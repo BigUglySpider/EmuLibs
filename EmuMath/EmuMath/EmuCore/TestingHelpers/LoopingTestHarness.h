@@ -13,6 +13,10 @@
 
 namespace EmuCore::TestingHelpers
 {
+	/// <summary>
+	/// <para> Type which may be used to easily perform basic timing tasks in bulk to calculate a semi-accurate average and collection of timings. </para>
+	/// </summary>
+	/// <typeparam name="ToExecutePerLoop">Type which will be passed as a non-const reference to execute via the () operator for each iteration in timing.</typeparam>
 	template<class ToExecutePerLoop>
 	class LoopingTestHarness
 	{

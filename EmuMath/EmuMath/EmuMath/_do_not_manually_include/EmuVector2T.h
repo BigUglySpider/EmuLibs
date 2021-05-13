@@ -3,6 +3,7 @@
 
 #include "EmuVectorInfo.h"
 #include <exception>
+#include <immintrin.h>
 
 namespace EmuMath
 {
@@ -642,6 +643,76 @@ namespace EmuMath
 				x = castVal;
 				y = castVal;
 			}
+		}
+#pragma endregion
+
+#pragma region OVERALL_OPERATIONS
+		template<typename OutT = nonref_value_type>
+		constexpr OutT OverallSum() const
+		{
+			if constexpr (std::is_same_v<nonref_value_type, OutT>)
+			{
+				return x + y;
+			}
+			else
+			{
+				return static_cast<OutT>(x) + static_cast<OutT>(y);
+			}
+		}
+		template<typename OutT = nonref_value_type>
+		constexpr OutT OverallProduct() const
+		{
+			if constexpr (std::is_same_v<nonref_value_type, OutT>)
+			{
+				return x * y;
+			}
+			else
+			{
+				return static_cast<OutT>(x) * static_cast<OutT>(y);
+			}
+		}
+		constexpr bool AllZero() const
+		{
+			const nonref_value_type zero = nonref_value_type();
+			return x == zero && y == zero;
+		}
+		constexpr nonref_value_type Min() const
+		{
+			return x < y ? x : y;
+		}
+		constexpr nonref_value_type Max() const
+		{
+			return x > y ? x : y;
+		}
+		constexpr Vector2<nonref_value_type> AsClampedMin(const value_type& min_) const
+		{
+			return { x > min_ ? x : min_, y > min_ ? y : min_ };
+		}
+		constexpr Vector2<nonref_value_type> AsClampedMax(const value_type& max_) const
+		{
+			return { x < max_ ? x : max_, y < max_ ? y : max_ };
+		}
+		constexpr Vector2<nonref_value_type> AsClamped(const value_type& min_, const value_type& max_) const
+		{
+			return
+			{
+				x < min_ ? min_ : x > max_ ? max_ : x,
+				y < min_ ? min_ : y > max_ ? max_ : y
+			};
+		}
+		void Clamp(const value_type& min_, const value_type& max_)
+		{
+			__m128 data128 = _mm_setr_ps(x, y, 0.0f, 0.0f);
+			const __m128 min128 = _mm_broadcast_ss(&min_);
+			const __m128 max128 = _mm_broadcast_ss(&max_);
+
+			__m128 clampedMin = _mm_and_ps(min128, _mm_cmplt_ps(data128, min128));
+			__m128 clampedMax = _mm_and_ps(max128, _mm_cmpgt_ps(data128, max128));
+
+			__m128 unaffectedMask = _mm_and_ps(_mm_cmpnlt_ps(data128, min128), _mm_cmpngt_ps(data128, max128));
+			data128 = _mm_or_ps(_mm_and_ps(data128, unaffectedMask), _mm_or_ps(clampedMin, clampedMax));
+			x = data128.m128_f32[0];
+			y = data128.m128_f32[1];
 		}
 #pragma endregion
 
