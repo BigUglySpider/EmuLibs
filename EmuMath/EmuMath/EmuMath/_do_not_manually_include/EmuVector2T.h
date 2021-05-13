@@ -684,35 +684,56 @@ namespace EmuMath
 		{
 			return x > y ? x : y;
 		}
+		constexpr Vector2<nonref_value_type> AsClampedMin(const Vector2<value_type>& min_) const
+		{
+			return { x > min_.x ? x : min_.x, y > min_.y ? y : min_.y };
+		}
 		constexpr Vector2<nonref_value_type> AsClampedMin(const value_type& min_) const
 		{
-			return { x > min_ ? x : min_, y > min_ ? y : min_ };
+			AsClampedMin(min_, min_);
+		}
+		constexpr Vector2<nonref_value_type> AsClampedMax(const Vector2<value_type>& max_) const
+		{
+			return { x < max_.x ? x : max_.x, y < max_.y ? y : max_.y };
 		}
 		constexpr Vector2<nonref_value_type> AsClampedMax(const value_type& max_) const
 		{
-			return { x < max_ ? x : max_, y < max_ ? y : max_ };
+			return this->AsClampedMax(Vector2<value_type>(max_, max_));
 		}
-		constexpr Vector2<nonref_value_type> AsClamped(const value_type& min_, const value_type& max_) const
+		constexpr Vector2<nonref_value_type> AsClamped(const Vector2<value_type>& min_, const Vector2<value_type>& max_) const
 		{
 			return
 			{
-				x < min_ ? min_ : x > max_ ? max_ : x,
-				y < min_ ? min_ : y > max_ ? max_ : y
+				x < min_.x ? min_.x : x > max_.x ? max_.x : x,
+				y < min_.y ? min_.y : y > max_.y ? max_.y : y
 			};
+		}
+		constexpr Vector2<nonref_value_type> AsClamped(const value_type& min_, const value_type& max_) const
+		{
+			return this->AsClamped(Vector2<value_type>(min_, min_), Vector2<value_type>(max_, max_));
+		}
+		void Clamp(const Vector2<value_type>& min_, const Vector2<value_type>& max_)
+		{
+			if (x < min_.x)
+			{
+				x = min_.x;
+			}
+			else if (x > max_.x)
+			{
+				x = max_.x;
+			}
+			if (y < min_.y)
+			{
+				y = min_.y;
+			}
+			else if (y > max_.y)
+			{
+				y = max_.y;
+			}
 		}
 		void Clamp(const value_type& min_, const value_type& max_)
 		{
-			__m128 data128 = _mm_setr_ps(x, y, 0.0f, 0.0f);
-			const __m128 min128 = _mm_broadcast_ss(&min_);
-			const __m128 max128 = _mm_broadcast_ss(&max_);
-
-			__m128 clampedMin = _mm_and_ps(min128, _mm_cmplt_ps(data128, min128));
-			__m128 clampedMax = _mm_and_ps(max128, _mm_cmpgt_ps(data128, max128));
-
-			__m128 unaffectedMask = _mm_and_ps(_mm_cmpnlt_ps(data128, min128), _mm_cmpngt_ps(data128, max128));
-			data128 = _mm_or_ps(_mm_and_ps(data128, unaffectedMask), _mm_or_ps(clampedMin, clampedMax));
-			x = data128.m128_f32[0];
-			y = data128.m128_f32[1];
+			this->Clamp(Vector2<value_type>(min_, min_), Vector2<value_type>(max_, max_));
 		}
 #pragma endregion
 
@@ -819,7 +840,10 @@ namespace EmuMath
 		}
 #pragma endregion
 
-		value_type x, y;
+		/// <summary> The first component of this vector, representing the X-axis. </summary>
+		value_type x;
+		/// <summary> The second component of this vector, representing the Y-axis. </summary>
+		value_type y;
 
 	private:
 		template<std::size_t Index, typename T_>
