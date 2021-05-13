@@ -30,7 +30,7 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region Constructors
+#pragma region CONSTRUCTORS
 		constexpr Vector2() :
 			x(),
 			y()
