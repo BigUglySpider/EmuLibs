@@ -526,7 +526,37 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region VECTOR_OPERATIONS
-
+		constexpr float Magnitudef() const
+		{
+			return sqrtf(SquareMagnitude<float>());
+		}
+		constexpr double Magnituded() const
+		{
+			return sqrt(SquareMagnitude<double>());
+		}
+		constexpr long double Magnitudeld() const
+		{
+			return sqrt(SquareMagnitude<long double>());
+		}
+		template<typename OutT = nonref_value_type>
+		constexpr OutT SquareMagnitude() const
+		{
+			if constexpr (std::is_same_v<nonref_value_type, OutT>)
+			{
+				return x * x + y * y;
+			}
+			else
+			{
+				if constexpr (sizeof(OutT) > sizeof(nonref_value_type))
+				{
+					return (static_cast<OutT>(x) * x) + (static_cast<OutT>(y) * y);
+				}
+				else
+				{
+					return static_cast<OutT>(x * x + y * y);
+				}
+			}
+		}
 #pragma endregion
 
 		value_type x, y;
