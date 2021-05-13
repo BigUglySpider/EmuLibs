@@ -412,10 +412,130 @@ namespace EmuMath
 		{
 			return x == rhs.x && y == rhs.y;
 		}
+		template<typename RhsT>
+		constexpr bool operator==(const RhsT& rhs) const
+		{
+			if constexpr (info_type::has_integral_values)
+			{
+				return this->SquareMagnitude<std::uint64_t>() == rhs;
+			}
+			else
+			{
+				return this->SquareMagnitude<long double>() == rhs;
+			}
+		}
 		template<typename OtherT>
 		constexpr bool operator!=(const Vector2<OtherT>& rhs) const
 		{
 			return x != rhs.x || y != rhs.y;
+		}
+		template<typename RhsT>
+		constexpr bool operator!=(const RhsT& rhs) const
+		{
+			if constexpr (info_type::has_integral_values)
+			{
+				return this->SquareMagnitude<std::uint64_t>() != rhs;
+			}
+			else
+			{
+				return this->SquareMagnitude<long double>() != rhs;
+			}
+		}
+		template<typename OtherT>
+		constexpr bool operator>(const Vector2<OtherT>& rhs) const
+		{
+			if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
+			{
+				return SquareMagnitude<std::uint64_t>() > rhs.SquareMagnitude<std::uint64_t>();
+			}
+			else
+			{
+				return SquareMagnitude<long double>() > rhs.SquareMagnitude<long double>();
+			}
+		}
+		template<typename RhsT>
+		constexpr bool operator>(const RhsT& rhs) const
+		{
+			if constexpr (info_type::has_integral_values)
+			{
+				return this->SquareMagnitude<std::uint64_t>() > rhs;
+			}
+			else
+			{
+				return this->SquareMagnitude<long double>() > rhs;
+			}
+		}
+		template<typename OtherT>
+		constexpr bool operator<(const Vector2<OtherT>& rhs) const
+		{
+			if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
+			{
+				return SquareMagnitude<std::uint64_t>() < rhs.SquareMagnitude<std::uint64_t>();
+			}
+			else
+			{
+				return SquareMagnitude<long double>() < rhs.SquareMagnitude<long double>();
+			}
+		}
+		template<typename RhsT>
+		constexpr bool operator<(const RhsT& rhs) const
+		{
+			if constexpr (info_type::has_integral_values)
+			{
+				return this->SquareMagnitude<std::uint64_t>() < rhs;
+			}
+			else
+			{
+				return this->SquareMagnitude<long double>() < rhs;
+			}
+		}
+		template<typename OtherT>
+		constexpr bool operator>=(const Vector2<OtherT>& rhs) const
+		{
+			if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
+			{
+				return SquareMagnitude<std::uint64_t>() >= rhs.SquareMagnitude<std::uint64_t>();
+			}
+			else
+			{
+				return SquareMagnitude<long double>() >= rhs.SquareMagnitude<long double>();
+			}
+		}
+		template<typename RhsT>
+		constexpr bool operator>=(const RhsT& rhs) const
+		{
+			if constexpr (info_type::has_integral_values)
+			{
+				return this->SquareMagnitude<std::uint64_t>() >= rhs;
+			}
+			else
+			{
+				return this->SquareMagnitude<long double>() >= rhs;
+			}
+		}
+		template<typename OtherT>
+		constexpr bool operator<=(const Vector2<OtherT>& rhs) const
+		{
+			if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
+			{
+				return SquareMagnitude<std::uint64_t>() <= rhs.SquareMagnitude<std::uint64_t>();
+			}
+			else
+			{
+				return SquareMagnitude<long double>() <= rhs.SquareMagnitude<long double>();
+			}
+		}
+		template<typename RhsT>
+		constexpr bool operator<=(const RhsT& rhs) const
+		{
+			if constexpr (info_type::has_integral_values)
+			{
+				return this->SquareMagnitude<std::uint64_t>() <= rhs;
+			}
+			else
+			{
+				return this->SquareMagnitude<long double>() <= rhs;
+			}
 		}
 #pragma endregion
 
@@ -526,15 +646,15 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region VECTOR_OPERATIONS
-		constexpr float Magnitudef() const
+		float Magnitudef() const
 		{
 			return sqrtf(SquareMagnitude<float>());
 		}
-		constexpr double Magnituded() const
+		double Magnituded() const
 		{
 			return sqrt(SquareMagnitude<double>());
 		}
-		constexpr long double Magnitudeld() const
+		long double Magnitudeld() const
 		{
 			return sqrt(SquareMagnitude<long double>());
 		}
@@ -555,6 +675,75 @@ namespace EmuMath
 				{
 					return static_cast<OutT>(x * x + y * y);
 				}
+			}
+		}
+		template<typename RhsT, typename OutT = nonref_value_type>
+		constexpr OutT DotProduct(const Vector2<RhsT>& rhs) const
+		{
+			if constexpr (std::is_same_v<nonref_value_type, typename info_type_t<RhsT>::nonref_value_type>)
+			{
+				if constexpr (std::is_same_v<nonref_value_type, OutT>)
+				{
+					return x * rhs.x + y * rhs.y;
+				}
+				else
+				{
+					if constexpr (sizeof(OutT) > sizeof(nonref_value_type))
+					{
+						return (static_cast<OutT>(x) * rhs.x) + (static_cast<OutT>(y) * rhs.y);
+					}
+					else
+					{
+						return static_cast<OutT>(x * rhs.x + y * rhs.y);
+					}
+				}
+			}
+			else
+			{
+				if constexpr (sizeof(OutT) > sizeof(nonref_value_type))
+				{
+					return (static_cast<OutT>(x) * rhs.x) + (static_cast<OutT>(y) * rhs.y);
+				}
+				else
+				{
+					return static_cast<OutT>(x * static_cast<nonref_value_type>(rhs.x) + y * static_cast<nonref_value_type>(rhs.y));
+				}
+			}
+		}
+		Vector2<float> AsNormalisedf() const
+		{
+			const float reciprocal = 1.0f / Magnitudef();
+			if constexpr (std::is_same_v<nonref_value_type, float>)
+			{
+				return { x * reciprocal, y * reciprocal };
+			}
+			else
+			{
+				return { static_cast<float>(x * reciprocal), static_cast<float>(y * reciprocal) };
+			}
+		}
+		Vector2<double> AsNormalisedd() const
+		{
+			const double reciprocal = 1.0f / Magnituded();
+			if constexpr (std::is_same_v<nonref_value_type, double>)
+			{
+				return { x * reciprocal, y * reciprocal };
+			}
+			else
+			{
+				return { static_cast<double>(x * reciprocal), static_cast<double>(y * reciprocal) };
+			}
+		}
+		Vector2<long double> AsNormalisedld() const
+		{
+			const long double reciprocal = 1.0f / Magnituded();
+			if constexpr (std::is_same_v<nonref_value_type, long double>)
+			{
+				return { x * reciprocal, y * reciprocal };
+			}
+			else
+			{
+				return { static_cast<long double>(x * reciprocal), static_cast<long double>(y * reciprocal) };
 			}
 		}
 #pragma endregion
