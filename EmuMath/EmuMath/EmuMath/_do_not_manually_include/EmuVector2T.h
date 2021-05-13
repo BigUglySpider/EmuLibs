@@ -500,9 +500,51 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region SETS
+		template<typename X_, typename Y_>
+		void SetAll(const X_& x_, const Y_& y_)
+		{
+			_set_individual_value<0, X_>(x_);
+			_set_individual_value<1, Y_>(y_);
+		}
+
+		template<typename T_>
+		void SetAll(const T_& val_)
+		{
+			if constexpr (std::is_same_v<nonref_value_type, std::remove_reference_t<T_>>)
+			{
+				x = val_;
+				y = val_;
+			}
+			else
+			{
+				const nonref_value_type castVal = static_cast<nonref_value_type>(val_);
+				x = castVal;
+				y = castVal;
+			}
+		}
+#pragma endregion
+
+#pragma region VECTOR_OPERATIONS
+
+#pragma endregion
+
 		value_type x, y;
 
 	private:
+		template<std::size_t Index, typename T_>
+		constexpr void _set_individual_value(const T_& val_)
+		{
+			if constexpr (std::is_same_v<nonref_value_type, std::remove_reference_t<T_>>)
+			{
+				at<Index>() = val_;
+			}
+			else
+			{
+				at<Index>() = static_cast<nonref_value_type>(val_);
+			}
+		}
+
 		static constexpr value_type _value_one()
 		{
 			if constexpr (info_type::has_integral_values)
