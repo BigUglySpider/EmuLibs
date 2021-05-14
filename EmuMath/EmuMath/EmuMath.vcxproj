@@ -147,6 +147,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EmuCore\ArithmeticHelpers\CommonValues.h" />
     <ClInclude Include="EmuCore\FileHelpers\PathValidation.h" />
     <ClInclude Include="EmuCore\TestingHelpers\LoopingTestHarness.h" />
     <ClInclude Include="EmuMath\EmuVector.h" />

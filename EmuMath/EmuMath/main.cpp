@@ -34,14 +34,21 @@ int main()
 
 	constexpr long double MAG = CONSTEXPR_32I2_ORED.SquareMagnitude();
 
-	constexpr Vector2<float> CLAMPED = Vector2<float>(1.0f, 25.0f).AsClamped(0.0f, 4.0f);
+	constexpr Vector2<float> CLAMPED = Vector2<float>(1.0f, 25.0f).AsClamped(0.0f, 4.35f);
 
-	Vector2<float> yo;
+	Vector2<float> yo = CLAMPED;
+	Vector2<const float&> yoRef = yo.ShuffledReference<0, 1>();
+
+	std::cout << "Floored: "<< yoRef.AsFloored() << "\n";
+	Vector2<const float&> boi = yoRef;
+
+	Vector2<float&> anotherRef = yo;
 
 	constexpr std::size_t NUM_LOOPS = 5000000;
 	using TEST_A = TestA<float>;
 	LoopingTestHarness<TEST_A> testHarnessA;
 	TEST_A testA(NUM_LOOPS);
+
 
 	Vector2<float> a = Vector2<float>(15u, 1.0f);
 	std::cout << a << "\n";

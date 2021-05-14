@@ -38,5 +38,8 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\EmuVectorInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuCore\ArithmeticHelpers\CommonValues.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

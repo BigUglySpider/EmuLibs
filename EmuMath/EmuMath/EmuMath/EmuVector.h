@@ -28,6 +28,8 @@ namespace EmuMath
 	using Vector2ui32 = EmuMath::Vector2<std::uint32_t>;
 	/// <summary> 2-dimensional vector of 64-bit unsigned integers. </summary>
 	using Vector2ui64 = EmuMath::Vector2<std::uint64_t>;
+	/// <summary> 2-dimensional vector of std::size_t elements. </summary>
+	using Vector2size_t = EmuMath::Vector2<std::size_t>;
 }
 
 template<typename T>

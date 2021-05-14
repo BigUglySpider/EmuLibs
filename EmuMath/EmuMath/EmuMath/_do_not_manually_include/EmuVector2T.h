@@ -12,6 +12,8 @@ namespace EmuMath
 	{
 #pragma region ALIASES_AND_STATIC_CONSTANT_EXPRESSIONS
 	protected:
+		/// <summary> Templatised type containing info for all sizes of vectors containing the passed type T_. </summary>
+		/// <typeparam name="T_">Type contained within the vector for which the info is required.</typeparam>
 		template<typename T_>
 		using info_type_t = EmuMath::_info::VectorInfo<T_>;
 
@@ -24,7 +26,12 @@ namespace EmuMath
 		using nonref_value_type = typename info_type::nonref_value_type;
 		/// <summary> The reference variant of value types stored within this vector. </summary>
 		using ref_value_type = typename info_type::ref_value_type;
+		/// <summary> The constant reference variant of value types stored within this vector. </summary>
+		using const_ref_value_type = typename info_type::const_ref_value_type;
+		using nonref_value_type_without_qualifiers = typename info_type::nonref_value_type_without_qualifiers;
 
+		/// <summary> The number of elements contained within this vector. </summary>
+		/// <returns>2</returns>
 		static constexpr std::size_t size()
 		{
 			return 2;
@@ -33,36 +40,64 @@ namespace EmuMath
 
 #pragma region CONSTRUCTORS
 
+		/// <summary> Constructs a 2-dimensional Vector with its x and y elements set to their default constructors. </summary>
 		constexpr Vector2() :
 			x(),
 			y()
 		{
 		}
+		/// <summary> Constructs a 2-dimensional Vector with its x and y elements set to copies of the respective passed values. </summary>
+		/// <param name="x_">Value to copy to the Vector's x component.</param>
+		/// <param name="y_">Value to copy to the Vector's y component.</param>
 		constexpr Vector2(const value_type& x_, const value_type& y_) :
 			x(x_),
 			y(y_)
 		{
 		}
+		/// <summary> Constructs a 2-dimensional Vector with its x and y elements set to copies of the respective passed values after a static_cast. </summary>
+		/// <typeparam name="X_">Non value_type type used for the passed x_ value.</typeparam>
+		/// <typeparam name="Y_">Non value_type type used for the passed y_ value.</typeparam>
+		/// <param name="x_">Value to cast and copy to the Vector's x component.</param>
+		/// <param name="y_">Value to cast and copy to the Vector's y component.</param>
 		template<typename X_, typename Y_>
 		constexpr Vector2(const X_& x_, const Y_& y_) :
 			x(static_cast<value_type>(x_)),
 			y(static_cast<value_type>(y_))
 		{
 		}
+		/// <summary> Constructs a 2-dimensional Vector with its x set to a copy of the passed x_ value after a static_cast, and y a direct copy of the passed y_ value. </summary>
+		/// <typeparam name="X_">Non value_type type used for the passed x_ value.</typeparam>
+		/// <param name="x_">Value to cast and copy to the Vector's x component.</param>
+		/// <param name="y_">Value to copy to the Vector's y component.</param>
 		template<typename X_>
 		constexpr Vector2(const X_& x_, const value_type& y_) :
 			x(static_cast<value_type>(x_)),
 			y(y_)
 		{
 		}
+		/// <summary> Constructs a 2-dimensional Vector with its x set to a copy of the passed x_ value, and y a copy of the passed y_ value after a static_cast. </summary>
+		/// <typeparam name="Y_">Non value_type type used for the passed y_ value.</typeparam>
+		/// <param name="x_">Value to copy to the Vector's x component.</param>
+		/// <param name="y_">Value to cast and copy to the Vector's y component.</param>
 		template<typename Y_>
 		constexpr Vector2(const value_type& x_, const Y_& y_) :
 			x(x_),
 			y(static_cast<value_type>(y_))
 		{
 		}
+		/// <summary> Constructs a 2-dimensional vector with its x and y components set to copies of the passed vector's respective components, performing casts where needed. </summary>
+		/// <typeparam name="OtherT">The contained type within the passed Vector2.</typeparam>
+		/// <param name="toCopy">Vector to copy the elements of.</param>
 		template<typename OtherT>
 		constexpr Vector2(const Vector2<OtherT>& toCopy) :
+			Vector2(toCopy.x, toCopy.y)
+		{
+		}
+		/// <summary> Constructs a 2-dimensional vector with its x and y components set to copies of the passed vector's respective components, performing casts where needed. </summary>
+		/// <typeparam name="OtherT">The contained type within the passed Vector2.</typeparam>
+		/// <param name="toCopy">Vector to copy the elements of.</param>
+		template<typename OtherT>
+		constexpr Vector2(Vector2<OtherT>& toCopy) :
 			Vector2(toCopy.x, toCopy.y)
 		{
 		}
@@ -73,7 +108,7 @@ namespace EmuMath
 		{
 			return at(index);
 		}
-		const ref_value_type operator[](const std::size_t index) const
+		const_ref_value_type operator[](const std::size_t index) const
 		{
 			return at(index);
 		}
@@ -89,7 +124,7 @@ namespace EmuMath
 					throw std::logic_error("Attempted to access an EmuMath::Vector2 element by an index which does not exist.");
 			}
 		}
-		const ref_value_type at(std::size_t index) const
+		const_ref_value_type at(std::size_t index) const
 		{
 			switch (index)
 			{
@@ -118,7 +153,7 @@ namespace EmuMath
 			}
 		}
 		template<std::size_t index>
-		constexpr const ref_value_type at() const
+		constexpr const_ref_value_type at() const
 		{
 			if constexpr (index == 0)
 			{
@@ -139,7 +174,7 @@ namespace EmuMath
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator+(const Vector2<OtherT>& rhs) const
 		{
-			if constexpr (std::is_same_v<nonref_value_type, typename Vector2<OtherT>::nonref_value_type>)
+			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
 			{
 				return { x + rhs.x, y + rhs.y };
 			}
@@ -151,7 +186,7 @@ namespace EmuMath
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator-(const Vector2<OtherT>& rhs) const
 		{
-			if constexpr (std::is_same_v<nonref_value_type, typename Vector2<OtherT>::nonref_value_type>)
+			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
 			{
 				return { x - rhs.x, y - rhs.y };
 			}
@@ -163,7 +198,7 @@ namespace EmuMath
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator*(const Vector2<OtherT>& rhs) const
 		{
-			if constexpr (std::is_same_v<nonref_value_type, Vector2<OtherT>::nonref_value_type>)
+			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
 			{
 				return { x * rhs.x, y * rhs.y };
 			}
@@ -176,7 +211,7 @@ namespace EmuMath
 		constexpr Vector2<nonref_value_type> operator*(const RhsT& rhs) const
 		{
 			using NonRefRhs = std::remove_reference_t<RhsT>;
-			if constexpr (std::is_same_v<nonref_value_type, NonRefRhs> || !info_type::has_arithmetic_values || !std::is_arithmetic_v<NonRefRhs>)
+			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, NonRefRhs> || !info_type::has_arithmetic_values || !std::is_arithmetic_v<NonRefRhs>)
 			{
 				return { x * rhs, y * rhs };
 			}
@@ -188,7 +223,7 @@ namespace EmuMath
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator/(const Vector2<OtherT>& rhs) const
 		{
-			if constexpr (std::is_same_v<nonref_value_type, typename Vector2<OtherT>::nonref_value_type>)
+			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
 			{
 				return { x / rhs.x, y / rhs.y };
 			}
@@ -203,7 +238,7 @@ namespace EmuMath
 			using NonRefRhs = std::remove_reference_t<RhsT>;
 			if constexpr (info_type::has_floating_point_values && std::is_arithmetic_v<NonRefRhs>)
 			{
-				return this->operator*(_value_one() / rhs);
+				return this->operator*(info_type::value_one / rhs);
 			}
 			else
 			{
@@ -242,7 +277,7 @@ namespace EmuMath
 		{
 			if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
 			{
-				if constexpr (std::is_same_v<nonref_value_type, typename Vector2<OtherT>::nonref_value_type>)
+				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
 				{
 					return { x & rhs.x, y & rhs.y };
 				}
@@ -263,7 +298,7 @@ namespace EmuMath
 			using NonRefRhs = std::remove_reference_t<RhsT>;
 			if constexpr (info_type::has_integral_values && std::is_integral_v<NonRefRhs>)
 			{
-				if constexpr (std::is_same_v<nonref_value_type, NonRefRhs>)
+				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, NonRefRhs>)
 				{
 					return { x & rhs, y & rhs };
 				}
@@ -283,7 +318,7 @@ namespace EmuMath
 		{
 			if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
 			{
-				if constexpr (std::is_same_v<nonref_value_type, typename Vector2<OtherT>::nonref_value_type>)
+				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
 				{
 					return { x | rhs.x, y | rhs.y };
 				}
@@ -304,7 +339,7 @@ namespace EmuMath
 			using NonRefRhs = std::remove_reference_t<RhsT>;
 			if constexpr (info_type::has_integral_values && std::is_integral_v<NonRefRhs>)
 			{
-				if constexpr (std::is_same_v<nonref_value_type, NonRefRhs>)
+				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, NonRefRhs>)
 				{
 					return { x | rhs, y | rhs };
 				}
@@ -324,7 +359,7 @@ namespace EmuMath
 		{
 			if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
 			{
-				if constexpr (std::is_same_v<nonref_value_type, typename Vector2<OtherT>::nonref_value_type>)
+				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
 				{
 					return { x ^ rhs.x, y ^ rhs.y };
 				}
@@ -345,7 +380,7 @@ namespace EmuMath
 			using NonRefRhs = std::remove_reference_t<RhsT>;
 			if constexpr (info_type::has_integral_values && std::is_integral_v<NonRefRhs>)
 			{
-				if constexpr (std::is_same_v<nonref_value_type, NonRefRhs>)
+				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, NonRefRhs>)
 				{
 					return { x ^ rhs, y ^ rhs };
 				}
@@ -425,6 +460,10 @@ namespace EmuMath
 				return *this;
 			}
 		}
+#pragma endregion
+
+#pragma region ARITHMETIC_NONCONST_OPERATORS
+
 #pragma endregion
 
 #pragma region BOOLEAN_COMPARISON_OPERATORS
@@ -627,7 +666,7 @@ namespace EmuMath
 			return { at<X_>(), at<Y_>() };
 		}
 		template<std::size_t X_, std::size_t Y_>
-		constexpr Vector2<ref_value_type> ShuffledReference() const
+		constexpr Vector2<const_ref_value_type> ShuffledReference() const
 		{
 			return { at<X_>(), at<Y_>() };
 		}
@@ -635,7 +674,7 @@ namespace EmuMath
 		{
 			return { at(x_), at(y_) };
 		}
-		Vector2<const ref_value_type> ShuffledReference(const std::size_t x_, const std::size_t y_) const
+		Vector2<const_ref_value_type> ShuffledReference(const std::size_t x_, const std::size_t y_) const
 		{
 			return { at(x_), at(y_) };
 		}
@@ -643,34 +682,68 @@ namespace EmuMath
 
 #pragma region SETS
 		template<typename X_, typename Y_>
-		void SetAll(const X_& x_, const Y_& y_)
+		constexpr void SetAll(const X_& x_, const Y_& y_)
 		{
-			_set_individual_value<0, X_>(x_);
-			_set_individual_value<1, Y_>(y_);
-		}
-
-		template<typename T_>
-		void SetAll(const T_& val_)
-		{
-			if constexpr (std::is_same_v<nonref_value_type, std::remove_reference_t<T_>>)
+			if constexpr (!info_type::has_const_values)
 			{
-				x = val_;
-				y = val_;
+				_set_individual_value<0, X_>(x_);
+				_set_individual_value<1, Y_>(y_);
 			}
 			else
 			{
-				const nonref_value_type castVal = static_cast<nonref_value_type>(val_);
-				x = castVal;
-				y = castVal;
+				static_assert(false, "Attempted to perform a non-const function (SetAll<X_, Y_>) on an EmuMath::Vector2 which contains constant values.");
+			}
+		}
+
+		template<typename T_>
+		constexpr void SetAll(const T_& val_)
+		{
+			if constexpr (!info_type::has_const_values)
+			{
+				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, std::remove_reference_t<T_>>)
+				{
+					x = val_;
+					y = val_;
+				}
+				else
+				{
+					const nonref_value_type castVal = static_cast<nonref_value_type>(val_);
+					x = castVal;
+					y = castVal;
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (SetAll<T_>) on an EmuMath::Vector2 which contains constant values.");
 			}
 		}
 #pragma endregion
 
 #pragma region OVERALL_OPERATIONS
+		template<typename OutT = float>
+		constexpr Vector2<OutT> Reciprocal() const
+		{
+			if constexpr (std::is_floating_point_v<OutT>)
+			{
+				constexpr OutT one_ = EmuCore::ArithmeticHelpers::OneT<OutT>;
+				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, OutT>)
+				{
+					return { one_ / x, one_ / y };
+				}
+				else
+				{
+					return { one_ / static_cast<OutT>(x), one_ / static_cast<OutT>(y) };
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to retrieve a non-floating-point reciprocal from an EmuMath::Vector2, which is not allowed.");
+			}
+		}
 		template<typename OutT = nonref_value_type>
 		constexpr OutT OverallSum() const
 		{
-			if constexpr (std::is_same_v<nonref_value_type, OutT>)
+			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, OutT>)
 			{
 				return x + y;
 			}
@@ -682,7 +755,7 @@ namespace EmuMath
 		template<typename OutT = nonref_value_type>
 		constexpr OutT OverallProduct() const
 		{
-			if constexpr (std::is_same_v<nonref_value_type, OutT>)
+			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, OutT>)
 			{
 				return x * y;
 			}
@@ -734,21 +807,28 @@ namespace EmuMath
 		}
 		void Clamp(const Vector2<value_type>& min_, const Vector2<value_type>& max_)
 		{
-			if (x < min_.x)
+			if constexpr (!info_type::has_const_values)
 			{
-				x = min_.x;
+				if (x < min_.x)
+				{
+					x = min_.x;
+				}
+				else if (x > max_.x)
+				{
+					x = max_.x;
+				}
+				if (y < min_.y)
+				{
+					y = min_.y;
+				}
+				else if (y > max_.y)
+				{
+					y = max_.y;
+				}
 			}
-			else if (x > max_.x)
+			else
 			{
-				x = max_.x;
-			}
-			if (y < min_.y)
-			{
-				y = min_.y;
-			}
-			else if (y > max_.y)
-			{
-				y = max_.y;
+				static_assert(false, "Attempted to perform a non-const function (Clamp) on an EmuMath::Vector2 which contains constant values.");
 			}
 		}
 		void Clamp(const value_type& min_, const value_type& max_)
@@ -763,11 +843,11 @@ namespace EmuMath
 			}
 			else if constexpr(info_type::has_floating_point_values)
 			{
-				if constexpr (std::is_same_v<nonref_value_type, float>)
+				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, float>)
 				{
 					return { floorf(x), floorf(y) };
 				}
-				else if constexpr (std::is_same_v<nonref_value_type, double>)
+				else if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, double>)
 				{
 					return { floor(x), floor(y) };
 				}
@@ -783,31 +863,38 @@ namespace EmuMath
 		}
 		void Floor()
 		{
-			// Don't need to do anything if already integers
-			if constexpr (!info_type::has_integral_values)
+			if constexpr (!info_type::has_const_values)
 			{
-				if constexpr (info_type::has_floating_point_values)
+				// Don't need to do anything if already integers
+				if constexpr (!info_type::has_integral_values)
 				{
-					if constexpr (std::is_same_v<nonref_value_type, float>)
+					if constexpr (info_type::has_floating_point_values)
 					{
-						x = floorf(x);
-						y = floorf(y);
-					}
-					else if constexpr (std::is_same_v<nonref_value_type, double>)
-					{
-						x = floor(x);
-						y = floor(y);
+						if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, float>)
+						{
+							x = floorf(x);
+							y = floorf(y);
+						}
+						else if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, double>)
+						{
+							x = floor(x);
+							y = floor(y);
+						}
+						else
+						{
+							x = floorl(x);
+							y = floorl(y);
+						}
 					}
 					else
 					{
-						x = floorl(x);
-						y = floorl(y);
+						static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
 					}
 				}
-				else
-				{
-					static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
-				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (Floor) on an EmuMath::Vector2 which contains constant values.");
 			}
 		}
 		Vector2<nonref_value_type> AsCeiled() const
@@ -818,11 +905,11 @@ namespace EmuMath
 			}
 			else if constexpr (info_type::has_floating_point_values)
 			{
-				if constexpr (std::is_same_v<nonref_value_type, float>)
+				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, float>)
 				{
 					return { ceilf(x), ceilf(y) };
 				}
-				else if constexpr (std::is_same_v<nonref_value_type, double>)
+				else if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, double>)
 				{
 					return { ceil(x), ceil(y) };
 				}
@@ -839,30 +926,37 @@ namespace EmuMath
 		}
 		void Ceil()
 		{
-			if constexpr (!info_type::has_integral_values)
+			if constexpr (!info_type::has_const_values)
 			{
-				if constexpr (info_type::has_floating_point_values)
+				if constexpr (!info_type::has_integral_values)
 				{
-					if constexpr (std::is_same_v<nonref_value_type, float>)
+					if constexpr (info_type::has_floating_point_values)
 					{
-						x = ceilf(x);
-						y = ceilf(y);
-					}
-					else if constexpr (std::is_same_v<nonref_value_type, double>)
-					{
-						x = ceil(x);
-						y = ceil(y);
+						if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, float>)
+						{
+							x = ceilf(x);
+							y = ceilf(y);
+						}
+						else if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, double>)
+						{
+							x = ceil(x);
+							y = ceil(y);
+						}
+						else
+						{
+							x = ceill(x);
+							y = ceill(y);
+						}
 					}
 					else
 					{
-						x = ceill(x);
-						y = ceill(y);
+						static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
 					}
 				}
-				else
-				{
-					static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
-				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (Ceil) on an EmuMath::Vector2 which contains constant values.");
 			}
 		}
 		constexpr Vector2<nonref_value_type> AsTrunced() const
@@ -888,21 +982,28 @@ namespace EmuMath
 		}
 		constexpr void Trunc()
 		{
-			if constexpr (!info_type::has_integral_values)
+			if constexpr (!info_type::has_const_values)
 			{
-				if constexpr (info_type::has_floating_point_values)
+				if constexpr (!info_type::has_integral_values)
 				{
-					// Faster to do a double cast than call trunc functions
-					return
+					if constexpr (info_type::has_floating_point_values)
 					{
-						static_cast<nonref_value_type>(static_cast<std::int64_t>(x)),
-						static_cast<nonref_value_type>(static_cast<std::int64_t>(y))
-					};
+						// Faster to do a double cast than call trunc functions
+						return
+						{
+							static_cast<nonref_value_type>(static_cast<std::int64_t>(x)),
+							static_cast<nonref_value_type>(static_cast<std::int64_t>(y))
+						};
+					}
+					else
+					{
+						static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
+					}
 				}
-				else
-				{
-					static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
-				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (Clamp) on an EmuMath::Vector2 which contains constant values.");
 			}
 		}
 #pragma endregion
@@ -1040,10 +1141,11 @@ namespace EmuMath
 		value_type y;
 
 	private:
+#pragma region PRIVATE_HELPERS
 		template<std::size_t Index, typename T_>
 		constexpr void _set_individual_value(const T_& val_)
 		{
-			if constexpr (std::is_same_v<nonref_value_type, std::remove_reference_t<T_>>)
+			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, std::remove_reference_t<T_>>)
 			{
 				at<Index>() = val_;
 			}
@@ -1071,29 +1173,7 @@ namespace EmuMath
 				return sqrtl(distX * distX + distY * distY) <= maxDistance;
 			}
 		}
-
-		static constexpr value_type _value_one()
-		{
-			if constexpr (info_type::has_integral_values)
-			{
-				return 1;
-			}
-			else if constexpr (info_type::has_floating_point_values)
-			{
-				if constexpr (std::is_same_v<float, value_type>)
-				{
-					return 1.0f;
-				}
-				else
-				{
-					return 1.0;
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to use _value_one for an EmuMath::Vector2 variant which does not have a solid representation of 1.");
-			}
-		}
+#pragma endregion
 	};
 }
 
