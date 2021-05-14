@@ -66,16 +66,6 @@ namespace EmuMath
 			Vector2(toCopy.x, toCopy.y)
 		{
 		}
-		Vector2(nonref_value_type* pToLoad) :
-			x(*pToLoad),
-			y(*(pToLoad + 1))
-		{
-		}
-		Vector2(const nonref_value_type* pToLoad) :
-			x(*pToLoad),
-			y(*(pToLoad + 1))
-		{
-		}
 #pragma endregion
 
 #pragma region RANDOM_ACCESS
