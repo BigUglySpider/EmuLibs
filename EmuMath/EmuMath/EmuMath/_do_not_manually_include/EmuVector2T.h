@@ -463,7 +463,448 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region ARITHMETIC_NONCONST_OPERATORS
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator+=(const Vector2<OtherT>& rhs)
+		{
+			if constexpr (!info_type::has_const_values)
+			{
+				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
+				{
+					x += rhs.x;
+					y += rhs.y;
+				}
+				else
+				{
+					x += static_cast<nonref_value_type>(rhs.x);
+					y += static_cast<nonref_value_type>(rhs.y);
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (+=) on an EmuMath::Vector2 which contains constant values.");
+			}
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator-=(const Vector2<OtherT>& rhs)
+		{
+			if constexpr (!info_type::has_const_values)
+			{
+				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
+				{
+					x -= rhs.x;
+					y -= rhs.y;
+				}
+				else
+				{
+					x -= static_cast<nonref_value_type>(rhs.x);
+					y -= static_cast<nonref_value_type>(rhs.y);
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (-=) on an EmuMath::Vector2 which contains constant values.");
+			}
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator*=(const Vector2<OtherT>& rhs)
+		{
+			if constexpr (!info_type::has_const_values)
+			{
+				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
+				{
+					x *= rhs.x;
+					y *= rhs.y;
+				}
+				else
+				{
+					x *= static_cast<nonref_value_type>(rhs.x);
+					y *= static_cast<nonref_value_type>(rhs.y);
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (*=) on an EmuMath::Vector2 which contains constant values.");
+			}
+			return *this;
+		}
+		template<typename RhsT>
+		constexpr Vector2<value_type>& operator*=(const RhsT& rhs)
+		{
+			if constexpr (!info_type::has_const_values)
+			{
+				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<RhsT>::nonref_value_type_without_qualifiers>)
+				{
+					x *= rhs;
+					y *= rhs;
+				}
+				else
+				{
+					x *= static_cast<nonref_value_type>(rhs);
+					y *= static_cast<nonref_value_type>(rhs);
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (*=) on an EmuMath::Vector2 which contains constant values.");
+			}
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator/=(const Vector2<OtherT>& rhs)
+		{
+			if constexpr (!info_type::has_const_values)
+			{
+				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
+				{
+					x /= rhs.x;
+					y /= rhs.y;
+				}
+				else
+				{
+					x /= static_cast<nonref_value_type>(rhs.x);
+					y /= static_cast<nonref_value_type>(rhs.y);
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (/=) on an EmuMath::Vector2 which contains constant values.");
+			}
+			return *this;
+		}
+		template<typename RhsT>
+		constexpr Vector2<value_type>& operator/=(const RhsT& rhs)
+		{
+			if constexpr (!info_type::has_const_values)
+			{
+				using NonRefRhs = std::remove_reference_t<RhsT>;
+				if constexpr (info_type::has_floating_point_values && std::is_arithmetic_v<NonRefRhs>)
+				{
+					// Early return from this func, which defers division to a reciprocal multiplication
+					return this->operator*=(info_type::value_one / rhs);
+				}
+				else
+				{
+					x /= static_cast<nonref_value_type>(rhs.x);
+					y /= static_cast<nonref_value_type>(rhs.y);
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (/=) on an EmuMath::Vector2 which contains constant values.");
+			}
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator%=(const Vector2<OtherT>& rhs)
+		{
+			if constexpr (!info_type::has_const_values)
+			{
+				if constexpr (!(info_type::has_floating_point_values || info_type_t<OtherT>::has_floating_point_values))
+				{
+					x %= rhs.x;
+					y %= rhs.y;
+				}
+				else
+				{
+					static_assert(false, "Attempted to use modulus operator (%) with an EmuMath::Vector2 using incompatible floating point values.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (%=) on an EmuMath::Vector2 which contains constant values.");
+			}
+			return *this;
+		}
+		template<typename RhsT>
+		constexpr Vector2<value_type>& operator%=(const RhsT& rhs)
+		{
+			if constexpr (!info_type::has_const_values)
+			{
+				if constexpr (!(info_type::has_floating_point_values || std::is_floating_point_v<RhsT>))
+				{
+					x %= rhs;
+					y %= rhs;
+				}
+				else
+				{
+					static_assert(false, "Attempted to use modulus operator (%) with an EmuMath::Vector2 using incompatible floating point values.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (%=) on an EmuMath::Vector2 which contains constant values.");
+			}
+			return *this;
+		}
+#pragma endregion
 
+#pragma region BITWISE_NONCONST_OPERATORS
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator&=(const Vector2<OtherT>& rhs)
+		{
+			if constexpr (!info_type::has_const_values)
+			{
+				if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
+				{
+					if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
+					{
+						x &= rhs.x;
+						y &= rhs.y;
+					}
+					else
+					{
+						x &= static_cast<nonref_value_type>(rhs.x);
+						y &= static_cast<nonref_value_type>(rhs.y);
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to use a bitwise AND (&) operation on an EmuMath::Vector2 using non-integral values.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (&=) on an EmuMath::Vector2 which contains constant values.");
+			}
+			return *this;
+		}
+		template<typename RhsT>
+		constexpr Vector2<value_type>& operator&=(const RhsT& rhs)
+		{
+			using NonRefRhs = std::remove_reference_t<RhsT>;
+			if constexpr (!info_type::has_const_values)
+			{
+				if constexpr (info_type::has_integral_values && std::is_integral_v<NonRefRhs>)
+				{
+					if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, NonRefRhs>)
+					{
+						x &= rhs;
+						y &= rhs;
+					}
+					else
+					{
+						const NonRefRhs castRhs = static_cast<nonref_value_type>(rhs);
+						x &= static_cast<nonref_value_type>(castRhs);
+						y &= static_cast<nonref_value_type>(castRhs);
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to use a bitwise AND (&) operation on an EmuMath::Vector2 using non-integral values.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (&=) on an EmuMath::Vector2 which contains constant values.");
+			}
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator|=(const Vector2<OtherT>& rhs)
+		{
+			if constexpr (!info_type::has_const_values)
+			{
+				if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
+				{
+					if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
+					{
+						x |= rhs.x;
+						y |= rhs.y;
+					}
+					else
+					{
+						x |= static_cast<nonref_value_type>(rhs.x);
+						y |= static_cast<nonref_value_type>(rhs.y);
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to use a bitwise AND (&) operation on an EmuMath::Vector2 using non-integral values.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (|=) on an EmuMath::Vector2 which contains constant values.");
+			}
+			return *this;
+		}
+		template<typename RhsT>
+		constexpr Vector2<value_type>& operator|=(const RhsT& rhs)
+		{
+			using NonRefRhs = std::remove_reference_t<RhsT>;
+			if constexpr (!info_type::has_const_values)
+			{
+				if constexpr (info_type::has_integral_values && std::is_integral_v<NonRefRhs>)
+				{
+					if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, NonRefRhs>)
+					{
+						x |= rhs;
+						y |= rhs;
+					}
+					else
+					{
+						const NonRefRhs castRhs = static_cast<nonref_value_type>(rhs);
+						x |= static_cast<nonref_value_type>(castRhs);
+						y |= static_cast<nonref_value_type>(castRhs);
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to use a bitwise AND (&) operation on an EmuMath::Vector2 using non-integral values.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (|=) on an EmuMath::Vector2 which contains constant values.");
+			}
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator^=(const Vector2<OtherT>& rhs)
+		{
+			if constexpr (!info_type::has_const_values)
+			{
+				if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
+				{
+					if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
+					{
+						x ^= rhs.x;
+						y ^= rhs.y;
+					}
+					else
+					{
+						x ^= static_cast<nonref_value_type>(rhs.x);
+						y ^= static_cast<nonref_value_type>(rhs.y);
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to use a bitwise AND (&) operation on an EmuMath::Vector2 using non-integral values.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (^=) on an EmuMath::Vector2 which contains constant values.");
+			}
+			return *this;
+		}
+		template<typename RhsT>
+		constexpr Vector2<value_type>& operator^=(const RhsT& rhs)
+		{
+			using NonRefRhs = std::remove_reference_t<RhsT>;
+			if constexpr (!info_type::has_const_values)
+			{
+				if constexpr (info_type::has_integral_values && std::is_integral_v<NonRefRhs>)
+				{
+					if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, NonRefRhs>)
+					{
+						x ^= rhs;
+						y ^= rhs;
+					}
+					else
+					{
+						const NonRefRhs castRhs = static_cast<nonref_value_type>(rhs);
+						x ^= static_cast<nonref_value_type>(castRhs);
+						y ^= static_cast<nonref_value_type>(castRhs);
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to use a bitwise AND (&) operation on an EmuMath::Vector2 using non-integral values.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (^=) on an EmuMath::Vector2 which contains constant values.");
+			}
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator<<=(const Vector2<OtherT>& rhs)
+		{
+			if constexpr (!info_type::has_const_values)
+			{
+				if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
+				{
+					x <<= rhs.x;
+					y <<= rhs.y;
+				}
+				else
+				{
+					static_assert(false, "Attempted to use a bitwise left shift (<<) operation on an EmuMath::Vector2 using non-integral values.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (<<=) on an EmuMath::Vector2 which contains constant values.");
+			}
+			return *this;
+		}
+		template<typename RhsT>
+		constexpr Vector2<value_type>& operator<<=(const RhsT& rhs)
+		{
+			if constexpr (!info_type::has_const_values)
+			{
+				if constexpr (info_type::has_integral_values && std::is_integral_v<RhsT>)
+				{
+					x <<= rhs;
+					y <<= rhs;
+				}
+				else
+				{
+					static_assert(false, "Attempted to use a bitwise left shift (<<) operation on an EmuMath::Vector2 using non-integral values.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (<<=) on an EmuMath::Vector2 which contains constant values.");
+			}
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator>>=(const Vector2<OtherT>& rhs)
+		{
+			if constexpr (!info_type::has_const_values)
+			{
+				if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
+				{
+					x >>= rhs.x;
+					y >>= rhs.y;
+				}
+				else
+				{
+					static_assert(false, "Attempted to use a bitwise left shift (<<) operation on an EmuMath::Vector2 using non-integral values.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (>>=) on an EmuMath::Vector2 which contains constant values.");
+			}
+			return *this;
+		}
+		template<typename RhsT>
+		constexpr Vector2<value_type>& operator>>=(const RhsT& rhs)
+		{
+			if constexpr (!info_type::has_const_values)
+			{
+				if constexpr (info_type::has_integral_values && std::is_integral_v<RhsT>)
+				{
+					x >>= rhs;
+					y >>= rhs;
+				}
+				else
+				{
+					static_assert(false, "Attempted to use a bitwise left shift (<<) operation on an EmuMath::Vector2 using non-integral values.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a non-const function (>>=) on an EmuMath::Vector2 which contains constant values.");
+			}
+			return *this;
+		}
 #pragma endregion
 
 #pragma region BOOLEAN_COMPARISON_OPERATORS

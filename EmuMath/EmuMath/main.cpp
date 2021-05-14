@@ -37,9 +37,12 @@ int main()
 	constexpr Vector2<float> CLAMPED = Vector2<float>(1.0f, 25.0f).AsClamped(0.0f, 4.35f);
 
 	Vector2<float> yo = CLAMPED;
-	Vector2<const float&> yoRef = yo.ShuffledReference<0, 1>();
+	yo *= 5;
+	Vector2<float&> yoRef = yo.ShuffledReference<0, 1>();
+	yoRef /= 5;
+	yoRef *= 2.3l;
 
-	std::cout << "Floored: "<< yoRef.AsFloored() << "\n";
+	std::cout << "Normal: " << yoRef << " | Floored: "<< yoRef.AsFloored() << "\n";
 	Vector2<const float&> boi = yoRef;
 
 	Vector2<float&> anotherRef = yo;
