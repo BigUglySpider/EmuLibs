@@ -7,6 +7,9 @@
 namespace EmuMath
 {
 	template<typename T>
+	struct Vector2;
+
+	template<typename T>
 	struct Vector3
 	{
 #pragma region ALIASES_AND_STATIC_CONSTANT_EXPRESSIONS
@@ -107,6 +110,31 @@ namespace EmuMath
 		template<typename OtherT>
 		constexpr Vector3(Vector3<OtherT>& toCopy) :
 			Vector3(toCopy.x, toCopy.y, toCopy.z)
+		{
+		}
+		template<typename OtherT>
+		constexpr Vector3(const Vector2<OtherT>& toCopy) :
+			Vector3(toCopy.x, toCopy.y, value_type())
+		{
+		}
+		template<typename OtherT>
+		constexpr Vector3(Vector2<OtherT>& toCopy) :
+			Vector3(toCopy.x, toCopy.y, value_type())
+		{
+		}
+		template<typename OtherT, typename Z_>
+		constexpr Vector3(const Vector2<OtherT>& toCopy, const Z_& z_) :
+			Vector3(toCopy.x, toCopy.y, z_)
+		{
+		}
+		template<typename OtherT, typename Z_>
+		constexpr Vector3(Vector2<OtherT>& toCopy, const Z_& z_) :
+			Vector3(toCopy.x, toCopy.y, z_)
+		{
+		}
+		template<typename OtherT, typename Z_>
+		constexpr Vector3(Vector2<OtherT>& toCopy, Z_& z_) :
+			Vector3(toCopy.x, toCopy.y, z_)
 		{
 		}
 #pragma endregion

@@ -36,7 +36,11 @@ int main()
 	Vector2si16 v2si16Fromv3f = v3f;
 	std::cout << "v3f: " << v3f << " | v2si16: " << v2si16Fromv3f << "\n";
 
-	EmuCore::TestingHelpers::PerformTests();
+	Vector3<std::uint64_t> v3ui64 = v2si16Fromv3f;
+	std::cout << v3ui64 << "\n";
 
+#pragma region TEST_HARNESS_EXECUTION
+	EmuCore::TestingHelpers::PerformTests();
+#pragma endregion
 	return 0;
 }
