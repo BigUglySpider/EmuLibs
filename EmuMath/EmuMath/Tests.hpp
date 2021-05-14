@@ -8,7 +8,7 @@
 #include <tuple>
 
 // ADDITIONAL INCLUDES
-#include "EmuMath/EmuVector.h"
+#include "EmuMath/Vectors.h"
 
 namespace EmuCore::TestingHelpers
 {

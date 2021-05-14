@@ -1,6 +1,6 @@
 #include "Tests.hpp"
 
-#include "EmuMath/EmuVector.h"
+#include "EmuMath/Vectors.h"
 
 using namespace EmuCore::TestingHelpers;
 using namespace EmuMath;

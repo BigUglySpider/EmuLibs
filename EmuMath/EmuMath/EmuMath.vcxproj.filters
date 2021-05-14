@@ -29,7 +29,7 @@
     <ClInclude Include="EmuCore\FileHelpers\PathValidation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\EmuVector.h">
+    <ClInclude Include="EmuMath\Vectors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\_do_not_manually_include\EmuVector2T.h">
