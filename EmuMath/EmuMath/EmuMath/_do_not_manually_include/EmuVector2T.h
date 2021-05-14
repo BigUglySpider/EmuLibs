@@ -3,7 +3,6 @@
 
 #include "EmuVectorInfo.h"
 #include <exception>
-#include <immintrin.h>
 
 namespace EmuMath
 {
