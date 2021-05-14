@@ -1,4 +1,4 @@
-#ifndef EMU_MATH_VECTOR_2_T_H_INC_
+#ifndef EMU_MATH_VECTOR_3_T_H_INC_
 #define EMU_MATH_VECTOR_3_T_H_INC_
 
 #include "EmuVectorInfo.h"

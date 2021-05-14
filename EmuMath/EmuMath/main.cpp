@@ -1,28 +1,9 @@
-#include "EmuCore/TestingHelpers/LoopingTestHarness.h"
-#include "EmuCore/FileHelpers/PathValidation.h"
+#include "Tests.hpp"
+
 #include "EmuMath/EmuVector.h"
-#include <iostream>
 
 using namespace EmuCore::TestingHelpers;
 using namespace EmuMath;
-
-template<typename T>
-struct TestA
-{
-	TestA(std::size_t numLoops)
-	{
-		allClamped.resize(numLoops);
-		for (auto& vec : allClamped)
-		{
-			vec = { static_cast<T>((rand() % 30 - 15) * 0.75f), static_cast<T>((rand() % 30 - 15) * 0.75f) };
-		}
-	}
-	void operator()(std::size_t i)
-	{
-		allClamped[i] = allClamped[i].AsTrunced();
-	}
-	std::vector<Vector2<T>> allClamped;
-};
 
 int main()
 {
@@ -47,23 +28,15 @@ int main()
 
 	Vector2<float&> anotherRef = yo;
 
-	constexpr std::size_t NUM_LOOPS = 5000000;
-	using TEST_A = TestA<float>;
-	LoopingTestHarness<TEST_A> testHarnessA;
-	TEST_A testA(NUM_LOOPS);
-
 
 	Vector2<float> a = Vector2<float>(15u, 1.0f);
 	std::cout << a << "\n";
 
-	auto outputA = testHarnessA.ExecuteAndOutputAsString<true>(NUM_LOOPS, testA, false);
+	Vector3<float> v3f(0.0f, 1.75f, 2.0f);
+	Vector2si16 v2si16Fromv3f = v3f;
+	std::cout << "v3f: " << v3f << " | v2si16: " << v2si16Fromv3f << "\n";
 
-	std::cout << "TEST A:\n" << outputA << "\n";
-
-	for (std::size_t i = 0; i < NUM_LOOPS; ++i)
-	{
-		std::cout << testA.allClamped[i] << "\n";
-	}
+	EmuCore::TestingHelpers::PerformTests();
 
 	return 0;
 }

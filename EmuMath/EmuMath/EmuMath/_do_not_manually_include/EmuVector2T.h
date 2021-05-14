@@ -7,6 +7,9 @@
 namespace EmuMath
 {
 	template<typename T>
+	struct Vector3;
+
+	template<typename T>
 	struct Vector2
 	{
 #pragma region ALIASES_AND_STATIC_CONSTANT_EXPRESSIONS
@@ -97,6 +100,16 @@ namespace EmuMath
 		/// <param name="toCopy">Vector to copy the elements of.</param>
 		template<typename OtherT>
 		constexpr Vector2(Vector2<OtherT>& toCopy) :
+			Vector2(toCopy.x, toCopy.y)
+		{
+		}
+		template<typename OtherT>
+		constexpr Vector2(const EmuMath::Vector3<OtherT>& toCopy) :
+			Vector2(toCopy.x, toCopy.y)
+		{
+		}
+		template<typename OtherT>
+		constexpr Vector2(EmuMath::Vector3<OtherT>& toCopy) :
 			Vector2(toCopy.x, toCopy.y)
 		{
 		}
