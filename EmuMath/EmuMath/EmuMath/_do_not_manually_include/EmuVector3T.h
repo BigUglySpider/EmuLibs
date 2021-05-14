@@ -30,6 +30,7 @@ namespace EmuMath
 		using ref_value_type = typename info_type::ref_value_type;
 		/// <summary> The constant reference variant of value types stored within this vector. </summary>
 		using const_ref_value_type = typename info_type::const_ref_value_type;
+		/// <summary> The non-qualified, non-reference variant of the value types stored within this vector. </summary>
 		using nonref_value_type_without_qualifiers = typename info_type::nonref_value_type_without_qualifiers;
 
 		/// <summary> The number of elements contained within this vector. </summary>
@@ -41,18 +42,28 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONSTRUCTORS
+		/// <summary> Constructs a 3-dimensional Vector with its x, y and z elements set to their default constructors. </summary>
 		constexpr Vector3() :
 			x(),
 			y(),
 			z()
 		{
 		}
+		/// <summary> Constructs a 3-dimensional Vector with its x, y and z elements set to copies of the respective passed values. </summary>
+		/// <param name="x_">Value to copy to the Vector's x component.</param>
+		/// <param name="y_">Value to copy to the Vector's y component.</param>
+		/// <param name="z_">Value to copy to the Vector's z component.</param>
 		constexpr Vector3(const value_type& x_, const value_type& y_, const value_type& z_) :
 			x(x_),
 			y(y_),
 			z(z_)
 		{
 		}
+		/// <summary> Constructs a 3-dimensional Vector with its x set to a copy of the passed x_ value after a static_cast, and y and z direct copies of their respective values. </summary>
+		/// <typeparam name="X_">Non value_type type used for the passed x_ value.</typeparam>
+		/// <param name="x_">Value to cast and copy to the Vector's x component.</param>
+		/// <param name="y_">Value to copy to the Vector's y component.</param>
+		/// <param name="z_">Value to copy to the Vector's z component.</param>
 		template<typename X_>
 		constexpr Vector3(const X_& x_, const value_type& y_, const value_type& z_) :
 			x(static_cast<value_type>(x_)),
@@ -60,6 +71,11 @@ namespace EmuMath
 			z(z_)
 		{
 		}
+		/// <summary> Constructs a 3-dimensional Vector with its y set to a copy of the passed y_ value after a static_cast, and x and z direct copies of their respective values. </summary>
+		/// <typeparam name="X_">Non value_type type used for the passed x_ value.</typeparam>
+		/// <param name="x_">Value to copy to the Vector's x component.</param>
+		/// <param name="y_">Value to cast and copy to the Vector's y component.</param>
+		/// <param name="z_">Value to copy to the Vector's z component.</param>
 		template<typename Y_>
 		constexpr Vector3(const value_type& x_, const Y_& y_, const value_type& z_) :
 			x(x_),
@@ -67,6 +83,11 @@ namespace EmuMath
 			z(z_)
 		{
 		}
+		/// <summary> Constructs a 3-dimensional Vector with its z set to a copy of the passed z_ value after a static_cast, and x and y direct copies of their respective values. </summary>
+		/// <typeparam name="X_">Non value_type type used for the passed x_ value.</typeparam>
+		/// <param name="x_">Value to copy to the Vector's x component.</param>
+		/// <param name="y_">Value to copy to the Vector's y component.</param>
+		/// <param name="z_">Value to cast and copy to the Vector's z component.</param>
 		template<typename Z_>
 		constexpr Vector3(const value_type& x_, const value_type& y_, const Z_& z_) :
 			x(x_),
@@ -74,6 +95,14 @@ namespace EmuMath
 			z(static_cast<value_type>(z_))
 		{
 		}
+		/// <summary>
+		/// Constructs a 3-dimensional Vector with its x and y set to a copy of the respective passed values after a static_cast, and z a direct copy of the passed z_.
+		/// </summary>
+		/// <typeparam name="X_">Non value_type type used for the passed x_ value.</typeparam>
+		/// <typeparam name="Y_">Non value_type type used for the passed y_ value.</typeparam>
+		/// <param name="x_">Value to cast and copy to the Vector's x component.</param>
+		/// <param name="y_">Value to cast and copy to the Vector's y component.</param>
+		/// <param name="z_">Value to copy to the Vector's z component.</param>
 		template<typename X_, typename Y_>
 		constexpr Vector3(const X_& x_, const Y_& y_, const value_type& z_) :
 			x(static_cast<value_type>(x_)),
@@ -81,6 +110,14 @@ namespace EmuMath
 			z(z_)
 		{
 		}
+		/// <summary>
+		/// Constructs a 3-dimensional Vector with its x and z set to a copy of the respective passed values after a static_cast, and y a direct copy of the passed y_.
+		/// </summary>
+		/// <typeparam name="X_">Non value_type type used for the passed x_ value.</typeparam>
+		/// <typeparam name="Z_">Non value_type type used for the passed z_ value.</typeparam>
+		/// <param name="x_">Value to cast and copy to the Vector's x component.</param>
+		/// <param name="y_">Value to copy to the Vector's y component.</param>
+		/// <param name="z_">Value to cast and copy to the Vector's z component.</param>
 		template<typename X_, typename Z_>
 		constexpr Vector3(const X_& x_, const value_type& y_, const Z_& z_) :
 			x(static_cast<value_type>(x_)),
@@ -88,6 +125,14 @@ namespace EmuMath
 			z(static_cast<value_type>(z_))
 		{
 		}
+		/// <summary>
+		/// Constructs a 3-dimensional Vector with its y and z set to a copy of the respective passed values after a static_cast, and x a direct copy of the passed x_.
+		/// </summary>
+		/// <typeparam name="Y_">Non value_type type used for the passed x_ value.</typeparam>
+		/// <typeparam name="Z_">Non value_type type used for the passed y_ value.</typeparam>
+		/// <param name="x_">Value to copy to the Vector's x component.</param>
+		/// <param name="y_">Value to cast and copy to the Vector's y component.</param>
+		/// <param name="z_">Value to cast and copy to the Vector's z component.</param>
 		template<typename Y_, typename Z_>
 		constexpr Vector3(const value_type& x_, const Y_& y_, const Z_& z_) :
 			x(x_),
@@ -95,6 +140,13 @@ namespace EmuMath
 			z(static_cast<value_type>(z_))
 		{
 		}
+		/// <summary> Constructs a 2-dimensional Vector with its x, y and z elements set to copies of the respective passed values after a static_cast. </summary>
+		/// <typeparam name="X_">Non value_type type used for the passed x_ value.</typeparam>
+		/// <typeparam name="Y_">Non value_type type used for the passed y_ value.</typeparam>
+		/// <typeparam name="Z_">Non value_type type used for the passed z_ value.</typeparam>
+		/// <param name="x_">Value to cast and copy to the Vector's x component.</param>
+		/// <param name="y_">Value to cast and copy to the Vector's y component.</param>
+		/// <param name="z_">Value to cast and copy to the Vector's z component.</param>
 		template<typename X_, typename Y_, typename Z_>
 		constexpr Vector3(const X_& x_, const Y_& y_, const Z_& z_) :
 			x(static_cast<value_type>(x_)),
@@ -102,36 +154,78 @@ namespace EmuMath
 			z(static_cast<value_type>(z_))
 		{
 		}
+		/// <summary> Constructs a 3-dimensional vector with its x, y and z components set to copies of the passed vector's respective components, performing casts where needed. </summary>
+		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
+		/// <param name="toCopy">Vector to copy the elements of.</param>
 		template<typename OtherT>
 		constexpr Vector3(const Vector3<OtherT>& toCopy) :
 			Vector3(toCopy.x, toCopy.y, toCopy.z)
 		{
 		}
+		/// <summary> Constructs a 3-dimensional vector with its x, y and z components set to copies of the passed vector's respective components, performing casts where needed. </summary>
+		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
+		/// <param name="toCopy">Vector to copy the elements of.</param>
 		template<typename OtherT>
 		constexpr Vector3(Vector3<OtherT>& toCopy) :
 			Vector3(toCopy.x, toCopy.y, toCopy.z)
 		{
 		}
+		/// <summary>
+		/// <para>Constructs a 3-dimensional vector with its x and y components set to copies of the passed vector's respective components, performing casts where needed.</para>
+		/// <para>The vector's z value will be set to a default constructed value_type.</para>
+		/// </summary>
+		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
+		/// <param name="toCopy">Vector to copy the elements of.</param>
 		template<typename OtherT>
 		constexpr Vector3(const Vector2<OtherT>& toCopy) :
 			Vector3(toCopy.x, toCopy.y, value_type())
 		{
 		}
+		/// <summary>
+		/// <para>Constructs a 3-dimensional vector with its x and y components set to copies of the passed vector's respective components, performing casts where needed.</para>
+		/// <para>The vector's z value will be set to the default value_type.</para>
+		/// </summary>
+		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
+		/// <param name="toCopy">Vector to copy the elements of.</param>
 		template<typename OtherT>
 		constexpr Vector3(Vector2<OtherT>& toCopy) :
 			Vector3(toCopy.x, toCopy.y, value_type())
 		{
 		}
+		/// <summary>
+		/// <para>Constructs a 3-dimensional vector with its x and y components set to copies of the passed vector's respective components, performing casts where needed.</para>
+		/// <para>The vector's z value will be set via the passed z_ value..</para>
+		/// </summary>
+		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
+		/// <typeparam name="Z_">The type of the passed z_ value.</typeparam>
+		/// <param name="toCopy">Vector to copy the elements of.</param>
+		/// <param name="z_">Value to set the vector's z component via.</param>
 		template<typename OtherT, typename Z_>
 		constexpr Vector3(const Vector2<OtherT>& toCopy, const Z_& z_) :
 			Vector3(toCopy.x, toCopy.y, z_)
 		{
 		}
+		/// <summary>
+		/// <para>Constructs a 3-dimensional vector with its x and y components set to copies of the passed vector's respective components, performing casts where needed.</para>
+		/// <para>The vector's z value will be set via the passed z_ value..</para>
+		/// </summary>
+		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
+		/// <typeparam name="Z_">The type of the passed z_ value.</typeparam>
+		/// <param name="toCopy">Vector to copy the elements of.</param>
+		/// <param name="z_">Value to set the vector's z component via.</param>
 		template<typename OtherT, typename Z_>
 		constexpr Vector3(Vector2<OtherT>& toCopy, const Z_& z_) :
 			Vector3(toCopy.x, toCopy.y, z_)
 		{
 		}
+		/// <summary>
+		/// <para>Constructs a 3-dimensional vector with its x and y components set to copies of the passed vector's respective components, performing casts where needed.</para>
+		/// <para>The vector's z value will be set via the passed z_ value..</para>
+		/// </summary>
+		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
+		/// <typeparam name="Z_">The type of the passed z_ value.</typeparam>
+		/// <param name="toCopy">Vector to copy the elements of.</param>
+		/// <param name="z_">Value to set the vector's z component via.</param>
 		template<typename OtherT, typename Z_>
 		constexpr Vector3(Vector2<OtherT>& toCopy, Z_& z_) :
 			Vector3(toCopy.x, toCopy.y, z_)

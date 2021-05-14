@@ -30,6 +30,7 @@ namespace EmuMath
 		using ref_value_type = typename info_type::ref_value_type;
 		/// <summary> The constant reference variant of value types stored within this vector. </summary>
 		using const_ref_value_type = typename info_type::const_ref_value_type;
+		/// <summary> The non-qualified, non-reference variant of the value types stored within this vector. </summary>
 		using nonref_value_type_without_qualifiers = typename info_type::nonref_value_type_without_qualifiers;
 
 		/// <summary> The number of elements contained within this vector. </summary>
@@ -41,7 +42,6 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONSTRUCTORS
-
 		/// <summary> Constructs a 2-dimensional Vector with its x and y elements set to their default constructors. </summary>
 		constexpr Vector2() :
 			x(),
@@ -103,11 +103,17 @@ namespace EmuMath
 			Vector2(toCopy.x, toCopy.y)
 		{
 		}
+		/// <summary> Constructs a 2-dimensional vector with its x and y components set to copies of the passed vector's respective components, performing casts where needed. </summary>
+		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
+		/// <param name="toCopy">Vector to copy the elements of.</param>
 		template<typename OtherT>
 		constexpr Vector2(const EmuMath::Vector3<OtherT>& toCopy) :
 			Vector2(toCopy.x, toCopy.y)
 		{
 		}
+		/// <summary> Constructs a 2-dimensional vector with its x and y components set to copies of the passed vector's respective components, performing casts where needed. </summary>
+		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
+		/// <param name="toCopy">Vector to copy the elements of.</param>
 		template<typename OtherT>
 		constexpr Vector2(EmuMath::Vector3<OtherT>& toCopy) :
 			Vector2(toCopy.x, toCopy.y)
