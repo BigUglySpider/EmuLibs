@@ -38,6 +38,11 @@ namespace EmuMath
 			y()
 		{
 		}
+		constexpr Vector2(const value_type& x_, const value_type& y_) :
+			x(x_),
+			y(y_)
+		{
+		}
 		template<typename X_, typename Y_>
 		constexpr Vector2(const X_& x_, const Y_& y_) :
 			x(static_cast<value_type>(x_)),
@@ -54,11 +59,6 @@ namespace EmuMath
 		constexpr Vector2(const value_type& x_, const Y_& y_) :
 			x(x_),
 			y(static_cast<value_type>(y_))
-		{
-		}
-		constexpr Vector2(const value_type& x_, const value_type& y_) :
-			x(x_),
-			y(y_)
 		{
 		}
 		template<typename OtherT>

@@ -43,7 +43,8 @@ int main()
 	LoopingTestHarness<TEST_A> testHarnessA;
 	TEST_A testA(NUM_LOOPS);
 
-	Vector2<float> a = Vector2<float>(1u, 1.0f);
+	Vector2<float> a = Vector2<float>(15u, 1.0f);
+	std::cout << a << "\n";
 
 	auto outputA = testHarnessA.ExecuteAndOutputAsString<true>(NUM_LOOPS, testA, false);
 
