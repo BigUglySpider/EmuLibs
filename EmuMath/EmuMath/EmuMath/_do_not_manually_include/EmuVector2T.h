@@ -32,18 +32,48 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONSTRUCTORS
+
 		constexpr Vector2() :
 			x(),
 			y()
 		{
 		}
-		constexpr Vector2(const Vector2<value_type>& toCopy) :
-			Vector2(toCopy.x, toCopy.y)
+		template<typename X_, typename Y_>
+		constexpr Vector2(const X_& x_, const Y_& y_) :
+			x(static_cast<value_type>(x_)),
+			y(static_cast<value_type>(y_))
+		{
+		}
+		template<typename X_>
+		constexpr Vector2(const X_& x_, const value_type& y_) :
+			x(static_cast<value_type>(x_)),
+			y(y_)
+		{
+		}
+		template<typename Y_>
+		constexpr Vector2(const value_type& x_, const Y_& y_) :
+			x(x_),
+			y(static_cast<value_type>(y_))
 		{
 		}
 		constexpr Vector2(const value_type& x_, const value_type& y_) :
 			x(x_),
 			y(y_)
+		{
+		}
+		template<typename OtherT>
+		constexpr Vector2(const Vector2<OtherT>& toCopy) :
+			Vector2(toCopy.x, toCopy.y)
+		{
+		}
+		Vector2(nonref_value_type* pToLoad) :
+			x(*pToLoad),
+			y(*(pToLoad + 1))
+		{
+		}
+		Vector2(const nonref_value_type* pToLoad) :
+			x(*pToLoad),
+			y(*(pToLoad + 1))
 		{
 		}
 #pragma endregion
@@ -735,6 +765,156 @@ namespace EmuMath
 		{
 			this->Clamp(Vector2<value_type>(min_, min_), Vector2<value_type>(max_, max_));
 		}
+		Vector2<nonref_value_type> AsFloored() const
+		{
+			if constexpr (info_type::has_integral_values)
+			{
+				return { x, y };
+			}
+			else if constexpr(info_type::has_floating_point_values)
+			{
+				if constexpr (std::is_same_v<nonref_value_type, float>)
+				{
+					return { floorf(x), floorf(y) };
+				}
+				else if constexpr (std::is_same_v<nonref_value_type, double>)
+				{
+					return { floor(x), floor(y) };
+				}
+				else
+				{
+					return { floorl(x), floorl(y) };
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
+			}
+		}
+		void Floor()
+		{
+			// Don't need to do anything if already integers
+			if constexpr (!info_type::has_integral_values)
+			{
+				if constexpr (info_type::has_floating_point_values)
+				{
+					if constexpr (std::is_same_v<nonref_value_type, float>)
+					{
+						x = floorf(x);
+						y = floorf(y);
+					}
+					else if constexpr (std::is_same_v<nonref_value_type, double>)
+					{
+						x = floor(x);
+						y = floor(y);
+					}
+					else
+					{
+						x = floorl(x);
+						y = floorl(y);
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
+				}
+			}
+		}
+		Vector2<nonref_value_type> AsCeiled() const
+		{
+			if constexpr (info_type::has_integral_values)
+			{
+				return { x, y };
+			}
+			else if constexpr (info_type::has_floating_point_values)
+			{
+				if constexpr (std::is_same_v<nonref_value_type, float>)
+				{
+					return { ceilf(x), ceilf(y) };
+				}
+				else if constexpr (std::is_same_v<nonref_value_type, double>)
+				{
+					return { ceil(x), ceil(y) };
+				}
+				else
+				{
+					return { ceill(x), ceill(y) };
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
+				return *this;
+			}
+		}
+		void Ceil()
+		{
+			if constexpr (!info_type::has_integral_values)
+			{
+				if constexpr (info_type::has_floating_point_values)
+				{
+					if constexpr (std::is_same_v<nonref_value_type, float>)
+					{
+						x = ceilf(x);
+						y = ceilf(y);
+					}
+					else if constexpr (std::is_same_v<nonref_value_type, double>)
+					{
+						x = ceil(x);
+						y = ceil(y);
+					}
+					else
+					{
+						x = ceill(x);
+						y = ceill(y);
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
+				}
+			}
+		}
+		constexpr Vector2<nonref_value_type> AsTrunced() const
+		{
+			if constexpr (info_type::has_integral_values)
+			{
+				return { x, y };
+			}
+			else if constexpr (info_type::has_floating_point_values)
+			{
+				// Faster to do a double cast than call trunc functions
+				return
+				{
+					static_cast<nonref_value_type>(static_cast<std::int64_t>(x)),
+					static_cast<nonref_value_type>(static_cast<std::int64_t>(y))
+				};
+			}
+			else
+			{
+				static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
+				return *this;
+			}
+		}
+		constexpr void Trunc()
+		{
+			if constexpr (!info_type::has_integral_values)
+			{
+				if constexpr (info_type::has_floating_point_values)
+				{
+					// Faster to do a double cast than call trunc functions
+					return
+					{
+						static_cast<nonref_value_type>(static_cast<std::int64_t>(x)),
+						static_cast<nonref_value_type>(static_cast<std::int64_t>(y))
+					};
+				}
+				else
+				{
+					static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
+				}
+			}
+		}
 #pragma endregion
 
 #pragma region VECTOR_OPERATIONS
@@ -766,39 +946,6 @@ namespace EmuMath
 				else
 				{
 					return static_cast<OutT>(x * x + y * y);
-				}
-			}
-		}
-		template<typename RhsT, typename OutT = nonref_value_type>
-		constexpr OutT DotProduct(const Vector2<RhsT>& rhs) const
-		{
-			if constexpr (std::is_same_v<nonref_value_type, typename info_type_t<RhsT>::nonref_value_type>)
-			{
-				if constexpr (std::is_same_v<nonref_value_type, OutT>)
-				{
-					return x * rhs.x + y * rhs.y;
-				}
-				else
-				{
-					if constexpr (sizeof(OutT) > sizeof(nonref_value_type))
-					{
-						return (static_cast<OutT>(x) * rhs.x) + (static_cast<OutT>(y) * rhs.y);
-					}
-					else
-					{
-						return static_cast<OutT>(x * rhs.x + y * rhs.y);
-					}
-				}
-			}
-			else
-			{
-				if constexpr (sizeof(OutT) > sizeof(nonref_value_type))
-				{
-					return (static_cast<OutT>(x) * rhs.x) + (static_cast<OutT>(y) * rhs.y);
-				}
-				else
-				{
-					return static_cast<OutT>(x * static_cast<nonref_value_type>(rhs.x) + y * static_cast<nonref_value_type>(rhs.y));
 				}
 			}
 		}
@@ -838,6 +985,63 @@ namespace EmuMath
 				return { static_cast<long double>(x * reciprocal), static_cast<long double>(y * reciprocal) };
 			}
 		}
+		template<typename RhsT, typename OutT = nonref_value_type>
+		constexpr OutT DotProduct(const Vector2<RhsT>& rhs) const
+		{
+			if constexpr (std::is_same_v<nonref_value_type, typename info_type_t<RhsT>::nonref_value_type>)
+			{
+				if constexpr (std::is_same_v<nonref_value_type, OutT>)
+				{
+					return x * rhs.x + y * rhs.y;
+				}
+				else
+				{
+					if constexpr (sizeof(OutT) > sizeof(nonref_value_type))
+					{
+						return (static_cast<OutT>(x) * rhs.x) + (static_cast<OutT>(y) * rhs.y);
+					}
+					else
+					{
+						return static_cast<OutT>(x * rhs.x + y * rhs.y);
+					}
+				}
+			}
+			else
+			{
+				if constexpr (sizeof(OutT) > sizeof(nonref_value_type))
+				{
+					return (static_cast<OutT>(x) * rhs.x) + (static_cast<OutT>(y) * rhs.y);
+				}
+				else
+				{
+					return static_cast<OutT>(x * static_cast<nonref_value_type>(rhs.x) + y * static_cast<nonref_value_type>(rhs.y));
+				}
+			}
+		}
+		template<typename OtherT>
+		bool WithinDistance(const Vector2<OtherT>& target, const float maxDistance) const
+		{
+			return this->_perform_normalised_distance_check<float, OtherT>(target, maxDistance);
+		}
+		template<typename OtherT>
+		bool WithinDistance(const Vector2<OtherT>& target, const double maxDistance) const
+		{
+			return this->_perform_normalised_distance_check<double, OtherT>(target, maxDistance);
+		}
+		template<typename OtherT>
+		bool WithinDistance(const Vector2<OtherT>& target, const long double maxDistance) const
+		{
+			return this->_perform_normalised_distance_check<long double, OtherT>(target, maxDistance);
+		}
+		template<typename OtherT, typename DistT>
+		constexpr bool WithinSquareDistance(const Vector2<OtherT>& target, const OtherT& maxSquareDistance) const
+		{
+			return target.operator-(*this).SquareMagnitude<DistT>() <= maxSquareDistance;
+		}
+		constexpr Vector2<nonref_value_type> AsReversed() const
+		{
+			return { -x, -y };
+		}
 #pragma endregion
 
 		/// <summary> The first component of this vector, representing the X-axis. </summary>
@@ -856,6 +1060,25 @@ namespace EmuMath
 			else
 			{
 				at<Index>() = static_cast<nonref_value_type>(val_);
+			}
+		}
+
+		template<typename DistT, typename OtherT>
+		bool _perform_normalised_distance_check(const Vector2<OtherT>& target, const DistT maxDistance) const
+		{
+			DistT distX = static_cast<DistT>(target.x - x);
+			DistT distY = static_cast<DistT>(target.y - y);
+			if constexpr (std::is_same_v<DistT, float>)
+			{
+				return sqrtf(distX * distX + distY * distY) <= maxDistance;
+			}
+			else if constexpr (std::is_same_v<DistT, double>)
+			{
+				return sqrt(distX * distX + distY * distY) <= maxDistance;
+			}
+			else if constexpr (std::is_same_v<DistT, long double>)
+			{
+				return sqrtl(distX * distX + distY * distY) <= maxDistance;
 			}
 		}
 
