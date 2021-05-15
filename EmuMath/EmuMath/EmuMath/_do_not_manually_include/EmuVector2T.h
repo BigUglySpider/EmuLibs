@@ -1124,31 +1124,55 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region BOOLEAN_PER_ELEMENT_COMPARISON_FUNCTIONS
+		/// <summary> Compares the equality of the elements in this Vector with the respecitve elements in the passed Vector. </summary>
+		/// <typeparam name="OtherT">Type stored within the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to compare respective elements of.</param>
+		/// <returns>Vector of booleans indicating if respective values were equal.</returns>
 		template<typename OtherT>
 		constexpr Vector2<bool> CompareElementsEqual(const Vector2<OtherT>& rhs) const
 		{
 			return { x == rhs.x, y == rhs.y };
 		}
+		/// <summary> Compares the inequality of the elements in this Vector with the respecitve elements in the passed Vector. </summary>
+		/// <typeparam name="OtherT">Type stored within the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to compare respective elements of.</param>
+		/// <returns>Vector of booleans indicating if respective values were unequal.</returns>
 		template<typename OtherT>
 		constexpr Vector2<bool> CompareElementsNotEqual(const Vector2<OtherT>& rhs) const
 		{
 			return { x != rhs.x, y != rhs.y };
 		}
+		/// <summary> Compares if the elements of this Vector are greater than the respective elements in the passed Vector. </summary>
+		/// <typeparam name="OtherT">Type stored within the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to compare respective elements of.</param>
+		/// <returns>Vector of booleans indicating if respective values of this Vector are greater than the values in the passed Vector.</returns>
 		template<typename OtherT>
 		constexpr Vector2<bool> CompareElementsGreater(const Vector2<OtherT>& rhs) const
 		{
 			return { x > rhs.x, y > rhs.y };
 		}
+		/// <summary> Compares if the elements of this Vector are less than the respective elements in the passed Vector. </summary>
+		/// <typeparam name="OtherT">Type stored within the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to compare respective elements of.</param>
+		/// <returns>Vector of booleans indicating if respective values of this Vector are less than the values in the passed Vector.</returns>
 		template<typename OtherT>
 		constexpr Vector2<bool> CompareElementsLess(const Vector2<OtherT>& rhs) const
 		{
 			return { x < rhs.x, y < rhs.y };
 		}
+		/// <summary> Compares if the elements of this Vector are greater than or equal to the respective elements in the passed Vector. </summary>
+		/// <typeparam name="OtherT">Type stored within the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to compare respective elements of.</param>
+		/// <returns>Vector of booleans indicating if respective values of this Vector are greater than or equal to the values in the passed Vector.</returns>
 		template<typename OtherT>
 		constexpr Vector2<bool> CompareElementsGreaterEqual(const Vector2<OtherT>& rhs) const
 		{
 			return { x >= rhs.x, y >= rhs.y };
 		}
+		/// <summary> Compares if the elements of this Vector are less than or equal to the respective elements in the passed Vector. </summary>
+		/// <typeparam name="OtherT">Type stored within the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to compare respective elements of.</param>
+		/// <returns>Vector of booleans indicating if respective values of this Vector are less than or equal to the values in the passed Vector.</returns>
 		template<typename OtherT>
 		constexpr Vector2<bool> CompareElementsLessEqual(const Vector2<OtherT>& rhs) const
 		{

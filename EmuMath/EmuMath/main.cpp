@@ -31,6 +31,7 @@ int main()
 	std::cout << "hi: " << hi << "\n";
 
 
+
 	Vector2<float> a = Vector2<float>(15u, 1.0f);
 	std::cout << a << "\n";
 
