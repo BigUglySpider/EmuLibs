@@ -3,6 +3,7 @@
 
 #include "EmuVectorInfo.h"
 #include "../../EmuCore/TMPHelpers/TypeComparators.h"
+#include "../../EmuCore/TMPHelpers/TypeConvertors.h"
 #include <exception>
 
 namespace EmuMath
@@ -1655,34 +1656,23 @@ namespace EmuMath
 		template<typename RhsT, typename OutT = nonref_value_type>
 		constexpr OutT DotProduct(const Vector2<RhsT>& rhs) const
 		{
-			if constexpr (std::is_same_v<nonref_value_type, typename info_type_t<RhsT>::nonref_value_type>)
+			if constexpr (info_type::has_floating_point_values || info_type_t<RhsT>::has_floating_point_values)
 			{
-				if constexpr (std::is_same_v<nonref_value_type, OutT>)
-				{
-					return x * rhs.x + y * rhs.y;
-				}
-				else
-				{
-					if constexpr (sizeof(OutT) > sizeof(nonref_value_type))
-					{
-						return (static_cast<OutT>(x) * rhs.x) + (static_cast<OutT>(y) * rhs.y);
-					}
-					else
-					{
-						return static_cast<OutT>(x * rhs.x + y * rhs.y);
-					}
-				}
+				using ThisFP = EmuCore::TMPHelpers::best_floating_point_rep_t<nonref_value_type_without_qualifiers>;
+				using RhsFP = EmuCore::TMPHelpers::best_floating_point_rep_t<typename Vector2<RhsT>::nonref_value_type_without_qualifiers>;
+				using OutFP = EmuCore::TMPHelpers::best_floating_point_rep_t<OutT>;
+				using CalcT = EmuCore::TMPHelpers::highest_byte_size_t<ThisFP, RhsFP, OutFP>;
+
+				return static_cast<OutT>
+				(
+					(static_cast<CalcT>(x) * rhs.x) +
+					(static_cast<CalcT>(y) * rhs.y)
+				);
 			}
 			else
 			{
-				if constexpr (sizeof(OutT) > sizeof(nonref_value_type))
-				{
-					return (static_cast<OutT>(x) * rhs.x) + (static_cast<OutT>(y) * rhs.y);
-				}
-				else
-				{
-					return static_cast<OutT>(x * static_cast<nonref_value_type>(rhs.x) + y * static_cast<nonref_value_type>(rhs.y));
-				}
+				using HighestVecT = EmuCore::TMPHelpers::highest_byte_size<nonref_value_type_without_qualifiers, typename Vector2<RhsT>::nonref_value_type_without_qualifiers>;
+				
 			}
 		}
 		template<typename OtherT, typename MaxDistT>

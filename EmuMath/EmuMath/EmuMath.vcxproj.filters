@@ -50,5 +50,8 @@
     <ClInclude Include="EmuCore\TMPHelpers\TypeComparators.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuCore\TMPHelpers\TypeConvertors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

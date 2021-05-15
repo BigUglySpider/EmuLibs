@@ -151,6 +151,7 @@
     <ClInclude Include="EmuCore\FileHelpers\PathValidation.h" />
     <ClInclude Include="EmuCore\TestingHelpers\LoopingTestHarness.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TypeComparators.h" />
+    <ClInclude Include="EmuCore\TMPHelpers\TypeConvertors.h" />
     <ClInclude Include="EmuMath\Vectors.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\EmuVector2T.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\EmuVector3T.h" />

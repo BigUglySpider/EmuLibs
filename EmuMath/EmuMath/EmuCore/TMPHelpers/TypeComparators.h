@@ -53,98 +53,109 @@ namespace EmuCore::TMPHelpers
 	template<typename X_, typename Y_, typename...Others_>
 	using lowest_byte_size_t = typename lowest_byte_size<X_, Y_, Others_...>::type;
 
-	/// <summary> The floating-point type best suited to representing the passed type based on byte size. </summary>
-	/// <typeparam name="T">Type to provide the best suited floating point representing type of.</typeparam>
-	template<typename T>
-	using best_floating_point_rep_t = std::conditional_t
-	<
-		std::is_floating_point_v<T>,
-		T,
-		std::conditional_t
-		<
-			(sizeof(T) <= sizeof(float)),
-			float,
-			std::conditional_t
-			<
-				(sizeof(T) <= sizeof(double)),
-				double,
-				long double
-			>
-		>
-	>;
+	/// <summary> Underlying check used for all is_any_ values. Performs the passed check_ with each provided parameter until one is true or they are exhausted. </summary>
+	/// <typeparam name="First">The first type to perform the check on. Required.</typeparam>
+	/// <typeparam name="Others">All additional types to perform the check on. Optional.</typeparam>
+	template<template<typename T_> typename check_, typename First, typename...Others>
+	struct is_any_check
+	{
+		static constexpr bool value = check_<First>::value ? true : is_any_check<check_, Others...>::value;
+	};
+	/// <summary> Underlying check used for all is_any_ values. Contained value is set to the value of the passed check_ with the provided First parameter. </summary>
+	/// <typeparam name="First">Type to perform the check on.</typeparam>
+	template<template<typename T_> typename check_, typename First>
+	struct is_any_check<check_, First>
+	{
+		static constexpr bool value = check_<First>::value;
+	};
+	/// <summary> Inverted variant of is_any_check, which in turn is the underlying check for all is_any_not_ values. </summary>
+	/// <typeparam name="First">The first type to perform the check on. Required.</typeparam>
+	/// <typeparam name="Others">All additional types to perform the check on. Optional.</typeparam>
+	template<template<typename T_> typename check_, typename First, typename...Others>
+	struct is_any_not_check
+	{
+		static constexpr bool value = !check_<First>::value ? true : is_any_not_check<check_, Others...>::value;
+	};
+	/// <summary> Inverted variant of is_any_check, which in turn is the underlying check for all is_any_not_ values. </summary>
+	/// <typeparam name="First">Type to perform the check on.</typeparam>
+	template<template<typename T_> typename check_, typename First>
+	struct is_any_not_check<check_, First>
+	{
+		static constexpr bool value = !check_<First>::value;
+	};
 
-	/// <summary>
-	/// <para> The signed integer type best suited to representing the passed type based on byte size. Sign bit is taken into consideration. </para>
-	/// </summary>
-	/// <typeparam name="T">Type to provide the best suited signed value representing type of.</typeparam>
-	template<typename T>
-	using best_signed_rep_t = std::conditional_t
-	<
-		std::is_signed_v<T>,
-		T,
-		std::conditional_t
-		<
-			std::is_floating_point_v<T>,
-			// FLOATING POINT REPS
-			std::conditional_t
-			<
-				(sizeof(T) < sizeof(float)),
-				float,
-				std::conditional_t
-				<
-					(sizeof(T) < sizeof(double)),
-					double,
-					long double
-				>
-			>,
-			// INTEGER REPS
-			std::conditional_t
-			<
-				(sizeof(T) < sizeof(std::int8_t)),
-				std::int8_t,
-				std::conditional_t
-				<
-					(sizeof(T) < sizeof(std::int16_t)),
-					std::int16_t,
-					std::conditional_t
-					<
-						(sizeof(T) < sizeof(std::int32_t)),
-						std::int32_t,
-						std::int64_t
-					>
-				>
-			>
-		>
-	>;
+	/// <summary> Underlying check used for all are_all_ values. Performs the passed check_ with each provided parameter until one is false or they are exhausted. </summary>
+	/// <typeparam name="First">The first type to perform the check on. Required.</typeparam>
+	/// <typeparam name="Others">All additional types to perform the check on. Optional.</typeparam>
+	template<template<typename T_> typename check_, typename First, typename...Others>
+	struct are_all_check
+	{
+		static constexpr bool value = check_<First>::value ? are_all_check<check_, Others...>::value : false;
+	};
+	/// <summary> Underlying check used for all are_all_ values. Contained value is set to the value of the passed check_ with the provided First parameter. </summary>
+	/// <typeparam name="First">Type to perform the check on.</typeparam>
+	template<template<typename T_> typename check_, typename First>
+	struct are_all_check<check_, First>
+	{
+		static constexpr bool value = check_<First>::value;
+	};
+	/// <summary> Inverted variant of are_all_check, which in turn is the underlying check for all are_all_not_ values. </summary>
+	/// <typeparam name="First">The first type to perform the check on. Required.</typeparam>
+	/// <typeparam name="Others">All additional types to perform the check on. Optional.</typeparam>
+	template<template<typename T_> typename check_, typename First, typename...Others>
+	struct are_all_not_check
+	{
+		static constexpr bool value = !check_<First>::value ? is_any_not_check<check_, Others...>::value : false;
+	};
+	/// <summary> Inverted variant of are_all_check, which in turn is the underlying check for all are_all_not_ values. </summary>
+	/// <typeparam name="First">Type to perform the check on.</typeparam>
+	template<template<typename T_> typename check_, typename First>
+	struct are_all_not_check<check_, First>
+	{
+		static constexpr bool value = !check_<First>::value;
+	};
 
-	/// <summary>
-	/// <para> The unsigned integer type best suited to representing the passed type based on byte size. </para>
-	/// <para> This is only suitable with floating point types when they are planned to be used like integers. </para>
-	/// <para> Similarly, this is only suitable with signed types when they are planned to be used only in positive ranges. </para>
-	/// </summary>
-	/// <typeparam name="T">Type to provide the best suited unsigned integer representing type of.</typeparam>
-	template<typename T>
-	using best_unsigned_int_rep_t = std::conditional_t
-	<
-		std::is_unsigned_v<T>,
-		T,
-		std::conditional_t
-		<
-			(sizeof(T) <= sizeof(std::uint8_t)),
-			std::uint8_t,
-			std::conditional_t
-			<
-				(sizeof(T) <= sizeof(std::uint16_t)),
-				std::uint16_t,
-				std::conditional_t
-				<
-					(sizeof(T) <= sizeof(std::uint32_t)),
-					std::uint32_t,
-					std::uint64_t
-				>
-			>
-		>
-	>;
+	/// <summary> Boolean indicating if any of the provided types are signed. </summary>
+	/// <typeparam name="T">First type to check. Required.</typeparam>
+	/// <typeparam name="Others">All types to check after the first. Optional.</typeparam>
+	template<typename T, typename...Others>
+	static constexpr bool is_any_signed_v = is_any_check<std::is_signed, T, Others...>::value;
+	/// <summary> Boolean indicating if all provided types are signed. </summary>
+	/// <typeparam name="T">First type to check. Required.</typeparam>
+	/// <typeparam name="Others">All types to check after the first. Optional.</typeparam>
+	template<typename T, typename...Others>
+	static constexpr bool are_all_signed_v = are_all_check<std::is_signed, T, Others...>::value;
+	/// <summary> Boolean indicating if any of the provided types are not signed (not to be confused with is_any_unsigned_v). </summary>
+	/// <typeparam name="T">First type to check. Required.</typeparam>
+	/// <typeparam name="Others">All types to check after the first. Optional.</typeparam>
+	template<typename T, typename...Others>
+	static constexpr bool is_any_not_signed_v = is_any_not_check<std::is_signed, T, Others...>::value;
+	/// <summary> Boolean indicating if all provided types are not signed (not to be confused with are_all_unsigned_v). </summary>
+	/// <typeparam name="T">First type to check. Required.</typeparam>
+	/// <typeparam name="Others">All types to check after the first. Optional.</typeparam>
+	template<typename T, typename...Others>
+	static constexpr bool are_all_not_signed_v = are_all_not_check<std::is_signed, T, Others...>::value;
+
+	/// <summary> Boolean indicating if any of the provided types are unsigned. </summary>
+	/// <typeparam name="T">First type to check. Required.</typeparam>
+	/// <typeparam name="Others">All types to check after the first. Optional.</typeparam>
+	template<typename T, typename...Others>
+	static constexpr bool is_any_unsigned_v = is_any_check<std::is_unsigned, T, Others...>::value;
+	/// <summary> Boolean indicating if all provided types are unsigned. </summary>
+	/// <typeparam name="T">First type to check. Required.</typeparam>
+	/// <typeparam name="Others">All types to check after the first. Optional.</typeparam>
+	template<typename T, typename...Others>
+	static constexpr bool are_all_unsigned_v = are_all_check<std::is_unsigned, T, Others...>::value;
+	/// <summary> Boolean indicating if any of the provided types are not unsigned (not to be confused with is_any_signed_v). </summary>
+	/// <typeparam name="T">First type to check. Required.</typeparam>
+	/// <typeparam name="Others">All types to check after the first. Optional.</typeparam>
+	template<typename T, typename...Others>
+	static constexpr bool is_any_not_unsigned_v = is_any_not_check<std::is_unsigned, T, Others...>::value;
+	/// <summary> Boolean indicating if all provided types are not unsigned (not to be confused with are_all_signed_v). </summary>
+	/// <typeparam name="T">First type to check. Required.</typeparam>
+	/// <typeparam name="Others">All types to check after the first. Optional.</typeparam>
+	template<typename T, typename...Others>
+	static constexpr bool are_all_not_unsigned_v = are_all_not_check<std::is_unsigned, T, Others...>::value;
 }
 
 #endif
