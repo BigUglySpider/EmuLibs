@@ -50,6 +50,56 @@ namespace EmuMath
 			using const_ref_value_type = std::conditional_t<has_const_reference_values, ref_value_type, const nonref_value_type&>;
 			/// <summary> Constant variant of pointer_value_type. </summary>
 			using const_pointer_value_type = std::conditional_t<has_const_values, pointer_value_type, const nonref_value_type*>;
+
+			/// <summary> The default floating point value used by this vector type. </summary>
+			using default_floating_point = float;
+
+			/// <summary> Simplification for calling a square root function for the default_floating_point type. </summary>
+			/// <typeparam name="Val_">Type of the passed value to get the square root of.</typeparam>
+			/// <param name="val_">Value to get the square root of.</param>
+			/// <returns>Square root of the passed value, calculated and represented as a default_floating_point type.</returns>
+			template<typename Val_>
+			static default_floating_point _default_floating_point_sqrt(const Val_& val_)
+			{
+				using UnqualifiedVal = std::remove_cv_t<Val_>;
+				if constexpr (std::is_same_v<default_floating_point, float>)
+				{
+					if constexpr (std::is_same_v<default_floating_point, UnqualifiedVal>)
+					{
+						return sqrtf(val_);
+					}
+					else
+					{
+						return sqrtf(static_cast<default_floating_point>(val_));
+					}
+				}
+				else if constexpr (std::is_same_v<default_floating_point, double>)
+				{
+					if constexpr (std::is_same_v<default_floating_point, UnqualifiedVal>)
+					{
+						return sqrt(val_);
+					}
+					else
+					{
+						return sqrt(static_cast<default_floating_point>(val_));
+					}
+				}
+				else if constexpr (std::is_same_v<default_floating_point, long double>)
+				{
+					if constexpr (std::is_same_v<default_floating_point, UnqualifiedVal>)
+					{
+						return sqrtl(val_);
+					}
+					else
+					{
+						return sqrtl(static_cast<default_floating_point>(val_));
+					}
+				}
+				else
+				{
+					static_assert(false, "An EmuVectorInfo's default_floating_point is not a supported type. This is an internal EmuMath error.");
+				}
+			}
 		};
 	}
 }

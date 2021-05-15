@@ -2,6 +2,7 @@
 #define EMU_MATH_VECTOR_2_T_H_INC_
 
 #include "EmuVectorInfo.h"
+#include "../../EmuCore/TMPHelpers/TypeComparators.h"
 #include <exception>
 
 namespace EmuMath
@@ -32,6 +33,8 @@ namespace EmuMath
 		using const_ref_value_type = typename info_type::const_ref_value_type;
 		/// <summary> The non-qualified, non-reference variant of the value types stored within this vector. </summary>
 		using nonref_value_type_without_qualifiers = typename info_type::nonref_value_type_without_qualifiers;
+		/// <summary> The default floating point value used by relevant functions for this vector type. </summary>
+		using default_floating_point = typename info_type::default_floating_point;
 
 		/// <summary> The number of elements contained within this vector. </summary>
 		/// <returns>2</returns>
@@ -1291,7 +1294,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region OVERALL_OPERATIONS
-		template<typename OutT = float>
+		template<typename OutT = default_floating_point>
 		constexpr Vector2<OutT> Reciprocal() const
 		{
 			if constexpr (std::is_floating_point_v<OutT>)
@@ -1580,17 +1583,33 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region VECTOR_OPERATIONS
-		float Magnitudef() const
+		template<typename OutT = default_floating_point>
+		OutT Magnitude() const
 		{
-			return sqrtf(SquareMagnitude<float>());
-		}
-		double Magnituded() const
-		{
-			return sqrt(SquareMagnitude<double>());
-		}
-		long double Magnitudeld() const
-		{
-			return sqrt(SquareMagnitude<long double>());
+			if constexpr (std::is_floating_point_v<OutT>)
+			{
+				using NonQualifiedOutT = std::remove_cv_t<OutT>;
+				if constexpr (std::is_same_v<NonQualifiedOutT, float>)
+				{
+					return sqrtf(this->SquareMagnitude<float>());
+				}
+				else if constexpr (std::is_same_v<NonQualifiedOutT, double>)
+				{
+					return sqrt(this->SquareMagnitude<double>());
+				}
+				else if constexpr (std::is_same_v<NonQualifiedOutT, long double>)
+				{
+					return sqrtl(this->SquareMagnitude<long double>());
+				}
+				else
+				{
+					return static_cast<OutT>(info_type::_default_floating_point_sqrt(this->SquareMagnitude<default_floating_point>()));
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to retrieve a non-floating-point magnitude from an EmuMath::Vector2, which is not allowed.");
+			}
 		}
 		template<typename OutT = nonref_value_type>
 		constexpr OutT SquareMagnitude() const
@@ -1611,40 +1630,26 @@ namespace EmuMath
 				}
 			}
 		}
-		Vector2<float> AsNormalisedf() const
+		template<typename OutT = default_floating_point>
+		Vector2<OutT> AsNormalised() const
 		{
-			const float reciprocal = 1.0f / Magnitudef();
-			if constexpr (std::is_same_v<nonref_value_type, float>)
+			if constexpr (std::is_floating_point_v<OutT>)
 			{
-				return { x * reciprocal, y * reciprocal };
+				using NonQualifiedOutT = std::remove_cv_t<OutT>;
+				const NonQualifiedOutT reciprocal = EmuCore::ArithmeticHelpers::OneT<NonQualifiedOutT> / this->Magnitude<NonQualifiedOutT>();
+				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, NonQualifiedOutT>)
+				{
+					return { x * reciprocal, y * reciprocal };
+				}
+				else
+				{
+					return { static_cast<NonQualifiedOutT>(x) * reciprocal, static_cast<NonQualifiedOutT>(y) * reciprocal };
+				}
 			}
 			else
 			{
-				return { static_cast<float>(x * reciprocal), static_cast<float>(y * reciprocal) };
-			}
-		}
-		Vector2<double> AsNormalisedd() const
-		{
-			const double reciprocal = 1.0f / Magnituded();
-			if constexpr (std::is_same_v<nonref_value_type, double>)
-			{
-				return { x * reciprocal, y * reciprocal };
-			}
-			else
-			{
-				return { static_cast<double>(x * reciprocal), static_cast<double>(y * reciprocal) };
-			}
-		}
-		Vector2<long double> AsNormalisedld() const
-		{
-			const long double reciprocal = 1.0f / Magnituded();
-			if constexpr (std::is_same_v<nonref_value_type, long double>)
-			{
-				return { x * reciprocal, y * reciprocal };
-			}
-			else
-			{
-				return { static_cast<long double>(x * reciprocal), static_cast<long double>(y * reciprocal) };
+				static_assert(false, "Attempted to retrieve a non-floating-point normalised Vector from an EmuMath::Vector2, which is not allowed.");
+				return {};
 			}
 		}
 		template<typename RhsT, typename OutT = nonref_value_type>
@@ -1680,25 +1685,55 @@ namespace EmuMath
 				}
 			}
 		}
-		template<typename OtherT>
-		bool WithinDistance(const Vector2<OtherT>& target, const float maxDistance) const
+		template<typename OtherT, typename MaxDistT>
+		bool WithinDistance(const Vector2<OtherT>& target, const MaxDistT& maxDistance) const
 		{
-			return this->_perform_normalised_distance_check<float, OtherT>(target, maxDistance);
+			using ThisFP = EmuCore::TMPHelpers::best_floating_point_rep_t<nonref_value_type_without_qualifiers>;
+			using TargetFP = EmuCore::TMPHelpers::best_floating_point_rep_t<typename Vector2<OtherT>::nonref_value_type_without_qualifiers>;
+			using MaxDistFP = EmuCore::TMPHelpers::best_floating_point_rep_t<MaxDistT>;
+			using HighestFP = EmuCore::TMPHelpers::highest_byte_size_t<ThisFP, TargetFP, MaxDistFP>;
+
+			return Vector2<HighestFP>
+			(
+				static_cast<HighestFP>(target.x) - x,
+				static_cast<HighestFP>(target.y - y)
+			).Magnitude<HighestFP>() <= maxDistance;
 		}
-		template<typename OtherT>
-		bool WithinDistance(const Vector2<OtherT>& target, const double maxDistance) const
+		template<typename OtherT, typename MaxDistT>
+		constexpr bool WithinSquareDistance(const Vector2<OtherT>& target, const MaxDistT& maxSquareDistance) const
 		{
-			return this->_perform_normalised_distance_check<double, OtherT>(target, maxDistance);
-		}
-		template<typename OtherT>
-		bool WithinDistance(const Vector2<OtherT>& target, const long double maxDistance) const
-		{
-			return this->_perform_normalised_distance_check<long double, OtherT>(target, maxDistance);
-		}
-		template<typename OtherT, typename DistT>
-		constexpr bool WithinSquareDistance(const Vector2<OtherT>& target, const OtherT& maxSquareDistance) const
-		{
-			return target.operator-(*this).SquareMagnitude<DistT>() <= maxSquareDistance;
+			constexpr bool ThisOrTargetIsFP = info_type::has_floating_point_values || info_type_t<OtherT>::has_floating_point_values;
+			constexpr bool MaxDistTIsFP = std::is_floating_point_v<MaxDistT>;
+			if constexpr (!(ThisOrTargetIsFP || MaxDistTIsFP))
+			{
+				// Since we know we're working with integers, use the highest-sized type as an unsigned rep to support higher bound values.
+				using HighestType = EmuCore::TMPHelpers::highest_byte_size_t
+				<
+					nonref_value_type_without_qualifiers,
+					typename Vector2<OtherT>::nonref_value_type_without_qualifiers,
+					MaxDistT
+				>;
+				using HighestUnsigned = EmuCore::TMPHelpers::best_unsigned_int_rep_t<HighestType>;
+
+				return Vector2<HighestUnsigned>
+				(
+					static_cast<HighestUnsigned>(target.x) - x,
+					static_cast<HighestUnsigned>(target.y) - y
+				).SquareMagnitude<HighestUnsigned>() <= maxSquareDistance;
+			}
+			else
+			{
+				using ThisFP = EmuCore::TMPHelpers::best_floating_point_rep_t<nonref_value_type_without_qualifiers>;
+				using TargetFP = EmuCore::TMPHelpers::best_floating_point_rep_t<typename Vector2<OtherT>::nonref_value_type_without_qualifiers>;
+				using MaxDistFP = EmuCore::TMPHelpers::best_floating_point_rep_t<MaxDistT>;
+				using HighestFP = EmuCore::TMPHelpers::highest_byte_size_t<ThisFP, TargetFP, MaxDistFP>;
+
+				return Vector2<HighestFP>
+				(
+					static_cast<HighestFP>(target.x) - x,
+					static_cast<HighestFP>(target.y - y)
+				).SquareMagnitude<HighestFP>() <= maxSquareDistance;
+			}
 		}
 		constexpr Vector2<nonref_value_type> AsReversed() const
 		{
@@ -1723,25 +1758,6 @@ namespace EmuMath
 			else
 			{
 				at<Index>() = static_cast<nonref_value_type>(val_);
-			}
-		}
-
-		template<typename DistT, typename OtherT>
-		bool _perform_normalised_distance_check(const Vector2<OtherT>& target, const DistT maxDistance) const
-		{
-			DistT distX = static_cast<DistT>(target.x - x);
-			DistT distY = static_cast<DistT>(target.y - y);
-			if constexpr (std::is_same_v<DistT, float>)
-			{
-				return sqrtf(distX * distX + distY * distY) <= maxDistance;
-			}
-			else if constexpr (std::is_same_v<DistT, double>)
-			{
-				return sqrt(distX * distX + distY * distY) <= maxDistance;
-			}
-			else if constexpr (std::is_same_v<DistT, long double>)
-			{
-				return sqrtl(distX * distX + distY * distY) <= maxDistance;
 			}
 		}
 #pragma endregion

@@ -39,6 +39,8 @@ int main()
 	Vector3<std::uint64_t> v3ui64 = v2si16Fromv3f;
 	std::cout << v3ui64 << "\n";
 
+	std::cout << "Within Dist(" << v2si16Fromv3f << ", " << yo << ", 5): " << v2si16Fromv3f.WithinDistance(yo, 5);
+
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();
 #pragma endregion

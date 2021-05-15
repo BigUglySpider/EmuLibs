@@ -32,6 +32,8 @@ namespace EmuMath
 		using const_ref_value_type = typename info_type::const_ref_value_type;
 		/// <summary> The non-qualified, non-reference variant of the value types stored within this vector. </summary>
 		using nonref_value_type_without_qualifiers = typename info_type::nonref_value_type_without_qualifiers;
+		/// <summary> The default floating point value used by relevant functions for this vector type. </summary>
+		using default_floating_point = typename info_type::default_floating_point;
 
 		/// <summary> The number of elements contained within this vector. </summary>
 		/// <returns>3</returns>

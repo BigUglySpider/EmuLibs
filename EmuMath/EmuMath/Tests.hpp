@@ -91,6 +91,7 @@ namespace EmuCore::TestingHelpers
 		std::cout << "\n-----Finished execution and output of " << numTests << " test " << harnessCorrectPlural << " in " << duration << " seconds-----\n";
 		system("pause");
 		OnAllTestsOver(tests);
+		system("pause");
 	}
 #pragma endregion
 }
