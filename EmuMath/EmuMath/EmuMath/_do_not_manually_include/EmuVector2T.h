@@ -11,6 +11,8 @@ namespace EmuMath
 	template<typename T>
 	struct Vector3;
 
+	/// <summary> Generic Vector type which contains 2 elements of the provided type, representing the X- and Y-axes respectively. </summary>
+	/// <typeparam name="T">Type to store within the Vector.</typeparam>
 	template<typename T>
 	struct Vector2
 	{
