@@ -1106,6 +1106,21 @@ namespace EmuMath
 			}
 			return *this;
 		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator=(const Vector3<OtherT>& rhs)
+		{
+			if constexpr (std::is_same_v<nonref_value_type, typename info_type_t<OtherT>::nonref_value_type>)
+			{
+				x = rhs.x;
+				y = rhs.y;
+			}
+			else
+			{
+				x = static_cast<nonref_value_type>(rhs.x);
+				y = static_cast<nonref_value_type>(rhs.y);
+			}
+			return *this;
+		}
 #pragma endregion
 
 #pragma region BOOLEAN_PER_ELEMENT_COMPARISON_FUNCTIONS
