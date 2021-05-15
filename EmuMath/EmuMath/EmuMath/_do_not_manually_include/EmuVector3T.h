@@ -342,6 +342,43 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region ASSIGNMENT_OPERATORS
+		template<typename OtherT>
+		constexpr Vector3<value_type>& operator=(const Vector3<OtherT>& rhs)
+		{
+			if constexpr (std::is_same_v<nonref_value_type, typename info_type_t<OtherT>::nonref_value_type>)
+			{
+				x = rhs.x;
+				y = rhs.y;
+				z = rhs.z;
+			}
+			else
+			{
+				x = static_cast<nonref_value_type>(rhs.x);
+				y = static_cast<nonref_value_type>(rhs.y);
+				z = static_cast<nonref_value_type>(rhs.z);
+			}
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector3<value_type>& operator=(const Vector2<OtherT>& rhs)
+		{
+			if constexpr (std::is_same_v<nonref_value_type, typename Vector2<OtherT>::nonref_value_type>)
+			{
+				x = rhs.x;
+				y = rhs.y;
+				z = info_type::value_zero;
+			}
+			else
+			{
+				x = static_cast<nonref_value_type>(rhs.x);
+				y = static_cast<nonref_value_type>(rhs.y);
+				z = info_type::value_zero;
+			}
+			return *this;
+		}
+#pragma endregion
+
 #pragma region SHUFFLES
 		/// <summary> Returns a Vector3 with elements X, Y and Z copying the elements at the respective provided indices within this Vector. </summary>
 		/// <returns>This vector shuffled as a Vector3.</returns>
