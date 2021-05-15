@@ -1672,7 +1672,19 @@ namespace EmuMath
 			else
 			{
 				using HighestVecT = EmuCore::TMPHelpers::highest_byte_size<nonref_value_type_without_qualifiers, typename Vector2<RhsT>::nonref_value_type_without_qualifiers>;
-				
+				using HighestT = EmuCore::TMPHelpers::highest_byte_size_t<HighestVecT, OutT>;
+				using CalcT = std::conditional_t
+				<
+					EmuCore::TMPHelpers::is_any_signed_v<nonref_value_type_without_qualifiers, typename Vector2<RhsT>::nonref_value_type_without_qualifiers>,
+					EmuCore::TMPHelpers::best_signed_rep_t<HighestT>,
+					HighestT
+				>;
+
+				return static_cast<OutT>
+				(
+					(static_cast<CalcT>(x) * rhs.x) +
+					(static_cast<CalcT>(y) * rhs.y)
+				);
 			}
 		}
 		template<typename OtherT, typename MaxDistT>
@@ -1721,7 +1733,7 @@ namespace EmuMath
 				return Vector2<HighestFP>
 				(
 					static_cast<HighestFP>(target.x) - x,
-					static_cast<HighestFP>(target.y - y)
+					static_cast<HighestFP>(target.y) - y
 				).SquareMagnitude<HighestFP>() <= maxSquareDistance;
 			}
 		}
