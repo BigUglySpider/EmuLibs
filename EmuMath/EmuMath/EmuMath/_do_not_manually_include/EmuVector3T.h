@@ -179,7 +179,7 @@ namespace EmuMath
 		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
 		/// <param name="toCopy">Vector to copy the elements of.</param>
 		template<typename OtherT>
-		constexpr Vector3(const Vector2<OtherT>& toCopy) :
+		explicit constexpr Vector3(const Vector2<OtherT>& toCopy) :
 			Vector3(toCopy.x, toCopy.y, value_type())
 		{
 		}
@@ -190,7 +190,7 @@ namespace EmuMath
 		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
 		/// <param name="toCopy">Vector to copy the elements of.</param>
 		template<typename OtherT>
-		constexpr Vector3(Vector2<OtherT>& toCopy) :
+		explicit constexpr Vector3(Vector2<OtherT>& toCopy) :
 			Vector3(toCopy.x, toCopy.y, value_type())
 		{
 		}
@@ -203,7 +203,7 @@ namespace EmuMath
 		/// <param name="toCopy">Vector to copy the elements of.</param>
 		/// <param name="z_">Value to set the vector's z component via.</param>
 		template<typename OtherT, typename Z_>
-		constexpr Vector3(const Vector2<OtherT>& toCopy, const Z_& z_) :
+		explicit constexpr Vector3(const Vector2<OtherT>& toCopy, const Z_& z_) :
 			Vector3(toCopy.x, toCopy.y, z_)
 		{
 		}
@@ -216,7 +216,7 @@ namespace EmuMath
 		/// <param name="toCopy">Vector to copy the elements of.</param>
 		/// <param name="z_">Value to set the vector's z component via.</param>
 		template<typename OtherT, typename Z_>
-		constexpr Vector3(Vector2<OtherT>& toCopy, const Z_& z_) :
+		explicit constexpr Vector3(Vector2<OtherT>& toCopy, const Z_& z_) :
 			Vector3(toCopy.x, toCopy.y, z_)
 		{
 		}
@@ -229,7 +229,7 @@ namespace EmuMath
 		/// <param name="toCopy">Vector to copy the elements of.</param>
 		/// <param name="z_">Value to set the vector's z component via.</param>
 		template<typename OtherT, typename Z_>
-		constexpr Vector3(Vector2<OtherT>& toCopy, Z_& z_) :
+		explicit constexpr Vector3(Vector2<OtherT>& toCopy, Z_& z_) :
 			Vector3(toCopy.x, toCopy.y, z_)
 		{
 		}

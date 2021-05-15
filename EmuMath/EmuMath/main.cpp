@@ -27,16 +27,18 @@ int main()
 	Vector2<const float&> boi = yoRef;
 
 	Vector2<float&> anotherRef = yo;
+	Vector2<float> hi(0.0f, 1.0f);
+	std::cout << "hi: " << hi << "\n";
 
 
 	Vector2<float> a = Vector2<float>(15u, 1.0f);
 	std::cout << a << "\n";
 
 	Vector3<float> v3f(0.0f, 1.75f, 2.0f);
-	Vector2si16 v2si16Fromv3f = v3f;
+	Vector2si16 v2si16Fromv3f = Vector2si16(v3f);
 	std::cout << "v3f: " << v3f << " | v2si16: " << v2si16Fromv3f << "\n";
 
-	Vector3<std::uint64_t> v3ui64 = v2si16Fromv3f;
+	Vector3<std::uint64_t> v3ui64 = Vector3<std::uint64_t>(v2si16Fromv3f);
 	std::cout << v3ui64 << "\n";
 
 	std::cout << "Within Dist(" << v2si16Fromv3f << ", " << yo << ", 5): " << v2si16Fromv3f.WithinDistance(yo, 5);

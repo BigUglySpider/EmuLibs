@@ -111,7 +111,7 @@ namespace EmuMath
 		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
 		/// <param name="toCopy">Vector to copy the elements of.</param>
 		template<typename OtherT>
-		constexpr Vector2(const EmuMath::Vector3<OtherT>& toCopy) :
+		explicit constexpr Vector2(const EmuMath::Vector3<OtherT>& toCopy) :
 			Vector2(toCopy.x, toCopy.y)
 		{
 		}
@@ -119,7 +119,7 @@ namespace EmuMath
 		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
 		/// <param name="toCopy">Vector to copy the elements of.</param>
 		template<typename OtherT>
-		constexpr Vector2(EmuMath::Vector3<OtherT>& toCopy) :
+		explicit constexpr Vector2(EmuMath::Vector3<OtherT>& toCopy) :
 			Vector2(toCopy.x, toCopy.y)
 		{
 		}
@@ -1584,6 +1584,13 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region VECTOR_OPERATIONS
+		/// <summary>
+		/// <para> Calculates the magnitude of this Vector. </para>
+		/// <para> It is recommended to use SquareMagnitude over this where the final magnitude is not required, due to avoiding a square root calculation. </para>
+		/// <para> Note that the output type must be a valid floating point type. If not, a static assertion will be triggered. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type to output the magnitude as.</typeparam>
+		/// <returns>The magnitude of this Vector, represented as the provided OutT type (defaults to this Vector's default_floating_point).</returns>
 		template<typename OutT = default_floating_point>
 		OutT Magnitude() const
 		{
@@ -1612,6 +1619,12 @@ namespace EmuMath
 				static_assert(false, "Attempted to retrieve a non-floating-point magnitude from an EmuMath::Vector2, which is not allowed.");
 			}
 		}
+		/// <summary>
+		/// <para> Calculates the square magnitude of this Vector (that is, the magnitude of this Vector before finding the square root). </para>
+		/// <para> It is recommended to use this instead of Magnitude where the final magnitude is not required, due to avoiding a square root calculation. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type to output the square magnitude as.</typeparam>
+		/// <returns>The square magnitude of this Vector, represented as the provided OutT type (defaults to this Vector's nonref_value_type).</returns>
 		template<typename OutT = nonref_value_type>
 		constexpr OutT SquareMagnitude() const
 		{
@@ -1631,6 +1644,12 @@ namespace EmuMath
 				}
 			}
 		}
+		/// <summary>
+		/// <para> Returns a normalised Vector from this Vector's components, stored as optionally customisable floating point types. </para>
+		/// <para> Note that the output type must be a valid floating point type. If not, a static assertion will be triggered. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type to output as. Must be a floating point type.</typeparam>
+		/// <returns>Normalised version of this Vector, with its contained elements stored as the provided OutT (defaults to this Vector's default_floating_point).</returns>
 		template<typename OutT = default_floating_point>
 		Vector2<OutT> AsNormalised() const
 		{
@@ -1653,6 +1672,13 @@ namespace EmuMath
 				return {};
 			}
 		}
+		/// <summary>
+		/// <para> Returns the dot product of this Vector and the provided Vector, output as an optionally customisable type. </para>
+		/// </summary>
+		/// <typeparam name="RhsT">Type contained within the passed Vector.</typeparam>
+		/// <typeparam name="OutT">Type to output. Defaults to this Vector's nonref_value_type.</typeparam>
+		/// <param name="rhs">Vector to calculate a dot product with.</param>
+		/// <returns>Dot product of this Vector and the provided Vector, represented as this Vector's nonref_value_type or an optional provided type.</returns>
 		template<typename RhsT, typename OutT = nonref_value_type>
 		constexpr OutT DotProduct(const Vector2<RhsT>& rhs) const
 		{
@@ -1687,6 +1713,31 @@ namespace EmuMath
 				);
 			}
 		}
+		/// <summary>
+		/// <para> Returns the dot product of this Vector and the provided Vector, output as an optionally customisable type. </para>
+		/// </summary>
+		/// <typeparam name="RhsT">Type contained within the passed Vector.</typeparam>
+		/// <typeparam name="OutT">Type to output. Defaults to this Vector's nonref_value_type.</typeparam>
+		/// <param name="rhs">Vector to calculate a dot product with.</param>
+		/// <returns>Dot product of this Vector and the provided Vector, represented as this Vector's nonref_value_type or an optional provided type.</returns>
+		template<typename RhsT, typename OutT = nonref_value_type>
+		constexpr OutT DotProduct(const Vector3<RhsT>& rhs) const
+		{
+			using RhsNonRef = typename info_type_t<RhsT>::nonref_value_type;
+			return this->DotProduct<RhsNonRef, OutT>(Vector2<RhsNonRef>(rhs.x, rhs.y));
+		}
+		/// <summary>
+		/// <para> Returns a boolean indicating if the provided target vector is within the provided distance of this vector. </para>
+		/// <para>
+		///		Recommended to use WithinSquareDistance over this if possible as it avoids a square root and may be evaluable at compile time if needed. 
+		///		The only change needed for your parameters to do so will be to multiply maxDistance by itself.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="OtherT">Type contained within the target vector.</typeparam>
+		/// <typeparam name="MaxDistT">Type used to represent the max distance.</typeparam>
+		/// <param name="target">Target vector to calculate the distance between.</param>
+		/// <param name="maxDistance">Maximum distance between this vector and the target vector before this function returns false.</param>
+		/// <returns>Boolean indicating if the target vector was within maxDistance (true) or not (false).</returns>
 		template<typename OtherT, typename MaxDistT>
 		bool WithinDistance(const Vector2<OtherT>& target, const MaxDistT& maxDistance) const
 		{
@@ -1701,6 +1752,15 @@ namespace EmuMath
 				static_cast<HighestFP>(target.y - y)
 			).Magnitude<HighestFP>() <= maxDistance;
 		}
+		/// <summary>
+		/// <para> Returns a boolean indicating if the provided target vector is within the provided square distance of this vector. </para>
+		/// <para> Recommended to use this over WithinDistance if possible as it avoids a square root and may be evaluable at compile time if needed. </para>
+		/// </summary>
+		/// <typeparam name="OtherT">Type contained within the target vector.</typeparam>
+		/// <typeparam name="MaxDistT">Type used to represent the max square distance.</typeparam>
+		/// <param name="target">Target vector to calculate the square distance between.</param>
+		/// <param name="maxSquareDistance">Maximum square distance between this vector and the target vector before this function returns false.</param>
+		/// <returns>Boolean indicating if the target vector was within maxSquareDistance (true) or not (false).</returns>
 		template<typename OtherT, typename MaxDistT>
 		constexpr bool WithinSquareDistance(const Vector2<OtherT>& target, const MaxDistT& maxSquareDistance) const
 		{
@@ -1737,9 +1797,23 @@ namespace EmuMath
 				).SquareMagnitude<HighestFP>() <= maxSquareDistance;
 			}
 		}
-		constexpr Vector2<nonref_value_type> AsReversed() const
+		/// <summary>
+		/// <para> Returns a reversed version of this Vector, with an optional different type. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type for the returned Vector to contain. Defaults to this Vector's nonref_value_type.</typeparam>
+		/// <returns>Reversed version of this Vector.</returns>
+		template<typename OutT = nonref_value_type>
+		constexpr Vector2<OutT> AsReversed() const
 		{
-			return { -x, -y };
+			if constexpr (std::is_signed_v<nonref_value_type>)
+			{
+				return { -x, -y };
+			}
+			else
+			{
+				using HighestSigned = EmuCore::TMPHelpers::best_signed_rep_t<EmuCore::TMPHelpers::highest_byte_size_t<OutT, nonref_value_type>>;
+				return { -static_cast<HighestSigned>(x), -static_cast<HighestSigned>(y) };
+			}
 		}
 #pragma endregion
 

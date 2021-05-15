@@ -2,6 +2,7 @@
 #define EMU_MATH_VECTOR_INFO_H_INC_
 
 #include "../../EmuCore/ArithmeticHelpers/CommonValues.h"
+#include "../../EmuCore/TMPHelpers/TypeConvertors.h"
 
 namespace EmuMath
 {
@@ -51,8 +52,8 @@ namespace EmuMath
 			/// <summary> Constant variant of pointer_value_type. </summary>
 			using const_pointer_value_type = std::conditional_t<has_const_values, pointer_value_type, const nonref_value_type*>;
 
-			/// <summary> The default floating point value used by this vector type. </summary>
-			using default_floating_point = float;
+			/// <summary> The default floating point type used by this vector type. </summary>
+			using default_floating_point = EmuCore::TMPHelpers::best_floating_point_rep_t<nonref_value_type_without_qualifiers>;
 
 			/// <summary> Simplification for calling a square root function for the default_floating_point type. </summary>
 			/// <typeparam name="Val_">Type of the passed value to get the square root of.</typeparam>
