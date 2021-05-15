@@ -79,7 +79,7 @@ namespace EmuCore::TestingHelpers
 			PerformLoop<PassLoopNumberOnExecution>(numLoops, toExecutePerLoop, times, minTime, maxTime, totalTime, meanTime);
 
 			resultsStream
-				<< "Completed " << numLoops << " iteration test harness execution.\n"
+				<< "Completed Looping Test Harness execution with " << numLoops << " iterations.\n"
 				<< "Total Time: " << totalTime
 				<< "ms\nMin Time: " << minTime
 				<< "ms\nMax Time: " << maxTime
@@ -105,7 +105,7 @@ namespace EmuCore::TestingHelpers
 			PerformLoop<PassLoopNumberOnExecution>(numLoops, toExecutePerLoop, times, minTime, maxTime, totalTime, meanTime);
 
 			resultsStream
-				<< L"Completed " << numLoops << L" iteration test harness execution.\n"
+				<< "Completed Looping Test Harness execution with " << numLoops << " iterations.\n"
 				<< L"Total Time: " << totalTime
 				<< L"ms\nMin Time: " << minTime
 				<< L"ms\nMax Time: " << maxTime
