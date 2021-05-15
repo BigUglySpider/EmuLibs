@@ -14,30 +14,18 @@ namespace EmuCore::TMPHelpers
 		T,
 		std::conditional_t
 		<
-			(sizeof(T) <= sizeof(float)),
-			float,
+			std::is_signed_v<T>,
 			std::conditional_t
 			<
-				(sizeof(T) <= sizeof(double)),
-				double,
-				long double
-			>
-		>
-	>;
-
-	/// <summary>
-	/// <para> The signed integer type best suited to representing the passed type based on byte size. Sign bit is taken into consideration. </para>
-	/// </summary>
-	/// <typeparam name="T">Type to provide the best suited signed value representing type of.</typeparam>
-	template<typename T>
-	using best_signed_rep_t = std::conditional_t
-	<
-		std::is_signed_v<T>,
-		T,
-		std::conditional_t
-		<
-			std::is_floating_point_v<T>,
-			// FLOATING POINT REPS
+				(sizeof(T) <= sizeof(float)),
+				float,
+				std::conditional_t
+				<
+					(sizeof(T) <= sizeof(double)),
+					double,
+					long double
+				>
+			>,
 			std::conditional_t
 			<
 				(sizeof(T) < sizeof(float)),
@@ -48,24 +36,53 @@ namespace EmuCore::TMPHelpers
 					double,
 					long double
 				>
-			>,
-			// INTEGER REPS
+			>
+		>
+	>;
+
+	/// <summary>
+	/// <para> The signed integer type best suited to representing the passed type based on byte size. Sign bit is taken into consideration. </para>
+	/// <para> Not to be confused with best_signed_rep_t. </para>
+	/// </summary>
+	/// <typeparam name="T">Type to provide the best suited signed value representing type of.</typeparam>
+	template<typename T>
+	using best_signed_int_rep_t = std::conditional_t
+	<
+		std::is_signed_v<T> && std::is_integral_v<T>,
+		T,
+		std::conditional_t
+		<
+			(sizeof(T) < sizeof(std::int8_t)),
+			std::int8_t,
 			std::conditional_t
 			<
-				(sizeof(T) < sizeof(std::int8_t)),
-				std::int8_t,
+				(sizeof(T) < sizeof(std::int16_t)),
+				std::int16_t,
 				std::conditional_t
 				<
-					(sizeof(T) < sizeof(std::int16_t)),
-					std::int16_t,
-					std::conditional_t
-					<
-						(sizeof(T) < sizeof(std::int32_t)),
-						std::int32_t,
-						std::int64_t
-					>
+					(sizeof(T) < sizeof(std::int32_t)),
+					std::int32_t,
+					std::int64_t
 				>
 			>
+		>
+	>;
+
+	/// <summary>
+	/// <para> The signed type best suited to representing the passed type based on byte size. Sign bit is taken into consideration. </para>
+	/// <para> Not to be confused with best_signed_int_rep_t. </para>
+	/// </summary>
+	/// <typeparam name="T">Type to provide the best suited signed value representing type of.</typeparam>
+	template<typename T>
+	using best_signed_rep_t = std::conditional_t
+	<
+		std::is_signed_v<T>,
+		T,
+		std::conditional_t
+		<
+			std::is_floating_point_v<T>,
+			best_floating_point_rep_t<T>,
+			best_signed_int_rep_t<T>
 		>
 	>;
 

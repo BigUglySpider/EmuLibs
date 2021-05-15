@@ -1295,6 +1295,12 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region OVERALL_OPERATIONS
+		/// <summary>
+		/// <para> Calculates the reciprocals of this Vector's elements, with an optionally customisable floating-point output type. </para>
+		/// <para> Note that the output type must be a valid floating point type. If not, a static assertion will be triggered. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Floating-point type to output the reciprocals as.</typeparam>
+		/// <returns>Vector of reciprocals to this Vector's respective elements, stored as the provided OutT (defaults to this Vector's default_floating_point).</returns>
 		template<typename OutT = default_floating_point>
 		constexpr Vector2<OutT> Reciprocal() const
 		{
@@ -1315,6 +1321,11 @@ namespace EmuMath
 				static_assert(false, "Attempted to retrieve a non-floating-point reciprocal from an EmuMath::Vector2, which is not allowed.");
 			}
 		}
+		/// <summary>
+		/// <para> Calculates the total of all of this Vector's elements added together and outputs the result as an optionally customisable type. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type to output the sum as.</typeparam>
+		/// <returns>The total of all elements in this Vector added together, represented as the provided OutT (defaults to this Vector's nonref_value_type).</returns>
 		template<typename OutT = nonref_value_type>
 		constexpr OutT OverallSum() const
 		{
@@ -1327,6 +1338,11 @@ namespace EmuMath
 				return static_cast<OutT>(x) + static_cast<OutT>(y);
 			}
 		}
+		/// <summary>
+		/// <para> Calculates the total of all of this Vector's elements multiplied together and outputs the result as an optionally customisable type. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type to output the product as.</typeparam>
+		/// <returns>The total of all elements in this Vector multiplied together, represented as the provided OutT (defaults to this Vector's nonref_value_type).</returns>
 		template<typename OutT = nonref_value_type>
 		constexpr OutT OverallProduct() const
 		{
@@ -1339,35 +1355,56 @@ namespace EmuMath
 				return static_cast<OutT>(x) * static_cast<OutT>(y);
 			}
 		}
+		/// <summary> Returns a boolean indicating if all elements within this Vector are zero. </summary>
+		/// <returns> True if all elements in this Vector are zero, otherwise false. </returns>
 		constexpr bool AllZero() const
 		{
-			const nonref_value_type zero = nonref_value_type();
-			return x == zero && y == zero;
+			return x == info_type::value_zero && y == info_type::value_zero;
 		}
+		/// <summary> Determines the lowest element within this Vector. </summary>
+		/// <returns>Copy of the lowest element within this Vector.</returns>
 		constexpr nonref_value_type Min() const
 		{
 			return x < y ? x : y;
 		}
+		/// <summary> Determines the highest element within this Vector. </summary>
+		/// <returns>Copy of the highest element within this Vector.</returns>
 		constexpr nonref_value_type Max() const
 		{
 			return x > y ? x : y;
 		}
+		/// <summary> Calculates the values of this Vector's elements when clamped to the provided minimum respective values of the passed Vector. </summary>
+		/// <param name="min_">Minimum values for the respective elements of this Vector.</param>
+		/// <returns>Copy of this Vector with its elements clamped to a minimum of the respective elements in the provided Vector.</returns>
 		constexpr Vector2<nonref_value_type> AsClampedMin(const Vector2<value_type>& min_) const
 		{
 			return { x > min_.x ? x : min_.x, y > min_.y ? y : min_.y };
 		}
-		constexpr Vector2<nonref_value_type> AsClampedMin(const value_type& min_) const
+		/// <summary> Calculates the values of this vector's elements when clamped to the provided minimum value for all elements. </summary>
+		/// <param name="min_">Minimum value that any element within this Vector may be.</param>
+		/// <returns>Copy of this Vector with its elements clamped to a minimum of the provided value.</returns>
+		constexpr Vector2<nonref_value_type> AsClampedMin(const_ref_value_type min_) const
 		{
 			AsClampedMin(min_, min_);
 		}
+		/// <summary> Calculates the values of this Vector's elements when clamped to the provided maximum respective values of the passed Vector. </summary>
+		/// <param name="max_">Maximum values for the respective elements of this Vector.</param>
+		/// <returns>Copy of this Vector with its elements clamped to a maximum of the respective elements in the provided Vector.</returns>
 		constexpr Vector2<nonref_value_type> AsClampedMax(const Vector2<value_type>& max_) const
 		{
 			return { x < max_.x ? x : max_.x, y < max_.y ? y : max_.y };
 		}
+		/// <summary> Calculates the values of this vector's elements when clamped to the provided maximum value for all elements. </summary>
+		/// <param name="max_">Maximum value that any element within this Vector may be.</param>
+		/// <returns>Copy of this Vector with its elements clamped to a maximum of the provided value.</returns>
 		constexpr Vector2<nonref_value_type> AsClampedMax(const value_type& max_) const
 		{
 			return this->AsClampedMax(Vector2<value_type>(max_, max_));
 		}
+		/// <summary> Calculates the values of this Vector's elements when clamped between the provided minimum and maximum respective values of the passed Vectors. </summary>
+		/// <param name="min_">Minimum values for the respective elements of this Vector.</param>
+		/// <param name="max_">Maximum values for the respective elements of this Vector.</param>
+		/// <returns>Copy of this Vector with its elements clamped between the minimum and maximum of the respective elements in ths provided Vectors.</returns>
 		constexpr Vector2<nonref_value_type> AsClamped(const Vector2<value_type>& min_, const Vector2<value_type>& max_) const
 		{
 			return
@@ -1376,40 +1413,16 @@ namespace EmuMath
 				y < min_.y ? min_.y : y > max_.y ? max_.y : y
 			};
 		}
+		/// <summary> Calculates the values of this Vector's elements when clamped between the provided minimum and maximum respective values of the passed Vectors. </summary>
+		/// <param name="min_">Minimum value that each element of this Vector may be.</param>
+		/// <param name="max_">Maximum value that each element of this Vector may be.</param>
+		/// <returns>Copy of this Vector with its elements clamped between the provided minimum and maximum values.</returns>
 		constexpr Vector2<nonref_value_type> AsClamped(const value_type& min_, const value_type& max_) const
 		{
 			return this->AsClamped(Vector2<value_type>(min_, min_), Vector2<value_type>(max_, max_));
 		}
-		void Clamp(const Vector2<value_type>& min_, const Vector2<value_type>& max_)
-		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if (x < min_.x)
-				{
-					x = min_.x;
-				}
-				else if (x > max_.x)
-				{
-					x = max_.x;
-				}
-				if (y < min_.y)
-				{
-					y = min_.y;
-				}
-				else if (y > max_.y)
-				{
-					y = max_.y;
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (Clamp) on an EmuMath::Vector2 which contains constant values.");
-			}
-		}
-		void Clamp(const value_type& min_, const value_type& max_)
-		{
-			this->Clamp(Vector2<value_type>(min_, min_), Vector2<value_type>(max_, max_));
-		}
+		/// <summary> Calculates the values of this Vector's elements when rounded toward negative infinity. </summary>
+		/// <returns>Copy of this Vector with its elements rounded toward negative infinity.</returns>
 		Vector2<nonref_value_type> AsFloored() const
 		{
 			if constexpr (info_type::has_integral_values)
@@ -1436,42 +1449,8 @@ namespace EmuMath
 				static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
 			}
 		}
-		void Floor()
-		{
-			if constexpr (!info_type::has_const_values)
-			{
-				// Don't need to do anything if already integers
-				if constexpr (!info_type::has_integral_values)
-				{
-					if constexpr (info_type::has_floating_point_values)
-					{
-						if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, float>)
-						{
-							x = floorf(x);
-							y = floorf(y);
-						}
-						else if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, double>)
-						{
-							x = floor(x);
-							y = floor(y);
-						}
-						else
-						{
-							x = floorl(x);
-							y = floorl(y);
-						}
-					}
-					else
-					{
-						static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
-					}
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (Floor) on an EmuMath::Vector2 which contains constant values.");
-			}
-		}
+		/// <summary> Calculates the values of this Vector's elements when rounded toward positive infinity. </summary>
+		/// <returns>Copy of this Vector with its elements rounded toward positive infinity.</returns>
 		Vector2<nonref_value_type> AsCeiled() const
 		{
 			if constexpr (info_type::has_integral_values)
@@ -1499,41 +1478,8 @@ namespace EmuMath
 				return *this;
 			}
 		}
-		void Ceil()
-		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (!info_type::has_integral_values)
-				{
-					if constexpr (info_type::has_floating_point_values)
-					{
-						if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, float>)
-						{
-							x = ceilf(x);
-							y = ceilf(y);
-						}
-						else if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, double>)
-						{
-							x = ceil(x);
-							y = ceil(y);
-						}
-						else
-						{
-							x = ceill(x);
-							y = ceill(y);
-						}
-					}
-					else
-					{
-						static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
-					}
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (Ceil) on an EmuMath::Vector2 which contains constant values.");
-			}
-		}
+		/// <summary> Calculates the values of this Vector's elements when rounded toward 0. </summary>
+		/// <returns>Copy of this Vector with its elements rounded toward 0.</returns>
 		constexpr Vector2<nonref_value_type> AsTrunced() const
 		{
 			if constexpr (info_type::has_integral_values)
@@ -1543,42 +1489,17 @@ namespace EmuMath
 			else if constexpr (info_type::has_floating_point_values)
 			{
 				// Faster to do a double cast than call trunc functions
+				using IntRep = EmuCore::TMPHelpers::best_signed_int_rep_t<nonref_value_type_without_qualifiers>;
 				return
 				{
-					static_cast<nonref_value_type>(static_cast<std::int64_t>(x)),
-					static_cast<nonref_value_type>(static_cast<std::int64_t>(y))
+					static_cast<nonref_value_type>(static_cast<IntRep>(x)),
+					static_cast<nonref_value_type>(static_cast<IntRep>(y))
 				};
 			}
 			else
 			{
 				static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
 				return *this;
-			}
-		}
-		constexpr void Trunc()
-		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (!info_type::has_integral_values)
-				{
-					if constexpr (info_type::has_floating_point_values)
-					{
-						// Faster to do a double cast than call trunc functions
-						return
-						{
-							static_cast<nonref_value_type>(static_cast<std::int64_t>(x)),
-							static_cast<nonref_value_type>(static_cast<std::int64_t>(y))
-						};
-					}
-					else
-					{
-						static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
-					}
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (Clamp) on an EmuMath::Vector2 which contains constant values.");
 			}
 		}
 #pragma endregion
