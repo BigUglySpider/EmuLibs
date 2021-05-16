@@ -1298,6 +1298,12 @@ namespace EmuMath
 		{
 			return this->_perform_scalar_xor<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
+
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsLeftShiftedScalar(const Vector2<RhsT>& numShifts) const
+		{
+			return this->_perform_vector_per_element_leftshift<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
+		}
 #pragma endregion
 
 #pragma region BOOLEAN_PER_ELEMENT_COMPARISON_FUNCTIONS
@@ -2109,6 +2115,26 @@ namespace EmuMath
 		constexpr OutVector _perform_scalar_xor(const RhsT& rhs) const
 		{
 			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::logical_xor_diff_types>(rhs);
+		}
+
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_vector_per_element_leftshift(const RhsVec& rhs) const
+		{
+			if constexpr (std::is_integral_v<typename RhsVec::value_type>)
+			{
+				OutVector out = OutVector();
+				out.x = x << rhs.x;
+				out.y = y << rhs.y;
+				return out;
+			}
+			else if constexpr (std::is_convertible_v<typename RhsVec::value_type, std::size_t>)
+			{
+
+			}
+			else
+			{
+
+			}
 		}
 
 		template<typename RhsVec, typename OutVector, template<typename LhsT_, typename RhsT_, typename OutT_> typename Func_>
