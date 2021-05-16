@@ -2102,6 +2102,11 @@ namespace EmuMath
 			return this->_perform_scalar_arithmetic_emu<RhsT, OutVector, EmuCore::TMPHelpers::modulus_diff_types>(rhs);
 		}
 
+		/// <summary> Template for performing arithmetic on this Vector via another Vector, using EmuCore arithmetic functors. </summary>
+		/// <typeparam name="RhsVec">Type of the right-hand side Vector.</typeparam>
+		/// <typeparam name="OutVector">Type of Vector to output the result as.</typeparam>
+		/// <param name="rhs">Vector to perform arithmetic on the respective values of this Vector with.</param>
+		/// <returns>Result of the arithmetic operation stored as the provided OutVector type.</returns>
 		template<typename RhsVec, typename OutVector, template<typename LhsT_, typename RhsT_, typename OutT_> typename Func_>
 		constexpr OutVector _perform_vector_arithmetic_emu(const RhsVec& rhs) const
 		{
@@ -2184,6 +2189,11 @@ namespace EmuMath
 			}
 		}
 
+		/// <summary> Template for performing arithmetic on this Vector via a scalar value, using EmuCore arithmetic functors. </summary>
+		/// <typeparam name="RhsT">Type of the right-hand side scalar.</typeparam>
+		/// <typeparam name="OutVector">Type of Vector to output the result as.</typeparam>
+		/// <param name="rhs">Scalar value to perform arithmetic on all values of this Vector with.</param>
+		/// <returns>Result of the arithmetic operation stored as the provided OutVector type.</returns>
 		template<typename RhsT, typename OutVector, template<typename LhsT_, typename RhsT_, typename OutT_> typename Func_>
 		constexpr OutVector _perform_scalar_arithmetic_emu(const RhsT& rhs) const
 		{
@@ -2267,6 +2277,11 @@ namespace EmuMath
 			}
 		}
 
+		/// <summary> Template for performing arithmetic on this Vector via another Vector, using standard arithmetic functors. </summary>
+		/// <typeparam name="RhsVec">Type of the right-hand side Vector.</typeparam>
+		/// <typeparam name="OutVector">Type of Vector to output the result as.</typeparam>
+		/// <param name="rhs">Vector to perform arithmetic on the respective values of this Vector with.</param>
+		/// <returns>Result of the arithmetic operation stored as the provided OutVector type.</returns>
 		template<typename RhsVec, typename OutVector, template<typename FuncT_> typename Func_>
 		constexpr OutVector _perform_vector_arithmetic_std(const RhsVec& rhs) const
 		{
