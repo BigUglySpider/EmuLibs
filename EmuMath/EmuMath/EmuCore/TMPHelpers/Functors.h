@@ -159,7 +159,7 @@ namespace EmuCore::TMPHelpers
 	template<typename Lhs_, typename Rhs_, typename Out_ = Lhs_>
 	struct _common_logical_functor_info
 	{
-		static constexpr bool lhs_or_rhs_fp = EmuCore::TMPHelpers::is_any_floating_point_v<Lhs_, Rhs_>;
+		static constexpr bool any_fp = EmuCore::TMPHelpers::is_any_floating_point_v<Lhs_, Rhs_, Out_>;
 		static constexpr bool lhs_rhs_same = std::is_same_v<Lhs_, Rhs_>;
 		static constexpr bool lhs_output_same = std::is_same_v<Lhs_, Out_>;
 		static constexpr bool all_same = lhs_rhs_same && lhs_output_same;
@@ -223,21 +223,21 @@ namespace EmuCore::TMPHelpers
 		template<typename Lhs_, typename Rhs_, typename Out_>
 		Out_ Execute(const Lhs_& lhs, const Rhs_& rhs) const
 		{
-			using HighestT = EmuCore::TMPHelpers::highest_byte_size_t<Lhs_, Rhs_>;
+			using HighestT = EmuCore::TMPHelpers::highest_byte_size_t<Lhs_, Rhs_, Out_>;
 			HighestT lhsHighest = HighestT();
 			HighestT rhsHighest = HighestT();
 			memcpy(&lhsHighest, &lhs, sizeof(Lhs_));
 			memcpy(&rhsHighest, &rhs, sizeof(Rhs_));
-			HighestT out = HighestT();
+			Out_ out = Out_();
 
-			using final_iterative_type = _iterative_template<sizeof(HighestT)>;
+			using final_iterative_type = _iterative_template<sizeof(Out_)>;
 			final_iterative_type()
 			(
 				reinterpret_cast<typename final_iterative_type::byte_ptr>(&out),
 				reinterpret_cast<typename final_iterative_type::const_byte_ptr>(&lhsHighest),
 				reinterpret_cast<typename final_iterative_type::const_byte_ptr>(&rhsHighest)
 			);
-			return static_cast<Out_>(out);
+			return out;
 		}
 	};
 	enum class _bitwise_op_flag : std::uint8_t
@@ -271,7 +271,7 @@ namespace EmuCore::TMPHelpers
 
 		Out_ operator()(const Lhs_& lhs, const Rhs_& rhs) const
 		{
-			if constexpr (_info_type::lhs_or_rhs_fp)
+			if constexpr (_info_type::any_fp)
 			{
 				return _perform_iterative_bitwise_op_execution_based_on_flag<_bitwise_op_flag::AND>().Execute<Lhs_, Rhs_, Out_>(lhs, rhs);
 			}
@@ -300,7 +300,7 @@ namespace EmuCore::TMPHelpers
 
 		Out_ operator()(const Lhs_& lhs, const Rhs_& rhs) const
 		{
-			if constexpr (_info_type::lhs_or_rhs_fp)
+			if constexpr (_info_type::any_fp)
 			{
 				return _perform_iterative_bitwise_op_execution_based_on_flag<_bitwise_op_flag::OR>().Execute<Lhs_, Rhs_, Out_>(lhs, rhs);
 			}
@@ -329,7 +329,7 @@ namespace EmuCore::TMPHelpers
 
 		Out_ operator()(const Lhs_& lhs, const Rhs_& rhs) const
 		{
-			if constexpr (_info_type::lhs_or_rhs_fp)
+			if constexpr (_info_type::any_fp)
 			{
 				return _perform_iterative_bitwise_op_execution_based_on_flag<_bitwise_op_flag::XOR>().Execute<Lhs_, Rhs_, Out_>(lhs, rhs);
 			}

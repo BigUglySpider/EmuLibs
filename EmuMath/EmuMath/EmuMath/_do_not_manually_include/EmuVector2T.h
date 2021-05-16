@@ -1249,7 +1249,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseAnded(const Vector4<RhsT>& rhs) const
 		{
-			return this->_perform_vector_and<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+			return this->_perform_vector_and<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
 		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseAnded(const RhsT& rhs) const
@@ -1270,7 +1270,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseOred(const Vector4<RhsT>& rhs) const
 		{
-			return this->_perform_vector_or<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+			return this->_perform_vector_or<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
 		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseOred(const RhsT& rhs) const
@@ -1291,7 +1291,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseXored(const Vector4<RhsT>& rhs) const
 		{
-			return this->_perform_vector_xor<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+			return this->_perform_vector_xor<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
 		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseXored(const RhsT& rhs) const
