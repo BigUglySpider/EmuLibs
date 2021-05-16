@@ -2188,7 +2188,7 @@ namespace EmuMath
 		constexpr OutVector _perform_scalar_arithmetic_emu(const RhsT& rhs) const
 		{
 			using OutT = typename OutVector::nonref_value_type_without_qualifiers;
-			if constexpr (info_type::has_floating_point_values || info_type_t<typename RhsVec::value_type>::has_floating_point_values)
+			if constexpr (info_type::has_floating_point_values || info_type_t<typename RhsT::value_type>::has_floating_point_values)
 			{
 				// Floating points involved so care needs to be taken to not accidentally lose fractions if needed in output
 				using ThisFP = EmuCore::TMPHelpers::best_floating_point_rep_t<nonref_value_type_without_qualifiers>;
