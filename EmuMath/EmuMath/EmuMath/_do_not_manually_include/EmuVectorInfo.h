@@ -54,6 +54,12 @@ namespace EmuMath
 
 			/// <summary> The default floating point type used by this vector type. </summary>
 			using default_floating_point = EmuCore::TMPHelpers::best_floating_point_rep_t<nonref_value_type_without_qualifiers>;
+			using default_int = std::conditional_t
+			<
+				std::is_signed_v<nonref_value_type_without_qualifiers>,
+				EmuCore::TMPHelpers::best_signed_int_rep_t<nonref_value_type_without_qualifiers>,
+				EmuCore::TMPHelpers::best_unsigned_int_rep_t<nonref_value_type_without_qualifiers>
+			>;
 
 			/// <summary> Simplification for calling a square root function for the default_floating_point type. </summary>
 			/// <typeparam name="Val_">Type of the passed value to get the square root of.</typeparam>

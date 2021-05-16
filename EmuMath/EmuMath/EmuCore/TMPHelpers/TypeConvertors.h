@@ -114,6 +114,14 @@ namespace EmuCore::TMPHelpers
 			>
 		>
 	>;
+
+	template<typename T>
+	using best_int_rep_t = std::conditional_t
+	<
+		std::is_signed_v<T>,
+		best_signed_int_rep_t<T>,
+		best_unsigned_int_rep_t<T>
+	>;
 }
 
 #endif

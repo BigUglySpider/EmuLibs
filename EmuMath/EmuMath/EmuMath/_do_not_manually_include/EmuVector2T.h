@@ -227,167 +227,78 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region ARITHMETIC_CONST_OPERATORS
-		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator+(const Vector2<OtherT>& rhs) const
+		template<typename RhsT>
+		constexpr Vector2<nonref_value_type> operator+(const Vector2<RhsT>& rhs) const
 		{
-			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename info_type_t<OtherT>::nonref_value_type_without_qualifiers>)
-			{
-				return { x + rhs.x, y + rhs.y };
-			}
-			else
-			{
-				return { x + static_cast<nonref_value_type>(rhs.x), y + static_cast<nonref_value_type>(rhs.y) };
-			}
-		}
-		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator+(const Vector3<OtherT>& rhs) const
-		{
-			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename info_type_t<OtherT>::nonref_value_type_without_qualifiers>)
-			{
-				return { x + rhs.x, y + rhs.y };
-			}
-			else
-			{
-				return { x + static_cast<nonref_value_type>(rhs.x), y + static_cast<nonref_value_type>(rhs.y) };
-			}
-		}
-		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator-(const Vector2<OtherT>& rhs) const
-		{
-			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename info_type_t<OtherT>::nonref_value_type_without_qualifiers>)
-			{
-				return { x - rhs.x, y - rhs.y };
-			}
-			else
-			{
-				return { x - static_cast<nonref_value_type>(rhs.x), y - static_cast<nonref_value_type>(rhs.y) };
-			}
-		}
-		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator-(const Vector3<OtherT>& rhs) const
-		{
-			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename info_type_t<OtherT>::nonref_value_type_without_qualifiers>)
-			{
-				return { x - rhs.x, y - rhs.y };
-			}
-			else
-			{
-				return { x - static_cast<nonref_value_type>(rhs.x), y - static_cast<nonref_value_type>(rhs.y) };
-			}
-		}
-		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator*(const Vector2<OtherT>& rhs) const
-		{
-			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename info_type_t<OtherT>::nonref_value_type_without_qualifiers>)
-			{
-				return { x * rhs.x, y * rhs.y };
-			}
-			else
-			{
-				return { static_cast<nonref_value_type>(x * rhs.x), static_cast<nonref_value_type>(y * rhs.y) };
-			}
-		}
-		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator*(const Vector3<OtherT>& rhs) const
-		{
-			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename info_type_t<OtherT>::nonref_value_type_without_qualifiers>)
-			{
-				return { x * rhs.x, y * rhs.y };
-			}
-			else
-			{
-				return { static_cast<nonref_value_type>(x * rhs.x), static_cast<nonref_value_type>(y * rhs.y) };
-			}
+			return this->AsAdded<size(), nonref_value_type, RhsT>(rhs);
 		}
 		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator*(const RhsT& rhs) const
+		constexpr Vector2<nonref_value_type> operator+(const Vector3<RhsT>& rhs) const
 		{
-			using NonRefRhs = std::remove_reference_t<RhsT>;
-			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, NonRefRhs> || !info_type::has_arithmetic_values || !std::is_arithmetic_v<NonRefRhs>)
-			{
-				return { x * rhs, y * rhs };
-			}
-			else
-			{
-				return { static_cast<nonref_value_type>(x * rhs), static_cast<nonref_value_type>(y * rhs) };
-			}
+			return this->AsAdded<size(), nonref_value_type, RhsT>(rhs);
 		}
-		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator/(const Vector2<OtherT>& rhs) const
+
+		template<typename RhsT>
+		constexpr Vector2<nonref_value_type> operator-(const Vector2<RhsT>& rhs) const
 		{
-			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename info_type_t<OtherT>::nonref_value_type_without_qualifiers>)
-			{
-				return { x / rhs.x, y / rhs.y };
-			}
-			else
-			{
-				return { static_cast<nonref_value_type>(x / rhs.x), static_cast<nonref_value_type>(y / rhs.y) };
-			}
-		}
-		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator/(const Vector3<OtherT>& rhs) const
-		{
-			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename info_type_t<OtherT>::nonref_value_type_without_qualifiers>)
-			{
-				return { x / rhs.x, y / rhs.y };
-			}
-			else
-			{
-				return { static_cast<nonref_value_type>(x / rhs.x), static_cast<nonref_value_type>(y / rhs.y) };
-			}
+			return this->AsSubtracted<size(), nonref_value_type, RhsT>(rhs);
 		}
 		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator/(const RhsT& rhs) const
+		constexpr Vector2<nonref_value_type> operator-(const Vector3<RhsT>& rhs) const
 		{
-			using NonRefRhs = std::remove_reference_t<RhsT>;
-			if constexpr (info_type::has_floating_point_values && std::is_arithmetic_v<NonRefRhs>)
-			{
-				return this->operator*(info_type::value_one / rhs);
-			}
-			else
-			{
-				return { static_cast<nonref_value_type>(x / rhs), static_cast<nonref_value_type>(y / rhs) };
-			}
-		}
-		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator%(const Vector2<OtherT>& rhs) const
-		{
-			if constexpr (!(info_type::has_floating_point_values || info_type_t<OtherT>::has_floating_point_values))
-			{
-				return { x % rhs.x, y % rhs.y };
-			}
-			else
-			{
-				static_assert(false, "Attempted to use modulus operator (%) with an EmuMath::Vector2 which stores incompatible floating point values.");
-			}
-		}
-		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator%(const Vector3<OtherT>& rhs) const
-		{
-			if constexpr (!(info_type::has_floating_point_values || info_type_t<OtherT>::has_floating_point_values))
-			{
-				return { x % rhs.x, y % rhs.y };
-			}
-			else
-			{
-				static_assert(false, "Attempted to use modulus operator (%) with an EmuMath::Vector2 which stores incompatible floating point values.");
-			}
-		}
-		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator%(const RhsT& rhs) const
-		{
-			if constexpr (!(info_type::has_floating_point_values || std::is_floating_point_v<RhsT>))
-			{
-				return { x % rhs, y % rhs };
-			}
-			else
-			{
-				static_assert(false, "Attempted to use modulus operator (%) with an EmuMath::Vector2 which stores incompatible floating point values.");
-			}
+			return this->AsSubtracted<size(), nonref_value_type, RhsT>(rhs);
 		}
 		constexpr Vector2<nonref_value_type> operator-() const
 		{
 			return this->AsReversed<nonref_value_type>();
+		}
+
+		template<typename RhsT>
+		constexpr Vector2<nonref_value_type> operator*(const Vector2<RhsT>& rhs) const
+		{
+			return this->AsMultiplied<size(), nonref_value_type, RhsT>(rhs);
+		}
+		template<typename RhsT>
+		constexpr Vector2<nonref_value_type> operator*(const Vector3<RhsT>& rhs) const
+		{
+			return this->AsMultiplied<size(), nonref_value_type, RhsT>(rhs);
+		}
+		template<typename RhsT>
+		constexpr Vector2<nonref_value_type> operator*(const RhsT& rhs) const
+		{
+			return this->AsMultiplied<size(), nonref_value_type, RhsT>(rhs);
+		}
+
+		template<typename RhsT>
+		constexpr Vector2<nonref_value_type> operator/(const Vector2<RhsT>& rhs) const
+		{
+			return this->AsDivided<size(), nonref_value_type, RhsT>(rhs);
+		}
+		template<typename RhsT>
+		constexpr Vector2<nonref_value_type> operator/(const Vector3<RhsT>& rhs) const
+		{
+			return this->AsDivided<size(), nonref_value_type, RhsT>(rhs);
+		}
+		template<typename RhsT>
+		constexpr Vector2<nonref_value_type> operator/(const RhsT& rhs) const
+		{
+			return this->AsDivided<size(), nonref_value_type, RhsT>(rhs);
+		}
+
+		template<typename RhsT>
+		constexpr Vector2<nonref_value_type> operator%(const Vector2<RhsT>& rhs) const
+		{
+			return this->AsMod<size(), nonref_value_type, RhsT>(rhs);
+		}
+		template<typename RhsT>
+		constexpr Vector2<nonref_value_type> operator%(const Vector3<RhsT>& rhs) const
+		{
+			return this->AsMod<size(), nonref_value_type, RhsT>(rhs);
+		}
+		template<typename RhsT>
+		constexpr Vector2<nonref_value_type> operator%(const RhsT& rhs) const
+		{
+			return this->AsMod<size(), nonref_value_type, RhsT>(rhs);
 		}
 #pragma endregion
 
@@ -1227,7 +1138,7 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region ADDITION_TEMPLATES
+#pragma region ARITHMETIC_TEMPLATES
 		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsAdded(const Vector2<RhsT>& rhs) const
 		{
@@ -1322,7 +1233,72 @@ namespace EmuMath
 		{
 			return this->_perform_scalar_mod<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-#pragma region
+#pragma endregion
+
+#pragma region BITWISE_TEMPLATES
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseAnded(const Vector2<RhsT>& rhs) const
+		{
+			return this->_perform_vector_and<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseAnded(const Vector3<RhsT>& rhs) const
+		{
+			return this->_perform_vector_and<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseAnded(const Vector4<RhsT>& rhs) const
+		{
+			return this->_perform_vector_and<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseAnded(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_and<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseOred(const Vector2<RhsT>& rhs) const
+		{
+			return this->_perform_vector_or<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseOred(const Vector3<RhsT>& rhs) const
+		{
+			return this->_perform_vector_or<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseOred(const Vector4<RhsT>& rhs) const
+		{
+			return this->_perform_vector_or<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseOred(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_or<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseXored(const Vector2<RhsT>& rhs) const
+		{
+			return this->_perform_vector_xor<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseXored(const Vector3<RhsT>& rhs) const
+		{
+			return this->_perform_vector_xor<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseXored(const Vector4<RhsT>& rhs) const
+		{
+			return this->_perform_vector_xor<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseXored(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_xor<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+#pragma endregion
 
 #pragma region BOOLEAN_PER_ELEMENT_COMPARISON_FUNCTIONS
 		/// <summary> Compares the equality of the elements in this Vector with the respecitve elements in the passed Vector. </summary>
@@ -2100,6 +2076,125 @@ namespace EmuMath
 		constexpr OutVector _perform_scalar_mod(const RhsT& rhs) const
 		{
 			return this->_perform_scalar_arithmetic_emu<RhsT, OutVector, EmuCore::TMPHelpers::modulus_diff_types>(rhs);
+		}
+
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_vector_and(const RhsVec& rhs) const
+		{
+			return this->_perform_vector_bitwise_op_emu<RhsVec, OutVector, EmuCore::TMPHelpers::logical_and_diff_types>(rhs);
+		}
+		template<typename RhsT, typename OutVector>
+		constexpr OutVector _perform_scalar_and(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::logical_and_diff_types>(rhs);
+		}
+
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_vector_or(const RhsVec& rhs) const
+		{
+			return this->_perform_vector_bitwise_op_emu<RhsVec, OutVector, EmuCore::TMPHelpers::logical_or_diff_types>(rhs);
+		}
+		template<typename RhsT, typename OutVector>
+		constexpr OutVector _perform_scalar_or(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::logical_or_diff_types>(rhs);
+		}
+
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_vector_xor(const RhsVec& rhs) const
+		{
+			return this->_perform_vector_bitwise_op_emu<RhsVec, OutVector, EmuCore::TMPHelpers::logical_xor_diff_types>(rhs);
+		}
+		template<typename RhsT, typename OutVector>
+		constexpr OutVector _perform_scalar_xor(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::logical_xor_diff_types>(rhs);
+		}
+
+		template<typename RhsVec, typename OutVector, template<typename LhsT_, typename RhsT_, typename OutT_> typename Func_>
+		constexpr OutVector _perform_vector_bitwise_op_emu(const RhsVec& rhs) const
+		{
+			using EndFunc = Func_
+			<
+				nonref_value_type_without_qualifiers,
+				typename RhsVec::nonref_value_type_without_qualifiers,
+				typename OutVector::value_type
+			>;
+			EndFunc func = EndFunc();
+			if constexpr (OutVector::size() == 2)
+			{
+				return OutVector
+				(
+					func(x, rhs.x),
+					func(y, rhs.y)
+				);
+			}
+			else if constexpr (OutVector::size() == 3)
+			{
+				return OutVector
+				(
+					func(x, rhs.x),
+					func(y, rhs.y),
+					func(info_type::value_zero, EmuMath::TMPHelpers::emu_vector_z(rhs))
+				);
+			}
+			else if constexpr (OutVector::size() == 4)
+			{
+				return OutVector
+				(
+					func(x, rhs.x),
+					func(y, rhs.y),
+					func(info_type::value_zero, EmuMath::TMPHelpers::emu_vector_z(rhs)),
+					func(info_type::value_zero, EmuMath::TMPHelpers::emu_vector_w(rhs))
+				);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a bitwise operation on an EmuMath::Vector2 with an unsupported size of output Vector.");
+			}
+		}
+
+		template<typename RhsT, typename OutVector, template<typename LhsT_, typename RhsT_, typename OutT_> typename Func_>
+		constexpr OutVector _perform_scalar_bitwise_op_emu(const RhsT& rhs) const
+		{
+			using EndFunc = Func_
+			<
+				nonref_value_type_without_qualifiers,
+				RhsT,
+				typename OutVector::value_type
+			>;
+			EndFunc func = EndFunc();
+			if constexpr (OutVector::size() == 2)
+			{
+				return OutVector
+				(
+					func(x, rhs),
+					func(y, rhs)
+				);
+			}
+			else if constexpr (OutVector::size() == 3)
+			{
+				return OutVector
+				(
+					func(x, rhs),
+					func(y, rhs),
+					func(info_type::value_zero, rhs)
+				);
+			}
+			else if constexpr (OutVector::size() == 4)
+			{
+				return OutVector
+				(
+					func(x, rhs),
+					func(y, rhs),
+					func(info_type::value_zero, rhs),
+					func(info_type::value_zero, rhs)
+				);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a bitwise operation on an EmuMath::Vector2 with an unsupported size of output Vector.");
+			}
 		}
 
 		/// <summary> Template for performing arithmetic on this Vector via another Vector, using EmuCore arithmetic functors. </summary>
