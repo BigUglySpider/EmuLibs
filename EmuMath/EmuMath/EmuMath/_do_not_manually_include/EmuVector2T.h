@@ -1278,7 +1278,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMultiplied(const RhsT& rhs) const
 		{
-			return this->_perform_scalar_multiplication<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+			return this->_perform_scalar_multiplication<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
 
 		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
@@ -1299,7 +1299,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsDivided(const RhsT& rhs) const
 		{
-			return this->_perform_scalar_division<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+			return this->_perform_scalar_division<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
 
 		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
@@ -1320,7 +1320,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMod(const RhsT& rhs) const
 		{
-			return this->_perform_scalar_mod<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+			return this->_perform_scalar_mod<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
 #pragma region
 
@@ -2129,8 +2129,8 @@ namespace EmuMath
 				{
 					return OutVector
 					(
-						func(static_cast<HighestFP>(x), static_cast<HighestFP>(rhs.x)),
-						func(static_cast<HighestFP>(y), static_cast<HighestFP>(rhs.y)),
+						func(static_cast<HighestFP>(x), rhs.x),
+						func(static_cast<HighestFP>(y), rhs.y),
 						func(EmuCore::ArithmeticHelpers::ZeroT<HighestFP>, EmuMath::TMPHelpers::emu_vector_z<RhsVec>(rhs))
 					);
 				}
@@ -2188,7 +2188,7 @@ namespace EmuMath
 		constexpr OutVector _perform_scalar_arithmetic_emu(const RhsT& rhs) const
 		{
 			using OutT = typename OutVector::nonref_value_type_without_qualifiers;
-			if constexpr (info_type::has_floating_point_values || info_type_t<typename RhsT::value_type>::has_floating_point_values)
+			if constexpr (info_type::has_floating_point_values || std::is_floating_point_v<RhsT>)
 			{
 				// Floating points involved so care needs to be taken to not accidentally lose fractions if needed in output
 				using ThisFP = EmuCore::TMPHelpers::best_floating_point_rep_t<nonref_value_type_without_qualifiers>;
