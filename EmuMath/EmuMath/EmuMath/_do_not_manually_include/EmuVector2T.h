@@ -2,14 +2,18 @@
 #define EMU_MATH_VECTOR_2_T_H_INC_
 
 #include "EmuVectorInfo.h"
+#include "../../EmuCore/TMPHelpers/Functors.h"
 #include "../../EmuCore/TMPHelpers/TypeComparators.h"
 #include "../../EmuCore/TMPHelpers/TypeConvertors.h"
+#include "../../EmuMath/_do_not_manually_include/EmuVectorTMPHelpers.h"
 #include <exception>
 
 namespace EmuMath
 {
 	template<typename T>
 	struct Vector3;
+	template<typename T>
+	struct Vector4;
 
 	/// <summary> Generic Vector type which contains 2 elements of the provided type, representing the X- and Y-axes respectively. </summary>
 	/// <typeparam name="T">Type to store within the Vector.</typeparam>
@@ -226,7 +230,19 @@ namespace EmuMath
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator+(const Vector2<OtherT>& rhs) const
 		{
-			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
+			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename info_type_t<OtherT>::nonref_value_type_without_qualifiers>)
+			{
+				return { x + rhs.x, y + rhs.y };
+			}
+			else
+			{
+				return { x + static_cast<nonref_value_type>(rhs.x), y + static_cast<nonref_value_type>(rhs.y) };
+			}
+		}
+		template<typename OtherT>
+		constexpr Vector2<nonref_value_type> operator+(const Vector3<OtherT>& rhs) const
+		{
+			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename info_type_t<OtherT>::nonref_value_type_without_qualifiers>)
 			{
 				return { x + rhs.x, y + rhs.y };
 			}
@@ -238,7 +254,19 @@ namespace EmuMath
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator-(const Vector2<OtherT>& rhs) const
 		{
-			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
+			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename info_type_t<OtherT>::nonref_value_type_without_qualifiers>)
+			{
+				return { x - rhs.x, y - rhs.y };
+			}
+			else
+			{
+				return { x - static_cast<nonref_value_type>(rhs.x), y - static_cast<nonref_value_type>(rhs.y) };
+			}
+		}
+		template<typename OtherT>
+		constexpr Vector2<nonref_value_type> operator-(const Vector3<OtherT>& rhs) const
+		{
+			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename info_type_t<OtherT>::nonref_value_type_without_qualifiers>)
 			{
 				return { x - rhs.x, y - rhs.y };
 			}
@@ -250,7 +278,19 @@ namespace EmuMath
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator*(const Vector2<OtherT>& rhs) const
 		{
-			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
+			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename info_type_t<OtherT>::nonref_value_type_without_qualifiers>)
+			{
+				return { x * rhs.x, y * rhs.y };
+			}
+			else
+			{
+				return { static_cast<nonref_value_type>(x * rhs.x), static_cast<nonref_value_type>(y * rhs.y) };
+			}
+		}
+		template<typename OtherT>
+		constexpr Vector2<nonref_value_type> operator*(const Vector3<OtherT>& rhs) const
+		{
+			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename info_type_t<OtherT>::nonref_value_type_without_qualifiers>)
 			{
 				return { x * rhs.x, y * rhs.y };
 			}
@@ -275,7 +315,19 @@ namespace EmuMath
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator/(const Vector2<OtherT>& rhs) const
 		{
-			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
+			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename info_type_t<OtherT>::nonref_value_type_without_qualifiers>)
+			{
+				return { x / rhs.x, y / rhs.y };
+			}
+			else
+			{
+				return { static_cast<nonref_value_type>(x / rhs.x), static_cast<nonref_value_type>(y / rhs.y) };
+			}
+		}
+		template<typename OtherT>
+		constexpr Vector2<nonref_value_type> operator/(const Vector3<OtherT>& rhs) const
+		{
+			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename info_type_t<OtherT>::nonref_value_type_without_qualifiers>)
 			{
 				return { x / rhs.x, y / rhs.y };
 			}
@@ -309,6 +361,18 @@ namespace EmuMath
 				static_assert(false, "Attempted to use modulus operator (%) with an EmuMath::Vector2 which stores incompatible floating point values.");
 			}
 		}
+		template<typename OtherT>
+		constexpr Vector2<nonref_value_type> operator%(const Vector3<OtherT>& rhs) const
+		{
+			if constexpr (!(info_type::has_floating_point_values || info_type_t<OtherT>::has_floating_point_values))
+			{
+				return { x % rhs.x, y % rhs.y };
+			}
+			else
+			{
+				static_assert(false, "Attempted to use modulus operator (%) with an EmuMath::Vector2 which stores incompatible floating point values.");
+			}
+		}
 		template<typename RhsT>
 		constexpr Vector2<nonref_value_type> operator%(const RhsT& rhs) const
 		{
@@ -320,6 +384,10 @@ namespace EmuMath
 			{
 				static_assert(false, "Attempted to use modulus operator (%) with an EmuMath::Vector2 which stores incompatible floating point values.");
 			}
+		}
+		constexpr Vector2<nonref_value_type> operator-() const
+		{
+			return this->AsReversed<nonref_value_type>();
 		}
 #pragma endregion
 
@@ -965,37 +1033,35 @@ namespace EmuMath
 		{
 			return x == rhs.x && y == rhs.y;
 		}
-		template<typename RhsT>
-		constexpr bool operator==(const RhsT& rhs) const
+		template<typename OtherT>
+		constexpr bool operator==(const Vector3<OtherT>& rhs) const
 		{
-			if constexpr (info_type::has_integral_values)
-			{
-				return this->SquareMagnitude<std::uint64_t>() == rhs;
-			}
-			else
-			{
-				return this->SquareMagnitude<long double>() == rhs;
-			}
+			return x == rhs.x && y == rhs.y && rhs.z == info_type::value_zero;
 		}
 		template<typename OtherT>
 		constexpr bool operator!=(const Vector2<OtherT>& rhs) const
 		{
 			return x != rhs.x || y != rhs.y;
 		}
-		template<typename RhsT>
-		constexpr bool operator!=(const RhsT& rhs) const
+		template<typename OtherT>
+		constexpr bool operator!=(const Vector3<OtherT>& rhs) const
 		{
-			if constexpr (info_type::has_integral_values)
-			{
-				return this->SquareMagnitude<std::uint64_t>() != rhs;
-			}
-			else
-			{
-				return this->SquareMagnitude<long double>() != rhs;
-			}
+			return x != rhs.x || y != rhs.y || rhs.z != info_type::value_zero;
 		}
 		template<typename OtherT>
 		constexpr bool operator>(const Vector2<OtherT>& rhs) const
+		{
+			if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
+			{
+				return SquareMagnitude<std::uint64_t>() > rhs.SquareMagnitude<std::uint64_t>();
+			}
+			else
+			{
+				return SquareMagnitude<long double>() > rhs.SquareMagnitude<long double>();
+			}
+		}
+		template<typename OtherT>
+		constexpr bool operator>(const Vector3<OtherT>& rhs) const
 		{
 			if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
 			{
@@ -1030,6 +1096,18 @@ namespace EmuMath
 				return SquareMagnitude<long double>() < rhs.SquareMagnitude<long double>();
 			}
 		}
+		template<typename OtherT>
+		constexpr bool operator<(const Vector3<OtherT>& rhs) const
+		{
+			if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
+			{
+				return SquareMagnitude<std::uint64_t>() < rhs.SquareMagnitude<std::uint64_t>();
+			}
+			else
+			{
+				return SquareMagnitude<long double>() < rhs.SquareMagnitude<long double>();
+			}
+		}
 		template<typename RhsT>
 		constexpr bool operator<(const RhsT& rhs) const
 		{
@@ -1054,6 +1132,18 @@ namespace EmuMath
 				return SquareMagnitude<long double>() >= rhs.SquareMagnitude<long double>();
 			}
 		}
+		template<typename OtherT>
+		constexpr bool operator>=(const Vector3<OtherT>& rhs) const
+		{
+			if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
+			{
+				return SquareMagnitude<std::uint64_t>() >= rhs.SquareMagnitude<std::uint64_t>();
+			}
+			else
+			{
+				return SquareMagnitude<long double>() >= rhs.SquareMagnitude<long double>();
+			}
+		}
 		template<typename RhsT>
 		constexpr bool operator>=(const RhsT& rhs) const
 		{
@@ -1068,6 +1158,18 @@ namespace EmuMath
 		}
 		template<typename OtherT>
 		constexpr bool operator<=(const Vector2<OtherT>& rhs) const
+		{
+			if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
+			{
+				return SquareMagnitude<std::uint64_t>() <= rhs.SquareMagnitude<std::uint64_t>();
+			}
+			else
+			{
+				return SquareMagnitude<long double>() <= rhs.SquareMagnitude<long double>();
+			}
+		}
+		template<typename OtherT>
+		constexpr bool operator<=(const Vector3<OtherT>& rhs) const
 		{
 			if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
 			{
@@ -1124,6 +1226,103 @@ namespace EmuMath
 			return *this;
 		}
 #pragma endregion
+
+#pragma region ADDITION_TEMPLATES
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsAdded(const Vector2<RhsT>& rhs) const
+		{
+			return this->_perform_addition<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsAdded(const Vector3<RhsT>& rhs) const
+		{
+			return this->_perform_addition<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsAdded(const Vector4<RhsT>& rhs) const
+		{
+			return this->_perform_addition<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsSubtracted(const Vector2<RhsT>& rhs) const
+		{
+			return this->_perform_subtraction<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsSubtracted(const Vector3<RhsT>& rhs) const
+		{
+			return this->_perform_subtraction<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsSubtracted(const Vector4<RhsT>& rhs) const
+		{
+			return this->_perform_subtraction<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMultiplied(const Vector2<RhsT>& rhs) const
+		{
+			return this->_perform_vector_multiplication<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMultiplied(const Vector3<RhsT>& rhs) const
+		{
+			return this->_perform_vector_multiplication<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMultiplied(const Vector4<RhsT>& rhs) const
+		{
+			return this->_perform_vector_multiplication<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMultiplied(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_multiplication<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsDivided(const Vector2<RhsT>& rhs) const
+		{
+			return this->_perform_vector_division<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsDivided(const Vector3<RhsT>& rhs) const
+		{
+			return this->_perform_vector_division<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsDivided(const Vector4<RhsT>& rhs) const
+		{
+			return this->_perform_vector_division<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsDivided(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_division<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMod(const Vector2<RhsT>& rhs) const
+		{
+			return this->_perform_vector_mod<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMod(const Vector3<RhsT>& rhs) const
+		{
+			return this->_perform_vector_mod<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMod(const Vector4<RhsT>& rhs) const
+		{
+			return this->_perform_vector_mod<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMod(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_mod<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+		}
+#pragma region
 
 #pragma region BOOLEAN_PER_ELEMENT_COMPARISON_FUNCTIONS
 		/// <summary> Compares the equality of the elements in this Vector with the respecitve elements in the passed Vector. </summary>
@@ -1859,6 +2058,294 @@ namespace EmuMath
 			else
 			{
 				at<Index>() = static_cast<nonref_value_type>(val_);
+			}
+		}
+
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_addition(const RhsVec& rhs) const
+		{
+			return this->_perform_vector_arithmetic_emu<RhsVec, OutVector, EmuCore::TMPHelpers::plus_diff_types>(rhs);
+		}
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_subtraction(const RhsVec& rhs) const
+		{
+			return this->_perform_vector_arithmetic_emu<RhsVec, OutVector, EmuCore::TMPHelpers::minus_diff_types>(rhs);
+		}
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_vector_multiplication(const RhsVec& rhs) const
+		{
+			return this->_perform_vector_arithmetic_emu<RhsVec, OutVector, EmuCore::TMPHelpers::multiplies_diff_types>(rhs);
+		}
+		template<typename RhsT, typename OutVector>
+		constexpr OutVector _perform_scalar_multiplication(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_arithmetic_emu<RhsT, OutVector, EmuCore::TMPHelpers::multiplies_diff_types>(rhs);
+		}
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_vector_division(const RhsVec& rhs) const
+		{
+			return this->_perform_vector_arithmetic_emu<RhsVec, OutVector, EmuCore::TMPHelpers::divides_diff_types>(rhs);
+		}
+		template<typename RhsT, typename OutVector>
+		constexpr OutVector _perform_scalar_division(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_arithmetic_emu<RhsT, OutVector, EmuCore::TMPHelpers::divides_diff_types>(rhs);
+		}
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_vector_mod(const RhsVec& rhs) const
+		{
+			return this->_perform_vector_arithmetic_emu<RhsVec, OutVector, EmuCore::TMPHelpers::modulus_diff_types>(rhs);
+		}
+		template<typename RhsT, typename OutVector>
+		constexpr OutVector _perform_scalar_mod(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_arithmetic_emu<RhsT, OutVector, EmuCore::TMPHelpers::modulus_diff_types>(rhs);
+		}
+
+		template<typename RhsVec, typename OutVector, template<typename LhsT_, typename RhsT_, typename OutT_> typename Func_>
+		constexpr OutVector _perform_vector_arithmetic_emu(const RhsVec& rhs) const
+		{
+			using OutT = typename OutVector::nonref_value_type_without_qualifiers;
+			using RhsT = typename RhsVec::nonref_value_type_without_qualifiers;
+			if constexpr (info_type::has_floating_point_values || info_type_t<typename RhsVec::value_type>::has_floating_point_values)
+			{
+				// Floating points involved in addition so care needs to be taken to not accidentally lose fractions if needed in output
+				using ThisFP = EmuCore::TMPHelpers::best_floating_point_rep_t<nonref_value_type_without_qualifiers>;
+				using RhsFP = EmuCore::TMPHelpers::best_floating_point_rep_t<RhsT>;
+				using OutFP = EmuCore::TMPHelpers::best_floating_point_rep_t<OutT>;
+				using HighestFP = EmuCore::TMPHelpers::highest_byte_size_t<ThisFP, RhsFP, OutFP>;
+
+				using EndFunc = Func_<HighestFP, RhsT, HighestFP>;
+				EndFunc func = EndFunc();
+				if constexpr (OutVector::size() == 2)
+				{
+					return OutVector
+					(
+						func(static_cast<HighestFP>(x), rhs.x),
+						func(static_cast<HighestFP>(y), rhs.y)
+					);
+				}
+				else if constexpr (OutVector::size() == 3)
+				{
+					return OutVector
+					(
+						func(static_cast<HighestFP>(x), static_cast<HighestFP>(rhs.x)),
+						func(static_cast<HighestFP>(y), static_cast<HighestFP>(rhs.y)),
+						func(EmuCore::ArithmeticHelpers::ZeroT<HighestFP>, EmuMath::TMPHelpers::emu_vector_z<RhsVec>(rhs))
+					);
+				}
+				else if constexpr (OutVector::size() == 4)
+				{
+					const HighestFP zeroHighest = EmuCore::ArithmeticHelpers::ZeroT<HighestFP>;
+					return OutVector
+					(
+						func(static_cast<HighestFP>(x) + rhs.x),
+						func(static_cast<HighestFP>(y) + rhs.y),
+						func(zeroHighest, EmuMath::TMPHelpers::emu_vector_z(rhs)),
+						func(zeroHighest, EmuMath::TMPHelpers::emu_vector_w(rhs))
+					);
+				}
+			}
+			else
+			{
+				// No floating points to worry about in addition
+				using HighestT = EmuCore::TMPHelpers::highest_byte_size_t<nonref_value_type_without_qualifiers, RhsT, OutT>;
+				using EndFunc = Func_<HighestT, RhsT, HighestT>;
+				EndFunc func = EndFunc();
+
+				if constexpr (OutVector::size() == 2)
+				{
+					return Vector2<OutT>
+					(
+						func(static_cast<HighestT>(x), rhs.x),
+						func(static_cast<HighestT>(y), rhs.y)
+					);
+				}
+				else if constexpr (OutVector::size() == 3)
+				{
+					return OutVector
+					(
+						func(static_cast<HighestT>(x), rhs.x),
+						func(static_cast<HighestT>(y), rhs.y),
+						func(EmuCore::ArithmeticHelpers::ZeroT<HighestT>, EmuMath::TMPHelpers::emu_vector_z(rhs))
+					);
+				}
+				else if constexpr (OutVector::size() == 4)
+				{
+					const HighestT zeroHighest = EmuCore::ArithmeticHelpers::ZeroT<HighestT>;
+					return OutVector
+					(
+						func(static_cast<HighestT>(x), rhs.x),
+						func(static_cast<HighestT>(y), rhs.y),
+						func(zeroHighest, EmuMath::TMPHelpers::emu_vector_z(rhs)),
+						func(zeroHighest, EmuMath::TMPHelpers::emu_vector_w(rhs))
+					);
+				}
+			}
+		}
+
+		template<typename RhsT, typename OutVector, template<typename LhsT_, typename RhsT_, typename OutT_> typename Func_>
+		constexpr OutVector _perform_scalar_arithmetic_emu(const RhsT& rhs) const
+		{
+			using OutT = typename OutVector::nonref_value_type_without_qualifiers;
+			if constexpr (info_type::has_floating_point_values || info_type_t<typename RhsVec::value_type>::has_floating_point_values)
+			{
+				// Floating points involved so care needs to be taken to not accidentally lose fractions if needed in output
+				using ThisFP = EmuCore::TMPHelpers::best_floating_point_rep_t<nonref_value_type_without_qualifiers>;
+				using RhsFP = EmuCore::TMPHelpers::best_floating_point_rep_t<RhsT>;
+				using OutFP = EmuCore::TMPHelpers::best_floating_point_rep_t<OutT>;
+				using HighestFP = EmuCore::TMPHelpers::highest_byte_size_t<ThisFP, RhsFP, OutFP>;
+				using EndFunc = Func_<HighestFP, HighestFP, HighestFP>;
+				EndFunc func = EndFunc();
+				const HighestFP rhsFp = static_cast<HighestFP>(rhs);
+				if constexpr (OutVector::size() == 2)
+				{
+					return OutVector
+					(
+						func(static_cast<HighestFP>(x), rhsFp),
+						func(static_cast<HighestFP>(y), rhsFp)
+					);
+				}
+				else if constexpr (OutVector::size() == 3)
+				{
+					return OutVector
+					(
+						func(static_cast<HighestFP>(x), rhsFp),
+						func(static_cast<HighestFP>(y), rhsFp),
+						func(EmuCore::ArithmeticHelpers::ZeroT<HighestFP>, rhsFp)
+					);
+				}
+				else if constexpr (OutVector::size() == 4)
+				{
+					const HighestFP zeroHighest = EmuCore::ArithmeticHelpers::ZeroT<HighestFP>;
+					return OutVector
+					(
+						func(static_cast<HighestFP>(x), rhsFp),
+						func(static_cast<HighestFP>(y), rhsFp),
+						func(zeroHighest, rhsFp),
+						func(zeroHighest, rhsFp)
+					);
+				}
+			}
+			else
+			{
+				// No floating points to worry about
+				using HighestT = EmuCore::TMPHelpers::highest_byte_size_t<nonref_value_type_without_qualifiers, RhsT, OutT>;
+				using EndFunc = Func_<HighestT, HighestT, HighestT>;
+				EndFunc func = EndFunc();
+				const HighestT rhsHighest = static_cast<HighestT>(rhs);
+
+
+				if constexpr (OutVector::size() == 2)
+				{
+					return Vector2<OutT>
+					(
+						func(static_cast<HighestT>(x), rhsHighest),
+						func(static_cast<HighestT>(y), rhsHighest)
+					);
+				}
+				else if constexpr (OutVector::size() == 3)
+				{
+					return OutVector
+					(
+						func(static_cast<HighestT>(x), rhsHighest),
+						func(static_cast<HighestT>(y), rhsHighest),
+						func(EmuCore::ArithmeticHelpers::ZeroT<HighestT>, rhsHighest)
+					);
+				}
+				else if constexpr (OutVector::size() == 4)
+				{
+					const HighestT zeroHighest = EmuCore::ArithmeticHelpers::ZeroT<HighestT>;
+					return OutVector
+					(
+						func(static_cast<HighestT>(x), rhsHighest),
+						func(static_cast<HighestT>(y), rhsHighest),
+						func(zeroHighest, rhsHighest),
+						func(zeroHighest, rhsHighest)
+					);
+				}
+			}
+		}
+
+		template<typename RhsVec, typename OutVector, template<typename FuncT_> typename Func_>
+		constexpr OutVector _perform_vector_arithmetic_std(const RhsVec& rhs) const
+		{
+			using OutT = typename OutVector::nonref_value_type_without_qualifiers;
+			using RhsT = typename RhsVec::nonref_value_type_without_qualifiers;
+			if constexpr (info_type::has_floating_point_values || info_type_t<typename RhsVec::value_type>::has_floating_point_values)
+			{
+				// Floating points involved in addition so care needs to be taken to not accidentally lose fractions if needed in output
+				using ThisFP = EmuCore::TMPHelpers::best_floating_point_rep_t<nonref_value_type_without_qualifiers>;
+				using RhsFP = EmuCore::TMPHelpers::best_floating_point_rep_t<RhsT>;
+				using OutFP = EmuCore::TMPHelpers::best_floating_point_rep_t<OutT>;
+				using HighestFP = EmuCore::TMPHelpers::highest_byte_size_t<ThisFP, RhsFP, OutFP>;
+		
+				using EndFunc = Func_<HighestFP>;
+				EndFunc func = EndFunc();
+				if constexpr (OutVector::size() == 2)
+				{
+					return OutVector
+					(
+						func(static_cast<HighestFP>(x), static_cast<HighestFP>(rhs.x)),
+						func(static_cast<HighestFP>(y), static_cast<HighestFP>(rhs.y))
+					);
+				}
+				else if constexpr (OutVector::size() == 3)
+				{
+					return OutVector
+					(
+						func(static_cast<HighestFP>(x), static_cast<HighestFP>(rhs.x)),
+						func(static_cast<HighestFP>(y), static_cast<HighestFP>(rhs.y)),
+						func(EmuCore::ArithmeticHelpers::ZeroT<HighestFP>, EmuMath::TMPHelpers::emu_vector_z<RhsVec>(rhs))
+					);
+				}
+				else if constexpr (OutVector::size() == 4)
+				{
+					const HighestFP zeroHighest = EmuCore::ArithmeticHelpers::ZeroT<HighestFP>;
+					return OutVector
+					(
+						func(static_cast<HighestFP>(x) + rhs.x),
+						func(static_cast<HighestFP>(y) + rhs.y),
+						func(zeroHighest, static_cast<HighestFP>(EmuMath::TMPHelpers::emu_vector_z(rhs))),
+						func(zeroHighest, static_cast<HighestFP>(EmuMath::TMPHelpers::emu_vector_w(rhs)))
+					);
+				}
+			}
+			else
+			{
+				// No floating points to worry about in addition
+				using HighestT = EmuCore::TMPHelpers::highest_byte_size_t<nonref_value_type_without_qualifiers, RhsT, OutT>;
+				using EndFunc = Func_<HighestT>;
+				EndFunc func = EndFunc();
+		
+				if constexpr (OutVector::size() == 2)
+				{
+					return Vector2<OutT>
+					(
+						func(static_cast<HighestT>(x), static_cast<HighestT>(rhs.x)),
+						func(static_cast<HighestT>(y), static_cast<HighestT>(rhs.y))
+					);
+				}
+				else if constexpr (OutVector::size() == 3)
+				{
+					return OutVector
+					(
+						func(static_cast<HighestT>(x), rhs.x),
+						func(static_cast<HighestT>(y), rhs.y),
+						func(EmuCore::ArithmeticHelpers::ZeroT<HighestT>, static_cast<HighestT>(EmuMath::TMPHelpers::emu_vector_z(rhs)))
+					);
+				}
+				else if constexpr (OutVector::size() == 4)
+				{
+					const HighestT zeroHighest = EmuCore::ArithmeticHelpers::ZeroT<HighestT>;
+					return OutVector
+					(
+						func(static_cast<HighestT>(x), rhs.x),
+						func(static_cast<HighestT>(y), rhs.y),
+						func(zeroHighest, static_cast<HighestT>(EmuMath::TMPHelpers::emu_vector_z(rhs))),
+						func(zeroHighest, static_cast<HighestT>(EmuMath::TMPHelpers::emu_vector_w(rhs)))
+					);
+				}
 			}
 		}
 #pragma endregion

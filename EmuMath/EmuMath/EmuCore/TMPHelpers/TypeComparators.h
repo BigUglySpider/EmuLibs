@@ -156,6 +156,34 @@ namespace EmuCore::TMPHelpers
 	/// <typeparam name="Others">All types to check after the first. Optional.</typeparam>
 	template<typename T, typename...Others>
 	static constexpr bool are_all_not_unsigned_v = are_all_not_check<std::is_unsigned, T, Others...>::value;
+
+	template<typename T, typename...Others>
+	static constexpr bool is_any_floating_point_v = is_any_check<std::is_floating_point, T, Others...>::value;
+
+	/// <summary> Underlying check used for all is_any_[comparison] values. </summary>
+	/// <typeparam name="First_">First item to compare.</typeparam>
+	/// <typeparam name="ToCompareAgainst_">Item to compare all additional passed items against within comparison_.</typeparam>
+	/// <typeparam name="Others">All additional items to compare against after First_ until true or exhausted.</typeparam>
+	template<template<typename X__, typename Y__> typename comparison_, typename ToCompareAgainst_, typename First_, typename...Others>
+	struct is_any_comparison_true
+	{
+		static constexpr bool value = comparison_<ToCompareAgainst_, First_>::value ? true : is_any_comparison_true<comparison_, ToCompareAgainst_, Others...>::value;
+	};
+	/// <summary> Underlying check used for all is_any_[comparison] values. </summary>
+	/// <typeparam name="First_">First item to compare.</typeparam>
+	/// <typeparam name="ToCompareAgainst_">Item to compare all additional passed items against within comparison_.</typeparam>
+	template<template<typename X__, typename Y__> typename comparison_, typename ToCompareAgainst_, typename First_>
+	struct is_any_comparison_true<comparison_, ToCompareAgainst_, First_>
+	{
+		static constexpr bool value = comparison_<ToCompareAgainst_, First_>::value;
+	};
+
+	/// <summary> Boolean indicating if any of the types passed types after ToFind_ are the same type as it. </summary>
+	/// <typeparam name="ToFind_">Type to try to find.</typeparam>
+	/// <typeparam name="First_">First type to compare to ToFind_.</typeparam>
+	/// <typeparam name="Others">All types to compare after First_ until true or exhausted.</typeparam>
+	template<typename ToFind_, typename First_, typename...Others>
+	static constexpr bool is_any_same_v = is_any_comparison_true<std::is_same, ToFind_, First_, Others...>::value;
 }
 
 #endif

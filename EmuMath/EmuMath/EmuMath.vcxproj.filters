@@ -53,5 +53,11 @@
     <ClInclude Include="EmuCore\TMPHelpers\TypeConvertors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\EmuVectorTMPHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuCore\TMPHelpers\Functors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
