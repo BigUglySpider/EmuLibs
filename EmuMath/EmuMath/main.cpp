@@ -72,6 +72,9 @@ int main()
 	EmuMath::Vector4<float> v4f = Vector4<float>(EmuMath::Vector2<int>(2, 1), 1.0f, 66.66666666666666f);
 
 
+	Vector4<float> v4fOut = EmuMath::Helpers::VectorSubtraction<Vector4<float>>(Vector2<std::uint16_t>(5, 2), Vector3<std::uint32_t>(2.5f, 4.0f, 255.0f));
+	std::cout << v4fOut << "\n";
+
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();
 #pragma endregion

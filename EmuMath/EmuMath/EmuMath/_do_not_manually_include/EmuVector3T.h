@@ -466,6 +466,698 @@ namespace EmuMath
 				at<Index>() = static_cast<nonref_value_type>(val_);
 			}
 		}
+
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_addition(const RhsVec& rhs) const
+		{
+			return this->_perform_vector_arithmetic_emu<RhsVec, OutVector, EmuCore::TMPHelpers::plus_diff_types>(rhs);
+		}
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_subtraction(const RhsVec& rhs) const
+		{
+			return this->_perform_vector_arithmetic_emu<RhsVec, OutVector, EmuCore::TMPHelpers::minus_diff_types>(rhs);
+		}
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_vector_multiplication(const RhsVec& rhs) const
+		{
+			return this->_perform_vector_arithmetic_emu<RhsVec, OutVector, EmuCore::TMPHelpers::multiplies_diff_types>(rhs);
+		}
+		template<typename RhsT, typename OutVector>
+		constexpr OutVector _perform_scalar_multiplication(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_arithmetic_emu<RhsT, OutVector, EmuCore::TMPHelpers::multiplies_diff_types>(rhs);
+		}
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_vector_division(const RhsVec& rhs) const
+		{
+			return this->_perform_vector_arithmetic_emu<RhsVec, OutVector, EmuCore::TMPHelpers::divides_diff_types>(rhs);
+		}
+		template<typename RhsT, typename OutVector>
+		constexpr OutVector _perform_scalar_division(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_arithmetic_emu<RhsT, OutVector, EmuCore::TMPHelpers::divides_diff_types>(rhs);
+		}
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_vector_mod(const RhsVec& rhs) const
+		{
+			return this->_perform_vector_arithmetic_emu<RhsVec, OutVector, EmuCore::TMPHelpers::modulus_diff_types>(rhs);
+		}
+		template<typename RhsT, typename OutVector>
+		constexpr OutVector _perform_scalar_mod(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_arithmetic_emu<RhsT, OutVector, EmuCore::TMPHelpers::modulus_diff_types>(rhs);
+		}
+
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_vector_and(const RhsVec& rhs) const
+		{
+			return this->_perform_vector_bitwise_op_emu<RhsVec, OutVector, EmuCore::TMPHelpers::logical_and_diff_types>(rhs);
+		}
+		template<typename RhsT, typename OutVector>
+		constexpr OutVector _perform_scalar_and(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::logical_and_diff_types>(rhs);
+		}
+
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_vector_or(const RhsVec& rhs) const
+		{
+			return this->_perform_vector_bitwise_op_emu<RhsVec, OutVector, EmuCore::TMPHelpers::logical_or_diff_types>(rhs);
+		}
+		template<typename RhsT, typename OutVector>
+		constexpr OutVector _perform_scalar_or(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::logical_or_diff_types>(rhs);
+		}
+
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_vector_xor(const RhsVec& rhs) const
+		{
+			return this->_perform_vector_bitwise_op_emu<RhsVec, OutVector, EmuCore::TMPHelpers::logical_xor_diff_types>(rhs);
+		}
+		template<typename RhsT, typename OutVector>
+		constexpr OutVector _perform_scalar_xor(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::logical_xor_diff_types>(rhs);
+		}
+
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_vector_per_element_leftshift(const RhsVec& numShifts) const
+		{
+			return this->_perform_vector_bitwise_op_emu<RhsVec, OutVector, EmuCore::TMPHelpers::bitwise_shift_left_diff_types>(numShifts);
+		}
+		template<typename RhsT, typename OutVector>
+		constexpr OutVector _perform_scalar_per_element_leftshift(const RhsT& numShifts) const
+		{
+			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::bitwise_shift_left_diff_types>(numShifts);
+		}
+
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_vector_per_element_rightshift(const RhsVec& numShifts) const
+		{
+			return this->_perform_vector_bitwise_op_emu<RhsVec, OutVector, EmuCore::TMPHelpers::bitwise_shift_right_diff_types>(numShifts);
+		}
+		template<typename RhsT, typename OutVector>
+		constexpr OutVector _perform_scalar_per_element_rightshift(const RhsT& numShifts) const
+		{
+			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::bitwise_shift_right_diff_types>(numShifts);
+		}
+
+		template<typename OutVector>
+		constexpr OutVector _perform_inversion() const
+		{
+			using Func = EmuCore::TMPHelpers::bit_inversion_diff_types<nonref_value_type_without_qualifiers, typename OutVector::value_type>;
+			Func func = Func();
+			if constexpr (OutVector::size() == 2)
+			{
+				return OutVector
+				(
+					func(x),
+					func(y)
+				);
+			}
+			else if constexpr (OutVector::size() == 3)
+			{
+				return OutVector
+				(
+					func(x),
+					func(y),
+					func(z)
+				);
+			}
+			else if constexpr (OutVector::size() == 4)
+			{
+				const auto& zero_ = info_type::value_zero;
+				return OutVector
+				(
+					func(x),
+					func(y),
+					func(z),
+					func(zero_)
+				);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a bit inversion on an EmuMath::Vector2 with an unsupported size of output Vector.");
+			}
+		}
+
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_vector_compare_equal(const RhsVector& rhs) const
+		{
+			return this->_perform_vector_comparison_std<Size_, RhsVector, std::equal_to>(rhs);
+		}
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_scalar_compare_equal(const RhsVector& rhs) const
+		{
+			return this->_perform_scalar_comparison_std<Size_, RhsVector, std::equal_to>(rhs);
+		}
+
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_vector_compare_not_equal(const RhsVector& rhs) const
+		{
+			return this->_perform_vector_comparison_std<Size_, RhsVector, std::not_equal_to>(rhs);
+		}
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_scalar_compare_not_equal(const RhsVector& rhs) const
+		{
+			return this->_perform_scalar_comparison_std<Size_, RhsVector, std::not_equal_to>(rhs);
+		}
+
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_vector_compare_less(const RhsVector& rhs) const
+		{
+			return this->_perform_vector_comparison_std<Size_, RhsVector, std::less>(rhs);
+		}
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_scalar_compare_less(const RhsVector& rhs) const
+		{
+			return this->_perform_scalar_comparison_std<Size_, RhsVector, std::less>(rhs);
+		}
+
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_vector_compare_greater(const RhsVector& rhs) const
+		{
+			return this->_perform_vector_comparison_std<Size_, RhsVector, std::greater>(rhs);
+		}
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_scalar_compare_greater(const RhsVector& rhs) const
+		{
+			return this->_perform_scalar_comparison_std<Size_, RhsVector, std::greater>(rhs);
+		}
+
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_vector_compare_less_equal(const RhsVector& rhs) const
+		{
+			return this->_perform_vector_comparison_std<Size_, RhsVector, std::less_equal>(rhs);
+		}
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_scalar_compare_less_equal(const RhsVector& rhs) const
+		{
+			return this->_perform_scalar_comparison_std<Size_, RhsVector, std::less_equal>(rhs);
+		}
+
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_vector_compare_greater_equal(const RhsVector& rhs) const
+		{
+			return this->_perform_vector_comparison_std<Size_, RhsVector, std::greater_equal>(rhs);
+		}
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_scalar_compare_greater_equal(const RhsVector& rhs) const
+		{
+			return this->_perform_scalar_comparison_std<Size_, RhsVector, std::greater_equal>(rhs);
+		}
+
+		template<std::size_t NumElementsToCheck_, typename RhsT, template<class> class Func_>
+		constexpr bool _perform_overall_comparison_std(const RhsT& rhs) const
+		{
+			using Func = Func_<nonref_value_type_without_qualifiers>;
+			Func func = Func();
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<RhsT>)
+			{
+				if constexpr (NumElementsToCheck_ == 1)
+				{
+					return func(x, rhs.x);
+				}
+				else if constexpr (NumElementsToCheck_ == 2)
+				{
+					return func(x, rhs.x) && func(y, rhs.y);
+				}
+				else if constexpr (NumElementsToCheck_ == 3)
+				{
+					return func(x, rhs.x) && func(y, rhs.y) && func(z, EmuMath::TMPHelpers::emu_vector_z(rhs));
+				}
+				else if constexpr (NumElementsToCheck_ == 4)
+				{
+					return
+					(
+						func(x, rhs.x) &&
+						func(y, rhs.y) &&
+						func(z, EmuMath::TMPHelpers::emu_vector_z(rhs)) &&
+						func(info_type::value_zero, EmuMath::TMPHelpers::emu_vector_w(rhs))
+					);
+				}
+				else
+				{
+					static_assert(false, "Attempted to perform a per-element comparison on an EmuMath::Vector2 with an unsupported number of elements in the comparison.");
+				}
+			}
+			else
+			{
+				if constexpr (NumElementsToCheck_ == 1)
+				{
+					return func(x, rhs);
+				}
+				else if constexpr (NumElementsToCheck_ == 2)
+				{
+					return func(x, rhs) && func(y, rhs);
+				}
+				else if constexpr (NumElementsToCheck_ == 3 || NumElementsToCheck_ == 4)
+				{
+					// z and w result in the same output when comparisng to a scalar since they are both implied zero comparisons in a Vector2
+					return func(x, rhs) && func(y, rhs) && func(z, rhs);
+				}
+				else
+				{
+					static_assert(false, "Attempted to perform a per-element comparison on an EmuMath::Vector2 with an unsupported number of elements in the comparison.");
+				}
+			}
+		}
+
+		template<std::size_t Size_, typename RhsVector, template<class> class Func_>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_vector_comparison_std(const RhsVector& rhs) const
+		{
+			using OutVector = EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool>;
+			using Func = Func_<nonref_value_type>;
+			Func func = Func();
+			if constexpr (Size_ == 2)
+			{
+				return OutVector
+				(
+					func(x, rhs.x),
+					func(y, rhs.y)
+				);
+			}
+			else if constexpr (Size_ == 3)
+			{
+				return OutVector
+				(
+					func(x, rhs.x),
+					func(y, rhs.y),
+					func(z, EmuMath::TMPHelpers::emu_vector_z(rhs))
+				);
+			}
+			else if constexpr (Size_ == 4)
+			{
+				return OutVector
+				(
+					func(x, rhs.x),
+					func(y, rhs.y),
+					func(z, EmuMath::TMPHelpers::emu_vector_z(rhs)),
+					func(info_type::value_zero, EmuMath::TMPHelpers::emu_vector_w(rhs))
+				);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a per-element comparison on an EmuMath::Vector2 with an unsupported size of output Vector.");
+			}
+		}
+		template<std::size_t Size_, typename RhsVector, template<class> class Func_>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_scalar_comparison_std(const RhsVector& rhs) const
+		{
+			using OutVector = EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool>;
+			using Func = Func_<nonref_value_type>;
+			Func func = Func();
+			if constexpr (Size_ == 2)
+			{
+				return OutVector
+				(
+					func(x, rhs),
+					func(y, rhs)
+				);
+			}
+			else if constexpr (Size_ == 3)
+			{
+				return OutVector
+				(
+					func(x, rhs),
+					func(y, rhs),
+					func(info_type::value_zero, rhs)
+				);
+			}
+			else if constexpr (Size_ == 4)
+			{
+				return OutVector
+				(
+					func(x, rhs.x),
+					func(y, rhs.y),
+					func(info_type::value_zero, rhs),
+					func(info_type::value_zero, rhs)
+				);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a per-element comparison on an EmuMath::Vector2 with an unsupported size of output Vector.");
+			}
+		}
+
+		/// <summary> Template for performing bitwise operations on this Vector via another Vector, using EmuCore bitwise op functors. </summary>
+		/// <typeparam name="RhsVec">Type of the right-hand side Vector.</typeparam>
+		/// <typeparam name="OutVector">Type of Vector to output the result as.</typeparam>
+		/// <param name="rhs">Vector to perform bitwise operations on the respective values of this Vector with.</param>
+		/// <returns>Result of the bitwise operation stored as the provided OutVector type.</returns>
+		template<typename RhsVec, typename OutVector, template<typename LhsT_, typename RhsT_, typename OutT_> typename Func_>
+		constexpr OutVector _perform_vector_bitwise_op_emu(const RhsVec& rhs) const
+		{
+			using EndFunc = Func_
+				<
+				nonref_value_type_without_qualifiers,
+				typename RhsVec::nonref_value_type_without_qualifiers,
+				typename OutVector::value_type
+				>;
+			EndFunc func = EndFunc();
+			if constexpr (OutVector::size() == 2)
+			{
+				return OutVector
+				(
+					func(x, rhs.x),
+					func(y, rhs.y)
+				);
+			}
+			else if constexpr (OutVector::size() == 3)
+			{
+				return OutVector
+				(
+					func(x, rhs.x),
+					func(y, rhs.y),
+					func(info_type::value_zero, EmuMath::TMPHelpers::emu_vector_z(rhs))
+				);
+			}
+			else if constexpr (OutVector::size() == 4)
+			{
+				return OutVector
+				(
+					func(x, rhs.x),
+					func(y, rhs.y),
+					func(info_type::value_zero, EmuMath::TMPHelpers::emu_vector_z(rhs)),
+					func(info_type::value_zero, EmuMath::TMPHelpers::emu_vector_w(rhs))
+				);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a bitwise operation on an EmuMath::Vector2 with an unsupported size of output Vector.");
+			}
+		}
+
+		/// <summary> Template for performing bitwise operations on this Vector via a scalar value, using EmuCore bitwise op functors. </summary>
+		/// <typeparam name="RhsT">Type of the right-hand side scalar.</typeparam>
+		/// <typeparam name="OutVector">Type of Vector to output the result as.</typeparam>
+		/// <param name="rhs">Scalar value to perform bitwise operations on all values of this Vector with.</param>
+		/// <returns>Result of the bitwise operation stored as the provided OutVector type.</returns>
+		template<typename RhsT, typename OutVector, template<typename LhsT_, typename RhsT_, typename OutT_> typename Func_>
+		constexpr OutVector _perform_scalar_bitwise_op_emu(const RhsT& rhs) const
+		{
+			using EndFunc = Func_
+				<
+				nonref_value_type_without_qualifiers,
+				RhsT,
+				typename OutVector::value_type
+				>;
+			EndFunc func = EndFunc();
+			if constexpr (OutVector::size() == 2)
+			{
+				return OutVector
+				(
+					func(x, rhs),
+					func(y, rhs)
+				);
+			}
+			else if constexpr (OutVector::size() == 3)
+			{
+				return OutVector
+				(
+					func(x, rhs),
+					func(y, rhs),
+					func(info_type::value_zero, rhs)
+				);
+			}
+			else if constexpr (OutVector::size() == 4)
+			{
+				return OutVector
+				(
+					func(x, rhs),
+					func(y, rhs),
+					func(info_type::value_zero, rhs),
+					func(info_type::value_zero, rhs)
+				);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a bitwise operation on an EmuMath::Vector2 with an unsupported size of output Vector.");
+			}
+		}
+
+		/// <summary> Template for performing arithmetic on this Vector via another Vector, using EmuCore arithmetic functors. </summary>
+		/// <typeparam name="RhsVec">Type of the right-hand side Vector.</typeparam>
+		/// <typeparam name="OutVector">Type of Vector to output the result as.</typeparam>
+		/// <param name="rhs">Vector to perform arithmetic on the respective values of this Vector with.</param>
+		/// <returns>Result of the arithmetic operation stored as the provided OutVector type.</returns>
+		template<typename RhsVec, typename OutVector, template<typename LhsT_, typename RhsT_, typename OutT_> typename Func_>
+		constexpr OutVector _perform_vector_arithmetic_emu(const RhsVec& rhs) const
+		{
+			using OutT = typename OutVector::nonref_value_type_without_qualifiers;
+			using RhsT = typename RhsVec::nonref_value_type_without_qualifiers;
+			if constexpr (info_type::has_floating_point_values || info_type_t<typename RhsVec::value_type>::has_floating_point_values)
+			{
+				// Floating points involved in addition so care needs to be taken to not accidentally lose fractions if needed in output
+				using ThisFP = EmuCore::TMPHelpers::best_floating_point_rep_t<nonref_value_type_without_qualifiers>;
+				using RhsFP = EmuCore::TMPHelpers::best_floating_point_rep_t<RhsT>;
+				using OutFP = EmuCore::TMPHelpers::best_floating_point_rep_t<OutT>;
+				using HighestFP = EmuCore::TMPHelpers::highest_byte_size_t<ThisFP, RhsFP, OutFP>;
+
+				using EndFunc = Func_<HighestFP, RhsT, HighestFP>;
+				EndFunc func = EndFunc();
+				if constexpr (OutVector::size() == 2)
+				{
+					return OutVector
+					(
+						func(static_cast<HighestFP>(x), rhs.x),
+						func(static_cast<HighestFP>(y), rhs.y)
+					);
+				}
+				else if constexpr (OutVector::size() == 3)
+				{
+					return OutVector
+					(
+						func(static_cast<HighestFP>(x), rhs.x),
+						func(static_cast<HighestFP>(y), rhs.y),
+						func(EmuCore::ArithmeticHelpers::ZeroT<HighestFP>, EmuMath::TMPHelpers::emu_vector_z<RhsVec>(rhs))
+					);
+				}
+				else if constexpr (OutVector::size() == 4)
+				{
+					const HighestFP zeroHighest = EmuCore::ArithmeticHelpers::ZeroT<HighestFP>;
+					return OutVector
+					(
+						func(static_cast<HighestFP>(x) + rhs.x),
+						func(static_cast<HighestFP>(y) + rhs.y),
+						func(zeroHighest, EmuMath::TMPHelpers::emu_vector_z(rhs)),
+						func(zeroHighest, EmuMath::TMPHelpers::emu_vector_w(rhs))
+					);
+				}
+			}
+			else
+			{
+				// No floating points to worry about in addition
+				using HighestT = EmuCore::TMPHelpers::highest_byte_size_t<nonref_value_type_without_qualifiers, RhsT, OutT>;
+				using EndFunc = Func_<HighestT, RhsT, HighestT>;
+				EndFunc func = EndFunc();
+
+				if constexpr (OutVector::size() == 2)
+				{
+					return Vector2<OutT>
+						(
+							func(static_cast<HighestT>(x), rhs.x),
+							func(static_cast<HighestT>(y), rhs.y)
+							);
+				}
+				else if constexpr (OutVector::size() == 3)
+				{
+					return OutVector
+					(
+						func(static_cast<HighestT>(x), rhs.x),
+						func(static_cast<HighestT>(y), rhs.y),
+						func(EmuCore::ArithmeticHelpers::ZeroT<HighestT>, EmuMath::TMPHelpers::emu_vector_z(rhs))
+					);
+				}
+				else if constexpr (OutVector::size() == 4)
+				{
+					const HighestT zeroHighest = EmuCore::ArithmeticHelpers::ZeroT<HighestT>;
+					return OutVector
+					(
+						func(static_cast<HighestT>(x), rhs.x),
+						func(static_cast<HighestT>(y), rhs.y),
+						func(zeroHighest, EmuMath::TMPHelpers::emu_vector_z(rhs)),
+						func(zeroHighest, EmuMath::TMPHelpers::emu_vector_w(rhs))
+					);
+				}
+			}
+		}
+
+		/// <summary> Template for performing arithmetic on this Vector via a scalar value, using EmuCore arithmetic functors. </summary>
+		/// <typeparam name="RhsT">Type of the right-hand side scalar.</typeparam>
+		/// <typeparam name="OutVector">Type of Vector to output the result as.</typeparam>
+		/// <param name="rhs">Scalar value to perform arithmetic on all values of this Vector with.</param>
+		/// <returns>Result of the arithmetic operation stored as the provided OutVector type.</returns>
+		template<typename RhsT, typename OutVector, template<typename LhsT_, typename RhsT_, typename OutT_> typename Func_>
+		constexpr OutVector _perform_scalar_arithmetic_emu(const RhsT& rhs) const
+		{
+			using OutT = typename OutVector::nonref_value_type_without_qualifiers;
+			if constexpr (info_type::has_floating_point_values || std::is_floating_point_v<RhsT>)
+			{
+				// Floating points involved so care needs to be taken to not accidentally lose fractions if needed in output
+				using ThisFP = EmuCore::TMPHelpers::best_floating_point_rep_t<nonref_value_type_without_qualifiers>;
+				using RhsFP = EmuCore::TMPHelpers::best_floating_point_rep_t<RhsT>;
+				using OutFP = EmuCore::TMPHelpers::best_floating_point_rep_t<OutT>;
+				using HighestFP = EmuCore::TMPHelpers::highest_byte_size_t<ThisFP, RhsFP, OutFP>;
+				using EndFunc = Func_<HighestFP, HighestFP, HighestFP>;
+				EndFunc func = EndFunc();
+				const HighestFP rhsFp = static_cast<HighestFP>(rhs);
+				if constexpr (OutVector::size() == 2)
+				{
+					return OutVector
+					(
+						func(static_cast<HighestFP>(x), rhsFp),
+						func(static_cast<HighestFP>(y), rhsFp)
+					);
+				}
+				else if constexpr (OutVector::size() == 3)
+				{
+					return OutVector
+					(
+						func(static_cast<HighestFP>(x), rhsFp),
+						func(static_cast<HighestFP>(y), rhsFp),
+						func(EmuCore::ArithmeticHelpers::ZeroT<HighestFP>, rhsFp)
+					);
+				}
+				else if constexpr (OutVector::size() == 4)
+				{
+					const HighestFP zeroHighest = EmuCore::ArithmeticHelpers::ZeroT<HighestFP>;
+					return OutVector
+					(
+						func(static_cast<HighestFP>(x), rhsFp),
+						func(static_cast<HighestFP>(y), rhsFp),
+						func(zeroHighest, rhsFp),
+						func(zeroHighest, rhsFp)
+					);
+				}
+			}
+			else
+			{
+				// No floating points to worry about
+				using HighestT = EmuCore::TMPHelpers::highest_byte_size_t<nonref_value_type_without_qualifiers, RhsT, OutT>;
+				using EndFunc = Func_<HighestT, HighestT, HighestT>;
+				EndFunc func = EndFunc();
+				const HighestT rhsHighest = static_cast<HighestT>(rhs);
+
+
+				if constexpr (OutVector::size() == 2)
+				{
+					return Vector2<OutT>
+						(
+							func(static_cast<HighestT>(x), rhsHighest),
+							func(static_cast<HighestT>(y), rhsHighest)
+							);
+				}
+				else if constexpr (OutVector::size() == 3)
+				{
+					return OutVector
+					(
+						func(static_cast<HighestT>(x), rhsHighest),
+						func(static_cast<HighestT>(y), rhsHighest),
+						func(EmuCore::ArithmeticHelpers::ZeroT<HighestT>, rhsHighest)
+					);
+				}
+				else if constexpr (OutVector::size() == 4)
+				{
+					const HighestT zeroHighest = EmuCore::ArithmeticHelpers::ZeroT<HighestT>;
+					return OutVector
+					(
+						func(static_cast<HighestT>(x), rhsHighest),
+						func(static_cast<HighestT>(y), rhsHighest),
+						func(zeroHighest, rhsHighest),
+						func(zeroHighest, rhsHighest)
+					);
+				}
+			}
+		}
+
+		/// <summary> Template for performing arithmetic on this Vector via another Vector, using standard arithmetic functors. </summary>
+		/// <typeparam name="RhsVec">Type of the right-hand side Vector.</typeparam>
+		/// <typeparam name="OutVector">Type of Vector to output the result as.</typeparam>
+		/// <param name="rhs">Vector to perform arithmetic on the respective values of this Vector with.</param>
+		/// <returns>Result of the arithmetic operation stored as the provided OutVector type.</returns>
+		template<typename RhsVec, typename OutVector, template<typename FuncT_> typename Func_>
+		constexpr OutVector _perform_vector_arithmetic_std(const RhsVec& rhs) const
+		{
+			using OutT = typename OutVector::nonref_value_type_without_qualifiers;
+			using RhsT = typename RhsVec::nonref_value_type_without_qualifiers;
+			if constexpr (info_type::has_floating_point_values || info_type_t<typename RhsVec::value_type>::has_floating_point_values)
+			{
+				// Floating points involved in addition so care needs to be taken to not accidentally lose fractions if needed in output
+				using ThisFP = EmuCore::TMPHelpers::best_floating_point_rep_t<nonref_value_type_without_qualifiers>;
+				using RhsFP = EmuCore::TMPHelpers::best_floating_point_rep_t<RhsT>;
+				using OutFP = EmuCore::TMPHelpers::best_floating_point_rep_t<OutT>;
+				using HighestFP = EmuCore::TMPHelpers::highest_byte_size_t<ThisFP, RhsFP, OutFP>;
+
+				using EndFunc = Func_<HighestFP>;
+				EndFunc func = EndFunc();
+				if constexpr (OutVector::size() == 2)
+				{
+					return OutVector
+					(
+						func(static_cast<HighestFP>(x), static_cast<HighestFP>(rhs.x)),
+						func(static_cast<HighestFP>(y), static_cast<HighestFP>(rhs.y))
+					);
+				}
+				else if constexpr (OutVector::size() == 3)
+				{
+					return OutVector
+					(
+						func(static_cast<HighestFP>(x), static_cast<HighestFP>(rhs.x)),
+						func(static_cast<HighestFP>(y), static_cast<HighestFP>(rhs.y)),
+						func(EmuCore::ArithmeticHelpers::ZeroT<HighestFP>, EmuMath::TMPHelpers::emu_vector_z<RhsVec>(rhs))
+					);
+				}
+				else if constexpr (OutVector::size() == 4)
+				{
+					const HighestFP zeroHighest = EmuCore::ArithmeticHelpers::ZeroT<HighestFP>;
+					return OutVector
+					(
+						func(static_cast<HighestFP>(x) + rhs.x),
+						func(static_cast<HighestFP>(y) + rhs.y),
+						func(zeroHighest, static_cast<HighestFP>(EmuMath::TMPHelpers::emu_vector_z(rhs))),
+						func(zeroHighest, static_cast<HighestFP>(EmuMath::TMPHelpers::emu_vector_w(rhs)))
+					);
+				}
+			}
+			else
+			{
+				// No floating points to worry about in addition
+				using HighestT = EmuCore::TMPHelpers::highest_byte_size_t<nonref_value_type_without_qualifiers, RhsT, OutT>;
+				using EndFunc = Func_<HighestT>;
+				EndFunc func = EndFunc();
+
+				if constexpr (OutVector::size() == 2)
+				{
+					return Vector2<OutT>
+						(
+							func(static_cast<HighestT>(x), static_cast<HighestT>(rhs.x)),
+							func(static_cast<HighestT>(y), static_cast<HighestT>(rhs.y))
+							);
+				}
+				else if constexpr (OutVector::size() == 3)
+				{
+					return OutVector
+					(
+						func(static_cast<HighestT>(x), rhs.x),
+						func(static_cast<HighestT>(y), rhs.y),
+						func(EmuCore::ArithmeticHelpers::ZeroT<HighestT>, static_cast<HighestT>(EmuMath::TMPHelpers::emu_vector_z(rhs)))
+					);
+				}
+				else if constexpr (OutVector::size() == 4)
+				{
+					const HighestT zeroHighest = EmuCore::ArithmeticHelpers::ZeroT<HighestT>;
+					return OutVector
+					(
+						func(static_cast<HighestT>(x), rhs.x),
+						func(static_cast<HighestT>(y), rhs.y),
+						func(zeroHighest, static_cast<HighestT>(EmuMath::TMPHelpers::emu_vector_z(rhs))),
+						func(zeroHighest, static_cast<HighestT>(EmuMath::TMPHelpers::emu_vector_w(rhs)))
+					);
+				}
+			}
+		}
 #pragma endregion
 	};
 }

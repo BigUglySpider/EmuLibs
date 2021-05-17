@@ -15,8 +15,10 @@ namespace EmuCore::TestingHelpers
 	template<typename T>
 	struct TestA
 	{
+		using ToAddT = T;
+
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr std::size_t NUM_LOOPS = 5000000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 
 		TestA()
@@ -25,16 +27,19 @@ namespace EmuCore::TestingHelpers
 		void Prepare()
 		{
 			outData.resize(NUM_LOOPS);
-			for (auto& vec : outData)
+			toAdd.resize(NUM_LOOPS);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				vec = { static_cast<T>((rand() % 30 - 15) * 0.75f), static_cast<T>((rand() % 30 - 15) * 0.75f) };
+				outData[i] = { static_cast<T>((rand() % 30 - 15) * 0.75f), static_cast<T>((rand() % 30 - 15) * 0.75f) };
+				toAdd[i] = { static_cast<ToAddT>((rand() % 30 - 15) * 0.75f), static_cast<ToAddT>((rand() % 30 - 15) * 0.75f) };
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			outData[i] = outData[i].AsTrunced();
+			outData[i] = outData[i] + toAdd[i];
 		}
 		std::vector<EmuMath::Vector2<T>> outData;
+		std::vector<EmuMath::Vector2<ToAddT>> toAdd;
 	};
 
 	using AllTests = std::tuple<TestA<float>>;

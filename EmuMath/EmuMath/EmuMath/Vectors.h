@@ -73,4 +73,11 @@ std::ostream& operator<<(std::ostream& stream, const EmuMath::Vector3<T>& emuVec
 	return stream;
 }
 
+template<typename T>
+std::ostream& operator<<(std::ostream& stream, const EmuMath::Vector4<T>& emuVector)
+{
+	stream << "{ " << emuVector.x << ", " << emuVector.y << ", " << emuVector.z << ", " << emuVector.w << " }";
+	return stream;
+}
+
 #endif

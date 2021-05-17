@@ -5,7 +5,8 @@
 #include "../../EmuCore/TMPHelpers/Functors.h"
 #include "../../EmuCore/TMPHelpers/TypeComparators.h"
 #include "../../EmuCore/TMPHelpers/TypeConvertors.h"
-#include "../../EmuMath/_do_not_manually_include/EmuVectorTMPHelpers.h"
+#include "EmuVectorTMPHelpers.h"
+#include "VectorHelpers.h"
 #include <exception>
 
 namespace EmuMath
@@ -246,75 +247,50 @@ namespace EmuMath
 		template<typename RhsT>
 		constexpr Vector2<nonref_value_type> operator+(const Vector2<RhsT>& rhs) const
 		{
-			return this->AsAdded<size(), nonref_value_type, RhsT>(rhs);
+			return EmuMath::Helpers::VectorAddition<Vector2<nonref_value_type>>(*this, rhs);
 		}
 		template<typename RhsT>
 		constexpr Vector2<nonref_value_type> operator+(const Vector3<RhsT>& rhs) const
 		{
-			return this->AsAdded<size(), nonref_value_type, RhsT>(rhs);
+			return EmuMath::Helpers::VectorAddition<Vector2<nonref_value_type>>(*this, rhs);
+		}
+		template<typename RhsT>
+		constexpr Vector2<nonref_value_type> operator+(const Vector4<RhsT>& rhs) const
+		{
+			return EmuMath::Helpers::VectorAddition<Vector2<nonref_value_type>>(*this, rhs);
 		}
 
 		template<typename RhsT>
 		constexpr Vector2<nonref_value_type> operator-(const Vector2<RhsT>& rhs) const
 		{
-			return this->AsSubtracted<size(), nonref_value_type, RhsT>(rhs);
+			return EmuMath::Helpers::VectorSubtraction<Vector2<nonref_value_type>>(*this, rhs);
 		}
 		template<typename RhsT>
 		constexpr Vector2<nonref_value_type> operator-(const Vector3<RhsT>& rhs) const
 		{
-			return this->AsSubtracted<size(), nonref_value_type, RhsT>(rhs);
+			return EmuMath::Helpers::VectorSubtraction<Vector2<nonref_value_type>>(*this, rhs);
 		}
 		constexpr Vector2<nonref_value_type> operator-() const
 		{
-			return this->AsReversed<nonref_value_type>();
+			return this->AsReversed();
 		}
 
-		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator*(const Vector2<RhsT>& rhs) const
-		{
-			return this->AsMultiplied<size(), nonref_value_type, RhsT>(rhs);
-		}
-		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator*(const Vector3<RhsT>& rhs) const
-		{
-			return this->AsMultiplied<size(), nonref_value_type, RhsT>(rhs);
-		}
 		template<typename RhsT>
 		constexpr Vector2<nonref_value_type> operator*(const RhsT& rhs) const
 		{
-			return this->AsMultiplied<size(), nonref_value_type, RhsT>(rhs);
+			return EmuMath::Helpers::VectorMultiplication<Vector2<nonref_value_type>>(*this, rhs);
 		}
 
-		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator/(const Vector2<RhsT>& rhs) const
-		{
-			return this->AsDivided<size(), nonref_value_type, RhsT>(rhs);
-		}
-		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator/(const Vector3<RhsT>& rhs) const
-		{
-			return this->AsDivided<size(), nonref_value_type, RhsT>(rhs);
-		}
 		template<typename RhsT>
 		constexpr Vector2<nonref_value_type> operator/(const RhsT& rhs) const
 		{
-			return this->AsDivided<size(), nonref_value_type, RhsT>(rhs);
+			return EmuMath::Helpers::VectorDivision<Vector2<nonref_value_type>>(*this, rhs);
 		}
 
 		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator%(const Vector2<RhsT>& rhs) const
-		{
-			return this->AsMod<size(), nonref_value_type, RhsT>(rhs);
-		}
-		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator%(const Vector3<RhsT>& rhs) const
-		{
-			return this->AsMod<size(), nonref_value_type, RhsT>(rhs);
-		}
-		template<typename RhsT>
 		constexpr Vector2<nonref_value_type> operator%(const RhsT& rhs) const
 		{
-			return this->AsMod<size(), nonref_value_type, RhsT>(rhs);
+			return EmuMath::Helpers::VectorMod<Vector2<nonref_value_type>>(*this, rhs);
 		}
 #pragma endregion
 
