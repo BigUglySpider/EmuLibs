@@ -1300,9 +1300,45 @@ namespace EmuMath
 		}
 
 		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsLeftShiftedScalar(const Vector2<RhsT>& numShifts) const
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsLeftShiftedPerElement(const Vector2<RhsT>& numShifts) const
 		{
-			return this->_perform_vector_per_element_leftshift<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
+			return this->_perform_vector_per_element_leftshift<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsLeftShiftedPerElement(const Vector3<RhsT>& numShifts) const
+		{
+			return this->_perform_vector_per_element_leftshift<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsLeftShiftedPerElement(const Vector4<RhsT>& numShifts) const
+		{
+			return this->_perform_vector_per_element_leftshift<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsLeftShiftedPerElement(const RhsT& numShifts) const
+		{
+			return this->_perform_scalar_per_element_leftshift<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
+		}
+
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsRightShiftedPerElement(const Vector2<RhsT>& numShifts) const
+		{
+			return this->_perform_vector_per_element_rightshift<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsRightShiftedPerElement(const Vector3<RhsT>& numShifts) const
+		{
+			return this->_perform_vector_per_element_rightshift<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsRightShiftedPerElement(const Vector4<RhsT>& numShifts) const
+		{
+			return this->_perform_vector_per_element_rightshift<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
+		}
+		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsRightShiftedPerElement(const RhsT& numShifts) const
+		{
+			return this->_perform_scalar_per_element_rightshift<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
 		}
 #pragma endregion
 
@@ -2118,23 +2154,25 @@ namespace EmuMath
 		}
 
 		template<typename RhsVec, typename OutVector>
-		constexpr OutVector _perform_vector_per_element_leftshift(const RhsVec& rhs) const
+		constexpr OutVector _perform_vector_per_element_leftshift(const RhsVec& numShifts) const
 		{
-			if constexpr (std::is_integral_v<typename RhsVec::value_type>)
-			{
-				OutVector out = OutVector();
-				out.x = x << rhs.x;
-				out.y = y << rhs.y;
-				return out;
-			}
-			else if constexpr (std::is_convertible_v<typename RhsVec::value_type, std::size_t>)
-			{
+			return this->_perform_vector_bitwise_op_emu<RhsVec, OutVector, EmuCore::TMPHelpers::bitwise_shift_left_diff_types>(numShifts);
+		}
+		template<typename RhsT, typename OutVector>
+		constexpr OutVector _perform_scalar_per_element_leftshift(const RhsT& numShifts) const
+		{
+			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::bitwise_shift_left_diff_types>(numShifts);
+		}
 
-			}
-			else
-			{
-
-			}
+		template<typename RhsVec, typename OutVector>
+		constexpr OutVector _perform_vector_per_element_rightshift(const RhsVec& numShifts) const
+		{
+			return this->_perform_vector_bitwise_op_emu<RhsVec, OutVector, EmuCore::TMPHelpers::bitwise_shift_right_diff_types>(numShifts);
+		}
+		template<typename RhsT, typename OutVector>
+		constexpr OutVector _perform_scalar_per_element_rightshift(const RhsT& numShifts) const
+		{
+			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::bitwise_shift_right_diff_types>(numShifts);
 		}
 
 		template<typename RhsVec, typename OutVector, template<typename LhsT_, typename RhsT_, typename OutT_> typename Func_>

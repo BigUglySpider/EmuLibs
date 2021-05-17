@@ -184,6 +184,19 @@ namespace EmuCore::TMPHelpers
 	/// <typeparam name="Others">All types to compare after First_ until true or exhausted.</typeparam>
 	template<typename ToFind_, typename First_, typename...Others>
 	static constexpr bool is_any_same_v = is_any_comparison_true<std::is_same, ToFind_, First_, Others...>::value;
+
+	template<class T, template<class> class ToFind_>
+	struct is_instance_of
+	{
+		static constexpr bool value = false;
+	};
+	template<class T, template<class> class ToFind_>
+	struct is_instance_of<ToFind_<T>, ToFind_>
+	{
+		static constexpr bool value = true;
+	};
+	template<class T, template<class> class ToFind_>
+	static constexpr bool is_instance_of_v = is_instance_of<T, ToFind_>::value;
 }
 
 #endif
