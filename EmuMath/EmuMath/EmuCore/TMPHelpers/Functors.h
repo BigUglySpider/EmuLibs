@@ -554,7 +554,6 @@ namespace EmuCore::TMPHelpers
 			{
 				constexpr std::size_t offset = NumBytes_ - 1;
 				*(pOutBytes + offset) = ~(*(pInBytes + offset));
-				std::cout << "\n" << static_cast<int>(*(pInBytes + offset)) << "\n";
 				iterative_bit_inversion_on_byte_pointers<offset>()(pOutBytes, pInBytes);
 			}
 		}
