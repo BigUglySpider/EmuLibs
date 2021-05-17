@@ -413,176 +413,113 @@ namespace EmuMath
 		template<typename OtherT>
 		constexpr Vector2<value_type>& operator+=(const Vector2<OtherT>& rhs)
 		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
-				{
-					x += rhs.x;
-					y += rhs.y;
-				}
-				else
-				{
-					x += static_cast<nonref_value_type>(rhs.x);
-					y += static_cast<nonref_value_type>(rhs.y);
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (+=) on an EmuMath::Vector2 which contains constant values.");
-			}
+			*this = (*this + rhs);
 			return *this;
 		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator+=(const Vector3<OtherT>& rhs)
+		{
+			*this = (*this + rhs);
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator+=(const Vector4<OtherT>& rhs)
+		{
+			*this = (*this + rhs);
+			return *this;
+		}
+
 		template<typename OtherT>
 		constexpr Vector2<value_type>& operator-=(const Vector2<OtherT>& rhs)
 		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
-				{
-					x -= rhs.x;
-					y -= rhs.y;
-				}
-				else
-				{
-					x -= static_cast<nonref_value_type>(rhs.x);
-					y -= static_cast<nonref_value_type>(rhs.y);
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (-=) on an EmuMath::Vector2 which contains constant values.");
-			}
+			*this = (*this - rhs);
 			return *this;
 		}
 		template<typename OtherT>
+		constexpr Vector2<value_type>& operator-=(const Vector3<OtherT>& rhs)
+		{
+			*this = (*this - rhs);
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator-=(const Vector4<OtherT>& rhs)
+		{
+			*this = (*this - rhs);
+			return *this;
+		}
+
+		template<typename OtherT>
 		constexpr Vector2<value_type>& operator*=(const Vector2<OtherT>& rhs)
 		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
-				{
-					x *= rhs.x;
-					y *= rhs.y;
-				}
-				else
-				{
-					x *= static_cast<nonref_value_type>(rhs.x);
-					y *= static_cast<nonref_value_type>(rhs.y);
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (*=) on an EmuMath::Vector2 which contains constant values.");
-			}
+			*this = (*this * rhs);
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator*=(const Vector3<OtherT>& rhs)
+		{
+			*this = (*this * rhs);
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator*=(const Vector4<OtherT>& rhs)
+		{
+			*this = (*this * rhs);
 			return *this;
 		}
 		template<typename RhsT>
 		constexpr Vector2<value_type>& operator*=(const RhsT& rhs)
 		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<RhsT>::nonref_value_type_without_qualifiers>)
-				{
-					x *= rhs;
-					y *= rhs;
-				}
-				else
-				{
-					x *= static_cast<nonref_value_type>(rhs);
-					y *= static_cast<nonref_value_type>(rhs);
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (*=) on an EmuMath::Vector2 which contains constant values.");
-			}
+			*this = (*this * rhs);
 			return *this;
 		}
+
 		template<typename OtherT>
 		constexpr Vector2<value_type>& operator/=(const Vector2<OtherT>& rhs)
 		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
-				{
-					x /= rhs.x;
-					y /= rhs.y;
-				}
-				else
-				{
-					x /= static_cast<nonref_value_type>(rhs.x);
-					y /= static_cast<nonref_value_type>(rhs.y);
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (/=) on an EmuMath::Vector2 which contains constant values.");
-			}
+			*this = (*this / rhs);
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator/=(const Vector3<OtherT>& rhs)
+		{
+			*this = (*this / rhs);
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator/=(const Vector4<OtherT>& rhs)
+		{
+			*this = (*this / rhs);
 			return *this;
 		}
 		template<typename RhsT>
 		constexpr Vector2<value_type>& operator/=(const RhsT& rhs)
 		{
-			if constexpr (!info_type::has_const_values)
-			{
-				using NonRefRhs = std::remove_reference_t<RhsT>;
-				if constexpr (info_type::has_floating_point_values && std::is_arithmetic_v<NonRefRhs>)
-				{
-					// Early return from this func, which defers division to a reciprocal multiplication
-					return this->operator*=(info_type::value_one / rhs);
-				}
-				else
-				{
-					x /= static_cast<nonref_value_type>(rhs.x);
-					y /= static_cast<nonref_value_type>(rhs.y);
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (/=) on an EmuMath::Vector2 which contains constant values.");
-			}
+			*this = (*this / rhs);
 			return *this;
 		}
+
 		template<typename OtherT>
 		constexpr Vector2<value_type>& operator%=(const Vector2<OtherT>& rhs)
 		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (!(info_type::has_floating_point_values || info_type_t<OtherT>::has_floating_point_values))
-				{
-					x %= rhs.x;
-					y %= rhs.y;
-				}
-				else
-				{
-					static_assert(false, "Attempted to use modulus operator (%) with an EmuMath::Vector2 using incompatible floating point values.");
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (%=) on an EmuMath::Vector2 which contains constant values.");
-			}
+			*this = (*this % rhs);
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator%=(const Vector3<OtherT>& rhs)
+		{
+			*this = (*this % rhs);
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator%=(const Vector4<OtherT>& rhs)
+		{
+			*this = (*this % rhs);
 			return *this;
 		}
 		template<typename RhsT>
 		constexpr Vector2<value_type>& operator%=(const RhsT& rhs)
 		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (!(info_type::has_floating_point_values || std::is_floating_point_v<RhsT>))
-				{
-					x %= rhs;
-					y %= rhs;
-				}
-				else
-				{
-					static_assert(false, "Attempted to use modulus operator (%) with an EmuMath::Vector2 using incompatible floating point values.");
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (%=) on an EmuMath::Vector2 which contains constant values.");
-			}
+			*this = (*this % rhs);
 			return *this;
 		}
 #pragma endregion
@@ -591,265 +528,125 @@ namespace EmuMath
 		template<typename OtherT>
 		constexpr Vector2<value_type>& operator&=(const Vector2<OtherT>& rhs)
 		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
-				{
-					if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
-					{
-						x &= rhs.x;
-						y &= rhs.y;
-					}
-					else
-					{
-						x &= static_cast<nonref_value_type>(rhs.x);
-						y &= static_cast<nonref_value_type>(rhs.y);
-					}
-				}
-				else
-				{
-					static_assert(false, "Attempted to use a bitwise AND (&) operation on an EmuMath::Vector2 using non-integral values.");
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (&=) on an EmuMath::Vector2 which contains constant values.");
-			}
+			*this = (*this & rhs);
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator&=(const Vector3<OtherT>& rhs)
+		{
+			*this = (*this & rhs);
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator&=(const Vector4<OtherT>& rhs)
+		{
+			*this = (*this & rhs);
 			return *this;
 		}
 		template<typename RhsT>
 		constexpr Vector2<value_type>& operator&=(const RhsT& rhs)
 		{
-			using NonRefRhs = std::remove_reference_t<RhsT>;
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (info_type::has_integral_values && std::is_integral_v<NonRefRhs>)
-				{
-					if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, NonRefRhs>)
-					{
-						x &= rhs;
-						y &= rhs;
-					}
-					else
-					{
-						const NonRefRhs castRhs = static_cast<nonref_value_type>(rhs);
-						x &= static_cast<nonref_value_type>(castRhs);
-						y &= static_cast<nonref_value_type>(castRhs);
-					}
-				}
-				else
-				{
-					static_assert(false, "Attempted to use a bitwise AND (&) operation on an EmuMath::Vector2 using non-integral values.");
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (&=) on an EmuMath::Vector2 which contains constant values.");
-			}
+			*this = (*this & rhs);
 			return *this;
 		}
+
 		template<typename OtherT>
 		constexpr Vector2<value_type>& operator|=(const Vector2<OtherT>& rhs)
 		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
-				{
-					if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
-					{
-						x |= rhs.x;
-						y |= rhs.y;
-					}
-					else
-					{
-						x |= static_cast<nonref_value_type>(rhs.x);
-						y |= static_cast<nonref_value_type>(rhs.y);
-					}
-				}
-				else
-				{
-					static_assert(false, "Attempted to use a bitwise AND (&) operation on an EmuMath::Vector2 using non-integral values.");
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (|=) on an EmuMath::Vector2 which contains constant values.");
-			}
+			*this = (*this | rhs);
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator|=(const Vector3<OtherT>& rhs)
+		{
+			*this = (*this | rhs);
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator|=(const Vector4<OtherT>& rhs)
+		{
+			*this = (*this | rhs);
 			return *this;
 		}
 		template<typename RhsT>
 		constexpr Vector2<value_type>& operator|=(const RhsT& rhs)
 		{
-			using NonRefRhs = std::remove_reference_t<RhsT>;
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (info_type::has_integral_values && std::is_integral_v<NonRefRhs>)
-				{
-					if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, NonRefRhs>)
-					{
-						x |= rhs;
-						y |= rhs;
-					}
-					else
-					{
-						const NonRefRhs castRhs = static_cast<nonref_value_type>(rhs);
-						x |= static_cast<nonref_value_type>(castRhs);
-						y |= static_cast<nonref_value_type>(castRhs);
-					}
-				}
-				else
-				{
-					static_assert(false, "Attempted to use a bitwise AND (&) operation on an EmuMath::Vector2 using non-integral values.");
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (|=) on an EmuMath::Vector2 which contains constant values.");
-			}
+			*this = (*this | rhs);
 			return *this;
 		}
+
 		template<typename OtherT>
 		constexpr Vector2<value_type>& operator^=(const Vector2<OtherT>& rhs)
 		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
-				{
-					if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
-					{
-						x ^= rhs.x;
-						y ^= rhs.y;
-					}
-					else
-					{
-						x ^= static_cast<nonref_value_type>(rhs.x);
-						y ^= static_cast<nonref_value_type>(rhs.y);
-					}
-				}
-				else
-				{
-					static_assert(false, "Attempted to use a bitwise AND (&) operation on an EmuMath::Vector2 using non-integral values.");
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (^=) on an EmuMath::Vector2 which contains constant values.");
-			}
+			*this = (*this ^ rhs);
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator^=(const Vector3<OtherT>& rhs)
+		{
+			*this = (*this ^ rhs);
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator^=(const Vector4<OtherT>& rhs)
+		{
+			*this = (*this ^ rhs);
 			return *this;
 		}
 		template<typename RhsT>
 		constexpr Vector2<value_type>& operator^=(const RhsT& rhs)
 		{
-			using NonRefRhs = std::remove_reference_t<RhsT>;
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (info_type::has_integral_values && std::is_integral_v<NonRefRhs>)
-				{
-					if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, NonRefRhs>)
-					{
-						x ^= rhs;
-						y ^= rhs;
-					}
-					else
-					{
-						const NonRefRhs castRhs = static_cast<nonref_value_type>(rhs);
-						x ^= static_cast<nonref_value_type>(castRhs);
-						y ^= static_cast<nonref_value_type>(castRhs);
-					}
-				}
-				else
-				{
-					static_assert(false, "Attempted to use a bitwise AND (&) operation on an EmuMath::Vector2 using non-integral values.");
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (^=) on an EmuMath::Vector2 which contains constant values.");
-			}
+			*this = (*this ^ rhs);
 			return *this;
 		}
+
 		template<typename OtherT>
 		constexpr Vector2<value_type>& operator<<=(const Vector2<OtherT>& rhs)
 		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
-				{
-					x <<= rhs.x;
-					y <<= rhs.y;
-				}
-				else
-				{
-					static_assert(false, "Attempted to use a bitwise left shift (<<) operation on an EmuMath::Vector2 using non-integral values.");
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (<<=) on an EmuMath::Vector2 which contains constant values.");
-			}
+			*this = (*this << rhs);
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator<<=(const Vector3<OtherT>& rhs)
+		{
+			*this = (*this << rhs);
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator<<=(const Vector4<OtherT>& rhs)
+		{
+			*this = (*this << rhs);
 			return *this;
 		}
 		template<typename RhsT>
 		constexpr Vector2<value_type>& operator<<=(const RhsT& rhs)
 		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (info_type::has_integral_values && std::is_integral_v<RhsT>)
-				{
-					x <<= rhs;
-					y <<= rhs;
-				}
-				else
-				{
-					static_assert(false, "Attempted to use a bitwise left shift (<<) operation on an EmuMath::Vector2 using non-integral values.");
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (<<=) on an EmuMath::Vector2 which contains constant values.");
-			}
+			*this = (*this << rhs);
 			return *this;
 		}
+
 		template<typename OtherT>
 		constexpr Vector2<value_type>& operator>>=(const Vector2<OtherT>& rhs)
 		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
-				{
-					x >>= rhs.x;
-					y >>= rhs.y;
-				}
-				else
-				{
-					static_assert(false, "Attempted to use a bitwise left shift (<<) operation on an EmuMath::Vector2 using non-integral values.");
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (>>=) on an EmuMath::Vector2 which contains constant values.");
-			}
+			*this = (*this >> rhs);
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator>>=(const Vector3<OtherT>& rhs)
+		{
+			*this = (*this >> rhs);
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator>>=(const Vector4<OtherT>& rhs)
+		{
+			*this = (*this >> rhs);
 			return *this;
 		}
 		template<typename RhsT>
 		constexpr Vector2<value_type>& operator>>=(const RhsT& rhs)
 		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (info_type::has_integral_values && std::is_integral_v<RhsT>)
-				{
-					x >>= rhs;
-					y >>= rhs;
-				}
-				else
-				{
-					static_assert(false, "Attempted to use a bitwise left shift (<<) operation on an EmuMath::Vector2 using non-integral values.");
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (>>=) on an EmuMath::Vector2 which contains constant values.");
-			}
+			*this = (*this >> rhs);
 			return *this;
 		}
 #pragma endregion
@@ -1152,111 +949,400 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region BITWISE_TEMPLATES
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise AND with the passed Vector's respective elements.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type contained in the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to perform the AND operation with the elements of.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise AND with the passed Vector, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseAnded(const Vector2<RhsT>& rhs) const
 		{
 			return this->_perform_vector_and<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise AND with the passed Vector's respective elements.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type contained in the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to perform the AND operation with the elements of.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise AND with the passed Vector, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseAnded(const Vector3<RhsT>& rhs) const
 		{
 			return this->_perform_vector_and<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise AND with the passed Vector's respective elements.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type contained in the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to perform the AND operation with the elements of.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise AND with the passed Vector, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseAnded(const Vector4<RhsT>& rhs) const
 		{
 			return this->_perform_vector_and<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise AND with each of this Vector's elements and the passed scalar value.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type of the passed scalar.</typeparam>
+		/// <param name="rhs">Scalar to perform the AND operation with each elements of this Vector.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise AND with the passed scalar on each value, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseAnded(const RhsT& rhs) const
 		{
 			return this->_perform_scalar_and<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
 
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise OR with the passed Vector's respective elements.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type contained in the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to perform the OR operation with the elements of.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise OR with the passed Vector, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseOred(const Vector2<RhsT>& rhs) const
 		{
 			return this->_perform_vector_or<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise OR with the passed Vector's respective elements.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type contained in the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to perform the OR operation with the elements of.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise OR with the passed Vector, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseOred(const Vector3<RhsT>& rhs) const
 		{
 			return this->_perform_vector_or<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise OR with the passed Vector's respective elements.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type contained in the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to perform the OR operation with the elements of.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise OR with the passed Vector, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseOred(const Vector4<RhsT>& rhs) const
 		{
 			return this->_perform_vector_or<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise OR with each of this Vector's elements and the passed scalar value.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type of the passed scalar.</typeparam>
+		/// <param name="rhs">Scalar to perform the OR operation with each elements of this Vector.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise OR with the passed scalar on each value, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseOred(const RhsT& rhs) const
 		{
 			return this->_perform_scalar_or<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
 
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise XOR with the passed Vector's respective elements.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type contained in the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to perform the XOR operation with the elements of.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise XOR with the passed Vector, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseXored(const Vector2<RhsT>& rhs) const
 		{
 			return this->_perform_vector_xor<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise XOR with the passed Vector's respective elements.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type contained in the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to perform the XOR operation with the elements of.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise XOR with the passed Vector, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseXored(const Vector3<RhsT>& rhs) const
 		{
 			return this->_perform_vector_xor<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise XOR with the passed Vector's respective elements.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type contained in the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to perform the XOR operation with the elements of.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise XOR with the passed Vector, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseXored(const Vector4<RhsT>& rhs) const
 		{
 			return this->_perform_vector_xor<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise XOR with each of this Vector's elements and the passed scalar value.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type of the passed scalar.</typeparam>
+		/// <param name="rhs">Scalar to perform the XOR operation with each elements of this Vector.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise XOR with the passed scalar on each value, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseXored(const RhsT& rhs) const
 		{
 			return this->_perform_scalar_xor<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
 
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise left shift with the passed Vector's respective elements.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type contained in the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to perform the left shift operation with the elements of.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise left shift with the passed Vector, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsLeftShiftedPerElement(const Vector2<RhsT>& numShifts) const
 		{
 			return this->_perform_vector_per_element_leftshift<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise left shift with the passed Vector's respective elements.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type contained in the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to perform the left shift operation with the elements of.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise left shift with the passed Vector, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsLeftShiftedPerElement(const Vector3<RhsT>& numShifts) const
 		{
 			return this->_perform_vector_per_element_leftshift<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise left shift with the passed Vector's respective elements.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type contained in the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to perform the left shift operation with the elements of.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise left shift with the passed Vector, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsLeftShiftedPerElement(const Vector4<RhsT>& numShifts) const
 		{
 			return this->_perform_vector_per_element_leftshift<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise left shift with each of this Vector's elements and the passed scalar value.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type of the passed scalar.</typeparam>
+		/// <param name="rhs">Scalar to perform the left shift operation with each elements of this Vector.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise left shift with the passed scalar on each value, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsLeftShiftedPerElement(const RhsT& numShifts) const
 		{
 			return this->_perform_scalar_per_element_leftshift<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
 		}
 
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise right shift with the passed Vector's respective elements.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type contained in the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to perform the right shift operation with the elements of.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise right shift with the passed Vector, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsRightShiftedPerElement(const Vector2<RhsT>& numShifts) const
 		{
 			return this->_perform_vector_per_element_rightshift<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise right shift with the passed Vector's respective elements.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type contained in the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to perform the right shift operation with the elements of.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise right shift with the passed Vector, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsRightShiftedPerElement(const Vector3<RhsT>& numShifts) const
 		{
 			return this->_perform_vector_per_element_rightshift<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise right shift with the passed Vector's respective elements.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type contained in the passed Vector.</typeparam>
+		/// <param name="rhs">Vector to perform the right shift operation with the elements of.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise right shift with the passed Vector, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsRightShiftedPerElement(const Vector4<RhsT>& numShifts) const
 		{
 			return this->_perform_vector_per_element_rightshift<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		/// <summary>
+		/// <para>
+		///		Returns a Vector of customisable size containing customisable types representing the result of a
+		///		bitwise right shift with each of this Vector's elements and the passed scalar value.
+		/// </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <typeparam name="RhsT">Type of the passed scalar.</typeparam>
+		/// <param name="rhs">Scalar to perform the right shift operation with each elements of this Vector.</param>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise right shift with the passed scalar on each value, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsRightShiftedPerElement(const RhsT& numShifts) const
 		{
 			return this->_perform_scalar_per_element_rightshift<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
 		}
 
+		/// <summary>
+		/// <para> Inverts the bits of the elements within this Vector and returns them as a Vector of customisable size with customisable types. </para>
+		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
+		/// </summary>
+		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
+		/// <returns>
+		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise inversion on this Vector's elements, 
+		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
+		/// </returns>
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsNot() const
 		{
