@@ -19,23 +19,23 @@ namespace EmuMath
 
 		/// <summary> Determines if the passed type T is an EmuMath Vector type. </summary>
 		/// <typeparam name="T">Type to check for being an EmuMath Vector.</typeparam>
-		template<typename T>
+		template<class T>
 		struct is_emu_vector
 		{
 			static constexpr bool value =
 			(
-				EmuCore::TMPHelpers::is_instance_of_v<T, EmuMath::Vector2> ||
-				EmuCore::TMPHelpers::is_instance_of_v<T, EmuMath::Vector3> ||
-				EmuCore::TMPHelpers::is_instance_of_v<T, EmuMath::Vector4>
+				EmuCore::TMPHelpers::is_instance_of_typeparams_only_v<T, EmuMath::Vector2> ||
+				EmuCore::TMPHelpers::is_instance_of_typeparams_only_v<T, EmuMath::Vector3> ||
+				EmuCore::TMPHelpers::is_instance_of_typeparams_only_v<T, EmuMath::Vector4>
 			);
 		};
 		/// <summary> Boolean indicating if the passed type T is an EmuMath Vector type. </summary>
 		/// <typeparam name="T">Type to check for being an EmuMath Vector.</typeparam>
-		template<typename T>
+		template<class T>
 		static constexpr bool is_emu_vector_v = is_emu_vector<T>::value;
 
 		/// <summary> Determines if the passed template type T taking 1 typeparam is an EmuMath Vector. </summary>
-		template<template<typename> typename T>
+		template<template<class> class T>
 		struct is_emu_vector_template
 		{
 			static constexpr bool value = false;
@@ -56,7 +56,7 @@ namespace EmuMath
 			static constexpr bool value = true;
 		};
 		/// <summary> Boolean indicating if the passed template type T taking 1 typeparam is an EmuMath Vector. </summary>
-		template<template<typename> typename T>
+		template<template<class> class T>
 		static constexpr bool is_emu_vector_template_v = is_emu_vector_template<T>::value;
 
 		/// <summary>
@@ -100,17 +100,17 @@ namespace EmuMath
 
 		/// <summary> Helper for arbitrarily accessing X, Y, Z or W of an EmuMath Vector, representing non-contained values as the stored type's zero. </summary>
 		/// <typeparam name="EmuVec_">Type of EmuMath vector to get the element from.</typeparam>
-		template<typename EmuVec__>
+		template<class EmuVec__>
 		struct emu_vector_get_element
 		{
 			using _non_qualified_vec = std::remove_cv_t<EmuVec__>;
-			using _temp_value_type = typename _non_qualified_vec::value_type;
 			static constexpr bool _is_emu_vector = EmuMath::TMPHelpers::is_emu_vector_v<_non_qualified_vec>;
 			static_assert
 			(
 				_is_emu_vector,
 				"Failed to retrieve an element from an EmuMath::Vector type as the passed type was not an EmuMath::Vector."
 			);
+			using _temp_value_type = typename _non_qualified_vec::value_type;
 			using _value_type = std::conditional_t<_is_emu_vector, _temp_value_type, int>;
 
 			static constexpr bool _has_z = _non_qualified_vec::size() >= 3;

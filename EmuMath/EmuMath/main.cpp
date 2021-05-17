@@ -35,6 +35,8 @@ int main()
 
 	using T__ =  EmuMath::Vector3<int>;
 
+
+
 	std::cout << EmuMath::TMPHelpers::emu_vector_z(T__(2, 3, 4)) << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
