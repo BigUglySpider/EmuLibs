@@ -129,6 +129,22 @@ namespace EmuMath
 			Vector2(toCopy.x, toCopy.y)
 		{
 		}
+		/// <summary> Constructs a 2-dimensional vector with its x and y components set to copies of the passed vector's respective components, performing casts where needed. </summary>
+		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
+		/// <param name="toCopy">Vector to copy the elements of.</param>
+		template<typename OtherT>
+		explicit constexpr Vector2(const EmuMath::Vector4<OtherT>& toCopy) :
+			Vector2(toCopy.x, toCopy.y)
+		{
+		}
+		/// <summary> Constructs a 2-dimensional vector with its x and y components set to copies of the passed vector's respective components, performing casts where needed. </summary>
+		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
+		/// <param name="toCopy">Vector to copy the elements of.</param>
+		template<typename OtherT>
+		explicit constexpr Vector2(EmuMath::Vector4<OtherT>& toCopy) :
+			Vector2(toCopy.x, toCopy.y)
+		{
+		}
 #pragma endregion
 
 #pragma region RANDOM_ACCESS
@@ -836,6 +852,21 @@ namespace EmuMath
 		}
 		template<typename OtherT>
 		constexpr Vector2<value_type>& operator=(const Vector3<OtherT>& rhs)
+		{
+			if constexpr (std::is_same_v<nonref_value_type, typename info_type_t<OtherT>::nonref_value_type>)
+			{
+				x = rhs.x;
+				y = rhs.y;
+			}
+			else
+			{
+				x = static_cast<nonref_value_type>(rhs.x);
+				y = static_cast<nonref_value_type>(rhs.y);
+			}
+			return *this;
+		}
+		template<typename OtherT>
+		constexpr Vector2<value_type>& operator=(const Vector4<OtherT>& rhs)
 		{
 			if constexpr (std::is_same_v<nonref_value_type, typename info_type_t<OtherT>::nonref_value_type>)
 			{
@@ -1580,109 +1611,56 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region SHUFFLES
+		/// <summary> Returns a Vector4 with elements X, Y, Z and W copying the elements at the respective provided indices within this Vector. </summary>
+		/// <returns>This vector shuffled as a Vector4.</returns>
+		template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_, typename OutT = nonref_value_type>
+		constexpr Vector4<OutT> AsShuffled() const
+		{
+			return Vector4<OutT>(at<X_>(), at<Y_>(), at<Z_>(), at<W_>());
+		}
 		/// <summary> Returns a Vector3 with elements X, Y and Z copying the elements at the respective provided indices within this Vector. </summary>
 		/// <returns>This vector shuffled as a Vector3.</returns>
-		template<std::size_t X_, std::size_t Y_, std::size_t Z_>
-		constexpr Vector3<nonref_value_type> AsShuffled() const
+		template<std::size_t X_, std::size_t Y_, std::size_t Z_, typename OutT = nonref_value_type>
+		constexpr Vector3<OutT> AsShuffled() const
 		{
-			return { at<X_>(), at<Y_>(), at<Z_>() };
+			return Vector3<OutT>(at<X_>(), at<Y_>(), at<Z_>());
 		}
 		/// <summary> Returns a Vector2 with elements X and Y copying the elements at the respective provided indices within this Vector. </summary>
 		/// <returns>This vector shuffled as a Vector2.</returns>
-		template<std::size_t X_, std::size_t Y_>
-		constexpr Vector2<nonref_value_type> AsShuffled() const
+		template<std::size_t X_, std::size_t Y_, typename OutT = nonref_value_type>
+		constexpr Vector2<OutT> AsShuffled() const
 		{
-			return { at<X_>(), at<Y_>() };
+			return Vector2<OutT>(at<X_>(), at<Y_>());
+		}
+		/// <summary>
+		///	<para> Returns a Vector4 with elements X, Y, Z and W copying the elements at the respective provided indices within this Vector. </para>
+		/// <para> If possible, it is recommended to use the templatised version of this function. </para>
+		/// </summary>
+		/// <returns>This Vector shuffled as a Vector4.</returns>
+		template<typename OutT = nonref_value_type>
+		Vector4<OutT> AsShuffled(const std::size_t x_, const std::size_t y_, const std::size_t z_, const std::size_t w_) const
+		{
+			return Vector4<OutT>(at(x_), at(y_), at(z_), at(w_));
 		}
 		/// <summary>
 		///	<para> Returns a Vector3 with elements X, Y and Z copying the elements at the respective provided indices within this Vector. </para>
 		/// <para> If possible, it is recommended to use the templatised version of this function. </para>
 		/// </summary>
-		/// <returns>This vector shuffled as a Vector3.</returns>
-		Vector3<nonref_value_type> AsShuffled(const std::size_t x_, const std::size_t y_, const std::size_t z_) const
+		/// <returns>This Vector shuffled as a Vector3.</returns>
+		template<typename OutT = nonref_value_type>
+		Vector3<OutT> AsShuffled(const std::size_t x_, const std::size_t y_, const std::size_t z_) const
 		{
-			return { at(x_), at(y_), at(z_) };
+			return Vector3<OutT>(at(x_), at(y_), at(z_));
 		}
 		/// <summary>
 		/// <para> Returns a Vector2 with elements X and Y copying the elements at the respective provided indices within this Vector. </para>
 		/// <para> If possible, it is recommended to use the templatised version of this function. </para>
 		/// </summary>
-		/// <returns>This vector shuffled as a Vector2.</returns>
-		Vector2<nonref_value_type> AsShuffled(const std::size_t x_, const std::size_t y_) const
+		/// <returns>This Vector shuffled as a Vector2.</returns>
+		template<typename OutT = nonref_value_type>
+		Vector2<OutT> AsShuffled(const std::size_t x_, const std::size_t y_) const
 		{
-			return { at(x_), at(y_) };
-		}
-		/// <summary>
-		/// <para> Returns a Vector3 containing references to the elements at the respective provided indices within this vector. </para>
-		/// </summary>
-		/// <returns>Vector3 of references to the elements at the provided indices within this Vector.</returns>
-		template<std::size_t X_, std::size_t Y_, std::size_t Z_>
-		constexpr Vector3<ref_value_type> ShuffledReference()
-		{
-			return { at<X_>(), at<Y_>(), at<Z_>() };
-		}
-		/// <summary>
-		/// <para> Returns a Vector3 containing constant references to the elements at the respective provided indices within this vector. </para>
-		/// </summary>
-		/// <returns>Vector3 of constant references to the elements at the provided indices within this Vector.</returns>
-		template<std::size_t X_, std::size_t Y_, std::size_t Z_>
-		constexpr Vector3<const_ref_value_type> ShuffledReference() const
-		{
-			return { at<X_>(), at<Y_>(), at<Z_>() };
-		}
-		/// <summary>
-		/// <para> Returns a Vector2 containing references to the elements at the respective provided indices within this vector. </para>
-		/// </summary>
-		/// <returns>Vector2 of references to the elements at the provided indices within this Vector.</returns>
-		template<std::size_t X_, std::size_t Y_>
-		constexpr Vector2<ref_value_type> ShuffledReference()
-		{
-			return { at<X_>(), at<Y_>() };
-		}
-		/// <summary>
-		/// <para> Returns a Vector2 containing constant references to the elements at the respective provided indices within this vector. </para>
-		/// </summary>
-		/// <returns>Vector2 of constant references to the elements at the provided indices within this Vector.</returns>
-		template<std::size_t X_, std::size_t Y_>
-		constexpr Vector2<const_ref_value_type> ShuffledReference() const
-		{
-			return { at<X_>(), at<Y_>() };
-		}
-		/// <summary>
-		/// <para> Returns a Vector3 containing references to the elements at the respective provided indices within this vector. </para>
-		/// <para> If possible, it is recommended to use the templatised version of this function. </para>
-		/// </summary>
-		/// <returns>Vector3 of references to the elements at the provided indices within this Vector.</returns>
-		Vector3<ref_value_type> ShuffledReference(const std::size_t x_, const std::size_t y_, const std::size_t z_)
-		{
-			return { at(x_), at(y_), at(z_) };
-		}
-		/// <summary>
-		/// <para> Returns a Vector3 containing constant references to the elements at the respective provided indices within this vector. </para>
-		/// <para> If possible, it is recommended to use the templatised version of this function. </para>
-		/// </summary>
-		/// <returns>Vector3 of constant references to the elements at the provided indices within this Vector.</returns>
-		Vector3<const_ref_value_type> ShuffledReference(const std::size_t x_, const std::size_t y_, const std::size_t z_) const
-		{
-			return { at(x_), at(y_), at(z_) };
-		}
-		/// <summary>
-		/// <para> Returns a Vector2 containing references to the elements at the respective provided indices within this vector. </para>
-		/// <para> If possible, it is recommended to use the templatised version of this function. </para>
-		/// </summary>
-		/// <returns>Vector2 of references to the elements at the provided indices within this Vector.</returns>
-		Vector2<ref_value_type> ShuffledReference(const std::size_t x_, const std::size_t y_)
-		{
-			return { at(x_), at(y_) };
-		}
-		/// <summary>
-		/// <para> Returns a Vector2 containing constant references to the elements at the respective provided indices within this vector. </para>
-		/// <para> If possible, it is recommended to use the templatised version of this function. </para>
-		/// </summary>
-		/// <returns>Vector2 of constant references to the elements at the provided indices within this Vector.</returns>
-		Vector2<const_ref_value_type> ShuffledReference(const std::size_t x_, const std::size_t y_) const
-		{
-			return { at(x_), at(y_) };
+			return Vector2<OutT>(at(x_), at(y_));
 		}
 #pragma endregion
 

@@ -3,6 +3,7 @@
 
 #include "_do_not_manually_include/EmuVector2T.h"
 #include "_do_not_manually_include/EmuVector3T.h"
+#include "_do_not_manually_include/EmuVector4T.h"
 #include <ostream>
 
 namespace EmuMath

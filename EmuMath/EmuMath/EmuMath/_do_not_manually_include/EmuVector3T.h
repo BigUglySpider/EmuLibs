@@ -8,6 +8,8 @@ namespace EmuMath
 {
 	template<typename T>
 	struct Vector2;
+	template<typename T>
+	struct Vector4;
 
 	/// <summary> Generic Vector type which contains 3 elements of the provided type, representing the X-, Y- and Z-axes respectively. </summary>
 	/// <typeparam name="T">Type to store within the Vector.</typeparam>
@@ -174,6 +176,22 @@ namespace EmuMath
 			Vector3(toCopy.x, toCopy.y, toCopy.z)
 		{
 		}
+		/// <summary> Constructs a 3-dimensional vector with its x, y and z components set to copies of the passed vector's respective components, performing casts where needed. </summary>
+		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
+		/// <param name="toCopy">Vector to copy the elements of.</param>
+		template<typename OtherT>
+		constexpr Vector3(const Vector4<OtherT>& toCopy) :
+			Vector3(toCopy.x, toCopy.y, toCopy.z)
+		{
+		}
+		/// <summary> Constructs a 3-dimensional vector with its x, y and z components set to copies of the passed vector's respective components, performing casts where needed. </summary>
+		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
+		/// <param name="toCopy">Vector to copy the elements of.</param>
+		template<typename OtherT>
+		constexpr Vector3(Vector4<OtherT>& toCopy) :
+			Vector3(toCopy.x, toCopy.y, toCopy.z)
+		{
+		}
 		/// <summary>
 		/// <para>Constructs a 3-dimensional vector with its x and y components set to copies of the passed vector's respective components, performing casts where needed.</para>
 		/// <para>The vector's z value will be set to a default constructed value_type.</para>
@@ -182,17 +200,6 @@ namespace EmuMath
 		/// <param name="toCopy">Vector to copy the elements of.</param>
 		template<typename OtherT>
 		explicit constexpr Vector3(const Vector2<OtherT>& toCopy) :
-			Vector3(toCopy.x, toCopy.y, value_type())
-		{
-		}
-		/// <summary>
-		/// <para>Constructs a 3-dimensional vector with its x and y components set to copies of the passed vector's respective components, performing casts where needed.</para>
-		/// <para>The vector's z value will be set to the default value_type.</para>
-		/// </summary>
-		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
-		/// <param name="toCopy">Vector to copy the elements of.</param>
-		template<typename OtherT>
-		explicit constexpr Vector3(Vector2<OtherT>& toCopy) :
 			Vector3(toCopy.x, toCopy.y, value_type())
 		{
 		}
@@ -211,30 +218,16 @@ namespace EmuMath
 		}
 		/// <summary>
 		/// <para>Constructs a 3-dimensional vector with its x and y components set to copies of the passed vector's respective components, performing casts where needed.</para>
-		/// <para>The vector's z value will be set via the passed z_ value..</para>
+		/// <para>The vector's z value will be set to the default value_type.</para>
 		/// </summary>
 		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
-		/// <typeparam name="Z_">The type of the passed z_ value.</typeparam>
 		/// <param name="toCopy">Vector to copy the elements of.</param>
-		/// <param name="z_">Value to set the vector's z component via.</param>
-		template<typename OtherT, typename Z_>
-		explicit constexpr Vector3(Vector2<OtherT>& toCopy, const Z_& z_) :
-			Vector3(toCopy.x, toCopy.y, z_)
+		template<typename OtherT>
+		explicit constexpr Vector3(Vector2<OtherT>& toCopy) :
+			Vector3(toCopy.x, toCopy.y, value_type())
 		{
 		}
-		/// <summary>
-		/// <para>Constructs a 3-dimensional vector with its x and y components set to copies of the passed vector's respective components, performing casts where needed.</para>
-		/// <para>The vector's z value will be set via the passed z_ value..</para>
-		/// </summary>
-		/// <typeparam name="OtherT">The contained type within the passed Vector3.</typeparam>
-		/// <typeparam name="Z_">The type of the passed z_ value.</typeparam>
-		/// <param name="toCopy">Vector to copy the elements of.</param>
-		/// <param name="z_">Value to set the vector's z component via.</param>
-		template<typename OtherT, typename Z_>
-		explicit constexpr Vector3(Vector2<OtherT>& toCopy, Z_& z_) :
-			Vector3(toCopy.x, toCopy.y, z_)
-		{
-		}
+
 #pragma endregion
 
 #pragma region RANDOM_ACCESS
@@ -379,220 +372,76 @@ namespace EmuMath
 			}
 			return *this;
 		}
-#pragma endregion
-
-#pragma region BOOLEAN_PER_ELEMENT_COMPARISON_FUNCTIONS
-		/// <summary> Compares the equality of the elements in this Vector with the respecitve elements in the passed Vector. </summary>
-		/// <typeparam name="OtherT">Type stored within the passed Vector.</typeparam>
-		/// <param name="rhs">Vector to compare respective elements of.</param>
-		/// <returns>Vector of booleans indicating if respective values were equal.</returns>
 		template<typename OtherT>
-		constexpr Vector3<bool> CompareElementsEqual(const Vector3<OtherT>& rhs) const
+		constexpr Vector3<value_type>& operator=(const Vector4<OtherT>& rhs)
 		{
-			return { x == rhs.x, y == rhs.y, z == rhs.z };
-		}
-		/// <summary> Compares the inequality of the elements in this Vector with the respecitve elements in the passed Vector. </summary>
-		/// <typeparam name="OtherT">Type stored within the passed Vector.</typeparam>
-		/// <param name="rhs">Vector to compare respective elements of.</param>
-		/// <returns>Vector of booleans indicating if respective values were unequal.</returns>
-		template<typename OtherT>
-		constexpr Vector3<bool> CompareElementsNotEqual(const Vector3<OtherT>& rhs) const
-		{
-			return { x != rhs.x, y != rhs.y, z != rhs.z };
-		}
-		/// <summary> Compares if the elements of this Vector are greater than the respective elements in the passed Vector. </summary>
-		/// <typeparam name="OtherT">Type stored within the passed Vector.</typeparam>
-		/// <param name="rhs">Vector to compare respective elements of.</param>
-		/// <returns>Vector of booleans indicating if respective values of this Vector are greater than the values in the passed Vector.</returns>
-		template<typename OtherT>
-		constexpr Vector3<bool> CompareElementsGreater(const Vector3<OtherT>& rhs) const
-		{
-			return { x > rhs.x, y > rhs.y, z > rhs.z };
-		}
-		/// <summary> Compares if the elements of this Vector are less than the respective elements in the passed Vector. </summary>
-		/// <typeparam name="OtherT">Type stored within the passed Vector.</typeparam>
-		/// <param name="rhs">Vector to compare respective elements of.</param>
-		/// <returns>Vector of booleans indicating if respective values of this Vector are less than the values in the passed Vector.</returns>
-		template<typename OtherT>
-		constexpr Vector3<bool> CompareElementsLess(const Vector3<OtherT>& rhs) const
-		{
-			return { x < rhs.x, y < rhs.y, z < rhs.z };
-		}
-		/// <summary> Compares if the elements of this Vector are greater than or equal to the respective elements in the passed Vector. </summary>
-		/// <typeparam name="OtherT">Type stored within the passed Vector.</typeparam>
-		/// <param name="rhs">Vector to compare respective elements of.</param>
-		/// <returns>Vector of booleans indicating if respective values of this Vector are greater than or equal to the values in the passed Vector.</returns>
-		template<typename OtherT>
-		constexpr Vector3<bool> CompareElementsGreaterEqual(const Vector3<OtherT>& rhs) const
-		{
-			return { x >= rhs.x, y >= rhs.y, z >= rhs.z };
-		}
-		/// <summary> Compares if the elements of this Vector are less than or equal to the respective elements in the passed Vector. </summary>
-		/// <typeparam name="OtherT">Type stored within the passed Vector.</typeparam>
-		/// <param name="rhs">Vector to compare respective elements of.</param>
-		/// <returns>Vector of booleans indicating if respective values of this Vector are less than or equal to the values in the passed Vector.</returns>
-		template<typename OtherT>
-		constexpr Vector3<bool> CompareElementsLessEqual(const Vector3<OtherT>& rhs) const
-		{
-			return { x <= rhs.x, y <= rhs.y, z <= rhs.z };
+			if constexpr (std::is_same_v<nonref_value_type, typename Vector2<OtherT>::nonref_value_type>)
+			{
+				x = rhs.x;
+				y = rhs.y;
+				z = rhs.z;
+			}
+			else
+			{
+				x = static_cast<nonref_value_type>(rhs.x);
+				y = static_cast<nonref_value_type>(rhs.y);
+				z = static_cast<nonref_value_type>(rhs.z);
+			}
+			return *this;
 		}
 #pragma endregion
 
 #pragma region SHUFFLES
+		/// <summary> Returns a Vector4 with elements X, Y, Z and W copying the elements at the respective provided indices within this Vector. </summary>
+		/// <returns>This vector shuffled as a Vector4.</returns>
+		template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_, typename OutT = nonref_value_type>
+		constexpr Vector4<OutT> AsShuffled() const
+		{
+			return Vector4<OutT>(at<X_>(), at<Y_>(), at<Z_>(), at<W_>());
+		}
 		/// <summary> Returns a Vector3 with elements X, Y and Z copying the elements at the respective provided indices within this Vector. </summary>
 		/// <returns>This vector shuffled as a Vector3.</returns>
-		template<std::size_t X_, std::size_t Y_, std::size_t Z_>
-		constexpr Vector3<nonref_value_type> AsShuffled() const
+		template<std::size_t X_, std::size_t Y_, std::size_t Z_, typename OutT = nonref_value_type>
+		constexpr Vector3<OutT> AsShuffled() const
 		{
-			return { at<X_>(), at<Y_>(), at<Z_>() };
+			return Vector3<OutT>(at<X_>(), at<Y_>(), at<Z_>());
 		}
 		/// <summary> Returns a Vector2 with elements X and Y copying the elements at the respective provided indices within this Vector. </summary>
 		/// <returns>This vector shuffled as a Vector2.</returns>
-		template<std::size_t X_, std::size_t Y_>
-		constexpr Vector2<nonref_value_type> AsShuffled() const
+		template<std::size_t X_, std::size_t Y_, typename OutT = nonref_value_type>
+		constexpr Vector2<OutT> AsShuffled() const
 		{
-			return { at<X_>(), at<Y_>() };
+			return Vector2<OutT>(at<X_>(), at<Y_>());
+		}
+		/// <summary>
+		///	<para> Returns a Vector4 with elements X, Y, Z and W copying the elements at the respective provided indices within this Vector. </para>
+		/// <para> If possible, it is recommended to use the templatised version of this function. </para>
+		/// </summary>
+		/// <returns>This Vector shuffled as a Vector4.</returns>
+		template<typename OutT = nonref_value_type>
+		Vector4<OutT> AsShuffled(const std::size_t x_, const std::size_t y_, const std::size_t z_, const std::size_t w_) const
+		{
+			return Vector4<OutT>(at(x_), at(y_), at(z_), at(w_));
 		}
 		/// <summary>
 		///	<para> Returns a Vector3 with elements X, Y and Z copying the elements at the respective provided indices within this Vector. </para>
 		/// <para> If possible, it is recommended to use the templatised version of this function. </para>
 		/// </summary>
-		/// <returns>This vector shuffled as a Vector3.</returns>
-		Vector3<nonref_value_type> AsShuffled(const std::size_t x_, const std::size_t y_, const std::size_t z_) const
+		/// <returns>This Vector shuffled as a Vector3.</returns>
+		template<typename OutT = nonref_value_type>
+		Vector3<OutT> AsShuffled(const std::size_t x_, const std::size_t y_, const std::size_t z_) const
 		{
-			return { at(x_), at(y_), at(z_) };
+			return Vector3<OutT>(at(x_), at(y_), at(z_));
 		}
 		/// <summary>
 		/// <para> Returns a Vector2 with elements X and Y copying the elements at the respective provided indices within this Vector. </para>
 		/// <para> If possible, it is recommended to use the templatised version of this function. </para>
 		/// </summary>
-		/// <returns>This vector shuffled as a Vector2.</returns>
-		Vector2<nonref_value_type> AsShuffled(const std::size_t x_, const std::size_t y_) const
+		/// <returns>This Vector shuffled as a Vector2.</returns>
+		template<typename OutT = nonref_value_type>
+		Vector2<OutT> AsShuffled(const std::size_t x_, const std::size_t y_) const
 		{
-			return { at(x_), at(y_) };
-		}
-		/// <summary>
-		/// <para> Returns a Vector3 containing references to the elements at the respective provided indices within this vector. </para>
-		/// </summary>
-		/// <returns>Vector3 of references to the elements at the provided indices within this Vector.</returns>
-		template<std::size_t X_, std::size_t Y_, std::size_t Z_>
-		constexpr Vector3<ref_value_type> ShuffledReference()
-		{
-			return { at<X_>(), at<Y_>(), at<Z_>() };
-		}
-		/// <summary>
-		/// <para> Returns a Vector3 containing constant references to the elements at the respective provided indices within this vector. </para>
-		/// </summary>
-		/// <returns>Vector3 of constant references to the elements at the provided indices within this Vector.</returns>
-		template<std::size_t X_, std::size_t Y_, std::size_t Z_>
-		constexpr Vector3<const_ref_value_type> ShuffledReference() const
-		{
-			return { at<X_>(), at<Y_>(), at<Z_>() };
-		}
-		/// <summary>
-		/// <para> Returns a Vector2 containing references to the elements at the respective provided indices within this vector. </para>
-		/// </summary>
-		/// <returns>Vector2 of references to the elements at the provided indices within this Vector.</returns>
-		template<std::size_t X_, std::size_t Y_>
-		constexpr Vector2<ref_value_type> ShuffledReference()
-		{
-			return { at<X_>(), at<Y_>() };
-		}
-		/// <summary>
-		/// <para> Returns a Vector2 containing constant references to the elements at the respective provided indices within this vector. </para>
-		/// </summary>
-		/// <returns>Vector2 of constant references to the elements at the provided indices within this Vector.</returns>
-		template<std::size_t X_, std::size_t Y_>
-		constexpr Vector2<const_ref_value_type> ShuffledReference() const
-		{
-			return { at<X_>(), at<Y_>() };
-		}
-		/// <summary>
-		/// <para> Returns a Vector3 containing references to the elements at the respective provided indices within this vector. </para>
-		/// <para> If possible, it is recommended to use the templatised version of this function. </para>
-		/// </summary>
-		/// <returns>Vector3 of references to the elements at the provided indices within this Vector.</returns>
-		Vector3<ref_value_type> ShuffledReference(const std::size_t x_, const std::size_t y_, const std::size_t z_)
-		{
-			return { at(x_), at(y_), at(z_) };
-		}
-		/// <summary>
-		/// <para> Returns a Vector3 containing constant references to the elements at the respective provided indices within this vector. </para>
-		/// <para> If possible, it is recommended to use the templatised version of this function. </para>
-		/// </summary>
-		/// <returns>Vector3 of constant references to the elements at the provided indices within this Vector.</returns>
-		Vector3<const_ref_value_type> ShuffledReference(const std::size_t x_, const std::size_t y_, const std::size_t z_) const
-		{
-			return { at(x_), at(y_), at(z_) };
-		}
-		/// <summary>
-		/// <para> Returns a Vector2 containing references to the elements at the respective provided indices within this vector. </para>
-		/// <para> If possible, it is recommended to use the templatised version of this function. </para>
-		/// </summary>
-		/// <returns>Vector2 of references to the elements at the provided indices within this Vector.</returns>
-		Vector2<ref_value_type> ShuffledReference(const std::size_t x_, const std::size_t y_)
-		{
-			return { at(x_), at(y_) };
-		}
-		/// <summary>
-		/// <para> Returns a Vector2 containing constant references to the elements at the respective provided indices within this vector. </para>
-		/// <para> If possible, it is recommended to use the templatised version of this function. </para>
-		/// </summary>
-		/// <returns>Vector2 of constant references to the elements at the provided indices within this Vector.</returns>
-		Vector2<const_ref_value_type> ShuffledReference(const std::size_t x_, const std::size_t y_) const
-		{
-			return { at(x_), at(y_) };
-		}
-#pragma endregion
-
-#pragma region SETS
-		/// <summary> Sets all values within this Vector to the respective passed values. </summary>
-		/// <typeparam name="X_">Type of the value to set this Vector's x component to.</typeparam>
-		/// <typeparam name="Y_">Type of the value to set this Vector's y component to.</typeparam>
-		/// <typeparam name="Z_">Type of the value to set this Vector's z component to.</typeparam>
-		/// <param name="x_">Value to set this Vector's x component to.</param>
-		/// <param name="y_">Value to set this Vector's y component to.</param>
-		/// <param name="z_">Value to set this Vector's z component to.</param>
-		template<typename X_, typename Y_, typename Z_>
-		constexpr void SetAll(const X_& x_, const Y_& y_, const Z_& z_)
-		{
-			if constexpr (!info_type::has_const_values)
-			{
-				_set_individual_value<0, X_>(x_);
-				_set_individual_value<1, Y_>(y_);
-				_set_individual_value<2, Z_>(z_);
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (SetAll<X_, Y_>) on an EmuMath::Vector3 which contains constant values.");
-			}
-		}
-		/// <summary> Sets all elements of this Vector to match the provided value. </summary>
-		/// <typeparam name="T_">Type of the value to set this Vector's components to.</typeparam>
-		/// <param name="val_">Value to set this Vector's componenets to.</param>
-		template<typename T_>
-		constexpr void SetAll(const T_& val_)
-		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, std::remove_reference_t<T_>>)
-				{
-					x = val_;
-					y = val_;
-					z = val_;
-				}
-				else
-				{
-					const nonref_value_type castVal = static_cast<nonref_value_type>(val_);
-					x = castVal;
-					y = castVal;
-					z = castVal;
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (SetAll<T_>) on an EmuMath::Vector3 which contains constant values.");
-			}
+			return Vector2<OutT>(at(x_), at(y_));
 		}
 #pragma endregion
 

@@ -69,6 +69,8 @@ int main()
 
 	std::cout << EmuMath::TMPHelpers::emu_vector_z(T__(2, 3, 4)) << "\n";
 
+	EmuMath::Vector4<float> v4f = Vector4<float>(EmuMath::Vector2<int>(2, 1), 1.0f, 66.66666666666666f);
+
 
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();
