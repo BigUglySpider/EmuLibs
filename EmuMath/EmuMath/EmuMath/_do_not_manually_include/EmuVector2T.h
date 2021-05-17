@@ -852,96 +852,96 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region ARITHMETIC_TEMPLATES
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsAdded(const Vector2<RhsT>& rhs) const
 		{
 			return this->_perform_addition<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsAdded(const Vector3<RhsT>& rhs) const
 		{
 			return this->_perform_addition<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsAdded(const Vector4<RhsT>& rhs) const
 		{
 			return this->_perform_addition<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
 
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsSubtracted(const Vector2<RhsT>& rhs) const
 		{
 			return this->_perform_subtraction<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsSubtracted(const Vector3<RhsT>& rhs) const
 		{
 			return this->_perform_subtraction<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsSubtracted(const Vector4<RhsT>& rhs) const
 		{
 			return this->_perform_subtraction<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
 
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMultiplied(const Vector2<RhsT>& rhs) const
 		{
 			return this->_perform_vector_multiplication<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMultiplied(const Vector3<RhsT>& rhs) const
 		{
 			return this->_perform_vector_multiplication<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMultiplied(const Vector4<RhsT>& rhs) const
 		{
 			return this->_perform_vector_multiplication<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMultiplied(const RhsT& rhs) const
 		{
 			return this->_perform_scalar_multiplication<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
 
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsDivided(const Vector2<RhsT>& rhs) const
 		{
 			return this->_perform_vector_division<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsDivided(const Vector3<RhsT>& rhs) const
 		{
 			return this->_perform_vector_division<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsDivided(const Vector4<RhsT>& rhs) const
 		{
 			return this->_perform_vector_division<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsDivided(const RhsT& rhs) const
 		{
 			return this->_perform_scalar_division<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
 
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMod(const Vector2<RhsT>& rhs) const
 		{
 			return this->_perform_vector_mod<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMod(const Vector3<RhsT>& rhs) const
 		{
 			return this->_perform_vector_mod<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMod(const Vector4<RhsT>& rhs) const
 		{
 			return this->_perform_vector_mod<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
 		}
-		template<std::size_t OutSize_ = 2, typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMod(const RhsT& rhs) const
 		{
 			return this->_perform_scalar_mod<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
@@ -1355,55 +1355,227 @@ namespace EmuMath
 		/// <typeparam name="OtherT">Type stored within the passed Vector.</typeparam>
 		/// <param name="rhs">Vector to compare respective elements of.</param>
 		/// <returns>Vector of booleans indicating if respective values were equal.</returns>
-		template<typename OtherT>
-		constexpr Vector2<bool> CompareElementsEqual(const Vector2<OtherT>& rhs) const
+		template<std::size_t OutSize_ = size(), typename OtherT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsEqual(const Vector2<OtherT>& rhs) const
 		{
-			return { x == rhs.x, y == rhs.y };
+			return this->_perform_vector_compare_equal<OutSize_, Vector2<OtherT>>(rhs);
 		}
-		/// <summary> Compares the inequality of the elements in this Vector with the respecitve elements in the passed Vector. </summary>
-		/// <typeparam name="OtherT">Type stored within the passed Vector.</typeparam>
-		/// <param name="rhs">Vector to compare respective elements of.</param>
-		/// <returns>Vector of booleans indicating if respective values were unequal.</returns>
-		template<typename OtherT>
-		constexpr Vector2<bool> CompareElementsNotEqual(const Vector2<OtherT>& rhs) const
+		template<std::size_t OutSize_ = size(), typename OtherT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsEqual(const Vector3<OtherT>& rhs) const
 		{
-			return { x != rhs.x, y != rhs.y };
+			return this->_perform_vector_compare_equal<OutSize_, Vector3<OtherT>>(rhs);
 		}
-		/// <summary> Compares if the elements of this Vector are greater than the respective elements in the passed Vector. </summary>
-		/// <typeparam name="OtherT">Type stored within the passed Vector.</typeparam>
-		/// <param name="rhs">Vector to compare respective elements of.</param>
-		/// <returns>Vector of booleans indicating if respective values of this Vector are greater than the values in the passed Vector.</returns>
-		template<typename OtherT>
-		constexpr Vector2<bool> CompareElementsGreater(const Vector2<OtherT>& rhs) const
+		template<std::size_t OutSize_ = size(), typename OtherT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsEqual(const Vector4<OtherT>& rhs) const
 		{
-			return { x > rhs.x, y > rhs.y };
+			return this->_perform_vector_compare_equal<OutSize_, Vector4<OtherT>>(rhs);
 		}
-		/// <summary> Compares if the elements of this Vector are less than the respective elements in the passed Vector. </summary>
-		/// <typeparam name="OtherT">Type stored within the passed Vector.</typeparam>
-		/// <param name="rhs">Vector to compare respective elements of.</param>
-		/// <returns>Vector of booleans indicating if respective values of this Vector are less than the values in the passed Vector.</returns>
-		template<typename OtherT>
-		constexpr Vector2<bool> CompareElementsLess(const Vector2<OtherT>& rhs) const
+		template<std::size_t OutSize_ = size(), typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsEqual(const RhsT& rhs) const
 		{
-			return { x < rhs.x, y < rhs.y };
+			return this->_perform_scalar_compare_equal<OutSize_, RhsT>(rhs);
 		}
-		/// <summary> Compares if the elements of this Vector are greater than or equal to the respective elements in the passed Vector. </summary>
-		/// <typeparam name="OtherT">Type stored within the passed Vector.</typeparam>
-		/// <param name="rhs">Vector to compare respective elements of.</param>
-		/// <returns>Vector of booleans indicating if respective values of this Vector are greater than or equal to the values in the passed Vector.</returns>
-		template<typename OtherT>
-		constexpr Vector2<bool> CompareElementsGreaterEqual(const Vector2<OtherT>& rhs) const
+
+		template<std::size_t OutSize_ = size(), typename OtherT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsNotEqual(const Vector2<OtherT>& rhs) const
 		{
-			return { x >= rhs.x, y >= rhs.y };
+			return this->_perform_vector_compare_not_equal<OutSize_, Vector2<OtherT>>(rhs);
 		}
-		/// <summary> Compares if the elements of this Vector are less than or equal to the respective elements in the passed Vector. </summary>
-		/// <typeparam name="OtherT">Type stored within the passed Vector.</typeparam>
-		/// <param name="rhs">Vector to compare respective elements of.</param>
-		/// <returns>Vector of booleans indicating if respective values of this Vector are less than or equal to the values in the passed Vector.</returns>
-		template<typename OtherT>
-		constexpr Vector2<bool> CompareElementsLessEqual(const Vector2<OtherT>& rhs) const
+		template<std::size_t OutSize_ = size(), typename OtherT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsNotEqual(const Vector3<OtherT>& rhs) const
 		{
-			return { x <= rhs.x, y <= rhs.y };
+			return this->_perform_vector_compare_not_equal<OutSize_, Vector3<OtherT>>(rhs);
+		}
+		template<std::size_t OutSize_ = size(), typename OtherT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsNotEqual(const Vector4<OtherT>& rhs) const
+		{
+			return this->_perform_vector_compare_not_equal<OutSize_, Vector4<OtherT>>(rhs);
+		}
+		template<std::size_t OutSize_ = size(), typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsNotEqual(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_compare_not_equal<OutSize_, RhsT>(rhs);
+		}
+
+		template<std::size_t OutSize_ = size(), typename OtherT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsGreater(const Vector2<OtherT>& rhs) const
+		{
+			return this->_perform_vector_compare_greater<OutSize_, Vector2<OtherT>>(rhs);
+		}
+		template<std::size_t OutSize_ = size(), typename OtherT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsGreater(const Vector3<OtherT>& rhs) const
+		{
+			return this->_perform_vector_compare_greater<OutSize_, Vector3<OtherT>>(rhs);
+		}
+		template<std::size_t OutSize_ = size(), typename OtherT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsGreater(const Vector4<OtherT>& rhs) const
+		{
+			return this->_perform_vector_compare_greater<OutSize_, Vector4<OtherT>>(rhs);
+		}
+		template<std::size_t OutSize_ = size(), typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsGreater(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_compare_greater<OutSize_, RhsT>(rhs);
+		}
+
+		template<std::size_t OutSize_ = size(), typename OtherT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsLess(const Vector2<OtherT>& rhs) const
+		{
+			return this->_perform_vector_compare_less<OutSize_, Vector2<OtherT>>(rhs);
+		}
+		template<std::size_t OutSize_ = size(), typename OtherT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsLess(const Vector3<OtherT>& rhs) const
+		{
+			return this->_perform_vector_compare_less<OutSize_, Vector3<OtherT>>(rhs);
+		}
+		template<std::size_t OutSize_ = size(), typename OtherT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsLess(const Vector4<OtherT>& rhs) const
+		{
+			return this->_perform_vector_compare_less<OutSize_, Vector4<OtherT>>(rhs);
+		}
+		template<std::size_t OutSize_ = size(), typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsLess(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_compare_less<OutSize_, RhsT>(rhs);
+		}
+
+		template<std::size_t OutSize_ = size(), typename OtherT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsGreaterEqual(const Vector2<OtherT>& rhs) const
+		{
+			return this->_perform_vector_compare_greater_equal<OutSize_, Vector2<OtherT>>(rhs);
+		}
+		template<std::size_t OutSize_ = size(), typename OtherT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsGreaterEqual(const Vector3<OtherT>& rhs) const
+		{
+			return this->_perform_vector_compare_greater_equal<OutSize_, Vector3<OtherT>>(rhs);
+		}
+		template<std::size_t OutSize_ = size(), typename OtherT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsGreaterEqual(const Vector4<OtherT>& rhs) const
+		{
+			return this->_perform_vector_compare_greater_equal<OutSize_, Vector4<OtherT>>(rhs);
+		}
+		template<std::size_t OutSize_ = size(), typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsGreaterEqual(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_compare_greater_equal<OutSize_, RhsT>(rhs);
+		}
+
+		template<std::size_t OutSize_ = size(), typename OtherT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsLessEqual(const Vector2<OtherT>& rhs) const
+		{
+			return this->_perform_vector_compare_less_equal<OutSize_, Vector2<OtherT>>(rhs);
+		}
+		template<std::size_t OutSize_ = size(), typename OtherT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsLessEqual(const Vector3<OtherT>& rhs) const
+		{
+			return this->_perform_vector_compare_less_equal<OutSize_, Vector3<OtherT>>(rhs);
+		}
+		template<std::size_t OutSize_ = size(), typename OtherT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsLessEqual(const Vector4<OtherT>& rhs) const
+		{
+			return this->_perform_vector_compare_less_equal<OutSize_, Vector4<OtherT>>(rhs);
+		}
+		template<std::size_t OutSize_ = size(), typename RhsT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> CompareElementsLessEqual(const RhsT& rhs) const
+		{
+			return this->_perform_scalar_compare_less_equal<OutSize_, RhsT>(rhs);
+		}
+
+		/// <summary>
+		/// <para> Checks if all elements in this Vector for the provided number of elements starting from x are equal to the provided value. </para>
+		/// <para> EmuMath vectors passed will instead be compared on a per element basis. </para>
+		/// <para> For comparisons of elements further than this Vector contains, non-contained elements will be considered as zero. </para>
+		/// <para> The NumElementsToCheck_ value must be a value between 1 (inclusive) and the highest EmuMath Vector size (4) (inclusive). </para>
+		/// </summary>
+		/// <typeparam name="RhsT">Type to compare to.</typeparam>
+		/// <param name="rhs">
+		///		Value to compare to; if a scalar, each element will be compared to this. If this is an EmuMath Vector, per-element comparisons will be performed instead.
+		/// </param>
+		/// <returns>Boolean indicating if the comparison of all decided elements returned true.</returns>
+		template<std::size_t NumElementsToCheck_ = size(), typename RhsT = nonref_value_type>
+		constexpr bool AllEqual(const RhsT& rhs) const
+		{
+			return this->_perform_overall_comparison_std<NumElementsToCheck_, RhsT, std::equal_to>(rhs);
+		}
+		/// <summary>
+		/// <para> Checks if all elements in this Vector for the provided number of elements starting from x are not equal to the provided value. </para>
+		/// <para> EmuMath vectors passed will instead be compared on a per element basis. </para>
+		/// <para> For comparisons of elements further than this Vector contains, non-contained elements will be considered as zero. </para>
+		/// <para> The NumElementsToCheck_ value must be a value between 1 (inclusive) and the highest EmuMath Vector size (4) (inclusive). </para>
+		/// </summary>
+		/// <typeparam name="RhsT">Type to compare to.</typeparam>
+		/// <param name="rhs">
+		///		Value to compare to; if a scalar, each element will be compared to this. If this is an EmuMath Vector, per-element comparisons will be performed instead.
+		/// </param>
+		/// <returns>Boolean indicating if the comparison of all decided elements returned true.</returns>
+		template<std::size_t NumElementsToCheck_ = size(), typename RhsT = nonref_value_type>
+		constexpr bool AllNotEqual(const RhsT& rhs) const
+		{
+			return this->_perform_overall_comparison_std<NumElementsToCheck_, RhsT, std::not_equal_to>(rhs);
+		}
+		/// <summary>
+		/// <para> Checks if all elements in this Vector for the provided number of elements starting from x are less than the provided value. </para>
+		/// <para> EmuMath vectors passed will instead be compared on a per element basis. </para>
+		/// <para> For comparisons of elements further than this Vector contains, non-contained elements will be considered as zero. </para>
+		/// <para> The NumElementsToCheck_ value must be a value between 1 (inclusive) and the highest EmuMath Vector size (4) (inclusive). </para>
+		/// </summary>
+		/// <typeparam name="RhsT">Type to compare to.</typeparam>
+		/// <param name="rhs">
+		///		Value to compare to; if a scalar, each element will be compared to this. If this is an EmuMath Vector, per-element comparisons will be performed instead.
+		/// </param>
+		/// <returns>Boolean indicating if the comparison of all decided elements returned true.</returns>
+		template<std::size_t NumElementsToCheck_ = size(), typename RhsT = nonref_value_type>
+		constexpr bool AllLess(const RhsT& rhs) const
+		{
+			return this->_perform_overall_comparison_std<NumElementsToCheck_, RhsT, std::less>(rhs);
+		}
+		/// <summary>
+		/// <para> Checks if all elements in this Vector for the provided number of elements starting from x are greater than the provided value. </para>
+		/// <para> EmuMath vectors passed will instead be compared on a per element basis. </para>
+		/// <para> For comparisons of elements further than this Vector contains, non-contained elements will be considered as zero. </para>
+		/// <para> The NumElementsToCheck_ value must be a value between 1 (inclusive) and the highest EmuMath Vector size (4) (inclusive). </para>
+		/// </summary>
+		/// <typeparam name="RhsT">Type to compare to.</typeparam>
+		/// <param name="rhs">
+		///		Value to compare to; if a scalar, each element will be compared to this. If this is an EmuMath Vector, per-element comparisons will be performed instead.
+		/// </param>
+		/// <returns>Boolean indicating if the comparison of all decided elements returned true.</returns>
+		template<std::size_t NumElementsToCheck_ = size(), typename RhsT = nonref_value_type>
+		constexpr bool AllGreater(const RhsT& rhs) const
+		{
+			return this->_perform_overall_comparison_std<NumElementsToCheck_, RhsT, std::greater>(rhs);
+		}
+		/// <summary>
+		/// <para> Checks if all elements in this Vector for the provided number of elements starting from x are less than or equal to the provided value. </para>
+		/// <para> EmuMath vectors passed will instead be compared on a per element basis. </para>
+		/// <para> For comparisons of elements further than this Vector contains, non-contained elements will be considered as zero. </para>
+		/// <para> The NumElementsToCheck_ value must be a value between 1 (inclusive) and the highest EmuMath Vector size (4) (inclusive). </para>
+		/// </summary>
+		/// <typeparam name="RhsT">Type to compare to.</typeparam>
+		/// <param name="rhs">
+		///		Value to compare to; if a scalar, each element will be compared to this. If this is an EmuMath Vector, per-element comparisons will be performed instead.
+		/// </param>
+		/// <returns>Boolean indicating if the comparison of all decided elements returned true.</returns>
+		template<std::size_t NumElementsToCheck_ = size(), typename RhsT = nonref_value_type>
+		constexpr bool AllLessEqual(const RhsT& rhs) const
+		{
+			return this->_perform_overall_comparison_std<NumElementsToCheck_, RhsT, std::less_equal>(rhs);
+		}
+		/// <summary>
+		/// <para> Checks if all elements in this Vector for the provided number of elements starting from x are greater than or equal to the provided value. </para>
+		/// <para> EmuMath vectors passed will instead be compared on a per element basis. </para>
+		/// <para> For comparisons of elements further than this Vector contains, non-contained elements will be considered as zero. </para>
+		/// <para> The NumElementsToCheck_ value must be a value between 1 (inclusive) and the highest EmuMath Vector size (4) (inclusive). </para>
+		/// </summary>
+		/// <typeparam name="RhsT">Type to compare to.</typeparam>
+		/// <param name="rhs">
+		///		Value to compare to; if a scalar, each element will be compared to this. If this is an EmuMath Vector, per-element comparisons will be performed instead.
+		/// </param>
+		/// <returns>Boolean indicating if the comparison of all decided elements returned true.</returns>
+		template<std::size_t NumElementsToCheck_ = size(), typename RhsT = nonref_value_type>
+		constexpr bool AllGreaterEqual(const RhsT& rhs) const
+		{
+			return this->_perform_overall_comparison_std<NumElementsToCheck_, RhsT, std::greater_equal>(rhs);
 		}
 #pragma endregion
 
@@ -1625,7 +1797,7 @@ namespace EmuMath
 		/// <returns> True if all elements in this Vector are zero, otherwise false. </returns>
 		constexpr bool AllZero() const
 		{
-			return x == info_type::value_zero && y == info_type::value_zero;
+			return this->AllEqualTo(info_type::value_zero);
 		}
 		/// <summary> Determines the lowest element within this Vector. </summary>
 		/// <returns>Copy of the lowest element within this Vector.</returns>
@@ -2219,6 +2391,205 @@ namespace EmuMath
 			else
 			{
 				static_assert(false, "Attempted to perform a bit inversion on an EmuMath::Vector2 with an unsupported size of output Vector.");
+			}
+		}
+
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_vector_compare_equal(const RhsVector& rhs) const
+		{
+			return this->_perform_vector_comparison_std<Size_, RhsVector, std::equal_to>(rhs);
+		}
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_scalar_compare_equal(const RhsVector& rhs) const
+		{
+			return this->_perform_scalar_comparison_std<Size_, RhsVector, std::equal_to>(rhs);
+		}
+
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_vector_compare_not_equal(const RhsVector& rhs) const
+		{
+			return this->_perform_vector_comparison_std<Size_, RhsVector, std::not_equal_to>(rhs);
+		}
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_scalar_compare_not_equal(const RhsVector& rhs) const
+		{
+			return this->_perform_scalar_comparison_std<Size_, RhsVector, std::not_equal_to>(rhs);
+		}
+
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_vector_compare_less(const RhsVector& rhs) const
+		{
+			return this->_perform_vector_comparison_std<Size_, RhsVector, std::less>(rhs);
+		}
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_scalar_compare_less(const RhsVector& rhs) const
+		{
+			return this->_perform_scalar_comparison_std<Size_, RhsVector, std::less>(rhs);
+		}
+
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_vector_compare_greater(const RhsVector& rhs) const
+		{
+			return this->_perform_vector_comparison_std<Size_, RhsVector, std::greater>(rhs);
+		}
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_scalar_compare_greater(const RhsVector& rhs) const
+		{
+			return this->_perform_scalar_comparison_std<Size_, RhsVector, std::greater>(rhs);
+		}
+
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_vector_compare_less_equal(const RhsVector& rhs) const
+		{
+			return this->_perform_vector_comparison_std<Size_, RhsVector, std::less_equal>(rhs);
+		}
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_scalar_compare_less_equal(const RhsVector& rhs) const
+		{
+			return this->_perform_scalar_comparison_std<Size_, RhsVector, std::less_equal>(rhs);
+		}
+
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_vector_compare_greater_equal(const RhsVector& rhs) const
+		{
+			return this->_perform_vector_comparison_std<Size_, RhsVector, std::greater_equal>(rhs);
+		}
+		template<std::size_t Size_, typename RhsVector>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_scalar_compare_greater_equal(const RhsVector& rhs) const
+		{
+			return this->_perform_scalar_comparison_std<Size_, RhsVector, std::greater_equal>(rhs);
+		}
+
+		template<std::size_t NumElementsToCheck_, typename RhsT, template<class> class Func_>
+		constexpr bool _perform_overall_comparison_std(const RhsT& rhs) const
+		{
+			using Func = Func_<nonref_value_type_without_qualifiers>;
+			Func func = Func();
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<RhsT>)
+			{
+				if constexpr (NumElementsToCheck_ == 1)
+				{
+					return func(x, rhs.x);
+				}
+				else if constexpr (NumElementsToCheck_ == 2)
+				{
+					return func(x, rhs.x) && func(y, rhs.y);
+				}
+				else if constexpr (NumElementsToCheck_ == 3)
+				{
+					return func(x, rhs.x) && func(y, rhs.y) && func(info_type::value_zero, EmuMath::TMPHelpers::emu_vector_z(rhs));
+				}
+				else if constexpr (NumElementsToCheck_ == 4)
+				{
+					return 
+					(
+						func(x, rhs.x) &&
+						func(y, rhs.y) &&
+						func(info_type::value_zero, EmuMath::TMPHelpers::emu_vector_z(rhs)) &&
+						func(info_type::value_zero, EmuMath::TMPHelpers::emu_vector_w(rhs))
+					);
+				}
+				else
+				{
+					static_assert(false, "Attempted to perform a per-element comparison on an EmuMath::Vector2 with an unsupported number of elements in the comparison.");
+				}
+			}
+			else
+			{
+				if constexpr (NumElementsToCheck_ == 1)
+				{
+					return func(x, rhs);
+				}
+				else if constexpr (NumElementsToCheck_ == 2)
+				{
+					return func(x, rhs) && func(y, rhs);
+				}
+				else if constexpr (NumElementsToCheck_ == 3 || NumElementsToCheck_ == 4)
+				{
+					// z and w result in the same output when comparisng to a scalar since they are both implied zero comparisons in a Vector2
+					return func(x, rhs) && func(y, rhs) && func(info_type::value_zero, rhs);
+				}
+				else
+				{
+					static_assert(false, "Attempted to perform a per-element comparison on an EmuMath::Vector2 with an unsupported number of elements in the comparison.");
+				}
+			}
+		}
+
+		template<std::size_t Size_, typename RhsVector, template<class> class Func_>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_vector_comparison_std(const RhsVector& rhs) const
+		{
+			using OutVector = EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool>;
+			using Func = Func_<nonref_value_type>;
+			Func func = Func();
+			if constexpr (Size_ == 2)
+			{
+				return OutVector
+				(
+					func(x, rhs.x),
+					func(y, rhs.y)
+				);
+			}
+			else if constexpr (Size_ == 3)
+			{
+				return OutVector
+				(
+					func(x, rhs.x),
+					func(y, rhs.y),
+					func(info_type::value_zero, EmuMath::TMPHelpers::emu_vector_z(rhs))
+				);
+			}
+			else if constexpr (Size_ == 4)
+			{
+				return OutVector
+				(
+					func(x, rhs.x),
+					func(y, rhs.y),
+					func(info_type::value_zero, EmuMath::TMPHelpers::emu_vector_z(rhs)),
+					func(info_type::value_zero, EmuMath::TMPHelpers::emu_vector_w(rhs))
+				);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a per-element comparison on an EmuMath::Vector2 with an unsupported size of output Vector.");
+			}
+		}
+		template<std::size_t Size_, typename RhsVector, template<class> class Func_>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool> _perform_scalar_comparison_std(const RhsVector& rhs) const
+		{
+			using OutVector = EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, bool>;
+			using Func = Func_<nonref_value_type>;
+			Func func = Func();
+			if constexpr (Size_ == 2)
+			{
+				return OutVector
+				(
+					func(x, rhs),
+					func(y, rhs)
+				);
+			}
+			else if constexpr (Size_ == 3)
+			{
+				return OutVector
+				(
+					func(x, rhs),
+					func(y, rhs),
+					func(info_type::value_zero, rhs)
+				);
+			}
+			else if constexpr (Size_ == 4)
+			{
+				return OutVector
+				(
+					func(x, rhs.x),
+					func(y, rhs.y),
+					func(info_type::value_zero, rhs),
+					func(info_type::value_zero, rhs)
+				);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a per-element comparison on an EmuMath::Vector2 with an unsupported size of output Vector.");
 			}
 		}
 

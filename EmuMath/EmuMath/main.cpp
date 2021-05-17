@@ -49,6 +49,24 @@ int main()
 	Vector2<std::uint16_t> inverui16 = { 1, 2 };
 	std::cout << "Before invert (ui16): " << inverui16 << " | After invert: " << inverui16.AsNot<3>() << " | " << ~inverui16 << "\n";
 
+	Vector2<float> yooooooo;
+
+	Vector2<float> A(2.5f, 5.0f);
+	Vector2<float> B(5.0f, 2.5f);
+	Vector2<float> C(2.5f, 2.5f);
+	Vector2<float> D(2.5f, 5.0f);
+
+	std::cout << A << " == " << B << ": " << A.CompareElementsEqual(B) << "\n";
+	std::cout << A << " == " << C << ": " << A.CompareElementsEqual(C) << "\n";
+	std::cout << A << " == " << D << ": " << A.CompareElementsEqual(D) << "\n";
+	std::cout << B << " == " << C << ": " << B.CompareElementsEqual(C) << "\n";
+
+
+	std::cout << A << " === " << B << ": " << A.AllEqual<1>(B) << "\n";
+	std::cout << A << " === " << C << ": " << A.AllEqual<1>(C) << "\n";
+	std::cout << A << " === " << D << ": " << A.AllEqual<1>(D) << "\n";
+	std::cout << B << " === " << C << ": " << B.AllEqual<1>(C) << "\n";
+
 	std::cout << EmuMath::TMPHelpers::emu_vector_z(T__(2, 3, 4)) << "\n";
 
 
