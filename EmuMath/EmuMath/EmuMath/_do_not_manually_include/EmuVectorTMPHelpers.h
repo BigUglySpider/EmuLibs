@@ -98,7 +98,7 @@ namespace EmuMath
 		template<std::size_t Size_, typename ContainedType>
 		using emu_vector_from_size_t = typename emu_vector_from_size<Size_, ContainedType>::type;
 
-		/// <summary> Helper for arbitrarily accessing X, Y, Z or W of an EmuMath Vector, representing non-contained values as the stored type's zero. </summary>
+		/// <summary> Helper for arbitrarily accessing X, Y, Z or W of an EmuMath Vector, representing non-contained values as a copy of the stored type's zero. </summary>
 		/// <typeparam name="EmuVec_">Type of EmuMath vector to get the element from.</typeparam>
 		template<class EmuVec__>
 		struct emu_vector_get_element
@@ -228,7 +228,7 @@ namespace EmuMath
 			return emu_vector_get_element<EmuVec_>::Y(vec_);
 		}
 		/// <summary>
-		/// Returns a reference to the passed Vector's z element if it has one, or a zero-initialised item of the Vector's contained type if it does not have one.
+		/// Returns a reference to the passed Vector's z element if it has one, or a copy of a zero-initialised item of the Vector's contained type if it does not have one.
 		/// </summary>
 		/// <typeparam name="EmuVec_">Type of EmuMath Vector to retrieve the z element of.</typeparam>
 		/// <param name="vec_">EmuMath Vector to retrieve the z element of.</param>
@@ -239,7 +239,7 @@ namespace EmuMath
 			return emu_vector_get_element<EmuVec_>::Z(vec_);
 		}
 		/// <summary>
-		/// Returns a constant reference to the passed Vector's z element if it has one, or a zero-initialised item of the Vector's contained type if it does not have one.
+		/// Returns a constant reference to the passed Vector's z element if it has one, or a copy of a zero-initialised item of the Vector's contained type if it does not have one.
 		/// </summary>
 		/// <typeparam name="EmuVec_">Type of EmuMath Vector to retrieve the z element of.</typeparam>
 		/// <param name="vec_">EmuMath Vector to retrieve the z element of.</param>
@@ -250,7 +250,7 @@ namespace EmuMath
 			return emu_vector_get_element<EmuVec_>::Z(vec_);
 		}
 		/// <summary>
-		/// Returns a reference to the passed Vector's w element if it has one, or a zero-initialised item of the Vector's contained type if it does not have one.
+		/// Returns a reference to the passed Vector's w element if it has one, or a copy of a zero-initialised item of the Vector's contained type if it does not have one.
 		/// </summary>
 		/// <typeparam name="EmuVec_">Type of EmuMath Vector to retrieve the w element of.</typeparam>
 		/// <param name="vec_">EmuMath Vector to retrieve the w element of.</param>
@@ -261,7 +261,7 @@ namespace EmuMath
 			return emu_vector_get_element<EmuVec_>::W(vec_);
 		}
 		/// <summary>
-		/// Returns a constant reference to the passed Vector's w element if it has one, or a zero-initialised item of the Vector's contained type if it does not have one.
+		/// Returns a constant reference to the passed Vector's w element if it has one, or a copy of a zero-initialised item of the Vector's contained type if it does not have one.
 		/// </summary>
 		/// <typeparam name="EmuVec_">Type of EmuMath Vector to retrieve the w element of.</typeparam>
 		/// <param name="vec_">EmuMath Vector to retrieve the w element of.</param>
