@@ -42,7 +42,12 @@ int main()
 
 	using T__ =  EmuMath::Vector3<int>;
 
-
+	Vector2<float> invertv2 = { 1.0f, 2.0f };
+	unsigned short yo = 8;
+	std::cout << "Before invert: " << yo << " | After invert: " << (EmuCore::TMPHelpers::bit_inversion_diff_types<unsigned short, float>()(yo)) << "\n";
+	std::cout << "Before invert (f): " << invertv2 << " | After invert: " << invertv2.AsNot<2, std::uint32_t>() << "\n";
+	Vector2<std::uint16_t> inverui16 = { 1, 2 };
+	std::cout << "Before invert (ui16): " << inverui16 << " | After invert: " << inverui16.AsNot<3>() << " | " << ~inverui16 << "\n";
 
 	std::cout << EmuMath::TMPHelpers::emu_vector_z(T__(2, 3, 4)) << "\n";
 

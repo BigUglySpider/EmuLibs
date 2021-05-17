@@ -52,6 +52,12 @@ namespace EmuCore::TMPHelpers
 	/// <typeparam name="Others_">All additional types to compare. Optional.</typeparam>
 	template<class X_, class Y_, class...Others_>
 	using lowest_byte_size_t = typename lowest_byte_size<X_, Y_, Others_...>::type;
+	/// <summary> The number of bytes within the lowest type of passed options. </summary>
+	/// <typeparam name="X_">First type to compare. Required.</typeparam>
+	/// <typeparam name="Y_">Second type to compare. Required.</typeparam>
+	/// <typeparam name="Others_">All additional types to compare. Optional.</typeparam>
+	template<class X_, class Y_, class...Others_>
+	static constexpr std::size_t lowest_byte_size_v = sizeof(lowest_byte_size_t<X_, Y_, Others_...>);
 
 	/// <summary> Underlying check used for all is_any_ values. Performs the passed check_ with each provided parameter until one is true or they are exhausted. </summary>
 	/// <typeparam name="First">The first type to perform the check on. Required.</typeparam>

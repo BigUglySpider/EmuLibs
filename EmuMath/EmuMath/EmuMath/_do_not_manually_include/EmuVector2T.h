@@ -306,190 +306,106 @@ namespace EmuMath
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator&(const Vector2<OtherT>& rhs) const
 		{
-			if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
-			{
-				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
-				{
-					return { x & rhs.x, y & rhs.y };
-				}
-				else
-				{
-					return { x & static_cast<nonref_value_type>(rhs.x), y & static_cast<nonref_value_type>(rhs.y) };
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to use a bitwise AND (&) operation on an EmuMath::Vector2 using non-integral values.");
-				return *this;
-			}
+			return this->AsBitwiseAnded<size(), nonref_value_type, OtherT>(rhs);
+		}
+		template<typename OtherT>
+		constexpr Vector2<nonref_value_type> operator&(const Vector3<OtherT>& rhs) const
+		{
+			return this->AsBitwiseAnded<size(), nonref_value_type, OtherT>(rhs);
+		}
+		template<typename OtherT>
+		constexpr Vector2<nonref_value_type> operator&(const Vector4<OtherT>& rhs) const
+		{
+			return this->AsBitwiseAnded<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename RhsT>
 		constexpr Vector2<nonref_value_type> operator&(const RhsT& rhs) const
 		{
-			using NonRefRhs = std::remove_reference_t<RhsT>;
-			if constexpr (info_type::has_integral_values && std::is_integral_v<NonRefRhs>)
-			{
-				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, NonRefRhs>)
-				{
-					return { x & rhs, y & rhs };
-				}
-				else
-				{
-					return { x & static_cast<nonref_value_type>(rhs), y & static_cast<nonref_value_type>(rhs) };
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to use a bitwise AND (&) operation on an EmuMath::Vector2 using non-integral values.");
-				return *this;
-			}
+			return this->AsBitwiseAnded<size(), nonref_value_type, RhsT>(rhs);
 		}
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator|(const Vector2<OtherT>& rhs) const
 		{
-			if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
-			{
-				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
-				{
-					return { x | rhs.x, y | rhs.y };
-				}
-				else
-				{
-					return { x | static_cast<nonref_value_type>(rhs.x), y | static_cast<nonref_value_type>(rhs.y) };
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to use a bitwise OR (|) operation on an EmuMath::Vector2 using non-integral values.");
-				return *this;
-			}
+			return this->AsBitwiseOred<size(), nonref_value_type, OtherT>(rhs);
+		}
+		template<typename OtherT>
+		constexpr Vector2<nonref_value_type> operator|(const Vector3<OtherT>& rhs) const
+		{
+			return this->AsBitwiseOred<size(), nonref_value_type, OtherT>(rhs);
+		}
+		template<typename OtherT>
+		constexpr Vector2<nonref_value_type> operator|(const Vector4<OtherT>& rhs) const
+		{
+			return this->AsBitwiseOred<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename RhsT>
 		constexpr Vector2<nonref_value_type> operator|(const RhsT& rhs) const
 		{
-			using NonRefRhs = std::remove_reference_t<RhsT>;
-			if constexpr (info_type::has_integral_values && std::is_integral_v<NonRefRhs>)
-			{
-				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, NonRefRhs>)
-				{
-					return { x | rhs, y | rhs };
-				}
-				else
-				{
-					return { x | static_cast<nonref_value_type>(rhs), y | static_cast<nonref_value_type>(rhs) };
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to use a bitwise OR (|) operation on an EmuMath::Vector2 using non-integral values.");
-				return *this;
-			}
+			return this->AsBitwiseOred<size(), nonref_value_type, RhsT>(rhs);
 		}
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator^(const Vector2<OtherT>& rhs) const
 		{
-			if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
-			{
-				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, typename Vector2<OtherT>::nonref_value_type_without_qualifiers>)
-				{
-					return { x ^ rhs.x, y ^ rhs.y };
-				}
-				else
-				{
-					return { x ^ static_cast<nonref_value_type>(rhs.x), y ^ static_cast<nonref_value_type>(rhs.y) };
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to use a bitwise XOR (^) operation on an EmuMath::Vector2 using non-integral values.");
-				return *this;
-			}
+			return this->AsBitwiseXored<size(), nonref_value_type, OtherT>(rhs);
+		}
+		template<typename OtherT>
+		constexpr Vector2<nonref_value_type> operator^(const Vector3<OtherT>& rhs) const
+		{
+			return this->AsBitwiseXored<size(), nonref_value_type, OtherT>(rhs);
+		}
+		template<typename OtherT>
+		constexpr Vector2<nonref_value_type> operator^(const Vector4<OtherT>& rhs) const
+		{
+			return this->AsBitwiseXored<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename RhsT>
 		constexpr Vector2<nonref_value_type> operator^(const RhsT& rhs) const
 		{
-			using NonRefRhs = std::remove_reference_t<RhsT>;
-			if constexpr (info_type::has_integral_values && std::is_integral_v<NonRefRhs>)
-			{
-				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, NonRefRhs>)
-				{
-					return { x ^ rhs, y ^ rhs };
-				}
-				else
-				{
-					return { x ^ static_cast<nonref_value_type>(rhs), y ^ static_cast<nonref_value_type>(rhs) };
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to use a bitwise XOR (^) operation on an EmuMath::Vector2 using non-integral values.");
-				return *this;
-			}
+			return this->AsBitwiseXored<size(), nonref_value_type, RhsT>(rhs);
 		}
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator<<(const Vector2<OtherT>& rhs) const
 		{
-			if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
-			{
-				return { x << rhs.x, y << rhs.y };
-			}
-			else
-			{
-				static_assert(false, "Attempted to use a bitwise left shift (<<) operation on an EmuMath::Vector2 using non-integral values.");
-				return *this;
-			}
+			return this->AsLeftShiftedPerElement<size(), nonref_value_type, OtherT>(rhs);
+		}
+		template<typename OtherT>
+		constexpr Vector2<nonref_value_type> operator<<(const Vector3<OtherT>& rhs) const
+		{
+			return this->AsLeftShiftedPerElement<size(), nonref_value_type, OtherT>(rhs);
+		}
+		template<typename OtherT>
+		constexpr Vector2<nonref_value_type> operator<<(const Vector4<OtherT>& rhs) const
+		{
+			return this->AsLeftShiftedPerElement<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename RhsT>
 		constexpr Vector2<nonref_value_type> operator<<(const RhsT& rhs) const
 		{
-			using NonRefRhs = std::remove_reference_t<RhsT>;
-			if constexpr (info_type::has_integral_values && std::is_integral_v<NonRefRhs>)
-			{
-				return { x << rhs, y << rhs };
-			}
-			else
-			{
-				static_assert(false, "Attempted to use a bitwise left shift (<<) operation on an EmuMath::Vector2 using non-integral values.");
-				return *this;
-			}
+			return this->AsLeftShiftedPerElement<size(), nonref_value_type, RhsT>(rhs);
 		}
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator>>(const Vector2<OtherT>& rhs) const
 		{
-			if constexpr (info_type::has_integral_values && info_type_t<OtherT>::has_integral_values)
-			{
-				return { x >> rhs.x, y >> rhs.y };
-			}
-			else
-			{
-				static_assert(false, "Attempted to use a bitwise right shift (>>) operation on an EmuMath::Vector2 using non-integral values.");
-				return *this;
-			}
+			return this->AsRightShiftedPerElement<size(), nonref_value_type, OtherT>(rhs);
+		}
+		template<typename OtherT>
+		constexpr Vector2<nonref_value_type> operator>>(const Vector3<OtherT>& rhs) const
+		{
+			return this->AsRightShiftedPerElement<size(), nonref_value_type, OtherT>(rhs);
+		}
+		template<typename OtherT>
+		constexpr Vector2<nonref_value_type> operator>>(const Vector4<OtherT>& rhs) const
+		{
+			return this->AsRightShiftedPerElement<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename RhsT>
 		constexpr Vector2<nonref_value_type> operator>>(const RhsT& rhs) const
 		{
-			if constexpr (info_type::has_integral_values && std::is_integral_v<RhsT>)
-			{
-				return { x >> rhs, y >> rhs };
-			}
-			else
-			{
-				static_assert(false, "Attempted to use a bitwise right shift (>>) operation on an EmuMath::Vector2 using non-integral values.");
-				return *this;
-			}
+			return this->AsRightShiftedPerElement<size(), nonref_value_type, RhsT>(rhs);
 		}
 		constexpr Vector2<nonref_value_type> operator~() const
 		{
-			if constexpr (info_type::has_integral_values)
-			{
-				return { ~x, ~y };
-			}
-			else
-			{
-				static_assert(false, "Attempted to use a bitwise NOT (~) operation on an EmuMath::Vector2 using non-integral values.");
-				return *this;
-			}
+			return this->AsNot<size(), nonref_value_type>();
 		}
 #pragma endregion
 
@@ -1340,6 +1256,12 @@ namespace EmuMath
 		{
 			return this->_perform_scalar_per_element_rightshift<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(numShifts);
 		}
+
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsNot() const
+		{
+			return this->_perform_inversion<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>();
+		}
 #pragma endregion
 
 #pragma region BOOLEAN_PER_ELEMENT_COMPARISON_FUNCTIONS
@@ -2175,6 +2097,50 @@ namespace EmuMath
 			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::bitwise_shift_right_diff_types>(numShifts);
 		}
 
+		template<typename OutVector>
+		constexpr OutVector _perform_inversion() const
+		{
+			using Func = EmuCore::TMPHelpers::bit_inversion_diff_types<nonref_value_type_without_qualifiers, typename OutVector::value_type>;
+			Func func = Func();
+			if constexpr (OutVector::size() == 2)
+			{
+				return OutVector
+				(
+					func(x),
+					func(y)
+				);
+			}
+			else if constexpr (OutVector::size() == 3)
+			{
+				return OutVector
+				(
+					func(x),
+					func(y),
+					func(info_type::value_zero)
+				);
+			}
+			else if constexpr (OutVector::size() == 4)
+			{
+				const auto& zero_ = info_type::value_zero;
+				return OutVector
+				(
+					func(x),
+					func(y),
+					func(zero_),
+					func(zero_)
+				);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a bit inversion on an EmuMath::Vector2 with an unsupported size of output Vector.");
+			}
+		}
+
+		/// <summary> Template for performing bitwise operations on this Vector via another Vector, using EmuCore bitwise op functors. </summary>
+		/// <typeparam name="RhsVec">Type of the right-hand side Vector.</typeparam>
+		/// <typeparam name="OutVector">Type of Vector to output the result as.</typeparam>
+		/// <param name="rhs">Vector to perform bitwise operations on the respective values of this Vector with.</param>
+		/// <returns>Result of the bitwise operation stored as the provided OutVector type.</returns>
 		template<typename RhsVec, typename OutVector, template<typename LhsT_, typename RhsT_, typename OutT_> typename Func_>
 		constexpr OutVector _perform_vector_bitwise_op_emu(const RhsVec& rhs) const
 		{
@@ -2218,6 +2184,11 @@ namespace EmuMath
 			}
 		}
 
+		/// <summary> Template for performing bitwise operations on this Vector via a scalar value, using EmuCore bitwise op functors. </summary>
+		/// <typeparam name="RhsT">Type of the right-hand side scalar.</typeparam>
+		/// <typeparam name="OutVector">Type of Vector to output the result as.</typeparam>
+		/// <param name="rhs">Scalar value to perform bitwise operations on all values of this Vector with.</param>
+		/// <returns>Result of the bitwise operation stored as the provided OutVector type.</returns>
 		template<typename RhsT, typename OutVector, template<typename LhsT_, typename RhsT_, typename OutT_> typename Func_>
 		constexpr OutVector _perform_scalar_bitwise_op_emu(const RhsT& rhs) const
 		{

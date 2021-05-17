@@ -222,7 +222,7 @@ namespace EmuCore::TMPHelpers
 		/// <summary> Pointer to readonly bytes. </summary>
 		using const_byte_ptr = const _byte*;
 
-		void operator()(byte_ptr pOutBytes, const_byte_ptr pLeftBytes, const_byte_ptr pRightBytes)
+		void operator()(byte_ptr pOutBytes, const_byte_ptr pLeftBytes, const_byte_ptr pRightBytes) const
 		{
 			if constexpr (NumBytes_ > 0)
 			{
@@ -246,13 +246,13 @@ namespace EmuCore::TMPHelpers
 		/// <summary> Pointer to readonly bytes. </summary>
 		using const_byte_ptr = const _byte*;
 
-		void operator()(byte_ptr pOutBytes, const_byte_ptr pLeftBytes, const_byte_ptr pRightBytes)
+		void operator()(byte_ptr pOutBytes, const_byte_ptr pLeftBytes, const_byte_ptr pRightBytes) const
 		{
 			if constexpr (NumBytes_ > 0)
 			{
 				constexpr std::size_t offset = NumBytes_ - 1;
 				*(pOutBytes + offset) = ((*(pLeftBytes + offset)) | (*(pRightBytes + offset)));
-				iterative_and_on_byte_pointers<offset>()(pOutBytes, pLeftBytes, pRightBytes);
+				iterative_or_on_byte_pointers<offset>()(pOutBytes, pLeftBytes, pRightBytes);
 			}
 		}
 	};
@@ -270,13 +270,13 @@ namespace EmuCore::TMPHelpers
 		/// <summary> Pointer to readonly bytes. </summary>
 		using const_byte_ptr = const _byte*;
 
-		void operator()(byte_ptr pOutBytes, const_byte_ptr pLeftBytes, const_byte_ptr pRightBytes)
+		void operator()(byte_ptr pOutBytes, const_byte_ptr pLeftBytes, const_byte_ptr pRightBytes) const
 		{
 			if constexpr (NumBytes_ > 0)
 			{
 				constexpr std::size_t offset = NumBytes_ - 1;
 				*(pOutBytes + offset) = ((*(pLeftBytes + offset)) ^ (*(pRightBytes + offset)));
-				iterative_and_on_byte_pointers<offset>()(pOutBytes, pLeftBytes, pRightBytes);
+				iterative_xor_on_byte_pointers<offset>()(pOutBytes, pLeftBytes, pRightBytes);
 			}
 		}
 	};
@@ -534,6 +534,55 @@ namespace EmuCore::TMPHelpers
 						return static_cast<Out_>(lhs >> finalRhs);
 					}
 				}
+			}
+		}
+	};
+
+	template<std::size_t NumBytes_>
+	struct iterative_bit_inversion_on_byte_pointers
+	{
+		/// <summary> Type used to represent a byte. </summary>
+		using _byte = unsigned char;
+		/// <summary> Pointer to modifiable bytes. </summary>
+		using byte_ptr = _byte*;
+		/// <summary> Pointer to readonly bytes. </summary>
+		using const_byte_ptr = const _byte*;
+
+		constexpr void operator()(byte_ptr pOutBytes, const_byte_ptr pInBytes) const
+		{
+			if constexpr (NumBytes_ > 0)
+			{
+				constexpr std::size_t offset = NumBytes_ - 1;
+				*(pOutBytes + offset) = ~(*(pInBytes + offset));
+				std::cout << "\n" << static_cast<int>(*(pInBytes + offset)) << "\n";
+				iterative_bit_inversion_on_byte_pointers<offset>()(pOutBytes, pInBytes);
+			}
+		}
+	};
+	template<typename In_, typename Out_>
+	struct bit_inversion_diff_types
+	{
+		constexpr bit_inversion_diff_types()
+		{
+		}
+		constexpr Out_ operator()(const In_ in_) const
+		{
+			if constexpr (std::is_integral_v<In_> && std::is_same_v<In_, Out_>)
+			{
+				return ~in_;
+			}
+			else
+			{
+				Out_ out = EmuCore::ArithmeticHelpers::ZeroT<Out_>;
+				memcpy(&out, &in_, EmuCore::TMPHelpers::lowest_byte_size_v<In_, Out_>);
+
+				constexpr std::size_t OutSize_ = sizeof(Out_);
+				iterative_bit_inversion_on_byte_pointers<OutSize_>()
+				(
+					reinterpret_cast<typename iterative_bit_inversion_on_byte_pointers<OutSize_>::byte_ptr>(&out),
+					reinterpret_cast<typename iterative_bit_inversion_on_byte_pointers<OutSize_>::const_byte_ptr>(&out)
+				);
+				return out;
 			}
 		}
 	};
