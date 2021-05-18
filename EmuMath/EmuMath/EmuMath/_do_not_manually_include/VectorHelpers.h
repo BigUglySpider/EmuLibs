@@ -20,6 +20,7 @@ namespace EmuMath::Helpers
 	/// <summary> Underlying functions used for performing Vector helpers. These are not recommended for manual use. </summary>
 	namespace _underlying_vector_funcs
 	{
+#pragma region ARITHMETIC
 		/// <summary>
 		/// <para> Performs an arithmetic operation using the provided Functor which takes two operands in its function operator. </para>
 		/// <para> LhsVector elements will be cast to LhsElementAsScalar if it is different to the type that the LhsVector will provide. </para>
@@ -259,6 +260,97 @@ namespace EmuMath::Helpers
 				return _perform_vector_arithmetic_scalar_rhs_with_types<OutVector, LhsVector, Rhs, HighestT, Func>(lhs, rhs);
 			}
 		}
+#pragma endregion
+
+#pragma region BITWISE
+		template<class OutVector, class LhsVector, class RhsVector, template<class LhsT_, class RhsT_, class OutT_> class Func_>
+		inline OutVector _perform_vector_bitwise_op_vector_rhs_emu(const LhsVector& lhs, const RhsVector& rhs)
+		{
+			using Func = Func_
+			<
+				typename LhsVector::nonref_value_type_without_qualifiers,
+				typename RhsVector::nonref_value_type_without_qualifiers,
+				typename OutVector::value_type
+			>;
+			Func func = Func();
+
+			if constexpr (OutVector::size() == 2)
+			{
+				return OutVector
+				(
+					func(lhs.x, rhs.x),
+					func(lhs.y, rhs.y)
+				);
+			}
+			else if constexpr (OutVector::size() == 3)
+			{
+				return OutVector
+				(
+					func(lhs.x, rhs.x),
+					func(lhs.y, rhs.y),
+					func(EmuMath::TMPHelpers::emu_vector_z(lhs), EmuMath::TMPHelpers::emu_vector_z(rhs))
+				);
+			}
+			else if constexpr (OutVector::size() == 4)
+			{
+				return OutVector
+				(
+					func(lhs.x, rhs.x),
+					func(lhs.y, rhs.y),
+					func(EmuMath::TMPHelpers::emu_vector_z(lhs), EmuMath::TMPHelpers::emu_vector_z(rhs)),
+					func(EmuMath::TMPHelpers::emu_vector_w(lhs), EmuMath::TMPHelpers::emu_vector_w(rhs))
+				);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform bitwise operation with EmuMath Vector and another EmuMath Vector using an invalidly sized output Vector.");
+			}
+		}
+
+		template<class OutVector, class LhsVector, typename Rhs, template<class LhsT_, class RhsT_, class OutT_> class Func_>
+		inline OutVector _perform_vector_bitwise_op_scalar_rhs_emu(const LhsVector& lhs, const Rhs& rhs)
+		{
+			using Func = Func_
+			<
+				typename LhsVector::nonref_value_type_without_qualifiers,
+				std::remove_cv_t<Rhs>,
+				typename OutVector::value_type
+			>;
+			Func func = Func();
+
+			if constexpr (OutVector::size() == 2)
+			{
+				return OutVector
+				(
+					func(lhs.x, rhs),
+					func(lhs.y, rhs)
+				);
+			}
+			else if constexpr (OutVector::size() == 3)
+			{
+				return OutVector
+				(
+					func(lhs.x, rhs,
+					func(lhs.y, rhs,
+					func(EmuMath::TMPHelpers::emu_vector_z(lhs), rhs)
+				);
+			}
+			else if constexpr (OutVector::size() == 4)
+			{
+				return OutVector
+				(
+					func(lhs.x, rhs.x),
+					func(lhs.y, rhs.y),
+					func(EmuMath::TMPHelpers::emu_vector_z(lhs), rhs),
+					func(EmuMath::TMPHelpers::emu_vector_w(lhs), rhs)
+				);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform bitwise operation with EmuMath Vector a scalar using an invalidly sized output Vector.");
+			}
+		}
+#pragma endregion
 	}
 
 	template<class OutVector, class LhsVector, class RhsVector>
@@ -270,7 +362,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuMath Vector addition via non-EmuMath Vector types. Non-Vectors may not be used with addition.");
+			static_assert(false, "Attempted to perform EmuMath Vector addition (+) via non-EmuMath Vector types. Non-Vectors may not be used with addition.");
 			return OutVector();
 		}
 	}
@@ -284,7 +376,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuMath Vector subtraction via non-EmuMath Vector types. Non-Vectors may not be used with subtraction.");
+			static_assert(false, "Attempted to perform EmuMath Vector subtraction (-) via non-EmuMath Vector types. Non-Vectors may not be used with subtraction.");
 			return OutVector();
 		}
 	}
@@ -305,7 +397,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuMath Vector multiplication with non-EmuMath Vector left-handed operand or output type.");
+			static_assert(false, "Attempted to perform EmuMath Vector multiplication (*) with non-EmuMath Vector left-handed operand or output type.");
 			return OutVector();
 		}
 	}
@@ -326,7 +418,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuMath Vector division with non-EmuMath Vector left-handed operand or output type.");
+			static_assert(false, "Attempted to perform EmuMath Vector division (/) with non-EmuMath Vector left-handed operand or output type.");
 			return OutVector();
 		}
 	}
@@ -347,7 +439,112 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuMath Vector division with non-EmuMath Vector left-handed operand or output type.");
+			static_assert(false, "Attempted to perform EmuMath Vector modulo division (%) with non-EmuMath Vector left-handed operand or output type.");
+			return OutVector();
+		}
+	}
+
+	template<class OutVector, class LhsVector, class Rhs>
+	inline OutVector VectorBitwiseAnd(const LhsVector& lhs, const Rhs& rhs)
+	{
+		if constexpr (EmuCore::TMPHelpers::are_all_check<EmuMath::TMPHelpers::is_emu_vector, LhsVector, OutVector>::value)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Rhs>)
+			{
+				return _underlying_vector_funcs::_perform_vector_bitwise_op_vector_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::logical_and_diff_types>(lhs, rhs);
+			}
+			else
+			{
+				return _underlying_vector_funcs::_perform_vector_bitwise_op_scalar_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::logical_and_diff_types>(lhs, rhs);
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform EmuMath Vector bitwise AND (&) with non-EmuMath Vector left-handed operand or output type.");
+			return OutVector();
+		}
+	}
+
+	template<class OutVector, class LhsVector, class Rhs>
+	inline OutVector VectorBitwiseOr(const LhsVector& lhs, const Rhs& rhs)
+	{
+		if constexpr (EmuCore::TMPHelpers::are_all_check<EmuMath::TMPHelpers::is_emu_vector, LhsVector, OutVector>::value)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Rhs>)
+			{
+				return _underlying_vector_funcs::_perform_vector_bitwise_op_vector_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::logical_or_diff_types>(lhs, rhs);
+			}
+			else
+			{
+				return _underlying_vector_funcs::_perform_vector_bitwise_op_scalar_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::logical_or_diff_types>(lhs, rhs);
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform EmuMath Vector bitwise OR (|) with non-EmuMath Vector left-handed operand or output type.");
+			return OutVector();
+		}
+	}
+
+	template<class OutVector, class LhsVector, class Rhs>
+	inline OutVector VectorBitwiseOr(const LhsVector& lhs, const Rhs& rhs)
+	{
+		if constexpr (EmuCore::TMPHelpers::are_all_check<EmuMath::TMPHelpers::is_emu_vector, LhsVector, OutVector>::value)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Rhs>)
+			{
+				return _underlying_vector_funcs::_perform_vector_bitwise_op_vector_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::logical_xor_diff_types>(lhs, rhs);
+			}
+			else
+			{
+				return _underlying_vector_funcs::_perform_vector_bitwise_op_scalar_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::logical_xor_diff_types>(lhs, rhs);
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform EmuMath Vector bitwise XOR (^) with non-EmuMath Vector left-handed operand or output type.");
+			return OutVector();
+		}
+	}
+
+	template<class OutVector, class LhsVector, class Rhs>
+	inline OutVector VectorLeftShiftPerElement(const LhsVector& lhs, const Rhs& rhs)
+	{
+		if constexpr (EmuCore::TMPHelpers::are_all_check<EmuMath::TMPHelpers::is_emu_vector, LhsVector, OutVector>::value)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Rhs>)
+			{
+				return _underlying_vector_funcs::_perform_vector_bitwise_op_vector_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::bitwise_shift_left_diff_types>(lhs, rhs);
+			}
+			else
+			{
+				return _underlying_vector_funcs::_perform_vector_bitwise_op_scalar_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::bitwise_shift_left_diff_types>(lhs, rhs);
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform EmuMath Vector bitwise left shift (<<) per-element with non-EmuMath Vector left-handed operand or output type.");
+			return OutVector();
+		}
+	}
+
+	template<class OutVector, class LhsVector, class Rhs>
+	inline OutVector VectorRightShiftPerElement(const LhsVector& lhs, const Rhs& rhs)
+	{
+		if constexpr (EmuCore::TMPHelpers::are_all_check<EmuMath::TMPHelpers::is_emu_vector, LhsVector, OutVector>::value)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Rhs>)
+			{
+				return _underlying_vector_funcs::_perform_vector_bitwise_op_vector_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::bitwise_shift_right_diff_types>(lhs, rhs);
+			}
+			else
+			{
+				return _underlying_vector_funcs::_perform_vector_bitwise_op_scalar_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::bitwise_shift_right_diff_types>(lhs, rhs);
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform EmuMath Vector right shift (>>) per-element with non-EmuMath Vector left-handed operand or output type.");
 			return OutVector();
 		}
 	}
