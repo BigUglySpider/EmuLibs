@@ -77,10 +77,22 @@ int main()
 	std::cout << v4fOut << "\n";
 
 	std::uint16_t boi(0b0110001000010000);
-	std::cout << "Before reverse: " << boi << " | After reverse: " << EmuCore::TMPHelpers::reverse_bits<std::uint16_t>()(boi) << "\n";
+	std::cout << "Before reverse: " << boi << " | After reverse: " << EmuCore::TMPHelpers::reverse_bits<std::uint16_t>()(boi) << "\n\n\n";
 
-	Vector2<std::uint16_t> u16vwshift = { 0x0003, 0b1110100000000000 };
-	std::cout << "Before vectorwise shift: " << u16vwshift << " | After vectorwise shift: " << EmuMath::Helpers::VectorLeftShiftVectorwise<Vector2<std::uint16_t>>(u16vwshift, 5);
+	Vector4<std::uint16_t> initial = { 0b0000000000000011, 0b1110100000000000, 0b0000000000000001, 0b0100000000000000 };
+	Vector4<float> u16vwshift = Vector4<float>();
+	Vector4<std::uint32_t> as32 = initial;
+	for (std::size_t i = 0, end = Vector2<std::size_t>(initial.size(), u16vwshift.size()).Min(); i < end; ++i)
+	{
+		u16vwshift.at(i) = *reinterpret_cast<const float*>(&initial.at(i));
+	}
+	for (std::size_t i = 0, end = Vector2<std::size_t>(initial.size(), u16vwshift.size()).Min(); i < end; ++i)
+	{
+		as32.at(i) = initial.at(i) << 16;
+	}
+
+	Vector4<std::uint16_t> ree = { 0b0000000000000011, 0b1110100000000000, 0b0000000000000011, 0b0000000000000001 };
+	std::cout << "Before vectorwise shift: " << ree << " | After vectorwise shift: " << EmuMath::Helpers::VectorLeftShiftVectorwise(ree, 48);
 
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();

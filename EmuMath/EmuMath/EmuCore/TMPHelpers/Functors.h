@@ -634,9 +634,10 @@ namespace EmuCore::TMPHelpers
 		constexpr T operator()(const std::size_t numBits) const
 		{
 			T out = T();
+			const T one_ = 1;
 			for (std::size_t i = 0, end = numBits <= NumBits_ ? numBits : NumBits_; i < end; ++i)
 			{
-				out |= (1 << i);
+				out |= (one_ << i);
 			}
 			return out;
 		}

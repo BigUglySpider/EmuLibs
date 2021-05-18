@@ -549,51 +549,84 @@ namespace EmuMath::Helpers
 		}
 	}
 
-	template<class OutVector, class InVector>
-	inline OutVector VectorLeftShiftVectorwise(const InVector& inVector, const std::size_t numShifts)
+	template<class EmuVector_>
+	inline auto VectorLeftShiftVectorwise(const EmuVector_& inVector, const std::size_t numShifts)
 	{
-		if constexpr (EmuCore::TMPHelpers::are_all_check<EmuMath::TMPHelpers::is_emu_vector, InVector, OutVector>::value)
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<EmuVector_>)
 		{
-			using InScalar = typename InVector::nonref_value_type_without_qualifiers;
-			constexpr std::size_t ScalarSize = sizeof(InScalar);
-			constexpr std::size_t ScalarBits = ScalarSize * 8;
-			using UintType = EmuCore::TMPHelpers::uint_of_size_t<ScalarSize>;
-			if constexpr (!std::is_same_v<UintType, std::false_type>)
+			using Scalar = typename EmuVector_::nonref_value_type_without_qualifiers;
+			using OutVector = EmuMath::TMPHelpers::emu_vector_from_size_t<EmuVector_::size(), Scalar>;
+			constexpr std::size_t ScalarSize_ = sizeof(Scalar);
+			constexpr std::size_t NumScalarBits = ScalarSize_ * 8;
+			constexpr std::size_t NumScalarBitsX2 = NumScalarBits * 2;
+			
+			if constexpr (std::is_unsigned_v<Scalar>)
 			{
-				if constexpr (InVector::size() == 2)
+				if constexpr (EmuVector_::size() >= 2 && EmuVector_::size() <= 4)
 				{
-					// Reverse y bits for x
-					EmuCore::TMPHelpers::create_mask<InScalar> masker;
-					return OutVector
-					(
-						(inVector.x << numShifts) | (inVector.y >> (ScalarBits - numShifts)),
-						inVector.y << numShifts
-					);
-				}
-				else if constexpr (InVector::size() == 3)
-				{
+					const bool zeroesSelf_ = numShifts >= NumScalarBits;
+					const bool zeroesThroughNeighbour = numShifts >= NumScalarBitsX2;
+					std::size_t ownShifts = (zeroesSelf_ * NumScalarBits) + (!zeroesSelf_ * numShifts);
+					const std::size_t neighbourShiftsLeft = ((numShifts - NumScalarBits) * zeroesSelf_ * !zeroesThroughNeighbour) + NumScalarBits * zeroesThroughNeighbour;
+					const std::size_t neighbourShiftsRight = (NumScalarBits - numShifts) * !zeroesSelf_;
+					if constexpr (EmuVector_::size() == 2)
+					{
+						return OutVector
+						(
+							(inVector.x << ownShifts) | ((inVector.y >> neighbourShiftsRight) << neighbourShiftsLeft),
+							inVector.y << ownShifts
+						);
+					}
+					else
+					{
+						constexpr std::size_t NumScalarBitsX3 = NumScalarBits * 3;
+						const bool entersSecondNeighbour = numShifts > NumScalarBits;
+						const bool zeroesThroughSecondNeighbour = numShifts >= NumScalarBitsX3;
+						const std::size_t secondNeighbourShiftsLeft = ((numShifts - NumScalarBitsX2) * zeroesThroughNeighbour * !zeroesThroughSecondNeighbour);
+						const std::size_t secondNeighbourShiftsRight = ((NumScalarBitsX2 - numShifts) * !zeroesThroughNeighbour);
 
-				}
-				else if constexpr (InVector::size() == 4)
-				{
+						if constexpr (EmuVector_::size() == 3)
+						{
+							return OutVector
+							(
+								(inVector.x << ownShifts) | ((inVector.y >> neighbourShiftsRight) << neighbourShiftsLeft) | (((inVector.z >> secondNeighbourShiftsRight) << secondNeighbourShiftsLeft) * entersSecondNeighbour),
+								(inVector.y << ownShifts) | ((inVector.z >> neighbourShiftsRight) << neighbourShiftsLeft),
+								inVector.z << ownShifts
+							);
+						}
+						else
+						{
+							constexpr std::size_t NumScalarBitsX4 = NumScalarBits * 4;
+							const bool entersThirdNeighbour = numShifts > NumScalarBitsX2;
+							const bool zeroesThroughThirdNeighbour = numShifts >= NumScalarBitsX4;
+							const std::size_t thirdNeighbourShiftsLeft = ((numShifts - NumScalarBitsX3) * zeroesThroughSecondNeighbour * !zeroesThroughThirdNeighbour);
+							const std::size_t thirdNeighbourShiftsRight = ((NumScalarBitsX3 - numShifts) * !zeroesThroughSecondNeighbour);
 
+							return OutVector
+							(
+								(inVector.x << ownShifts) | ((inVector.y >> neighbourShiftsRight) << neighbourShiftsLeft) | (((inVector.z >> secondNeighbourShiftsRight) << secondNeighbourShiftsLeft) * !zeroesThroughSecondNeighbour) | (((inVector.w >> thirdNeighbourShiftsRight) << thirdNeighbourShiftsLeft) * entersThirdNeighbour),
+								(inVector.y << ownShifts) | ((inVector.z >> neighbourShiftsRight) << neighbourShiftsLeft) | (((inVector.w >> secondNeighbourShiftsRight) << secondNeighbourShiftsLeft) * zeroesThroughSecondNeighbour),
+								(inVector.z << ownShifts) | ((inVector.w >> neighbourShiftsRight) << neighbourShiftsLeft),
+								inVector.w << ownShifts
+							);
+						}
+					}
 				}
 				else
 				{
-					static_assert(false, "Attempted to perform vectorwise left shift (<<) with an EmuMath Vector using an invalidly sized input Vector.");
+					static_assert(false, "Attempted to perform a vectorwise left shift on an invalidly sized EmuMath Vector type.");
 					return OutVector();
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform vectorwise left shift (<<) with an EmuMath Vector with a type that cannot be safely reinterpreted for shifts.");
 				return OutVector();
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuMath Vector vectorwise left shift <<  with non-EmuMath Vector input or output type.");
-			return OutVector();
+			static_assert(false, "Attempted to perform a vectorwise left shift on non-EmuMath-Vector type.");
+			return EmuVector_();
 		}
 	}
 }
