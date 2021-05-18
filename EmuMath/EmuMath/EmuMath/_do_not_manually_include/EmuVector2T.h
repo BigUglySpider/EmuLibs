@@ -29,6 +29,7 @@ namespace EmuMath
 		using info_type_t = EmuMath::_info::VectorInfo<T_>;
 
 	public:
+		using emu_vector_type = Vector2<T>;
 		/// <summary> Type containing info regarding EmuMath vectors containing the type within this vector. </summary>
 		using info_type = info_type_t<T>;
 		/// <summary> The value types stored within this vector. </summary>
@@ -862,96 +863,51 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsAdded(const Vector2<RhsT>& rhs) const
 		{
-			return this->_perform_addition<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+			return EmuMath::Helpers::VectorAddition<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(*this, rhs);
 		}
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsAdded(const Vector3<RhsT>& rhs) const
 		{
-			return this->_perform_addition<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+			return EmuMath::Helpers::VectorAddition<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(*this, rhs);
 		}
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsAdded(const Vector4<RhsT>& rhs) const
 		{
-			return this->_perform_addition<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+			return EmuMath::Helpers::VectorAddition<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(*this, rhs);
 		}
 
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsSubtracted(const Vector2<RhsT>& rhs) const
 		{
-			return this->_perform_subtraction<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+			return EmuMath::Helpers::VectorSubtraction<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(*this, rhs);
 		}
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsSubtracted(const Vector3<RhsT>& rhs) const
 		{
-			return this->_perform_subtraction<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+			return EmuMath::Helpers::VectorSubtraction<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(*this, rhs);
 		}
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsSubtracted(const Vector4<RhsT>& rhs) const
 		{
-			return this->_perform_subtraction<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+			return EmuMath::Helpers::VectorSubtraction<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(*this, rhs);
 		}
 
-		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMultiplied(const Vector2<RhsT>& rhs) const
-		{
-			return this->_perform_vector_multiplication<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
-		}
-		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMultiplied(const Vector3<RhsT>& rhs) const
-		{
-			return this->_perform_vector_multiplication<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
-		}
-		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMultiplied(const Vector4<RhsT>& rhs) const
-		{
-			return this->_perform_vector_multiplication<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
-		}
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMultiplied(const RhsT& rhs) const
 		{
-			return this->_perform_scalar_multiplication<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+			return EmuMath::Helpers::VectorMultiplication<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(*this, rhs);
 		}
 
-		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsDivided(const Vector2<RhsT>& rhs) const
-		{
-			return this->_perform_vector_division<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
-		}
-		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsDivided(const Vector3<RhsT>& rhs) const
-		{
-			return this->_perform_vector_division<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
-		}
-		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsDivided(const Vector4<RhsT>& rhs) const
-		{
-			return this->_perform_vector_division<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
-		}
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsDivided(const RhsT& rhs) const
 		{
-			return this->_perform_scalar_division<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+			return EmuMath::Helpers::VectorDivision<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(*this, rhs);
 		}
 
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMod(const Vector2<RhsT>& rhs) const
-		{
-			return this->_perform_vector_mod<Vector2<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
-		}
-		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMod(const Vector3<RhsT>& rhs) const
-		{
-			return this->_perform_vector_mod<Vector3<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
-		}
-		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMod(const Vector4<RhsT>& rhs) const
-		{
-			return this->_perform_vector_mod<Vector4<RhsT>, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
-		}
-		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
 		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMod(const RhsT& rhs) const
 		{
-			return this->_perform_scalar_mod<RhsT, EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(rhs);
+			return EmuMath::Helpers::VectorMod<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(*this, rhs);
 		}
 #pragma endregion
 
@@ -2205,47 +2161,6 @@ namespace EmuMath
 			{
 				at<Index>() = static_cast<nonref_value_type>(val_);
 			}
-		}
-
-		template<typename RhsVec, typename OutVector>
-		constexpr OutVector _perform_addition(const RhsVec& rhs) const
-		{
-			return this->_perform_vector_arithmetic_emu<RhsVec, OutVector, EmuCore::TMPHelpers::plus_diff_types>(rhs);
-		}
-		template<typename RhsVec, typename OutVector>
-		constexpr OutVector _perform_subtraction(const RhsVec& rhs) const
-		{
-			return this->_perform_vector_arithmetic_emu<RhsVec, OutVector, EmuCore::TMPHelpers::minus_diff_types>(rhs);
-		}
-		template<typename RhsVec, typename OutVector>
-		constexpr OutVector _perform_vector_multiplication(const RhsVec& rhs) const
-		{
-			return this->_perform_vector_arithmetic_emu<RhsVec, OutVector, EmuCore::TMPHelpers::multiplies_diff_types>(rhs);
-		}
-		template<typename RhsT, typename OutVector>
-		constexpr OutVector _perform_scalar_multiplication(const RhsT& rhs) const
-		{
-			return this->_perform_scalar_arithmetic_emu<RhsT, OutVector, EmuCore::TMPHelpers::multiplies_diff_types>(rhs);
-		}
-		template<typename RhsVec, typename OutVector>
-		constexpr OutVector _perform_vector_division(const RhsVec& rhs) const
-		{
-			return this->_perform_vector_arithmetic_emu<RhsVec, OutVector, EmuCore::TMPHelpers::divides_diff_types>(rhs);
-		}
-		template<typename RhsT, typename OutVector>
-		constexpr OutVector _perform_scalar_division(const RhsT& rhs) const
-		{
-			return this->_perform_scalar_arithmetic_emu<RhsT, OutVector, EmuCore::TMPHelpers::divides_diff_types>(rhs);
-		}
-		template<typename RhsVec, typename OutVector>
-		constexpr OutVector _perform_vector_mod(const RhsVec& rhs) const
-		{
-			return this->_perform_vector_arithmetic_emu<RhsVec, OutVector, EmuCore::TMPHelpers::modulus_diff_types>(rhs);
-		}
-		template<typename RhsT, typename OutVector>
-		constexpr OutVector _perform_scalar_mod(const RhsT& rhs) const
-		{
-			return this->_perform_scalar_arithmetic_emu<RhsT, OutVector, EmuCore::TMPHelpers::modulus_diff_types>(rhs);
 		}
 
 		template<typename RhsVec, typename OutVector>

@@ -71,8 +71,8 @@ namespace EmuMath::Helpers
 				{
 					return OutVector
 					(
-						func(lhs.x, rhs.x),
-						func(lhs.y, rhs.y),
+						func(static_cast<LhsElementAsScalar>(lhs.x), rhs.x),
+						func(static_cast<LhsElementAsScalar>(lhs.y), rhs.y),
 						func(static_cast<LhsElementAsScalar>(EmuMath::TMPHelpers::emu_vector_z(lhs)), EmuMath::TMPHelpers::emu_vector_z(rhs))
 					);
 				}
@@ -93,8 +93,8 @@ namespace EmuMath::Helpers
 				{
 					return OutVector
 					(
-						func(lhs.x, rhs.x),
-						func(lhs.y, rhs.y),
+						func(static_cast<LhsElementAsScalar>(lhs.x), rhs.x),
+						func(static_cast<LhsElementAsScalar>(lhs.y), rhs.y),
 						func(static_cast<LhsElementAsScalar>(EmuMath::TMPHelpers::emu_vector_z(lhs)), EmuMath::TMPHelpers::emu_vector_z(rhs)),
 						func(static_cast<LhsElementAsScalar>(EmuMath::TMPHelpers::emu_vector_w(lhs)), EmuMath::TMPHelpers::emu_vector_w(rhs))
 					);
@@ -158,8 +158,8 @@ namespace EmuMath::Helpers
 				{
 					return OutVector
 					(
-						func(lhs.x, rhs),
-						func(lhs.y, rhs),
+						func(static_cast<LhsElementAsScalar>(lhs.x), rhs),
+						func(static_cast<LhsElementAsScalar>(lhs.y), rhs),
 						func(static_cast<LhsElementAsScalar>(EmuMath::TMPHelpers::emu_vector_z(lhs)), rhs)
 					);
 				}
@@ -180,8 +180,8 @@ namespace EmuMath::Helpers
 				{
 					return OutVector
 					(
-						func(lhs.x, rhs),
-						func(lhs.y, rhs),
+						func(static_cast<LhsElementAsScalar>(lhs.x), rhs),
+						func(static_cast<LhsElementAsScalar>(lhs.y), rhs),
 						func(static_cast<LhsElementAsScalar>(EmuMath::TMPHelpers::emu_vector_z(lhs)), rhs),
 						func(static_cast<LhsElementAsScalar>(EmuMath::TMPHelpers::emu_vector_w(lhs)), rhs)
 					);

@@ -22,6 +22,7 @@ int main()
 	std::cout << "After add (default): " << v2i.AsAdded(v3f) << "\n";
 	std::cout << "After add (v2): " << v2i.AsAdded<2>(v3f) << "\n";
 	std::cout << "After add (v3): " << v2i.AsAdded<3, float>(v3f) << "\n";
+	//std::cout << "After add (v3): " << (v2i + v3f) << "\n";
 	std::cout << "After mult (v3): " << v2i.AsMultiplied<3, double>(v3f) << "\n";
 	std::cout << "After scalar mult (v3): " << v2i.AsMultiplied<3, long double>(5.5f) << "\n";
 
