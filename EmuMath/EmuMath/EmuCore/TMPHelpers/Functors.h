@@ -439,13 +439,8 @@ namespace EmuCore::TMPHelpers
 	struct _common_bitwise_shift_info
 	{
 		static constexpr bool lhs_matches_out = std::is_same_v<Lhs_, Out_>;
-		using RhsT = std::conditional_t
-		<
-			std::is_unsigned_v<Rhs_> && std::is_integral_v<Rhs_>,
-			Rhs_,
-			std::size_t
-		>;
-		static constexpr bool rhs_matches_template = std::is_same_v<RhsT, Rhs_>;
+		static constexpr bool lhs_integral = std::is_integral_v<Lhs_>;
+		static constexpr bool rhs_integral = std::is_integral_v<Rhs_>;
 	};
 	/// <summary> Functor for performing a bitwise left shift via the &lt;&lt; operator taking two possibly different types, with an optionally customisable output type. </summary>
 	/// <typeparam name="Lhs_">Left-handed argument type in the left shift operation.</typeparam>
@@ -459,35 +454,46 @@ namespace EmuCore::TMPHelpers
 		constexpr bitwise_shift_left_diff_types()
 		{
 		}
-		constexpr Out_ operator()(const Lhs_& lhs, const Rhs_& rhs) const
+		constexpr Out_ operator()(const Lhs_& lhs, const Rhs_& numShifts) const
 		{
-			if constexpr (_info_type::rhs_matches_template)
+			if constexpr (_info_type::lhs_integral)
 			{
-				if constexpr (_info_type::lhs_integral)
+				if constexpr (_info_type::rhs_integral)
 				{
-					if constexpr (_info_type::lhs_matches_input)
+					if constexpr (_info_type::lhs_matches_out)
 					{
-						return lhs << rhs;
+						return lhs << numShifts;
 					}
 					else
 					{
-						return static_cast<Out_>(lhs << rhs);
+						const Lhs_ shifted = lhs << numShifts;
+						Out_ out = Out_();
+						memcpy(&out, &shifted, EmuCore::TMPHelpers::lowest_byte_size_v<Lhs_, Out_>);
+						return out;
 					}
+				}
+				else
+				{
+					return bitwise_shift_left_diff_types<Lhs_, std::size_t, Out_>()(lhs, static_cast<std::size_t>(numShifts));
 				}
 			}
 			else
 			{
-				typename _info_type::RhsT finalRhs = static_cast<typename _info_type::RhsT>(rhs);
-				if constexpr (_info_type::lhs_integral)
+				using LhsInt = EmuCore::TMPHelpers::uint_of_size_t<sizeof(Lhs_)>;
+				if constexpr (!std::is_same_v<LhsInt, std::false_type>)
 				{
-					if constexpr (_info_type::lhs_matches_input)
-					{
-						return lhs << finalRhs;
-					}
-					else
-					{
-						return static_cast<Out_>(lhs << finalRhs);
-					}
+					LhsInt lhsInt = 0;
+					LhsInt* pLhsInt = &lhsInt;
+					memcpy(pLhsInt, &lhs, sizeof(Lhs_));
+					lhsInt = bitwise_shift_left_diff_types<LhsInt, Rhs_, LhsInt>()(lhsInt, numShifts);
+					Out_ out = Out_();
+					memcpy(&out, pLhsInt, EmuCore::TMPHelpers::lowest_byte_size_v<LhsInt, Out_>);
+					return out;
+				}
+				else
+				{
+					static_assert(false, "Attempted to perform a bitwise left shift via bitwise_shift_left_diff_types using a type that cannot be accurately reinterpreted.");
+					return Out_();
 				}
 			}
 		}
@@ -504,35 +510,46 @@ namespace EmuCore::TMPHelpers
 		constexpr bitwise_shift_right_diff_types()
 		{
 		}
-		constexpr Out_ operator()(const Lhs_& lhs, const Rhs_& rhs) const
+		constexpr Out_ operator()(const Lhs_& lhs, const Rhs_& numShifts) const
 		{
-			if constexpr (_info_type::rhs_matches_template)
+			if constexpr (_info_type::lhs_integral)
 			{
-				if constexpr (_info_type::lhs_integral)
+				if constexpr (_info_type::rhs_integral)
 				{
-					if constexpr (_info_type::lhs_matches_input)
+					if constexpr (_info_type::lhs_matches_out)
 					{
-						return lhs >> rhs;
+						return lhs >> numShifts;
 					}
 					else
 					{
-						return static_cast<Out_>(lhs >> rhs);
+						const Lhs_ shifted = lhs >> numShifts;
+						Out_ out = Out_();
+						memcpy(&out, &shifted, EmuCore::TMPHelpers::lowest_byte_size_v<Lhs_, Out_>);
+						return out;
 					}
+				}
+				else
+				{
+					return bitwise_shift_right_diff_types<Lhs_, std::size_t, Out_>()(lhs, static_cast<std::size_t>(numShifts));
 				}
 			}
 			else
 			{
-				typename _info_type::RhsT finalRhs = static_cast<typename _info_type::RhsT>(rhs);
-				if constexpr (_info_type::lhs_integral)
+				using LhsInt = EmuCore::TMPHelpers::uint_of_size_t<sizeof(Lhs_)>;
+				if constexpr (!std::is_same_v<LhsInt, std::false_type>)
 				{
-					if constexpr (_info_type::lhs_matches_input)
-					{
-						return lhs >> finalRhs;
-					}
-					else
-					{
-						return static_cast<Out_>(lhs >> finalRhs);
-					}
+					LhsInt lhsInt = 0;
+					LhsInt* pLhsInt = &lhsInt;
+					memcpy(pLhsInt, &lhs, sizeof(Lhs_));
+					lhsInt = bitwise_shift_right_diff_types<LhsInt, Rhs_, LhsInt>()(lhsInt, numShifts);
+					Out_ out = Out_();
+					memcpy(&out, pLhsInt, EmuCore::TMPHelpers::lowest_byte_size_v<LhsInt, Out_>);
+					return out;
+				}
+				else
+				{
+					static_assert(false, "Attempted to perform a bitwise right shift via bitwise_shift_left_diff_types using a type that cannot be accurately reinterpreted.");
+					return Out_();
 				}
 			}
 		}

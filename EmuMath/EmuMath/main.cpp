@@ -91,8 +91,8 @@ int main()
 		as32.at(i) = initial.at(i) << 16;
 	}
 
-	Vector4<std::uint16_t> ree = { 0b0000000000000011, 0b1110100000000000, 0b0000000000000011, 0b0000000000000001 };
-	std::cout << "Before vectorwise shift: " << ree << " | After vectorwise shift: " << EmuMath::Helpers::VectorLeftShiftVectorwise(ree, 48);
+	Vector4<std::uint16_t> ree = { 0b0000000000000011, 0b1110100000000000, 0b0000000000000011, 0b1000000000000001 };
+	std::cout << "Before vectorwise shift: " << ree << " | After vectorwise shift: " << EmuMath::Helpers::VectorLeftShiftVectorwise(ree, 17);
 
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();
