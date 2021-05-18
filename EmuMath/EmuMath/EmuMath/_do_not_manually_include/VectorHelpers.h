@@ -330,8 +330,8 @@ namespace EmuMath::Helpers
 			{
 				return OutVector
 				(
-					func(lhs.x, rhs,
-					func(lhs.y, rhs,
+					func(lhs.x, rhs),
+					func(lhs.y, rhs),
 					func(EmuMath::TMPHelpers::emu_vector_z(lhs), rhs)
 				);
 			}
@@ -487,7 +487,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<class OutVector, class LhsVector, class Rhs>
-	inline OutVector VectorBitwiseOr(const LhsVector& lhs, const Rhs& rhs)
+	inline OutVector VectorBitwiseXor(const LhsVector& lhs, const Rhs& rhs)
 	{
 		if constexpr (EmuCore::TMPHelpers::are_all_check<EmuMath::TMPHelpers::is_emu_vector, LhsVector, OutVector>::value)
 		{
