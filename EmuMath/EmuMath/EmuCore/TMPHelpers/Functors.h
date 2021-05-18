@@ -585,6 +585,81 @@ namespace EmuCore::TMPHelpers
 			}
 		}
 	};
+
+	template<typename T>
+	struct reverse_bits
+	{
+	public:
+		static constexpr std::size_t NumBytes_ = sizeof(T);
+		constexpr reverse_bits()
+		{
+		}
+		constexpr T operator()(const T& in_) const
+		{
+			T out = T();
+			this->_reverse_bytes<0>
+			(
+				reinterpret_cast<const std::uint8_t*>(&(in_)) + (NumBytes_ - 1),
+				reinterpret_cast<std::uint8_t*>(&out)
+			);
+			return out;
+		}
+
+	private:
+		/// <summary> Iteratively reverses the pointed to in bytes and stores the results in the pointed to out bytes. </summary>
+		/// <param name="pInBytes">The final input byte. This pointer will be iterated through in reverse (from end to start).</param>
+		/// <param name="pOutBytes">The first output byte. This pointer will be iterated through in normal order (from start to end).</param>
+		template<std::size_t Iteration_>
+		constexpr void _reverse_bytes(const std::uint8_t* pInBytes, std::uint8_t* pOutBytes) const
+		{
+			if constexpr (Iteration_ < NumBytes_)
+			{
+				std::uint8_t& outByte = *(pOutBytes + Iteration_);
+				outByte = *(pInBytes - Iteration_);
+				outByte = (outByte & 0xF0) >> 4 | (outByte & 0x0F) << 4; // Swap HI and LO
+				outByte = (outByte & 0xCC) >> 2 | (outByte & 0x33) << 2; // Swap adjacent bits
+				outByte = (outByte & 0xAA) >> 1 | (outByte & 0x55) << 1; // Swap adjacent single bits
+				this->_reverse_bytes<Iteration_ + 1>(pInBytes, pOutBytes);
+			}
+		}
+	};
+
+	template<typename T>
+	struct create_mask
+	{
+		static constexpr std::size_t NumBits_ = sizeof(T) * 8;
+		constexpr create_mask()
+		{
+		}
+		constexpr T operator()(const std::size_t numBits) const
+		{
+			T out = T();
+			for (std::size_t i = 0, end = numBits <= NumBits_ ? numBits : NumBits_; i < end; ++i)
+			{
+				out |= (1 << i);
+			}
+			return out;
+		}
+	};
+
+	template<typename T>
+	struct create_reverse_mask
+	{
+		static constexpr std::size_t NumBits_ = sizeof(T) * 8;
+		static constexpr std::size_t FinalBitOffset_ = NumBits_ - 1;
+		constexpr create_reverse_mask()
+		{
+		}
+		constexpr T operator()(const std::size_t numBits) const
+		{
+			T out = T();
+			for (std::size_t i = 0, end = numBits <= NumBits_ ? numBits : NumBits_; i < end; ++i)
+			{
+				out |= (1 << (NumBits_ - i));
+			}
+			return out;
+		}
+	};
 }
 
 #endif

@@ -122,6 +122,29 @@ namespace EmuCore::TMPHelpers
 		best_signed_int_rep_t<T>,
 		best_unsigned_int_rep_t<T>
 	>;
+
+	template<std::size_t NumBytes_>
+	using uint_of_size_t = std::conditional_t
+	<
+		NumBytes_ == sizeof(std::uint8_t),
+		std::uint8_t,
+		std::conditional_t
+		<
+			NumBytes_ == sizeof(std::uint16_t),
+			std::uint16_t,
+			std::conditional_t
+			<
+				NumBytes_ == sizeof(std::uint32_t),
+				std::uint32_t,
+				std::conditional_t
+				<
+					NumBytes_ == sizeof(std::uint64_t),
+					std::uint64_t,
+					std::false_type
+				>
+			>
+		>
+	>;
 }
 
 #endif

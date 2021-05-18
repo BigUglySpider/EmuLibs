@@ -347,7 +347,7 @@ namespace EmuMath::Helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform bitwise operation with EmuMath Vector a scalar using an invalidly sized output Vector.");
+				static_assert(false, "Attempted to perform bitwise operation with EmuMath Vector and a scalar using an invalidly sized output Vector.");
 			}
 		}
 #pragma endregion
@@ -545,6 +545,54 @@ namespace EmuMath::Helpers
 		else
 		{
 			static_assert(false, "Attempted to perform EmuMath Vector right shift (>>) per-element with non-EmuMath Vector left-handed operand or output type.");
+			return OutVector();
+		}
+	}
+
+	template<class OutVector, class InVector>
+	inline OutVector VectorLeftShiftVectorwise(const InVector& inVector, const std::size_t numShifts)
+	{
+		if constexpr (EmuCore::TMPHelpers::are_all_check<EmuMath::TMPHelpers::is_emu_vector, InVector, OutVector>::value)
+		{
+			using InScalar = typename InVector::nonref_value_type_without_qualifiers;
+			constexpr std::size_t ScalarSize = sizeof(InScalar);
+			constexpr std::size_t ScalarBits = ScalarSize * 8;
+			using UintType = EmuCore::TMPHelpers::uint_of_size_t<ScalarSize>;
+			if constexpr (!std::is_same_v<UintType, std::false_type>)
+			{
+				if constexpr (InVector::size() == 2)
+				{
+					// Reverse y bits for x
+					EmuCore::TMPHelpers::create_mask<InScalar> masker;
+					return OutVector
+					(
+						(inVector.x << numShifts) | (inVector.y >> (ScalarBits - numShifts)),
+						inVector.y << numShifts
+					);
+				}
+				else if constexpr (InVector::size() == 3)
+				{
+
+				}
+				else if constexpr (InVector::size() == 4)
+				{
+
+				}
+				else
+				{
+					static_assert(false, "Attempted to perform vectorwise left shift (<<) with an EmuMath Vector using an invalidly sized input Vector.");
+					return OutVector();
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform vectorwise left shift (<<) with an EmuMath Vector with a type that cannot be safely reinterpreted for shifts.");
+				return OutVector();
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform EmuMath Vector vectorwise left shift <<  with non-EmuMath Vector input or output type.");
 			return OutVector();
 		}
 	}

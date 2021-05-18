@@ -76,6 +76,12 @@ int main()
 	Vector4<float> v4fOut = EmuMath::Helpers::VectorSubtraction<Vector4<float>>(Vector2<std::uint16_t>(5, 2), Vector3<std::uint32_t>(2.5f, 4.0f, 255.0f));
 	std::cout << v4fOut << "\n";
 
+	std::uint16_t boi(0b0110001000010000);
+	std::cout << "Before reverse: " << boi << " | After reverse: " << EmuCore::TMPHelpers::reverse_bits<std::uint16_t>()(boi) << "\n";
+
+	Vector2<std::uint16_t> u16vwshift = { 0x0003, 0b1110100000000000 };
+	std::cout << "Before vectorwise shift: " << u16vwshift << " | After vectorwise shift: " << EmuMath::Helpers::VectorLeftShiftVectorwise<Vector2<std::uint16_t>>(u16vwshift, 5);
+
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();
 #pragma endregion
