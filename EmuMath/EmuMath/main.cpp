@@ -92,8 +92,12 @@ int main()
 	}
 
 	Vector4<std::uint16_t> ree = { 0b0000000000000011, 0b1110100000000000, 0b0000000000000011, 0b1000000000000001 };
+	Vector2<std::uint16_t> ree2 = { ree.x, ree.y };
+	using BitVec2 = Vector2<std::bitset<sizeof(std::uint16_t) * 8>>;
 	std::cout << "Before vectorwise shift (Left): " << ree << " | After vectorwise shift (Left): " << EmuMath::Helpers::VectorLeftShiftVectorwise(ree, 16) << "\n";
 	std::cout << "Before vectorwise shift (Right): " << ree << " | After vectorwise shift (Right): " << EmuMath::Helpers::VectorRightShiftVectorwise(ree, 48) << "\n";
+	std::cout << "Before vectorwise shift (Left): " << BitVec2(ree2) << " | After vectorwise shift (Left): " << BitVec2(ree2.AsLeftShiftedVectorwise(8)) << "\n";
+	std::cout << "Before vectorwise shift (Right): " << BitVec2(ree2) << " | After vectorwise shift (Right): " << BitVec2(ree2.AsRightShiftedVectorwise(8)) << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();
