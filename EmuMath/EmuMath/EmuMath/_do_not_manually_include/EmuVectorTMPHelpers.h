@@ -98,6 +98,11 @@ namespace EmuMath
 		template<std::size_t Size_, typename ContainedType>
 		using emu_vector_from_size_t = typename emu_vector_from_size<Size_, ContainedType>::type;
 
+		/// <summary>
+		///	<para> Finds the type used to create a copy of the passed EmuMath Vector type. If the passed type is not an EmuMath vector, the type will be std::false_type. </para>
+		/// <para> This copy type is primarily used to consistently get non-reference copies from EmuMath Vectors containing references. </para>
+		/// </summary>
+		/// <typeparam name="EmuVector_">EmuMath Vector type to get the copy type of.</typeparam>
 		template<typename EmuVector_>
 		struct emu_vector_copy
 		{
@@ -114,6 +119,11 @@ namespace EmuMath
 				std::false_type
 			>;
 		};
+		/// <summary>
+		/// <para> Type used to create a copy of the passed EmuMath Vector type. If the passed type is not an EmuMath vector, this will be std::false_type. </para>
+		/// <para> This copy type is primarily used to consistently get non-reference copies from EmuMath Vectors containing references. </para>
+		/// </summary>
+		/// <typeparam name="EmuVector_">EmuMath Vector type to get the copy type of.</typeparam>
 		template<typename EmuVector_>
 		using emu_vector_copy_t = typename emu_vector_copy<EmuVector_>::type;
 

@@ -29,6 +29,7 @@ namespace EmuMath
 		using info_type_t = EmuMath::_info::VectorInfo<T_>;
 
 	public:
+		/// <summary> The overall type of EmuMath Vector that this type is. </summary>
 		using emu_vector_type = Vector2<T>;
 		/// <summary> Type containing info regarding EmuMath vectors containing the type within this vector. </summary>
 		using info_type = info_type_t<T>;
@@ -51,6 +52,9 @@ namespace EmuMath
 		{
 			return 2;
 		}
+
+		/// <summary> The type of Vector created when getting a copy of this Vector's data (used to get copy values instead of references). </summary>
+		using copy_vector = typename EmuMath::TMPHelpers::emu_vector_copy<emu_vector_type>::type;
 #pragma endregion
 
 #pragma region CONSTRUCTORS
