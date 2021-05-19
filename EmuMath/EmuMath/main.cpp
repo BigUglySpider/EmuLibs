@@ -1,18 +1,26 @@
 #include "Tests.hpp"
 
+#include "EmuMath/GeneralMath.h"
 #include "EmuMath/Vectors.h"
 
 using namespace EmuCore::TestingHelpers;
 using namespace EmuMath;
 
+
+
 int main()
 {
+	constexpr double SQRT_0 = EmuMath::SqrtConstexpr<long double>(42141124214126477412.512512);
+
 	constexpr Vector3<std::uint32_t> BLOOB = { 1, 2, 3 };
 	constexpr std::uint32_t BLOOB_X = EmuMath::TMPHelpers::emu_vector_x(BLOOB);
 	constexpr std::uint32_t BLOOB_Y = EmuMath::TMPHelpers::emu_vector_y(BLOOB);
 	constexpr std::uint32_t BLOOB_Z = EmuMath::TMPHelpers::emu_vector_z(BLOOB);
 	constexpr std::uint32_t BLOOB_W = EmuMath::TMPHelpers::emu_vector_w(BLOOB);
-	constexpr auto BLOOB_MAGXY = Vector2<std::uint32_t>(BLOOB.x, BLOOB.y).SquareMagnitude();
+	constexpr auto BLOOB_SQR_MAGXY = Vector2<std::uint32_t>(BLOOB.x, BLOOB.y).SquareMagnitude();
+	constexpr auto BLOOB_SQR_MAG = EmuMath::Helpers::VectorSquareMagnitude<std::uint64_t>(BLOOB);
+	constexpr auto BLOOB_MAG = EmuMath::Helpers::VectorMagnitudeConstexpr<long double>(BLOOB);
+	constexpr auto BLOOB_NORM = Vector2<std::uint32_t>(BLOOB).NormalisedConstexpr();
 
 	Vector2<int> v2i(-7, 7);
 	Vector3<float> v3f(-7.0f, 7.0f, -777.0f);
@@ -57,21 +65,12 @@ int main()
 	Vector2<float> C(2.5f, 2.5f);
 	Vector2<float> D(2.5f, 5.0f);
 
-	std::cout << A << " == " << B << ": " << A.CompareElementsEqual(B) << "\n";
-	std::cout << A << " == " << C << ": " << A.CompareElementsEqual(C) << "\n";
-	std::cout << A << " == " << D << ": " << A.CompareElementsEqual(D) << "\n";
-	std::cout << B << " == " << C << ": " << B.CompareElementsEqual(C) << "\n";
-
-
-	std::cout << A << " === " << B << ": " << A.AllEqual<1>(B) << "\n";
-	std::cout << A << " === " << C << ": " << A.AllEqual<1>(C) << "\n";
-	std::cout << A << " === " << D << ": " << A.AllEqual<1>(D) << "\n";
-	std::cout << B << " === " << C << ": " << B.AllEqual<1>(C) << "\n";
 
 	std::cout << EmuMath::TMPHelpers::emu_vector_z(T__(2, 3, 4)) << "\n";
 
 	EmuMath::Vector4<float> v4f = Vector4<float>(EmuMath::Vector2<int>(2, 1), 1.0f, 66.66666666666666f);
 
+	A.SquareMagnitude<long double>();
 
 	Vector4<float> v4fOut = EmuMath::Helpers::VectorSubtraction<Vector4<float>>(Vector2<std::uint16_t>(5, 2), Vector3<std::uint32_t>(2.5f, 4.0f, 255.0f));
 	std::cout << v4fOut << "\n";

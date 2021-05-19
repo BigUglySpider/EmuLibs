@@ -127,6 +127,25 @@ namespace EmuMath
 		template<typename EmuVector_>
 		using emu_vector_copy_t = typename emu_vector_copy<EmuVector_>::type;
 
+		template<typename LhsVector_, typename RhsVector_>
+		struct emu_vector_with_most_elements
+		{
+		private:
+			static constexpr bool _is_valid = EmuCore::TMPHelpers::are_all_check<EmuMath::TMPHelpers::is_emu_vector_v, LhsVector_, RhsVector_>::value;
+
+		public:
+			static_assert(_is_valid, "Attempted to find the EmuMath VEctor type with the most elements using at least one type that is not an EmuMath Vector.");
+
+			using type = std::conditional_t
+			<
+				_is_valid,
+				std::conditional_t<(LhsVector_::size() >= RhsVector_::size()), LhsVector_, RhsVector_>,
+				std::false_type
+			>;
+		};
+		template<typename LhsVector_, typename RhsVector_>
+		using emu_vector_with_most_elements_t = typename emu_vector_with_most_elements<LhsVector_, RhsVector_>::type;
+
 		/// <summary> Helper for arbitrarily accessing X, Y, Z or W of an EmuMath Vector, representing non-contained values as a copy of the stored type's zero. </summary>
 		/// <typeparam name="EmuVec_">Type of EmuMath vector to get the element from.</typeparam>
 		template<class EmuVec__>

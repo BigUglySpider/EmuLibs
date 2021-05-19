@@ -8,6 +8,7 @@
 #include <tuple>
 
 // ADDITIONAL INCLUDES
+#include "EmuMath/GeneralMath.h"
 #include "EmuMath/Vectors.h"
 #include <bitset>
 
@@ -55,7 +56,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr std::size_t NUM_BITS_T = sizeof(T) * 8;
 		static constexpr std::size_t NUM_LOOPS = (Vec::size() * NUM_BITS_T) + 1;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = true;
+		static constexpr bool DO_TEST = false;
 
 		using ScalarBits = std::bitset<NUM_BITS_T>;
 		using BitVec = EmuMath::TMPHelpers::emu_vector_from_size_t<Vec::size(), ScalarBits>;
@@ -103,21 +104,79 @@ namespace EmuCore::TestingHelpers
 		std::vector<BitVec> outRightBits;
 	};
 
-	using AllTests = std::tuple<TestA<float>, VectorwiseShiftTest<std::int16_t>>;
+	template<typename T, bool UseEmuMath>
+	struct SqrtTest
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+
+		SqrtTest()
+		{
+		}
+
+		T _select_random() const
+		{
+			return static_cast<T>(rand() % static_cast<std::int64_t>(std::numeric_limits<T>::max()));
+		}
+		void Prepare()
+		{
+			inData.resize(NUM_LOOPS);
+			outData.resize(NUM_LOOPS);
+			for (auto& val : inData)
+			{
+				val = _select_random();
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			if constexpr (UseEmuMath)
+			{
+				outData[i] = EmuMath::SqrtConstexpr<T, T>(inData[i]);
+			}
+			else
+			{
+				if constexpr (std::is_same_v<T, float>)
+				{
+					outData[i] = sqrtf(inData[i]);
+				}
+				else if constexpr (std::is_same_v<T, double>)
+				{
+					outData[i] = sqrt(inData[i]);
+				}
+				else
+				{
+					outData[i] = sqrt(inData[i]);
+				}
+			}
+		}
+
+		std::vector<T> inData;
+		std::vector<T> outData;
+	};
+
+	using SqrtTestFP = float;
+
+	using AllTests = std::tuple<TestA<float>, VectorwiseShiftTest<std::int16_t>, SqrtTest<SqrtTestFP, true>, SqrtTest<SqrtTestFP, false>>;
+
+	template<std::size_t Index_>
+	void PrepareAllTests(AllTests& tests)
+	{
+		if constexpr (Index_ < std::tuple_size_v<AllTests>)
+		{
+			auto& test_ = std::get<Index_>(tests);
+			if (test_.DO_TEST)
+			{
+				test_.Prepare();
+			}
+			PrepareAllTests<Index_ + 1>(tests);
+		}
+	}
 
 	void PrepareForTests(AllTests& outTests)
 	{
-		auto& testZero = std::get<0>(outTests);
-		if (testZero.DO_TEST)
-		{
-			testZero.Prepare();
-		}
-
-		auto& testOne = std::get<1>(outTests);
-		if (testOne.DO_TEST)
-		{
-			testOne.Prepare();
-		}
+		PrepareAllTests<0>(outTests);
 	}
 
 	void OnAllTestsOver(AllTests& tests)

@@ -65,5 +65,8 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\VectorHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\GeneralMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
