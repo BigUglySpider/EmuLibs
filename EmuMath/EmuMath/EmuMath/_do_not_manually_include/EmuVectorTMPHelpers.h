@@ -98,6 +98,25 @@ namespace EmuMath
 		template<std::size_t Size_, typename ContainedType>
 		using emu_vector_from_size_t = typename emu_vector_from_size<Size_, ContainedType>::type;
 
+		template<typename EmuVector_>
+		struct emu_vector_copy
+		{
+		private:
+			static constexpr bool _is_valid = EmuMath::TMPHelpers::is_emu_vector_v<EmuVector_>;
+
+		public:
+			static_assert(_is_valid, "Attempted to get the copy type for an EmuMath Vector using a type that is not an EmuMath Vector.");
+
+			using type = std::conditional_t
+			<
+				_is_valid,
+				EmuMath::TMPHelpers::emu_vector_from_size_t<EmuVector_::size(), typename EmuVector_::nonref_value_type_without_qualifiers>,
+				std::false_type
+			>;
+		};
+		template<typename EmuVector_>
+		using emu_vector_copy_t = typename emu_vector_copy<EmuVector_>::type;
+
 		/// <summary> Helper for arbitrarily accessing X, Y, Z or W of an EmuMath Vector, representing non-contained values as a copy of the stored type's zero. </summary>
 		/// <typeparam name="EmuVec_">Type of EmuMath vector to get the element from.</typeparam>
 		template<class EmuVec__>

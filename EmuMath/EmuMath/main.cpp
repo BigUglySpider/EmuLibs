@@ -92,7 +92,8 @@ int main()
 	}
 
 	Vector4<std::uint16_t> ree = { 0b0000000000000011, 0b1110100000000000, 0b0000000000000011, 0b1000000000000001 };
-	std::cout << "Before vectorwise shift: " << ree << " | After vectorwise shift: " << EmuMath::Helpers::VectorLeftShiftVectorwise(ree, 17);
+	std::cout << "Before vectorwise shift (Left): " << ree << " | After vectorwise shift (Left): " << EmuMath::Helpers::VectorLeftShiftVectorwise(ree, 16) << "\n";
+	std::cout << "Before vectorwise shift (Right): " << ree << " | After vectorwise shift (Right): " << EmuMath::Helpers::VectorRightShiftVectorwise(ree, 48) << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();

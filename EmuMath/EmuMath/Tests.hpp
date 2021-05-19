@@ -36,7 +36,8 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i)
 		{
-			outData[i] = outData[i] + toAdd[i];
+			outData[i] = outData[i] + (toAdd[i] * static_cast<T>((rand() % (sizeof(T) * 8)) + 1));
+			//outData[i] = EmuMath::Helpers::VectorRightShiftVectorwise(outData[i], (rand() % (sizeof(T) * 8)) + 1);
 		}
 		std::vector<EmuMath::Vector2<T>> outData;
 		std::vector<EmuMath::Vector2<ToAddT>> toAdd;
@@ -79,24 +80,47 @@ namespace EmuCore::TestingHelpers
 
 	void PerformTests()
 	{
-		constexpr std::size_t numTests = std::tuple_size_v<AllTests>;
-		const std::string testCorrectPlural = numTests == 1 ? "test" : "tests";
-		const std::string harnessCorrectPlural = numTests == 1 ? "harness" : "harnesses";
+		bool shouldRepeat = false;
+		do
+		{
+			constexpr std::size_t numTests = std::tuple_size_v<AllTests>;
+			const std::string testCorrectPlural = numTests == 1 ? "test" : "tests";
+			const std::string harnessCorrectPlural = numTests == 1 ? "harness" : "harnesses";
 
-		AllTests tests = AllTests();
-		std::cout << "\n-----Beginning preparation of " << numTests << " " << testCorrectPlural << "-----\n";
-		PrepareForTests(tests);
+			AllTests tests = AllTests();
+			std::cout << "\n-----Beginning preparation of " << numTests << " " << testCorrectPlural << "-----\n";
+			PrepareForTests(tests);
 
-		std::cout << "\n-----Beginning execution of " << numTests << " test " << harnessCorrectPlural << "-----\n";
-		auto begin = std::chrono::steady_clock::now();
-		ExecuteTests<0>(tests);
-		auto end = std::chrono::steady_clock::now();
+			std::cout << "\n-----Beginning execution of " << numTests << " test " << harnessCorrectPlural << "-----\n";
+			auto begin = std::chrono::steady_clock::now();
+			ExecuteTests<0>(tests);
+			auto end = std::chrono::steady_clock::now();
 
-		auto duration = std::chrono::duration<double>(end - begin).count();
-		std::cout << "\n-----Finished execution and output of " << numTests << " test " << harnessCorrectPlural << " in " << duration << " seconds-----\n";
-		system("pause");
-		OnAllTestsOver(tests);
-		system("pause");
+			auto duration = std::chrono::duration<double>(end - begin).count();
+			std::cout << "\n-----Finished execution and output of " << numTests << " test " << harnessCorrectPlural << " in " << duration << " seconds-----\n";
+
+			std::string str;
+			std::cout << "\n\nExecute additinal OnAllTestsOver branch? [Y - Yes]: ";
+			std::getline(std::cin, str);
+			if (str.size() != 0)
+			{
+				if (str[0] == 'y' || str[0] == 'Y')
+				{
+					OnAllTestsOver(tests);
+				}
+			}
+
+			std::cout << "\n\nRepeat all tests? [Y - Yes]: ";
+			std::getline(std::cin, str);
+			if (str.size() != 0)
+			{
+				shouldRepeat = str[0] == 'Y' || str[0] == 'y';
+			}
+			else
+			{
+				shouldRepeat = false;
+			}
+		} while (shouldRepeat);
 	}
 #pragma endregion
 }
