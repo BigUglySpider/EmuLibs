@@ -81,32 +81,34 @@ namespace EmuCore::TestingHelpers
 	void PerformTests()
 	{
 		bool shouldRepeat = false;
+		std::string str;
 		do
 		{
-			constexpr std::size_t numTests = std::tuple_size_v<AllTests>;
-			const std::string testCorrectPlural = numTests == 1 ? "test" : "tests";
-			const std::string harnessCorrectPlural = numTests == 1 ? "harness" : "harnesses";
-
-			AllTests tests = AllTests();
-			std::cout << "\n-----Beginning preparation of " << numTests << " " << testCorrectPlural << "-----\n";
-			PrepareForTests(tests);
-
-			std::cout << "\n-----Beginning execution of " << numTests << " test " << harnessCorrectPlural << "-----\n";
-			auto begin = std::chrono::steady_clock::now();
-			ExecuteTests<0>(tests);
-			auto end = std::chrono::steady_clock::now();
-
-			auto duration = std::chrono::duration<double>(end - begin).count();
-			std::cout << "\n-----Finished execution and output of " << numTests << " test " << harnessCorrectPlural << " in " << duration << " seconds-----\n";
-
-			std::string str;
-			std::cout << "\n\nExecute additinal OnAllTestsOver branch? [Y - Yes]: ";
-			std::getline(std::cin, str);
-			if (str.size() != 0)
 			{
-				if (str[0] == 'y' || str[0] == 'Y')
+				constexpr std::size_t numTests = std::tuple_size_v<AllTests>;
+				const std::string testCorrectPlural = numTests == 1 ? "test" : "tests";
+				const std::string harnessCorrectPlural = numTests == 1 ? "harness" : "harnesses";
+
+				AllTests tests = AllTests();
+				std::cout << "\n-----Beginning preparation of " << numTests << " " << testCorrectPlural << "-----\n";
+				PrepareForTests(tests);
+
+				std::cout << "\n-----Beginning execution of " << numTests << " test " << harnessCorrectPlural << "-----\n";
+				auto begin = std::chrono::steady_clock::now();
+				ExecuteTests<0>(tests);
+				auto end = std::chrono::steady_clock::now();
+
+				auto duration = std::chrono::duration<double>(end - begin).count();
+				std::cout << "\n-----Finished execution and output of " << numTests << " test " << harnessCorrectPlural << " in " << duration << " seconds-----\n";
+
+				std::cout << "\n\nExecute additinal OnAllTestsOver branch? [Y - Yes]: ";
+				std::getline(std::cin, str);
+				if (str.size() != 0)
 				{
-					OnAllTestsOver(tests);
+					if (str[0] == 'y' || str[0] == 'Y')
+					{
+						OnAllTestsOver(tests);
+					}
 				}
 			}
 
