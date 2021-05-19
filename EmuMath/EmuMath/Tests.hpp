@@ -9,6 +9,7 @@
 
 // ADDITIONAL INCLUDES
 #include "EmuMath/Vectors.h"
+#include <bitset>
 
 namespace EmuCore::TestingHelpers
 {
@@ -20,6 +21,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 5000000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = false;
 
 		TestA()
 		{
@@ -43,19 +45,122 @@ namespace EmuCore::TestingHelpers
 		std::vector<EmuMath::Vector2<ToAddT>> toAdd;
 	};
 
-	using AllTests = std::tuple<TestA<float>>;
+	template<typename T>
+	struct VectorwiseShiftTest
+	{
+		using Vec = EmuMath::Vector4<T>;
+		using CopyVec = EmuMath::TMPHelpers::emu_vector_copy_t<Vec>;
+
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_BITS_T = sizeof(T) * 8;
+		static constexpr std::size_t NUM_LOOPS = (Vec::size() * NUM_BITS_T) + 1;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+
+		using ScalarBits = std::bitset<NUM_BITS_T>;
+		using BitVec = EmuMath::TMPHelpers::emu_vector_from_size_t<Vec::size(), ScalarBits>;
+
+		VectorwiseShiftTest()
+		{
+		}
+
+		T _select_random() const
+		{
+			return static_cast<T>(rand() % std::numeric_limits<T>::max());
+		}
+		void Prepare()
+		{
+			vec.x = _select_random();
+			vec.y = _select_random();
+			if constexpr (Vec::size() >= 3)
+			{
+				vec.z = _select_random();
+				if constexpr (Vec::size() >= 4)
+				{
+					vec.w = _select_random();
+				}
+			}
+			vecBits = vec;
+			outLeftShift.resize(NUM_LOOPS);
+			outRightShift.resize(NUM_LOOPS);
+			outLeftBits.resize(NUM_LOOPS);
+			outRightBits.resize(NUM_LOOPS);
+		}
+		void operator()(std::size_t i)
+		{
+			outLeftShift[i] = EmuMath::Helpers::VectorLeftShiftVectorwise(vec, i);
+			//outRightShift[i] = EmuMath::Helpers::VectorRightShiftVectorwise(vec, i);
+
+			outLeftBits[i] = outLeftShift[i];
+			//outRightBits[i] = outRightShift[i];
+		}
+
+		Vec vec;
+		BitVec vecBits;
+		std::vector<CopyVec> outLeftShift;
+		std::vector<CopyVec> outRightShift;
+		std::vector<BitVec> outLeftBits;
+		std::vector<BitVec> outRightBits;
+	};
+
+	using AllTests = std::tuple<TestA<float>, VectorwiseShiftTest<std::int16_t>>;
 
 	void PrepareForTests(AllTests& outTests)
 	{
-		std::get<0>(outTests).Prepare();
+		auto& testZero = std::get<0>(outTests);
+		if (testZero.DO_TEST)
+		{
+			testZero.Prepare();
+		}
+
+		auto& testOne = std::get<1>(outTests);
+		if (testOne.DO_TEST)
+		{
+			testOne.Prepare();
+		}
 	}
 
 	void OnAllTestsOver(AllTests& tests)
 	{
-		std::cout << "\n\n\n\n-----DUMP-----";
-		for (auto& data_ : std::get<0>(tests).outData)
+		std::string inputStr;
+		if (std::get<0>(tests).DO_TEST)
 		{
-			std::cout << data_ << "\n";
+			std::cout << "Dump Test 0 output? [Y- Yes]: ";
+			std::getline(std::cin, inputStr);
+
+			if (inputStr.size() != 0)
+			{
+				if (inputStr[0] == 'Y' || inputStr[0] == 'y')
+				{
+					std::cout << "\n\n\n\n-----DUMP-----";
+					for (auto& data_ : std::get<0>(tests).outData)
+					{
+						std::cout << data_ << "\n";
+					}
+					std::cout << "-----END OF DUMP-----\n\n\n";
+				}
+			}
+			std::cout << "\n";
+		}
+
+		if (std::get<1>(tests).DO_TEST)
+		{
+			using _TestBT_ = std::tuple_element_t<1, AllTests>;
+			_TestBT_& _testB = std::get<1>(tests);
+			std::ostringstream str;
+			str << "Decimal:\n";
+			for (std::size_t i = 0; i < _TestBT_::NUM_LOOPS; ++i)
+			{
+				str << "Left Shift [" << i << "]: " << _testB.outLeftShift[i] << "\n";
+				str << "Right Shift [" << i << "]: " << _testB.outRightShift[i] << "\n\n";
+			}
+			str << "Binary:\n";
+			for (std::size_t i = 0; i < _TestBT_::NUM_LOOPS; ++i)
+			{
+				str << "Left Shift [" << i << "]:  " << _testB.outLeftBits[i] << "\n";
+				str << "Right Shift [" << i << "]: " << _testB.outRightBits[i] << "\n\n";
+			}
+			std::cout << str.str();
 		}
 	}
 
@@ -73,7 +178,14 @@ namespace EmuCore::TestingHelpers
 			Test& test = std::get<TestIndex>(tests);
 			LoopingTestHarness<Test> harness;
 			std::cout << "!!!Test " << TestIndex << " Results!!!\n";
-			std::cout << harness.ExecuteAndOutputAsString<Test::PASS_LOOP_NUM>(Test::NUM_LOOPS, test, test.WRITE_ALL_TIMES_TO_STREAM) << "\n\n";
+			if (test.DO_TEST)
+			{
+				std::cout << harness.ExecuteAndOutputAsString<Test::PASS_LOOP_NUM>(Test::NUM_LOOPS, test, test.WRITE_ALL_TIMES_TO_STREAM) << "\n\n";
+			}
+			else
+			{
+				std::cout << "Test skipped through DO_TEST member being false.\n\n";
+			}
 			ExecuteTests<TestIndex + 1, Tests_...>(tests);
 		}
 	}

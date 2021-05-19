@@ -413,7 +413,7 @@ namespace EmuMath::Helpers
 				{
 					return OutVector
 					(
-						tagetShifter(inVector.z, (numShifts - NumScalarBitsX2)),
+						leftShifter(inVector.z, (numShifts - NumScalarBitsX2)),
 						0,
 						0
 					);
@@ -427,6 +427,7 @@ namespace EmuMath::Helpers
 			{
 				constexpr std::size_t NumScalarBitsX3 = NumScalarBits * 3;
 				constexpr std::size_t NumScalarBitsX4 = NumScalarBits * 4;
+
 				if (numShifts < NumScalarBits)
 				{
 					const std::size_t neighbourShiftsRight = NumScalarBits - numShifts;
@@ -461,7 +462,7 @@ namespace EmuMath::Helpers
 						0,
 						0
 					);
-
+				
 				}
 				else if (numShifts < NumScalarBitsX4)
 				{

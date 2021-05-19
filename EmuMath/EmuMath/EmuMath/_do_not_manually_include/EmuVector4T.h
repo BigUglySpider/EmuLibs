@@ -335,7 +335,7 @@ namespace EmuMath
 
 #pragma region ASSIGNMENT_OPERATORS
 		template<typename OtherT>
-		constexpr Vector3<value_type>& operator=(const Vector4<OtherT>& rhs)
+		constexpr Vector4<value_type>& operator=(const Vector4<OtherT>& rhs)
 		{
 			if constexpr (std::is_same_v<nonref_value_type, typename Vector2<OtherT>::nonref_value_type>)
 			{
@@ -354,7 +354,7 @@ namespace EmuMath
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector3<value_type>& operator=(const Vector3<OtherT>& rhs)
+		constexpr Vector4<value_type>& operator=(const Vector3<OtherT>& rhs)
 		{
 			if constexpr (std::is_same_v<nonref_value_type, typename info_type_t<OtherT>::nonref_value_type>)
 			{
@@ -373,7 +373,7 @@ namespace EmuMath
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector3<value_type>& operator=(const Vector2<OtherT>& rhs)
+		constexpr Vector4<value_type>& operator=(const Vector2<OtherT>& rhs)
 		{
 			if constexpr (std::is_same_v<nonref_value_type, typename Vector2<OtherT>::nonref_value_type>)
 			{
