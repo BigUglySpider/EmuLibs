@@ -282,7 +282,7 @@ namespace EmuMath
 		/// <summary> Access the element of this vector at the provided index, where x is index 0 and w is index 3. </summary>
 		/// <returns>Reference to the element at the provided index.</returns>
 		template<std::size_t Index_>
-		ref_value_type at()
+		constexpr ref_value_type at()
 		{
 			if constexpr (Index_ == 0)
 			{
@@ -308,7 +308,7 @@ namespace EmuMath
 		/// <summary> Access the element of this vector at the provided index, where x is index 0 and w is index 3. </summary>
 		/// <returns>Constant reference to the element at the provided index.</returns>
 		template<std::size_t Index_>
-		const_ref_value_type at() const
+		constexpr const_ref_value_type at() const
 		{
 			if constexpr (Index_ == 0)
 			{

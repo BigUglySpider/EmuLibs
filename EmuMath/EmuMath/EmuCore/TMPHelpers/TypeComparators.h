@@ -206,6 +206,10 @@ namespace EmuCore::TMPHelpers
 	/// <summary> Boolean indicating if the passed type T is an instance of the template class ToFind_. </summary>
 	template<class T, template<class...> class ToFind_>
 	static constexpr bool is_instance_of_typeparams_only_v = is_instance_of_typeparams_only<T, ToFind_>::value;
+
+	/// <summary> The number of bits contained within the passed type T. </summary>
+	template<typename T>
+	static constexpr std::size_t bits_in_type_v = sizeof(T) * CHAR_BIT;
 }
 
 #endif

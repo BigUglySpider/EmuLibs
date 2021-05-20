@@ -511,34 +511,34 @@ namespace EmuMath
 		template<typename RhsVec, typename OutVector>
 		constexpr OutVector _perform_vector_and(const RhsVec& rhs) const
 		{
-			return this->_perform_vector_bitwise_op_emu<RhsVec, OutVector, EmuCore::TMPHelpers::logical_and_diff_types>(rhs);
+			return this->_perform_vector_bitwise_op_emu<RhsVec, OutVector, EmuCore::TMPHelpers::bitwise_and_diff_types>(rhs);
 		}
 		template<typename RhsT, typename OutVector>
 		constexpr OutVector _perform_scalar_and(const RhsT& rhs) const
 		{
-			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::logical_and_diff_types>(rhs);
+			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::bitwise_and_diff_types>(rhs);
 		}
 
 		template<typename RhsVec, typename OutVector>
 		constexpr OutVector _perform_vector_or(const RhsVec& rhs) const
 		{
-			return this->_perform_vector_bitwise_op_emu<RhsVec, OutVector, EmuCore::TMPHelpers::logical_or_diff_types>(rhs);
+			return this->_perform_vector_bitwise_op_emu<RhsVec, OutVector, EmuCore::TMPHelpers::bitwise_or_diff_types>(rhs);
 		}
 		template<typename RhsT, typename OutVector>
 		constexpr OutVector _perform_scalar_or(const RhsT& rhs) const
 		{
-			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::logical_or_diff_types>(rhs);
+			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::bitwise_or_diff_types>(rhs);
 		}
 
 		template<typename RhsVec, typename OutVector>
 		constexpr OutVector _perform_vector_xor(const RhsVec& rhs) const
 		{
-			return this->_perform_vector_bitwise_op_emu<RhsVec, OutVector, EmuCore::TMPHelpers::logical_xor_diff_types>(rhs);
+			return this->_perform_vector_bitwise_op_emu<RhsVec, OutVector, EmuCore::TMPHelpers::bitwise_xor_diff_types>(rhs);
 		}
 		template<typename RhsT, typename OutVector>
 		constexpr OutVector _perform_scalar_xor(const RhsT& rhs) const
 		{
-			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::logical_xor_diff_types>(rhs);
+			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::bitwise_xor_diff_types>(rhs);
 		}
 
 		template<typename RhsVec, typename OutVector>
@@ -561,45 +561,6 @@ namespace EmuMath
 		constexpr OutVector _perform_scalar_per_element_rightshift(const RhsT& numShifts) const
 		{
 			return this->_perform_scalar_bitwise_op_emu<RhsT, OutVector, EmuCore::TMPHelpers::bitwise_shift_right_diff_types>(numShifts);
-		}
-
-		template<typename OutVector>
-		constexpr OutVector _perform_inversion() const
-		{
-			using Func = EmuCore::TMPHelpers::bit_inversion_diff_types<nonref_value_type_without_qualifiers, typename OutVector::value_type>;
-			Func func = Func();
-			if constexpr (OutVector::size() == 2)
-			{
-				return OutVector
-				(
-					func(x),
-					func(y)
-				);
-			}
-			else if constexpr (OutVector::size() == 3)
-			{
-				return OutVector
-				(
-					func(x),
-					func(y),
-					func(z)
-				);
-			}
-			else if constexpr (OutVector::size() == 4)
-			{
-				const auto& zero_ = info_type::value_zero;
-				return OutVector
-				(
-					func(x),
-					func(y),
-					func(z),
-					func(zero_)
-				);
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a bit inversion on an EmuMath::Vector2 with an unsupported size of output Vector.");
-			}
 		}
 
 		template<std::size_t Size_, typename RhsVector>

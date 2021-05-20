@@ -351,6 +351,51 @@ namespace EmuMath::Helpers
 				static_assert(false, "Attempted to perform bitwise operation with EmuMath Vector and a scalar using an invalidly sized output Vector.");
 			}
 		}
+
+		template<class OutVector_, class InVector_>
+		inline constexpr OutVector_ _perform_vector_bitwise_not(const InVector_ in_)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<OutVector_>)
+			{
+				if constexpr (OutVector_::size() == 2)
+				{
+					return OutVector_
+					(
+						~(in_.x),
+						~(in_.y)
+					);
+				}
+				else if constexpr (OutVector_::size() == 3)
+				{
+					return OutVector_
+					(
+						~(in_.x),
+						~(in_.y),
+						~(EmuMath::TMPHelpers::emu_vector_z(in_))
+					);
+				}
+				else if constexpr (OutVector_::size() == 4)
+				{
+					return OutVector_
+					(
+						~(in_.x),
+						~(in_.y),
+						~(EmuMath::TMPHelpers::emu_vector_z(in_)),
+						~(EmuMath::TMPHelpers::emu_vector_w(in_))
+					);
+				}
+				else
+				{
+					static_assert(false, "Attempted to perform a bitwise not on an EmuMath Vector with an invalidly sized output Vector.");
+					return OutVector_();
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a bitwise not on an EmuMath Vector with a non-EmuMath-Vector output type.");
+				return OutVector_();
+			}
+		}
 #pragma endregion
 
 #pragma region VECTORWISE SHIFTS
@@ -359,7 +404,7 @@ namespace EmuMath::Helpers
 		{
 			using Scalar = typename OutVector::value_type;
 			constexpr std::size_t ScalarSize_ = sizeof(Scalar);
-			constexpr std::size_t NumScalarBits = ScalarSize_ * 8;
+			constexpr std::size_t NumScalarBits = ScalarSize_ * CHAR_BIT;
 			constexpr std::size_t NumScalarBitsX2 = NumScalarBits * 2;
 
 			LeftShifter_ leftShifter = LeftShifter_();
@@ -488,7 +533,7 @@ namespace EmuMath::Helpers
 		{
 			using Scalar = typename OutVector::value_type;
 			constexpr std::size_t ScalarSize_ = sizeof(Scalar);
-			constexpr std::size_t NumScalarBits = ScalarSize_ * 8;
+			constexpr std::size_t NumScalarBits = ScalarSize_ * CHAR_BIT;
 			constexpr std::size_t NumScalarBitsX2 = NumScalarBits * 2;
 
 			RightShifter_ mainShifter = RightShifter_();
@@ -638,7 +683,7 @@ namespace EmuMath::Helpers
 			{
 				using Scalar = typename OutVector::value_type;
 				constexpr std::size_t ScalarSize_ = sizeof(Scalar);
-				constexpr std::size_t NumScalarBits = ScalarSize_ * 8;
+				constexpr std::size_t NumScalarBits = ScalarSize_ * CHAR_BIT;
 				constexpr std::size_t NumScalarBitsX2 = NumScalarBits * 2;
 
 				if constexpr (std::is_unsigned_v<Scalar>)
@@ -802,11 +847,11 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Rhs>)
 			{
-				return _underlying_vector_funcs::_perform_vector_bitwise_op_vector_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::logical_and_diff_types>(lhs, rhs);
+				return _underlying_vector_funcs::_perform_vector_bitwise_op_vector_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::bitwise_and_diff_types>(lhs, rhs);
 			}
 			else
 			{
-				return _underlying_vector_funcs::_perform_vector_bitwise_op_scalar_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::logical_and_diff_types>(lhs, rhs);
+				return _underlying_vector_funcs::_perform_vector_bitwise_op_scalar_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::bitwise_and_diff_types>(lhs, rhs);
 			}
 		}
 		else
@@ -823,11 +868,11 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Rhs>)
 			{
-				return _underlying_vector_funcs::_perform_vector_bitwise_op_vector_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::logical_or_diff_types>(lhs, rhs);
+				return _underlying_vector_funcs::_perform_vector_bitwise_op_vector_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::bitwise_or_diff_types>(lhs, rhs);
 			}
 			else
 			{
-				return _underlying_vector_funcs::_perform_vector_bitwise_op_scalar_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::logical_or_diff_types>(lhs, rhs);
+				return _underlying_vector_funcs::_perform_vector_bitwise_op_scalar_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::bitwise_or_diff_types>(lhs, rhs);
 			}
 		}
 		else
@@ -844,11 +889,11 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Rhs>)
 			{
-				return _underlying_vector_funcs::_perform_vector_bitwise_op_vector_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::logical_xor_diff_types>(lhs, rhs);
+				return _underlying_vector_funcs::_perform_vector_bitwise_op_vector_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::bitwise_xor_diff_types>(lhs, rhs);
 			}
 			else
 			{
-				return _underlying_vector_funcs::_perform_vector_bitwise_op_scalar_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::logical_xor_diff_types>(lhs, rhs);
+				return _underlying_vector_funcs::_perform_vector_bitwise_op_scalar_rhs_emu<OutVector, LhsVector, Rhs, EmuCore::TMPHelpers::bitwise_xor_diff_types>(lhs, rhs);
 			}
 		}
 		else
@@ -901,7 +946,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<class EmuVector_>
-	inline typename EmuMath::TMPHelpers::emu_vector_copy<EmuVector_>::type VectorLeftShiftVectorwise(const EmuVector_& inVector, const std::size_t numShifts)
+	inline constexpr typename EmuMath::TMPHelpers::emu_vector_copy<EmuVector_>::type VectorLeftShiftVectorwise(const EmuVector_& inVector, const std::size_t numShifts)
 	{
 		using OutVector = EmuMath::TMPHelpers::emu_vector_copy_t<EmuVector_>;
 		if constexpr (!std::is_same_v<OutVector, std::false_type>)
@@ -941,6 +986,21 @@ namespace EmuMath::Helpers
 		{
 			static_assert(false, "Attempted to perform a vectorwise right-shift for EmuMath Vectors using a non-EmuMath-Vector type.");
 			return std::false_type();
+		}
+	}
+
+	template<std::size_t OutSize_, typename OutT, class InVector_>
+	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT>::type VectorBitwiseNot(const InVector_& in_)
+	{
+		using OutVector = typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT>::type;
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<InVector_>)
+		{
+			return _underlying_vector_funcs::_perform_vector_bitwise_not<OutVector, InVector_>(in_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a bitwise not on an EmuMath Vector with a non-EmuMath-Vector operand.");
+			return OutVector();
 		}
 	}
 
@@ -1565,6 +1625,294 @@ namespace EmuMath::Helpers
 	inline constexpr bool VectorComparisonLessEqual(const LhsVector_& lhs, const Rhs_& rhs)
 	{
 		return _perform_vector_magnitude_comparison_std<LhsVector_, Rhs_, std::less_equal<void>>(lhs, rhs);
+	}
+
+	template<class OutVector_, class InVector_, template<typename In__, typename Out__> class Rounder_>
+	inline OutVector_ _perform_vector_round_emu(const InVector_& in_)
+	{
+		using Rounder = Rounder_<InVector_, OutVector_>;
+		Rounder rounder = Rounder();
+		if constexpr (OutVector_::size() == 2)
+		{
+			return OutVector_
+			(
+				rounder(in_.x),
+				rounder(in_.y)
+			);
+		}
+		else if constexpr (OutVector_::size() == 3)
+		{
+			if constexpr (OutVector_::size() >= 3)
+			{
+				return OutVector_
+				(
+					rounder(in_.x),
+					rounder(in_.y),
+					rounder(in_.z)
+				);
+			}
+			else
+			{
+				using OutT = typename OutVector_::value_type;
+				return OutVector_
+				(
+					rounder(in_.x),
+					rounder(in_.y),
+					OutT()
+				);
+			}
+		}
+		else if constexpr (OutVector_::size() == 4)
+		{
+			using OutT = typename OutVector_::value_type;
+			if constexpr (OutVector_::size() >= 4)
+			{
+				return OutVector_
+				(
+					rounder(in_.x),
+					rounder(in_.y),
+					rounder(in_.z),
+					rounder(in_.w)
+				);
+			}
+			else if constexpr (OutVector_::size() >= 3)
+			{
+				return OutVector_
+				(
+					rounder(in_.x),
+					rounder(in_.y),
+					rounder(in_.z),
+					OutT()
+				);
+			}
+			else
+			{
+				using OutT = typename OutVector_::value_type;
+				const OutT zero_ = OutT();
+				return OutVector_
+				(
+					rounder(in_.x),
+					rounder(in_.y),
+					zero_,
+					zero_
+				);
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to round an EmuMath Vector with an invalidly sized output Vector.");
+		}
+	}
+
+	template<class OutVector_, class InVector_, template<typename In__, typename Out__> class Rounder_>
+	inline constexpr OutVector_ _perform_vector_constexpr_round_emu(const InVector_& in_)
+	{
+		using InScalar_ = typename InVector_::nonref_value_type_without_qualifiers;
+		using OutScalar_ = typename OutVector_::nonref_value_type_without_qualifiers;
+		using Rounder = Rounder_<InScalar_, OutScalar_>;
+		Rounder rounder = Rounder();
+		if constexpr (OutVector_::size() == 2)
+		{
+			return OutVector_
+			(
+				rounder.ConstexprRound(in_.x),
+				rounder.ConstexprRound(in_.y)
+			);
+		}
+		else if constexpr (OutVector_::size() == 3)
+		{
+			if constexpr (OutVector_::size() >= 3)
+			{
+				return OutVector_
+				(
+					rounder.ConstexprRound(in_.x),
+					rounder.ConstexprRound(in_.y),
+					rounder.ConstexprRound(in_.z)
+				);
+			}
+			else
+			{
+				return OutVector_
+				(
+					rounder.ConstexprRound(in_.x),
+					rounder.ConstexprRound(in_.y),
+					OutScalar_()
+				);
+			}
+		}
+		else if constexpr (OutVector_::size() == 4)
+		{
+			if constexpr (OutVector_::size() >= 4)
+			{
+				return OutVector_
+				(
+					rounder.ConstexprRound(in_.x),
+					rounder.ConstexprRound(in_.y),
+					rounder.ConstexprRound(in_.z),
+					rounder.ConstexprRound(in_.w)
+				);
+			}
+			else if constexpr (OutVector_::size() >= 3)
+			{
+				return OutVector_
+				(
+					rounder.ConstexprRound(in_.x),
+					rounder.ConstexprRound(in_.y),
+					rounder.ConstexprRound(in_.z),
+					OutScalar_()
+				);
+			}
+			else
+			{
+				const OutScalar_ zero_ = OutScalar_();
+				return OutVector_
+				(
+					rounder.ConstexprRound(in_.x),
+					rounder.ConstexprRound(in_.y),
+					zero_,
+					zero_
+				);
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to round an EmuMath Vector with an invalidly sized output Vector.");
+		}
+	}
+
+	template<std::size_t OutSize_, typename OutContainedT_, class InVector_>
+	inline typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutContainedT_>::type VectorCeil(const InVector_& in_)
+	{
+		using OutVector_ = typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutContainedT_>::type;
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<OutVector_>)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<InVector_>)
+			{
+				return _perform_vector_round_emu<OutVector_, InVector_, EmuCore::TMPHelpers::ceil_diff_types>(in_);
+			}
+			else
+			{
+				static_assert(false, "Provided a non-EmuMath Vector input type when attempted to perform a Vector Ceil.");
+				return OutVector_();
+			}
+		}
+		else
+		{
+			static_assert(false, "Provided an invalid output EmuMath Vector size when attempting to Ceil an EmuMath Vector.");
+			return OutVector_();
+		}
+	}
+	template<std::size_t OutSize_, typename OutContainedT_, class InVector_>
+	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutContainedT_>::type VectorCeilConstexpr(const InVector_& in_)
+	{
+		using OutVector_ = typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutContainedT_>::type;
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<OutVector_>)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<InVector_>)
+			{
+				return _perform_vector_constexpr_round_emu<OutVector_, InVector_, EmuCore::TMPHelpers::ceil_diff_types>(in_);
+			}
+			else
+			{
+				static_assert(false, "Provided a non-EmuMath Vector input type when attempted to perform a Vector Ceil.");
+				return OutVector_();
+			}
+		}
+		else
+		{
+			static_assert(false, "Provided an invalid output EmuMath Vector size when attempting to Ceil an EmuMath Vector.");
+			return OutVector_();
+		}
+	}
+
+	template<std::size_t OutSize_, typename OutContainedT_, class InVector_>
+	inline typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutContainedT_>::type VectorFloor(const InVector_& in_)
+	{
+		using OutVector_ = typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutContainedT_>::type;
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<OutVector_>)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<InVector_>)
+			{
+				return _perform_vector_round_emu<OutVector_, InVector_, EmuCore::TMPHelpers::floor_diff_types>(in_);
+			}
+			else
+			{
+				static_assert(false, "Provided a non-EmuMath Vector input type when attempted to perform a Vector Floor.");
+				return OutVector_();
+			}
+		}
+		else
+		{
+			static_assert(false, "Provided an invalid output EmuMath Vector size when attempting to Floor an EmuMath Vector.");
+			return OutVector_();
+		}
+	}
+	template<std::size_t OutSize_, typename OutContainedT_, class InVector_>
+	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutContainedT_>::type VectorFloorConstexpr(const InVector_& in_)
+	{
+		using OutVector_ = typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutContainedT_>::type;
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<OutVector_>)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<InVector_>)
+			{
+				return _perform_vector_constexpr_round_emu<OutVector_, InVector_, EmuCore::TMPHelpers::floor_diff_types>(in_);
+			}
+			else
+			{
+				static_assert(false, "Provided a non-EmuMath Vector input type when attempted to perform a Vector Floor.");
+				return OutVector_();
+			}
+		}
+		else
+		{
+			static_assert(false, "Provided an invalid output EmuMath Vector size when attempting to Floor an EmuMath Vector.");
+			return OutVector_();
+		}
+	}
+
+	template<std::size_t OutSize_, typename OutContainedT_, class InVector_>
+	inline typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutContainedT_>::type VectorTrunc(const InVector_& in_)
+	{
+		using OutVector_ = typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutContainedT_>::type;
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<OutVector_>)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<InVector_>)
+			{
+				return _perform_vector_round_emu<OutVector_, InVector_, EmuCore::TMPHelpers::trunc_diff_types>(in_);
+			}
+			else
+			{
+				static_assert(false, "Provided a non-EmuMath Vector input type when attempted to perform a Vector Floor.");
+				return OutVector_();
+			}
+		}
+		else
+		{
+			static_assert(false, "Provided an invalid output EmuMath Vector size when attempting to Floor an EmuMath Vector.");
+			return OutVector_();
+		}
+	}
+	template<std::size_t OutSize_, typename OutContainedT_, class InVector_>
+	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutContainedT_>::type VectorTruncConstexpr(const InVector_& in_)
+	{
+		using OutVector_ = typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutContainedT_>::type;
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<OutVector_>)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<InVector_>)
+			{
+				return _perform_vector_constexpr_round_emu<OutVector_, InVector_, EmuCore::TMPHelpers::trunc_diff_types>(in_);
+			}
+			else
+			{
+				static_assert(false, "Provided a non-EmuMath Vector input type when attempted to perform a Vector Floor.");
+				return OutVector_();
+			}
+		}
+		else
+		{
+			static_assert(false, "Provided an invalid output EmuMath Vector size when attempting to Floor an EmuMath Vector.");
+			return OutVector_();
+		}
 	}
 }
 

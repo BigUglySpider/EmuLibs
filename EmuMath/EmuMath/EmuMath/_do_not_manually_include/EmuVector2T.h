@@ -277,7 +277,7 @@ namespace EmuMath
 		}
 		constexpr Vector2<nonref_value_type> operator-() const
 		{
-			return this->AsReversed();
+			return this->Reverse();
 		}
 
 		template<typename RhsT>
@@ -303,107 +303,108 @@ namespace EmuMath
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator&(const Vector2<OtherT>& rhs) const
 		{
-			return this->AsBitwiseAnded<size(), nonref_value_type, OtherT>(rhs);
+			return this->And<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator&(const Vector3<OtherT>& rhs) const
 		{
-			return this->AsBitwiseAnded<size(), nonref_value_type, OtherT>(rhs);
+			return this->And<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator&(const Vector4<OtherT>& rhs) const
 		{
-			return this->AsBitwiseAnded<size(), nonref_value_type, OtherT>(rhs);
+			return this->And<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename RhsT>
 		constexpr Vector2<nonref_value_type> operator&(const RhsT& rhs) const
 		{
-			return this->AsBitwiseAnded<size(), nonref_value_type, RhsT>(rhs);
+			return this->And<size(), nonref_value_type, RhsT>(rhs);
 		}
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator|(const Vector2<OtherT>& rhs) const
 		{
-			return this->AsBitwiseOred<size(), nonref_value_type, OtherT>(rhs);
+			return this->Or<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator|(const Vector3<OtherT>& rhs) const
 		{
-			return this->AsBitwiseOred<size(), nonref_value_type, OtherT>(rhs);
+			return this->Or<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator|(const Vector4<OtherT>& rhs) const
 		{
-			return this->AsBitwiseOred<size(), nonref_value_type, OtherT>(rhs);
+			return this->Or<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename RhsT>
 		constexpr Vector2<nonref_value_type> operator|(const RhsT& rhs) const
 		{
-			return this->AsBitwiseOred<size(), nonref_value_type, RhsT>(rhs);
+			return this->Or<size(), nonref_value_type, RhsT>(rhs);
 		}
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator^(const Vector2<OtherT>& rhs) const
 		{
-			return this->AsBitwiseXored<size(), nonref_value_type, OtherT>(rhs);
+			return this->Xor<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator^(const Vector3<OtherT>& rhs) const
 		{
-			return this->AsBitwiseXored<size(), nonref_value_type, OtherT>(rhs);
+			return this->Xor<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator^(const Vector4<OtherT>& rhs) const
 		{
-			return this->AsBitwiseXored<size(), nonref_value_type, OtherT>(rhs);
+			return this->Xor<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename RhsT>
 		constexpr Vector2<nonref_value_type> operator^(const RhsT& rhs) const
 		{
-			return this->AsBitwiseXored<size(), nonref_value_type, RhsT>(rhs);
+			return this->Xor<size(), nonref_value_type, RhsT>(rhs);
 		}
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator<<(const Vector2<OtherT>& rhs) const
 		{
-			return this->AsLeftShiftedPerElement<size(), nonref_value_type, OtherT>(rhs);
+			return this->LeftShiftPerElement<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator<<(const Vector3<OtherT>& rhs) const
 		{
-			return this->AsLeftShiftedPerElement<size(), nonref_value_type, OtherT>(rhs);
+			return this->LeftShiftPerElement<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator<<(const Vector4<OtherT>& rhs) const
 		{
-			return this->AsLeftShiftedPerElement<size(), nonref_value_type, OtherT>(rhs);
+			return this->LeftShiftPerElement<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename RhsT>
 		constexpr Vector2<nonref_value_type> operator<<(const RhsT& rhs) const
 		{
-			return this->AsLeftShiftedPerElement<size(), nonref_value_type, RhsT>(rhs);
+			return this->LeftShiftPerElement<size(), nonref_value_type, RhsT>(rhs);
 		}
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator>>(const Vector2<OtherT>& rhs) const
 		{
-			return this->AsRightShiftedPerElement<size(), nonref_value_type, OtherT>(rhs);
+			return this->RightShiftPerElement<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator>>(const Vector3<OtherT>& rhs) const
 		{
-			return this->AsRightShiftedPerElement<size(), nonref_value_type, OtherT>(rhs);
+			return this->RightShiftPerElement<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
 		constexpr Vector2<nonref_value_type> operator>>(const Vector4<OtherT>& rhs) const
 		{
-			return this->AsRightShiftedPerElement<size(), nonref_value_type, OtherT>(rhs);
+			return this->RightShiftPerElement<size(), nonref_value_type, OtherT>(rhs);
 		}
 		template<typename RhsT>
 		constexpr Vector2<nonref_value_type> operator>>(const RhsT& rhs) const
 		{
-			return this->AsRightShiftedPerElement<size(), nonref_value_type, RhsT>(rhs);
+			return this->RightShiftPerElement<size(), nonref_value_type, RhsT>(rhs);
 		}
 		constexpr Vector2<nonref_value_type> operator~() const
 		{
-			return this->AsNot<size(), nonref_value_type>();
+			return this->Not();
 		}
+
 #pragma endregion
 
 #pragma region ARITHMETIC_NONCONST_OPERATORS
@@ -754,51 +755,51 @@ namespace EmuMath
 
 #pragma region ARITHMETIC_TEMPLATES
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsAdded(const Vector2<RhsT>& rhs) const
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> Plus(const Vector2<RhsT>& rhs) const
 		{
 			return EmuMath::Helpers::VectorAddition<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(*this, rhs);
 		}
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsAdded(const Vector3<RhsT>& rhs) const
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> Plus(const Vector3<RhsT>& rhs) const
 		{
 			return EmuMath::Helpers::VectorAddition<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(*this, rhs);
 		}
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsAdded(const Vector4<RhsT>& rhs) const
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> Plus(const Vector4<RhsT>& rhs) const
 		{
 			return EmuMath::Helpers::VectorAddition<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(*this, rhs);
 		}
 
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsSubtracted(const Vector2<RhsT>& rhs) const
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> Minus(const Vector2<RhsT>& rhs) const
 		{
 			return EmuMath::Helpers::VectorSubtraction<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(*this, rhs);
 		}
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsSubtracted(const Vector3<RhsT>& rhs) const
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> Minus(const Vector3<RhsT>& rhs) const
 		{
 			return EmuMath::Helpers::VectorSubtraction<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(*this, rhs);
 		}
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsSubtracted(const Vector4<RhsT>& rhs) const
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> Minus(const Vector4<RhsT>& rhs) const
 		{
 			return EmuMath::Helpers::VectorSubtraction<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(*this, rhs);
 		}
 
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMultiplied(const RhsT& rhs) const
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> Mult(const RhsT& rhs) const
 		{
 			return EmuMath::Helpers::VectorMultiplication<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(*this, rhs);
 		}
 
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsDivided(const RhsT& rhs) const
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> Div(const RhsT& rhs) const
 		{
 			return EmuMath::Helpers::VectorDivision<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(*this, rhs);
 		}
 
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsMod(const RhsT& rhs) const
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> Mod(const RhsT& rhs) const
 		{
 			return EmuMath::Helpers::VectorMod<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>(*this, rhs);
 		}
@@ -820,7 +821,7 @@ namespace EmuMath
 		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
 		/// </returns>
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseAnded(const RhsT& rhs) const
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> And(const RhsT& rhs) const
 		{
 			using OutVector = EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>;
 			return EmuMath::Helpers::VectorBitwiseAnd<OutVector>(*this, rhs);
@@ -841,7 +842,7 @@ namespace EmuMath
 		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
 		/// </returns>
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseOred(const RhsT& rhs) const
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> Or(const RhsT& rhs) const
 		{
 			using OutVector = EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>;
 			return EmuMath::Helpers::VectorBitwiseOr<OutVector>(*this, rhs);
@@ -862,7 +863,7 @@ namespace EmuMath
 		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
 		/// </returns>
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsBitwiseXored(const RhsT& rhs) const
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> Xor(const RhsT& rhs) const
 		{
 			using OutVector = EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>;
 			return EmuMath::Helpers::VectorBitwiseXor<OutVector>(*this, rhs);
@@ -883,7 +884,7 @@ namespace EmuMath
 		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
 		/// </returns>
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsLeftShiftedPerElement(const RhsT& numShifts) const
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> LeftShiftPerElement(const RhsT& numShifts) const
 		{
 			using OutVector = EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>;
 			return EmuMath::Helpers::VectorLeftShiftPerElement<OutVector>(*this, numShifts);
@@ -904,7 +905,7 @@ namespace EmuMath
 		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
 		/// </returns>
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type, typename RhsT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsRightShiftedPerElement(const RhsT& numShifts) const
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> RightShiftPerElement(const RhsT& numShifts) const
 		{
 			using OutVector = EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>;
 			return EmuMath::Helpers::VectorRightShiftPerElement<OutVector>(*this, numShifts);
@@ -916,7 +917,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="numShifts">Number of times to shift this Vector's bits to the left.</param>
 		/// <returns>Copy of this Vector with its elements' bits shifted to the left the provided number of times.</returns>
-		constexpr copy_vector AsLeftShiftedVectorwise(const std::size_t numShifts) const
+		constexpr copy_vector LeftShiftVectorwise(const std::size_t numShifts) const
 		{
 			return EmuMath::Helpers::VectorLeftShiftVectorwise(*this, numShifts);
 		}
@@ -927,24 +928,15 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="numShifts">Number of times to shift this Vector's bits to the left.</param>
 		/// <returns>Copy of this Vector with its elements' bits shifted to the left the provided number of times.</returns>
-		constexpr copy_vector AsRightShiftedVectorwise(const std::size_t numShifts) const
+		constexpr copy_vector RightShiftVectorwise(const std::size_t numShifts) const
 		{
 			return EmuMath::Helpers::VectorRightShiftVectorwise(*this, numShifts);
 		}
 
-		/// <summary>
-		/// <para> Inverts the bits of the elements within this Vector and returns them as a Vector of customisable size with customisable types. </para>
-		/// <para> The default output Vector size is the same as this Vector, and the contained type is the nonref_value_type of this Vector. </para>
-		/// </summary>
-		/// <typeparam name="OutT">Type contained in the output Vector.</typeparam>
-		/// <returns>
-		///		Vector of the provided size (defaulting to this Vector's size) containing the results of a bitwise inversion on this Vector's elements, 
-		///		contained as the provided OutT (defaulting to this Vector's nonref_value_type).
-		/// </returns>
-		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type>
-		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT> AsNot() const
+		template<std::size_t OutSize_ = size(), typename OutContainedT = nonref_value_type>
+		constexpr EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutContainedT> Not() const
 		{
-			return this->_perform_inversion<EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, OutT>>();
+			return EmuMath::Helpers::VectorBitwiseNot<OutSize_, OutContainedT>(*this);
 		}
 #pragma endregion
 
@@ -956,21 +948,21 @@ namespace EmuMath
 		/// <summary> Returns a Vector4 with elements X, Y, Z and W copying the elements at the respective provided indices within this Vector. </summary>
 		/// <returns>This vector shuffled as a Vector4.</returns>
 		template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_, typename OutT = nonref_value_type>
-		constexpr Vector4<OutT> AsShuffled() const
+		constexpr Vector4<OutT> Shuffle() const
 		{
 			return Vector4<OutT>(at<X_>(), at<Y_>(), at<Z_>(), at<W_>());
 		}
 		/// <summary> Returns a Vector3 with elements X, Y and Z copying the elements at the respective provided indices within this Vector. </summary>
 		/// <returns>This vector shuffled as a Vector3.</returns>
 		template<std::size_t X_, std::size_t Y_, std::size_t Z_, typename OutT = nonref_value_type>
-		constexpr Vector3<OutT> AsShuffled() const
+		constexpr Vector3<OutT> Shuffle() const
 		{
 			return Vector3<OutT>(at<X_>(), at<Y_>(), at<Z_>());
 		}
 		/// <summary> Returns a Vector2 with elements X and Y copying the elements at the respective provided indices within this Vector. </summary>
 		/// <returns>This vector shuffled as a Vector2.</returns>
 		template<std::size_t X_, std::size_t Y_, typename OutT = nonref_value_type>
-		constexpr Vector2<OutT> AsShuffled() const
+		constexpr Vector2<OutT> Shuffle() const
 		{
 			return Vector2<OutT>(at<X_>(), at<Y_>());
 		}
@@ -980,7 +972,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>This Vector shuffled as a Vector4.</returns>
 		template<typename OutT = nonref_value_type>
-		Vector4<OutT> AsShuffled(const std::size_t x_, const std::size_t y_, const std::size_t z_, const std::size_t w_) const
+		Vector4<OutT> Shuffle(const std::size_t x_, const std::size_t y_, const std::size_t z_, const std::size_t w_) const
 		{
 			return Vector4<OutT>(at(x_), at(y_), at(z_), at(w_));
 		}
@@ -990,7 +982,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>This Vector shuffled as a Vector3.</returns>
 		template<typename OutT = nonref_value_type>
-		Vector3<OutT> AsShuffled(const std::size_t x_, const std::size_t y_, const std::size_t z_) const
+		Vector3<OutT> Shuffle(const std::size_t x_, const std::size_t y_, const std::size_t z_) const
 		{
 			return Vector3<OutT>(at(x_), at(y_), at(z_));
 		}
@@ -1000,7 +992,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>This Vector shuffled as a Vector2.</returns>
 		template<typename OutT = nonref_value_type>
-		Vector2<OutT> AsShuffled(const std::size_t x_, const std::size_t y_) const
+		Vector2<OutT> Shuffle(const std::size_t x_, const std::size_t y_) const
 		{
 			return Vector2<OutT>(at(x_), at(y_));
 		}
@@ -1175,85 +1167,42 @@ namespace EmuMath
 		}
 		/// <summary> Calculates the values of this Vector's elements when rounded toward negative infinity. </summary>
 		/// <returns>Copy of this Vector with its elements rounded toward negative infinity.</returns>
-		Vector2<nonref_value_type> AsFloored() const
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type>
+		Vector2<nonref_value_type> Floor() const
 		{
-			if constexpr (info_type::has_integral_values)
-			{
-				return { x, y };
-			}
-			else if constexpr(info_type::has_floating_point_values)
-			{
-				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, float>)
-				{
-					return { floorf(x), floorf(y) };
-				}
-				else if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, double>)
-				{
-					return { floor(x), floor(y) };
-				}
-				else
-				{
-					return { floorl(x), floorl(y) };
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
-			}
+			return EmuMath::Helpers::VectorFloor<OutSize_, OutT>(*this);
 		}
 		/// <summary> Calculates the values of this Vector's elements when rounded toward positive infinity. </summary>
 		/// <returns>Copy of this Vector with its elements rounded toward positive infinity.</returns>
-		Vector2<nonref_value_type> AsCeiled() const
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type>
+		Vector2<nonref_value_type> Ceil() const
 		{
-			if constexpr (info_type::has_integral_values)
-			{
-				return { x, y };
-			}
-			else if constexpr (info_type::has_floating_point_values)
-			{
-				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, float>)
-				{
-					return { ceilf(x), ceilf(y) };
-				}
-				else if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, double>)
-				{
-					return { ceil(x), ceil(y) };
-				}
-				else
-				{
-					return { ceill(x), ceill(y) };
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
-				return *this;
-			}
+			return EmuMath::Helpers::VectorCeil<OutSize_, OutT>(*this);
 		}
 		/// <summary> Calculates the values of this Vector's elements when rounded toward 0. </summary>
 		/// <returns>Copy of this Vector with its elements rounded toward 0.</returns>
-		constexpr Vector2<nonref_value_type> AsTrunced() const
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type>
+		Vector2<nonref_value_type> Trunc() const
 		{
-			if constexpr (info_type::has_integral_values)
-			{
-				return { x, y };
-			}
-			else if constexpr (info_type::has_floating_point_values)
-			{
-				// Faster to do a double cast than call trunc functions
-				using IntRep = EmuCore::TMPHelpers::best_signed_int_rep_t<nonref_value_type_without_qualifiers>;
-				return
-				{
-					static_cast<nonref_value_type>(static_cast<IntRep>(x)),
-					static_cast<nonref_value_type>(static_cast<IntRep>(y))
-				};
-			}
-			else
-			{
-				static_assert(false, "Attempted to floor an EmuMath::Vector2 which contains a type which may not be arbitrarily rounded.");
-				return *this;
-			}
+			return EmuMath::Helpers::VectorTrunc<OutSize_, OutT>(*this);
 		}
+
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type>
+		constexpr Vector2<nonref_value_type> FloorConstexpr() const
+		{
+			return EmuMath::Helpers::VectorFloorConstexpr<OutSize_, OutT>(*this);
+		}
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type>
+		constexpr Vector2<nonref_value_type> CeilConstexpr() const
+		{
+			return EmuMath::Helpers::VectorCeilConstexpr<OutSize_, OutT>(*this);
+		}
+		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type>
+		constexpr Vector2<nonref_value_type> TruncConstexpr() const
+		{
+			return EmuMath::Helpers::VectorTruncConstexpr<OutSize_, OutT>(*this);
+		}
+
 		/// <summary>
 		/// <para> Returns a Vector resulting from a linear interpolation between this Vector and Vector b, using t as the weighting. </para>
 		/// <para> The output Vector's contained types may be optionally customised, and default to this Vector's default_floating_point. </para>
@@ -1500,7 +1449,7 @@ namespace EmuMath
 		/// <typeparam name="OutT">Type for the returned Vector to contain. Defaults to this Vector's nonref_value_type.</typeparam>
 		/// <returns>Reversed version of this Vector.</returns>
 		template<typename OutT = nonref_value_type>
-		constexpr Vector2<OutT> AsReversed() const
+		constexpr Vector2<OutT> Reverse() const
 		{
 			if constexpr (std::is_signed_v<nonref_value_type>)
 			{
@@ -1531,45 +1480,6 @@ namespace EmuMath
 			else
 			{
 				at<Index>() = static_cast<nonref_value_type>(val_);
-			}
-		}
-
-		template<typename OutVector>
-		constexpr OutVector _perform_inversion() const
-		{
-			using Func = EmuCore::TMPHelpers::bit_inversion_diff_types<nonref_value_type_without_qualifiers, typename OutVector::value_type>;
-			Func func = Func();
-			if constexpr (OutVector::size() == 2)
-			{
-				return OutVector
-				(
-					func(x),
-					func(y)
-				);
-			}
-			else if constexpr (OutVector::size() == 3)
-			{
-				return OutVector
-				(
-					func(x),
-					func(y),
-					func(info_type::value_zero)
-				);
-			}
-			else if constexpr (OutVector::size() == 4)
-			{
-				const auto& zero_ = info_type::value_zero;
-				return OutVector
-				(
-					func(x),
-					func(y),
-					func(zero_),
-					func(zero_)
-				);
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a bit inversion on an EmuMath::Vector2 with an unsupported size of output Vector.");
 			}
 		}
 #pragma endregion

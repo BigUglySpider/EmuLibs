@@ -3,6 +3,7 @@
 
 #include "TypeComparators.h"
 #include "TypeConvertors.h"
+#include <functional>
 #include <type_traits>
 
 namespace EmuCore::TMPHelpers
@@ -195,12 +196,12 @@ namespace EmuCore::TMPHelpers
 		}
 	};
 
-	/// <summary> Common info used by logical (non-shifting) bitwise functors. </summary>
+	/// <summary> Common info used by bitwise (non-shifting) bitwise functors. </summary>
 	/// <typeparam name="Lhs_">Left-handed argument type in the bitwise operation.</typeparam>
 	/// <typeparam name="Rhs_">Right-handed argument type in the bitwise operation.</typeparam>
 	/// <typeparam name="Out_">Type to output the result as. Defaults to the same as Lhs_.</typeparam>
 	template<typename Lhs_, typename Rhs_, typename Out_ = Lhs_>
-	struct _common_logical_functor_info
+	struct _common_bitwise_functor_info
 	{
 		static constexpr bool any_fp = EmuCore::TMPHelpers::is_any_floating_point_v<Lhs_, Rhs_, Out_>;
 		static constexpr bool lhs_rhs_same = std::is_same_v<Lhs_, Rhs_>;
@@ -331,14 +332,14 @@ namespace EmuCore::TMPHelpers
 		>
 	>;
 
-	/// <summary> Functor for performing a logical AND via the &amp; operator taking two possibly different types, with an optionally customisable output type. </summary>
+	/// <summary> Functor for performing a bitwise AND via the &amp; operator taking two possibly different types, with an optionally customisable output type. </summary>
 	/// <typeparam name="Lhs_">Left-handed argument type in the AND operation.</typeparam>
 	/// <typeparam name="Rhs_">Right-handed argument type in the AND operation.</typeparam>
 	/// <typeparam name="Out_">Type to output the result as. Defaults to the same as Lhs_.</typeparam>
 	template<typename Lhs_, typename Rhs_, typename Out_ = Lhs_>
-	struct logical_and_diff_types
+	struct bitwise_and_diff_types
 	{
-		using _info_type = _common_logical_functor_info<Lhs_, Rhs_, Out_>;
+		using _info_type = _common_bitwise_functor_info<Lhs_, Rhs_, Out_>;
 
 		Out_ operator()(const Lhs_& lhs, const Rhs_& rhs) const
 		{
@@ -364,14 +365,14 @@ namespace EmuCore::TMPHelpers
 			}
 		}
 	};
-	/// <summary> Functor for performing a logical OR via the | operator taking two possibly different types, with an optionally customisable output type. </summary>
+	/// <summary> Functor for performing a bitwise OR via the | operator taking two possibly different types, with an optionally customisable output type. </summary>
 	/// <typeparam name="Lhs_">Left-handed argument type in the OR operation.</typeparam>
 	/// <typeparam name="Rhs_">Right-handed argument type in the OR operation.</typeparam>
 	/// <typeparam name="Out_">Type to output the result as. Defaults to the same as Lhs_.</typeparam>
 	template<typename Lhs_, typename Rhs_, typename Out_ = Lhs_>
-	struct logical_or_diff_types
+	struct bitwise_or_diff_types
 	{
-		using _info_type = _common_logical_functor_info<Lhs_, Rhs_, Out_>;
+		using _info_type = _common_bitwise_functor_info<Lhs_, Rhs_, Out_>;
 
 		Out_ operator()(const Lhs_& lhs, const Rhs_& rhs) const
 		{
@@ -397,14 +398,14 @@ namespace EmuCore::TMPHelpers
 			}
 		}
 	};
-	/// <summary> Functor for performing a logical XOR via the ^ operator taking two possibly different types, with an optionally customisable output type. </summary>
+	/// <summary> Functor for performing a bitwise XOR via the ^ operator taking two possibly different types, with an optionally customisable output type. </summary>
 	/// <typeparam name="Lhs_">Left-handed argument type in the XOR operation.</typeparam>
 	/// <typeparam name="Rhs_">Right-handed argument type in the XOR operation.</typeparam>
 	/// <typeparam name="Out_">Type to output the result as. Defaults to the same as Lhs_.</typeparam>
 	template<typename Lhs_, typename Rhs_, typename Out_ = Lhs_>
-	struct logical_xor_diff_types
+	struct bitwise_xor_diff_types
 	{
-		using _info_type = _common_logical_functor_info<Lhs_, Rhs_, Out_>;
+		using _info_type = _common_bitwise_functor_info<Lhs_, Rhs_, Out_>;
 
 		Out_ operator()(const Lhs_& lhs, const Rhs_& rhs) const
 		{
@@ -555,54 +556,6 @@ namespace EmuCore::TMPHelpers
 		}
 	};
 
-	template<std::size_t NumBytes_>
-	struct iterative_bit_inversion_on_byte_pointers
-	{
-		/// <summary> Type used to represent a byte. </summary>
-		using _byte = unsigned char;
-		/// <summary> Pointer to modifiable bytes. </summary>
-		using byte_ptr = _byte*;
-		/// <summary> Pointer to readonly bytes. </summary>
-		using const_byte_ptr = const _byte*;
-
-		constexpr void operator()(byte_ptr pOutBytes, const_byte_ptr pInBytes) const
-		{
-			if constexpr (NumBytes_ > 0)
-			{
-				constexpr std::size_t offset = NumBytes_ - 1;
-				*(pOutBytes + offset) = ~(*(pInBytes + offset));
-				iterative_bit_inversion_on_byte_pointers<offset>()(pOutBytes, pInBytes);
-			}
-		}
-	};
-	template<typename In_, typename Out_>
-	struct bit_inversion_diff_types
-	{
-		constexpr bit_inversion_diff_types()
-		{
-		}
-		constexpr Out_ operator()(const In_ in_) const
-		{
-			if constexpr (std::is_integral_v<In_> && std::is_same_v<In_, Out_>)
-			{
-				return ~in_;
-			}
-			else
-			{
-				Out_ out = EmuCore::ArithmeticHelpers::ZeroT<Out_>;
-				memcpy(&out, &in_, EmuCore::TMPHelpers::lowest_byte_size_v<In_, Out_>);
-
-				constexpr std::size_t OutSize_ = sizeof(Out_);
-				iterative_bit_inversion_on_byte_pointers<OutSize_>()
-				(
-					reinterpret_cast<typename iterative_bit_inversion_on_byte_pointers<OutSize_>::byte_ptr>(&out),
-					reinterpret_cast<typename iterative_bit_inversion_on_byte_pointers<OutSize_>::const_byte_ptr>(&out)
-				);
-				return out;
-			}
-		}
-	};
-
 	template<typename T>
 	struct reverse_bits
 	{
@@ -644,28 +597,33 @@ namespace EmuCore::TMPHelpers
 	template<typename T>
 	struct create_mask
 	{
-		static constexpr std::size_t NumBits_ = sizeof(T) * 8;
-		constexpr create_mask()
+	private:
+		template<std::size_t NumBits_>
+		static constexpr T _compile_time_mask_creation_iteration(T mask_)
 		{
-		}
-		constexpr T operator()(const std::size_t numBits) const
-		{
-			T out = T();
-			const T one_ = 1;
-			for (std::size_t i = 0, end = numBits <= NumBits_ ? numBits : NumBits_; i < end; ++i)
+			static_assert(NumBits_ <= (sizeof(T) * CHAR_BIT), "Requested the construction of a CompileTimeMask through create_mask<T> with more bits than in the type T.");
+			if constexpr (NumBits_ > 0)
 			{
-				out |= (one_ << i);
+				if constexpr (NumBits_ == 1)
+				{
+					return mask_ | 1;
+				}
+				else
+				{
+					constexpr std::size_t Offset_ = NumBits_ - 1;
+					return _compile_time_mask_creation_iteration<Offset_>(mask_ | (1 << Offset_));
+				}
 			}
-			return out;
+			else
+			{
+				return mask_;
+			}
 		}
-	};
 
-	template<typename T>
-	struct create_reverse_mask
-	{
-		static constexpr std::size_t NumBits_ = sizeof(T) * 8;
+	public:
+		static constexpr std::size_t NumBits_ = sizeof(T) * CHAR_BIT;
 		static constexpr std::size_t FinalBitOffset_ = NumBits_ - 1;
-		constexpr create_reverse_mask()
+		constexpr create_mask()
 		{
 		}
 		constexpr T operator()(const std::size_t numBits) const
@@ -676,6 +634,205 @@ namespace EmuCore::TMPHelpers
 				out |= (1 << (NumBits_ - i));
 			}
 			return out;
+		}
+
+		template<std::size_t NumBits_>
+		static constexpr T MaskN = _compile_time_mask_creation_iteration<NumBits_>(T());
+	};
+
+	/// <summary>
+	/// <para> Functor for performing truncation via the function operator(). Includes a constexpr variation for compile time rounding. </para>
+	/// <para> Truncation rounds a value toward zero. </para>
+	/// </summary>
+	/// <typeparam name="In_">Type being input for truncation.</typeparam>
+	/// <typeparam name="Out_">Type to output the truncated result as.</typeparam>
+	template<typename In_, typename Out_>
+	struct trunc_diff_types
+	{
+		constexpr trunc_diff_types()
+		{
+		}
+
+		Out_ operator()(const In_& in_) const
+		{
+			if constexpr (std::is_integral_v<In_>)
+			{
+				return static_cast<Out_>(in_);
+			}
+			else
+			{
+				using StrippedIn_ = std::remove_cv_t<In_>;
+				if constexpr (std::is_same_v<float, StrippedIn_>)
+				{
+					return static_cast<Out_>(truncf(in_));
+				}
+				else if constexpr (std::is_same_v<double, StrippedIn_>)
+				{
+					return static_cast<Out_>(trunc(in_));
+				}
+				else if constexpr (std::is_same_v<long double, StrippedIn_>)
+				{
+					return static_cast<Out_>(truncl(in_));
+				}
+				else
+				{
+					// Unknown type response
+					return static_cast<Out_>(trunc(in_));
+				}
+			}
+		}
+
+		/// <summary> Constexpr variation of this rounding function. Note that this may have some inaccuracies in comparison to operator(). </summary>
+		/// <param name="in_">Value to round.</param>
+		/// <returns>The passed value rounded without use of the standard rounding functions.</returns>
+		static constexpr Out_ ConstexprRound(const In_& in_)
+		{
+			if constexpr (std::is_integral_v<In_>)
+			{
+				// No need to round since already an integer
+				return static_cast<Out_>(in_);
+			}
+			else
+			{
+				// Cast to an integer to truncate (faster than standard trunc funcs).
+				using BestIntCast_ = EmuCore::TMPHelpers::best_int_rep_t<In_>;
+				if constexpr (std::is_same_v<Out_, BestIntCast_>)
+				{
+					return static_cast<Out_>(in_);
+				}
+				else
+				{
+					return static_cast<Out_>(static_cast<BestIntCast_>(in_));
+				}
+			}
+		}
+	};
+
+	/// <summary>
+	/// <para> Functor for performing flooring via the function operator(). Includes a constexpr variation for compile time rounding. </para>
+	/// <para> Flooring rounds a value toward negative infinity. </para>
+	/// </summary>
+	/// <typeparam name="In_">Type being input for flooring.</typeparam>
+	/// <typeparam name="Out_">Type to output the floored result as.</typeparam>
+	template<typename In_, typename Out_>
+	struct floor_diff_types
+	{
+		constexpr floor_diff_types()
+		{
+		}
+
+		Out_ operator()(const In_& in_) const
+		{
+			if constexpr (std::is_integral_v<In_>)
+			{
+				return static_cast<Out_>(in_);
+			}
+			else
+			{
+				using StrippedIn_ = std::remove_cv_t<In_>;
+				if constexpr (std::is_same_v<float, StrippedIn_>)
+				{
+					return static_cast<Out_>(floorf(in_));
+				}
+				else if constexpr (std::is_same_v<double, StrippedIn_>)
+				{
+					return static_cast<Out_>(floor(in_));
+				}
+				else if constexpr (std::is_same_v<long double, StrippedIn_>)
+				{
+					return static_cast<Out_>(floorl(in_));
+				}
+				else
+				{
+					// Unknown type response
+					return static_cast<Out_>(floor(in_));
+				}
+			}
+		}
+
+		/// <summary> Constexpr variation of this rounding function. Note that this may have some inaccuracies in comparison to operator(). </summary>
+		/// <param name="in_">Value to round.</param>
+		/// <returns>The passed value rounded without use of the standard rounding functions.</returns>
+		static constexpr Out_ ConstexprRound(const In_ in_)
+		{
+			if constexpr (std::is_integral_v<In_>)
+			{
+				// No need to round since already an integer
+				return static_cast<Out_>(in_);
+			}
+			else
+			{
+				using BestIntCast_ = EmuCore::TMPHelpers::best_int_rep_t<In_>;
+				const BestIntCast_ cast_in_ = static_cast<BestIntCast_>(in_);
+				
+				// Cast truncation is enough to floor when positive.
+				// When negative, the truncation will give a ceil value instead, so subtract 1 if it ends up greater (if equal, already rounded).
+				return static_cast<Out_>(cast_in_ - (cast_in_ > in_));
+			}
+		}
+	};
+
+	/// <summary>
+	/// <para> Functor for performing ceiling via the function operator(). Includes a constexpr variation for compile time rounding. </para>
+	/// <para> Flooring rounds a value toward positive infinity. </para>
+	/// </summary>
+	/// <typeparam name="In_">Type being input for ceiling.</typeparam>
+	/// <typeparam name="Out_">Type to output the ceiled result as.</typeparam>
+	template<typename In_, typename Out_>
+	struct ceil_diff_types
+	{
+		constexpr ceil_diff_types()
+		{
+		}
+
+		Out_ operator()(const In_& in_) const
+		{
+			if constexpr (std::is_integral_v<In_>)
+			{
+				return static_cast<Out_>(in_);
+			}
+			else
+			{
+				using StrippedIn_ = std::remove_cv_t<In_>;
+				if constexpr (std::is_same_v<float, StrippedIn_>)
+				{
+					return static_cast<Out_>(ceilf(in_));
+				}
+				else if constexpr (std::is_same_v<double, StrippedIn_>)
+				{
+					return static_cast<Out_>(ceil(in_));
+				}
+				else if constexpr (std::is_same_v<long double, StrippedIn_>)
+				{
+					return static_cast<Out_>(ceill(in_));
+				}
+				else
+				{
+					// Unknown type response
+					return static_cast<Out_>(ceil(in_));
+				}
+			}
+		}
+
+		/// <summary> Constexpr variation of this rounding function. Note that this may have some inaccuracies in comparison to operator(). </summary>
+		/// <param name="in_">Value to round.</param>
+		/// <returns>The passed value rounded without use of the standard rounding functions.</returns>
+		static constexpr Out_ ConstexprRound(const In_& in_)
+		{
+			if constexpr (std::is_integral_v<In_>)
+			{
+				// No need to round since already an integer
+				return static_cast<Out_>(in_);
+			}
+			else
+			{
+				using BestIntCast_ = EmuCore::TMPHelpers::best_int_rep_t<In_>;
+				const BestIntCast_ cast_in_ = static_cast<BestIntCast_>(in_);
+
+				// Cast truncation is enough to ceil when negative.
+				// When positive, the truncation will give a floor value instead, so add 1 if it ends up less (if equal, already rounded).
+				return static_cast<Out_>(cast_in_ + (cast_in_ < in_));
+			}
 		}
 	};
 }
