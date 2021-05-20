@@ -42,6 +42,13 @@ int main()
 
 	constexpr Vector2<float> v4f_ywv2_ceil = V4f.AsShuffled<1, 3>().CeilConstexpr();
 
+	constexpr float V4f_V4fyw2_dot = EmuMath::Helpers::VectorDotProduct<float>(V4f, v4f_ywv2_ceil);
+
+	constexpr float min_v4f = EmuMath::Helpers::VectorMin<float>(V4f);
+	constexpr float max_v4f = EmuMath::Helpers::VectorMax<float>(V4f);
+	constexpr float min_v4fyw2 = v4f_ywv2_ceil.Min();
+	constexpr float max_v4fyw2 = v4f_ywv2_ceil.Max();
+
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();
 #pragma endregion

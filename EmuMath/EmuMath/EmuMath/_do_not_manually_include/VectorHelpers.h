@@ -1914,6 +1914,121 @@ namespace EmuMath::Helpers
 			return OutVector_();
 		}
 	}
+
+	template<typename OutT, class LhsVector_, class RhsVector_>
+	inline constexpr OutT VectorDotProduct(const LhsVector_& lhs, const RhsVector_& rhs)
+	{
+		if constexpr (EmuCore::TMPHelpers::is_any_check<EmuMath::TMPHelpers::is_emu_vector, LhsVector_, RhsVector_>::value)
+		{
+			constexpr std::size_t SmallestVecSize_ = (LhsVector_::size() < RhsVector_::size()) ? LhsVector_::size() : RhsVector_::size();
+			if constexpr (SmallestVecSize_ == 2)
+			{
+				return
+				(
+					(static_cast<OutT>(lhs.x) * rhs.x) +
+					(static_cast<OutT>(lhs.y) * rhs.y)
+				);
+			}
+			else if constexpr (SmallestVecSize_ == 3)
+			{
+				return
+				(
+					(static_cast<OutT>(lhs.x) * rhs.x) +
+					(static_cast<OutT>(lhs.y) * rhs.y) +
+					(static_cast<OutT>(lhs.z) * rhs.z)
+				);
+			}
+			else if constexpr (SmallestVecSize_ == 4)
+			{
+				return
+				(
+					(static_cast<OutT>(lhs.x) * rhs.x) +
+					(static_cast<OutT>(lhs.y) * rhs.y) +
+					(static_cast<OutT>(lhs.z) * rhs.z) +
+					(static_cast<OutT>(lhs.w) * rhs.w)
+				);
+			}
+			else
+			{
+				static_assert(false, "Attempted to get the dot product of two invalidly sized EmuMath Vectors.");
+				return OutT();
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the dot product of two EmuMath Vectors with at least one non-EmuMath-Vector operand.");
+			return OutT();
+		}
+	}
+
+	template<typename OutT, class InVector_, class Func_>
+	inline constexpr OutT _perform_vector_min_or_max(const InVector_& in_)
+	{
+		Func_ cmp_ = Func_();
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<InVector_>)
+		{
+			if constexpr (InVector_::size() == 2)
+			{
+				return static_cast<OutT>(cmp_(in_.x, in_.y) ? in_.x : in_.y);
+			}
+			else if constexpr (InVector_::size() == 3)
+			{
+				if (cmp_(in_.x, in_.y))
+				{
+					return static_cast<OutT>(cmp_(in_.x, in_.z) ? in_.x : in_.z);
+				}
+				else
+				{
+					return static_cast<OutT>(cmp_(in_.y, in_.z) ? in_.y : in_.z);
+				}
+			}
+			else if constexpr (InVector_::size() == 4)
+			{
+				if (cmp_(in_.x, in_.y))
+				{
+					if (cmp_(in_.x, in_.z))
+					{
+						return static_cast<OutT>(cmp_(in_.x, in_.w) ? in_.x : in_.w);
+					}
+					else
+					{
+						return static_cast<OutT>(cmp_(in_.z, in_.w) ? in_.z : in_.w);
+					}
+				}
+				else
+				{
+					if (cmp_(in_.y, in_.z))
+					{
+						return static_cast<OutT>(cmp_(in_.y, in_.w) ? in_.y : in_.w);
+					}
+					else
+					{
+						return static_cast<OutT>(cmp_(in_.z, in_.w) ? in_.z : in_.w);
+					}
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to get the min/max value of an invalidly sized EmuMath Vector.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the min/max value of an EmuMath Vector, but the passed operand was not an EmuMath Vector.");
+			return OutT();
+		}
+	}
+
+	template<typename OutT, class InVector_>
+	inline constexpr OutT VectorMin(const InVector_& in_)
+	{
+		return _perform_vector_min_or_max<OutT, InVector_, std::less_equal<void>>(in_);
+	}
+	template<typename OutT, class InVector_>
+	inline constexpr OutT VectorMax(const InVector_& in_)
+	{
+		return _perform_vector_min_or_max<OutT, InVector_, std::greater_equal<void>>(in_);
+	}
 }
 
 #endif

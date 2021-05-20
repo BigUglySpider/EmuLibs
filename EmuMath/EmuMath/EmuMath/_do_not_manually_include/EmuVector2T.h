@@ -1107,15 +1107,17 @@ namespace EmuMath
 		}
 		/// <summary> Determines the lowest element within this Vector. </summary>
 		/// <returns>Copy of the lowest element within this Vector.</returns>
-		constexpr nonref_value_type Min() const
+		template<typename OutT = nonref_value_type>
+		constexpr OutT Min() const
 		{
-			return x < y ? x : y;
+			return EmuMath::Helpers::VectorMin<OutT>(*this);
 		}
 		/// <summary> Determines the highest element within this Vector. </summary>
 		/// <returns>Copy of the highest element within this Vector.</returns>
-		constexpr nonref_value_type Max() const
+		template<typename OutT = nonref_value_type>
+		constexpr OutT Max() const
 		{
-			return x > y ? x : y;
+			return EmuMath::Helpers::VectorMax<OutT>(*this);
 		}
 		/// <summary> Calculates the values of this Vector's elements when clamped to the provided minimum respective values of the passed Vector. </summary>
 		/// <param name="min_">Minimum values for the respective elements of this Vector.</param>
@@ -1309,12 +1311,12 @@ namespace EmuMath
 		/// <typeparam name="OutT">Type to output as. Must be a floating point type.</typeparam>
 		/// <returns>Normalised version of this Vector, with its contained elements stored as the provided OutT (defaults to this Vector's default_floating_point).</returns>
 		template<typename OutFP = default_floating_point>
-		Vector2<OutFP> Normalised() const
+		Vector2<OutFP> Normalise() const
 		{
 			return EmuMath::Helpers::VectorNormalise<OutFP>(*this);
 		}
 		template<typename OutFP = default_floating_point>
-		constexpr Vector2<OutFP> NormalisedConstexpr() const
+		constexpr Vector2<OutFP> NormaliseConstexpr() const
 		{
 			return EmuMath::Helpers::VectorNormaliseConstexpr<OutFP>(*this);
 		}
@@ -1325,39 +1327,10 @@ namespace EmuMath
 		/// <typeparam name="OutT">Type to output. Defaults to this Vector's nonref_value_type.</typeparam>
 		/// <param name="rhs">Vector to calculate a dot product with.</param>
 		/// <returns>Dot product of this Vector and the provided Vector, represented as this Vector's nonref_value_type or an optional provided type.</returns>
-		template<typename RhsT, typename OutT = nonref_value_type>
+		template<typename OutT = default_floating_point, typename RhsT = nonref_value_type>
 		constexpr OutT DotProduct(const Vector2<RhsT>& rhs) const
 		{
-			if constexpr (info_type::has_floating_point_values || info_type_t<RhsT>::has_floating_point_values)
-			{
-				using ThisFP = EmuCore::TMPHelpers::best_floating_point_rep_t<nonref_value_type_without_qualifiers>;
-				using RhsFP = EmuCore::TMPHelpers::best_floating_point_rep_t<typename Vector2<RhsT>::nonref_value_type_without_qualifiers>;
-				using OutFP = EmuCore::TMPHelpers::best_floating_point_rep_t<OutT>;
-				using CalcT = EmuCore::TMPHelpers::highest_byte_size_t<ThisFP, RhsFP, OutFP>;
-
-				return static_cast<OutT>
-				(
-					(static_cast<CalcT>(x) * rhs.x) +
-					(static_cast<CalcT>(y) * rhs.y)
-				);
-			}
-			else
-			{
-				using HighestVecT = EmuCore::TMPHelpers::highest_byte_size<nonref_value_type_without_qualifiers, typename Vector2<RhsT>::nonref_value_type_without_qualifiers>;
-				using HighestT = EmuCore::TMPHelpers::highest_byte_size_t<HighestVecT, OutT>;
-				using CalcT = std::conditional_t
-				<
-					EmuCore::TMPHelpers::is_any_signed_v<nonref_value_type_without_qualifiers, typename Vector2<RhsT>::nonref_value_type_without_qualifiers>,
-					EmuCore::TMPHelpers::best_signed_rep_t<HighestT>,
-					HighestT
-				>;
-
-				return static_cast<OutT>
-				(
-					(static_cast<CalcT>(x) * rhs.x) +
-					(static_cast<CalcT>(y) * rhs.y)
-				);
-			}
+			return EmuMath::Helpers::VectorDotProduct<OutT>(*this, rhs);
 		}
 		/// <summary>
 		/// <para> Returns the dot product of this Vector and the provided Vector, output as an optionally customisable type. </para>
