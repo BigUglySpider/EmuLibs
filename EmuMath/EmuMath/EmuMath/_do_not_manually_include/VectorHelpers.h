@@ -2918,6 +2918,244 @@ namespace EmuMath::Helpers
 			std::greater_equal<void>
 		>(lhs_, rhs_);
 	}
+
+	template<std::size_t X_, std::size_t Y_, typename OutT_, class In_>
+	inline constexpr EmuMath::Vector2<OutT_> VectorShuffle(const In_& in_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<In_>)
+		{
+			return Vector2<OutT_>
+			(
+				EmuMath::TMPHelpers::emu_vector_element_n<X_>(in_),
+				EmuMath::TMPHelpers::emu_vector_element_n<Y_>(in_)
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform an EmuMath Vector shuffle while providing a non-EmuMath-Vector operand.");
+			return Vector2<OutT_>();
+		}
+	}
+	template<std::size_t X_, std::size_t Y_, std::size_t Z_, typename OutT_, class In_>
+	inline constexpr EmuMath::Vector3<OutT_> VectorShuffle(const In_& in_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<In_>)
+		{
+			return Vector3<OutT_>
+			(
+				EmuMath::TMPHelpers::emu_vector_element_n<X_>(in_),
+				EmuMath::TMPHelpers::emu_vector_element_n<Y_>(in_),
+				EmuMath::TMPHelpers::emu_vector_element_n<Z_>(in_)
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform an EmuMath Vector shuffle while providing a non-EmuMath-Vector operand.");
+			return Vector3<OutT_>();
+		}
+	}
+	template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_, typename OutT_, class In_>
+	inline constexpr EmuMath::Vector4<OutT_> VectorShuffle(const In_& in_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<In_>)
+		{
+			return Vector4<OutT_>
+			(
+				EmuMath::TMPHelpers::emu_vector_element_n<X_>(in_),
+				EmuMath::TMPHelpers::emu_vector_element_n<Y_>(in_),
+				EmuMath::TMPHelpers::emu_vector_element_n<Z_>(in_),
+				EmuMath::TMPHelpers::emu_vector_element_n<W_>(in_)
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform an EmuMath Vector shuffle while providing a non-EmuMath-Vector operand.");
+			return Vector4<OutT_>();
+		}
+	}
+
+	template<std::size_t X_, std::size_t Y_, class In_>
+	inline EmuMath::Vector2<typename In_::const_ref_value_type> VectorShuffledReference(const In_& in_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<In_>)
+		{
+			if constexpr (X_ < In_::size() && Y_ < In_::size())
+			{
+				return Vector2<typename In_::const_ref_value_type>
+				(
+					EmuMath::TMPHelpers::emu_vector_element_n<X_>(in_),
+					EmuMath::TMPHelpers::emu_vector_element_n<Y_>(in_)
+				);
+			}
+			else
+			{
+				static_assert
+				(
+					false,
+					"Attemped to perform an EmuMath Vector shuffle reference with at least one invalid shuffle index. You can only reference indices contained in the passed Vector."
+				);
+				return Vector2<typename In_::const_ref_value_type>();
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform an EmuMath Vector shuffle reference while providing a non-EmuMath-Vector operand.");
+			return Vector2<typename In_::const_ref_value_type>();
+		}
+	}
+	template<std::size_t X_, std::size_t Y_, class In_>
+	inline EmuMath::Vector2<typename In_::ref_value_type> VectorShuffledReference(In_& in_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<In_>)
+		{
+			if constexpr (X_ < In_::size() && Y_ < In_::size())
+			{
+				return Vector2<typename In_::ref_value_type>
+				(
+					EmuMath::TMPHelpers::emu_vector_element_n<X_>(in_),
+					EmuMath::TMPHelpers::emu_vector_element_n<Y_>(in_)
+				);
+			}
+			else
+			{
+				static_assert
+				(
+					false,
+					"Attemped to perform an EmuMath Vector shuffle reference with at least one invalid shuffle index. You can only reference indices contained in the passed Vector."
+				);
+				return Vector2<typename In_::ref_value_type>();
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform an EmuMath Vector shuffle reference while providing a non-EmuMath-Vector operand.");
+			return Vector2<typename In_::ref_value_type>();
+		}
+	}
+
+	template<std::size_t X_, std::size_t Y_, std::size_t Z_, class In_>
+	inline EmuMath::Vector3<typename In_::const_ref_value_type> VectorShuffledReference(const In_& in_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<In_>)
+		{
+			if constexpr (X_ < In_::size() && Y_ < In_::size() && Z_ < In_::size())
+			{
+				return Vector3<typename In_::const_ref_value_type>
+				(
+					EmuMath::TMPHelpers::emu_vector_element_n<X_>(in_),
+					EmuMath::TMPHelpers::emu_vector_element_n<Y_>(in_),
+					EmuMath::TMPHelpers::emu_vector_element_n<Z_>(in_)
+				);
+			}
+			else
+			{
+				static_assert
+				(
+					false,
+					"Attemped to perform an EmuMath Vector shuffle reference with at least one invalid shuffle index. You can only reference indices contained in the passed Vector."
+				);
+				return Vector3<typename In_::const_ref_value_type>();
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform an EmuMath Vector shuffle reference while providing a non-EmuMath-Vector operand.");
+			return Vector3<typename In_::const_ref_value_type>();
+		}
+	}
+	template<std::size_t X_, std::size_t Y_, std::size_t Z_, class In_>
+	inline EmuMath::Vector3<typename In_::ref_value_type> VectorShuffledReference(In_& in_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<In_>)
+		{
+			if constexpr (X_ < In_::size() && Y_ < In_::size() && Z_ < In_::size())
+			{
+				return Vector3<typename In_::ref_value_type>
+				(
+					EmuMath::TMPHelpers::emu_vector_element_n<X_>(in_),
+					EmuMath::TMPHelpers::emu_vector_element_n<Y_>(in_),
+					EmuMath::TMPHelpers::emu_vector_element_n<Z_>(in_)
+				);
+			}
+			else
+			{
+				static_assert
+				(
+					false,
+					"Attemped to perform an EmuMath Vector shuffle reference with at least one invalid shuffle index. You can only reference indices contained in the passed Vector."
+				);
+				return Vector3<typename In_::ref_value_type>();
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform an EmuMath Vector shuffle reference while providing a non-EmuMath-Vector operand.");
+			return Vector3<typename In_::ref_value_type>();
+		}
+	}
+
+	template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_, class In_>
+	inline EmuMath::Vector4<typename In_::const_ref_value_type> VectorShuffledReference(const In_& in_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<In_>)
+		{
+			if constexpr (X_ < In_::size() && Y_ < In_::size() && Z_ < In_::size() && W_ < In_::size())
+			{
+				return Vector4<typename In_::const_ref_value_type>
+				(
+					EmuMath::TMPHelpers::emu_vector_element_n<X_>(in_),
+					EmuMath::TMPHelpers::emu_vector_element_n<Y_>(in_),
+					EmuMath::TMPHelpers::emu_vector_element_n<Z_>(in_),
+					EmuMath::TMPHelpers::emu_vector_element_n<W_>(in_)
+				);
+			}
+			else
+			{
+				static_assert
+				(
+					false,
+					"Attemped to perform an EmuMath Vector shuffle reference with at least one invalid shuffle index. You can only reference indices contained in the passed Vector."
+				);
+				return Vector4<typename In_::const_ref_value_type>();
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform an EmuMath Vector shuffle reference while providing a non-EmuMath-Vector operand.");
+			return Vector4<typename In_::const_ref_value_type>();
+		}
+	}
+	template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_, class In_>
+	inline EmuMath::Vector4<typename In_::ref_value_type> VectorShuffledReference(In_& in_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<In_>)
+		{
+			if constexpr (X_ < In_::size() && Y_ < In_::size() && Z_ < In_::size() && W_ < In_::size())
+			{
+				return Vector4<typename In_::ref_value_type>
+				(
+					EmuMath::TMPHelpers::emu_vector_element_n<X_>(in_),
+					EmuMath::TMPHelpers::emu_vector_element_n<Y_>(in_),
+					EmuMath::TMPHelpers::emu_vector_element_n<Z_>(in_),
+					EmuMath::TMPHelpers::emu_vector_element_n<W_>(in_)
+				);
+			}
+			else
+			{
+				static_assert
+				(
+					false,
+					"Attemped to perform an EmuMath Vector shuffle reference with at least one invalid shuffle index. You can only reference indices contained in the passed Vector."
+				);
+				return Vector4<typename In_::ref_value_type>();
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform an EmuMath Vector shuffle reference while providing a non-EmuMath-Vector operand.");
+			return Vector4<typename In_::ref_value_type>();
+		}
+	}
 }
 
 #endif

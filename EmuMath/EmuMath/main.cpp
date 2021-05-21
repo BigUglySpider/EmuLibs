@@ -89,6 +89,12 @@ int main()
 	constexpr bool result_any_greater = EmuMath::Helpers::VectorComparisonAny_Greater<true>(Vector2<float>(2.5f, 2.6f), 2.55f);
 	constexpr bool result_any_greater_equal = EmuMath::Helpers::VectorComparisonAny_GreaterEqual<true>(Vector2<float>(2.5f, 2.6f), 2.6f);
 
+	constexpr Vector4<float> shuffled_ = EmuMath::Helpers::VectorShuffle<1, 3, 2, 0, float>(Vector4<int>(1, 2, 3, 4));
+
+	constexpr float some_val_ = 5.0f;
+	auto made_vector_ = EmuMath::TMPHelpers::make_emu_vector<const float&>(some_val_, some_val_, some_val_, some_val_);
+	std::cout << made_vector_ << "\n";
+
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();
 #pragma endregion

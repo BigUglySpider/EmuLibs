@@ -352,6 +352,52 @@ namespace EmuMath
 				static_assert(false, "Attempted to get element N of an EmuMath Vector, but the passed operand was not an EmuMath Vector.");
 			}
 		}
+		template<std::size_t N_, class EmuVec_>
+		inline constexpr auto emu_vector_element_n(EmuVec_& vec_)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<EmuVec_>)
+			{
+				if constexpr (N_ == 0)
+				{
+					return emu_vector_x(vec_);
+				}
+				else if constexpr (N_ == 1)
+				{
+					return emu_vector_y(vec_);
+				}
+				else if constexpr (N_ == 2)
+				{
+					return emu_vector_z(vec_);
+				}
+				else if constexpr (N_ == 3)
+				{
+					return emu_vector_w(vec_);
+				}
+				else
+				{
+					static_assert(false, "Attempted to get element N of an EmuMath Vector with an invalid N value. Only 0, 1, 2, and 3 are valid values.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to get element N of an EmuMath Vector, but the passed operand was not an EmuMath Vector.");
+			}
+		}
+
+		template<typename ContainedT, typename...Args>
+		constexpr inline typename EmuMath::TMPHelpers::emu_vector_from_size<sizeof...(Args), ContainedT>::type make_emu_vector(Args&&...args)
+		{
+			using Out_ = EmuMath::TMPHelpers::emu_vector_from_size_t<sizeof...(Args), ContainedT>;
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Out_>)
+			{
+				return Out_(std::forward<Args>(args)...);
+			}
+			else
+			{
+				static_assert(false, "Invalid arguments provided to make_emu_vector.");
+				return Out_();
+			}
+		}
 	}
 }
 

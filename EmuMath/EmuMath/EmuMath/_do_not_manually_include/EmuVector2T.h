@@ -950,51 +950,53 @@ namespace EmuMath
 		template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_, typename OutT = nonref_value_type>
 		constexpr Vector4<OutT> Shuffle() const
 		{
-			return Vector4<OutT>(at<X_>(), at<Y_>(), at<Z_>(), at<W_>());
+			return EmuMath::Helpers::VectorShuffle<X_, Y_, Z_, W_, OutT>(*this);
 		}
 		/// <summary> Returns a Vector3 with elements X, Y and Z copying the elements at the respective provided indices within this Vector. </summary>
 		/// <returns>This vector shuffled as a Vector3.</returns>
 		template<std::size_t X_, std::size_t Y_, std::size_t Z_, typename OutT = nonref_value_type>
 		constexpr Vector3<OutT> Shuffle() const
 		{
-			return Vector3<OutT>(at<X_>(), at<Y_>(), at<Z_>());
+			return EmuMath::Helpers::VectorShuffle<X_, Y_, Z_, OutT>(*this);
 		}
 		/// <summary> Returns a Vector2 with elements X and Y copying the elements at the respective provided indices within this Vector. </summary>
 		/// <returns>This vector shuffled as a Vector2.</returns>
 		template<std::size_t X_, std::size_t Y_, typename OutT = nonref_value_type>
 		constexpr Vector2<OutT> Shuffle() const
 		{
-			return Vector2<OutT>(at<X_>(), at<Y_>());
+			return EmuMath::Helpers::VectorShuffle<X_, Y_, OutT>(*this);
 		}
-		/// <summary>
-		///	<para> Returns a Vector4 with elements X, Y, Z and W copying the elements at the respective provided indices within this Vector. </para>
-		/// <para> If possible, it is recommended to use the templatised version of this function. </para>
-		/// </summary>
-		/// <returns>This Vector shuffled as a Vector4.</returns>
-		template<typename OutT = nonref_value_type>
-		Vector4<OutT> Shuffle(const std::size_t x_, const std::size_t y_, const std::size_t z_, const std::size_t w_) const
+
+		template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_>
+		Vector4<const_ref_value_type> ShuffleReference() const
 		{
-			return Vector4<OutT>(at(x_), at(y_), at(z_), at(w_));
+			return EmuMath::Helpers::VectorShuffledReference<X_, Y_, Z_, W_>(*this);
 		}
-		/// <summary>
-		///	<para> Returns a Vector3 with elements X, Y and Z copying the elements at the respective provided indices within this Vector. </para>
-		/// <para> If possible, it is recommended to use the templatised version of this function. </para>
-		/// </summary>
-		/// <returns>This Vector shuffled as a Vector3.</returns>
-		template<typename OutT = nonref_value_type>
-		Vector3<OutT> Shuffle(const std::size_t x_, const std::size_t y_, const std::size_t z_) const
+		template<std::size_t X_, std::size_t Y_, std::size_t Z_>
+		Vector3<const_ref_value_type> ShuffleReference() const
 		{
-			return Vector3<OutT>(at(x_), at(y_), at(z_));
+			return EmuMath::Helpers::VectorShuffledReference<X_, Y_, Z_>(*this);
 		}
-		/// <summary>
-		/// <para> Returns a Vector2 with elements X and Y copying the elements at the respective provided indices within this Vector. </para>
-		/// <para> If possible, it is recommended to use the templatised version of this function. </para>
-		/// </summary>
-		/// <returns>This Vector shuffled as a Vector2.</returns>
-		template<typename OutT = nonref_value_type>
-		Vector2<OutT> Shuffle(const std::size_t x_, const std::size_t y_) const
+		template<std::size_t X_, std::size_t Y_>
+		Vector2<const_ref_value_type> ShuffleReference() const
 		{
-			return Vector2<OutT>(at(x_), at(y_));
+			return EmuMath::Helpers::VectorShuffledReference<X_, Y_>(*this);
+		}
+
+		template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_>
+		Vector4<ref_value_type> ShuffleReference()
+		{
+			return EmuMath::Helpers::VectorShuffledReference<X_, Y_, Z_, W_>(*this);
+		}
+		template<std::size_t X_, std::size_t Y_, std::size_t Z_>
+		Vector3<ref_value_type> ShuffleReference()
+		{
+			return EmuMath::Helpers::VectorShuffledReference<X_, Y_, Z_>(*this);
+		}
+		template<std::size_t X_, std::size_t Y_>
+		Vector2<ref_value_type> ShuffleReference()
+		{
+			return EmuMath::Helpers::VectorShuffledReference<X_, Y_>(*this);
 		}
 #pragma endregion
 
@@ -1275,94 +1277,10 @@ namespace EmuMath
 		/// <typeparam name="OutT">Type to output. Defaults to this Vector's nonref_value_type.</typeparam>
 		/// <param name="rhs">Vector to calculate a dot product with.</param>
 		/// <returns>Dot product of this Vector and the provided Vector, represented as this Vector's nonref_value_type or an optional provided type.</returns>
-		template<typename OutT = default_floating_point, typename RhsT = nonref_value_type>
-		constexpr OutT DotProduct(const Vector2<RhsT>& rhs) const
+		template<typename OutT = default_floating_point, typename RhsVector_ = copy_vector>
+		constexpr OutT DotProduct(const RhsVector_& rhs) const
 		{
 			return EmuMath::Helpers::VectorDotProduct<OutT>(*this, rhs);
-		}
-		/// <summary>
-		/// <para> Returns the dot product of this Vector and the provided Vector, output as an optionally customisable type. </para>
-		/// </summary>
-		/// <typeparam name="RhsT">Type contained within the passed Vector.</typeparam>
-		/// <typeparam name="OutT">Type to output. Defaults to this Vector's nonref_value_type.</typeparam>
-		/// <param name="rhs">Vector to calculate a dot product with.</param>
-		/// <returns>Dot product of this Vector and the provided Vector, represented as this Vector's nonref_value_type or an optional provided type.</returns>
-		template<typename RhsT, typename OutT = nonref_value_type>
-		constexpr OutT DotProduct(const Vector3<RhsT>& rhs) const
-		{
-			using RhsNonRef = typename info_type_t<RhsT>::nonref_value_type;
-			return this->DotProduct<RhsNonRef, OutT>(Vector2<RhsNonRef>(rhs.x, rhs.y));
-		}
-		/// <summary>
-		/// <para> Returns a boolean indicating if the provided target vector is within the provided distance of this vector. </para>
-		/// <para>
-		///		Recommended to use WithinSquareDistance over this if possible as it avoids a square root and may be evaluable at compile time if needed. 
-		///		The only change needed for your parameters to do so will be to multiply maxDistance by itself.
-		/// </para>
-		/// </summary>
-		/// <typeparam name="OtherT">Type contained within the target vector.</typeparam>
-		/// <typeparam name="MaxDistT">Type used to represent the max distance.</typeparam>
-		/// <param name="target">Target vector to calculate the distance between.</param>
-		/// <param name="maxDistance">Maximum distance between this vector and the target vector before this function returns false.</param>
-		/// <returns>Boolean indicating if the target vector was within maxDistance (true) or not (false).</returns>
-		template<typename OtherT, typename MaxDistT>
-		bool WithinDistance(const Vector2<OtherT>& target, const MaxDistT& maxDistance) const
-		{
-			using ThisFP = EmuCore::TMPHelpers::best_floating_point_rep_t<nonref_value_type_without_qualifiers>;
-			using TargetFP = EmuCore::TMPHelpers::best_floating_point_rep_t<typename Vector2<OtherT>::nonref_value_type_without_qualifiers>;
-			using MaxDistFP = EmuCore::TMPHelpers::best_floating_point_rep_t<MaxDistT>;
-			using HighestFP = EmuCore::TMPHelpers::highest_byte_size_t<ThisFP, TargetFP, MaxDistFP>;
-
-			return Vector2<HighestFP>
-			(
-				static_cast<HighestFP>(target.x) - x,
-				static_cast<HighestFP>(target.y - y)
-			).Magnitude<HighestFP>() <= maxDistance;
-		}
-		/// <summary>
-		/// <para> Returns a boolean indicating if the provided target vector is within the provided square distance of this vector. </para>
-		/// <para> Recommended to use this over WithinDistance if possible as it avoids a square root and may be evaluable at compile time if needed. </para>
-		/// </summary>
-		/// <typeparam name="OtherT">Type contained within the target vector.</typeparam>
-		/// <typeparam name="MaxDistT">Type used to represent the max square distance.</typeparam>
-		/// <param name="target">Target vector to calculate the square distance between.</param>
-		/// <param name="maxSquareDistance">Maximum square distance between this vector and the target vector before this function returns false.</param>
-		/// <returns>Boolean indicating if the target vector was within maxSquareDistance (true) or not (false).</returns>
-		template<typename OtherT, typename MaxDistT>
-		constexpr bool WithinSquareDistance(const Vector2<OtherT>& target, const MaxDistT& maxSquareDistance) const
-		{
-			constexpr bool ThisOrTargetIsFP = info_type::has_floating_point_values || info_type_t<OtherT>::has_floating_point_values;
-			constexpr bool MaxDistTIsFP = std::is_floating_point_v<MaxDistT>;
-			if constexpr (!(ThisOrTargetIsFP || MaxDistTIsFP))
-			{
-				// Since we know we're working with integers, use the highest-sized type as an unsigned rep to support higher bound values.
-				using HighestType = EmuCore::TMPHelpers::highest_byte_size_t
-				<
-					nonref_value_type_without_qualifiers,
-					typename Vector2<OtherT>::nonref_value_type_without_qualifiers,
-					MaxDistT
-				>;
-				using HighestUnsigned = EmuCore::TMPHelpers::best_unsigned_int_rep_t<HighestType>;
-
-				return Vector2<HighestUnsigned>
-				(
-					static_cast<HighestUnsigned>(target.x) - x,
-					static_cast<HighestUnsigned>(target.y) - y
-				).SquareMagnitude<HighestUnsigned>() <= maxSquareDistance;
-			}
-			else
-			{
-				using ThisFP = EmuCore::TMPHelpers::best_floating_point_rep_t<nonref_value_type_without_qualifiers>;
-				using TargetFP = EmuCore::TMPHelpers::best_floating_point_rep_t<typename Vector2<OtherT>::nonref_value_type_without_qualifiers>;
-				using MaxDistFP = EmuCore::TMPHelpers::best_floating_point_rep_t<MaxDistT>;
-				using HighestFP = EmuCore::TMPHelpers::highest_byte_size_t<ThisFP, TargetFP, MaxDistFP>;
-
-				return Vector2<HighestFP>
-				(
-					static_cast<HighestFP>(target.x) - x,
-					static_cast<HighestFP>(target.y) - y
-				).SquareMagnitude<HighestFP>() <= maxSquareDistance;
-			}
 		}
 		/// <summary>
 		/// <para> Returns a reversed version of this Vector, with an optional different type. </para>
