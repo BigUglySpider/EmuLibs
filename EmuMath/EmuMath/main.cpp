@@ -81,6 +81,14 @@ int main()
 	constexpr bool result_all_greater = EmuMath::Helpers::VectorComparisonAll_Greater<true>(Vector2<float>(2.5f, 2.6f), 2.4f);
 	constexpr bool result_all_greater_equal = EmuMath::Helpers::VectorComparisonAll_GreaterEqual<true>(Vector2<float>(2.5f, 2.6f), 2.5f);
 
+
+	constexpr bool result_any_equal_ = EmuMath::Helpers::VectorComparisonAny_Equal<true>(Vector2<float>(2.5f, 2.99f), 2.5f);
+	constexpr bool result_any_not_equal = EmuMath::Helpers::VectorComparisonAny_NotEqual<true>(Vector2<float>(2.5f, 2.1f), 2.5f);
+	constexpr bool result_any_less = EmuMath::Helpers::VectorComparisonAny_Less<true>(Vector2<float>(2.5f, 2.4f), 2.5f);
+	constexpr bool result_any_less_equal = EmuMath::Helpers::VectorComparisonAny_LessEqual<true>(Vector2<float>(2.5f, 2.2f), 2.4f);
+	constexpr bool result_any_greater = EmuMath::Helpers::VectorComparisonAny_Greater<true>(Vector2<float>(2.5f, 2.6f), 2.55f);
+	constexpr bool result_any_greater_equal = EmuMath::Helpers::VectorComparisonAny_GreaterEqual<true>(Vector2<float>(2.5f, 2.6f), 2.6f);
+
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();
 #pragma endregion

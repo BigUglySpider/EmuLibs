@@ -1849,11 +1849,11 @@ namespace EmuMath::Helpers
 			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Rhs_>)
 			{
 				constexpr std::size_t used_size_ =
-					(
-						(IncludeNonContained_) ?
-						(LhsVector_::size() >= Rhs_::size()) ? LhsVector_::size() : Rhs_::size() :
-						(LhsVector_::size() <= Rhs_::size()) ? LhsVector_::size() : Rhs_::size()
-						);
+				(
+					(IncludeNonContained_) ?
+					(LhsVector_::size() >= Rhs_::size()) ? LhsVector_::size() : Rhs_::size() :
+					(LhsVector_::size() <= Rhs_::size()) ? LhsVector_::size() : Rhs_::size()
+				);
 				if constexpr (used_size_ == 2)
 				{
 					return cmp_(lhs_.x, rhs_.x) && cmp_(lhs_.y, rhs_.y);
@@ -1861,21 +1861,21 @@ namespace EmuMath::Helpers
 				else if constexpr (used_size_ == 3)
 				{
 					return
-						(
-							cmp_(lhs_.x, rhs_.x) &&
-							cmp_(lhs_.y, rhs_.y) &&
-							cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), EmuMath::TMPHelpers::emu_vector_z(rhs_))
-							);
+					(
+						cmp_(lhs_.x, rhs_.x) &&
+						cmp_(lhs_.y, rhs_.y) &&
+						cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), EmuMath::TMPHelpers::emu_vector_z(rhs_))
+					);
 				}
 				else if constexpr (used_size_ == 4)
 				{
 					return
-						(
-							cmp_(lhs_.x, rhs_.x) &&
-							cmp_(lhs_.y, rhs_.y) &&
-							cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), EmuMath::TMPHelpers::emu_vector_z(rhs_)),
-							cmp_(EmuMath::TMPHelpers::emu_vector_w(lhs_), EmuMath::TMPHelpers::emu_vector_w(rhs_))
-							);
+					(
+						cmp_(lhs_.x, rhs_.x) &&
+						cmp_(lhs_.y, rhs_.y) &&
+						cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), EmuMath::TMPHelpers::emu_vector_z(rhs_)) &&
+						cmp_(EmuMath::TMPHelpers::emu_vector_w(lhs_), EmuMath::TMPHelpers::emu_vector_w(rhs_))
+					);
 				}
 				else
 				{
@@ -1905,6 +1905,75 @@ namespace EmuMath::Helpers
 		else
 		{
 			static_assert(false, "Attempted to perform an all-element comparison with an EmuMath Vector with a non-EmuMath Vector left-hand operand.");
+			return false;
+		}
+	}
+
+	template<bool IncludeNonContained_, class LhsVector_, class Rhs_, class Func_>
+	inline constexpr bool _perform_vector_comparison_any(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<LhsVector_>)
+		{
+			Func_ cmp_ = Func_();
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Rhs_>)
+			{
+				constexpr std::size_t used_size_ =
+				(
+					(IncludeNonContained_) ?
+					(LhsVector_::size() >= Rhs_::size()) ? LhsVector_::size() : Rhs_::size() :
+					(LhsVector_::size() <= Rhs_::size()) ? LhsVector_::size() : Rhs_::size()
+				);
+				if constexpr (used_size_ == 2)
+				{
+					return cmp_(lhs_.x, rhs_.x) && cmp_(lhs_.y, rhs_.y);
+				}
+				else if constexpr (used_size_ == 3)
+				{
+					return
+					(
+						cmp_(lhs_.x, rhs_.x) ||
+						cmp_(lhs_.y, rhs_.y) ||
+						cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), EmuMath::TMPHelpers::emu_vector_z(rhs_))
+					);
+				}
+				else if constexpr (used_size_ == 4)
+				{
+					return
+					(
+						cmp_(lhs_.x, rhs_.x) ||
+						cmp_(lhs_.y, rhs_.y) ||
+						cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), EmuMath::TMPHelpers::emu_vector_z(rhs_)) ||
+						cmp_(EmuMath::TMPHelpers::emu_vector_w(lhs_), EmuMath::TMPHelpers::emu_vector_w(rhs_))
+					);
+				}
+				else
+				{
+					static_assert(false, "Attempted to perform an any-element comparison of EmuMath Vectors with at least one invalidly sized EmuMath Vector.");
+				}
+			}
+			else
+			{
+				if constexpr (LhsVector_::size() == 2)
+				{
+					return cmp_(lhs_.x, rhs_) || cmp_(lhs_.y, rhs_);
+				}
+				else if constexpr (LhsVector_::size() == 3)
+				{
+					return cmp_(lhs_.x, rhs_) || cmp_(lhs_.y, rhs_) || cmp_(lhs_.z, rhs_);
+				}
+				else if constexpr (LhsVector_::size() == 4)
+				{
+					return cmp_(lhs_.x, rhs_) || cmp_(lhs_.y, rhs_) || cmp_(lhs_.z, rhs_) && cmp_(lhs_.w, rhs_);
+				}
+				else
+				{
+					static_assert(false, "Attempted to perform an any-element comparison with an invalidly sized EmuMath Vector.");
+				}
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform an any-element comparison with an EmuMath Vector with a non-EmuMath Vector left-hand operand.");
 			return false;
 		}
 	}
@@ -2773,6 +2842,75 @@ namespace EmuMath::Helpers
 	inline constexpr bool VectorComparisonAll_GreaterEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		return _underlying_vector_funcs::_perform_vector_comparison_all
+		<
+			IncludeNonContained_,
+			LhsVector_,
+			Rhs_,
+			std::greater_equal<void>
+		>(lhs_, rhs_);
+	}
+
+	template<bool IncludeNonContained_, class LhsVector_, class Rhs_>
+	inline constexpr bool VectorComparisonAny_Equal(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_vector_funcs::_perform_vector_comparison_any
+		<
+			IncludeNonContained_,
+			LhsVector_,
+			Rhs_,
+			std::equal_to<void>
+		>(lhs_, rhs_);
+	}
+	template<bool IncludeNonContained_, class LhsVector_, class Rhs_>
+	inline constexpr bool VectorComparisonAny_NotEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_vector_funcs::_perform_vector_comparison_any
+		<
+			IncludeNonContained_,
+			LhsVector_,
+			Rhs_,
+			std::not_equal_to<void>
+		>(lhs_, rhs_);
+	}
+
+	template<bool IncludeNonContained_, class LhsVector_, class Rhs_>
+	inline constexpr bool VectorComparisonAny_Less(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_vector_funcs::_perform_vector_comparison_any
+		<
+			IncludeNonContained_,
+			LhsVector_,
+			Rhs_,
+			std::less<void>
+		>(lhs_, rhs_);
+	}
+	template<bool IncludeNonContained_, class LhsVector_, class Rhs_>
+	inline constexpr bool VectorComparisonAny_LessEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_vector_funcs::_perform_vector_comparison_any
+		<
+			IncludeNonContained_,
+			LhsVector_,
+			Rhs_,
+			std::less_equal<void>
+		>(lhs_, rhs_);
+	}
+
+	template<bool IncludeNonContained_, class LhsVector_, class Rhs_>
+	inline constexpr bool VectorComparisonAny_Greater(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_vector_funcs::_perform_vector_comparison_any
+		<
+			IncludeNonContained_,
+			LhsVector_,
+			Rhs_,
+			std::greater<void>
+		>(lhs_, rhs_);
+	}
+	template<bool IncludeNonContained_, class LhsVector_, class Rhs_>
+	inline constexpr bool VectorComparisonAny_GreaterEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_vector_funcs::_perform_vector_comparison_any
 		<
 			IncludeNonContained_,
 			LhsVector_,
