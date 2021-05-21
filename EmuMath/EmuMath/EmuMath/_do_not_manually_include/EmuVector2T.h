@@ -54,7 +54,7 @@ namespace EmuMath
 		}
 
 		/// <summary> The type of Vector created when getting a copy of this Vector's data (used to get copy values instead of references). </summary>
-		using copy_vector = typename EmuMath::TMPHelpers::emu_vector_copy<emu_vector_type>::type;
+		using copy_vector = Vector2<nonref_value_type_without_qualifiers>;
 #pragma endregion
 
 #pragma region CONSTRUCTORS
@@ -250,272 +250,276 @@ namespace EmuMath
 
 #pragma region ARITHMETIC_CONST_OPERATORS
 		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator+(const Vector2<RhsT>& rhs) const
+		constexpr copy_vector operator+(const Vector2<RhsT>& rhs) const
 		{
-			return EmuMath::Helpers::VectorAddition<Vector2<nonref_value_type>>(*this, rhs);
+			return EmuMath::Helpers::VectorAddition<copy_vector>(*this, rhs);
 		}
 		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator+(const Vector3<RhsT>& rhs) const
+		constexpr copy_vector operator+(const Vector3<RhsT>& rhs) const
 		{
-			return EmuMath::Helpers::VectorAddition<Vector2<nonref_value_type>>(*this, rhs);
+			return EmuMath::Helpers::VectorAddition<copy_vector>(*this, rhs);
 		}
 		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator+(const Vector4<RhsT>& rhs) const
+		constexpr copy_vector operator+(const Vector4<RhsT>& rhs) const
 		{
-			return EmuMath::Helpers::VectorAddition<Vector2<nonref_value_type>>(*this, rhs);
+			return EmuMath::Helpers::VectorAddition<copy_vector>(*this, rhs);
 		}
 
 		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator-(const Vector2<RhsT>& rhs) const
+		constexpr copy_vector operator-(const Vector2<RhsT>& rhs) const
 		{
-			return EmuMath::Helpers::VectorSubtraction<Vector2<nonref_value_type>>(*this, rhs);
+			return EmuMath::Helpers::VectorSubtraction<copy_vector>(*this, rhs);
 		}
 		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator-(const Vector3<RhsT>& rhs) const
+		constexpr copy_vector operator-(const Vector3<RhsT>& rhs) const
 		{
-			return EmuMath::Helpers::VectorSubtraction<Vector2<nonref_value_type>>(*this, rhs);
+			return EmuMath::Helpers::VectorSubtraction<copy_vector>(*this, rhs);
 		}
-		constexpr Vector2<nonref_value_type> operator-() const
+		template<typename RhsT>
+		constexpr copy_vector operator-(const Vector4<RhsT>& rhs) const
+		{
+			return EmuMath::Helpers::VectorSubtraction<copy_vector>(*this, rhs);
+		}
+		constexpr copy_vector operator-() const
 		{
 			return this->Reverse();
 		}
 
 		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator*(const RhsT& rhs) const
+		constexpr copy_vector operator*(const RhsT& rhs) const
 		{
-			return EmuMath::Helpers::VectorMultiplication<Vector2<nonref_value_type>>(*this, rhs);
+			return EmuMath::Helpers::VectorMultiplication<copy_vector>(*this, rhs);
 		}
 
 		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator/(const RhsT& rhs) const
+		constexpr copy_vector operator/(const RhsT& rhs) const
 		{
-			return EmuMath::Helpers::VectorDivision<Vector2<nonref_value_type>>(*this, rhs);
+			return EmuMath::Helpers::VectorDivision<copy_vector>(*this, rhs);
 		}
 
 		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator%(const RhsT& rhs) const
+		constexpr copy_vector operator%(const RhsT& rhs) const
 		{
-			return EmuMath::Helpers::VectorMod<Vector2<nonref_value_type>>(*this, rhs);
+			return EmuMath::Helpers::VectorMod<copy_vector>(*this, rhs);
 		}
 #pragma endregion
 
 #pragma region BITWISE_CONST_OPERATORS
 		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator&(const Vector2<OtherT>& rhs) const
+		constexpr copy_vector operator&(const Vector2<OtherT>& rhs) const
 		{
-			return this->And<size(), nonref_value_type, OtherT>(rhs);
+			return this->And<size(), typename copy_vector::value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator&(const Vector3<OtherT>& rhs) const
+		constexpr copy_vector operator&(const Vector3<OtherT>& rhs) const
 		{
-			return this->And<size(), nonref_value_type, OtherT>(rhs);
+			return this->And<size(), typename copy_vector::value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator&(const Vector4<OtherT>& rhs) const
+		constexpr copy_vector operator&(const Vector4<OtherT>& rhs) const
 		{
-			return this->And<size(), nonref_value_type, OtherT>(rhs);
+			return this->And<size(), typename copy_vector::value_type, OtherT>(rhs);
 		}
 		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator&(const RhsT& rhs) const
+		constexpr copy_vector operator&(const RhsT& rhs) const
 		{
-			return this->And<size(), nonref_value_type, RhsT>(rhs);
+			return this->And<size(), typename copy_vector::value_type, RhsT>(rhs);
 		}
 		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator|(const Vector2<OtherT>& rhs) const
+		constexpr copy_vector operator|(const Vector2<OtherT>& rhs) const
 		{
-			return this->Or<size(), nonref_value_type, OtherT>(rhs);
+			return this->Or<size(), typename copy_vector::value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator|(const Vector3<OtherT>& rhs) const
+		constexpr copy_vector operator|(const Vector3<OtherT>& rhs) const
 		{
-			return this->Or<size(), nonref_value_type, OtherT>(rhs);
+			return this->Or<size(), typename copy_vector::value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator|(const Vector4<OtherT>& rhs) const
+		constexpr copy_vector operator|(const Vector4<OtherT>& rhs) const
 		{
-			return this->Or<size(), nonref_value_type, OtherT>(rhs);
+			return this->Or<size(), typename copy_vector::value_type, OtherT>(rhs);
 		}
 		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator|(const RhsT& rhs) const
+		constexpr copy_vector operator|(const RhsT& rhs) const
 		{
-			return this->Or<size(), nonref_value_type, RhsT>(rhs);
+			return this->Or<size(), typename copy_vector::value_type, RhsT>(rhs);
 		}
 		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator^(const Vector2<OtherT>& rhs) const
+		constexpr copy_vector operator^(const Vector2<OtherT>& rhs) const
 		{
-			return this->Xor<size(), nonref_value_type, OtherT>(rhs);
+			return this->Xor<size(), typename copy_vector::value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator^(const Vector3<OtherT>& rhs) const
+		constexpr copy_vector operator^(const Vector3<OtherT>& rhs) const
 		{
-			return this->Xor<size(), nonref_value_type, OtherT>(rhs);
+			return this->Xor<size(), typename copy_vector::value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator^(const Vector4<OtherT>& rhs) const
+		constexpr copy_vector operator^(const Vector4<OtherT>& rhs) const
 		{
-			return this->Xor<size(), nonref_value_type, OtherT>(rhs);
+			return this->Xor<size(), typename copy_vector::value_type, OtherT>(rhs);
 		}
 		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator^(const RhsT& rhs) const
+		constexpr copy_vector operator^(const RhsT& rhs) const
 		{
-			return this->Xor<size(), nonref_value_type, RhsT>(rhs);
+			return this->Xor<size(), typename copy_vector::value_type, RhsT>(rhs);
 		}
 		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator<<(const Vector2<OtherT>& rhs) const
+		constexpr copy_vector operator<<(const Vector2<OtherT>& rhs) const
 		{
-			return this->LeftShiftPerElement<size(), nonref_value_type, OtherT>(rhs);
+			return this->LeftShiftPerElement<size(), typename copy_vector::value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator<<(const Vector3<OtherT>& rhs) const
+		constexpr copy_vector operator<<(const Vector3<OtherT>& rhs) const
 		{
-			return this->LeftShiftPerElement<size(), nonref_value_type, OtherT>(rhs);
+			return this->LeftShiftPerElement<size(), typename copy_vector::value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator<<(const Vector4<OtherT>& rhs) const
+		constexpr copy_vector operator<<(const Vector4<OtherT>& rhs) const
 		{
-			return this->LeftShiftPerElement<size(), nonref_value_type, OtherT>(rhs);
+			return this->LeftShiftPerElement<size(), typename copy_vector::value_type, OtherT>(rhs);
 		}
 		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator<<(const RhsT& rhs) const
+		constexpr copy_vector operator<<(const RhsT& rhs) const
 		{
-			return this->LeftShiftPerElement<size(), nonref_value_type, RhsT>(rhs);
+			return this->LeftShiftPerElement<size(), typename copy_vector::value_type, RhsT>(rhs);
 		}
 		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator>>(const Vector2<OtherT>& rhs) const
+		constexpr copy_vector operator>>(const Vector2<OtherT>& rhs) const
 		{
-			return this->RightShiftPerElement<size(), nonref_value_type, OtherT>(rhs);
+			return this->RightShiftPerElement<size(), typename copy_vector::value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator>>(const Vector3<OtherT>& rhs) const
+		constexpr copy_vector operator>>(const Vector3<OtherT>& rhs) const
 		{
-			return this->RightShiftPerElement<size(), nonref_value_type, OtherT>(rhs);
+			return this->RightShiftPerElement<size(), typename copy_vector::value_type, OtherT>(rhs);
 		}
 		template<typename OtherT>
-		constexpr Vector2<nonref_value_type> operator>>(const Vector4<OtherT>& rhs) const
+		constexpr copy_vector operator>>(const Vector4<OtherT>& rhs) const
 		{
-			return this->RightShiftPerElement<size(), nonref_value_type, OtherT>(rhs);
+			return this->RightShiftPerElement<size(), typename copy_vector::value_type, OtherT>(rhs);
 		}
 		template<typename RhsT>
-		constexpr Vector2<nonref_value_type> operator>>(const RhsT& rhs) const
+		constexpr copy_vector operator>>(const RhsT& rhs) const
 		{
-			return this->RightShiftPerElement<size(), nonref_value_type, RhsT>(rhs);
+			return this->RightShiftPerElement<size(), typename copy_vector::value_type, RhsT>(rhs);
 		}
-		constexpr Vector2<nonref_value_type> operator~() const
+		constexpr copy_vector operator~() const
 		{
 			return this->Not();
 		}
-
 #pragma endregion
 
 #pragma region ARITHMETIC_NONCONST_OPERATORS
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator+=(const Vector2<OtherT>& rhs)
+		emu_vector_type& operator+=(const Vector2<OtherT>& rhs)
 		{
 			*this = (*this + rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator+=(const Vector3<OtherT>& rhs)
+		emu_vector_type& operator+=(const Vector3<OtherT>& rhs)
 		{
 			*this = (*this + rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator+=(const Vector4<OtherT>& rhs)
+		emu_vector_type& operator+=(const Vector4<OtherT>& rhs)
 		{
 			*this = (*this + rhs);
 			return *this;
 		}
 
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator-=(const Vector2<OtherT>& rhs)
+		emu_vector_type& operator-=(const Vector2<OtherT>& rhs)
 		{
 			*this = (*this - rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator-=(const Vector3<OtherT>& rhs)
+		emu_vector_type& operator-=(const Vector3<OtherT>& rhs)
 		{
 			*this = (*this - rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator-=(const Vector4<OtherT>& rhs)
+		emu_vector_type& operator-=(const Vector4<OtherT>& rhs)
 		{
 			*this = (*this - rhs);
 			return *this;
 		}
 
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator*=(const Vector2<OtherT>& rhs)
+		emu_vector_type& operator*=(const Vector2<OtherT>& rhs)
 		{
 			*this = (*this * rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator*=(const Vector3<OtherT>& rhs)
+		emu_vector_type& operator*=(const Vector3<OtherT>& rhs)
 		{
 			*this = (*this * rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator*=(const Vector4<OtherT>& rhs)
+		emu_vector_type& operator*=(const Vector4<OtherT>& rhs)
 		{
 			*this = (*this * rhs);
 			return *this;
 		}
 		template<typename RhsT>
-		constexpr Vector2<value_type>& operator*=(const RhsT& rhs)
+		emu_vector_type& operator*=(const RhsT& rhs)
 		{
 			*this = (*this * rhs);
 			return *this;
 		}
 
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator/=(const Vector2<OtherT>& rhs)
+		emu_vector_type& operator/=(const Vector2<OtherT>& rhs)
 		{
 			*this = (*this / rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator/=(const Vector3<OtherT>& rhs)
+		emu_vector_type& operator/=(const Vector3<OtherT>& rhs)
 		{
 			*this = (*this / rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator/=(const Vector4<OtherT>& rhs)
+		emu_vector_type& operator/=(const Vector4<OtherT>& rhs)
 		{
 			*this = (*this / rhs);
 			return *this;
 		}
 		template<typename RhsT>
-		constexpr Vector2<value_type>& operator/=(const RhsT& rhs)
+		emu_vector_type& operator/=(const RhsT& rhs)
 		{
 			*this = (*this / rhs);
 			return *this;
 		}
 
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator%=(const Vector2<OtherT>& rhs)
+		emu_vector_type& operator%=(const Vector2<OtherT>& rhs)
 		{
 			*this = (*this % rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator%=(const Vector3<OtherT>& rhs)
+		emu_vector_type& operator%=(const Vector3<OtherT>& rhs)
 		{
 			*this = (*this % rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator%=(const Vector4<OtherT>& rhs)
+		emu_vector_type& operator%=(const Vector4<OtherT>& rhs)
 		{
 			*this = (*this % rhs);
 			return *this;
 		}
 		template<typename RhsT>
-		constexpr Vector2<value_type>& operator%=(const RhsT& rhs)
+		emu_vector_type& operator%=(const RhsT& rhs)
 		{
 			*this = (*this % rhs);
 			return *this;
@@ -524,125 +528,125 @@ namespace EmuMath
 
 #pragma region BITWISE_NONCONST_OPERATORS
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator&=(const Vector2<OtherT>& rhs)
+		constexpr emu_vector_type& operator&=(const Vector2<OtherT>& rhs)
 		{
 			*this = (*this & rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator&=(const Vector3<OtherT>& rhs)
+		constexpr emu_vector_type& operator&=(const Vector3<OtherT>& rhs)
 		{
 			*this = (*this & rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator&=(const Vector4<OtherT>& rhs)
+		constexpr emu_vector_type& operator&=(const Vector4<OtherT>& rhs)
 		{
 			*this = (*this & rhs);
 			return *this;
 		}
 		template<typename RhsT>
-		constexpr Vector2<value_type>& operator&=(const RhsT& rhs)
+		constexpr emu_vector_type& operator&=(const RhsT& rhs)
 		{
 			*this = (*this & rhs);
 			return *this;
 		}
 
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator|=(const Vector2<OtherT>& rhs)
+		constexpr emu_vector_type& operator|=(const Vector2<OtherT>& rhs)
 		{
 			*this = (*this | rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator|=(const Vector3<OtherT>& rhs)
+		constexpr emu_vector_type& operator|=(const Vector3<OtherT>& rhs)
 		{
 			*this = (*this | rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator|=(const Vector4<OtherT>& rhs)
+		constexpr emu_vector_type& operator|=(const Vector4<OtherT>& rhs)
 		{
 			*this = (*this | rhs);
 			return *this;
 		}
 		template<typename RhsT>
-		constexpr Vector2<value_type>& operator|=(const RhsT& rhs)
+		constexpr emu_vector_type& operator|=(const RhsT& rhs)
 		{
 			*this = (*this | rhs);
 			return *this;
 		}
 
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator^=(const Vector2<OtherT>& rhs)
+		constexpr emu_vector_type& operator^=(const Vector2<OtherT>& rhs)
 		{
 			*this = (*this ^ rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator^=(const Vector3<OtherT>& rhs)
+		constexpr emu_vector_type& operator^=(const Vector3<OtherT>& rhs)
 		{
 			*this = (*this ^ rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator^=(const Vector4<OtherT>& rhs)
+		constexpr emu_vector_type& operator^=(const Vector4<OtherT>& rhs)
 		{
 			*this = (*this ^ rhs);
 			return *this;
 		}
 		template<typename RhsT>
-		constexpr Vector2<value_type>& operator^=(const RhsT& rhs)
+		constexpr emu_vector_type& operator^=(const RhsT& rhs)
 		{
 			*this = (*this ^ rhs);
 			return *this;
 		}
 
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator<<=(const Vector2<OtherT>& rhs)
+		constexpr emu_vector_type& operator<<=(const Vector2<OtherT>& rhs)
 		{
 			*this = (*this << rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator<<=(const Vector3<OtherT>& rhs)
+		constexpr emu_vector_type& operator<<=(const Vector3<OtherT>& rhs)
 		{
 			*this = (*this << rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator<<=(const Vector4<OtherT>& rhs)
+		constexpr emu_vector_type& operator<<=(const Vector4<OtherT>& rhs)
 		{
 			*this = (*this << rhs);
 			return *this;
 		}
 		template<typename RhsT>
-		constexpr Vector2<value_type>& operator<<=(const RhsT& rhs)
+		constexpr emu_vector_type& operator<<=(const RhsT& rhs)
 		{
 			*this = (*this << rhs);
 			return *this;
 		}
 
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator>>=(const Vector2<OtherT>& rhs)
+		constexpr emu_vector_type& operator>>=(const Vector2<OtherT>& rhs)
 		{
 			*this = (*this >> rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator>>=(const Vector3<OtherT>& rhs)
+		constexpr emu_vector_type& operator>>=(const Vector3<OtherT>& rhs)
 		{
 			*this = (*this >> rhs);
 			return *this;
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator>>=(const Vector4<OtherT>& rhs)
+		constexpr emu_vector_type& operator>>=(const Vector4<OtherT>& rhs)
 		{
 			*this = (*this >> rhs);
 			return *this;
 		}
 		template<typename RhsT>
-		constexpr Vector2<value_type>& operator>>=(const RhsT& rhs)
+		constexpr emu_vector_type& operator>>=(const RhsT& rhs)
 		{
 			*this = (*this >> rhs);
 			return *this;
@@ -942,66 +946,66 @@ namespace EmuMath
 			return EmuMath::Helpers::VectorComparisonPerElement_GreaterEqual<OutSize_>(*this, rhs_);
 		}
 
-		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		template<bool IncludeNonContained_ = false, class Rhs_ = emu_vector_type>
 		constexpr bool CompareAll_Equal(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorComparisonAll_Equal<OutSize_>(*this, rhs_);
+			return EmuMath::Helpers::VectorComparisonAll_Equal<IncludeNonContained_>(*this, rhs_);
 		}
-		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		template<bool IncludeNonContained_ = false, class Rhs_ = emu_vector_type>
 		constexpr bool CompareAll_NotEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorComparisonAll_NotEqual<OutSize_>(*this, rhs_);
+			return EmuMath::Helpers::VectorComparisonAll_NotEqual<IncludeNonContained_>(*this, rhs_);
 		}
-		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		template<bool IncludeNonContained_ = false, class Rhs_ = emu_vector_type>
 		constexpr bool CompareAll_Less(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorComparisonAll_Less<OutSize_>(*this, rhs_);
+			return EmuMath::Helpers::VectorComparisonAll_Less<IncludeNonContained_>(*this, rhs_);
 		}
-		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		template<bool IncludeNonContained_ = false, class Rhs_ = emu_vector_type>
 		constexpr bool CompareAll_LessEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorComparisonAll_LessEqual<OutSize_>(*this, rhs_);
+			return EmuMath::Helpers::VectorComparisonAll_LessEqual<IncludeNonContained_>(*this, rhs_);
 		}
-		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		template<bool IncludeNonContained_ = false, class Rhs_ = emu_vector_type>
 		constexpr bool CompareAll_Greater(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorComparisonAll_Greater<OutSize_>(*this, rhs_);
+			return EmuMath::Helpers::VectorComparisonAll_Greater<IncludeNonContained_>(*this, rhs_);
 		}
-		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		template<bool IncludeNonContained_= false, class Rhs_ = emu_vector_type>
 		constexpr bool CompareAll_GreaterEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorComparisonAll_GreaterEqual<OutSize_>(*this, rhs_);
+			return EmuMath::Helpers::VectorComparisonAll_GreaterEqual<IncludeNonContained_>(*this, rhs_);
 		}
 
-		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		template<bool IncludeNonContained_ = false, class Rhs_ = emu_vector_type>
 		constexpr bool CompareAny_Equal(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorComparisonAny_Equal<OutSize_>(*this, rhs_);
+			return EmuMath::Helpers::VectorComparisonAny_Equal<IncludeNonContained_>(*this, rhs_);
 		}
-		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		template<bool IncludeNonContained_ = false, class Rhs_ = emu_vector_type>
 		constexpr bool CompareAny_NotEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorComparisonAny_NotEqual<OutSize_>(*this, rhs_);
+			return EmuMath::Helpers::VectorComparisonAny_NotEqual<IncludeNonContained_>(*this, rhs_);
 		}
-		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		template<bool IncludeNonContained_ = false, class Rhs_ = emu_vector_type>
 		constexpr bool CompareAny_Less(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorComparisonAny_Less<OutSize_>(*this, rhs_);
+			return EmuMath::Helpers::VectorComparisonAny_Less<IncludeNonContained_>(*this, rhs_);
 		}
-		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		template<bool IncludeNonContained_ = false, class Rhs_ = emu_vector_type>
 		constexpr bool CompareAny_LessEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorComparisonAny_LessEqual<OutSize_>(*this, rhs_);
+			return EmuMath::Helpers::VectorComparisonAny_LessEqual<IncludeNonContained_>(*this, rhs_);
 		}
-		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		template<bool IncludeNonContained_ = false, class Rhs_ = emu_vector_type>
 		constexpr bool CompareAny_Greater(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorComparisonAny_Greater<OutSize_>(*this, rhs_);
+			return EmuMath::Helpers::VectorComparisonAny_Greater<IncludeNonContained_>(*this, rhs_);
 		}
-		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		template<bool IncludeNonContained_ = false, class Rhs_ = emu_vector_type>
 		constexpr bool CompareAny_GreaterEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorComparisonAny_GreaterEqual<OutSize_>(*this, rhs_);
+			return EmuMath::Helpers::VectorComparisonAny_GreaterEqual<IncludeNonContained_>(*this, rhs_);
 		}
 #pragma endregion
 
@@ -1177,37 +1181,37 @@ namespace EmuMath
 		/// <summary> Calculates the values of this Vector's elements when rounded toward negative infinity. </summary>
 		/// <returns>Copy of this Vector with its elements rounded toward negative infinity.</returns>
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type>
-		Vector2<nonref_value_type> Floor() const
+		typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT>::type Floor() const
 		{
 			return EmuMath::Helpers::VectorFloor<OutSize_, OutT>(*this);
 		}
 		/// <summary> Calculates the values of this Vector's elements when rounded toward positive infinity. </summary>
 		/// <returns>Copy of this Vector with its elements rounded toward positive infinity.</returns>
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type>
-		Vector2<nonref_value_type> Ceil() const
+		typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT>::type Ceil() const
 		{
 			return EmuMath::Helpers::VectorCeil<OutSize_, OutT>(*this);
 		}
 		/// <summary> Calculates the values of this Vector's elements when rounded toward 0. </summary>
 		/// <returns>Copy of this Vector with its elements rounded toward 0.</returns>
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type>
-		Vector2<nonref_value_type> Trunc() const
+		typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT>::type Trunc() const
 		{
 			return EmuMath::Helpers::VectorTrunc<OutSize_, OutT>(*this);
 		}
 
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type>
-		constexpr Vector2<nonref_value_type> FloorConstexpr() const
+		constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT>::type FloorConstexpr() const
 		{
 			return EmuMath::Helpers::VectorFloorConstexpr<OutSize_, OutT>(*this);
 		}
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type>
-		constexpr Vector2<nonref_value_type> CeilConstexpr() const
+		constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT>::type CeilConstexpr() const
 		{
 			return EmuMath::Helpers::VectorCeilConstexpr<OutSize_, OutT>(*this);
 		}
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type>
-		constexpr Vector2<nonref_value_type> TruncConstexpr() const
+		constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT>::type TruncConstexpr() const
 		{
 			return EmuMath::Helpers::VectorTruncConstexpr<OutSize_, OutT>(*this);
 		}

@@ -76,15 +76,15 @@ namespace EmuMath
 			using type = std::conditional_t
 			<
 				Size_ == 2,
-				Vector2<ContainedType>,
+				EmuMath::Vector2<ContainedType>,
 				std::conditional_t
 				<
 					Size_ == 3,
-					Vector3<ContainedType>,
+					EmuMath::Vector3<ContainedType>,
 					std::conditional_t
 					<
 						Size_ == 4,
-						Vector4<ContainedType>,
+						EmuMath::Vector4<ContainedType>,
 						std::false_type
 					>
 				>
@@ -115,7 +115,7 @@ namespace EmuMath
 			using type = std::conditional_t
 			<
 				_is_valid,
-				EmuMath::TMPHelpers::emu_vector_from_size_t<EmuVector_::size(), typename EmuVector_::nonref_value_type_without_qualifiers>,
+				typename EmuMath::TMPHelpers::emu_vector_from_size<EmuVector_::size(), typename EmuVector_::nonref_value_type_without_qualifiers>::type,
 				std::false_type
 			>;
 		};

@@ -40,14 +40,10 @@ int main()
 
 	EmuCore::TMPHelpers::bits_in_type_v<std::array<float, 400>>;
 
-	constexpr Vector2<float> v4f_ywv2_ceil = V4f.AsShuffled<1, 3>().CeilConstexpr();
 
-	constexpr float V4f_V4fyw2_dot = EmuMath::Helpers::VectorDotProduct<float>(V4f, v4f_ywv2_ceil);
 
 	constexpr float min_v4f = EmuMath::Helpers::VectorMin<float>(V4f);
 	constexpr float max_v4f = EmuMath::Helpers::VectorMax<float>(V4f);
-	constexpr float min_v4fyw2 = v4f_ywv2_ceil.Min();
-	constexpr float max_v4fyw2 = v4f_ywv2_ceil.Max();
 
 	constexpr Vector4<float> v4f_clamped_min = EmuMath::Helpers::VectorClampMin<4, float>(V4f, -255);
 	constexpr Vector4<float> v4f_clamped_max = EmuMath::Helpers::VectorClampMax<4, float>(V4f, -0.5f);
@@ -67,12 +63,12 @@ int main()
 	constexpr Vector2<float> lerp_scalar_t_v2 = Vector2<float>(lerp_scalar_t_);
 	constexpr Vector2<float> further_lerp_v2 = lerp_scalar_t_v2.Lerp(b_, lone_t_);
 
-	constexpr Vector4<bool> check_equal_v4 = EmuMath::Helpers::VectorComparisonPerElement_Equal<4>(Vector2f(0.0f, 5.0f), Vector4<float>(5.0f, 5.0f, 1.0f, 0.0f));
-	constexpr Vector4<bool> check_not_equal_v4 = EmuMath::Helpers::VectorComparisonPerElement_NotEqual<4>(Vector2f(0.0f, 5.0f), Vector4<float>(5.0f, 5.0f, 1.0f, 0.0f));
-	constexpr Vector4<bool> check_less_v4 = EmuMath::Helpers::VectorComparisonPerElement_Less<4>(Vector2f(0.0f, 5.0f), Vector4<float>(5.0f, 5.0f, 1.0f, 0.0f));
-	constexpr Vector4<bool> check_less_equal_v4 = EmuMath::Helpers::VectorComparisonPerElement_LessEqual<4>(Vector2f(0.0f, 5.0f), Vector4<float>(5.0f, 5.0f, 1.0f, 0.0f));
-	constexpr Vector4<bool> check_greater_v4 = EmuMath::Helpers::VectorComparisonPerElement_Greater<4>(Vector2f(0.0f, 5.0f), Vector4<float>(5.0f, 5.0f, 1.0f, 0.0f));
-	constexpr Vector4<bool> check_greater_equal_v4 = EmuMath::Helpers::VectorComparisonPerElement_GreaterEqual<4>(Vector2f(0.0f, 5.0f), Vector4<float>(5.0f, 5.0f, 1.0f, 0.0f));
+	constexpr Vector4<bool> check_equal_v4 = EmuMath::Helpers::VectorComparisonPerElement_Equal<4>(Vector2<float>(0.0f, 5.0f), Vector4<float>(5.0f, 5.0f, 1.0f, 0.0f));
+	constexpr Vector4<bool> check_not_equal_v4 = EmuMath::Helpers::VectorComparisonPerElement_NotEqual<4>(Vector2<float>(0.0f, 5.0f), Vector4<float>(5.0f, 5.0f, 1.0f, 0.0f));
+	constexpr Vector4<bool> check_less_v4 = EmuMath::Helpers::VectorComparisonPerElement_Less<4>(Vector2<float>(0.0f, 5.0f), Vector4<float>(5.0f, 5.0f, 1.0f, 0.0f));
+	constexpr Vector4<bool> check_less_equal_v4 = EmuMath::Helpers::VectorComparisonPerElement_LessEqual<4>(Vector2<float>(0.0f, 5.0f), Vector4<float>(5.0f, 5.0f, 1.0f, 0.0f));
+	constexpr Vector4<bool> check_greater_v4 = EmuMath::Helpers::VectorComparisonPerElement_Greater<4>(Vector2<float>(0.0f, 5.0f), Vector4<float>(5.0f, 5.0f, 1.0f, 0.0f));
+	constexpr Vector4<bool> check_greater_equal_v4 = EmuMath::Helpers::VectorComparisonPerElement_GreaterEqual<4>(Vector2<float>(0.0f, 5.0f), Vector4<float>(5.0f, 5.0f, 1.0f, 0.0f));
 
 	constexpr bool result_all_equal_ = EmuMath::Helpers::VectorComparisonAll_Equal<true>(Vector2<float>(2.5f, 2.5f), 2.5f);
 	constexpr bool result_all_not_equal = EmuMath::Helpers::VectorComparisonAll_NotEqual<true>(Vector2<float>(2.5f, 2.5f), 2.1f);
@@ -105,6 +101,10 @@ int main()
 	constexpr Vector3<std::int32_t> a3_ = { 2, 3, 4 };
 	constexpr Vector3<std::uint64_t> b3_ = { 5, 6, 7 };
 	constexpr Vector3<float> c3_ = EmuMath::Helpers::VectorCrossProduct<float>(a3_, b3_);
+
+
+
+	using A_ = EmuMath::TMPHelpers::emu_vector_copy<Vector4<float>>::type;
 
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();
