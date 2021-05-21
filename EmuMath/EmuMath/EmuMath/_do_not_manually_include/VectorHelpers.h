@@ -261,6 +261,63 @@ namespace EmuMath::Helpers
 				return _perform_vector_arithmetic_scalar_rhs_with_types<OutVector, LhsVector, Rhs, HighestT, Func>(lhs, rhs);
 			}
 		}
+
+		template<typename OutT_, class InVector_, template<typename Lhs__, typename Rhs__, typename Out__> class FuncTemplate_>
+		inline constexpr OutT_ _calculate_vector_total_emu(const InVector_& in_)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<InVector_>)
+			{
+				using InScalar_ = typename InVector_::nonref_value_type_without_qualifiers;
+				using HighestT_ = EmuCore::TMPHelpers::highest_byte_size_t<std::remove_cv_t<OutT_>, InScalar_>;
+				using Func_ = FuncTemplate_<HighestT_, HighestT_, OutT_>;
+				Func_ func = Func_();
+				if constexpr (InVector_::size() == 2)
+				{
+					return func
+					(
+						static_cast<HighestT_>(in_.x),
+						static_cast<HighestT_>(in_.y)
+					);
+				}
+				else if constexpr (InVector_::size() == 3)
+				{
+					return func
+					(
+						func
+						(
+							static_cast<HighestT_>(in_.x),
+							static_cast<HighestT_>(in_.y)
+						),
+						static_cast<HighestT_>(in_.z)
+					);
+				}
+				else if constexpr (InVector_::size() == 4)
+				{
+					return func
+					(
+						func
+						(
+							func
+							(
+								static_cast<HighestT_>(in_.x),
+								static_cast<HighestT_>(in_.y)
+							),
+							static_cast<HighestT_>(in_.z)
+						),
+						static_cast<HighestT_>(in_.w)
+					);
+				}
+				else
+				{
+					static_assert(false, "Attempted to calculate a total of an invalidly sized EmuMath Vector.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to calculate a total of an EmuMath Vector, but passed a non-EmuMath-Vector operand.");
+				return OutT_();
+			}
+		}
 #pragma endregion
 
 #pragma region BITWISE
@@ -3379,6 +3436,163 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to set an EmuMath Vector with multiple scalar values, but provided a non-EmuMath-Vector left-hand operand.");
 		}
 		return lhs_;
+	}
+
+	template<std::size_t OutSize_, typename OutFP_, class InVector_>
+	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutFP_>::type VectorReciprocal(const InVector_& in_)
+	{
+		using OutVector_ = typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutFP_>::type;
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<InVector_>)
+		{
+			if constexpr (std::is_floating_point_v<std::remove_cv_t<OutFP_>>)
+			{
+				constexpr OutFP_ fp_one_ = OutFP_(1);
+				if constexpr (OutSize_ == 2)
+				{
+					return OutVector_
+					(
+						fp_one_ / in_.x,
+						fp_one_ / in_.y
+					);
+				}
+				else if constexpr (OutSize_ == 3)
+				{
+					if constexpr (InVector_::size() >= 3)
+					{
+						return OutVector_
+						(
+							fp_one_ / in_.x,
+							fp_one_ / in_.y,
+							fp_one_ / in_.z
+						);
+					}
+					else
+					{
+						return OutVector_
+						(
+							fp_one_ / in_.x,
+							fp_one_ / in_.y,
+							OutFP_()
+						);
+					}
+				}
+				else if constexpr (OutSize_ == 4)
+				{
+					if constexpr (InVector_::size() >= 3)
+					{
+						if constexpr (InVector_::size() >= 4)
+						{
+							return OutVector_
+							(
+								fp_one_ / in_.x,
+								fp_one_ / in_.y,
+								fp_one_ / in_.z,
+								fp_one_ / in_.w
+							);
+						}
+						else
+						{
+							return OutVector_
+							(
+								fp_one_ / in_.x,
+								fp_one_ / in_.y,
+								fp_one_ / in_.z,
+								OutFP_()
+							);
+						}
+					}
+					else
+					{
+						return OutVector_
+						(
+							fp_one_ / in_.x,
+							fp_one_ / in_.y,
+							OutFP_(),
+							OutFP_()
+						);
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to get the reciprocal of an EmuMath Vector with an invalidly sized output Vector.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to output the reciprocal of an EmuMath Vector as a Vector not containing floating points, which is required.");
+				return OutVector_();
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the reciprocal of an EmuMath Vector while passing a non-EmuMath-Vector operand.");
+			return OutVector_();
+		}
+	}
+
+	template<typename OutT_, class InVector_>
+	inline constexpr OutT_ VectorTotalSum(const InVector_& in_)
+	{
+		return _underlying_vector_funcs::_calculate_vector_total_emu<OutT_, InVector_, EmuCore::TMPHelpers::plus_diff_types>(in_);
+	}
+	template<typename OutT_, class InVector_>
+	inline constexpr OutT_ VectorTotalProduct(const InVector_& in_)
+	{
+		return _underlying_vector_funcs::_calculate_vector_total_emu<OutT_, InVector_, EmuCore::TMPHelpers::multiplies_diff_types>(in_);
+	}
+
+	template<std::size_t OutSize_, typename OutT_, class InVector_>
+	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type VectorReverse(const InVector_& in_)
+	{
+		using OutVector_ = typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type;
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<OutVector_>)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<InVector_>)
+			{
+				if constexpr (OutVector_::size() == 2)
+				{
+					return OutVector_
+					(
+						-static_cast<OutT_>(in_.x),
+						-static_cast<OutT_>(in_.y)
+					);
+				}
+				else if constexpr (OutVector_::size() == 3)
+				{
+					return OutVector_
+					(
+						-static_cast<OutT_>(in_.x),
+						-static_cast<OutT_>(in_.y),
+						-static_cast<OutT_>(EmuMath::TMPHelpers::emu_vector_z(in_))
+					);
+				}
+				else if constexpr (OutVector_::size() == 4)
+				{
+					return OutVector_
+					(
+						-static_cast<OutT_>(in_.x),
+						-static_cast<OutT_>(in_.y),
+						-static_cast<OutT_>(EmuMath::TMPHelpers::emu_vector_z(in_)),
+						-static_cast<OutT_>(EmuMath::TMPHelpers::emu_vector_w(in_))
+					);
+				}
+				else
+				{
+					static_assert(false, "Attempted to reverse an EmuMath Vector with an invalidly sized output Vector.");
+					return OutVector_();
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to get the reverse of an EmuMath Vector with a non-EmuMath-Vector operand.");
+				return OutVector_();
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the reverse of an EmuMath Vector with an invalid output Vector.");
+			return OutVector_();
+		}
 	}
 }
 

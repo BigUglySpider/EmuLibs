@@ -94,7 +94,13 @@ int main()
 	constexpr float some_val_ = 5.0f;
 	auto made_vector_ = EmuMath::TMPHelpers::make_emu_vector<const float&>(some_val_, some_val_);
 	std::cout << made_vector_ << "\n";
+	constexpr auto hi = v2f.Reciprocal();
 
+	constexpr float total_add_ = EmuMath::Helpers::VectorTotalSum<float>(Vector4<float>(5.0f, -27.0f, 3.1f, 27.0f));
+	constexpr float total_mult_ = EmuMath::Helpers::VectorTotalProduct<float>(Vector4<float>(5.0f, -27.0f, 3.1f, 27.0f));
+
+	constexpr Vector4<std::uint32_t> normal_vec_ = { 1, std::numeric_limits<std::uint32_t>::max(), 17, 198759823 };
+	constexpr Vector4<std::int64_t> reverse_vec_ = EmuMath::Helpers::VectorReverse<4, std::int64_t>(normal_vec_);
 
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();

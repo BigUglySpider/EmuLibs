@@ -1077,29 +1077,14 @@ namespace EmuMath
 #pragma region OVERALL_OPERATIONS
 		/// <summary>
 		/// <para> Calculates the reciprocals of this Vector's elements, with an optionally customisable floating-point output type. </para>
-		/// <para> Note that the output type must be a valid floating point type. If not, a static assertion will be triggered. </para>
+		/// <para> Note that the output type must be a valid floating point type. </para>
 		/// </summary>
 		/// <typeparam name="OutT">Floating-point type to output the reciprocals as.</typeparam>
 		/// <returns>Vector of reciprocals to this Vector's respective elements, stored as the provided OutT (defaults to this Vector's default_floating_point).</returns>
-		template<typename OutT = default_floating_point>
-		constexpr Vector2<OutT> Reciprocal() const
+		template<std::size_t OutSize_ = size(), typename OutFP_ = default_floating_point>
+		constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutFP_>::type Reciprocal() const
 		{
-			if constexpr (std::is_floating_point_v<OutT>)
-			{
-				constexpr OutT one_ = EmuCore::ArithmeticHelpers::OneT<OutT>;
-				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, OutT>)
-				{
-					return { one_ / x, one_ / y };
-				}
-				else
-				{
-					return { one_ / static_cast<OutT>(x), one_ / static_cast<OutT>(y) };
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to retrieve a non-floating-point reciprocal from an EmuMath::Vector2, which is not allowed.");
-			}
+			return EmuMath::Helpers::VectorReciprocal<OutSize_, OutFP_>(*this);
 		}
 		/// <summary>
 		/// <para> Calculates the total of all of this Vector's elements added together and outputs the result as an optionally customisable type. </para>
@@ -1107,16 +1092,9 @@ namespace EmuMath
 		/// <typeparam name="OutT">Type to output the sum as.</typeparam>
 		/// <returns>The total of all elements in this Vector added together, represented as the provided OutT (defaults to this Vector's nonref_value_type).</returns>
 		template<typename OutT = nonref_value_type>
-		constexpr OutT OverallSum() const
+		constexpr OutT TotalSum() const
 		{
-			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, OutT>)
-			{
-				return x + y;
-			}
-			else
-			{
-				return static_cast<OutT>(x) + static_cast<OutT>(y);
-			}
+			return EmuMath::Helpers::VectorTotalSum<OutT>(*this);
 		}
 		/// <summary>
 		/// <para> Calculates the total of all of this Vector's elements multiplied together and outputs the result as an optionally customisable type. </para>
@@ -1124,16 +1102,9 @@ namespace EmuMath
 		/// <typeparam name="OutT">Type to output the product as.</typeparam>
 		/// <returns>The total of all elements in this Vector multiplied together, represented as the provided OutT (defaults to this Vector's nonref_value_type).</returns>
 		template<typename OutT = nonref_value_type>
-		constexpr OutT OverallProduct() const
+		constexpr OutT TotalProduct() const
 		{
-			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, OutT>)
-			{
-				return x * y;
-			}
-			else
-			{
-				return static_cast<OutT>(x) * static_cast<OutT>(y);
-			}
+			return EmuMath::Helpers::VectorTotalProduct<OutT>(*this);
 		}
 		/// <summary> Determines the lowest element within this Vector. </summary>
 		/// <returns>Copy of the lowest element within this Vector.</returns>
@@ -1313,20 +1284,12 @@ namespace EmuMath
 		/// <summary>
 		/// <para> Returns a reversed version of this Vector, with an optional different type. </para>
 		/// </summary>
-		/// <typeparam name="OutT">Type for the returned Vector to contain. Defaults to this Vector's nonref_value_type.</typeparam>
+		/// <typeparam name="OutT_">Type for the returned Vector to contain. Defaults to this Vector's nonref_value_type.</typeparam>
 		/// <returns>Reversed version of this Vector.</returns>
-		template<typename OutT = nonref_value_type>
-		constexpr Vector2<OutT> Reverse() const
+		template<std::size_t OutSize_ = size(), typename OutT_ = nonref_value_type>
+		constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type Reverse() const
 		{
-			if constexpr (std::is_signed_v<nonref_value_type>)
-			{
-				return { -x, -y };
-			}
-			else
-			{
-				using HighestSigned = EmuCore::TMPHelpers::best_signed_rep_t<EmuCore::TMPHelpers::highest_byte_size_t<OutT, nonref_value_type>>;
-				return { -static_cast<HighestSigned>(x), -static_cast<HighestSigned>(y) };
-			}
+			return EmuMath::Helpers::VectorReverse<OutSize_, OutT_>(*this);
 		}
 #pragma endregion
 
@@ -1334,22 +1297,6 @@ namespace EmuMath
 		value_type x;
 		/// <summary> The second component of this vector, representing the Y-axis. </summary>
 		value_type y;
-
-	private:
-#pragma region PRIVATE_HELPERS
-		template<std::size_t Index, typename T_>
-		constexpr void _set_individual_value(const T_& val_)
-		{
-			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, std::remove_reference_t<T_>>)
-			{
-				at<Index>() = val_;
-			}
-			else
-			{
-				at<Index>() = static_cast<nonref_value_type>(val_);
-			}
-		}
-#pragma endregion
 	};
 }
 
