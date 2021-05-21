@@ -1338,36 +1338,221 @@ namespace EmuMath::Helpers
 	}
 #pragma endregion
 
+#pragma region MAG
+	template<typename OutT, class EmuVector_>
+	inline constexpr OutT _calculate_square_magnitude(const EmuVector_& vector_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<EmuVector_>)
+		{
+			using Scalar = typename EmuVector_::nonref_value_type_without_qualifiers;
+			using HighestT = EmuCore::TMPHelpers::highest_byte_size_t<OutT, Scalar>;
+			using CastT = std::conditional_t
+			<
+				EmuCore::TMPHelpers::is_any_floating_point_v<OutT, Scalar>,
+				EmuCore::TMPHelpers::best_floating_point_rep_t<HighestT>,
+				std::conditional_t
+				<
+					EmuCore::TMPHelpers::is_any_signed_v<OutT, Scalar>,
+					EmuCore::TMPHelpers::best_signed_int_rep_t<HighestT>,
+					EmuCore::TMPHelpers::best_unsigned_int_rep_t<HighestT>
+				>
+			>;
+			if constexpr (EmuVector_::size() == 2)
+			{
+				if constexpr (std::is_same_v<Scalar, CastT>)
+				{
+					if constexpr (std::is_same_v<OutT, CastT>)
+					{
+						return
+						(
+							(vector_.x * vector_.x) +
+							(vector_.y * vector_.y)
+						);
+					}
+					else
+					{
+						return static_cast<OutT>
+						(
+							(vector_.x * vector_.x) +
+							(vector_.y * vector_.y)
+						);
+					}
+				}
+				else
+				{
+					if constexpr (std::is_same_v<OutT, CastT>)
+					{
+						return
+						(
+							(static_cast<CastT>(vector_.x) * vector_.x) +
+							(static_cast<CastT>(vector_.y) * vector_.y)
+						);
+					}
+					else
+					{
+						return static_cast<OutT>
+						(
+							(static_cast<CastT>(vector_.x) * vector_.x) +
+							(static_cast<CastT>(vector_.y) * vector_.y)
+						);
+					}
+				}
+			}
+			else if constexpr (EmuVector_::size() == 3)
+			{
+				if constexpr (std::is_same_v<Scalar, CastT>)
+				{
+					if constexpr (std::is_same_v<OutT, CastT>)
+					{
+						return 
+						(
+							(vector_.x * vector_.x) +
+							(vector_.y * vector_.y) +
+							(vector_.z * vector_.z)
+						);
+					}
+					else
+					{
+						return static_cast<OutT>
+						(
+							(vector_.x * vector_.x) +
+							(vector_.y * vector_.y) +
+							(vector_.z * vector_.z)
+						);
+					}
+				}
+				else
+				{
+					if constexpr (std::is_same_v<OutT, CastT>)
+					{
+						return
+						(
+							(static_cast<CastT>(vector_.x) * vector_.x) +
+							(static_cast<CastT>(vector_.y) * vector_.y) +
+							(static_cast<CastT>(vector_.z) * vector_.z)
+						);
+					}
+					else
+					{
+						return static_cast<OutT>
+						(
+							(static_cast<CastT>(vector_.x) * vector_.x) +
+							(static_cast<CastT>(vector_.y) * vector_.y) +
+							(static_cast<CastT>(vector_.z) * vector_.z)
+						);
+					}
+				}
+			}
+			else if constexpr (EmuVector_::size() == 4)
+			{
+				if constexpr (std::is_same_v<Scalar, CastT>)
+				{
+					if constexpr (std::is_same_v<OutT, CastT>)
+					{
+						return 
+						(
+							(vector_.x * vector_.x) +
+							(vector_.y * vector_.y) +
+							(vector_.z * vector_.z) +
+							(vector_.w * vector_.w)
+						);
+					}
+					else
+					{
+						return static_cast<OutT>
+						(
+							(vector_.x * vector_.x) +
+							(vector_.y * vector_.y) +
+							(vector_.z * vector_.z) +
+							(vector_.w * vector_.w)
+						);
+					}
+				}
+				else
+				{
+					if constexpr (std::is_same_v<OutT, CastT>)
+					{
+						return
+						(
+							(static_cast<CastT>(vector_.x) * vector_.x) +
+							(static_cast<CastT>(vector_.y) * vector_.y) +
+							(static_cast<CastT>(vector_.z) * vector_.z) +
+							(static_cast<CastT>(vector_.w) * vector_.w)
+						);
+					}
+					else
+					{
+						return static_cast<OutT>
+						(
+							(static_cast<CastT>(vector_.x) * vector_.x) +
+							(static_cast<CastT>(vector_.y) * vector_.y) +
+							(static_cast<CastT>(vector_.z) * vector_.z) +
+							(static_cast<CastT>(vector_.w) * vector_.w)
+						);
+					}
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to get the Square Magnitude of an EmuMath Vector of an invalid size.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the Square Magnitude of an EmuMath Vector, but passed a type that is not an EmuMath Vector.");
+			return OutT();
+		}
+	}
+
+	template<typename OutFP_, class EmuVector_>
+	inline constexpr OutFP_ _calculate_magnitude_constexpr(const EmuVector_& vector_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<EmuVector_>)
+		{
+			using VecInfo_ = typename EmuVector_::info_type;
+			if constexpr (VecInfo_::has_floating_point_values)
+			{
+				return EmuMath::SqrtConstexpr<OutFP_, long double>(_calculate_square_magnitude<long double>(vector_));
+			}
+			else
+			{
+				return EmuMath::SqrtConstexpr<OutFP_, std::uint64_t>(_calculate_square_magnitude<std::uint64_t>(vector_));
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the magnitude of an EmuMath Vector, but passed a type that is not an EmuMath Vector.");
+			return OutFP_();
+		}
+	}
+
+	template<typename Out_, class EmuVector_>
+	inline Out_ _calculate_magnitude(const EmuVector_& vector_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<EmuVector_>)
+		{
+			using StrippedOut_ = std::remove_cv_t<Out_>;
+			using VecInfo_ = typename EmuVector_::info_type;
+			using SqrMag = std::conditional_t<VecInfo_::has_floating_point_values, long double, std::uint64_t>;
+			const SqrMag sqrMag_ = _calculate_square_magnitude<SqrMag>(vector_);
+			if constexpr (std::is_same_v<StrippedOut_, SqrMag>)
+			{
+				return sqrtl(static_cast<long double>(sqrMag_));
+			}
+			else
+			{
+				return static_cast<Out_>(sqrtl(static_cast<long double>(sqrMag_)));
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the magnitude of an EmuMath Vector, but passed a type that is not an EmuMath Vector.");
+			return Out_();
+		}
+	}
+#pragma endregion
+
 #pragma region COMPARISON
-	template<class LhsVector_, class RhsT_, std::size_t RhsVectorSize_>
-	inline constexpr bool _perform_vector_comparison_equal(const LhsVector_& lhs, const EmuMath::TMPHelpers::emu_vector_from_size_t<RhsVectorSize_, RhsT_>& rhs)
-	{
-		using RhsVector_ = EmuMath::TMPHelpers::emu_vector_from_size_t<RhsVectorSize_, RhsT_>;
-		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<LhsVector_>)
-		{
-			return _perform_vector_overall_comparison_with_vector<LhsVector_, RhsVector_, std::equal_to<void>>(lhs, rhs);
-		}
-		else
-		{
-			static_assert(false, "Attempted to perform an EmuMath Vector comparison (Equal) using a non-EmuMath-Vector operand.");
-			return false;
-		}
-	}
-
-	template<class LhsVector_, class RhsT_, std::size_t RhsVectorSize_>
-	inline constexpr bool _perform_vector_comparison_not_equal(const LhsVector_& lhs, const EmuMath::TMPHelpers::emu_vector_from_size_t<RhsVectorSize_, RhsT_>& rhs)
-	{
-		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<LhsVector_>)
-		{
-			return !_perform_vector_overall_comparison_with_vector<LhsVector_, Vector2<RhsT_>, std::equal_to<void>>(lhs, rhs);
-		}
-		else
-		{
-			static_assert(false, "Attempted to perform an EmuMath Vector comparison (Not Equal) using a non-EmuMath-Vector operand.");
-			return false;
-		}
-	}
-
 	template<class LhsVector_, class Rhs_, class Func_>
 	inline constexpr bool _perform_vector_magnitude_comparison_std(const LhsVector_& lhs, const Rhs_& rhs)
 	{
@@ -1381,22 +1566,22 @@ namespace EmuMath::Helpers
 				using RhsInfo = typename Rhs_::info_Type;
 				if constexpr (LhsInfo::has_floating_point_values || RhsInfo::has_floating_point_values)
 				{
-					return func(VectorSquareMagnitude<long double>(lhs), VectorSquareMagnitude<long double>(rhs));
+					return func(_calculate_square_magnitude<long double>(lhs), _calculate_square_magnitude<long double>(rhs));
 				}
 				else
 				{
-					return func(VectorSquareMagnitude<std::uint64_t>(lhs), VectorSquareMagnitude<std::uint64_t>(rhs));
+					return func(_calculate_square_magnitude<std::uint64_t>(lhs), _calculate_square_magnitude<std::uint64_t>(rhs));
 				}
 			}
 			else
 			{
 				if constexpr (LhsInfo::has_floating_point_values)
 				{
-					return func(VectorSquareMagnitude<long double>(lhs), rhs);
+					return func(_calculate_square_magnitude<long double>(lhs), rhs);
 				}
 				else
 				{
-					return func(VectorSquareMagnitude<std::uint64_t>(lhs), rhs);
+					return func(_calculate_square_magnitude<std::uint64_t>(lhs), rhs);
 				}
 			}
 		}
@@ -1552,6 +1737,35 @@ namespace EmuMath::Helpers
 		{
 			static_assert(false, "Attempted to perform a comparison of EmuMath Vectors with an invalid number of comparisons; only 2, 3, or 4 comparisons are valid.");
 			return {};
+		}
+	}
+
+	template<class LhsVector_, class RhsT_, std::size_t RhsVectorSize_>
+	inline constexpr bool _perform_vector_comparison_equal(const LhsVector_& lhs, const EmuMath::TMPHelpers::emu_vector_from_size_t<RhsVectorSize_, RhsT_>& rhs)
+	{
+		using RhsVector_ = EmuMath::TMPHelpers::emu_vector_from_size_t<RhsVectorSize_, RhsT_>;
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<LhsVector_>)
+		{
+			return _perform_vector_overall_comparison_with_vector<LhsVector_, RhsVector_, std::equal_to<void>>(lhs, rhs);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform an EmuMath Vector comparison (Equal) using a non-EmuMath-Vector operand.");
+			return false;
+		}
+	}
+
+	template<class LhsVector_, class RhsT_, std::size_t RhsVectorSize_>
+	inline constexpr bool _perform_vector_comparison_not_equal(const LhsVector_& lhs, const EmuMath::TMPHelpers::emu_vector_from_size_t<RhsVectorSize_, RhsT_>& rhs)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<LhsVector_>)
+		{
+			return !_perform_vector_overall_comparison_with_vector<LhsVector_, Vector2<RhsT_>, std::equal_to<void>>(lhs, rhs);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform an EmuMath Vector comparison (Not Equal) using a non-EmuMath-Vector operand.");
+			return false;
 		}
 	}
 #pragma endregion
@@ -1815,166 +2029,7 @@ namespace EmuMath::Helpers
 	template<typename OutT, class EmuVector_>
 	inline constexpr OutT VectorSquareMagnitude(const EmuVector_& vector_)
 	{
-		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<EmuVector_>)
-		{
-			using Scalar = typename EmuVector_::nonref_value_type_without_qualifiers;
-			using HighestT = EmuCore::TMPHelpers::highest_byte_size_t<OutT, Scalar>;
-			using CastT = std::conditional_t
-			<
-				EmuCore::TMPHelpers::is_any_floating_point_v<OutT, Scalar>,
-				EmuCore::TMPHelpers::best_floating_point_rep_t<HighestT>,
-				std::conditional_t
-				<
-					EmuCore::TMPHelpers::is_any_signed_v<OutT, Scalar>,
-					EmuCore::TMPHelpers::best_signed_int_rep_t<HighestT>,
-					EmuCore::TMPHelpers::best_unsigned_int_rep_t<HighestT>
-				>
-			>;
-			if constexpr (EmuVector_::size() == 2)
-			{
-				if constexpr (std::is_same_v<Scalar, CastT>)
-				{
-					if constexpr (std::is_same_v<OutT, CastT>)
-					{
-						return
-						(
-							(vector_.x * vector_.x) +
-							(vector_.y * vector_.y)
-						);
-					}
-					else
-					{
-						return static_cast<OutT>
-						(
-							(vector_.x * vector_.x) +
-							(vector_.y * vector_.y)
-						);
-					}
-				}
-				else
-				{
-					if constexpr (std::is_same_v<OutT, CastT>)
-					{
-						return
-						(
-							(static_cast<CastT>(vector_.x) * vector_.x) +
-							(static_cast<CastT>(vector_.y) * vector_.y)
-						);
-					}
-					else
-					{
-						return static_cast<OutT>
-						(
-							(static_cast<CastT>(vector_.x) * vector_.x) +
-							(static_cast<CastT>(vector_.y) * vector_.y)
-						);
-					}
-				}
-			}
-			else if constexpr (EmuVector_::size() == 3)
-			{
-				if constexpr (std::is_same_v<Scalar, CastT>)
-				{
-					if constexpr (std::is_same_v<OutT, CastT>)
-					{
-						return 
-						(
-							(vector_.x * vector_.x) +
-							(vector_.y * vector_.y) +
-							(vector_.z * vector_.z)
-						);
-					}
-					else
-					{
-						return static_cast<OutT>
-						(
-							(vector_.x * vector_.x) +
-							(vector_.y * vector_.y) +
-							(vector_.z * vector_.z)
-						);
-					}
-				}
-				else
-				{
-					if constexpr (std::is_same_v<OutT, CastT>)
-					{
-						return
-						(
-							(static_cast<CastT>(vector_.x) * vector_.x) +
-							(static_cast<CastT>(vector_.y) * vector_.y) +
-							(static_cast<CastT>(vector_.z) * vector_.z)
-						);
-					}
-					else
-					{
-						return static_cast<OutT>
-						(
-							(static_cast<CastT>(vector_.x) * vector_.x) +
-							(static_cast<CastT>(vector_.y) * vector_.y) +
-							(static_cast<CastT>(vector_.z) * vector_.z)
-						);
-					}
-				}
-			}
-			else if constexpr (EmuVector_::size() == 4)
-			{
-				if constexpr (std::is_same_v<Scalar, CastT>)
-				{
-					if constexpr (std::is_same_v<OutT, CastT>)
-					{
-						return 
-						(
-							(vector_.x * vector_.x) +
-							(vector_.y * vector_.y) +
-							(vector_.z * vector_.z) +
-							(vector_.w * vector_.w)
-						);
-					}
-					else
-					{
-						return static_cast<OutT>
-						(
-							(vector_.x * vector_.x) +
-							(vector_.y * vector_.y) +
-							(vector_.z * vector_.z) +
-							(vector_.w * vector_.w)
-						);
-					}
-				}
-				else
-				{
-					if constexpr (std::is_same_v<OutT, CastT>)
-					{
-						return
-						(
-							(static_cast<CastT>(vector_.x) * vector_.x) +
-							(static_cast<CastT>(vector_.y) * vector_.y) +
-							(static_cast<CastT>(vector_.z) * vector_.z) +
-							(static_cast<CastT>(vector_.w) * vector_.w)
-						);
-					}
-					else
-					{
-						return static_cast<OutT>
-						(
-							(static_cast<CastT>(vector_.x) * vector_.x) +
-							(static_cast<CastT>(vector_.y) * vector_.y) +
-							(static_cast<CastT>(vector_.z) * vector_.z) +
-							(static_cast<CastT>(vector_.w) * vector_.w)
-						);
-					}
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to get the Square Magnitude of an EmuMath Vector of an invalid size.");
-			}
-		}
-		else
-		{
-			static_assert(false, "Attempted to get the Square Magnitude of an EmuMath Vector, but passed a type that is not an EmuMath Vector.");
-			return OutT();
-		}
+		return _underlying_vector_funcs::_calculate_square_magnitude<OutT, EmuVector_>(vector_);
 	}
 
 	/// <summary>
@@ -1988,23 +2043,7 @@ namespace EmuMath::Helpers
 	template<typename OutFP_, class EmuVector_>
 	inline constexpr OutFP_ VectorMagnitudeConstexpr(const EmuVector_& vector_)
 	{
-		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<EmuVector_>)
-		{
-			using VecInfo_ = typename EmuVector_::info_type;
-			if constexpr (VecInfo_::has_floating_point_values)
-			{
-				return EmuMath::SqrtConstexpr<OutFP_, long double>(VectorSquareMagnitude<long double>(vector_));
-			}
-			else
-			{
-				return EmuMath::SqrtConstexpr<OutFP_, std::uint64_t>(VectorSquareMagnitude<std::uint64_t>(vector_));
-			}
-		}
-		else
-		{
-			static_assert(false, "Attempted to get the magnitude of an EmuMath Vector, but passed a type that is not an EmuMath Vector.");
-			return OutFP_();
-		}
+		return _underlying_vector_funcs::_calculate_magnitude_constexpr<OutFP_, EmuVector_>(vector_);
 	}
 
 	/// <summary>
@@ -2018,26 +2057,7 @@ namespace EmuMath::Helpers
 	template<typename Out_, class EmuVector_>
 	inline Out_ VectorMagnitude(const EmuVector_& vector_)
 	{
-		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<EmuVector_>)
-		{
-			using StrippedOut_ = std::remove_cv_t<Out_>;
-			using VecInfo_ = typename EmuVector_::info_type;
-			using SqrMag = std::conditional_t<VecInfo_::has_floating_point_values, long double, std::uint64_t>;
-			const SqrMag sqrMag_ = VectorSquareMagnitude<SqrMag>(vector_);
-			if constexpr (std::is_same_v<StrippedOut_, SqrMag>)
-			{
-				return sqrtl(sqrMag_);
-			}
-			else
-			{
-				return static_cast<Out_>(sqrtl(sqrMag_));
-			}
-		}
-		else
-		{
-			static_assert(false, "Attempted to get the magnitude of an EmuMath Vector, but passed a type that is not an EmuMath Vector.");
-			return Out_();
-		}
+		return _underlying_vector_funcs::_calculate_magnitude<Out_, EmuVector_>(vector_);
 	}
 
 	template<typename OutFP_, typename InT_>

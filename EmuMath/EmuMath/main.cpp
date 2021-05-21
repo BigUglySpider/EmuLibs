@@ -67,6 +67,8 @@ int main()
 	constexpr Vector2<float> lerp_scalar_t_v2 = Vector2<float>(lerp_scalar_t_);
 	constexpr Vector2<float> further_lerp_v2 = lerp_scalar_t_v2.Lerp(b_, lone_t_);
 
+
+
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();
 #pragma endregion

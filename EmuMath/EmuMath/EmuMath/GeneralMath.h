@@ -8,7 +8,6 @@ namespace EmuMath
 {
 	namespace _underlying_general_funcs
 	{
-
 		template<typename Out_, typename In_>
 		constexpr Out_ _sqrt_constexpr(In_ in_, Out_ current_, Out_ prev_)
 		{
