@@ -13,6 +13,11 @@
 
 namespace EmuCore::TestingHelpers
 {
+	/// <summary>
+	/// <para> Type which may be used to easily perform basic timing tasks in bulk to calculate a semi-accurate average and collection of timings. </para>
+	/// <para> Note that this is a basic loop test and, depending on the passed functor, may or may not attribute for cache misses. </para>
+	/// </summary>
+	/// <typeparam name="ToExecutePerLoop">Type which will be passed as a non-const reference to execute via the () operator for each iteration in timing.</typeparam>
 	template<class ToExecutePerLoop>
 	class LoopingTestHarness
 	{
@@ -74,7 +79,7 @@ namespace EmuCore::TestingHelpers
 			PerformLoop<PassLoopNumberOnExecution>(numLoops, toExecutePerLoop, times, minTime, maxTime, totalTime, meanTime);
 
 			resultsStream
-				<< "Completed " << numLoops << " iteration test harness execution.\n"
+				<< "Completed Looping Test Harness execution with " << numLoops << " iterations.\n"
 				<< "Total Time: " << totalTime
 				<< "ms\nMin Time: " << minTime
 				<< "ms\nMax Time: " << maxTime
@@ -100,7 +105,7 @@ namespace EmuCore::TestingHelpers
 			PerformLoop<PassLoopNumberOnExecution>(numLoops, toExecutePerLoop, times, minTime, maxTime, totalTime, meanTime);
 
 			resultsStream
-				<< L"Completed " << numLoops << L" iteration test harness execution.\n"
+				<< "Completed Looping Test Harness execution with " << numLoops << " iterations.\n"
 				<< L"Total Time: " << totalTime
 				<< L"ms\nMin Time: " << minTime
 				<< L"ms\nMax Time: " << maxTime
