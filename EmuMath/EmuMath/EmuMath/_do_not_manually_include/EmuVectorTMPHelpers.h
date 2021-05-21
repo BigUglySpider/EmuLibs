@@ -245,7 +245,7 @@ namespace EmuMath
 		/// <param name="vec_">EmuMath Vector to retrieve the x element of.</param>
 		/// <returns>Reference to the passed Vector's x element.</returns>
 		template<typename EmuVec_>
-		static constexpr typename emu_vector_get_element<EmuVec_>::out_x emu_vector_x(EmuVec_& vec_)
+		inline constexpr typename emu_vector_get_element<EmuVec_>::out_x emu_vector_x(EmuVec_& vec_)
 		{
 			return emu_vector_get_element<EmuVec_>::X(vec_);
 		}
@@ -254,7 +254,7 @@ namespace EmuMath
 		/// <param name="vec_">EmuMath Vector to retrieve the x element of.</param>
 		/// <returns>Constant reference to the passed Vector's x element.</returns>
 		template<typename EmuVec_>
-		static constexpr typename emu_vector_get_element<EmuVec_>::out_const_x emu_vector_x(const EmuVec_& vec_)
+		inline constexpr typename emu_vector_get_element<EmuVec_>::out_const_x emu_vector_x(const EmuVec_& vec_)
 		{
 			return emu_vector_get_element<EmuVec_>::X(vec_);
 		}
@@ -263,7 +263,7 @@ namespace EmuMath
 		/// <param name="vec_">EmuMath Vector to retrieve the y element of.</param>
 		/// <returns>Reference to the passed Vector's y element.</returns>
 		template<typename EmuVec_>
-		static constexpr typename emu_vector_get_element<EmuVec_>::out_y emu_vector_y(EmuVec_& vec_)
+		inline constexpr typename emu_vector_get_element<EmuVec_>::out_y emu_vector_y(EmuVec_& vec_)
 		{
 			return emu_vector_get_element<EmuVec_>::Y(vec_);
 		}
@@ -272,7 +272,7 @@ namespace EmuMath
 		/// <param name="vec_">EmuMath Vector to retrieve the y element of.</param>
 		/// <returns>Constant reference to the passed Vector's y element.</returns>
 		template<typename EmuVec_>
-		static constexpr typename emu_vector_get_element<EmuVec_>::out_const_y emu_vector_y(const EmuVec_& vec_)
+		inline constexpr typename emu_vector_get_element<EmuVec_>::out_const_y emu_vector_y(const EmuVec_& vec_)
 		{
 			return emu_vector_get_element<EmuVec_>::Y(vec_);
 		}
@@ -283,7 +283,7 @@ namespace EmuMath
 		/// <param name="vec_">EmuMath Vector to retrieve the z element of.</param>
 		/// <returns>Reference to the passed Vector's z element, or a zero-initialised item of the Vector's contained type if it does not have one.</returns>
 		template<typename EmuVec_>
-		static constexpr typename emu_vector_get_element<EmuVec_>::out_z emu_vector_z(EmuVec_& vec_)
+		inline constexpr typename emu_vector_get_element<EmuVec_>::out_z emu_vector_z(EmuVec_& vec_)
 		{
 			return emu_vector_get_element<EmuVec_>::Z(vec_);
 		}
@@ -294,7 +294,7 @@ namespace EmuMath
 		/// <param name="vec_">EmuMath Vector to retrieve the z element of.</param>
 		/// <returns>Constant reference to the passed Vector's z element, or a zero-initialised item of the Vector's contained type if it does not have one.</returns>
 		template<typename EmuVec_>
-		static constexpr typename emu_vector_get_element<EmuVec_>::out_const_z emu_vector_z(const EmuVec_& vec_)
+		inline constexpr typename emu_vector_get_element<EmuVec_>::out_const_z emu_vector_z(const EmuVec_& vec_)
 		{
 			return emu_vector_get_element<EmuVec_>::Z(vec_);
 		}
@@ -305,7 +305,7 @@ namespace EmuMath
 		/// <param name="vec_">EmuMath Vector to retrieve the w element of.</param>
 		/// <returns>Reference to the passed Vector's w element, or a zero-initialised item of the Vector's contained type if it does not have one.</returns>
 		template<typename EmuVec_>
-		static constexpr typename emu_vector_get_element<EmuVec_>::out_w emu_vector_w(EmuVec_& vec_)
+		inline constexpr typename emu_vector_get_element<EmuVec_>::out_w emu_vector_w(EmuVec_& vec_)
 		{
 			return emu_vector_get_element<EmuVec_>::W(vec_);
 		}
@@ -319,6 +319,38 @@ namespace EmuMath
 		static constexpr typename emu_vector_get_element<EmuVec_>::out_const_w emu_vector_w(const EmuVec_& vec_)
 		{
 			return emu_vector_get_element<EmuVec_>::W(vec_);
+		}
+
+		template<std::size_t N_, class EmuVec_>
+		inline constexpr auto emu_vector_element_n(const EmuVec_& vec_)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<EmuVec_>)
+			{
+				if constexpr (N_ == 0)
+				{
+					return emu_vector_x(vec_);
+				}
+				else if constexpr (N_ == 1)
+				{
+					return emu_vector_y(vec_);
+				}
+				else if constexpr (N_ == 2)
+				{
+					return emu_vector_z(vec_);
+				}
+				else if constexpr (N_ == 3)
+				{
+					return emu_vector_w(vec_);
+				}
+				else
+				{
+					static_assert(false, "Attempted to get element N of an EmuMath Vector with an invalid N value. Only 0, 1, 2, and 3 are valid values.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to get element N of an EmuMath Vector, but the passed operand was not an EmuMath Vector.");
+			}
 		}
 	}
 }

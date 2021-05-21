@@ -2033,13 +2033,14 @@ namespace EmuMath::Helpers
 	template<class OutVector_, class InVector_, class MinOrMaxVector_, class CmpFunc_>
 	inline constexpr OutVector_ _perform_vector_clamp_min_or_max_with_vector(const InVector_& in_, const MinOrMaxVector_& minOrMax_)
 	{
+		using OutScalar_ = typename OutVector_::value_type;
 		CmpFunc_ cmp_ = CmpFunc_();
 		if constexpr (OutVector_::size() == 2)
 		{
 			return OutVector_
 			(
-				cmp_(in_.x, minOrMax_.x) ? minOrMax_.x : in_.x,
-				cmp_(in_.y, minOrMax_.y) ? minOrMax_.y : in_.y
+				cmp_(in_.x, minOrMax_.x) ? static_cast<OutScalar_>(minOrMax_.x) : static_cast<OutScalar_>(in_.x),
+				cmp_(in_.y, minOrMax_.y) ? static_cast<OutScalar_>(minOrMax_.y) : static_cast<OutScalar_>(in_.y)
 			);
 		}
 		else if constexpr (OutVector_::size() == 3)
@@ -2049,17 +2050,17 @@ namespace EmuMath::Helpers
 				const auto inZ_ = EmuMath::TMPHelpers::emu_vector_z(in_);
 				return OutVector_
 				(
-					cmp_(in_.x, minOrMax_.x) ? minOrMax_.x : in_.x,
-					cmp_(in_.y, minOrMax_.y) ? minOrMax_.y : in_.y,
-					cmp_(inZ_, minOrMax_.z) ? minOrMax_.z : inZ_;
+					cmp_(in_.x, minOrMax_.x) ? static_cast<OutScalar_>(minOrMax_.x) : static_cast<OutScalar_>(in_.x),
+					cmp_(in_.y, minOrMax_.y) ? static_cast<OutScalar_>(minOrMax_.y) : static_cast<OutScalar_>(in_.y),
+					cmp_(inZ_, minOrMax_.z)  ? static_cast<OutScalar_>(minOrMax_.z) : static_cast<OutScalar_>(inZ_)
 				);
 			}
 			else
 			{
 				return OutVector_
 				(
-					cmp_(in_.x, minOrMax_.x) ? minOrMax_.x : in_.x,
-					cmp_(in_.y, minOrMax_.y) ? minOrMax_.y : in_.y,
+					cmp_(in_.x, minOrMax_.x) ? static_cast<OutScalar_>(minOrMax_.x) : static_cast<OutScalar_>(in_.x),
+					cmp_(in_.y, minOrMax_.y) ? static_cast<OutScalar_>(minOrMax_.y) : static_cast<OutScalar_>(in_.y),
 					EmuMath::TMPHelpers::emu_vector_z(in_)
 				);
 			}
@@ -2074,19 +2075,19 @@ namespace EmuMath::Helpers
 					const auto inW_ = EmuMath::TMPHelpers::emu_vector_w(in_);
 					return OutVector_
 					(
-						cmp_(in_.x, minOrMax_.x) ? minOrMax_.x : in_.x,
-						cmp_(in_.y, minOrMax_.y) ? minOrMax_.y : in_.y,
-						cmp_(inZ_, minOrMax_.z) ? minOrMax_.z : inZ_,
-						cmp_(inW_, minOrMax_.w) ? minOrMax_.w : inW_
+						cmp_(in_.x, minOrMax_.x) ? static_cast<OutScalar_>(minOrMax_.x) : static_cast<OutScalar_>(in_.x),
+						cmp_(in_.y, minOrMax_.y) ? static_cast<OutScalar_>(minOrMax_.y) : static_cast<OutScalar_>(in_.y),
+						cmp_(inZ_, minOrMax_.z)  ? static_cast<OutScalar_>(minOrMax_.z) : static_cast<OutScalar_>(inZ_),
+						cmp_(inW_, minOrMax_.w)  ? static_cast<OutScalar_>(minOrMax_.w) : static_cast<OutScalar_>(inW_)
 					);
 				}
 				else
 				{
 					return OutVector_
 					(
-						cmp_(in_.x, minOrMax_.x) ? minOrMax_.x : in_.x,
-						cmp_(in_.y, minOrMax_.y) ? minOrMax_.y : in_.y,
-						cmp_(inZ_, minOrMax_.z) ? minOrMax_.z : inZ_,
+						cmp_(in_.x, minOrMax_.x) ? static_cast<OutScalar_>(minOrMax_.x) : static_cast<OutScalar_>(in_.x),
+						cmp_(in_.y, minOrMax_.y) ? static_cast<OutScalar_>(minOrMax_.y) : static_cast<OutScalar_>(in_.y),
+						cmp_(inZ_, minOrMax_.z)  ? static_cast<OutScalar_>(minOrMax_.z) : static_cast<OutScalar_>(inZ_),
 						EmuMath::TMPHelpers::emu_vector_w(in_)
 					);
 				}
@@ -2095,8 +2096,8 @@ namespace EmuMath::Helpers
 			{
 				return OutVector_
 				(
-					cmp_(in_.x, minOrMax_.x) ? minOrMax_.x : in_.x,
-					cmp_(in_.y, minOrMax_.y) ? minOrMax_.y : in_.y,
+					cmp_(in_.x, minOrMax_.x) ? static_cast<OutScalar_>(minOrMax_.x) : static_cast<OutScalar_>(in_.x),
+					cmp_(in_.y, minOrMax_.y) ? static_cast<OutScalar_>(minOrMax_.y) : static_cast<OutScalar_>(in_.y),
 					EmuMath::TMPHelpers::emu_vector_z(in_),
 					EmuMath::TMPHelpers::emu_vector_w(in_)
 				);
@@ -2112,13 +2113,14 @@ namespace EmuMath::Helpers
 	template<class OutVector_, class InVector_, typename MinOrMaxScalar_, class CmpFunc_>
 	inline constexpr OutVector_ _perform_vector_clamp_min_or_max_with_scalar(const InVector_& in_, const MinOrMaxScalar_& minOrMax_)
 	{
+		using OutScalar_ = typename OutVector_::value_type;
 		CmpFunc_ cmp_ = CmpFunc_();
 		if constexpr (OutVector_::size() == 2)
 		{
 			return OutVector_
 			(
-				cmp_(in_.x, minOrMax_) ? minOrMax_ : in_.x,
-				cmp_(in_.y, minOrMax_) ? minOrMax_ : in_.y
+				cmp_(in_.x, minOrMax_) ? static_cast<OutScalar_>(minOrMax_) : static_cast<OutScalar_>(in_.x),
+				cmp_(in_.y, minOrMax_) ? static_cast<OutScalar_>(minOrMax_) : static_cast<OutScalar_>(in_.y)
 			);
 		}
 		else if constexpr (OutVector_::size() == 3)
@@ -2126,9 +2128,9 @@ namespace EmuMath::Helpers
 			const auto inZ_ = EmuMath::TMPHelpers::emu_vector_z(in_);
 			return OutVector_
 			(
-				cmp_(in_.x, minOrMax_) ? minOrMax_ : in_.x,
-				cmp_(in_.y, minOrMax_) ? minOrMax_ : in_.y,
-				cmp_(inZ_, minOrMax_) ? minOrMax_ : inZ_
+				cmp_(in_.x, minOrMax_) ? static_cast<OutScalar_>(minOrMax_) : static_cast<OutScalar_>(in_.x),
+				cmp_(in_.y, minOrMax_) ? static_cast<OutScalar_>(minOrMax_) : static_cast<OutScalar_>(in_.y),
+				cmp_(inZ_, minOrMax_)  ? static_cast<OutScalar_>(minOrMax_) : static_cast<OutScalar_>(inZ_)
 			);
 		}
 		else if constexpr (OutVector_::size() == 4)
@@ -2137,10 +2139,10 @@ namespace EmuMath::Helpers
 			const auto inW_ = EmuMath::TMPHelpers::emu_vector_w(in_);
 			return OutVector_
 			(
-				cmp_(in_.x, minOrMax_) ? minOrMax_ : in_.x,
-				cmp_(in_.y, minOrMax_) ? minOrMax_ : in_.y,
-				cmp_(inZ_, minOrMax_) ? minOrMax_ : inZ_,
-				cmp_(inW_, minOrMax_) ? minOrMax_ : inW_
+				cmp_(in_.x, minOrMax_) ? static_cast<OutScalar_>(minOrMax_) : static_cast<OutScalar_>(in_.x),
+				cmp_(in_.y, minOrMax_) ? static_cast<OutScalar_>(minOrMax_) : static_cast<OutScalar_>(in_.y),
+				cmp_(inZ_, minOrMax_)  ? static_cast<OutScalar_>(minOrMax_) : static_cast<OutScalar_>(inZ_),
+				cmp_(inW_, minOrMax_)  ? static_cast<OutScalar_>(minOrMax_) : static_cast<OutScalar_>(inW_)
 			);
 		}
 		else
@@ -2178,17 +2180,145 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	template<std::size_t Index_, class OutScalar_, class In_, class Min_, class Max_>
+	inline constexpr OutScalar_ _perform_vector_min_and_max_comparison(const In_& in_, const Min_& min_, const Max_& max_)
+	{
+		using InScalar_ = std::conditional_t<(Index_ < In_::size()), typename In_::const_ref_value_type, typename In_::nonref_value_type_without_qualifiers>;
+		const InScalar_ in_n_ = EmuMath::TMPHelpers::emu_vector_element_n<Index_>(in_);
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Min_>)
+		{
+			if constexpr (Index_ < Min_::size())
+			{
+				typename Min_::const_ref_value_type min_n_ = EmuMath::TMPHelpers::emu_vector_element_n<Index_>(min_);
+				if constexpr (Index_ < Max_::size())
+				{
+					typename Max_::const_ref_value_type max_n_ = EmuMath::TMPHelpers::emu_vector_element_n<Index_>(max_);
+					return
+					(
+						(in_n_ < min_n_) ? static_cast<OutScalar_>(min_n_) :
+						(in_n_ > max_n_) ? static_cast<OutScalar_>(max_n_) : static_cast<OutScalar_>(in_n_)
+					);
+				}
+				else
+				{
+					return
+					(
+						(in_n_ < min_n_) ? static_cast<OutScalar_>(min_n_) : static_cast<OutScalar_>(in_n_)
+					);
+				}
+			}
+			else
+			{
+				if constexpr (Index_ < Max_::size())
+				{
+					typename Max_::const_ref_value_type max_n_ = EmuMath::TMPHelpers::emu_vector_element_n<Index_>(max_);
+					return
+					(
+						(in_n_ > max_n_) ? static_cast<OutScalar_>(max_n_) : static_cast<OutScalar_>(in_n_)
+					);
+				}
+				else
+				{
+					return static_cast<OutScalar_>(in_n_);
+				}
+			}
+		}
+		else
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Max_>)
+			{
+				if constexpr (Index_ < Max_::size())
+				{
+					typename Max_::const_ref_value_type max_n_ = EmuMath::TMPHelpers::emu_vector_element_n<Index_>(max_);
+					return
+					(
+						(in_n_ < min_) ? static_cast<OutScalar_>(min_) :
+						(in_n_ > max_n_) ? static_cast<OutScalar_>(max_n_) : static_cast<OutScalar_>(in_n_)
+					);
+				}
+				else
+				{
+					return
+					(
+						(in_n_ < min_) ? static_cast<OutScalar_>(min_) : static_cast<OutScalar_>(in_n_)
+					);
+				}
+			}
+			else
+			{
+				return
+				(
+					(in_n_ < min_) ? static_cast<OutScalar_>(min_) :
+					(in_n_ > max_) ? static_cast<OutScalar_>(max_) : static_cast<OutScalar_>(in_n_)
+				);
+			}
+		}
+	}
+
+	template<class OutVector_, class InVector_, typename MinScalar_, typename MaxScalar_>
+	inline constexpr OutVector_ _perform_vector_clamp_min_and_max(const InVector_& in_, const MinScalar_& min_, const MaxScalar_& max_)
+	{
+		using OutScalar_ = typename OutVector_::value_type;
+
+		if constexpr (OutVector_::size() == 2)
+		{
+			return OutVector_
+			(
+				_perform_vector_min_and_max_comparison<0, OutScalar_>(in_, min_, max_),
+				_perform_vector_min_and_max_comparison<1, OutScalar_>(in_, min_, max_)
+			);
+		}
+		else if constexpr (OutVector_::size() == 3)
+		{
+			return OutVector_
+			(
+				_perform_vector_min_and_max_comparison<0, OutScalar_>(in_, min_, max_),
+				_perform_vector_min_and_max_comparison<1, OutScalar_>(in_, min_, max_),
+				_perform_vector_min_and_max_comparison<2, OutScalar_>(in_, min_, max_)
+			);
+		}
+		else if constexpr (OutVector_::size() == 4)
+		{
+			return OutVector_
+			(
+				_perform_vector_min_and_max_comparison<0, OutScalar_>(in_, min_, max_),
+				_perform_vector_min_and_max_comparison<1, OutScalar_>(in_, min_, max_),
+				_perform_vector_min_and_max_comparison<2, OutScalar_>(in_, min_, max_),
+				_perform_vector_min_and_max_comparison<3, OutScalar_>(in_, min_, max_)
+			);
+
+		}
+		else
+		{
+			static_assert(false, "Attempted to clamp an EmuMath Vector to minimum or maximum values with an invalidly sized output Vector.");
+			return OutVector_();
+		}
+	}
+
 	template<std::size_t OutSize_, typename OutT_, class InVector_, class MinT_>
 	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type VectorClampMin(const InVector_& in_, const MinT_& min_)
 	{
 		using OutVector_ = typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type;
-		return _perform_vector_min_or_max_clamp<OutVector_, InVector_, MinT_, std::less<void>>(in_, min_);
+		return _perform_vector_min_or_max_clamp<typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type, InVector_, MinT_, std::less<void>>(in_, min_);
 	}
 	template<std::size_t OutSize_, typename OutT_, class InVector_, class MinT_>
 	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type VectorClampMax(const InVector_& in_, const MinT_& min_)
 	{
-		using OutVector_ = typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type;
-		return _perform_vector_min_or_max_clamp<OutVector_, InVector_, MinT_, std::greater<void>>(in_, min_);
+		return _perform_vector_min_or_max_clamp<typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type, InVector_, MinT_, std::greater<void>>(in_, min_);
+	}
+	template<std::size_t OutSize_, typename OutT_, class InVector_, class MinT_, class MaxT_>
+	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type VectorClamp(const InVector_& in_, const MinT_& min_, const MaxT_& max_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type>)
+		{
+			return _perform_vector_clamp_min_and_max<typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type, InVector_, MinT_, MaxT_>(in_, min_, max_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to clamp an EmuMath Vector to minimum and maximum values with an invalid output Vector.");
+			using OutVec_ = typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type;
+			return OutVec_();
+		}
 	}
 }
 
