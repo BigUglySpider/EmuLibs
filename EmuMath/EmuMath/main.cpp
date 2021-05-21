@@ -53,6 +53,9 @@ int main()
 	constexpr Vector4<float> v4f_clamped_max = EmuMath::Helpers::VectorClampMax<4, float>(V4f, -0.5f);
 	constexpr Vector3<float> v4f_clamped = EmuMath::Helpers::VectorClamp<3, float>(V4f, -1000.0f, Vector4<float>(0.5f, 0.5f, 2.1f, 0.5f));
 
+	v2f.Clamp(0.5f, 2.0f);
+	v2f.ClampMin(0.5f);
+	v2f.ClampMax(0.5f);
 
 
 #pragma region TEST_HARNESS_EXECUTION

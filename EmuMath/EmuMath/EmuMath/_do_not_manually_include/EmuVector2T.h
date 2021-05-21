@@ -1119,54 +1119,60 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::VectorMax<OutT>(*this);
 		}
-		/// <summary> Calculates the values of this Vector's elements when clamped to the provided minimum respective values of the passed Vector. </summary>
-		/// <param name="min_">Minimum values for the respective elements of this Vector.</param>
-		/// <returns>Copy of this Vector with its elements clamped to a minimum of the respective elements in the provided Vector.</returns>
-		constexpr Vector2<nonref_value_type> AsClampedMin(const Vector2<value_type>& min_) const
+
+		/// <summary>
+		/// <para> Returns a copy of this Vector with its elements clamped to the passed minimum. </para>
+		/// <para> If the passed min_ is an EmuMath Vector, minimum values will be a per element basis (e.g. x will be clamped to min_.x, y to min_.y, etc). </para>
+		/// </summary>
+		/// <typeparam name="OutT_">Type contained within the output Vector.</typeparam>
+		/// <typeparam name="MinT_">Type for the passed minimum clamp.</typeparam>
+		/// <param name="min_">Minimum value for elements to be clamped to, or minimum values for respective elements if an EmuMath Vector.</param>
+		/// <returns>
+		///		Copy of this Vector with its values clamped to the provided minimum, with custom size (defaults to the size of this Vector) 
+		///		and contained types (defaults to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT_ = nonref_value_type, typename MinT_ = nonref_value_type>
+		constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type ClampMin(const MinT_& min_) const
 		{
-			return { x > min_.x ? x : min_.x, y > min_.y ? y : min_.y };
+			return EmuMath::Helpers::VectorClampMin<OutSize_, OutT_>(*this, min_);
 		}
-		/// <summary> Calculates the values of this vector's elements when clamped to the provided minimum value for all elements. </summary>
-		/// <param name="min_">Minimum value that any element within this Vector may be.</param>
-		/// <returns>Copy of this Vector with its elements clamped to a minimum of the provided value.</returns>
-		constexpr Vector2<nonref_value_type> AsClampedMin(const_ref_value_type min_) const
+		/// <summary>
+		/// <para> Returns a copy of this Vector with its elements clamped to the passed maximum. </para>
+		/// <para> If the passed max_ is an EmuMath Vector, maximum values will be a per element basis (e.g. x will be clamped to max_.x, y to max_.y, etc). </para>
+		/// </summary>
+		/// <typeparam name="OutT_">Type contained within the output Vector.</typeparam>
+		/// <typeparam name="MinT_">Type for the passed minimum clamp.</typeparam>
+		/// <typeparam name="MaxT_">Type for the passed maximum clamp.</typeparam>
+		/// <param name="min_">Minimum value for elements to be clamped to, or minimum values for respective elements if an EmuMath Vector.</param>
+		/// <param name="max_">Maximum value for elements to be clamped to, or maximum values for respective elements if an EmuMath Vector.</param>
+		/// <returns>
+		///		Copy of this Vector with its values clamped to the provided maximum, with custom size (defaults to the size of this Vector) 
+		///		and contained types (defaults to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT_ = nonref_value_type, typename MaxT_ = nonref_value_type>
+		constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type ClampMax(const MaxT_& max_) const
 		{
-			AsClampedMin(min_, min_);
+			return EmuMath::Helpers::VectorClampMax<OutSize_, OutT_>(*this, max_);
 		}
-		/// <summary> Calculates the values of this Vector's elements when clamped to the provided maximum respective values of the passed Vector. </summary>
-		/// <param name="max_">Maximum values for the respective elements of this Vector.</param>
-		/// <returns>Copy of this Vector with its elements clamped to a maximum of the respective elements in the provided Vector.</returns>
-		constexpr Vector2<nonref_value_type> AsClampedMax(const Vector2<value_type>& max_) const
+		/// <summary>
+		/// <para> Returns a copy of this Vector with its elements clamped to the passed minimum and maximum. </para>
+		/// <para>
+		///		If the passed min_ or max_ is an EmuMath Vector, respective values will be clamped on a per element basis (e.g. x will be clamped to max_.x, y to max_.y, etc).
+		/// </para>
+		/// </summary>
+		/// <typeparam name="OutT_">Type contained within the output Vector.</typeparam>
+		/// <typeparam name="MaxT_">Type for the passed maximum clamp.</typeparam>
+		/// <param name="max_">Maximum value for elements to be clamped to, or maximum values for respective elements if an EmuMath Vector.</param>
+		/// <returns>
+		///		Copy of this Vector with its values clamped to the provided maximum, with custom size (defaults to the size of this Vector) 
+		///		and contained types (defaults to this Vector's nonref_value_type).
+		/// </returns>
+		template<std::size_t OutSize_ = size(), typename OutT_ = nonref_value_type, typename MinT_ = nonref_value_type, typename MaxT_ = nonref_value_type>
+		constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type Clamp(const MinT_& min_, const MaxT_& max_) const
 		{
-			return { x < max_.x ? x : max_.x, y < max_.y ? y : max_.y };
+			return EmuMath::Helpers::VectorClamp<OutSize_, OutT_>(*this, min_, max_);
 		}
-		/// <summary> Calculates the values of this vector's elements when clamped to the provided maximum value for all elements. </summary>
-		/// <param name="max_">Maximum value that any element within this Vector may be.</param>
-		/// <returns>Copy of this Vector with its elements clamped to a maximum of the provided value.</returns>
-		constexpr Vector2<nonref_value_type> AsClampedMax(const value_type& max_) const
-		{
-			return this->AsClampedMax(Vector2<value_type>(max_, max_));
-		}
-		/// <summary> Calculates the values of this Vector's elements when clamped between the provided minimum and maximum respective values of the passed Vectors. </summary>
-		/// <param name="min_">Minimum values for the respective elements of this Vector.</param>
-		/// <param name="max_">Maximum values for the respective elements of this Vector.</param>
-		/// <returns>Copy of this Vector with its elements clamped between the minimum and maximum of the respective elements in ths provided Vectors.</returns>
-		constexpr Vector2<nonref_value_type> AsClamped(const Vector2<value_type>& min_, const Vector2<value_type>& max_) const
-		{
-			return
-			{
-				x < min_.x ? min_.x : x > max_.x ? max_.x : x,
-				y < min_.y ? min_.y : y > max_.y ? max_.y : y
-			};
-		}
-		/// <summary> Calculates the values of this Vector's elements when clamped between the provided minimum and maximum respective values of the passed Vectors. </summary>
-		/// <param name="min_">Minimum value that each element of this Vector may be.</param>
-		/// <param name="max_">Maximum value that each element of this Vector may be.</param>
-		/// <returns>Copy of this Vector with its elements clamped between the provided minimum and maximum values.</returns>
-		constexpr Vector2<nonref_value_type> AsClamped(const value_type& min_, const value_type& max_) const
-		{
-			return this->AsClamped(Vector2<value_type>(min_, min_), Vector2<value_type>(max_, max_));
-		}
+
 		/// <summary> Calculates the values of this Vector's elements when rounded toward negative infinity. </summary>
 		/// <returns>Copy of this Vector with its elements rounded toward negative infinity.</returns>
 		template<std::size_t OutSize_ = size(), typename OutT = nonref_value_type>
