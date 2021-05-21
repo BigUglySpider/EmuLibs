@@ -3594,6 +3594,17 @@ namespace EmuMath::Helpers
 			return OutVector_();
 		}
 	}
+
+	template<typename OutT_, typename AT_, class BT_>
+	inline constexpr EmuMath::Vector3<OutT_> VectorCrossProduct(const EmuMath::Vector3<AT_>& a_, const EmuMath::Vector3<BT_>& b_)
+	{
+		return EmuMath::Vector3<OutT_>
+		(
+			(static_cast<OutT_>(a_.y) * b_.z) - (static_cast<OutT_>(a_.z) * b_.y),
+			(static_cast<OutT_>(a_.z) * b_.x) - (static_cast<OutT_>(a_.x) * b_.z),
+			(static_cast<OutT_>(a_.x) * b_.y) - (static_cast<OutT_>(a_.y) * b_.x)
+		);
+	}
 }
 
 #endif

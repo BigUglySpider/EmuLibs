@@ -102,6 +102,10 @@ int main()
 	constexpr Vector4<std::uint32_t> normal_vec_ = { 1, std::numeric_limits<std::uint32_t>::max(), 17, 198759823 };
 	constexpr Vector4<std::int64_t> reverse_vec_ = EmuMath::Helpers::VectorReverse<4, std::int64_t>(normal_vec_);
 
+	constexpr Vector3<std::int32_t> a3_ = { 2, 3, 4 };
+	constexpr Vector3<std::uint64_t> b3_ = { 5, 6, 7 };
+	constexpr Vector3<float> c3_ = EmuMath::Helpers::VectorCrossProduct<float>(a3_, b3_);
+
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();
 #pragma endregion
