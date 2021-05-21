@@ -3156,6 +3156,230 @@ namespace EmuMath::Helpers
 			return Vector4<typename In_::ref_value_type>();
 		}
 	}
+
+	template<class LhsVector_, class Rhs_>
+	inline LhsVector_& VectorSet(LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<LhsVector_>)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Rhs_>)
+			{
+				using LhsScalar_ = typename LhsVector_::nonref_value_type_without_qualifiers;
+				using RhsScalar_ = typename Rhs_::nonref_value_type_without_qualifiers;
+				constexpr std::size_t SetSize_ = LhsVector_::size() <= Rhs_::size() ? LhsVector_::size() : Rhs_::size();
+
+				if constexpr (std::is_same_v<LhsScalar_, RhsScalar_>)
+				{
+					if constexpr (SetSize_ >= 2 && SetSize_ <= 4)
+					{
+						lhs_.x = rhs_.x;
+						lhs_.y = rhs_.y;
+						if constexpr (SetSize_ >= 3)
+						{
+							lhs_.z = rhs_.z;
+							if constexpr (SetSize_ >= 4)
+							{
+								lhs_.w = rhs_.w;
+							}
+						}
+					}
+					else
+					{
+						static_assert(false, "Attempted to set an EmuMath Vector with at least one invalidly sized EmuMath Vector operand.");
+					}
+				}
+				else
+				{
+					lhs_.x = static_cast<LhsScalar_>(rhs_.x);
+					lhs_.y = static_cast<LhsScalar_>(rhs_.y);
+					if constexpr (SetSize_ >= 3)
+					{
+						lhs_.z = static_cast<LhsScalar_>(rhs_.z);
+						if constexpr (SetSize_ >= 4)
+						{
+							lhs_.w = static_cast<LhsScalar_>(rhs_.w);
+						}
+					}
+				}
+			}
+			else
+			{
+				constexpr std::size_t LhsSize_ = LhsVector_::size();
+				if constexpr (LhsSize_ >= 2 && LhsSize_ <= 4)
+				{
+					using LhsScalar_ = typename LhsVector_::nonref_value_type_without_qualifiers;
+					if constexpr (std::is_same_v<LhsScalar_, std::remove_cv_t<Rhs_>>)
+					{
+						lhs_.x = rhs_;
+						lhs_.y = rhs_;
+						if constexpr (LhsSize_ >= 3)
+						{
+							lhs_.z = rhs_;
+							if constexpr (LhsSize_ >= 4)
+							{
+								lhs_.w = rhs_;
+							}
+						}
+					}
+					else
+					{
+						const LhsScalar_ cast_rhs_ = static_cast<LhsScalar_>(rhs_);
+						lhs_.x = cast_rhs_;
+						rhs_.y = cast_rhs_;
+						if constexpr (LhsSize_ >= 3)
+						{
+							lhs_.z = cast_rhs_;
+							if constexpr (LhsSize_ >= 4)
+							{
+								lhs_.w = cast_rhs_;
+							}
+						}
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to set an invalidly sized EmuMath Vector.");
+				}
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to set an EmuMath Vector with a non-EmuMath-Vector left-hand operand.");
+		}
+		return lhs_;
+	}
+
+	template<class LhsVector_, typename RhsScalarX_, typename RhsScalarY_>
+	inline LhsVector_& VectorSet(LhsVector_& lhs_, const RhsScalarX_& x_, const RhsScalarY_& y_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<LhsVector_>)
+		{
+			using LhsScalar_ = typename LhsVector_::nonref_value_type_without_qualifiers;
+			if constexpr (std::is_same_v<LhsScalar_, std::remove_cv_t<RhsScalarX_>>)
+			{
+				lhs_.x = x_;
+			}
+			else
+			{
+				lhs_.x = static_cast<LhsScalar_>(x_);
+			}
+
+			if constexpr (std::is_same_v<LhsScalar_, std::remove_cv_t<RhsScalarY_>>)
+			{
+				lhs_.y = y_;
+			}
+			else
+			{
+				lhs_.y = static_cast<LhsScalar_>(y_);
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to set an EmuMath Vector with multiple scalar values, but provided a non-EmuMath-Vector left-hand operand.");
+		}
+		return lhs_;
+	}
+	template<class LhsVector_, typename RhsScalarX_, typename RhsScalarY_, typename RhsScalarZ_>
+	inline LhsVector_& VectorSet(LhsVector_& lhs_, const RhsScalarX_& x_, const RhsScalarY_& y_, const RhsScalarZ_& z_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<LhsVector_>)
+		{
+			if constexpr (LhsVector_::size() >= 3)
+			{
+				using LhsScalar_ = typename LhsVector_::nonref_value_type_without_qualifiers;
+				if constexpr (std::is_same_v<LhsScalar_, std::remove_cv_t<RhsScalarX_>>)
+				{
+					lhs_.x = x_;
+				}
+				else
+				{
+					lhs_.x = static_cast<LhsScalar_>(x_);
+				}
+
+				if constexpr (std::is_same_v<LhsScalar_, std::remove_cv_t<RhsScalarY_>>)
+				{
+					lhs_.y = y_;
+				}
+				else
+				{
+					lhs_.y = static_cast<LhsScalar_>(y_);
+				}
+
+				if constexpr (std::is_same_v<LhsScalar_, std::remove_cv_t<RhsScalarZ_>>)
+				{
+					lhs_.z = z_;
+				}
+				else
+				{
+					lhs_.z = static_cast<LhsScalar_>(z_);
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to set an EmuMath Vector using 3 scalar values, but the provided EmuMath Vector contains less than 3 values.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to set an EmuMath Vector with multiple scalar values, but provided a non-EmuMath-Vector left-hand operand.");
+		}
+		return lhs_;
+	}
+	template<class LhsVector_, typename RhsScalarX_, typename RhsScalarY_, typename RhsScalarZ_, typename RhsScalarW_>
+	inline LhsVector_& VectorSet(LhsVector_& lhs_, const RhsScalarX_& x_, const RhsScalarY_& y_, const RhsScalarZ_& z_, const RhsScalarW_& w_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<LhsVector_>)
+		{
+			if constexpr (LhsVector_::size() >= 4)
+			{
+				using LhsScalar_ = typename LhsVector_::nonref_value_type_without_qualifiers;
+				if constexpr (std::is_same_v<LhsScalar_, std::remove_cv_t<RhsScalarX_>>)
+				{
+					lhs_.x = x_;
+				}
+				else
+				{
+					lhs_.x = static_cast<LhsScalar_>(x_);
+				}
+
+				if constexpr (std::is_same_v<LhsScalar_, std::remove_cv_t<RhsScalarY_>>)
+				{
+					lhs_.y = y_;
+				}
+				else
+				{
+					lhs_.y = static_cast<LhsScalar_>(y_);
+				}
+
+				if constexpr (std::is_same_v<LhsScalar_, std::remove_cv_t<RhsScalarZ_>>)
+				{
+					lhs_.z = z_;
+				}
+				else
+				{
+					lhs_.z = static_cast<LhsScalar_>(z_);
+				}
+
+				if constexpr (std::is_same_v<LhsScalar_, std::remove_cv_t<RhsScalarZ_>>)
+				{
+					lhs_.z = z_;
+				}
+				else
+				{
+					lhs_.z = static_cast<LhsScalar_>(w_);
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to set an EmuMath Vector using 4 scalar values, but the provided EmuMath Vector contains less than 4 values.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to set an EmuMath Vector with multiple scalar values, but provided a non-EmuMath-Vector left-hand operand.");
+		}
+		return lhs_;
+	}
 }
 
 #endif

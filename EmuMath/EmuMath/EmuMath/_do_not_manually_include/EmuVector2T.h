@@ -707,49 +707,19 @@ namespace EmuMath
 
 #pragma region ASSIGNMENT_OPERATORS
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator=(const Vector2<OtherT>& rhs)
+		constexpr emu_vector_type& operator=(const Vector2<OtherT>& rhs)
 		{
-			if constexpr (std::is_same_v<nonref_value_type, typename Vector2<OtherT>::nonref_value_type>)
-			{
-				x = rhs.x;
-				y = rhs.y;
-			}
-			else
-			{
-				x = static_cast<nonref_value_type>(rhs.x);
-				y = static_cast<nonref_value_type>(rhs.y);
-			}
-			return *this;
+			return EmuMath::Helpers::VectorSet(*this, rhs);
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator=(const Vector3<OtherT>& rhs)
+		constexpr emu_vector_type& operator=(const Vector3<OtherT>& rhs)
 		{
-			if constexpr (std::is_same_v<nonref_value_type, typename info_type_t<OtherT>::nonref_value_type>)
-			{
-				x = rhs.x;
-				y = rhs.y;
-			}
-			else
-			{
-				x = static_cast<nonref_value_type>(rhs.x);
-				y = static_cast<nonref_value_type>(rhs.y);
-			}
-			return *this;
+			return EmuMath::Helpers::VectorSet(*this, rhs);
 		}
 		template<typename OtherT>
-		constexpr Vector2<value_type>& operator=(const Vector4<OtherT>& rhs)
+		constexpr emu_vector_type& operator=(const Vector4<OtherT>& rhs)
 		{
-			if constexpr (std::is_same_v<nonref_value_type, typename info_type_t<OtherT>::nonref_value_type>)
-			{
-				x = rhs.x;
-				y = rhs.y;
-			}
-			else
-			{
-				x = static_cast<nonref_value_type>(rhs.x);
-				y = static_cast<nonref_value_type>(rhs.y);
-			}
-			return *this;
+			return EmuMath::Helpers::VectorSet(*this, rhs);
 		}
 #pragma endregion
 
@@ -940,8 +910,99 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region BOOLEAN_PER_ELEMENT_COMPARISON_FUNCTIONS
+#pragma region COMPARISON_TEMPLATES
+		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		constexpr typename EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> ComparePerElement_Equal(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorComparisonPerElement_Equal<OutSize_>(*this, rhs_);
+		}
+		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		constexpr typename EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> ComparePerElement_NotEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorComparisonPerElement_NotEqual<OutSize_>(*this, rhs_);
+		}
+		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		constexpr typename EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> ComparePerElement_Less(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorComparisonPerElement_Less<OutSize_>(*this, rhs_);
+		}
+		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		constexpr typename EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> ComparePerElement_LessEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorComparisonPerElement_LessEqual<OutSize_>(*this, rhs_);
+		}
+		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		constexpr typename EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> ComparePerElement_Greater(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorComparisonPerElement_Greater<OutSize_>(*this, rhs_);
+		}
+		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		constexpr typename EmuMath::TMPHelpers::emu_vector_from_size_t<OutSize_, bool> ComparePerElement_GreaterEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorComparisonPerElement_GreaterEqual<OutSize_>(*this, rhs_);
+		}
 
+		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		constexpr bool CompareAll_Equal(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorComparisonAll_Equal<OutSize_>(*this, rhs_);
+		}
+		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		constexpr bool CompareAll_NotEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorComparisonAll_NotEqual<OutSize_>(*this, rhs_);
+		}
+		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		constexpr bool CompareAll_Less(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorComparisonAll_Less<OutSize_>(*this, rhs_);
+		}
+		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		constexpr bool CompareAll_LessEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorComparisonAll_LessEqual<OutSize_>(*this, rhs_);
+		}
+		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		constexpr bool CompareAll_Greater(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorComparisonAll_Greater<OutSize_>(*this, rhs_);
+		}
+		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		constexpr bool CompareAll_GreaterEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorComparisonAll_GreaterEqual<OutSize_>(*this, rhs_);
+		}
+
+		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		constexpr bool CompareAny_Equal(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorComparisonAny_Equal<OutSize_>(*this, rhs_);
+		}
+		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		constexpr bool CompareAny_NotEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorComparisonAny_NotEqual<OutSize_>(*this, rhs_);
+		}
+		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		constexpr bool CompareAny_Less(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorComparisonAny_Less<OutSize_>(*this, rhs_);
+		}
+		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		constexpr bool CompareAny_LessEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorComparisonAny_LessEqual<OutSize_>(*this, rhs_);
+		}
+		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		constexpr bool CompareAny_Greater(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorComparisonAny_Greater<OutSize_>(*this, rhs_);
+		}
+		template<std::size_t OutSize_ = size(), class Rhs_ = emu_vector_type>
+		constexpr bool CompareAny_GreaterEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorComparisonAny_GreaterEqual<OutSize_>(*this, rhs_);
+		}
 #pragma endregion
 
 #pragma region SHUFFLES
@@ -1001,48 +1062,15 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region SETS
-		/// <summary> Sets all values within this Vector to the respective passed values. </summary>
-		/// <typeparam name="X_">Type of the value to set this Vector's x component to.</typeparam>
-		/// <typeparam name="Y_">Type of the value to set this Vector's y component to.</typeparam>
-		/// <param name="x_">Value to set this Vector's x component to.</param>
-		/// <param name="y_">Value to set this Vector's y component to.</param>
-		template<typename X_, typename Y_>
-		constexpr void SetAll(const X_& x_, const Y_& y_)
+		template<class Rhs_>
+		emu_vector_type& Set(const Rhs_& rhs_)
 		{
-			if constexpr (!info_type::has_const_values)
-			{
-				_set_individual_value<0, X_>(x_);
-				_set_individual_value<1, Y_>(y_);
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (SetAll<X_, Y_>) on an EmuMath::Vector2 which contains constant values.");
-			}
+			return EmuMath::Helpers::VectorSet(*this, rhs_);
 		}
-		/// <summary> Sets all elements of this Vector to match the provided value. </summary>
-		/// <typeparam name="T_">Type of the value to set this Vector's components to.</typeparam>
-		/// <param name="val_">Value to set this Vector's componenets to.</param>
-		template<typename T_>
-		constexpr void SetAll(const T_& val_)
+		template<typename X_, typename Y_>
+		emu_vector_type& Set(const X_& x_, const Y_& y_)
 		{
-			if constexpr (!info_type::has_const_values)
-			{
-				if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, std::remove_reference_t<T_>>)
-				{
-					x = val_;
-					y = val_;
-				}
-				else
-				{
-					const nonref_value_type castVal = static_cast<nonref_value_type>(val_);
-					x = castVal;
-					y = castVal;
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a non-const function (SetAll<T_>) on an EmuMath::Vector2 which contains constant values.");
-			}
+			return EmuMath::Helpers::VectorSet(*this, x_, y_);
 		}
 #pragma endregion
 
