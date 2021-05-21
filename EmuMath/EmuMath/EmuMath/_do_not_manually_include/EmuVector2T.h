@@ -1211,68 +1211,10 @@ namespace EmuMath
 			return EmuMath::Helpers::VectorTruncConstexpr<OutSize_, OutT>(*this);
 		}
 
-		/// <summary>
-		/// <para> Returns a Vector resulting from a linear interpolation between this Vector and Vector b, using t as the weighting. </para>
-		/// <para> The output Vector's contained types may be optionally customised, and default to this Vector's default_floating_point. </para>
-		/// </summary>
-		/// <typeparam name="OutT">Type for the result Vector to contain.</typeparam>
-		/// <typeparam name="BContainedT_">The type contained in Vector b.</typeparam>
-		/// <typeparam name="T_">The type used for the t argument.</typeparam>
-		/// <param name="b">Vector to interpolate this Vector with. b in the equation a + (b - a) * t.</param>
-		/// <param name="t">Weighting to apply to the interpolation. t in the equation a + (b - a) * t.</param>
-		/// <returns>
-		///		Vector containing the passed OutT (defaults to this Vector's default_floating_point), with elements being the results of the equation
-		///		a + (b - a) * t, where a is this Vector, b the passed Vector, and t the passed weighting.
-		/// </returns>
-		template<typename OutT = default_floating_point, typename BContainedT_ = nonref_value_type, typename T_ = default_floating_point>
-		constexpr Vector2<OutT> AsLerped(const Vector2<BContainedT_>& b, const T_& t) const
+		template<std::size_t OutSize_ = size(), typename OutT_ = default_floating_point, typename B_ = emu_vector_type, typename T_ = default_floating_point>
+		constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type Lerp(const B_& b_, const T_& t_) const
 		{
-			using OutFP = EmuCore::TMPHelpers::best_floating_point_rep_t<OutT>;
-			using TFP = EmuCore::TMPHelpers::best_floating_point_rep_t<T_>;
-			using BContainedTFP = EmuCore::TMPHelpers::best_floating_point_rep_t<BContainedT_>;
-			using HighestFP = EmuCore::TMPHelpers::highest_byte_size_t<default_floating_point, OutFP, TFP, BContainedTFP>;
-
-			const HighestFP tfp = static_cast<HighestFP>(t);
-			if constexpr (std::is_same_v<nonref_value_type_without_qualifiers, HighestFP>)
-			{
-				if constexpr (std::is_same_v<typename Vector2<BContainedT_>::nonref_value_type_without_qualifiers, HighestFP>)
-				{
-					return Vector2<OutT>
-					(
-						x + (b.x - x) * tfp,
-						y + (b.y - y) * tfp
-					);
-				}
-				else
-				{
-					return Vector2<OutT>
-					(
-						x + (static_cast<HighestFP>(b.x) - x) * tfp,
-						y + (static_cast<HighestFP>(b.y) - y) * tfp
-					);
-				}
-			}
-			else
-			{
-				const HighestFP xfp = static_cast<HighestFP>(x);
-				const HighestFP yfp = static_cast<HighestFP>(y);
-				if constexpr (std::is_same_v<typename Vector2<BContainedT_>::nonref_value_type_without_qualifiers, HighestFP>)
-				{
-					return Vector2<OutT>
-					(
-						xfp + (b.x - xfp) * tfp,
-						y + (b.y - yfp) * tfp
-					);
-				}
-				else
-				{
-					return Vector2<OutT>
-					(
-						xfp + (static_cast<HighestFP>(b.x) - xfp) * tfp,
-						yfp + (static_cast<HighestFP>(b.y) - yfp) * tfp
-					);
-				}
-			}
+			return EmuMath::Helpers::VectorLerp<OutSize_, OutT_>(*this, b_, t_);
 		}
 #pragma endregion
 

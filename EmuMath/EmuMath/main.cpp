@@ -57,6 +57,15 @@ int main()
 	v2f.ClampMin(0.5f);
 	v2f.ClampMax(0.5f);
 
+	constexpr Vector4<float> a_ = { 1.0f, 25.0f, -7.0f, 1.234f };
+	constexpr Vector3<double> b_ = { 0.0, -25.0, 1.0 };
+	constexpr Vector3<long double> t_ = { 0.5L, 0.25L, 0.75L };
+	constexpr double lone_t_ = 0.5;
+	constexpr Vector4<float> lerp_scalar_t_ = EmuMath::Helpers::VectorLerp<4, float>(a_, b_, lone_t_);
+	constexpr Vector4<long double> lerp_vector_t_ = EmuMath::Helpers::VectorLerp<4, long double>(a_, b_, t_);
+
+	constexpr Vector2<float> lerp_scalar_t_v2 = Vector2<float>(lerp_scalar_t_);
+	constexpr Vector2<float> further_lerp_v2 = lerp_scalar_t_v2.Lerp(b_, lone_t_);
 
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();

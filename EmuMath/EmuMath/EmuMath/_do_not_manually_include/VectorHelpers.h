@@ -2320,6 +2320,147 @@ namespace EmuMath::Helpers
 			return OutVec_();
 		}
 	}
+
+	template<std::size_t Index_, class OutScalar_, class VectorA_, class B_, class T_>
+	inline constexpr OutScalar_ _calculate_vector_lerp_val(const VectorA_& a_, const B_& b_, const T_& t_)
+	{
+		const auto a_n_ = EmuMath::TMPHelpers::emu_vector_element_n<Index_>(a_);
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<B_>)
+		{
+			if constexpr (Index_ < B_::size())
+			{
+				if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<T_>)
+				{
+					if constexpr (Index_ < T_::size())
+					{
+						return static_cast<OutScalar_>
+						(
+							a_n_ +
+							(EmuMath::TMPHelpers::emu_vector_element_n<Index_>(b_) - a_n_) *
+							EmuMath::TMPHelpers::emu_vector_element_n<Index_>(t_)
+						);
+					}
+					else
+					{
+						return static_cast<OutScalar_>(a_n_);
+					}
+				}
+				else
+				{
+					return static_cast<OutScalar_>(a_n_ + (EmuMath::TMPHelpers::emu_vector_element_n<Index_>(b_) - a_n_) * t_);
+				}
+			}
+			else
+			{
+				if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<T_>)
+				{
+					if constexpr (Index_ < T_::size())
+					{
+						return static_cast<OutScalar_>(a_n_ - (a_n_ * EmuMath::TMPHelpers::emu_vector_element_n<Index_>(t_)));
+					}
+					else
+					{
+						return static_cast<OutScalar_>(a_n_);
+					}
+				}
+				else
+				{
+					return static_cast<OutScalar_>(a_n_ - (a_n_ * t_));
+				}
+			}
+		}
+		else
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<T_>)
+			{
+				if constexpr (Index_ < T_::size())
+				{
+					return static_cast<OutScalar_>(a_n_ + (b_ - a_n_) * EmuMath::TMPHelpers::emu_vector_element_n<Index_>(t_));
+				}
+				else
+				{
+					return static_cast<OutScalar_>(a_n_);
+				}
+			}
+			else
+			{
+				return static_cast<OutScalar_>(a_n_ + (b_ - a_n_) * t_);
+			}
+		}
+	}
+
+	template<class OutVector_, class VectorA_, class B_, class T_>
+	inline constexpr OutVector_ _perform_vector_lerp(const VectorA_& a_, const B_& b_, const T_& t_)
+	{
+		using OutScalar_ = typename OutVector_::value_type;
+		if constexpr (OutVector_::size() == 2)
+		{
+			return OutVector_
+			(
+				_calculate_vector_lerp_val<0, OutScalar_>(a_, b_, t_),
+				_calculate_vector_lerp_val<1, OutScalar_>(a_, b_, t_)
+			);
+		}
+		else if constexpr (OutVector_::size() == 3)
+		{
+			return OutVector_
+			(
+				_calculate_vector_lerp_val<0, OutScalar_>(a_, b_, t_),
+				_calculate_vector_lerp_val<1, OutScalar_>(a_, b_, t_),
+				_calculate_vector_lerp_val<2, OutScalar_>(a_, b_, t_)
+			);
+		}
+		else if constexpr (OutVector_::size() == 4)
+		{
+			return OutVector_
+			(
+				_calculate_vector_lerp_val<0, OutScalar_>(a_, b_, t_),
+				_calculate_vector_lerp_val<1, OutScalar_>(a_, b_, t_),
+				_calculate_vector_lerp_val<2, OutScalar_>(a_, b_, t_),
+				_calculate_vector_lerp_val<3, OutScalar_>(a_, b_, t_)
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform linear interpolation (lerp) with EmuMath Vector using an invalidly sized output Vector.");
+			return OutVector_();
+		}
+	}
+
+	/// <summary>
+	/// <para> Linearly interpolates the values of the passed EmuMath Vector a_ with the values of b_, using the passed t_ as the weighting. </para>
+	/// <para> b_ and t_ may be scalar values instead of Vectors. In the case of providing scalar values, they will be applied to all values in the Vector. </para>
+	/// <para>
+	///		If b_ is a Vector, the respective values will be used for each interpolation (e.g. b_.x will be used to lerp a_.x). 
+	///		If b_ does not have a value for an interpolation to form the (e.g. only has x and y but a z element is outputted), it will be treated as 0.
+	/// </para>
+	/// <para>
+	///		If t_ is a Vector, the respective values will be used for each interpolation (e.g. t_.x will be used to lerp a_.x). 
+	///		If t_ does not have a value for an interpolation, it will be treated as 0 and thus no interpolation will be performed.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="OutT_">Type to contain within the returned Vector.</typeparam>
+	/// <typeparam name="VectorA_">The EmuMath Vector type that represents argument a_. Must be an EmuMath Vector.</typeparam>
+	/// <typeparam name="B_">Scalar or EmuMath Vector type representing argument b_.</typeparam>
+	/// <typeparam name="T_">Type of the provided t_ argument.</typeparam>
+	/// <param name="a_">EmuMath Vector to perform interpolation with.</param>
+	/// <param name="b_">Scalar value or EmuMath Vector to interpolate elements of a_ with.</param>
+	/// <param name="t_">Scalar value or EmuMath Vector to use as the weighting for the interpolation (where 0.0 is completely a_, and 1.0 is completely b_).</param>
+	/// <returns>EmuMath Vector of the provided size and contained type, containing the results of the linear interpolation (a_ + (b_ - a_) * t_).</returns>
+	template<std::size_t OutSize_, typename OutT_, class VectorA_, class B_, typename T_>
+	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type VectorLerp(const VectorA_& a_, const B_& b_, const T_& t_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type>)
+		{
+			return _perform_vector_lerp<typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type, VectorA_, B_, T_>(a_, b_, t_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform linear interpolation (lerp) with EmuMath Vector using invalid output params.");
+			using Out_ = typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type;
+			return Out_();
+		}
+	}
 }
 
 #endif
