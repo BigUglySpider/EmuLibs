@@ -49,6 +49,9 @@ int main()
 	constexpr float min_v4fyw2 = v4f_ywv2_ceil.Min();
 	constexpr float max_v4fyw2 = v4f_ywv2_ceil.Max();
 
+	constexpr Vector4<float> v4f_clamped_min = EmuMath::Helpers::VectorClampMin<4, float>(V4f, -0.5f);
+	constexpr Vector4<float> v4f_clamped_max = EmuMath::Helpers::VectorClampMax<4, float>(V4f, -0.5f);
+
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();
 #pragma endregion
