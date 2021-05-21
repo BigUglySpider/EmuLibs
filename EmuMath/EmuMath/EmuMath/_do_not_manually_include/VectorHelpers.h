@@ -1338,7 +1338,7 @@ namespace EmuMath::Helpers
 	}
 #pragma endregion
 
-#pragma region MAG
+#pragma region MAGNITUDE
 	template<typename OutT, class EmuVector_>
 	inline constexpr OutT _calculate_square_magnitude(const EmuVector_& vector_)
 	{
@@ -1592,8 +1592,6 @@ namespace EmuMath::Helpers
 		}
 	}
 
-
-
 	template<class LhsVector_, class RhsVector_, class Func>
 	inline constexpr bool _perform_vector_overall_comparison_with_vector(const LhsVector_& lhs, const RhsVector_& rhs)
 	{
@@ -1767,6 +1765,148 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to perform an EmuMath Vector comparison (Not Equal) using a non-EmuMath-Vector operand.");
 			return false;
 		}
+	}	
+
+	template<class OutVector_, class LhsEmuVector_, class Rhs_, class Func_>
+	inline constexpr OutVector_ _perform_per_element_comparison(const LhsEmuVector_& lhs_, const Rhs_& rhs_)
+	{
+		Func_ cmp_ = Func_();
+		if constexpr (OutVector_::size() == 2)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Rhs_>)
+			{
+				return OutVector_
+				(
+					cmp_(lhs_.x, rhs_.x),
+					cmp_(lhs_.y, rhs_.y)
+				);
+			}
+			else
+			{
+				return OutVector_
+				(
+					cmp_(lhs_.x, rhs_),
+					cmp_(lhs_.y, rhs_)
+				);
+			}
+		}
+		else if constexpr (OutVector_::size() == 3)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Rhs_>)
+			{
+				return OutVector_
+				(
+					cmp_(lhs_.x, rhs_.x),
+					cmp_(lhs_.y, rhs_.y),
+					cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), EmuMath::TMPHelpers::emu_vector_z(rhs_))
+				);
+			}
+			else
+			{
+				return OutVector_
+				(
+					cmp_(lhs_.x, rhs_),
+					cmp_(lhs_.y, rhs_),
+					cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), rhs_)
+				);
+			}
+		}
+		else if constexpr (OutVector_::size() == 4)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Rhs_>)
+			{
+				return OutVector_
+				(
+					cmp_(lhs_.x, rhs_.x),
+					cmp_(lhs_.y, rhs_.y),
+					cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), EmuMath::TMPHelpers::emu_vector_z(rhs_)),
+					cmp_(EmuMath::TMPHelpers::emu_vector_w(lhs_), EmuMath::TMPHelpers::emu_vector_w(rhs_))
+				);
+			}
+			else
+			{
+				return OutVector_
+				(
+					cmp_(lhs_.x, rhs_),
+					cmp_(lhs_.y, rhs_),
+					cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), rhs_),
+					cmp_(EmuMath::TMPHelpers::emu_vector_w(lhs_), rhs_)
+				);
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a per-element EmuMath Vector comparison with an invalidly sized output Vector.");
+		}
+	}
+
+	template<bool IncludeNonContained_, class LhsVector_, class Rhs_, class Func_>
+	inline constexpr bool _perform_vector_comparison_all(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<LhsVector_>)
+		{
+			Func_ cmp_ = Func_();
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Rhs_>)
+			{
+				constexpr std::size_t used_size_ =
+					(
+						(IncludeNonContained_) ?
+						(LhsVector_::size() >= Rhs_::size()) ? LhsVector_::size() : Rhs_::size() :
+						(LhsVector_::size() <= Rhs_::size()) ? LhsVector_::size() : Rhs_::size()
+						);
+				if constexpr (used_size_ == 2)
+				{
+					return cmp_(lhs_.x, rhs_.x) && cmp_(lhs_.y, rhs_.y);
+				}
+				else if constexpr (used_size_ == 3)
+				{
+					return
+						(
+							cmp_(lhs_.x, rhs_.x) &&
+							cmp_(lhs_.y, rhs_.y) &&
+							cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), EmuMath::TMPHelpers::emu_vector_z(rhs_))
+							);
+				}
+				else if constexpr (used_size_ == 4)
+				{
+					return
+						(
+							cmp_(lhs_.x, rhs_.x) &&
+							cmp_(lhs_.y, rhs_.y) &&
+							cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), EmuMath::TMPHelpers::emu_vector_z(rhs_)),
+							cmp_(EmuMath::TMPHelpers::emu_vector_w(lhs_), EmuMath::TMPHelpers::emu_vector_w(rhs_))
+							);
+				}
+				else
+				{
+					static_assert(false, "Attempted to perform an all-element comparison of EmuMath Vectors with at least one invalidly sized EmuMath Vector.");
+				}
+			}
+			else
+			{
+				if constexpr (LhsVector_::size() == 2)
+				{
+					return cmp_(lhs_.x, rhs_) && cmp_(lhs_.y, rhs_);
+				}
+				else if constexpr (LhsVector_::size() == 3)
+				{
+					return cmp_(lhs_.x, rhs_) && cmp_(lhs_.y, rhs_) && cmp_(lhs_.z, rhs_);
+				}
+				else if constexpr (LhsVector_::size() == 4)
+				{
+					return cmp_(lhs_.x, rhs_) && cmp_(lhs_.y, rhs_) && cmp_(lhs_.z, rhs_) && cmp_(lhs_.w, rhs_);
+				}
+				else
+				{
+					static_assert(false, "Attempted to perform an all-element comparison with an invalidly sized EmuMath Vector.");
+				}
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform an all-element comparison with an EmuMath Vector with a non-EmuMath Vector left-hand operand.");
+			return false;
+		}
 	}
 #pragma endregion
 	}
@@ -1784,7 +1924,6 @@ namespace EmuMath::Helpers
 			return OutVector();
 		}
 	}
-
 	template<class OutVector, class LhsVector, class RhsVector>
 	inline OutVector VectorSubtraction(const LhsVector& lhs, const RhsVector& rhs)
 	{
@@ -1798,7 +1937,6 @@ namespace EmuMath::Helpers
 			return OutVector();
 		}
 	}
-
 	template<class OutVector, class LhsVector, class Rhs>
 	inline OutVector VectorMultiplication(const LhsVector& lhs, const Rhs& rhs)
 	{
@@ -1819,7 +1957,6 @@ namespace EmuMath::Helpers
 			return OutVector();
 		}
 	}
-
 	template<class OutVector, class LhsVector, class Rhs>
 	inline OutVector VectorDivision(const LhsVector& lhs, const Rhs& rhs)
 	{
@@ -1840,7 +1977,6 @@ namespace EmuMath::Helpers
 			return OutVector();
 		}
 	}
-
 	template<class OutVector, class LhsVector, class Rhs>
 	inline OutVector VectorMod(const LhsVector& lhs, const Rhs& rhs)
 	{
@@ -1882,7 +2018,6 @@ namespace EmuMath::Helpers
 			return OutVector();
 		}
 	}
-
 	template<class OutVector, class LhsVector, class Rhs>
 	inline OutVector VectorBitwiseOr(const LhsVector& lhs, const Rhs& rhs)
 	{
@@ -1903,7 +2038,6 @@ namespace EmuMath::Helpers
 			return OutVector();
 		}
 	}
-
 	template<class OutVector, class LhsVector, class Rhs>
 	inline OutVector VectorBitwiseXor(const LhsVector& lhs, const Rhs& rhs)
 	{
@@ -1945,7 +2079,6 @@ namespace EmuMath::Helpers
 			return OutVector();
 		}
 	}
-
 	template<class OutVector, class LhsVector, class Rhs>
 	inline OutVector VectorRightShiftPerElement(const LhsVector& lhs, const Rhs& rhs)
 	{
@@ -1988,7 +2121,6 @@ namespace EmuMath::Helpers
 			return std::false_type();
 		}
 	}
-
 	template<class EmuVector_>
 	inline constexpr typename EmuMath::TMPHelpers::emu_vector_copy<EmuVector_>::type VectorRightShiftVectorwise(const EmuVector_& inVector, const std::size_t numShifts)
 	{
@@ -2509,6 +2641,144 @@ namespace EmuMath::Helpers
 			using Out_ = typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type;
 			return Out_();
 		}
+	}
+
+	template<std::size_t OutSize_, class LhsEmuVector_, class Rhs_>
+	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, bool>::type VectorComparisonPerElement_Equal(const LhsEmuVector_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_vector_funcs::_perform_per_element_comparison
+		<
+			typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, bool>::type,
+			LhsEmuVector_,
+			Rhs_,
+			std::equal_to<void>
+		>(lhs_, rhs_);
+	}
+	template<std::size_t OutSize_, class LhsEmuVector_, class Rhs_>
+	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, bool>::type VectorComparisonPerElement_NotEqual(const LhsEmuVector_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_vector_funcs::_perform_per_element_comparison
+		<
+			typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, bool>::type,
+			LhsEmuVector_,
+			Rhs_,
+			std::not_equal_to<void>
+		>(lhs_, rhs_);
+	}
+
+	template<std::size_t OutSize_, class LhsEmuVector_, class Rhs_>
+	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, bool>::type VectorComparisonPerElement_Less(const LhsEmuVector_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_vector_funcs::_perform_per_element_comparison
+		<
+			typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, bool>::type,
+			LhsEmuVector_,
+			Rhs_,
+			std::less<void>
+		>(lhs_, rhs_);
+	}
+	template<std::size_t OutSize_, class LhsEmuVector_, class Rhs_>
+	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, bool>::type VectorComparisonPerElement_LessEqual(const LhsEmuVector_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_vector_funcs::_perform_per_element_comparison
+		<
+			typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, bool>::type,
+			LhsEmuVector_,
+			Rhs_,
+			std::less_equal<void>
+		>(lhs_, rhs_);
+	}
+
+	template<std::size_t OutSize_, class LhsEmuVector_, class Rhs_>
+	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, bool>::type VectorComparisonPerElement_Greater(const LhsEmuVector_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_vector_funcs::_perform_per_element_comparison
+		<
+			typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, bool>::type,
+			LhsEmuVector_,
+			Rhs_,
+			std::greater<void>
+		>(lhs_, rhs_);
+	}
+	template<std::size_t OutSize_, class LhsEmuVector_, class Rhs_>
+	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, bool>::type VectorComparisonPerElement_GreaterEqual(const LhsEmuVector_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_vector_funcs::_perform_per_element_comparison
+		<
+			typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, bool>::type,
+			LhsEmuVector_,
+			Rhs_,
+			std::greater_equal<void>
+		>(lhs_, rhs_);
+	}
+
+	template<bool IncludeNonContained_, class LhsVector_, class Rhs_>
+	inline constexpr bool VectorComparisonAll_Equal(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_vector_funcs::_perform_vector_comparison_all
+		<
+			IncludeNonContained_,
+			LhsVector_,
+			Rhs_,
+			std::equal_to<void>
+		>(lhs_, rhs_);
+	}
+	template<bool IncludeNonContained_, class LhsVector_, class Rhs_>
+	inline constexpr bool VectorComparisonAll_NotEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_vector_funcs::_perform_vector_comparison_all
+		<
+			IncludeNonContained_,
+			LhsVector_,
+			Rhs_,
+			std::not_equal_to<void>
+		>(lhs_, rhs_);
+	}
+
+	template<bool IncludeNonContained_, class LhsVector_, class Rhs_>
+	inline constexpr bool VectorComparisonAll_Less(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_vector_funcs::_perform_vector_comparison_all
+		<
+			IncludeNonContained_,
+			LhsVector_,
+			Rhs_,
+			std::less<void>
+		>(lhs_, rhs_);
+	}
+	template<bool IncludeNonContained_, class LhsVector_, class Rhs_>
+	inline constexpr bool VectorComparisonAll_LessEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_vector_funcs::_perform_vector_comparison_all
+		<
+			IncludeNonContained_,
+			LhsVector_,
+			Rhs_,
+			std::less_equal<void>
+		>(lhs_, rhs_);
+	}
+
+	template<bool IncludeNonContained_, class LhsVector_, class Rhs_>
+	inline constexpr bool VectorComparisonAll_Greater(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_vector_funcs::_perform_vector_comparison_all
+		<
+			IncludeNonContained_,
+			LhsVector_,
+			Rhs_,
+			std::greater<void>
+		>(lhs_, rhs_);
+	}
+	template<bool IncludeNonContained_, class LhsVector_, class Rhs_>
+	inline constexpr bool VectorComparisonAll_GreaterEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_vector_funcs::_perform_vector_comparison_all
+		<
+			IncludeNonContained_,
+			LhsVector_,
+			Rhs_,
+			std::greater_equal<void>
+		>(lhs_, rhs_);
 	}
 }
 

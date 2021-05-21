@@ -67,7 +67,19 @@ int main()
 	constexpr Vector2<float> lerp_scalar_t_v2 = Vector2<float>(lerp_scalar_t_);
 	constexpr Vector2<float> further_lerp_v2 = lerp_scalar_t_v2.Lerp(b_, lone_t_);
 
+	constexpr Vector4<bool> check_equal_v4 = EmuMath::Helpers::VectorComparisonPerElement_Equal<4>(Vector2f(0.0f, 5.0f), Vector4<float>(5.0f, 5.0f, 1.0f, 0.0f));
+	constexpr Vector4<bool> check_not_equal_v4 = EmuMath::Helpers::VectorComparisonPerElement_NotEqual<4>(Vector2f(0.0f, 5.0f), Vector4<float>(5.0f, 5.0f, 1.0f, 0.0f));
+	constexpr Vector4<bool> check_less_v4 = EmuMath::Helpers::VectorComparisonPerElement_Less<4>(Vector2f(0.0f, 5.0f), Vector4<float>(5.0f, 5.0f, 1.0f, 0.0f));
+	constexpr Vector4<bool> check_less_equal_v4 = EmuMath::Helpers::VectorComparisonPerElement_LessEqual<4>(Vector2f(0.0f, 5.0f), Vector4<float>(5.0f, 5.0f, 1.0f, 0.0f));
+	constexpr Vector4<bool> check_greater_v4 = EmuMath::Helpers::VectorComparisonPerElement_Greater<4>(Vector2f(0.0f, 5.0f), Vector4<float>(5.0f, 5.0f, 1.0f, 0.0f));
+	constexpr Vector4<bool> check_greater_equal_v4 = EmuMath::Helpers::VectorComparisonPerElement_GreaterEqual<4>(Vector2f(0.0f, 5.0f), Vector4<float>(5.0f, 5.0f, 1.0f, 0.0f));
 
+	constexpr bool result_all_equal_ = EmuMath::Helpers::VectorComparisonAll_Equal<true>(Vector2<float>(2.5f, 2.5f), 2.5f);
+	constexpr bool result_all_not_equal = EmuMath::Helpers::VectorComparisonAll_NotEqual<true>(Vector2<float>(2.5f, 2.5f), 2.1f);
+	constexpr bool result_all_less = EmuMath::Helpers::VectorComparisonAll_Less<true>(Vector2<float>(2.5f, 2.5f), 2.6f);
+	constexpr bool result_all_less_equal = EmuMath::Helpers::VectorComparisonAll_LessEqual<true>(Vector2<float>(2.5f, 2.5f), 2.5f);
+	constexpr bool result_all_greater = EmuMath::Helpers::VectorComparisonAll_Greater<true>(Vector2<float>(2.5f, 2.6f), 2.4f);
+	constexpr bool result_all_greater_equal = EmuMath::Helpers::VectorComparisonAll_GreaterEqual<true>(Vector2<float>(2.5f, 2.6f), 2.5f);
 
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();
