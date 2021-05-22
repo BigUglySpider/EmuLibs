@@ -11,6 +11,7 @@ namespace EmuMath
 	template<typename T>
 	struct NoOverflowT
 	{
+	public:
 		static_assert(std::is_arithmetic_v<T>, "Attempted to form a NoOverflowT with a non-arithmetic type T.");
 
 		using value_type = T;
@@ -52,6 +53,11 @@ namespace EmuMath
 		{
 			return val;
 		}
+		constexpr operator bool() const
+		{
+			return val;
+		}
+
 		value_type* operator&()
 		{
 			return this->GetPointerToVal();
@@ -77,191 +83,46 @@ namespace EmuMath
 		{
 			return this;
 		}
+		
+		constexpr this_type operator&(value_type rhs) const
+		{
+			return this_type(val & rhs);
+		}
+		constexpr this_type operator|(value_type rhs) const
+		{
+			return this_type(val | rhs);
+		}
+		constexpr this_type operator^(value_type rhs) const
+		{
+			return this_type(val ^ rhs);
+		}
+		constexpr this_type operator<<(const std::size_t numShifts) const
+		{
+			if (numShifts >= num_bits)
+			{
+				return this_type(0);
+			}
+			else
+			{
+				return this_type(val << numShifts);
+			}
+		}
+		constexpr this_type operator>>(const std::size_t numShifts) const
+		{
+			if (numShifts >= num_bits)
+			{
+				return this_type(0);
+			}
+			else
+			{
+				return this_type(val >> numShifts);
+			}
+		}
+		constexpr this_type operator~() const
+		{
+			return this_type(~val);
+		}
 
-		template<typename Rhs>
-		constexpr this_type _add_negative_lhs_positive_rhs(Rhs rhs) const
-		{
-			using conversion_type = std::conditional_t<is_integral, EmuCore::TMPHelpers::unsigned_if_int_t<value_type>, EmuCore::TMPHelpers::next_size_up_t<value_type>>;
-			if constexpr (std::is_same_v<conversion_type, value_type>)
-			{
-				if (rhs > max_val)
-				{
-					value_type result = val + max_val;
-					rhs -= max_val;
-					while (result < 0 && rhs != 0)
-					{
-						if (rhs > max_val)
-						{
-							result += max_val;
-							rhs -= max_val;
-						}
-						else
-						{
-							result += static_cast<value_type>(rhs);
-							rhs = 0;
-						}
-					}
-					if (rhs != 0)
-					{
-						const value_type highest_possible_rhs = max_val - val;
-						return this_type((rhs >= highest_possible_rhs) ? max_val : static_cast<value_type>(val + rhs));
-					}
-					else
-					{
-						return this_type(result);
-					}
-				}
-				else
-				{
-					return this_type(val + rhs);
-				}
-			}
-			else
-			{
-				const conversion_type highest_possible_rhs = static_cast<conversion_type>(max_val) - val;
-				return this_type((rhs >= highest_possible_rhs) ? max_val : static_cast<value_type>(val + rhs));
-			}
-		}
-		
-		template<typename Rhs>
-		constexpr this_type _add_negative_lhs_negative_rhs(Rhs rhs) const
-		{
-			const value_type lowest_possible_rhs = min_val - val;
-			return this_type((lowest_possible_rhs <= rhs) ? min_val : static_cast<value_type>(val + rhs));
-		}
-		
-		template<typename Rhs>
-		constexpr this_type _add_negative_lhs(Rhs rhs) const
-		{
-			if constexpr (std::is_signed_v<Rhs>)
-			{
-				if (rhs > 0)
-				{
-					return _add_negative_lhs_positive_rhs<Rhs>(rhs);
-				}
-				else
-				{
-					return _add_negative_lhs_negative_rhs<Rhs>(rhs);
-				}
-			}
-			else
-			{
-				return _add_negative_lhs_positive_rhs<Rhs>(rhs);
-			}
-		}
-		
-		template<typename Rhs>
-		constexpr this_type _add_positive_lhs_positive_rhs(Rhs rhs) const
-		{
-			const value_type highest_possible_rhs = max_val - val;
-			return this_type((highest_possible_rhs <= rhs) ? max_val : static_cast<value_type>(val + rhs));
-		}
-		
-		template<typename Rhs>
-		constexpr this_type _add_positive_lhs_negative_rhs(Rhs rhs) const
-		{
-			if constexpr (is_signed)
-			{
-				using conversion_type = EmuCore::TMPHelpers::next_size_up_t<value_type>;
-				if constexpr (std::is_same_v<conversion_type, value_type>)
-				{
-					if (rhs < min_val)
-					{
-						//value_type result = val + max_val;
-						//rhs -= max_val;
-						//while (result < 0 && rhs != 0)
-						//{
-						//	if (rhs > max_val)
-						//	{
-						//		result += max_val;
-						//		rhs -= max_val;
-						//	}
-						//	else
-						//	{
-						//		result += static_cast<value_type>(rhs);
-						//		rhs = 0;
-						//	}
-						//}
-						//if (rhs != 0)
-						//{
-						//	const value_type highest_possible_rhs = max_val - val;
-						//	return this_type((rhs >= highest_possible_rhs) ? max_val : static_cast<value_type>(val + rhs));
-						//}
-						//else
-						//{
-						//	return this_type(result);
-						//}
-					}
-					else
-					{
-						return this_type(val + rhs);
-					}
-				}
-				else
-				{
-					const conversion_type lowest_possible_rhs = static_cast<conversion_type>(min_val) - static_cast<conversion_type>(val);
-					return this_type((lowest_possible_rhs >= rhs) ? min_val : static_cast<value_type>(val + rhs));
-				}
-			}
-			else
-			{
-				using signed_type = std::make_signed_t<value_type>;
-				using conversion_type = EmuCore::TMPHelpers::next_size_up_t<signed_type>;
-				if constexpr (std::is_same_v<signed_type, conversion_type>)
-				{
-					constexpr signed_type max_signed = std::numeric_limits<signed_type>::max();
-					constexpr signed_type min_signed_from_max = -max_signed;
-					value_type result = val;
-					while (result != 0 && rhs != 0)
-					{
-						if (min_signed_from_max >= rhs)
-						{
-							if (result <= max_signed)
-							{
-								return this_type(0);
-							}
-							else
-							{
-								result += min_signed_from_max;
-								rhs += min_signed_from_max;
-							}
-						}
-						else
-						{
-							signed_type positive_rhs = -static_cast<signed_type>(rhs);
-							return this_type((result <= positive_rhs) ? 0 : static_cast<value_type>(result + rhs));
-						}
-					}
-					return this_type(result);
-				}
-				else
-				{
-					conversion_type lowest_possible_rhs = -static_cast<conversion_type>(val);
-					return this_type((val <= lowest_possible_rhs) ? min_val : static_cast<value_type>(max_val + rhs));
-				}
-			}
-		}
-		
-		template<typename Rhs>
-		constexpr this_type _add_positive_lhs(Rhs rhs) const
-		{
-			if constexpr (std::is_signed_v<Rhs>)
-			{
-				if (rhs < 0)
-				{
-					return _add_positive_lhs_negative_rhs<Rhs>(rhs);
-				}
-				else
-				{
-					return _add_positive_lhs_positive_rhs<Rhs>(rhs);
-				}
-			}
-			else
-			{
-				return _add_positive_lhs_positive_rhs<Rhs>(rhs);
-			}
-		}
-		
 		template<typename Rhs>
 		constexpr this_type operator+(Rhs rhs) const
 		{
@@ -304,6 +165,51 @@ namespace EmuMath
 				else
 				{
 					return _add_positive_lhs_positive_rhs<Rhs>(rhs);
+				}
+			}
+		}
+		template<typename Rhs>
+		constexpr this_type operator-(Rhs rhs) const
+		{
+			if constexpr (is_floating_point != std::is_floating_point_v<Rhs>)
+			{
+				if constexpr (is_floating_point)
+				{
+					return (*this) - static_cast<long double>(rhs);
+				}
+				else
+				{
+					return (*this) - (EmuMath::NoOverflowT<std::int64_t>(rhs).val);
+				}
+			}
+			else if constexpr (is_signed)
+			{
+				if (val < 0)
+				{
+
+					return _subtract_negative_lhs<Rhs>(rhs);
+				}
+				else
+				{
+					return _subtract_positive_lhs<Rhs>(rhs);
+				}
+			}
+			else
+			{
+				if constexpr (std::is_signed_v<Rhs>)
+				{
+					if (rhs < 0)
+					{
+						return _subtract_positive_lhs_negative_rhs<Rhs>(rhs);
+					}
+					else
+					{
+						return _subtract_positive_lhs_positive_rhs<Rhs>(rhs);
+					}
+				}
+				else
+				{
+					return _subtract_positive_lhs_positive_rhs<Rhs>(rhs);
 				}
 			}
 		}
@@ -374,6 +280,38 @@ namespace EmuMath
 			}
 			return *this;
 		}
+		this_type& operator&=(value_type rhs)
+		{
+			*this = (*this) & rhs;
+			return *this;
+		}
+		this_type& operator|=(value_type rhs)
+		{
+			*this = (*this) | rhs;
+			return *this;
+		}
+		this_type& operator^=(value_type rhs)
+		{
+			*this = (*this) ^ rhs;
+			return *this;
+		}
+		this_type& operator<<=(value_type rhs)
+		{
+			*this = (*this) << rhs;
+			return *this;
+		}
+		this_type& operator>>=(value_type rhs)
+		{
+			*this = (*this) >> rhs;
+			return *this;
+		}
+
+		template<typename Rhs>
+		this_type& operator+=(Rhs rhs)
+		{
+			*this = (*this) + rhs;
+			return *this;
+		}
 
 		template<typename Rhs>
 		constexpr bool operator==(Rhs rhs) const
@@ -408,6 +346,414 @@ namespace EmuMath
 
 		/// <summary> The underlying value stored here. Note that modifications directly through val will not have overflow safety. </summary>
 		T val;
+
+	private:
+		template<typename Rhs>
+		constexpr this_type _add_positive_lhs(Rhs rhs) const
+		{
+			if constexpr (std::is_signed_v<Rhs>)
+			{
+				if (rhs < 0)
+				{
+					return _add_positive_lhs_negative_rhs<Rhs>(rhs);
+				}
+				else
+				{
+					return _add_positive_lhs_positive_rhs<Rhs>(rhs);
+				}
+			}
+			else
+			{
+				return _add_positive_lhs_positive_rhs<Rhs>(rhs);
+			}
+		}
+		template<typename Rhs>
+		constexpr this_type _add_negative_lhs(Rhs rhs) const
+		{
+			if constexpr (std::is_signed_v<Rhs>)
+			{
+				if (rhs > 0)
+				{
+					return _add_negative_lhs_positive_rhs<Rhs>(rhs);
+				}
+				else
+				{
+					return _add_negative_lhs_negative_rhs<Rhs>(rhs);
+				}
+			}
+			else
+			{
+				return _add_negative_lhs_positive_rhs<Rhs>(rhs);
+			}
+		}
+		template<typename Rhs>
+		constexpr this_type _add_positive_lhs_positive_rhs(Rhs rhs) const
+		{
+			const value_type highest_possible_rhs = max_val - val;
+			return this_type((highest_possible_rhs <= rhs) ? max_val : static_cast<value_type>(val + rhs));
+		}
+		template<typename Rhs>
+		constexpr this_type _add_positive_lhs_negative_rhs(Rhs rhs) const
+		{
+			if constexpr (is_signed)
+			{
+				using conversion_type = EmuCore::TMPHelpers::next_size_up_t<value_type>;
+				if constexpr (std::is_same_v<conversion_type, value_type>)
+				{
+					if (rhs < min_val)
+					{
+						value_type result = val + min_val;
+						rhs -= min_val;
+						while (result > 0 && rhs != 0)
+						{
+							if (rhs < min_val)
+							{
+								result += min_val;
+								rhs -= min_val;
+							}
+							else
+							{
+								result += rhs;
+								rhs = 0;
+							}
+						}
+						if (rhs != 0)
+						{
+							const value_type lowest_possible_rhs = min_val - val;
+							return this_type((rhs <= lowest_possible_rhs) ? min_val : static_cast<value_type>(val + rhs));
+						}
+						else
+						{
+							return this_type(result);
+						}
+					}
+					else
+					{
+						return this_type(val + rhs);
+					}
+				}
+				else
+				{
+					const conversion_type lowest_possible_rhs = static_cast<conversion_type>(min_val) - static_cast<conversion_type>(val);
+					return this_type((lowest_possible_rhs >= rhs) ? min_val : static_cast<value_type>(val + rhs));
+				}
+			}
+			else
+			{
+				using signed_type = std::make_signed_t<value_type>;
+				using conversion_type = EmuCore::TMPHelpers::next_size_up_t<signed_type>;
+				if constexpr (std::is_same_v<signed_type, conversion_type>)
+				{
+					constexpr signed_type max_signed = std::numeric_limits<signed_type>::max();
+					constexpr signed_type min_signed_from_max = -max_signed;
+					value_type result = val;
+					while (result != 0 && rhs != 0)
+					{
+						if (min_signed_from_max >= rhs)
+						{
+							if (result <= max_signed)
+							{
+								return this_type(0);
+							}
+							else
+							{
+								result += min_signed_from_max;
+								rhs += min_signed_from_max;
+							}
+						}
+						else
+						{
+							signed_type positive_rhs = -static_cast<signed_type>(rhs);
+							return this_type((result <= positive_rhs) ? 0 : static_cast<value_type>(result + rhs));
+						}
+					}
+					return this_type(result);
+				}
+				else
+				{
+					conversion_type lowest_possible_rhs = -static_cast<conversion_type>(val);
+					return this_type((val <= lowest_possible_rhs) ? min_val : static_cast<value_type>(max_val + rhs));
+				}
+			}
+		}
+		template<typename Rhs>
+		constexpr this_type _add_negative_lhs_positive_rhs(Rhs rhs) const
+		{
+			using conversion_type = std::conditional_t<is_integral, EmuCore::TMPHelpers::unsigned_if_int_t<value_type>, EmuCore::TMPHelpers::next_size_up_t<value_type>>;
+			if constexpr (std::is_same_v<conversion_type, value_type>)
+			{
+				if (rhs > max_val)
+				{
+					value_type result = val + max_val;
+					rhs -= max_val;
+					while (result < 0 && rhs != 0)
+					{
+						if (rhs > max_val)
+						{
+							result += max_val;
+							rhs -= max_val;
+						}
+						else
+						{
+							result += rhs;
+							rhs = 0;
+						}
+					}
+					if (rhs != 0)
+					{
+						const value_type highest_possible_rhs = max_val - val;
+						return this_type((rhs >= highest_possible_rhs) ? max_val : static_cast<value_type>(val + rhs));
+					}
+					else
+					{
+						return this_type(result);
+					}
+				}
+				else
+				{
+					return this_type(val + rhs);
+				}
+			}
+			else
+			{
+				const conversion_type highest_possible_rhs = static_cast<conversion_type>(max_val) - val;
+				return this_type((rhs >= highest_possible_rhs) ? max_val : static_cast<value_type>(val + rhs));
+			}
+		}		
+		template<typename Rhs>
+		constexpr this_type _add_negative_lhs_negative_rhs(Rhs rhs) const
+		{
+			const value_type lowest_possible_rhs = min_val - val;
+			return this_type((lowest_possible_rhs <= rhs) ? min_val : static_cast<value_type>(val + rhs));
+		}
+
+		template<typename Rhs>
+		constexpr this_type _subtract_positive_lhs(Rhs rhs) const
+		{
+			if constexpr (std::is_signed_v<Rhs>)
+			{
+				if (rhs < 0)
+				{
+					return _subtract_positive_lhs_negative_rhs<Rhs>(rhs);
+				}
+				else
+				{
+					return _subtract_positive_lhs_positive_rhs<Rhs>(rhs);
+				}
+			}
+			else
+			{
+				return _subtract_positive_lhs_positive_rhs<Rhs>(rhs);
+			}
+		}
+
+		template<typename Rhs>
+		constexpr this_type _subtract_negative_lhs(Rhs rhs) const
+		{
+			if constexpr (std::is_signed_v<Rhs>)
+			{
+				if (rhs > 0)
+				{
+					return this->_subtract_negative_lhs_positive_rhs<Rhs>(rhs);
+				}
+				else
+				{
+					return this->_subtract_negative_lhs_negative_rhs<Rhs>(rhs);
+				}
+			}
+			else
+			{
+				return this->_subtract_negative_lhs_positive_rhs<Rhs>(rhs);
+			}
+		}
+
+		template<typename Rhs>
+		constexpr this_type _subtract_positive_lhs_positive_rhs(Rhs rhs) const
+		{
+			if constexpr (is_signed)
+			{
+				using conversion_type = std::conditional_t<is_integral, EmuCore::TMPHelpers::unsigned_if_int_t<value_type>, EmuCore::TMPHelpers::next_size_up_t<value_type>>;
+				if constexpr (std::is_same_v<conversion_type, value_type>)
+				{
+					if (rhs > max_val)
+					{
+						value_type result = val - max_val;
+						rhs -= max_val;
+						while (result > 0 && rhs != 0)
+						{
+							if (rhs > max_val)
+							{
+								result -= max_val;
+								rhs -= max_val;
+							}
+							else
+							{
+								result -= rhs;
+								rhs = 0;
+							}
+						}
+						if (rhs != 0)
+						{
+							return this_type(((val - min_val) <= rhs) ? min_val : static_cast<value_type>(val - rhs));
+						}
+						else
+						{
+							return this_type(result);
+						}
+					}
+					else
+					{
+						return this_type(val - rhs);
+					}
+				}
+				else
+				{
+					const conversion_type highest_possible_rhs = val - min_val;
+					return this_type((highest_possible_rhs <= rhs) ? min_val : static_cast<value_type>(val - rhs));
+				}
+			}
+			else
+			{
+				return this_type((val <= rhs) ? 0 : val - rhs);
+			}
+		}
+
+		template<typename Rhs>
+		constexpr this_type _subtract_positive_lhs_negative_rhs(Rhs rhs) const
+		{
+			if constexpr (is_signed)
+			{
+				using conversion_type = EmuCore::TMPHelpers::next_size_up_t<value_type>;
+				if constexpr (std::is_same_v<conversion_type, value_type>)
+				{
+					if (rhs < min_val)
+					{
+						value_type result = val + min_val;
+						rhs -= min_val;
+						while (result > 0 && rhs != 0)
+						{
+							if (rhs < min_val)
+							{
+								result += min_val;
+								rhs -= min_val;
+							}
+							else
+							{
+								result += rhs;
+								rhs = 0;
+							}
+						}
+						if (rhs != 0)
+						{
+							const value_type lowest_possible_rhs = min_val - val;
+							return this_type((rhs <= lowest_possible_rhs) ? min_val : static_cast<value_type>(val + rhs));
+						}
+						else
+						{
+							return this_type(result);
+						}
+					}
+					else
+					{
+						return this_type(val + rhs);
+					}
+				}
+				else
+				{
+					const conversion_type lowest_possible_rhs = static_cast<conversion_type>(min_val) - static_cast<conversion_type>(val);
+					return this_type((lowest_possible_rhs >= rhs) ? min_val : static_cast<value_type>(val + rhs));
+				}
+			}
+			else
+			{
+				using signed_type = std::make_signed_t<value_type>;
+				using conversion_type = EmuCore::TMPHelpers::next_size_up_t<signed_type>;
+				if constexpr (std::is_same_v<signed_type, conversion_type>)
+				{
+					constexpr signed_type max_signed = std::numeric_limits<signed_type>::max();
+					constexpr signed_type min_signed_from_max = -max_signed;
+					value_type result = val;
+					while (result != 0 && rhs != 0)
+					{
+						if (min_signed_from_max >= rhs)
+						{
+							if (result <= max_signed)
+							{
+								return this_type(0);
+							}
+							else
+							{
+								result += min_signed_from_max;
+								rhs += min_signed_from_max;
+							}
+						}
+						else
+						{
+							signed_type positive_rhs = -static_cast<signed_type>(rhs);
+							return this_type((result <= positive_rhs) ? 0 : static_cast<value_type>(result + rhs));
+						}
+					}
+					return this_type(result);
+				}
+				else
+				{
+					conversion_type lowest_possible_rhs = -static_cast<conversion_type>(val);
+					return this_type((val <= lowest_possible_rhs) ? min_val : static_cast<value_type>(max_val + rhs));
+				}
+			}
+		}
+
+		template<typename Rhs>
+		constexpr this_type _subtract_negative_lhs_positive_rhs(Rhs rhs) const
+		{
+			using conversion_type = std::conditional_t<is_integral, EmuCore::TMPHelpers::unsigned_if_int_t<value_type>, EmuCore::TMPHelpers::next_size_up_t<value_type>>;
+			if constexpr (std::is_same_v<conversion_type, value_type>)
+			{
+				if (rhs > max_val)
+				{
+					value_type result = val + max_val;
+					rhs -= max_val;
+					while (result < 0 && rhs != 0)
+					{
+						if (rhs > max_val)
+						{
+							result += max_val;
+							rhs -= max_val;
+						}
+						else
+						{
+							result += rhs;
+							rhs = 0;
+						}
+					}
+					if (rhs != 0)
+					{
+						const value_type highest_possible_rhs = max_val - val;
+						return this_type((rhs >= highest_possible_rhs) ? max_val : static_cast<value_type>(val + rhs));
+					}
+					else
+					{
+						return this_type(result);
+					}
+				}
+				else
+				{
+					return this_type(val + rhs);
+				}
+			}
+			else
+			{
+				const conversion_type highest_possible_rhs = static_cast<conversion_type>(max_val) - val;
+				return this_type((rhs >= highest_possible_rhs) ? max_val : static_cast<value_type>(val + rhs));
+			}
+		}
+
+		template<typename Rhs>
+		constexpr this_type _subtract_negative_lhs_negative_rhs(Rhs rhs) const
+		{
+			const value_type lowest_possible_rhs = min_val - val;
+			return this_type((lowest_possible_rhs <= rhs) ? min_val : static_cast<value_type>(val + rhs));
+		}
 	};
 
 	namespace TMPHelpers
