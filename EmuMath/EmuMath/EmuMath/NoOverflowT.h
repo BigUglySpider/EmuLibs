@@ -396,7 +396,6 @@ namespace EmuMath
 			val = this->operator/(rhs).val;
 			return *this;
 		}
-
 		constexpr this_type& operator--()
 		{
 			if (val != min_val)
@@ -453,6 +452,7 @@ namespace EmuMath
 			this->operator++();
 			return out_;
 		}
+
 		template<typename Rhs>
 		constexpr bool operator==(Rhs rhs) const
 		{
