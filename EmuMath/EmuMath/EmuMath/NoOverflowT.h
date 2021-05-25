@@ -171,7 +171,7 @@ namespace EmuMath
 			}
 		}
 		template<typename Rhs>
-		constexpr this_type operator+(const NoOverflowT<Rhs>& rhs) const
+		constexpr this_type operator+(NoOverflowT<Rhs> rhs) const
 		{
 			return (*this) + rhs.val;
 		}
@@ -188,7 +188,7 @@ namespace EmuMath
 			}
 		}
 		template<typename Rhs>
-		constexpr this_type operator-(const NoOverflowT<Rhs>& rhs) const
+		constexpr this_type operator-(NoOverflowT<Rhs> rhs) const
 		{
 			return (*this) - rhs.val;
 		}
@@ -291,6 +291,62 @@ namespace EmuMath
 			return *this;
 		}
 
+		constexpr this_type& operator--()
+		{
+			if (val != min_val)
+			{
+				if constexpr (is_integral)
+				{
+					--val;
+				}
+				else
+				{
+					if (val < 0)
+					{
+						val = (min_val - val) > value_type(-1) ? min_val : val - value_type(1);
+					}
+					else
+					{
+						val -= value_type(1);
+					}
+				}
+			}
+			return *this;
+		}
+		constexpr this_type operator--(int)
+		{
+			const this_type out_(*this);
+			this->operator--();
+			return out_;
+		}
+		constexpr this_type& operator++()
+		{
+			if (val != max_val)
+			{
+				if constexpr (is_integral)
+				{
+					++val;
+				}
+				else
+				{
+					if (val > 0)
+					{
+						val = (max_val - val) < value_type(1) ? max_val : val + value_type(1);
+					}
+					else
+					{
+						val += value_type(1);
+					}
+				}
+			}
+			return *this;
+		}
+		constexpr this_type operator++(int)
+		{
+			const this_type out_(*this);
+			this->operator++();
+			return out_;
+		}
 		template<typename Rhs>
 		constexpr bool operator==(Rhs rhs) const
 		{
@@ -326,7 +382,6 @@ namespace EmuMath
 		T val;
 
 	private:
-
 		template<typename Rhs>
 		constexpr value_type _perform_add_unsigned_lhs(Rhs rhs_) const
 		{
