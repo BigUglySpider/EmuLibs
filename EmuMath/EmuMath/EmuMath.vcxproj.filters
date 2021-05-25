@@ -68,5 +68,8 @@
     <ClInclude Include="EmuMath\GeneralMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\NoOverflowT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

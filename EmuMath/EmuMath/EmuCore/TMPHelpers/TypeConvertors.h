@@ -145,6 +145,143 @@ namespace EmuCore::TMPHelpers
 			>
 		>
 	>;
+
+	template<typename T>
+	struct next_size_up
+	{
+		static constexpr std::size_t original_size = sizeof(T);
+		
+		using type = std::conditional_t
+		<
+			std::is_integral_v<T>,
+			std::conditional_t
+			<
+				std::is_signed_v<T>,
+				std::conditional_t
+				<
+					original_size == sizeof(std::int8_t),
+					std::int16_t,
+					std::conditional_t
+					<
+						original_size == sizeof(std::int16_t),
+						std::int32_t,
+						std::int64_t
+					>
+				>,
+				std::conditional_t
+				<
+					original_size == sizeof(std::uint8_t),
+					std::uint16_t,
+					std::conditional_t
+					<
+						original_size == sizeof(std::uint16_t),
+						std::uint32_t,
+						std::uint64_t
+					>
+				>
+			>,
+			std::conditional_t
+			<
+				original_size == sizeof(float),
+				double,
+				long double
+			>
+		>;
+
+		static constexpr std::size_t next_size = sizeof(type);
+		static constexpr bool is_new_size = original_size != next_size;
+		static constexpr bool is_new_type = !std::is_same_v<T, type>;
+	};
+	template<typename T>
+	using next_size_up_t = typename EmuCore::TMPHelpers::next_size_up<T>::type;
+
+	template<typename T>
+	struct unsigned_if_int
+	{
+		using type = std::conditional_t<std::is_integral_v<T>, std::make_unsigned_t<T>, T>;
+	};
+	template<>
+	struct unsigned_if_int<float>
+	{
+		using type = float;
+	};
+	template<>
+	struct unsigned_if_int<double>
+	{
+		using type = double;
+	};
+	template<>
+	struct unsigned_if_int<long double>
+	{
+		using type = long double;
+	};
+	template<typename T>
+	using unsigned_if_int_t = typename unsigned_if_int<T>::type;
+
+	template<typename T>
+	struct signed_if_int
+	{
+		using type = std::conditional_t<std::is_integral_v<T>, std::make_signed_t<T>, T>;
+	};
+	template<>
+	struct signed_if_int<float>
+	{
+		using type = float;
+	};
+	template<>
+	struct signed_if_int<double>
+	{
+		using type = double;
+	};
+	template<>
+	struct signed_if_int<long double>
+	{
+		using type = long double;
+	};
+	template<typename T>
+	using signed_if_int_t = typename signed_if_int<T>::type;
+
+	/// <summary>
+	/// <para> Determines the type a passed unsigned int may be converted to to maintain any of its values with a signed representation. </para>
+	/// <para> For std::uint32_t and below, this will provide the std::int of the next size (e.g. std::uint32_t -> std::int64_t). </para>
+	/// <para> For anything higher, this will provide the float type as no standard int will be able to store uint64 values above the max of std::int64_t. </para>
+	/// <para> If the passed type is already signed, the same type will be provided. </para>
+	/// </summary>
+	/// <typeparam name="UintT_">Type to provide the lossless signed rep of. If it is already signed, the determined type will be the same as this.</typeparam>
+	template<typename UintT_>
+	struct uint_lossless_signed_rep
+	{
+		using type = std::conditional_t
+		<
+			std::is_signed_v<UintT_>,
+			UintT_,
+			std::conditional_t
+			<
+				std::is_same_v<std::uint8_t, UintT_>,
+				std::int16_t,
+				std::conditional_t
+				<
+					std::is_same_v<std::uint16_t, UintT_>,
+					std::int32_t,
+					std::conditional_t
+					<
+						std::is_same_v<std::uint32_t, UintT_>,
+						std::int64_t,
+						float
+					>
+				>
+			>
+		>;
+	};
+	/// <summary>
+	/// <para> Type the passed unsigned int may be converted to to maintain any of its values with a signed representation. </para>
+	/// <para> For std::uint32_t and below, this will provide the std::int of the next size (e.g. std::uint32_t -> std::int64_t). </para>
+	/// <para> For anything higher, this will provide the float type as no standard int will be able to store uint64 values above the max of std::int64_t. </para>
+	/// <para> If the passed type is already signed, the same type will be provided. </para>
+	/// </summary>
+	/// <typeparam name="UintT_">Type to provide the lossless signed rep of. If it is already signed, the determined type will be the same as this.</typeparam>
+	template<typename UintT_>
+	using uint_lossless_signed_rep_t = typename EmuCore::TMPHelpers::uint_lossless_signed_rep<UintT_>::type;
 }
 
 #endif
