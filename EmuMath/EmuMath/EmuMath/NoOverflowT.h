@@ -107,7 +107,7 @@ namespace EmuMath
 		{
 			return &val;
 		}
-		/// <summary> Provides a pointer to this wrapper. Required to use if wanting a wrapper pointer as the ampersand operator will point to the underlying value.  </summary>
+		/// <summary> Provides a pointer to this wrapper. Required to use if wanting a wrapper pointer as the ampersand operator will point to the underlying value. </summary>
 		/// <returns>Pointer to this wrapper.</returns>
 		this_type* GetPointerToWrapper()
 		{
@@ -118,6 +118,14 @@ namespace EmuMath
 		const this_type* GetPointerToWrapper() const
 		{
 			return this;
+		}
+		/// <summary> Copies this wrapper as one containing the provided type. Normal requirements for the contained type apply. </summary>
+		/// <typeparam name="OutT_">Type to be contained within the returned wrapper.</typeparam>
+		/// <returns>Wrapper containing a copy of this wrapper's underlying value, stored as the provided type.</returns>
+		template<typename OutT_>
+		constexpr NoOverflowT<OutT_> As() const
+		{
+			return NoOverflowT<OutT_>(val);
 		}
 		
 		constexpr this_type operator&(value_type rhs) const
@@ -210,6 +218,92 @@ namespace EmuMath
 				return as_signed(-static_cast<value_signed>(val));
 			}
 		}
+		template<typename Rhs>
+		constexpr this_type operator*(Rhs rhs) const
+		{
+			if constexpr (is_integral && std::is_integral_v<Rhs>)
+			{
+				if constexpr (std::is_signed_v<Rhs>)
+				{
+					if (rhs < 0)
+					{
+						if constexpr (is_signed)
+						{
+							return ((-this_type(val)) * -NoOverflowT<Rhs>(rhs));
+						}
+						else
+						{
+							return this_type(0);
+						}
+					}
+					else
+					{
+						if (val > (max_val / rhs))
+						{
+							return this_type(max_val);
+						}
+						else if (val < (min_val / rhs))
+						{
+							return this_type(min_val);
+						}
+						else
+						{
+							return this_type(static_cast<value_type>(val * rhs));
+						}
+					}
+				}
+				else
+				{
+					if (val > (max_val / rhs))
+					{
+						return this_type(max_val);
+					}
+					else if (val < (min_val / rhs))
+					{
+						return this_type(min_val);
+					}
+					else
+					{
+						return this_type(static_cast<value_type>(val * rhs));
+					}
+				}
+			}
+			else
+			{
+				using result_t = long double;
+				const result_t result = static_cast<result_t>(val) * rhs;
+				return this_type((result <= static_cast<result_t>(min_val)) ? min_val : (result >= static_cast<result_t>(max_val)) ? max_val : static_cast<value_type>(result));
+			}
+		}
+		template<typename Rhs>
+		constexpr this_type operator*(NoOverflowT<Rhs> rhs) const
+		{
+			return (*this) * rhs.val;
+		}
+		template<typename Rhs>
+		constexpr this_type operator/(Rhs rhs) const
+		{
+			if constexpr (std::is_integral_v<Rhs>)
+			{
+				return this_type(static_cast<Rhs>(val) / rhs);
+			}
+			else
+			{
+				if (rhs >= 1 || rhs <= -1)
+				{
+					return this_type(static_cast<value_type>(val / rhs));
+				}
+				else
+				{
+					return (*this) * (1.0L / rhs);
+				}
+			}
+		}
+		template<typename Rhs>
+		constexpr this_type operator/(NoOverflowT<Rhs> rhs) const
+		{
+			return (*this) / rhs.val;
+		}
 
 		template<typename Rhs>
 		constexpr this_type& operator=(Rhs rhs)
@@ -281,13 +375,25 @@ namespace EmuMath
 		template<typename Rhs>
 		constexpr this_type& operator+=(Rhs rhs)
 		{
-			val = ((*this) + rhs).val;
+			val = this->operator+(rhs).val;
 			return *this;
 		}
 		template<typename Rhs>
 		constexpr this_type& operator-=(Rhs rhs)
 		{
-			val = ((*this) - rhs).val;
+			val = this->operator-(rhs).val;
+			return *this;
+		}
+		template<typename Rhs>
+		constexpr this_type& operator*=(Rhs rhs)
+		{
+			val = this->operator*(rhs).val;
+			return *this;
+		}
+		template<typename Rhs>
+		constexpr this_type& operator/=(Rhs rhs)
+		{
+			val = this->operator/(rhs).val;
 			return *this;
 		}
 
