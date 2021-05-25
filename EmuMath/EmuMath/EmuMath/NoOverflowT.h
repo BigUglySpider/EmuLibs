@@ -281,7 +281,13 @@ namespace EmuMath
 		template<typename Rhs>
 		constexpr this_type& operator+=(Rhs rhs)
 		{
-			*this = (*this) + rhs;
+			val = ((*this) + rhs).val;
+			return *this;
+		}
+		template<typename Rhs>
+		constexpr this_type& operator-=(Rhs rhs)
+		{
+			val = ((*this) - rhs).val;
 			return *this;
 		}
 
@@ -371,7 +377,7 @@ namespace EmuMath
 					{
 						const value_type result = val + min_val;
 						const value_type lowest_possible_rhs = min_val - result;	// We know this is safe to do now as result will be a maximum of 0
-						rhs_ -= min_val;
+						rhs_ -= static_cast<Rhs>(min_val);
 						return (rhs_ <= lowest_possible_rhs) ? min_val : result + static_cast<value_type>(rhs_);
 					}
 					else
@@ -510,7 +516,15 @@ namespace EmuMath
 			}
 			else
 			{
-				return (rhs_ <= -(max_val - val)) ? max_val : val - static_cast<value_type>(rhs_);
+				if constexpr (std::is_signed_v<Rhs>)
+				{
+					return (rhs_ <= -(max_val - val)) ? max_val : val - static_cast<value_type>(rhs_);
+				}
+				else
+				{
+					using rhs_signed_cast = EmuCore::TMPHelpers::uint_lossless_signed_rep_t<Rhs>;
+					return (static_cast<rhs_signed_cast>(rhs_) <= -(max_val - val)) ? max_val : val - static_cast<value_type>(rhs_);
+				}
 			}
 		}
 		template<typename Rhs>
@@ -533,8 +547,16 @@ namespace EmuMath
 				if (rhs_ <= min_val)
 				{
 					const value_type result = val - min_val;
-					rhs_ -= min_val;
-					return (rhs_ <= -(max_val - result)) ? max_val : result - static_cast<value_type>(rhs_);
+					rhs_ -= static_cast<Rhs>(min_val);
+					if constexpr (std::is_signed_v<Rhs>)
+					{
+						return (rhs_ <= -(max_val - result)) ? max_val : result - static_cast<value_type>(rhs_);
+					}
+					else
+					{
+						using rhs_as_signed = EmuCore::TMPHelpers::uint_lossless_signed_rep_t<Rhs>;
+						return (static_cast<rhs_as_signed>(rhs_) <= -(max_val - result)) ? max_val : result - static_cast<value_type>(rhs_);
+					}
 				}
 				else
 				{
