@@ -1,8 +1,8 @@
 #ifndef EMU_MATH_FAST_VECTOR_BASE_H_INC_
 #define EMU_MATH_FAST_VECTOR_BASE_H_INC_
 
+#include "../SIMDHelpers.h"
 #include "../Vectors.h"
-#include <immintrin.h>
 
 namespace EmuMath
 {

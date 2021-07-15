@@ -3,11 +3,13 @@
 
 // REQUIRED INCLUDES
 #include "EmuCore/TestingHelpers/LoopingTestHarness.h"
+#include <array>
 #include <chrono>
 #include <iostream>
 #include <tuple>
 
 // ADDITIONAL INCLUDES
+#include "EmuMath/FastVector.h"
 #include "EmuMath/GeneralMath.h"
 #include "EmuMath/Vectors.h"
 #include <bitset>
@@ -110,7 +112,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = true;
+		static constexpr bool DO_TEST = false;
 
 		SqrtTest()
 		{
@@ -156,9 +158,114 @@ namespace EmuCore::TestingHelpers
 		std::vector<T> outData;
 	};
 
+	struct NormalVector4fMultTest
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+
+		NormalVector4fMultTest()
+		{
+		}
+		void Prepare()
+		{
+			inData.resize(NUM_LOOPS);
+			mults.resize(NUM_LOOPS);
+			outData.resize(NUM_LOOPS);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				inData[i] = EmuMath::Vector4<float>(rand() % 100, rand() % 100, rand() % 100, rand() % 100) * 0.75f;
+				mults[i] = EmuMath::Vector4<float>(rand() % 250, rand() % 250, rand() % 250, rand() % 250) * 0.75f;
+				outData[i] = EmuMath::Vector4<float>(0.0f, 0.0f, 0.0f, 0.0f);
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			outData[i] = (inData[i] * mults[i]) * 0.5f;
+		}
+
+		std::vector<EmuMath::Vector4<float>> inData;
+		std::vector<EmuMath::Vector4<float>> outData;
+		std::vector<EmuMath::Vector4<float>> mults;
+	};
+	struct FastVector4fMultTest_WithLoad
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+
+		FastVector4fMultTest_WithLoad()
+		{
+		}
+
+		void Prepare()
+		{
+			inData.resize(NUM_LOOPS);
+			mults.resize(NUM_LOOPS);
+			outData.resize(NUM_LOOPS);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				inData[i] = EmuMath::FastVector<4, float>(rand() % 100, rand() % 100, rand() % 100, rand() % 100);
+				mults[i] = EmuMath::Vector4<float>(rand() % 250, rand() % 250, rand() % 250, rand() % 250) * 0.75f;
+				outData[i] = EmuMath::FastVector<4, float>(0.0f, 0.0f, 0.0f, 0.0f);
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			outData[i] = (inData[i] * EmuMath::FastVector<4, float>(mults[i])) * 0.5f;
+		}
+
+		std::vector<EmuMath::FastVector<4, float>> inData;
+		std::vector<EmuMath::FastVector<4, float>> outData;
+		std::vector<EmuMath::Vector4<float>> mults;
+	};
+	struct FastVector4fMultTest_WithoutLoad
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+
+		FastVector4fMultTest_WithoutLoad()
+		{
+		}
+
+		void Prepare()
+		{
+			inData.resize(NUM_LOOPS);
+			mults.resize(NUM_LOOPS);
+			outData.resize(NUM_LOOPS);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				inData[i] = EmuMath::FastVector<4, float>(rand() % 100, rand() % 100, rand() % 100, rand() % 100);
+				mults[i] = EmuMath::FastVector<4, float>(rand() % 250, rand() % 250, rand() % 250, rand() % 250) * 0.75f;
+				outData[i] = EmuMath::FastVector<4, float>(0.0f, 0.0f, 0.0f, 0.0f);
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			outData[i] = (inData[i] * mults[i]) * 0.5f;
+		}
+
+		std::vector<EmuMath::FastVector<4, float>> inData;
+		std::vector<EmuMath::FastVector<4, float>> outData;
+		std::vector<EmuMath::FastVector<4, float>> mults;
+	};
+
 	using SqrtTestFP = float;
 
-	using AllTests = std::tuple<TestA<float>, VectorwiseShiftTest<std::int16_t>, SqrtTest<SqrtTestFP, true>, SqrtTest<SqrtTestFP, false>>;
+	using AllTests = std::tuple
+	<
+		TestA<float>,
+		VectorwiseShiftTest<std::int16_t>,
+		SqrtTest<SqrtTestFP, true>,
+		SqrtTest<SqrtTestFP, false>,
+		NormalVector4fMultTest,
+		FastVector4fMultTest_WithLoad,
+		FastVector4fMultTest_WithoutLoad
+	>;
 
 	template<std::size_t Index_>
 	void PrepareAllTests(AllTests& tests)
@@ -220,6 +327,19 @@ namespace EmuCore::TestingHelpers
 				str << "Right Shift [" << i << "]: " << _testB.outRightBits[i] << "\n\n";
 			}
 			std::cout << str.str();
+		}
+
+		if (std::get<4>(tests).DO_TEST)
+		{
+			std::cout << std::get<4>(tests).outData[rand() % std::get<4>(tests).NUM_LOOPS] << "\n";
+		}
+		if (std::get<5>(tests).DO_TEST)
+		{
+			std::cout << std::get<5>(tests).outData[rand() % std::get<5>(tests).NUM_LOOPS] << "\n";
+		}
+		if (std::get<6>(tests).DO_TEST)
+		{
+			std::cout << std::get<6>(tests).outData[rand() % std::get<6>(tests).NUM_LOOPS] << "\n";
 		}
 	}
 

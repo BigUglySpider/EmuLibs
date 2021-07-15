@@ -80,5 +80,8 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\FastVectorBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\SIMDHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

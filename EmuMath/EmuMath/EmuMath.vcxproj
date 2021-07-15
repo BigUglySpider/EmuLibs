@@ -156,6 +156,7 @@
     <ClInclude Include="EmuMath\FastVector.h" />
     <ClInclude Include="EmuMath\GeneralMath.h" />
     <ClInclude Include="EmuMath\NoOverflowT.h" />
+    <ClInclude Include="EmuMath\SIMDHelpers.h" />
     <ClInclude Include="EmuMath\Vectors.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\EmuVector4T.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\EmuVectorTMPHelpers.h" />
