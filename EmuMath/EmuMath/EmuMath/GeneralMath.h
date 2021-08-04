@@ -119,14 +119,14 @@ namespace EmuMath
 
 	struct CommonConstants
 	{
-		/// <summary> References the EmuMath::Pi struct. </summary>
+		/// <summary> Alias of the EmuMath::Pi struct. </summary>
 		using Pi_ = Pi;
 
 		CommonConstants() = delete;
 
-		/// <summary> Square root of the provided value n_. </summary>
-		template<typename OutT, typename N, N n_>
-		static constexpr OutT SQRT_N = EmuMath::SqrtConstexpr<OutT, N>(n_);
+		/// <summary> Square root of the provided value N_ stores as the type OutT. </summary>
+		template<typename OutT, typename N, N N_>
+		static constexpr OutT SQRT_N = EmuMath::SqrtConstexpr<OutT, N>(N_);
 		/// <summary> Square root of 2 stored as the provided type. </summary>
 		template<typename T>
 		static constexpr T SQRT_2 = SQRT_N<T, std::uint8_t, 2>;
