@@ -259,7 +259,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = true;
+		static constexpr bool DO_TEST = false;
 
 		ScalarNorm()
 		{
@@ -297,7 +297,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = true;
+		static constexpr bool DO_TEST = false;
 
 		FastNorm()
 		{
@@ -330,6 +330,91 @@ namespace EmuCore::TestingHelpers
 		std::vector<EmuMath::FastVector<4, float>> results;
 	};
 
+	struct RoundScalar
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+
+		RoundScalar()
+		{
+		}
+
+		void Prepare()
+		{
+			original.resize(NUM_LOOPS);
+			downed.resize(NUM_LOOPS, EmuMath::Vector4<float>(0.0f, 0.0f, 0.0f, 0.0f));
+			upped.resize(NUM_LOOPS, EmuMath::Vector4<float>(0.0f, 0.0f, 0.0f, 0.0f));
+			trunced.resize(NUM_LOOPS, EmuMath::Vector4<float>(0.0f, 0.0f, 0.0f, 0.0f));
+
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				original[i] = EmuMath::Vector4<float>(rand() % 500, rand() % 500, rand() % 500, rand() % 500);
+				original[i] *= (static_cast<float>(rand() % 100) * 0.01f);
+			}
+		}
+
+		void operator()(std::size_t i)
+		{
+			upped[i] = original[i].Ceil();
+			downed[i] = original[i].Floor();
+			trunced[i] = original[i].Trunc();
+		}
+
+		void OutputRand()
+		{
+			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
+			std::cout << "{\n\tOriginal: " << original[i] << "\n\tTrunced: " << trunced[i] << "\n\tCeiled: " << upped[i] << "\n\tFloored: " << downed[i] << "\n}\n";
+		}
+
+		std::vector<EmuMath::Vector4<float>> original;
+		std::vector<EmuMath::Vector4<float>> downed;
+		std::vector<EmuMath::Vector4<float>> upped;
+		std::vector<EmuMath::Vector4<float>> trunced;
+	};
+
+	struct RoundFast
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+
+		void Prepare()
+		{
+			original.resize(NUM_LOOPS);
+			downed.resize(NUM_LOOPS, EmuMath::FastVector<4, float>(0.0f, 0.0f, 0.0f, 0.0f));
+			upped.resize(NUM_LOOPS, EmuMath::FastVector<4, float>(0.0f, 0.0f, 0.0f, 0.0f));
+			trunced.resize(NUM_LOOPS, EmuMath::FastVector<4, float>(0.0f, 0.0f, 0.0f, 0.0f));
+
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				original[i] = EmuMath::FastVector<4, float>(rand() % 500, rand() % 500, rand() % 500, rand() % 500);
+				original[i] = original[i] * _mm_set_ps(rand() % 2 == 0 ? 1 : -1, rand() % 2 == 0 ? 1 : -1, rand() % 2 == 0 ? 1 : -1, rand() % 2 == 0 ? 1 : -1);
+				original[i] = original[i] * _mm_set_ps1(static_cast<float>(rand() % 100) * 0.01f);
+			}
+		}
+
+		void operator()(std::size_t i)
+		{
+			upped[i] = original[i].Ceil();
+			downed[i] = original[i].Floor();
+			trunced[i] = original[i].Trunc();
+		}
+
+		void OutputRand()
+		{
+			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
+			std::cout << "{\n\tOriginal: " << original[i] << "\n\tTrunced: " << trunced[i] << "\n\tCeiled: " << upped[i] << "\n\tFloored: " << downed[i] << "\n}\n";
+		}
+
+		std::vector<EmuMath::FastVector<4, float>> original;
+		std::vector<EmuMath::FastVector<4, float>> downed;
+		std::vector<EmuMath::FastVector<4, float>> upped;
+		std::vector<EmuMath::FastVector<4, float>> trunced;
+	};
+
 	using SqrtTestFP = float;
 
 	using AllTests = std::tuple
@@ -342,7 +427,9 @@ namespace EmuCore::TestingHelpers
 		FastVector4fMultTest_WithLoad,
 		FastVector4fMultTest_WithoutLoad,
 		ScalarNorm,
-		FastNorm
+		FastNorm,
+		RoundScalar,
+		RoundFast
 	>;
 
 	template<std::size_t Index_>
@@ -427,6 +514,15 @@ namespace EmuCore::TestingHelpers
 		if (std::get<8>(tests).DO_TEST)
 		{
 			std::get<8>(tests).OutputRand();
+		}
+
+		if (std::get<9>(tests).DO_TEST)
+		{
+			std::get<9>(tests).OutputRand();
+		}
+		if (std::get<10>(tests).DO_TEST)
+		{
+			std::get<10>(tests).OutputRand();
 		}
 	}
 

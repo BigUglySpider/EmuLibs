@@ -809,7 +809,7 @@ namespace EmuMath::Helpers
 	template<class OutVector_, class InVector_, template<typename In__, typename Out__> class Rounder_>
 	inline OutVector_ _perform_vector_round_emu(const InVector_& in_)
 	{
-		using Rounder = Rounder_<InVector_, OutVector_>;
+		using Rounder = Rounder_<typename InVector_::nonref_value_type, typename OutVector_::nonref_value_type>;
 		Rounder rounder = Rounder();
 		if constexpr (OutVector_::size() == 2)
 		{

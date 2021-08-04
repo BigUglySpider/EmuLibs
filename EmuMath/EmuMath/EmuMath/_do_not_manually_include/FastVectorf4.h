@@ -109,6 +109,19 @@ namespace EmuMath
 			return this_type(_mm_div_ps(vectorData, mag));
 		}
 
+		this_type Floor() const
+		{
+			return this_type(_mm_round_ps(vectorData, _MM_FROUND_FLOOR));
+		}
+		this_type Ceil() const
+		{
+			return this_type(_mm_round_ps(vectorData, _MM_FROUND_CEIL));
+		}
+		this_type Trunc() const
+		{
+			return this_type(_mm_round_ps(vectorData, _MM_FROUND_TRUNC));
+		}
+
 		template<std::size_t Size_ = size, typename T_ = value_type>
 		typename EmuMath::TMPHelpers::emu_vector_from_size<Size_, T_>::type AsEmuVector() const
 		{
