@@ -163,7 +163,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = true;
+		static constexpr bool DO_TEST = false;
 
 		NormalVector4fMultTest()
 		{
@@ -194,7 +194,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = true;
+		static constexpr bool DO_TEST = false;
 
 		FastVector4fMultTest_WithLoad()
 		{
@@ -226,7 +226,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = true;
+		static constexpr bool DO_TEST = false;
 
 		FastVector4fMultTest_WithoutLoad()
 		{
@@ -254,6 +254,82 @@ namespace EmuCore::TestingHelpers
 		std::vector<EmuMath::FastVector<4, float>> mults;
 	};
 
+	struct ScalarNorm
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+
+		ScalarNorm()
+		{
+		}
+
+		void Prepare()
+		{
+			a.resize(NUM_LOOPS);
+			b.resize(NUM_LOOPS);
+			results.resize(NUM_LOOPS);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				a[i] = EmuMath::Vector4<float>(rand() % 500, rand() % 500, rand() % 500, rand() % 500);
+				b[i] = EmuMath::Vector4<float>(rand() % 500, rand() % 500, rand() % 500, rand() % 500);
+				results[i] = EmuMath::Vector4<float>(0.0f, 0.0f, 0.0f, 0.0f);
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			results[i] = a[i].Normalise();
+		}
+		void OutputRand() const
+		{
+			const std::size_t i = rand() % NUM_LOOPS;
+			std::cout << a[i] << ".Normalised() = " << results[i] << "\n";
+		}
+
+		std::vector<EmuMath::Vector4<float>> a;
+		std::vector<EmuMath::Vector4<float>> b;
+		std::vector<EmuMath::Vector4<float>> results;
+	};
+
+	struct FastNorm
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+
+		FastNorm()
+		{
+		}
+
+		void Prepare()
+		{
+			a.resize(NUM_LOOPS);
+			b.resize(NUM_LOOPS);
+			results.resize(NUM_LOOPS);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				a[i] = EmuMath::FastVector<4, float>(rand() % 500, rand() % 500, rand() % 500, rand() % 500);
+				b[i] = EmuMath::FastVector<4, float>(rand() % 500, rand() % 500, rand() % 500, rand() % 500);
+				results[i] = EmuMath::FastVector<4, float>(0.0f, 0.0f, 0.0f, 0.0f);
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			results[i] = a[i].Normalise();
+		}
+		void OutputRand() const
+		{
+			const std::size_t i = rand() % NUM_LOOPS;
+			std::cout << a[i] << ".Normalised() = " << results[i] << "\n";
+		}
+
+		std::vector<EmuMath::FastVector<4, float>> a;
+		std::vector<EmuMath::FastVector<4, float>> b;
+		std::vector<EmuMath::FastVector<4, float>> results;
+	};
+
 	using SqrtTestFP = float;
 
 	using AllTests = std::tuple
@@ -264,7 +340,9 @@ namespace EmuCore::TestingHelpers
 		SqrtTest<SqrtTestFP, false>,
 		NormalVector4fMultTest,
 		FastVector4fMultTest_WithLoad,
-		FastVector4fMultTest_WithoutLoad
+		FastVector4fMultTest_WithoutLoad,
+		ScalarNorm,
+		FastNorm
 	>;
 
 	template<std::size_t Index_>
@@ -340,6 +418,15 @@ namespace EmuCore::TestingHelpers
 		if (std::get<6>(tests).DO_TEST)
 		{
 			std::cout << std::get<6>(tests).outData[rand() % std::get<6>(tests).NUM_LOOPS] << "\n";
+		}
+
+		if (std::get<7>(tests).DO_TEST)
+		{
+			std::get<7>(tests).OutputRand();
+		}
+		if (std::get<8>(tests).DO_TEST)
+		{
+			std::get<8>(tests).OutputRand();
 		}
 	}
 

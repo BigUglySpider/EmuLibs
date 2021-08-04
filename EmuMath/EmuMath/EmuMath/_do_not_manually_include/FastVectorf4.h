@@ -91,7 +91,25 @@ namespace EmuMath
 			return *this;
 		}
 
-		template<std::size_t Size_, typename T_>
+		float DotProduct(const this_type& b_) const
+		{
+			return this->DotProduct(b_.vectorData);
+		}
+		float DotProduct(const __m128 b_) const
+		{
+			return _mm_dp_ps(vectorData, b_, 0xFF).m128_f32[0];
+		}
+
+		this_type Normalise() const
+		{
+			__m128 mag = _mm_mul_ps(vectorData, vectorData);
+			mag = _mm_hadd_ps(mag, mag);
+			mag = _mm_hadd_ps(mag, mag);
+			mag = _mm_sqrt_ps(mag);
+			return this_type(_mm_div_ps(vectorData, mag));
+		}
+
+		template<std::size_t Size_ = size, typename T_ = value_type>
 		typename EmuMath::TMPHelpers::emu_vector_from_size<Size_, T_>::type AsEmuVector() const
 		{
 			if constexpr (Size_ == 2)
@@ -136,12 +154,6 @@ namespace EmuMath
 			}
 		}
 	};
-}
-
-std::ostream& operator<<(std::ostream& stream_, const EmuMath::FastVector<4, float>& fastVector_)
-{
-	stream_ << fastVector_.AsEmuVector<4, float>();
-	return stream_;
 }
 
 #endif

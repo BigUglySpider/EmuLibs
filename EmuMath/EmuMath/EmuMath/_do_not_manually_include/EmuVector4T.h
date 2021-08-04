@@ -1371,12 +1371,12 @@ namespace EmuMath
 		/// <typeparam name="OutT">Type to output as. Must be a floating point type.</typeparam>
 		/// <returns>Normalised version of this Vector, with its contained elements stored as the provided OutT (defaults to this Vector's default_floating_point).</returns>
 		template<typename OutFP = default_floating_point>
-		Vector2<OutFP> Normalise() const
+		Vector4<OutFP> Normalise() const
 		{
 			return EmuMath::Helpers::VectorNormalise<OutFP>(*this);
 		}
 		template<typename OutFP = default_floating_point>
-		constexpr Vector2<OutFP> NormaliseConstexpr() const
+		constexpr Vector4<OutFP> NormaliseConstexpr() const
 		{
 			return EmuMath::Helpers::VectorNormaliseConstexpr<OutFP>(*this);
 		}

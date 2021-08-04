@@ -45,6 +45,15 @@ namespace EmuMath::SIMD
 	{
 		return _mm_shuffle_ps(ab, ab, shuffle_arg_v<X_, Y_, Z_, W_>);
 	}
+
+	float horizontal_vector_sum(__m128 a)
+	{
+		__m128 shuffled = _mm_shuffle_ps(a, a, _MM_SHUFFLE(2, 3, 0, 1));
+		__m128 sums = _mm_add_ps(a, shuffled);
+		shuffled = _mm_movehl_ps(shuffled, sums);
+		sums = _mm_add_ss(sums, shuffled);
+		return _mm_cvtss_f32(sums);
+	}
 }
 
 #endif
