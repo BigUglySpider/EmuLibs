@@ -100,13 +100,18 @@ namespace EmuMath
 			return _mm_dp_ps(vectorData, b_, 0xFF).m128_f32[0];
 		}
 
+		float SquareMagnitude() const
+		{
+			return _calculate_square_mag_128().m128_f32[0];
+		}
+		float Magnitude() const
+		{
+			return _calculate_mag_128().m128_f32[0];
+		}
+
 		this_type Normalise() const
 		{
-			__m128 mag = _mm_mul_ps(vectorData, vectorData);
-			mag = _mm_hadd_ps(mag, mag);
-			mag = _mm_hadd_ps(mag, mag);
-			mag = _mm_sqrt_ps(mag);
-			return this_type(_mm_div_ps(vectorData, mag));
+			return this_type(_mm_div_ps(vectorData, _calculate_mag_128()));
 		}
 
 		this_type Floor() const
@@ -196,27 +201,44 @@ namespace EmuMath
 			return this_type(result);
 		}
 
-		template<std::size_t Size_ = size, typename T_ = value_type>
-		typename EmuMath::TMPHelpers::emu_vector_from_size<Size_, T_>::type AsEmuVector() const
+		float Min() const
 		{
-			if constexpr (Size_ == 2)
+			__m128 result = _mm_min_ps(vectorData, EmuMath::SIMD::shuffle<3, 0, 1, 2>(vectorData));
+			result = _mm_min_ps(result, EmuMath::SIMD::shuffle<2, 3, 1, 0>(result));
+			result = _mm_min_ps(result, EmuMath::SIMD::shuffle<1, 2, 3, 0>(result));
+			return _mm_cvtss_f32(result);
+		}
+		float Max() const
+		{
+			__m128 result = _mm_max_ps(vectorData, EmuMath::SIMD::shuffle<3, 0, 1, 2>(vectorData));
+			result = _mm_max_ps(result, EmuMath::SIMD::shuffle<2, 3, 1, 0>(result));
+			result = _mm_max_ps(result, EmuMath::SIMD::shuffle<1, 2, 3, 0>(result));
+			return _mm_cvtss_f32(result);
+		}
+		float Mean() const
+		{
+			// No advantage from SIMD due to the required horizontal addition
+			float scalarData[4];
+			_mm_store_ps(scalarData, vectorData);
+			return (scalarData[0] + scalarData[1] + scalarData[2] + scalarData[3]) * 0.25f;
+		}
+
+		template<std::size_t OutSize_ = size, typename OutT_ = value_type>
+		typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type AsEmuVector() const
+		{
+			float scalarData[4];
+			_mm_store_ps(scalarData, vectorData);
+			if constexpr (OutSize_ == 2)
 			{
-				return EmuMath::Vector2<T_>(vectorData.m128_f32[0], vectorData.m128_f32[1]);
+				return EmuMath::Vector2<OutT_>(scalarData[0], scalarData[1]);
 			}
-			else if constexpr (Size_ == 3)
+			else if constexpr (OutSize_ == 3)
 			{
-				return EmuMath::Vector3<T_>(vectorData.m128_f32[0], vectorData.m128_f32[1], vectorData.m128_f32[2]);
+				return EmuMath::Vector3<OutT_>(scalarData[0], scalarData[1], scalarData[2]);
 			}
-			else if constexpr (Size_ == 4)
+			else if constexpr (OutSize_ == 4)
 			{
-				return EmuMath::Vector4<T_>(vectorData.m128_f32[0], vectorData.m128_f32[1], vectorData.m128_f32[2], vectorData.m128_f32[3]);
-			}
-			else if constexpr(Size_ > 4)
-			{
-				return EmuMath::TMPHelpers::emu_vector_from_size_t<Size_, T_>
-				(
-					EmuMath::Vector4<T_>(vectorData.m128_f32[0], vectorData.m128_f32[1], vectorData.m128_f32[2], vectorData.m128_f32[3])
-				);
+				return EmuMath::Vector4<OutT_>(scalarData[0], scalarData[1], scalarData[2], scalarData[3]);
 			}
 			else
 			{
@@ -224,21 +246,36 @@ namespace EmuMath
 			}
 		}
 
+		/// <summary> Retrieves a copy of the data at the given index of this Vector. The at function cannot be used to obtain a reference. </summary>
+		/// <returns>Copy of the value at the provided index.</returns>
+		template<std::size_t Index_>
+		float at() const
+		{
+			return EmuMath::SIMD::get_m128_index<Index_>(vectorData);
+		}
+		/// <summary>
+		/// <para> Retrieves a copy of the data at the given index of this Vector. The at function cannot be used to obtain a reference. </para>
+		/// <para> If the desired index_ is compile-time evaluable, it is recommended to provide it as a template argument instead of a function argument. </para>
+		/// </summary>
+		/// <returns>Copy of the value at the provided index.</returns>
+		float at(std::size_t index_) const
+		{
+			return EmuMath::SIMD::get_m128_index(vectorData, index_);
+		}
+
 		/// <summary> SIMD storage of this FastVector's data. Implementation defined, and should not be used directly unless you know exactly what you are doing. </summary>
 		__m128 vectorData;
 
 	private:
-		template<std::size_t Index_>
-		float _get_value() const
+		__m128 _calculate_square_mag_128() const
 		{
-			if constexpr (Index_ < size)
-			{
-				return vectorData.m128_f32[Index_];
-			}
-			else
-			{
-				static_assert(false, "Attempted to get an invalid Index from an EmuMath FastVector.");
-			}
+			__m128 result = _mm_mul_ps(vectorData, vectorData);
+			return EmuMath::SIMD::horizontal_vector_sum_fill(result);
+		}
+
+		__m128 _calculate_mag_128() const
+		{
+			return _mm_sqrt_ps(_calculate_square_mag_128());
 		}
 	};
 }

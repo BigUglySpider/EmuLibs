@@ -52,6 +52,15 @@ namespace EmuMath
 		{
 			return 3;
 		}
+		/// <summary> The reciprocal of the number of elements contained within this vector. Recommended to multiply this instead of dividing by size. </summary>
+		/// <typeparam name="OutT_">Type to output the reciprocal as. Must be a floating point value. Defaults to this vector's default_floating_point.</typeparam>
+		/// <returns>The result of 1/size, where both values are interpreted as the provided OutT_ type.</returns>
+		template<typename OutT_ = default_floating_point>
+		static constexpr OutT_ size_reciprocal()
+		{
+			static_assert(std::is_floating_point_v<OutT_>, "Provided a non-floating-point data type for an EmuMath Vector's size reciprocal. A floating-point must be provided.");
+			return OutT_(1) / static_cast<OutT_>(size());
+		}
 
 		/// <summary> The type of Vector created when getting a copy of this Vector's data (used to get copy values instead of references). </summary>
 		using copy_vector = Vector3<nonref_value_type_without_qualifiers>;
@@ -1227,6 +1236,21 @@ namespace EmuMath
 		constexpr OutT Max() const
 		{
 			return EmuMath::Helpers::VectorMax<OutT>(*this);
+		}
+		/// <summary> Determines the mean average of this Vector's elements (the sum of all elements divided by the size number of elements). </summary>
+		/// <typeparam name="OutT">Type to output the mean as. Defaults as this Vector's default_floating_point.</typeparam>
+		/// <returns>The mean of this Vector's elements, represented as the provided type.</returns>
+		template<typename OutT = default_floating_point>
+		constexpr OutT Mean() const
+		{
+			if constexpr (std::is_floating_point_v<OutT>)
+			{
+				return (x + y + z) * size_reciprocal<OutT>();
+			}
+			else
+			{
+				return static_cast<OutT>((x + y + z) * size_reciprocal());
+			}
 		}
 
 		/// <summary>

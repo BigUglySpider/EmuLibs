@@ -1288,17 +1288,17 @@ namespace EmuMath::Helpers
 #pragma endregion
 
 #pragma region INTERPOLATION
-	template<std::size_t Index_, class OutScalar_, class VectorA_, class B_, class T_>
-	inline constexpr OutScalar_ _calculate_vector_lerp_val(const VectorA_& a_, const B_& b_, const T_& t_)
+	template<std::size_t Index_, class OutScalar_, class VectorA_, class B_, class OutT_>
+	inline constexpr OutScalar_ _calculate_vector_lerp_val(const VectorA_& a_, const B_& b_, const OutT_& t_)
 	{
 		const auto a_n_ = EmuMath::TMPHelpers::emu_vector_element_n<Index_>(a_);
 		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<B_>)
 		{
 			if constexpr (Index_ < B_::size())
 			{
-				if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<T_>)
+				if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<OutT_>)
 				{
-					if constexpr (Index_ < T_::size())
+					if constexpr (Index_ < OutT_::size())
 					{
 						return static_cast<OutScalar_>
 						(
@@ -1319,9 +1319,9 @@ namespace EmuMath::Helpers
 			}
 			else
 			{
-				if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<T_>)
+				if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<OutT_>)
 				{
-					if constexpr (Index_ < T_::size())
+					if constexpr (Index_ < OutT_::size())
 					{
 						return static_cast<OutScalar_>(a_n_ - (a_n_ * EmuMath::TMPHelpers::emu_vector_element_n<Index_>(t_)));
 					}
@@ -1338,9 +1338,9 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<T_>)
+			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<OutT_>)
 			{
-				if constexpr (Index_ < T_::size())
+				if constexpr (Index_ < OutT_::size())
 				{
 					return static_cast<OutScalar_>(a_n_ + (b_ - a_n_) * EmuMath::TMPHelpers::emu_vector_element_n<Index_>(t_));
 				}
@@ -1356,8 +1356,8 @@ namespace EmuMath::Helpers
 		}
 	}
 
-	template<class OutVector_, class VectorA_, class B_, class T_>
-	inline constexpr OutVector_ _perform_vector_lerp(const VectorA_& a_, const B_& b_, const T_& t_)
+	template<class OutVector_, class VectorA_, class B_, class OutT_>
+	inline constexpr OutVector_ _perform_vector_lerp(const VectorA_& a_, const B_& b_, const OutT_& t_)
 	{
 		using OutScalar_ = typename OutVector_::value_type;
 		if constexpr (OutVector_::size() == 2)
@@ -2755,11 +2755,11 @@ namespace EmuMath::Helpers
 	/// <param name="t_">Scalar value or EmuMath Vector to use as the weighting for the interpolation (where 0.0 is completely a_, and 1.0 is completely b_).</param>
 	/// <returns>EmuMath Vector of the provided size and contained type, containing the results of the linear interpolation (a_ + (b_ - a_) * t_).</returns>
 	template<std::size_t OutSize_, typename OutT_, class VectorA_, class B_, typename T_>
-	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type VectorLerp(const VectorA_& a_, const B_& b_, const T_& t_)
+	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type VectorLerp(const VectorA_& a_, const B_& b_, const OutT_& t_)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type>)
 		{
-			return _underlying_vector_funcs::_perform_vector_lerp<typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type, VectorA_, B_, T_>(a_, b_, t_);
+			return _underlying_vector_funcs::_perform_vector_lerp<typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type, VectorA_, B_, OutT_>(a_, b_, t_);
 		}
 		else
 		{

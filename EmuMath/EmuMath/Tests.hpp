@@ -259,7 +259,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = false;
+		static constexpr bool DO_TEST = true;
 
 		ScalarNorm()
 		{
@@ -297,7 +297,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = false;
+		static constexpr bool DO_TEST = true;
 
 		FastNorm()
 		{
@@ -426,7 +426,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = true;
+		static constexpr bool DO_TEST = false;
 
 		ClampScalar()
 		{
@@ -472,7 +472,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = true;
+		static constexpr bool DO_TEST = false;
 
 		ClampFast()
 		{
@@ -513,6 +513,90 @@ namespace EmuCore::TestingHelpers
 		std::vector<float> clampMaxs;
 	};
 
+	struct MinMaxScalar
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+
+		MinMaxScalar()
+		{
+		}
+
+		void Prepare()
+		{
+			mins.resize(NUM_LOOPS, 0.0f);
+			maxes.resize(NUM_LOOPS, 0.0f);
+			means.resize(NUM_LOOPS, 0.0f);
+			vectors.resize(NUM_LOOPS);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				vectors[i] = EmuMath::Vector4<float>(rand() % 500, rand() % 500, rand() % 500, rand() % 500);
+			}
+		}
+
+		void operator()(std::size_t i)
+		{
+			mins[i] = vectors[i].Min();
+			//maxes[i] = vectors[i].Max();
+			//means[i] = vectors[i].Mean();
+		}
+
+		void OutputRand()
+		{
+			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
+			std::cout << vectors[i] << " | Min: " << mins[i] << " | Max: " << maxes[i] << " | Mean: " << means[i] << "\n";
+		}
+
+		std::vector<EmuMath::Vector4<float>> vectors;
+		std::vector<float> mins;
+		std::vector<float> maxes;
+		std::vector<float> means;
+	};
+
+	struct MinMaxFast
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+
+		MinMaxFast()
+		{
+		}
+
+		void Prepare()
+		{
+			mins.resize(NUM_LOOPS, 0.0f);
+			maxes.resize(NUM_LOOPS, 0.0f);
+			means.resize(NUM_LOOPS, 0.0f);
+			vectors.resize(NUM_LOOPS);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				vectors[i] = EmuMath::FastVector<4, float>(rand() % 500, rand() % 500, rand() % 500, rand() % 500);
+			}
+		}
+
+		void operator()(std::size_t i)
+		{
+			mins[i] = vectors[i].Min();
+			//maxes[i] = vectors[i].Max();
+			//means[i] = vectors[i].Mean();
+		}
+
+		void OutputRand()
+		{
+			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
+			std::cout << vectors[i] << " | Min: " << mins[i] << " | Max: " << maxes[i] << " | Mean: " << means[i] << "\n";
+		}
+
+		std::vector<EmuMath::FastVector<4, float>> vectors;
+		std::vector<float> mins;
+		std::vector<float> maxes;
+		std::vector<float> means;
+	};
+
 	using SqrtTestFP = float;
 
 	using AllTests = std::tuple
@@ -529,7 +613,9 @@ namespace EmuCore::TestingHelpers
 		RoundScalar,
 		RoundFast,
 		ClampScalar,
-		ClampFast
+		ClampFast,
+		MinMaxScalar,
+		MinMaxFast
 	>;
 
 	template<std::size_t Index_>
@@ -632,6 +718,15 @@ namespace EmuCore::TestingHelpers
 		if (std::get<12>(tests).DO_TEST)
 		{
 			std::get<12>(tests).OutputRand();
+		}
+
+		if (std::get<13>(tests).DO_TEST)
+		{
+			std::get<13>(tests).OutputRand();
+		}
+		if (std::get<14>(tests).DO_TEST)
+		{
+			std::get<14>(tests).OutputRand();
 		}
 	}
 

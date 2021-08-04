@@ -2,6 +2,7 @@
 #define EMU_MATH_SIMD_HELPERS_H_INC_
 
 #include <cstdlib>
+#include <exception>
 #include <immintrin.h>
 
 namespace EmuMath::SIMD
@@ -46,13 +47,85 @@ namespace EmuMath::SIMD
 		return _mm_shuffle_ps(ab, ab, shuffle_arg_v<X_, Y_, Z_, W_>);
 	}
 
-	float horizontal_vector_sum(__m128 a)
+	/// <summary>
+	/// <para> Returns a copy of the element at the provided Index_ of the provided m128_ SIMD vector. </para>
+	/// </summary>
+	/// <param name="m128_">SIMD vector to access an index of.</param>
+	/// <returns>Copy of the value at the provided index of the provided SIMD vector.</returns>
+	template<std::size_t Index_>
+	float get_m128_index(__m128 m128_)
+	{
+		if constexpr (Index_ == 0)
+		{
+			return _mm_cvtss_f32(m128_);
+		}
+		else if constexpr (Index_ <= 3)
+		{
+			return _mm_cvtss_f32(shuffle<Index_, 1, 2, 3>(m128_));
+		}
+		else
+		{
+			static_assert(false, "Invalid index provided to get_m128_index template function. Only 0-3 (inclusive) are valid indices.");
+			return 0.0f;
+		}
+	}
+	/// <summary>
+	/// <para> Returns a copy of the element at the provided index_ of the provided m128_ SIMD vector. </para>
+	/// <para>
+	///		This uses a conditional check due to requirements for constant expressions with some intrinsic functions. 
+	///		If the provided index_ may be evaluated at compile time, it is highly recommended to provide it as a template argument instead to avoid the condition.
+	/// </para>
+	/// <para> If the provided index_ is invalid, a standard logic_error will be thrown. </para>
+	/// </summary>
+	/// <param name="m128_">SIMD vector to access an index of.</param>
+	/// <param name="index_">Index of the provided SIMD vector to access.</param>
+	/// <returns>Copy of the value at the provided index of the provided SIMD vector.</returns>
+	inline float get_m128_index(__m128 m128_, std::size_t index_)
+	{
+		switch (index_)
+		{
+			case 0:
+				return get_m128_index<0>(m128_);
+				break;
+			case 1:
+				return get_m128_index<1>(m128_);
+				break;
+			case 2:
+				return get_m128_index<2>(m128_);
+				break;
+			case 3:
+				return get_m128_index<3>(m128_);
+				break;
+			default:
+				throw std::logic_error("Invalid index provided to get_m128_index template function. Only 0-3 (inclusive) are valid indices.");
+				break;
+		}
+	}
+
+	/// <summary> Performs a horizontal add within the passed vector, storing the result in the output register's first component. </summary>
+	/// <param name="a">SIMD vector to perform horizontal addition with.</param>
+	/// <returns>SIMD vector containing the result of the horizontal add in its first component.</returns>
+	inline __m128 horizontal_vector_sum(__m128 a)
 	{
 		__m128 shuffled = _mm_shuffle_ps(a, a, _MM_SHUFFLE(2, 3, 0, 1));
 		__m128 sums = _mm_add_ps(a, shuffled);
 		shuffled = _mm_movehl_ps(shuffled, sums);
-		sums = _mm_add_ss(sums, shuffled);
-		return _mm_cvtss_f32(sums);
+		return _mm_add_ss(sums, shuffled);
+	}
+	/// <summary> Performs a horizontal add within the passed vector, storing the result in every component of the output register. </summary>
+	/// <param name="a">SIMD vector to perform horizontal addition with.</param>
+	/// <returns>SIMD vector containing the result of the horizontal add in every component.</returns>
+	inline __m128 horizontal_vector_sum_fill(__m128 a)
+	{
+		__m128 result = _mm_hadd_ps(a, a);
+		return _mm_hadd_ps(a, a);
+	}
+	/// <summary> Performs a horizontal add within the passed vector and returns the result as a scalar. </summary>
+	/// <param name="a">SIMD vector to perform horizontal addition with.</param>
+	/// <returns>Result of the horizontal addition as a scalar.</returns>
+	inline float horizontal_vector_sum_scalar(__m128 a)
+	{
+		return _mm_cvtss_f32(horizontal_vector_sum(a));
 	}
 }
 

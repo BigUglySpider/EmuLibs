@@ -13,8 +13,8 @@ namespace EmuMath
 	};
 }
 
-template<std::size_t Size_, typename T_>
-std::ostream& operator<<(std::ostream& stream_, const EmuMath::FastVector<Size_, T_>& fastVector_)
+template<std::size_t OutSize_, typename OutT_>
+std::ostream& operator<<(std::ostream& stream_, const EmuMath::FastVector<OutSize_, OutT_>& fastVector_)
 {
 	stream_ << fastVector_.AsEmuVector();
 	return stream_;

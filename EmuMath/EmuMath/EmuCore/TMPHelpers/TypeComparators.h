@@ -62,14 +62,14 @@ namespace EmuCore::TMPHelpers
 	/// <summary> Underlying check used for all is_any_ values. Performs the passed check_ with each provided parameter until one is true or they are exhausted. </summary>
 	/// <typeparam name="First">The first type to perform the check on. Required.</typeparam>
 	/// <typeparam name="Others">All additional types to perform the check on. Optional.</typeparam>
-	template<template<class T_> class check_, class First, class...Others>
+	template<template<class OutT_> class check_, class First, class...Others>
 	struct is_any_check
 	{
 		static constexpr bool value = check_<First>::value ? true : is_any_check<check_, Others...>::value;
 	};
 	/// <summary> Underlying check used for all is_any_ values. Contained value is set to the value of the passed check_ with the provided First parameter. </summary>
 	/// <typeparam name="First">Type to perform the check on.</typeparam>
-	template<template<class T_> class check_, class First>
+	template<template<class OutT_> class check_, class First>
 	struct is_any_check<check_, First>
 	{
 		static constexpr bool value = check_<First>::value;
@@ -77,14 +77,14 @@ namespace EmuCore::TMPHelpers
 	/// <summary> Inverted variant of is_any_check, which in turn is the underlying check for all is_any_not_ values. </summary>
 	/// <typeparam name="First">The first type to perform the check on. Required.</typeparam>
 	/// <typeparam name="Others">All additional types to perform the check on. Optional.</typeparam>
-	template<template<class T_> class check_, class First, class...Others>
+	template<template<class OutT_> class check_, class First, class...Others>
 	struct is_any_not_check
 	{
 		static constexpr bool value = !check_<First>::value ? true : is_any_not_check<check_, Others...>::value;
 	};
 	/// <summary> Inverted variant of is_any_check, which in turn is the underlying check for all is_any_not_ values. </summary>
 	/// <typeparam name="First">Type to perform the check on.</typeparam>
-	template<template<class T_> class check_, class First>
+	template<template<class OutT_> class check_, class First>
 	struct is_any_not_check<check_, First>
 	{
 		static constexpr bool value = !check_<First>::value;
@@ -93,14 +93,14 @@ namespace EmuCore::TMPHelpers
 	/// <summary> Underlying check used for all are_all_ values. Performs the passed check_ with each provided parameter until one is false or they are exhausted. </summary>
 	/// <typeparam name="First">The first type to perform the check on. Required.</typeparam>
 	/// <typeparam name="Others">All additional types to perform the check on. Optional.</typeparam>
-	template<template<class T_> class check_, class First, class...Others>
+	template<template<class OutT_> class check_, class First, class...Others>
 	struct are_all_check
 	{
 		static constexpr bool value = check_<First>::value ? are_all_check<check_, Others...>::value : false;
 	};
 	/// <summary> Underlying check used for all are_all_ values. Contained value is set to the value of the passed check_ with the provided First parameter. </summary>
 	/// <typeparam name="First">Type to perform the check on.</typeparam>
-	template<template<class T_> class check_, class First>
+	template<template<class OutT_> class check_, class First>
 	struct are_all_check<check_, First>
 	{
 		static constexpr bool value = check_<First>::value;
@@ -108,14 +108,14 @@ namespace EmuCore::TMPHelpers
 	/// <summary> Inverted variant of are_all_check, which in turn is the underlying check for all are_all_not_ values. </summary>
 	/// <typeparam name="First">The first type to perform the check on. Required.</typeparam>
 	/// <typeparam name="Others">All additional types to perform the check on. Optional.</typeparam>
-	template<template<class T_> class check_, class First, class...Others>
+	template<template<class OutT_> class check_, class First, class...Others>
 	struct are_all_not_check
 	{
 		static constexpr bool value = !check_<First>::value ? is_any_not_check<check_, Others...>::value : false;
 	};
 	/// <summary> Inverted variant of are_all_check, which in turn is the underlying check for all are_all_not_ values. </summary>
 	/// <typeparam name="First">Type to perform the check on.</typeparam>
-	template<template<class T_> class check_, class First>
+	template<template<class OutT_> class check_, class First>
 	struct are_all_not_check<check_, First>
 	{
 		static constexpr bool value = !check_<First>::value;
