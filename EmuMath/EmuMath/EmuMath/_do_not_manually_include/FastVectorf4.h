@@ -122,6 +122,80 @@ namespace EmuMath
 			return this_type(_mm_round_ps(vectorData, _MM_FROUND_TRUNC));
 		}
 
+		this_type ClampMin(const this_type min_) const
+		{
+			return this->ClampMin(min_.vectorData);
+		}
+		this_type ClampMin(const float min_) const
+		{
+			return this->ClampMin(_mm_broadcast_ss(&min_));
+		}
+		this_type ClampMin(const __m128 min_) const
+		{
+			__m128 ignoreFlags = _mm_cmpge_ps(vectorData, min_);
+			__m128 result = _mm_and_ps(ignoreFlags, vectorData);
+			result = _mm_or_ps(result, _mm_andnot_ps(ignoreFlags, min_));
+			return this_type(result);
+		}
+		this_type ClampMax(const this_type max_) const
+		{
+			return this->ClampMax(max_.vectorData);
+		}
+		this_type ClampMax(const float max_) const
+		{
+			return this->ClampMax(_mm_broadcast_ss(&max_));
+		}
+		this_type ClampMax(__m128 max_) const
+		{
+			__m128 ignoreFlags = _mm_cmple_ps(vectorData, max_);
+			__m128 result = _mm_and_ps(ignoreFlags, vectorData);
+			result = _mm_or_ps(result, _mm_andnot_ps(ignoreFlags, max_));
+			return this_type(result);
+		}
+		this_type Clamp(const this_type min_, const this_type max_) const
+		{
+			return this->Clamp(min_.vectorData, max_.vectorData);
+		}
+		this_type Clamp(const this_type min_, const __m128 max_) const
+		{
+			return this->Clamp(min_.vectorData, max_);
+		}
+		this_type Clamp(const __m128 min_, const this_type max_) const
+		{
+			return this->Clamp(min_, max_.vectorData);
+		}
+		this_type Clamp(const this_type min_, const float max_) const
+		{
+			return this->Clamp(min_.vectorData, _mm_broadcast_ss(&max_));
+		}
+		this_type Clamp(const float min_, const this_type max_) const
+		{
+			return this->Clamp(_mm_broadcast_ss(&min_), max_.vectorData);
+		}
+		this_type Clamp(const float min_, const __m128 max_) const
+		{
+			return this->Clamp(_mm_broadcast_ss(&min_), max_);
+		}
+		this_type Clamp(const __m128 min_, const float max_) const
+		{
+			return this->Clamp(min_, _mm_broadcast_ss(&max_));
+		}
+		this_type Clamp(const float min_, const float max_) const
+		{
+			return this->Clamp(_mm_broadcast_ss(&min_), _mm_broadcast_ss(&max_));
+		}
+		this_type Clamp(const __m128 min_, const __m128 max_) const
+		{
+			__m128 clampMinFlags = _mm_cmplt_ps(vectorData, min_);
+			__m128 clampMaxFlags = _mm_cmpgt_ps(vectorData, max_);
+			__m128 clampFlags = _mm_or_ps(clampMinFlags, clampMaxFlags);
+
+			__m128 result = _mm_andnot_ps(clampFlags, vectorData);
+			result = _mm_or_ps(result, _mm_and_ps(clampMinFlags, min_));
+			result = _mm_or_ps(result, _mm_and_ps(clampMaxFlags, max_));
+			return this_type(result);
+		}
+
 		template<std::size_t Size_ = size, typename T_ = value_type>
 		typename EmuMath::TMPHelpers::emu_vector_from_size<Size_, T_>::type AsEmuVector() const
 		{
