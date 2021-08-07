@@ -83,5 +83,8 @@
     <ClInclude Include="EmuMath\SIMDHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuCore\ArithmeticHelpers\BitHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

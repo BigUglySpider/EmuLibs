@@ -37,6 +37,19 @@ int main()
 	std::cout << "[1] = " << EmuMath::SIMD::get_m128_index(test128, 1) << "\n";
 	std::cout << "[2] = " << EmuMath::SIMD::get_m128_index(test128, 2) << "\n";
 	std::cout << "[3] = " << EmuMath::SIMD::get_m128_index(test128, 3) << "\n";
+
+	EmuMath::FastVector<4, float> a(1.0f, 1.0f, 1.0f, 1.0f);
+	EmuMath::FastVector<4, float> b(1.0f, 2.0f, 1.0f, 1.0f);
+	std::cout << a << " == " << b << ": " << (EmuMath::SIMD::all_not_equal<false, true, false, false>(a.vectorData, b.vectorData) ? "true" : "false") << "\n";
+
+	constexpr std::uint32_t c = 0b0011;
+	constexpr std::uint32_t d = 0b11111111111111110111111111111111;
+	constexpr std::uint32_t e = 0;
+	std::cout
+		<< "c bits: " << EmuCore::ArithmeticHelpers::num_active_bits(c) << "\t(" << std::bitset<32>(c) << ")\n"
+		<< "d bits: " << EmuCore::ArithmeticHelpers::num_active_bits(d) << "\t(" << std::bitset<32>(d) << ")\n"
+		<< "e bits: " << EmuCore::ArithmeticHelpers::num_active_bits(e) << "\t(" << std::bitset<32>(e) << ")\n";
+
 	system("pause");
 
 #pragma region TEST_HARNESS_EXECUTION

@@ -84,11 +84,68 @@ namespace EmuMath
 		{
 			return this_type(_mm_div_ps(vectorData, rhs));
 		}
+		this_type operator&(const this_type& rhs) const
+		{
+			return this_type(_mm_and_ps(vectorData, rhs.vectorData));
+		}
+		this_type operator&(const __m128 rhs) const
+		{
+			return this_type(_mm_and_ps(vectorData, rhs));
+		}
+		this_type operator|(const this_type& rhs) const
+		{
+			return this_type(_mm_or_ps(vectorData, rhs.vectorData));
+		}
+		this_type operator|(const __m128 rhs) const
+		{
+			return this_type(_mm_or_ps(vectorData, rhs));
+		}
+		this_type operator^(const this_type& rhs) const
+		{
+			return this_type(_mm_xor_ps(vectorData, rhs.vectorData));
+		}
+		this_type operator^(const __m128 rhs) const
+		{
+			return this_type(_mm_xor_ps(vectorData, rhs));
+		}
 
 		this_type& operator=(const this_type& toCopy_)
 		{
 			vectorData = toCopy_.vectorData;
 			return *this;
+		}
+
+		bool operator==(const this_type& rhs) const
+		{
+			return this->operator==(rhs.vectorData);
+		}
+		bool operator==(const __m128 rhs) const
+		{
+			return EmuMath::SIMD::all_equal<true, true, true, true>(vectorData, rhs);
+		}
+		bool operator!=(const this_type& rhs) const
+		{
+			return this->operator!=(rhs.vectorData);
+		}
+		bool operator!=(const __m128 rhs) const
+		{
+			return !EmuMath::SIMD::all_equal<true, true, true, true>(vectorData, rhs);
+		}
+		bool operator>(const this_type& rhs) const
+		{
+			return this->SquareMagnitude() > rhs.SquareMagnitude();
+		}
+		bool operator<(const this_type& rhs) const
+		{
+			return this->SquareMagnitude() < rhs.SquareMagnitude();
+		}
+		bool operator>=(const this_type& rhs) const
+		{
+			return this->SquareMagnitude() >= rhs.SquareMagnitude();
+		}
+		bool operator<=(const this_type& rhs) const
+		{
+			return this->SquareMagnitude() <= rhs.SquareMagnitude();
 		}
 
 		float DotProduct(const this_type& b_) const
