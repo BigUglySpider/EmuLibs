@@ -67,6 +67,10 @@ int main()
 	std::cout << blooble.Transpose() << std::endl;
 	std::cout << "Transposed Row 0: " << blooble.GetRow(0) << std::endl;
 
+	float blob[4] = { 1.0f, 2.0f, 3.0f, 4.0f };
+	EmuMath::MatrixCM<3, 2, float> bloobs(blob);
+	std::cout << bloobs << std::endl;
+
 	system("pause");
 
 #pragma region TEST_HARNESS_EXECUTION

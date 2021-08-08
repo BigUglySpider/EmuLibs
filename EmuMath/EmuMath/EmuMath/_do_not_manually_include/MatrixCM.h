@@ -10,6 +10,8 @@ namespace EmuMath
 {
 	namespace _underlying_components
 	{
+		/// <summary> TMP helper to determine what a major type should be stored as within a matrix (e.g. what columns are stored as in column-major matrices). </summary>
+		/// <typeparam name="T_">Type used to represent an individual value within the matrix.</typeparam>
 		template<std::size_t NumComponents_, typename T_>
 		struct matrix_major_element
 		{
@@ -32,6 +34,8 @@ namespace EmuMath
 		};
 	}
 
+	/// <summary> Arbitrarily-sized matrix, stored as Column-Major. </summary>
+	/// <typeparam name="T_">The type used to represent an individual value within this matrix.</typeparam>
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_>
 	struct MatrixCM
 	{

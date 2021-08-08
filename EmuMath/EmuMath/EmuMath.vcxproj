@@ -167,7 +167,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\EmuVectorInfo.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\FastVectorBase.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\FastVectorf4.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\MatrixT.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\MatrixCM.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\VectorHelpers.h" />
     <ClInclude Include="Tests.hpp" />
   </ItemGroup>

@@ -86,7 +86,7 @@
     <ClInclude Include="EmuCore\ArithmeticHelpers\BitHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\MatrixT.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\MatrixCM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\Matrices.h">
