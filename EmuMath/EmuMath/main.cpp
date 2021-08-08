@@ -3,6 +3,7 @@
 #include "EmuMath/GeneralMath.h"
 #include "EmuMath/NoOverflowT.h"
 #include "EmuMath/Vectors.h"
+#include "EmuMath/FastVector.h"
 #include <array>
 
 using namespace EmuCore::TestingHelpers;
@@ -10,54 +11,47 @@ using namespace EmuMath;
 
 int main()
 {
-	constexpr NoOverflowT<std::int32_t> no_overflow_si32_pos = 25;
-	constexpr NoOverflowT<std::int32_t> no_overflow_si32_neg = -no_overflow_si32_pos;
-	constexpr float to_add = static_cast<float>(std::numeric_limits<std::int16_t>::max());
-	constexpr double to_sub = static_cast<double>(to_add);
-	constexpr float flt_max = std::numeric_limits<float>::max();
+	const float bobs[4] = { 1.0f, 2.0f, 3.0f, 4.0f };
+	FastVector<4, float> yo(2.0f, 1.0f, 5.0f, -777.69f);
+	FastVector<4, float> no(5.0f, 1.0f, 6.0f, 2.0f);
+	yo.vectorData = _mm_load_ps(bobs);
+	const float* pData = yo.vectorData.m128_f32;
+	std::cout << "Data: { " << pData[0] << ", " << pData[1] << ", " << pData[2] << ", " << pData[3] << " }\n";
+	yo = yo.Shuffle<2, 1, 0, 3>();
+	std::cout << "Data: { " << pData[0] << ", " << pData[1] << ", " << pData[2] << ", " << pData[3] << " }\n";
+	float dot = yo.DotProduct(no);
+	std::cout << yo << " DOT " << no << " = " << dot << "\n\n";
 
-	constexpr NoOverflowT<std::int32_t> add_pos_pos = no_overflow_si32_pos + to_add;
-	constexpr NoOverflowT<std::int32_t> add_pos_neg = no_overflow_si32_pos + -to_add;
-	constexpr NoOverflowT<std::int32_t> add_neg_pos = no_overflow_si32_neg + to_add;
-	constexpr NoOverflowT<std::int32_t> add_neg_neg = no_overflow_si32_neg + -to_add;
+	FastVector<4, float> max0(123.4f, 123.3f, 3.0f, -123.5f);
+	FastVector<4, float> max1(4.6f, 22.5f, 3.5f, -22.5f);
+	FastVector<4, float> max2(2.3f, -77.1f, 666.666f, 2.2f);
+	FastVector<4, float> max3(12.0f, 34.0f, 56.0f, 78.0f);
+	std::cout << max0 << " | Min: " << max0.Min() << " |  Max: " << max0.Max() << " | Average: " << max0.Mean() << "\n";
+	std::cout << max1 << " | Min: " << max1.Min() << " |  Max: " << max1.Max() << " | Average: " << max1.Mean() << "\n";
+	std::cout << max2 << " | Min: " << max2.Min() << " |  Max: " << max2.Max() << " | Average: " << max2.Mean() << "\n";
+	std::cout << max3 << " | Min: " << max3.Min() << " |  Max: " << max3.Max() << " | Average: " << max3.Mean() << "\n";
 
-	constexpr NoOverflowT<std::int16_t> add_signed_pos_pos_overflow = no_overflow_si32_pos + flt_max;
-	constexpr NoOverflowT<std::int16_t> add_signed_pos_neg_overflow = no_overflow_si32_pos + -flt_max;
-	constexpr NoOverflowT<std::int16_t> add_signed_neg_pos_overflow = no_overflow_si32_neg + flt_max;
-	constexpr NoOverflowT<std::int16_t> add_signed_neg_neg_overflow = no_overflow_si32_neg + -flt_max;
+	__m128 test128 = _mm_setr_ps(1.0f, 2.0f, 3.0f, 4.0f);
+	test128 = EmuMath::SIMD::horizontal_vector_sum(test128);
+	std::cout << "[0] = " << EmuMath::SIMD::get_m128_index(test128, 0) << "\n";
+	std::cout << "[1] = " << EmuMath::SIMD::get_m128_index(test128, 1) << "\n";
+	std::cout << "[2] = " << EmuMath::SIMD::get_m128_index(test128, 2) << "\n";
+	std::cout << "[3] = " << EmuMath::SIMD::get_m128_index(test128, 3) << "\n";
 
-	constexpr std::uint16_t to_add_ui16 = std::numeric_limits<std::uint16_t>::max();
+	EmuMath::FastVector<4, float> a(1.0f, 1.0f, 1.0f, 1.0f);
+	EmuMath::FastVector<4, float> b(1.0f, 2.0f, 1.0f, 1.0f);
+	std::cout << a << " == " << b << ": " << (EmuMath::SIMD::all_not_equal<false, true, false, false>(a.vectorData, b.vectorData) ? "true" : "false") << "\n";
 
-	constexpr NoOverflowT<std::int32_t> add_signed_pos_unsigned= no_overflow_si32_pos + to_add_ui16;
-	constexpr NoOverflowT<std::int32_t> add_signed_neg_unsigned = no_overflow_si32_neg + to_add_ui16;
+	constexpr std::uint32_t c = 0b0011;
+	constexpr std::uint32_t d = 0b11111111111111110111111111111111;
+	constexpr std::uint32_t e = 0;
+	std::cout
+		<< "c bits: " << EmuCore::ArithmeticHelpers::num_active_bits(c) << "\t(" << std::bitset<32>(c) << ")\n"
+		<< "d bits: " << EmuCore::ArithmeticHelpers::num_active_bits(d) << "\t(" << std::bitset<32>(d) << ")\n"
+		<< "e bits: " << EmuCore::ArithmeticHelpers::num_active_bits(e) << "\t(" << std::bitset<32>(e) << ")\n";
+	
 
-	constexpr std::uint32_t to_add_ui32 = std::numeric_limits<std::uint32_t>::max();
-
-	constexpr NoOverflowT<std::int32_t> add_signed_pos_unsigned_overflow = no_overflow_si32_pos + to_add_ui32;
-	constexpr NoOverflowT<std::int32_t> add_signed_neg_unsigned_overflow = no_overflow_si32_neg + to_add_ui32;
-
-	constexpr NoOverflowT<std::int32_t> overflown_positive_negated = -add_signed_pos_unsigned_overflow;
-	constexpr std::int64_t overflown_unsigned_negated = -NoOverflowT<std::uint32_t>(NoOverflowT<std::uint32_t>::max_val);
-
-	constexpr NoOverflowT<std::int32_t> sub_pos_pos = no_overflow_si32_pos - to_sub;
-	constexpr NoOverflowT<std::int32_t> sub_pos_neg = no_overflow_si32_pos - -to_sub;
-	constexpr NoOverflowT<std::int32_t> sub_neg_pos = no_overflow_si32_neg - to_sub;
-	constexpr NoOverflowT<std::int32_t> sub_neg_neg = no_overflow_si32_neg - -to_sub;
-
-	constexpr NoOverflowT<std::int16_t> sub_signed_pos_pos_overflow = no_overflow_si32_pos - flt_max;
-	constexpr NoOverflowT<std::int16_t> sub_signed_pos_neg_overflow = no_overflow_si32_pos - -flt_max;
-	constexpr NoOverflowT<std::int16_t> sub_signed_neg_pos_overflow = no_overflow_si32_neg - flt_max;
-	constexpr NoOverflowT<std::int16_t> sub_signed_neg_neg_overflow = no_overflow_si32_neg - -flt_max;
-
-	constexpr std::uint16_t to_sub_ui16 = std::numeric_limits<std::uint16_t>::max();
-
-	constexpr NoOverflowT<std::int32_t> sub_signed_pos_unsigned = no_overflow_si32_pos - to_sub_ui16;
-	constexpr NoOverflowT<std::int32_t> sub_signed_neg_unsigned = no_overflow_si32_neg - to_sub_ui16;
-
-	constexpr std::uint32_t to_sub_ui32 = std::numeric_limits<std::uint32_t>::max();
-
-	constexpr NoOverflowT<std::int32_t> sub_signed_pos_unsigned_overflow = no_overflow_si32_pos - to_sub_ui32;
-	constexpr NoOverflowT<std::int32_t> sub_signed_neg_unsigned_overflow = no_overflow_si32_neg - to_sub_ui32;
+	system("pause");
 
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();

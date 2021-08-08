@@ -52,6 +52,15 @@ namespace EmuMath
 		{
 			return 4;
 		}
+		/// <summary> The reciprocal of the number of elements contained within this vector. Recommended to multiply this instead of dividing by size. </summary>
+		/// <typeparam name="OutT_">Type to output the reciprocal as. Must be a floating point value. Defaults to this vector's default_floating_point.</typeparam>
+		/// <returns>The result of 1/size, where both values are interpreted as the provided OutT_ type.</returns>
+		template<typename OutT_ = default_floating_point>
+		static constexpr OutT_ size_reciprocal()
+		{
+			static_assert(std::is_floating_point_v<OutT_>, "Provided a non-floating-point data type for an EmuMath Vector's size reciprocal. A floating-point must be provided.");
+			return OutT_(1) / static_cast<OutT_>(size());
+		}
 
 		/// <summary> The type of Vector created when getting a copy of this Vector's data (used to get copy values instead of references). </summary>
 		using copy_vector = Vector4<nonref_value_type_without_qualifiers>;
@@ -1231,6 +1240,21 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::VectorMax<OutT>(*this);
 		}
+		/// <summary> Determines the mean average of this Vector's elements (the sum of all elements divided by the size number of elements). </summary>
+		/// <typeparam name="OutT">Type to output the mean as. Defaults as this Vector's default_floating_point.</typeparam>
+		/// <returns>The mean of this Vector's elements, represented as the provided type.</returns>
+		template<typename OutT = default_floating_point>
+		constexpr OutT Mean() const
+		{
+			if constexpr (std::is_floating_point_v<OutT>)
+			{
+				return (x + y + z + w) * size_reciprocal<OutT>();
+			}
+			else
+			{
+				return static_cast<OutT>((x + y + z + w) * size_reciprocal());
+			}
+		}
 
 		/// <summary>
 		/// <para> Returns a copy of this Vector with its elements clamped to the passed minimum. </para>
@@ -1371,12 +1395,12 @@ namespace EmuMath
 		/// <typeparam name="OutT">Type to output as. Must be a floating point type.</typeparam>
 		/// <returns>Normalised version of this Vector, with its contained elements stored as the provided OutT (defaults to this Vector's default_floating_point).</returns>
 		template<typename OutFP = default_floating_point>
-		Vector2<OutFP> Normalise() const
+		Vector4<OutFP> Normalise() const
 		{
 			return EmuMath::Helpers::VectorNormalise<OutFP>(*this);
 		}
 		template<typename OutFP = default_floating_point>
-		constexpr Vector2<OutFP> NormaliseConstexpr() const
+		constexpr Vector4<OutFP> NormaliseConstexpr() const
 		{
 			return EmuMath::Helpers::VectorNormaliseConstexpr<OutFP>(*this);
 		}
@@ -1401,6 +1425,17 @@ namespace EmuMath
 		constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<OutSize_, OutT_>::type Reverse() const
 		{
 			return EmuMath::Helpers::VectorReverse<OutSize_, OutT_>(*this);
+		}
+
+		template<typename OutT_ = nonref_value_type, typename BT_>
+		constexpr Vector3<OutT_> CrossProductV3(const Vector3<BT_>& b_) const
+		{
+			return EmuMath::Helpers::VectorCrossProductV3<OutT_>(*this, b_);
+		}
+		template<typename OutT_ = nonref_value_type, typename BT_>
+		constexpr Vector3<OutT_> CrossProductV3(const Vector4<BT_>& b_) const
+		{
+			return EmuMath::Helpers::VectorCrossProductV3<OutT_>(*this, b_);
 		}
 #pragma endregion
 

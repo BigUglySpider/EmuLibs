@@ -147,20 +147,25 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EmuCore\ArithmeticHelpers\BitHelpers.h" />
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonValues.h" />
     <ClInclude Include="EmuCore\FileHelpers\PathValidation.h" />
     <ClInclude Include="EmuCore\TestingHelpers\LoopingTestHarness.h" />
     <ClInclude Include="EmuCore\TMPHelpers\Functors.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TypeComparators.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TypeConvertors.h" />
+    <ClInclude Include="EmuMath\FastVector.h" />
     <ClInclude Include="EmuMath\GeneralMath.h" />
     <ClInclude Include="EmuMath\NoOverflowT.h" />
+    <ClInclude Include="EmuMath\SIMDHelpers.h" />
     <ClInclude Include="EmuMath\Vectors.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\EmuVector4T.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\EmuVectorTMPHelpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\EmuVector2T.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\EmuVector3T.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\EmuVectorInfo.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\FastVectorBase.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\FastVectorf4.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\VectorHelpers.h" />
     <ClInclude Include="Tests.hpp" />
   </ItemGroup>

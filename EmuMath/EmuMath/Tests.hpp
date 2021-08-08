@@ -3,11 +3,13 @@
 
 // REQUIRED INCLUDES
 #include "EmuCore/TestingHelpers/LoopingTestHarness.h"
+#include <array>
 #include <chrono>
 #include <iostream>
 #include <tuple>
 
 // ADDITIONAL INCLUDES
+#include "EmuMath/FastVector.h"
 #include "EmuMath/GeneralMath.h"
 #include "EmuMath/Vectors.h"
 #include <bitset>
@@ -110,7 +112,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = true;
+		static constexpr bool DO_TEST = false;
 
 		SqrtTest()
 		{
@@ -156,9 +158,465 @@ namespace EmuCore::TestingHelpers
 		std::vector<T> outData;
 	};
 
+	struct NormalVector4fMultTest
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+
+		NormalVector4fMultTest()
+		{
+		}
+		void Prepare()
+		{
+			inData.resize(NUM_LOOPS);
+			mults.resize(NUM_LOOPS);
+			outData.resize(NUM_LOOPS);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				inData[i] = EmuMath::Vector4<float>(rand() % 100, rand() % 100, rand() % 100, rand() % 100) * 0.75f;
+				mults[i] = EmuMath::Vector4<float>(rand() % 250, rand() % 250, rand() % 250, rand() % 250) * 0.75f;
+				outData[i] = EmuMath::Vector4<float>(0.0f, 0.0f, 0.0f, 0.0f);
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			outData[i] = inData[i].CrossProductV3(mults[i]);
+		}
+
+		std::vector<EmuMath::Vector4<float>> inData;
+		std::vector<EmuMath::Vector4<float>> outData;
+		std::vector<EmuMath::Vector4<float>> mults;
+	};
+	struct FastVector4fMultTest_WithLoad
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = false;
+
+		FastVector4fMultTest_WithLoad()
+		{
+		}
+
+		void Prepare()
+		{
+			inData.resize(NUM_LOOPS);
+			mults.resize(NUM_LOOPS);
+			outData.resize(NUM_LOOPS);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				inData[i] = EmuMath::FastVector<4, float>(rand() % 100, rand() % 100, rand() % 100, rand() % 100);
+				mults[i] = EmuMath::Vector4<float>(rand() % 250, rand() % 250, rand() % 250, rand() % 250) * 0.75f;
+				outData[i] = EmuMath::FastVector<4, float>(0.0f, 0.0f, 0.0f, 0.0f);
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			outData[i] = (inData[i] * EmuMath::FastVector<4, float>(mults[i])) * 0.5f;
+		}
+
+		std::vector<EmuMath::FastVector<4, float>> inData;
+		std::vector<EmuMath::FastVector<4, float>> outData;
+		std::vector<EmuMath::Vector4<float>> mults;
+	};
+	struct FastVector4fMultTest_WithoutLoad
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+
+		FastVector4fMultTest_WithoutLoad()
+		{
+		}
+
+		void Prepare()
+		{
+			inData.resize(NUM_LOOPS);
+			mults.resize(NUM_LOOPS);
+			outData.resize(NUM_LOOPS);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				inData[i] = EmuMath::FastVector<4, float>(rand() % 100, rand() % 100, rand() % 100, rand() % 100);
+				mults[i] = EmuMath::FastVector<4, float>(rand() % 250, rand() % 250, rand() % 250, rand() % 250) * 0.75f;
+				outData[i] = EmuMath::FastVector<4, float>(0.0f, 0.0f, 0.0f, 0.0f);
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			outData[i] = inData[i].CrossProductV3(mults[i]);
+		}
+
+		std::vector<EmuMath::FastVector<4, float>> inData;
+		std::vector<EmuMath::FastVector<4, float>> outData;
+		std::vector<EmuMath::FastVector<4, float>> mults;
+	};
+
+	struct ScalarNorm
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = false;
+
+		ScalarNorm()
+		{
+		}
+
+		void Prepare()
+		{
+			a.resize(NUM_LOOPS);
+			b.resize(NUM_LOOPS);
+			results.resize(NUM_LOOPS);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				a[i] = EmuMath::Vector4<float>(rand() % 500, rand() % 500, rand() % 500, rand() % 500);
+				b[i] = EmuMath::Vector4<float>(rand() % 500, rand() % 500, rand() % 500, rand() % 500);
+				results[i] = EmuMath::Vector4<float>(0.0f, 0.0f, 0.0f, 0.0f);
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			results[i] = a[i].Normalise();
+		}
+		void OutputRand() const
+		{
+			const std::size_t i = rand() % NUM_LOOPS;
+			std::cout << a[i] << ".Normalised() = " << results[i] << "\n";
+		}
+
+		std::vector<EmuMath::Vector4<float>> a;
+		std::vector<EmuMath::Vector4<float>> b;
+		std::vector<EmuMath::Vector4<float>> results;
+	};
+
+	struct FastNorm
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = false;
+
+		FastNorm()
+		{
+		}
+
+		void Prepare()
+		{
+			a.resize(NUM_LOOPS);
+			b.resize(NUM_LOOPS);
+			results.resize(NUM_LOOPS);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				a[i] = EmuMath::FastVector<4, float>(rand() % 500, rand() % 500, rand() % 500, rand() % 500);
+				b[i] = EmuMath::FastVector<4, float>(rand() % 500, rand() % 500, rand() % 500, rand() % 500);
+				results[i] = EmuMath::FastVector<4, float>(0.0f, 0.0f, 0.0f, 0.0f);
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			results[i] = a[i].Normalise();
+		}
+		void OutputRand() const
+		{
+			const std::size_t i = rand() % NUM_LOOPS;
+			std::cout << a[i] << ".Normalised() = " << results[i] << "\n";
+		}
+
+		std::vector<EmuMath::FastVector<4, float>> a;
+		std::vector<EmuMath::FastVector<4, float>> b;
+		std::vector<EmuMath::FastVector<4, float>> results;
+	};
+
+	struct RoundScalar
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = false;
+
+		RoundScalar()
+		{
+		}
+
+		void Prepare()
+		{
+			original.resize(NUM_LOOPS);
+			downed.resize(NUM_LOOPS, EmuMath::Vector4<float>(0.0f, 0.0f, 0.0f, 0.0f));
+			upped.resize(NUM_LOOPS, EmuMath::Vector4<float>(0.0f, 0.0f, 0.0f, 0.0f));
+			trunced.resize(NUM_LOOPS, EmuMath::Vector4<float>(0.0f, 0.0f, 0.0f, 0.0f));
+
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				original[i] = EmuMath::Vector4<float>(rand() % 500, rand() % 500, rand() % 500, rand() % 500);
+				original[i] *= (static_cast<float>(rand() % 100) * 0.01f);
+			}
+		}
+
+		void operator()(std::size_t i)
+		{
+			upped[i] = original[i].Ceil();
+			downed[i] = original[i].Floor();
+			trunced[i] = original[i].Trunc();
+		}
+
+		void OutputRand()
+		{
+			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
+			std::cout << "{\n\tOriginal: " << original[i] << "\n\tTrunced: " << trunced[i] << "\n\tCeiled: " << upped[i] << "\n\tFloored: " << downed[i] << "\n}\n";
+		}
+
+		std::vector<EmuMath::Vector4<float>> original;
+		std::vector<EmuMath::Vector4<float>> downed;
+		std::vector<EmuMath::Vector4<float>> upped;
+		std::vector<EmuMath::Vector4<float>> trunced;
+	};
+
+	struct RoundFast
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = false;
+
+		void Prepare()
+		{
+			original.resize(NUM_LOOPS);
+			downed.resize(NUM_LOOPS, EmuMath::FastVector<4, float>(0.0f, 0.0f, 0.0f, 0.0f));
+			upped.resize(NUM_LOOPS, EmuMath::FastVector<4, float>(0.0f, 0.0f, 0.0f, 0.0f));
+			trunced.resize(NUM_LOOPS, EmuMath::FastVector<4, float>(0.0f, 0.0f, 0.0f, 0.0f));
+
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				original[i] = EmuMath::FastVector<4, float>(rand() % 500, rand() % 500, rand() % 500, rand() % 500);
+				original[i] = original[i] * _mm_set_ps
+											(
+												rand() % 2 == 0 ? 1.0f : -1.0f,
+												rand() % 2 == 0 ? 1.0f : -1.0f,
+												rand() % 2 == 0 ? 1.0f : -1.0f,
+												rand() % 2 == 0 ? 1.0f : -1.0f
+											);
+				original[i] = original[i] * _mm_set_ps1(static_cast<float>(rand() % 100) * 0.01f);
+			}
+		}
+
+		void operator()(std::size_t i)
+		{
+			upped[i] = original[i].Ceil();
+			downed[i] = original[i].Floor();
+			trunced[i] = original[i].Trunc();
+		}
+
+		void OutputRand()
+		{
+			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
+			std::cout << "{\n\tOriginal: " << original[i] << "\n\tTrunced: " << trunced[i] << "\n\tCeiled: " << upped[i] << "\n\tFloored: " << downed[i] << "\n}\n";
+		}
+
+		std::vector<EmuMath::FastVector<4, float>> original;
+		std::vector<EmuMath::FastVector<4, float>> downed;
+		std::vector<EmuMath::FastVector<4, float>> upped;
+		std::vector<EmuMath::FastVector<4, float>> trunced;
+	};
+
+	struct ClampScalar
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = false;
+
+		ClampScalar()
+		{
+		}
+
+		void Prepare()
+		{
+			original.resize(NUM_LOOPS);
+			clampMins.resize(NUM_LOOPS);
+			clampMaxs.resize(NUM_LOOPS);
+			clamped.resize(NUM_LOOPS, EmuMath::Vector4<float>(0, 0, 0, 0));
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				original[i] = EmuMath::Vector4<float>(rand() % 500, rand() % 500, rand() % 500, rand() % 500);
+				clampMins[i] = static_cast<float>(rand() % 500);
+				clampMaxs[i] = static_cast<float>(rand() % 500);
+				if (clampMaxs[i] < clampMins[i])
+				{
+					clampMaxs[i] = clampMins[i] + 1.0f;
+				}
+			}
+		}
+
+		void operator()(std::size_t i)
+		{
+			clamped[i] = original[i].Clamp(clampMins[i], clampMaxs[i]);
+		}
+
+		void OutputRand()
+		{
+			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
+			std::cout << "Original: " << original[i] << " | Min: " << clampMins[i] << " | Max: " << clampMaxs[i] << " | Result: " << clamped[i] << "\n";
+		}
+
+		std::vector<EmuMath::Vector4<float>> original;
+		std::vector<EmuMath::Vector4<float>> clamped;
+		std::vector<float> clampMins;
+		std::vector<float> clampMaxs;
+	};
+
+	struct ClampFast
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = false;
+
+		ClampFast()
+		{
+		}
+
+		void Prepare()
+		{
+			original.resize(NUM_LOOPS);
+			clampMins.resize(NUM_LOOPS);
+			clampMaxs.resize(NUM_LOOPS);
+			clamped.resize(NUM_LOOPS, EmuMath::FastVector<4, float>(0, 0, 0, 0));
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				original[i] = EmuMath::FastVector<4, float>(rand() % 500, rand() % 500, rand() % 500, rand() % 500);
+				clampMins[i] = static_cast<float>(rand() % 500);
+				clampMaxs[i] = static_cast<float>(rand() % 500);
+				if (clampMaxs[i] < clampMins[i])
+				{
+					clampMaxs[i] = clampMins[i] + 1.0f;
+				}
+			}
+		}
+
+		void operator()(std::size_t i)
+		{
+			clamped[i] = original[i].Clamp(clampMins[i], clampMaxs[i]);
+		}
+
+		void OutputRand()
+		{
+			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
+			std::cout << "Original: " << original[i] << " | Min: " << clampMins[i] << " | Max: " << clampMaxs[i] << " | Result: " << clamped[i] << "\n";
+		}
+
+		std::vector<EmuMath::FastVector<4, float>> original;
+		std::vector<EmuMath::FastVector<4, float>> clamped;
+		std::vector<float> clampMins;
+		std::vector<float> clampMaxs;
+	};
+
+	struct MinMaxScalar
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = false;
+
+		MinMaxScalar()
+		{
+		}
+
+		void Prepare()
+		{
+			mins.resize(NUM_LOOPS, 0.0f);
+			maxes.resize(NUM_LOOPS, 0.0f);
+			means.resize(NUM_LOOPS, 0.0f);
+			vectors.resize(NUM_LOOPS);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				vectors[i] = EmuMath::Vector4<float>(rand() % 500, rand() % 500, rand() % 500, rand() % 500);
+			}
+		}
+
+		void operator()(std::size_t i)
+		{
+			mins[i] = vectors[i].Min();
+			//maxes[i] = vectors[i].Max();
+			//means[i] = vectors[i].Mean();
+		}
+
+		void OutputRand()
+		{
+			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
+			std::cout << vectors[i] << " | Min: " << mins[i] << " | Max: " << maxes[i] << " | Mean: " << means[i] << "\n";
+		}
+
+		std::vector<EmuMath::Vector4<float>> vectors;
+		std::vector<float> mins;
+		std::vector<float> maxes;
+		std::vector<float> means;
+	};
+
+	struct MinMaxFast
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = false;
+
+		MinMaxFast()
+		{
+		}
+
+		void Prepare()
+		{
+			mins.resize(NUM_LOOPS, 0.0f);
+			maxes.resize(NUM_LOOPS, 0.0f);
+			means.resize(NUM_LOOPS, 0.0f);
+			vectors.resize(NUM_LOOPS);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				vectors[i] = EmuMath::FastVector<4, float>(rand() % 500, rand() % 500, rand() % 500, rand() % 500);
+			}
+		}
+
+		void operator()(std::size_t i)
+		{
+			mins[i] = vectors[i].Min();
+			//maxes[i] = vectors[i].Max();
+			//means[i] = vectors[i].Mean();
+		}
+
+		void OutputRand()
+		{
+			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
+			std::cout << vectors[i] << " | Min: " << mins[i] << " | Max: " << maxes[i] << " | Mean: " << means[i] << "\n";
+		}
+
+		std::vector<EmuMath::FastVector<4, float>> vectors;
+		std::vector<float> mins;
+		std::vector<float> maxes;
+		std::vector<float> means;
+	};
+
 	using SqrtTestFP = float;
 
-	using AllTests = std::tuple<TestA<float>, VectorwiseShiftTest<std::int16_t>, SqrtTest<SqrtTestFP, true>, SqrtTest<SqrtTestFP, false>>;
+	using AllTests = std::tuple
+	<
+		TestA<float>,
+		VectorwiseShiftTest<std::int16_t>,
+		SqrtTest<SqrtTestFP, true>,
+		SqrtTest<SqrtTestFP, false>,
+		NormalVector4fMultTest,
+		FastVector4fMultTest_WithLoad,
+		FastVector4fMultTest_WithoutLoad,
+		ScalarNorm,
+		FastNorm,
+		RoundScalar,
+		RoundFast,
+		ClampScalar,
+		ClampFast,
+		MinMaxScalar,
+		MinMaxFast
+	>;
 
 	template<std::size_t Index_>
 	void PrepareAllTests(AllTests& tests)
@@ -220,6 +678,57 @@ namespace EmuCore::TestingHelpers
 				str << "Right Shift [" << i << "]: " << _testB.outRightBits[i] << "\n\n";
 			}
 			std::cout << str.str();
+		}
+
+		if (std::get<4>(tests).DO_TEST)
+		{
+			std::size_t i = rand() % std::get<4>(tests).NUM_LOOPS;
+			std::cout << std::get<4>(tests).inData[i] << ".Cross(" << std::get<4>(tests).mults[i] << ") = " << std::get<4>(tests).outData[i] << "\n";
+		}
+		if (std::get<5>(tests).DO_TEST)
+		{
+			std::cout << std::get<5>(tests).outData[rand() % std::get<5>(tests).NUM_LOOPS] << "\n";
+		}
+		if (std::get<6>(tests).DO_TEST)
+		{
+			std::size_t i = rand() % std::get<6>(tests).NUM_LOOPS;
+			std::cout << std::get<6>(tests).inData[i] << ".Cross(" << std::get<6>(tests).mults[i] << ") = " << std::get<6>(tests).outData[i] << "\n";
+		}
+
+		if (std::get<7>(tests).DO_TEST)
+		{
+			std::get<7>(tests).OutputRand();
+		}
+		if (std::get<8>(tests).DO_TEST)
+		{
+			std::get<8>(tests).OutputRand();
+		}
+
+		if (std::get<9>(tests).DO_TEST)
+		{
+			std::get<9>(tests).OutputRand();
+		}
+		if (std::get<10>(tests).DO_TEST)
+		{
+			std::get<10>(tests).OutputRand();
+		}
+
+		if (std::get<11>(tests).DO_TEST)
+		{
+			std::get<11>(tests).OutputRand();
+		}
+		if (std::get<12>(tests).DO_TEST)
+		{
+			std::get<12>(tests).OutputRand();
+		}
+
+		if (std::get<13>(tests).DO_TEST)
+		{
+			std::get<13>(tests).OutputRand();
+		}
+		if (std::get<14>(tests).DO_TEST)
+		{
+			std::get<14>(tests).OutputRand();
 		}
 	}
 

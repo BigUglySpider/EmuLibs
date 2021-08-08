@@ -95,8 +95,8 @@ namespace EmuMath
 		/// <para> The only valid values for Size_ are 2, 3, and 4; everything else will result in a static assertion being triggered. </para>
 		/// </summary>
 		/// <typeparam name="ContainedType">Type contained within the resulting Vector.</typeparam>
-		template<std::size_t Size_, typename ContainedType>
-		using emu_vector_from_size_t = typename emu_vector_from_size<Size_, ContainedType>::type;
+		template<std::size_t OutSize_, typename ContainedType>
+		using emu_vector_from_size_t = typename emu_vector_from_size<OutSize_, ContainedType>::type;
 
 		/// <summary>
 		///	<para> Finds the type used to create a copy of the passed EmuMath Vector type. If the passed type is not an EmuMath vector, the type will be std::false_type. </para>
