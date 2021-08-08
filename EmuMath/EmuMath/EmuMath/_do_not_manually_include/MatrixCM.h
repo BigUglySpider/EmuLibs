@@ -53,6 +53,7 @@ namespace EmuMath
 		static constexpr std::size_t num_columns = NumColumns_;
 		/// <summary> The number of rows in this matrix (i.e. The number of values in the vertical direction). </summary>
 		static constexpr std::size_t num_rows = NumRows_;
+		/// <summary> Boolean indicating if the columns within this vector are stored as EmuMath vectors. </summary>
 		static constexpr bool uses_vector_columns = NumRows_ >= 2 && NumRows_ <= 4;
 
 		using this_type = MatrixCM<num_columns, num_rows, value_type>;
@@ -214,9 +215,17 @@ namespace EmuMath
 			return columns[columnIndex_];
 		}
 
+		/// <summary>
+		/// <para>
+		///		The data within this matrix, stored contiguously as columns 
+		///		(i.e. all rows in column 0 will appear in order in memory immediately before the rows of column 1).
+		/// </para>
+		/// </summary>
 		packed_data_type columns;
 
 	private:
+		/// <summary> Appends a row to a stream from the passed column. Uses recursion to go through all columns within the row, appending each to the stream. </summary>
+		/// <param name="stream_">Stream to append to.</param>
 		template<std::size_t Column_, std::size_t Row_>
 		void _append_row_to_stream_from_column(std::ostream& stream_) const
 		{
@@ -228,6 +237,8 @@ namespace EmuMath
 			}
 		}
 
+		/// <summary> Uses recursion to output this matrix's rows as another matrix's columns. </summary>
+		/// <param name="out">Matrix to output to. If dimensions are uneven, it will have opposite dimensions to this matrix (e.g. 4x3 => 3x4). </param>
 		template<std::size_t Row_>
 		void _perform_tranpose(MatrixCM<num_rows, num_columns, value_type>& out) const
 		{
@@ -238,15 +249,20 @@ namespace EmuMath
 			}
 		}
 
+		/// <summary> Fills an output row_type reference to match the values at the relevant spots within this matrix. Uses recursion to get all columns within the row. </summary>
+		/// <param name="outRow_">Row to putput to.</param>
 		template<std::size_t Column_, std::size_t Row_>
 		void _fill_row(row_type& outRow_) const
 		{
 			if constexpr (Column_ < num_columns)
 			{
-				this->template _set_row_data<Column_, Row_>(outRow_);
+				_get_row_data_value<Column_>(outRow_) = this->template at<Column_, Row_>();
 				this->template _fill_row<Column_ + 1, Row_>(outRow_);
 			}
 		}
+		/// <summary> Fills an output row_type reference to match the values at the relevant spots within this matrix. Uses recursion to get all columns within the row. </summary>
+		/// <param name="outRow_">Row to putput to.</param>
+		/// <param name="rowIndex">Index of the row to copy.</param>
 		template<std::size_t Column_>
 		void _fill_row(row_type& outRow_, std::size_t rowIndex) const
 		{
@@ -256,13 +272,9 @@ namespace EmuMath
 				this->template _fill_row<Column_ + 1>(outRow_, rowIndex);
 			}
 		}
-
-		template<std::size_t Column_, std::size_t Row_>
-		void _set_row_data(row_type& outRow_) const
-		{
-			_get_row_data_value<Column_>(outRow_) = this->template at<Column_, Row_>();
-		}
-
+		/// <summary> Retrieves a non-const reference to the index of a row of this matrix's row_type. </summary>
+		/// <param name="outRow_">row_type instance to retrieve a reference from.</param>
+		/// <returns>Non-const reference to the specified index within the provided row_type instance.</returns>
 		template<std::size_t Index_>
 		static constexpr typename row_type::value_type& _get_row_data_value(row_type& outRow_)
 		{
