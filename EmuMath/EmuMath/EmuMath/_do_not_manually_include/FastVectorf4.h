@@ -478,7 +478,6 @@ namespace EmuMath
 
 		inline this_type Reverse() const
 		{
-			return this_type(_mm_mul_ps(vectorData, _mm_set_ps1(-1.0f)));
 			return this_type(_mm_sub_ps(_mm_setzero_ps(), vectorData));
 		}
 #pragma endregion
