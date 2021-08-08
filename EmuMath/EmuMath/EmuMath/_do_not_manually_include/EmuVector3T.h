@@ -1427,7 +1427,12 @@ namespace EmuMath
 		template<typename OutT_ = nonref_value_type, typename BT_>
 		constexpr Vector3<OutT_> CrossProduct(const Vector3<BT_>& b_) const
 		{
-			return EmuMath::Helpers::VectorCrossProduct<OutT_>(*this, b_);
+			return EmuMath::Helpers::VectorCrossProductV3<OutT_>(*this, b_);
+		}
+		template<typename OutT_ = nonref_value_type, typename BT_>
+		constexpr Vector3<OutT_> CrossProduct(const Vector4<BT_>& b_) const
+		{
+			return EmuMath::Helpers::VectorCrossProductV3<OutT_>(*this, b_);
 		}
 #pragma endregion
 

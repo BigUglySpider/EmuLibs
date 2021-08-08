@@ -163,7 +163,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = false;
+		static constexpr bool DO_TEST = true;
 
 		NormalVector4fMultTest()
 		{
@@ -182,7 +182,7 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i)
 		{
-			outData[i] = (inData[i] * mults[i]) * 0.5f;
+			outData[i] = inData[i].CrossProductV3(mults[i]);
 		}
 
 		std::vector<EmuMath::Vector4<float>> inData;
@@ -226,7 +226,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = false;
+		static constexpr bool DO_TEST = true;
 
 		FastVector4fMultTest_WithoutLoad()
 		{
@@ -246,7 +246,7 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i)
 		{
-			outData[i] = (inData[i] * mults[i]) * 0.5f;
+			outData[i] = inData[i].CrossProductV3(mults[i]);
 		}
 
 		std::vector<EmuMath::FastVector<4, float>> inData;
@@ -259,7 +259,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = true;
+		static constexpr bool DO_TEST = false;
 
 		ScalarNorm()
 		{
@@ -297,7 +297,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = true;
+		static constexpr bool DO_TEST = false;
 
 		FastNorm()
 		{
@@ -518,7 +518,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = true;
+		static constexpr bool DO_TEST = false;
 
 		MinMaxScalar()
 		{
@@ -560,7 +560,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = true;
+		static constexpr bool DO_TEST = false;
 
 		MinMaxFast()
 		{

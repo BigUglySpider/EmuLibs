@@ -460,6 +460,20 @@ namespace EmuMath
 		{
 			return _mm_dp_ps(vectorData, b_, 0xFF).m128_f32[0];
 		}
+		inline this_type CrossProductV3(const this_type& b_) const
+		{
+			return this->CrossProductV3(b_.vectorData);
+		}
+		inline this_type CrossProductV3(const __m128 b_) const
+		{
+			// Calculation based on https://geometrian.com/programming/tutorials/cross-product/index.php - method 5
+			__m128 temp0 = EmuMath::SIMD::shuffle<1, 2, 0, 3>(vectorData, vectorData);
+			__m128 temp1 = EmuMath::SIMD::shuffle<2, 0, 1, 3>(b_, b_);
+			__m128 temp2 = _mm_mul_ps(temp0, b_);
+			__m128 temp3 = _mm_mul_ps(temp0, temp1);
+			__m128 temp4 = EmuMath::SIMD::shuffle<1, 2, 0, 3>(temp2);
+			return this_type(_mm_sub_ps(temp3, temp4));
+		}
 
 		inline this_type Reverse() const
 		{

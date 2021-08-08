@@ -1426,6 +1426,17 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::VectorReverse<OutSize_, OutT_>(*this);
 		}
+
+		template<typename OutT_ = nonref_value_type, typename BT_>
+		constexpr Vector3<OutT_> CrossProductV3(const Vector3<BT_>& b_) const
+		{
+			return EmuMath::Helpers::VectorCrossProductV3<OutT_>(*this, b_);
+		}
+		template<typename OutT_ = nonref_value_type, typename BT_>
+		constexpr Vector3<OutT_> CrossProductV3(const Vector4<BT_>& b_) const
+		{
+			return EmuMath::Helpers::VectorCrossProductV3<OutT_>(*this, b_);
+		}
 #pragma endregion
 
 		/// <summary> The first component of this vector, representing the X-axis. </summary>
