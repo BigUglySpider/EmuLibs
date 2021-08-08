@@ -49,6 +49,7 @@ int main()
 		<< "c bits: " << EmuCore::ArithmeticHelpers::num_active_bits(c) << "\t(" << std::bitset<32>(c) << ")\n"
 		<< "d bits: " << EmuCore::ArithmeticHelpers::num_active_bits(d) << "\t(" << std::bitset<32>(d) << ")\n"
 		<< "e bits: " << EmuCore::ArithmeticHelpers::num_active_bits(e) << "\t(" << std::bitset<32>(e) << ")\n";
+	
 
 	system("pause");
 
