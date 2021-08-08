@@ -682,7 +682,8 @@ namespace EmuCore::TestingHelpers
 
 		if (std::get<4>(tests).DO_TEST)
 		{
-			std::cout << std::get<4>(tests).outData[rand() % std::get<4>(tests).NUM_LOOPS] << "\n";
+			std::size_t i = rand() % std::get<4>(tests).NUM_LOOPS;
+			std::cout << std::get<4>(tests).inData[i] << ".Cross(" << std::get<4>(tests).mults[i] << ") = " << std::get<4>(tests).outData[i] << "\n";
 		}
 		if (std::get<5>(tests).DO_TEST)
 		{
@@ -690,7 +691,8 @@ namespace EmuCore::TestingHelpers
 		}
 		if (std::get<6>(tests).DO_TEST)
 		{
-			std::cout << std::get<6>(tests).outData[rand() % std::get<6>(tests).NUM_LOOPS] << "\n";
+			std::size_t i = rand() % std::get<6>(tests).NUM_LOOPS;
+			std::cout << std::get<6>(tests).inData[i] << ".Cross(" << std::get<6>(tests).mults[i] << ") = " << std::get<6>(tests).outData[i] << "\n";
 		}
 
 		if (std::get<7>(tests).DO_TEST)

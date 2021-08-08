@@ -467,17 +467,19 @@ namespace EmuMath
 		inline this_type CrossProductV3(const __m128 b_) const
 		{
 			// Calculation based on https://geometrian.com/programming/tutorials/cross-product/index.php - method 5
-			__m128 temp0 = EmuMath::SIMD::shuffle<1, 2, 0, 3>(vectorData, vectorData);
-			__m128 temp1 = EmuMath::SIMD::shuffle<2, 0, 1, 3>(b_, b_);
-			__m128 temp2 = _mm_mul_ps(temp0, b_);
-			__m128 temp3 = _mm_mul_ps(temp0, temp1);
-			__m128 temp4 = EmuMath::SIMD::shuffle<1, 2, 0, 3>(temp2);
-			return this_type(_mm_sub_ps(temp3, temp4));
+			__m128 temp0 = EmuMath::SIMD::shuffle<1, 2, 0, 3>(vectorData);
+			__m128 temp1 = EmuMath::SIMD::shuffle<2, 0, 1, 3>(b_);
+			__m128 temp0_mul_b = _mm_mul_ps(temp0, b_);
+
+			__m128 sub_lhs = _mm_mul_ps(temp0, temp1);
+			__m128 sub_rhs = EmuMath::SIMD::shuffle<1, 2, 0, 3>(temp0_mul_b);
+			return this_type(_mm_sub_ps(sub_lhs, sub_rhs));
 		}
 
 		inline this_type Reverse() const
 		{
 			return this_type(_mm_mul_ps(vectorData, _mm_set_ps1(-1.0f)));
+			return this_type(_mm_sub_ps(_mm_setzero_ps(), vectorData));
 		}
 #pragma endregion
 
