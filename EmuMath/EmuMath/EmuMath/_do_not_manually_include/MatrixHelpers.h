@@ -283,6 +283,39 @@ namespace EmuMath::Helpers
 				_fill_matrix_row<CurrentColumn_ + 1, TargetRowIndex_>(outRow_, matrix_);
 			}
 		}
+
+		template<std::size_t num_columns, std::size_t num_rows, typename value_type>
+		std::array<typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::row_type, num_columns> _copy_all_matrix_columns
+		(
+			const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_
+		)
+		{
+			return matrix_.columns;
+		}
+
+		template<std::size_t RowIndex_, std::size_t num_columns, std::size_t num_rows, typename value_type>
+		void _copy_all_matrix_rows
+		(
+			std::array<typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::row_type, num_rows>& outRows_,
+			const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_
+		)
+		{
+			if constexpr (RowIndex_ < num_rows)
+			{
+				_fill_matrix_row<0, RowIndex_>(outRows_[RowIndex_], matrix_);
+				_copy_all_matrix_rows<RowIndex_ + 1>(outRows_, matrix_);
+			}
+		}
+		template<std::size_t num_columns, std::size_t num_rows, typename value_type>
+		std::array<typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::row_type, num_rows> _copy_all_matrix_rows
+		(
+			const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_
+		)
+		{
+			std::array<typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::row_type, num_rows> rows;
+			_copy_all_matrix_rows<0>(rows, matrix_);
+			return rows;
+		}
 #pragma endregion
 
 #pragma region MATRIX_OPERATIONS
@@ -311,6 +344,76 @@ namespace EmuMath::Helpers
 			{
 				return OutT_(0);
 			}
+		}
+#pragma endregion
+
+#pragma region MATRIX_ARITHMETIC
+
+		template<std::size_t Index_, typename OutT_, class LhsRow_, class RhsColumn_>
+		inline constexpr OutT_ _matrix_row_column_dot_scalar(const LhsRow_& lhsRow_, const RhsColumn_& rhsColumn_)
+		{
+			if constexpr (Index_ < LhsRow_::size())
+			{
+				return (lhsRow_[Index_] * rhsColumn_[Index_]) + _matrix_row_column_dot_scalar<Index_ + 1, OutT_, LhsRow_, RhsColumn_>(lhsRow_, rhsColumn_);
+			}
+			else
+			{
+				return OutT_(0);
+			}
+		}
+		template<typename OutT_, class LhsRow_, class RhsColumn_>
+		inline constexpr OutT_ _matrix_row_column_dot(const LhsRow_& lhsRow_, const RhsColumn_& rhsColumn_)
+		{
+			if constexpr (EmuCore::TMPHelpers::are_all_check<EmuMath::TMPHelpers::is_emu_vector, LhsRow_, RhsColumn_>::value)
+			{
+				return EmuMath::Helpers::VectorDotProduct<OutT_>(lhsRow_, rhsColumn_);
+			}
+			else
+			{
+				return _matrix_row_column_dot_scalar<0, OutT_, LhsRow_, RhsColumn_>(lhsRow_, rhsColumn_);
+			}
+		}
+
+		template<std::size_t Column_, std::size_t Row_, std::size_t num_columns, std::size_t num_rows, class LhsRows_, class RhsColumns_, typename value_type>
+		constexpr void _multiply_matrices
+		(
+			EmuMath::MatrixCM<num_columns, num_rows, value_type>& out_,
+			const LhsRows_& lhsRows_,
+			const RhsColumns_& rhsColumns_
+		)
+		{
+			if constexpr (Column_ < num_columns)
+			{
+				if constexpr (Row_ < num_rows)
+				{
+					using LhsValue = typename LhsRows_::value_type;
+					using RhsValue = typename RhsColumns_::value_type;
+					_get_matrix_data_value<Column_, Row_>(out_) = _matrix_row_column_dot<value_type, LhsValue, RhsValue>(lhsRows_[Row_], rhsColumns_[Column_]);
+					_multiply_matrices<Column_, Row_ + 1>(out_, lhsRows_, rhsColumns_);
+				}
+				else
+				{
+					_multiply_matrices<Column_ + 1, 0>(out_, lhsRows_, rhsColumns_);
+				}
+			}
+		}
+
+		template<std::size_t num_columns, std::size_t num_rows, typename value_type>
+		constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> _multiply_matrices
+		(
+			const EmuMath::MatrixCM<num_columns, num_rows, value_type>& lhs,
+			const EmuMath::MatrixCM<num_columns, num_rows, value_type>& rhs
+		)
+		{
+			using LhsRow = typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::row_type;
+			using RhsColumn = typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::column_type;
+
+			EmuMath::MatrixCM<num_columns, num_rows, value_type> out_ = EmuMath::MatrixCM<num_columns, num_rows, value_type>();
+			std::array<LhsRow, num_rows> lhsRows = _copy_all_matrix_rows(lhs);
+			std::array<RhsColumn, num_columns> rhsColumns = _copy_all_matrix_columns(rhs);
+			_multiply_matrices<0, 0>(out_, lhsRows, rhsColumns);
+			return out_;
+
 		}
 #pragma endregion
 	}
@@ -353,6 +456,15 @@ namespace EmuMath::Helpers
 			"Attempted to multiply an EmuMath Matrix by a non-matrix right-hand type which is also not an arithmetic type."
 		);
 		return _underlying_matrix_funcs::_perform_basic_matrix_arithmetic<std::multiplies<void>>(matrix_, mult);
+	}
+	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
+	constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> MatrixMultiplication
+	(
+		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& lhs,
+		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& rhs
+	)
+	{
+		return _underlying_matrix_funcs::_multiply_matrices(lhs, rhs);
 	}
 	/// <summary>
 	/// <para> Multiplies respective elements of two matrices, instead of performing a normal matrix multiplication (e.g. c0r2` = c0r2a * c0r2b). </para>
@@ -405,6 +517,17 @@ namespace EmuMath::Helpers
 			static_assert(false, "Passed an invalid column index when attempting to get the column of an EmuMath Matrix.");
 			return typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::column_type();
 		}
+	}
+
+	template<class Matrix_>
+	std::array<typename Matrix_::row_type, Matrix_::num_rows> MatrixCopyAsRows(const Matrix_& matrix_)
+	{
+		return _underlying_matrix_funcs::_copy_all_matrix_rows(matrix_);
+	}
+	template<class Matrix_>
+	std::array<typename Matrix_::column_type, Matrix_::num_columns> MatrixCopyAsColumns(const Matrix_& matrix_)
+	{
+		return _underlying_matrix_funcs::_copy_all_matrix_columns(matrix_);
 	}
 #pragma endregion
 

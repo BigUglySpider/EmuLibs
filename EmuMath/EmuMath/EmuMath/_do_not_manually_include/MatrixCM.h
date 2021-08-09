@@ -167,6 +167,10 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::MatrixMultiplication(*this, rhs);
 		}
+		constexpr inline this_type operator*(const this_type& rhs) const
+		{
+			return EmuMath::Helpers::MatrixMultiplication(*this, rhs);
+		}
 #pragma endregion
 
 #pragma region MATRIX_OPERATIONS

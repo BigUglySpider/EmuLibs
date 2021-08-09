@@ -10,6 +10,21 @@
 using namespace EmuCore::TestingHelpers;
 using namespace EmuMath;
 
+template<typename T_, std::size_t Size_>
+inline std::ostream& operator<<(std::ostream& stream_, const std::array<T_, Size_>& arr_)
+{
+	std::ostringstream str;
+	str << "{ ";
+	str << arr_[0];
+	for (std::size_t i = 1; i < Size_; ++i)
+	{
+		str << ", " << arr_[i];
+	}
+	str << " }";
+	stream_ << str.str();
+	return stream_;
+}
+
 int main()
 {
 	const float bobs[4] = { 1.0f, 2.0f, 3.0f, 4.0f };
@@ -70,6 +85,10 @@ int main()
 	std::cout << "Column 3:\n" << blooble.GetColumn<3>() << std::endl;
 	std::cout << "Multiplied by 0.5f:\n" << (blooble * 0.5f) << std::endl;
 	std::cout << "Trace: " << blooble.Trace() << std::endl;
+	std::cout << "\n\n" << blooble << "\nMULT\n" << (blooble * 2.5f) << "\nEQUALS:\n" << (blooble * (blooble * 2.5f)) << std::endl;
+
+	std::cout << "BLOOBLE ROWS EXTRACTED INDIVIDUALLY:\n" << EmuMath::Helpers::MatrixCopyAsRows(blooble) << "\n";
+	std::cout << "BLOOBLE COLUMNS EXTRACTED INDIVIDUALLY:\n" << EmuMath::Helpers::MatrixCopyAsColumns(blooble) << "\n";
 	system("pause");
 
 #pragma region TEST_HARNESS_EXECUTION
