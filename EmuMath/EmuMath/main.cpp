@@ -52,18 +52,24 @@ int main()
 		<< "e bits: " << EmuCore::ArithmeticHelpers::num_active_bits(e) << "\t(" << std::bitset<32>(e) << ")\n";
 	
 	//EmuMath::MatrixCM<4, 4, float> blooble(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f);
-	EmuMath::MatrixCM<4, 3, float> blooble
-	(
-		EmuMath::Vector3<float>(1.0f, 5.0f, 9.0f),
-		EmuMath::Vector3<float>(2.0f, 6.0f, 10.0f),
-		EmuMath::Vector3<float>(3.0f, 7.0f, 11.0f), 
-		EmuMath::Vector3<float>(4.0f, 8.0f, 12.0f)
-	);
+	EmuMath::MatrixCM<4, 4, float> blooble
+	({
+		EmuMath::Vector4<float>(1.0f, 5.0f, 9.0f, 13.0f),
+		EmuMath::Vector4<float>(2.0f, 6.0f, 10.0f, 14.0f),
+		EmuMath::Vector4<float>(3.0f, 7.0f, 11.0f, 15.0f), 
+		EmuMath::Vector4<float>(4.0f, 8.0f, 12.0f, 16.0f)
+	});
 
 	blooble.columns[1] *= 10.0f;
-	std::cout << blooble << std::endl;
+	std::cout << "Base:\n" << blooble << std::endl;
+	std::cout << "Tranpose:\n" << blooble.Transpose() << std::endl;
 	std::cout << "Added to self:\n" << (blooble + blooble) << std::endl;
-
+	std::cout << "Subtracted from self 3 times:\n" << (blooble - blooble - blooble - blooble) << std::endl;
+	std::cout << "Negated:\n" << -blooble << std::endl;
+	std::cout << "Negated row 1:\n" << (-blooble).GetRow<1>() << std::endl;
+	std::cout << "Column 3:\n" << blooble.GetColumn<3>() << std::endl;
+	std::cout << "Multiplied by 0.5f:\n" << (blooble * 0.5f) << std::endl;
+	std::cout << "Trace: " << blooble.Trace() << std::endl;
 	system("pause");
 
 #pragma region TEST_HARNESS_EXECUTION
