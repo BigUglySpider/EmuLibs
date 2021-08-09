@@ -184,6 +184,18 @@ namespace EmuCore::TMPHelpers
 		static constexpr bool value = comparison_<ToCompareAgainst_, First_>::value;
 	};
 
+	template<template<class X__, class Y__> class comparison_, class ToCompareAgainst_, class First_, class...Others>
+	struct are_all_comparisons_true
+	{
+		static constexpr bool value = comparison_<ToCompareAgainst_, First_>::value ? are_all_comparisons_true<comparison_, ToCompareAgainst_, Others...>::value : false;
+	};
+
+	template<template<class X__, class Y__> class comparison_, class ToCompareAgainst_, class First_>
+	struct are_all_comparisons_true<comparison_, ToCompareAgainst_, First_>
+	{
+		static constexpr bool value = comparison_<ToCompareAgainst_, First_>::value;
+	};
+
 	/// <summary> Boolean indicating if any of the types passed types after ToFind_ are the same type as it. </summary>
 	/// <typeparam name="ToFind_">Type to try to find.</typeparam>
 	/// <typeparam name="First_">First type to compare to ToFind_.</typeparam>

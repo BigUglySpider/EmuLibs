@@ -53,23 +53,16 @@ int main()
 	
 	//EmuMath::MatrixCM<4, 4, float> blooble(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f);
 	EmuMath::MatrixCM<4, 3, float> blooble
-	({
+	(
 		EmuMath::Vector3<float>(1.0f, 5.0f, 9.0f),
 		EmuMath::Vector3<float>(2.0f, 6.0f, 10.0f),
 		EmuMath::Vector3<float>(3.0f, 7.0f, 11.0f), 
 		EmuMath::Vector3<float>(4.0f, 8.0f, 12.0f)
-	});
+	);
 
 	blooble.columns[1] *= 10.0f;
 	std::cout << blooble << std::endl;
-	std::cout << "Row 2: " << blooble.GetRow<2>() << std::endl;
-	std::cout << "Row 1: " << blooble.GetRow(1) << std::endl;
-	std::cout << blooble.Transpose() << std::endl;
-	std::cout << "Transposed Row 0: " << blooble.GetRow(0) << std::endl;
-
-	float blob[4] = { 1.0f, 2.0f, 3.0f, 4.0f };
-	EmuMath::MatrixCM<3, 2, float> bloobs(blob);
-	std::cout << bloobs << std::endl;
+	std::cout << "Added to self:\n" << (blooble + blooble) << std::endl;
 
 	system("pause");
 

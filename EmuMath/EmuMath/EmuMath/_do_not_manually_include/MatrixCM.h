@@ -58,6 +58,14 @@ namespace EmuMath
 
 		using this_type = MatrixCM<num_columns, num_rows, value_type>;
 
+	private:
+		template<typename...PassedColumns_>
+		static constexpr bool _valid_template_constructor_args()
+		{
+			return (sizeof...(PassedColumns_) == num_columns) && EmuCore::TMPHelpers::are_all_comparisons_true<std::is_same, column_type, PassedColumns_...>::value;
+		}
+
+	public:
 		/// <summary> Constructs this matrix with all data also default constructed. </summary>
 		constexpr MatrixCM() : columns()
 		{
@@ -67,22 +75,42 @@ namespace EmuMath
 		constexpr MatrixCM(const packed_data_type& toCopy_) : columns(toCopy_)
 		{
 		}
+
 		/// <summary> Copies the passed matrix's data to this matrix upon construction. </summary>
 		/// <param name="toCopy_">Matrix to copy to this matrix.</param>
 		constexpr MatrixCM(const this_type& toCopy_) : MatrixCM(toCopy_.columns)
 		{
 		}
+
+		/// <summary>
+		/// <para> Constructs a matrix from the passed columns. </para>
+		/// <para> The passed columns are required to be of this matrix's column_type, and a number of arguments equal to this matrix's num_columns is required. </para>
+		/// </summary>
+		/// <typeparam name="FirstColumn">Type of the first column. Must match this matrix's column_type.</typeparam>
+		/// <typeparam name="...AdditionalColumns_">Types of all sequential columns after the first column. Must match this matrix's column_type.</typeparam>
+		/// <typeparam name="RequiresMatchingColumns_">Dummy type used to perform the test to produce clear errors when providing invalid arguments.</typeparam>
+		/// <param name="firstColumn_">The first column for the constructed matrix.</param>
+		/// <param name="additionalColumns_">All sequential columns after the first column in the matrix. The total number of arguments should equate to this matrix's num_columns.</param>
+		template
+		<
+			typename FirstColumn,
+			typename...AdditionalColumns_,
+			typename RequiresMatchingColumns_ = std::enable_if_t<_valid_template_constructor_args<FirstColumn, AdditionalColumns_...>()>
+		>
+		constexpr MatrixCM(const FirstColumn& firstColumn_, const AdditionalColumns_&...additionalColumns_) : columns({firstColumn_, additionalColumns_...})
+		{
+		}
 		/// <summary> Copies the pointed-to column_types to this matrix's data contiguously for the provided number of bytes after default construction. </summary>
 		/// <param name="pColumnsToCopy">Pointer to the column data that will be copied after default construction.</param>
 		/// <param name="numBytes">The number of bytes to copy. Defaults to the full stride of this matrix's data.</param>
-		constexpr MatrixCM(const column_type* pColumnsToCopy, std::size_t numBytes = sizeof(packed_data_type)) : MatrixCM()
+		MatrixCM(const column_type* pColumnsToCopy, std::size_t numBytes = sizeof(packed_data_type)) : MatrixCM()
 		{
 			memcpy(columns.data(), pColumnsToCopy, numBytes);
 		}
 		/// <summary> Copies the pointer-to value_types to this matrix's data contiguously for the provided number of bytes after default construction. </summary>
 		/// <param name="pDataToCopy">Pointer to the value data that will be copied after default construction.</param>
 		/// <param name="numBytes">The number of bytes to copy. Defaults to the full stride of this matrix's data.</param>
-		constexpr MatrixCM(const value_type* pDataToCopy, std::size_t numBytes = sizeof(packed_data_type)) : MatrixCM()
+		MatrixCM(const value_type* pDataToCopy, std::size_t numBytes = sizeof(packed_data_type)) : MatrixCM()
 		{
 			memcpy(columns.data(), pDataToCopy, numBytes);
 		}
@@ -143,6 +171,42 @@ namespace EmuMath
 				static_assert(false, "Provided an invalid column index to EmuMath::MatrixCM::at.");
 			}
 		}
+
+#pragma region CONST_OPERATORS
+		constexpr inline this_type operator+(const this_type& rhs) const
+		{
+			this_type out = this_type();
+			this->template _perform_addition<0>(out, rhs);
+			return out;
+		}
+
+		template<std::size_t Row_>
+		constexpr inline void _perform_column_scalar_addition(column_type& outColumn, const column_type& thisColumn, const column_type& rhsColumn)
+		{
+			if constexpr (Row_ < num_rows)
+			{
+				outColumn[Row_] = thisColumn[Row_] + rhsColumn[Row_];
+				this->template _perform_column_scalar_addition<Row_ + 1>(outColumn, thisColumn, rhsColumn);
+			}
+		}
+
+		template<std::size_t Column_>
+		constexpr inline void _perform_addition(this_type& out_, const this_type& rhs) const
+		{
+			if constexpr (Column_ < num_columns)
+			{
+				if constexpr (uses_vector_columns)
+				{
+					out_.columns[Column_] = this->columns[Column_] + rhs.columns[Column_];
+				}
+				else
+				{
+					this->template _perform_column_scalar_addition<0>(out_.columns[Column_], this->columns[Column_], rhs.columns[Column_]);
+				}
+				this->template _perform_addition<Column_ + 1>(out_, rhs);
+			}
+		}
+#pragma endregion
 
 		/// <summary> Returns the transpose of this matrix. The dimensions of the returned matrix will be the reverse of this matrix (e.g. a 4x3 transpose will be 3x4). </summary>
 		/// <returns>Transpose matrix to this matrix.</returns>
