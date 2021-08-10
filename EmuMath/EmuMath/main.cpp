@@ -72,8 +72,6 @@ int main()
 	constexpr EmuMath::MatrixCM<25, 25, float> mat_25x25_identity = EmuMath::MatrixCM<25, 25, float>::Identity();
 	std::cout << mat_25x25_identity << "\n";
 
-	EmuMath::TMPHelpers::emu_matrix_identity_v<6, 6, float, EmuMath::MatrixCM>;
-
 	//blooble.columns[1] *= 10.0f;
 	std::cout << "Base:\n" << blooble << std::endl;
 	std::cout << "Tranpose:\n" << blooble.Transpose() << std::endl;

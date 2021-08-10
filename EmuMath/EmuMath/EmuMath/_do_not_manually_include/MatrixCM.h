@@ -147,6 +147,40 @@ namespace EmuMath
 		{
 		}
 		
+		/// <summary> Special constructor only available to 4x4 matrices. Takes contiguous arguments in column order and constructs the matrix data via them. </summary>
+		/// <typeparam name="C0R0_">Type used to represent Column 0, Row 0. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C0R1_">Type used to represent Column 0, Row 1. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C0R2_">Type used to represent Column 0, Row 2. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C0R3_">Type used to represent Column 0, Row 3. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C1R0_">Type used to represent Column 1, Row 0. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C1R1_">Type used to represent Column 1, Row 1. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C1R2_">Type used to represent Column 1, Row 2. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C1R3_">Type used to represent Column 1, Row 3. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C2R0_">Type used to represent Column 2, Row 0. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C2R1_">Type used to represent Column 2, Row 1. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C2R2_">Type used to represent Column 2, Row 2. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C2R3_">Type used to represent Column 2, Row 3. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C3R0_">Type used to represent Column 3, Row 0. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C3R1_">Type used to represent Column 3, Row 1. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C3R2_">Type used to represent Column 3, Row 2. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C3R3_">Type used to represent Column 3, Row 3. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="Requires4x4">Dummy paremeter used to make use of std::enable_if check.</typeparam>
+		/// <param name="c0r0_">Value to initialise this matrix's data at Column 0, Row 0.</param>
+		/// <param name="c0r1_">Value to initialise this matrix's data at Column 0, Row 1.</param>
+		/// <param name="c0r2_">Value to initialise this matrix's data at Column 0, Row 2.</param>
+		/// <param name="c0r3_">Value to initialise this matrix's data at Column 0, Row 3.</param>
+		/// <param name="c1r0_">Value to initialise this matrix's data at Column 1, Row 0.</param>
+		/// <param name="c1r1_">Value to initialise this matrix's data at Column 1, Row 1.</param>
+		/// <param name="c1r2_">Value to initialise this matrix's data at Column 1, Row 2.</param>
+		/// <param name="c1r3_">Value to initialise this matrix's data at Column 1, Row 3.</param>
+		/// <param name="c2r0_">Value to initialise this matrix's data at Column 2, Row 0.</param>
+		/// <param name="c2r1_">Value to initialise this matrix's data at Column 2, Row 1.</param>
+		/// <param name="c2r2_">Value to initialise this matrix's data at Column 2, Row 2.</param>
+		/// <param name="c2r3_">Value to initialise this matrix's data at Column 2, Row 3.</param>
+		/// <param name="c3r0_">Value to initialise this matrix's data at Column 3, Row 0.</param>
+		/// <param name="c3r1_">Value to initialise this matrix's data at Column 3, Row 1.</param>
+		/// <param name="c3r2_">Value to initialise this matrix's data at Column 3, Row 2.</param>
+		/// <param name="c3r3_">Value to initialise this matrix's data at Column 3, Row 3.</param>
 		template
 		<// --- TEMPLATE PARAMS
 			typename C0R0_, typename C0R1_, typename C0R2_, typename C0R3_,
@@ -291,7 +325,9 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::MatrixTrace<OutT_>(*this);
 		}
-		
+		/// <summary> Returns the Identity matrix for this type of matrix. </summary>
+		/// <typeparam name="RequiresSquareMatrix">Dummy parameter to make use of std::enable_if.</typeparam>
+		/// <returns>Identity matrix of this matrix type, as long as it is a square matrix.</returns>
 		template<typename RequiresSquareMatrix = std::enable_if_t<is_square>>
 		static constexpr this_type Identity()
 		{
