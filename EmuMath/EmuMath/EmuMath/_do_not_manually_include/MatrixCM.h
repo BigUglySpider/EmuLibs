@@ -336,6 +336,12 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::MatrixIdentity<this_type>();
 		}
+
+		template<std::size_t BeginColumn, std::size_t EndColumn, std::size_t BeginRow, std::size_t EndRow>
+		EmuMath::MatrixCM<EndColumn - BeginColumn + 1, EndRow - BeginRow + 1, value_type> SubMatrix() const
+		{
+			return EmuMath::Helpers::MatrixSubMatrix<BeginColumn, EndColumn, BeginRow, EndRow, this_type>(*this);
+		}
 #pragma endregion
 
 		/// <summary> Appends a row of this matrix to the passed out stream. </summary>

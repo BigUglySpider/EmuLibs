@@ -92,6 +92,7 @@ int main()
 
 	std::cout << "Submatrix(0-1, 0-1):\n" << EmuMath::Helpers::MatrixSubMatrix<0, 1, 0, 1>(blooble) << std::endl;
 	std::cout << "Submatrix(0-1, 1-3):\n" << EmuMath::Helpers::MatrixSubMatrix<0, 1, 1, 3>(blooble) << std::endl;
+	std::cout << "Submatrix(2:3, 0:3):\n" << blooble.SubMatrix<2, 3, 0, 3>() << std::endl;
 
 	system("pause");
 
