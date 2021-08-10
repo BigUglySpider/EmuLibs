@@ -29,6 +29,7 @@ namespace EmuMath
 		static constexpr std::size_t num_rows = NumRows_;
 		/// <summary> Boolean indicating if the columns within this vector are stored as EmuMath vectors. </summary>
 		static constexpr bool uses_vector_storage = NumRows_ >= 2 && NumRows_ <= 4;
+		static constexpr bool is_square = (num_columns == num_rows);
 
 		using this_type = MatrixCM<num_columns, num_rows, value_type>;
 
@@ -41,7 +42,7 @@ namespace EmuMath
 
 	public:
 		/// <summary> Constructs this matrix with all data also default constructed. </summary>
-		constexpr MatrixCM() : columns()
+		constexpr MatrixCM() : columns({})
 		{
 		}
 		/// <summary> Copies the passed packed column data to this matrix's column data upon construction. </summary>
@@ -52,11 +53,6 @@ namespace EmuMath
 		/// <summary> Copies the passed matrix's data to this matrix upon construction. </summary>
 		/// <param name="toCopy_">Matrix to copy to this matrix.</param>
 		constexpr MatrixCM(const this_type& toCopy_) : MatrixCM(toCopy_.columns)
-		{
-		}
-		/// <summary> Creates this matrix with its data set via the passed nitializer list. </summary>
-		/// <param name="dataInitList_">Initializer list to construct this matrix's data from.</param>
-		constexpr MatrixCM(std::initializer_list<packed_data_type> dataInitList_) : columns(dataInitList_)
 		{
 		}
 		/// <summary>
@@ -173,6 +169,31 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region NON_CONST_OPERATORS
+		constexpr inline this_type& operator=(const this_type& rhs)
+		{
+			_perform_set<0, 0>(rhs);
+			return *this;
+		}
+
+		template<std::size_t Column_, std::size_t Row_>
+		constexpr inline void _perform_set(const this_type& rhs)
+		{
+			if constexpr (Column_ < num_columns)
+			{
+				if constexpr (Row_ < num_rows)
+				{
+					at<Column_, Row_>() = rhs.template at<Column_, Row_>();
+					_perform_set<Column_, Row_ + 1>(rhs);
+				}
+				else
+				{
+					_perform_set<Column_ + 1, 0>(rhs);
+				}
+			}
+		}
+#pragma endregion
+
 #pragma region MATRIX_OPERATIONS
 		/// <summary> Returns the transpose of this matrix. The dimensions of the returned matrix will be the reverse of this matrix (e.g. a 4x3 transpose will be 3x4). </summary>
 		/// <returns>Transpose matrix to this matrix.</returns>
@@ -181,10 +202,16 @@ namespace EmuMath
 			return EmuMath::Helpers::MatrixTranspose(*this);
 		}
 
-		template<typename OutT_ = value_type, typename RequiresSquareMatrix = std::enable_if_t<num_columns == num_rows>>
-		OutT_ Trace() const
+		template<typename OutT_ = value_type, typename RequiresSquareMatrix = std::enable_if_t<is_square>>
+		constexpr inline OutT_ Trace() const
 		{
 			return EmuMath::Helpers::MatrixTrace<OutT_>(*this);
+		}
+		
+		template<typename RequiresSquareMatrix = std::enable_if_t<is_square>>
+		static constexpr this_type Identity()
+		{
+			return EmuMath::Helpers::MatrixIdentity<this_type>();
 		}
 #pragma endregion
 

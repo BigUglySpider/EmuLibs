@@ -52,12 +52,12 @@ namespace EmuMath::Helpers
 				if constexpr (std::is_arithmetic_v<std::remove_reference_t<Rhs_>>)
 				{
 					outColumn_[Row_] = func_(lhsColumn[Row_], rhs);
-					_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<Row_ + 1, ArithmeticFunc_>(outColumn_, lhsColumn, rhs, func_);
+					_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<Row_ + 1, ArithmeticFunc_, num_columns, num_rows, value_type>(outColumn_, lhsColumn, rhs, func_);
 				}
 				else
 				{
 					outColumn_[Row_] = func_(lhsColumn[Row_], rhs[Row_]);
-					_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<Row_ + 1, ArithmeticFunc_>(outColumn_, lhsColumn, rhs, func_);
+					_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<Row_ + 1, ArithmeticFunc_, num_columns, num_rows, value_type>(outColumn_, lhsColumn, rhs, func_);
 				}
 			}
 		}
@@ -72,7 +72,7 @@ namespace EmuMath::Helpers
 			if constexpr (Row_ < num_rows)
 			{
 				outColumn_[Row_] = func_(matrix_[Row_]);
-				_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<Row_ + 1, ArithmeticFunc_>(outColumn_, matrix_, func_);
+				_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<Row_ + 1, ArithmeticFunc_, num_columns, num_rows, value_type>(outColumn_, matrix_, func_);
 			}
 		}
 
@@ -107,7 +107,7 @@ namespace EmuMath::Helpers
 				{
 					if constexpr (std::is_same_v<EmuMath::MatrixCM<num_columns, num_rows, value_type>, Rhs_>)
 					{
-						_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<0, ArithmeticFunc_>
+						_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<0, ArithmeticFunc_, num_columns, num_rows, value_type>
 						(
 							out_.columns[Column_],
 							lhs.columns[Column_],
@@ -117,7 +117,7 @@ namespace EmuMath::Helpers
 					}
 					else if constexpr (std::is_arithmetic_v<std::remove_reference_t<Rhs_>>)
 					{
-						_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<0, ArithmeticFunc_>
+						_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<0, ArithmeticFunc_, num_columns, num_rows, value_type>
 						(
 							out_.columns[Column_],
 							lhs.columns[Column_],
@@ -345,6 +345,17 @@ namespace EmuMath::Helpers
 				return OutT_(0);
 			}
 		}
+
+		template<std::size_t Index_, class Matrix_>
+		constexpr void _fill_identity_matrix(Matrix_& matrix_)
+		{
+			if constexpr (Index_ < Matrix_::num_rows)
+			{
+				using value_type = typename Matrix_::value_type;
+				_get_matrix_data_value<Index_, Index_>(matrix_) = value_type(1);
+				_fill_identity_matrix<Index_ + 1>(matrix_);
+			}
+		}
 #pragma endregion
 
 #pragma region MATRIX_ARITHMETIC
@@ -540,7 +551,7 @@ namespace EmuMath::Helpers
 		return out_;
 	}
 
-	template<typename OutT_ = float, typename Matrix_ = void>
+	template<typename OutT_ = float, class Matrix_ = void>
 	constexpr inline OutT_ MatrixTrace(const Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
@@ -558,6 +569,36 @@ namespace EmuMath::Helpers
 		{
 			static_assert(false, "Passed a non-EmuMath Matrix argument when attempting to get the trace of a matrix.");
 		}
+	}
+
+	template
+	<
+		class Matrix_,
+		typename RequiresSquareMatrix = std::enable_if_t<Matrix_::is_square>
+	>
+	constexpr inline Matrix_ MatrixIdentity()
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
+		{
+			Matrix_ out_ = Matrix_();
+			_underlying_matrix_funcs::_fill_identity_matrix<0>(out_);
+			return out_;
+			//return Matrix_();
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the identity matrix of a type that is not an EmuMath matrix.");
+			return Matrix_();
+		}
+	}
+	template
+	<
+		class Matrix_,
+		typename RequiresSquareMatrix = std::enable_if_t<Matrix_::is_square>
+	>
+	constexpr inline Matrix_ MatrixIdentity(const Matrix_& matrix_)
+	{
+		return MatrixIdentity<Matrix_>();
 	}
 #pragma endregion
 }
