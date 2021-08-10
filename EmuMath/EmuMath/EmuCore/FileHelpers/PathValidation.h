@@ -2,6 +2,7 @@
 #define EMU_CORE_PATH_VALIDATION_H_INC_
 
 #include <filesystem>
+#include <string>
 
 namespace EmuCore::FileHelpers
 {

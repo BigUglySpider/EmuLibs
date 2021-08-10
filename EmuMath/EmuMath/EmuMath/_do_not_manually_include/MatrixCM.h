@@ -42,7 +42,7 @@ namespace EmuMath
 
 	public:
 		/// <summary> Constructs this matrix with all data also default constructed. </summary>
-		constexpr MatrixCM() : columns({})
+		constexpr MatrixCM() : columns()
 		{
 		}
 		/// <summary> Copies the passed packed column data to this matrix's column data upon construction. </summary>
@@ -73,6 +73,7 @@ namespace EmuMath
 		constexpr MatrixCM(const FirstColumn& firstColumn_, const AdditionalColumns_&...additionalColumns_) : columns({firstColumn_, additionalColumns_...})
 		{
 		}
+
 		/// <summary> Copies the pointed-to column_types to this matrix's data contiguously for the provided number of bytes after default construction. </summary>
 		/// <param name="pColumnsToCopy">Pointer to the column data that will be copied after default construction.</param>
 		/// <param name="numBytes">The number of bytes to copy. Defaults to the full stride of this matrix's data.</param>
@@ -87,6 +88,89 @@ namespace EmuMath
 		{
 			memcpy(columns.data(), pDataToCopy, numBytes);
 		}
+
+#pragma region SPECIAL_CONSTRUCTORS
+		/// <summary> Special constructor only available to 2x2 matrices. Takes contiguous arguments in column order and constructs the matrix data via them. </summary>
+		/// <typeparam name="C0R0_">Type used to represent Column 0, Row 0. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C0R1_">Type used to represent Column 0, Row 1. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C1R0_">Type used to represent Column 1, Row 0. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C1R1_">Type used to represent Column 1, Row 1. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="Requires2x2">Dummy paremeter used to make use of std::enable_if check.</typeparam>
+		/// <param name="c0r0_">Value to initialise this matrix's data at Column 0, Row 0.</param>
+		/// <param name="c0r1_">Value to initialise this matrix's data at Column 0, Row 1.</param>
+		/// <param name="c1r0_">Value to initialise this matrix's data at Column 1, Row 0.</param>
+		/// <param name="c1r1_">Value to initialise this matrix's data at Column 1, Row 1.</param>
+		template<typename C0R0_, typename C0R1_, typename C1R0_, typename C1R1_, typename Requires2x2 = std::enable_if_t<num_columns == 2 && num_rows == 2>>
+		constexpr MatrixCM(C0R0_ c0r0_, C0R1_ c0r1_, C1R0_ c1r0_, C1R1_ c1r1_)
+			: columns({ column_type(c0r0_, c0r1_), column_type(c1r0_, c1r1_) })
+		{
+		}
+
+		/// <summary> Special constructor only available to 3x3 matrices. Takes contiguous arguments in column order and constructs the matrix data via them. </summary>
+		/// <typeparam name="C0R0_">Type used to represent Column 0, Row 0. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C0R1_">Type used to represent Column 0, Row 1. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C0R2_">Type used to represent Column 0, Row 2. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C1R0_">Type used to represent Column 1, Row 0. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C1R1_">Type used to represent Column 1, Row 1. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C1R2_">Type used to represent Column 1, Row 2. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C2R0_">Type used to represent Column 2, Row 0. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C2R1_">Type used to represent Column 2, Row 1. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="C2R2_">Type used to represent Column 2, Row 2. Must be of the type stored within column_type or convertible to it.</typeparam>
+		/// <typeparam name="Requires3x3">Dummy paremeter used to make use of std::enable_if check.</typeparam>
+		/// <param name="c0r0_">Value to initialise this matrix's data at Column 0, Row 0.</param>
+		/// <param name="c0r1_">Value to initialise this matrix's data at Column 0, Row 1.</param>
+		/// <param name="c0r2_">Value to initialise this matrix's data at Column 0, Row 2.</param>
+		/// <param name="c1r0_">Value to initialise this matrix's data at Column 1, Row 0.</param>
+		/// <param name="c1r1_">Value to initialise this matrix's data at Column 1, Row 1.</param>
+		/// <param name="c1r2_">Value to initialise this matrix's data at Column 1, Row 2.</param>
+		/// <param name="c2r0_">Value to initialise this matrix's data at Column 2, Row 0.</param>
+		/// <param name="c2r1_">Value to initialise this matrix's data at Column 2, Row 1.</param>
+		/// <param name="c2r2_">Value to initialise this matrix's data at Column 2, Row 2.</param>
+		template
+		<// --- TEMPLATE PARAMS
+			typename C0R0_, typename C0R1_, typename C0R2_,
+			typename C1R0_, typename C1R1_, typename C1R2_,
+			typename C2R0_, typename C2R1_, typename C2R2_,
+			typename Requires3x3 = std::enable_if_t<num_columns == 3 && num_rows == 3>
+		>
+		constexpr MatrixCM
+		(// --- ARGS
+			C0R0_ c0r0_, C0R1_ c0r1_, C0R2_ c0r2_,
+			C1R0_ c1r0_, C1R1_ c1r1_, C1R2_ c1r2_,
+			C2R0_ c2r0_, C2R1_ c2r1_, C2R2_ c2r2_
+		) : columns
+			({// --- COLUMNS INIT
+				column_type(c0r0_, c0r1_, c0r2_),
+				column_type(c1r0_, c1r1_, c1r2_),
+				column_type(c2r0_, c2r1_, c2r2_)
+			})
+		{
+		}
+		
+		template
+		<// --- TEMPLATE PARAMS
+			typename C0R0_, typename C0R1_, typename C0R2_, typename C0R3_,
+			typename C1R0_, typename C1R1_, typename C1R2_, typename C1R3_,
+			typename C2R0_, typename C2R1_, typename C2R2_, typename C2R3_,
+			typename C3R0_, typename C3R1_, typename C3R2_, typename C3R3_,
+			typename Requires4x4 = std::enable_if_t<num_columns == 4 && num_rows == 4>
+		>
+		constexpr MatrixCM
+		(// --- ARGS
+			C0R0_ c0r0_, C0R1_ c0r1_, C0R2_ c0r2_, C0R3_ c0r3_,
+			C1R0_ c1r0_, C1R1_ c1r1_, C1R2_ c1r2_, C1R3_ c1r3_,
+			C2R0_ c2r0_, C2R1_ c2r1_, C2R2_ c2r2_, C2R3_ c2r3_,
+			C3R0_ c3r0_, C3R1_ c3r1_, C3R2_ c3r2_, C3R3_ c3r3_
+		) : columns
+			({// --- COLUMNS INIT
+				column_type(c0r0_, c0r1_, c0r2_, c0r3_),
+				column_type(c1r0_, c1r1_, c1r2_, c1r3_),
+				column_type(c2r0_, c2r1_, c2r2_, c2r3_),
+				column_type(c3r0_, c3r1_, c3r2_, c3r3_)
+			})
+		{
+		}
+#pragma endregion
 
 		/// <summary> Returns a copy of the element at the provided point in this matrix, where Column_ is the horizontal index and Row_ is the vertical index. </summary>
 		/// <returns>Copy of the value at the specified point in this matrix.</returns>
@@ -219,7 +303,7 @@ namespace EmuMath
 		/// <param name="stream_">Reference to the stream to append to.</param>
 		/// <returns>Reference to the passed output stream.</returns>
 		template<std::size_t Row_>
-		std::ostream& AppendRowToStream(std::ostream& stream_) const
+		inline std::ostream& AppendRowToStream(std::ostream& stream_) const
 		{
 			if constexpr (Row_ < NumRows_)
 			{
@@ -237,14 +321,14 @@ namespace EmuMath
 		/// <summary> Returns a collection of data representing a copy of an individual row within this matrix. </summary>
 		/// <returns>Specified row of this matrix. If inclusively between 2-4 dimensions, the row will be an EmuMath Vector, otherwise a std::array.</returns>
 		template<std::size_t Row_>
-		row_type GetRow() const
+		inline row_type GetRow() const
 		{
 			return EmuMath::Helpers::MatrixGetRow<Row_>(*this);
 		}
 		/// <summary> Returns a copy of an individual column of this matrix. Identical to copying ThisMatrix.columns[Column_]. </summary>
 		/// <returns>Copy of the column at the specified index.</returns>
 		template<std::size_t Column_>
-		column_type GetColumn() const
+		inline column_type GetColumn() const
 		{
 			return EmuMath::Helpers::MatrixGetColumn<Column_>(*this);
 		}
@@ -261,7 +345,7 @@ namespace EmuMath
 		/// <summary> Appends a row to a stream from the passed column. Uses recursion to go through all columns within the row, appending each to the stream. </summary>
 		/// <param name="stream_">Stream to append to.</param>
 		template<std::size_t Column_, std::size_t Row_>
-		void _append_row_to_stream_from_column(std::ostream& stream_) const
+		inline void _append_row_to_stream_from_column(std::ostream& stream_) const
 		{
 			stream_ << this->at<Column_, Row_>();
 			if constexpr ((Column_ + 1) < NumColumns_)

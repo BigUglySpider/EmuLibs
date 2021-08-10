@@ -66,18 +66,13 @@ int main()
 		<< "d bits: " << EmuCore::ArithmeticHelpers::num_active_bits(d) << "\t(" << std::bitset<32>(d) << ")\n"
 		<< "e bits: " << EmuCore::ArithmeticHelpers::num_active_bits(e) << "\t(" << std::bitset<32>(e) << ")\n";
 	
-	//EmuMath::MatrixCM<4, 4, float> blooble(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f);
-	//muMath::MatrixCM<4, 4, float> blooble
-	//{
-	//	EmuMath::Vector4<float>(1.0f, 5.0f, 9.0f, 13.0f),
-	//	EmuMath::Vector4<float>(2.0f, 6.0f, 10.0f, 14.0f),
-	//	EmuMath::Vector4<float>(3.0f, 7.0f, 11.0f, 15.0f), 
-	//	EmuMath::Vector4<float>(4.0f, 8.0f, 12.0f, 16.0f)
-	//);
-	EmuMath::MatrixCM<2, 2, float> blooble(EmuMath::MatrixCM<2, 2, float>::packed_data_type({ EmuMath::Vector2<float>(1.0f, 1.0f), EmuMath::Vector2<float>(1.0f, 1.0f) }));
+	
+	EmuMath::MatrixCM<4, 4, float> blooble(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f);
 
 	constexpr EmuMath::MatrixCM<25, 25, float> mat_25x25_identity = EmuMath::MatrixCM<25, 25, float>::Identity();
 	std::cout << mat_25x25_identity << "\n";
+
+	EmuMath::TMPHelpers::emu_matrix_identity_v<6, 6, float, EmuMath::MatrixCM>;
 
 	//blooble.columns[1] *= 10.0f;
 	std::cout << "Base:\n" << blooble << std::endl;
