@@ -42,13 +42,13 @@ namespace EmuMath::TMPHelpers
 		static constexpr matrix_type value = matrix_type::Identity();
 	};
 	template
-		<
+	<
 		std::size_t num_columns,
 		std::size_t num_rows,
 		typename value_type,
 		template<std::size_t NumColumns__, std::size_t NumRows__, typename T__> class matrix_template
-		>
-		static constexpr matrix_template<num_columns, num_rows, value_type> emu_matrix_identity_v = emu_matrix_identity<num_columns, num_rows, value_type, matrix_template>::value;
+	>
+	static constexpr matrix_template<num_columns, num_rows, value_type> emu_matrix_identity_v = emu_matrix_identity<num_columns, num_rows, value_type, matrix_template>::value;
 }
 
 #endif
