@@ -14,6 +14,9 @@ namespace EmuMath
 	struct MatrixCM
 	{
 	public:
+		template<std::size_t NumColumns__, std::size_t NumRows__, typename T__>
+		using matrix_template = MatrixCM;
+
 		/// <summary> The type used to represent an individual value within this matrix. </summary>
 		using value_type = T_;
 		/// <summary> The type used to represent a column within this matrix. Used for storage due to this matrix's column-major nature. </summary>

@@ -88,6 +88,11 @@ int main()
 	std::cout << "BLOOBLE COLUMNS EXTRACTED INDIVIDUALLY:\n" << EmuMath::Helpers::MatrixCopyAsColumns(blooble) << "\n";
 
 	std::cout << "Identity:\n" << blooble.Identity() << std::endl;
+
+
+	std::cout << "Submatrix(0-1, 0-1):\n" << EmuMath::Helpers::MatrixSubMatrix<0, 1, 0, 1>(blooble) << std::endl;
+	std::cout << "Submatrix(0-1, 1-3):\n" << EmuMath::Helpers::MatrixSubMatrix<0, 1, 1, 3>(blooble) << std::endl;
+
 	system("pause");
 
 #pragma region TEST_HARNESS_EXECUTION

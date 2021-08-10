@@ -356,6 +356,31 @@ namespace EmuMath::Helpers
 				_fill_identity_matrix<Index_ + 1>(matrix_);
 			}
 		}
+
+		template<std::size_t BeginColumn, std::size_t EndColumn, std::size_t BeginRow, std::size_t EndRow, std::size_t OutColumn, std::size_t OutRow, class Matrix_, class Out_>
+		constexpr inline void _fill_matrix_submatrix(const Matrix_& matrix_, Out_& out_)
+		{
+			if constexpr (OutColumn < Out_::num_columns)
+			{
+				if constexpr (OutRow < Out_::num_rows)
+				{
+					_get_matrix_data_value<OutColumn, OutRow>(out_) = _get_matrix_data_value<BeginColumn + OutColumn, BeginRow + OutRow>(matrix_);
+					_fill_matrix_submatrix<BeginColumn, EndColumn, BeginRow, EndRow, OutColumn, OutRow + 1, Matrix_, Out_>(matrix_, out_);
+				}
+				else
+				{
+					_fill_matrix_submatrix<BeginColumn, EndColumn, BeginRow, EndRow, OutColumn + 1, 0, Matrix_, Out_>(matrix_, out_);
+				}
+			}
+		}
+
+		template<std::size_t BeginColumn, std::size_t EndColumn, std::size_t BeginRow, std::size_t EndRow, class Matrix_, class Out_>
+		constexpr inline Out_ _find_matrix_submatrix(const Matrix_& matrix_)
+		{
+			Out_ out_ = Out_();
+			_fill_matrix_submatrix<BeginColumn, EndColumn, BeginRow, EndRow, 0, 0, Matrix_, Out_>(matrix_, out_);
+			return out_;
+		}
 #pragma endregion
 
 #pragma region MATRIX_ARITHMETIC
@@ -583,7 +608,6 @@ namespace EmuMath::Helpers
 			Matrix_ out_ = Matrix_();
 			_underlying_matrix_funcs::_fill_identity_matrix<0>(out_);
 			return out_;
-			//return Matrix_();
 		}
 		else
 		{
@@ -599,6 +623,98 @@ namespace EmuMath::Helpers
 	constexpr inline Matrix_ MatrixIdentity(const Matrix_& matrix_)
 	{
 		return MatrixIdentity<Matrix_>();
+	}
+
+	/// <summary>
+	/// <para> Returns a smaller matrix contained within the passed matrix at the given ranges. </para>
+	/// </summary>
+	/// <typeparam name="Matrix_"></typeparam>
+	/// <param name="matrix_"></param>
+	/// <returns></returns>
+	template<std::size_t BeginColumn, std::size_t EndColumn, std::size_t BeginRow, std::size_t EndRow, class Matrix_>
+	constexpr inline typename TMPHelpers::emu_matrix_matching_template<EndColumn - BeginColumn + 1, EndRow - BeginRow + 1, typename Matrix_::value_type, Matrix_>::type MatrixSubMatrix
+	(
+		const Matrix_& matrix_
+	)
+	{
+		// NOTE: Output type is handled the way it is to allow nice intellisense
+		// --- Sometimes using a cleaner alias results in intellisense saying the alias rather than a clear output type when calling the function
+
+		constexpr std::size_t OutColumns = EndColumn - BeginColumn + 1;
+		constexpr std::size_t OutRows = EndRow - BeginRow + 1;
+		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
+		{
+			if constexpr (EndColumn > BeginColumn)
+			{
+				if constexpr (EndRow > BeginRow)
+				{
+					if constexpr (OutColumns <= Matrix_::num_columns)
+					{
+						if constexpr (OutRows <= Matrix_::num_rows)
+						{
+							if constexpr (EndColumn < Matrix_::num_columns)
+							{
+								if constexpr (EndRow < Matrix_::num_rows)
+								{
+									if constexpr (OutColumns == Matrix_::num_columns && OutRows == Matrix_::num_rows)
+									{
+										// Only reach this point if we're covering the full matrix, so quickly return a copy of the matrix instead.
+										return matrix_;
+									}
+									else
+									{
+										return _underlying_matrix_funcs::_find_matrix_submatrix
+										<
+											BeginColumn,
+											EndColumn,
+											BeginRow,
+											EndRow,
+											Matrix_,
+											typename EmuMath::TMPHelpers::emu_matrix_matching_template<OutColumns, OutRows, typename Matrix_::value_type, Matrix_>::type
+										>(matrix_);
+									}
+								}
+								else
+								{
+									static_assert(false, "Attempting to output a submatrix within a matrix, but the indices of the submatrix rows exceed those of the full matrix.");
+									return typename EmuMath::TMPHelpers::emu_matrix_matching_template<OutColumns, OutRows, typename Matrix_::value_type, Matrix_>::type();
+								}
+							}
+							else
+							{
+								static_assert(false, "Attempting to output a submatrix within a matrix, but the indices of the submatrix columns exceed those of the full matrix.");
+								return typename EmuMath::TMPHelpers::emu_matrix_matching_template<OutColumns, OutRows, typename Matrix_::value_type, Matrix_>::type();
+							}
+						}
+						else
+						{
+							static_assert(false, "Attempting to output a submatrix within a matrix, but the output submatrix has more rows than the full matrix.");
+							return typename EmuMath::TMPHelpers::emu_matrix_matching_template<OutColumns, OutRows, typename Matrix_::value_type, Matrix_>::type();
+						}
+					}
+					else
+					{
+						static_assert(false, "Attempting to output a submatrix within a matrix, but the output submatrix has more columns than the full matrix.");
+						return typename EmuMath::TMPHelpers::emu_matrix_matching_template<OutColumns, OutRows, typename Matrix_::value_type, Matrix_>::type();
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempting to output a submatrix within a matrix, but the end row indices are not greater than the begin row indices.");
+					return typename EmuMath::TMPHelpers::emu_matrix_matching_template<OutColumns, OutRows, typename Matrix_::value_type, Matrix_>::type();
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempting to output a submatrix within a matrix, but the end column indices are not greater than the begin column indices.");
+				return typename EmuMath::TMPHelpers::emu_matrix_matching_template<OutColumns, OutRows, typename Matrix_::value_type, Matrix_>::type();
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempting to output a submatrix within a matrix, but passed a non-EmuMath-matrix type.");
+			return typename EmuMath::TMPHelpers::emu_matrix_matching_template<OutColumns, OutRows, typename Matrix_::value_type, Matrix_>::type();
+		}
 	}
 #pragma endregion
 }

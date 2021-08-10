@@ -51,6 +51,29 @@ namespace EmuMath::TMPHelpers
 		template<std::size_t NumColumns__, std::size_t NumRows__, typename T__> class matrix_template
 	>
 	static constexpr matrix_template<num_columns, num_rows, value_type> emu_matrix_identity_v = emu_matrix_identity<num_columns, num_rows, value_type, matrix_template>::value;
+
+	template<std::size_t num_columns, std::size_t num_rows, typename value_type, class Matrix_>
+	struct emu_matrix_matching_template
+	{
+		static_assert(is_emu_matrix_v<Matrix_>, "Passed a non-EmuMath-matrix type when attempting to instantiate a new template instance based on it via emu_matrix_matching_template.");
+		using type = std::false_type;
+	};
+	template
+	<
+		std::size_t num_columns, std::size_t num_rows, typename value_type,
+		std::size_t copy_columns, std::size_t copy_rows, typename copy_value_type, template<std::size_t Columns__, std::size_t Rows__, typename T__> class MatrixTemplate_
+	>
+	struct emu_matrix_matching_template<num_columns, num_rows, value_type, MatrixTemplate_<copy_columns, copy_rows, copy_value_type>>
+	{
+	private:
+		using matrix_type = MatrixTemplate_<copy_columns, copy_rows, copy_value_type>;
+		static_assert(is_emu_matrix_v<matrix_type>, "Passed a non-EmuMath-matrix type when attempting to instantiate a new template instance based on it via emu_matrix_matching_template.");
+
+	public:
+		using type = MatrixTemplate_<num_columns, num_rows, value_type>;
+	};
+	template<std::size_t num_columns, std::size_t num_rows, typename value_type, class Matrix_>
+	using emu_matrix_matching_template_t = typename emu_matrix_matching_template<num_columns, num_rows, value_type, Matrix_>::type;
 }
 
 #endif
