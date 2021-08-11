@@ -624,6 +624,11 @@ namespace EmuMath::Helpers
 	}
 
 #pragma region ARITHMETIC
+	/// <summary> Adds respective elements of the passed matrices together and outputs them in a new matrix. </summary>
+	/// <typeparam name="value_type">Type contained within the passed matrices.</typeparam>
+	/// <param name="lhs">Left-hand EmuMath matrix in the addition.</param>
+	/// <param name="rhs">Right-hand EmuMath matrix in the addition.</param>
+	/// <returns>Matrix containing the results of the addition.</returns>
 	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
 	constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> MatrixAddition
 	(
@@ -633,6 +638,12 @@ namespace EmuMath::Helpers
 	{
 		return _underlying_matrix_funcs::_perform_basic_matrix_arithmetic<std::plus<void>>(lhs, rhs);
 	}
+
+	/// <summary> Subtracts respective elements of the passed matrices together and outputs them in a new matrix. </summary>
+	/// <typeparam name="value_type">Type contained within the passed matrices.</typeparam>
+	/// <param name="lhs">Left-hand EmuMath matrix in the subtraction.</param>
+	/// <param name="rhs">Right-hand EmuMath matrix in the subtraction.</param>
+	/// <returns>Matrix containing the results of the subtraction.</returns>
 	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
 	constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> MatrixSubtraction
 	(
@@ -642,12 +653,23 @@ namespace EmuMath::Helpers
 	{
 		return _underlying_matrix_funcs::_perform_basic_matrix_arithmetic<std::minus<void>>(lhs, rhs);
 	}
+
+	/// <summary> Negates all elements within the passed matrix (i.e. element[x][y] is set to -element[x][y]). </summary>
+	/// <typeparam name="value_type">Type contained within the passed matrix.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to negate.</param>
+	/// <returns>Negated variant of the passed matrix.</returns>
 	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
 	constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> MatrixNegation(const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_)
 	{
 		return _underlying_matrix_funcs::_perform_basic_matrix_arithmetic<std::negate<void>>(matrix_);
 	}
 
+	/// <summary> Multiplies all elements within the passed matrix by the passed scalar mult. </summary>
+	/// <typeparam name="ScalarMultiplier">Type of scalar provided. Must be an arithmetic type.</typeparam>
+	/// <typeparam name="value_type">Type contained within the passed matrix.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to multiply.</param>
+	/// <param name="mult">Value to multiply all of the passed matrix's elements by.</param>
+	/// <returns>Matrix containing the results of the multiplication.</returns>
 	template<typename ScalarMultiplier, std::size_t num_columns, std::size_t num_rows, typename value_type>
 	constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> MatrixMultiplication
 	(
@@ -662,6 +684,14 @@ namespace EmuMath::Helpers
 		);
 		return _underlying_matrix_funcs::_perform_basic_matrix_arithmetic<std::multiplies<void>>(matrix_, mult);
 	}
+	/// <summary>
+	/// <para> Multiplies the two passed matrices and returns the result as another matrix. </para>
+	/// <para> Note that matrix multiplication is non-commutative, and (lhs * rhs) != (rhs * lhs) in most cases. </para>
+	/// </summary>
+	/// <typeparam name="value_type">Type contained within the passed matrices.</typeparam>
+	/// <param name="lhs">Left-hand matrix in this multiplication.</param>
+	/// <param name="rhs">Right-hand matrix in this multiplication.</param>
+	/// <returns>Matrix containing the results of the multiplication lhs * rhs.</returns>
 	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
 	constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> MatrixMultiplication
 	(
