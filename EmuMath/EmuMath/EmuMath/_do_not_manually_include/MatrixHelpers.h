@@ -954,6 +954,12 @@ namespace EmuMath::Helpers
 #pragma endregion
 
 #pragma region MATRIX_OPERATIONS
+	/// <summary> Returns the transpose of the passed matrix. Columns will be converted to rows and vice versa. </summary>
+	/// <param name="matrix_">EmuMath matrix to determine the transpose of.</param>
+	/// <returns>
+	///		Tranposed variant of the passed matrix. If the dimensions differ, the returned matrix's dimensions will be flipped 
+	///		(i.e. num_columns will be the passed matrix's num_rows, and num_rows will be the passed matrix's num_columns).
+	/// </returns>
 	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
 	constexpr EmuMath::MatrixCM<num_rows, num_columns, value_type> MatrixTranspose(const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_)
 	{
@@ -962,12 +968,20 @@ namespace EmuMath::Helpers
 		return out_;
 	}
 
+	/// <summary>
+	/// <para> Calculates the trace of the passed matrix (the sum of diagonals from the top-left corner to the bottom-right corner). </para>
+	/// <para> As the trace is only defined for a square matrix, this function requires that the passed matrix be a square matrix (i.e. equal number of columns and rows). </para>
+	/// </summary>
+	/// <typeparam name="OutT_">Type to output the trace as.</typeparam>
+	/// <typeparam name="Matrix_">Type of matrix to calculate the trace of.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to calculate the trace of.</param>
+	/// <returns>Trace of the passed matrix, assuming it is a square matrix.</returns>
 	template<typename OutT_ = float, class Matrix_ = void>
 	constexpr inline OutT_ MatrixTrace(const Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
 		{
-			if constexpr (Matrix_::num_rows == Matrix_::num_columns)
+			if constexpr (Matrix_::is_square)
 			{
 				return _underlying_matrix_funcs::_calculate_matrix_trace<0, OutT_>(matrix_);
 			}
@@ -982,18 +996,29 @@ namespace EmuMath::Helpers
 		}
 	}
 
-	template
-	<
-		class Matrix_,
-		typename RequiresSquareMatrix = std::enable_if_t<Matrix_::is_square>
-	>
+	/// <summary>
+	/// <para> Returns the identity matrix of the provided matrix type. </para>
+	/// <para> As the identity matrix is only defined for square matrices, this requires that the provided matrix type has an equal number of columns and rows. </para>
+	/// </summary>
+	/// <typeparam name="Matrix_">Type of matrix to return the identity matrix of.</typeparam>
+	/// <typeparam name="RequiresSquareMatrix">Dummy parameter to make use of std::enable_if.</typeparam>
+	/// <returns>Identity matrix of the provided EmuMath Matrix_ type.</returns>
+	template<class Matrix_, typename RequiresSquareMatrix = std::enable_if_t<Matrix_::is_square>>
 	constexpr inline Matrix_ MatrixIdentity()
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
 		{
-			Matrix_ out_ = Matrix_();
-			_underlying_matrix_funcs::_fill_identity_matrix<0>(out_);
-			return out_;
+			if constexpr (Matrix_::is_square)
+			{
+				Matrix_ out_ = Matrix_();
+				_underlying_matrix_funcs::_fill_identity_matrix<0>(out_);
+				return out_;
+			}
+			else
+			{
+				static_assert(false, "Attempted to get the identity matrix of an EmuMath matrix that does not have square dimensions (i.e. num_columns != num_rows).")
+				return Matrix_();
+			}
 		}
 		else
 		{
@@ -1001,11 +1026,12 @@ namespace EmuMath::Helpers
 			return Matrix_();
 		}
 	}
-	template
-	<
-		class Matrix_,
-		typename RequiresSquareMatrix = std::enable_if_t<Matrix_::is_square>
-	>
+	/// <summary> Shorthand for MatrixIdentity(), determining the argument for Matrix_ itself based on the passed matrix. </summary>
+	/// <typeparam name="Matrix_">Type of matrix to return the identity matrix of.</typeparam>
+	/// <typeparam name="RequiresSquareMatrix">Dummy parameter to make use of std::enable_if.</typeparam>
+	/// <param name="matrix_">Matrix to determine the identity matrix of. This is the same for all matrices of the provided type, and the matrix is never used directly.</param>
+	/// <returns>Identity matrix of the provided EmuMath Matrix_ type.</returns>
+	template<class Matrix_, typename RequiresSquareMatrix = std::enable_if_t<Matrix_::is_square>>
 	constexpr inline Matrix_ MatrixIdentity(const Matrix_& matrix_)
 	{
 		return MatrixIdentity<Matrix_>();
@@ -1018,7 +1044,8 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">The full matrix to return a submatrix of.</param>
 	/// <returns>Submatrix of the correct dimensions located at the specified inclusive indices within the passed matrix.</returns>
 	template<std::size_t BeginColumn, std::size_t EndColumn, std::size_t BeginRow, std::size_t EndRow, class Matrix_>
-	constexpr inline typename TMPHelpers::emu_matrix_matching_template<EndColumn - BeginColumn + 1, EndRow - BeginRow + 1, typename Matrix_::value_type, Matrix_>::type MatrixSubMatrix
+	constexpr inline typename TMPHelpers::emu_matrix_matching_template<EndColumn - BeginColumn + 1, EndRow - BeginRow + 1, typename Matrix_::value_type, Matrix_>::type
+		MatrixSubMatrix
 	(
 		const Matrix_& matrix_
 	)
