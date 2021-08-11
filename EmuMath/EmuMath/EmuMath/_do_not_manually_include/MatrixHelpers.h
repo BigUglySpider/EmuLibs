@@ -917,6 +917,12 @@ namespace EmuMath::Helpers
 #pragma endregion
 
 #pragma region SETS
+	/// <summary> Sets respective elements in the left-hand matrix to match those of the right-hand matrix. </summary>
+	/// <typeparam name="LhsMatrix_">Type of the left-hand matrix in this set.</typeparam>
+	/// <typeparam name="RhsMatrix_">Type of the right-hand matrix in this set.</typeparam>
+	/// <param name="lhs_">EmuMath matrix to set the values of.</param>
+	/// <param name="rhs_">EmuMath matrix to copy the values of.</param>
+	/// <returns>Reference to lhs_ after it has been fully set.</returns>
 	template<class LhsMatrix_, class RhsMatrix_>
 	constexpr inline LhsMatrix_& MatrixSet(LhsMatrix_& lhs_, const RhsMatrix_& rhs_)
 	{
