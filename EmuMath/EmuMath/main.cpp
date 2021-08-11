@@ -72,6 +72,8 @@ int main()
 	constexpr EmuMath::MatrixCM<25, 25, float> mat_25x25_identity = EmuMath::MatrixCM<25, 25, float>::Identity();
 	std::cout << mat_25x25_identity << "\n";
 
+	constexpr auto SomeSubMatrix = EmuMath::MatrixCM<4, 4, std::uint32_t>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16).SubMatrix<0, 2, 0, 2>();
+
 	//blooble.columns[1] *= 10.0f;
 	std::cout << "Base:\n" << blooble << std::endl;
 	std::cout << "Tranpose:\n" << blooble.Transpose() << std::endl;
@@ -90,9 +92,11 @@ int main()
 	std::cout << "Identity:\n" << blooble.Identity() << std::endl;
 
 
-	std::cout << "Submatrix(0-1, 0-1):\n" << EmuMath::Helpers::MatrixSubMatrix<0, 1, 0, 1>(blooble) << std::endl;
-	std::cout << "Submatrix(0-1, 1-3):\n" << EmuMath::Helpers::MatrixSubMatrix<0, 1, 1, 3>(blooble) << std::endl;
+	std::cout << "Submatrix(0:1, 0:1):\n" << EmuMath::Helpers::MatrixSubMatrix<0, 1, 0, 1>(blooble) << std::endl;
+	std::cout << "Submatrix(0:1, 1:3):\n" << EmuMath::Helpers::MatrixSubMatrix<0, 1, 1, 3>(blooble) << std::endl;
 	std::cout << "Submatrix(2:3, 0:3):\n" << blooble.SubMatrix<2, 3, 0, 3>() << std::endl;
+
+	std::cout << "\n\nMatrix:\n" << blooble << "\nSubmatrix[3, 2] (" << blooble.at<3, 2>() << "):\n" << blooble.SubMatrixExcluding<3, 2>() << std::endl;
 
 	system("pause");
 

@@ -337,10 +337,23 @@ namespace EmuMath
 			return EmuMath::Helpers::MatrixIdentity<this_type>();
 		}
 
+		/// <summary>
+		/// <para> Returns a smaller matrix contained within this matrix at the specified inclusive indices. </para>
+		/// </summary>
+		/// <returns></returns>
 		template<std::size_t BeginColumn, std::size_t EndColumn, std::size_t BeginRow, std::size_t EndRow>
-		EmuMath::MatrixCM<EndColumn - BeginColumn + 1, EndRow - BeginRow + 1, value_type> SubMatrix() const
+		constexpr inline EmuMath::MatrixCM<EndColumn - BeginColumn + 1, EndRow - BeginRow + 1, value_type> SubMatrix() const
 		{
 			return EmuMath::Helpers::MatrixSubMatrix<BeginColumn, EndColumn, BeginRow, EndRow, this_type>(*this);
+		}
+		/// <summary>
+		/// <para> Returns a smaller matrix contained within this matrix when the provided column and row indices are excluded. </para>
+		/// </summary>
+		/// <returns>Submatrix contained within this matrix when the column at index Column_ is removed, and row at index Row_ is removed.</returns>
+		template<std::size_t Column_, std::size_t Row_>
+		constexpr inline EmuMath::MatrixCM<num_columns - 1, num_rows - 1, value_type> SubMatrixExcluding() const
+		{
+			return EmuMath::Helpers::MatrixSubMatrixExcluding<Column_, Row_, this_type>(*this);
 		}
 #pragma endregion
 

@@ -381,6 +381,45 @@ namespace EmuMath::Helpers
 			_fill_matrix_submatrix<BeginColumn, EndColumn, BeginRow, EndRow, 0, 0, Matrix_, Out_>(matrix_, out_);
 			return out_;
 		}
+
+		template<std::size_t IgnoreColumn_, std::size_t IgnoreRow_, std::size_t InColumn_, std::size_t InRow_, std::size_t OutColumn_, std::size_t OutRow_, class Matrix_, class Out_>
+		constexpr inline void _fill_matrix_submatrix_exclusive(const Matrix_& matrix_, Out_& out_)
+		{
+			if constexpr (InColumn_ < Matrix_::num_columns)
+			{
+				if constexpr (InColumn_ != IgnoreColumn_)
+				{
+					if constexpr (InRow_ < Matrix_::num_rows)
+					{
+						if constexpr (InRow_ != IgnoreRow_)
+						{
+							_get_matrix_data_value<OutColumn_, OutRow_>(out_) = _get_matrix_data_value<InColumn_, InRow_>(matrix_);
+							_fill_matrix_submatrix_exclusive<IgnoreColumn_, IgnoreRow_, InColumn_, InRow_ + 1, OutColumn_, OutRow_ + 1, Matrix_, Out_>(matrix_, out_);
+						}
+						else
+						{
+							_fill_matrix_submatrix_exclusive<IgnoreColumn_, IgnoreRow_, InColumn_, InRow_ + 1, OutColumn_, OutRow_, Matrix_, Out_>(matrix_, out_);
+						}
+					}
+					else
+					{
+						_fill_matrix_submatrix_exclusive<IgnoreColumn_, IgnoreRow_, InColumn_ + 1, 0, OutColumn_ + 1, 0, Matrix_, Out_>(matrix_, out_);
+					}
+				}
+				else
+				{
+					_fill_matrix_submatrix_exclusive<IgnoreColumn_, IgnoreRow_, InColumn_ + 1, InRow_, OutColumn_, OutRow_, Matrix_, Out_>(matrix_, out_);
+				}
+			}
+		}
+
+		template<std::size_t IgnoreColumn_, std::size_t IgnoreRow_, class Matrix_, class Out_>
+		constexpr inline Out_ _find_matrix_submatrix_exclusive(const Matrix_& matrix_)
+		{
+			Out_ out_ = Out_();
+			_fill_matrix_submatrix_exclusive<IgnoreColumn_, IgnoreRow_, 0, 0, 0, 0, Matrix_, Out_>(matrix_, out_);
+			return out_;
+		}
 #pragma endregion
 
 #pragma region MATRIX_ARITHMETIC
@@ -628,9 +667,9 @@ namespace EmuMath::Helpers
 	/// <summary>
 	/// <para> Returns a smaller matrix contained within the passed matrix at the given ranges. </para>
 	/// </summary>
-	/// <typeparam name="Matrix_"></typeparam>
-	/// <param name="matrix_"></param>
-	/// <returns></returns>
+	/// <typeparam name="Matrix_">Type of the full matrix to return a submatrix of.</typeparam>
+	/// <param name="matrix_">The full matrix to return a submatrix of.</param>
+	/// <returns>Submatrix of the correct dimensions located at the specified inclusive indices within the passed matrix.</returns>
 	template<std::size_t BeginColumn, std::size_t EndColumn, std::size_t BeginRow, std::size_t EndRow, class Matrix_>
 	constexpr inline typename TMPHelpers::emu_matrix_matching_template<EndColumn - BeginColumn + 1, EndRow - BeginRow + 1, typename Matrix_::value_type, Matrix_>::type MatrixSubMatrix
 	(
@@ -714,6 +753,56 @@ namespace EmuMath::Helpers
 		{
 			static_assert(false, "Attempting to output a submatrix within a matrix, but passed a non-EmuMath-matrix type.");
 			return typename EmuMath::TMPHelpers::emu_matrix_matching_template<OutColumns, OutRows, typename Matrix_::value_type, Matrix_>::type();
+		}
+	}
+	/// <summary>
+	/// <para> Returns a smaller matrix contained within the passed matrix once the provided column and row indices are excluded. </para>
+	/// </summary>
+	/// <typeparam name="Matrix_">Type of the matrix to find a submatrix within.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to find the specified submatrix of.</param>
+	/// <returns>Submatrix contained within the passed matrix when the column at index Column_ is removed, and the row and index Row_ is removed.</returns>
+	template<std::size_t Column_, std::size_t Row_, class Matrix_>
+	constexpr inline typename TMPHelpers::emu_matrix_matching_template<Matrix_::num_columns - 1, Matrix_::num_rows - 1, typename Matrix_::value_type, Matrix_>::type 
+		MatrixSubMatrixExcluding(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
+		{
+			if constexpr (Matrix_::num_columns != 1 && Matrix_::num_rows != 1)
+			{
+				if constexpr (Column_ < Matrix_::num_columns)
+				{
+					if constexpr (Row_ < Matrix_::num_rows)
+					{
+						return _underlying_matrix_funcs::_find_matrix_submatrix_exclusive
+						<
+							Column_,
+							Row_,
+							Matrix_,
+							typename TMPHelpers::emu_matrix_matching_template<Matrix_::num_columns - 1, Matrix_::num_rows - 1, typename Matrix_::value_type, Matrix_>::type
+						>(matrix_);
+					}
+					else
+					{
+						static_assert(false, "Attempted to get a matrix's submatrix excluding a certain column+row via MatrixSubMatrixExcluding, but provided a row index that exceeds the matrix's indices.");
+						return typename TMPHelpers::emu_matrix_matching_template<Matrix_::num_columns - 1, Matrix_::num_rows - 1, typename Matrix_::value_type, Matrix_>::type();
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to get a matrix's submatrix excluding a certain column+row via MatrixSubMatrixExcluding, but provided a column index that exceeds the matrix's indices.");
+					return typename TMPHelpers::emu_matrix_matching_template<Matrix_::num_columns - 1, Matrix_::num_rows - 1, typename Matrix_::value_type, Matrix_>::type();
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to get a matrix's submatrix excluding a certain column+row via MatrixSubMatrixExcluding, but provided a matrix which cannot contain any smaller matrix after exclusion.");
+				return typename TMPHelpers::emu_matrix_matching_template<Matrix_::num_columns - 1, Matrix_::num_rows - 1, typename Matrix_::value_type, Matrix_>::type();
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to get a matrix's submatrix excluding a certain column+row via MatrixSubMatrixExcluding, but the provided argument was not an EmuMath matrix.");
+			return typename TMPHelpers::emu_matrix_matching_template<Matrix_::num_columns - 1, Matrix_::num_rows - 1, typename Matrix_::value_type, Matrix_>::type();
 		}
 	}
 #pragma endregion

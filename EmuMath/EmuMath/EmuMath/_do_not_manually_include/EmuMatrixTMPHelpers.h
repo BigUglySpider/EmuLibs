@@ -24,6 +24,14 @@ namespace EmuMath::TMPHelpers
 	template<class T>
 	static constexpr bool is_emu_matrix_v = is_emu_matrix<T>::value;
 
+	template<template<std::size_t NumColumns__, std::size_t NumRows__, typename T__> class Template_>
+	struct is_emu_matrix_template
+	{
+		static constexpr bool value = is_emu_matrix_v<Template_<4, 4, float>>;
+	};
+	template<template<std::size_t NumColumns__, std::size_t NumRows__, typename T__> class Template_>
+	static constexpr bool is_emu_matrix_template_v = is_emu_matrix_template<Template_>::value;
+
 	/// <summary> May be used to guarantee that a certain matrix type's identity matrix will be evaluated at compile time. </summary>
 	template
 	<
