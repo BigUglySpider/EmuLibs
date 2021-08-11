@@ -172,6 +172,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\MatrixHelpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\MatrixHelpersUnderlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\VectorHelpers.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\VectorHelpersUnderlying.h" />
     <ClInclude Include="Tests.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

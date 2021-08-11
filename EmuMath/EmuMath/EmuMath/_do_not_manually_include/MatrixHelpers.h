@@ -3,12 +3,6 @@
 
 #include "MatrixHelpersUnderlying.h"
 
-namespace EmuMath
-{
-	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_>
-	struct MatrixCM;
-}
-
 namespace EmuMath::Helpers
 {
 	/// <summary> TMP helper to determine what a major type should be stored as within a matrix (e.g. what columns are stored as in column-major matrices). </summary>

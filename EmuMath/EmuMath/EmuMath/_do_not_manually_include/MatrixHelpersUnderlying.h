@@ -4,6 +4,12 @@
 #include "EmuMatrixTMPHelpers.h"
 #include "../Vectors.h"
 
+namespace EmuMath
+{
+	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_>
+	struct MatrixCM;
+}
+
 /// <summary> Underlying functions used by EmuMath::Helper functions for matrices. These should not be used directly. </summary>
 namespace EmuMath::Helpers::_underlying_matrix_funcs
 {
