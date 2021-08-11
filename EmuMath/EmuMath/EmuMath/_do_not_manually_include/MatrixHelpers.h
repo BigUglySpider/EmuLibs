@@ -693,6 +693,10 @@ namespace EmuMath::Helpers
 #pragma endregion
 
 #pragma region GETS
+	/// <summary> Accesses the element at the provided indices of the passed matrix. </summary>
+	/// <typeparam name="Matrix_">Type of matrix to access.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to access.</param>
+	/// <returns>Reference to the element at the provided indices within the passed matrix.</returns>
 	template<std::size_t Column_, std::size_t Row_, class Matrix_>
 	constexpr inline typename Matrix_::value_type& MatrixGet(Matrix_& matrix_)
 	{
@@ -705,18 +709,10 @@ namespace EmuMath::Helpers
 			static_assert(false, "Invalid call to EmuMath::Helpers::MatrixGet.");
 		}
 	}
-	template<std::size_t MajorIndex_, class Matrix_>
-	constexpr inline typename Matrix_::major_type& MatrixGet(Matrix_& matrix_)
-	{
-		if constexpr (_underlying_matrix_funcs::_matrix_get_major_validity_check<MajorIndex_, Matrix_>())
-		{
-			return _underlying_matrix_funcs::_get_matrix_major_index<MajorIndex_>(matrix_);
-		}
-		else
-		{
-			static_assert(false, "Invalid call to EmuMath::Helpers::MatrixGet.");
-		}
-	}
+	/// <summary> Accesses a copy of the element at the provided indices of the passed matrix. </summary>
+	/// <typeparam name="Matrix_">Type of matrix to access.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to access.</param>
+	/// <returns>Copy of the element at the provided indices within the passed matrix.</returns>
 	template<std::size_t Column_, std::size_t Row_, class Matrix_>
 	constexpr inline typename Matrix_::value_type MatrixGet(const Matrix_& matrix_)
 	{
@@ -729,6 +725,38 @@ namespace EmuMath::Helpers
 			static_assert(false, "Invalid call to EmuMath::Helpers::MatrixGet.");
 		}
 	}
+	/// <summary>
+	/// <para> Accesses the major element at the provided index of the passed matrix. </para>
+	/// <para>
+	///		The returned data will depend on the storage of the matrix; if it is column major, this will return the row at the passed index; 
+	///		if row major, it will return the row at the passed index.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="Matrix_">Type of matrix to access.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to access.</param>
+	/// <returns>Reference to the major element at the provided indices within the passed matrix; a column if the matrix is column major, or a row if the matrix is row major.</returns>
+	template<std::size_t MajorIndex_, class Matrix_>
+	constexpr inline typename Matrix_::major_type& MatrixGet(Matrix_& matrix_)
+	{
+		if constexpr (_underlying_matrix_funcs::_matrix_get_major_validity_check<MajorIndex_, Matrix_>())
+		{
+			return _underlying_matrix_funcs::_get_matrix_major_index<MajorIndex_>(matrix_);
+		}
+		else
+		{
+			static_assert(false, "Invalid call to EmuMath::Helpers::MatrixGet.");
+		}
+	}
+	/// <summary>
+	/// <para> Accesses a copy of the major element at the provided index of the passed matrix. </para>
+	/// <para>
+	///		The returned data will depend on the storage of the matrix; if it is column major, this will return the row at the passed index; 
+	///		if row major, it will return the row at the passed index.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="Matrix_">Type of matrix to access.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to access.</param>
+	/// <returns>Copy of the major element at the provided indices within the passed matrix; a column if the matrix is column major, or a row if the matrix is row major.</returns>
 	template<std::size_t MajorIndex_, class Matrix_>
 	constexpr inline typename Matrix_::major_type MatrixGet(const Matrix_& matrix_)
 	{
@@ -741,6 +769,15 @@ namespace EmuMath::Helpers
 			static_assert(false, "Invalid call to EmuMath::Helpers::MatrixGet.");
 		}
 	}
+	/// <summary>
+	/// <para> Accesses the element at the provided column_ and row_ indices of the passed matrix. </para>
+	/// <para> If column_ and row_ are compile-time evaluable, it is recommended to pass them as template arguments instead. </para>
+	/// </summary>
+	/// <typeparam name="Matrix_">Type of matrix to access.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to access.</param>
+	/// <param name="column_">Index of the column to access.</param>
+	/// <param name="row_">Index of the row to access.</param>
+	/// <returns>Reference to the element at the provided indices within the passed matrix.</returns>
 	template<class Matrix_>
 	constexpr inline typename Matrix_::value_type& MatrixGet(Matrix_& matrix_, const std::size_t column_, const std::size_t row_)
 	{
@@ -753,6 +790,15 @@ namespace EmuMath::Helpers
 			static_assert(false, "Invalid call to EmuMath::Helpers::MatrixGet.");
 		}
 	}
+	/// <summary>
+	/// <para> Accesses a copy of the element at the provided column_ and row_ indices of the passed matrix. </para>
+	/// <para> If column_ and row_ are compile-time evaluable, it is recommended to pass them as template arguments instead. </para>
+	/// </summary>
+	/// <typeparam name="Matrix_">Type of matrix to access.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to access.</param>
+	/// <param name="column_">Index of the column to access.</param>
+	/// <param name="row_">Index of the row to access.</param>
+	/// <returns>Copy of the element at the provided indices within the passed matrix.</returns>
 	template<class Matrix_>
 	constexpr inline typename Matrix_::value_type MatrixGet(const Matrix_& matrix_, const std::size_t column_, const std::size_t row_)
 	{
@@ -765,6 +811,18 @@ namespace EmuMath::Helpers
 			static_assert(false, "Invalid call to EmuMath::Helpers::MatrixGet.");
 		}
 	}
+	/// <summary>
+	/// <para> Accesses the major element at the provided index of the passed matrix. </para>
+	/// <para>
+	///		The returned data will depend on the storage of the matrix; if it is column major, this will return the row at the passed index; 
+	///		if row major, it will return the row at the passed index.
+	/// </para>
+	/// <para> If majorIndex_ is compile-time evaluable, it is recommended to pass it as a template argument instead. </para>
+	/// </summary>
+	/// <typeparam name="Matrix_">Type of matrix to access.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to access.</param>
+	/// <param name="majorIndex_">Index of the major-stored element to access.</param>
+	/// <returns>Reference to the major element at the provided indices within the passed matrix; a column if the matrix is column major, or a row if the matrix is row major.</returns>
 	template<class Matrix_>
 	constexpr inline typename Matrix_::major_type& MatrixGet(Matrix_& matrix_, const std::size_t majorIndex_)
 	{
@@ -777,6 +835,18 @@ namespace EmuMath::Helpers
 			static_assert(false, "Invalid call to EmuMath::Helpers::MatrixGet.");
 		}
 	}
+	/// <summary>
+	/// <para> Accesses a copy of the major element at the provided index of the passed matrix. </para>
+	/// <para>
+	///		The returned data will depend on the storage of the matrix; if it is column major, this will return the row at the passed index; 
+	///		if row major, it will return the row at the passed index.
+	/// </para>
+	/// <para> If majorIndex_ is compile-time evaluable, it is recommended to pass it as a template argument instead. </para>
+	/// </summary>
+	/// <typeparam name="Matrix_">Type of matrix to access.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to access.</param>
+	/// <param name="majorIndex_">Index of the major-stored element to access.</param>
+	/// <returns>Copy of the major element at the provided indices within the passed matrix; a column if the matrix is column major, or a row if the matrix is row major.</returns>
 	template<class Matrix_>
 	constexpr inline typename Matrix_::major_type MatrixGet(const Matrix_& matrix_, const std::size_t majorIndex_)
 	{
@@ -790,6 +860,9 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary> Copies the specified row index from the passed matrix, regardless of its major-storage configuration. </summary>
+	/// <param name="matrix_">EmuMath matrix to access.</param>
+	/// <returns>Copy of the specified row within the passed matrix.</returns>
 	template<std::size_t TargetRowIndex_, std::size_t num_columns, std::size_t num_rows, typename value_type>
 	constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::row_type MatrixGetRow(const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_)
 	{
@@ -806,7 +879,9 @@ namespace EmuMath::Helpers
 			return OutT_();
 		}
 	}
-
+	/// <summary> Copies the specified column index from the passed matrix, regardless of its major-storage configuration. </summary>
+	/// <param name="matrix_">EmuMath matrix to access.</param>
+	/// <returns>Copy of the specified column within the passed matrix.</returns>
 	template<std::size_t TargetColumnIndex_, std::size_t num_columns, std::size_t num_rows, typename value_type>
 	constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::column_type MatrixGetColumn(const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_)
 	{
@@ -821,11 +896,19 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary> Returns a standard array copy of the passed matrix, stored in rows as the matrix's row_type. </summary>
+	/// <typeparam name="Matrix_">Type of matrix to access.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to access.</param>
+	/// <returns>Standard array of passed matrix's row_type, representing a copy of the passed matrix.</returns>
 	template<class Matrix_>
 	constexpr inline std::array<typename Matrix_::row_type, Matrix_::num_rows> MatrixCopyAsRows(const Matrix_& matrix_)
 	{
 		return _underlying_matrix_funcs::_copy_all_matrix_rows(matrix_);
 	}
+	/// <summary> Returns a standard array copy of the passed matrix, stored in columns as the matrix's column_type. </summary>
+	/// <typeparam name="Matrix_">Type of matrix to access.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to access.</param>
+	/// <returns>Standard array of passed matrix's column_type, representing a copy of the passed matrix.</returns>
 	template<class Matrix_>
 	constexpr inline std::array<typename Matrix_::column_type, Matrix_::num_columns> MatrixCopyAsColumns(const Matrix_& matrix_)
 	{
