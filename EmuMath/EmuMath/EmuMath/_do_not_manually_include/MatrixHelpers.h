@@ -37,6 +37,72 @@ namespace EmuMath::Helpers
 
 	namespace _underlying_matrix_funcs
 	{
+#pragma region CHECKS
+		template<std::size_t Column_, std::size_t Row_, class Matrix_>
+		constexpr inline bool _matrix_get_validity_check()
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
+			{
+				if constexpr (Column_ < Matrix_::num_columns)
+				{
+					if constexpr (Row_ < Matrix_::num_rows)
+					{
+						return true;
+					}
+					else
+					{
+						static_assert(false, "Attempted to get a matrix element via MatrixGet via an invalid row index.");
+						return false;
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to get a matrix element via MatrixGet via an invalid column index.");
+					return false;
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to get a matrix element via MatrixGet, but passed a non-EmuMath-matrix type.");
+				return false;
+			}
+		}
+		template<std::size_t Index_, class Matrix_>
+		constexpr inline bool _matrix_get_major_validity_check()
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
+			{
+				if constexpr (Index_ < Matrix_::num_majors)
+				{
+					return true;
+				}
+				else
+				{
+					static_assert(false, "Attempted to get a major matrix element via MatrixGet, using an invalid major index.");
+					return false;
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to get a major matrix element via MatrixGet, but passed a non-EmuMath-matrix type.");
+				return false;
+			}
+		}
+		template<class Matrix_>
+		constexpr inline bool _matrix_get_basic_validity_check()
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
+			{
+				return true;
+			}
+			else
+			{
+				static_assert(false, "Attempted to get a matrix element via MatrixGet, but passed a non-EmuMath-matrix type.");
+				return false;
+			}
+		}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 		template<std::size_t Row_, class ArithmeticFunc_, std::size_t num_columns, std::size_t num_rows, typename value_type, typename Rhs_>
 		constexpr inline void _execute_basic_matrix_arithmetic_on_contained_scalars_until_complete
@@ -242,6 +308,51 @@ namespace EmuMath::Helpers
 			{
 				static_assert(false, "Provided an invalid column index when trying to get an element from an EmuMath Matrix.");
 			}
+		}
+		template<std::size_t num_columns, std::size_t num_rows, typename value_type>
+		constexpr value_type& _get_matrix_data_value(EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_, const std::size_t column_, const std::size_t row_)
+		{
+			return matrix_.columns[column_][row_];
+		}
+		template<std::size_t num_columns, std::size_t num_rows, typename value_type>
+		constexpr value_type _get_matrix_data_value(const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_, const std::size_t column_, const std::size_t row_)
+		{
+			return matrix_.columns[column_][row_];
+		}
+
+		template<std::size_t Index_, std::size_t num_columns, std::size_t num_rows, typename value_type>
+		constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::major_type& _get_matrix_major_index
+		(
+			EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_
+		)
+		{
+			return matrix_.columns[Index_];
+		}
+		template<std::size_t Index_, std::size_t num_columns, std::size_t num_rows, typename value_type>
+		constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::major_type _get_matrix_major_index
+		(
+			const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_
+		)
+		{
+			return matrix_.columns[Index_];
+		}
+		template<std::size_t num_columns, std::size_t num_rows, typename value_type>
+		constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::major_type& _get_matrix_major_index
+		(
+			EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_,
+			std::size_t index_
+		)
+		{
+			return matrix_.columns[index_];
+		}
+		template<std::size_t num_columns, std::size_t num_rows, typename value_type>
+		constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::major_type _get_matrix_major_index
+		(
+			const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_,
+			std::size_t index_
+		)
+		{
+			return matrix_.columns[index_];
 		}
 
 		template<std::size_t Index_, typename MajorData_>
@@ -582,6 +693,103 @@ namespace EmuMath::Helpers
 #pragma endregion
 
 #pragma region GETS
+	template<std::size_t Column_, std::size_t Row_, class Matrix_>
+	constexpr inline typename Matrix_::value_type& MatrixGet(Matrix_& matrix_)
+	{
+		if constexpr (_underlying_matrix_funcs::_matrix_get_validity_check<Column_, Row_, Matrix_>())
+		{
+			return _underlying_matrix_funcs::_get_matrix_data_value<Column_, Row_>(matrix_);
+		}
+		else
+		{
+			static_assert(false, "Invalid call to EmuMath::Helpers::MatrixGet.");
+		}
+	}
+	template<std::size_t MajorIndex_, class Matrix_>
+	constexpr inline typename Matrix_::major_type& MatrixGet(Matrix_& matrix_)
+	{
+		if constexpr (_underlying_matrix_funcs::_matrix_get_major_validity_check<MajorIndex_, Matrix_>())
+		{
+			return _underlying_matrix_funcs::_get_matrix_major_index<MajorIndex_>(matrix_);
+		}
+		else
+		{
+			static_assert(false, "Invalid call to EmuMath::Helpers::MatrixGet.");
+		}
+	}
+	template<std::size_t Column_, std::size_t Row_, class Matrix_>
+	constexpr inline typename Matrix_::value_type MatrixGet(const Matrix_& matrix_)
+	{
+		if constexpr (_underlying_matrix_funcs::_matrix_get_validity_check<Column_, Row_, Matrix_>())
+		{
+			return _underlying_matrix_funcs::_get_matrix_data_value<Column_, Row_>(matrix_);
+		}
+		else
+		{
+			static_assert(false, "Invalid call to EmuMath::Helpers::MatrixGet.");
+		}
+	}
+	template<std::size_t MajorIndex_, class Matrix_>
+	constexpr inline typename Matrix_::major_type MatrixGet(const Matrix_& matrix_)
+	{
+		if constexpr (_underlying_matrix_funcs::_matrix_get_major_validity_check<MajorIndex_, Matrix_>())
+		{
+			return _underlying_matrix_funcs::_get_matrix_major_index<MajorIndex_>(matrix_);
+		}
+		else
+		{
+			static_assert(false, "Invalid call to EmuMath::Helpers::MatrixGet.");
+		}
+	}
+	template<class Matrix_>
+	constexpr inline typename Matrix_::value_type& MatrixGet(Matrix_& matrix_, const std::size_t column_, const std::size_t row_)
+	{
+		if constexpr (_underlying_matrix_funcs::_matrix_get_basic_validity_check<Matrix_>())
+		{
+			return _underlying_matrix_funcs::_get_matrix_data_value(matrix_, column_, row_);
+		}
+		else
+		{
+			static_assert(false, "Invalid call to EmuMath::Helpers::MatrixGet.");
+		}
+	}
+	template<class Matrix_>
+	constexpr inline typename Matrix_::value_type MatrixGet(const Matrix_& matrix_, const std::size_t column_, const std::size_t row_)
+	{
+		if constexpr (_underlying_matrix_funcs::_matrix_get_basic_validity_check<Matrix_>())
+		{
+			return _underlying_matrix_funcs::_get_matrix_data_value(matrix_, column_, row_);
+		}
+		else
+		{
+			static_assert(false, "Invalid call to EmuMath::Helpers::MatrixGet.");
+		}
+	}
+	template<class Matrix_>
+	constexpr inline typename Matrix_::major_type& MatrixGet(Matrix_& matrix_, const std::size_t majorIndex_)
+	{
+		if constexpr (_underlying_matrix_funcs::_matrix_get_basic_validity_check<Matrix_>())
+		{
+			return _underlying_matrix_funcs::_get_matrix_major_index(matrix_, majorIndex_);
+		}
+		else
+		{
+			static_assert(false, "Invalid call to EmuMath::Helpers::MatrixGet.");
+		}
+	}
+	template<class Matrix_>
+	constexpr inline typename Matrix_::major_type MatrixGet(const Matrix_& matrix_, const std::size_t majorIndex_)
+	{
+		if constexpr (_underlying_matrix_funcs::_matrix_get_basic_validity_check<Matrix_>())
+		{
+			return _underlying_matrix_funcs::_get_matrix_major_index(matrix_, majorIndex_);
+		}
+		else
+		{
+			static_assert(false, "Invalid call to EmuMath::Helpers::MatrixGet.");
+		}
+	}
+
 	template<std::size_t TargetRowIndex_, std::size_t num_columns, std::size_t num_rows, typename value_type>
 	constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::row_type MatrixGetRow(const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_)
 	{
@@ -614,12 +822,12 @@ namespace EmuMath::Helpers
 	}
 
 	template<class Matrix_>
-	std::array<typename Matrix_::row_type, Matrix_::num_rows> MatrixCopyAsRows(const Matrix_& matrix_)
+	constexpr inline std::array<typename Matrix_::row_type, Matrix_::num_rows> MatrixCopyAsRows(const Matrix_& matrix_)
 	{
 		return _underlying_matrix_funcs::_copy_all_matrix_rows(matrix_);
 	}
 	template<class Matrix_>
-	std::array<typename Matrix_::column_type, Matrix_::num_columns> MatrixCopyAsColumns(const Matrix_& matrix_)
+	constexpr inline std::array<typename Matrix_::column_type, Matrix_::num_columns> MatrixCopyAsColumns(const Matrix_& matrix_)
 	{
 		return _underlying_matrix_funcs::_copy_all_matrix_columns(matrix_);
 	}

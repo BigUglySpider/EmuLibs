@@ -14,8 +14,7 @@ namespace EmuMath
 	struct MatrixCM
 	{
 	public:
-		template<std::size_t NumColumns__, std::size_t NumRows__, typename T__>
-		using matrix_template = MatrixCM;
+		static_assert(NumColumns_ != 0 && NumRows_ != 0, "Attempted to create an EmuMath Matrix with 0 pieces of data due to containing either 0 columns or 0 rows.");
 
 		/// <summary> The type used to represent an individual value within this matrix. </summary>
 		using value_type = T_;
@@ -25,6 +24,8 @@ namespace EmuMath
 		using row_type = typename EmuMath::Helpers::matrix_major_element<NumColumns_, value_type>::type;
 		/// <summary> The type used to represent all of this matrix's data as a single item. </summary>
 		using packed_data_type = std::array<column_type, NumColumns_>;
+		/// <summary> The major storage type of this matrix. As this is a column-major matrix, this is an alias for column_type. </summary>
+		using major_type = column_type;
 
 		/// <summary> The number of columns in this matrix (i.e. The number of values in the horizontal direction). </summary>
 		static constexpr std::size_t num_columns = NumColumns_;
@@ -32,8 +33,12 @@ namespace EmuMath
 		static constexpr std::size_t num_rows = NumRows_;
 		/// <summary> Boolean indicating if the columns within this vector are stored as EmuMath vectors. </summary>
 		static constexpr bool uses_vector_storage = NumRows_ >= 2 && NumRows_ <= 4;
+		/// <summary> Boolean indicating if this is a square-dimensioned matrix. Only true if num_columns is the same value as num_rows. </summary>
 		static constexpr bool is_square = (num_columns == num_rows);
+		/// <summary> The number of major elements in this matrix. As this is a column-major matrix, this is equal to num_columns. </summary>
+		static constexpr std::size_t num_majors = num_columns;
 
+		/// <summary> This matrix's instantiated type. Primarily for internal use. </summary>
 		using this_type = MatrixCM<num_columns, num_rows, value_type>;
 
 	private:
@@ -209,63 +214,55 @@ namespace EmuMath
 		}
 #pragma endregion
 
-		/// <summary> Returns a copy of the element at the provided point in this matrix, where Column_ is the horizontal index and Row_ is the vertical index. </summary>
-		/// <returns>Copy of the value at the specified point in this matrix.</returns>
-		template<std::size_t Column_, std::size_t Row_>
-		constexpr value_type at() const
-		{
-			if constexpr (Column_ < NumColumns_)
-			{
-				if constexpr (Row_ < NumRows_)
-				{
-					if constexpr (uses_vector_storage)
-					{
-						return columns[Column_].template at<Row_>();
-					}
-					else
-					{
-						return std::get<Row_>(columns[Column_]);
-					}
-				}
-				else
-				{
-					static_assert(false, "Provided an invalid row index to EmuMath::MatrixCM::at.");
-				}
-			}
-			else
-			{
-				static_assert(false, "Provided an invalid column index to EmuMath::MatrixCM::at.");
-			}
-		}
+
 		/// <summary> Returns a reference to the element at the provided point in this matrix, where Column_ is the horizontal index and Row_ is the vertical index. </summary>
 		/// <returns>Non-const reference to the element at the specified point in this matrix.</returns>
 		template<std::size_t Column_, std::size_t Row_>
-		constexpr value_type& at()
+		constexpr inline value_type& at()
 		{
-			if constexpr (Column_ < NumColumns_)
-			{
-				if constexpr (Row_ < NumRows_)
-				{
-					if constexpr (uses_vector_storage)
-					{
-						return columns[Column_].template at<Row_>();
-					}
-					else
-					{
-						return std::get<Row_>(columns[Column_]);
-					}
-				}
-				else
-				{
-					static_assert(false, "Provided an invalid row index to EmuMath::MatrixCM::at.");
-				}
-			}
-			else
-			{
-				static_assert(false, "Provided an invalid column index to EmuMath::MatrixCM::at.");
-			}
+			return EmuMath::Helpers::MatrixGet<Column_, Row_, this_type>(*this);
 		}
-
+		/// <summary> Returns a copy of the element at the provided point in this matrix, where Column_ is the horizontal index and Row_ is the vertical index. </summary>
+		/// <returns>Copy of the value at the specified point in this matrix.</returns>
+		template<std::size_t Column_, std::size_t Row_>
+		constexpr inline value_type at() const
+		{
+			return EmuMath::Helpers::MatrixGet<Column_, Row_, this_type>(*this);
+		}
+		template<std::size_t MajorIndex_>
+		constexpr inline major_type& at()
+		{
+			return EmuMath::Helpers::MatrixGet<MajorIndex_, this_type>(*this);
+		}
+		template<std::size_t MajorIndex_>
+		constexpr inline major_type at() const
+		{
+			return EmuMath::Helpers::MatrixGet<MajorIndex_, this_type>(*this);
+		}
+		constexpr inline column_type& at(const std::size_t columnIndex_)
+		{
+			return columns[columnIndex_];
+		}
+		constexpr inline column_type at(const std::size_t columnIndex_) const
+		{
+			return columns[columnIndex_];
+		}
+		constexpr inline value_type& at(const std::size_t columnIndex_, const std::size_t rowIndex_)
+		{
+			return columns[columnIndex_][rowIndex_];
+		}
+		constexpr inline value_type at(const std::size_t columnIndex_, const std::size_t rowIndex_) const
+		{
+			return columns[columnIndex_][rowIndex_];
+		}
+		constexpr inline column_type& operator[](const std::size_t columnIndex_)
+		{
+			return this->at(columnIndex_);
+		}
+		constexpr inline column_type operator[](const std::size_t columnIndex_) const
+		{
+			return this->at(columnIndex_);
+		}
 #pragma region CONST_OPERATORS
 		constexpr inline this_type operator+(const this_type& rhs) const
 		{

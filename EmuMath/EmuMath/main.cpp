@@ -74,6 +74,7 @@ int main()
 
 	constexpr auto SomeSubMatrix = EmuMath::MatrixCM<4, 4, std::uint32_t>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16).SubMatrix<0, 2, 0, 2>();
 
+
 	//blooble.columns[1] *= 10.0f;
 	std::cout << "Base:\n" << blooble << std::endl;
 	std::cout << "Tranpose:\n" << blooble.Transpose() << std::endl;
@@ -101,6 +102,9 @@ int main()
 	constexpr EmuMath::MatrixCM<4, 4, double> McDooble(17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0, 32.0);
 	blooble = McDooble;
 	std::cout << "After set:\n" << blooble << std::endl;
+
+	std::cout << "Element (1, 3): " << EmuMath::Helpers::MatrixGet(blooble, 1, 3) << "\n";
+	std::cout << "Column 2: " << EmuMath::Helpers::MatrixGet(blooble, 2) << "\n";
 
 	system("pause");
 
