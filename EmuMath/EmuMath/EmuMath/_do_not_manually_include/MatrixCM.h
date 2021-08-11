@@ -241,19 +241,19 @@ namespace EmuMath
 		}
 		constexpr inline column_type& at(const std::size_t columnIndex_)
 		{
-			return columns[columnIndex_];
+			return EmuMath::Helpers::MatrixGet(*this, columnIndex_);
 		}
 		constexpr inline column_type at(const std::size_t columnIndex_) const
 		{
-			return columns[columnIndex_];
+			return EmuMath::Helpers::MatrixGet(*this, columnIndex_);
 		}
 		constexpr inline value_type& at(const std::size_t columnIndex_, const std::size_t rowIndex_)
 		{
-			return columns[columnIndex_][rowIndex_];
+			return EmuMath::Helpers::MatrixGet(*this, columnIndex_, rowIndex_);
 		}
 		constexpr inline value_type at(const std::size_t columnIndex_, const std::size_t rowIndex_) const
 		{
-			return columns[columnIndex_][rowIndex_];
+			return EmuMath::Helpers::MatrixGet(*this, columnIndex_, rowIndex_);
 		}
 		constexpr inline column_type& operator[](const std::size_t columnIndex_)
 		{

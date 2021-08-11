@@ -105,6 +105,7 @@ int main()
 
 	std::cout << "Element (1, 3): " << EmuMath::Helpers::MatrixGet(blooble, 1, 3) << "\n";
 	std::cout << "Column 2: " << EmuMath::Helpers::MatrixGet(blooble, 2) << "\n";
+	std::cout << "Column 3: " << blooble[3] << "\n";
 
 	system("pause");
 
