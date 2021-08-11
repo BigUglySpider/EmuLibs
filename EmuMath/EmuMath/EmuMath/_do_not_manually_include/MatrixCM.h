@@ -291,27 +291,10 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region NON_CONST_OPERATORS
-		constexpr inline this_type& operator=(const this_type& rhs)
+		template<class RhsMatrix_>
+		constexpr inline this_type& operator=(const RhsMatrix_& rhs_)
 		{
-			_perform_set<0, 0>(rhs);
-			return *this;
-		}
-
-		template<std::size_t Column_, std::size_t Row_>
-		constexpr inline void _perform_set(const this_type& rhs)
-		{
-			if constexpr (Column_ < num_columns)
-			{
-				if constexpr (Row_ < num_rows)
-				{
-					at<Column_, Row_>() = rhs.template at<Column_, Row_>();
-					_perform_set<Column_, Row_ + 1>(rhs);
-				}
-				else
-				{
-					_perform_set<Column_ + 1, 0>(rhs);
-				}
-			}
+			return EmuMath::Helpers::MatrixSet<this_type, RhsMatrix_>(*this, rhs_);
 		}
 #pragma endregion
 

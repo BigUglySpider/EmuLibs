@@ -318,6 +318,25 @@ namespace EmuMath::Helpers
 		}
 #pragma endregion
 
+#pragma region SETS
+		template<std::size_t Column_, std::size_t Row_, class LhsMatrix_, class RhsMatrix_>
+		constexpr inline void _matrix_set(LhsMatrix_& lhs_, const RhsMatrix_& rhs_)
+		{
+			if constexpr (Column_ < LhsMatrix_::num_columns)
+			{
+				if constexpr (Row_ < RhsMatrix_::num_rows)
+				{
+					_get_matrix_data_value<Column_, Row_>(lhs_) = static_cast<typename LhsMatrix_::value_type>(_get_matrix_data_value<Column_, Row_>(rhs_));
+					_matrix_set<Column_, Row_ + 1, LhsMatrix_, RhsMatrix_>(lhs_, rhs_);
+				}
+				else
+				{
+					_matrix_set<Column_ + 1, 0, LhsMatrix_, RhsMatrix_>(lhs_, rhs_);
+				}
+			}
+		}
+#pragma endregion
+
 #pragma region MATRIX_OPERATIONS
 		template<std::size_t Row_, std::size_t num_columns, std::size_t num_rows, typename value_type>
 		constexpr inline void _execute_matrix_transposition
@@ -603,6 +622,43 @@ namespace EmuMath::Helpers
 	std::array<typename Matrix_::column_type, Matrix_::num_columns> MatrixCopyAsColumns(const Matrix_& matrix_)
 	{
 		return _underlying_matrix_funcs::_copy_all_matrix_columns(matrix_);
+	}
+#pragma endregion
+
+#pragma region SETS
+	template<class LhsMatrix_, class RhsMatrix_>
+	constexpr inline LhsMatrix_& MatrixSet(LhsMatrix_& lhs_, const RhsMatrix_& rhs_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<LhsMatrix_>)
+		{
+			if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<RhsMatrix_>)
+			{
+				if constexpr (LhsMatrix_::num_columns == RhsMatrix_::num_columns)
+				{
+					if constexpr (LhsMatrix_::num_rows == RhsMatrix_::num_rows)
+					{
+						_underlying_matrix_funcs::_matrix_set<0, 0, LhsMatrix_, RhsMatrix_>(lhs_, rhs_);
+					}
+					else
+					{
+						static_assert(false, "Attempted to set an EmuMath matrix via MatrixSet, but the matrices did not have matching numbers of rows.");
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to set an EmuMath matrix via MatrixSet, but the matrices did not have matching numbers of columns.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to set an EmuMath Matrix via MatrixSet, but provided a non-EmuMath-matrix right-hand operand.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to set an EmuMath Matrix via MatrixSet, but provided a non-EmuMath-matrix left-hand operand.");
+		}
+		return lhs_;
 	}
 #pragma endregion
 
