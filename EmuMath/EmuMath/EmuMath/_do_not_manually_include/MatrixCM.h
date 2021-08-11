@@ -214,51 +214,100 @@ namespace EmuMath
 		}
 #pragma endregion
 
-
-		/// <summary> Returns a reference to the element at the provided point in this matrix, where Column_ is the horizontal index and Row_ is the vertical index. </summary>
-		/// <returns>Non-const reference to the element at the specified point in this matrix.</returns>
+		/// <summary>
+		/// <para> Accesses a copy of the element at the provided indices of this matrix. </para>
+		/// </summary>
+		/// <returns>Copy of the element at the provided indices within this matrix.</returns>
 		template<std::size_t Column_, std::size_t Row_>
 		constexpr inline value_type& at()
 		{
 			return EmuMath::Helpers::MatrixGet<Column_, Row_, this_type>(*this);
 		}
-		/// <summary> Returns a copy of the element at the provided point in this matrix, where Column_ is the horizontal index and Row_ is the vertical index. </summary>
-		/// <returns>Copy of the value at the specified point in this matrix.</returns>
+		/// <summary>
+		/// <para> Accesses a copy of the element at the provided indices of this matrix. </para>
+		/// </summary>
+		/// <returns>Copy of the element at the provided indices within this matrix.</returns>
 		template<std::size_t Column_, std::size_t Row_>
 		constexpr inline value_type at() const
 		{
 			return EmuMath::Helpers::MatrixGet<Column_, Row_, this_type>(*this);
 		}
+		/// <summary>
+		/// <para> Accesses the major-stored item at the provided index. As this is a column-major matrix, this will access the column of the provided index. </para>
+		/// </summary>
+		/// <returns>Reference to the column at the provided index.</returns>
 		template<std::size_t MajorIndex_>
 		constexpr inline major_type& at()
 		{
 			return EmuMath::Helpers::MatrixGet<MajorIndex_, this_type>(*this);
 		}
+		/// <summary>
+		/// <para> Accesses a copy of the major-stored item at the provided index. As this is a column-major matrix, this will access the column of the provided index. </para>
+		/// </summary>
+		/// <returns>Copy of the column at the provided index.</returns>
 		template<std::size_t MajorIndex_>
 		constexpr inline major_type at() const
 		{
 			return EmuMath::Helpers::MatrixGet<MajorIndex_, this_type>(*this);
 		}
+		/// <summary>
+		/// <para> Accesses the column at the provided index of this matrix's columns. Identical to accessing the columns member directly with the same index. </para>
+		/// <para> If columnIndex_ is compile-time evaluable, it is recommended to use it as a template argument in a call to at instead. </para>
+		/// </summary>
+		/// <param name="columnIndex_">Index of the column to access.</param>
+		/// <returns>Reference to the column at the provided columnIndex_.</returns>
 		constexpr inline column_type& at(const std::size_t columnIndex_)
 		{
 			return EmuMath::Helpers::MatrixGet(*this, columnIndex_);
 		}
+		/// <summary>
+		/// <para> Accesses a copy of the column at the provided index of this matrix's columns. Identical to accessing the columns member directly with the same index. </para>
+		/// <para> If columnIndex_ is compile-time evaluable, it is recommended to use it as a template argument in a call to at instead. </para>
+		/// </summary>
+		/// <param name="columnIndex_">Index of the column to access.</param>
+		/// <returns>Copy of the column at the provided columnIndex_.</returns>
 		constexpr inline column_type at(const std::size_t columnIndex_) const
 		{
 			return EmuMath::Helpers::MatrixGet(*this, columnIndex_);
 		}
+		/// <summary>
+		/// <para> Accesses the element at the provided indices of this matrix. </para>
+		/// <para> If columnIndex_ and rowIndex_ are evaluable at compile time, it is recommended to use them as template arguments instead. </para>
+		/// </summary>
+		/// <param name="columnIndex_">Index of the column to access.</param>
+		/// <param name="rowIndex_">Index of the row to access.</param>
+		/// <returns>Reference to the element at the provided indices within this matrix.</returns>
 		constexpr inline value_type& at(const std::size_t columnIndex_, const std::size_t rowIndex_)
 		{
 			return EmuMath::Helpers::MatrixGet(*this, columnIndex_, rowIndex_);
 		}
+		/// <summary>
+		/// <para> Accesses a copy of the element at the provided indices of this matrix. </para>
+		/// <para> If columnIndex_ and rowIndex_ are evaluable at compile time, it is recommended to use them as template arguments instead. </para>
+		/// </summary>
+		/// <param name="columnIndex_">Index of the column to access.</param>
+		/// <param name="rowIndex_">Index of the row to access.</param>
+		/// <returns>Copy of the element at the provided indices within this matrix.</returns>
 		constexpr inline value_type at(const std::size_t columnIndex_, const std::size_t rowIndex_) const
 		{
 			return EmuMath::Helpers::MatrixGet(*this, columnIndex_, rowIndex_);
 		}
+		/// <summary>
+		/// <para> Shorthand for at(columnIndex_). </para>
+		/// <para> If columnIndex_ is compile-time evaluable, it is recommended to use it as a template argument in a call to at instead. </para>
+		/// </summary>
+		/// <param name="columnIndex_">Index of the column to access.</param>
+		/// <returns>Reference to the column at the provided columnIndex_.</returns>
 		constexpr inline column_type& operator[](const std::size_t columnIndex_)
 		{
 			return this->at(columnIndex_);
 		}
+		/// <summary>
+		/// <para> Shorthand for at(columnIndex_). </para>
+		/// <para> If columnIndex_ is compile-time evaluable, it is recommended to use it as a template argument in a call to at instead. </para>
+		/// </summary>
+		/// <param name="columnIndex_">Index of the column to access.</param>
+		/// <returns>Copy of the column at the provided columnIndex_.</returns>
 		constexpr inline column_type operator[](const std::size_t columnIndex_) const
 		{
 			return this->at(columnIndex_);
