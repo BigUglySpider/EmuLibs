@@ -77,158 +77,27 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 			return false;
 		}
 	}
-#pragma endregion
 
-#pragma region BASIC_ARITHMETIC
-	template<std::size_t Row_, class ArithmeticFunc_, std::size_t num_columns, std::size_t num_rows, typename value_type, typename Rhs_>
-	constexpr inline void _execute_basic_matrix_arithmetic_on_contained_scalars_until_complete
-	(
-		typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::column_type& outColumn_,
-		const typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::column_type& lhsColumn,
-		const Rhs_& rhs,
-		ArithmeticFunc_& func_
-	)
+	template<class LhsMatrix_, class RhsMatrix_>
+	[[nodiscard]] constexpr inline bool _matrix_comparison_validity_check()
 	{
-		if constexpr (Row_ < num_rows)
+		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<LhsMatrix_>)
 		{
-			if constexpr (std::is_arithmetic_v<std::remove_reference_t<Rhs_>>)
+			if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<RhsMatrix_>)
 			{
-				outColumn_[Row_] = func_(lhsColumn[Row_], rhs);
-				_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<Row_ + 1, ArithmeticFunc_, num_columns, num_rows, value_type>(outColumn_, lhsColumn, rhs, func_);
+				return true;
 			}
 			else
 			{
-				outColumn_[Row_] = func_(lhsColumn[Row_], rhs[Row_]);
-				_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<Row_ + 1, ArithmeticFunc_, num_columns, num_rows, value_type>(outColumn_, lhsColumn, rhs, func_);
+				static_assert(false, "Attempted to perform a matrix comparison with non-EmuMath-matrix right-hand argument.");
+				return false;
 			}
 		}
-	}
-	template<std::size_t Row_, class ArithmeticFunc_, std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr inline void _execute_basic_matrix_arithmetic_on_contained_scalars_until_complete
-	(
-		typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::column_type& outColumn_,
-		const typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::column_type& matrix_,
-		ArithmeticFunc_& func_
-	)
-	{
-		if constexpr (Row_ < num_rows)
+		else
 		{
-			outColumn_[Row_] = func_(matrix_[Row_]);
-			_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<Row_ + 1, ArithmeticFunc_, num_columns, num_rows, value_type>(outColumn_, matrix_, func_);
+			static_assert(false, "Attempted to perform a matrix comparison with non-EmuMath-matrix left-hand argument.");
+			return false;
 		}
-	}
-
-	template<std::size_t Column_, class ArithmeticFunc_, std::size_t num_columns, std::size_t num_rows, typename value_type, typename Rhs_>
-	constexpr inline void _execute_basic_matrix_arithmetic_until_complete
-	(
-		EmuMath::MatrixCM<num_columns, num_rows, value_type>& out_,
-		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& lhs,
-		const Rhs_& rhs,
-		ArithmeticFunc_& func_
-	)
-	{
-		if constexpr (Column_ < num_columns)
-		{
-			if constexpr (EmuMath::MatrixCM<num_columns, num_rows, value_type>::uses_vector_storage)
-			{
-				if constexpr (std::is_same_v<EmuMath::MatrixCM<num_columns, num_rows, value_type>, Rhs_>)
-				{
-					out_.columns[Column_] = func_(lhs.columns[Column_], rhs.columns[Column_]);
-				}
-				else if constexpr (std::is_arithmetic_v<std::remove_reference_t<Rhs_>>)
-				{
-					out_.columns[Column_] = func_(lhs.columns[Column_], rhs);
-				}
-				else
-				{
-					static_assert(false, "Attempted to perform basic Matrix arithmetic with an invalid right-hand argument type.");
-					return;
-				}
-			}
-			else
-			{
-				if constexpr (std::is_same_v<EmuMath::MatrixCM<num_columns, num_rows, value_type>, Rhs_>)
-				{
-					_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<0, ArithmeticFunc_, num_columns, num_rows, value_type>
-					(
-						out_.columns[Column_],
-						lhs.columns[Column_],
-						rhs.columns[Column_],
-						func_
-					);
-				}
-				else if constexpr (std::is_arithmetic_v<std::remove_reference_t<Rhs_>>)
-				{
-					_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<0, ArithmeticFunc_, num_columns, num_rows, value_type>
-					(
-						out_.columns[Column_],
-						lhs.columns[Column_],
-						rhs,
-						func_
-					);
-				}
-				else
-				{
-					static_assert(false, "Attempted to perform basic Matrix arithmetic with an invalid right-hand argument type.");
-					return;
-				}
-			}
-			_execute_basic_matrix_arithmetic_until_complete<Column_ + 1, ArithmeticFunc_>(out_, lhs, rhs, func_);
-		}
-	}
-	template<std::size_t Column_, class ArithmeticFunc_, std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr inline void _execute_basic_matrix_arithmetic_until_complete
-	(
-		EmuMath::MatrixCM<num_columns, num_rows, value_type>& out_,
-		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_,
-		ArithmeticFunc_& func_
-	)
-	{
-		if constexpr (Column_ < num_columns)
-		{
-			if constexpr (EmuMath::MatrixCM<num_columns, num_rows, value_type>::uses_vector_storage)
-			{
-				out_.columns[Column_] = func_(matrix_.columns[Column_]);
-			}
-			else
-			{
-				_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<0, ArithmeticFunc_>
-					(
-						out_.columns[Column_],
-						matrix_.columns[Column_],
-						func_
-						);
-			}
-			_execute_basic_matrix_arithmetic_until_complete<Column_ + 1, ArithmeticFunc_>(out_, matrix_, func_);
-		}
-	}
-
-	/// <summary> Performs basic matrix arithmetic where adjacent elements have particular arithmetic performed on respective elements (e.g. c0r1a + c0r1b). </summary>
-	/// <typeparam name="ArithmeticFunc_">Functor to perform arithmetic.</typeparam>
-	/// <typeparam name="value_type">Type stored within the matrix.</typeparam>
-	/// <returns>Matrix after the arithmetic has been performed.</returns>
-	template<class ArithmeticFunc_, std::size_t num_columns, std::size_t num_rows, typename value_type, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::MatrixCM<num_columns, num_rows, value_type> _perform_basic_matrix_arithmetic
-	(
-		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& lhs,
-		const Rhs_& rhs
-	)
-	{
-		ArithmeticFunc_ func_ = ArithmeticFunc_();
-		EmuMath::MatrixCM<num_columns, num_rows, value_type> out_ = EmuMath::MatrixCM<num_columns, num_rows, value_type>();
-		_execute_basic_matrix_arithmetic_until_complete<0, ArithmeticFunc_>(out_, lhs, rhs, func_);
-		return out_;
-	}
-	template<class ArithmeticFunc_, std::size_t num_columns, std::size_t num_rows, typename value_type>
-	[[nodiscard]] constexpr inline EmuMath::MatrixCM<num_columns, num_rows, value_type> _perform_basic_matrix_arithmetic
-	(
-		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_
-	)
-	{
-		ArithmeticFunc_ func_ = ArithmeticFunc_();
-		EmuMath::MatrixCM<num_columns, num_rows, value_type> out_ = EmuMath::MatrixCM<num_columns, num_rows, value_type>();
-		_execute_basic_matrix_arithmetic_until_complete<0, ArithmeticFunc_>(out_, matrix_, func_);
-		return out_;
 	}
 #pragma endregion
 
@@ -412,6 +281,218 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		std::array<typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::row_type, num_rows> rows;
 		_copy_all_matrix_rows<0>(rows, matrix_);
 		return rows;
+	}
+#pragma endregion
+
+#pragma region BASIC_ARITHMETIC
+	template<std::size_t Row_, class ArithmeticFunc_, std::size_t num_columns, std::size_t num_rows, typename value_type, typename Rhs_>
+	constexpr inline void _execute_basic_matrix_arithmetic_on_contained_scalars_until_complete
+	(
+		typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::column_type& outColumn_,
+		const typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::column_type& lhsColumn,
+		const Rhs_& rhs,
+		ArithmeticFunc_& func_
+	)
+	{
+		if constexpr (Row_ < num_rows)
+		{
+			if constexpr (std::is_arithmetic_v<std::remove_reference_t<Rhs_>>)
+			{
+				outColumn_[Row_] = func_(lhsColumn[Row_], rhs);
+				_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<Row_ + 1, ArithmeticFunc_, num_columns, num_rows, value_type>(outColumn_, lhsColumn, rhs, func_);
+			}
+			else
+			{
+				outColumn_[Row_] = func_(lhsColumn[Row_], rhs[Row_]);
+				_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<Row_ + 1, ArithmeticFunc_, num_columns, num_rows, value_type>(outColumn_, lhsColumn, rhs, func_);
+			}
+		}
+	}
+	template<std::size_t Row_, class ArithmeticFunc_, std::size_t num_columns, std::size_t num_rows, typename value_type>
+	constexpr inline void _execute_basic_matrix_arithmetic_on_contained_scalars_until_complete
+	(
+		typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::column_type& outColumn_,
+		const typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::column_type& matrix_,
+		ArithmeticFunc_& func_
+	)
+	{
+		if constexpr (Row_ < num_rows)
+		{
+			outColumn_[Row_] = func_(matrix_[Row_]);
+			_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<Row_ + 1, ArithmeticFunc_, num_columns, num_rows, value_type>(outColumn_, matrix_, func_);
+		}
+	}
+
+	template<std::size_t Column_, class ArithmeticFunc_, std::size_t num_columns, std::size_t num_rows, typename value_type, typename Rhs_>
+	constexpr inline void _execute_basic_matrix_arithmetic_until_complete
+	(
+		EmuMath::MatrixCM<num_columns, num_rows, value_type>& out_,
+		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& lhs,
+		const Rhs_& rhs,
+		ArithmeticFunc_& func_
+	)
+	{
+		if constexpr (Column_ < num_columns)
+		{
+			if constexpr (EmuMath::MatrixCM<num_columns, num_rows, value_type>::uses_vector_storage)
+			{
+				if constexpr (std::is_same_v<EmuMath::MatrixCM<num_columns, num_rows, value_type>, Rhs_>)
+				{
+					out_.columns[Column_] = func_(lhs.columns[Column_], rhs.columns[Column_]);
+				}
+				else if constexpr (std::is_arithmetic_v<std::remove_reference_t<Rhs_>>)
+				{
+					out_.columns[Column_] = func_(lhs.columns[Column_], rhs);
+				}
+				else
+				{
+					static_assert(false, "Attempted to perform basic Matrix arithmetic with an invalid right-hand argument type.");
+					return;
+				}
+			}
+			else
+			{
+				if constexpr (std::is_same_v<EmuMath::MatrixCM<num_columns, num_rows, value_type>, Rhs_>)
+				{
+					_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<0, ArithmeticFunc_, num_columns, num_rows, value_type>
+					(
+						out_.columns[Column_],
+						lhs.columns[Column_],
+						rhs.columns[Column_],
+						func_
+					);
+				}
+				else if constexpr (std::is_arithmetic_v<std::remove_reference_t<Rhs_>>)
+				{
+					_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<0, ArithmeticFunc_, num_columns, num_rows, value_type>
+					(
+						out_.columns[Column_],
+						lhs.columns[Column_],
+						rhs,
+						func_
+					);
+				}
+				else
+				{
+					static_assert(false, "Attempted to perform basic Matrix arithmetic with an invalid right-hand argument type.");
+					return;
+				}
+			}
+			_execute_basic_matrix_arithmetic_until_complete<Column_ + 1, ArithmeticFunc_>(out_, lhs, rhs, func_);
+		}
+	}
+	template<std::size_t Column_, class ArithmeticFunc_, std::size_t num_columns, std::size_t num_rows, typename value_type>
+	constexpr inline void _execute_basic_matrix_arithmetic_until_complete
+	(
+		EmuMath::MatrixCM<num_columns, num_rows, value_type>& out_,
+		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_,
+		ArithmeticFunc_& func_
+	)
+	{
+		if constexpr (Column_ < num_columns)
+		{
+			if constexpr (EmuMath::MatrixCM<num_columns, num_rows, value_type>::uses_vector_storage)
+			{
+				out_.columns[Column_] = func_(matrix_.columns[Column_]);
+			}
+			else
+			{
+				_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<0, ArithmeticFunc_>
+					(
+						out_.columns[Column_],
+						matrix_.columns[Column_],
+						func_
+						);
+			}
+			_execute_basic_matrix_arithmetic_until_complete<Column_ + 1, ArithmeticFunc_>(out_, matrix_, func_);
+		}
+	}
+
+	/// <summary> Performs basic matrix arithmetic where adjacent elements have particular arithmetic performed on respective elements (e.g. c0r1a + c0r1b). </summary>
+	/// <typeparam name="ArithmeticFunc_">Functor to perform arithmetic.</typeparam>
+	/// <typeparam name="value_type">Type stored within the matrix.</typeparam>
+	/// <returns>Matrix after the arithmetic has been performed.</returns>
+	template<class ArithmeticFunc_, std::size_t num_columns, std::size_t num_rows, typename value_type, typename Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::MatrixCM<num_columns, num_rows, value_type> _perform_basic_matrix_arithmetic
+	(
+		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& lhs,
+		const Rhs_& rhs
+	)
+	{
+		ArithmeticFunc_ func_ = ArithmeticFunc_();
+		EmuMath::MatrixCM<num_columns, num_rows, value_type> out_ = EmuMath::MatrixCM<num_columns, num_rows, value_type>();
+		_execute_basic_matrix_arithmetic_until_complete<0, ArithmeticFunc_>(out_, lhs, rhs, func_);
+		return out_;
+	}
+	template<class ArithmeticFunc_, std::size_t num_columns, std::size_t num_rows, typename value_type>
+	[[nodiscard]] constexpr inline EmuMath::MatrixCM<num_columns, num_rows, value_type> _perform_basic_matrix_arithmetic
+	(
+		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_
+	)
+	{
+		ArithmeticFunc_ func_ = ArithmeticFunc_();
+		EmuMath::MatrixCM<num_columns, num_rows, value_type> out_ = EmuMath::MatrixCM<num_columns, num_rows, value_type>();
+		_execute_basic_matrix_arithmetic_until_complete<0, ArithmeticFunc_>(out_, matrix_, func_);
+		return out_;
+	}
+#pragma endregion
+
+#pragma region COMPARISONS
+	template<std::size_t Column_, std::size_t Row_, class LhsMatrix_, class RhsMatrix_, class Comparator_, class LogicalMerger_, bool FinalDummyReturn_>
+	constexpr inline bool _compare_equal_sized_matrices_until_finished(const LhsMatrix_& lhs_, const RhsMatrix_& rhs_, Comparator_& comparator_, LogicalMerger_& logicalMerger_)
+	{
+		if constexpr (Column_ < LhsMatrix_::num_columns)
+		{
+			if constexpr (Row_ < LhsMatrix_::num_rows)
+			{
+				return logicalMerger_
+				(
+					comparator_(_get_matrix_data_value<Column_, Row_>(lhs_), _get_matrix_data_value<Column_, Row_>(rhs_)),
+					_compare_equal_sized_matrices_until_finished<Column_, Row_ + 1, LhsMatrix_, RhsMatrix_, Comparator_, LogicalMerger_, FinalDummyReturn_>
+					(
+						lhs_,
+						rhs_,
+						comparator_,
+						logicalMerger_
+					)
+				);
+			}
+			else
+			{
+				return _compare_equal_sized_matrices_until_finished<Column_ + 1, 0, LhsMatrix_, RhsMatrix_, Comparator_, LogicalMerger_, FinalDummyReturn_>
+				(
+					lhs_,
+					rhs_,
+					comparator_,
+					logicalMerger_
+				);
+			}
+		}
+		else
+		{
+			return FinalDummyReturn_;
+		}
+	}
+
+	template<class LhsMatrix_, class RhsMatrix_, class Comparator_, class LogicalMerger_, bool FinalDummyReturn_, bool DefaultResultIfUnequalSize_>
+	constexpr inline bool _compare_full_matrices(const LhsMatrix_& lhs_, const RhsMatrix_& rhs_)
+	{
+		if constexpr (LhsMatrix_::num_columns == RhsMatrix_::num_columns && LhsMatrix_::num_rows == RhsMatrix_::num_rows)
+		{
+			Comparator_ comparator_ = Comparator_();
+			LogicalMerger_ logicalMerger_ = LogicalMerger_();
+			return _compare_equal_sized_matrices_until_finished<0, 0, LhsMatrix_, RhsMatrix_, Comparator_, LogicalMerger_, FinalDummyReturn_>
+			(
+				lhs_,
+				rhs_,
+				comparator_,
+				logicalMerger_
+			);
+		}
+		else
+		{
+			return DefaultResultIfUnequalSize_;
+		}
 	}
 #pragma endregion
 

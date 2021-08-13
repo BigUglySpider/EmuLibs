@@ -132,7 +132,16 @@ int main()
 
 	std::cout << "Minors:\n" << EmuMath::Helpers::MatrixMinorsLaplace(resooble) << "\n";
 
-	EmuMath::Helpers::MatrixInverseLaplace(resooble);
+	std::cout << "\n" << resooble << "\nEQUAL TO\n" << resoobleInverse << "\n?: " << EmuMath::Helpers::MatrixEqual(resooble, resoobleInverse) << "\n";
+	std::cout << "\n" << resooble << "\nEQUAL TO\n" << resooble << "\n?: " << EmuMath::Helpers::MatrixEqual(resooble, resooble) << "\n";
+
+
+	std::cout << "\n" << resooble << "\nNOT EQUAL TO\n" << resoobleInverse << "\n?: " << EmuMath::Helpers::MatrixNotEqual(resooble, resoobleInverse) << "\n";
+	std::cout << "\n" << resooble << "\nNOT EQUAL TO\n" << resooble << "\n?: " << EmuMath::Helpers::MatrixNotEqual(resooble, resooble) << "\n";
+
+	std::cout << "\n" << resooble << "\nEQUAL TO\n" << bigooble << "\n?: " << EmuMath::Helpers::MatrixEqual(resooble, bigooble) << "\n";
+	std::cout << "\n" << resooble << "\nNOT EQUAL TO\n" << bigooble << "\n?: " << EmuMath::Helpers::MatrixNotEqual(resooble, bigooble) << "\n";
+	std::cout << "\n" << bigooble << "\nEQUAL TO\n" << bigooble << "\n?: " << EmuMath::Helpers::MatrixEqual(bigooble, bigooble) << "\n";
 
 	system("pause");
 

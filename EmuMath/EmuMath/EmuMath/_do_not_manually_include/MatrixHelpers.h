@@ -128,6 +128,36 @@ namespace EmuMath::Helpers
 	}
 #pragma endregion
 
+#pragma region COMPARISONS
+	template<class LhsMatrix_, class RhsMatrix_>
+	constexpr inline bool MatrixEqual(const LhsMatrix_& lhs_, const RhsMatrix_& rhs_)
+	{
+		if constexpr (_underlying_matrix_funcs::_matrix_comparison_validity_check<LhsMatrix_, RhsMatrix_>())
+		{
+			return _underlying_matrix_funcs::_compare_full_matrices<LhsMatrix_, RhsMatrix_, std::equal_to<void>, std::logical_and<void>, true, false>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Failed to check matrix equality via EmuMath::Helpers::MatrixEqual.");
+			return false;
+		}
+	}
+
+	template<class LhsMatrix_, class RhsMatrix_>
+	constexpr inline bool MatrixNotEqual(const LhsMatrix_& lhs_, const RhsMatrix_& rhs_)
+	{
+		if constexpr (_underlying_matrix_funcs::_matrix_comparison_validity_check<LhsMatrix_, RhsMatrix_>())
+		{
+			return _underlying_matrix_funcs::_compare_full_matrices<LhsMatrix_, RhsMatrix_, std::not_equal_to<void>, std::logical_or<void>, false, true>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Failed to check matrix inequality via EmuMath::Helpers::MatrixEqual.");
+			return false;
+		}
+	}
+#pragma endregion
+
 #pragma region GETS
 	/// <summary> Accesses the element at the provided indices of the passed matrix. </summary>
 	/// <typeparam name="Matrix_">Type of matrix to access.</typeparam>
