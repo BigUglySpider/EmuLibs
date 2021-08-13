@@ -623,6 +623,12 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary>
+	/// <para> Calculates and returns the matrix of minors to the passed matrix, using Laplace Expansion to calculate individual elements. </para>
+	/// </summary>
+	/// <typeparam name="Matrix_">Type of matrix being used.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to calculate the matrix of minors for.</param>
+	/// <returns>Matrix of minors to the passed matrix.</returns>
 	template<class Matrix_>
 	constexpr inline Matrix_ MatrixMinorsLaplace(const Matrix_& matrix_)
 	{
@@ -647,6 +653,10 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary> Creates a matrix of cofactors to the passed matrix. Relevant steps, such as calculating determinants, make use of Laplace Expansion. </summary>
+	/// <typeparam name="Matrix_">Type of matrix being used.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to calculate the matrix of cofactors for.</param>
+	/// <returns>Matrix of cofactors to the passed matrix.</returns>
 	template<class Matrix_>
 	constexpr inline Matrix_ MatrixCofactorsLaplace(const Matrix_& matrix_)
 	{
@@ -663,6 +673,10 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary> Creates the adjugate matrix to the passed matrix. Relevant steps, such as calculating determinants, make use of Laplace Expansion. </summary>
+	/// <typeparam name="Matrix_">Type of matrix being used.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to calculate the adjugate for.</param>
+	/// <returns>Adjugate matrix to the passed matrix.</returns>
 	template<class Matrix_>
 	constexpr inline Matrix_ MatrixAdjugateLaplace(const Matrix_& matrix_)
 	{
