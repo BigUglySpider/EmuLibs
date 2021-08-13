@@ -15,7 +15,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 {
 #pragma region CHECKS
 	template<std::size_t Column_, std::size_t Row_, class Matrix_>
-	constexpr inline bool _matrix_get_validity_check()
+	[[nodiscard]] constexpr inline bool _matrix_get_validity_check()
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
 		{
@@ -44,7 +44,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 	}
 	template<std::size_t Index_, class Matrix_>
-	constexpr inline bool _matrix_get_major_validity_check()
+	[[nodiscard]] constexpr inline bool _matrix_get_major_validity_check()
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
 		{
@@ -65,7 +65,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 	}
 	template<class Matrix_>
-	constexpr inline bool _matrix_get_basic_validity_check()
+	[[nodiscard]] constexpr inline bool _matrix_get_basic_validity_check()
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
 		{
@@ -150,22 +150,22 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 				if constexpr (std::is_same_v<EmuMath::MatrixCM<num_columns, num_rows, value_type>, Rhs_>)
 				{
 					_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<0, ArithmeticFunc_, num_columns, num_rows, value_type>
-						(
-							out_.columns[Column_],
-							lhs.columns[Column_],
-							rhs.columns[Column_],
-							func_
-							);
+					(
+						out_.columns[Column_],
+						lhs.columns[Column_],
+						rhs.columns[Column_],
+						func_
+					);
 				}
 				else if constexpr (std::is_arithmetic_v<std::remove_reference_t<Rhs_>>)
 				{
 					_execute_basic_matrix_arithmetic_on_contained_scalars_until_complete<0, ArithmeticFunc_, num_columns, num_rows, value_type>
-						(
-							out_.columns[Column_],
-							lhs.columns[Column_],
-							rhs,
-							func_
-							);
+					(
+						out_.columns[Column_],
+						lhs.columns[Column_],
+						rhs,
+						func_
+					);
 				}
 				else
 				{
@@ -208,7 +208,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	/// <typeparam name="value_type">Type stored within the matrix.</typeparam>
 	/// <returns>Matrix after the arithmetic has been performed.</returns>
 	template<class ArithmeticFunc_, std::size_t num_columns, std::size_t num_rows, typename value_type, typename Rhs_>
-	constexpr inline EmuMath::MatrixCM<num_columns, num_rows, value_type> _perform_basic_matrix_arithmetic
+	[[nodiscard]] constexpr inline EmuMath::MatrixCM<num_columns, num_rows, value_type> _perform_basic_matrix_arithmetic
 	(
 		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& lhs,
 		const Rhs_& rhs
@@ -220,7 +220,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		return out_;
 	}
 	template<class ArithmeticFunc_, std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr inline EmuMath::MatrixCM<num_columns, num_rows, value_type> _perform_basic_matrix_arithmetic
+	[[nodiscard]] constexpr inline EmuMath::MatrixCM<num_columns, num_rows, value_type> _perform_basic_matrix_arithmetic
 	(
 		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_
 	)
@@ -234,7 +234,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 
 #pragma region GETS
 	template<std::size_t Column_, std::size_t Row_, std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr value_type& _get_matrix_data_value(EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_)
+	[[nodiscard]] constexpr inline value_type& _get_matrix_data_value(EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_)
 	{
 		if constexpr (Column_ < num_columns)
 		{
@@ -260,7 +260,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 	}
 	template<std::size_t Column_, std::size_t Row_, std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr value_type _get_matrix_data_value(const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_)
+	[[nodiscard]] constexpr inline value_type _get_matrix_data_value(const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_)
 	{
 		if constexpr (Column_ < num_columns)
 		{
@@ -286,18 +286,28 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 	}
 	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr value_type& _get_matrix_data_value(EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_, const std::size_t column_, const std::size_t row_)
+	[[nodiscard]] constexpr inline value_type& _get_matrix_data_value
+	(
+		EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_,
+		const std::size_t column_,
+		const std::size_t row_
+	)
 	{
 		return matrix_.columns[column_][row_];
 	}
 	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr value_type _get_matrix_data_value(const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_, const std::size_t column_, const std::size_t row_)
+	[[nodiscard]] constexpr inline value_type _get_matrix_data_value
+	(
+		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_,
+		const std::size_t column_,
+		const std::size_t row_
+	)
 	{
 		return matrix_.columns[column_][row_];
 	}
 
 	template<std::size_t Index_, std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::major_type& _get_matrix_major_index
+	[[nodiscard]] constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::major_type& _get_matrix_major_index
 	(
 		EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_
 	)
@@ -305,7 +315,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		return matrix_.columns[Index_];
 	}
 	template<std::size_t Index_, std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::major_type _get_matrix_major_index
+	[[nodiscard]] constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::major_type _get_matrix_major_index
 	(
 		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_
 	)
@@ -313,7 +323,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		return matrix_.columns[Index_];
 	}
 	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::major_type& _get_matrix_major_index
+	[[nodiscard]] constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::major_type& _get_matrix_major_index
 	(
 		EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_,
 		std::size_t index_
@@ -322,7 +332,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		return matrix_.columns[index_];
 	}
 	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::major_type _get_matrix_major_index
+	[[nodiscard]] constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::major_type _get_matrix_major_index
 	(
 		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_,
 		std::size_t index_
@@ -332,7 +342,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<std::size_t Index_, typename MajorData_>
-	constexpr typename MajorData_::value_type& _get_matrix_major_data_value(typename MajorData_& majorData_)
+	[[nodiscard]] constexpr inline typename MajorData_::value_type& _get_matrix_major_data_value(typename MajorData_& majorData_)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<MajorData_>)
 		{
@@ -344,7 +354,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 	}
 	template<std::size_t Index_, typename MajorData_>
-	constexpr typename MajorData_::value_type _get_matrix_major_data_value(const MajorData_& majorData_)
+	[[nodiscard]] constexpr inline typename MajorData_::value_type _get_matrix_major_data_value(const MajorData_& majorData_)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<MajorData_>)
 		{
@@ -357,7 +367,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<std::size_t CurrentColumn_, std::size_t TargetRowIndex_, std::size_t num_columns, std::size_t num_rows, typename value_type>
-	void _fill_matrix_row
+	constexpr inline void _fill_matrix_row
 
 	(
 		typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::row_type& outRow_,
@@ -372,7 +382,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
-	std::array<typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::row_type, num_columns> _copy_all_matrix_columns
+	[[nodiscard]] constexpr inline std::array<typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::row_type, num_columns> _copy_all_matrix_columns
 	(
 		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_
 	)
@@ -381,7 +391,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<std::size_t RowIndex_, std::size_t num_columns, std::size_t num_rows, typename value_type>
-	void _copy_all_matrix_rows
+	constexpr inline void _copy_all_matrix_rows
 	(
 		std::array<typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::row_type, num_rows>& outRows_,
 		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_
@@ -394,7 +404,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 	}
 	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
-	std::array<typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::row_type, num_rows> _copy_all_matrix_rows
+	[[nodiscard]] constexpr inline std::array<typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::row_type, num_rows> _copy_all_matrix_rows
 	(
 		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_
 	)
@@ -440,7 +450,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<std::size_t Index_, typename OutT_, class Matrix_>
-	constexpr inline OutT_ _calculate_matrix_trace(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline OutT_ _calculate_matrix_trace(const Matrix_& matrix_)
 	{
 		if constexpr (Index_ < Matrix_::num_rows)
 		{
@@ -481,7 +491,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<std::size_t BeginColumn, std::size_t EndColumn, std::size_t BeginRow, std::size_t EndRow, class Matrix_, class Out_>
-	constexpr inline Out_ _find_matrix_submatrix(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline Out_ _find_matrix_submatrix(const Matrix_& matrix_)
 	{
 		Out_ out_ = Out_();
 		_fill_matrix_submatrix<BeginColumn, EndColumn, BeginRow, EndRow, 0, 0, Matrix_, Out_>(matrix_, out_);
@@ -520,7 +530,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<std::size_t IgnoreColumn_, std::size_t IgnoreRow_, class Matrix_, class Out_>
-	constexpr inline Out_ _find_matrix_submatrix_exclusive(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline Out_ _find_matrix_submatrix_exclusive(const Matrix_& matrix_)
 	{
 		Out_ out_ = Out_();
 		_fill_matrix_submatrix_exclusive<IgnoreColumn_, IgnoreRow_, 0, 0, 0, 0, Matrix_, Out_>(matrix_, out_);
@@ -528,7 +538,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<class Matrix_>
-	constexpr inline bool _matrix_valid_for_determinant()
+	[[nodiscard]] constexpr inline bool _matrix_valid_for_determinant()
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
 		{
@@ -549,7 +559,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 	}
 	template<class Matrix_>
-	constexpr inline bool _matrix_valid_for_inversion()
+	[[nodiscard]] constexpr inline bool _matrix_valid_for_inversion()
 	{
 		if constexpr (_matrix_valid_for_determinant<Matrix_>())
 		{
@@ -563,7 +573,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<typename Out_, class Matrix_>
-	constexpr inline Out_ _calculate_matrix_determinant_2x2(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline Out_ _calculate_matrix_determinant_2x2(const Matrix_& matrix_)
 	{
 		Out_ out_ = static_cast<Out_>(_get_matrix_data_value<0, 0>(matrix_)) * static_cast<Out_>(_get_matrix_data_value<1, 1>(matrix_));
 		out_ = out_ - static_cast<Out_>(_get_matrix_data_value<1, 0>(matrix_)) * static_cast<Out_>(_get_matrix_data_value<0, 1>(matrix_));
@@ -610,7 +620,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<std::size_t Column_, std::size_t Row_, class Matrix_>
-	void _create_cofactor_matrix(const Matrix_& matrix_, Matrix_& out_)
+	constexpr inline void _create_cofactor_matrix(const Matrix_& matrix_, Matrix_& out_)
 	{
 		if constexpr (Column_ < Matrix_::num_columns)
 		{
@@ -672,7 +682,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 #pragma region MATRIX_ARITHMETIC
 
 	template<std::size_t Index_, typename OutT_, class LhsRow_, class RhsColumn_>
-	inline constexpr OutT_ _matrix_row_column_dot_scalar(const LhsRow_& lhsRow_, const RhsColumn_& rhsColumn_)
+	[[nodiscard]] constexpr inline OutT_ _matrix_row_column_dot_scalar(const LhsRow_& lhsRow_, const RhsColumn_& rhsColumn_)
 	{
 		if constexpr (Index_ < LhsRow_::size())
 		{
@@ -684,7 +694,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 	}
 	template<typename OutT_, class LhsRow_, class RhsColumn_>
-	inline constexpr OutT_ _matrix_row_column_dot(const LhsRow_& lhsRow_, const RhsColumn_& rhsColumn_)
+	[[nodiscard]] constexpr inline OutT_ _matrix_row_column_dot(const LhsRow_& lhsRow_, const RhsColumn_& rhsColumn_)
 	{
 		if constexpr (EmuCore::TMPHelpers::are_all_check<EmuMath::TMPHelpers::is_emu_vector, LhsRow_, RhsColumn_>::value)
 		{
@@ -697,7 +707,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<std::size_t Column_, std::size_t Row_, std::size_t num_columns, std::size_t num_rows, class LhsRows_, class RhsColumns_, typename value_type>
-	constexpr void _multiply_matrices
+	constexpr inline void _multiply_matrices
 	(
 		EmuMath::MatrixCM<num_columns, num_rows, value_type>& out_,
 		const LhsRows_& lhsRows_,
@@ -721,7 +731,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> _multiply_matrices
+	[[nodiscard]] constexpr inline EmuMath::MatrixCM<num_columns, num_rows, value_type> _multiply_matrices
 	(
 		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& lhs,
 		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& rhs

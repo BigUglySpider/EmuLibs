@@ -34,7 +34,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	/// <param name="rhs">Right-handed operand in the arithmetic operation.</param>
 	/// <returns>Results of the arithmetic operation represented in an OutVector type.</returns>
 	template<class OutVector, class LhsVector, class RhsVector, typename LhsElementAsScalar, class Func>
-	inline OutVector _perform_vector_arithmetic_vector_rhs_with_types(const LhsVector& lhs, const RhsVector& rhs)
+	[[nodiscard]] constexpr inline OutVector _perform_vector_arithmetic_vector_rhs_with_types(const LhsVector& lhs, const RhsVector& rhs)
 	{
 		Func func = Func();
 		if constexpr (OutVector::size() == 2)
@@ -121,7 +121,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	/// <param name="rhs">Right-handed operand in the arithmetic operation.</param>
 	/// <returns>Results of the arithmetic operation represented in an OutVector type.</returns>
 	template<class OutVector, class LhsVector, typename Rhs, typename LhsElementAsScalar, class Func>
-	inline OutVector _perform_vector_arithmetic_scalar_rhs_with_types(const LhsVector& lhs, const Rhs& rhs)
+	[[nodiscard]] constexpr inline OutVector _perform_vector_arithmetic_scalar_rhs_with_types(const LhsVector& lhs, const Rhs& rhs)
 	{
 		Func func = Func();
 		if constexpr (OutVector::size() == 2)
@@ -205,7 +205,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	/// <param name="rhs">Right-handed operand in the arithmetic operation.</param>
 	/// <returns>Results of the arithmetic operation represented in an OutVector type.</returns>
 	template<class OutVector, class LhsVector, class RhsVector, template<typename Lhs_, typename Rhs_, typename Out_> class Func_>
-	inline OutVector _perform_vector_arithmetic_vector_rhs_emu(const LhsVector& lhs, const RhsVector& rhs)
+	[[nodiscard]] constexpr inline OutVector _perform_vector_arithmetic_vector_rhs_emu(const LhsVector& lhs, const RhsVector& rhs)
 	{
 		using LhsNonref = typename LhsVector::nonref_value_type_without_qualifiers;
 		using RhsNonref = typename RhsVector::nonref_value_type_without_qualifiers;
@@ -238,7 +238,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	/// <param name="rhs">Right-handed operand in the arithmetic operation.</param>
 	/// <returns>Results of the arithmetic operation represented in an OutVector type.</returns>
 	template<class OutVector, class LhsVector, class Rhs, template<typename Lhs_, typename Rhs_, typename Out_> class Func_>
-	inline OutVector _perform_vector_arithmetic_scalar_rhs_emu(const LhsVector& lhs, const Rhs& rhs)
+	[[nodiscard]] constexpr inline OutVector _perform_vector_arithmetic_scalar_rhs_emu(const LhsVector& lhs, const Rhs& rhs)
 	{
 		using LhsNonref = typename LhsVector::nonref_value_type_without_qualifiers;
 		using RhsNonref = std::remove_cv_t<Rhs>;
@@ -261,7 +261,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<typename OutT_, class InVector_, template<typename Lhs__, typename Rhs__, typename Out__> class FuncTemplate_>
-	inline constexpr OutT_ _calculate_vector_total_emu(const InVector_& in_)
+	[[nodiscard]] constexpr inline OutT_ _calculate_vector_total_emu(const InVector_& in_)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<InVector_>)
 		{
@@ -320,7 +320,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 
 #pragma region BITWISE
 	template<class OutVector, class LhsVector, class RhsVector, template<class LhsT_, class RhsT_, class OutT_> class Func_>
-	inline OutVector _perform_vector_bitwise_op_vector_rhs_emu(const LhsVector& lhs, const RhsVector& rhs)
+	[[nodiscard]] constexpr inline OutVector _perform_vector_bitwise_op_vector_rhs_emu(const LhsVector& lhs, const RhsVector& rhs)
 	{
 		using Func = Func_
 			<
@@ -364,7 +364,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<class OutVector, class LhsVector, typename Rhs, template<class LhsT_, class RhsT_, class OutT_> class Func_>
-	inline OutVector _perform_vector_bitwise_op_scalar_rhs_emu(const LhsVector& lhs, const Rhs& rhs)
+	[[nodiscard]] constexpr inline OutVector _perform_vector_bitwise_op_scalar_rhs_emu(const LhsVector& lhs, const Rhs& rhs)
 	{
 		using Func = Func_
 			<
@@ -408,7 +408,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<class OutVector_, class InVector_>
-	inline constexpr OutVector_ _perform_vector_bitwise_not(const InVector_ in_)
+	[[nodiscard]] constexpr inline OutVector_ _perform_vector_bitwise_not(const InVector_ in_)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<OutVector_>)
 		{
@@ -455,7 +455,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 
 #pragma region VECTORWISE SHIFTS
 	template<class OutVector, class EmuVector_, class LeftShifter_, class RightShifter_>
-	inline constexpr OutVector _perform_branching_vectorwise_left_shift(const EmuVector_& inVector, const std::size_t numShifts)
+	[[nodiscard]] constexpr inline OutVector _perform_branching_vectorwise_left_shift(const EmuVector_& inVector, const std::size_t numShifts)
 	{
 		using Scalar = typename OutVector::value_type;
 		constexpr std::size_t ScalarSize_ = sizeof(Scalar);
@@ -584,7 +584,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<class OutVector, class EmuVector_, class RightShifter_, class LeftShifter_>
-	inline constexpr OutVector _perform_branching_vectorwise_right_shift(const EmuVector_& inVector, const std::size_t numShifts)
+	[[nodiscard]] constexpr inline OutVector _perform_branching_vectorwise_right_shift(const EmuVector_& inVector, const std::size_t numShifts)
 	{
 		using Scalar = typename OutVector::value_type;
 		constexpr std::size_t ScalarSize_ = sizeof(Scalar);
@@ -712,7 +712,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<class OutVector, class EmuVector_, class TargetShifter_, class OppositeShifter_, bool IsLeft_>
-	inline constexpr OutVector _perform_branching_vectorwise_shift(const EmuVector_& inVector, const std::size_t numShifts)
+	[[nodiscard]] constexpr inline OutVector _perform_branching_vectorwise_shift(const EmuVector_& inVector, const std::size_t numShifts)
 	{
 		if constexpr (IsLeft_)
 		{
@@ -725,14 +725,14 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template
-		<
+	<
 		class OutVector,
 		class EmuVector_,
 		template<class Lhs__, class Rhs__, class Out__> class TargetShiftTemplate_,
 		template<class Lhs__, class Rhs__, class Out__> class OppositeShiftTemplate_,
 		bool IsLeft_
-		>
-		inline constexpr OutVector _perform_vectorwise_shift_emu(const EmuVector_& inVector, const std::size_t numShifts)
+	>
+	[[nodiscard]] constexpr inline OutVector _perform_vectorwise_shift_emu(const EmuVector_& inVector, const std::size_t numShifts)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<EmuVector_>)
 		{
@@ -805,7 +805,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 
 #pragma region ROUNDING
 	template<class OutVector_, class InVector_, template<typename In__, typename Out__> class Rounder_>
-	inline OutVector_ _perform_vector_round_emu(const InVector_& in_)
+	[[nodiscard]] inline OutVector_ _perform_vector_round_emu(const InVector_& in_)
 	{
 		using Rounder = Rounder_<typename InVector_::nonref_value_type, typename OutVector_::nonref_value_type>;
 		Rounder rounder = Rounder();
@@ -882,7 +882,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<class OutVector_, class InVector_, template<typename In__, typename Out__> class Rounder_>
-	inline constexpr OutVector_ _perform_vector_constexpr_round_emu(const InVector_& in_)
+	[[nodiscard]] constexpr inline OutVector_ _perform_vector_constexpr_round_emu(const InVector_& in_)
 	{
 		using InScalar_ = typename InVector_::nonref_value_type_without_qualifiers;
 		using OutScalar_ = typename OutVector_::nonref_value_type_without_qualifiers;
@@ -960,7 +960,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 
 #pragma region MIN_MAX
 	template<std::size_t Index_, class OutScalar_, class In_, class Min_, class Max_>
-	inline constexpr OutScalar_ _perform_vector_min_and_max_comparison(const In_& in_, const Min_& min_, const Max_& max_)
+	[[nodiscard]] constexpr inline OutScalar_ _perform_vector_min_and_max_comparison(const In_& in_, const Min_& min_, const Max_& max_)
 	{
 		using InScalar_ = std::conditional_t<(Index_ < In_::size()), typename In_::const_ref_value_type, typename In_::nonref_value_type_without_qualifiers>;
 		const InScalar_ in_n_ = EmuMath::TMPHelpers::emu_vector_element_n<Index_>(in_);
@@ -973,17 +973,17 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 				{
 					typename Max_::const_ref_value_type max_n_ = EmuMath::TMPHelpers::emu_vector_element_n<Index_>(max_);
 					return
-						(
-							(in_n_ < min_n_) ? static_cast<OutScalar_>(min_n_) :
-							(in_n_ > max_n_) ? static_cast<OutScalar_>(max_n_) : static_cast<OutScalar_>(in_n_)
-							);
+					(
+						(in_n_ < min_n_) ? static_cast<OutScalar_>(min_n_) :
+						(in_n_ > max_n_) ? static_cast<OutScalar_>(max_n_) : static_cast<OutScalar_>(in_n_)
+					);
 				}
 				else
 				{
 					return
-						(
-							(in_n_ < min_n_) ? static_cast<OutScalar_>(min_n_) : static_cast<OutScalar_>(in_n_)
-							);
+					(
+						(in_n_ < min_n_) ? static_cast<OutScalar_>(min_n_) : static_cast<OutScalar_>(in_n_)
+					);
 				}
 			}
 			else
@@ -992,9 +992,9 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 				{
 					typename Max_::const_ref_value_type max_n_ = EmuMath::TMPHelpers::emu_vector_element_n<Index_>(max_);
 					return
-						(
-							(in_n_ > max_n_) ? static_cast<OutScalar_>(max_n_) : static_cast<OutScalar_>(in_n_)
-							);
+					(
+						(in_n_ > max_n_) ? static_cast<OutScalar_>(max_n_) : static_cast<OutScalar_>(in_n_)
+					);
 				}
 				else
 				{
@@ -1010,32 +1010,32 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 				{
 					typename Max_::const_ref_value_type max_n_ = EmuMath::TMPHelpers::emu_vector_element_n<Index_>(max_);
 					return
-						(
-							(in_n_ < min_) ? static_cast<OutScalar_>(min_) :
-							(in_n_ > max_n_) ? static_cast<OutScalar_>(max_n_) : static_cast<OutScalar_>(in_n_)
-							);
+					(
+						(in_n_ < min_) ? static_cast<OutScalar_>(min_) :
+						(in_n_ > max_n_) ? static_cast<OutScalar_>(max_n_) : static_cast<OutScalar_>(in_n_)
+					);
 				}
 				else
 				{
 					return
-						(
-							(in_n_ < min_) ? static_cast<OutScalar_>(min_) : static_cast<OutScalar_>(in_n_)
-							);
+					(
+						(in_n_ < min_) ? static_cast<OutScalar_>(min_) : static_cast<OutScalar_>(in_n_)
+					);
 				}
 			}
 			else
 			{
 				return
-					(
-						(in_n_ < min_) ? static_cast<OutScalar_>(min_) :
-						(in_n_ > max_) ? static_cast<OutScalar_>(max_) : static_cast<OutScalar_>(in_n_)
-						);
+				(
+					(in_n_ < min_) ? static_cast<OutScalar_>(min_) :
+					(in_n_ > max_) ? static_cast<OutScalar_>(max_) : static_cast<OutScalar_>(in_n_)
+				);
 			}
 		}
 	}
 
 	template<typename OutT, class InVector_, class Func_>
-	inline constexpr OutT _perform_vector_min_or_max_get(const InVector_& in_)
+	[[nodiscard]] constexpr inline OutT _perform_vector_min_or_max_get(const InVector_& in_)
 	{
 		Func_ cmp_ = Func_();
 		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<InVector_>)
@@ -1095,7 +1095,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 
 #pragma region CLAMPING
 	template<class OutVector_, class InVector_, class MinOrMaxVector_, class CmpFunc_>
-	inline constexpr OutVector_ _perform_vector_clamp_min_or_max_with_vector(const InVector_& in_, const MinOrMaxVector_& minOrMax_)
+	[[nodiscard]] constexpr inline OutVector_ _perform_vector_clamp_min_or_max_with_vector(const InVector_& in_, const MinOrMaxVector_& minOrMax_)
 	{
 		using OutScalar_ = typename OutVector_::value_type;
 		CmpFunc_ cmp_ = CmpFunc_();
@@ -1175,7 +1175,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<class OutVector_, class InVector_, typename MinOrMaxScalar_, class CmpFunc_>
-	inline constexpr OutVector_ _perform_vector_clamp_min_or_max_with_scalar(const InVector_& in_, const MinOrMaxScalar_& minOrMax_)
+	[[nodiscard]] constexpr inline OutVector_ _perform_vector_clamp_min_or_max_with_scalar(const InVector_& in_, const MinOrMaxScalar_& minOrMax_)
 	{
 		using OutScalar_ = typename OutVector_::value_type;
 		CmpFunc_ cmp_ = CmpFunc_();
@@ -1216,7 +1216,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<class OutVector_, class InVector_, class MinT_, class CmpFunc_>
-	inline constexpr OutVector_ _perform_vector_min_or_max_clamp(const InVector_& in_, const MinT_& minOrMax_)
+	[[nodiscard]] constexpr inline OutVector_ _perform_vector_min_or_max_clamp(const InVector_& in_, const MinT_& minOrMax_)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<OutVector_>)
 		{
@@ -1245,7 +1245,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<class OutVector_, class InVector_, typename MinScalar_, typename MaxScalar_>
-	inline constexpr OutVector_ _perform_vector_clamp_min_and_max(const InVector_& in_, const MinScalar_& min_, const MaxScalar_& max_)
+	[[nodiscard]] constexpr inline OutVector_ _perform_vector_clamp_min_and_max(const InVector_& in_, const MinScalar_& min_, const MaxScalar_& max_)
 	{
 		using OutScalar_ = typename OutVector_::value_type;
 
@@ -1287,7 +1287,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 
 #pragma region INTERPOLATION
 	template<std::size_t Index_, class OutScalar_, class VectorA_, class B_, class OutT_>
-	inline constexpr OutScalar_ _calculate_vector_lerp_val(const VectorA_& a_, const B_& b_, const OutT_& t_)
+	[[nodiscard]] constexpr inline OutScalar_ _calculate_vector_lerp_val(const VectorA_& a_, const B_& b_, const OutT_& t_)
 	{
 		const auto a_n_ = EmuMath::TMPHelpers::emu_vector_element_n<Index_>(a_);
 		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<B_>)
@@ -1355,7 +1355,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<class OutVector_, class VectorA_, class B_, class OutT_>
-	inline constexpr OutVector_ _perform_vector_lerp(const VectorA_& a_, const B_& b_, const OutT_& t_)
+	[[nodiscard]] constexpr inline OutVector_ _perform_vector_lerp(const VectorA_& a_, const B_& b_, const OutT_& t_)
 	{
 		using OutScalar_ = typename OutVector_::value_type;
 		if constexpr (OutVector_::size() == 2)
@@ -1395,7 +1395,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 
 #pragma region MAGNITUDE
 	template<typename OutT, class EmuVector_>
-	inline constexpr OutT _calculate_square_magnitude(const EmuVector_& vector_)
+	[[nodiscard]] constexpr inline OutT _calculate_square_magnitude(const EmuVector_& vector_)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<EmuVector_>)
 		{
@@ -1419,18 +1419,18 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 					if constexpr (std::is_same_v<OutT, CastT>)
 					{
 						return
-							(
-								(vector_.x * vector_.x) +
-								(vector_.y * vector_.y)
-								);
+						(
+							(vector_.x * vector_.x) +
+							(vector_.y * vector_.y)
+						);
 					}
 					else
 					{
 						return static_cast<OutT>
-							(
-								(vector_.x * vector_.x) +
-								(vector_.y * vector_.y)
-								);
+						(
+							(vector_.x * vector_.x) +
+							(vector_.y * vector_.y)
+						);
 					}
 				}
 				else
@@ -1438,18 +1438,18 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 					if constexpr (std::is_same_v<OutT, CastT>)
 					{
 						return
-							(
-								(static_cast<CastT>(vector_.x) * vector_.x) +
-								(static_cast<CastT>(vector_.y) * vector_.y)
-								);
+						(
+							(static_cast<CastT>(vector_.x) * vector_.x) +
+							(static_cast<CastT>(vector_.y) * vector_.y)
+						);
 					}
 					else
 					{
 						return static_cast<OutT>
-							(
-								(static_cast<CastT>(vector_.x) * vector_.x) +
-								(static_cast<CastT>(vector_.y) * vector_.y)
-								);
+						(
+							(static_cast<CastT>(vector_.x) * vector_.x) +
+							(static_cast<CastT>(vector_.y) * vector_.y)
+						);
 					}
 				}
 			}
@@ -1460,20 +1460,20 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 					if constexpr (std::is_same_v<OutT, CastT>)
 					{
 						return
-							(
-								(vector_.x * vector_.x) +
-								(vector_.y * vector_.y) +
-								(vector_.z * vector_.z)
-								);
+						(
+							(vector_.x * vector_.x) +
+							(vector_.y * vector_.y) +
+							(vector_.z * vector_.z)
+						);
 					}
 					else
 					{
 						return static_cast<OutT>
-							(
-								(vector_.x * vector_.x) +
-								(vector_.y * vector_.y) +
-								(vector_.z * vector_.z)
-								);
+						(
+							(vector_.x * vector_.x) +
+							(vector_.y * vector_.y) +
+							(vector_.z * vector_.z)
+						);
 					}
 				}
 				else
@@ -1481,20 +1481,20 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 					if constexpr (std::is_same_v<OutT, CastT>)
 					{
 						return
-							(
-								(static_cast<CastT>(vector_.x) * vector_.x) +
-								(static_cast<CastT>(vector_.y) * vector_.y) +
-								(static_cast<CastT>(vector_.z) * vector_.z)
-								);
+						(
+							(static_cast<CastT>(vector_.x) * vector_.x) +
+							(static_cast<CastT>(vector_.y) * vector_.y) +
+							(static_cast<CastT>(vector_.z) * vector_.z)
+						);
 					}
 					else
 					{
 						return static_cast<OutT>
-							(
-								(static_cast<CastT>(vector_.x) * vector_.x) +
-								(static_cast<CastT>(vector_.y) * vector_.y) +
-								(static_cast<CastT>(vector_.z) * vector_.z)
-								);
+						(
+							(static_cast<CastT>(vector_.x) * vector_.x) +
+							(static_cast<CastT>(vector_.y) * vector_.y) +
+							(static_cast<CastT>(vector_.z) * vector_.z)
+						);
 					}
 				}
 			}
@@ -1505,22 +1505,22 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 					if constexpr (std::is_same_v<OutT, CastT>)
 					{
 						return
-							(
-								(vector_.x * vector_.x) +
-								(vector_.y * vector_.y) +
-								(vector_.z * vector_.z) +
-								(vector_.w * vector_.w)
-								);
+						(
+							(vector_.x * vector_.x) +
+							(vector_.y * vector_.y) +
+							(vector_.z * vector_.z) +
+							(vector_.w * vector_.w)
+						);
 					}
 					else
 					{
 						return static_cast<OutT>
-							(
-								(vector_.x * vector_.x) +
-								(vector_.y * vector_.y) +
-								(vector_.z * vector_.z) +
-								(vector_.w * vector_.w)
-								);
+						(
+							(vector_.x * vector_.x) +
+							(vector_.y * vector_.y) +
+							(vector_.z * vector_.z) +
+							(vector_.w * vector_.w)
+						);
 					}
 				}
 				else
@@ -1528,22 +1528,22 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 					if constexpr (std::is_same_v<OutT, CastT>)
 					{
 						return
-							(
-								(static_cast<CastT>(vector_.x) * vector_.x) +
-								(static_cast<CastT>(vector_.y) * vector_.y) +
-								(static_cast<CastT>(vector_.z) * vector_.z) +
-								(static_cast<CastT>(vector_.w) * vector_.w)
-								);
+						(
+							(static_cast<CastT>(vector_.x) * vector_.x) +
+							(static_cast<CastT>(vector_.y) * vector_.y) +
+							(static_cast<CastT>(vector_.z) * vector_.z) +
+							(static_cast<CastT>(vector_.w) * vector_.w)
+						);
 					}
 					else
 					{
 						return static_cast<OutT>
-							(
-								(static_cast<CastT>(vector_.x) * vector_.x) +
-								(static_cast<CastT>(vector_.y) * vector_.y) +
-								(static_cast<CastT>(vector_.z) * vector_.z) +
-								(static_cast<CastT>(vector_.w) * vector_.w)
-								);
+						(
+							(static_cast<CastT>(vector_.x) * vector_.x) +
+							(static_cast<CastT>(vector_.y) * vector_.y) +
+							(static_cast<CastT>(vector_.z) * vector_.z) +
+							(static_cast<CastT>(vector_.w) * vector_.w)
+						);
 					}
 				}
 			}
@@ -1560,7 +1560,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<typename OutFP_, class EmuVector_>
-	inline constexpr OutFP_ _calculate_magnitude_constexpr(const EmuVector_& vector_)
+	[[nodiscard]] constexpr inline OutFP_ _calculate_magnitude_constexpr(const EmuVector_& vector_)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<EmuVector_>)
 		{
@@ -1582,7 +1582,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<typename Out_, class EmuVector_>
-	inline Out_ _calculate_magnitude(const EmuVector_& vector_)
+	[[nodiscard]] inline Out_ _calculate_magnitude(const EmuVector_& vector_)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<EmuVector_>)
 		{
@@ -1609,7 +1609,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 
 #pragma region COMPARISON
 	template<class LhsVector_, class Rhs_, class Func_>
-	inline constexpr bool _perform_vector_magnitude_comparison_std(const LhsVector_& lhs, const Rhs_& rhs)
+	[[nodiscard]] constexpr inline bool _perform_vector_magnitude_comparison_std(const LhsVector_& lhs, const Rhs_& rhs)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<LhsVector_>)
 		{
@@ -1648,7 +1648,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<class LhsVector_, class RhsVector_, class Func>
-	inline constexpr bool _perform_vector_overall_comparison_with_vector(const LhsVector_& lhs, const RhsVector_& rhs)
+	[[nodiscard]] constexpr inline bool _perform_vector_overall_comparison_with_vector(const LhsVector_& lhs, const RhsVector_& rhs)
 	{
 		using LhsInfo = typename LhsVector_::info_type;
 		using RhsInfo = typename RhsVector_::info_type;
@@ -1717,7 +1717,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<class LhsVector_, class RhsVector_, class Func>
-	inline constexpr bool _perform_vector_overall_comparison_with_scalar(const LhsVector_& lhs, const RhsVector_& rhs)
+	[[nodiscard]] constexpr inline bool _perform_vector_overall_comparison_with_scalar(const LhsVector_& lhs, const RhsVector_& rhs)
 	{
 		using LhsInfo = typename LhsVector_::info_type;
 		Func func = Func();
@@ -1740,7 +1740,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<std::size_t NumComparisons, class LhsVector_, class RhsVector_, class Func>
-	inline constexpr typename EmuMath::TMPHelpers::emu_vector_from_size<NumComparisons, bool>::type _perform_vector_per_element_comparison_with_vector
+	[[nodiscard]] constexpr inline typename EmuMath::TMPHelpers::emu_vector_from_size<NumComparisons, bool>::type _perform_vector_per_element_comparison_with_vector
 	(
 		const LhsVector_& lhs,
 		const RhsVector_& rhs
@@ -1794,7 +1794,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<class LhsVector_, class RhsT_, std::size_t RhsVectorSize_>
-	inline constexpr bool _perform_vector_comparison_equal(const LhsVector_& lhs, const EmuMath::TMPHelpers::emu_vector_from_size_t<RhsVectorSize_, RhsT_>& rhs)
+	[[nodiscard]] constexpr inline bool _perform_vector_comparison_equal(const LhsVector_& lhs, const EmuMath::TMPHelpers::emu_vector_from_size_t<RhsVectorSize_, RhsT_>& rhs)
 	{
 		using RhsVector_ = EmuMath::TMPHelpers::emu_vector_from_size_t<RhsVectorSize_, RhsT_>;
 		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<LhsVector_>)
@@ -1809,7 +1809,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<class LhsVector_, class RhsT_, std::size_t RhsVectorSize_>
-	inline constexpr bool _perform_vector_comparison_not_equal(const LhsVector_& lhs, const EmuMath::TMPHelpers::emu_vector_from_size_t<RhsVectorSize_, RhsT_>& rhs)
+	[[nodiscard]] constexpr inline bool _perform_vector_comparison_not_equal(const LhsVector_& lhs, const EmuMath::TMPHelpers::emu_vector_from_size_t<RhsVectorSize_, RhsT_>& rhs)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<LhsVector_>)
 		{
@@ -1823,7 +1823,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<class OutVector_, class LhsEmuVector_, class Rhs_, class Func_>
-	inline constexpr OutVector_ _perform_per_element_comparison(const LhsEmuVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline OutVector_ _perform_per_element_comparison(const LhsEmuVector_& lhs_, const Rhs_& rhs_)
 	{
 		Func_ cmp_ = Func_();
 		if constexpr (OutVector_::size() == 2)
@@ -1896,7 +1896,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<bool IncludeNonContained_, class LhsVector_, class Rhs_, class Func_>
-	inline constexpr bool _perform_vector_comparison_all(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool _perform_vector_comparison_all(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<LhsVector_>)
 		{
@@ -1904,11 +1904,11 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 			if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<Rhs_>)
 			{
 				constexpr std::size_t used_size_ =
-					(
-						(IncludeNonContained_) ?
-						(LhsVector_::size() >= Rhs_::size()) ? LhsVector_::size() : Rhs_::size() :
-						(LhsVector_::size() <= Rhs_::size()) ? LhsVector_::size() : Rhs_::size()
-						);
+				(
+					(IncludeNonContained_) ?
+					(LhsVector_::size() >= Rhs_::size()) ? LhsVector_::size() : Rhs_::size() :
+					(LhsVector_::size() <= Rhs_::size()) ? LhsVector_::size() : Rhs_::size()
+				);
 				if constexpr (used_size_ == 2)
 				{
 					return cmp_(lhs_.x, rhs_.x) && cmp_(lhs_.y, rhs_.y);
@@ -1916,21 +1916,21 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 				else if constexpr (used_size_ == 3)
 				{
 					return
-						(
-							cmp_(lhs_.x, rhs_.x) &&
-							cmp_(lhs_.y, rhs_.y) &&
-							cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), EmuMath::TMPHelpers::emu_vector_z(rhs_))
-							);
+					(
+						cmp_(lhs_.x, rhs_.x) &&
+						cmp_(lhs_.y, rhs_.y) &&
+						cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), EmuMath::TMPHelpers::emu_vector_z(rhs_))
+					);
 				}
 				else if constexpr (used_size_ == 4)
 				{
 					return
-						(
-							cmp_(lhs_.x, rhs_.x) &&
-							cmp_(lhs_.y, rhs_.y) &&
-							cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), EmuMath::TMPHelpers::emu_vector_z(rhs_)) &&
-							cmp_(EmuMath::TMPHelpers::emu_vector_w(lhs_), EmuMath::TMPHelpers::emu_vector_w(rhs_))
-							);
+					(
+						cmp_(lhs_.x, rhs_.x) &&
+						cmp_(lhs_.y, rhs_.y) &&
+						cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), EmuMath::TMPHelpers::emu_vector_z(rhs_)) &&
+						cmp_(EmuMath::TMPHelpers::emu_vector_w(lhs_), EmuMath::TMPHelpers::emu_vector_w(rhs_))
+					);
 				}
 				else
 				{
@@ -1965,7 +1965,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<bool IncludeNonContained_, class LhsVector_, class Rhs_, class Func_>
-	inline constexpr bool _perform_vector_comparison_any(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool _perform_vector_comparison_any(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_vector_v<LhsVector_>)
 		{
@@ -1985,21 +1985,21 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 				else if constexpr (used_size_ == 3)
 				{
 					return
-						(
-							cmp_(lhs_.x, rhs_.x) ||
-							cmp_(lhs_.y, rhs_.y) ||
-							cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), EmuMath::TMPHelpers::emu_vector_z(rhs_))
-							);
+					(
+						cmp_(lhs_.x, rhs_.x) ||
+						cmp_(lhs_.y, rhs_.y) ||
+						cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), EmuMath::TMPHelpers::emu_vector_z(rhs_))
+					);
 				}
 				else if constexpr (used_size_ == 4)
 				{
 					return
-						(
-							cmp_(lhs_.x, rhs_.x) ||
-							cmp_(lhs_.y, rhs_.y) ||
-							cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), EmuMath::TMPHelpers::emu_vector_z(rhs_)) ||
-							cmp_(EmuMath::TMPHelpers::emu_vector_w(lhs_), EmuMath::TMPHelpers::emu_vector_w(rhs_))
-							);
+					(
+						cmp_(lhs_.x, rhs_.x) ||
+						cmp_(lhs_.y, rhs_.y) ||
+						cmp_(EmuMath::TMPHelpers::emu_vector_z(lhs_), EmuMath::TMPHelpers::emu_vector_z(rhs_)) ||
+						cmp_(EmuMath::TMPHelpers::emu_vector_w(lhs_), EmuMath::TMPHelpers::emu_vector_w(rhs_))
+					);
 				}
 				else
 				{

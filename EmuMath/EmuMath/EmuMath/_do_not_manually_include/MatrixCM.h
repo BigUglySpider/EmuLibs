@@ -219,7 +219,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>Copy of the element at the provided indices within this matrix.</returns>
 		template<std::size_t Column_, std::size_t Row_>
-		constexpr inline value_type& at()
+		[[nodiscard]] constexpr inline value_type& at()
 		{
 			return EmuMath::Helpers::MatrixGet<Column_, Row_, this_type>(*this);
 		}
@@ -228,7 +228,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>Copy of the element at the provided indices within this matrix.</returns>
 		template<std::size_t Column_, std::size_t Row_>
-		constexpr inline value_type at() const
+		[[nodiscard]] constexpr inline value_type at() const
 		{
 			return EmuMath::Helpers::MatrixGet<Column_, Row_, this_type>(*this);
 		}
@@ -237,7 +237,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>Reference to the column at the provided index.</returns>
 		template<std::size_t MajorIndex_>
-		constexpr inline major_type& at()
+		[[nodiscard]] constexpr inline major_type& at()
 		{
 			return EmuMath::Helpers::MatrixGet<MajorIndex_, this_type>(*this);
 		}
@@ -246,7 +246,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>Copy of the column at the provided index.</returns>
 		template<std::size_t MajorIndex_>
-		constexpr inline major_type at() const
+		[[nodiscard]] constexpr inline major_type at() const
 		{
 			return EmuMath::Helpers::MatrixGet<MajorIndex_, this_type>(*this);
 		}
@@ -256,7 +256,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="columnIndex_">Index of the column to access.</param>
 		/// <returns>Reference to the column at the provided columnIndex_.</returns>
-		constexpr inline column_type& at(const std::size_t columnIndex_)
+		[[nodiscard]] constexpr inline column_type& at(const std::size_t columnIndex_)
 		{
 			return EmuMath::Helpers::MatrixGet(*this, columnIndex_);
 		}
@@ -266,7 +266,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="columnIndex_">Index of the column to access.</param>
 		/// <returns>Copy of the column at the provided columnIndex_.</returns>
-		constexpr inline column_type at(const std::size_t columnIndex_) const
+		[[nodiscard]] constexpr inline column_type at(const std::size_t columnIndex_) const
 		{
 			return EmuMath::Helpers::MatrixGet(*this, columnIndex_);
 		}
@@ -277,7 +277,7 @@ namespace EmuMath
 		/// <param name="columnIndex_">Index of the column to access.</param>
 		/// <param name="rowIndex_">Index of the row to access.</param>
 		/// <returns>Reference to the element at the provided indices within this matrix.</returns>
-		constexpr inline value_type& at(const std::size_t columnIndex_, const std::size_t rowIndex_)
+		[[nodiscard]] constexpr inline value_type& at(const std::size_t columnIndex_, const std::size_t rowIndex_)
 		{
 			return EmuMath::Helpers::MatrixGet(*this, columnIndex_, rowIndex_);
 		}
@@ -288,7 +288,7 @@ namespace EmuMath
 		/// <param name="columnIndex_">Index of the column to access.</param>
 		/// <param name="rowIndex_">Index of the row to access.</param>
 		/// <returns>Copy of the element at the provided indices within this matrix.</returns>
-		constexpr inline value_type at(const std::size_t columnIndex_, const std::size_t rowIndex_) const
+		[[nodiscard]] constexpr inline value_type at(const std::size_t columnIndex_, const std::size_t rowIndex_) const
 		{
 			return EmuMath::Helpers::MatrixGet(*this, columnIndex_, rowIndex_);
 		}
@@ -298,7 +298,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="columnIndex_">Index of the column to access.</param>
 		/// <returns>Reference to the column at the provided columnIndex_.</returns>
-		constexpr inline column_type& operator[](const std::size_t columnIndex_)
+		[[nodiscard]] constexpr inline column_type& operator[](const std::size_t columnIndex_)
 		{
 			return this->at(columnIndex_);
 		}
@@ -308,29 +308,29 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="columnIndex_">Index of the column to access.</param>
 		/// <returns>Copy of the column at the provided columnIndex_.</returns>
-		constexpr inline column_type operator[](const std::size_t columnIndex_) const
+		[[nodiscard]] constexpr inline column_type operator[](const std::size_t columnIndex_) const
 		{
 			return this->at(columnIndex_);
 		}
 #pragma region CONST_OPERATORS
-		constexpr inline this_type operator+(const this_type& rhs) const
+		[[nodiscard]] constexpr inline this_type operator+(const this_type& rhs) const
 		{
 			return EmuMath::Helpers::MatrixAddition(*this, rhs);
 		}
-		constexpr inline this_type operator-(const this_type& rhs) const
+		[[nodiscard]] constexpr inline this_type operator-(const this_type& rhs) const
 		{
 			return EmuMath::Helpers::MatrixSubtraction(*this, rhs);
 		}
-		constexpr inline this_type operator-() const
+		[[nodiscard]] constexpr inline this_type operator-() const
 		{
 			return EmuMath::Helpers::MatrixNegation(*this);
 		}
 		template<typename ScalarMultiplier>
-		constexpr inline this_type operator*(ScalarMultiplier rhs) const
+		[[nodiscard]] constexpr inline this_type operator*(ScalarMultiplier rhs) const
 		{
 			return EmuMath::Helpers::MatrixMultiplication(*this, rhs);
 		}
-		constexpr inline this_type operator*(const this_type& rhs) const
+		[[nodiscard]] constexpr inline this_type operator*(const this_type& rhs) const
 		{
 			return EmuMath::Helpers::MatrixMultiplication(*this, rhs);
 		}
@@ -347,13 +347,13 @@ namespace EmuMath
 #pragma region MATRIX_OPERATIONS
 		/// <summary> Returns the transpose of this matrix. The dimensions of the returned matrix will be the reverse of this matrix (e.g. a 4x3 transpose will be 3x4). </summary>
 		/// <returns>Transpose matrix to this matrix.</returns>
-		MatrixCM<num_rows, num_columns, value_type> Transpose() const
+		[[nodiscard]] constexpr inline MatrixCM<num_rows, num_columns, value_type> Transpose() const
 		{
 			return EmuMath::Helpers::MatrixTranspose(*this);
 		}
 
 		template<typename OutT_ = value_type, typename RequiresSquareMatrix = std::enable_if_t<is_square>>
-		constexpr inline OutT_ Trace() const
+		[[nodiscard]] constexpr inline OutT_ Trace() const
 		{
 			return EmuMath::Helpers::MatrixTrace<OutT_>(*this);
 		}
@@ -361,7 +361,7 @@ namespace EmuMath
 		/// <typeparam name="RequiresSquareMatrix">Dummy parameter to make use of std::enable_if.</typeparam>
 		/// <returns>Identity matrix of this matrix type, as long as it is a square matrix.</returns>
 		template<typename RequiresSquareMatrix = std::enable_if_t<is_square>>
-		static constexpr this_type Identity()
+		[[nodiscard]] static constexpr this_type Identity()
 		{
 			return EmuMath::Helpers::MatrixIdentity<this_type>();
 		}
@@ -371,7 +371,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns></returns>
 		template<std::size_t BeginColumn, std::size_t EndColumn, std::size_t BeginRow, std::size_t EndRow>
-		constexpr inline EmuMath::MatrixCM<EndColumn - BeginColumn + 1, EndRow - BeginRow + 1, value_type> SubMatrix() const
+		[[nodiscard]] constexpr inline EmuMath::MatrixCM<EndColumn - BeginColumn + 1, EndRow - BeginRow + 1, value_type> SubMatrix() const
 		{
 			return EmuMath::Helpers::MatrixSubMatrix<BeginColumn, EndColumn, BeginRow, EndRow, this_type>(*this);
 		}
@@ -380,7 +380,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>Submatrix contained within this matrix when the column at index Column_ is removed, and row at index Row_ is removed.</returns>
 		template<std::size_t Column_, std::size_t Row_>
-		constexpr inline EmuMath::MatrixCM<num_columns - 1, num_rows - 1, value_type> SubMatrixExcluding() const
+		[[nodiscard]] constexpr inline EmuMath::MatrixCM<num_columns - 1, num_rows - 1, value_type> SubMatrixExcluding() const
 		{
 			return EmuMath::Helpers::MatrixSubMatrixExcluding<Column_, Row_, this_type>(*this);
 		}
@@ -408,14 +408,14 @@ namespace EmuMath
 		/// <summary> Returns a collection of data representing a copy of an individual row within this matrix. </summary>
 		/// <returns>Specified row of this matrix. If inclusively between 2-4 dimensions, the row will be an EmuMath Vector, otherwise a std::array.</returns>
 		template<std::size_t Row_>
-		inline row_type GetRow() const
+		[[nodiscard]] constexpr inline row_type GetRow() const
 		{
 			return EmuMath::Helpers::MatrixGetRow<Row_>(*this);
 		}
 		/// <summary> Returns a copy of an individual column of this matrix. Identical to copying ThisMatrix.columns[Column_]. </summary>
 		/// <returns>Copy of the column at the specified index.</returns>
 		template<std::size_t Column_>
-		inline column_type GetColumn() const
+		[[nodiscard]] constexpr inline column_type GetColumn() const
 		{
 			return EmuMath::Helpers::MatrixGetColumn<Column_>(*this);
 		}
