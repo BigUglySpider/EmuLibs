@@ -132,6 +132,8 @@ int main()
 
 	std::cout << "Minors:\n" << EmuMath::Helpers::MatrixMinorsLaplace(resooble) << "\n";
 
+	EmuMath::Helpers::MatrixInverseLaplace(resooble);
+
 	system("pause");
 
 #pragma region TEST_HARNESS_EXECUTION

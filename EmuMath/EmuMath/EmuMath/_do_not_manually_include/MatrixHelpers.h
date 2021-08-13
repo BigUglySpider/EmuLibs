@@ -37,7 +37,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs">Right-hand EmuMath matrix in the addition.</param>
 	/// <returns>Matrix containing the results of the addition.</returns>
 	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> MatrixAddition
+	[[nodiscard]] constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> MatrixAddition
 	(
 		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& lhs,
 		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& rhs
@@ -52,7 +52,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs">Right-hand EmuMath matrix in the subtraction.</param>
 	/// <returns>Matrix containing the results of the subtraction.</returns>
 	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> MatrixSubtraction
+	[[nodiscard]] constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> MatrixSubtraction
 	(
 		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& lhs,
 		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& rhs
@@ -66,7 +66,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to negate.</param>
 	/// <returns>Negated variant of the passed matrix.</returns>
 	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> MatrixNegation(const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_)
+	[[nodiscard]] constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> MatrixNegation(const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_)
 	{
 		return _underlying_matrix_funcs::_perform_basic_matrix_arithmetic<std::negate<void>>(matrix_);
 	}
@@ -78,7 +78,7 @@ namespace EmuMath::Helpers
 	/// <param name="mult">Value to multiply all of the passed matrix's elements by.</param>
 	/// <returns>Matrix containing the results of the multiplication.</returns>
 	template<typename ScalarMultiplier, std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> MatrixMultiplication
+	[[nodiscard]] constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> MatrixMultiplication
 	(
 		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_,
 		ScalarMultiplier mult
@@ -100,7 +100,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs">Right-hand matrix in this multiplication.</param>
 	/// <returns>Matrix containing the results of the multiplication lhs * rhs.</returns>
 	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> MatrixMultiplication
+	[[nodiscard]] constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> MatrixMultiplication
 	(
 		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& lhs,
 		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& rhs
@@ -117,7 +117,7 @@ namespace EmuMath::Helpers
 	/// <param name="lhs">Right-hand argument for the multiplications. This is a commutative multiplication, so handedness does not affect the result.</param>
 	/// <returns>Resulting matrix from mutliplying respective elements of the two passed matrices. This is not the result of a standard matrix multiplication.</returns>
 	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> MatrixRespectiveMultiplication
+	[[nodiscard]] constexpr EmuMath::MatrixCM<num_columns, num_rows, value_type> MatrixRespectiveMultiplication
 	(
 		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& lhs,
 		const EmuMath::MatrixCM<num_columns, num_rows, value_type>& rhs
@@ -126,7 +126,6 @@ namespace EmuMath::Helpers
 		return _underlying_matrix_funcs::_perform_basic_matrix_arithmetic<std::multiplies<void>>(lhs, rhs);
 
 	}
-
 #pragma endregion
 
 #pragma region GETS
@@ -135,7 +134,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to access.</param>
 	/// <returns>Reference to the element at the provided indices within the passed matrix.</returns>
 	template<std::size_t Column_, std::size_t Row_, class Matrix_>
-	constexpr inline typename Matrix_::value_type& MatrixGet(Matrix_& matrix_)
+	[[nodiscard]] constexpr inline typename Matrix_::value_type& MatrixGet(Matrix_& matrix_)
 	{
 		if constexpr (_underlying_matrix_funcs::_matrix_get_validity_check<Column_, Row_, Matrix_>())
 		{
@@ -151,7 +150,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to access.</param>
 	/// <returns>Copy of the element at the provided indices within the passed matrix.</returns>
 	template<std::size_t Column_, std::size_t Row_, class Matrix_>
-	constexpr inline typename Matrix_::value_type MatrixGet(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline typename Matrix_::value_type MatrixGet(const Matrix_& matrix_)
 	{
 		if constexpr (_underlying_matrix_funcs::_matrix_get_validity_check<Column_, Row_, Matrix_>())
 		{
@@ -173,7 +172,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to access.</param>
 	/// <returns>Reference to the major element at the provided indices within the passed matrix; a column if the matrix is column major, or a row if the matrix is row major.</returns>
 	template<std::size_t MajorIndex_, class Matrix_>
-	constexpr inline typename Matrix_::major_type& MatrixGet(Matrix_& matrix_)
+	[[nodiscard]] constexpr inline typename Matrix_::major_type& MatrixGet(Matrix_& matrix_)
 	{
 		if constexpr (_underlying_matrix_funcs::_matrix_get_major_validity_check<MajorIndex_, Matrix_>())
 		{
@@ -195,7 +194,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to access.</param>
 	/// <returns>Copy of the major element at the provided indices within the passed matrix; a column if the matrix is column major, or a row if the matrix is row major.</returns>
 	template<std::size_t MajorIndex_, class Matrix_>
-	constexpr inline typename Matrix_::major_type MatrixGet(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline typename Matrix_::major_type MatrixGet(const Matrix_& matrix_)
 	{
 		if constexpr (_underlying_matrix_funcs::_matrix_get_major_validity_check<MajorIndex_, Matrix_>())
 		{
@@ -216,7 +215,7 @@ namespace EmuMath::Helpers
 	/// <param name="row_">Index of the row to access.</param>
 	/// <returns>Reference to the element at the provided indices within the passed matrix.</returns>
 	template<class Matrix_>
-	constexpr inline typename Matrix_::value_type& MatrixGet(Matrix_& matrix_, const std::size_t column_, const std::size_t row_)
+	[[nodiscard]] constexpr inline typename Matrix_::value_type& MatrixGet(Matrix_& matrix_, const std::size_t column_, const std::size_t row_)
 	{
 		if constexpr (_underlying_matrix_funcs::_matrix_get_basic_validity_check<Matrix_>())
 		{
@@ -237,7 +236,7 @@ namespace EmuMath::Helpers
 	/// <param name="row_">Index of the row to access.</param>
 	/// <returns>Copy of the element at the provided indices within the passed matrix.</returns>
 	template<class Matrix_>
-	constexpr inline typename Matrix_::value_type MatrixGet(const Matrix_& matrix_, const std::size_t column_, const std::size_t row_)
+	[[nodiscard]] constexpr inline typename Matrix_::value_type MatrixGet(const Matrix_& matrix_, const std::size_t column_, const std::size_t row_)
 	{
 		if constexpr (_underlying_matrix_funcs::_matrix_get_basic_validity_check<Matrix_>())
 		{
@@ -261,7 +260,7 @@ namespace EmuMath::Helpers
 	/// <param name="majorIndex_">Index of the major-stored element to access.</param>
 	/// <returns>Reference to the major element at the provided indices within the passed matrix; a column if the matrix is column major, or a row if the matrix is row major.</returns>
 	template<class Matrix_>
-	constexpr inline typename Matrix_::major_type& MatrixGet(Matrix_& matrix_, const std::size_t majorIndex_)
+	[[nodiscard]] constexpr inline typename Matrix_::major_type& MatrixGet(Matrix_& matrix_, const std::size_t majorIndex_)
 	{
 		if constexpr (_underlying_matrix_funcs::_matrix_get_basic_validity_check<Matrix_>())
 		{
@@ -285,7 +284,7 @@ namespace EmuMath::Helpers
 	/// <param name="majorIndex_">Index of the major-stored element to access.</param>
 	/// <returns>Copy of the major element at the provided indices within the passed matrix; a column if the matrix is column major, or a row if the matrix is row major.</returns>
 	template<class Matrix_>
-	constexpr inline typename Matrix_::major_type MatrixGet(const Matrix_& matrix_, const std::size_t majorIndex_)
+	[[nodiscard]] constexpr inline typename Matrix_::major_type MatrixGet(const Matrix_& matrix_, const std::size_t majorIndex_)
 	{
 		if constexpr (_underlying_matrix_funcs::_matrix_get_basic_validity_check<Matrix_>())
 		{
@@ -301,7 +300,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to access.</param>
 	/// <returns>Copy of the specified row within the passed matrix.</returns>
 	template<std::size_t TargetRowIndex_, std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::row_type MatrixGetRow(const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_)
+	[[nodiscard]] constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::row_type MatrixGetRow(const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_)
 	{
 		using OutT_ = typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::row_type;
 		if constexpr (TargetRowIndex_ < num_rows)
@@ -320,7 +319,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to access.</param>
 	/// <returns>Copy of the specified column within the passed matrix.</returns>
 	template<std::size_t TargetColumnIndex_, std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::column_type MatrixGetColumn(const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_)
+	[[nodiscard]] constexpr inline typename EmuMath::MatrixCM<num_columns, num_rows, value_type>::column_type MatrixGetColumn(const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_)
 	{
 		if constexpr (TargetColumnIndex_ < num_columns)
 		{
@@ -338,7 +337,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to access.</param>
 	/// <returns>Standard array of passed matrix's row_type, representing a copy of the passed matrix.</returns>
 	template<class Matrix_>
-	constexpr inline std::array<typename Matrix_::row_type, Matrix_::num_rows> MatrixCopyAsRows(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline std::array<typename Matrix_::row_type, Matrix_::num_rows> MatrixCopyAsRows(const Matrix_& matrix_)
 	{
 		return _underlying_matrix_funcs::_copy_all_matrix_rows(matrix_);
 	}
@@ -347,7 +346,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to access.</param>
 	/// <returns>Standard array of passed matrix's column_type, representing a copy of the passed matrix.</returns>
 	template<class Matrix_>
-	constexpr inline std::array<typename Matrix_::column_type, Matrix_::num_columns> MatrixCopyAsColumns(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline std::array<typename Matrix_::column_type, Matrix_::num_columns> MatrixCopyAsColumns(const Matrix_& matrix_)
 	{
 		return _underlying_matrix_funcs::_copy_all_matrix_columns(matrix_);
 	}
@@ -404,7 +403,7 @@ namespace EmuMath::Helpers
 	///		(i.e. num_columns will be the passed matrix's num_rows, and num_rows will be the passed matrix's num_columns).
 	/// </returns>
 	template<std::size_t num_columns, std::size_t num_rows, typename value_type>
-	constexpr EmuMath::MatrixCM<num_rows, num_columns, value_type> MatrixTranspose(const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_)
+	[[nodiscard]] constexpr EmuMath::MatrixCM<num_rows, num_columns, value_type> MatrixTranspose(const EmuMath::MatrixCM<num_columns, num_rows, value_type>& matrix_)
 	{
 		EmuMath::MatrixCM<num_rows, num_columns, value_type> out_ = EmuMath::MatrixCM<num_rows, num_columns, value_type>();
 		_underlying_matrix_funcs::_execute_matrix_transposition<0>(out_, matrix_);
@@ -420,7 +419,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to calculate the trace of.</param>
 	/// <returns>Trace of the passed matrix, assuming it is a square matrix.</returns>
 	template<typename OutT_ = float, class Matrix_ = void>
-	constexpr inline OutT_ MatrixTrace(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline OutT_ MatrixTrace(const Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
 		{
@@ -447,7 +446,7 @@ namespace EmuMath::Helpers
 	/// <typeparam name="RequiresSquareMatrix">Dummy parameter to make use of std::enable_if.</typeparam>
 	/// <returns>Identity matrix of the provided EmuMath Matrix_ type.</returns>
 	template<class Matrix_, typename RequiresSquareMatrix = std::enable_if_t<Matrix_::is_square>>
-	constexpr inline Matrix_ MatrixIdentity()
+	[[nodiscard]] constexpr inline Matrix_ MatrixIdentity()
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
 		{
@@ -475,7 +474,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">Matrix to determine the identity matrix of. This is the same for all matrices of the provided type, and the matrix is never used directly.</param>
 	/// <returns>Identity matrix of the provided EmuMath Matrix_ type.</returns>
 	template<class Matrix_, typename RequiresSquareMatrix = std::enable_if_t<Matrix_::is_square>>
-	constexpr inline Matrix_ MatrixIdentity(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline Matrix_ MatrixIdentity(const Matrix_& matrix_)
 	{
 		return MatrixIdentity<Matrix_>();
 	}
@@ -487,7 +486,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">The full matrix to return a submatrix of.</param>
 	/// <returns>Submatrix of the correct dimensions located at the specified inclusive indices within the passed matrix.</returns>
 	template<std::size_t BeginColumn, std::size_t EndColumn, std::size_t BeginRow, std::size_t EndRow, class Matrix_>
-	constexpr inline typename TMPHelpers::emu_matrix_matching_template<EndColumn - BeginColumn + 1, EndRow - BeginRow + 1, typename Matrix_::value_type, Matrix_>::type
+	[[nodiscard]] constexpr inline typename TMPHelpers::emu_matrix_matching_template<EndColumn - BeginColumn + 1, EndRow - BeginRow + 1, typename Matrix_::value_type, Matrix_>::type
 		MatrixSubMatrix
 	(
 		const Matrix_& matrix_
@@ -579,7 +578,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to find the specified submatrix of.</param>
 	/// <returns>Submatrix contained within the passed matrix when the column at index Column_ is removed, and the row and index Row_ is removed.</returns>
 	template<std::size_t Column_, std::size_t Row_, class Matrix_>
-	constexpr inline typename TMPHelpers::emu_matrix_matching_template<Matrix_::num_columns - 1, Matrix_::num_rows - 1, typename Matrix_::value_type, Matrix_>::type 
+	[[nodiscard]] constexpr inline typename TMPHelpers::emu_matrix_matching_template<Matrix_::num_columns - 1, Matrix_::num_rows - 1, typename Matrix_::value_type, Matrix_>::type
 		MatrixSubMatrixExcluding(const Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
@@ -630,7 +629,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to calculate the matrix of minors for.</param>
 	/// <returns>Matrix of minors to the passed matrix.</returns>
 	template<class Matrix_>
-	constexpr inline Matrix_ MatrixMinorsLaplace(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline Matrix_ MatrixMinorsLaplace(const Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
 		{
@@ -658,7 +657,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to calculate the matrix of cofactors for.</param>
 	/// <returns>Matrix of cofactors to the passed matrix.</returns>
 	template<class Matrix_>
-	constexpr inline Matrix_ MatrixCofactorsLaplace(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline Matrix_ MatrixCofactorsLaplace(const Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
 		{
@@ -678,7 +677,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to calculate the adjugate for.</param>
 	/// <returns>Adjugate matrix to the passed matrix.</returns>
 	template<class Matrix_>
-	constexpr inline Matrix_ MatrixAdjugateLaplace(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline Matrix_ MatrixAdjugateLaplace(const Matrix_& matrix_)
 	{
 		return MatrixTranspose(MatrixCofactorsLaplace(matrix_));
 	}
@@ -693,7 +692,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">Square EmuMath matrix to calculate the determinant of.</param>
 	/// <returns>Determinant of the passed matrix, represented as the provided Out_ type.</returns>
 	template<typename Out_ = float, class Matrix_>
-	constexpr inline Out_ MatrixDeterminantLaplace(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline Out_ MatrixDeterminantLaplace(const Matrix_& matrix_)
 	{
 		if constexpr (_underlying_matrix_funcs::_matrix_valid_for_determinant<Matrix_>())
 		{
@@ -714,7 +713,7 @@ namespace EmuMath::Helpers
 	/// <param name="outDeterminant">Reference to the specified Determinant_ type to output the passed matrix's determinant to. Optional.</param>
 	/// <returns>Inverse matrix to the passed matrix.</returns>
 	template<typename Determinant_ = double, class Matrix_>
-	constexpr inline Matrix_ MatrixInverseLaplace(const Matrix_& matrix_, Determinant_& outDeterminant)
+	[[nodiscard]] constexpr inline Matrix_ MatrixInverseLaplace(const Matrix_& matrix_, Determinant_& outDeterminant)
 	{
 		if constexpr (_underlying_matrix_funcs::_matrix_valid_for_inversion<Matrix_>())
 		{
@@ -739,7 +738,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to find the inverse matrix to.</param>
 	/// <returns>Inverse matrix to the passed matrix.</returns>
 	template<typename Determinant_ = float, class Matrix_ = void>
-	constexpr inline Matrix_ MatrixInverseLaplace(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline Matrix_ MatrixInverseLaplace(const Matrix_& matrix_)
 	{
 		Determinant_ dummy_ = Determinant_();
 		return MatrixInverseLaplace<Determinant_, Matrix_>(matrix_, dummy_);
