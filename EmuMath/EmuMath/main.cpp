@@ -6,6 +6,7 @@
 #include "EmuMath/FastVector.h"
 #include "EmuMath/Matrices.h"
 #include <array>
+#include <iomanip>
 
 using namespace EmuCore::TestingHelpers;
 using namespace EmuMath;
@@ -99,13 +100,32 @@ int main()
 
 	std::cout << "\n\nMatrix:\n" << blooble << "\nSubmatrix[3, 2] (" << blooble.at<3, 2>() << "):\n" << blooble.SubMatrixExcluding<3, 2>() << std::endl;
 
-	constexpr EmuMath::MatrixCM<4, 4, double> McDooble(17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0, 32.0);
+	constexpr EmuMath::MatrixCM<4, 4, float> McDooble(17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0, 32.0);
 	blooble = McDooble;
 	std::cout << "After set:\n" << blooble << std::endl;
 
 	std::cout << "Element (1, 3): " << EmuMath::Helpers::MatrixGet(blooble, 1, 3) << "\n";
 	std::cout << "Column 2: " << EmuMath::Helpers::MatrixGet(blooble, 2) << "\n";
 	std::cout << "Column 3: " << blooble[3] << "\n";
+
+	EmuMath::MatrixCM<2, 2, std::uint64_t> a_(257, 1, 233, 42);
+	EmuMath::MatrixCM<2, 2, std::uint64_t> b_(29, 333, 1, 2);
+	EmuMath::MatrixCM<2, 2, std::uint64_t> result_ = EmuMath::Helpers::MatrixRespectiveMultiplication(a_, b_);
+	std::cout << "Determinant of:\n" << result_ << "\n: " << EmuMath::Helpers::MatrixDeterminantLaplace<float>(result_) << "\n";
+
+	auto resooble = EmuMath::MatrixCM<4, 4, double>(2.73, -6.66, 2.0, 3.5, 2.3, 16.6, 0.0, 12.345, 19.9, -1.337, 22.0, 1.0, 3.0, 5.0, 2.37, 6.6);
+	std::cout << "Determinant of:\n" << resooble << "\n: " << std::setprecision(10) << std::fixed << EmuMath::Helpers::MatrixDeterminantLaplace<double>(resooble) << "\n";
+
+	auto bigooble = EmuMath::MatrixCM<6, 6, double>
+	(
+		EmuMath::MatrixCM<6, 6, double>::column_type({ 0.1f, 0.005f, 0.6f, 2.0f, 3.0f, 2.0f }),
+		EmuMath::MatrixCM<6, 6, double>::column_type({ 26.0f }),
+		EmuMath::MatrixCM<6, 6, double>::column_type({ 1.0f, 1.0f, 1.0f, 3.0f, 1.0f, 2.0f }),
+		EmuMath::MatrixCM<6, 6, double>::column_type({ 31.5f, 0.0f, 2.0f, 3.0f, 7.0f, 13.0f }),
+		EmuMath::MatrixCM<6, 6, double>::column_type({ 12.0f, 1.0f, 0.0f, 3.0f, 4.0f, 6.0f }),
+		EmuMath::MatrixCM<6, 6, double>::column_type({ -22.0f, 3.0f, 4.0f, 5.0f, 1.0f, 23.0215f })
+	);
+	std::cout << "Determinant of:\n" << bigooble << "\n: " << EmuMath::Helpers::MatrixDeterminantLaplace<double>(bigooble) << "\n";
 
 	system("pause");
 

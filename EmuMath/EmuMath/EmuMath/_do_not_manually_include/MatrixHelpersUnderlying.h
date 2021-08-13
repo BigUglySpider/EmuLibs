@@ -526,6 +526,59 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		_fill_matrix_submatrix_exclusive<IgnoreColumn_, IgnoreRow_, 0, 0, 0, 0, Matrix_, Out_>(matrix_, out_);
 		return out_;
 	}
+
+	template<class Matrix_>
+	constexpr inline bool _matrix_valid_for_determinant()
+	{
+
+	}
+
+	template<typename Out_, class Matrix_>
+	constexpr inline Out_ _calculate_matrix_determinant_2x2(const Matrix_& matrix_)
+	{
+		Out_ out_ = static_cast<Out_>(_get_matrix_data_value<0, 0>(matrix_)) * static_cast<Out_>(_get_matrix_data_value<1, 1>(matrix_));
+		out_ = out_ - static_cast<Out_>(_get_matrix_data_value<1, 0>(matrix_)) * static_cast<Out_>(_get_matrix_data_value<0, 1>(matrix_));
+		return out_;
+	}
+
+	template<std::size_t Iteration_, typename Out_, class Matrix_>
+	constexpr inline void _calculate_matrix_determinant_laplace(const Matrix_& matrix_, Out_& out_)
+	{
+		// We assume we are guaranteed to be passed a square matrix as this function is designed to be called after validity checks
+		// --- As such, we only check num_columns for the size of both columns and rows
+		constexpr std::size_t size_ = Matrix_::num_columns;
+
+		if constexpr (Iteration_ < size_)
+		{
+			if constexpr (size_ == 1)
+			{
+				out_ = _get_matrix_data_value<0, 0>(matrix_);
+			}
+			else if constexpr (size_ == 2)
+			{
+				out_ = _calculate_matrix_determinant_2x2<Out_, Matrix_>(matrix_);
+			}
+			else
+			{
+				using SubMatrix_ = typename EmuMath::TMPHelpers::emu_matrix_matching_template<size_ - 1, size_ - 1, typename Matrix_::value_type, Matrix_>::type;
+				const SubMatrix_ subMatrix_ = _find_matrix_submatrix_exclusive<Iteration_, 0, Matrix_, SubMatrix_>(matrix_);
+				Out_ subDet = Out_();
+				_calculate_matrix_determinant_laplace<0, Out_, SubMatrix_>(subMatrix_, subDet);
+				subDet *= static_cast<Out_>(_get_matrix_data_value<Iteration_, 0>(matrix_));
+
+				// Add on even iterations, subtract on odd iterations
+				if constexpr ((Iteration_ % 2) == 0)
+				{
+					out_ = out_ + subDet;
+				}
+				else
+				{
+					out_ = out_ - subDet;
+				}
+				_calculate_matrix_determinant_laplace<Iteration_ + 1, Out_, Matrix_>(matrix_, out_);
+			}
+		}
+	}
 #pragma endregion
 
 #pragma region MATRIX_ARITHMETIC

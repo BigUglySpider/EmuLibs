@@ -622,6 +622,45 @@ namespace EmuMath::Helpers
 			return typename TMPHelpers::emu_matrix_matching_template<Matrix_::num_columns - 1, Matrix_::num_rows - 1, typename Matrix_::value_type, Matrix_>::type();
 		}
 	}
+
+	/// <summary>
+	/// <para> Calculates the determinant of the passed matrix, outputting it as the provided Out_ type (a floating-point type is recommended). </para>
+	/// <para> The determinant is only defined for square matrices. As such, this function may only be validly used with a square matrix. </para>
+	/// <para> This function uses the Laplace Expansion method to calculate the determinant. This method takes exponentially longer the larger a matrix is. </para>
+	/// </summary>
+	/// <typeparam name="Out_">Type to output as. Preference should be given to float or double.</typeparam>
+	/// <typeparam name="Matrix_">Type of matrix to find the determinant of.</typeparam>
+	/// <param name="matrix_">Square EmuMath matrix to calculate the determinant of.</param>
+	/// <returns>Determinant of the passed matrix, represented as the provided Out_ type.</returns>
+	template<typename Out_ = float, class Matrix_>
+	constexpr inline Out_ MatrixDeterminantLaplace(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
+		{
+			if constexpr (Matrix_::is_square)
+			{
+				Out_ out_ = Out_();
+				_underlying_matrix_funcs::_calculate_matrix_determinant_laplace<0, Out_, Matrix_>(matrix_, out_);
+				return out_;
+			}
+			else
+			{
+				static_assert(false, "Attempted to calculate the determinant of a non-square matrix. Only square matrices have a defined determinant.");
+				return Out_();
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to calculate a matrix's determinant, but passed a non-EmuMath-matrix type.");
+			return Out_();
+		}
+	}
+
+	template<class Matrix_>
+	constexpr inline Matrix_ MatrixInverseLaplace(const Matrix_& matrix_)
+	{
+
+	}
 #pragma endregion
 }
 
