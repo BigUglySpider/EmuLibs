@@ -26,6 +26,19 @@ inline std::ostream& operator<<(std::ostream& stream_, const std::array<T_, Size
 	return stream_;
 }
 
+template<typename T_, int Max_ = std::numeric_limits<int>::max()>
+struct SettyBoi
+{
+	T_ operator()() const
+	{
+		return T_(rand() % Max_);
+	}
+	T_ operator()(const std::size_t x_, const std::size_t y_) const
+	{
+		return T_(rand() % (x_ + y_ + 1));
+	}
+};
+
 int main()
 {
 	const float bobs[4] = { 1.0f, 2.0f, 3.0f, 4.0f };
@@ -143,7 +156,10 @@ int main()
 	std::cout << "\n" << resooble << "\nNOT EQUAL TO\n" << bigooble << "\n?: " << EmuMath::Helpers::MatrixNotEqual(resooble, bigooble) << "\n";
 	std::cout << "\n" << bigooble << "\nEQUAL TO\n" << bigooble << "\n?: " << EmuMath::Helpers::MatrixEqual(bigooble, bigooble) << "\n";
 
-
+	EmuMath::MatrixCM<250, 2, float> blobs;
+	blobs.SetViaFunc<true>(SettyBoi<float>());
+	std::cout << blobs << "\n";
+	std::cout << "Transpose:\n" << blobs.Transpose() << "\n";
 
 
 	system("pause");

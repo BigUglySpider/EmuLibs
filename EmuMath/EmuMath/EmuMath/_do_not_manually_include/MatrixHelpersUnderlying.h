@@ -513,6 +513,31 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 			}
 		}
 	}
+
+
+	template<std::size_t Column_, std::size_t Row_, bool PassIndices_, class Matrix_, class Func_>
+	constexpr inline void _matrix_set_via_func(Matrix_& matrix_, Func_& func_)
+	{
+		if constexpr (Column_ < Matrix_::num_columns)
+		{
+			if constexpr (Row_ < Matrix_::num_rows)
+			{
+				if constexpr (PassIndices_)
+				{
+					_get_matrix_data_value<Column_, Row_>(matrix_) = func_(Column_, Row_);
+				}
+				else
+				{
+					_get_matrix_data_value<Column_, Row_>(matrix_) = func_();
+				}
+				_matrix_set_via_func<Column_, Row_ + 1, PassIndices_, Matrix_, Func_>(matrix_, func_);
+			}
+			else
+			{
+				_matrix_set_via_func<Column_ + 1, 0, PassIndices_, Matrix_, Func_>(matrix_, func_);
+			}
+		}
+	}
 #pragma endregion
 
 #pragma region MATRIX_OPERATIONS

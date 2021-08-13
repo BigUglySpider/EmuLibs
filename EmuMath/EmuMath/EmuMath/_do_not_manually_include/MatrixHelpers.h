@@ -423,6 +423,20 @@ namespace EmuMath::Helpers
 		}
 		return lhs_;
 	}
+
+	template<bool PassIndices_, class Matrix_, class FillFunc_>
+	constexpr inline Matrix_& MatrixSetViaFunc(Matrix_& matrix_, FillFunc_ fillFunc_ = FillFunc_())
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
+		{
+			_underlying_matrix_funcs::_matrix_set_via_func<0, 0, PassIndices_, Matrix_, FillFunc_>(matrix_, fillFunc_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to set an EmuMath matrix via MatrixSetViaFunc, but provided a non-EmuMath-matrix to set.");
+		}
+		return matrix_;
+	}
 #pragma endregion
 
 #pragma region MATRIX_OPERATIONS

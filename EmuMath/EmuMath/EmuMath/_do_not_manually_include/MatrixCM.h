@@ -358,6 +358,14 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region SETS
+		template<bool PassIndices_, class Func_>
+		this_type& SetViaFunc(Func_ func_ = Func_())
+		{
+			return EmuMath::Helpers::MatrixSetViaFunc<PassIndices_, this_type, Func_>(*this, func_);
+		}
+#pragma endregion
+
 #pragma region MATRIX_OPERATIONS
 		/// <summary> Returns the transpose of this matrix. The dimensions of the returned matrix will be the reverse of this matrix (e.g. a 4x3 transpose will be 3x4). </summary>
 		/// <returns>Transpose matrix to this matrix.</returns>
