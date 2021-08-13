@@ -707,6 +707,12 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary> Calculates the inverse matrix to the passed matrix, and returns the calculated determinant via the passed outDeterminant reference. </summary>
+	/// <typeparam name="Determinant_">Type to represent determinants as.</typeparam>
+	/// <typeparam name="Matrix_">Type of matrix being used.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to find the inverse matrix to.</param>
+	/// <param name="outDeterminant">Reference to the specified Determinant_ type to output the passed matrix's determinant to. Optional.</param>
+	/// <returns>Inverse matrix to the passed matrix.</returns>
 	template<typename Determinant_ = double, class Matrix_>
 	constexpr inline Matrix_ MatrixInverseLaplace(const Matrix_& matrix_, Determinant_& outDeterminant)
 	{
@@ -727,6 +733,11 @@ namespace EmuMath::Helpers
 			return Matrix_();
 		}
 	}
+	/// <summary> Calculates the inverse matrix to the passed matrix. </summary>
+	/// <typeparam name="Determinant_">Type to represent determinants as.</typeparam>
+	/// <typeparam name="Matrix_">Type of matrix being used.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to find the inverse matrix to.</param>
+	/// <returns>Inverse matrix to the passed matrix.</returns>
 	template<typename Determinant_ = float, class Matrix_ = void>
 	constexpr inline Matrix_ MatrixInverseLaplace(const Matrix_& matrix_)
 	{
