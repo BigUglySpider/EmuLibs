@@ -114,7 +114,7 @@ int main()
 	std::cout << "Determinant of:\n" << result_ << "\n: " << EmuMath::Helpers::MatrixDeterminantLaplace<float>(result_) << "\n";
 
 	auto resooble = EmuMath::MatrixCM<4, 4, double>(2.73, -6.66, 2.0, 3.5, 2.3, 16.6, 0.0, 12.345, 19.9, -1.337, 22.0, 1.0, 3.0, 5.0, 2.37, 6.6);
-	std::cout << "Determinant of:\n" << resooble << "\n: " << std::setprecision(10) << std::fixed << EmuMath::Helpers::MatrixDeterminantLaplace<double>(resooble) << "\n";
+	std::cout << "Determinant of:\n" << resooble << "\n: " << std::setprecision(10) << std::fixed << EmuMath::Helpers::MatrixDeterminantLaplace<double>(resooble) << std::endl;
 
 	auto bigooble = EmuMath::MatrixCM<6, 6, double>
 	(
@@ -125,7 +125,12 @@ int main()
 		EmuMath::MatrixCM<6, 6, double>::column_type({ 12.0f, 1.0f, 0.0f, 3.0f, 4.0f, 6.0f }),
 		EmuMath::MatrixCM<6, 6, double>::column_type({ -22.0f, 3.0f, 4.0f, 5.0f, 1.0f, 23.0215f })
 	);
-	std::cout << "Determinant of:\n" << bigooble << "\n: " << EmuMath::Helpers::MatrixDeterminantLaplace<double>(bigooble) << "\n";
+	std::cout << "Determinant of:\n" << bigooble << "\n: " << std::setprecision(10) << std::fixed << EmuMath::Helpers::MatrixDeterminantLaplace<double>(bigooble) << std::endl;
+
+	auto resoobleInverse = EmuMath::Helpers::MatrixInverseLaplace<double>(resooble);
+	std::cout << "Base:\n" << resooble << "\nInverse:\n" << resoobleInverse << "\nBase x Inverse:\n" << (resooble * resoobleInverse) << "\n";
+
+	std::cout << "Minors:\n" << EmuMath::Helpers::MatrixMinorsLaplace(resooble) << "\n";
 
 	system("pause");
 

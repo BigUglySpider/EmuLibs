@@ -530,7 +530,36 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	template<class Matrix_>
 	constexpr inline bool _matrix_valid_for_determinant()
 	{
-
+		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
+		{
+			if constexpr (Matrix_::is_square)
+			{
+				return true;
+			}
+			else
+			{
+				static_assert(false, "Attempted to calculate the determinant of a non-square matrix. Only square matrices have a defined determinant.");
+				return false;
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to calculate a matrix's determinant, but passed a non-EmuMath-matrix type.");
+			return false;
+		}
+	}
+	template<class Matrix_>
+	constexpr inline bool _matrix_valid_for_inversion()
+	{
+		if constexpr (_matrix_valid_for_determinant<Matrix_>())
+		{
+			return true;
+		}
+		else
+		{
+			static_assert(false, "Unable to get matrix inverse as a passed matrix was not valid for calculating a determinant, which is required for inversion.");
+			return false;
+		}
 	}
 
 	template<typename Out_, class Matrix_>
@@ -576,6 +605,65 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 					out_ = out_ - subDet;
 				}
 				_calculate_matrix_determinant_laplace<Iteration_ + 1, Out_, Matrix_>(matrix_, out_);
+			}
+		}
+	}
+
+	template<std::size_t Column_, std::size_t Row_, class Matrix_>
+	void _create_cofactor_matrix(const Matrix_& matrix_, Matrix_& out_)
+	{
+		if constexpr (Column_ < Matrix_::num_columns)
+		{
+			if constexpr (Row_ < Matrix_::num_rows)
+			{
+				if constexpr ((Column_ % 2) == 0)
+				{
+					// Row begins positive
+					if constexpr ((Row_ % 2) == 0)
+					{
+						_get_matrix_data_value<Column_, Row_>(out_) = _get_matrix_data_value<Column_, Row_>(matrix_);
+					}
+					else
+					{
+						_get_matrix_data_value<Column_, Row_>(out_) = -_get_matrix_data_value<Column_, Row_>(matrix_);
+					}
+				}
+				else
+				{
+					// Row begins negative
+					if constexpr ((Row_ % 2) == 0)
+					{
+						_get_matrix_data_value<Column_, Row_>(out_) = -_get_matrix_data_value<Column_, Row_>(matrix_);
+					}
+					else
+					{
+						_get_matrix_data_value<Column_, Row_>(out_) = _get_matrix_data_value<Column_, Row_>(matrix_);
+					}
+				}
+				_create_cofactor_matrix<Column_, Row_ + 1, Matrix_>(matrix_, out_);
+			}
+			else
+			{
+				_create_cofactor_matrix<Column_ + 1, 0, Matrix_>(matrix_, out_);
+			}
+		}
+	}
+
+	template<std::size_t Column_, std::size_t Row_, class Matrix_>
+	constexpr inline void _calculate_matrix_of_minors_laplace(const Matrix_& matrix_, Matrix_& out_)
+	{
+		if constexpr (Column_ < Matrix_::num_columns)
+		{
+			if constexpr (Row_ < Matrix_::num_rows)
+			{
+				using SubMatrix_ = EmuMath::TMPHelpers::emu_matrix_matching_template_t<Matrix_::num_columns - 1, Matrix_::num_rows - 1, typename Matrix_::value_type, Matrix_>;
+				const SubMatrix_ subMatrix_ = _find_matrix_submatrix_exclusive<Column_, Row_, Matrix_, SubMatrix_>(matrix_);
+				_calculate_matrix_determinant_laplace<0, typename Matrix_::value_type, SubMatrix_>(subMatrix_, _get_matrix_data_value<Column_, Row_>(out_));
+				_calculate_matrix_of_minors_laplace<Column_, Row_ + 1, Matrix_>(matrix_, out_);
+			}
+			else
+			{
+				_calculate_matrix_of_minors_laplace<Column_ + 1, 0, Matrix_>(matrix_, out_);
 			}
 		}
 	}

@@ -623,6 +623,52 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	template<class Matrix_>
+	constexpr inline Matrix_ MatrixMinorsLaplace(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
+		{
+			if constexpr (Matrix_::is_square)
+			{
+				Matrix_ out_ = Matrix_();
+				_underlying_matrix_funcs::_calculate_matrix_of_minors_laplace<0, 0, Matrix_>(matrix_, out_);
+				return out_;
+			}
+			else
+			{
+				static_assert(false, "Attempted to calculate a matrix of minors for a non-square matrix.");
+				return Matrix_();
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to calculate a matrix of minors for a non-EmuMath-matrix type.");
+			return Matrix_();
+		}
+	}
+
+	template<class Matrix_>
+	constexpr inline Matrix_ MatrixCofactorsLaplace(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
+		{
+			Matrix_ out_ = Matrix_();
+			_underlying_matrix_funcs::_create_cofactor_matrix<0, 0, Matrix_>(MatrixMinorsLaplace(matrix_), out_);
+			return out_;
+		}
+		else
+		{
+			static_assert(false, "Attempted to retrieve a matrix of cofactors via a non-EmuMath-matrix type.");
+			return Matrix_();
+		}
+	}
+
+	template<class Matrix_>
+	constexpr inline Matrix_ MatrixAdjugateLaplace(const Matrix_& matrix_)
+	{
+		return MatrixTranspose(MatrixCofactorsLaplace(matrix_));
+	}
+
 	/// <summary>
 	/// <para> Calculates the determinant of the passed matrix, outputting it as the provided Out_ type (a floating-point type is recommended). </para>
 	/// <para> The determinant is only defined for square matrices. As such, this function may only be validly used with a square matrix. </para>
@@ -635,31 +681,43 @@ namespace EmuMath::Helpers
 	template<typename Out_ = float, class Matrix_>
 	constexpr inline Out_ MatrixDeterminantLaplace(const Matrix_& matrix_)
 	{
-		if constexpr (EmuMath::TMPHelpers::is_emu_matrix_v<Matrix_>)
+		if constexpr (_underlying_matrix_funcs::_matrix_valid_for_determinant<Matrix_>())
 		{
-			if constexpr (Matrix_::is_square)
-			{
-				Out_ out_ = Out_();
-				_underlying_matrix_funcs::_calculate_matrix_determinant_laplace<0, Out_, Matrix_>(matrix_, out_);
-				return out_;
-			}
-			else
-			{
-				static_assert(false, "Attempted to calculate the determinant of a non-square matrix. Only square matrices have a defined determinant.");
-				return Out_();
-			}
+			Out_ out_ = Out_();
+			_underlying_matrix_funcs::_calculate_matrix_determinant_laplace<0, Out_, Matrix_>(matrix_, out_);
+			return out_;
 		}
 		else
 		{
-			static_assert(false, "Attempted to calculate a matrix's determinant, but passed a non-EmuMath-matrix type.");
 			return Out_();
 		}
 	}
 
-	template<class Matrix_>
+	template<typename Determinant_ = double, class Matrix_>
+	constexpr inline Matrix_ MatrixInverseLaplace(const Matrix_& matrix_, Determinant_& outDeterminant)
+	{
+		if constexpr (_underlying_matrix_funcs::_matrix_valid_for_inversion<Matrix_>())
+		{
+			outDeterminant = MatrixDeterminantLaplace<Determinant_, Matrix_>(matrix_);
+			if (outDeterminant != Determinant_(0))
+			{
+				return MatrixMultiplication(MatrixAdjugateLaplace(matrix_), Determinant_(1) / outDeterminant);
+			}
+			else
+			{
+				return matrix_;
+			}
+		}
+		else
+		{
+			return Matrix_();
+		}
+	}
+	template<typename Determinant_ = float, class Matrix_ = void>
 	constexpr inline Matrix_ MatrixInverseLaplace(const Matrix_& matrix_)
 	{
-
+		Determinant_ dummy_ = Determinant_();
+		return MatrixInverseLaplace<Determinant_, Matrix_>(matrix_, dummy_);
 	}
 #pragma endregion
 }
