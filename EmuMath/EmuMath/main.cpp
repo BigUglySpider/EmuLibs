@@ -143,6 +143,9 @@ int main()
 	std::cout << "\n" << resooble << "\nNOT EQUAL TO\n" << bigooble << "\n?: " << EmuMath::Helpers::MatrixNotEqual(resooble, bigooble) << "\n";
 	std::cout << "\n" << bigooble << "\nEQUAL TO\n" << bigooble << "\n?: " << EmuMath::Helpers::MatrixEqual(bigooble, bigooble) << "\n";
 
+
+
+
 	system("pause");
 
 #pragma region TEST_HARNESS_EXECUTION

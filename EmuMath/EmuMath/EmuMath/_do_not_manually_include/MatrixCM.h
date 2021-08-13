@@ -344,6 +344,20 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region BOOLEAN_OPERATORS
+		template<class RhsMatrix_>
+		[[nodiscard]] constexpr inline bool operator==(const RhsMatrix_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixEqual(*this, rhs_);
+		}
+
+		template<class RhsMatrix_>
+		[[nodiscard]] constexpr inline bool operator!=(const RhsMatrix_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixNotEqual(*this, rhs_);
+		}
+#pragma endregion
+
 #pragma region MATRIX_OPERATIONS
 		/// <summary> Returns the transpose of this matrix. The dimensions of the returned matrix will be the reverse of this matrix (e.g. a 4x3 transpose will be 3x4). </summary>
 		/// <returns>Transpose matrix to this matrix.</returns>
@@ -383,6 +397,88 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline EmuMath::MatrixCM<num_columns - 1, num_rows - 1, value_type> SubMatrixExcluding() const
 		{
 			return EmuMath::Helpers::MatrixSubMatrixExcluding<Column_, Row_, this_type>(*this);
+		}
+
+		/// <summary>
+		/// <para> Calculates the matrix of minors to this matrix, using Laplace Expansion where applicable. </para>
+		/// <para> It should be noted that Laplace Expansion gets exponentially more expensive as the size of a matrix increases. </para>
+		/// <para> This may only be performed with square matrices. </para>
+		/// </summary>
+		/// <typeparam name="RequiresSquareMatrix">Dummy to make use of std::enable_if.</typeparam>
+		/// <returns>Matrix of minors to this matrix.</returns>
+		template<class RequiresSquareMatrix = std::enable_if_t<is_square>>
+		[[nodiscard]] constexpr inline this_type MatrixOfMinorsLaplace() const
+		{
+			return EmuMath::Helpers::MatrixMinorsLaplace(*this);
+		}
+
+		/// <summary>
+		/// <para> Calculates the matrix of cofactors to this matrix, using Laplace Expansion where applicable. </para>
+		/// <para> It should be noted that Laplace Expansion gets exponentially more expensive as the size of a matrix increases. </para>
+		/// <para> This may only be performed with square matrices. </para>
+		/// </summary>
+		/// <typeparam name="RequiresSquareMatrix">Dummy to make use of std::enable_if.</typeparam>
+		/// <returns>Matrix of cofactors to this matrix.</returns>
+		template<class RequiresSquareMatrix = std::enable_if_t<is_square>>
+		[[nodiscard]] constexpr inline this_type MatrixOfCofactorsLaplace() const
+		{
+			return EmuMath::Helpers::MatrixCofactorsLaplace(*this);
+		}
+		/// <summary>
+		/// <para> Calculates the adjugate matrix to this matrix, using Laplace Expansion where applicable. </para>
+		/// <para> It should be noted that Laplace Expansion gets exponentially more expensive as the size of a matrix increases. </para>
+		/// <para> This may only be performed with square matrices. </para>
+		/// </summary>
+		/// <typeparam name="RequiresSquareMatrix">Dummy to make use of std::enable_if.</typeparam>
+		/// <returns>Adjugate matrix to this matrix.</returns>
+		template<class RequiresSquareMatrix = std::enable_if_t<is_square>>
+		[[nodiscard]] constexpr inline this_type AdjugateLaplace() const
+		{
+			return EmuMath::Helpers::MatrixAdjugateLaplace(*this);
+		}
+
+		/// <summary>
+		/// <para> Calculates the determinant of this matrix, using Laplace Expansion where applicable. </para>
+		/// <para> It should be noted that Laplace Expansion gets exponentially more expensive as the size of a matrix increases. </para>
+		/// <para> This may only be performed with square matrices. </para>
+		/// </summary>
+		/// <typeparam name="RequiresSquareMatrix">Dummy to make use of std::enable_if.</typeparam>
+		/// <returns>Determinant this matrix, represented as the provided Out_ type (a floating-point type is highly recommended).</returns>
+		template<typename Out_ = float, class RequiresSquareMatrix = std::enable_if_t<is_square>>
+		[[nodiscard]] constexpr inline Out_ DeterminantLaplace() const
+		{
+			return EmuMath::Helpers::MatrixDeterminantLaplace<Out_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Calculates the inverse to this matrix, using Laplace Expansion where applicable. </para>
+		/// <para> It should be noted that Laplace Expansion gets exponentially more expensive as the size of a matrix increases. </para>
+		/// <para> This may only be performed with square matrices. </para>
+		/// <para> If this matrix has no inverse (i.e. its determinant is 0), this will instead return a copy of this matrix. </para>
+		/// </summary>
+		/// <typeparam name="RequiresSquareMatrix">Dummy to make use of std::enable_if.</typeparam>
+		/// <returns>Inverse matrix to this matrix.</returns>
+		template<typename Determinant_ = float, class RequiresSquareMatrix = std::enable_if_t<is_square>>
+		[[nodiscard]] constexpr inline this_type InverseLaplace() const
+		{
+			return EmuMath::Helpers::MatrixInverseLaplace<Determinant_>(*this);
+		}
+		/// <summary>
+		/// <para>
+		///		Calculates the inverse to this matrix, using Laplace Expansion where applicable. 
+		///		Additionally outputs the determinant of this matrix via the passexd reference.
+		/// </para>
+		/// <para> It should be noted that Laplace Expansion gets exponentially more expensive as the size of a matrix increases. </para>
+		/// <para> This may only be performed with square matrices. </para>
+		/// <para> If this matrix has no inverse (i.e. its determinant is 0), this will instead return a copy of this matrix. </para>
+		/// </summary>
+		/// <typeparam name="RequiresSquareMatrix">Dummy to make use of std::enable_if.</typeparam>
+		/// <param name="outDeterminant_">Optional reference to output this matrix's determinant to. May be compared to 0 to test if this function could find an inverse.</param>
+		/// <returns>Inverse matrix to this matrix.</returns>
+		template<typename Determinant_, class RequiresSquareMatrix = std::enable_if_t<is_square>>
+		[[nodiscard]] constexpr inline this_type InverseLaplace(Determinant_& outDeterminant_) const
+		{
+			return EmuMath::Helpers::MatrixInverseLaplace<Determinant_>(*this, outDeterminant_);
 		}
 #pragma endregion
 

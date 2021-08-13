@@ -736,13 +736,17 @@ namespace EmuMath::Helpers
 		}
 	}
 
-	/// <summary> Calculates the inverse matrix to the passed matrix, and returns the calculated determinant via the passed outDeterminant reference. </summary>
+	/// <summary> 
+	/// <para> Calculates the inverse matrix to the passed matrix. Additionally outputs the matrix's determinant via the passed outDeterminant reference. </para>
+	/// <para> It should be noted that Laplace Expansion gets exponentially more expensive as the size of a matrix increases. </para>
+	/// <para> If the passed matrix has no inverse (i.e. its determinant is 0), this will instead return a copy of the matrix. </para>
+	/// </summary>
 	/// <typeparam name="Determinant_">Type to represent determinants as.</typeparam>
 	/// <typeparam name="Matrix_">Type of matrix being used.</typeparam>
 	/// <param name="matrix_">EmuMath matrix to find the inverse matrix to.</param>
 	/// <param name="outDeterminant">Reference to the specified Determinant_ type to output the passed matrix's determinant to. Optional.</param>
 	/// <returns>Inverse matrix to the passed matrix.</returns>
-	template<typename Determinant_ = double, class Matrix_>
+	template<typename Determinant_, class Matrix_>
 	[[nodiscard]] constexpr inline Matrix_ MatrixInverseLaplace(const Matrix_& matrix_, Determinant_& outDeterminant)
 	{
 		if constexpr (_underlying_matrix_funcs::_matrix_valid_for_inversion<Matrix_>())
@@ -762,7 +766,11 @@ namespace EmuMath::Helpers
 			return Matrix_();
 		}
 	}
-	/// <summary> Calculates the inverse matrix to the passed matrix. </summary>
+	/// <summary> 
+	/// <para> Calculates the inverse matrix to the passed matrix. </para>
+	/// <para> It should be noted that Laplace Expansion gets exponentially more expensive as the size of a matrix increases. </para>
+	/// <para> If the passed matrix has no inverse (i.e. its determinant is 0), this will instead return a copy of the matrix. </para>
+	/// </summary>
 	/// <typeparam name="Determinant_">Type to represent determinants as.</typeparam>
 	/// <typeparam name="Matrix_">Type of matrix being used.</typeparam>
 	/// <param name="matrix_">EmuMath matrix to find the inverse matrix to.</param>
