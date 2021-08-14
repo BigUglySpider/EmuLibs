@@ -283,7 +283,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		// No need to loop if surpassing at least one vector's size as we will just be adding 0 from that point on
 		if constexpr (Index_ < A_::size && Index_ < B_::size)
 		{
-			out_ = out_ + (_get_vector_data<Index_>(a_) * _get_vector_data<Index_>(b_));
+			out_ = out_ + static_cast<OutT_>(_get_vector_data<Index_>(a_) * _get_vector_data<Index_>(b_));
 			_calculate_vector_dot_product<Index_ + 1, OutT_, A_, B_>(a_, b_, out_);
 		}
 	}
@@ -360,6 +360,85 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		else
 		{
 			_perform_vector_arithmetic_scalar<0, OutVector_, LhsVector_, Rhs_, ArithmeticFunc_>(lhs_, rhs_, out_, func_);
+		}
+		return out_;
+	}
+#pragma endregion
+
+#pragma region COMPARISONS
+	template<std::size_t Index_, class OutVector_, class Comparison_, class LhsVector_, class RhsScalar_>
+	[[nodiscard]] constexpr inline void _perform_vector_per_element_comparison_rhs_scalar
+	(
+		const LhsVector_& lhs_,
+		const RhsScalar_& rhs_,
+		OutVector_& out_,
+		Comparison_& cmpFunc_
+	)
+	{
+		if constexpr (Index_ < OutVector_::size)
+		{
+			if constexpr (Index_ < LhsVector_::size)
+			{
+				_get_vector_data<Index_>(out_) = static_cast<typename OutVector_::value_type>(cmpFunc_(_get_vector_data<Index_>(lhs_), rhs_));
+			}
+			else
+			{
+				_get_vector_data<Index_>(out_) = static_cast<typename OutVector_::value_type>(cmpFunc_(typename LhsVector_::value_type(), rhs_));
+			}
+			_perform_vector_per_element_comparison_rhs_scalar<Index_ + 1, OutVector_, Comparison_, LhsVector_, RhsScalar_>(lhs_, rhs_, out_, cmpFunc_);
+		}
+	}
+	template<std::size_t Index_, class OutVector_, class Comparison_, class LhsVector_, class RhsVector_>
+	[[nodiscard]] constexpr inline void _perform_vector_per_element_comparison_rhs_vector
+	(
+		const LhsVector_& lhs_,
+		const RhsVector_& rhs_,
+		OutVector_& out_,
+		Comparison_& cmpFunc_
+	)
+	{
+		if constexpr (Index_ < OutVector_::size)
+		{
+			using out_value_type = typename OutVector_::value_type;
+			if constexpr (Index_ < LhsVector_::size)
+			{
+				if constexpr (Index_ < RhsVector_::size)
+				{
+					_get_vector_data<Index_>(out_) = static_cast<out_value_type>(cmpFunc_(_get_vector_data<Index_>(lhs_), _get_vector_data<Index_>(rhs_)));
+				}
+				else
+				{
+					using rhs_value_type = typename RhsVector_::value_type;
+					_get_vector_data<Index_>(out_) = static_cast<out_value_type>(cmpFunc_(_get_vector_data<Index_>(lhs_), rhs_value_type()));
+				}
+			}
+			else
+			{
+				using lhs_value_type = typename LhsVector_::value_type;
+				if constexpr (Index_ < RhsVector_::size)
+				{
+					_get_vector_data<Index_>(out_) = static_cast<out_value_type>(cmpFunc_(lhs_value_type(), _get_vector_data<Index_>(rhs_)));
+				}
+				else
+				{
+					using rhs_value_type = typename RhsVector_::value_type;
+					_get_vector_data<Index_>(out_) = static_cast<out_value_type>(cmpFunc_(lhs_value_type(), rhs_value_type()));
+				}
+			}
+			_perform_vector_per_element_comparison_rhs_vector<Index_ + 1, OutVector_, Comparison_, LhsVector_, RhsVector_>(lhs_, rhs_, out_, cmpFunc_);
+		}
+	}
+	template<class OutVector_, class Comparison_, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline OutVector_ _perform_vector_per_element_comparison(const LhsVector_& lhs_, const Rhs_& rhs_, Comparison_& cmpFunc_)
+	{
+		OutVector_ out_ = OutVector_();
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
+		{
+			_perform_vector_per_element_comparison_rhs_vector<0, OutVector_, Comparison_, LhsVector_, Rhs_>(lhs_, rhs_, out_, cmpFunc_);
+		}
+		else
+		{
+
 		}
 		return out_;
 	}

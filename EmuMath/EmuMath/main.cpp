@@ -83,13 +83,21 @@ int main()
 	std::cout << a << " / " << b << ": " << EmuMath::Helpers::VectorDivide(a, b) << "\n";
 	std::cout << a << " / " << c << ": " << EmuMath::Helpers::VectorDivide(a, c) << "\n";
 
-	constexpr EmuMath::Vector<3, int> d(0, -7, 23);
+	constexpr EmuMath::Vector<4, int> d(0, -7, 23, 2);
 	constexpr EmuMath::Vector<4, float> e(1.0f, 0.0f, 3.0f, 2.0f);
 	auto result_ = EmuMath::Helpers::VectorDivide<5, float>(d, e);
 	std::cout << d << " / " << e << ": " << EmuMath::Helpers::VectorDivide<5, float>(d, e) << "\n";
 	std::cout << d << " DOT " << e << ": " << EmuMath::Helpers::VectorDotProduct(d, e) << "\n";
 
 	constexpr double dMag = EmuMath::Helpers::VectorMagnitudeConstexpr<double>(d);
+
+	std::cout << d << " == " << e << ": " << EmuMath::Helpers::VectorPerElementCmpEqualTo(d, e) << "\n";
+	std::cout << d << " != " << e << ": " << EmuMath::Helpers::VectorPerElementCmpNotEqualTo<307>(d, e) << "\n";
+	std::cout << d << " < " << e << ": " << EmuMath::Helpers::VectorPerElementCmpLess(d, e) << "\n";
+	std::cout << d << " > " << e << ": " << EmuMath::Helpers::VectorPerElementCmpGreater(d, e) << "\n";
+	std::cout << d << " <= " << e << ": " << EmuMath::Helpers::VectorPerElementCmpLessEqual(d, e) << "\n";
+	std::cout << d << " >= " << e << ": " << EmuMath::Helpers::VectorPerElementCmpGreaterEqual(d, e) << "\n";
+
 	std::cout << EmuMath::Helpers::VectorMagnitude(d) << "\n";
 
 	system("pause");
