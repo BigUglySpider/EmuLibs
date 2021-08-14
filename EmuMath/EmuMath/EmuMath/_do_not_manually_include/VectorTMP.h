@@ -45,6 +45,19 @@ namespace EmuMath::TMP
 	};
 	template<typename value_type, class Vector_>
 	using copy_emu_vector_size_t = typename copy_emu_vector_size<value_type, Vector_>::type;
+
+	template<class Vector_, std::size_t FirstIndex_, std::size_t...OtherIndices_>
+	struct valid_vector_indices
+	{
+		static constexpr bool value = valid_vector_indices<Vector_, FirstIndex_>::value ? valid_vector_indices<Vector_, OtherIndices_...>::value : false;
+	};
+	template<class Vector_, std::size_t FirstIndex_>
+	struct valid_vector_indices<Vector_, FirstIndex_>
+	{
+		static constexpr bool value = (FirstIndex_ < Vector_::size);
+	};
+	template<class Vector_, std::size_t...Indices_>
+	static constexpr bool valid_vector_indices_v = valid_vector_indices<Vector_, Indices_...>::value;
 }
 
 #endif

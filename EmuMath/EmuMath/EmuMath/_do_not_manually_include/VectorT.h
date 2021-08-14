@@ -11,12 +11,18 @@ namespace EmuMath
 	struct Vector
 	{
 	public:
+		static_assert(Size_ > 0, "Unable to create an EmuMath Vector which contains 0 elements.");
+		static_assert(!std::is_same_v<T_, void>, "Unable to create an EmuMath Vector which contains void elements.");
+
 		using value_type = T_;
 		using preferred_floating_point = std::conditional_t<std::is_floating_point_v<value_type>, value_type, float>;
 
 		static constexpr std::size_t size = Size_;
 		using this_type = Vector<size, value_type>;
 		using data_storage_type = std::array<value_type, size>;
+
+		static constexpr bool has_integral_elements = std::is_integral_v<std::remove_cv_t<value_type>>;
+		static constexpr bool has_floating_point_elements = std::is_floating_point_v<std::remove_cv_t<value_type>>;
 
 		constexpr Vector() : data()
 		{
