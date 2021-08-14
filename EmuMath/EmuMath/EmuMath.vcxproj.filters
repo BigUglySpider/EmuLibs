@@ -29,19 +29,7 @@
     <ClInclude Include="EmuCore\FileHelpers\PathValidation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\Vectors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\EmuVector2T.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\EmuVectorInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonValues.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\EmuVector3T.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Tests.hpp">
@@ -53,16 +41,7 @@
     <ClInclude Include="EmuCore\TMPHelpers\TypeConvertors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\EmuVectorTMPHelpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EmuCore\TMPHelpers\Functors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\EmuVector4T.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\VectorHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\GeneralMath.h">
@@ -71,37 +50,25 @@
     <ClInclude Include="EmuMath\NoOverflowT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\FastVector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\FastVectorf4.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\FastVectorBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EmuMath\SIMDHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuCore\ArithmeticHelpers\BitHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\MatrixCM.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\VectorT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\Matrices.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\MatrixHelpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\EmuMatrixTMPHelpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\MatrixHelpersUnderlying.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\VectorHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\_do_not_manually_include\VectorHelpersUnderlying.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\VectorTMP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

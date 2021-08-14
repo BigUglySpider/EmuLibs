@@ -3,8 +3,8 @@
 
 #include "../EmuCore/ArithmeticHelpers/BitHelpers.h"
 #include <cstdlib>
-#include <exception>
 #include <immintrin.h>
+#include <stdexcept>
 
 namespace EmuMath::SIMD
 {
