@@ -84,6 +84,30 @@ namespace EmuMath
 		}
 	}
 
+	template<typename FloatingPoint_>
+	FloatingPoint_ DoCorrectStandardSqrt(const FloatingPoint_ val_)
+	{
+		if constexpr (std::is_floating_point_v<FloatingPoint_>)
+		{
+			if constexpr (std::is_same_v<FloatingPoint_, float>)
+			{
+				return sqrtf(val_);
+			}
+			else if constexpr (std::is_same_v<FloatingPoint_, double>)
+			{
+				return sqrt(val_);
+			}
+			else
+			{
+				return static_cast<FloatingPoint_>(sqrtl(static_cast<long double>(val_)));
+			}
+		}
+		else
+		{
+			static_assert(false, "Passed a non-floating-point type to EmuMath::DoCorrectStandardSqrt. This behaviour is blocked.");
+		}
+	}
+
 	struct Pi
 	{
 		Pi() = delete;

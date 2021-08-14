@@ -1,6 +1,7 @@
 #ifndef EMU_MATH_VECTOR_T_HELPERS_H_INC_
 #define EMU_MATH_VECTOR_T_HELPERS_H_INC_
 
+#include "../GeneralMath.h"
 #include "VectorHelpersUnderlying.h"
 #include <functional>
 
@@ -184,6 +185,54 @@ namespace EmuMath::Helpers
 	[[nodiscard]] constexpr inline typename Vector_::value_type VectorElementSum(const Vector_& vector_)
 	{
 		return VectorElementSum<typename Vector_::value_type, Vector_>(vector_);
+	}
+
+	template<typename OutT_ = float, class VectorA_, class VectorB_>
+	[[nodiscard]] constexpr inline OutT_ VectorDotProduct(const VectorA_& a_, const VectorB_& b_)
+	{
+		if constexpr (_underlying_vector_funcs::_validity_check_vector_dot_product<VectorA_, VectorB_>())
+		{
+			return _underlying_vector_funcs::_calculate_vector_dot_product<OutT_, VectorA_, VectorB_>(a_, b_);
+		}
+		else
+		{
+			static_assert
+			(
+				false,
+				"A validity check on arguments provided for EmuMath::Helpers::VectorDotProduct has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
+			);
+		}
+	}
+
+	template<typename OutT_, class Vector_>
+	[[nodiscard]] constexpr inline OutT_ VectorSquareMagnitude(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_calculate_vector_dot_product<OutT_, Vector_, Vector_>(vector_, vector_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the square magnitude of a vector, but passed a non-EmuMath-vector.");
+		}
+	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline typename Vector_::value_type VectorSquareMagnitude(const Vector_& vector_)
+	{
+		return VectorSquareMagnitude<typename Vector_::value_type, Vector_>(vector_);
+	}
+
+	template<typename OutT_ = float, class Vector_>
+	[[nodiscard]] constexpr inline OutT_ VectorMagnitudeConstexpr(const Vector_& vector_)
+	{
+		using FloatingPoint_ = EmuCore::TMPHelpers::first_floating_point_t<OutT_, typename Vector_::value_type, float>;
+		return static_cast<OutT_>(EmuMath::SqrtConstexpr<FloatingPoint_, FloatingPoint_>(VectorSquareMagnitude<FloatingPoint_, Vector_>(vector_)));
+	}
+	template<typename OutT_ = float, class Vector_>
+	[[nodiscard]] inline OutT_ VectorMagnitude(const Vector_& vector_)
+	{
+		using FloatingPoint_ = EmuCore::TMPHelpers::first_floating_point_t<OutT_, typename Vector_::value_type, float>;
+		return EmuMath::DoCorrectStandardSqrt<FloatingPoint_>(VectorSquareMagnitude<FloatingPoint_, Vector_>(vector_));
 	}
 #pragma endregion
 

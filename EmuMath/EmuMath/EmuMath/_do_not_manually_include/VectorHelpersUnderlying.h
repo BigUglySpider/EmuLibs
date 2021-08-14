@@ -176,6 +176,28 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 			return false;
 		}
 	}
+
+	template<class A_, class B_>
+	constexpr inline bool _validity_check_vector_dot_product()
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<A_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<B_>)
+			{
+				return true;
+			}
+			else
+			{
+				static_assert(false, "attempted to get the dot product of two vectors, but provided a non-EmuMath-vector type as argument B_.");
+				return false;
+			}
+		}
+		else
+		{
+			static_assert(false, "attempted to get the dot product of two vectors, but provided a non-EmuMath-vector type as argument A_.");
+			return false;
+		}
+	}
 #pragma endregion
 
 #pragma region GETS
@@ -252,6 +274,24 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		OutT_ out_ = static_cast<OutT_>(_get_vector_data<0>(vector_));
 		CombineFunc_ func_ = CombineFunc_();
 		_combine_all_vector_elements<1, OutT_, Vector_, CombineFunc_>(vector_, out_, func_);
+		return out_;
+	}
+
+	template<std::size_t Index_, typename OutT_, class A_, class B_>
+	constexpr inline void _calculate_vector_dot_product(const A_& a_, const B_& b_, OutT_& out_)
+	{
+		// No need to loop if surpassing at least one vector's size as we will just be adding 0 from that point on
+		if constexpr (Index_ < A_::size && Index_ < B_::size)
+		{
+			out_ = out_ + (_get_vector_data<Index_>(a_) * _get_vector_data<Index_>(b_));
+			_calculate_vector_dot_product<Index_ + 1, OutT_, A_, B_>(a_, b_, out_);
+		}
+	}
+	template<typename OutT_, class A_, class B_>
+	[[nodiscard]] constexpr inline OutT_ _calculate_vector_dot_product(const A_& a_, const B_& b_)
+	{
+		OutT_ out_ = OutT_();
+		_calculate_vector_dot_product<0, OutT_, A_, B_>(a_, b_, out_);
 		return out_;
 	}
 #pragma endregion
