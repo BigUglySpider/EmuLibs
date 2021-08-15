@@ -608,6 +608,62 @@ namespace EmuMath::Helpers
 	{
 		return VectorReciprocal<Vector_::size, out_floating_point_value_type, Vector_>(vector_);
 	}
+
+	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Min_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorClampMin(const Vector_& vector_, const Min_& min_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_vector_clamp_min<EmuMath::Vector<OutSize_, out_value_type>, Vector_, Min_>(vector_, min_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to clamp the minimum values of a vector, but provided a non-EmuMath-vector to clamp.");
+		}
+	}
+	template<typename out_value_type, class Vector_, class Min_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorClampMin(const Vector_& vector_, const Min_& min_)
+	{
+		return VectorClampMin<Vector_::size, out_value_type, Vector_, Min_>(vector_, min_);
+	}
+	template<std::size_t OutSize_, class Vector_, class Min_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorClampMin(const Vector_& vector_, const Min_& min_)
+	{
+		return VectorClampMin<OutSize_, typename Vector_::value_type, Vector_, Min_>(vector_, min_);
+	}
+	template<class Vector_, class Min_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorClampMin(const Vector_& vector_, const Min_& min_)
+	{
+		return VectorClampMin<Vector_::size, typename Vector_::value_type, Vector_, Min_>(vector_, min_);
+	}
+
+	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorClampMax(const Vector_& vector_, const Max_& max_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_vector_clamp_max<EmuMath::Vector<OutSize_, out_value_type>, Vector_, Max_>(vector_, max_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to clamp the maximum values of a vector, but provided a non-EmuMath-vector to clamp.");
+		}
+	}
+	template<typename out_value_type, class Vector_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorClampMax(const Vector_& vector_, const Max_& max_)
+	{
+		return VectorClampMax<Vector_::size, out_value_type, Vector_, Max_>(vector_, max_);
+	}
+	template<std::size_t OutSize_, class Vector_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorClampMax(const Vector_& vector_, const Max_& max_)
+	{
+		return VectorClampMax<OutSize_, typename Vector_::value_type, Vector_, Max_>(vector_, max_);
+	}
+	template<class Vector_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorClampMax(const Vector_& vector_, const Max_& max_)
+	{
+		return VectorClampMax<Vector_::size, typename Vector_::value_type, Vector_, Max_>(vector_, max_);
+	}
 #pragma endregion
 
 #pragma region ARITHMETIC

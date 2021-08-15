@@ -693,6 +693,97 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		_vector_reciprocal<0, OutVector_, Vector_>(vector_, out_);
 		return out_;
 	}
+
+	template<std::size_t Index_, class OutVector_, class Vector_, class ClampVector_, class CmpFunc_>
+	constexpr inline void _vector_clamp_single_vector(const Vector_& vector_, const ClampVector_& clampVector_, OutVector_& out_, CmpFunc_& cmp_)
+	{
+		if constexpr (Index_ < OutVector_::size)
+		{
+			using out_value = typename OutVector_::value_type;
+			using vector_value = typename Vector_::value_type;
+			using clamp_value = typename ClampVector_::value_type;
+			if constexpr (Index_ < Vector_::size)
+			{
+				const vector_value& val_ = _get_vector_data<Index_>(vector_);
+				if constexpr (Index_ < ClampVector_::size)
+				{
+					const clamp_value& clamp_ = _get_vector_data<Index_>(clampVector_);
+					_get_vector_data<Index_>(out_) = cmp_(val_, clamp_) ? static_cast<out_value>(clamp_) : static_cast<out_value>(val_);
+				}
+				else
+				{
+					const clamp_value clamp_ = clamp_value();
+					_get_vector_data<Index_>(out_) = cmp_(val_, clamp_) ? static_cast<out_value>(clamp_) : static_cast<out_value>(val_);
+				}
+			}
+			else
+			{
+				const vector_value val_ = vector_value();
+				if constexpr (Index_ < ClampVector_::size)
+				{
+					const clamp_value& clamp_ = _get_vector_data<Index_>(clampVector_);
+					_get_vector_data<Index_>(out_) = cmp_(val_, clamp_) ? static_cast<out_value>(clamp_) : static_cast<out_value>(val_);
+				}
+				else
+				{
+					const clamp_value clamp_ = clamp_value();
+					_get_vector_data<Index_>(out_) = cmp_(val_, clamp_) ? static_cast<out_value>(clamp_) : static_cast<out_value>(val_);
+				}
+			}
+			_vector_clamp_single_vector<Index_ + 1, OutVector_, Vector_, ClampVector_, CmpFunc_>(vector_, clampVector_, out_, cmp_);
+		}
+	}
+	template<std::size_t Index_, class OutVector_, class Vector_, class ClampScalar_, class CmpFunc_>
+	constexpr inline void _vector_clamp_single_scalar(const Vector_& vector_, const ClampScalar_& clampScalar_, OutVector_& out_, CmpFunc_& cmp_)
+	{
+		if constexpr (Index_ < OutVector_::size)
+		{
+			using out_value = typename OutVector_::value_type;
+			using vector_value = typename Vector_::value_type;
+			if constexpr (Index_ < Vector_::size)
+			{
+				const vector_value& val_ = _get_vector_data<Index_>(vector_);
+				_get_vector_data<Index_>(out_) = cmp_(val_, clampScalar_) ? static_cast<out_value>(clampScalar_) : static_cast<out_value>(val_);
+				_vector_clamp_single_scalar<Index_ + 1, OutVector_, Vector_, ClampScalar_, CmpFunc_>(vector_, clampScalar_, out_, cmp_);
+			}
+			else
+			{
+				const vector_value val_ = vector_value();
+				_assign_vector_via_scalar<Index_, OutVector_>(out_, cmp_(val_, clampScalar_) ? static_cast<out_value>(clampScalar_) : static_cast<out_value>(val_));
+			}
+		}
+	}
+
+	template<class OutVector_, class Vector_, class Min_>
+	[[nodiscard]] constexpr inline OutVector_ _vector_clamp_min(const Vector_& vector_, const Min_& min_)
+	{
+		OutVector_ out_ = OutVector_();
+		std::less<void> cmp_ = std::less<void>();
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Min_>)
+		{
+			_vector_clamp_single_vector<0, OutVector_, Vector_, Min_, std::less<void>>(vector_, min_, out_, cmp_);
+		}
+		else
+		{
+			_vector_clamp_single_scalar<0, OutVector_, Vector_, Min_, std::less<void>>(vector_, min_, out_, cmp_);
+		}
+		return out_;
+	}
+	template<class OutVector_, class Vector_, class Max_>
+	[[nodiscard]] constexpr inline OutVector_ _vector_clamp_max(const Vector_& vector_, const Max_& max_)
+	{
+		OutVector_ out_ = OutVector_();
+		std::greater<void> cmp_ = std::greater<void>();
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Max_>)
+		{
+			_vector_clamp_single_vector<0, OutVector_, Vector_, Max_, std::greater<void>>(vector_, max_, out_, cmp_);
+		}
+		else
+		{
+			_vector_clamp_single_scalar<0, OutVector_, Vector_, Max_, std::greater<void>>(vector_, max_, out_, cmp_);
+		}
+		return out_;
+	}
 #pragma endregion
 
 #pragma region ARITHMETIC
