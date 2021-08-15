@@ -667,6 +667,32 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		}
 		return out_;
 	}
+
+	template<std::size_t Index_, class OutVector_, class Vector_>
+	constexpr inline void _vector_reciprocal(const Vector_& vector_, OutVector_& out_)
+	{
+		if constexpr (Index_ < OutVector_::size)
+		{
+			using out_value = typename OutVector_::value_type;
+			if constexpr (Index_ < OutVector_::size)
+			{
+				_get_vector_data<Index_>(out_) = static_cast<out_value>(out_value(1.0) / _get_vector_data<Index_>(vector_));
+				_vector_reciprocal<Index_ + 1, OutVector_, Vector_>(vector_, out_);
+			}
+			else
+			{
+				// Defer rest to assignment template as then we only have to do 1/0 once and can simply copy to all remaining indices.
+				_assign_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(out_value(1.0) / typename Vector_::value_type()));
+			}
+		}
+	}
+	template<class OutVector_, class Vector_>
+	[[nodiscard]] constexpr inline OutVector_ _vector_reciprocal(const Vector_& vector_)
+	{
+		OutVector_ out_ = OutVector_();
+		_vector_reciprocal<0, OutVector_, Vector_>(vector_, out_);
+		return out_;
+	}
 #pragma endregion
 
 #pragma region ARITHMETIC
@@ -740,7 +766,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 
 #pragma region COMPARISONS
 	template<std::size_t Index_, class OutVector_, class Comparison_, class LhsVector_, class RhsScalar_>
-	[[nodiscard]] constexpr inline void _perform_vector_per_element_comparison_rhs_scalar
+	constexpr inline void _perform_vector_per_element_comparison_rhs_scalar
 	(
 		const LhsVector_& lhs_,
 		const RhsScalar_& rhs_,
@@ -762,7 +788,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		}
 	}
 	template<std::size_t Index_, class OutVector_, class Comparison_, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline void _perform_vector_per_element_comparison_rhs_vector
+	constexpr inline void _perform_vector_per_element_comparison_rhs_vector
 	(
 		const LhsVector_& lhs_,
 		const RhsVector_& rhs_,

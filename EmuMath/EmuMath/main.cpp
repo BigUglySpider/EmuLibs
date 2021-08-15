@@ -133,6 +133,7 @@ int main()
 	using V2f = EmuMath::Vector<2, float>;
 	using V2si32 = EmuMath::Vector<2, std::int32_t>;
 	std::cout << "do_lerp({0, 100}, {100, 0}, {0.5, 0.25}): " << EmuMath::do_lerp<void>()(V2si32(0, 100), V2si32(100, 0), V2f(0.5f, 0.25f)) << "\n";
+	std::cout << "Reciprocal(" << d << "): " << EmuMath::Helpers::VectorReciprocal(d) << "\n";
 
 	system("pause");
 

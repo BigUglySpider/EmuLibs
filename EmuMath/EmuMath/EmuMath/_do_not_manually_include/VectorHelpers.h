@@ -511,12 +511,26 @@ namespace EmuMath::Helpers
 		const V_& v_
 	)
 	{
-		return VectorLerp<OutSize_, out_value_type, EmuMath::Vector<OutSize_, out_value_type>, EmuMath::Vector<OutSize_, out_value_type>, V_>
-		(
-			VectorLerp<OutSize_, out_value_type, AVector_, B_, U_>(a_, b_, u_),
-			VectorLerp<OutSize_, out_value_type, DVector_, C_, U_>(d_, c_, u_),
-			v_
-		);
+		if constexpr(EmuMath::TMP::is_emu_vector_v<AVector_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<DVector_>)
+			{
+				return VectorLerp<OutSize_, out_value_type, EmuMath::Vector<OutSize_, out_value_type>, EmuMath::Vector<OutSize_, out_value_type>, V_>
+				(
+					VectorLerp<OutSize_, out_value_type, AVector_, B_, U_>(a_, b_, u_),
+					VectorLerp<OutSize_, out_value_type, DVector_, C_, U_>(d_, c_, u_),
+					v_
+				);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform bilinear interpolation with vectors, but provided a non-EmuMath-vector argument for D_.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform bilinear interpolation with vectors, but provided a non-EmuMath-vector argument for A_.");
+		}
 	}
 	template<typename out_value_type, class AVector_, class B_, class C_, class DVector_, class U_, class V_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<AVector_::size, out_value_type> VectorBlerp
@@ -556,6 +570,31 @@ namespace EmuMath::Helpers
 	)
 	{
 		return VectorBlerp<AVector_::size, typename AVector_::value_type, AVector_, B_, C_, DVector_, U_, V_>(a_, b_, c_, d_, u_, v_);
+	}
+
+	template<std::size_t OutSize_, typename out_floating_point_value_type = float, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_floating_point_value_type> VectorReciprocal(const Vector_& vector_)
+	{
+		if constexpr (std::is_floating_point_v<std::remove_cv_t<std::remove_reference_t<out_floating_point_value_type>>>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+			{
+				return _underlying_vector_funcs::_vector_reciprocal<EmuMath::Vector<OutSize_, out_floating_point_value_type>, Vector_>(vector_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to retrieve the reciprocal of a vector, but provided a non-EmuMath-vector argument.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to retrieve the reciprocal of a vector, but provided a non-floating-point output value_type. This behaviour is blocked.");
+		}
+	}
+	template<typename out_floating_point_value_type = float, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_floating_point_value_type> VectorReciprocal(const Vector_& vector_)
+	{
+		return VectorReciprocal<Vector_::size, out_floating_point_value_type, Vector_>(vector_);
 	}
 #pragma endregion
 

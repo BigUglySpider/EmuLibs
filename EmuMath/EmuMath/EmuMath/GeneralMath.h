@@ -176,7 +176,7 @@ namespace EmuMath
 		}
 		[[nodiscard]] constexpr inline A_ operator()(const A_& a_, const B_& b_, const T_& t_) const
 		{
-			return static_cast<A_>(a_ + ((b_ - a_) * t_));
+			return static_cast<A_>(a_ + static_cast<A_>((b_ - a_) * t_));
 		}
 	};
 	/// <summary>
