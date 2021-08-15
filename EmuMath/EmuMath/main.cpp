@@ -117,16 +117,14 @@ int main()
 
 	std::cout << EmuMath::Helpers::VectorMagnitude(d) << "\n";
 
-	EmuMath::Vector<3, float> a_(27.0f, -5.0f, 0.0f);
-	EmuMath::Vector<2, std::uint64_t> b_vec_(1237215, 31234);
-	double b_scalar_ = 123.456;
-	EmuMath::Vector<2, double> t_vec_(0.5, 0.25);
-	float t_scalar_ = 0.5f;
+	constexpr EmuMath::Vector<7, double> a_(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0);
+	constexpr float b_ = 25.0f;
+	constexpr std::uint32_t c_ = 100;
+	constexpr EmuMath::Vector<5, double> d_(5.0, 4.0, 3.0, 2.0, 1.0);
+	constexpr float u_ = 0.5f;
+	constexpr EmuMath::Vector<10, float> v_(0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0f);
 
-	std::cout << "LERP(" << a_ << ", " << b_vec_ << ", " << t_vec_ << "): " << EmuMath::Helpers::VectorLerp(a_, b_vec_, t_vec_) << "\n";
-	std::cout << "LERP(" << a_ << ", " << b_scalar_ << ", " << t_vec_ << "): " << EmuMath::Helpers::VectorLerp(a_, b_scalar_, t_vec_) << "\n";
-	std::cout << "LERP(" << a_ << ", " << b_vec_ << ", " << t_scalar_ << "): " << EmuMath::Helpers::VectorLerp(a_, b_vec_, t_scalar_) << "\n";
-	std::cout << "LERP(" << a_ << ", " << b_scalar_ << ", " << t_scalar_ << "): " << EmuMath::Helpers::VectorLerp(a_, b_scalar_, t_scalar_) << "\n";
+	std::cout << "\nBLERP(" << a_ << ", " << b_ << ", " << c_ << ", " << d_ << ", " << u_ << ", " << v_ << "): " << EmuMath::Helpers::VectorBlerp(a_, b_, c_, d_, u_, v_) << "\n";
 
 	system("pause");
 

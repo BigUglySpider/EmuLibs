@@ -450,7 +450,7 @@ namespace EmuMath::Helpers
 	/// <param name="a_">EmuMath vector that acts as a in the equation a + ((b - a) * t).</param>
 	/// <param name="b_">EmuMath vector or scalar that acts as b in the equation a + ((b - a) * t).</param>
 	/// <param name="t_">EmuMath vector or scalar that acts as t in the equation a + ((b - a) * t).</param>
-	/// <returns>Vector containing the result of interpolation with the provided arguments.</returns>
+	/// <returns>Vector containing the result of linear interpolation with the provided arguments.</returns>
 	template<std::size_t OutSize_, typename out_value_type, class AVector_, class B_, class T_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorLerp(const AVector_& a_, const B_& b_, const T_& t_)
 	{
@@ -477,6 +477,85 @@ namespace EmuMath::Helpers
 	[[nodiscard]] constexpr inline EmuMath::Vector<AVector_::size, typename AVector_::value_type> VectorLerp(const AVector_& a_, const B_& b_, const T_& t_)
 	{
 		return VectorLerp<AVector_::size, typename AVector_::value_type, AVector_, B_, T_>(a_, b_, t_);
+	}
+
+	/// <summary>
+	/// <para> Calculates the resulting vector from a bilinear interpolation using the passed operands. </para>
+	/// <para> The underlying equation can be summarised as LERP(LERP(a, b, u), LERP(d, c, u), v). </para>
+	/// <para> AVector_ and DVector_ are required to be EmuMath vectors. </para>
+	/// <para> If no OutSize_ is provided, the output vector size will be that of a_. </para>
+	/// <para> If no out_value_type is provided, the output vector's contained type will be the same as that in a_. </para>
+	/// </summary>
+	/// <typeparam name="out_value_type">Type to be contained in the output vector.</typeparam>
+	/// <typeparam name="AVector_">Type of a in the equation LERP(LERP(a, b, u), LERP(d, c, u), v).</typeparam>
+	/// <typeparam name="B_">Type of b in the equation LERP(LERP(a, b, u), LERP(d, c, u), v).</typeparam>
+	/// <typeparam name="C_">Type of c in the equation LERP(LERP(a, b, u), LERP(d, c, u), v).</typeparam>
+	/// <typeparam name="DVector_">Type of d in the equation LERP(LERP(a, b, u), LERP(d, c, u), v).</typeparam>
+	/// <typeparam name="U_">Type of u in the equation LERP(LERP(a, b, u), LERP(d, c, u), v).</typeparam>
+	/// <typeparam name="V_">Type of v in the equation LERP(LERP(a, b, u), LERP(d, c, u), v).</typeparam>
+	/// <param name="a_">EmuMath vector representing a in the equation LERP(LERP(a, b, u), LERP(d, c, u), v).</param>
+	/// <param name="b_">EmuMath vector or scalar representing b in the equation LERP(LERP(a, b, u), LERP(d, c, u), v).</param>
+	/// <param name="c_">EmuMath vector or scalar representing c in the equation LERP(LERP(a, b, u), LERP(d, c, u), v).</param>
+	/// <param name="d_">EmuMath vector representing d in the equation LERP(LERP(a, b, u), LERP(d, c, u), v).</param>
+	/// <param name="u_">EmuMath vector or scalar representing u in the equation LERP(LERP(a, b, u), LERP(d, c, u), v).</param>
+	/// <param name="v_">EmuMath vector or scalar representing v in the equation LERP(LERP(a, b, u), LERP(d, c, u), v).</param>
+	/// <returns>Vector containing the result of bilinear interpolation with the provided arguments.</returns>
+	template<std::size_t OutSize_, typename out_value_type, class AVector_, class B_, class C_, class DVector_, class U_, class V_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorBlerp
+	(
+		const AVector_& a_,
+		const B_& b_,
+		const C_& c_,
+		const DVector_& d_,
+		const U_& u_,
+		const V_& v_
+	)
+	{
+		return VectorLerp<OutSize_, out_value_type, EmuMath::Vector<OutSize_, out_value_type>, EmuMath::Vector<OutSize_, out_value_type>, V_>
+		(
+			VectorLerp<OutSize_, out_value_type, AVector_, B_, U_>(a_, b_, u_),
+			VectorLerp<OutSize_, out_value_type, DVector_, C_, U_>(d_, c_, u_),
+			v_
+		);
+	}
+	template<typename out_value_type, class AVector_, class B_, class C_, class DVector_, class U_, class V_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<AVector_::size, out_value_type> VectorBlerp
+	(
+		const AVector_& a_,
+		const B_& b_,
+		const C_& c_,
+		const DVector_& d_,
+		const U_& u_,
+		const V_& v_
+	)
+	{
+		return VectorBlerp<AVector_::size, out_value_type, AVector_, B_, C_, DVector_, U_, V_>(a_, b_, c_, d_, u_, v_);
+	}
+	template<std::size_t OutSize_, class AVector_, class B_, class C_, class DVector_, class U_, class V_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename AVector_::value_type> VectorBlerp
+	(
+		const AVector_& a_,
+		const B_& b_,
+		const C_& c_,
+		const DVector_& d_,
+		const U_& u_,
+		const V_& v_
+	)
+	{
+		return VectorBlerp<OutSize_, typename AVector_::value_type, AVector_, B_, C_, DVector_, U_, V_>(a_, b_, c_, d_, u_, v_);
+	}
+	template<class AVector_, class B_, class C_, class DVector_, class U_, class V_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<AVector_::size, typename AVector_::value_type> VectorBlerp
+	(
+		const AVector_& a_,
+		const B_& b_,
+		const C_& c_,
+		const DVector_& d_,
+		const U_& u_,
+		const V_& v_
+	)
+	{
+		return VectorBlerp<AVector_::size, typename AVector_::value_type, AVector_, B_, C_, DVector_, U_, V_>(a_, b_, c_, d_, u_, v_);
 	}
 #pragma endregion
 
