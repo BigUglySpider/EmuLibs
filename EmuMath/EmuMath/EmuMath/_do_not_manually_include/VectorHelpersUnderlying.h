@@ -674,15 +674,15 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		if constexpr (Index_ < OutVector_::size)
 		{
 			using out_value = typename OutVector_::value_type;
-			if constexpr (Index_ < OutVector_::size)
+			if constexpr (Index_ < Vector_::size)
 			{
 				_get_vector_data<Index_>(out_) = static_cast<out_value>(out_value(1.0) / _get_vector_data<Index_>(vector_));
 				_vector_reciprocal<Index_ + 1, OutVector_, Vector_>(vector_, out_);
 			}
 			else
 			{
-				// Defer rest to assignment template as then we only have to do 1/0 once and can simply copy to all remaining indices.
-				_assign_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(out_value(1.0) / typename Vector_::value_type()));
+				// Don't force a div/0 situation, and instead set all to infinity as that is the expected result of dividing by 0 as per IEEE.
+				_assign_vector_via_scalar<Index_, OutVector_>(out_, std::numeric_limits<out_value>::infinity());
 			}
 		}
 	}
