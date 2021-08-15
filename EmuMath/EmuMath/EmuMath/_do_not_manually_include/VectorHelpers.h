@@ -291,6 +291,10 @@ namespace EmuMath::Helpers
 		return EmuMath::DoCorrectStandardSqrt<FloatingPoint_>(VectorSquareMagnitude<FloatingPoint_, Vector_>(vector_));
 	}
 
+	/// <summary> Returns a copy of the lowest value within the passed EmuMath vector. </summary>
+	/// <typeparam name="Vector_">Type of vector to find the lowest value of.</typeparam>
+	/// <param name="vector_">EmuMath vector to find the lowest value of.</param>
+	/// <returns>Copy of the lowest value within the passed vector.</returns>
 	template<class Vector_>
 	[[nodiscard]] constexpr inline typename Vector_::value_type VectorMin(const Vector_& vector_)
 	{
@@ -304,6 +308,10 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary> Returns a copy of the highest value within the passed EmuMath vector. </summary>
+	/// <typeparam name="Vector_">Type of vector to find the highest value of.</typeparam>
+	/// <param name="vector_">EmuMath vector to find the highest value of.</param>
+	/// <returns>Copy of the highest value within the passed vector.</returns>
 	template<class Vector_>
 	[[nodiscard]] constexpr inline typename Vector_::value_type VectorMax(const Vector_& vector_)
 	{
@@ -317,6 +325,10 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary> Returns a vector containing a copy of the passed vector's lowest and highest values at indices 0 and 1, respectively. </summary>
+	/// <typeparam name="Vector_">Type of vector to find the lowest and highest values of.</typeparam>
+	/// <param name="vector_">EmuMath vector to find the lowest and highest values of.</param>
+	/// <returns>EmuMath vector containing 2 elements; index 0 is a copy of the lowest value of the passed vector, and index 1 is a copy of the highest value.</returns>
 	template<class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<2, typename Vector_::value_type> VectorMinMax(const Vector_& vector_)
 	{
@@ -329,8 +341,13 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to get the lowest and highest values within an EmuMath vector, but provided a non-EmuMath-vector argument.");
 		}
 	}
+	/// <summary> Finds the lowest and highest values within the passed vector, and outputs copies of them via the passed min_ and max_ arguments respectively. </summary>
+	/// <typeparam name="Vector_">Type of vector to find the lowest and highest values of.</typeparam>
+	/// <param name="vector_">EmuMath vector to find the lowest and highest values of.</param>
+	/// <param name="min_">Reference to output a copy of the lowest value to.</param>
+	/// <param name="max_">Reference to output a copy of the highest value to.</param>
 	template<class Vector_>
-	[[nodiscard]] constexpr inline void VectorMinMax(const Vector_& vector_, typename Vector_::value_type& min_, typename Vector_::value_type& max_)
+	constexpr inline void VectorMinMax(const Vector_& vector_, typename Vector_::value_type& min_, typename Vector_::value_type& max_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
