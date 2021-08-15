@@ -572,6 +572,18 @@ namespace EmuMath::Helpers
 		return VectorBlerp<AVector_::size, typename AVector_::value_type, AVector_, B_, C_, DVector_, U_, V_>(a_, b_, c_, d_, u_, v_);
 	}
 
+	/// <summary>
+	/// <para> Calculates the reciprocal of each element in the passed vector and returns the result as a floating-point vector. </para>
+	/// <para>
+	///		OutSize_ is an optional parameter which may be used to get the reciprocal of less or more elements than stored in the vector. 
+	///		Indices exceeding the passed vector's storage will be set to infinity.
+	/// </para>
+	/// <para> The provided out_floating_point_value_type is optional and defaults to float, and must be a floating-point type for this function to be used. </para>
+	/// </summary>
+	/// <typeparam name="out_floating_point_value_type">Floating-point type to be contained within the output vector.</typeparam>
+	/// <typeparam name="Vector_">Vector type to calculate the reciprocal of.</typeparam>
+	/// <param name="vector_">EmuMath vector to calculate the reciprocal of.</param>
+	/// <returns>Vector of floating-points containing reciprocals of respective elements in the passed vector, or infinity in indices exceeding those of said vector.</returns>
 	template<std::size_t OutSize_, typename out_floating_point_value_type = float, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_floating_point_value_type> VectorReciprocal(const Vector_& vector_)
 	{
