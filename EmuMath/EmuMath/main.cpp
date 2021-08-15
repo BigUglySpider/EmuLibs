@@ -92,7 +92,7 @@ int main()
 	constexpr double dMag = EmuMath::Helpers::VectorMagnitudeConstexpr<double>(d);
 
 	std::cout << d << " == " << e << ": " << EmuMath::Helpers::VectorPerElementCmpEqualTo(d, e) << "\n";
-	std::cout << d << " != " << e << ": " << EmuMath::Helpers::VectorPerElementCmpNotEqualTo<307>(d, e) << "\n";
+	std::cout << d << " != " << e << ": " << EmuMath::Helpers::VectorPerElementCmpNotEqualTo(d, e) << "\n";
 	std::cout << d << " < " << e << ": " << EmuMath::Helpers::VectorPerElementCmpLess(d, e) << "\n";
 	std::cout << d << " > " << e << ": " << EmuMath::Helpers::VectorPerElementCmpGreater(d, e) << "\n";
 	std::cout << d << " <= " << e << ": " << EmuMath::Helpers::VectorPerElementCmpLessEqual(d, e) << "\n";

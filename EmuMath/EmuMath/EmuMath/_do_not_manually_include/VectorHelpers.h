@@ -409,6 +409,24 @@ namespace EmuMath::Helpers
 #pragma endregion
 
 #pragma region COMPARISONS
+	/// <summary>
+	/// <para> Returns a vector of booleans containing the results of comparing lhs_ with rhs_ via the provided cmpFunc_. </para>
+	/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise (e.g. rhs_ is a scalar), all elements of lhs_ will be compared with rhs_. </para>
+	/// <para> May provide an optional OutSize_ for the output vector to perform more or less comparisons than there are elements within the left-hand vector. </para>
+	/// </summary>
+	/// <typeparam name="Comparison_">Type to invoke to perform the comparison.</typeparam>
+	/// <typeparam name="LhsVector_">EmuMath vector type of the left-hand argument.</typeparam>
+	/// <typeparam name="Rhs_">EmuMath vector type or scalar type of the right-hand argument.</typeparam>
+	/// <param name="lhs_">EmuMath vector which will have its elements compared on the left-hand side of the comparison.</param>
+	/// <param name="rhs_">
+	///		Either an EmuMath vector which will have its elements compared on the right-hand side of the comparison, 
+	///		or a scalar that will always be used on the right-hand side of the comparison.
+	/// </param>
+	/// <param name="cmpFunc_">
+	///		Function to perform the comparison. Requires an accessible function operator() which can take the two arguments. 
+	///		If this argument is not provided, the default-constructed form of the Comparison_ will be used.
+	/// </param>
+	/// <returns>Vector of booleans containing the results of the comparison of respective elements within lhs_ with rhs_.</returns>
 	template<std::size_t OutSize_, class Comparison_, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> VectorPerElementComparison(const LhsVector_& lhs_, const Rhs_& rhs_, Comparison_ cmpFunc_)
 	{
@@ -437,6 +455,20 @@ namespace EmuMath::Helpers
 		return VectorPerElementComparison<EmuMath::Vector<LhsVector_::size, bool>, Comparison_, LhsVector_, Rhs_>(lhs_, rhs_, Comparison_());
 	}
 
+	/// <summary>
+	/// <para>
+	///		Returns a vector of booleans containing the results of comparing the equality of respective elements of lhs_ with either those of the rhs_ vector,
+	///		or a rhs_ scalar.
+	/// </para>
+	/// <para> If rhs_ is an EmuMath vector, it will be compared on a per-respective-element basis. If it is a scalar, all elements of lhs_ will be compared with it. </para>
+	/// <para> May provide an optional OutSize_ for the output vector to perform more or less comparisons than there are elements within the left-hand vector. </para>
+	/// <para> Operator equivalent: == </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">EmuMath vector type for the left-hand argument.</typeparam>
+	/// <typeparam name="Rhs_">EmuMath vector or scalar type for the right-hand argument.</typeparam>
+	/// <param name="lhs_">EmuMath vector to appear on the left-hand side of </param>
+	/// <param name="rhs_">EmuMath vector to compare respective elements of the left-hand vector with, or scalar to compare all elements of the left-hand vector with.</param>
+	/// <returns>Vector of booleans containing the results of the comparison of respective elements within lhs_ with rhs_.</returns>
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> VectorPerElementCmpEqualTo(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
@@ -448,6 +480,20 @@ namespace EmuMath::Helpers
 		return VectorPerElementCmpEqualTo<LhsVector_::size, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
+	/// <summary>
+	/// <para>
+	///		Returns a vector of booleans containing the results of comparing the inequality of respective elements of lhs_ with either those of the rhs_ vector,
+	///		or a rhs_ scalar.
+	/// </para>
+	/// <para> If rhs_ is an EmuMath vector, it will be compared on a per-respective-element basis. If it is a scalar, all elements of lhs_ will be compared with it. </para>
+	/// <para> May provide an optional OutSize_ for the output vector to perform more or less comparisons than there are elements within the left-hand vector. </para>
+	/// <para> Operator equivalent: != </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">EmuMath vector type for the left-hand argument.</typeparam>
+	/// <typeparam name="Rhs_">EmuMath vector or scalar type for the right-hand argument.</typeparam>
+	/// <param name="lhs_">EmuMath vector to appear on the left-hand side of </param>
+	/// <param name="rhs_">EmuMath vector to compare respective elements of the left-hand vector with, or scalar to compare all elements of the left-hand vector with.</param>
+	/// <returns>Vector of booleans containing the results of the comparison of respective elements within lhs_ with rhs_.</returns>
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> VectorPerElementCmpNotEqualTo(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
@@ -459,6 +505,20 @@ namespace EmuMath::Helpers
 		return VectorPerElementCmpNotEqualTo<LhsVector_::size, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
+	/// <summary>
+	/// <para>
+	///		Returns a vector of booleans containing the results of comparing if respective elements of lhs_ are greater than either those of the rhs_ vector,
+	///		or a rhs_ scalar.
+	/// </para>
+	/// <para> If rhs_ is an EmuMath vector, it will be compared on a per-respective-element basis. If it is a scalar, all elements of lhs_ will be compared with it. </para>
+	/// <para> May provide an optional OutSize_ for the output vector to perform more or less comparisons than there are elements within the left-hand vector. </para>
+	/// <para> Operator equivalent: &gt; </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">EmuMath vector type for the left-hand argument.</typeparam>
+	/// <typeparam name="Rhs_">EmuMath vector or scalar type for the right-hand argument.</typeparam>
+	/// <param name="lhs_">EmuMath vector to appear on the left-hand side of </param>
+	/// <param name="rhs_">EmuMath vector to compare respective elements of the left-hand vector with, or scalar to compare all elements of the left-hand vector with.</param>
+	/// <returns>Vector of booleans containing the results of the comparison of respective elements within lhs_ with rhs_.</returns>
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> VectorPerElementCmpGreater(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
@@ -470,6 +530,20 @@ namespace EmuMath::Helpers
 		return VectorPerElementCmpGreater<LhsVector_::size, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
+	/// <summary>
+	/// <para>
+	///		Returns a vector of booleans containing the results of comparing if respective elements of lhs_ are less than either those of the rhs_ vector,
+	///		or a rhs_ scalar.
+	/// </para>
+	/// <para> If rhs_ is an EmuMath vector, it will be compared on a per-respective-element basis. If it is a scalar, all elements of lhs_ will be compared with it. </para>
+	/// <para> May provide an optional OutSize_ for the output vector to perform more or less comparisons than there are elements within the left-hand vector. </para>
+	/// <para> Operator equivalent: &lt; </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">EmuMath vector type for the left-hand argument.</typeparam>
+	/// <typeparam name="Rhs_">EmuMath vector or scalar type for the right-hand argument.</typeparam>
+	/// <param name="lhs_">EmuMath vector to appear on the left-hand side of </param>
+	/// <param name="rhs_">EmuMath vector to compare respective elements of the left-hand vector with, or scalar to compare all elements of the left-hand vector with.</param>
+	/// <returns>Vector of booleans containing the results of the comparison of respective elements within lhs_ with rhs_.</returns>
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> VectorPerElementCmpLess(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
@@ -481,6 +555,20 @@ namespace EmuMath::Helpers
 		return VectorPerElementCmpLess<LhsVector_::size, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
+	/// <summary>
+	/// <para>
+	///		Returns a vector of booleans containing the results of comparing if respective elements of lhs_ are greater than or equal to either those of the rhs_ vector,
+	///		or a rhs_ scalar.
+	/// </para>
+	/// <para> If rhs_ is an EmuMath vector, it will be compared on a per-respective-element basis. If it is a scalar, all elements of lhs_ will be compared with it. </para>
+	/// <para> May provide an optional OutSize_ for the output vector to perform more or less comparisons than there are elements within the left-hand vector. </para>
+	/// <para> Operator equivalent: &gt;= </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">EmuMath vector type for the left-hand argument.</typeparam>
+	/// <typeparam name="Rhs_">EmuMath vector or scalar type for the right-hand argument.</typeparam>
+	/// <param name="lhs_">EmuMath vector to appear on the left-hand side of </param>
+	/// <param name="rhs_">EmuMath vector to compare respective elements of the left-hand vector with, or scalar to compare all elements of the left-hand vector with.</param>
+	/// <returns>Vector of booleans containing the results of the comparison of respective elements within lhs_ with rhs_.</returns>
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> VectorPerElementCmpGreaterEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
@@ -492,6 +580,20 @@ namespace EmuMath::Helpers
 		return VectorPerElementCmpGreaterEqual<LhsVector_::size, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
+	/// <summary>
+	/// <para>
+	///		Returns a vector of booleans containing the results of comparing if respective elements of lhs_ are less than or equal to either those of the rhs_ vector,
+	///		or a rhs_ scalar.
+	/// </para>
+	/// <para> If rhs_ is an EmuMath vector, it will be compared on a per-respective-element basis. If it is a scalar, all elements of lhs_ will be compared with it. </para>
+	/// <para> May provide an optional OutSize_ for the output vector to perform more or less comparisons than there are elements within the left-hand vector. </para>
+	/// <para> Operator equivalent: &lt;= </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">EmuMath vector type for the left-hand argument.</typeparam>
+	/// <typeparam name="Rhs_">EmuMath vector or scalar type for the right-hand argument.</typeparam>
+	/// <param name="lhs_">EmuMath vector to appear on the left-hand side of </param>
+	/// <param name="rhs_">EmuMath vector to compare respective elements of the left-hand vector with, or scalar to compare all elements of the left-hand vector with.</param>
+	/// <returns>Vector of booleans containing the results of the comparison of respective elements within lhs_ with rhs_.</returns>
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> VectorPerElementCmpLessEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
