@@ -429,6 +429,55 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to get the lowest- and highest-valued indices within an EmuMath vector, but provided a non-EmuMath-vector argument.");
 		}
 	}
+
+	/// <summary>
+	/// <para> Calculates the resulting vector from a linear interpolation of the passed vector and operands, which can be summarised as a_ + ((b_ - a_) * t_). </para>
+	/// <para>
+	///		B_ may be either a vector or a scalar. If it is a vector, all elements of a_ will be interpolated with their respective elements in b_. 
+	///		Otherwise, all elements of a_ will be interpolated with the value of b_.
+	/// </para>
+	/// <para>
+	///		T_ may be either a vector or a scalar. If it is a vector, all linear interpolations will be weighted by the value in the respective element in t_. 
+	///		Otherwise, all linear interpolations will be weighted by the value of t_.
+	/// </para>
+	/// <para> If no OutSize_ is provided, the output vector size will be that of a_. </para>
+	/// <para> If no out_value_type is provided, the output vector's contained type will be the same as that in a_. </para>
+	/// </summary>
+	/// <typeparam name="out_value_type">Type to be contained in the output vector.</typeparam>
+	/// <typeparam name="AVector_">Type of the vector a in the equation a + ((b - a) * t).</typeparam>
+	/// <typeparam name="B_">Type of b in the equation a + ((b - a) * t).</typeparam>
+	/// <typeparam name="T_">Type of t in the equation a + ((b - a) * t).</typeparam>
+	/// <param name="a_">EmuMath vector that acts as a in the equation a + ((b - a) * t).</param>
+	/// <param name="b_">EmuMath vector or scalar that acts as b in the equation a + ((b - a) * t).</param>
+	/// <param name="t_">EmuMath vector or scalar that acts as t in the equation a + ((b - a) * t).</param>
+	/// <returns>Vector containing the result of interpolation with the provided arguments.</returns>
+	template<std::size_t OutSize_, typename out_value_type, class AVector_, class B_, class T_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorLerp(const AVector_& a_, const B_& b_, const T_& t_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<AVector_>)
+		{
+			return _underlying_vector_funcs::_vector_lerp<AVector_, B_, T_, EmuMath::Vector<OutSize_, out_value_type>>(a_, b_, t_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a vector lerp with a non-EmuMath-vector argument for a_.");
+		}
+	}
+	template<typename out_value_type, class AVector_, class B_, class T_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<AVector_::size, out_value_type> VectorLerp(const AVector_& a_, const B_& b_, const T_& t_)
+	{
+		return VectorLerp<AVector_::size, out_value_type, AVector_, B_, T_>(a_, b_, t_);
+	}
+	template<std::size_t OutSize_, class AVector_, class B_, class T_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename AVector_::value_type> VectorLerp(const AVector_& a_, const B_& b_, const T_& t_)
+	{
+		return VectorLerp<OutSize_, typename AVector_::value_type, AVector_, B_, T_>(a_, b_, t_);
+	}
+	template<class AVector_, class B_, class T_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<AVector_::size, typename AVector_::value_type> VectorLerp(const AVector_& a_, const B_& b_, const T_& t_)
+	{
+		return VectorLerp<AVector_::size, typename AVector_::value_type, AVector_, B_, T_>(a_, b_, t_);
+	}
 #pragma endregion
 
 #pragma region ARITHMETIC

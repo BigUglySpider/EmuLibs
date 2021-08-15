@@ -459,6 +459,214 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		typename Vector_::value_type max_(min_);
 		_find_vector_min_max_indices<1, Vector_>(vector_, min_, max_, outMinIndex_, outMaxIndex_);
 	}
+
+	template<std::size_t Index_, class A_, class B_, class T_, class Out_>
+	constexpr inline void _vector_lerp_vvv(const A_& a_, const B_& b_, const T_& t_, Out_& out_)
+	{
+		if constexpr (Index_ < Out_::size)
+		{
+			using out_value = typename Out_::value_type;
+			using a_value = typename A_::value_type;
+			if constexpr (Index_ < A_::size)
+			{
+				const a_value& a_val_ = _get_vector_data<Index_>(a_);
+				if constexpr (Index_ < B_::size)
+				{
+					if constexpr (Index_ < T_::size)
+					{
+						_get_vector_data<Index_>(out_) = static_cast<out_value>
+						(
+							a_val_ + ((_get_vector_data<Index_>(b_) - a_val_) * _get_vector_data<Index_>(t_))
+						);
+					}
+					else
+					{
+						_get_vector_data<Index_>(out_) = static_cast<out_value>
+						(
+							a_val_ + ((_get_vector_data<Index_>(b_) - a_val_) * typename T_::value_type())
+						);
+					}
+				}
+				else
+				{
+					using b_value = typename B_::value_type;
+					if constexpr (Index_ < T_::size)
+					{
+						_get_vector_data<Index_>(out_) = static_cast<out_value>
+						(
+							a_val_ + ((b_value() - a_val_) * _get_vector_data<Index_>(t_))
+						);
+					}
+					else
+					{
+						_get_vector_data<Index_>(out_) = static_cast<out_value>
+						(
+							a_val_ + ((b_value() - a_val_) * typename T_::value_type())
+						);
+					}
+				};
+			}
+			else
+			{
+				const a_value a_val_ = a_value();
+				if constexpr (Index_ < B_::size)
+				{
+					if constexpr (Index_ < T_::size)
+					{
+						_get_vector_data<Index_>(out_) = static_cast<out_value>
+						(
+							a_val_ + ((_get_vector_data<Index_>(b_) - a_val_) * _get_vector_data<Index_>(t_))
+						);
+					}
+					else
+					{
+						_get_vector_data<Index_>(out_) = static_cast<out_value>
+						(
+							a_val_ + ((_get_vector_data<Index_>(b_) - a_val_) * typename T_::value_type())
+						);
+					}
+				}
+				else
+				{
+					using b_value = typename B_::value_type;
+					if constexpr (Index_ < T_::size)
+					{
+						_get_vector_data<Index_>(out_) = static_cast<out_value>
+						(
+							a_val_ + ((b_value() - a_val_) * _get_vector_data<Index_>(t_))
+						);
+					}
+					else
+					{
+						_get_vector_data<Index_>(out_) = static_cast<out_value>
+						(
+							a_val_ + ((b_value() - a_val_) * typename T_::value_type())
+						);
+					}
+				}
+			}
+			_vector_lerp_vvv<Index_ + 1, A_, B_, T_, Out_>(a_, b_, t_, out_);
+		}
+	}
+	template<std::size_t Index_, class A_, class B_, class T_, class Out_>
+	constexpr inline void _vector_lerp_vvs(const A_& a_, const B_& b_, const T_& t_, Out_& out_)
+	{
+		if constexpr (Index_ < Out_::size)
+		{
+			using out_value = typename Out_::value_type;
+			using a_value = typename A_::value_type;
+			if constexpr (Index_ < A_::size)
+			{
+				const a_value& a_val_ = _get_vector_data<Index_>(a_);
+				if constexpr (Index_ < B_::size)
+				{
+					_get_vector_data<Index_>(out_) = static_cast<out_value>(a_val_ + ((_get_vector_data<Index_>(b_) - a_val_) * t_));
+				}
+				else
+				{
+					_get_vector_data<Index_>(out_) = static_cast<out_value>(a_val_ + ((typename B_::value_type() - a_val_) * t_));
+				}
+			}
+			else
+			{
+				const a_value a_val_ = a_value();
+				if constexpr (Index_ < B_::size)
+				{
+					_get_vector_data<Index_>(out_) = static_cast<out_value>(a_val_ + ((_get_vector_data<Index_>(b_) - a_val_) * t_));
+				}
+				else
+				{
+					_get_vector_data<Index_>(out_) = static_cast<out_value>(a_val_ + ((typename B_::value_type() - a_val_) * t_));
+				}
+			}
+			_vector_lerp_vvs<Index_ + 1, A_, B_, T_, Out_>(a_, b_, t_, out_);
+		}
+	}
+	template<std::size_t Index_, class A_, class B_, class T_, class Out_>
+	constexpr inline void _vector_lerp_vsv(const A_& a_, const B_& b_, const T_& t_, Out_& out_)
+	{
+		if constexpr (Index_ < Out_::size)
+		{
+			using out_value = typename Out_::value_type;
+			using a_value = typename A_::value_type;
+			if constexpr (Index_ < A_::size)
+			{
+				const a_value& a_val_ = _get_vector_data<Index_>(a_);
+				if constexpr (Index_ < T_::size)
+				{
+					_get_vector_data<Index_>(out_) = static_cast<out_value>(a_val_ + ((b_ - a_val_) * _get_vector_data<Index_>(t_)));
+				}
+				else
+				{
+					_get_vector_data<Index_>(out_) = static_cast<out_value>(a_val_ + ((b_ - a_val_) * typename T_::value_type()));
+				}
+			}
+			else
+			{
+				const a_value a_val_ = a_value();
+				if constexpr (Index_ < T_::size)
+				{
+					_get_vector_data<Index_>(out_) = static_cast<out_value>(a_val_ + ((b_ - a_val_) * _get_vector_data<Index_>(t_)));
+				}
+				else
+				{
+					_get_vector_data<Index_>(out_) = static_cast<out_value>(a_val_ + ((b_ - a_val_) * typename T_::value_type()));
+				}
+			}
+			_vector_lerp_vsv<Index_ + 1, A_, B_, T_, Out_>(a_, b_, t_, out_);
+		}
+	}
+	template<std::size_t Index_, class A_, class B_, class T_, class Out_>
+	constexpr inline void _vector_lerp_vss(const A_& a_, const B_& b_, const T_& t_, Out_& out_)
+	{
+		if constexpr (Index_ < Out_::size)
+		{
+			using out_value = typename Out_::value_type;
+			if constexpr (Index_ < A_::size)
+			{
+				const typename A_::value_type& a_val_ = _get_vector_data<Index_>(a_);
+				_get_vector_data<Index_>(out_) = static_cast<out_value>(a_val_ + ((b_ - a_val_) * t_));
+			}
+			else
+			{
+				const typename A_::value_type a_val_ = typename A_::value_type();
+				_get_vector_data<Index_>(out_) = static_cast<out_value>(a_val_ + ((b_ - a_val_) * t_));
+			}
+			_vector_lerp_vss<Index_ + 1, A_, B_, T_, Out_>(a_, b_, t_, out_);
+		}
+	}
+	template<class A_, class B_, class T_, class Out_>
+	[[nodiscard]] constexpr inline Out_ _vector_lerp(const A_& a_, const B_& b_, const T_& t_)
+	{
+		Out_ out_ = Out_();
+		if constexpr (EmuMath::TMP::is_emu_vector_v<B_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<T_>)
+			{
+				// Lerp(vector, vector, vector)
+				_vector_lerp_vvv<0, A_, B_, T_, Out_>(a_, b_, t_, out_);
+			}
+			else
+			{
+				// Lerp(vector, vector, scalar)
+				_vector_lerp_vvs<0, A_, B_, T_, Out_>(a_, b_, t_, out_);
+			}
+		}
+		else
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<T_>)
+			{
+				// Lerp(vector, scalar, vector)
+				_vector_lerp_vsv<0, A_, B_, T_, Out_>(a_, b_, t_, out_);
+			}
+			else
+			{
+				// Lerp(vector, scalar, scalar)
+				_vector_lerp_vss<0, A_, B_, T_, Out_>(a_, b_, t_, out_);
+			}
+		}
+		return out_;
+	}
 #pragma endregion
 
 #pragma region ARITHMETIC
