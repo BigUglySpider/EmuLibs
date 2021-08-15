@@ -358,6 +358,77 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to get the lowest and highest values within an EmuMath vector, but provided a non-EmuMath-vector argument.");
 		}
 	}
+
+	/// <summary> Finds the lowest value within the passed vector and returns its index within the vector. </summary>
+	/// <typeparam name="Vector_">Type of vector to find the lowest-valued index of.</typeparam>
+	/// <param name="vector_">EmuMath vector to find the lowest-valued index of.</param>
+	/// <returns>Index within the passed vector of its lowest element.</returns>
+	template<class Vector_>
+	[[nodiscard]] constexpr inline std::size_t VectorMinIndex(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_find_vector_min_index<Vector_>(vector_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the lowest-valued index within an EmuMath vector, but provided a non-EmuMath-vector argument.");
+		}
+	}
+
+	/// <summary> Finds the highest value within the passed vector and returns its index within the vector. </summary>
+	/// <typeparam name="Vector_">Type of vector to find the highest-valued index of.</typeparam>
+	/// <param name="vector_">EmuMath vector to find the highest-valued index of.</param>
+	/// <returns>Index within the passed vector of its highest element.</returns>
+	template<class Vector_>
+	[[nodiscard]] constexpr inline std::size_t VectorMaxIndex(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_find_vector_max_index<Vector_>(vector_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the highest-valued index within an EmuMath vector, but provided a non-EmuMath-vector argument.");
+		}
+	}
+
+	/// <summary> Returns a vector containing the indices of the passed vector's lowest and highest values at indices 0 and 1, respectively. </summary>
+	/// <typeparam name="Vector_">Type of vector to find the lowest- and highest-valued indices of.</typeparam>
+	/// <param name="vector_">EmuMath vector to find the lowest- and highest-valued indices of.</param>
+	/// <returns>EmuMath vector containing 2 elements; index 0 is the index of the lowest value in the passed vector, and index 1 is the index of the highest value.</returns>
+	template<class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<2, std::size_t> VectorMinMaxIndices(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_find_vector_min_max_indices<Vector_>(vector_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the lowest- and highest-valued indices within an EmuMath vector, but provided a non-EmuMath-vector argument.");
+		}
+	}
+	/// <summary>
+	///		Finds the indices of lowest and highest values within the passed vector, 
+	///		and outputs them via the passed outMinIndex_ and outMaxIndex_ reference arguments respectively.
+	/// </summary>
+	/// <typeparam name="Vector_">Type of vector to find the lowest- and highest-valued indices of.</typeparam>
+	/// <param name="vector_">EmuMath vector to find the lowest- and highest-valued indices of.</param>
+	/// <param name="min_">Reference to output the index of the lowest value to.</param>
+	/// <param name="max_">Reference to output the index of the highest value to.</param>
+	template<class Vector_>
+	constexpr inline void VectorMinMaxIndices(const Vector_& vector_, std::size_t& outMinIndex_, std::size_t& outMaxIndex_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			_underlying_vector_funcs::_find_vector_min_max_indices<Vector_>(vector_, outMinIndex_, outMaxIndex_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the lowest- and highest-valued indices within an EmuMath vector, but provided a non-EmuMath-vector argument.");
+		}
+	}
 #pragma endregion
 
 #pragma region ARITHMETIC

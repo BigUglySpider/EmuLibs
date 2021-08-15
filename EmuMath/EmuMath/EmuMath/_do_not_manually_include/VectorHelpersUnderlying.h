@@ -369,6 +369,96 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		max_ = min_;
 		_find_vector_min_max<1, Vector_, typename Vector_::value_type>(vector_, min_, max_);
 	}
+
+	template<std::size_t Index_, class Vector_>
+	constexpr inline void _find_vector_min_index(const Vector_& vector_, typename Vector_::value_type& min_, std::size_t& out_)
+	{
+		if constexpr (Index_ < Vector_::size)
+		{
+			const typename Vector_::value_type& val_ = _get_vector_data<Index_>(vector_);
+			if (val_ < min_)
+			{
+				out_ = Index_;
+				min_ = val_;
+			}
+			_find_vector_min_index<Index_ + 1, Vector_>(vector_, min_, out_);
+		}
+	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline std::size_t _find_vector_min_index(const Vector_& vector_)
+	{
+		typename Vector_::value_type min_(_get_vector_data<0>(vector_));
+		std::size_t out_(0);
+		_find_vector_min_index<1, Vector_>(vector_, min_, out_);
+		return out_;
+	}
+
+	template<std::size_t Index_, class Vector_>
+	constexpr inline void _find_vector_max_index(const Vector_& vector_, typename Vector_::value_type& max_, std::size_t& out_)
+	{
+		if constexpr (Index_ < Vector_::size)
+		{
+			const typename Vector_::value_type& val_ = _get_vector_data<Index_>(vector_);
+			if (val_ > max_)
+			{
+				out_ = Index_;
+				max_ = val_;
+			}
+			_find_vector_max_index<Index_ + 1, Vector_>(vector_, max_, out_);
+		}
+	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline std::size_t _find_vector_max_index(const Vector_& vector_)
+	{
+		typename Vector_::value_type max_(_get_vector_data<0>(vector_));
+		std::size_t out_(0);
+		_find_vector_max_index<1, Vector_>(vector_, max_, out_);
+		return out_;
+	}
+
+	template<std::size_t Index_, class Vector_>
+	constexpr inline void _find_vector_min_max_indices
+	(
+		const Vector_& vector_,
+		typename Vector_::value_type& min_,
+		typename Vector_::value_type& max_,
+		std::size_t& outMin_,
+		std::size_t& outMax_
+	)
+	{
+		if constexpr (Index_ < Vector_::size)
+		{
+			const typename Vector_::value_type& val_ = _get_vector_data<Index_>(vector_);
+
+			if (val_ < min_)
+			{
+				outMin_ = Index_;
+				min_ = val_;
+			}
+			else if (val_ > max_)
+			{
+				outMax_ = Index_;
+				max_ = val_;
+			}
+			_find_vector_min_max_indices<Index_ + 1, Vector_>(vector_, min_, max_, outMin_, outMax_);
+		}
+	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<2, std::size_t> _find_vector_min_max_indices(const Vector_& vector_)
+	{
+		typename Vector_::value_type min_(_get_vector_data<0>(vector_));
+		typename Vector_::value_type max_(min_);
+		EmuMath::Vector<2, std::size_t> out_(0, 0);
+		_find_vector_min_max_indices<1, Vector_>(vector_, min_, max_, _get_vector_data<0>(out_), _get_vector_data<1>(out_));
+		return out_;
+	}
+	template<class Vector_>
+	constexpr inline void _find_vector_min_max_indices(const Vector_& vector_, std::size_t& outMinIndex_, std::size_t& outMaxIndex_)
+	{
+		typename Vector_::value_type min_(_get_vector_data<0>(vector_));
+		typename Vector_::value_type max_(min_);
+		_find_vector_min_max_indices<1, Vector_>(vector_, min_, max_, outMinIndex_, outMaxIndex_);
+	}
 #pragma endregion
 
 #pragma region ARITHMETIC

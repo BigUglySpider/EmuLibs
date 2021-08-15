@@ -107,6 +107,14 @@ int main()
 	EmuMath::Helpers::VectorMinMax(d, min_, max_);
 	std::cout << "(" << min_ << ", " << max_ << ")\n";
 
+	std::cout << "MinIndex(" << d << "): " << EmuMath::Helpers::VectorMinIndex(d) << "\n";
+	std::cout << "MaxIndex(" << d << "): " << EmuMath::Helpers::VectorMaxIndex(d) << "\n";
+	std::cout << "MinMaxIndices(" << d << "): " << EmuMath::Helpers::VectorMinMaxIndices(d) << "\n";
+	std::cout << "MinMaxIndices(" << d << ", min&, max&): ";
+	std::size_t minIndex_ = 0, maxIndex_ = 0;
+	EmuMath::Helpers::VectorMinMaxIndices(d, minIndex_, maxIndex_);
+	std::cout << "(" << minIndex_ << ", " << maxIndex_ << ")\n";
+
 	std::cout << EmuMath::Helpers::VectorMagnitude(d) << "\n";
 
 	system("pause");
