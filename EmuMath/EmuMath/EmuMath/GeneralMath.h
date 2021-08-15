@@ -158,6 +158,43 @@ namespace EmuMath
 		template<typename T>
 		static constexpr T SQRT_3 = SQRT_N<T, std::uint8_t, 3>;
 	};
+
+	/// <summary>
+	/// <para> Functor which may be used to perform linear interpolations. </para>
+	/// <para> Takes 3 type arguments, however only one or two may be passed. Type arguments not passed will be the same type as A_. </para>
+	/// <para> Types should be considered for the equation A_ + ((B_ - A_) * T_). </para>
+	/// <para> do_lerp&lt;void&gt;, do_lerp&lt;void, void&gt;, and do_lerp&lt;void, void, void&gt; are reserved for a generic specialisation of do_lerp. </para>
+	/// </summary>
+	/// <typeparam name="A_">Type used to represent a in the equation a + ((b - a) * t).</typeparam>
+	/// <typeparam name="B_">Type used to represent b in the equation a + ((b - a) * t).</typeparam>
+	/// <typeparam name="T_">Type used to represent t in the equation a + ((b - a) * t).</typeparam>
+	template<class A_, class B_ = A_, class T_ = A_>
+	struct do_lerp
+	{
+		constexpr do_lerp()
+		{
+		}
+		[[nodiscard]] constexpr inline A_ operator()(const A_& a_, const B_& b_, const T_& t_) const
+		{
+			return static_cast<A_>(a_ + ((b_ - a_) * t_));
+		}
+	};
+	/// <summary>
+	/// <para> Reserved generic specialisation of do_lerp. </para>
+	/// <para> Determines the specialisation to make use of when the function operator() is called, based on the 3 arguments when called. </para>
+	/// </summary>
+	template<>
+	struct do_lerp<void, void, void>
+	{
+		constexpr inline do_lerp()
+		{
+		}
+		template<class A_, class B_, class T_>
+		[[nodiscard]] constexpr inline A_ operator()(const A_& a_, const B_& b_, const T_& t_) const
+		{
+			return do_lerp<A_, B_, T_>()(a_, b_, t_);
+		}
+	};
 }
 
 #endif

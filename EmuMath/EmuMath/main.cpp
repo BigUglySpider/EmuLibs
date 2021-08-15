@@ -129,6 +129,11 @@ int main()
 	constexpr auto blerped = EmuMath::Helpers::VectorBlerp(a_, b_, c_, d_, u_, v_);
 	constexpr auto half_doubled_blerp = EmuMath::Helpers::VectorLerp<3, float>(blerped, EmuMath::Helpers::VectorMultiply(blerped, 2.0f), 0.5f);
 
+	std::cout << "do_lerp(0, 10, 0.5): " << EmuMath::do_lerp<void>()(0, 10, 0.5) << "\n";
+	using V2f = EmuMath::Vector<2, float>;
+	using V2si32 = EmuMath::Vector<2, std::int32_t>;
+	std::cout << "do_lerp({0, 100}, {100, 0}, {0.5, 0.25}): " << EmuMath::do_lerp<void>()(V2si32(0, 100), V2si32(100, 0), V2f(0.5f, 0.25f)) << "\n";
+
 	system("pause");
 
 #pragma region TEST_HARNESS_EXECUTION

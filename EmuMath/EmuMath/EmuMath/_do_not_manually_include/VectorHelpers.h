@@ -930,4 +930,24 @@ namespace EmuMath::Helpers
 #pragma endregion
 }
 
+#pragma region EMU_MATH_SPECIALISATIONS
+namespace EmuMath
+{
+	/// <summary> do_lerp specialisation which defers the calculation to EmuMath::Helpers::VectorLerp. </summary>
+	/// <typeparam name="a_value_type">Type contained within the vector used for argument A_.<typeparam>
+	template<std::size_t ASize_, typename a_value_type, class B_, class T_>
+	struct do_lerp<EmuMath::Vector<ASize_, a_value_type>, B_, T_>
+	{
+		constexpr do_lerp()
+		{
+		}
+		template<std::size_t OutSize_ = ASize_, typename out_value_type = a_value_type>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> operator()(const EmuMath::Vector<ASize_, a_value_type>& a_, const B_& b_, const T_& t_) const
+		{
+			return EmuMath::Helpers::VectorLerp<OutSize_, out_value_type, EmuMath::Vector<ASize_, a_value_type>, B_, T_>(a_, b_, t_);
+		}
+	};
+}
+#pragma endregion
+
 #endif
