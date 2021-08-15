@@ -126,6 +126,9 @@ int main()
 
 	std::cout << "\nBLERP(" << a_ << ", " << b_ << ", " << c_ << ", " << d_ << ", " << u_ << ", " << v_ << "): " << EmuMath::Helpers::VectorBlerp(a_, b_, c_, d_, u_, v_) << "\n";
 
+	constexpr auto blerped = EmuMath::Helpers::VectorBlerp(a_, b_, c_, d_, u_, v_);
+	constexpr auto half_doubled_blerp = EmuMath::Helpers::VectorLerp(blerped, EmuMath::Helpers::VectorMultiply(blerped, 2.0f), 0.5f);
+
 	system("pause");
 
 #pragma region TEST_HARNESS_EXECUTION
