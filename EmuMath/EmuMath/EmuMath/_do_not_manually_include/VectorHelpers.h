@@ -8,6 +8,10 @@
 namespace EmuMath::Helpers
 {
 #pragma region GETS
+	/// <summary> Accesses the element at the specified Index_ of the passed EmuMath vector. </summary>
+	/// <typeparam name="Vector_">Type of vector to get an element from.</typeparam>
+	/// <param name="vector_">EmuMath vector to retrieve the specified index of.</param>
+	/// <returns>Reference to the element at the provided index of the passed EmuMath vector.</returns>
 	template<std::size_t Index_, class Vector_>
 	[[nodiscard]] constexpr inline typename Vector_::value_type& VectorGet(Vector_& vector_)
 	{
@@ -76,6 +80,12 @@ namespace EmuMath::Helpers
 #pragma endregion
 
 #pragma region SETS
+	/// <summary> Sets respective elements of a lhs_ EmuMath vector to match those of a rhs_ EmuMath vector. </summary>
+	/// <typeparam name="LhsVector_">Type of vector to set the data of.</typeparam>
+	/// <typeparam name="RhsVector_">Type of vector to copy the data of.</typeparam>
+	/// <param name="lhs_">EmuMath vector to set the data of.</param>
+	/// <param name="rhs_">EmuMath vector to copy the data of.</param>
+	/// <returns>Reference to the lhs_ vector after setting.</returns>
 	template<class LhsVector_, class RhsVector_>
 	constexpr inline LhsVector_& VectorSet(LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
@@ -151,6 +161,11 @@ namespace EmuMath::Helpers
 #pragma endregion
 
 #pragma region VECTOR_OPERATIONS
+	/// <summary> Calculates the product of multiplying all elements within the passed vector and returns it as the optional provided OutT_. </summary>
+	/// <typeparam name="OutT_">Optional type to output as. If not provided, this will match the vector's value_type.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to multiply all elements of.</typeparam>
+	/// <param name="vector_">EmuMath vector to multiply all elements of.</param>
+	/// <returns>Product of all elements within the passed vector.</returns>
 	template<typename OutT_, class Vector_>
 	[[nodiscard]] constexpr inline OutT_ VectorElementProduct(const Vector_& vector_)
 	{
@@ -169,6 +184,11 @@ namespace EmuMath::Helpers
 		return VectorElementProduct<typename Vector_::value_type, Vector_>(vector_);
 	}
 
+	/// <summary> Calculates the sum of adding all elements within the passed vector and returns it as the optional provided OutT_. </summary>
+	/// <typeparam name="OutT_">Optional type to output as. If not provided, this will match the vector's value_type.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to add all elements of.</typeparam>
+	/// <param name="vector_">EmuMath vector to multiply all elements of.</param>
+	/// <returns>Sum of all elements within the passed vector.</returns>
 	template<typename OutT_, class Vector_>
 	[[nodiscard]] constexpr inline OutT_ VectorElementSum(const Vector_& vector_)
 	{
@@ -187,6 +207,15 @@ namespace EmuMath::Helpers
 		return VectorElementSum<typename Vector_::value_type, Vector_>(vector_);
 	}
 
+	/// <summary>
+	/// <para> Calculates the dot product of the vectors a_ and b_ and outputs it as the provided OutT_ type, which defaults to float. </para>
+	/// </summary>
+	/// <typeparam name="OutT_">Type to output the dot product as. Defaults to float.</typeparam>
+	/// <typeparam name="VectorA_">Type of vector A in the equation A DOT B.</typeparam>
+	/// <typeparam name="VectorB_">Type of vector B in the equation A DOT B.</typeparam>
+	/// <param name="a_">EmuMath vector A in the equation A DOT B.</param>
+	/// <param name="b_">EmuMath vector B in the equation A DOT B.</param>
+	/// <returns>Dot product of the passed vectors, represented as the provided OutT_.</returns>
 	template<typename OutT_ = float, class VectorA_, class VectorB_>
 	[[nodiscard]] constexpr inline OutT_ VectorDotProduct(const VectorA_& a_, const VectorB_& b_)
 	{
@@ -204,6 +233,15 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary>
+	/// <para> Calculates the squared magnitude of the passed vector, and outputs it as the optional provided OutT_ type. </para>
+	/// <para> If OutT_ is not provided, the returned square magnitude will be of the same type as the passed vector's value_type. </para>
+	/// <para> Note that a vector's square magnitude is equivalent to its dot product with itself (i.e. SQUARE_MAG(V) == V DOT V). </para>
+	/// </summary>
+	/// <typeparam name="OutT_">Type to output the square magnitude as. Optional.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to calculate the square magnitude of.</typeparam>
+	/// <param name="vector_">EmuMath vector to calculate the square magnitude of.</param>
+	/// <returns>Square magnitude of the passed vector, represented as OutT_ if provided, otherwise represented as the passed vector's value_type.</returns>
 	template<typename OutT_, class Vector_>
 	[[nodiscard]] constexpr inline OutT_ VectorSquareMagnitude(const Vector_& vector_)
 	{
@@ -222,12 +260,30 @@ namespace EmuMath::Helpers
 		return VectorSquareMagnitude<typename Vector_::value_type, Vector_>(vector_);
 	}
 
+	/// <summary>
+	/// <para>
+	///		Calculates the passed vector's magnitude via means which may be evaluated at compile time for constant expressions, 
+	///		and outputs it as the optional provided OutT_ type, which defaults to float.
+	/// </para>
+	/// <para> If this will be executed at runtime, it is recommended to use VectorMagnitude(vector_) instead as this function may sacrifice performance to be constexpr. </para>
+	/// </summary>
+	/// <typeparam name="Vector_">Type of vector to calculate the magnitude of.</typeparam>
+	/// <typeparam name="OutT_">Optional type to output the magnitude as. Defaults to float.</typeparam>
+	/// <param name="vector_">EmuMath vector to calculate the magnitude of.</param>
+	/// <returns>Magnitude of the passed vector, represented as OutT_ if provided, otherwise represented as the passed vector's value_type.</returns>
 	template<typename OutT_ = float, class Vector_>
 	[[nodiscard]] constexpr inline OutT_ VectorMagnitudeConstexpr(const Vector_& vector_)
 	{
 		using FloatingPoint_ = EmuCore::TMPHelpers::first_floating_point_t<OutT_, typename Vector_::value_type, float>;
 		return static_cast<OutT_>(EmuMath::SqrtConstexpr<FloatingPoint_, FloatingPoint_>(VectorSquareMagnitude<FloatingPoint_, Vector_>(vector_)));
 	}
+	/// <summary>
+	/// <para>Calculates the passed vector's magnitude and outputs it as the optional provided OutT_ type. </para>
+	/// </summary>
+	/// <typeparam name="Vector_">Type of vector to calculate the magnitude of.</typeparam>
+	/// <typeparam name="OutT_">Optional type to output the magnitude as. Defaults to float.</typeparam>
+	/// <param name="vector_">EmuMath vector to calculate the magnitude of.</param>
+	/// <returns>Magnitude of the passed vector, represented as OutT_ if provided, otherwise represented as the passed vector's value_type.</returns>
 	template<typename OutT_ = float, class Vector_>
 	[[nodiscard]] inline OutT_ VectorMagnitude(const Vector_& vector_)
 	{
