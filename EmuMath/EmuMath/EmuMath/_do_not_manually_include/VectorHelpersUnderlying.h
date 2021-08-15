@@ -251,8 +251,8 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 			}
 			else
 			{
-				// Finish the vector off by assigning a scalar - done this way in case constructing a zeroed value_type is noticeably expensive
-				_assign_vector_via_scalar<Index_, LhsVector_>(lhs_, typename LhsVector_::value_type(0));
+				// Finish the vector off by assigning a scalar - done this way in case constructing a default value_type is noticeably expensive
+				_assign_vector_via_scalar<Index_, LhsVector_>(lhs_, typename LhsVector_::value_type());
 			}
 		}
 	}

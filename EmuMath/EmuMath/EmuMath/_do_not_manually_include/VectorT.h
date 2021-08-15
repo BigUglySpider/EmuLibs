@@ -27,7 +27,7 @@ namespace EmuMath
 		constexpr Vector() : data()
 		{
 		}
-		constexpr Vector(const Vector<Size_, T_>& toCopy_) : data(toCopy_.data)
+		constexpr Vector(const this_type& toCopy_) : data(toCopy_.data)
 		{
 		}
 		template<std::size_t ToCopySize_, typename ToCopyValueType_>
