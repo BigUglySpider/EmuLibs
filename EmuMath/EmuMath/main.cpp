@@ -89,6 +89,7 @@ int main()
 	std::cout << d << " / " << e << ": " << EmuMath::Helpers::VectorDivide<5, float>(d, e) << "\n";
 	std::cout << d << " DOT " << e << ": " << EmuMath::Helpers::VectorDotProduct(d, e) << "\n";
 
+	constexpr double dSqrMag = EmuMath::Helpers::VectorSquareMagnitude<double>(d);
 	constexpr double dMag = EmuMath::Helpers::VectorMagnitudeConstexpr<double>(d);
 
 	std::cout << d << " == " << e << ": " << EmuMath::Helpers::VectorPerElementCmpEqualTo(d, e) << "\n";
@@ -97,6 +98,14 @@ int main()
 	std::cout << d << " > " << e << ": " << EmuMath::Helpers::VectorPerElementCmpGreater(d, e) << "\n";
 	std::cout << d << " <= " << e << ": " << EmuMath::Helpers::VectorPerElementCmpLessEqual(d, e) << "\n";
 	std::cout << d << " >= " << e << ": " << EmuMath::Helpers::VectorPerElementCmpGreaterEqual(d, e) << "\n";
+
+	std::cout << "MIN(" << d << "): " << EmuMath::Helpers::VectorMin(d) << "\n";
+	std::cout << "MAX(" << d << "): " << EmuMath::Helpers::VectorMax(d) << "\n";
+	std::cout << "MINMAX(" << d << "): " << EmuMath::Helpers::VectorMinMax(d) << "\n";
+	std::cout << "MINMAX(" << d << ", min&, max&): ";
+	int min_ = 0, max_ = 0;
+	EmuMath::Helpers::VectorMinMax(d, min_, max_);
+	std::cout << "(" << min_ << ", " << max_ << ")\n";
 
 	std::cout << EmuMath::Helpers::VectorMagnitude(d) << "\n";
 

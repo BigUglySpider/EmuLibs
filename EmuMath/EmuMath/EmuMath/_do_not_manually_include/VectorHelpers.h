@@ -290,6 +290,57 @@ namespace EmuMath::Helpers
 		using FloatingPoint_ = EmuCore::TMPHelpers::first_floating_point_t<OutT_, typename Vector_::value_type, float>;
 		return EmuMath::DoCorrectStandardSqrt<FloatingPoint_>(VectorSquareMagnitude<FloatingPoint_, Vector_>(vector_));
 	}
+
+	template<class Vector_>
+	[[nodiscard]] constexpr inline typename Vector_::value_type VectorMin(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_find_vector_min<Vector_>(vector_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the lowest value within an EmuMath vector, but provided a non-EmuMath-vector argument.");
+		}
+	}
+
+	template<class Vector_>
+	[[nodiscard]] constexpr inline typename Vector_::value_type VectorMax(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_find_vector_max<Vector_>(vector_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the highest value within an EmuMath vector, but provided a non-EmuMath-vector argument.");
+		}
+	}
+
+	template<class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<2, typename Vector_::value_type> VectorMinMax(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_find_vector_min_max<Vector_>(vector_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the lowest and highest values within an EmuMath vector, but provided a non-EmuMath-vector argument.");
+		}
+	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline void VectorMinMax(const Vector_& vector_, typename Vector_::value_type& min_, typename Vector_::value_type& max_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			_underlying_vector_funcs::_find_vector_min_max<Vector_>(vector_, min_, max_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the lowest and highest values within an EmuMath vector, but provided a non-EmuMath-vector argument.");
+		}
+	}
 #pragma endregion
 
 #pragma region ARITHMETIC
