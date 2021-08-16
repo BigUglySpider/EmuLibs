@@ -1,5 +1,5 @@
 #ifndef EMU_CORE_TMP_HELPER_FUNCTORS_H_INC_
-#define EMU_CORE_TMP_HELPER_FUNCTORS_H_INC_
+#define EMU_CORE_TMP_HELPER_FUNCTORS_H_INC_ 1
 
 #include "TypeComparators.h"
 #include "TypeConvertors.h"

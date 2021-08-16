@@ -1,5 +1,5 @@
 #ifndef EMU_MATH_SIMD_HELPERS_H_INC_
-#define EMU_MATH_SIMD_HELPERS_H_INC_
+#define EMU_MATH_SIMD_HELPERS_H_INC_ 1
 
 #include "../EmuCore/ArithmeticHelpers/BitHelpers.h"
 #include <cstdlib>

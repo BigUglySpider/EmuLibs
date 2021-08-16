@@ -1,5 +1,5 @@
 #ifndef EMU_CORE_LOOPING_TEST_HARNESS_H_INC_
-#define EMU_CORE_LOOPING_TEST_HARNESS_H_INC_
+#define EMU_CORE_LOOPING_TEST_HARNESS_H_INC_ 1
 
 #include <chrono>
 #include <exception>

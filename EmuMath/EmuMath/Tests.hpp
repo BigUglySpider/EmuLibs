@@ -1,5 +1,5 @@
 #ifndef EMU_TESTS_HPP_INC_
-#define EMU_TESTS_HPP_INC_
+#define EMU_TESTS_HPP_INC_ 1
 
 // REQUIRED INCLUDES
 #include "EmuCore/TestingHelpers/LoopingTestHarness.h"

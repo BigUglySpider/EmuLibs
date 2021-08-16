@@ -1,5 +1,5 @@
 #ifndef EMU_CORE_BIT_HELPERS_H_INC_
-#define EMU_CORE_BIT_HELPERS_H_INC_
+#define EMU_CORE_BIT_HELPERS_H_INC_ 1
 
 #include <cstddef>
 #include <cstdint>

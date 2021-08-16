@@ -1,5 +1,5 @@
 #ifndef EMU_MATH_VECTOR_T_HELPERS_UNDERLYING_H_INC_
-#define EMU_MATH_VECTOR_T_HELPERS_UNDERLYING_H_INC_
+#define EMU_MATH_VECTOR_T_HELPERS_UNDERLYING_H_INC_ 1
 
 #include "../../EmuCore/TMPHelpers/TypeComparators.h"
 #include "VectorTMP.h"

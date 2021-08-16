@@ -1,5 +1,5 @@
 #ifndef EMU_CORE_PATH_VALIDATION_H_INC_
-#define EMU_CORE_PATH_VALIDATION_H_INC_
+#define EMU_CORE_PATH_VALIDATION_H_INC_ 1
 
 #include <filesystem>
 #include <string>
