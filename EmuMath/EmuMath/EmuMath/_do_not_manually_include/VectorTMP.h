@@ -58,6 +58,23 @@ namespace EmuMath::TMP
 	};
 	template<class Vector_, std::size_t...Indices_>
 	static constexpr bool valid_vector_indices_v = valid_vector_indices<Vector_, Indices_...>::value;
+
+	/// <summary>
+	/// <para> Function to construct an EmuMath vector with the provided data. The output vector's size will be equal to the number of arguments provided. </para>
+	/// <para> The provided value_type must be constructible by all all types passed as args_. </para>
+	/// </summary>
+	/// <typeparam name="value_type">Type to be contained within the vector.</typeparam>
+	/// <typeparam name="Args_">Types of the arguments provided to the vector.</typeparam>
+	/// <param name="args_">Arguments to be provided to the vector on construction. For every argument, the vector's size will increase by one.</param>
+	/// <returns>
+	///		EmuMath vector containing the specified value_type, with a number of elements equal to the provided number of args_. 
+	///		All elements of the returned vector are constructed by the provided args_..
+	/// </returns>
+	template<typename value_type, typename...Args_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Args_), value_type> make_emu_vector(Args_&&...args_)
+	{
+		return EmuMath::Vector<sizeof...(Args_), value_type>(std::forward<Args_>(args_)...);
+	}
 }
 
 #endif

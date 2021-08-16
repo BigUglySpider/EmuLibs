@@ -916,6 +916,31 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		_vector_clamp<0, OutVector_, Vector_, Min_, Max_, std::less<void>, std::greater<void>>(vector_, min_, max_, out_, min_cmp_, max_cmp_);
 		return out_;
 	}
+
+	template<std::size_t Index_, class OutVector_, class Vector_, class Rounder_>
+	constexpr inline void _vector_round(const Vector_& vector_, OutVector_& out_, Rounder_& rounder_)
+	{
+		if constexpr (Index_ < OutVector_::size)
+		{
+			using out_value = typename OutVector_::value_type;
+			if constexpr (Index_ < Vector_::size)
+			{
+				_get_vector_data<Index_>(out_) = static_cast<out_value>(rounder_(_get_vector_data<Index_>(vector_)));
+			}
+			else
+			{
+				using vector_value = typename Vector_::value_type;
+				_assign_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(rounder_(vector_value())));
+			}
+		}
+	}
+	template<class OutVector_, class Vector_, class Rounder_>
+	[[nodiscard]] constexpr inline OutVector_ _vector_round(const Vector_& vector_, Rounder_& rounder_)
+	{
+		OutVector_ out_ = OutVector_();
+		_vector_round<0, OutVector_, Vector_, Rounder_>(vector_, out_, rounder_);
+		return out_;
+	}
 #pragma endregion
 
 #pragma region ARITHMETIC

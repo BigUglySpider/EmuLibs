@@ -46,6 +46,9 @@ int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
 
+	auto vectorf = EmuMath::TMP::make_emu_vector<float>(1.0f);
+	auto vectord = EmuMath::TMP::make_emu_vector<double>(1.0, 3.0, 5.0, 6.5, 21.345);
+
 	EmuMath::do_sqrt<void> do_sqrt_;
 
 #pragma region TEST_HARNESS_EXECUTION

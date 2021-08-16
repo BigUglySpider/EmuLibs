@@ -46,6 +46,11 @@ namespace EmuMath
 		constexpr Vector(Args&&...contiguousData_) : data({ static_cast<value_type>(std::forward<Args>(contiguousData_))... })
 		{
 			static_assert(sizeof...(Args) == size, "Provided an amount of arguments to an EmuMath Vector constructor that is not equal to the number of elements in the Vector.");
+			static_assert
+			(
+				EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, value_type, Args...>::value,
+				"Attempted to construct an EmuMath Vector via it's template constructor, but at least one provided argument cannot be used to construct the Vector's value_type."
+			);
 		}
 
 		template<std::size_t Index_>

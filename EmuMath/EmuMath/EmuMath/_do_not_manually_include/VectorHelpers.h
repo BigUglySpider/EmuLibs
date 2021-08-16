@@ -692,6 +692,19 @@ namespace EmuMath::Helpers
 	{
 		return VectorClamp<Vector_::size, typename Vector_::value_type, Vector_, Min_, Max_>(vector_, min_, max_);
 	}
+
+	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Rounder_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorRound(const Vector_& vector_, Rounder_ rounder_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a round operation on a vector, but provided a non-EmuMath-vector type.");
+		}
+	}
 #pragma endregion
 
 #pragma region ARITHMETIC
