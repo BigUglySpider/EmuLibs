@@ -8,10 +8,14 @@ namespace EmuMath
 	template<std::size_t Size_, typename T_>
 	struct Vector;
 
-	/// <summary> Alias for EmuMath vectors which contain standard reference wrappers. This is the EmuMath standard for storing references within a vector. </summary>
+	/// <summary> Alias for EmuMath vectors which contain non-const standard reference wrappers. This is the EmuMath standard for storing such references within a vector. </summary>
 	/// <typeparam name="T_">Type to be referencing. T_ itself should not be a reference type; the reference will be applied automatically.</typeparam>
 	template<std::size_t Size_, typename T_>
 	using RefVector = EmuMath::Vector<Size_, std::reference_wrapper<T_>>;
+	/// <summary> Alias for EmuMath vectors which contain const standard reference wrappers. This is the EmuMath standard for storing such references within a vector. </summary>
+	/// <typeparam name="T_">Type to be referencing. T_ itself should not be a reference type; the reference will be applied automatically.</typeparam>
+	template<std::size_t Size_, typename T_>
+	using ConstRefVector = EmuMath::Vector<Size_, std::reference_wrapper<const T_>>;
 }
 
 namespace EmuMath::TMP

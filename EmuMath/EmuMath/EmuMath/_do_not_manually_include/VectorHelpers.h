@@ -159,8 +159,21 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary>
+	/// <para> Creates a vector containing a number of reference elements equal to the provided number of indices. </para>
+	/// <para>
+	///		Each provided index references an index within the passed vector, 
+	///		which will be referenced in the output vector's index of the index's place in the provided indices.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="Vector_">Type of vector to create a shuffled reference vector of.</typeparam>
+	/// <param name="vector_">EmuMath vector to create a shuffled reference vector of.</param>
+	/// <returns>
+	///		Shuffled reference vector containing a number of elements equal to the provided number of index arguments.
+	///		Elements are references to the elements at specified indices within the passed vector.
+	/// </returns>
 	template<std::size_t X_, std::size_t...RemainingShuffleIndices_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::RefVector<sizeof...(RemainingShuffleIndices_) + 1, typename Vector_::value_type> VectorShuffleReference
+	[[nodiscard]] constexpr inline EmuMath::RefVector<sizeof...(RemainingShuffleIndices_) + 1, typename Vector_::value_type> VectorShuffledReference
 	(
 		Vector_& vector_
 	)
@@ -178,8 +191,21 @@ namespace EmuMath::Helpers
 			static_assert(false, "Failed to retrieve a shuffled EmuMath vector reference as the provided argument was not an EmuMath vector.");
 		}
 	}
+	/// <summary>
+	/// <para> Creates a vector containing a number of reference elements equal to the provided number of indices. </para>
+	/// <para>
+	///		Each provided index references an index within the passed vector, 
+	///		which will be referenced in the output vector's index of the index's place in the provided indices.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="Vector_">Type of vector to create a shuffled reference vector of.</typeparam>
+	/// <param name="vector_">EmuMath vector to create a shuffled reference vector of.</param>
+	/// <returns>
+	///		Shuffled constant reference vector containing a number of elements equal to the provided number of index arguments.
+	///		Elements are references to the elements at specified indices within the passed vector.
+	/// </returns>
 	template<std::size_t X_, std::size_t...RemainingShuffleIndices_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::RefVector<sizeof...(RemainingShuffleIndices_) + 1, const typename Vector_::value_type> VectorShuffleReference
+	[[nodiscard]] constexpr inline EmuMath::ConstRefVector<sizeof...(RemainingShuffleIndices_) + 1, typename Vector_::value_type> VectorShuffledReference
 	(
 		const Vector_& vector_
 	)
