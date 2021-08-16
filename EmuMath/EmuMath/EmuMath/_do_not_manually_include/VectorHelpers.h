@@ -816,6 +816,13 @@ namespace EmuMath::Helpers
 		return VectorMutate<Vector_::size, typename Vector_::value_type, Vector_, Func_>(vector_, Func_());
 	}
 
+	/// <summary>
+	///		Floors all elements within the passed vector (i.e. rounds them toward negative infinity) and stores the results in respective elements of the output vector.
+	/// </summary>
+	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to round the elements of.</typeparam>
+	/// <param name="vector_">EmuMath vector to round the elements of.</param>
+	/// <returns>EmuMath vector containing the results of rounding respective elements in the passed vector_.</returns>
 	template<std::size_t OutSize_, typename out_value_type, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorFloor(const Vector_& vector_)
 	{
@@ -847,6 +854,13 @@ namespace EmuMath::Helpers
 		return VectorFloor<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
 	}
 
+	/// <summary>
+	///		Ceils all elements within the passed vector (i.e. rounds them toward positive infinity) and stores the results in respective elements of the output vector.
+	/// </summary>
+	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to round the elements of.</typeparam>
+	/// <param name="vector_">EmuMath vector to round the elements of.</param>
+	/// <returns>EmuMath vector containing the results of rounding respective elements in the passed vector_.</returns>
 	template<std::size_t OutSize_, typename out_value_type, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorCeil(const Vector_& vector_)
 	{
@@ -878,6 +892,13 @@ namespace EmuMath::Helpers
 		return VectorCeil<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
 	}
 
+	/// <summary>
+	///		Truncates all elements within the passed vector (i.e. rounds them toward 0) and stores the results in respective elements of the output vector.
+	/// </summary>
+	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to round the elements of.</typeparam>
+	/// <param name="vector_">EmuMath vector to round the elements of.</param>
+	/// <returns>EmuMath vector containing the results of rounding respective elements in the passed vector_.</returns>
 	template<std::size_t OutSize_, typename out_value_type, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorTrunc(const Vector_& vector_)
 	{
@@ -1081,6 +1102,13 @@ namespace EmuMath::Helpers
 		return VectorDivide<LhsVector_, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
+	/// <summary>
+	/// <para> Negates the elements of the passed vector and returns the result in the output vector, where out[x] == -vector_[x]. </para>
+	/// </summary>
+	/// <typeparam name="out_value_type">Type to be contained in the output vector.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to negate the elements of.</typeparam>
+	/// <param name="vector_">EmuMath vector to negate the elements of.</param>
+	/// <returns>Vector whose elements are the negated form of the respective elements in the passed vector_.</returns>
 	template<std::size_t OutSize_, typename out_value_type, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorNegate(const Vector_& vector_)
 	{
