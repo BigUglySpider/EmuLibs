@@ -20,7 +20,7 @@ namespace EmuMath
 		/// <summary> Boolean indicating if this vector contains std::reference_wrapper types. </summary>
 		static constexpr bool contains_reference_wrappers = EmuCore::TMPHelpers::is_reference_wrapper<contained_type>::value;
 		/// <summary> Value type of the items stored within this vector. </summary>
-		using value_type = std::conditional_t<contains_reference_wrappers, typename EmuCore::TMPHelpers::get_value_type<contained_type>::type&, contained_type>;
+		using value_type = typename EmuCore::TMPHelpers::get_value_type<contained_type>::type;
 		/// <summary> The preferred floating point type for this vector. Float if this vector contains non-floating-point types, otherwise matches value_type. </summary>
 		using preferred_floating_point = EmuCore::TMPHelpers::first_floating_point_t<value_type, float>;
 
@@ -51,13 +51,13 @@ namespace EmuMath
 		/// <typeparam name="RequiresArgumentCountEqualToSize">Dummy parameter used to make use of std::enable_if.</typeparam>
 		/// <param name="contiguousData_">Arguments to create this vector's elements, in contiguous order from the 0th-(size - 1)th element in this vector.</param>
 		template<typename...Args, typename RequiresArgumentCountEqualToSize = std::enable_if_t<sizeof...(Args) == size>>
-		constexpr Vector(Args&&...contiguousData_) : data({ static_cast<value_type>(std::forward<Args>(contiguousData_))... })
+		constexpr Vector(Args&&...contiguousData_) : data({ static_cast<contained_type>(std::forward<Args>(contiguousData_))... })
 		{
 			static_assert(sizeof...(Args) == size, "Provided an amount of arguments to an EmuMath Vector constructor that is not equal to the number of elements in the Vector.");
 			static_assert
 			(
 				EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, Args...>::value,
-				"Attempted to construct an EmuMath Vector via it's template constructor, but at least one provided argument cannot be used to construct the Vector's value_type."
+				"Attempted to construct an EmuMath Vector via it's template constructor, but at least one provided argument cannot be used to construct the Vector's contained_type."
 			);
 		}
 

@@ -758,17 +758,155 @@ namespace EmuMath::Helpers
 		return VectorClamp<Vector_::size, typename Vector_::value_type, Vector_, Min_, Max_>(vector_, min_, max_);
 	}
 
-	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Rounder_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorRound(const Vector_& vector_, Rounder_ rounder_)
+	/// <summary> Mutates the elements of a vector with a provided function and outputs them via the returned vector. </summary>
+	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to mutate.</typeparam>
+	/// <typeparam name="Func_">Type of invokable used to mutate the vector.</typeparam>
+	/// <param name="vector_">Vector to mutate the elements of.</param>
+	/// <param name="func_">
+	///		Item invokable via the function operator() which can take a single argument of the passed vector's value_type, 
+	///		and returns a value of out_value_type or which may be cast to out_value_type.
+	/// </param>
+	/// <returns>Vector containing the results of the mutation of the passed vector_ via the passed func_.</returns>
+	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Func_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorMutate(const Vector_& vector_, Func_ func_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-
+			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, Func_>(vector_, func_);
 		}
 		else
 		{
 			static_assert(false, "Attempted to perform a round operation on a vector, but provided a non-EmuMath-vector type.");
 		}
+	}
+	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Func_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorMutate(const Vector_& vector_)
+	{
+		return VectorMutate<OutSize_, out_value_type, Vector_, Func_>(vector_, Func_());
+	}
+	template<typename out_value_type, class Vector_, class Func_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorMutate(const Vector_& vector_, Func_ func_)
+	{
+		return VectorMutate<Vector_::size, out_value_type, Vector_, Func_&>(vector_, func_);
+	}
+	template<std::size_t OutSize_, class Vector_, class Func_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorMutate(const Vector_& vector_, Func_ func_)
+	{
+		return VectorMutate<OutSize_, typename Vector_::value_type, Vector_, Func_&>(vector_, func_);
+	}
+	template<class Vector_, class Func_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorMutate(const Vector_& vector_, Func_ func_)
+	{
+		return VectorMutate<Vector_::size, typename Vector_::value_type, Vector_, Func_&>(vector_, func_);
+	}
+	template<typename out_value_type, class Vector_, class Func_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorMutate(const Vector_& vector_)
+	{
+		return VectorMutate<Vector_::size, out_value_type, Vector_, Func_>(vector_, Func_());
+	}
+	template<std::size_t OutSize_, class Vector_, class Func_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorMutate(const Vector_& vector_)
+	{
+		return VectorMutate<OutSize_, typename Vector_::value_type, Vector_, Func_>(vector_, Func_());
+	}
+	template<class Vector_, class Func_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorMutate(const Vector_& vector_)
+	{
+		return VectorMutate<Vector_::size, typename Vector_::value_type, Vector_, Func_>(vector_, Func_());
+	}
+
+	template<std::size_t OutSize_, typename out_value_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorFloor(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, EmuMath::do_floor<typename Vector_::value_type>>
+			(
+				vector_
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to floor a vector, but provided a non-EmuMath-vector argument type.");
+		}
+	}
+	template<typename out_value_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorFloor(const Vector_& vector_)
+	{
+		return VectorFloor<Vector_::size, out_value_type, Vector_>(vector_);
+	}
+	template<std::size_t OutSize_, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorFloor(const Vector_& vector_)
+	{
+		return VectorFloor<OutSize_, typename Vector_::value_type, Vector_>(vector_);
+	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorFloor(const Vector_& vector_)
+	{
+		return VectorFloor<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
+	}
+
+	template<std::size_t OutSize_, typename out_value_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorCeil(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, EmuMath::do_ceil<typename Vector_::value_type>>
+			(
+				vector_
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to ceil a vector, but provided a non-EmuMath-vector argument type.");
+		}
+	}
+	template<typename out_value_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorCeil(const Vector_& vector_)
+	{
+		return VectorCeil<Vector_::size, out_value_type, Vector_>(vector_);
+	}
+	template<std::size_t OutSize_, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorCeil(const Vector_& vector_)
+	{
+		return VectorCeil<OutSize_, typename Vector_::value_type, Vector_>(vector_);
+	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorCeil(const Vector_& vector_)
+	{
+		return VectorCeil<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
+	}
+
+	template<std::size_t OutSize_, typename out_value_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorTrunc(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, EmuMath::do_trunc<typename Vector_::value_type>>
+			(
+				vector_
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to trunc a vector, but provided a non-EmuMath-vector argument type.");
+		}
+	}
+	template<typename out_value_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorTrunc(const Vector_& vector_)
+	{
+		return VectorTrunc<Vector_::size, out_value_type, Vector_>(vector_);
+	}
+	template<std::size_t OutSize_, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorTrunc(const Vector_& vector_)
+	{
+		return VectorTrunc<OutSize_, typename Vector_::value_type, Vector_>(vector_);
+	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorTrunc(const Vector_& vector_)
+	{
+		return VectorTrunc<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
 	}
 #pragma endregion
 
@@ -941,6 +1079,34 @@ namespace EmuMath::Helpers
 	[[nodiscard]] constexpr inline LhsVector_ VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		return VectorDivide<LhsVector_, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+
+	template<std::size_t OutSize_, typename out_value_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorNegate(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, std::negate<void>>(vector_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to negate a vector, but passed a non-EmuMath-vector argument type.");
+		}
+	}
+	template<typename out_value_type, class Vector_>
+	[[nodiscard]] constexpr inline auto VectorNegate(const Vector_& vector_)
+	{
+		return VectorNegate<Vector_::size, out_value_type>(vector_);
+	}
+	template<std::size_t OutSize_, class Vector_>
+	[[nodiscard]] constexpr inline auto VectorNegate(const Vector_& vector_)
+	{
+		return VectorNegate<OutSize_, typename Vector_::value_type>(vector_);
+	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline auto VectorNegate(const Vector_& vector_)
+	{
+		return VectorNegate<Vector_::size, typename Vector_::value_type>(vector_);
 	}
 #pragma endregion
 

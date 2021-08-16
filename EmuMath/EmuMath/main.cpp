@@ -49,12 +49,15 @@ int main()
 	auto vectorf = EmuMath::TMP::make_emu_vector<float>(1.0f);
 	auto vectord = EmuMath::TMP::make_emu_vector<double>(1.0, 3.0, 5.0, 6.5, 21.345);
 
-	const auto ref_d_ = EmuMath::Helpers::VectorShuffledReference<4, 3, 2, 1, 2, 4, 0>(vectord);
+	auto ref_d_ = EmuMath::Helpers::VectorShuffledReference<4, 3, 2, 1, 0>(vectord);
 	std::cout << "D: " << vectord << "\nRef: " << ref_d_ << "\n";
 	ref_d_.at<2>() = 255.0;
 	ref_d_.at<0>() = std::numeric_limits<double>::infinity();
 	std::cout << "D: " << vectord << "\nRef: " << ref_d_ << "\n";
 
+
+	EmuMath::Helpers::VectorSet(ref_d_, EmuMath::Helpers::VectorFloor(EmuMath::Helpers::VectorNegate(ref_d_)));
+	std::cout << "D: " << vectord << "\nRef: " << ref_d_ << "\n";
 	EmuMath::do_sqrt<void> do_sqrt_;
 
 #pragma region TEST_HARNESS_EXECUTION

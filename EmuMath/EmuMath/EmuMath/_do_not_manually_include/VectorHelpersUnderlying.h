@@ -260,6 +260,25 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 #pragma endregion
 
 #pragma region VECTOR_OPERATIONS
+	template<std::size_t Index_, class OutVector_, class Vector_, class Func_>
+	constexpr inline void _vector_single_operand_func(const Vector_& vector_, OutVector_& out_, Func_& func_)
+	{
+		if constexpr (Index_ < OutVector_::size)
+		{
+			using out_value = typename OutVector_::value_type;
+			if constexpr (Index_ < Vector_::size)
+			{
+				_get_vector_data<Index_>(out_) = static_cast<out_value>(func_(_get_vector_data<Index_>(vector_)));
+				_vector_single_operand_func<Index_ + 1, OutVector_, Vector_, Func_>(vector_, out_, func_);
+			}
+			else
+			{
+				using vector_value = typename Vector_::value_type;
+				_assign_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(func_(vector_value())));
+			}
+		}
+	}
+
 	template<std::size_t Index_, typename OutT_, class Vector_, class CombineFunc_>
 	constexpr inline void _combine_all_vector_elements(const Vector_& vector_, OutT_& out_, CombineFunc_& func_)
 	{
@@ -917,28 +936,19 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		return out_;
 	}
 
-	template<std::size_t Index_, class OutVector_, class Vector_, class Rounder_>
-	constexpr inline void _vector_round(const Vector_& vector_, OutVector_& out_, Rounder_& rounder_)
-	{
-		if constexpr (Index_ < OutVector_::size)
-		{
-			using out_value = typename OutVector_::value_type;
-			if constexpr (Index_ < Vector_::size)
-			{
-				_get_vector_data<Index_>(out_) = static_cast<out_value>(rounder_(_get_vector_data<Index_>(vector_)));
-			}
-			else
-			{
-				using vector_value = typename Vector_::value_type;
-				_assign_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(rounder_(vector_value())));
-			}
-		}
-	}
-	template<class OutVector_, class Vector_, class Rounder_>
-	[[nodiscard]] constexpr inline OutVector_ _vector_round(const Vector_& vector_, Rounder_& rounder_)
+	template<class OutVector_, class Vector_, class Func_>
+	[[nodiscard]] constexpr inline OutVector_ _vector_single_operand_func(const Vector_& vector_, Func_& func_)
 	{
 		OutVector_ out_ = OutVector_();
-		_vector_round<0, OutVector_, Vector_, Rounder_>(vector_, out_, rounder_);
+		_vector_single_operand_func<0, OutVector_, Vector_, Func_>(vector_, out_, func_);
+		return out_;
+	}
+	template<class OutVector_, class Vector_, class Func_>
+	[[nodiscard]] constexpr inline OutVector_ _vector_single_operand_func(const Vector_& vector_)
+	{
+		OutVector_ out_ = OutVector_();
+		Func_ func_ = Func_();
+		_vector_single_operand_func<0, OutVector_, Vector_, Func_>(vector_, out_, func_);
 		return out_;
 	}
 #pragma endregion
