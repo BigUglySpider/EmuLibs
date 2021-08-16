@@ -158,6 +158,45 @@ namespace EmuMath::Helpers
 			static_assert(false, "Failed to shuffle an EmuMath vector as the provided argument was not an EmuMath vector.");
 		}
 	}
+
+	template<std::size_t X_, std::size_t...RemainingShuffleIndices_, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::RefVector<sizeof...(RemainingShuffleIndices_) + 1, typename Vector_::value_type> VectorShuffleReference
+	(
+		Vector_& vector_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return EmuMath::RefVector<sizeof...(RemainingShuffleIndices_) + 1, typename Vector_::value_type>
+			(
+				_underlying_vector_funcs::_get_vector_data<X_>(vector_),
+				_underlying_vector_funcs::_get_vector_data<RemainingShuffleIndices_>(vector_)...
+			);
+		}
+		else
+		{
+			static_assert(false, "Failed to retrieve a shuffled EmuMath vector reference as the provided argument was not an EmuMath vector.");
+		}
+	}
+	template<std::size_t X_, std::size_t...RemainingShuffleIndices_, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::RefVector<sizeof...(RemainingShuffleIndices_) + 1, const typename Vector_::value_type> VectorShuffleReference
+	(
+		const Vector_& vector_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return EmuMath::RefVector<sizeof...(RemainingShuffleIndices_) + 1, typename Vector_::value_type>
+			(
+				_underlying_vector_funcs::_get_vector_data<X_>(vector_),
+				_underlying_vector_funcs::_get_vector_data<RemainingShuffleIndices_>(vector_)...
+			);
+		}
+		else
+		{
+			static_assert(false, "Failed to retrieve a shuffled EmuMath vector reference as the provided argument was not an EmuMath vector.");
+		}
+	}
 #pragma endregion
 
 #pragma region VECTOR_OPERATIONS

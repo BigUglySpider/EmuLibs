@@ -238,6 +238,17 @@ namespace EmuCore::TMPHelpers
 	};
 	template<typename...Types_>
 	using first_floating_point_t = typename first_floating_point<Types_...>::type;
+
+	template<typename T_>
+	struct is_reference_wrapper
+	{
+		static constexpr bool value = false;
+	};
+	template<typename T_>
+	struct is_reference_wrapper<std::reference_wrapper<T_>>
+	{
+		static constexpr bool value = true;
+	};
 }
 
 #endif

@@ -282,6 +282,22 @@ namespace EmuCore::TMPHelpers
 	/// <typeparam name="UintT_">Type to provide the lossless signed rep of. If it is already signed, the determined type will be the same as this.</typeparam>
 	template<typename UintT_>
 	using uint_lossless_signed_rep_t = typename EmuCore::TMPHelpers::uint_lossless_signed_rep<UintT_>::type;
+
+	template<typename T_>
+	struct get_value_type
+	{
+		using type = T_;
+	};
+	template<template<typename T__> class Template_, typename T_>
+	struct get_value_type<Template_<T_>>
+	{
+		using type = typename Template_<T_>::value_type;
+	};
+	template<typename T_>
+	struct get_value_type<std::reference_wrapper<T_>>
+	{
+		using type = typename std::reference_wrapper<T_>::type;
+	};
 }
 
 #endif

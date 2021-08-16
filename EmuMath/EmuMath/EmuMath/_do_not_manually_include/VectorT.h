@@ -2,6 +2,7 @@
 #define EMU_MATH_VECTOR_T_H_INC_ 1
 
 #include "VectorHelpers.h"
+#include "../../EmuCore/TMPHelpers/TypeConvertors.h"
 #include <array>
 #include <ostream>
 
@@ -14,12 +15,19 @@ namespace EmuMath
 		static_assert(Size_ > 0, "Unable to create an EmuMath Vector which contains 0 elements.");
 		static_assert(!std::is_same_v<T_, void>, "Unable to create an EmuMath Vector which contains void elements.");
 
-		using value_type = T_;
-		using preferred_floating_point = std::conditional_t<std::is_floating_point_v<value_type>, value_type, float>;
+		/// <summary> The type contained within this vector. </summary>
+		using contained_type = T_;
+		/// <summary> Boolean indicating if this vector contains std::reference_wrapper types. </summary>
+		static constexpr bool contains_reference_wrappers = EmuCore::TMPHelpers::is_reference_wrapper<contained_type>::value;
+		/// <summary> Value type of the items stored within this vector. </summary>
+		using value_type = std::conditional_t<contains_reference_wrappers, typename EmuCore::TMPHelpers::get_value_type<contained_type>::type&, contained_type>;
+		/// <summary> The preferred floating point type for this vector. Float if this vector contains non-floating-point types, otherwise matches value_type. </summary>
+		using preferred_floating_point = EmuCore::TMPHelpers::first_floating_point_t<value_type, float>;
 
+		/// <summary> The number of elements contained in this vector. </summary>
 		static constexpr std::size_t size = Size_;
-		using this_type = Vector<size, value_type>;
-		using data_storage_type = std::array<value_type, size>;
+		/// <summary> This vector's instantiated type. </summary>
+		using this_type = Vector<size, contained_type>;
 
 		static constexpr bool has_integral_elements = std::is_integral_v<std::remove_cv_t<value_type>>;
 		static constexpr bool has_floating_point_elements = std::is_floating_point_v<std::remove_cv_t<value_type>>;
@@ -48,7 +56,7 @@ namespace EmuMath
 			static_assert(sizeof...(Args) == size, "Provided an amount of arguments to an EmuMath Vector constructor that is not equal to the number of elements in the Vector.");
 			static_assert
 			(
-				EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, value_type, Args...>::value,
+				EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, Args...>::value,
 				"Attempted to construct an EmuMath Vector via it's template constructor, but at least one provided argument cannot be used to construct the Vector's value_type."
 			);
 		}
@@ -101,6 +109,9 @@ namespace EmuMath
 		}
 
 	private:
+		/// <summary> The type used to store this vector's data. </summary>
+		using data_storage_type = std::array<contained_type, size>;
+
 		/// <summary> Contiguous data stored within this matrix. </summary>
 		data_storage_type data;
 	};
