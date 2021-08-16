@@ -1,6 +1,7 @@
 #ifndef EMU_MATH_GENERAL_MATH_H_INC_
 #define EMU_MATH_GENERAL_MATH_H_INC_
 
+#include "../EmuCore/TMPHelpers/TypeComparators.h"
 #include <limits>
 #include <type_traits>
 
@@ -108,6 +109,79 @@ namespace EmuMath
 		}
 	}
 
+	template<typename T_>
+	T_ DoCorrectFloor(const T_ val_)
+	{
+		if constexpr (std::is_floating_point_v<T_>)
+		{
+			if constexpr (std::is_same_v<T_, float>)
+			{
+				return floorf(val_);
+			}
+			else if constexpr (std::is_same_v<T_, double>)
+			{
+				return floor(val_);
+			}
+			else
+			{
+				return static_cast<T_>(floorl(static_cast<long double>(val_)));
+			}
+		}
+		else
+		{
+			// Cannot be rounded, so return a copy of val_.
+			return val_;
+		}
+	}
+	template<typename T_>
+	T_ DoCorrectCeil(const T_ val_)
+	{
+		if constexpr (std::is_floating_point_v<T_>)
+		{
+			if constexpr (std::is_same_v<T_, float>)
+			{
+				return ceilf(val_);
+			}
+			else if constexpr (std::is_same_v<T_, double>)
+			{
+				return ceil(val_);
+			}
+			else
+			{
+				return static_cast<T_>(ceill(static_cast<long double>(val_)));
+			}
+		}
+		else
+		{
+			// Cannot be rounded, so return a copy of val_.
+			return val_;
+		}
+	}
+	template<typename T_>
+	T_ DoCorrectTrunc(const T_ val_)
+	{
+		if constexpr (std::is_floating_point_v<T_>)
+		{
+			if constexpr (std::is_same_v<T_, float>)
+			{
+				return truncf(val_);
+			}
+			else if constexpr (std::is_same_v<T_, double>)
+			{
+				return trunc(val_);
+			}
+			else
+			{
+				return static_cast<T_>(truncl(static_cast<long double>(val_)));
+			}
+		}
+		else
+		{
+			// Cannot be rounded, so return a copy of val_.
+			return val_;
+		}
+	}
+
 	struct Pi
 	{
 		Pi() = delete;
@@ -186,13 +260,146 @@ namespace EmuMath
 	template<>
 	struct do_lerp<void, void, void>
 	{
-		constexpr inline do_lerp()
+		constexpr do_lerp()
 		{
 		}
 		template<class A_, class B_, class T_>
-		[[nodiscard]] constexpr inline A_ operator()(const A_& a_, const B_& b_, const T_& t_) const
+		[[nodiscard]] constexpr inline auto operator()(const A_& a_, const B_& b_, const T_& t_) const
 		{
 			return do_lerp<A_, B_, T_>()(a_, b_, t_);
+		}
+	};
+
+	template<typename T_>
+	struct do_sqrt_constexpr
+	{
+		using Out_ = std::conditional_t<std::is_floating_point_v<T_>, T_, double>;
+
+		constexpr do_sqrt_constexpr()
+		{
+		}
+		[[nodiscard]] constexpr inline Out_ operator()(T_ val_) const
+		{
+			return SqrtConstexpr<Out_, T_>(val_);
+		}
+	};
+	template<>
+	struct do_sqrt_constexpr<void>
+	{
+		constexpr do_sqrt_constexpr()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline auto operator()(T_ val_) const
+		{
+			return do_sqrt_constexpr<T_>()(val_);
+		}
+	};
+
+	template<typename T_>
+	struct do_sqrt
+	{
+	private:
+		using floating_point_ = std::conditional_t<std::is_floating_point_v<T_>, T_, double>;
+
+	public:
+		constexpr do_sqrt()
+		{
+		}
+		[[nodiscard]] constexpr inline floating_point_ operator()(T_ val_) const
+		{
+			if constexpr (std::is_same_v<T_, floating_point_>)
+			{
+				return DoCorrectStandardSqrt<T_>(val_);
+			}
+			else
+			{
+				return DoCorrectStandardSqrt<floating_point_>(static_cast<floating_point_>(val_));
+			}
+		}
+	};
+	template<>
+	struct do_sqrt<void>
+	{
+		constexpr do_sqrt()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline auto operator()(T_ val_) const
+		{
+			return do_sqrt<T_>()(val_);
+		}
+	};
+
+	template<typename T_>
+	struct do_floor
+	{
+		constexpr do_floor()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_ val_) const
+		{
+			return DoCorrectFloor<T_>(val_);
+		}
+	};
+	template<>
+	struct do_floor<void>
+	{
+		constexpr do_floor()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline auto operator()(const T_ val_) const
+		{
+			return do_floor<T_>()(val_);
+		}
+	};
+
+	template<typename T_>
+	struct do_ceil
+	{
+		constexpr do_ceil()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_ val_) const
+		{
+			return DoCorrectCeil<T_>(val_);
+		}
+	};
+	template<>
+	struct do_ceil<void>
+	{
+		constexpr do_ceil()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline auto operator()(const T_ val_) const
+		{
+			return do_ceil<T_>()(val_);
+		}
+	};
+
+	template<typename T_>
+	struct do_trunc
+	{
+		constexpr do_trunc()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_ val_) const
+		{
+			return DoCorrectTrunc<T_>(val_);
+		}
+	};
+	template<>
+	struct do_trunc<void>
+	{
+		constexpr do_trunc()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline auto operator()(const T_ val_) const
+		{
+			return do_trunc<T_>()(val_);
 		}
 	};
 }

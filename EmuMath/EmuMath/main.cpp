@@ -46,6 +46,7 @@ int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
 
+	EmuMath::do_sqrt<void> do_sqrt_;
 
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();
