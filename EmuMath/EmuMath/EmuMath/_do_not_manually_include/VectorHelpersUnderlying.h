@@ -1,6 +1,7 @@
 #ifndef EMU_MATH_VECTOR_T_HELPERS_UNDERLYING_H_INC_
 #define EMU_MATH_VECTOR_T_HELPERS_UNDERLYING_H_INC_
 
+#include "../../EmuCore/TMPHelpers/TypeComparators.h"
 #include "VectorTMP.h"
 
 /// <summary> Underlying functions for performing vector operations. These should not be called directly. </summary>
@@ -676,7 +677,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 			using out_value = typename OutVector_::value_type;
 			if constexpr (Index_ < Vector_::size)
 			{
-				_get_vector_data<Index_>(out_) = static_cast<out_value>(out_value(1.0) / _get_vector_data<Index_>(vector_));
+				_get_vector_data<Index_>(out_) = static_cast<out_value>(out_value(1) / static_cast<out_value>(_get_vector_data<Index_>(vector_)));
 				_vector_reciprocal<Index_ + 1, OutVector_, Vector_>(vector_, out_);
 			}
 			else
@@ -782,6 +783,137 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		{
 			_vector_clamp_single_scalar<0, OutVector_, Vector_, Max_, std::greater<void>>(vector_, max_, out_, cmp_);
 		}
+		return out_;
+	}
+
+	template<std::size_t Index_, class OutVector_, typename vector_value_type, typename min_value_type, class Max_, class MinCmp_, class MaxCmp_>
+	constexpr inline void _execute_vector_clamp_index_with_vector_and_min_value
+	(
+		const vector_value_type& val_,
+		const min_value_type& min_val_,
+		const Max_& max_,
+		OutVector_& out_,
+		MinCmp_& min_cmp_,
+		MaxCmp_& max_cmp_
+	)
+	{
+		using out_value = typename OutVector_::value_type;
+		if (min_cmp_(val_, min_val_))
+		{
+			_get_vector_data<Index_>(out_) = static_cast<out_value>(min_val_);
+		}
+		else
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<Max_>)
+			{
+				using max_value_type = typename Max_::value_type;
+				if constexpr (Index_ < Max_::size)
+				{
+					const max_value_type& max_val_ = _get_vector_data<Index_>(max_);
+					_get_vector_data<Index_>(out_) = (max_cmp_(val_, max_val_)) ? static_cast<out_value>(max_val_) : static_cast<out_value>(val_);
+				}
+				else
+				{
+					const max_value_type max_val_ = max_value_type();
+					_get_vector_data<Index_>(out_) = max_cmp_(val_, max_val_) ? static_cast<out_value>(max_val_) : static_cast<out_value>(val_);
+				}
+			}
+			else
+			{
+				_get_vector_data<Index_>(out_) = max_cmp_(val_, max_) ? static_cast<out_value>(max_) : static_cast<out_value>(val_);
+			}
+		}
+	}
+	template<std::size_t Index_, class OutVector_, typename vector_value_type, class Min_, class Max_, class MinCmp_, class MaxCmp_>
+	constexpr inline void _execute_vector_clamp_index_with_vector_value
+	(
+		const vector_value_type& val_,
+		const Min_& min_,
+		const Max_& max_,
+		OutVector_& out_,
+		MinCmp_& min_cmp_,
+		MaxCmp_& max_cmp_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Min_>)
+		{
+			if constexpr (Index_ < Min_::size)
+			{
+				_execute_vector_clamp_index_with_vector_and_min_value<Index_, OutVector_, vector_value_type, typename Min_::value_type, Max_, MinCmp_, MaxCmp_>
+				(
+					val_,
+					_get_vector_data<Index_>(min_),
+					max_,
+					out_,
+					min_cmp_,
+					max_cmp_
+				);
+			}
+			else
+			{
+				_execute_vector_clamp_index_with_vector_and_min_value<Index_, OutVector_, vector_value_type, typename Min_::value_type, Max_, MinCmp_, MaxCmp_>
+				(
+					val_,
+					typename Min_::value_type(),
+					max_,
+					out_,
+					min_cmp_,
+					max_cmp_
+				);
+			}
+		}
+		else
+		{
+			_execute_vector_clamp_index_with_vector_and_min_value<Index_, OutVector_, vector_value_type, Min_, Max_, MinCmp_, MaxCmp_>
+			(
+				val_,
+				min_,
+				max_,
+				out_,
+				min_cmp_,
+				max_cmp_
+			);
+		}
+	}
+	template<std::size_t Index_, class OutVector_, class Vector_, class Min_, class Max_, class MinCmp_, class MaxCmp_>
+	constexpr inline void _vector_clamp(const Vector_& vector_, const Min_& min_, const Max_& max_, OutVector_& out_, MinCmp_& min_cmp_, MaxCmp_& max_cmp_)
+	{
+		if constexpr (Index_ < OutVector_::size)
+		{
+			if constexpr (Index_ < Vector_::size)
+			{
+				_execute_vector_clamp_index_with_vector_value<Index_, OutVector_, typename Vector_::value_type, Min_, Max_, MinCmp_, MaxCmp_>
+				(
+					_get_vector_data<Index_>(vector_),
+					min_,
+					max_,
+					out_,
+					min_cmp_,
+					max_cmp_
+				);
+			}
+			else
+			{
+				_execute_vector_clamp_index_with_vector_value<Index_, OutVector_, typename Vector_::value_type, Min_, Max_, MinCmp_, MaxCmp_>
+				(
+					typename Vector_::value_type(),
+					min_,
+					max_,
+					out_,
+					min_cmp_,
+					max_cmp_
+				);
+			}
+			_vector_clamp<Index_ + 1, OutVector_, Vector_, Min_, Max_, MinCmp_, MaxCmp_>(vector_, min_, max_, out_, min_cmp_, max_cmp_);
+		}
+	}
+	template<class OutVector_, class Vector_, class Min_, class Max_>
+	[[nodiscard]] constexpr inline OutVector_ _vector_clamp(const Vector_& vector_, const Min_& min_, const Max_& max_)
+	{
+		OutVector_ out_ = OutVector_();
+		std::less<void> min_cmp_ = std::less<void>();
+		std::greater<void> max_cmp_ = std::greater<void>();
+		_vector_clamp<0, OutVector_, Vector_, Min_, Max_, std::less<void>, std::greater<void>>(vector_, min_, max_, out_, min_cmp_, max_cmp_);
 		return out_;
 	}
 #pragma endregion

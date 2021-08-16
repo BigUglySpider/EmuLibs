@@ -80,16 +80,16 @@ namespace EmuCore::TestingHelpers
 
 			resultsStream
 				<< "Completed Looping Test Harness execution with " << numLoops << " iterations.\n"
-				<< "Total Time: " << totalTime
+				<< "Total Time: " << (totalTime * TimingType(0.001))
 				<< "ms\nMin Time: " << minTime
-				<< "ms\nMax Time: " << maxTime
-				<< "ms\nMean Time: " << meanTime << "ms";
+				<< "us\nMax Time: " << maxTime
+				<< "us\nMean Time: " << meanTime << "us";
 			if (writeAllTimesToStream)
 			{
 				resultsStream << "\nAll times:";
 				for (std::size_t i = 0; i < numLoops; ++i)
 				{
-					resultsStream << "\n[" << i << "]: " << times[i] << "ms";
+					resultsStream << "\n[" << i << "]: " << times[i] << "us";
 				}
 			}
 		}
@@ -106,16 +106,16 @@ namespace EmuCore::TestingHelpers
 
 			resultsStream
 				<< "Completed Looping Test Harness execution with " << numLoops << " iterations.\n"
-				<< L"Total Time: " << totalTime
+				<< L"Total Time: " << (totalTime * TimingType(0.001))
 				<< L"ms\nMin Time: " << minTime
-				<< L"ms\nMax Time: " << maxTime
-				<< L"ms\nMean Time: " << meanTime << L"ms";
+				<< L"us\nMax Time: " << maxTime
+				<< L"us\nMean Time: " << meanTime << L"us";
 			if (writeAllTimesToStream)
 			{
 				resultsStream << L"\nAll times:";
 				for (std::size_t i = 0; i < numLoops; ++i)
 				{
-					resultsStream << L"\n[" << i << L"]: " << times[i] << L"ms";
+					resultsStream << L"\n[" << i << L"]: " << times[i] << L"us";
 				}
 			}
 		}
@@ -137,8 +137,8 @@ namespace EmuCore::TestingHelpers
 			totalTime = TimingType();
 			minTime = std::numeric_limits<TimingType>::max();
 			maxTime = std::numeric_limits<TimingType>::min();
-			auto begin = std::chrono::steady_clock::now();
-			auto end = begin;
+			std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+			std::chrono::steady_clock::time_point end;
 
 			for (std::size_t i = 0; i < numLoops; ++i)
 			{
@@ -152,7 +152,7 @@ namespace EmuCore::TestingHelpers
 					toExecutePerLoop();
 				}
 				end = std::chrono::steady_clock::now();
-				double thisTime = std::chrono::duration<TimingType, std::milli>(end - begin).count();
+				double thisTime = std::chrono::duration<TimingType, std::micro>(end - begin).count();
 				totalTime += thisTime;
 				times[i] = thisTime;
 
