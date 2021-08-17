@@ -1,7 +1,7 @@
 #ifndef EMU_MATH_VECTOR_T_HELPERS_H_INC_
 #define EMU_MATH_VECTOR_T_HELPERS_H_INC_ 1
 
-#include "../GeneralMath.h"
+#include "../../EmuCore/Functors/Arithmetic.h"
 #include "VectorHelpersUnderlying.h"
 #include <functional>
 
@@ -236,7 +236,8 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return EmuMath::Helpers::_underlying_vector_funcs::_combine_all_vector_elements<OutT_, Vector_, std::multiplies<void>>(vector_);
+			using multiplier_type = EmuCore::do_multiply<typename Vector_::value_type, typename Vector_::value_type>;
+			return EmuMath::Helpers::_underlying_vector_funcs::_combine_all_vector_elements<OutT_, Vector_, multiplier_type>(vector_);
 		}
 		else
 		{
@@ -259,7 +260,8 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_combine_all_vector_elements<OutT_, Vector_, std::plus<void>>(vector_);
+			using adder_type = EmuCore::do_add<typename Vector_::value_type, typename Vector_::value_type>;
+			return _underlying_vector_funcs::_combine_all_vector_elements<OutT_, Vector_, adder_type>(vector_);
 		}
 		else
 		{
@@ -340,7 +342,7 @@ namespace EmuMath::Helpers
 	[[nodiscard]] constexpr inline OutT_ VectorMagnitudeConstexpr(const Vector_& vector_)
 	{
 		using FloatingPoint_ = EmuCore::TMPHelpers::first_floating_point_t<OutT_, typename Vector_::value_type, float>;
-		return static_cast<OutT_>(EmuMath::SqrtConstexpr<FloatingPoint_, FloatingPoint_>(VectorSquareMagnitude<FloatingPoint_, Vector_>(vector_)));
+		return static_cast<OutT_>(EmuCore::SqrtConstexpr<FloatingPoint_, FloatingPoint_>(VectorSquareMagnitude<FloatingPoint_, Vector_>(vector_)));
 	}
 	/// <summary>
 	/// <para>Calculates the passed vector's magnitude and outputs it as the optional provided OutT_ type. </para>
@@ -353,7 +355,7 @@ namespace EmuMath::Helpers
 	[[nodiscard]] inline OutT_ VectorMagnitude(const Vector_& vector_)
 	{
 		using FloatingPoint_ = EmuCore::TMPHelpers::first_floating_point_t<OutT_, typename Vector_::value_type, float>;
-		return EmuMath::DoCorrectStandardSqrt<FloatingPoint_>(VectorSquareMagnitude<FloatingPoint_, Vector_>(vector_));
+		return EmuCore::DoCorrectStandardSqrt<FloatingPoint_>(VectorSquareMagnitude<FloatingPoint_, Vector_>(vector_));
 	}
 
 	/// <summary> Returns a copy of the lowest value within the passed EmuMath vector. </summary>
@@ -828,7 +830,7 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, EmuMath::do_floor<typename Vector_::value_type>>
+			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, EmuCore::do_floor<typename Vector_::value_type>>
 			(
 				vector_
 			);
@@ -866,7 +868,7 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, EmuMath::do_ceil<typename Vector_::value_type>>
+			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, EmuCore::do_ceil<typename Vector_::value_type>>
 			(
 				vector_
 			);
@@ -904,7 +906,7 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, EmuMath::do_trunc<typename Vector_::value_type>>
+			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, EmuCore::do_trunc<typename Vector_::value_type>>
 			(
 				vector_
 			);
@@ -948,7 +950,7 @@ namespace EmuMath::Helpers
 			<
 				EmuMath::Vector<OutSize_, out_value_type>,
 				Vector_,
-				EmuMath::do_sqrt_constexpr<typename Vector_::value_type>
+				EmuCore::do_sqrt_constexpr<typename Vector_::value_type>
 			>(vector_);
 		}
 		else
@@ -989,7 +991,7 @@ namespace EmuMath::Helpers
 			<
 				EmuMath::Vector<OutSize_, out_value_type>,
 				Vector_,
-				EmuMath::do_sqrt<typename Vector_::value_type>
+				EmuCore::do_sqrt<typename Vector_::value_type>
 			>(vector_);
 		}
 		else
@@ -1029,7 +1031,8 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (_underlying_vector_funcs::_validity_check_vector_arithmetic<OutVector_, LhsVector_, RhsVector_>())
 		{
-			return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, RhsVector_, std::plus<void>>(lhs_, rhs_);
+			using adder_type = EmuCore::do_add<typename LhsVector_::value_type, typename RhsVector_::value_type>;
+			return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, RhsVector_, adder_type>(lhs_, rhs_);
 		}
 		else
 		{
@@ -1070,7 +1073,8 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (_underlying_vector_funcs::_validity_check_vector_arithmetic<OutVector_, LhsVector_, RhsVector_>())
 		{
-			return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, RhsVector_, std::minus<void>>(lhs_, rhs_);
+			using subtractor_type = EmuCore::do_subtract<typename LhsVector_::value_type, typename RhsVector_::value_type>;
+			return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, RhsVector_, subtractor_type>(lhs_, rhs_);
 		}
 		else
 		{
@@ -1111,7 +1115,16 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (_underlying_vector_funcs::_validity_check_vector_arithmetic_potential_scalar<OutVector_, LhsVector_>())
 		{
-			return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, Rhs_, std::multiplies<void>>(lhs_, rhs_);
+			if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
+			{
+				using multiplier_type = EmuCore::do_multiply<typename LhsVector_::value_type, typename Rhs_::value_type>;
+				return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, Rhs_, multiplier_type>(lhs_, rhs_);
+			}
+			else
+			{
+				using multiplier_type = EmuCore::do_multiply<typename LhsVector_::value_type, Rhs_>;
+				return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, Rhs_, multiplier_type>(lhs_, rhs_);
+			}
 		}
 		else
 		{
@@ -1158,7 +1171,16 @@ namespace EmuMath::Helpers
 			_underlying_vector_funcs::_validity_check_no_integral_divide_by_zero<OutVector_, LhsVector_, Rhs_>()
 		)
 		{
-			return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, Rhs_, std::divides<void>>(lhs_, rhs_);
+			if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
+			{
+				using divider_type = EmuCore::do_divide<typename LhsVector_::value_type, typename Rhs_::value_type>;
+				return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, Rhs_, divider_type>(lhs_, rhs_);
+			}
+			else
+			{
+				using divider_type = EmuCore::do_divide<typename LhsVector_::value_type, Rhs_>;
+				return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, Rhs_, divider_type>(lhs_, rhs_);
+			}
 		}
 		else
 		{
@@ -1197,7 +1219,8 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, std::negate<void>>(vector_);
+			using negator_type = EmuCore::do_negate<typename Vector_::value_type>;
+			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, negator_type>(vector_);
 		}
 		else
 		{
@@ -1427,12 +1450,12 @@ namespace EmuMath::Helpers
 	///		If it is an EmuMath vector, shifts for each element will be performed a number of times equal to the value in the respective index of this vector. 
 	///		Otherwise, all elements will be shifted by this value.
 	/// </para>
-	/// <para> This function uses an instantiation of EmuMath::do_left_shift&lt;Vector_::value_type, Shifts_&gt; to perform each shift. </para>
+	/// <para> This function uses an instantiation of EmuCore::do_left_shift&lt;Vector_::value_type, Shifts_&gt; to perform each shift. </para>
 	/// </summary>
 	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to shift the elements of.</typeparam>
 	/// <typeparam name="Shifts_">Scalar type or EmuMath vector used to represent the number of shifts.</typeparam>
-	/// <param name="vector_">EmuMath vector to shift the elements of. Its value_type must be shiftable via the EmuMath::do_left_shift functor for said type.</param>
+	/// <param name="vector_">EmuMath vector to shift the elements of. Its value_type must be shiftable via the EmuCore::do_left_shift functor for said type.</param>
 	/// <param name="num_shifts_">Scalar or EmuMath vector representing the number of shifts to apply to every element or to each respective element.</param>
 	/// <returns>Result of left-shifting the elements of the passed EmuMath vector the specified number of times in num_shifts_.</returns>
 	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Shifts_>
@@ -1447,7 +1470,7 @@ namespace EmuMath::Helpers
 					EmuMath::Vector<OutSize_, out_value_type>,
 					Vector_,
 					Shifts_,
-					EmuMath::do_left_shift
+					EmuCore::do_left_shift
 				>(vector_, num_shifts_);
 			}
 			else
@@ -1483,12 +1506,12 @@ namespace EmuMath::Helpers
 	///		If it is an EmuMath vector, shifts for each element will be performed a number of times equal to the value in the respective index of this vector. 
 	///		Otherwise, all elements will be shifted by this value.
 	/// </para>
-	/// <para> This function uses an instantiation of EmuMath::do_right_shift&lt;Vector_::value_type, Shifts_&gt; to perform each shift. </para>
+	/// <para> This function uses an instantiation of EmuCore::do_right_shift&lt;Vector_::value_type, Shifts_&gt; to perform each shift. </para>
 	/// </summary>
 	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to shift the elements of.</typeparam>
 	/// <typeparam name="Shifts_">Scalar type or EmuMath vector used to represent the number of shifts.</typeparam>
-	/// <param name="vector_">EmuMath vector to shift the elements of. Its value_type must be shiftable via the EmuMath::do_right_shift functor for said type.</param>
+	/// <param name="vector_">EmuMath vector to shift the elements of. Its value_type must be shiftable via the EmuCore::do_right_shift functor for said type.</param>
 	/// <param name="num_shifts_">Scalar or EmuMath vector representing the number of shifts to apply to every element or to each respective element.</param>
 	/// <returns>Result of right-shifting the elements of the passed EmuMath vector the specified number of times in num_shifts_.</returns>
 	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Shifts_>
@@ -1503,7 +1526,7 @@ namespace EmuMath::Helpers
 					EmuMath::Vector<OutSize_, out_value_type>,
 					Vector_,
 					Shifts_,
-					EmuMath::do_right_shift
+					EmuCore::do_right_shift
 				>(vector_, num_shifts_);
 			}
 			else
@@ -1534,8 +1557,8 @@ namespace EmuMath::Helpers
 #pragma endregion
 }
 
-#pragma region EMU_MATH_SPECIALISATIONS
-namespace EmuMath
+#pragma region EMU_CORE_SPECIALISATIONS
+namespace EmuCore
 {
 	/// <summary> do_lerp specialisation which defers the calculation to EmuMath::Helpers::VectorLerp. Leaves room for specific vectors to be specialised. </summary>
 	/// <typeparam name="a_value_type">Type contained within the vector used for argument A_.<typeparam>
@@ -1545,10 +1568,9 @@ namespace EmuMath
 		constexpr do_lerp()
 		{
 		}
-		template<std::size_t OutSize_ = ASize_, typename out_value_type = a_value_type>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> operator()(const EmuMath::Vector<ASize_, a_value_type>& a_, const B_& b_, const T_& t_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<ASize_, a_value_type>& a_, const B_& b_, const T_& t_) const
 		{
-			return EmuMath::Helpers::VectorLerp<OutSize_, out_value_type, EmuMath::Vector<ASize_, a_value_type>, B_, T_>(a_, b_, t_);
+			return EmuMath::Helpers::VectorLerp(a_, b_, t_);
 		}
 	};
 
@@ -1560,9 +1582,9 @@ namespace EmuMath
 		constexpr do_floor()
 		{
 		}
-		[[nodiscard]] constexpr inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorFloor<Size_, T_, EmuMath::Vector<Size_, T_>>(vector_);
+			return EmuMath::Helpers::VectorFloor(vector_);
 		}
 	};
 
@@ -1574,9 +1596,9 @@ namespace EmuMath
 		constexpr do_ceil()
 		{
 		}
-		[[nodiscard]] constexpr inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorCeil<Size_, T_, EmuMath::Vector<Size_, T_>>(vector_);
+			return EmuMath::Helpers::VectorCeil(vector_);
 		}
 	};
 
@@ -1588,9 +1610,9 @@ namespace EmuMath
 		constexpr do_trunc()
 		{
 		}
-		[[nodiscard]] constexpr inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorTrunc<Size_, T_, EmuMath::Vector<Size_, T_>>(vector_);
+			return EmuMath::Helpers::VectorTrunc(vector_);
 		}
 	};
 
@@ -1605,9 +1627,9 @@ namespace EmuMath
 		constexpr do_sqrt_constexpr()
 		{
 		}
-		[[nodiscard]] constexpr inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorSqrtConstexpr<Size_, T_, EmuMath::Vector<Size_, T_>>(vector_);
+			return EmuMath::Helpers::VectorSqrtConstexpr(vector_);
 		}
 	};
 
@@ -1619,9 +1641,9 @@ namespace EmuMath
 		constexpr do_sqrt()
 		{
 		}
-		[[nodiscard]] inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		[[nodiscard]] inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorSqrt<Size_, T_, EmuMath::Vector<Size_, T_>>(vector_);
+			return EmuMath::Helpers::VectorSqrt(vector_);
 		}
 	};
 
@@ -1631,15 +1653,15 @@ namespace EmuMath
 		constexpr do_left_shift()
 		{
 		}
-		constexpr inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_, const Shifts_& num_shifts_) const
+		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_, const Shifts_& num_shifts_) const
 		{
 			if constexpr (std::is_arithmetic_v<Shifts_>)
 			{
-				return EmuMath::Helpers::VectorShiftLeft<Size_, T_, EmuMath::Vector<Size_, std::size_t>, std::size_t>(vector_, static_cast<std::size_t>(num_shifts_));
+				return EmuMath::Helpers::VectorShiftLeft(vector_, static_cast<std::size_t>(num_shifts_));
 			}
 			else
 			{
-				return EmuMath::Helpers::VectorShiftLeft<Size_, T_, EmuMath::Vector<Size_, T_>, Shifts_>(vector_, num_shifts_);
+				return EmuMath::Helpers::VectorShiftLeft(vector_, num_shifts_);
 			}
 		}
 	};
@@ -1650,16 +1672,76 @@ namespace EmuMath
 		constexpr do_right_shift()
 		{
 		}
-		constexpr inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_, const Shifts_& num_shifts_) const
+		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_, const Shifts_& num_shifts_) const
 		{
 			if constexpr (std::is_arithmetic_v<Shifts_>)
 			{
-				return EmuMath::Helpers::VectorShiftRight<Size_, T_, EmuMath::Vector<Size_, std::size_t>, std::size_t>(vector_, static_cast<std::size_t>(num_shifts_));
+				return EmuMath::Helpers::VectorShiftRight(vector_, static_cast<std::size_t>(num_shifts_));
 			}
 			else
 			{
-				return EmuMath::Helpers::VectorShiftRight<Size_, T_, EmuMath::Vector<Size_, T_>, Shifts_>(vector_, num_shifts_);
+				return EmuMath::Helpers::VectorShiftRight(vector_, num_shifts_);
 			}
+		}
+	};
+
+	template<std::size_t Size_, typename T_, typename Rhs_>
+	struct do_add<EmuMath::Vector<Size_, T_>, Rhs_>
+	{
+		constexpr do_add()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorAdd(lhs_, rhs_);
+		}
+	};
+
+	template<std::size_t Size_, typename T_, typename Rhs_>
+	struct do_subtract<EmuMath::Vector<Size_, T_>, Rhs_>
+	{
+		constexpr do_subtract()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorSubtract(lhs_, rhs_);
+		}
+	};
+
+	template<std::size_t Size_, typename T_, typename Rhs_>
+	struct do_multiply<EmuMath::Vector<Size_, T_>, Rhs_>
+	{
+		constexpr do_multiply()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorMultiply(lhs_, rhs_);
+		}
+	};
+
+	template<std::size_t Size_, typename T_, typename Rhs_>
+	struct do_divide<EmuMath::Vector<Size_, T_>, Rhs_>
+	{
+		constexpr do_divide()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorDivide(lhs_, rhs_);
+		}
+	};
+
+	template<std::size_t Size_, typename T_>
+	struct do_negate<EmuMath::Vector<Size_, T_>>
+	{
+		constexpr do_negate()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		{
+			return EmuMath::Helpers::VectorNegate(vector_);
 		}
 	};
 }

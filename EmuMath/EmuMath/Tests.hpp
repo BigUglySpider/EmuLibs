@@ -9,7 +9,6 @@
 #include <tuple>
 
 // ADDITIONAL INCLUDES
-#include "EmuMath/GeneralMath.h"
 #include "EmuMath/Vector.h"
 #include <bitset>
 #include <string_view>
