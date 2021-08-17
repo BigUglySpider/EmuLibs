@@ -2,6 +2,7 @@
 #define EMU_MATH_VECTOR_T_HELPERS_H_INC_ 1
 
 #include "../../EmuCore/Functors/Arithmetic.h"
+#include "../../EmuCore/Functors/Comparators.h"
 #include "VectorHelpersUnderlying.h"
 #include <functional>
 
@@ -1560,6 +1561,7 @@ namespace EmuMath::Helpers
 #pragma region EMU_CORE_SPECIALISATIONS
 namespace EmuCore
 {
+#pragma region ARITHMETIC
 	/// <summary> do_lerp specialisation which defers the calculation to EmuMath::Helpers::VectorLerp. Leaves room for specific vectors to be specialised. </summary>
 	/// <typeparam name="a_value_type">Type contained within the vector used for argument A_.<typeparam>
 	template<std::size_t ASize_, typename a_value_type, class B_, class T_>
@@ -1744,6 +1746,11 @@ namespace EmuCore
 			return EmuMath::Helpers::VectorNegate(vector_);
 		}
 	};
+#pragma endregion
+
+#pragma region COMPARATORS
+
+#pragma endregion
 }
 #pragma endregion
 
