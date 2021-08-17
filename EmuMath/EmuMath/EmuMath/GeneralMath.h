@@ -278,7 +278,7 @@ namespace EmuMath
 		constexpr do_sqrt_constexpr()
 		{
 		}
-		[[nodiscard]] constexpr inline Out_ operator()(T_ val_) const
+		[[nodiscard]] constexpr inline Out_ operator()(const T_& val_) const
 		{
 			return SqrtConstexpr<Out_, T_>(val_);
 		}
@@ -290,7 +290,7 @@ namespace EmuMath
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline auto operator()(T_ val_) const
+		[[nodiscard]] constexpr inline auto operator()(const T_& val_) const
 		{
 			return do_sqrt_constexpr<T_>()(val_);
 		}
@@ -306,7 +306,7 @@ namespace EmuMath
 		constexpr do_sqrt()
 		{
 		}
-		[[nodiscard]] inline floating_point_ operator()(T_ val_) const
+		[[nodiscard]] inline floating_point_ operator()(const T_& val_) const
 		{
 			if constexpr (std::is_same_v<T_, floating_point_>)
 			{
@@ -325,7 +325,7 @@ namespace EmuMath
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] inline auto operator()(T_ val_) const
+		[[nodiscard]] inline auto operator()(const T_& val_) const
 		{
 			return do_sqrt<T_>()(val_);
 		}
@@ -337,7 +337,7 @@ namespace EmuMath
 		constexpr do_floor()
 		{
 		}
-		[[nodiscard]] constexpr inline T_ operator()(const T_ val_) const
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
 		{
 			return DoCorrectFloor<T_>(val_);
 		}
@@ -349,7 +349,7 @@ namespace EmuMath
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline auto operator()(const T_ val_) const
+		[[nodiscard]] constexpr inline auto operator()(const T_& val_) const
 		{
 			return do_floor<T_>()(val_);
 		}
@@ -361,7 +361,7 @@ namespace EmuMath
 		constexpr do_ceil()
 		{
 		}
-		[[nodiscard]] constexpr inline T_ operator()(const T_ val_) const
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
 		{
 			return DoCorrectCeil<T_>(val_);
 		}
@@ -373,7 +373,7 @@ namespace EmuMath
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline auto operator()(const T_ val_) const
+		[[nodiscard]] constexpr inline auto operator()(const T_& val_) const
 		{
 			return do_ceil<T_>()(val_);
 		}
@@ -385,7 +385,7 @@ namespace EmuMath
 		constexpr do_trunc()
 		{
 		}
-		[[nodiscard]] constexpr inline T_ operator()(const T_ val_) const
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
 		{
 			return DoCorrectTrunc<T_>(val_);
 		}
@@ -397,57 +397,71 @@ namespace EmuMath
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline auto operator()(const T_ val_) const
+		[[nodiscard]] constexpr inline auto operator()(const T_& val_) const
 		{
 			return do_trunc<T_>()(val_);
 		}
 	};
 
-	template<typename T_>
+	template<typename T_, typename Shifts_>
 	struct do_left_shift
 	{
 		constexpr do_left_shift()
 		{
 		}
-		constexpr inline T_ operator()(const T_ val_, const std::size_t num_shifts_) const
+		constexpr inline T_ operator()(const T_& val_, const Shifts_& num_shifts_) const
 		{
-			return val_ << num_shifts_;
+			if constexpr (std::is_arithmetic_v<T_>)
+			{
+				return val_ << static_cast<std::size_t>(num_shifts_);
+			}
+			else
+			{
+				return val_ << num_shifts_;
+			}
 		}
 	};
 	template<>
-	struct do_left_shift<void>
+	struct do_left_shift<void, void>
 	{
 		constexpr do_left_shift()
 		{
 		}
-		template<typename T_>
-		constexpr inline T_ operator()(T_&& val_, std::size_t&& num_shifts_) const
+		template<typename T_, typename Shifts_>
+		constexpr inline T_ operator()(const T_& val_, const Shifts_& num_shifts_) const
 		{
-			return do_left_shift<T_>()(std::forward(val_), std::forward(num_shifts_));
+			return do_left_shift<T_>()(val_, num_shifts_);
 		}
 	};
 
-	template<typename T_>
+	template<typename T_, typename Shifts_>
 	struct do_right_shift
 	{
 		constexpr do_right_shift()
 		{
 		}
-		constexpr inline T_ operator()(const T_ val_, const std::size_t num_shifts_) const
+		constexpr inline T_ operator()(const T_& val_, const Shifts_& num_shifts_) const
 		{
-			return val_ >> num_shifts_;
+			if constexpr (std::is_arithmetic_v<T_>)
+			{
+				return val_ >> static_cast<std::size_t>(num_shifts_);
+			}
+			else
+			{
+				return val_ >> num_shifts_;
+			}
 		}
 	};
 	template<>
-	struct do_right_shift<void>
+	struct do_right_shift<void, void>
 	{
 		constexpr do_right_shift()
 		{
 		}
-		template<typename T_>
-		constexpr inline T_ operator()(T_&& val_, std::size_t&& num_shifts_) const
+		template<typename T_, typename Shifts_>
+		constexpr inline T_ operator()(const T_& val_, const Shifts_& num_shifts_) const
 		{
-			return do_right_shift<T_>()(std::forward(val_), std::forward(num_shifts_));
+			return do_right_shift<T_, Shifts_>()(val_, num_shifts_);
 		}
 	};
 }

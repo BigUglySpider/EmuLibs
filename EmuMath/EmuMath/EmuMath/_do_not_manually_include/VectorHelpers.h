@@ -1452,7 +1452,7 @@ namespace EmuMath::Helpers
 					EmuMath::Vector<OutSize_, out_value_type>,
 					Vector_,
 					Shifts_,
-					EmuMath::do_left_shift<typename Vector_::value_type>
+					EmuMath::do_left_shift
 				>(vector_, num_shifts_);
 			}
 			else
@@ -1513,7 +1513,7 @@ namespace EmuMath::Helpers
 					EmuMath::Vector<OutSize_, out_value_type>,
 					Vector_,
 					Shifts_,
-					EmuMath::do_right_shift<typename Vector_::value_type>
+					EmuMath::do_right_shift
 				>(vector_, num_shifts_);
 			}
 			else
@@ -1635,27 +1635,41 @@ namespace EmuMath
 		}
 	};
 
-	template<std::size_t Size_, typename T_>
-	struct do_left_shift<EmuMath::Vector<Size_, T_>>
+	template<std::size_t Size_, typename T_, typename Shifts_>
+	struct do_left_shift<EmuMath::Vector<Size_, T_>, Shifts_>
 	{
 		constexpr do_left_shift()
 		{
 		}
-		constexpr inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_, const std::size_t num_shifts_) const
+		constexpr inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_, const Shifts_& num_shifts_) const
 		{
-			return EmuMath::Helpers::VectorShiftLeft<Size_, T_, EmuMath::Vector<Size_, T_>>(vector_, num_shifts_);
+			if constexpr (std::is_arithmetic_v<Shifts_>)
+			{
+				return EmuMath::Helpers::VectorShiftLeft<Size_, T_, EmuMath::Vector<Size_, std::size_t>, std::size_t>(vector_, static_cast<std::size_t>(num_shifts_));
+			}
+			else
+			{
+				return EmuMath::Helpers::VectorShiftLeft<Size_, T_, EmuMath::Vector<Size_, T_>, Shifts_>(vector_, num_shifts_);
+			}
 		}
 	};
 
-	template<std::size_t Size_, typename T_>
-	struct do_right_shift<EmuMath::Vector<Size_, T_>>
+	template<std::size_t Size_, typename T_, typename Shifts_>
+	struct do_right_shift<EmuMath::Vector<Size_, T_>, Shifts_>
 	{
 		constexpr do_right_shift()
 		{
 		}
-		constexpr inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_, const std::size_t num_shifts_) const
+		constexpr inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_, const Shifts_& num_shifts_) const
 		{
-			return EmuMath::Helpers::VectorShiftRight<Size_, T_, EmuMath::Vector<Size_, T_>>(vector_, num_shifts_);
+			if constexpr (std::is_arithmetic_v<Shifts_>)
+			{
+				return EmuMath::Helpers::VectorShiftRight<Size_, T_, EmuMath::Vector<Size_, std::size_t>, std::size_t>(vector_, static_cast<std::size_t>(num_shifts_));
+			}
+			else
+			{
+				return EmuMath::Helpers::VectorShiftRight<Size_, T_, EmuMath::Vector<Size_, T_>, Shifts_>(vector_, num_shifts_);
+			}
 		}
 	};
 }
