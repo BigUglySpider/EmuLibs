@@ -1423,22 +1423,17 @@ namespace EmuMath::Helpers
 	/// <summary>
 	/// <para> Shifts each element in the passed vector to the left the specified number of times, outputting the results in a new vector. </para>
 	/// <para>
-	///		The passed num_shifts_ may be a scalar type convertible to std::size_t, or an EmuMath vector containing types convertible to std::size_t. 
+	///		The passed num_shifts_ may be a scalar type or an EmuMath vector. 
 	///		If it is an EmuMath vector, shifts for each element will be performed a number of times equal to the value in the respective index of this vector. 
 	///		Otherwise, all elements will be shifted by this value.
 	/// </para>
-	/// <para> This function uses the passed vector_'s value_type specialisation of EmuMath::do_left_shift to perform each shift. </para>
+	/// <para> This function uses an instantiation of EmuMath::do_left_shift&lt;Vector_::value_type, Shifts_&gt; to perform each shift. </para>
 	/// </summary>
 	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to shift the elements of.</typeparam>
-	/// <typeparam name="Shifts_">
-	///		Scalar type convertible to std::size_t or EmuMath vector containing types convertible to std::size_t used to represent the number of shifts.
-	/// </typeparam>
+	/// <typeparam name="Shifts_">Scalar type or EmuMath vector used to represent the number of shifts.</typeparam>
 	/// <param name="vector_">EmuMath vector to shift the elements of. Its value_type must be shiftable via the EmuMath::do_left_shift functor for said type.</param>
-	/// <param name="num_shifts_">
-	///		Scalar convertible to std::size_t, or EmuMath vector with value_type convertible to std::size_t, 
-	///		representing the number of shifts to apply to every element or to each respective element.
-	/// </param>
+	/// <param name="num_shifts_">Scalar or EmuMath vector representing the number of shifts to apply to every element or to each respective element.</param>
 	/// <returns>Result of left-shifting the elements of the passed EmuMath vector the specified number of times in num_shifts_.</returns>
 	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Shifts_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorShiftLeft(const Vector_& vector_, const Shifts_& num_shifts_)
@@ -1484,22 +1479,17 @@ namespace EmuMath::Helpers
 	/// <summary>
 	/// <para> Shifts each element in the passed vector to the right the specified number of times, outputting the results in a new vector. </para>
 	/// <para>
-	///		The passed num_shifts_ may be a scalar type convertible to std::size_t, or an EmuMath vector containing types convertible to std::size_t. 
+	///		The passed num_shifts_ may be a scalar type or an EmuMath vector. 
 	///		If it is an EmuMath vector, shifts for each element will be performed a number of times equal to the value in the respective index of this vector. 
 	///		Otherwise, all elements will be shifted by this value.
 	/// </para>
-	/// <para> This function uses the passed vector_'s value_type specialisation of EmuMath::do_right_shift to perform each shift. </para>
+	/// <para> This function uses an instantiation of EmuMath::do_right_shift&lt;Vector_::value_type, Shifts_&gt; to perform each shift. </para>
 	/// </summary>
 	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to shift the elements of.</typeparam>
-	/// <typeparam name="Shifts_">
-	///		Scalar type convertible to std::size_t or EmuMath vector containing types convertible to std::size_t used to represent the number of shifts.
-	/// </typeparam>
+	/// <typeparam name="Shifts_">Scalar type or EmuMath vector used to represent the number of shifts.</typeparam>
 	/// <param name="vector_">EmuMath vector to shift the elements of. Its value_type must be shiftable via the EmuMath::do_right_shift functor for said type.</param>
-	/// <param name="num_shifts_">
-	///		Scalar convertible to std::size_t, or EmuMath vector with value_type convertible to std::size_t, 
-	///		representing the number of shifts to apply to every element or to each respective element.
-	/// </param>
+	/// <param name="num_shifts_">Scalar or EmuMath vector representing the number of shifts to apply to every element or to each respective element.</param>
 	/// <returns>Result of right-shifting the elements of the passed EmuMath vector the specified number of times in num_shifts_.</returns>
 	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Shifts_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorShiftRight(const Vector_& vector_, const Shifts_& num_shifts_)
