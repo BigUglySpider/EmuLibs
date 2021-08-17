@@ -930,6 +930,15 @@ namespace EmuMath::Helpers
 		return VectorTrunc<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
 	}
 
+	/// <summary>
+	/// <para> Performs a square root calculation of elements within the passed vector and returns the resulting vector. </para>
+	/// <para> This calculation may make some sacrifices to be executable at compile time. If it is being called at runtime, it is recommended to use VectorSqrt instead. </para>
+	/// <para> This function makes use of the EmuMath::do_sqrt_constexpr functor. The specialisation for the passed vector's value_type will be used, if one exists. </para>
+	/// </summary>
+	/// <typeparam name="out_value_type">Type to be stored in the output vector.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to calculate the square root of the elements of.</typeparam>
+	/// <param name="vector_">EmuMath vector to calculate the square root of elements of.</param>
+	/// <returns>EmuMath vector containing the results of the square root calculation for each respective element within the passed vector.</returns>
 	template<std::size_t OutSize_, typename out_value_type, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorSqrtConstexpr(const Vector_& vector_)
 	{
@@ -963,6 +972,14 @@ namespace EmuMath::Helpers
 		return VectorSqrtConstexpr<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
 	}
 
+	/// <summary>
+	/// <para> Performs a square root calculation of elements within the passed vector and returns the resulting vector. </para>
+	/// <para> This function makes use of the EmuMath::do_sqrt functor. The specialisation for the passed vector's value_type will be used, if one exists. </para>
+	/// </summary>
+	/// <typeparam name="out_value_type">Type to be stored in the output vector.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to calculate the square root of the elements of.</typeparam>
+	/// <param name="vector_">EmuMath vector to calculate the square root of elements of.</param>
+	/// <returns>EmuMath vector containing the results of the square root calculation for each respective element within the passed vector.</returns>
 	template<std::size_t OutSize_, typename out_value_type, class Vector_>
 	[[nodiscard]] inline EmuMath::Vector<OutSize_, out_value_type> VectorSqrt(const Vector_& vector_)
 	{
