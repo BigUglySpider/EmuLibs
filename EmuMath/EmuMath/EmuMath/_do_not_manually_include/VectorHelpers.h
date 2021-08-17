@@ -1418,6 +1418,74 @@ namespace EmuMath::Helpers
 		return VectorPerElementCmpLessEqual<LhsVector_::size, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 #pragma endregion
+
+#pragma region BITWISE
+	template<std::size_t OutSize_, typename out_value_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorShiftLeft(const Vector_& vector_, const std::size_t num_shifts_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_vector_bitwise_shift_per_element
+			<
+				EmuMath::Vector<OutSize_, out_value_type>,
+				Vector_,
+				EmuMath::do_left_shift<typename Vector_::value_type>
+			>(vector_, num_shifts_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to shift each element within a vector to the left, but the provided argument was not an EmuMath vector type.");
+		}
+	}
+	template<typename out_value_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorShiftLeft(const Vector_& vector_, const std::size_t num_shifts_)
+	{
+		return VectorShiftLeft<Vector_::size, out_value_type, Vector_>(vector_, num_shifts_);
+	}
+	template<std::size_t OutSize_, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorShiftLeft(const Vector_& vector_, const std::size_t num_shifts_)
+	{
+		return VectorShiftLeft<OutSize_, typename Vector_::value_type, Vector_>(vector_, num_shifts_);
+	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorShiftLeft(const Vector_& vector_, const std::size_t num_shifts_)
+	{
+		return VectorShiftLeft<Vector_::size, typename Vector_::value_type, Vector_>(vector_, num_shifts_);
+	}
+
+	template<std::size_t OutSize_, typename out_value_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorShiftRight(const Vector_& vector_, const std::size_t num_shifts_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_vector_bitwise_shift_per_element
+			<
+				EmuMath::Vector<OutSize_, out_value_type>,
+				Vector_,
+				EmuMath::do_right_shift<typename Vector_::value_type>
+			>(vector_, num_shifts_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to shift each element within a vector to the right, but the provided argument was not an EmuMath vector type.");
+		}
+	}
+	template<typename out_value_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorShiftRight(const Vector_& vector_, const std::size_t num_shifts_)
+	{
+		return VectorShiftRight<Vector_::size, out_value_type, Vector_>(vector_, num_shifts_);
+	}
+	template<std::size_t OutSize_, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorShiftRight(const Vector_& vector_, const std::size_t num_shifts_)
+	{
+		return VectorShiftRight<OutSize_, typename Vector_::value_type, Vector_>(vector_, num_shifts_);
+	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorShiftRight(const Vector_& vector_, const std::size_t num_shifts_)
+	{
+		return VectorShiftRight<Vector_::size, typename Vector_::value_type, Vector_>(vector_, num_shifts_);
+	}
+#pragma endregion
 }
 
 #pragma region EMU_MATH_SPECIALISATIONS
@@ -1508,6 +1576,30 @@ namespace EmuMath
 		[[nodiscard]] inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
 			return EmuMath::Helpers::VectorSqrt<Size_, T_, EmuMath::Vector<Size_, T_>>(vector_);
+		}
+	};
+
+	template<std::size_t Size_, typename T_>
+	struct do_left_shift<EmuMath::Vector<Size_, T_>>
+	{
+		constexpr do_left_shift()
+		{
+		}
+		constexpr inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_, const std::size_t num_shifts_) const
+		{
+			return EmuMath::Helpers::VectorShiftLeft<Size_, T_, EmuMath::Vector<Size_, T_>>(vector_, num_shifts_);
+		}
+	};
+
+	template<std::size_t Size_, typename T_>
+	struct do_right_shift<EmuMath::Vector<Size_, T_>>
+	{
+		constexpr do_right_shift()
+		{
+		}
+		constexpr inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_, const std::size_t num_shifts_) const
+		{
+			return EmuMath::Helpers::VectorShiftRight<Size_, T_, EmuMath::Vector<Size_, T_>>(vector_, num_shifts_);
 		}
 	};
 }

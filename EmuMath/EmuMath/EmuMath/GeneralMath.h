@@ -402,6 +402,54 @@ namespace EmuMath
 			return do_trunc<T_>()(val_);
 		}
 	};
+
+	template<typename T_>
+	struct do_left_shift
+	{
+		constexpr do_left_shift()
+		{
+		}
+		constexpr inline T_ operator()(const T_ val_, const std::size_t num_shifts_) const
+		{
+			return val_ << num_shifts_;
+		}
+	};
+	template<>
+	struct do_left_shift<void>
+	{
+		constexpr do_left_shift()
+		{
+		}
+		template<typename T_>
+		constexpr inline T_ operator()(T_&& val_, std::size_t&& num_shifts_) const
+		{
+			return do_left_shift<T_>()(std::forward(val_), std::forward(num_shifts_));
+		}
+	};
+
+	template<typename T_>
+	struct do_right_shift
+	{
+		constexpr do_right_shift()
+		{
+		}
+		constexpr inline T_ operator()(const T_ val_, const std::size_t num_shifts_) const
+		{
+			return val_ >> num_shifts_;
+		}
+	};
+	template<>
+	struct do_right_shift<void>
+	{
+		constexpr do_right_shift()
+		{
+		}
+		template<typename T_>
+		constexpr inline T_ operator()(T_&& val_, std::size_t&& num_shifts_) const
+		{
+			return do_right_shift<T_>()(std::forward(val_), std::forward(num_shifts_));
+		}
+	};
 }
 
 #endif

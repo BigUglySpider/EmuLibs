@@ -951,6 +951,40 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		_vector_single_operand_func<0, OutVector_, Vector_, Func_>(vector_, out_, func_);
 		return out_;
 	}
+
+	template<std::size_t Index_, class OutVector_, class Vector_, class Shifter_>
+	constexpr inline void _vector_bitwise_shift_per_element(const Vector_& vector_, const std::size_t num_shifts_, OutVector_& out_, Shifter_& shifter_)
+	{
+		if constexpr (Index_ < OutVector_::size)
+		{
+			using out_value = typename OutVector_::value_type;
+			if constexpr (Index_ < Vector_::size)
+			{
+				_get_vector_data<Index_>(out_) = static_cast<out_value>(shifter_(_get_vector_data<Index_>(vector_), num_shifts_));
+				_vector_bitwise_shift_per_element<Index_ + 1, OutVector_, Vector_, Shifter_>(vector_, num_shifts_, out_, shifter_);
+			}
+			else
+			{
+				using vector_value = typename Vector_::value_type;
+				if constexpr (std::is_arithmetic_v<vector_value>)
+				{
+					_assign_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(vector_value()));
+				}
+				else
+				{
+					_assign_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(shifter_(vector_value(), num_shifts_)));
+				}
+			}
+		}
+	}
+	template<class OutVector_, class Vector_, class Shifter_>
+	[[nodiscard]] constexpr inline OutVector_ _vector_bitwise_shift_per_element(const Vector_& vector_, const std::size_t num_shifts_)
+	{
+		OutVector_ out_ = OutVector_();
+		Shifter_ shifter_ = Shifter_();
+		_vector_bitwise_shift_per_element<0, OutVector_, Vector_, Shifter_>(vector_, num_shifts_, out_, shifter_);
+		return out_;
+	}
 #pragma endregion
 
 #pragma region ARITHMETIC
