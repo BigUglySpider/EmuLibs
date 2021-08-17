@@ -58,7 +58,12 @@ int main()
 
 	EmuMath::Helpers::VectorSet(ref_d_, EmuMath::Helpers::VectorFloor(EmuMath::Helpers::VectorNegate(ref_d_)));
 	std::cout << "D: " << vectord << "\nRef: " << ref_d_ << "\n";
-	EmuMath::do_sqrt<void> do_sqrt_;
+
+	auto some_vector = EmuMath::TMP::make_emu_vector<float>(102, 13.0f, 27.6, 100, 10000, 1000000);
+	std::cout << "Sqrt(" << some_vector << "): " << EmuMath::Helpers::VectorSqrt(some_vector) << "\n";
+	constexpr auto some_other_vector = EmuMath::TMP::make_emu_vector<double>(100.0, 0.25, 1.0f, 2.0f, EmuMath::Pi::PI<long double>);
+	constexpr auto some_other_vector_sqrt = EmuMath::Helpers::VectorSqrtConstexpr(some_other_vector);
+	std::cout << "SqrtConstexpr(" << some_other_vector << "): " << some_other_vector_sqrt << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();

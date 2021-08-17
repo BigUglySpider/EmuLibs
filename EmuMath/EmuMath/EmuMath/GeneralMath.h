@@ -306,7 +306,7 @@ namespace EmuMath
 		constexpr do_sqrt()
 		{
 		}
-		[[nodiscard]] constexpr inline floating_point_ operator()(T_ val_) const
+		[[nodiscard]] inline floating_point_ operator()(T_ val_) const
 		{
 			if constexpr (std::is_same_v<T_, floating_point_>)
 			{
@@ -325,7 +325,7 @@ namespace EmuMath
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline auto operator()(T_ val_) const
+		[[nodiscard]] inline auto operator()(T_ val_) const
 		{
 			return do_sqrt<T_>()(val_);
 		}

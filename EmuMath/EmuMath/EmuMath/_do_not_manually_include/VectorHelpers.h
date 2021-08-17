@@ -929,6 +929,72 @@ namespace EmuMath::Helpers
 	{
 		return VectorTrunc<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
 	}
+
+	template<std::size_t OutSize_, typename out_value_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorSqrtConstexpr(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_vector_single_operand_func
+			<
+				EmuMath::Vector<OutSize_, out_value_type>,
+				Vector_,
+				EmuMath::do_sqrt_constexpr<typename Vector_::value_type>
+			>(vector_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to calculate the square root of all elements within a vector, but provided a non-EmuMath-vector argument type.");
+		}
+	}
+	template<typename out_value_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorSqrtConstexpr(const Vector_& vector_)
+	{
+		return VectorSqrtConstexpr<Vector_::size, out_value_type, Vector_>(vector_);
+	}
+	template<std::size_t OutSize_, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorSqrtConstexpr(const Vector_& vector_)
+	{
+		return VectorSqrtConstexpr<OutSize_, typename Vector_::value_type, Vector_>(vector_);
+	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorSqrtConstexpr(const Vector_& vector_)
+	{
+		return VectorSqrtConstexpr<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
+	}
+
+	template<std::size_t OutSize_, typename out_value_type, class Vector_>
+	[[nodiscard]] inline EmuMath::Vector<OutSize_, out_value_type> VectorSqrt(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_vector_single_operand_func
+			<
+				EmuMath::Vector<OutSize_, out_value_type>,
+				Vector_,
+				EmuMath::do_sqrt<typename Vector_::value_type>
+			>(vector_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to calculate the square root of all elements within a vector, but provided a non-EmuMath-vector argument type.");
+		}
+	}
+	template<typename out_value_type, class Vector_>
+	[[nodiscard]] inline EmuMath::Vector<Vector_::size, out_value_type> VectorSqrt(const Vector_& vector_)
+	{
+		return VectorSqrt<Vector_::size, out_value_type, Vector_>(vector_);
+	}
+	template<std::size_t OutSize_, class Vector_>
+	[[nodiscard]] inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorSqrt(const Vector_& vector_)
+	{
+		return VectorSqrt<OutSize_, typename Vector_::value_type, Vector_>(vector_);
+	}
+	template<class Vector_>
+	[[nodiscard]] inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorSqrt(const Vector_& vector_)
+	{
+		return VectorSqrt<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
+	}
 #pragma endregion
 
 #pragma region ARITHMETIC
@@ -1340,7 +1406,7 @@ namespace EmuMath::Helpers
 #pragma region EMU_MATH_SPECIALISATIONS
 namespace EmuMath
 {
-	/// <summary> do_lerp specialisation which defers the calculation to EmuMath::Helpers::VectorLerp. </summary>
+	/// <summary> do_lerp specialisation which defers the calculation to EmuMath::Helpers::VectorLerp. Leaves room for specific vectors to be specialised. </summary>
 	/// <typeparam name="a_value_type">Type contained within the vector used for argument A_.<typeparam>
 	template<std::size_t ASize_, typename a_value_type, class B_, class T_>
 	struct do_lerp<EmuMath::Vector<ASize_, a_value_type>, B_, T_>
@@ -1352,6 +1418,79 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> operator()(const EmuMath::Vector<ASize_, a_value_type>& a_, const B_& b_, const T_& t_) const
 		{
 			return EmuMath::Helpers::VectorLerp<OutSize_, out_value_type, EmuMath::Vector<ASize_, a_value_type>, B_, T_>(a_, b_, t_);
+		}
+	};
+
+	/// <summary> do_floor specialisation which defers a flooring calculation to EmuMath::Helpers::VectorFloor. Leaves room for specific vectors to be specialised. </summary>
+	/// <typeparam name="T_">Type contained within the passed EmuMath vector.</typeparam>
+	template<std::size_t Size_, typename T_>
+	struct do_floor<EmuMath::Vector<Size_, T_>>
+	{
+		constexpr do_floor()
+		{
+		}
+		[[nodiscard]] constexpr inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		{
+			return EmuMath::Helpers::VectorFloor<Size_, T_, EmuMath::Vector<Size_, T_>>(vector_);
+		}
+	};
+
+	/// <summary> do_ceil specialisation which defers a ceiling calculation to EmuMath::Helpers::VectorCeil. Leaves room for specific vectors to be specialised. </summary>
+	/// <typeparam name="T_">Type contained within the passed EmuMath vector.</typeparam>
+	template<std::size_t Size_, typename T_>
+	struct do_ceil<EmuMath::Vector<Size_, T_>>
+	{
+		constexpr do_ceil()
+		{
+		}
+		[[nodiscard]] constexpr inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		{
+			return EmuMath::Helpers::VectorCeil<Size_, T_, EmuMath::Vector<Size_, T_>>(vector_);
+		}
+	};
+
+	/// <summary> do_trunc specialisation which defers a truncating calculation to EmuMath::Helpers::VectorTrunc. Leaves room for specific vectors to be specialised. </summary>
+	/// <typeparam name="T_">Type contained within the passed EmuMath vector.</typeparam>
+	template<std::size_t Size_, typename T_>
+	struct do_trunc<EmuMath::Vector<Size_, T_>>
+	{
+		constexpr do_trunc()
+		{
+		}
+		[[nodiscard]] constexpr inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		{
+			return EmuMath::Helpers::VectorTrunc<Size_, T_, EmuMath::Vector<Size_, T_>>(vector_);
+		}
+	};
+
+	/// <summary> 
+	///		do_sqrt_constexpr specialisation which defers a constexpr sqrt calculation to EmuMath::Helpers::VectorSqrtConstexpr. 
+	///		Leaves room for specific vectors to be specialised.
+	/// </summary>
+	/// <typeparam name="T_">Type contained within the passed EmuMath vector.</typeparam>
+	template<std::size_t Size_, typename T_>
+	struct do_sqrt_constexpr<EmuMath::Vector<Size_, T_>>
+	{
+		constexpr do_sqrt_constexpr()
+		{
+		}
+		[[nodiscard]] constexpr inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		{
+			return EmuMath::Helpers::VectorSqrtConstexpr<Size_, T_, EmuMath::Vector<Size_, T_>>(vector_);
+		}
+	};
+
+	/// <summary> do_sqrt specialisation which defers a square root calculation to EmuMath::Helpers::VectorSqrt. Leaves room for specific vectors to be specialised. </summary>
+	/// <typeparam name="T_">Type contained within the passed EmuMath vector.</typeparam>
+	template<std::size_t Size_, typename T_>
+	struct do_sqrt<EmuMath::Vector<Size_, T_>>
+	{
+		constexpr do_sqrt()
+		{
+		}
+		[[nodiscard]] inline EmuMath::Vector<Size_, T_> operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		{
+			return EmuMath::Helpers::VectorSqrt<Size_, T_, EmuMath::Vector<Size_, T_>>(vector_);
 		}
 	};
 }
