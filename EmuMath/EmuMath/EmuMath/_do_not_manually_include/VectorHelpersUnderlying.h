@@ -953,7 +953,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<std::size_t Index_, class OutVector_, class Vector_, class Shifter_>
-	constexpr inline void _vector_bitwise_shift_per_element(const Vector_& vector_, const std::size_t num_shifts_, OutVector_& out_, Shifter_& shifter_)
+	constexpr inline void _vector_bitwise_shift_per_element_scalar_shifts(const Vector_& vector_, const std::size_t num_shifts_, OutVector_& out_, Shifter_& shifter_)
 	{
 		if constexpr (Index_ < OutVector_::size)
 		{
@@ -961,7 +961,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 			if constexpr (Index_ < Vector_::size)
 			{
 				_get_vector_data<Index_>(out_) = static_cast<out_value>(shifter_(_get_vector_data<Index_>(vector_), num_shifts_));
-				_vector_bitwise_shift_per_element<Index_ + 1, OutVector_, Vector_, Shifter_>(vector_, num_shifts_, out_, shifter_);
+				_vector_bitwise_shift_per_element_scalar_shifts<Index_ + 1, OutVector_, Vector_, Shifter_>(vector_, num_shifts_, out_, shifter_);
 			}
 			else
 			{
@@ -977,12 +977,70 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 			}
 		}
 	}
-	template<class OutVector_, class Vector_, class Shifter_>
-	[[nodiscard]] constexpr inline OutVector_ _vector_bitwise_shift_per_element(const Vector_& vector_, const std::size_t num_shifts_)
+	template<std::size_t Index_, class OutVector_, class Vector_, class ShiftVector_, class Shifter_>
+	constexpr inline void _vector_bitwise_shift_per_element_vector_shifts(const Vector_& vector_, const ShiftVector_& num_shifts_, OutVector_& out_, Shifter_& shifter_)
+	{
+		if constexpr (Index_ < OutVector_::size)
+		{
+			using out_value = typename OutVector_::value_type;
+			if constexpr (Index_ < ShiftVector_::size)
+			{
+				using vector_value = typename Vector_::value_type;
+				if constexpr (Index_ < Vector_::size)
+				{
+					_get_vector_data<Index_>(out_) = static_cast<out_value>
+					(
+						shifter_(_get_vector_data<Index_>(vector_), static_cast<std::size_t>(_get_vector_data<Index_>(num_shifts_)))
+					);
+					_vector_bitwise_shift_per_element_vector_shifts<Index_ + 1, OutVector_, Vector_, ShiftVector_, Shifter_>(vector_, num_shifts_, out_, shifter_);
+				}
+				else
+				{
+					if constexpr (std::is_arithmetic_v<vector_value>)
+					{
+						// If arithmetic, we know any remaining shifts would lead to 0, so simply copy 0 into the remaining indices.
+						_assign_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(vector_value()));
+					}
+					else
+					{
+						// If not arithmetic type then perform a shift on the default value as we don't have a guarantee of what another arbitrary type may do here
+						_get_vector_data<Index_>(out_) = static_cast<out_value>
+						(
+							shifter_(vector_value(), static_cast<std::size_t>(_get_vector_data<Index_>(num_shifts_)))
+						);
+						_vector_bitwise_shift_per_element_vector_shifts<Index_ + 1, OutVector_, Vector_, ShiftVector_, Shifter_>(vector_, num_shifts_, out_, shifter_);
+					}
+				}
+			}
+			else
+			{
+				// All shifts will be whatever shift_value's default translates to, so use that as a scalar for remaining iterations.
+				using shift_value = typename ShiftVector_::value_type;
+				_vector_bitwise_shift_per_element_scalar_shifts<Index_, OutVector_, Vector_, Shifter_>(vector_, static_cast<std::size_t>(shift_value()), out_, shifter_);
+			}
+		}
+	}
+	template<class OutVector_, class Vector_, class Shifts_, class Shifter_>
+	[[nodiscard]] constexpr inline OutVector_ _vector_bitwise_shift_per_element(const Vector_& vector_, const Shifts_& num_shifts_)
 	{
 		OutVector_ out_ = OutVector_();
 		Shifter_ shifter_ = Shifter_();
-		_vector_bitwise_shift_per_element<0, OutVector_, Vector_, Shifter_>(vector_, num_shifts_, out_, shifter_);
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Shifts_>)
+		{
+			using shift_value = typename Shifts_::value_type;
+			if constexpr (std::is_convertible_v<shift_value, std::size_t>)
+			{
+				_vector_bitwise_shift_per_element_vector_shifts<0, OutVector_, Vector_, Shifts_, Shifter_>(vector_, num_shifts_, out_, shifter_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a bitwise shift on each element of an EmuMath vector, but the provided vector of shift amounts did not contain types convertible to std::size_t.");
+			}
+		}
+		else
+		{
+			_vector_bitwise_shift_per_element_scalar_shifts<0, OutVector_, Vector_, Shifter_>(vector_, static_cast<std::size_t>(num_shifts_), out_, shifter_);
+		}
 		return out_;
 	}
 #pragma endregion

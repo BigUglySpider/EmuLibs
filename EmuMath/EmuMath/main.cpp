@@ -65,9 +65,11 @@ int main()
 	constexpr auto some_other_vector_sqrt = EmuMath::Helpers::VectorSqrtConstexpr(some_other_vector);
 	std::cout << "SqrtConstexpr(" << some_other_vector << "): " << some_other_vector_sqrt << "\n";
 
-	constexpr auto some_uint_vector = EmuMath::TMP::make_emu_vector<std::uint32_t>(32u, 63u, 255u);
+	constexpr auto some_uint_vector = EmuMath::TMP::make_emu_vector<std::uint32_t>(1, 2, 4, 8, 16, 32, 64, 128);
 	constexpr auto shifted_left_uint_vector = EmuMath::Helpers::VectorShiftLeft(some_uint_vector, 1);
 	constexpr auto shifted_right_uint_vector = EmuMath::Helpers::VectorShiftRight(some_uint_vector, 2);
+	constexpr auto shifted_left_vector_shifts = EmuMath::Helpers::VectorShiftLeft(some_uint_vector, EmuMath::TMP::make_emu_vector<float>(1, 2, 3, 4, 5, 6, 7, 8));
+	constexpr auto shifted_right_vector_shifts = EmuMath::Helpers::VectorShiftRight(some_uint_vector, EmuMath::TMP::make_emu_vector<float>(1, 2, 3, 4, 5, 6, 7, 8));
 
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();
