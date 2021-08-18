@@ -144,6 +144,8 @@ int main()
 	std::cout << x_bits_ << " |\n  " << simple_bitset<x_val_type>(some_constant_) << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorOr(x_, some_constant_)) << "\n\n";
 	std::cout << x_bits_ << " ^\n  " << simple_bitset<x_val_type>(some_constant_) << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorXor(x_, some_constant_)) << "\n\n";
 
+
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();
