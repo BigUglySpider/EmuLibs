@@ -120,6 +120,11 @@ int main()
 	std::cout << vec_a << " ANY < " << EmuMath::Helpers::VectorShuffle<2, 1, 0>(vec_a) << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpAnyLess<false>(vec_a, EmuMath::Helpers::VectorShuffle<2, 1, 0>(vec_a)) << "\n";
 	std::cout << "----------\n";
 
+	constexpr auto vec_a_mag_recip_constexpr = EmuMath::Helpers::VectorMagnitudeReciprocalConstexpr(vec_a);
+	std::cout << "MagRecipConstexpr(" << vec_a << "): " << vec_a_mag_recip_constexpr << "\n";
+	std::cout << "MagRecipQrsqrt(" << vec_a << "): " << EmuMath::Helpers::VectorMagnitudeReciprocalQrsqrt<float, 1>(vec_a) << "\n";
+
+
 
 
 #pragma region TEST_HARNESS_EXECUTION

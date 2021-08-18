@@ -368,6 +368,53 @@ namespace EmuMath::Helpers
 		return EmuCore::DoCorrectStandardSqrt<FloatingPoint_>(VectorSquareMagnitude<FloatingPoint_, Vector_>(vector_));
 	}
 
+	/// <summary>
+	/// <para>  </para>
+	/// </summary>
+	/// <typeparam name="OutFloatingPoint_"></typeparam>
+	/// <typeparam name="Vector_"></typeparam>
+	/// <param name="vector_"></param>
+	/// <returns></returns>
+	template<typename OutFloatingPoint_ = float, class Vector_>
+	[[nodiscard]] constexpr inline OutFloatingPoint_ VectorMagnitudeReciprocalConstexpr(const Vector_& vector_)
+	{
+		if constexpr (std::is_floating_point_v<OutFloatingPoint_>)
+		{
+			return OutFloatingPoint_(1.0) / VectorMagnitudeConstexpr<OutFloatingPoint_, Vector_>(vector_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to retrieve an EmuMath vector's magnitude reciprocal with a non-floating-point output type.");
+		}
+	}
+	template<typename OutFloatingPoint_ = float, class Vector_>
+	[[nodiscard]] inline OutFloatingPoint_ VectorMagnitudeReciprocal(const Vector_& vector_)
+	{
+		if constexpr (std::is_floating_point_v<OutFloatingPoint_>)
+		{
+			return OutFloatingPoint_(1.0) / VectorMagnitude<OutFloatingPoint_, Vector_>(vector_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to retrieve an EmuMath vector's magnitude reciprocal with a non-floating-point output type.");
+		}
+	}
+	template<typename OutFloatingPoint_ = float, std::size_t NumNewtonIterations_ = 1, std::size_t MagicConstant_ = 0x5f3759df, class Vector_>
+	[[nodiscard]] inline OutFloatingPoint_ VectorMagnitudeReciprocalQrsqrt(const Vector_& vector_)
+	{
+		if constexpr (std::is_floating_point_v<OutFloatingPoint_>)
+		{
+			return EmuCore::Q_rsqrt<OutFloatingPoint_, NumNewtonIterations_, MagicConstant_, OutFloatingPoint_>
+			(
+				VectorSquareMagnitude<OutFloatingPoint_, Vector_>(vector_)
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to retrieve an EmuMath vector's magnitude reciprocal with a non-floating-point output type.");
+		}
+	}
+
 	/// <summary> Returns a copy of the lowest value within the passed EmuMath vector. </summary>
 	/// <typeparam name="Vector_">Type of vector to find the lowest value of.</typeparam>
 	/// <param name="vector_">EmuMath vector to find the lowest value of.</param>

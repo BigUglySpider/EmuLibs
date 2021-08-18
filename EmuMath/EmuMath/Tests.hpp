@@ -15,6 +15,25 @@
 
 namespace EmuCore::TestingHelpers
 {
+	struct VectorFiller
+	{
+		constexpr VectorFiller()
+		{
+		}
+		template<typename T_>
+		constexpr inline T_ operator()(const T_& dummy_) const
+		{
+			if constexpr (std::numeric_limits<T_>::max() < std::numeric_limits<int>::max())
+			{
+				return static_cast<T_>((rand() % static_cast<int>(std::numeric_limits<T_>::max())) * 0.33f);
+			}
+			else
+			{
+				return static_cast<T_>(rand() * 0.33f);
+			}
+		}
+	};
+
 	/// <summary> Example which only contains the required items for the test harness. </summary>
 	struct ExampleTest
 	{
@@ -190,7 +209,6 @@ namespace EmuCore::TestingHelpers
 		std::vector<MinType> min_;
 		std::vector<MaxType> max_;
 	};
-
 	struct VectorClampMinMaxSimultaneous
 	{
 		static constexpr bool PASS_LOOP_NUM = true;
@@ -241,13 +259,129 @@ namespace EmuCore::TestingHelpers
 		std::vector<MaxType> max_;
 	};
 
+	struct VectorMagRecipTest_Normal
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 5000000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+		static constexpr std::string_view NAME = "Mag Reciprocal (Normal)";
+
+		using vector_type = EmuMath::Vector<3, float>;
+		using floating_point = vector_type::preferred_floating_point;
+
+		VectorMagRecipTest_Normal()
+		{
+		}
+		void Prepare()
+		{
+			in_.resize(NUM_LOOPS);
+			out_.resize(NUM_LOOPS);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				in_[i] = EmuMath::Helpers::VectorMutate(in_[i], VectorFiller());
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			out_[i] = EmuMath::Helpers::VectorMagnitudeReciprocal<floating_point>(in_[i]);
+		}
+		void OnTestsOver()
+		{
+			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
+			std::cout << "MagRecip(" << in_[i] << "): " << out_[i] << "\n";
+		}
+		std::vector<vector_type> in_;
+		std::vector<floating_point> out_;
+	};
+
+	struct VectorMagRecipTest_Qrsqrt
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 5000000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+		static constexpr std::string_view NAME = "Mag Reciprocal (Q_rsqrt)";
+
+		using vector_type = EmuMath::Vector<3, float>;
+		using floating_point = vector_type::preferred_floating_point;
+
+		VectorMagRecipTest_Qrsqrt()
+		{
+		}
+		void Prepare()
+		{
+			in_.resize(NUM_LOOPS);
+			out_.resize(NUM_LOOPS);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				in_[i] = EmuMath::Helpers::VectorMutate(in_[i], VectorFiller());
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			out_[i] = EmuMath::Helpers::VectorMagnitudeReciprocalQrsqrt<floating_point>(in_[i]);
+		}
+		void OnTestsOver()
+		{
+			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
+			std::cout << "MagRecipQrsqrt(" << in_[i] << "): " << out_[i] << "\n";
+		}
+		std::vector<vector_type> in_;
+		std::vector<floating_point> out_;
+	};
+
+	struct VectorMagRecipTest_Constexpr
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 5000000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+		static constexpr std::string_view NAME = "Mag Reciprocal (constexpr)";
+
+		using vector_type = EmuMath::Vector<3, float>;
+		using floating_point = vector_type::preferred_floating_point;
+
+		VectorMagRecipTest_Constexpr()
+		{
+		}
+		void Prepare()
+		{
+			in_.resize(NUM_LOOPS);
+			out_.resize(NUM_LOOPS);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				in_[i] = EmuMath::Helpers::VectorMutate(in_[i], VectorFiller());
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			out_[i] = EmuMath::Helpers::VectorMagnitudeReciprocalConstexpr<floating_point>(in_[i]);
+		}
+		void OnTestsOver()
+		{
+			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
+			std::cout << "MagRecipConstexpr(" << in_[i] << "): " << out_[i] << "\n";
+		}
+		std::vector<vector_type> in_;
+		std::vector<floating_point> out_;
+	};
+
 	using SqrtTestFP = float;
 
 	using AllTests = std::tuple
 	<
-		VectorClampMinMaxSequential,
-		VectorClampMinMaxSimultaneous
+		VectorMagRecipTest_Normal,
+		VectorMagRecipTest_Constexpr,
+		VectorMagRecipTest_Qrsqrt
 	>;
+
+
+
+
+
+
+	// ----------- TESTS BEGIN -----------
 
 	template<std::size_t Index_>
 	void PrepareAllTests(AllTests& tests)

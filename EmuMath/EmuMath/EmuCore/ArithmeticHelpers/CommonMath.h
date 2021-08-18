@@ -231,6 +231,45 @@ namespace EmuCore
 		template<typename T>
 		static constexpr T SQRT_3 = SQRT_N<T, std::uint8_t, 3>;
 	};
+
+	/// <summary>
+	/// <para> Performs Newton's Method for a specified number of iterations, using the provided. </para>
+	/// <para> Each iteration can be summarised as: y_ = y_ * (constant_ - (x_ * y_ * y_)). </para>
+	/// <para> After the final iteration of this calculation, the value of y_ is returned. </para>
+	/// </summary>
+	/// <typeparam name="OutT_">Type to output the result as.</typeparam>
+	/// <typeparam name="InX_">Type used for the x_ argument.</typeparam>
+	/// <typeparam name="InY_">Type used for the y_ argument.</typeparam>
+	/// <typeparam name="ConstantT_">Type used for the constant_ argument.</typeparam>
+	/// <param name="x_">Value that will be constantly used as x_ in the described calculation every iteration.</param>
+	/// <param name="y_">Initial value of y_ before iterating the described calculation.</param>
+	/// <param name="constant_">Value used as constant_ in the described calculation every iteration.</param>
+	/// <returns>Result of Newton's Method being performed for the provided number of iterations with the provided operands.</returns>
+	template<std::size_t NumIterations_, typename OutT_ = float, typename InX_, typename InY_, typename ConstantT_, std::size_t CurrentIteration_ = 0>
+	constexpr inline OutT_ NewtonsMethod(const InX_ x_, const InY_ y_, const ConstantT_ constant_)
+	{
+		if constexpr (CurrentIteration_ < NumIterations_)
+		{
+			return NewtonsMethod<NumIterations_, OutT_, InX_, InY_, ConstantT_, CurrentIteration_ + 1>(x_, static_cast<InY_>(y_ * (constant_ - (x_ * y_ * y_))), constant_);
+		}
+		else
+		{
+			return static_cast<OutT_>(y_);
+		}
+	}
+
+	template<typename OutFloatingPoint_ = float, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5f3759df, typename InT_>
+	inline OutFloatingPoint_ Q_rsqrt(const InT_ in_)
+	{
+		using int_type = std::int32_t;
+
+		float y_ = static_cast<float>(in_);
+		float x_ = y_ * 0.5f;
+		int_type i_ = *reinterpret_cast<const int_type*>(&y_);
+		i_ = MagicConstant_ - (i_ >> 1);
+		y_ = *reinterpret_cast<const float*>(&i_);
+		return NewtonsMethod<NumNewtonIterations_, OutFloatingPoint_, float, float, float>(x_, y_, 1.5f);
+	}
 }
 
 #endif
