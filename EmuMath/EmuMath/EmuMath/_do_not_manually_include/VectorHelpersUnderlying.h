@@ -1190,9 +1190,96 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		}
 		else
 		{
-
+			_perform_vector_per_element_comparison_rhs_scalar<0, OutVector_, Comparison_, LhsVector_, Rhs_>(lhs_, rhs_, out_, cmpFunc_);
 		}
 		return out_;
+	}
+
+
+	template<std::size_t Index_, bool IncludeNonContained_, class LhsVector_, class RhsVector_, class Comparator_, class Combiner_>
+	[[nodiscard]] constexpr inline bool _vector_overall_comparison(const LhsVector_& lhs_, const RhsVector_& rhs_, Comparator_& cmp_, Combiner_& combiner_, bool out_)
+	{
+		if constexpr (IncludeNonContained_)
+		{
+			// ALL ELEMENTS OF LHS AND RHS, NON-EXISTEND ASSUMED AS DEFAULT CONSTRUCTED
+			if constexpr (Index_ < LhsVector_::size || Index_ < RhsVector_::size)
+			{
+				if constexpr (Index_ < LhsVector_::size)
+				{
+					if constexpr (Index_ < RhsVector_::size)
+					{
+						return _vector_overall_comparison<Index_ + 1, IncludeNonContained_, LhsVector_, RhsVector_, Comparator_, Combiner_>
+						(
+							lhs_,
+							rhs_,
+							cmp_,
+							combiner_,
+							static_cast<bool>(cmp_(_get_vector_data<Index_>(lhs_), _get_vector_data<Index_>(rhs_)))
+						);
+					}
+					else
+					{
+						return _vector_overall_comparison<Index_ + 1, IncludeNonContained_, LhsVector_, RhsVector_, Comparator_, Combiner_>
+						(
+							lhs_,
+							rhs_,
+							cmp_,
+							combiner_,
+							static_cast<bool>(cmp_(_get_vector_data<Index_>(lhs_), typename RhsVector_::value_type()))
+						);
+					}
+				}
+				else
+				{
+					// Only reach this point if RhsVector_ is in Index_ range but LhsVector_ is not.
+					return _vector_overall_comparison<Index_ + 1, IncludeNonContained_, LhsVector_, RhsVector_, Comparator_, Combiner_>
+					(
+						lhs_,
+						rhs_,
+						cmp_,
+						combiner_,
+						static_cast<bool>(cmp_(typename LhsVector_::value_type(), _get_vector_data<Index_>(rhs_)))
+					);
+				}
+			}
+			else
+			{
+				return out_;
+			}
+		}
+		else
+		{
+			// ONLY INCLUDING LHS ELEMENTS
+			if constexpr (Index_ < LhsVector_::size)
+			{
+				if constexpr (Index_ < RhsVector_::size)
+				{
+					return _vector_overall_comparison<Index_ + 1, IncludeNonContained_, LhsVector_, RhsVector_, Comparator_, Combiner_>
+					(
+						lhs_,
+						rhs_,
+						cmp_,
+						combiner_,
+						static_cast<bool>(cmp_(_get_vector_data<Index_>(lhs_), _get_vector_data<Index_>(rhs_)))
+					);
+				}
+				else
+				{
+					return out_;
+				}
+			}
+			else
+			{
+				return out_;
+			}
+		}
+	}
+	template<bool IncludeNonContained_, class LhsVector_, class RhsVector_, class Comparator_, class Combiner_>
+	[[nodiscard]] constexpr inline bool _vector_overall_comparison(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	{
+		Comparator_ cmp_ = Comparator_();
+		Combiner_ combiner_ = Combiner_();
+		return _vector_overall_comparison<0, IncludeNonContained_, LhsVector_, RhsVector_, Comparator_, Combiner_>(lhs_, rhs_, cmp_, combiner_, false);
 	}
 #pragma endregion
 

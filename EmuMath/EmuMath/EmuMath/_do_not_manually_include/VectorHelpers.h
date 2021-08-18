@@ -170,6 +170,39 @@ namespace EmuMath::Helpers
 	/// <typeparam name="Vector_">Type of vector to create a shuffled reference vector of.</typeparam>
 	/// <param name="vector_">EmuMath vector to create a shuffled reference vector of.</param>
 	/// <returns>
+	///		Shuffled constant reference vector containing a number of elements equal to the provided number of index arguments.
+	///		Elements are references to the elements at specified indices within the passed vector.
+	/// </returns>
+	template<std::size_t X_, std::size_t...RemainingShuffleIndices_, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::ConstRefVector<sizeof...(RemainingShuffleIndices_) + 1, typename Vector_::value_type> VectorShuffledConstReference
+	(
+		const Vector_& vector_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return EmuMath::ConstRefVector<sizeof...(RemainingShuffleIndices_) + 1, typename Vector_::value_type>
+			(
+				_underlying_vector_funcs::_get_vector_data<X_>(vector_),
+				_underlying_vector_funcs::_get_vector_data<RemainingShuffleIndices_>(vector_)...
+			);
+		}
+		else
+		{
+			static_assert(false, "Failed to retrieve a shuffled EmuMath vector constant reference as the provided argument was not an EmuMath vector.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Creates a vector containing a number of reference elements equal to the provided number of indices. </para>
+	/// <para>
+	///		Each provided index references an index within the passed vector, 
+	///		which will be referenced in the output vector's index of the index's place in the provided indices.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="Vector_">Type of vector to create a shuffled reference vector of.</typeparam>
+	/// <param name="vector_">EmuMath vector to create a shuffled reference vector of.</param>
+	/// <returns>
 	///		Shuffled reference vector containing a number of elements equal to the provided number of index arguments.
 	///		Elements are references to the elements at specified indices within the passed vector.
 	/// </returns>
@@ -192,37 +225,13 @@ namespace EmuMath::Helpers
 			static_assert(false, "Failed to retrieve a shuffled EmuMath vector reference as the provided argument was not an EmuMath vector.");
 		}
 	}
-	/// <summary>
-	/// <para> Creates a vector containing a number of reference elements equal to the provided number of indices. </para>
-	/// <para>
-	///		Each provided index references an index within the passed vector, 
-	///		which will be referenced in the output vector's index of the index's place in the provided indices.
-	/// </para>
-	/// </summary>
-	/// <typeparam name="Vector_">Type of vector to create a shuffled reference vector of.</typeparam>
-	/// <param name="vector_">EmuMath vector to create a shuffled reference vector of.</param>
-	/// <returns>
-	///		Shuffled constant reference vector containing a number of elements equal to the provided number of index arguments.
-	///		Elements are references to the elements at specified indices within the passed vector.
-	/// </returns>
 	template<std::size_t X_, std::size_t...RemainingShuffleIndices_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::ConstRefVector<sizeof...(RemainingShuffleIndices_) + 1, typename Vector_::value_type> VectorShuffledReference
 	(
 		const Vector_& vector_
 	)
 	{
-		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
-		{
-			return EmuMath::RefVector<sizeof...(RemainingShuffleIndices_) + 1, typename Vector_::value_type>
-			(
-				_underlying_vector_funcs::_get_vector_data<X_>(vector_),
-				_underlying_vector_funcs::_get_vector_data<RemainingShuffleIndices_>(vector_)...
-			);
-		}
-		else
-		{
-			static_assert(false, "Failed to retrieve a shuffled EmuMath vector reference as the provided argument was not an EmuMath vector.");
-		}
+		return VectorShuffledConstReference<X_, RemainingShuffleIndices_...>(vector_);
 	}
 #pragma endregion
 
@@ -1246,6 +1255,27 @@ namespace EmuMath::Helpers
 #pragma endregion
 
 #pragma region COMPARISONS
+	template<bool TestAllIndices_ = true, class LhsVector_, class RhsVector_>
+	[[nodiscard]] constexpr inline bool VectorCmpEqualTo(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<RhsVector_>)
+			{
+				using Comparator_ = EmuCore::do_cmp_equal_to<typename LhsVector_::value_type, typename RhsVector_::value_type>;
+				return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, LhsVector_, RhsVector_, Comparator_, std::logical_or<void>>(lhs_, rhs_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a vector equality comparison, but the provided right-hand argument was not an EmuMath vector.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a vector equality comparison, but the provided left-hand argument was not an EmuMath vector.");
+		}
+	}
+
 	/// <summary>
 	/// <para> Returns a vector of booleans containing the results of comparing lhs_ with rhs_ via the provided cmpFunc_. </para>
 	/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise (e.g. rhs_ is a scalar), all elements of lhs_ will be compared with rhs_. </para>

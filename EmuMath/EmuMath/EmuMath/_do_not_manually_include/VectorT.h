@@ -23,6 +23,10 @@ namespace EmuMath
 		using value_type = typename EmuCore::TMPHelpers::get_value_type<contained_type>::type;
 		/// <summary> The preferred floating point type for this vector. Float if this vector contains non-floating-point types, otherwise matches value_type. </summary>
 		using preferred_floating_point = EmuCore::TMPHelpers::first_floating_point_t<value_type, float>;
+		/// <summary> Boolean indicating if the reference wrappers within this vector contain constant references. Always false if contains_reference_wrappers is false. </summary>
+		static constexpr bool contains_const_reference_wrappers = std::is_const_v<value_type> && contains_reference_wrappers;
+		/// <summary> Boolean indicating if the reference wrappers within this vector contain non-constant references. Always false if contains_reference_wrappers is false. </summary>
+		static constexpr bool contains_non_const_reference_wrappers = contains_reference_wrappers && !contains_const_reference_wrappers;
 
 		/// <summary> The number of elements contained in this vector. </summary>
 		static constexpr std::size_t size = Size_;

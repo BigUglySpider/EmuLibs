@@ -71,6 +71,20 @@ int main()
 	constexpr auto shifted_left_vector_shifts = EmuMath::Helpers::VectorShiftLeft(some_uint_vector, EmuMath::TMP::make_emu_vector<float>(1, 2, 3, 4, 5, 6, 7, 8));
 	constexpr auto shifted_right_vector_shifts = EmuMath::Helpers::VectorShiftRight(some_uint_vector, EmuMath::TMP::make_emu_vector<float>(1, 1, 1, 1, 5));
 
+	constexpr auto vec_a = EmuMath::TMP::make_emu_vector<float>(1.0f, 2.0f, 3.0f);
+	constexpr auto vec_b = EmuMath::TMP::make_emu_vector<std::uint64_t>(1, 2, 3);
+	constexpr auto vec_c = EmuMath::TMP::make_emu_vector<float>(1.1f, 2.0f, 3.0f);
+	auto vec_d = EmuMath::Helpers::VectorShuffledReference<0, 1, 2, 0>(vec_a);
+	auto vec_e = EmuMath::Vector<10, double>(vec_d);
+	std::cout << vec_e << "\n";
+
+
+	// NOTE: TESTING EmuMath::VectorCmpEqualTo
+	std::cout << vec_a << " == " << vec_b << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_a, vec_b) << "\n";
+	std::cout << vec_b << " == " << vec_c << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_b, vec_c) << "\n";
+	std::cout << vec_a << " == " << vec_d << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_a, vec_d) << "\n";
+	std::cout << vec_a << " == " << vec_d << " (Don't inlcude non-contained): " << EmuMath::Helpers::VectorCmpEqualTo<false>(vec_a, vec_d) << "\n";
+
 #pragma region TEST_HARNESS_EXECUTION
 	EmuCore::TestingHelpers::PerformTests();
 #pragma endregion
