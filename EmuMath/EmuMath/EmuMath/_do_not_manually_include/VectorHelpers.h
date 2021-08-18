@@ -369,12 +369,16 @@ namespace EmuMath::Helpers
 	}
 
 	/// <summary>
-	/// <para>  </para>
+	/// <para> Calculates the reciprocal to the passed EmuMath vector's magnitude. </para>
+	/// <para>
+	///		To be executed at compile-time, this function may make some sacrifices. 
+	///		As such, VectorMagnitudeReciprocal or VectorMagnitudeReciprocalQrsqrt are recommended to be used instead if this is being called at runtime.
+	/// </para>
 	/// </summary>
-	/// <typeparam name="OutFloatingPoint_"></typeparam>
-	/// <typeparam name="Vector_"></typeparam>
-	/// <param name="vector_"></param>
-	/// <returns></returns>
+	/// <typeparam name="OutFloatingPoint_">Type to output the magnitude reciprocal as.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to find the reciprocal to the magnitude of.</typeparam>
+	/// <param name="vector_">EmuMath vector to find the reciprocal to the magnitude of.</param>
+	/// <returns>Reciprocal to the passed EmuMath vector's magnitude, represented as the provided OutFloatingPoint_ type.</returns>
 	template<typename OutFloatingPoint_ = float, class Vector_>
 	[[nodiscard]] constexpr inline OutFloatingPoint_ VectorMagnitudeReciprocalConstexpr(const Vector_& vector_)
 	{
@@ -387,6 +391,13 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to retrieve an EmuMath vector's magnitude reciprocal with a non-floating-point output type.");
 		}
 	}
+	/// <summary>
+	/// <para> Calculates the reciprocal to the passed EmuMath vector's magnitude. </para>
+	/// </summary>
+	/// <typeparam name="OutFloatingPoint_">Type to output the magnitude reciprocal as.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to find the reciprocal to the magnitude of.</typeparam>
+	/// <param name="vector_">EmuMath vector to find the reciprocal to the magnitude of.</param>
+	/// <returns>Reciprocal to the passed EmuMath vector's magnitude, represented as the provided OutFloatingPoint_ type.</returns>
 	template<typename OutFloatingPoint_ = float, class Vector_>
 	[[nodiscard]] inline OutFloatingPoint_ VectorMagnitudeReciprocal(const Vector_& vector_)
 	{
@@ -399,7 +410,15 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to retrieve an EmuMath vector's magnitude reciprocal with a non-floating-point output type.");
 		}
 	}
-	template<typename OutFloatingPoint_ = float, std::size_t NumNewtonIterations_ = 1, std::size_t MagicConstant_ = 0x5f3759df, class Vector_>
+	/// <summary>
+	/// <para> Calculates the reciprocal to the passed EmuMath vector's magnitude, using the Q_rsqrt method. </para>
+	/// <para> A custom number of newton iterations may be provided to increase accuracy. Additionally, the maigc constant may also be changed from 0x5F3759DF. </para>
+	/// </summary>
+	/// <typeparam name="OutFloatingPoint_">Type to output the magnitude reciprocal as.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to find the reciprocal to the magnitude of.</typeparam>
+	/// <param name="vector_">EmuMath vector to find the reciprocal to the magnitude of.</param>
+	/// <returns>Reciprocal to the passed EmuMath vector's magnitude, represented as the provided OutFloatingPoint_ type.</returns>
+	template<typename OutFloatingPoint_ = float, std::size_t NumNewtonIterations_ = 1, std::size_t MagicConstant_ = 0x5F3759DF, class Vector_>
 	[[nodiscard]] inline OutFloatingPoint_ VectorMagnitudeReciprocalQrsqrt(const Vector_& vector_)
 	{
 		if constexpr (std::is_floating_point_v<OutFloatingPoint_>)

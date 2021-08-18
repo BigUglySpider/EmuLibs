@@ -258,17 +258,37 @@ namespace EmuCore
 		}
 	}
 
-	template<typename OutFloatingPoint_ = float, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5f3759df, typename InT_>
+	/// <summary>
+	/// <para> Calculates the reciprocal to the square root of the passed in_ value, represented as the provided OutFloatingPoint_ type. </para>
+	/// <para> By default, performs 1 Newton's Method iteration to improve accuracy. More iterations may be requested to increase accuracy. </para>
+	/// <para> A magic constant is used for some bit manipulation. It is recommended to only change this from the default (0x5F3759DF) if you know what you are doing. </para>
+	/// <para> More information regarding the algorithm may be found here: https://en.wikipedia.org/wiki/Fast_inverse_square_root#Overview_of_the_code </para>
+	/// </summary>
+	/// <typeparam name="InT_">Type being input to find the reciprocal to the square root of.</typeparam>
+	/// <typeparam name="OutFloatingPoint_">Type to output the reciprocal as.</typeparam>
+	/// <param name="in_">Value to find the reciprocal to the square root of.</param>
+	/// <returns>
+	///		Close approximation of the reciprocal to the provided in_ value's square root, represented as the provided OutFloatingPoint_. 
+	///		The accuracy of this value increases with more newton iterations.
+	/// </returns>
+	template<typename OutFloatingPoint_ = float, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, typename InT_>
 	inline OutFloatingPoint_ Q_rsqrt(const InT_ in_)
 	{
-		using int_type = std::int32_t;
+		if constexpr (std::is_floating_point_v<OutFloatingPoint_>)
+		{
+			using int_type = std::int32_t;
 
-		float y_ = static_cast<float>(in_);
-		float x_ = y_ * 0.5f;
-		int_type i_ = *reinterpret_cast<const int_type*>(&y_);
-		i_ = MagicConstant_ - (i_ >> 1);
-		y_ = *reinterpret_cast<const float*>(&i_);
-		return NewtonsMethod<NumNewtonIterations_, OutFloatingPoint_, float, float, float>(x_, y_, 1.5f);
+			float y_ = static_cast<float>(in_);
+			float x_ = y_ * 0.5f;
+			int_type i_ = *reinterpret_cast<const int_type*>(&y_);
+			i_ = MagicConstant_ - (i_ >> 1);
+			y_ = *reinterpret_cast<const float*>(&i_);
+			return NewtonsMethod<NumNewtonIterations_, OutFloatingPoint_, float, float, float>(x_, y_, 1.5f);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform Q_rsqrt with a non-floating-point output type.");
+		}
 	}
 }
 
