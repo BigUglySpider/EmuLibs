@@ -288,16 +288,38 @@ namespace EmuCore::TMPHelpers
 	{
 		using type = T_;
 	};
-	template<template<typename T__> class Template_, typename T_>
-	struct get_value_type<Template_<T_>>
+	template<template<typename...Ts__> class Template_, typename...Ts_>
+	struct get_value_type<Template_<Ts_...>>
 	{
-		using type = typename Template_<T_>::value_type;
+		using type = typename Template_<Ts_...>::value_type;
+	};
+	template<template<std::size_t Size__, typename Ts__> class Template_, std::size_t Size_, typename...Ts_>
+	struct get_value_type<Template_<Size_, Ts_...>>
+	{
+		using type = typename Template_<Size_, Ts_...>::value_type;
+	};
+	template<template<std::size_t SizeX__, std::size_t SizeY__, typename Ts__> class Template_, std::size_t SizeX_, std::size_t SizeY_, typename...Ts_>
+	struct get_value_type<Template_<SizeX_, SizeY_, Ts_...>>
+	{
+		using type = typename Template_<SizeX_, SizeY_, Ts_...>::value_type;
+	};
+	template<template<typename T__, std::size_t Size__> class Template_, typename T_, std::size_t Size_>
+	struct get_value_type<Template_<T_, Size_>>
+	{
+		using type = typename Template_<T_, Size_>::value_type;
+	};
+	template<template<typename T__, std::size_t SizeX__, std::size_t SizeY__> class Template_, typename T_, std::size_t SizeX_, std::size_t SizeY_>
+	struct get_value_type<Template_<T_, SizeX_, SizeY_>>
+	{
+		using type = typename Template_<T_, SizeX_, SizeY_>::value_type;
 	};
 	template<typename T_>
 	struct get_value_type<std::reference_wrapper<T_>>
 	{
 		using type = typename std::reference_wrapper<T_>::type;
 	};
+	template<typename T_>
+	using get_value_type_t = typename get_value_type<T_>::type;
 }
 
 #endif
