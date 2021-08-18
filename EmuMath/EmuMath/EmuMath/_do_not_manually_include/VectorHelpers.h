@@ -2061,6 +2061,17 @@ namespace EmuMath::Helpers
 		return VectorShiftRight<Vector_::size, typename Vector_::value_type, Vector_, Shifts_>(vector_, num_shifts_);
 	}
 
+	/// <summary>
+	/// <para> Perform a bitwise AND with all elements of the lhs_ vector with the rhs_, depending on the type rhs_ is passed as. </para>
+	/// <para> If rhs_ is an EmuMath vector, respective elements will be ANDed, otherwise all elements in lhs_ will be ANDed with the value of rhs_ itself. </para>
+	/// <para> This operatoion is carried out by EmuCore::do_bitwise_and&lt;LhsVector_::value_type, Rhs_::value_type (or just Rhs_ if not a vector)&gt;. </para>
+	/// </summary>
+	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="LhsVector_">Type of vector appearing on the left-hand side of AND operations.</typeparam>
+	/// <typeparam name="Rhs_">Type of vector or scalar appearing the the right-hand side of AND operations.</typeparam>
+	/// <param name="lhs_">EmuMath vector appearing on the left-hand side of AND operations.</param>
+	/// <param name="rhs_">EmuMath vector or scalar appearing on the left-hand side of AND operations.</param>
+	/// <returns>EmuMath vector containing the results of bitwise ANDing the provided operands.</returns>
 	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorAnd(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
@@ -2099,6 +2110,17 @@ namespace EmuMath::Helpers
 		return VectorAnd<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
+	/// <summary>
+	/// <para> Perform a bitwise OR with all elements of the lhs_ vector with the rhs_, depending on the type rhs_ is passed as. </para>
+	/// <para> If rhs_ is an EmuMath vector, respective elements will be ORed, otherwise all elements in lhs_ will be ORed with the value of rhs_ itself. </para>
+	/// <para> This operatoion is carried out by EmuCore::do_bitwise_or&lt;LhsVector_::value_type, Rhs_::value_type (or just Rhs_ if not a vector)&gt;. </para>
+	/// </summary>
+	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="LhsVector_">Type of vector appearing on the left-hand side of OR operations.</typeparam>
+	/// <typeparam name="Rhs_">Type of vector or scalar appearing the the right-hand side of OR operations.</typeparam>
+	/// <param name="lhs_">EmuMath vector appearing on the left-hand side of OR operations.</param>
+	/// <param name="rhs_">EmuMath vector or scalar appearing on the left-hand side of OR operations.</param>
+	/// <returns>EmuMath vector containing the results of bitwise ORing the provided operands.</returns>
 	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorOr(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
@@ -2137,6 +2159,17 @@ namespace EmuMath::Helpers
 		return VectorOr<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
+	/// <summary>
+	/// <para> Perform a bitwise XOR with all elements of the lhs_ vector with the rhs_, depending on the type rhs_ is passed as. </para>
+	/// <para> If rhs_ is an EmuMath vector, respective elements will be XORed, otherwise all elements in lhs_ will be XORed with the value of rhs_ itself. </para>
+	/// <para> This operatoion is carried out by EmuCore::do_bitwise_xor&lt;LhsVector_::value_type, Rhs_::value_type (or just Rhs_ if not a vector)&gt;. </para>
+	/// </summary>
+	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="LhsVector_">Type of vector appearing on the left-hand side of XOR operations.</typeparam>
+	/// <typeparam name="Rhs_">Type of vector or scalar appearing the the right-hand side of XOR operations.</typeparam>
+	/// <param name="lhs_">EmuMath vector appearing on the left-hand side of XOR operations.</param>
+	/// <param name="rhs_">EmuMath vector or scalar appearing on the left-hand side of XOR operations.</param>
+	/// <returns>EmuMath vector containing the results of bitwise XOR the provided operands.</returns>
 	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorXor(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
@@ -2175,6 +2208,14 @@ namespace EmuMath::Helpers
 		return VectorXor<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
+	/// <summary>
+	/// <para> Performs a bitwise NOT on all elements within the passed vector and outputs the results in the return vector. </para>
+	/// <para> This operatoion is carried out by EmuCore::do_bitwise_not&lt;Vector_::value_type&gt;. </para>
+	/// </summary>
+	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to perform the bitwise NOT operation on.</typeparam>
+	/// <param name="vector_">EmuMath vector to perform the bitwise NOT operation on.</param>
+	/// <returns>EmuMath vector containing the results of the bitwise NOT operation on the passed vector_.</returns>
 	template<std::size_t OutSize_, typename out_value_type, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorNot(const Vector_& vector_)
 	{
@@ -2363,6 +2404,54 @@ namespace EmuCore
 #pragma endregion
 
 #pragma region BITWISE
+	template<std::size_t Size_, typename T_, typename Rhs_>
+	struct do_bitwise_and<EmuMath::Vector<Size_, T_>, Rhs_>
+	{
+		constexpr do_bitwise_and()
+		{
+		}
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_)
+		{
+			return EmuMath::Helpers::VectorAnd<Size_, T_, EmuMath::Vector<Size_, T_>, Rhs_>(lhs_, rhs_);
+		}
+	};
+
+	template<std::size_t Size_, typename T_, typename Rhs_>
+	struct do_bitwise_or<EmuMath::Vector<Size_, T_>, Rhs_>
+	{
+		constexpr do_bitwise_or()
+		{
+		}
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_)
+		{
+			return EmuMath::Helpers::VectorOr<Size_, T_, EmuMath::Vector<Size_, T_>, Rhs_>(lhs_, rhs_);
+		}
+	};
+
+	template<std::size_t Size_, typename T_, typename Rhs_>
+	struct do_bitwise_xor<EmuMath::Vector<Size_, T_>, Rhs_>
+	{
+		constexpr do_bitwise_xor()
+		{
+		}
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_)
+		{
+			return EmuMath::Helpers::VectorXor<Size_, T_, EmuMath::Vector<Size_, T_>, Rhs_>(lhs_, rhs_);
+		}
+	};
+
+	template<std::size_t Size_, typename T_>
+	struct do_bitwise_not<EmuMath::Vector<Size_, T_>>
+	{
+		constexpr do_bitwise_not()
+		{
+		}
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_)
+		{
+			return EmuMath::Helpers::VectorNot<Size_, T_, EmuMath::Vector<Size_, T_>>(vector_);
+		}
+	};
+
 	template<std::size_t Size_, typename T_, typename Shifts_>
 	struct do_left_shift<EmuMath::Vector<Size_, T_>, Shifts_>
 	{
