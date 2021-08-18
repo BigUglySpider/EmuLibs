@@ -1255,24 +1255,155 @@ namespace EmuMath::Helpers
 #pragma endregion
 
 #pragma region COMPARISONS
-	template<bool TestAllIndices_ = true, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline bool VectorCmpEqualTo(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	/// <summary>
+	/// <para> Performs an equality comparison with the type of comparison depending on the passed rhs_ argument. </para>
+	/// <para>
+	///		If the rhs_ argument is an EmuMath vector, this will compare respective elements of both vectors. 
+	///		Otherwise, rhs_ will be assumed as scalar, and the magnitude of the lhs_ vector will be compared to rhs_.
+	/// </para>
+	/// <para>
+	///		If TestAllIndices is true, comparisons will continue until both vector indices are exhausted. Otherwise, comparison will only go to the end of the smallest vector. 
+	///		This argument is not used if rhs_ is not an EmuMath vector.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">Type of EmuMath vector that appears on the left-hand side of comparisons.</typeparam>
+	/// <typeparam name="Rhs_">
+	///		Type of EmuMath vector that appears on the right-hand side of comparisons, or scalar that appears on the right-hand side of a magnitude comparison.
+	/// </typeparam>
+	/// <param name="lhs_">EmuMath vector that appears on the left-hand side of comparisons.</param>
+	/// <param name="rhs_">EmuMath vector that appears on the right-hand side of comparisons, or scalar that appears on the right-hand side of a magnitude comparison.</param>
+	/// <returns>
+	///		<para>If rhs_ is an EmuMath vector: True if comparisons of all respective elements returned true, otherwise false.</para>
+	///		<para>If rhs_ is NOT an EmuMath vector: Result of comparing the lhs_ vector's magnitude with the passed rhs_ value.</para>
+	/// </returns>
+	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline bool VectorCmpEqualTo(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
-			if constexpr (EmuMath::TMP::is_emu_vector_v<RhsVector_>)
-			{
-				using Comparator_ = EmuCore::do_cmp_equal_to<typename LhsVector_::value_type, typename RhsVector_::value_type>;
-				return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, LhsVector_, RhsVector_, Comparator_, std::logical_or<void>>(lhs_, rhs_);
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a vector equality comparison, but the provided right-hand argument was not an EmuMath vector.");
-			}
+			return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, true, EmuCore::do_cmp_equal_to, LhsVector_, Rhs_>(lhs_, rhs_);
 		}
 		else
 		{
 			static_assert(false, "Attempted to perform a vector equality comparison, but the provided left-hand argument was not an EmuMath vector.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Performs an inequality comparison with the type of comparison depending on the passed rhs_ argument. </para>
+	/// <para>
+	///		If the rhs_ argument is an EmuMath vector, this will compare respective elements of both vectors. 
+	///		Otherwise, rhs_ will be assumed as scalar, and the magnitude of the lhs_ vector will be compared to rhs_.
+	/// </para>
+	/// <para>
+	///		If TestAllIndices is true, comparisons will continue until both vector indices are exhausted. Otherwise, comparison will only go to the end of the smallest vector. 
+	///		This argument is not used if rhs_ is not an EmuMath vector.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">Type of EmuMath vector that appears on the left-hand side of comparisons.</typeparam>
+	/// <typeparam name="Rhs_">
+	///		Type of EmuMath vector that appears on the right-hand side of comparisons, or scalar that appears on the right-hand side of a magnitude comparison.
+	/// </typeparam>
+	/// <param name="lhs_">EmuMath vector that appears on the left-hand side of comparisons.</param>
+	/// <param name="rhs_">EmuMath vector that appears on the right-hand side of comparisons, or scalar that appears on the right-hand side of a magnitude comparison.</param>
+	/// <returns>
+	///		<para>If rhs_ is an EmuMath vector: True if comparisons of at least one of the vectors' respective elements returned true, otherwise false.</para>
+	///		<para>If rhs_ is NOT an EmuMath vector: Result of comparing the lhs_ vector's magnitude with the passed rhs_ value.</para>
+	/// </returns>
+	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline bool VectorCmpNotEqualTo(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, false, EmuCore::do_cmp_not_equal_to, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a vector inequality comparison, but the provided left-hand argument was not an EmuMath vector.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Compares the magnitude of the lhs_ vector with that of a rhs_ EmuMath vector, or directly with the value of rhs_ if it is not an EmuMath vector. </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">Type of EmuMath vector appearing on the left of the magnitude comparison.</typeparam>
+	/// <typeparam name="Rhs_">Type of EmuMath vector or scalar appearing on the left of the magnitude comparison.</typeparam>
+	/// <param name="lhs_">EmuMath vector appearing on the left of the magnitude comparison.</param>
+	/// <param name="rhs_">EmuMath vector or scalar appearing on the left of the magnitude comparison.</param>
+	/// <returns>True if the magnitude of lhs_ is greater than that of rhs_ if rhs_ is an EmuMath vector, or greater than rhs_ itself if it is a scalar.</returns>
+	template<class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline bool VectorCmpGreater(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_compare_magnitude<EmuCore::do_cmp_greater, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a vector magnitude comparison, but the provided left-hand argument was not an EmuMath vector.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Compares the magnitude of the lhs_ vector with that of a rhs_ EmuMath vector, or directly with the value of rhs_ if it is not an EmuMath vector. </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">Type of EmuMath vector appearing on the left of the magnitude comparison.</typeparam>
+	/// <typeparam name="Rhs_">Type of EmuMath vector or scalar appearing on the left of the magnitude comparison.</typeparam>
+	/// <param name="lhs_">EmuMath vector appearing on the left of the magnitude comparison.</param>
+	/// <param name="rhs_">EmuMath vector or scalar appearing on the left of the magnitude comparison.</param>
+	/// <returns>True if the magnitude of lhs_ is less than that of rhs_ if rhs_ is an EmuMath vector, or less than rhs_ itself if it is a scalar.</returns>
+	template<class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline bool VectorCmpLess(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_compare_magnitude<EmuCore::do_cmp_less, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a vector magnitude comparison, but the provided left-hand argument was not an EmuMath vector.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Compares the magnitude of the lhs_ vector with that of a rhs_ EmuMath vector, or directly with the value of rhs_ if it is not an EmuMath vector. </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">Type of EmuMath vector appearing on the left of the magnitude comparison.</typeparam>
+	/// <typeparam name="Rhs_">Type of EmuMath vector or scalar appearing on the left of the magnitude comparison.</typeparam>
+	/// <param name="lhs_">EmuMath vector appearing on the left of the magnitude comparison.</param>
+	/// <param name="rhs_">EmuMath vector or scalar appearing on the left of the magnitude comparison.</param>
+	/// <returns>True if the magnitude of lhs_ is greater than or equal to that of rhs_ if rhs_ is an EmuMath vector, or greater than or equal to rhs_ itself if it is a scalar.</returns>
+	template<class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline bool VectorCmpGreaterEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_compare_magnitude<EmuCore::do_cmp_greater_equal, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a vector magnitude comparison, but the provided left-hand argument was not an EmuMath vector.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Compares the magnitude of the lhs_ vector with that of a rhs_ EmuMath vector, or directly with the value of rhs_ if it is not an EmuMath vector. </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">Type of EmuMath vector appearing on the left of the magnitude comparison.</typeparam>
+	/// <typeparam name="Rhs_">Type of EmuMath vector or scalar appearing on the left of the magnitude comparison.</typeparam>
+	/// <param name="lhs_">EmuMath vector appearing on the left of the magnitude comparison.</param>
+	/// <param name="rhs_">EmuMath vector or scalar appearing on the left of the magnitude comparison.</param>
+	/// <returns>True if the magnitude of lhs_ is less than or equal that of rhs_ if rhs_ is an EmuMath vector, or less than or equal to rhs_ itself if it is a scalar.</returns>
+	template<class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline bool VectorCmpLessEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_compare_magnitude<EmuCore::do_cmp_less_equal, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a vector magnitude comparison, but the provided left-hand argument was not an EmuMath vector.");
 		}
 	}
 
@@ -1779,7 +1910,29 @@ namespace EmuCore
 #pragma endregion
 
 #pragma region COMPARATORS
+	template<std::size_t Size_, typename T_, typename Rhs_>
+	struct do_cmp_equal_to<EmuMath::Vector<Size_, T_>, Rhs_>
+	{
+		inline do_cmp_equal_to()
+		{
+		}
+		constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpEqualTo(lhs_, rhs_);
+		}
+	};
 
+	template<std::size_t Size_, typename T_, typename Rhs_>
+	struct do_cmp_not_equal_to<EmuMath::Vector<Size_, T_>, Rhs_>
+	{
+		inline do_cmp_not_equal_to()
+		{
+		}
+		constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpNotEqualTo(lhs_, rhs_);
+		}
+	};
 #pragma endregion
 }
 #pragma endregion
