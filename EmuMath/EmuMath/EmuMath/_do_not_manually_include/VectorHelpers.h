@@ -1933,6 +1933,54 @@ namespace EmuCore
 			return EmuMath::Helpers::VectorCmpNotEqualTo(lhs_, rhs_);
 		}
 	};
+
+	template<std::size_t Size_, typename T_, typename Rhs_>
+	struct do_cmp_greater<EmuMath::Vector<Size_, T_>, Rhs_>
+	{
+		inline do_cmp_greater()
+		{
+		}
+		constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpGreater(lhs_, rhs_);
+		}
+	};
+
+	template<std::size_t Size_, typename T_, typename Rhs_>
+	struct do_cmp_less<EmuMath::Vector<Size_, T_>, Rhs_>
+	{
+		inline do_cmp_less()
+		{
+		}
+		constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpLess(lhs_, rhs_);
+		}
+	};
+
+	template<std::size_t Size_, typename T_, typename Rhs_>
+	struct do_cmp_greater_equal<EmuMath::Vector<Size_, T_>, Rhs_>
+	{
+		inline do_cmp_greater_equal()
+		{
+		}
+		constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpGreaterEqual(lhs_, rhs_);
+		}
+	};
+
+	template<std::size_t Size_, typename T_, typename Rhs_>
+	struct do_cmp_less_equal<EmuMath::Vector<Size_, T_>, Rhs_>
+	{
+		inline do_cmp_less_equal()
+		{
+		}
+		constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpLessEqual(lhs_, rhs_);
+		}
+	};
 #pragma endregion
 }
 #pragma endregion
