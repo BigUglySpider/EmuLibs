@@ -177,68 +177,6 @@ namespace EmuCore
 		}
 	};
 
-	template<typename T_, typename Shifts_>
-	struct do_left_shift
-	{
-		constexpr do_left_shift()
-		{
-		}
-		constexpr inline T_ operator()(const T_& val_, const Shifts_& num_shifts_) const
-		{
-			if constexpr (std::is_arithmetic_v<T_>)
-			{
-				return val_ << static_cast<std::size_t>(num_shifts_);
-			}
-			else
-			{
-				return val_ << num_shifts_;
-			}
-		}
-	};
-	template<>
-	struct do_left_shift<void, void>
-	{
-		constexpr do_left_shift()
-		{
-		}
-		template<typename T_, typename Shifts_>
-		constexpr inline T_ operator()(const T_& val_, const Shifts_& num_shifts_) const
-		{
-			return do_left_shift<T_>()(val_, num_shifts_);
-		}
-	};
-
-	template<typename T_, typename Shifts_>
-	struct do_right_shift
-	{
-		constexpr do_right_shift()
-		{
-		}
-		constexpr inline T_ operator()(const T_& val_, const Shifts_& num_shifts_) const
-		{
-			if constexpr (std::is_arithmetic_v<T_>)
-			{
-				return val_ >> static_cast<std::size_t>(num_shifts_);
-			}
-			else
-			{
-				return val_ >> num_shifts_;
-			}
-		}
-	};
-	template<>
-	struct do_right_shift<void, void>
-	{
-		constexpr do_right_shift()
-		{
-		}
-		template<typename T_, typename Shifts_>
-		constexpr inline T_ operator()(const T_& val_, const Shifts_& num_shifts_) const
-		{
-			return do_right_shift<T_, Shifts_>()(val_, num_shifts_);
-		}
-	};
-
 	template<typename Lhs_, typename Rhs_ = Lhs_>
 	struct do_add
 	{

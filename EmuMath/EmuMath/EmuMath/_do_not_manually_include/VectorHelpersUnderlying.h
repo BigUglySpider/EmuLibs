@@ -1027,22 +1027,86 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Shifts_>)
 		{
 			using shift_value = typename Shifts_::value_type;
-			if constexpr (std::is_convertible_v<shift_value, std::size_t>)
-			{
-				using Shifter_ = ShifterTemplate_<typename Vector_::value_type, typename Shifts_::value_type>;
-				Shifter_ shifter_ = Shifter_();
-				_vector_bitwise_shift_per_element_vector_shifts<0, OutVector_, Vector_, Shifts_, Shifter_>(vector_, num_shifts_, out_, shifter_);
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform a bitwise shift on each element of an EmuMath vector, but the provided vector of shift amounts did not contain types convertible to std::size_t.");
-			}
+			using Shifter_ = ShifterTemplate_<typename Vector_::value_type, typename Shifts_::value_type>;
+			Shifter_ shifter_ = Shifter_();
+			_vector_bitwise_shift_per_element_vector_shifts<0, OutVector_, Vector_, Shifts_, Shifter_>(vector_, num_shifts_, out_, shifter_);
 		}
 		else
 		{
 			using Shifter_ = ShifterTemplate_<typename Vector_::value_type, Shifts_>;
 			Shifter_ shifter_ = Shifter_();
 			_vector_bitwise_shift_per_element_scalar_shifts<0, OutVector_, Vector_, Shifts_, Shifter_>(vector_, num_shifts_, out_, shifter_);
+		}
+		return out_;
+	}
+
+	template<std::size_t Index_, class OutVector_, class LhsVector_, class RhsScalar_, class Func_>
+	constexpr inline void _vector_bitwise_non_shift_op_rhs_scalar(const LhsVector_& lhs_, const RhsScalar_& rhs_, OutVector_& out_, Func_& func_)
+	{
+		if constexpr (Index_ < OutVector_::size)
+		{
+			using out_value = typename OutVector_::value_type;
+			if constexpr (Index_ < LhsVector_::size)
+			{
+				_get_vector_data<Index_>(out_) = static_cast<out_value>(func_(_get_vector_data<Index_>(lhs_), rhs_));
+				_vector_bitwise_non_shift_op_rhs_scalar<Index_ + 1, OutVector_, LhsVector_, RhsScalar_, Func_>(lhs_, rhs_, out_, func_);
+			}
+			else
+			{
+				// All remaining results will be the same, so defer to assignment
+				_assign_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(func_(typename LhsVector_::value_type(), rhs_)));
+			}
+		}
+	}
+	template<std::size_t Index_, class OutVector_, class LhsVector_, class RhsVector_, class Func_>
+	constexpr inline void _vector_bitwise_non_shift_op_rhs_vector(const LhsVector_& lhs_, const RhsVector_& rhs_, OutVector_& out_, Func_& func_)
+	{
+		if constexpr (Index_ < OutVector_::size)
+		{
+			using out_value = typename OutVector_::value_type;
+			if constexpr (Index_ < LhsVector_::size)
+			{
+				if constexpr (Index_ < RhsVector_::size)
+				{
+					_get_vector_data<Index_>(out_) = static_cast<out_value>(func_(_get_vector_data<Index_>(lhs_), _get_vector_data<Index_>(rhs_)));
+					_vector_bitwise_non_shift_op_rhs_vector<Index_ + 1, OutVector_, LhsVector_, RhsVector_, Func_>(lhs_, rhs_, out_, func_);
+				}
+				else
+				{
+					// Defer remaining calls to scalar variant since we'd just keep constructing a new rhs_value for remaining calls otherwise.
+					using rhs_value = typename RhsVector_::value_type;
+					_vector_bitwise_non_shift_op_rhs_scalar<Index_, OutVector_, LhsVector_, rhs_value, Func_>(lhs_, rhs_value(), out_, func_);
+				}
+			}
+			else
+			{
+				if constexpr (Index_ < RhsVector_::size)
+				{
+					_get_vector_data<Index_>(out_) = static_cast<out_value>(func_(typename LhsVector_::value_type(), _get_vector_data<Index_>(rhs_)));
+					_vector_bitwise_non_shift_op_rhs_vector<Index_ + 1, OutVector_, LhsVector_, RhsVector_, Func_>(lhs_, rhs_, out_, func_);
+				}
+				else
+				{
+					// Defer remaining calls to assignment, since the remaining values will all be the same result we can cut out the middleman here
+					using lhs_value = typename LhsVector_::value_type;
+					using rhs_value = typename RhsVector_::value_type;
+					_assign_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(func_(lhs_value(), rhs_value())));
+				}
+			}
+		}
+	}
+	template<class OutVector_, class LhsVector_, class Rhs_, class Func_>
+	[[nodiscard]] constexpr inline OutVector_ _vector_bitwise_non_shift_op(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		OutVector_ out_ = OutVector_();
+		Func_ func_ = Func_();
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
+		{
+			_vector_bitwise_non_shift_op_rhs_vector<0, OutVector_, LhsVector_, Rhs_, Func_>(lhs_, rhs_, out_, func_);
+		}
+		else
+		{
+			_vector_bitwise_non_shift_op_rhs_scalar<0, OutVector_, LhsVector_, Rhs_, Func_>(lhs_, rhs_, out_, func_);
 		}
 		return out_;
 	}

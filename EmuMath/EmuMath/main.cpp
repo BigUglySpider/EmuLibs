@@ -2,9 +2,13 @@
 
 #include "EmuMath/Vector.h"
 #include <array>
+#include <bitset>
 #include <iomanip>
 
 using namespace EmuCore::TestingHelpers;
+
+template<typename T_>
+using simple_bitset = std::bitset<sizeof(T_) * CHAR_BIT>;
 
 template<typename T_, std::size_t Size_>
 inline std::ostream& operator<<(std::ostream& stream_, const std::array<T_, Size_>& arr_)
@@ -124,10 +128,24 @@ int main()
 	std::cout << "MagRecipConstexpr(" << vec_a << "): " << vec_a_mag_recip_constexpr << "\n";
 	std::cout << "MagRecipQrsqrt(" << vec_a << "): " << EmuMath::Helpers::VectorMagnitudeReciprocalQrsqrt<float, 1>(vec_a) << "\n";
 
+	using x_val_type = std::uint16_t;
+	using y_val_type = std::uint16_t;
+	EmuMath::Vector<4, x_val_type> x_(128, 7, 255, 16);
+	EmuMath::Vector<3, y_val_type> y_(128, 6, 231);
+	EmuMath::Vector<4, simple_bitset<x_val_type>> x_bits_(x_);
+	EmuMath::Vector<3, simple_bitset<y_val_type>> y_bits_(y_);
+	std::cout << x_bits_ << " &\n" << y_bits_ << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorAnd(x_, y_)) << "\n\n";
+	std::cout << x_bits_ << " |\n" << y_bits_ << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorOr(x_, y_)) << "\n\n";
+	std::cout << x_bits_ << " ^\n" << y_bits_ << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorXor(x_, y_)) << "\n\n";
+	std::cout << x_bits_ << ".NOT():\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorNot(x_)) << "\n\n";
 
-
+	x_val_type some_constant_ = 0xE28F;
+	std::cout << x_bits_ << " &\n  " << simple_bitset<x_val_type>(some_constant_) << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorAnd(x_, some_constant_)) << "\n\n";
+	std::cout << x_bits_ << " |\n  " << simple_bitset<x_val_type>(some_constant_) << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorOr(x_, some_constant_)) << "\n\n";
+	std::cout << x_bits_ << " ^\n  " << simple_bitset<x_val_type>(some_constant_) << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorXor(x_, some_constant_)) << "\n\n";
 
 #pragma region TEST_HARNESS_EXECUTION
+	system("pause");
 	EmuCore::TestingHelpers::PerformTests();
 #pragma endregion
 	return 0;

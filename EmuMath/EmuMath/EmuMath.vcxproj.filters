@@ -77,5 +77,8 @@
     <ClInclude Include="EmuCore\Functors\Comparators.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuCore\Functors\Bitwise.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

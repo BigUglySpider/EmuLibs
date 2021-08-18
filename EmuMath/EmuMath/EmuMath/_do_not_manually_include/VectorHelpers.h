@@ -2,7 +2,9 @@
 #define EMU_MATH_VECTOR_T_HELPERS_H_INC_ 1
 
 #include "../../EmuCore/Functors/Arithmetic.h"
+#include "../../EmuCore/Functors/Bitwise.h"
 #include "../../EmuCore/Functors/Comparators.h"
+#include "../../EmuCore/TMPHelpers/TypeConvertors.h"
 #include "VectorHelpersUnderlying.h"
 #include <functional>
 
@@ -412,7 +414,7 @@ namespace EmuMath::Helpers
 	}
 	/// <summary>
 	/// <para> Calculates the reciprocal to the passed EmuMath vector's magnitude, using the Q_rsqrt method. </para>
-	/// <para> A custom number of newton iterations may be provided to increase accuracy. Additionally, the maigc constant may also be changed from 0x5F3759DF. </para>
+	/// <para> A custom number of newton iterations may be provided to increase accuracy. Additionally, the magic constant may also be changed from 0x5F3759DF. </para>
 	/// </summary>
 	/// <typeparam name="OutFloatingPoint_">Type to output the magnitude reciprocal as.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to find the reciprocal to the magnitude of.</typeparam>
@@ -2058,6 +2060,153 @@ namespace EmuMath::Helpers
 	{
 		return VectorShiftRight<Vector_::size, typename Vector_::value_type, Vector_, Shifts_>(vector_, num_shifts_);
 	}
+
+	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorAnd(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_bitwise_non_shift_op
+			<
+				EmuMath::Vector<OutSize_, out_value_type>,
+				LhsVector_,
+				Rhs_,
+				EmuCore::do_bitwise_and<typename LhsVector_::value_type, EmuCore::TMPHelpers::get_value_type_t<Rhs_>>
+			>
+			(
+				lhs_,
+				rhs_
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a bitwise AND on a vector, but the provided lhs_ argument was not an EmuMath vector.");
+		}
+	}
+	template<typename out_value_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, out_value_type> VectorAnd(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorAnd<LhsVector_::size, out_value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename LhsVector_::value_type> VectorAnd(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorAnd<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+	template<class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, typename LhsVector_::value_type> VectorAnd(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorAnd<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+
+	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorOr(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_bitwise_non_shift_op
+			<
+				EmuMath::Vector<OutSize_, out_value_type>,
+				LhsVector_,
+				Rhs_,
+				EmuCore::do_bitwise_or<typename LhsVector_::value_type, EmuCore::TMPHelpers::get_value_type_t<Rhs_>>
+			>
+			(
+				lhs_,
+				rhs_
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a bitwise OR on a vector, but the provided lhs_ argument was not an EmuMath vector.");
+		}
+	}
+	template<typename out_value_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, out_value_type> VectorOr(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorOr<LhsVector_::size, out_value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename LhsVector_::value_type> VectorOr(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorOr<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+	template<class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, typename LhsVector_::value_type> VectorOr(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorOr<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+
+	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorXor(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_bitwise_non_shift_op
+			<
+				EmuMath::Vector<OutSize_, out_value_type>,
+				LhsVector_,
+				Rhs_,
+				EmuCore::do_bitwise_xor<typename LhsVector_::value_type, EmuCore::TMPHelpers::get_value_type_t<Rhs_>>
+			>
+			(
+				lhs_,
+				rhs_
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a bitwise XOR on a vector, but the provided lhs_ argument was not an EmuMath vector.");
+		}
+	}
+	template<typename out_value_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, out_value_type> VectorXor(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorXor<LhsVector_::size, out_value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename LhsVector_::value_type> VectorXor(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorXor<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+	template<class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, typename LhsVector_::value_type> VectorXor(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorXor<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+
+	template<std::size_t OutSize_, typename out_value_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorNot(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_vector_single_operand_func
+			<
+				EmuMath::Vector<OutSize_, out_value_type>,
+				Vector_,
+				EmuCore::do_bitwise_not<typename Vector_::value_type>
+			>(vector_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a bitwise NOT on a vector, but the provided lhs_ argument was not an EmuMath vector.");
+		}
+	}
+	template<typename out_value_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorNot(const Vector_& vector_)
+	{
+		return VectorNot<Vector_::size, out_value_type, Vector_>(vector_);
+	}
+	template<std::size_t OutSize_, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorNot(const Vector_& vector_)
+	{
+		return VectorNot<OutSize_, typename Vector_::value_type, Vector_>(vector_);
+	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorNot(const Vector_& vector_)
+	{
+		return VectorNot<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
+	}
 #pragma endregion
 }
 
@@ -2152,44 +2301,6 @@ namespace EmuCore
 		}
 	};
 
-	template<std::size_t Size_, typename T_, typename Shifts_>
-	struct do_left_shift<EmuMath::Vector<Size_, T_>, Shifts_>
-	{
-		constexpr do_left_shift()
-		{
-		}
-		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_, const Shifts_& num_shifts_) const
-		{
-			if constexpr (std::is_arithmetic_v<Shifts_>)
-			{
-				return EmuMath::Helpers::VectorShiftLeft(vector_, static_cast<std::size_t>(num_shifts_));
-			}
-			else
-			{
-				return EmuMath::Helpers::VectorShiftLeft(vector_, num_shifts_);
-			}
-		}
-	};
-
-	template<std::size_t Size_, typename T_, typename Shifts_>
-	struct do_right_shift<EmuMath::Vector<Size_, T_>, Shifts_>
-	{
-		constexpr do_right_shift()
-		{
-		}
-		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_, const Shifts_& num_shifts_) const
-		{
-			if constexpr (std::is_arithmetic_v<Shifts_>)
-			{
-				return EmuMath::Helpers::VectorShiftRight(vector_, static_cast<std::size_t>(num_shifts_));
-			}
-			else
-			{
-				return EmuMath::Helpers::VectorShiftRight(vector_, num_shifts_);
-			}
-		}
-	};
-
 	template<std::size_t Size_, typename T_, typename Rhs_>
 	struct do_add<EmuMath::Vector<Size_, T_>, Rhs_>
 	{
@@ -2247,6 +2358,46 @@ namespace EmuCore
 		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
 			return EmuMath::Helpers::VectorNegate(vector_);
+		}
+	};
+#pragma endregion
+
+#pragma region BITWISE
+	template<std::size_t Size_, typename T_, typename Shifts_>
+	struct do_left_shift<EmuMath::Vector<Size_, T_>, Shifts_>
+	{
+		constexpr do_left_shift()
+		{
+		}
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_, const Shifts_& num_shifts_) const
+		{
+			if constexpr (std::is_arithmetic_v<Shifts_>)
+			{
+				return EmuMath::Helpers::VectorShiftLeft(vector_, static_cast<std::size_t>(num_shifts_));
+			}
+			else
+			{
+				return EmuMath::Helpers::VectorShiftLeft(vector_, num_shifts_);
+			}
+		}
+	};
+
+	template<std::size_t Size_, typename T_, typename Shifts_>
+	struct do_right_shift<EmuMath::Vector<Size_, T_>, Shifts_>
+	{
+		constexpr do_right_shift()
+		{
+		}
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_, const Shifts_& num_shifts_) const
+		{
+			if constexpr (std::is_arithmetic_v<Shifts_>)
+			{
+				return EmuMath::Helpers::VectorShiftRight(vector_, static_cast<std::size_t>(num_shifts_));
+			}
+			else
+			{
+				return EmuMath::Helpers::VectorShiftRight(vector_, num_shifts_);
+			}
 		}
 	};
 #pragma endregion
