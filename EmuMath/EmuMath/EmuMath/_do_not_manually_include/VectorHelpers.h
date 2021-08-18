@@ -1256,6 +1256,282 @@ namespace EmuMath::Helpers
 
 #pragma region COMPARISONS
 	/// <summary>
+	/// <para> Returns a boolean indicating if any elements in the passed lhs_ vector are equal to rhs_, depending on the type of rhs_. </para>
+	/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all lhs_ elements will be compared to the same rhs_ value. </para>
+	/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">Type of EmuMath vector that appears on the left-hand side of comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+	/// <param name="lhs_">EmuMath vector that appears on the left-hand side of comparisons.</param>
+	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+	/// <returns>True if any executed comparisons returned true, otherwise false.</returns>
+	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline bool VectorCmpAnyEqualTo(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, false, true, EmuCore::do_cmp_equal_to, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to compare the equality of any vector elements, but passed a non-EmuMath-vector left-hand operand.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns a boolean indicating if any elements in the passed lhs_ vector are not equal to rhs_, depending on the type of rhs_. </para>
+	/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all lhs_ elements will be compared to the same rhs_ value. </para>
+	/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">Type of EmuMath vector that appears on the left-hand side of comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+	/// <param name="lhs_">EmuMath vector that appears on the left-hand side of comparisons.</param>
+	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+	/// <returns>True if any executed comparisons returned true, otherwise false.</returns>
+	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline bool VectorCmpAnyNotEqualTo(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, false, true, EmuCore::do_cmp_not_equal_to, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to compare the inequality of any vector elements, but passed a non-EmuMath-vector left-hand operand.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns a boolean indicating if any elements in the passed lhs_ vector are greater than rhs_, depending on the type of rhs_. </para>
+	/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all lhs_ elements will be compared to the same rhs_ value. </para>
+	/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">Type of EmuMath vector that appears on the left-hand side of comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+	/// <param name="lhs_">EmuMath vector that appears on the left-hand side of comparisons.</param>
+	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+	/// <returns>True if any executed comparisons returned true, otherwise false.</returns>
+	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline bool VectorCmpAnyGreater(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, false, true, EmuCore::do_cmp_greater, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to compare the magnitude of any vector elements, but passed a non-EmuMath-vector left-hand operand.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns a boolean indicating if any elements in the passed lhs_ vector are less than rhs_, depending on the type of rhs_. </para>
+	/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all lhs_ elements will be compared to the same rhs_ value. </para>
+	/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">Type of EmuMath vector that appears on the left-hand side of comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+	/// <param name="lhs_">EmuMath vector that appears on the left-hand side of comparisons.</param>
+	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+	/// <returns>True if any executed comparisons returned true, otherwise false.</returns>
+	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline bool VectorCmpAnyLess(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, false, true, EmuCore::do_cmp_less, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to compare the magnitude of any vector elements, but passed a non-EmuMath-vector left-hand operand.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns a boolean indicating if any elements in the passed lhs_ vector are greater than or equal to rhs_, depending on the type of rhs_. </para>
+	/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all lhs_ elements will be compared to the same rhs_ value. </para>
+	/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">Type of EmuMath vector that appears on the left-hand side of comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+	/// <param name="lhs_">EmuMath vector that appears on the left-hand side of comparisons.</param>
+	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+	/// <returns>True if any executed comparisons returned true, otherwise false.</returns>
+	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline bool VectorCmpAnyGreaterEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, false, true, EmuCore::do_cmp_greater_equal, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to compare the magnitude of any vector elements, but passed a non-EmuMath-vector left-hand operand.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns a boolean indicating if any elements in the passed lhs_ vector are less than or equal to rhs_, depending on the type of rhs_. </para>
+	/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all lhs_ elements will be compared to the same rhs_ value. </para>
+	/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">Type of EmuMath vector that appears on the left-hand side of comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+	/// <param name="lhs_">EmuMath vector that appears on the left-hand side of comparisons.</param>
+	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+	/// <returns>True if any executed comparisons returned true, otherwise false.</returns>
+	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline bool VectorCmpAnyLessEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, false, true, EmuCore::do_cmp_less_equal, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to compare the magnitude of any vector elements, but passed a non-EmuMath-vector left-hand operand.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns a boolean indicating if all elements in the passed lhs_ vector are equal to rhs_, depending on the type of rhs_. </para>
+	/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all lhs_ elements will be compared to the same rhs_ value. </para>
+	/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">Type of EmuMath vector that appears on the left-hand side of comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+	/// <param name="lhs_">EmuMath vector that appears on the left-hand side of comparisons.</param>
+	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+	/// <returns>True if all executed comparisons returned true, otherwise false.</returns>
+	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline bool VectorCmpAllEqualTo(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, true, true, EmuCore::do_cmp_equal_to, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to compare the equality of all vector elements, but passed a non-EmuMath-vector left-hand operand.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns a boolean indicating if all elements in the passed lhs_ vector are not equal to rhs_, depending on the type of rhs_. </para>
+	/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all lhs_ elements will be compared to the same rhs_ value. </para>
+	/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">Type of EmuMath vector that appears on the left-hand side of comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+	/// <param name="lhs_">EmuMath vector that appears on the left-hand side of comparisons.</param>
+	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+	/// <returns>True if all executed comparisons returned true, otherwise false.</returns>
+	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline bool VectorCmpAllNotEqualTo(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, true, true, EmuCore::do_cmp_not_equal_to, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to compare the inequality of all vector elements, but passed a non-EmuMath-vector left-hand operand.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns a boolean indicating if all elements in the passed lhs_ vector are greater than rhs_, depending on the type of rhs_. </para>
+	/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all lhs_ elements will be compared to the same rhs_ value. </para>
+	/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">Type of EmuMath vector that appears on the left-hand side of comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+	/// <param name="lhs_">EmuMath vector that appears on the left-hand side of comparisons.</param>
+	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+	/// <returns>True if all executed comparisons returned true, otherwise false.</returns>
+	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline bool VectorCmpAllGreater(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, true, true, EmuCore::do_cmp_greater, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to compare the magnitude of all vector elements, but passed a non-EmuMath-vector left-hand operand.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns a boolean indicating if all elements in the passed lhs_ vector are less than rhs_, depending on the type of rhs_. </para>
+	/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all lhs_ elements will be compared to the same rhs_ value. </para>
+	/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">Type of EmuMath vector that appears on the left-hand side of comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+	/// <param name="lhs_">EmuMath vector that appears on the left-hand side of comparisons.</param>
+	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+	/// <returns>True if all executed comparisons returned true, otherwise false.</returns>
+	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline bool VectorCmpAllLess(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, true, true, EmuCore::do_cmp_less, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to compare the magnitude of all vector elements, but passed a non-EmuMath-vector left-hand operand.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns a boolean indicating if all elements in the passed lhs_ vector are greater than or equal to rhs_, depending on the type of rhs_. </para>
+	/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all lhs_ elements will be compared to the same rhs_ value. </para>
+	/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">Type of EmuMath vector that appears on the left-hand side of comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+	/// <param name="lhs_">EmuMath vector that appears on the left-hand side of comparisons.</param>
+	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+	/// <returns>True if all executed comparisons returned true, otherwise false.</returns>
+	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline bool VectorCmpAllGreaterEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, true, true, EmuCore::do_cmp_greater_equal, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to compare the magnitude of all vector elements, but passed a non-EmuMath-vector left-hand operand.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns a boolean indicating if all elements in the passed lhs_ vector are less than or equal to rhs_, depending on the type of rhs_. </para>
+	/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all lhs_ elements will be compared to the same rhs_ value. </para>
+	/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+	/// </summary>
+	/// <typeparam name="LhsVector_">Type of EmuMath vector that appears on the left-hand side of comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+	/// <param name="lhs_">EmuMath vector that appears on the left-hand side of comparisons.</param>
+	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+	/// <returns>True if all executed comparisons returned true, otherwise false.</returns>
+	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline bool VectorCmpAllLessEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, true, true, EmuCore::do_cmp_less_equal, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to compare the magnitude of all vector elements, but passed a non-EmuMath-vector left-hand operand.");
+		}
+	}
+
+	/// <summary>
 	/// <para> Performs an equality comparison with the type of comparison depending on the passed rhs_ argument. </para>
 	/// <para>
 	///		If the rhs_ argument is an EmuMath vector, this will compare respective elements of both vectors. 
@@ -1281,7 +1557,7 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
-			return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, true, EmuCore::do_cmp_equal_to, LhsVector_, Rhs_>(lhs_, rhs_);
+			return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, true, false, EmuCore::do_cmp_equal_to, LhsVector_, Rhs_>(lhs_, rhs_);
 		}
 		else
 		{
@@ -1315,7 +1591,7 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
-			return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, false, EmuCore::do_cmp_not_equal_to, LhsVector_, Rhs_>(lhs_, rhs_);
+			return _underlying_vector_funcs::_vector_overall_comparison<TestAllIndices_, false, false, EmuCore::do_cmp_not_equal_to, LhsVector_, Rhs_>(lhs_, rhs_);
 		}
 		else
 		{

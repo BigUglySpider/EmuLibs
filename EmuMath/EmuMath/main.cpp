@@ -83,14 +83,14 @@ int main()
 	std::cout << vec_a << " == " << vec_b << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_a, vec_b) << "\n";
 	std::cout << vec_b << " == " << vec_c << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_b, vec_c) << "\n";
 	std::cout << vec_a << " == " << vec_d << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_a, vec_d) << "\n";
-	std::cout << vec_a << " == " << vec_d << " (Don't inlcude non-contained): " << EmuMath::Helpers::VectorCmpEqualTo<false>(vec_a, vec_d) << "\n";
+	std::cout << vec_a << " == " << vec_d << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpEqualTo<false>(vec_a, vec_d) << "\n";
 	std::cout << "----------\n";
 
 
 	std::cout << vec_a << " != " << vec_b << ": " << EmuMath::Helpers::VectorCmpNotEqualTo(vec_a, vec_b) << "\n";
 	std::cout << vec_b << " != " << vec_c << ": " << EmuMath::Helpers::VectorCmpNotEqualTo(vec_b, vec_c) << "\n";
 	std::cout << vec_a << " != " << vec_d << ": " << EmuMath::Helpers::VectorCmpNotEqualTo(vec_a, vec_d) << "\n";
-	std::cout << vec_a << " != " << vec_d << " (Don't inlcude non-contained): " << EmuMath::Helpers::VectorCmpNotEqualTo<false>(vec_a, vec_d) << "\n";
+	std::cout << vec_a << " != " << vec_d << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpNotEqualTo<false>(vec_a, vec_d) << "\n";
 	std::cout << "----------\n";
 
 
@@ -100,7 +100,24 @@ int main()
 	std::cout << vec_a << " == " << EmuMath::Helpers::VectorMagnitude(vec_a) << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_a, vec_a_mag_) << "\n";
 	std::cout << vec_b << " == " << 2 << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_b, 2) << "\n";
 	std::cout << vec_a << " == " << 5 << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_a, 5) << "\n";
-	std::cout << vec_a << " == " << 4 << " (Don't inlcude non-contained): " << EmuMath::Helpers::VectorCmpEqualTo<false>(vec_a, 4) << "\n";
+	std::cout << vec_a << " == " << 4 << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpEqualTo<false>(vec_a, 4) << "\n";
+	std::cout << "----------\n";
+
+
+	std::cout << vec_a << " ALL == " << vec_b << ": " << EmuMath::Helpers::VectorCmpAllEqualTo(vec_a, vec_b) << "\n";
+	std::cout << vec_b << " ALL != " << vec_c << ": " << EmuMath::Helpers::VectorCmpAllNotEqualTo(vec_b, std::uint64_t(2)) << "\n";
+	std::cout << vec_a << " ALL <= " << vec_d << ": " << EmuMath::Helpers::VectorCmpAllLessEqual(vec_a, vec_d) << "\n";
+	std::cout << vec_a << " ALL > " << vec_a << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpAllGreater<false>(vec_a, vec_a) << "\n";
+	std::cout << vec_a << " ALL == " << EmuMath::Helpers::VectorShuffle<0, 1, 2, 2, 1, 0>(vec_a) << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpAllEqualTo<false>(vec_a, EmuMath::Helpers::VectorShuffle<0, 1, 2, 2, 1, 0>(vec_a)) << "\n";
+	std::cout << vec_a << " ALL == " << EmuMath::Helpers::VectorShuffle<0, 1>(vec_a) << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpAllEqualTo<false>(vec_a, EmuMath::Helpers::VectorShuffle<0, 1>(vec_a)) << "\n";
+	std::cout << "----------\n";
+
+
+	std::cout << vec_a << " ANY == " << vec_b << ": " << EmuMath::Helpers::VectorCmpAnyEqualTo(vec_a, vec_b) << "\n";
+	std::cout << vec_b << " ANY != " << std::uint64_t(2) << ": " << EmuMath::Helpers::VectorCmpAnyNotEqualTo(vec_b, std::uint64_t(2)) << "\n";
+	std::cout << vec_a << " ANY <= " << vec_a << ": " << EmuMath::Helpers::VectorCmpAnyLessEqual(vec_a, vec_a) << "\n";
+	std::cout << vec_a << " ANY > " << vec_a << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpAnyGreater<false>(vec_a, vec_a) << "\n";
+	std::cout << vec_a << " ANY < " << EmuMath::Helpers::VectorShuffle<2, 1, 0>(vec_a) << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpAnyLess<false>(vec_a, EmuMath::Helpers::VectorShuffle<2, 1, 0>(vec_a)) << "\n";
 	std::cout << "----------\n";
 
 

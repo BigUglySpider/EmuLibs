@@ -1226,6 +1226,25 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		}
 		return out_;
 	}
+	template<std::size_t Index_, class LhsVector_, class Rhs_, class Comparator_, class Combiner_>
+	[[nodiscard]] constexpr inline bool _vector_overall_comparison_scalar(const LhsVector_& lhs_, const Rhs_& rhs_, Comparator_& cmp_, Combiner_& combiner_, bool out_)
+	{
+		if constexpr (Index_ < LhsVector_::size)
+		{
+			return _vector_overall_comparison_scalar<Index_ + 1, LhsVector_, Rhs_, Comparator_, Combiner_>
+			(
+				lhs_,
+				rhs_,
+				cmp_,
+				combiner_,
+				combiner_(out_, cmp_(_get_vector_data<Index_>(lhs_), rhs_))
+			);
+		}
+		else
+		{
+			return out_;
+		}
+	}
 	template<std::size_t Index_, bool IncludeNonContained_, class LhsVector_, class RhsVector_, class Comparator_, class Combiner_>
 	[[nodiscard]] constexpr inline bool _vector_overall_comparison(const LhsVector_& lhs_, const RhsVector_& rhs_, Comparator_& cmp_, Combiner_& combiner_, bool out_)
 	{
@@ -1249,13 +1268,14 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 					}
 					else
 					{
-						return _vector_overall_comparison<Index_ + 1, IncludeNonContained_, LhsVector_, RhsVector_, Comparator_, Combiner_>
+						// Defer to comparing to scalar so we don't have to keep default constructing a rhs value in cases where lhs is significantly larger
+						return _vector_overall_comparison_scalar<Index_, LhsVector_, typename RhsVector_::value_type, Comparator_, Combiner_>
 						(
 							lhs_,
-							rhs_,
+							typename RhsVector_::value_type(),
 							cmp_,
 							combiner_,
-							combiner_(out_, static_cast<bool>(cmp_(_get_vector_data<Index_>(lhs_), typename RhsVector_::value_type())))
+							out_
 						);
 					}
 				}
@@ -1313,14 +1333,14 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	///		If LogicalAND is true, resulting booleans will be combined with && (i.e. all must be true for a true return). 
 	///		Otherwise, they will be combined with || (i.e. at least one must be true for a true return).
 	/// </para>
+	/// <para> If AllowScalar_ is false, this will perform a magnitude comparison in cases where Rhs_ is not an EmuMath vector. </para>
 	/// </summary>
 	/// <typeparam name="LhsVector_">Type of vector appearing as the left-hand argument for comparisons.</typeparam>
 	/// <typeparam name="RhsVector_">Type of item appearing as the right-hand argument for comparisons.</typeparam>
 	/// <typeparam name="Comparator_">Type used to perform comparisons.</typeparam>
 	/// <param name="lhs_">Vector appearing as the left-hand argument for comparisons.</param>
 	/// <param name="rhs_">Item appearing as the right-hand argument for comparisons.</param>
-	/// <returns>Boolean indicating if all comparisons were true if LogicalAND is true, or at least one was true if LogicalAND is false.</returns>
-	template<bool IncludeNonContained_, bool LogicalAND_, template<typename Lhs__, typename Rhs__> class ComparatorTemplate_, class LhsVector_, class Rhs_>
+	template<bool IncludeNonContained_, bool LogicalAND_, bool AllowScalar_, template<typename Lhs__, typename Rhs__> class ComparatorTemplate_, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline bool _vector_overall_comparison(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		using Combiner_ = std::conditional_t<LogicalAND_, std::logical_and<void>, std::logical_or<void>>;
@@ -1334,9 +1354,20 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		}
 		else
 		{
-			// When comparing to a non-vector, we assume a scalar comparison.
-			// --- We substitute lhs_ with its magnitude for this scalar comparison.
-			return _vector_compare_magnitude<ComparatorTemplate_, LhsVector_, Rhs_>(lhs_, rhs_);
+			if constexpr (AllowScalar_)
+			{
+				// If scalars are allowed for rhs, that means we're comparing each element to the same value
+				using Comparator_ = ComparatorTemplate_<typename LhsVector_::value_type, Rhs_>;
+				Combiner_ combiner_ = Combiner_();
+				Comparator_ cmp_ = Comparator_();
+				return _vector_overall_comparison_scalar<0, LhsVector_, Rhs_, Comparator_, Combiner_>(lhs_, rhs_, cmp_, combiner_, LogicalAND_);
+			}
+			else
+			{
+				// When comparing to a non-vector, we assume a scalar comparison.
+				// --- We substitute lhs_ with its magnitude for this scalar comparison.
+				return _vector_compare_magnitude<ComparatorTemplate_, LhsVector_, Rhs_>(lhs_, rhs_);
+			}
 		}
 	}
 #pragma endregion
