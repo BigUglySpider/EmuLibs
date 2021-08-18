@@ -75,36 +75,36 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Attempted to use EmuCore SqrtConstexpr with an input type that is neither floating point nor integral.");
+				static_assert(false, "Attempted to use EmuCore::SqrtConstexpr with an input type that is neither floating point nor integral. Did you mean to use the do_sqrt_constexpr functor?");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to use EmuCore SqrtConstexpr with an output type that is not a floating point.");
+			static_assert(false, "Attempted to use EmuCore::SqrtConstexpr with an output type that is not a floating point.");
 		}
 	}
 
-	template<typename FloatingPoint_>
-	FloatingPoint_ DoCorrectStandardSqrt(const FloatingPoint_ val_)
+	template<typename FloatingPointOut_ = float, typename FloatingPointIn_>
+	FloatingPointOut_ DoCorrectStandardSqrt(const FloatingPointIn_ val_)
 	{
-		if constexpr (std::is_floating_point_v<FloatingPoint_>)
+		if constexpr (std::is_floating_point_v<FloatingPointIn_>)
 		{
-			if constexpr (std::is_same_v<FloatingPoint_, float>)
+			if constexpr (std::is_same_v<FloatingPointIn_, float>)
 			{
-				return sqrtf(val_);
+				return static_cast<FloatingPointOut_>(sqrtf(val_));
 			}
-			else if constexpr (std::is_same_v<FloatingPoint_, double>)
+			else if constexpr (std::is_same_v<FloatingPointIn_, double>)
 			{
-				return sqrt(val_);
+				return static_cast<FloatingPointOut_>(sqrt(val_));
 			}
 			else
 			{
-				return static_cast<FloatingPoint_>(sqrtl(static_cast<long double>(val_)));
+				return static_cast<FloatingPointOut_>(sqrtl(static_cast<long double>(val_)));
 			}
 		}
 		else
 		{
-			static_assert(false, "Passed a non-floating-point type to EmuCore::DoCorrectStandardSqrt. This behaviour is blocked.");
+			static_assert(false, "Passed a non-floating-point output type to EmuCore::DoCorrectStandardSqrt. Did you mean to use the do_sqrt functor?");
 		}
 	}
 
@@ -128,8 +128,15 @@ namespace EmuCore
 		}
 		else
 		{
-			// Cannot be rounded, so return a copy of val_.
-			return val_;
+			if constexpr (std::is_arithmetic_v<T_>)
+			{
+				// Already integral, so return a copy of val_.
+				return val_;
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform EmuCore::DoCorrectFloor with a non-arithmetic type. Did you mean to use the do_floor functor?");
+			}
 		}
 	}
 	template<typename T_>
@@ -152,8 +159,15 @@ namespace EmuCore
 		}
 		else
 		{
-			// Cannot be rounded, so return a copy of val_.
-			return val_;
+			if constexpr (std::is_arithmetic_v<T_>)
+			{
+				// Already integral, so return a copy of val_.
+				return val_;
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform EmuCore::DoCorrectCeil with a non-arithmetic type. Did you mean to use the do_ceil functor?");
+			}
 		}
 	}
 	template<typename T_>
@@ -176,8 +190,15 @@ namespace EmuCore
 		}
 		else
 		{
-			// Cannot be rounded, so return a copy of val_.
-			return val_;
+			if constexpr (std::is_arithmetic_v<T_>)
+			{
+				// Already integral, so return a copy of val_.
+				return val_;
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform EmuCore::DoCorrectTrunc with a non-arithmetic type. Did you mean to use the do_trunc functor?");
+			}
 		}
 	}
 
