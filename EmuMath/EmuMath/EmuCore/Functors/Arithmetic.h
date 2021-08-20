@@ -187,7 +187,7 @@ namespace EmuCore
 		constexpr do_add() : adder_()
 		{
 		}
-		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			return adder_(lhs_, rhs_);
 		}
@@ -200,7 +200,7 @@ namespace EmuCore
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			return do_add<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
@@ -216,7 +216,7 @@ namespace EmuCore
 		constexpr do_subtract() : subtractor_()
 		{
 		}
-		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			return subtractor_(lhs_, rhs_);
 		}
@@ -229,7 +229,7 @@ namespace EmuCore
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			return do_subtract<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
@@ -245,7 +245,7 @@ namespace EmuCore
 		constexpr do_multiply() : multiplier_()
 		{
 		}
-		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			return multiplier_(lhs_, rhs_);
 		}
@@ -258,7 +258,7 @@ namespace EmuCore
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			return do_multiply<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
@@ -274,7 +274,7 @@ namespace EmuCore
 		constexpr do_divide() : divider_()
 		{
 		}
-		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			return divider_(lhs_, rhs_);
 		}
@@ -287,7 +287,7 @@ namespace EmuCore
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			return do_divide<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
@@ -303,7 +303,7 @@ namespace EmuCore
 		constexpr do_negate() : negator_()
 		{
 		}
-		constexpr inline auto operator()(const T_& val_) const
+		[[nodiscard]] constexpr inline auto operator()(const T_& val_) const
 		{
 			return negator_(val_);
 		}
@@ -316,7 +316,7 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		constexpr inline auto operator()(const T_& val_) const
+		[[nodiscard]] constexpr inline auto operator()(const T_& val_) const
 		{
 			return do_negate<T_>()(val_);
 		}
@@ -328,7 +328,7 @@ namespace EmuCore
 		constexpr do_cos()
 		{
 		}
-		constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
 		{
 			return EmuCore::DoMatchingCos<T_, T_>(t_);
 		}
@@ -340,7 +340,7 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
 		{
 			return do_cos<T_>()(t_);
 		}
@@ -352,7 +352,7 @@ namespace EmuCore
 		constexpr do_acos()
 		{
 		}
-		constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
 		{
 			return EmuCore::DoMatchingAcos<T_, T_>(t_);
 		}
@@ -364,7 +364,7 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
 		{
 			return do_acos<T_>()(t_);
 		}
@@ -376,7 +376,7 @@ namespace EmuCore
 		constexpr do_sin()
 		{
 		}
-		constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
 		{
 			return EmuCore::DoMatchingSin<T_, T_>(t_);
 		}
@@ -388,7 +388,7 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
 		{
 			return do_sin<T_>()(t_);
 		}
@@ -400,7 +400,7 @@ namespace EmuCore
 		constexpr do_asin()
 		{
 		}
-		constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
 		{
 			return EmuCore::DoMatchingAsin<T_, T_>(t_);
 		}
@@ -412,7 +412,7 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
 		{
 			return do_asin<T_>()(t_);
 		}
@@ -424,7 +424,7 @@ namespace EmuCore
 		constexpr do_tan()
 		{
 		}
-		constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
 		{
 			return EmuCore::DoMatchingTan<T_, T_>(t_);
 		}
@@ -436,7 +436,7 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
 		{
 			return do_tan<T_>()(t_);
 		}
@@ -448,7 +448,7 @@ namespace EmuCore
 		constexpr do_atan()
 		{
 		}
-		constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
 		{
 			return EmuCore::DoMatchingAtan<T_, T_>(t_);
 		}
@@ -460,9 +460,57 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
 		{
 			return do_atan<T_>()(t_);
+		}
+	};
+
+	template<typename T_>
+	struct do_degs_to_rads
+	{
+		constexpr do_degs_to_rads()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			return EmuCore::Pi::DegsToRads<T_>(val_);
+		}
+	};
+	template<>
+	struct do_degs_to_rads<void>
+	{
+		constexpr do_degs_to_rads()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			return do_degs_to_rads<T_>()(val_);
+		}
+	};
+
+	template<typename T_>
+	struct do_rads_to_degs
+	{
+		constexpr do_rads_to_degs()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			return EmuCore::Pi::RadsToDegs<T_>(val_);
+		}
+	};
+	template<>
+	struct do_rads_to_degs<void>
+	{
+		constexpr do_rads_to_degs()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			return do_rads_to_degs<T_>()(val_);
 		}
 	};
 }

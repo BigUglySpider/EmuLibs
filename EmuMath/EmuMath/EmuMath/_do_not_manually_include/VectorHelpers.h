@@ -982,12 +982,25 @@ namespace EmuMath::Helpers
 		return VectorReciprocal<Vector_::size, out_floating_point_value_type, Vector_>(vector_);
 	}
 
-	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Min_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorClampMin(const Vector_& vector_, const Min_& min_)
+	/// <summary>
+	/// <para> Clamps the passed vector_ so that it's elements do not compare lower than min_. </para>
+	/// <para> 
+	///		If min_ is an EmuMath vector, elements will be clamped to a minimum of the respective elements in the min_ vector. 
+	///		Otherwise, all elements will be clamped to a minimum of the value of min_.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to be clamping the minimum values of.</typeparam>
+	/// <typeparam name="Min_">Type of vector or scalar to be using as the minimum value(s).</typeparam>
+	/// <param name="vector_">EmuMath vector to be clamping the minimum values of.</param>
+	/// <param name="min_">EmuMath vector or scalar to be using as the minimum value(s).</param>
+	/// <returns>EmuMath vector copy of the passed vector with its values clamped to an inclusive minimum as dictacted by min_.</returns>
+	template<std::size_t OutSize_, typename out_contained_type, class Vector_, class Min_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorClampMin(const Vector_& vector_, const Min_& min_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_vector_clamp_min<EmuMath::Vector<OutSize_, out_value_type>, Vector_, Min_>(vector_, min_);
+			return _underlying_vector_funcs::_vector_clamp_min<EmuMath::Vector<OutSize_, out_contained_type>, Vector_, Min_>(vector_, min_);
 		}
 		else
 		{
@@ -1010,6 +1023,19 @@ namespace EmuMath::Helpers
 		return VectorClampMin<Vector_::size, typename Vector_::value_type, Vector_, Min_>(vector_, min_);
 	}
 
+	/// <summary>
+	/// <para> Clamps the passed vector_ so that it's elements do not compare greater than max_. </para>
+	/// <para> 
+	///		If max_ is an EmuMath vector, elements will be clamped to a maximum of the respective elements in the max_ vector. 
+	///		Otherwise, all elements will be clamped to a maximum of the value of max_.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to be clamping the maximum values of.</typeparam>
+	/// <typeparam name="Max_">Type of vector or scalar to be using as the maximum value(s).</typeparam>
+	/// <param name="vector_">EmuMath vector to be clamping the maximum values of.</param>
+	/// <param name="max_">EmuMath vector or scalar to be using as the maximum value(s).</param>
+	/// <returns>EmuMath vector copy of the passed vector with its values clamped to an inclusive maximum as dictacted by max_.</returns>
 	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Max_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorClampMax(const Vector_& vector_, const Max_& max_)
 	{
@@ -1038,6 +1064,26 @@ namespace EmuMath::Helpers
 		return VectorClampMax<Vector_::size, typename Vector_::value_type, Vector_, Max_>(vector_, max_);
 	}
 
+	/// <summary>
+	/// <para> Clamps the passed vector_ so that it's elements do not compare less than min_ or greater than max_. </para>
+	/// <para> This function assumes that min_ and max_ are logically correct (i.e. min_ is less than or equal to max_, max_ is greater than or equal to min_). </para>
+	/// <para> 
+	///		If min_ is an EmuMath vector, elements will be clamped to a minimum of the respective elements in the min_ vector. 
+	///		Otherwise, all elements will be clamped to a minimum of the value of min_.
+	/// </para>
+	/// <para> 
+	///		If max_ is an EmuMath vector, elements will be clamped to a maximum of the respective elements in the max_ vector. 
+	///		Otherwise, all elements will be clamped to a maximum of the value of max_.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to be clamping the values of.</typeparam>
+	/// <typeparam name="Min_">Type of vector or scalar to be using as the minimum value(s).</typeparam>
+	/// <typeparam name="Max_">Type of vector or scalar to be using as the maximum value(s).</typeparam>
+	/// <param name="vector_">EmuMath vector to be clamping the values of.</param>
+	/// <param name="min_">EmuMath vector or scalar to be using as the minimum value(s).</param>
+	/// <param name="max_">EmuMath vector or scalar to be using as the maximum value(s).</param>
+	/// <returns>EmuMath vector copy of the passed vector with its values clamped to between an inclusive minimum and maximum as dictacted by min_ and max_.</returns>
 	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Min_, class Max_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorClamp(const Vector_& vector_, const Min_& min_, const Max_& max_)
 	{
@@ -1085,7 +1131,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform a round operation on a vector, but provided a non-EmuMath-vector type.");
+			static_assert(false, "Attempted to perform a mutation on a vector, but provided a non-EmuMath-vector type.");
 		}
 	}
 	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Func_>
@@ -2868,6 +2914,30 @@ namespace EmuCore
 		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
 			return EmuMath::Helpers::VectorMutate(vector_, EmuCore::do_atan<typename EmuMath::Vector<Size_, T_>::value_type>());
+		}
+	};
+
+	template<std::size_t Size_, typename T_>
+	struct do_degs_to_rads<EmuMath::Vector<Size_, T_>>
+	{
+		constexpr do_degs_to_rads()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		{
+			return EmuMath::Helpers::VectorMutate(vector_, EmuCore::do_degs_to_rads<typename EmuMath::Vector<Size_, T_>::value_type>());
+		}
+	};
+
+	template<std::size_t Size_, typename T_>
+	struct do_rads_to_degs<EmuMath::Vector<Size_, T_>>
+	{
+		constexpr do_rads_to_degs()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		{
+			return EmuMath::Helpers::VectorMutate(vector_, EmuCore::do_rads_to_degs<typename EmuMath::Vector<Size_, T_>::value_type>());
 		}
 	};
 #pragma endregion
