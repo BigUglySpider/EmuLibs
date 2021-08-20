@@ -1412,6 +1412,104 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to normalise a vector, but provided a non-EmuMath-vector argument.");
 		}
 	}
+
+	/// <summary>
+	/// <para> Calculates the cosine of the angle between the two provided vectors. </para>
+	/// <para> It is recommended, but not enforced, that you output the cosine as a floating-point type. It will default to float. </para>
+	/// <para> This function may make sacrifices to be evaluable at compile time. If it is being used at runtime, it is recommended to use VectorAngleCosine. </para>
+	/// </summary>
+	/// <typeparam name="OutCosine_">Type to output the cosine as. Defaults to float.</typeparam>
+	/// <typeparam name="LhsVector_">Type of vector appearing on the left-hand side of arguments.</typeparam>
+	/// <typeparam name="RhsVector_">Type of vector appearing on the right-hand side of arguments.</typeparam>
+	/// <param name="lhs_">First EmuMath vector in the calculation.</param>
+	/// <param name="rhs_">Second EmuMath vector in the calculation.</param>
+	/// <returns>Cosine of the angle between vectors lhs_ and rhs_, represented as the provided OutCosine_ type.</returns>
+	template<typename OutCosine_ = float, class LhsVector_, class RhsVector_>
+	[[nodiscard]] constexpr inline OutCosine_ VectorAngleCosineConstexpr(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<RhsVector_>)
+			{
+				return
+				(
+					VectorDotProduct<OutCosine_>(lhs_, rhs_) / 
+					(
+						VectorMagnitudeConstexpr<OutCosine_, LhsVector_>(lhs_) *
+						VectorMagnitudeConstexpr<OutCosine_, RhsVector_>(rhs_)
+					)
+				);
+			}
+			else
+			{
+				static_assert(false, "Attempted to find the cosine of the angle between two vectors, but provided a non-EmuMath-vector right-hand argument.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to find the cosine of the angle between two vectors, but provided a non-EmuMath-vector left-hand argument.");
+		}
+	}
+	/// <summary>
+	/// <para> Calculates the cosine of the angle between the two provided vectors. </para>
+	/// <para> It is recommended, but not enforced, that you output the cosine as a floating-point type. It will default to float. </para>
+	/// </summary>
+	/// <typeparam name="OutCosine_">Type to output the cosine as. Defaults to float.</typeparam>
+	/// <typeparam name="LhsVector_">Type of vector appearing on the left-hand side of arguments.</typeparam>
+	/// <typeparam name="RhsVector_">Type of vector appearing on the right-hand side of arguments.</typeparam>
+	/// <param name="lhs_">First EmuMath vector in the calculation.</param>
+	/// <param name="rhs_">Second EmuMath vector in the calculation.</param>
+	/// <returns>Cosine of the angle between vectors lhs_ and rhs_, represented as the provided OutCosine_ type.</returns>
+	template<typename OutCosine_ = float, class LhsVector_, class RhsVector_>
+	[[nodiscard]] inline OutCosine_ VectorAngleCosine(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<RhsVector_>)
+			{
+				return 
+				(
+					VectorDotProduct<OutCosine_>(lhs_, rhs_) / 
+					(
+						VectorMagnitude<OutCosine_, LhsVector_>(lhs_) *
+						VectorMagnitude<OutCosine_, RhsVector_>(rhs_)
+					)
+				);
+			}
+			else
+			{
+				static_assert(false, "Attempted to find the cosine of the angle between two vectors, but provided a non-EmuMath-vector right-hand argument.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to find the cosine of the angle between two vectors, but provided a non-EmuMath-vector left-hand argument.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Calculates the angle between the passed vectors and outputs it in either radians or degrees. </para>
+	/// <para> If Rads_ is true, output will be in radians, otherwise it will be in degrees. By default, output will be in radians. </para>
+	/// </summary>
+	/// <typeparam name="OutAngle_">Type to output the angle as.</typeparam>
+	/// <typeparam name="VectorA_">Type of vector appearing on the left-hand side of arguments.</typeparam>
+	/// <typeparam name="VectorB_">Type of vector appearing on the right-hand side of arguments.</typeparam>
+	/// <param name="a_">First EmuMath vector in the calculation.</param>
+	/// <param name="b_">Second EmuMath vector in the calculation.</param>
+	/// <returns>The angle between the two vectors represented as the provided OutAngle_ type. Units will be radians if Rads_ is true, otherwise they will be degrees.</returns>
+	template<bool Rads_ = true, typename OutAngle_ = float, class VectorA_, class VectorB_>
+	[[nodiscard]] inline OutAngle_ VectorAngle(const VectorA_& a_, const VectorB_& b_)
+	{
+		using floating_point = EmuCore::TMPHelpers::first_floating_point_t<OutAngle_, float>;
+		if constexpr (Rads_)
+		{
+			return static_cast<OutAngle_>(EmuCore::do_acos<floating_point>()(VectorAngleCosine<floating_point>(a_, b_)));
+		}
+		else
+		{
+			return static_cast<OutAngle_>(EmuCore::Pi::RadsToDegs(EmuCore::do_acos<floating_point>()(VectorAngleCosine<floating_point>(a_, b_))));
+		}
+	}
 #pragma endregion
 
 #pragma region COMPARISONS
@@ -2587,7 +2685,7 @@ namespace EmuCore
 	template<std::size_t Size_, typename T_, typename Rhs_>
 	struct do_cmp_equal_to<EmuMath::Vector<Size_, T_>, Rhs_>
 	{
-		inline do_cmp_equal_to()
+		constexpr do_cmp_equal_to()
 		{
 		}
 		constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, Rhs_& rhs_) const
@@ -2599,7 +2697,7 @@ namespace EmuCore
 	template<std::size_t Size_, typename T_, typename Rhs_>
 	struct do_cmp_not_equal_to<EmuMath::Vector<Size_, T_>, Rhs_>
 	{
-		inline do_cmp_not_equal_to()
+		constexpr do_cmp_not_equal_to()
 		{
 		}
 		constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, Rhs_& rhs_) const
@@ -2611,7 +2709,7 @@ namespace EmuCore
 	template<std::size_t Size_, typename T_, typename Rhs_>
 	struct do_cmp_greater<EmuMath::Vector<Size_, T_>, Rhs_>
 	{
-		inline do_cmp_greater()
+		constexpr do_cmp_greater()
 		{
 		}
 		constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, Rhs_& rhs_) const
@@ -2623,7 +2721,7 @@ namespace EmuCore
 	template<std::size_t Size_, typename T_, typename Rhs_>
 	struct do_cmp_less<EmuMath::Vector<Size_, T_>, Rhs_>
 	{
-		inline do_cmp_less()
+		constexpr do_cmp_less()
 		{
 		}
 		constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, Rhs_& rhs_) const
@@ -2635,7 +2733,7 @@ namespace EmuCore
 	template<std::size_t Size_, typename T_, typename Rhs_>
 	struct do_cmp_greater_equal<EmuMath::Vector<Size_, T_>, Rhs_>
 	{
-		inline do_cmp_greater_equal()
+		constexpr do_cmp_greater_equal()
 		{
 		}
 		constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, Rhs_& rhs_) const
@@ -2647,12 +2745,84 @@ namespace EmuCore
 	template<std::size_t Size_, typename T_, typename Rhs_>
 	struct do_cmp_less_equal<EmuMath::Vector<Size_, T_>, Rhs_>
 	{
-		inline do_cmp_less_equal()
+		constexpr do_cmp_less_equal()
 		{
 		}
 		constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorCmpLessEqual(lhs_, rhs_);
+		}
+	};
+
+	template<std::size_t Size_, typename T_>
+	struct do_cos<EmuMath::Vector<Size_, T_>>
+	{
+		constexpr do_cos()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		{
+			return EmuMath::Helpers::VectorMutate(vector_, EmuCore::do_cos<typename EmuMath::Vector<Size_, T_>::value_type>());
+		}
+	};
+
+	template<std::size_t Size_, typename T_>
+	struct do_acos<EmuMath::Vector<Size_, T_>>
+	{
+		constexpr do_acos()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		{
+			return EmuMath::Helpers::VectorMutate(vector_, EmuCore::do_acos<typename EmuMath::Vector<Size_, T_>::value_type>());
+		}
+	};
+
+	template<std::size_t Size_, typename T_>
+	struct do_sin<EmuMath::Vector<Size_, T_>>
+	{
+		constexpr do_sin()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		{
+			return EmuMath::Helpers::VectorMutate(vector_, EmuCore::do_sin<typename EmuMath::Vector<Size_, T_>::value_type>());
+		}
+	};
+
+	template<std::size_t Size_, typename T_>
+	struct do_asin<EmuMath::Vector<Size_, T_>>
+	{
+		constexpr do_asin()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		{
+			return EmuMath::Helpers::VectorMutate(vector_, EmuCore::do_asin<typename EmuMath::Vector<Size_, T_>::value_type>());
+		}
+	};
+
+	template<std::size_t Size_, typename T_>
+	struct do_tan<EmuMath::Vector<Size_, T_>>
+	{
+		constexpr do_tan()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		{
+			return EmuMath::Helpers::VectorMutate(vector_, EmuCore::do_tan<typename EmuMath::Vector<Size_, T_>::value_type>());
+		}
+	};
+
+	template<std::size_t Size_, typename T_>
+	struct do_atan<EmuMath::Vector<Size_, T_>>
+	{
+		constexpr do_atan()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		{
+			return EmuMath::Helpers::VectorMutate(vector_, EmuCore::do_atan<typename EmuMath::Vector<Size_, T_>::value_type>());
 		}
 	};
 #pragma endregion

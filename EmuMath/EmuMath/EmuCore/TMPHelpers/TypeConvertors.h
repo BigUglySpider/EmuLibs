@@ -286,7 +286,7 @@ namespace EmuCore::TMPHelpers
 	template<typename T_>
 	struct get_value_type
 	{
-		using type = T_;
+		using type = std::remove_reference_t<std::remove_pointer_t<T_>>;
 	};
 	template<template<typename...Ts__> class Template_, typename...Ts_>
 	struct get_value_type<Template_<Ts_...>>

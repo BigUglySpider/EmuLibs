@@ -223,7 +223,7 @@ namespace EmuCore::TMPHelpers
 	template<typename T>
 	static constexpr std::size_t bits_in_type_v = sizeof(T) * CHAR_BIT;
 
-	/// <summary> Finds the first floating point of all the passed types. If there are no floating point types, the type contained will be std::false_type. </summary>
+	/// <summary> Finds the first floating point of all the passed types. If there are no floating point types, the type contained will be void. </summary>
 	/// <typeparam name="First_">First type to check.</typeparam>
 	/// <typeparam name="Others_">All other types to check if First_ is not a floating point.</typeparam>
 	template<typename First_, typename...Others_>
@@ -234,7 +234,7 @@ namespace EmuCore::TMPHelpers
 	template<typename First_>
 	struct first_floating_point<First_>
 	{
-		using type = std::conditional_t<std::is_floating_point_v<First_>, First_, std::false_type>;
+		using type = std::conditional_t<std::is_floating_point_v<First_>, First_, void>;
 	};
 	template<typename...Types_>
 	using first_floating_point_t = typename first_floating_point<Types_...>::type;

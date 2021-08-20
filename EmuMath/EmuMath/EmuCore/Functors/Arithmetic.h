@@ -321,6 +321,150 @@ namespace EmuCore
 			return do_negate<T_>()(val_);
 		}
 	};
+
+	template<typename T_>
+	struct do_cos
+	{
+		constexpr do_cos()
+		{
+		}
+		constexpr inline T_ operator()(const T_& t_) const
+		{
+			return EmuCore::DoMatchingCos<T_, T_>(t_);
+		}
+	};
+	template<>
+	struct do_cos<void>
+	{
+		constexpr do_cos()
+		{
+		}
+		template<typename T_>
+		constexpr inline T_ operator()(const T_& t_) const
+		{
+			return do_cos<T_>()(t_);
+		}
+	};
+
+	template<typename T_>
+	struct do_acos
+	{
+		constexpr do_acos()
+		{
+		}
+		constexpr inline T_ operator()(const T_& t_) const
+		{
+			return EmuCore::DoMatchingAcos<T_, T_>(t_);
+		}
+	};
+	template<>
+	struct do_acos<void>
+	{
+		constexpr do_acos()
+		{
+		}
+		template<typename T_>
+		constexpr inline T_ operator()(const T_& t_) const
+		{
+			return do_acos<T_>()(t_);
+		}
+	};
+
+	template<typename T_>
+	struct do_sin
+	{
+		constexpr do_sin()
+		{
+		}
+		constexpr inline T_ operator()(const T_& t_) const
+		{
+			return EmuCore::DoMatchingSin<T_, T_>(t_);
+		}
+	};
+	template<>
+	struct do_sin<void>
+	{
+		constexpr do_sin()
+		{
+		}
+		template<typename T_>
+		constexpr inline T_ operator()(const T_& t_) const
+		{
+			return do_sin<T_>()(t_);
+		}
+	};
+
+	template<typename T_>
+	struct do_asin
+	{
+		constexpr do_asin()
+		{
+		}
+		constexpr inline T_ operator()(const T_& t_) const
+		{
+			return EmuCore::DoMatchingAsin<T_, T_>(t_);
+		}
+	};
+	template<>
+	struct do_asin<void>
+	{
+		constexpr do_asin()
+		{
+		}
+		template<typename T_>
+		constexpr inline T_ operator()(const T_& t_) const
+		{
+			return do_asin<T_>()(t_);
+		}
+	};
+
+	template<typename T_>
+	struct do_tan
+	{
+		constexpr do_tan()
+		{
+		}
+		constexpr inline T_ operator()(const T_& t_) const
+		{
+			return EmuCore::DoMatchingTan<T_, T_>(t_);
+		}
+	};
+	template<>
+	struct do_tan<void>
+	{
+		constexpr do_tan()
+		{
+		}
+		template<typename T_>
+		constexpr inline T_ operator()(const T_& t_) const
+		{
+			return do_tan<T_>()(t_);
+		}
+	};
+
+	template<typename T_>
+	struct do_atan
+	{
+		constexpr do_atan()
+		{
+		}
+		constexpr inline T_ operator()(const T_& t_) const
+		{
+			return EmuCore::DoMatchingAtan<T_, T_>(t_);
+		}
+	};
+	template<>
+	struct do_atan<void>
+	{
+		constexpr do_atan()
+		{
+		}
+		template<typename T_>
+		constexpr inline T_ operator()(const T_& t_) const
+		{
+			return do_atan<T_>()(t_);
+		}
+	};
 }
 
 #endif

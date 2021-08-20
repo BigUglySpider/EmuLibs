@@ -158,6 +158,10 @@ int main()
 	std::cout << "a_norm_qrsqrt (1 newton iteration): " << a_norm_qrsqrt_1 << " | Mag: " << a_norm_qrsqrt_1_mag << "\n";
 	std::cout << "a_norm_qrsqrt (2 newton iterations): " << a_norm_qrsqrt_2 << " | Mag: " << a_norm_qrsqrt_2_mag << "\n";
 
+	std::cout << "AngleRads(" << vec_a << ", " << vec_d << "): " << EmuMath::Helpers::VectorAngle<true>(vec_a, vec_d) << "\n";
+	std::cout << "AngleDegs(" << vec_a << ", " << vec_d << "): " << EmuMath::Helpers::VectorAngle<false>(vec_a, vec_d) << "\n";
+
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();
