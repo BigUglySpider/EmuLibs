@@ -32,6 +32,7 @@ namespace EmuMath
 		static constexpr std::size_t size = Size_;
 		/// <summary> This vector's instantiated type. </summary>
 		using this_type = Vector<size, contained_type>;
+		using copy_type = Vector<size, value_type>;
 
 		static constexpr bool has_integral_elements = std::is_integral_v<std::remove_cv_t<value_type>>;
 		static constexpr bool has_floating_point_elements = std::is_floating_point_v<std::remove_cv_t<value_type>>;

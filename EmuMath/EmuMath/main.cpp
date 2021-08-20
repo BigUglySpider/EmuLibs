@@ -1,10 +1,10 @@
-#include "Tests.hpp"
-
 #include "EmuMath/Vector.h"
 #include <array>
 #include <bitset>
 #include <iomanip>
 
+
+#include "Tests.hpp"
 using namespace EmuCore::TestingHelpers;
 
 template<typename T_>
@@ -144,7 +144,19 @@ int main()
 	std::cout << x_bits_ << " |\n  " << simple_bitset<x_val_type>(some_constant_) << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorOr(x_, some_constant_)) << "\n\n";
 	std::cout << x_bits_ << " ^\n  " << simple_bitset<x_val_type>(some_constant_) << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorXor(x_, some_constant_)) << "\n\n";
 
+	constexpr auto a_norm = EmuMath::Helpers::VectorNormaliseConstexpr(vec_a);
+	constexpr auto a_norm_mag = EmuMath::Helpers::VectorMagnitudeConstexpr(a_norm);
 
+	auto a_norm_nonconst = EmuMath::Helpers::VectorNormalise(vec_a);
+	auto a_norm_qrsqrt_1 = EmuMath::Helpers::VectorNormaliseQrsqrt<float, 1>(vec_a);
+	auto a_norm_qrsqrt_2 = EmuMath::Helpers::VectorNormaliseQrsqrt<float, 2>(vec_a);
+	auto a_norm_nonconst_mag = EmuMath::Helpers::VectorMagnitude(a_norm_nonconst);
+	auto a_norm_qrsqrt_1_mag = EmuMath::Helpers::VectorMagnitude(a_norm_qrsqrt_1);
+	auto a_norm_qrsqrt_2_mag = EmuMath::Helpers::VectorMagnitude(a_norm_qrsqrt_2);
+
+	std::cout << "a_norm_nonconst: " << a_norm_nonconst << " | Mag: " << a_norm_nonconst_mag << "\n";
+	std::cout << "a_norm_qrsqrt (1 newton iteration): " << a_norm_qrsqrt_1 << " | Mag: " << a_norm_qrsqrt_1_mag << "\n";
+	std::cout << "a_norm_qrsqrt (2 newton iterations): " << a_norm_qrsqrt_2 << " | Mag: " << a_norm_qrsqrt_2_mag << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

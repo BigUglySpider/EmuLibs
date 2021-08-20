@@ -320,6 +320,12 @@ namespace EmuCore::TMPHelpers
 	};
 	template<typename T_>
 	using get_value_type_t = typename get_value_type<T_>::type;
+
+	template<class Item_>
+	struct item_info
+	{
+		using type = Item_;
+	};
 }
 
 #endif

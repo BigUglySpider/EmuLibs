@@ -237,6 +237,234 @@ namespace EmuMath::Helpers
 	}
 #pragma endregion
 
+#pragma region ARITHMETIC
+	/// <summary>
+	/// <para> Adds respective elements of the lhs_ vector to those of the rhs_ vector. </para>
+	/// </summary>
+	/// <typeparam name="OutVector_">Type of vector to output the results of addition as.</typeparam>
+	/// <typeparam name="LhsVector_">Type of vector on the left-hand side of the addition.</typeparam>
+	/// <typeparam name="Rhs_">Type of vector on the right-hand side of the addition.</typeparam>
+	/// <param name="lhs_">Left-hand vector in the addition operation.</param>
+	/// <param name="lhs_">Right-hand vector in the addition operation.</param>
+	/// <returns>Vector of the provided type containing the results of the addition.</returns>
+	template<class OutVector_, class LhsVector_, class RhsVector_>
+	[[nodiscard]] constexpr inline OutVector_ VectorAdd(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	{
+		if constexpr (_underlying_vector_funcs::_validity_check_vector_arithmetic<OutVector_, LhsVector_, RhsVector_>())
+		{
+			using adder_type = EmuCore::do_add<typename LhsVector_::value_type, typename RhsVector_::value_type>;
+			return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, RhsVector_, adder_type>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert
+			(
+				false,
+				"A validity check on arguments provided for EmuMath::Helpers::VectorAdd has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
+			);
+		}
+	}
+	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class RhsVector_>
+	[[nodiscard]] constexpr inline auto VectorAdd(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	{
+		return VectorAdd<EmuMath::Vector<OutSize_, out_value_type>, LhsVector_, RhsVector_>(lhs_, rhs_);
+	}
+	template<std::size_t OutSize_, class LhsVector_, class RhsVector_>
+	[[nodiscard]] constexpr inline auto VectorAdd(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	{
+		return VectorAdd<EmuMath::Vector<OutSize_, typename LhsVector_::value_type>, LhsVector_, RhsVector_>(lhs_, rhs_);
+	}
+	template<class LhsVector_, class RhsVector_>
+	[[nodiscard]] constexpr inline LhsVector_ VectorAdd(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	{
+		return VectorAdd<LhsVector_, LhsVector_, RhsVector_>(lhs_, rhs_);
+	}
+
+	/// <summary>
+	/// <para> Subtracts respective elements of the lhs_ vector by those of the rhs_ vector. </para>
+	/// </summary>
+	/// <typeparam name="OutVector_">Type of vector to output the results of subtraction as.</typeparam>
+	/// <typeparam name="LhsVector_">Type of vector on the left-hand side of the subtraction.</typeparam>
+	/// <typeparam name="Rhs_">Type of vector on the right-hand side of the subtraction.</typeparam>
+	/// <param name="lhs_">EmuMath vector to be subtracted from.</param>
+	/// <param name="rhs_">EmuMath vector of amounts to subtract from respective elements.</param>
+	/// <returns>Vector of the provided type containing the results of the subtraction.</returns>
+	template<class OutVector_, class LhsVector_, class RhsVector_>
+	[[nodiscard]] constexpr inline OutVector_ VectorSubtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	{
+		if constexpr (_underlying_vector_funcs::_validity_check_vector_arithmetic<OutVector_, LhsVector_, RhsVector_>())
+		{
+			using subtractor_type = EmuCore::do_subtract<typename LhsVector_::value_type, typename RhsVector_::value_type>;
+			return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, RhsVector_, subtractor_type>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert
+			(
+				false,
+				"A validity check on arguments provided for EmuMath::Helpers::VectorSubtract has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
+			);
+		}
+	}
+	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class RhsVector_>
+	[[nodiscard]] constexpr inline auto VectorSubtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	{
+		return VectorSubtract<EmuMath::Vector<OutSize_, out_value_type>, LhsVector_, RhsVector_>(lhs_, rhs_);
+	}
+	template<std::size_t OutSize_, class LhsVector_, class RhsVector_>
+	[[nodiscard]] constexpr inline auto VectorSubtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	{
+		return VectorSubtract<EmuMath::Vector<OutSize_, typename LhsVector_::value_type>, LhsVector_, RhsVector_>(lhs_, rhs_);
+	}
+	template<class LhsVector_, class RhsVector_>
+	[[nodiscard]] constexpr inline LhsVector_ VectorSubtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	{
+		return VectorSubtract<LhsVector_, LhsVector_, RhsVector_>(lhs_, rhs_);
+	}
+
+	/// <summary>
+	/// <para> Multiplies respective elements of the lhs_ vector by those of a rhs_ vector, or multiplies all elements of the lhs_ vector by a rhs_ scalar. </para>
+	/// </summary>
+	/// <typeparam name="OutVector_">Type of vector to output the results of multiplication as.</typeparam>
+	/// <typeparam name="LhsVector_">Type of vector on the left-hand side of the multiplication.</typeparam>
+	/// <typeparam name="Rhs_">Type of either vector or scalar on the right-hand side of the multiplication.</typeparam>
+	/// <param name="lhs_">EmuMath vector to be multiplied.</param>
+	/// <param name="rhs_">EmuMath vector to multiply respective elements by, or a scalar to multiply every element by.</param>
+	/// <returns>Vector of the provided type containing the results of the multiplication.</returns>
+	template<class OutVector_, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline OutVector_ VectorMultiply(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (_underlying_vector_funcs::_validity_check_vector_arithmetic_potential_scalar<OutVector_, LhsVector_>())
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
+			{
+				using multiplier_type = EmuCore::do_multiply<typename LhsVector_::value_type, typename Rhs_::value_type>;
+				return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, Rhs_, multiplier_type>(lhs_, rhs_);
+			}
+			else
+			{
+				using multiplier_type = EmuCore::do_multiply<typename LhsVector_::value_type, Rhs_>;
+				return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, Rhs_, multiplier_type>(lhs_, rhs_);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				false,
+				"A validity check on arguments provided for EmuMath::Helpers::VectorMultiply has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
+			);
+		}
+	}
+	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline auto VectorMultiply(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorMultiply<EmuMath::Vector<OutSize_, out_value_type>, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline auto VectorMultiply(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorMultiply<EmuMath::Vector<OutSize_, typename LhsVector_::value_type>, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+	template<class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline auto VectorMultiply(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorMultiply<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+
+	/// <summary>
+	/// <para> Divides respective elements of the lhs_ vector by those of a rhs_ vector, or divides all elements of the lhs_ vector by a rhs_ scalar. </para>
+	/// <para> There is an additional compile-time safety check to avoid guaranteed integral divides by 0, or casting divides by 0 to integral types. </para>
+	/// <para> This function cannot provide a valid constexpr if the result requires a divide by 0, integral or not. </para>
+	/// </summary>
+	/// <typeparam name="OutVector_">Type of vector to output the results of division as.</typeparam>
+	/// <typeparam name="LhsVector_">Type of vector on the left-hand side of the division.</typeparam>
+	/// <typeparam name="Rhs_">Type of either vector or scalar on the right-hand side of the division.</typeparam>
+	/// <param name="lhs_">EmuMath vector to be divided.</param>
+	/// <param name="rhs_">EmuMath vector to divide respective elements by, or a scalar to divide every element by.</param>
+	/// <returns>Vector of the provided type containing the results of the division.</returns>
+	template<class OutVector_, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline OutVector_ VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr
+		(
+			_underlying_vector_funcs::_validity_check_vector_arithmetic_potential_scalar<OutVector_, LhsVector_>() &&
+			_underlying_vector_funcs::_validity_check_no_integral_divide_by_zero<OutVector_, LhsVector_, Rhs_>()
+		)
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
+			{
+				using divider_type = EmuCore::do_divide<typename LhsVector_::value_type, typename Rhs_::value_type>;
+				return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, Rhs_, divider_type>(lhs_, rhs_);
+			}
+			else
+			{
+				using divider_type = EmuCore::do_divide<typename LhsVector_::value_type, Rhs_>;
+				return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, Rhs_, divider_type>(lhs_, rhs_);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				false,
+				"A validity check on arguments provided for EmuMath::Helpers::VectorDivide has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
+			);
+		}
+	}
+	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline auto VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorDivide<EmuMath::Vector<OutSize_, out_value_type>, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline auto VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorDivide<EmuMath::Vector<OutSize_, typename LhsVector_::value_type>, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+	template<class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline LhsVector_ VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorDivide<LhsVector_, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+
+	/// <summary>
+	/// <para> Negates the elements of the passed vector and returns the result in the output vector, where out[x] == -vector_[x]. </para>
+	/// </summary>
+	/// <typeparam name="out_value_type">Type to be contained in the output vector.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to negate the elements of.</typeparam>
+	/// <param name="vector_">EmuMath vector to negate the elements of.</param>
+	/// <returns>Vector whose elements are the negated form of the respective elements in the passed vector_.</returns>
+	template<std::size_t OutSize_, typename out_value_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorNegate(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			using negator_type = EmuCore::do_negate<typename Vector_::value_type>;
+			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, negator_type>(vector_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to negate a vector, but passed a non-EmuMath-vector argument type.");
+		}
+	}
+	template<typename out_value_type, class Vector_>
+	[[nodiscard]] constexpr inline auto VectorNegate(const Vector_& vector_)
+	{
+		return VectorNegate<Vector_::size, out_value_type>(vector_);
+	}
+	template<std::size_t OutSize_, class Vector_>
+	[[nodiscard]] constexpr inline auto VectorNegate(const Vector_& vector_)
+	{
+		return VectorNegate<OutSize_, typename Vector_::value_type>(vector_);
+	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline auto VectorNegate(const Vector_& vector_)
+	{
+		return VectorNegate<Vector_::size, typename Vector_::value_type>(vector_);
+	}
+#pragma endregion
+
 #pragma region VECTOR_OPERATIONS
 	/// <summary> Calculates the product of multiplying all elements within the passed vector and returns it as the optional provided OutT_. </summary>
 	/// <typeparam name="OutT_">Optional type to output as. If not provided, this will match the vector's value_type.</typeparam>
@@ -367,7 +595,7 @@ namespace EmuMath::Helpers
 	[[nodiscard]] inline OutT_ VectorMagnitude(const Vector_& vector_)
 	{
 		using FloatingPoint_ = EmuCore::TMPHelpers::first_floating_point_t<OutT_, typename Vector_::value_type, float>;
-		return EmuCore::DoCorrectStandardSqrt<FloatingPoint_>(VectorSquareMagnitude<FloatingPoint_, Vector_>(vector_));
+		return EmuCore::DoMatchingStandardSqrt<FloatingPoint_>(VectorSquareMagnitude<FloatingPoint_, Vector_>(vector_));
 	}
 
 	/// <summary>
@@ -1092,233 +1320,97 @@ namespace EmuMath::Helpers
 	{
 		return VectorSqrt<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
 	}
-#pragma endregion
-
-#pragma region ARITHMETIC
-	/// <summary>
-	/// <para> Adds respective elements of the lhs_ vector to those of the rhs_ vector. </para>
-	/// </summary>
-	/// <typeparam name="OutVector_">Type of vector to output the results of addition as.</typeparam>
-	/// <typeparam name="LhsVector_">Type of vector on the left-hand side of the addition.</typeparam>
-	/// <typeparam name="Rhs_">Type of vector on the right-hand side of the addition.</typeparam>
-	/// <param name="lhs_">Left-hand vector in the addition operation.</param>
-	/// <param name="lhs_">Right-hand vector in the addition operation.</param>
-	/// <returns>Vector of the provided type containing the results of the addition.</returns>
-	template<class OutVector_, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline OutVector_ VectorAdd(const LhsVector_& lhs_, const RhsVector_& rhs_)
-	{
-		if constexpr (_underlying_vector_funcs::_validity_check_vector_arithmetic<OutVector_, LhsVector_, RhsVector_>())
-		{
-			using adder_type = EmuCore::do_add<typename LhsVector_::value_type, typename RhsVector_::value_type>;
-			return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, RhsVector_, adder_type>(lhs_, rhs_);
-		}
-		else
-		{
-			static_assert
-			(
-				false,
-				"A validity check on arguments provided for EmuMath::Helpers::VectorAdd has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
-			);
-		}
-	}
-	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline auto VectorAdd(const LhsVector_& lhs_, const RhsVector_& rhs_)
-	{
-		return VectorAdd<EmuMath::Vector<OutSize_, out_value_type>, LhsVector_, RhsVector_>(lhs_, rhs_);
-	}
-	template<std::size_t OutSize_, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline auto VectorAdd(const LhsVector_& lhs_, const RhsVector_& rhs_)
-	{
-		return VectorAdd<EmuMath::Vector<OutSize_, typename LhsVector_::value_type>, LhsVector_, RhsVector_>(lhs_, rhs_);
-	}
-	template<class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline LhsVector_ VectorAdd(const LhsVector_& lhs_, const RhsVector_& rhs_)
-	{
-		return VectorAdd<LhsVector_, LhsVector_, RhsVector_>(lhs_, rhs_);
-	}
 
 	/// <summary>
-	/// <para> Subtracts respective elements of the lhs_ vector by those of the rhs_ vector. </para>
+	/// <para> Creates a copy of the passed vector with its elements normalised. </para>
+	/// <para>
+	///		This function may make some sacrifices to be evaluable at compile time. 
+	///		If it is being called at compile time, it is recommended to use VectorNormalise or VectorNormaliseQrsqrt instead.
+	/// </para>
 	/// </summary>
-	/// <typeparam name="OutVector_">Type of vector to output the results of subtraction as.</typeparam>
-	/// <typeparam name="LhsVector_">Type of vector on the left-hand side of the subtraction.</typeparam>
-	/// <typeparam name="Rhs_">Type of vector on the right-hand side of the subtraction.</typeparam>
-	/// <param name="lhs_">EmuMath vector to be subtracted from.</param>
-	/// <param name="rhs_">EmuMath vector of amounts to subtract from respective elements.</param>
-	/// <returns>Vector of the provided type containing the results of the subtraction.</returns>
-	template<class OutVector_, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline OutVector_ VectorSubtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
-	{
-		if constexpr (_underlying_vector_funcs::_validity_check_vector_arithmetic<OutVector_, LhsVector_, RhsVector_>())
-		{
-			using subtractor_type = EmuCore::do_subtract<typename LhsVector_::value_type, typename RhsVector_::value_type>;
-			return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, RhsVector_, subtractor_type>(lhs_, rhs_);
-		}
-		else
-		{
-			static_assert
-			(
-				false,
-				"A validity check on arguments provided for EmuMath::Helpers::VectorSubtract has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
-			);
-		}
-	}
-	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline auto VectorSubtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
-	{
-		return VectorSubtract<EmuMath::Vector<OutSize_, out_value_type>, LhsVector_, RhsVector_>(lhs_, rhs_);
-	}
-	template<std::size_t OutSize_, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline auto VectorSubtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
-	{
-		return VectorSubtract<EmuMath::Vector<OutSize_, typename LhsVector_::value_type>, LhsVector_, RhsVector_>(lhs_, rhs_);
-	}
-	template<class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline LhsVector_ VectorSubtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
-	{
-		return VectorSubtract<LhsVector_, LhsVector_, RhsVector_>(lhs_, rhs_);
-	}
-
-	/// <summary>
-	/// <para> Multiplies respective elements of the lhs_ vector by those of a rhs_ vector, or multiplies all elements of the lhs_ vector by a rhs_ scalar. </para>
-	/// </summary>
-	/// <typeparam name="OutVector_">Type of vector to output the results of multiplication as.</typeparam>
-	/// <typeparam name="LhsVector_">Type of vector on the left-hand side of the multiplication.</typeparam>
-	/// <typeparam name="Rhs_">Type of either vector or scalar on the right-hand side of the multiplication.</typeparam>
-	/// <param name="lhs_">EmuMath vector to be multiplied.</param>
-	/// <param name="rhs_">EmuMath vector to multiply respective elements by, or a scalar to multiply every element by.</param>
-	/// <returns>Vector of the provided type containing the results of the multiplication.</returns>
-	template<class OutVector_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline OutVector_ VectorMultiply(const LhsVector_& lhs_, const Rhs_& rhs_)
-	{
-		if constexpr (_underlying_vector_funcs::_validity_check_vector_arithmetic_potential_scalar<OutVector_, LhsVector_>())
-		{
-			if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
-			{
-				using multiplier_type = EmuCore::do_multiply<typename LhsVector_::value_type, typename Rhs_::value_type>;
-				return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, Rhs_, multiplier_type>(lhs_, rhs_);
-			}
-			else
-			{
-				using multiplier_type = EmuCore::do_multiply<typename LhsVector_::value_type, Rhs_>;
-				return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, Rhs_, multiplier_type>(lhs_, rhs_);
-			}
-		}
-		else
-		{
-			static_assert
-			(
-				false,
-				"A validity check on arguments provided for EmuMath::Helpers::VectorMultiply has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
-			);
-		}
-	}
-	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline auto VectorMultiply(const LhsVector_& lhs_, const Rhs_& rhs_)
-	{
-		return VectorMultiply<EmuMath::Vector<OutSize_, out_value_type>, LhsVector_, Rhs_>(lhs_, rhs_);
-	}
-	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline auto VectorMultiply(const LhsVector_& lhs_, const Rhs_& rhs_)
-	{
-		return VectorMultiply<EmuMath::Vector<OutSize_, typename LhsVector_::value_type>, LhsVector_, Rhs_>(lhs_, rhs_);
-	}
-	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline LhsVector_ VectorMultiply(const LhsVector_& lhs_, const Rhs_& rhs_)
-	{
-		return VectorMultiply<LhsVector_, LhsVector_, Rhs_>(lhs_, rhs_);
-	}
-
-	/// <summary>
-	/// <para> Divides respective elements of the lhs_ vector by those of a rhs_ vector, or divides all elements of the lhs_ vector by a rhs_ scalar. </para>
-	/// <para> There is an additional compile-time safety check to avoid guaranteed integral divides by 0, or casting divides by 0 to integral types. </para>
-	/// <para> This function cannot provide a valid constexpr if the result requires a divide by 0, integral or not. </para>
-	/// </summary>
-	/// <typeparam name="OutVector_">Type of vector to output the results of division as.</typeparam>
-	/// <typeparam name="LhsVector_">Type of vector on the left-hand side of the division.</typeparam>
-	/// <typeparam name="Rhs_">Type of either vector or scalar on the right-hand side of the division.</typeparam>
-	/// <param name="lhs_">EmuMath vector to be divided.</param>
-	/// <param name="rhs_">EmuMath vector to divide respective elements by, or a scalar to divide every element by.</param>
-	/// <returns>Vector of the provided type containing the results of the division.</returns>
-	template<class OutVector_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline OutVector_ VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
-	{
-		if constexpr
-		(
-			_underlying_vector_funcs::_validity_check_vector_arithmetic_potential_scalar<OutVector_, LhsVector_>() &&
-			_underlying_vector_funcs::_validity_check_no_integral_divide_by_zero<OutVector_, LhsVector_, Rhs_>()
-		)
-		{
-			if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
-			{
-				using divider_type = EmuCore::do_divide<typename LhsVector_::value_type, typename Rhs_::value_type>;
-				return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, Rhs_, divider_type>(lhs_, rhs_);
-			}
-			else
-			{
-				using divider_type = EmuCore::do_divide<typename LhsVector_::value_type, Rhs_>;
-				return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, Rhs_, divider_type>(lhs_, rhs_);
-			}
-		}
-		else
-		{
-			static_assert
-			(
-				false,
-				"A validity check on arguments provided for EmuMath::Helpers::VectorDivide has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
-			);
-		}
-	}
-	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline auto VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
-	{
-		return VectorDivide<EmuMath::Vector<OutSize_, out_value_type>, LhsVector_, Rhs_>(lhs_, rhs_);
-	}
-	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline auto VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
-	{
-		return VectorDivide<EmuMath::Vector<OutSize_, typename LhsVector_::value_type>, LhsVector_, Rhs_>(lhs_, rhs_);
-	}
-	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline LhsVector_ VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
-	{
-		return VectorDivide<LhsVector_, LhsVector_, Rhs_>(lhs_, rhs_);
-	}
-
-	/// <summary>
-	/// <para> Negates the elements of the passed vector and returns the result in the output vector, where out[x] == -vector_[x]. </para>
-	/// </summary>
-	/// <typeparam name="out_value_type">Type to be contained in the output vector.</typeparam>
-	/// <typeparam name="Vector_">Type of vector to negate the elements of.</typeparam>
-	/// <param name="vector_">EmuMath vector to negate the elements of.</param>
-	/// <returns>Vector whose elements are the negated form of the respective elements in the passed vector_.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorNegate(const Vector_& vector_)
+	/// <typeparam name="MagFloatingPointType_">Type of floating-point to calculate the magnitude as and use for arithmetic in normalisation. Defaults to float.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to return a normalised copy of.</typeparam>
+	/// <param name="vector_">EmuMath vector to calculate the normalised form of.</param>
+	/// <returns>Copy of the passed EmuMath vector with its elements normalised.</returns>
+	template<typename MagFloatingPointType_ = float, class Vector_>
+	[[nodiscard]] constexpr inline typename Vector_::copy_type VectorNormaliseConstexpr(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			using negator_type = EmuCore::do_negate<typename Vector_::value_type>;
-			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, negator_type>(vector_);
+			if constexpr (std::is_floating_point_v<MagFloatingPointType_>)
+			{
+				return VectorMultiply<Vector_, MagFloatingPointType_>(vector_, VectorMagnitudeReciprocalConstexpr<MagFloatingPointType_>(vector_));
+			}
+			else
+			{
+				static_assert(false, "Attempted to use a non-floating-point type for calculating the reciprocal to a vector's magnitude when normalising it.");
+			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to negate a vector, but passed a non-EmuMath-vector argument type.");
+			static_assert(false, "Attempted to normalise a vector, but provided a non-EmuMath-vector argument.");
 		}
 	}
-	template<typename out_value_type, class Vector_>
-	[[nodiscard]] constexpr inline auto VectorNegate(const Vector_& vector_)
+
+	/// <summary>
+	/// <para> Creates a copy of the passed vector with its elements normalised. </para>
+	/// </summary>
+	/// <typeparam name="MagFloatingPointType_">Type of floating-point to calculate the magnitude as and use for arithmetic in normalisation. Defaults to float.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to return a normalised copy of.</typeparam>
+	/// <param name="vector_">EmuMath vector to calculate the normalised form of.</param>
+	/// <returns>Copy of the passed EmuMath vector with its elements normalised.</returns>
+	template<typename MagFloatingPointType_ = float, class Vector_>
+	[[nodiscard]] inline typename Vector_::copy_type VectorNormalise(const Vector_& vector_)
 	{
-		return VectorNegate<Vector_::size, out_value_type>(vector_);
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			if constexpr (std::is_floating_point_v<MagFloatingPointType_>)
+			{
+				return VectorMultiply<Vector_, MagFloatingPointType_>(vector_, VectorMagnitudeReciprocal<MagFloatingPointType_>(vector_));
+			}
+			else
+			{
+				static_assert(false, "Attempted to use a non-floating-point type for calculating the reciprocal to a vector's magnitude when normalising it.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to normalise a vector, but provided a non-EmuMath-vector argument.");
+		}
 	}
-	template<std::size_t OutSize_, class Vector_>
-	[[nodiscard]] constexpr inline auto VectorNegate(const Vector_& vector_)
+
+	/// <summary>
+	/// <para> Creates a copy of the passed vector with its elements normalised. </para>
+	/// <para> Uses Q_rsqrt to find the magnitude reciprocal to multiply all elements by. </para>
+	///	<para> NumNewtonIterations_ can be increased to improve accuracy. </para>
+	///	<para> MagicConstant_ may be changed to modify bitwise operations, but is recommended to be left to the default (0x5F3759DF) unless you know what you are doing. </para>
+	/// </summary>
+	/// <typeparam name="MagFloatingPointType_">Type of floating-point to calculate the magnitude as and use for arithmetic in normalisation. Defaults to float.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to return a normalised copy of.</typeparam>
+	/// <param name="vector_">EmuMath vector to calculate the normalised form of.</param>
+	/// <returns>Copy of the passed EmuMath vector with its elements normalised via the result of using Q_rsqrt to find the magnitude's reciprocal.</returns>
+	template<typename MagFloatingPointType_ = float, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, class Vector_>
+	[[nodiscard]] inline typename Vector_::copy_type VectorNormaliseQrsqrt(const Vector_& vector_)
 	{
-		return VectorNegate<OutSize_, typename Vector_::value_type>(vector_);
-	}
-	template<class Vector_>
-	[[nodiscard]] constexpr inline auto VectorNegate(const Vector_& vector_)
-	{
-		return VectorNegate<Vector_::size, typename Vector_::value_type>(vector_);
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			if constexpr (std::is_floating_point_v<MagFloatingPointType_>)
+			{
+				return VectorMultiply<Vector_, MagFloatingPointType_>
+				(
+					vector_,
+					VectorMagnitudeReciprocalQrsqrt<MagFloatingPointType_, NumNewtonIterations_, MagicConstant_, Vector_>(vector_)
+				);
+			}
+			else
+			{
+				static_assert(false, "Attempted to use a non-floating-point type for calculating the reciprocal to a vector's magnitude when normalising it.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to normalise a vector, but provided a non-EmuMath-vector argument.");
+		}
 	}
 #pragma endregion
 

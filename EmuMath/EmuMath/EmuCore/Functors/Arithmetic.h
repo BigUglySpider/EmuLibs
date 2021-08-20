@@ -84,11 +84,11 @@ namespace EmuCore
 		{
 			if constexpr (std::is_same_v<T_, floating_point_>)
 			{
-				return DoCorrectStandardSqrt<T_>(val_);
+				return DoMatchingStandardSqrt<T_>(val_);
 			}
 			else
 			{
-				return DoCorrectStandardSqrt<floating_point_>(static_cast<floating_point_>(val_));
+				return DoMatchingStandardSqrt<floating_point_>(static_cast<floating_point_>(val_));
 			}
 		}
 	};
@@ -184,7 +184,7 @@ namespace EmuCore
 		const std::plus<void> adder_;
 
 	public:
-		constexpr do_add()
+		constexpr do_add() : adder_()
 		{
 		}
 		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
@@ -213,7 +213,7 @@ namespace EmuCore
 		const std::minus<void> subtractor_;
 
 	public:
-		constexpr do_subtract()
+		constexpr do_subtract() : subtractor_()
 		{
 		}
 		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
@@ -239,15 +239,15 @@ namespace EmuCore
 	struct do_multiply
 	{
 	private:
-		const std::multiplies<void> mutliplier_;
+		const std::multiplies<void> multiplier_;
 
 	public:
-		constexpr do_multiply()
+		constexpr do_multiply() : multiplier_()
 		{
 		}
 		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return mutliplier_(lhs_, rhs_);
+			return multiplier_(lhs_, rhs_);
 		}
 	};
 	template<>
@@ -271,7 +271,7 @@ namespace EmuCore
 		const std::divides<void> divider_;
 
 	public:
-		constexpr do_divide()
+		constexpr do_divide() : divider_()
 		{
 		}
 		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
@@ -300,7 +300,7 @@ namespace EmuCore
 		const std::negate<void> negator_;
 
 	public:
-		constexpr do_negate()
+		constexpr do_negate() : negator_()
 		{
 		}
 		constexpr inline auto operator()(const T_& val_) const

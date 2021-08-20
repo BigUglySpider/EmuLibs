@@ -3,6 +3,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <limits>
+#include <type_traits>
 
 namespace EmuCore
 {
@@ -85,7 +87,7 @@ namespace EmuCore
 	}
 
 	template<typename FloatingPointOut_ = float, typename FloatingPointIn_>
-	FloatingPointOut_ DoCorrectStandardSqrt(const FloatingPointIn_ val_)
+	FloatingPointOut_ DoMatchingStandardSqrt(const FloatingPointIn_ val_)
 	{
 		if constexpr (std::is_floating_point_v<FloatingPointIn_>)
 		{
@@ -104,7 +106,7 @@ namespace EmuCore
 		}
 		else
 		{
-			static_assert(false, "Passed a non-floating-point output type to EmuCore::DoCorrectStandardSqrt. Did you mean to use the do_sqrt functor?");
+			static_assert(false, "Passed a non-floating-point output type to EmuCore::DoMatchingStandardSqrt. Did you mean to use the do_sqrt functor?");
 		}
 	}
 
