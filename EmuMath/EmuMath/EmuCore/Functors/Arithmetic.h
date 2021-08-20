@@ -1,5 +1,5 @@
 #ifndef EMU_CORE_ARITHMETIC_FUNCTORS_H_INC_
-#define EMU_CORE_ARITHMETIC_FUNCTORS_H_INC_
+#define EMU_CORE_ARITHMETIC_FUNCTORS_H_INC_ 1
 
 #include "../ArithmeticHelpers/CommonMath.h"
 #include <cstddef>

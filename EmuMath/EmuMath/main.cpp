@@ -162,6 +162,7 @@ int main()
 	std::cout << "AngleDegs(" << vec_a << ", " << vec_d << "): " << EmuMath::Helpers::VectorAngle<false>(vec_a, vec_d) << "\n";
 
 
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();

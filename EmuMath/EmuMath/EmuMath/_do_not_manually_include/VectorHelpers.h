@@ -1510,6 +1510,51 @@ namespace EmuMath::Helpers
 			return static_cast<OutAngle_>(EmuCore::Pi::RadsToDegs(EmuCore::do_acos<floating_point>()(VectorAngleCosine<floating_point>(a_, b_))));
 		}
 	}
+
+	/// <summary>
+	/// <para> Returns a vector containing the distance that may be added to the vector from_ to reach the values of the vector to_. </para>
+	/// <para> This is effectively syntactic sugar for VectorSubtract(to_, from_). </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output vector.</typeparam>
+	/// <typeparam name="FromVector_">Type of vector to calculate the distance from.</typeparam>
+	/// <typeparam name="ToVector_">Type of vector to calculate the distance to.</typeparam>
+	/// <param name="from_">EmuMath vector to calculate the distance from.</param>
+	/// <param name="to_">EmuMath vector to calculate the distance to.</param>
+	/// <returns>Vector that may be added to from_ to reach the respective elements of to_.</returns>
+	template<std::size_t OutSize_, typename out_contained_type, class FromVector_, class ToVector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorDistance(const FromVector_& from_, const ToVector_& to_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<FromVector_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<FromVector_>)
+			{
+				return VectorSubtract<OutSize_, out_contained_type, ToVector_, FromVector_>(to_, from_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to find the distance between two vectors, but provided a non-EmuMath-vector argument for to_.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to find the distance between two vectors, but provided a non-EmuMath-vector argument for from_.");
+		}
+	}
+	template<typename out_contained_type, class FromVector_, class ToVector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<FromVector_::size, out_contained_type> VectorDistance(const FromVector_& from_, const ToVector_& to_)
+	{
+		return VectorDistance<FromVector_::size, out_contained_type, FromVector_, ToVector_>(from_, to_);
+	}
+	template<std::size_t OutSize_, class FromVector_, class ToVector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename FromVector_::value_type> VectorDistance(const FromVector_& from_, const ToVector_& to_)
+	{
+		return VectorDistance<OutSize_, typename FromVector_::value_type, FromVector_, ToVector_>(from_, to_);
+	}
+	template<class FromVector_, class ToVector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<FromVector_::size, typename FromVector_::value_type> VectorDistance(const FromVector_& from_, const ToVector_& to_)
+	{
+		return VectorDistance<FromVector_::size, typename FromVector_::value_type, FromVector_, ToVector_>(from_, to_);
+	}
 #pragma endregion
 
 #pragma region COMPARISONS

@@ -1,5 +1,5 @@
 #ifndef EMU_CORE_BITWISE_FUNCTORS_H_INC_
-#define EMU_CORE_BITWISE_FUNCTORS_H_INC_
+#define EMU_CORE_BITWISE_FUNCTORS_H_INC_ 1
 
 #include <cstddef>
 #include <functional>

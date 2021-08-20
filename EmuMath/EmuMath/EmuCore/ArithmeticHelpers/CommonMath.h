@@ -1,5 +1,5 @@
 #ifndef EMU_CORE_COMMON_MATH_H_INC_
-#define EMU_CORE_COMMON_MATH_H_INC_
+#define EMU_CORE_COMMON_MATH_H_INC_ 1
 
 #include <cstddef>
 #include <cstdint>
