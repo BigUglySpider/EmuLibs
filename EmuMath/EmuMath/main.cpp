@@ -46,6 +46,10 @@ struct SettyBoi
 	}
 };
 
+
+template<std::size_t SizeX_, std::size_t SizeY_, typename T_>
+using MatrixCM_ = EmuMath::Vector<SizeX_, EmuMath::Vector<SizeY_, T_>>;
+
 int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
@@ -161,7 +165,8 @@ int main()
 	std::cout << "AngleRads(" << vec_a << ", " << vec_d << "): " << EmuMath::Helpers::VectorAngle<true>(vec_a, vec_d) << "\n";
 	std::cout << "AngleDegs(" << vec_a << ", " << vec_d << "): " << EmuMath::Helpers::VectorAngle<false>(vec_a, vec_d) << "\n";
 
-
+	MatrixCM_<4, 4, float> matrix_;
+	std::cout << matrix_ << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

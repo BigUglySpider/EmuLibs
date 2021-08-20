@@ -326,6 +326,17 @@ namespace EmuCore::TMPHelpers
 	{
 		using type = Item_;
 	};
+
+	template<class T_>
+	struct get_reference_wrapper_contained_type
+	{
+		using type = T_;
+	};
+	template<class T_>
+	struct get_reference_wrapper_contained_type<std::reference_wrapper<T_>>
+	{
+		using type = typename std::reference_wrapper<T_>::type;
+	};
 }
 
 #endif

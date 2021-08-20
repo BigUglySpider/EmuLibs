@@ -20,7 +20,7 @@ namespace EmuMath
 		/// <summary> Boolean indicating if this vector contains std::reference_wrapper types. </summary>
 		static constexpr bool contains_reference_wrappers = EmuCore::TMPHelpers::is_reference_wrapper<contained_type>::value;
 		/// <summary> Value type of the items stored within this vector. </summary>
-		using value_type = typename EmuCore::TMPHelpers::get_value_type<contained_type>::type;
+		using value_type = typename EmuCore::TMPHelpers::get_reference_wrapper_contained_type<contained_type>::type;
 		/// <summary> The preferred floating point type for this vector. Float if this vector contains non-floating-point types, otherwise matches value_type. </summary>
 		using preferred_floating_point = EmuCore::TMPHelpers::first_floating_point_t<value_type, float>;
 		/// <summary> Boolean indicating if the reference wrappers within this vector contain constant references. Always false if contains_reference_wrappers is false. </summary>
