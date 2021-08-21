@@ -1,5 +1,5 @@
 #ifndef EMU_CORE_BIT_HELPERS_H_INC_
-#define EMU_CORE_BIT_HELPERS_H_INC_
+#define EMU_CORE_BIT_HELPERS_H_INC_ 1
 
 #include <cstddef>
 #include <cstdint>
@@ -14,7 +14,7 @@ namespace EmuCore::ArithmeticHelpers
 		return static_cast<std::size_t>((val * 0x01010101) >> 24);
 	}
 	template<std::uint32_t Val_>
-	constexpr std::size_t num_active_bits_v = num_active_bits(Val_);
+	static constexpr std::size_t num_active_bits_v = num_active_bits(Val_);
 }
 
 #endif

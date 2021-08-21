@@ -1,5 +1,5 @@
 #ifndef EMU_CORE_TMP_HELPERS_TYPE_CONVERTORS_H_INC_
-#define EMU_CORE_TMP_HELPERS_TYPE_CONVERTORS_H_INC_
+#define EMU_CORE_TMP_HELPERS_TYPE_CONVERTORS_H_INC_ 1
 
 #include <type_traits>
 
@@ -282,6 +282,61 @@ namespace EmuCore::TMPHelpers
 	/// <typeparam name="UintT_">Type to provide the lossless signed rep of. If it is already signed, the determined type will be the same as this.</typeparam>
 	template<typename UintT_>
 	using uint_lossless_signed_rep_t = typename EmuCore::TMPHelpers::uint_lossless_signed_rep<UintT_>::type;
+
+	template<typename T_>
+	struct get_value_type
+	{
+		using type = std::remove_reference_t<std::remove_pointer_t<T_>>;
+	};
+	template<template<typename...Ts__> class Template_, typename...Ts_>
+	struct get_value_type<Template_<Ts_...>>
+	{
+		using type = typename Template_<Ts_...>::value_type;
+	};
+	template<template<std::size_t Size__, typename Ts__> class Template_, std::size_t Size_, typename...Ts_>
+	struct get_value_type<Template_<Size_, Ts_...>>
+	{
+		using type = typename Template_<Size_, Ts_...>::value_type;
+	};
+	template<template<std::size_t SizeX__, std::size_t SizeY__, typename Ts__> class Template_, std::size_t SizeX_, std::size_t SizeY_, typename...Ts_>
+	struct get_value_type<Template_<SizeX_, SizeY_, Ts_...>>
+	{
+		using type = typename Template_<SizeX_, SizeY_, Ts_...>::value_type;
+	};
+	template<template<typename T__, std::size_t Size__> class Template_, typename T_, std::size_t Size_>
+	struct get_value_type<Template_<T_, Size_>>
+	{
+		using type = typename Template_<T_, Size_>::value_type;
+	};
+	template<template<typename T__, std::size_t SizeX__, std::size_t SizeY__> class Template_, typename T_, std::size_t SizeX_, std::size_t SizeY_>
+	struct get_value_type<Template_<T_, SizeX_, SizeY_>>
+	{
+		using type = typename Template_<T_, SizeX_, SizeY_>::value_type;
+	};
+	template<typename T_>
+	struct get_value_type<std::reference_wrapper<T_>>
+	{
+		using type = typename std::reference_wrapper<T_>::type;
+	};
+	template<typename T_>
+	using get_value_type_t = typename get_value_type<T_>::type;
+
+	template<class Item_>
+	struct item_info
+	{
+		using type = Item_;
+	};
+
+	template<class T_>
+	struct get_reference_wrapper_contained_type
+	{
+		using type = T_;
+	};
+	template<class T_>
+	struct get_reference_wrapper_contained_type<std::reference_wrapper<T_>>
+	{
+		using type = typename std::reference_wrapper<T_>::type;
+	};
 }
 
 #endif

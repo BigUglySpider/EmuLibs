@@ -1,15 +1,13 @@
-#include "Tests.hpp"
-
-#include "EmuMath/GeneralMath.h"
-#include "EmuMath/NoOverflowT.h"
-#include "EmuMath/Vectors.h"
-#include "EmuMath/FastVector.h"
-#include "EmuMath/Matrices.h"
+#include "EmuMath/Vector.h"
 #include <array>
+#include <bitset>
 #include <iomanip>
 
+#include "Tests.hpp"
 using namespace EmuCore::TestingHelpers;
-using namespace EmuMath;
+
+template<typename T_>
+using simple_bitset = std::bitset<sizeof(T_) * CHAR_BIT>;
 
 template<typename T_, std::size_t Size_>
 inline std::ostream& operator<<(std::ostream& stream_, const std::array<T_, Size_>& arr_)
@@ -29,6 +27,14 @@ inline std::ostream& operator<<(std::ostream& stream_, const std::array<T_, Size
 template<typename T_, int Max_ = std::numeric_limits<int>::max()>
 struct SettyBoi
 {
+	SettyBoi() : SettyBoi(static_cast<unsigned int>(time(0)))
+	{
+	}
+	SettyBoi(unsigned int seed_)
+	{
+		srand(seed_);
+	}
+
 	T_ operator()() const
 	{
 		return T_(rand() % Max_);
@@ -41,130 +47,136 @@ struct SettyBoi
 
 int main()
 {
-	const float bobs[4] = { 1.0f, 2.0f, 3.0f, 4.0f };
-	FastVector<4, float> yo(2.0f, 1.0f, 5.0f, -777.69f);
-	FastVector<4, float> no(5.0f, 1.0f, 6.0f, 2.0f);
-	yo.vectorData = _mm_load_ps(bobs);
-	const float* pData = yo.vectorData.m128_f32;
-	std::cout << "Data: { " << pData[0] << ", " << pData[1] << ", " << pData[2] << ", " << pData[3] << " }\n";
-	yo = yo.Shuffle<2, 1, 0, 3>();
-	std::cout << "Data: { " << pData[0] << ", " << pData[1] << ", " << pData[2] << ", " << pData[3] << " }\n";
-	float dot = yo.DotProduct(no);
-	std::cout << yo << " DOT " << no << " = " << dot << "\n\n";
+	srand(static_cast<unsigned int>(time(0)));
 
-	FastVector<4, float> max0(123.4f, 123.3f, 3.0f, -123.5f);
-	FastVector<4, float> max1(4.6f, 22.5f, 3.5f, -22.5f);
-	FastVector<4, float> max2(2.3f, -77.1f, 666.666f, 2.2f);
-	FastVector<4, float> max3(12.0f, 34.0f, 56.0f, 78.0f);
-	std::cout << max0 << " | Min: " << max0.Min() << " |  Max: " << max0.Max() << " | Average: " << max0.Mean() << "\n";
-	std::cout << max1 << " | Min: " << max1.Min() << " |  Max: " << max1.Max() << " | Average: " << max1.Mean() << "\n";
-	std::cout << max2 << " | Min: " << max2.Min() << " |  Max: " << max2.Max() << " | Average: " << max2.Mean() << "\n";
-	std::cout << max3 << " | Min: " << max3.Min() << " |  Max: " << max3.Max() << " | Average: " << max3.Mean() << "\n";
+	auto vectorf = EmuMath::TMP::make_emu_vector<float>(1.0f);
+	auto vectord = EmuMath::TMP::make_emu_vector<double>(1.0, 3.0, 5.0, 6.5, 21.345);
 
-	__m128 test128 = _mm_setr_ps(1.0f, 2.0f, 3.0f, 4.0f);
-	test128 = EmuMath::SIMD::horizontal_vector_sum(test128);
-	std::cout << "[0] = " << EmuMath::SIMD::get_m128_index(test128, 0) << "\n";
-	std::cout << "[1] = " << EmuMath::SIMD::get_m128_index(test128, 1) << "\n";
-	std::cout << "[2] = " << EmuMath::SIMD::get_m128_index(test128, 2) << "\n";
-	std::cout << "[3] = " << EmuMath::SIMD::get_m128_index(test128, 3) << "\n";
-
-	EmuMath::FastVector<4, float> a(1.0f, 1.0f, 1.0f, 1.0f);
-	EmuMath::FastVector<4, float> b(1.0f, 2.0f, 1.0f, 1.0f);
-	std::cout << a << " == " << b << ": " << (EmuMath::SIMD::all_not_equal<false, true, false, false>(a.vectorData, b.vectorData) ? "true" : "false") << "\n";
-
-	constexpr std::uint32_t c = 0b0011;
-	constexpr std::uint32_t d = 0b11111111111111110111111111111111;
-	constexpr std::uint32_t e = 0;
-	std::cout
-		<< "c bits: " << EmuCore::ArithmeticHelpers::num_active_bits(c) << "\t(" << std::bitset<32>(c) << ")\n"
-		<< "d bits: " << EmuCore::ArithmeticHelpers::num_active_bits(d) << "\t(" << std::bitset<32>(d) << ")\n"
-		<< "e bits: " << EmuCore::ArithmeticHelpers::num_active_bits(e) << "\t(" << std::bitset<32>(e) << ")\n";
-	
-	
-	EmuMath::MatrixCM<4, 4, float> blooble(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f);
-
-	constexpr EmuMath::MatrixCM<25, 25, float> mat_25x25_identity = EmuMath::MatrixCM<25, 25, float>::Identity();
-	std::cout << mat_25x25_identity << "\n";
-
-	constexpr auto SomeSubMatrix = EmuMath::MatrixCM<4, 4, std::uint32_t>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16).SubMatrix<0, 2, 0, 2>();
+	auto ref_d_ = EmuMath::Helpers::VectorShuffledReference<4, 3, 2, 1, 0>(vectord);
+	std::cout << "D: " << vectord << "\nRef: " << ref_d_ << "\n";
+	ref_d_.at<2>() = 255.0;
+	ref_d_.at<0>() = std::numeric_limits<double>::infinity();
+	std::cout << "D: " << vectord << "\nRef: " << ref_d_ << "\n";
 
 
-	//blooble.columns[1] *= 10.0f;
-	std::cout << "Base:\n" << blooble << std::endl;
-	std::cout << "Tranpose:\n" << blooble.Transpose() << std::endl;
-	std::cout << "Added to self:\n" << (blooble + blooble) << std::endl;
-	std::cout << "Subtracted from self 3 times:\n" << (blooble - blooble - blooble - blooble) << std::endl;
-	std::cout << "Negated:\n" << -blooble << std::endl;
-	//std::cout << "Negated row 1:\n" << (-blooble).GetRow<1>() << std::endl;
-	//std::cout << "Column 3:\n" << blooble.GetColumn<3>() << std::endl;
-	std::cout << "Multiplied by 0.5f:\n" << (blooble * 0.5f) << std::endl;
-	std::cout << "Trace: " << blooble.Trace() << std::endl;
-	std::cout << "\n\n" << blooble << "\nMULT\n" << (blooble * 2.5f) << "\nEQUALS:\n" << (blooble * (blooble * 2.5f)) << std::endl;
+	EmuMath::Helpers::VectorCopy(ref_d_, EmuMath::Helpers::VectorFloor(EmuMath::Helpers::VectorNegate(ref_d_)));
+	std::cout << "D: " << vectord << "\nRef: " << ref_d_ << "\n";
 
-	std::cout << "BLOOBLE ROWS EXTRACTED INDIVIDUALLY:\n" << EmuMath::Helpers::MatrixCopyAsRows(blooble) << "\n";
-	std::cout << "BLOOBLE COLUMNS EXTRACTED INDIVIDUALLY:\n" << EmuMath::Helpers::MatrixCopyAsColumns(blooble) << "\n";
+	auto some_vector = EmuMath::TMP::make_emu_vector<float>(102, 13.0f, 27.6, 100, 10000, 1000000);
+	std::cout << "Sqrt(" << some_vector << "): " << EmuMath::Helpers::VectorSqrt(some_vector) << "\n";
+	constexpr auto some_other_vector = EmuMath::TMP::make_emu_vector<double>(100.0, 0.25, 1.0f, 2.0f, EmuCore::Pi::PI<long double>);
+	constexpr auto some_other_vector_sqrt = EmuMath::Helpers::VectorSqrtConstexpr(some_other_vector);
+	std::cout << "SqrtConstexpr(" << some_other_vector << "): " << some_other_vector_sqrt << "\n";
 
-	std::cout << "Identity:\n" << blooble.Identity() << std::endl;
+	constexpr auto some_uint_vector = EmuMath::TMP::make_emu_vector<std::uint32_t>(1, 2, 4, 8, 16, 32, 64, 128);
+	constexpr auto shifted_left_uint_vector = EmuMath::Helpers::VectorShiftLeft(some_uint_vector, 1);
+	constexpr auto shifted_right_uint_vector = EmuMath::Helpers::VectorShiftRight(some_uint_vector, float(2));
+	constexpr auto shifted_left_vector_shifts = EmuMath::Helpers::VectorShiftLeft(some_uint_vector, EmuMath::TMP::make_emu_vector<float>(1, 2, 3, 4, 5, 6, 7, 8));
+	constexpr auto shifted_right_vector_shifts = EmuMath::Helpers::VectorShiftRight(some_uint_vector, EmuMath::TMP::make_emu_vector<float>(1, 1, 1, 1, 5));
 
-
-	std::cout << "Submatrix(0:1, 0:1):\n" << EmuMath::Helpers::MatrixSubMatrix<0, 1, 0, 1>(blooble) << std::endl;
-	std::cout << "Submatrix(0:1, 1:3):\n" << EmuMath::Helpers::MatrixSubMatrix<0, 1, 1, 3>(blooble) << std::endl;
-	std::cout << "Submatrix(2:3, 0:3):\n" << blooble.SubMatrix<2, 3, 0, 3>() << std::endl;
-
-	std::cout << "\n\nMatrix:\n" << blooble << "\nSubmatrix[3, 2] (" << blooble.at<3, 2>() << "):\n" << blooble.SubMatrixExcluding<3, 2>() << std::endl;
-
-	constexpr EmuMath::MatrixCM<4, 4, float> McDooble(17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0, 32.0);
-	blooble = McDooble;
-	std::cout << "After set:\n" << blooble << std::endl;
-
-	std::cout << "Element (1, 3): " << EmuMath::Helpers::MatrixGet(blooble, 1, 3) << "\n";
-	std::cout << "Column 2: " << EmuMath::Helpers::MatrixGet(blooble, 2) << "\n";
-	std::cout << "Column 3: " << blooble[3] << "\n";
-
-	EmuMath::MatrixCM<2, 2, std::uint64_t> a_(257, 1, 233, 42);
-	EmuMath::MatrixCM<2, 2, std::uint64_t> b_(29, 333, 1, 2);
-	EmuMath::MatrixCM<2, 2, std::uint64_t> result_ = EmuMath::Helpers::MatrixRespectiveMultiplication(a_, b_);
-	std::cout << "Determinant of:\n" << result_ << "\n: " << EmuMath::Helpers::MatrixDeterminantLaplace<float>(result_) << "\n";
-
-	auto resooble = EmuMath::MatrixCM<4, 4, double>(2.73, -6.66, 2.0, 3.5, 2.3, 16.6, 0.0, 12.345, 19.9, -1.337, 22.0, 1.0, 3.0, 5.0, 2.37, 6.6);
-	std::cout << "Determinant of:\n" << resooble << "\n: " << std::setprecision(10) << std::fixed << EmuMath::Helpers::MatrixDeterminantLaplace<double>(resooble) << std::endl;
-
-	auto bigooble = EmuMath::MatrixCM<6, 6, double>
-	(
-		EmuMath::MatrixCM<6, 6, double>::column_type({ 0.1f, 0.005f, 0.6f, 2.0f, 3.0f, 2.0f }),
-		EmuMath::MatrixCM<6, 6, double>::column_type({ 26.0f }),
-		EmuMath::MatrixCM<6, 6, double>::column_type({ 1.0f, 1.0f, 1.0f, 3.0f, 1.0f, 2.0f }),
-		EmuMath::MatrixCM<6, 6, double>::column_type({ 31.5f, 0.0f, 2.0f, 3.0f, 7.0f, 13.0f }),
-		EmuMath::MatrixCM<6, 6, double>::column_type({ 12.0f, 1.0f, 0.0f, 3.0f, 4.0f, 6.0f }),
-		EmuMath::MatrixCM<6, 6, double>::column_type({ -22.0f, 3.0f, 4.0f, 5.0f, 1.0f, 23.0215f })
-	);
-	std::cout << "Determinant of:\n" << bigooble << "\n: " << std::setprecision(1) << std::fixed << EmuMath::Helpers::MatrixDeterminantLaplace<double>(bigooble) << std::endl;
-
-	auto resoobleInverse = EmuMath::Helpers::MatrixInverseLaplace<double>(resooble);
-	std::cout << "Base:\n" << resooble << "\nInverse:\n" << resoobleInverse << "\nBase x Inverse:\n" << (resooble * resoobleInverse) << "\n";
-
-	std::cout << "Minors:\n" << EmuMath::Helpers::MatrixMinorsLaplace(resooble) << "\n";
-
-	std::cout << "\n" << resooble << "\nEQUAL TO\n" << resoobleInverse << "\n?: " << EmuMath::Helpers::MatrixEqual(resooble, resoobleInverse) << "\n";
-	std::cout << "\n" << resooble << "\nEQUAL TO\n" << resooble << "\n?: " << EmuMath::Helpers::MatrixEqual(resooble, resooble) << "\n";
+	constexpr auto vec_a = EmuMath::TMP::make_emu_vector<float>(1.0f, 2.0f, 3.0f);
+	constexpr auto vec_b = EmuMath::TMP::make_emu_vector<std::uint64_t>(1, 2, 3);
+	constexpr auto vec_c = EmuMath::TMP::make_emu_vector<float>(1.1f, 2.2f, 3.0f);
+	auto vec_d = EmuMath::Helpers::VectorShuffledReference<0, 1, 2, 0>(vec_a);
+	auto vec_e = EmuMath::Vector<10, double>(vec_d);
+	std::cout << vec_e << "\n";
 
 
-	std::cout << "\n" << resooble << "\nNOT EQUAL TO\n" << resoobleInverse << "\n?: " << EmuMath::Helpers::MatrixNotEqual(resooble, resoobleInverse) << "\n";
-	std::cout << "\n" << resooble << "\nNOT EQUAL TO\n" << resooble << "\n?: " << EmuMath::Helpers::MatrixNotEqual(resooble, resooble) << "\n";
-
-	std::cout << "\n" << resooble << "\nEQUAL TO\n" << bigooble << "\n?: " << EmuMath::Helpers::MatrixEqual(resooble, bigooble) << "\n";
-	std::cout << "\n" << resooble << "\nNOT EQUAL TO\n" << bigooble << "\n?: " << EmuMath::Helpers::MatrixNotEqual(resooble, bigooble) << "\n";
-	std::cout << "\n" << bigooble << "\nEQUAL TO\n" << bigooble << "\n?: " << EmuMath::Helpers::MatrixEqual(bigooble, bigooble) << "\n";
-
-	EmuMath::MatrixCM<250, 2, float> blobs;
-	blobs.SetViaFunc<true>(SettyBoi<float>());
-	std::cout << blobs << "\n";
-	std::cout << "Transpose:\n" << blobs.Transpose() << "\n";
+	// NOTE: TESTING EmuMath::VectorCmpEqualTo
+	std::cout << vec_a << " == " << vec_b << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_a, vec_b) << "\n";
+	std::cout << vec_b << " == " << vec_c << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_b, vec_c) << "\n";
+	std::cout << vec_a << " == " << vec_d << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_a, vec_d) << "\n";
+	std::cout << vec_a << " == " << vec_d << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpEqualTo<false>(vec_a, vec_d) << "\n";
+	std::cout << "----------\n";
 
 
-	system("pause");
+	std::cout << vec_a << " != " << vec_b << ": " << EmuMath::Helpers::VectorCmpNotEqualTo(vec_a, vec_b) << "\n";
+	std::cout << vec_b << " != " << vec_c << ": " << EmuMath::Helpers::VectorCmpNotEqualTo(vec_b, vec_c) << "\n";
+	std::cout << vec_a << " != " << vec_d << ": " << EmuMath::Helpers::VectorCmpNotEqualTo(vec_a, vec_d) << "\n";
+	std::cout << vec_a << " != " << vec_d << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpNotEqualTo<false>(vec_a, vec_d) << "\n";
+	std::cout << "----------\n";
+
+
+	constexpr auto vec_a_sqr_mag_ = EmuMath::Helpers::VectorSquareMagnitude<float>(vec_a);
+	constexpr auto vec_a_mag_ = EmuMath::Helpers::VectorMagnitudeConstexpr<float>(vec_a);
+	constexpr auto vec_a_mag_mult_vec_a_mag_ = vec_a_mag_ * vec_a_mag_;
+	std::cout << vec_a << " == " << EmuMath::Helpers::VectorMagnitude(vec_a) << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_a, vec_a_mag_) << "\n";
+	std::cout << vec_b << " == " << 2 << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_b, 2) << "\n";
+	std::cout << vec_a << " == " << 5 << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_a, 5) << "\n";
+	std::cout << vec_a << " == " << 4 << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpEqualTo<false>(vec_a, 4) << "\n";
+	std::cout << "----------\n";
+
+
+	std::cout << vec_a << " ALL == " << vec_b << ": " << EmuMath::Helpers::VectorCmpAllEqualTo(vec_a, vec_b) << "\n";
+	std::cout << vec_b << " ALL != " << vec_c << ": " << EmuMath::Helpers::VectorCmpAllNotEqualTo(vec_b, std::uint64_t(2)) << "\n";
+	std::cout << vec_a << " ALL <= " << vec_d << ": " << EmuMath::Helpers::VectorCmpAllLessEqual(vec_a, vec_d) << "\n";
+	std::cout << vec_a << " ALL > " << vec_a << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpAllGreater<false>(vec_a, vec_a) << "\n";
+	std::cout << vec_a << " ALL == " << EmuMath::Helpers::VectorShuffle<0, 1, 2, 2, 1, 0>(vec_a) << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpAllEqualTo<false>(vec_a, EmuMath::Helpers::VectorShuffle<0, 1, 2, 2, 1, 0>(vec_a)) << "\n";
+	std::cout << vec_a << " ALL == " << EmuMath::Helpers::VectorShuffle<0, 1>(vec_a) << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpAllEqualTo<false>(vec_a, EmuMath::Helpers::VectorShuffle<0, 1>(vec_a)) << "\n";
+	std::cout << "----------\n";
+
+
+	std::cout << vec_a << " ANY == " << vec_b << ": " << EmuMath::Helpers::VectorCmpAnyEqualTo(vec_a, vec_b) << "\n";
+	std::cout << vec_b << " ANY != " << std::uint64_t(2) << ": " << EmuMath::Helpers::VectorCmpAnyNotEqualTo(vec_b, std::uint64_t(2)) << "\n";
+	std::cout << vec_a << " ANY <= " << vec_a << ": " << EmuMath::Helpers::VectorCmpAnyLessEqual(vec_a, vec_a) << "\n";
+	std::cout << vec_a << " ANY > " << vec_a << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpAnyGreater<false>(vec_a, vec_a) << "\n";
+	std::cout << vec_a << " ANY < " << EmuMath::Helpers::VectorShuffle<2, 1, 0>(vec_a) << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpAnyLess<false>(vec_a, EmuMath::Helpers::VectorShuffle<2, 1, 0>(vec_a)) << "\n";
+	std::cout << "----------\n";
+
+	constexpr auto vec_a_mag_recip_constexpr = EmuMath::Helpers::VectorMagnitudeReciprocalConstexpr(vec_a);
+	std::cout << "MagRecipConstexpr(" << vec_a << "): " << vec_a_mag_recip_constexpr << "\n";
+	std::cout << "MagRecipQrsqrt(" << vec_a << "): " << EmuMath::Helpers::VectorMagnitudeReciprocalQrsqrt<float, 1>(vec_a) << "\n";
+
+	using x_val_type = std::uint16_t;
+	using y_val_type = std::uint16_t;
+	EmuMath::Vector<4, x_val_type> x_(128, 7, 255, 16);
+	EmuMath::Vector<3, y_val_type> y_(128, 6, 231);
+	EmuMath::Vector<4, simple_bitset<x_val_type>> x_bits_(x_);
+	EmuMath::Vector<3, simple_bitset<y_val_type>> y_bits_(y_);
+	std::cout << x_bits_ << " &\n" << y_bits_ << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorAnd(x_, y_)) << "\n\n";
+	std::cout << x_bits_ << " |\n" << y_bits_ << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorOr(x_, y_)) << "\n\n";
+	std::cout << x_bits_ << " ^\n" << y_bits_ << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorXor(x_, y_)) << "\n\n";
+	std::cout << x_bits_ << ".NOT():\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorNot(x_)) << "\n\n";
+
+	x_val_type some_constant_ = 0xE28F;
+	std::cout << x_bits_ << " &\n  " << simple_bitset<x_val_type>(some_constant_) << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorAnd(x_, some_constant_)) << "\n\n";
+	std::cout << x_bits_ << " |\n  " << simple_bitset<x_val_type>(some_constant_) << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorOr(x_, some_constant_)) << "\n\n";
+	std::cout << x_bits_ << " ^\n  " << simple_bitset<x_val_type>(some_constant_) << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorXor(x_, some_constant_)) << "\n\n";
+
+	constexpr auto a_norm = EmuMath::Helpers::VectorNormaliseConstexpr(vec_a);
+	constexpr auto a_norm_mag = EmuMath::Helpers::VectorMagnitudeConstexpr(a_norm);
+
+	auto a_norm_nonconst = EmuMath::Helpers::VectorNormalise(vec_a);
+	auto a_norm_qrsqrt_1 = EmuMath::Helpers::VectorNormaliseQrsqrt<float, 1>(vec_a);
+	auto a_norm_qrsqrt_2 = EmuMath::Helpers::VectorNormaliseQrsqrt<float, 2>(vec_a);
+	auto a_norm_nonconst_mag = EmuMath::Helpers::VectorMagnitude(a_norm_nonconst);
+	auto a_norm_qrsqrt_1_mag = EmuMath::Helpers::VectorMagnitude(a_norm_qrsqrt_1);
+	auto a_norm_qrsqrt_2_mag = EmuMath::Helpers::VectorMagnitude(a_norm_qrsqrt_2);
+
+
+	std::cout << "a_norm_nonconst: " << a_norm_nonconst << " | Mag: " << a_norm_nonconst_mag << "\n";
+	std::cout << "a_norm_qrsqrt (1 newton iteration): " << a_norm_qrsqrt_1 << " | Mag: " << a_norm_qrsqrt_1_mag << "\n";
+	std::cout << "a_norm_qrsqrt (2 newton iterations): " << a_norm_qrsqrt_2 << " | Mag: " << a_norm_qrsqrt_2_mag << "\n";
+
+	std::cout << "AngleRads(" << vec_a << ", " << vec_d << "): " << EmuMath::Helpers::VectorAngle<true>(vec_a, vec_d) << "\n";
+	std::cout << "AngleDegs(" << vec_a << ", " << vec_d << "): " << EmuMath::Helpers::VectorAngle<false>(vec_a, vec_d) << "\n";
+	std::cout << "AngleRads(" << vec_d << ", " << vec_a << "): " << EmuMath::Helpers::VectorAngle<true>(vec_d, vec_a) << "\n";
+	std::cout << "AngleDegs(" << vec_d << ", " << vec_a << "): " << EmuMath::Helpers::VectorAngle<false>(vec_d, vec_a) << "\n";
+
+
+
+	EmuMath::RefVector<3, float> a_norm_nonconst_ref(a_norm_nonconst);
+	std::cout << "Ref:" << a_norm_nonconst_ref << " | Act: " << a_norm_nonconst << "\n";
+	a_norm_nonconst_ref = EmuMath::Helpers::VectorShuffle<7, 1, 0>(some_uint_vector);
+	std::cout << "Ref:" << a_norm_nonconst_ref << " | Act: " << a_norm_nonconst << "\n";
+
+	EmuMath::ConstRefVector<7, float> const_ref_(EmuMath::Helpers::VectorShuffledReference<0, 1, 2, 1, 0, 1, 2>(a_norm_nonconst_ref));
+	std::cout << "Another, constant reference: " << const_ref_ << "\n";
+	a_norm_nonconst_ref.at<2>() = 1337.0f;
+	std::cout << const_ref_ << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
+	system("pause");
 	EmuCore::TestingHelpers::PerformTests();
 #pragma endregion
 	return 0;

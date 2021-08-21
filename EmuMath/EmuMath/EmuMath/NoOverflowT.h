@@ -1,5 +1,5 @@
 #ifndef EMU_MATH_NO_OVERFLOW_T_H_INC_
-#define EMU_MATH_NO_OVERFLOW_T_H_INC_
+#define EMU_MATH_NO_OVERFLOW_T_H_INC_ 1
 
 #include "../EmuCore/TMPHelpers/TypeComparators.h"
 #include "../EmuCore/TMPHelpers/TypeConvertors.h"
