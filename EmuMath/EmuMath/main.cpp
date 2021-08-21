@@ -46,10 +46,6 @@ struct SettyBoi
 	}
 };
 
-
-template<std::size_t SizeX_, std::size_t SizeY_, typename T_>
-using MatrixCM_ = EmuMath::Vector<SizeX_, EmuMath::Vector<SizeY_, T_>>;
-
 int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
@@ -64,7 +60,7 @@ int main()
 	std::cout << "D: " << vectord << "\nRef: " << ref_d_ << "\n";
 
 
-	EmuMath::Helpers::VectorSet(ref_d_, EmuMath::Helpers::VectorFloor(EmuMath::Helpers::VectorNegate(ref_d_)));
+	EmuMath::Helpers::VectorCopy(ref_d_, EmuMath::Helpers::VectorFloor(EmuMath::Helpers::VectorNegate(ref_d_)));
 	std::cout << "D: " << vectord << "\nRef: " << ref_d_ << "\n";
 
 	auto some_vector = EmuMath::TMP::make_emu_vector<float>(102, 13.0f, 27.6, 100, 10000, 1000000);
@@ -158,6 +154,7 @@ int main()
 	auto a_norm_qrsqrt_1_mag = EmuMath::Helpers::VectorMagnitude(a_norm_qrsqrt_1);
 	auto a_norm_qrsqrt_2_mag = EmuMath::Helpers::VectorMagnitude(a_norm_qrsqrt_2);
 
+
 	std::cout << "a_norm_nonconst: " << a_norm_nonconst << " | Mag: " << a_norm_nonconst_mag << "\n";
 	std::cout << "a_norm_qrsqrt (1 newton iteration): " << a_norm_qrsqrt_1 << " | Mag: " << a_norm_qrsqrt_1_mag << "\n";
 	std::cout << "a_norm_qrsqrt (2 newton iterations): " << a_norm_qrsqrt_2 << " | Mag: " << a_norm_qrsqrt_2_mag << "\n";
@@ -165,8 +162,7 @@ int main()
 	std::cout << "AngleRads(" << vec_a << ", " << vec_d << "): " << EmuMath::Helpers::VectorAngle<true>(vec_a, vec_d) << "\n";
 	std::cout << "AngleDegs(" << vec_a << ", " << vec_d << "): " << EmuMath::Helpers::VectorAngle<false>(vec_a, vec_d) << "\n";
 
-	MatrixCM_<4, 4, float> matrix_;
-	std::cout << matrix_ << "\n";
+
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

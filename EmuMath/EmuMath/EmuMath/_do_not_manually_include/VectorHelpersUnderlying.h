@@ -8,28 +8,6 @@
 namespace EmuMath::Helpers::_underlying_vector_funcs
 {
 #pragma region VALIDITY_CHECKS
-	template<class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline bool _validity_check_vector_assignment()
-	{
-		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
-		{
-			if constexpr (EmuMath::TMP::is_emu_vector_v<RhsVector_>)
-			{
-				return true;
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform an assignment to an EmuMath vector via another vector, but the provided item to assign from was not an EmuMath vector.");
-				return false;
-			}
-		}
-		else
-		{
-			static_assert(false, "Attempted to perform an assignment to an EmuMath vector, but the provided item to assign to was not an EmuMath vector.");
-			return false;
-		}
-	}
-
 	template<class Vector_, std::size_t X_, std::size_t...OtherIndices_>
 	constexpr inline bool _validity_check_vector_shuffle()
 	{
@@ -230,31 +208,98 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 #pragma endregion
 
 #pragma region SETS
+	template<std::size_t Index_, class Vector_, class Data_>
+	void _set_vector_data(Vector_& vector_, Data_& data_)
+	{
+		vector_.template Set<Index_>(data_);
+	}
+
 	template<std::size_t Index_, class Vector_>
-	void _assign_vector_via_scalar(Vector_& vector_, const typename Vector_::value_type& scalar_)
+	void _copy_to_vector_via_scalar(Vector_& vector_, const typename Vector_::value_type& scalar_)
 	{
 		if constexpr (Index_ < Vector_::size)
 		{
 			_get_vector_data<Index_>(vector_) = scalar_;
-			_assign_vector_via_scalar<Index_ + 1, Vector_>(vector_, scalar_);
+			_copy_to_vector_via_scalar<Index_ + 1, Vector_>(vector_, scalar_);
 		}
 	}
-
 	template<std::size_t Index_, class LhsVector_, class RhsVector_>
-	void _assign_vector_via_vector(LhsVector_& lhs_, const RhsVector_& rhs_)
+	void _copy_to_vector_via_vector(LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
 		if constexpr (Index_ < LhsVector_::size)
 		{
 			if constexpr (Index_ < RhsVector_::size)
 			{
 				_get_vector_data<Index_>(lhs_) = static_cast<typename LhsVector_::value_type>(_get_vector_data<Index_>(rhs_));
-				_assign_vector_via_vector<Index_ + 1, LhsVector_, RhsVector_>(lhs_, rhs_);
+				_copy_to_vector_via_vector<Index_ + 1, LhsVector_, RhsVector_>(lhs_, rhs_);
 			}
 			else
 			{
 				// Finish the vector off by assigning a scalar - done this way in case constructing a default value_type is noticeably expensive
-				_assign_vector_via_scalar<Index_, LhsVector_>(lhs_, typename LhsVector_::value_type());
+				_copy_to_vector_via_scalar<Index_, LhsVector_>(lhs_, typename LhsVector_::value_type());
 			}
+		}
+	}
+	template<class LhsVector_, class Rhs_>
+	void _copy_to_vector(LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
+		{
+			_copy_to_vector_via_vector<0, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+		else
+		{
+			_copy_to_vector_via_scalar<0, LhsVector_, Rhs_>(lhs_, rhs_);
+		}
+	}
+
+	template<std::size_t Index_, class LhsVector_, class Rhs_>
+	void _set_vector(LhsVector_& lhs_, Rhs_& rhs_)
+	{
+		if constexpr (Index_ < LhsVector_::size)
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
+			{
+				// Set explicitly only goes the size of the smallest vector (for the sake of reference assignment compatibility).
+				if constexpr (Index_ < Rhs_::size)
+				{
+					_set_vector_data<Index_>(lhs_, _get_vector_data<Index_>(rhs_));
+					_set_vector<Index_ + 1>(lhs_, rhs_);
+				}
+			}
+			else
+			{
+				// All set to the same if vector only on lhs_, whether references or values
+				_set_vector_data<Index_>(lhs_, rhs_);
+				_set_vector<Index_ + 1>(lhs_, rhs_);
+			}
+		}
+	}
+	template<class LhsVector_, class Rhs_>
+	void _set_vector(LhsVector_& lhs_, Rhs_& rhs_)
+	{
+		if constexpr (LhsVector_::contains_reference_wrappers)
+		{
+			if constexpr (LhsVector_::contains_const_reference_wrappers)
+			{
+				// No additional checks needed for const references since non-const will implicitly assigned as const
+				_set_vector<0>(lhs_, rhs_);
+			}
+			else
+			{
+				if constexpr (!(std::is_const_v<Rhs_> || Rhs_::contains_const_reference_wrappers))
+				{
+					_set_vector<0>(lhs_, rhs_);
+				}
+				else
+				{
+					static_assert(false, "Attempted to set an EmuMath vector of non-const references via a vector that can only provide const references in its context.");
+				}
+			}
+		}
+		else
+		{
+			_set_vector<0>(lhs_, rhs_);
 		}
 	}
 #pragma endregion
@@ -274,7 +319,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 			else
 			{
 				using vector_value = typename Vector_::value_type;
-				_assign_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(func_(vector_value())));
+				_copy_to_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(func_(vector_value())));
 			}
 		}
 	}
@@ -702,7 +747,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 			else
 			{
 				// Don't force a div/0 situation, and instead set all to infinity as that is the expected result of dividing by 0 as per IEEE.
-				_assign_vector_via_scalar<Index_, OutVector_>(out_, std::numeric_limits<out_value>::infinity());
+				_copy_to_vector_via_scalar<Index_, OutVector_>(out_, std::numeric_limits<out_value>::infinity());
 			}
 		}
 	}
@@ -769,7 +814,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 			else
 			{
 				const vector_value val_ = vector_value();
-				_assign_vector_via_scalar<Index_, OutVector_>(out_, cmp_(val_, clampScalar_) ? static_cast<out_value>(clampScalar_) : static_cast<out_value>(val_));
+				_copy_to_vector_via_scalar<Index_, OutVector_>(out_, cmp_(val_, clampScalar_) ? static_cast<out_value>(clampScalar_) : static_cast<out_value>(val_));
 			}
 		}
 	}
@@ -968,11 +1013,11 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 				using vector_value = typename Vector_::value_type;
 				if constexpr (std::is_arithmetic_v<vector_value>)
 				{
-					_assign_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(vector_value()));
+					_copy_to_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(vector_value()));
 				}
 				else
 				{
-					_assign_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(shifter_(vector_value(), num_shifts_)));
+					_copy_to_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(shifter_(vector_value(), num_shifts_)));
 				}
 			}
 		}
@@ -999,7 +1044,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 					if constexpr (std::is_arithmetic_v<vector_value>)
 					{
 						// If arithmetic, we know any remaining shifts would lead to 0, so simply copy 0 into the remaining indices.
-						_assign_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(vector_value()));
+						_copy_to_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(vector_value()));
 					}
 					else
 					{
@@ -1054,7 +1099,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 			else
 			{
 				// All remaining results will be the same, so defer to assignment
-				_assign_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(func_(typename LhsVector_::value_type(), rhs_)));
+				_copy_to_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(func_(typename LhsVector_::value_type(), rhs_)));
 			}
 		}
 	}
@@ -1090,7 +1135,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 					// Defer remaining calls to assignment, since the remaining values will all be the same result we can cut out the middleman here
 					using lhs_value = typename LhsVector_::value_type;
 					using rhs_value = typename RhsVector_::value_type;
-					_assign_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(func_(lhs_value(), rhs_value())));
+					_copy_to_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(func_(lhs_value(), rhs_value())));
 				}
 			}
 		}

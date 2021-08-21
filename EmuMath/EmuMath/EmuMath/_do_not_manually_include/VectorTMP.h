@@ -23,7 +23,13 @@ namespace EmuMath::TMP
 	template<class T_>
 	struct is_emu_vector
 	{
-		static constexpr bool value = false;
+		static constexpr bool value = std::conditional_t
+		<
+			// This is a recursive check to make sure that T_ does not have modifiers that may lead to false negatives
+			std::is_same_v<T_, std::remove_reference_t<std::remove_cv_t<T_>>>,
+			std::false_type,
+			is_emu_vector<std::remove_reference_t<std::remove_cv_t<T_>>>
+		>::value;
 	};
 	template<std::size_t Size_, typename T_>
 	struct is_emu_vector<EmuMath::Vector<Size_, T_>>

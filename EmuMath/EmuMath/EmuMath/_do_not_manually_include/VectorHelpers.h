@@ -83,27 +83,43 @@ namespace EmuMath::Helpers
 #pragma endregion
 
 #pragma region SETS
-	/// <summary> Sets respective elements of a lhs_ EmuMath vector to match those of a rhs_ EmuMath vector. </summary>
-	/// <typeparam name="LhsVector_">Type of vector to set the data of.</typeparam>
-	/// <typeparam name="RhsVector_">Type of vector to copy the data of.</typeparam>
-	/// <param name="lhs_">EmuMath vector to set the data of.</param>
-	/// <param name="rhs_">EmuMath vector to copy the data of.</param>
-	/// <returns>Reference to the lhs_ vector after setting.</returns>
-	template<class LhsVector_, class RhsVector_>
-	constexpr inline LhsVector_& VectorSet(LhsVector_& lhs_, const RhsVector_& rhs_)
+	/// <summary> 
+	/// <para> Copies the data of data_ into the elements of a destination_ vector. </para>
+	/// <para> 
+	///		If data_ is an EmuMath vector, elements of destination_ will be set to match their respective elements in data_. 
+	///		Otherwise, all elements of destination_ will be set to copies of data_.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="DestinationVector_">Type of vector that is the destiantion of the copy.</typeparam>
+	/// <typeparam name="Data_">Type of vector or scalar to copy the data of.</typeparam>
+	/// <param name="destination_">EmuMath vector to store the copied data to.</param>
+	/// <param name="data_">EmuMath vector or scalar to copy the data of.</param>
+	/// <returns>Reference to the destination_ vector after setting.</returns>
+	template<class DestinationVector_, class Data_>
+	constexpr inline DestinationVector_& VectorCopy(DestinationVector_& destination_, const Data_& data_)
 	{
-		if constexpr (_underlying_vector_funcs::_validity_check_vector_assignment<LhsVector_, RhsVector_>())
+		if constexpr (EmuMath::TMP::is_emu_vector_v<DestinationVector_>)
 		{
-			_underlying_vector_funcs::_assign_vector_via_vector<0, LhsVector_, RhsVector_>(lhs_, rhs_);
-			return lhs_;
+			_underlying_vector_funcs::_copy_to_vector(destination_, data_);
+			return destination_;
 		}
 		else
 		{
-			static_assert
-			(
-				false,
-				"A validity check on arguments provided for EmuMath::Helpers::VectorSet has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
-			);
+			static_assert(false, "Attempted to copy to a vector, but the provided destination was not an EmuMath vector.");
+		}
+	}
+
+	template<class DestinationVector_, class Data_>
+	constexpr inline DestinationVector_& VectorSet(DestinationVector_& destination_, Data_& data_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<DestinationVector_>)
+		{
+			_underlying_vector_funcs::_set_vector(destination_, data_);
+			return destination_;
+		}
+		else
+		{
+			static_assert(false, "Attempted to set the internal data of a vector, but the provided destination was not an EmuMath vector.");
 		}
 	}
 #pragma endregion
