@@ -64,22 +64,14 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		}
 	}
 
-	template<class OutVector_, class LhsVector_, class RhsVector_>
+	template<class LhsVector_, class RhsVector_>
 	constexpr inline bool _validity_check_vector_arithmetic()
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
 			if constexpr (EmuMath::TMP::is_emu_vector_v<RhsVector_>)
 			{
-				if constexpr (EmuMath::TMP::is_emu_vector_v<OutVector_>)
-				{
-					return true;
-				}
-				else
-				{
-					static_assert(false, "Attempted to perform vector arithmetic with a non-EmuMath-vector output type.");
-					return false;
-				}
+				return true;
 			}
 			else
 			{
@@ -134,20 +126,12 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		}
 	}
 
-	template<class OutVector_, class LhsVector_>
+	template<class LhsVector_>
 	constexpr inline bool _validity_check_vector_arithmetic_potential_scalar()
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
-			if constexpr (EmuMath::TMP::is_emu_vector_v<OutVector_>)
-			{
-				return true;
-			}
-			else
-			{
-				static_assert(false, "Attempted to perform vector arithmetic with a non-EmuMath-vector output type.");
-				return false;
-			}
+			return true;
 		}
 		else
 		{

@@ -271,19 +271,18 @@ namespace EmuMath::Helpers
 	/// <summary>
 	/// <para> Adds respective elements of the lhs_ vector to those of the rhs_ vector. </para>
 	/// </summary>
-	/// <typeparam name="OutVector_">Type of vector to output the results of addition as.</typeparam>
 	/// <typeparam name="LhsVector_">Type of vector on the left-hand side of the addition.</typeparam>
 	/// <typeparam name="Rhs_">Type of vector on the right-hand side of the addition.</typeparam>
 	/// <param name="lhs_">Left-hand vector in the addition operation.</param>
 	/// <param name="lhs_">Right-hand vector in the addition operation.</param>
-	/// <returns>Vector of the provided type containing the results of the addition.</returns>
-	template<class OutVector_, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline OutVector_ VectorAdd(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	/// <returns>Vector containing the results of the addition.</returns>
+	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class RhsVector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorAdd(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
-		if constexpr (_underlying_vector_funcs::_validity_check_vector_arithmetic<OutVector_, LhsVector_, RhsVector_>())
+		if constexpr (_underlying_vector_funcs::_validity_check_vector_arithmetic<LhsVector_, RhsVector_>())
 		{
 			using adder_type = EmuCore::do_add<typename LhsVector_::value_type, typename RhsVector_::value_type>;
-			return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, RhsVector_, adder_type>(lhs_, rhs_);
+			return _underlying_vector_funcs::_perform_vector_arithmetic<EmuMath::Vector<OutSize_, out_contained_type>, LhsVector_, RhsVector_, adder_type>(lhs_, rhs_);
 		}
 		else
 		{
@@ -294,20 +293,20 @@ namespace EmuMath::Helpers
 			);
 		}
 	}
-	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline auto VectorAdd(const LhsVector_& lhs_, const RhsVector_& rhs_)
-	{
-		return VectorAdd<EmuMath::Vector<OutSize_, out_value_type>, LhsVector_, RhsVector_>(lhs_, rhs_);
-	}
 	template<std::size_t OutSize_, class LhsVector_, class RhsVector_>
 	[[nodiscard]] constexpr inline auto VectorAdd(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
-		return VectorAdd<EmuMath::Vector<OutSize_, typename LhsVector_::value_type>, LhsVector_, RhsVector_>(lhs_, rhs_);
+		return VectorAdd<OutSize_, typename LhsVector_::value_type, LhsVector_, RhsVector_>(lhs_, rhs_);
+	}
+	template<typename out_contained_type, class LhsVector_, class RhsVector_>
+	[[nodiscard]] constexpr inline auto VectorAdd(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	{
+		return VectorAdd<LhsVector_::size, out_contained_type, LhsVector_, RhsVector_>(lhs_, rhs_);
 	}
 	template<class LhsVector_, class RhsVector_>
 	[[nodiscard]] constexpr inline LhsVector_ VectorAdd(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
-		return VectorAdd<LhsVector_, LhsVector_, RhsVector_>(lhs_, rhs_);
+		return VectorAdd<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, RhsVector_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -318,14 +317,14 @@ namespace EmuMath::Helpers
 	/// <typeparam name="Rhs_">Type of vector on the right-hand side of the subtraction.</typeparam>
 	/// <param name="lhs_">EmuMath vector to be subtracted from.</param>
 	/// <param name="rhs_">EmuMath vector of amounts to subtract from respective elements.</param>
-	/// <returns>Vector of the provided type containing the results of the subtraction.</returns>
-	template<class OutVector_, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline OutVector_ VectorSubtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	/// <returns>Vector containing the results of the subtraction.</returns>
+	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class RhsVector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorSubtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
-		if constexpr (_underlying_vector_funcs::_validity_check_vector_arithmetic<OutVector_, LhsVector_, RhsVector_>())
+		if constexpr (_underlying_vector_funcs::_validity_check_vector_arithmetic<LhsVector_, RhsVector_>())
 		{
 			using subtractor_type = EmuCore::do_subtract<typename LhsVector_::value_type, typename RhsVector_::value_type>;
-			return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, RhsVector_, subtractor_type>(lhs_, rhs_);
+			return _underlying_vector_funcs::_perform_vector_arithmetic<EmuMath::Vector<OutSize_, out_contained_type>, LhsVector_, RhsVector_, subtractor_type>(lhs_, rhs_);
 		}
 		else
 		{
@@ -336,45 +335,44 @@ namespace EmuMath::Helpers
 			);
 		}
 	}
-	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline auto VectorSubtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
-	{
-		return VectorSubtract<EmuMath::Vector<OutSize_, out_value_type>, LhsVector_, RhsVector_>(lhs_, rhs_);
-	}
 	template<std::size_t OutSize_, class LhsVector_, class RhsVector_>
 	[[nodiscard]] constexpr inline auto VectorSubtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
-		return VectorSubtract<EmuMath::Vector<OutSize_, typename LhsVector_::value_type>, LhsVector_, RhsVector_>(lhs_, rhs_);
+		return VectorSubtract<OutSize_, typename LhsVector_::value_type, LhsVector_, RhsVector_>(lhs_, rhs_);
+	}
+	template<typename out_contained_type, class LhsVector_, class RhsVector_>
+	[[nodiscard]] constexpr inline LhsVector_ VectorSubtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	{
+		return VectorSubtract<LhsVector_::size, out_contained_type, LhsVector_, RhsVector_>(lhs_, rhs_);
 	}
 	template<class LhsVector_, class RhsVector_>
 	[[nodiscard]] constexpr inline LhsVector_ VectorSubtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
-		return VectorSubtract<LhsVector_, LhsVector_, RhsVector_>(lhs_, rhs_);
+		return VectorSubtract<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, RhsVector_>(lhs_, rhs_);
 	}
 
 	/// <summary>
 	/// <para> Multiplies respective elements of the lhs_ vector by those of a rhs_ vector, or multiplies all elements of the lhs_ vector by a rhs_ scalar. </para>
 	/// </summary>
-	/// <typeparam name="OutVector_">Type of vector to output the results of multiplication as.</typeparam>
 	/// <typeparam name="LhsVector_">Type of vector on the left-hand side of the multiplication.</typeparam>
 	/// <typeparam name="Rhs_">Type of either vector or scalar on the right-hand side of the multiplication.</typeparam>
 	/// <param name="lhs_">EmuMath vector to be multiplied.</param>
 	/// <param name="rhs_">EmuMath vector to multiply respective elements by, or a scalar to multiply every element by.</param>
-	/// <returns>Vector of the provided type containing the results of the multiplication.</returns>
-	template<class OutVector_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline OutVector_ VectorMultiply(const LhsVector_& lhs_, const Rhs_& rhs_)
+	/// <returns>Vector containing the results of the multiplication.</returns>
+	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMultiply(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		if constexpr (_underlying_vector_funcs::_validity_check_vector_arithmetic_potential_scalar<OutVector_, LhsVector_>())
+		if constexpr (_underlying_vector_funcs::_validity_check_vector_arithmetic_potential_scalar<LhsVector_>())
 		{
 			if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
 			{
 				using multiplier_type = EmuCore::do_multiply<typename LhsVector_::value_type, typename Rhs_::value_type>;
-				return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, Rhs_, multiplier_type>(lhs_, rhs_);
+				return _underlying_vector_funcs::_perform_vector_arithmetic<EmuMath::Vector<OutSize_, out_contained_type>, LhsVector_, Rhs_, multiplier_type>(lhs_, rhs_);
 			}
 			else
 			{
 				using multiplier_type = EmuCore::do_multiply<typename LhsVector_::value_type, Rhs_>;
-				return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, Rhs_, multiplier_type>(lhs_, rhs_);
+				return _underlying_vector_funcs::_perform_vector_arithmetic<EmuMath::Vector<OutSize_, out_contained_type>, LhsVector_, Rhs_, multiplier_type>(lhs_, rhs_);
 			}
 		}
 		else
@@ -386,15 +384,15 @@ namespace EmuMath::Helpers
 			);
 		}
 	}
-	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline auto VectorMultiply(const LhsVector_& lhs_, const Rhs_& rhs_)
-	{
-		return VectorMultiply<EmuMath::Vector<OutSize_, out_value_type>, LhsVector_, Rhs_>(lhs_, rhs_);
-	}
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline auto VectorMultiply(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorMultiply<EmuMath::Vector<OutSize_, typename LhsVector_::value_type>, LhsVector_, Rhs_>(lhs_, rhs_);
+		return VectorMultiply<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+	template<typename out_contained_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline auto VectorMultiply(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorMultiply<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 	template<class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline auto VectorMultiply(const LhsVector_& lhs_, const Rhs_& rhs_)
@@ -412,25 +410,25 @@ namespace EmuMath::Helpers
 	/// <typeparam name="Rhs_">Type of either vector or scalar on the right-hand side of the division.</typeparam>
 	/// <param name="lhs_">EmuMath vector to be divided.</param>
 	/// <param name="rhs_">EmuMath vector to divide respective elements by, or a scalar to divide every element by.</param>
-	/// <returns>Vector of the provided type containing the results of the division.</returns>
-	template<class OutVector_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline OutVector_ VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
+	/// <returns>Vector containing the results of the division.</returns>
+	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr
 		(
-			_underlying_vector_funcs::_validity_check_vector_arithmetic_potential_scalar<OutVector_, LhsVector_>() &&
-			_underlying_vector_funcs::_validity_check_no_integral_divide_by_zero<OutVector_, LhsVector_, Rhs_>()
+			_underlying_vector_funcs::_validity_check_vector_arithmetic_potential_scalar<LhsVector_>() &&
+			_underlying_vector_funcs::_validity_check_no_integral_divide_by_zero<EmuMath::Vector<OutSize_, out_contained_type>, LhsVector_, Rhs_>()
 		)
 		{
 			if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
 			{
 				using divider_type = EmuCore::do_divide<typename LhsVector_::value_type, typename Rhs_::value_type>;
-				return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, Rhs_, divider_type>(lhs_, rhs_);
+				return _underlying_vector_funcs::_perform_vector_arithmetic<EmuMath::Vector<OutSize_, out_contained_type>, LhsVector_, Rhs_, divider_type>(lhs_, rhs_);
 			}
 			else
 			{
 				using divider_type = EmuCore::do_divide<typename LhsVector_::value_type, Rhs_>;
-				return _underlying_vector_funcs::_perform_vector_arithmetic<OutVector_, LhsVector_, Rhs_, divider_type>(lhs_, rhs_);
+				return _underlying_vector_funcs::_perform_vector_arithmetic<EmuMath::Vector<OutSize_, out_contained_type>, LhsVector_, Rhs_, divider_type>(lhs_, rhs_);
 			}
 		}
 		else
@@ -442,20 +440,20 @@ namespace EmuMath::Helpers
 			);
 		}
 	}
-	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline auto VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
-	{
-		return VectorDivide<EmuMath::Vector<OutSize_, out_value_type>, LhsVector_, Rhs_>(lhs_, rhs_);
-	}
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline auto VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorDivide<EmuMath::Vector<OutSize_, typename LhsVector_::value_type>, LhsVector_, Rhs_>(lhs_, rhs_);
+		return VectorDivide<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+	template<typename out_contained_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline auto VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorDivide<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline LhsVector_ VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline auto VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorDivide<LhsVector_, LhsVector_, Rhs_>(lhs_, rhs_);
+		return VectorDivide<LhsVector_::size, typename LhsVector_::value_type, Rhs_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -592,40 +590,51 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::value_type VectorSquareMagnitude(const Vector_& vector_)
+	[[nodiscard]] constexpr inline typename Vector_::preferred_floating_point VectorSquareMagnitude(const Vector_& vector_)
 	{
-		return VectorSquareMagnitude<typename Vector_::value_type, Vector_>(vector_);
+		return VectorSquareMagnitude<typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 
 	/// <summary>
 	/// <para>
 	///		Calculates the passed vector's magnitude via means which may be evaluated at compile time for constant expressions, 
-	///		and outputs it as the optional provided OutT_ type, which defaults to float.
+	///		and outputs it as the optional provided OutT_ type, which defaults to the vector's preferred floating point type.
 	/// </para>
 	/// <para> If this will be executed at runtime, it is recommended to use VectorMagnitude(vector_) instead as this function may sacrifice performance to be constexpr. </para>
 	/// </summary>
 	/// <typeparam name="Vector_">Type of vector to calculate the magnitude of.</typeparam>
-	/// <typeparam name="OutT_">Optional type to output the magnitude as. Defaults to float.</typeparam>
+	/// <typeparam name="OutT_">Optional type to output the magnitude as.</typeparam>
 	/// <param name="vector_">EmuMath vector to calculate the magnitude of.</param>
 	/// <returns>Magnitude of the passed vector, represented as OutT_ if provided, otherwise represented as the passed vector's value_type.</returns>
-	template<typename OutT_ = float, class Vector_>
+	template<typename OutT_, class Vector_>
 	[[nodiscard]] constexpr inline OutT_ VectorMagnitudeConstexpr(const Vector_& vector_)
 	{
 		using FloatingPoint_ = EmuCore::TMPHelpers::first_floating_point_t<OutT_, typename Vector_::value_type, float>;
 		return static_cast<OutT_>(EmuCore::SqrtConstexpr<FloatingPoint_, FloatingPoint_>(VectorSquareMagnitude<FloatingPoint_, Vector_>(vector_)));
 	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline typename Vector_::preferred_floating_point VectorMagnitudeConstexpr(const Vector_& vector_)
+	{
+		return VectorMagnitudeConstexpr<typename Vector_::preferred_floating_point, Vector_>(vector_);
+	}
+
 	/// <summary>
-	/// <para>Calculates the passed vector's magnitude and outputs it as the optional provided OutT_ type. </para>
+	/// <para>Calculates the passed vector's magnitude and outputs it as the optional provided OutT_ type, which defaults to the vector's preferred floating point type. </para>
 	/// </summary>
 	/// <typeparam name="Vector_">Type of vector to calculate the magnitude of.</typeparam>
-	/// <typeparam name="OutT_">Optional type to output the magnitude as. Defaults to float.</typeparam>
+	/// <typeparam name="OutT_">Optional type to output the magnitude as.</typeparam>
 	/// <param name="vector_">EmuMath vector to calculate the magnitude of.</param>
 	/// <returns>Magnitude of the passed vector, represented as OutT_ if provided, otherwise represented as the passed vector's value_type.</returns>
-	template<typename OutT_ = float, class Vector_>
+	template<typename OutT_, class Vector_>
 	[[nodiscard]] inline OutT_ VectorMagnitude(const Vector_& vector_)
 	{
 		using FloatingPoint_ = EmuCore::TMPHelpers::first_floating_point_t<OutT_, typename Vector_::value_type, float>;
 		return EmuCore::DoMatchingStandardSqrt<FloatingPoint_>(VectorSquareMagnitude<FloatingPoint_, Vector_>(vector_));
+	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline typename Vector_::preferred_floating_point VectorMagnitude(const Vector_& vector_)
+	{
+		return VectorMagnitude<typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 
 	/// <summary>
@@ -639,7 +648,7 @@ namespace EmuMath::Helpers
 	/// <typeparam name="Vector_">Type of vector to find the reciprocal to the magnitude of.</typeparam>
 	/// <param name="vector_">EmuMath vector to find the reciprocal to the magnitude of.</param>
 	/// <returns>Reciprocal to the passed EmuMath vector's magnitude, represented as the provided OutFloatingPoint_ type.</returns>
-	template<typename OutFloatingPoint_ = float, class Vector_>
+	template<typename OutFloatingPoint_, class Vector_>
 	[[nodiscard]] constexpr inline OutFloatingPoint_ VectorMagnitudeReciprocalConstexpr(const Vector_& vector_)
 	{
 		if constexpr (std::is_floating_point_v<OutFloatingPoint_>)
@@ -651,6 +660,12 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to retrieve an EmuMath vector's magnitude reciprocal with a non-floating-point output type.");
 		}
 	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline typename Vector_::preferred_floating_point VectorMagnitudeReciprocalConstexpr(const Vector_& vector_)
+	{
+		return VectorMagnitudeReciprocalConstexpr<typename Vector_::preferred_floating_point, Vector_>(vector_);
+	}
+
 	/// <summary>
 	/// <para> Calculates the reciprocal to the passed EmuMath vector's magnitude. </para>
 	/// </summary>
@@ -670,6 +685,12 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to retrieve an EmuMath vector's magnitude reciprocal with a non-floating-point output type.");
 		}
 	}
+	template<class Vector_>
+	[[nodiscard]] inline typename Vector_::preferred_floating_point VectorMagnitudeReciprocal(const Vector_& vector_)
+	{
+		return VectorMagnitudeReciprocal<typename Vector_::preferred_floating_point, Vector_>(vector_);
+	}
+
 	/// <summary>
 	/// <para> Calculates the reciprocal to the passed EmuMath vector's magnitude, using the Q_rsqrt method. </para>
 	/// <para> A custom number of newton iterations may be provided to increase accuracy. Additionally, the magic constant may also be changed from 0x5F3759DF. </para>
@@ -692,6 +713,11 @@ namespace EmuMath::Helpers
 		{
 			static_assert(false, "Attempted to retrieve an EmuMath vector's magnitude reciprocal with a non-floating-point output type.");
 		}
+	}
+	template<std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, class Vector_>
+	[[nodiscard]] inline typename Vector_::preferred_floating_point VectorMagnitudeReciprocalQrsqrt(const Vector_& vector_)
+	{
+		return VectorMagnitudeReciprocalQrsqrt<typename Vector_::preferred_floating_point, NumNewtonIterations_, MagicConstant_, Vector_>(vector_);
 	}
 
 	/// <summary> Returns a copy of the lowest value within the passed EmuMath vector. </summary>
@@ -846,7 +872,7 @@ namespace EmuMath::Helpers
 	/// <para> If no OutSize_ is provided, the output vector size will be that of a_. </para>
 	/// <para> If no out_value_type is provided, the output vector's contained type will be the same as that in a_. </para>
 	/// </summary>
-	/// <typeparam name="out_value_type">Type to be contained in the output vector.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be contained in the output vector.</typeparam>
 	/// <typeparam name="AVector_">Type of the vector a in the equation a + ((b - a) * t).</typeparam>
 	/// <typeparam name="B_">Type of b in the equation a + ((b - a) * t).</typeparam>
 	/// <typeparam name="T_">Type of t in the equation a + ((b - a) * t).</typeparam>
@@ -854,22 +880,22 @@ namespace EmuMath::Helpers
 	/// <param name="b_">EmuMath vector or scalar that acts as b in the equation a + ((b - a) * t).</param>
 	/// <param name="t_">EmuMath vector or scalar that acts as t in the equation a + ((b - a) * t).</param>
 	/// <returns>Vector containing the result of linear interpolation with the provided arguments.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class AVector_, class B_, class T_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorLerp(const AVector_& a_, const B_& b_, const T_& t_)
+	template<std::size_t OutSize_, typename out_contained_type, class AVector_, class B_, class T_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorLerp(const AVector_& a_, const B_& b_, const T_& t_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<AVector_>)
 		{
-			return _underlying_vector_funcs::_vector_lerp<AVector_, B_, T_, EmuMath::Vector<OutSize_, out_value_type>>(a_, b_, t_);
+			return _underlying_vector_funcs::_vector_lerp<AVector_, B_, T_, EmuMath::Vector<OutSize_, out_contained_type>>(a_, b_, t_);
 		}
 		else
 		{
 			static_assert(false, "Attempted to perform a vector lerp with a non-EmuMath-vector argument for a_.");
 		}
 	}
-	template<typename out_value_type, class AVector_, class B_, class T_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<AVector_::size, out_value_type> VectorLerp(const AVector_& a_, const B_& b_, const T_& t_)
+	template<typename out_contained_type, class AVector_, class B_, class T_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<AVector_::size, out_contained_type> VectorLerp(const AVector_& a_, const B_& b_, const T_& t_)
 	{
-		return VectorLerp<AVector_::size, out_value_type, AVector_, B_, T_>(a_, b_, t_);
+		return VectorLerp<AVector_::size, out_contained_type, AVector_, B_, T_>(a_, b_, t_);
 	}
 	template<std::size_t OutSize_, class AVector_, class B_, class T_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename AVector_::value_type> VectorLerp(const AVector_& a_, const B_& b_, const T_& t_)
@@ -889,7 +915,7 @@ namespace EmuMath::Helpers
 	/// <para> If no OutSize_ is provided, the output vector size will be that of a_. </para>
 	/// <para> If no out_value_type is provided, the output vector's contained type will be the same as that in a_. </para>
 	/// </summary>
-	/// <typeparam name="out_value_type">Type to be contained in the output vector.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be contained in the output vector.</typeparam>
 	/// <typeparam name="AVector_">Type of a in the equation LERP(LERP(a, b, u), LERP(d, c, u), v).</typeparam>
 	/// <typeparam name="B_">Type of b in the equation LERP(LERP(a, b, u), LERP(d, c, u), v).</typeparam>
 	/// <typeparam name="C_">Type of c in the equation LERP(LERP(a, b, u), LERP(d, c, u), v).</typeparam>
@@ -903,8 +929,8 @@ namespace EmuMath::Helpers
 	/// <param name="u_">EmuMath vector or scalar representing u in the equation LERP(LERP(a, b, u), LERP(d, c, u), v).</param>
 	/// <param name="v_">EmuMath vector or scalar representing v in the equation LERP(LERP(a, b, u), LERP(d, c, u), v).</param>
 	/// <returns>Vector containing the result of bilinear interpolation with the provided arguments.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class AVector_, class B_, class C_, class DVector_, class U_, class V_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorBlerp
+	template<std::size_t OutSize_, typename out_contained_type, class AVector_, class B_, class C_, class DVector_, class U_, class V_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorBlerp
 	(
 		const AVector_& a_,
 		const B_& b_,
@@ -918,10 +944,10 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (EmuMath::TMP::is_emu_vector_v<DVector_>)
 			{
-				return VectorLerp<OutSize_, out_value_type, EmuMath::Vector<OutSize_, out_value_type>, EmuMath::Vector<OutSize_, out_value_type>, V_>
+				return VectorLerp<OutSize_, out_contained_type, EmuMath::Vector<OutSize_, out_contained_type>, EmuMath::Vector<OutSize_, out_contained_type>, V_>
 				(
-					VectorLerp<OutSize_, out_value_type, AVector_, B_, U_>(a_, b_, u_),
-					VectorLerp<OutSize_, out_value_type, DVector_, C_, U_>(d_, c_, u_),
+					VectorLerp<OutSize_, out_contained_type, AVector_, B_, U_>(a_, b_, u_),
+					VectorLerp<OutSize_, out_contained_type, DVector_, C_, U_>(d_, c_, u_),
 					v_
 				);
 			}
@@ -935,8 +961,8 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to perform bilinear interpolation with vectors, but provided a non-EmuMath-vector argument for A_.");
 		}
 	}
-	template<typename out_value_type, class AVector_, class B_, class C_, class DVector_, class U_, class V_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<AVector_::size, out_value_type> VectorBlerp
+	template<typename out_contained_type, class AVector_, class B_, class C_, class DVector_, class U_, class V_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<AVector_::size, out_contained_type> VectorBlerp
 	(
 		const AVector_& a_,
 		const B_& b_,
@@ -946,7 +972,7 @@ namespace EmuMath::Helpers
 		const V_& v_
 	)
 	{
-		return VectorBlerp<AVector_::size, out_value_type, AVector_, B_, C_, DVector_, U_, V_>(a_, b_, c_, d_, u_, v_);
+		return VectorBlerp<AVector_::size, out_contained_type, AVector_, B_, C_, DVector_, U_, V_>(a_, b_, c_, d_, u_, v_);
 	}
 	template<std::size_t OutSize_, class AVector_, class B_, class C_, class DVector_, class U_, class V_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename AVector_::value_type> VectorBlerp
@@ -983,18 +1009,18 @@ namespace EmuMath::Helpers
 	/// </para>
 	/// <para> The provided out_floating_point_value_type is optional and defaults to float, and must be a floating-point type for this function to be used. </para>
 	/// </summary>
-	/// <typeparam name="out_floating_point_value_type">Floating-point type to be contained within the output vector.</typeparam>
+	/// <typeparam name="out_floating_point_contained_type">Floating-point type to be contained within the output vector.</typeparam>
 	/// <typeparam name="Vector_">Vector type to calculate the reciprocal of.</typeparam>
 	/// <param name="vector_">EmuMath vector to calculate the reciprocal of.</param>
 	/// <returns>Vector of floating-points containing reciprocals of respective elements in the passed vector, or infinity in indices exceeding those of said vector.</returns>
-	template<std::size_t OutSize_, typename out_floating_point_value_type = float, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_floating_point_value_type> VectorReciprocal(const Vector_& vector_)
+	template<std::size_t OutSize_, typename out_floating_point_contained_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_floating_point_contained_type> VectorReciprocal(const Vector_& vector_)
 	{
-		if constexpr (std::is_floating_point_v<std::remove_cv_t<std::remove_reference_t<out_floating_point_value_type>>>)
+		if constexpr (std::is_floating_point_v<std::remove_cv_t<std::remove_reference_t<out_floating_point_contained_type>>>)
 		{
 			if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 			{
-				return _underlying_vector_funcs::_vector_reciprocal<EmuMath::Vector<OutSize_, out_floating_point_value_type>, Vector_>(vector_);
+				return _underlying_vector_funcs::_vector_reciprocal<EmuMath::Vector<OutSize_, out_floating_point_contained_type>, Vector_>(vector_);
 			}
 			else
 			{
@@ -1003,13 +1029,23 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to retrieve the reciprocal of a vector, but provided a non-floating-point output value_type. This behaviour is blocked.");
+			static_assert(false, "Attempted to retrieve the reciprocal of a vector, but provided a non-floating-point output contained_type. This behaviour is blocked.");
 		}
 	}
-	template<typename out_floating_point_value_type = float, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_floating_point_value_type> VectorReciprocal(const Vector_& vector_)
+	template<typename out_floating_point_contained_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_floating_point_contained_type> VectorReciprocal(const Vector_& vector_)
 	{
-		return VectorReciprocal<Vector_::size, out_floating_point_value_type, Vector_>(vector_);
+		return VectorReciprocal<Vector_::size, out_floating_point_contained_type, Vector_>(vector_);
+	}
+	template<std::size_t OutSize_, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::preferred_floating_point> VectorReciprocal(const Vector_& vector_)
+	{
+		return VectorReciprocal<OutSize_, typename Vector_::preferred_floating_point, Vector_>(vector_);
+	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::preferred_floating_point> VectorReciprocal(const Vector_& vector_)
+	{
+		return VectorReciprocal<Vector_::size, typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 
 	/// <summary>
@@ -1019,7 +1055,7 @@ namespace EmuMath::Helpers
 	///		Otherwise, all elements will be clamped to a minimum of the value of min_.
 	/// </para>
 	/// </summary>
-	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to be clamping the minimum values of.</typeparam>
 	/// <typeparam name="Min_">Type of vector or scalar to be using as the minimum value(s).</typeparam>
 	/// <param name="vector_">EmuMath vector to be clamping the minimum values of.</param>
@@ -1037,10 +1073,10 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to clamp the minimum values of a vector, but provided a non-EmuMath-vector to clamp.");
 		}
 	}
-	template<typename out_value_type, class Vector_, class Min_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorClampMin(const Vector_& vector_, const Min_& min_)
+	template<typename out_contained_type, class Vector_, class Min_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorClampMin(const Vector_& vector_, const Min_& min_)
 	{
-		return VectorClampMin<Vector_::size, out_value_type, Vector_, Min_>(vector_, min_);
+		return VectorClampMin<Vector_::size, out_contained_type, Vector_, Min_>(vector_, min_);
 	}
 	template<std::size_t OutSize_, class Vector_, class Min_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorClampMin(const Vector_& vector_, const Min_& min_)
@@ -1060,28 +1096,28 @@ namespace EmuMath::Helpers
 	///		Otherwise, all elements will be clamped to a maximum of the value of max_.
 	/// </para>
 	/// </summary>
-	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to be clamping the maximum values of.</typeparam>
 	/// <typeparam name="Max_">Type of vector or scalar to be using as the maximum value(s).</typeparam>
 	/// <param name="vector_">EmuMath vector to be clamping the maximum values of.</param>
 	/// <param name="max_">EmuMath vector or scalar to be using as the maximum value(s).</param>
 	/// <returns>EmuMath vector copy of the passed vector with its values clamped to an inclusive maximum as dictacted by max_.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Max_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorClampMax(const Vector_& vector_, const Max_& max_)
+	template<std::size_t OutSize_, typename out_contained_type, class Vector_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorClampMax(const Vector_& vector_, const Max_& max_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_vector_clamp_max<EmuMath::Vector<OutSize_, out_value_type>, Vector_, Max_>(vector_, max_);
+			return _underlying_vector_funcs::_vector_clamp_max<EmuMath::Vector<OutSize_, out_contained_type>, Vector_, Max_>(vector_, max_);
 		}
 		else
 		{
 			static_assert(false, "Attempted to clamp the maximum values of a vector, but provided a non-EmuMath-vector to clamp.");
 		}
 	}
-	template<typename out_value_type, class Vector_, class Max_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorClampMax(const Vector_& vector_, const Max_& max_)
+	template<typename out_contained_type, class Vector_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorClampMax(const Vector_& vector_, const Max_& max_)
 	{
-		return VectorClampMax<Vector_::size, out_value_type, Vector_, Max_>(vector_, max_);
+		return VectorClampMax<Vector_::size, out_contained_type, Vector_, Max_>(vector_, max_);
 	}
 	template<std::size_t OutSize_, class Vector_, class Max_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorClampMax(const Vector_& vector_, const Max_& max_)
@@ -1106,7 +1142,7 @@ namespace EmuMath::Helpers
 	///		Otherwise, all elements will be clamped to a maximum of the value of max_.
 	/// </para>
 	/// </summary>
-	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to be clamping the values of.</typeparam>
 	/// <typeparam name="Min_">Type of vector or scalar to be using as the minimum value(s).</typeparam>
 	/// <typeparam name="Max_">Type of vector or scalar to be using as the maximum value(s).</typeparam>
@@ -1114,22 +1150,22 @@ namespace EmuMath::Helpers
 	/// <param name="min_">EmuMath vector or scalar to be using as the minimum value(s).</param>
 	/// <param name="max_">EmuMath vector or scalar to be using as the maximum value(s).</param>
 	/// <returns>EmuMath vector copy of the passed vector with its values clamped to between an inclusive minimum and maximum as dictacted by min_ and max_.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Min_, class Max_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorClamp(const Vector_& vector_, const Min_& min_, const Max_& max_)
+	template<std::size_t OutSize_, typename out_contained_type, class Vector_, class Min_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorClamp(const Vector_& vector_, const Min_& min_, const Max_& max_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_vector_clamp<EmuMath::Vector<OutSize_, out_value_type>, Vector_, Min_, Max_>(vector_, min_, max_);
+			return _underlying_vector_funcs::_vector_clamp<EmuMath::Vector<OutSize_, out_contained_type>, Vector_, Min_, Max_>(vector_, min_, max_);
 		}
 		else
 		{
 			static_assert(false, "Attempted to clamp the values of a vector, but provided a non-EmuMath-vector type to clamp.");
 		}
 	}
-	template<typename out_value_type, class Vector_, class Min_, class Max_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorClamp(const Vector_& vector_, const Min_& min_, const Max_& max_)
+	template<typename out_contained_type, class Vector_, class Min_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorClamp(const Vector_& vector_, const Min_& min_, const Max_& max_)
 	{
-		return VectorClamp<Vector_::size, out_value_type, Vector_, Min_, Max_>(vector_, min_, max_);
+		return VectorClamp<Vector_::size, out_contained_type, Vector_, Min_, Max_>(vector_, min_, max_);
 	}
 	template<std::size_t OutSize_, class Vector_, class Min_, class Max_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorClamp(const Vector_& vector_, const Min_& min_, const Max_& max_)
@@ -1143,7 +1179,7 @@ namespace EmuMath::Helpers
 	}
 
 	/// <summary> Mutates the elements of a vector with a provided function and outputs them via the returned vector. </summary>
-	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to mutate.</typeparam>
 	/// <typeparam name="Func_">Type of invokable used to mutate the vector.</typeparam>
 	/// <param name="vector_">Vector to mutate the elements of.</param>
@@ -1152,27 +1188,27 @@ namespace EmuMath::Helpers
 	///		and returns a value of out_value_type or which may be cast to out_value_type.
 	/// </param>
 	/// <returns>Vector containing the results of the mutation of the passed vector_ via the passed func_.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Func_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorMutate(const Vector_& vector_, Func_ func_)
+	template<std::size_t OutSize_, typename out_contained_type, class Vector_, class Func_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMutate(const Vector_& vector_, Func_ func_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, Func_>(vector_, func_);
+			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_contained_type>, Vector_, Func_>(vector_, func_);
 		}
 		else
 		{
 			static_assert(false, "Attempted to perform a mutation on a vector, but provided a non-EmuMath-vector type.");
 		}
 	}
-	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Func_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorMutate(const Vector_& vector_)
+	template<std::size_t OutSize_, typename out_contained_type, class Vector_, class Func_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMutate(const Vector_& vector_)
 	{
-		return VectorMutate<OutSize_, out_value_type, Vector_, Func_>(vector_, Func_());
+		return VectorMutate<OutSize_, out_contained_type, Vector_, Func_>(vector_, Func_());
 	}
-	template<typename out_value_type, class Vector_, class Func_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorMutate(const Vector_& vector_, Func_ func_)
+	template<typename out_contained_type, class Vector_, class Func_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorMutate(const Vector_& vector_, Func_ func_)
 	{
-		return VectorMutate<Vector_::size, out_value_type, Vector_, Func_&>(vector_, func_);
+		return VectorMutate<Vector_::size, out_contained_type, Vector_, Func_&>(vector_, func_);
 	}
 	template<std::size_t OutSize_, class Vector_, class Func_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorMutate(const Vector_& vector_, Func_ func_)
@@ -1184,10 +1220,10 @@ namespace EmuMath::Helpers
 	{
 		return VectorMutate<Vector_::size, typename Vector_::value_type, Vector_, Func_&>(vector_, func_);
 	}
-	template<typename out_value_type, class Vector_, class Func_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorMutate(const Vector_& vector_)
+	template<typename out_contained_type, class Vector_, class Func_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorMutate(const Vector_& vector_)
 	{
-		return VectorMutate<Vector_::size, out_value_type, Vector_, Func_>(vector_, Func_());
+		return VectorMutate<Vector_::size, out_contained_type, Vector_, Func_>(vector_, Func_());
 	}
 	template<std::size_t OutSize_, class Vector_, class Func_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorMutate(const Vector_& vector_)
@@ -1203,16 +1239,16 @@ namespace EmuMath::Helpers
 	/// <summary>
 	///		Floors all elements within the passed vector (i.e. rounds them toward negative infinity) and stores the results in respective elements of the output vector.
 	/// </summary>
-	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to round the elements of.</typeparam>
 	/// <param name="vector_">EmuMath vector to round the elements of.</param>
 	/// <returns>EmuMath vector containing the results of rounding respective elements in the passed vector_.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorFloor(const Vector_& vector_)
+	template<std::size_t OutSize_, typename out_contained_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorFloor(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, EmuCore::do_floor<typename Vector_::value_type>>
+			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_contained_type>, Vector_, EmuCore::do_floor<typename Vector_::value_type>>
 			(
 				vector_
 			);
@@ -1222,10 +1258,10 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to floor a vector, but provided a non-EmuMath-vector argument type.");
 		}
 	}
-	template<typename out_value_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorFloor(const Vector_& vector_)
+	template<typename out_contained_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorFloor(const Vector_& vector_)
 	{
-		return VectorFloor<Vector_::size, out_value_type, Vector_>(vector_);
+		return VectorFloor<Vector_::size, out_contained_type, Vector_>(vector_);
 	}
 	template<std::size_t OutSize_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorFloor(const Vector_& vector_)
@@ -1241,16 +1277,16 @@ namespace EmuMath::Helpers
 	/// <summary>
 	///		Ceils all elements within the passed vector (i.e. rounds them toward positive infinity) and stores the results in respective elements of the output vector.
 	/// </summary>
-	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to round the elements of.</typeparam>
 	/// <param name="vector_">EmuMath vector to round the elements of.</param>
 	/// <returns>EmuMath vector containing the results of rounding respective elements in the passed vector_.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorCeil(const Vector_& vector_)
+	template<std::size_t OutSize_, typename out_contained_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorCeil(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, EmuCore::do_ceil<typename Vector_::value_type>>
+			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_contained_type>, Vector_, EmuCore::do_ceil<typename Vector_::value_type>>
 			(
 				vector_
 			);
@@ -1260,10 +1296,10 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to ceil a vector, but provided a non-EmuMath-vector argument type.");
 		}
 	}
-	template<typename out_value_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorCeil(const Vector_& vector_)
+	template<typename out_contained_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorCeil(const Vector_& vector_)
 	{
-		return VectorCeil<Vector_::size, out_value_type, Vector_>(vector_);
+		return VectorCeil<Vector_::size, out_contained_type, Vector_>(vector_);
 	}
 	template<std::size_t OutSize_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorCeil(const Vector_& vector_)
@@ -1279,16 +1315,16 @@ namespace EmuMath::Helpers
 	/// <summary>
 	///		Truncates all elements within the passed vector (i.e. rounds them toward 0) and stores the results in respective elements of the output vector.
 	/// </summary>
-	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to round the elements of.</typeparam>
 	/// <param name="vector_">EmuMath vector to round the elements of.</param>
 	/// <returns>EmuMath vector containing the results of rounding respective elements in the passed vector_.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorTrunc(const Vector_& vector_)
+	template<std::size_t OutSize_, typename out_contained_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorTrunc(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, EmuCore::do_trunc<typename Vector_::value_type>>
+			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_contained_type>, Vector_, EmuCore::do_trunc<typename Vector_::value_type>>
 			(
 				vector_
 			);
@@ -1298,10 +1334,10 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to trunc a vector, but provided a non-EmuMath-vector argument type.");
 		}
 	}
-	template<typename out_value_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorTrunc(const Vector_& vector_)
+	template<typename out_contained_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorTrunc(const Vector_& vector_)
 	{
-		return VectorTrunc<Vector_::size, out_value_type, Vector_>(vector_);
+		return VectorTrunc<Vector_::size, out_contained_type, Vector_>(vector_);
 	}
 	template<std::size_t OutSize_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorTrunc(const Vector_& vector_)
@@ -1319,18 +1355,18 @@ namespace EmuMath::Helpers
 	/// <para> This calculation may make some sacrifices to be executable at compile time. If it is being called at runtime, it is recommended to use VectorSqrt instead. </para>
 	/// <para> This function makes use of the EmuMath::do_sqrt_constexpr functor. The specialisation for the passed vector's value_type will be used, if one exists. </para>
 	/// </summary>
-	/// <typeparam name="out_value_type">Type to be stored in the output vector.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be stored in the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to calculate the square root of the elements of.</typeparam>
 	/// <param name="vector_">EmuMath vector to calculate the square root of elements of.</param>
 	/// <returns>EmuMath vector containing the results of the square root calculation for each respective element within the passed vector.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorSqrtConstexpr(const Vector_& vector_)
+	template<std::size_t OutSize_, typename out_contained_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorSqrtConstexpr(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
 			return _underlying_vector_funcs::_vector_single_operand_func
 			<
-				EmuMath::Vector<OutSize_, out_value_type>,
+				EmuMath::Vector<OutSize_, out_contained_type>,
 				Vector_,
 				EmuCore::do_sqrt_constexpr<typename Vector_::value_type>
 			>(vector_);
@@ -1340,10 +1376,10 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to calculate the square root of all elements within a vector, but provided a non-EmuMath-vector argument type.");
 		}
 	}
-	template<typename out_value_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorSqrtConstexpr(const Vector_& vector_)
+	template<typename out_contained_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorSqrtConstexpr(const Vector_& vector_)
 	{
-		return VectorSqrtConstexpr<Vector_::size, out_value_type, Vector_>(vector_);
+		return VectorSqrtConstexpr<Vector_::size, out_contained_type, Vector_>(vector_);
 	}
 	template<std::size_t OutSize_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorSqrtConstexpr(const Vector_& vector_)
@@ -1360,18 +1396,18 @@ namespace EmuMath::Helpers
 	/// <para> Performs a square root calculation of elements within the passed vector and returns the resulting vector. </para>
 	/// <para> This function makes use of the EmuMath::do_sqrt functor. The specialisation for the passed vector's value_type will be used, if one exists. </para>
 	/// </summary>
-	/// <typeparam name="out_value_type">Type to be stored in the output vector.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be stored in the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to calculate the square root of the elements of.</typeparam>
 	/// <param name="vector_">EmuMath vector to calculate the square root of elements of.</param>
 	/// <returns>EmuMath vector containing the results of the square root calculation for each respective element within the passed vector.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class Vector_>
-	[[nodiscard]] inline EmuMath::Vector<OutSize_, out_value_type> VectorSqrt(const Vector_& vector_)
+	template<std::size_t OutSize_, typename out_contained_type, class Vector_>
+	[[nodiscard]] inline EmuMath::Vector<OutSize_, out_contained_type> VectorSqrt(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
 			return _underlying_vector_funcs::_vector_single_operand_func
 			<
-				EmuMath::Vector<OutSize_, out_value_type>,
+				EmuMath::Vector<OutSize_, out_contained_type>,
 				Vector_,
 				EmuCore::do_sqrt<typename Vector_::value_type>
 			>(vector_);
@@ -1381,10 +1417,10 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to calculate the square root of all elements within a vector, but provided a non-EmuMath-vector argument type.");
 		}
 	}
-	template<typename out_value_type, class Vector_>
-	[[nodiscard]] inline EmuMath::Vector<Vector_::size, out_value_type> VectorSqrt(const Vector_& vector_)
+	template<typename out_contained_type, class Vector_>
+	[[nodiscard]] inline EmuMath::Vector<Vector_::size, out_contained_type> VectorSqrt(const Vector_& vector_)
 	{
-		return VectorSqrt<Vector_::size, out_value_type, Vector_>(vector_);
+		return VectorSqrt<Vector_::size, out_contained_type, Vector_>(vector_);
 	}
 	template<std::size_t OutSize_, class Vector_>
 	[[nodiscard]] inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorSqrt(const Vector_& vector_)
@@ -1408,14 +1444,25 @@ namespace EmuMath::Helpers
 	/// <typeparam name="Vector_">Type of vector to return a normalised copy of.</typeparam>
 	/// <param name="vector_">EmuMath vector to calculate the normalised form of.</param>
 	/// <returns>Copy of the passed EmuMath vector with its elements normalised.</returns>
-	template<typename MagFloatingPointType_ = float, class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::copy_type VectorNormaliseConstexpr(const Vector_& vector_)
+	template<typename out_floating_point_contained_type, typename MagFloatingPointType_, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_floating_point_contained_type> VectorNormaliseConstexpr(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
 			if constexpr (std::is_floating_point_v<MagFloatingPointType_>)
 			{
-				return VectorMultiply<Vector_, MagFloatingPointType_>(vector_, VectorMagnitudeReciprocalConstexpr<MagFloatingPointType_>(vector_));
+				if constexpr(std::is_floating_point_v<out_floating_point_contained_type>)
+				{
+					return VectorMultiply<Vector_::size, out_floating_point_contained_type, Vector_, MagFloatingPointType_>
+					(
+						vector_,
+						VectorMagnitudeReciprocalConstexpr<MagFloatingPointType_>(vector_)
+					);
+				}
+				else
+				{
+					static_assert(false, "Attempted to normalise a vector and output it with non-floating-point contained types. As this would render the normalisation to all-0, this behaviour is blocked.");
+				}
 			}
 			else
 			{
@@ -1427,6 +1474,16 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to normalise a vector, but provided a non-EmuMath-vector argument.");
 		}
 	}
+	template<typename out_floating_point_contained_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_floating_point_contained_type> VectorNormaliseConstexpr(const Vector_& vector_)
+	{
+		return VectorNormaliseConstexpr<out_floating_point_contained_type, out_floating_point_contained_type, Vector_>(vector_);
+	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::preferred_floating_point> VectorNormaliseConstexpr(const Vector_& vector_)
+	{
+		return VectorNormaliseConstexpr<typename Vector_::preferred_floating_point, typename Vector_::preferred_floating_point, Vector_>(vector_);
+	}
 
 	/// <summary>
 	/// <para> Creates a copy of the passed vector with its elements normalised. </para>
@@ -1435,14 +1492,25 @@ namespace EmuMath::Helpers
 	/// <typeparam name="Vector_">Type of vector to return a normalised copy of.</typeparam>
 	/// <param name="vector_">EmuMath vector to calculate the normalised form of.</param>
 	/// <returns>Copy of the passed EmuMath vector with its elements normalised.</returns>
-	template<typename MagFloatingPointType_ = float, class Vector_>
-	[[nodiscard]] inline typename Vector_::copy_type VectorNormalise(const Vector_& vector_)
+	template<typename out_floating_point_contained_type, typename MagFloatingPointType_, class Vector_>
+	[[nodiscard]] inline EmuMath::Vector<Vector_::size, out_floating_point_contained_type> VectorNormalise(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
 			if constexpr (std::is_floating_point_v<MagFloatingPointType_>)
 			{
-				return VectorMultiply<Vector_, MagFloatingPointType_>(vector_, VectorMagnitudeReciprocal<MagFloatingPointType_>(vector_));
+				if constexpr (std::is_floating_point_v<out_floating_point_contained_type>)
+				{
+					return VectorMultiply<Vector_::size, out_floating_point_contained_type, Vector_, MagFloatingPointType_>
+					(
+						vector_,
+						VectorMagnitudeReciprocal<MagFloatingPointType_>(vector_)
+					);
+				}
+				else
+				{
+					static_assert(false, "Attempted to normalise a vector and output it with non-floating-point contained types. As this would render the normalisation to all-0, this behaviour is blocked.");
+				}
 			}
 			else
 			{
@@ -1453,6 +1521,16 @@ namespace EmuMath::Helpers
 		{
 			static_assert(false, "Attempted to normalise a vector, but provided a non-EmuMath-vector argument.");
 		}
+	}
+	template<typename out_floating_point_contained_type, class Vector_>
+	[[nodiscard]] inline EmuMath::Vector<Vector_::size, out_floating_point_contained_type> VectorNormalise(const Vector_& vector_)
+	{
+		return VectorNormalise<out_floating_point_contained_type, out_floating_point_contained_type, Vector_>(vector_);
+	}
+	template<class Vector_>
+	[[nodiscard]] inline EmuMath::Vector<Vector_::size, typename Vector_::preferred_floating_point> VectorNormalise(const Vector_& vector_)
+	{
+		return VectorNormalise<typename Vector_::preferred_floating_point, typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 
 	/// <summary>
@@ -1465,18 +1543,25 @@ namespace EmuMath::Helpers
 	/// <typeparam name="Vector_">Type of vector to return a normalised copy of.</typeparam>
 	/// <param name="vector_">EmuMath vector to calculate the normalised form of.</param>
 	/// <returns>Copy of the passed EmuMath vector with its elements normalised via the result of using Q_rsqrt to find the magnitude's reciprocal.</returns>
-	template<typename MagFloatingPointType_ = float, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, class Vector_>
-	[[nodiscard]] inline typename Vector_::copy_type VectorNormaliseQrsqrt(const Vector_& vector_)
+	template<typename out_floating_point_contained_type, typename MagFloatingPointType_, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, class Vector_>
+	[[nodiscard]] inline typename EmuMath::Vector<Vector_::size, out_floating_point_contained_type> VectorNormaliseQrsqrt(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
 			if constexpr (std::is_floating_point_v<MagFloatingPointType_>)
 			{
-				return VectorMultiply<Vector_, MagFloatingPointType_>
-				(
-					vector_,
-					VectorMagnitudeReciprocalQrsqrt<MagFloatingPointType_, NumNewtonIterations_, MagicConstant_, Vector_>(vector_)
-				);
+				if constexpr (std::is_floating_point_v<out_floating_point_contained_type>)
+				{
+					return VectorMultiply<Vector_::size, out_floating_point_contained_type, Vector_, MagFloatingPointType_>
+					(
+						vector_,
+						VectorMagnitudeReciprocalQrsqrt<MagFloatingPointType_, NumNewtonIterations_, MagicConstant_, Vector_>(vector_)
+					);
+				}
+				else
+				{
+					static_assert(false, "Attempted to normalise a vector and output it with non-floating-point contained types. As this would render the normalisation to all-0, this behaviour is blocked.");
+				}
 			}
 			else
 			{
@@ -1488,19 +1573,32 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to normalise a vector, but provided a non-EmuMath-vector argument.");
 		}
 	}
+	template<typename out_floating_point_contained_type, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, class Vector_>
+	[[nodiscard]] inline typename EmuMath::Vector<Vector_::size, out_floating_point_contained_type> VectorNormaliseQrsqrt(const Vector_& vector_)
+	{
+		return VectorNormaliseQrsqrt<out_floating_point_contained_type, out_floating_point_contained_type, NumNewtonIterations_, MagicConstant_, Vector_>(vector_);
+	}
+	template<std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, class Vector_>
+	[[nodiscard]] inline typename EmuMath::Vector<Vector_::size, typename Vector_::preferred_floating_point> VectorNormaliseQrsqrt(const Vector_& vector_)
+	{
+		return VectorNormaliseQrsqrt<typename Vector_::preferred_floating_point, typename Vector_::preferred_floating_point, NumNewtonIterations_, MagicConstant_, Vector_>
+		(
+			vector_
+		);
+	}
 
 	/// <summary>
 	/// <para> Calculates the cosine of the angle between the two provided vectors. </para>
-	/// <para> It is recommended, but not enforced, that you output the cosine as a floating-point type. It will default to float. </para>
+	/// <para> It is recommended, but not enforced, that you output the cosine as a floating-point type. Defaults to lhs_ vector's preferred_floating_point. </para>
 	/// <para> This function may make sacrifices to be evaluable at compile time. If it is being used at runtime, it is recommended to use VectorAngleCosine. </para>
 	/// </summary>
-	/// <typeparam name="OutCosine_">Type to output the cosine as. Defaults to float.</typeparam>
+	/// <typeparam name="OutCosine_">Type to output the cosine as. Defaults to the lhs_ vector's preferred floating point type.</typeparam>
 	/// <typeparam name="LhsVector_">Type of vector appearing on the left-hand side of arguments.</typeparam>
 	/// <typeparam name="RhsVector_">Type of vector appearing on the right-hand side of arguments.</typeparam>
 	/// <param name="lhs_">First EmuMath vector in the calculation.</param>
 	/// <param name="rhs_">Second EmuMath vector in the calculation.</param>
 	/// <returns>Cosine of the angle between vectors lhs_ and rhs_, represented as the provided OutCosine_ type.</returns>
-	template<typename OutCosine_ = float, class LhsVector_, class RhsVector_>
+	template<typename OutCosine_, class LhsVector_, class RhsVector_>
 	[[nodiscard]] constexpr inline OutCosine_ VectorAngleCosineConstexpr(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
@@ -1526,17 +1624,23 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to find the cosine of the angle between two vectors, but provided a non-EmuMath-vector left-hand argument.");
 		}
 	}
+	template<class LhsVector_, class RhsVector_>
+	[[nodiscard]] constexpr inline typename LhsVector_::preferred_floating_point VectorAngleCosineConstexpr(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	{
+		return VectorAngleCosineConstexpr<typename LhsVector_::preferred_floating_point, LhsVector_, RhsVector_>(lhs_, rhs_);
+	}
+
 	/// <summary>
 	/// <para> Calculates the cosine of the angle between the two provided vectors. </para>
-	/// <para> It is recommended, but not enforced, that you output the cosine as a floating-point type. It will default to float. </para>
+	/// <para> It is recommended, but not enforced, that you output the cosine as a floating-point type. Defaults to lhs_ vector's preferred_floating_point. </para>
 	/// </summary>
-	/// <typeparam name="OutCosine_">Type to output the cosine as. Defaults to float.</typeparam>
+	/// <typeparam name="OutCosine_">Type to output the cosine as. Defaults to the lhs_ vector's preferred floating point type.</typeparam>
 	/// <typeparam name="LhsVector_">Type of vector appearing on the left-hand side of arguments.</typeparam>
 	/// <typeparam name="RhsVector_">Type of vector appearing on the right-hand side of arguments.</typeparam>
 	/// <param name="lhs_">First EmuMath vector in the calculation.</param>
 	/// <param name="rhs_">Second EmuMath vector in the calculation.</param>
 	/// <returns>Cosine of the angle between vectors lhs_ and rhs_, represented as the provided OutCosine_ type.</returns>
-	template<typename OutCosine_ = float, class LhsVector_, class RhsVector_>
+	template<typename OutCosine_, class LhsVector_, class RhsVector_>
 	[[nodiscard]] inline OutCosine_ VectorAngleCosine(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
@@ -1562,6 +1666,11 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to find the cosine of the angle between two vectors, but provided a non-EmuMath-vector left-hand argument.");
 		}
 	}
+	template<class LhsVector_, class RhsVector_>
+	[[nodiscard]] inline typename LhsVector_::preferred_floating_point VectorAngleCosine(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	{
+		return VectorAngleCosine<typename LhsVector_::preferred_floating_point, LhsVector_, RhsVector_>(lhs_, rhs_);
+	}
 
 	/// <summary>
 	/// <para> Calculates the angle between the passed vectors and outputs it in either radians or degrees. </para>
@@ -1573,7 +1682,7 @@ namespace EmuMath::Helpers
 	/// <param name="a_">First EmuMath vector in the calculation.</param>
 	/// <param name="b_">Second EmuMath vector in the calculation.</param>
 	/// <returns>The angle between the two vectors represented as the provided OutAngle_ type. Units will be radians if Rads_ is true, otherwise they will be degrees.</returns>
-	template<bool Rads_ = true, typename OutAngle_ = float, class VectorA_, class VectorB_>
+	template<typename OutAngle_, bool Rads_ = true, class VectorA_, class VectorB_>
 	[[nodiscard]] inline OutAngle_ VectorAngle(const VectorA_& a_, const VectorB_& b_)
 	{
 		using floating_point = EmuCore::TMPHelpers::first_floating_point_t<OutAngle_, float>;
@@ -1585,6 +1694,11 @@ namespace EmuMath::Helpers
 		{
 			return static_cast<OutAngle_>(EmuCore::Pi::RadsToDegs(EmuCore::do_acos<floating_point>()(VectorAngleCosine<floating_point>(a_, b_))));
 		}
+	}
+	template<bool Rads_ = true, class VectorA_, class VectorB_>
+	[[nodiscard]] inline typename VectorA_::preferred_floating_point VectorAngle(const VectorA_& a_, const VectorB_& b_)
+	{
+		return VectorAngle<typename VectorA_::preferred_floating_point, Rads_, VectorA_, VectorB_>(a_, b_);
 	}
 
 	/// <summary>
@@ -2269,14 +2383,14 @@ namespace EmuMath::Helpers
 	/// </para>
 	/// <para> This function uses an instantiation of EmuCore::do_left_shift&lt;Vector_::value_type, Shifts_&gt; to perform each shift. </para>
 	/// </summary>
-	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to shift the elements of.</typeparam>
 	/// <typeparam name="Shifts_">Scalar type or EmuMath vector used to represent the number of shifts.</typeparam>
 	/// <param name="vector_">EmuMath vector to shift the elements of. Its value_type must be shiftable via the EmuCore::do_left_shift functor for said type.</param>
 	/// <param name="num_shifts_">Scalar or EmuMath vector representing the number of shifts to apply to every element or to each respective element.</param>
 	/// <returns>Result of left-shifting the elements of the passed EmuMath vector the specified number of times in num_shifts_.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorShiftLeft(const Vector_& vector_, const Shifts_& num_shifts_)
+	template<std::size_t OutSize_, typename out_contained_type, class Vector_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorShiftLeft(const Vector_& vector_, const Shifts_& num_shifts_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -2284,7 +2398,7 @@ namespace EmuMath::Helpers
 			{
 				return _underlying_vector_funcs::_vector_bitwise_shift_per_element
 				<
-					EmuMath::Vector<OutSize_, out_value_type>,
+					EmuMath::Vector<OutSize_, out_contained_type>,
 					Vector_,
 					Shifts_,
 					EmuCore::do_left_shift
@@ -2300,10 +2414,10 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to shift each element within a vector to the left, but the provided argument was not an EmuMath vector type.");
 		}
 	}
-	template<typename out_value_type, class Vector_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorShiftLeft(const Vector_& vector_, const Shifts_& num_shifts_)
+	template<typename out_contained_type, class Vector_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorShiftLeft(const Vector_& vector_, const Shifts_& num_shifts_)
 	{
-		return VectorShiftLeft<Vector_::size, out_value_type, Vector_, Shifts_>(vector_, num_shifts_);
+		return VectorShiftLeft<Vector_::size, out_contained_type, Vector_, Shifts_>(vector_, num_shifts_);
 	}
 	template<std::size_t OutSize_, class Vector_, class Shifts_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorShiftLeft(const Vector_& vector_, const Shifts_& num_shifts_)
@@ -2325,14 +2439,14 @@ namespace EmuMath::Helpers
 	/// </para>
 	/// <para> This function uses an instantiation of EmuCore::do_right_shift&lt;Vector_::value_type, Shifts_&gt; to perform each shift. </para>
 	/// </summary>
-	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to shift the elements of.</typeparam>
 	/// <typeparam name="Shifts_">Scalar type or EmuMath vector used to represent the number of shifts.</typeparam>
 	/// <param name="vector_">EmuMath vector to shift the elements of. Its value_type must be shiftable via the EmuCore::do_right_shift functor for said type.</param>
 	/// <param name="num_shifts_">Scalar or EmuMath vector representing the number of shifts to apply to every element or to each respective element.</param>
 	/// <returns>Result of right-shifting the elements of the passed EmuMath vector the specified number of times in num_shifts_.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class Vector_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorShiftRight(const Vector_& vector_, const Shifts_& num_shifts_)
+	template<std::size_t OutSize_, typename out_contained_type, class Vector_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorShiftRight(const Vector_& vector_, const Shifts_& num_shifts_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -2340,7 +2454,7 @@ namespace EmuMath::Helpers
 			{
 				return _underlying_vector_funcs::_vector_bitwise_shift_per_element
 				<
-					EmuMath::Vector<OutSize_, out_value_type>,
+					EmuMath::Vector<OutSize_, out_contained_type>,
 					Vector_,
 					Shifts_,
 					EmuCore::do_right_shift
@@ -2356,10 +2470,10 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to shift each element within a vector to the right, but the provided argument was not an EmuMath vector type.");
 		}
 	}
-	template<typename out_value_type, class Vector_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorShiftRight(const Vector_& vector_, const Shifts_& num_shifts_)
+	template<typename out_contained_type, class Vector_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorShiftRight(const Vector_& vector_, const Shifts_& num_shifts_)
 	{
-		return VectorShiftRight<Vector_::size, out_value_type, Vector_, Shifts_>(vector_, num_shifts_);
+		return VectorShiftRight<Vector_::size, out_contained_type, Vector_, Shifts_>(vector_, num_shifts_);
 	}
 	template<std::size_t OutSize_, class Vector_, class Shifts_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorShiftRight(const Vector_& vector_, const Shifts_& num_shifts_)
@@ -2377,20 +2491,20 @@ namespace EmuMath::Helpers
 	/// <para> If rhs_ is an EmuMath vector, respective elements will be ANDed, otherwise all elements in lhs_ will be ANDed with the value of rhs_ itself. </para>
 	/// <para> This operatoion is carried out by EmuCore::do_bitwise_and&lt;LhsVector_::value_type, Rhs_::value_type (or just Rhs_ if not a vector)&gt;. </para>
 	/// </summary>
-	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="LhsVector_">Type of vector appearing on the left-hand side of AND operations.</typeparam>
 	/// <typeparam name="Rhs_">Type of vector or scalar appearing the the right-hand side of AND operations.</typeparam>
 	/// <param name="lhs_">EmuMath vector appearing on the left-hand side of AND operations.</param>
 	/// <param name="rhs_">EmuMath vector or scalar appearing on the left-hand side of AND operations.</param>
 	/// <returns>EmuMath vector containing the results of bitwise ANDing the provided operands.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorAnd(const LhsVector_& lhs_, const Rhs_& rhs_)
+	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorAnd(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
 			return _underlying_vector_funcs::_vector_bitwise_non_shift_op
 			<
-				EmuMath::Vector<OutSize_, out_value_type>,
+				EmuMath::Vector<OutSize_, out_contained_type>,
 				LhsVector_,
 				Rhs_,
 				EmuCore::do_bitwise_and<typename LhsVector_::value_type, EmuCore::TMPHelpers::get_value_type_t<Rhs_>>
@@ -2405,10 +2519,10 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to perform a bitwise AND on a vector, but the provided lhs_ argument was not an EmuMath vector.");
 		}
 	}
-	template<typename out_value_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, out_value_type> VectorAnd(const LhsVector_& lhs_, const Rhs_& rhs_)
+	template<typename out_contained_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, out_contained_type> VectorAnd(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorAnd<LhsVector_::size, out_value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return VectorAnd<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename LhsVector_::value_type> VectorAnd(const LhsVector_& lhs_, const Rhs_& rhs_)
@@ -2426,20 +2540,20 @@ namespace EmuMath::Helpers
 	/// <para> If rhs_ is an EmuMath vector, respective elements will be ORed, otherwise all elements in lhs_ will be ORed with the value of rhs_ itself. </para>
 	/// <para> This operatoion is carried out by EmuCore::do_bitwise_or&lt;LhsVector_::value_type, Rhs_::value_type (or just Rhs_ if not a vector)&gt;. </para>
 	/// </summary>
-	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="LhsVector_">Type of vector appearing on the left-hand side of OR operations.</typeparam>
 	/// <typeparam name="Rhs_">Type of vector or scalar appearing the the right-hand side of OR operations.</typeparam>
 	/// <param name="lhs_">EmuMath vector appearing on the left-hand side of OR operations.</param>
 	/// <param name="rhs_">EmuMath vector or scalar appearing on the left-hand side of OR operations.</param>
 	/// <returns>EmuMath vector containing the results of bitwise ORing the provided operands.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorOr(const LhsVector_& lhs_, const Rhs_& rhs_)
+	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorOr(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
 			return _underlying_vector_funcs::_vector_bitwise_non_shift_op
 			<
-				EmuMath::Vector<OutSize_, out_value_type>,
+				EmuMath::Vector<OutSize_, out_contained_type>,
 				LhsVector_,
 				Rhs_,
 				EmuCore::do_bitwise_or<typename LhsVector_::value_type, EmuCore::TMPHelpers::get_value_type_t<Rhs_>>
@@ -2454,10 +2568,10 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to perform a bitwise OR on a vector, but the provided lhs_ argument was not an EmuMath vector.");
 		}
 	}
-	template<typename out_value_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, out_value_type> VectorOr(const LhsVector_& lhs_, const Rhs_& rhs_)
+	template<typename out_contained_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, out_contained_type> VectorOr(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorOr<LhsVector_::size, out_value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return VectorOr<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename LhsVector_::value_type> VectorOr(const LhsVector_& lhs_, const Rhs_& rhs_)
@@ -2475,20 +2589,20 @@ namespace EmuMath::Helpers
 	/// <para> If rhs_ is an EmuMath vector, respective elements will be XORed, otherwise all elements in lhs_ will be XORed with the value of rhs_ itself. </para>
 	/// <para> This operatoion is carried out by EmuCore::do_bitwise_xor&lt;LhsVector_::value_type, Rhs_::value_type (or just Rhs_ if not a vector)&gt;. </para>
 	/// </summary>
-	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="LhsVector_">Type of vector appearing on the left-hand side of XOR operations.</typeparam>
 	/// <typeparam name="Rhs_">Type of vector or scalar appearing the the right-hand side of XOR operations.</typeparam>
 	/// <param name="lhs_">EmuMath vector appearing on the left-hand side of XOR operations.</param>
 	/// <param name="rhs_">EmuMath vector or scalar appearing on the left-hand side of XOR operations.</param>
 	/// <returns>EmuMath vector containing the results of bitwise XOR the provided operands.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorXor(const LhsVector_& lhs_, const Rhs_& rhs_)
+	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorXor(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
 			return _underlying_vector_funcs::_vector_bitwise_non_shift_op
 			<
-				EmuMath::Vector<OutSize_, out_value_type>,
+				EmuMath::Vector<OutSize_, out_contained_type>,
 				LhsVector_,
 				Rhs_,
 				EmuCore::do_bitwise_xor<typename LhsVector_::value_type, EmuCore::TMPHelpers::get_value_type_t<Rhs_>>
@@ -2503,10 +2617,10 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to perform a bitwise XOR on a vector, but the provided lhs_ argument was not an EmuMath vector.");
 		}
 	}
-	template<typename out_value_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, out_value_type> VectorXor(const LhsVector_& lhs_, const Rhs_& rhs_)
+	template<typename out_contained_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, out_contained_type> VectorXor(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorXor<LhsVector_::size, out_value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return VectorXor<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename LhsVector_::value_type> VectorXor(const LhsVector_& lhs_, const Rhs_& rhs_)
@@ -2523,18 +2637,18 @@ namespace EmuMath::Helpers
 	/// <para> Performs a bitwise NOT on all elements within the passed vector and outputs the results in the return vector. </para>
 	/// <para> This operatoion is carried out by EmuCore::do_bitwise_not&lt;Vector_::value_type&gt;. </para>
 	/// </summary>
-	/// <typeparam name="out_value_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to perform the bitwise NOT operation on.</typeparam>
 	/// <param name="vector_">EmuMath vector to perform the bitwise NOT operation on.</param>
 	/// <returns>EmuMath vector containing the results of the bitwise NOT operation on the passed vector_.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorNot(const Vector_& vector_)
+	template<std::size_t OutSize_, typename out_contained_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorNot(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
 			return _underlying_vector_funcs::_vector_single_operand_func
 			<
-				EmuMath::Vector<OutSize_, out_value_type>,
+				EmuMath::Vector<OutSize_, out_contained_type>,
 				Vector_,
 				EmuCore::do_bitwise_not<typename Vector_::value_type>
 			>(vector_);
@@ -2544,10 +2658,10 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to perform a bitwise NOT on a vector, but the provided lhs_ argument was not an EmuMath vector.");
 		}
 	}
-	template<typename out_value_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_value_type> VectorNot(const Vector_& vector_)
+	template<typename out_contained_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorNot(const Vector_& vector_)
 	{
-		return VectorNot<Vector_::size, out_value_type, Vector_>(vector_);
+		return VectorNot<Vector_::size, out_contained_type, Vector_>(vector_);
 	}
 	template<std::size_t OutSize_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorNot(const Vector_& vector_)
