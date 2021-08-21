@@ -213,6 +213,11 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	{
 		vector_.template Set<Index_>(data_);
 	}
+	template<class Vector_, class Data_>
+	void _set_vector_data(Vector_& vector_, Data_& data_, const std::size_t index_)
+	{
+		vector_.template Set(data_, index_);
+	}
 
 	template<std::size_t Index_, class Vector_>
 	void _copy_to_vector_via_scalar(Vector_& vector_, const typename Vector_::value_type& scalar_)

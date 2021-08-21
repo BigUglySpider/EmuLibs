@@ -94,7 +94,7 @@ namespace EmuMath::Helpers
 	/// <typeparam name="Data_">Type of vector or scalar to copy the data of.</typeparam>
 	/// <param name="destination_">EmuMath vector to store the copied data to.</param>
 	/// <param name="data_">EmuMath vector or scalar to copy the data of.</param>
-	/// <returns>Reference to the destination_ vector after setting.</returns>
+	/// <returns>Reference to the destination_ vector after copying.</returns>
 	template<class DestinationVector_, class Data_>
 	constexpr inline DestinationVector_& VectorCopy(DestinationVector_& destination_, const Data_& data_)
 	{
@@ -109,6 +109,20 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary>
+	/// <para> Sets the internal data within destination_ via the passed data_. </para>
+	/// <para> 
+	///		If data_ is an EmuMath vector, elements of destination_ will be set to their respective elements in data_. 
+	///		Otherwise, all elements of destination_ will be set to data_.
+	/// </para>
+	/// <para> This is effectively the same as VectorCopy for value-type vectors. </para>
+	/// <para> If the vector contains references, this will change the memory location that the internal refernces point to, to the location(s) of data_. </para>
+	/// </summary>
+	/// <typeparam name="DestinationVector_">Type of vector that is the destination of this set.</typeparam>
+	/// <typeparam name="Data_">Type of data to be setting the destination's to.</typeparam>
+	/// <param name="destination_">EmuMath vector that is the destination of this set.</param>
+	/// <param name="data_">EmuMath vector or scalar to set the data in the destination via.</param>
+	/// <returns>Reference to the destination_ vector after setting.</returns>
 	template<class DestinationVector_, class Data_>
 	constexpr inline DestinationVector_& VectorSet(DestinationVector_& destination_, Data_& data_)
 	{

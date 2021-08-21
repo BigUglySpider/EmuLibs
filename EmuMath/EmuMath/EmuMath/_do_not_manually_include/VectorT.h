@@ -60,10 +60,10 @@ namespace EmuMath
 		{
 			static_assert(sizeof...(Args) == size, "Provided an amount of arguments to an EmuMath Vector constructor that is not equal to the number of elements in the Vector.");
 			static_assert
-			(
-				EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, Args...>::value,
-				"Attempted to construct an EmuMath Vector via it's template constructor, but at least one provided argument cannot be used to construct the Vector's contained_type."
-			);
+				(
+					EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, Args...>::value,
+					"Attempted to construct an EmuMath Vector via it's template constructor, but at least one provided argument cannot be used to construct the Vector's contained_type."
+					);
 		}
 
 		template<std::size_t Index_>
@@ -111,6 +111,11 @@ namespace EmuMath
 		constexpr inline void Set(In_& in_)
 		{
 			_set_data_at_index<Index_, In_>(in_);
+		}
+		template<typename In_>
+		constexpr inline void Set(In_& in_, const std::size_t index_)
+		{
+			_set_data_at_index<In_>(in_, index_);
 		}
 
 		template<class ToCopy_>
@@ -165,6 +170,41 @@ namespace EmuMath
 			else
 			{
 				static_assert(false, "Attempted to set the index of an EmuMath vector using an out-of-range index.");
+			}
+		}
+
+		template<typename In_>
+		inline void _set_data_at_index(In_& in_, const std::size_t index_)
+		{
+			if constexpr (contains_reference_wrappers)
+			{
+				if constexpr (std::is_reference_v<In_>)
+				{
+					if constexpr (contains_const_reference_wrappers)
+					{
+						// May set any type of reference to a const since non-const will be implicitly interpreted as const in such contexts
+						data[index_] = contained_type(in_);
+					}
+					else
+					{
+						if constexpr (!std::is_const_v<In_>)
+						{
+							data[index_] = contained_type(in_);
+						}
+						else
+						{
+							static_assert(false, "Attempted to set a non-const-reference-containing EmuMath vector's data via constant data. If a copy is intended, use vector.at<Index_> = in_.");
+						}
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to set the references contained within an EmuMath vector via a non-reference type. If a copy is intended, use vector.at<Index_> = in_.");
+				}
+			}
+			else
+			{
+				data[index_] = static_cast<contained_type>(in_);
 			}
 		}
 	};
