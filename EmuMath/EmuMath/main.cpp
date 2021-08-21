@@ -160,6 +160,8 @@ int main()
 
 	std::cout << "AngleRads(" << vec_a << ", " << vec_d << "): " << EmuMath::Helpers::VectorAngle<true>(vec_a, vec_d) << "\n";
 	std::cout << "AngleDegs(" << vec_a << ", " << vec_d << "): " << EmuMath::Helpers::VectorAngle<false>(vec_a, vec_d) << "\n";
+	std::cout << "AngleRads(" << vec_d << ", " << vec_a << "): " << EmuMath::Helpers::VectorAngle<true>(vec_d, vec_a) << "\n";
+	std::cout << "AngleDegs(" << vec_d << ", " << vec_a << "): " << EmuMath::Helpers::VectorAngle<false>(vec_d, vec_a) << "\n";
 
 
 

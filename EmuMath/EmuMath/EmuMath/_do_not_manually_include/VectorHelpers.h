@@ -16,7 +16,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to retrieve the specified index of.</param>
 	/// <returns>Reference to the element at the provided index of the passed EmuMath vector.</returns>
 	template<std::size_t Index_, class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::value_type& VectorGet(Vector_& vector_)
+	[[nodiscard]] constexpr inline typename Vector_::raw_value_type& VectorGet(Vector_& vector_)
 	{
 		if constexpr (_underlying_vector_funcs::_validity_check_vector_get<Index_, Vector_>())
 		{
@@ -32,7 +32,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t Index_, class Vector_>
-	[[nodiscard]] constexpr inline const typename Vector_::value_type& VectorGet(const Vector_& vector_)
+	[[nodiscard]] constexpr inline const typename Vector_::raw_value_type& VectorGet(const Vector_& vector_)
 	{
 		if constexpr (_underlying_vector_funcs::_validity_check_vector_get<Index_, Vector_>())
 		{
@@ -49,7 +49,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::value_type& VectorGet(Vector_& vector_, const std::size_t index_)
+	[[nodiscard]] constexpr inline typename Vector_::raw_value_type& VectorGet(Vector_& vector_, const std::size_t index_)
 	{
 		if constexpr (_underlying_vector_funcs::_validity_check_vector_get<Vector_>())
 		{
@@ -65,7 +65,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline const typename Vector_::value_type& VectorGet(const Vector_& vector_, const std::size_t index_)
+	[[nodiscard]] constexpr inline const typename Vector_::raw_value_type& VectorGet(const Vector_& vector_, const std::size_t index_)
 	{
 		if constexpr (_underlying_vector_funcs::_validity_check_vector_get<Vector_>())
 		{
@@ -1695,6 +1695,16 @@ namespace EmuMath::Helpers
 			return static_cast<OutAngle_>(EmuCore::Pi::RadsToDegs(EmuCore::do_acos<floating_point>()(VectorAngleCosine<floating_point>(a_, b_))));
 		}
 	}
+	/// <summary>
+	/// <para> Calculates the angle between the passed vectors and outputs it in either radians or degrees. </para>
+	/// <para> If Rads_ is true, output will be in radians, otherwise it will be in degrees. By default, output will be in radians. </para>
+	/// </summary>
+	/// <typeparam name="OutAngle_">Type to output the angle as.</typeparam>
+	/// <typeparam name="VectorA_">Type of vector appearing on the left-hand side of arguments.</typeparam>
+	/// <typeparam name="VectorB_">Type of vector appearing on the right-hand side of arguments.</typeparam>
+	/// <param name="a_">First EmuMath vector in the calculation.</param>
+	/// <param name="b_">Second EmuMath vector in the calculation.</param>
+	/// <returns>The angle between the two vectors represented as the provided OutAngle_ type. Units will be radians if Rads_ is true, otherwise they will be degrees.</returns>
 	template<bool Rads_ = true, class VectorA_, class VectorB_>
 	[[nodiscard]] inline typename VectorA_::preferred_floating_point VectorAngle(const VectorA_& a_, const VectorB_& b_)
 	{

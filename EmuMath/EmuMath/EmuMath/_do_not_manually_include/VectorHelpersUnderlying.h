@@ -169,23 +169,23 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	/// <param name="vector_">Vector to get the data at the passed index of.</param>
 	/// <returns>Result of calling Vector_::at&lt;Index_&gt; on the passed vector.</returns>
 	template<std::size_t Index_, class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::value_type& _get_vector_data(Vector_& vector_)
+	[[nodiscard]] constexpr inline typename Vector_::raw_value_type& _get_vector_data(Vector_& vector_)
 	{
 		return vector_.template at<Index_>();
 	}
 	template<std::size_t Index_, class Vector_>
-	[[nodiscard]] constexpr inline const typename Vector_::value_type& _get_vector_data(const Vector_& vector_)
+	[[nodiscard]] constexpr inline const typename Vector_::raw_value_type& _get_vector_data(const Vector_& vector_)
 	{
 		return vector_.template at<Index_>();
 	}
 
 	template<class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::value_type& _get_vector_data(Vector_& vector_, const std::size_t index_)
+	[[nodiscard]] constexpr inline typename Vector_::raw_value_type& _get_vector_data(Vector_& vector_, const std::size_t index_)
 	{
 		return vector_.at(index_);
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline const typename Vector_::value_type& _get_vector_data(const Vector_& vector_, const std::size_t index_)
+	[[nodiscard]] constexpr inline const typename Vector_::raw_value_type& _get_vector_data(const Vector_& vector_, const std::size_t index_)
 	{
 		return vector_.at(index_);
 	}

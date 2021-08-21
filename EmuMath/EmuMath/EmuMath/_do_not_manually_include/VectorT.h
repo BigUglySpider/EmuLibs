@@ -20,12 +20,14 @@ namespace EmuMath
 		using contained_type = T_;
 		/// <summary> Boolean indicating if this vector contains reference wrapping types. </summary>
 		static constexpr bool contains_reference_wrappers = EmuCore::TMPHelpers::is_reference_wrapper<contained_type>::value;
-		/// <summary> Value type of the items stored within this vector. </summary>
-		using value_type = typename EmuCore::TMPHelpers::get_reference_wrapper_contained_type<contained_type>::type;
+		/// <summary> The raw value_type within this vector before its const qualifier is forcibly removed. </summary>
+		using raw_value_type = typename EmuCore::TMPHelpers::get_reference_wrapper_contained_type<contained_type>::type;
+		/// <summary> Value type of the items stored within this vector, without const qualifiers where applicable. </summary>
+		using value_type = std::remove_const_t<raw_value_type>;
 		/// <summary> The preferred floating point type for this vector. Float if this vector contains non-floating-point types, otherwise matches value_type. </summary>
 		using preferred_floating_point = EmuCore::TMPHelpers::first_floating_point_t<value_type, float>;
 		/// <summary> Boolean indicating if the reference wrappers within this vector contain constant references. Always false if contains_reference_wrappers is false. </summary>
-		static constexpr bool contains_const_reference_wrappers = std::is_const_v<value_type> && contains_reference_wrappers;
+		static constexpr bool contains_const_reference_wrappers = std::is_const_v<raw_value_type> && contains_reference_wrappers;
 		/// <summary> Boolean indicating if the reference wrappers within this vector contain non-constant references. Always false if contains_reference_wrappers is false. </summary>
 		static constexpr bool contains_non_const_reference_wrappers = contains_reference_wrappers && !contains_const_reference_wrappers;
 
@@ -73,7 +75,7 @@ namespace EmuMath
 		}
 
 		template<std::size_t Index_>
-		[[nodiscard]] constexpr inline value_type& at()
+		[[nodiscard]] constexpr inline raw_value_type& at()
 		{
 			if constexpr (Index_ < size)
 			{
@@ -85,7 +87,7 @@ namespace EmuMath
 			}
 		}
 		template<std::size_t Index_>
-		[[nodiscard]] constexpr inline const value_type& at() const
+		[[nodiscard]] constexpr inline const raw_value_type& at() const
 		{
 			if constexpr (Index_ < size)
 			{
@@ -96,19 +98,19 @@ namespace EmuMath
 				static_assert(false, "Attempted to retrieve data from an EmuMath vector using an out-of-range index.");
 			}
 		}
-		[[nodiscard]] constexpr inline value_type& at(const std::size_t index_)
+		[[nodiscard]] constexpr inline raw_value_type& at(const std::size_t index_)
 		{
 			return data[index_];
 		}
-		[[nodiscard]] constexpr inline const value_type& at(const std::size_t index_) const
+		[[nodiscard]] constexpr inline const raw_value_type& at(const std::size_t index_) const
 		{
 			return data[index_];
 		}
-		[[nodiscard]] constexpr inline value_type& operator[](const std::size_t index_)
+		[[nodiscard]] constexpr inline raw_value_type& operator[](const std::size_t index_)
 		{
 			return this->at(index_);
 		}
-		[[nodiscard]] constexpr inline const value_type& operator[](const std::size_t index_) const
+		[[nodiscard]] constexpr inline const raw_value_type& operator[](const std::size_t index_) const
 		{
 			return this->at(index_);
 		}
