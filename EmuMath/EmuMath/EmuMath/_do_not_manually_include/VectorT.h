@@ -14,10 +14,11 @@ namespace EmuMath
 	public:
 		static_assert(Size_ > 0, "Unable to create an EmuMath Vector which contains 0 elements.");
 		static_assert(!std::is_same_v<T_, void>, "Unable to create an EmuMath Vector which contains void elements.");
+		static_assert(!std::is_reference_v<T_>, "Attempted to form an EmuMath vector with an internal reference type. To have a vector storing references, use EmuMath::InternalVectorReference<T> as the vector's stored type, or create a vector via the EmuMath::RefVector or EmuMath::ConstRefVector aliases to achieve the same with cleaner semantics.");
 
 		/// <summary> The type contained within this vector. </summary>
 		using contained_type = T_;
-		/// <summary> Boolean indicating if this vector contains std::reference_wrapper types. </summary>
+		/// <summary> Boolean indicating if this vector contains reference wrapping types. </summary>
 		static constexpr bool contains_reference_wrappers = EmuCore::TMPHelpers::is_reference_wrapper<contained_type>::value;
 		/// <summary> Value type of the items stored within this vector. </summary>
 		using value_type = typename EmuCore::TMPHelpers::get_reference_wrapper_contained_type<contained_type>::type;
@@ -45,6 +46,11 @@ namespace EmuMath
 		}
 		template<std::size_t ToCopySize_, typename ToCopyValueType_>
 		constexpr Vector(const EmuMath::Vector<ToCopySize_, ToCopyValueType_>& toCopy_) : Vector()
+		{
+			EmuMath::Helpers::VectorSet(*this, toCopy_);
+		}
+		template<std::size_t ToCopySize_, typename ToCopyValueType_>
+		constexpr Vector(EmuMath::Vector<ToCopySize_, ToCopyValueType_>& toCopy_) : Vector()
 		{
 			EmuMath::Helpers::VectorSet(*this, toCopy_);
 		}
@@ -124,6 +130,12 @@ namespace EmuMath
 			return EmuMath::Helpers::VectorCopy<this_type, ToCopy_>(*this, toCopy_);
 		}
 
+		template<class ToCopy_>
+		constexpr inline this_type& operator=(const ToCopy_& toCopy_)
+		{
+			return EmuMath::Helpers::VectorCopy<this_type, ToCopy_>(*this, toCopy_);
+		}
+
 	private:
 		/// <summary> The type used to store this vector's data. </summary>
 		using data_storage_type = std::array<contained_type, size>;
@@ -132,34 +144,27 @@ namespace EmuMath
 		data_storage_type data;
 
 		template<std::size_t Index_, typename In_>
-		inline void _set_data_at_index(In_& in_)
+		constexpr inline void _set_data_at_index(In_& in_)
 		{
 			if constexpr (Index_ < size)
 			{
 				if constexpr (contains_reference_wrappers)
 				{
-					if constexpr (std::is_reference_v<In_>)
+					if constexpr (contains_const_reference_wrappers)
 					{
-						if constexpr (contains_const_reference_wrappers)
+						// May set any type of reference to a const since non-const will be implicitly interpreted as const in such contexts
+						data[Index_] = contained_type(in_);
+					}
+					else
+					{
+						if constexpr (!std::is_const_v<In_>)
 						{
-							// May set any type of reference to a const since non-const will be implicitly interpreted as const in such contexts
 							data[Index_] = contained_type(in_);
 						}
 						else
 						{
-							if constexpr (!std::is_const_v<In_>)
-							{
-								data[Index_] = contained_type(in_);
-							}
-							else
-							{
-								static_assert(false, "Attempted to set a non-const-reference-containing EmuMath vector's data via constant data. If a copy is intended, use vector.at<Index_> = in_.");
-							}
+							static_assert(false, "Attempted to set a non-const-reference-containing EmuMath vector's data via constant data. If a copy is intended, use vector.at<Index_> = in_.");
 						}
-					}
-					else
-					{
-						static_assert(false, "Attempted to set the references contained within an EmuMath vector via a non-reference type. If a copy is intended, use vector.at<Index_> = in_.");
 					}
 				}
 				else
@@ -174,7 +179,7 @@ namespace EmuMath
 		}
 
 		template<typename In_>
-		inline void _set_data_at_index(In_& in_, const std::size_t index_)
+		constexpr inline void _set_data_at_index(In_& in_, const std::size_t index_)
 		{
 			if constexpr (contains_reference_wrappers)
 			{

@@ -209,18 +209,18 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 
 #pragma region SETS
 	template<std::size_t Index_, class Vector_, class Data_>
-	void _set_vector_data(Vector_& vector_, Data_& data_)
+	constexpr inline void _set_vector_data(Vector_& vector_, Data_& data_)
 	{
 		vector_.template Set<Index_>(data_);
 	}
 	template<class Vector_, class Data_>
-	void _set_vector_data(Vector_& vector_, Data_& data_, const std::size_t index_)
+	constexpr inline void _set_vector_data(Vector_& vector_, Data_& data_, const std::size_t index_)
 	{
 		vector_.template Set(data_, index_);
 	}
 
 	template<std::size_t Index_, class Vector_>
-	void _copy_to_vector_via_scalar(Vector_& vector_, const typename Vector_::value_type& scalar_)
+	constexpr inline void _copy_to_vector_via_scalar(Vector_& vector_, const typename Vector_::value_type& scalar_)
 	{
 		if constexpr (Index_ < Vector_::size)
 		{
@@ -229,7 +229,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		}
 	}
 	template<std::size_t Index_, class LhsVector_, class RhsVector_>
-	void _copy_to_vector_via_vector(LhsVector_& lhs_, const RhsVector_& rhs_)
+	constexpr inline void _copy_to_vector_via_vector(LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
 		if constexpr (Index_ < LhsVector_::size)
 		{
@@ -246,7 +246,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		}
 	}
 	template<class LhsVector_, class Rhs_>
-	void _copy_to_vector(LhsVector_& lhs_, const Rhs_& rhs_)
+	constexpr inline void _copy_to_vector(LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
 		{
@@ -259,7 +259,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 
 	template<std::size_t Index_, class LhsVector_, class Rhs_>
-	void _set_vector(LhsVector_& lhs_, Rhs_& rhs_)
+	constexpr inline void _set_vector(LhsVector_& lhs_, Rhs_& rhs_)
 	{
 		if constexpr (Index_ < LhsVector_::size)
 		{
@@ -281,7 +281,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		}
 	}
 	template<class LhsVector_, class Rhs_>
-	void _set_vector(LhsVector_& lhs_, Rhs_& rhs_)
+	constexpr inline void _set_vector(LhsVector_& lhs_, Rhs_& rhs_)
 	{
 		if constexpr (LhsVector_::contains_reference_wrappers)
 		{

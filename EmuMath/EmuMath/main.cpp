@@ -3,7 +3,6 @@
 #include <bitset>
 #include <iomanip>
 
-
 #include "Tests.hpp"
 using namespace EmuCore::TestingHelpers;
 
@@ -163,6 +162,16 @@ int main()
 	std::cout << "AngleDegs(" << vec_a << ", " << vec_d << "): " << EmuMath::Helpers::VectorAngle<false>(vec_a, vec_d) << "\n";
 
 
+
+	EmuMath::RefVector<3, float> a_norm_nonconst_ref(a_norm_nonconst);
+	std::cout << "Ref:" << a_norm_nonconst_ref << " | Act: " << a_norm_nonconst << "\n";
+	a_norm_nonconst_ref = EmuMath::Helpers::VectorShuffle<7, 1, 0>(some_uint_vector);
+	std::cout << "Ref:" << a_norm_nonconst_ref << " | Act: " << a_norm_nonconst << "\n";
+
+	EmuMath::ConstRefVector<7, float> const_ref_(EmuMath::Helpers::VectorShuffledReference<0, 1, 2, 1, 0, 1, 2>(a_norm_nonconst_ref));
+	std::cout << "Another, constant reference: " << const_ref_ << "\n";
+	a_norm_nonconst_ref.at<2>() = 1337.0f;
+	std::cout << const_ref_ << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

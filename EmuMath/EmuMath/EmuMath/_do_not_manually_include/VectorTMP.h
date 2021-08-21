@@ -1,6 +1,7 @@
 #ifndef EMU_MATH_VECTOR_T_TMP_H_INC_
 #define EMU_MATH_VECTOR_T_TMP_H_INC_ 1
 
+#include "../../EmuCore/CommonTypes/DeferrableReferenceWrapper.h"
 #include <cstddef>
 
 namespace EmuMath
@@ -8,14 +9,28 @@ namespace EmuMath
 	template<std::size_t Size_, typename T_>
 	struct Vector;
 
-	/// <summary> Alias for EmuMath vectors which contain non-const standard reference wrappers. This is the EmuMath standard for storing such references within a vector. </summary>
+	/// <summary>
+	/// <para> The type of reference wrapper used to store references within an EmuMath vector. </para>
+	/// <para> This is the standard type for any references stored within an EmuMath vector. References of other types are undefined and unsupported. </para>
+	/// </summary>
+	/// <typeparam name="T_"></typeparam>
+	template<typename T_>
+	using InternalVectorReference = EmuCore::DeferrableReferenceWrapper<T_>;
+
+	/// <summary>
+	/// <para> Alias for EmuMath vectors which contain non-const reference wrappers. </para>
+	/// <para> This is the EmuMath standard for storing such references within a vector. The behaviour of storing other types of references is undefined and unsupported. </para>
+	/// </summary>
 	/// <typeparam name="T_">Type to be referencing. T_ itself should not be a reference type; the reference will be applied automatically.</typeparam>
 	template<std::size_t Size_, typename T_>
-	using RefVector = EmuMath::Vector<Size_, std::reference_wrapper<T_>>;
-	/// <summary> Alias for EmuMath vectors which contain const standard reference wrappers. This is the EmuMath standard for storing such references within a vector. </summary>
+	using RefVector = EmuMath::Vector<Size_, InternalVectorReference<T_>>;
+	/// <summary>
+	/// <para> Alias for EmuMath vectors which contain const reference wrappers. </para>
+	/// <para> This is the EmuMath standard for storing such references within a vector. The behaviour of storing other types of references is undefined and unsupported. </para>
+	/// </summary>
 	/// <typeparam name="T_">Type to be referencing. T_ itself should not be a reference type; the reference will be applied automatically.</typeparam>
 	template<std::size_t Size_, typename T_>
-	using ConstRefVector = EmuMath::Vector<Size_, std::reference_wrapper<const T_>>;
+	using ConstRefVector = EmuMath::Vector<Size_, InternalVectorReference<const T_>>;
 }
 
 namespace EmuMath::TMP
