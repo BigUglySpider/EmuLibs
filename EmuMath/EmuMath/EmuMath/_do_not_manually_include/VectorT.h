@@ -998,7 +998,275 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region COMPARISONS
+		/// <summary>
+		/// <para> Returns a boolean indicating if any elements in this vector are equal to rhs_, depending on the type of rhs_. </para>
+		/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all elements will be compared to the same rhs_ value. </para>
+		/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+		/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+		/// <returns>True if any executed comparisons returned true, otherwise false.</returns>
+		template<bool TestAllIndices_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyEqualTo(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpAnyEqualTo<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
 
+		/// <summary>
+		/// <para> Returns a boolean indicating if any elements in this vector are not equal to rhs_, depending on the type of rhs_. </para>
+		/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all elements will be compared to the same rhs_ value. </para>
+		/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+		/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+		/// <returns>True if any executed comparisons returned true, otherwise false.</returns>
+		template<bool TestAllIndices_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyNotEqualTo(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpAnyNotEqualTo<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns a boolean indicating if any elements in this vector are greater than rhs_, depending on the type of rhs_. </para>
+		/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all elements will be compared to the same rhs_ value. </para>
+		/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+		/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+		/// <returns>True if any executed comparisons returned true, otherwise false.</returns>
+		template<bool TestAllIndices_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyGreater(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpAnyGreater<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns a boolean indicating if any elements in this vector are less than rhs_, depending on the type of rhs_. </para>
+		/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all elements will be compared to the same rhs_ value. </para>
+		/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+		/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+		/// <returns>True if any executed comparisons returned true, otherwise false.</returns>
+		template<bool TestAllIndices_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyLess(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpAnyLess<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns a boolean indicating if any elements in this vector are greater than or equal to rhs_, depending on the type of rhs_. </para>
+		/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all elements will be compared to the same rhs_ value. </para>
+		/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+		/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+		/// <returns>True if any executed comparisons returned true, otherwise false.</returns>
+		template<bool TestAllIndices_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyGreaterEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpAnyGreaterEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns a boolean indicating if any elements in this vector are greater than or equal to rhs_, depending on the type of rhs_. </para>
+		/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all elements will be compared to the same rhs_ value. </para>
+		/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+		/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+		/// <returns>True if any executed comparisons returned true, otherwise false.</returns>
+		template<bool TestAllIndices_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyLessEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpAnyLessEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns a boolean indicating if all elements in this vector are equal to rhs_, depending on the type of rhs_. </para>
+		/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all elements will be compared to the same rhs_ value. </para>
+		/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+		/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+		/// <returns>True if all executed comparisons returned true, otherwise false.</returns>
+		template<bool TestAllIndices_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllEqualTo(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpAllEqualTo<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns a boolean indicating if all elements in this vector are not equal to rhs_, depending on the type of rhs_. </para>
+		/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all elements will be compared to the same rhs_ value. </para>
+		/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+		/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+		/// <returns>True if all executed comparisons returned true, otherwise false.</returns>
+		template<bool TestAllIndices_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllNotEqualTo(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpAllNotEqualTo<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns a boolean indicating if all elements in this vector are greater than rhs_, depending on the type of rhs_. </para>
+		/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all elements will be compared to the same rhs_ value. </para>
+		/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+		/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+		/// <returns>True if all executed comparisons returned true, otherwise false.</returns>
+		template<bool TestAllIndices_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllGreater(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpAllGreater<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns a boolean indicating if all elements in this vector are less than rhs_, depending on the type of rhs_. </para>
+		/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all elements will be compared to the same rhs_ value. </para>
+		/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+		/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+		/// <returns>True if all executed comparisons returned true, otherwise false.</returns>
+		template<bool TestAllIndices_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllLess(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpAllLess<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns a boolean indicating if all elements in this vector are greater than or equal to rhs_, depending on the type of rhs_. </para>
+		/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all elements will be compared to the same rhs_ value. </para>
+		/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+		/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+		/// <returns>True if all executed comparisons returned true, otherwise false.</returns>
+		template<bool TestAllIndices_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllGreaterEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpAllGreaterEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns a boolean indicating if all elements in this vector are greater than or equal to rhs_, depending on the type of rhs_. </para>
+		/// <para> If rhs_ is an EmuMath vector, respective elements will be compared. Otherwise, all elements will be compared to the same rhs_ value. </para>
+		/// <para> By default, all indices are tested. To test only up to the end of the smallest vector, pass false as the argument for TestAllIndices_. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type of EmuMath vector or scalar that appears on the right hand side of comparisons.</typeparam>
+		/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
+		/// <returns>True if all executed comparisons returned true, otherwise false.</returns>
+		template<bool TestAllIndices_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllLessEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpAllLessEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Returns a vector of booleans containing the results of comparing the equality of respective elements of this vector with either those of the rhs_ vector,
+		///		or with the value of a rhs_ scalar.
+		/// </para>
+		/// <para> If rhs_ is an EmuMath vector, it will be compared on a per-respective-element basis. If it is a scalar, all elements will be compared with it. </para>
+		/// <para> May provide an optional OutSize_ for the output vector to perform more or less comparisons than there are elements within this vector. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">EmuMath vector or scalar type for the right-hand argument.</typeparam>
+		/// <param name="rhs_">EmuMath vector to compare respective elements of this vector with, or scalar to compare all elements of this vector with.</param>
+		/// <returns>Vector of booleans containing the results of the comparison of respective elements within this vector with rhs_.</returns>
+		template<std::size_t OutSize_ = size, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> CmpPerElementEqualTo(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorPerElementCmpEqualTo<OutSize_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Returns a vector of booleans containing the results of comparing the inequality of respective elements of this vector with either those of the rhs_ vector,
+		///		or with the value of a rhs_ scalar.
+		/// </para>
+		/// <para> If rhs_ is an EmuMath vector, it will be compared on a per-respective-element basis. If it is a scalar, all elements will be compared with it. </para>
+		/// <para> May provide an optional OutSize_ for the output vector to perform more or less comparisons than there are elements within this vector. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">EmuMath vector or scalar type for the right-hand argument.</typeparam>
+		/// <param name="rhs_">EmuMath vector to compare respective elements of this vector with, or scalar to compare all elements of this vector with.</param>
+		/// <returns>Vector of booleans containing the results of the comparison of respective elements within this vector with rhs_.</returns>
+		template<std::size_t OutSize_ = size, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> CmpPerElementNotEqualTo(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorPerElementCmpNotEqualTo<OutSize_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Returns a vector of booleans containing the results of comparing the magnitude of respective elements of this vector with either those of the rhs_ vector,
+		///		or with the value of a rhs_ scalar.
+		/// </para>
+		/// <para> If rhs_ is an EmuMath vector, it will be compared on a per-respective-element basis. If it is a scalar, all elements will be compared with it. </para>
+		/// <para> May provide an optional OutSize_ for the output vector to perform more or less comparisons than there are elements within this vector. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">EmuMath vector or scalar type for the right-hand argument.</typeparam>
+		/// <param name="rhs_">EmuMath vector to compare respective elements of this vector with, or scalar to compare all elements of this vector with.</param>
+		/// <returns>Vector of booleans containing the results of the comparison of respective elements within this vector with rhs_.</returns>
+		template<std::size_t OutSize_ = size, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> CmpPerElementGreater(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorPerElementCmpGreater<OutSize_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Returns a vector of booleans containing the results of comparing the magnitude of respective elements of this vector with either those of the rhs_ vector,
+		///		or with the value of a rhs_ scalar.
+		/// </para>
+		/// <para> If rhs_ is an EmuMath vector, it will be compared on a per-respective-element basis. If it is a scalar, all elements will be compared with it. </para>
+		/// <para> May provide an optional OutSize_ for the output vector to perform more or less comparisons than there are elements within this vector. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">EmuMath vector or scalar type for the right-hand argument.</typeparam>
+		/// <param name="rhs_">EmuMath vector to compare respective elements of this vector with, or scalar to compare all elements of this vector with.</param>
+		/// <returns>Vector of booleans containing the results of the comparison of respective elements within this vector with rhs_.</returns>
+		template<std::size_t OutSize_ = size, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> CmpPerElementLess(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorPerElementCmpLess<OutSize_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Returns a vector of booleans containing the results of comparing the magnitude of respective elements of this vector with either those of the rhs_ vector,
+		///		or with the value of a rhs_ scalar.
+		/// </para>
+		/// <para> If rhs_ is an EmuMath vector, it will be compared on a per-respective-element basis. If it is a scalar, all elements will be compared with it. </para>
+		/// <para> May provide an optional OutSize_ for the output vector to perform more or less comparisons than there are elements within this vector. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">EmuMath vector or scalar type for the right-hand argument.</typeparam>
+		/// <param name="rhs_">EmuMath vector to compare respective elements of this vector with, or scalar to compare all elements of this vector with.</param>
+		/// <returns>Vector of booleans containing the results of the comparison of respective elements within this vector with rhs_.</returns>
+		template<std::size_t OutSize_ = size, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> CmpPerElementGreaterEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorPerElementCmpGreaterEqual<OutSize_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Returns a vector of booleans containing the results of comparing the magnitude of respective elements of this vector with either those of the rhs_ vector,
+		///		or with the value of a rhs_ scalar.
+		/// </para>
+		/// <para> If rhs_ is an EmuMath vector, it will be compared on a per-respective-element basis. If it is a scalar, all elements will be compared with it. </para>
+		/// <para> May provide an optional OutSize_ for the output vector to perform more or less comparisons than there are elements within this vector. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">EmuMath vector or scalar type for the right-hand argument.</typeparam>
+		/// <param name="rhs_">EmuMath vector to compare respective elements of this vector with, or scalar to compare all elements of this vector with.</param>
+		/// <returns>Vector of booleans containing the results of the comparison of respective elements within this vector with rhs_.</returns>
+		template<std::size_t OutSize_ = size, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> CmpPerElementLessEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorPerElementCmpLessEqual<OutSize_, this_type, Rhs_>(*this, rhs_);
+		}
 #pragma endregion
 
 	private:
