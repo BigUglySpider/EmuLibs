@@ -8,6 +8,11 @@
 
 namespace EmuMath
 {
+	/// <summary>
+	/// <para> Mathematical vector containing a fixed number of elements of the provided type T_. </para>
+	/// <para> Interacts with EmuMath::Helpers functions starting with Vector, and contains many members for common vector operations. </para>
+	/// </summary>
+	/// <typeparam name="T_">Type to be contained within this vector.</typeparam>
 	template<std::size_t Size_, typename T_>
 	struct Vector
 	{
