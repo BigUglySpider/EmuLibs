@@ -1836,6 +1836,126 @@ namespace EmuMath::Helpers
 	{
 		return VectorDistance<FromVector_::size, typename FromVector_::value_type, FromVector_, ToVector_>(from_, to_);
 	}
+
+	/// <summary>
+	/// <para> Calculates the 3D cross product of the passed two vectors, using the provided template indices as the X, Y, and Z for A and B. </para>
+	/// <para> The provided indices default to the logical x, y, and z components of both A and B, but may be modified to refer to different areas of the vectors. </para>
+	/// <para> 
+	///		Unless explicitly stated otherwise, the indices for B will mimic those of A. 
+	///		As such, providing custom indices for A will implicitly provide the same indices for B, unless additional indices are explicitly provided for B.
+	/// </para>
+	/// <para> The end vector can be summarised as: </para>
+	///	<para> [0] = (a_[AY_] * b_[BZ_]) - (a_[AZ_] * b_[BY_]) </para>
+	/// <para> [1] = (a_[AZ_] * b_[BX_]) - (a_[AX_] * b_[BZ_]) </para>
+	/// <para> [2] = (a_[AX_] * b_[BY_]) - (a_[AY_] * b_[BX_]) </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="VectorA_">Type of vector representing a_ in the above formulae.</typeparam>
+	/// <typeparam name="VectorB_">Type of vector representing b_ in the above formulae.</typeparam>
+	/// <param name="a_">EmuMath vector representing a_ in the above formulae.</param>
+	/// <param name="b_">EmuMath vector representing b_ in the above formulae.</param>
+	/// <returns>Cross product of the passed two vectors, using the provided indices for 3 elements from each of the respective vectors.</returns>
+	template
+	<
+		std::size_t AX_ = 0,
+		std::size_t AY_ = 1,
+		std::size_t AZ_ = 2,
+		std::size_t BX_ = AX_,
+		std::size_t BY_ = AY_,
+		std::size_t BZ_ = AZ_,
+		std::size_t OutSize_,
+		typename out_contained_type,
+		class VectorA_,
+		class VectorB_
+	>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorCrossProduct3D(const VectorA_& a_, const VectorB_& b_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<VectorA_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<VectorB_>)
+			{
+				const auto& ay_ = _underlying_vector_funcs::_get_vector_data<AY_>(a_);
+				const auto& az_ = _underlying_vector_funcs::_get_vector_data<AZ_>(a_);
+
+				const auto& by_ = _underlying_vector_funcs::_get_vector_data<BY_>(b_);
+				const auto& bz_ = _underlying_vector_funcs::_get_vector_data<BZ_>(b_);
+
+				EmuMath::Vector<OutSize_, out_contained_type> out_ = EmuMath::Vector<OutSize_, out_contained_type>();
+				using out_value_type = typename EmuMath::Vector<OutSize_, out_contained_type>::value_type;
+				_underlying_vector_funcs::_get_vector_data<0>(out_) = static_cast<out_value_type>((ay_ * bz_) - (az_ * by_));
+
+				if constexpr (OutSize_ > 1)
+				{
+					// Only need these values if out vector has a y component
+					const auto& ax_ = _underlying_vector_funcs::_get_vector_data<AX_>(a_);
+					const auto& bx_ = _underlying_vector_funcs::_get_vector_data<BX_>(b_);
+					_underlying_vector_funcs::_get_vector_data<1>(out_) = static_cast<out_value_type>((az_ * bx_) - (ax_ * bz_));
+
+					if constexpr (OutSize_ > 2)
+					{
+						// Only need to calculate this part of the cross if our output vector will contain it
+						_underlying_vector_funcs::_get_vector_data<2>(out_) = static_cast<out_value_type>((ax_ * by_) - (ay_ * bx_));
+					}
+				}
+				return out_;
+			}
+			else
+			{
+				static_assert(false, "Attempted to get the cross product of two vectors, but the passed argument b_ was not an EmuMath vector.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the cross product of two vectors, but the passed argument a_ was not an EmuMath vector.");
+		}
+	}
+	template
+	<
+		std::size_t AX_ = 0,
+		std::size_t AY_ = 1,
+		std::size_t AZ_ = 2,
+		std::size_t BX_ = AX_,
+		std::size_t BY_ = AY_,
+		std::size_t BZ_ = AZ_,
+		std::size_t OutSize_,
+		class VectorA_,
+		class VectorB_
+	>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename VectorA_::value_type> VectorCrossProduct3D(const VectorA_& a_, const VectorB_& b_)
+	{
+		return VectorCrossProduct3D<AX_, AY_, AZ_, BX_, BY_, BZ_, OutSize_, typename VectorA_::value_type, VectorA_, VectorB_>(a_, b_);
+	}
+	template
+	<
+		std::size_t AX_ = 0,
+		std::size_t AY_ = 1,
+		std::size_t AZ_ = 2,
+		std::size_t BX_ = AX_,
+		std::size_t BY_ = AY_,
+		std::size_t BZ_ = AZ_,
+		typename out_contained_type,
+		class VectorA_,
+		class VectorB_
+	>
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, out_contained_type> VectorCrossProduct3D(const VectorA_& a_, const VectorB_& b_)
+	{
+		return VectorCrossProduct3D<AX_, AY_, AZ_, BX_, BY_, BZ_, 3, out_contained_type, VectorA_, VectorB_>(a_, b_);
+	}
+	template
+	<
+		std::size_t AX_ = 0,
+		std::size_t AY_ = 1,
+		std::size_t AZ_ = 2,
+		std::size_t BX_ = AX_,
+		std::size_t BY_ = AY_,
+		std::size_t BZ_ = AZ_,
+		class VectorA_,
+		class VectorB_
+	>
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, typename VectorA_::value_type> VectorCrossProduct3D(const VectorA_& a_, const VectorB_& b_)
+	{
+		return VectorCrossProduct3D<AX_, AY_, AZ_, BX_, BY_, BZ_, 3, typename VectorA_::value_type, VectorA_, VectorB_>(a_, b_);
+	}
 #pragma endregion
 
 #pragma region COMPARISONS

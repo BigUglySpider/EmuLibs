@@ -193,6 +193,12 @@ int main()
 	
 	std::cout << static_cast<bool>(bigBoiRef) << " | " << !bigBoiRef << "\n";
 
+	auto cross_a_ = EmuMath::Vector3<float>(1.0f, 2.0f, 3.0f);
+	auto cross_b_ = EmuMath::Vector4<double>(-5.0f, 0.0f, 5.0f, 203.0f);
+	std::cout << "CROSS(" << cross_a_ << ", " << cross_b_ << "): " << cross_a_.CrossProduct3D(cross_b_) << "\n";
+	std::cout << "CROSS<0, 1, 2, 1, 2, 3>(" << cross_a_ << ", " << cross_b_ << "): " << cross_a_.CrossProduct3D<0, 1, 2, 1, 2, 3>(cross_b_) << "\n";
+
+	std::cout << cross_a_ << ": [" << cross_a_[0] << " | " << cross_a_[1] << " | " << cross_a_[2] << "]\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
