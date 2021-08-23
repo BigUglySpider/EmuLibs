@@ -1,23 +1,19 @@
-#ifndef EMU_MATH_VECTOR_T_H_INC_
-#define EMU_MATH_VECTOR_T_H_INC_ 1
+#ifndef EMU_MATH_VECTOR_3_SUGAR_H_INC_
+#define EMU_MATH_VECTOR_3_SUGAR_H_INC_ 1
 
-#include "VectorHelpers.h"
-#include "VectorInfo.h"
-#include <array>
-#include <ostream>
+#include "VectorT.h"
 
 namespace EmuMath
 {
-	template<std::size_t Size_, typename T_>
-	struct Vector
+	template<typename T_>
+	struct Vector<3, T_>
 	{
-	public:
 #pragma region VECTOR_INFO
 		/// <summary>
 		/// <para> General template info regarding this type of EmuMath vector. </para>
 		/// <para> For further information on individual components within this vector, you should view components of the same name under this vector_info. </para>
 		/// </summary>
-		using vector_info = EmuMath::_underlying_components::VectorInfo<Size_, T_>;
+		using vector_info = EmuMath::_underlying_components::VectorInfo<3, T_>;
 		using contained_type = typename vector_info::contained_type;
 		static constexpr bool contains_reference_wrappers = vector_info::contains_reference_wrappers;
 		using raw_value_type = typename vector_info::raw_value_type;
@@ -37,10 +33,10 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONSTRUCTORS
-		constexpr Vector() : data()
+		constexpr Vector() : x(), y(), z()
 		{
 		}
-		constexpr Vector(const this_type& toCopy_) : data(toCopy_.data)
+		constexpr Vector(const this_type& toCopy_) : x(toCopy_.at<0>()), y(toCopy_.at<1>()), z(toCopy_.at<2>())
 		{
 		}
 		template<std::size_t ToCopySize_, typename ToCopyValueType_>
@@ -53,20 +49,15 @@ namespace EmuMath
 		{
 			EmuMath::Helpers::VectorSet(*this, toCopy_);
 		}
-		/// <summary>
-		/// <para> Constructs this vector with its elements matching the passed data, in contiguous order of the 0th to the (size - 1)th element. </para>
-		/// <para> This constructor requires a number of arguments equal to the number of elements in the vector. </para>
-		/// </summary>
-		/// <typeparam name="Args">All arguments passed to construct this vector via.</typeparam>
-		/// <typeparam name="RequiresArgumentCountEqualToSize">Dummy parameter used to make use of std::enable_if.</typeparam>
-		/// <param name="contiguousData_">Arguments to create this vector's elements, in contiguous order from the 0th-(size - 1)th element in this vector.</param>
-		template<typename...Args, typename RequiresArgumentCountEqualToSize = std::enable_if_t<sizeof...(Args) == size>>
-		constexpr Vector(Args&&...contiguousData_) : data({ static_cast<contained_type>(std::forward<Args>(contiguousData_))... })
+		template<typename X_, typename Y_, typename Z_>
+		constexpr Vector(X_&& x_, Y_&& y_, Z_&& z_) :
+			x(std::forward<X_>(x_)),
+			y(std::forward<Y_>(y_)),
+			z(std::forward<Z_>(z_))
 		{
-			static_assert(sizeof...(Args) == size, "Provided an amount of arguments to an EmuMath Vector constructor that is not equal to the number of elements in the Vector.");
 			static_assert
 			(
-				EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, Args...>::value,
+				EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, X_, Y_, Z_>::value,
 				"Attempted to construct an EmuMath Vector via it's template constructor, but at least one provided argument cannot be used to construct the Vector's contained_type."
 			);
 		}
@@ -76,42 +67,28 @@ namespace EmuMath
 		template<std::size_t Index_>
 		[[nodiscard]] constexpr inline raw_value_type& at()
 		{
-			if constexpr (Index_ < size)
-			{
-				return std::get<Index_>(data);
-			}
-			else
-			{
-				static_assert(false, "Attempted to retrieve data from an EmuMath vector using an out-of-range index.");
-			}
+			return _get_index<Index_>();
 		}
 		template<std::size_t Index_>
 		[[nodiscard]] constexpr inline const raw_value_type& at() const
 		{
-			if constexpr (Index_ < size)
-			{
-				return std::get<Index_>(data);
-			}
-			else
-			{
-				static_assert(false, "Attempted to retrieve data from an EmuMath vector using an out-of-range index.");
-			}
+			return _get_index<Index_>();
 		}
 		[[nodiscard]] constexpr inline raw_value_type& at(const std::size_t index_)
 		{
-			return data[index_];
+			return _get_index(index_);
 		}
 		[[nodiscard]] constexpr inline const raw_value_type& at(const std::size_t index_) const
 		{
-			return data[index_];
+			return _get_index(index_);
 		}
 		[[nodiscard]] constexpr inline raw_value_type& operator[](const std::size_t index_)
 		{
-			return this->at(index_);
+			return _get_index(index_);
 		}
 		[[nodiscard]] constexpr inline const raw_value_type& operator[](const std::size_t index_) const
 		{
-			return this->at(index_);
+			return _get_index(index_);
 		}
 #pragma endregion
 
@@ -142,12 +119,71 @@ namespace EmuMath
 		}
 #pragma endregion
 
-	private:
-		/// <summary> The type used to store this vector's data. </summary>
-		using data_storage_type = std::array<contained_type, size>;
+		/// <summary> Element 0 within this vector. </summary>
+		contained_type x;
+		/// <summary> Element 1 within this vector. </summary>
+		contained_type y;
+		/// <summary> Element 2 within this vector. </summary>
+		contained_type z;
 
-		/// <summary> Contiguous data stored within this matrix. </summary>
-		data_storage_type data;
+	private:
+		constexpr inline contained_type* _data()
+		{
+			return &x;
+		}
+		constexpr inline const contained_type* _data() const
+		{
+			return &x;
+		}
+
+		template<std::size_t Index_>
+		constexpr inline contained_type& _get_index()
+		{
+			if constexpr (Index_ == 0)
+			{
+				return x;
+			}
+			else if constexpr (Index_ == 1)
+			{
+				return y;
+			}
+			else if constexpr (Index_ == 2)
+			{
+				return z;
+			}
+			else
+			{
+				static_assert(false, "Attempted to retrieve data from an EmuMath vector using an out-of-range index.");
+			}
+		}
+		template<std::size_t Index_>
+		constexpr inline const contained_type& _get_index() const
+		{
+			if constexpr (Index_ == 0)
+			{
+				return x;
+			}
+			else if constexpr (Index_ == 1)
+			{
+				return y;
+			}
+			else if constexpr (Index_ == 2)
+			{
+				return z;
+			}
+			else
+			{
+				static_assert(false, "Attempted to retrieve data from an EmuMath vector using an out-of-range index.");
+			}
+		}
+		constexpr inline contained_type& _get_index(const std::size_t index_)
+		{
+			return *(_data() + index_);
+		}
+		constexpr inline const contained_type& _get_index(const std::size_t index_) const
+		{
+			return *(_data() + index_);
+		}
 
 		template<std::size_t Index_, typename In_>
 		constexpr inline void _set_data_at_index(In_& in_)
@@ -159,13 +195,13 @@ namespace EmuMath
 					if constexpr (contains_const_reference_wrappers)
 					{
 						// May set any type of reference to a const since non-const will be implicitly interpreted as const in such contexts
-						data[Index_] = contained_type(in_);
+						_get_index<Index_>() = contained_type(in_);
 					}
 					else
 					{
 						if constexpr (!std::is_const_v<In_>)
 						{
-							data[Index_] = contained_type(in_);
+							_get_index<Index_>() = contained_type(in_);
 						}
 						else
 						{
@@ -175,7 +211,7 @@ namespace EmuMath
 				}
 				else
 				{
-					data[Index_] = static_cast<contained_type>(in_);
+					_get_index<Index_>() = static_cast<contained_type>(in_);
 				}
 			}
 			else
@@ -193,13 +229,13 @@ namespace EmuMath
 					if constexpr (contains_const_reference_wrappers)
 					{
 						// May set any type of reference to a const since non-const will be implicitly interpreted as const in such contexts
-						data[index_] = contained_type(in_);
+						_get_index(index_) = contained_type(in_);
 					}
 					else
 					{
 						if constexpr (!std::is_const_v<In_>)
 						{
-							data[index_] = contained_type(in_);
+							_get_index(index_) = contained_type(in_);
 						}
 						else
 						{
@@ -214,21 +250,15 @@ namespace EmuMath
 			}
 			else
 			{
-				data[index_] = static_cast<contained_type>(in_);
+				_get_index(index_) = static_cast<contained_type>(in_);
 			}
 		}
 	};
-}
 
-template<std::size_t Size_, typename T_>
-inline std::ostream& operator<<(std::ostream& stream_, const EmuMath::Vector<Size_, T_>& vector_)
-{
-	return EmuMath::Helpers::_underlying_vector_funcs::_append_vector_to_stream(stream_, vector_);
-}
-template<std::size_t Size_, typename T_>
-inline std::wostream& operator<<(std::wostream& stream_, const EmuMath::Vector<Size_, T_>& vector_)
-{
-	return EmuMath::Helpers::_underlying_vector_funcs::_append_vector_to_wide_stream(stream_, vector_);
+	/// <summary> Alias shorthand for creating an EmuMath vector containing 3 elements. Specialised to provide some syntactic sugar, such as named axis elements. </summary>
+	/// <typeparam name="T_">Type to be contained within the vector.</typeparam>
+	template<typename T_>
+	using Vector3 = EmuMath::Vector<3, T_>;
 }
 
 #endif

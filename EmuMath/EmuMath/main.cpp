@@ -153,7 +153,6 @@ int main()
 	auto a_norm_qrsqrt_1_mag = EmuMath::Helpers::VectorMagnitude(a_norm_qrsqrt_1);
 	auto a_norm_qrsqrt_2_mag = EmuMath::Helpers::VectorMagnitude(a_norm_qrsqrt_2);
 
-
 	std::cout << "a_norm_nonconst: " << a_norm_nonconst << " | Mag: " << a_norm_nonconst_mag << "\n";
 	std::cout << "a_norm_qrsqrt (1 newton iteration): " << a_norm_qrsqrt_1 << " | Mag: " << a_norm_qrsqrt_1_mag << "\n";
 	std::cout << "a_norm_qrsqrt (2 newton iterations): " << a_norm_qrsqrt_2 << " | Mag: " << a_norm_qrsqrt_2_mag << "\n";
@@ -165,14 +164,15 @@ int main()
 
 
 
-	EmuMath::RefVector<3, float> a_norm_nonconst_ref(a_norm_nonconst);
+	EmuMath::RefVector<2, float> a_norm_nonconst_ref(a_norm_nonconst);
 	std::cout << "Ref:" << a_norm_nonconst_ref << " | Act: " << a_norm_nonconst << "\n";
 	a_norm_nonconst_ref = EmuMath::Helpers::VectorShuffle<7, 1, 0>(some_uint_vector);
 	std::cout << "Ref:" << a_norm_nonconst_ref << " | Act: " << a_norm_nonconst << "\n";
 
-	EmuMath::ConstRefVector<7, float> const_ref_(EmuMath::Helpers::VectorShuffledReference<0, 1, 2, 1, 0, 1, 2>(a_norm_nonconst_ref));
+
+	EmuMath::ConstRefVector<7, float> const_ref_(EmuMath::Helpers::VectorShuffledReference<0, 1, 0, 1, 0, 1, 0>(a_norm_nonconst_ref));
 	std::cout << "Another, constant reference: " << const_ref_ << "\n";
-	a_norm_nonconst_ref.at<2>() = 1337.0f;
+	a_norm_nonconst_ref.at<1>() = 1337.0f;
 	std::cout << const_ref_ << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
