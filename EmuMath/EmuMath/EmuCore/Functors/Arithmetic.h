@@ -513,6 +513,34 @@ namespace EmuCore
 			return do_rads_to_degs<T_>()(val_);
 		}
 	};
+
+	template<typename Lhs_, typename Rhs_>
+	struct do_mod
+	{
+	private:
+		std::modulus<void> modder_;
+
+	public:
+		constexpr do_mod() : modder_()
+		{
+		}
+		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			return modder_(lhs_, rhs_);
+		}
+	};
+	template<>
+	struct do_mod<void, void>
+	{
+		constexpr do_mod()
+		{
+		}
+		template<typename Lhs_, typename Rhs_>
+		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			return do_mod<Lhs_, Rhs_>()(lhs_, rhs_);
+		}
+	};
 }
 
 #endif

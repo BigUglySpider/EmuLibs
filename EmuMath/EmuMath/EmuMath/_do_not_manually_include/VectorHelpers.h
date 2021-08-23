@@ -457,29 +457,88 @@ namespace EmuMath::Helpers
 	}
 
 	/// <summary>
+	/// <para>
+	///		Divides respective elements of the lhs_ vector by those of a rhs_ vector, or divides all elements of the lhs_ vector by a rhs_ scalar,
+	///		and outputs the remainders.
+	/// </para>
+	/// <para> There is an additional compile-time safety check to avoid guaranteed integral divides by 0, or casting divides by 0 to integral types. </para>
+	/// <para> This function cannot provide a valid constexpr if the result requires a divide by 0, integral or not. </para>
+	/// </summary>
+	/// <typeparam name="OutVector_">Type of vector to output the results of mod division as.</typeparam>
+	/// <typeparam name="LhsVector_">Type of vector on the left-hand side of the mod division.</typeparam>
+	/// <typeparam name="Rhs_">Type of either vector or scalar on the right-hand side of the mod division.</typeparam>
+	/// <param name="lhs_">EmuMath vector to be divided.</param>
+	/// <param name="rhs_">EmuMath vector to divide respective elements by, or a scalar to divide every element by.</param>
+	/// <returns>Vector containing the results of the mod division.</returns>
+	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMod(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr
+			(
+				_underlying_vector_funcs::_validity_check_vector_arithmetic_potential_scalar<LhsVector_>() &&
+				_underlying_vector_funcs::_validity_check_no_integral_divide_by_zero<EmuMath::Vector<OutSize_, out_contained_type>, LhsVector_, Rhs_>()
+				)
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
+			{
+				using modder_type = EmuCore::do_mod<typename LhsVector_::value_type, typename Rhs_::value_type>;
+				return _underlying_vector_funcs::_perform_vector_arithmetic<EmuMath::Vector<OutSize_, out_contained_type>, LhsVector_, Rhs_, modder_type>(lhs_, rhs_);
+			}
+			else
+			{
+				using modder_type = EmuCore::do_mod<typename LhsVector_::value_type, Rhs_>;
+				return _underlying_vector_funcs::_perform_vector_arithmetic<EmuMath::Vector<OutSize_, out_contained_type>, LhsVector_, Rhs_, modder_type>(lhs_, rhs_);
+			}
+		}
+		else
+		{
+			static_assert
+				(
+					false,
+					"A validity check on arguments provided for EmuMath::Helpers::VectorMod has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
+					);
+		}
+	}
+	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline auto VectorMod(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorMod<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+	template<typename out_contained_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline auto VectorMod(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorMod<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+	template<class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline auto VectorMod(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorMod<LhsVector_::size, typename LhsVector_::value_type, Rhs_>(lhs_, rhs_);
+	}
+
+	/// <summary>
 	/// <para> Negates the elements of the passed vector and returns the result in the output vector, where out[x] == -vector_[x]. </para>
 	/// </summary>
 	/// <typeparam name="out_value_type">Type to be contained in the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to negate the elements of.</typeparam>
 	/// <param name="vector_">EmuMath vector to negate the elements of.</param>
 	/// <returns>Vector whose elements are the negated form of the respective elements in the passed vector_.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorNegate(const Vector_& vector_)
+	template<std::size_t OutSize_, typename out_contained_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorNegate(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
 			using negator_type = EmuCore::do_negate<typename Vector_::value_type>;
-			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, negator_type>(vector_);
+			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_contained_type>, Vector_, negator_type>(vector_);
 		}
 		else
 		{
 			static_assert(false, "Attempted to negate a vector, but passed a non-EmuMath-vector argument type.");
 		}
 	}
-	template<typename out_value_type, class Vector_>
+	template<typename out_contained_type, class Vector_>
 	[[nodiscard]] constexpr inline auto VectorNegate(const Vector_& vector_)
 	{
-		return VectorNegate<Vector_::size, out_value_type>(vector_);
+		return VectorNegate<Vector_::size, out_contained_type>(vector_);
 	}
 	template<std::size_t OutSize_, class Vector_>
 	[[nodiscard]] constexpr inline auto VectorNegate(const Vector_& vector_)
@@ -724,63 +783,78 @@ namespace EmuMath::Helpers
 	/// <typeparam name="Vector_">Type of vector to find the lowest value of.</typeparam>
 	/// <param name="vector_">EmuMath vector to find the lowest value of.</param>
 	/// <returns>Copy of the lowest value within the passed vector.</returns>
-	template<class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::value_type VectorMin(const Vector_& vector_)
+	template<typename OutT_, class Vector_>
+	[[nodiscard]] constexpr inline OutT_ VectorMin(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_find_vector_min<Vector_>(vector_);
+			return _underlying_vector_funcs::_find_vector_min<Vector_, OutT_>>(vector_);
 		}
 		else
 		{
 			static_assert(false, "Attempted to get the lowest value within an EmuMath vector, but provided a non-EmuMath-vector argument.");
 		}
 	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline typename Vector_::value_type VectorMin(const Vector_& vector_)
+	{
+		return VectorMin<typename Vector_::value_type, Vector_>(vector_);
+	}
 
 	/// <summary> Returns a copy of the highest value within the passed EmuMath vector. </summary>
 	/// <typeparam name="Vector_">Type of vector to find the highest value of.</typeparam>
 	/// <param name="vector_">EmuMath vector to find the highest value of.</param>
 	/// <returns>Copy of the highest value within the passed vector.</returns>
-	template<class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::value_type VectorMax(const Vector_& vector_)
+	template<typename OutT_, class Vector_>
+	[[nodiscard]] constexpr inline typename OutT_ VectorMax(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_find_vector_max<Vector_>(vector_);
+			return _underlying_vector_funcs::_find_vector_max<Vector_, OutT_>(vector_);
 		}
 		else
 		{
 			static_assert(false, "Attempted to get the highest value within an EmuMath vector, but provided a non-EmuMath-vector argument.");
 		}
 	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline typename Vector_::value_type VectorMax(const Vector_& vector_)
+	{
+		return VectorMax<typename Vector_::value_type, Vector_>(vector_);
+	}
 
 	/// <summary> Returns a vector containing a copy of the passed vector's lowest and highest values at indices 0 and 1, respectively. </summary>
 	/// <typeparam name="Vector_">Type of vector to find the lowest and highest values of.</typeparam>
 	/// <param name="vector_">EmuMath vector to find the lowest and highest values of.</param>
 	/// <returns>EmuMath vector containing 2 elements; index 0 is a copy of the lowest value of the passed vector, and index 1 is a copy of the highest value.</returns>
-	template<class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<2, typename Vector_::value_type> VectorMinMax(const Vector_& vector_)
+	template<typename OutT_, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<2, OutT_> VectorMinMax(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_find_vector_min_max<Vector_>(vector_);
+			return _underlying_vector_funcs::_find_vector_min_max<Vector_, OutT_>(vector_);
 		}
 		else
 		{
 			static_assert(false, "Attempted to get the lowest and highest values within an EmuMath vector, but provided a non-EmuMath-vector argument.");
 		}
 	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<2, typename Vector_::value_type> VectorMinMax(const Vector_& vector_)
+	{
+		return VectorMinMax<typename Vector_::value_type, Vector_>(vector_);
+	}
 	/// <summary> Finds the lowest and highest values within the passed vector, and outputs copies of them via the passed min_ and max_ arguments respectively. </summary>
 	/// <typeparam name="Vector_">Type of vector to find the lowest and highest values of.</typeparam>
 	/// <param name="vector_">EmuMath vector to find the lowest and highest values of.</param>
 	/// <param name="min_">Reference to output a copy of the lowest value to.</param>
 	/// <param name="max_">Reference to output a copy of the highest value to.</param>
-	template<class Vector_>
-	constexpr inline void VectorMinMax(const Vector_& vector_, typename Vector_::value_type& min_, typename Vector_::value_type& max_)
+	template<typename OutMin_, typename OutMax_, class Vector_>
+	constexpr inline void VectorMinMax(const Vector_& vector_, typename OutMin_& min_, typename OutMax_& max_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			_underlying_vector_funcs::_find_vector_min_max<Vector_>(vector_, min_, max_);
+			_underlying_vector_funcs::_find_vector_min_max<Vector_, OutMin_, OutMax_>(vector_, min_, max_);
 		}
 		else
 		{
@@ -1188,7 +1262,7 @@ namespace EmuMath::Helpers
 	///		and returns a value of out_value_type or which may be cast to out_value_type.
 	/// </param>
 	/// <returns>Vector containing the results of the mutation of the passed vector_ via the passed func_.</returns>
-	template<std::size_t OutSize_, typename out_contained_type, class Vector_, class Func_>
+	template<std::size_t OutSize_, typename out_contained_type, class Func_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMutate(const Vector_& vector_, Func_ func_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
@@ -1200,40 +1274,40 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to perform a mutation on a vector, but provided a non-EmuMath-vector type.");
 		}
 	}
-	template<std::size_t OutSize_, typename out_contained_type, class Vector_, class Func_>
+	template<std::size_t OutSize_, typename out_contained_type, class Func_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMutate(const Vector_& vector_)
 	{
-		return VectorMutate<OutSize_, out_contained_type, Vector_, Func_>(vector_, Func_());
+		return VectorMutate<OutSize_, out_contained_type, Func_, Vector_>(vector_, Func_());
 	}
-	template<typename out_contained_type, class Vector_, class Func_>
+	template<typename out_contained_type, class Func_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorMutate(const Vector_& vector_, Func_ func_)
 	{
-		return VectorMutate<Vector_::size, out_contained_type, Vector_, Func_&>(vector_, func_);
+		return VectorMutate<Vector_::size, out_contained_type, Func_&, Vector_>(vector_, func_);
 	}
-	template<std::size_t OutSize_, class Vector_, class Func_>
+	template<std::size_t OutSize_, class Func_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorMutate(const Vector_& vector_, Func_ func_)
 	{
-		return VectorMutate<OutSize_, typename Vector_::value_type, Vector_, Func_&>(vector_, func_);
+		return VectorMutate<OutSize_, typename Vector_::value_type, Func_&, Vector_>(vector_, func_);
 	}
-	template<class Vector_, class Func_>
+	template<class Func_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorMutate(const Vector_& vector_, Func_ func_)
 	{
-		return VectorMutate<Vector_::size, typename Vector_::value_type, Vector_, Func_&>(vector_, func_);
+		return VectorMutate<Vector_::size, typename Vector_::value_type, Func_&, Vector_>(vector_, func_);
 	}
-	template<typename out_contained_type, class Vector_, class Func_>
+	template<typename out_contained_type, class Func_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorMutate(const Vector_& vector_)
 	{
-		return VectorMutate<Vector_::size, out_contained_type, Vector_, Func_>(vector_, Func_());
+		return VectorMutate<Vector_::size, out_contained_type, Func_, Vector_>(vector_, Func_());
 	}
-	template<std::size_t OutSize_, class Vector_, class Func_>
+	template<std::size_t OutSize_, class Func_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorMutate(const Vector_& vector_)
 	{
-		return VectorMutate<OutSize_, typename Vector_::value_type, Vector_, Func_>(vector_, Func_());
+		return VectorMutate<OutSize_, typename Vector_::value_type, Func_, Vector_>(vector_, Func_());
 	}
-	template<class Vector_, class Func_>
+	template<class Func_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorMutate(const Vector_& vector_)
 	{
-		return VectorMutate<Vector_::size, typename Vector_::value_type, Vector_, Func_>(vector_, Func_());
+		return VectorMutate<Vector_::size, typename Vector_::value_type, Func_, Vector_>(vector_, Func_());
 	}
 
 	/// <summary>
@@ -1384,12 +1458,12 @@ namespace EmuMath::Helpers
 	template<std::size_t OutSize_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorSqrtConstexpr(const Vector_& vector_)
 	{
-		return VectorSqrtConstexpr<OutSize_, typename Vector_::value_type, Vector_>(vector_);
+		return VectorSqrtConstexpr<OutSize_, typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 	template<class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorSqrtConstexpr(const Vector_& vector_)
 	{
-		return VectorSqrtConstexpr<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
+		return VectorSqrtConstexpr<Vector_::size, typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 
 	/// <summary>
@@ -1543,7 +1617,14 @@ namespace EmuMath::Helpers
 	/// <typeparam name="Vector_">Type of vector to return a normalised copy of.</typeparam>
 	/// <param name="vector_">EmuMath vector to calculate the normalised form of.</param>
 	/// <returns>Copy of the passed EmuMath vector with its elements normalised via the result of using Q_rsqrt to find the magnitude's reciprocal.</returns>
-	template<typename out_floating_point_contained_type, typename MagFloatingPointType_, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, class Vector_>
+	template
+	<
+		typename out_floating_point_contained_type,
+		typename MagFloatingPointType_,
+		std::size_t NumNewtonIterations_ = 1,
+		std::int32_t MagicConstant_ = 0x5F3759DF,
+		class Vector_
+	>
 	[[nodiscard]] inline typename EmuMath::Vector<Vector_::size, out_floating_point_contained_type> VectorNormaliseQrsqrt(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
@@ -1754,6 +1835,126 @@ namespace EmuMath::Helpers
 	[[nodiscard]] constexpr inline EmuMath::Vector<FromVector_::size, typename FromVector_::value_type> VectorDistance(const FromVector_& from_, const ToVector_& to_)
 	{
 		return VectorDistance<FromVector_::size, typename FromVector_::value_type, FromVector_, ToVector_>(from_, to_);
+	}
+
+	/// <summary>
+	/// <para> Calculates the 3D cross product of the passed two vectors, using the provided template indices as the X, Y, and Z for A and B. </para>
+	/// <para> The provided indices default to the logical x, y, and z components of both A and B, but may be modified to refer to different areas of the vectors. </para>
+	/// <para> 
+	///		Unless explicitly stated otherwise, the indices for B will mimic those of A. 
+	///		As such, providing custom indices for A will implicitly provide the same indices for B, unless additional indices are explicitly provided for B.
+	/// </para>
+	/// <para> The end vector can be summarised as: </para>
+	///	<para> [0] = (a_[AY_] * b_[BZ_]) - (a_[AZ_] * b_[BY_]) </para>
+	/// <para> [1] = (a_[AZ_] * b_[BX_]) - (a_[AX_] * b_[BZ_]) </para>
+	/// <para> [2] = (a_[AX_] * b_[BY_]) - (a_[AY_] * b_[BX_]) </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="VectorA_">Type of vector representing a_ in the above formulae.</typeparam>
+	/// <typeparam name="VectorB_">Type of vector representing b_ in the above formulae.</typeparam>
+	/// <param name="a_">EmuMath vector representing a_ in the above formulae.</param>
+	/// <param name="b_">EmuMath vector representing b_ in the above formulae.</param>
+	/// <returns>Cross product of the passed two vectors, using the provided indices for 3 elements from each of the respective vectors.</returns>
+	template
+	<
+		std::size_t AX_ = 0,
+		std::size_t AY_ = 1,
+		std::size_t AZ_ = 2,
+		std::size_t BX_ = AX_,
+		std::size_t BY_ = AY_,
+		std::size_t BZ_ = AZ_,
+		std::size_t OutSize_,
+		typename out_contained_type,
+		class VectorA_,
+		class VectorB_
+	>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorCrossProduct3D(const VectorA_& a_, const VectorB_& b_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<VectorA_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<VectorB_>)
+			{
+				const auto& ay_ = _underlying_vector_funcs::_get_vector_data<AY_>(a_);
+				const auto& az_ = _underlying_vector_funcs::_get_vector_data<AZ_>(a_);
+
+				const auto& by_ = _underlying_vector_funcs::_get_vector_data<BY_>(b_);
+				const auto& bz_ = _underlying_vector_funcs::_get_vector_data<BZ_>(b_);
+
+				EmuMath::Vector<OutSize_, out_contained_type> out_ = EmuMath::Vector<OutSize_, out_contained_type>();
+				using out_value_type = typename EmuMath::Vector<OutSize_, out_contained_type>::value_type;
+				_underlying_vector_funcs::_get_vector_data<0>(out_) = static_cast<out_value_type>((ay_ * bz_) - (az_ * by_));
+
+				if constexpr (OutSize_ > 1)
+				{
+					// Only need these values if out vector has a y component
+					const auto& ax_ = _underlying_vector_funcs::_get_vector_data<AX_>(a_);
+					const auto& bx_ = _underlying_vector_funcs::_get_vector_data<BX_>(b_);
+					_underlying_vector_funcs::_get_vector_data<1>(out_) = static_cast<out_value_type>((az_ * bx_) - (ax_ * bz_));
+
+					if constexpr (OutSize_ > 2)
+					{
+						// Only need to calculate this part of the cross if our output vector will contain it
+						_underlying_vector_funcs::_get_vector_data<2>(out_) = static_cast<out_value_type>((ax_ * by_) - (ay_ * bx_));
+					}
+				}
+				return out_;
+			}
+			else
+			{
+				static_assert(false, "Attempted to get the cross product of two vectors, but the passed argument b_ was not an EmuMath vector.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the cross product of two vectors, but the passed argument a_ was not an EmuMath vector.");
+		}
+	}
+	template
+	<
+		std::size_t AX_ = 0,
+		std::size_t AY_ = 1,
+		std::size_t AZ_ = 2,
+		std::size_t BX_ = AX_,
+		std::size_t BY_ = AY_,
+		std::size_t BZ_ = AZ_,
+		std::size_t OutSize_,
+		class VectorA_,
+		class VectorB_
+	>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename VectorA_::value_type> VectorCrossProduct3D(const VectorA_& a_, const VectorB_& b_)
+	{
+		return VectorCrossProduct3D<AX_, AY_, AZ_, BX_, BY_, BZ_, OutSize_, typename VectorA_::value_type, VectorA_, VectorB_>(a_, b_);
+	}
+	template
+	<
+		std::size_t AX_ = 0,
+		std::size_t AY_ = 1,
+		std::size_t AZ_ = 2,
+		std::size_t BX_ = AX_,
+		std::size_t BY_ = AY_,
+		std::size_t BZ_ = AZ_,
+		typename out_contained_type,
+		class VectorA_,
+		class VectorB_
+	>
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, out_contained_type> VectorCrossProduct3D(const VectorA_& a_, const VectorB_& b_)
+	{
+		return VectorCrossProduct3D<AX_, AY_, AZ_, BX_, BY_, BZ_, 3, out_contained_type, VectorA_, VectorB_>(a_, b_);
+	}
+	template
+	<
+		std::size_t AX_ = 0,
+		std::size_t AY_ = 1,
+		std::size_t AZ_ = 2,
+		std::size_t BX_ = AX_,
+		std::size_t BY_ = AY_,
+		std::size_t BZ_ = AZ_,
+		class VectorA_,
+		class VectorB_
+	>
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, typename VectorA_::value_type> VectorCrossProduct3D(const VectorA_& a_, const VectorB_& b_)
+	{
+		return VectorCrossProduct3D<AX_, AY_, AZ_, BX_, BY_, BZ_, 3, typename VectorA_::value_type, VectorA_, VectorB_>(a_, b_);
 	}
 #pragma endregion
 
@@ -2499,13 +2700,13 @@ namespace EmuMath::Helpers
 	/// <summary>
 	/// <para> Perform a bitwise AND with all elements of the lhs_ vector with the rhs_, depending on the type rhs_ is passed as. </para>
 	/// <para> If rhs_ is an EmuMath vector, respective elements will be ANDed, otherwise all elements in lhs_ will be ANDed with the value of rhs_ itself. </para>
-	/// <para> This operatoion is carried out by EmuCore::do_bitwise_and&lt;LhsVector_::value_type, Rhs_::value_type (or just Rhs_ if not a vector)&gt;. </para>
+	/// <para> This operation is carried out by EmuCore::do_bitwise_and&lt;LhsVector_::value_type, Rhs_::value_type (or just Rhs_ if not a vector)&gt;. </para>
 	/// </summary>
 	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="LhsVector_">Type of vector appearing on the left-hand side of AND operations.</typeparam>
 	/// <typeparam name="Rhs_">Type of vector or scalar appearing the the right-hand side of AND operations.</typeparam>
 	/// <param name="lhs_">EmuMath vector appearing on the left-hand side of AND operations.</param>
-	/// <param name="rhs_">EmuMath vector or scalar appearing on the left-hand side of AND operations.</param>
+	/// <param name="rhs_">EmuMath vector or scalar appearing on the right-hand side of AND operations.</param>
 	/// <returns>EmuMath vector containing the results of bitwise ANDing the provided operands.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorAnd(const LhsVector_& lhs_, const Rhs_& rhs_)
@@ -2548,13 +2749,13 @@ namespace EmuMath::Helpers
 	/// <summary>
 	/// <para> Perform a bitwise OR with all elements of the lhs_ vector with the rhs_, depending on the type rhs_ is passed as. </para>
 	/// <para> If rhs_ is an EmuMath vector, respective elements will be ORed, otherwise all elements in lhs_ will be ORed with the value of rhs_ itself. </para>
-	/// <para> This operatoion is carried out by EmuCore::do_bitwise_or&lt;LhsVector_::value_type, Rhs_::value_type (or just Rhs_ if not a vector)&gt;. </para>
+	/// <para> This operation is carried out by EmuCore::do_bitwise_or&lt;LhsVector_::value_type, Rhs_::value_type (or just Rhs_ if not a vector)&gt;. </para>
 	/// </summary>
 	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="LhsVector_">Type of vector appearing on the left-hand side of OR operations.</typeparam>
 	/// <typeparam name="Rhs_">Type of vector or scalar appearing the the right-hand side of OR operations.</typeparam>
 	/// <param name="lhs_">EmuMath vector appearing on the left-hand side of OR operations.</param>
-	/// <param name="rhs_">EmuMath vector or scalar appearing on the left-hand side of OR operations.</param>
+	/// <param name="rhs_">EmuMath vector or scalar appearing on the right-hand side of OR operations.</param>
 	/// <returns>EmuMath vector containing the results of bitwise ORing the provided operands.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorOr(const LhsVector_& lhs_, const Rhs_& rhs_)
@@ -2597,13 +2798,13 @@ namespace EmuMath::Helpers
 	/// <summary>
 	/// <para> Perform a bitwise XOR with all elements of the lhs_ vector with the rhs_, depending on the type rhs_ is passed as. </para>
 	/// <para> If rhs_ is an EmuMath vector, respective elements will be XORed, otherwise all elements in lhs_ will be XORed with the value of rhs_ itself. </para>
-	/// <para> This operatoion is carried out by EmuCore::do_bitwise_xor&lt;LhsVector_::value_type, Rhs_::value_type (or just Rhs_ if not a vector)&gt;. </para>
+	/// <para> This operation is carried out by EmuCore::do_bitwise_xor&lt;LhsVector_::value_type, Rhs_::value_type (or just Rhs_ if not a vector)&gt;. </para>
 	/// </summary>
 	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="LhsVector_">Type of vector appearing on the left-hand side of XOR operations.</typeparam>
 	/// <typeparam name="Rhs_">Type of vector or scalar appearing the the right-hand side of XOR operations.</typeparam>
 	/// <param name="lhs_">EmuMath vector appearing on the left-hand side of XOR operations.</param>
-	/// <param name="rhs_">EmuMath vector or scalar appearing on the left-hand side of XOR operations.</param>
+	/// <param name="rhs_">EmuMath vector or scalar appearing on the right-hand side of XOR operations.</param>
 	/// <returns>EmuMath vector containing the results of bitwise XOR the provided operands.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorXor(const LhsVector_& lhs_, const Rhs_& rhs_)
@@ -2645,7 +2846,7 @@ namespace EmuMath::Helpers
 
 	/// <summary>
 	/// <para> Performs a bitwise NOT on all elements within the passed vector and outputs the results in the return vector. </para>
-	/// <para> This operatoion is carried out by EmuCore::do_bitwise_not&lt;Vector_::value_type&gt;. </para>
+	/// <para> This operation is carried out by EmuCore::do_bitwise_not&lt;Vector_::value_type&gt;. </para>
 	/// </summary>
 	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to perform the bitwise NOT operation on.</typeparam>
@@ -2822,6 +3023,18 @@ namespace EmuCore
 		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorDivide(lhs_, rhs_);
+		}
+	};
+
+	template<std::size_t Size_, typename T_, typename Rhs_>
+	struct do_mod<EmuMath::Vector<Size_, T_>, Rhs_>
+	{
+		constexpr do_mod()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorMod(lhs_, rhs_);
 		}
 	};
 

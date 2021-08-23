@@ -45,6 +45,11 @@ struct SettyBoi
 	}
 };
 
+bool boolfunc(bool bool_)
+{
+	return bool(bool_);
+}
+
 int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
@@ -153,7 +158,6 @@ int main()
 	auto a_norm_qrsqrt_1_mag = EmuMath::Helpers::VectorMagnitude(a_norm_qrsqrt_1);
 	auto a_norm_qrsqrt_2_mag = EmuMath::Helpers::VectorMagnitude(a_norm_qrsqrt_2);
 
-
 	std::cout << "a_norm_nonconst: " << a_norm_nonconst << " | Mag: " << a_norm_nonconst_mag << "\n";
 	std::cout << "a_norm_qrsqrt (1 newton iteration): " << a_norm_qrsqrt_1 << " | Mag: " << a_norm_qrsqrt_1_mag << "\n";
 	std::cout << "a_norm_qrsqrt (2 newton iterations): " << a_norm_qrsqrt_2 << " | Mag: " << a_norm_qrsqrt_2_mag << "\n";
@@ -163,17 +167,40 @@ int main()
 	std::cout << "AngleRads(" << vec_d << ", " << vec_a << "): " << EmuMath::Helpers::VectorAngle<true>(vec_d, vec_a) << "\n";
 	std::cout << "AngleDegs(" << vec_d << ", " << vec_a << "): " << EmuMath::Helpers::VectorAngle<false>(vec_d, vec_a) << "\n";
 
-
-
-	EmuMath::RefVector<3, float> a_norm_nonconst_ref(a_norm_nonconst);
+	EmuMath::RefVector<2, float> a_norm_nonconst_ref(a_norm_nonconst);
 	std::cout << "Ref:" << a_norm_nonconst_ref << " | Act: " << a_norm_nonconst << "\n";
 	a_norm_nonconst_ref = EmuMath::Helpers::VectorShuffle<7, 1, 0>(some_uint_vector);
 	std::cout << "Ref:" << a_norm_nonconst_ref << " | Act: " << a_norm_nonconst << "\n";
 
-	EmuMath::ConstRefVector<7, float> const_ref_(EmuMath::Helpers::VectorShuffledReference<0, 1, 2, 1, 0, 1, 2>(a_norm_nonconst_ref));
+
+	EmuMath::ConstRefVector<7, float> const_ref_(EmuMath::Helpers::VectorShuffledReference<0, 1, 0, 1, 0, 1, 0>(a_norm_nonconst_ref));
 	std::cout << "Another, constant reference: " << const_ref_ << "\n";
-	a_norm_nonconst_ref.at<2>() = 1337.0f;
-	std::cout << const_ref_ << "\n";
+	a_norm_nonconst_ref.at<1>() = 1337.0f;
+	std::cout << const_ref_ << "\n\n\n";
+
+	auto bigBoiRef = a_norm_nonconst_ref.ShuffledReference<0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1>();
+	std::cout << bigBoiRef << "\n";
+	bigBoiRef = bigBoiRef.ClampMin(50000);
+	std::cout << bigBoiRef << "\n";
+	bigBoiRef.at<0>() = 42;
+	std::cout << bigBoiRef << "\n\n\n";
+
+	std::cout << a_norm_nonconst_ref << "\n";
+	a_norm_nonconst_ref.Set(bigBoiRef);
+	std::cout << a_norm_nonconst_ref << "\n";
+	bigBoiRef.at<1>() = 42424242.0f;
+	std::cout << a_norm_nonconst_ref << "\n";
+	
+	std::cout << static_cast<bool>(bigBoiRef) << " | " << !bigBoiRef << "\n";
+
+	auto cross_a_ = EmuMath::Vector3<float>(1.0f, 2.0f, 3.0f);
+	auto cross_b_ = EmuMath::Vector4<double>(-5.0f, 0.0f, 5.0f, 203.0f);
+	std::cout << "CROSS(" << cross_a_ << ", " << cross_b_ << "): " << cross_a_.CrossProduct3D(cross_b_) << "\n";
+	std::cout << "CROSS<0, 1, 2, 1, 2, 3>(" << cross_a_ << ", " << cross_b_ << "): " << cross_a_.CrossProduct3D<0, 1, 2, 1, 2, 3>(cross_b_) << "\n";
+
+
+	std::cout << cross_a_ << ": [" << cross_a_[0] << " | " << cross_a_[1] << " | " << cross_a_[2] << "]\n";
+
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

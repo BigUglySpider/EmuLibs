@@ -161,9 +161,13 @@
     <ClInclude Include="EmuMath\NoOverflowT.h" />
     <ClInclude Include="EmuMath\SIMDHelpers.h" />
     <ClInclude Include="EmuMath\Vector.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\Vector2.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\Vector3.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\Vector4.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\VectorHelpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\VectorHelpersUnderlying.h" />
     <ClInclude Include="EmuCore\CommonTypes\DeferrableReferenceWrapper.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\VectorInfo.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\VectorT.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\VectorTMP.h" />
     <ClInclude Include="Tests.hpp" />

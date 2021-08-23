@@ -362,12 +362,12 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 			_find_vector_min<Index_ + 1, Vector_, Out_>(vector_, out_);
 		}
 	}
-	template<class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::value_type _find_vector_min(const Vector_& vector_)
+	template<class Vector_, typename Out_>
+	[[nodiscard]] constexpr inline typename Out_ _find_vector_min(const Vector_& vector_)
 	{
 		typename Vector_::value_type out_(_get_vector_data<0>(vector_));
 		_find_vector_min<1, Vector_, typename Vector_::value_type>(vector_, out_);
-		return out_;
+		return static_cast<Out_>(out_);
 	}
 
 	template<std::size_t Index_, class Vector_, class Out_>
@@ -383,12 +383,12 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 			_find_vector_max<Index_ + 1, Vector_, Out_>(vector_, out_);
 		}
 	}
-	template<class Vector_>
+	template<class Vector_, typename Out_>
 	[[nodiscard]] constexpr inline typename Vector_::value_type _find_vector_max(const Vector_& vector_)
 	{
 		typename Vector_::value_type out_(_get_vector_data<0>(vector_));
 		_find_vector_max<1, Vector_, typename Vector_::value_type>(vector_, out_);
-		return out_;
+		return static_cast<Out_>(out_);
 	}
 
 	template<std::size_t Index_, class Vector_, class Out_>
@@ -408,20 +408,22 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 			_find_vector_min_max<Index_ + 1, Vector_, Out_>(vector_, min_, max_);
 		}
 	}
-	template<class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<2, typename Vector_::value_type> _find_vector_min_max(const Vector_& vector_)
+	template<class Vector_, typename Out_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<2, Out_> _find_vector_min_max(const Vector_& vector_)
 	{
-		const typename Vector_::value_type& element_zero_ = _get_vector_data<0>(vector_);
-		EmuMath::Vector<2, typename Vector_::value_type> out_(element_zero_, element_zero_);
-		_find_vector_min_max<1, Vector_, typename Vector_::value_type>(vector_, _get_vector_data<0>(out_), _get_vector_data<1>(out_));
-		return out_;
-	}
-	template<class Vector_>
-	constexpr inline void _find_vector_min_max(const Vector_& vector_, typename Vector_::value_type& min_, typename Vector_::value_type& max_)
-	{
-		min_ = _get_vector_data<0>(vector_);
-		max_ = min_;
+		typename Vector_::value_type min_(_get_vector_data<0>(vector_));
+		typename Vector_::value_type max_(min_);
 		_find_vector_min_max<1, Vector_, typename Vector_::value_type>(vector_, min_, max_);
+		return EmuMath::Vector<2, Out_>(min_, max_);
+	}
+	template<class Vector_, typename OutMin_, typename OutMax_>
+	constexpr inline void _find_vector_min_max(const Vector_& vector_, typename OutMin_& outMin_, typename OutMax_& outMax_)
+	{
+		typename Vector_::value_type min_ = _get_vector_data<0>(vector_);
+		typename Vector_::value_type max_ = min_;
+		_find_vector_min_max<1, Vector_, typename Vector_::value_type>(vector_, min_, max_);
+		outMin_ = static_cast<OutMin_>(min_);
+		outMax_ = static_cast<OutMax_>(max_);
 	}
 
 	template<std::size_t Index_, class Vector_>

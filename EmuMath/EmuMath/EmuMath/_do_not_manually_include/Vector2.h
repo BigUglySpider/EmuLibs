@@ -1,28 +1,19 @@
-#ifndef EMU_MATH_VECTOR_T_H_INC_
-#define EMU_MATH_VECTOR_T_H_INC_ 1
+#ifndef EMU_MATH_VECTOR_2_SUGAR_H_INC_
+#define EMU_MATH_VECTOR_2_SUGAR_H_INC_ 1
 
-#include "VectorHelpers.h"
-#include "VectorInfo.h"
-#include <array>
-#include <ostream>
+#include "VectorT.h"
 
 namespace EmuMath
 {
-	/// <summary>
-	/// <para> Mathematical vector containing a fixed number of elements of the provided type T_. </para>
-	/// <para> Interacts with EmuMath::Helpers functions starting with Vector, and contains many members for common vector operations. </para>
-	/// </summary>
-	/// <typeparam name="T_">Type to be contained within this vector.</typeparam>
-	template<std::size_t Size_, typename T_>
-	struct Vector
+	template<typename T_>
+	struct Vector<2, T_>
 	{
-	public:
 #pragma region VECTOR_INFO
 		/// <summary>
 		/// <para> General template info regarding this type of EmuMath vector. </para>
 		/// <para> For further information on individual components within this vector, you should view components of the same name under this vector_info. </para>
 		/// </summary>
-		using vector_info = EmuMath::_underlying_components::VectorInfo<Size_, T_>;
+		using vector_info = EmuMath::_underlying_components::VectorInfo<2, T_>;
 		using contained_type = typename vector_info::contained_type;
 		static constexpr bool contains_reference_wrappers = vector_info::contains_reference_wrappers;
 		using raw_value_type = typename vector_info::raw_value_type;
@@ -42,10 +33,10 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONSTRUCTORS
-		constexpr Vector() : data_()
+		constexpr Vector() : x(), y()
 		{
 		}
-		constexpr Vector(const this_type& toCopy_) : data_(toCopy_.data_)
+		constexpr Vector(const this_type& toCopy_) : x(toCopy_.at<0>()), y(toCopy_.at<1>())
 		{
 		}
 		template<std::size_t ToCopySize_, typename ToCopyValueType_>
@@ -58,20 +49,14 @@ namespace EmuMath
 		{
 			EmuMath::Helpers::VectorSet(*this, toCopy_);
 		}
-		/// <summary>
-		/// <para> Constructs this vector with its elements matching the passed data, in contiguous order of the 0th to the (size - 1)th element. </para>
-		/// <para> This constructor requires a number of arguments equal to the number of elements in the vector. </para>
-		/// </summary>
-		/// <typeparam name="Args">All arguments passed to construct this vector via.</typeparam>
-		/// <typeparam name="RequiresArgumentCountEqualToSize">Dummy parameter used to make use of std::enable_if.</typeparam>
-		/// <param name="contiguousData_">Arguments to create this vector's elements, in contiguous order from the 0th-(size - 1)th element in this vector.</param>
-		template<typename...Args, typename RequiresArgumentCountEqualToSize = std::enable_if_t<sizeof...(Args) == size>>
-		constexpr Vector(Args&&...contiguousData_) : data_({ static_cast<contained_type>(std::forward<Args>(contiguousData_))... })
+		template<typename X_, typename Y_>
+		constexpr Vector(X_&& x_, Y_&& y_) : 
+			x(std::forward<X_>(x_)),
+			y(std::forward<Y_>(y_))
 		{
-			static_assert(sizeof...(Args) == size, "Provided an amount of arguments to an EmuMath Vector constructor that is not equal to the number of elements in the Vector.");
 			static_assert
 			(
-				EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, Args...>::value,
+				EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, X_, Y_>::value,
 				"Attempted to construct an EmuMath Vector via it's template constructor, but at least one provided argument cannot be used to construct the Vector's contained_type."
 			);
 		}
@@ -81,53 +66,39 @@ namespace EmuMath
 		template<std::size_t Index_>
 		[[nodiscard]] constexpr inline raw_value_type& at()
 		{
-			if constexpr (Index_ < size)
-			{
-				return std::get<Index_>(data_);
-			}
-			else
-			{
-				static_assert(false, "Attempted to retrieve data from an EmuMath vector using an out-of-range index.");
-			}
+			return _get_index<Index_>();
 		}
 		template<std::size_t Index_>
 		[[nodiscard]] constexpr inline const raw_value_type& at() const
 		{
-			if constexpr (Index_ < size)
-			{
-				return std::get<Index_>(data_);
-			}
-			else
-			{
-				static_assert(false, "Attempted to retrieve data from an EmuMath vector using an out-of-range index.");
-			}
+			return _get_index<Index_>();
 		}
 		[[nodiscard]] constexpr inline raw_value_type& at(const std::size_t index_)
 		{
-			return data_[index_];
+			return _get_index(index_);
 		}
 		[[nodiscard]] constexpr inline const raw_value_type& at(const std::size_t index_) const
 		{
-			return data_[index_];
+			return _get_index(index_);
 		}
 		[[nodiscard]] constexpr inline raw_value_type& operator[](const std::size_t index_)
 		{
-			return this->at(index_);
+			return _get_index(index_);
 		}
 		[[nodiscard]] constexpr inline const raw_value_type& operator[](const std::size_t index_) const
 		{
-			return this->at(index_);
+			return _get_index(index_);
 		}
 
 		/// <summary> Provides a pointer to the start of this vector's data (i.e. the memory location of the start of element 0). </summary>
 		[[nodiscard]] constexpr inline contained_type* data()
 		{
-			return data_.data();
+			return &x;
 		}
 		/// <summary> Provides a constant pointer to the start of this vector's data (i.e. the memory location of the start of element 0). </summary>
 		[[nodiscard]] constexpr inline const contained_type* data() const
 		{
-			return data_.data();
+			return &x;
 		}
 #pragma endregion
 
@@ -142,6 +113,13 @@ namespace EmuMath
 		{
 			_set_data_at_index<In_>(in_, index_);
 		}
+
+		template<class ToCopy_>
+		constexpr inline this_type& Copy(const ToCopy_& toCopy_)
+		{
+			return EmuMath::Helpers::VectorCopy<this_type, ToCopy_>(*this, toCopy_);
+		}
+
 		template<typename In_>
 		constexpr inline void Set(In_& in_)
 		{
@@ -153,78 +131,73 @@ namespace EmuMath
 			EmuMath::Helpers::VectorSet<this_type, const In_>(*this, in_);
 		}
 
-		template<class ToCopy_>
-		constexpr inline this_type& Copy(const ToCopy_& toCopy_)
-		{
-			return EmuMath::Helpers::VectorCopy<this_type, ToCopy_>(*this, toCopy_);
-		}
 #pragma endregion
 
 #pragma region CONST_OPERATORS
 		template<class Rhs_>
-		[[nodiscard]] constexpr inline bool operator==(const Rhs_& rhs_) const
+		constexpr inline bool operator==(const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorCmpEqualTo(*this, rhs_);
 		}
 
 		template<class Rhs_>
-		[[nodiscard]] constexpr inline bool operator!=(const Rhs_& rhs_) const
+		constexpr inline bool operator!=(const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorCmpNotEqualTo(*this, rhs_);
 		}
 
 		template<class Rhs_>
-		[[nodiscard]] constexpr inline bool operator>(const Rhs_& rhs_) const
+		constexpr inline bool operator>(const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorCmpGreater(*this, rhs_);
 		}
 
 		template<class Rhs_>
-		[[nodiscard]] constexpr inline bool operator<(const Rhs_& rhs_) const
+		constexpr inline bool operator<(const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorCmpLess(*this, rhs_);
 		}
 
 		template<class Rhs_>
-		[[nodiscard]] constexpr inline bool operator>=(const Rhs_& rhs_) const
+		constexpr inline bool operator>=(const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorCmpGreaterEqual(*this, rhs_);
 		}
 
 		template<class Rhs_>
-		[[nodiscard]] constexpr inline bool operator<=(const Rhs_& rhs_) const
+		constexpr inline bool operator<=(const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorCmpLessEqual(*this, rhs_);
 		}
 
 		template<class RhsVector_>
-		[[nodiscard]] constexpr inline copy_type operator+(const RhsVector_& rhs_) const
+		constexpr inline copy_type operator+(const RhsVector_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorAdd<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
 		}
-		[[nodiscard]] constexpr inline copy_type operator+() const
+		constexpr inline copy_type operator+() const
 		{
 			return copy_type(*this);
 		}
 
 		template<class RhsVector_>
-		[[nodiscard]] constexpr inline copy_type operator-(const RhsVector_& rhs_) const
+		constexpr inline copy_type operator-(const RhsVector_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorSubtract<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
 		}
-		[[nodiscard]] constexpr inline copy_type operator-() const
+		constexpr inline copy_type operator-() const
 		{
 			return EmuMath::Helpers::VectorNegate<copy_type::size, typename copy_type::contained_type>(*this);
 		}
 
 		template<typename Rhs_>
-		[[nodiscard]] constexpr inline copy_type operator*(const Rhs_& rhs_) const
+		constexpr inline copy_type operator*(const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorMultiply<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
 		}
 
 		template<typename Rhs_>
-		[[nodiscard]] constexpr inline copy_type operator/(const Rhs_& rhs_) const
+		constexpr inline copy_type operator/(const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorDivide<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
 		}
@@ -236,36 +209,36 @@ namespace EmuMath
 		}
 
 		template<typename Rhs_>
-		[[nodiscard]] constexpr inline copy_type operator&(const Rhs_& rhs_) const
+		constexpr inline copy_type operator&(const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorAnd<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
 		}
 
 		template<typename Rhs_>
-		[[nodiscard]] constexpr inline copy_type operator|(const Rhs_& rhs_) const
+		constexpr inline copy_type operator|(const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorOr<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
 		}
 
 		template<typename Rhs_>
-		[[nodiscard]] constexpr inline copy_type operator^(const Rhs_& rhs_) const
+		constexpr inline copy_type operator^(const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorXor<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
 		}
 
-		[[nodiscard]] constexpr inline copy_type operator~() const
+		constexpr inline copy_type operator~() const
 		{
 			return EmuMath::Helpers::VectorNot<copy_type::size, typename copy_type::contained_type>(*this);
 		}
 
 		template<typename Rhs_>
-		[[nodiscard]] constexpr inline copy_type operator<<(const Rhs_& rhs_) const
+		constexpr inline copy_type operator<<(const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorShiftLeft<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
 		}
 
 		template<typename Rhs_>
-		[[nodiscard]] constexpr inline copy_type operator>>(const Rhs_& rhs_) const
+		constexpr inline copy_type operator>>(const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorShiftRight<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
 		}
@@ -935,14 +908,14 @@ namespace EmuMath
 		/// <typeparam name="MagFloatingPointType_">Type of floating-point to calculate the magnitude as and use for arithmetic in normalisation. Defaults to float.</typeparam>
 		/// <returns>Normalised form of this vector.</returns>
 		template
-		<
+			<
 			typename out_floating_point_contained_type = preferred_floating_point,
 			typename MagFloatingPointType_ = out_floating_point_contained_type,
 			std::size_t NumNewtonIterations_ = 1,
 			std::int32_t MagicConstant_ = 0x5F3759DF,
 			class Vector_
-		>
-		[[nodiscard]] inline EmuMath::Vector<size, out_floating_point_contained_type> NormaliseQrsqrt() const
+			>
+			[[nodiscard]] inline EmuMath::Vector<size, out_floating_point_contained_type> NormaliseQrsqrt() const
 		{
 			return EmuMath::Helpers::VectorNormaliseQrsqrt<out_floating_point_contained_type, MagFloatingPointType_, NumNewtonIterations_, MagicConstant_, this_type>(*this);
 		}
@@ -999,39 +972,6 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Distance(const TargetVector_& target_) const
 		{
 			return EmuMath::Helpers::VectorDistance<OutSize_, out_contained_type, this_type, TargetVector_>(*this, target_);
-		}
-
-		/// <summary>
-		/// <para> Calculates the 3D cross product of this vector and b_, where this vector is a_, using the provided template indices as the X, Y, and Z for A and B. </para>
-		/// <para> The provided indices default to the logical x, y, and z components of both A and B, but may be modified to refer to different areas of the vectors. </para>
-		/// <para> 
-		///		Unless explicitly stated otherwise, the indices for B will mimic those of A. 
-		///		As such, providing custom indices for A will implicitly provide the same indices for B, unless additional indices are explicitly provided for B.
-		/// </para>
-		/// <para> The end vector can be summarised as: </para>
-		///	<para> [0] = (a_[AY_] * b_[BZ_]) - (a_[AZ_] * b_[BY_]) </para>
-		/// <para> [1] = (a_[AZ_] * b_[BX_]) - (a_[AX_] * b_[BZ_]) </para>
-		/// <para> [2] = (a_[AX_] * b_[BY_]) - (a_[AY_] * b_[BX_]) </para>
-		/// </summary>
-		/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
-		/// <typeparam name="VectorB_">Type of vector representing b_ in the above formulae.</typeparam>
-		/// <param name="b_">EmuMath vector representing b_ in the above formulae.</param>
-		/// <returns>Cross product of this vector and the passed vector b_, using the provided indices for 3 elements from each of the respective vectors.</returns>
-		template
-		<
-			std::size_t AX_ = 0,
-			std::size_t AY_ = 1,
-			std::size_t AZ_ = 2,
-			std::size_t BX_ = AX_,
-			std::size_t BY_ = AY_,
-			std::size_t BZ_ = AZ_,
-			std::size_t OutSize_ = 3,
-			typename out_contained_type = preferred_floating_point,
-			class VectorB_
-		>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> CrossProduct3D(const VectorB_& b_) const
-		{
-			return EmuMath::Helpers::VectorCrossProduct3D<AX_, AY_, AZ_, BX_, BY_, BZ_, OutSize_, out_contained_type, this_type, VectorB_>(*this, b_);
 		}
 #pragma endregion
 
@@ -1431,12 +1371,52 @@ namespace EmuMath
 		}
 #pragma endregion
 
-	private:
-		/// <summary> The type used to store this vector's data. </summary>
-		using data_storage_type = std::array<contained_type, size>;
+		/// <summary> Element 0 within this vector. </summary>
+		contained_type x;
+		/// <summary> Element 1 within this vector. </summary>
+		contained_type y;
 
-		/// <summary> Contiguous data stored within this matrix. </summary>
-		data_storage_type data_;
+	private:
+		template<std::size_t Index_>
+		constexpr inline contained_type& _get_index()
+		{
+			if constexpr (Index_ == 0)
+			{
+				return x;
+			}
+			else if constexpr (Index_ == 1)
+			{
+				return y;
+			}
+			else
+			{
+				static_assert(false, "Attempted to retrieve data from an EmuMath vector using an out-of-range index.");
+			}
+		}
+		template<std::size_t Index_>
+		constexpr inline const contained_type& _get_index() const
+		{
+			if constexpr (Index_ == 0)
+			{
+				return x;
+			}
+			else if constexpr (Index_ == 1)
+			{
+				return y;
+			}
+			else
+			{
+				static_assert(false, "Attempted to retrieve data from an EmuMath vector using an out-of-range index.");
+			}
+		}
+		constexpr inline contained_type& _get_index(const std::size_t index_)
+		{
+			return *(data() + index_);
+		}
+		constexpr inline const contained_type& _get_index(const std::size_t index_) const
+		{
+			return *(data() + index_);
+		}
 
 		template<std::size_t Index_, typename In_>
 		constexpr inline void _set_data_at_index(In_& in_)
@@ -1448,13 +1428,13 @@ namespace EmuMath
 					if constexpr (contains_const_reference_wrappers)
 					{
 						// May set any type of reference to a const since non-const will be implicitly interpreted as const in such contexts
-						data_[Index_] = contained_type(in_);
+						_get_index<Index_>() = contained_type(in_);
 					}
 					else
 					{
 						if constexpr (!std::is_const_v<In_>)
 						{
-							data_[Index_] = contained_type(in_);
+							_get_index<Index_>() = contained_type(in_);
 						}
 						else
 						{
@@ -1464,7 +1444,7 @@ namespace EmuMath
 				}
 				else
 				{
-					data_[Index_] = static_cast<contained_type>(in_);
+					_get_index<Index_>() = static_cast<contained_type>(in_);
 				}
 			}
 			else
@@ -1482,13 +1462,13 @@ namespace EmuMath
 					if constexpr (contains_const_reference_wrappers)
 					{
 						// May set any type of reference to a const since non-const will be implicitly interpreted as const in such contexts
-						data_[index_] = contained_type(in_);
+						_get_index(index_) = contained_type(in_);
 					}
 					else
 					{
 						if constexpr (!std::is_const_v<In_>)
 						{
-							data_[index_] = contained_type(in_);
+							_get_index(index_) = contained_type(in_);
 						}
 						else
 						{
@@ -1503,21 +1483,15 @@ namespace EmuMath
 			}
 			else
 			{
-				data_[index_] = static_cast<contained_type>(in_);
+				_get_index(index_) = static_cast<contained_type>(in_);
 			}
 		}
 	};
-}
 
-template<std::size_t Size_, typename T_>
-inline std::ostream& operator<<(std::ostream& stream_, const EmuMath::Vector<Size_, T_>& vector_)
-{
-	return EmuMath::Helpers::_underlying_vector_funcs::_append_vector_to_stream(stream_, vector_);
-}
-template<std::size_t Size_, typename T_>
-inline std::wostream& operator<<(std::wostream& stream_, const EmuMath::Vector<Size_, T_>& vector_)
-{
-	return EmuMath::Helpers::_underlying_vector_funcs::_append_vector_to_wide_stream(stream_, vector_);
+	/// <summary> Alias shorthand for creating an EmuMath vector containing 2 elements. Specialised to provide some syntactic sugar, such as named axis elements. </summary>
+	/// <typeparam name="T_">Type to be contained within the vector.</typeparam>
+	template<typename T_>
+	using Vector2 = EmuMath::Vector<2, T_>;
 }
 
 #endif
