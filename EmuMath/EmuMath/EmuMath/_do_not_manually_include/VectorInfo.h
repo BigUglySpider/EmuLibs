@@ -36,6 +36,7 @@ namespace EmuMath::_underlying_components
 
 		static constexpr bool has_integral_elements = std::is_integral_v<std::remove_cv_t<value_type>>;
 		static constexpr bool has_floating_point_elements = std::is_floating_point_v<std::remove_cv_t<value_type>>;
+		static constexpr bool has_const_values = std::is_const_v<raw_value_type>;
 	};
 }
 

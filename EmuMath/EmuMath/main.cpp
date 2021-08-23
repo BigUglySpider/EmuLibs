@@ -171,7 +171,14 @@ int main()
 	EmuMath::ConstRefVector<7, float> const_ref_(EmuMath::Helpers::VectorShuffledReference<0, 1, 0, 1, 0, 1, 0>(a_norm_nonconst_ref));
 	std::cout << "Another, constant reference: " << const_ref_ << "\n";
 	a_norm_nonconst_ref.at<1>() = 1337.0f;
-	std::cout << const_ref_ << "\n";
+	std::cout << const_ref_ << "\n\n\n";
+
+	auto bigBoiRef = a_norm_nonconst_ref.ShuffledReference<0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1>();
+	std::cout << bigBoiRef << "\n";
+	bigBoiRef = bigBoiRef.ClampMin(50000);
+	std::cout << bigBoiRef << "\n";
+	bigBoiRef.at<0>() = 42;
+	std::cout << bigBoiRef << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

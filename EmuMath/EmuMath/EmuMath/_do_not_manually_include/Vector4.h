@@ -232,7 +232,14 @@ namespace EmuMath
 		template<class ToCopy_>
 		constexpr inline this_type& operator=(const ToCopy_& toCopy_)
 		{
-			return EmuMath::Helpers::VectorCopy(*this, toCopy_);
+			if constexpr (!vector_info::has_const_values)
+			{
+				return EmuMath::Helpers::VectorCopy(*this, toCopy_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to set the data of an EmuMath vector which contains constant values via operator=.");
+			}
 		}
 
 		template<class RhsVector_>
@@ -296,6 +303,36 @@ namespace EmuMath
 		{
 			(*this) = EmuMath::Helpers::VectorShiftLeft(*this, rhs_);
 			return *this;
+		}
+#pragma endregion
+
+#pragma region PERMUTATIONS
+		template<std::size_t X_, std::size_t...RemainingShuffleIndices_>
+		constexpr EmuMath::Vector<sizeof...(RemainingShuffleIndices_) + 1, value_type> Shuffle() const
+		{
+			return EmuMath::Helpers::VectorShuffle<value_type, X_, RemainingShuffleIndices_...>(*this);
+		}
+		template<typename out_contained_type, std::size_t X_, std::size_t...RemainingShuffleIndices_>
+		constexpr EmuMath::Vector<sizeof...(RemainingShuffleIndices_) + 1, out_contained_type> Shuffle() const
+		{
+			return EmuMath::Helpers::VectorShuffle<out_contained_type, X_, RemainingShuffleIndices_...>(*this);
+		}
+
+		template<std::size_t X_, std::size_t...RemainingShuffleIndices_>
+		[[nodiscard]] constexpr inline EmuMath::ConstRefVector<sizeof...(RemainingShuffleIndices_) + 1, value_type> ShuffledConstReference() const
+		{
+			return EmuMath::Helpers::VectorShuffledConstReference<X_, RemainingShuffleIndices_...>(*this);
+		}
+
+		template<std::size_t X_, std::size_t...RemainingShuffleIndices_>
+		[[nodiscard]] constexpr inline EmuMath::RefVector<sizeof...(RemainingShuffleIndices_) + 1, value_type> ShuffledReference()
+		{
+			return EmuMath::Helpers::VectorShuffledReference<X_, RemainingShuffleIndices_...>(*this);
+		}
+		template<std::size_t X_, std::size_t...RemainingShuffleIndices_>
+		[[nodiscard]] constexpr inline EmuMath::ConstRefVector<sizeof...(RemainingShuffleIndices_) + 1, value_type> ShuffledReference() const
+		{
+			return EmuMath::Helpers::VectorShuffledReference<X_, RemainingShuffleIndices_...>(*this);
 		}
 #pragma endregion
 
