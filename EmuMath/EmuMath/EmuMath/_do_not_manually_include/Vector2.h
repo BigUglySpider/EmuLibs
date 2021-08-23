@@ -243,64 +243,127 @@ namespace EmuMath
 		template<class RhsVector_>
 		constexpr inline this_type& operator+=(const RhsVector_& rhs_)
 		{
-			(*this) = EmuMath::Helpers::VectorAdd(*this, rhs_);
-			return *this;
+			if constexpr (!vector_info::has_const_values)
+			{
+				(*this) = EmuMath::Helpers::VectorAdd(*this, rhs_);
+				return *this;
+			}
+			else
+			{
+				static_assert(false, "Attempted to set the data of an EmuMath vector which contains constant values via operator+=.");
+			}
 		}
 
 		template<class RhsVector_>
 		constexpr inline this_type& operator-=(const RhsVector_& rhs_)
 		{
-			(*this) = EmuMath::Helpers::VectorSubtract(*this, rhs_);
-			return *this;
+			if constexpr (!vector_info::has_const_values)
+			{
+				(*this) = EmuMath::Helpers::VectorSubtract(*this, rhs_);
+				return *this;
+			}
+			else
+			{
+				static_assert(false, "Attempted to set the data of an EmuMath vector which contains constant values via operator-=.");
+			}
 		}
 
 		template<class Rhs_>
 		constexpr inline this_type& operator*=(const Rhs_& rhs_)
 		{
-			(*this) = EmuMath::Helpers::VectorMultiply(*this, rhs_);
-			return *this;
+			if constexpr (!vector_info::has_const_values)
+			{
+				(*this) = EmuMath::Helpers::VectorMultiply(*this, rhs_);
+				return *this;
+			}
+			else
+			{
+				static_assert(false, "Attempted to set the data of an EmuMath vector which contains constant values via operator*=.");
+			}
 		}
 
 		template<class Rhs_>
 		constexpr inline this_type& operator/=(const Rhs_& rhs_)
 		{
-			(*this) = EmuMath::Helpers::VectorDivide(*this, rhs_);
-			return *this;
+			if constexpr (!vector_info::has_const_values)
+			{
+				(*this) = EmuMath::Helpers::VectorDivide(*this, rhs_);
+				return *this;
+			}
+			else
+			{
+				static_assert(false, "Attempted to set the data of an EmuMath vector which contains constant values via operator/=.");
+			}
 		}
 
 		template<class Rhs_>
 		constexpr inline this_type& operator&=(const Rhs_& rhs_)
 		{
-			(*this) = EmuMath::Helpers::VectorAnd(*this, rhs_);
-			return *this;
+			if constexpr (!vector_info::has_const_values)
+			{
+				(*this) = EmuMath::Helpers::VectorAnd(*this, rhs_);
+				return *this;
+			}
+			else
+			{
+				static_assert(false, "Attempted to set the data of an EmuMath vector which contains constant values via operator&=.");
+			}
 		}
 
 		template<class Rhs_>
 		constexpr inline this_type& operator|=(const Rhs_& rhs_)
 		{
-			(*this) = EmuMath::Helpers::VectorOr(*this, rhs_);
-			return *this;
+			if constexpr (!vector_info::has_const_values)
+			{
+				(*this) = EmuMath::Helpers::VectorOr(*this, rhs_);
+				return *this;
+			}
+			else
+			{
+				static_assert(false, "Attempted to set the data of an EmuMath vector which contains constant values via operator|=.");
+			}
 		}
 
 		template<class Rhs_>
 		constexpr inline this_type& operator^=(const Rhs_& rhs_)
 		{
-			(*this) = EmuMath::Helpers::VectorXor(*this, rhs_);
-			return *this;
+			if constexpr (!vector_info::has_const_values)
+			{
+				(*this) = EmuMath::Helpers::VectorXor(*this, rhs_);
+				return *this;
+			}
+			else
+			{
+				static_assert(false, "Attempted to set the data of an EmuMath vector which contains constant values via operator^=.");
+			}
 		}
 
 		template<class Rhs_>
 		constexpr inline this_type& operator<<=(const Rhs_& rhs_)
 		{
-			(*this) = EmuMath::Helpers::VectorShiftLeft(*this, rhs_);
-			return *this;
+			if constexpr (!vector_info::has_const_values)
+			{
+				(*this) = EmuMath::Helpers::VectorShiftLeft(*this, rhs_);
+				return *this;
+			}
+			else
+			{
+				static_assert(false, "Attempted to set the data of an EmuMath vector which contains constant values via operator<<=.");
+			}
 		}
 
 		template<class Rhs_>
 		constexpr inline this_type& operator>>=(const Rhs_& rhs_)
 		{
-			(*this) = EmuMath::Helpers::VectorShiftLeft(*this, rhs_);
-			return *this;
+			if constexpr (!vector_info::has_const_values)
+			{
+				(*this) = EmuMath::Helpers::VectorShiftLeft(*this, rhs_);
+				return *this;
+			}
+			else
+			{
+				static_assert(false, "Attempted to set the data of an EmuMath vector which contains constant values via operator>>=.");
+			}
 		}
 #pragma endregion
 
