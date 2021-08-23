@@ -121,6 +121,18 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::VectorCopy<this_type, ToCopy_>(*this, toCopy_);
 		}
+
+		template<typename In_>
+		constexpr inline void Set(In_& in_)
+		{
+			EmuMath::Helpers::VectorSet<this_type, In_>(*this, in_);
+		}
+		template<typename In_>
+		constexpr inline void Set(const In_& in_)
+		{
+			EmuMath::Helpers::VectorSet<this_type, const In_>(*this, in_);
+		}
+
 #pragma endregion
 
 #pragma region CONST_OPERATORS
@@ -966,7 +978,7 @@ namespace EmuMath
 						}
 						else
 						{
-							static_assert(false, "Attempted to set a non-const-reference-containing EmuMath vector's data via constant data. If a copy is intended, use vector.at<Index_> = in_.");
+							static_assert(false, "Attempted to set a non-const-reference-containing EmuMath vector's data via constant data. If a copy is intended, use vector.at<Index_>() = in_.");
 						}
 					}
 				}
@@ -1000,13 +1012,13 @@ namespace EmuMath
 						}
 						else
 						{
-							static_assert(false, "Attempted to set a non-const-reference-containing EmuMath vector's data via constant data. If a copy is intended, use vector.at<Index_> = in_.");
+							static_assert(false, "Attempted to set a non-const-reference-containing EmuMath vector's data via constant data. If a copy is intended, use vector.at<Index_>() = in_.");
 						}
 					}
 				}
 				else
 				{
-					static_assert(false, "Attempted to set the references contained within an EmuMath vector via a non-reference type. If a copy is intended, use vector.at<Index_> = in_.");
+					static_assert(false, "Attempted to set the references contained within an EmuMath vector via a non-reference type. If a copy is intended, use vector.at<Index_>() = in_.");
 				}
 			}
 			else

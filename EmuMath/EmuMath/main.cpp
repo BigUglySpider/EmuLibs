@@ -178,7 +178,13 @@ int main()
 	bigBoiRef = bigBoiRef.ClampMin(50000);
 	std::cout << bigBoiRef << "\n";
 	bigBoiRef.at<0>() = 42;
-	std::cout << bigBoiRef << "\n";
+	std::cout << bigBoiRef << "\n\n\n";
+
+	std::cout << a_norm_nonconst_ref << "\n";
+	a_norm_nonconst_ref.Set(bigBoiRef);
+	std::cout << a_norm_nonconst_ref << "\n";
+	bigBoiRef.at<1>() = 42424242.0f;
+	std::cout << a_norm_nonconst_ref << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

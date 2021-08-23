@@ -34,8 +34,11 @@ namespace EmuMath::_underlying_components
 		/// <summary> The number of elements contained in this vector. </summary>
 		static constexpr std::size_t size = Size_;
 
+		/// <summary> Boolean indcating if this vector's values are integral. </summary>
 		static constexpr bool has_integral_elements = std::is_integral_v<std::remove_cv_t<value_type>>;
+		/// <summary> Boolean indcating if this vector's values are floating-points. </summary>
 		static constexpr bool has_floating_point_elements = std::is_floating_point_v<std::remove_cv_t<value_type>>;
+		/// <summary> Boolean indicating if this vector's values are constant. </summary>
 		static constexpr bool has_const_values = std::is_const_v<raw_value_type>;
 	};
 }
