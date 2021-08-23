@@ -186,8 +186,6 @@ int main()
 	bigBoiRef.at<1>() = 42424242.0f;
 	std::cout << a_norm_nonconst_ref << "\n";
 
-
-
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();

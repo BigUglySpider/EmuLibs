@@ -1247,6 +1247,103 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region BITWISE
+		/// <summary>
+		/// <para> Shifts each element in this vector to the left the specified number of times, outputting the results in a new vector. </para>
+		/// <para>
+		///		The passed num_shifts_ may be a scalar type or an EmuMath vector. 
+		///		If it is an EmuMath vector, shifts for each element will be performed a number of times equal to the value in the respective index of this vector. 
+		///		Otherwise, all elements will be shifted by this value.
+		/// </para>
+		/// <para> This function uses an instantiation of EmuCore::do_left_shift&lt;this_vector::value_type, Shifts_&gt; to perform each shift. </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
+		/// <typeparam name="Shifts_">Scalar type or EmuMath vector used to represent the number of shifts.</typeparam>
+		/// <param name="num_shifts_">Scalar or EmuMath vector representing the number of shifts to apply to every element or to each respective element.</param>
+		/// <returns>Result of left-shifting the elements of this vector the specified number of times in num_shifts_.</returns>
+		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Shifts_>
+		constexpr inline EmuMath::Vector<OutSize_, out_contained_type> ShiftLeft(const Shifts_& num_shifts_) const
+		{
+			return EmuMath::Helpers::VectorShiftLeft<OutSize_, out_contained_type, this_type, Shifts_>(*this, num_shifts_);
+		}
+
+		/// <summary>
+		/// <para> Shifts each element in this vector to the right the specified number of times, outputting the results in a new vector. </para>
+		/// <para>
+		///		The passed num_shifts_ may be a scalar type or an EmuMath vector. 
+		///		If it is an EmuMath vector, shifts for each element will be performed a number of times equal to the value in the respective index of this vector. 
+		///		Otherwise, all elements will be shifted by this value.
+		/// </para>
+		/// <para> This function uses an instantiation of EmuCore::do_right_shift&lt;this_vector::value_type, Shifts_&gt; to perform each shift. </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
+		/// <typeparam name="Shifts_">Scalar type or EmuMath vector used to represent the number of shifts.</typeparam>
+		/// <param name="num_shifts_">Scalar or EmuMath vector representing the number of shifts to apply to every element or to each respective element.</param>
+		/// <returns>Result of right-shifting the elements of this vector the specified number of times in num_shifts_.</returns>
+		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Shifts_>
+		constexpr inline EmuMath::Vector<OutSize_, out_contained_type> ShiftRight(const Shifts_& num_shifts_) const
+		{
+			return EmuMath::Helpers::VectorShiftRight<OutSize_, out_contained_type, this_type, Shifts_>(*this, num_shifts_);
+		}
+
+		/// <summary>
+		/// <para> Perform a bitwise AND on all elements of this vector with rhs_, depending on the type rhs_ is passed as. </para>
+		/// <para> If rhs_ is an EmuMath vector, respective elements will be ANDed, otherwise all elements in this vector will be ANDed with the value of rhs_ itself. </para>
+		/// <para> This operation is carried out by EmuCore::do_bitwise_and&lt;this_vector::value_type, Rhs_::value_type (or just Rhs_ if not a vector)&gt;. </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
+		/// <typeparam name="Rhs_">Type of vector or scalar appearing the the right-hand side of AND operations.</typeparam>
+		/// <param name="rhs_">EmuMath vector or scalar appearing on the right-hand side of AND operations.</param>
+		/// <returns>EmuMath vector containing the results of bitwise ANDing this vector with the passed rhs_.</returns>
+		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Rhs_>
+		constexpr inline EmuMath::Vector<OutSize_, out_contained_type> And(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorAnd<OutSize_, out_contained_type, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Perform a bitwise OR on all elements of this vector with rhs_, depending on the type rhs_ is passed as. </para>
+		/// <para> If rhs_ is an EmuMath vector, respective elements will be ORed, otherwise all elements in this vector will be ORed with the value of rhs_ itself. </para>
+		/// <para> This operation is carried out by EmuCore::do_bitwise_or&lt;this_vector::value_type, Rhs_::value_type (or just Rhs_ if not a vector)&gt;. </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
+		/// <typeparam name="Rhs_">Type of vector or scalar appearing the the right-hand side of OR operations.</typeparam>
+		/// <param name="rhs_">EmuMath vector or scalar appearing on the right-hand side of OR operations.</param>
+		/// <returns>EmuMath vector containing the results of bitwise ORing this vector with the passed rhs_.</returns>
+		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Rhs_>
+		constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Or(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorOr<OutSize_, out_contained_type, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Perform a bitwise XOR on all elements of this vector with rhs_, depending on the type rhs_ is passed as. </para>
+		/// <para> If rhs_ is an EmuMath vector, respective elements will be XORed, otherwise all elements in this vector will be ORed with the value of rhs_ itself. </para>
+		/// <para> This operation is carried out by EmuCore::do_bitwise_xor&lt;this_vector::value_type, Rhs_::value_type (or just Rhs_ if not a vector)&gt;. </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
+		/// <typeparam name="Rhs_">Type of vector or scalar appearing the the right-hand side of XOR operations.</typeparam>
+		/// <param name="rhs_">EmuMath vector or scalar appearing on the right-hand side of XOR operations.</param>
+		/// <returns>EmuMath vector containing the results of bitwise XORing this vector with the passed rhs_.</returns>
+		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Rhs_>
+		constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Xor(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorXor<OutSize_, out_contained_type, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Performs a bitwise NOT on all elements within this vector and outputs the results in the return vector. </para>
+		/// <para> This operation is carried out by EmuCore::do_bitwise_not&lt;this_vector::value_type&gt;. </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
+		/// <returns>EmuMath vector containing the results of the bitwise NOT operation on this vector_.</returns>
+		template<std::size_t OutSize_ = size, typename out_contained_type = value_type>
+		constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Not() const
+		{
+			return EmuMath::Helpers::VectorNot<OutSize_, out_contained_type, this_type>(*this);
+		}
+#pragma endregion
+
 		/// <summary> Element 0 within this vector. </summary>
 		contained_type x;
 		/// <summary> Element 1 within this vector. </summary>
