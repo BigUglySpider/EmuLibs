@@ -1345,6 +1345,33 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region CONVERSIONS
+		/// <summary>
+		///	Boolean interpretation of this vector. 
+		///	As the all-zero vector is considered the fully default constructed vector, this will be true if at least 1 element is not equal to a default value_type.
+		/// </summary>
+		explicit constexpr inline operator bool() const
+		{
+			return EmuMath::Helpers::VectorCmpAnyNotEqualTo<true, this_type, value_type>(*this, value_type());
+		}
+		/// <summary>
+		///	Vectorwise boolean interpretation of this vector. 
+		/// As the zero of this vector is considered the default constructed value_type, an index will be true if it's respective element is not equal to a default value_type.
+		/// </summary>
+		explicit constexpr inline operator EmuMath::Vector<size, bool>() const
+		{
+			return EmuMath::Helpers::VectorPerElementCmpNotEqualTo<size, bool, this_type, value_type>(*this, value_type());
+		}
+		/// <summary>
+		///	Inversion of this vector's bool cast. As such, this will only be true if all values within this vactor are equal to its default-constructed value_type.
+		/// </summary>
+		/// <returns>True if all elements of this vector are equal to a default-constructed value_type, otherwise false.</returns>
+		constexpr inline bool operator!() const
+		{
+			return !static_cast<bool>(*this);
+		}
+#pragma endregion
+
 		/// <summary> Element 0 within this vector. </summary>
 		contained_type x;
 		/// <summary> Element 1 within this vector. </summary>

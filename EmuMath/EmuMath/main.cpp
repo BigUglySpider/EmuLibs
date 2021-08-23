@@ -45,6 +45,11 @@ struct SettyBoi
 	}
 };
 
+bool boolfunc(bool bool_)
+{
+	return bool(bool_);
+}
+
 int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
@@ -185,6 +190,9 @@ int main()
 	std::cout << a_norm_nonconst_ref << "\n";
 	bigBoiRef.at<1>() = 42424242.0f;
 	std::cout << a_norm_nonconst_ref << "\n";
+	
+	std::cout << static_cast<bool>(bigBoiRef) << " | " << !bigBoiRef << "\n";
+
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
