@@ -724,63 +724,78 @@ namespace EmuMath::Helpers
 	/// <typeparam name="Vector_">Type of vector to find the lowest value of.</typeparam>
 	/// <param name="vector_">EmuMath vector to find the lowest value of.</param>
 	/// <returns>Copy of the lowest value within the passed vector.</returns>
-	template<class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::value_type VectorMin(const Vector_& vector_)
+	template<typename OutT_, class Vector_>
+	[[nodiscard]] constexpr inline OutT_ VectorMin(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_find_vector_min<Vector_>(vector_);
+			return _underlying_vector_funcs::_find_vector_min<Vector_, OutT_>>(vector_);
 		}
 		else
 		{
 			static_assert(false, "Attempted to get the lowest value within an EmuMath vector, but provided a non-EmuMath-vector argument.");
 		}
 	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline typename Vector_::value_type VectorMin(const Vector_& vector_)
+	{
+		return VectorMin<typename Vector_::value_type, Vector_>(vector_);
+	}
 
 	/// <summary> Returns a copy of the highest value within the passed EmuMath vector. </summary>
 	/// <typeparam name="Vector_">Type of vector to find the highest value of.</typeparam>
 	/// <param name="vector_">EmuMath vector to find the highest value of.</param>
 	/// <returns>Copy of the highest value within the passed vector.</returns>
-	template<class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::value_type VectorMax(const Vector_& vector_)
+	template<typename OutT_, class Vector_>
+	[[nodiscard]] constexpr inline typename OutT_ VectorMax(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_find_vector_max<Vector_>(vector_);
+			return _underlying_vector_funcs::_find_vector_max<Vector_, OutT_>(vector_);
 		}
 		else
 		{
 			static_assert(false, "Attempted to get the highest value within an EmuMath vector, but provided a non-EmuMath-vector argument.");
 		}
 	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline typename Vector_::value_type VectorMax(const Vector_& vector_)
+	{
+		return VectorMax<typename Vector_::value_type, Vector_>(vector_);
+	}
 
 	/// <summary> Returns a vector containing a copy of the passed vector's lowest and highest values at indices 0 and 1, respectively. </summary>
 	/// <typeparam name="Vector_">Type of vector to find the lowest and highest values of.</typeparam>
 	/// <param name="vector_">EmuMath vector to find the lowest and highest values of.</param>
 	/// <returns>EmuMath vector containing 2 elements; index 0 is a copy of the lowest value of the passed vector, and index 1 is a copy of the highest value.</returns>
-	template<class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<2, typename Vector_::value_type> VectorMinMax(const Vector_& vector_)
+	template<typename OutT_, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<2, OutT_> VectorMinMax(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_find_vector_min_max<Vector_>(vector_);
+			return _underlying_vector_funcs::_find_vector_min_max<Vector_, OutT_>(vector_);
 		}
 		else
 		{
 			static_assert(false, "Attempted to get the lowest and highest values within an EmuMath vector, but provided a non-EmuMath-vector argument.");
 		}
 	}
+	template<class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<2, typename Vector_::value_type> VectorMinMax(const Vector_& vector_)
+	{
+		return VectorMinMax<typename Vector_::value_type, Vector_>(vector_);
+	}
 	/// <summary> Finds the lowest and highest values within the passed vector, and outputs copies of them via the passed min_ and max_ arguments respectively. </summary>
 	/// <typeparam name="Vector_">Type of vector to find the lowest and highest values of.</typeparam>
 	/// <param name="vector_">EmuMath vector to find the lowest and highest values of.</param>
 	/// <param name="min_">Reference to output a copy of the lowest value to.</param>
 	/// <param name="max_">Reference to output a copy of the highest value to.</param>
-	template<class Vector_>
-	constexpr inline void VectorMinMax(const Vector_& vector_, typename Vector_::value_type& min_, typename Vector_::value_type& max_)
+	template<typename OutMin_, typename OutMax_, class Vector_>
+	constexpr inline void VectorMinMax(const Vector_& vector_, typename OutMin_& min_, typename OutMax_& max_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			_underlying_vector_funcs::_find_vector_min_max<Vector_>(vector_, min_, max_);
+			_underlying_vector_funcs::_find_vector_min_max<Vector_, OutMin_, OutMax_>(vector_, min_, max_);
 		}
 		else
 		{
@@ -1188,7 +1203,7 @@ namespace EmuMath::Helpers
 	///		and returns a value of out_value_type or which may be cast to out_value_type.
 	/// </param>
 	/// <returns>Vector containing the results of the mutation of the passed vector_ via the passed func_.</returns>
-	template<std::size_t OutSize_, typename out_contained_type, class Vector_, class Func_>
+	template<std::size_t OutSize_, typename out_contained_type, class Func_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMutate(const Vector_& vector_, Func_ func_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
@@ -1200,40 +1215,40 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to perform a mutation on a vector, but provided a non-EmuMath-vector type.");
 		}
 	}
-	template<std::size_t OutSize_, typename out_contained_type, class Vector_, class Func_>
+	template<std::size_t OutSize_, typename out_contained_type, class Func_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMutate(const Vector_& vector_)
 	{
-		return VectorMutate<OutSize_, out_contained_type, Vector_, Func_>(vector_, Func_());
+		return VectorMutate<OutSize_, out_contained_type, Func_, Vector_>(vector_, Func_());
 	}
-	template<typename out_contained_type, class Vector_, class Func_>
+	template<typename out_contained_type, class Func_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorMutate(const Vector_& vector_, Func_ func_)
 	{
-		return VectorMutate<Vector_::size, out_contained_type, Vector_, Func_&>(vector_, func_);
+		return VectorMutate<Vector_::size, out_contained_type, Func_&, Vector_>(vector_, func_);
 	}
-	template<std::size_t OutSize_, class Vector_, class Func_>
+	template<std::size_t OutSize_, class Func_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorMutate(const Vector_& vector_, Func_ func_)
 	{
-		return VectorMutate<OutSize_, typename Vector_::value_type, Vector_, Func_&>(vector_, func_);
+		return VectorMutate<OutSize_, typename Vector_::value_type, Func_&, Vector_>(vector_, func_);
 	}
-	template<class Vector_, class Func_>
+	template<class Func_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorMutate(const Vector_& vector_, Func_ func_)
 	{
-		return VectorMutate<Vector_::size, typename Vector_::value_type, Vector_, Func_&>(vector_, func_);
+		return VectorMutate<Vector_::size, typename Vector_::value_type, Func_&, Vector_>(vector_, func_);
 	}
-	template<typename out_contained_type, class Vector_, class Func_>
+	template<typename out_contained_type, class Func_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorMutate(const Vector_& vector_)
 	{
-		return VectorMutate<Vector_::size, out_contained_type, Vector_, Func_>(vector_, Func_());
+		return VectorMutate<Vector_::size, out_contained_type, Func_, Vector_>(vector_, Func_());
 	}
-	template<std::size_t OutSize_, class Vector_, class Func_>
+	template<std::size_t OutSize_, class Func_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorMutate(const Vector_& vector_)
 	{
-		return VectorMutate<OutSize_, typename Vector_::value_type, Vector_, Func_>(vector_, Func_());
+		return VectorMutate<OutSize_, typename Vector_::value_type, Func_, Vector_>(vector_, Func_());
 	}
-	template<class Vector_, class Func_>
+	template<class Func_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorMutate(const Vector_& vector_)
 	{
-		return VectorMutate<Vector_::size, typename Vector_::value_type, Vector_, Func_>(vector_, Func_());
+		return VectorMutate<Vector_::size, typename Vector_::value_type, Func_, Vector_>(vector_, Func_());
 	}
 
 	/// <summary>
@@ -1384,12 +1399,12 @@ namespace EmuMath::Helpers
 	template<std::size_t OutSize_, class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorSqrtConstexpr(const Vector_& vector_)
 	{
-		return VectorSqrtConstexpr<OutSize_, typename Vector_::value_type, Vector_>(vector_);
+		return VectorSqrtConstexpr<OutSize_, typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 	template<class Vector_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorSqrtConstexpr(const Vector_& vector_)
 	{
-		return VectorSqrtConstexpr<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
+		return VectorSqrtConstexpr<Vector_::size, typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 
 	/// <summary>
@@ -1543,7 +1558,14 @@ namespace EmuMath::Helpers
 	/// <typeparam name="Vector_">Type of vector to return a normalised copy of.</typeparam>
 	/// <param name="vector_">EmuMath vector to calculate the normalised form of.</param>
 	/// <returns>Copy of the passed EmuMath vector with its elements normalised via the result of using Q_rsqrt to find the magnitude's reciprocal.</returns>
-	template<typename out_floating_point_contained_type, typename MagFloatingPointType_, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, class Vector_>
+	template
+	<
+		typename out_floating_point_contained_type,
+		typename MagFloatingPointType_,
+		std::size_t NumNewtonIterations_ = 1,
+		std::int32_t MagicConstant_ = 0x5F3759DF,
+		class Vector_
+	>
 	[[nodiscard]] inline typename EmuMath::Vector<Vector_::size, out_floating_point_contained_type> VectorNormaliseQrsqrt(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
