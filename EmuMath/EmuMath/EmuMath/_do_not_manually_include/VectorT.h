@@ -37,10 +37,14 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONSTRUCTORS
-		constexpr Vector() : data()
+		constexpr Vector() : data_()
 		{
 		}
-		constexpr Vector(const this_type& toCopy_) : data(toCopy_.data)
+		constexpr Vector(const this_type& toCopy_) : data_(toCopy_.data_)
+		{
+		}
+		template<typename Dummy_ = std::enable_if_t<!std::is_same_v<this_type, copy_type>>>
+		constexpr Vector(const copy_type& toCopy_) : data_(toCopy_.data_)
 		{
 		}
 		template<std::size_t ToCopySize_, typename ToCopyValueType_>
@@ -61,7 +65,7 @@ namespace EmuMath
 		/// <typeparam name="RequiresArgumentCountEqualToSize">Dummy parameter used to make use of std::enable_if.</typeparam>
 		/// <param name="contiguousData_">Arguments to create this vector's elements, in contiguous order from the 0th-(size - 1)th element in this vector.</param>
 		template<typename...Args, typename RequiresArgumentCountEqualToSize = std::enable_if_t<sizeof...(Args) == size>>
-		constexpr Vector(Args&&...contiguousData_) : data({ static_cast<contained_type>(std::forward<Args>(contiguousData_))... })
+		constexpr Vector(Args&&...contiguousData_) : data_({ static_cast<contained_type>(std::forward<Args>(contiguousData_))... })
 		{
 			static_assert(sizeof...(Args) == size, "Provided an amount of arguments to an EmuMath Vector constructor that is not equal to the number of elements in the Vector.");
 			static_assert
@@ -78,7 +82,7 @@ namespace EmuMath
 		{
 			if constexpr (Index_ < size)
 			{
-				return std::get<Index_>(data);
+				return std::get<Index_>(data_);
 			}
 			else
 			{
@@ -90,7 +94,7 @@ namespace EmuMath
 		{
 			if constexpr (Index_ < size)
 			{
-				return std::get<Index_>(data);
+				return std::get<Index_>(data_);
 			}
 			else
 			{
@@ -99,11 +103,11 @@ namespace EmuMath
 		}
 		[[nodiscard]] constexpr inline raw_value_type& at(const std::size_t index_)
 		{
-			return data[index_];
+			return data_[index_];
 		}
 		[[nodiscard]] constexpr inline const raw_value_type& at(const std::size_t index_) const
 		{
-			return data[index_];
+			return data_[index_];
 		}
 		[[nodiscard]] constexpr inline raw_value_type& operator[](const std::size_t index_)
 		{
@@ -112,6 +116,17 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline const raw_value_type& operator[](const std::size_t index_) const
 		{
 			return this->at(index_);
+		}
+
+		/// <summary> Provides a pointer to the start of this vector's data (i.e. the memory location of the start of element 0). </summary>
+		[[nodiscard]] constexpr inline contained_type* data()
+		{
+			return data_.data();
+		}
+		/// <summary> Provides a constant pointer to the start of this vector's data (i.e. the memory location of the start of element 0). </summary>
+		[[nodiscard]] constexpr inline const contained_type* data() const
+		{
+			return data_.data();
 		}
 #pragma endregion
 
@@ -134,11 +149,179 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region OPERATORS
+#pragma region CONST_OPERATORS
+		template<class Rhs_>
+		constexpr inline bool operator==(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpEqualTo(*this, rhs_);
+		}
+
+		template<class Rhs_>
+		constexpr inline bool operator!=(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpNotEqualTo(*this, rhs_);
+		}
+
+		template<class Rhs_>
+		constexpr inline bool operator>(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpGreater(*this, rhs_);
+		}
+
+		template<class Rhs_>
+		constexpr inline bool operator<(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpLess(*this, rhs_);
+		}
+
+		template<class Rhs_>
+		constexpr inline bool operator>=(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpGreaterEqual(*this, rhs_);
+		}
+
+		template<class Rhs_>
+		constexpr inline bool operator<=(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorCmpLessEqual(*this, rhs_);
+		}
+
+		template<class RhsVector_>
+		constexpr inline copy_type operator+(const RhsVector_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorAdd<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
+		}
+		constexpr inline copy_type operator+() const
+		{
+			return copy_type(*this);
+		}
+
+		template<class RhsVector_>
+		constexpr inline copy_type operator-(const RhsVector_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorSubtract<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
+		}
+		constexpr inline copy_type operator-() const
+		{
+			return EmuMath::Helpers::VectorNegate<copy_type::size, typename copy_type::contained_type>(*this);
+		}
+
+		template<typename Rhs_>
+		constexpr inline copy_type operator*(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorMultiply<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
+		}
+
+		template<typename Rhs_>
+		constexpr inline copy_type operator/(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorDivide<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
+		}
+
+		template<typename Rhs_>
+		constexpr inline copy_type operator&(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorAnd<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
+		}
+
+		template<typename Rhs_>
+		constexpr inline copy_type operator|(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorOr<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
+		}
+
+		template<typename Rhs_>
+		constexpr inline copy_type operator^(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorXor<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
+		}
+
+		constexpr inline copy_type operator~() const
+		{
+			return EmuMath::Helpers::VectorNot<copy_type::size, typename copy_type::contained_type>(*this);
+		}
+
+		template<typename Rhs_>
+		constexpr inline copy_type operator<<(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorShiftLeft<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
+		}
+
+		template<typename Rhs_>
+		constexpr inline copy_type operator>>(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorShiftRight<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
+		}
+#pragma endregion
+
+#pragma region NON_CONST_OPERATORS
 		template<class ToCopy_>
 		constexpr inline this_type& operator=(const ToCopy_& toCopy_)
 		{
-			return EmuMath::Helpers::VectorCopy<this_type, ToCopy_>(*this, toCopy_);
+			return EmuMath::Helpers::VectorCopy(*this, toCopy_);
+		}
+
+		template<class RhsVector_>
+		constexpr inline this_type& operator+=(const RhsVector_& rhs_)
+		{
+			(*this) = EmuMath::Helpers::VectorAdd(*this, rhs_);
+			return *this;
+		}
+
+		template<class RhsVector_>
+		constexpr inline this_type& operator-=(const RhsVector_& rhs_)
+		{
+			(*this) = EmuMath::Helpers::VectorSubtract(*this, rhs_);
+			return *this;
+		}
+
+		template<class Rhs_>
+		constexpr inline this_type& operator*=(const Rhs_& rhs_)
+		{
+			(*this) = EmuMath::Helpers::VectorMultiply(*this, rhs_);
+			return *this;
+		}
+
+		template<class Rhs_>
+		constexpr inline this_type& operator/=(const Rhs_& rhs_)
+		{
+			(*this) = EmuMath::Helpers::VectorDivide(*this, rhs_);
+			return *this;
+		}
+
+		template<class Rhs_>
+		constexpr inline this_type& operator&=(const Rhs_& rhs_)
+		{
+			(*this) = EmuMath::Helpers::VectorAnd(*this, rhs_);
+			return *this;
+		}
+
+		template<class Rhs_>
+		constexpr inline this_type& operator|=(const Rhs_& rhs_)
+		{
+			(*this) = EmuMath::Helpers::VectorOr(*this, rhs_);
+			return *this;
+		}
+
+		template<class Rhs_>
+		constexpr inline this_type& operator^=(const Rhs_& rhs_)
+		{
+			(*this) = EmuMath::Helpers::VectorXor(*this, rhs_);
+			return *this;
+		}
+
+		template<class Rhs_>
+		constexpr inline this_type& operator<<=(const Rhs_& rhs_)
+		{
+			(*this) = EmuMath::Helpers::VectorShiftLeft(*this, rhs_);
+			return *this;
+		}
+
+		template<class Rhs_>
+		constexpr inline this_type& operator>>=(const Rhs_& rhs_)
+		{
+			(*this) = EmuMath::Helpers::VectorShiftLeft(*this, rhs_);
+			return *this;
 		}
 #pragma endregion
 
@@ -147,7 +330,7 @@ namespace EmuMath
 		using data_storage_type = std::array<contained_type, size>;
 
 		/// <summary> Contiguous data stored within this matrix. </summary>
-		data_storage_type data;
+		data_storage_type data_;
 
 		template<std::size_t Index_, typename In_>
 		constexpr inline void _set_data_at_index(In_& in_)
@@ -159,13 +342,13 @@ namespace EmuMath
 					if constexpr (contains_const_reference_wrappers)
 					{
 						// May set any type of reference to a const since non-const will be implicitly interpreted as const in such contexts
-						data[Index_] = contained_type(in_);
+						data_[Index_] = contained_type(in_);
 					}
 					else
 					{
 						if constexpr (!std::is_const_v<In_>)
 						{
-							data[Index_] = contained_type(in_);
+							data_[Index_] = contained_type(in_);
 						}
 						else
 						{
@@ -175,7 +358,7 @@ namespace EmuMath
 				}
 				else
 				{
-					data[Index_] = static_cast<contained_type>(in_);
+					data_[Index_] = static_cast<contained_type>(in_);
 				}
 			}
 			else
@@ -193,13 +376,13 @@ namespace EmuMath
 					if constexpr (contains_const_reference_wrappers)
 					{
 						// May set any type of reference to a const since non-const will be implicitly interpreted as const in such contexts
-						data[index_] = contained_type(in_);
+						data_[index_] = contained_type(in_);
 					}
 					else
 					{
 						if constexpr (!std::is_const_v<In_>)
 						{
-							data[index_] = contained_type(in_);
+							data_[index_] = contained_type(in_);
 						}
 						else
 						{
@@ -214,7 +397,7 @@ namespace EmuMath
 			}
 			else
 			{
-				data[index_] = static_cast<contained_type>(in_);
+				data_[index_] = static_cast<contained_type>(in_);
 			}
 		}
 	};
