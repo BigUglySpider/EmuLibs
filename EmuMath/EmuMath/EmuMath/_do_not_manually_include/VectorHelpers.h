@@ -457,29 +457,88 @@ namespace EmuMath::Helpers
 	}
 
 	/// <summary>
+	/// <para>
+	///		Divides respective elements of the lhs_ vector by those of a rhs_ vector, or divides all elements of the lhs_ vector by a rhs_ scalar,
+	///		and outputs the remainders.
+	/// </para>
+	/// <para> There is an additional compile-time safety check to avoid guaranteed integral divides by 0, or casting divides by 0 to integral types. </para>
+	/// <para> This function cannot provide a valid constexpr if the result requires a divide by 0, integral or not. </para>
+	/// </summary>
+	/// <typeparam name="OutVector_">Type of vector to output the results of mod division as.</typeparam>
+	/// <typeparam name="LhsVector_">Type of vector on the left-hand side of the mod division.</typeparam>
+	/// <typeparam name="Rhs_">Type of either vector or scalar on the right-hand side of the mod division.</typeparam>
+	/// <param name="lhs_">EmuMath vector to be divided.</param>
+	/// <param name="rhs_">EmuMath vector to divide respective elements by, or a scalar to divide every element by.</param>
+	/// <returns>Vector containing the results of the mod division.</returns>
+	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMod(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr
+			(
+				_underlying_vector_funcs::_validity_check_vector_arithmetic_potential_scalar<LhsVector_>() &&
+				_underlying_vector_funcs::_validity_check_no_integral_divide_by_zero<EmuMath::Vector<OutSize_, out_contained_type>, LhsVector_, Rhs_>()
+				)
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
+			{
+				using modder_type = EmuCore::do_mod<typename LhsVector_::value_type, typename Rhs_::value_type>;
+				return _underlying_vector_funcs::_perform_vector_arithmetic<EmuMath::Vector<OutSize_, out_contained_type>, LhsVector_, Rhs_, modder_type>(lhs_, rhs_);
+			}
+			else
+			{
+				using modder_type = EmuCore::do_mod<typename LhsVector_::value_type, Rhs_>;
+				return _underlying_vector_funcs::_perform_vector_arithmetic<EmuMath::Vector<OutSize_, out_contained_type>, LhsVector_, Rhs_, modder_type>(lhs_, rhs_);
+			}
+		}
+		else
+		{
+			static_assert
+				(
+					false,
+					"A validity check on arguments provided for EmuMath::Helpers::VectorMod has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
+					);
+		}
+	}
+	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline auto VectorMod(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorMod<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+	template<typename out_contained_type, class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline auto VectorMod(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorMod<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
+	}
+	template<class LhsVector_, class Rhs_>
+	[[nodiscard]] constexpr inline auto VectorMod(const LhsVector_& lhs_, const Rhs_& rhs_)
+	{
+		return VectorMod<LhsVector_::size, typename LhsVector_::value_type, Rhs_>(lhs_, rhs_);
+	}
+
+	/// <summary>
 	/// <para> Negates the elements of the passed vector and returns the result in the output vector, where out[x] == -vector_[x]. </para>
 	/// </summary>
 	/// <typeparam name="out_value_type">Type to be contained in the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to negate the elements of.</typeparam>
 	/// <param name="vector_">EmuMath vector to negate the elements of.</param>
 	/// <returns>Vector whose elements are the negated form of the respective elements in the passed vector_.</returns>
-	template<std::size_t OutSize_, typename out_value_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_value_type> VectorNegate(const Vector_& vector_)
+	template<std::size_t OutSize_, typename out_contained_type, class Vector_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorNegate(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
 			using negator_type = EmuCore::do_negate<typename Vector_::value_type>;
-			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_value_type>, Vector_, negator_type>(vector_);
+			return _underlying_vector_funcs::_vector_single_operand_func<EmuMath::Vector<OutSize_, out_contained_type>, Vector_, negator_type>(vector_);
 		}
 		else
 		{
 			static_assert(false, "Attempted to negate a vector, but passed a non-EmuMath-vector argument type.");
 		}
 	}
-	template<typename out_value_type, class Vector_>
+	template<typename out_contained_type, class Vector_>
 	[[nodiscard]] constexpr inline auto VectorNegate(const Vector_& vector_)
 	{
-		return VectorNegate<Vector_::size, out_value_type>(vector_);
+		return VectorNegate<Vector_::size, out_contained_type>(vector_);
 	}
 	template<std::size_t OutSize_, class Vector_>
 	[[nodiscard]] constexpr inline auto VectorNegate(const Vector_& vector_)
@@ -2844,6 +2903,18 @@ namespace EmuCore
 		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorDivide(lhs_, rhs_);
+		}
+	};
+
+	template<std::size_t Size_, typename T_, typename Rhs_>
+	struct do_mod<EmuMath::Vector<Size_, T_>, Rhs_>
+	{
+		constexpr do_mod()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorMod(lhs_, rhs_);
 		}
 	};
 

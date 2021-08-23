@@ -225,6 +225,12 @@ namespace EmuMath
 		}
 
 		template<typename Rhs_>
+		[[nodiscard]] constexpr inline copy_type operator%(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorMod<copy_type::size, typename copy_type::contained_type, this_type, Rhs_>(*this, rhs_);
+		}
+
+		template<typename Rhs_>
 		[[nodiscard]] constexpr inline copy_type operator&(const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::VectorAnd<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
@@ -331,6 +337,20 @@ namespace EmuMath
 		}
 
 		template<class Rhs_>
+		constexpr inline this_type& operator%=(const Rhs_& rhs_)
+		{
+			if constexpr (!vector_info::has_const_values)
+			{
+				(*this) = EmuMath::Helpers::VectorMod(*this, rhs_);
+				return *this;
+			}
+			else
+			{
+				static_assert(false, "Attempted to set the data of an EmuMath vector which contains constant values via operator%=.");
+			}
+		}
+
+		template<class Rhs_>
 		constexpr inline this_type& operator&=(const Rhs_& rhs_)
 		{
 			if constexpr (!vector_info::has_const_values)
@@ -428,6 +448,72 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline EmuMath::ConstRefVector<sizeof...(RemainingShuffleIndices_) + 1, value_type> ShuffledReference() const
 		{
 			return EmuMath::Helpers::VectorShuffledReference<X_, RemainingShuffleIndices_...>(*this);
+		}
+#pragma endregion
+
+#pragma region ARITHMETIC
+		/// <summary> Returns the result of adding the passed rhs_ vector to this vector. </summary>
+		/// <typeparam name="out_contained_type">Type to be contained in the result vector.</typeparam>
+		/// <typeparam name="RhsVector_">Type of the passed vector to add.</typeparam>
+		/// <param name="rhs_">EmuMath vector to add to this vector.</param>
+		/// <returns>Vector containing the results of adding the passed vector to this vector.</returns>
+		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class RhsVector_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Add(const RhsVector_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorAdd<OutSize_, out_contained_type, this_type, RhsVector_>(*this, rhs_);
+		}
+
+		/// <summary> Returns the result of subtracting the passed rhs_ vector from this vector. </summary>
+		/// <typeparam name="out_contained_type">Type to be contained in the result vector.</typeparam>
+		/// <typeparam name="RhsVector_">Type of the passed vector to subtract.</typeparam>
+		/// <param name="rhs_">EmuMath vector to subtract from this vector.</param>
+		/// <returns>Vector containing the results of subtracting the passed vector from this vector.</returns>
+		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class RhsVector_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Subtract(const RhsVector_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorSubtract<OutSize_, out_contained_type, this_type, RhsVector_>(*this, rhs_);
+		}
+
+		/// <summary> Returns the result of multiplying this vector by the passed rhs_ argument. </summary>
+		/// <typeparam name="out_contained_type">Type to be contained in the result vector.</typeparam>
+		/// <typeparam name="RhsVector_">Type to be multiplying by..</typeparam>
+		/// <param name="rhs_">EmuMath vector or scalar to multiply this vector by.</param>
+		/// <returns>Vector containing the results of multiplying this vector by the passed rhs_ argument.</returns>
+		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Multiply(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorMultiply<OutSize_, out_contained_type, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary> Returns the result of dividing this vector by the passed rhs_ argument. </summary>
+		/// <typeparam name="out_contained_type">Type to be contained in the result vector.</typeparam>
+		/// <typeparam name="RhsVector_">Type to be dividing by.</typeparam>
+		/// <param name="rhs_">EmuMath vector or scalar to divide this vector by.</param>
+		/// <returns>Vector containing the results of dividing this vector by the passed rhs_ argument.</returns>
+		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Divide(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorDivide<OutSize_, out_contained_type, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary> Returns the result of modulo division of this vector by the passed rhs_ argument. </summary>
+		/// <typeparam name="out_contained_type">Type to be contained in the result vector.</typeparam>
+		/// <typeparam name="RhsVector_">Type to be dividing by.</typeparam>
+		/// <param name="rhs_">EmuMath vector or scalar to perform modulo division on this vector by.</param>
+		/// <returns>Vector containing the results of modulo division on this vector by the passed rhs_ argument..</returns>
+		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Mod(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::VectorMod<OutSize_, out_contained_type, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary> Returns a negated form of this vector (i.e. one where each element is the negative of this vector's element at the respective index). </summary>
+		/// <typeparam name="out_contained_type">Type to be contained in the output vector.</typeparam>
+		/// <returns>Negated form of this vector.</returns>
+		template<std::size_t OutSize_ = size, typename out_contained_type = value_type>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Negate() const
+		{
+			return EmuMath::Helpers::VectorNegate<OutSize_, out_contained_type, this_type>(*this);
 		}
 #pragma endregion
 
@@ -909,6 +995,10 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::VectorDistance<OutSize_, out_contained_type, this_type, TargetVector_>(*this, target_);
 		}
+#pragma endregion
+
+#pragma region COMPARISONS
+
 #pragma endregion
 
 	private:
