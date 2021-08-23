@@ -973,39 +973,6 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::VectorDistance<OutSize_, out_contained_type, this_type, TargetVector_>(*this, target_);
 		}
-
-		/// <summary>
-		/// <para> Calculates the 3D cross product of this vector and b_, where this vector is a_, using the provided template indices as the X, Y, and Z for A and B. </para>
-		/// <para> The provided indices default to the logical x, y, and z components of both A and B, but may be modified to refer to different areas of the vectors. </para>
-		/// <para> 
-		///		Unless explicitly stated otherwise, the indices for B will mimic those of A. 
-		///		As such, providing custom indices for A will implicitly provide the same indices for B, unless additional indices are explicitly provided for B.
-		/// </para>
-		/// <para> The end vector can be summarised as: </para>
-		///	<para> [0] = (a_[AY_] * b_[BZ_]) - (a_[AZ_] * b_[BY_]) </para>
-		/// <para> [1] = (a_[AZ_] * b_[BX_]) - (a_[AX_] * b_[BZ_]) </para>
-		/// <para> [2] = (a_[AX_] * b_[BY_]) - (a_[AY_] * b_[BX_]) </para>
-		/// </summary>
-		/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
-		/// <typeparam name="VectorB_">Type of vector representing b_ in the above formulae.</typeparam>
-		/// <param name="b_">EmuMath vector representing b_ in the above formulae.</param>
-		/// <returns>Cross product of this vector and the passed vector b_, using the provided indices for 3 elements from each of the respective vectors.</returns>
-		template
-		<
-			std::size_t AX_ = 0,
-			std::size_t AY_ = 1,
-			std::size_t AZ_ = 0,
-			std::size_t BX_ = AX_,
-			std::size_t BY_ = AY_,
-			std::size_t BZ_ = AZ_,
-			std::size_t OutSize_ = 3,
-			typename out_contained_type = preferred_floating_point,
-			class VectorB_
-		>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> CrossProduct3D(const VectorB_& b_) const
-		{
-			return EmuMath::Helpers::VectorCrossProduct3D<AX_, AY_, AZ_, BX_, BY_, BZ_, OutSize_, out_contained_type, this_type, VectorB_>(*this, b_);
-		}
 #pragma endregion
 
 #pragma region COMPARISONS
