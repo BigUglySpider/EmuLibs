@@ -58,12 +58,12 @@ namespace EmuMath
 			val(value_)
 		{
 		}
-		template<typename ToCopyT>
+		template<typename ToCopyT, typename OnlyValidArgs_ = std::enable_if_t<std::is_convertible_v<ToCopyT, value_type>>>
 		constexpr NoOverflowT(ToCopyT toCopy_) :
 			val((toCopy_ < min_val) ? min_val : (toCopy_ > max_val) ? max_val : static_cast<value_type>(toCopy_))
 		{
 		}
-		template<typename ToCopyT>
+		template<typename ToCopyT, typename OnlyValidArgs_ = std::enable_if_t<std::is_convertible_v<ToCopyT, value_type>>>
 		constexpr NoOverflowT(const NoOverflowT<ToCopyT>& toCopy_) :
 			NoOverflowT(toCopy_.val)
 		{
