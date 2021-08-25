@@ -26,15 +26,30 @@ namespace EmuMath
 		/// <summary> The number of bits consumed by a single element within this vector in terms of 8-bit bytes. This is not guaranteed to match up to CHAR_BIT. </summary>
 		static constexpr std::size_t register_element_8bit_num_bits = contained_item_byte_size * 8;
 
+#pragma region CONSTRUCTORS
 		FastVector4f() : data_()
 		{
 		}
+		/// <summary> Constructs this vector with its associated register initialised as a copy of the passed register. </summary>
+		/// <param name="dataToCopy_">Register to copy to this vector's register.</param>
 		FastVector4f(data_type dataToCopy_) : data_(dataToCopy_)
 		{
 		}
+		/// <summary> Constructs this vector as a copy of the passed vector. </summary>
+		/// <param name="toCopy_">EmuMath FastVector of the same type to copy.</param>
 		FastVector4f(const FastVector4f& toCopy_) : data_(toCopy_.data_)
 		{
 		}
+		/// <summary> Constructs this vector by loading the data of the passed EmuMath vector into its associated register. </summary>
+		/// <param name="toLoad_">EmuMath vector to load the data of.</param>
+		FastVector4f(const EmuMath::Vector<4, float>& toLoad_) : data_(_mm_load_ps(toLoad_.data()))
+		{
+		}
+		/// <summary>
+		/// <para> Constructs this vector with its associated register initialised as a copy of the passed EmuMath vector. </para>
+		/// <para> If the vector is not at least 4 elements in size, non-existent elements will be assumed as 0. </para>
+		/// </summary>
+		/// <param name="toCopy_">EmuMath vector to copy the data of.</param>
 		template<std::size_t ToCopySize_, typename to_copy_contained_type>
 		FastVector4f(const EmuMath::Vector<ToCopySize_, to_copy_contained_type>& toCopy_) : 
 			FastVector4f
@@ -46,6 +61,15 @@ namespace EmuMath
 			)
 		{
 		}
+		/// <summary> Constructs this vector with its associated register initialised as a copy of the passed respective elements. </summary>
+		/// <typeparam name="X_">Type used for argument x_, which is copied to element 0.</typeparam>
+		/// <typeparam name="Y_">Type used for argument y_, which is copied to element 1.</typeparam>
+		/// <typeparam name="Z_">Type used for argument z_, which is copied to element 2.</typeparam>
+		/// <typeparam name="W_">Type used for argument w_, which is copied to element 3.</typeparam>
+		/// <param name="x_">Value to copy to element 0. Must be convertible to this vector's value_type.</param>
+		/// <param name="y_">Value to copy to element 1. Must be convertible to this vector's value_type.</param>
+		/// <param name="z_">Value to copy to element 2. Must be convertible to this vector's value_type.</param>
+		/// <param name="w_">Value to copy to element 3. Must be convertible to this vector's value_type.</param>
 		template<typename X_, typename Y_, typename Z_, typename W_>
 		FastVector4f(X_&& x_, Y_&& y_, Z_&& z_, W_&& w_) : 
 			data_
@@ -60,6 +84,7 @@ namespace EmuMath
 			)
 		{
 		}
+#pragma endregion
 
 #pragma region RANDOM_ACCESS
 		/// <summary>
