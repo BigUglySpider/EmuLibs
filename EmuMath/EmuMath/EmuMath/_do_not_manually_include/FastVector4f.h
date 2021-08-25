@@ -13,14 +13,10 @@ namespace EmuMath
 	/// </summary>
 	struct FastVector4f
 	{
-		using value_type = float;
-		using this_type = FastVector4f;
-		using data_type = __m128;
-
 		/// <summary> The number of items contained within this vector. </summary>
 		static constexpr std::size_t size = 4;
 		/// <summary> The size of an individual item within this vector in bytes. </summary>
-		static constexpr std::size_t contained_item_byte_size = sizeof(value_type);
+		static constexpr std::size_t contained_item_byte_size = sizeof(float);
 		/// <summary> The total size of contained items within this vector in bytes. </summary>
 		static constexpr std::size_t total_contained_bytes = contained_item_byte_size * size;
 		/// <summary> The number of bits consumed by a single element within this vector in terms of 8-bit bytes. This is not guaranteed to match up to CHAR_BIT. </summary>
@@ -32,7 +28,7 @@ namespace EmuMath
 		}
 		/// <summary> Constructs this vector with its associated register initialised as a copy of the passed register. </summary>
 		/// <param name="dataToCopy_">Register to copy to this vector's register.</param>
-		FastVector4f(data_type dataToCopy_) : data_(dataToCopy_)
+		FastVector4f(__m128 dataToCopy_) : data_(dataToCopy_)
 		{
 		}
 		/// <summary> Constructs this vector as a copy of the passed vector. </summary>
@@ -54,10 +50,10 @@ namespace EmuMath
 		FastVector4f(const EmuMath::Vector<ToCopySize_, to_copy_contained_type>& toCopy_) : 
 			FastVector4f
 			(
-				EmuMath::Helpers::VectorGetTheoretical<0, value_type>(toCopy_),
-				EmuMath::Helpers::VectorGetTheoretical<1, value_type>(toCopy_),
-				EmuMath::Helpers::VectorGetTheoretical<2, value_type>(toCopy_),
-				EmuMath::Helpers::VectorGetTheoretical<3, value_type>(toCopy_)
+				EmuMath::Helpers::VectorGetTheoretical<0, float>(toCopy_),
+				EmuMath::Helpers::VectorGetTheoretical<1, float>(toCopy_),
+				EmuMath::Helpers::VectorGetTheoretical<2, float>(toCopy_),
+				EmuMath::Helpers::VectorGetTheoretical<3, float>(toCopy_)
 			)
 		{
 		}
@@ -66,20 +62,20 @@ namespace EmuMath
 		/// <typeparam name="Y_">Type used for argument y_, which is copied to element 1.</typeparam>
 		/// <typeparam name="Z_">Type used for argument z_, which is copied to element 2.</typeparam>
 		/// <typeparam name="W_">Type used for argument w_, which is copied to element 3.</typeparam>
-		/// <param name="x_">Value to copy to element 0. Must be convertible to this vector's value_type.</param>
-		/// <param name="y_">Value to copy to element 1. Must be convertible to this vector's value_type.</param>
-		/// <param name="z_">Value to copy to element 2. Must be convertible to this vector's value_type.</param>
-		/// <param name="w_">Value to copy to element 3. Must be convertible to this vector's value_type.</param>
+		/// <param name="x_">Value to copy to element 0. Must be convertible to this vector's float.</param>
+		/// <param name="y_">Value to copy to element 1. Must be convertible to this vector's float.</param>
+		/// <param name="z_">Value to copy to element 2. Must be convertible to this vector's float.</param>
+		/// <param name="w_">Value to copy to element 3. Must be convertible to this vector's float.</param>
 		template<typename X_, typename Y_, typename Z_, typename W_>
 		FastVector4f(X_&& x_, Y_&& y_, Z_&& z_, W_&& w_) : 
 			data_
 			(
 				_mm_set_ps
 				(
-					static_cast<value_type>(std::forward<W_>(w_)),
-					static_cast<value_type>(std::forward<Z_>(z_)),
-					static_cast<value_type>(std::forward<Y_>(y_)),
-					static_cast<value_type>(std::forward<X_>(x_))
+					static_cast<float>(std::forward<W_>(w_)),
+					static_cast<float>(std::forward<Z_>(z_)),
+					static_cast<float>(std::forward<Y_>(y_)),
+					static_cast<float>(std::forward<X_>(x_))
 				)
 			)
 		{
@@ -93,7 +89,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>Copy of the value at the provided index.</returns>
 		template<std::size_t Index_>
-		inline value_type at() const
+		inline float at() const
 		{
 			if constexpr (Index_ < size)
 			{
@@ -115,7 +111,7 @@ namespace EmuMath
 
 #pragma region SETS
 		/// <summary>
-		/// <para> Sets the data at the provided index to copy the passed data, which must be convertible to this vector's value_type. </para>
+		/// <para> Sets the data at the provided index to copy the passed data, which must be convertible to this vector's float. </para>
 		/// <para> This is increasingly inefficient with more sets, and is seldom recommended with a FastVector. </para>
 		/// </summary>
 		/// <typeparam name="ToCopy_">Type to be copying.</typeparam>
@@ -123,18 +119,18 @@ namespace EmuMath
 		template<std::size_t Index_, typename ToCopy_>
 		inline void Set(ToCopy_&& toCopyAtIndex_)
 		{
-			if constexpr (std::is_convertible_v<ToCopy_, value_type>)
+			if constexpr (std::is_convertible_v<ToCopy_, float>)
 			{
 				if constexpr (Index_ < size)
 				{
-					data_type mask_ = EmuMath::SIMD::index_mask<data_type, Index_, register_element_8bit_num_bits>();
+					__m128 mask_ = EmuMath::SIMD::index_mask<__m128, Index_, register_element_8bit_num_bits>();
 					data_ = _mm_or_ps
 					(
 						_mm_andnot_ps(mask_, data_),
 						_mm_and_ps
 						(
 							mask_,
-							_mm_set_ps1(static_cast<value_type>(std::forward<ToCopy_>(toCopyAtIndex_)))
+							_mm_set_ps1(static_cast<float>(std::forward<ToCopy_>(toCopyAtIndex_)))
 						)
 					);
 				}
@@ -145,7 +141,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to set an index of an EmuMath::FastVector4f via a type that cannot be converted to its contained value_type.");
+				static_assert(false, "Attempted to set an index of an EmuMath::FastVector4f via a type that cannot be converted to its contained float.");
 			}
 		}
 		template<typename ToCopy_>
@@ -156,20 +152,20 @@ namespace EmuMath
 				// Defer to set (x, y, z, w) since passing an EmuMath vector is assumed to mean "copy the data of this vector"
 				this->Set
 				(
-					EmuMath::Helpers::VectorGetTheoretical<0, value_type>(toCopy_),
-					EmuMath::Helpers::VectorGetTheoretical<1, value_type>(toCopy_),
-					EmuMath::Helpers::VectorGetTheoretical<2, value_type>(toCopy_),
-					EmuMath::Helpers::VectorGetTheoretical<3, value_type>(toCopy_)
+					EmuMath::Helpers::VectorGetTheoretical<0, float>(toCopy_),
+					EmuMath::Helpers::VectorGetTheoretical<1, float>(toCopy_),
+					EmuMath::Helpers::VectorGetTheoretical<2, float>(toCopy_),
+					EmuMath::Helpers::VectorGetTheoretical<3, float>(toCopy_)
 				);
 			}
 			else
 			{
-				if constexpr (std::is_same_v<ToCopy_, this_type>)
+				if constexpr (std::is_same_v<ToCopy_, FastVector4f>)
 				{
 					// Simple register copy
 					data_ = std::forward<ToCopy_>(toCopy_).data_;
 				}
-				else if constexpr (std::is_convertible_v<ToCopy_, value_type>)
+				else if constexpr (std::is_convertible_v<ToCopy_, float>)
 				{
 					data_ = _mm_set_ps1(static_cast<float>(std::forward<ToCopy_>(toCopy_)));
 				}
@@ -181,7 +177,7 @@ namespace EmuMath
 		}
 		/// <summary>
 		/// <para> Sets the data of this vector to copies of the provided respective values. </para>
-		/// <para> All provided values must be convertible to this vector's value_type. </para>
+		/// <para> All provided values must be convertible to this vector's float. </para>
 		/// </summary>
 		/// <typeparam name="X_">Type of the provided x_ argument.</typeparam>
 		/// <typeparam name="Y_">Type of the provided y_ argument.</typeparam>
@@ -196,10 +192,10 @@ namespace EmuMath
 		{
 			data_ = _mm_set_ps
 			(
-				static_cast<value_type>(std::forward<W_>(w_)),
-				static_cast<value_type>(std::forward<Z_>(z_)),
-				static_cast<value_type>(std::forward<Y_>(y_)),
-				static_cast<value_type>(std::forward<X_>(x_))
+				static_cast<float>(std::forward<W_>(w_)),
+				static_cast<float>(std::forward<Z_>(z_)),
+				static_cast<float>(std::forward<Y_>(y_)),
+				static_cast<float>(std::forward<X_>(x_))
 			);
 		}
 
@@ -213,10 +209,10 @@ namespace EmuMath
 		{
 			this->Set
 			(
-				EmuMath::Helpers::VectorGetTheoretical<X_, value_type>(toLoad_),
-				EmuMath::Helpers::VectorGetTheoretical<Y_, value_type>(toLoad_),
-				EmuMath::Helpers::VectorGetTheoretical<Z_, value_type>(toLoad_),
-				EmuMath::Helpers::VectorGetTheoretical<W_, value_type>(toLoad_)
+				EmuMath::Helpers::VectorGetTheoretical<X_, float>(toLoad_),
+				EmuMath::Helpers::VectorGetTheoretical<Y_, float>(toLoad_),
+				EmuMath::Helpers::VectorGetTheoretical<Z_, float>(toLoad_),
+				EmuMath::Helpers::VectorGetTheoretical<W_, float>(toLoad_)
 			);
 		}
 
@@ -225,7 +221,7 @@ namespace EmuMath
 		/// <para> This function assumes the passed pointer is safe to load into the width of this vector. </para>
 		/// </summary>
 		/// <param name="pData_">Pointer to contiguous data to load into this vector.</param>
-		inline void LoadContiguous(const value_type* pData_)
+		inline void LoadContiguous(const float* pData_)
 		{
 			data_ = _mm_load_ps(pData_);
 		}
@@ -251,7 +247,7 @@ namespace EmuMath
 					constexpr std::size_t bytes_to_copy = (vec_info::total_contained_bytes - (IndexOffset_ * vec_info::contained_item_byte_size));
 					if constexpr (bytes_to_copy >= total_contained_bytes)
 					{
-						this->LoadContiguous(reinterpret_cast<const value_type*>(toLoad_.data() + IndexOffset_));
+						this->LoadContiguous(reinterpret_cast<const float*>(toLoad_.data() + IndexOffset_));
 					}
 					else
 					{
@@ -273,17 +269,17 @@ namespace EmuMath
 			{
 				this->Set
 				(
-					EmuMath::Helpers::VectorGetTheoretical<IndexOffset_ + 0, value_type>(toLoad_),
-					EmuMath::Helpers::VectorGetTheoretical<IndexOffset_ + 1, value_type>(toLoad_),
-					EmuMath::Helpers::VectorGetTheoretical<IndexOffset_ + 2, value_type>(toLoad_),
-					EmuMath::Helpers::VectorGetTheoretical<IndexOffset_ + 3, value_type>(toLoad_)
+					EmuMath::Helpers::VectorGetTheoretical<IndexOffset_ + 0, float>(toLoad_),
+					EmuMath::Helpers::VectorGetTheoretical<IndexOffset_ + 1, float>(toLoad_),
+					EmuMath::Helpers::VectorGetTheoretical<IndexOffset_ + 2, float>(toLoad_),
+					EmuMath::Helpers::VectorGetTheoretical<IndexOffset_ + 3, float>(toLoad_)
 				);
 			}
 		}
 #pragma endregion
 
 #pragma region CONST_OPERATORS
-		[[nodiscard]] inline bool operator==(data_type rhs_) const
+		[[nodiscard]] inline bool operator==(__m128 rhs_) const
 		{
 			return EmuMath::SIMD::all_equal(data_, rhs_);
 		}
@@ -292,7 +288,7 @@ namespace EmuMath
 			return this->operator==(rhs_.data_);
 		}
 
-		[[nodiscard]] inline bool operator!=(data_type rhs_) const
+		[[nodiscard]] inline bool operator!=(__m128 rhs_) const
 		{
 			return EmuMath::SIMD::any_not_equal(data_, rhs_);
 		}
@@ -319,12 +315,12 @@ namespace EmuMath
 		/// <typeparam name="OutT_">Type to output the dot product as.</typeparam>
 		/// <param name="b_">Data to calculate the dot product of with this vector.</param>
 		/// <returns>Dot product of this vector and the provided data b_.</returns>
-		template<typename OutT_ = value_type>
-		[[nodiscard]] inline OutT_ DotProduct(data_type b_) const
+		template<typename OutT_ = float>
+		[[nodiscard]] inline OutT_ DotProduct(__m128 b_) const
 		{
 			return static_cast<OutT_>(_mm_cvtss_f32(_calculate_dot_single(b_)));
 		}
-		template<typename OutT_ = value_type>
+		template<typename OutT_ = float>
 		[[nodiscard]] inline OutT_ DotProduct(const FastVector4f& b_) const
 		{
 			return DotProduct(b_.data_);
@@ -333,7 +329,7 @@ namespace EmuMath
 		/// <summary> Calculates the squared magnitude of this vector. </summary>
 		/// <typeparam name="OutT_">Type to output the square magnitude as.</typeparam>
 		/// <returns>Square magnitude of this vector (i.e. its magnitude before a sqrt operation is performed).</returns>
-		template<typename OutT_ = value_type>
+		template<typename OutT_ = float>
 		[[nodiscard]] inline OutT_ SquareMagnitude() const
 		{
 			return this->template DotProduct<OutT_>(data_);
@@ -342,7 +338,7 @@ namespace EmuMath
 		/// <summary> Calculates the magnitude of this vector. </summary>
 		/// <typeparam name="OutT_">Type to output the magnitude as.</typeparam>
 		/// <returns>Magnitude of this vector.</returns>
-		template<typename OutT_ = value_type>
+		template<typename OutT_ = float>
 		[[nodiscard]] inline OutT_ Magnitude() const
 		{
 			return static_cast<OutT_>(sqrtf(this->template SquareMagnitude<float>()));
@@ -351,21 +347,21 @@ namespace EmuMath
 		/// <summary> Calculates the reciprocal to the magnitude of this vector. </summary>
 		/// <typeparam name="OutT_">Type to output the magnitude reciprocal as.</typeparam>
 		/// <returns>Reciprocal to this vector's magnitude.</returns>
-		template<typename OutT_ = value_type>
+		template<typename OutT_ = float>
 		[[nodiscard]] inline OutT_ MagnitudeReciprocal() const
 		{
-			data_type mag_reciprocal = _calculate_dot_single(data_);
+			__m128 mag_reciprocal = _calculate_dot_single(data_);
 			mag_reciprocal = _mm_rsqrt_ps(mag_reciprocal);
 			return _mm_cvtss_f32(mag_reciprocal);
 		}
 
 		/// <summary> Normalises the elements of this vector. </summary>
 		/// <returns>Copy of this vector with its elements normalised to result in a magnitude of 1.</returns>
-		[[nodiscard]] inline this_type Normalise() const
+		[[nodiscard]] inline FastVector4f Normalise() const
 		{
-			data_type mag_reciprocal = _calculate_dot_fill(data_);
+			__m128 mag_reciprocal = _calculate_dot_fill(data_);
 			mag_reciprocal = _mm_rsqrt_ps(mag_reciprocal);
-			return this_type(_mm_mul_ps(data_, mag_reciprocal));
+			return FastVector4f(_mm_mul_ps(data_, mag_reciprocal));
 		}
 
 		/// <summary>
@@ -375,28 +371,28 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="b_">Vector data to linearly interpolate this vector with. b in the equation a + ((b - a) * t).</param>
 		/// <param name="t_">Scalar or vector weighting to use for each linear interpolation. t in the equation a + ((b - a) * t).</param>
-		[[nodiscard]] inline this_type Lerp(data_type b_, data_type t_) const
+		[[nodiscard]] inline FastVector4f Lerp(__m128 b_, __m128 t_) const
 		{
 			b_ = _mm_sub_ps(b_, data_);
-			return this_type(_mm_fmadd_ps(b_, t_, data_));
+			return FastVector4f(_mm_fmadd_ps(b_, t_, data_));
 		}
-		[[nodiscard]] inline this_type Lerp(data_type b_, const FastVector4f& t_) const
+		[[nodiscard]] inline FastVector4f Lerp(__m128 b_, const FastVector4f& t_) const
 		{
 			return this->Lerp(b_, t_.data_);
 		}
-		[[nodiscard]] inline this_type Lerp(data_type b_, const value_type t_) const
+		[[nodiscard]] inline FastVector4f Lerp(__m128 b_, const float t_) const
 		{
 			return this->Lerp(b_, _mm_broadcast_ss(&t_));
 		}
-		[[nodiscard]] inline this_type Lerp(const FastVector4f& b_, data_type t_) const
+		[[nodiscard]] inline FastVector4f Lerp(const FastVector4f& b_, __m128 t_) const
 		{
 			return this->Lerp(b_.data_, t_);
 		}
-		[[nodiscard]] inline this_type Lerp(const FastVector4f& b_, const FastVector4f& t_) const
+		[[nodiscard]] inline FastVector4f Lerp(const FastVector4f& b_, const FastVector4f& t_) const
 		{
 			return this->Lerp(b_.data_, t_.data_);
 		}
-		[[nodiscard]] inline this_type Lerp(const FastVector4f& b_, const value_type t_) const
+		[[nodiscard]] inline FastVector4f Lerp(const FastVector4f& b_, const float t_) const
 		{
 			return this->Lerp(b_.data_, _mm_broadcast_ss(&t_));
 		}
@@ -405,8 +401,8 @@ namespace EmuMath
 		/// <typeparam name="OutCosine_">Type to output the cosine as.</typeparam>
 		/// <param name="b_">Vector data to find the cosine of the angle residing between itself and this vector.</param>
 		/// <returns>Cosine of the angle between this vector and b_.</returns>
-		template<typename OutCosine_ = value_type>
-		[[nodiscard]] inline OutCosine_ AngleCosine(data_type b_) const
+		template<typename OutCosine_ = float>
+		[[nodiscard]] inline OutCosine_ AngleCosine(__m128 b_) const
 		{
 			__m128 b_sqr_mag_ = _mm_mul_ps(b_, b_);
 			b_sqr_mag_ = EmuMath::SIMD::horizontal_vector_sum(b_sqr_mag_);
@@ -414,7 +410,7 @@ namespace EmuMath
 			out_ = _mm_mul_ps(out_, _calculate_dot_single(b_));
 			return _mm_cvtss_f32(out_);
 		}
-		template<typename OutCosine_ = value_type>
+		template<typename OutCosine_ = float>
 		[[nodiscard]] inline OutCosine_ AngleCosine(const FastVector4f& b_) const
 		{
 			return this->template AngleCosine<OutCosine_>(b_.data_);
@@ -427,8 +423,8 @@ namespace EmuMath
 		/// <typeparam name="OutAngle_">Type to output the angle as.</typeparam>
 		/// <param name="b_">Vector data to find the angle residing between itself and this vector.</param>
 		/// <returns>Angle between this vector and b_, measured in radian units if Rads_ is true, otherwise measured in degree units.</returns>
-		template<bool Rads_ = true, typename OutAngle_ = value_type>
-		[[nodiscard]] inline OutAngle_ Angle(data_type b_) const
+		template<bool Rads_ = true, typename OutAngle_ = float>
+		[[nodiscard]] inline OutAngle_ Angle(__m128 b_) const
 		{
 			__m128 b_sqr_mag_ = _mm_mul_ps(b_, b_);
 			b_sqr_mag_ = EmuMath::SIMD::horizontal_vector_sum(b_sqr_mag_);
@@ -437,11 +433,11 @@ namespace EmuMath
 			out_ = _mm_acos_ps(out_);
 			if constexpr (!Rads_)
 			{
-				out_ = _mm_mul_ps(out_, _mm_set_ps1(EmuCore::Pi::HUNDRED80_DIV_PI<value_type>));
+				out_ = _mm_mul_ps(out_, _mm_set_ps1(EmuCore::Pi::HUNDRED80_DIV_PI<float>));
 			}
 			return _mm_cvtss_f32(out_);
 		}
-		template<bool Rads_ = true, typename OutAngle_ = value_type>
+		template<bool Rads_ = true, typename OutAngle_ = float>
 		[[nodiscard]] inline OutAngle_ Angle(FastVector4f b_) const
 		{
 			return this->template Angle<Rads_, OutAngle_>(b_.data_);
@@ -450,11 +446,11 @@ namespace EmuMath
 		/// <summary> Calculates the distance that may be added to this vector to reach the target_ vector. </summary>
 		/// <param name="target_">Vector data of the point to calculate the distance from this vector.</param>
 		/// <returns>Vector which may be added to this vector to reach the provided target_.</returns>
-		[[nodiscard]] inline this_type Distance(data_type target_) const
+		[[nodiscard]] inline FastVector4f Distance(__m128 target_) const
 		{
-			return this_type(_mm_sub_ps(target_, data_));
+			return FastVector4f(_mm_sub_ps(target_, data_));
 		}
-		[[nodiscard]] inline this_type Distance(FastVector4f target_) const
+		[[nodiscard]] inline FastVector4f Distance(FastVector4f target_) const
 		{
 			return this->Distance(target_.data_);
 		}
@@ -464,73 +460,73 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="b_">Vector data to calculate the cross product of with this vector. b_ in the equation a_ x b_.</param>
 		/// <returns>Vector of the 3D cross product between this vector and the provided vector data in b_.</returns>
-		[[nodiscard]] inline this_type CrossProduct(data_type b_) const
+		[[nodiscard]] inline FastVector4f CrossProduct(__m128 b_) const
 		{
-			data_type a_1203_ = EmuMath::SIMD::shuffle<1, 2, 0, 3>(data_);
-			data_type to_subract_ = EmuMath::SIMD::shuffle<1, 2, 0, 3>(_mm_mul_ps(a_1203_, b_));
-			return this_type(_mm_fmsub_ps(a_1203_, EmuMath::SIMD::shuffle<2, 0, 1, 3>(b_), to_subract_));
+			__m128 a_1203_ = EmuMath::SIMD::shuffle<1, 2, 0, 3>(data_);
+			__m128 to_subract_ = EmuMath::SIMD::shuffle<1, 2, 0, 3>(_mm_mul_ps(a_1203_, b_));
+			return FastVector4f(_mm_fmsub_ps(a_1203_, EmuMath::SIMD::shuffle<2, 0, 1, 3>(b_), to_subract_));
 		}
-		[[nodiscard]] inline this_type CrossProduct(FastVector4f b_) const
+		[[nodiscard]] inline FastVector4f CrossProduct(FastVector4f b_) const
 		{
 			return this->CrossProduct(b_.data_);
 		}
 
 		/// <summary> Calculates the square root of all elements within this vector. </summary>
 		/// <returns>Copy of this vector with all elements set to their square roots.</returns>
-		[[nodiscard]] inline this_type Sqrt() const
+		[[nodiscard]] inline FastVector4f Sqrt() const
 		{
-			return this_type(_mm_sqrt_ps(data_));
+			return FastVector4f(_mm_sqrt_ps(data_));
 		}
 
 		/// <summary> Rounds all elements within this vector toward negative infinity. </summary>
 		/// <returns>Copy of this vector with all elements floored.</returns>
-		[[nodiscard]] inline this_type Floor() const
+		[[nodiscard]] inline FastVector4f Floor() const
 		{
-			return this_type(_mm_round_ps(data_, _MM_FROUND_FLOOR));
+			return FastVector4f(_mm_round_ps(data_, _MM_FROUND_FLOOR));
 		}
 		
 		/// <summary> Rounds all elements within this vector toward positive infinity. </summary>
 		/// <returns>Copy of this vector with all elements ceiled.</returns>
-		[[nodiscard]] inline this_type Ceil() const
+		[[nodiscard]] inline FastVector4f Ceil() const
 		{
-			return this_type(_mm_round_ps(data_, _MM_FROUND_CEIL));
+			return FastVector4f(_mm_round_ps(data_, _MM_FROUND_CEIL));
 		}
 
 		/// <summary> Rounds all elements within this vector toward 0. </summary>
 		/// <returns>Copy of this vector with all elements trunced.</returns>
-		[[nodiscard]] inline this_type Trunc() const
+		[[nodiscard]] inline FastVector4f Trunc() const
 		{
-			return this_type(_mm_round_ps(data_, _MM_FROUND_TRUNC));
+			return FastVector4f(_mm_round_ps(data_, _MM_FROUND_TRUNC));
 		}
 
 		/// <summary> Clamps the values within this vector so they are not less than the respective data within min_. </summary>
 		/// <returns>Copy of this vector with all elements clamped to not be less than min_.</returns>
-		[[nodiscard]] inline this_type ClampMin(data_type min_) const
+		[[nodiscard]] inline FastVector4f ClampMin(__m128 min_) const
 		{
 			__m128 keep_mask_ = _mm_cmpge_ps(data_, min_);
-			return this_type(_mm_or_ps(_mm_and_ps(keep_mask_, data_), _mm_andnot_ps(keep_mask_, min_)));
+			return FastVector4f(_mm_or_ps(_mm_and_ps(keep_mask_, data_), _mm_andnot_ps(keep_mask_, min_)));
 		}
-		[[nodiscard]] inline this_type ClampMin(const FastVector4f& min_) const
+		[[nodiscard]] inline FastVector4f ClampMin(const FastVector4f& min_) const
 		{
 			return this->ClampMin(min_.data_);
 		}
-		[[nodiscard]] inline this_type ClampMin(const value_type min_) const
+		[[nodiscard]] inline FastVector4f ClampMin(const float min_) const
 		{
 			return this->ClampMin(_mm_broadcast_ss(&min_));
 		}
 
 		/// <summary> Clamps the values within this vector so they are not greater than the respective data within max_. </summary>
 		/// <returns>Copy of this vector with all elements clamped to not be greater than max_.</returns>
-		[[nodiscard]] inline this_type ClampMax(data_type max_) const
+		[[nodiscard]] inline FastVector4f ClampMax(__m128 max_) const
 		{
 			__m128 keep_mask_ = _mm_cmple_ps(data_, max_);
-			return this_type(_mm_or_ps(_mm_and_ps(keep_mask_, data_), _mm_andnot_ps(keep_mask_, max_)));
+			return FastVector4f(_mm_or_ps(_mm_and_ps(keep_mask_, data_), _mm_andnot_ps(keep_mask_, max_)));
 		}
-		[[nodiscard]] inline this_type ClampMax(const FastVector4f& max_) const
+		[[nodiscard]] inline FastVector4f ClampMax(const FastVector4f& max_) const
 		{
 			return this->ClampMax(max_.data_);
 		}
-		[[nodiscard]] inline this_type ClampMax(const value_type max_) const
+		[[nodiscard]] inline FastVector4f ClampMax(const float max_) const
 		{
 			return this->ClampMax(_mm_broadcast_ss(&max_));
 		}
@@ -541,43 +537,43 @@ namespace EmuMath
 		/// <para> If min_ and max_ are not logically correct, output may potentially appear as nonsense. </para>
 		/// </summary>
 		/// <returns>Copy of this vector with all elements clamped to not be greater than max_.</returns>
-		[[nodiscard]] inline this_type Clamp(data_type min_, data_type max_) const
+		[[nodiscard]] inline FastVector4f Clamp(__m128 min_, __m128 max_) const
 		{
 			__m128 replace_min_mask_ = _mm_cmplt_ps(data_, min_);
 			__m128 replace_max_mask_ = _mm_cmpgt_ps(data_, max_);
 			__m128 out_ = _mm_andnot_ps(_mm_or_ps(replace_min_mask_, replace_max_mask_), data_);
 			out_ = _mm_or_ps(out_, _mm_and_ps(replace_min_mask_, min_));
-			return this_type(_mm_or_ps(out_, _mm_and_ps(replace_max_mask_, max_)));
+			return FastVector4f(_mm_or_ps(out_, _mm_and_ps(replace_max_mask_, max_)));
 		}
-		[[nodiscard]] inline this_type Clamp(const FastVector4f& min_, data_type max_) const
+		[[nodiscard]] inline FastVector4f Clamp(const FastVector4f& min_, __m128 max_) const
 		{
 			return this->Clamp(min_.data_, max_);
 		}
-		[[nodiscard]] inline this_type Clamp(const value_type min_, data_type max_) const
+		[[nodiscard]] inline FastVector4f Clamp(const float min_, __m128 max_) const
 		{
 			return this->Clamp(_mm_broadcast_ss(&min_), max_);
 		}
-		[[nodiscard]] inline this_type Clamp(data_type min_, const FastVector4f& max_) const
+		[[nodiscard]] inline FastVector4f Clamp(__m128 min_, const FastVector4f& max_) const
 		{
 			return this->Clamp(min_, max_.data_);
 		}
-		[[nodiscard]] inline this_type Clamp(const FastVector4f& min_, const FastVector4f& max_) const
+		[[nodiscard]] inline FastVector4f Clamp(const FastVector4f& min_, const FastVector4f& max_) const
 		{
 			return this->Clamp(min_.data_, max_.data_);
 		}
-		[[nodiscard]] inline this_type Clamp(const value_type min_, const FastVector4f& max_) const
+		[[nodiscard]] inline FastVector4f Clamp(const float min_, const FastVector4f& max_) const
 		{
 			return this->Clamp(_mm_broadcast_ss(&min_), max_.data_);
 		}
-		[[nodiscard]] inline this_type Clamp(data_type min_, const value_type max_) const
+		[[nodiscard]] inline FastVector4f Clamp(__m128 min_, const float max_) const
 		{
 			return this->Clamp(min_, _mm_broadcast_ss(&max_));
 		}
-		[[nodiscard]] inline this_type Clamp(const FastVector4f& min_, const value_type max_) const
+		[[nodiscard]] inline FastVector4f Clamp(const FastVector4f& min_, const float max_) const
 		{
 			return this->Clamp(min_.data_, _mm_broadcast_ss(&max_));
 		}
-		[[nodiscard]] inline this_type Clamp(const value_type min_, const value_type max_) const
+		[[nodiscard]] inline FastVector4f Clamp(const float min_, const float max_) const
 		{
 			return this->Clamp(_mm_broadcast_ss(&min_), _mm_broadcast_ss(&max_));
 		}
@@ -585,7 +581,7 @@ namespace EmuMath
 		/// <summary> Calculates the total of adding all elements within this vector together. </summary>
 		/// <typeparam name="OutT_">Type to output the total sum as.</typeparam>
 		/// <returns>Total sum of all elements within this vector.</returns>
-		template<typename OutT_ = value_type>
+		template<typename OutT_ = float>
 		[[nodiscard]] inline OutT_ HorizontalSum() const
 		{
 			return static_cast<OutT_>(EmuMath::SIMD::horizontal_vector_sum_scalar(data_));
@@ -594,7 +590,7 @@ namespace EmuMath
 		/// <summary> Calculates the total of multiplying all elements within this vector together. </summary>
 		/// <typeparam name="OutT_">Type to output the total product as.</typeparam>
 		/// <returns>Total product of all elements within this vector.</returns>
-		template<typename OutT_ = value_type>
+		template<typename OutT_ = float>
 		[[nodiscard]] inline OutT_ HorizontalProduct() const
 		{
 			__m128 out_ = _mm_mul_ps(data_, EmuMath::SIMD::shuffle<3, 2, 1, 0>(data_));
@@ -605,7 +601,7 @@ namespace EmuMath
 		/// <summary> Finds the lowest stored value within this vector. </summary>
 		/// <typeparam name="OutT_">Type to output the lowest value as.</typeparam>
 		/// <returns>Copy of the lowest value within this vector.</returns>
-		template<typename OutT_ = value_type>
+		template<typename OutT_ = float>
 		[[nodiscard]] inline OutT_ Min() const
 		{
 			__m128 out_ = _mm_min_ps(data_, EmuMath::SIMD::shuffle<3, 2, 1, 0>(data_));
@@ -616,7 +612,7 @@ namespace EmuMath
 		/// <summary> Finds the highest stored value within this vector. </summary>
 		/// <typeparam name="OutT_">Type to output the highest value as.</typeparam>
 		/// <returns>Copy of the highest value within this vector.</returns>
-		template<typename OutT_ = value_type>
+		template<typename OutT_ = float>
 		[[nodiscard]] inline OutT_ Max() const
 		{
 			__m128 out_ = _mm_max_ps(data_, EmuMath::SIMD::shuffle<3, 2, 1, 0>(data_));
@@ -658,7 +654,7 @@ namespace EmuMath
 #pragma region CONVERSIONS
 		/// <summary>
 		/// <para> Stores this vector into the passed EmuMath vector reference. </para>
-		/// <para> This function is optimised to store into a 128-bit wide range of this vector's value_type. If possible, it will store its data by these means. </para>
+		/// <para> This function is optimised to store into a 128-bit wide range of this vector's float. If possible, it will store its data by these means. </para>
 		/// <para> May provide an additional index offset to start contiguously outputting this vector's data from. </para>
 		/// </summary>
 		/// <param name="out_">EmuMath vector to store this vector's data in.</param>
@@ -670,31 +666,31 @@ namespace EmuMath
 				constexpr std::size_t num_to_copy = OutSize_ - OutOffset_;
 				if constexpr (num_to_copy == 1)
 				{
-					out_.Set<OutOffset_ + 0, const value_type>(at<0>());
+					out_.Set<OutOffset_ + 0, const float>(at<0>());
 				}
 				else if constexpr (num_to_copy == 2)
 				{
-					out_.Set<OutOffset_ + 0, const value_type>(at<0>());
-					out_.Set<OutOffset_ + 1, const value_type>(at<1>());
+					out_.Set<OutOffset_ + 0, const float>(at<0>());
+					out_.Set<OutOffset_ + 1, const float>(at<1>());
 				}
 				else if constexpr (num_to_copy == 3)
 				{
-					out_.Set<OutOffset_ + 0, const value_type>(at<0>());
-					out_.Set<OutOffset_ + 1, const value_type>(at<1>());
-					out_.Set<OutOffset_ + 2, const value_type>(at<2>());
+					out_.Set<OutOffset_ + 0, const float>(at<0>());
+					out_.Set<OutOffset_ + 1, const float>(at<1>());
+					out_.Set<OutOffset_ + 2, const float>(at<2>());
 				}
 				else
 				{
-					if constexpr (std::is_same_v<value_type, out_contained_type>)
+					if constexpr (std::is_same_v<float, out_contained_type>)
 					{
 						_mm_store_ps(out_.data() + OutOffset_, data_);
 					}
 					else
 					{
-						out_.Set<OutOffset_ + 0, const value_type>(at<0>());
-						out_.Set<OutOffset_ + 1, const value_type>(at<1>());
-						out_.Set<OutOffset_ + 2, const value_type>(at<2>());
-						out_.Set<OutOffset_ + 3, const value_type>(at<3>());
+						out_.Set<OutOffset_ + 0, const float>(at<0>());
+						out_.Set<OutOffset_ + 1, const float>(at<1>());
+						out_.Set<OutOffset_ + 2, const float>(at<2>());
+						out_.Set<OutOffset_ + 3, const float>(at<3>());
 					}
 				}
 			}
@@ -705,11 +701,11 @@ namespace EmuMath
 		}
 		// <summary>
 		/// <para> Stores this vector into an EmuMath vector of the provided OutSize_, containing the provided out_contained_type. </para>
-		/// <para> The output EmuMath vector defaults to the EmuMath vector that mirrors this vector in terms of size and value_type. </para>
-		/// <para> This function is optimised to store into a 128-bit wide range of this vector's value_type. If possible, it will store its data by these means. </para>
+		/// <para> The output EmuMath vector defaults to the EmuMath vector that mirrors this vector in terms of size and float. </para>
+		/// <para> This function is optimised to store into a 128-bit wide range of this vector's float. If possible, it will store its data by these means. </para>
 		/// <para> May provide an additional index offset to start contiguously outputting this vector's data from. </para>
 		/// </summary>
-		template<std::size_t OutOffset_ = 0, std::size_t OutSize_ = 4, typename out_contained_type = value_type>
+		template<std::size_t OutOffset_ = 0, std::size_t OutSize_ = 4, typename out_contained_type = float>
 		inline EmuMath::Vector<OutSize_, out_contained_type> Store() const
 		{
 			if constexpr (OutOffset_ == 0)
@@ -729,7 +725,7 @@ namespace EmuMath
 				}
 				else if constexpr (OutSize_ == 4)
 				{
-					if constexpr (std::is_same_v<value_type, std::remove_const_t<out_contained_type>>)
+					if constexpr (std::is_same_v<float, std::remove_const_t<out_contained_type>>)
 					{
 						// Faster to load to some dummy floats and then copy the contiguous memory than perform suboptimal at commands several times.
 						float to_copy_[4];
@@ -744,10 +740,10 @@ namespace EmuMath
 				else
 				{
 					EmuMath::Vector<OutSize_, out_contained_type> out_ = EmuMath::Vector<OutSize_, out_contained_type>();
-					out_.Set<0, const value_type>(at<0>());
-					out_.Set<1, const value_type>(at<1>());
-					out_.Set<2, const value_type>(at<2>());
-					out_.Set<3, const value_type>(at<3>());
+					out_.Set<0, const float>(at<0>());
+					out_.Set<1, const float>(at<1>());
+					out_.Set<2, const float>(at<2>());
+					out_.Set<3, const float>(at<3>());
 					return out_;
 				}
 			}
@@ -776,16 +772,16 @@ namespace EmuMath
 #pragma endregion
 
 		/// <summary> SIMD register represeneting this vector's data. This should not be interacted with directly unless you know what you are doing. </summary>
-		data_type data_;
+		__m128 data_;
 
 	private:
-		/// <summary> Calculates data_ DOT b_, storing the result in the output data_type's first element. </summary>
-		inline data_type _calculate_dot_single(data_type b_) const
+		/// <summary> Calculates data_ DOT b_, storing the result in the output __m128's first element. </summary>
+		inline __m128 _calculate_dot_single(__m128 b_) const
 		{
 			return EmuMath::SIMD::horizontal_vector_sum(_mm_mul_ps(data_, b_));
 		}
-		/// <summary> Calculates data_ DOT b_, storing the result in every element of the output data_type. </summary>
-		inline data_type _calculate_dot_fill(data_type b_) const
+		/// <summary> Calculates data_ DOT b_, storing the result in every element of the output __m128. </summary>
+		inline __m128 _calculate_dot_fill(__m128 b_) const
 		{
 			return EmuMath::SIMD::horizontal_vector_sum_fill(_mm_mul_ps(data_, b_));
 		}

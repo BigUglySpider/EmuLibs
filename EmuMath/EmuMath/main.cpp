@@ -262,7 +262,6 @@ int main()
 	to_product.MinMax(min_, max_);
 	std::cout << "MINMAX(" << to_product << "): [" << min_ << ", " << max_ << "]\n";
 
-
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();
