@@ -262,6 +262,9 @@ int main()
 	to_product.MinMax(min_, max_);
 	std::cout << "MINMAX(" << to_product << "): [" << min_ << ", " << max_ << "]\n";
 
+	std::cout << (EmuMath::FastVector4f(1.0f, 2.0f, 3.0f, 4.0f) % 1.5f) << "\n";
+
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();
