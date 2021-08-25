@@ -394,5 +394,10 @@ inline std::ostream& operator<<(std::ostream& stream_, const EmuMath::FastVector
 	stream_ << "{ " << v4f_.at<0>() << ", " << v4f_.at<1>() << ", " << v4f_.at<2>() << ", " << v4f_.at<3>() << " }";
 	return stream_;
 }
+inline std::wostream& operator<<(std::wostream& stream_, const EmuMath::FastVector4f& v4f_)
+{
+	stream_ << L"{ " << v4f_.at<0>() << L", " << v4f_.at<1>() << L", " << v4f_.at<2>() << L", " << v4f_.at<3>() << L" }";
+	return stream_;
+}
 
 #endif
