@@ -80,6 +80,43 @@ namespace EmuMath::Helpers
 			);
 		}
 	}
+
+	/// <summary>
+	/// <para> Returns a copy of the theoretical value within the provided index of the passed vector. </para>
+	/// <para> If the provided index is a valid index for the passed vector, a copy of that index will be provided. </para>
+	/// <para>
+	///		If the provided index is an invalid index for the passed vector, a copy of the vector's default-constructed value_type will be returned instead, 
+	///		inferred as representing 0.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="OutT_">Type to output the theoretical value at the provided index as.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to extract the value from.</typeparam>
+	/// <param name="vector_">EmuMath vector to extract the theoretical value for the provided index of.</param>
+	/// <returns>If Index_ is within the passed vector's index range: copy of the given index within the vector. Otherwise, a default-constructed value_type, inferring 0.</returns>
+	template<std::size_t Index_, typename OutT_, class Vector_>
+	[[nodiscard]] OutT_ VectorGetTheoretical(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			if constexpr (Index_ < Vector_::size)
+			{
+				return static_cast<OutT_>(VectorGet<Index_>(vector_));
+			}
+			else
+			{
+				return static_cast<OutT_>(typename Vector_::value_type());
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the theoretical value of an index within a vector, but provided a non-EmuMath-vector type argument.");
+		}
+	}
+	template<std::size_t Index_, class Vector_>
+	[[nodiscard]] typename Vector_::value_type VectorGetTheoretical(const Vector_& vector_)
+	{
+		return VectorGetTheoretical<Index_, typename Vector_::value_type, Vector_>(vector_);
+	}
 #pragma endregion
 
 #pragma region SETS

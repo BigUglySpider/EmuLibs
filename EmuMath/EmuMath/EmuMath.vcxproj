@@ -158,9 +158,11 @@
     <ClInclude Include="EmuCore\TMPHelpers\Functors.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TypeComparators.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TypeConvertors.h" />
+    <ClInclude Include="EmuMath\FastVector.h" />
     <ClInclude Include="EmuMath\NoOverflowT.h" />
     <ClInclude Include="EmuMath\SIMDHelpers.h" />
     <ClInclude Include="EmuMath\Vector.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\FastVector4f.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\Vector2.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\Vector3.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\Vector4.h" />

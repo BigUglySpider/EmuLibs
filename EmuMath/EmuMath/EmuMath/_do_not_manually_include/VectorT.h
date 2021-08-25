@@ -58,6 +58,10 @@ namespace EmuMath
 		{
 			EmuMath::Helpers::VectorSet(*this, toCopy_);
 		}
+		constexpr Vector(const contained_type* pDataToLoad, std::size_t numBytes_) : Vector()
+		{
+			memcpy(data(), pDataToLoad, numBytes_);
+		}
 		/// <summary>
 		/// <para> Constructs this vector with its elements matching the passed data, in contiguous order of the 0th to the (size - 1)th element. </para>
 		/// <para> This constructor requires a number of arguments equal to the number of elements in the vector. </para>

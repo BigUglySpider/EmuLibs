@@ -48,6 +48,35 @@ namespace EmuMath::SIMD
 		return _mm_shuffle_ps(ab, ab, shuffle_arg_v<X_, Y_, Z_, W_>);
 	}
 
+	template<std::size_t Index_>
+	inline __m128 index_mask_m128()
+	{
+		if constexpr (Index_ == 0)
+		{
+			__m128i mask_ = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
+			return *reinterpret_cast<__m128*>(&mask_);
+		}
+		else if constexpr (Index_ == 1)
+		{
+			__m128i mask_ = _mm_set_epi32(0, 0, 0xFFFFFFFF, 0);
+			return *reinterpret_cast<__m128*>(&mask_);
+		}
+		else if constexpr (Index_ == 2)
+		{
+			__m128i mask_ = _mm_set_epi32(0, 0xFFFFFFFF, 0, 0);
+			return *reinterpret_cast<__m128*>(&mask_);
+		}
+		else if constexpr (Index_ == 3)
+		{
+			__m128i mask_ = _mm_set_epi32(0xFFFFFFFF, 0, 0, 0);
+			return *reinterpret_cast<__m128*>(&mask_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to retrieve a mask for an invalid index within an __m128 register.");
+		}
+	}
+
 	/// <summary> Compile-time executable function to generate an expected move mask for the provided comparison results for respective elements. </summary>
 	/// <param name="x_">Whether the resultant x-bit should be true or false.</param>
 	/// <param name="y_">Whether the resultant y-bit should be true or false.</param>

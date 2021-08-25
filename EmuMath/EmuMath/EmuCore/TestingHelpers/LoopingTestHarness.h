@@ -1,6 +1,7 @@
 #ifndef EMU_CORE_LOOPING_TEST_HARNESS_H_INC_
 #define EMU_CORE_LOOPING_TEST_HARNESS_H_INC_ 1
 
+#include "../Functors/Arithmetic.h"
 #include <chrono>
 #include <exception>
 #include <filesystem>
@@ -83,7 +84,8 @@ namespace EmuCore::TestingHelpers
 				<< "Total Time: " << (totalTime * TimingType(0.001))
 				<< "ms\nMin Time: " << minTime
 				<< "us\nMax Time: " << maxTime
-				<< "us\nMean Time: " << meanTime << "us";
+				<< "us\nMean Time: " << meanTime
+				<< "us\nStandard Deviation: " << CalculateStandardDeviation(times, meanTime);
 			if (writeAllTimesToStream)
 			{
 				resultsStream << "\nAll times:";
@@ -109,7 +111,8 @@ namespace EmuCore::TestingHelpers
 				<< L"Total Time: " << (totalTime * TimingType(0.001))
 				<< L"ms\nMin Time: " << minTime
 				<< L"us\nMax Time: " << maxTime
-				<< L"us\nMean Time: " << meanTime << L"us";
+				<< L"us\nMean Time: " << meanTime
+				<< L"us\nStandard Deviation: " << CalculateStandardDeviation(times, meanTime);
 			if (writeAllTimesToStream)
 			{
 				resultsStream << L"\nAll times:";
@@ -121,6 +124,17 @@ namespace EmuCore::TestingHelpers
 		}
 
 	private:
+		inline TimingType CalculateStandardDeviation(const std::vector<TimingType>& times, const TimingType meanTime) const
+		{
+			TimingType std_mean = TimingType(0);
+			for (const TimingType& time_ : times)
+			{
+				TimingType subtracted = time_ - meanTime;
+				std_mean += (subtracted * subtracted);
+			}
+			return EmuCore::do_sqrt<TimingType>()(std_mean / static_cast<TimingType>(times.size()));
+		}
+
 		template<bool PassLoopNumberOnExecution>
 		inline void PerformLoop
 		(

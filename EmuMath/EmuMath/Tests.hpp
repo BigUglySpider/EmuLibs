@@ -10,6 +10,7 @@
 
 // ADDITIONAL INCLUDES
 #include "EmuMath/Vector.h"
+#include "EmuMath/FastVector.h"
 #include <bitset>
 #include <string_view>
 
@@ -57,20 +58,19 @@ namespace EmuCore::TestingHelpers
 		}
 	};
 
-	struct VectorMagRecipTest_Normal
+	struct FastVectorStoreTest
 	{
-	private:
-		using vector_type = EmuMath::Vector<3, float>;
-		using floating_point = vector_type::preferred_floating_point;
-
-	public:
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 5000000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr bool DO_TEST = true;
-		static constexpr std::string_view NAME = "Mag Reciprocal (Normal)";
+		static constexpr std::string_view NAME = "Fast Vector Store";
 
-		VectorMagRecipTest_Normal()
+		static constexpr std::size_t OutSize_ = 4;
+		using out_contained_type = float;
+		using out_type = EmuMath::Vector<OutSize_, out_contained_type>;
+
+		FastVectorStoreTest()
 		{
 		}
 		void Prepare()
@@ -79,104 +79,30 @@ namespace EmuCore::TestingHelpers
 			out_.resize(NUM_LOOPS);
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				in_[i] = EmuMath::Helpers::VectorMutate(in_[i], VectorFiller());
+				EmuMath::Vector4<float> data_ = EmuMath::Vector4<float>();
+				in_[i] = EmuMath::FastVector4f(EmuMath::Helpers::VectorMutate(data_, VectorFiller()));
+				in_[i].data_ = _mm_mul_ps(in_[i].data_, _mm_setr_ps((rand() % 5) * 0.5f, (rand() % 5) * 0.5f, (rand() % 5) * 0.5f, (rand() % 5) * 0.5f));
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			out_[i] = EmuMath::Helpers::VectorMagnitudeReciprocal<floating_point>(in_[i]);
+			out_[i] = in_[i].Store<0, OutSize_, out_contained_type>();
 		}
 		void OnTestsOver()
 		{
 			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
-			std::cout << "MagRecip(" << in_[i] << "): " << out_[i] << "\n";
+			std::cout << in_[i] << " == " << out_[i] << "\n";
 		}
-		std::vector<vector_type> in_;
-		std::vector<floating_point> out_;
-	};
 
-	struct VectorMagRecipTest_Qrsqrt
-	{
-		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 5000000;
-		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = true;
-		static constexpr std::string_view NAME = "Mag Reciprocal (Q_rsqrt)";
-
-		using vector_type = EmuMath::Vector<3, float>;
-		using floating_point = vector_type::preferred_floating_point;
-
-		VectorMagRecipTest_Qrsqrt()
-		{
-		}
-		void Prepare()
-		{
-			in_.resize(NUM_LOOPS);
-			out_.resize(NUM_LOOPS);
-			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
-			{
-				in_[i] = EmuMath::Helpers::VectorMutate(in_[i], VectorFiller());
-			}
-		}
-		void operator()(std::size_t i)
-		{
-			out_[i] = EmuMath::Helpers::VectorMagnitudeReciprocalQrsqrt<floating_point>(in_[i]);
-		}
-		void OnTestsOver()
-		{
-			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
-			std::cout << "MagRecipQrsqrt(" << in_[i] << "): " << out_[i] << "\n";
-		}
-		std::vector<vector_type> in_;
-		std::vector<floating_point> out_;
-	};
-
-	struct VectorMagRecipTest_Constexpr
-	{
-	private:
-		using vector_type = EmuMath::Vector<3, float>;
-		using floating_point = vector_type::preferred_floating_point;
-
-
-	public:
-		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 5000000;
-		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = true;
-		static constexpr std::string_view NAME = "Mag Reciprocal (constexpr)";
-
-		VectorMagRecipTest_Constexpr()
-		{
-		}
-		void Prepare()
-		{
-			in_.resize(NUM_LOOPS);
-			out_.resize(NUM_LOOPS);
-			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
-			{
-				in_[i] = EmuMath::Helpers::VectorMutate(in_[i], VectorFiller());
-			}
-		}
-		void operator()(std::size_t i)
-		{
-			out_[i] = EmuMath::Helpers::VectorMagnitudeReciprocalConstexpr<floating_point>(in_[i]);
-		}
-		void OnTestsOver()
-		{
-			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
-			std::cout << "MagRecipConstexpr(" << in_[i] << "): " << out_[i] << "\n";
-		}
-		std::vector<vector_type> in_;
-		std::vector<floating_point> out_;
+		std::vector<EmuMath::FastVector4f> in_;
+		std::vector<out_type> out_;
 	};
 
 	using SqrtTestFP = float;
 
 	using AllTests = std::tuple
 	<
-		VectorMagRecipTest_Normal,
-		VectorMagRecipTest_Constexpr,
-		VectorMagRecipTest_Qrsqrt
+		FastVectorStoreTest
 	>;
 
 

@@ -49,6 +49,10 @@ namespace EmuMath
 		{
 			EmuMath::Helpers::VectorSet(*this, toCopy_);
 		}
+		constexpr Vector(const contained_type* pDataToLoad, std::size_t numBytes_) : Vector()
+		{
+			memcpy(data(), pDataToLoad, numBytes_);
+		}
 		template<typename X_, typename Y_>
 		constexpr Vector(X_&& x_, Y_&& y_) : 
 			x(std::forward<X_>(x_)),
