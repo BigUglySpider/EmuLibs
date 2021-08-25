@@ -202,19 +202,26 @@ int main()
 
 	std::cout << cross_a_ << ": [" << cross_a_[0] << " | " << cross_a_[1] << " | " << cross_a_[2] << "]\n\n\n";
 
-	//EmuMath::Vector4<float> scalar_(1.0f, 2.0f, 3.0f, 4.0f);
-	//EmuMath::FastVector4f simd_(scalar_);
-	//std::cout << "Scalar: " << scalar_ << "\n";
-	//std::cout << "SIMD  : " << simd_ << "\n";
-	//simd_.Set<2>(0.0f);
-	//simd_.Set<3>(1337.0f);
-	//std::cout << simd_ << "\n";
-	//simd_.data_ = _mm_mul_ps(simd_.data_, _mm_set_ps1(3.0f));
-	//simd_.Store(scalar_);
-	//std::cout << simd_ << " | " << scalar_ << "\n";
-	//
-	//std::cout << simd_.Store<3, 8, double>() << "\n";
-	//std::cout << simd_.Store() << "\n";
+	EmuMath::Vector4<float> scalar_(1.0f, 2.0f, 3.0f, 4.0f);
+	EmuMath::FastVector4f simd_(scalar_);
+	std::cout << "Scalar: " << scalar_ << "\n";
+	std::cout << "SIMD  : " << simd_ << "\n";
+	simd_.Set<2>(0.0f);
+	simd_.Set<3>(1337.0f);
+	std::cout << simd_ << "\n";
+	simd_.data_ = _mm_mul_ps(simd_.data_, _mm_set_ps1(3.0f));
+	simd_.Store(scalar_);
+	std::cout << simd_ << " | " << scalar_ << "\n";
+
+	std::cout << simd_.Store<3, 8, double>() << "\n";
+	std::cout << simd_.Store() << "\n";
+
+	std::cout << !simd_ << " | " << static_cast<bool>(simd_) << "\n";
+	simd_.Set(0);
+	std::cout << !simd_ << " | " << static_cast<bool>(simd_) << "\n";
+	simd_.Set<2>(0.0000001f);
+	std::cout << !simd_ << " | " << static_cast<bool>(simd_) << "\n";
+
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

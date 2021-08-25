@@ -104,7 +104,7 @@ namespace EmuMath::Helpers
 			}
 			else
 			{
-				return static_cast<OutT_>(typename Vector_::value_type());
+				return OutT_();
 			}
 		}
 		else
