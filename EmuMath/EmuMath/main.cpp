@@ -1,5 +1,6 @@
 #include "EmuMath/Vector.h"
 #include "EmuMath/FastVector.h"
+#include "EmuMath/NoOverflowT.h"
 #include <array>
 #include <bitset>
 #include <iomanip>
@@ -216,11 +217,9 @@ int main()
 	std::cout << simd_.Store<3, 8, double>() << "\n";
 	std::cout << simd_.Store() << "\n";
 
-	std::cout << !simd_ << " | " << static_cast<bool>(simd_) << "\n";
-	simd_.Set(0);
-	std::cout << !simd_ << " | " << static_cast<bool>(simd_) << "\n";
-	simd_.Set<2>(0.0000001f);
-	std::cout << !simd_ << " | " << static_cast<bool>(simd_) << "\n";
+	simd_.Set<3>(200000.0f);
+	std::cout << "Cast to Vector<16, std::uint16_t>: " << static_cast<EmuMath::Vector<16, std::uint16_t>>(simd_) << "\n";
+	std::cout << "Cast to Vector<16, NoOverflowT<std::uint16_t>>: " << static_cast<EmuMath::Vector<16, EmuMath::NoOverflowT<std::uint16_t>>>(simd_) << "\n";
 
 
 #pragma region TEST_HARNESS_EXECUTION
