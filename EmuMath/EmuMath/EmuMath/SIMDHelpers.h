@@ -399,7 +399,7 @@ namespace EmuMath::SIMD
 	inline __m128 horizontal_vector_sum_fill(__m128 a)
 	{
 		__m128 result = _mm_hadd_ps(a, a);
-		return _mm_hadd_ps(a, a);
+		return _mm_hadd_ps(result, result);
 	}
 	/// <summary> Performs a horizontal add within the passed vector and returns the result as a scalar. </summary>
 	/// <param name="a">SIMD vector to perform horizontal addition with.</param>

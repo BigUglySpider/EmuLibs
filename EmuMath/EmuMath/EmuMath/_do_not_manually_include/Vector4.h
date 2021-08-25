@@ -55,10 +55,10 @@ namespace EmuMath
 		}
 		template<typename X_, typename Y_, typename Z_, typename W_>
 		constexpr Vector(X_&& x_, Y_&& y_, Z_&& z_, W_&& w_) :
-			x(std::forward<X_>(x_)),
-			y(std::forward<Y_>(y_)),
-			z(std::forward<Z_>(z_)),
-			w(std::forward<W_>(w_))
+			x(static_cast<contained_type>(std::forward<X_>(x_))),
+			y(static_cast<contained_type>(std::forward<Y_>(y_))),
+			z(static_cast<contained_type>(std::forward<Z_>(z_))),
+			w(static_cast<contained_type>(std::forward<W_>(w_)))
 		{
 			static_assert
 			(

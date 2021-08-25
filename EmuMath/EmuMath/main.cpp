@@ -221,6 +221,46 @@ int main()
 	std::cout << "Cast to Vector<16, std::uint16_t>: " << static_cast<EmuMath::Vector<16, std::uint16_t>>(simd_) << "\n";
 	std::cout << "Cast to Vector<16, NoOverflowT<std::uint16_t>>: " << static_cast<EmuMath::Vector<16, EmuMath::NoOverflowT<std::uint16_t>>>(simd_) << "\n";
 
+	simd_.Set(2.0f, 4.0f, 6.0f, 8.0f);
+	std::cout << "Data: " << simd_ << "\n";
+	std::cout << "Norm: " << simd_.Normalise() << "\n";
+
+	EmuMath::Vector<4, float> blooble_a(1.0f, 2.0f, 3.0f, 4.0f);
+	EmuMath::Vector<4, float> blooble_b(5.0f, 4.0, 3.0f, 2.0f);
+	EmuMath::FastVector4f blobbo_a(1.0f, 2.0f, 3.0f, 4.0f);
+	EmuMath::FastVector4f blobbo_b(5.0f, 4.0, 3.0f, 2.0f);
+	std::cout << "Normal Angle Cosine: " << blooble_a.AngleCosine(blooble_b) << "\n";
+	std::cout << "SIMD Angle Cosine:   " << blobbo_a.AngleCosine(blobbo_b) << "\n";
+	std::cout << "Normal Angle (RADS): " << blooble_a.Angle<true>(blooble_b) << "\n";
+	std::cout << "SIMD Angle (RADS):   " << blobbo_a.Angle<true>(blobbo_b) << "\n";
+	std::cout << "Normal Angle (DEGS): " << blooble_a.Angle<false>(blooble_b) << "\n";
+	std::cout << "SIMD Angle (DEGS):   " << blobbo_a.Angle<false>(blobbo_b) << "\n";
+	std::cout << "Normal Cross: " << blooble_a.CrossProduct3D(blooble_b) << "\n";
+	std::cout << "SIMD Cross: " << blobbo_a.CrossProduct(blobbo_b) << "\n";
+
+	std::cout << "Min(5): " << blobbo_a.ClampMin(5.0f) << "\n";
+	std::cout << "Min(2): " << blobbo_a.ClampMin(2.0f) << "\n";
+	std::cout << "Max(5): " << blobbo_a.ClampMax(5.0f) << "\n";
+	std::cout << "Max(2): " << blobbo_a.ClampMax(2.0f) << "\n";
+	std::cout << "Clamp(2, 3): " << blobbo_a.Clamp(2.0f, 5.0f) << "\n";
+
+	EmuMath::FastVector4f to_product(2.0f, 3.0f, 5.0f, 7.0f);
+	std::cout << "Horizontal Product(" << to_product << "): " << to_product.HorizontalProduct() << "\n";
+	std::cout << "MIN(" << to_product << "): " << to_product.Min() << "\n";
+	std::cout << "MAX(" << to_product << "): " << to_product.Max() << "\n";
+	to_product.Set<1>(-to_product.at<1>());
+	std::cout << "MIN(" << to_product << "): " << to_product.Min() << "\n";
+	std::cout << "MAX(" << to_product << "): " << to_product.Max() << "\n";
+	to_product.Set<2>(-to_product.at<2>());
+	std::cout << "MIN(" << to_product << "): " << to_product.Min() << "\n";
+	std::cout << "MAX(" << to_product << "): " << to_product.Max() << "\n";
+	to_product.Set<3>(-to_product.at<3>());
+	std::cout << "MIN(" << to_product << "): " << to_product.Min() << "\n";
+	std::cout << "MAX(" << to_product << "): " << to_product.Max() << "\n";
+
+	float min_, max_;
+	to_product.MinMax(min_, max_);
+	std::cout << "MINMAX(" << to_product << "): [" << min_ << ", " << max_ << "]\n";
 
 
 #pragma region TEST_HARNESS_EXECUTION
