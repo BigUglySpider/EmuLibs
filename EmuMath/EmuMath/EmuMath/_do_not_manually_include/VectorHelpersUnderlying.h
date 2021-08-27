@@ -516,6 +516,259 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		_find_vector_min_max_indices<1, Vector_>(vector_, min_, max_, outMinIndex_, outMaxIndex_);
 	}
 
+	template<std::size_t Index_, class OutVector_, class VectorA_, class B_, class Func_>
+	constexpr inline void _form_min_or_max_vector_b_vector(const VectorA_& a_, const B_& b_, OutVector_& out_, Func_& func_)
+	{
+		if constexpr (Index_ < OutVector_::size)
+		{
+			using out_value = typename OutVector_::value_type;
+			if constexpr (Index_ < VectorA_::size)
+			{
+				if constexpr (Index_ < B_::size)
+				{
+					_get_vector_data<Index_>(out_) = static_cast<out_value>(func_(_get_vector_data<Index_>(a_), _get_vector_data<Index_>(b_)));
+					_form_min_or_max_vector_b_vector<Index_ + 1, OutVector_, VectorA_, B_, Func_>(a_, b_, out_, func_);
+				}
+				else
+				{
+					_get_vector_data<Index_>(out_) = static_cast<out_value>(func_(_get_vector_data<Index_>(a_), typename B_::value_type()));
+					_form_min_or_max_vector_b_vector<Index_ + 1, OutVector_, VectorA_, B_, Func_>(a_, b_, out_, func_);
+				}
+			}
+			else
+			{
+				using a_value = typename VectorA_::value_type;
+				if constexpr (Index_ < B_::size)
+				{
+					_get_vector_data<Index_>(out_) = static_cast<out_value>(func_(a_value(), _get_vector_data<Index_>(b_)));
+					_form_min_or_max_vector_b_vector<Index_ + 1, OutVector_, VectorA_, B_, Func_>(a_, b_, out_, func_);
+				}
+				else
+				{
+					// Will be the same for all remaining indices, so just defer the rest of the formation to a copy of the result instead.
+					_copy_to_vector_via_scalar<Index_, OutVector_>(out_, static_cast<out_value>(func_(a_value(), typename B_::value_type())));
+				}
+			}
+		}
+	}
+	template<std::size_t Index_, class OutVector_, class VectorA_, class B_, class Func_>
+	constexpr inline void _form_min_or_max_vector_b_scalar(const VectorA_& a_, const B_& b_, OutVector_& out_, Func_& func_)
+	{
+		if constexpr (Index_ < OutVector_::size)
+		{
+			using out_value = typename OutVector_::value_type;
+			if constexpr (Index_ < VectorA_::size)
+			{
+				_get_vector_data<Index_>(out_) = static_cast<out_value>(func_(_get_vector_data<Index_>(a_), b_));
+				_form_min_or_max_vector_b_scalar<Index_ + 1, OutVector_, VectorA_, B_, Func_>(a_, b_, out_, func_);
+			}
+			else
+			{
+				// Will be the same for all remaining indices, so just defer the rest of the formation to a copy of the result instead.
+				_copy_to_vector_via_scalar<Index_>(out_, static_cast<out_value>(func_(typename VectorA_::value_type(), b_)));
+			}
+		}
+	}
+	template<class OutVector, class VectorA_, class B_>
+	constexpr inline OutVector _form_min_vector(const VectorA_& a_, const B_& b_)
+	{
+		OutVector out_ = OutVector();
+		if constexpr (EmuMath::TMP::is_emu_vector_v<B_>)
+		{
+			using Func_ = EmuCore::do_min<typename VectorA_::value_type, typename B_::value_type>;
+			Func_ func_ = Func_();
+			_form_min_or_max_vector_b_vector<0, OutVector, VectorA_, B_, Func_>(a_, b_, out_, func_);
+		}
+		else
+		{
+			using Func_ = EmuCore::do_min<typename VectorA_::value_type, B_>;
+			Func_ func_ = Func_();
+			_form_min_or_max_vector_b_scalar<0, OutVector, VectorA_, B_, Func_>(a_, b_, out_, func_);
+		}
+		return out_;
+	}
+	template<class OutVector, class VectorA_, class B_>
+	constexpr inline OutVector _form_max_vector(const VectorA_& a_, const B_& b_)
+	{
+		OutVector out_ = OutVector();
+		if constexpr (EmuMath::TMP::is_emu_vector_v<B_>)
+		{
+			using Func_ = EmuCore::do_max<typename VectorA_::value_type, typename B_::value_type>;
+			Func_ func_ = Func_();
+			_form_min_or_max_vector_b_vector<0, OutVector, VectorA_, B_, Func_>(a_, b_, out_, func_);
+		}
+		else
+		{
+			using Func_ = EmuCore::do_max<typename VectorA_::value_type, B_>;
+			Func_ func_ = Func_();
+			_form_min_or_max_vector_b_scalar<0, OutVector, VectorA_, B_, Func_>(a_, b_, out_, func_);
+		}
+		return out_;
+	}
+
+	template<std::size_t Index_, class OutVector_, class VectorA_, class B_, class MinFunc_, class MaxFunc_, bool FirstMinArg_, bool...RemainingMinArgs>
+	struct _form_min_and_max_vector_b_vector
+	{
+		constexpr _form_min_and_max_vector_b_vector()
+		{
+		}
+
+		constexpr inline void operator()(const VectorA_& a_, const B_& b_, OutVector_& out_, MinFunc_& min_, MaxFunc_& max_) const
+		{
+			if constexpr (Index_ < OutVector_::size)
+			{
+				_form_min_and_max_vector_b_vector<Index_, OutVector_, VectorA_, B_, MinFunc_, MaxFunc_, FirstMinArg_>()(a_, b_, out_, min_, max_);
+				_form_min_and_max_vector_b_vector<Index_ + 1, OutVector_, VectorA_, B_, MinFunc_, MaxFunc_, RemainingMinArgs...>()(a_, b_, out_, min_, max_);
+			}
+		}
+	};
+	template<std::size_t Index_, class OutVector_, class VectorA_, class B_, class MinFunc_, class MaxFunc_, bool FirstMinArg_>
+	struct _form_min_and_max_vector_b_vector<Index_, OutVector_, VectorA_, B_, MinFunc_, MaxFunc_, FirstMinArg_>
+	{
+		constexpr _form_min_and_max_vector_b_vector()
+		{
+		}
+
+		constexpr inline void operator()(const VectorA_& a_, const B_& b_, OutVector_& out_, MinFunc_& min_, MaxFunc_& max_) const
+		{
+			// NOTE: This function is not recursive as it only takes one bool. As num bool args determines out vector size, this suggests we are at the end anyway
+			// --- A recursive form of this function is the one found with a further variadic arg after FirstMinArg_.
+			if constexpr (Index_ < OutVector_::size)
+			{
+				using out_value = typename OutVector_::value_type;
+				if constexpr (Index_ < VectorA_::size)
+				{
+					if constexpr (Index_ < B_::size)
+					{
+						if constexpr (FirstMinArg_)
+						{
+							_get_vector_data<Index_>(out_) = static_cast<out_value>(min_(_get_vector_data<Index_>(a_), _get_vector_data<Index_>(b_)));
+						}
+						else
+						{
+							_get_vector_data<Index_>(out_) = static_cast<out_value>(max_(_get_vector_data<Index_>(a_), _get_vector_data<Index_>(b_)));
+						}
+					}
+					else
+					{
+						using b_value = typename B_::value_type;
+						if constexpr (FirstMinArg_)
+						{
+							_get_vector_data<Index_>(out_) = static_cast<out_value>(min_(_get_vector_data<Index_>(a_), b_value()));
+						}
+						else
+						{
+							_get_vector_data<Index_>(out_) = static_cast<out_value>(max_(_get_vector_data<Index_>(a_), b_value()));
+						}
+					}
+				}
+				else
+				{
+					using a_value = typename VectorA_::value_type;
+					if constexpr (Index_ < B_::size)
+					{
+						if constexpr (FirstMinArg_)
+						{
+							_get_vector_data<Index_>(out_) = static_cast<out_value>(min_(a_value(), _get_vector_data<Index_>(b_)));
+						}
+						else
+						{
+							_get_vector_data<Index_>(out_) = static_cast<out_value>(max_(a_value(), _get_vector_data<Index_>(b_)));
+						}
+					}
+					else
+					{
+						using b_value = typename B_::value_type;
+						if constexpr (FirstMinArg_)
+						{
+							_get_vector_data<Index_>(out_) = static_cast<out_value>(min_(a_value(), b_value()));
+						}
+						else
+						{
+							_get_vector_data<Index_>(out_) = static_cast<out_value>(max_(a_value(), b_value()));
+						}
+					}
+				}
+			}
+		}
+	};
+	template<std::size_t Index_, class OutVector_, class VectorA_, class B_, class MinFunc_, class MaxFunc_, bool FirstMinArg_, bool...RemainingMinArgs>
+	struct _form_min_and_max_vector_b_scalar
+	{
+		constexpr _form_min_and_max_vector_b_scalar()
+		{
+		}
+		constexpr inline void operator()(const VectorA_& a_, const B_& b_, OutVector_& out_, MinFunc_& min_, MaxFunc_& max_) const
+		{
+			if constexpr (Index_ < OutVector_::size)
+			{
+				_form_min_and_max_vector_b_scalar<Index_, OutVector_, VectorA_, B_, MinFunc_, MaxFunc_, FirstMinArg_>()(a_, b_, out_, min_, max_);
+				_form_min_and_max_vector_b_scalar<Index_ + 1, OutVector_, VectorA_, B_, MinFunc_, MaxFunc_, RemainingMinArgs...>()(a_, b_, out_, min_, max_);
+			}
+		}
+	};
+	template<std::size_t Index_, class OutVector_, class VectorA_, class B_, class MinFunc_, class MaxFunc_, bool FirstMinArg_>
+	struct _form_min_and_max_vector_b_scalar<Index_, OutVector_, VectorA_, B_, MinFunc_, MaxFunc_, FirstMinArg_>
+	{
+		constexpr _form_min_and_max_vector_b_scalar()
+		{
+		}
+		constexpr inline void operator()(const VectorA_& a_, const B_& b_, OutVector_& out_, MinFunc_& min_, MaxFunc_& max_) const
+		{
+			// NOTE: This function is not recursive as it only takes one bool. As num bool args determines out vector size, this suggests we are at the end anyway
+			// --- A recursive form of this function is the one found with a further variadic arg after FirstMinArg_.
+			if constexpr (Index_ < OutVector_::size)
+			{
+				using out_value = typename OutVector_::value_type;
+				if constexpr (Index_ < VectorA_::size)
+				{
+					if constexpr (FirstMinArg_)
+					{
+						_get_vector_data<Index_>(out_) = static_cast<out_value>(min_(_get_vector_data<Index_>(a_), b_));
+					}
+					else
+					{
+						_get_vector_data<Index_>(out_) = static_cast<out_value>(max_(_get_vector_data<Index_>(a_), b_));
+					}
+				}
+				else
+				{
+					using a_value = typename VectorA_::value_type;
+					if constexpr (FirstMinArg_)
+					{
+						_get_vector_data<Index_>(out_) = static_cast<out_value>(min_(a_value(), b_));
+					}
+					else
+					{
+						_get_vector_data<Index_>(out_) = static_cast<out_value>(max_(a_value(), b_));
+					}
+				}
+			}
+		}
+	};
+	template<class OutVector_, class VectorA_, class B_, bool...MinArgs_>
+	constexpr inline OutVector_ _form_min_and_max_vector(const VectorA_& a_, const B_& b_)
+	{
+		OutVector_ out_ = OutVector_();
+		if constexpr (EmuMath::TMP::is_emu_vector_v<B_>)
+		{
+			using MinFunc_ = EmuCore::do_min<typename VectorA_::value_type, typename B_::value_type>;
+			using MaxFunc_ = EmuCore::do_max<typename VectorA_::value_type, typename B_::value_type>;
+			MinFunc_ min_ = MinFunc_();
+			MaxFunc_ max_ = MaxFunc_();
+			_form_min_and_max_vector_b_vector<0, OutVector_, VectorA_, B_, MinFunc_, MaxFunc_, MinArgs_...>()(a_, b_, out_, min_, max_);
+		}
+		else
+		{
+			using MinFunc_ = EmuCore::do_min<typename VectorA_::value_type, B_>;
+			using MaxFunc_ = EmuCore::do_max<typename VectorA_::value_type, B_>;
+			MinFunc_ min_ = MinFunc_();
+			MaxFunc_ max_ = MaxFunc_();
+			_form_min_and_max_vector_b_scalar<0, OutVector_, VectorA_, B_, MinFunc_, MaxFunc_, MinArgs_...>()(a_, b_, out_, min_, max_);
+		}
+		return out_;
+	}
+
 	template<std::size_t Index_, class A_, class B_, class T_, class Out_>
 	constexpr inline void _vector_lerp_vvv(const A_& a_, const B_& b_, const T_& t_, Out_& out_)
 	{

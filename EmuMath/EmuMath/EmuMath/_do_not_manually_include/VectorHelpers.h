@@ -970,6 +970,84 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	template<std::size_t OutSize_, typename out_contained_type, class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMinVector(const VectorA_& a_, const B_& b_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<VectorA_>)
+		{
+			return _underlying_vector_funcs::_form_min_vector<EmuMath::Vector<OutSize_, out_contained_type>, VectorA_, B_>(a_, b_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the minimum values of two vectors, but the passed argument a_ was not an EmuMath vector.");
+		}
+	}
+	template<std::size_t OutSize_, class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename VectorA_::value_type> VectorMinVector(const VectorA_& a_, const B_& b_)
+	{
+		return VectorMinVector<OutSize_, typename VectorA_::value_type, VectorA_, B_>(a_, b_);
+	}
+	template<typename out_contained_type, class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<VectorA_::size, out_contained_type> VectorMinVector(const VectorA_& a_, const B_& b_)
+	{
+		return VectorMinVector<VectorA_::size, out_contained_type, VectorA_, B_>(a_, b_);
+	}
+	template<class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<VectorA_::size, typename VectorA_::value_type> VectorMinVector(const VectorA_& a_, const B_& b_)
+	{
+		return VectorMinVector<VectorA_::size, typename VectorA_::value_type, VectorA_, B_>(a_, b_);
+	}
+
+	template<std::size_t OutSize_, typename out_contained_type, class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMaxVector(const VectorA_& a_, const B_& b_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<VectorA_>)
+		{
+			return _underlying_vector_funcs::_form_max_vector<EmuMath::Vector<OutSize_, out_contained_type>, VectorA_, B_>(a_, b_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the maximum values of two vectors, but the passed argument a_ was not an EmuMath vector.");
+		}
+	}
+	template<std::size_t OutSize_, class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename VectorA_::value_type> VectorMaxVector(const VectorA_& a_, const B_& b_)
+	{
+		return VectorMaxVector<OutSize_, typename VectorA_::value_type, VectorA_, B_>(a_, b_);
+	}
+	template<typename out_contained_type, class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<VectorA_::size, out_contained_type> VectorMaxVector(const VectorA_& a_, const B_& b_)
+	{
+		return VectorMaxVector<VectorA_::size, out_contained_type, VectorA_, B_>(a_, b_);
+	}
+	template<class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<VectorA_::size, typename VectorA_::value_type> VectorMaxVector(const VectorA_& a_, const B_& b_)
+	{
+		return VectorMaxVector<VectorA_::size, typename VectorA_::value_type, VectorA_, B_>(a_, b_);
+	}
+
+	template<typename out_contained_type, bool Min0_, bool...OthersMins_, class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(OthersMins_) + 1, out_contained_type> VectorMinMaxVector(const VectorA_& a_, const B_& b_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<VectorA_>)
+		{
+			return _underlying_vector_funcs::_form_min_and_max_vector<EmuMath::Vector<sizeof...(OthersMins_) + 1, out_contained_type>, VectorA_, B_, Min0_, OthersMins_...>
+			(
+				a_,
+				b_
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the minimum and maximum values of two vectors, but the passed argument a_ was not an EmuMath vector.");
+		}
+	}
+	template<bool Min0_, bool...OthersMins_, class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(OthersMins_) + 1, typename VectorA_::value_type> VectorMinMaxVector(const VectorA_& a_, const B_& b_)
+	{
+		return VectorMinMaxVector<typename VectorA_::value_type, Min0_, OthersMins_...>(a_, b_);
+	}
+
 	/// <summary>
 	/// <para> Calculates the resulting vector from a linear interpolation of the passed vector and operands, which can be summarised as a_ + ((b_ - a_) * t_). </para>
 	/// <para>

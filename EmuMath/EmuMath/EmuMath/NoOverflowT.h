@@ -3,6 +3,8 @@
 
 #include "../EmuCore/TMPHelpers/TypeComparators.h"
 #include "../EmuCore/TMPHelpers/TypeConvertors.h"
+#include "../EmuCore/Functors/Arithmetic.h"
+#include "../EmuCore/Functors/Bitwise.h"
 #include <limits>
 #include <ostream>
 #include <type_traits>
@@ -765,6 +767,86 @@ namespace std
 	};
 	template<typename T>
 	static constexpr bool is_integral_v<EmuMath::NoOverflowT<T>> = std::is_integral_v<T>;
+}
+#pragma endregion
+
+#pragma region EMU_CORE_FUNCTOR_SPECIALISATIONS
+namespace EmuCore
+{
+	// We specialise the bitwise operations as floating-point primitives are specialised, and bitwise ops cannot result in overflows anyway
+	// --- It should be noted that actual arithmetic should not be specialised in this way as no-overflow safety will be compromised implicitly as a result
+
+	template<typename T_, typename Rhs_>
+	struct do_bitwise_and<EmuMath::NoOverflowT<T_>, Rhs_> : public do_bitwise_and<T_, Rhs_>
+	{
+		constexpr do_bitwise_and() : do_bitwise_and<T_, Rhs_>()
+		{
+		}
+		constexpr inline EmuMath::NoOverflowT<T_> operator()(EmuMath::NoOverflowT<T_> lhs_, Rhs_&& rhs_) const
+		{
+			return EmuMath::NoOverflowT<T_>(do_bitwise_and<T_, Rhs_>::operator()(lhs_.val, std::forward<Rhs_>(rhs_)));
+		}
+	};
+
+	template<typename T_, typename Rhs_>
+	struct do_bitwise_or<EmuMath::NoOverflowT<T_>, Rhs_> : public do_bitwise_or<T_, Rhs_>
+	{
+		constexpr do_bitwise_or() : do_bitwise_or<T_, Rhs_>()
+		{
+		}
+		constexpr inline EmuMath::NoOverflowT<T_> operator()(EmuMath::NoOverflowT<T_> lhs_, Rhs_&& rhs_) const
+		{
+			return EmuMath::NoOverflowT<T_>(do_bitwise_or<T_, Rhs_>::operator()(lhs_.val, std::forward<Rhs_>(rhs_)));
+		}
+	};
+
+	template<typename T_, typename Rhs_>
+	struct do_bitwise_xor<EmuMath::NoOverflowT<T_>, Rhs_> : public do_bitwise_xor<T_, Rhs_>
+	{
+		constexpr do_bitwise_xor() : do_bitwise_or<T_, Rhs_>()
+		{
+		}
+		constexpr inline EmuMath::NoOverflowT<T_> operator()(EmuMath::NoOverflowT<T_> lhs_, Rhs_&& rhs_) const
+		{
+			return EmuMath::NoOverflowT<T_>(do_bitwise_xor<T_, Rhs_>::operator()(lhs_.val, std::forward<Rhs_>(rhs_)));
+		}
+	};
+
+	template<typename T_>
+	struct do_bitwise_not<EmuMath::NoOverflowT<T_>> : public do_bitwise_not<T_>
+	{
+		constexpr do_bitwise_not() : do_bitwise_not<T_>()
+		{
+		}
+		constexpr inline EmuMath::NoOverflowT<T_> operator()(EmuMath::NoOverflowT<T_> val_) const
+		{
+			return EmuMath::NoOverflowT<T_>(do_bitwise_not<T_>::operator()(val_.val));
+		}
+	};
+
+	template<typename T_, typename Shifts_>
+	struct do_left_shift<EmuMath::NoOverflowT<T_>, Shifts_> : public do_left_shift<T_, Shifts_>
+	{
+		constexpr do_left_shift() : do_left_shift<T_, Shifts_>()
+		{
+		}
+		constexpr inline EmuMath::NoOverflowT<T_> operator()(EmuMath::NoOverflowT<T_> lhs_, Shifts_&& num_shifts_) const
+		{
+			return EmuMath::NoOverflowT<T_>(do_left_shift<T_, Shifts_>::operator()(lhs_.val, std::forward<Shifts_>(num_shifts_)));
+		}
+	};
+
+	template<typename T_, typename Shifts_>
+	struct do_right_shift<EmuMath::NoOverflowT<T_>, Shifts_> : public do_right_shift<T_, Shifts_>
+	{
+		constexpr do_right_shift() : do_right_shift<T_, Shifts_>()
+		{
+		}
+		constexpr inline EmuMath::NoOverflowT<T_> operator()(EmuMath::NoOverflowT<T_> lhs_, Shifts_&& num_shifts_) const
+		{
+			return EmuMath::NoOverflowT<T_>(do_right_shift<T_, Shifts_>::operator()(lhs_.val, std::forward<Shifts_>(num_shifts_)));
+		}
+	};
 }
 #pragma endregion
 

@@ -652,6 +652,52 @@ namespace EmuMath
 			return EmuMath::Helpers::VectorMinMax<OutMin_, OutMax_, this_type>(*this, min_, max_);
 		}
 
+		/// <summary> Returns a vector containing copies of values stored at the respective indices of this vector or b_, whichever contains the lowest value. </summary>
+		/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
+		/// <typeparam name="B_">Type to compare the elements of this vector to.</typeparam>
+		/// <param name="b_">EmuMath vector or scalar to compare the elements of this vector to.</param>
+		/// <returns>Vector containing the lowest values in respective indices between this vector and b_.</returns>
+		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> MinVector(const B_& b_) const
+		{
+			return EmuMath::Helpers::VectorMinVector<OutSize_, out_contained_type, this_type, B_>(*this, b_);
+		}
+
+		/// <summary> Returns a vector containing copies of values stored at the respective indices of this vector or b_, whichever contains the greatest value. </summary>
+		/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
+		/// <typeparam name="B_">Type to compare the elements of this vector to.</typeparam>
+		/// <param name="b_">EmuMath vector or scalar to compare the elements of this vector to.</param>
+		/// <returns>Vector containing the greatest values in respective indices between this vector and b_.</returns>
+		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> MaxVector(const B_& b_) const
+		{
+			return EmuMath::Helpers::VectorMaxVector<OutSize_, out_contained_type, this_type, B_>(*this, b_);
+		}
+
+		/// <summary>
+		/// <para> Returns a vector containing copies of values stored at the respective indices of this vector or b_, whichever contains the lowest/greatest value. </para>
+		/// <para>
+		///		Boolean arguments are taken on a per-index basis.
+		///		Each respective argument determines if a copied value is the lowest (true) or greatest (false) of this vector and b_.
+		/// </para>
+		/// <para> Additionally, the size of the output vector is determined by the provided number of boolean arguments. </para>
+		/// <para> E.g. MinMaxVector&lt;false, true, true&gt;(b_) would result in a vector [Max(this[0], b_[0]), Min(this[1], b_[1]), Min(this[2], b_[2])]. </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type to be contained in the output vector.</typeparam>
+		/// <typeparam name="B_">Type to compare the elements of this vector to.</typeparam>
+		/// <param name="b_">EmuMath vector or scalar to compare the elements of this vector to.</param>
+		/// <returns>Vector containing the lowest or greatest values in respective indices between this vector and b_, depending on provided boolean template arguments.</returns>
+		template<typename out_contained_type, bool Min0_, bool...OtherMins_, class B_>
+		constexpr inline EmuMath::Vector<sizeof...(OtherMins_) + 1, out_contained_type> MinMaxVector(const B_& b_) const
+		{
+			return EmuMath::Helpers::VectorMinMaxVector<out_contained_type, Min0_, OtherMins_...>(*this, b_);
+		}
+		template<bool Min0_, bool...OtherMins_, class B_>
+		constexpr inline EmuMath::Vector<sizeof...(OtherMins_) + 1, value_type> MinMaxVector(const B_& b_) const
+		{
+			return EmuMath::Helpers::VectorMinMaxVector<value_type, Min0_, OtherMins_...>(*this, b_);
+		}
+
 		/// <summary> Finds the index of the lowest value within this vector. </summary>
 		/// <returns>Index of the lowest value within this vector.</returns>
 		[[nodiscard]] constexpr inline std::size_t MinIndex() const
@@ -1384,6 +1430,38 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONVERSIONS
+		/// <summary> Function to convert this vector to a different EmuMath vector of the specified size and contained type. </summary>
+		/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
+		/// <returns>This vector represented as an EmuMath vector with the provided size and contained type.</returns>
+		template<std::size_t OutSize_, typename out_contained_type>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> As()
+		{
+			return EmuMath::Vector<OutSize_, out_contained_type>(*this);
+		}
+		/// <summary> Function to convert this vector to a different EmuMath vector of the specified size and contained type. </summary>
+		/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
+		/// <returns>This vector represented as an EmuMath vector with the provided size and contained type.</returns>
+		template<std::size_t OutSize_, typename out_contained_type>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> As() const
+		{
+			return EmuMath::Vector<OutSize_, out_contained_type>(*this);
+		}
+
+		/// <summary> Conversion of this vector to a different type of EmuMath vector. Identical to As&lt;OutSize_, out_contained_type&gt;. </summary>
+		/// <typeparam name="out_contained_type"></typeparam>
+		template<std::size_t OutSize_, typename out_contained_type>
+		explicit constexpr inline operator EmuMath::Vector<OutSize_, out_contained_type>()
+		{
+			return this->template As<OutSize_, out_contained_type>();
+		}
+		/// <summary> Conversion of this vector to a different type of EmuMath vector. Identical to As&lt;OutSize_, out_contained_type&gt;. </summary>
+		/// <typeparam name="out_contained_type"></typeparam>
+		template<std::size_t OutSize_, typename out_contained_type>
+		explicit constexpr inline operator EmuMath::Vector<OutSize_, out_contained_type>() const
+		{
+			return this->template As<OutSize_, out_contained_type>();
+		}
+
 		/// <summary>
 		///	Boolean interpretation of this vector. 
 		///	As the all-zero vector is considered the fully default constructed vector, this will be true if at least 1 element is not equal to a default value_type.

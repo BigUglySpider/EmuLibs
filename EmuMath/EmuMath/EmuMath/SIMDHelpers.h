@@ -125,6 +125,29 @@ namespace EmuMath::SIMD
 			static_assert(false, "Attempted to retrieve a mask for an invalid index within an __m128i 8-bit register.");
 		}
 	}
+	template<bool i0_, bool i1_, bool i2_, bool i3_, bool i4_, bool i5_, bool i6_, bool i7_, bool i8_, bool i9_, bool i10_, bool i11_, bool i12_, bool i13_, bool i14_, bool i15_>
+	inline __m128i index_mask_m128i_8()
+	{
+		return _mm_set_epi8
+		(
+			0xFF * i15_,
+			0xFF * i14_,
+			0xFF * i13_,
+			0xFF * i12_,
+			0xFF * i11_,
+			0xFF * i10_,
+			0xFF * i9_,
+			0xFF * i8_,
+			0xFF * i7_,
+			0xFF * i6_,
+			0xFF * i5_,
+			0xFF * i4_,
+			0xFF * i3_,
+			0xFF * i2_,
+			0xFF * i1_,
+			0xFF * i0_
+		);
+	}
 	/// <summary>
 	/// <para> Provides the mask for the provided index within an __m128i 16-bit register. </para>
 	/// </summary>
@@ -169,6 +192,12 @@ namespace EmuMath::SIMD
 			static_assert(false, "Attempted to retrieve a mask for an invalid index within an __m128i 16-bit register.");
 		}
 	}
+	template<bool i0_, bool i1_, bool i2_, bool i3_, bool i4_, bool i5_, bool i6_, bool i7_>
+	inline __m128 index_mask_m128i_16()
+	{
+		return _mm_set_epi16(0xFFFF * i7_, 0xFFFF * i6_, 0xFFFF * i5_, 0xFFFF * i4_, 0xFFFF * i3_, 0xFFFF * i2_, 0xFFFF * i1_, 0xFFFF * i0_);
+	}
+
 	/// <summary>
 	/// <para> Provides the mask for the provided index within an __m128i 32-bit register. </para>
 	/// </summary>
@@ -197,6 +226,11 @@ namespace EmuMath::SIMD
 			static_assert(false, "Attempted to retrieve a mask for an invalid index within an __m128i 32-bit register.");
 		}
 	}
+	template<bool i0_, bool i1_, bool i2_, bool i3_>
+	inline __m128i index_mask_m128i_32()
+	{
+		return _mm_set_epi32(0xFFFFFFFF * i3_, 0xFFFFFFFF * i2_, 0xFFFFFFFF * i1_, 0xFFFFFFFF * i0_);
+	}
 
 	/// <summary>
 	/// <para> Provides the mask for the provided index within an __m128i 64-bit register. </para>
@@ -218,6 +252,12 @@ namespace EmuMath::SIMD
 			static_assert(false, "Attempted to retrieve a mask for an invalid index within an __m128i 64-bit register.");
 		}
 	}
+	template<bool i0_, bool i1_>
+	inline __m128i index_mask_m128i_64()
+	{
+		return _mm_set_epi64x(0xFFFFFFFFFFFFFFFF * i1_, 0xFFFFFFFFFFFFFFFF * i0_);
+	}
+
 	/// <summary>
 	/// <para> Provides the mask for the provided index within an __m128i register, where each element is considered to contain NumBits_ bits. </para>
 	/// <para> Valid values for NumBits_ are: 8, 16, 32, 64. Anything else will result in a static assertion being triggered. </para>
@@ -265,6 +305,12 @@ namespace EmuMath::SIMD
 			static_assert(false, "Attempted to retrieve a mask for an invalid index within an __m128 register.");
 		}
 	}
+	template<bool i0_, bool i1_, bool i2_, bool i3_>
+	inline __m128 index_mask_m128()
+	{
+		__m128i mask_ = index_mask_m128i_32<i0_, i1_, i2_, i3_>();
+		return *reinterpret_cast<__m128*>(&mask_);
+	}
 
 	template<std::size_t Index_>
 	inline __m128d index_mask_m128d()
@@ -279,17 +325,23 @@ namespace EmuMath::SIMD
 			static_assert(false, "Attempted to retrieve a mask for an invalid index within an __m128d reigster.");
 		}
 	}
+	template<bool i0_, bool i1_>
+	inline __m128d index_mask_m128d()
+	{
+		__m128i mask_ = index_mask_m128i_64<i0_, i1_>();
+		return *reinterpret_cast<__m128d*>(&mask_);
+	}
 
 	/// <summary>
 	/// <para> Provides the mask for a provided index for a provided SIMD RegisterType_. Useful for when a type of register may not be known. </para>
 	/// <para>
 	///		NOTE: The NumBits_ argument is only used if an integer register is being passed, and is used to determine the number of bits that each element consumes. 
-	///		It defaults to 32-bit integers, but may be 8-, 16-, 32-, or 64-bit integers.
+	///		It defaults to 32-bit integers, but may be 8-, 16-, 32-, or 64-bit integers. If a non-integer register type is provided, this value may be anything.
 	/// </para>
 	/// </summary>
 	/// <typeparam name="RegisterType_">Type of SIMD register intrinsic type to return an index mask for.</typeparam>
 	/// <returns>Mask for the provided index when used with the provided register type.</returns>
-	template<typename RegisterType_, std::size_t Index_, std::size_t NumBits_ = 32>
+	template<typename RegisterType_, std::size_t Index_, std::size_t NumBits_>
 	inline RegisterType_ index_mask()
 	{
 		using unqualified_ = std::remove_cv_t<std::remove_reference_t<RegisterType_>>;

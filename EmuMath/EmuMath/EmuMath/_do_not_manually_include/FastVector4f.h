@@ -464,6 +464,11 @@ namespace EmuMath
 			__m128i shifted_ = _mm_srl_epi32(*reinterpret_cast<const __m128i*>(&data_), numShifts_);
 			return FastVector4f(*reinterpret_cast<const __m128*>(&shifted_));
 		}
+
+		[[nodiscard]] inline FastVector4f operator~() const
+		{
+			return this->Not();
+		}
 #pragma endregion
 
 #pragma region NON_CONST_OPERATORS
@@ -475,7 +480,62 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region ARITHMETIC
+		inline FastVector4f Add(__m128 rhs_) const
+		{
+			return FastVector4f(_mm_add_ps(data_, rhs_));
+		}
+		inline FastVector4f Add(const FastVector4f& rhs_) const
+		{
+			return this->Add(rhs_.data_);
+		}
 
+		inline FastVector4f Subtract(__m128 rhs_) const
+		{
+			return FastVector4f(_mm_sub_ps(data_, rhs_));
+		}
+		inline FastVector4f Subtract(const FastVector4f& rhs_) const
+		{
+			return this->Subtract(rhs_.data_);
+		}
+
+		inline FastVector4f Multiply(__m128 rhs_) const
+		{
+			return FastVector4f(_mm_mul_ps(data_, rhs_));
+		}
+		inline FastVector4f Multiply(const FastVector4f& rhs_) const
+		{
+			return this->Multiply(rhs_.data_);
+		}
+		inline FastVector4f Multiply(const float rhs_) const
+		{
+			return this->Multiply(_mm_broadcast_ss(&rhs_));
+		}
+
+		inline FastVector4f Divide(__m128 rhs_) const
+		{
+			return FastVector4f(_mm_div_ps(data_, rhs_));
+		}
+		inline FastVector4f Divide(const FastVector4f& rhs_) const
+		{
+			return this->Divide(rhs_.data_);
+		}
+		inline FastVector4f Divide(const float rhs_) const
+		{
+			return this->Divide(_mm_broadcast_ss(&rhs_));
+		}
+
+		inline FastVector4f Mod(__m128 rhs_) const
+		{
+			return FastVector4f(_mm_fmod_ps(data_, rhs_));
+		}
+		inline FastVector4f Mod(const FastVector4f& rhs_) const
+		{
+			return this->Mod(rhs_.data_);
+		}
+		inline FastVector4f Mod(const float rhs_) const
+		{
+			return this->Mod(_mm_broadcast_ss(&rhs_));
+		}
 #pragma endregion
 
 #pragma region VECTOR_OPERATIONS
@@ -809,6 +869,66 @@ namespace EmuMath
 			out_ = _mm_max_ps(out_, EmuMath::SIMD::shuffle<1, 0, 2, 3>(out_));
 			outMax_ = static_cast<OutMax_>(_mm_cvtss_f32(out_));
 		}
+
+		inline FastVector4f MinVector(__m128 b_) const
+		{
+			return FastVector4f(_mm_min_ps(data_, b_));
+		}
+		inline FastVector4f MinVector(const FastVector4f& b_) const
+		{
+			return this->MinVector(b_.data_);;
+		}
+		inline FastVector4f MinVector(const float b_) const
+		{
+			return this->MinVector(_mm_broadcast_ss(&b_));
+		}
+
+		inline FastVector4f MaxVector(__m128 b_) const
+		{
+			return FastVector4f(_mm_max_ps(data_, b_));
+		}
+		inline FastVector4f MaxVector(const FastVector4f& b_) const
+		{
+			return this->MaxVector(b_.data_);;
+		}
+		inline FastVector4f MaxVector(const float b_) const
+		{
+			return this->MaxVector(_mm_broadcast_ss(&b_));
+		}
+
+		template<bool XMin_, bool YMin_, bool ZMin_, bool WMin_>
+		inline FastVector4f MinMaxVector(__m128 b_) const
+		{
+			if constexpr (XMin_ == YMin_ && YMin_ == ZMin_ && ZMin_ == WMin_)
+			{
+				// Defer to min or max as that function would be faster due to avoiding non-required masks, since we are only doing one operation with these args
+				if constexpr (XMin_ == true)
+				{
+					return this->MinVector(b_);
+				}
+				else
+				{
+					return this->MaxVector(b_);
+				}
+			}
+			else
+			{
+				__m128 mask_ = EmuMath::SIMD::index_mask_m128<XMin_, YMin_, ZMin_, WMin_>();
+				__m128 out_ = _mm_and_ps(mask_, _mm_min_ps(data_, b_));
+				out_ = _mm_or_ps(out_, _mm_andnot_ps(mask_, _mm_max_ps(data_, b_)));
+				return FastVector4f(out_);
+			}
+		}
+		template<bool XMin_, bool YMin_, bool ZMin_, bool WMin_>
+		inline FastVector4f MinMaxVector(const FastVector4f& b_) const
+		{
+			return this->MinMaxVector<XMin_, YMin_, ZMin_, WMin_>(b_.data_);
+		}
+		template<bool XMin_, bool YMin_, bool ZMin_, bool WMin_>
+		inline FastVector4f MinMaxVector(const float b_) const
+		{
+			return this->template MinMaxVector<XMin_, YMin_, ZMin_, WMin_>(_mm_broadcast_ss(&b_));
+		}
 #pragma endregion
 
 #pragma region COMPARISONS
@@ -816,7 +936,102 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region BITWISE
+		/// <summary> Outputs the resulting vector from a bitwise AND with this vector's data and the passed vector data. </summary>
+		/// <param name="rhs_">Vector data to perform the bitwise AND on this vector's data.</param>
+		/// <returns>Vector resulting from a bitwise AND performed between this vector's data and the passed vector data.</returns>
+		inline FastVector4f And(__m128 rhs_) const
+		{
+			return FastVector4f(_mm_and_ps(data_, rhs_));
+		}
+		inline FastVector4f And(const FastVector4f& rhs_) const
+		{
+			return this->And(rhs_.data_);
+		}
+		inline FastVector4f And(const float rhs_) const
+		{
+			return this->And(_mm_broadcast_ss(&rhs_));
+		}
 
+		/// <summary> Outputs the resulting vector from a bitwise OR with this vector's data and the passed vector data. </summary>
+		/// <param name="rhs_">Vector data to perform the bitwise OR on this vector's data.</param>
+		/// <returns>Vector resulting from a bitwise OR performed between this vector's data and the passed vector data.</returns>
+		inline FastVector4f Or(__m128 rhs_) const
+		{
+			return FastVector4f(_mm_or_ps(data_, rhs_));
+		}
+		inline FastVector4f Or(const FastVector4f& rhs_) const
+		{
+			return this->Or(rhs_.data_);
+		}
+		inline FastVector4f Or(const float rhs_) const
+		{
+			return this->Or(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary> Outputs the resulting vector from a bitwise XOR with this vector's data and the passed vector data. </summary>
+		/// <param name="rhs_">Vector data to perform the bitwise XOR on this vector's data.</param>
+		/// <returns>Vector resulting from a bitwise XOR performed between this vector's data and the passed vector data.</returns>
+		inline FastVector4f Xor(__m128 rhs_) const
+		{
+			return FastVector4f(_mm_xor_ps(data_, rhs_));
+		}
+		inline FastVector4f Xor(const FastVector4f& rhs_) const
+		{
+			return this->Xor(rhs_.data_);
+		}
+		inline FastVector4f Xor(const float rhs_) const
+		{
+			return this->Xor(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary> Outputs the resulting vector from a bitwise logical shift left the provided number of times for all elements. </summary>
+		/// <param name="rhs_">Scalar or integral vector data indicating the number of times each element should be shifted.</param>
+		/// <returns>Vector resulting from a bitwise shift performed on this vector's data.</returns>
+		inline FastVector4f ShiftLeft(const std::size_t numShifts_) const
+		{
+			__m128i shifted_ = _mm_slli_epi32(*reinterpret_cast<const __m128i*>(&data_), static_cast<int>(numShifts_));
+			return FastVector4f(*reinterpret_cast<const __m128*>(&shifted_));
+		}
+		inline FastVector4f ShiftLeft(__m128i numShifts_) const
+		{
+			__m128i shifted_ = _mm_sll_epi32(*reinterpret_cast<const __m128i*>(&data_), numShifts_);
+			return FastVector4f(*reinterpret_cast<const __m128*>(&shifted_));
+		}
+
+		/// <summary> Outputs the resulting vector from a bitwise logical shift right the provided number of times for all elements. </summary>
+		/// <param name="rhs_">Scalar or integral vector data indicating the number of times each element should be shifted.</param>
+		/// <returns>Vector resulting from a bitwise shift performed on this vector's data.</returns>
+		inline FastVector4f ShiftRight(const std::size_t numShifts_) const
+		{
+			__m128i shifted_ = _mm_srli_epi32(*reinterpret_cast<const __m128i*>(&data_), static_cast<int>(numShifts_));
+			return FastVector4f(*reinterpret_cast<const __m128*>(&shifted_));
+		}
+		inline FastVector4f ShiftRight(__m128i numShifts_) const
+		{
+			__m128i shifted_ = _mm_srl_epi32(*reinterpret_cast<const __m128i*>(&data_), numShifts_);
+			return FastVector4f(*reinterpret_cast<const __m128*>(&shifted_));
+		}
+
+		/// <summary> Outputs the resulting vector from a bitwise arithmetic shift right the provided number of times for all elements. </summary>
+		/// <param name="rhs_">Scalar or integral vector data indicating the number of times each element should be shifted.</param>
+		/// <returns>Vector resulting from a bitwise shift performed on this vector's data.</returns>
+		inline FastVector4f ShiftRightArithmetic(const std::size_t numShifts_) const
+		{
+			__m128i shifted_ = _mm_srai_epi32(*reinterpret_cast<const __m128i*>(&data_), static_cast<int>(numShifts_));
+			return FastVector4f(*reinterpret_cast<const __m128*>(&shifted_));
+		}
+		inline FastVector4f ShiftRightArithmetic(__m128i numShifts_) const
+		{
+			__m128i shifted_ = _mm_sra_epi32(*reinterpret_cast<const __m128i*>(&data_), numShifts_);
+			return FastVector4f(*reinterpret_cast<const __m128*>(&shifted_));
+		}
+
+		/// <summary> Outputs the resulting vector from performing a bitwise NOT on this vector. </summary>
+		/// <returns>Inverted form of this vector resulting from a bitwise NOT.</returns>
+		inline FastVector4f Not() const
+		{
+			return _mm_andnot_ps(data_, EmuMath::SIMD::index_mask_m128<true, true, true, true>());
+		}
 #pragma endregion
 
 #pragma region CONVERSIONS

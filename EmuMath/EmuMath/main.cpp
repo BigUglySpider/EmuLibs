@@ -264,6 +264,37 @@ int main()
 
 	std::cout << (EmuMath::FastVector4f(1.0f, 2.0f, 3.0f, 4.0f) % 1.5f) << "\n";
 
+	EmuMath::FastVector4f fast_a_(rand(), rand(), rand(), rand());
+	EmuMath::FastVector4f fast_b_(rand(), rand(), rand(), rand());
+	std::cout << "A: " << fast_a_ << "\nB: " << fast_b_ << "\n";
+	std::cout << "Min(" << fast_a_ << ", " << fast_b_ << "): " << fast_a_.MinVector(fast_b_) << "\n";
+	std::cout << "Max(" << fast_a_ << ", " << fast_b_ << "): " << fast_a_.MaxVector(fast_b_) << "\n";
+	std::cout << "MinMax<true, false, false, true>(" << fast_a_ << ", " << fast_b_ << "): " << fast_a_.MinMaxVector<1, 0, 0, 1>(fast_b_) << "\n";
+
+	EmuMath::Vector<7, float> vec_c_(rand(), rand(), rand(), rand(), rand(), rand(), rand());
+	EmuMath::Vector<4, std::uint64_t> vec_d_(rand(), rand(), rand(), rand());
+	std::cout << "C: " << vec_c_ << "\nD: " << vec_d_ << "\n";
+	std::cout << "Min(C, D): " << vec_c_.MinVector(vec_d_) << "\n";
+	std::cout << "Max(C, D): " << vec_c_.MaxVector(vec_d_) << "\n";
+	float rand_ = rand() * 0.99f;
+	std::cout << "MinMax<false, true, true, true, false, false, true>(C, D): " << vec_c_.MinMaxVector<0, 1, 1, 1, 0, 0, 1>(vec_d_) << "\n";
+	std::cout << "MinMax<false, true, true, true, false, false, true>(C, " << rand_ << "): " << vec_c_.MinMaxVector<0, 1, 1, 1, 0, 0, 1>(rand_) << "\n";
+
+	EmuMath::Vector<5, float> wee_(1.0f, 2.0f, 3.0f, 4.0f, 5.0f);
+	auto wee_ref_ = wee_.As<EmuMath::RefVector<3, float>>();
+	auto wee_const_ref_ = wee_.As<EmuMath::ConstRefVector<3, float>>();
+	std::cout << wee_ << " | " << wee_ref_ << " | " << wee_const_ref_ << "\n";
+	wee_ref_[0] = 1.0f;
+	wee_ref_[1] = 33.0f;
+	wee_ref_[2] = 7.0f;
+	std::cout << wee_ << " | " << wee_ref_ << " | " << wee_const_ref_ << "\n";
+
+	fast_a_.Set(1.0f, 2.0f, 3.0f, 4.0f);
+	std::cout << fast_a_ << "\n";
+	std::cout << fast_a_.Not() << "\n";
+	std::cout << fast_a_.Not().Not() << "\n";
+
+
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
