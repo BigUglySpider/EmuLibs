@@ -472,11 +472,147 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region NON_CONST_OPERATORS
+		inline FastVector4f& operator=(__m128 rhs_)
+		{
+			data_ = rhs_;
+			return *this;
+		}
+		inline FastVector4f& operator=(const FastVector4f& rhs_)
+		{
+			data_ = rhs_.data_;
+			return *this;
+		}
 
+		inline FastVector4f& operator+=(__m128 rhs_)
+		{
+			data_ = _mm_add_ps(data_, rhs_);
+			return *this;
+		}
+		inline FastVector4f& operator+=(const FastVector4f& rhs_)
+		{
+			return this->operator+=(rhs_.data_);
+		}
+
+		inline FastVector4f& operator-=(__m128 rhs_)
+		{
+			data_ = _mm_sub_ps(data_, rhs_);
+			return *this;
+		}
+		inline FastVector4f& operator-=(const FastVector4f& rhs_)
+		{
+			return this->operator-=(rhs_.data_);
+		}
+
+		inline FastVector4f& operator*=(__m128 rhs_)
+		{
+			data_ = _mm_mul_ps(data_, rhs_);
+			return *this;
+		}
+		inline FastVector4f& operator*=(const FastVector4f& rhs_)
+		{
+			return this->operator*=(rhs_.data_);
+		}
+		inline FastVector4f& operator*=(const float rhs_)
+		{
+			return this->operator*=(_mm_broadcast_ss(&rhs_));
+		}
+
+		inline FastVector4f& operator/=(__m128 rhs_)
+		{
+			data_ = _mm_div_ps(data_, rhs_);
+			return *this;
+		}
+		inline FastVector4f& operator/=(const FastVector4f& rhs_)
+		{
+			return this->operator/=(rhs_.data_);
+		}
+		inline FastVector4f& operator/=(const float rhs_)
+		{
+			return this->operator/=(_mm_broadcast_ss(&rhs_));
+		}
+
+		inline FastVector4f& operator&=(__m128 rhs_)
+		{
+			data_ = _mm_and_ps(data_, rhs_);
+			return *this;
+		}
+		inline FastVector4f& operator&=(const FastVector4f& rhs_)
+		{
+			return this->operator&=(rhs_.data_);
+		}
+		inline FastVector4f& operator&=(const float rhs_)
+		{
+			return this->operator&=(_mm_broadcast_ss(&rhs_));
+		}
+
+		inline FastVector4f& operator|=(__m128 rhs_)
+		{
+			data_ = _mm_or_ps(data_, rhs_);
+			return *this;
+		}
+		inline FastVector4f& operator|=(const FastVector4f& rhs_)
+		{
+			return this->operator|=(rhs_.data_);
+		}
+		inline FastVector4f& operator|=(const float rhs_)
+		{
+			return this->operator|=(_mm_broadcast_ss(&rhs_));
+		}
+
+		inline FastVector4f& operator^=(__m128 rhs_)
+		{
+			data_ = _mm_xor_ps(data_, rhs_);
+			return *this;
+		}
+		inline FastVector4f& operator^=(const FastVector4f& rhs_)
+		{
+			return this->operator^=(rhs_.data_);
+		}
+		inline FastVector4f& operator^=(const float rhs_)
+		{
+			return this->operator^=(_mm_broadcast_ss(&rhs_));
+		}
+
+		inline FastVector4f& operator<<=(const std::size_t num_shifts_)
+		{
+			__m128i shifted_ = _mm_slli_epi32(*reinterpret_cast<__m128i*>(&data_), static_cast<int>(num_shifts_));
+			data_ = *reinterpret_cast<__m128*>(&shifted_);
+			return *this;
+		}
+		inline FastVector4f& operator<<=(__m128i num_shifts_)
+		{
+			__m128i shifted_ = _mm_sll_epi32(*reinterpret_cast<__m128i*>(&data_), num_shifts_);
+			data_ = *reinterpret_cast<__m128*>(&shifted_);
+			return *this;
+		}
+
+		inline FastVector4f& operator>>=(const std::size_t num_shifts_)
+		{
+			__m128i shifted_ = _mm_srli_epi32(*reinterpret_cast<__m128i*>(&data_), static_cast<int>(num_shifts_));
+			data_ = *reinterpret_cast<__m128*>(&shifted_);
+			return *this;
+		}
+		inline FastVector4f& operator>>=(__m128i num_shifts_)
+		{
+			__m128i shifted_ = _mm_srl_epi32(*reinterpret_cast<__m128i*>(&data_), num_shifts_);
+			data_ = *reinterpret_cast<__m128*>(&shifted_);
+			return *this;
+		}
 #pragma endregion
 
 #pragma region PERMUTATIONS
-
+		template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_>
+		inline FastVector4f Shuffle() const
+		{
+			if constexpr (X_ < size && Y_ < size && Z_ < size && W_ < size)
+			{
+				return FastVector4f(EmuMath::SIMD::shuffle<X_, Y_, Z_, W_>(data_));
+			}
+			else
+			{
+				static_assert(false, "Attempted to shuffle an EmuMath FastVector4f, but provided an invalid index for one of the shuffled indices. Only 0-3 (inclusive) are valid indices.");
+			}
+		}
 #pragma endregion
 
 #pragma region ARITHMETIC
