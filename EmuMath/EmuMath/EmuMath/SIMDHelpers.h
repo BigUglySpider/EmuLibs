@@ -742,6 +742,25 @@ namespace EmuMath::SIMD
 		return EmuCore::ArithmeticHelpers::num_active_bits(mask_greater_equal(lhs, rhs));
 	}
 #pragma endregion
+
+#pragma region GENERAL_ARITHMETIC
+	__m128 dot_product(__m128 a_, __m128 b_)
+	{
+		a_ = _mm_mul_ps(a_, b_);
+		return EmuMath::SIMD::horizontal_vector_sum(a_);
+	}
+	__m128 dot_product_fill(__m128 a_, __m128 b_)
+	{
+		a_ = _mm_mul_ps(a_, b_);
+		return EmuMath::SIMD::horizontal_vector_sum_fill(a_);
+	}
+	float dot_product_scalar(__m128 a_, __m128 b_)
+	{
+		a_ = _mm_mul_ps(a_, b_);
+		a_ = EmuMath::SIMD::horizontal_vector_sum(a_);
+		return _mm_cvtss_f32(a_);
+	}
+#pragma endregion
 }
 
 #endif
