@@ -40,6 +40,9 @@ namespace EmuMath::_underlying_components
 		static constexpr bool has_floating_point_elements = std::is_floating_point_v<std::remove_cv_t<value_type>>;
 		/// <summary> Boolean indicating if this vector's values are constant. </summary>
 		static constexpr bool has_const_values = std::is_const_v<raw_value_type>;
+
+		static constexpr std::size_t contained_item_byte_size = sizeof(contained_type);
+		static constexpr std::size_t total_contained_bytes = contained_item_byte_size * size;
 	};
 }
 

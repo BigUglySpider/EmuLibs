@@ -48,6 +48,317 @@ namespace EmuMath::SIMD
 		return _mm_shuffle_ps(ab, ab, shuffle_arg_v<X_, Y_, Z_, W_>);
 	}
 
+	/// <summary>
+	/// <para> Provides the mask for the provided index within an __m128i 8-bit register. </para>
+	/// </summary>
+	/// <returns>__m128i register which acts as a mask for the provided index within said register types.</returns>
+	template<std::size_t Index_>
+	inline __m128i index_mask_m128i_8()
+	{
+		// Switch constexpr would sure be nice...
+		if constexpr (Index_ == 0)
+		{
+			return _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF);
+		}
+		else if constexpr (Index_ == 1)
+		{
+			return _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0);
+		}
+		else if constexpr (Index_ == 2)
+		{
+			return _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0, 0);
+		}
+		else if constexpr (Index_ == 3)
+		{
+			return _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0, 0, 0);
+		}
+		else if constexpr (Index_ == 4)
+		{
+			return _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0, 0, 0, 0);
+		}
+		else if constexpr (Index_ == 5)
+		{
+			return _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0, 0, 0, 0, 0);
+		}
+		else if constexpr (Index_ == 6)
+		{
+			return _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0, 0, 0, 0, 0, 0);
+		}
+		else if constexpr (Index_ == 7)
+		{
+			return _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0, 0, 0, 0, 0, 0, 0);
+		}
+		else if constexpr (Index_ == 8)
+		{
+			return _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0);
+		}
+		else if constexpr (Index_ == 9)
+		{
+			return _mm_set_epi8(0, 0, 0, 0, 0, 0, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		}
+		else if constexpr (Index_ == 10)
+		{
+			return _mm_set_epi8(0, 0, 0, 0, 0, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		}
+		else if constexpr (Index_ == 11)
+		{
+			return _mm_set_epi8(0, 0, 0, 0, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		}
+		else if constexpr (Index_ == 12)
+		{
+			return _mm_set_epi8(0, 0, 0, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		}
+		else if constexpr (Index_ == 13)
+		{
+			return _mm_set_epi8(0, 0, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		}
+		else if constexpr (Index_ == 14)
+		{
+			return _mm_set_epi8(0, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		}
+		else if constexpr (Index_ == 15)
+		{
+			return _mm_set_epi8(0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		}
+		else
+		{
+			static_assert(false, "Attempted to retrieve a mask for an invalid index within an __m128i 8-bit register.");
+		}
+	}
+	template<bool i0_, bool i1_, bool i2_, bool i3_, bool i4_, bool i5_, bool i6_, bool i7_, bool i8_, bool i9_, bool i10_, bool i11_, bool i12_, bool i13_, bool i14_, bool i15_>
+	inline __m128i index_mask_m128i_8()
+	{
+		return _mm_set_epi8
+		(
+			0xFF * i15_,
+			0xFF * i14_,
+			0xFF * i13_,
+			0xFF * i12_,
+			0xFF * i11_,
+			0xFF * i10_,
+			0xFF * i9_,
+			0xFF * i8_,
+			0xFF * i7_,
+			0xFF * i6_,
+			0xFF * i5_,
+			0xFF * i4_,
+			0xFF * i3_,
+			0xFF * i2_,
+			0xFF * i1_,
+			0xFF * i0_
+		);
+	}
+	/// <summary>
+	/// <para> Provides the mask for the provided index within an __m128i 16-bit register. </para>
+	/// </summary>
+	/// <returns>__m128i register which acts as a mask for the provided index within said register types.</returns>
+	template<std::size_t Index_>
+	inline __m128i index_mask_m128i_16()
+	{
+		if constexpr (Index_ == 0)
+		{
+			return _mm_set_epi16(0, 0, 0, 0, 0, 0, 0, 0xFFFF);
+		}
+		else if constexpr (Index_ == 1)
+		{
+			return _mm_set_epi16(0, 0, 0, 0, 0, 0, 0xFFFF, 0);
+		}
+		else if constexpr (Index_ == 2)
+		{
+			return _mm_set_epi16(0, 0, 0, 0, 0, 0xFFFF, 0, 0);
+		}
+		else if constexpr (Index_ == 3)
+		{
+			return _mm_set_epi16(0, 0, 0, 0, 0xFFFF, 0, 0, 0);
+		}
+		else if constexpr (Index_ == 4)
+		{
+			return _mm_set_epi16(0, 0, 0, 0xFFFF0, 0, 0, 0, 0);
+		}
+		else if constexpr (Index_ == 5)
+		{
+			return _mm_set_epi16(0, 0, 0xFFFF, 0, 0, 0, 0, 0);
+		}
+		else if constexpr (Index_ == 6)
+		{
+			return _mm_set_epi16(0, 0xFFFF, 0, 0, 0, 0, 0, 0);
+		}
+		else if constexpr (Index_ == 7)
+		{
+			return _mm_set_epi16(0xFFFF, 0, 0, 0, 0, 0, 0, 0);
+		}
+		else
+		{
+			static_assert(false, "Attempted to retrieve a mask for an invalid index within an __m128i 16-bit register.");
+		}
+	}
+	template<bool i0_, bool i1_, bool i2_, bool i3_, bool i4_, bool i5_, bool i6_, bool i7_>
+	inline __m128 index_mask_m128i_16()
+	{
+		return _mm_set_epi16(0xFFFF * i7_, 0xFFFF * i6_, 0xFFFF * i5_, 0xFFFF * i4_, 0xFFFF * i3_, 0xFFFF * i2_, 0xFFFF * i1_, 0xFFFF * i0_);
+	}
+
+	/// <summary>
+	/// <para> Provides the mask for the provided index within an __m128i 32-bit register. </para>
+	/// </summary>
+	/// <returns>__m128i register which acts as a mask for the provided index within said register types.</returns>
+	template<std::size_t Index_>
+	inline __m128i index_mask_m128i_32()
+	{
+		if constexpr (Index_ == 0)
+		{
+			return _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
+		}
+		else if constexpr (Index_ == 1)
+		{
+			return _mm_set_epi32(0, 0, 0xFFFFFFFF, 0);
+		}
+		else if constexpr (Index_ == 2)
+		{
+			return _mm_set_epi32(0, 0xFFFFFFFF, 0, 0);
+		}
+		else if constexpr (Index_ == 3)
+		{
+			return _mm_set_epi32(0xFFFFFFFF, 0, 0, 0);
+		}
+		else
+		{
+			static_assert(false, "Attempted to retrieve a mask for an invalid index within an __m128i 32-bit register.");
+		}
+	}
+	template<bool i0_, bool i1_, bool i2_, bool i3_>
+	inline __m128i index_mask_m128i_32()
+	{
+		return _mm_set_epi32(0xFFFFFFFF * i3_, 0xFFFFFFFF * i2_, 0xFFFFFFFF * i1_, 0xFFFFFFFF * i0_);
+	}
+
+	/// <summary>
+	/// <para> Provides the mask for the provided index within an __m128i 64-bit register. </para>
+	/// </summary>
+	/// <returns>__m128i register which acts as a mask for the provided index within said register types.</returns>
+	template<std::size_t Index_>
+	inline __m128i index_mask_m128i_64()
+	{
+		if constexpr (Index_ == 0)
+		{
+			return _mm_set_epi64x(0, 0xFFFFFFFFFFFFFFFF);
+		}
+		else if constexpr (Index_ == 1)
+		{
+			return _mm_set_epi64x(0xFFFFFFFFFFFFFFFF, 0);
+		}
+		else
+		{
+			static_assert(false, "Attempted to retrieve a mask for an invalid index within an __m128i 64-bit register.");
+		}
+	}
+	template<bool i0_, bool i1_>
+	inline __m128i index_mask_m128i_64()
+	{
+		return _mm_set_epi64x(0xFFFFFFFFFFFFFFFF * i1_, 0xFFFFFFFFFFFFFFFF * i0_);
+	}
+
+	/// <summary>
+	/// <para> Provides the mask for the provided index within an __m128i register, where each element is considered to contain NumBits_ bits. </para>
+	/// <para> Valid values for NumBits_ are: 8, 16, 32, 64. Anything else will result in a static assertion being triggered. </para>
+	/// </summary>
+	/// <returns></returns>
+	template<std::size_t Index_, std::size_t NumBits_>
+	inline __m128i index_mask_m128i()
+	{
+		if constexpr (NumBits_ == 8)
+		{
+			return index_mask_m128i_8<Index_>();
+		}
+		else if constexpr (NumBits_ == 16)
+		{
+			return index_mask_m128i_16<Index_>();
+		}
+		else if constexpr (NumBits_ == 32)
+		{
+			return index_mask_m128i_32<Index_>();
+		}
+		else if constexpr (NumBits_ == 64)
+		{
+			return index_mask_m128i_64<Index_>();
+		}
+		else
+		{
+			static_assert(false, "Attempted to retreieve a mask for an __m128i register with an invalid number of bits per element. The only valid numbers of bits are 8, 16, 32, and 64.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Provides the mask for the provided index within an __m128 register. </para>
+	/// </summary>
+	/// <returns>__m128 register which acts as a mask for the provided index within said register types.</returns>
+	template<std::size_t Index_>
+	inline __m128 index_mask_m128()
+	{
+		if constexpr (Index_ <= 3)
+		{
+			__m128i mask_ = index_mask_m128i_32<Index_>();
+			return *reinterpret_cast<__m128*>(&mask_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to retrieve a mask for an invalid index within an __m128 register.");
+		}
+	}
+	template<bool i0_, bool i1_, bool i2_, bool i3_>
+	inline __m128 index_mask_m128()
+	{
+		__m128i mask_ = index_mask_m128i_32<i0_, i1_, i2_, i3_>();
+		return *reinterpret_cast<__m128*>(&mask_);
+	}
+
+	template<std::size_t Index_>
+	inline __m128d index_mask_m128d()
+	{
+		if constexpr (Index_ <= 1)
+		{
+			__m128i mask_ = index_mask_m128i_64<Index_>();
+			return *reinterpret_cast<__m128d*>(&mask_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to retrieve a mask for an invalid index within an __m128d reigster.");
+		}
+	}
+	template<bool i0_, bool i1_>
+	inline __m128d index_mask_m128d()
+	{
+		__m128i mask_ = index_mask_m128i_64<i0_, i1_>();
+		return *reinterpret_cast<__m128d*>(&mask_);
+	}
+
+	/// <summary>
+	/// <para> Provides the mask for a provided index for a provided SIMD RegisterType_. Useful for when a type of register may not be known. </para>
+	/// <para>
+	///		NOTE: The NumBits_ argument is only used if an integer register is being passed, and is used to determine the number of bits that each element consumes. 
+	///		It defaults to 32-bit integers, but may be 8-, 16-, 32-, or 64-bit integers. If a non-integer register type is provided, this value may be anything.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="RegisterType_">Type of SIMD register intrinsic type to return an index mask for.</typeparam>
+	/// <returns>Mask for the provided index when used with the provided register type.</returns>
+	template<typename RegisterType_, std::size_t Index_, std::size_t NumBits_>
+	inline RegisterType_ index_mask()
+	{
+		using unqualified_ = std::remove_cv_t<std::remove_reference_t<RegisterType_>>;
+		if constexpr (std::is_same_v<unqualified_, __m128>)
+		{
+			return index_mask_m128<Index_>();
+		}
+		else if constexpr (std::is_same_v<unqualified_, __m128i>)
+		{
+			return index_mask_m128i<Index_, NumBits_>();
+		}
+		else
+		{
+			static_assert(false, "Provided an unsupported register type when attempting to get a register index mask via index_mask_t.");
+		}
+	}
+
 	/// <summary> Compile-time executable function to generate an expected move mask for the provided comparison results for respective elements. </summary>
 	/// <param name="x_">Whether the resultant x-bit should be true or false.</param>
 	/// <param name="y_">Whether the resultant y-bit should be true or false.</param>
@@ -140,7 +451,7 @@ namespace EmuMath::SIMD
 	inline __m128 horizontal_vector_sum_fill(__m128 a)
 	{
 		__m128 result = _mm_hadd_ps(a, a);
-		return _mm_hadd_ps(a, a);
+		return _mm_hadd_ps(result, result);
 	}
 	/// <summary> Performs a horizontal add within the passed vector and returns the result as a scalar. </summary>
 	/// <param name="a">SIMD vector to perform horizontal addition with.</param>
@@ -429,6 +740,25 @@ namespace EmuMath::SIMD
 	inline std::size_t count_greater_equal(__m128 lhs, __m128 rhs)
 	{
 		return EmuCore::ArithmeticHelpers::num_active_bits(mask_greater_equal(lhs, rhs));
+	}
+#pragma endregion
+
+#pragma region GENERAL_ARITHMETIC
+	__m128 dot_product(__m128 a_, __m128 b_)
+	{
+		a_ = _mm_mul_ps(a_, b_);
+		return EmuMath::SIMD::horizontal_vector_sum(a_);
+	}
+	__m128 dot_product_fill(__m128 a_, __m128 b_)
+	{
+		a_ = _mm_mul_ps(a_, b_);
+		return EmuMath::SIMD::horizontal_vector_sum_fill(a_);
+	}
+	float dot_product_scalar(__m128 a_, __m128 b_)
+	{
+		a_ = _mm_mul_ps(a_, b_);
+		a_ = EmuMath::SIMD::horizontal_vector_sum(a_);
+		return _mm_cvtss_f32(a_);
 	}
 #pragma endregion
 }

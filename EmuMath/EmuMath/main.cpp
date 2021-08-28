@@ -1,4 +1,6 @@
 #include "EmuMath/Vector.h"
+#include "EmuMath/FastVector.h"
+#include "EmuMath/NoOverflowT.h"
 #include <array>
 #include <bitset>
 #include <iomanip>
@@ -199,8 +201,101 @@ int main()
 	std::cout << "CROSS<0, 1, 2, 1, 2, 3>(" << cross_a_ << ", " << cross_b_ << "): " << cross_a_.CrossProduct3D<0, 1, 2, 1, 2, 3>(cross_b_) << "\n";
 
 
-	std::cout << cross_a_ << ": [" << cross_a_[0] << " | " << cross_a_[1] << " | " << cross_a_[2] << "]\n";
+	std::cout << cross_a_ << ": [" << cross_a_[0] << " | " << cross_a_[1] << " | " << cross_a_[2] << "]\n\n\n";
 
+	EmuMath::Vector4<float> scalar_(1.0f, 2.0f, 3.0f, 4.0f);
+	EmuMath::FastVector4f simd_(scalar_);
+	std::cout << "Scalar: " << scalar_ << "\n";
+	std::cout << "SIMD  : " << simd_ << "\n";
+	simd_.Set<2>(0.0f);
+	simd_.Set<3>(1337.0f);
+	std::cout << simd_ << "\n";
+	simd_.data_ = _mm_mul_ps(simd_.data_, _mm_set_ps1(3.0f));
+	simd_.Store(scalar_);
+	std::cout << simd_ << " | " << scalar_ << "\n";
+
+	std::cout << simd_.Store<3, 8, double>() << "\n";
+	std::cout << simd_.Store() << "\n";
+
+	simd_.Set<3>(200000.0f);
+	std::cout << "Cast to Vector<16, std::uint16_t>: " << static_cast<EmuMath::Vector<16, std::uint16_t>>(simd_) << "\n";
+	std::cout << "Cast to Vector<16, NoOverflowT<std::uint16_t>>: " << static_cast<EmuMath::Vector<16, EmuMath::NoOverflowT<std::uint16_t>>>(simd_) << "\n";
+
+	simd_.Set(2.0f, 4.0f, 6.0f, 8.0f);
+	std::cout << "Data: " << simd_ << "\n";
+	std::cout << "Norm: " << simd_.Normalise() << "\n";
+
+	EmuMath::Vector<4, float> blooble_a(1.0f, 2.0f, 3.0f, 4.0f);
+	EmuMath::Vector<4, float> blooble_b(5.0f, 4.0, 3.0f, 2.0f);
+	EmuMath::FastVector4f blobbo_a(1.0f, 2.0f, 3.0f, 4.0f);
+	EmuMath::FastVector4f blobbo_b(5.0f, 4.0, 3.0f, 2.0f);
+	std::cout << "Normal Angle Cosine: " << blooble_a.AngleCosine(blooble_b) << "\n";
+	std::cout << "SIMD Angle Cosine:   " << blobbo_a.AngleCosine(blobbo_b) << "\n";
+	std::cout << "Normal Angle (RADS): " << blooble_a.Angle<true>(blooble_b) << "\n";
+	std::cout << "SIMD Angle (RADS):   " << blobbo_a.Angle<true>(blobbo_b) << "\n";
+	std::cout << "Normal Angle (DEGS): " << blooble_a.Angle<false>(blooble_b) << "\n";
+	std::cout << "SIMD Angle (DEGS):   " << blobbo_a.Angle<false>(blobbo_b) << "\n";
+	std::cout << "Normal Cross: " << blooble_a.CrossProduct3D(blooble_b) << "\n";
+	std::cout << "SIMD Cross: " << blobbo_a.CrossProduct(blobbo_b) << "\n";
+
+	std::cout << "Min(5): " << blobbo_a.ClampMin(5.0f) << "\n";
+	std::cout << "Min(2): " << blobbo_a.ClampMin(2.0f) << "\n";
+	std::cout << "Max(5): " << blobbo_a.ClampMax(5.0f) << "\n";
+	std::cout << "Max(2): " << blobbo_a.ClampMax(2.0f) << "\n";
+	std::cout << "Clamp(2, 3): " << blobbo_a.Clamp(2.0f, 5.0f) << "\n";
+
+	EmuMath::FastVector4f to_product(2.0f, 3.0f, 5.0f, 7.0f);
+	std::cout << "Horizontal Product(" << to_product << "): " << to_product.HorizontalProduct() << "\n";
+	std::cout << "MIN(" << to_product << "): " << to_product.Min() << "\n";
+	std::cout << "MAX(" << to_product << "): " << to_product.Max() << "\n";
+	to_product.Set<1>(-to_product.at<1>());
+	std::cout << "MIN(" << to_product << "): " << to_product.Min() << "\n";
+	std::cout << "MAX(" << to_product << "): " << to_product.Max() << "\n";
+	to_product.Set<2>(-to_product.at<2>());
+	std::cout << "MIN(" << to_product << "): " << to_product.Min() << "\n";
+	std::cout << "MAX(" << to_product << "): " << to_product.Max() << "\n";
+	to_product.Set<3>(-to_product.at<3>());
+	std::cout << "MIN(" << to_product << "): " << to_product.Min() << "\n";
+	std::cout << "MAX(" << to_product << "): " << to_product.Max() << "\n";
+
+	float min_, max_;
+	to_product.MinMax(min_, max_);
+	std::cout << "MINMAX(" << to_product << "): [" << min_ << ", " << max_ << "]\n";
+
+	std::cout << (EmuMath::FastVector4f(1.0f, 2.0f, 3.0f, 4.0f) % 1.5f) << "\n";
+
+	EmuMath::FastVector4f fast_a_(rand(), rand(), rand(), rand());
+	EmuMath::FastVector4f fast_b_(rand(), rand(), rand(), rand());
+	std::cout << "A: " << fast_a_ << "\nB: " << fast_b_ << "\n";
+	std::cout << "Min(" << fast_a_ << ", " << fast_b_ << "): " << fast_a_.MinVector(fast_b_) << "\n";
+	std::cout << "Max(" << fast_a_ << ", " << fast_b_ << "): " << fast_a_.MaxVector(fast_b_) << "\n";
+	std::cout << "MinMax<true, false, false, true>(" << fast_a_ << ", " << fast_b_ << "): " << fast_a_.MinMaxVector<1, 0, 0, 1>(fast_b_) << "\n";
+
+	EmuMath::Vector<7, float> vec_c_(rand(), rand(), rand(), rand(), rand(), rand(), rand());
+	EmuMath::Vector<4, std::uint64_t> vec_d_(rand(), rand(), rand(), rand());
+	std::cout << "C: " << vec_c_ << "\nD: " << vec_d_ << "\n";
+	std::cout << "Min(C, D): " << vec_c_.MinVector(vec_d_) << "\n";
+	std::cout << "Max(C, D): " << vec_c_.MaxVector(vec_d_) << "\n";
+	float rand_ = rand() * 0.99f;
+	std::cout << "MinMax<false, true, true, true, false, false, true>(C, D): " << vec_c_.MinMaxVector<0, 1, 1, 1, 0, 0, 1>(vec_d_) << "\n";
+	std::cout << "MinMax<false, true, true, true, false, false, true>(C, " << rand_ << "): " << vec_c_.MinMaxVector<0, 1, 1, 1, 0, 0, 1>(rand_) << "\n";
+
+	EmuMath::Vector<5, float> wee_(1.0f, 2.0f, 3.0f, 4.0f, 5.0f);
+	auto wee_ref_ = wee_.As<EmuMath::RefVector<3, float>>();
+	auto wee_const_ref_ = wee_.As<EmuMath::ConstRefVector<3, float>>();
+	std::cout << wee_ << " | " << wee_ref_ << " | " << wee_const_ref_ << "\n";
+	wee_ref_[0] = 1.0f;
+	wee_ref_[1] = 33.0f;
+	wee_ref_[2] = 7.0f;
+	std::cout << wee_ << " | " << wee_ref_ << " | " << wee_const_ref_ << "\n";
+
+	fast_a_.Set(1.0f, 2.0f, 3.0f, 4.0f);
+	std::cout << fast_a_ << "\n";
+	std::cout << fast_a_.Not() << "\n";
+	std::cout << fast_a_.Not().Not() << "\n";
+
+	EmuMath::FastVector4f test_a_(1.0f, 2.0f, 3.0f, 4.0f);
+	std::cout << test_a_ * EmuMath::Vector<12, float>(12.0f, 11.0f, 10.0f, 9.0f, 8.0f, 7.0f, 6.0f, 5.0f, 4.0f, 3.0f, 2.0f, 1.0f) << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

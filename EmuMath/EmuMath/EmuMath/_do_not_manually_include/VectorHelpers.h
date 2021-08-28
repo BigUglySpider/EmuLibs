@@ -80,6 +80,43 @@ namespace EmuMath::Helpers
 			);
 		}
 	}
+
+	/// <summary>
+	/// <para> Returns a copy of the theoretical value within the provided index of the passed vector. </para>
+	/// <para> If the provided index is a valid index for the passed vector, a copy of that index will be provided. </para>
+	/// <para>
+	///		If the provided index is an invalid index for the passed vector, a copy of the vector's default-constructed value_type will be returned instead, 
+	///		inferred as representing 0.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="OutT_">Type to output the theoretical value at the provided index as.</typeparam>
+	/// <typeparam name="Vector_">Type of vector to extract the value from.</typeparam>
+	/// <param name="vector_">EmuMath vector to extract the theoretical value for the provided index of.</param>
+	/// <returns>If Index_ is within the passed vector's index range: copy of the given index within the vector. Otherwise, a default-constructed value_type, inferring 0.</returns>
+	template<std::size_t Index_, typename OutT_, class Vector_>
+	[[nodiscard]] OutT_ VectorGetTheoretical(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			if constexpr (Index_ < Vector_::size)
+			{
+				return static_cast<OutT_>(VectorGet<Index_>(vector_));
+			}
+			else
+			{
+				return OutT_();
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the theoretical value of an index within a vector, but provided a non-EmuMath-vector type argument.");
+		}
+	}
+	template<std::size_t Index_, class Vector_>
+	[[nodiscard]] typename Vector_::value_type VectorGetTheoretical(const Vector_& vector_)
+	{
+		return VectorGetTheoretical<Index_, typename Vector_::value_type, Vector_>(vector_);
+	}
 #pragma endregion
 
 #pragma region SETS
@@ -933,6 +970,84 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	template<std::size_t OutSize_, typename out_contained_type, class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMinVector(const VectorA_& a_, const B_& b_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<VectorA_>)
+		{
+			return _underlying_vector_funcs::_form_min_vector<EmuMath::Vector<OutSize_, out_contained_type>, VectorA_, B_>(a_, b_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the minimum values of two vectors, but the passed argument a_ was not an EmuMath vector.");
+		}
+	}
+	template<std::size_t OutSize_, class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename VectorA_::value_type> VectorMinVector(const VectorA_& a_, const B_& b_)
+	{
+		return VectorMinVector<OutSize_, typename VectorA_::value_type, VectorA_, B_>(a_, b_);
+	}
+	template<typename out_contained_type, class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<VectorA_::size, out_contained_type> VectorMinVector(const VectorA_& a_, const B_& b_)
+	{
+		return VectorMinVector<VectorA_::size, out_contained_type, VectorA_, B_>(a_, b_);
+	}
+	template<class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<VectorA_::size, typename VectorA_::value_type> VectorMinVector(const VectorA_& a_, const B_& b_)
+	{
+		return VectorMinVector<VectorA_::size, typename VectorA_::value_type, VectorA_, B_>(a_, b_);
+	}
+
+	template<std::size_t OutSize_, typename out_contained_type, class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMaxVector(const VectorA_& a_, const B_& b_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<VectorA_>)
+		{
+			return _underlying_vector_funcs::_form_max_vector<EmuMath::Vector<OutSize_, out_contained_type>, VectorA_, B_>(a_, b_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the maximum values of two vectors, but the passed argument a_ was not an EmuMath vector.");
+		}
+	}
+	template<std::size_t OutSize_, class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename VectorA_::value_type> VectorMaxVector(const VectorA_& a_, const B_& b_)
+	{
+		return VectorMaxVector<OutSize_, typename VectorA_::value_type, VectorA_, B_>(a_, b_);
+	}
+	template<typename out_contained_type, class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<VectorA_::size, out_contained_type> VectorMaxVector(const VectorA_& a_, const B_& b_)
+	{
+		return VectorMaxVector<VectorA_::size, out_contained_type, VectorA_, B_>(a_, b_);
+	}
+	template<class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<VectorA_::size, typename VectorA_::value_type> VectorMaxVector(const VectorA_& a_, const B_& b_)
+	{
+		return VectorMaxVector<VectorA_::size, typename VectorA_::value_type, VectorA_, B_>(a_, b_);
+	}
+
+	template<typename out_contained_type, bool Min0_, bool...OthersMins_, class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(OthersMins_) + 1, out_contained_type> VectorMinMaxVector(const VectorA_& a_, const B_& b_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<VectorA_>)
+		{
+			return _underlying_vector_funcs::_form_min_and_max_vector<EmuMath::Vector<sizeof...(OthersMins_) + 1, out_contained_type>, VectorA_, B_, Min0_, OthersMins_...>
+			(
+				a_,
+				b_
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to get the minimum and maximum values of two vectors, but the passed argument a_ was not an EmuMath vector.");
+		}
+	}
+	template<bool Min0_, bool...OthersMins_, class VectorA_, class B_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(OthersMins_) + 1, typename VectorA_::value_type> VectorMinMaxVector(const VectorA_& a_, const B_& b_)
+	{
+		return VectorMinMaxVector<typename VectorA_::value_type, Min0_, OthersMins_...>(a_, b_);
+	}
+
 	/// <summary>
 	/// <para> Calculates the resulting vector from a linear interpolation of the passed vector and operands, which can be summarised as a_ + ((b_ - a_) * t_). </para>
 	/// <para>
@@ -1686,12 +1801,13 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (EmuMath::TMP::is_emu_vector_v<RhsVector_>)
 			{
-				return
+				using floating_point = EmuCore::TMPHelpers::first_floating_point_t<OutCosine_, float>;
+				return static_cast<OutCosine_>
 				(
-					VectorDotProduct<OutCosine_>(lhs_, rhs_) / 
+					VectorDotProduct<floating_point>(lhs_, rhs_) / EmuCore::do_sqrt_constexpr<floating_point>()
 					(
-						VectorMagnitudeConstexpr<OutCosine_, LhsVector_>(lhs_) *
-						VectorMagnitudeConstexpr<OutCosine_, RhsVector_>(rhs_)
+						VectorSquareMagnitude<floating_point, LhsVector_>(lhs_) *
+						VectorSquareMagnitude<floating_point, RhsVector_>(rhs_)
 					)
 				);
 			}
@@ -1728,12 +1844,13 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (EmuMath::TMP::is_emu_vector_v<RhsVector_>)
 			{
-				return 
+				using floating_point = EmuCore::TMPHelpers::first_floating_point_t<OutCosine_, float>;
+				return static_cast<OutCosine_>
 				(
-					VectorDotProduct<OutCosine_>(lhs_, rhs_) / 
+					VectorDotProduct<floating_point>(lhs_, rhs_) / EmuCore::do_sqrt<floating_point>()
 					(
-						VectorMagnitude<OutCosine_, LhsVector_>(lhs_) *
-						VectorMagnitude<OutCosine_, RhsVector_>(rhs_)
+						VectorSquareMagnitude<floating_point, LhsVector_>(lhs_) *
+						VectorSquareMagnitude<floating_point, RhsVector_>(rhs_)
 					)
 				);
 			}
