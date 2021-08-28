@@ -1199,6 +1199,270 @@ namespace EmuMath
 		{
 			return this->Magnitude() <= rhs_;
 		}
+
+		/// <summary>
+		/// <para> Compares all elements within this vector to the passed vector data, and returns true if all desired elements are equal. </para>
+		/// <para> By default this will test for all elements. To ignore an element's result, set its respective boolean template argument to false. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
+		/// <returns>True if all desired elements' comparisons were true, otherwise false.</returns>
+		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
+		inline bool CmpAllEqual(__m128 rhs_) const
+		{
+			return EmuMath::SIMD::all_equal<TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
+		}
+		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
+		inline bool CmpAllEqual(const FastVector4f& rhs_) const
+		{
+			return this->template CmpAllEqual<TestX_, TestY_, TestZ_, TestW_>(rhs_.data_);
+		}
+		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
+		inline bool CmpAllEqual(const float rhs_) const
+		{
+			return this->template CmpAllEqual<TestX_, TestY_, TestZ_, TestW_>(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para> Compares all elements within this vector to the passed vector data, and returns true if all desired elements are not equal. </para>
+		/// <para> By default this will test for all elements. To ignore an element's result, set its respective boolean template argument to false. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
+		/// <returns>True if all desired elements' comparisons were true, otherwise false.</returns>
+		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
+		inline bool CmpAllNotEqual(__m128 rhs_) const
+		{
+			return EmuMath::SIMD::all_not_equal<TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
+		}
+		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
+		inline bool CmpAllNotEqual(const FastVector4f& rhs_) const
+		{
+			return this->template CmpAllNotEqual<TestX_, TestY_, TestZ_, TestW_>(rhs_.data_);
+		}
+		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
+		inline bool CmpAllNotEqual(const float rhs_) const
+		{
+			return this->template CmpAllNotEqual<TestX_, TestY_, TestZ_, TestW_>(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Compares all elements within this vector to the passed vector data, 
+		///		and returns true if all desired elements in this vector are greater than rhs_. 
+		/// </para>
+		/// <para> By default this will test for all elements. To ignore an element's result, set its respective boolean template argument to false. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
+		/// <returns>True if all desired elements' comparisons were true, otherwise false.</returns>
+		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
+		inline bool CmpAllGreater(__m128 rhs_) const
+		{
+			return EmuMath::SIMD::all_greater_than<TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
+		}
+		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
+		inline bool CmpAllGreater(const FastVector4f& rhs_) const
+		{
+			return this->template CmpAllGreater<TestX_, TestY_, TestZ_, TestW_>(rhs_.data_);
+		}
+		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
+		inline bool CmpAllGreater(const float rhs_) const
+		{
+			return this->template CmpAllGreater<TestX_, TestY_, TestZ_, TestW_>(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Compares all elements within this vector to the passed vector data, 
+		///		and returns true if all desired elements in this vector are less than rhs_. 
+		/// </para>
+		/// <para> By default this will test for all elements. To ignore an element's result, set its respective boolean template argument to false. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
+		/// <returns>True if all desired elements' comparisons were true, otherwise false.</returns>
+		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
+		inline bool CmpAllLess(__m128 rhs_) const
+		{
+			return EmuMath::SIMD::all_less_than<TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
+		}
+		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
+		inline bool CmpAllLess(const FastVector4f& rhs_) const
+		{
+			return this->template CmpAllLess<TestX_, TestY_, TestZ_, TestW_>(rhs_.data_);
+		}
+		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
+		inline bool CmpAllLess(const float rhs_) const
+		{
+			return this->template CmpAllLess<TestX_, TestY_, TestZ_, TestW_>(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Compares all elements within this vector to the passed vector data, 
+		///		and returns true if all desired elements in this vector are greater than or equal to rhs_. 
+		/// </para>
+		/// <para> By default this will test for all elements. To ignore an element's result, set its respective boolean template argument to false. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
+		/// <returns>True if all desired elements' comparisons were true, otherwise false.</returns>
+		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
+		inline bool CmpAllGreaterEqual(__m128 rhs_) const
+		{
+			return EmuMath::SIMD::all_greater_equal<TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
+		}
+		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
+		inline bool CmpAllGreaterEqual(const FastVector4f& rhs_) const
+		{
+			return this->template CmpAllGreaterEqual<TestX_, TestY_, TestZ_, TestW_>(rhs_.data_);
+		}
+		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
+		inline bool CmpAllGreaterEqual(const float rhs_) const
+		{
+			return this->template CmpAllGreaterEqual<TestX_, TestY_, TestZ_, TestW_>(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Compares all elements within this vector to the passed vector data, 
+		///		and returns true if all desired elements in this vector are less than or equal to rhs_. 
+		/// </para>
+		/// <para> By default this will test for all elements. To ignore an element's result, set its respective boolean template argument to false. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
+		/// <returns>True if all desired elements' comparisons were true, otherwise false.</returns>
+		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
+		inline bool CmpAllLessEqual(__m128 rhs_) const
+		{
+			return EmuMath::SIMD::all_less_equal<TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
+		}
+		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
+		inline bool CmpAllLessEqual(const FastVector4f& rhs_) const
+		{
+			return this->template CmpAllLessEqual<TestX_, TestY_, TestZ_, TestW_>(rhs_.data_);
+		}
+		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
+		inline bool CmpAllLessEqual(const float rhs_) const
+		{
+			return this->template CmpAllLessEqual<TestX_, TestY_, TestZ_, TestW_>(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para> Compares all elements within this vector to the passed vector data, and returns true if any elements are equal. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
+		/// <returns>True if any elements' comparisons were true, otherwise false.</returns>
+		inline bool CmpAnyEqual(__m128 rhs_) const
+		{
+			return EmuMath::SIMD::any_equal(data_, rhs_);
+		}
+		inline bool CmpAnyEqual(const FastVector4f& rhs_) const
+		{
+			return this->CmpAnyEqual(rhs_.data_);
+		}
+		inline bool CmpAnyEqual(const float rhs_) const
+		{
+			return this->CmpAnyEqual(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para> Compares all elements within this vector to the passed vector data, and returns true if any elements are not equal. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
+		/// <returns>True if any elements' comparisons were true, otherwise false.</returns>
+		inline bool CmpAnyNotEqual(__m128 rhs_) const
+		{
+			return EmuMath::SIMD::any_not_equal(data_, rhs_);
+		}
+		inline bool CmpAnyNotEqual(const FastVector4f& rhs_) const
+		{
+			return this->CmpAnyNotEqual(rhs_.data_);
+		}
+		inline bool CmpAnyNotEqual(const float rhs_) const
+		{
+			return this->CmpAnyNotEqual(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Compares all elements within this vector to the passed vector data, 
+		///		and returns true if any elements of this vector are greater than rhs_.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
+		/// <returns>True if any elements' comparisons were true, otherwise false.</returns>
+		inline bool CmpAnyGreater(__m128 rhs_) const
+		{
+			return EmuMath::SIMD::any_greater_than(data_, rhs_);
+		}
+		inline bool CmpAnyGreater(const FastVector4f& rhs_) const
+		{
+			return this->CmpAnyGreater(rhs_.data_);
+		}
+		inline bool CmpAnyGreater(const float rhs_) const
+		{
+			return this->CmpAnyGreater(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Compares all elements within this vector to the passed vector data, 
+		///		and returns true if any elements of this vector are less than rhs_.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
+		/// <returns>True if any elements' comparisons were true, otherwise false.</returns>
+		inline bool CmpAnyLess(__m128 rhs_) const
+		{
+			return EmuMath::SIMD::any_less_than(data_, rhs_);
+		}
+		inline bool CmpAnyLess(const FastVector4f& rhs_) const
+		{
+			return this->CmpAnyLess(rhs_.data_);
+		}
+		inline bool CmpAnyLess(const float rhs_) const
+		{
+			return this->CmpAnyLess(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Compares all elements within this vector to the passed vector data, 
+		///		and returns true if any elements of this vector are greater than or equal to rhs_.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
+		/// <returns>True if any elements' comparisons were true, otherwise false.</returns>
+		inline bool CmpAnyGreaterEqual(__m128 rhs_) const
+		{
+			return EmuMath::SIMD::any_greater_equal(data_, rhs_);
+		}
+		inline bool CmpAnyGreaterEqual(const FastVector4f& rhs_) const
+		{
+			return this->CmpAnyGreaterEqual(rhs_.data_);
+		}
+		inline bool CmpAnyGreaterEqual(const float rhs_) const
+		{
+			return this->CmpAnyGreaterEqual(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Compares all elements within this vector to the passed vector data, 
+		///		and returns true if any elements of this vector are less than or equal to rhs_.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
+		/// <returns>True if any elements' comparisons were true, otherwise false.</returns>
+		inline bool CmpAnyLessEqual(__m128 rhs_) const
+		{
+			return EmuMath::SIMD::any_less_equal(data_, rhs_);
+		}
+		inline bool CmpAnyLessEqual(const FastVector4f& rhs_) const
+		{
+			return this->CmpAnyLessEqual(rhs_.data_);
+		}
+		inline bool CmpAnyLessEqual(const float rhs_) const
+		{
+			return this->CmpAnyLessEqual(_mm_broadcast_ss(&rhs_));
+		}
 #pragma endregion
 
 #pragma region BITWISE
