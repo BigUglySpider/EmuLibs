@@ -297,9 +297,6 @@ int main()
 	EmuMath::FastVector4f test_a_(1.0f, 2.0f, 3.0f, 4.0f);
 	std::cout << test_a_ * EmuMath::Vector<12, float>(12.0f, 11.0f, 10.0f, 9.0f, 8.0f, 7.0f, 6.0f, 5.0f, 4.0f, 3.0f, 2.0f, 1.0f) << "\n";
 
-	EmuCore::do_max<EmuMath::FastVector4f, __m128> maxor_;
-	std::cout << maxor_(test_a_, _mm_set_ps1(2.5f)) << "\n";
-
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();
