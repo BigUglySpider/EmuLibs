@@ -1021,6 +1021,9 @@ namespace EmuMath
 			outMax_ = static_cast<OutMax_>(_mm_cvtss_f32(out_));
 		}
 
+		/// <summary> Outputs a new vector which contains the lowest element at each respective index within this vector and the passed vector data. </summary>
+		/// <param name="b_">Vector data to compare this vector with when selecting the lowest elements.</param>
+		/// <returns>Vector containing the lowest elements of respective indices between this vector and the passed vector.</returns>
 		[[nodiscard]] inline FastVector4f MinVector(__m128 b_) const
 		{
 			return FastVector4f(_mm_min_ps(data_, b_));
@@ -1034,6 +1037,9 @@ namespace EmuMath
 			return this->MinVector(_mm_broadcast_ss(&b_));
 		}
 
+		/// <summary> Outputs a new vector which contains the greatest element at each respective index within this vector and the passed vector data. </summary>
+		/// <param name="b_">Vector data to compare this vector with when selecting the greatest elements.</param>
+		/// <returns>Vector containing the greatest elements of respective indices between this vector and the passed vector.</returns>
 		[[nodiscard]] inline FastVector4f MaxVector(__m128 b_) const
 		{
 			return FastVector4f(_mm_max_ps(data_, b_));
@@ -1047,6 +1053,12 @@ namespace EmuMath
 			return this->MaxVector(_mm_broadcast_ss(&b_));
 		}
 
+		/// <summary> 
+		/// <para> Outputs a new vector which contains the greatest element at each respective index within this vector and the passed vector data. </para>
+		/// <para> A boolean template argument is required for each index. If the argument is true, that index will be the min; if it is false, the index will be the max. </para>
+		/// </summary>
+		/// <param name="b_">Vector data to compare this vector with when selecting the lowest/greatest elements.</param>
+		/// <returns>Vector containing the lowest/greatest elements of respective indices between this vector and the passed vector, depending on passed template args.</returns>
 		template<bool XMin_, bool YMin_, bool ZMin_, bool WMin_>
 		[[nodiscard]] inline FastVector4f MinMaxVector(__m128 b_) const
 		{
@@ -1079,6 +1091,13 @@ namespace EmuMath
 		[[nodiscard]] inline FastVector4f MinMaxVector(const float b_) const
 		{
 			return this->template MinMaxVector<XMin_, YMin_, ZMin_, WMin_>(_mm_broadcast_ss(&b_));
+		}
+
+		/// <summary> Calculates the reciprocal to this vector, which may be multiplied by to achieve the same result as dividing by this vector. </summary>
+		/// <returns>Vector that may be multiplied by to achieve the same result as dividing by this vector.</returns>
+		[[nodiscard]] inline FastVector4f Reciprocal() const
+		{
+			return FastVector4f(_mm_div_ps(_mm_set_ps1(1.0f), data_));
 		}
 #pragma endregion
 
@@ -1471,6 +1490,216 @@ namespace EmuMath
 		[[nodiscard]] inline bool CmpAnyLessEqual(const float rhs_) const
 		{
 			return this->CmpAnyLessEqual(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the mask resulting from comparing this vector to the passed rhs_ vector data. </para>
+		/// <para> In the returned mask, elements which compared true will have all bits set to 1, otherwise all bits will be set to 0 for said element. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare this vector to.</param>
+		/// <returns>Mask vector resulting from the comparison of the this vector and the provided rhs_ vector data.</returns>
+		[[nodiscard]] inline FastVector4f CmpMaskEqual(__m128 rhs_) const
+		{
+			return FastVector4f(_mm_cmpeq_ps(data_, rhs_));
+		}
+		[[nodiscard]] inline FastVector4f CmpMaskEqual(const FastVector4f& rhs_) const
+		{
+			return this->CmpMaskEqual(rhs_.data_);
+		}
+		[[nodiscard]] inline FastVector4f CmpMaskEqual(const float rhs_) const
+		{
+			return this->CmpMaskEqual(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the mask resulting from comparing this vector to the passed rhs_ vector data. </para>
+		/// <para> In the returned mask, elements which compared true will have all bits set to 1, otherwise all bits will be set to 0 for said element. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare this vector to.</param>
+		/// <returns>Mask vector resulting from the comparison of the this vector and the provided rhs_ vector data.</returns>
+		[[nodiscard]] inline FastVector4f CmpMaskNotEqual(__m128 rhs_) const
+		{
+			return FastVector4f(_mm_cmpneq_ps(data_, rhs_));
+		}
+		[[nodiscard]] inline FastVector4f CmpMaskNotEqual(const FastVector4f& rhs_) const
+		{
+			return this->CmpMaskNotEqual(rhs_.data_);
+		}
+		[[nodiscard]] inline FastVector4f CmpMaskNotEqual(const float rhs_) const
+		{
+			return this->CmpMaskNotEqual(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the mask resulting from comparing this vector to the passed rhs_ vector data. </para>
+		/// <para> In the returned mask, elements which compared true will have all bits set to 1, otherwise all bits will be set to 0 for said element. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare this vector to.</param>
+		/// <returns>Mask vector resulting from the comparison of the this vector and the provided rhs_ vector data.</returns>
+		[[nodiscard]] inline FastVector4f CmpMaskGreater(__m128 rhs_) const
+		{
+			return FastVector4f(_mm_cmpgt_ps(data_, rhs_));
+		}
+		[[nodiscard]] inline FastVector4f CmpMaskGreater(const FastVector4f& rhs_) const
+		{
+			return this->CmpMaskGreater(rhs_.data_);
+		}
+		[[nodiscard]] inline FastVector4f CmpMaskGreater(const float rhs_) const
+		{
+			return this->CmpMaskGreater(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the mask resulting from comparing this vector to the passed rhs_ vector data. </para>
+		/// <para> In the returned mask, elements which compared true will have all bits set to 1, otherwise all bits will be set to 0 for said element. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare this vector to.</param>
+		/// <returns>Mask vector resulting from the comparison of the this vector and the provided rhs_ vector data.</returns>
+		[[nodiscard]] inline FastVector4f CmpMaskLess(__m128 rhs_) const
+		{
+			return FastVector4f(_mm_cmplt_ps(data_, rhs_));
+		}
+		[[nodiscard]] inline FastVector4f CmpMaskLess(const FastVector4f& rhs_) const
+		{
+			return this->CmpMaskLess(rhs_.data_);
+		}
+		[[nodiscard]] inline FastVector4f CmpMaskLess(const float rhs_) const
+		{
+			return this->CmpMaskLess(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the mask resulting from comparing this vector to the passed rhs_ vector data. </para>
+		/// <para> In the returned mask, elements which compared true will have all bits set to 1, otherwise all bits will be set to 0 for said element. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare this vector to.</param>
+		/// <returns>Mask vector resulting from the comparison of the this vector and the provided rhs_ vector data.</returns>
+		[[nodiscard]] inline FastVector4f CmpMaskGreaterEqual(__m128 rhs_) const
+		{
+			return FastVector4f(_mm_cmpge_ps(data_, rhs_));
+		}
+		[[nodiscard]] inline FastVector4f CmpMaskGreaterEqual(const FastVector4f& rhs_) const
+		{
+			return this->CmpMaskGreaterEqual(rhs_.data_);
+		}
+		[[nodiscard]] inline FastVector4f CmpMaskGreaterEqual(const float rhs_) const
+		{
+			return this->CmpMaskGreaterEqual(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the mask resulting from comparing this vector to the passed rhs_ vector data. </para>
+		/// <para> In the returned mask, elements which compared true will have all bits set to 1, otherwise all bits will be set to 0 for said element. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare this vector to.</param>
+		/// <returns>Mask vector resulting from the comparison of the this vector and the provided rhs_ vector data.</returns>
+		[[nodiscard]] inline FastVector4f CmpMaskLessEqual(__m128 rhs_) const
+		{
+			return FastVector4f(_mm_cmple_ps(data_, rhs_));
+		}
+		[[nodiscard]] inline FastVector4f CmpMaskLessEqual(const FastVector4f& rhs_) const
+		{
+			return this->CmpMaskLessEqual(rhs_.data_);
+		}
+		[[nodiscard]] inline FastVector4f CmpMaskLessEqual(const float rhs_) const
+		{
+			return this->CmpMaskLessEqual(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary> Returns a vector of booleans indicating if respective elements in this vector are equal to the passed rhs_ vector data. </summary>
+		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
+		/// <returns>Vector of 4 booleans which indicate the results of comparisons of the respective indices.</returns>
+		[[nodiscard]] inline EmuMath::Vector<4, bool> CmpPerElementEqual(__m128 rhs_) const
+		{
+			return this->CmpMaskEqual(rhs_).Store<0, 4, bool>();
+		}
+		[[nodiscard]] inline EmuMath::Vector<4, bool> CmpPerElementEqual(const FastVector4f& rhs_) const
+		{
+			return this->CmpPerElementEqual(rhs_.data_);
+		}
+		[[nodiscard]] inline EmuMath::Vector<4, bool> CmpPerElementEqual(const float rhs_) const
+		{
+			return this->CmpPerElementEqual(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary> Returns a vector of booleans indicating if respective elements in this vector are not equal to the passed rhs_ vector data. </summary>
+		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
+		/// <returns>Vector of 4 booleans which indicate the results of comparisons of the respective indices.</returns>
+		[[nodiscard]] inline EmuMath::Vector<4, bool> CmpPerElementNotEqual(__m128 rhs_) const
+		{
+			return this->CmpMaskNotEqual(rhs_).Store<0, 4, bool>();
+		}
+		[[nodiscard]] inline EmuMath::Vector<4, bool> CmpPerElementNotEqual(const FastVector4f& rhs_) const
+		{
+			return this->CmpPerElementNotEqual(rhs_.data_);
+		}
+		[[nodiscard]] inline EmuMath::Vector<4, bool> CmpPerElementNotEqual(const float rhs_) const
+		{
+			return this->CmpPerElementNotEqual(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary> Returns a vector of booleans indicating if respective elements in this vector are greater than the passed rhs_ vector data. </summary>
+		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
+		/// <returns>Vector of 4 booleans which indicate the results of comparisons of the respective indices.</returns>
+		[[nodiscard]] inline EmuMath::Vector<4, bool> CmpPerElementGreater(__m128 rhs_) const
+		{
+			return this->CmpMaskGreater(rhs_).Store<0, 4, bool>();
+		}
+		[[nodiscard]] inline EmuMath::Vector<4, bool> CmpPerElementGreater(const FastVector4f& rhs_) const
+		{
+			return this->CmpPerElementGreater(rhs_.data_);
+		}
+		[[nodiscard]] inline EmuMath::Vector<4, bool> CmpPerElementGreater(const float rhs_) const
+		{
+			return this->CmpPerElementGreater(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary> Returns a vector of booleans indicating if respective elements in this vector are less than the passed rhs_ vector data. </summary>
+		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
+		/// <returns>Vector of 4 booleans which indicate the results of comparisons of the respective indices.</returns>
+		[[nodiscard]] inline EmuMath::Vector<4, bool> CmpPerElementLess(__m128 rhs_) const
+		{
+			return this->CmpMaskLess(rhs_).Store<0, 4, bool>();
+		}
+		[[nodiscard]] inline EmuMath::Vector<4, bool> CmpPerElementLess(const FastVector4f& rhs_) const
+		{
+			return this->CmpPerElementLess(rhs_.data_);
+		}
+		[[nodiscard]] inline EmuMath::Vector<4, bool> CmpPerElementLess(const float rhs_) const
+		{
+			return this->CmpPerElementLess(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary> Returns a vector of booleans indicating if respective elements in this vector are greater than or equal to the passed rhs_ vector data. </summary>
+		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
+		/// <returns>Vector of 4 booleans which indicate the results of comparisons of the respective indices.</returns>
+		[[nodiscard]] inline EmuMath::Vector<4, bool> CmpPerElementGreaterEqual(__m128 rhs_) const
+		{
+			return this->CmpMaskGreaterEqual(rhs_).Store<0, 4, bool>();
+		}
+		[[nodiscard]] inline EmuMath::Vector<4, bool> CmpPerElementGreaterEqual(const FastVector4f& rhs_) const
+		{
+			return this->CmpPerElementGreaterEqual(rhs_.data_);
+		}
+		[[nodiscard]] inline EmuMath::Vector<4, bool> CmpPerElementGreaterEqual(const float rhs_) const
+		{
+			return this->CmpPerElementGreaterEqual(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary> Returns a vector of booleans indicating if respective elements in this vector are less than or equal to the passed rhs_ vector data. </summary>
+		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
+		/// <returns>Vector of 4 booleans which indicate the results of comparisons of the respective indices.</returns>
+		[[nodiscard]] inline EmuMath::Vector<4, bool> CmpPerElementLessEqual(__m128 rhs_) const
+		{
+			return this->CmpMaskLessEqual(rhs_).Store<0, 4, bool>();
+		}
+		[[nodiscard]] inline EmuMath::Vector<4, bool> CmpPerElementLessEqual(const FastVector4f& rhs_) const
+		{
+			return this->CmpPerElementLessEqual(rhs_.data_);
+		}
+		[[nodiscard]] inline EmuMath::Vector<4, bool> CmpPerElementLessEqual(const float rhs_) const
+		{
+			return this->CmpPerElementLessEqual(_mm_broadcast_ss(&rhs_));
 		}
 #pragma endregion
 
