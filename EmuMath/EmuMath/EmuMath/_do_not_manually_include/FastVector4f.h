@@ -1074,6 +1074,12 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region COMPARISONS
+		/// <summary> 
+		/// <para> If rhs_ is a vector or vector data: returns true if all respective elements are equal. </para>
+		/// <para> If rhs_ is a scalar: returns true if the magnitude of this vector is equal to the passed scalar. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare respective elements to, or scalar to compare magnitude to.</param>
+		/// <returns>True if all elements in rhs_ are equal to respective elements in this vector, or if the magnitude of this vector is equal to rhs_ if it is scalar.</returns>
 		inline bool CmpEqualTo(__m128 rhs_) const
 		{
 			return EmuMath::SIMD::all_equal<true, true, true, true>(data_, rhs_);
@@ -1087,6 +1093,14 @@ namespace EmuMath
 			return this->Magnitude() == rhs_;
 		}
 
+		/// <summary> 
+		/// <para> If rhs_ is a vector or vector data: returns true if any respective elements are not equal. </para>
+		/// <para> If rhs_ is a scalar: returns true if the magnitude of this vector is not equal to the passed scalar. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare respective elements to, or scalar to compare magnitude to.</param>
+		/// <returns>
+		///		True if any elements in rhs_ are not equal to respective elements in this vector, or if the magnitude of this vector is equal to rhs_ if it is scalar.
+		/// </returns>
 		inline bool CmpNotEqualTo(__m128 rhs_) const
 		{
 			return EmuMath::SIMD::any_not_equal(data_, rhs_);
@@ -1100,6 +1114,14 @@ namespace EmuMath
 			return this->Magnitude() != rhs_;
 		}
 
+		/// <summary> 
+		/// <para> If rhs_ is a vector or vector data: returns true if the square magnitude of this vector is greater than that of the rhs_ vector. </para>
+		/// <para> If rhs_ is a scalar: returns true if the magnitude of this vector is greater than the passed scalar. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare square magnitude with, or scalar to compare magnitude to.</param>
+		/// <returns>
+		///		True if the square magnitude of this vector is greater than that of rhs_, or if the magnitude of this vector is greater than rhs_ if it is scalar.
+		/// </returns>
 		inline bool CmpGreater(__m128 rhs_) const
 		{
 			return this->SquareMagnitude() > EmuMath::SIMD::dot_product_scalar(rhs_, rhs_);
@@ -1113,6 +1135,14 @@ namespace EmuMath
 			return this->Magnitude() > rhs_;
 		}
 
+		/// <summary> 
+		/// <para> If rhs_ is a vector or vector data: returns true if the square magnitude of this vector is less than that of the rhs_ vector. </para>
+		/// <para> If rhs_ is a scalar: returns true if the magnitude of this vector is less than the passed scalar. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare square magnitude with, or scalar to compare magnitude to.</param>
+		/// <returns>
+		///		True if the square magnitude of this vector is less than that of rhs_, or if the magnitude of this vector is less than rhs_ if it is scalar.
+		/// </returns>
 		inline bool CmpLess(__m128 rhs_) const
 		{
 			return this->SquareMagnitude() < EmuMath::SIMD::dot_product_scalar(rhs_, rhs_);
@@ -1126,6 +1156,15 @@ namespace EmuMath
 			return this->Magnitude() < rhs_;
 		}
 
+		/// <summary> 
+		/// <para> If rhs_ is a vector or vector data: returns true if the square magnitude of this vector is greater than or equal to that of the rhs_ vector. </para>
+		/// <para> If rhs_ is a scalar: returns true if the magnitude of this vector is greater than or equal to the passed scalar. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare square magnitude with, or scalar to compare magnitude to.</param>
+		/// <returns>
+		///		True if the square magnitude of this vector is greater than or equal to that of rhs_, 
+		///		or if the magnitude of this vector is greater than or equal to rhs_ if it is scalar.
+		/// </returns>
 		inline bool CmpGreaterEqual(__m128 rhs_) const
 		{
 			return this->SquareMagnitude() >= EmuMath::SIMD::dot_product_scalar(rhs_, rhs_);
@@ -1139,6 +1178,15 @@ namespace EmuMath
 			return this->Magnitude() >= rhs_;
 		}
 
+		/// <summary> 
+		/// <para> If rhs_ is a vector or vector data: returns true if the square magnitude of this vector is less than or equal to that of the rhs_ vector. </para>
+		/// <para> If rhs_ is a scalar: returns true if the magnitude of this vector is less than or equal to the passed scalar. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector data to compare square magnitude with, or scalar to compare magnitude to.</param>
+		/// <returns>
+		///		True if the square magnitude of this vector is less than or equal to that of rhs_, 
+		///		or if the magnitude of this vector is less than or equal to rhs_ if it is scalar.
+		/// </returns>
 		inline bool CmpLessEqual(__m128 rhs_) const
 		{
 			return this->SquareMagnitude() <= EmuMath::SIMD::dot_product_scalar(rhs_, rhs_);
