@@ -1369,7 +1369,7 @@ namespace EmuMath
 		}
 		explicit inline operator bool() const
 		{
-			return _mm_movemask_ps(_mm_cmpneq_ps(data_, _mm_setzero_ps()));
+			return EmuMath::SIMD::any_not_equal(data_, _mm_setzero_ps());
 		}
 		inline bool operator!() const
 		{
