@@ -1801,12 +1801,13 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (EmuMath::TMP::is_emu_vector_v<RhsVector_>)
 			{
-				return
+				using floating_point = EmuCore::TMPHelpers::first_floating_point_t<OutCosine_, float>;
+				return static_cast<OutCosine_>
 				(
-					VectorDotProduct<OutCosine_>(lhs_, rhs_) / 
+					VectorDotProduct<floating_point>(lhs_, rhs_) / EmuCore::do_sqrt_constexpr<floating_point>()
 					(
-						VectorMagnitudeConstexpr<OutCosine_, LhsVector_>(lhs_) *
-						VectorMagnitudeConstexpr<OutCosine_, RhsVector_>(rhs_)
+						VectorSquareMagnitude<floating_point, LhsVector_>(lhs_) *
+						VectorSquareMagnitude<floating_point, RhsVector_>(rhs_)
 					)
 				);
 			}
@@ -1843,12 +1844,13 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (EmuMath::TMP::is_emu_vector_v<RhsVector_>)
 			{
-				return 
+				using floating_point = EmuCore::TMPHelpers::first_floating_point_t<OutCosine_, float>;
+				return static_cast<OutCosine_>
 				(
-					VectorDotProduct<OutCosine_>(lhs_, rhs_) / 
+					VectorDotProduct<floating_point>(lhs_, rhs_) / EmuCore::do_sqrt<floating_point>()
 					(
-						VectorMagnitude<OutCosine_, LhsVector_>(lhs_) *
-						VectorMagnitude<OutCosine_, RhsVector_>(rhs_)
+						VectorSquareMagnitude<floating_point, LhsVector_>(lhs_) *
+						VectorSquareMagnitude<floating_point, RhsVector_>(rhs_)
 					)
 				);
 			}

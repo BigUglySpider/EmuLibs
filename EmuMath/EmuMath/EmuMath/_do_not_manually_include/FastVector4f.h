@@ -89,7 +89,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>Copy of the value at the provided index.</returns>
 		template<std::size_t Index_>
-		inline float at() const
+		[[nodiscard]] inline float at() const
 		{
 			if constexpr (Index_ < size)
 			{
@@ -295,6 +295,10 @@ namespace EmuMath
 		[[nodiscard]] inline FastVector4f operator-(const FastVector4f& rhs_) const
 		{
 			return this->Subtract(rhs_.data_);
+		}
+		[[nodiscard]] inline FastVector4f operator-() const
+		{
+			return this->Negate();
 		}
 
 		[[nodiscard]] inline FastVector4f operator*(__m128 rhs_) const
@@ -598,7 +602,7 @@ namespace EmuMath
 			data_ = *reinterpret_cast<__m128*>(&shifted_);
 			return *this;
 		}
-		inline FastVector4f& operator>>=(__m128i num_shifts_)
+		[[nodiscard]] inline FastVector4f& operator>>=(__m128i num_shifts_)
 		{
 			__m128i shifted_ = _mm_srl_epi32(*reinterpret_cast<__m128i*>(&data_), num_shifts_);
 			data_ = *reinterpret_cast<__m128*>(&shifted_);
@@ -608,7 +612,7 @@ namespace EmuMath
 
 #pragma region PERMUTATIONS
 		template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_>
-		inline FastVector4f Shuffle() const
+		[[nodiscard]] inline FastVector4f Shuffle() const
 		{
 			if constexpr (X_ < size && Y_ < size && Z_ < size && W_ < size)
 			{
@@ -622,61 +626,66 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region ARITHMETIC
-		inline FastVector4f Add(__m128 rhs_) const
+		[[nodiscard]] inline FastVector4f Add(__m128 rhs_) const
 		{
 			return FastVector4f(_mm_add_ps(data_, rhs_));
 		}
-		inline FastVector4f Add(const FastVector4f& rhs_) const
+		[[nodiscard]] inline FastVector4f Add(const FastVector4f& rhs_) const
 		{
 			return this->Add(rhs_.data_);
 		}
 
-		inline FastVector4f Subtract(__m128 rhs_) const
+		[[nodiscard]] inline FastVector4f Subtract(__m128 rhs_) const
 		{
 			return FastVector4f(_mm_sub_ps(data_, rhs_));
 		}
-		inline FastVector4f Subtract(const FastVector4f& rhs_) const
+		[[nodiscard]] inline FastVector4f Subtract(const FastVector4f& rhs_) const
 		{
 			return this->Subtract(rhs_.data_);
 		}
 
-		inline FastVector4f Multiply(__m128 rhs_) const
+		[[nodiscard]] inline FastVector4f Multiply(__m128 rhs_) const
 		{
 			return FastVector4f(_mm_mul_ps(data_, rhs_));
 		}
-		inline FastVector4f Multiply(const FastVector4f& rhs_) const
+		[[nodiscard]] inline FastVector4f Multiply(const FastVector4f& rhs_) const
 		{
 			return this->Multiply(rhs_.data_);
 		}
-		inline FastVector4f Multiply(const float rhs_) const
+		[[nodiscard]] inline FastVector4f Multiply(const float rhs_) const
 		{
 			return this->Multiply(_mm_broadcast_ss(&rhs_));
 		}
 
-		inline FastVector4f Divide(__m128 rhs_) const
+		[[nodiscard]] inline FastVector4f Divide(__m128 rhs_) const
 		{
 			return FastVector4f(_mm_div_ps(data_, rhs_));
 		}
-		inline FastVector4f Divide(const FastVector4f& rhs_) const
+		[[nodiscard]] inline FastVector4f Divide(const FastVector4f& rhs_) const
 		{
 			return this->Divide(rhs_.data_);
 		}
-		inline FastVector4f Divide(const float rhs_) const
+		[[nodiscard]] inline FastVector4f Divide(const float rhs_) const
 		{
 			return this->Divide(_mm_broadcast_ss(&rhs_));
 		}
 
-		inline FastVector4f Mod(__m128 rhs_) const
+		[[nodiscard]] inline FastVector4f Mod(__m128 rhs_) const
 		{
 			return FastVector4f(_mm_fmod_ps(data_, rhs_));
 		}
-		inline FastVector4f Mod(const FastVector4f& rhs_) const
+		[[nodiscard]] inline FastVector4f Mod(const FastVector4f& rhs_) const
 		{
 			return this->Mod(rhs_.data_);
 		}
-		inline FastVector4f Mod(const float rhs_) const
+		[[nodiscard]] inline FastVector4f Mod(const float rhs_) const
 		{
 			return this->Mod(_mm_broadcast_ss(&rhs_));
+		}
+
+		[[nodiscard]] inline FastVector4f Negate() const
+		{
+			return FastVector4f(_mm_sub_ps(_mm_setzero_ps(), data_));
 		}
 #pragma endregion
 
@@ -688,7 +697,7 @@ namespace EmuMath
 		template<typename OutT_ = float>
 		[[nodiscard]] inline OutT_ DotProduct(__m128 b_) const
 		{
-			return static_cast<OutT_>(_mm_cvtss_f32(_calculate_dot_single(b_)));
+			return static_cast<OutT_>(_mm_cvtss_f32(EmuMath::SIMD::dot_product(data_, b_)));
 		}
 		template<typename OutT_ = float>
 		[[nodiscard]] inline OutT_ DotProduct(const FastVector4f& b_) const
@@ -720,7 +729,7 @@ namespace EmuMath
 		template<typename OutT_ = float>
 		[[nodiscard]] inline OutT_ MagnitudeReciprocal() const
 		{
-			__m128 mag_reciprocal = _calculate_dot_single(data_);
+			__m128 mag_reciprocal = EmuMath::SIMD::dot_product(data_, data_);
 			mag_reciprocal = _mm_rsqrt_ps(mag_reciprocal);
 			return _mm_cvtss_f32(mag_reciprocal);
 		}
@@ -729,7 +738,7 @@ namespace EmuMath
 		/// <returns>Copy of this vector with its elements normalised to result in a magnitude of 1.</returns>
 		[[nodiscard]] inline FastVector4f Normalise() const
 		{
-			__m128 mag_reciprocal = _calculate_dot_fill(data_);
+			__m128 mag_reciprocal = EmuMath::SIMD::dot_product_fill(data_, data_);
 			mag_reciprocal = _mm_rsqrt_ps(mag_reciprocal);
 			return FastVector4f(_mm_mul_ps(data_, mag_reciprocal));
 		}
@@ -774,10 +783,10 @@ namespace EmuMath
 		template<typename OutCosine_ = float>
 		[[nodiscard]] inline OutCosine_ AngleCosine(__m128 b_) const
 		{
-			__m128 b_sqr_mag_ = _mm_mul_ps(b_, b_);
-			b_sqr_mag_ = EmuMath::SIMD::horizontal_vector_sum(b_sqr_mag_);
-			__m128 out_ = _mm_rsqrt_ps(_mm_mul_ps(b_sqr_mag_, _calculate_dot_single(data_)));
-			out_ = _mm_mul_ps(out_, _calculate_dot_single(b_));
+			__m128 a_sqr_mag_ = EmuMath::SIMD::dot_product(data_, data_);
+			__m128 b_sqr_mag_ = EmuMath::SIMD::dot_product(b_, b_);
+			__m128 out_ = _mm_rsqrt_ps(_mm_mul_ps(a_sqr_mag_, b_sqr_mag_));
+			out_ = _mm_mul_ps(out_, EmuMath::SIMD::dot_product(data_, b_));
 			return _mm_cvtss_f32(out_);
 		}
 		template<typename OutCosine_ = float>
@@ -798,8 +807,8 @@ namespace EmuMath
 		{
 			__m128 b_sqr_mag_ = _mm_mul_ps(b_, b_);
 			b_sqr_mag_ = EmuMath::SIMD::horizontal_vector_sum(b_sqr_mag_);
-			__m128 out_ = _mm_rsqrt_ps(_mm_mul_ps(b_sqr_mag_, _calculate_dot_single(data_)));
-			out_ = _mm_mul_ps(out_, _calculate_dot_single(b_));
+			__m128 out_ = _mm_rsqrt_ps(_mm_mul_ps(b_sqr_mag_, EmuMath::SIMD::dot_product(data_, data_)));
+			out_ = _mm_mul_ps(out_, EmuMath::SIMD::dot_product(data_, b_));
 			out_ = _mm_acos_ps(out_);
 			if constexpr (!Rads_)
 			{
@@ -1012,34 +1021,34 @@ namespace EmuMath
 			outMax_ = static_cast<OutMax_>(_mm_cvtss_f32(out_));
 		}
 
-		inline FastVector4f MinVector(__m128 b_) const
+		[[nodiscard]] inline FastVector4f MinVector(__m128 b_) const
 		{
 			return FastVector4f(_mm_min_ps(data_, b_));
 		}
-		inline FastVector4f MinVector(const FastVector4f& b_) const
+		[[nodiscard]] inline FastVector4f MinVector(const FastVector4f& b_) const
 		{
 			return this->MinVector(b_.data_);;
 		}
-		inline FastVector4f MinVector(const float b_) const
+		[[nodiscard]] inline FastVector4f MinVector(const float b_) const
 		{
 			return this->MinVector(_mm_broadcast_ss(&b_));
 		}
 
-		inline FastVector4f MaxVector(__m128 b_) const
+		[[nodiscard]] inline FastVector4f MaxVector(__m128 b_) const
 		{
 			return FastVector4f(_mm_max_ps(data_, b_));
 		}
-		inline FastVector4f MaxVector(const FastVector4f& b_) const
+		[[nodiscard]] inline FastVector4f MaxVector(const FastVector4f& b_) const
 		{
 			return this->MaxVector(b_.data_);;
 		}
-		inline FastVector4f MaxVector(const float b_) const
+		[[nodiscard]] inline FastVector4f MaxVector(const float b_) const
 		{
 			return this->MaxVector(_mm_broadcast_ss(&b_));
 		}
 
 		template<bool XMin_, bool YMin_, bool ZMin_, bool WMin_>
-		inline FastVector4f MinMaxVector(__m128 b_) const
+		[[nodiscard]] inline FastVector4f MinMaxVector(__m128 b_) const
 		{
 			if constexpr (XMin_ == YMin_ && YMin_ == ZMin_ && ZMin_ == WMin_)
 			{
@@ -1062,12 +1071,12 @@ namespace EmuMath
 			}
 		}
 		template<bool XMin_, bool YMin_, bool ZMin_, bool WMin_>
-		inline FastVector4f MinMaxVector(const FastVector4f& b_) const
+		[[nodiscard]] inline FastVector4f MinMaxVector(const FastVector4f& b_) const
 		{
 			return this->MinMaxVector<XMin_, YMin_, ZMin_, WMin_>(b_.data_);
 		}
 		template<bool XMin_, bool YMin_, bool ZMin_, bool WMin_>
-		inline FastVector4f MinMaxVector(const float b_) const
+		[[nodiscard]] inline FastVector4f MinMaxVector(const float b_) const
 		{
 			return this->template MinMaxVector<XMin_, YMin_, ZMin_, WMin_>(_mm_broadcast_ss(&b_));
 		}
@@ -1080,15 +1089,15 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Vector data to compare respective elements to, or scalar to compare magnitude to.</param>
 		/// <returns>True if all elements in rhs_ are equal to respective elements in this vector, or if the magnitude of this vector is equal to rhs_ if it is scalar.</returns>
-		inline bool CmpEqualTo(__m128 rhs_) const
+		[[nodiscard]] inline bool CmpEqualTo(__m128 rhs_) const
 		{
 			return EmuMath::SIMD::all_equal<true, true, true, true>(data_, rhs_);
 		}
-		inline bool CmpEqualTo(const FastVector4f& rhs_) const
+		[[nodiscard]] inline bool CmpEqualTo(const FastVector4f& rhs_) const
 		{
 			return this->CmpEqualTo(rhs_.data_);
 		}
-		inline bool CmpEqualTo(const float rhs_) const
+		[[nodiscard]] inline bool CmpEqualTo(const float rhs_) const
 		{
 			return this->Magnitude() == rhs_;
 		}
@@ -1101,15 +1110,15 @@ namespace EmuMath
 		/// <returns>
 		///		True if any elements in rhs_ are not equal to respective elements in this vector, or if the magnitude of this vector is equal to rhs_ if it is scalar.
 		/// </returns>
-		inline bool CmpNotEqualTo(__m128 rhs_) const
+		[[nodiscard]] inline bool CmpNotEqualTo(__m128 rhs_) const
 		{
 			return EmuMath::SIMD::any_not_equal(data_, rhs_);
 		}
-		inline bool CmpNotEqualTo(const FastVector4f& rhs_) const
+		[[nodiscard]] inline bool CmpNotEqualTo(const FastVector4f& rhs_) const
 		{
 			return this->CmpNotEqualTo(rhs_.data_);
 		}
-		inline bool CmpNotEqualTo(const float rhs_) const
+		[[nodiscard]] inline bool CmpNotEqualTo(const float rhs_) const
 		{
 			return this->Magnitude() != rhs_;
 		}
@@ -1122,15 +1131,15 @@ namespace EmuMath
 		/// <returns>
 		///		True if the square magnitude of this vector is greater than that of rhs_, or if the magnitude of this vector is greater than rhs_ if it is scalar.
 		/// </returns>
-		inline bool CmpGreater(__m128 rhs_) const
+		[[nodiscard]] inline bool CmpGreater(__m128 rhs_) const
 		{
 			return this->SquareMagnitude() > EmuMath::SIMD::dot_product_scalar(rhs_, rhs_);
 		}
-		inline bool CmpGreater(const FastVector4f& rhs_) const
+		[[nodiscard]] inline bool CmpGreater(const FastVector4f& rhs_) const
 		{
 			return this->CmpGreater(rhs_.data_);
 		}
-		inline bool CmpGreater(const float rhs_) const
+		[[nodiscard]] inline bool CmpGreater(const float rhs_) const
 		{
 			return this->Magnitude() > rhs_;
 		}
@@ -1143,15 +1152,15 @@ namespace EmuMath
 		/// <returns>
 		///		True if the square magnitude of this vector is less than that of rhs_, or if the magnitude of this vector is less than rhs_ if it is scalar.
 		/// </returns>
-		inline bool CmpLess(__m128 rhs_) const
+		[[nodiscard]] inline bool CmpLess(__m128 rhs_) const
 		{
 			return this->SquareMagnitude() < EmuMath::SIMD::dot_product_scalar(rhs_, rhs_);
 		}
-		inline bool CmpLess(const FastVector4f& rhs_) const
+		[[nodiscard]] inline bool CmpLess(const FastVector4f& rhs_) const
 		{
 			return this->CmpLess(rhs_.data_);
 		}
-		inline bool CmpLess(const float rhs_) const
+		[[nodiscard]] inline bool CmpLess(const float rhs_) const
 		{
 			return this->Magnitude() < rhs_;
 		}
@@ -1165,15 +1174,15 @@ namespace EmuMath
 		///		True if the square magnitude of this vector is greater than or equal to that of rhs_, 
 		///		or if the magnitude of this vector is greater than or equal to rhs_ if it is scalar.
 		/// </returns>
-		inline bool CmpGreaterEqual(__m128 rhs_) const
+		[[nodiscard]] inline bool CmpGreaterEqual(__m128 rhs_) const
 		{
 			return this->SquareMagnitude() >= EmuMath::SIMD::dot_product_scalar(rhs_, rhs_);
 		}
-		inline bool CmpGreaterEqual(const FastVector4f& rhs_) const
+		[[nodiscard]] inline bool CmpGreaterEqual(const FastVector4f& rhs_) const
 		{
 			return this->CmpGreaterEqual(rhs_.data_);
 		}
-		inline bool CmpGreaterEqual(const float rhs_) const
+		[[nodiscard]] inline bool CmpGreaterEqual(const float rhs_) const
 		{
 			return this->Magnitude() >= rhs_;
 		}
@@ -1187,15 +1196,15 @@ namespace EmuMath
 		///		True if the square magnitude of this vector is less than or equal to that of rhs_, 
 		///		or if the magnitude of this vector is less than or equal to rhs_ if it is scalar.
 		/// </returns>
-		inline bool CmpLessEqual(__m128 rhs_) const
+		[[nodiscard]] inline bool CmpLessEqual(__m128 rhs_) const
 		{
 			return this->SquareMagnitude() <= EmuMath::SIMD::dot_product_scalar(rhs_, rhs_);
 		}
-		inline bool CmpLessEqual(const FastVector4f& rhs_) const
+		[[nodiscard]] inline bool CmpLessEqual(const FastVector4f& rhs_) const
 		{
 			return this->CmpLessEqual(rhs_.data_);
 		}
-		inline bool CmpLessEqual(const float rhs_) const
+		[[nodiscard]] inline bool CmpLessEqual(const float rhs_) const
 		{
 			return this->Magnitude() <= rhs_;
 		}
@@ -1207,17 +1216,17 @@ namespace EmuMath
 		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
 		/// <returns>True if all desired elements' comparisons were true, otherwise false.</returns>
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
-		inline bool CmpAllEqual(__m128 rhs_) const
+		[[nodiscard]] inline bool CmpAllEqual(__m128 rhs_) const
 		{
 			return EmuMath::SIMD::all_equal<TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
 		}
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
-		inline bool CmpAllEqual(const FastVector4f& rhs_) const
+		[[nodiscard]] inline bool CmpAllEqual(const FastVector4f& rhs_) const
 		{
 			return this->template CmpAllEqual<TestX_, TestY_, TestZ_, TestW_>(rhs_.data_);
 		}
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
-		inline bool CmpAllEqual(const float rhs_) const
+		[[nodiscard]] inline bool CmpAllEqual(const float rhs_) const
 		{
 			return this->template CmpAllEqual<TestX_, TestY_, TestZ_, TestW_>(_mm_broadcast_ss(&rhs_));
 		}
@@ -1229,17 +1238,17 @@ namespace EmuMath
 		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
 		/// <returns>True if all desired elements' comparisons were true, otherwise false.</returns>
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
-		inline bool CmpAllNotEqual(__m128 rhs_) const
+		[[nodiscard]] inline bool CmpAllNotEqual(__m128 rhs_) const
 		{
 			return EmuMath::SIMD::all_not_equal<TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
 		}
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
-		inline bool CmpAllNotEqual(const FastVector4f& rhs_) const
+		[[nodiscard]] inline bool CmpAllNotEqual(const FastVector4f& rhs_) const
 		{
 			return this->template CmpAllNotEqual<TestX_, TestY_, TestZ_, TestW_>(rhs_.data_);
 		}
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
-		inline bool CmpAllNotEqual(const float rhs_) const
+		[[nodiscard]] inline bool CmpAllNotEqual(const float rhs_) const
 		{
 			return this->template CmpAllNotEqual<TestX_, TestY_, TestZ_, TestW_>(_mm_broadcast_ss(&rhs_));
 		}
@@ -1254,17 +1263,17 @@ namespace EmuMath
 		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
 		/// <returns>True if all desired elements' comparisons were true, otherwise false.</returns>
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
-		inline bool CmpAllGreater(__m128 rhs_) const
+		[[nodiscard]] inline bool CmpAllGreater(__m128 rhs_) const
 		{
 			return EmuMath::SIMD::all_greater_than<TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
 		}
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
-		inline bool CmpAllGreater(const FastVector4f& rhs_) const
+		[[nodiscard]] inline bool CmpAllGreater(const FastVector4f& rhs_) const
 		{
 			return this->template CmpAllGreater<TestX_, TestY_, TestZ_, TestW_>(rhs_.data_);
 		}
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
-		inline bool CmpAllGreater(const float rhs_) const
+		[[nodiscard]] inline bool CmpAllGreater(const float rhs_) const
 		{
 			return this->template CmpAllGreater<TestX_, TestY_, TestZ_, TestW_>(_mm_broadcast_ss(&rhs_));
 		}
@@ -1279,17 +1288,17 @@ namespace EmuMath
 		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
 		/// <returns>True if all desired elements' comparisons were true, otherwise false.</returns>
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
-		inline bool CmpAllLess(__m128 rhs_) const
+		[[nodiscard]] inline bool CmpAllLess(__m128 rhs_) const
 		{
 			return EmuMath::SIMD::all_less_than<TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
 		}
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
-		inline bool CmpAllLess(const FastVector4f& rhs_) const
+		[[nodiscard]] inline bool CmpAllLess(const FastVector4f& rhs_) const
 		{
 			return this->template CmpAllLess<TestX_, TestY_, TestZ_, TestW_>(rhs_.data_);
 		}
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
-		inline bool CmpAllLess(const float rhs_) const
+		[[nodiscard]] inline bool CmpAllLess(const float rhs_) const
 		{
 			return this->template CmpAllLess<TestX_, TestY_, TestZ_, TestW_>(_mm_broadcast_ss(&rhs_));
 		}
@@ -1304,17 +1313,17 @@ namespace EmuMath
 		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
 		/// <returns>True if all desired elements' comparisons were true, otherwise false.</returns>
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
-		inline bool CmpAllGreaterEqual(__m128 rhs_) const
+		[[nodiscard]] inline bool CmpAllGreaterEqual(__m128 rhs_) const
 		{
 			return EmuMath::SIMD::all_greater_equal<TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
 		}
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
-		inline bool CmpAllGreaterEqual(const FastVector4f& rhs_) const
+		[[nodiscard]] inline bool CmpAllGreaterEqual(const FastVector4f& rhs_) const
 		{
 			return this->template CmpAllGreaterEqual<TestX_, TestY_, TestZ_, TestW_>(rhs_.data_);
 		}
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
-		inline bool CmpAllGreaterEqual(const float rhs_) const
+		[[nodiscard]] inline bool CmpAllGreaterEqual(const float rhs_) const
 		{
 			return this->template CmpAllGreaterEqual<TestX_, TestY_, TestZ_, TestW_>(_mm_broadcast_ss(&rhs_));
 		}
@@ -1329,17 +1338,17 @@ namespace EmuMath
 		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
 		/// <returns>True if all desired elements' comparisons were true, otherwise false.</returns>
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
-		inline bool CmpAllLessEqual(__m128 rhs_) const
+		[[nodiscard]] inline bool CmpAllLessEqual(__m128 rhs_) const
 		{
 			return EmuMath::SIMD::all_less_equal<TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
 		}
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
-		inline bool CmpAllLessEqual(const FastVector4f& rhs_) const
+		[[nodiscard]] inline bool CmpAllLessEqual(const FastVector4f& rhs_) const
 		{
 			return this->template CmpAllLessEqual<TestX_, TestY_, TestZ_, TestW_>(rhs_.data_);
 		}
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
-		inline bool CmpAllLessEqual(const float rhs_) const
+		[[nodiscard]] inline bool CmpAllLessEqual(const float rhs_) const
 		{
 			return this->template CmpAllLessEqual<TestX_, TestY_, TestZ_, TestW_>(_mm_broadcast_ss(&rhs_));
 		}
@@ -1349,15 +1358,15 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
 		/// <returns>True if any elements' comparisons were true, otherwise false.</returns>
-		inline bool CmpAnyEqual(__m128 rhs_) const
+		[[nodiscard]] inline bool CmpAnyEqual(__m128 rhs_) const
 		{
 			return EmuMath::SIMD::any_equal(data_, rhs_);
 		}
-		inline bool CmpAnyEqual(const FastVector4f& rhs_) const
+		[[nodiscard]] inline bool CmpAnyEqual(const FastVector4f& rhs_) const
 		{
 			return this->CmpAnyEqual(rhs_.data_);
 		}
-		inline bool CmpAnyEqual(const float rhs_) const
+		[[nodiscard]] inline bool CmpAnyEqual(const float rhs_) const
 		{
 			return this->CmpAnyEqual(_mm_broadcast_ss(&rhs_));
 		}
@@ -1367,15 +1376,15 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
 		/// <returns>True if any elements' comparisons were true, otherwise false.</returns>
-		inline bool CmpAnyNotEqual(__m128 rhs_) const
+		[[nodiscard]] inline bool CmpAnyNotEqual(__m128 rhs_) const
 		{
 			return EmuMath::SIMD::any_not_equal(data_, rhs_);
 		}
-		inline bool CmpAnyNotEqual(const FastVector4f& rhs_) const
+		[[nodiscard]] inline bool CmpAnyNotEqual(const FastVector4f& rhs_) const
 		{
 			return this->CmpAnyNotEqual(rhs_.data_);
 		}
-		inline bool CmpAnyNotEqual(const float rhs_) const
+		[[nodiscard]] inline bool CmpAnyNotEqual(const float rhs_) const
 		{
 			return this->CmpAnyNotEqual(_mm_broadcast_ss(&rhs_));
 		}
@@ -1388,15 +1397,15 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
 		/// <returns>True if any elements' comparisons were true, otherwise false.</returns>
-		inline bool CmpAnyGreater(__m128 rhs_) const
+		[[nodiscard]] inline bool CmpAnyGreater(__m128 rhs_) const
 		{
 			return EmuMath::SIMD::any_greater_than(data_, rhs_);
 		}
-		inline bool CmpAnyGreater(const FastVector4f& rhs_) const
+		[[nodiscard]] inline bool CmpAnyGreater(const FastVector4f& rhs_) const
 		{
 			return this->CmpAnyGreater(rhs_.data_);
 		}
-		inline bool CmpAnyGreater(const float rhs_) const
+		[[nodiscard]] inline bool CmpAnyGreater(const float rhs_) const
 		{
 			return this->CmpAnyGreater(_mm_broadcast_ss(&rhs_));
 		}
@@ -1409,15 +1418,15 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
 		/// <returns>True if any elements' comparisons were true, otherwise false.</returns>
-		inline bool CmpAnyLess(__m128 rhs_) const
+		[[nodiscard]] inline bool CmpAnyLess(__m128 rhs_) const
 		{
 			return EmuMath::SIMD::any_less_than(data_, rhs_);
 		}
-		inline bool CmpAnyLess(const FastVector4f& rhs_) const
+		[[nodiscard]] inline bool CmpAnyLess(const FastVector4f& rhs_) const
 		{
 			return this->CmpAnyLess(rhs_.data_);
 		}
-		inline bool CmpAnyLess(const float rhs_) const
+		[[nodiscard]] inline bool CmpAnyLess(const float rhs_) const
 		{
 			return this->CmpAnyLess(_mm_broadcast_ss(&rhs_));
 		}
@@ -1430,15 +1439,15 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
 		/// <returns>True if any elements' comparisons were true, otherwise false.</returns>
-		inline bool CmpAnyGreaterEqual(__m128 rhs_) const
+		[[nodiscard]] inline bool CmpAnyGreaterEqual(__m128 rhs_) const
 		{
 			return EmuMath::SIMD::any_greater_equal(data_, rhs_);
 		}
-		inline bool CmpAnyGreaterEqual(const FastVector4f& rhs_) const
+		[[nodiscard]] inline bool CmpAnyGreaterEqual(const FastVector4f& rhs_) const
 		{
 			return this->CmpAnyGreaterEqual(rhs_.data_);
 		}
-		inline bool CmpAnyGreaterEqual(const float rhs_) const
+		[[nodiscard]] inline bool CmpAnyGreaterEqual(const float rhs_) const
 		{
 			return this->CmpAnyGreaterEqual(_mm_broadcast_ss(&rhs_));
 		}
@@ -1451,15 +1460,15 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Vector data to compare this vector's data to.</param>
 		/// <returns>True if any elements' comparisons were true, otherwise false.</returns>
-		inline bool CmpAnyLessEqual(__m128 rhs_) const
+		[[nodiscard]] inline bool CmpAnyLessEqual(__m128 rhs_) const
 		{
 			return EmuMath::SIMD::any_less_equal(data_, rhs_);
 		}
-		inline bool CmpAnyLessEqual(const FastVector4f& rhs_) const
+		[[nodiscard]] inline bool CmpAnyLessEqual(const FastVector4f& rhs_) const
 		{
 			return this->CmpAnyLessEqual(rhs_.data_);
 		}
-		inline bool CmpAnyLessEqual(const float rhs_) const
+		[[nodiscard]] inline bool CmpAnyLessEqual(const float rhs_) const
 		{
 			return this->CmpAnyLessEqual(_mm_broadcast_ss(&rhs_));
 		}
@@ -1469,15 +1478,15 @@ namespace EmuMath
 		/// <summary> Outputs the resulting vector from a bitwise AND with this vector's data and the passed vector data. </summary>
 		/// <param name="rhs_">Vector data to perform the bitwise AND on this vector's data.</param>
 		/// <returns>Vector resulting from a bitwise AND performed between this vector's data and the passed vector data.</returns>
-		inline FastVector4f And(__m128 rhs_) const
+		[[nodiscard]] inline FastVector4f And(__m128 rhs_) const
 		{
 			return FastVector4f(_mm_and_ps(data_, rhs_));
 		}
-		inline FastVector4f And(const FastVector4f& rhs_) const
+		[[nodiscard]] inline FastVector4f And(const FastVector4f& rhs_) const
 		{
 			return this->And(rhs_.data_);
 		}
-		inline FastVector4f And(const float rhs_) const
+		[[nodiscard]] inline FastVector4f And(const float rhs_) const
 		{
 			return this->And(_mm_broadcast_ss(&rhs_));
 		}
@@ -1485,15 +1494,15 @@ namespace EmuMath
 		/// <summary> Outputs the resulting vector from a bitwise OR with this vector's data and the passed vector data. </summary>
 		/// <param name="rhs_">Vector data to perform the bitwise OR on this vector's data.</param>
 		/// <returns>Vector resulting from a bitwise OR performed between this vector's data and the passed vector data.</returns>
-		inline FastVector4f Or(__m128 rhs_) const
+		[[nodiscard]] inline FastVector4f Or(__m128 rhs_) const
 		{
 			return FastVector4f(_mm_or_ps(data_, rhs_));
 		}
-		inline FastVector4f Or(const FastVector4f& rhs_) const
+		[[nodiscard]] inline FastVector4f Or(const FastVector4f& rhs_) const
 		{
 			return this->Or(rhs_.data_);
 		}
-		inline FastVector4f Or(const float rhs_) const
+		[[nodiscard]] inline FastVector4f Or(const float rhs_) const
 		{
 			return this->Or(_mm_broadcast_ss(&rhs_));
 		}
@@ -1501,15 +1510,15 @@ namespace EmuMath
 		/// <summary> Outputs the resulting vector from a bitwise XOR with this vector's data and the passed vector data. </summary>
 		/// <param name="rhs_">Vector data to perform the bitwise XOR on this vector's data.</param>
 		/// <returns>Vector resulting from a bitwise XOR performed between this vector's data and the passed vector data.</returns>
-		inline FastVector4f Xor(__m128 rhs_) const
+		[[nodiscard]] inline FastVector4f Xor(__m128 rhs_) const
 		{
 			return FastVector4f(_mm_xor_ps(data_, rhs_));
 		}
-		inline FastVector4f Xor(const FastVector4f& rhs_) const
+		[[nodiscard]] inline FastVector4f Xor(const FastVector4f& rhs_) const
 		{
 			return this->Xor(rhs_.data_);
 		}
-		inline FastVector4f Xor(const float rhs_) const
+		[[nodiscard]] inline FastVector4f Xor(const float rhs_) const
 		{
 			return this->Xor(_mm_broadcast_ss(&rhs_));
 		}
@@ -1517,12 +1526,12 @@ namespace EmuMath
 		/// <summary> Outputs the resulting vector from a bitwise logical shift left the provided number of times for all elements. </summary>
 		/// <param name="rhs_">Scalar or integral vector data indicating the number of times each element should be shifted.</param>
 		/// <returns>Vector resulting from a bitwise shift performed on this vector's data.</returns>
-		inline FastVector4f ShiftLeft(const std::size_t numShifts_) const
+		[[nodiscard]] inline FastVector4f ShiftLeft(const std::size_t numShifts_) const
 		{
 			__m128i shifted_ = _mm_slli_epi32(*reinterpret_cast<const __m128i*>(&data_), static_cast<int>(numShifts_));
 			return FastVector4f(*reinterpret_cast<const __m128*>(&shifted_));
 		}
-		inline FastVector4f ShiftLeft(__m128i numShifts_) const
+		[[nodiscard]] inline FastVector4f ShiftLeft(__m128i numShifts_) const
 		{
 			__m128i shifted_ = _mm_sll_epi32(*reinterpret_cast<const __m128i*>(&data_), numShifts_);
 			return FastVector4f(*reinterpret_cast<const __m128*>(&shifted_));
@@ -1531,12 +1540,12 @@ namespace EmuMath
 		/// <summary> Outputs the resulting vector from a bitwise logical shift right the provided number of times for all elements. </summary>
 		/// <param name="rhs_">Scalar or integral vector data indicating the number of times each element should be shifted.</param>
 		/// <returns>Vector resulting from a bitwise shift performed on this vector's data.</returns>
-		inline FastVector4f ShiftRight(const std::size_t numShifts_) const
+		[[nodiscard]] inline FastVector4f ShiftRight(const std::size_t numShifts_) const
 		{
 			__m128i shifted_ = _mm_srli_epi32(*reinterpret_cast<const __m128i*>(&data_), static_cast<int>(numShifts_));
 			return FastVector4f(*reinterpret_cast<const __m128*>(&shifted_));
 		}
-		inline FastVector4f ShiftRight(__m128i numShifts_) const
+		[[nodiscard]] inline FastVector4f ShiftRight(__m128i numShifts_) const
 		{
 			__m128i shifted_ = _mm_srl_epi32(*reinterpret_cast<const __m128i*>(&data_), numShifts_);
 			return FastVector4f(*reinterpret_cast<const __m128*>(&shifted_));
@@ -1545,12 +1554,12 @@ namespace EmuMath
 		/// <summary> Outputs the resulting vector from a bitwise arithmetic shift right the provided number of times for all elements. </summary>
 		/// <param name="rhs_">Scalar or integral vector data indicating the number of times each element should be shifted.</param>
 		/// <returns>Vector resulting from a bitwise shift performed on this vector's data.</returns>
-		inline FastVector4f ShiftRightArithmetic(const std::size_t numShifts_) const
+		[[nodiscard]] inline FastVector4f ShiftRightArithmetic(const std::size_t numShifts_) const
 		{
 			__m128i shifted_ = _mm_srai_epi32(*reinterpret_cast<const __m128i*>(&data_), static_cast<int>(numShifts_));
 			return FastVector4f(*reinterpret_cast<const __m128*>(&shifted_));
 		}
-		inline FastVector4f ShiftRightArithmetic(__m128i numShifts_) const
+		[[nodiscard]] inline FastVector4f ShiftRightArithmetic(__m128i numShifts_) const
 		{
 			__m128i shifted_ = _mm_sra_epi32(*reinterpret_cast<const __m128i*>(&data_), numShifts_);
 			return FastVector4f(*reinterpret_cast<const __m128*>(&shifted_));
@@ -1558,7 +1567,7 @@ namespace EmuMath
 
 		/// <summary> Outputs the resulting vector from performing a bitwise NOT on this vector. </summary>
 		/// <returns>Inverted form of this vector resulting from a bitwise NOT.</returns>
-		inline FastVector4f Not() const
+		[[nodiscard]] inline FastVector4f Not() const
 		{
 			return _mm_andnot_ps(data_, EmuMath::SIMD::index_mask_m128<true, true, true, true>());
 		}
@@ -1619,7 +1628,7 @@ namespace EmuMath
 		/// <para> May provide an additional index offset to start contiguously outputting this vector's data from. </para>
 		/// </summary>
 		template<std::size_t OutOffset_ = 0, std::size_t OutSize_ = 4, typename out_contained_type = float>
-		inline EmuMath::Vector<OutSize_, out_contained_type> Store() const
+		[[nodiscard]] inline EmuMath::Vector<OutSize_, out_contained_type> Store() const
 		{
 			if constexpr (OutOffset_ == 0)
 			{
@@ -1670,7 +1679,7 @@ namespace EmuMath
 		}
 
 		template<std::size_t OutSize_, typename out_contained_type>
-		inline EmuMath::Vector<OutSize_, out_contained_type> As() const
+		[[nodiscard]] inline EmuMath::Vector<OutSize_, out_contained_type> As() const
 		{
 			return this->template Store<0, OutSize_, out_contained_type>();
 		}
@@ -1691,20 +1700,337 @@ namespace EmuMath
 
 		/// <summary> SIMD register represeneting this vector's data. This should not be interacted with directly unless you know what you are doing. </summary>
 		__m128 data_;
+	};
+}
 
-	private:
-		/// <summary> Calculates data_ DOT b_, storing the result in the output __m128's first element. </summary>
-		inline __m128 _calculate_dot_single(__m128 b_) const
+#pragma region EMU_CORE_FUNCTOR_SPECIALISATIONS
+namespace EmuCore
+{
+	template<typename B_, typename T_>
+	struct do_lerp<EmuMath::FastVector4f, B_, T_>
+	{
+		constexpr do_lerp()
 		{
-			return EmuMath::SIMD::horizontal_vector_sum(_mm_mul_ps(data_, b_));
 		}
-		/// <summary> Calculates data_ DOT b_, storing the result in every element of the output __m128. </summary>
-		inline __m128 _calculate_dot_fill(__m128 b_) const
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& a_, B_&& b_, T_&& t_) const
 		{
-			return EmuMath::SIMD::horizontal_vector_sum_fill(_mm_mul_ps(data_, b_));
+			return a_.Lerp(std::forward<B_>(b_), std::forward<T_>(t_));
+		}
+	};
+
+	template<>
+	struct do_sqrt<EmuMath::FastVector4f>
+	{
+		constexpr do_sqrt()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& val_) const
+		{
+			return val_.Sqrt();
+		}
+	};
+
+	template<>
+	struct do_floor<EmuMath::FastVector4f>
+	{
+		constexpr do_floor()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& val_) const
+		{
+			return val_.Floor();
+		}
+	};
+
+	template<>
+	struct do_ceil<EmuMath::FastVector4f>
+	{
+		constexpr do_ceil()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& val_) const
+		{
+			return val_.Ceil();
+		}
+	};
+
+	template<>
+	struct do_trunc<EmuMath::FastVector4f>
+	{
+		constexpr do_trunc()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& val_) const
+		{
+			return val_.Trunc();
+		}
+	};
+
+	template<typename Rhs_>
+	struct do_add<EmuMath::FastVector4f, Rhs_>
+	{
+		constexpr do_add()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& lhs_, Rhs_&& rhs_) const
+		{
+			return lhs_.Add(std::forward<Rhs_>(rhs_));
+		}
+	};
+
+	template<typename Rhs_>
+	struct do_subtract<EmuMath::FastVector4f, Rhs_>
+	{
+		constexpr do_subtract()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& lhs_, Rhs_&& rhs_) const
+		{
+			return lhs_.Subtract(std::forward<Rhs_>(rhs_));
+		}
+	};
+
+	template<typename Rhs_>
+	struct do_multiply<EmuMath::FastVector4f, Rhs_>
+	{
+		constexpr do_multiply()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& lhs_, Rhs_&& rhs_) const
+		{
+			return lhs_.Multiply(std::forward<Rhs_>(rhs_));
+		}
+	};
+
+	template<typename Rhs_>
+	struct do_divide<EmuMath::FastVector4f, Rhs_>
+	{
+		constexpr do_divide()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& lhs_, Rhs_&& rhs_) const
+		{
+			return lhs_.Divide(std::forward<Rhs_>(rhs_));
+		}
+	};
+
+	template<typename Rhs_>
+	struct do_mod<EmuMath::FastVector4f, Rhs_>
+	{
+		constexpr do_mod()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& lhs_, Rhs_&& rhs_) const
+		{
+			return lhs_.Mod(std::forward<Rhs_>(rhs_));
+		}
+	};
+
+	template<>
+	struct do_negate<EmuMath::FastVector4f>
+	{
+		constexpr do_negate()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& val_) const
+		{
+			return val_.Negate();
+		}
+	};
+
+	template<>
+	struct do_rads_to_degs<EmuMath::FastVector4f>
+	{
+		constexpr do_rads_to_degs()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& val_) const
+		{
+			return val_.Multiply(_mm_set_ps1(EmuCore::Pi::HUNDRED80_DIV_PI<float>));
+		}
+	};
+
+	template<>
+	struct do_degs_to_rads<EmuMath::FastVector4f>
+	{
+		constexpr do_degs_to_rads()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& val_) const
+		{
+			return val_.Multiply(_mm_set_ps1(EmuCore::Pi::PI_DIV_180<float>));
+		}
+	};
+
+	template<typename Rhs_>
+	struct do_bitwise_and<EmuMath::FastVector4f, Rhs_>
+	{
+		constexpr do_bitwise_and()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& lhs_, Rhs_&& rhs_) const
+		{
+			return lhs_.And(std::forward<Rhs_>(rhs_));
+		}
+	};
+
+	template<typename Rhs_>
+	struct do_bitwise_or<EmuMath::FastVector4f, Rhs_>
+	{
+		constexpr do_bitwise_or()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& lhs_, Rhs_&& rhs_) const
+		{
+			return lhs_.Or(std::forward<Rhs_>(rhs_));
+		}
+	};
+
+	template<typename Rhs_>
+	struct do_bitwise_xor<EmuMath::FastVector4f, Rhs_>
+	{
+		constexpr do_bitwise_xor()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& lhs_, Rhs_&& rhs_) const
+		{
+			return lhs_.Xor(std::forward<Rhs_>(rhs_));
+		}
+	};
+
+	template<>
+	struct do_bitwise_not<EmuMath::FastVector4f>
+	{
+		constexpr do_bitwise_not()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& val_) const
+		{
+			return val_.Not();
+		}
+	};
+
+	template<typename Shifts_>
+	struct do_left_shift<EmuMath::FastVector4f, Shifts_>
+	{
+		constexpr do_left_shift()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& val_, Shifts_&& num_shifts_) const
+		{
+			return val_.ShiftLeft(std::forward<Shifts_>(num_shifts_));
+		}
+	};
+
+	template<typename Shifts_>
+	struct do_right_shift<EmuMath::FastVector4f, Shifts_>
+	{
+		constexpr do_right_shift()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& val_, Shifts_&& num_shifts_) const
+		{
+			return val_.ShiftRight(std::forward<Shifts_>(num_shifts_));
+		}
+	};
+
+	template<typename Rhs_>
+	struct do_cmp_equal_to<EmuMath::FastVector4f, Rhs_>
+	{
+		constexpr do_cmp_equal_to()
+		{
+		}
+		inline bool operator()(const EmuMath::FastVector4f& lhs_, Rhs_&& rhs_) const
+		{
+			return lhs_.CmpEqualTo(std::forward<Rhs_>(rhs_));
+		}
+	};
+
+	template<typename Rhs_>
+	struct do_cmp_not_equal_to<EmuMath::FastVector4f, Rhs_>
+	{
+		constexpr do_cmp_not_equal_to()
+		{
+		}
+		inline bool operator()(const EmuMath::FastVector4f& lhs_, Rhs_&& rhs_) const
+		{
+			return lhs_.CmpNotEqualTo(std::forward<Rhs_>(rhs_));
+		}
+	};
+
+	template<typename Rhs_>
+	struct do_cmp_greater<EmuMath::FastVector4f, Rhs_>
+	{
+		constexpr do_cmp_greater()
+		{
+		}
+		inline bool operator()(const EmuMath::FastVector4f& lhs_, Rhs_&& rhs_) const
+		{
+			return lhs_.CmpGreater(std::forward<Rhs_>(rhs_));
+		}
+	};
+
+	template<typename Rhs_>
+	struct do_cmp_less<EmuMath::FastVector4f, Rhs_>
+	{
+		constexpr do_cmp_less()
+		{
+		}
+		inline bool operator()(const EmuMath::FastVector4f& lhs_, Rhs_&& rhs_) const
+		{
+			return lhs_.CmpLess(std::forward<Rhs_>(rhs_));
+		}
+	};
+
+	template<typename Rhs_>
+	struct do_cmp_greater_equal<EmuMath::FastVector4f, Rhs_>
+	{
+		constexpr do_cmp_greater_equal()
+		{
+		}
+		inline bool operator()(const EmuMath::FastVector4f& lhs_, Rhs_&& rhs_) const
+		{
+			return lhs_.CmpGreaterEqual(std::forward<Rhs_>(rhs_));
+		}
+	};
+
+	template<typename Rhs_>
+	struct do_cmp_less_equal<EmuMath::FastVector4f, Rhs_>
+	{
+		constexpr do_cmp_less_equal()
+		{
+		}
+		inline bool operator()(const EmuMath::FastVector4f& lhs_, Rhs_&& rhs_) const
+		{
+			return lhs_.CmpLessEqual(std::forward<Rhs_>(rhs_));
+		}
+	};
+
+	template<typename B_>
+	struct do_min<EmuMath::FastVector4f, B_>
+	{
+		constexpr do_min()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& a_, B_&& b_) const
+		{
+			return a_.MinVector(std::forward<B_>(b_));
+		}
+	};
+
+	template<typename B_>
+	struct do_max<EmuMath::FastVector4f, B_>
+	{
+		constexpr do_max()
+		{
+		}
+		inline EmuMath::FastVector4f operator()(const EmuMath::FastVector4f& a_, B_&& b_) const
+		{
+			return a_.MaxVector(std::forward<B_>(b_));
 		}
 	};
 }
+#pragma endregion
 
 inline std::ostream& operator<<(std::ostream& stream_, const EmuMath::FastVector4f& v4f_)
 {
