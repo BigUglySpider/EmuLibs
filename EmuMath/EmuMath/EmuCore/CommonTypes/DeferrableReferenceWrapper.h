@@ -2,6 +2,7 @@
 #define EMU_CORE_DEFERRABLE_REFERENCE_WRAPPER_H_INC_
 
 #include "../TMPHelpers/TypeComparators.h"
+#include "../TMPHelpers/TypeConvertors.h"
 #include <functional>
 
 namespace EmuCore

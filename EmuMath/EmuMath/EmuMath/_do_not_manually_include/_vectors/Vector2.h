@@ -36,6 +36,9 @@ namespace EmuMath
 		constexpr Vector() : x(), y()
 		{
 		}
+		constexpr Vector(this_type& toCopy_) : x(toCopy_.at<0>()), y(toCopy_.at<1>())
+		{
+		}
 		constexpr Vector(const this_type& toCopy_) : x(toCopy_.at<0>()), y(toCopy_.at<1>())
 		{
 		}

@@ -1,7 +1,7 @@
 #ifndef EMU_MATH_MATRIX_T_H_INC_
 #define EMU_MATH_MATRIX_T_H_INC_
 
-#include "../../Vector.h"
+#include "MatrixHelpers.h"
 
 namespace EmuMath
 {
@@ -11,8 +11,10 @@ namespace EmuMath
 	public:
 		static constexpr std::size_t num_columns = NumColumns_;
 		static constexpr std::size_t num_rows = NumRows_;
+		static constexpr std::size_t size = num_columns * num_rows;
 		static constexpr bool is_column_major = ColumnMajor_;
 		static constexpr bool is_row_major = !is_column_major;
+		static constexpr bool is_square = (num_columns == num_rows);
 
 		static constexpr std::size_t num_major_elements = is_column_major ? num_columns : num_rows;
 		static constexpr std::size_t num_non_major_elements = is_column_major ? num_rows : num_columns;
@@ -31,6 +33,7 @@ namespace EmuMath
 		static constexpr bool contains_const_reference_wrappers = std::is_const_v<raw_value_type> && contains_reference_wrappers;
 		/// <summary> Boolean indicating if the reference wrappers within this matrix contain non-constant references. Always false if contains_reference_wrappers is false. </summary>
 		static constexpr bool contains_non_const_reference_wrappers = contains_reference_wrappers && !contains_const_reference_wrappers;
+		using this_type = EmuMath::Matrix<num_columns, num_rows, contained_type, is_column_major>;
 
 		/// <summary> Boolean indcating if this matrix's values are integral. </summary>
 		static constexpr bool has_integral_elements = std::is_integral_v<std::remove_cv_t<value_type>>;
@@ -63,114 +66,221 @@ namespace EmuMath
 		constexpr Matrix(const data_storage_type& toCopy_) : data_(toCopy_)
 		{
 		}
+		constexpr Matrix(this_type& toCopy_) : data_(toCopy_.data_)
+		{
+		}
+		constexpr Matrix(const this_type& toCopy_) : data_(toCopy_)
+		{
+		}
 		template<typename...Vectors_, typename RequiresNumMajorArgs_ = std::enable_if_t<sizeof...(Vectors_) == num_major_elements>>
 		constexpr Matrix(Vectors_&&...major_vectors_) : data_(std::forward<Vectors_>(major_vectors_)...)
 		{
-			static_assert(std::is_constructible_v<data_storage_type, Vectors_...>, "Attempted to construct an EmuMath matrix via a template constructors, using Vector data which cannot be used to construct the matrix's underlying data.");
+			static_assert(std::is_constructible_v<data_storage_type, Vectors_...>, "Attempted to construct an EmuMath matrix via a template constructor, using Vector data which cannot be used to construct the matrix's underlying data.");
 		}
 #pragma endregion
 
 #pragma region RANDOM_ACCESS
-		template<std::size_t RowIndex_>
-		constexpr inline random_access_row GetRow()
+		template<std::size_t ColumnIndex_, std::size_t RowIndex_>
+		[[nodiscard]] constexpr inline raw_value_type& at()
 		{
-			if constexpr (RowIndex_ < num_rows)
+			if constexpr (_valid_static_indices<ColumnIndex_, RowIndex_>())
 			{
-				if constexpr (is_row_major)
-				{
-					return random_access_row(data_[RowIndex_]);
-				}
-				else
-				{
-					const_random_access_row out_ = const_random_access_row();
-					_assign_non_major_reference<RowIndex_, 0, const_random_access_row>(out_);
-					return out_;
-				}
+				return _get_index<ColumnIndex_, RowIndex_>();
 			}
 			else
 			{
-				static_assert(false, "Attempted to access a row within an EmuMath matrix, but an invalid row index was provided.");
+				static_assert(false, "Failed to retrieve an EmuMath matrix element due to invalid indices being provided.");
 			}
+		}
+		template<std::size_t ColumnIndex_, std::size_t RowIndex_>
+		[[nodiscard]] constexpr inline const raw_value_type& at() const
+		{
+			if constexpr (_valid_static_indices<ColumnIndex_, RowIndex_>())
+			{
+				return _get_index<ColumnIndex_, RowIndex_>();
+			}
+			else
+			{
+				static_assert(false, "Failed to retrieve an EmuMath matrix element due to invalid indices being provided.");
+			}
+		}
+		[[nodiscard]] constexpr inline raw_value_type& at(const std::size_t columnIndex_, const std::size_t rowIndex_)
+		{
+			return _get_index(columnIndex_, rowIndex_);
+		}
+		[[nodiscard]] constexpr inline const raw_value_type& at(const std::size_t columnIndex_, const std::size_t rowIndex_) const
+		{
+			return _get_index(columnIndex_, rowIndex_);
+		}
+
+		template<std::size_t MajorOrderIndex_>
+		[[nodiscard]] constexpr inline raw_value_type& at()
+		{
+			return EmuMath::Helpers::MatrixGet<MajorOrderIndex_, this_type>(*this);
+		}
+		template<std::size_t MajorOrderIndex_>
+		[[nodiscard]] constexpr inline const raw_value_type& at() const
+		{
+			return EmuMath::Helpers::MatrixGet<MajorOrderIndex_, this_type>(*this);
+		}
+		[[nodiscard]] constexpr inline raw_value_type& at(const std::size_t majorOrderIndex_)
+		{
+			return EmuMath::Helpers::MatrixGet<this_type>(*this, majorOrderIndex_);
+		}
+		[[nodiscard]] constexpr inline const raw_value_type& at(const std::size_t majorOrderIndex_) const
+		{
+			return EmuMath::Helpers::MatrixGet<this_type>(*this, majorOrderIndex_);
+		}
+
+		[[nodiscard]] constexpr inline raw_value_type& operator[](const std::size_t majorOrderIndex_)
+		{
+			return this->at(majorOrderIndex_);
+		}
+		[[nodiscard]] constexpr inline const raw_value_type& operator[](const std::size_t majorOrderIndex_) const
+		{
+			return this->at(majorOrderIndex_);
+		}
+
+		template<std::size_t MajorIndex_>
+		constexpr inline EmuMath::Vector<num_non_major_elements, contained_type>& GetMajor()
+		{
+			if constexpr (MajorIndex_ < num_major_elements)
+			{
+				return data_.template at<MajorIndex_>();
+			}
+			else
+			{
+				static_assert(false, "Attempted to access a major element within an EmuMath matrix using an invalid MajorIndex_.");
+			}
+		}
+		template<std::size_t MajorIndex_>
+		constexpr inline const EmuMath::Vector<num_non_major_elements, contained_type>& GetMajor() const
+		{
+			if constexpr (MajorIndex_ < num_major_elements)
+			{
+				return data_.template at<MajorIndex_>();
+			}
+			else
+			{
+				static_assert(false, "Attempted to access a major element within an EmuMath matrix using an invalid MajorIndex_.");
+			}
+		}
+
+		constexpr inline EmuMath::Vector<num_non_major_elements, contained_type>& GetMajor(const std::size_t majorIndex_)
+		{
+			return data_.at(majorIndex_);
+		}
+		constexpr inline const EmuMath::Vector<num_non_major_elements, contained_type>& GetMajor(const std::size_t majorIndex_) const
+		{
+			return data_.at(majorIndex_);
+		}
+
+		template<std::size_t RowIndex_>
+		constexpr inline random_access_row GetRow()
+		{
+			return EmuMath::Helpers::MatrixGetRow<RowIndex_, this_type>(*this);
 		}
 		template<std::size_t RowIndex_>
 		constexpr inline const_random_access_row GetRow() const
 		{
-			return this->template GetRowConst<RowIndex_>();
+			return EmuMath::Helpers::MatrixGetRow<RowIndex_, this_type>(*this);
 		}
 		template<std::size_t RowIndex_>
 		constexpr inline const_random_access_row GetRowConst() const
 		{
-			if constexpr (RowIndex_ < num_rows)
-			{
-				if constexpr (is_row_major)
-				{
-					return const_random_access_row(data_[RowIndex_]);
-				}
-				else
-				{
-					const_random_access_row out_ = const_random_access_row();
-					_assign_non_major_reference<RowIndex_, 0, const_random_access_row>(out_);
-					return out_;
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to access a row within an EmuMath matrix, but an invalid row index was provided.");
-			}
+			return EmuMath::Helpers::MatrixGetRow<RowIndex_, this_type>(*this);
 		}
 
 		template<std::size_t ColumnIndex_>
-		constexpr inline const_random_access_column GetColumn()
+		constexpr inline random_access_column GetColumn()
 		{
-			if constexpr (ColumnIndex_ < num_rows)
-			{
-				if constexpr (is_column_major)
-				{
-					return random_access_row(data_[ColumnIndex_]);
-				}
-				else
-				{
-					const_random_access_row out_ = const_random_access_row();
-					_assign_non_major_reference<ColumnIndex_, 0, const_random_access_row>(out_);
-					return out_;
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to access a column within an EmuMath matrix, but an invalid column index was provided.");
-			}
+			return EmuMath::Helpers::MatrixGetColumn<ColumnIndex_, this_type>(*this);
 		}
 		template<std::size_t ColumnIndex_>
 		constexpr inline const_random_access_column GetColumn() const
 		{
-			return this->template GetColumnConst<ColumnIndex_>();
+			return EmuMath::Helpers::MatrixGetColumn<ColumnIndex_, this_type>(*this);
 		}
 		template<std::size_t ColumnIndex_>
 		constexpr inline const_random_access_column GetColumnConst() const
 		{
-			if constexpr (ColumnIndex_ < num_rows)
+			return EmuMath::Helpers::MatrixGetColumn<ColumnIndex_, this_type>(*this);
+		}
+#pragma endregion
+
+	private:
+		data_storage_type data_;
+
+		template<std::size_t ColumnIndex_, std::size_t RowIndex_>
+		static constexpr inline bool _valid_static_indices()
+		{
+			if constexpr (ColumnIndex_ < num_columns)
 			{
-				if constexpr (is_column_major)
+				if constexpr (RowIndex_ < num_rows)
 				{
-					return const_random_access_column(data_[ColumnIndex_]);
+					return true;
 				}
 				else
 				{
-					const_random_access_column out_ = const_random_access_column();
-					_assign_non_major_reference<ColumnIndex_, 0, const_random_access_column>(out_);
-					return out_;
+					static_assert(false, "Provided an invalid ColumnIndex_ when attempting to access a row of an EmuMath matrix.");
+					return false;
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to access a column within an EmuMath matrix, but an invalid column index was provided.");
+				static_assert(false, "Provided an invalid ColumnIndex_ when attempting to access a column of an EmuMath matrix.");
+				return false;
 			}
 		}
-#pragma endregion
 
-		data_storage_type data_;
+		template<std::size_t ColumnIndex_, std::size_t RowIndex_>
+		constexpr inline raw_value_type& _get_index()
+		{
+			if constexpr (is_column_major)
+			{
+				return data_.template at<ColumnIndex_>().template at<RowIndex_>();
+			}
+			else
+			{
+				return data_.template at<RowIndex_>().template at<ColumnIndex_>();
+			}
+		}
+		template<std::size_t ColumnIndex_, std::size_t RowIndex_>
+		constexpr inline const raw_value_type& _get_index() const
+		{
+			if constexpr (is_column_major)
+			{
+				return data_.template at<ColumnIndex_>().template at<RowIndex_>();
+			}
+			else
+			{
+				return data_.template at<RowIndex_>().template at<ColumnIndex_>();
+			}
+		}
 
-	private:
+		constexpr inline raw_value_type& _get_index(const std::size_t columnIndex_, std::size_t rowIndex_)
+		{
+			if constexpr (is_column_major)
+			{
+				return data_.at(columnIndex_).at(rowIndex_);
+			}
+			else
+			{
+				return data_.at(rowIndex_).at(columnIndex_);
+			}
+		}
+		constexpr inline const raw_value_type& _get_index(const std::size_t columnIndex_, std::size_t rowIndex_) const
+		{
+			if constexpr (is_column_major)
+			{
+				return data_.at(columnIndex_).at(rowIndex_);
+			}
+			else
+			{
+				return data_.at(rowIndex_).at(columnIndex_);
+			}
+		}
+
 		template<std::size_t NonMajorIndex_, std::size_t MajorIndex_, typename Out_>
 		constexpr inline void _assign_non_major_reference(Out_& out_)
 		{

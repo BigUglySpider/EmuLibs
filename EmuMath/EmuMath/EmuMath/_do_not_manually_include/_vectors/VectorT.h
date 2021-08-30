@@ -45,6 +45,9 @@ namespace EmuMath
 		constexpr Vector() : data_()
 		{
 		}
+		constexpr Vector(this_type& toCopy_) : data_(toCopy_.data_)
+		{
+		}
 		constexpr Vector(const this_type& toCopy_) : data_(toCopy_.data_)
 		{
 		}

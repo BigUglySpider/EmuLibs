@@ -53,11 +53,28 @@ bool boolfunc(bool bool_)
 	return bool(bool_);
 }
 
+template<std::size_t X_, std::size_t Y_, typename Type_, bool ColumnMajor_>
+void TestFunc(const EmuMath::Matrix<X_, Y_, Type_, ColumnMajor_>& matrix_)
+{
+	std::cout << matrix_ << "\n";
+}
+template<std::size_t X_, std::size_t Y_, typename Type_, bool ColumnMajor_>
+void TestFunc(EmuMath::Matrix<X_, Y_, Type_, ColumnMajor_>&& matrix_)
+{
+	TestFunc(std::forward<EmuMath::Matrix<X_, Y_, Type_, ColumnMajor_>>(matrix_));
+}
+template<std::size_t FirstX_, std::size_t FirstY_, typename FirstType_, bool FirstColumnMajor_, std::size_t...X_, std::size_t...Y_, typename...Types_, bool...ColumnMajors_>
+void TestFunc(const EmuMath::Matrix<FirstX_, FirstY_, FirstType_, FirstColumnMajor_>& first_, const EmuMath::Matrix<X_, Y_, Types_, ColumnMajors_>&...matrices_)
+{
+	TestFunc(first_);
+	TestFunc(matrices_...);
+}
+
 int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
 
-	EmuMath::Matrix<4, 4, float, true> matrix_
+	constexpr EmuMath::Matrix<4, 4, float, true> matrix_
 	(
 		EmuMath::Vector4<float>(0.0f, 1.0f, 2.0f, 3.0f),
 		EmuMath::Vector4<double>(4.0f, 5.0f, 6.0f, 7.0f),
@@ -65,7 +82,21 @@ int main()
 		EmuMath::Vector4<std::uint64_t>(12.0f, 13.0f, 14.0f, 15.0f)
 	);
 
+
 	std::cout << matrix_ << "\n";
+	std::cout << "[2]: " << matrix_[2] << "\n";
+	std::cout << "[7]: " << matrix_[7] << "\n";
+	std::cout << "[13]: " << matrix_[13] << "\n";
+	std::cout << "[15]: " << matrix_[15] << "\n";
+	std::cout << "Column 3: " << matrix_.GetColumn<3>() << "\n";
+	std::cout << "Row 2: " << matrix_.GetRow<2>() << "\n";
+
+
+	matrix_.GetRow<3>() = EmuMath::Vector4<float>(2.0f, 4.0f, 6.0f, 8.0f);
+	
+	std::cout << matrix_ << "\n";
+
+	constexpr EmuMath::Vector4<float> booble = matrix_.GetColumn<2>();
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
