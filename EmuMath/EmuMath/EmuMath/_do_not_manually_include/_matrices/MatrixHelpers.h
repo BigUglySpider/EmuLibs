@@ -385,6 +385,14 @@ namespace EmuMath::Helpers
 		return VectorToRowMatrix<typename Vector_::value_type, ColumnMajor_, Vector_>(vector_);
 	}
 #pragma endregion
+
+#pragma region ARITHMETIC
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
+	constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> VectorLhsRhsOperation(const LhsMatrix_& lhs_, const Rhs_& rhs_)
+	{
+
+	}
+#pragma endregion
 }
 
 #endif
