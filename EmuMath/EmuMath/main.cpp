@@ -126,10 +126,9 @@ int main()
 		EmuMath::Vector4<float>(9.0f + 16.0f, 10.0f + 16.0f, 11.0f + 16.0f, 12.0f + 16.0f),
 		EmuMath::Vector4<float>(13.0f + 16.0f, 14.0f + 16.0f, 15.0f + 16.0f, 16.0f + 16.0f)
 	);
-	constexpr auto mat_res_ = EmuMath::Helpers::MatrixLhsRhsOperation<8, 3, std::uint64_t, false>(mat_a_, mat_b_, std::plus<void>());
-	constexpr auto mat_res_scalar_ = EmuMath::Helpers::MatrixLhsRhsOperation<5, 6, float, true>(mat_a_, 25.0f, std::plus<void>());
+	constexpr auto mat_res_ = EmuMath::Helpers::MatrixDivideBasic<long double>(mat_a_, mat_b_);
+	constexpr auto mat_res_scalar_ = EmuMath::Helpers::MatrixDivideBasic(mat_a_, 25.0f);
 
-	constexpr auto mat_rest_scalar_ = EmuMath::Matrix<4, 6, float, true>(EmuMath::Matrix<4, 6, float, true>());
 	std::cout << mat_res_scalar_ << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
