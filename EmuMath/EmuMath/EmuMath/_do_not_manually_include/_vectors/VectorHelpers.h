@@ -177,6 +177,10 @@ namespace EmuMath::Helpers
 #pragma endregion
 
 #pragma region REINTERPRETATIONS
+	/// <summary> Converts the passed EmuMath vector to a tuple. The tuple will effectively be a copy of the vector. </summary>
+	/// <typeparam name="Vector_">Type of EmuMath vector to convert to a tuple.</typeparam>
+	/// <param name="vector_">EmuMath vector to convert to a tuple.</param>
+	/// <returns>Tuple representation of the passed EmuMath vector. Note that this is a copy, and may not be used to modify the vector itself's data.</returns>
 	template<class Vector_>
 	constexpr inline typename EmuCore::TMPHelpers::tuple_n<Vector_::size, typename Vector_::value_type>::type VectorAsTuple(const Vector_& vector_)
 	{
