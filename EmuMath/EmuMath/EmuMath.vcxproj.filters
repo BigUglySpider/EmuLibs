@@ -101,5 +101,11 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\FastVector4f.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\MatrixT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\Matrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
