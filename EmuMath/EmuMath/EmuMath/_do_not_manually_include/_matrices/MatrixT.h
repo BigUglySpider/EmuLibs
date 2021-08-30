@@ -75,7 +75,7 @@ namespace EmuMath
 		constexpr Matrix(this_type& toCopy_) : data_(toCopy_.data_)
 		{
 		}
-		constexpr Matrix(const this_type& toCopy_) : data_(toCopy_)
+		constexpr Matrix(const this_type& toCopy_) : data_(toCopy_.data_)
 		{
 		}
 		template<std::size_t...Sizes_, typename...Ts_>

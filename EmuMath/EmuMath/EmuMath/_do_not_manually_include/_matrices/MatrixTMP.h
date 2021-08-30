@@ -83,6 +83,40 @@ namespace EmuMath::TMP
 	using emu_matrix_transpose_copy_t = emu_matrix_transpose_t<typename Matrix_::value_type, Matrix_>;
 	template<class Matrix_>
 	using emu_matrix_transpose_same_contained_t = emu_matrix_transpose_t<typename Matrix_::contained_type, Matrix_>;
+
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Matrix_>
+	struct emu_matrix_theoretical_data
+	{
+		using type = void;
+	};
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
+	struct emu_matrix_theoretical_data<ColumnIndex_, RowIndex_, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>
+	{
+		using type = std::conditional_t
+		<
+			(ColumnIndex_ < NumColumns_) && (RowIndex_ < NumRows_),
+			const typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::raw_value_type&,
+			typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type
+		>;
+	};
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Matrix_>
+	using emu_matrix_theoretical_data_t = typename emu_matrix_theoretical_data<ColumnIndex_, RowIndex_, Matrix_>::type;
+
+	template<std::size_t MajorOrderIndex_, class Matrix_>
+	struct emu_matrix_theoretical_major_order_index_data
+	{
+		using type = void;
+	};
+	template<std::size_t MajorOrderIndex_, std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
+	struct emu_matrix_theoretical_major_order_index_data<MajorOrderIndex_, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>
+	{
+		using type = std::conditional_t
+		<
+			(MajorOrderIndex_ < EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::size),
+			const typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::raw_value_type&,
+			typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type
+		>;
+	};
 }
 
 #endif

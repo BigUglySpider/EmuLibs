@@ -36,10 +36,10 @@ namespace EmuMath
 		constexpr Vector() : x(), y(), z()
 		{
 		}
-		constexpr Vector(this_type& toCopy_) : x(toCopy_.at<0>()), y(toCopy_.at<1>()), z(toCopy_.at<2>())
+		constexpr Vector(this_type& toCopy_) : x(toCopy_.x), y(toCopy_.y), z(toCopy_.z)
 		{
 		}
-		constexpr Vector(const this_type& toCopy_) : x(toCopy_.at<0>()), y(toCopy_.at<1>()), z(toCopy_.at<2>())
+		constexpr Vector(const this_type& toCopy_) : x(toCopy_.x), y(toCopy_.y), z(toCopy_.z)
 		{
 		}
 		template<std::size_t ToCopySize_, typename ToCopyValueType_>

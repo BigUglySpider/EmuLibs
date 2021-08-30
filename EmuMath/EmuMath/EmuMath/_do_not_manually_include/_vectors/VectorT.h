@@ -42,14 +42,29 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONSTRUCTORS
+	private:
+		template<std::size_t...Indices_>
+		constexpr Vector(this_type& toCopy_, std::index_sequence<Indices_...>) : data_({ std::get<Indices_>(toCopy_.data_)... })
+		{
+			EmuMath::Helpers::VectorSet(*this, toCopy_);
+		}
+		template<std::size_t...Indices_>
+		constexpr Vector(const this_type& toCopy_, std::index_sequence<Indices_...>) : data_({ std::get<Indices_>(toCopy_.data_)... })
+		{
+			EmuMath::Helpers::VectorSet(*this, toCopy_);
+		}
+
+	public:
 		constexpr Vector() : data_()
 		{
 		}
-		constexpr Vector(this_type& toCopy_) : data_(toCopy_.data_)
+		constexpr Vector(this_type& toCopy_) : Vector(toCopy_, std::make_index_sequence<size>())
 		{
+			EmuMath::Helpers::VectorSet(*this, toCopy_);
 		}
-		constexpr Vector(const this_type& toCopy_) : data_(toCopy_.data_)
+		constexpr Vector(const this_type& toCopy_) : Vector(toCopy_, std::make_index_sequence<size>())
 		{
+			EmuMath::Helpers::VectorSet(*this, toCopy_);
 		}
 		template<std::size_t ToCopySize_, typename ToCopyValueType_>
 		constexpr Vector(const EmuMath::Vector<ToCopySize_, ToCopyValueType_>& toCopy_) : Vector()

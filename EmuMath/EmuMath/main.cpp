@@ -107,7 +107,30 @@ int main()
 	std::cout << column_ << "\n";
 	std::cout << row_ << "\n";
 
-	//constexpr auto ColumnVector_ = EmuMath::Helpers::VectorToColumnMatrix<float, false>(EmuMath::Vector<12, float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12));
+	auto out_a_ = EmuMath::Helpers::MatrixGetTheoretical<2, 2>(matrix_);
+	auto out_b_ = EmuMath::Helpers::MatrixGetTheoretical<2, 5>(matrix_);
+	auto out_c_ = EmuMath::Helpers::MatrixGetTheoretical<13>(matrix_);
+	auto out_d_ = EmuMath::Helpers::MatrixGetTheoretical<16>(matrix_);
+
+	constexpr EmuMath::Matrix<4, 4, float, true> mat_a_
+	(
+		EmuMath::Vector4<float>(1.0f, 2.0f, 3.0f, 4.0f),
+		EmuMath::Vector4<float>(5.0f, 6.0f, 7.0f, 8.0f),
+		EmuMath::Vector4<float>(9.0f, 10.0f, 11.0f, 12.0f),
+		EmuMath::Vector4<float>(13.0f, 14.0f, 15.0f, 16.0f)
+	);
+	constexpr EmuMath::Matrix<4, 4, float, true> mat_b_
+	(
+		EmuMath::Vector4<float>(1.0f + 16.0f, 2.0f + 16.0f, 3.0f + 16.0f, 4.0f + 16.0f),
+		EmuMath::Vector4<float>(5.0f + 16.0f, 6.0f + 16.0f, 7.0f + 16.0f, 8.0f + 16.0f),
+		EmuMath::Vector4<float>(9.0f + 16.0f, 10.0f + 16.0f, 11.0f + 16.0f, 12.0f + 16.0f),
+		EmuMath::Vector4<float>(13.0f + 16.0f, 14.0f + 16.0f, 15.0f + 16.0f, 16.0f + 16.0f)
+	);
+	constexpr auto mat_res_ = EmuMath::Helpers::MatrixLhsRhsOperation<8, 3, std::uint64_t, false>(mat_a_, mat_b_, std::plus<void>());
+	constexpr auto mat_res_scalar_ = EmuMath::Helpers::MatrixLhsRhsOperation<5, 6, float, true>(mat_a_, 25.0f, std::plus<void>());
+
+	constexpr auto mat_rest_scalar_ = EmuMath::Matrix<4, 6, float, true>(EmuMath::Matrix<4, 6, float, true>());
+	std::cout << mat_res_scalar_ << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

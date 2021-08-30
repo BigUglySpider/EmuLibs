@@ -5,6 +5,19 @@
 
 namespace EmuMath::Helpers::_underlying_matrix_funcs
 {
+#pragma region VALIDITY_CHECKS
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Matrix_>
+	constexpr inline bool _valid_matrix_indices()
+	{
+		return ColumnIndex_ < Matrix_::num_columns && RowIndex_ < Matrix_::num_rows;
+	}
+	template<std::size_t MajorOrderIndex_, class Matrix_>
+	constexpr inline bool _valid_matrix_major_order_index()
+	{
+		return MajorOrderIndex_ < Matrix_::size;
+	}
+#pragma endregion
+
 #pragma region INDEX_CONVERSIONS
 	template<std::size_t Index_, class Matrix_>
 	constexpr inline std::size_t _matrix_major_order_index_to_column_index()
@@ -168,6 +181,31 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 			return out_row(out_);
 		}
 	}
+
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Matrix_>
+	constexpr inline typename EmuMath::TMP::emu_matrix_theoretical_data<ColumnIndex_, RowIndex_, Matrix_>::type _get_matrix_theoretical_data(const Matrix_& matrix_)
+	{
+		if constexpr (_valid_matrix_indices<ColumnIndex_, RowIndex_, Matrix_>())
+		{
+			return _get_matrix_data<ColumnIndex_, RowIndex_, Matrix_>(matrix_);
+		}
+		else
+		{
+			return typename Matrix_::value_type();
+		}
+	}
+	template<std::size_t MajorOrderIndex_, class Matrix_>
+	constexpr inline typename EmuMath::TMP::emu_matrix_theoretical_major_order_index_data<MajorOrderIndex_, Matrix_>::type _get_matrix_theoretical_data(const Matrix_& matrix_)
+	{
+		if constexpr (_valid_matrix_major_order_index<MajorOrderIndex_, Matrix_>())
+		{
+			return _get_matrix_data<MajorOrderIndex_, Matrix_>(matrix_);
+		}
+		else
+		{
+			return typename Matrix_::value_type();
+		}
+	}
 #pragma endregion
 
 #pragma region REINTERPRETATIONS
@@ -175,6 +213,70 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	constexpr inline OutMatrix_ _vector_to_matrix(const Vector_& vector_)
 	{
 		return OutMatrix_(static_cast<EmuMath::Vector<Vector_::size, typename OutMatrix_::contained_type>>(vector_));
+	}
+#pragma endregion
+
+#pragma region ARITHMETIC
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class OutMatrix_, class LhsMatrix_, class Rhs_, class Func_>
+	constexpr inline void _matrix_lhs_rhs_operation_rhs_scalar(const LhsMatrix_& lhs_, const Rhs_& rhs_, Func_& func_, OutMatrix_& out_)
+	{
+		if constexpr (ColumnIndex_ < OutMatrix_::num_columns)
+		{
+			if constexpr (RowIndex_ < OutMatrix_::num_rows)
+			{
+				using out_value = typename OutMatrix_::value_type;
+				_get_matrix_data<ColumnIndex_, RowIndex_>(out_) = static_cast<out_value>(func_(_get_matrix_theoretical_data<ColumnIndex_, RowIndex_>(lhs_), rhs_));
+				_matrix_lhs_rhs_operation_rhs_scalar<ColumnIndex_, RowIndex_ + 1, OutMatrix_, LhsMatrix_, Rhs_, Func_>(lhs_, rhs_, func_, out_);
+			}
+			else
+			{
+				_matrix_lhs_rhs_operation_rhs_scalar<ColumnIndex_ + 1, 0, OutMatrix_, LhsMatrix_, Rhs_, Func_>(lhs_, rhs_, func_, out_);
+			}
+		}
+	}
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class OutMatrix_, class LhsMatrix_, class Rhs_, class Func_>
+	constexpr inline void _matrix_lhs_rhs_operation_rhs_matrix(const LhsMatrix_& lhs_, const Rhs_& rhs_, Func_& func_, OutMatrix_& out_)
+	{
+		if constexpr (ColumnIndex_ < OutMatrix_::num_columns)
+		{
+			if constexpr (RowIndex_ < OutMatrix_::num_rows)
+			{
+				using out_value = typename OutMatrix_::value_type;
+				_get_matrix_data<ColumnIndex_, RowIndex_>(out_) = static_cast<out_value>
+				(
+					func_
+					(
+						_get_matrix_theoretical_data<ColumnIndex_, RowIndex_>(lhs_),
+						_get_matrix_theoretical_data<ColumnIndex_, RowIndex_>(rhs_)
+					)
+				);
+				_matrix_lhs_rhs_operation_rhs_matrix<ColumnIndex_, RowIndex_ + 1, OutMatrix_, LhsMatrix_, Rhs_, Func_>(lhs_, rhs_, func_, out_);
+			}
+			else
+			{
+				_matrix_lhs_rhs_operation_rhs_matrix<ColumnIndex_ + 1, 0, OutMatrix_, LhsMatrix_, Rhs_, Func_>(lhs_, rhs_, func_, out_);
+			}
+		}
+	}
+	template<class OutMatrix_, class LhsMatrix_, class Rhs_, class Func_>
+	constexpr inline OutMatrix_ _matrix_lhs_rhs_operation(const LhsMatrix_& lhs_, const Rhs_& rhs_, Func_& func_)
+	{
+		OutMatrix_ out_ = OutMatrix_();
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
+		{
+			_matrix_lhs_rhs_operation_rhs_matrix<0, 0, OutMatrix_, LhsMatrix_, Rhs_, Func_>(lhs_, rhs_, func_, out_);
+		}
+		else
+		{
+			_matrix_lhs_rhs_operation_rhs_scalar<0, 0, OutMatrix_, LhsMatrix_, Rhs_, Func_>(lhs_, rhs_, func_, out_);
+		}
+		return out_;
+	}
+	template<class OutMatrix_, class LhsMatrix_, class Rhs_, class Func_>
+	constexpr inline OutMatrix_ _matrix_lhs_rhs_operation(const LhsMatrix_& lhs_, const Rhs_& rhs_)
+	{
+		Func_ func_ = Func_();
+		return _matrix_lhs_rhs_operation<OutMatrix_, LhsMatrix_, Rhs_, Func_>(lhs_, rhs_, func_);
 	}
 #pragma endregion
 }
