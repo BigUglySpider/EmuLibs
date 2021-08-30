@@ -53,16 +53,16 @@
     <ClInclude Include="EmuCore\ArithmeticHelpers\BitHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\VectorT.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\VectorT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\VectorHelpers.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\VectorHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\VectorHelpersUnderlying.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\VectorHelpersUnderlying.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\VectorTMP.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\VectorTMP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\Vector.h">
@@ -83,22 +83,22 @@
     <ClInclude Include="EmuCore\CommonTypes\DeferrableReferenceWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\Vector2.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\Vector2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\VectorInfo.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\VectorInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\Vector3.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\Vector3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\Vector4.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\Vector4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\FastVector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\FastVector4f.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\FastVector4f.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

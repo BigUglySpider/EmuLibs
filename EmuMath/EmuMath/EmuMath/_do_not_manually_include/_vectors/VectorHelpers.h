@@ -1,10 +1,10 @@
 #ifndef EMU_MATH_VECTOR_T_HELPERS_H_INC_
 #define EMU_MATH_VECTOR_T_HELPERS_H_INC_ 1
 
-#include "../../EmuCore/Functors/Arithmetic.h"
-#include "../../EmuCore/Functors/Bitwise.h"
-#include "../../EmuCore/Functors/Comparators.h"
-#include "../../EmuCore/TMPHelpers/TypeConvertors.h"
+#include "../../../EmuCore/Functors/Arithmetic.h"
+#include "../../../EmuCore/Functors/Bitwise.h"
+#include "../../../EmuCore/Functors/Comparators.h"
+#include "../../../EmuCore/TMPHelpers/TypeConvertors.h"
 #include "VectorHelpersUnderlying.h"
 #include <functional>
 

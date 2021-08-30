@@ -1,8 +1,8 @@
 #ifndef EMU_MATH_FAST_VECTOR_4_FLOAT_H_INC_
 #define EMU_MATH_FAST_VECTOR_4_FLOAT_H_INC_
 
-#include "../SIMDHelpers.h"
-#include "../Vector.h"
+#include "../../SIMDHelpers.h"
+#include "../../Vector.h"
 #include <immintrin.h>
 #include <ostream>
 
