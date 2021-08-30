@@ -298,6 +298,17 @@ namespace EmuMath::Helpers
 #pragma endregion
 
 #pragma region REINTERPRETATIONS
+	/// <summary>
+	/// <para> Converts the passed EmuMath vector to an EmuMath matrix as though it represents a single column. </para>
+	/// <para>
+	///		The vector data will be stored as columns regardless of the ColumnMajor_ argument. 
+	///		To store the vector as a row matrix instead, use VectorToRowMatrix.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="Vector_">Type of EmuMath vector to convert to a column matrix.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be contained within the output matrix.</typeparam>
+	/// <param name="vector_">EmuMath vector to convert to a column matrix.</param>
+	/// <returns>Column matrix containing a copy of the passed vector's data. The matrix will be a single column which contains the full data of the passed vector.</returns>
 	template<typename out_contained_type, bool ColumnMajor_ = true, class Vector_>
 	constexpr inline EmuMath::Matrix<1, Vector_::size, out_contained_type, ColumnMajor_> VectorToColumnMatrix(const Vector_& vector_)
 	{
@@ -319,6 +330,17 @@ namespace EmuMath::Helpers
 		return VectorToColumnMatrix<typename Vector_::value_type, ColumnMajor_, Vector_>(vector_);
 	}
 
+	/// <summary>
+	/// <para> Converts the passed EmuMath vector to an EmuMath matrix as though it represents a single row. </para>
+	/// <para>
+	///		The vector data will be stored as rows regardless of the ColumnMajor_ argument. 
+	///		To store the vector as a column matrix instead, use VectorToColumnMatrix.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="Vector_">Type of EmuMath vector to convert to a row matrix.</typeparam>
+	/// <typeparam name="out_contained_type">Type to be contained within the output matrix.</typeparam>
+	/// <param name="vector_">EmuMath vector to convert to a row matrix.</param>
+	/// <returns>Row matrix containing a copy of the passed vector's data. The matrix will be a single row which contains the full data of the passed vector.</returns>
 	template<typename out_contained_type, bool ColumnMajor_ = true, class Vector_>
 	constexpr inline EmuMath::Matrix<Vector_::size, 1, out_contained_type, ColumnMajor_> VectorToRowMatrix(const Vector_& vector_)
 	{
