@@ -9,6 +9,12 @@ namespace EmuMath
 	struct Matrix
 	{
 	public:
+		static_assert(NumColumns_ != 0, "Attempted to instantiate an EmuMath matrix with 0 columns. A matrix must contain at least 1 column.");
+		static_assert(NumRows_ != 0, "Attempted to instantiate an EmuMath matrix with 0 rows. A matrix must contain at least 1 row.");
+
+		static_assert(!std::is_same_v<T_, void>, "Unable to create an EmuMath matrix which contains void elements.");
+		static_assert(!std::is_reference_v<T_>, "Attempted to form an EmuMath matrix with an internal reference type. To have a matrix storing references, use EmuMath::InternalMatrixReference<T> as the matrix's stored type, or create a matrix via the EmuMath::RefMatrix or EmuMath::ConstRefMatrix aliases to achieve the same with cleaner semantics.");
+
 		static constexpr std::size_t num_columns = NumColumns_;
 		static constexpr std::size_t num_rows = NumRows_;
 		static constexpr std::size_t size = num_columns * num_rows;
@@ -72,10 +78,10 @@ namespace EmuMath
 		constexpr Matrix(const this_type& toCopy_) : data_(toCopy_)
 		{
 		}
-		template<typename...Vectors_, typename RequiresNumMajorArgs_ = std::enable_if_t<sizeof...(Vectors_) == num_major_elements>>
-		constexpr Matrix(Vectors_&&...major_vectors_) : data_(std::forward<Vectors_>(major_vectors_)...)
+		template<std::size_t...Sizes_, typename...Ts_>
+		constexpr Matrix(EmuMath::Vector<Sizes_, Ts_>&&...major_vectors_) : data_(std::forward<EmuMath::Vector<Sizes_, Ts_>>(major_vectors_)...)
 		{
-			static_assert(std::is_constructible_v<data_storage_type, Vectors_...>, "Attempted to construct an EmuMath matrix via a template constructor, using Vector data which cannot be used to construct the matrix's underlying data.");
+			static_assert(std::is_constructible_v<data_storage_type, EmuMath::Vector<Sizes_, Ts_>...>, "Attempted to construct an EmuMath matrix via a template constructor, using Vector data which cannot be used to construct the matrix's underlying data.");
 		}
 #pragma endregion
 
@@ -208,7 +214,6 @@ namespace EmuMath
 		}
 #pragma endregion
 
-	private:
 		data_storage_type data_;
 
 		template<std::size_t ColumnIndex_, std::size_t RowIndex_>

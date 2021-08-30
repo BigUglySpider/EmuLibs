@@ -2,6 +2,7 @@
 #include "EmuMath/FastVector.h"
 #include "EmuMath/Matrix.h"
 #include "EmuMath/NoOverflowT.h"
+#include "EmuCore/TMPHelpers/Tuples.h"
 #include <array>
 #include <bitset>
 #include <iomanip>
@@ -74,10 +75,12 @@ int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
 
-	constexpr EmuMath::Matrix<4, 4, float, true> matrix_
+	EmuMath::Vector<4, double> _1(4.0f, 5.0f, 6.0f, 37.0f);
+
+	EmuMath::Matrix<4, 4, float, true> matrix_
 	(
 		EmuMath::Vector4<float>(0.0f, 1.0f, 2.0f, 3.0f),
-		EmuMath::Vector4<double>(4.0f, 5.0f, 6.0f, 7.0f),
+		std::move(_1),
 		EmuMath::Vector4<std::uint8_t>(8.0f, 9.0f, 10.0f, 11.0f),
 		EmuMath::Vector4<std::uint64_t>(12.0f, 13.0f, 14.0f, 15.0f)
 	);
@@ -90,13 +93,21 @@ int main()
 	std::cout << "[15]: " << matrix_[15] << "\n";
 	std::cout << "Column 3: " << matrix_.GetColumn<3>() << "\n";
 	std::cout << "Row 2: " << matrix_.GetRow<2>() << "\n";
-
-
-	matrix_.GetRow<3>() = EmuMath::Vector4<float>(2.0f, 4.0f, 6.0f, 8.0f);
 	
 	std::cout << matrix_ << "\n";
 
-	constexpr EmuMath::Vector4<float> booble = matrix_.GetColumn<2>();
+	using test_type = EmuCore::TMPHelpers::tuple_n<10, float>::type;
+
+	constexpr auto vec_ = (EmuMath::Vector<10, float>(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f));;
+	constexpr test_type tuple_ = EmuMath::Helpers::VectorAsTuple(vec_);
+	std::cout << std::get<0>(tuple_) << "\n";
+
+	constexpr auto column_ = EmuMath::Helpers::VectorToColumnMatrix<true>(vec_);
+	constexpr auto row_ = EmuMath::Helpers::VectorToRowMatrix<true>(vec_);
+	std::cout << column_ << "\n";
+	std::cout << row_ << "\n";
+
+	//constexpr auto ColumnVector_ = EmuMath::Helpers::VectorToColumnMatrix<float, false>(EmuMath::Vector<12, float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12));
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

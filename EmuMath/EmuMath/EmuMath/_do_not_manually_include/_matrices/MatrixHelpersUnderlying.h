@@ -169,6 +169,14 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 	}
 #pragma endregion
+
+#pragma region REINTERPRETATIONS
+	template<class Vector_, class OutMatrix_>
+	constexpr inline OutMatrix_ _vector_to_matrix(const Vector_& vector_)
+	{
+		return OutMatrix_(static_cast<EmuMath::Vector<Vector_::size, typename OutMatrix_::contained_type>>(vector_));
+	}
+#pragma endregion
 }
 
 #endif

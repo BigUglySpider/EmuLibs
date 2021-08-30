@@ -4,6 +4,7 @@
 #include "../../../EmuCore/Functors/Arithmetic.h"
 #include "../../../EmuCore/Functors/Bitwise.h"
 #include "../../../EmuCore/Functors/Comparators.h"
+#include "../../../EmuCore/TMPHelpers/Tuples.h"
 #include "../../../EmuCore/TMPHelpers/TypeConvertors.h"
 #include "VectorHelpersUnderlying.h"
 #include <functional>
@@ -171,6 +172,25 @@ namespace EmuMath::Helpers
 		else
 		{
 			static_assert(false, "Attempted to set the internal data of a vector, but the provided destination was not an EmuMath vector.");
+		}
+	}
+#pragma endregion
+
+#pragma region REINTERPRETATIONS
+	template<class Vector_>
+	constexpr inline typename EmuCore::TMPHelpers::tuple_n<Vector_::size, typename Vector_::value_type>::type VectorAsTuple(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_vector_to_tuple<Vector_,typename  EmuCore::TMPHelpers::tuple_n<Vector_::size, typename Vector_::value_type>::type>
+			(
+				vector_,
+				std::make_index_sequence<Vector_::size>()
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to convert a vector to a tuple, but the provided argument was not an EmuMath vector.");
 		}
 	}
 #pragma endregion

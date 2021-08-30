@@ -296,6 +296,50 @@ namespace EmuMath::Helpers
 		}
 	}
 #pragma endregion
+
+#pragma region REINTERPRETATIONS
+	template<typename out_contained_type, bool ColumnMajor_ = true, class Vector_>
+	constexpr inline EmuMath::Matrix<1, Vector_::size, out_contained_type, ColumnMajor_> VectorToColumnMatrix(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_matrix_funcs::_vector_to_matrix<Vector_, EmuMath::Matrix<1, Vector_::size, out_contained_type, ColumnMajor_>>
+			(
+				vector_
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to convert a vector to a column matrix, but the provided argument was not an EmuMath vector.");
+		}
+	}
+	template<bool ColumnMajor_ = true, class Vector_>
+	constexpr inline EmuMath::Matrix<1, Vector_::size, typename Vector_::value_type, ColumnMajor_> VectorToColumnMatrix(const Vector_& vector_)
+	{
+		return VectorToColumnMatrix<typename Vector_::value_type, ColumnMajor_, Vector_>(vector_);
+	}
+
+	template<typename out_contained_type, bool ColumnMajor_ = true, class Vector_>
+	constexpr inline EmuMath::Matrix<Vector_::size, 1, out_contained_type, ColumnMajor_> VectorToRowMatrix(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_matrix_funcs::_vector_to_matrix<Vector_, EmuMath::Matrix<Vector_::size, 1, out_contained_type, ColumnMajor_>>
+			(
+				vector_
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to convert a vector to a row matrix, but the provided argument was not an EmuMath vector.");
+		}
+	}
+	template<bool ColumnMajor_ = true, class Vector_>
+	constexpr inline EmuMath::Matrix<Vector_::size, 1, typename Vector_::value_type, ColumnMajor_> VectorToRowMatrix(const Vector_& vector_)
+	{
+		return VectorToRowMatrix<typename Vector_::value_type, ColumnMajor_, Vector_>(vector_);
+	}
+#pragma endregion
 }
 
 #endif

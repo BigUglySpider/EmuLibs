@@ -116,5 +116,8 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\MatrixTMP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuCore\TMPHelpers\Tuples.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

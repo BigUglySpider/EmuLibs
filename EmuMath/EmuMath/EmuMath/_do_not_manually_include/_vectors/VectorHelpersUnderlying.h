@@ -293,6 +293,20 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 	}
 #pragma endregion
 
+#pragma region REINTERPRETATIONS
+	template<class Vector_, class OutTuple_, std::size_t...Indices_>
+	constexpr inline OutTuple_ _vector_to_tuple(const Vector_& vector_, std::index_sequence<Indices_...>)
+	{
+		return OutTuple_
+		(
+			static_cast<std::tuple_element_t<Indices_, OutTuple_>>
+			(
+				_get_vector_data<Indices_>(vector_)
+			)...
+		);
+	}
+#pragma endregion
+
 #pragma region VECTOR_OPERATIONS
 	template<std::size_t Index_, class OutVector_, class Vector_, class Func_>
 	constexpr inline void _vector_single_operand_func(const Vector_& vector_, OutVector_& out_, Func_& func_)
