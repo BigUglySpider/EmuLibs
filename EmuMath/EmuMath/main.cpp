@@ -144,7 +144,7 @@ int main()
 		EmuMath::Vector<2, float>(14.0f, 16.0f),
 		EmuMath::Vector<2, float>(18.0f, 20.0f)
 	);
-	constexpr auto mat_d_ = EmuMath::Matrix<2, 5, double, false>
+	constexpr auto mat_d_ = EmuMath::Matrix<3, 5, double, false>
 	(
 		EmuMath::Vector<2, double>(13.0, 16.0),
 		EmuMath::Vector<2, double>(2.5, 0.5),
@@ -159,13 +159,26 @@ int main()
 	std::cout << "\n\n";
 	std::cout << mat_c_ << "\nMULT\n" << mat_d_ << "\n:\n" << mat_mult_cd_ << "\n";
 
-	constexpr auto mat_mult_dc_ = EmuMath::Helpers::MatrixMultiply<double, true>(mat_d_, mat_c_);
-	std::cout << "\n\n";
-	std::cout << mat_d_ << "\nMULT\n" << mat_c_ << "\n:\n" << mat_mult_dc_ << "\n";
+	//constexpr auto mat_mult_dc_ = EmuMath::Helpers::MatrixMultiply<double, true>(mat_d_, mat_c_);
+	//std::cout << "\n\n";
+	//std::cout << mat_d_ << "\nMULT\n" << mat_c_ << "\n:\n" << mat_mult_dc_ << "\n";
 
 	constexpr auto mat_mult_c05_ = EmuMath::Helpers::MatrixMultiply<double, false>(mat_c_, 0.5);
 	std::cout << "\n\n";
 	std::cout << mat_c_ << "\nMULT\n" << 0.5 << "\n:\n" << mat_mult_c05_ << "\n";
+
+	constexpr auto mat_e_ = EmuMath::Matrix<4, 3, float>
+	(
+		EmuMath::Vector<3, float>(1.0f, 5.0f, 9.0f),
+		EmuMath::Vector<3, float>(2.0f, 6.0f, 10.0f),
+		EmuMath::Vector<3, float>(3.0f, 7.0f, 11.0f),
+		EmuMath::Vector<3, float>(4.0f, 8.0f, 12.0f)
+	);
+	constexpr auto mat_f_ = EmuMath::Helpers::VectorToColumnMatrix(EmuMath::Vector<4, double>(10.0, 20.0, 30.0, 40.0));
+	
+	constexpr auto mat_mult_ef_ = EmuMath::Helpers::MatrixMultiply<double, true>(mat_e_, mat_f_);
+	std::cout << "\n\n";
+	std::cout << mat_e_ << "\nMULT\n" << mat_f_ << "\n:\n" << mat_mult_ef_ << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

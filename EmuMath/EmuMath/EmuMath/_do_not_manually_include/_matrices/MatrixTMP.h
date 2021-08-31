@@ -118,6 +118,14 @@ namespace EmuMath::TMP
 		>;
 	};
 
+	/// <summary>
+	/// <para> Used to determine the type that will result from multiplying a Lhs_ matrix by a Rhs_ value. </para>
+	/// <para> If Rhs_ is not an EmuMath matrix, the determined type will be of matching dimensions to the Lhs_ matrix. </para>
+	/// <para> If the provided Lhs_ and Rhs_ types are invalid for matrix multiplication, the determined type will be void. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained within the determined matrix.</typeparam>
+	/// <typeparam name="Lhs_">Type of EmuMath matrix that would appear on the left-hand side of multiplication.</typeparam>
+	/// <typeparam name="Rhs_">Type of EmuMath matrix or scalar that would appear on the right-hand side of multiplication.</typeparam>
 	template<typename out_contained_type, bool OutColumnMajor_, class Lhs_, class Rhs_>
 	struct emu_matrix_multiplication_result
 	{
@@ -158,7 +166,7 @@ namespace EmuMath::TMP
 		using type = std::conditional_t
 		<
 			LhsNumColumns_ == RhsNumRows_,
-			EmuMath::Matrix<LhsNumRows_, RhsNumColumns_, out_contained_type, OutColumnMajor_>,
+			EmuMath::Matrix<RhsNumColumns_, LhsNumRows_, out_contained_type, OutColumnMajor_>,
 			void
 		>;
 	};
