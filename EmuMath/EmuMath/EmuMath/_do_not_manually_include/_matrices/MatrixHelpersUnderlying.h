@@ -359,6 +359,30 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		_make_identity_matrix<0, Matrix_>(out_);
 		return out_;
 	}
+
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class OutMatrix_, class Matrix_>
+	constexpr inline void _transpose_matrix(const Matrix_& matrix_, OutMatrix_& out_)
+	{
+		if constexpr (ColumnIndex_ < OutMatrix_::num_columns)
+		{
+			if constexpr (RowIndex_ < OutMatrix_::num_rows)
+			{
+				_get_matrix_data<ColumnIndex_, RowIndex_>(out_) = _get_matrix_data<RowIndex_, ColumnIndex_>(matrix_);
+				_transpose_matrix<ColumnIndex_, RowIndex_ + 1, OutMatrix_, Matrix_>(matrix_, out_);
+			}
+			else
+			{
+				_transpose_matrix<ColumnIndex_ + 1, 0, OutMatrix_, Matrix_>(matrix_, out_);
+			}
+		}
+	}
+	template<class OutMatrix_, class Matrix_>
+	[[nodiscard]] constexpr inline OutMatrix_ _transpose_matrix(const Matrix_& matrix_)
+	{
+		OutMatrix_ out_ = OutMatrix_();
+		_transpose_matrix<0, 0, OutMatrix_, Matrix_>(matrix_, out_);
+		return out_;
+	}
 #pragma endregion
 }
 

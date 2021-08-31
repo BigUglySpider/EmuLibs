@@ -1343,6 +1343,38 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to acquire an EmuMath identity matrix, but provided a non-EmuMath-matrix type to determine the identity of.");
 		}
 	}
+
+	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, OutColumnMajor_, Matrix_>::type MatrixTranspose(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return _underlying_matrix_funcs::_transpose_matrix
+			<
+				typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, OutColumnMajor_, Matrix_>::type,
+				Matrix_
+			>(matrix_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to form the transpose of a matrix, but the passed argument was not an EmuMath matrix.");
+		}
+	}
+	template<typename out_contained_type, class Matrix_>
+	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, Matrix_::is_column_major, Matrix_>::type MatrixTranspose(const Matrix_& matrix_)
+	{
+		return MatrixTranspose<out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+	template<bool OutColumnMajor_, class Matrix_>
+	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::value_type, OutColumnMajor_, Matrix_>::type MatrixTranspose(const Matrix_& matrix_)
+	{
+		return MatrixTranspose<typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+	}
+	template<class Matrix_>
+	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>::type MatrixTranspose(const Matrix_& matrix_)
+	{
+		return MatrixTranspose<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
 #pragma endregion
 }
 

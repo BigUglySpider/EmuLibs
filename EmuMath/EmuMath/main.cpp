@@ -197,6 +197,19 @@ int main()
 
 	constexpr auto size_identity_ = EmuMath::Helpers::MatrixIdentity<Size_, Size_, float, true>();
 
+	constexpr auto bloobo = EmuMath::Matrix<4, 2, double>
+	(
+		EmuMath::Vector<2, double>(25.0, 50.0),
+		EmuMath::Vector<2, double>(13, -27),
+		EmuMath::Vector<2, double>(-0.0052, 13.37),
+		EmuMath::Vector<2, double>(-13, 6.66)
+	);
+	constexpr auto bloobo_trans_ = EmuMath::Helpers::MatrixTranspose(bloobo);
+
+	std::cout << "\n\n";
+
+	std::cout << bloobo << "\nTRANSPOSED:\n" << bloobo_trans_  << "\nRETURNED:\n" << EmuMath::Helpers::MatrixTranspose(bloobo_trans_) << "\n\n";
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();

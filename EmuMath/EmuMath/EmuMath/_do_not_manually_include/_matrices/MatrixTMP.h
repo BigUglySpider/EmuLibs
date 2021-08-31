@@ -67,23 +67,6 @@ namespace EmuMath::TMP
 		static constexpr bool value = true;
 	};
 
-	template<typename out_contained_type, class Matrix_>
-	struct emu_matrix_transpose
-	{
-		using type = void;
-	};
-	template<typename out_contained_type, std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
-	struct emu_matrix_transpose<out_contained_type, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>
-	{
-		using type = EmuMath::Matrix<NumRows_, NumColumns_, out_contained_type, ColumnMajor_>;
-	};
-	template<typename out_contained_type, class Matrix_>
-	using emu_matrix_transpose_t = typename emu_matrix_transpose<out_contained_type, Matrix_>::type;
-	template<class Matrix_>
-	using emu_matrix_transpose_copy_t = emu_matrix_transpose_t<typename Matrix_::value_type, Matrix_>;
-	template<class Matrix_>
-	using emu_matrix_transpose_same_contained_t = emu_matrix_transpose_t<typename Matrix_::contained_type, Matrix_>;
-
 	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Matrix_>
 	struct emu_matrix_theoretical_data
 	{
@@ -179,6 +162,41 @@ namespace EmuMath::TMP
 	};
 	template<class Lhs_, class Rhs_>
 	using emu_matrix_multiplication_result_no_custom_t = typename emu_matrix_multiplication_result_no_custom<Lhs_, Rhs_>::type;
+
+	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	struct emu_matrix_transpose
+	{
+		using type = void;
+	};
+	template<typename out_contained_type, bool OutColumnMajor_, std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
+	struct emu_matrix_transpose<out_contained_type, OutColumnMajor_, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>
+	{
+		using type = EmuMath::Matrix<NumRows_, NumColumns_, out_contained_type, OutColumnMajor_>;
+	};
+	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	using emu_matrix_transpose_t = typename emu_matrix_transpose<out_contained_type, OutColumnMajor_, Matrix_>::type;
+
+	template<typename out_contained_type, class Matrix_>
+	struct emu_matrix_transpose_maintain_major : public emu_matrix_transpose<out_contained_type, Matrix_::is_column_major, Matrix_>
+	{
+	};
+	template<typename out_contained_type, class Matrix_>
+	using emu_matrix_transpose_maintain_major_t = typename emu_matrix_transpose_maintain_major<out_contained_type, Matrix_>::type;
+
+	template<bool OutColumnMajor_, class Matrix_>
+	struct emu_matrix_transpose_maintain_contained_type : public emu_matrix_transpose<typename Matrix_::contained_type, OutColumnMajor_, Matrix_>
+	{
+	};
+	template<bool OutColumnMajor_, class Matrix_>
+	using emu_matrix_transpose_maintain_contained_type_t = typename emu_matrix_transpose_maintain_contained_type<OutColumnMajor_, Matrix_>::type;
+
+	template<class Matrix_>
+	struct emu_matrix_transpose_match : public emu_matrix_transpose<typename Matrix_::contained_type, Matrix_::is_column_major, Matrix_>
+	{
+	};
+	template<class Matrix_>
+	using emu_matrix_transpose_match_t = typename emu_matrix_transpose_match<Matrix_>::type;
 }
 
 #endif
+

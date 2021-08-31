@@ -171,7 +171,6 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\MatrixT.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\MatrixTMP.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\FastVector4f.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\Vector1.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\Vector2.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\Vector3.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\Vector4.h" />
