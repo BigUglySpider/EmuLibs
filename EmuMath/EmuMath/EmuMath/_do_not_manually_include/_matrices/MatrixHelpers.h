@@ -345,7 +345,8 @@ namespace EmuMath::Helpers
 	}
 #pragma endregion
 
-#pragma region REINTERPRETATIONS
+	// These reinterpretations are specifically those related to matrices, that would only act as pointless noise if included without matrices.
+#pragma region VECTOR_REINTERPRETATIONS
 	/// <summary>
 	/// <para> Converts the passed EmuMath vector to an EmuMath matrix as though it represents a single column. </para>
 	/// <para>
