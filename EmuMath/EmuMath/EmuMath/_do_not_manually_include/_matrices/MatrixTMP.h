@@ -117,6 +117,60 @@ namespace EmuMath::TMP
 			typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type
 		>;
 	};
+
+	template<typename out_contained_type, bool OutColumnMajor_, class Lhs_, class Rhs_>
+	struct emu_matrix_multiplication_result
+	{
+		using type = void;
+	};
+	template<typename out_contained_type, bool OutColumnMajor_, std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, class Rhs_>
+	struct emu_matrix_multiplication_result
+	<
+		out_contained_type,
+		OutColumnMajor_,
+		EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>,
+		Rhs_
+	>
+	{
+		using type = EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, out_contained_type, OutColumnMajor_>;
+	};
+	template
+	<
+		typename out_contained_type,
+		bool OutColumnMajor_,
+		std::size_t LhsNumColumns_,
+		std::size_t LhsNumRows_,
+		typename LhsT_,
+		bool LhsColumnMajor_,
+		std::size_t RhsNumColumns_,
+		std::size_t RhsNumRows_,
+		typename RhsT_,
+		bool RhsColumnMajor_
+	>
+	struct emu_matrix_multiplication_result
+	<
+		out_contained_type,
+		OutColumnMajor_,
+		EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>,
+		EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>
+	>
+	{
+		using type = std::conditional_t
+		<
+			LhsNumColumns_ == RhsNumRows_,
+			EmuMath::Matrix<LhsNumRows_, RhsNumColumns_, out_contained_type, OutColumnMajor_>,
+			void
+		>;
+	};
+	template<typename out_contained_type, bool OutColumnMajor_, class Lhs_, class Rhs_>
+	using emu_matrix_multiplication_result_t = typename emu_matrix_multiplication_result<out_contained_type, OutColumnMajor_, Lhs_, Rhs_>::type;
+
+	template<class Lhs_, class Rhs_>
+	struct emu_matrix_multiplication_result_no_custom : public emu_matrix_multiplication_result<typename Lhs_::value_type, Lhs_::is_column_major, Lhs_, Rhs_>
+	{
+	};
+	template<class Lhs_, class Rhs_>
+	using emu_matrix_multiplication_result_no_custom_t = typename emu_matrix_multiplication_result_no_custom<Lhs_, Rhs_>::type;
 }
 
 #endif

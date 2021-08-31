@@ -966,7 +966,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform basic matrix multiplication, but provided a non-EmuMath-matrix lhs_ argument.");
+			static_assert(false, "Attempted to perform basic matrix division, but provided a non-EmuMath-matrix lhs_ argument.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
@@ -1028,6 +1028,50 @@ namespace EmuMath::Helpers
 	)
 	{
 		return MatrixDivideBasic<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
+	}
+
+	/// <summary>
+	/// <para> Performs a multiplication operation on lhs_ using the passed rhs_. </para>
+	/// <para>
+	///		If the passed rhs_ is a matrix, the resulting matrix will be that of a standard matrix multiplication.
+	///		Otherwise, each index in the lhs_ matrix will be multiplied by rhs_.
+	/// </para>
+	/// <para> If rhs_ is a scalar, multiplications are performed using EmuCore::do_multiply&lt;LhsMatrix_::value_type, Rhs_ (or Rhs_::value_type if it is a matrix)&gt;. </para>
+	/// <para> NOTE: This is a standard matrix multiplication operation. To instead multiply respective matrix indices, use MatrixMultiplyBasic. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained within the result matrix.</typeparam>
+	/// <typeparam name="LhsMatrix_">Type of matrix appearing on the left-hand side of multiplication.</typeparam>
+	/// <typeparam name="Rhs_">Type of matrix or scalar appearing on the right-hand side of multiplication.</typeparam>
+	/// <param name="lhs_">EmuMath matrix appearing on the left-hand side of multiplication.</param>
+	/// <param name="rhs_">EmuMath matrix or scalar appearing on the right-hand side of multiplication.</param>
+	/// <returns>Matrix containing the results of performing multiplication on the lhs_ matrix by the provided rhs_.</returns>
+	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
+	constexpr inline typename EmuMath::TMP::emu_matrix_multiplication_result<out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>::type MatrixMultiply
+	(
+		const LhsMatrix_& lhs_,
+		const Rhs_& rhs_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			if constexpr(!std::is_same_v<typename EmuMath::TMP::emu_matrix_multiplication_result<out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>::type, void>)
+			{
+			return _underlying_matrix_funcs::_matrix_std_multiply
+				<
+					typename EmuMath::TMP::emu_matrix_multiplication_result<out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>::type,
+					LhsMatrix_,
+					Rhs_
+				>(lhs_, rhs_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to multiply two EmuMath matrices which can not be multiplied together.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform matrix multiplication with a lhs_ argument that is not an EmuMath matrix.");
+		}
 	}
 #pragma endregion
 }

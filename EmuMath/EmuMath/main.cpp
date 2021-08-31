@@ -131,6 +131,42 @@ int main()
 
 	std::cout << mat_res_scalar_ << "\n";
 
+	constexpr auto mat_mult = EmuMath::Helpers::MatrixMultiply<float, true>(mat_a_, mat_b_);
+
+	std::cout << "\n\n";
+	std::cout << mat_a_ << "\nMULT\n" << mat_b_ << "\n:\n" << mat_mult << "\n";
+
+	constexpr auto mat_c_ = EmuMath::Matrix<5, 2, float, true>
+	(
+		EmuMath::Vector<2, float>(2.0f, 4.0f),
+		EmuMath::Vector<2, float>(6.0f, 8.0f),
+		EmuMath::Vector<2, float>(10.0f, 12.0f),
+		EmuMath::Vector<2, float>(14.0f, 16.0f),
+		EmuMath::Vector<2, float>(18.0f, 20.0f)
+	);
+	constexpr auto mat_d_ = EmuMath::Matrix<2, 5, double, false>
+	(
+		EmuMath::Vector<2, double>(13.0, 16.0),
+		EmuMath::Vector<2, double>(2.5, 0.5),
+		EmuMath::Vector<2, double>(1.0, 0.25),
+		EmuMath::Vector<2, double>(1.0, 0.1),
+		EmuMath::Vector<2, double>(2.0, 6)
+	);
+	constexpr auto mat_mult_cd_ = EmuMath::Helpers::MatrixMultiply<double, true>(mat_c_, mat_d_);
+
+	EmuMath::TMP::emu_matrix_multiplication_result_t<float, true, EmuMath::Matrix<5, 2, float, true>, EmuMath::Matrix<2, 5, double, false>> dummy_;
+
+	std::cout << "\n\n";
+	std::cout << mat_c_ << "\nMULT\n" << mat_d_ << "\n:\n" << mat_mult_cd_ << "\n";
+
+	constexpr auto mat_mult_dc_ = EmuMath::Helpers::MatrixMultiply<double, true>(mat_d_, mat_c_);
+	std::cout << "\n\n";
+	std::cout << mat_d_ << "\nMULT\n" << mat_c_ << "\n:\n" << mat_mult_dc_ << "\n";
+
+	constexpr auto mat_mult_c05_ = EmuMath::Helpers::MatrixMultiply<double, false>(mat_c_, 0.5);
+	std::cout << "\n\n";
+	std::cout << mat_c_ << "\nMULT\n" << 0.5 << "\n:\n" << mat_mult_c05_ << "\n";
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();

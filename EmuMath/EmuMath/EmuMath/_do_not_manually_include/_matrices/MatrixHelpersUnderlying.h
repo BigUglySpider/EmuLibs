@@ -276,7 +276,69 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	constexpr inline OutMatrix_ _matrix_lhs_rhs_operation(const LhsMatrix_& lhs_, const Rhs_& rhs_)
 	{
 		Func_ func_ = Func_();
-		return _matrix_lhs_rhs_operation<OutMatrix_, LhsMatrix_, Rhs_, Func_>(lhs_, rhs_, func_);
+		return _matrix_lhs_rhs_operation<OutMatrix_, LhsMatrix_, Rhs_, Func_&>(lhs_, rhs_, func_);
+	}
+
+	template<class Matrix_, std::size_t...Indices_>
+	constexpr inline std::array<EmuMath::Vector<Matrix_::num_rows, typename Matrix_::value_type>, sizeof...(Indices_)> _get_matrix_columns
+	(
+		const Matrix_& matrix_,
+		std::index_sequence<Indices_...>
+	)
+	{
+		return std::array<EmuMath::Vector<Matrix_::num_rows, typename Matrix_::value_type>, sizeof...(Indices_)>
+		({
+			_get_matrix_column<Indices_>(matrix_)...
+		});
+	}
+	template<class Matrix_, std::size_t...Indices_>
+	constexpr inline std::array<EmuMath::Vector<Matrix_::num_columns, typename Matrix_::value_type>, sizeof...(Indices_)> _get_matrix_rows
+	(
+		const Matrix_& matrix_,
+		std::index_sequence<Indices_...>
+	)
+	{
+		return std::array<EmuMath::Vector<Matrix_::num_columns, typename Matrix_::value_type>, sizeof...(Indices_)>
+		({
+			_get_matrix_row<Indices_>(matrix_)...
+		});
+	}
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class OutMatrix_, class LhsRows_, class RhsColumns_>
+	constexpr inline void _matrix_std_multiply(OutMatrix_& out_, const LhsRows_& lhs_rows_, const RhsColumns_& rhs_columns_)
+	{
+		if constexpr (ColumnIndex_ < OutMatrix_::num_columns)
+		{
+			if constexpr (RowIndex_ < OutMatrix_::num_rows)
+			{
+				_get_matrix_data<ColumnIndex_, RowIndex_>(out_) = EmuMath::Helpers::VectorDotProduct<typename OutMatrix_::value_type>
+				(
+					std::get<RowIndex_>(lhs_rows_),
+					std::get<ColumnIndex_>(rhs_columns_)
+				);
+				_matrix_std_multiply<ColumnIndex_, RowIndex_ + 1, OutMatrix_, LhsRows_, RhsColumns_>(out_, lhs_rows_, rhs_columns_);
+			}
+			else
+			{
+				_matrix_std_multiply<ColumnIndex_ + 1, 0, OutMatrix_, LhsRows_, RhsColumns_>(out_, lhs_rows_, rhs_columns_);
+			}
+		}
+	}
+	template<class OutMatrix_, class LhsMatrix_, class Rhs_>
+	constexpr inline OutMatrix_ _matrix_std_multiply(const LhsMatrix_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
+		{
+			auto lhs_rows_ = _get_matrix_rows<LhsMatrix_>(lhs_, std::make_index_sequence<LhsMatrix_::num_rows>());
+			auto rhs_columns_ = _get_matrix_columns<Rhs_>(rhs_, std::make_index_sequence<Rhs_::num_columns>());
+			OutMatrix_ out_ = OutMatrix_();
+			_matrix_std_multiply<0, 0, OutMatrix_>(out_, lhs_rows_, rhs_columns_);
+			return out_;
+		}
+		else
+		{
+			// Defer to basic lhs_rhs functor executor since A * scalar_x is effectively A[00]-A[XX] * scalar_x.
+			return _matrix_lhs_rhs_operation<OutMatrix_, LhsMatrix_, Rhs_, EmuCore::do_multiply<typename LhsMatrix_::value_type, Rhs_>>(lhs_, rhs_);
+		}
 	}
 #pragma endregion
 }
