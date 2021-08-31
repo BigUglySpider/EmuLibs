@@ -1375,6 +1375,31 @@ namespace EmuMath::Helpers
 	{
 		return MatrixTranspose<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
+
+	template<typename OutT_, class Matrix_>
+	constexpr inline OutT_ MatrixTrace(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			if constexpr (Matrix_::is_square)
+			{
+				return _underlying_matrix_funcs::_calculate_matrix_trace<OutT_, Matrix_>(matrix_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to retrieve the trace of an EmuMath matrix that is not square. Only square matrices have a mathematically defined trace.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to retrieve the trace of a matrix, but a non-EmuMath-matrix argument was passed.");
+		}
+	}
+	template<class Matrix_>
+	constexpr inline typename Matrix_::value_type MatrixTrace(const Matrix_& matrix_)
+	{
+		return MatrixTrace<typename Matrix_::value_type, Matrix_>(matrix_);
+	}
 #pragma endregion
 }
 

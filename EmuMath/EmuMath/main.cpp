@@ -210,6 +210,15 @@ int main()
 
 	std::cout << bloobo << "\nTRANSPOSED:\n" << bloobo_trans_  << "\nRETURNED:\n" << EmuMath::Helpers::MatrixTranspose(bloobo_trans_) << "\n\n";
 
+	constexpr auto mat_hehe_ = EmuMath::Matrix<4, 4, float, true>
+	(
+		EmuMath::Vector4<float>(1.0f, 2.0f, 3.0f, 4.0f),
+		EmuMath::Vector4<float>(5.0f, 6.0f, 7.0f, 8.0f),
+		EmuMath::Vector4<float>(9.0f, 10.0f, 11.2f, 12.0f),
+		EmuMath::Vector4<float>(13.0f, 14.0f, 15.0f, 16.0f)
+	);
+	constexpr auto mat_hehe_trace_ = EmuMath::Helpers::MatrixTrace(mat_hehe_);
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();

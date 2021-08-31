@@ -383,6 +383,25 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		_transpose_matrix<0, 0, OutMatrix_, Matrix_>(matrix_, out_);
 		return out_;
 	}
+
+	template<std::size_t Index_, typename Out_, class Matrix_, class Adder_>
+	constexpr inline void _calculate_matrix_trace(const Matrix_& matrix_, Out_& out_, Adder_& adder_)
+	{
+		if constexpr (Index_ < Matrix_::num_columns)
+		{
+			out_ = adder_(out_, _get_matrix_data<Index_, Index_>(matrix_));
+			_calculate_matrix_trace<Index_ + 1, Out_, Matrix_, Adder_>(matrix_, out_, adder_);
+		}
+	}
+	template<typename Out_, class Matrix_>
+	[[nodiscard]] constexpr inline Out_ _calculate_matrix_trace(const Matrix_& matrix_)
+	{
+		using Adder_ = EmuCore::do_add<Out_, Out_>;
+		Out_ out_ = Out_();
+		Adder_ adder_ = Adder_();
+		_calculate_matrix_trace<0, Out_, Matrix_, Adder_>(matrix_, out_, adder_);
+		return out_;
+	}
 #pragma endregion
 }
 
