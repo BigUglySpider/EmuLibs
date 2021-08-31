@@ -180,6 +180,23 @@ int main()
 	std::cout << "\n\n";
 	std::cout << mat_e_ << "\nMULT\n" << mat_f_ << "\n:\n" << mat_mult_ef_ << "\n";
 
+	EmuMath::Matrix<4, 4, float> wee
+	(
+		EmuMath::Vector<3, float>(1.0f, 5.0f, 9.0f),
+		EmuMath::Vector<3, float>(2.0f, 6.0f, 10.0f),
+		EmuMath::Vector<3, float>(3.0f, 7.0f, 11.0f),
+		EmuMath::Vector<3, float>(4.0f, 8.0f, 12.0f)
+	);
+	wee = EmuMath::Helpers::MatrixMultiply(wee, 1.0f / (rand() + 1.0f));
+	std::cout << wee << "\n";
+	constexpr auto wee_identity = EmuMath::Helpers::MatrixIdentity(wee);
+	std::cout << "Identity:\n" << wee_identity << "\n";
+
+	constexpr std::size_t Size_ = 1;
+	std::cout << Size_ << "x" << Size_ << " Identity:\n" << EmuMath::Helpers::MatrixIdentity<Size_, Size_, float, true>();
+
+	constexpr auto size_identity_ = EmuMath::Helpers::MatrixIdentity<Size_, Size_, float, true>();
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();

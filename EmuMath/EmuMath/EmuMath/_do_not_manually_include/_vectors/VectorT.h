@@ -42,27 +42,15 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONSTRUCTORS
-	private:
-		template<std::size_t...Indices_>
-		constexpr Vector(this_type& toCopy_, std::index_sequence<Indices_...>) : data_({ std::get<Indices_>(toCopy_.data_)... })
-		{
-			EmuMath::Helpers::VectorSet(*this, toCopy_);
-		}
-		template<std::size_t...Indices_>
-		constexpr Vector(const this_type& toCopy_, std::index_sequence<Indices_...>) : data_({ std::get<Indices_>(toCopy_.data_)... })
-		{
-			EmuMath::Helpers::VectorSet(*this, toCopy_);
-		}
-
 	public:
 		constexpr Vector() : data_()
 		{
 		}
-		constexpr Vector(this_type& toCopy_) : Vector(toCopy_, std::make_index_sequence<size>())
+		constexpr Vector(this_type& toCopy_) : Vector()
 		{
 			EmuMath::Helpers::VectorSet(*this, toCopy_);
 		}
-		constexpr Vector(const this_type& toCopy_) : Vector(toCopy_, std::make_index_sequence<size>())
+		constexpr Vector(const this_type& toCopy_) : Vector()
 		{
 			EmuMath::Helpers::VectorSet(*this, toCopy_);
 		}
@@ -88,7 +76,7 @@ namespace EmuMath
 		/// <typeparam name="RequiresArgumentCountEqualToSize">Dummy parameter used to make use of std::enable_if.</typeparam>
 		/// <param name="contiguousData_">Arguments to create this vector's elements, in contiguous order from the 0th-(size - 1)th element in this vector.</param>
 		template<typename...Args, typename RequiresArgumentCountEqualToSize = std::enable_if_t<sizeof...(Args) == size>>
-		constexpr Vector(Args&&...contiguousData_) : data_({ static_cast<contained_type>(std::forward<Args>(contiguousData_))... })
+		constexpr Vector(Args&&...contiguousData_) : data_({ static_cast<contained_type>(std::forward<Args>(contiguousData_))... })// data_({ static_cast<contained_type>(std::forward<Args>(contiguousData_))... })
 		{
 			static_assert(sizeof...(Args) == size, "Provided an amount of arguments to an EmuMath Vector constructor that is not equal to the number of elements in the Vector.");
 			static_assert

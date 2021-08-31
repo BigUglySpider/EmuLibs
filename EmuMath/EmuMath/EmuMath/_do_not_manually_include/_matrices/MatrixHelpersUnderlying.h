@@ -341,6 +341,25 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 	}
 #pragma endregion
+
+#pragma region MATRIX_OPERATIONS
+	template<std::size_t Index_, class Matrix_>
+	constexpr inline void _make_identity_matrix(Matrix_& out_)
+	{
+		if constexpr (Index_ < Matrix_::num_columns)
+		{
+			_get_matrix_data<Index_, Index_>(out_) = typename Matrix_::value_type(1);
+			_make_identity_matrix<Index_ + 1, Matrix_>(out_);
+		}
+	}
+	template<class Matrix_>
+	[[nodiscard]] constexpr inline Matrix_ _make_identity_matrix()
+	{
+		Matrix_ out_ = Matrix_();
+		_make_identity_matrix<0, Matrix_>(out_);
+		return out_;
+	}
+#pragma endregion
 }
 
 #endif

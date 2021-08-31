@@ -1130,6 +1130,220 @@ namespace EmuMath::Helpers
 		return MatrixMultiply<typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 #pragma endregion
+
+#pragma region MATRIX_OPERATIONS
+	/// <summary>
+	/// <para> Determines the identity matrix of an EmuMath matrix with the provided dimensions. </para>
+	/// <para> Instead of passing dimensions and other matrix focused data, a matrix type may be provided as a template argument to determine defaults. </para>
+	/// <para> If a specific matrix's identity is desired, but the type is unknown, the matrix itself may be passed to this function to determine default arguments. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type"></typeparam>
+	/// <returns></returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = true>
+	constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixIdentity()
+	{
+		if constexpr (OutNumColumns_ == OutNumRows_)
+		{
+			return _underlying_matrix_funcs::_make_identity_matrix<EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>>();
+		}
+		else
+		{
+			static_assert(false, "Attempted to acquire an EmuMath identity matrix, but the provided matrix dimensions were non-square. An identity matrix must be square.");
+		}
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixIdentity()
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return MatrixIdentity<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>();
+		}
+		else
+		{
+			static_assert(false, "Attempted to acquire an EmuMath identity matrix, but provided a non-EmuMath-matrix type to determine the identity of.");
+		}
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixIdentity(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return MatrixIdentity<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>();
+		}
+		else
+		{
+			static_assert(false, "Attempted to acquire an EmuMath identity matrix, but provided a non-EmuMath-matrix type to determine the identity of.");
+		}
+	}
+	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixIdentity()
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return MatrixIdentity<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_>();
+		}
+		else
+		{
+			static_assert(false, "Attempted to acquire an EmuMath identity matrix, but provided a non-EmuMath-matrix type to determine the identity of.");
+		}
+	}
+	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixIdentity(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return MatrixIdentity<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_>();
+		}
+		else
+		{
+			static_assert(false, "Attempted to acquire an EmuMath identity matrix, but provided a non-EmuMath-matrix type to determine the identity of.");
+		}
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Matrix_>
+	constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> MatrixIdentity()
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return MatrixIdentity<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_>();
+		}
+		else
+		{
+			static_assert(false, "Attempted to acquire an EmuMath identity matrix, but provided a non-EmuMath-matrix type to determine the identity of.");
+		}
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Matrix_>
+	constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> MatrixIdentity(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return MatrixIdentity<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_>();
+		}
+		else
+		{
+			static_assert(false, "Attempted to acquire an EmuMath identity matrix, but provided a non-EmuMath-matrix type to determine the identity of.");
+		}
+	}
+	template<bool OutColumnMajor_, class Matrix_>
+	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixIdentity()
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return MatrixIdentity<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_>();
+		}
+		else
+		{
+			static_assert(false, "Attempted to acquire an EmuMath identity matrix, but provided a non-EmuMath-matrix type to determine the identity of.");
+		}
+	}
+	template<bool OutColumnMajor_, class Matrix_>
+	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixIdentity(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return MatrixIdentity<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_>();
+		}
+		else
+		{
+			static_assert(false, "Attempted to acquire an EmuMath identity matrix, but provided a non-EmuMath-matrix type to determine the identity of.");
+		}
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Matrix_>
+	constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> MatrixIdentity()
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return MatrixIdentity<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major>();
+		}
+		else
+		{
+			static_assert(false, "Attempted to acquire an EmuMath identity matrix, but provided a non-EmuMath-matrix type to determine the identity of.");
+		}
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Matrix_>
+	constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> MatrixIdentity(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return MatrixIdentity<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major>();
+		}
+		else
+		{
+			static_assert(false, "Attempted to acquire an EmuMath identity matrix, but provided a non-EmuMath-matrix type to determine the identity of.");
+		}
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Matrix_>
+	constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> MatrixIdentity()
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return MatrixIdentity<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major>();
+		}
+		else
+		{
+			static_assert(false, "Attempted to acquire an EmuMath identity matrix, but provided a non-EmuMath-matrix type to determine the identity of.");
+		}
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Matrix_>
+	constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> MatrixIdentity(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return MatrixIdentity<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major>();
+		}
+		else
+		{
+			static_assert(false, "Attempted to acquire an EmuMath identity matrix, but provided a non-EmuMath-matrix type to determine the identity of.");
+		}
+	}
+	template<typename out_contained_type, class Matrix_>
+	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixIdentity()
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return MatrixIdentity<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major>();
+		}
+		else
+		{
+			static_assert(false, "Attempted to acquire an EmuMath identity matrix, but provided a non-EmuMath-matrix type to determine the identity of.");
+		}
+	}
+	template<typename out_contained_type, class Matrix_>
+	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixIdentity(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return MatrixIdentity<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major>();
+		}
+		else
+		{
+			static_assert(false, "Attempted to acquire an EmuMath identity matrix, but provided a non-EmuMath-matrix type to determine the identity of.");
+		}
+	}
+	template<class Matrix_>
+	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixIdentity()
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return MatrixIdentity<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major>();
+		}
+		else
+		{
+			static_assert(false, "Attempted to acquire an EmuMath identity matrix, but provided a non-EmuMath-matrix type to determine the identity of.");
+		}
+	}
+	template<class Matrix_>
+	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixIdentity(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return MatrixIdentity<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major>();
+		}
+		else
+		{
+			static_assert(false, "Attempted to acquire an EmuMath identity matrix, but provided a non-EmuMath-matrix type to determine the identity of.");
+		}
+	}
+#pragma endregion
 }
 
 #endif
