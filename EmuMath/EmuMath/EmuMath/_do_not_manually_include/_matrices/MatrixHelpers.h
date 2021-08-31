@@ -409,6 +409,34 @@ namespace EmuMath::Helpers
 	{
 		return VectorToRowMatrix<typename Vector_::value_type, ColumnMajor_, Vector_>(vector_);
 	}
+
+	/// <summary>
+	/// <para> Creates an EmuMath vector one item larger than the passed vector, containing a copy of the passed vector_ in existing indices and 1 in the new index. </para>
+	/// <para> This process allows an X-dimensional vector to be transformed by an (X+1)x(X+1) transformation matrix. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="Vector_">Type of EmuMath vector to prepare for transformation.</typeparam>
+	/// <param name="vector_">EmuMath vector to prepare for transformation.</param>
+	/// <returns>Copy of the provided vector_, with one additional element appended to the end set to 1.</returns>
+	template<typename out_contained_type, class Vector_>
+	constexpr inline EmuMath::Vector<Vector_::size + 1, out_contained_type> VectorPrepareToTransform(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			EmuMath::Vector<Vector_::size + 1, out_contained_type> out_(vector_);
+			out_.at<Vector_::size>() = out_contained_type(1.0);
+			return out_;
+		}
+		else
+		{
+			static_assert(false, "Attempted to prepare a vector to be transformed by a matrix, but the provided argument was not an EmuMath vector.");
+		}
+	}
+	template<class Vector_>
+	constexpr inline EmuMath::Vector<Vector_::size + 1, typename Vector_::value_type> VectorPrepareToTransform(const Vector_& vector_)
+	{
+		return VectorPrepareToTransform<typename Vector_::value_type, Vector_>(vector_);
+	}
 #pragma endregion
 
 #pragma region ARITHMETIC
@@ -1056,7 +1084,7 @@ namespace EmuMath::Helpers
 		{
 			if constexpr(!std::is_same_v<typename EmuMath::TMP::emu_matrix_multiplication_result<out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>::type, void>)
 			{
-			return _underlying_matrix_funcs::_matrix_std_multiply
+				return _underlying_matrix_funcs::_matrix_std_multiply
 				<
 					typename EmuMath::TMP::emu_matrix_multiplication_result<out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>::type,
 					LhsMatrix_,
@@ -1065,13 +1093,40 @@ namespace EmuMath::Helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to multiply two EmuMath matrices which can not be multiplied together.");
+				static_assert(false, "Attempted to multiply two EmuMath matrices which can not be multiplied together. When multiplying matrices, the left-hand matrix must have the same number of columns as the right-hand matrix's number of rows.");
 			}
 		}
 		else
 		{
 			static_assert(false, "Attempted to perform matrix multiplication with a lhs_ argument that is not an EmuMath matrix.");
 		}
+	}
+	template<typename out_contained_type, class LhsMatrix_, class Rhs_>
+	constexpr inline typename EmuMath::TMP::emu_matrix_multiplication_result<out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>::type MatrixMultiply
+	(
+		const LhsMatrix_& lhs_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixMultiply<out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
+	}
+	template<bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
+	constexpr inline typename EmuMath::TMP::emu_matrix_multiplication_result<typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>::type MatrixMultiply
+	(
+		const LhsMatrix_& lhs_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixMultiply<typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
+	}
+	template<class LhsMatrix_, class Rhs_>
+	constexpr inline typename EmuMath::TMP::emu_matrix_multiplication_result<typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>::type MatrixMultiply
+	(
+		const LhsMatrix_& lhs_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixMultiply<typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 #pragma endregion
 }
