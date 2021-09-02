@@ -196,6 +196,29 @@ namespace EmuMath::TMP
 	};
 	template<class Matrix_>
 	using emu_matrix_transpose_match_t = typename emu_matrix_transpose_match<Matrix_>::type;
+
+	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	struct emu_matrix_submatrix_excluding_element_region
+	{
+		using type = typename std::conditional_t
+		<
+			std::is_same_v<Matrix_, std::remove_cv_t<std::remove_reference_t<Matrix_>>>,
+			EmuCore::TMPHelpers::void_type,
+			emu_matrix_submatrix_excluding_element_region<out_contained_type, OutColumnMajor_, std::remove_cv_t<std::remove_reference_t<Matrix_>>>
+		>::type;
+	};
+	template<typename out_contained_type, bool OutColumnMajor_, std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
+	struct emu_matrix_submatrix_excluding_element_region<out_contained_type, OutColumnMajor_, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>
+	{
+		using type = std::conditional_t
+		<
+			(NumColumns_ > 1) && (NumRows_ > 1),
+			EmuMath::Matrix<NumColumns_ - 1, NumRows_ - 1, out_contained_type, OutColumnMajor_>,
+			void
+		>;
+	};
+	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	using emu_matrix_submatrix_excluding_element_region_t = typename emu_matrix_submatrix_excluding_element_region<out_contained_type, OutColumnMajor_, Matrix_>::type;
 }
 
 #endif

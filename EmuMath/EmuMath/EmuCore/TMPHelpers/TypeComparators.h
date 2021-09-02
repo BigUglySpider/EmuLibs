@@ -249,6 +249,19 @@ namespace EmuCore::TMPHelpers
 	{
 		static constexpr bool value = true;
 	};
+
+	template<class A_, class B_>
+	struct is_two_way_convertible
+	{
+		static constexpr bool value = std::is_convertible_v<A_, B_> && std::is_convertible_v<B_, A_>;
+	};
+	template<class A_, class B_>
+	constexpr bool is_two_way_convertible_v = is_two_way_convertible<A_, B_>::value;
+
+	struct void_type
+	{
+		using type = void;
+	};
 }
 
 #endif

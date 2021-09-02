@@ -208,6 +208,39 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 #pragma endregion
 
+#pragma region SETS
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Matrix_, typename Arg_>
+	constexpr inline Matrix_& _matrix_set(Matrix_& matrix_, Arg_& arg_)
+	{
+		if constexpr (Matrix_::is_column_major)
+		{
+			auto& column_ = matrix_.template GetMajor<ColumnIndex_>();
+			column_.template Set<RowIndex_>(arg_);
+		}
+		else
+		{
+			auto& row_ = matrix_.template GetMajor<RowIndex_>();
+			row_.template Set<ColumnIndex_>(arg_);
+		}
+		return matrix_;
+	}
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Matrix_, typename Arg_>
+	constexpr inline Matrix_& _matrix_set(Matrix_& matrix_, const Arg_& arg_)
+	{
+		if constexpr (Matrix_::is_column_major)
+		{
+			auto& column_ = matrix_.template GetMajor<ColumnIndex_>();
+			column_.template Set<RowIndex_>(arg_);
+		}
+		else
+		{
+			auto& row_ = matrix_.template GetMajor<RowIndex_>();
+			row_.template Set<ColumnIndex_>(arg_);
+		}
+		return matrix_;
+	}
+#pragma endregion
+
 #pragma region REINTERPRETATIONS
 	template<class Vector_, class OutMatrix_>
 	constexpr inline OutMatrix_ _vector_to_matrix(const Vector_& vector_)
@@ -400,6 +433,117 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		Out_ out_ = Out_();
 		Adder_ adder_ = Adder_();
 		_calculate_matrix_trace<0, Out_, Matrix_, Adder_>(matrix_, out_, adder_);
+		return out_;
+	}
+
+	template<std::size_t InColumn_, std::size_t InRow_, std::size_t OutColumn_, std::size_t OutRow_, std::size_t ExcludeColumn_, std::size_t ExcludeRow_, class Out_, class In_>
+	constexpr inline void _get_submatrix_excluding_element_region(In_& in_, Out_& out_)
+	{
+		if constexpr (OutColumn_ < Out_::num_columns)
+		{
+			if constexpr (OutRow_ < Out_::num_rows)
+			{
+				if constexpr (InColumn_ != ExcludeColumn_)
+				{
+					if constexpr (InRow_ != ExcludeRow_)
+					{
+						_matrix_set<OutColumn_, OutRow_>
+						(
+							out_,
+							(_get_matrix_data<InColumn_, InRow_>(in_))
+						);
+						_get_submatrix_excluding_element_region<InColumn_, InRow_ + 1, OutColumn_, OutRow_ + 1, ExcludeColumn_, ExcludeRow_, Out_, In_>(in_, out_);
+					}
+					else
+					{
+						_get_submatrix_excluding_element_region<InColumn_, InRow_ + 1, OutColumn_, OutRow_, ExcludeColumn_, ExcludeRow_, Out_, In_>(in_, out_);
+					}
+				}
+				else
+				{
+					_get_submatrix_excluding_element_region<InColumn_ + 1, InRow_, OutColumn_, OutRow_, ExcludeColumn_, ExcludeRow_, Out_, In_>(in_, out_);
+				}
+			}
+			else
+			{
+				_get_submatrix_excluding_element_region<InColumn_ + 1, 0, OutColumn_ + 1, 0, ExcludeColumn_, ExcludeRow_, Out_, In_>(in_, out_);
+			}
+		}
+	}
+	template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_, class OutMatrix_, class InMatrix_>
+	[[nodiscard]] constexpr inline OutMatrix_ _get_submatrix_excluding_element_region(InMatrix_& in_)
+	{
+		OutMatrix_ out_ = OutMatrix_();
+		_get_submatrix_excluding_element_region<0, 0, 0, 0, ExcludeColumn_, ExcludeRow_, OutMatrix_, InMatrix_>(in_, out_);
+		return out_;
+	}
+
+	template<typename Out_, class Matrix_>
+	constexpr inline void _calculate_matrix_determinant_laplace_1x1(const Matrix_& matrix_, Out_& out_)
+	{
+		out_ = static_cast<Out_>(_get_matrix_data<0, 0>(matrix_));
+	}
+	template<typename Out_, class Matrix_, class Subtractor_, class Multiplier_>
+	constexpr inline void _calculate_matrix_determinant_laplace_2x2(const Matrix_& matrix_, Out_& out_, Subtractor_& sub_, Multiplier_& mult_)
+	{
+		// Returns (a*d)-(b*c) where a 2x2 matrix is:
+		// a b
+		// c d
+		out_ = static_cast<Out_>
+		(
+			sub_
+			(
+				mult_(static_cast<Out_>(_get_matrix_data<0, 0>(matrix_)), static_cast<Out_>(_get_matrix_data<1, 1>(matrix_))),
+				mult_(static_cast<Out_>(_get_matrix_data<1, 0>(matrix_)), static_cast<Out_>(_get_matrix_data<0, 1>(matrix_)))
+			)
+		);
+	}
+	template<std::size_t ColumnIndex_, typename Out_, class Matrix_, class Adder_, class Subtractor_, class Multiplier_>
+	constexpr inline void _calculate_matrix_determinant_laplace(const Matrix_& matrix_, Out_& out_, Adder_& add_, Subtractor_& sub_, Multiplier_& mult_)
+	{
+		if constexpr (Matrix_::num_columns == 1)
+		{
+			_calculate_matrix_determinant_laplace_1x1<Out_, Matrix_>(matrix_, out_);
+		}
+		else if constexpr (Matrix_::num_columns == 2)
+		{
+			_calculate_matrix_determinant_laplace_2x2<Out_, Matrix_, Subtractor_, Multiplier_>(matrix_, out_, sub_, mult_);
+		}
+		else if constexpr (ColumnIndex_ < Matrix_::num_columns)
+		{
+			using mat_val = typename Matrix_::value_type;
+			using sub_mat_type = EmuMath::TMP::emu_matrix_submatrix_excluding_element_region_t<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>;
+			mat_val sub_det_ = mat_val();
+			sub_mat_type sub_mat_ = _get_submatrix_excluding_element_region<ColumnIndex_, 0, sub_mat_type, const Matrix_>(matrix_);
+			_calculate_matrix_determinant_laplace<0, mat_val, sub_mat_type, Adder_, Subtractor_, Multiplier_>(sub_mat_, sub_det_, add_, sub_, mult_);
+			sub_det_ = mult_(sub_det_, _get_matrix_data<ColumnIndex_, 0>(matrix_));
+
+			if constexpr ((ColumnIndex_ % 2) == 0)
+			{
+				// EVEN: Add to existing out_.
+				out_ = static_cast<Out_>(add_(out_, sub_det_));
+			}
+			else
+			{
+				// ODD: Subtract from existing out_.
+				out_ = static_cast<Out_>(sub_(out_, sub_det_));
+			}
+			_calculate_matrix_determinant_laplace<ColumnIndex_ + 1, Out_, Matrix_, Adder_, Subtractor_, Multiplier_>(matrix_, out_, add_, sub_, mult_);
+		}
+	}
+	template<typename Out_, class Matrix_>
+	[[nodiscard]] constexpr inline Out_ _calculate_matrix_determinant_laplace(const Matrix_& matrix_)
+	{
+		using mat_value = typename Matrix_::value_type;
+		using Adder_ = EmuCore::do_add<Out_, mat_value>;
+		using Subtractor_ = EmuCore::do_subtract<Out_, mat_value>;
+		using Multiplier_ = EmuCore::do_multiply<mat_value, mat_value>;
+
+		Multiplier_ mult_ = Multiplier_();
+		Subtractor_ sub_ = Subtractor_();
+		Adder_ add_ = Adder_();
+		Out_ out_ = Out_();
+		_calculate_matrix_determinant_laplace<0, Out_, Matrix_, Adder_, Subtractor_, Multiplier_>(matrix_, out_, add_, sub_, mult_);
 		return out_;
 	}
 #pragma endregion

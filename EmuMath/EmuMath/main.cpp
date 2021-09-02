@@ -219,6 +219,55 @@ int main()
 	);
 	constexpr auto mat_hehe_trace_ = EmuMath::Helpers::MatrixTrace(mat_hehe_);
 
+	constexpr auto mat_2x2_ = EmuMath::Matrix<2, 2, float>(EmuMath::Vector2<float>(2.0f, -13.3f), EmuMath::Vector2<float>(17.0f, 7.0f));
+	constexpr auto det_ = EmuMath::Helpers::MatrixDeterminantLaplace(mat_2x2_);
+
+	auto mat_2x2_rt_ = mat_2x2_;
+	std::cout << "\n\nBEFORE:\n" << mat_2x2_rt_ << "\n";
+	EmuMath::Helpers::_underlying_matrix_funcs::_matrix_set<1, 1>(mat_2x2_rt_, 13.37f);
+	std::cout << "AFTER:\n" << mat_2x2_rt_ << "\n\n";
+
+	EmuMath::RefMatrix<2, 2, float> ref_;
+	ref_.GetMajor<0>().Set<0>(mat_2x2_rt_.GetMajor<0>().at<0>());
+	ref_.GetMajor<0>().Set<1>(mat_2x2_rt_.GetMajor<0>().at<1>());
+	ref_.GetMajor<1>().Set<0>(mat_2x2_rt_.GetMajor<1>().at<0>());
+	ref_.GetMajor<1>().Set<1>(mat_2x2_rt_.GetMajor<1>().at<1>());
+	std::cout << ref_ << "\n\n";
+	ref_.at<0, 1>() = 0.0f;
+	std::cout << ref_ << "\n|\n" << mat_2x2_rt_ << "\n\n";
+
+	float some_fp_ = 1337.0f;
+	EmuMath::Helpers::_underlying_matrix_funcs::_matrix_set<0, 0>(ref_, some_fp_);
+	std::cout << ref_ << "\n";
+	some_fp_ = 25.0f;
+	std::cout << "|\n" << ref_ << "\n";
+
+
+	std::cout << "\n\n\n\n";
+
+	wee.at<2, 3>() = 5.0f;
+	auto wee_submat_ = EmuMath::Helpers::MatrixExclusiveSubmatrix<1, 1, EmuMath::InternalMatrixReference<const float>, true>(wee);
+	wee.at<0, 0>() = 25.0f;
+	std::cout << "WEE:\n" << wee << "\nWEE SUBMAT<1, 1>:\n" << wee_submat_ << "\n";
+	std::cout << "SUBMAT SUBMAT<0, 0>:\n" << EmuMath::Helpers::MatrixExclusiveSubmatrix<0, 0>(wee_submat_) << "\n";
+	std::cout << "SUBMAT SUBMAT SUBMAT<1, 1>:\n" << EmuMath::Helpers::MatrixExclusiveSubmatrix<1, 1>(EmuMath::Helpers::MatrixExclusiveSubmatrix<0, 0, double>(wee_submat_)) << "\n";
+
+	std::cout << "\n" << wee << "\nDET: " << std::setprecision(100) << std::setw(25) << EmuMath::Helpers::MatrixDeterminantLaplace(wee) << "\n";
+
+	constexpr auto some_mat_ = EmuMath::Matrix<4, 4, float, true>
+	(
+		EmuMath::Vector4<float>(2.0f, 3.0f, 1.0f, 1.75f),
+		EmuMath::Vector4<float>(-2.0f, 3.5f, 0.05f, 1.3f),
+		EmuMath::Vector4<float>(1.0f, 2.4f, 2.6f, 0.75f),
+		EmuMath::Vector4<float>(2.0f, 1.2f, 0.37f, 0.75f)
+	);
+	constexpr auto some_mat_det_ = EmuMath::Helpers::MatrixDeterminantLaplace(some_mat_);
+	constexpr auto some_mat_mul_det_ = EmuMath::Helpers::MatrixMultiply(some_mat_, some_mat_det_);
+	std::cout << "\n\n" << some_mat_ << "\nDET: " << some_mat_det_ << "\n";
+
+	constexpr auto some_2x2_ = EmuMath::Matrix<2, 2, float, true>(EmuMath::Vector2<float>(2.0f, 6.0f), EmuMath::Vector2<float>(-17.0f, 0.51f));
+	constexpr auto some_2x2_det_ = EmuMath::Helpers::MatrixDeterminantLaplace(some_2x2_);
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();

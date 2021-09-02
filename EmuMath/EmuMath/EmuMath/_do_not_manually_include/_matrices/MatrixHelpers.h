@@ -1387,18 +1387,135 @@ namespace EmuMath::Helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to retrieve the trace of an EmuMath matrix that is not square. Only square matrices have a mathematically defined trace.");
+				static_assert(false, "Attempted to calculate the trace of an EmuMath matrix that is not square. Only square matrices have a mathematically defined trace.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to retrieve the trace of a matrix, but a non-EmuMath-matrix argument was passed.");
+			static_assert(false, "Attempted to calculate the trace of a matrix, but a non-EmuMath-matrix argument was passed.");
 		}
 	}
 	template<class Matrix_>
 	constexpr inline typename Matrix_::value_type MatrixTrace(const Matrix_& matrix_)
 	{
 		return MatrixTrace<typename Matrix_::value_type, Matrix_>(matrix_);
+	}
+
+	template<typename OutDet_, class Matrix_>
+	constexpr inline OutDet_ MatrixDeterminantLaplace(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			if constexpr (Matrix_::is_square)
+			{
+				return _underlying_matrix_funcs::_calculate_matrix_determinant_laplace<OutDet_, Matrix_>(matrix_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to calculate the determinant of an EmuMath matrix that is not square. Only square matrices have a mathematically defined determinant.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to calculate a matrix's determinant, but a non-EmuMath-matrix argument was passed.");
+		}
+	}
+
+	template<class Matrix_>
+	constexpr inline typename Matrix_::preferred_floating_point MatrixDeterminantLaplace(const Matrix_& matrix_)
+	{
+		return MatrixDeterminantLaplace<typename Matrix_::preferred_floating_point, Matrix_>(matrix_);
+	}
+
+	template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_, typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<out_contained_type, OutColumnMajor_, Matrix_>::type MatrixExclusiveSubmatrix
+	(
+		Matrix_& matrix_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			if constexpr (!std::is_same_v<typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<out_contained_type, OutColumnMajor_, Matrix_>::type, void>)
+			{
+				if constexpr (ExcludeColumn_ < Matrix_::num_columns)
+				{
+					if constexpr (ExcludeRow_ < Matrix_::num_rows)
+					{
+						return _underlying_matrix_funcs::_get_submatrix_excluding_element_region
+						<
+							ExcludeColumn_,
+							ExcludeRow_,
+							typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<out_contained_type, OutColumnMajor_, Matrix_>::type,
+							Matrix_
+						>(matrix_);
+					}
+					else
+					{
+						static_assert(false, "Attempted to retrieve a submatrix excluding an element's regions within an EmuMath matrix, but the provided row index to ignore exceeded the range of the passed matrix's rows.");
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to retrieve a submatrix excluding an element's regions within an EmuMath matrix, but the provided column index to ignore exceeded the range of the passed matrix's columns.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to retrieve a submatrix excluding an element's regions with an EmuMath matrix, but the provided matrix cannot supply a submatrix.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to retrieve a submatrix excluding an element's regions within a matrix, but the provided argument was not an EmuMath matrix.");
+		}
+	}
+	template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_, typename out_contained_type, class Matrix_>
+	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<out_contained_type, Matrix_::is_column_major, Matrix_>::type MatrixExclusiveSubmatrix
+	(
+		Matrix_& matrix_
+	)
+	{
+		return MatrixExclusiveSubmatrix<ExcludeColumn_, ExcludeRow_, out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+	template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_, typename out_contained_type, class Matrix_>
+	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<out_contained_type, Matrix_::is_column_major, Matrix_>::type MatrixExclusiveSubmatrix
+	(
+		const Matrix_& matrix_
+	)
+	{
+		return MatrixExclusiveSubmatrix<ExcludeColumn_, ExcludeRow_, out_contained_type, const Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+	template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_, bool OutColumnMajor_, class Matrix_>
+	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<typename Matrix_::value_type, OutColumnMajor_, Matrix_>::type MatrixExclusiveSubmatrix
+	(
+		Matrix_& matrix_
+	)
+	{
+		return MatrixExclusiveSubmatrix<ExcludeColumn_, ExcludeRow_, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+	}
+	template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_, bool OutColumnMajor_, class Matrix_>
+	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<typename Matrix_::value_type, OutColumnMajor_, Matrix_>::type MatrixExclusiveSubmatrix
+	(
+		const Matrix_& matrix_
+	)
+	{
+		return MatrixExclusiveSubmatrix<ExcludeColumn_, ExcludeRow_, typename Matrix_::value_type, OutColumnMajor_, const Matrix_>(matrix_);
+	}
+	template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_, class Matrix_>
+	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>::type MatrixExclusiveSubmatrix
+	(
+		Matrix_& matrix_
+	)
+	{
+		return MatrixExclusiveSubmatrix<ExcludeColumn_, ExcludeRow_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+	template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_, class Matrix_>
+	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>::type MatrixExclusiveSubmatrix
+	(
+		const Matrix_& matrix_
+	)
+	{
+		return MatrixExclusiveSubmatrix<ExcludeColumn_, ExcludeRow_, typename Matrix_::value_type, Matrix_::is_column_major, const Matrix_>(matrix_);
 	}
 #pragma endregion
 }
