@@ -239,6 +239,27 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 		return matrix_;
 	}
+
+	template<std::size_t Index_, class Matrix_, typename Arg_>
+	constexpr inline Matrix_& _matrix_set_trace_region(Matrix_& matrix_,  Arg_& arg_)
+	{
+		if constexpr ((Index_ < Matrix_::num_columns) && (Index_ < Matrix_::num_rows))
+		{
+			matrix_.template GetMajor<Index_>().template Set<Index_>(arg_);
+			_matrix_set_trace_region<Index_ + 1, Matrix_, Arg_>(matrix_, arg_);
+		}
+		return matrix_;
+	}
+	template<std::size_t Index_, class Matrix_, typename Arg_>
+	constexpr inline Matrix_& _matrix_set_trace_region(Matrix_& matrix_, const Arg_& arg_)
+	{
+		if constexpr ((Index_ < Matrix_::num_columns) && (Index_ < Matrix_::num_rows))
+		{
+			matrix_.template GetMajor<Index_>().template Set<Index_>(arg_);
+			_matrix_set_trace_region<Index_ + 1, Matrix_, Arg_>(matrix_, arg_);
+		}
+		return matrix_;
+	}
 #pragma endregion
 
 #pragma region REINTERPRETATIONS
@@ -376,20 +397,11 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 #pragma endregion
 
 #pragma region MATRIX_OPERATIONS
-	template<std::size_t Index_, class Matrix_>
-	constexpr inline void _make_identity_matrix(Matrix_& out_)
-	{
-		if constexpr (Index_ < Matrix_::num_columns)
-		{
-			_get_matrix_data<Index_, Index_>(out_) = typename Matrix_::value_type(1);
-			_make_identity_matrix<Index_ + 1, Matrix_>(out_);
-		}
-	}
 	template<class Matrix_>
 	[[nodiscard]] constexpr inline Matrix_ _make_identity_matrix()
 	{
 		Matrix_ out_ = Matrix_();
-		_make_identity_matrix<0, Matrix_>(out_);
+		_matrix_set_trace_region<0, Matrix_, typename Matrix_::contained_type>(out_, typename Matrix_::contained_type(1));
 		return out_;
 	}
 
@@ -696,6 +708,60 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		using Multiplier_ = EmuCore::do_multiply<typename OutMatrix_::value_type, reciprocal_type>;
 		reciprocal_type det_reciprocal_ = reciprocal_type(1) / static_cast<reciprocal_type>(outDeterminant_);
 		return _matrix_lhs_rhs_operation<OutMatrix_, OutMatrix_, reciprocal_type, Multiplier_>(adjugate_, det_reciprocal_);
+	}
+#pragma endregion
+
+#pragma region TRANSFORMATIONS
+
+
+	template<class Matrix_, class FirstArg_, class...AdditionalArgs_>
+	struct _translation_matrix_builder
+	{
+		constexpr _translation_matrix_builder()
+		{
+		}
+		template<std::size_t RowIndex_ = 0>
+		constexpr inline void operator()(Matrix_& out_, const FirstArg_& first_arg_, const AdditionalArgs_&...additional_args_) const
+		{
+			if constexpr (RowIndex_ < Matrix_::num_rows)
+			{
+				_translation_matrix_builder<Matrix_, FirstArg_>().operator() < RowIndex_ > (out_, first_arg_);
+				_translation_matrix_builder<Matrix_, AdditionalArgs_...>().operator() < RowIndex_ + 1 > (out_, additional_args_...);
+			}
+		}
+	};
+	template<class Matrix_, class Arg_>
+	struct _translation_matrix_builder<Matrix_, Arg_>
+	{
+		constexpr _translation_matrix_builder()
+		{
+		}
+		// This is called independetnly from a recursive loop, and does not need to recursively call itself for further indices.
+		template<std::size_t RowIndex_ = 0>
+		constexpr inline void operator()(Matrix_& out_, const Arg_& arg_) const
+		{
+			if constexpr (RowIndex_ < Matrix_::num_rows)
+			{
+				using out_value = typename Matrix_::value_type;
+				if constexpr (std::is_convertible_v<Arg_, out_value>)
+				{
+					_get_matrix_data<Matrix_::num_columns - 1, RowIndex_, Matrix_>(out_) = static_cast<out_value>(arg_);
+				}
+				else
+				{
+					static_assert(false, "Attempted to create an EmuMath translation matrix using a coordinate argument which cannot be converted to the output matrix's value type.");
+				}
+			}
+		}
+	};
+
+	template<class OutMatrix_, class...Args_>
+	constexpr inline OutMatrix_ _make_translation_matrix(const Args_&...args_)
+	{
+		OutMatrix_ out_ = OutMatrix_();
+		_matrix_set_trace_region<0, OutMatrix_, typename OutMatrix_::contained_type>(out_, typename OutMatrix_::contained_type(1));
+		_translation_matrix_builder<OutMatrix_, Args_...>()(out_, args_...);
+		return out_;
 	}
 #pragma endregion
 }

@@ -268,14 +268,30 @@ int main()
 	constexpr auto some_2x2_ = EmuMath::Matrix<2, 2, float, true>(EmuMath::Vector2<float>(2.0f, 6.0f), EmuMath::Vector2<float>(-17.0f, 0.51f));
 	constexpr auto some_2x2_det_ = EmuMath::Helpers::MatrixDeterminantLaplace(some_2x2_);
 
-	std::cout << "\n\n" << some_2x2_ << "\nMINOR MATRIX:\n" << EmuMath::Helpers::MatrixOfMinors(some_2x2_) << "\n\n";
-	std::cout << "\n\n" << some_2x2_ << "\nCOFACTOR MATRIX:\n" << EmuMath::Helpers::MatrixOfCofactors(some_2x2_) << "\n\n";
-	std::cout << "\n\n" << some_2x2_ << "\nADJUGATE MATRIX:\n" << EmuMath::Helpers::MatrixAdjugate(some_2x2_) << "\n\n";
+	std::cout << "\n\n" << some_2x2_ << "\nMINOR MATRIX:\n" << EmuMath::Helpers::MatrixOfMinorsLaplace(some_2x2_) << "\n\n";
+	std::cout << "\n\n" << some_2x2_ << "\nCOFACTOR MATRIX:\n" << EmuMath::Helpers::MatrixOfCofactorsLaplace(some_2x2_) << "\n\n";
+	std::cout << "\n\n" << some_2x2_ << "\nADJUGATE MATRIX:\n" << EmuMath::Helpers::MatrixAdjugateLaplace(some_2x2_) << "\n\n";
 	float test_det_output_ = 0.0f;
-	std::cout << "\n\n" << some_2x2_ << "\nINVERSE MATRIX:\n" << EmuMath::Helpers::MatrixInverse(some_2x2_, test_det_output_) << "\n\n";
+	std::cout << "\n\n" << some_2x2_ << "\nINVERSE MATRIX:\n" << EmuMath::Helpers::MatrixInverseLaplace(some_2x2_, test_det_output_) << "\n\n";
 	std::cout << "\n\n" << some_2x2_ << "\nDETERMINANT: " << test_det_output_ << "\n\n";
-	std::cout << "\n\n" << some_2x2_ << "\nMULT INVERSE:\n" << EmuMath::Helpers::MatrixMultiply(some_2x2_, EmuMath::Helpers::MatrixInverse(some_2x2_, test_det_output_)) << "\n\n";
-	std::cout << "\n\n" << some_2x2_ << "\nMULT INVERSE:\n" << EmuMath::Helpers::MatrixMultiply(some_2x2_, EmuMath::Helpers::MatrixInverse(some_2x2_)) << "\n\n";
+	std::cout << "\n\n" << some_2x2_ << "\nMULT INVERSE:\n" << EmuMath::Helpers::MatrixMultiply(some_2x2_, EmuMath::Helpers::MatrixInverseLaplace(some_2x2_, test_det_output_)) << "\n\n";
+	std::cout << "\n\n" << some_2x2_ << "\nMULT INVERSE:\n" << EmuMath::Helpers::MatrixMultiply(some_2x2_, EmuMath::Helpers::MatrixInverseLaplace(some_2x2_)) << "\n\n";
+
+
+	constexpr auto translate_mat_ = EmuMath::Helpers::MatrixTranslation(1.0f, 2.0f, 3.0f);
+	std::cout << translate_mat_ << "\n\n";
+	constexpr auto translate_mat_rm_ = EmuMath::Helpers::MatrixTranslation<double, false>(1.0f, 2.0f, 3.0f);
+	std::cout << translate_mat_rm_ << "\n\n";
+
+	constexpr auto identity_mat_10x10_ = EmuMath::Helpers::MatrixIdentity<EmuMath::Matrix<10, 10, float>>();
+	std::cout << identity_mat_10x10_ << "\n\n";
+
+	constexpr auto point_ = EmuMath::Vector3<float>(1.0f, 2.0f, 3.0f);
+	constexpr auto point_as_column_vector_ = EmuMath::Helpers::VectorToColumnMatrix(EmuMath::Helpers::VectorPrepareToTransform(point_));
+	constexpr auto point_translation_ = EmuMath::Helpers::MatrixTranslation(10.0f, 20.0f, 30.0f);
+	constexpr auto point_translated_ = EmuMath::Helpers::MatrixMultiply(point_translation_, point_as_column_vector_);
+
+	std::cout << "Point: " << point_ << "\nTransformation Matrix:\n" << point_translation_ << "\nTransformed point: " << point_translated_.GetColumn<0>().As<3, float>() << "\n\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

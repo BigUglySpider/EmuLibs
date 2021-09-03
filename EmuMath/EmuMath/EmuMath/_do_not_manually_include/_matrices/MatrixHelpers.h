@@ -1137,8 +1137,8 @@ namespace EmuMath::Helpers
 	/// <para> Instead of passing dimensions and other matrix focused data, a matrix type may be provided as a template argument to determine defaults. </para>
 	/// <para> If a specific matrix's identity is desired, but the type is unknown, the matrix itself may be passed to this function to determine default arguments. </para>
 	/// </summary>
-	/// <typeparam name="out_contained_type"></typeparam>
-	/// <returns></returns>
+	/// <typeparam name="out_contained_type">Type to be contained in the output identity matrix.</typeparam>
+	/// <returns>Identity matrix of the provided size, where all elements are 0 excluding the main diagonal, along which all elements are 1.</returns>
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = true>
 	constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixIdentity()
 	{
@@ -1344,6 +1344,14 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary>
+	/// <para> Transposes the passed matrix, effectively turning columns into rows and vice versa. </para>
+	/// <para> The output matrix will always be of dimensions [Y, X] when provided an input matrix of dimensions [X, Y]. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output transpose matrix.</typeparam>
+	/// <typeparam name="Matrix_">Type of matrix to tranpose.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to transpose.</param>
+	/// <returns>Tranposed form of the passed EmuMath matrix.</returns>
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
 	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, OutColumnMajor_, Matrix_>::type MatrixTranspose(const Matrix_& matrix_)
 	{
@@ -1376,6 +1384,14 @@ namespace EmuMath::Helpers
 		return MatrixTranspose<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 
+	/// <summary>
+	/// <para> Calculates the trace of the passed matrix (i.e. the sum of all diagonal elements from the top-left to the bottom right). </para>
+	/// <para> The trace is only defined for a square matrix, and as such this function may only be validly executed on square matrices. </para>
+	/// </summary>
+	/// <typeparam name="OutT_">Type to output the trace as.</typeparam>
+	/// <typeparam name="Matrix_">Type of matrix to calculate the trace of.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to calculate the trace of.</param>
+	/// <returns>Trace of the passed matrix, represented as the provided OutT_.</returns>
 	template<typename OutT_, class Matrix_>
 	constexpr inline OutT_ MatrixTrace(const Matrix_& matrix_)
 	{
@@ -1401,37 +1417,20 @@ namespace EmuMath::Helpers
 		return MatrixTrace<typename Matrix_::value_type, Matrix_>(matrix_);
 	}
 
-	template<typename OutDet_, class Matrix_>
-	constexpr inline OutDet_ MatrixDeterminantLaplace(const Matrix_& matrix_)
-	{
-		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
-		{
-			if constexpr (Matrix_::is_square)
-			{
-				return _underlying_matrix_funcs::_calculate_matrix_determinant_laplace<OutDet_, Matrix_>(matrix_);
-			}
-			else
-			{
-				static_assert(false, "Attempted to calculate the determinant of an EmuMath matrix that is not square. Only square matrices have a mathematically defined determinant.");
-			}
-		}
-		else
-		{
-			static_assert(false, "Attempted to calculate a matrix's determinant, but a non-EmuMath-matrix argument was passed.");
-		}
-	}
-
-	template<class Matrix_>
-	constexpr inline typename Matrix_::preferred_floating_point MatrixDeterminantLaplace(const Matrix_& matrix_)
-	{
-		return MatrixDeterminantLaplace<typename Matrix_::preferred_floating_point, Matrix_>(matrix_);
-	}
-
+	/// <summary>
+	/// <para> Retrieves a smaller matrix from within the passed matrix, which is formed of all elements excluding those in the provided row and column. </para>
+	/// <para> This will always yield a matrix of size [X-1, Y-1] when performed on a matrix of size [X, Y]. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output submatrix.</typeparam>
+	/// <typeparam name="Matrix_">Type of matrix to retrieve a submatrix from.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to retrieve the specified submatrix from.</param>
+	/// <returns>Copy of the submatrix within the passed EmuMath matrix, formed of all elements excluding those in the provided column or row indices.</returns>
 	template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_, typename out_contained_type, bool OutColumnMajor_, class Matrix_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<out_contained_type, OutColumnMajor_, Matrix_>::type MatrixExclusiveSubmatrix
-	(
-		Matrix_& matrix_
-	)
+	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<out_contained_type, OutColumnMajor_, Matrix_>::type
+		MatrixExclusiveSubmatrix
+		(
+			Matrix_& matrix_
+		)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
@@ -1442,12 +1441,12 @@ namespace EmuMath::Helpers
 					if constexpr (ExcludeRow_ < Matrix_::num_rows)
 					{
 						return _underlying_matrix_funcs::_get_submatrix_excluding_element_region
-						<
+							<
 							ExcludeColumn_,
 							ExcludeRow_,
 							typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<out_contained_type, OutColumnMajor_, Matrix_>::type,
 							Matrix_
-						>(matrix_);
+							>(matrix_);
 					}
 					else
 					{
@@ -1470,56 +1469,104 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_, typename out_contained_type, class Matrix_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<out_contained_type, Matrix_::is_column_major, Matrix_>::type MatrixExclusiveSubmatrix
-	(
-		Matrix_& matrix_
-	)
+	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<out_contained_type, Matrix_::is_column_major, Matrix_>::type
+		MatrixExclusiveSubmatrix
+		(
+			Matrix_& matrix_
+		)
 	{
 		return MatrixExclusiveSubmatrix<ExcludeColumn_, ExcludeRow_, out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 	template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_, typename out_contained_type, class Matrix_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<out_contained_type, Matrix_::is_column_major, Matrix_>::type MatrixExclusiveSubmatrix
-	(
-		const Matrix_& matrix_
-	)
+	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<out_contained_type, Matrix_::is_column_major, Matrix_>::type
+		MatrixExclusiveSubmatrix
+		(
+			const Matrix_& matrix_
+		)
 	{
 		return MatrixExclusiveSubmatrix<ExcludeColumn_, ExcludeRow_, out_contained_type, const Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 	template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_, bool OutColumnMajor_, class Matrix_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<typename Matrix_::value_type, OutColumnMajor_, Matrix_>::type MatrixExclusiveSubmatrix
-	(
-		Matrix_& matrix_
-	)
+	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<typename Matrix_::value_type, OutColumnMajor_, Matrix_>::type
+		MatrixExclusiveSubmatrix
+		(
+			Matrix_& matrix_
+		)
 	{
 		return MatrixExclusiveSubmatrix<ExcludeColumn_, ExcludeRow_, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
 	}
 	template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_, bool OutColumnMajor_, class Matrix_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<typename Matrix_::value_type, OutColumnMajor_, Matrix_>::type MatrixExclusiveSubmatrix
-	(
-		const Matrix_& matrix_
-	)
+	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<typename Matrix_::value_type, OutColumnMajor_, Matrix_>::type
+		MatrixExclusiveSubmatrix
+		(
+			const Matrix_& matrix_
+		)
 	{
 		return MatrixExclusiveSubmatrix<ExcludeColumn_, ExcludeRow_, typename Matrix_::value_type, OutColumnMajor_, const Matrix_>(matrix_);
 	}
 	template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_, class Matrix_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>::type MatrixExclusiveSubmatrix
-	(
-		Matrix_& matrix_
-	)
+	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>::type
+		MatrixExclusiveSubmatrix
+		(
+			Matrix_& matrix_
+		)
 	{
 		return MatrixExclusiveSubmatrix<ExcludeColumn_, ExcludeRow_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 	template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_, class Matrix_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>::type MatrixExclusiveSubmatrix
-	(
-		const Matrix_& matrix_
-	)
+	constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>::type
+		MatrixExclusiveSubmatrix
+		(
+			const Matrix_& matrix_
+		)
 	{
 		return MatrixExclusiveSubmatrix<ExcludeColumn_, ExcludeRow_, typename Matrix_::value_type, Matrix_::is_column_major, const Matrix_>(matrix_);
 	}
 
+	/// <summary>
+	/// <para> Calculates the determinant of the passed matrix using Laplace Expansion. </para>
+	/// <para> NOTE: Laplace Expansion grows exponentially more expensive as the size of a matrix increases. </para>
+	/// </summary>
+	/// <typeparam name="OutDet_">Type to output the passed matrix's determinant as.</typeparam>
+	/// <typeparam name="Matrix_">Type of matrix to calculate the determinant of.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to calculate the determinant of.</param>
+	/// <returns>Determinant of the passed EmuMath matrix, represented as the provided OutDet_ type.</returns>
+	template<typename OutDet_, class Matrix_>
+	constexpr inline OutDet_ MatrixDeterminantLaplace(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			if constexpr (Matrix_::is_square)
+			{
+				return _underlying_matrix_funcs::_calculate_matrix_determinant_laplace<OutDet_, Matrix_>(matrix_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to calculate the determinant of an EmuMath matrix that is not square. Only square matrices have a mathematically defined determinant.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to calculate a matrix's determinant, but a non-EmuMath-matrix argument was passed.");
+		}
+	}
+	template<class Matrix_>
+	constexpr inline typename Matrix_::preferred_floating_point MatrixDeterminantLaplace(const Matrix_& matrix_)
+	{
+		return MatrixDeterminantLaplace<typename Matrix_::preferred_floating_point, Matrix_>(matrix_);
+	}
+
+	/// <summary>
+	/// <para> Calculates the matrix of minors to the passed matrix using Laplace Expansion. </para>
+	/// <para> Each element in the output matrix may be summarised as the determinant of the submatrix which excludes said element's column and row. </para>
+	/// <para> NOTE: Laplace Expansion grows exponentially more expensive as the size of a matrix increases. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output minor matrix.</typeparam>
+	/// <typeparam name="Matrix_">Matrix to calculate the matrix of minors to.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to find the matrix of minors to.</param>
+	/// <returns>Matrix of minors to the passed EmuMath matrix.</returns>
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
-	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixOfMinors(const Matrix_& matrix_)
+	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixOfMinorsLaplace(const Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
@@ -1542,23 +1589,31 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<bool OutColumnMajor_, class Matrix_>
-	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixOfMinors(const Matrix_& matrix_)
+	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixOfMinorsLaplace(const Matrix_& matrix_)
 	{
-		return MatrixOfMinors<typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+		return MatrixOfMinorsLaplace<typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
 	}
 	template<typename out_contained_type, class Matrix_>
-	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixOfMinors(const Matrix_& matrix_)
+	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixOfMinorsLaplace(const Matrix_& matrix_)
 	{
-		return MatrixOfMinors<out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+		return MatrixOfMinorsLaplace<out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 	template<class Matrix_>
-	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixOfMinors(const Matrix_& matrix_)
+	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixOfMinorsLaplace(const Matrix_& matrix_)
 	{
-		return MatrixOfMinors<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+		return MatrixOfMinorsLaplace<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 
+	/// <summary>
+	/// <para> Calculates the matrix of cofactors to the passed matrix using Laplace Expansion. </para>
+	/// <para> NOTE: Laplace Expansion grows exponentially more expensive as the size of a matrix increases. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output cofactor matrix.</typeparam>
+	/// <typeparam name="Matrix_">Matrix to calculate the matrix of cofactors to.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to find the matrix of cofactors to.</param>
+	/// <returns>Matrix of cofactors to the passed EmuMath matrix.</returns>
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
-	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixOfCofactors(const Matrix_& matrix_)
+	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixOfCofactorsLaplace(const Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
@@ -1581,23 +1636,32 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<bool OutColumnMajor_, class Matrix_>
-	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixOfCofactors(const Matrix_& matrix_)
+	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixOfCofactorsLaplace(const Matrix_& matrix_)
 	{
-		return MatrixOfCofactors<typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+		return MatrixOfCofactorsLaplace<typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
 	}
 	template<typename out_contained_type, class Matrix_>
-	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixOfCofactors(const Matrix_& matrix_)
+	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixOfCofactorsLaplace(const Matrix_& matrix_)
 	{
-		return MatrixOfCofactors<out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+		return MatrixOfCofactorsLaplace<out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 	template<class Matrix_>
-	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixOfCofactors(const Matrix_& matrix_)
+	constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixOfCofactorsLaplace(const Matrix_& matrix_)
 	{
-		return MatrixOfCofactors<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+		return MatrixOfCofactorsLaplace<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 
+	/// <summary>
+	/// <para> Calculates the adjugate matrix to the passed matrix using Laplace Expansion. </para>
+	/// <para> This matrix can be summarised as the transpose to the passed matrix's matrix of cofactors. </para>
+	/// <para> NOTE: Laplace Expansion grows exponentially more expensive as the size of a matrix increases. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output adjugate matrix.</typeparam>
+	/// <typeparam name="Matrix_">Matrix to calculate the adjugate to.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to find the adjugate to.</param>
+	/// <returns>Adjugate matrix to the passed EmuMath matrix.</returns>
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, OutColumnMajor_, Matrix_>::type MatrixAdjugate(const Matrix_& matrix_)
+	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, OutColumnMajor_, Matrix_>::type MatrixAdjugateLaplace(const Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
@@ -1620,23 +1684,40 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<bool OutColumnMajor_, class Matrix_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::value_type, OutColumnMajor_, Matrix_>::type MatrixAdjugate(const Matrix_& matrix_)
+	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::value_type, OutColumnMajor_, Matrix_>::type MatrixAdjugateLaplace(const Matrix_& matrix_)
 	{
-		return MatrixAdjugate<typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+		return MatrixAdjugateLaplace<typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
 	}
 	template<typename out_contained_type, class Matrix_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, Matrix_::is_column_major, Matrix_>::type MatrixAdjugate(const Matrix_& matrix_)
+	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, Matrix_::is_column_major, Matrix_>::type MatrixAdjugateLaplace(const Matrix_& matrix_)
 	{
-		return MatrixAdjugate<out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+		return MatrixAdjugateLaplace<out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 	template<class Matrix_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>::type MatrixAdjugate(const Matrix_& matrix_)
+	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>::type MatrixAdjugateLaplace(const Matrix_& matrix_)
 	{
-		return MatrixAdjugate<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+		return MatrixAdjugateLaplace<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 
+	/// <summary>
+	/// <para> Calculates the inverse to the passed matrix using Laplace Expansion. May optionally output the matrix's determinant as a customisable type. </para>
+	/// <para>
+	///		Note that this operation does not check that the matrix's determinant is not 0. As matrices with a determinant of 0 have no inverse,
+	///		it is recommended to use the outDeterminant argument to test if the output matrix is valid if there is a chance that the passed matrix's determinant will be 0.
+	/// </para>
+	/// <para> NOTE: Laplace Expansion grows exponentially more expensive as the size of a matrix increases. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output inverse matrix.</typeparam>
+	/// <typeparam name="Matrix_">Type of matrix to find the inverse of.</typeparam>
+	/// <typeparam name="OutDeterminant_">Type to optionally output the matrix's determinant as.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to find the inverse of.</param>
+	/// <param name="outDeterminant_">
+	///		Optional reference to output the passed matrix's determinant to. 
+	///		Useful to test if the determinant is 0 in cases where a non-invertible matrix may potentially be passed.
+	/// </param>
+	/// <returns>Inverted version of this matrix if it is invertible. Otherwise, a matrix containing the results of multiplying by (1/0).</returns>
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_, typename OutDeterminant_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, OutColumnMajor_, Matrix_>::type MatrixInverse
+	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, OutColumnMajor_, Matrix_>::type MatrixInverseLaplace
 	(
 		const Matrix_& matrix_,
 		OutDeterminant_& outDeterminant_
@@ -1664,65 +1745,85 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<bool OutColumnMajor_, class Matrix_, typename OutDeterminant_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::value_type, OutColumnMajor_, Matrix_>::type MatrixInverse
+	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::value_type, OutColumnMajor_, Matrix_>::type MatrixInverseLaplace
 	(
 		const Matrix_& matrix_,
 		OutDeterminant_& outDeterminant_
 	)
 	{
-		return MatrixInverse<typename Matrix_::value_type, OutColumnMajor_, Matrix_, OutDeterminant_>(matrix_, outDeterminant_);
+		return MatrixInverseLaplace<typename Matrix_::value_type, OutColumnMajor_, Matrix_, OutDeterminant_>(matrix_, outDeterminant_);
 	}
 	template<typename out_contained_type, class Matrix_, typename OutDeterminant_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, Matrix_::is_column_major, Matrix_>::type MatrixInverse
+	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, Matrix_::is_column_major, Matrix_>::type MatrixInverseLaplace
 	(
 		const Matrix_& matrix_,
 		OutDeterminant_& outDeterminant_
 	)
 	{
-		return MatrixInverse<out_contained_type, Matrix_::is_column_major, Matrix_, OutDeterminant_>(matrix_, outDeterminant_);
+		return MatrixInverseLaplace<out_contained_type, Matrix_::is_column_major, Matrix_, OutDeterminant_>(matrix_, outDeterminant_);
 	}
 	template<class Matrix_, typename OutDeterminant_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>::type MatrixInverse
+	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>::type MatrixInverseLaplace
 	(
 		const Matrix_& matrix_,
 		OutDeterminant_& outDeterminant_
 	)
 	{
-		return MatrixInverse<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, OutDeterminant_>(matrix_, outDeterminant_);
+		return MatrixInverseLaplace<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, OutDeterminant_>(matrix_, outDeterminant_);
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, OutColumnMajor_, Matrix_>::type MatrixInverse
+	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, OutColumnMajor_, Matrix_>::type MatrixInverseLaplace
 	(
 		const Matrix_& matrix_
 	)
 	{
 		using dummy_output_type = float;
 		dummy_output_type reciprocal_dummy_output_ = 0.0f;
-		return MatrixInverse<out_contained_type, OutColumnMajor_, Matrix_, dummy_output_type>(matrix_, reciprocal_dummy_output_);
+		return MatrixInverseLaplace<out_contained_type, OutColumnMajor_, Matrix_, dummy_output_type>(matrix_, reciprocal_dummy_output_);
 	}
 	template<bool OutColumnMajor_, class Matrix_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::value_type, OutColumnMajor_, Matrix_>::type MatrixInverse
+	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::value_type, OutColumnMajor_, Matrix_>::type MatrixInverseLaplace
 	(
 		const Matrix_& matrix_
 	)
 	{
-		return MatrixInverse<typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+		return MatrixInverseLaplace<typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
 	}
 	template<typename out_contained_type, class Matrix_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, Matrix_::is_column_major, Matrix_>::type MatrixInverse
+	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, Matrix_::is_column_major, Matrix_>::type MatrixInverseLaplace
 	(
 		const Matrix_& matrix_
 	)
 	{
-		return MatrixInverse<out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+		return MatrixInverseLaplace<out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 	template<class Matrix_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>::type MatrixInverse
+	constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>::type MatrixInverseLaplace
 	(
 		const Matrix_& matrix_
 	)
 	{
-		return MatrixInverse<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+		return MatrixInverseLaplace<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+#pragma endregion
+
+#pragma region TRANSFORMATIONS
+	/// <summary>
+	/// <para> Creates a 4x4 transformation matrix which may be used to perform a translation of x_ in the X-dimension, y_ in the Y-dimension, and z_ in the Z-dimension. </para>
+	/// <para> x_, y_, and z_ may be any types, but they must be convertible to the output matrix's contained type (provided as the out_contained_type argument). </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained within the output matrix.</typeparam>
+	/// <typeparam name="X_">Type use for the argument representing the translation in the X-dimension.</typeparam>
+	/// <typeparam name="Y_">Type use for the argument representing the translation in the Y-dimension.</typeparam>
+	/// <typeparam name="Z_">Type use for the argument representing the translation in the Z-dimension.</typeparam>
+	/// <param name="x_">Distance to translate in the X-dimension.</param>
+	/// <param name="y_">Distance to translate in the Y-dimension.</param>
+	/// <param name="z_">Distance to translate in the Z-dimension.</param>
+	/// <returns>4x4 EmuMath matrix which may be used to perform a translation of the specified amounts in respective dimensions.</returns>
+	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename X_, typename Y_, typename Z_>
+	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixTranslation(const X_& x_, const Y_& y_, const Z_& z_)
+	{
+		return _underlying_matrix_funcs::_make_translation_matrix<EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>, X_, Y_, Z_>(x_, y_, z_);
 	}
 #pragma endregion
 }
