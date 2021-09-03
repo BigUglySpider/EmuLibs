@@ -289,9 +289,9 @@ int main()
 	constexpr auto point_ = EmuMath::Vector3<float>(1.0f, 2.0f, 3.0f);
 	constexpr auto point_as_column_vector_ = EmuMath::Helpers::VectorToColumnMatrix(EmuMath::Helpers::VectorPrepareToTransform(point_));
 	constexpr auto point_translation_ = EmuMath::Helpers::MatrixTranslation(10.0f, 20.0f, 30.0f);
-	constexpr auto point_translated_ = EmuMath::Helpers::MatrixMultiply(point_translation_, point_as_column_vector_);
+	constexpr auto point_translated_ = EmuMath::Helpers::MatrixMultiply(point_translation_, point_as_column_vector_).GetMajor<0>().As<3, float>();
 
-	std::cout << "Point: " << point_ << "\nTransformation Matrix:\n" << point_translation_ << "\nTransformed point: " << point_translated_.GetColumn<0>().As<3, float>() << "\n\n";
+	std::cout << "Point: " << point_ << "\nTransformation Matrix:\n" << point_translation_ << "\nTransformed point: " << point_translated_ << "\n\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
