@@ -345,22 +345,63 @@ namespace EmuCore
 		}
 	}
 
+	template<typename T_, std::size_t Power_>
+	struct do_pow
+	{
+		constexpr do_pow()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_)
+		{
+			return val_ * do_pow<T_, Power_ - 1>()(val_);
+		}
+	};
+	template<typename T_>
+	struct do_pow<T_, 1>
+	{
+		constexpr do_pow()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_)
+		{
+			// x^1 always == x
+			return val_;
+		}
+	};
+	template<typename T_>
+	struct do_pow<T_, 0>
+	{
+		constexpr do_pow()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_)
+		{
+			// x^0 always == 1
+			return T_(1);
+		}
+	};
+
 	struct Pi
 	{
 		Pi() = delete;
 
+		/// <summary> Approximation of pi represented as the provided type T. </summary>
 		template<typename T>
-		static constexpr T PI = T(3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148086513282306647093844);
+		static constexpr T PI = T(3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148086513282306647093844L);
+		/// <summary> Approximation of pi / 180, which may be used to convert degree units to radian units. </summary>
 		template<typename T>
 		static constexpr T PI_DIV_180 = PI<T> / T(180);
+		/// <summary> Approximation of 180 / pi, which may be used to convert radian units to degree units. </summary>
 		template<typename T>
 		static constexpr T HUNDRED80_DIV_PI = T(180) / PI<T>;
 		template<typename T>
 		static constexpr T SQRT_PI = EmuCore::SqrtConstexpr<T, T>(PI<T>);
+		template<typename T_, std::size_t Power_>
+		static constexpr T_ PI_POW = do_pow<T_, Power_>()(PI<T_>);
 		template<typename T>
-		static constexpr T PI_SQR = PI<T> *PI<T>;
+		static constexpr T PI_SQR = PI_POW<T, 2>;
 		template<typename T>
-		static constexpr T PI_CUBE = PI<T> *PI<T> *PI<T>;
+		static constexpr T PI_CUBE = PI_POW<T, 3>;
 
 		template<typename T>
 		static constexpr T RadsToDegs(const T rads_)
