@@ -252,7 +252,7 @@ int main()
 	std::cout << "SUBMAT SUBMAT<0, 0>:\n" << EmuMath::Helpers::MatrixExclusiveSubmatrix<0, 0>(wee_submat_) << "\n";
 	std::cout << "SUBMAT SUBMAT SUBMAT<1, 1>:\n" << EmuMath::Helpers::MatrixExclusiveSubmatrix<1, 1>(EmuMath::Helpers::MatrixExclusiveSubmatrix<0, 0, double>(wee_submat_)) << "\n";
 
-	std::cout << "\n" << wee << "\nDET: " << std::setprecision(100) << std::setw(25) << EmuMath::Helpers::MatrixDeterminantLaplace(wee) << "\n";
+	std::cout << "\n" << wee << "\nDET: " << EmuMath::Helpers::MatrixDeterminantLaplace(wee) << "\n";
 
 	constexpr auto some_mat_ = EmuMath::Matrix<4, 4, float, true>
 	(
@@ -267,6 +267,15 @@ int main()
 
 	constexpr auto some_2x2_ = EmuMath::Matrix<2, 2, float, true>(EmuMath::Vector2<float>(2.0f, 6.0f), EmuMath::Vector2<float>(-17.0f, 0.51f));
 	constexpr auto some_2x2_det_ = EmuMath::Helpers::MatrixDeterminantLaplace(some_2x2_);
+
+	std::cout << "\n\n" << some_2x2_ << "\nMINOR MATRIX:\n" << EmuMath::Helpers::MatrixOfMinors(some_2x2_) << "\n\n";
+	std::cout << "\n\n" << some_2x2_ << "\nCOFACTOR MATRIX:\n" << EmuMath::Helpers::MatrixOfCofactors(some_2x2_) << "\n\n";
+	std::cout << "\n\n" << some_2x2_ << "\nADJUGATE MATRIX:\n" << EmuMath::Helpers::MatrixAdjugate(some_2x2_) << "\n\n";
+	float test_det_output_ = 0.0f;
+	std::cout << "\n\n" << some_2x2_ << "\nINVERSE MATRIX:\n" << EmuMath::Helpers::MatrixInverse(some_2x2_, test_det_output_) << "\n\n";
+	std::cout << "\n\n" << some_2x2_ << "\nDETERMINANT: " << test_det_output_ << "\n\n";
+	std::cout << "\n\n" << some_2x2_ << "\nMULT INVERSE:\n" << EmuMath::Helpers::MatrixMultiply(some_2x2_, EmuMath::Helpers::MatrixInverse(some_2x2_, test_det_output_)) << "\n\n";
+	std::cout << "\n\n" << some_2x2_ << "\nMULT INVERSE:\n" << EmuMath::Helpers::MatrixMultiply(some_2x2_, EmuMath::Helpers::MatrixInverse(some_2x2_)) << "\n\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
