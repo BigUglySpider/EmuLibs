@@ -543,9 +543,11 @@ namespace EmuCore
 		}
 	};
 
-	template<typename T_>
+	template<typename T_, std::size_t NumIterations_ = 3>
 	struct do_sin_constexpr
 	{
+		static_assert(NumIterations_ != 0, "Attempted to create an EmuCore::do_sin_constexpr instance with 0 iterations. At least 1 iteration is required.");
+
 		using out_t = std::conditional_t
 		<
 			std::is_arithmetic_v<T_>,
@@ -555,7 +557,6 @@ namespace EmuCore
 		constexpr do_sin_constexpr() : add_(), sub_(), mul_(), div_()
 		{
 		}
-		template<std::size_t NumIterations_ = 3>
 		constexpr inline out_t operator()(T_ val_) const
 		{
 			if constexpr (std::is_same_v<T_, out_t>)
@@ -607,23 +608,25 @@ namespace EmuCore
 			}
 		}
 	};
-	template<>
-	struct do_sin_constexpr<void>
+	template<std::size_t NumIterations_>
+	struct do_sin_constexpr<void, NumIterations_>
 	{
 		constexpr do_sin_constexpr()
 		{
 		}
-		template<std::size_t NumIterations_, typename T_>
+		template<typename T_>
 		constexpr inline auto operator()(const T_& val_) const
 		{
-			return do_sin_constexpr<T_>().operator()<NumIterations_>(val_);
+			return do_sin_constexpr<T_, NumIterations_>()(val_);
 		}
 	};
 
-	template<typename T_>
+	template<typename T_, std::size_t NumIterations_ = 3>
 	struct do_cos_constexpr
 	{
 	public:
+		static_assert(NumIterations_ != 0, "Attempted to create an EmuCore::do_cos_constexpr instance with 0 iterations. At least 1 iteration is required.");
+
 		using out_t = std::conditional_t
 		<
 			std::is_arithmetic_v<T_>,
@@ -633,7 +636,6 @@ namespace EmuCore
 		constexpr do_cos_constexpr() : add_(), sub_(), mul_(), div_()
 		{
 		}
-		template<std::size_t NumIterations_ = 3>
 		constexpr inline out_t operator()(T_ val_)
 		{
 			if constexpr (std::is_same_v<T_, out_t>)
@@ -684,8 +686,8 @@ namespace EmuCore
 			}
 		}
 	};
-	template<>
-	struct do_cos_constexpr<void>
+	template<std::size_t NumIterations_>
+	struct do_cos_constexpr<void, NumIterations_>
 	{
 		constexpr do_cos_constexpr()
 		{
@@ -693,7 +695,7 @@ namespace EmuCore
 		template<std::size_t NumIterations_, typename T_>
 		constexpr inline auto operator()(const T_& val_) const
 		{
-			return do_cos_constexpr<T_>().operator()<NumIterations_>(val_);
+			return do_cos_constexpr<T_, NumIterations_>()(val_);
 		}
 	};
 }

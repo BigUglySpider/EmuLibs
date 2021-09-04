@@ -293,8 +293,8 @@ int main()
 
 	std::cout << "Point: " << point_ << "\nTransformation Matrix:\n" << point_translation_ << "\nTransformed point: " << point_translated_ << "\n\n";
 
-	constexpr auto sin_ = EmuCore::do_sin_constexpr<void>().operator()<5>(0.4014257);
-	constexpr auto cos_ = EmuCore::do_cos_constexpr<double>().operator()<55>(0.4014257);
+	constexpr auto sin_ = EmuCore::do_sin_constexpr<void, 5>()(0.4014257L);
+	constexpr auto cos_ = EmuCore::do_cos_constexpr<double>()(0.4014257);
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
