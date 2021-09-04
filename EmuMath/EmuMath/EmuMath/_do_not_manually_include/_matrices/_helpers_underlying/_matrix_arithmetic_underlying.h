@@ -1,7 +1,7 @@
 #ifndef EMU_MATH__UNDERLYING_MATRIX_ARITHMETIC_H_INC_
 #define EMU_MATH__UNDERLYING_MATRIX_ARITHMETIC_H_INC_ 1
 
-#include "_common_matrix_helper_includes.h"
+#include "_common_underlying_matrix_helper_includes.h"
 #include "_matrix_gets_underlying.h"
 #include "_matrix_index_conversions_underlying.h"
 #include "_matrix_sets_underlying.h"

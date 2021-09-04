@@ -116,7 +116,7 @@
     <ClInclude Include="EmuCore\TMPHelpers\Tuples.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_common_matrix_helper_includes.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_common_underlying_matrix_helper_includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_gets_underlying.h">

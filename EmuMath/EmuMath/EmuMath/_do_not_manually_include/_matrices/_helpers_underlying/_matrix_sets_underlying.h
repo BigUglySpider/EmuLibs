@@ -1,7 +1,7 @@
 #ifndef EMU_MATH__UNDERLYING_MATRIX_SETS_H_INC_
 #define EMU_MATH__UNDERLYING_MATRIX_SETS_H_INC_ 1
 
-#include "_common_matrix_helper_includes.h"
+#include "_common_underlying_matrix_helper_includes.h"
 
 namespace EmuMath::Helpers::_underlying_matrix_funcs
 {
