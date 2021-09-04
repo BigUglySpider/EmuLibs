@@ -317,6 +317,7 @@ int main()
 		<< "\nRotated Point: " << EmuMath::Helpers::MatrixMultiply(rot_x_runtime_, runtime_point_cm_).GetMajor<0>().As<3, float>() << "\n";
 
 
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();
