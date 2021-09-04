@@ -227,6 +227,32 @@ namespace EmuCore
 		}
 	}
 
+	template<std::size_t Val_, typename T_>
+	struct factorial
+	{
+		constexpr factorial()
+		{
+		}
+
+		static constexpr T_ value = static_cast<T_>(Val_) * factorial<Val_ - 1, T_>::value;
+		constexpr inline operator T_() const
+		{
+			return value;
+		}
+	};
+	template<typename T_>
+	struct factorial<1, T_>
+	{
+		static constexpr T_ value = static_cast<T_>(1);
+	};
+	template<typename T_>
+	struct factorial<0, T_>
+	{
+		static constexpr T_ value = T_();
+	};
+	template<std::size_t Val_, typename T_>
+	static constexpr T_ factorial_v = factorial<Val_, T_>::value;
+
 	template<typename FloatingPointOut_ = float, typename FloatingPointIn_>
 	FloatingPointOut_ DoMatchingStandardSqrt(const FloatingPointIn_ val_)
 	{

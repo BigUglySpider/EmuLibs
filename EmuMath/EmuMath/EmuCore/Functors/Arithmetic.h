@@ -2,6 +2,7 @@
 #define EMU_CORE_ARITHMETIC_FUNCTORS_H_INC_ 1
 
 #include "../ArithmeticHelpers/CommonMath.h"
+#include "../TMPHelpers/TypeComparators.h"
 #include <cstddef>
 #include <functional>
 
@@ -539,6 +540,160 @@ namespace EmuCore
 		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			return do_mod<Lhs_, Rhs_>()(lhs_, rhs_);
+		}
+	};
+
+	template<typename T_>
+	struct do_sin_constexpr
+	{
+		using out_t = std::conditional_t
+		<
+			std::is_arithmetic_v<T_>,
+			EmuCore::TMPHelpers::first_floating_point_t<T_, float>,
+			T_
+		>;
+		constexpr do_sin_constexpr() : add_(), sub_(), mul_(), div_()
+		{
+		}
+		template<std::size_t NumIterations_ = 3>
+		constexpr inline out_t operator()(T_ val_) const
+		{
+			if constexpr (std::is_same_v<T_, out_t>)
+			{
+				return _calculate_taylor_series<NumIterations_>(val_);
+			}
+			else
+			{
+				out_t val_as_out_t_ = static_cast<out_t>(val_);
+				return _calculate_taylor_series<NumIterations_>(val_as_out_t_);
+			}
+		}
+
+	private:
+		using Add_ = EmuCore::do_add<out_t, out_t>;
+		using Sub_ = EmuCore::do_subtract<out_t, out_t>;
+		using Mul_ = EmuCore::do_multiply<out_t, out_t>;
+		using Div_ = EmuCore::do_divide<out_t, out_t>;
+		Add_ add_;
+		Sub_ sub_;
+		Mul_ mul_;
+		Div_ div_;
+
+		template<std::size_t NumIterations_>
+		constexpr inline out_t _calculate_taylor_series(const out_t& in_) const
+		{
+			out_t out_ = in_;
+			out_t pow_ = in_;
+			out_t in_sqr_ = mul_(in_, in_);
+			_calculate_taylor_series<0, NumIterations_, 3>(in_sqr_, out_, pow_);
+			return out_;
+		}
+		template<std::size_t Iteration_, std::size_t End_, std::size_t PowExponent_>
+		constexpr inline void _calculate_taylor_series(const out_t& in_sqr_, out_t& out_, out_t& pow_) const
+		{
+			if constexpr (Iteration_ < End_)
+			{
+				pow_ = mul_(in_sqr_, pow_);
+				const out_t derivative_ = div_(pow_, EmuCore::factorial_v<PowExponent_, out_t>);
+				if constexpr (Iteration_ & 1)
+				{
+					out_ = add_(out_, derivative_);
+				}
+				else
+				{
+					out_ = sub_(out_, derivative_);
+				}
+				_calculate_taylor_series<Iteration_ + 1, End_, PowExponent_ + 2>(in_sqr_, out_, pow_);
+			}
+		}
+	};
+	template<>
+	struct do_sin_constexpr<void>
+	{
+		constexpr do_sin_constexpr()
+		{
+		}
+		template<std::size_t NumIterations_, typename T_>
+		constexpr inline auto operator()(const T_& val_) const
+		{
+			return do_sin_constexpr<T_>().operator()<NumIterations_>(val_);
+		}
+	};
+
+	template<typename T_>
+	struct do_cos_constexpr
+	{
+	public:
+		using out_t = std::conditional_t
+		<
+			std::is_arithmetic_v<T_>,
+			EmuCore::TMPHelpers::first_floating_point_t<T_, float>,
+			T_
+		>;
+		constexpr do_cos_constexpr() : add_(), sub_(), mul_(), div_()
+		{
+		}
+		template<std::size_t NumIterations_ = 3>
+		constexpr inline out_t operator()(T_ val_)
+		{
+			if constexpr (std::is_same_v<T_, out_t>)
+			{
+				return _calculate_taylor_series<NumIterations_>(val_);
+			}
+			else
+			{
+				out_t val_as_out_t_ = static_cast<out_t>(val_);
+				return _calculate_taylor_series<NumIterations_>(val_as_out_t_);
+			}
+		}
+	private:
+		using Add_ = EmuCore::do_add<out_t, out_t>;
+		using Sub_ = EmuCore::do_subtract<out_t, out_t>;
+		using Mul_ = EmuCore::do_multiply<out_t, out_t>;
+		using Div_ = EmuCore::do_divide<out_t, out_t>;
+		Add_ add_;
+		Sub_ sub_;
+		Mul_ mul_;
+		Div_ div_;
+
+		template<std::size_t NumIterations_>
+		constexpr inline out_t _calculate_taylor_series(const out_t& in_)
+		{
+			out_t out_ = out_t(1);
+			out_t pow_ = out_t(1);
+			out_t in_sqr_ = mul_(in_, in_);
+			_calculate_taylor_series<0, NumIterations_, 2>(in_sqr_, out_, pow_);
+			return out_;
+		}
+		template<std::size_t Iteration_, std::size_t End_, std::size_t PowExponent_>
+		constexpr inline void _calculate_taylor_series(const out_t& in_sqr_, out_t& out_, out_t& pow_) const
+		{
+			if constexpr (Iteration_ < End_)
+			{
+				pow_ = mul_(in_sqr_, pow_);
+				const out_t derivative_ = div_(pow_, EmuCore::factorial_v<PowExponent_, out_t>);
+				if constexpr (Iteration_ & 1)
+				{
+					out_ = add_(out_, derivative_);
+				}
+				else
+				{
+					out_ = sub_(out_, derivative_);
+				}
+				_calculate_taylor_series<Iteration_ + 1, End_, PowExponent_ + 2>(in_sqr_, out_, pow_);
+			}
+		}
+	};
+	template<>
+	struct do_cos_constexpr<void>
+	{
+		constexpr do_cos_constexpr()
+		{
+		}
+		template<std::size_t NumIterations_, typename T_>
+		constexpr inline auto operator()(const T_& val_) const
+		{
+			return do_cos_constexpr<T_>().operator()<NumIterations_>(val_);
 		}
 	};
 }
