@@ -293,8 +293,29 @@ int main()
 
 	std::cout << "Point: " << point_ << "\nTransformation Matrix:\n" << point_translation_ << "\nTransformed point: " << point_translated_ << "\n\n";
 
-	constexpr auto sin_ = EmuCore::do_sin_constexpr<void, 5>()(0.4014257L);
-	constexpr auto cos_ = EmuCore::do_cos_constexpr<double>()(0.4014257);
+	constexpr auto sin_ = EmuCore::do_sin_constexpr<void, 5>()(10.0f);
+	constexpr auto cos_ = EmuCore::do_cos_constexpr<double>()(10.0f);
+
+	constexpr auto rot_x_mat_ = EmuMath::Helpers::MatrixRotationXDegsConstexpr<10>(10.0f);
+	constexpr auto point_rotated_x = EmuMath::Helpers::MatrixMultiply(rot_x_mat_, point_as_column_vector_).GetMajor<0>().As<3, float>();
+	constexpr auto rot_x_det_ = EmuMath::Helpers::MatrixDeterminantLaplace(rot_x_mat_);
+
+	constexpr auto rot_y_mat_ = EmuMath::Helpers::MatrixRotationYDegsConstexpr<10>(10.0f);
+	constexpr auto point_rotated_y = EmuMath::Helpers::MatrixMultiply(rot_y_mat_, point_as_column_vector_).GetMajor<0>().As<3, float>();
+	constexpr auto rot_y_det_ = EmuMath::Helpers::MatrixDeterminantLaplace(rot_y_mat_);
+
+	constexpr auto rot_z_mat_ = EmuMath::Helpers::MatrixRotationZDegsConstexpr<10>(10.0f);
+	constexpr auto point_rotated_z = EmuMath::Helpers::MatrixMultiply(rot_z_mat_, point_as_column_vector_).GetMajor<0>().As<3, float>();
+	constexpr auto rot_z_det_ = EmuMath::Helpers::MatrixDeterminantLaplace(rot_z_mat_);
+
+	auto runtime_point = point_;
+	auto rot_x_runtime_ = EmuMath::Helpers::MatrixRotationXDegs(25.0f);
+	auto runtime_point_cm_ = EmuMath::Helpers::VectorToColumnMatrix(EmuMath::Helpers::VectorPrepareToTransform(point_));
+	std::cout
+		<< "Point: " << runtime_point
+		<< "\nMatrix:\n" << rot_x_runtime_
+		<< "\nRotated Point: " << EmuMath::Helpers::MatrixMultiply(rot_x_runtime_, runtime_point_cm_).GetMajor<0>().As<3, float>() << "\n";
+
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

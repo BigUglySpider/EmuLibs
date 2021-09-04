@@ -58,87 +58,81 @@ namespace EmuCore::TestingHelpers
 		}
 	};
 
-	struct NormalVectorNot
+	struct MatrixRotConstexprTest
 	{
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 5000000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr bool DO_TEST = true;
-		static constexpr std::string_view NAME = "Normal Vector NOT";
+		static constexpr std::string_view NAME = "Rotation Constexpr";
 
-		static constexpr std::size_t size = 4;
-		using contained_type = float;
-		using vector_type = EmuMath::Vector<size, contained_type>;
-		using out_type = vector_type;
-
-		NormalVectorNot()
+		MatrixRotConstexprTest()
 		{
 		}
 		void Prepare()
 		{
+			srand(5);
 			in_.resize(NUM_LOOPS);
 			out_.resize(NUM_LOOPS);
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				in_[i] = in_[i].Mutate(VectorFiller());
+				in_[i] = 0.99f * (rand() % 360);
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			out_[i] = ~in_[i];
+			out_[i] = EmuMath::Helpers::MatrixRotationXDegsConstexpr(in_[i]);
 		}
 		void OnTestsOver()
 		{
+			srand(7);
 			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
-			std::cout << "NOT(" << in_[i] << "): " << out_[i] << "\n";
+			std::cout << "ROTX(" << in_[i] << "):\n" << out_[i] << "\n";
 		}
 
-		std::vector<vector_type> in_;
-		std::vector<out_type> out_;
+		std::vector<float> in_;
+		std::vector<EmuMath::Matrix<4, 4, float, true>> out_;
 	};
-	struct FastVectorNot
+	struct MatrixRotTest
 	{
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 5000000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr bool DO_TEST = true;
-		static constexpr std::string_view NAME = "Fast Vector NOT";
+		static constexpr std::string_view NAME = "Rotation Normal";
 
-		using out_type = EmuMath::FastVector4f;
-
-		FastVectorNot()
+		MatrixRotTest()
 		{
 		}
 		void Prepare()
 		{
+			srand(5);
 			in_.resize(NUM_LOOPS);
 			out_.resize(NUM_LOOPS);
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				EmuMath::Vector4<float> data_ = EmuMath::Vector4<float>();
-				in_[i] = EmuMath::FastVector4f(data_.Mutate(VectorFiller()));
+				in_[i] = 0.99f * (rand() % 360);
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			out_[i] = ~in_[i];
+			out_[i] = EmuMath::Helpers::MatrixRotationXDegs(in_[i]);
 		}
 		void OnTestsOver()
 		{
+			srand(7);
 			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
-			std::cout << "NOT(" << in_[i] << "): " << out_[i] << "\n";
+			std::cout << "ROTX(" << in_[i] << "):\n" << out_[i] << "\n";
 		}
 
-		std::vector<EmuMath::FastVector4f> in_;
-		std::vector<out_type> out_;
+		std::vector<float> in_;
+		std::vector<EmuMath::Matrix<4, 4, float, true>> out_;
 	};
-
-	using SqrtTestFP = float;
 
 	using AllTests = std::tuple
 	<
-		NormalVectorNot,
-		FastVectorNot
+		MatrixRotConstexprTest,
+		MatrixRotTest
 	>;
 
 

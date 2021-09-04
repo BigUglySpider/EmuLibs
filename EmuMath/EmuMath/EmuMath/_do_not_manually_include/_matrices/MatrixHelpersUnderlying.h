@@ -763,6 +763,71 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		_translation_matrix_builder<OutMatrix_, Args_...>()(out_, args_...);
 		return out_;
 	}
+
+	template<class OutMatrix_, class Theta_, class CosCalculator_, class SinCalculator_>
+	constexpr inline OutMatrix_ _make_rotation_matrix_x(const Theta_& theta_)
+	{
+		using out_value = typename OutMatrix_::value_type;
+
+		OutMatrix_ out_ = OutMatrix_();
+		out_value cos_ = static_cast<out_value>(CosCalculator_()(theta_));
+		out_value sin_ = static_cast<out_value>(SinCalculator_()(theta_));
+		_get_matrix_data<1, 1>(out_) = cos_;
+		_get_matrix_data<2, 1>(out_) = sin_;
+		_get_matrix_data<1, 2>(out_) = EmuCore::do_negate<out_value>()(sin_);
+		_get_matrix_data<2, 2>(out_) = cos_;
+
+		// Set unfilled trace elements to 1 before returning.
+		const out_value one_ = out_value(1);
+		_get_matrix_data<0, 0>(out_) = one_;
+		if constexpr (OutMatrix_::num_columns >= 4 && OutMatrix_::num_rows >= 4)
+		{
+			_matrix_set_trace_region<3, OutMatrix_, out_value>(out_, one_);
+		}
+		return out_;
+	}
+	template<class OutMatrix_, class Theta_, class CosCalculator_, class SinCalculator_>
+	constexpr inline OutMatrix_ _make_rotation_matrix_y(const Theta_& theta_)
+	{
+		using out_value = typename OutMatrix_::value_type;
+
+		OutMatrix_ out_ = OutMatrix_();
+		out_value cos_ = static_cast<out_value>(CosCalculator_()(theta_));
+		out_value sin_ = static_cast<out_value>(SinCalculator_()(theta_));
+		_get_matrix_data<0, 0>(out_) = cos_;
+		_get_matrix_data<2, 0>(out_) = EmuCore::do_negate<out_value>()(sin_);
+		_get_matrix_data<0, 2>(out_) = sin_;
+		_get_matrix_data<2, 2>(out_) = cos_;
+
+		// Set unfilled trace elements to 1 before returning.
+		const out_value one_ = out_value(1);
+		_get_matrix_data<1, 1>(out_) = one_;
+		if constexpr (OutMatrix_::num_columns >= 4 && OutMatrix_::num_rows >= 4)
+		{
+			_matrix_set_trace_region<3, OutMatrix_, out_value>(out_, one_);
+		}
+		return out_;
+	}
+	template<class OutMatrix_, class Theta_, class CosCalculator_, class SinCalculator_>
+	constexpr inline OutMatrix_ _make_rotation_matrix_z(const Theta_& theta_)
+	{
+		using out_value = typename OutMatrix_::value_type;
+
+		OutMatrix_ out_ = OutMatrix_();
+		out_value cos_ = static_cast<out_value>(CosCalculator_()(theta_));
+		out_value sin_ = static_cast<out_value>(SinCalculator_()(theta_));
+		_get_matrix_data<0, 0>(out_) = cos_;
+		_get_matrix_data<1, 0>(out_) = EmuCore::do_negate<out_value>()(sin_);
+		_get_matrix_data<0, 1>(out_) = sin_;
+		_get_matrix_data<1, 1>(out_) = cos_;
+
+		// Set unfilled trace elements to 1 before returning.
+		if constexpr (OutMatrix_::num_columns >= 3 && OutMatrix_::num_rows >= 3)
+		{
+			_matrix_set_trace_region<2, OutMatrix_, out_value>(out_, out_value(1));
+		}
+		return out_;
+	}
 #pragma endregion
 }
 
