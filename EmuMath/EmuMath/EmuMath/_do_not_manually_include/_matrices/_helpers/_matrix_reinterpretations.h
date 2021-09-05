@@ -74,6 +74,7 @@ namespace EmuMath::Helpers
 	/// <summary>
 	/// <para> Creates an EmuMath vector one item larger than the passed vector, containing a copy of the passed vector_ in existing indices and 1 in the new index. </para>
 	/// <para> This process allows an X-dimensional vector to be transformed by an (X+1)x(X+1) transformation matrix. </para>
+	/// <para> Note that if the vector's dimension is equal to the square transformation matrix's dimension (e.g. 4D vector and 4x4 matrix), this is not required. </para>
 	/// </summary>
 	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 	/// <typeparam name="Vector_">Type of EmuMath vector to prepare for transformation.</typeparam>

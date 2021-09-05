@@ -142,6 +142,17 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 			return typename Matrix_::value_type();
 		}
 	}
+
+	template<std::size_t MajorIndex_, class Matrix_>
+	constexpr inline EmuMath::Vector<Matrix_::num_non_major_elements, typename Matrix_::contained_type>& _get_matrix_major(Matrix_& matrix_)
+	{
+		return matrix_.template GetMajor<MajorIndex_>();
+	}
+	template<std::size_t MajorIndex_, class Matrix_>
+	constexpr inline const EmuMath::Vector<Matrix_::num_non_major_elements, typename Matrix_::contained_type>& _get_matrix_major(const Matrix_& matrix_)
+	{
+		return matrix_.template GetMajor<MajorIndex_>();
+	}
 }
 
 #endif

@@ -2,6 +2,7 @@
 #define EMU_MATH_MATRIX_HELPERS_ARITHMETIC_H_INC_ 1
 
 #include "_common_matrix_helper_includes.h"
+#include "_matrix_reinterpretations.h"
 
 namespace EmuMath::Helpers
 {
@@ -624,11 +625,68 @@ namespace EmuMath::Helpers
 	}
 
 	/// <summary>
+	/// <para>
+	///		Returns a resulting EmuMath vector from a multiplication between the passed lhs_matrix_ and rhs_vector_, 
+	///		where rhs_vector_ is interpreted as a single-column matrix.
+	/// </para>
+	/// <para> The provided vector requires one of two specific sizes in order to be valid: </para>
+	/// <para> 1. Equal to the number of rows within the matrix. </para>
+	/// <para> 2. Equal to the number of rows within the matrix - 1. The non-contained element will be implicitly considered to be 1. </para>
+	/// <para> Condition 2. allows spatial transformation multiplications to be performed, such as transforming 3D vectors with a 4x4 transformation matrix. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
+	/// <typeparam name="LhsMatrix_">Type of matrix appearing on the left of multiplication.</typeparam>
+	/// <typeparam name="RhsVector_">Type of vector appearing on the right of multiplication.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left of multiplication.</param>
+	/// <param name="rhs_vector_">EmuMath vector appearing on the right of multiplication.</param>
+	/// <returns>
+	///		EmuMath vector of the passed vector's size containing the results of matrix multiplication, where rhs_vector_ is interpreted as a single-column matrix.
+	/// </returns>
+	template<typename out_contained_type, class LhsMatrix_, class RhsVector_>
+	constexpr inline EmuMath::Vector<RhsVector_::size, out_contained_type> MatrixMultiplyVector(const LhsMatrix_& lhs_matrix_, const RhsVector_& rhs_vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<RhsVector_>)
+			{
+				using RhsMatrix_ = EmuMath::Matrix<1, LhsMatrix_::num_rows, typename RhsVector_::value_type, true>;
+				if constexpr (RhsVector_::size == LhsMatrix_::num_rows)
+				{
+					RhsMatrix_ rhs_matrix_ = VectorToColumnMatrix<typename RhsVector_::value_type, true, RhsVector_>(rhs_vector_);
+					RhsMatrix_ result_ = _underlying_matrix_funcs::_matrix_std_multiply<RhsMatrix_, LhsMatrix_, RhsMatrix_>(lhs_matrix_, rhs_matrix_);
+					return _underlying_matrix_funcs::_get_matrix_major<0>(result_).template As<RhsVector_::size, out_contained_type>();
+				}
+				else if constexpr ((RhsVector_::size + 1) == LhsMatrix_::num_rows)
+				{
+					using rhs_value = typename RhsVector_::value_type;
+					using prepared_vector = EmuMath::Vector<RhsVector_::size + 1, rhs_value>;
+					RhsMatrix_ rhs_matrix_ = VectorToColumnMatrix<rhs_value, true, prepared_vector>(VectorPrepareToTransform<rhs_value, RhsVector_>(rhs_vector_));
+					RhsMatrix_ result_ = _underlying_matrix_funcs::_matrix_std_multiply<RhsMatrix_, LhsMatrix_, RhsMatrix_>(lhs_matrix_, rhs_matrix_);
+					return _underlying_matrix_funcs::_get_matrix_major<0>(result_).template As<RhsVector_::size, out_contained_type>();
+				}
+				else
+				{
+					static_assert(false, "Attempted to multiply a left-hand EmuMath matrix and right-hand EmuMath vector, but the provided vector is not a valid size. The vector must have a size equal to the matrix's number of rows, or the matrix's number of rows - 1, to be correctly reinterpreted as a single-column matrix.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to multiply a matrix and vector, but the provided rhs_matrix_ argument was not an EmuMath vector.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to multiply a matrix and vector, but the provided lhs_matrix_ argument was not an EmuMath matrix.");
+		}
+	}
+
+	/// <summary>
 	/// <para> Performs a multiplication operation on lhs_ using the passed rhs_. </para>
 	/// <para>
 	///		If the passed rhs_ is a matrix, the resulting matrix will be that of a standard matrix multiplication.
 	///		Otherwise, each index in the lhs_ matrix will be multiplied by rhs_.
 	/// </para>
+	/// <para> If rhs_ is an EmuMath vector, it will be interpreted as a single-column matrix. Refer to MatrixMultiplyVector for more information. </para>
 	/// <para> If rhs_ is a scalar, multiplications are performed using EmuCore::do_multiply&lt;LhsMatrix_::value_type, Rhs_ (or Rhs_::value_type if it is a matrix)&gt;. </para>
 	/// <para> NOTE: This is a standard matrix multiplication operation. To instead multiply respective matrix indices, use MatrixMultiplyBasic. </para>
 	/// </summary>
@@ -639,7 +697,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath matrix or scalar appearing on the right-hand side of multiplication.</param>
 	/// <returns>Matrix containing the results of performing multiplication on the lhs_ matrix by the provided rhs_.</returns>
 	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_multiplication_result<out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>::type MatrixMultiply
+	constexpr inline auto MatrixMultiply
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
@@ -649,12 +707,19 @@ namespace EmuMath::Helpers
 		{
 			if constexpr(!std::is_same_v<typename EmuMath::TMP::emu_matrix_multiplication_result<out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>::type, void>)
 			{
-				return _underlying_matrix_funcs::_matrix_std_multiply
-				<
-					typename EmuMath::TMP::emu_matrix_multiplication_result<out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>::type,
-					LhsMatrix_,
-					Rhs_
-				>(lhs_, rhs_);
+				if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
+				{
+					return MatrixMultiplyVector<out_contained_type, LhsMatrix_, Rhs_>(lhs_, rhs_);
+				}
+				else
+				{
+					return _underlying_matrix_funcs::_matrix_std_multiply
+					<
+						typename EmuMath::TMP::emu_matrix_multiplication_result<out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>::type,
+						LhsMatrix_,
+						Rhs_
+					>(lhs_, rhs_);
+				}
 			}
 			else
 			{
@@ -685,7 +750,7 @@ namespace EmuMath::Helpers
 		return MatrixMultiply<typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<class LhsMatrix_, class Rhs_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_multiplication_result<typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>::type MatrixMultiply
+	constexpr inline auto MatrixMultiply
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_

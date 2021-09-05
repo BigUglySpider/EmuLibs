@@ -121,6 +121,46 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 		return out_;
 	}
+
+	template<class Matrix_, class FirstArg_, class...RemainingArgs_>
+	struct _scale_matrix_builder
+	{
+		constexpr _scale_matrix_builder()
+		{
+		}
+		template<std::size_t Index_ = 0>
+		constexpr inline void operator()(Matrix_& out_, const FirstArg_& first_arg_, const RemainingArgs_&...remaining_args_) const
+		{
+			if constexpr (Index_ < Matrix_::num_columns)
+			{
+				_scale_matrix_builder<Matrix_, FirstArg_>().operator()<Index_>(out_, first_arg_);
+				_scale_matrix_builder<Matrix_, RemainingArgs_...>().operator()<Index_ + 1>(out_, remaining_args_...);
+			}
+		}
+	};
+	template<class Matrix_, class Arg_>
+	struct _scale_matrix_builder<Matrix_, Arg_>
+	{
+		constexpr _scale_matrix_builder()
+		{
+		}
+		template<std::size_t Index_ = 0>
+		constexpr inline void operator()(Matrix_& out_, const Arg_& arg_) const
+		{
+			if constexpr (Index_ < Matrix_::num_columns)
+			{
+				_get_matrix_data<Index_, Index_>(out_) = static_cast<typename Matrix_::value_type>(arg_);
+			}
+		}
+	};
+	template<class OutMatrix_, typename...Args_>
+	constexpr inline OutMatrix_ _make_scale_matrix(const Args_&...args_)
+	{
+		OutMatrix_ out_ = OutMatrix_();
+		_matrix_set_trace_region<0, OutMatrix_, typename OutMatrix_::value_type>(out_, typename OutMatrix_::value_type(1));
+		_scale_matrix_builder<OutMatrix_, Args_...>()(out_, args_...);
+		return out_;
+	}
 }
 
 #endif

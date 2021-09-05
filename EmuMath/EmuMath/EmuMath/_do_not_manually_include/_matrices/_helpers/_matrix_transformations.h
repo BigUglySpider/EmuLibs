@@ -208,6 +208,12 @@ namespace EmuMath::Helpers
 	{
 		return MatrixRotationZRads<out_contained_type, OutColumnMajor_, RotX_>(EmuCore::Pi::DegsToRads(rotation_x_degs_));
 	}
+
+	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename X_, typename Y_, typename Z_>
+	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixScale(const X_& x_, const Y_& y_, const Z_& z_)
+	{
+		return _underlying_matrix_funcs::_make_scale_matrix<EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>, X_, Y_, Z_>(x_, y_, z_);
+	}
 }
 
 #endif

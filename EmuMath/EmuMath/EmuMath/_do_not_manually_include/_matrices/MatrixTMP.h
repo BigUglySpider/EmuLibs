@@ -153,6 +153,46 @@ namespace EmuMath::TMP
 			void
 		>;
 	};
+	template
+	<
+		typename out_contained_type,
+		bool OutColumnMajor_,
+		std::size_t LhsNumColumns_,
+		std::size_t LhsNumRows_,
+		typename LhsT_,
+		bool LhsColumnMajor_,
+		typename rhs_contained_type
+	>
+	struct emu_matrix_multiplication_result
+	<
+		out_contained_type,
+		OutColumnMajor_,
+		EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>,
+		EmuMath::Vector<LhsNumRows_ - 1, rhs_contained_type>
+	>
+	{
+		using type = EmuMath::Vector<LhsNumRows_ - 1, out_contained_type>;
+	};
+	template
+	<
+		typename out_contained_type,
+		bool OutColumnMajor_,
+		std::size_t LhsNumColumns_,
+		std::size_t LhsNumRows_,
+		typename LhsT_,
+		bool LhsColumnMajor_,
+		typename rhs_contained_type
+	>
+	struct emu_matrix_multiplication_result
+	<
+		out_contained_type,
+		OutColumnMajor_,
+		EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>,
+		EmuMath::Vector<LhsNumRows_, rhs_contained_type>
+	>
+	{
+		using type = EmuMath::Vector<LhsNumRows_, out_contained_type>;
+	};
 	template<typename out_contained_type, bool OutColumnMajor_, class Lhs_, class Rhs_>
 	using emu_matrix_multiplication_result_t = typename emu_matrix_multiplication_result<out_contained_type, OutColumnMajor_, Lhs_, Rhs_>::type;
 

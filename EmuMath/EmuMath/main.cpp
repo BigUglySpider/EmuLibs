@@ -8,6 +8,7 @@
 #include <iomanip>
 
 #include "Tests.hpp"
+
 using namespace EmuCore::TestingHelpers;
 
 template<typename T_>
@@ -316,7 +317,17 @@ int main()
 		<< "\nMatrix:\n" << rot_x_runtime_
 		<< "\nRotated Point: " << EmuMath::Helpers::MatrixMultiply(rot_x_runtime_, runtime_point_cm_).GetMajor<0>().As<3, float>() << "\n";
 
+	constexpr auto scale_123_mat_ = EmuMath::Helpers::MatrixScale(1.0f, 2.0f, 3.0f);
+	std::cout << "Scale(1, 2, 3) Mat:\n" << scale_123_mat_ << "\n";
+	constexpr auto scaled_point_ = EmuMath::Helpers::MatrixMultiply(scale_123_mat_, point_as_column_vector_).GetMajor<0>().As<3, float>();
 
+	constexpr auto scale_123_mat_double_ = EmuMath::Helpers::MatrixScale<double>(1.0, 2.0, 3.0);
+	constexpr auto scaled_point_v2_ = EmuMath::Helpers::MatrixMultiply<float, true, EmuMath::Matrix<4, 4, double, true>, EmuMath::Vector<3, float>>(scale_123_mat_double_, point_);
+	constexpr auto scaled_point_v3_ = EmuMath::Helpers::MatrixMultiply(scale_123_mat_double_, point_);
+
+	//constexpr EmuMath::TMP::emu_matrix_multiplication_result<int, false, EmuMath::Matrix<4, 4, double, true>, EmuMath::Vector<3, float>>::type ree = scaled_point_v2_;
+
+	std::cout << "\n\n\n" << EmuMath::Helpers::MatrixMultiply(scale_123_mat_double_, point_) << "\n\n\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
