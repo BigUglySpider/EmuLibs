@@ -161,6 +161,74 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		_scale_matrix_builder<OutMatrix_, Args_...>()(out_, args_...);
 		return out_;
 	}
+
+	/// <summary> Calculates cofactor a from the provided near_ and far_ values, which will be the result of -(far / (far - near)). </summary>
+	/// <typeparam name="Near_">Type used to provide the near_ argument.</typeparam>
+	/// <typeparam name="Far_">Type used to provided the far_ argument.</typeparam>
+	/// <typeparam name="Out_">Type to output the cofactor as.</typeparam>
+	/// <param name="near_">Near value when creating the normalisation cofactor.</param>
+	/// <param name="far_">Far value when creating the normalisation cofactor.</param>
+	/// <returns>Result of -(far / (far - near)).</returns>
+	template<typename Near_, typename Far_, typename Out_>
+	constexpr inline Out_ _calculate_basic_perspective_near_far_cofactor_a(const Near_& near_, const Far_& far_)
+	{
+		auto far_sub_near = EmuCore::do_subtract<Far_, Near_>()(far_, near_);
+		auto out_ = EmuCore::do_divide<Far_, decltype(far_sub_near)>()(far_, far_sub_near);
+		return static_cast<Out_>(EmuCore::do_negate<decltype(out_)>()(out_));
+	}
+
+	/// <summary> Calculates cofactor b from the provided near_ and far_ values, which will be the result of -((far * near) / (far - near)). </summary>
+	/// <typeparam name="Near_">Type used to provide the near_ argument.</typeparam>
+	/// <typeparam name="Far_">Type used to provided the far_ argument.</typeparam>
+	/// <typeparam name="Out_">Type to output the cofactor as.</typeparam>
+	/// <param name="near_">Near value when creating the normalisation cofactor.</param>
+	/// <param name="far_">Far value when creating the normalisation cofactor.</param>
+	/// <returns>Result of -((f * n) / (f - n)).</returns>
+	template<typename Near_, typename Far_, typename Out_>
+	constexpr inline Out_ _calculate_basic_perspective_near_far_cofactor_b(const Near_& near_, const Far_& far_)
+	{
+		auto far_sub_near = EmuCore::do_subtract<Far_, Near_>()(far_, near_);
+		auto far_mult_near_ = EmuCore::do_multiply<Far_, Near_>()(far_, near_);
+		auto out_ = EmuCore::do_divide<decltype(far_mult_near_), decltype(far_sub_near)>()(far_mult_near_, far_sub_near);
+		return static_cast<Out_>(EmuCore::do_negate<decltype(out_)>()(out_));
+	}
+
+	/// <summary> Calculates the FOV scale for a perspective projection matrix with the provided FOV. </summary>
+	/// <typeparam name="Fov_">Type used to represent the passed FOV.</typeparam>
+	/// <typeparam name="Out_">Type to output the scale as.</typeparam>
+	/// <param name="fov_">FOV to use for the scale calculation, measured in radians.</param>
+	/// <returns>Result of 1 / tan((fov_ / 2)). </returns>
+	template<std::size_t NumIterations_, typename Fov_, typename Out_>
+	constexpr inline Out_ _calculate_basic_perspective_fov_scale_rads(const Fov_& fov_rads_)
+	{
+		using floating_point = EmuCore::TMPHelpers::first_floating_point_t<Fov_, Out_, float>;
+		constexpr floating_point one_ = floating_point(1);
+		constexpr floating_point half_ = floating_point(0.5);
+
+		using Mul_ = EmuCore::do_multiply<floating_point, floating_point>;
+		using Div_ = EmuCore::do_divide<floating_point, floating_point>;
+		using Tan_ = EmuCore::do_tan_constexpr<floating_point, NumIterations_>;
+
+		floating_point out_ = Mul_()(fov_rads_, half_);
+		out_ = Tan_()(out_);
+		return Div_()(one_, out_);
+	}
+
+	template<std::size_t NumIterations_, class Matrix_, typename Near_, typename Far_, typename Fov_>
+	constexpr inline Matrix_ _make_basic_perspective_projection_matrix_rads(const Near_& near_, const Far_& far_, const Fov_& fov_rads_)
+	{
+		using out_value = typename Matrix_::value_type;
+
+		Matrix_ out_ = Matrix_();
+		out_value scale_ = _calculate_basic_perspective_fov_scale_rads<NumIterations_, Fov_, out_value>(fov_rads_);
+		_get_matrix_data<0, 0>(out_) = scale_;
+		_get_matrix_data<1, 1>(out_) = scale_;
+		_get_matrix_data<2, 2>(out_) = _calculate_basic_perspective_near_far_cofactor_a<Near_, Far_, out_value>(near_, far_);
+		_get_matrix_data<3, 2>(out_) = _calculate_basic_perspective_near_far_cofactor_b<Near_, Far_, out_value>(near_, far_);
+		_get_matrix_data<2, 3>(out_) = out_value(-1);
+
+		return out_;
+	}
 }
 
 #endif

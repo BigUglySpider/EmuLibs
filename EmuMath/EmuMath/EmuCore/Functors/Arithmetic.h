@@ -542,8 +542,140 @@ namespace EmuCore
 			return do_mod<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
 	};
+	template<typename Rhs_>
+	struct do_mod<float, Rhs_>
+	{
+		constexpr do_mod()
+		{
+		}
+		constexpr inline auto operator()(const float& lhs_, const Rhs_& rhs_) const
+		{
+			return FmodConstexpr<float, Rhs_>(lhs_, rhs_);
+		}
+	};
+	template<typename Rhs_>
+	struct do_mod<double, Rhs_>
+	{
+		constexpr do_mod()
+		{
+		}
+		constexpr inline auto operator()(const double& lhs_, const Rhs_& rhs_) const
+		{
+			return FmodConstexpr<double, Rhs_>(lhs_, rhs_);
+		}
+	};
+	template<typename Rhs_>
+	struct do_mod<long double, Rhs_>
+	{
+		constexpr do_mod()
+		{
+		}
+		constexpr inline auto operator()(const long double& lhs_, const Rhs_& rhs_) const
+		{
+			return FmodConstexpr<long double, Rhs_>(lhs_, rhs_);
+		}
+	};
 
-	template<typename T_, std::size_t NumIterations_ = 3>
+	/// <summary>
+	/// <para> Functor to calculate cosine (radian units) at compile time using Taylor Series, using the specified number of iterations of said series to do so. </para>
+	/// <para>
+	///		DoMod_ is true by default, and will only have an effect on values greater than 6.28319. 
+	///		In cases where input ranges are unknown, it is recommended to keep it as true.
+	///		In cases where you know inputs will not exceed the provided range, it will do nothing and thus setting the argument to false will avoid a useless fmod operation.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="T_"></typeparam>
+	template<typename T_, std::size_t NumIterations_ = 3, bool DoMod_ = true>
+	struct do_cos_constexpr
+	{
+	public:
+		static_assert(NumIterations_ != 0, "Attempted to create an EmuCore::do_cos_constexpr instance with 0 iterations. At least 1 iteration is required.");
+
+		using out_t = std::conditional_t
+		<
+			std::is_arithmetic_v<T_>,
+			EmuCore::TMPHelpers::first_floating_point_t<T_, float>,
+			T_
+		>;
+		static constexpr out_t full_circle = EmuCore::Pi::DegsToRads_v<out_t, int, 360>;
+
+		constexpr do_cos_constexpr() : add_(), sub_(), mul_(), div_(), mod_()
+		{
+		}
+		constexpr inline out_t operator()(T_ val_) const
+		{
+			if constexpr (DoMod_)
+			{
+				out_t rounded_ = static_cast<out_t>(mod_(static_cast<out_t>(val_), full_circle));
+				return _calculate_taylor_series<NumIterations_>(rounded_);
+			}
+			else
+			{
+				if constexpr (std::is_same_v<T_, out_t>)
+				{
+					return _calculate_taylor_series<NumIterations_>(val_);
+				}
+				else
+				{
+					out_t val_as_out_t_ = static_cast<out_t>(val_);
+					return _calculate_taylor_series<NumIterations_>(val_as_out_t_);
+				}
+			}
+		}
+	private:
+		using Add_ = EmuCore::do_add<out_t, out_t>;
+		using Sub_ = EmuCore::do_subtract<out_t, out_t>;
+		using Mul_ = EmuCore::do_multiply<out_t, out_t>;
+		using Div_ = EmuCore::do_divide<out_t, out_t>;
+		using Mod_ = EmuCore::do_mod<out_t, out_t>;
+		Add_ add_;
+		Sub_ sub_;
+		Mul_ mul_;
+		Div_ div_;
+		Mod_ mod_;
+
+		template<std::size_t NumIterations_>
+		constexpr inline out_t _calculate_taylor_series(const out_t& in_) const
+		{
+			out_t out_ = out_t(1);
+			out_t pow_ = out_t(1);
+			out_t in_sqr_ = mul_(in_, in_);
+			_calculate_taylor_series<0, NumIterations_, 2>(in_sqr_, out_, pow_);
+			return out_;
+		}
+		template<std::size_t Iteration_, std::size_t End_, std::size_t PowExponent_>
+		constexpr inline void _calculate_taylor_series(const out_t& in_sqr_, out_t& out_, out_t& pow_) const
+		{
+			if constexpr (Iteration_ < End_)
+			{
+				pow_ = mul_(in_sqr_, pow_);
+				const out_t derivative_ = div_(pow_, EmuCore::factorial_v<PowExponent_, out_t>);
+				if constexpr (Iteration_ & 1)
+				{
+					out_ = add_(out_, derivative_);
+				}
+				else
+				{
+					out_ = sub_(out_, derivative_);
+				}
+				_calculate_taylor_series<Iteration_ + 1, End_, PowExponent_ + 2>(in_sqr_, out_, pow_);
+			}
+		}
+	};
+	template<std::size_t NumIterations_, bool DoMod_>
+	struct do_cos_constexpr<void, NumIterations_, DoMod_>
+	{
+		constexpr do_cos_constexpr()
+		{
+		}
+		template<bool DoMod_ = true, typename T_>
+		constexpr inline auto operator()(const T_& val_) const
+		{
+			return do_cos_constexpr<T_, NumIterations_, DoMod_>()(val_);
+		}
+	};
+
+	template<typename T_, std::size_t NumIterations_ = 3, bool DoMod_ = true>
 	struct do_sin_constexpr
 	{
 		static_assert(NumIterations_ != 0, "Attempted to create an EmuCore::do_sin_constexpr instance with 0 iterations. At least 1 iteration is required.");
@@ -554,19 +686,29 @@ namespace EmuCore
 			EmuCore::TMPHelpers::first_floating_point_t<T_, float>,
 			T_
 		>;
-		constexpr do_sin_constexpr() : add_(), sub_(), mul_(), div_()
+		static constexpr out_t full_circle = EmuCore::Pi::DegsToRads_v<out_t, int, 360>;
+
+		constexpr do_sin_constexpr() : add_(), sub_(), mul_(), div_(), mod_()
 		{
 		}
 		constexpr inline out_t operator()(T_ val_) const
 		{
-			if constexpr (std::is_same_v<T_, out_t>)
+			if constexpr (DoMod_)
 			{
-				return _calculate_taylor_series<NumIterations_>(val_);
+				out_t rounded_ = mod_(static_cast<out_t>(val_), full_circle);
+				return _calculate_taylor_series<NumIterations_>(rounded_);
 			}
 			else
 			{
-				out_t val_as_out_t_ = static_cast<out_t>(val_);
-				return _calculate_taylor_series<NumIterations_>(val_as_out_t_);
+				if constexpr (std::is_same_v<T_, out_t>)
+				{
+					return _calculate_taylor_series<NumIterations_>(val_);
+				}
+				else
+				{
+					out_t val_as_out_t_ = static_cast<out_t>(val_);
+					return _calculate_taylor_series<NumIterations_>(val_as_out_t_);
+				}
 			}
 		}
 
@@ -575,10 +717,12 @@ namespace EmuCore
 		using Sub_ = EmuCore::do_subtract<out_t, out_t>;
 		using Mul_ = EmuCore::do_multiply<out_t, out_t>;
 		using Div_ = EmuCore::do_divide<out_t, out_t>;
+		using Mod_ = EmuCore::do_mod<out_t, out_t>;
 		Add_ add_;
 		Sub_ sub_;
 		Mul_ mul_;
 		Div_ div_;
+		Mod_ mod_;
 
 		template<std::size_t NumIterations_>
 		constexpr inline out_t _calculate_taylor_series(const out_t& in_) const
@@ -608,8 +752,8 @@ namespace EmuCore
 			}
 		}
 	};
-	template<std::size_t NumIterations_>
-	struct do_sin_constexpr<void, NumIterations_>
+	template<std::size_t NumIterations_, bool DoMod_>
+	struct do_sin_constexpr<void, NumIterations_, DoMod_>
 	{
 		constexpr do_sin_constexpr()
 		{
@@ -617,15 +761,15 @@ namespace EmuCore
 		template<typename T_>
 		constexpr inline auto operator()(const T_& val_) const
 		{
-			return do_sin_constexpr<T_, NumIterations_>()(val_);
+			return do_sin_constexpr<T_, NumIterations_, DoMod_>()(val_);
 		}
 	};
 
 	template<typename T_, std::size_t NumIterations_ = 3>
-	struct do_cos_constexpr
+	struct do_tan_constexpr
 	{
 	public:
-		static_assert(NumIterations_ != 0, "Attempted to create an EmuCore::do_cos_constexpr instance with 0 iterations. At least 1 iteration is required.");
+		static_assert(NumIterations_ != 0, "Attempted to create an EmuCore::do_tan_constexpr instance with 0 iterations. At least 1 iteration is required.");
 
 		using out_t = std::conditional_t
 		<
@@ -633,69 +777,38 @@ namespace EmuCore
 			EmuCore::TMPHelpers::first_floating_point_t<T_, float>,
 			T_
 		>;
-		constexpr do_cos_constexpr() : add_(), sub_(), mul_(), div_()
-		{
-		}
-		constexpr inline out_t operator()(T_ val_)
-		{
-			if constexpr (std::is_same_v<T_, out_t>)
-			{
-				return _calculate_taylor_series<NumIterations_>(val_);
-			}
-			else
-			{
-				out_t val_as_out_t_ = static_cast<out_t>(val_);
-				return _calculate_taylor_series<NumIterations_>(val_as_out_t_);
-			}
-		}
-	private:
-		using Add_ = EmuCore::do_add<out_t, out_t>;
-		using Sub_ = EmuCore::do_subtract<out_t, out_t>;
-		using Mul_ = EmuCore::do_multiply<out_t, out_t>;
-		using Div_ = EmuCore::do_divide<out_t, out_t>;
-		Add_ add_;
-		Sub_ sub_;
-		Mul_ mul_;
-		Div_ div_;
 
-		template<std::size_t NumIterations_>
-		constexpr inline out_t _calculate_taylor_series(const out_t& in_)
+		constexpr do_tan_constexpr() : cos_(), sin_(), div_()
 		{
-			out_t out_ = out_t(1);
-			out_t pow_ = out_t(1);
-			out_t in_sqr_ = mul_(in_, in_);
-			_calculate_taylor_series<0, NumIterations_, 2>(in_sqr_, out_, pow_);
-			return out_;
 		}
-		template<std::size_t Iteration_, std::size_t End_, std::size_t PowExponent_>
-		constexpr inline void _calculate_taylor_series(const out_t& in_sqr_, out_t& out_, out_t& pow_) const
+		constexpr inline out_t operator()(const T_& val_) const
 		{
-			if constexpr (Iteration_ < End_)
-			{
-				pow_ = mul_(in_sqr_, pow_);
-				const out_t derivative_ = div_(pow_, EmuCore::factorial_v<PowExponent_, out_t>);
-				if constexpr (Iteration_ & 1)
-				{
-					out_ = add_(out_, derivative_);
-				}
-				else
-				{
-					out_ = sub_(out_, derivative_);
-				}
-				_calculate_taylor_series<Iteration_ + 1, End_, PowExponent_ + 2>(in_sqr_, out_, pow_);
-			}
+			cos_t cosine_ = cos_(val_);
+			sin_t sine_ = sin_(val_);
+			return static_cast<out_t>(div_(sine_, cosine_));
 		}
+
+	private:
+		using cos_calc = do_cos_constexpr<T_, NumIterations_>;
+		using sin_calc = do_sin_constexpr<T_, NumIterations_>;
+		using cos_t = typename cos_calc::out_t;
+		using sin_t = typename sin_calc::out_t;
+		using divider = do_divide<sin_t, cos_t>;
+
+		cos_calc cos_;
+		sin_calc sin_;
+		divider div_;
 	};
 	template<std::size_t NumIterations_>
-	struct do_cos_constexpr<void, NumIterations_>
+	struct do_tan_constexpr<void, NumIterations_>
 	{
-		constexpr do_cos_constexpr()
+		constexpr do_tan_constexpr()
 		{
 		}
-		template<std::size_t NumIterations_, typename T_>
+		template<typename T_>
 		constexpr inline auto operator()(const T_& val_) const
 		{
-			return do_cos_constexpr<T_, NumIterations_>()(val_);
+			return do_tan_constexpr<T_, NumIterations_>()(val_);
 		}
 	};
 }

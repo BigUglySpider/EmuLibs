@@ -214,6 +214,90 @@ namespace EmuMath::Helpers
 	{
 		return _underlying_matrix_funcs::_make_scale_matrix<EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>, X_, Y_, Z_>(x_, y_, z_);
 	}
+
+	/// <summary> Calculates near and far normalisation cofactors and ouputs them via the passed out_a_ and out_b_ references. </summary>
+	/// <typeparam name="Near_">Type used to provide the near_ argument.</typeparam>
+	/// <typeparam name="Far_">Type used to provided the far_ argument.</typeparam>
+	/// <typeparam name="OutA_">Type referenced for the output of out_a_.</typeparam>
+	/// <typeparam name="OutB_">Type referenced for the output of out_b_.</typeparam>
+	/// <param name="near_">Near value when creating the normalisation cofactors.</param>
+	/// <param name="far_">Far value when creating the normalisation cofactors.</param>
+	/// <param name="out_a_">Reference to output the first cofactor to be used via. Output will be the result of -(far / (far - near)).</param>
+	/// <param name="out_b_">Reference to output the second cofactor to be used via. Output will be the result of -((f * n) / (f - n)).</param>
+	template<typename Near_, typename Far_, typename OutA_, typename OutB_>
+	constexpr inline void MatrixBasicPerspectiveNearFarCofactors(const Near_& near_, const Far_& far_, OutA_& out_a_, OutB_& out_b_)
+	{
+		out_a_ = _underlying_matrix_funcs::_calculate_basic_perspective_near_far_cofactor_a<Near_, Far_, OutA_>(near_, far_);
+		out_b_ = _underlying_matrix_funcs::_calculate_basic_perspective_near_far_cofactor_b<Near_, Far_, OutB_>(near_, far_);
+	}
+
+	/// <summary> Calculates cofactor a from _calculate_near_far_normalise_values, which will be the result of -(far / (far - near)). </summary>
+	/// <typeparam name="Near_">Type used to provide the near_ argument.</typeparam>
+	/// <typeparam name="Far_">Type used to provided the far_ argument.</typeparam>
+	/// <typeparam name="Out_">Type to output the cofactor as.</typeparam>
+	/// <param name="near_">Near value when creating the normalisation cofactor.</param>
+	/// <param name="far_">Far value when creating the normalisation cofactor.</param>
+	/// <returns>Result of -(far / (far - near)).</returns>
+	template<typename Out_ = float, typename Near_, typename Far_>
+	constexpr inline Out_ MatrixBasicPerspectiveNearFarCofactorA(const Near_& near_, const Far_& far_)
+	{
+		return _underlying_matrix_funcs::_calculate_basic_perspective_near_far_cofactor_a<Near_, Far_, Out_>(near_, far_);
+	}
+
+	/// <summary> Calculates cofactor b from _calculate_near_far_normalise_values, which will be the result of -((far * near) / (far - near)). </summary>
+	/// <typeparam name="Near_">Type used to provide the near_ argument.</typeparam>
+	/// <typeparam name="Far_">Type used to provided the far_ argument.</typeparam>
+	/// <typeparam name="Out_">Type to output the cofactor as.</typeparam>
+	/// <param name="near_">Near value when creating the normalisation cofactor.</param>
+	/// <param name="far_">Far value when creating the normalisation cofactor.</param>
+	/// <returns>Result of -((f * n) / (f - n)).</returns>
+	template<typename Out_ = float, typename Near_, typename Far_>
+	constexpr inline Out_ MatrixBasicPerspectiveNearFarCofactorB(const Near_& near_, const Far_& far_)
+	{
+		return _underlying_matrix_funcs::_calculate_basic_perspective_near_far_cofactor_b<Near_, Far_, Out_>(near_, far_);
+	}
+
+	template<std::size_t NumIterations_ = 5, bool Rads_ = true, typename Out_ = float, typename Fov_>
+	constexpr inline Out_ MatrixBasicPerspectiveFovScale(const Fov_& fov_)
+	{
+		if constexpr (Rads_)
+		{
+			return _underlying_matrix_funcs::_calculate_basic_perspective_fov_scale_rads<NumIterations_, Fov_, Out_>(fov_);
+		}
+		else
+		{
+			auto rads_ = fov_ * EmuCore::Pi::PI_DIV_180<EmuCore::TMPHelpers::first_floating_point_t<Fov_, float>>;
+			return _underlying_matrix_funcs::_calculate_basic_perspective_fov_scale_rads<NumIterations_, decltype(rads_), Out_>(rads_);
+		}
+	}
+
+	template<std::size_t NumIterations_ = 5, bool RadsFov_ = true, typename out_contained_type = float, bool OutColumnMajor_ = true, typename Near_, typename Far_, typename Fov_>
+	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixBasicPerspective(const Near_& near_, const Far_& far_, const Fov_& fov_)
+	{
+		if constexpr (RadsFov_)
+		{
+			return _underlying_matrix_funcs::_make_basic_perspective_projection_matrix_rads
+			<
+				NumIterations_,
+				EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
+				Near_,
+				Far_,
+				Fov_
+			>(near_, far_, fov_); 
+		}
+		else
+		{
+			auto fov_rads_ = fov_ * EmuCore::Pi::PI_DIV_180<EmuCore::TMPHelpers::first_floating_point_t<Fov_, float>>;
+			return _underlying_matrix_funcs::_make_basic_perspective_projection_matrix_rads
+			<
+				NumIterations_,
+				EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
+				Near_,
+				Far_,
+				decltype(fov_rads_)
+			>(near_, far_, fov_rads_);
+		}
+	}
 }
 
 #endif

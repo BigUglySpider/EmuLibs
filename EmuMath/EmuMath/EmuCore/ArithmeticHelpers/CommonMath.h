@@ -407,6 +407,18 @@ namespace EmuCore
 		}
 	};
 
+	/// <summary> Variant of fmod which may be used to calculate floating-point modulo at compile time. </summary>
+	/// <typeparam name="Lhs_">Type of lhs argument. Should ideally be floating-point considering the use of this function.</typeparam>
+	/// <typeparam name="Rhs_">Type of rhs argument.</typeparam>
+	/// <param name="lhs_">Value to divide, acting as lhs_ in the expression lhs_ % rhs_. This should be a floating-point value due to the nature of this function.</param>
+	/// <param name="rhs_">Value to divide by, acting as rhs_ in the expression lhs_ % rhs_.</param>
+	/// <returns>Floating-point mod of the provided arguments, expressed as the type Lhs_.</returns>
+	template<typename Lhs_, typename Rhs_>
+	constexpr inline Lhs_ FmodConstexpr(const Lhs_& lhs_, const Rhs_& rhs_)
+	{
+		return static_cast<Lhs_>(lhs_ - (static_cast<std::int64_t>(lhs_ / rhs_) * rhs_));
+	}
+
 	struct Pi
 	{
 		Pi() = delete;

@@ -346,90 +346,39 @@ int main()
 
 	std::cout << "\n\n\n" << EmuMath::Helpers::MatrixMultiply(scale_123_mat_double_, point_) << "\n\n\n";
 
-	struct DummyListener
-	{
-		DummyListener() : DummyListener(0)
-		{
-		}
-		DummyListener(std::size_t val_) : internal_(val_)
-		{
-		}
+	constexpr auto cof_a_ = EmuMath::Helpers::MatrixBasicPerspectiveNearFarCofactorA<long double>(0.1f, 1.0f);
+	constexpr auto cof_b_ = EmuMath::Helpers::MatrixBasicPerspectiveNearFarCofactorB<long double>(0.1f, 1.0f);
 
-		inline void operator()()
-		{
-			std::cout << internal_ << "\n";
-		}
-		inline void operator()(std::size_t val_)
-		{
-			std::cout << val_ + internal_ << "\n";
-		}
-		inline void operator()(std::size_t val_0_, std::size_t val_1_) const
-		{
-			std::cout << (val_0_ / val_1_) + internal_ << " (using " << val_0_ << " / " << val_1_ << ")\n";
-		}
+	float cof_a_runtime_;
+	double cof_b_runtime_;
+	EmuMath::Helpers::MatrixBasicPerspectiveNearFarCofactors(0.1f, 1.0f, cof_a_runtime_, cof_b_runtime_);
+	std::cout << "\n\n";
+	std::cout << "Cofactor A: " << cof_a_runtime_ << "\n";
+	std::cout << "Cofactor B: " << cof_b_runtime_ << "\n";
 
-		std::size_t internal_;
-	};
+	constexpr auto tan_constexpr_ = EmuCore::do_tan_constexpr<float, 3>()(EmuCore::Pi::DegsToRads(30.0f));
+	std::cout << "\ntan_constexpr(30): " << tan_constexpr_ << "\ntanf(30): " << tanf(EmuCore::Pi::DegsToRads(30.0f)) << "\n";
 
-	EmuCore::Events::DefaultEvent<DummyListener> event_ = EmuCore::Events::DefaultEvent<DummyListener>();
-	event_.ConstructListener();
-	event_.ConstructListener();
-	event_.ConstructListener();
-	event_.ConstructListener();
-	event_.ConstructListener();
-	event_.ConstructListener();
-	event_.ConstructListener();
-	event_.ConstructListener(rand());
-	event_.Invoke();
+	constexpr auto sin_constexpr_ = EmuCore::do_sin_constexpr<float, 3>()(30.0f);
+	std::cout << "\nsin_constexpr(30): " << sin_constexpr_ << "\nsinf(30): " << sinf(30.0f) << "\n";
 
-	std::cout << "reeeeeee\n";
-	DummyListener dummy_0_ = DummyListener();
-	DummyListener dummy_1_ = DummyListener();
-	EmuCore::Events::DefaultEvent<DummyListener*, std::size_t> evnt_refs_;
-	evnt_refs_.AddListener(&dummy_0_);
-	evnt_refs_.ConstructListener<DummyListener*>(&dummy_1_);
-	evnt_refs_.Invoke(3);
-	std::cout << "---\n";
-	dummy_1_.internal_ = 1337;
-	evnt_refs_.Invoke(3);
-	std::cout << "---\n";
+	constexpr auto cos_constexpr_ = EmuCore::do_cos_constexpr<float, 5>()(30.0f);
+	std::cout << "\ncos_constexpr(30): " << cos_constexpr_ << "\ncosf(30): " << cosf(30.0f) << "\n";
 
-	const EmuCore::Events::DefaultEvent<DummyListener>& const_evnt_ref_ = event_;
+	constexpr float help_ = 30.0f;
+	constexpr float const_sin_ = EmuCore::do_sin_constexpr<float, 10>()(help_);
+	float sin___ = sinf(help_);
+	std::cout << "\nhelp_: " << const_sin_ << "\nstd__: " << sin___ << "\n\n";
 
+	constexpr auto ndjkisgndefi = 179 % 180;
 
-	EmuCore::Events::DefaultEvent<DummyListener, std::size_t, std::size_t> evnt_xy_;
-	evnt_xy_.ConstructListener();
-	evnt_xy_.ConstructListener(13);
-	evnt_xy_.Invoke(4, 3);
+	constexpr float bloobjgboirejhoie = 361.0f;
+	constexpr float djfgokd = EmuCore::do_cos_constexpr<float, 10, true>()(bloobjgboirejhoie);
+	float cos___ = cosf(bloobjgboirejhoie);
+	std::cout << "\nhelp_: " << djfgokd << "\nstd__: " << cos___ << "\n\n";
 
-
-
-	EmuCore::Events::DefaultEventStdFuncs<int> evnt_;
-	std::cout << "---\n";
-	evnt_.AddListener(_up);
-	evnt_.AddListener(_down);
-	evnt_.AddListener(_upf);
-	evnt_.Invoke(42);
-	std::cout << "---\n";
-	evnt_.RemoveListener(2);
-	evnt_.Invoke(42);
-	std::cout << "---\n";
-	evnt_.RemoveAllListeners();
-	evnt_.Invoke(42);
-	std::cout << "---\n";
-
-
-	EmuCore::Events::DefaultThreadSafeEventStdFuncs<int> thread_safe_evnt_;
-	thread_safe_evnt_.AddListener(_up);
-	thread_safe_evnt_.AddListener(_up);
-	thread_safe_evnt_.AddListener(_up);
-	thread_safe_evnt_.AddListener(_up);
-	thread_safe_evnt_.AddListener(_up);
-	thread_safe_evnt_.AddListener(_upf);
-	thread_safe_evnt_.AddListener(_down);
-	thread_safe_evnt_.Invoke(1337);
-	thread_safe_evnt_.Invoke(-7);
-	thread_safe_evnt_.Invoke(42);
+	constexpr auto basic_perspective_mat_ = EmuMath::Helpers::MatrixBasicPerspective<5, false>(0.01f, 1.0f, 45.0f);
+	std::cout << basic_perspective_mat_ << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
