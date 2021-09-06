@@ -382,6 +382,18 @@ int main()
 	event_.ConstructListener(rand());
 	event_.Invoke();
 
+	std::cout << "reeeeeee\n";
+	DummyListener dummy_0_ = DummyListener();
+	DummyListener dummy_1_ = DummyListener();
+	EmuCore::Events::DefaultEvent<DummyListener*, std::size_t> evnt_refs_;
+	evnt_refs_.AddListener(&dummy_0_);
+	evnt_refs_.ConstructListener<DummyListener*>(&dummy_1_);
+	evnt_refs_.Invoke(3);
+	std::cout << "---\n";
+	dummy_1_.internal_ = 1337;
+	evnt_refs_.Invoke(3);
+	std::cout << "---\n";
+
 	const EmuCore::Events::DefaultEvent<DummyListener>& const_evnt_ref_ = event_;
 
 
@@ -416,7 +428,8 @@ int main()
 	thread_safe_evnt_.AddListener(_upf);
 	thread_safe_evnt_.AddListener(_down);
 	thread_safe_evnt_.Invoke(1337);
-
+	thread_safe_evnt_.Invoke(-7);
+	thread_safe_evnt_.Invoke(42);
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

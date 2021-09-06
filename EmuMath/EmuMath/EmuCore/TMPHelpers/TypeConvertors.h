@@ -337,6 +337,17 @@ namespace EmuCore::TMPHelpers
 	{
 		using type = typename std::reference_wrapper<T_>::type;
 	};
+
+	template<class T_>
+	struct remove_all_pointers
+	{
+		using type = T_;
+	};
+	template<class T_>
+	struct remove_all_pointers<T_*>
+	{
+		using type = typename remove_all_pointers<std::remove_pointer_t<T_>>::type;
+	};
 }
 
 #endif

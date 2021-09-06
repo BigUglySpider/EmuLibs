@@ -29,9 +29,14 @@ namespace EmuCore::Events
 	class Event
 	{
 	public:
-		static_assert(std::is_invocable_v<Listener_, Args_...>, "Attempted to create an EmuCore Event with a listener type that cannot take the provided args.");
-		using id_type = std::size_t;
 		using listener_type = Listener_;
+		static_assert
+		(
+			Dispatcher_::template valid_invocation<Listener_, Args_...>(),
+			"Attempted to create an EmuCore Event with a listener type that cannot take the provided args using its underlying dispatcher."
+		);
+
+		using id_type = std::size_t;
 		using dispatcher_type = Dispatcher_;
 		using this_type = Event<listener_type, dispatcher_type>;
 
@@ -117,6 +122,7 @@ namespace EmuCore::Events
 			listeners.emplace(id_type(id_), listener_);
 			return id_;
 		}
+		template<typename = std::enable_if_t<!(std::is_const_v<listener_type> && std::is_reference_v<listener_type>)>>
 		inline id_type AddListener(const listener_type& listener_)
 		{
 			id_type id_ = _get_next_id();
