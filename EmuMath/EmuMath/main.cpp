@@ -9,6 +9,9 @@
 
 #include "Tests.hpp"
 
+#include "EmuCore/Events/Event.h"
+#include "EmuCore/Events/ThreadSafeEvent.h"
+
 using namespace EmuCore::TestingHelpers;
 
 template<typename T_>
@@ -70,6 +73,20 @@ void TestFunc(const EmuMath::Matrix<FirstX_, FirstY_, FirstType_, FirstColumnMaj
 {
 	TestFunc(first_);
 	TestFunc(matrices_...);
+}
+
+void _up(int val_)
+{
+	std::cout << val_ << "\n";
+}
+void _down(int val_)
+{
+	std::cout << -val_ << "\n";
+}
+float _upf(int val_)
+{
+	_up(val_);
+	return static_cast<float>(val_);
 }
 
 int main()
@@ -328,6 +345,78 @@ int main()
 	//constexpr EmuMath::TMP::emu_matrix_multiplication_result<int, false, EmuMath::Matrix<4, 4, double, true>, EmuMath::Vector<3, float>>::type ree = scaled_point_v2_;
 
 	std::cout << "\n\n\n" << EmuMath::Helpers::MatrixMultiply(scale_123_mat_double_, point_) << "\n\n\n";
+
+	struct DummyListener
+	{
+		DummyListener() : DummyListener(0)
+		{
+		}
+		DummyListener(std::size_t val_) : internal_(val_)
+		{
+		}
+
+		inline void operator()()
+		{
+			std::cout << internal_ << "\n";
+		}
+		inline void operator()(std::size_t val_)
+		{
+			std::cout << val_ + internal_ << "\n";
+		}
+		inline void operator()(std::size_t val_0_, std::size_t val_1_) const
+		{
+			std::cout << (val_0_ / val_1_) + internal_ << " (using " << val_0_ << " / " << val_1_ << ")\n";
+		}
+
+		std::size_t internal_;
+	};
+
+	EmuCore::Events::DefaultEvent<DummyListener> event_ = EmuCore::Events::DefaultEvent<DummyListener>();
+	event_.ConstructListener();
+	event_.ConstructListener();
+	event_.ConstructListener();
+	event_.ConstructListener();
+	event_.ConstructListener();
+	event_.ConstructListener();
+	event_.ConstructListener();
+	event_.ConstructListener(rand());
+	event_.Invoke();
+
+	const EmuCore::Events::DefaultEvent<DummyListener>& const_evnt_ref_ = event_;
+
+
+	EmuCore::Events::DefaultEvent<DummyListener, std::size_t, std::size_t> evnt_xy_;
+	evnt_xy_.ConstructListener();
+	evnt_xy_.ConstructListener(13);
+	evnt_xy_.Invoke(4, 3);
+
+
+
+	EmuCore::Events::DefaultEventStdFuncs<int> evnt_;
+	std::cout << "---\n";
+	evnt_.AddListener(_up);
+	evnt_.AddListener(_down);
+	evnt_.AddListener(_upf);
+	evnt_.Invoke(42);
+	std::cout << "---\n";
+	evnt_.RemoveListener(2);
+	evnt_.Invoke(42);
+	std::cout << "---\n";
+	evnt_.RemoveAllListeners();
+	evnt_.Invoke(42);
+	std::cout << "---\n";
+
+
+	EmuCore::Events::DefaultThreadSafeEventStdFuncs<int> thread_safe_evnt_;
+	thread_safe_evnt_.AddListener(_up);
+	thread_safe_evnt_.AddListener(_up);
+	thread_safe_evnt_.AddListener(_up);
+	thread_safe_evnt_.AddListener(_up);
+	thread_safe_evnt_.AddListener(_up);
+	thread_safe_evnt_.AddListener(_upf);
+	thread_safe_evnt_.AddListener(_down);
+	thread_safe_evnt_.Invoke(1337);
+
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
