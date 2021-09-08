@@ -89,6 +89,21 @@ float _upf(int val_)
 	return static_cast<float>(val_);
 }
 
+struct SomeStructForTestingEdges
+{
+	template<typename Fov_, typename Near_, typename AspectRatio_>
+	constexpr SomeStructForTestingEdges(const Fov_& in_fov_angle_y_, const Near_& in_near_, const AspectRatio_& in_aspect_ratio_) :
+		left_(0.0f), right_(0.0f), bottom_(0.0f), top_(0.0f)
+	{
+		EmuMath::Helpers::MatrixPerspectiveFrustumEdges<false>(in_fov_angle_y_, in_near_, in_aspect_ratio_, left_, right_, bottom_, top_);
+	}
+
+	float left_;
+	float right_;
+	float bottom_;
+	float top_;
+};
+
 int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
@@ -379,6 +394,28 @@ int main()
 
 	constexpr auto basic_perspective_mat_ = EmuMath::Helpers::MatrixBasicPerspective<5, false>(0.01f, 1.0f, 45.0f);
 	std::cout << basic_perspective_mat_ << "\n";
+
+	constexpr float fov_angle_y_ = 75.0f;
+	constexpr float near_ = 0.1f;
+	constexpr float far_ = 1000.0f;
+	constexpr float aspect_ratio_ = 1920.0f / 1080.0f;
+
+	constexpr auto scale_ = EmuMath::Helpers::MatrixPerspectiveScale<false, float, 5>(fov_angle_y_, near_);
+	constexpr auto edge_top_ = EmuMath::Helpers::MatrixPerspectiveFrustumEdgeTop<false>(fov_angle_y_, near_);
+	constexpr auto edge_bottom_ = EmuMath::Helpers::MatrixPerspectiveFrustumEdgeBottom<false>(fov_angle_y_, near_);
+	constexpr auto edge_right_ = EmuMath::Helpers::MatrixPerspectiveFrustumEdgeRight<false>(fov_angle_y_, near_, aspect_ratio_);
+	constexpr auto edge_left_ = EmuMath::Helpers::MatrixPerspectiveFrustumEdgeLeft<false>(fov_angle_y_, near_, aspect_ratio_);
+
+	constexpr SomeStructForTestingEdges test_struct_(fov_angle_y_, near_, aspect_ratio_);
+	constexpr auto struct_top_ = test_struct_.top_;
+	constexpr auto struct_bottom_ = test_struct_.bottom_;
+	constexpr auto struct_left_ = test_struct_.left_;
+	constexpr auto struct_right_ = test_struct_.right_;
+
+	constexpr auto full_perspective_mat_ = EmuMath::Helpers::MatrixPerspectiveWithFrustum<false>(fov_angle_y_, near_, far_, aspect_ratio_);
+	std::cout << "Perspective(FovY (degs): " << fov_angle_y_ << ", Near: " << near_ << ", Far: " << far_ << ", Aspect Ratio: " << aspect_ratio_ << "):\n";
+	std::cout << full_perspective_mat_ << "\n";
+	
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

@@ -298,6 +298,272 @@ namespace EmuMath::Helpers
 			>(near_, far_, fov_rads_);
 		}
 	}
+
+	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_>
+	constexpr inline Out_ MatrixPerspectiveScale(const FovY_& fov_angle_y_, const Near_& near_)
+	{
+		// Output type takes priority for calculation type; this way if less precision than input values, we can save time; if more precision, we can get better approximations
+		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<Out_, FovY_, Near_, float>;
+		if constexpr (FovYIsRads_)
+		{
+			return _underlying_matrix_funcs::_calculate_matrix_perspective_projection_scale_rads
+			<
+				Out_,
+				FovY_,
+				Near_,
+				calc_type,
+				EmuCore::do_tan_constexpr<calc_type, NumTanIterations_, DoTanMod_>
+			>(fov_angle_y_, near_);
+		}
+		else
+		{
+			return MatrixPerspectiveScale<true, Out_, NumTanIterations_, DoTanMod_, calc_type, Near_>
+			(
+				EmuCore::Pi::DegsToRads(static_cast<calc_type>(fov_angle_y_)),
+				near_
+			);
+		}
+	}
+
+	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_>
+	constexpr inline Out_ MatrixPerspectiveFrustumEdgeTop(const FovY_& fov_angle_y_, const Near_& near_)
+	{
+		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<Out_, FovY_, Near_, float>;
+		if constexpr (FovYIsRads_)
+		{
+			return _underlying_matrix_funcs::_calculate_matrix_perspective_edge_top_rads
+			<
+				Out_,
+				FovY_,
+				Near_,
+				calc_type,
+				EmuCore::do_tan_constexpr<calc_type, NumTanIterations_, DoTanMod_>
+			>(fov_angle_y_, near_);
+		}
+		else
+		{
+			return MatrixPerspectiveFrustumEdgeTop<true, Out_, NumTanIterations_, DoTanMod_, calc_type, Near_>
+			(
+				EmuCore::Pi::DegsToRads(static_cast<calc_type>(fov_angle_y_)),
+				near_
+			);
+		}
+	}
+
+	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_>
+	constexpr inline Out_ MatrixPerspectiveFrustumEdgeBottom(const FovY_& fov_angle_y_, const Near_& near_)
+	{
+		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<Out_, FovY_, Near_, float>;
+		if constexpr (FovYIsRads_)
+		{
+			return _underlying_matrix_funcs::_calculate_matrix_perspective_edge_bottom_rads
+			<
+				Out_,
+				FovY_,
+				Near_,
+				calc_type,
+				EmuCore::do_tan_constexpr<calc_type, NumTanIterations_, DoTanMod_>
+			>(fov_angle_y_, near_);
+		}
+		else
+		{
+			return MatrixPerspectiveFrustumEdgeBottom<true, Out_, NumTanIterations_, DoTanMod_, calc_type, Near_>
+			(
+				EmuCore::Pi::DegsToRads(static_cast<calc_type>(fov_angle_y_)),
+				near_
+			);
+		}
+	}
+
+	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_, typename AspectRatio_>
+	constexpr inline Out_ MatrixPerspectiveFrustumEdgeRight(const FovY_& fov_angle_y_, const Near_& near_, const AspectRatio_& aspect_ratio_)
+	{
+		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<Out_, FovY_, Near_, AspectRatio_, float>;
+		if constexpr (FovYIsRads_)
+		{
+			return _underlying_matrix_funcs::_calculate_matrix_perspective_edge_right_rads
+			<
+				Out_,
+				FovY_,
+				Near_,
+				AspectRatio_,
+				calc_type,
+				EmuCore::do_tan_constexpr<calc_type, NumTanIterations_, DoTanMod_>
+			>(fov_angle_y_, near_, aspect_ratio_);
+		}
+		else
+		{
+			return MatrixPerspectiveFrustumEdgeRight<true, Out_, NumTanIterations_, DoTanMod_, calc_type, Near_, AspectRatio_>
+			(
+				EmuCore::Pi::DegsToRads(static_cast<calc_type>(fov_angle_y_)),
+				near_,
+				aspect_ratio_
+			);
+		}
+	}
+
+	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_, typename AspectRatio_>
+	constexpr inline Out_ MatrixPerspectiveFrustumEdgeLeft(const FovY_& fov_angle_y_, const Near_& near_, const AspectRatio_& aspect_ratio_)
+	{
+		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<Out_, FovY_, Near_, AspectRatio_, float>;
+		if constexpr (FovYIsRads_)
+		{
+			return _underlying_matrix_funcs::_calculate_matrix_perspective_edge_left_rads
+			<
+				Out_,
+				FovY_,
+				Near_,
+				AspectRatio_,
+				calc_type,
+				EmuCore::do_tan_constexpr<calc_type, NumTanIterations_, DoTanMod_>
+			>(fov_angle_y_, near_, aspect_ratio_);
+		}
+		else
+		{
+			return MatrixPerspectiveFrustumEdgeLeft<true, Out_, NumTanIterations_, DoTanMod_, calc_type, Near_, AspectRatio_>
+			(
+				EmuCore::Pi::DegsToRads(static_cast<calc_type>(fov_angle_y_)),
+				near_,
+				aspect_ratio_
+			);
+		}
+	}
+
+	template
+	<
+		bool FovYIsRads_ = true,
+		std::size_t NumTanIterations_ = 5,
+		bool DoTanMod_ = true,
+		typename FovY_,
+		typename Near_,
+		typename AspectRatio_,
+		typename OutLeft_,
+		typename OutRight_,
+		typename OutBottom_,
+		typename OutTop_
+	>
+	constexpr inline void MatrixPerspectiveFrustumEdges
+	(
+		const FovY_& fov_angle_y_,
+		const Near_& near_,
+		const AspectRatio_& aspect_ratio_,
+		OutLeft_& out_left_,
+		OutRight_& out_right_,
+		OutBottom_& out_bottom_,
+		OutTop_& out_top_
+	)
+	{
+		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<FovY_, Near_, AspectRatio_, OutLeft_, OutRight_, OutBottom_, OutTop_, float>;
+		if constexpr (FovYIsRads_)
+		{
+			_underlying_matrix_funcs::_calculate_matrix_perspective_edges_rads
+			<
+				FovY_,
+				Near_,
+				AspectRatio_,
+				OutLeft_,
+				OutRight_,
+				OutBottom_,
+				OutTop_,
+				calc_type,
+				EmuCore::do_tan_constexpr<calc_type, NumTanIterations_, DoTanMod_>
+			>(fov_angle_y_, near_, aspect_ratio_, out_left_, out_right_, out_bottom_, out_top_);
+		}
+		else
+		{
+			MatrixPerspectiveFrustumEdges<true, NumTanIterations_, DoTanMod_, calc_type, Near_, AspectRatio_, OutLeft_, OutRight_, OutBottom_, OutTop_>
+			(
+				EmuCore::Pi::DegsToRads(static_cast<calc_type>(fov_angle_y_)),
+				near_,
+				aspect_ratio_,
+				out_left_,
+				out_right_,
+				out_bottom_,
+				out_top_
+			);
+		}
+	}
+
+	template
+	<
+		bool FovYIsRads_ = true,
+		typename out_contained_type = float,
+		bool OutColumnMajor_ = true,
+		std::size_t NumTanIterations_ = 5,
+		bool DoTanMod_ = true,
+		typename FovY_,
+		typename Near_,
+		typename Far_,
+		typename AspectRatio_
+	>
+	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixPerspectiveWithFrustum
+	(
+		const FovY_& fov_angle_y_,
+		const Near_& near_,
+		const Far_& far_,
+		const AspectRatio_& aspect_ratio_
+	)
+	{
+		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, FovY_, Near_, Far_, AspectRatio_, float>;
+		if constexpr (FovYIsRads_)
+		{
+			return _underlying_matrix_funcs::_make_perspective_matrix_with_frustum_rads
+			<
+				EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
+				FovY_,
+				Near_,
+				Far_,
+				AspectRatio_,
+				calc_type,
+				EmuCore::do_tan_constexpr<calc_type, NumTanIterations_, DoTanMod_>
+			>(fov_angle_y_, near_, far_, aspect_ratio_);
+		}
+		else
+		{
+			return MatrixPerspectiveWithFrustum<true, out_contained_type, OutColumnMajor_, NumTanIterations_, DoTanMod_, FovY_, Near_, Far_, AspectRatio_>
+			(
+				fov_angle_y_,
+				near_,
+				far_,
+				aspect_ratio_
+			);
+		}
+	}
+
+	template
+	<
+		typename out_contained_type = float,
+		bool OutColumnMajor_ = true,
+		typename Near_,
+		typename Far_,
+		typename Left_,
+		typename Right_,
+		typename Bottom_,
+		typename Top_
+	>
+	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixPerspectiveWithFrustum
+	(
+		const Near_& near_,
+		const Far_& far_,
+		const Left_& left_,
+		const Right_& right_,
+		const Bottom_& bottom_,
+		const Top_& top_
+	)
+	{
+		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, Near_, Far_, Left_, Right_, Bottom_, Top_, float>;
+		return _underlying_matrix_funcs::_make_perspective_matrix_with_frustum_rads
+		<
+			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
+			Near_,
+			Far_,
+			Left_,
+			Right_,
+			Bottom_,
+			Top_,
+			calc_type
+		>(near_, far_, left_, right_, bottom_, top_);
+	}
 }
 
 #endif

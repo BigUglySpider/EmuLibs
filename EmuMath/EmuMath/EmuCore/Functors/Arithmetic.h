@@ -765,7 +765,7 @@ namespace EmuCore
 		}
 	};
 
-	template<typename T_, std::size_t NumIterations_ = 3>
+	template<typename T_, std::size_t NumIterations_ = 3, bool DoMod_ = true>
 	struct do_tan_constexpr
 	{
 	public:
@@ -777,30 +777,45 @@ namespace EmuCore
 			EmuCore::TMPHelpers::first_floating_point_t<T_, float>,
 			T_
 		>;
+		static constexpr out_t full_circle = EmuCore::Pi::DegsToRads_v<out_t, int, 360>;
 
-		constexpr do_tan_constexpr() : cos_(), sin_(), div_()
+		constexpr do_tan_constexpr() : cos_(), sin_(), div_(), mod_()
 		{
 		}
 		constexpr inline out_t operator()(const T_& val_) const
 		{
-			cos_t cosine_ = cos_(val_);
-			sin_t sine_ = sin_(val_);
-			return static_cast<out_t>(div_(sine_, cosine_));
+			if constexpr (DoMod_)
+			{
+				out_t rounded_ = mod_(static_cast<out_t>(val_), full_circle);
+				cos_t cosine_ = cos_(val_);
+				sin_t sine_ = sin_(val_);
+				return static_cast<out_t>(div_(sine_, cosine_));
+			}
+			else
+			{
+				cos_t cosine_ = cos_(val_);
+				sin_t sine_ = sin_(val_);
+				return static_cast<out_t>(div_(sine_, cosine_));
+			}
 		}
 
 	private:
-		using cos_calc = do_cos_constexpr<T_, NumIterations_>;
-		using sin_calc = do_sin_constexpr<T_, NumIterations_>;
+		using cos_sin_passed_type = std::conditional_t<DoMod_, out_t, T_>;
+		using cos_calc = do_cos_constexpr<cos_sin_passed_type, NumIterations_, false>;
+		using sin_calc = do_sin_constexpr<cos_sin_passed_type, NumIterations_, false>;
 		using cos_t = typename cos_calc::out_t;
 		using sin_t = typename sin_calc::out_t;
 		using divider = do_divide<sin_t, cos_t>;
+		using modder = do_mod<out_t, out_t>;
 
 		cos_calc cos_;
 		sin_calc sin_;
 		divider div_;
+		modder mod_;
+
 	};
-	template<std::size_t NumIterations_>
-	struct do_tan_constexpr<void, NumIterations_>
+	template<std::size_t NumIterations_, bool DoMod_>
+	struct do_tan_constexpr<void, NumIterations_, DoMod_>
 	{
 		constexpr do_tan_constexpr()
 		{
@@ -808,7 +823,7 @@ namespace EmuCore
 		template<typename T_>
 		constexpr inline auto operator()(const T_& val_) const
 		{
-			return do_tan_constexpr<T_, NumIterations_>()(val_);
+			return do_tan_constexpr<T_, NumIterations_, DoMod_>()(val_);
 		}
 	};
 }
