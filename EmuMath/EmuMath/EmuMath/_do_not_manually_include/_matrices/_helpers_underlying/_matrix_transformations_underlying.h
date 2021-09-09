@@ -468,41 +468,6 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		);
 	}
 
-	template<class OutMatrix_, typename Width_, typename Height_, typename Near_, typename Far_, typename CalcType_>
-	constexpr inline OutMatrix_ _make_orthograhpic_projection_matrix_(const Width_& width_, const Height_& height_, const Near_& near_, const Far_& far_)
-	{
-		// Arithmetic Functors
-		using Add_ = EmuCore::do_add<CalcType_, CalcType_>;
-		using Sub_ = EmuCore::do_subtract<CalcType_, CalcType_>;
-		using Mul_ = EmuCore::do_multiply<CalcType_, CalcType_>;
-		using Div_ = EmuCore::do_divide<CalcType_, CalcType_>;
-		using Negate_ = EmuCore::do_negate<CalcType_>;
-		Add_ add_ = Add_();
-		Sub_ sub_ = Sub_();
-		Mul_ mul_ = Mul_();
-		Div_ div_ = Div_();
-		Negate_ negate_ = Negate_();
-
-		// Calculate common constants
-		CalcType_ near_calc_cast_ = static_cast<CalcType_>(near_);
-		CalcType_ far_calc_cast_ = static_cast<CalcType_>(far_);
-		CalcType_ one_ = CalcType_(1);
-		CalcType_ far_minus_near_reciprocal_neg_ = negate_(div_(one_, sub_(far_, near_)));
-
-		// Fill matrix
-		using out_value = typename OutMatrix_::value_type;
-		OutMatrix_ out_ = OutMatrix_();
-		// Column 0
-		_get_matrix_data<0, 0>(out_) = static_cast<out_value>(div_(one_, static_cast<CalcType_>(width_))); // 1/width
-		// Column 1
-		_get_matrix_data<1, 1>(out_) = static_cast<out_value>(div_(one_, static_cast<CalcType_>(height_))); // 1/height
-		// Column 2
-		_get_matrix_data<2, 2>(out_) = static_cast<out_value>(negate_(mul_(CalcType_(2), far_minus_near_reciprocal_neg_))); // -(2/(far-near))
-		// Column 3
-		_get_matrix_data<3, 2>(out_) = static_cast<out_value>(mul_(add_(far_calc_cast_, near_calc_cast_), far_minus_near_reciprocal_neg_)); // -((far+near)/(far-near))
-		_get_matrix_data<3, 3>(out_) = out_value(1);
-		return out_;
-	}
 	template<class OutMatrix_, typename Left_, typename Right_, typename Bottom_, typename Top_, typename Near_, typename Far_, typename CalcType_>
 	constexpr inline OutMatrix_ _make_orthograhpic_projection_matrix_
 	(
