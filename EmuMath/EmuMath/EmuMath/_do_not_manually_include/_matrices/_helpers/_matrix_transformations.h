@@ -557,6 +557,7 @@ namespace EmuMath::Helpers
 
 	/// <summary>
 	/// <para> Creates a full 4x4 perspective projection matrix, automatically calculating a frustum based on the provided fov_angle_y_ and aspect_ratio_. </para>
+	/// <para> The projection is created for an OpenGL clipping space. </para>
 	/// <para>
 	///		If a view angle or aspect ratio is unknown, but specific edges for a frustum are available, consider using the overload of this function taking 
 	///		near_, far_, left_, right_, bottom_, top_ arguments.
@@ -584,7 +585,7 @@ namespace EmuMath::Helpers
 		typename Far_,
 		typename AspectRatio_
 	>
-	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixPerspectiveWithFrustum
+	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixPerspectiveGL
 	(
 		const FovY_& fov_angle_y_,
 		const Near_& near_,
@@ -595,7 +596,7 @@ namespace EmuMath::Helpers
 		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, FovY_, Near_, Far_, AspectRatio_, float>;
 		if constexpr (FovYIsRads_)
 		{
-			return _underlying_matrix_funcs::_make_perspective_matrix_with_frustum_rads
+			return _underlying_matrix_funcs::_make_perspective_matrix_with_frustum_rads_gl
 			<
 				EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
 				FovY_,
@@ -608,7 +609,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			return MatrixPerspectiveWithFrustum<true, out_contained_type, OutColumnMajor_, NumTanIterations_, DoTanMod_, FovY_, Near_, Far_, AspectRatio_>
+			return MatrixPerspectiveGL<true, out_contained_type, OutColumnMajor_, NumTanIterations_, DoTanMod_, FovY_, Near_, Far_, AspectRatio_>
 			(
 				fov_angle_y_,
 				near_,
@@ -619,6 +620,7 @@ namespace EmuMath::Helpers
 	}
 	/// <summary>
 	/// <para> Creates a full 4x4 perspective projection matrix, using the provided left_, right_, bottom_, and top_ arguments as respective edges of a frustum. </para>
+	/// <para> The projection is created for an OpenGL clipping space. </para>
 	/// <para>
 	///		If edges of the frustum are not known, consider using the overload of this function taking fov_angle_y, near_, far_, aspect_ratio_ instead, 
 	///		which will automatically calculate a generic frustum.
@@ -650,7 +652,7 @@ namespace EmuMath::Helpers
 		typename Bottom_,
 		typename Top_
 	>
-	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixPerspectiveWithFrustum
+	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixPerspectiveGL
 	(
 		const Near_& near_,
 		const Far_& far_,
@@ -661,7 +663,128 @@ namespace EmuMath::Helpers
 	)
 	{
 		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, Near_, Far_, Left_, Right_, Bottom_, Top_, float>;
-		return _underlying_matrix_funcs::_make_perspective_matrix_with_frustum_rads
+		return _underlying_matrix_funcs::_make_perspective_matrix_with_frustum_rads_gl
+		<
+			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
+			Near_,
+			Far_,
+			Left_,
+			Right_,
+			Bottom_,
+			Top_,
+			calc_type
+		>(near_, far_, left_, right_, bottom_, top_);
+	}
+
+	/// <summary>
+	/// <para> Creates a full 4x4 perspective projection matrix, automatically calculating a frustum based on the provided fov_angle_y_ and aspect_ratio_. </para>
+	/// <para> The projection is created for a Vulkan clipping space. </para>
+	/// <para>
+	///		If a view angle or aspect ratio is unknown, but specific edges for a frustum are available, consider using the overload of this function taking 
+	///		near_, far_, left_, right_, bottom_, top_ arguments.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+	/// <typeparam name="FovY_">Type used to y-angle of the FOV.</typeparam>
+	/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>
+	/// <typeparam name="Far_">Type used to provide the far plane.</typeparam>
+	/// <typeparam name="AspectRatio_">Type used to provide the aspect ratio.</typeparam>
+	/// <param name="fov_angle_y_">Y-angle of the FOV for projections via the created matrix. This may be in radians or degrees, and by default is interpreted as radians.</param>
+	/// <param name="near_">Near plane for the perspective projection matrix.</param>
+	/// <param name="far_">Far plane for the perspective projection matrix.</param>
+	/// <param name="aspect_ratio_">Aspect ratio for projections via the created matrix. In general, this should be equal to target_width/target_height.</param>
+	/// <returns>4x4 EmuMath matrix formed as a perspective projection matrix via the provided arguments, with its frustum's edges automatically calculated.</returns>
+	template
+	<
+		bool FovYIsRads_ = true,
+		typename out_contained_type = float,
+		bool OutColumnMajor_ = true,
+		std::size_t NumTanIterations_ = 5,
+		bool DoTanMod_ = true,
+		typename FovY_,
+		typename Near_,
+		typename Far_,
+		typename AspectRatio_
+	>
+	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixPerspectiveVK
+	(
+		const FovY_& fov_angle_y_,
+		const Near_& near_,
+		const Far_& far_,
+		const AspectRatio_& aspect_ratio_
+	)
+	{
+		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, FovY_, Near_, Far_, AspectRatio_, float>;
+		if constexpr (FovYIsRads_)
+		{
+			return _underlying_matrix_funcs::_make_perspective_matrix_with_frustum_rads_vk
+			<
+				EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
+				FovY_,
+				Near_,
+				Far_,
+				AspectRatio_,
+				calc_type,
+				EmuCore::do_tan_constexpr<calc_type, NumTanIterations_, DoTanMod_>
+			>(fov_angle_y_, near_, far_, aspect_ratio_);
+		}
+		else
+		{
+			return MatrixPerspectiveGL<true, out_contained_type, OutColumnMajor_, NumTanIterations_, DoTanMod_, FovY_, Near_, Far_, AspectRatio_>
+			(
+				fov_angle_y_,
+				near_,
+				far_,
+				aspect_ratio_
+			);
+		}
+	}
+	/// <summary>
+	/// <para> Creates a full 4x4 perspective projection matrix, using the provided left_, right_, bottom_, and top_ arguments as respective edges of a frustum. </para>
+	/// <para> The projection is created for a Vulkan clipping space. </para>
+	/// <para>
+	///		If edges of the frustum are not known, consider using the overload of this function taking fov_angle_y, near_, far_, aspect_ratio_ instead, 
+	///		which will automatically calculate a generic frustum.
+	/// </para>
+	/// <para> Note that frustum edges are expected to be scalars; the axis the scalar represents is assumed based on the axis the edge would be aligned with. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+	/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>
+	/// <typeparam name="Far_">Type used to provide the far plane.</typeparam>
+	/// <typeparam name="Left_">Type used to provide the left edge of the frustum.</typeparam>
+	/// <typeparam name="Right_">Type used to provide the right edge of the frustum.</typeparam>
+	/// <typeparam name="Bottom_">Type used to provide the bottom edge of the frustum.</typeparam>
+	/// <typeparam name="Top_">Type used to provide the top edge of the frustum.</typeparam>
+	/// <param name="near_">Near plane for the perspective projection matrix.</param>
+	/// <param name="far_">Far plane for the perspective projection matrix.</param>
+	/// <param name="left_">Left edge of the frustum when determining the perspective projection matrix.</param>
+	/// <param name="right_">Right edge of the frustum when determining the perspective projection matrix.</param>
+	/// <param name="bottom_">Bottom edge of the frustum when determining the perspective projection matrix.</param>
+	/// <param name="top_">Top edge of the frustum when determining theperspective  projection matrix.</param>
+	/// <returns>4x4 EmuMath matrix formed as a perspective projection matrix via the provided arguments.</returns>
+	template
+	<
+		typename out_contained_type = float,
+		bool OutColumnMajor_ = true,
+		typename Near_,
+		typename Far_,
+		typename Left_,
+		typename Right_,
+		typename Bottom_,
+		typename Top_
+	>
+	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixPerspectiveVK
+	(
+		const Near_& near_,
+		const Far_& far_,
+		const Left_& left_,
+		const Right_& right_,
+		const Bottom_& bottom_,
+		const Top_& top_
+	)
+	{
+		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, Near_, Far_, Left_, Right_, Bottom_, Top_, float>;
+		return _underlying_matrix_funcs::_make_perspective_matrix_with_frustum_rads_vk
 		<
 			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
 			Near_,

@@ -59,6 +59,9 @@ namespace EmuCore::TestingHelpers
 		}
 	};
 
+	constexpr unsigned int shared_seed_ = 13333133;
+	constexpr unsigned int shared_seed_b_ = 6;
+
 	struct ProjMatEmu
 	{
 		static constexpr bool PASS_LOOP_NUM = true;
@@ -72,7 +75,7 @@ namespace EmuCore::TestingHelpers
 		}
 		void Prepare()
 		{
-			srand(7);
+			srand(shared_seed_);
 			near_.resize(NUM_LOOPS);
 			far_.resize(NUM_LOOPS);
 			fov_.resize(NUM_LOOPS);
@@ -88,11 +91,11 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i)
 		{
-			out_[i] = EmuMath::Helpers::MatrixPerspectiveWithFrustum<true, float, true, 10, true>(fov_[i], near_[i], far_[i], aspect_ratio_[i]);
+			out_[i] = EmuMath::Helpers::MatrixPerspectiveVK<true, float, true, 5, true>(fov_[i], near_[i], far_[i], aspect_ratio_[i]);
 		}
 		void OnTestsOver()
 		{
-			srand(7);
+			srand(shared_seed_b_);
 			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
 			std::cout << "Perspective(Near: " << near_[i] << ", Far: " << far_[i] << ", FOV: " << fov_[i] << ", Aspect Ratio: " << aspect_ratio_[i] << "):\n";
 			std::cout << out_[i] << "\n";
@@ -117,7 +120,7 @@ namespace EmuCore::TestingHelpers
 		}
 		void Prepare()
 		{
-			srand(7);
+			srand(shared_seed_);
 			near_.resize(NUM_LOOPS);
 			far_.resize(NUM_LOOPS);
 			fov_.resize(NUM_LOOPS);
@@ -133,12 +136,12 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i)
 		{
-			DirectX::XMMATRIX mat_ = DirectX::XMMatrixPerspectiveFovRH(fov_[i], aspect_ratio_[i], near_[i], far_[i]);
+			DirectX::XMMATRIX mat_ = DirectX::XMMatrixPerspectiveFovLH(fov_[i], aspect_ratio_[i], near_[i], far_[i]);
 			DirectX::XMStoreFloat4x4(&out_[i], mat_);
 		}
 		void OnTestsOver()
 		{
-			srand(7);
+			srand(shared_seed_b_);
 			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
 			std::cout << "Perspective(Near: " << near_[i] << ", Far: " << far_[i] << ", FOV: " << fov_[i] << ", Aspect Ratio: " << aspect_ratio_[i] << "):\n";
 			for (std::size_t x = 0; x < 4; ++x)

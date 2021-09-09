@@ -373,7 +373,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<class OutMatrix_, typename Near_, typename Far_, typename Left_, typename Right_, typename Bottom_, typename Top_, typename CalcType_>
-	constexpr inline OutMatrix_ _make_perspective_matrix_with_frustum_rads
+	constexpr inline OutMatrix_ _make_perspective_matrix_with_frustum_rads_gl
 	(
 		const Near_& near_,
 		const Far_& far_,
@@ -394,18 +394,18 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		Mul_ mul_ = Mul_();
 		Div_ div_ = Div_();
 		Negate_ negate_ = Negate_();
-
+		
 		// Calculate common constants to be used more than once throughout calculations
 		CalcType_ near_calc_cast_ = static_cast<CalcType_>(near_);
 		CalcType_ far_calc_cast_ = static_cast<CalcType_>(far_);
 		CalcType_ one_ = CalcType_(1);
 		CalcType_ two_ = CalcType_(2);
-
+		
 		CalcType_ right_minus_left_reciprocal_ = div_(one_, sub_(right_, left_));
 		CalcType_ top_minus_bottom_reciprocal_ = div_(one_, sub_(top_, bottom_));
 		CalcType_ double_near_ = mul_(near_calc_cast_, two_);
 		CalcType_ far_minus_near_reciprocal_neg = negate_(div_(one_, sub_(far_calc_cast_, near_calc_cast_)));
-
+		
 		// Fill the matrix
 		using out_value = typename OutMatrix_::value_type;
 		OutMatrix_ out_ = OutMatrix_();
@@ -434,7 +434,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		return out_;
 	}
 	template<class OutMatrix_, typename FovYRads_, typename Near_, typename Far_, typename AspectRatio_, typename CalcType_, class Tan_>
-	constexpr inline OutMatrix_ _make_perspective_matrix_with_frustum_rads
+	constexpr inline OutMatrix_ _make_perspective_matrix_with_frustum_rads_gl
 	(
 		const FovYRads_& fov_angle_y_rads_,
 		const Near_& near_,
@@ -457,7 +457,92 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 			bottom_,
 			top_
 		);
-		return _make_perspective_matrix_with_frustum_rads<OutMatrix_, Near_, Far_, CalcType_, CalcType_, CalcType_, CalcType_, CalcType_>
+		return _make_perspective_matrix_with_frustum_rads_gl<OutMatrix_, Near_, Far_, CalcType_, CalcType_, CalcType_, CalcType_, CalcType_>
+		(
+			near_,
+			far_,
+			left_,
+			right_,
+			bottom_,
+			top_
+		);
+	}
+
+	template<class OutMatrix_, typename Near_, typename Far_, typename Left_, typename Right_, typename Bottom_, typename Top_, typename CalcType_>
+	constexpr inline OutMatrix_ _make_perspective_matrix_with_frustum_rads_vk
+	(
+		const Near_& near_,
+		const Far_& far_,
+		const Left_& left_,
+		const Right_& right_,
+		const Bottom_& bottom_,
+		const Top_& top_
+	)
+	{
+		// Create arithmetic functors ready to call later on
+		using Add_ = EmuCore::do_add<CalcType_, CalcType_>;
+		using Sub_ = EmuCore::do_subtract<CalcType_, CalcType_>;
+		using Mul_ = EmuCore::do_multiply<CalcType_, CalcType_>;
+		using Div_ = EmuCore::do_divide<CalcType_, CalcType_>;
+		using Negate_ = EmuCore::do_negate<CalcType_>;
+		Add_ add_ = Add_();
+		Sub_ sub_ = Sub_();
+		Mul_ mul_ = Mul_();
+		Div_ div_ = Div_();
+		Negate_ negate_ = Negate_();
+		
+		// Calculate common constants to be used more than once throughout calculations
+		CalcType_ near_calc_cast_ = static_cast<CalcType_>(near_);
+		CalcType_ far_calc_cast_ = static_cast<CalcType_>(far_);
+		CalcType_ one_ = CalcType_(1);
+		CalcType_ two_ = CalcType_(2);
+		
+		CalcType_ right_minus_left_reciprocal_ = div_(one_, sub_(right_, left_));
+		CalcType_ top_minus_bottom_reciprocal_ = div_(one_, sub_(top_, bottom_));
+		CalcType_ double_near_ = mul_(near_calc_cast_, two_);
+		CalcType_ far_minus_near_reciprocal_neg = negate_(div_(one_, sub_(far_calc_cast_, near_calc_cast_)));
+		
+		// Fill the matrix
+		using out_value = typename OutMatrix_::value_type;
+		OutMatrix_ out_ = OutMatrix_();
+		// Column 0
+		_get_matrix_data<0, 0>(out_) = static_cast<out_value>(mul_(double_near_, right_minus_left_reciprocal_)); // (2*near)/(right-left)
+		// Columnn 1
+		_get_matrix_data<1, 1>(out_) = static_cast<out_value>(mul_(double_near_, top_minus_bottom_reciprocal_)); // (2*near)/(top-bottom)
+		// Column 2
+		_get_matrix_data<2, 0>(out_) = static_cast<out_value>(mul_(add_(right_, left_), right_minus_left_reciprocal_)); // (right+left)/(right-left)
+		_get_matrix_data<2, 1>(out_) = static_cast<out_value>(mul_(add_(top_, bottom_), top_minus_bottom_reciprocal_)); // (top+bottom)/(top-bottom)
+		_get_matrix_data<2, 2>(out_) = static_cast<out_value>(mul_(add_(far_calc_cast_, near_calc_cast_), far_minus_near_reciprocal_neg)); // -((far+near)/(far-near))
+		_get_matrix_data<2, 3>(out_) = out_value(-1);
+		// Column 3
+		_get_matrix_data<3, 2>(out_) = static_cast<out_value>(mul_(mul_(far_calc_cast_, near_calc_cast_), far_minus_near_reciprocal_neg)); // -((far*near)/(far-near))
+		return out_;
+	}
+	template<class OutMatrix_, typename FovYRads_, typename Near_, typename Far_, typename AspectRatio_, typename CalcType_, class Tan_>
+	constexpr inline OutMatrix_ _make_perspective_matrix_with_frustum_rads_vk
+	(
+		const FovYRads_& fov_angle_y_rads_,
+		const Near_& near_,
+		const Far_& far_,
+		const AspectRatio_& aspect_ratio_
+	)
+	{
+		// Calculate frustum edges
+		CalcType_ scale_ = _calculate_matrix_perspective_projection_scale_rads<CalcType_, FovYRads_, Near_, CalcType_, Tan_>(fov_angle_y_rads_, near_);
+		CalcType_ right_ = CalcType_();
+		CalcType_ left_ = CalcType_();
+		CalcType_ top_ = CalcType_();
+		CalcType_ bottom_ = CalcType_();
+		_calculate_matrix_perspective_edges_rads<AspectRatio_, CalcType_, CalcType_, CalcType_, CalcType_, CalcType_, CalcType_>
+		(
+			aspect_ratio_,
+			scale_,
+			left_,
+			right_,
+			bottom_,
+			top_
+		);
+		return _make_perspective_matrix_with_frustum_rads_vk<OutMatrix_, Near_, Far_, CalcType_, CalcType_, CalcType_, CalcType_, CalcType_>
 		(
 			near_,
 			far_,

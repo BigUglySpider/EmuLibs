@@ -416,7 +416,7 @@ int main()
 	constexpr auto struct_left_ = test_struct_.left_;
 	constexpr auto struct_right_ = test_struct_.right_;
 
-	constexpr auto full_perspective_mat_ = EmuMath::Helpers::MatrixPerspectiveWithFrustum<false>(fov_angle_y_, near_, far_, aspect_ratio_);
+	constexpr auto full_perspective_mat_ = EmuMath::Helpers::MatrixPerspectiveGL<false>(fov_angle_y_, near_, far_, aspect_ratio_);
 	std::cout << "Perspective(FovY (degs): " << fov_angle_y_ << ", Near: " << near_ << ", Far: " << far_ << ", Aspect Ratio: " << aspect_ratio_ << "):\n";
 	std::cout << full_perspective_mat_ << "\n";
 	
