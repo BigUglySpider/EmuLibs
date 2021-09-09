@@ -257,6 +257,11 @@ namespace EmuMath::Helpers
 		return _underlying_matrix_funcs::_calculate_basic_perspective_near_far_cofactor_b<Near_, Far_, Out_>(near_, far_);
 	}
 
+	/// <summary> Calculates the FOV scale used for a basic perspective projection matrix when generated with the provided fov_ angle. </summary>
+	/// <typeparam name="Out_">Type to output the scale as.</typeparam>
+	/// <typeparam name="Fov_">Type used to provide the FOV angle.</typeparam>
+	/// <param name="fov_">FOV angle for calculating the projection matrix. This may be either radians or degrees, and by default is interpreted as radians.</param>
+	/// <returns>Scalar scale used for creating a basic perspective projection matrix.</returns>
 	template<std::size_t NumIterations_ = 5, bool Rads_ = true, typename Out_ = float, typename Fov_>
 	constexpr inline Out_ MatrixBasicPerspectiveFovScale(const Fov_& fov_)
 	{
@@ -271,6 +276,18 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary>
+	/// <para> Creates a basic 4x4 perspective projection matrix which does not take a frustum into too much consideration. </para>
+	/// <para> In general, it may be more beneficial to use MatrixPerspectiveWithFrustum instead. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+	/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>
+	/// <typeparam name="Far_">Type used to provide the far plane.</typeparam>
+	/// <typeparam name="Fov_">Type used to provide the FOV angle.</typeparam>
+	/// <param name="near_">Near plane for calculating the projection matrix.</param>
+	/// <param name="far_">Far plane for calculating the projection matrix.</param>
+	/// <param name="fov_">FOV angle for calculating the projection matrix. This may be either radians or degrees, and by default is interpreted as radians.</param>
+	/// <returns>Basic perspective matrix using the provided arguments. It should be noted that an accurate frustum is not too heavily considered for the output.</returns>
 	template<std::size_t NumIterations_ = 5, bool RadsFov_ = true, typename out_contained_type = float, bool OutColumnMajor_ = true, typename Near_, typename Far_, typename Fov_>
 	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixBasicPerspective(const Near_& near_, const Far_& far_, const Fov_& fov_)
 	{
@@ -299,8 +316,15 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary> Calculates the scale used for determining automatic frustum edge values for a perspective projection matrix. </summary>
+	/// <typeparam name="Out_">Type to output the top edge as.</typeparam>
+	/// <typeparam name="FovY_">Type used to y-angle of the FOV.</typeparam>
+	/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>
+	/// <param name="fov_angle_y_">Y-angle of the FOV for projections. This may be in radians or degrees, and by default is interpreted as radians.</param>
+	/// <param name="near_">Near plane for a perspective projection matrix.</param>
+	/// <returns>Scalar scale used to automatically determine frustum edges for a perspective projection matrix.</returns>
 	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_>
-	constexpr inline Out_ MatrixPerspectiveScale(const FovY_& fov_angle_y_, const Near_& near_)
+	constexpr inline Out_ MatrixPerspectiveFrustumScale(const FovY_& fov_angle_y_, const Near_& near_)
 	{
 		// Output type takes priority for calculation type; this way if less precision than input values, we can save time; if more precision, we can get better approximations
 		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<Out_, FovY_, Near_, float>;
@@ -317,7 +341,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			return MatrixPerspectiveScale<true, Out_, NumTanIterations_, DoTanMod_, calc_type, Near_>
+			return MatrixPerspectiveFrustumScale<true, Out_, NumTanIterations_, DoTanMod_, calc_type, Near_>
 			(
 				EmuCore::Pi::DegsToRads(static_cast<calc_type>(fov_angle_y_)),
 				near_
@@ -325,6 +349,13 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary> Outputs the automatic frustum top edge for a perspective projection matrix when generated with the provided arguments. </summary>
+	/// <typeparam name="Out_">Type to output the top edge as.</typeparam>
+	/// <typeparam name="FovY_">Type used to y-angle of the FOV.</typeparam>
+	/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>
+	/// <param name="fov_angle_y_">Y-angle of the FOV for projections. This may be in radians or degrees, and by default is interpreted as radians.</param>
+	/// <param name="near_">Near plane for a perspective projection matrix.</param>
+	/// <returns>Top edge for a frustum automatically calculated with the provided arguments. This should be a scalar, which represents a Y-coordinate.</returns>
 	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_>
 	constexpr inline Out_ MatrixPerspectiveFrustumEdgeTop(const FovY_& fov_angle_y_, const Near_& near_)
 	{
@@ -350,6 +381,13 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary> Outputs the automatic frustum bottom edge for a perspective projection matrix when generated with the provided arguments. </summary>
+	/// <typeparam name="Out_">Type to output the bottom edge as.</typeparam>
+	/// <typeparam name="FovY_">Type used to y-angle of the FOV.</typeparam>
+	/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>
+	/// <param name="fov_angle_y_">Y-angle of the FOV for projections. This may be in radians or degrees, and by default is interpreted as radians.</param>
+	/// <param name="near_">Near plane for a perspective projection matrix.</param>
+	/// <returns>Bottom edge for a frustum automatically calculated with the provided arguments. This should be a scalar, which represents a Y-coordinate.</returns>
 	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_>
 	constexpr inline Out_ MatrixPerspectiveFrustumEdgeBottom(const FovY_& fov_angle_y_, const Near_& near_)
 	{
@@ -375,6 +413,15 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary> Outputs the automatic frustum right edge for a perspective projection matrix when generated with the provided arguments. </summary>
+	/// <typeparam name="Out_">Type to output the right edge as.</typeparam>
+	/// <typeparam name="FovY_">Type used to y-angle of the FOV.</typeparam>
+	/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>
+	/// <typeparam name="AspectRatio_">Type used to provide the aspect ratio.</typeparam>
+	/// <param name="fov_angle_y_">Y-angle of the FOV for projections. This may be in radians or degrees, and by default is interpreted as radians.</param>
+	/// <param name="near_">Near plane for a perspective projection matrix.</param>
+	/// <param name="aspect_ratio_">Aspect ratio for projections. In general, this should be equal to target_width/target_height.</param>
+	/// <returns>Right edge for a frustum automatically calculated with the provided arguments. This should be a scalar, which represents an X-coordinate.</returns>
 	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_, typename AspectRatio_>
 	constexpr inline Out_ MatrixPerspectiveFrustumEdgeRight(const FovY_& fov_angle_y_, const Near_& near_, const AspectRatio_& aspect_ratio_)
 	{
@@ -402,6 +449,15 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary> Outputs the automatic frustum left edge for a perspective projection matrix when generated with the provided arguments. </summary>
+	/// <typeparam name="Out_">Type to output the left edge as.</typeparam>
+	/// <typeparam name="FovY_">Type used to y-angle of the FOV.</typeparam>
+	/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>
+	/// <typeparam name="AspectRatio_">Type used to provide the aspect ratio.</typeparam>
+	/// <param name="fov_angle_y_">Y-angle of the FOV for projections. This may be in radians or degrees, and by default is interpreted as radians.</param>
+	/// <param name="near_">Near plane for a perspective projection matrix.</param>
+	/// <param name="aspect_ratio_">Aspect ratio for projections. In general, this should be equal to target_width/target_height.</param>
+	/// <returns>Left edge for a frustum automatically calculated with the provided arguments. This should be a scalar, which represents an X-coordinate.</returns>
 	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_, typename AspectRatio_>
 	constexpr inline Out_ MatrixPerspectiveFrustumEdgeLeft(const FovY_& fov_angle_y_, const Near_& near_, const AspectRatio_& aspect_ratio_)
 	{
@@ -429,6 +485,21 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary> Outputs the automatic frustum edges for a perspective projection matrix when generated with the provided arguments. </summary>
+	/// <typeparam name="FovY_">Type used to y-angle of the FOV.</typeparam>
+	/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>
+	/// <typeparam name="AspectRatio_">Type used to provide the aspect ratio.</typeparam>
+	/// <typeparam name="OutLeft_">Type to output the left edge as.</typeparam>
+	/// <typeparam name="OutRight_">Type to output the right edge as.</typeparam>
+	/// <typeparam name="OutBottom_">Type to output the bottom edge as.</typeparam>
+	/// <typeparam name="OutTop_">Type to output the left top as.</typeparam>
+	/// <param name="fov_angle_y_">Y-angle of the FOV for projections. This may be in radians or degrees, and by default is interpreted as radians.</param>
+	/// <param name="near_">Near plane for a perspective projection matrix.</param>
+	/// <param name="aspect_ratio_">Aspect ratio for projections. In general, this should be equal to target_width/target_height.</param>
+	/// <param name="out_left_">Reference to output the frustum's left edge to. This is expected to be a scalar with an inferred axis based on the edge's alignment.</param>
+	/// <param name="out_right_">Reference to output the frustum's right edge to. This is expected to be a scalar with an inferred axis based on the edge's alignment.</param>
+	/// <param name="out_bottom_">Reference to output the frustum's bottom edge to. This is expected to be a scalar with an inferred axis based on the edge's alignment.</param>
+	/// <param name="out_top_">Reference to output the frustum's top edge to. This is expected to be a scalar with an inferred axis based on the edge's alignment.</param>
 	template
 	<
 		bool FovYIsRads_ = true,
@@ -484,6 +555,23 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary>
+	/// <para> Creates a full 4x4 perspective projection matrix, automatically calculating a frustum based on the provided fov_angle_y_ and aspect_ratio_. </para>
+	/// <para>
+	///		If a view angle or aspect ratio is unknown, but specific edges for a frustum are available, consider using the overload of this function taking 
+	///		near_, far_, left_, right_, bottom_, top_ arguments.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+	/// <typeparam name="FovY_">Type used to y-angle of the FOV.</typeparam>
+	/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>
+	/// <typeparam name="Far_">Type used to provide the far plane.</typeparam>
+	/// <typeparam name="AspectRatio_">Type used to provide the aspect ratio.</typeparam>
+	/// <param name="fov_angle_y_">Y-angle of the FOV for projections via the created matrix. This may be in radians or degrees, and by default is interpreted as radians.</param>
+	/// <param name="near_">Near plane for the perspective projection matrix.</param>
+	/// <param name="far_">Far plane for the perspective projection matrix.</param>
+	/// <param name="aspect_ratio_">Aspect ratio for projections via the created matrix. In general, this should be equal to target_width/target_height.</param>
+	/// <returns>4x4 EmuMath matrix formed as a perspective projection matrix via the provided arguments, with its frustum's edges automatically calculated.</returns>
 	template
 	<
 		bool FovYIsRads_ = true,
@@ -529,7 +617,28 @@ namespace EmuMath::Helpers
 			);
 		}
 	}
-
+	/// <summary>
+	/// <para> Creates a full 4x4 perspective projection matrix, using the provided left_, right_, bottom_, and top_ arguments as respective edges of a frustum. </para>
+	/// <para>
+	///		If edges of the frustum are not known, consider using the overload of this function taking fov_angle_y, near_, far_, aspect_ratio_ instead, 
+	///		which will automatically calculate a generic frustum.
+	/// </para>
+	/// <para> Note that frustum edges are expected to be scalars; the axis the scalar represents is assumed based on the axis the edge would be aligned with. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+	/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>
+	/// <typeparam name="Far_">Type used to provide the far plane.</typeparam>
+	/// <typeparam name="Left_">Type used to provide the left edge of the frustum.</typeparam>
+	/// <typeparam name="Right_">Type used to provide the right edge of the frustum.</typeparam>
+	/// <typeparam name="Bottom_">Type used to provide the bottom edge of the frustum.</typeparam>
+	/// <typeparam name="Top_">Type used to provide the top edge of the frustum.</typeparam>
+	/// <param name="near_">Near plane for the perspective projection matrix.</param>
+	/// <param name="far_">Far plane for the perspective projection matrix.</param>
+	/// <param name="left_">Left edge of the frustum when determining the perspective projection matrix.</param>
+	/// <param name="right_">Right edge of the frustum when determining the perspective projection matrix.</param>
+	/// <param name="bottom_">Bottom edge of the frustum when determining the perspective projection matrix.</param>
+	/// <param name="top_">Top edge of the frustum when determining theperspective  projection matrix.</param>
+	/// <returns>4x4 EmuMath matrix formed as a perspective projection matrix via the provided arguments.</returns>
 	template
 	<
 		typename out_contained_type = float,
