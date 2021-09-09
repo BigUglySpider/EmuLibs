@@ -420,8 +420,8 @@ int main()
 	std::cout << "Perspective(FovY (degs): " << fov_angle_y_ << ", Near: " << near_ << ", Far: " << far_ << ", Aspect Ratio: " << aspect_ratio_ << "):\n";
 	std::cout << full_perspective_mat_ << "\n";
 	
-	constexpr auto size_ortho_mat_ = EmuMath::Helpers::MatrixOrthographic(width_, height_, near_, far_);
-	constexpr auto bounds_ortho_mat_ = EmuMath::Helpers::MatrixOrthographic(-half_width_, half_width_, -half_height_, half_height_, near_, far_);
+	constexpr auto size_ortho_mat_ = EmuMath::Helpers::MatrixOrthographicGL(width_, height_, near_, far_);
+	constexpr auto bounds_ortho_mat_ = EmuMath::Helpers::MatrixOrthographicGL(-half_width_, half_width_, -half_height_, half_height_, near_, far_);
 	std::cout << "Ortho(Dims):\n" << size_ortho_mat_ << "\nOrtho(bounds):\n" << bounds_ortho_mat_ << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION

@@ -91,13 +91,15 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i)
 		{
-			out_[i] = EmuMath::Helpers::MatrixPerspectiveVK<true, float, true, 10, true>(fov_[i], near_[i], far_[i], aspect_ratio_[i]);
+			//out_[i] = EmuMath::Helpers::MatrixPerspectiveVK<true, float, true, 10, true>(fov_[i], near_[i], far_[i], aspect_ratio_[i]);
+			out_[i] = EmuMath::Helpers::MatrixOrthographicVK(1920, 1080, near_[i], far_[i]);
 		}
 		void OnTestsOver()
 		{
 			srand(shared_seed_b_);
 			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
-			std::cout << "Perspective(Near: " << near_[i] << ", Far: " << far_[i] << ", FOV: " << fov_[i] << ", Aspect Ratio: " << aspect_ratio_[i] << "):\n";
+			//std::cout << "Perspective(Near: " << near_[i] << ", Far: " << far_[i] << ", FOV: " << fov_[i] << ", Aspect Ratio: " << aspect_ratio_[i] << "):\n";
+			std::cout << "Orthographic(width: 1920, height: 1080, near: " << near_[i] << ", far: " << far_[i] << "):\n";
 			std::cout << out_[i] << "\n";
 
 			EmuMath::Vector3<float> vector_ = EmuMath::Vector3<float>(1.0f, 2.0f, 182154.3f);
@@ -139,14 +141,16 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i)
 		{
-			DirectX::XMMATRIX mat_ = DirectX::XMMatrixPerspectiveFovRH(fov_[i], aspect_ratio_[i], near_[i], far_[i]);
+			//DirectX::XMMATRIX mat_ = DirectX::XMMatrixPerspectiveFovRH(fov_[i], aspect_ratio_[i], near_[i], far_[i]);
+			DirectX::XMMATRIX mat_ = DirectX::XMMatrixOrthographicRH(1920.0f, 1080.0f, near_[i], far_[i]);
 			DirectX::XMStoreFloat4x4(&out_[i], mat_);
 		}
 		void OnTestsOver()
 		{
 			srand(shared_seed_b_);
 			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
-			std::cout << "Perspective(Near: " << near_[i] << ", Far: " << far_[i] << ", FOV: " << fov_[i] << ", Aspect Ratio: " << aspect_ratio_[i] << "):\n";
+			//std::cout << "Perspective(Near: " << near_[i] << ", Far: " << far_[i] << ", FOV: " << fov_[i] << ", Aspect Ratio: " << aspect_ratio_[i] << "):\n";
+			std::cout << "Orthographic(width: 1920, height: 1080, near: " << near_[i] << ", far: " << far_[i] << "):\n";
 			for (std::size_t x = 0; x < 4; ++x)
 			{
 				std::cout << "{ ";

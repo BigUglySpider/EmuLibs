@@ -813,7 +813,7 @@ namespace EmuMath::Helpers
 	/// <param name="far_">Far plane value for orthographic projection.</param>
 	/// <returns>4x4 EmuMath matrix formed as an orthographic projection matrix via the provided arguments.</returns>
 	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename Left_, typename Right_, typename Bottom_, typename Top_, typename Near_, typename Far_>
-	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixOrthographic
+	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixOrthographicGL
 	(
 		const Left_& left_,
 		const Right_& right_,
@@ -824,7 +824,7 @@ namespace EmuMath::Helpers
 	)
 	{
 		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, Left_, Right_, Bottom_, Top_, Near_, Far_, float>;
-		return _underlying_matrix_funcs::_make_orthograhpic_projection_matrix_
+		return _underlying_matrix_funcs::_make_orthograhpic_projection_matrix_gl
 		<
 			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
 			Left_,
@@ -856,7 +856,7 @@ namespace EmuMath::Helpers
 	/// <param name="far_">Far plane value for orthographic projection.</param>
 	/// <returns>4x4 EmuMath matrix formed as an orthographic projection matrix of the specified dimensions with lower bounds both set to 0.</returns>
 	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename Width_, typename Height_, typename Near_, typename Far_>
-	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixOrthographic
+	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixOrthographicGL
 	(
 		const Width_ width_,
 		const Height_& height_,
@@ -866,7 +866,93 @@ namespace EmuMath::Helpers
 	{
 		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, Width_, Height_, Near_, Far_, float>;
 		const calc_type zero_ = calc_type(0);
-		return _underlying_matrix_funcs::_make_orthograhpic_projection_matrix_
+		return _underlying_matrix_funcs::_make_orthograhpic_projection_matrix_gl
+		<
+			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
+			calc_type,
+			Width_,
+			calc_type,
+			Height_,
+			Near_,
+			Far_,
+			calc_type
+		>(zero_, width_, zero_, height_, near_, far_);
+	}
+
+
+
+
+
+	/// <summary> Creates a 4x4 six-tuple orthographic projection matrix via the passed bounds and near/far planes. </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+	/// <typeparam name="Left_">Type used to provide the left bound.</typeparam>
+	/// <typeparam name="Right_">Type used to provide the right bound.</typeparam>
+	/// <typeparam name="Bottom_">Type used to provide the bottom bound.</typeparam>
+	/// <typeparam name="Top_">Type used to provide the top bound.</typeparam>
+	/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>
+	/// <typeparam name="Far_">Type used to provide the far plane.</typeparam>
+	/// <param name="left_">Left bound for orthographic projection.</param>
+	/// <param name="right_">Right bound for orthographic projection.</param>
+	/// <param name="bottom_">Bottom bound for orthographic projection.</param>
+	/// <param name="top_">Top bound for orthographic projection.</param>
+	/// <param name="near_">Near plane value for orthographic projection.</param>
+	/// <param name="far_">Far plane value for orthographic projection.</param>
+	/// <returns>4x4 EmuMath matrix formed as an orthographic projection matrix via the provided arguments.</returns>
+	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename Left_, typename Right_, typename Bottom_, typename Top_, typename Near_, typename Far_>
+	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixOrthographicVK
+	(
+		const Left_& left_,
+		const Right_& right_,
+		const Bottom_& bottom_,
+		const Top_& top_,
+		const Near_& near_,
+		const Far_& far_
+	)
+	{
+		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, Left_, Right_, Bottom_, Top_, Near_, Far_, float>;
+		return _underlying_matrix_funcs::_make_orthograhpic_projection_matrix_vk
+		<
+			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
+			Left_,
+			Right_,
+			Bottom_,
+			Top_,
+			Near_,
+			Far_,
+			calc_type
+		>(left_, right_, bottom_, top_, near_, far_);
+	}
+	/// <summary>
+	/// <para> Creates a 4x4 six-tuple orthographic projection matrix via the passed width/height and near/far planes. </para>
+	/// <para> This is effectively shorthand for providing bounded arguments for via dimensions, with the following argument translations: </para>
+	/// <para> left_ and bottom_ are both equal to 0. </para>
+	/// <para> right_ is equal to width_. </para>
+	/// <para> top_ is equal to height_. </para>
+	/// <para> near_ and far_ remain the same. </para>
+	/// <para> If non-zero lower bounds are required, use the overload to this function taking  left_, right_, bottom_, top_, near_, far_ arguments instead. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+	/// <typeparam name="Width_">Type used to provide the width.</typeparam>
+	/// <typeparam name="Height_">Type used to provide the height.</typeparam>
+	/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>
+	/// <typeparam name="Far_">Type used to provide the far plane.</typeparam>
+	/// <param name="width_">Width of the orthographic projection region, which will be used as the right_ argument.</param>
+	/// <param name="height_">Height of the orthographic projection region, which will be used as the top_ argument.</param>
+	/// <param name="near_">Near plane value for orthographic projection.</param>
+	/// <param name="far_">Far plane value for orthographic projection.</param>
+	/// <returns>4x4 EmuMath matrix formed as an orthographic projection matrix of the specified dimensions with lower bounds both set to 0.</returns>
+	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename Width_, typename Height_, typename Near_, typename Far_>
+	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixOrthographicVK
+	(
+		const Width_ width_,
+		const Height_& height_,
+		const Near_& near_,
+		const Far_& far_
+	)
+	{
+		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, Width_, Height_, Near_, Far_, float>;
+		const calc_type zero_ = calc_type(0);
+		return _underlying_matrix_funcs::_make_orthograhpic_projection_matrix_vk
 		<
 			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
 			calc_type,
