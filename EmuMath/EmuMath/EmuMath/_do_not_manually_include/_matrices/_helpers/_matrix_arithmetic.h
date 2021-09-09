@@ -671,12 +671,24 @@ namespace EmuMath::Helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to multiply a matrix and vector, but the provided rhs_matrix_ argument was not an EmuMath vector.");
+				static_assert(false, "Attempted to multiply a matrix and vector, but the provided rhs_vector_ argument was not an EmuMath vector.");
 			}
 		}
 		else
 		{
 			static_assert(false, "Attempted to multiply a matrix and vector, but the provided lhs_matrix_ argument was not an EmuMath matrix.");
+		}
+	}
+	template<class LhsMatrix_, class RhsVector_>
+	constexpr inline EmuMath::Vector<RhsVector_::size, typename RhsVector_::value_type> MatrixMultiplyVector(const LhsMatrix_& lhs_matrix_, const RhsVector_& rhs_vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<RhsVector_>)
+		{
+			return MatrixMultiplyVector<typename RhsVector_::value_type, LhsMatrix_, RhsVector_>(lhs_matrix_, rhs_vector_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to multiply a matrix and vector, but the provided rhs_vector_ argument was not an EmuMath vector.");
 		}
 	}
 

@@ -91,7 +91,7 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i)
 		{
-			out_[i] = EmuMath::Helpers::MatrixPerspectiveVK<true, float, true, 5, true>(fov_[i], near_[i], far_[i], aspect_ratio_[i]);
+			out_[i] = EmuMath::Helpers::MatrixPerspectiveVK<true, double, true, 5, true>(fov_[i], near_[i], far_[i], aspect_ratio_[i]);
 		}
 		void OnTestsOver()
 		{
@@ -99,13 +99,16 @@ namespace EmuCore::TestingHelpers
 			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
 			std::cout << "Perspective(Near: " << near_[i] << ", Far: " << far_[i] << ", FOV: " << fov_[i] << ", Aspect Ratio: " << aspect_ratio_[i] << "):\n";
 			std::cout << out_[i] << "\n";
+
+			EmuMath::Vector3<float> vector_ = EmuMath::Vector3<float>(1.0f, 2.0f, 3.0f);
+			std::cout << "Vector: " << vector_ << "\nTransformed: " << EmuMath::Helpers::MatrixMultiplyVector(out_[i], vector_) << "\n";
 		}
 
 		std::vector<float> near_;
 		std::vector<float> far_;
 		std::vector<float> fov_;
 		std::vector<float> aspect_ratio_;
-		std::vector<EmuMath::Matrix<4, 4, float, true>> out_;
+		std::vector<EmuMath::Matrix<4, 4, double, true>> out_;
 	};
 	struct ProjMatDXM
 	{
@@ -136,7 +139,7 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i)
 		{
-			DirectX::XMMATRIX mat_ = DirectX::XMMatrixPerspectiveFovLH(fov_[i], aspect_ratio_[i], near_[i], far_[i]);
+			DirectX::XMMATRIX mat_ = DirectX::XMMatrixPerspectiveFovRH(fov_[i], aspect_ratio_[i], near_[i], far_[i]);
 			DirectX::XMStoreFloat4x4(&out_[i], mat_);
 		}
 		void OnTestsOver()
@@ -157,6 +160,13 @@ namespace EmuCore::TestingHelpers
 				}
 				std::cout << " }\n";
 			}
+			DirectX::XMFLOAT3 vector_(1.0f, 2.0f, 3.0f);
+			DirectX::XMVECTOR transf_ = DirectX::XMLoadFloat3(&vector_);
+			transf_ = DirectX::XMVector3Transform(transf_, DirectX::XMLoadFloat4x4(&out_[i]));
+			DirectX::XMFLOAT3 result_;
+			DirectX::XMStoreFloat3(&result_, transf_);
+			std::cout << "Vector: { " << vector_.x << ", " << vector_.y << ", " << vector_.z << " }\n";
+			std::cout << "Transformed: { " << result_.x << ", " << result_.y << ", " << result_.z << " }\n";
 		}
 
 		std::vector<float> near_;
