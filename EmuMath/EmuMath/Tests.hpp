@@ -100,7 +100,7 @@ namespace EmuCore::TestingHelpers
 			std::cout << "Perspective(Near: " << near_[i] << ", Far: " << far_[i] << ", FOV: " << fov_[i] << ", Aspect Ratio: " << aspect_ratio_[i] << "):\n";
 			std::cout << out_[i] << "\n";
 
-			EmuMath::Vector3<float> vector_ = EmuMath::Vector3<float>(1.0f, 2.0f, 3.0f);
+			EmuMath::Vector3<float> vector_ = EmuMath::Vector3<float>(1.0f, 2.0f, 182154.3f);
 			std::cout << "Vector: " << vector_ << "\nTransformed: " << EmuMath::Helpers::MatrixMultiplyVector(out_[i], vector_) << "\n";
 		}
 
@@ -160,7 +160,7 @@ namespace EmuCore::TestingHelpers
 				}
 				std::cout << " }\n";
 			}
-			DirectX::XMFLOAT3 vector_(1.0f, 2.0f, 3.0f);
+			DirectX::XMFLOAT3 vector_(1.0f, 2.0f, 182154.3f);
 			DirectX::XMVECTOR transf_ = DirectX::XMLoadFloat3(&vector_);
 			transf_ = DirectX::XMVector3Transform(transf_, DirectX::XMLoadFloat4x4(&out_[i]));
 			DirectX::XMFLOAT3 result_;
