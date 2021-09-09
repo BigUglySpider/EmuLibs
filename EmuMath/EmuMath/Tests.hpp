@@ -12,6 +12,7 @@
 #include "EmuMath/Vector.h"
 #include "EmuMath/FastVector.h"
 #include <bitset>
+#include <DirectXMath.h>
 #include <string_view>
 
 namespace EmuCore::TestingHelpers
@@ -58,81 +59,114 @@ namespace EmuCore::TestingHelpers
 		}
 	};
 
-	struct MatrixRotConstexprTest
+	struct ProjMatEmu
 	{
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 5000000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr bool DO_TEST = true;
-		static constexpr std::string_view NAME = "Rotation Constexpr";
+		static constexpr std::string_view NAME = "Projection Creation (EmuMath)";
 
-		MatrixRotConstexprTest()
+		ProjMatEmu()
 		{
 		}
 		void Prepare()
 		{
-			srand(5);
-			in_.resize(NUM_LOOPS);
+			srand(7);
+			near_.resize(NUM_LOOPS);
+			far_.resize(NUM_LOOPS);
+			fov_.resize(NUM_LOOPS);
+			aspect_ratio_.resize(NUM_LOOPS);
 			out_.resize(NUM_LOOPS);
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				in_[i] = 0.99f * (rand() % 360);
+				near_[i] = static_cast<float>((rand() % 10) + 1) * 0.1f;
+				far_[i] = static_cast<float>(rand() % 1000 + 2);
+				fov_[i] = EmuCore::Pi::DegsToRads(45.0f + static_cast<float>(rand() % 46));
+				aspect_ratio_[i] = 1920.0f / 1080.0f;
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			out_[i] = EmuMath::Helpers::MatrixRotationXDegsConstexpr(in_[i]);
+			out_[i] = EmuMath::Helpers::MatrixPerspectiveWithFrustum<true, float, true, 10, true>(fov_[i], near_[i], far_[i], aspect_ratio_[i]);
 		}
 		void OnTestsOver()
 		{
 			srand(7);
 			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
-			std::cout << "ROTX(" << in_[i] << "):\n" << out_[i] << "\n";
+			std::cout << "Perspective(Near: " << near_[i] << ", Far: " << far_[i] << ", FOV: " << fov_[i] << ", Aspect Ratio: " << aspect_ratio_[i] << "):\n";
+			std::cout << out_[i] << "\n";
 		}
 
-		std::vector<float> in_;
+		std::vector<float> near_;
+		std::vector<float> far_;
+		std::vector<float> fov_;
+		std::vector<float> aspect_ratio_;
 		std::vector<EmuMath::Matrix<4, 4, float, true>> out_;
 	};
-	struct MatrixRotTest
+	struct ProjMatDXM
 	{
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 5000000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr bool DO_TEST = true;
-		static constexpr std::string_view NAME = "Rotation Normal";
+		static constexpr std::string_view NAME = "Projection Creation (DirectXMath)";
 
-		MatrixRotTest()
+		ProjMatDXM()
 		{
 		}
 		void Prepare()
 		{
-			srand(5);
-			in_.resize(NUM_LOOPS);
-			out_.resize(NUM_LOOPS);
+			srand(7);
+			near_.resize(NUM_LOOPS);
+			far_.resize(NUM_LOOPS);
+			fov_.resize(NUM_LOOPS);
+			aspect_ratio_.resize(NUM_LOOPS);
+			out_.resize(NUM_LOOPS, DirectX::XMFLOAT4X4(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				in_[i] = 0.99f * (rand() % 360);
+				near_[i] = static_cast<float>((rand() % 10) + 1) * 0.1f;
+				far_[i] = static_cast<float>(rand() % 1000 + 2);
+				fov_[i] = EmuCore::Pi::DegsToRads(45.0f + static_cast<float>(rand() % 46));
+				aspect_ratio_[i] = 1920.0f / 1080.0f;
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			out_[i] = EmuMath::Helpers::MatrixRotationXDegs(in_[i]);
+			DirectX::XMMATRIX mat_ = DirectX::XMMatrixPerspectiveFovRH(fov_[i], aspect_ratio_[i], near_[i], far_[i]);
+			DirectX::XMStoreFloat4x4(&out_[i], mat_);
 		}
 		void OnTestsOver()
 		{
 			srand(7);
 			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
-			std::cout << "ROTX(" << in_[i] << "):\n" << out_[i] << "\n";
+			std::cout << "Perspective(Near: " << near_[i] << ", Far: " << far_[i] << ", FOV: " << fov_[i] << ", Aspect Ratio: " << aspect_ratio_[i] << "):\n";
+			for (std::size_t x = 0; x < 4; ++x)
+			{
+				std::cout << "{ ";
+				for (std::size_t y = 0; y < 4; ++y)
+				{
+					std::cout << out_[i](y, x);
+					if (y != 3)
+					{
+						std::cout << ", ";
+					}
+				}
+				std::cout << " }\n";
+			}
 		}
 
-		std::vector<float> in_;
-		std::vector<EmuMath::Matrix<4, 4, float, true>> out_;
+		std::vector<float> near_;
+		std::vector<float> far_;
+		std::vector<float> fov_;
+		std::vector<float> aspect_ratio_;
+		std::vector<DirectX::XMFLOAT4X4> out_;
 	};
 
 	using AllTests = std::tuple
 	<
-		MatrixRotConstexprTest,
-		MatrixRotTest
+		ProjMatEmu,
+		ProjMatDXM
 	>;
 
 

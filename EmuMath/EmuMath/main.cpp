@@ -404,7 +404,7 @@ int main()
 	constexpr float half_height_ = height_ * decltype(height_)(0.5);
 	constexpr float aspect_ratio_ = width_ / height_;
 
-	constexpr auto scale_ = EmuMath::Helpers::MatrixPerspectiveScale<false, float, 5>(fov_angle_y_, near_);
+	constexpr auto scale_ = EmuMath::Helpers::MatrixPerspectiveFrustumScale<false, float, 5>(fov_angle_y_, near_);
 	constexpr auto edge_top_ = EmuMath::Helpers::MatrixPerspectiveFrustumEdgeTop<false>(fov_angle_y_, near_);
 	constexpr auto edge_bottom_ = EmuMath::Helpers::MatrixPerspectiveFrustumEdgeBottom<false>(fov_angle_y_, near_);
 	constexpr auto edge_right_ = EmuMath::Helpers::MatrixPerspectiveFrustumEdgeRight<false>(fov_angle_y_, near_, aspect_ratio_);
