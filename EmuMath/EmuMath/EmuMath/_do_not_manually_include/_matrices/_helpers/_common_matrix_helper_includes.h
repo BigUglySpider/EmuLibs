@@ -6,6 +6,7 @@
 #include "../_helpers_underlying/_matrix_gets_underlying.h"
 #include "../_helpers_underlying/_matrix_index_conversions_underlying.h"
 #include "../_helpers_underlying/_matrix_operations_underlying.h"
+#include "../_helpers_underlying/_matrix_projections_underlying.h"
 #include "../_helpers_underlying/_matrix_reinterpretations_underlying.h"
 #include "../_helpers_underlying/_matrix_sets_underlying.h"
 #include "../_helpers_underlying/_matrix_transformations_underlying.h"

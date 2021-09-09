@@ -6,6 +6,7 @@
 #include "_helpers/_matrix_gets.h"
 #include "_helpers/_matrix_index_conversions.h"
 #include "_helpers/_matrix_operations.h"
+#include "_helpers/matrix_projections_.h"
 #include "_helpers/_matrix_reinterpretations.h"
 #include "_helpers/_matrix_transformations.h"
 
