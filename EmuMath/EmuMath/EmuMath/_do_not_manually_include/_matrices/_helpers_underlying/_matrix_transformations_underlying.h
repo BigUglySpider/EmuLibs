@@ -207,7 +207,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 
 		using Mul_ = EmuCore::do_multiply<floating_point, floating_point>;
 		using Div_ = EmuCore::do_divide<floating_point, floating_point>;
-		using Tan_ = EmuCore::do_tan_constexpr<floating_point, NumIterations_>;
+		using Tan_ = EmuCore::do_tan_constexpr<floating_point, NumIterations_, true>;
 
 		floating_point out_ = Mul_()(fov_rads_, half_);
 		out_ = Tan_()(out_);
@@ -404,7 +404,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		CalcType_ right_minus_left_reciprocal_ = div_(one_, sub_(right_, left_));
 		CalcType_ top_minus_bottom_reciprocal_ = div_(one_, sub_(top_, bottom_));
 		CalcType_ double_near_ = mul_(near_calc_cast_, two_);
-		CalcType_ far_minus_near_reciprocal = div_(one_, sub_(far_calc_cast_, near_calc_cast_));
+		CalcType_ far_minus_near_reciprocal_neg = negate_(div_(one_, sub_(far_calc_cast_, near_calc_cast_)));
 
 		// Fill the matrix
 		using out_value = typename OutMatrix_::value_type;
@@ -416,22 +416,19 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		// Column 2
 		_get_matrix_data<2, 0>(out_) = static_cast<out_value>(mul_(add_(right_, left_), right_minus_left_reciprocal_)); // (right+left)/(right-left)
 		_get_matrix_data<2, 1>(out_) = static_cast<out_value>(mul_(add_(top_, bottom_), top_minus_bottom_reciprocal_)); // (top+bottom)/(top-bottom)
-		_get_matrix_data<2, 2>(out_) = static_cast<out_value>(negate_(mul_(add_(far_calc_cast_, near_calc_cast_), far_minus_near_reciprocal))); // -((far+near)/(far-near))
+		_get_matrix_data<2, 2>(out_) = static_cast<out_value>(mul_(add_(far_calc_cast_, near_calc_cast_), far_minus_near_reciprocal_neg)); // -((far+near)/(far-near))
 		_get_matrix_data<2, 3>(out_) = out_value(-1);
 		// Column 3
 		_get_matrix_data<3, 2>(out_) = static_cast<out_value>
 		(
-			negate_
+			mul_
 			(
 				mul_
 				(
-					mul_
-					(
-						mul_(two_, far_calc_cast_),
-						near_calc_cast_
-					),
-					far_minus_near_reciprocal
-				)
+					mul_(two_, far_calc_cast_),
+					near_calc_cast_
+				),
+				far_minus_near_reciprocal_neg
 			)
 		); // -((2*far*near)/(far-near))
 		return out_;
@@ -469,6 +466,124 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 			bottom_,
 			top_
 		);
+	}
+
+	template<class OutMatrix_, typename Width_, typename Height_, typename Near_, typename Far_, typename CalcType_>
+	constexpr inline OutMatrix_ _make_orthograhpic_projection_matrix_(const Width_& width_, const Height_& height_, const Near_& near_, const Far_& far_)
+	{
+		// Arithmetic Functors
+		using Add_ = EmuCore::do_add<CalcType_, CalcType_>;
+		using Sub_ = EmuCore::do_subtract<CalcType_, CalcType_>;
+		using Mul_ = EmuCore::do_multiply<CalcType_, CalcType_>;
+		using Div_ = EmuCore::do_divide<CalcType_, CalcType_>;
+		using Negate_ = EmuCore::do_negate<CalcType_>;
+		Add_ add_ = Add_();
+		Sub_ sub_ = Sub_();
+		Mul_ mul_ = Mul_();
+		Div_ div_ = Div_();
+		Negate_ negate_ = Negate_();
+
+		// Calculate common constants
+		CalcType_ near_calc_cast_ = static_cast<CalcType_>(near_);
+		CalcType_ far_calc_cast_ = static_cast<CalcType_>(far_);
+		CalcType_ one_ = CalcType_(1);
+		CalcType_ far_minus_near_reciprocal_neg_ = negate_(div_(one_, sub_(far_, near_)));
+
+		// Fill matrix
+		using out_value = typename OutMatrix_::value_type;
+		OutMatrix_ out_ = OutMatrix_();
+		// Column 0
+		_get_matrix_data<0, 0>(out_) = static_cast<out_value>(div_(one_, static_cast<CalcType_>(width_))); // 1/width
+		// Column 1
+		_get_matrix_data<1, 1>(out_) = static_cast<out_value>(div_(one_, static_cast<CalcType_>(height_))); // 1/height
+		// Column 2
+		_get_matrix_data<2, 2>(out_) = static_cast<out_value>(negate_(mul_(CalcType_(2), far_minus_near_reciprocal_neg_))); // -(2/(far-near))
+		// Column 3
+		_get_matrix_data<3, 2>(out_) = static_cast<out_value>(mul_(add_(far_calc_cast_, near_calc_cast_), far_minus_near_reciprocal_neg_)); // -((far+near)/(far-near))
+		_get_matrix_data<3, 3>(out_) = out_value(1);
+		return out_;
+	}
+	template<class OutMatrix_, typename Left_, typename Right_, typename Bottom_, typename Top_, typename Near_, typename Far_, typename CalcType_>
+	constexpr inline OutMatrix_ _make_orthograhpic_projection_matrix_
+	(
+		const Left_& left_,
+		const Right_& right_,
+		const Bottom_& bottom_,
+		const Top_& top_,
+		const Near_& near_,
+		const Far_& far_
+	)
+	{
+		// Arithmetic Functors
+		using Add_ = EmuCore::do_add<CalcType_, CalcType_>;
+		using Sub_ = EmuCore::do_subtract<CalcType_, CalcType_>;
+		using Mul_ = EmuCore::do_multiply<CalcType_, CalcType_>;
+		using Div_ = EmuCore::do_divide<CalcType_, CalcType_>;
+		using Negate_ = EmuCore::do_negate<CalcType_>;
+		Add_ add_ = Add_();
+		Sub_ sub_ = Sub_();
+		Mul_ mul_ = Mul_();
+		Div_ div_ = Div_();
+		Negate_ negate_ = Negate_();
+
+		// Calculate common constants
+		CalcType_ left_calc_cast_ = static_cast<CalcType_>(left_);
+		CalcType_ right_calc_cast_ = static_cast<CalcType_>(right_);
+		CalcType_ bottom_calc_cast_ = static_cast<CalcType_>(bottom_);
+		CalcType_ top_calc_cast_ = static_cast<CalcType_>(top_);
+		CalcType_ near_calc_cast_ = static_cast<CalcType_>(near_);
+		CalcType_ far_calc_cast_ = static_cast<CalcType_>(far_);
+		CalcType_ two_ = CalcType_(2);
+
+		CalcType_ right_minus_left_ = sub_(right_calc_cast_, left_calc_cast_);
+		CalcType_ top_minus_bottom_ = sub_(top_calc_cast_, bottom_calc_cast_);
+		CalcType_ far_minus_near_reciprocal = div_(CalcType_(1), sub_(far_calc_cast_, near_calc_cast_));
+
+		// Fill matrix
+		using out_value = typename OutMatrix_::value_type;
+		OutMatrix_ out_ = OutMatrix_();
+		// Column 0
+		_get_matrix_data<0, 0>(out_) = static_cast<out_value>(div_(two_, right_minus_left_)); // 2/(right-left)
+		_get_matrix_data<0, 3>(out_) = static_cast<out_value>
+		(
+			negate_
+			(
+				div_
+				(
+					add_(right_calc_cast_, left_calc_cast_),
+					right_minus_left_
+				)
+			)
+		); // -((right+left)/(right-left))
+		// Column 1
+		_get_matrix_data<1, 1>(out_) = static_cast<out_value>(div_(two_, top_minus_bottom_));
+		_get_matrix_data<1, 3>(out_) = static_cast<out_value>
+		(
+			negate_
+			(
+				div_
+				(
+					add_(top_calc_cast_, bottom_calc_cast_),
+					top_minus_bottom_
+				)
+			)
+		); // -((top+bottom)/(top-bottom))
+		// Column 2
+		_get_matrix_data<2, 2>(out_) = static_cast<out_value>(mul_(CalcType_(-2), far_minus_near_reciprocal)); // (-2)/(far-near)
+		_get_matrix_data<2, 3>(out_) = static_cast<out_value>
+		(
+			negate_
+			(
+				mul_
+				(
+					add_(far_calc_cast_, near_calc_cast_),
+					far_minus_near_reciprocal
+				)
+			)
+		); // -((far+near)/(far-near))
+		// Column 3
+		_get_matrix_data<3, 3>(out_) = out_value(1);
+		return out_;
 	}
 }
 

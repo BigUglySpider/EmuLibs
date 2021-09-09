@@ -398,7 +398,9 @@ int main()
 	constexpr float fov_angle_y_ = 75.0f;
 	constexpr float near_ = 0.1f;
 	constexpr float far_ = 1000.0f;
-	constexpr float aspect_ratio_ = 1920.0f / 1080.0f;
+	constexpr float width_ = 1920.0f;
+	constexpr float height_ = 1080.0f;
+	constexpr float aspect_ratio_ = width_ / height_;
 
 	constexpr auto scale_ = EmuMath::Helpers::MatrixPerspectiveScale<false, float, 5>(fov_angle_y_, near_);
 	constexpr auto edge_top_ = EmuMath::Helpers::MatrixPerspectiveFrustumEdgeTop<false>(fov_angle_y_, near_);
@@ -416,6 +418,9 @@ int main()
 	std::cout << "Perspective(FovY (degs): " << fov_angle_y_ << ", Near: " << near_ << ", Far: " << far_ << ", Aspect Ratio: " << aspect_ratio_ << "):\n";
 	std::cout << full_perspective_mat_ << "\n";
 	
+	constexpr auto size_ortho_mat_ = EmuMath::Helpers::MatrixOrthographic(width_, height_, near_, far_);
+	constexpr auto bounds_ortho_mat_ = EmuMath::Helpers::MatrixOrthographic(0, width_, 0, height_, near_, far_);
+	std::cout << "Ortho(Dims):\n" << size_ortho_mat_ << "\nOrtho(bounds):\n" << bounds_ortho_mat_ << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

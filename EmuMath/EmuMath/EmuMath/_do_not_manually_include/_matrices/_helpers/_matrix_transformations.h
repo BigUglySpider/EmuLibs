@@ -564,6 +564,54 @@ namespace EmuMath::Helpers
 			calc_type
 		>(near_, far_, left_, right_, bottom_, top_);
 	}
+
+	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename Left_, typename Right_, typename Bottom_, typename Top_, typename Near_, typename Far_>
+	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixOrthographic
+	(
+		const Left_& left_,
+		const Right_& right_,
+		const Bottom_& bottom_,
+		const Top_& top_,
+		const Near_& near_,
+		const Far_& far_
+	)
+	{
+		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, Left_, Right_, Bottom_, Top_, Near_, Far_, float>;
+		return _underlying_matrix_funcs::_make_orthograhpic_projection_matrix_
+		<
+			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
+			Left_,
+			Right_,
+			Bottom_,
+			Top_,
+			Near_,
+			Far_,
+			calc_type
+		>(left_, right_, bottom_, top_, near_, far_);
+	}
+	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename Width_, typename Height_, typename Near_, typename Far_>
+	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixOrthographic
+	(
+		const Width_ width_,
+		const Height_& height_,
+		const Near_& near_,
+		const Far_& far_
+	)
+	{
+		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, Width_, Height_, Near_, Far_, float>;
+		const calc_type zero_ = calc_type(0);
+		return MatrixOrthographic
+		<
+			out_contained_type,
+			OutColumnMajor_,
+			calc_type,
+			Width_,
+			calc_type,
+			Height_,
+			Near_,
+			Far_
+		>(zero_, width_, zero_, height_, near_, far_);
+	}
 }
 
 #endif
