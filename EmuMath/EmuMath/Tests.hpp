@@ -59,7 +59,7 @@ namespace EmuCore::TestingHelpers
 		}
 	};
 
-	constexpr unsigned int shared_seed_ = 13333133;
+	constexpr unsigned int shared_seed_ = 666;
 	constexpr unsigned int shared_seed_b_ = 6;
 
 	struct ProjMatEmu
@@ -91,7 +91,7 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i)
 		{
-			out_[i] = EmuMath::Helpers::MatrixPerspectiveVK<true, double, true, 5, true>(fov_[i], near_[i], far_[i], aspect_ratio_[i]);
+			out_[i] = EmuMath::Helpers::MatrixPerspectiveVK<true, float, true, 10, true>(fov_[i], near_[i], far_[i], aspect_ratio_[i]);
 		}
 		void OnTestsOver()
 		{
@@ -108,7 +108,7 @@ namespace EmuCore::TestingHelpers
 		std::vector<float> far_;
 		std::vector<float> fov_;
 		std::vector<float> aspect_ratio_;
-		std::vector<EmuMath::Matrix<4, 4, double, true>> out_;
+		std::vector<EmuMath::Matrix<4, 4, float, true>> out_;
 	};
 	struct ProjMatDXM
 	{
