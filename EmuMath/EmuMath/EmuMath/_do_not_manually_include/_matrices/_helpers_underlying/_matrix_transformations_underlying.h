@@ -512,7 +512,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		// Column 2
 		_get_matrix_data<2, 0>(out_) = static_cast<out_value>(mul_(add_(right_, left_), right_minus_left_reciprocal_)); // (right+left)/(right-left)
 		_get_matrix_data<2, 1>(out_) = static_cast<out_value>(mul_(add_(top_, bottom_), top_minus_bottom_reciprocal_)); // (top+bottom)/(top-bottom)
-		//_get_matrix_data<2, 2>(out_) = static_cast<out_value>(mul_(add_(0, near_calc_cast_), far_minus_near_reciprocal_neg)); // -((far+near)/(far-near))
+		//_get_matrix_data<2, 2>(out_) = static_cast<out_value>(mul_(add_(far_calc_cast_, near_calc_cast_), far_minus_near_reciprocal_neg)); // -((far+near)/(far-near))
 		_get_matrix_data<2, 2>(out_) = static_cast<out_value>(mul_(far_calc_cast_, far_minus_near_reciprocal_neg)); // -(far/(far-near))
 		_get_matrix_data<2, 3>(out_) = out_value(-1);
 		// Column 3

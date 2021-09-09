@@ -59,7 +59,7 @@ namespace EmuCore::TestingHelpers
 		}
 	};
 
-	constexpr unsigned int shared_seed_ = 666;
+	constexpr unsigned int shared_seed_ = 6166;
 	constexpr unsigned int shared_seed_b_ = 6;
 
 	struct ProjMatEmu
