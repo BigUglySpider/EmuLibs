@@ -600,16 +600,16 @@ namespace EmuMath::Helpers
 	{
 		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, Width_, Height_, Near_, Far_, float>;
 		const calc_type zero_ = calc_type(0);
-		return MatrixOrthographic
+		return _underlying_matrix_funcs::_make_orthograhpic_projection_matrix_
 		<
-			out_contained_type,
-			OutColumnMajor_,
+			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
 			calc_type,
 			Width_,
 			calc_type,
 			Height_,
 			Near_,
-			Far_
+			Far_,
+			calc_type
 		>(zero_, width_, zero_, height_, near_, far_);
 	}
 }
