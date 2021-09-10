@@ -274,9 +274,14 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region CONST_OPERATORS
+
+#pragma endregion
+
 	private:
 		data_storage_type data_;
 
+#pragma region SELF_HELPERS
 		template<std::size_t ColumnIndex_, std::size_t RowIndex_>
 		static constexpr inline bool _valid_static_indices()
 		{
@@ -365,6 +370,7 @@ namespace EmuMath
 				_assign_non_major_reference<NonMajorIndex_, MajorIndex_ + 1, Out_>(out_);
 			}
 		}
+#pragma endregion
 	};
 }
 

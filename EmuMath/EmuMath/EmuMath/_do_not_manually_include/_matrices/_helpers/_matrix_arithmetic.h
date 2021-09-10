@@ -999,7 +999,7 @@ namespace EmuMath::Helpers
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Matrix_>
 	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> MatrixNegate(const Matrix_& matrix_)
 	{
-		return MatrixNegate<OutNumColumns_, OutNumColumns_, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+		return MatrixNegate<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
 	}
 	template<bool OutColumnMajor_, class Matrix_>
 	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixNegate
@@ -1009,8 +1009,6 @@ namespace EmuMath::Helpers
 	{
 		return MatrixNegate<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
 	}
-
-
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Matrix_>
 	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> MatrixNegate(const Matrix_& matrix_)
 	{
@@ -1024,7 +1022,7 @@ namespace EmuMath::Helpers
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Matrix_>
 	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> MatrixNegate(const Matrix_& matrix_)
 	{
-		return MatrixNegate<OutNumColumns_, OutNumColumns_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+		return MatrixNegate<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 	template<class Matrix_>
 	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixNegate

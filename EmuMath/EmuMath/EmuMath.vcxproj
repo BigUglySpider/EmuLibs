@@ -173,6 +173,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\MatrixHelpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\MatrixT.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\MatrixTMP.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_bitwise.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_sets.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\matrix_projections_.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_common_matrix_helper_includes.h" />

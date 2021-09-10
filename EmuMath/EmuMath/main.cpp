@@ -480,7 +480,10 @@ int main()
 	EmuMath::Helpers::MatrixMutate(mat_to_negate_, mat_to_negate_, EmuCore::do_negate<double>());
 	std::cout << "After negate:\n" << mat_to_negate_ << "\n";
 
-	constexpr auto cm_2x2_auto_cast_ = EmuMath::Helpers::MatrixAs<2, 4, double, false>(mat_2x2_cm_auto_);
+
+	constexpr auto cm_2x2_auto_cast_ = EmuMath::Helpers::MatrixAs<2, 4, std::int32_t, false>(mat_2x2_cm_auto_);
+	std::cout << EmuMath::Helpers::MatrixAnd(cm_2x2_auto_cast_, 0x01) << "\n";
+	std::cout << EmuMath::Helpers::MatrixNot<3, 2>(cm_2x2_auto_cast_) << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
