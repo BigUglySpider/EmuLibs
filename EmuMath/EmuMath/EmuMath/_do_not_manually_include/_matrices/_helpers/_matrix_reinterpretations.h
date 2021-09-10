@@ -19,7 +19,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to convert to a column matrix.</param>
 	/// <returns>Column matrix containing a copy of the passed vector's data. The matrix will be a single column which contains the full data of the passed vector.</returns>
 	template<typename out_contained_type, bool ColumnMajor_ = true, class Vector_>
-	constexpr inline EmuMath::Matrix<1, Vector_::size, out_contained_type, ColumnMajor_> VectorToColumnMatrix(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<1, Vector_::size, out_contained_type, ColumnMajor_> VectorToColumnMatrix(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -34,7 +34,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<bool ColumnMajor_ = true, class Vector_>
-	constexpr inline EmuMath::Matrix<1, Vector_::size, typename Vector_::value_type, ColumnMajor_> VectorToColumnMatrix(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<1, Vector_::size, typename Vector_::value_type, ColumnMajor_> VectorToColumnMatrix(const Vector_& vector_)
 	{
 		return VectorToColumnMatrix<typename Vector_::value_type, ColumnMajor_, Vector_>(vector_);
 	}
@@ -51,7 +51,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to convert to a row matrix.</param>
 	/// <returns>Row matrix containing a copy of the passed vector's data. The matrix will be a single row which contains the full data of the passed vector.</returns>
 	template<typename out_contained_type, bool ColumnMajor_ = true, class Vector_>
-	constexpr inline EmuMath::Matrix<Vector_::size, 1, out_contained_type, ColumnMajor_> VectorToRowMatrix(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Vector_::size, 1, out_contained_type, ColumnMajor_> VectorToRowMatrix(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -66,7 +66,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<bool ColumnMajor_ = true, class Vector_>
-	constexpr inline EmuMath::Matrix<Vector_::size, 1, typename Vector_::value_type, ColumnMajor_> VectorToRowMatrix(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Vector_::size, 1, typename Vector_::value_type, ColumnMajor_> VectorToRowMatrix(const Vector_& vector_)
 	{
 		return VectorToRowMatrix<typename Vector_::value_type, ColumnMajor_, Vector_>(vector_);
 	}
@@ -81,7 +81,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to prepare for transformation.</param>
 	/// <returns>Copy of the provided vector_, with one additional element appended to the end set to 1.</returns>
 	template<typename out_contained_type, class Vector_>
-	constexpr inline EmuMath::Vector<Vector_::size + 1, out_contained_type> VectorPrepareToTransform(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size + 1, out_contained_type> VectorPrepareToTransform(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -95,7 +95,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class Vector_>
-	constexpr inline EmuMath::Vector<Vector_::size + 1, typename Vector_::value_type> VectorPrepareToTransform(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size + 1, typename Vector_::value_type> VectorPrepareToTransform(const Vector_& vector_)
 	{
 		return VectorPrepareToTransform<typename Vector_::value_type, Vector_>(vector_);
 	}

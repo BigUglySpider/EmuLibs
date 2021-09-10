@@ -120,10 +120,6 @@ int main()
 
 
 	std::cout << matrix_ << "\n";
-	std::cout << "[2]: " << matrix_[2] << "\n";
-	std::cout << "[7]: " << matrix_[7] << "\n";
-	std::cout << "[13]: " << matrix_[13] << "\n";
-	std::cout << "[15]: " << matrix_[15] << "\n";
 	std::cout << "Column 3: " << matrix_.GetColumn<3>() << "\n";
 	std::cout << "Row 2: " << matrix_.GetRow<2>() << "\n";
 	
@@ -142,8 +138,8 @@ int main()
 
 	auto out_a_ = EmuMath::Helpers::MatrixGetTheoretical<2, 2>(matrix_);
 	auto out_b_ = EmuMath::Helpers::MatrixGetTheoretical<2, 5>(matrix_);
-	auto out_c_ = EmuMath::Helpers::MatrixGetTheoretical<13>(matrix_);
-	auto out_d_ = EmuMath::Helpers::MatrixGetTheoretical<16>(matrix_);
+	auto out_c_ = EmuMath::Helpers::MatrixGetTheoretical<13, 13>(matrix_);
+	auto out_d_ = EmuMath::Helpers::MatrixGetTheoretical<16, 16>(matrix_);
 
 	constexpr EmuMath::Matrix<4, 4, float, true> mat_a_
 	(

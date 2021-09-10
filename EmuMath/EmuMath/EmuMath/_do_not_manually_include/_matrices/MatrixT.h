@@ -170,34 +170,6 @@ namespace EmuMath
 			return _get_index(columnIndex_, rowIndex_);
 		}
 
-		template<std::size_t MajorOrderIndex_>
-		[[nodiscard]] constexpr inline raw_value_type& at()
-		{
-			return EmuMath::Helpers::MatrixGet<MajorOrderIndex_, this_type>(*this);
-		}
-		template<std::size_t MajorOrderIndex_>
-		[[nodiscard]] constexpr inline const raw_value_type& at() const
-		{
-			return EmuMath::Helpers::MatrixGet<MajorOrderIndex_, this_type>(*this);
-		}
-		[[nodiscard]] constexpr inline raw_value_type& at(const std::size_t majorOrderIndex_)
-		{
-			return EmuMath::Helpers::MatrixGet<this_type>(*this, majorOrderIndex_);
-		}
-		[[nodiscard]] constexpr inline const raw_value_type& at(const std::size_t majorOrderIndex_) const
-		{
-			return EmuMath::Helpers::MatrixGet<this_type>(*this, majorOrderIndex_);
-		}
-
-		[[nodiscard]] constexpr inline raw_value_type& operator[](const std::size_t majorOrderIndex_)
-		{
-			return this->at(majorOrderIndex_);
-		}
-		[[nodiscard]] constexpr inline const raw_value_type& operator[](const std::size_t majorOrderIndex_) const
-		{
-			return this->at(majorOrderIndex_);
-		}
-
 		template<std::size_t MajorIndex_>
 		constexpr inline EmuMath::Vector<num_non_major_elements, contained_type>& GetMajor()
 		{

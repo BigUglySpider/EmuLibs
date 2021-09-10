@@ -29,7 +29,7 @@ namespace EmuMath::Helpers
 	/// <param name="far_">Far value when creating the normalisation cofactor.</param>
 	/// <returns>Result of -(far / (far - near)).</returns>
 	template<typename Out_ = float, typename Near_, typename Far_>
-	constexpr inline Out_ MatrixBasicPerspectiveNearFarCofactorA(const Near_& near_, const Far_& far_)
+	[[nodiscard]] constexpr inline Out_ MatrixBasicPerspectiveNearFarCofactorA(const Near_& near_, const Far_& far_)
 	{
 		return _underlying_matrix_funcs::_calculate_basic_perspective_near_far_cofactor_a<Near_, Far_, Out_>(near_, far_);
 	}
@@ -42,7 +42,7 @@ namespace EmuMath::Helpers
 	/// <param name="far_">Far value when creating the normalisation cofactor.</param>
 	/// <returns>Result of -((f * n) / (f - n)).</returns>
 	template<typename Out_ = float, typename Near_, typename Far_>
-	constexpr inline Out_ MatrixBasicPerspectiveNearFarCofactorB(const Near_& near_, const Far_& far_)
+	[[nodiscard]] constexpr inline Out_ MatrixBasicPerspectiveNearFarCofactorB(const Near_& near_, const Far_& far_)
 	{
 		return _underlying_matrix_funcs::_calculate_basic_perspective_near_far_cofactor_b<Near_, Far_, Out_>(near_, far_);
 	}
@@ -53,7 +53,7 @@ namespace EmuMath::Helpers
 	/// <param name="fov_">FOV angle for calculating the projection matrix. This may be either radians or degrees, and by default is interpreted as radians.</param>
 	/// <returns>Scalar scale used for creating a basic perspective projection matrix.</returns>
 	template<std::size_t NumIterations_ = 5, bool Rads_ = true, typename Out_ = float, typename Fov_>
-	constexpr inline Out_ MatrixBasicPerspectiveFovScale(const Fov_& fov_)
+	[[nodiscard]] constexpr inline Out_ MatrixBasicPerspectiveFovScale(const Fov_& fov_)
 	{
 		if constexpr (Rads_)
 		{
@@ -79,7 +79,12 @@ namespace EmuMath::Helpers
 	/// <param name="fov_">FOV angle for calculating the projection matrix. This may be either radians or degrees, and by default is interpreted as radians.</param>
 	/// <returns>Basic perspective matrix using the provided arguments. It should be noted that an accurate frustum is not too heavily considered for the output.</returns>
 	template<std::size_t NumIterations_ = 5, bool RadsFov_ = true, typename out_contained_type = float, bool OutColumnMajor_ = true, typename Near_, typename Far_, typename Fov_>
-	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixBasicPerspective(const Near_& near_, const Far_& far_, const Fov_& fov_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixBasicPerspective
+	(
+		const Near_& near_,
+		const Far_& far_,
+		const Fov_& fov_
+	)
 	{
 		if constexpr (RadsFov_)
 		{
@@ -114,7 +119,7 @@ namespace EmuMath::Helpers
 	/// <param name="near_">Near plane for a perspective projection matrix.</param>
 	/// <returns>Scalar scale used to automatically determine frustum edges for a perspective projection matrix.</returns>
 	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_>
-	constexpr inline Out_ MatrixPerspectiveFrustumScale(const FovY_& fov_angle_y_, const Near_& near_)
+	[[nodiscard]] constexpr inline Out_ MatrixPerspectiveFrustumScale(const FovY_& fov_angle_y_, const Near_& near_)
 	{
 		// Output type takes priority for calculation type; this way if less precision than input values, we can save time; if more precision, we can get better approximations
 		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<Out_, FovY_, Near_, float>;
@@ -147,7 +152,7 @@ namespace EmuMath::Helpers
 	/// <param name="near_">Near plane for a perspective projection matrix.</param>
 	/// <returns>Top edge for a frustum automatically calculated with the provided arguments. This should be a scalar, which represents a Y-coordinate.</returns>
 	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_>
-	constexpr inline Out_ MatrixPerspectiveFrustumEdgeTop(const FovY_& fov_angle_y_, const Near_& near_)
+	[[nodiscard]] constexpr inline Out_ MatrixPerspectiveFrustumEdgeTop(const FovY_& fov_angle_y_, const Near_& near_)
 	{
 		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<Out_, FovY_, Near_, float>;
 		if constexpr (FovYIsRads_)
@@ -179,7 +184,7 @@ namespace EmuMath::Helpers
 	/// <param name="near_">Near plane for a perspective projection matrix.</param>
 	/// <returns>Bottom edge for a frustum automatically calculated with the provided arguments. This should be a scalar, which represents a Y-coordinate.</returns>
 	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_>
-	constexpr inline Out_ MatrixPerspectiveFrustumEdgeBottom(const FovY_& fov_angle_y_, const Near_& near_)
+	[[nodiscard]] constexpr inline Out_ MatrixPerspectiveFrustumEdgeBottom(const FovY_& fov_angle_y_, const Near_& near_)
 	{
 		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<Out_, FovY_, Near_, float>;
 		if constexpr (FovYIsRads_)
@@ -213,7 +218,7 @@ namespace EmuMath::Helpers
 	/// <param name="aspect_ratio_">Aspect ratio for projections. In general, this should be equal to target_width/target_height.</param>
 	/// <returns>Right edge for a frustum automatically calculated with the provided arguments. This should be a scalar, which represents an X-coordinate.</returns>
 	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_, typename AspectRatio_>
-	constexpr inline Out_ MatrixPerspectiveFrustumEdgeRight(const FovY_& fov_angle_y_, const Near_& near_, const AspectRatio_& aspect_ratio_)
+	[[nodiscard]] constexpr inline Out_ MatrixPerspectiveFrustumEdgeRight(const FovY_& fov_angle_y_, const Near_& near_, const AspectRatio_& aspect_ratio_)
 	{
 		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<Out_, FovY_, Near_, AspectRatio_, float>;
 		if constexpr (FovYIsRads_)
@@ -249,7 +254,7 @@ namespace EmuMath::Helpers
 	/// <param name="aspect_ratio_">Aspect ratio for projections. In general, this should be equal to target_width/target_height.</param>
 	/// <returns>Left edge for a frustum automatically calculated with the provided arguments. This should be a scalar, which represents an X-coordinate.</returns>
 	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_, typename AspectRatio_>
-	constexpr inline Out_ MatrixPerspectiveFrustumEdgeLeft(const FovY_& fov_angle_y_, const Near_& near_, const AspectRatio_& aspect_ratio_)
+	[[nodiscard]] constexpr inline Out_ MatrixPerspectiveFrustumEdgeLeft(const FovY_& fov_angle_y_, const Near_& near_, const AspectRatio_& aspect_ratio_)
 	{
 		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<Out_, FovY_, Near_, AspectRatio_, float>;
 		if constexpr (FovYIsRads_)
@@ -375,7 +380,7 @@ namespace EmuMath::Helpers
 		typename Far_,
 		typename AspectRatio_
 	>
-	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixPerspectiveGL
+	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixPerspectiveGL
 	(
 		const FovY_& fov_angle_y_,
 		const Near_& near_,
@@ -442,7 +447,7 @@ namespace EmuMath::Helpers
 		typename Bottom_,
 		typename Top_
 	>
-	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixPerspectiveGL
+	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixPerspectiveGL
 	(
 		const Near_& near_,
 		const Far_& far_,
@@ -496,7 +501,7 @@ namespace EmuMath::Helpers
 		typename Far_,
 		typename AspectRatio_
 	>
-	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixPerspectiveVK
+	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixPerspectiveVK
 	(
 		const FovY_& fov_angle_y_,
 		const Near_& near_,
@@ -563,7 +568,7 @@ namespace EmuMath::Helpers
 		typename Bottom_,
 		typename Top_
 	>
-	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixPerspectiveVK
+	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixPerspectiveVK
 	(
 		const Near_& near_,
 		const Far_& far_,
@@ -603,7 +608,7 @@ namespace EmuMath::Helpers
 	/// <param name="far_">Far plane value for orthographic projection.</param>
 	/// <returns>4x4 EmuMath matrix formed as an orthographic projection matrix via the provided arguments.</returns>
 	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename Left_, typename Right_, typename Bottom_, typename Top_, typename Near_, typename Far_>
-	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixOrthographicGL
+	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixOrthographicGL
 	(
 		const Left_& left_,
 		const Right_& right_,
@@ -646,7 +651,7 @@ namespace EmuMath::Helpers
 	/// <param name="far_">Far plane value for orthographic projection.</param>
 	/// <returns>4x4 EmuMath matrix formed as an orthographic projection matrix of the specified dimensions with lower bounds both set to 0.</returns>
 	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename Width_, typename Height_, typename Near_, typename Far_>
-	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixOrthographicGL
+	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixOrthographicGL
 	(
 		const Width_ width_,
 		const Height_& height_,
@@ -685,7 +690,7 @@ namespace EmuMath::Helpers
 	/// <param name="far_">Far plane value for orthographic projection.</param>
 	/// <returns>4x4 EmuMath matrix formed as an orthographic projection matrix via the provided arguments.</returns>
 	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename Left_, typename Right_, typename Bottom_, typename Top_, typename Near_, typename Far_>
-	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixOrthographicVK
+	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixOrthographicVK
 	(
 		const Left_& left_,
 		const Right_& right_,
@@ -728,7 +733,7 @@ namespace EmuMath::Helpers
 	/// <param name="far_">Far plane value for orthographic projection.</param>
 	/// <returns>4x4 EmuMath matrix formed as an orthographic projection matrix of the specified dimensions with lower bounds both set to 0.</returns>
 	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename Width_, typename Height_, typename Near_, typename Far_>
-	constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixOrthographicVK
+	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixOrthographicVK
 	(
 		const Width_ width_,
 		const Height_& height_,

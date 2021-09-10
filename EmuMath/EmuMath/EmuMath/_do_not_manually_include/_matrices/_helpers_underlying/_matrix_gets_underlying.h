@@ -2,7 +2,6 @@
 #define EMU_MATH__UNDERLYING_MATRIX_GETS_H_INC_ 1
 
 #include "_common_underlying_matrix_helper_includes.h"
-#include "_matrix_index_conversions_underlying.h"
 #include "_matrix_validity_checks_underlying.h"
 
 namespace EmuMath::Helpers::_underlying_matrix_funcs
@@ -18,27 +17,6 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		return matrix_.template at<ColumnIndex_, RowIndex_>();
 	}
 
-	template<std::size_t Index_, class Matrix_>
-	constexpr inline typename Matrix_::raw_value_type& _get_matrix_data(Matrix_& matrix_)
-	{
-		return _get_matrix_data
-		<
-			_matrix_major_order_index_to_column_index<Index_, Matrix_>(),
-			_matrix_major_order_index_to_row_index<Index_, Matrix_>(),
-			Matrix_
-		>(matrix_);
-	}
-	template<std::size_t Index_, class Matrix_>
-	constexpr inline const typename Matrix_::raw_value_type& _get_matrix_data(const Matrix_& matrix_)
-	{
-		return _get_matrix_data
-		<
-			_matrix_major_order_index_to_column_index<Index_, Matrix_>(),
-			_matrix_major_order_index_to_row_index<Index_, Matrix_>(),
-			Matrix_
-		>(matrix_);
-	}
-
 	template<class Matrix_>
 	constexpr inline typename Matrix_::raw_value_type& _get_matrix_data(Matrix_& matrix_, const std::size_t column_index_, const std::size_t row_index_)
 	{
@@ -48,26 +26,6 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	constexpr inline const typename Matrix_::raw_value_type& _get_matrix_data(const Matrix_& matrix_, const std::size_t column_index_, const std::size_t row_index_)
 	{
 		return matrix_.at(column_index_, row_index_);
-	}
-	template<class Matrix_>
-	constexpr inline typename Matrix_::raw_value_type& _get_matrix_data(Matrix_& matrix_, const std::size_t major_order_index_)
-	{
-		return _get_matrix_data
-		(
-			matrix_,
-			_matrix_major_order_index_to_column_index<Matrix_>(major_order_index_),
-			_matrix_major_order_index_to_row_index<Matrix_>(major_order_index_)
-		);
-	}
-	template<class Matrix_>
-	constexpr inline const typename Matrix_::raw_value_type& _get_matrix_data(const Matrix_& matrix_, const std::size_t major_order_index_)
-	{
-		return _get_matrix_data
-		(
-			matrix_,
-			_matrix_major_order_index_to_column_index<Matrix_>(major_order_index_),
-			_matrix_major_order_index_to_row_index<Matrix_>(major_order_index_)
-		);
 	}
 
 	template<std::size_t MajorIndex_, std::size_t NonMajorIndex_, class Matrix_, class Out_>
@@ -124,18 +82,6 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		if constexpr (_valid_matrix_indices<ColumnIndex_, RowIndex_, Matrix_>())
 		{
 			return _get_matrix_data<ColumnIndex_, RowIndex_, Matrix_>(matrix_);
-		}
-		else
-		{
-			return typename Matrix_::value_type();
-		}
-	}
-	template<std::size_t MajorOrderIndex_, class Matrix_>
-	constexpr inline typename EmuMath::TMP::emu_matrix_theoretical_major_order_index_data<MajorOrderIndex_, Matrix_>::type _get_matrix_theoretical_data(const Matrix_& matrix_)
-	{
-		if constexpr (_valid_matrix_major_order_index<MajorOrderIndex_, Matrix_>())
-		{
-			return _get_matrix_data<MajorOrderIndex_, Matrix_>(matrix_);
 		}
 		else
 		{

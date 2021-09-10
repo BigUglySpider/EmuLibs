@@ -178,7 +178,6 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_common_matrix_helper_includes.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_arithmetic.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_gets.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_index_conversions.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_operations.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_reinterpretations.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_transformations.h" />
@@ -186,7 +185,6 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_common_underlying_matrix_helper_includes.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_arithmetic_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_gets_underlying.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_index_conversions_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_operations_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_reinterpretations_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_sets_underlying.h" />

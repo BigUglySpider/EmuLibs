@@ -3,7 +3,6 @@
 
 #include "_common_underlying_matrix_helper_includes.h"
 #include "_matrix_gets_underlying.h"
-#include "_matrix_index_conversions_underlying.h"
 #include "_matrix_sets_underlying.h"
 #include "_matrix_validity_checks_underlying.h"
 
