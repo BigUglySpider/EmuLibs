@@ -473,9 +473,14 @@ int main()
 	std::cout << "MatrixMake<2, 2, float, false>(1, 2, 3, 4):\n" << mat_2x2_rm_auto_ << "\n";
 
 	std::cout << "CM Negated:\n" << EmuMath::Helpers::MatrixNegate(mat_2x2_cm_auto_) << "\n";
-	std::cout << "NegNeg:\n" << EmuMath::Helpers::MatrixNegate<4, 4>(EmuMath::Helpers::MatrixNegate(mat_2x2_cm_auto_)) << "\n";
+	std::cout << "NegNeg:\n" << EmuMath::Helpers::MatrixNegate<4, 4>(EmuMath::Helpers::MatrixNegate<4, 4>(mat_2x2_cm_auto_)) << "\n";
 
+	auto mat_to_negate_ = EmuMath::Helpers::MatrixMake<4, 4, double, true>(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f);
+	std::cout << "Before negate:\n" << mat_to_negate_ << "\n";
+	EmuMath::Helpers::MatrixMutate(mat_to_negate_, mat_to_negate_, EmuCore::do_negate<double>());
+	std::cout << "After negate:\n" << mat_to_negate_ << "\n";
 
+	constexpr auto cm_2x2_auto_cast_ = EmuMath::Helpers::MatrixAs<2, 4, double, false>(mat_2x2_cm_auto_);
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

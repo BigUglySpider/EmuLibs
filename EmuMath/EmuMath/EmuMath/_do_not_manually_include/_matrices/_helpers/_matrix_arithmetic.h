@@ -831,6 +831,19 @@ namespace EmuMath::Helpers
 		return MatrixMultiply<typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 
+	/// <summary>
+	/// <para> Function which may be used to create a new EmuMath matrix containing copies of mutated respective elements within another EmuMath matrix. </para>
+	/// <para>
+	///		The passed Func_ is expected to be invocable with one argument, of the type InMatrix_::raw_value_type, or a type it may be implictly cast to. 
+	///		Additionally, it is expected to return a type castable to OutMatrix_::value_type.
+	/// </para>
+	/// <para> Invocations of func_ will always be in column-major order; all elements in a column will be passed before the next column, until all columns are complete. </para>
+	/// </summary>
+	/// <typeparam name="Func_">Type to invoke for every element.</typeparam>
+	/// <typeparam name="InMatrix_">Type of matrix to mutate.</typeparam>
+	/// <param name="in_matrix_">EmuMath matrix to mutate each element of.</param>
+	/// <param name="func_">Invocable item that meets the defined constraints above, which will be invoked for every element to mutate said element.</param>
+	/// <returns>Copy of the provided matrix with its elements mutated via the provided func_.</returns>
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Func_, class InMatrix_>
 	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixMutate
 	(
@@ -915,86 +928,22 @@ namespace EmuMath::Helpers
 	{
 		return MatrixMutate<InMatrix_::num_columns, InMatrix_::num_rows, typename InMatrix_::value_type, InMatrix_::is_column_major, Func_&, InMatrix_>(in_matrix_, func_);
 	}
-	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Func_, class InMatrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixMutate
-	(
-		const InMatrix_& in_matrix_
-	)
-	{
-		if constexpr (EmuMath::TMP::is_emu_matrix_v<InMatrix_>)
-		{
-			return _underlying_matrix_funcs::_make_mutated_matrix
-			<
-				Func_&,
-				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
-				InMatrix_
-			>(in_matrix_);
-		}
-		else
-		{
-			static_assert(false, "Attempted to mutate a matrix, but the passed in_matrix_ was not an EmuMath matrix.");
-		}
-	}
-	template<typename out_contained_type, bool OutColumnMajor_, class Func_, class InMatrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<InMatrix_::num_columns, InMatrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixMutate
-	(
-		const InMatrix_& in_matrix_
-	)
-	{
-		return MatrixMutate<InMatrix_::num_columns, InMatrix_::num_rows, out_contained_type, OutColumnMajor_, Func_, InMatrix_>(in_matrix_);
-	}
-	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Func_, class InMatrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename InMatrix_::value_type, OutColumnMajor_> MatrixMutate
-	(
-		const InMatrix_& in_matrix_
-	)
-	{
-		return MatrixMutate<OutNumColumns_, OutNumRows_, typename InMatrix_::value_type, OutColumnMajor_, Func_, InMatrix_>(in_matrix_);
-	}
-	template<bool OutColumnMajor_, class Func_, class InMatrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<InMatrix_::num_columns, InMatrix_::num_rows, typename InMatrix_::value_type, OutColumnMajor_> MatrixMutate
-	(
-		const InMatrix_& in_matrix_
-	)
-	{
-		return MatrixMutate<InMatrix_::num_columns, InMatrix_::num_rows, typename InMatrix_::value_type, OutColumnMajor_, Func_, InMatrix_>(in_matrix_);
-	}
-	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Func_, class InMatrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, InMatrix_::is_column_major> MatrixMutate
-	(
-		const InMatrix_& in_matrix_
-	)
-	{
-		return MatrixMutate<OutNumColumns_, OutNumColumns_, out_contained_type, InMatrix_::is_column_major, Func_, InMatrix_>(in_matrix_);
-	}
-	template<typename out_contained_type, class Func_, class InMatrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<InMatrix_::num_columns, InMatrix_::num_rows, out_contained_type, InMatrix_::is_column_major> MatrixMutate
-	(
-		const InMatrix_& in_matrix_
-	)
-	{
-		return MatrixMutate<InMatrix_::num_columns, InMatrix_::num_rows, out_contained_type, InMatrix_::is_column_major, Func_, InMatrix_>(in_matrix_);
-	}
-	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Func_, class InMatrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename InMatrix_::value_type, InMatrix_::is_column_major> MatrixMutate
-	(
-		const InMatrix_& in_matrix_
-	)
-	{
-		return MatrixMutate<OutNumColumns_, OutNumRows_, typename InMatrix_::value_type, InMatrix_::is_column_major, Func_, InMatrix_>(in_matrix_);
-	}
-	template<class Func_, class InMatrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<InMatrix_::num_columns, InMatrix_::num_rows, typename InMatrix_::value_type, InMatrix_::is_column_major> MatrixMutate
-	(
-		const InMatrix_& in_matrix_
-	)
-	{
-		return MatrixMutate<InMatrix_::num_columns, InMatrix_::num_rows, typename InMatrix_::value_type, InMatrix_::is_column_major, Func_, InMatrix_>(in_matrix_);
-	}
 
-
-
-
+	/// <summary>
+	/// <para> Function which may be used to output mutated elements of an EmuMath matrix to a referenced output EmuMath matrix. </para>
+	/// <para>
+	///		The passed Func_ is expected to be invocable with one argument, of the type InMatrix_::raw_value_type, or a type it may be implictly cast to. 
+	///		Additionally, it is expected to return a type castable to OutMatrix_::value_type.
+	/// </para>
+	/// <para> Invocations of func_ will always be in column-major order; all elements in a column will be passed before the next column, until all columns are complete. </para>
+	/// </summary>
+	/// <typeparam name="Func_">Type to invoke for every element.</typeparam>
+	/// <typeparam name="InMatrix_">Type of matrix to mutate.</typeparam>
+	/// <typeparam name="OutMatrix_">Type of matrix to output mutation results to.</typeparam>
+	/// <param name="in_matrix_">EmuMath matrix to mutate each element of.</param>
+	/// <param name="out_matrix_">Reference to the EmuMath matrix to store the results of respective element mutations within.</param>
+	/// <param name="func_">Invocable item that meets the defined constraints above, which will be invoked for every element to mutate said element.</param>
+	/// <returns>Reference to out_matrix_ after mutation has been called for all elements.</returns>
 	template<class Func_, class InMatrix_, class OutMatrix_>
 	constexpr inline OutMatrix_& MatrixMutate(const InMatrix_& in_matrix_, OutMatrix_& out_matrix_, Func_ func_)
 	{
@@ -1019,31 +968,12 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to mutate a matrix, but the passed in_matrix_ was not an EmuMath matrix.");
 		}
 	}
-	template<class Func_, class InMatrix_, class OutMatrix_>
-	constexpr inline OutMatrix_& MatrixMutate(const InMatrix_& in_matrix_, OutMatrix_& out_matrix_)
-	{
-		if constexpr (EmuMath::TMP::is_emu_matrix_v<InMatrix_>)
-		{
-			if constexpr (EmuMath::TMP::is_emu_matrix_v<OutMatrix_>)
-			{
-				return _underlying_matrix_funcs::_matrix_mutate
-				<
-					Func_,
-					OutMatrix_,
-					InMatrix_
-				>(in_matrix_, out_matrix_);
-			}
-			else
-			{
-				static_assert(false, "Attempted to mutate a matrix, but the passed out_matrix_ was not an EmuMath matrix.");
-			}
-		}
-		else
-		{
-			static_assert(false, "Attempted to mutate a matrix, but the passed in_matrix_ was not an EmuMath matrix.");
-		}
-	}
 
+	/// <summary> Returns a negated version of the passed EmuMath matrix, where all elements [x][y] can be summarised as -[x][y]. </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+	/// <typeparam name="Matrix_">Type of matrix to negate.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to negate.</param>
+	/// <returns>Negated form of the provided matrix.</returns>
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Matrix_>
 	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixNegate(const Matrix_& matrix_)
 	{

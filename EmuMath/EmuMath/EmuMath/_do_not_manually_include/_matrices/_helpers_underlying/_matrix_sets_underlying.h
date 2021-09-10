@@ -67,7 +67,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 			if constexpr (RowIndex_ < LhsMatrix_::num_rows)
 			{
 				using lhs_value = typename LhsMatrix_::value_type;
-				static constexpr bool is_same_type = std::is_same_v<lhs_value, std::remove_cv_t<std::remove_reference_t<RhsScalar_>>>;
+				constexpr bool is_same_type = std::is_same_v<lhs_value, std::remove_cv_t<std::remove_reference_t<RhsScalar_>>>;
 				static_assert
 				(
 					is_same_type || std::is_convertible_v<RhsScalar_, lhs_value>,
@@ -93,7 +93,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 			if constexpr (RowIndex_ < LhsMatrix_::num_rows)
 			{
 				using lhs_value = typename LhsMatrix_::value_type;
-				static constexpr bool is_same_type = std::is_same_v<lhs_value, std::remove_cv_t<std::remove_reference_t<RhsScalar_>>>;
+				constexpr bool is_same_type = std::is_same_v<lhs_value, std::remove_cv_t<std::remove_reference_t<RhsScalar_>>>;
 				static_assert
 				(
 					is_same_type || std::is_convertible_v<RhsScalar_, lhs_value>,
