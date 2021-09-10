@@ -131,6 +131,63 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 			return _matrix_lhs_rhs_operation<OutMatrix_, LhsMatrix_, Rhs_, EmuCore::do_multiply<typename LhsMatrix_::value_type, Rhs_>>(lhs_, rhs_);
 		}
 	}
+
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Func_, class InMatrix_, class OutMatrix_>
+	constexpr inline void _matrix_mutate_column(const InMatrix_& in_, OutMatrix_& out_, Func_& func_)
+	{
+		if constexpr (ColumnIndex_ < OutMatrix_::num_columns)
+		{
+			if constexpr (RowIndex_ < OutMatrix_::num_rows)
+			{
+				using out_value = typename OutMatrix_::value_type;
+				if constexpr (ColumnIndex_ < InMatrix_::num_columns && RowIndex_ < InMatrix_::num_rows)
+				{
+					_get_matrix_data<ColumnIndex_, RowIndex_>(out_) = static_cast<out_value>(func_(_get_matrix_data<ColumnIndex_, RowIndex_>(in_)));
+				}
+				else
+				{
+					using in_raw_value = typename InMatrix_::raw_value_type;
+					_get_matrix_data<ColumnIndex_, RowIndex_>(out_) = static_cast<out_value>(func_(in_raw_value()));
+				}
+				_matrix_mutate_column<ColumnIndex_, RowIndex_ + 1, Func_, InMatrix_, OutMatrix_>(in_, out_, func_);
+			}
+		}
+	}
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Func_, class InMatrix_, class OutMatrix_>
+	constexpr inline void _matrix_mutate(const InMatrix_& in_, OutMatrix_& out_, Func_& func_)
+	{
+		if constexpr (ColumnIndex_ < OutMatrix_::num_columns)
+		{
+			_matrix_mutate_column<ColumnIndex_, RowIndex_, Func_, InMatrix_, OutMatrix_>(in_, out_, func_);
+			_matrix_mutate<ColumnIndex_ + 1, RowIndex_, Func_, InMatrix_, OutMatrix_>(in_, out_, func_);
+		}
+	}
+	template<class Func_, class OutMatrix_, class InMatrix_>
+	constexpr inline OutMatrix_& _matrix_mutate(const InMatrix_& in_, OutMatrix_& out_, Func_ func_)
+	{
+		_matrix_mutate<0, 0, Func_, InMatrix_, OutMatrix_>(in_, out_, func_);
+		return out_;
+	}
+	template<class Func_, class OutMatrix_, class InMatrix_>
+	constexpr inline OutMatrix_& _matrix_mutate(const InMatrix_& in_, OutMatrix_& out_)
+	{
+		return _matrix_mutate<Func_, OutMatrix_, InMatrix_>(in_, out_, Func_());
+	}
+
+	template<class Func_, class OutMatrix_, class InMatrix_>
+	[[nodiscard]] constexpr inline OutMatrix_ _make_mutated_matrix(const InMatrix_& in_, Func_ func_)
+	{
+		OutMatrix_ out_ = OutMatrix_();
+		_matrix_mutate<Func_&, OutMatrix_, InMatrix_>(in_, out_, func_);
+		return out_;
+	}
+	template<class Func_, class OutMatrix_, class InMatrix_>
+	[[nodiscard]] constexpr inline OutMatrix_ _make_mutated_matrix(const InMatrix_& in_)
+	{
+		OutMatrix_ out_ = OutMatrix_();
+		_matrix_mutate<Func_, OutMatrix_, InMatrix_>(in_, out_);
+		return out_;
+	}
 }
 
 #endif

@@ -472,6 +472,10 @@ int main()
 	std::cout << "MatrixMake<2, 2, float, true>(1, 2, 3, 4):\n" << mat_2x2_cm_auto_ << "\n";
 	std::cout << "MatrixMake<2, 2, float, false>(1, 2, 3, 4):\n" << mat_2x2_rm_auto_ << "\n";
 
+	std::cout << "CM Negated:\n" << EmuMath::Helpers::MatrixNegate(mat_2x2_cm_auto_) << "\n";
+	std::cout << "NegNeg:\n" << EmuMath::Helpers::MatrixNegate<4, 4>(EmuMath::Helpers::MatrixNegate(mat_2x2_cm_auto_)) << "\n";
+
+
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

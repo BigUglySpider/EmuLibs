@@ -830,6 +830,280 @@ namespace EmuMath::Helpers
 	{
 		return MatrixMultiply<typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
+
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Func_, class InMatrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixMutate
+	(
+		const InMatrix_& in_matrix_,
+		Func_ func_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<InMatrix_>)
+		{
+			return _underlying_matrix_funcs::_make_mutated_matrix
+			<
+				Func_&,
+				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+				InMatrix_
+			>(in_matrix_, func_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to mutate a matrix, but the passed in_matrix_ was not an EmuMath matrix.");
+		}
+	}
+	template<typename out_contained_type, bool OutColumnMajor_, class Func_, class InMatrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<InMatrix_::num_columns, InMatrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixMutate
+	(
+		const InMatrix_& in_matrix_,
+		Func_ func_
+	)
+	{
+		return MatrixMutate<InMatrix_::num_columns, InMatrix_::num_rows, out_contained_type, OutColumnMajor_, Func_&, InMatrix_>(in_matrix_, func_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Func_, class InMatrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename InMatrix_::value_type, OutColumnMajor_> MatrixMutate
+	(
+		const InMatrix_& in_matrix_,
+		Func_ func_
+	)
+	{
+		return MatrixMutate<OutNumColumns_, OutNumRows_, typename InMatrix_::value_type, OutColumnMajor_, Func_&, InMatrix_>(in_matrix_, func_);
+	}
+	template<bool OutColumnMajor_, class Func_, class InMatrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<InMatrix_::num_columns, InMatrix_::num_rows, typename InMatrix_::value_type, OutColumnMajor_> MatrixMutate
+	(
+		const InMatrix_& in_matrix_,
+		Func_ func_
+	)
+	{
+		return MatrixMutate<InMatrix_::num_columns, InMatrix_::num_rows, typename InMatrix_::value_type, OutColumnMajor_, Func_&, InMatrix_>(in_matrix_, func_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Func_, class InMatrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, InMatrix_::is_column_major> MatrixMutate
+	(
+		const InMatrix_& in_matrix_,
+		Func_ func_
+	)
+	{
+		return MatrixMutate<OutNumColumns_, OutNumColumns_, out_contained_type, InMatrix_::is_column_major, Func_&, InMatrix_>(in_matrix_, func_);
+	}
+	template<typename out_contained_type, class Func_, class InMatrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<InMatrix_::num_columns, InMatrix_::num_rows, out_contained_type, InMatrix_::is_column_major> MatrixMutate
+	(
+		const InMatrix_& in_matrix_,
+		Func_ func_
+	)
+	{
+		return MatrixMutate<InMatrix_::num_columns, InMatrix_::num_rows, out_contained_type, InMatrix_::is_column_major, Func_&, InMatrix_>(in_matrix_, func_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Func_, class InMatrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename InMatrix_::value_type, InMatrix_::is_column_major> MatrixMutate
+	(
+		const InMatrix_& in_matrix_,
+		Func_ func_
+	)
+	{
+		return MatrixMutate<OutNumColumns_, OutNumRows_, typename InMatrix_::value_type, InMatrix_::is_column_major, Func_&, InMatrix_>(in_matrix_, func_);
+	}
+	template<class Func_, class InMatrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<InMatrix_::num_columns, InMatrix_::num_rows, typename InMatrix_::value_type, InMatrix_::is_column_major> MatrixMutate
+	(
+		const InMatrix_& in_matrix_,
+		Func_ func_
+	)
+	{
+		return MatrixMutate<InMatrix_::num_columns, InMatrix_::num_rows, typename InMatrix_::value_type, InMatrix_::is_column_major, Func_&, InMatrix_>(in_matrix_, func_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Func_, class InMatrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixMutate
+	(
+		const InMatrix_& in_matrix_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<InMatrix_>)
+		{
+			return _underlying_matrix_funcs::_make_mutated_matrix
+			<
+				Func_&,
+				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+				InMatrix_
+			>(in_matrix_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to mutate a matrix, but the passed in_matrix_ was not an EmuMath matrix.");
+		}
+	}
+	template<typename out_contained_type, bool OutColumnMajor_, class Func_, class InMatrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<InMatrix_::num_columns, InMatrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixMutate
+	(
+		const InMatrix_& in_matrix_
+	)
+	{
+		return MatrixMutate<InMatrix_::num_columns, InMatrix_::num_rows, out_contained_type, OutColumnMajor_, Func_, InMatrix_>(in_matrix_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Func_, class InMatrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename InMatrix_::value_type, OutColumnMajor_> MatrixMutate
+	(
+		const InMatrix_& in_matrix_
+	)
+	{
+		return MatrixMutate<OutNumColumns_, OutNumRows_, typename InMatrix_::value_type, OutColumnMajor_, Func_, InMatrix_>(in_matrix_);
+	}
+	template<bool OutColumnMajor_, class Func_, class InMatrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<InMatrix_::num_columns, InMatrix_::num_rows, typename InMatrix_::value_type, OutColumnMajor_> MatrixMutate
+	(
+		const InMatrix_& in_matrix_
+	)
+	{
+		return MatrixMutate<InMatrix_::num_columns, InMatrix_::num_rows, typename InMatrix_::value_type, OutColumnMajor_, Func_, InMatrix_>(in_matrix_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Func_, class InMatrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, InMatrix_::is_column_major> MatrixMutate
+	(
+		const InMatrix_& in_matrix_
+	)
+	{
+		return MatrixMutate<OutNumColumns_, OutNumColumns_, out_contained_type, InMatrix_::is_column_major, Func_, InMatrix_>(in_matrix_);
+	}
+	template<typename out_contained_type, class Func_, class InMatrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<InMatrix_::num_columns, InMatrix_::num_rows, out_contained_type, InMatrix_::is_column_major> MatrixMutate
+	(
+		const InMatrix_& in_matrix_
+	)
+	{
+		return MatrixMutate<InMatrix_::num_columns, InMatrix_::num_rows, out_contained_type, InMatrix_::is_column_major, Func_, InMatrix_>(in_matrix_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Func_, class InMatrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename InMatrix_::value_type, InMatrix_::is_column_major> MatrixMutate
+	(
+		const InMatrix_& in_matrix_
+	)
+	{
+		return MatrixMutate<OutNumColumns_, OutNumRows_, typename InMatrix_::value_type, InMatrix_::is_column_major, Func_, InMatrix_>(in_matrix_);
+	}
+	template<class Func_, class InMatrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<InMatrix_::num_columns, InMatrix_::num_rows, typename InMatrix_::value_type, InMatrix_::is_column_major> MatrixMutate
+	(
+		const InMatrix_& in_matrix_
+	)
+	{
+		return MatrixMutate<InMatrix_::num_columns, InMatrix_::num_rows, typename InMatrix_::value_type, InMatrix_::is_column_major, Func_, InMatrix_>(in_matrix_);
+	}
+
+
+
+
+	template<class Func_, class InMatrix_, class OutMatrix_>
+	constexpr inline OutMatrix_& MatrixMutate(const InMatrix_& in_matrix_, OutMatrix_& out_matrix_, Func_ func_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<InMatrix_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_matrix_v<OutMatrix_>)
+			{
+				return _underlying_matrix_funcs::_matrix_mutate
+				<
+					Func_&,
+					OutMatrix_,
+					InMatrix_
+				>(in_matrix_, out_matrix_, func_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to mutate a matrix, but the passed out_matrix_ was not an EmuMath matrix.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to mutate a matrix, but the passed in_matrix_ was not an EmuMath matrix.");
+		}
+	}
+	template<class Func_, class InMatrix_, class OutMatrix_>
+	constexpr inline OutMatrix_& MatrixMutate(const InMatrix_& in_matrix_, OutMatrix_& out_matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<InMatrix_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_matrix_v<OutMatrix_>)
+			{
+				return _underlying_matrix_funcs::_matrix_mutate
+				<
+					Func_,
+					OutMatrix_,
+					InMatrix_
+				>(in_matrix_, out_matrix_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to mutate a matrix, but the passed out_matrix_ was not an EmuMath matrix.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to mutate a matrix, but the passed in_matrix_ was not an EmuMath matrix.");
+		}
+	}
+
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixNegate(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return _underlying_matrix_funcs::_make_mutated_matrix
+			<
+				EmuCore::do_negate<typename Matrix_::value_type>,
+				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+				Matrix_
+			>(matrix_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to negate a matrix, but the passed matrix_ was not an EmuMath matrix.");
+		}
+	}
+	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixNegate(const Matrix_& matrix_)
+	{
+		return MatrixNegate<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_, Matrix_>(matrix_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> MatrixNegate(const Matrix_& matrix_)
+	{
+		return MatrixNegate<OutNumColumns_, OutNumColumns_, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+	}
+	template<bool OutColumnMajor_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixNegate
+	(
+		const Matrix_& matrix_
+	)
+	{
+		return MatrixNegate<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+	}
+
+
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> MatrixNegate(const Matrix_& matrix_)
+	{
+		return MatrixNegate<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+	template<typename out_contained_type, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixNegate(const Matrix_& matrix_)
+	{
+		return MatrixNegate<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> MatrixNegate(const Matrix_& matrix_)
+	{
+		return MatrixNegate<OutNumColumns_, OutNumColumns_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+	template<class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixNegate
+	(
+		const Matrix_& matrix_
+	)
+	{
+		return MatrixNegate<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
 }
 
 #endif

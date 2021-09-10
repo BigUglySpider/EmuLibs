@@ -244,9 +244,9 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	[[nodiscard]] constexpr inline OutMatrix_ _calculate_matrix_adjugate_laplace(const Matrix_& matrix_)
 	{
 		return _transpose_matrix<OutMatrix_, OutMatrix_>
-			(
-				_calculate_matrix_of_cofactors_laplace<OutMatrix_, Matrix_>(matrix_)
-				);
+		(
+			_calculate_matrix_of_cofactors_laplace<OutMatrix_, Matrix_>(matrix_)
+		);
 	}
 
 	template<std::size_t ColumnIndex_, class Out_, class Matrix_, class Minors_, class Adder_, class Subtractor_, class Multiplier_>
