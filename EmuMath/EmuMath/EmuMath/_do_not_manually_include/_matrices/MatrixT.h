@@ -5,6 +5,18 @@
 
 namespace EmuMath
 {
+	/// <summary>
+	/// <para> Template matrix type used for arbitrarily sized matrices containing any arithmetic type, stored in order of columns or rows. </para>
+	/// <para>
+	///		NOTE: The ColumnMajor_ bool affects only the memory layout of a matrix. 
+	///		Positions of elements, such as when generating transformation matrices, will always be at the same column and row indices regardless of major order. 
+	/// </para>
+	/// <para>
+	///		All default arguments where a matrix is provided will use that matrix's major order. 
+	///		Otherwise, if no matrix is available to copy, the default argument will always be for column major (true).
+	/// </para>
+	/// </summary>
+	/// <typeparam name="T_"></typeparam>
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_ = true>
 	struct Matrix
 	{
@@ -40,6 +52,8 @@ namespace EmuMath
 		/// <summary> Boolean indicating if the reference wrappers within this matrix contain non-constant references. Always false if contains_reference_wrappers is false. </summary>
 		static constexpr bool contains_non_const_reference_wrappers = contains_reference_wrappers && !contains_const_reference_wrappers;
 		using this_type = EmuMath::Matrix<num_columns, num_rows, contained_type, is_column_major>;
+
+		static_assert(std::is_arithmetic_v<value_type>, "Attempted to create an EmuMath matrix with a non-arithmetic value_type. This behaviour is not supported.");
 
 		/// <summary> Boolean indcating if this matrix's values are integral. </summary>
 		static constexpr bool has_integral_elements = std::is_integral_v<std::remove_cv_t<value_type>>;
@@ -82,6 +96,43 @@ namespace EmuMath
 		constexpr Matrix(EmuMath::Vector<Sizes_, Ts_>&&...major_vectors_) : data_(std::forward<EmuMath::Vector<Sizes_, Ts_>>(major_vectors_)...)
 		{
 			static_assert(std::is_constructible_v<data_storage_type, EmuMath::Vector<Sizes_, Ts_>...>, "Attempted to construct an EmuMath matrix via a template constructor, using Vector data which cannot be used to construct the matrix's underlying data.");
+		}
+		/// <summary>
+		/// <para> Template constructor to create this matrix type via scalar arguments. </para>
+		/// <para> Arguments are taken in contiguous order within this matrix. </para>
+		/// <para>
+		///		Passed arguments must be valid types for constructing this matrix's contained_type, 
+		///		and the number of arguments must be equal to the total number of elements within this matrix.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="ScalarArgs_">Types of scalars to form this matrix with. Must be valid individual types to construct this matrix's contained_type.</typeparam>
+		/// <param name="contiguous_scalar_args_">Scalars to form this matrix with. Must be valid individual types to construct this matrix's contained_type.</param>
+		template
+		<
+			typename...ScalarArgs_,
+			typename = std::enable_if_t
+			<
+				EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, ScalarArgs_...>::value &&
+				sizeof...(ScalarArgs_) == size
+			>
+		>
+		constexpr Matrix(ScalarArgs_&&...contiguous_scalar_args_) : Matrix()
+		{
+			if constexpr (sizeof...(ScalarArgs_) == size)
+			{
+				if constexpr (EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, ScalarArgs_...>::value)
+				{
+					EmuMath::Helpers::_underlying_matrix_funcs::_matrix_maker<this_type, ScalarArgs_...>()(*this, std::move(contiguous_scalar_args_)...);
+				}
+				else
+				{
+					static_assert(false, "Attempted to construct an EmuMath matrix using scalar arguments, but at least one of the provided arguments could not be used to construct an element within the matrix.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to construct an EmuMath matrix using scalar arguments, but the provided number of arguments did not match the number of elements within the matrix.");
+			}
 		}
 #pragma endregion
 
@@ -214,6 +265,7 @@ namespace EmuMath
 		}
 #pragma endregion
 
+	private:
 		data_storage_type data_;
 
 		template<std::size_t ColumnIndex_, std::size_t RowIndex_>

@@ -8,6 +8,7 @@
 #include "_helpers/_matrix_operations.h"
 #include "_helpers/matrix_projections_.h"
 #include "_helpers/_matrix_reinterpretations.h"
+#include "_helpers/_matrix_sets.h"
 #include "_helpers/_matrix_transformations.h"
 
 #endif

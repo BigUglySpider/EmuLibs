@@ -424,6 +424,57 @@ int main()
 	constexpr auto bounds_ortho_mat_ = EmuMath::Helpers::MatrixOrthographicGL(-half_width_, half_width_, -half_height_, half_height_, near_, far_);
 	std::cout << "Ortho(Dims):\n" << size_ortho_mat_ << "\nOrtho(bounds):\n" << bounds_ortho_mat_ << "\n";
 
+	std::cout << "Copy3x3:\n" << EmuMath::Helpers::MatrixCopy<3, 3, float, true>(bounds_ortho_mat_) << "\n";
+	std::cout << "Copy2x4:\n" << EmuMath::Helpers::MatrixCopy<2, 4, float, true>(bounds_ortho_mat_) << "\n";
+	std::cout << "Copy1x1:\n" << EmuMath::Helpers::MatrixCopy<1, 1, float, true>(bounds_ortho_mat_) << "\n";
+	std::cout << "Copy16x16:\n" << EmuMath::Helpers::MatrixCopy<16, 16, float, true>(bounds_ortho_mat_) << "\n";
+	std::cout << "Copy16x16(13.37L):\n" << EmuMath::Helpers::MatrixCopy<16, 16, float, true>(13.37L) << "\n";
+
+	EmuMath::Matrix<7, 2, double, false> direct_copy_;
+	EmuMath::Helpers::MatrixCopy(direct_copy_, 5.5f);
+	std::cout << "Direct Copy(5.5f):\n" << direct_copy_ << "\n";
+	EmuMath::Helpers::MatrixCopy(direct_copy_, size_ortho_mat_);
+	std::cout << "Direct Copy(Ortho(Dims)):\n" << direct_copy_ << "\n";
+
+	EmuMath::Helpers::MatrixSet(direct_copy_, bounds_ortho_mat_);
+	std::cout << "After set:\n" << direct_copy_ << "\n";
+	EmuMath::Helpers::MatrixSet(direct_copy_, 2);
+	std::cout << "After set(2):\n" << direct_copy_ << "\n";
+
+	EmuMath::ConstRefMatrix<4, 4, float, true> const_ref_mat_;
+	EmuMath::Helpers::MatrixSet(const_ref_mat_, bounds_ortho_mat_);
+	std::cout << "Const Ref set:\n" << const_ref_mat_ << "\n";
+
+	EmuMath::RefMatrix<4, 4, float, true> ref_mat_;
+	float some_random_val_ = rand() * 0.5f;
+	EmuMath::Helpers::MatrixSet(ref_mat_, some_random_val_);
+	std::cout << "Ref set:\n" << ref_mat_ << "\n";
+	some_random_val_ = 0.5f;
+	std::cout << "Ref set after changing referenced scalar:\n" << ref_mat_ << "\n";
+	
+	auto auto_mat_ = EmuMath::Helpers::MatrixMake<4, 4, float, true>(1.0f, 2.0f, 3, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f);
+	std::cout << "Matrix via MatrixMake:\n" << auto_mat_ << "\n";
+	auto auto_mat_rm_ = EmuMath::Helpers::MatrixMake<4, 4, float, false>(1.0f, 2.0f, 3, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f);
+	std::cout << "Same args but row major:\n" << auto_mat_rm_ << "\n";
+
+	std::cout << "2x6:\n" << EmuMath::Helpers::MatrixMake<2, 6, float, true>(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7, 8.L, 9., 10U, 11u, 12L) << "\n";
+	std::cout << "6x2:\n" << EmuMath::Helpers::MatrixMake<6, 2, float, true>(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7, 8.L, 9., 10U, 11u, 12L) << "\n";
+
+	constexpr auto scalar_made_matrix_cm_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	constexpr auto scalar_made_matrix_rm_ = EmuMath::Matrix<4, 4, float, false>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << "Constructed CM:\n" << scalar_made_matrix_cm_ << "\n";
+	std::cout << "Constructed RM:\n" << scalar_made_matrix_rm_ << "\n";
+	constexpr auto scalar_made_matrix_1x1_cm = EmuMath::Matrix<1, 1, float, true>(1);
+	constexpr auto scalar_made_matrix_1x1_rm = EmuMath::Matrix<1, 1, long double, false>(1);
+	std::cout << "Constructed 1x1 CM:\n" << scalar_made_matrix_1x1_cm << "\n";
+	std::cout << "Constructed 1x1 RM:\n" << scalar_made_matrix_1x1_rm << "\n";
+
+
+	constexpr auto mat_2x2_cm_auto_ = EmuMath::Helpers::MatrixMake<2, 2, float, true>(1, 2, 3, 4);
+	constexpr auto mat_2x2_rm_auto_ = EmuMath::Helpers::MatrixMake<2, 2, float, false>(1, 2, 3, 4);
+	std::cout << "MatrixMake<2, 2, float, true>(1, 2, 3, 4):\n" << mat_2x2_cm_auto_ << "\n";
+	std::cout << "MatrixMake<2, 2, float, false>(1, 2, 3, 4):\n" << mat_2x2_rm_auto_ << "\n";
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();
