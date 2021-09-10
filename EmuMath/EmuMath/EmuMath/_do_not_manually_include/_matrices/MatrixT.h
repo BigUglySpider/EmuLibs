@@ -171,6 +171,43 @@ namespace EmuMath
 		}
 
 		template<std::size_t MajorIndex_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_non_major_elements, contained_type>& at()
+		{
+			return this->template GetMajor<MajorIndex_>();
+		}
+		template<std::size_t MajorIndex_>
+		[[nodiscard]] constexpr inline const EmuMath::Vector<num_non_major_elements, contained_type>& at() const
+		{
+			return this->template GetMajor<MajorIndex_>();
+		}
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_non_major_elements, contained_type>& at(const std::size_t majorIndex_)
+		{
+			return this->GetMajor(majorIndex_);
+		}
+		[[nodiscard]] constexpr inline const EmuMath::Vector<num_non_major_elements, contained_type>& at(const std::size_t majorIndex_) const
+		{
+			return this->GetMajor(majorIndex_);
+		}
+
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_non_major_elements, contained_type>& operator[](const std::size_t majorIndex_)
+		{
+			return this->at(majorIndex_);
+		}
+		[[nodiscard]] constexpr inline const EmuMath::Vector<num_non_major_elements, contained_type>& operator[](const std::size_t majorIndex_) const
+		{
+			return this->at(majorIndex_);
+		}
+
+		[[nodiscard]] constexpr inline raw_value_type& operator()(const std::size_t columnIndex_, const std::size_t rowIndex_)
+		{
+			return this->at(columnIndex_, rowIndex_);
+		}
+		[[nodiscard]] constexpr inline const raw_value_type& operator()(const std::size_t columnIndex_, const std::size_t rowIndex_) const
+		{
+			return this->at(columnIndex_, rowIndex_);
+		}
+
+		template<std::size_t MajorIndex_>
 		constexpr inline EmuMath::Vector<num_non_major_elements, contained_type>& GetMajor()
 		{
 			if constexpr (MajorIndex_ < num_major_elements)

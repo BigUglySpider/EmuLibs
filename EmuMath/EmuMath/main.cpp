@@ -468,6 +468,7 @@ int main()
 
 	constexpr auto mat_2x2_cm_auto_ = EmuMath::Helpers::MatrixMake<2, 2, float, true>(1, 2, 3, 4);
 	constexpr auto mat_2x2_rm_auto_ = EmuMath::Helpers::MatrixMake<2, 2, float, false>(1, 2, 3, 4);
+
 	std::cout << "MatrixMake<2, 2, float, true>(1, 2, 3, 4):\n" << mat_2x2_cm_auto_ << "\n";
 	std::cout << "MatrixMake<2, 2, float, false>(1, 2, 3, 4):\n" << mat_2x2_rm_auto_ << "\n";
 
