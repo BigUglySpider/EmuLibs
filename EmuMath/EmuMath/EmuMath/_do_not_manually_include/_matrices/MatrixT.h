@@ -75,6 +75,7 @@ namespace EmuMath
 		using random_access_column = EmuMath::Vector<num_rows, random_access_vector_contained_type>;
 		using const_random_access_row = EmuMath::Vector<num_columns, const_random_access_vector_contained_type>;
 		using const_random_access_column = EmuMath::Vector<num_rows, const_random_access_vector_contained_type>;
+		using copy_type = EmuMath::Matrix<num_columns, num_rows, value_type, is_column_major>;
 
 #pragma region CONSTRUCTORS
 		constexpr Matrix() : data_()
@@ -275,7 +276,134 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONST_OPERATORS
+		template<typename Rhs_>
+		constexpr inline copy_type operator+(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixAdd<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
+		}
+		constexpr inline copy_type operator+() const
+		{
+			return EmuMath::Helpers::MatrixAs<num_columns, num_rows, value_type, is_column_major, this_type>(*this);
+		}
 
+		template<typename Rhs_>
+		constexpr inline copy_type operator-(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixSubtract<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
+		}
+		constexpr inline copy_type operator-() const
+		{
+			return EmuMath::Helpers::MatrixNegate<num_columns, num_rows, value_type, is_column_major, this_type>(*this);
+		}
+
+		template<typename Rhs_>
+		constexpr inline copy_type operator*(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixMultiply<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
+		}
+
+		template<typename Rhs_>
+		constexpr inline copy_type operator/(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixDivideBasic<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
+		}
+
+		template<typename Rhs_>
+		constexpr inline copy_type operator&(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixAnd<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
+		}
+
+		template<typename Rhs_>
+		constexpr inline copy_type operator|(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixOr<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
+		}
+
+		template<typename Rhs_>
+		constexpr inline copy_type operator^(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixXor<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
+		}
+
+		template<typename Shifts_>
+		constexpr inline copy_type operator<<(const Shifts_& num_shifts_) const
+		{
+			return EmuMath::Helpers::MatrixShiftLeft<num_columns, num_rows, value_type, is_column_major, this_type, Shifts_>(*this, num_shifts_);
+		}
+
+		template<typename Shifts_>
+		constexpr inline copy_type operator>>(const Shifts_& num_shifts_) const
+		{
+			return EmuMath::Helpers::MatrixShiftRight<num_columns, num_rows, value_type, is_column_major, this_type, Shifts_>(*this, num_shifts_);
+		}
+
+		constexpr inline copy_type operator~() const
+		{
+			return EmuMath::Helpers::MatrixNot<num_columns, num_rows, value_type, is_column_major, this_type>(*this);
+		}
+#pragma endregion
+
+#pragma region NON_CONST_OPERATORS
+		template<typename Rhs_>
+		constexpr inline this_type& operator=(const Rhs_& to_copy_)
+		{
+			return EmuMath::Helpers::MatrixCopy(*this, to_copy_);
+		}
+
+		template<typename Rhs_>
+		constexpr inline this_type& operator+=(const Rhs_& rhs_)
+		{
+			return this->operator=(this->operator+(rhs_));
+		}
+
+		template<typename Rhs_>
+		constexpr inline this_type& operator-=(const Rhs_& rhs_)
+		{
+			return this->operator=(this->operator-(rhs_));
+		}
+
+		template<typename Rhs_>
+		constexpr inline this_type& operator*=(const Rhs_& rhs_)
+		{
+			return this->operator=(this->operator*(rhs_));
+		}
+
+		template<typename Rhs_>
+		constexpr inline this_type& operator/=(const Rhs_& rhs_)
+		{
+			return this->operator=(this->operator/(rhs_));
+		}
+
+		template<typename Rhs_>
+		constexpr inline this_type& operator&=(const Rhs_& rhs_)
+		{
+			return this->operator=(this->operator&(rhs_));
+		}
+
+		template<typename Rhs_>
+		constexpr inline this_type& operator|=(const Rhs_& rhs_)
+		{
+			return this->operator=(this->operator|(rhs_));
+		}
+
+		template<typename Rhs_>
+		constexpr inline this_type& operator^=(const Rhs_& rhs_)
+		{
+			return this->operator=(this->operator^(rhs_));
+		}
+
+		template<typename Shifts_>
+		constexpr inline this_type& operator<<=(const Shifts_& num_shifts_)
+		{
+			return this->operator=(this->operator<<(num_shifts_));
+		}
+
+		template<typename Shifts_>
+		constexpr inline this_type& operator>>=(const Shifts_& num_shifts_)
+		{
+			return this->operator=(this->operator>>(num_shifts_));
+		}
 #pragma endregion
 
 	private:

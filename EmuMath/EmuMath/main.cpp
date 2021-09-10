@@ -491,7 +491,10 @@ int main()
 	constexpr auto shifted_left_scalar = EmuMath::Helpers::MatrixShiftLeft(to_shift_, 2);
 	constexpr auto shifted_left_mat = EmuMath::Helpers::MatrixShiftLeft(to_shift_, EmuMath::Helpers::MatrixMake<3, 3, std::size_t>(2, 1, 2, 0, 1, 2, 1, 2, 3));
 	constexpr auto shifted_right_scalar = EmuMath::Helpers::MatrixShiftRight(to_shift_, 2);
-	constexpr auto shifted_right_mat = EmuMath::Helpers::MatrixShiftRight(to_shift_, EmuMath::Helpers::MatrixMake<3, 3, std::size_t>(2, 1, 2, 0, 1, 2, 1, 2, 3));
+	constexpr auto shifted_right_mat = EmuMath::Helpers::MatrixShiftRight<std::int64_t>(to_shift_, EmuMath::Helpers::MatrixMake<3, 3, std::size_t>(2, 1, 2, 0, 1, 2, 1, 2, 3));
+	constexpr auto neg_srm_ = -shifted_right_mat;
+	constexpr auto pos_srm_ = +shifted_right_mat;
+	constexpr auto inv_srm_ = ~shifted_right_mat;
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
