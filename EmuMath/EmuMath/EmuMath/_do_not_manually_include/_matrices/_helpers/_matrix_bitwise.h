@@ -409,6 +409,230 @@ namespace EmuMath::Helpers
 	{
 		return MatrixNot<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
+
+	/// <summary>
+	/// <para> Shifts all elements of the passed matrix_ to the left the specified number of times within num_shifts_. </para>
+	/// <para> If num_shifts_ is an EmuMath matrix: each element of the passed matrix_ will be shifted by the respective element in num_shifts_. </para>
+	/// <para> If num_shifts_ is none of the above: every element of the passed matrix_ will be shifted by the value of num_shifts_. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+	/// <typeparam name="Matrix_">Type of matrix to shift the elements of.</typeparam>
+	/// <typeparam name="Shifts_">Type of argument indicating the number of shifts.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to shift the elements of.</param>
+	/// <param name="num_shifts_">Number of shifts to perform on the passed matrix as defined above.</param>
+	/// <returns>EmuMath matrix copy of the passed matrix with each element shifted to the left a number of times indicated by num_shifts_.</returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixShiftLeft
+	(
+		const Matrix_& matrix_,
+		const Shifts_& num_shifts_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_matrix_v<Shifts_>)
+			{
+				using shifter = EmuCore::do_left_shift<typename Matrix_::value_type, typename Shifts_::value_type>;
+				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
+				<
+					EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+					Matrix_,
+					Shifts_,
+					shifter
+				>(matrix_, num_shifts_);
+			}
+			else
+			{
+				using shifter = EmuCore::do_left_shift<typename Matrix_::value_type, Shifts_>;
+				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
+				<
+					EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+					Matrix_,
+					Shifts_,
+					shifter
+				>(matrix_, num_shifts_);
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to shift a matrix left, but the provided matrix_ argument was not an EmuMath matrix.");
+		}
+	}
+	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixShiftLeft
+	(
+		const Matrix_& matrix_,
+		const Shifts_& num_shifts_
+	)
+	{
+		return MatrixShiftLeft<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_, Matrix_, Shifts_>(matrix_, num_shifts_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Matrix_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> MatrixShiftLeft
+	(
+		const Matrix_& matrix_,
+		const Shifts_& num_shifts_
+	)
+	{
+		return MatrixShiftLeft<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_, Matrix_, Shifts_>(matrix_, num_shifts_);
+	}
+	template<bool OutColumnMajor_, class Matrix_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixShiftLeft
+	(
+		const Matrix_& matrix_,
+		const Shifts_& num_shifts_
+	)
+	{
+		return MatrixShiftLeft<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_, Matrix_, Shifts_>(matrix_, num_shifts_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Matrix_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> MatrixShiftLeft
+	(
+		const Matrix_& matrix_,
+		const Shifts_& num_shifts_
+	)
+	{
+		return MatrixShiftLeft<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
+	}
+	template<typename out_contained_type, class Matrix_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixShiftLeft
+	(
+		const Matrix_& matrix_,
+		const Shifts_& num_shifts_
+	)
+	{
+		return MatrixShiftLeft<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Matrix_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> MatrixShiftLeft
+	(
+		const Matrix_& matrix_,
+		const Shifts_& num_shifts_
+	)
+	{
+		return MatrixShiftLeft<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
+	}
+	template<class Matrix_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixShiftLeft
+	(
+		const Matrix_& matrix_,
+		const Shifts_& num_shifts_
+	)
+	{
+		return MatrixShiftLeft<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
+	}
+
+	/// <summary>
+	/// <para> Shifts all elements of the passed matrix_ to the right the specified number of times within num_shifts_. </para>
+	/// <para> If num_shifts_ is an EmuMath matrix: each element of the passed matrix_ will be shifted by the respective element in num_shifts_. </para>
+	/// <para> If num_shifts_ is none of the above: every element of the passed matrix_ will be shifted by the value of num_shifts_. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+	/// <typeparam name="Matrix_">Type of matrix to shift the elements of.</typeparam>
+	/// <typeparam name="Shifts_">Type of argument indicating the number of shifts.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to shift the elements of.</param>
+	/// <param name="num_shifts_">Number of shifts to perform on the passed matrix as defined above.</param>
+	/// <returns>EmuMath matrix copy of the passed matrix with each element shifted to the right a number of times indicated by num_shifts_.</returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixShiftRight
+	(
+		const Matrix_& matrix_,
+		const Shifts_& num_shifts_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_matrix_v<Shifts_>)
+			{
+				using shifter = EmuCore::do_right_shift<typename Matrix_::value_type, typename Shifts_::value_type>;
+				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
+				<
+					EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+					Matrix_,
+					Shifts_,
+					shifter
+				>(matrix_, num_shifts_);
+			}
+			else
+			{
+				using shifter = EmuCore::do_right_shift<typename Matrix_::value_type, Shifts_>;
+				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
+				<
+					EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+					Matrix_,
+					Shifts_,
+					shifter
+				>(matrix_, num_shifts_);
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to shift a matrix right, but the provided matrix_ argument was not an EmuMath matrix.");
+		}
+	}
+	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixShiftRight
+	(
+		const Matrix_& matrix_,
+		const Shifts_& num_shifts_
+	)
+	{
+		return MatrixShiftRight<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_, Matrix_, Shifts_>(matrix_, num_shifts_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Matrix_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> MatrixShiftRight
+	(
+		const Matrix_& matrix_,
+		const Shifts_& num_shifts_
+	)
+	{
+		return MatrixShiftRight<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_, Matrix_, Shifts_>(matrix_, num_shifts_);
+	}
+	template<bool OutColumnMajor_, class Matrix_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixShiftRight
+	(
+		const Matrix_& matrix_,
+		const Shifts_& num_shifts_
+	)
+	{
+		return MatrixShiftRight<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_, Matrix_, Shifts_>(matrix_, num_shifts_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Matrix_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> MatrixShiftRight
+	(
+		const Matrix_& matrix_,
+		const Shifts_& num_shifts_
+	)
+	{
+		return MatrixShiftRight<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
+	}
+	template<typename out_contained_type, class Matrix_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixShiftRight
+	(
+		const Matrix_& matrix_,
+		const Shifts_& num_shifts_
+	)
+	{
+		return MatrixShiftRight<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Matrix_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> MatrixShiftRight
+	(
+		const Matrix_& matrix_,
+		const Shifts_& num_shifts_
+	)
+	{
+		return MatrixShiftRight<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
+	}
+	template<class Matrix_, class Shifts_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixShiftRight
+	(
+		const Matrix_& matrix_,
+		const Shifts_& num_shifts_
+	)
+	{
+		return MatrixShiftRight<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
+	}
 }
 
 #endif

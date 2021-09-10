@@ -484,6 +484,14 @@ int main()
 	constexpr auto cm_2x2_auto_cast_ = EmuMath::Helpers::MatrixAs<2, 4, std::int32_t, false>(mat_2x2_cm_auto_);
 	std::cout << EmuMath::Helpers::MatrixAnd(cm_2x2_auto_cast_, 0x01) << "\n";
 	std::cout << EmuMath::Helpers::MatrixNot<3, 2>(cm_2x2_auto_cast_) << "\n";
+	std::cout << EmuMath::Helpers::MatrixOr<3, 2>(cm_2x2_auto_cast_, 0x01) << "\n";
+	std::cout << EmuMath::Helpers::MatrixXor<3, 2>(cm_2x2_auto_cast_, 0x01) << "\n";
+
+	constexpr auto to_shift_ = EmuMath::Helpers::MatrixMake<3, 3, std::uint32_t, true>(8, 4, 8, 4, 8, 4, 8, 4, 8);
+	constexpr auto shifted_left_scalar = EmuMath::Helpers::MatrixShiftLeft(to_shift_, 2);
+	constexpr auto shifted_left_mat = EmuMath::Helpers::MatrixShiftLeft(to_shift_, EmuMath::Helpers::MatrixMake<3, 3, std::size_t>(2, 1, 2, 0, 1, 2, 1, 2, 3));
+	constexpr auto shifted_right_scalar = EmuMath::Helpers::MatrixShiftRight(to_shift_, 2);
+	constexpr auto shifted_right_mat = EmuMath::Helpers::MatrixShiftRight(to_shift_, EmuMath::Helpers::MatrixMake<3, 3, std::size_t>(2, 1, 2, 0, 1, 2, 1, 2, 3));
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
