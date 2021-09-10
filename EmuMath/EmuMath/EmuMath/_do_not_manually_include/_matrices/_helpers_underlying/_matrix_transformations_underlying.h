@@ -49,7 +49,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	};
 
 	template<class OutMatrix_, class...Args_>
-	constexpr inline OutMatrix_ _make_translation_matrix(const Args_&...args_)
+	[[nodiscard]] constexpr inline OutMatrix_ _make_translation_matrix(const Args_&...args_)
 	{
 		OutMatrix_ out_ = OutMatrix_();
 		_matrix_set_trace_region<0, OutMatrix_, typename OutMatrix_::contained_type>(out_, typename OutMatrix_::contained_type(1));
@@ -58,7 +58,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<class OutMatrix_, class Theta_, class CosCalculator_, class SinCalculator_>
-	constexpr inline OutMatrix_ _make_rotation_matrix_x(const Theta_& theta_)
+	[[nodiscard]] constexpr inline OutMatrix_ _make_rotation_matrix_x(const Theta_& theta_)
 	{
 		using out_value = typename OutMatrix_::value_type;
 
@@ -80,7 +80,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		return out_;
 	}
 	template<class OutMatrix_, class Theta_, class CosCalculator_, class SinCalculator_>
-	constexpr inline OutMatrix_ _make_rotation_matrix_y(const Theta_& theta_)
+	[[nodiscard]] constexpr inline OutMatrix_ _make_rotation_matrix_y(const Theta_& theta_)
 	{
 		using out_value = typename OutMatrix_::value_type;
 
@@ -102,7 +102,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		return out_;
 	}
 	template<class OutMatrix_, class Theta_, class CosCalculator_, class SinCalculator_>
-	constexpr inline OutMatrix_ _make_rotation_matrix_z(const Theta_& theta_)
+	[[nodiscard]] constexpr inline OutMatrix_ _make_rotation_matrix_z(const Theta_& theta_)
 	{
 		using out_value = typename OutMatrix_::value_type;
 
@@ -154,7 +154,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 	};
 	template<class OutMatrix_, typename...Args_>
-	constexpr inline OutMatrix_ _make_scale_matrix(const Args_&...args_)
+	[[nodiscard]] constexpr inline OutMatrix_ _make_scale_matrix(const Args_&...args_)
 	{
 		OutMatrix_ out_ = OutMatrix_();
 		_matrix_set_trace_region<0, OutMatrix_, typename OutMatrix_::value_type>(out_, typename OutMatrix_::value_type(1));

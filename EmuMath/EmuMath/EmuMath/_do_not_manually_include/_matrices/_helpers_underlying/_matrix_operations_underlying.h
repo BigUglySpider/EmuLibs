@@ -47,7 +47,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	{
 		if constexpr (Index_ < Matrix_::num_columns)
 		{
-			out_ = adder_(out_, _get_matrix_data<Index_, Index_>(matrix_));
+			out_ = adder_(out_, static_cast<Out_>(_get_matrix_data<Index_, Index_>(matrix_)));
 			_calculate_matrix_trace<Index_ + 1, Out_, Matrix_, Adder_>(matrix_, out_, adder_);
 		}
 	}
@@ -204,7 +204,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class InMatrix_, class OutMatrix_, class Negator_>
-	[[nodiscard]] constexpr inline void _transform_matrix_minors_to_cofactors(const InMatrix_& in_, OutMatrix_& out_, Negator_& negator_)
+	constexpr inline void _transform_matrix_minors_to_cofactors(const InMatrix_& in_, OutMatrix_& out_, Negator_& negator_)
 	{
 		if constexpr (ColumnIndex_ < OutMatrix_::num_columns)
 		{

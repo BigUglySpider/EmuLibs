@@ -15,7 +15,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	/// <param name="far_">Far value when creating the normalisation cofactor.</param>
 	/// <returns>Result of -(far / (far - near)).</returns>
 	template<typename Near_, typename Far_, typename Out_>
-	constexpr inline Out_ _calculate_basic_perspective_near_far_cofactor_a(const Near_& near_, const Far_& far_)
+	[[nodiscard]] constexpr inline Out_ _calculate_basic_perspective_near_far_cofactor_a(const Near_& near_, const Far_& far_)
 	{
 		auto far_sub_near = EmuCore::do_subtract<Far_, Near_>()(far_, near_);
 		auto out_ = EmuCore::do_divide<Far_, decltype(far_sub_near)>()(far_, far_sub_near);
@@ -30,7 +30,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	/// <param name="far_">Far value when creating the normalisation cofactor.</param>
 	/// <returns>Result of -((f * n) / (f - n)).</returns>
 	template<typename Near_, typename Far_, typename Out_>
-	constexpr inline Out_ _calculate_basic_perspective_near_far_cofactor_b(const Near_& near_, const Far_& far_)
+	[[nodiscard]] constexpr inline Out_ _calculate_basic_perspective_near_far_cofactor_b(const Near_& near_, const Far_& far_)
 	{
 		auto far_sub_near = EmuCore::do_subtract<Far_, Near_>()(far_, near_);
 		auto far_mult_near_ = EmuCore::do_multiply<Far_, Near_>()(far_, near_);
@@ -44,7 +44,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	/// <param name="fov_">FOV to use for the scale calculation, measured in radians.</param>
 	/// <returns>Result of 1 / tan((fov_ / 2)). </returns>
 	template<std::size_t NumIterations_, typename Fov_, typename Out_>
-	constexpr inline Out_ _calculate_basic_perspective_fov_scale_rads(const Fov_& fov_rads_)
+	[[nodiscard]] constexpr inline Out_ _calculate_basic_perspective_fov_scale_rads(const Fov_& fov_rads_)
 	{
 		using floating_point = EmuCore::TMPHelpers::first_floating_point_t<Fov_, Out_, float>;
 		constexpr floating_point one_ = floating_point(1);
@@ -60,7 +60,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<std::size_t NumIterations_, class Matrix_, typename Near_, typename Far_, typename Fov_>
-	constexpr inline Matrix_ _make_basic_perspective_projection_matrix_rads(const Near_& near_, const Far_& far_, const Fov_& fov_rads_)
+	[[nodiscard]] constexpr inline Matrix_ _make_basic_perspective_projection_matrix_rads(const Near_& near_, const Far_& far_, const Fov_& fov_rads_)
 	{
 		using out_value = typename Matrix_::value_type;
 
@@ -76,7 +76,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<typename Out_, typename FovYRads_, typename Near_, typename CalcType_, class Tan_>
-	constexpr inline Out_ _calculate_matrix_perspective_projection_scale_rads(const FovYRads_& fov_angle_y_rads_, const Near_& near_)
+	[[nodiscard]] constexpr inline Out_ _calculate_matrix_perspective_projection_scale_rads(const FovYRads_& fov_angle_y_rads_, const Near_& near_)
 	{
 		using Mul_ = EmuCore::do_multiply<CalcType_, CalcType_>;
 		Mul_ mul_ = Mul_();
@@ -88,12 +88,12 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<typename Out_, typename Scale_>
-	constexpr inline Out_ _calculate_matrix_perspective_edge_top_rads(const Scale_& scale_)
+	[[nodiscard]] constexpr inline Out_ _calculate_matrix_perspective_edge_top_rads(const Scale_& scale_)
 	{
 		return static_cast<Out_>(scale_);
 	}
 	template<typename Out_, typename FovYRads_, typename Near_, typename CalcType_, class Tan_>
-	constexpr inline Out_ _calculate_matrix_perspective_edge_top_rads(const FovYRads_& fov_angle_y_rads_, const Near_& near_)
+	[[nodiscard]] constexpr inline Out_ _calculate_matrix_perspective_edge_top_rads(const FovYRads_& fov_angle_y_rads_, const Near_& near_)
 	{
 		return _calculate_matrix_perspective_edge_top_rads<Out_, CalcType_>
 		(
@@ -102,7 +102,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<typename Out_, typename Scale_>
-	constexpr inline Out_ _calculate_matrix_perspective_edge_bottom_rads(const Scale_& scale_)
+	[[nodiscard]] constexpr inline Out_ _calculate_matrix_perspective_edge_bottom_rads(const Scale_& scale_)
 	{
 		return EmuCore::do_negate<Out_>()
 		(
@@ -110,7 +110,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		);
 	}
 	template<typename Out_, typename FovYRads_, typename Near_, typename CalcType_, class Tan_>
-	constexpr inline Out_ _calculate_matrix_perspective_edge_bottom_rads(const FovYRads_& fov_angle_y_rads_, const Near_& near_)
+	[[nodiscard]] constexpr inline Out_ _calculate_matrix_perspective_edge_bottom_rads(const FovYRads_& fov_angle_y_rads_, const Near_& near_)
 	{
 		return _calculate_matrix_perspective_edge_bottom_rads<Out_, CalcType_>
 		(
@@ -119,7 +119,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<typename Out_, typename AspectRatio_, typename Scale_>
-	constexpr inline Out_ _calculate_matrix_perspective_edge_right_rads(const AspectRatio_& aspect_ratio_, const Scale_& scale_)
+	[[nodiscard]] constexpr inline Out_ _calculate_matrix_perspective_edge_right_rads(const AspectRatio_& aspect_ratio_, const Scale_& scale_)
 	{
 		if constexpr (std::is_floating_point_v<AspectRatio_> && std::is_floating_point_v<Scale_>)
 		{
@@ -139,7 +139,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 	}
 	template<typename Out_, typename FovYRads_, typename Near_, typename AspectRatio_, typename CalcType_, class Tan_>
-	constexpr inline Out_ _calculate_matrix_perspective_edge_right_rads(const FovYRads_& fov_angle_y_rads_, const Near_& near_, const AspectRatio_& aspect_ratio_)
+	[[nodiscard]] constexpr inline Out_ _calculate_matrix_perspective_edge_right_rads(const FovYRads_& fov_angle_y_rads_, const Near_& near_, const AspectRatio_& aspect_ratio_)
 	{
 		return _calculate_matrix_perspective_edge_right_rads<Out_, AspectRatio_, CalcType_>
 		(
@@ -149,7 +149,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<typename Out_, typename AspectRatio_, typename Scale_>
-	constexpr inline Out_ _calculate_matrix_perspective_edge_left_rads(const AspectRatio_& aspect_ratio_, const Scale_& scale_)
+	[[nodiscard]] constexpr inline Out_ _calculate_matrix_perspective_edge_left_rads(const AspectRatio_& aspect_ratio_, const Scale_& scale_)
 	{
 		return EmuCore::do_negate<Out_>()
 		(
@@ -157,7 +157,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		);
 	}
 	template<typename Out_, typename FovYRads_, typename Near_, typename AspectRatio_, typename CalcType_, class Tan_>
-	constexpr inline Out_ _calculate_matrix_perspective_edge_left_rads(const FovYRads_& fov_angle_y_rads_, const Near_& near_, const AspectRatio_& aspect_ratio_)
+	[[nodiscard]] constexpr inline Out_ _calculate_matrix_perspective_edge_left_rads(const FovYRads_& fov_angle_y_rads_, const Near_& near_, const AspectRatio_& aspect_ratio_)
 	{
 		return _calculate_matrix_perspective_edge_left_rads<Out_, AspectRatio_, CalcType_>
 		(
@@ -218,7 +218,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<class OutMatrix_, typename Near_, typename Far_, typename Left_, typename Right_, typename Bottom_, typename Top_, typename CalcType_>
-	constexpr inline OutMatrix_ _make_perspective_matrix_with_frustum_rads_gl
+	[[nodiscard]] constexpr inline OutMatrix_ _make_perspective_matrix_with_frustum_rads_gl
 	(
 		const Near_& near_,
 		const Far_& far_,
@@ -279,7 +279,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		return out_;
 	}
 	template<class OutMatrix_, typename FovYRads_, typename Near_, typename Far_, typename AspectRatio_, typename CalcType_, class Tan_>
-	constexpr inline OutMatrix_ _make_perspective_matrix_with_frustum_rads_gl
+	[[nodiscard]] constexpr inline OutMatrix_ _make_perspective_matrix_with_frustum_rads_gl
 	(
 		const FovYRads_& fov_angle_y_rads_,
 		const Near_& near_,
@@ -314,7 +314,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<class OutMatrix_, typename Near_, typename Far_, typename Left_, typename Right_, typename Bottom_, typename Top_, typename CalcType_>
-	constexpr inline OutMatrix_ _make_perspective_matrix_with_frustum_rads_vk
+	[[nodiscard]] constexpr inline OutMatrix_ _make_perspective_matrix_with_frustum_rads_vk
 	(
 		const Near_& near_,
 		const Far_& far_,
@@ -365,7 +365,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		return out_;
 	}
 	template<class OutMatrix_, typename FovYRads_, typename Near_, typename Far_, typename AspectRatio_, typename CalcType_, class Tan_>
-	constexpr inline OutMatrix_ _make_perspective_matrix_with_frustum_rads_vk
+	[[nodiscard]] constexpr inline OutMatrix_ _make_perspective_matrix_with_frustum_rads_vk
 	(
 		const FovYRads_& fov_angle_y_rads_,
 		const Near_& near_,
@@ -400,7 +400,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<class OutMatrix_, typename Left_, typename Right_, typename Bottom_, typename Top_, typename Near_, typename Far_, typename CalcType_>
-	constexpr inline OutMatrix_ _make_orthograhpic_projection_matrix_gl
+	[[nodiscard]] constexpr inline OutMatrix_ _make_orthograhpic_projection_matrix_gl
 	(
 		const Left_& left_,
 		const Right_& right_,
@@ -483,7 +483,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<class OutMatrix_, typename Left_, typename Right_, typename Bottom_, typename Top_, typename Near_, typename Far_, typename CalcType_>
-	constexpr inline OutMatrix_ _make_orthograhpic_projection_matrix_vk
+	[[nodiscard]] constexpr inline OutMatrix_ _make_orthograhpic_projection_matrix_vk
 	(
 		const Left_& left_,
 		const Right_& right_,

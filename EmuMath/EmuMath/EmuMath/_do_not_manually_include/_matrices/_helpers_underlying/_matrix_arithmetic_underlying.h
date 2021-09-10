@@ -50,7 +50,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 	}
 	template<class OutMatrix_, class LhsMatrix_, class Rhs_, class Func_>
-	constexpr inline OutMatrix_ _matrix_lhs_rhs_operation(const LhsMatrix_& lhs_, const Rhs_& rhs_, Func_& func_)
+	[[nodiscard]] constexpr inline OutMatrix_ _matrix_lhs_rhs_operation(const LhsMatrix_& lhs_, const Rhs_& rhs_, Func_& func_)
 	{
 		OutMatrix_ out_ = OutMatrix_();
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
@@ -64,14 +64,14 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		return out_;
 	}
 	template<class OutMatrix_, class LhsMatrix_, class Rhs_, class Func_>
-	constexpr inline OutMatrix_ _matrix_lhs_rhs_operation(const LhsMatrix_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline OutMatrix_ _matrix_lhs_rhs_operation(const LhsMatrix_& lhs_, const Rhs_& rhs_)
 	{
 		Func_ func_ = Func_();
 		return _matrix_lhs_rhs_operation<OutMatrix_, LhsMatrix_, Rhs_, Func_&>(lhs_, rhs_, func_);
 	}
 
 	template<class Matrix_, std::size_t...Indices_>
-	constexpr inline std::array<EmuMath::Vector<Matrix_::num_rows, typename Matrix_::value_type>, sizeof...(Indices_)> _get_matrix_columns
+	[[nodiscard]] constexpr inline std::array<EmuMath::Vector<Matrix_::num_rows, typename Matrix_::value_type>, sizeof...(Indices_)> _get_matrix_columns
 	(
 		const Matrix_& matrix_,
 		std::index_sequence<Indices_...>
@@ -83,7 +83,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		});
 	}
 	template<class Matrix_, std::size_t...Indices_>
-	constexpr inline std::array<EmuMath::Vector<Matrix_::num_columns, typename Matrix_::value_type>, sizeof...(Indices_)> _get_matrix_rows
+	[[nodiscard]] constexpr inline std::array<EmuMath::Vector<Matrix_::num_columns, typename Matrix_::value_type>, sizeof...(Indices_)> _get_matrix_rows
 	(
 		const Matrix_& matrix_,
 		std::index_sequence<Indices_...>
@@ -115,7 +115,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 	}
 	template<class OutMatrix_, class LhsMatrix_, class Rhs_>
-	constexpr inline OutMatrix_ _matrix_std_multiply(const LhsMatrix_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline OutMatrix_ _matrix_std_multiply(const LhsMatrix_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
 		{

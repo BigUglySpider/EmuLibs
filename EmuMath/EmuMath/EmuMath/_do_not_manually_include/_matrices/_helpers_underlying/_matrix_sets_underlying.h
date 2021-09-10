@@ -171,7 +171,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		return lhs_;
 	}
 	template<class OutMatrix_, class Src_>
-	constexpr inline OutMatrix_ _matrix_create_from_src(const Src_& src_)
+	[[nodiscard]] constexpr inline OutMatrix_ _matrix_create_from_src(const Src_& src_)
 	{
 		OutMatrix_ out_ = OutMatrix_();
 		_matrix_copy<OutMatrix_, Src_>(out_, src_);
@@ -274,7 +274,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		return lhs_;
 	}
 	template<class OutMatrix_, class Src_>
-	constexpr inline OutMatrix_ _matrix_make_and_set_full(Src_& src_)
+	[[nodiscard]] constexpr inline OutMatrix_ _matrix_make_and_set_full(Src_& src_)
 	{
 		OutMatrix_ out_ = OutMatrix_();
 		_matrix_set_full<OutMatrix_, Src_>(out_, src_);
@@ -327,7 +327,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 	};
 	template<class Matrix_, typename...Args_>
-	constexpr inline Matrix_ _make_matrix(Args_&&...args_)
+	[[nodiscard]] constexpr inline Matrix_ _make_matrix(Args_&&...args_)
 	{
 		Matrix_ matrix_ = Matrix_();
 		_matrix_maker<Matrix_, Args_...>()(matrix_, std::move(args_)...);

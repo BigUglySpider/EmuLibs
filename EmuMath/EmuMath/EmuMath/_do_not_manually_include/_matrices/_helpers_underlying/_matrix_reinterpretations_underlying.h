@@ -6,7 +6,7 @@
 namespace EmuMath::Helpers::_underlying_matrix_funcs
 {
 	template<class Vector_, class OutMatrix_>
-	constexpr inline OutMatrix_ _vector_to_matrix(const Vector_& vector_)
+	[[nodiscard]] constexpr inline OutMatrix_ _vector_to_matrix(const Vector_& vector_)
 	{
 		return OutMatrix_(static_cast<EmuMath::Vector<Vector_::size, typename OutMatrix_::contained_type>>(vector_));
 	}
