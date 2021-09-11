@@ -512,13 +512,16 @@ int main()
 	constexpr auto copied_ = inv_srm_;
 	constexpr auto copied_with_noise_ = EmuMath::Helpers::MatrixMake<4, 4, float, true>
 	(
-		inv_srm_.at<0, 0>(), inv_srm_.at<0, 1>(), inv_srm_.at<0, 2>(), 1.0f,
-		inv_srm_.at<1, 0>(), inv_srm_.at<1, 1>(), inv_srm_.at<1, 2>(), 2.0f,
-		inv_srm_.at<2, 0>(), inv_srm_.at<2, 1>(), inv_srm_.at<2, 2>(), 3.0f,
+		copied_.at<0, 0>(), copied_.at<0, 1>(), copied_.at<0, 2>(), 1.0f,
+		copied_.at<1, 0>(), copied_.at<1, 1>(), copied_.at<1, 2>(), 2.0f,
+		copied_.at<2, 0>(), copied_.at<2, 1>(), copied_.at<2, 2>(), 3.0f,
 		4.0f, 5.0f, 6.0f, 7.0f
 	);
-	constexpr auto cmp_all_result_equal_mat_ = EmuMath::Helpers::MatrixCmpAllTrue<EmuCore::do_cmp_equal_to, true>(inv_srm_, copied_);
-	constexpr auto cmp_all_result_equal_mat_ = EmuMath::Helpers::MatrixCmpAllTrue<EmuCore::do_cmp_equal_to, false>(inv_srm_, copied_with_noise_);
+
+	constexpr auto cmp_all_result_equal_mat_all_ = EmuMath::Helpers::MatrixCmpAllTrue<EmuCore::do_cmp_equal_to, true>(inv_srm_, copied_with_noise_);
+	constexpr auto cmp_all_result_equal_mat_largest_ = EmuMath::Helpers::MatrixCmpAllTrue<EmuCore::do_cmp_equal_to, false>(inv_srm_, copied_with_noise_);
+
+
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

@@ -479,6 +479,18 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to perform a CmpAll operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
 		}
 	}
+	template<class Func_, bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
+	constexpr inline bool MatrixCmpAllTrue(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_, Func_ func_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_cmp_all<Func_&, TestAllIndices_, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_, func_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a CmpAll operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
+		}
+	}
 
 	template<template<class Lhs__, class Rhs__> class FuncTemplate_, bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
 	constexpr inline bool MatrixCmpAnyTrue(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
@@ -489,7 +501,19 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform a CmpAll operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
+			static_assert(false, "Attempted to perform a CmpAny operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
+		}
+	}
+	template<class Func_, bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
+	constexpr inline bool MatrixCmpAnyTrue(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_, Func_ func_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_cmp_any<Func_&, TestAllIndices_, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_, func_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a CmpAny operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
 		}
 	}
 }

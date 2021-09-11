@@ -78,55 +78,103 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 	}
 
-	template<bool CompareAllIndices_, template<class Lhs__, class Rhs__> class CmpTemplate_, class LhsMatrix_, class Rhs_>
-	constexpr inline bool _matrix_cmp_all(const LhsMatrix_& lhs_, const Rhs_& rhs_)
+	template<class Cmp_, bool CompareAllIndices_, class LhsMatrix_, class Rhs_>
+	constexpr inline bool _matrix_cmp_all(const LhsMatrix_& lhs_, const Rhs_& rhs_, Cmp_ cmp_)
 	{
 		using Joiner_ = std::logical_and<bool>;
 		Joiner_ joiner_ = Joiner_();
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
 		{
-			using Cmp_ = CmpTemplate_<typename LhsMatrix_::raw_value_type, typename Rhs_::raw_value_type>;
-			Cmp_ cmp_ = Cmp_();
-			if constexpr (CompareAllIndices_)
+			if constexpr (std::is_invocable_v<Cmp_, const typename LhsMatrix_::raw_value_type&, typename Rhs_::raw_value_type>)
 			{
-				return _matrix_cmp_matrix_do_all_indices<0, 0, LhsMatrix_, Rhs_, Cmp_, Joiner_>(lhs_, rhs_, cmp_, joiner_, true);
+				if constexpr (CompareAllIndices_)
+				{
+					return _matrix_cmp_matrix_do_all_indices<0, 0, LhsMatrix_, Rhs_, Cmp_, Joiner_>(lhs_, rhs_, cmp_, joiner_, true);
+				}
+				else
+				{
+					return _matrix_cmp_matrix_until_one_ends<0, 0, LhsMatrix_, Rhs_, Cmp_, Joiner_>(lhs_, rhs_, cmp_, joiner_, true);
+				}
 			}
 			else
 			{
-				return _matrix_cmp_matrix_until_one_ends<0, 0, LhsMatrix_, Rhs_, Cmp_, Joiner_>(lhs_, rhs_, cmp_, joiner_, true);
+				static_assert(false, "Attempted to perform a cmp_all operation on a matrix, but the provided comparator could not be called with the passed values.");
 			}
 		}
 		else
 		{
+			if constexpr (std::is_invocable_v<Cmp_, const typename LhsMatrix_::raw_value_type&, Rhs_>)
+			{
+				return _matrix_cmp_scalar<0, 0, LhsMatrix_, Rhs_, Cmp_, Joiner_>(lhs_, rhs_, cmp_, joiner_, true);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a cmp_all operation on a matrix, but the provided comparator could not be called with the passed values.");
+			}
+		}
+	}
+	template<bool CompareAllIndices_, template<class Lhs__, class Rhs__> class CmpTemplate_, class LhsMatrix_, class Rhs_>
+	constexpr inline bool _matrix_cmp_all(const LhsMatrix_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
+		{
+			using Cmp_ = CmpTemplate_<typename LhsMatrix_::raw_value_type, typename Rhs_::raw_value_type>;
+			return _matrix_cmp_all<Cmp_, CompareAllIndices_, LhsMatrix_, Rhs_>(lhs_, rhs_, Cmp_());
+		}
+		else
+		{
 			using Cmp_ = CmpTemplate_<typename LhsMatrix_::raw_value_type, Rhs_>;
-			Cmp_ cmp_ = Cmp_();
-			return _matrix_cmp_scalar<0, 0, LhsMatrix_, Rhs_, Cmp_, Joiner_>(lhs_, rhs_, cmp_, joiner_, true);
+			return _matrix_cmp_all<Cmp_, CompareAllIndices_, LhsMatrix_, Rhs_>(lhs_, rhs_, Cmp_());
 		}
 	}
 
-	template<bool CompareAllIndices_, template<class Lhs__, class Rhs__> class CmpTemplate_, class LhsMatrix_, class Rhs_>
-	constexpr inline bool _matrix_cmp_any(const LhsMatrix_& lhs_, const Rhs_& rhs_)
+	template<class Cmp_, bool CompareAllIndices_, class LhsMatrix_, class Rhs_>
+	constexpr inline bool _matrix_cmp_any(const LhsMatrix_& lhs_, const Rhs_& rhs_, Cmp_ cmp_)
 	{
 		using Joiner_ = std::logical_or<bool>;
 		Joiner_ joiner_ = Joiner_();
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
 		{
-			using Cmp_ = CmpTemplate_<typename LhsMatrix_::raw_value_type, typename Rhs_::raw_value_type>;
-			Cmp_ cmp_ = Cmp_();
-			if constexpr (CompareAllIndices_)
+			if constexpr (std::is_invocable_v<Cmp_, const typename LhsMatrix_::raw_value_type&, typename Rhs_::raw_value_type>)
 			{
-				return _matrix_cmp_matrix_do_all_indices<0, 0, LhsMatrix_, Rhs_, Cmp_, Joiner_>(lhs_, rhs_, cmp_, joiner_, false);
+				if constexpr (CompareAllIndices_)
+				{
+					return _matrix_cmp_matrix_do_all_indices<0, 0, LhsMatrix_, Rhs_, Cmp_, Joiner_>(lhs_, rhs_, cmp_, joiner_, false);
+				}
+				else
+				{
+					return _matrix_cmp_matrix_until_one_ends<0, 0, LhsMatrix_, Rhs_, Cmp_, Joiner_>(lhs_, rhs_, cmp_, joiner_, false);
+				}
 			}
 			else
 			{
-				return _matrix_cmp_matrix_until_one_ends<0, 0, LhsMatrix_, Rhs_, Cmp_, Joiner_>(lhs_, rhs_, cmp_, joiner_, false);
+				static_assert(false, "Attempted to perform a cmp_any operation on a matrix, but the provided comparator could not be called with the passed values.");
 			}
 		}
 		else
 		{
+			if constexpr (std::is_invocable_v<Cmp_, const typename LhsMatrix_::raw_value_type&, Rhs_>)
+			{
+				return _matrix_cmp_scalar<0, 0, LhsMatrix_, Rhs_, Cmp_, Joiner_>(lhs_, rhs_, cmp_, joiner_, false);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a cmp_any operation on a matrix, but the provided comparator could not be called with the passed values.");
+			}
+		}
+	}
+	template<bool CompareAllIndices_, template<class Lhs__, class Rhs__> class CmpTemplate_, class LhsMatrix_, class Rhs_>
+	constexpr inline bool _matrix_cmp_any(const LhsMatrix_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
+		{
+			using Cmp_ = CmpTemplate_<typename LhsMatrix_::raw_value_type, typename Rhs_::raw_value_type>;
+			return _matrix_cmp_any<Cmp_, CompareAllIndices_, LhsMatrix_, Rhs_>(lhs_, rhs_, Cmp_());
+		}
+		else
+		{
 			using Cmp_ = CmpTemplate_<typename LhsMatrix_::raw_value_type, Rhs_>;
-			Cmp_ cmp_ = Cmp_();
-			return _matrix_cmp_scalar<0, 0, LhsMatrix_, Rhs_, Cmp_, Joiner_>(lhs_, rhs_, cmp_, joiner_, false);
+			return _matrix_cmp_any<Cmp_, CompareAllIndices_, LhsMatrix_, Rhs_>(lhs_, rhs_, Cmp_());
 		}
 	}
 }
