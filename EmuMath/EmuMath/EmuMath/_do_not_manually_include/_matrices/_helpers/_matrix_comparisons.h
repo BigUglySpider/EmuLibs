@@ -896,6 +896,74 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to perform a CmpAnyLessEqual operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
 		}
 	}
+
+	/// <summary>
+	/// <para> Returns true if the two passed matrices are equal. </para>
+	/// <para>
+	///		By default, only the lowest-sized matrix indices are compared.
+	///		To compare even non-existent indices, set the TestAllIndices_ template argument to true.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="LhsMatrix_">Type of matrix appearing on the left of the comparison.</typeparam>
+	/// <typeparam name="RhsMatrix_">Type of matrix appearing on the right of the comparison.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left of the comparison.</param>
+	/// <param name="rhs_matrix_">EmuMath matrix appearing on the right of the comparison.</param>
+	/// <returns>
+	///		True if all respective elements (overall or smallest-size, depending on TestAllIndices_ value) of the passed matrices are equal; otherwise false.
+	/// </returns>
+	template<bool TestAllIndices_ = false, class LhsMatrix_, class RhsMatrix_>
+	constexpr inline bool MatrixCmpEqual(const LhsMatrix_& lhs_matrix_, const RhsMatrix_& rhs_matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_matrix_v<RhsMatrix_>)
+			{
+				return MatrixCmpAllEqual<TestAllIndices_, LhsMatrix_, RhsMatrix_>(lhs_matrix_, rhs_matrix_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to compare two matrices for equality, but the provided rhs_matrix_ was not an EmuMath matrix.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to compare two matrices for equality, but the provided lhs_matrix_ was not an EmuMath matrix.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns true if the two passed matrices are unequal. </para>
+	/// <para>
+	///		By default, only the lowest-sized matrix indices are compared.
+	///		To compare even non-existent indices, set the TestAllIndices_ template argument to true.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="LhsMatrix_">Type of matrix appearing on the left of the comparison.</typeparam>
+	/// <typeparam name="RhsMatrix_">Type of matrix appearing on the right of the comparison.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left of the comparison.</param>
+	/// <param name="rhs_matrix_">EmuMath matrix appearing on the right of the comparison.</param>
+	/// <returns>
+	///		True if at least one respective element (overall or smallest-size, depending on TestAllIndices_ value) of the passed matrices is not equal; otherwise false.
+	/// </returns>
+	template<bool TestAllIndices_ = false, class LhsMatrix_, class RhsMatrix_>
+	constexpr inline bool MatrixCmpNotEqual(const LhsMatrix_& lhs_matrix_, const RhsMatrix_& rhs_matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_matrix_v<RhsMatrix_>)
+			{
+				return MatrixCmpAnyNotEqual<TestAllIndices_, LhsMatrix_, RhsMatrix_>(lhs_matrix_, rhs_matrix_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to compare two matrices for inequality, but the provided rhs_matrix_ was not an EmuMath matrix.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to compare two matrices for inequality, but the provided lhs_matrix_ was not an EmuMath matrix.");
+		}
+	}
 }
 
 #endif

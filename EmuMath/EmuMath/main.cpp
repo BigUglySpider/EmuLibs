@@ -571,28 +571,10 @@ int main()
 	std::cout << _some16x2cm << "\n\n";
 	std::cout << _some16x2rm << "\n\n";
 
-
-	float a_ = 0.0f, b_ = 1.0f, c_ = 2.0f, d_ = 3.0f;
-	auto ref_made_cm_ = EmuMath::Helpers::MatrixMakeRef<2, 2, float, true>(a_, b_, c_, d_);
-	auto ref_made_rm_ = EmuMath::Helpers::MatrixMake<2, 2, EmuMath::InternalMatrixReference<float>, false>(a_, b_, c_, d_);
-	auto const_ref_made_cm_ = EmuMath::Helpers::MatrixMakeRef<4, 4, const float, true>(a_, b_, c_, d_, b_, c_, d_, a_, c_, d_, a_, b_, d_, a_, b_, c_);
-	std::cout << "---\n";
-	std::cout << ref_made_cm_ << "\n\n";
-	std::cout << ref_made_rm_ << "\n\n";
-	std::cout << const_ref_made_cm_ << "\n\n";
-	ref_made_cm_.at<0, 0>() = 42.0f;
-	ref_made_rm_.at<1, 0>() = 69.0f;
-	ref_made_rm_.at<1, 1>() = 255.0f;
-	std::cout << "---\n";
-	std::cout << ref_made_cm_ << "\n\n";
-	std::cout << ref_made_rm_ << "\n\n";
-	std::cout << const_ref_made_cm_ << "\n\n";
-	c_ = 1337.0f;
-	std::cout << "---\n";
-	std::cout << ref_made_cm_ << "\n\n";
-	std::cout << ref_made_rm_ << "\n\n";
-	std::cout << const_ref_made_cm_ << "\n\n";
-
+	constexpr bool cmp_0_ = _some16x2cm == _some16x2rm;
+	constexpr bool cmp_1_ = _some16x2cm == _some16x2cm;
+	constexpr bool cmp_2_ = _some16x2cm != _some16x2rm;
+	constexpr bool cmp_3_ = _some16x2cm != _some16x2cm;
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
