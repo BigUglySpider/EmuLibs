@@ -281,56 +281,51 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		return out_;
 	}
 
-	template<class Matrix_, typename FirstArg_, typename...RemainingArgs_>
+	template<class Matrix_>
 	struct _matrix_maker
 	{
+	private:
+		template<std::size_t Index_, typename Arg_>
+		static constexpr bool _set_index(Matrix_& out_, Arg_&& arg_)
+		{
+			constexpr std::size_t major_index_ = Index_ / Matrix_::num_non_major_elements;
+			constexpr std::size_t non_major_index_ = Index_ % Matrix_::num_non_major_elements;
+			if constexpr (Matrix_::is_column_major)
+			{
+				_matrix_set<major_index_, non_major_index_>(out_, std::forward<Arg_>(arg_));
+			}
+			else
+			{
+				_matrix_set<non_major_index_, major_index_>(out_, std::forward<Arg_>(arg_));
+			}
+			return true;
+		}
+
+		/// <summary> Used as a dummy to allow variadic unpacking of one item per _set_index call. </summary>
+		struct _build_instructor
+		{
+			template<typename...Args_>
+			constexpr _build_instructor(Args_&&...args_)
+			{
+			}
+		};
+
+	public:
 		constexpr _matrix_maker()
 		{
 		}
-		template<std::size_t MajorIndex_ = 0, std::size_t NonMajorIndex_ = 0>
-		constexpr inline void operator()(Matrix_& out_, FirstArg_&& first_arg_, RemainingArgs_&&...remaining_args_) const
+		template<typename...Args_, std::size_t...Indices_>
+		constexpr inline void operator()(Matrix_& out_, std::index_sequence<Indices_...> indices_, Args_&&...args_)
 		{
-			if constexpr (MajorIndex_ < Matrix_::num_major_elements)
-			{
-				if constexpr (NonMajorIndex_ < Matrix_::num_non_major_elements)
-				{
-					_matrix_maker<Matrix_, FirstArg_>().template operator()<MajorIndex_, NonMajorIndex_>(out_, std::move(first_arg_));
-					_matrix_maker<Matrix_, RemainingArgs_...>().template operator()<MajorIndex_, NonMajorIndex_ + 1>(out_, std::move(remaining_args_)...);
-				}
-				else
-				{
-					this->template operator()<MajorIndex_ + 1, 0>(out_, std::move(first_arg_), std::move(remaining_args_)...);
-				}
-			}
-		}
-	};
-	template<class Matrix_, typename Arg_>
-	struct _matrix_maker<Matrix_, Arg_>
-	{
-		constexpr _matrix_maker()
-		{
-		}
-		template<std::size_t MajorIndex_ = 0, std::size_t NonMajorIndex_ = 0>
-		constexpr inline void operator()(Matrix_& out_, Arg_&& arg_) const
-		{
-			if constexpr (MajorIndex_ < Matrix_::num_major_elements)
-			{
-				if constexpr (Matrix_::is_column_major)
-				{
-					_matrix_set<MajorIndex_, NonMajorIndex_>(out_, std::forward<Arg_>(arg_));
-				}
-				else
-				{
-					_matrix_set<NonMajorIndex_, MajorIndex_>(out_, std::forward<Arg_>(arg_));
-				}
-			}
+			// There must be some other way to do this, since it looks a little bit hacky
+			_build_instructor(_set_index<Indices_>(out_, args_)...);
 		}
 	};
 	template<class Matrix_, typename...Args_>
 	[[nodiscard]] constexpr inline Matrix_ _make_matrix(Args_&&...args_)
 	{
 		Matrix_ matrix_ = Matrix_();
-		_matrix_maker<Matrix_, Args_...>()(matrix_, std::move(args_)...);
+		_matrix_maker<Matrix_>()(matrix_, std::make_index_sequence<sizeof...(Args_)>(), args_...);
 		return matrix_;
 	}
 }

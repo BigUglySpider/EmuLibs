@@ -522,6 +522,7 @@ int main()
 
 
 	constexpr auto copied_ = EmuMath::Helpers::MatrixAs<4, 4>(inv_srm_);
+	
 	constexpr auto copied_with_noise_ = EmuMath::Helpers::MatrixMake<4, 4, float, true>
 	(
 		copied_.at<0, 0>(), copied_.at<0, 1>(), copied_.at<0, 2>(), 1.0f,
@@ -530,12 +531,45 @@ int main()
 		4.0f, 5.0f, 6.0f, 7.0f
 	);
 
+	int x__ = 1; int y__ = 2; int z__ = 3; int w__ = 4;
+	auto yo_ = EmuMath::Helpers::MatrixMake<3, 3, double>(0.0f, x__, 0.0f, y__, 0.0f, z__, 0.0f, w__, 0.0f);
+
 	constexpr auto cmp_all_result_equal_mat_all_ = EmuMath::Helpers::MatrixCmpAllEqual<true>(inv_srm_, copied_with_noise_);
 	constexpr auto cmp_all_result_equal_mat_largest_ = EmuMath::Helpers::MatrixCmpAllEqual<false>(inv_srm_, copied_with_noise_);
 	constexpr auto cmp_all_result_equal_mat_all_no_noise_ = EmuMath::Helpers::MatrixCmpAllEqual<true>(inv_srm_, copied_);
 	constexpr auto cmp_all_result_equal_mat_largest_no_noise_ = EmuMath::Helpers::MatrixCmpAllEqual<false>(inv_srm_, copied_);
 
+	constexpr auto _some2x2cm = EmuMath::Helpers::MatrixMake<2, 2, float, true>(1.0f, 2.0f, 3.0f, 4.0f);
+	constexpr auto _some2x2rm = EmuMath::Helpers::MatrixMake<2, 2, float, false>(1.0f, 2.0f, 3.0f, 4.0f);
+	std::cout << "---\n";
+	std::cout << _some2x2cm << "\n";
+	std::cout << _some2x2rm << "\n";
 
+	constexpr auto _some1x1cm = EmuMath::Helpers::MatrixMake<1, 1, float, true>(5);
+	constexpr auto _some1x1rm = EmuMath::Helpers::MatrixMake<1, 1, float, false>(5);
+	std::cout << "---\n";
+	std::cout << _some1x1cm << "\n\n";
+	std::cout << _some1x1rm << "\n\n";
+
+
+	constexpr auto _some1x16cm = EmuMath::Helpers::MatrixMake<1, 16, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	constexpr auto _some1x16rm = EmuMath::Helpers::MatrixMake<1, 16, float, false>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << "---\n";
+	std::cout << _some1x16cm << "\n\n";
+	std::cout << _some1x16rm << "\n\n";
+
+
+	constexpr auto _some16x1cm = EmuMath::Helpers::MatrixMake<16, 1, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	constexpr auto _some16x1rm = EmuMath::Helpers::MatrixMake<16, 1, float, false>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << "---\n";
+	std::cout << _some16x1cm << "\n\n";
+	std::cout << _some16x1rm << "\n\n";
+
+	constexpr auto _some16x2cm = EmuMath::Helpers::MatrixMake<16, 2, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32);
+	constexpr auto _some16x2rm = EmuMath::Helpers::MatrixMake<16, 2, float, false>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32);
+	std::cout << "---\n";
+	std::cout << _some16x2cm << "\n\n";
+	std::cout << _some16x2rm << "\n\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

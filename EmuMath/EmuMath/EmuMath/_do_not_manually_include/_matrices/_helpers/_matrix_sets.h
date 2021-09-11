@@ -77,12 +77,17 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	template<typename...Args_>
+	constexpr inline void bloobo(Args_&&...args_)
+	{
+		
+	}
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_ = true, typename...Args_>
 	[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_> MatrixMake(Args_&&...contiguous_args_)
 	{
 		if constexpr (sizeof...(Args_) == EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::size)
 		{
-			return _underlying_matrix_funcs::_make_matrix<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>, Args_...>(std::move(contiguous_args_)...);
+			return _underlying_matrix_funcs::_make_matrix<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>(contiguous_args_...);
 		}
 		else
 		{

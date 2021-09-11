@@ -123,7 +123,7 @@ namespace EmuMath
 			{
 				if constexpr (EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, ScalarArgs_...>::value)
 				{
-					EmuMath::Helpers::_underlying_matrix_funcs::_matrix_maker<this_type, ScalarArgs_...>()(*this, std::move(contiguous_scalar_args_)...);
+					EmuMath::Helpers::_underlying_matrix_funcs::_matrix_maker<this_type>()(*this, std::make_index_sequence<size>(), contiguous_scalar_args_...);
 				}
 				else
 				{
