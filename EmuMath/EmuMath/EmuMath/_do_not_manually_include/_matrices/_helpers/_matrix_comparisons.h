@@ -467,6 +467,15 @@ namespace EmuMath::Helpers
 		return MatrixCmpPerElementLessEqual<LhsMatrix_::num_columns, LhsMatrix_::num_rows, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
 	}
 
+	/// <summary>
+	/// <para> Returns true if all comparisons performed with the provided callable return true. </para>
+	/// <para> The callable will be discerned from a template type. </para>
+	/// </summary>
+	/// <typeparam name="LhsMatrix_"></typeparam>
+	/// <typeparam name="Rhs_"></typeparam>
+	/// <param name="lhs_matrix_"></param>
+	/// <param name="rhs_"></param>
+	/// <returns></returns>
 	template<template<class Lhs__, class Rhs__> class FuncTemplate_, bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
 	constexpr inline bool MatrixCmpAllTrue(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
 	{
@@ -514,6 +523,19 @@ namespace EmuMath::Helpers
 		else
 		{
 			static_assert(false, "Attempted to perform a CmpAny operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
+		}
+	}
+
+	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
+	constexpr inline bool MatrixCmpAnyEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_cmp_any<TestAllIndices_, EmuCore::do_cmp_equal_to, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a CmpAnyEqual operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
 		}
 	}
 }

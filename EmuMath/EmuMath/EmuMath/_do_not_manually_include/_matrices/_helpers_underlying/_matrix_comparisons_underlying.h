@@ -85,7 +85,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		Joiner_ joiner_ = Joiner_();
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
 		{
-			if constexpr (std::is_invocable_v<Cmp_, const typename LhsMatrix_::raw_value_type&, typename Rhs_::raw_value_type>)
+			if constexpr (std::is_invocable_r_v<bool, Cmp_, const typename LhsMatrix_::raw_value_type&, const typename Rhs_::raw_value_type&>)
 			{
 				if constexpr (CompareAllIndices_)
 				{
@@ -98,18 +98,18 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform a cmp_all operation on a matrix, but the provided comparator could not be called with the passed values.");
+				static_assert(false, "Attempted to perform a cmp_all operation on a matrix, but the provided comparator could not be invoked with the argument types (const LhsMatrix_::raw_value_type&, const Rhs_::raw_value_type&) while also providing a result that may be considered a bool.");
 			}
 		}
 		else
 		{
-			if constexpr (std::is_invocable_v<Cmp_, const typename LhsMatrix_::raw_value_type&, Rhs_>)
+			if constexpr (std::is_invocable_r_v<bool, Cmp_, const typename LhsMatrix_::raw_value_type&, const Rhs_&>)
 			{
 				return _matrix_cmp_scalar<0, 0, LhsMatrix_, Rhs_, Cmp_, Joiner_>(lhs_, rhs_, cmp_, joiner_, true);
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform a cmp_all operation on a matrix, but the provided comparator could not be called with the passed values.");
+				static_assert(false, "Attempted to perform a cmp_all operation on a matrix, but the provided comparator could not be invoked with the argument types (const LhsMatrix_::raw_value_type&, const Rhs_&) while also providing a result that may be considered a bool.");
 			}
 		}
 	}
@@ -135,7 +135,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		Joiner_ joiner_ = Joiner_();
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
 		{
-			if constexpr (std::is_invocable_v<Cmp_, const typename LhsMatrix_::raw_value_type&, typename Rhs_::raw_value_type>)
+			if constexpr (std::is_invocable_r_v<bool, Cmp_, const typename LhsMatrix_::raw_value_type&, const typename Rhs_::raw_value_type&>)
 			{
 				if constexpr (CompareAllIndices_)
 				{
@@ -148,18 +148,18 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform a cmp_any operation on a matrix, but the provided comparator could not be called with the passed values.");
+				static_assert(false, "Attempted to perform a cmp_any operation on a matrix, but the provided comparator could not be invoked with the argument types (const LhsMatrix_::raw_value_type&, const Rhs_::raw_value_type&) while also providing a result that may be considered a bool.");
 			}
 		}
 		else
 		{
-			if constexpr (std::is_invocable_v<Cmp_, const typename LhsMatrix_::raw_value_type&, Rhs_>)
+			if constexpr (std::is_invocable_r_v<bool, Cmp_, const typename LhsMatrix_::raw_value_type&, const Rhs_&>)
 			{
 				return _matrix_cmp_scalar<0, 0, LhsMatrix_, Rhs_, Cmp_, Joiner_>(lhs_, rhs_, cmp_, joiner_, false);
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform a cmp_any operation on a matrix, but the provided comparator could not be called with the passed values.");
+				static_assert(false, "Attempted to perform a cmp_any operation on a matrix, but the provided comparator could not be invoked with the argument types (const LhsMatrix_::raw_value_type&, const Rhs_&) while also providing a result that may be considered a bool.");
 			}
 		}
 	}
