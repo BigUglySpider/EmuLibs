@@ -587,6 +587,12 @@ int main()
 	std::cout << ref_made_cm_ << "\n\n";
 	std::cout << ref_made_rm_ << "\n\n";
 	std::cout << const_ref_made_cm_ << "\n\n";
+	c_ = 1337.0f;
+	std::cout << "---\n";
+	std::cout << ref_made_cm_ << "\n\n";
+	std::cout << ref_made_rm_ << "\n\n";
+	std::cout << const_ref_made_cm_ << "\n\n";
+
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
