@@ -50,6 +50,7 @@ namespace EmuMath
 		{
 			EmuMath::Helpers::VectorSet(*this, toCopy_);
 		}
+		template<typename = std::enable_if_t<!contains_non_const_reference_wrappers>>
 		constexpr Vector(const this_type& toCopy_) : Vector()
 		{
 			EmuMath::Helpers::VectorSet(*this, toCopy_);

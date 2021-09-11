@@ -77,21 +77,86 @@ namespace EmuMath::Helpers
 		}
 	}
 
-	template<typename...Args_>
-	constexpr inline void bloobo(Args_&&...args_)
-	{
-		
-	}
+	/// <summary>
+	/// <para> Creates an EmuMath matrix of const references with the specified template arguments, with its data set in contiguous order with the passed arguments. </para>
+	/// <para> The passed number of arguments must be equal to the number of elements contained within the desired output matrix. </para>
+	/// <para> If the matrix is column major: Arguments will be used in order to fill columns, moving on to the next column once one is complete. </para>
+	/// <para> If the matrix is row major: Arguments will be used in order to fill rows, moving on to the next row once one is complete. </para>
+	/// </summary>
+	/// <typeparam name="T_">Type to be contained in the created matrix.</typeparam>
+	/// <typeparam name="Args_">Types used as scalar arguments for constructing the matrix.</typeparam>
+	/// <param name="contiguous_args_">Scalar arguments used to form the matrix in contiguous order. The number of arguments must match the matrix's number of elements.</param>
+	/// <returns>Const reference matrix of the specified type with its elements contiguously set via the provided arguments as defined above.</returns>
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_ = true, typename...Args_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_> MatrixMake(Args_&&...contiguous_args_)
+	[[nodiscard]] constexpr inline EmuMath::ConstRefMatrix<NumColumns_, NumRows_, T_, ColumnMajor_> MatrixMakeConstRef(Args_&&...contiguous_args_)
 	{
-		if constexpr (sizeof...(Args_) == EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::size)
+		if constexpr (sizeof...(Args_) == EmuMath::ConstRefMatrix<NumColumns_, NumRows_, T_, ColumnMajor_>::size)
 		{
-			return _underlying_matrix_funcs::_make_matrix<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>(contiguous_args_...);
+			return _underlying_matrix_funcs::_make_matrix<EmuMath::ConstRefMatrix<NumColumns_, NumRows_, T_, ColumnMajor_>>(contiguous_args_...);
 		}
 		else
 		{
-			static_assert(false, "Attempted to make an EmuMath matrix via MatrixMake with a number of arguments not equal to the number of elements within the matrix.");
+			static_assert(false, "Attempted to make an EmuMath matrix of const references via MatrixMake with a number of arguments not equal to the number of elements within the matrix.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Creates an EmuMath matrix of references with the specified template arguments, with its data set in contiguous order with the passed arguments. </para>
+	/// <para> The passed number of arguments must be equal to the number of elements contained within the desired output matrix. </para>
+	/// <para> If the matrix is column major: Arguments will be used in order to fill columns, moving on to the next column once one is complete. </para>
+	/// <para> If the matrix is row major: Arguments will be used in order to fill rows, moving on to the next row once one is complete. </para>
+	/// </summary>
+	/// <typeparam name="T_">Type to be contained in the created matrix.</typeparam>
+	/// <typeparam name="Args_">Types used as scalar arguments for constructing the matrix.</typeparam>
+	/// <param name="contiguous_args_">Scalar arguments used to form the matrix in contiguous order. The number of arguments must match the matrix's number of elements.</param>
+	/// <returns>Reference matrix of the specified type with its elements contiguously set via the provided arguments as defined above.</returns>
+	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_ = true, typename...Args_>
+	[[nodiscard]] constexpr inline EmuMath::RefMatrix<NumColumns_, NumRows_, T_, ColumnMajor_> MatrixMakeRef(Args_&&...contiguous_args_)
+	{
+		if constexpr (std::is_const_v<T_>)
+		{
+			return MatrixMakeConstRef<NumColumns_, NumRows_, T_, ColumnMajor_>(contiguous_args_...);
+		}
+		else
+		{
+			if constexpr (sizeof...(Args_) == EmuMath::RefMatrix<NumColumns_, NumRows_, T_, ColumnMajor_>::size)
+			{
+				return _underlying_matrix_funcs::_make_matrix<EmuMath::RefMatrix<NumColumns_, NumRows_, T_, ColumnMajor_>>(contiguous_args_...);
+			}
+			else
+			{
+				static_assert(false, "Attempted to make an EmuMath matrix of references via MatrixMake with a number of arguments not equal to the number of elements within the matrix.");
+			}
+		}
+	}
+
+	/// <summary>
+	/// <para> Creates an EmuMath matrix with the specified template arguments, with its data set in contiguous order with the passed arguments. </para>
+	/// <para> The passed number of arguments must be equal to the number of elements contained within the desired output matrix. </para>
+	/// <para> If the matrix is column major: Arguments will be used in order to fill columns, moving on to the next column once one is complete. </para>
+	/// <para> If the matrix is row major: Arguments will be used in order to fill rows, moving on to the next row once one is complete. </para>
+	/// </summary>
+	/// <typeparam name="T_">Type to be contained in the created matrix.</typeparam>
+	/// <typeparam name="Args_">Types used as scalar arguments for constructing the matrix.</typeparam>
+	/// <param name="contiguous_args_">Scalar arguments used to form the matrix in contiguous order. The number of arguments must match the matrix's number of elements.</param>
+	/// <returns>Matrix of the specified type with its elements contiguously set via the provided arguments as defined above.</returns>
+	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_ = true, typename...Args_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_> MatrixMake(Args_&&...contiguous_args_)
+	{
+		if constexpr (EmuMath::TMP::is_internal_emu_matrix_reference_v<T_>)
+		{
+			return MatrixMakeRef<NumColumns_, NumRows_, typename T_::value_type, ColumnMajor_>(contiguous_args_...);
+		}
+		else
+		{
+			if constexpr (sizeof...(Args_) == EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::size)
+			{
+				return _underlying_matrix_funcs::_make_matrix<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>(contiguous_args_...);
+			}
+			else
+			{
+				static_assert(false, "Attempted to make an EmuMath matrix via MatrixMake with a number of arguments not equal to the number of elements within the matrix.");
+			}
 		}
 	}
 }

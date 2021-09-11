@@ -90,6 +90,7 @@ namespace EmuMath
 		constexpr Matrix(this_type& toCopy_) : data_(toCopy_.data_)
 		{
 		}
+		template<typename = std::enable_if_t<!contains_non_const_reference_wrappers>>
 		constexpr Matrix(const this_type& toCopy_) : data_(toCopy_.data_)
 		{
 		}

@@ -39,6 +39,7 @@ namespace EmuMath
 		constexpr Vector(this_type& toCopy_) : x(toCopy_.x), y(toCopy_.y), z(toCopy_.z)
 		{
 		}
+		template<typename = std::enable_if_t<!contains_non_const_reference_wrappers>>
 		constexpr Vector(const this_type& toCopy_) : x(toCopy_.x), y(toCopy_.y), z(toCopy_.z)
 		{
 		}

@@ -32,11 +32,30 @@ namespace EmuMath
 	/// </summary>
 	/// <typeparam name="T_">Type to be referencing. T_ itself should not be a reference type; the reference will be applied automatically.</typeparam>
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_ = true>
-	using ConstRefMatrix = EmuMath::Matrix<NumColumns_, NumRows_, EmuMath::InternalMatrixReference<const T_>, ColumnMajor_>;
+	using ConstRefMatrix = RefMatrix<NumColumns_, NumRows_, const T_, ColumnMajor_>;
 }
 
 namespace EmuMath::TMP
 {
+	template<class T_>
+	struct is_internal_emu_matrix_reference
+	{
+		static constexpr bool value = std::conditional_t
+		<
+			// This is a recursive check to make sure that T_ does not have modifiers that may lead to false negatives
+			std::is_same_v<T_, std::remove_reference_t<std::remove_cv_t<T_>>>,
+			std::false_type,
+			is_internal_emu_matrix_reference<std::remove_reference_t<std::remove_cv_t<T_>>>
+		>::value;
+	};
+	template<class T_>
+	struct is_internal_emu_matrix_reference<EmuMath::InternalVectorReference<T_>>
+	{
+		static constexpr bool value = true;
+	};
+	template<class T_>
+	static constexpr bool is_internal_emu_matrix_reference_v = is_internal_emu_matrix_reference<T_>::value;
+
 	template<class T_>
 	struct is_emu_matrix
 	{
