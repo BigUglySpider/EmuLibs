@@ -3,6 +3,7 @@
 
 #include "../_helpers_underlying/_common_underlying_matrix_helper_includes.h"
 #include "../_helpers_underlying/_matrix_arithmetic_underlying.h"
+#include "../_helpers_underlying/_matrix_comparisons_underlying.h"
 #include "../_helpers_underlying/_matrix_gets_underlying.h"
 #include "../_helpers_underlying/_matrix_operations_underlying.h"
 #include "../_helpers_underlying/_matrix_projections_underlying.h"

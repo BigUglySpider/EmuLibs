@@ -182,5 +182,11 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_bitwise.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_comparisons.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_comparisons_underlying.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

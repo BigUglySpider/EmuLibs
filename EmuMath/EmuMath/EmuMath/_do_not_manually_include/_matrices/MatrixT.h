@@ -408,7 +408,6 @@ namespace EmuMath
 
 	private:
 		data_storage_type data_;
-
 #pragma region SELF_HELPERS
 		template<std::size_t ColumnIndex_, std::size_t RowIndex_>
 		static constexpr inline bool _valid_static_indices()
