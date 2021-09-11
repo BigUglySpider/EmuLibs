@@ -504,9 +504,21 @@ int main()
 	constexpr auto cmp_per_element_result_greater_equal_ = EmuMath::Helpers::MatrixCmpPerElementGreaterEqual(inv_srm_, -3);
 	constexpr auto cmp_per_element_result_less_equal_ = EmuMath::Helpers::MatrixCmpPerElementLessEqual(inv_srm_, -3);
 
-	constexpr auto cmp_all_result_equal_scalar_ = EmuMath::Helpers::MatrixCmpAllTrue<EmuCore::do_cmp_equal_to>(inv_srm_, -2);
+	constexpr auto cmp_all_result_equal_scalar_ = EmuMath::Helpers::MatrixCmpAllEqual(inv_srm_, -2);
+	constexpr auto cmp_all_result_not_equal_scalar_ = EmuMath::Helpers::MatrixCmpAllNotEqual(inv_srm_, 42);
+	constexpr auto cmp_all_result_greater_scalar_ = EmuMath::Helpers::MatrixCmpAllGreater(inv_srm_, -5);
+	constexpr auto cmp_all_result_greater_equal_scalar_ = EmuMath::Helpers::MatrixCmpAllGreaterEqual(inv_srm_, -5);
+	constexpr auto cmp_all_result_less_scalar_ = EmuMath::Helpers::MatrixCmpAllLess(inv_srm_, -2);
+	constexpr auto cmp_all_result_less_equal_scalar_ = EmuMath::Helpers::MatrixCmpAllLessEqual(inv_srm_, -2);
 
-	constexpr auto cmp_any_result_equal_scalar_ = EmuMath::Helpers::MatrixCmpAnyTrue<EmuCore::do_cmp_equal_to>(inv_srm_, 42);
+	constexpr auto cmp_any_result_equal_scalar_ = EmuMath::Helpers::MatrixCmpAnyEqual(inv_srm_, -2);
+	constexpr auto cmp_any_result_not_equal_scalar_ = EmuMath::Helpers::MatrixCmpAnyNotEqual(inv_srm_, 42);
+	constexpr auto cmp_any_result_greater_scalar_ = EmuMath::Helpers::MatrixCmpAnyGreater(inv_srm_, -5);
+	constexpr auto cmp_any_result_greater_equal_scalar_ = EmuMath::Helpers::MatrixCmpAnyGreaterEqual(inv_srm_, -5);
+	constexpr auto cmp_any_result_less_scalar_ = EmuMath::Helpers::MatrixCmpAnyLess(inv_srm_, -2);
+	constexpr auto cmp_any_result_less_equal_scalar_ = EmuMath::Helpers::MatrixCmpAnyLessEqual(inv_srm_, -2);
+	constexpr auto cmp_any_result_less_equal_scalar_ex0_ = EmuMath::Helpers::MatrixCmpAnyLessEqual(inv_srm_, 0);
+	constexpr auto cmp_any_result_less_equal_scalar_ex1_ = EmuMath::Helpers::MatrixCmpAnyGreaterEqual(inv_srm_, 0);
 
 
 	constexpr auto copied_ = inv_srm_;

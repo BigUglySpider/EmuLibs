@@ -469,13 +469,26 @@ namespace EmuMath::Helpers
 
 	/// <summary>
 	/// <para> Returns true if all comparisons performed with the provided callable return true. </para>
-	/// <para> The callable will be discerned from a template type. </para>
+	/// <para>
+	///		The callable type will be discerned from a provided template type. 
+	///		The final callable type will amount to one of the following:
+	/// </para>
+	/// <para> 1: FuncTemplate_&lt;LhsMatrix_::raw_value_type, Rhs_::raw_value_type&gt; in the scenario that Rhs_ is an EmuMath Matrix. </para>
+	/// <para> 2: FuncTemplate_&lt;LhsMatrix_::raw_value_type, Rhs_&gt; in the scenario that none of the above scenarios are met. </para>
+	/// <para>
+	///		If a state is required for the callable, use the overload of this function which takes a finished Func_ instead. 
+	///		Note that use of said function will require you to find the template arguments yourself.
+	/// </para>
+	/// <para> 
+	///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+	///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+	/// </para>
 	/// </summary>
-	/// <typeparam name="LhsMatrix_"></typeparam>
-	/// <typeparam name="Rhs_"></typeparam>
-	/// <param name="lhs_matrix_"></param>
-	/// <param name="rhs_"></param>
-	/// <returns></returns>
+	/// <typeparam name="LhsMatrix_">Type of matrix to appear on the left-hand side of the comparison.</typeparam>
+	/// <typeparam name="Rhs_">Type appearing on the right-hand side of the comparison.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left-hand side of the comparison.</param>
+	/// <param name="rhs_">Item appearing on the right-hand side of the comparison.</param>
+	/// <returns>Boolean indcating if comparisons on all elements within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<template<class Lhs__, class Rhs__> class FuncTemplate_, bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
 	constexpr inline bool MatrixCmpAllTrue(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
 	{
@@ -488,6 +501,24 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to perform a CmpAll operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
 		}
 	}
+	/// <summary>
+	/// <para> Returns true if all comparisons performed with the provided callable return true. </para>
+	/// <para> 
+	///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+	///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+	/// </para>
+	/// <para> The provided callable will be provided arguments depending on the provided arguments: </para>
+	/// <para> 1: If rhs_ is an EmuMath matrix: The callable will be invoked with (const LhsMatrix_::raw_value_type&amp;, const Rhs_::raw_value_type&amp;) arguments. </para>
+	/// <para> 2: If rhs_ is none of the above: The callable will be invoked with (const LhsMatrix_::raw_value_type&amp;, const Rhs_&amp;) arguments. </para>
+	/// <para> In both above scenarios, invocation will be required to return a type that may be interpreted as a bool. </para>
+	/// </summary>
+	/// <typeparam name="LhsMatrix_">Type of matrix to appear on the left-hand side of the comparison.</typeparam>
+	/// <typeparam name="Rhs_">Type appearing on the right-hand side of the comparison.</typeparam>
+	/// <typeparam name="Func_">Type of callable to perform comparisons.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left-hand side of the comparison.</param>
+	/// <param name="rhs_">Item appearing on the right-hand side of the comparison.</param>
+	/// <param name="func_">Callable to perform comparisons, meeting the constraints defined above.</param>
+	/// <returns>Boolean indcating if comparisons on all elements within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<class Func_, bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
 	constexpr inline bool MatrixCmpAllTrue(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_, Func_ func_)
 	{
@@ -501,6 +532,178 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary>
+	/// <para> Returns true if all equal_to comparisons between lhs_matrix_ and rhs_ return true. </para>
+	/// <para> 
+	///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+	///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="LhsMatrix_">Matrix appearing on the left-hand side of equal_to comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left-hand side of equal_to comparisons.</param>
+	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+	/// <returns>Boolean indcating if comparisons on all elements within lhs_matrix_ with rhs_ as defined above returned true.</returns>
+	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
+	constexpr inline bool MatrixCmpAllEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_cmp_all<TestAllIndices_, EmuCore::do_cmp_equal_to, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a CmpAllEqual operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns true if all not_equal_to comparisons between lhs_matrix_ and rhs_ return true. </para>
+	/// <para> 
+	///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+	///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="LhsMatrix_">Matrix appearing on the left-hand side of equal_to comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left-hand side of equal_to comparisons.</param>
+	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+	/// <returns>Boolean indcating if comparisons on all elements within lhs_matrix_ with rhs_ as defined above returned true.</returns>
+	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
+	constexpr inline bool MatrixCmpAllNotEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_cmp_all<TestAllIndices_, EmuCore::do_cmp_not_equal_to, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a CmpAllNotEqual operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns true if all greater_than comparisons between lhs_matrix_ and rhs_ return true. </para>
+	/// <para> 
+	///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+	///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="LhsMatrix_">Matrix appearing on the left-hand side of equal_to comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left-hand side of equal_to comparisons.</param>
+	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+	/// <returns>Boolean indcating if comparisons on all elements within lhs_matrix_ with rhs_ as defined above returned true.</returns>
+	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
+	constexpr inline bool MatrixCmpAllGreater(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_cmp_all<TestAllIndices_, EmuCore::do_cmp_greater, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a CmpAllGreater operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns true if all less_than comparisons between lhs_matrix_ and rhs_ return true. </para>
+	/// <para> 
+	///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+	///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="LhsMatrix_">Matrix appearing on the left-hand side of equal_to comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left-hand side of equal_to comparisons.</param>
+	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+	/// <returns>Boolean indcating if comparisons on all elements within lhs_matrix_ with rhs_ as defined above returned true.</returns>
+	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
+	constexpr inline bool MatrixCmpAllLess(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_cmp_all<TestAllIndices_, EmuCore::do_cmp_less, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a CmpAllLess operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns true if all greater_equal comparisons between lhs_matrix_ and rhs_ return true. </para>
+	/// <para> 
+	///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+	///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="LhsMatrix_">Matrix appearing on the left-hand side of equal_to comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left-hand side of equal_to comparisons.</param>
+	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+	/// <returns>Boolean indcating if comparisons on all elements within lhs_matrix_ with rhs_ as defined above returned true.</returns>
+	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
+	constexpr inline bool MatrixCmpAllGreaterEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_cmp_all<TestAllIndices_, EmuCore::do_cmp_greater_equal, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a CmpAllGreaterEqual operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns true if all less_equal comparisons between lhs_matrix_ and rhs_ return true. </para>
+	/// <para> 
+	///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+	///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="LhsMatrix_">Matrix appearing on the left-hand side of equal_to comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left-hand side of equal_to comparisons.</param>
+	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+	/// <returns>Boolean indcating if comparisons all elements within lhs_matrix_ with rhs_ as defined above returned true.</returns>
+	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
+	constexpr inline bool MatrixCmpAllLessEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_cmp_all<TestAllIndices_, EmuCore::do_cmp_less_equal, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a CmpAllLessEqual operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns true if any comparisons performed with the provided callable return true. </para>
+	/// <para>
+	///		The callable type will be discerned from a provided template type. 
+	///		The final callable type will amount to one of the following:
+	/// </para>
+	/// <para> 1: FuncTemplate_&lt;LhsMatrix_::raw_value_type, Rhs_::raw_value_type&gt; in the scenario that Rhs_ is an EmuMath Matrix. </para>
+	/// <para> 2: FuncTemplate_&lt;LhsMatrix_::raw_value_type, Rhs_&gt; in the scenario that none of the above scenarios are met. </para>
+	/// <para>
+	///		If a state is required for the callable, use the overload of this function which takes a finished Func_ instead. 
+	///		Note that use of said function will require you to find the template arguments yourself.
+	/// </para>
+	/// <para> 
+	///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+	///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="LhsMatrix_">Type of matrix to appear on the left-hand side of the comparison.</typeparam>
+	/// <typeparam name="Rhs_">Type appearing on the right-hand side of the comparison.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left-hand side of the comparison.</param>
+	/// <param name="rhs_">Item appearing on the right-hand side of the comparison.</param>
+	/// <returns>Boolean indcating if comparisons on at least one element within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<template<class Lhs__, class Rhs__> class FuncTemplate_, bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
 	constexpr inline bool MatrixCmpAnyTrue(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
 	{
@@ -513,6 +716,24 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to perform a CmpAny operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
 		}
 	}
+	/// <summary>
+	/// <para> Returns true if any comparisons performed with the provided callable return true. </para>
+	/// <para> 
+	///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+	///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+	/// </para>
+	/// <para> The provided callable will be provided arguments depending on the provided arguments: </para>
+	/// <para> 1: If rhs_ is an EmuMath matrix: The callable will be invoked with (const LhsMatrix_::raw_value_type&amp;, const Rhs_::raw_value_type&amp;) arguments. </para>
+	/// <para> 2: If rhs_ is none of the above: The callable will be invoked with (const LhsMatrix_::raw_value_type&amp;, const Rhs_&amp;) arguments. </para>
+	/// <para> In both above scenarios, invocation will be required to return a type that may be interpreted as a bool. </para>
+	/// </summary>
+	/// <typeparam name="LhsMatrix_">Type of matrix to appear on the left-hand side of the comparison.</typeparam>
+	/// <typeparam name="Rhs_">Type appearing on the right-hand side of the comparison.</typeparam>
+	/// <typeparam name="Func_">Type of callable to perform comparisons.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left-hand side of the comparison.</param>
+	/// <param name="rhs_">Item appearing on the right-hand side of the comparison.</param>
+	/// <param name="func_">Callable to perform comparisons, meeting the constraints defined above.</param>
+	/// <returns>Boolean indcating if comparisons on at least one element within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<class Func_, bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
 	constexpr inline bool MatrixCmpAnyTrue(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_, Func_ func_)
 	{
@@ -526,6 +747,18 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary>
+	/// <para> Returns true if any equal_to comparisons between lhs_matrix_ and rhs_ return true. </para>
+	/// <para> 
+	///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+	///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="LhsMatrix_">Matrix appearing on the left-hand side of equal_to comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left-hand side of equal_to comparisons.</param>
+	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+	/// <returns>Boolean indcating if comparisons on at least one element within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
 	constexpr inline bool MatrixCmpAnyEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
 	{
@@ -536,6 +769,131 @@ namespace EmuMath::Helpers
 		else
 		{
 			static_assert(false, "Attempted to perform a CmpAnyEqual operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns true if any not_equal_to comparisons between lhs_matrix_ and rhs_ return true. </para>
+	/// <para> 
+	///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+	///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="LhsMatrix_">Matrix appearing on the left-hand side of equal_to comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left-hand side of equal_to comparisons.</param>
+	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+	/// <returns>Boolean indcating if comparisons on at least one element within lhs_matrix_ with rhs_ as defined above returned true.</returns>
+	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
+	constexpr inline bool MatrixCmpAnyNotEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_cmp_any<TestAllIndices_, EmuCore::do_cmp_not_equal_to, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a CmpAnyNotEqual operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns true if any greater_than comparisons between lhs_matrix_ and rhs_ return true. </para>
+	/// <para> 
+	///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+	///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="LhsMatrix_">Matrix appearing on the left-hand side of equal_to comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left-hand side of equal_to comparisons.</param>
+	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+	/// <returns>Boolean indcating if comparisons on at least one element within lhs_matrix_ with rhs_ as defined above returned true.</returns>
+	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
+	constexpr inline bool MatrixCmpAnyGreater(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_cmp_any<TestAllIndices_, EmuCore::do_cmp_greater, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a CmpAnyGreater operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns true if any less_than comparisons between lhs_matrix_ and rhs_ return true. </para>
+	/// <para> 
+	///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+	///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="LhsMatrix_">Matrix appearing on the left-hand side of equal_to comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left-hand side of equal_to comparisons.</param>
+	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+	/// <returns>Boolean indcating if comparisons on at least one element within lhs_matrix_ with rhs_ as defined above returned true.</returns>
+	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
+	constexpr inline bool MatrixCmpAnyLess(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_cmp_any<TestAllIndices_, EmuCore::do_cmp_less, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a CmpAnyLess operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns true if any greater_equal comparisons between lhs_matrix_ and rhs_ return true. </para>
+	/// <para> 
+	///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+	///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="LhsMatrix_">Matrix appearing on the left-hand side of equal_to comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left-hand side of equal_to comparisons.</param>
+	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+	/// <returns>Boolean indcating if comparisons on at least one element within lhs_matrix_ with rhs_ as defined above returned true.</returns>
+	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
+	constexpr inline bool MatrixCmpAnyGreaterEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_cmp_any<TestAllIndices_, EmuCore::do_cmp_greater_equal, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a CmpAnyGreaterEqual operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
+		}
+	}
+
+	/// <summary>
+	/// <para> Returns true if any less_equal comparisons between lhs_matrix_ and rhs_ return true. </para>
+	/// <para> 
+	///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+	///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="LhsMatrix_">Matrix appearing on the left-hand side of equal_to comparisons.</typeparam>
+	/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing on the left-hand side of equal_to comparisons.</param>
+	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+	/// <returns>Boolean indcating if comparisons on at least one element within lhs_matrix_ with rhs_ as defined above returned true.</returns>
+	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
+	constexpr inline bool MatrixCmpAnyLessEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_cmp_any<TestAllIndices_, EmuCore::do_cmp_less_equal, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform a CmpAnyLessEqual operation on a matrix, but the passed lhs_matrix_ was not an EmuMath matrix.");
 		}
 	}
 }
