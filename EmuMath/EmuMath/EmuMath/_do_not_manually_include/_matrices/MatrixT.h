@@ -318,9 +318,9 @@ namespace EmuMath
 		}
 
 		template<typename Rhs_>
-		constexpr inline copy_type operator*(const Rhs_& rhs_) const
+		constexpr inline auto operator*(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixMultiply<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::MatrixMultiply(*this, rhs_);
 		}
 
 		template<typename Rhs_>
@@ -384,7 +384,11 @@ namespace EmuMath
 			return this->operator=(this->operator-(rhs_));
 		}
 
-		template<typename Rhs_>
+		template
+		<
+			typename Rhs_,
+			typename = std::enable_if_t<EmuMath::TMP::is_matching_size_matrix_multiply_result_v<this_type, Rhs_>>
+		>
 		constexpr inline this_type& operator*=(const Rhs_& rhs_)
 		{
 			return this->operator=(this->operator*(rhs_));

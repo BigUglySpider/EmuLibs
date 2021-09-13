@@ -278,6 +278,40 @@ namespace EmuMath::TMP
 	};
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
 	using emu_matrix_submatrix_excluding_element_region_t = typename emu_matrix_submatrix_excluding_element_region<out_contained_type, OutColumnMajor_, Matrix_>::type;
+
+	/// <summary>
+	/// Test if LhsMatrix_ and Rhs_ are EmuMath matrices with matching dimensions. If Rhs_ is not an EmuMath matrix, results will always be false. 
+	/// Additionally provides the result for individual axes.
+	/// </summary>
+	template<class LhsMatrix_, class Rhs_>
+	struct is_matching_matrix_dimensions
+	{
+		static_assert(is_emu_matrix_v<LhsMatrix_>, "Cannot use EmuMath::TMP::is_matching_matrix_dimensions with a non-EmuMath-matrix LhsMatrix_ argument.");
+		static constexpr bool matching_columns = false;
+		static constexpr bool matching_rows = false;
+		static constexpr bool value = false;
+	};
+	template<class LhsMatrix_, std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename rhs_contained_type, bool RhsColumnMajor_>
+	struct is_matching_matrix_dimensions<LhsMatrix_, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, rhs_contained_type, RhsColumnMajor_>>
+	{
+		static constexpr bool matching_columns = LhsMatrix_::num_columns == RhsNumColumns_;
+		static constexpr bool matching_rows = LhsMatrix_::num_rows == RhsNumRows_;
+		static constexpr bool value = matching_columns && matching_rows;
+	};
+	template<class LhsMatrix_, class Rhs_>
+	static constexpr bool is_matching_matrix_dimensions_v = is_matching_matrix_dimensions<LhsMatrix_, Rhs_>::value;
+
+	/// <summary> Test if LhsMatrix_ and Rhs_ will produce a matrix of the same dimensions of LhsMatrix_ when multiplied. Additionally provides the result type. </summary>
+	template<class LhsMatrix_, class Rhs_>
+	struct is_matching_size_matrix_multiply_result
+	{
+		static_assert(is_emu_matrix_v<LhsMatrix_>, "Cannot use EmuMath::TMP::is_matching_size_matrix_multiply_result with a non-EmuMath-matrix LhsMatrix_ argument.");
+
+		using result_t = std::invoke_result_t<EmuCore::do_multiply<LhsMatrix_, Rhs_>, LhsMatrix_, Rhs_>;
+		static constexpr bool value = is_matching_matrix_dimensions<LhsMatrix_, result_t>::value;
+	};
+	template<class LhsMatrix_, class Rhs_>
+	static constexpr bool is_matching_size_matrix_multiply_result_v = is_matching_size_matrix_multiply_result<LhsMatrix_, Rhs_>::value;
 }
 
 #endif

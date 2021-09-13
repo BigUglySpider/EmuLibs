@@ -576,6 +576,22 @@ int main()
 	constexpr bool cmp_2_ = _some16x2cm != _some16x2rm;
 	constexpr bool cmp_3_ = _some16x2cm != _some16x2cm;
 
+
+	constexpr auto some_translation_mat_ = EmuMath::Helpers::MatrixTranslation(1.0f, 2.0f, 3.0f);
+	constexpr auto trans_mul_vec = some_translation_mat_ * EmuMath::Vector3<float>(10.0f, 20.0f, 10.0f);
+	constexpr auto trans_mul_scalar = some_translation_mat_ * 5;
+	constexpr auto trans_mul_trans_ = some_translation_mat_ * some_translation_mat_;
+	constexpr auto trans_det_ = EmuMath::Helpers::MatrixDeterminantLaplace(some_translation_mat_);
+	constexpr auto trans_inv_ = EmuMath::Helpers::MatrixInverseLaplace(some_translation_mat_);
+
+	auto muleq_mat_ = EmuMath::Matrix<4, 4, float, true>(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f);
+	std::cout << "\n\n";
+	std::cout << "Before mult:\n" << muleq_mat_ << "\n";
+	muleq_mat_ *= 2.0f;
+	std::cout << "After scalar mult:\n" << muleq_mat_ << "\n";
+	muleq_mat_ *= EmuMath::Matrix<4, 4, float, true>(2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 2.0f);
+	std::cout << "After matrix mult:\n" << muleq_mat_ << "\n";
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();
