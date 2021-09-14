@@ -191,5 +191,8 @@
     <ClInclude Include="EmuCore\Functors\MiscMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_functors_matrix_arithmetic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

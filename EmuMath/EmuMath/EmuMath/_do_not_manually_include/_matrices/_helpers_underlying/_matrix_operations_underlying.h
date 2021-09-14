@@ -73,10 +73,10 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 					if constexpr (InRow_ != ExcludeRow_)
 					{
 						_matrix_set<OutColumn_, OutRow_>
-							(
-								out_,
-								(_get_matrix_data<InColumn_, InRow_>(in_))
-								);
+						(
+							out_,
+							(_get_matrix_data<InColumn_, InRow_>(in_))
+						);
 						_get_submatrix_excluding_element_region<InColumn_, InRow_ + 1, OutColumn_, OutRow_ + 1, ExcludeColumn_, ExcludeRow_, Out_, In_>(in_, out_);
 					}
 					else

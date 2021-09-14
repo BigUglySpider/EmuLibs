@@ -604,6 +604,12 @@ int main()
 
 	constexpr auto clamped_min_max_ss = EmuMath::Helpers::MatrixClamp<3, 3, int, true>(lhs___, 1.0f, 3.0f);
 
+	constexpr auto id_ = lhs___.Identity();
+
+	constexpr auto _3x3_transpose_ = lhs___.Transpose();
+	constexpr auto _2x4_tranpose_ = EmuMath::Matrix<2, 4, double, true>(1, 2, 3, 4, 5, 6, 7, 8).Transpose();
+	constexpr auto _4x5_sub = EmuMath::Matrix<4, 5, int>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20).ExclusiveSubmatrix<0, 0>();
+
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
