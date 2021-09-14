@@ -10,22 +10,35 @@ namespace EmuCore
 {
 	/// <summary>
 	/// <para> Functor which may be used to perform linear interpolations. </para>
-	/// <para> Takes 3 type arguments, however only one or two may be passed. Type arguments not passed will be the same type as A_. </para>
+	/// <para> Takes 3 type arguments, however only one or two may be passed. B_ will be the same type as A_ if omitted. T_ will be float if omitted. </para>
 	/// <para> Types should be considered for the equation A_ + ((B_ - A_) * T_). </para>
 	/// <para> do_lerp&lt;void&gt;, do_lerp&lt;void, void&gt;, and do_lerp&lt;void, void, void&gt; are reserved for a generic specialisation of do_lerp. </para>
 	/// </summary>
 	/// <typeparam name="A_">Type used to represent a in the equation a + ((b - a) * t).</typeparam>
 	/// <typeparam name="B_">Type used to represent b in the equation a + ((b - a) * t).</typeparam>
 	/// <typeparam name="T_">Type used to represent t in the equation a + ((b - a) * t).</typeparam>
-	template<class A_, class B_ = A_, class T_ = A_>
+	template<class A_, class B_ = A_, class T_ = float>
 	struct do_lerp
 	{
 		constexpr do_lerp()
 		{
 		}
-		[[nodiscard]] constexpr inline A_ operator()(const A_& a_, const B_& b_, const T_& t_) const
+		[[nodiscard]] constexpr inline auto operator()(const A_& a_, const B_& b_, const T_& t_) const
 		{
-			return static_cast<A_>(a_ + static_cast<A_>((b_ - a_) * t_));
+			if constexpr
+			(
+				EmuCore::TMPHelpers::is_any_floating_point_v<A_, B_, T_> &&
+				!EmuCore::TMPHelpers::are_all_comparisons_true<std::is_same, A_, B_, T_>::value
+			)
+			{
+				using floating_point = typename EmuCore::TMPHelpers::largest_floating_point<A_, B_, T_>::type;
+				floating_point a_cast_ = static_cast<floating_point>(a_);
+				return a_cast_ + ((static_cast<floating_point>(b_) - a_cast_) * static_cast<floating_point>(t_));
+			}
+			else
+			{
+				return (a_ + ((b_ - a_) * t_));
+			}
 		}
 	};
 	/// <summary>

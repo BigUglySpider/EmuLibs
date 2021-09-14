@@ -604,9 +604,6 @@ int main()
 
 	constexpr auto clamped_min_max_ss = EmuMath::Helpers::MatrixClamp<3, 3, int, true>(lhs___, 1.0f, 3.0f);
 
-	using ___ = EmuMath::Helpers::_underlying_matrix_funcs::_matrix_mutli_arg_individual_template_arg<float>::type;
-	using ____ = EmuMath::Helpers::_underlying_matrix_funcs::_matrix_mutli_arg_individual_template_arg<EmuMath::Matrix<4, 4, int, true>>::type;
-
 
 
 #pragma region TEST_HARNESS_EXECUTION

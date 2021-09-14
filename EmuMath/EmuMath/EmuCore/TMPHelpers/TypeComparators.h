@@ -239,6 +239,78 @@ namespace EmuCore::TMPHelpers
 	template<typename...Types_>
 	using first_floating_point_t = typename first_floating_point<Types_...>::type;
 
+	template<typename Lhs_, typename Rhs_>
+	struct larger_float
+	{
+	private:
+		template<typename LhsFloat_, typename RhsFloat_>
+		struct largest_of_guaranteed_floating_points
+		{
+			using type = std::conditional_t
+			<
+				(sizeof(LhsFloat_) == sizeof(RhsFloat_)),
+				std::conditional_t
+				<
+					EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, long double, LhsFloat_, RhsFloat_>::value,
+					long double,
+					Lhs_
+				>,
+				std::conditional_t
+				<
+					(sizeof(LhsFloat_) > sizeof(RhsFloat_)),
+					LhsFloat_,
+					RhsFloat_
+				>
+			>;
+		};
+	public:
+		using type = std::conditional_t
+		<
+			EmuCore::TMPHelpers::is_any_floating_point_v<Lhs_, Rhs_>,
+			std::conditional_t
+			<
+				EmuCore::TMPHelpers::are_all_check<std::is_floating_point, Lhs_, Rhs_>::value,
+				typename largest_of_guaranteed_floating_points<Lhs_, Rhs_>::type,
+				typename EmuCore::TMPHelpers::first_floating_point<Lhs_, Rhs_>::type
+			>,
+			void
+		>;
+	};
+	/// <summary> Determines the largest floating point of the passed params. If no floating point type is passed, the determined type will be float. </summary>
+	template<typename First_, typename...Others_>
+	struct largest_floating_point
+	{
+	private:
+		template<typename Highest_, typename First__, typename...Others__>
+		struct find_largest_floating_point
+		{
+			using type = typename find_largest_floating_point
+			<
+				typename EmuCore::TMPHelpers::larger_float<Highest_, First__>::type,
+				Others__...
+			>::type;
+		};
+		template<typename Highest_, typename First__>
+		struct find_largest_floating_point<Highest_, First__>
+		{
+			using type = std::conditional_t
+			<
+				std::is_floating_point_v<First__>,
+				std::conditional_t
+				<
+					(sizeof(First__) > sizeof(Highest_)),
+					First__,
+					Highest_
+				>,
+				Highest_
+			>;
+		};
+	public:
+		using type = typename find_largest_floating_point<float, First_, Others_...>::type;
+	};
+	template<typename First_, typename...Others_>
+	using largest_floating_point_t = typename largest_floating_point<First_, Others_...>::type;
+
 	template<typename T_>
 	struct is_reference_wrapper
 	{

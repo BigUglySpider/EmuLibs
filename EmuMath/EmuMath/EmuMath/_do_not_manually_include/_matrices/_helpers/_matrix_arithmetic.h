@@ -1665,6 +1665,117 @@ namespace EmuMath::Helpers
 	{
 		return MatrixClamp<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Min_, Max_>(matrix_, min_, max_);
 	}
+
+	/// <summary>
+	/// <para> Linearly interpolates the elements of matrix_a_ using the target b_ and weighting t_. Result may be summarised as a + ((b - a) * t). </para>
+	/// <para> If b_ is an EmuMath matrix, elements in matrix_a_ will be interpolated with respective elements of b_ used as targets. </para>
+	/// <para> If b_ is none of the above: elements in matrix_a_ will all be interpolated with a target of the value of b_. </para>
+	/// <para> If t_ is an EmuMath matrix, elements in matrix_a_ will be interpolated with respective elements of t_ used as weightings. </para>
+	/// <para> If b_ is none of the above: elements in matrix_a_ will all be interpolated with a target of the value of t_. </para>
+	/// </summary>
+	/// <typeparam name="MatrixA_">Type of matrix to linearly interpolate the elements of.</typeparam>
+	/// <typeparam name="B_">Type representing the target for interpolation.</typeparam>
+	/// <typeparam name="T_">Type representing the weighting for interpolation.</typeparam>
+	/// <param name="matrix_a_">EmuMath matrix to linearly interpolate the elements of.</param>
+	/// <param name="b_">Item to provide a target for elements of matrix_a_ to interpolate towards.</param>
+	/// <param name="t_">Item to provide the weightings for how much matrix_a_ elements should interpolate towards their target.</param>
+	/// <returns>Resulting matrix from linear interpolation using the provided arguments as defined above.</returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class MatrixA_, class B_, class T_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixLerp
+	(
+		const MatrixA_& matrix_a_,
+		const B_& b_,
+		const T_& t_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<MatrixA_>)
+		{
+			return _underlying_matrix_funcs::_matrix_multi_arg_operation
+			<
+				EmuCore::do_lerp,
+				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+				MatrixA_,
+				B_,
+				T_
+			>(matrix_a_, b_, t_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to lineraly interpolate the elements of an EmuMath matrix, but the passed matrix_a_ was not an EmuMath matrix.");
+		}
+	}
+	template<typename out_contained_type, bool OutColumnMajor_, class MatrixA_, class B_, class T_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<MatrixA_::num_columns, MatrixA_::num_rows, out_contained_type, OutColumnMajor_> MatrixLerp
+	(
+		const MatrixA_& matrix_a_,
+		const B_& b_,
+		const T_& t_
+	)
+	{
+		return MatrixLerp<MatrixA_::num_columns, MatrixA_::num_rows, out_contained_type, OutColumnMajor_, MatrixA_, B_, T_>(matrix_a_, b_, t_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class MatrixA_, class B_, class T_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename MatrixA_::value_type, OutColumnMajor_> MatrixLerp
+	(
+		const MatrixA_& matrix_a_,
+		const B_& b_,
+		const T_& t_
+	)
+	{
+		return MatrixLerp<OutNumColumns_, OutNumRows_, typename MatrixA_::value_type, OutColumnMajor_, MatrixA_, B_, T_>(matrix_a_, b_, t_);
+	}
+	template<bool OutColumnMajor_, class MatrixA_, class B_, class T_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<MatrixA_::num_columns, MatrixA_::num_rows, typename MatrixA_::value_type, OutColumnMajor_> MatrixLerp
+	(
+		const MatrixA_& matrix_a_,
+		const B_& b_,
+		const T_& t_
+	)
+	{
+		return MatrixLerp<MatrixA_::num_columns, MatrixA_::num_rows, typename MatrixA_::value_type, OutColumnMajor_, MatrixA_, B_, T_>(matrix_a_, b_, t_);
+	}
+
+
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class MatrixA_, class B_, class T_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, MatrixA_::is_column_major> MatrixLerp
+	(
+		const MatrixA_& matrix_a_,
+		const B_& b_,
+		const T_& t_
+	)
+	{
+		return MatrixLerp<OutNumColumns_, OutNumRows_, out_contained_type, MatrixA_::is_column_major, MatrixA_, B_, T_>(matrix_a_, b_, t_);
+	}
+	template<typename out_contained_type, class MatrixA_, class B_, class T_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<MatrixA_::num_columns, MatrixA_::num_rows, out_contained_type, MatrixA_::is_column_major> MatrixLerp
+	(
+		const MatrixA_& matrix_a_,
+		const B_& b_,
+		const T_& t_
+	)
+	{
+		return MatrixLerp<MatrixA_::num_columns, MatrixA_::num_rows, out_contained_type, MatrixA_::is_column_major, MatrixA_, B_, T_>(matrix_a_, b_, t_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class MatrixA_, class B_, class T_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename MatrixA_::value_type, MatrixA_::is_column_major> MatrixLerp
+	(
+		const MatrixA_& matrix_a_,
+		const B_& b_,
+		const T_& t_
+	)
+	{
+		return MatrixLerp<OutNumColumns_, OutNumRows_, typename MatrixA_::value_type, MatrixA_::is_column_major, MatrixA_, B_, T_>(matrix_a_, b_, t_);
+	}
+	template<class MatrixA_, class B_, class T_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<MatrixA_::num_columns, MatrixA_::num_rows, typename MatrixA_::value_type, MatrixA_::is_column_major> MatrixLerp
+	(
+		const MatrixA_& matrix_a_,
+		const B_& b_,
+		const T_& t_
+	)
+	{
+		return MatrixLerp<MatrixA_::num_columns, MatrixA_::num_rows, typename MatrixA_::value_type, MatrixA_::is_column_major, MatrixA_, B_, T_>(matrix_a_, b_, t_);
+	}
 }
 
 #endif
