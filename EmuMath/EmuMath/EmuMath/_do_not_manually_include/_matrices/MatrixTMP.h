@@ -2,6 +2,10 @@
 #define EMU_MATH_MATRIX_TMP_H_INC_ 1
 
 #include "../../Vector.h"
+#include "../../../EmuCore/Functors/Arithmetic.h"
+#include "../../../EmuCore/Functors/Bitwise.h"
+#include "../../../EmuCore/Functors/Comparators.h"
+#include "../../../EmuCore/Functors/MiscMath.h"
 #include <cstddef>
 #include <cstdint>
 #include <type_traits>
@@ -89,7 +93,12 @@ namespace EmuMath::TMP
 	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Matrix_>
 	struct emu_matrix_theoretical_data
 	{
-		using type = void;
+		using type = std::conditional_t
+		<
+			EmuMath::TMP::is_emu_matrix_v<Matrix_>,
+			typename emu_matrix_theoretical_data<ColumnIndex_, RowIndex_, std::remove_cv_t<std::remove_reference_t<Matrix_>>>::type,
+			void
+		>;
 	};
 	template<std::size_t ColumnIndex_, std::size_t RowIndex_, std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
 	struct emu_matrix_theoretical_data<ColumnIndex_, RowIndex_, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>

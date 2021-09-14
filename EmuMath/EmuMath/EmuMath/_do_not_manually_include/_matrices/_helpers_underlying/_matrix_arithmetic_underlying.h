@@ -8,6 +8,17 @@
 
 namespace EmuMath::Helpers::_underlying_matrix_funcs
 {
+	template<class T_ >
+	struct _matrix_mutli_arg_individual_template_arg
+	{
+		using type = T_;
+	};
+	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
+	struct _matrix_mutli_arg_individual_template_arg<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>
+	{
+		using type = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::raw_value_type;
+	};
+
 	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class OutMatrix_, class LhsMatrix_, class Rhs_, class Func_>
 	constexpr inline void _matrix_lhs_rhs_operation_rhs_scalar(const LhsMatrix_& lhs_, const Rhs_& rhs_, Func_& func_, OutMatrix_& out_)
 	{
@@ -68,6 +79,20 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	{
 		Func_ func_ = Func_();
 		return _matrix_lhs_rhs_operation<OutMatrix_, LhsMatrix_, Rhs_, Func_&>(lhs_, rhs_, func_);
+	}
+	template<class OutMatrix_, class LhsMatrix_, class Rhs_, template<class Lhs__, class Rhs__> class FuncTemplate_>
+	[[nodiscard]] constexpr inline OutMatrix_ _matrix_lhs_rhs_operation(const LhsMatrix_& lhs_, const Rhs_& rhs_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
+		{
+			using Func_ = FuncTemplate_<typename LhsMatrix_::raw_value_type, typename Rhs_::raw_value_type>;
+			return _matrix_lhs_rhs_operation<OutMatrix_, LhsMatrix_, Rhs_, Func_>(lhs_, rhs_);
+		}
+		else
+		{
+			using Func_ = FuncTemplate_<typename LhsMatrix_::raw_value_type, Rhs_>;
+			return _matrix_lhs_rhs_operation<OutMatrix_, LhsMatrix_, Rhs_, Func_>(lhs_, rhs_);
+		}
 	}
 
 	template<class Matrix_, std::size_t...Indices_>
@@ -187,6 +212,53 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		OutMatrix_ out_ = OutMatrix_();
 		_matrix_mutate<Func_, OutMatrix_, InMatrix_>(in_, out_);
 		return out_;
+	}
+
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Func_, class OutMatrix_, class MatrixA_, class...OtherArgs_>
+	constexpr inline void _matrix_multi_arg_operation(Func_& func_, OutMatrix_& out_, const MatrixA_& a_, const OtherArgs_&...other_args_)
+	{
+		if constexpr (ColumnIndex_ < OutMatrix_::num_columns)
+		{
+			if constexpr (RowIndex_ < OutMatrix_::num_rows)
+			{
+				_get_matrix_data<ColumnIndex_, RowIndex_>(out_) = static_cast<typename OutMatrix_::value_type>
+				(
+					func_
+					(
+						_get_theoretical_arg<ColumnIndex_, RowIndex_>(a_),
+						_get_theoretical_arg<ColumnIndex_, RowIndex_, OtherArgs_>(other_args_)...
+					)
+				);
+				_matrix_multi_arg_operation<ColumnIndex_, RowIndex_ + 1, Func_, OutMatrix_, MatrixA_, OtherArgs_...>(func_, out_, a_, other_args_...);
+			}
+			else
+			{
+				_matrix_multi_arg_operation<ColumnIndex_ + 1, 0, Func_, OutMatrix_, MatrixA_, OtherArgs_...>(func_, out_, a_, other_args_...);
+			}
+		}
+	}
+	template<class Func_, class OutMatrix_, class MatrixA_, class...OtherArgs_>
+	[[nodiscard]] constexpr inline OutMatrix_ _matrix_multi_arg_operation(Func_ func_, const MatrixA_& matrix_a_, const OtherArgs_&...other_args_)
+	{
+		OutMatrix_ out_ = OutMatrix_();
+		_matrix_multi_arg_operation<0, 0, Func_, OutMatrix_, MatrixA_, OtherArgs_...>(func_, out_, matrix_a_, other_args_...);
+		return out_;
+	}
+	template<class Func_, class OutMatrix_, class MatrixA_, class...OtherArgs_>
+	[[nodiscard]] constexpr inline OutMatrix_ _matrix_multi_arg_operation(const MatrixA_& matrix_a_, const OtherArgs_&...other_args_)
+	{
+		return _matrix_multi_arg_operation<Func_, OutMatrix_, MatrixA_, OtherArgs_...>(Func_(), matrix_a_, other_args_...);
+	}
+
+	template<template<class...Args__> class FuncTemplate_, class OutMatrix_, class MatrixA_, class...OtherArgs_>
+	[[nodiscard]] constexpr inline OutMatrix_ _matrix_multi_arg_operation(const MatrixA_& matrix_a_, const OtherArgs_&...other_args_)
+	{
+		using Func_ = FuncTemplate_
+		<
+			typename _matrix_mutli_arg_individual_template_arg<MatrixA_>::type,
+			typename _matrix_mutli_arg_individual_template_arg<OtherArgs_>::type...
+		>;
+		return _matrix_multi_arg_operation<Func_, OutMatrix_, MatrixA_, OtherArgs_...>(matrix_a_, other_args_...);
 	}
 }
 

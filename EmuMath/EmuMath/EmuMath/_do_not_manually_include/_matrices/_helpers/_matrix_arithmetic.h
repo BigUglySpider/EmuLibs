@@ -1032,6 +1032,611 @@ namespace EmuMath::Helpers
 	{
 		return MatrixNegate<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
+
+	/// <summary> Floors all elements of the provided matrix, rounding them toward negative infinity. </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+	/// <typeparam name="Matrix_">Type of matrix to round the elements of.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to round the elements of.</param>
+	/// <returns>Rounded form of the provided matrix.</returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixFloor(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return _underlying_matrix_funcs::_make_mutated_matrix
+			<
+				EmuCore::do_floor<typename Matrix_::value_type>,
+				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+				Matrix_
+			>(matrix_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to floor a matrix, but the passed matrix_ was not an EmuMath matrix.");
+		}
+	}
+	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixFloor(const Matrix_& matrix_)
+	{
+		return MatrixFloor<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_, Matrix_>(matrix_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> MatrixFloor(const Matrix_& matrix_)
+	{
+		return MatrixFloor<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+	}
+	template<bool OutColumnMajor_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixFloor
+	(
+		const Matrix_& matrix_
+	)
+	{
+		return MatrixFloor<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> MatrixFloor(const Matrix_& matrix_)
+	{
+		return MatrixFloor<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+	template<typename out_contained_type, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixFloor(const Matrix_& matrix_)
+	{
+		return MatrixFloor<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> MatrixFloor(const Matrix_& matrix_)
+	{
+		return MatrixFloor<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+	template<class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixFloor
+	(
+		const Matrix_& matrix_
+	)
+	{
+		return MatrixFloor<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+
+	/// <summary> Ceils all elements of the provided matrix, rounding them toward positive infinity. </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+	/// <typeparam name="Matrix_">Type of matrix to round the elements of.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to round the elements of.</param>
+	/// <returns>Rounded form of the provided matrix.</returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixCeil(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return _underlying_matrix_funcs::_make_mutated_matrix
+			<
+				EmuCore::do_ceil<typename Matrix_::value_type>,
+				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+				Matrix_
+			>(matrix_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to ceil a matrix, but the passed matrix_ was not an EmuMath matrix.");
+		}
+	}
+	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixCeil(const Matrix_& matrix_)
+	{
+		return MatrixCeil<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_, Matrix_>(matrix_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> MatrixCeil(const Matrix_& matrix_)
+	{
+		return MatrixCeil<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+	}
+	template<bool OutColumnMajor_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixCeil
+	(
+		const Matrix_& matrix_
+	)
+	{
+		return MatrixCeil<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> MatrixCeil(const Matrix_& matrix_)
+	{
+		return MatrixCeil<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+	template<typename out_contained_type, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixCeil(const Matrix_& matrix_)
+	{
+		return MatrixCeil<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> MatrixCeil(const Matrix_& matrix_)
+	{
+		return MatrixCeil<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+	template<class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixCeil
+	(
+		const Matrix_& matrix_
+	)
+	{
+		return MatrixCeil<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+
+	/// <summary> Truncates all elements of the provided matrix, rounding them toward 0. </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+	/// <typeparam name="Matrix_">Type of matrix to round the elements of.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to round the elements of.</param>
+	/// <returns>Rounded form of the provided matrix.</returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixTrunc(const Matrix_& matrix_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return _underlying_matrix_funcs::_make_mutated_matrix
+			<
+				EmuCore::do_trunc<typename Matrix_::value_type>,
+				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+				Matrix_
+			>(matrix_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to trunc a matrix, but the passed matrix_ was not an EmuMath matrix.");
+		}
+	}
+	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixTrunc(const Matrix_& matrix_)
+	{
+		return MatrixTrunc<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_, Matrix_>(matrix_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> MatrixTrunc(const Matrix_& matrix_)
+	{
+		return MatrixTrunc<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+	}
+	template<bool OutColumnMajor_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixTrunc
+	(
+		const Matrix_& matrix_
+	)
+	{
+		return MatrixTrunc<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> MatrixTrunc(const Matrix_& matrix_)
+	{
+		return MatrixTrunc<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+	template<typename out_contained_type, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixTrunc(const Matrix_& matrix_)
+	{
+		return MatrixTrunc<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> MatrixTrunc(const Matrix_& matrix_)
+	{
+		return MatrixTrunc<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+	template<class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixTrunc
+	(
+		const Matrix_& matrix_
+	)
+	{
+		return MatrixTrunc<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+
+	/// <summary>
+	/// <para> Finds the smallest respective value for each element of lhs_matrix_ and rhs_. </para>
+	/// <para> If rhs_ is an EmuMath matrix: Determined min elements will be for respective elements in lhs_matrix_ and rhs_. </para>
+	/// <para> If rhs_ is none of the above: Determined min elements will be for respective elements in lhs_matrix_ and the value of rhs_. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+	/// <typeparam name="LhsMatrix_">Type of matrix appearing as the left-hand argument.</typeparam>
+	/// <typeparam name="Rhs_">Type of item appearing as the right-hand argument.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing as the left-hand argument.</param>
+	/// <param name="lhs_matrix_">Item appearing as the right-hand argument.</param>
+	/// <returns>Matrix containing the minimum values for respective elements betweeen lhs_matrix_ and rhs_.</returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixMin
+	(
+		const LhsMatrix_& lhs_matrix_,
+		const Rhs_& rhs_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
+			<
+				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+				LhsMatrix_,
+				Rhs_,
+				EmuCore::do_min
+			>(lhs_matrix_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to find the minimum of elements between a lhs_matrix_ and a rhs_ arg, but the passed lhs_matrix_ was not an EmuMath matrix.");
+		}
+	}
+	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixMin
+	(
+		const LhsMatrix_& lhs_matrix_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixMin<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_> MatrixMin
+	(
+		const LhsMatrix_& lhs_matrix_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixMin<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+	}
+	template<bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_> MatrixMin
+	(
+		const LhsMatrix_& lhs_matrix_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixMin<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major> MatrixMin
+	(
+		const LhsMatrix_& lhs_matrix_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixMin<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+	}
+	template<typename out_contained_type, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major> MatrixMin
+	(
+		const LhsMatrix_& lhs_matrix_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixMin<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major> MatrixMin
+	(
+		const LhsMatrix_& lhs_matrix_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixMin<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+	}
+	template<class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major> MatrixMin
+	(
+		const LhsMatrix_& lhs_matrix_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixMin<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+	}
+
+	/// <summary>
+	/// <para> Finds the greatest respective value for each element of lhs_matrix_ and rhs_. </para>
+	/// <para> If rhs_ is an EmuMath matrix: Determined min elements will be for respective elements in lhs_matrix_ and rhs_. </para>
+	/// <para> If rhs_ is none of the above: Determined min elements will be for respective elements in lhs_matrix_ and the value of rhs_. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+	/// <typeparam name="LhsMatrix_">Type of matrix appearing as the left-hand argument.</typeparam>
+	/// <typeparam name="Rhs_">Type of item appearing as the right-hand argument.</typeparam>
+	/// <param name="lhs_matrix_">EmuMath matrix appearing as the left-hand argument.</param>
+	/// <param name="lhs_matrix_">Item appearing as the right-hand argument.</param>
+	/// <returns>Matrix containing the maximum values for respective elements betweeen lhs_matrix_ and rhs_.</returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixMax
+	(
+		const LhsMatrix_& lhs_matrix_,
+		const Rhs_& rhs_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
+			<
+				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+				LhsMatrix_,
+				Rhs_,
+				EmuCore::do_max
+			>(lhs_matrix_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to find the maximum of elements between a lhs_matrix_ and a rhs_ arg, but the passed lhs_matrix_ was not an EmuMath matrix.");
+		}
+	}
+	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixMax
+	(
+		const LhsMatrix_& lhs_matrix_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixMax<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_> MatrixMax
+	(
+		const LhsMatrix_& lhs_matrix_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixMax<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+	}
+	template<bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_> MatrixMax
+	(
+		const LhsMatrix_& lhs_matrix_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixMax<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major> MatrixMax
+	(
+		const LhsMatrix_& lhs_matrix_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixMax<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+	}
+	template<typename out_contained_type, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major> MatrixMax
+	(
+		const LhsMatrix_& lhs_matrix_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixMax<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major> MatrixMax
+	(
+		const LhsMatrix_& lhs_matrix_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixMax<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+	}
+	template<class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major> MatrixMax
+	(
+		const LhsMatrix_& lhs_matrix_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixMax<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
+	}
+
+	/// <summary>
+	/// <para> Clamps the passed matrix_ so that none of its elements compares less than min_. </para>
+	/// <para> If min_ is an EmuMath matrix: Elements in the passed matrix_ are clamped to a minimum of the respective element in min_. </para>
+	/// <para> If min_ is none of the above: All elements in the passed matrix_ are clamped to a minimum of the value of min_. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+	/// <typeparam name="LhsMatrix_">Type of matrix to clamp.</typeparam>
+	/// <typeparam name="Rhs_">Type used as the minimum value to clamp to.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to clamp.</param>
+	/// <param name="min_">Item to clamp the matrix's minimum values to.</param>
+	/// <returns>EmuMath matrix copy of the passed matrix_ with its elements clamped to a minimum via the passed min_ as defined above.</returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Min_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixClampMin
+	(
+		const Matrix_& matrix_,
+		const Min_& min_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
+			<
+				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+				Matrix_,
+				Min_,
+				EmuCore::do_clamp_min
+			>(matrix_, min_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to clamp the elements of an EmuMath matrix to minimum values, but the passed matrix_ was not an EmuMath matrix.");
+		}
+	}
+	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Min_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixClampMin
+	(
+		const Matrix_& matrix_,
+		const Min_& min_
+	)
+	{
+		return MatrixClampMin<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_, Matrix_, Min_>(matrix_, min_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Matrix_, class Min_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> MatrixClampMin
+	(
+		const Matrix_& matrix_,
+		const Min_& min_
+	)
+	{
+		return MatrixClampMin<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_, Matrix_, Min_>(matrix_, min_);
+	}
+	template<bool OutColumnMajor_, class Matrix_, class Min_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixClampMin
+	(
+		const Matrix_& matrix_,
+		const Min_& min_
+	)
+	{
+		return MatrixClampMin<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_, Matrix_, Min_>(matrix_, min_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Matrix_, class Min_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> MatrixClampMin
+	(
+		const Matrix_& matrix_,
+		const Min_& min_
+	)
+	{
+		return MatrixClampMin<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major, Matrix_, Min_>(matrix_, min_);
+	}
+	template<typename out_contained_type, class Matrix_, class Min_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixClampMin
+	(
+		const Matrix_& matrix_,
+		const Min_& min_
+	)
+	{
+		return MatrixClampMin<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major, Matrix_, Min_>(matrix_, min_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Matrix_, class Min_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> MatrixClampMin
+	(
+		const Matrix_& matrix_,
+		const Min_& min_
+	)
+	{
+		return MatrixClampMin<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Min_>(matrix_, min_);
+	}
+	template<class Matrix_, class Min_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixClampMin
+	(
+		const Matrix_& matrix_,
+		const Min_& min_
+	)
+	{
+		return MatrixClampMin<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Min_>(matrix_, min_);
+	}
+
+	/// <summary>
+	/// <para> Clamps the passed matrix_ so that none of its elements compares greater than max_. </para>
+	/// <para> If max_ is an EmuMath matrix: Elements in the passed matrix_ are clamped to a maximum of the respective element in max_. </para>
+	/// <para> If max_ is none of the above: All elements in the passed matrix_ are clamped to a maximum of the value of max_. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+	/// <typeparam name="LhsMatrix_">Type of matrix to clamp.</typeparam>
+	/// <typeparam name="Max_">Type used as the naximum value to clamp to.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to clamp.</param>
+	/// <param name="max_">Item to clamp the matrix's max_imum values to.</param>
+	/// <returns>EmuMath matrix copy of the passed matrix_ with its elements clamped to a maximum via the passed max_ as defined above.</returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixClampMax
+	(
+		const Matrix_& matrix_,
+		const Max_& max_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
+			<
+				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+				Matrix_,
+				Max_,
+				EmuCore::do_clamp_max
+			>(matrix_, max_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to clamp the elements of an EmuMath matrix to maximum values, but the passed matrix_ was not an EmuMath matrix.");
+		}
+	}
+	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixClampMax
+	(
+		const Matrix_& matrix_,
+		const Max_& max_
+	)
+	{
+		return MatrixClampMax<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_, Matrix_, Max_>(matrix_, max_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Matrix_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> MatrixClampMax
+	(
+		const Matrix_& matrix_,
+		const Max_& max_
+	)
+	{
+		return MatrixClampMax<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_, Matrix_, Max_>(matrix_, max_);
+	}
+	template<bool OutColumnMajor_, class Matrix_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixClampMax
+	(
+		const Matrix_& matrix_,
+		const Max_& max_
+	)
+	{
+		return MatrixClampMax<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_, Matrix_, Max_>(matrix_, max_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Matrix_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> MatrixClampMax
+	(
+		const Matrix_& matrix_,
+		const Max_& max_
+	)
+	{
+		return MatrixClampMax<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major, Matrix_, Max_>(matrix_, max_);
+	}
+	template<typename out_contained_type, class Matrix_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixClampMax
+	(
+		const Matrix_& matrix_,
+		const Max_& max_
+	)
+	{
+		return MatrixClampMax<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major, Matrix_, Max_>(matrix_, max_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Matrix_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> MatrixClampMax
+	(
+		const Matrix_& matrix_,
+		const Max_& max_
+	)
+	{
+		return MatrixClampMax<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Max_>(matrix_, max_);
+	}
+	template<class Matrix_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixClampMax
+	(
+		const Matrix_& matrix_,
+		const Max_& max_
+	)
+	{
+		return MatrixClampMax<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Max_>(matrix_, max_);
+	}
+
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Min_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixClamp
+	(
+		const Matrix_& matrix_,
+		const Min_& min_,
+		const Max_& max_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_multi_arg_operation
+			<
+				EmuCore::do_clamp,
+				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+				Matrix_,
+				Min_,
+				Max_
+			>(matrix_, min_, max_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to clamp the elements of an EmuMath matrix, but the passed matrix_ was not an EmuMath matrix.");
+		}
+	}
 }
 
 #endif

@@ -12,7 +12,7 @@ namespace EmuCore::Events
 {
 	/// <summary>
 	/// <para> Event which may have an arbitrary number of listeners passed, which will be called with provided arguments whenever the event is invoked. </para>
-	/// <para> It is recommended to use DefaultEvent and its variants unless you know exactly what you are doing with the porivded Dispatcher_. </para>
+	/// <para> It is recommended to use DefaultEvent and its variants unless you know exactly what you are doing with the provided Dispatcher_. </para>
 	/// </summary>
 	/// <typeparam name="Listener_">Type that will be used as the listeners to this event.</typeparam>
 	/// <typeparam name="Dispatcher_">

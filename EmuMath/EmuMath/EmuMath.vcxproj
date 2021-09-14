@@ -160,6 +160,7 @@
     <ClInclude Include="EmuCore\Functors\Arithmetic.h" />
     <ClInclude Include="EmuCore\Functors\Bitwise.h" />
     <ClInclude Include="EmuCore\Functors\Comparators.h" />
+    <ClInclude Include="EmuCore\Functors\MiscMath.h" />
     <ClInclude Include="EmuCore\TestingHelpers\LoopingTestHarness.h" />
     <ClInclude Include="EmuCore\TMPHelpers\Functors.h" />
     <ClInclude Include="EmuCore\TMPHelpers\Tuples.h" />

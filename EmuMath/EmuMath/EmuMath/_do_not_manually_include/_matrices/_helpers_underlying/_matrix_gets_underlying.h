@@ -104,6 +104,31 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	{
 		return matrix_.template GetMajor<MajorIndex_>();
 	}
+
+	/// <summary> Determines return type when calling _get_theoretical_arg, optimised to avoid unnecessary copies. </summary>
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, typename Arg_>
+	struct _theoretical_arg_return
+	{
+		using type = const Arg_&;
+	};
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
+	struct _theoretical_arg_return<ColumnIndex_, RowIndex_, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>
+	{
+		using type = typename EmuMath::TMP::emu_matrix_theoretical_data<ColumnIndex_, RowIndex_, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>::type;
+	};
+	/// <summary> Used for getting theoretical arguments from either matrices or scalars in additional underlying matrix funcs. </summary>
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Arg_>
+	constexpr inline typename _theoretical_arg_return<ColumnIndex_, RowIndex_, Arg_>::type _get_theoretical_arg(const Arg_& arg_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Arg_>)
+		{
+			return _get_matrix_theoretical_data<ColumnIndex_, RowIndex_>(arg_);
+		}
+		else
+		{
+			return arg_;
+		}
+	}
 }
 
 #endif

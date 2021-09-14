@@ -592,6 +592,23 @@ int main()
 	muleq_mat_ *= EmuMath::Matrix<4, 4, float, true>(2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 2.0f);
 	std::cout << "After matrix mult:\n" << muleq_mat_ << "\n";
 
+	constexpr auto lhs___ = EmuMath::Matrix<3, 3, float, true>(		 0.0f, -3.0f, 27.0f, 16.6f, 2.0f,  15.0f, 0.0f, 0.0f, 1.0f);
+	constexpr auto rhs___ = EmuMath::Matrix<3, 3, long double, true>(1.0f, -4.0f, 14.0f, 16.7f, 12.0f, 13.0f, 0.0f, 1.0f, 0.0f);
+	constexpr auto min_mat_ = EmuMath::Helpers::MatrixMin<std::int64_t>(lhs___, rhs___);
+	constexpr auto max_mat_ = EmuMath::Helpers::MatrixMax<long double>(lhs___, rhs___);
+
+	constexpr auto clamped_min_scalar = EmuMath::Helpers::MatrixClampMin(lhs___, 1.0f);
+	constexpr auto clamped_min_mat = EmuMath::Helpers::MatrixClampMin(lhs___, rhs___);
+	constexpr auto clamped_max_scalar = EmuMath::Helpers::MatrixClampMax(lhs___, 1.0f);
+	constexpr auto clamped_max_mat = EmuMath::Helpers::MatrixClampMax(lhs___, rhs___);
+
+	constexpr auto clamped_min_max_ss = EmuMath::Helpers::MatrixClamp<3, 3, int, true>(lhs___, 1.0f, 3.0f);
+
+	using ___ = EmuMath::Helpers::_underlying_matrix_funcs::_matrix_mutli_arg_individual_template_arg<float>::type;
+	using ____ = EmuMath::Helpers::_underlying_matrix_funcs::_matrix_mutli_arg_individual_template_arg<EmuMath::Matrix<4, 4, int, true>>::type;
+
+
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();

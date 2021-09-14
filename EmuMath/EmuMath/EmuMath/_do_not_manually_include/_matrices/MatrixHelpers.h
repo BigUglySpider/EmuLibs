@@ -17,6 +17,30 @@
 namespace EmuCore
 {
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_, class Rhs_>
+	struct do_add<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>, Rhs_>
+	{
+		constexpr do_add()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& lhs_, const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixAdd(lhs_, rhs_);
+		}
+	};
+
+	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_, class Rhs_>
+	struct do_subtract<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>, Rhs_>
+	{
+		constexpr do_subtract()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& lhs_, const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixSubtract(lhs_, rhs_);
+		}
+	};
+
+	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_, class Rhs_>
 	struct do_multiply<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>, Rhs_>
 	{
 		constexpr do_multiply()
@@ -25,6 +49,30 @@ namespace EmuCore
 		constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& lhs_, const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::MatrixMultiply(lhs_, rhs_);
+		}
+	};
+
+	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_, class Rhs_>
+	struct do_divide<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>, Rhs_>
+	{
+		constexpr do_divide()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& lhs_, const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixDivideBasic(lhs_, rhs_);
+		}
+	};
+
+	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
+	struct do_negate<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>
+	{
+		constexpr do_negate()
+		{
+		}
+		constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_) const
+		{
+			return EmuMath::Helpers::MatrixNegate(matrix_);
 		}
 	};
 }
