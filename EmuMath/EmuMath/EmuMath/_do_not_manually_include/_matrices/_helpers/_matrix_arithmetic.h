@@ -1365,7 +1365,7 @@ namespace EmuMath::Helpers
 	/// <para> If min_ is none of the above: All elements in the passed matrix_ are clamped to a minimum of the value of min_. </para>
 	/// </summary>
 	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
-	/// <typeparam name="LhsMatrix_">Type of matrix to clamp.</typeparam>
+	/// <typeparam name="Matrix_">Type of matrix to clamp.</typeparam>
 	/// <typeparam name="Rhs_">Type used as the minimum value to clamp to.</typeparam>
 	/// <param name="matrix_">EmuMath matrix to clamp.</param>
 	/// <param name="min_">Item to clamp the matrix's minimum values to.</param>
@@ -1462,7 +1462,7 @@ namespace EmuMath::Helpers
 	/// <para> If max_ is none of the above: All elements in the passed matrix_ are clamped to a maximum of the value of max_. </para>
 	/// </summary>
 	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
-	/// <typeparam name="LhsMatrix_">Type of matrix to clamp.</typeparam>
+	/// <typeparam name="Matrix_">Type of matrix to clamp.</typeparam>
 	/// <typeparam name="Max_">Type used as the naximum value to clamp to.</typeparam>
 	/// <param name="matrix_">EmuMath matrix to clamp.</param>
 	/// <param name="max_">Item to clamp the matrix's max_imum values to.</param>
@@ -1553,6 +1553,22 @@ namespace EmuMath::Helpers
 		return MatrixClampMax<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Max_>(matrix_, max_);
 	}
 
+	/// <summary>
+	/// <para> Clamps the passed matrix_ so that none of its elements compares less than min_ or greater than max_. </para>
+	/// <para> If min_ is an EmuMath matrix: Elements in the passed matrix_ are clamped to a minimum of the respective element in min_. </para>
+	/// <para> If min_ is none of the above: All elements in the passed matrix_ are clamped to a minimum of the value of min_. </para>
+	/// <para> If max_ is an EmuMath matrix: Elements in the passed matrix_ are clamped to a maximum of the respective element in max_. </para>
+	/// <para> If max_ is none of the above: All elements in the passed matrix_ are clamped to a maximum of the value of max_. </para>
+	/// <para> Both min_ and max_ are assumed to be logically correct (i.e. min_ &lt;= max_, or compared respective elements where either min_ and/or max_ is a matrix). </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+	/// <typeparam name="Matrix_">Type of matrix to clamp.</typeparam>
+	/// <typeparam name="Min_">Type used as the minimum value to clamp to.</typeparam>
+	/// <typeparam name="Max_">Type used as the minimum value to clamp to.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to clamp.</param>
+	/// <param name="min_">Item to clamp the matrix's minimum values to.</param>
+	/// <param name="max_">Item to clamp the matrix's maximum values to.</param>
+	/// <returns>EmuMath matrix copy of the passed matrix_ with its elements between the provided min_ and max_ as defined above.</returns>
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Min_, class Max_>
 	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixClamp
 	(
@@ -1576,6 +1592,78 @@ namespace EmuMath::Helpers
 		{
 			static_assert(false, "Attempted to clamp the elements of an EmuMath matrix, but the passed matrix_ was not an EmuMath matrix.");
 		}
+	}
+	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Min_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixClamp
+	(
+		const Matrix_& matrix_,
+		const Min_& min_,
+		const Max_& max_
+	)
+	{
+		return MatrixClamp<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_, Matrix_, Min_, Max_>(matrix_, min_, max_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Matrix_, class Min_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> MatrixClamp
+	(
+		const Matrix_& matrix_,
+		const Min_& min_,
+		const Max_& max_
+	)
+	{
+		return MatrixClamp<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_, Matrix_, Min_, Max_>(matrix_, min_, max_);
+	}
+	template<bool OutColumnMajor_, class Matrix_, class Min_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixClamp
+	(
+		const Matrix_& matrix_,
+		const Min_& min_,
+		const Max_& max_
+	)
+	{
+		return MatrixClamp<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_, Matrix_, Min_, Max_>(matrix_, min_, max_);
+	}
+
+
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Matrix_, class Min_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> MatrixClamp
+	(
+		const Matrix_& matrix_,
+		const Min_& min_,
+		const Max_& max_
+	)
+	{
+		return MatrixClamp<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major, Matrix_, Min_, Max_>(matrix_, min_, max_);
+	}
+	template<typename out_contained_type, class Matrix_, class Min_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixClamp
+	(
+		const Matrix_& matrix_,
+		const Min_& min_,
+		const Max_& max_
+	)
+	{
+		return MatrixClamp<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major, Matrix_, Min_, Max_>(matrix_, min_, max_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Matrix_, class Min_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> MatrixClamp
+	(
+		const Matrix_& matrix_,
+		const Min_& min_,
+		const Max_& max_
+	)
+	{
+		return MatrixClamp<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Min_, Max_>(matrix_, min_, max_);
+	}
+	template<class Matrix_, class Min_, class Max_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixClamp
+	(
+		const Matrix_& matrix_,
+		const Min_& min_,
+		const Max_& max_
+	)
+	{
+		return MatrixClamp<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Min_, Max_>(matrix_, min_, max_);
 	}
 }
 
