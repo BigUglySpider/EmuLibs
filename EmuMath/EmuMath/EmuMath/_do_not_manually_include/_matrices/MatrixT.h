@@ -330,6 +330,12 @@ namespace EmuMath
 		}
 
 		template<typename Rhs_>
+		constexpr inline copy_type operator%(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixModBasic<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
+		}
+
+		template<typename Rhs_>
 		constexpr inline copy_type operator&(const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::MatrixAnd<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
@@ -398,6 +404,12 @@ namespace EmuMath
 		constexpr inline this_type& operator/=(const Rhs_& rhs_)
 		{
 			return this->operator=(this->operator/(rhs_));
+		}
+
+		template<typename Rhs_>
+		constexpr inline this_type& operator%=(const Rhs_& rhs_)
+		{
+			return this->operator=(this->operator%(rhs_));
 		}
 
 		template<typename Rhs_>

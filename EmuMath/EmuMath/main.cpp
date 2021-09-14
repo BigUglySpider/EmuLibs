@@ -605,7 +605,6 @@ int main()
 	constexpr auto clamped_min_max_ss = EmuMath::Helpers::MatrixClamp<3, 3, int, true>(lhs___, 1.0f, 3.0f);
 
 
-
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();
