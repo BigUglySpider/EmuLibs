@@ -16,13 +16,13 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
-			return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
+			return _underlying_matrix_funcs::_matrix_multi_arg_operation
 			<
+				Func_&,
 				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
 				LhsMatrix_,
-				Rhs_,
-				Func_&
-			>(lhs_, rhs_, func_);
+				Rhs_
+			>(func_, lhs_, rhs_);
 		}
 		else
 		{
@@ -231,28 +231,13 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
-			if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
-			{
-				using adder_type = EmuCore::do_add<typename LhsMatrix_::value_type, typename Rhs_::value_type>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					adder_type
-				>(lhs_, rhs_);
-			}
-			else
-			{
-				using adder_type = EmuCore::do_add<typename LhsMatrix_::value_type, Rhs_>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					adder_type
-				>(lhs_, rhs_);
-			}
+			return _underlying_matrix_funcs::_matrix_multi_arg_operation
+			<
+				EmuCore::do_add,
+				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+				LhsMatrix_,
+				Rhs_
+			>(lhs_, rhs_);
 		}
 		else
 		{
@@ -347,28 +332,13 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
-			if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
-			{
-				using subtractor_type = EmuCore::do_subtract<typename LhsMatrix_::value_type, typename Rhs_::value_type>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					subtractor_type
-				>(lhs_, rhs_);
-			}
-			else
-			{
-				using subtractor_type = EmuCore::do_subtract<typename LhsMatrix_::value_type, Rhs_>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					subtractor_type
-				>(lhs_, rhs_);
-			}
+			return _underlying_matrix_funcs::_matrix_multi_arg_operation
+			<
+				EmuCore::do_subtract,
+				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+				LhsMatrix_,
+				Rhs_
+			>(lhs_, rhs_);
 		}
 		else
 		{
@@ -464,28 +434,13 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
-			if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
-			{
-				using multiplier_type = EmuCore::do_multiply<typename LhsMatrix_::value_type, typename Rhs_::value_type>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					multiplier_type
-				>(lhs_, rhs_);
-			}
-			else
-			{
-				using multiplier_type = EmuCore::do_multiply<typename LhsMatrix_::value_type, Rhs_>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					multiplier_type
-				>(lhs_, rhs_);
-			}
+			return _underlying_matrix_funcs::_matrix_multi_arg_operation
+			<
+				EmuCore::do_multiply,
+				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+				LhsMatrix_,
+				Rhs_
+			>(lhs_, rhs_);
 		}
 		else
 		{
@@ -582,28 +537,13 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
-			if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
-			{
-				using divider_type = EmuCore::do_divide<typename LhsMatrix_::value_type, typename Rhs_::value_type>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					divider_type
-				>(lhs_, rhs_);
-			}
-			else
-			{
-				using divider_type = EmuCore::do_divide<typename LhsMatrix_::value_type, Rhs_>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					divider_type
-				>(lhs_, rhs_);
-			}
+			return _underlying_matrix_funcs::_matrix_multi_arg_operation
+			<
+				EmuCore::do_divide,
+				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+				LhsMatrix_,
+				Rhs_
+			>(lhs_, rhs_);
 		}
 		else
 		{
@@ -1245,12 +1185,12 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
-			return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
+			return _underlying_matrix_funcs::_matrix_multi_arg_operation
 			<
+				EmuCore::do_min,
 				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
 				LhsMatrix_,
-				Rhs_,
-				EmuCore::do_min
+				Rhs_
 			>(lhs_matrix_, rhs_);
 		}
 		else
@@ -1342,12 +1282,12 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
-			return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
+			return _underlying_matrix_funcs::_matrix_multi_arg_operation
 			<
+				EmuCore::do_max,
 				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
 				LhsMatrix_,
-				Rhs_,
-				EmuCore::do_max
+				Rhs_
 			>(lhs_matrix_, rhs_);
 		}
 		else
@@ -1439,12 +1379,12 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
-			return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
+			return _underlying_matrix_funcs::_matrix_multi_arg_operation
 			<
+				EmuCore::do_clamp_min,
 				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
 				Matrix_,
-				Min_,
-				EmuCore::do_clamp_min
+				Min_
 			>(matrix_, min_);
 		}
 		else
@@ -1536,12 +1476,12 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
-			return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
+			return _underlying_matrix_funcs::_matrix_multi_arg_operation
 			<
+				EmuCore::do_clamp_max,
 				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
 				Matrix_,
-				Max_,
-				EmuCore::do_clamp_max
+				Max_
 			>(matrix_, max_);
 		}
 		else

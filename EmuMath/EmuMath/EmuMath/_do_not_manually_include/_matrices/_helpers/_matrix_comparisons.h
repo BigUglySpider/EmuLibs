@@ -26,28 +26,13 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
-			if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
-			{
-				using comparator = EmuCore::do_cmp_equal_to<typename LhsMatrix_::value_type, typename Rhs_::value_type>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					comparator
-				>(lhs_matrix_, rhs_);
-			}
-			else
-			{
-				using comparator = EmuCore::do_cmp_equal_to<typename LhsMatrix_::value_type, Rhs_>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					comparator
-				>(lhs_matrix_, rhs_);
-			}
+			return _underlying_matrix_funcs::_matrix_multi_arg_operation
+			<
+				EmuCore::do_cmp_equal_to,
+				EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_>,
+				LhsMatrix_,
+				Rhs_
+			>(lhs_matrix_, rhs_);
 		}
 		else
 		{
@@ -103,28 +88,13 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
-			if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
-			{
-				using comparator = EmuCore::do_cmp_not_equal_to<typename LhsMatrix_::value_type, typename Rhs_::value_type>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					comparator
-				>(lhs_matrix_, rhs_);
-			}
-			else
-			{
-				using comparator = EmuCore::do_cmp_not_equal_to<typename LhsMatrix_::value_type, Rhs_>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					comparator
-				>(lhs_matrix_, rhs_);
-			}
+			return _underlying_matrix_funcs::_matrix_multi_arg_operation
+			<
+				EmuCore::do_cmp_not_equal_to,
+				EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_>,
+				LhsMatrix_,
+				Rhs_
+			>(lhs_matrix_, rhs_);
 		}
 		else
 		{
@@ -180,28 +150,13 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
-			if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
-			{
-				using comparator = EmuCore::do_cmp_greater<typename LhsMatrix_::value_type, typename Rhs_::value_type>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					comparator
-				>(lhs_matrix_, rhs_);
-			}
-			else
-			{
-				using comparator = EmuCore::do_cmp_greater<typename LhsMatrix_::value_type, Rhs_>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					comparator
-				>(lhs_matrix_, rhs_);
-			}
+			return _underlying_matrix_funcs::_matrix_multi_arg_operation
+			<
+				EmuCore::do_cmp_greater,
+				EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_>,
+				LhsMatrix_,
+				Rhs_
+			>(lhs_matrix_, rhs_);
 		}
 		else
 		{
@@ -257,28 +212,13 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
-			if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
-			{
-				using comparator = EmuCore::do_cmp_less<typename LhsMatrix_::value_type, typename Rhs_::value_type>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					comparator
-				>(lhs_matrix_, rhs_);
-			}
-			else
-			{
-				using comparator = EmuCore::do_cmp_less<typename LhsMatrix_::value_type, Rhs_>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					comparator
-				>(lhs_matrix_, rhs_);
-			}
+			return _underlying_matrix_funcs::_matrix_multi_arg_operation
+			<
+				EmuCore::do_cmp_less,
+				EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_>,
+				LhsMatrix_,
+				Rhs_
+			>(lhs_matrix_, rhs_);
 		}
 		else
 		{
@@ -334,28 +274,13 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
-			if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
-			{
-				using comparator = EmuCore::do_cmp_greater_equal<typename LhsMatrix_::value_type, typename Rhs_::value_type>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					comparator
-				>(lhs_matrix_, rhs_);
-			}
-			else
-			{
-				using comparator = EmuCore::do_cmp_greater_equal<typename LhsMatrix_::value_type, Rhs_>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					comparator
-				>(lhs_matrix_, rhs_);
-			}
+			return _underlying_matrix_funcs::_matrix_multi_arg_operation
+			<
+				EmuCore::do_cmp_greater_equal,
+				EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_>,
+				LhsMatrix_,
+				Rhs_
+			>(lhs_matrix_, rhs_);
 		}
 		else
 		{
@@ -411,28 +336,13 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
-			if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
-			{
-				using comparator = EmuCore::do_cmp_less_equal<typename LhsMatrix_::value_type, typename Rhs_::value_type>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					comparator
-				>(lhs_matrix_, rhs_);
-			}
-			else
-			{
-				using comparator = EmuCore::do_cmp_less_equal<typename LhsMatrix_::value_type, Rhs_>;
-				return _underlying_matrix_funcs::_matrix_lhs_rhs_operation
-				<
-					EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_>,
-					LhsMatrix_,
-					Rhs_,
-					comparator
-				>(lhs_matrix_, rhs_);
-			}
+			return _underlying_matrix_funcs::_matrix_multi_arg_operation
+			<
+				EmuCore::do_cmp_less_equal,
+				EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_>,
+				LhsMatrix_,
+				Rhs_
+			>(lhs_matrix_, rhs_);
 		}
 		else
 		{

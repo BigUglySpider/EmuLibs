@@ -318,9 +318,8 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 
 		// Multiply the adjugate by the reciprocal to the original matrix's determinant
 		using reciprocal_type = EmuCore::TMPHelpers::first_floating_point_t<OutDeterminant_, float>;
-		using Multiplier_ = EmuCore::do_multiply<typename OutMatrix_::value_type, reciprocal_type>;
 		reciprocal_type det_reciprocal_ = reciprocal_type(1) / static_cast<reciprocal_type>(outDeterminant_);
-		return _matrix_lhs_rhs_operation<OutMatrix_, OutMatrix_, reciprocal_type, Multiplier_>(adjugate_, det_reciprocal_);
+		return _matrix_multi_arg_operation<EmuCore::do_multiply, OutMatrix_, OutMatrix_, reciprocal_type>(adjugate_, det_reciprocal_);
 	}
 }
 
