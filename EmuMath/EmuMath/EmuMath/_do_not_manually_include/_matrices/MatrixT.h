@@ -2,6 +2,7 @@
 #define EMU_MATH_MATRIX_T_H_INC_
 
 #include "MatrixHelpers.h"
+#include "MatrixInfo.h"
 
 namespace EmuMath
 {
@@ -20,62 +21,72 @@ namespace EmuMath
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_ = true>
 	struct Matrix
 	{
+	private:
+		// Formed using decltype on a constructor call in order to trigger an assertion before doing anything further
+		using _matrix_assert = decltype(EmuMath::_underlying_components::MatrixAssert<NumColumns_, NumRows_, T_, ColumnMajor_>());
+
 	public:
-		static_assert(NumColumns_ != 0, "Attempted to instantiate an EmuMath matrix with 0 columns. A matrix must contain at least 1 column.");
-		static_assert(NumRows_ != 0, "Attempted to instantiate an EmuMath matrix with 0 rows. A matrix must contain at least 1 row.");
+		/// <summary> Underlying default MatrixInfo regarding this matrix's static information, including common type aliases. </summary>
+		using matrix_info = EmuMath::_underlying_components::MatrixInfo<NumColumns_, NumRows_, T_, ColumnMajor_>;
 
-		static_assert(!std::is_same_v<T_, void>, "Unable to create an EmuMath matrix which contains void elements.");
-		static_assert(!std::is_reference_v<T_>, "Attempted to form an EmuMath matrix with an internal reference type. To have a matrix storing references, use EmuMath::InternalMatrixReference<T> as the matrix's stored type, or create a matrix via the EmuMath::RefMatrix or EmuMath::ConstRefMatrix aliases to achieve the same with cleaner semantics.");
+		/// <summary> The number of columns contained in this matrix. </summary>
+		static constexpr std::size_t num_columns = matrix_info::num_columns;
+		/// <summary> The number of rows contained in this matrix. </summary>
+		static constexpr std::size_t num_rows = matrix_info::num_rows;
+		/// <summary> The total number of elements contained in this matrix. This is not the memory-size of this matrix acquired via sizeof. </summary>
+		static constexpr std::size_t size = matrix_info::size;
+		/// <summary> Boolean indicating if this matrix's elements are stored contiguously as columns. Mutually exclusive with is_row_major. </summary>
+		static constexpr bool is_column_major = matrix_info::is_column_major;
+		/// <summary> Boolean indicating if this matrix's elements are stored contiguously as rows. Mutually exclusive with is_column_major. </summary>
+		static constexpr bool is_row_major = matrix_info::is_row_major;
+		/// <summary> Boolean indicating if this is a matrix with an equal number of columns and rows. </summary>
+		static constexpr bool is_square = matrix_info::is_square;
 
-		static constexpr std::size_t num_columns = NumColumns_;
-		static constexpr std::size_t num_rows = NumRows_;
-		static constexpr std::size_t size = num_columns * num_rows;
-		static constexpr bool is_column_major = ColumnMajor_;
-		static constexpr bool is_row_major = !is_column_major;
-		static constexpr bool is_square = (num_columns == num_rows);
-
-		static constexpr std::size_t num_major_elements = is_column_major ? num_columns : num_rows;
-		static constexpr std::size_t num_non_major_elements = is_column_major ? num_rows : num_columns;
+		/// <summary> The number of major elements in this matrix (i.e. num_columns if column-major, or num_rows if row-major). </summary>
+		static constexpr std::size_t num_major_elements = matrix_info::num_major_elements;
+		/// <summary> The number of non-major elements in this matrix (i.e. num_rows if column-major, or num_columns if row-major). </summary>
+		static constexpr std::size_t num_non_major_elements = matrix_info::num_non_major_elements;
 
 		/// <summary> The type contained within this matrix. </summary>
-		using contained_type = T_;
+		using contained_type = typename matrix_info::contained_type;
 		/// <summary> Boolean indicating if this matrix contains reference wrapping types. </summary>
-		static constexpr bool contains_reference_wrappers = EmuCore::TMPHelpers::is_reference_wrapper<contained_type>::value;
+		static constexpr bool contains_reference_wrappers = matrix_info::contains_reference_wrappers;
 		/// <summary> The raw value_type within this matrix before its const qualifier is forcibly removed. </summary>
-		using raw_value_type = typename EmuCore::TMPHelpers::get_reference_wrapper_contained_type<contained_type>::type;
+		using raw_value_type = typename matrix_info::raw_value_type;
 		/// <summary> Value type of the items stored within this matrix, without const qualifiers where applicable. </summary>
-		using value_type = std::remove_const_t<raw_value_type>;
+		using value_type = typename matrix_info::value_type;
 		/// <summary> The preferred floating point type for this matrix. Float if this matrix contains non-floating-point types, otherwise matches value_type. </summary>
-		using preferred_floating_point = EmuCore::TMPHelpers::first_floating_point_t<value_type, float>;
+		using preferred_floating_point = typename matrix_info::preferred_floating_point;
 		/// <summary> Boolean indicating if the reference wrappers within this matrix contain constant references. Always false if contains_reference_wrappers is false. </summary>
-		static constexpr bool contains_const_reference_wrappers = std::is_const_v<raw_value_type> && contains_reference_wrappers;
+		static constexpr bool contains_const_reference_wrappers = matrix_info::contains_const_reference_wrappers;
 		/// <summary> Boolean indicating if the reference wrappers within this matrix contain non-constant references. Always false if contains_reference_wrappers is false. </summary>
-		static constexpr bool contains_non_const_reference_wrappers = contains_reference_wrappers && !contains_const_reference_wrappers;
-		using this_type = EmuMath::Matrix<num_columns, num_rows, contained_type, is_column_major>;
-
-		static_assert(std::is_arithmetic_v<value_type>, "Attempted to create an EmuMath matrix with a non-arithmetic value_type. This behaviour is not supported.");
+		static constexpr bool contains_non_const_reference_wrappers = matrix_info::contains_non_const_reference_wrappers;
 
 		/// <summary> Boolean indcating if this matrix's values are integral. </summary>
-		static constexpr bool has_integral_elements = std::is_integral_v<std::remove_cv_t<value_type>>;
+		static constexpr bool has_integral_elements = matrix_info::has_integral_elements;
 		/// <summary> Boolean indcating if this matrix's values are floating-points. </summary>
-		static constexpr bool has_floating_point_elements = std::is_floating_point_v<std::remove_cv_t<value_type>>;
+		static constexpr bool has_floating_point_elements = matrix_info::has_floating_point_elements;
 		/// <summary> Boolean indicating if this matrix's values are constant. </summary>
-		static constexpr bool has_const_values = std::is_const_v<raw_value_type>;
+		static constexpr bool has_const_values = matrix_info::has_const_values;
 
-		using data_storage_type = EmuMath::Vector<num_major_elements, EmuMath::Vector<num_non_major_elements, contained_type>>;
-		using random_access_vector_contained_type = std::conditional_t<contains_reference_wrappers, contained_type, EmuMath::InternalVectorReference<contained_type>>;
-		using const_random_access_vector_contained_type = std::conditional_t
-		<
-			contains_reference_wrappers,
-			std::conditional_t<contains_const_reference_wrappers, contained_type, EmuMath::InternalVectorReference<const value_type>>, 
-			EmuMath::InternalVectorReference<const contained_type>
-		>;
+		/// <summary> The type used to store this matrix's underlying data. Effectively a vector of vectors. </summary>
+		using data_storage_type = typename matrix_info::data_storage_type;
 
-		using random_access_row = EmuMath::Vector<num_columns, random_access_vector_contained_type>;
-		using random_access_column = EmuMath::Vector<num_rows, random_access_vector_contained_type>;
-		using const_random_access_row = EmuMath::Vector<num_columns, const_random_access_vector_contained_type>;
-		using const_random_access_column = EmuMath::Vector<num_rows, const_random_access_vector_contained_type>;
+		/// <summary> Type used to randomly access a row referencing this matrix. </summary>
+		using random_access_row = typename matrix_info::random_access_row;
+		/// <summary> Type used to randomly access a column referencing this matrix. </summary>
+		using random_access_column = typename matrix_info::random_access_column;
+		/// <summary> Type used to randomly access a row referencing this matrix with constant constraints. </summary>
+		using const_random_access_row = typename matrix_info::const_random_access_row;
+		/// <summary> Type used to randomly access a column referencing this matrix with constant constraints. </summary>
+		using const_random_access_column = typename matrix_info::const_random_access_column;
+
+		/// <summary> This matrix type. </summary>
+		using this_type = EmuMath::Matrix<num_columns, num_rows, contained_type, is_column_major>;
+		/// <summary> Type used to receive a copy of this matrix. This is the same as this_type normally, but will remove qualifiers and references where applicable. </summary>
 		using copy_type = EmuMath::Matrix<num_columns, num_rows, value_type, is_column_major>;
+		/// <summary> Type used to receive a copy of this matrix. This is the same as this_type normally, but with references removed if it is a reference wrapper. </summary>
+		using raw_copy_type = EmuMath::Matrix<num_columns, num_rows, raw_value_type, is_column_major>;
 
 #pragma region CONSTRUCTORS
 		constexpr Matrix() : data_()
@@ -565,6 +576,78 @@ namespace EmuMath
 		) const
 		{
 			return EmuMath::Helpers::MatrixInverseLaplace<out_contained_type, OutColumnMajor_, this_type, OutDeterminant_>(*this, out_determinant_);
+		}
+#pragma endregion
+
+#pragma region REINTERPRETATIONS
+		/// <summary>
+		/// <para> Casts this matrix to an alternative matrix type with the provided template arguments. </para>
+		/// <para> Template arguments must be in order of the arguments provided to instantiate an EmuMath::Matrix type. </para>
+		/// <para>
+		///		Arguments may be omitted. Where omitted, they will be automatically matched up to this matrix's own arguments, 
+		///		with the exception of out_contained_type which will be this matrix's value_type instead.
+		/// </para>
+		/// <para> To easily convert straight to an existing EmuMath::Matrix type, use AsMatrix instead, which takes a single EmuMath::Matrix template argument. </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+		/// <returns>This matrix cast to an EmuMath matrix instantiated with the provided template arguments.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> As() const
+		{
+			return EmuMath::Helpers::MatrixAs<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type>(*this);
+		}
+		template<typename out_contained_type, bool OutColumnMajor_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> As() const
+		{
+			return EmuMath::Helpers::MatrixAs<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type>(*this);
+		}
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> As() const
+		{
+			return EmuMath::Helpers::MatrixAs<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type>(*this);
+		}
+		template<bool OutColumnMajor_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, typename value_type, OutColumnMajor_> As() const
+		{
+			return EmuMath::Helpers::MatrixAs<num_columns, num_rows, value_type, OutColumnMajor_, this_type>(*this);
+		}
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, is_column_major> As() const
+		{
+			return EmuMath::Helpers::MatrixAs<OutNumColumns_, OutNumRows_, out_contained_type, is_column_major, this_type>(*this);
+		}
+		template<typename out_contained_type>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, is_column_major> As() const
+		{
+			return EmuMath::Helpers::MatrixAs<num_columns, num_rows, out_contained_type, is_column_major, this_type>(*this);
+		}
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, is_column_major> As() const
+		{
+			return EmuMath::Helpers::MatrixAs<OutNumColumns_, OutNumRows_, value_type, is_column_major, this_type>(*this);
+		}
+
+		/// <summary>
+		/// <para> Casts this matrix to the provided EmuMath matrix template argument type. </para>
+		/// <para> 
+		///		Note that reference casts are not provided by this function; 
+		///		output will be the provided matrix's raw_copy_type, which is the same type for non-ref matrices.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="TargetCastMatrix_">Type of matrix to cast this matrix to. Note that the cast will effectively be a raw copy type.</typeparam>
+		/// <returns>This matrix cast to the raw_copy_type of the passed EmuMath matrix template argument.</returns>
+		template<typename TargetCastMatrix_>
+		[[nodiscard]] constexpr inline typename TargetCastMatrix_::raw_copy_type AsMatrix() const
+		{
+			if constexpr (EmuMath::TMP::is_emu_matrix_v<TargetCastMatrix_>)
+			{
+				using cast_raw_copy_type = typename TargetCastMatrix_::raw_copy_type;
+				return As<cast_raw_copy_type::num_columns, cast_raw_copy_type::num_rows, cast_raw_copy_type::contained_type, cast_raw_copy_type::is_column_major>();
+			}
+			else
+			{
+				static_assert(false, "Attempted to convert an EmuMath matrix to another matrix type via AsMatrix, but the provided TargetCastMatrix_ type was not an EmuMath matrix.");
+			}
 		}
 #pragma endregion
 
