@@ -1586,6 +1586,302 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region COMPARISON_FUNCTIONS
+		/// <summary>
+		/// <para> Compares the equality of each element in this matrix to rhs_ and returns the results of comparisons in respective indices of a matrix of booleans. </para>
+		/// <para> If rhs_ is an EmuMath matrix: Comparisons for elements in this matrix will be performed with respective elements in rhs_. </para>
+		/// <para> If rhs_ is none of the above: Comparisons for elements in this matrix will all be performed with the value of rhs_. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type of item appearing on the right-hand side of comparisons.</typeparam>
+		/// <param name="rhs_">Item appearing on the right-hand side of comparisons.</param>
+		/// <returns>Matrix of booleans containing the results of comparisons of each respective element in this matrix with rhs_ as defined above.</returns>
+		template<std::size_t NumColumnsToTest_ = num_columns, std::size_t NumRowsToTest_ = num_rows, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> CmpPerElementEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixCmpPerElementEqual<NumColumnsToTest_, NumRowsToTest_, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
+		/// <summary>
+		/// <para> Compares the inequality of each element in this matrix to rhs_ and returns the results of comparisons in respective indices of a matrix of booleans. </para>
+		/// <para> If rhs_ is an EmuMath matrix: Comparisons for elements in this matrix will be performed with respective elements in rhs_. </para>
+		/// <para> If rhs_ is none of the above: Comparisons for elements in this matrix will all be performed with the value of rhs_. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type of item appearing on the right-hand side of comparisons.</typeparam>
+		/// <param name="rhs_">Item appearing on the right-hand side of comparisons.</param>
+		/// <returns>Matrix of booleans containing the results of comparisons of each respective element in this matrix with rhs_ as defined above.</returns>
+		template<std::size_t NumColumnsToTest_ = num_columns, std::size_t NumRowsToTest_ = num_rows, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> CmpPerElementNotEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixCmpPerElementNotEqual<NumColumnsToTest_, NumRowsToTest_, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
+		/// <summary>
+		/// <para> Compares the magnitude of each element in this matrix to rhs_ and returns the results of comparisons in respective indices of a matrix of booleans. </para>
+		/// <para> If rhs_ is an EmuMath matrix: Comparisons for elements in this matrix will be performed with respective elements in rhs_. </para>
+		/// <para> If rhs_ is none of the above: Comparisons for elements in this matrix will all be performed with the value of rhs_. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type of item appearing on the right-hand side of comparisons.</typeparam>
+		/// <param name="rhs_">Item appearing on the right-hand side of comparisons.</param>
+		/// <returns>Matrix of booleans containing the results of magntidue of each respective element in this matrix with rhs_ as defined above.</returns>
+		template<std::size_t NumColumnsToTest_ = num_columns, std::size_t NumRowsToTest_ = num_rows, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> CmpPerElementGreater(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixCmpPerElementGreater<NumColumnsToTest_, NumRowsToTest_, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
+		/// <summary>
+		/// <para> Compares the magnitude of each element in this matrix to rhs_ and returns the results of comparisons in respective indices of a matrix of booleans. </para>
+		/// <para> If rhs_ is an EmuMath matrix: Comparisons for elements in this matrix will be performed with respective elements in rhs_. </para>
+		/// <para> If rhs_ is none of the above: Comparisons for elements in this matrix will all be performed with the value of rhs_. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type of item appearing on the right-hand side of comparisons.</typeparam>
+		/// <param name="rhs_">Item appearing on the right-hand side of comparisons.</param>
+		/// <returns>Matrix of booleans containing the results of magntidue of each respective element in this matrix with rhs_ as defined above.</returns>
+		template<std::size_t NumColumnsToTest_ = num_columns, std::size_t NumRowsToTest_ = num_rows, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> CmpPerElementLess(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixCmpPerElementLess<NumColumnsToTest_, NumRowsToTest_, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
+		/// <summary>
+		/// <para> Compares the magnitude of each element in this matrix to rhs_ and returns the results of comparisons in respective indices of a matrix of booleans. </para>
+		/// <para> If rhs_ is an EmuMath matrix: Comparisons for elements in this matrix will be performed with respective elements in rhs_. </para>
+		/// <para> If rhs_ is none of the above: Comparisons for elements in this matrix will all be performed with the value of rhs_. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type of item appearing on the right-hand side of comparisons.</typeparam>
+		/// <param name="rhs_">Item appearing on the right-hand side of comparisons.</param>
+		/// <returns>Matrix of booleans containing the results of magntidue of each respective element in this matrix with rhs_ as defined above.</returns>
+		template<std::size_t NumColumnsToTest_ = num_columns, std::size_t NumRowsToTest_ = num_rows, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> CmpPerElementGreaterEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixCmpPerElementGreaterEqual<NumColumnsToTest_, NumRowsToTest_, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
+		/// <summary>
+		/// <para> Compares the magnitude of each element in this matrix to rhs_ and returns the results of comparisons in respective indices of a matrix of booleans. </para>
+		/// <para> If rhs_ is an EmuMath matrix: Comparisons for elements in this matrix will be performed with respective elements in rhs_. </para>
+		/// <para> If rhs_ is none of the above: Comparisons for elements in this matrix will all be performed with the value of rhs_. </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type of item appearing on the right-hand side of comparisons.</typeparam>
+		/// <param name="rhs_">Item appearing on the right-hand side of comparisons.</param>
+		/// <returns>Matrix of booleans containing the results of magntidue of each respective element in this matrix with rhs_ as defined above.</returns>
+		template<std::size_t NumColumnsToTest_ = num_columns, std::size_t NumRowsToTest_ = num_rows, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> CmpPerElementLessEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixCmpPerElementLessEqual<NumColumnsToTest_, NumRowsToTest_, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns true if all equal_to comparisons between this matrix and rhs_ return true. </para>
+		/// <para> 
+		///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+		///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+		/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+		/// <returns>Boolean indcating if comparisons on all elements within this matrix with rhs_ as defined above returned true.</returns>
+		template<bool TestAllIndices_ = false, class Rhs_>
+		constexpr inline bool CmpAllEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixCmpAllEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+		/// <summary>
+		/// <para> Returns true if all not_equal_to comparisons between this matrix and rhs_ return true. </para>
+		/// <para> 
+		///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+		///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+		/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+		/// <returns>Boolean indcating if comparisons on all elements within this matrix with rhs_ as defined above returned true.</returns>
+		template<bool TestAllIndices_ = false, class Rhs_>
+		constexpr inline bool CmpAllNotEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixCmpAllNotEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+		/// <summary>
+		/// <para> Returns true if all greater_than comparisons between this matrix and rhs_ return true. </para>
+		/// <para> 
+		///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+		///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+		/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+		/// <returns>Boolean indcating if comparisons on all elements within this matrix with rhs_ as defined above returned true.</returns>
+		template<bool TestAllIndices_ = false, class Rhs_>
+		constexpr inline bool CmpAllGreater(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixCmpAllGreater<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+		/// <summary>
+		/// <para> Returns true if all less_than comparisons between this matrix and rhs_ return true. </para>
+		/// <para> 
+		///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+		///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+		/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+		/// <returns>Boolean indcating if comparisons on all elements within this matrix with rhs_ as defined above returned true.</returns>
+		template<bool TestAllIndices_ = false, class Rhs_>
+		constexpr inline bool CmpAllLess(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixCmpAllLess<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+		/// <summary>
+		/// <para> Returns true if all greater_equal comparisons between this matrix and rhs_ return true. </para>
+		/// <para> 
+		///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+		///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+		/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+		/// <returns>Boolean indcating if comparisons on all elements within this matrix with rhs_ as defined above returned true.</returns>
+		template<bool TestAllIndices_ = false, class Rhs_>
+		constexpr inline bool CmpAllGreaterEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixCmpAllGreaterEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+		/// <summary>
+		/// <para> Returns true if all less_equal comparisons between this matrix and rhs_ return true. </para>
+		/// <para> 
+		///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+		///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+		/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+		/// <returns>Boolean indcating if comparisons on all elements within this matrix with rhs_ as defined above returned true.</returns>
+		template<bool TestAllIndices_ = false, class Rhs_>
+		constexpr inline bool CmpAllLessEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixCmpAllLessEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns true if at least one equal_to comparison between this matrix and rhs_ returns true. </para>
+		/// <para> 
+		///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+		///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+		/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+		/// <returns>Boolean indcating if comparisons on any elements within this matrix with rhs_ as defined above returned true.</returns>
+		template<bool TestAllIndices_ = false, class Rhs_>
+		constexpr inline bool CmpAnyEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixCmpAnyEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+		/// <summary>
+		/// <para> Returns true if at least one not_equal_to comparison between this matrix and rhs_ returns true. </para>
+		/// <para> 
+		///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+		///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+		/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+		/// <returns>Boolean indcating if comparisons on any elements within this matrix with rhs_ as defined above returned true.</returns>
+		template<bool TestAllIndices_ = false, class Rhs_>
+		constexpr inline bool CmpAnyNotEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixCmpAnyNotEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+		/// <summary>
+		/// <para> Returns true if at least one greater_than comparison between this matrix and rhs_ returns true. </para>
+		/// <para> 
+		///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+		///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+		/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+		/// <returns>Boolean indcating if comparisons on any elements within this matrix with rhs_ as defined above returned true.</returns>
+		template<bool TestAllIndices_ = false, class Rhs_>
+		constexpr inline bool CmpAnyGreater(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixCmpAnyGreater<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+		/// <summary>
+		/// <para> Returns true if at least one less_than comparison between this matrix and rhs_ returns true. </para>
+		/// <para> 
+		///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+		///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+		/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+		/// <returns>Boolean indcating if comparisons on any elements within this matrix with rhs_ as defined above returned true.</returns>
+		template<bool TestAllIndices_ = false, class Rhs_>
+		constexpr inline bool CmpAnyLess(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixCmpAnyLess<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+		/// <summary>
+		/// <para> Returns true if at least one greater_equal comparison between this matrix and rhs_ returns true. </para>
+		/// <para> 
+		///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+		///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+		/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+		/// <returns>Boolean indcating if comparisons on any elements within this matrix with rhs_ as defined above returned true.</returns>
+		template<bool TestAllIndices_ = false, class Rhs_>
+		constexpr inline bool CmpAnyGreaterEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixCmpAnyGreaterEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+		/// <summary>
+		/// <para> Returns true if at least one less_equal comparison between this matrix and rhs_ returns true. </para>
+		/// <para> 
+		///		If rhs_ is an EmuMath matrix: respective elements within the two matrices will be compared. 
+		///		If this is the case, comparisons will only be performed on shared elements by default. To test all elements regardless of size, set TestAllIndices_ to true.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Item appearing on the right-hand side of equal_to comparisons.</typeparam>
+		/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
+		/// <returns>Boolean indcating if comparisons on any elements within this matrix with rhs_ as defined above returned true.</returns>
+		template<bool TestAllIndices_ = false, class Rhs_>
+		constexpr inline bool CmpAnyLessEqual(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixCmpAnyLessEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns true if the passed matrix is equal to this matrix. </para>
+		/// <para>
+		///		By default, only the lowest-sized matrix indices are compared.
+		///		To compare even non-existent indices, set the TestAllIndices_ template argument to true.
+		/// </para>
+		/// <para> This is effectively shorthand for calling CmpAllEqual with a matrix rhs_, but also enforces a guarantee that rhs_ will be a matrix. </para>
+		/// </summary>
+		/// <typeparam name="RhsMatrix_">Type of matrix appearing on the right of the comparison.</typeparam>
+		/// <param name="rhs_matrix_">EmuMath matrix appearing on the right of the comparison.</param>
+		/// <returns>True if all respective elements (overall or smallest-size, depending on TestAllIndices_ value) of the matrices are equal; otherwise false.</returns>
+		template<bool TestAllIndices_ = false, class RhsMatrix_>
+		constexpr inline bool CmpEqual(const RhsMatrix_& rhs_matrix_) const
+		{
+			return EmuMath::Helpers::MatrixCmpEqual<TestAllIndices_, this_type, RhsMatrix_>(*this, rhs_matrix_);
+		}
+		/// <summary>
+		/// <para> Returns true if the passed matrix is not equal to this matrix. </para>
+		/// <para>
+		///		By default, only the lowest-sized matrix indices are compared.
+		///		To compare even non-existent indices, set the TestAllIndices_ template argument to true.
+		/// </para>
+		/// <para> This is effectively shorthand for calling CmpAnyNotEqual with a matrix rhs_, but also enforces a guarantee that rhs_ will be a matrix. </para>
+		/// </summary>
+		/// <typeparam name="RhsMatrix_">Type of matrix appearing on the right of the comparison.</typeparam>
+		/// <param name="rhs_matrix_">EmuMath matrix appearing on the right of the comparison.</param>
+		/// <returns>True if any respective elements (overall or smallest-size, depending on TestAllIndices_ value) of the matrices are not equal; otherwise false.</returns>
+		template<bool TestAllIndices_ = false, class RhsMatrix_>
+		constexpr inline bool CmpNotEqual(const RhsMatrix_& rhs_matrix_) const
+		{
+			return EmuMath::Helpers::MatrixCmpNotEqual<TestAllIndices_, this_type, RhsMatrix_>(*this, rhs_matrix_);
+		}
+#pragma endregion
+
 	private:
 		data_storage_type data_;
 #pragma region SELF_HELPERS
