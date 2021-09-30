@@ -24,195 +24,195 @@ namespace EmuMath::Helpers
 	}
 
 	/// <summary>
-	/// <para> Creates a 4x4 transformation matrix which may be used to rotate a point about the X-axis by the provided number of radians. </para>
-	/// <para> This function may make sacrifices to be evaluable at compile time. If it is being called at runtime, it is recommended to use MatrixRotationXRads instead. </para>
+	/// <para> Creates a 4x4 transformation matrix which may be used to rotate a point about the X-axis by the provided number of radians or degrees. </para>
+	/// <para> This function may make sacrifices to be evaluable at compile time. If it is being called at runtime, it is recommended to use MatrixRotationX instead. </para>
 	/// <para> NumIterations_ may be increased to improve accuracy at the cost of performance, or decreased to reduce accuracy and increase performance. </para>
 	/// </summary>
 	/// <typeparam name="out_contained_type">Type to be contained in the output rotation matrix.</typeparam>
-	/// <typeparam name="RotX_">Type used to provide the amount of radians to rotate about the X-axis.</typeparam>
-	/// <param name="rotation_x_rads_">The amount of radians to rotate about the X-axis.</param>
-	/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the X-axis by the passed number of radians.</returns>
-	template<std::size_t NumIterations_ = 3, typename out_contained_type = float, bool OutColumnMajor_ = true, typename RotX_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixRotationXRadsConstexpr(const RotX_& rotation_x_rads_)
+	/// <typeparam name="RotX_">Type used to provide the amount of radians or degrees to rotate about the X-axis.</typeparam>
+	/// <param name="rot_x_">The amount of radians or degrees to rotate about the X-axis.</param>
+	/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the X-axis by the passed number of radians or degrees.</returns>
+	template<bool RotIsRads_ = true, std::size_t NumIterations_ = 3, bool DoMod_ = true, typename out_contained_type = float, bool OutColumnMajor_ = true, typename RotX_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixRotationXConstexpr(const RotX_& rot_x_)
 	{
-		return _underlying_matrix_funcs::_make_rotation_matrix_x
-		<
-			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
-			RotX_,
-			EmuCore::do_cos_constexpr<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type, NumIterations_>,
-			EmuCore::do_sin_constexpr<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type, NumIterations_>
-		>(rotation_x_rads_);
-	}
-	/// <summary>
-	/// <para> Creates a 4x4 transformation matrix which may be used to rotate a point about the X-axis by the provided number of degrees. </para>
-	/// <para> This function may make sacrifices to be evaluable at compile time. If it is being called at runtime, it is recommended to use MatrixRotationXDegs instead. </para>
-	/// <para> NumIterations_ may be increased to improve accuracy at the cost of performance, or decreased to reduce accuracy and increase performance. </para>
-	/// </summary>
-	/// <typeparam name="out_contained_type">Type to be contained in the output rotation matrix.</typeparam>
-	/// <typeparam name="RotX_">Type used to provide the amount of degrees to rotate about the X-axis.</typeparam>
-	/// <param name="rotation_x_rads_">The amount of degrees to rotate about the X-axis.</param>
-	/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the X-axis by the passed number of degrees.</returns>
-	template<std::size_t NumIterations_ = 3, typename out_contained_type = float, bool OutColumnMajor_ = true, typename RotX_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixRotationXDegsConstexpr(const RotX_& rotation_x_degs_)
-	{
-		return MatrixRotationXRadsConstexpr<NumIterations_, out_contained_type, OutColumnMajor_, RotX_>(EmuCore::Pi::DegsToRads(rotation_x_degs_));
+		if constexpr(RotIsRads_)
+		{
+			return _underlying_matrix_funcs::_make_rotation_matrix_x
+			<
+				EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
+				RotX_,
+				EmuCore::do_cos_constexpr<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type, NumIterations_, DoMod_>,
+				EmuCore::do_sin_constexpr<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type, NumIterations_, DoMod_>
+			>(rot_x_);
+		}
+		else
+		{
+			using rot_x_floating_point = typename EmuCore::TMPHelpers::first_floating_point<RotX_, float>::type;
+			return MatrixRotationXConstexpr<true, NumIterations_, DoMod_, out_contained_type, OutColumnMajor_, rot_x_floating_point>
+			(
+				EmuCore::Pi::DegsToRads(static_cast<rot_x_floating_point>(rot_x_))
+			);
+		}
 	}
 
 	/// <summary>
-	/// <para> Creates a 4x4 transformation matrix which may be used to rotate a point about the Y-axis by the provided number of radians. </para>
-	/// <para> This function may make sacrifices to be evaluable at compile time. If it is being called at runtime, it is recommended to use MatrixRotationYRads instead. </para>
+	/// <para> Creates a 4x4 transformation matrix which may be used to rotate a point about the Y-axis by the provided number of radians or degrees. </para>
+	/// <para> This function may make sacrifices to be evaluable at compile time. If it is being called at runtime, it is recommended to use MatrixRotationY instead. </para>
 	/// <para> NumIterations_ may be increased to improve accuracy at the cost of performance, or decreased to reduce accuracy and increase performance. </para>
 	/// </summary>
 	/// <typeparam name="out_contained_type">Type to be contained in the output rotation matrix.</typeparam>
-	/// <typeparam name="RotX_">Type used to provide the amount of radians to rotate about the Y-axis.</typeparam>
-	/// <param name="rotation_x_rads_">The amount of radians to rotate about the Y-axis.</param>
-	/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the Y-axis by the passed number of radians.</returns>
-	template<std::size_t NumIterations_ = 3, typename out_contained_type = float, bool OutColumnMajor_ = true, typename RotX_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixRotationYRadsConstexpr(const RotX_& rotation_x_rads_)
+	/// <typeparam name="RotY_">Type used to provide the amount of radians or degrees to rotate about the Y-axis.</typeparam>
+	/// <param name="rot_y_">The amount of radians or degrees to rotate about the Y-axis.</param>
+	/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the Y-axis by the passed number of radians or degrees.</returns>
+	template<bool RotIsRads_ = true, std::size_t NumIterations_ = 3, bool DoMod_ = true, typename out_contained_type = float, bool OutColumnMajor_ = true, typename RotY_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixRotationYConstexpr(const RotY_& rot_y_)
 	{
-		return _underlying_matrix_funcs::_make_rotation_matrix_y
-		<
-			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
-			RotX_,
-			EmuCore::do_cos_constexpr<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type, NumIterations_>,
-			EmuCore::do_sin_constexpr<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type, NumIterations_>
-		>(rotation_x_rads_);
-	}
-	/// <summary>
-	/// <para> Creates a 4x4 transformation matrix which may be used to rotate a point about the Y-axis by the provided number of degrees. </para>
-	/// <para> This function may make sacrifices to be evaluable at compile time. If it is being called at runtime, it is recommended to use MatrixRotationYDegs instead. </para>
-	/// <para> NumIterations_ may be increased to improve accuracy at the cost of performance, or decreased to reduce accuracy and increase performance. </para>
-	/// </summary>
-	/// <typeparam name="out_contained_type">Type to be contained in the output rotation matrix.</typeparam>
-	/// <typeparam name="RotX_">Type used to provide the amount of degrees to rotate about the Y-axis.</typeparam>
-	/// <param name="rotation_x_rads_">The amount of degrees to rotate about the Y-axis.</param>
-	/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the Y-axis by the passed number of degrees.</returns>
-	template<std::size_t NumIterations_ = 3, typename out_contained_type = float, bool OutColumnMajor_ = true, typename RotX_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixRotationYDegsConstexpr(const RotX_& rotation_x_degs_)
-	{
-		return MatrixRotationYRadsConstexpr<NumIterations_, out_contained_type, OutColumnMajor_, RotX_>(EmuCore::Pi::DegsToRads(rotation_x_degs_));
+		if constexpr (RotIsRads_)
+		{
+			return _underlying_matrix_funcs::_make_rotation_matrix_y
+			<
+				EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
+				RotY_,
+				EmuCore::do_cos_constexpr<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type, NumIterations_, DoMod_>,
+				EmuCore::do_sin_constexpr<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type, NumIterations_, DoMod_>
+			>(rot_y_);
+		}
+		else
+		{
+			using rot_y_floating_point = typename EmuCore::TMPHelpers::first_floating_point<RotY_, float>::type;
+			return MatrixRotationYConstexpr<true, NumIterations_, DoMod_, out_contained_type, OutColumnMajor_, rot_y_floating_point>
+			(
+				EmuCore::Pi::DegsToRads(static_cast<rot_y_floating_point>(rot_y_))
+			);
+		}
 	}
 
 	/// <summary>
-	/// <para> Creates a 4x4 transformation matrix which may be used to rotate a point about the Z-axis by the provided number of radians. </para>
-	/// <para> This function may make sacrifices to be evaluable at compile time. If it is being called at runtime, it is recommended to use MatrixRotationZRads instead. </para>
+	/// <para> Creates a 4x4 transformation matrix which may be used to rotate a point about the Z-axis by the provided number of radians or degrees. </para>
+	/// <para> This function may make sacrifices to be evaluable at compile time. If it is being called at runtime, it is recommended to use MatrixRotationZ instead. </para>
 	/// <para> NumIterations_ may be increased to improve accuracy at the cost of performance, or decreased to reduce accuracy and increase performance. </para>
 	/// </summary>
 	/// <typeparam name="out_contained_type">Type to be contained in the output rotation matrix.</typeparam>
-	/// <typeparam name="RotX_">Type used to provide the amount of radians to rotate about the Z-axis.</typeparam>
-	/// <param name="rotation_x_rads_">The amount of radians to rotate about the Z-axis.</param>
-	/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the Z-axis by the passed number of radians.</returns>
-	template<std::size_t NumIterations_ = 3, typename out_contained_type = float, bool OutColumnMajor_ = true, typename RotX_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixRotationZRadsConstexpr(const RotX_& rotation_x_rads_)
+	/// <typeparam name="RotZ_">Type used to provide the amount of radians or degrees to rotate about the Z-axis.</typeparam>
+	/// <param name="rot_z_">The amount of radians or degrees to rotate about the Z-axis.</param>
+	/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the Z-axis by the passed number of radians or degrees.</returns>
+	template<bool RotIsRads_ = true, std::size_t NumIterations_ = 3, bool DoMod_ = true, typename out_contained_type = float, bool OutColumnMajor_ = true, typename RotZ_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixRotationZConstexpr(const RotZ_& rot_z_)
 	{
-		return _underlying_matrix_funcs::_make_rotation_matrix_z
-		<
-			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
-			RotX_,
-			EmuCore::do_cos_constexpr<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type, NumIterations_>,
-			EmuCore::do_sin_constexpr<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type, NumIterations_>
-		>(rotation_x_rads_);
-	}
-	/// <summary>
-	/// <para> Creates a 4x4 transformation matrix which may be used to rotate a point about the Z-axis by the provided number of degrees. </para>
-	/// <para> This function may make sacrifices to be evaluable at compile time. If it is being called at runtime, it is recommended to use MatrixRotationZDegs instead. </para>
-	/// <para> NumIterations_ may be increased to improve accuracy at the cost of performance, or decreased to reduce accuracy and increase performance. </para>
-	/// </summary>
-	/// <typeparam name="out_contained_type">Type to be contained in the output rotation matrix.</typeparam>
-	/// <typeparam name="RotX_">Type used to provide the amount of degrees to rotate about the Z-axis.</typeparam>
-	/// <param name="rotation_x_rads_">The amount of degrees to rotate about the Z-axis.</param>
-	/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the Z-axis by the passed number of degrees.</returns>
-	template<std::size_t NumIterations_ = 3, typename out_contained_type = float, bool OutColumnMajor_ = true, typename RotX_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixRotationZDegsConstexpr(const RotX_& rotation_x_degs_)
-	{
-		return MatrixRotationZRadsConstexpr<NumIterations_, out_contained_type, OutColumnMajor_, RotX_>(EmuCore::Pi::DegsToRads(rotation_x_degs_));
+		if constexpr (RotIsRads_)
+		{
+			return _underlying_matrix_funcs::_make_rotation_matrix_z
+			<
+				EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
+				RotZ_,
+				EmuCore::do_cos_constexpr<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type, NumIterations_, DoMod_>,
+				EmuCore::do_sin_constexpr<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type, NumIterations_, DoMod_>
+			>(rot_z_);
+		}
+		else
+		{
+			using rot_z_floating_point = typename EmuCore::TMPHelpers::first_floating_point<RotZ_, float>::type;
+			return MatrixRotationZConstexpr<true, NumIterations_, DoMod_, out_contained_type, OutColumnMajor_, rot_z_floating_point>
+			(
+				EmuCore::Pi::DegsToRads(static_cast<rot_z_floating_point>(rot_z_))
+			);
+		}
 	}
 
-	/// <summary> Creates a 4x4 transformation matrix which may be used to rotate a point about the X-axis by the provided number of radians. </summary>
+	/// <summary> Creates a 4x4 transformation matrix which may be used to rotate a point about the X-axis by the provided number of radians or degrees. </summary>
 	/// <typeparam name="out_contained_type">Type to be contained in the output rotation matrix.</typeparam>
-	/// <typeparam name="RotX_">Type used to provide the amount of radians to rotate about the X-axis.</typeparam>
-	/// <param name="rotation_x_rads_">The amount of radians to rotate about the X-axis.</param>
-	/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the X-axis by the passed number of radians.</returns>
-	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename RotX_>
-	[[nodiscard]] inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixRotationXRads(const RotX_& rotation_x_rads_)
+	/// <typeparam name="RotX_">Type used to provide the amount of radians or degrees to rotate about the X-axis.</typeparam>
+	/// <param name="rot_x_">The amount of radians or degrees to rotate about the X-axis.</param>
+	/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the X-axis by the passed number of radians or degrees.</returns>
+	template<bool RotIsRads_ = true, typename out_contained_type = float, bool OutColumnMajor_ = true, typename RotX_>
+	[[nodiscard]] inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixRotationX(const RotX_& rot_x_)
 	{
-		return _underlying_matrix_funcs::_make_rotation_matrix_x
-		<
-			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
-			RotX_,
-			EmuCore::do_cos<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type>,
-			EmuCore::do_sin<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type>
-		>(rotation_x_rads_);
-	}
-	/// <summary> Creates a 4x4 transformation matrix which may be used to rotate a point about the X-axis by the provided number of degrees. </summary>
-	/// <typeparam name="out_contained_type">Type to be contained in the output rotation matrix.</typeparam>
-	/// <typeparam name="RotX_">Type used to provide the amount of degrees to rotate about the X-axis.</typeparam>
-	/// <param name="rotation_x_rads_">The amount of degrees to rotate about the X-axis.</param>
-	/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the X-axis by the passed number of degrees.</returns>
-	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename RotX_>
-	[[nodiscard]] inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixRotationXDegs(const RotX_& rotation_x_degs_)
-	{
-		return MatrixRotationXRads<out_contained_type, OutColumnMajor_, RotX_>(EmuCore::Pi::DegsToRads(rotation_x_degs_));
-	}
-
-	/// <summary> Creates a 4x4 transformation matrix which may be used to rotate a point about the Y-axis by the provided number of radians. </summary>
-	/// <typeparam name="out_contained_type">Type to be contained in the output rotation matrix.</typeparam>
-	/// <typeparam name="RotX_">Type used to provide the amount of radians to rotate about the Y-axis.</typeparam>
-	/// <param name="rotation_x_rads_">The amount of radians to rotate about the Y-axis.</param>
-	/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the Y-axis by the passed number of radians.</returns>
-	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename RotX_>
-	[[nodiscard]] inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixRotationYRads(const RotX_& rotation_x_rads_)
-	{
-		return _underlying_matrix_funcs::_make_rotation_matrix_y
-		<
-			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
-			RotX_,
-			EmuCore::do_cos<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type>,
-			EmuCore::do_sin<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type>
-		>(rotation_x_rads_);
-	}
-	/// <summary> Creates a 4x4 transformation matrix which may be used to rotate a point about the Y-axis by the provided number of degrees. </summary>
-	/// <typeparam name="out_contained_type">Type to be contained in the output rotation matrix.</typeparam>
-	/// <typeparam name="RotX_">Type used to provide the amount of degrees to rotate about the Y-axis.</typeparam>
-	/// <param name="rotation_x_rads_">The amount of degrees to rotate about the Y-axis.</param>
-	/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the Y-axis by the passed number of degrees.</returns>
-	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename RotX_>
-	[[nodiscard]] inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixRotationYDegs(const RotX_& rotation_x_degs_)
-	{
-		return MatrixRotationYRads<out_contained_type, OutColumnMajor_, RotX_>(EmuCore::Pi::DegsToRads(rotation_x_degs_));
+		if constexpr (RotIsRads_)
+		{
+			return _underlying_matrix_funcs::_make_rotation_matrix_x
+			<
+				EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
+				RotX_,
+				EmuCore::do_cos<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type>,
+				EmuCore::do_sin<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type>
+			>(rot_x_);
+		}
+		else
+		{
+			using rot_x_floating_point = typename EmuCore::TMPHelpers::first_floating_point<RotX_, float>::type;
+			return MatrixRotationX<true, out_contained_type, OutColumnMajor_, rot_x_floating_point>
+			(
+				EmuCore::Pi::DegsToRads(static_cast<rot_x_floating_point>(rot_x_))
+			);
+		}
 	}
 
-	/// <summary> Creates a 4x4 transformation matrix which may be used to rotate a point about the Z-axis by the provided number of radians. </summary>
+	/// <summary> Creates a 4x4 transformation matrix which may be used to rotate a point about the Y-axis by the provided number of radians or degrees. </summary>
 	/// <typeparam name="out_contained_type">Type to be contained in the output rotation matrix.</typeparam>
-	/// <typeparam name="RotX_">Type used to provide the amount of radians to rotate about the Z-axis.</typeparam>
-	/// <param name="rotation_x_rads_">The amount of radians to rotate about the Z-axis.</param>
-	/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the Z-axis by the passed number of radians.</returns>
-	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename RotX_>
-	[[nodiscard]] inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixRotationZRads(const RotX_& rotation_x_rads_)
+	/// <typeparam name="RotY_">Type used to provide the amount of radians or degrees to rotate about the Y-axis.</typeparam>
+	/// <param name="rot_y_">The amount of radians or degrees to rotate about the Y-axis.</param>
+	/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the Y-axis by the passed number of radians or degrees.</returns>
+	template<bool RotIsRads_ = true, typename out_contained_type = float, bool OutColumnMajor_ = true, typename RotY_>
+	[[nodiscard]] inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixRotationY(const RotY_& rot_y_)
 	{
-		return _underlying_matrix_funcs::_make_rotation_matrix_z
-		<
-			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
-			RotX_,
-			EmuCore::do_cos<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type>,
-			EmuCore::do_sin<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type>
-		>(rotation_x_rads_);
+		if constexpr (RotIsRads_)
+		{
+			return _underlying_matrix_funcs::_make_rotation_matrix_y
+			<
+				EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
+				RotY_,
+				EmuCore::do_cos<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type>,
+				EmuCore::do_sin<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type>
+			>(rot_y_);
+		}
+		else
+		{
+			using rot_y_floating_point = typename EmuCore::TMPHelpers::first_floating_point<RotY_, float>::type;
+			return MatrixRotationY<true, out_contained_type, OutColumnMajor_, rot_y_floating_point>
+			(
+				EmuCore::Pi::DegsToRads(static_cast<rot_y_floating_point>(rot_y_))
+			);
+		}
 	}
-	/// <summary> Creates a 4x4 transformation matrix which may be used to rotate a point about the Z-axis by the provided number of degrees. </summary>
+
+	/// <summary> Creates a 4x4 transformation matrix which may be used to rotate a point about the Y-axis by the provided number of radians or degrees. </summary>
 	/// <typeparam name="out_contained_type">Type to be contained in the output rotation matrix.</typeparam>
-	/// <typeparam name="RotX_">Type used to provide the amount of degrees to rotate about the Z-axis.</typeparam>
-	/// <param name="rotation_x_rads_">The amount of degrees to rotate about the Z-axis.</param>
-	/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the Z-axis by the passed number of degrees.</returns>
-	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename RotX_>
-	[[nodiscard]] inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixRotationZDegs(const RotX_& rotation_x_degs_)
+	/// <typeparam name="RotZ_">Type used to provide the amount of radians or degrees to rotate about the Y-axis.</typeparam>
+	/// <param name="rot_z_">The amount of radians or degrees to rotate about the Y-axis.</param>
+	/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the Y-axis by the passed number of radians or degrees.</returns>
+	template<bool RotIsRads_ = true, typename out_contained_type = float, bool OutColumnMajor_ = true, typename RotZ_>
+	[[nodiscard]] inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixRotationZ(const RotZ_& rot_z_)
 	{
-		return MatrixRotationZRads<out_contained_type, OutColumnMajor_, RotX_>(EmuCore::Pi::DegsToRads(rotation_x_degs_));
+		if constexpr (RotIsRads_)
+		{
+			return _underlying_matrix_funcs::_make_rotation_matrix_z
+			<
+				EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
+				RotZ_,
+				EmuCore::do_cos<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type>,
+				EmuCore::do_sin<typename EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>::value_type>
+			>(rot_z_);
+		}
+		else
+		{
+			using rot_z_floating_point = typename EmuCore::TMPHelpers::first_floating_point<RotZ_, float>::type;
+			return MatrixRotationY<true, out_contained_type, OutColumnMajor_, rot_z_floating_point>
+			(
+				EmuCore::Pi::DegsToRads(static_cast<rot_z_floating_point>(rot_z_))
+			);
+		}
 	}
 
 	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename X_, typename Y_, typename Z_>
 	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixScale(const X_& x_, const Y_& y_, const Z_& z_)
 	{
-		return _underlying_matrix_funcs::_make_scale_matrix<EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>, X_, Y_, Z_>(x_, y_, z_);
+		return _underlying_matrix_funcs::_make_scale_matrix
+		<
+			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
+			X_,
+			Y_,
+			Z_
+		>(x_, y_, z_);
 	}
 }
 

@@ -325,20 +325,20 @@ int main()
 	constexpr auto sin_ = EmuCore::do_sin_constexpr<void, 5>()(10.0f);
 	constexpr auto cos_ = EmuCore::do_cos_constexpr<double>()(10.0f);
 	
-	constexpr auto rot_x_mat_ = EmuMath::Helpers::MatrixRotationXDegsConstexpr<10>(10.0f);
+	constexpr auto rot_x_mat_ = EmuMath::Helpers::MatrixRotationXConstexpr<false, 10>(10.0f);
 	constexpr auto point_rotated_x = EmuMath::Helpers::MatrixMultiply(rot_x_mat_, point_as_column_vector_).GetMajor<0>().As<3, float>();
 	constexpr auto rot_x_det_ = EmuMath::Helpers::MatrixDeterminantLaplace(rot_x_mat_);
 	
-	constexpr auto rot_y_mat_ = EmuMath::Helpers::MatrixRotationYDegsConstexpr<10>(10.0f);
+	constexpr auto rot_y_mat_ = EmuMath::Helpers::MatrixRotationYConstexpr<false, 10>(10.0f);
 	constexpr auto point_rotated_y = EmuMath::Helpers::MatrixMultiply(rot_y_mat_, point_as_column_vector_).GetMajor<0>().As<3, float>();
 	constexpr auto rot_y_det_ = EmuMath::Helpers::MatrixDeterminantLaplace(rot_y_mat_);
 	
-	constexpr auto rot_z_mat_ = EmuMath::Helpers::MatrixRotationZDegsConstexpr<10>(10.0f);
+	constexpr auto rot_z_mat_ = EmuMath::Helpers::MatrixRotationZConstexpr<false, 10>(10.0f);
 	constexpr auto point_rotated_z = EmuMath::Helpers::MatrixMultiply(rot_z_mat_, point_as_column_vector_).GetMajor<0>().As<3, float>();
 	constexpr auto rot_z_det_ = EmuMath::Helpers::MatrixDeterminantLaplace(rot_z_mat_);
 	
 	auto runtime_point = point_;
-	auto rot_x_runtime_ = EmuMath::Helpers::MatrixRotationXDegs(25.0f);
+	auto rot_x_runtime_ = EmuMath::Helpers::MatrixRotationX<false>(25.0f);
 	auto runtime_point_cm_ = EmuMath::Helpers::VectorToColumnMatrix(EmuMath::Helpers::VectorPrepareToTransform(point_));
 	std::cout
 		<< "Point: " << runtime_point
@@ -651,12 +651,14 @@ int main()
 
 	float hello_ = 0.5f;
 	constexpr long double bki = 1.25L;
-	EmuMath::Matrix4x4<float, false> _4x4_float_ = EmuMath::Matrix4x4<float, false>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	EmuMath::Matrix4x4<float, false> _4x4_float_ = EmuMath::Matrix4x4<float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 
 
 
 	std::cout << "\n\n";
 	std::cout << _4x4_float_ << "\n";
+
+	constexpr auto trans_from_4x4_ = _4x4_float_.Translation<long double>(1, 2, 3);
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
