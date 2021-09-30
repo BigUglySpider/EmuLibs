@@ -27,11 +27,15 @@ namespace EmuCore::TestingHelpers
 		{
 			if constexpr (std::numeric_limits<T_>::max() < std::numeric_limits<int>::max())
 			{
-				return static_cast<T_>((rand() % static_cast<int>(std::numeric_limits<T_>::max())) * 0.9f);
+				return static_cast<T_>
+				(
+					static_cast<T_>(rand() % static_cast<int>(std::numeric_limits<T_>::max())) * 
+					EmuCore::TMPHelpers::first_floating_point_t<T_, float>(0.9f)
+				);
 			}
 			else
 			{
-				return static_cast<T_>(rand() * 0.9f);
+				return static_cast<T_>(static_cast<T_>(rand()) * EmuCore::TMPHelpers::first_floating_point_t<T_, float>(0.9f));
 			}
 		}
 	};
