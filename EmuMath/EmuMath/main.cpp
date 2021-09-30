@@ -654,7 +654,6 @@ int main()
 	EmuMath::Matrix4x4<float, false> _4x4_float_ = EmuMath::Matrix4x4<float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 
 
-
 	std::cout << "\n\n";
 	std::cout << _4x4_float_ << "\n";
 
