@@ -203,6 +203,21 @@ namespace EmuMath::Helpers
 		}
 	}
 
+	/// <summary>
+	/// <para>
+	///		Creates a 4x4 transformation matrix which may be used to perform a scale of 
+	///		x_ in the X-dimension, y_ in the Y-dimension, and z_ in the Z-dimension.
+	/// </para>
+	/// <para> x_, y_, and z_ may be any types, but they must be convertible to the output matrix's contained type (provided as the out_contained_type argument). </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained within the output matrix.</typeparam>
+	/// <typeparam name="X_">Type use for the argument representing the scaling in the X-dimension.</typeparam>
+	/// <typeparam name="Y_">Type use for the argument representing the scaling in the Y-dimension.</typeparam>
+	/// <typeparam name="Z_">Type use for the argument representing the scaling in the Z-dimension.</typeparam>
+	/// <param name="x_">Percentage to scale in the X-dimension, where 0 is 0%, and 1 is 100%.</param>
+	/// <param name="y_">Percentage to scale in the Y-dimension, where 0 is 0%, and 1 is 100%.</param>
+	/// <param name="z_">Percentage to scale in the Z-dimension, where 0 is 0%, and 1 is 100%.</param>
+	/// <returns>4x4 EmuMath matrix which may be used to perform a scale of the specified amounts in respective dimensions.</returns>
 	template<typename out_contained_type = float, bool OutColumnMajor_ = true, typename X_, typename Y_, typename Z_>
 	[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> MatrixScale(const X_& x_, const Y_& y_, const Z_& z_)
 	{
