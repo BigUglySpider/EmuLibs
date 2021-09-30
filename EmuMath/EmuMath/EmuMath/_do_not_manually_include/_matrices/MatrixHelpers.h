@@ -7,7 +7,7 @@
 #include "_helpers/_matrix_comparisons.h"
 #include "_helpers/_matrix_gets.h"
 #include "_helpers/_matrix_operations.h"
-#include "_helpers/matrix_projections_.h"
+#include "_helpers/_matrix_projections.h"
 #include "_helpers/_matrix_reinterpretations.h"
 #include "_helpers/_matrix_sets.h"
 #include "_helpers/_matrix_transformations.h"

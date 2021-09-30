@@ -1391,7 +1391,199 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region BITWISE_FUNCTIONS
+		/// <summary>
+		/// <para> Performs a bitwise AND operation on the elements of this matrix with the provided rhs_. </para>
+		/// <para> If rhs_ is an EmuMath matrix: Respective elements will be ANDed. </para>
+		/// <para> If rhs_ is none of the above: All elements within this matrix will be ANDed with the value of rhs_. </para>
+		/// <para>
+		///		Template arguments are in the same order as when defining an EmuMath::Matrix. Arguments may be omitted to use the same as this matrix's arguments, 
+		///		with the exception of out_contained_type, which will be this matrix's value_type.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type appearing of the right of a bitwise AND.</typeparam>
+		/// <param name="rhs_">Item appearing on the right of a bitwise AND.</param>
+		/// <returns>Matrix resulting from a bitwise AND between this matrix and rhs_.</returns>
+		template<std::size_t OutNumColumns, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_> And(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixAnd<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
+		template<std::size_t OutNumColumns, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_> And(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixAnd<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
+		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> And(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixAnd<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> And(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixAnd<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
 
+		/// <summary>
+		/// <para> Performs a bitwise OR operation on the elements of this matrix with the provided rhs_. </para>
+		/// <para> If rhs_ is an EmuMath matrix: Respective elements will be ORed. </para>
+		/// <para> If rhs_ is none of the above: All elements within this matrix will be ORed with the value of rhs_. </para>
+		/// <para>
+		///		Template arguments are in the same order as when defining an EmuMath::Matrix. Arguments may be omitted to use the same as this matrix's arguments, 
+		///		with the exception of out_contained_type, which will be this matrix's value_type.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type appearing of the right of a bitwise OR.</typeparam>
+		/// <param name="rhs_">Item appearing on the right of a bitwise OR.</param>
+		/// <returns>Matrix resulting from a bitwise OR between this matrix and rhs_.</returns>
+		template<std::size_t OutNumColumns, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_> Or(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixOr<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
+		template<std::size_t OutNumColumns, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_> Or(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixOr<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
+		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> Or(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixOr<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Or(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixOr<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Performs a bitwise XOR operation on the elements of this matrix with the provided rhs_. </para>
+		/// <para> If rhs_ is an EmuMath matrix: Respective elements will be XORed. </para>
+		/// <para> If rhs_ is none of the above: All elements within this matrix will be XORed with the value of rhs_. </para>
+		/// <para>
+		///		Template arguments are in the same order as when defining an EmuMath::Matrix. Arguments may be omitted to use the same as this matrix's arguments, 
+		///		with the exception of out_contained_type, which will be this matrix's value_type.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Rhs_">Type appearing of the right of a bitwise XOR.</typeparam>
+		/// <param name="rhs_">Item appearing on the right of a bitwise XOR.</param>
+		/// <returns>Matrix resulting from a bitwise XOR between this matrix and rhs_.</returns>
+		template<std::size_t OutNumColumns, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_> Xor(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixXor<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
+		template<std::size_t OutNumColumns, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_> Xor(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixXor<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
+		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> Xor(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixXor<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Xor(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::MatrixXor<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Performs a bitwise NOT operation on the elements of this matrix. </para>
+		/// <para>
+		///		Template arguments are in the same order as when defining an EmuMath::Matrix. Arguments may be omitted to use the same as this matrix's arguments, 
+		///		with the exception of out_contained_type, which will be this matrix's value_type.
+		/// </para>
+		/// </summary>
+		/// <returns>Copy of this matrix with a bitwise NOT performed on it.</returns>
+		template<std::size_t OutNumColumns, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major>
+		constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_> Not() const
+		{
+			return EmuMath::Helpers::MatrixNot<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_, this_type>(*this);
+		}
+		template<std::size_t OutNumColumns, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major>
+		constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_> Not() const
+		{
+			return EmuMath::Helpers::MatrixNot<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_, this_type>(*this);
+		}
+		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major>
+		constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> Not() const
+		{
+			return EmuMath::Helpers::MatrixNot<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type>(*this);
+		}
+		template<bool OutColumnMajor_ = is_column_major>
+		constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Not() const
+		{
+			return EmuMath::Helpers::MatrixNot<num_columns, num_rows, value_type, OutColumnMajor_, this_type>(*this);
+		}
+
+		/// <summary>
+		/// <para> Shifts all elements of this matrix to the left the specified number of times within num_shifts_. </para>
+		/// <para> If num_shifts_ is an EmuMath matrix: each element of this matrix will be shifted by the respective element in num_shifts_. </para>
+		/// <para> If num_shifts_ is none of the above: every element of this matrix will be shifted by the value of num_shifts_. </para>
+		/// <para>
+		///		Template arguments are in the same order as when defining an EmuMath::Matrix. Arguments may be omitted to use the same as this matrix's arguments, 
+		///		with the exception of out_contained_type, which will be this matrix's value_type.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Shifts_">Type of argument indicating the number of shifts.</typeparam>
+		/// <param name="num_shifts_">Number of shifts to perform on this matrix as defined above.</param>
+		/// <returns>EmuMath matrix copy of this matrix with each element shifted to the left a number of times indicated by num_shifts_.</returns>
+		template<std::size_t OutNumColumns, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Shifts_>
+		constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_> ShiftLeft(const Shifts_& num_shifts_) const
+		{
+			return EmuMath::Helpers::MatrixShiftLeft<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
+		}
+		template<std::size_t OutNumColumns, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Shifts_>
+		constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_> ShiftLeft(const Shifts_& num_shifts_) const
+		{
+			return EmuMath::Helpers::MatrixShiftLeft<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
+		}
+		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Shifts_>
+		constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> ShiftLeft(const Shifts_& num_shifts_) const
+		{
+			return EmuMath::Helpers::MatrixShiftLeft<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
+		}
+		template<bool OutColumnMajor_ = is_column_major, class Shifts_>
+		constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> ShiftLeft(const Shifts_& num_shifts_) const
+		{
+			return EmuMath::Helpers::MatrixShiftLeft<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
+		}
+
+		/// <summary>
+		/// <para> Shifts all elements of this matrix to the right the specified number of times within num_shifts_. </para>
+		/// <para> If num_shifts_ is an EmuMath matrix: each element of this matrix will be shifted by the respective element in num_shifts_. </para>
+		/// <para> If num_shifts_ is none of the above: every element of this matrix will be shifted by the value of num_shifts_. </para>
+		/// <para>
+		///		Template arguments are in the same order as when defining an EmuMath::Matrix. Arguments may be omitted to use the same as this matrix's arguments, 
+		///		with the exception of out_contained_type, which will be this matrix's value_type.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Shifts_">Type of argument indicating the number of shifts.</typeparam>
+		/// <param name="num_shifts_">Number of shifts to perform on this matrix as defined above.</param>
+		/// <returns>EmuMath matrix copy of this matrix with each element shifted to the right a number of times indicated by num_shifts_.</returns>
+		template<std::size_t OutNumColumns, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Shifts_>
+		constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_> ShiftRight(const Shifts_& num_shifts_) const
+		{
+			return EmuMath::Helpers::MatrixShiftRight<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
+		}
+		template<std::size_t OutNumColumns, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Shifts_>
+		constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_> ShiftRight(const Shifts_& num_shifts_) const
+		{
+			return EmuMath::Helpers::MatrixShiftRight<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
+		}
+		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Shifts_>
+		constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> ShiftRight(const Shifts_& num_shifts_) const
+		{
+			return EmuMath::Helpers::MatrixShiftRight<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
+		}
+		template<bool OutColumnMajor_ = is_column_major, class Shifts_>
+		constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> ShiftRight(const Shifts_& num_shifts_) const
+		{
+			return EmuMath::Helpers::MatrixShiftRight<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
+		}
 #pragma endregion
 
 	private:
