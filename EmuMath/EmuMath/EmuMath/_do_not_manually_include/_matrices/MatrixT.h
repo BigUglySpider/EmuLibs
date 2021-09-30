@@ -1165,6 +1165,34 @@ namespace EmuMath
 		}
 
 		/// <summary>
+		/// <para> Returns the index of the lowest element within this matrix. </para>
+		/// <para> In the returned vector, element 0 represents the column index, and element 1 represents the row index. </para>
+		/// </summary>
+		/// <typeparam name="Matrix_">Matrix to find the highest element of.</typeparam>
+		/// <returns>EmuMath vector containing the column and row index of the lowest element within this matrix.</returns>
+		constexpr EmuMath::Vector<2, std::size_t> MinIndex() const
+		{
+			return EmuMath::Helpers::MatrixMinIndex<this_type>(*this);
+		}
+
+		/// <summary>
+		/// <para> Returns the lowest element within this matrix. </para>
+		/// <para> The output type is customisable, but defaults to a suitable reference to the element within this matrix. </para>
+		/// </summary>
+		/// <typeparam name="Matrix_">Matrix to find the highest element of.</typeparam>
+		/// <returns>The lowest element within this matrix as is suitable for the provided Out_ type.</returns>
+		template<typename Out_ = raw_value_type&>
+		constexpr inline Out_ Min()
+		{
+			return EmuMath::Helpers::MatrixMin<Out_, this_type>(*this);
+		}
+		template<typename Out_ = const raw_value_type&>
+		constexpr inline Out_ Min() const
+		{
+			return EmuMath::Helpers::MatrixMin<Out_, const this_type>(*this);
+		}
+
+		/// <summary>
 		/// <para> Finds the largest respective value for each element of this matrix and rhs_. </para>
 		/// <para> If rhs_ is an EmuMath matrix: Determined max elements will be for respective elements in this matrix and rhs_. </para>
 		/// <para> If rhs_ is none of the above: Determined max elements will be for respective elements in this matrix and the value of rhs_. </para>
@@ -1195,6 +1223,34 @@ namespace EmuMath
 		constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Max(const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::MatrixMax<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns the index of the highest element within this matrix. </para>
+		/// <para> In the returned vector, element 0 represents the column index, and element 1 represents the row index. </para>
+		/// </summary>
+		/// <typeparam name="Matrix_">Matrix to find the highest element of.</typeparam>
+		/// <returns>EmuMath vector containing the column and row index of the highest element within this matrix.</returns>
+		constexpr EmuMath::Vector<2, std::size_t> MaxIndex() const
+		{
+			return EmuMath::Helpers::MatrixMaxIndex<this_type>(*this);
+		}
+
+		/// <summary>
+		/// <para> Returns the highest element within this matrix. </para>
+		/// <para> The output type is customisable, but defaults to a suitable reference to the element within this matrix. </para>
+		/// </summary>
+		/// <typeparam name="Matrix_">Matrix to find the highest element of.</typeparam>
+		/// <returns>The highest element within this matrix as is suitable for the provided Out_ type.</returns>
+		template<typename Out_ = raw_value_type&>
+		constexpr inline Out_ Max()
+		{
+			return EmuMath::Helpers::MatrixMax<Out_, this_type>(*this);
+		}
+		template<typename Out_ = const raw_value_type&>
+		constexpr inline Out_ Max() const
+		{
+			return EmuMath::Helpers::MatrixMax<Out_, const this_type>(*this);
 		}
 
 		/// <summary>

@@ -183,6 +183,54 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		_matrix_mutate<Func_, OutMatrix_, InMatrix_>(in_, out_);
 		return out_;
 	}
+
+	/// <summary>
+	///	Finds the final element to compare true within the passed matrix with the passed cmp_. 
+	///	When a cmp_ is true, future comparisons are performed with that index's value. 
+	///	Primarily for operations such as finding the lowest value within a matrix.
+	/// </summary>
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Matrix_, class Cmp_>
+	[[nodiscard]] constexpr inline void _matrix_final_index_to_cmp_true
+	(
+		EmuMath::Vector<2, std::size_t>& out_,
+		const Matrix_& matrix_,
+		typename Matrix_::value_type& prev_val_,
+		Cmp_& cmp_
+	)
+	{
+		if constexpr (ColumnIndex_ < Matrix_::num_columns)
+		{
+			if constexpr (RowIndex_ < Matrix_::num_rows)
+			{
+				const auto& current_val_ = _get_matrix_data<ColumnIndex_, RowIndex_>(matrix_);
+				if (cmp_(current_val_, prev_val_))
+				{
+					prev_val_ = current_val_;
+					out_.at<0>() = ColumnIndex_;
+					out_.at<1>() = RowIndex_;
+				}
+				_matrix_final_index_to_cmp_true<ColumnIndex_, RowIndex_ + 1, Matrix_, Cmp_>(out_, matrix_, prev_val_, cmp_);
+			}
+			else
+			{
+				_matrix_final_index_to_cmp_true<ColumnIndex_ + 1, 0, Matrix_, Cmp_>(out_, matrix_, prev_val_, cmp_);
+			}
+		}
+	}
+	template<class Matrix_, class Cmp_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<2, std::size_t> _matrix_final_index_to_cmp_true(const Matrix_ matrix_, typename Matrix_::value_type starting_val_)
+	{
+		Cmp_ cmp_ = Cmp_();
+		EmuMath::Vector<2, std::size_t> out_(std::size_t(0), std::size_t(0));
+		_matrix_final_index_to_cmp_true<0, 0, Matrix_, Cmp_>(out_, matrix_, starting_val_, cmp_);
+		return out_;
+	}
+	template<typename Out_, class Cmp_, class Matrix_>
+	[[nodiscard]] constexpr inline Out_ _matrix_final_element_to_cmp_true(Matrix_& matrix_, typename Matrix_::value_type starting_val_)
+	{
+		EmuMath::Vector<2, std::size_t> index_ = _matrix_final_index_to_cmp_true<Matrix_, Cmp_>(matrix_, starting_val_);
+		return static_cast<Out_>(_get_matrix_data(matrix_, index_.at<0>(), index_.at<1>()));
+	}
 }
 
 #endif

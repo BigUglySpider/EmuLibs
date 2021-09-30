@@ -2,5 +2,6 @@
 #define EMU_MATH__UNDERLYING_COMMON_MATRIX_HELPER_INCLUDES_H_INC_ 1
 
 #include "../MatrixTMP.h"
+#include "../../../Vector.h"
 
 #endif

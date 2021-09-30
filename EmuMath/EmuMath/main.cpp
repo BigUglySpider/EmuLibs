@@ -628,6 +628,27 @@ int main()
 	constexpr auto _3x3_transpose_mul_scalar_ = _3x3_transpose_.Multiply(0.5L);
 	constexpr auto _3x3_transpose_mul_mat_ = _3x3_transpose_.Multiply(EmuMath::Matrix<2, 3, long double, true>(1, 2, 3, 4, 5, 6));
 
+	constexpr auto _3x3_transpose_min_index_ = EmuMath::Helpers::MatrixMinIndex(_3x3_transpose_);
+	constexpr auto _3x3_transpose_max_index_ = EmuMath::Helpers::MatrixMaxIndex(_3x3_transpose_);
+	auto& _3x3_transpose_min_element_ = EmuMath::Helpers::MatrixMin(_3x3_transpose_);
+	auto& _3x3_transpose_max_element_ = EmuMath::Helpers::MatrixMax(_3x3_transpose_);
+	std::cout << "\n\n";
+	std::cout << _3x3_transpose_ << "\n";
+	std::cout << "Min: " << _3x3_transpose_min_element_ << " (" << _3x3_transpose_min_index_ << ")\n";
+	std::cout << "Max: " << _3x3_transpose_max_element_ << " (" << _3x3_transpose_max_index_ << ")\n";
+
+	EmuMath::Matrix<10, 10, long double, true> test_big_boi_;
+	test_big_boi_ = test_big_boi_.Mutate(VectorFiller());
+	std::cout << "\n\n";
+	std::cout << test_big_boi_ << "\n";
+	std::cout << "Min: " << test_big_boi_.Min() << " (" << test_big_boi_.MinIndex() << ")\n";
+	std::cout << "Max: " << test_big_boi_.Max() << " (" << test_big_boi_.MaxIndex() << ")\n";
+	test_big_boi_.Min() *= 0.5L;
+	test_big_boi_.Max() *= 2.0L;
+	std::cout << "Min halved, Max doubled\n";
+	std::cout << "Min: " << test_big_boi_.Min() << " (" << test_big_boi_.MinIndex() << ")\n";
+	std::cout << "Max: " << test_big_boi_.Max() << " (" << test_big_boi_.MaxIndex() << ")\n";
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();

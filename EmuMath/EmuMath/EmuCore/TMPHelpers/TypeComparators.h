@@ -334,6 +334,26 @@ namespace EmuCore::TMPHelpers
 	{
 		using type = void;
 	};
+
+	/// <summary> Provides the constant type T_ if the provided Condition_ is true, otherwise provides T_ as it is passed. </summary>
+	/// <typeparam name="T_"></typeparam>
+	template<bool Condition_, typename T_>
+	struct conditional_const
+	{
+		using type = std::conditional_t
+		<
+			Condition_,
+			std::conditional_t
+			<
+				std::is_reference_v<T_>,
+				std::add_const_t<std::remove_reference_t<T_>>&,
+				std::add_const_t<T_>
+			>,
+			T_
+		>;
+	};
+	template<bool Condition_, typename T_>
+	using conditional_const_t = typename conditional_const<Condition_, T_>::type;
 }
 
 #endif
