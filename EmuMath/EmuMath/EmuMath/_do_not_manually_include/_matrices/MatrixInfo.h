@@ -46,7 +46,8 @@ namespace EmuMath::_underlying_components
 		/// <summary> Boolean indicating if this matrix's values are constant. </summary>
 		static constexpr bool has_const_values = std::is_const_v<raw_value_type>;
 
-		using data_storage_type = EmuMath::Vector<num_major_elements, EmuMath::Vector<num_non_major_elements, contained_type>>;
+		using major_storage_type = EmuMath::Vector<num_non_major_elements, contained_type>;
+		using data_storage_type = EmuMath::Vector<num_major_elements, major_storage_type>;
 		using random_access_vector_contained_type = std::conditional_t<contains_reference_wrappers, contained_type, EmuMath::InternalVectorReference<contained_type>>;
 		using const_random_access_vector_contained_type = std::conditional_t
 		<

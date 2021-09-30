@@ -1,33 +1,20 @@
-#ifndef EMU_MATH_MATRIX_T_H_INC_
-#define EMU_MATH_MATRIX_T_H_INC_
+#ifndef EMU_MATH_MATRIX_4X4_H_INC_
+#define EMU_MATH_MATRIX_4X4_H_INC_
 
-#include "MatrixHelpers.h"
-#include "MatrixInfo.h"
+#include "MatrixT.h"
 
 namespace EmuMath
 {
-	/// <summary>
-	/// <para> Template matrix type used for arbitrarily sized matrices containing any arithmetic type, stored in order of columns or rows. </para>
-	/// <para>
-	///		NOTE: The ColumnMajor_ bool affects only the memory layout of a matrix. 
-	///		Positions of elements, such as when generating transformation matrices, will always be at the same column and row indices regardless of major order. 
-	/// </para>
-	/// <para>
-	///		All default arguments where a matrix is provided will use that matrix's major order. 
-	///		Otherwise, if no matrix is available to copy, the default argument will always be for column major (true).
-	/// </para>
-	/// </summary>
-	/// <typeparam name="T_"></typeparam>
-	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_ = true>
-	struct Matrix
+	template<typename T_, bool ColumnMajor_>
+	struct Matrix<4, 4, T_, ColumnMajor_>
 	{
-	private:
+		private:
 		// Formed using decltype on a constructor call in order to trigger an assertion before doing anything further
-		using _matrix_assert = decltype(EmuMath::_underlying_components::MatrixAssert<NumColumns_, NumRows_, T_, ColumnMajor_>());
+		using _matrix_assert = decltype(EmuMath::_underlying_components::MatrixAssert<4, 4, T_, ColumnMajor_>());
 
 	public:
 		/// <summary> Underlying default MatrixInfo regarding this matrix's static information, including common type aliases. </summary>
-		using matrix_info = EmuMath::_underlying_components::MatrixInfo<NumColumns_, NumRows_, T_, ColumnMajor_>;
+		using matrix_info = EmuMath::_underlying_components::MatrixInfo<4, 4, T_, ColumnMajor_>;
 
 		/// <summary> The number of columns contained in this matrix. </summary>
 		static constexpr std::size_t num_columns = matrix_info::num_columns;
@@ -81,6 +68,8 @@ namespace EmuMath
 		/// <summary> Type used to randomly access a column referencing this matrix with constant constraints. </summary>
 		using const_random_access_column = typename matrix_info::const_random_access_column;
 
+		using major_storage_type = typename matrix_info::major_storage_type;
+
 		/// <summary> This matrix type. </summary>
 		using this_type = EmuMath::Matrix<num_columns, num_rows, contained_type, is_column_major>;
 		/// <summary> Type used to receive a copy of this matrix. This is the same as this_type normally, but will remove qualifiers and references where applicable. </summary>
@@ -118,38 +107,98 @@ namespace EmuMath
 		/// <summary>
 		/// <para> Template constructor to create this matrix type via scalar arguments. </para>
 		/// <para> Arguments are taken in contiguous order within this matrix. </para>
-		/// <para>
-		///		Passed arguments must be valid types for constructing this matrix's contained_type, 
-		///		and the number of arguments must be equal to the total number of elements within this matrix.
-		/// </para>
+		/// <para> Passed arguments must be valid types for constructing this matrix's contained_type. </para>
 		/// </summary>
-		/// <typeparam name="ScalarArgs_">Types of scalars to form this matrix with. Must be valid individual types to construct this matrix's contained_type.</typeparam>
-		/// <param name="contiguous_scalar_args_">Scalars to form this matrix with. Must be valid individual types to construct this matrix's contained_type.</param>
+		/// <typeparam name="Contig0_0">Type to construct this matrix's 0th major's 0th element via.</typeparam>
+		/// <typeparam name="Contig0_1">Type to construct this matrix's 0th major's 1st element via.</typeparam>
+		/// <typeparam name="Contig0_2">Type to construct this matrix's 0th major's 2nd element via.</typeparam>
+		/// <typeparam name="Contig0_3">Type to construct this matrix's 0th major's 3rd element via.</typeparam>
+		/// <typeparam name="Contig1_0">Type to construct this matrix's 1st major's 0th element via.</typeparam>
+		/// <typeparam name="Contig1_1">Type to construct this matrix's 1st major's 1st element via.</typeparam>
+		/// <typeparam name="Contig1_2">Type to construct this matrix's 1st major's 2nd element via.</typeparam>
+		/// <typeparam name="Contig1_3">Type to construct this matrix's 1st major's 3rd element via.</typeparam>
+		/// <typeparam name="Contig2_0">Type to construct this matrix's 2nd major's 0th element via.</typeparam>
+		/// <typeparam name="Contig2_1">Type to construct this matrix's 2nd major's 1st element via.</typeparam>
+		/// <typeparam name="Contig2_2">Type to construct this matrix's 2nd major's 2nd element via.</typeparam>
+		/// <typeparam name="Contig2_3">Type to construct this matrix's 2nd major's 3rd element via.</typeparam>
+		/// <typeparam name="Contig3_0">Type to construct this matrix's 3rd major's 0th element via.</typeparam>
+		/// <typeparam name="Contig3_1">Type to construct this matrix's 3rd major's 1st element via.</typeparam>
+		/// <typeparam name="Contig3_2">Type to construct this matrix's 3rd major's 2nd element via.</typeparam>
+		/// <typeparam name="Contig3_3">Type to construct this matrix's 3rd major's 3rd element via.</typeparam>
+		/// <param name="contiguous_0_0_">Value to construct this matrix's 0th major's 0th element via. Must be valid to construct this matrix's contained_type.</param>
+		/// <param name="contiguous_0_1_">Value to construct this matrix's 0th major's 1st element via. Must be valid to construct this matrix's contained_type.</param>
+		/// <param name="contiguous_0_2_">Value to construct this matrix's 0th major's 2nd element via. Must be valid to construct this matrix's contained_type.</param>
+		/// <param name="contiguous_0_3_">Value to construct this matrix's 0th major's 3rd element via. Must be valid to construct this matrix's contained_type.</param>
+		/// <param name="contiguous_1_0_">Value to construct this matrix's 1st major's 0th element via. Must be valid to construct this matrix's contained_type.</param>
+		/// <param name="contiguous_1_1_">Value to construct this matrix's 1st major's 1st element via. Must be valid to construct this matrix's contained_type.</param>
+		/// <param name="contiguous_1_2_">Value to construct this matrix's 1st major's 2nd element via. Must be valid to construct this matrix's contained_type.</param>
+		/// <param name="contiguous_1_3_">Value to construct this matrix's 1st major's 3rd element via. Must be valid to construct this matrix's contained_type.</param>
+		/// <param name="contiguous_2_0_">Value to construct this matrix's 2nd major's 0th element via. Must be valid to construct this matrix's contained_type.</param>
+		/// <param name="contiguous_2_1_">Value to construct this matrix's 2nd major's 1st element via. Must be valid to construct this matrix's contained_type.</param>
+		/// <param name="contiguous_2_2_">Value to construct this matrix's 2nd major's 2nd element via. Must be valid to construct this matrix's contained_type.</param>
+		/// <param name="contiguous_2_3_">Value to construct this matrix's 2nd major's 3rd element via. Must be valid to construct this matrix's contained_type.</param>
+		/// <param name="contiguous_3_0_">Value to construct this matrix's 3rd major's 0th element via. Must be valid to construct this matrix's contained_type.</param>
+		/// <param name="contiguous_3_1_">Value to construct this matrix's 3rd major's 1st element via. Must be valid to construct this matrix's contained_type.</param>
+		/// <param name="contiguous_3_2_">Value to construct this matrix's 3rd major's 2nd element via. Must be valid to construct this matrix's contained_type.</param>
+		/// <param name="contiguous_3_3_">Value to construct this matrix's 3rd major's 3rd element via. Must be valid to construct this matrix's contained_type.</param>
 		template
 		<
-			typename...ScalarArgs_,
-			typename RequiresNumberOfValidArgsEqualToSize = std::enable_if_t
-			<
-				EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, ScalarArgs_...>::value &&
-				sizeof...(ScalarArgs_) == size
-			>
+			typename Contig0_0, typename Contig0_1, typename Contig0_2, typename Contig0_3,
+			typename Contig1_0, typename Contig1_1, typename Contig1_2, typename Contig1_3,
+			typename Contig2_0, typename Contig2_1, typename Contig2_2, typename Contig2_3,
+			typename Contig3_0, typename Contig3_1, typename Contig3_2, typename Contig3_3
 		>
-		constexpr Matrix(ScalarArgs_&&...contiguous_scalar_args_) : Matrix()
+		constexpr Matrix
+		(
+			Contig0_0&& contiguous_0_0_, Contig0_1&& contiguous_0_1_, Contig0_2&& contiguous_0_2_, Contig0_3&& contiguous_0_3_,
+			Contig1_0&& contiguous_1_0_, Contig1_1&& contiguous_1_1_, Contig1_2&& contiguous_1_2_, Contig1_3&& contiguous_1_3_,
+			Contig2_0&& contiguous_2_0_, Contig2_1&& contiguous_2_1_, Contig2_2&& contiguous_2_2_, Contig2_3&& contiguous_2_3_,
+			Contig3_0&& contiguous_3_0_, Contig3_1&& contiguous_3_1_, Contig3_2&& contiguous_3_2_, Contig3_3&& contiguous_3_3_
+		) : data_
+			(
+				major_storage_type
+				(
+					std::forward<Contig0_0>(contiguous_0_0_),
+					std::forward<Contig0_1>(contiguous_0_1_),
+					std::forward<Contig0_2>(contiguous_0_2_),
+					std::forward<Contig0_3>(contiguous_0_3_)
+				),
+				major_storage_type
+				(
+					std::forward<Contig1_0>(contiguous_1_0_),
+					std::forward<Contig1_1>(contiguous_1_1_),
+					std::forward<Contig1_2>(contiguous_1_2_),
+					std::forward<Contig1_3>(contiguous_1_3_)
+				),
+				major_storage_type
+				(
+					std::forward<Contig2_0>(contiguous_2_0_),
+					std::forward<Contig2_1>(contiguous_2_1_),
+					std::forward<Contig2_2>(contiguous_2_2_),
+					std::forward<Contig2_3>(contiguous_2_3_)
+				),
+				major_storage_type
+				(
+					std::forward<Contig3_0>(contiguous_3_0_),
+					std::forward<Contig3_1>(contiguous_3_1_),
+					std::forward<Contig3_2>(contiguous_3_2_),
+					std::forward<Contig3_3>(contiguous_3_3_)
+				)
+			)
 		{
-			if constexpr (sizeof...(ScalarArgs_) == size)
+			if constexpr (is_column_major)
 			{
-				if constexpr (EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, ScalarArgs_...>::value)
-				{
-					EmuMath::Helpers::_underlying_matrix_funcs::_matrix_maker<this_type>()(*this, std::make_index_sequence<size>(), contiguous_scalar_args_...);
-				}
-				else
-				{
-					static_assert(false, "Attempted to construct an EmuMath matrix using scalar arguments, but at least one of the provided arguments could not be used to construct an element within the matrix.");
-				}
+				static_assert(std::is_constructible_v<major_storage_type, Contig0_0, Contig0_1, Contig0_2, Contig0_3>, "Attempted to construct an EmuMath 4x4 matrix with arguments that cannot be used to form its first column.");
+				static_assert(std::is_constructible_v<major_storage_type, Contig1_0, Contig1_1, Contig1_2, Contig1_3>, "Attempted to construct an EmuMath 4x4 matrix with arguments that cannot be used to form its second column.");
+				static_assert(std::is_constructible_v<major_storage_type, Contig2_0, Contig2_1, Contig2_2, Contig2_3>, "Attempted to construct an EmuMath 4x4 matrix with arguments that cannot be used to form its third column.");
+				static_assert(std::is_constructible_v<major_storage_type, Contig3_0, Contig3_1, Contig3_2, Contig3_3>, "Attempted to construct an EmuMath 4x4 matrix with arguments that cannot be used to form its fourth column.");
 			}
 			else
 			{
-				static_assert(false, "Attempted to construct an EmuMath matrix using scalar arguments, but the provided number of arguments did not match the number of elements within the matrix.");
+				static_assert(std::is_constructible_v<major_storage_type, Contig0_0, Contig0_1, Contig0_2, Contig0_3>, "Attempted to construct an EmuMath 4x4 matrix with arguments that cannot be used to form its first row.");
+				static_assert(std::is_constructible_v<major_storage_type, Contig1_0, Contig1_1, Contig1_2, Contig1_3>, "Attempted to construct an EmuMath 4x4 matrix with arguments that cannot be used to form its second row.");
+				static_assert(std::is_constructible_v<major_storage_type, Contig2_0, Contig2_1, Contig2_2, Contig2_3>, "Attempted to construct an EmuMath 4x4 matrix with arguments that cannot be used to form its third row.");
+				static_assert(std::is_constructible_v<major_storage_type, Contig3_0, Contig3_1, Contig3_2, Contig3_3>, "Attempted to construct an EmuMath 4x4 matrix with arguments that cannot be used to form its fourth row.");
 			}
 		}
 #pragma endregion
@@ -297,20 +346,20 @@ namespace EmuMath
 		constexpr inline bool operator==(const EmuMath::Matrix<LhsNumColumns_, RhsNumColumns_, rhs_contained_type, RhsColumnMajor_>& rhs_) const
 		{
 			return EmuMath::Helpers::MatrixCmpEqual<TestAllIndices_, this_type, EmuMath::Matrix<LhsNumColumns_, RhsNumColumns_, rhs_contained_type, RhsColumnMajor_>>
-			(
-				*this,
-				rhs_
-			);
+				(
+					*this,
+					rhs_
+					);
 		}
 
 		template<bool TestAllIndices_ = false, std::size_t LhsNumColumns_, std::size_t RhsNumColumns_, typename rhs_contained_type, bool RhsColumnMajor_>
 		constexpr inline bool operator!=(const EmuMath::Matrix<LhsNumColumns_, RhsNumColumns_, rhs_contained_type, RhsColumnMajor_>& rhs_) const
 		{
 			return EmuMath::Helpers::MatrixCmpNotEqual<TestAllIndices_, this_type, EmuMath::Matrix<LhsNumColumns_, RhsNumColumns_, rhs_contained_type, RhsColumnMajor_>>
-			(
-				*this,
-				rhs_
-			);
+				(
+					*this,
+					rhs_
+					);
 		}
 
 		template<typename Rhs_>
@@ -407,11 +456,11 @@ namespace EmuMath
 		}
 
 		template
-		<
+			<
 			typename Rhs_,
 			typename RequiresRhsWhichResultsInMatchingMatrixDimensions = std::enable_if_t<EmuMath::TMP::is_matching_size_matrix_multiply_result_v<this_type, Rhs_>>
-		>
-		constexpr inline this_type& operator*=(const Rhs_& rhs_)
+			>
+			constexpr inline this_type& operator*=(const Rhs_& rhs_)
 		{
 			return this->operator=(this->operator*(rhs_));
 		}
@@ -542,13 +591,13 @@ namespace EmuMath
 		/// <returns>Copy of the submatrix within the this matrix, formed of all elements excluding those in the provided column or row indices.</returns>
 		template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_, typename out_contained_type = value_type, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<out_contained_type, OutColumnMajor_, this_type>::type
-		ExclusiveSubmatrix()
+			ExclusiveSubmatrix()
 		{
 			return EmuMath::Helpers::MatrixExclusiveSubmatrix<ExcludeColumn_, ExcludeRow_, out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_, typename out_contained_type = value_type, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<out_contained_type, OutColumnMajor_, this_type>::type
-		ExclusiveSubmatrix() const
+			ExclusiveSubmatrix() const
 		{
 			return EmuMath::Helpers::MatrixExclusiveSubmatrix<ExcludeColumn_, ExcludeRow_, out_contained_type, OutColumnMajor_, const this_type>(*this);
 		}
@@ -1980,28 +2029,10 @@ namespace EmuMath
 		}
 #pragma endregion
 	};
-}
 
-template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_, std::size_t Index_ = 0>
-inline std::ostream& operator<<(std::ostream& str_, const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
-{
-	if constexpr (Index_ < EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::num_rows)
-	{
-		str_ << matrix_.GetRowConst<Index_>();
-		if constexpr ((Index_ + 1) < EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::num_rows)
-		{
-			str_ << "\n";
-			return operator<<<NumColumns_, NumRows_, T_, ColumnMajor_, Index_ + 1>(str_, matrix_);
-		}
-		else
-		{
-			return str_;
-		}
-	}
-	else
-	{
-		return str_;
-	}
+	/// <summary> Alias for the specialised EmuMath::Matrix which contains 4 columns and 4 rows. </summary>
+	template<typename T_, bool ColumnMajor_ = true>
+	using Matrix4x4 = EmuMath::Matrix<4, 4, T_, ColumnMajor_>;
 }
 
 #endif

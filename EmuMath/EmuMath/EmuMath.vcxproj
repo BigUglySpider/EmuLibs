@@ -171,6 +171,7 @@
     <ClInclude Include="EmuMath\NoOverflowT.h" />
     <ClInclude Include="EmuMath\SIMDHelpers.h" />
     <ClInclude Include="EmuMath\Vector.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\Matrix4x4.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\MatrixHelpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\MatrixInfo.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\MatrixT.h" />

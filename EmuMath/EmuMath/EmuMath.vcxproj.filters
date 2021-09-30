@@ -197,5 +197,8 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\MatrixInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\Matrix4x4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
