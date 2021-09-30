@@ -650,7 +650,6 @@ int main()
 	std::cout << "Max: " << test_big_boi_.Max() << " (" << test_big_boi_.MaxIndex() << ")\n";
 
 
-
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();
