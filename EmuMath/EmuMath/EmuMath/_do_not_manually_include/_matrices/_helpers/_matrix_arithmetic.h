@@ -617,6 +617,108 @@ namespace EmuMath::Helpers
 	}
 
 	/// <summary>
+	/// <para> Performs a basic modulo division operation on lhs_ using the passed rhs_. </para>
+	/// <para>
+	///		If the passed rhs_ is a matrix, respective indices in each matrix will be divided. 
+	///		Otherwise, each index in the lhs_ matrix will be divided by rhs_.
+	/// </para>
+	/// <para> NOTE: This is NOT a standard matrix mod operation. Such behaviour is mathematically undefined. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained within the result matrix.</typeparam>
+	/// <typeparam name="LhsMatrix_">Type of matrix appearing on the left-hand side of division.</typeparam>
+	/// <typeparam name="Rhs_">Type of matrix or scalar appearing on the right-hand side of division.</typeparam>
+	/// <param name="lhs_">EmuMath matrix appearing on the left-hand side of division.</param>
+	/// <param name="rhs_">EmuMath matrix or scalar appearing on the right-hand side of division.</param>
+	/// <returns>Matrix containing the results of performing a basic modulo division on the lhs_ matrix by the provided rhs_.</returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixModBasic
+	(
+		const LhsMatrix_& lhs_,
+		const Rhs_& rhs_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
+		{
+			return _underlying_matrix_funcs::_matrix_multi_arg_operation
+			<
+				EmuCore::do_mod,
+				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+				LhsMatrix_,
+				Rhs_
+			>(lhs_, rhs_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform basic matrix modulo division, but provided a non-EmuMath-matrix lhs_ argument.");
+		}
+	}
+	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixModBasic
+	(
+		const LhsMatrix_& lhs_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixModBasic<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_> MatrixModBasic
+	(
+		const LhsMatrix_& lhs_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixModBasic<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
+	}
+	template<bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_> MatrixModBasic
+	(
+		const LhsMatrix_& lhs_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixModBasic<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
+	}
+
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major> MatrixModBasic
+	(
+		const LhsMatrix_& lhs_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixModBasic<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
+	}
+	template<typename out_contained_type, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major> MatrixModBasic
+	(
+		const LhsMatrix_& lhs_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixModBasic<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
+	}
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major> MatrixModBasic
+	(
+		const LhsMatrix_& lhs_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixModBasic<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
+	}
+	template<class LhsMatrix_, class Rhs_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major>
+	MatrixModBasic
+	(
+		const LhsMatrix_& lhs_,
+		const Rhs_& rhs_
+	)
+	{
+		return MatrixModBasic<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
+	}
+
+	/// <summary>
 	/// <para>
 	///		Returns a resulting EmuMath vector from a multiplication between the passed lhs_matrix_ and rhs_vector_, 
 	///		where rhs_vector_ is interpreted as a single-column matrix.
@@ -704,10 +806,10 @@ namespace EmuMath::Helpers
 	/// </summary>
 	/// <typeparam name="out_contained_type">Type to be contained within the result matrix.</typeparam>
 	/// <typeparam name="LhsMatrix_">Type of matrix appearing on the left-hand side of multiplication.</typeparam>
-	/// <typeparam name="Rhs_">Type of matrix or scalar appearing on the right-hand side of multiplication.</typeparam>
+	/// <typeparam name="Rhs_">Type of matrix, vector, or scalar appearing on the right-hand side of multiplication.</typeparam>
 	/// <param name="lhs_">EmuMath matrix appearing on the left-hand side of multiplication.</param>
-	/// <param name="rhs_">EmuMath matrix or scalar appearing on the right-hand side of multiplication.</param>
-	/// <returns>Matrix containing the results of performing multiplication on the lhs_ matrix by the provided rhs_.</returns>
+	/// <param name="rhs_">EmuMath matrix, EmuMath vector, or scalar appearing on the right-hand side of multiplication.</param>
+		/// <returns>Result of performing standard matrix multiplication on the lhs_ matrix by the provided rhs_.</returns>
 	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
 	[[nodiscard]] constexpr inline auto MatrixMultiply
 	(
@@ -717,6 +819,7 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
+			// emu_matrix_multiplication_result::type should be void whenever multiplication arguments are invalid
 			if constexpr(!std::is_same_v<typename EmuMath::TMP::emu_matrix_multiplication_result<out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>::type, void>)
 			{
 				if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
@@ -793,12 +896,19 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<InMatrix_>)
 		{
-			return _underlying_matrix_funcs::_make_mutated_matrix
-			<
-				Func_&,
-				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
-				InMatrix_
-			>(in_matrix_, func_);
+			if constexpr(std::is_invocable_r_v<out_contained_type, Func_, const typename InMatrix_::raw_value_type&>)
+			{
+				return _underlying_matrix_funcs::_make_mutated_matrix
+				<
+					Func_&,
+					EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
+					InMatrix_
+				>(in_matrix_, func_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to mutate a matrix with an invalid mutation Func_. The provided Func_ must return a type castable to the provided out_contained_type (defaults to the passed matrix's value_type if not provided). Additionally, the Func_ must be callable via operator() with a single argument - a constant reference to the matrix's raw_value_type. This does not have to be the same type, as long as an implicit cast is possible. Warnings for unusual inputs (e.g. passing floats as int value arguments) will not be suppressed.");
+			}
 		}
 		else
 		{
@@ -1775,108 +1885,6 @@ namespace EmuMath::Helpers
 	)
 	{
 		return MatrixLerp<MatrixA_::num_columns, MatrixA_::num_rows, typename MatrixA_::value_type, MatrixA_::is_column_major, MatrixA_, B_, T_>(matrix_a_, b_, t_);
-	}
-
-	/// <summary>
-	/// <para> Performs a basic modulo division operation on lhs_ using the passed rhs_. </para>
-	/// <para>
-	///		If the passed rhs_ is a matrix, respective indices in each matrix will be divided. 
-	///		Otherwise, each index in the lhs_ matrix will be divided by rhs_.
-	/// </para>
-	/// <para> NOTE: This is NOT a standard matrix mod operation. Such behaviour is mathematically undefined. </para>
-	/// </summary>
-	/// <typeparam name="out_contained_type">Type to be contained within the result matrix.</typeparam>
-	/// <typeparam name="LhsMatrix_">Type of matrix appearing on the left-hand side of division.</typeparam>
-	/// <typeparam name="Rhs_">Type of matrix or scalar appearing on the right-hand side of division.</typeparam>
-	/// <param name="lhs_">EmuMath matrix appearing on the left-hand side of division.</param>
-	/// <param name="rhs_">EmuMath matrix or scalar appearing on the right-hand side of division.</param>
-	/// <returns>Matrix containing the results of performing a basic modulo division on the lhs_ matrix by the provided rhs_.</returns>
-	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixModBasic
-	(
-		const LhsMatrix_& lhs_,
-		const Rhs_& rhs_
-	)
-	{
-		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
-		{
-			return _underlying_matrix_funcs::_matrix_multi_arg_operation
-			<
-				EmuCore::do_mod,
-				EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_>,
-				LhsMatrix_,
-				Rhs_
-			>(lhs_, rhs_);
-		}
-		else
-		{
-			static_assert(false, "Attempted to perform basic matrix modulo division, but provided a non-EmuMath-matrix lhs_ argument.");
-		}
-	}
-	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixModBasic
-	(
-		const LhsMatrix_& lhs_,
-		const Rhs_& rhs_
-	)
-	{
-		return MatrixModBasic<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
-	}
-	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_> MatrixModBasic
-	(
-		const LhsMatrix_& lhs_,
-		const Rhs_& rhs_
-	)
-	{
-		return MatrixModBasic<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
-	}
-	template<bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_> MatrixModBasic
-	(
-		const LhsMatrix_& lhs_,
-		const Rhs_& rhs_
-	)
-	{
-		return MatrixModBasic<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
-	}
-
-	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major> MatrixModBasic
-	(
-		const LhsMatrix_& lhs_,
-		const Rhs_& rhs_
-	)
-	{
-		return MatrixModBasic<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
-	}
-	template<typename out_contained_type, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major> MatrixModBasic
-	(
-		const LhsMatrix_& lhs_,
-		const Rhs_& rhs_
-	)
-	{
-		return MatrixModBasic<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
-	}
-	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major> MatrixModBasic
-	(
-		const LhsMatrix_& lhs_,
-		const Rhs_& rhs_
-	)
-	{
-		return MatrixModBasic<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
-	}
-	template<class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major>
-	MatrixModBasic
-	(
-		const LhsMatrix_& lhs_,
-		const Rhs_& rhs_
-	)
-	{
-		return MatrixModBasic<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 }
 

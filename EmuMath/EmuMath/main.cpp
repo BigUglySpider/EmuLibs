@@ -612,6 +612,21 @@ int main()
 	constexpr auto _3x3_trans_cast_ = _3x3_transpose_.AsMatrix<EmuMath::Matrix<5, 27, float, true>>();
 
 
+	struct mutation_boi
+	{
+		constexpr mutation_boi() {}
+
+		constexpr inline std::size_t operator()(long double val_, int bobbo = 10) const
+		{
+			return (val_ < 0 ? operator()(-val_) : val_ >= std::numeric_limits<std::size_t>::max() ? std::numeric_limits<std::size_t>::max() : static_cast<std::size_t>(val_ * bobbo));
+		}
+	};
+
+	constexpr auto mutated_3x3_transpose_ = _3x3_transpose_.Mutate<std::size_t>(mutation_boi());
+
+	constexpr auto _3x3_transpose_mul_vec_ = _3x3_transpose_.Multiply(EmuMath::Vector2<float>(1.0f, 2.0f));
+	constexpr auto _3x3_transpose_mul_scalar_ = _3x3_transpose_.Multiply(0.5L);
+	constexpr auto _3x3_transpose_mul_mat_ = _3x3_transpose_.Multiply(EmuMath::Matrix<2, 3, long double, true>(1, 2, 3, 4, 5, 6));
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
