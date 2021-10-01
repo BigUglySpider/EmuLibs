@@ -1941,4 +1941,26 @@ inline std::ostream& operator<<(std::ostream& str_, const EmuMath::Matrix<NumCol
 	}
 }
 
+template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_, std::size_t Index_ = 0>
+inline std::wostream& operator<<(std::wostream& str_, const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+{
+	if constexpr (Index_ < EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::num_rows)
+	{
+		str_ << matrix_.GetRowConst<Index_>();
+		if constexpr ((Index_ + 1) < EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::num_rows)
+		{
+			str_ << L"\n";
+			return operator<<<NumColumns_, NumRows_, T_, ColumnMajor_, Index_ + 1>(str_, matrix_);
+		}
+		else
+		{
+			return str_;
+		}
+	}
+	else
+	{
+		return str_;
+	}
+}
+
 #endif

@@ -11,6 +11,7 @@
 // ADDITIONAL INCLUDES
 #include "EmuMath/Vector.h"
 #include "EmuMath/FastVector.h"
+#include "EmuMath/FastMatrix.h"
 #include <bitset>
 #include <DirectXMath.h>
 #include <string_view>
@@ -66,101 +67,116 @@ namespace EmuCore::TestingHelpers
 	constexpr unsigned int shared_seed_ = 6166;
 	constexpr unsigned int shared_seed_b_ = 6;
 
-	struct ProjMatEmu
+	struct MatEmu
 	{
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 5000000;
+		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr bool DO_TEST = true;
-		static constexpr std::string_view NAME = "Projection Creation (EmuMath)";
+		static constexpr std::string_view NAME = "Matrix (EmuMath)";
 
-		ProjMatEmu()
+		MatEmu()
 		{
 		}
 		void Prepare()
 		{
 			srand(shared_seed_);
-			near_.resize(NUM_LOOPS);
-			far_.resize(NUM_LOOPS);
-			fov_.resize(NUM_LOOPS);
-			aspect_ratio_.resize(NUM_LOOPS);
+			lhs_.resize(NUM_LOOPS);
+			rhs_.resize(NUM_LOOPS);
 			out_.resize(NUM_LOOPS);
+			EmuMath::Matrix4x4<float, true> temp_;
+			VectorFiller filler_ = VectorFiller();
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				near_[i] = static_cast<float>((rand() % 10) + 1) * 0.1f;
-				far_[i] = static_cast<float>(rand() % 1000 + 2);
-				fov_[i] = EmuCore::Pi::DegsToRads(45.0f + static_cast<float>(rand() % 46));
-				aspect_ratio_[i] = 1920.0f / 1080.0f;
+				temp_ = temp_.Mutate(filler_);
+				lhs_[i] = EmuMath::FastMatrix4x4f_CM(temp_);
+				temp_ = temp_.Mutate(filler_);
+				rhs_[i] = EmuMath::FastMatrix4x4f_CM(temp_);
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			out_[i] = EmuMath::Helpers::MatrixPerspectiveVK<true, float, true, 10, true>(fov_[i], near_[i], far_[i], aspect_ratio_[i]);
-			//out_[i] = EmuMath::Helpers::MatrixOrthographicVK(1920, 1080, near_[i], far_[i]);
+			out_[i] = lhs_[i].Multiply(rhs_[i]);
 		}
 		void OnTestsOver()
 		{
 			srand(shared_seed_b_);
-			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
-			std::cout << "Perspective(Near: " << near_[i] << ", Far: " << far_[i] << ", FOV: " << fov_[i] << ", Aspect Ratio: " << aspect_ratio_[i] << "):\n";
-			//std::cout << "Orthographic(width: 1920, height: 1080, near: " << near_[i] << ", far: " << far_[i] << "):\n";
-			std::cout << out_[i] << "\n";
-
-			EmuMath::Vector3<float> vector_ = EmuMath::Vector3<float>(1.0f, 2.0f, 182154.3f);
-			std::cout << "Vector: " << vector_ << "\nTransformed: " << EmuMath::Helpers::MatrixMultiplyVector(out_[i], vector_) << "\n";
+			std::size_t i = static_cast<std::size_t>(rand()) % NUM_LOOPS;
+			std::cout << lhs_[i] << "\nMULT\n" << rhs_[i] << "\n:\n" << out_[i] << "\n\n";
 		}
 
-		std::vector<float> near_;
-		std::vector<float> far_;
-		std::vector<float> fov_;
-		std::vector<float> aspect_ratio_;
-		std::vector<EmuMath::Matrix<4, 4, float, true>> out_;
+		std::vector<EmuMath::FastMatrix4x4f_CM> lhs_;
+		std::vector<EmuMath::FastMatrix4x4f_CM> rhs_;
+		std::vector<EmuMath::FastMatrix4x4f_CM> out_;
 	};
-	struct ProjMatDXM
+	struct MatDXM
 	{
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 5000000;
+		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr bool DO_TEST = true;
-		static constexpr std::string_view NAME = "Projection Creation (DirectXMath)";
+		static constexpr std::string_view NAME = "Matrix (DirectXMath)";
 
-		ProjMatDXM()
+		MatDXM()
 		{
 		}
 		void Prepare()
 		{
 			srand(shared_seed_);
-			near_.resize(NUM_LOOPS);
-			far_.resize(NUM_LOOPS);
-			fov_.resize(NUM_LOOPS);
-			aspect_ratio_.resize(NUM_LOOPS);
-			out_.resize(NUM_LOOPS, DirectX::XMFLOAT4X4(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
+			lhs_.resize(NUM_LOOPS);
+			rhs_.resize(NUM_LOOPS);
+			out_.resize(NUM_LOOPS);
+
+			EmuMath::Matrix4x4<float, true> temp_;
+			VectorFiller filler_ = VectorFiller();
+			DirectX::XMFLOAT4X4 to_load_;
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				near_[i] = static_cast<float>((rand() % 10) + 1) * 0.1f;
-				far_[i] = static_cast<float>(rand() % 1000 + 2);
-				fov_[i] = EmuCore::Pi::DegsToRads(45.0f + static_cast<float>(rand() % 46));
-				aspect_ratio_[i] = 1920.0f / 1080.0f;
+				temp_ = temp_.Mutate(filler_);
+				to_load_ = MakeXMFromEmu(temp_);
+				lhs_[i] = DirectX::XMLoadFloat4x4(&to_load_);
+				temp_ = temp_.Mutate(filler_);
+				to_load_ = MakeXMFromEmu(temp_);
+				rhs_[i] = DirectX::XMLoadFloat4x4(&to_load_);
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			DirectX::XMMATRIX mat_ = DirectX::XMMatrixPerspectiveFovRH(fov_[i], aspect_ratio_[i], near_[i], far_[i]);
-			//DirectX::XMMATRIX mat_ = DirectX::XMMatrixOrthographicRH(1920.0f, 1080.0f, near_[i], far_[i]);
-			DirectX::XMStoreFloat4x4(&out_[i], mat_);
+			out_[i] = DirectX::XMMatrixMultiply(lhs_[i], rhs_[i]);
+		}
+
+		DirectX::XMFLOAT4X4 MakeXMFromEmu(const EmuMath::Matrix4x4<float, true>& mat_) const
+		{
+			return DirectX::XMFLOAT4X4
+			(
+				mat_.at<0, 0>(), mat_.at<0, 1>(), mat_.at<0, 2>(), mat_.at<0, 3>(),
+				mat_.at<1, 0>(), mat_.at<1, 1>(), mat_.at<1, 2>(), mat_.at<1, 3>(),
+				mat_.at<2, 0>(), mat_.at<2, 1>(), mat_.at<2, 2>(), mat_.at<2, 3>(),
+				mat_.at<3, 0>(), mat_.at<3, 1>(), mat_.at<3, 2>(), mat_.at<3, 3>()
+			);
 		}
 		void OnTestsOver()
 		{
 			srand(shared_seed_b_);
 			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
-			std::cout << "Perspective(Near: " << near_[i] << ", Far: " << far_[i] << ", FOV: " << fov_[i] << ", Aspect Ratio: " << aspect_ratio_[i] << "):\n";
-			//std::cout << "Orthographic(width: 1920, height: 1080, near: " << near_[i] << ", far: " << far_[i] << "):\n";
+			PrintMatrix(lhs_[i]);
+			std::cout << "\nMULT\n";
+			PrintMatrix(rhs_[i]);
+			std::cout << "\n:\n";
+			PrintMatrix(out_[i]);
+			std::cout << "\n\n";
+		}
+
+		void PrintMatrix(const DirectX::XMMATRIX& mat_) const
+		{
+			DirectX::XMFLOAT4X4 readable_mat_;
+			DirectX::XMStoreFloat4x4(&readable_mat_, mat_);
 			for (std::size_t x = 0; x < 4; ++x)
 			{
 				std::cout << "{ ";
 				for (std::size_t y = 0; y < 4; ++y)
 				{
-					std::cout << out_[i](y, x);
+					std::cout << readable_mat_(y, x);
 					if (y != 3)
 					{
 						std::cout << ", ";
@@ -168,26 +184,18 @@ namespace EmuCore::TestingHelpers
 				}
 				std::cout << " }\n";
 			}
-			DirectX::XMFLOAT3 vector_(1.0f, 2.0f, 182154.3f);
-			DirectX::XMVECTOR transf_ = DirectX::XMLoadFloat3(&vector_);
-			transf_ = DirectX::XMVector3Transform(transf_, DirectX::XMLoadFloat4x4(&out_[i]));
-			DirectX::XMFLOAT3 result_;
-			DirectX::XMStoreFloat3(&result_, transf_);
-			std::cout << "Vector: { " << vector_.x << ", " << vector_.y << ", " << vector_.z << " }\n";
-			std::cout << "Transformed: { " << result_.x << ", " << result_.y << ", " << result_.z << " }\n";
 		}
 
-		std::vector<float> near_;
-		std::vector<float> far_;
-		std::vector<float> fov_;
-		std::vector<float> aspect_ratio_;
-		std::vector<DirectX::XMFLOAT4X4> out_;
+
+		std::vector<DirectX::XMMATRIX> lhs_;
+		std::vector<DirectX::XMMATRIX> rhs_;
+		std::vector<DirectX::XMMATRIX> out_;
 	};
 
 	using AllTests = std::tuple
 	<
-		ProjMatEmu,
-		ProjMatDXM
+		MatEmu,
+		MatDXM
 	>;
 
 
