@@ -166,11 +166,13 @@
     <ClInclude Include="EmuCore\TMPHelpers\Tuples.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TypeComparators.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TypeConvertors.h" />
+    <ClInclude Include="EmuMath\FastMatrix.h" />
     <ClInclude Include="EmuMath\FastVector.h" />
     <ClInclude Include="EmuMath\Matrix.h" />
     <ClInclude Include="EmuMath\NoOverflowT.h" />
     <ClInclude Include="EmuMath\SIMDHelpers.h" />
     <ClInclude Include="EmuMath\Vector.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\FastMatrix4x4f.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\Matrix4x4.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\MatrixHelpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\MatrixInfo.h" />

@@ -1,6 +1,7 @@
 #include "EmuMath/Vector.h"
 #include "EmuMath/FastVector.h"
 #include "EmuMath/Matrix.h"
+#include "EmuMath/FastMatrix.h"
 #include "EmuMath/NoOverflowT.h"
 #include "EmuCore/TMPHelpers/Tuples.h"
 #include <array>
@@ -661,6 +662,23 @@ int main()
 
 	*_4x4_float_.data()->data() = _4x4_float_.data()->data()->ClampMax(-5);
 	std::cout << _4x4_float_ << "\n";
+
+	EmuMath::FastMatrix4x4f_CM fast_4x4_(_4x4_float_);
+	std::cout << "As fast matrix:\n" << fast_4x4_ << "\n";
+
+	EmuMath::FastMatrix4x4f_CM fast_4x4_from_scalars(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << "\n\n";
+	std::cout << fast_4x4_from_scalars << "\n";
+	std::cout << "Row[0]: " << fast_4x4_from_scalars.GetRowReadable<0>() << "\n";
+	std::cout << "Row[1]: " << fast_4x4_from_scalars.GetRowReadable<1>() << "\n";
+	std::cout << "Row[2]: " << fast_4x4_from_scalars.GetRowReadable<2>() << "\n";
+	std::cout << "Row[3]: " << fast_4x4_from_scalars.GetRowReadable<3>() << "\n";
+	std::cout << "Column[0]: " << fast_4x4_from_scalars.GetColumnReadable<0>() << "\n";
+	std::cout << "Column[1]: " << fast_4x4_from_scalars.GetColumnReadable<1>() << "\n";
+	std::cout << "Column[2]: " << fast_4x4_from_scalars.GetColumnReadable<2>() << "\n";
+	std::cout << "Column[3]: " << fast_4x4_from_scalars.GetColumnReadable<3>() << "\n";
+	std::cout << "Tranposed:\n" << fast_4x4_from_scalars.Transpose() << "\n";
+
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

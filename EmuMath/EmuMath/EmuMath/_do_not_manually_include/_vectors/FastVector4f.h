@@ -28,7 +28,7 @@ namespace EmuMath
 		}
 		/// <summary> Constructs this vector with its associated register initialised as a copy of the passed register. </summary>
 		/// <param name="dataToCopy_">Register to copy to this vector's register.</param>
-		FastVector4f(__m128 dataToCopy_) : data_(dataToCopy_)
+		explicit FastVector4f(__m128 dataToCopy_) : data_(dataToCopy_)
 		{
 		}
 		/// <summary> Constructs this vector as a copy of the passed vector. </summary>
@@ -38,7 +38,7 @@ namespace EmuMath
 		}
 		/// <summary> Constructs this vector by loading the data of the passed EmuMath vector into its associated register. </summary>
 		/// <param name="toLoad_">EmuMath vector to load the data of.</param>
-		FastVector4f(const EmuMath::Vector<4, float>& toLoad_) : data_(_mm_load_ps(toLoad_.data()))
+		explicit FastVector4f(const EmuMath::Vector<4, float>& toLoad_) : data_(_mm_load_ps(toLoad_.data()))
 		{
 		}
 		/// <summary>
@@ -47,7 +47,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="toCopy_">EmuMath vector to copy the data of.</param>
 		template<std::size_t ToCopySize_, typename to_copy_contained_type>
-		FastVector4f(const EmuMath::Vector<ToCopySize_, to_copy_contained_type>& toCopy_) : 
+		explicit FastVector4f(const EmuMath::Vector<ToCopySize_, to_copy_contained_type>& toCopy_) : 
 			FastVector4f
 			(
 				EmuMath::Helpers::VectorGetTheoretical<0, float>(toCopy_),
@@ -1798,7 +1798,7 @@ namespace EmuMath
 		/// <returns>Inverted form of this vector resulting from a bitwise NOT.</returns>
 		[[nodiscard]] inline FastVector4f Not() const
 		{
-			return _mm_andnot_ps(data_, EmuMath::SIMD::index_mask_m128<true, true, true, true>());
+			return FastVector4f(_mm_andnot_ps(data_, EmuMath::SIMD::index_mask_m128<true, true, true, true>()));
 		}
 #pragma endregion
 
