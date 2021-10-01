@@ -7,7 +7,7 @@
 namespace EmuMath::Helpers::_underlying_matrix_funcs
 {
 	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class LhsMatrix_, class RhsMatrix_, class Cmp_, class Joiner_>
-	constexpr inline bool _matrix_cmp_matrix_until_one_ends(const LhsMatrix_& lhs_, const RhsMatrix_& rhs_, Cmp_& cmp_, Joiner_& joiner_, const bool& default_result_)
+	[[nodiscard]] constexpr inline bool _matrix_cmp_matrix_until_one_ends(const LhsMatrix_& lhs_, const RhsMatrix_& rhs_, Cmp_& cmp_, Joiner_& joiner_, const bool& default_result_)
 	{
 		if constexpr ((ColumnIndex_ < LhsMatrix_::num_columns) && (ColumnIndex_ < RhsMatrix_::num_columns))
 		{
@@ -31,7 +31,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class LhsMatrix_, class RhsMatrix_, class Cmp_, class Joiner_>
-	constexpr inline bool _matrix_cmp_matrix_do_all_indices(const LhsMatrix_& lhs_, const RhsMatrix_& rhs_, Cmp_& cmp_, Joiner_& joiner_, const bool& default_result_)
+	[[nodiscard]] constexpr inline bool _matrix_cmp_matrix_do_all_indices(const LhsMatrix_& lhs_, const RhsMatrix_& rhs_, Cmp_& cmp_, Joiner_& joiner_, const bool& default_result_)
 	{
 		if constexpr((ColumnIndex_ < LhsMatrix_::num_columns) || (ColumnIndex_ < RhsMatrix_::num_columns))
 		{
@@ -55,7 +55,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class LhsMatrix_, class RhsScalar_, class Cmp_, class Joiner_>
-	constexpr inline bool _matrix_cmp_scalar(const LhsMatrix_& lhs_, const RhsScalar_& rhs_, Cmp_& cmp_, Joiner_& joiner_, const bool& default_result_)
+	[[nodiscard]] constexpr inline bool _matrix_cmp_scalar(const LhsMatrix_& lhs_, const RhsScalar_& rhs_, Cmp_& cmp_, Joiner_& joiner_, const bool& default_result_)
 	{
 		if constexpr ((ColumnIndex_ < LhsMatrix_::num_columns))
 		{
@@ -79,7 +79,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<class Cmp_, bool CompareAllIndices_, class LhsMatrix_, class Rhs_>
-	constexpr inline bool _matrix_cmp_all(const LhsMatrix_& lhs_, const Rhs_& rhs_, Cmp_ cmp_)
+	[[nodiscard]] constexpr inline bool _matrix_cmp_all(const LhsMatrix_& lhs_, const Rhs_& rhs_, Cmp_ cmp_)
 	{
 		using Joiner_ = std::logical_and<bool>;
 		Joiner_ joiner_ = Joiner_();
@@ -114,7 +114,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 	}
 	template<bool CompareAllIndices_, template<class Lhs__, class Rhs__> class CmpTemplate_, class LhsMatrix_, class Rhs_>
-	constexpr inline bool _matrix_cmp_all(const LhsMatrix_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool _matrix_cmp_all(const LhsMatrix_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
 		{
@@ -129,7 +129,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	}
 
 	template<class Cmp_, bool CompareAllIndices_, class LhsMatrix_, class Rhs_>
-	constexpr inline bool _matrix_cmp_any(const LhsMatrix_& lhs_, const Rhs_& rhs_, Cmp_ cmp_)
+	[[nodiscard]] constexpr inline bool _matrix_cmp_any(const LhsMatrix_& lhs_, const Rhs_& rhs_, Cmp_ cmp_)
 	{
 		using Joiner_ = std::logical_or<bool>;
 		Joiner_ joiner_ = Joiner_();
@@ -164,7 +164,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 	}
 	template<bool CompareAllIndices_, template<class Lhs__, class Rhs__> class CmpTemplate_, class LhsMatrix_, class Rhs_>
-	constexpr inline bool _matrix_cmp_any(const LhsMatrix_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool _matrix_cmp_any(const LhsMatrix_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Rhs_>)
 		{

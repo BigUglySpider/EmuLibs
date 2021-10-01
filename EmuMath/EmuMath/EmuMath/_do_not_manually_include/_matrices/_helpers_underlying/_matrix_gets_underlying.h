@@ -118,7 +118,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	};
 	/// <summary> Used for getting theoretical arguments from either matrices or scalars in additional underlying matrix funcs. </summary>
 	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Arg_>
-	constexpr inline typename _theoretical_arg_return<ColumnIndex_, RowIndex_, Arg_>::type _get_theoretical_arg(const Arg_& arg_)
+	[[nodiscard]] constexpr inline typename _theoretical_arg_return<ColumnIndex_, RowIndex_, Arg_>::type _get_theoretical_arg(const Arg_& arg_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Arg_>)
 		{
