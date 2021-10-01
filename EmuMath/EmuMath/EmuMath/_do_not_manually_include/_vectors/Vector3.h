@@ -1,19 +1,19 @@
-#ifndef EMU_MATH_VECTOR_2_SUGAR_H_INC_
-#define EMU_MATH_VECTOR_2_SUGAR_H_INC_ 1
+#ifndef EMU_MATH_VECTOR_3_SUGAR_H_INC_
+#define EMU_MATH_VECTOR_3_SUGAR_H_INC_ 1
 
 #include "VectorT.h"
 
 namespace EmuMath
 {
 	template<typename T_>
-	struct Vector<2, T_>
+	struct Vector<3, T_>
 	{
 #pragma region VECTOR_INFO
 		/// <summary>
 		/// <para> General template info regarding this type of EmuMath vector. </para>
 		/// <para> For further information on individual components within this vector, you should view components of the same name under this vector_info. </para>
 		/// </summary>
-		using vector_info = EmuMath::_underlying_components::VectorInfo<2, T_>;
+		using vector_info = EmuMath::_underlying_components::VectorInfo<3, T_>;
 		using contained_type = typename vector_info::contained_type;
 		static constexpr bool contains_reference_wrappers = vector_info::contains_reference_wrappers;
 		using raw_value_type = typename vector_info::raw_value_type;
@@ -33,10 +33,14 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONSTRUCTORS
-		constexpr Vector() : x(), y()
+		constexpr Vector() : x(), y(), z()
 		{
 		}
-		constexpr Vector(const this_type& toCopy_) : x(toCopy_.at<0>()), y(toCopy_.at<1>())
+		constexpr Vector(this_type& toCopy_) : x(toCopy_.x), y(toCopy_.y), z(toCopy_.z)
+		{
+		}
+		template<typename = std::enable_if_t<!contains_non_const_reference_wrappers>>
+		constexpr Vector(const this_type& toCopy_) : x(toCopy_.x), y(toCopy_.y), z(toCopy_.z)
 		{
 		}
 		template<std::size_t ToCopySize_, typename ToCopyValueType_>
@@ -53,14 +57,15 @@ namespace EmuMath
 		{
 			memcpy(data(), pDataToLoad, numBytes_);
 		}
-		template<typename X_, typename Y_>
-		constexpr Vector(X_&& x_, Y_&& y_) : 
+		template<typename X_, typename Y_, typename Z_>
+		constexpr Vector(X_&& x_, Y_&& y_, Z_&& z_) :
 			x(static_cast<contained_type>(std::forward<X_>(x_))),
-			y(static_cast<contained_type>(std::forward<Y_>(y_)))
+			y(static_cast<contained_type>(std::forward<Y_>(y_))),
+			z(static_cast<contained_type>(std::forward<Z_>(z_)))
 		{
 			static_assert
 			(
-				EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, X_, Y_>::value,
+				EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, X_, Y_, Z_>::value,
 				"Attempted to construct an EmuMath Vector via it's template constructor, but at least one provided argument cannot be used to construct the Vector's contained_type."
 			);
 		}
@@ -1023,6 +1028,39 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::VectorDistance<OutSize_, out_contained_type, this_type, TargetVector_>(*this, target_);
 		}
+
+		/// <summary>
+		/// <para> Calculates the 3D cross product of this vector and b_, where this vector is a_, using the provided template indices as the X, Y, and Z for A and B. </para>
+		/// <para> The provided indices default to the logical x, y, and z components of both A and B, but may be modified to refer to different areas of the vectors. </para>
+		/// <para> 
+		///		Unless explicitly stated otherwise, the indices for B will mimic those of A. 
+		///		As such, providing custom indices for A will implicitly provide the same indices for B, unless additional indices are explicitly provided for B.
+		/// </para>
+		/// <para> The end vector can be summarised as: </para>
+		///	<para> [0] = (a_[AY_] * b_[BZ_]) - (a_[AZ_] * b_[BY_]) </para>
+		/// <para> [1] = (a_[AZ_] * b_[BX_]) - (a_[AX_] * b_[BZ_]) </para>
+		/// <para> [2] = (a_[AX_] * b_[BY_]) - (a_[AY_] * b_[BX_]) </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
+		/// <typeparam name="VectorB_">Type of vector representing b_ in the above formulae.</typeparam>
+		/// <param name="b_">EmuMath vector representing b_ in the above formulae.</param>
+		/// <returns>Cross product of this vector and the passed vector b_, using the provided indices for 3 elements from each of the respective vectors.</returns>
+		template
+		<
+			std::size_t AX_ = 0,
+			std::size_t AY_ = 1,
+			std::size_t AZ_ = 2,
+			std::size_t BX_ = AX_,
+			std::size_t BY_ = AY_,
+			std::size_t BZ_ = AZ_,
+			std::size_t OutSize_ = 3,
+			typename out_contained_type = preferred_floating_point,
+			class VectorB_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> CrossProduct3D(const VectorB_& b_) const
+		{
+			return EmuMath::Helpers::VectorCrossProduct3D<AX_, AY_, AZ_, BX_, BY_, BZ_, OutSize_, out_contained_type, this_type, VectorB_>(*this, b_);
+		}
 #pragma endregion
 
 #pragma region COMPARISONS
@@ -1457,6 +1495,8 @@ namespace EmuMath
 		contained_type x;
 		/// <summary> Element 1 within this vector. </summary>
 		contained_type y;
+		/// <summary> Element 2 within this vector. </summary>
+		contained_type z;
 
 	private:
 		template<std::size_t Index_>
@@ -1469,6 +1509,10 @@ namespace EmuMath
 			else if constexpr (Index_ == 1)
 			{
 				return y;
+			}
+			else if constexpr (Index_ == 2)
+			{
+				return z;
 			}
 			else
 			{
@@ -1485,6 +1529,10 @@ namespace EmuMath
 			else if constexpr (Index_ == 1)
 			{
 				return y;
+			}
+			else if constexpr (Index_ == 2)
+			{
+				return z;
 			}
 			else
 			{
@@ -1570,10 +1618,10 @@ namespace EmuMath
 		}
 	};
 
-	/// <summary> Alias shorthand for creating an EmuMath vector containing 2 elements. Specialised to provide some syntactic sugar, such as named axis elements. </summary>
+	/// <summary> Alias shorthand for creating an EmuMath vector containing 3 elements. Specialised to provide some syntactic sugar, such as named axis elements. </summary>
 	/// <typeparam name="T_">Type to be contained within the vector.</typeparam>
 	template<typename T_>
-	using Vector2 = EmuMath::Vector<2, T_>;
+	using Vector3 = EmuMath::Vector<3, T_>;
 }
 
 #endif

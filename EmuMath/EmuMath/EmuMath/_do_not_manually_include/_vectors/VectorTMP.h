@@ -1,7 +1,7 @@
 #ifndef EMU_MATH_VECTOR_T_TMP_H_INC_
 #define EMU_MATH_VECTOR_T_TMP_H_INC_ 1
 
-#include "../../EmuCore/CommonTypes/DeferrableReferenceWrapper.h"
+#include "../../../EmuCore/CommonTypes/DeferrableReferenceWrapper.h"
 #include <cstddef>
 
 namespace EmuMath
@@ -13,7 +13,7 @@ namespace EmuMath
 	/// <para> The type of reference wrapper used to store references within an EmuMath vector. </para>
 	/// <para> This is the standard type for any references stored within an EmuMath vector. References of other types are undefined and unsupported. </para>
 	/// </summary>
-	/// <typeparam name="T_"></typeparam>
+	/// <typeparam name="T_">Type to be referencing. T_ itself should not be a reference type; the reference will be applied automatically.</typeparam>
 	template<typename T_>
 	using InternalVectorReference = EmuCore::DeferrableReferenceWrapper<T_>;
 
