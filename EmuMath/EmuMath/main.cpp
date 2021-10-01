@@ -651,13 +651,16 @@ int main()
 
 	float hello_ = 0.5f;
 	constexpr long double bki = 1.25L;
-	EmuMath::Matrix4x4<float, false> _4x4_float_ = EmuMath::Matrix4x4<float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	EmuMath::Matrix4x4<float, true> _4x4_float_ = EmuMath::Matrix4x4<float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 
 
 	std::cout << "\n\n";
 	std::cout << _4x4_float_ << "\n";
 
 	std::cout << "Translation * Scale * Scale:\n" << _4x4_float_.Translation(1, 2, 3) * _4x4_float_.Scale(2.0f, 2, 0.5f) * _4x4_float_.Scale(0.75L, 12, 1) << "\n";
+
+	*_4x4_float_.data()->data() = _4x4_float_.data()->data()->ClampMax(-5);
+	std::cout << _4x4_float_ << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
