@@ -76,7 +76,7 @@ namespace EmuMath::Helpers
 		return MatrixAnd<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<typename out_contained_type, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major> MatrixAnd
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major> MatrixAnd
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
@@ -174,7 +174,7 @@ namespace EmuMath::Helpers
 		return MatrixOr<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<typename out_contained_type, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major> MatrixOr
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major> MatrixOr
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
@@ -272,7 +272,7 @@ namespace EmuMath::Helpers
 		return MatrixXor<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<typename out_contained_type, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major> MatrixXor
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major> MatrixXor
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_

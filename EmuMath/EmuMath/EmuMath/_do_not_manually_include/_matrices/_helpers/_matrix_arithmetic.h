@@ -1379,7 +1379,7 @@ namespace EmuMath::Helpers
 	/// <typeparam name="Matrix_">Matrix to find the highest element of.</typeparam>
 	/// <returns>EmuMath vector containing the column and row index of the lowest element within the passed matrix.</returns>
 	template<class Matrix_>
-	constexpr inline EmuMath::Vector<2, std::size_t> MatrixMinIndex(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<2, std::size_t> MatrixMinIndex(const Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
@@ -1402,7 +1402,7 @@ namespace EmuMath::Helpers
 	/// <typeparam name="Matrix_">Matrix to find the highest element of.</typeparam>
 	/// <returns>The lowest element within the provided matrix as is suitable for the provided Out_ type.</returns>
 	template<typename Out_, class Matrix_>
-	constexpr inline Out_ MatrixMin(Matrix_& matrix_)
+	[[nodiscard]] constexpr inline Out_ MatrixMin(Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
@@ -1432,7 +1432,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class Matrix_>
-	constexpr inline typename EmuCore::TMPHelpers::conditional_const<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>::type MatrixMin(Matrix_& matrix_)
+	[[nodiscard]] constexpr inline typename EmuCore::TMPHelpers::conditional_const<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>::type MatrixMin(Matrix_& matrix_)
 	{
 		return MatrixMin<typename EmuCore::TMPHelpers::conditional_const<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>::type, Matrix_>(matrix_);
 	}
@@ -1444,7 +1444,7 @@ namespace EmuMath::Helpers
 	/// <typeparam name="Matrix_">Matrix to find the highest element of.</typeparam>
 	/// <returns>EmuMath vector containing the column and row index of the highest element within the passed matrix.</returns>
 	template<class Matrix_>
-	constexpr inline EmuMath::Vector<2, std::size_t> MatrixMaxIndex(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<2, std::size_t> MatrixMaxIndex(const Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
@@ -1467,7 +1467,7 @@ namespace EmuMath::Helpers
 	/// <typeparam name="Matrix_">Matrix to find the highest element of.</typeparam>
 	/// <returns>The highest element within the provided matrix as is suitable for the provided Out_ type.</returns>
 	template<typename Out_, class Matrix_>
-	constexpr inline Out_ MatrixMax(Matrix_& matrix_)
+	[[nodiscard]] constexpr inline Out_ MatrixMax(Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
@@ -1497,7 +1497,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class Matrix_>
-	constexpr inline typename EmuCore::TMPHelpers::conditional_const<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>::type MatrixMax(Matrix_& matrix_)
+	[[nodiscard]] constexpr inline typename EmuCore::TMPHelpers::conditional_const<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>::type MatrixMax(Matrix_& matrix_)
 	{
 		return MatrixMax<typename EmuCore::TMPHelpers::conditional_const<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>::type, Matrix_>(matrix_);
 	}

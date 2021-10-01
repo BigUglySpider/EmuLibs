@@ -12,7 +12,7 @@ namespace EmuCore
 		constexpr do_add()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& lhs_, const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::MatrixAdd(lhs_, rhs_);
 		}
@@ -24,7 +24,7 @@ namespace EmuCore
 		constexpr do_subtract()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& lhs_, const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::MatrixSubtract(lhs_, rhs_);
 		}
@@ -36,7 +36,7 @@ namespace EmuCore
 		constexpr do_multiply()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& lhs_, const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::MatrixMultiply(lhs_, rhs_);
 		}
@@ -48,7 +48,7 @@ namespace EmuCore
 		constexpr do_divide()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& lhs_, const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::MatrixDivideBasic(lhs_, rhs_);
 		}
@@ -60,7 +60,7 @@ namespace EmuCore
 		constexpr do_mod()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& lhs_, const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::MatrixModBasic(lhs_, rhs_);
 		}
@@ -72,7 +72,7 @@ namespace EmuCore
 		constexpr do_negate()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_) const
 		{
 			return EmuMath::Helpers::MatrixNegate(matrix_);
 		}
@@ -84,7 +84,7 @@ namespace EmuCore
 		constexpr do_floor()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_) const
 		{
 			return EmuMath::Helpers::MatrixFloor(matrix_);
 		}
@@ -96,7 +96,7 @@ namespace EmuCore
 		constexpr do_ceil()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_) const
 		{
 			return EmuMath::Helpers::MatrixCeil(matrix_);
 		}
@@ -108,7 +108,7 @@ namespace EmuCore
 		constexpr do_trunc()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_) const
 		{
 			return EmuMath::Helpers::MatrixTrunc(matrix_);
 		}
@@ -120,7 +120,7 @@ namespace EmuCore
 		constexpr do_lerp()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, ContainedT_, ColumnMajor_>& a_, const B_& b_, const T_& t_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Matrix<NumColumns_, NumRows_, ContainedT_, ColumnMajor_>& a_, const B_& b_, const T_& t_) const
 		{
 			return EmuMath::Helpers::MatrixLerp(a_, b_, t_);
 		}

@@ -18,7 +18,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of comparisons.</param>
 	/// <returns>Matrix of booleans containing the results of comparisons of each respective element in lhs_matrix_ with rhs_ as defined above.</returns>
 	template<std::size_t NumColumnsToTest_, std::size_t NumRowsToTest_, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> MatrixCmpPerElementEqual
+	[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> MatrixCmpPerElementEqual
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -40,7 +40,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t NumColumnsToTest_, std::size_t NumRowsToTest_, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementEqual
+	[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementEqual
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -49,7 +49,7 @@ namespace EmuMath::Helpers
 		return MatrixCmpPerElementEqual<NumColumnsToTest_, NumRowsToTest_, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
 	}
 	template<bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, OutColumnMajor_> MatrixCmpPerElementEqual
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, OutColumnMajor_> MatrixCmpPerElementEqual
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -58,7 +58,7 @@ namespace EmuMath::Helpers
 		return MatrixCmpPerElementEqual<LhsMatrix_::num_columns, LhsMatrix_::num_rows, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
 	}
 	template<class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementEqual
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementEqual
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -80,7 +80,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of comparisons.</param>
 	/// <returns>Matrix of booleans containing the results of comparisons of each respective element in lhs_matrix_ with rhs_ as defined above.</returns>
 	template<std::size_t NumColumnsToTest_, std::size_t NumRowsToTest_, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> MatrixCmpPerElementNotEqual
+	[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> MatrixCmpPerElementNotEqual
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -102,7 +102,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t NumColumnsToTest_, std::size_t NumRowsToTest_, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementNotEqual
+	[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementNotEqual
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -111,7 +111,7 @@ namespace EmuMath::Helpers
 		return MatrixCmpPerElementNotEqual<NumColumnsToTest_, NumRowsToTest_, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
 	}
 	template<bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, OutColumnMajor_> MatrixCmpPerElementNotEqual
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, OutColumnMajor_> MatrixCmpPerElementNotEqual
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -120,7 +120,7 @@ namespace EmuMath::Helpers
 		return MatrixCmpPerElementNotEqual<LhsMatrix_::num_columns, LhsMatrix_::num_rows, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
 	}
 	template<class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementNotEqual
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementNotEqual
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -142,7 +142,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of comparisons.</param>
 	/// <returns>Matrix of booleans containing the results of comparisons of each respective element in lhs_matrix_ with rhs_ as defined above.</returns>
 	template<std::size_t NumColumnsToTest_, std::size_t NumRowsToTest_, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> MatrixCmpPerElementGreater
+	[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> MatrixCmpPerElementGreater
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -164,7 +164,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t NumColumnsToTest_, std::size_t NumRowsToTest_, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementGreater
+	[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementGreater
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -173,7 +173,7 @@ namespace EmuMath::Helpers
 		return MatrixCmpPerElementGreater<NumColumnsToTest_, NumRowsToTest_, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
 	}
 	template<bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, OutColumnMajor_> MatrixCmpPerElementGreater
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, OutColumnMajor_> MatrixCmpPerElementGreater
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -182,7 +182,7 @@ namespace EmuMath::Helpers
 		return MatrixCmpPerElementGreater<LhsMatrix_::num_columns, LhsMatrix_::num_rows, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
 	}
 	template<class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementGreater
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementGreater
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -204,7 +204,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of comparisons.</param>
 	/// <returns>Matrix of booleans containing the results of comparisons of each respective element in lhs_matrix_ with rhs_ as defined above.</returns>
 	template<std::size_t NumColumnsToTest_, std::size_t NumRowsToTest_, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> MatrixCmpPerElementLess
+	[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> MatrixCmpPerElementLess
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -226,7 +226,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t NumColumnsToTest_, std::size_t NumRowsToTest_, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementLess
+	[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementLess
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -235,7 +235,7 @@ namespace EmuMath::Helpers
 		return MatrixCmpPerElementLess<NumColumnsToTest_, NumRowsToTest_, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
 	}
 	template<bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, OutColumnMajor_> MatrixCmpPerElementLess
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, OutColumnMajor_> MatrixCmpPerElementLess
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -244,7 +244,7 @@ namespace EmuMath::Helpers
 		return MatrixCmpPerElementLess<LhsMatrix_::num_columns, LhsMatrix_::num_rows, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
 	}
 	template<class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementLess
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementLess
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -266,7 +266,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of comparisons.</param>
 	/// <returns>Matrix of booleans containing the results of comparisons of each respective element in lhs_matrix_ with rhs_ as defined above.</returns>
 	template<std::size_t NumColumnsToTest_, std::size_t NumRowsToTest_, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> MatrixCmpPerElementGreaterEqual
+	[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> MatrixCmpPerElementGreaterEqual
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -288,7 +288,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t NumColumnsToTest_, std::size_t NumRowsToTest_, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementGreaterEqual
+	[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementGreaterEqual
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -297,7 +297,7 @@ namespace EmuMath::Helpers
 		return MatrixCmpPerElementGreaterEqual<NumColumnsToTest_, NumRowsToTest_, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
 	}
 	template<bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, OutColumnMajor_> MatrixCmpPerElementGreaterEqual
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, OutColumnMajor_> MatrixCmpPerElementGreaterEqual
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -306,7 +306,7 @@ namespace EmuMath::Helpers
 		return MatrixCmpPerElementGreaterEqual<LhsMatrix_::num_columns, LhsMatrix_::num_rows, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
 	}
 	template<class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementGreaterEqual
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementGreaterEqual
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -328,7 +328,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of comparisons.</param>
 	/// <returns>Matrix of booleans containing the results of comparisons of each respective element in lhs_matrix_ with rhs_ as defined above.</returns>
 	template<std::size_t NumColumnsToTest_, std::size_t NumRowsToTest_, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> MatrixCmpPerElementLessEqual
+	[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> MatrixCmpPerElementLessEqual
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -350,7 +350,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t NumColumnsToTest_, std::size_t NumRowsToTest_, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementLessEqual
+	[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementLessEqual
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -359,7 +359,7 @@ namespace EmuMath::Helpers
 		return MatrixCmpPerElementLessEqual<NumColumnsToTest_, NumRowsToTest_, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
 	}
 	template<bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, OutColumnMajor_> MatrixCmpPerElementLessEqual
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, OutColumnMajor_> MatrixCmpPerElementLessEqual
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -368,7 +368,7 @@ namespace EmuMath::Helpers
 		return MatrixCmpPerElementLessEqual<LhsMatrix_::num_columns, LhsMatrix_::num_rows, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_matrix_, rhs_);
 	}
 	template<class LhsMatrix_, class Rhs_>
-	constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementLessEqual
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, bool, LhsMatrix_::is_column_major> MatrixCmpPerElementLessEqual
 	(
 		const LhsMatrix_& lhs_matrix_,
 		const Rhs_& rhs_
@@ -400,7 +400,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of the comparison.</param>
 	/// <returns>Boolean indcating if comparisons on all elements within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<template<class Lhs__, class Rhs__> class FuncTemplate_, bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
-	constexpr inline bool MatrixCmpAllTrue(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool MatrixCmpAllTrue(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
@@ -430,7 +430,7 @@ namespace EmuMath::Helpers
 	/// <param name="func_">Callable to perform comparisons, meeting the constraints defined above.</param>
 	/// <returns>Boolean indcating if comparisons on all elements within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<class Func_, bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
-	constexpr inline bool MatrixCmpAllTrue(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_, Func_ func_)
+	[[nodiscard]] constexpr inline bool MatrixCmpAllTrue(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_, Func_ func_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
@@ -455,7 +455,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
 	/// <returns>Boolean indcating if comparisons on all elements within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
-	constexpr inline bool MatrixCmpAllEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool MatrixCmpAllEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
@@ -480,7 +480,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
 	/// <returns>Boolean indcating if comparisons on all elements within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
-	constexpr inline bool MatrixCmpAllNotEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool MatrixCmpAllNotEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
@@ -505,7 +505,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
 	/// <returns>Boolean indcating if comparisons on all elements within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
-	constexpr inline bool MatrixCmpAllGreater(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool MatrixCmpAllGreater(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
@@ -530,7 +530,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
 	/// <returns>Boolean indcating if comparisons on all elements within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
-	constexpr inline bool MatrixCmpAllLess(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool MatrixCmpAllLess(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
@@ -555,7 +555,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
 	/// <returns>Boolean indcating if comparisons on all elements within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
-	constexpr inline bool MatrixCmpAllGreaterEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool MatrixCmpAllGreaterEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
@@ -580,7 +580,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
 	/// <returns>Boolean indcating if comparisons all elements within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
-	constexpr inline bool MatrixCmpAllLessEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool MatrixCmpAllLessEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
@@ -615,7 +615,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of the comparison.</param>
 	/// <returns>Boolean indcating if comparisons on at least one element within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<template<class Lhs__, class Rhs__> class FuncTemplate_, bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
-	constexpr inline bool MatrixCmpAnyTrue(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool MatrixCmpAnyTrue(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
@@ -645,7 +645,7 @@ namespace EmuMath::Helpers
 	/// <param name="func_">Callable to perform comparisons, meeting the constraints defined above.</param>
 	/// <returns>Boolean indcating if comparisons on at least one element within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<class Func_, bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
-	constexpr inline bool MatrixCmpAnyTrue(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_, Func_ func_)
+	[[nodiscard]] constexpr inline bool MatrixCmpAnyTrue(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_, Func_ func_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
@@ -670,7 +670,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
 	/// <returns>Boolean indcating if comparisons on at least one element within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
-	constexpr inline bool MatrixCmpAnyEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool MatrixCmpAnyEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
@@ -695,7 +695,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
 	/// <returns>Boolean indcating if comparisons on at least one element within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
-	constexpr inline bool MatrixCmpAnyNotEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool MatrixCmpAnyNotEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
@@ -720,7 +720,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
 	/// <returns>Boolean indcating if comparisons on at least one element within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
-	constexpr inline bool MatrixCmpAnyGreater(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool MatrixCmpAnyGreater(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
@@ -745,7 +745,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
 	/// <returns>Boolean indcating if comparisons on at least one element within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
-	constexpr inline bool MatrixCmpAnyLess(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool MatrixCmpAnyLess(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
@@ -770,7 +770,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
 	/// <returns>Boolean indcating if comparisons on at least one element within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
-	constexpr inline bool MatrixCmpAnyGreaterEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool MatrixCmpAnyGreaterEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
@@ -795,7 +795,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right-hand side of equal_to comparisons.</param>
 	/// <returns>Boolean indcating if comparisons on at least one element within lhs_matrix_ with rhs_ as defined above returned true.</returns>
 	template<bool TestAllIndices_ = false, class LhsMatrix_, class Rhs_>
-	constexpr inline bool MatrixCmpAnyLessEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool MatrixCmpAnyLessEqual(const LhsMatrix_& lhs_matrix_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
@@ -822,7 +822,7 @@ namespace EmuMath::Helpers
 	///		True if all respective elements (overall or smallest-size, depending on TestAllIndices_ value) of the passed matrices are equal; otherwise false.
 	/// </returns>
 	template<bool TestAllIndices_ = false, class LhsMatrix_, class RhsMatrix_>
-	constexpr inline bool MatrixCmpEqual(const LhsMatrix_& lhs_matrix_, const RhsMatrix_& rhs_matrix_)
+	[[nodiscard]] constexpr inline bool MatrixCmpEqual(const LhsMatrix_& lhs_matrix_, const RhsMatrix_& rhs_matrix_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
@@ -856,7 +856,7 @@ namespace EmuMath::Helpers
 	///		True if at least one respective element (overall or smallest-size, depending on TestAllIndices_ value) of the passed matrices is not equal; otherwise false.
 	/// </returns>
 	template<bool TestAllIndices_ = false, class LhsMatrix_, class RhsMatrix_>
-	constexpr inline bool MatrixCmpNotEqual(const LhsMatrix_& lhs_matrix_, const RhsMatrix_& rhs_matrix_)
+	[[nodiscard]] constexpr inline bool MatrixCmpNotEqual(const LhsMatrix_& lhs_matrix_, const RhsMatrix_& rhs_matrix_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<LhsMatrix_>)
 		{
