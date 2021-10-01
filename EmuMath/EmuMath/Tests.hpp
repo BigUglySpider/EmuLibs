@@ -71,7 +71,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 5000000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = false;
+		static constexpr bool DO_TEST = true;
 		static constexpr std::string_view NAME = "Projection Creation (EmuMath)";
 
 		ProjMatEmu()
@@ -121,7 +121,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 5000000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr bool DO_TEST = false;
+		static constexpr bool DO_TEST = true;
 		static constexpr std::string_view NAME = "Projection Creation (DirectXMath)";
 
 		ProjMatDXM()
@@ -186,6 +186,8 @@ namespace EmuCore::TestingHelpers
 
 	using AllTests = std::tuple
 	<
+		ProjMatEmu,
+		ProjMatDXM
 	>;
 
 
