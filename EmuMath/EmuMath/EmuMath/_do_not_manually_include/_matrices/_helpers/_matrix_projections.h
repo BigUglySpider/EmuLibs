@@ -68,7 +68,7 @@ namespace EmuMath::Helpers
 
 	/// <summary>
 	/// <para> Creates a basic 4x4 perspective projection matrix which does not take a frustum into too much consideration. </para>
-	/// <para> In general, it may be more beneficial to use MatrixPerspectiveWithFrustum instead. </para>
+	/// <para> In general, it may be more beneficial to use MatrixPerspective instead. </para>
 	/// </summary>
 	/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
 	/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>

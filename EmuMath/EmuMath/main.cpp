@@ -657,7 +657,7 @@ int main()
 	std::cout << "\n\n";
 	std::cout << _4x4_float_ << "\n";
 
-	constexpr auto trans_from_4x4_ = _4x4_float_.Translation<long double>(1, 2, 3);
+	std::cout << "Translation * Scale * Scale:\n" << _4x4_float_.Translation(1, 2, 3) * _4x4_float_.Scale(2.0f, 2, 0.5f) * _4x4_float_.Scale(0.75L, 12, 1) << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

@@ -2058,6 +2058,218 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region PROJECTION_FUNCTIONS
+		/// <summary>
+		/// <para> Creates a basic 4x4 perspective projection matrix which does not take a frustum into too much consideration. </para>
+		/// <para> In general, it may be more beneficial to use Perspective instead. </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+		/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>
+		/// <typeparam name="Far_">Type used to provide the far plane.</typeparam>
+		/// <typeparam name="Fov_">Type used to provide the FOV angle.</typeparam>
+		/// <param name="near_">Near plane for calculating the projection matrix.</param>
+		/// <param name="far_">Far plane for calculating the projection matrix.</param>
+		/// <param name="fov_">FOV angle for calculating the projection matrix. This may be either radians or degrees, and by default is interpreted as radians.</param>
+		/// <returns>Basic perspective matrix using the provided arguments. It should be noted that an accurate frustum is not too heavily considered for the output.</returns>
+		template
+		<
+			std::size_t NumIterations_ = 5,
+			bool RadsFov_ = true,
+			typename out_contained_type = preferred_floating_point,
+			bool OutColumnMajor_ = is_column_major,
+			typename Near_,
+			typename Far_,
+			typename Fov_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> BasicPerspective
+		(
+			const Near_& near_,
+			const Far_& far_,
+			const Fov_& fov_y_angle_
+		)
+		{
+			return EmuMath::Helpers::MatrixBasicPerspective<NumIterations_, RadsFov_, out_contained_type, OutColumnMajor_, Near_, Far_, Fov_>(near_, far_, fov_y_angle_);
+		}
+
+		/// <summary>
+		/// <para> Creates a full 4x4 perspective projection matrix, automatically calculating a frustum based on the provided fov_angle_y_ and aspect_ratio_. </para>
+		/// <para> The projection is created for a Vulkan clipping space. </para>
+		/// <para>
+		///		If a view angle or aspect ratio is unknown, but specific edges for a frustum are available, consider using the overload of this function taking 
+		///		near_, far_, left_, right_, bottom_, top_ arguments.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+		/// <typeparam name="FovY_">Type used to y-angle of the FOV.</typeparam>
+		/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>
+		/// <typeparam name="Far_">Type used to provide the far plane.</typeparam>
+		/// <typeparam name="AspectRatio_">Type used to provide the aspect ratio.</typeparam>
+		/// <param name="fov_angle_y_">
+		///		Y-angle of the FOV for projections via the created matrix. This may be in radians or degrees, and by default is interpreted as radians.
+		/// </param>
+		/// <param name="near_">Near plane for the perspective projection matrix.</param>
+		/// <param name="far_">Far plane for the perspective projection matrix.</param>
+		/// <param name="aspect_ratio_">Aspect ratio for projections via the created matrix. In general, this should be equal to target_width/target_height.</param>
+		/// <returns>4x4 EmuMath matrix formed as a perspective projection matrix via the provided arguments, with its frustum's edges automatically calculated.</returns>
+		template
+		<
+			bool FovYIsRads_ = true,
+			typename out_contained_type = preferred_floating_point,
+			bool OutColumnMajor_ = is_column_major,
+			std::size_t NumTanIterations_ = 5,
+			bool DoTanMod_ = true,
+			typename FovY_,
+			typename Near_,
+			typename Far_,
+			typename AspectRatio_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> PerspectiveVK
+		(
+			const FovY_& fov_angle_y_,
+			const Near_& near_,
+			const Far_& far_,
+			const AspectRatio_& aspect_ratio_
+		)
+		{
+			return EmuMath::Helpers::MatrixPerspectiveVK<FovYIsRads_, out_contained_type, OutColumnMajor_, NumTanIterations_, DoTanMod_, FovY_, Near_, Far_, AspectRatio_>
+			(
+				fov_angle_y_, near_, far_, aspect_ratio_
+			);
+		}
+		/// <summary>
+		/// <para> Creates a full 4x4 perspective projection matrix, using the provided left_, right_, bottom_, and top_ arguments as respective edges of a frustum. </para>
+		/// <para> The projection is created for a Vulkan clipping space. </para>
+		/// <para>
+		///		If edges of the frustum are not known, consider using the overload of this function taking fov_angle_y, near_, far_, aspect_ratio_ instead, 
+		///		which will automatically calculate a generic frustum.
+		/// </para>
+		/// <para> Note that frustum edges are expected to be scalars; the axis the scalar represents is assumed based on the axis the edge would be aligned with. </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+		/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>
+		/// <typeparam name="Far_">Type used to provide the far plane.</typeparam>
+		/// <typeparam name="Left_">Type used to provide the left edge of the frustum.</typeparam>
+		/// <typeparam name="Right_">Type used to provide the right edge of the frustum.</typeparam>
+		/// <typeparam name="Bottom_">Type used to provide the bottom edge of the frustum.</typeparam>
+		/// <typeparam name="Top_">Type used to provide the top edge of the frustum.</typeparam>
+		/// <param name="near_">Near plane for the perspective projection matrix.</param>
+		/// <param name="far_">Far plane for the perspective projection matrix.</param>
+		/// <param name="left_">Left edge of the frustum when determining the perspective projection matrix.</param>
+		/// <param name="right_">Right edge of the frustum when determining the perspective projection matrix.</param>
+		/// <param name="bottom_">Bottom edge of the frustum when determining the perspective projection matrix.</param>
+		/// <param name="top_">Top edge of the frustum when determining theperspective  projection matrix.</param>
+		/// <returns>4x4 EmuMath matrix formed as a perspective projection matrix via the provided arguments.</returns>
+		template
+		<
+			typename out_contained_type = preferred_floating_point,
+			bool OutColumnMajor_ = is_column_major,
+			typename Near_,
+			typename Far_,
+			typename Left_,
+			typename Right_,
+			typename Bottom_,
+			typename Top_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> PerspectiveVK
+		(
+			const Near_& near_,
+			const Far_& far_,
+			const Left_& left_,
+			const Right_& right_,
+			const Bottom_& bottom_,
+			const Top_& top_
+		)
+		{
+			return EmuMath::Helpers::MatrixPerspectiveVK<out_contained_type, OutColumnMajor_, Near_, Far_, Left_, Right_, Bottom_, top_>
+			(
+				near_, far_, left_, right_, bottom_, top_
+			);
+		}
+
+		/// <summary> Creates a 4x4 six-tuple orthographic projection matrix via the passed bounds and near/far planes. </summary>
+		/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+		/// <typeparam name="Left_">Type used to provide the left bound.</typeparam>
+		/// <typeparam name="Right_">Type used to provide the right bound.</typeparam>
+		/// <typeparam name="Bottom_">Type used to provide the bottom bound.</typeparam>
+		/// <typeparam name="Top_">Type used to provide the top bound.</typeparam>
+		/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>
+		/// <typeparam name="Far_">Type used to provide the far plane.</typeparam>
+		/// <param name="left_">Left bound for orthographic projection.</param>
+		/// <param name="right_">Right bound for orthographic projection.</param>
+		/// <param name="bottom_">Bottom bound for orthographic projection.</param>
+		/// <param name="top_">Top bound for orthographic projection.</param>
+		/// <param name="near_">Near plane value for orthographic projection.</param>
+		/// <param name="far_">Far plane value for orthographic projection.</param>
+		/// <returns>4x4 EmuMath matrix formed as an orthographic projection matrix via the provided arguments.</returns>
+		template
+		<
+			typename out_contained_type = preferred_floating_point,
+			bool OutColumnMajor_ = is_column_major,
+			typename Left_,
+			typename Right_,
+			typename Bottom_,
+			typename Top_,
+			typename Near_,
+			typename Far_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> OrthographicVK
+		(
+			const Left_& left_,
+			const Right_& right_,
+			const Bottom_& bottom_,
+			const Top_& top_,
+			const Near_& near_,
+			const Far_& far_
+		)
+		{
+			return EmuMath::Helpers::MatrixOrthographicVK<out_contained_type, OutColumnMajor_, Left_, Right_, Bottom_, Top_, Near_, Far_>
+			(
+				left_, right_, bottom_, top_, near_, far_
+			);
+		}
+		/// <summary>
+		/// <para> Creates a 4x4 six-tuple orthographic projection matrix via the passed width/height and near/far planes. </para>
+		/// <para> This is effectively shorthand for providing bounded arguments for via dimensions, with the following argument translations: </para>
+		/// <para> left_ and bottom_ are both equal to 0. </para>
+		/// <para> right_ is equal to width_. </para>
+		/// <para> top_ is equal to height_. </para>
+		/// <para> near_ and far_ remain the same. </para>
+		/// <para> If non-zero lower bounds are required, use the overload to this function taking  left_, right_, bottom_, top_, near_, far_ arguments instead. </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type to be contained in the output matrix.</typeparam>
+		/// <typeparam name="Width_">Type used to provide the width.</typeparam>
+		/// <typeparam name="Height_">Type used to provide the height.</typeparam>
+		/// <typeparam name="Near_">Type used to provide the near plane.</typeparam>
+		/// <typeparam name="Far_">Type used to provide the far plane.</typeparam>
+		/// <param name="width_">Width of the orthographic projection region, which will be used as the right_ argument.</param>
+		/// <param name="height_">Height of the orthographic projection region, which will be used as the top_ argument.</param>
+		/// <param name="near_">Near plane value for orthographic projection.</param>
+		/// <param name="far_">Far plane value for orthographic projection.</param>
+		/// <returns>4x4 EmuMath matrix formed as an orthographic projection matrix of the specified dimensions with lower bounds both set to 0.</returns>
+		template
+		<
+			typename out_contained_type = preferred_floating_point,
+			bool OutColumnMajor_ = is_column_major,
+			typename Width_,
+			typename Height_,
+			typename Near_,
+			typename Far_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> OrthographicVK
+		(
+			const Width_ width_,
+			const Height_& height_,
+			const Near_& near_,
+			const Far_& far_
+		)
+		{
+			return EmuMath::Helpers::MatrixOrthographicVK<out_contained_type, OutColumnMajor_, Width_, Height_, Near_, Far_>
+			(
+				width_, height_, near_, far_
+			);
+		}
+#pragma endregion
+
 	private:
 		data_storage_type data_;
 #pragma region SELF_HELPERS
