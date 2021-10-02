@@ -1926,7 +1926,7 @@ namespace EmuMath
 		/// <param name="rot_x_">The amount of radians or degrees to rotate about the X-axis.</param>
 		/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the X-axis by the passed number of radians or degrees.</returns>
 		template<bool RotIsRads_ = true, std::size_t NumIterations_ = 3, bool DoMod_ = true, typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = true, typename RotX_>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> RotationXConstexpr(const RotX_& rot_x_)
+		[[nodiscard]] static constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> RotationXConstexpr(const RotX_& rot_x_)
 		{
 			return EmuMath::Helpers::MatrixRotationXConstexpr<RotIsRads_, NumIterations_, DoMod_, out_contained_type, OutColumnMajor_, RotX_>(rot_x_);
 		}
@@ -1941,7 +1941,7 @@ namespace EmuMath
 		/// <param name="rot_y_">The amount of radians or degrees to rotate about the Y-axis.</param>
 		/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the Y-axis by the passed number of radians or degrees.</returns>
 		template<bool RotIsRads_ = true, std::size_t NumIterations_ = 3, bool DoMod_ = true, typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = true, typename RotY_>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> RotationYConstexpr(const RotY_& rot_y_)
+		[[nodiscard]] static constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> RotationYConstexpr(const RotY_& rot_y_)
 		{
 			return EmuMath::Helpers::MatrixRotationYConstexpr<RotIsRads_, NumIterations_, DoMod_, out_contained_type, OutColumnMajor_, RotY_>(rot_y_);
 		}
@@ -1956,7 +1956,7 @@ namespace EmuMath
 		/// <param name="rot_z_">The amount of radians or degrees to rotate about the Z-axis.</param>
 		/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the Z-axis by the passed number of radians or degrees.</returns>
 		template<bool RotIsRads_ = true, std::size_t NumIterations_ = 3, bool DoMod_ = true, typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = true, typename RotZ_>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> RotationZConstexpr(const RotZ_& rot_z_)
+		[[nodiscard]] static constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> RotationZConstexpr(const RotZ_& rot_z_)
 		{
 			return EmuMath::Helpers::MatrixRotationZConstexpr<RotIsRads_, NumIterations_, DoMod_, out_contained_type, OutColumnMajor_, RotZ_>(rot_z_);
 		}
@@ -1967,7 +1967,7 @@ namespace EmuMath
 		/// <param name="rot_x_">The amount of radians or degrees to rotate about the X-axis.</param>
 		/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the X-axis by the passed number of radians or degrees.</returns>
 		template<bool RotIsRads_ = true, typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = true, typename RotX_>
-		[[nodiscard]] inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> RotationX(const RotX_& rot_x_)
+		[[nodiscard]] static inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> RotationX(const RotX_& rot_x_)
 		{
 			return EmuMath::Helpers::MatrixRotationX<RotIsRads_, out_contained_type, OutColumnMajor_, RotX_>(rot_x_);
 		}
@@ -1978,7 +1978,7 @@ namespace EmuMath
 		/// <param name="rot_y_">The amount of radians or degrees to rotate about the Y-axis.</param>
 		/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the Y-axis by the passed number of radians or degrees.</returns>
 		template<bool RotIsRads_ = true, typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = true, typename RotY_>
-		[[nodiscard]] inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> RotationY(const RotY_& rot_y_)
+		[[nodiscard]] static inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> RotationY(const RotY_& rot_y_)
 		{
 			return EmuMath::Helpers::MatrixRotationY<RotIsRads_, out_contained_type, OutColumnMajor_, RotY_>(rot_y_);
 		}
@@ -1989,7 +1989,7 @@ namespace EmuMath
 		/// <param name="rot_z_">The amount of radians or degrees to rotate about the Z-axis.</param>
 		/// <returns>4x4 EmuMath matrix which may be used to perform a rotation about the Z-axis by the passed number of radians or degrees.</returns>
 		template<bool RotIsRads_ = true, typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = true, typename RotZ_>
-		[[nodiscard]] inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> RotationZ(const RotZ_& rot_z_)
+		[[nodiscard]] static inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> RotationZ(const RotZ_& rot_z_)
 		{
 			return EmuMath::Helpers::MatrixRotationZ<RotIsRads_, out_contained_type, OutColumnMajor_, RotZ_>(rot_z_);
 		}

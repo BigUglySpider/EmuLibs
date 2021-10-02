@@ -383,29 +383,27 @@ namespace EmuMath
 
 		inline EmuMath::FastVector4f MultiplyVector4(__m128 rhs_vector_) const
 		{
-			__m128 out_x_ = _mm_mul_ps(column0, EmuMath::SIMD::shuffle<0, 0, 0, 0>(rhs_vector_));
-			__m128 out_y_ = _mm_mul_ps(column1, EmuMath::SIMD::shuffle<1, 1, 1, 1>(rhs_vector_));
-			__m128 out_z_ = _mm_mul_ps(column2, EmuMath::SIMD::shuffle<2, 2, 2, 2>(rhs_vector_));
-			__m128 out_w_ = _mm_mul_ps(column3, EmuMath::SIMD::shuffle<3, 3, 3, 3>(rhs_vector_));
-			return FastVector4f(_mm_add_ps(_mm_add_ps(out_x_, out_y_), _mm_add_ps(out_z_, out_w_)));
+			return FastVector4f(_std_mult_calculate_column(rhs_vector_));
 		}
 		inline EmuMath::FastVector4f MultiplyVector3(__m128 rhs_vector_) const
 		{
-			__m128 out_x_ = _mm_mul_ps(column0, EmuMath::SIMD::shuffle<0, 0, 0, 0>(rhs_vector_));
-			__m128 out_y_ = _mm_mul_ps(column1, EmuMath::SIMD::shuffle<1, 1, 1, 1>(rhs_vector_));
-			__m128 out_z_ = _mm_mul_ps(column2, EmuMath::SIMD::shuffle<2, 2, 2, 2>(rhs_vector_));
+			__m128 out_ = _mm_mul_ps(column0, EmuMath::SIMD::shuffle<0, 0, 0, 0>(rhs_vector_));
+			out_ = _mm_add_ps(out_, _mm_mul_ps(column1, EmuMath::SIMD::shuffle<1, 1, 1, 1>(rhs_vector_)));
+			out_ = _mm_add_ps(out_, _mm_mul_ps(column2, EmuMath::SIMD::shuffle<2, 2, 2, 2>(rhs_vector_)));
 
-			// Add column3 as we interpret the missing value to be 1 as per homogeneous coordinates default to
-			return FastVector4f(_mm_add_ps(_mm_add_ps(out_x_, out_y_), _mm_add_ps(out_z_, column3)));
+			// Add column3 to end result as we interpret the missing value to be 1 as per homogeneous coordinates default to
+			return FastVector4f(_mm_add_ps(out_, column3));
 		}
 		inline EmuMath::FastVector4f MultiplyVector2(__m128 rhs_vector_) const
 		{
-			__m128 out_x_ = _mm_mul_ps(column0, EmuMath::SIMD::shuffle<0, 0, 0, 0>(rhs_vector_));
-			__m128 out_y_ = _mm_mul_ps(column1, EmuMath::SIMD::shuffle<1, 1, 1, 1>(rhs_vector_));
-
 			// Add column3 as we interpret the missing w value to be 1 as per homogeneous coordinates default to, 
-			// and z is interpreted to be 0 since 2D space is implicitly at Z 0.
-			return FastVector4f(_mm_add_ps(_mm_add_ps(out_x_, out_y_), column3));
+			// and z is interpreted to be 0 since 2D space is implicitly at Z 0, so the resulting Z should always be 0.
+			__m128 out_ = _mm_mul_ps(column0, EmuMath::SIMD::shuffle<0, 0, 0, 0>(rhs_vector_));
+			out_ = _mm_add_ps(out_, _mm_mul_ps(column1, EmuMath::SIMD::shuffle<1, 1, 1, 1>(rhs_vector_)));
+			out_ = _mm_add_ps(out_, column3);
+
+			// AND out the z coord to maintain implicit Z 0, and continue to add homogeneous 
+			return FastVector4f(_mm_and_ps(EmuMath::SIMD::index_mask_m128<true, true, false, true>(), out_));
 		}
 
 		/// <summary>
@@ -573,6 +571,7 @@ namespace EmuMath
 			__m128 out_ = _mm_mul_ps(column0, rhs_shuffled_);
 
 			// Repeat above for each individual column index, performing dot product additions with each step
+			// --- We use separate add and mul operations instead of fmadd since it appears to be faster in most reasonable use cases
 			rhs_shuffled_ = EmuMath::SIMD::shuffle<1, 1, 1, 1>(rhs_column_);
 			out_ = _mm_add_ps(out_, _mm_mul_ps(column1, rhs_shuffled_));
 

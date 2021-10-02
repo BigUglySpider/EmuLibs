@@ -72,7 +72,7 @@ namespace EmuCore::TestingHelpers
 	struct MatEmu
 	{
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr std::size_t NUM_LOOPS = 5000000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr bool DO_TEST = true;
 		static constexpr std::string_view NAME = "Matrix (EmuMath SIMD)";
@@ -114,7 +114,7 @@ namespace EmuCore::TestingHelpers
 	struct MatEmuSISD
 	{
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr std::size_t NUM_LOOPS = 5000000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr bool DO_TEST = true;
 		static constexpr std::string_view NAME = "Matrix (EmuMath SISD)";
@@ -156,7 +156,7 @@ namespace EmuCore::TestingHelpers
 	struct MatDXM
 	{
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr std::size_t NUM_LOOPS = 5000000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr bool DO_TEST = true;
 		static constexpr std::string_view NAME = "Matrix (DirectXMath)";

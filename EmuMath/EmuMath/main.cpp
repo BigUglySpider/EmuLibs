@@ -134,17 +134,18 @@ int main()
 		0, 0, 1, 0,
 		1, 2, 3, 1
 	);
+	fast_4x4_from_scalars = fast_4x4_from_scalars.Multiply(EmuMath::FastMatrix4x4f_CM(EmuMath::Matrix4x4<float, true>::RotationX<false>(45.0f)));
 	EmuMath::FastVector4f vec_(1.0f, 2.0f, 3.0f, 1.0f);
 
 	std::cout << "Matrix:\n" << fast_4x4_from_scalars << "\n";
 	std::cout << "Vector:\n" << vec_ << "\n\n";
-	std::cout << "SIMD:\n" << fast_4x4_from_scalars.MultiplyVector4(vec_.data_) << "\n";
-	std::cout << "SISD:\n" << fast_4x4_from_scalars.Store().MultiplyVector(vec_.Store()) << "\n\n";
-	std::cout << "SIMD:\n" << fast_4x4_from_scalars.MultiplyVector3(vec_.data_) << "\n";
-	std::cout << "SISD:\n" << fast_4x4_from_scalars.Store().MultiplyVector(vec_.Store<0, 3>()) << "\n\n";
-	std::cout << "SIMD:\n" << fast_4x4_from_scalars.MultiplyVector2(vec_.data_) << "\n";
+	std::cout << "SIMD 4D:\n" << fast_4x4_from_scalars.MultiplyVector4(vec_.data_) << "\n";
+	std::cout << "SISD 4D:\n" << fast_4x4_from_scalars.Store().MultiplyVector(vec_.Store()) << "\n\n";
+	std::cout << "SIMD 3D:\n" << fast_4x4_from_scalars.MultiplyVector3(vec_.data_) << "\n";
+	std::cout << "SISD 3D:\n" << fast_4x4_from_scalars.Store().MultiplyVector(vec_.Store<0, 3>()) << "\n\n";
+	std::cout << "SIMD 2D:\n" << fast_4x4_from_scalars.MultiplyVector2(vec_.data_) << "\n";
 	auto temp_ = vec_.Store<0, 2>();
-	std::cout << "SISD:\n" << fast_4x4_from_scalars.Store().MultiplyVector(EmuMath::Vector3<float>(temp_[0], temp_[1], 0.0f)) << "\n\n";
+	std::cout << "SISD 2D:\n" << fast_4x4_from_scalars.Store().MultiplyVector(EmuMath::Vector3<float>(temp_[0], temp_[1], 0.0f)) << "\n\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
