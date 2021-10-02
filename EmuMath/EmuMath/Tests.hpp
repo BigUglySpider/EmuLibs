@@ -26,17 +26,19 @@ namespace EmuCore::TestingHelpers
 		template<typename T_>
 		constexpr inline T_ operator()(const T_& dummy_) const
 		{
+			static constexpr typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type MULT_ = 
+			static_cast<typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type>(0.001f);
+
 			if constexpr (std::numeric_limits<T_>::max() < std::numeric_limits<int>::max())
 			{
 				return static_cast<T_>
 				(
-					static_cast<T_>(rand() % static_cast<int>(std::numeric_limits<T_>::max())) * 
-					EmuCore::TMPHelpers::first_floating_point_t<T_, float>(0.9f)
+					static_cast<T_>(rand() % static_cast<int>(std::numeric_limits<T_>::max())) * MULT_
 				);
 			}
 			else
 			{
-				return static_cast<T_>(static_cast<T_>(rand()) * EmuCore::TMPHelpers::first_floating_point_t<T_, float>(0.9f));
+				return static_cast<T_>(static_cast<T_>(rand()) * MULT_);
 			}
 		}
 	};
@@ -73,7 +75,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr bool DO_TEST = true;
-		static constexpr std::string_view NAME = "Matrix (EmuMath)";
+		static constexpr std::string_view NAME = "Matrix (EmuMath SIMD)";
 
 		MatEmu()
 		{
@@ -108,6 +110,48 @@ namespace EmuCore::TestingHelpers
 		std::vector<EmuMath::FastMatrix4x4f_CM> lhs_;
 		std::vector<EmuMath::FastMatrix4x4f_CM> rhs_;
 		std::vector<EmuMath::FastMatrix4x4f_CM> out_;
+	};
+	struct MatEmuSISD
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+		static constexpr std::string_view NAME = "Matrix (EmuMath SISD)";
+
+		MatEmuSISD()
+		{
+		}
+		void Prepare()
+		{
+			srand(shared_seed_);
+			lhs_.resize(NUM_LOOPS);
+			rhs_.resize(NUM_LOOPS);
+			out_.resize(NUM_LOOPS);
+			EmuMath::Matrix4x4<float, true> temp_;
+			VectorFiller filler_ = VectorFiller();
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				temp_ = temp_.Mutate(filler_);
+				lhs_[i] = temp_;
+				temp_ = temp_.Mutate(filler_);
+				rhs_[i] = temp_;
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			out_[i] = lhs_[i].Multiply(rhs_[i]);
+		}
+		void OnTestsOver()
+		{
+			srand(shared_seed_b_);
+			std::size_t i = static_cast<std::size_t>(rand()) % NUM_LOOPS;
+			std::cout << lhs_[i] << "\nMULT\n" << rhs_[i] << "\n:\n" << out_[i] << "\n\n";
+		}
+
+		std::vector<EmuMath::Matrix4x4<float>> lhs_;
+		std::vector<EmuMath::Matrix4x4<float>> rhs_;
+		std::vector<EmuMath::Matrix4x4<float>> out_;
 	};
 	struct MatDXM
 	{
@@ -147,12 +191,20 @@ namespace EmuCore::TestingHelpers
 
 		DirectX::XMFLOAT4X4 MakeXMFromEmu(const EmuMath::Matrix4x4<float, true>& mat_) const
 		{
+			//return DirectX::XMFLOAT4X4
+			//(
+			//	mat_.at<0, 0>(), mat_.at<0, 1>(), mat_.at<0, 2>(), mat_.at<0, 3>(),
+			//	mat_.at<1, 0>(), mat_.at<1, 1>(), mat_.at<1, 2>(), mat_.at<1, 3>(),
+			//	mat_.at<2, 0>(), mat_.at<2, 1>(), mat_.at<2, 2>(), mat_.at<2, 3>(),
+			//	mat_.at<3, 0>(), mat_.at<3, 1>(), mat_.at<3, 2>(), mat_.at<3, 3>()
+			//);
+
 			return DirectX::XMFLOAT4X4
 			(
-				mat_.at<0, 0>(), mat_.at<0, 1>(), mat_.at<0, 2>(), mat_.at<0, 3>(),
-				mat_.at<1, 0>(), mat_.at<1, 1>(), mat_.at<1, 2>(), mat_.at<1, 3>(),
-				mat_.at<2, 0>(), mat_.at<2, 1>(), mat_.at<2, 2>(), mat_.at<2, 3>(),
-				mat_.at<3, 0>(), mat_.at<3, 1>(), mat_.at<3, 2>(), mat_.at<3, 3>()
+				mat_.at<0, 0>(), mat_.at<1, 0>(), mat_.at<2, 0>(), mat_.at<3, 0>(),
+				mat_.at<0, 1>(), mat_.at<1, 1>(), mat_.at<2, 1>(), mat_.at<3, 1>(),
+				mat_.at<0, 2>(), mat_.at<1, 2>(), mat_.at<2, 2>(), mat_.at<3, 2>(),
+				mat_.at<0, 3>(), mat_.at<1, 3>(), mat_.at<2, 3>(), mat_.at<3, 3>()
 			);
 		}
 		void OnTestsOver()
@@ -176,7 +228,7 @@ namespace EmuCore::TestingHelpers
 				std::cout << "{ ";
 				for (std::size_t y = 0; y < 4; ++y)
 				{
-					std::cout << readable_mat_(y, x);
+					std::cout << readable_mat_(x, y);
 					if (y != 3)
 					{
 						std::cout << ", ";
@@ -195,7 +247,8 @@ namespace EmuCore::TestingHelpers
 	using AllTests = std::tuple
 	<
 		MatEmu,
-		MatDXM
+		MatDXM,
+		MatEmuSISD
 	>;
 
 

@@ -342,7 +342,7 @@ namespace EmuMath
 			);
 		}
 		/// <summary>
-		/// <para> Performs a basic multiplication whre respective columns in this matrix are multiplied by those in the passed matrix. </para>
+		/// <para> Performs a basic multiplication where respective columns in this matrix are multiplied by those in the passed matrix. </para>
 		/// <para> This is not a standard matrix multiplication. For such behaviour, use Multiply instead. </para>
 		/// </summary>
 		/// <param name="rhs_">Matrix to multiply respective columns of this matrix by.</param>
@@ -361,42 +361,85 @@ namespace EmuMath
 			return MultiplyBasic(_mm_set_ps1(static_cast<float>(val_)));
 		}
 
+		/// <summary>
+		/// <para> Performs a standard matrix multiplication with the provided registers, which are interpreted as respective columns within a 4x4 matrix. </para>
+		/// <para> This is a standard matrix multiplication. To perform a basic multiplication of respective columns, use MultiplyBasic. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Column 0 of the matrix to multiply this matrix by.</param>
+		/// <param name="rhs_column_1_">Column 1 of the matrix to multiply this matrix by.</param>
+		/// <param name="rhs_column_2_">Column 2 of the matrix to multiply this matrix by.</param>
+		/// <param name="rhs_column_3_">Column 3 of the matrix to multiply this matrix by.</param>
+		/// <returns>Matrix result from multiplying this matrix by a matrix comprised of respective passed columns.</returns>
 		inline FastMatrix4x4f_CM Multiply(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
 		{
-			// Registers declared outside of loop to avoid removing from stack just to re-add
-			__m128 lhs_temp_;
-			__m128 temp_out_;
-			__m128 out_columns[4] = {};
-
-			// Pointer to columns to access them arbitrarily via the loop
-			const __m128* p_columns_ = &column0;
-
-			// Calculate a column per loop
-			for (std::size_t i = 0; i < 4; ++i)
-			{
-				// Column of the lhs_ vector to shuffle for individual values
-				__m128 column_ = *(p_columns_ + i);
-
-				// We use a shuffle instead of dumping values and broadcasting as it tends to be better optimised by the compiler
-				// --- NOTE: this is slower in debug compared to the broadcasting of dumped values, but faster in release
-				lhs_temp_ = EmuMath::SIMD::shuffle<0, 0, 0, 0>(column_);
-				temp_out_ = _mm_mul_ps(lhs_temp_, rhs_column_0_);
-
-				lhs_temp_ = EmuMath::SIMD::shuffle<1, 1, 1, 1>(column_);
-				temp_out_ = _mm_add_ps(temp_out_, _mm_mul_ps(lhs_temp_, rhs_column_1_));
-
-				lhs_temp_ = EmuMath::SIMD::shuffle<2, 2, 2, 2>(column_);
-				temp_out_ = _mm_add_ps(temp_out_, _mm_mul_ps(lhs_temp_, rhs_column_2_));
-
-				lhs_temp_ = EmuMath::SIMD::shuffle<3, 3, 3, 3>(column_);
-				out_columns[i] = _mm_add_ps(temp_out_, _mm_mul_ps(lhs_temp_, rhs_column_3_));
-			}
-
-			return FastMatrix4x4f_CM(out_columns[0], out_columns[1], out_columns[2], out_columns[3]);
+			return FastMatrix4x4f_CM
+			(
+				_std_mult_calculate_column(rhs_column_0_),
+				_std_mult_calculate_column(rhs_column_1_),
+				_std_mult_calculate_column(rhs_column_2_),
+				_std_mult_calculate_column(rhs_column_3_)
+			);
 		}
+
+		inline EmuMath::FastVector4f MultiplyVector4(__m128 rhs_vector_) const
+		{
+			__m128 out_x_ = _mm_mul_ps(column0, EmuMath::SIMD::shuffle<0, 0, 0, 0>(rhs_vector_));
+			__m128 out_y_ = _mm_mul_ps(column1, EmuMath::SIMD::shuffle<1, 1, 1, 1>(rhs_vector_));
+			__m128 out_z_ = _mm_mul_ps(column2, EmuMath::SIMD::shuffle<2, 2, 2, 2>(rhs_vector_));
+			__m128 out_w_ = _mm_mul_ps(column3, EmuMath::SIMD::shuffle<3, 3, 3, 3>(rhs_vector_));
+			return FastVector4f(_mm_add_ps(_mm_add_ps(out_x_, out_y_), _mm_add_ps(out_z_, out_w_)));
+		}
+		inline EmuMath::FastVector4f MultiplyVector3(__m128 rhs_vector_) const
+		{
+			__m128 out_x_ = _mm_mul_ps(column0, EmuMath::SIMD::shuffle<0, 0, 0, 0>(rhs_vector_));
+			__m128 out_y_ = _mm_mul_ps(column1, EmuMath::SIMD::shuffle<1, 1, 1, 1>(rhs_vector_));
+			__m128 out_z_ = _mm_mul_ps(column2, EmuMath::SIMD::shuffle<2, 2, 2, 2>(rhs_vector_));
+
+			// Add column3 as we interpret the missing value to be 1 as per homogeneous coordinates default to
+			return FastVector4f(_mm_add_ps(_mm_add_ps(out_x_, out_y_), _mm_add_ps(out_z_, column3)));
+		}
+		inline EmuMath::FastVector4f MultiplyVector2(__m128 rhs_vector_) const
+		{
+			__m128 out_x_ = _mm_mul_ps(column0, EmuMath::SIMD::shuffle<0, 0, 0, 0>(rhs_vector_));
+			__m128 out_y_ = _mm_mul_ps(column1, EmuMath::SIMD::shuffle<1, 1, 1, 1>(rhs_vector_));
+
+			// Add column3 as we interpret the missing w value to be 1 as per homogeneous coordinates default to, 
+			// and z is interpreted to be 0 since 2D space is implicitly at Z 0.
+			return FastVector4f(_mm_add_ps(_mm_add_ps(out_x_, out_y_), column3));
+		}
+
+		/// <summary>
+		/// <para> Performs a standard matrix multiplication with the provided rhs_ matrix. </para>
+		/// <para> This is a standard matrix multiplication. To perform a basic multiplication of respective columns, use MultiplyBasic. </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to multiply this matrix by.</param>
+		/// <returns>Matrix result from multiplying this matrix by a matrix comprised of respective passed columns.</returns>
 		inline FastMatrix4x4f_CM Multiply(const FastMatrix4x4f_CM& rhs_) const
 		{
 			return Multiply(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary>
+		/// <para> Multiplies all columns in this matrix by the passed register. Useful for providing a blanket multiplication to each element on certain rows. </para>
+		/// <para> This is the same as calling MultiplyBasic with the same argument. </para>
+		/// <para> If the register is to be interpreted as a vector, use MultiplyVector. </para>
+		/// </summary>
+		/// <param name="mult_for_all_columns_">Register to multiply every column of this matrix via.</param>
+		/// <returns>Resulting matrix after this matrix's columns are all multiplied by the passed register.</returns>
+		inline FastMatrix4x4f_CM Multiply(__m128 mult_for_all_columns_) const
+		{
+			return MultiplyBasic(mult_for_all_columns_);
+		}
+		/// <summary>
+		/// <para> Multiplies all elements within this matrix by the provided val_. The provided val_ must be castable to a float. </para>
+		/// <para> This is the same as calling MultiplyBasic with the same argument. </para>
+		/// </summary>
+		/// <typeparam name="T_">Type to multiply by.</typeparam>
+		/// <param name="val_">Value to multiply all elements of this matrix by.</param>
+		/// <returns>Resulting matrix after multiply all of this matrix's elements by the passed val_.</returns>
+		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		inline FastMatrix4x4f_CM Multiply(const T_& val_) const
+		{
+			return MultiplyBasic<T_>(val_);
 		}
 
 		inline FastMatrix4x4f_CM Negate() const
@@ -518,6 +561,26 @@ namespace EmuMath
 				static_assert(false, "Provided an invalid type to cast to a value within an EmuMath::FastMatrix4x4f_CM. The provided type must be possible to convert to a float.");
 				return false;
 			}
+		}
+#pragma endregion
+
+#pragma region UNDERLYING_HELPERS
+		inline __m128 _std_mult_calculate_column(__m128 rhs_column_) const
+		{
+			// We use a shuffle instead of dumping values and broadcasting as it tends to be better optimised by the compiler
+			// --- NOTE: this is slower in debug compared to the broadcasting of dumped values, but faster in release
+			__m128 rhs_shuffled_ = EmuMath::SIMD::shuffle<0, 0, 0, 0>(rhs_column_);
+			__m128 out_ = _mm_mul_ps(column0, rhs_shuffled_);
+
+			// Repeat above for each individual column index, performing dot product additions with each step
+			rhs_shuffled_ = EmuMath::SIMD::shuffle<1, 1, 1, 1>(rhs_column_);
+			out_ = _mm_add_ps(out_, _mm_mul_ps(column1, rhs_shuffled_));
+
+			rhs_shuffled_ = EmuMath::SIMD::shuffle<2, 2, 2, 2>(rhs_column_);
+			out_ = _mm_add_ps(out_, _mm_mul_ps(column2, rhs_shuffled_));
+
+			rhs_shuffled_ = EmuMath::SIMD::shuffle<3, 3, 3, 3>(rhs_column_);
+			return _mm_add_ps(out_, _mm_mul_ps(column3, rhs_shuffled_));
 		}
 #pragma endregion
 	};

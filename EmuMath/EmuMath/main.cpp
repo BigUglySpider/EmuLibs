@@ -125,6 +125,26 @@ int main()
 	std::cout << (fast_4x4_from_scalars != fast_4x4_from_scalars) << " | " << (fast_4x4_from_scalars == fast_4x4_from_scalars) << "\n";
 	std::cout << fast_4x4_from_scalars * 2.5L << "\n\n";
 	std::cout << fast_4x4_from_scalars.Multiply(fast_4x4_from_scalars) << "\n\n";
+	std::cout << "(Above as SISD):\n" << fast_4x4_from_scalars.Store().Multiply(fast_4x4_from_scalars.Store()) << "\n\n";
+
+	fast_4x4_from_scalars = EmuMath::FastMatrix4x4f_CM
+	(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		1, 2, 3, 1
+	);
+	EmuMath::FastVector4f vec_(1.0f, 2.0f, 3.0f, 1.0f);
+
+	std::cout << "Matrix:\n" << fast_4x4_from_scalars << "\n";
+	std::cout << "Vector:\n" << vec_ << "\n\n";
+	std::cout << "SIMD:\n" << fast_4x4_from_scalars.MultiplyVector4(vec_.data_) << "\n";
+	std::cout << "SISD:\n" << fast_4x4_from_scalars.Store().MultiplyVector(vec_.Store()) << "\n\n";
+	std::cout << "SIMD:\n" << fast_4x4_from_scalars.MultiplyVector3(vec_.data_) << "\n";
+	std::cout << "SISD:\n" << fast_4x4_from_scalars.Store().MultiplyVector(vec_.Store<0, 3>()) << "\n\n";
+	std::cout << "SIMD:\n" << fast_4x4_from_scalars.MultiplyVector2(vec_.data_) << "\n";
+	auto temp_ = vec_.Store<0, 2>();
+	std::cout << "SISD:\n" << fast_4x4_from_scalars.Store().MultiplyVector(EmuMath::Vector3<float>(temp_[0], temp_[1], 0.0f)) << "\n\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
