@@ -860,7 +860,7 @@ namespace EmuMath
 		)
 		{
 			// Process isn't particularly too vectorisable without adding a good few undesirable shuffles
-			// --- Additionally, this way is generally 15-25% faster than DirectXMath's equivalent in tests
+			// --- Additionally, this way is generally 15-25% faster than DirectXMath's equivalent in tests in release with optimisations
 			float right_plus_left_ = static_cast<float>(right_) + static_cast<float>(left_);
 			float top_plus_bottom_ = static_cast<float>(top_) + static_cast<float>(bottom_);
 			float right_minus_left_reciprocal_ = 1.0f / (static_cast<float>(right_) - static_cast<float>(left_));
