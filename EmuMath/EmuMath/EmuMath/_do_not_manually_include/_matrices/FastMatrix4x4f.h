@@ -12,9 +12,15 @@ namespace EmuMath
 	{
 	public:
 #pragma region CONSTRUCTORS
+		/// <summary> Creates a 4x4 column-major matrix with default-constructed registers. </summary>
 		FastMatrix4x4f_CM() : column0(), column1(), column2(), column3()
 		{
 		}
+		/// <summary> Creates a 4x4 column-major matrix which has columns matching the respective input registers. </summary>
+		/// <param name="column_0_">Register to copy to this matrix's 0th column.</param>
+		/// <param name="column_1_">Register to copy to this matrix's 1st column.</param>
+		/// <param name="column_2_">Register to copy to this matrix's 2nd column.</param>
+		/// <param name="column_3_">Register to copy to this matrix's 3rd column.</param>
 		FastMatrix4x4f_CM(__m128 column_0_, __m128 column_1_, __m128 column_2_, __m128 column_3_) :
 			column0(column_0_),
 			column1(column_1_),
@@ -22,6 +28,8 @@ namespace EmuMath
 			column3(column_3_)
 		{
 		}
+		/// <summary> Creates a 4x4 column-major matrix which copies the respective columns of the passed matrix. </summary>
+		/// <param name="to_copy_">Matrix to copy the columns of.</param>
 		FastMatrix4x4f_CM(const FastMatrix4x4f_CM& to_copy_) :
 			column0(to_copy_.column0),
 			column1(to_copy_.column1),
@@ -29,7 +37,53 @@ namespace EmuMath
 			column3(to_copy_.column3)
 		{
 		}
-		template<typename std::size_t InColumns_, std::size_t InRows_, typename in_contained_type, bool InColumnMajor_>
+		/// <summary>
+		/// <para> Creates a 4x4 column-major matrix which loads the passed pointed-to floats directly into their respective column registers. </para>
+		/// <para> Behaviour is undefined if any of the passed pointers are not contiguous for at least 4 floats. </para>
+		/// </summary>
+		/// <param name="p_column_0_contiguous_4_floats_">Pointer to 4 contiguous floats to load into this matrix's 0th column.</param>
+		/// <param name="p_column_1_contiguous_4_floats_">Pointer to 4 contiguous floats to load into this matrix's 1st column.</param>
+		/// <param name="p_column_2_contiguous_4_floats_">Pointer to 4 contiguous floats to load into this matrix's 2nd column.</param>
+		/// <param name="p_column_3_contiguous_4_floats_">Pointer to 4 contiguous floats to load into this matrix's 3rd column.</param>
+		FastMatrix4x4f_CM
+		(
+			const float* p_column_0_contiguous_4_floats_,
+			const float* p_column_1_contiguous_4_floats_,
+			const float* p_column_2_contiguous_4_floats_,
+			const float* p_column_3_contiguous_4_floats_
+		) :
+			column0(_mm_load_ps(p_column_0_contiguous_4_floats_)),
+			column1(_mm_load_ps(p_column_1_contiguous_4_floats_)),
+			column2(_mm_load_ps(p_column_2_contiguous_4_floats_)),
+			column3(_mm_load_ps(p_column_3_contiguous_4_floats_))
+		{
+		}
+		/// <summary>
+		/// <para>
+		///		Creates a 4x4 column-major matrix which loads the pointed-to floats directly into its registers contiguously,
+		///		where 4 sequential floats represent one column.
+		/// </para>
+		/// <para> Behaviour is undefined if the passed pointer is not contiguous for at least 16 floats. </para>
+		/// </summary>
+		/// <param name="p_16_contiguous_floats">Pointer to 16 contiguous floats to load into this matrix's data, starting from the 0th column.</param>
+		explicit FastMatrix4x4f_CM(const float* p_16_contiguous_floats) :
+			column0(_mm_load_ps(p_16_contiguous_floats)),
+			column1(_mm_load_ps(p_16_contiguous_floats + 4)),
+			column2(_mm_load_ps(p_16_contiguous_floats + 8)),
+			column3(_mm_load_ps(p_16_contiguous_floats + 12))
+		{
+		}
+		/// <summary> Creates a 4x4 column-major matrix from the theoretical data of the passed EmuMath matrix. </summary>
+		/// <typeparam name="in_contained_type">Type contained within the provided matrix. Must be convertible to a float.</typeparam>
+		/// <param name="to_copy_">EmuMath matrix to copy into this matrix's column registers.</param>
+		template
+		<
+			typename std::size_t InColumns_,
+			std::size_t InRows_,
+			typename in_contained_type,
+			bool InColumnMajor_,
+			typename RequiresInContainedTypeCastableToFloat = std::enable_if_t<std::is_convertible_v<in_contained_type, float>>
+		>
 		explicit FastMatrix4x4f_CM(const EmuMath::Matrix<InColumns_, InRows_, in_contained_type, InColumnMajor_>& to_copy_) :
 			column0
 			(
@@ -73,6 +127,25 @@ namespace EmuMath
 			)
 		{
 		}
+		/// <summary> Creates a 4x4 column-major matrix from the data of the passed 4x4 column-major EmuMath matrix, loading its data directly into column registers. </summary>
+		/// <param name="to_load_">4x4 column-major EmuMath matrix containing floats to load the data of.</param>
+		template<>
+		explicit FastMatrix4x4f_CM(const EmuMath::Matrix<4, 4, float, true>& to_load_) :
+			column0(_mm_load_ps(to_load_.at<0>().data())),
+			column1(_mm_load_ps(to_load_.at<1>().data())),
+			column2(_mm_load_ps(to_load_.at<2>().data())),
+			column3(_mm_load_ps(to_load_.at<3>().data()))
+		{
+		}
+		/// <summary> Creates a 4x4 column-major matrix using EmuMath vectors to create each respective column's data. </summary>
+		/// <typeparam name="contained_type_0">Type contained in the vector used to create column 0.</typeparam>
+		/// <typeparam name="contained_type_1">Type contained in the vector used to create column 1.</typeparam>
+		/// <typeparam name="contained_type_2">Type contained in the vector used to create column 2.</typeparam>
+		/// <typeparam name="contained_type_3">Type contained in the vector used to create column 3.</typeparam>
+		/// <param name="column_0_">EmuMath vector used to create this matrix's 0th column.</param>
+		/// <param name="column_1_">EmuMath vector used to create this matrix's 1st column.</param>
+		/// <param name="column_2_">EmuMath vector used to create this matrix's 2nd column.</param>
+		/// <param name="column_3_">EmuMath vector used to create this matrix's 3rd column.</param>
 		template
 		<
 			std::size_t Size0_, typename contained_type_0,
@@ -93,6 +166,64 @@ namespace EmuMath
 			column3(EmuMath::SIMD::m128_from_emu_math_vector(column_3_))
 		{
 		}
+		/// <summary> Creates a 4x4 column-major matrix using the registers of the passed vectors to create each respective column's data. </summary>
+		/// <typeparam name="contained_type_0">Type contained in the vector used to create column 0.</typeparam>
+		/// <typeparam name="contained_type_1">Type contained in the vector used to create column 1.</typeparam>
+		/// <typeparam name="contained_type_2">Type contained in the vector used to create column 2.</typeparam>
+		/// <typeparam name="contained_type_3">Type contained in the vector used to create column 3.</typeparam>
+		/// <param name="column_0_">Vector used to create this matrix's 0th column.</param>
+		/// <param name="column_1_">Vector used to create this matrix's 1st column.</param>
+		/// <param name="column_2_">Vector used to create this matrix's 2nd column.</param>
+		/// <param name="column_3_">Vector used to create this matrix's 3rd column.</param>
+		FastMatrix4x4f_CM
+		(
+			const EmuMath::FastVector4f& column_0_,
+			const EmuMath::FastVector4f& column_1_,
+			const EmuMath::FastVector4f& column_2_,
+			const EmuMath::FastVector4f& column_3_
+		) :
+			column0(column_0_.data_),
+			column1(column_1_.data_),
+			column2(column_2_.data_),
+			column3(column_3_.data_)
+		{
+		}
+		/// <summary>
+		///		Creates a 4x4 column-major matrix using the passed data as contiguous initialisation values for its columns.
+		///		Arguments are taken in column-major order.
+		/// </summary>
+		/// <typeparam name="C0R0_">Type used to provide this matrix's 0th column's 0th element.</typeparam>
+		/// <typeparam name="C0R1_">Type used to provide this matrix's 0th column's 1st element.</typeparam>
+		/// <typeparam name="C0R2_">Type used to provide this matrix's 0th column's 2nd element.</typeparam>
+		/// <typeparam name="C0R3_">Type used to provide this matrix's 0th column's 3rd element.</typeparam>
+		/// <typeparam name="C1R0_">Type used to provide this matrix's 1st column's 0th element.</typeparam>
+		/// <typeparam name="C1R1_">Type used to provide this matrix's 1st column's 1st element.</typeparam>
+		/// <typeparam name="C1R2_">Type used to provide this matrix's 1st column's 2nd element.</typeparam>
+		/// <typeparam name="C1R3_">Type used to provide this matrix's 1st column's 3rd element.</typeparam>
+		/// <typeparam name="C2R0_">Type used to provide this matrix's 2nd column's 0th element.</typeparam>
+		/// <typeparam name="C2R1_">Type used to provide this matrix's 2nd column's 1st element.</typeparam>
+		/// <typeparam name="C2R2_">Type used to provide this matrix's 2nd column's 2nd element.</typeparam>
+		/// <typeparam name="C2R3_">Type used to provide this matrix's 2nd column's 3rd element.</typeparam>
+		/// <typeparam name="C3R0_">Type used to provide this matrix's 3rd column's 0th element.</typeparam>
+		/// <typeparam name="C3R1_">Type used to provide this matrix's 3rd column's 1st element.</typeparam>
+		/// <typeparam name="C3R2_">Type used to provide this matrix's 3rd column's 2nd element.</typeparam>
+		/// <typeparam name="C3R3_">Type used to provide this matrix's 3rd column's 3rd element.</typeparam>
+		/// <param name="c0r0_">Value used to initialise this matrix's 0th column's 0th element.</param>
+		/// <param name="c0r1_">Value used to initialise this matrix's 0th column's 1st element.</param>
+		/// <param name="c0r2_">Value used to initialise this matrix's 0th column's 2nd element.</param>
+		/// <param name="c0r3_">Value used to initialise this matrix's 0th column's 3rd element.</param>
+		/// <param name="c1r0_">Value used to initialise this matrix's 1st column's 0th element.</param>
+		/// <param name="c1r1_">Value used to initialise this matrix's 1st column's 1st element.</param>
+		/// <param name="c1r2_">Value used to initialise this matrix's 1st column's 2nd element.</param>
+		/// <param name="c1r3_">Value used to initialise this matrix's 1st column's 3rd element.</param>
+		/// <param name="c2r0_">Value used to initialise this matrix's 2nd column's 0th element.</param>
+		/// <param name="c2r1_">Value used to initialise this matrix's 2nd column's 1st element.</param>
+		/// <param name="c2r2_">Value used to initialise this matrix's 2nd column's 2nd element.</param>
+		/// <param name="c2r3_">Value used to initialise this matrix's 2nd column's 3rd element.</param>
+		/// <param name="c3r0_">Value used to initialise this matrix's 3rd column's 0th element.</param>
+		/// <param name="c3r1_">Value used to initialise this matrix's 3rd column's 1st element.</param>
+		/// <param name="c3r2_">Value used to initialise this matrix's 3rd column's 2nd element.</param>
+		/// <param name="c3r3_">Value used to initialise this matrix's 3rd column's 3rd element.</param>
 		template
 		<
 			typename C0R0_, typename C0R1_, typename C0R2_, typename C0R3_,
@@ -117,7 +248,7 @@ namespace EmuMath
 
 #pragma region EXTRACTION
 		/// <summary> Returns a copy of the value at the provided column and row index. </summary>
-		/// <returns></returns>
+		/// <returns>Copy of the element at the provided column and row index.</returns>
 		template<std::size_t ColumnIndex_, std::size_t RowIndex_, typename Out_ = float>
 		[[nodiscard]] Out_ at() const
 		{
@@ -134,7 +265,21 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Invalid indices provided to EmuMath::FastMatrix4x4f_CM::at.");
+				static_assert(false, "Invalid indices provided to EmuMath::FastMatrix4x4f_CM::at<ColumnIndex_, RowIndex_>.");
+			}
+		}
+		/// <summary> Returns a copy of the major register at the provided major index. </summary>
+		/// <returns>Register copy of the major register at the provided major index.</returns>
+		template<std::size_t MajorIndex_>
+		[[nodiscard]] __m128 at() const
+		{
+			if constexpr (_assert_valid_major_index<MajorIndex_>())
+			{
+				return GetColumn<MajorIndex_>();
+			}
+			else
+			{
+				static_assert(false, "Invalid Major Index provided to EmuMath::FastMatrix4x4f_CM::at<MajorIndex_>.");
 			}
 		}
 
@@ -381,10 +526,23 @@ namespace EmuMath
 			);
 		}
 
+		/// <summary> Multiplies the passed rhs_vector_ register with this matrix, treating it as a single column matrix. </summary>
+		/// <param name="rhs_vector_">Vector to multiply. Used as-is.</param>
+		/// <returns>Resulting vector from multiplying the passed vector by this matrix, interpreted as defined above.</returns>
 		inline EmuMath::FastVector4f MultiplyVector4(__m128 rhs_vector_) const
 		{
 			return FastVector4f(_std_mult_calculate_column(rhs_vector_));
 		}
+		inline EmuMath::FastVector4f MultiplyVector4(const EmuMath::FastVector4f& rhs_vector_) const
+		{
+			return MultiplyVector4(rhs_vector_.data_);
+		}
+		/// <summary>
+		/// <para> Multiplies the passed rhs_vector_ register with this matrix, treating it as a single column matrix. </para>
+		/// <para> The rhs_vector_ is assumed to have a w value of 1, as per homogeneous coordinates. </para>
+		/// </summary>
+		/// <param name="rhs_vector_">Vector to multiply. The x, y, and z values of this vector will be used, and w will be interpreted as 1.</param>
+		/// <returns>Resulting vector from multiplying the passed vector by this matrix, interpreted as defined above.</returns>
 		inline EmuMath::FastVector4f MultiplyVector3(__m128 rhs_vector_) const
 		{
 			__m128 out_ = _mm_mul_ps(column0, EmuMath::SIMD::shuffle<0, 0, 0, 0>(rhs_vector_));
@@ -394,6 +552,17 @@ namespace EmuMath
 			// Add column3 to end result as we interpret the missing value to be 1 as per homogeneous coordinates default to
 			return FastVector4f(_mm_add_ps(out_, column3));
 		}
+		inline EmuMath::FastVector4f MultiplyVector3(const EmuMath::FastVector4f& rhs_vector_) const
+		{
+			return MultiplyVector3(rhs_vector_.data_);
+		}
+		/// <summary>
+		/// <para> Multiplies the passed rhs_vector_ register with this matrix, treating it as a single column matrix. </para>
+		/// <para> The rhs_vector_ is assumed to have a z value of 0, as 2D space can be considered to have an implicit Z-coordinate of 0. </para>
+		/// <para> The rhs_vector_ is assumed to have a w value of 1, as per homogeneous coordinates. </para>
+		/// </summary>
+		/// <param name="rhs_vector_">Vector to multiply. The x and y values of this vector will be used, z will be interpreted as 0, and w will be interpreted as 1.</param>
+		/// <returns>Resulting vector from multiplying the passed vector by this matrix, interpreted as defined above. The output z will always be 0.</returns>
 		inline EmuMath::FastVector4f MultiplyVector2(__m128 rhs_vector_) const
 		{
 			// Add column3 as we interpret the missing w value to be 1 as per homogeneous coordinates default to, 
@@ -404,6 +573,10 @@ namespace EmuMath
 
 			// AND out the z coord to maintain implicit Z 0, and continue to add homogeneous 
 			return FastVector4f(_mm_and_ps(EmuMath::SIMD::index_mask_m128<true, true, false, true>(), out_));
+		}
+		inline EmuMath::FastVector4f MultiplyVector2(const EmuMath::FastVector4f& rhs_vector_) const
+		{
+			return MultiplyVector2(rhs_vector_.data_);
 		}
 
 		/// <summary>
@@ -440,6 +613,8 @@ namespace EmuMath
 			return MultiplyBasic<T_>(val_);
 		}
 
+		/// <summary> Negates this matrix, setting every element to its negative form (e.g. [0][0] = -[0][0]). </summary>
+		/// <returns>Negated form of this matrix.</returns>
 		inline FastMatrix4x4f_CM Negate() const
 		{
 			__m128 zero_ = _mm_setzero_ps();
@@ -495,12 +670,118 @@ namespace EmuMath
 		{
 			return MultiplyBasic<T_>(rhs_);
 		}
+		inline FastMatrix4x4f_CM operator*(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return Multiply(rhs_);
+		}
 #pragma endregion
 
 #pragma region MATRIX_OPERATIONS
 		inline FastMatrix4x4f_CM Transpose() const
 		{
 			return FastMatrix4x4f_CM(GetRow<0>(), GetRow<1>(), GetRow<2>(), GetRow<3>());
+		}
+
+		/// <summary> Provides a fast vector containing the trace of this matrix within its data. </summary>
+		/// <returns>Trace of this matrix represented as a FastVector4f.</returns>
+		inline EmuMath::FastVector4f Trace() const
+		{
+			__m128 out_01_ = EmuMath::SIMD::shuffle<0, 0, 1, 1>(column0, column1);
+			__m128 out_23_ = EmuMath::SIMD::shuffle<2, 2, 3, 3>(column2, column3);
+
+			return EmuMath::FastVector4f(EmuMath::SIMD::shuffle<0, 2, 0, 2>(out_01_, out_23_));
+		}
+#pragma endregion
+
+#pragma region STATIC_TRANSFORMATIONS
+		template<typename X_, typename Y_, typename Z_>
+		[[nodiscard]] static inline FastMatrix4x4f_CM Translation(const X_& x_, const Y_& y_, const Z_& z_)
+		{
+			return FastMatrix4x4f_CM
+			(
+				1.0f, 0.0f, 0.0f, 0.0f,
+				0.0f, 1.0f, 0.0f, 0.0f,
+				0.0f, 0.0f, 1.0f, 0.0f,
+				x_,   y_,   z_,   1.0f
+			);
+		}
+
+		template<typename X_, typename Y_, typename Z_>
+		[[nodiscard]] static inline FastMatrix4x4f_CM Scale(const X_& x_, const Y_& y_, const Z_& z_)
+		{
+			return FastMatrix4x4f_CM
+			(
+				x_,   0.0f, 0.0f, 0.0f,
+				0.0f, y_,   0.0f, 0.0f,
+				0.0f, 0.0f, z_,   0.0f,
+				0.0f, 0.0f, 0.0f, 1.0f
+			);
+		}
+
+		template<bool RotIsRads_ = true, typename RotX_>
+		[[nodiscard]] static inline FastMatrix4x4f_CM RotationX(const RotX_& rot_x_)
+		{
+			if constexpr(RotIsRads_)
+			{
+				float cos_x_ = static_cast<float>(EmuCore::do_cos<RotX_>()(rot_x_));
+				float sin_x_ = static_cast<float>(EmuCore::do_sin<RotX_>()(rot_x_));
+				return FastMatrix4x4f_CM
+				(
+					1.0f, 0.0f,   0.0f,    0.0f,
+					0.0f, cos_x_, -sin_x_, 0.0f,
+					0.0f, sin_x_, cos_x_,  0.0f,
+					0.0f, 0.0f,   0.0f,    1.0f
+				);
+			}
+			else
+			{
+				using rot_x_fp = typename EmuCore::TMPHelpers::first_floating_point_t<RotX_, float>;
+				return RotationX<true>(EmuCore::Pi::DegsToRads(static_cast<rot_x_fp>(rot_x_)));
+			}
+		}
+
+		template<bool RotIsRads_ = true, typename RotY_>
+		[[nodiscard]] static inline FastMatrix4x4f_CM RotationY(const RotY_& rot_y_)
+		{
+			if constexpr(RotIsRads_)
+			{
+				float cos_y_ = static_cast<float>(EmuCore::do_cos<RotY_>()(rot_y_));
+				float sin_y_ = static_cast<float>(EmuCore::do_sin<RotY_>()(rot_y_));
+				return FastMatrix4x4f_CM
+				(
+					cos_y_,  0.0f, sin_y_, 0.0f,
+					0.0f,    1.0f, 0.0f,   0.0f,
+					-sin_y_, 0.0f, cos_y_, 0.0f,
+					0.0f,    0.0f, 0.0f,   1.0f
+				);
+			}
+			else
+			{
+				using rot_y_fp = typename EmuCore::TMPHelpers::first_floating_point_t<RotY_, float>;
+				return RotationY<true>(EmuCore::Pi::DegsToRads(static_cast<rot_y_fp>(rot_y_)));
+			}
+		}
+
+		template<bool RotIsRads_ = true, typename RotZ_>
+		[[nodiscard]] static inline FastMatrix4x4f_CM RotationZ(const RotZ_& rot_z_)
+		{
+			if constexpr(RotIsRads_)
+			{
+				float cos_z_ = static_cast<float>(EmuCore::do_cos<RotZ_>()(rot_z_));
+				float sin_z_ = static_cast<float>(EmuCore::do_sin<RotZ_>()(rot_z_));
+				return FastMatrix4x4f_CM
+				(
+					cos_z_,  sin_z_, 0.0f, 0.0f,
+					-sin_z_, cos_z_, 0.0f, 0.0f,
+					0.0f,    0.0f,   1.0f, 0.0f,
+					0.0f,    0.0f,   0.0f, 1.0f
+				);
+			}
+			else
+			{
+				using rot_z_fp = typename EmuCore::TMPHelpers::first_floating_point_t<RotZ_, float>;
+				return RotationZ<true>(EmuCore::Pi::DegsToRads(static_cast<rot_z_fp>(rot_z_)));
+			}
 		}
 #pragma endregion
 
@@ -558,6 +839,20 @@ namespace EmuMath
 			{
 				static_assert(false, "Provided an invalid type to cast to a value within an EmuMath::FastMatrix4x4f_CM. The provided type must be possible to convert to a float.");
 				return false;
+			}
+		}
+
+		template<std::size_t MajorIndex_>
+		static constexpr inline bool _assert_valid_major_index()
+		{
+			if constexpr (MajorIndex_ < 4)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+				static_assert(false, "Provided an invalid Major Index for accessing an EmuMath::FastMatrix4x4f_CM. 0-3 (inclusive) is the valid Major Index range, the same as its Column range.");
 			}
 		}
 #pragma endregion

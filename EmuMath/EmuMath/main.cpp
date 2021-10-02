@@ -120,6 +120,7 @@ int main()
 	std::cout << "Column[1]: " << fast_4x4_from_scalars.GetColumnReadable<1>() << "\n";
 	std::cout << "Column[2]: " << fast_4x4_from_scalars.GetColumnReadable<2>() << "\n";
 	std::cout << "Column[3]: " << fast_4x4_from_scalars.GetColumnReadable<3>() << "\n";
+	std::cout << "Trace: " << fast_4x4_from_scalars.Trace() << "\n";
 	std::cout << "Stored as column-major matrix:\n" << fast_4x4_from_scalars.Store<float, true>() << "\n";
 	std::cout << "Stored as row-major matrix:\n" << fast_4x4_from_scalars.Store<float, false>() << "\n";
 	std::cout << (fast_4x4_from_scalars != fast_4x4_from_scalars) << " | " << (fast_4x4_from_scalars == fast_4x4_from_scalars) << "\n";
@@ -127,25 +128,17 @@ int main()
 	std::cout << fast_4x4_from_scalars.Multiply(fast_4x4_from_scalars) << "\n\n";
 	std::cout << "(Above as SISD):\n" << fast_4x4_from_scalars.Store().Multiply(fast_4x4_from_scalars.Store()) << "\n\n";
 
-	fast_4x4_from_scalars = EmuMath::FastMatrix4x4f_CM
-	(
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		1, 2, 3, 1
-	);
-	fast_4x4_from_scalars = fast_4x4_from_scalars.Multiply(EmuMath::FastMatrix4x4f_CM(EmuMath::Matrix4x4<float, true>::RotationX<false>(45.0f)));
-	EmuMath::FastVector4f vec_(1.0f, 2.0f, 3.0f, 1.0f);
-
-	std::cout << "Matrix:\n" << fast_4x4_from_scalars << "\n";
-	std::cout << "Vector:\n" << vec_ << "\n\n";
-	std::cout << "SIMD 4D:\n" << fast_4x4_from_scalars.MultiplyVector4(vec_.data_) << "\n";
-	std::cout << "SISD 4D:\n" << fast_4x4_from_scalars.Store().MultiplyVector(vec_.Store()) << "\n\n";
-	std::cout << "SIMD 3D:\n" << fast_4x4_from_scalars.MultiplyVector3(vec_.data_) << "\n";
-	std::cout << "SISD 3D:\n" << fast_4x4_from_scalars.Store().MultiplyVector(vec_.Store<0, 3>()) << "\n\n";
-	std::cout << "SIMD 2D:\n" << fast_4x4_from_scalars.MultiplyVector2(vec_.data_) << "\n";
-	auto temp_ = vec_.Store<0, 2>();
-	std::cout << "SISD 2D:\n" << fast_4x4_from_scalars.Store().MultiplyVector(EmuMath::Vector3<float>(temp_[0], temp_[1], 0.0f)) << "\n\n";
+	std::cout << "TRANSFORMATIONS\n";
+	std::cout << "Translation(1, 2, 3) SIMD:\n" << EmuMath::FastMatrix4x4f_CM::Translation(1, 2, 3) << "\n";
+	std::cout << "Translation(1, 2, 3) SISD:\n" << EmuMath::Matrix4x4<float, true>::Translation(1, 2, 3) << "\n\n";
+	std::cout << "Scale(1.5, -2, 3.3) SIMD:\n" << EmuMath::FastMatrix4x4f_CM::Scale(1.5, -2, 3.3) << "\n";
+	std::cout << "Scale(1.5, -2, 3.3) SISD:\n" << EmuMath::Matrix4x4<float, true>::Scale(1.5, -2, 3.3) << "\n\n";
+	std::cout << "RotationX<false>(33) SIMD:\n" << EmuMath::FastMatrix4x4f_CM::RotationX<false>(33.0f) << "\n";
+	std::cout << "RotationX<false>(33) SISD:\n" << EmuMath::Matrix4x4<float, true>::RotationX<false>(33.0f) << "\n\n";
+	std::cout << "RotationY<false>(33) SIMD:\n" << EmuMath::FastMatrix4x4f_CM::RotationY<false>(33) << "\n";
+	std::cout << "RotationY<false>(33) SISD:\n" << EmuMath::Matrix4x4<float, true>::RotationY<false>(33) << "\n\n";
+	std::cout << "RotationZ<false>(33) SIMD:\n" << EmuMath::FastMatrix4x4f_CM::RotationZ<false>(33) << "\n";
+	std::cout << "RotationZ<false>(33) SISD:\n" << EmuMath::Matrix4x4<float, true>::RotationZ<false>(33) << "\n\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

@@ -339,12 +339,13 @@ namespace EmuCore
 	template<typename T_>
 	struct do_cos
 	{
+		using out_t = typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type;
 		constexpr do_cos()
 		{
 		}
-		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline out_t operator()(const T_& t_) const
 		{
-			return EmuCore::DoMatchingCos<T_, T_>(t_);
+			return EmuCore::DoMatchingCos<out_t, T_>(t_);
 		}
 	};
 	template<>
@@ -354,7 +355,7 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline auto operator()(const T_& t_) const
 		{
 			return do_cos<T_>()(t_);
 		}
@@ -363,12 +364,13 @@ namespace EmuCore
 	template<typename T_>
 	struct do_acos
 	{
+		using out_t = typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type;
 		constexpr do_acos()
 		{
 		}
-		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline out_t operator()(const T_& t_) const
 		{
-			return EmuCore::DoMatchingAcos<T_, T_>(t_);
+			return EmuCore::DoMatchingAcos<out_t, T_>(t_);
 		}
 	};
 	template<>
@@ -378,7 +380,7 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline auto operator()(const T_& t_) const
 		{
 			return do_acos<T_>()(t_);
 		}
@@ -387,12 +389,13 @@ namespace EmuCore
 	template<typename T_>
 	struct do_sin
 	{
+		using out_t = typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type;
 		constexpr do_sin()
 		{
 		}
-		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline out_t operator()(const T_& t_) const
 		{
-			return EmuCore::DoMatchingSin<T_, T_>(t_);
+			return EmuCore::DoMatchingSin<out_t, T_>(t_);
 		}
 	};
 	template<>
@@ -402,7 +405,7 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline auto operator()(const T_& t_) const
 		{
 			return do_sin<T_>()(t_);
 		}
@@ -411,12 +414,13 @@ namespace EmuCore
 	template<typename T_>
 	struct do_asin
 	{
+		using out_t = typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type;
 		constexpr do_asin()
 		{
 		}
-		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline out_t operator()(const T_& t_) const
 		{
-			return EmuCore::DoMatchingAsin<T_, T_>(t_);
+			return EmuCore::DoMatchingAsin<out_t, T_>(t_);
 		}
 	};
 	template<>
@@ -426,7 +430,7 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline auto operator()(const T_& t_) const
 		{
 			return do_asin<T_>()(t_);
 		}
@@ -435,12 +439,13 @@ namespace EmuCore
 	template<typename T_>
 	struct do_tan
 	{
+		using out_t = typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type;
 		constexpr do_tan()
 		{
 		}
-		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline out_t operator()(const T_& t_) const
 		{
-			return EmuCore::DoMatchingTan<T_, T_>(t_);
+			return EmuCore::DoMatchingTan<out_t, T_>(t_);
 		}
 	};
 	template<>
@@ -450,7 +455,7 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline auto operator()(const T_& t_) const
 		{
 			return do_tan<T_>()(t_);
 		}
@@ -459,12 +464,13 @@ namespace EmuCore
 	template<typename T_>
 	struct do_atan
 	{
+		using out_t = typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type;
 		constexpr do_atan()
 		{
 		}
-		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline out_t operator()(const T_& t_) const
 		{
-			return EmuCore::DoMatchingAtan<T_, T_>(t_);
+			return EmuCore::DoMatchingAtan<out_t, T_>(t_);
 		}
 	};
 	template<>
@@ -474,7 +480,7 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline T_ operator()(const T_& t_) const
+		[[nodiscard]] constexpr inline auto operator()(const T_& t_) const
 		{
 			return do_atan<T_>()(t_);
 		}

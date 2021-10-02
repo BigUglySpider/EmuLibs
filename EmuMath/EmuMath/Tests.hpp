@@ -72,7 +72,7 @@ namespace EmuCore::TestingHelpers
 	struct MatEmu
 	{
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 5000000;
+		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr bool DO_TEST = true;
 		static constexpr std::string_view NAME = "Matrix (EmuMath SIMD)";
@@ -83,38 +83,45 @@ namespace EmuCore::TestingHelpers
 		void Prepare()
 		{
 			srand(shared_seed_);
-			lhs_.resize(NUM_LOOPS);
-			rhs_.resize(NUM_LOOPS);
+			//lhs_.resize(NUM_LOOPS);
+			//rhs_.resize(NUM_LOOPS);
 			out_.resize(NUM_LOOPS);
+			angles_.resize(NUM_LOOPS);
 			EmuMath::Matrix4x4<float, true> temp_;
 			VectorFiller filler_ = VectorFiller();
+
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				temp_ = temp_.Mutate(filler_);
-				lhs_[i] = EmuMath::FastMatrix4x4f_CM(temp_);
-				temp_ = temp_.Mutate(filler_);
-				rhs_[i] = EmuMath::FastMatrix4x4f_CM(temp_);
+				//temp_ = temp_.Mutate(filler_);
+				//lhs_[i] = EmuMath::FastMatrix4x4f_CM(temp_);
+				//temp_ = temp_.Mutate(filler_);
+				//rhs_[i] = EmuMath::FastMatrix4x4f_CM(temp_);
+
+				angles_[i] = filler_(angles_[i]);
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			out_[i] = lhs_[i].Multiply(rhs_[i]);
+			//out_[i] = lhs_[i].Multiply(rhs_[i]);
+			out_[i] = EmuMath::FastMatrix4x4f_CM::RotationX<false>(angles_[i]);
 		}
 		void OnTestsOver()
 		{
 			srand(shared_seed_b_);
 			std::size_t i = static_cast<std::size_t>(rand()) % NUM_LOOPS;
-			std::cout << lhs_[i] << "\nMULT\n" << rhs_[i] << "\n:\n" << out_[i] << "\n\n";
+			//std::cout << lhs_[i] << "\nMULT\n" << rhs_[i] << "\n:\n" << out_[i] << "\n\n";
+			std::cout << "RotX(" << angles_[i] << "):\n" << out_[i] << "\n\n";
 		}
 
-		std::vector<EmuMath::FastMatrix4x4f_CM> lhs_;
-		std::vector<EmuMath::FastMatrix4x4f_CM> rhs_;
+		//std::vector<EmuMath::FastMatrix4x4f_CM> lhs_;
+		//std::vector<EmuMath::FastMatrix4x4f_CM> rhs_;
 		std::vector<EmuMath::FastMatrix4x4f_CM> out_;
+		std::vector<float> angles_;
 	};
 	struct MatEmuSISD
 	{
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 5000000;
+		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr bool DO_TEST = true;
 		static constexpr std::string_view NAME = "Matrix (EmuMath SISD)";
@@ -156,7 +163,7 @@ namespace EmuCore::TestingHelpers
 	struct MatDXM
 	{
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 5000000;
+		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr bool DO_TEST = true;
 		static constexpr std::string_view NAME = "Matrix (DirectXMath)";
@@ -167,26 +174,30 @@ namespace EmuCore::TestingHelpers
 		void Prepare()
 		{
 			srand(shared_seed_);
-			lhs_.resize(NUM_LOOPS);
-			rhs_.resize(NUM_LOOPS);
+			//lhs_.resize(NUM_LOOPS);
+			//rhs_.resize(NUM_LOOPS);
 			out_.resize(NUM_LOOPS);
+			angles_.resize(NUM_LOOPS);
 
 			EmuMath::Matrix4x4<float, true> temp_;
 			VectorFiller filler_ = VectorFiller();
-			DirectX::XMFLOAT4X4 to_load_;
+			//DirectX::XMFLOAT4X4 to_load_;
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				temp_ = temp_.Mutate(filler_);
-				to_load_ = MakeXMFromEmu(temp_);
-				lhs_[i] = DirectX::XMLoadFloat4x4(&to_load_);
-				temp_ = temp_.Mutate(filler_);
-				to_load_ = MakeXMFromEmu(temp_);
-				rhs_[i] = DirectX::XMLoadFloat4x4(&to_load_);
+				//temp_ = temp_.Mutate(filler_);
+				//to_load_ = MakeXMFromEmu(temp_);
+				//lhs_[i] = DirectX::XMLoadFloat4x4(&to_load_);
+				//temp_ = temp_.Mutate(filler_);
+				//to_load_ = MakeXMFromEmu(temp_);
+				//rhs_[i] = DirectX::XMLoadFloat4x4(&to_load_);
+
+				angles_[i] = filler_(angles_[i]);
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			out_[i] = DirectX::XMMatrixMultiply(lhs_[i], rhs_[i]);
+			//out_[i] = DirectX::XMMatrixMultiply(lhs_[i], rhs_[i]);
+			out_[i] = DirectX::XMMatrixRotationX(EmuCore::Pi::DegsToRads(angles_[i]));
 		}
 
 		DirectX::XMFLOAT4X4 MakeXMFromEmu(const EmuMath::Matrix4x4<float, true>& mat_) const
@@ -211,10 +222,13 @@ namespace EmuCore::TestingHelpers
 		{
 			srand(shared_seed_b_);
 			std::size_t i = static_cast<std::size_t>(rand() % NUM_LOOPS);
-			PrintMatrix(lhs_[i]);
-			std::cout << "\nMULT\n";
-			PrintMatrix(rhs_[i]);
-			std::cout << "\n:\n";
+			//PrintMatrix(lhs_[i]);
+			//std::cout << "\nMULT\n";
+			//PrintMatrix(rhs_[i]);
+			//std::cout << "\n:\n";
+			//PrintMatrix(out_[i]);
+			//std::cout << "\n\n";
+			std::cout << "RotX(" << angles_[i] << "):\n";
 			PrintMatrix(out_[i]);
 			std::cout << "\n\n";
 		}
@@ -239,16 +253,16 @@ namespace EmuCore::TestingHelpers
 		}
 
 
-		std::vector<DirectX::XMMATRIX> lhs_;
-		std::vector<DirectX::XMMATRIX> rhs_;
+		//std::vector<DirectX::XMMATRIX> lhs_;
+		//std::vector<DirectX::XMMATRIX> rhs_;
+		std::vector<float> angles_;
 		std::vector<DirectX::XMMATRIX> out_;
 	};
 
 	using AllTests = std::tuple
 	<
 		MatEmu,
-		MatDXM,
-		MatEmuSISD
+		MatDXM
 	>;
 
 
