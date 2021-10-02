@@ -140,6 +140,47 @@ int main()
 	std::cout << "RotationZ<false>(33) SIMD:\n" << EmuMath::FastMatrix4x4f_CM::RotationZ<false>(33) << "\n";
 	std::cout << "RotationZ<false>(33) SISD:\n" << EmuMath::Matrix4x4<float, true>::RotationZ<false>(33) << "\n\n";
 
+	std::cout << "Ortho(0.01f, 25.0f, 1920.0f, 1080.0f) (SIMD):\n" << EmuMath::FastMatrix4x4f_CM::OrthographicVK(1920.0f, 1080.0f, 0.01f, 25.0f) << "\n\n";
+	std::cout << "Ortho(0.01f, 25.0f, 1920.0f, 1080.0f) (SISD):\n" << EmuMath::Matrix4x4<float>::OrthographicVK(1920.0f, 1080.0f, 0.01f, 25.0f) << "\n\n";
+	std::cout << "Ortho(0.01f, 25.0f, 1920.0f, 1080.0f) (DXM):\n";
+	auto dxm_proj_ = DirectX::XMMatrixOrthographicRH(1920.0f, 1080.0f, 0.01f, 25.0f);
+	DirectX::XMFLOAT4X4 readable_dxm_mat_;
+	DirectX::XMStoreFloat4x4(&readable_dxm_mat_, dxm_proj_);
+	for (std::size_t x = 0; x < 4; ++x)
+	{
+		std::cout << "{ ";
+		for (std::size_t y = 0; y < 4; ++y)
+		{
+			std::cout << readable_dxm_mat_(x, y);
+			if (y != 3)
+			{
+				std::cout << ", ";
+			}
+		}
+		std::cout << " }\n";
+	}
+	std::cout << "\n\n";
+
+	std::cout << "Projection(75.0f, 0.01f, 25.0f, 1920.0f / 1080.0f) (SIMD):\n" << EmuMath::FastMatrix4x4f_CM::PerspectiveVK<false>(75.0f, 0.01f, 25.0f, 1920.0f / 1080.0f) << "\n\n";
+	std::cout << "Projection(75.0f, 0.01f, 25.0f, 1920.0f / 1080.0f) (SISD):\n" << EmuMath::Matrix4x4<float>::PerspectiveVK<false>(75.0f, 0.01f, 25.0f, 1920.0f / 1080.0f) << "\n\n";
+	std::cout << "Projection(75.0f, 0.01f, 25.0f, 1920.0f / 1080.0f) (DXM):\n";
+	dxm_proj_ = DirectX::XMMatrixPerspectiveFovRH(EmuCore::Pi::DegsToRads(75.0f), 1920.0f / 1080.0f, 0.01f, 25.0f);
+	DirectX::XMStoreFloat4x4(&readable_dxm_mat_, dxm_proj_);
+	for (std::size_t x = 0; x < 4; ++x)
+	{
+		std::cout << "{ ";
+		for (std::size_t y = 0; y < 4; ++y)
+		{
+			std::cout << readable_dxm_mat_(x, y);
+			if (y != 3)
+			{
+				std::cout << ", ";
+			}
+		}
+		std::cout << " }\n";
+	}
+	std::cout << "\n\n";
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();

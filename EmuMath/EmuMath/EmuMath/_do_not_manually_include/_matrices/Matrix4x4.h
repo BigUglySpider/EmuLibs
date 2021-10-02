@@ -2018,7 +2018,7 @@ namespace EmuMath
 			typename Far_,
 			typename Fov_
 		>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> BasicPerspective
+		[[nodiscard]] static constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> BasicPerspective
 		(
 			const Near_& near_,
 			const Far_& far_,
@@ -2060,7 +2060,7 @@ namespace EmuMath
 			typename Far_,
 			typename AspectRatio_
 		>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> PerspectiveVK
+		[[nodiscard]] static constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> PerspectiveVK
 		(
 			const FovY_& fov_angle_y_,
 			const Near_& near_,
@@ -2107,7 +2107,7 @@ namespace EmuMath
 			typename Bottom_,
 			typename Top_
 		>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> PerspectiveVK
+		[[nodiscard]] static constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> PerspectiveVK
 		(
 			const Near_& near_,
 			const Far_& far_,
@@ -2149,7 +2149,7 @@ namespace EmuMath
 			typename Near_,
 			typename Far_
 		>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> OrthographicVK
+		[[nodiscard]] static constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> OrthographicVK
 		(
 			const Left_& left_,
 			const Right_& right_,
@@ -2192,7 +2192,7 @@ namespace EmuMath
 			typename Near_,
 			typename Far_
 		>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> OrthographicVK
+		[[nodiscard]] static constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> OrthographicVK
 		(
 			const Width_ width_,
 			const Height_& height_,
