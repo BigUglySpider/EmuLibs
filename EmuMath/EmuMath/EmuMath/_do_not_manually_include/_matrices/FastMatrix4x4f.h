@@ -694,6 +694,16 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region STATIC_TRANSFORMATIONS
+		/// <summary>
+		///		Creates a 4x4 column-major matrix which may be used to perform a translation of x_ in the X-direction, y_ in the Y-direction, and z_ in the Z-direction.
+		/// </summary>
+		/// <typeparam name="X_">Type used for the passed translation in the X-direction.</typeparam>
+		/// <typeparam name="Y_">Type used for the passed translation in the Y-direction.</typeparam>
+		/// <typeparam name="Z_">Type used for the passed translation in the Z-direction.</typeparam>
+		/// <param name="x_">Translation in the X-direction.</param>
+		/// <param name="y_">Translation in the Y-direction.</param>
+		/// <param name="z_">Translation in the Z-direction.</param>
+		/// <returns>4x4 column-major SIMD matrix that may be used to translate by the specified amounts in respective dimensions.</returns>
 		template<typename X_, typename Y_, typename Z_>
 		[[nodiscard]] static inline FastMatrix4x4f_CM Translation(const X_& x_, const Y_& y_, const Z_& z_)
 		{
@@ -706,6 +716,16 @@ namespace EmuMath
 			);
 		}
 
+		/// <summary>
+		///		Creates a 4x4 column-major matrix which may be used to perform a scale of x_ in the X-dimension, y_ in the Y-dimension, and z_ in the Z-dimension.
+		/// </summary>
+		/// <typeparam name="X_">Type used for the passed scale in the X-dimension.</typeparam>
+		/// <typeparam name="Y_">Type used for the passed scale in the Y-dimension.</typeparam>
+		/// <typeparam name="Z_">Type used for the passed scale in the Z-dimension.</typeparam>
+		/// <param name="x_">Scale in the X-dimension.</param>
+		/// <param name="y_">Scale in the Y-dimension.</param>
+		/// <param name="z_">Scale in the Z-dimension.</param>
+		/// <returns>4x4 column-major SIMD matrix that may be used to scale by the specified amounts in respective dimensions.</returns>
 		template<typename X_, typename Y_, typename Z_>
 		[[nodiscard]] static inline FastMatrix4x4f_CM Scale(const X_& x_, const Y_& y_, const Z_& z_)
 		{
@@ -718,6 +738,15 @@ namespace EmuMath
 			);
 		}
 
+		/// <summary>
+		/// <para> Creates a 4x4 column-major matrix which may used to perform about the X-axis by an angle of rot_x_. </para>
+		/// <para> If the template argument RotIsRads_ is true, rot_x_ will be interpreted as radians; otherwise, rot_x_ will be interpreted as degrees. </para>
+		/// </summary>
+		/// <typeparam name="RotX_">Type used to provide the angle to rotate.</typeparam>
+		/// <param name="rot_x_">Angle to rotate in either radians or degrees, depending on the RotIsRads_ template argument.</param>
+		/// <returns>
+		///		4x4 column-major SIMD matrix that may be used to rotate about the X-axis by rot_x_ radians or degrees, depending on the RotIsRads_ template argument.
+		/// </returns>
 		template<bool RotIsRads_ = true, typename RotX_>
 		[[nodiscard]] static inline FastMatrix4x4f_CM RotationX(const RotX_& rot_x_)
 		{
@@ -740,6 +769,15 @@ namespace EmuMath
 			}
 		}
 
+		/// <summary>
+		/// <para> Creates a 4x4 column-major matrix which may used to perform about the Y-axis by an angle of rot_y_. </para>
+		/// <para> If the template argument RotIsRads_ is true, rot_y_ will be interpreted as radians; otherwise, rot_y_ will be interpreted as degrees. </para>
+		/// </summary>
+		/// <typeparam name="RotY_">Type used to provide the angle to rotate.</typeparam>
+		/// <param name="rot_y_">Angle to rotate in either radians or degrees, depending on the RotIsRads_ template argument.</param>
+		/// <returns>
+		///		4x4 column-major SIMD matrix that may be used to rotate about the Y-axis by rot_y_ radians or degrees, depending on the RotIsRads_ template argument.
+		/// </returns>
 		template<bool RotIsRads_ = true, typename RotY_>
 		[[nodiscard]] static inline FastMatrix4x4f_CM RotationY(const RotY_& rot_y_)
 		{
@@ -762,6 +800,15 @@ namespace EmuMath
 			}
 		}
 
+		/// <summary>
+		/// <para> Creates a 4x4 column-major matrix which may used to perform about the Z-axis by an angle of rot_z_. </para>
+		/// <para> If the template argument RotIsRads_ is true, rot_z_ will be interpreted as radians; otherwise, rot_z_ will be interpreted as degrees. </para>
+		/// </summary>
+		/// <typeparam name="RotZ_">Type used to provide the angle to rotate.</typeparam>
+		/// <param name="rot_z_">Angle to rotate in either radians or degrees, depending on the RotIsRads_ template argument.</param>
+		/// <returns>
+		///		4x4 column-major SIMD matrix that may be used to rotate about the Z-axis by rot_z_ radians or degrees, depending on the RotIsRads_ template argument.
+		/// </returns>
 		template<bool RotIsRads_ = true, typename RotZ_>
 		[[nodiscard]] static inline FastMatrix4x4f_CM RotationZ(const RotZ_& rot_z_)
 		{
