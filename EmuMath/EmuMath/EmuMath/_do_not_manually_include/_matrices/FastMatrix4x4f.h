@@ -755,6 +755,45 @@ namespace EmuMath
 				_mm_sub_ps(zero_, column3)
 			);
 		}
+
+		/// <summary> Floors all elements in this matrix, rounding them toward negative infinity. </summary>
+		/// <returns>Copy of this matrix with all elements rounded toward negative infinity.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM Floor() const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_round_ps(column0, _MM_FROUND_FLOOR),
+				_mm_round_ps(column1, _MM_FROUND_FLOOR),
+				_mm_round_ps(column2, _MM_FROUND_FLOOR),
+				_mm_round_ps(column3, _MM_FROUND_FLOOR)
+			);
+		}
+
+		/// <summary> Ceils all elements in this matrix, rounding them toward positive infinity. </summary>
+		/// <returns>Copy of this matrix with all elements rounded toward positive infinity.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM Ceil() const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_round_ps(column0, _MM_FROUND_CEIL),
+				_mm_round_ps(column1, _MM_FROUND_CEIL),
+				_mm_round_ps(column2, _MM_FROUND_CEIL),
+				_mm_round_ps(column3, _MM_FROUND_CEIL)
+			);
+		}
+
+		/// <summary> Truncates all elements in this matrix, rounding them toward 0. </summary>
+		/// <returns>Copy of this matrix with all elements rounded toward 0.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM Trunc() const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_round_ps(column0, _MM_FROUND_TRUNC),
+				_mm_round_ps(column1, _MM_FROUND_TRUNC),
+				_mm_round_ps(column2, _MM_FROUND_TRUNC),
+				_mm_round_ps(column3, _MM_FROUND_TRUNC)
+			);
+		}
 #pragma endregion
 
 #pragma region BITWISE_FUNCS
