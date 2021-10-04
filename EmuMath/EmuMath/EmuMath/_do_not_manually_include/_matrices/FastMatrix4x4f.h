@@ -685,6 +685,63 @@ namespace EmuMath
 			return DivideBasic(_mm_set1_ps(static_cast<float>(divisor_)));
 		}
 
+		/// <summary>
+		/// <para> Performs a basic floating-point modulo division where respective columns in this matrix are divided by the passed column registers. </para>
+		/// <para> This is not a standard matrix modulo division. Such behaviour is mathematically undefined. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to divide this matrix's column0 by.</param>
+		/// <param name="rhs_column_1_">Register to divide this matrix's column1 by.</param>
+		/// <param name="rhs_column_2_">Register to divide this matrix's column2 by.</param>
+		/// <param name="rhs_column_3_">Register to divide this matrix's column3 by.</param>
+		/// <returns>Resulting matrix after floating-point modulo division between this matrix's columns and the respective passed column registers.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM ModBasic(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_fmod_ps(column0, rhs_column_0_),
+				_mm_fmod_ps(column1, rhs_column_1_),
+				_mm_fmod_ps(column2, rhs_column_2_),
+				_mm_fmod_ps(column3, rhs_column_3_)
+			);
+		}
+		/// <summary>
+		/// <para> Performs a basic floating-point modulo division where each column in this matrix is divided via the passed divisor register. </para>
+		/// <para> This is not a standard matrix modulo division. Such behaviour is mathematically undefined. </para>
+		/// </summary>
+		/// <param name="divisor_for_all_columns_">Register to divide each of this matrix's columns by.</param>
+		/// <returns>Resulting matrix after floating-point modulo division between this matrix's columns and the passed column register.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM ModBasic(__m128 divisor_for_all_columns_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_fmod_ps(column0, divisor_for_all_columns_),
+				_mm_fmod_ps(column1, divisor_for_all_columns_),
+				_mm_fmod_ps(column2, divisor_for_all_columns_),
+				_mm_fmod_ps(column3, divisor_for_all_columns_)
+			);
+		}
+		/// <summary>
+		/// <para> Performs a floating-point modulo division on each value in this matrix by the respective value in the passed matrix. </para>
+		/// <para> This is not a standard matrix modulo division. Such behaviour is mathematically undefined. </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to divide each respective value of this matrix by.</param>
+		/// <returns>Resulting matrix after floating-point modulo division between this matrix's and the passed matrix's respective elements.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM ModBasic(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return ModBasic(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary>
+		/// <para> Performs a floating-point modulo division on each value in this matrix by the passed scalar divisor_. </para>
+		/// <para> This is not a standard matrix modulo division. Such behaviour is mathematically undefined. </para>
+		/// </summary>
+		/// <param name="rhs_">Scalar to divide each respective value of this matrix by.</param>
+		/// <returns>Resulting matrix after floating-point modulo division between this matrix's elements and the passed scalar divisor_.</returns>
+		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM ModBasic(const T_& divisor_) const
+		{
+			return ModBasic(_mm_set1_ps(static_cast<float>(divisor_)));
+		}
+
 		/// <summary> Negates this matrix, setting every element to its negative form (e.g. [0][0] = -[0][0]). </summary>
 		/// <returns>Negated form of this matrix.</returns>
 		[[nodiscard]] inline FastMatrix4x4f_CM Negate() const
@@ -931,6 +988,16 @@ namespace EmuMath
 			return DivideBasic<T_>(rhs_);
 		}
 
+		[[nodiscard]] inline FastMatrix4x4f_CM operator%(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return ModBasic(rhs_);
+		}
+		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM operator%(const T_& rhs_) const
+		{
+			return ModBasic<T_>(rhs_);
+		}
+
 		[[nodiscard]] inline FastMatrix4x4f_CM operator&(float rhs_) const
 		{
 			return And(rhs_);
@@ -1055,6 +1122,16 @@ namespace EmuMath
 		inline FastMatrix4x4f_CM& operator/=(const T_& rhs_)
 		{
 			return operator=(DivideBasic<T_>(rhs_));
+		}
+
+		inline FastMatrix4x4f_CM& operator%=(const FastMatrix4x4f_CM& rhs_)
+		{
+			return operator=(ModBasic(rhs_));
+		}
+		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		inline FastMatrix4x4f_CM& operator%=(const T_& rhs_)
+		{
+			return operator=(ModBasic<T_>(rhs_));
 		}
 
 		inline FastMatrix4x4f_CM& operator&=(float rhs_)
