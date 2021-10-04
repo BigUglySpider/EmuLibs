@@ -186,6 +186,55 @@ int main()
 	std::cout << ~~fast_4x4_from_scalars << "\n\n";
 	std::cout << ~~~fast_4x4_from_scalars << "\n\n";
 
+	EmuMath::FastMatrix4x4f_CM a_mat_
+	(
+		0.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f
+	);
+	EmuMath::FastMatrix4x4f_CM b_mat_
+	(
+		10.0f, 10.0f, 10.0f, 10.0f,
+		10.0f, 10.0f, 10.0f, 10.0f,
+		10.0f, 10.0f, 10.0f, 10.0f,
+		10.0f, 10.0f, 10.0f, 10.0f
+	);
+	EmuMath::FastMatrix4x4f_CM t_mat_
+	(
+		0.1f, 0.2f, 0.3f, 0.4f,
+		0.5f, 0.6f, 0.7f, 0.8f,
+		0.9f, 1.0f, 1.1f, 1.2f,
+		1.3f, 1.4f, 1.5f, 1.6f
+	);
+	std::cout << "A:\n" << a_mat_ << "\nB:\n" << b_mat_ << "\nT:\n" << t_mat_ << "\nLERPED:\n" << a_mat_.Lerp(b_mat_, t_mat_) << "\n\n";
+	std::cout << "A:\n" << a_mat_ << "\nB:\n" << b_mat_ << "\nT:\n" << t_mat_ << "\nLERPED:\n" << a_mat_.Lerp(10.0L, 0.5f) << "\n\n";
+
+
+	EmuMath::FastMatrix4x4f_CM original_mat_
+	(
+		-5.0f, 0.0f, 1.0f, 12.0f,
+		66.0f, -555.0f, 12.0f, 1,
+		1.0f, 2.0f, 3.0f, 1337.1f,
+		1.0f, 3.0f, 3.0f, 7.331f
+	);
+	EmuMath::FastMatrix4x4f_CM min_mat_
+	(
+		0.0f, 0.0f, -5.0f, 0.0f,
+		1.0f, -500.0f, 2.0f, 0.0f,
+		6.0f, 1.0f, 3.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f
+	);
+	EmuMath::FastMatrix4x4f_CM max_mat_
+	(
+		1.0f, 2.0f, 3.0f, 4.0f,
+		5.0f, 6.0f, 7.0f, 8.0f,
+		9.0f, 10.0f, 11.0f, 12.0f,
+		13.0f, 14.0f, 15.0f, 16.0f
+	);
+	std::cout << "Original:\n" << original_mat_ << "\nMin:\n" << min_mat_ << "\nMax:\n" << max_mat_ << "\nClamped:\n" << original_mat_.Clamp(min_mat_, max_mat_) << "\n\n";
+	std::cout << "Original min: " << original_mat_.Min() << " | Original max: " << original_mat_.Max() << "\n\n";
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();

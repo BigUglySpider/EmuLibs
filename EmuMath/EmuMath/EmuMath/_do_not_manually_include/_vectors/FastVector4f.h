@@ -752,8 +752,7 @@ namespace EmuMath
 		/// <param name="t_">Scalar or vector weighting to use for each linear interpolation. t in the equation a + ((b - a) * t).</param>
 		[[nodiscard]] inline FastVector4f Lerp(__m128 b_, __m128 t_) const
 		{
-			b_ = _mm_sub_ps(b_, data_);
-			return FastVector4f(_mm_fmadd_ps(b_, t_, data_));
+			return FastVector4f(EmuMath::SIMD::vector_lerp(data_, b_, t_));
 		}
 		[[nodiscard]] inline FastVector4f Lerp(__m128 b_, const FastVector4f& t_) const
 		{
@@ -882,8 +881,7 @@ namespace EmuMath
 		/// <returns>Copy of this vector with all elements clamped to not be less than min_.</returns>
 		[[nodiscard]] inline FastVector4f ClampMin(__m128 min_) const
 		{
-			__m128 keep_mask_ = _mm_cmpge_ps(data_, min_);
-			return FastVector4f(_mm_or_ps(_mm_and_ps(keep_mask_, data_), _mm_andnot_ps(keep_mask_, min_)));
+			return FastVector4f(EmuMath::SIMD::vector_clamp_min(data_, min_));
 		}
 		[[nodiscard]] inline FastVector4f ClampMin(const FastVector4f& min_) const
 		{
@@ -898,8 +896,7 @@ namespace EmuMath
 		/// <returns>Copy of this vector with all elements clamped to not be greater than max_.</returns>
 		[[nodiscard]] inline FastVector4f ClampMax(__m128 max_) const
 		{
-			__m128 keep_mask_ = _mm_cmple_ps(data_, max_);
-			return FastVector4f(_mm_or_ps(_mm_and_ps(keep_mask_, data_), _mm_andnot_ps(keep_mask_, max_)));
+			return FastVector4f(EmuMath::SIMD::vector_clamp_max(data_, max_));
 		}
 		[[nodiscard]] inline FastVector4f ClampMax(const FastVector4f& max_) const
 		{
@@ -918,11 +915,7 @@ namespace EmuMath
 		/// <returns>Copy of this vector with all elements clamped to not be greater than max_.</returns>
 		[[nodiscard]] inline FastVector4f Clamp(__m128 min_, __m128 max_) const
 		{
-			__m128 replace_min_mask_ = _mm_cmplt_ps(data_, min_);
-			__m128 replace_max_mask_ = _mm_cmpgt_ps(data_, max_);
-			__m128 out_ = _mm_andnot_ps(_mm_or_ps(replace_min_mask_, replace_max_mask_), data_);
-			out_ = _mm_or_ps(out_, _mm_and_ps(replace_min_mask_, min_));
-			return FastVector4f(_mm_or_ps(out_, _mm_and_ps(replace_max_mask_, max_)));
+			return FastVector4f(EmuMath::SIMD::vector_clamp(data_, min_, max_));
 		}
 		[[nodiscard]] inline FastVector4f Clamp(const FastVector4f& min_, __m128 max_) const
 		{
@@ -983,9 +976,7 @@ namespace EmuMath
 		template<typename OutT_ = float>
 		[[nodiscard]] inline OutT_ Min() const
 		{
-			__m128 out_ = _mm_min_ps(data_, EmuMath::SIMD::shuffle<3, 2, 1, 0>(data_));
-			out_ = _mm_min_ps(out_, EmuMath::SIMD::shuffle<1, 0, 2, 3>(out_));
-			return static_cast<OutT_>(_mm_cvtss_f32(out_));
+			return static_cast<OutT_>(EmuMath::SIMD::vector_min_scalar(data_));
 		}
 
 		/// <summary> Finds the highest stored value within this vector. </summary>
@@ -994,9 +985,7 @@ namespace EmuMath
 		template<typename OutT_ = float>
 		[[nodiscard]] inline OutT_ Max() const
 		{
-			__m128 out_ = _mm_max_ps(data_, EmuMath::SIMD::shuffle<3, 2, 1, 0>(data_));
-			out_ = _mm_max_ps(out_, EmuMath::SIMD::shuffle<1, 0, 2, 3>(out_));
-			return static_cast<OutT_>(_mm_cvtss_f32(out_));
+			return static_cast<OutT_>(EmuMath::SIMD::vector_max_scalar(data_));
 		}
 
 		/// <summary> Outputs the lowest and highest values stored within this vector via the passed outMin_ and outMax_ references, respectively. </summary>
@@ -1007,18 +996,8 @@ namespace EmuMath
 		template<typename OutMin_, typename OutMax_>
 		inline void MinMax(OutMin_& outMin_, OutMax_& outMax_)
 		{
-			// Main advantage of MinMax over two separate Min() and Max() calls is avoiding duplicating this shuffle
-			__m128 reversed_data_ = EmuMath::SIMD::shuffle<3, 2, 1, 0>(data_);
-
-			// Find min
-			__m128 out_ = _mm_min_ps(data_, reversed_data_);
-			out_ = _mm_min_ps(out_, EmuMath::SIMD::shuffle<1, 0, 2, 3>(out_));
-			outMin_ = static_cast<OutMin_>(_mm_cvtss_f32(out_));
-
-			// Find max
-			out_ = _mm_max_ps(data_, reversed_data_);
-			out_ = _mm_max_ps(out_, EmuMath::SIMD::shuffle<1, 0, 2, 3>(out_));
-			outMax_ = static_cast<OutMax_>(_mm_cvtss_f32(out_));
+			outMin_ = static_cast<OutMin_>(EmuMath::SIMD::vector_min_scalar(data_));
+			outMax_ = static_cast<OutMax_>(EmuMath::SIMD::vector_max_scalar(data_));
 		}
 
 		/// <summary> Outputs a new vector which contains the lowest element at each respective index within this vector and the passed vector data. </summary>

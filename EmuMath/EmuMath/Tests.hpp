@@ -93,9 +93,13 @@ namespace EmuCore::TestingHelpers
 			//fars_.resize(NUM_LOOPS);
 			//fov_angle_y_degs_.resize(NUM_LOOPS);
 			//aspect_ratios_.resize(NUM_LOOPS);
-			out_readable_.resize(NUM_LOOPS);
-			lhs_readable_.resize(NUM_LOOPS);
-			rhs_readable_.resize(NUM_LOOPS);
+			//out_readable_.resize(NUM_LOOPS);
+			//lhs_readable_.resize(NUM_LOOPS);
+			//rhs_readable_.resize(NUM_LOOPS);
+			out_.resize(NUM_LOOPS);
+			in_.resize(NUM_LOOPS);
+			min_.resize(NUM_LOOPS);
+			max_.resize(NUM_LOOPS);
 
 			EmuMath::Matrix4x4<float, true> temp_;
 			VectorFiller filler_ = VectorFiller();
@@ -125,10 +129,17 @@ namespace EmuCore::TestingHelpers
 				//	fars_[i] += 10.0f;
 				//}
 
+				//temp_ = temp_.Mutate(filler_);
+				//lhs_readable_[i] = temp_;
+				//temp_ = temp_.Mutate(filler_);
+				//rhs_readable_[i] = temp_;
+
 				temp_ = temp_.Mutate(filler_);
-				lhs_readable_[i] = temp_;
+				in_[i] = temp_;
 				temp_ = temp_.Mutate(filler_);
-				rhs_readable_[i] = temp_;
+				min_[i] = temp_;
+				temp_ = temp_.Mutate(filler_);
+				max_[i] = temp_;
 			}
 		}
 		void operator()(std::size_t i)
@@ -137,8 +148,8 @@ namespace EmuCore::TestingHelpers
 			//out_[i] = EmuMath::FastMatrix4x4f_CM::RotationX<false>(angles_[i]);
 			//out_[i] = EmuMath::FastMatrix4x4f_CM::OrthographicVK(widths_[i], heights_[i], nears_[i], fars_[i]);
 			//out_[i] = EmuMath::FastMatrix4x4f_CM::PerspectiveRhVK<false>(fov_angle_y_degs_[i], nears_[i], fars_[i], aspect_ratios_[i]);
-			EmuMath::FastMatrix4x4f_CM(lhs_readable_[i]).Multiply(EmuMath::FastMatrix4x4f_CM(rhs_readable_[i])).Store(out_readable_[i]);
-
+			//EmuMath::FastMatrix4x4f_CM(lhs_readable_[i]).Multiply(EmuMath::FastMatrix4x4f_CM(rhs_readable_[i])).Store(out_readable_[i]);
+			out_[i] = in_[i].Clamp(min_[i], max_[i]);
 		}
 		void OnTestsOver()
 		{
@@ -148,7 +159,8 @@ namespace EmuCore::TestingHelpers
 			//std::cout << "RotX(" << angles_[i] << "):\n" << out_[i] << "\n\n";
 			//std::cout << "Ortho(" << widths_[i] << ", " << heights_[i] << ", " << nears_[i] << ", " << fars_[i] << "):\n" << out_[i] << "\n\n";
 			//std::cout << "Perspective(" << fov_angle_y_degs_[i] << ", " << nears_[i] << ", " << fars_[i] << ", " << aspect_ratios_[i] << "):\n" << out_[i] << "\n\n";
-			std::cout << lhs_readable_[i] << "\nMULT\n" << rhs_readable_[i] << "\n:\n" << out_readable_[i] << "\n\n";
+			//std::cout << lhs_readable_[i] << "\nMULT\n" << rhs_readable_[i] << "\n:\n" << out_readable_[i] << "\n\n";
+			std::cout << "In:\n" << in_[i] << "\nMin:\n" << min_[i] << "\nMax:\n" << max_[i] << "\nClamped:\n" << out_[i] << "\n\n";
 		}
 
 		//std::vector<EmuMath::FastMatrix4x4f_CM> lhs_;
@@ -160,10 +172,13 @@ namespace EmuCore::TestingHelpers
 		//std::vector<float> fars_;
 		//std::vector<float> fov_angle_y_degs_;
 		//std::vector<float> aspect_ratios_;
-		//std::vector<EmuMath::FastMatrix4x4f_CM> out_;
-		std::vector<EmuMath::Matrix4x4<float, true>> out_readable_;
-		std::vector<EmuMath::Matrix4x4<float, true>> lhs_readable_;
-		std::vector<EmuMath::Matrix4x4<float, true>> rhs_readable_;
+		std::vector<EmuMath::FastMatrix4x4f_CM> in_;
+		std::vector<EmuMath::FastMatrix4x4f_CM> min_;
+		std::vector<EmuMath::FastMatrix4x4f_CM> max_;
+		std::vector<EmuMath::FastMatrix4x4f_CM> out_;
+		//std::vector<EmuMath::Matrix4x4<float, true>> out_readable_;
+		//std::vector<EmuMath::Matrix4x4<float, true>> lhs_readable_;
+		//std::vector<EmuMath::Matrix4x4<float, true>> rhs_readable_;
 	};
 	struct MatEmuSISD
 	{

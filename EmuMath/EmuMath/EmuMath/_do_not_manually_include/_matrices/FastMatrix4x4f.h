@@ -794,6 +794,252 @@ namespace EmuMath
 				_mm_round_ps(column3, _MM_FROUND_TRUNC)
 			);
 		}
+
+		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(__m128 b_0_, __m128 b_1_, __m128 b_2_, __m128 b_3_, __m128 t_0_, __m128 t_1_, __m128 t_2_, __m128 t_3_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				EmuMath::SIMD::vector_lerp(column0, b_0_, t_0_),
+				EmuMath::SIMD::vector_lerp(column1, b_1_, t_1_),
+				EmuMath::SIMD::vector_lerp(column2, b_2_, t_2_),
+				EmuMath::SIMD::vector_lerp(column3, b_3_, t_3_)
+			);
+		}
+		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(__m128 b_, __m128 t_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				EmuMath::SIMD::vector_lerp(column0, b_, t_),
+				EmuMath::SIMD::vector_lerp(column1, b_, t_),
+				EmuMath::SIMD::vector_lerp(column2, b_, t_),
+				EmuMath::SIMD::vector_lerp(column3, b_, t_)
+			);
+		}
+		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(const FastMatrix4x4f_CM& b_, __m128 t_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				EmuMath::SIMD::vector_lerp(column0, b_.column0, t_),
+				EmuMath::SIMD::vector_lerp(column1, b_.column1, t_),
+				EmuMath::SIMD::vector_lerp(column2, b_.column2, t_),
+				EmuMath::SIMD::vector_lerp(column3, b_.column3, t_)
+			);
+		}
+		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(__m128 b_, const FastMatrix4x4f_CM& t_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				EmuMath::SIMD::vector_lerp(column0, b_, t_.column0),
+				EmuMath::SIMD::vector_lerp(column1, b_, t_.column1),
+				EmuMath::SIMD::vector_lerp(column2, b_, t_.column2),
+				EmuMath::SIMD::vector_lerp(column3, b_, t_.column3)
+			);
+		}
+		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(const FastMatrix4x4f_CM& b_, const FastMatrix4x4f_CM& t_) const
+		{
+			return Lerp(b_.column0, b_.column1, b_.column2, b_.column3, t_.column0, t_.column1, t_.column2, t_.column3);
+		}
+		template<typename B_, typename RequiresBConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<B_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(const B_& b_, __m128 t_) const
+		{
+			return Lerp(_mm_set1_ps(static_cast<float>(b_)), t_);
+		}
+		template<typename T_, typename RequiresTConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(__m128 b_, const T_& t_) const
+		{
+			return Lerp(b_, _mm_set1_ps(static_cast<float>(t_)));
+		}
+		template<typename B_, typename RequiresBConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<B_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(const B_& b_, const FastMatrix4x4f_CM& t_) const
+		{
+			return Lerp(_mm_set1_ps(static_cast<float>(b_)), t_);
+		}
+		template<typename T_, typename RequiresTConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(const FastMatrix4x4f_CM& b_, const T_& t_) const
+		{
+			return Lerp(b_, _mm_set1_ps(static_cast<float>(t_)));
+		}
+		template<typename B_, typename T_, typename RequiresArgsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float> && std::is_convertible_v<B_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(const B_& b_, const T_& t_) const
+		{
+			return Lerp(_mm_set1_ps(static_cast<float>(b_)), _mm_set1_ps(static_cast<float>(t_)));
+		}
+
+
+
+
+
+
+		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(__m128 min_0_, __m128 min_1_, __m128 min_2_, __m128 min_3_, __m128 max_0_, __m128 max_1_, __m128 max_2_, __m128 max_3_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				EmuMath::SIMD::vector_clamp(column0, min_0_, max_0_),
+				EmuMath::SIMD::vector_clamp(column1, min_1_, max_1_),
+				EmuMath::SIMD::vector_clamp(column2, min_2_, max_2_),
+				EmuMath::SIMD::vector_clamp(column3, min_3_, max_3_)
+			);
+		}
+		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(__m128 min_, __m128 max_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				EmuMath::SIMD::vector_clamp(column0, min_, max_),
+				EmuMath::SIMD::vector_clamp(column1, min_, max_),
+				EmuMath::SIMD::vector_clamp(column2, min_, max_),
+				EmuMath::SIMD::vector_clamp(column3, min_, max_)
+			);
+		}
+		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(const FastMatrix4x4f_CM& min_, __m128 max_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				EmuMath::SIMD::vector_clamp(column0, min_.column0, max_),
+				EmuMath::SIMD::vector_clamp(column1, min_.column1, max_),
+				EmuMath::SIMD::vector_clamp(column2, min_.column2, max_),
+				EmuMath::SIMD::vector_clamp(column3, min_.column3, max_)
+			);
+		}
+		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(__m128 min_, const FastMatrix4x4f_CM& max_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				EmuMath::SIMD::vector_clamp(column0, min_, max_.column0),
+				EmuMath::SIMD::vector_clamp(column1, min_, max_.column1),
+				EmuMath::SIMD::vector_clamp(column2, min_, max_.column2),
+				EmuMath::SIMD::vector_clamp(column3, min_, max_.column3)
+			);
+		}
+		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(const FastMatrix4x4f_CM& min_, const FastMatrix4x4f_CM& max_) const
+		{
+			return Clamp(min_.column0, min_.column1, min_.column2, min_.column3, max_.column0, max_.column1, max_.column2, max_.column3);
+		}
+		template<typename Min_, typename RequiresMinConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<Min_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(const Min_& min_, __m128 max_) const
+		{
+			return Clamp(_mm_set1_ps(static_cast<float>(min_)), max_);
+		}
+		template<typename Max_, typename RequiresMaxConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<Max_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(__m128 min_, const Max_& max_) const
+		{
+			return Clamp(min_, _mm_set1_ps(static_cast<float>(max_)));
+		}
+		template<typename Min_, typename RequiresMinConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<Min_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(const Min_& min_, const FastMatrix4x4f_CM& max_) const
+		{
+			return Clamp(_mm_set1_ps(static_cast<float>(min_)), max_);
+		}
+		template<typename Min_, typename RequiresMinConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<Min_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(const FastMatrix4x4f_CM& min_, const Min_& max_) const
+		{
+			return Clamp(min_, _mm_set1_ps(static_cast<float>(max_)));
+		}
+		template
+		<
+			typename Min_,
+			typename Max_,
+			typename RequiresArgsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Max_, float>&& std::is_convertible_v<Min_, float>>
+		>
+		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(const Min_& min_, const Max_& max_) const
+		{
+			return Clamp(_mm_set1_ps(static_cast<float>(min_)), _mm_set1_ps(static_cast<float>(max_)));
+		}
+
+		[[nodiscard]] inline FastMatrix4x4f_CM ClampMin(__m128 min_0_, __m128 min_1_, __m128 min_2_, __m128 min_3_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				EmuMath::SIMD::vector_clamp_min(column0, min_0_),
+				EmuMath::SIMD::vector_clamp_min(column1, min_1_),
+				EmuMath::SIMD::vector_clamp_min(column2, min_2_),
+				EmuMath::SIMD::vector_clamp_min(column3, min_3_)
+			);
+		}
+		[[nodiscard]] inline FastMatrix4x4f_CM ClampMin(__m128 min_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				EmuMath::SIMD::vector_clamp_min(column0, min_),
+				EmuMath::SIMD::vector_clamp_min(column1, min_),
+				EmuMath::SIMD::vector_clamp_min(column2, min_),
+				EmuMath::SIMD::vector_clamp_min(column3, min_)
+			);
+		}
+		[[nodiscard]] inline FastMatrix4x4f_CM ClampMin(const FastMatrix4x4f_CM& min_) const
+		{
+			return ClampMin(min_.column0, min_.column1, min_.column2, min_.column3);
+		}
+		template<typename Min_, typename RequiresMinConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<Min_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM ClampMin(const Min_& min_) const
+		{
+			return ClampMin(_mm_set1_ps(static_cast<float>(min_)));
+		}
+
+		[[nodiscard]] inline FastMatrix4x4f_CM ClampMax(__m128 max_0_, __m128 max_1_, __m128 max_2_, __m128 max_3_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				EmuMath::SIMD::vector_clamp_max(column0, max_0_),
+				EmuMath::SIMD::vector_clamp_max(column1, max_1_),
+				EmuMath::SIMD::vector_clamp_max(column2, max_2_),
+				EmuMath::SIMD::vector_clamp_max(column3, max_3_)
+			);
+		}
+		[[nodiscard]] inline FastMatrix4x4f_CM ClampMax(__m128 max_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				EmuMath::SIMD::vector_clamp_max(column0, max_),
+				EmuMath::SIMD::vector_clamp_max(column1, max_),
+				EmuMath::SIMD::vector_clamp_max(column2, max_),
+				EmuMath::SIMD::vector_clamp_max(column3, max_)
+			);
+		}
+		[[nodiscard]] inline FastMatrix4x4f_CM ClampMax(const FastMatrix4x4f_CM& max_) const
+		{
+			return ClampMax(max_.column0, max_.column1, max_.column2, max_.column3);
+		}
+		template<typename Max_, typename RequiresMaxConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<Max_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM ClampMax(const Max_& max_) const
+		{
+			return ClampMax(_mm_set1_ps(static_cast<float>(max_)));
+		}
+
+		/// <summary> Finds the smallest value within this matrix. </summary>
+		/// <typeparam name="Out_">Type to output the value as.</typeparam>
+		/// <returns>Copy of the smallest value within this matrix.</returns>
+		template<typename Out_ = float>
+		[[nodiscard]] inline Out_ Min() const
+		{
+			if constexpr (_assert_valid_cast_to<Out_>())
+			{
+				__m128 min_ = _mm_min_ps(column0, column1);
+				min_ = _mm_min_ps(min_, column2);
+				return static_cast<Out_>(EmuMath::SIMD::vector_min_scalar(_mm_min_ps(min_, column3)));
+			}
+			else
+			{
+				static_assert(false, "Attempted to retrieve an EmuMath::FastMatrix4x4f_CM's Min value using an output type that cannot be converted to from float.");
+			}
+		}
+
+		/// <summary> Finds the largest value within this matrix. </summary>
+		/// <typeparam name="Out_">Type to output the value as.</typeparam>
+		/// <returns>Copy of the largest value within this matrix.</returns>
+		template<typename Out_ = float>
+		[[nodiscard]] inline Out_ Max() const
+		{
+			if constexpr (_assert_valid_cast_to<Out_>())
+			{
+				__m128 max_ = _mm_max_ps(column0, column1);
+				max_ = _mm_max_ps(max_, column2);
+				return static_cast<Out_>(EmuMath::SIMD::vector_max_scalar(_mm_max_ps(max_, column3)));
+			}
+			else
+			{
+				static_assert(false, "Attempted to retrieve an EmuMath::FastMatrix4x4f_CM's Max value using an output type that cannot be converted to from float.");
+			}
+		}
 #pragma endregion
 
 #pragma region BITWISE_FUNCS
