@@ -206,5 +206,29 @@
     <ClInclude Include="EmuMath\FastMatrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_bits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_common_simd_helpers_includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_masks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_comparisons.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_arithmetic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_shuffles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_access.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuCore\TMPHelpers\Values.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

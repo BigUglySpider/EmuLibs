@@ -166,6 +166,7 @@
     <ClInclude Include="EmuCore\TMPHelpers\Tuples.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TypeComparators.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TypeConvertors.h" />
+    <ClInclude Include="EmuCore\TMPHelpers\Values.h" />
     <ClInclude Include="EmuMath\FastMatrix.h" />
     <ClInclude Include="EmuMath\FastVector.h" />
     <ClInclude Include="EmuMath\Matrix.h" />
@@ -199,6 +200,13 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_sets_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_transformations_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_validity_checks_underlying.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_common_simd_helpers_includes.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_access.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_arithmetic.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_bits.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_comparisons.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_masks.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_shuffles.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\FastVector4f.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\Vector2.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\Vector3.h" />

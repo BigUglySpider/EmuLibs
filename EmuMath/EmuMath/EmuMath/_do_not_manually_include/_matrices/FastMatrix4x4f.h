@@ -250,7 +250,7 @@ namespace EmuMath
 		/// <summary> Returns a copy of the value at the provided column and row index. </summary>
 		/// <returns>Copy of the element at the provided column and row index.</returns>
 		template<std::size_t ColumnIndex_, std::size_t RowIndex_, typename Out_ = float>
-		[[nodiscard]] Out_ at() const
+		[[nodiscard]] inline Out_ at() const
 		{
 			if constexpr (_assert_valid_index<ColumnIndex_, RowIndex_>())
 			{
@@ -271,7 +271,7 @@ namespace EmuMath
 		/// <summary> Returns a copy of the major register at the provided major index. </summary>
 		/// <returns>Register copy of the major register at the provided major index.</returns>
 		template<std::size_t MajorIndex_>
-		[[nodiscard]] __m128 at() const
+		[[nodiscard]] inline __m128 at() const
 		{
 			if constexpr (_assert_valid_major_index<MajorIndex_>())
 			{
@@ -287,25 +287,23 @@ namespace EmuMath
 		///	<para> Stores this matrix as an easily-readable 4x4 EmuMath matrix, with customisable contained types and major-order (defaults to the same as this matrix). </para>
 		/// </summary>
 		/// <typeparam name="out_contained_type">Type to be contained in the output EmuMath matrix.</typeparam>
+		/// <param name="out_">4x4 EmuMath matrix to output to. This may be omitted to return a value, but it is recommended to pass a matrix to output to.</param>
 		/// <returns>4x4 EmuMath matrix that may be easily read</returns>
 		template<typename out_contained_type = float, bool OutColumnMajor_ = true>
-		[[nodiscard]] EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> Store() const
+		[[nodiscard]] inline void Store(EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>& out_) const
 		{
 			if constexpr (std::is_same_v<out_contained_type, float> && OutColumnMajor_)
 			{
 				// Load data straight into output matrix since we can easily do so knowing major-order and type match.
-				EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> out_;
 				_mm_store_ps(out_.at<0>().data(), column0);
 				_mm_store_ps(out_.at<1>().data(), column1);
 				_mm_store_ps(out_.at<2>().data(), column2);
 				_mm_store_ps(out_.at<3>().data(), column3);
-				return out_;
 			}
 			else
 			{
 				if constexpr (_assert_valid_cast_to<out_contained_type>())
 				{
-					EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> out_;
 					if constexpr (OutColumnMajor_)
 					{
 						// Copy each individual column into the output matrix, deferring conversions of one vector to another to EmuMath::Vector using readable columns.
@@ -318,13 +316,23 @@ namespace EmuMath
 					{
 						// Same as above, but uses this matrix's transpose as we need to be feeding rows into major elements to produce the same matrix.
 						// --- Using transpose columns instead of GetRowReadable allows us to avoid some unneeded shuffles
+						// ------ Additionally, allows an optimised store if the output matrix contains floats
 						FastMatrix4x4f_CM transpose_ = Transpose();
-						out_.at<0>() = transpose_.GetColumnReadable<0>();
-						out_.at<1>() = transpose_.GetColumnReadable<1>();
-						out_.at<2>() = transpose_.GetColumnReadable<2>();
-						out_.at<3>() = transpose_.GetColumnReadable<3>();
+						if constexpr (std::is_same_v<float, out_contained_type>)
+						{
+							_mm_store_ps(out_.at<0>().data(), transpose_.column0);
+							_mm_store_ps(out_.at<1>().data(), transpose_.column1);
+							_mm_store_ps(out_.at<2>().data(), transpose_.column2);
+							_mm_store_ps(out_.at<3>().data(), transpose_.column3);
+						}
+						else
+						{
+							out_.at<0>() = transpose_.GetColumnReadable<0>();
+							out_.at<1>() = transpose_.GetColumnReadable<1>();
+							out_.at<2>() = transpose_.GetColumnReadable<2>();
+							out_.at<3>() = transpose_.GetColumnReadable<3>();
+						}
 					}
-					return out_;
 				}
 				else
 				{
@@ -332,11 +340,18 @@ namespace EmuMath
 				}
 			}
 		}
+		template<typename out_contained_type = float, bool OutColumnMajor_ = true>
+		[[nodiscard]] inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> Store() const
+		{
+			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> out_;
+			Store(out_);
+			return out_;
+		}
 
 		/// <summary> Provides a 128-bit register copy of the column at the specified index. </summary>
 		/// <returns>128-bit float register copy of the requested column within this matrix.</returns>
 		template<std::size_t Column_>
-		[[nodiscard]] __m128 GetColumn() const
+		[[nodiscard]] inline __m128 GetColumn() const
 		{
 			if constexpr (Column_ == 0)
 			{
@@ -362,7 +377,7 @@ namespace EmuMath
 		/// <summary> Provides an easily-readable EmuMath vector representing the column at the provided index. </summary>
 		/// <returns>EmuMath vector representing the requested column within this matrix.</returns>
 		template<std::size_t Column_>
-		[[nodiscard]] EmuMath::Vector<4, float> GetColumnReadable() const
+		[[nodiscard]] inline EmuMath::Vector<4, float> GetColumnReadable() const
 		{
 			EmuMath::Vector4<float> out_;
 			_mm_store_ps(out_.data(), GetColumn<Column_>());
@@ -372,7 +387,7 @@ namespace EmuMath
 		/// <summary> Provides a 128-bit register copy of the row at the specified index. As this matrix is column-major, this will require several shuffles. </summary>
 		/// <returns>128-bit float register copy of the requested row within this matrix.</returns>
 		template<std::size_t Row_>
-		[[nodiscard]] __m128 GetRow() const
+		[[nodiscard]] inline __m128 GetRow() const
 		{
 			if constexpr (Row_ <= 3)
 			{
@@ -391,7 +406,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>EmuMath vector representing the requested row within this matrix.</returns>
 		template<std::size_t Row_>
-		[[nodiscard]] EmuMath::Vector<4, float> GetRowReadable() const
+		[[nodiscard]] inline EmuMath::Vector<4, float> GetRowReadable() const
 		{
 			EmuMath::Vector4<float> out_;
 			_mm_store_ps(out_.data(), GetRow<Row_>());
@@ -409,7 +424,7 @@ namespace EmuMath
 		/// <param name="rhs_column_2_">Column 2 of a matrix to add to this matrix.</param>
 		/// <param name="rhs_column_3_">Column 3 of a matrix to add to this matrix.</param>
 		/// <returns>Matrix containing the results of addition.</returns>
-		inline FastMatrix4x4f_CM Add(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		[[nodiscard]] inline FastMatrix4x4f_CM Add(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
 		{
 			return FastMatrix4x4f_CM
 			(
@@ -422,7 +437,7 @@ namespace EmuMath
 		/// <summary> Adds the passed matrix to this matrix. </summary>
 		/// <param name="rhs_">Matrix to add to this matrix.</param>
 		/// <returns>Matrix containing the results of addition.</returns>
-		inline FastMatrix4x4f_CM Add(const FastMatrix4x4f_CM& rhs_) const
+		[[nodiscard]] inline FastMatrix4x4f_CM Add(const FastMatrix4x4f_CM& rhs_) const
 		{
 			return Add(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
 		}
@@ -436,7 +451,7 @@ namespace EmuMath
 		/// <param name="rhs_column_2_">Column 2 of a matrix to subtract from this matrix.</param>
 		/// <param name="rhs_column_3_">Column 3 of a matrix to subtract from this matrix.</param>
 		/// <returns>Matrix containing the results of subtraction.</returns>
-		inline FastMatrix4x4f_CM Subtract(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		[[nodiscard]] inline FastMatrix4x4f_CM Subtract(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
 		{
 			return FastMatrix4x4f_CM
 			(
@@ -449,7 +464,7 @@ namespace EmuMath
 		/// <summary> Subtracts the passed matrix from this matrix. </summary>
 		/// <param name="rhs_">Matrix to subtract from this matrix.</param>
 		/// <returns>Matrix containing the results of subtraction.</returns>
-		inline FastMatrix4x4f_CM Subtract(const FastMatrix4x4f_CM& rhs_) const
+		[[nodiscard]] inline FastMatrix4x4f_CM Subtract(const FastMatrix4x4f_CM& rhs_) const
 		{
 			return Subtract(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
 		}
@@ -463,7 +478,7 @@ namespace EmuMath
 		/// <param name="rhs_column_2_">Register to multiply this matrix's column2 by.</param>
 		/// <param name="rhs_column_3_">Register to multiply this matrix's column3 by.</param>
 		/// <returns>Resulting matrix after this matrix's columns are multiplied by the respective passed column registers.</returns>
-		inline FastMatrix4x4f_CM MultiplyBasic(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		[[nodiscard]] inline FastMatrix4x4f_CM MultiplyBasic(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
 		{
 			return FastMatrix4x4f_CM
 			(
@@ -476,7 +491,7 @@ namespace EmuMath
 		/// <summary> Multiplies all columns in this matrix by the passed register. Useful for providing a blanket multiplication to each element on certain rows. </summary>
 		/// <param name="mult_for_all_columns_">Register to multiply every column of this matrix via.</param>
 		/// <returns>Resulting matrix after this matrix's columns are all multiplied by the passed register.</returns>
-		inline FastMatrix4x4f_CM MultiplyBasic(__m128 mult_for_all_columns_) const
+		[[nodiscard]] inline FastMatrix4x4f_CM MultiplyBasic(__m128 mult_for_all_columns_) const
 		{
 			return FastMatrix4x4f_CM
 			(
@@ -492,7 +507,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Matrix to multiply respective columns of this matrix by.</param>
 		/// <returns>Resulting matrix after this matrix's columns are multiplied by the respective columns of the passed matrix.</returns>
-		inline FastMatrix4x4f_CM MultiplyBasic(const FastMatrix4x4f_CM& rhs_) const
+		[[nodiscard]] inline FastMatrix4x4f_CM MultiplyBasic(const FastMatrix4x4f_CM& rhs_) const
 		{
 			return MultiplyBasic(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
 		}
@@ -501,9 +516,9 @@ namespace EmuMath
 		/// <param name="val_">Value to multiply all elements of this matrix by.</param>
 		/// <returns>Resulting matrix after multiply all of this matrix's elements by the passed val_.</returns>
 		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
-		inline FastMatrix4x4f_CM MultiplyBasic(const T_& val_) const
+		[[nodiscard]] inline FastMatrix4x4f_CM MultiplyBasic(const T_& val_) const
 		{
-			return MultiplyBasic(_mm_set_ps1(static_cast<float>(val_)));
+			return MultiplyBasic(_mm_set1_ps(static_cast<float>(val_)));
 		}
 
 		/// <summary>
@@ -515,7 +530,7 @@ namespace EmuMath
 		/// <param name="rhs_column_2_">Column 2 of the matrix to multiply this matrix by.</param>
 		/// <param name="rhs_column_3_">Column 3 of the matrix to multiply this matrix by.</param>
 		/// <returns>Matrix result from multiplying this matrix by a matrix comprised of respective passed columns.</returns>
-		inline FastMatrix4x4f_CM Multiply(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		[[nodiscard]] inline FastMatrix4x4f_CM Multiply(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
 		{
 			return FastMatrix4x4f_CM
 			(
@@ -529,11 +544,11 @@ namespace EmuMath
 		/// <summary> Multiplies the passed rhs_vector_ register with this matrix, treating it as a single column matrix. </summary>
 		/// <param name="rhs_vector_">Vector to multiply. Used as-is.</param>
 		/// <returns>Resulting vector from multiplying the passed vector by this matrix, interpreted as defined above.</returns>
-		inline EmuMath::FastVector4f MultiplyVector4(__m128 rhs_vector_) const
+		[[nodiscard]] inline EmuMath::FastVector4f MultiplyVector4(__m128 rhs_vector_) const
 		{
 			return FastVector4f(_std_mult_calculate_column(rhs_vector_));
 		}
-		inline EmuMath::FastVector4f MultiplyVector4(const EmuMath::FastVector4f& rhs_vector_) const
+		[[nodiscard]] inline EmuMath::FastVector4f MultiplyVector4(const EmuMath::FastVector4f& rhs_vector_) const
 		{
 			return MultiplyVector4(rhs_vector_.data_);
 		}
@@ -543,7 +558,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_vector_">Vector to multiply. The x, y, and z values of this vector will be used, and w will be interpreted as 1.</param>
 		/// <returns>Resulting vector from multiplying the passed vector by this matrix, interpreted as defined above.</returns>
-		inline EmuMath::FastVector4f MultiplyVector3(__m128 rhs_vector_) const
+		[[nodiscard]] inline EmuMath::FastVector4f MultiplyVector3(__m128 rhs_vector_) const
 		{
 			__m128 out_ = _mm_mul_ps(column0, EmuMath::SIMD::shuffle<0, 0, 0, 0>(rhs_vector_));
 			out_ = _mm_add_ps(out_, _mm_mul_ps(column1, EmuMath::SIMD::shuffle<1, 1, 1, 1>(rhs_vector_)));
@@ -552,7 +567,7 @@ namespace EmuMath
 			// Add column3 to end result as we interpret the missing value to be 1 as per homogeneous coordinates default to
 			return FastVector4f(_mm_add_ps(out_, column3));
 		}
-		inline EmuMath::FastVector4f MultiplyVector3(const EmuMath::FastVector4f& rhs_vector_) const
+		[[nodiscard]] inline EmuMath::FastVector4f MultiplyVector3(const EmuMath::FastVector4f& rhs_vector_) const
 		{
 			return MultiplyVector3(rhs_vector_.data_);
 		}
@@ -563,7 +578,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_vector_">Vector to multiply. The x and y values of this vector will be used, z will be interpreted as 0, and w will be interpreted as 1.</param>
 		/// <returns>Resulting vector from multiplying the passed vector by this matrix, interpreted as defined above. The output z will always be 0.</returns>
-		inline EmuMath::FastVector4f MultiplyVector2(__m128 rhs_vector_) const
+		[[nodiscard]] inline EmuMath::FastVector4f MultiplyVector2(__m128 rhs_vector_) const
 		{
 			// Add column3 as we interpret the missing w value to be 1 as per homogeneous coordinates default to, 
 			// and z is interpreted to be 0 since 2D space is implicitly at Z 0, so the resulting Z should always be 0.
@@ -574,7 +589,7 @@ namespace EmuMath
 			// AND out the z coord to maintain implicit Z 0, and continue to add homogeneous 
 			return FastVector4f(_mm_and_ps(EmuMath::SIMD::index_mask_m128<true, true, false, true>(), out_));
 		}
-		inline EmuMath::FastVector4f MultiplyVector2(const EmuMath::FastVector4f& rhs_vector_) const
+		[[nodiscard]] inline EmuMath::FastVector4f MultiplyVector2(const EmuMath::FastVector4f& rhs_vector_) const
 		{
 			return MultiplyVector2(rhs_vector_.data_);
 		}
@@ -585,7 +600,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Matrix to multiply this matrix by.</param>
 		/// <returns>Matrix result from multiplying this matrix by a matrix comprised of respective passed columns.</returns>
-		inline FastMatrix4x4f_CM Multiply(const FastMatrix4x4f_CM& rhs_) const
+		[[nodiscard]] inline FastMatrix4x4f_CM Multiply(const FastMatrix4x4f_CM& rhs_) const
 		{
 			return Multiply(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
 		}
@@ -596,7 +611,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="mult_for_all_columns_">Register to multiply every column of this matrix via.</param>
 		/// <returns>Resulting matrix after this matrix's columns are all multiplied by the passed register.</returns>
-		inline FastMatrix4x4f_CM Multiply(__m128 mult_for_all_columns_) const
+		[[nodiscard]] inline FastMatrix4x4f_CM Multiply(__m128 mult_for_all_columns_) const
 		{
 			return MultiplyBasic(mult_for_all_columns_);
 		}
@@ -608,14 +623,71 @@ namespace EmuMath
 		/// <param name="val_">Value to multiply all elements of this matrix by.</param>
 		/// <returns>Resulting matrix after multiply all of this matrix's elements by the passed val_.</returns>
 		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
-		inline FastMatrix4x4f_CM Multiply(const T_& val_) const
+		[[nodiscard]] inline FastMatrix4x4f_CM Multiply(const T_& val_) const
 		{
 			return MultiplyBasic<T_>(val_);
 		}
 
+		/// <summary>
+		/// <para> Performs a basic division where respective columns in this matrix are divided by the passed column registers. </para>
+		/// <para> This is not a standard matrix division. Such behaviour is mathematically undefined. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to divide this matrix's column0 by.</param>
+		/// <param name="rhs_column_1_">Register to divide this matrix's column1 by.</param>
+		/// <param name="rhs_column_2_">Register to divide this matrix's column2 by.</param>
+		/// <param name="rhs_column_3_">Register to divide this matrix's column3 by.</param>
+		/// <returns>Resulting matrix after this matrix's columns are divided by the respective passed column registers.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM DivideBasic(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_div_ps(column0, rhs_column_0_),
+				_mm_div_ps(column1, rhs_column_1_),
+				_mm_div_ps(column2, rhs_column_2_),
+				_mm_div_ps(column3, rhs_column_3_)
+			);
+		}
+		/// <summary>
+		/// <para> Performs a basic division where each column in this matrix is divided via the passed divisor register. </para>
+		/// <para> This is not a standard matrix division. Such behaviour is mathematically undefined. </para>
+		/// </summary>
+		/// <param name="divisor_for_all_columns_">Register to divide each of this matrix's columns by.</param>
+		/// <returns>Resulting matrix after this matrix's columns are divided by the passed column register.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM DivideBasic(__m128 divisor_for_all_columns_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_div_ps(column0, divisor_for_all_columns_),
+				_mm_div_ps(column1, divisor_for_all_columns_),
+				_mm_div_ps(column2, divisor_for_all_columns_),
+				_mm_div_ps(column3, divisor_for_all_columns_)
+			);
+		}
+		/// <summary>
+		/// <para> Divides each value in this matrix by the respective value in the passed matrix. </para>
+		/// <para> This is not a standard matrix division. Such behaviour is mathematically undefined. </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to divide each respective value of this matrix by.</param>
+		/// <returns>Resulting matrix after this matrix's elements are divided by respective elements in the passed rhs_ matrix.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM DivideBasic(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return DivideBasic(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary>
+		/// <para> Divides each value in this matrix by the passed scalar. </para>
+		/// <para> This is not a standard matrix division. Such behaviour is mathematically undefined. </para>
+		/// </summary>
+		/// <param name="divisor_">Scalar to divide each respective value of this matrix by.</param>
+		/// <returns>Resulting matrix after this matrix's elements are divided by the passed scalar divisor_.</returns>
+		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM DivideBasic(const T_& divisor_) const
+		{
+			return DivideBasic(_mm_set1_ps(static_cast<float>(divisor_)));
+		}
+
 		/// <summary> Negates this matrix, setting every element to its negative form (e.g. [0][0] = -[0][0]). </summary>
 		/// <returns>Negated form of this matrix.</returns>
-		inline FastMatrix4x4f_CM Negate() const
+		[[nodiscard]] inline FastMatrix4x4f_CM Negate() const
 		{
 			__m128 zero_ = _mm_setzero_ps();
 			return FastMatrix4x4f_CM
@@ -628,8 +700,182 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region BITWISE_FUNCS
+		/// <summary>
+		/// <para> Performs a bitwise AND operation between this matrix and the passed column registers. </para>
+		/// <para> Passed registers represent the respective column within a 4x4 column-major matrix. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to AND with this matrix's 0th column.</param>
+		/// <param name="rhs_column_1_">Register to AND with this matrix's 1st column.</param>
+		/// <param name="rhs_column_2_">Register to AND with this matrix's 2nd column.</param>
+		/// <param name="rhs_column_3_">Register to AND with this matrix's 3rd column.</param>
+		/// <returns>Result of a bitwise AND between this matrix and the matrix represented by the passed column registers.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM And(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_and_ps(column0, rhs_column_0_),
+				_mm_and_ps(column1, rhs_column_1_),
+				_mm_and_ps(column2, rhs_column_2_),
+				_mm_and_ps(column3, rhs_column_3_)
+			);
+		}
+		/// <summary>
+		/// <para> Performs a bitwise AND operation between all of this matrix's columns and the passed rhs_ register. </para>
+		/// </summary>
+		/// <param name="rhs_">Register to AND with each of this matrix's columns.</param>
+		/// <returns>Result of a bitwise AND between this matrix's columns and the passed rhs_ register.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM And(__m128 rhs_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_and_ps(column0, rhs_),
+				_mm_and_ps(column1, rhs_),
+				_mm_and_ps(column2, rhs_),
+				_mm_and_ps(column3, rhs_)
+			);
+		}
+		/// <summary>
+		/// <para> Performs a bitwise AND operation between all of this matrix's elements and the respective elements of the passed matrix. </para>
+		/// </summary>
+		/// <param name="rhs_">4x4 column-major matrix to AND the elements of this matrix with.</param>
+		/// <returns>Result of a bitwise AND between this matrix and the passed matrix.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM And(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return And(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary>
+		/// <para> Performs a bitwise AND operation between all of this matrix's elements and the passed scalar. </para>
+		/// </summary>
+		/// <param name="rhs_">Scalar to AND every element of this matrix with.</param>
+		/// <returns>Result of a bitwise AND between this matrix and the passed scalar.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM And(float rhs_) const
+		{
+			return And(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a bitwise OR operation between this matrix and the passed column registers. </para>
+		/// <para> Passed registers represent the respective column within a 4x4 column-major matrix. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to OR with this matrix's 0th column.</param>
+		/// <param name="rhs_column_1_">Register to OR with this matrix's 1st column.</param>
+		/// <param name="rhs_column_2_">Register to OR with this matrix's 2nd column.</param>
+		/// <param name="rhs_column_3_">Register to OR with this matrix's 3rd column.</param>
+		/// <returns>Result of a bitwise OR between this matrix and the matrix represented by the passed column registers.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM Or(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_or_ps(column0, rhs_column_0_),
+				_mm_or_ps(column1, rhs_column_1_),
+				_mm_or_ps(column2, rhs_column_2_),
+				_mm_or_ps(column3, rhs_column_3_)
+			);
+		}
+		/// <summary>
+		/// <para> Performs a bitwise OR operation between all of this matrix's columns and the passed rhs_ register. </para>
+		/// </summary>
+		/// <param name="rhs_">Register to OR with each of this matrix's columns.</param>
+		/// <returns>Result of a bitwise OR between this matrix's columns and the passed rhs_ register.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM Or(__m128 rhs_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_or_ps(column0, rhs_),
+				_mm_or_ps(column1, rhs_),
+				_mm_or_ps(column2, rhs_),
+				_mm_or_ps(column3, rhs_)
+			);
+		}
+		/// <summary>
+		/// <para> Performs a bitwise OR operation between all of this matrix's elements and the respective elements of the passed matrix. </para>
+		/// </summary>
+		/// <param name="rhs_">4x4 column-major matrix to OR the elements of this matrix with.</param>
+		/// <returns>Result of a bitwise OR between this matrix and the passed matrix.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM Or(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return Or(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary>
+		/// <para> Performs a bitwise OR operation between all of this matrix's elements and the passed scalar. </para>
+		/// </summary>
+		/// <param name="rhs_">Scalar to OR every element of this matrix with.</param>
+		/// <returns>Result of a bitwise OR between this matrix and the passed scalar.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM Or(float rhs_) const
+		{
+			return Or(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a bitwise XOR operation between this matrix and the passed column registers. </para>
+		/// <para> Passed registers represent the respective column within a 4x4 column-major matrix. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to XOR with this matrix's 0th column.</param>
+		/// <param name="rhs_column_1_">Register to XOR with this matrix's 1st column.</param>
+		/// <param name="rhs_column_2_">Register to XOR with this matrix's 2nd column.</param>
+		/// <param name="rhs_column_3_">Register to XOR with this matrix's 3rd column.</param>
+		/// <returns>Result of a bitwise XOR between this matrix and the matrix represented by the passed column registers.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM Xor(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_xor_ps(column0, rhs_column_0_),
+				_mm_xor_ps(column1, rhs_column_1_),
+				_mm_xor_ps(column2, rhs_column_2_),
+				_mm_xor_ps(column3, rhs_column_3_)
+			);
+		}
+		/// <summary>
+		/// <para> Performs a bitwise XOR operation between all of this matrix's columns and the passed rhs_ register. </para>
+		/// </summary>
+		/// <param name="rhs_">Register to XOR with each of this matrix's columns.</param>
+		/// <returns>Result of a bitwise XOR between this matrix's columns and the passed rhs_ register.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM Xor(__m128 rhs_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_xor_ps(column0, rhs_),
+				_mm_xor_ps(column1, rhs_),
+				_mm_xor_ps(column2, rhs_),
+				_mm_xor_ps(column3, rhs_)
+			);
+		}
+		/// <summary>
+		/// <para> Performs a bitwise XOR operation between all of this matrix's elements and the respective elements of the passed matrix. </para>
+		/// </summary>
+		/// <param name="rhs_">4x4 column-major matrix to OR the elements of this matrix with.</param>
+		/// <returns>Result of a bitwise XOR between this matrix and the passed matrix.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM Xor(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return Xor(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary>
+		/// <para> Performs a bitwise XOR operation between all of this matrix's elements and the passed scalar. </para>
+		/// </summary>
+		/// <param name="rhs_">Scalar to XOR every element of this matrix with.</param>
+		/// <returns>Result of a bitwise XOR between this matrix and the passed scalar.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM Xor(float rhs_) const
+		{
+			return Xor(_mm_broadcast_ss(&rhs_));
+		}
+
+		/// <summary> Flips the bits of this matrix's columns. </summary>
+		/// <returns>Resulting matrix from flipping the bits of this matrix.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM Not() const
+		{
+			return FastMatrix4x4f_CM
+			(
+				EmuMath::SIMD::not_128(column0),
+				EmuMath::SIMD::not_128(column1),
+				EmuMath::SIMD::not_128(column2),
+				EmuMath::SIMD::not_128(column3)
+			);
+		}
+#pragma endregion
+
 #pragma region CONST_OPERATORS
-		inline bool operator==(const FastMatrix4x4f_CM& rhs_) const
+		[[nodiscard]] inline bool operator==(const FastMatrix4x4f_CM& rhs_) const
 		{
 			return
 			(
@@ -640,7 +886,7 @@ namespace EmuMath
 			);
 		}
 
-		inline bool operator!=(const FastMatrix4x4f_CM& rhs_) const
+		[[nodiscard]] inline bool operator!=(const FastMatrix4x4f_CM& rhs_) const
 		{
 			return
 			(
@@ -651,52 +897,223 @@ namespace EmuMath
 			);
 		}
 
-		inline FastMatrix4x4f_CM operator+(const FastMatrix4x4f_CM& rhs_) const
+		[[nodiscard]] inline FastMatrix4x4f_CM operator+(const FastMatrix4x4f_CM& rhs_) const
 		{
 			return Add(rhs_);
 		}
 
-		inline FastMatrix4x4f_CM operator-(const FastMatrix4x4f_CM& rhs_) const
+		[[nodiscard]] inline FastMatrix4x4f_CM operator-(const FastMatrix4x4f_CM& rhs_) const
 		{
 			return Subtract(rhs_);
 		}
-		inline FastMatrix4x4f_CM operator-() const
+		[[nodiscard]] inline FastMatrix4x4f_CM operator-() const
 		{
 			return Negate();
 		}
 
+		[[nodiscard]] inline FastMatrix4x4f_CM operator*(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return Multiply(rhs_);
+		}
 		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
-		inline FastMatrix4x4f_CM operator*(const T_& rhs_) const
+		[[nodiscard]] inline FastMatrix4x4f_CM operator*(const T_& rhs_) const
 		{
 			return MultiplyBasic<T_>(rhs_);
 		}
-		inline FastMatrix4x4f_CM operator*(const FastMatrix4x4f_CM& rhs_) const
+
+		[[nodiscard]] inline FastMatrix4x4f_CM operator/(const FastMatrix4x4f_CM& rhs_) const
 		{
-			return Multiply(rhs_);
+			return DivideBasic(rhs_);
+		}
+		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM operator/(const T_& rhs_) const
+		{
+			return DivideBasic<T_>(rhs_);
+		}
+
+		[[nodiscard]] inline FastMatrix4x4f_CM operator&(float rhs_) const
+		{
+			return And(rhs_);
+		}
+		[[nodiscard]] inline FastMatrix4x4f_CM operator&(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return And(rhs_);
+		}
+
+		[[nodiscard]] inline FastMatrix4x4f_CM operator|(float rhs_) const
+		{
+			return Or(rhs_);
+		}
+		[[nodiscard]] inline FastMatrix4x4f_CM operator|(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return Or(rhs_);
+		}
+
+		[[nodiscard]] inline FastMatrix4x4f_CM operator^(float rhs_) const
+		{
+			return Xor(rhs_);
+		}
+		[[nodiscard]] inline FastMatrix4x4f_CM operator^(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return Xor(rhs_);
+		}
+
+		[[nodiscard]] inline FastMatrix4x4f_CM operator~() const
+		{
+			return Not();
+		}
+
+		[[nodiscard]] inline bool operator!() const
+		{
+			return
+			(
+				_mm_movemask_ps(column0) == 0 &&
+				_mm_movemask_ps(column1) == 0 &&
+				_mm_movemask_ps(column2) == 0 &&
+				_mm_movemask_ps(column3) == 0
+			);
+		}
+#pragma endregion
+
+#pragma region NON_CONST_OPERATORS
+		inline FastMatrix4x4f_CM& operator=(const FastMatrix4x4f_CM& rhs_)
+		{
+			column0 = rhs_.column0;
+			column1 = rhs_.column1;
+			column2 = rhs_.column2;
+			column3 = rhs_.column3;
+			return *this;
+		}
+		template<std::size_t NumColumns_, std::size_t NumRows_, typename in_contained_type, bool InColumnMajor_>
+		inline FastMatrix4x4f_CM& operator=(const EmuMath::Matrix<NumColumns_, NumRows_, in_contained_type, InColumnMajor_>& rhs_)
+		{
+			column0 = _mm_set_ps
+			(
+				EmuMath::Helpers::MatrixGetTheoretical<0, 0>(rhs_),
+				EmuMath::Helpers::MatrixGetTheoretical<0, 1>(rhs_),
+				EmuMath::Helpers::MatrixGetTheoretical<0, 2>(rhs_),
+				EmuMath::Helpers::MatrixGetTheoretical<0, 3>(rhs_)
+			);
+			column1 = _mm_set_ps
+			(
+				EmuMath::Helpers::MatrixGetTheoretical<1, 0>(rhs_),
+				EmuMath::Helpers::MatrixGetTheoretical<1, 1>(rhs_),
+				EmuMath::Helpers::MatrixGetTheoretical<1, 2>(rhs_),
+				EmuMath::Helpers::MatrixGetTheoretical<1, 3>(rhs_)
+			);
+			column2 = _mm_set_ps
+			(
+				EmuMath::Helpers::MatrixGetTheoretical<2, 0>(rhs_),
+				EmuMath::Helpers::MatrixGetTheoretical<2, 1>(rhs_),
+				EmuMath::Helpers::MatrixGetTheoretical<2, 2>(rhs_),
+				EmuMath::Helpers::MatrixGetTheoretical<2, 3>(rhs_)
+			);
+			column3 = _mm_set_ps
+			(
+				EmuMath::Helpers::MatrixGetTheoretical<3, 0>(rhs_),
+				EmuMath::Helpers::MatrixGetTheoretical<3, 1>(rhs_),
+				EmuMath::Helpers::MatrixGetTheoretical<3, 2>(rhs_),
+				EmuMath::Helpers::MatrixGetTheoretical<3, 3>(rhs_)
+			);
+			return *this;
+		}
+		template<>
+		inline FastMatrix4x4f_CM& operator=(const EmuMath::Matrix<4, 4, float, true>& rhs_)
+		{
+			column0 = _mm_load_ps(rhs_.at<0>().data());
+			column1 = _mm_load_ps(rhs_.at<1>().data());
+			column2 = _mm_load_ps(rhs_.at<2>().data());
+			column3 = _mm_load_ps(rhs_.at<3>().data());
+			return *this;
+		}
+
+		inline FastMatrix4x4f_CM& operator+=(const FastMatrix4x4f_CM& rhs_)
+		{
+			return operator=(Add(rhs_));
+		}
+
+		inline FastMatrix4x4f_CM& operator-=(const FastMatrix4x4f_CM& rhs_)
+		{
+			return operator=(Subtract(rhs_));
+		}
+
+		inline FastMatrix4x4f_CM& operator*=(const FastMatrix4x4f_CM& rhs_)
+		{
+			return operator=(Multiply(rhs_));
+		}
+		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		inline FastMatrix4x4f_CM& operator*=(const T_& rhs_)
+		{
+			return operator=(MultiplyBasic<T_>(rhs_));
+		}
+
+		inline FastMatrix4x4f_CM& operator/=(const FastMatrix4x4f_CM& rhs_)
+		{
+			return operator=(DivideBasic(rhs_));
+		}
+		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		inline FastMatrix4x4f_CM& operator/=(const T_& rhs_)
+		{
+			return operator=(DivideBasic<T_>(rhs_));
+		}
+
+		inline FastMatrix4x4f_CM& operator&=(float rhs_)
+		{
+			return operator=(And(rhs_));
+		}
+		inline FastMatrix4x4f_CM& operator&=(const FastMatrix4x4f_CM& rhs_)
+		{
+			return operator=(And(rhs_));
+		}
+
+		inline FastMatrix4x4f_CM& operator|=(float rhs_)
+		{
+			return operator=(Or(rhs_));
+		}
+		inline FastMatrix4x4f_CM& operator|=(const FastMatrix4x4f_CM& rhs_)
+		{
+			return operator=(Or(rhs_));
+		}
+
+		inline FastMatrix4x4f_CM& operator^=(float rhs_)
+		{
+			return operator=(Xor(rhs_));
+		}
+		inline FastMatrix4x4f_CM& operator^=(const FastMatrix4x4f_CM& rhs_)
+		{
+			return operator=(Xor(rhs_));
 		}
 #pragma endregion
 
 #pragma region MATRIX_OPERATIONS
-		inline FastMatrix4x4f_CM Transpose() const
+		/// <summary> Transposes this matrix, effectively turning columns into rows and vice versa. </summary>
+		/// <returns>Transposed form of this matrix.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM Transpose() const
 		{
 			return FastMatrix4x4f_CM(GetRow<0>(), GetRow<1>(), GetRow<2>(), GetRow<3>());
 		}
 
-		/// <summary> Provides a fast vector containing the trace of this matrix within its data. </summary>
-		/// <returns>Trace of this matrix represented as a FastVector4f.</returns>
-		inline EmuMath::FastVector4f Trace() const
+		/// <summary> Provides a fast vector containing the main diagonal of this matrix within its data. </summary>
+		/// <returns>Main diagonal of this matrix represented as a FastVector4f.</returns>
+		[[nodiscard]] inline EmuMath::FastVector4f MainDiagonal() const
 		{
 			__m128 out_01_ = EmuMath::SIMD::shuffle<0, 0, 1, 1>(column0, column1);
 			__m128 out_23_ = EmuMath::SIMD::shuffle<2, 2, 3, 3>(column2, column3);
-
 			return EmuMath::FastVector4f(EmuMath::SIMD::shuffle<0, 2, 0, 2>(out_01_, out_23_));
+		}
+
+		/// <summary> Calculates the trace of this matrix (the sum of all elements along its main diagonal). </summary>
+		/// <returns>Trace of this matrix represented as a scalar.</returns>
+		[[nodiscard]] inline float Trace() const
+		{
+			return MainDiagonal().HorizontalSum();
 		}
 #pragma endregion
 
 #pragma region STATIC_CONSTANTS
 		/// <summary> Creates a 4x4 column-major identity matrix, which is all 0 except for its main diagonal (top left to bottom right), which is all 1. </summary>
 		/// <returns>4x4 column-major identity matrix.</returns>
-		static inline FastMatrix4x4f_CM Identity()
+		[[nodiscard]] static inline FastMatrix4x4f_CM Identity()
 		{
 			return FastMatrix4x4f_CM
 			(
@@ -848,8 +1265,28 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region STATIC_PROJECTIONS
+		/// <summary>
+		/// <para> Creates a 4x4 column-major perspective projection matrix for right-handed coordinate systems, formed for Vulkan clipping space. </para>
+		/// <para>
+		///		Unless you know exactly what you are doing, it is recommended to use the 
+		///		overload of this function which takes (fov_y_angle_, near_, far_, aspect_ratio_) arguments to calculate the clipping area edges for you.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Near_">Type used to provide the near plane value.</typeparam>
+		/// <typeparam name="Far_">Type used to provide the far plane value.</typeparam>
+		/// <typeparam name="Left_">Type used to provide the left (low horizontal) edge value.</typeparam>
+		/// <typeparam name="Right_">Type used to provide the right (high horizontal) edge value.</typeparam>
+		/// <typeparam name="Bottom_">Type used to provide the bottom (low vertical) edge value.</typeparam>
+		/// <typeparam name="Top_">Type used to provide the top (high vertical) edge value.</typeparam>
+		/// <param name="near_">Near clipping plane to project items to. For correct behaviour, this should be greater than far_.</param>
+		/// <param name="far_">Near clipping plane to project items to. For correct behaviour, this should be less than near_.</param>
+		/// <param name="left_">Left (low horizontal) edge value for the projection area.</param>
+		/// <param name="right_">Left (low horizontal) edge value for the projection area.</param>
+		/// <param name="bottom_">Left (low horizontal) edge value for the projection area.</param>
+		/// <param name="top_">Left (low horizontal) edge value for the projection area.</param>
+		/// <returns>Right-handed perspective projection matrix formed for Vulkan clipping space.</returns>
 		template<typename Near_, typename Far_, typename Left_, typename Right_, typename Bottom_, typename Top_>
-		static inline FastMatrix4x4f_CM PerspectiveVK
+		[[nodiscard]] static inline FastMatrix4x4f_CM PerspectiveRhVK
 		(
 			const Near_& near_,
 			const Far_& far_,
@@ -885,13 +1322,28 @@ namespace EmuMath
 				0.0f,    0.0f,    out_32_, 0.0f
 			);
 		}
+		/// <summary>
+		/// <para> Creates a 4x4 column-major perspective projection matrix for right-handed coordinate systems, formed for Vulkan clipping space. </para>
+		/// </summary>
+		/// <typeparam name="FovY_">Type used to provide the FOV y angle.</typeparam>
+		/// <typeparam name="Near_">Type used to provide the near plane value.</typeparam>
+		/// <typeparam name="Far_">Type used to provide the far plane value.</typeparam>
+		/// <typeparam name="AspectRatio_">Type used to provide the aspect ratio.</typeparam>
+		/// <param name="fov_y_angle_">
+		///		Angle of the field-of-view in the y-axis. 
+		///		May be in radians or degrees, and by default is interpreted as radians. To provide degrees, set the template argument FovIsRads_ to false.
+		/// </param>
+		/// <param name="near_">Near clipping plane to project items to. For correct behaviour, this should be greater than far_.</param>
+		/// <param name="far_">Near clipping plane to project items to. For correct behaviour, this should be less than near_.</param>
+		/// <param name="aspect_ratio_">Aspect ratio for the view represented as a scalar. Ratio is commonly (target_width / target_height).</param>
+		/// <returns>Right-handed perspective projection matrix formed for Vulkan clipping space.</returns>
 		template<bool FovIsRads_ = true, typename FovY_, typename Near_, typename Far_, typename AspectRatio_>
-		static inline FastMatrix4x4f_CM PerspectiveVK(const FovY_& fov_y_angle_, const Near_& near_, const Far_& far_, const AspectRatio_& aspect_ratio_)
+		[[nodiscard]] static inline FastMatrix4x4f_CM PerspectiveRhVK(const FovY_& fov_y_angle_, const Near_& near_, const Far_& far_, const AspectRatio_& aspect_ratio_)
 		{
 			using fov_y_fp = typename EmuCore::TMPHelpers::first_floating_point<FovY_, float>::type;
 			if constexpr (!FovIsRads_)
 			{
-				return PerspectiveVK<true, fov_y_fp, Near_, Far_, AspectRatio_>
+				return PerspectiveRhVK<true, fov_y_fp, Near_, Far_, AspectRatio_>
 				(
 					EmuCore::Pi::DegsToRads(static_cast<fov_y_fp>(fov_y_angle_)),
 					near_,
@@ -913,12 +1365,28 @@ namespace EmuMath
 					bottom_,
 					top_
 				);
-				return PerspectiveVK<Near_, Far_, float, float, float, float>(near_, far_, left_, right_, bottom_, top_);
+				return PerspectiveRhVK<Near_, Far_, float, float, float, float>(near_, far_, left_, right_, bottom_, top_);
 			}
 		}
 
+		/// <summary>
+		/// <para> Creates a 4x4 column-major orthographic projection matrix for right-handed coordinate systems, formed for Vulkan clipping space. </para>
+		/// </summary>
+		/// <typeparam name="Near_">Type used to provide the near plane value.</typeparam>
+		/// <typeparam name="Far_">Type used to provide the far plane value.</typeparam>
+		/// <typeparam name="Left_">Type used to provide the left (low horizontal) edge value.</typeparam>
+		/// <typeparam name="Right_">Type used to provide the right (high horizontal) edge value.</typeparam>
+		/// <typeparam name="Bottom_">Type used to provide the bottom (low vertical) edge value.</typeparam>
+		/// <typeparam name="Top_">Type used to provide the top (high vertical) edge value.</typeparam>
+		/// <param name="near_">Near clipping plane to project items to. For correct behaviour, this should be greater than far_.</param>
+		/// <param name="far_">Near clipping plane to project items to. For correct behaviour, this should be less than near_.</param>
+		/// <param name="left_">Left (low horizontal) edge value for the projection area.</param>
+		/// <param name="right_">Left (low horizontal) edge value for the projection area.</param>
+		/// <param name="bottom_">Left (low horizontal) edge value for the projection area.</param>
+		/// <param name="top_">Left (low horizontal) edge value for the projection area.</param>
+		/// <returns>Right-handed orthographic projection matrix formed for Vulkan clipping space.</returns>
 		template<typename Left_, typename Right_, typename Bottom_, typename Top_, typename Near_, typename Far_>
-		static inline FastMatrix4x4f_CM OrthographicVK
+		[[nodiscard]] static inline FastMatrix4x4f_CM OrthographicRhVK
 		(
 			const Left_& left_,
 			const Right_& right_,
@@ -944,10 +1412,26 @@ namespace EmuMath
 				0.0f,    0.0f,    out_32_, 1.0f
 			);
 		}
+		/// <summary>
+		/// <para> Creates a 4x4 column-major orthographic projection matrix for right-handed coordinate systems, formed for Vulkan clipping space. </para>
+		/// <para>
+		///		This is effectively shorthand for calling the overload of this function taking specific edges, 
+		///		where left and bottom will be set to 0, and right and top will be set to width and height respectively.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Width_">Type used to provided the view space's horizontal size.</typeparam>
+		/// <typeparam name="Width_">Type used to provided the view space's vertical size.</typeparam>
+		/// <typeparam name="Near_">Type used to provide the near plane value.</typeparam>
+		/// <typeparam name="Far_">Type used to provide the far plane value.</typeparam>
+		/// <param name="width_">Target view space's horizontal size.</param>
+		/// <param name="height_">Target view space's vertical size.</param>
+		/// <param name="near_">Near clipping plane to project items to. For correct behaviour, this should be greater than far_.</param>
+		/// <param name="far_">Near clipping plane to project items to. For correct behaviour, this should be less than near_.</param>
+		/// <returns>Right-handed orthographic projection matrix formed for Vulkan clipping space.</returns>
 		template<typename Width_, typename Height_, typename Near_, typename Far_>
-		static inline FastMatrix4x4f_CM OrthographicVK(const Width_& width_, const Height_& height_, const Near_& near_, const Far_& far_)
+		[[nodiscard]] static inline FastMatrix4x4f_CM OrthographicRhVK(const Width_& width_, const Height_& height_, const Near_& near_, const Far_& far_)
 		{
-			return OrthographicVK<float, Width_, float, Height_, Near_, Far_>(0.0f, width_, 0.0f, height_, near_, far_);
+			return OrthographicRhVK<float, Width_, float, Height_, Near_, Far_>(0.0f, width_, 0.0f, height_, near_, far_);
 		}
 #pragma endregion
 
@@ -1024,7 +1508,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region UNDERLYING_HELPERS
-		inline __m128 _std_mult_calculate_column(__m128 rhs_column_) const
+		[[nodiscard]] inline __m128 _std_mult_calculate_column(__m128 rhs_column_) const
 		{
 			// We use a shuffle instead of dumping values and broadcasting as it tends to be better optimised by the compiler
 			// --- NOTE: this is slower in debug compared to the broadcasting of dumped values, but faster in release

@@ -67,8 +67,8 @@ namespace EmuMath
 		using const_random_access_row = typename matrix_info::const_random_access_row;
 		/// <summary> Type used to randomly access a column referencing this matrix with constant constraints. </summary>
 		using const_random_access_column = typename matrix_info::const_random_access_column;
-
 		using major_storage_type = typename matrix_info::major_storage_type;
+
 
 		/// <summary> This matrix type. </summary>
 		using this_type = EmuMath::Matrix<num_columns, num_rows, contained_type, is_column_major>;
