@@ -1483,6 +1483,158 @@ namespace EmuMath
 		{
 			return MainDiagonal().HorizontalSum();
 		}
+
+		[[nodiscard]] inline FastMatrix4x4f_CM Inverse() const
+		{
+			auto row0 = GetRowReadable<0>();
+			auto row1 = GetRowReadable<1>();
+			auto row2 = GetRowReadable<2>();
+			auto row3 = GetRowReadable<3>();
+			auto identity = Identity().Store();
+			auto& identity_0_ = identity.at<0>();
+			auto& identity_1_ = identity.at<1>();
+			auto& identity_2_ = identity.at<2>();
+			auto& identity_3_ = identity.at<3>();
+
+			float pivot = row0.at<0>();
+			float mult_ = -(row1.at<0>() / pivot);
+			row1.at<0>() += (mult_ * row0.at<0>());
+			row1.at<1>() += (mult_ * row0.at<1>());
+			row1.at<2>() += (mult_ * row0.at<2>());
+			row1.at<3>() += (mult_ * row0.at<3>());
+			identity_1_.at<0>() += (mult_ * identity_0_.at<0>());
+			identity_1_.at<1>() += (mult_ * identity_0_.at<1>());
+			identity_1_.at<2>() += (mult_ * identity_0_.at<2>());
+			identity_1_.at<3>() += (mult_ * identity_0_.at<3>());
+
+			mult_ = -(row2.at<0>() / pivot);
+			row2.at<0>() += (mult_ * row0.at<0>());
+			row2.at<1>() += (mult_ * row0.at<1>());
+			row2.at<2>() += (mult_ * row0.at<2>());
+			row2.at<3>() += (mult_ * row0.at<3>());
+			identity_2_.at<0>() += (mult_ * identity_0_.at<0>());
+			identity_2_.at<1>() += (mult_ * identity_0_.at<1>());
+			identity_2_.at<2>() += (mult_ * identity_0_.at<2>());
+			identity_2_.at<3>() += (mult_ * identity_0_.at<3>());
+
+			mult_ = -(row3.at<0>() / pivot);
+			row3.at<0>() += (mult_ * row0.at<0>());
+			row3.at<1>() += (mult_ * row0.at<1>());
+			row3.at<2>() += (mult_ * row0.at<2>());
+			row3.at<3>() += (mult_ * row0.at<3>());
+			identity_3_.at<0>() += (mult_ * identity_0_.at<0>());
+			identity_3_.at<1>() += (mult_ * identity_0_.at<1>());
+			identity_3_.at<2>() += (mult_ * identity_0_.at<2>());
+			identity_3_.at<3>() += (mult_ * identity_0_.at<3>());
+
+
+
+			pivot = row1.at<1>();
+			mult_ = -(row0.at<1>() / pivot);
+			row0.at<0>() += (mult_ * row1.at<0>());
+			row0.at<1>() += (mult_ * row1.at<1>());
+			row0.at<2>() += (mult_ * row1.at<2>());
+			row0.at<3>() += (mult_ * row1.at<3>());
+			identity_0_.at<0>() += (mult_ * identity_1_.at<0>());
+			identity_0_.at<1>() += (mult_ * identity_1_.at<1>());
+			identity_0_.at<2>() += (mult_ * identity_1_.at<2>());
+			identity_0_.at<3>() += (mult_ * identity_1_.at<3>());
+
+			mult_ = -(row2.at<1>() / pivot);
+			row2.at<0>() += (mult_ * row1.at<0>());
+			row2.at<1>() += (mult_ * row1.at<1>());
+			row2.at<2>() += (mult_ * row1.at<2>());
+			row2.at<3>() += (mult_ * row1.at<3>());
+			identity_2_.at<0>() += (mult_ * identity_1_.at<0>());
+			identity_2_.at<1>() += (mult_ * identity_1_.at<1>());
+			identity_2_.at<2>() += (mult_ * identity_1_.at<2>());
+			identity_2_.at<3>() += (mult_ * identity_1_.at<3>());
+
+			mult_ = -(row3.at<1>() / pivot);
+			row3.at<0>() += (mult_ * row1.at<0>());
+			row3.at<1>() += (mult_ * row1.at<1>());
+			row3.at<2>() += (mult_ * row1.at<2>());
+			row3.at<3>() += (mult_ * row1.at<3>());
+			identity_3_.at<0>() += (mult_ * identity_1_.at<0>());
+			identity_3_.at<1>() += (mult_ * identity_1_.at<1>());
+			identity_3_.at<2>() += (mult_ * identity_1_.at<2>());
+			identity_3_.at<3>() += (mult_ * identity_1_.at<3>());
+
+
+
+			pivot = row2.at<2>();
+			mult_ = -(row0.at<2>() / pivot);
+			row0.at<0>() += (mult_ * row2.at<0>());
+			row0.at<1>() += (mult_ * row2.at<1>());
+			row0.at<2>() += (mult_ * row2.at<2>());
+			row0.at<3>() += (mult_ * row2.at<3>());
+			identity_0_.at<0>() += (mult_ * identity_2_.at<0>());
+			identity_0_.at<1>() += (mult_ * identity_2_.at<1>());
+			identity_0_.at<2>() += (mult_ * identity_2_.at<2>());
+			identity_0_.at<3>() += (mult_ * identity_2_.at<3>());
+
+			mult_ = -(row1.at<2>() / pivot);
+			row1.at<0>() += (mult_ * row2.at<0>());
+			row1.at<1>() += (mult_ * row2.at<1>());
+			row1.at<2>() += (mult_ * row2.at<2>());
+			row1.at<3>() += (mult_ * row2.at<3>());
+			identity_1_.at<0>() += (mult_ * identity_2_.at<0>());
+			identity_1_.at<1>() += (mult_ * identity_2_.at<1>());
+			identity_1_.at<2>() += (mult_ * identity_2_.at<2>());
+			identity_1_.at<3>() += (mult_ * identity_2_.at<3>());
+
+			mult_ = -(row3.at<2>() / pivot);
+			row3.at<0>() += (mult_ * row2.at<0>());
+			row3.at<1>() += (mult_ * row2.at<1>());
+			row3.at<2>() += (mult_ * row2.at<2>());
+			row3.at<3>() += (mult_ * row2.at<3>());
+			identity_3_.at<0>() += (mult_ * identity_2_.at<0>());
+			identity_3_.at<1>() += (mult_ * identity_2_.at<1>());
+			identity_3_.at<2>() += (mult_ * identity_2_.at<2>());
+			identity_3_.at<3>() += (mult_ * identity_2_.at<3>());
+
+
+
+			pivot = row3.at<3>();
+			mult_ = -(row0.at<3>() / pivot);
+			row0.at<0>() += (mult_ * row3.at<0>());
+			row0.at<1>() += (mult_ * row3.at<1>());
+			row0.at<2>() += (mult_ * row3.at<2>());
+			row0.at<3>() += (mult_ * row3.at<3>());
+			identity_0_.at<0>() += (mult_ * identity_3_.at<0>());
+			identity_0_.at<1>() += (mult_ * identity_3_.at<1>());
+			identity_0_.at<2>() += (mult_ * identity_3_.at<2>());
+			identity_0_.at<3>() += (mult_ * identity_3_.at<3>());
+
+			mult_ = -(row1.at<3>() / pivot);
+			row1.at<0>() += (mult_ * row3.at<0>());
+			row1.at<1>() += (mult_ * row3.at<1>());
+			row1.at<2>() += (mult_ * row3.at<2>());
+			row1.at<3>() += (mult_ * row3.at<3>());
+			identity_1_.at<0>() += (mult_ * identity_3_.at<0>());
+			identity_1_.at<1>() += (mult_ * identity_3_.at<1>());
+			identity_1_.at<2>() += (mult_ * identity_3_.at<2>());
+			identity_1_.at<3>() += (mult_ * identity_3_.at<3>());
+
+			mult_ = -(row2.at<3>() / pivot);
+			row2.at<0>() += (mult_ * row3.at<0>());
+			row2.at<1>() += (mult_ * row3.at<1>());
+			row2.at<2>() += (mult_ * row3.at<2>());
+			row2.at<3>() += (mult_ * row3.at<3>());
+			identity_2_.at<0>() += (mult_ * identity_3_.at<0>());
+			identity_2_.at<1>() += (mult_ * identity_3_.at<1>());
+			identity_2_.at<2>() += (mult_ * identity_3_.at<2>());
+			identity_2_.at<3>() += (mult_ * identity_3_.at<3>());
+
+
+			identity_0_ /= row0.at<0>();
+			identity_1_ /= row1.at<1>();
+			identity_2_ /= row2.at<2>();
+			identity_3_ /= row3.at<3>();
+
+			//return FastMatrix4x4f_CM(row0.data(), row1.data(), row2.data(), row3.data()).Transpose();
+			return FastMatrix4x4f_CM(identity_0_.data(), identity_1_.data(), identity_2_.data(), identity_3_.data()).Transpose();
+		}
 #pragma endregion
 
 #pragma region STATIC_CONSTANTS

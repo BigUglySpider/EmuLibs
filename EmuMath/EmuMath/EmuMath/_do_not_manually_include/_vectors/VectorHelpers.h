@@ -514,7 +514,7 @@ namespace EmuMath::Helpers
 	template<class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline auto VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorDivide<LhsVector_::size, typename LhsVector_::value_type, Rhs_>(lhs_, rhs_);
+		return VectorDivide<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
 	/// <summary>

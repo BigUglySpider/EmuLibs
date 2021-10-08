@@ -236,6 +236,17 @@ int main()
 	std::cout << "Original min: " << original_mat_.Min() << " | Original max: " << original_mat_.Max() << "\n\n";
 
 	std::cout << original_mat_ << "\nTRANSPOSE:\n" << original_mat_.Transpose() << "\n\n";
+	
+
+	EmuMath::FastMatrix4x4f_CM inv_test_
+	(
+		-3, 6, 3, 1,
+		2, -6, -4, 2,
+		-1, 7, 4, 3,
+		1, 1, 1, 1
+	);
+	std::cout << "Mat:\n" << inv_test_ << "\nInverse:\n" << inv_test_.Inverse() << "\nInverse Inverse:\n" << inv_test_.Inverse().Inverse() << "\n\n";
+	std::cout << inv_test_.Store().InverseLaplace() << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
