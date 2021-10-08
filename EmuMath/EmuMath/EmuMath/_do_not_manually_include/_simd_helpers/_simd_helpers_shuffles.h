@@ -28,7 +28,7 @@ namespace EmuMath::SIMD
 	/// <param name="b">Right-hand SIMD vector, accessed with the Z_ and W_ template arguments.</param>
 	/// <returns>Result of shuffling the passed two SIMD vectors based on the provided template arguments.</returns>
 	template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_>
-	[[nodiscard]] __m128 shuffle(const __m128 a, const __m128 b)
+	[[nodiscard]] inline __m128 shuffle(const __m128 a, const __m128 b)
 	{
 		return _mm_shuffle_ps(a, b, shuffle_arg_v<X_, Y_, Z_, W_>);
 	}
@@ -40,7 +40,7 @@ namespace EmuMath::SIMD
 	/// <param name="ab">SIMD vector to return a shuffled variant of. Used as both vector arguments in a call to _mm_shuffle_ps.</param>
 	/// <returns>Shuffled variant of the passed SIMD vector, using the passed template arguments to identify indices for the output vector.	</returns>
 	template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_>
-	[[nodiscard]] __m128 shuffle(const __m128 ab)
+	[[nodiscard]] inline __m128 shuffle(const __m128 ab)
 	{
 		return _mm_shuffle_ps(ab, ab, shuffle_arg_v<X_, Y_, Z_, W_>);
 	}

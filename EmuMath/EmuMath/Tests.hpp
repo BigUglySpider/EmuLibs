@@ -136,10 +136,10 @@ namespace EmuCore::TestingHelpers
 
 				temp_ = temp_.Mutate(filler_);
 				in_[i] = temp_;
-				temp_ = temp_.Mutate(filler_);
-				min_[i] = temp_;
-				temp_ = temp_.Mutate(filler_);
-				max_[i] = temp_;
+				//temp_ = temp_.Mutate(filler_);
+				//min_[i] = temp_;
+				//temp_ = temp_.Mutate(filler_);
+				//max_[i] = temp_;
 			}
 		}
 		void operator()(std::size_t i)
@@ -149,7 +149,8 @@ namespace EmuCore::TestingHelpers
 			//out_[i] = EmuMath::FastMatrix4x4f_CM::OrthographicVK(widths_[i], heights_[i], nears_[i], fars_[i]);
 			//out_[i] = EmuMath::FastMatrix4x4f_CM::PerspectiveRhVK<false>(fov_angle_y_degs_[i], nears_[i], fars_[i], aspect_ratios_[i]);
 			//EmuMath::FastMatrix4x4f_CM(lhs_readable_[i]).Multiply(EmuMath::FastMatrix4x4f_CM(rhs_readable_[i])).Store(out_readable_[i]);
-			out_[i] = in_[i].Clamp(min_[i], max_[i]);
+			//out_[i] = in_[i].Clamp(min_[i], max_[i]);
+			out_[i] = in_[i].Transpose();
 		}
 		void OnTestsOver()
 		{
@@ -160,7 +161,8 @@ namespace EmuCore::TestingHelpers
 			//std::cout << "Ortho(" << widths_[i] << ", " << heights_[i] << ", " << nears_[i] << ", " << fars_[i] << "):\n" << out_[i] << "\n\n";
 			//std::cout << "Perspective(" << fov_angle_y_degs_[i] << ", " << nears_[i] << ", " << fars_[i] << ", " << aspect_ratios_[i] << "):\n" << out_[i] << "\n\n";
 			//std::cout << lhs_readable_[i] << "\nMULT\n" << rhs_readable_[i] << "\n:\n" << out_readable_[i] << "\n\n";
-			std::cout << "In:\n" << in_[i] << "\nMin:\n" << min_[i] << "\nMax:\n" << max_[i] << "\nClamped:\n" << out_[i] << "\n\n";
+			//std::cout << "In:\n" << in_[i] << "\nMin:\n" << min_[i] << "\nMax:\n" << max_[i] << "\nClamped:\n" << out_[i] << "\n\n";
+			std::cout << in_[i] << "\nTRANSPOSE:\n" << out_[i] << "\n\n";
 		}
 
 		//std::vector<EmuMath::FastMatrix4x4f_CM> lhs_;

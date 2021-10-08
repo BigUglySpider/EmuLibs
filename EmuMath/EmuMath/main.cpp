@@ -235,6 +235,8 @@ int main()
 	std::cout << "Original:\n" << original_mat_ << "\nMin:\n" << min_mat_ << "\nMax:\n" << max_mat_ << "\nClamped:\n" << original_mat_.Clamp(min_mat_, max_mat_) << "\n\n";
 	std::cout << "Original min: " << original_mat_.Min() << " | Original max: " << original_mat_.Max() << "\n\n";
 
+	std::cout << original_mat_ << "\nTRANSPOSE:\n" << original_mat_.Transpose() << "\n\n";
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();

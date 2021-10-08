@@ -379,7 +379,7 @@ namespace EmuMath
 		template<std::size_t Column_>
 		[[nodiscard]] inline EmuMath::Vector<4, float> GetColumnReadable() const
 		{
-			EmuMath::Vector4<float> out_;
+			EmuMath::Vector<4, float> out_;
 			_mm_store_ps(out_.data(), GetColumn<Column_>());
 			return out_;
 		}
@@ -408,7 +408,7 @@ namespace EmuMath
 		template<std::size_t Row_>
 		[[nodiscard]] inline EmuMath::Vector<4, float> GetRowReadable() const
 		{
-			EmuMath::Vector4<float> out_;
+			EmuMath::Vector<4, float> out_;
 			_mm_store_ps(out_.data(), GetRow<Row_>());
 			return out_;
 		}
@@ -1452,7 +1452,20 @@ namespace EmuMath
 		/// <returns>Transposed form of this matrix.</returns>
 		[[nodiscard]] inline FastMatrix4x4f_CM Transpose() const
 		{
-			return FastMatrix4x4f_CM(GetRow<0>(), GetRow<1>(), GetRow<2>(), GetRow<3>());
+			// Preliminary shuffles to allow all resulting transposed rows to be created
+			// --- We do this instead of 4 calls to GetRow to complete the operation in 8 shuffles instead of 12.
+			__m128 c0r0_c0r1_c1r0_c1r1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(column0, column1);
+			__m128 c2r0_c2r1_c3r0_c3r1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(column2, column3);
+			__m128 c0r2_c0r3_c1r2_c1r3_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(column0, column1);
+			__m128 c2r2_c2r3_c3r2_c3r3_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(column2, column3);
+			
+			return FastMatrix4x4f_CM
+			(
+				EmuMath::SIMD::shuffle<0, 2, 0, 2>(c0r0_c0r1_c1r0_c1r1_, c2r0_c2r1_c3r0_c3r1_),
+				EmuMath::SIMD::shuffle<1, 3, 1, 3>(c0r0_c0r1_c1r0_c1r1_, c2r0_c2r1_c3r0_c3r1_),
+				EmuMath::SIMD::shuffle<0, 2, 0, 2>(c0r2_c0r3_c1r2_c1r3_, c2r2_c2r3_c3r2_c3r3_),
+				EmuMath::SIMD::shuffle<1, 3, 1, 3>(c0r2_c0r3_c1r2_c1r3_, c2r2_c2r3_c3r2_c3r3_)
+			);
 		}
 
 		/// <summary> Provides a fast vector containing the main diagonal of this matrix within its data. </summary>
