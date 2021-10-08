@@ -245,8 +245,12 @@ int main()
 		-1, 7, 4, 3,
 		1, 1, 1, 1
 	);
-	std::cout << "Mat:\n" << inv_test_ << "\nInverse:\n" << inv_test_.Inverse() << "\nInverse Inverse:\n" << inv_test_.Inverse().Inverse() << "\n\n";
-	std::cout << inv_test_.Store().InverseLaplace() << "\n";
+	std::cout << "Mat:\n" << inv_test_ << "\nInverse:\n" << inv_test_.Inverse() << "\n\n";
+	std::cout << "\n\nSCALAR INVERSE:\n" << inv_test_.Store().InverseLaplace() << "\n\n";
+
+
+	std::cout << "Mat:\n" << inv_test_ << "\nDeterminant: " << inv_test_.Determinant() << "\n\n";
+	std::cout << "\n\nSCALAR DETERMINANT: " << inv_test_.Store().DeterminantLaplace() << "\n\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

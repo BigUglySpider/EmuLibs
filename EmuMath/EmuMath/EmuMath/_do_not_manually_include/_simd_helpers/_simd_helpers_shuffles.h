@@ -44,6 +44,17 @@ namespace EmuMath::SIMD
 	{
 		return _mm_shuffle_ps(ab, ab, shuffle_arg_v<X_, Y_, Z_, W_>);
 	}
+	/// <summary>
+	/// <para> Returns a SIMD vector shuffled so that all indices correlate to the provided index within the passed vector. </para>
+	/// <para> The resulting SIMD vector will be { ab[Index_], ab[Index_], ab[Index_], ab[Index_] }. </para>
+	/// </summary>
+	/// <param name="ab">SIMD vector to perform the shuffle on.</param>
+	/// <returns>Passed SIMD vector shuffled so that all elements match the provided index.</returns>
+	template<std::size_t Index_>
+	[[nodiscard]] inline __m128 shuffle(__m128 ab)
+	{
+		return _mm_shuffle_ps(ab, ab, shuffle_arg_v<Index_, Index_, Index_, Index_>);
+	}
 }
 
 #endif

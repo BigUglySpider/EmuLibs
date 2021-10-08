@@ -1484,156 +1484,33 @@ namespace EmuMath
 			return MainDiagonal().HorizontalSum();
 		}
 
+		[[nodiscard]] inline float Determinant() const
+		{
+			FastMatrix4x4f_CM reff_transpose_ = Transpose();
+			_make_row_echelon_transpose(reff_transpose_);
+			return reff_transpose_.MainDiagonal().HorizontalProduct<float>();
+		}
+
+		/// <summary> 
+		/// <para> Calculates the inverse to this matrix using gaussian elimination. </para>
+		/// <para> This function assumes that this matrix does have an inverse, and that all elements along its main diagonal are non-zero. </para>
+		/// </summary>
+		/// <param name="out_determinant_"></param>
+		/// <returns>Trace of this matrix represented as a scalar.</returns>
 		[[nodiscard]] inline FastMatrix4x4f_CM Inverse() const
 		{
-			auto row0 = GetRowReadable<0>();
-			auto row1 = GetRowReadable<1>();
-			auto row2 = GetRowReadable<2>();
-			auto row3 = GetRowReadable<3>();
-			auto identity = Identity().Store();
-			auto& identity_0_ = identity.at<0>();
-			auto& identity_1_ = identity.at<1>();
-			auto& identity_2_ = identity.at<2>();
-			auto& identity_3_ = identity.at<3>();
-
-			float pivot = row0.at<0>();
-			float mult_ = -(row1.at<0>() / pivot);
-			row1.at<0>() += (mult_ * row0.at<0>());
-			row1.at<1>() += (mult_ * row0.at<1>());
-			row1.at<2>() += (mult_ * row0.at<2>());
-			row1.at<3>() += (mult_ * row0.at<3>());
-			identity_1_.at<0>() += (mult_ * identity_0_.at<0>());
-			identity_1_.at<1>() += (mult_ * identity_0_.at<1>());
-			identity_1_.at<2>() += (mult_ * identity_0_.at<2>());
-			identity_1_.at<3>() += (mult_ * identity_0_.at<3>());
-
-			mult_ = -(row2.at<0>() / pivot);
-			row2.at<0>() += (mult_ * row0.at<0>());
-			row2.at<1>() += (mult_ * row0.at<1>());
-			row2.at<2>() += (mult_ * row0.at<2>());
-			row2.at<3>() += (mult_ * row0.at<3>());
-			identity_2_.at<0>() += (mult_ * identity_0_.at<0>());
-			identity_2_.at<1>() += (mult_ * identity_0_.at<1>());
-			identity_2_.at<2>() += (mult_ * identity_0_.at<2>());
-			identity_2_.at<3>() += (mult_ * identity_0_.at<3>());
-
-			mult_ = -(row3.at<0>() / pivot);
-			row3.at<0>() += (mult_ * row0.at<0>());
-			row3.at<1>() += (mult_ * row0.at<1>());
-			row3.at<2>() += (mult_ * row0.at<2>());
-			row3.at<3>() += (mult_ * row0.at<3>());
-			identity_3_.at<0>() += (mult_ * identity_0_.at<0>());
-			identity_3_.at<1>() += (mult_ * identity_0_.at<1>());
-			identity_3_.at<2>() += (mult_ * identity_0_.at<2>());
-			identity_3_.at<3>() += (mult_ * identity_0_.at<3>());
-
-
-
-			pivot = row1.at<1>();
-			mult_ = -(row0.at<1>() / pivot);
-			row0.at<0>() += (mult_ * row1.at<0>());
-			row0.at<1>() += (mult_ * row1.at<1>());
-			row0.at<2>() += (mult_ * row1.at<2>());
-			row0.at<3>() += (mult_ * row1.at<3>());
-			identity_0_.at<0>() += (mult_ * identity_1_.at<0>());
-			identity_0_.at<1>() += (mult_ * identity_1_.at<1>());
-			identity_0_.at<2>() += (mult_ * identity_1_.at<2>());
-			identity_0_.at<3>() += (mult_ * identity_1_.at<3>());
-
-			mult_ = -(row2.at<1>() / pivot);
-			row2.at<0>() += (mult_ * row1.at<0>());
-			row2.at<1>() += (mult_ * row1.at<1>());
-			row2.at<2>() += (mult_ * row1.at<2>());
-			row2.at<3>() += (mult_ * row1.at<3>());
-			identity_2_.at<0>() += (mult_ * identity_1_.at<0>());
-			identity_2_.at<1>() += (mult_ * identity_1_.at<1>());
-			identity_2_.at<2>() += (mult_ * identity_1_.at<2>());
-			identity_2_.at<3>() += (mult_ * identity_1_.at<3>());
-
-			mult_ = -(row3.at<1>() / pivot);
-			row3.at<0>() += (mult_ * row1.at<0>());
-			row3.at<1>() += (mult_ * row1.at<1>());
-			row3.at<2>() += (mult_ * row1.at<2>());
-			row3.at<3>() += (mult_ * row1.at<3>());
-			identity_3_.at<0>() += (mult_ * identity_1_.at<0>());
-			identity_3_.at<1>() += (mult_ * identity_1_.at<1>());
-			identity_3_.at<2>() += (mult_ * identity_1_.at<2>());
-			identity_3_.at<3>() += (mult_ * identity_1_.at<3>());
-
-
-
-			pivot = row2.at<2>();
-			mult_ = -(row0.at<2>() / pivot);
-			row0.at<0>() += (mult_ * row2.at<0>());
-			row0.at<1>() += (mult_ * row2.at<1>());
-			row0.at<2>() += (mult_ * row2.at<2>());
-			row0.at<3>() += (mult_ * row2.at<3>());
-			identity_0_.at<0>() += (mult_ * identity_2_.at<0>());
-			identity_0_.at<1>() += (mult_ * identity_2_.at<1>());
-			identity_0_.at<2>() += (mult_ * identity_2_.at<2>());
-			identity_0_.at<3>() += (mult_ * identity_2_.at<3>());
-
-			mult_ = -(row1.at<2>() / pivot);
-			row1.at<0>() += (mult_ * row2.at<0>());
-			row1.at<1>() += (mult_ * row2.at<1>());
-			row1.at<2>() += (mult_ * row2.at<2>());
-			row1.at<3>() += (mult_ * row2.at<3>());
-			identity_1_.at<0>() += (mult_ * identity_2_.at<0>());
-			identity_1_.at<1>() += (mult_ * identity_2_.at<1>());
-			identity_1_.at<2>() += (mult_ * identity_2_.at<2>());
-			identity_1_.at<3>() += (mult_ * identity_2_.at<3>());
-
-			mult_ = -(row3.at<2>() / pivot);
-			row3.at<0>() += (mult_ * row2.at<0>());
-			row3.at<1>() += (mult_ * row2.at<1>());
-			row3.at<2>() += (mult_ * row2.at<2>());
-			row3.at<3>() += (mult_ * row2.at<3>());
-			identity_3_.at<0>() += (mult_ * identity_2_.at<0>());
-			identity_3_.at<1>() += (mult_ * identity_2_.at<1>());
-			identity_3_.at<2>() += (mult_ * identity_2_.at<2>());
-			identity_3_.at<3>() += (mult_ * identity_2_.at<3>());
-
-
-
-			pivot = row3.at<3>();
-			mult_ = -(row0.at<3>() / pivot);
-			row0.at<0>() += (mult_ * row3.at<0>());
-			row0.at<1>() += (mult_ * row3.at<1>());
-			row0.at<2>() += (mult_ * row3.at<2>());
-			row0.at<3>() += (mult_ * row3.at<3>());
-			identity_0_.at<0>() += (mult_ * identity_3_.at<0>());
-			identity_0_.at<1>() += (mult_ * identity_3_.at<1>());
-			identity_0_.at<2>() += (mult_ * identity_3_.at<2>());
-			identity_0_.at<3>() += (mult_ * identity_3_.at<3>());
-
-			mult_ = -(row1.at<3>() / pivot);
-			row1.at<0>() += (mult_ * row3.at<0>());
-			row1.at<1>() += (mult_ * row3.at<1>());
-			row1.at<2>() += (mult_ * row3.at<2>());
-			row1.at<3>() += (mult_ * row3.at<3>());
-			identity_1_.at<0>() += (mult_ * identity_3_.at<0>());
-			identity_1_.at<1>() += (mult_ * identity_3_.at<1>());
-			identity_1_.at<2>() += (mult_ * identity_3_.at<2>());
-			identity_1_.at<3>() += (mult_ * identity_3_.at<3>());
-
-			mult_ = -(row2.at<3>() / pivot);
-			row2.at<0>() += (mult_ * row3.at<0>());
-			row2.at<1>() += (mult_ * row3.at<1>());
-			row2.at<2>() += (mult_ * row3.at<2>());
-			row2.at<3>() += (mult_ * row3.at<3>());
-			identity_2_.at<0>() += (mult_ * identity_3_.at<0>());
-			identity_2_.at<1>() += (mult_ * identity_3_.at<1>());
-			identity_2_.at<2>() += (mult_ * identity_3_.at<2>());
-			identity_2_.at<3>() += (mult_ * identity_3_.at<3>());
-
-
-			identity_0_ /= row0.at<0>();
-			identity_1_ /= row1.at<1>();
-			identity_2_ /= row2.at<2>();
-			identity_3_ /= row3.at<3>();
-
-			//return FastMatrix4x4f_CM(row0.data(), row1.data(), row2.data(), row3.data()).Transpose();
-			return FastMatrix4x4f_CM(identity_0_.data(), identity_1_.data(), identity_2_.data(), identity_3_.data()).Transpose();
+			FastMatrix4x4f_CM transpose_row_echelon_ = Transpose();
+			FastMatrix4x4f_CM out_transpose_ = Identity();
+			_make_inverse_transpose(out_transpose_, transpose_row_echelon_);
+			return out_transpose_.Transpose();
+		}
+		[[nodiscard]] inline FastMatrix4x4f_CM Inverse(float& out_determinant_) const
+		{
+			FastMatrix4x4f_CM transpose_row_echelon_ = Transpose();
+			FastMatrix4x4f_CM out_transpose_ = Identity();
+			_make_inverse_transpose(out_transpose_, transpose_row_echelon_);
+			out_determinant_ = transpose_row_echelon_.MainDiagonal().HorizontalProduct<float>();
+			return out_transpose_.Transpose();
 		}
 #pragma endregion
 
@@ -2052,6 +1929,110 @@ namespace EmuMath
 
 			rhs_shuffled_ = EmuMath::SIMD::shuffle<3, 3, 3, 3>(rhs_column_);
 			return _mm_add_ps(out_, _mm_mul_ps(column3, rhs_shuffled_));
+		}
+
+		inline void _make_row_echelon_transpose(FastMatrix4x4f_CM& in_transpose_out_reff_) const
+		{
+			// PIVOT[0, 0]
+			__m128 neg_pivot_ = EmuMath::SIMD::vector_negate(EmuMath::SIMD::shuffle<0>(in_transpose_out_reff_.column0));
+			__m128 mults_ = _mm_div_ps(column0, neg_pivot_);
+			in_transpose_out_reff_.column1 = _mm_add_ps(in_transpose_out_reff_.column1, _mm_mul_ps(in_transpose_out_reff_.column0, EmuMath::SIMD::shuffle<1>(mults_)));
+			in_transpose_out_reff_.column2 = _mm_add_ps(in_transpose_out_reff_.column2, _mm_mul_ps(in_transpose_out_reff_.column0, EmuMath::SIMD::shuffle<2>(mults_)));
+			in_transpose_out_reff_.column3 = _mm_add_ps(in_transpose_out_reff_.column3, _mm_mul_ps(in_transpose_out_reff_.column0, EmuMath::SIMD::shuffle<3>(mults_)));
+
+			// PIVOT[1, 1]
+			neg_pivot_ = EmuMath::SIMD::vector_negate(EmuMath::SIMD::shuffle<1>(in_transpose_out_reff_.column1));
+			mults_ = _mm_div_ps(in_transpose_out_reff_.GetRow<1>(), neg_pivot_);
+			in_transpose_out_reff_.column0 = _mm_add_ps(in_transpose_out_reff_.column0, _mm_mul_ps(in_transpose_out_reff_.column1, EmuMath::SIMD::shuffle<0>(mults_)));
+			in_transpose_out_reff_.column2 = _mm_add_ps(in_transpose_out_reff_.column2, _mm_mul_ps(in_transpose_out_reff_.column1, EmuMath::SIMD::shuffle<2>(mults_)));
+			in_transpose_out_reff_.column3 = _mm_add_ps(in_transpose_out_reff_.column3, _mm_mul_ps(in_transpose_out_reff_.column1, EmuMath::SIMD::shuffle<3>(mults_)));
+
+			// PIVOT[2, 2]
+			neg_pivot_ = EmuMath::SIMD::vector_negate(EmuMath::SIMD::shuffle<2>(in_transpose_out_reff_.column2));
+			mults_ = _mm_div_ps(in_transpose_out_reff_.GetRow<2>(), neg_pivot_);
+			in_transpose_out_reff_.column0 = _mm_add_ps(in_transpose_out_reff_.column0, _mm_mul_ps(in_transpose_out_reff_.column2, EmuMath::SIMD::shuffle<0>(mults_)));
+			in_transpose_out_reff_.column1 = _mm_add_ps(in_transpose_out_reff_.column1, _mm_mul_ps(in_transpose_out_reff_.column2, EmuMath::SIMD::shuffle<1>(mults_)));
+			in_transpose_out_reff_.column3 = _mm_add_ps(in_transpose_out_reff_.column3, _mm_mul_ps(in_transpose_out_reff_.column2, EmuMath::SIMD::shuffle<3>(mults_)));
+
+			// PIVOT[3, 3]
+			neg_pivot_ = EmuMath::SIMD::vector_negate(EmuMath::SIMD::shuffle<3>(in_transpose_out_reff_.column3));
+			mults_ = _mm_div_ps(in_transpose_out_reff_.GetRow<3>(), neg_pivot_);
+			in_transpose_out_reff_.column0 = _mm_add_ps(in_transpose_out_reff_.column0, _mm_mul_ps(in_transpose_out_reff_.column3, EmuMath::SIMD::shuffle<0>(mults_)));
+			in_transpose_out_reff_.column1 = _mm_add_ps(in_transpose_out_reff_.column1, _mm_mul_ps(in_transpose_out_reff_.column3, EmuMath::SIMD::shuffle<1>(mults_)));
+			in_transpose_out_reff_.column2 = _mm_add_ps(in_transpose_out_reff_.column2, _mm_mul_ps(in_transpose_out_reff_.column3, EmuMath::SIMD::shuffle<2>(mults_)));
+		}
+
+		inline void _make_inverse_transpose(FastMatrix4x4f_CM& out_inverse_trans_, FastMatrix4x4f_CM& out_reff_trans_) const
+		{
+			__m128 neg_pivot_ = EmuMath::SIMD::vector_negate(EmuMath::SIMD::shuffle<0>(out_reff_trans_.column0));
+			// We can get away using our column here since no changes have been made, but will have to use transpose_.GetRow for future pivots
+			__m128 mults_ = _mm_div_ps(column0, neg_pivot_);
+
+			__m128 current_mult_ = EmuMath::SIMD::shuffle<1>(mults_);
+			out_reff_trans_.column1 = _mm_add_ps(out_reff_trans_.column1, _mm_mul_ps(out_reff_trans_.column0, current_mult_));
+			out_inverse_trans_.column1 = _mm_add_ps(out_inverse_trans_.column1, _mm_mul_ps(out_inverse_trans_.column0, current_mult_));
+
+			current_mult_ = EmuMath::SIMD::shuffle<2>(mults_);
+			out_reff_trans_.column2 = _mm_add_ps(out_reff_trans_.column2, _mm_mul_ps(out_reff_trans_.column0, current_mult_));
+			out_inverse_trans_.column2 = _mm_add_ps(out_inverse_trans_.column2, _mm_mul_ps(out_inverse_trans_.column0, current_mult_));
+
+			current_mult_ = EmuMath::SIMD::shuffle<3>(mults_);
+			out_reff_trans_.column3 = _mm_add_ps(out_reff_trans_.column3, _mm_mul_ps(out_reff_trans_.column0, current_mult_));
+			out_inverse_trans_.column3 = _mm_add_ps(out_inverse_trans_.column3, _mm_mul_ps(out_inverse_trans_.column0, current_mult_));
+
+			// PIVOT[1, 1]
+			neg_pivot_ = EmuMath::SIMD::vector_negate(EmuMath::SIMD::shuffle<1>(out_reff_trans_.column1));
+			mults_ = _mm_div_ps(out_reff_trans_.GetRow<1>(), neg_pivot_);
+
+			current_mult_ = EmuMath::SIMD::shuffle<0>(mults_);
+			out_reff_trans_.column0 = _mm_add_ps(out_reff_trans_.column0, _mm_mul_ps(out_reff_trans_.column1, current_mult_));
+			out_inverse_trans_.column0 = _mm_add_ps(out_inverse_trans_.column0, _mm_mul_ps(out_inverse_trans_.column1, current_mult_));
+
+			current_mult_ = EmuMath::SIMD::shuffle<2>(mults_);
+			out_reff_trans_.column2 = _mm_add_ps(out_reff_trans_.column2, _mm_mul_ps(out_reff_trans_.column1, current_mult_));
+			out_inverse_trans_.column2 = _mm_add_ps(out_inverse_trans_.column2, _mm_mul_ps(out_inverse_trans_.column1, current_mult_));
+
+			current_mult_ = EmuMath::SIMD::shuffle<3>(mults_);
+			out_reff_trans_.column3 = _mm_add_ps(out_reff_trans_.column3, _mm_mul_ps(out_reff_trans_.column1, current_mult_));
+			out_inverse_trans_.column3 = _mm_add_ps(out_inverse_trans_.column3, _mm_mul_ps(out_inverse_trans_.column1, current_mult_));
+
+			// PIVOT[2, 2]
+			neg_pivot_ = EmuMath::SIMD::vector_negate(EmuMath::SIMD::shuffle<2>(out_reff_trans_.column2));
+			mults_ = _mm_div_ps(out_reff_trans_.GetRow<2>(), neg_pivot_);
+
+			current_mult_ = EmuMath::SIMD::shuffle<0>(mults_);
+			out_reff_trans_.column0 = _mm_add_ps(out_reff_trans_.column0, _mm_mul_ps(out_reff_trans_.column2, current_mult_));
+			out_inverse_trans_.column0 = _mm_add_ps(out_inverse_trans_.column0, _mm_mul_ps(out_inverse_trans_.column2, current_mult_));
+
+			current_mult_ = EmuMath::SIMD::shuffle<1>(mults_);
+			out_reff_trans_.column1 = _mm_add_ps(out_reff_trans_.column1, _mm_mul_ps(out_reff_trans_.column2, current_mult_));
+			out_inverse_trans_.column1 = _mm_add_ps(out_inverse_trans_.column1, _mm_mul_ps(out_inverse_trans_.column2, current_mult_));
+
+			current_mult_ = EmuMath::SIMD::shuffle<3>(mults_);
+			out_reff_trans_.column3 = _mm_add_ps(out_reff_trans_.column3, _mm_mul_ps(out_reff_trans_.column2, current_mult_));
+			out_inverse_trans_.column3 = _mm_add_ps(out_inverse_trans_.column3, _mm_mul_ps(out_inverse_trans_.column2, current_mult_));
+
+			// PIVOT[3, 3]
+			neg_pivot_ = EmuMath::SIMD::vector_negate(EmuMath::SIMD::shuffle<3>(out_reff_trans_.column3));
+			mults_ = _mm_div_ps(out_reff_trans_.GetRow<3>(), neg_pivot_);
+
+			current_mult_ = EmuMath::SIMD::shuffle<0>(mults_);
+			out_reff_trans_.column0 = _mm_add_ps(out_reff_trans_.column0, _mm_mul_ps(out_reff_trans_.column3, current_mult_));
+			out_inverse_trans_.column0 = _mm_add_ps(out_inverse_trans_.column0, _mm_mul_ps(out_inverse_trans_.column3, current_mult_));
+
+			current_mult_ = EmuMath::SIMD::shuffle<1>(mults_);
+			out_reff_trans_.column1 = _mm_add_ps(out_reff_trans_.column1, _mm_mul_ps(out_reff_trans_.column3, current_mult_));
+			out_inverse_trans_.column1 = _mm_add_ps(out_inverse_trans_.column1, _mm_mul_ps(out_inverse_trans_.column3, current_mult_));
+
+			current_mult_ = EmuMath::SIMD::shuffle<2>(mults_);
+			out_reff_trans_.column2 = _mm_add_ps(out_reff_trans_.column2, _mm_mul_ps(out_reff_trans_.column3, current_mult_));
+			out_inverse_trans_.column2 = _mm_add_ps(out_inverse_trans_.column2, _mm_mul_ps(out_inverse_trans_.column3, current_mult_));
+
+			// Scale our output so that all pivots are 1
+			out_inverse_trans_.column0 = _mm_div_ps(out_inverse_trans_.column0, EmuMath::SIMD::shuffle<0>(out_reff_trans_.column0));
+			out_inverse_trans_.column1 = _mm_div_ps(out_inverse_trans_.column1, EmuMath::SIMD::shuffle<1>(out_reff_trans_.column1));
+			out_inverse_trans_.column2 = _mm_div_ps(out_inverse_trans_.column2, EmuMath::SIMD::shuffle<2>(out_reff_trans_.column2));
+			out_inverse_trans_.column3 = _mm_div_ps(out_inverse_trans_.column3, EmuMath::SIMD::shuffle<3>(out_reff_trans_.column3));
 		}
 #pragma endregion
 	};

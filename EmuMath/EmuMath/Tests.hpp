@@ -150,7 +150,9 @@ namespace EmuCore::TestingHelpers
 			//out_[i] = EmuMath::FastMatrix4x4f_CM::PerspectiveRhVK<false>(fov_angle_y_degs_[i], nears_[i], fars_[i], aspect_ratios_[i]);
 			//EmuMath::FastMatrix4x4f_CM(lhs_readable_[i]).Multiply(EmuMath::FastMatrix4x4f_CM(rhs_readable_[i])).Store(out_readable_[i]);
 			//out_[i] = in_[i].Clamp(min_[i], max_[i]);
-			out_[i] = in_[i].Transpose();
+			//out_[i] = in_[i].Transpose();
+			out_[i] = in_[i].Inverse();
+			//out_[i] = in_[i].InverseLaplace();
 		}
 		void OnTestsOver()
 		{
@@ -162,7 +164,7 @@ namespace EmuCore::TestingHelpers
 			//std::cout << "Perspective(" << fov_angle_y_degs_[i] << ", " << nears_[i] << ", " << fars_[i] << ", " << aspect_ratios_[i] << "):\n" << out_[i] << "\n\n";
 			//std::cout << lhs_readable_[i] << "\nMULT\n" << rhs_readable_[i] << "\n:\n" << out_readable_[i] << "\n\n";
 			//std::cout << "In:\n" << in_[i] << "\nMin:\n" << min_[i] << "\nMax:\n" << max_[i] << "\nClamped:\n" << out_[i] << "\n\n";
-			std::cout << in_[i] << "\nTRANSPOSE:\n" << out_[i] << "\n\n";
+			std::cout << in_[i] << "\nINVERSE:\n" << out_[i] << "\n\n";
 		}
 
 		//std::vector<EmuMath::FastMatrix4x4f_CM> lhs_;
@@ -174,10 +176,12 @@ namespace EmuCore::TestingHelpers
 		//std::vector<float> fars_;
 		//std::vector<float> fov_angle_y_degs_;
 		//std::vector<float> aspect_ratios_;
+		//std::vector<EmuMath::Matrix<4, 4, float, true>> in_;
 		std::vector<EmuMath::FastMatrix4x4f_CM> in_;
 		std::vector<EmuMath::FastMatrix4x4f_CM> min_;
 		std::vector<EmuMath::FastMatrix4x4f_CM> max_;
 		std::vector<EmuMath::FastMatrix4x4f_CM> out_;
+		//std::vector<EmuMath::Matrix<4, 4, float, true>> out_;
 		//std::vector<EmuMath::Matrix4x4<float, true>> out_readable_;
 		//std::vector<EmuMath::Matrix4x4<float, true>> lhs_readable_;
 		//std::vector<EmuMath::Matrix4x4<float, true>> rhs_readable_;
@@ -249,12 +253,13 @@ namespace EmuCore::TestingHelpers
 			//fov_angle_y_degs_.resize(NUM_LOOPS);
 			//aspect_ratios_.resize(NUM_LOOPS);
 			out_readable_.resize(NUM_LOOPS);
-			lhs_readable_.resize(NUM_LOOPS);
-			rhs_readable_.resize(NUM_LOOPS);
+			in_.resize(NUM_LOOPS);
+			//lhs_readable_.resize(NUM_LOOPS);
+			//rhs_readable_.resize(NUM_LOOPS);
 
 			EmuMath::Matrix4x4<float, true> temp_;
 			VectorFiller filler_ = VectorFiller();
-			//DirectX::XMFLOAT4X4 to_load_;
+			DirectX::XMFLOAT4X4 to_load_;
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
 				//temp_ = temp_.Mutate(filler_);
@@ -282,10 +287,14 @@ namespace EmuCore::TestingHelpers
 				//	fars_[i] += 10.0f;
 				//}
 
+				//temp_ = temp_.Mutate(filler_);
+				//lhs_readable_[i] = MakeXMFromEmu(temp_);
+				//temp_ = temp_.Mutate(filler_);
+				//rhs_readable_[i] = MakeXMFromEmu(temp_);
+
 				temp_ = temp_.Mutate(filler_);
-				lhs_readable_[i] = MakeXMFromEmu(temp_);
-				temp_ = temp_.Mutate(filler_);
-				rhs_readable_[i] = MakeXMFromEmu(temp_);
+				to_load_ = MakeXMFromEmu(temp_);
+				in_[i] = DirectX::XMLoadFloat4x4(&to_load_);
 			}
 		}
 		void operator()(std::size_t i)
@@ -293,9 +302,11 @@ namespace EmuCore::TestingHelpers
 			//out_[i] = DirectX::XMMatrixMultiply(lhs_[i], rhs_[i]);
 			//out_[i] = DirectX::XMMatrixRotationX(EmuCore::Pi::DegsToRads(angles_[i]));
 			//out_[i] = DirectX::XMMatrixPerspectiveFovRH(EmuCore::Pi::DegsToRads(fov_angle_y_degs_[i]), aspect_ratios_[i], nears_[i], fars_[i]);
-			DirectX::XMMATRIX lhs_mat_ = DirectX::XMLoadFloat4x4(&lhs_readable_[i]);
-			DirectX::XMMATRIX rhs_mat_ = DirectX::XMLoadFloat4x4(&rhs_readable_[i]);
-			DirectX::XMStoreFloat4x4(&out_readable_[i], DirectX::XMMatrixMultiply(lhs_mat_, rhs_mat_));
+			//DirectX::XMMATRIX lhs_mat_ = DirectX::XMLoadFloat4x4(&lhs_readable_[i]);
+			//DirectX::XMMATRIX rhs_mat_ = DirectX::XMLoadFloat4x4(&rhs_readable_[i]);
+			//DirectX::XMStoreFloat4x4(&out_readable_[i], DirectX::XMMatrixMultiply(lhs_mat_, rhs_mat_));
+
+			DirectX::XMStoreFloat4x4(&out_readable_[i], DirectX::XMMatrixInverse(nullptr, in_[i]));
 		}
 
 		DirectX::XMFLOAT4X4 MakeXMFromEmu(const EmuMath::Matrix4x4<float, true>& mat_) const
@@ -332,10 +343,15 @@ namespace EmuCore::TestingHelpers
 			//PrintMatrix(out_[i]);
 			//std::cout << "\n\n";
 
-			PrintMatrix(lhs_readable_[i]);
-			std::cout << "\nMULT\n";
-			PrintMatrix(rhs_readable_[i]);
-			std::cout << "\n:\n";
+			//PrintMatrix(lhs_readable_[i]);
+			//std::cout << "\nMULT\n";
+			//PrintMatrix(rhs_readable_[i]);
+			//std::cout << "\n:\n";
+			//PrintMatrix(out_readable_[i]);
+			//std::cout << "\n\n";
+
+			PrintMatrix(in_[i]);
+			std::cout << "\nINVERSE:\n";
 			PrintMatrix(out_readable_[i]);
 			std::cout << "\n\n";
 		}
@@ -373,8 +389,9 @@ namespace EmuCore::TestingHelpers
 		//std::vector<float> nears_;
 		//std::vector<float> fars_;
 		//std::vector<DirectX::XMMATRIX> out_;
-		std::vector<DirectX::XMFLOAT4X4> lhs_readable_;
-		std::vector<DirectX::XMFLOAT4X4> rhs_readable_;
+		//std::vector<DirectX::XMFLOAT4X4> lhs_readable_;
+		//std::vector<DirectX::XMFLOAT4X4> rhs_readable_;
+		std::vector<DirectX::XMMATRIX> in_;
 		std::vector<DirectX::XMFLOAT4X4> out_readable_;
 	};
 

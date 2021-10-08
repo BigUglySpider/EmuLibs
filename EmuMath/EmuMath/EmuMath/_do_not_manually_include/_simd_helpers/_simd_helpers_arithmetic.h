@@ -122,6 +122,11 @@ namespace EmuMath::SIMD
 	{
 		return _mm_cvtss_f32(vector_max_128(val_));
 	}
+
+	[[nodiscard]] inline __m128 vector_negate(__m128 val_)
+	{
+		return _mm_sub_ps(_mm_setzero_ps(), val_);
+	}
 }
 
 #endif
