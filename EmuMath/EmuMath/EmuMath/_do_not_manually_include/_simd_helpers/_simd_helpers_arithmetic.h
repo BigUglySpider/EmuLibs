@@ -123,40 +123,55 @@ namespace EmuMath::SIMD
 		return _mm_cvtss_f32(vector_max_128(val_));
 	}
 
+	/// <summary> Negates the passed SIMD vector. </summary>
+	/// <param name="val_">SIMD vector to negate.</param>
+	/// <returns>Negated form of the passed SIMD vector, such that the output matrix can be summarised as { -val_[0], -val_[1], -val_[2], -val_[3] }.</returns>
 	[[nodiscard]] inline __m128 vector_negate(__m128 val_)
 	{
 		return _mm_sub_ps(_mm_setzero_ps(), val_);
 	}
 
-	[[nodiscard]] inline __m128 matrix_2x2_determinant_128(__m128 column_0_, __m128 column_1_)
+	/// <summary> Multiplies lhs_mat_cm_ by rhs_mat_cm_ as though they are both contiguously column-major 2x2 matrices. </summary>
+	/// <param name="lhs_mat_cm_">SIMD vector representing a contiguously column-major 2x2 matrix which appears on the left of a matrix multiplication.</param>
+	/// <param name="rhs_mat_cm_">SIMD vector representing a contiguously column-major 2x2 matrix which appears on the right of a matrix multiplication.</param>
+	/// <returns>SIMD vector representing the result of multiplying the passed matrices, represented as a contiguously column-major 2x2 matrix.</returns>
+	[[nodiscard]] inline __m128 matrix_2x2_multiply_cm(__m128 lhs_mat_cm_, __m128 rhs_mat_cm_)
 	{
-		__m128 out_ = _mm_mul_ps(column_0_, EmuMath::SIMD::shuffle<1, 0, 2, 3>(column_1_));
-		return _mm_sub_ps(out_, EmuMath::SIMD::shuffle<1, 0, 2, 3>(out_));
+		return _mm_add_ps
+		(
+			_mm_mul_ps(lhs_mat_cm_, EmuMath::SIMD::shuffle<0, 0, 3, 3>(rhs_mat_cm_)),
+			_mm_mul_ps(EmuMath::SIMD::shuffle<2, 3, 0, 1>(lhs_mat_cm_), EmuMath::SIMD::shuffle<1, 1, 2, 2>(rhs_mat_cm_))
+		);
 	}
-	[[nodiscard]] inline __m128 matrix_2x2_determinant_128_fill(__m128 column_0_, __m128 column_1_)
+	/// <summary> Multiplies the adjugate of lhs_mat_cm_ by rhs_mat_cm_ as though they are both contiguously column-major 2x2 matrices. </summary>
+	/// <param name="lhs_mat_cm_">SIMD vector representing a contiguously column-major 2x2 matrix whose adjugate appears on the left of a matrix multiplication.</param>
+	/// <param name="rhs_mat_cm_">SIMD vector representing a contiguously column-major 2x2 matrix which appears on the right of a matrix multiplication.</param>
+	/// <returns>
+	///		SIMD vector representing the result of multiplying the adjugate of the passed lhs matrix by the passed rhs matrix, 
+	///		represented as a contiguously column-major 2x2 matrix.
+	/// </returns>
+	[[nodiscard]] inline __m128 matrix_2x2_multiply_adj_norm_cm(__m128 lhs_mat_cm_, __m128 rhs_mat_cm_)
 	{
-		return EmuMath::SIMD::shuffle<0>(matrix_2x2_determinant_128(column_0_, column_1_));
+		return _mm_sub_ps
+		(
+			_mm_mul_ps(EmuMath::SIMD::shuffle<3, 0, 3, 0>(lhs_mat_cm_), rhs_mat_cm_),
+			_mm_mul_ps(EmuMath::SIMD::shuffle<2, 1, 2, 1>(lhs_mat_cm_), EmuMath::SIMD::shuffle<1, 0, 3, 2>(rhs_mat_cm_))
+		);
 	}
-	[[nodiscard]] inline float matrix_2x2_determinant_scalar(__m128 column_0_, __m128 column_1_)
+	/// <summary> Multiplies lhs_mat_cm_ by the adjugate of rhs_mat_cm_ as though they are both contiguously column-major 2x2 matrices. </summary>
+	/// <param name="lhs_mat_cm_">SIMD vector representing a contiguously column-major 2x2 matrix which appears on the left of a matrix multiplication.</param>
+	/// <param name="rhs_mat_cm_">SIMD vector representing a contiguously column-major 2x2 matrix whose adjugate appears on the right of a matrix multiplication.</param>
+	/// <returns>
+	///		SIMD vector representing the result of multiplying the passed lhs matrix by the adjugate of the passed rhs matrix, 
+	///		represented as a contiguously column-major 2x2 matrix.
+	/// </returns>
+	[[nodiscard]] inline __m128 matrix_2x2_multiply_norm_adj_cm(__m128 lhs_mat_cm_, __m128 rhs_mat_cm_)
 	{
-		return _mm_cvtss_f32(matrix_2x2_determinant_128(column_0_, column_1_));
-	}
-
-	[[nodiscard]] inline __m128 matrix_3x3_determinant_128(__m128 column_0_, __m128 column_1_, __m128 column_2_)
-	{
-		__m128 sub_column_0_ = EmuMath::SIMD::shuffle<1, 2, 2, 3>(column_0_);
-		__m128 sub_column_1_ = EmuMath::SIMD::shuffle<1, 2, 2, 3>(column_1_);
-		__m128 sub_column_2_ = EmuMath::SIMD::shuffle<1, 2, 2, 3>(column_2_);
-		
-		__m128 out_ = _mm_mul_ps(column_0_, matrix_2x2_determinant_128(sub_column_1_, sub_column_2_));
-		out_ = _mm_sub_ps(out_, _mm_mul_ps(column_1_, matrix_2x2_determinant_128(sub_column_0_, sub_column_2_)));
-		out_ = _mm_add_ps(out_, _mm_mul_ps(column_2_, matrix_2x2_determinant_128(sub_column_0_, sub_column_1_)));
-		
-		return out_;
-	}
-	[[nodiscard]] inline float matrix_3x3_determinant_scalar(__m128 column_0_, __m128 column_1_, __m128 column_2_)
-	{
-		return _mm_cvtss_f32(matrix_3x3_determinant_128(column_0_, column_1_, column_2_));
+		return _mm_sub_ps
+		(
+			_mm_mul_ps(lhs_mat_cm_, EmuMath::SIMD::shuffle<3, 3, 0, 0>(rhs_mat_cm_)),
+			_mm_mul_ps(EmuMath::SIMD::shuffle<2, 3, 0, 1>(lhs_mat_cm_), EmuMath::SIMD::shuffle<1, 1, 2, 2>(rhs_mat_cm_))
+		);
 	}
 }
 
