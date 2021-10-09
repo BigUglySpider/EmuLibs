@@ -1594,8 +1594,8 @@ namespace EmuMath
 			);
 
 			// Multiply adjugates of the lhs submatrices by the rhs submatrices (non-adjugate)
-			__m128 c23r23_mult_c01r23_ = EmuMath::SIMD::matrix_2x2_multiply_adj_norm(submat_c23_r23_, submat_c01_r23_);
-			__m128 c01r01_mult_c23r01_ = EmuMath::SIMD::matrix_2x2_multiply_adj_norm(submat_c01_r01_, submat_c23_r01_);
+			__m128 c23r23_mult_c01r23_ = EmuMath::SIMD::matrix_2x2_multiply_adj_norm_cm(submat_c23_r23_, submat_c01_r23_);
+			__m128 c01r01_mult_c23r01_ = EmuMath::SIMD::matrix_2x2_multiply_adj_norm_cm(submat_c01_r01_, submat_c23_r01_);
 
 			// Calculate registers for output
 			// --- Registers with matching cxxyy names are shuffled together to form individual output columns if not transposed
@@ -1603,22 +1603,22 @@ namespace EmuMath
 			__m128 out_c1100_r1010_ = _mm_sub_ps
 			(
 				_mm_mul_ps(EmuMath::SIMD::shuffle<3>(determinants_), submat_c01_r01_),
-				EmuMath::SIMD::matrix_2x2_multiply(submat_c23_r01_, c23r23_mult_c01r23_)
+				EmuMath::SIMD::matrix_2x2_multiply_cm(submat_c23_r01_, c23r23_mult_c01r23_)
 			);
 			__m128 out_c1100_r3232_ = _mm_sub_ps
 			(
 				_mm_mul_ps(EmuMath::SIMD::shuffle<2>(determinants_), submat_c01_r23_),
-				EmuMath::SIMD::matrix_2x2_multiply_norm_adj(submat_c23_r23_, c01r01_mult_c23r01_)
+				EmuMath::SIMD::matrix_2x2_multiply_norm_adj_cm(submat_c23_r23_, c01r01_mult_c23r01_)
 			);
 			__m128 out_c3322_r1010_ = _mm_sub_ps
 			(
 				_mm_mul_ps(EmuMath::SIMD::shuffle<1>(determinants_), submat_c23_r01_),
-				EmuMath::SIMD::matrix_2x2_multiply_norm_adj(submat_c01_r01_, c23r23_mult_c01r23_)
+				EmuMath::SIMD::matrix_2x2_multiply_norm_adj_cm(submat_c01_r01_, c23r23_mult_c01r23_)
 			);
 			__m128 out_c3322_r3232_ = _mm_sub_ps
 			(
 				_mm_mul_ps(EmuMath::SIMD::shuffle<0>(determinants_), submat_c23_r23_),
-				EmuMath::SIMD::matrix_2x2_multiply(submat_c01_r23_, c01r01_mult_c23r01_)
+				EmuMath::SIMD::matrix_2x2_multiply_cm(submat_c01_r23_, c01r01_mult_c23r01_)
 			);
 
 			// Output final shuffles, performing transpose with output shuffles if desired
