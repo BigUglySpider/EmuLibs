@@ -127,6 +127,37 @@ namespace EmuMath::SIMD
 	{
 		return _mm_sub_ps(_mm_setzero_ps(), val_);
 	}
+
+	[[nodiscard]] inline __m128 matrix_2x2_determinant_128(__m128 column_0_, __m128 column_1_)
+	{
+		__m128 out_ = _mm_mul_ps(column_0_, EmuMath::SIMD::shuffle<1, 0, 2, 3>(column_1_));
+		return _mm_sub_ps(out_, EmuMath::SIMD::shuffle<1, 0, 2, 3>(out_));
+	}
+	[[nodiscard]] inline __m128 matrix_2x2_determinant_128_fill(__m128 column_0_, __m128 column_1_)
+	{
+		return EmuMath::SIMD::shuffle<0>(matrix_2x2_determinant_128(column_0_, column_1_));
+	}
+	[[nodiscard]] inline float matrix_2x2_determinant_scalar(__m128 column_0_, __m128 column_1_)
+	{
+		return _mm_cvtss_f32(matrix_2x2_determinant_128(column_0_, column_1_));
+	}
+
+	[[nodiscard]] inline __m128 matrix_3x3_determinant_128(__m128 column_0_, __m128 column_1_, __m128 column_2_)
+	{
+		__m128 sub_column_0_ = EmuMath::SIMD::shuffle<1, 2, 2, 3>(column_0_);
+		__m128 sub_column_1_ = EmuMath::SIMD::shuffle<1, 2, 2, 3>(column_1_);
+		__m128 sub_column_2_ = EmuMath::SIMD::shuffle<1, 2, 2, 3>(column_2_);
+		
+		__m128 out_ = _mm_mul_ps(column_0_, matrix_2x2_determinant_128(sub_column_1_, sub_column_2_));
+		out_ = _mm_sub_ps(out_, _mm_mul_ps(column_1_, matrix_2x2_determinant_128(sub_column_0_, sub_column_2_)));
+		out_ = _mm_add_ps(out_, _mm_mul_ps(column_2_, matrix_2x2_determinant_128(sub_column_0_, sub_column_1_)));
+		
+		return out_;
+	}
+	[[nodiscard]] inline float matrix_3x3_determinant_scalar(__m128 column_0_, __m128 column_1_, __m128 column_2_)
+	{
+		return _mm_cvtss_f32(matrix_3x3_determinant_128(column_0_, column_1_, column_2_));
+	}
 }
 
 #endif

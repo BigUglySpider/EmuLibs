@@ -252,6 +252,42 @@ int main()
 	std::cout << "Mat:\n" << inv_test_ << "\nDeterminant: " << inv_test_.Determinant() << "\n\n";
 	std::cout << "\n\nSCALAR DETERMINANT: " << inv_test_.Store().DeterminantLaplace() << "\n\n";
 
+	EmuMath::FastMatrix4x4f_CM det_test_
+	(
+		1, 2, 4, 3,
+		1, 36, -7, 8,
+		10, 22, 44, 12,
+		333, -666, 12, 1
+	);
+	EmuMath::Matrix<4, 4, float, true> det_test_scalar_
+	(
+		1, 2, 4, 3,
+		1, 36, -7, 8,
+		10, 22, 44, 12,
+		333, -666, 12, 1
+	);
+	std::cout << "Matrix:\n" << det_test_ << "\n";
+	std::cout << "Det (SIMD) 2x2: " << EmuMath::SIMD::matrix_2x2_determinant_scalar(det_test_.column0, det_test_.column1) << "\n";
+	std::cout << "Det (SISD) 2x2: " << det_test_scalar_.As<2, 2>().DeterminantLaplace() << "\n\n";
+	std::cout << "Det (SIMD) 3x3: " << EmuMath::SIMD::matrix_3x3_determinant_scalar(det_test_.column0, det_test_.column1, det_test_.column2) << "\n";
+	std::cout << "Det (SISD) 3x3: " << det_test_scalar_.As<3, 3>().DeterminantLaplace() << "\n\n";
+
+	std::cout << "Minors (SIMD):\n" << det_test_.MatrixOfMinorsLaplace() << "\n";
+	std::cout << "Minors (SISD):\n" << det_test_scalar_.MatrixOfMinorsLaplace() << "\n";
+	std::cout << "Cofactors (SIMD):\n" << det_test_.MatrixOfCofactorsLaplace() << "\n";
+	std::cout << "Cofactors (SISD):\n" << det_test_scalar_.MatrixOfCofactorsLaplace() << "\n";
+	std::cout << "Adjugate (SIMD):\n" << det_test_.AdjugateLaplace() << "\n";
+	std::cout << "Adjugate (SISD):\n" << det_test_scalar_.AdjugateLaplace() << "\n";
+	std::cout << "InverseLaplace (SIMD):\n" << det_test_.InverseLaplace() << "\n";
+	std::cout << "InverseLaplace (SISD):\n" << det_test_scalar_.InverseLaplace() << "\n\n\n";
+
+	det_test_ = EmuMath::FastMatrix4x4f_CM(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << "Matrix:\n" << det_test_ << "\n";
+	std::cout << "Sub[0, 1]:\n" << det_test_.ExclusiveSubmatrix<0, 1>() << "\n";
+	std::cout << "Sub[0, 0]:\n" << det_test_.ExclusiveSubmatrix<0, 0>() << "\n";
+	std::cout << "Sub[3, 3]:\n" << det_test_.ExclusiveSubmatrix<3, 3>() << "\n";
+	std::cout << "Sub[2, 3]:\n" << det_test_.ExclusiveSubmatrix<2, 3>() << "\n";
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();

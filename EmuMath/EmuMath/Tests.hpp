@@ -151,8 +151,8 @@ namespace EmuCore::TestingHelpers
 			//EmuMath::FastMatrix4x4f_CM(lhs_readable_[i]).Multiply(EmuMath::FastMatrix4x4f_CM(rhs_readable_[i])).Store(out_readable_[i]);
 			//out_[i] = in_[i].Clamp(min_[i], max_[i]);
 			//out_[i] = in_[i].Transpose();
-			out_[i] = in_[i].Inverse();
-			//out_[i] = in_[i].InverseLaplace();
+			//out_[i] = in_[i].Inverse();
+			out_[i] = in_[i].InverseLaplace();
 		}
 		void OnTestsOver()
 		{

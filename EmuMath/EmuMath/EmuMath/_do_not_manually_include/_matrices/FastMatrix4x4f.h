@@ -1495,8 +1495,8 @@ namespace EmuMath
 		/// <para> Calculates the inverse to this matrix using gaussian elimination. </para>
 		/// <para> This function assumes that this matrix does have an inverse, and that all elements along its main diagonal are non-zero. </para>
 		/// </summary>
-		/// <param name="out_determinant_"></param>
-		/// <returns>Trace of this matrix represented as a scalar.</returns>
+		/// <param name="out_determinant_">Optional reference to output this matrix's determinant via.</param>
+		/// <returns>The inverse to this matrix, as long as this matrix satisfies the above assumptions.</returns>
 		[[nodiscard]] inline FastMatrix4x4f_CM Inverse() const
 		{
 			FastMatrix4x4f_CM transpose_row_echelon_ = Transpose();
@@ -1511,6 +1511,185 @@ namespace EmuMath
 			_make_inverse_transpose(out_transpose_, transpose_row_echelon_);
 			out_determinant_ = transpose_row_echelon_.MainDiagonal().HorizontalProduct<float>();
 			return out_transpose_.Transpose();
+		}
+
+		/// <summary> 
+		/// <para> Returns a copy of a submatrix within this matrix, excluding the column and row at the provided respective indices. </para>
+		/// <para> The submatrix will be contained in the output's first 3x3 segment. The final column and the final row of the output matrix will be all 0s. </para>
+		/// </summary>
+		/// <returns>Submatrix excluding the provided column and row within this matrix, with the final column and final row all set to 0.</returns>
+		template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_>
+		[[nodiscard]] inline FastMatrix4x4f_CM ExclusiveSubmatrix() const
+		{
+			if constexpr (_assert_valid_index<ExcludeColumn_, ExcludeRow_>())
+			{
+				__m128 mask_ = EmuMath::SIMD::index_mask_m128<true, true, true, false>();
+				if constexpr (ExcludeColumn_ == 0)
+				{
+					return FastMatrix4x4f_CM
+					(
+						_mm_and_ps(mask_, _index_excluding_shuffle<ExcludeRow_>(column1)),
+						_mm_and_ps(mask_, _index_excluding_shuffle<ExcludeRow_>(column2)),
+						_mm_and_ps(mask_, _index_excluding_shuffle<ExcludeRow_>(column3)),
+						_mm_setzero_ps()
+					);
+				}
+				else if constexpr (ExcludeColumn_ == 1)
+				{
+					return FastMatrix4x4f_CM
+					(
+						_mm_and_ps(mask_, _index_excluding_shuffle<ExcludeRow_>(column0)),
+						_mm_and_ps(mask_, _index_excluding_shuffle<ExcludeRow_>(column2)),
+						_mm_and_ps(mask_, _index_excluding_shuffle<ExcludeRow_>(column3)),
+						_mm_setzero_ps()
+					);
+				}
+				else if constexpr (ExcludeColumn_ == 2)
+				{
+					return FastMatrix4x4f_CM
+					(
+						_mm_and_ps(mask_, _index_excluding_shuffle<ExcludeRow_>(column0)),
+						_mm_and_ps(mask_, _index_excluding_shuffle<ExcludeRow_>(column1)),
+						_mm_and_ps(mask_, _index_excluding_shuffle<ExcludeRow_>(column3)),
+						_mm_setzero_ps()
+					);
+				}
+				else
+				{
+					return FastMatrix4x4f_CM
+					(
+						_mm_and_ps(mask_, _index_excluding_shuffle<ExcludeRow_>(column0)),
+						_mm_and_ps(mask_, _index_excluding_shuffle<ExcludeRow_>(column1)),
+						_mm_and_ps(mask_, _index_excluding_shuffle<ExcludeRow_>(column2)),
+						_mm_setzero_ps()
+					);
+				}
+			}
+			else
+			{
+				static_assert(false, "Invalid column and/or row index passed to EmuMath::FastMatrix4x4f_CM::ExclusiveSubmatrix.");
+			}
+		}
+
+		/// <summary> 
+		/// <para> Calculates the matrix of minors to this matrix using laplace expansion. </para>
+		/// </summary>
+		/// <returns>Matrix of minors to this matrix, which can be summarised as a matrix of determinants to all respective exclusive submatrices within this matrix.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM MatrixOfMinorsLaplace() const
+		{
+			// This function can be made significantly more efficient by not deferring to EmuMath::SIMD::matrix_3x3_determinant_128
+			// --- This will allow us to reuse already calculated determinants, as well as better vectorise the process
+
+			// Row 3
+			__m128 sub_0_ = column0;
+			__m128 sub_1_ = column1;
+			__m128 sub_2_ = column2;
+			__m128 sub_3_ = column3;
+
+			__m128 out_0_wz_ = EmuMath::SIMD::matrix_3x3_determinant_128(sub_1_, sub_2_, sub_3_);
+			__m128 out_1_wz_ = EmuMath::SIMD::matrix_3x3_determinant_128(sub_0_, sub_2_, sub_3_);
+			__m128 out_2_wz_ = EmuMath::SIMD::matrix_3x3_determinant_128(sub_0_, sub_1_, sub_3_);
+			__m128 out_3_wz_ = EmuMath::SIMD::matrix_3x3_determinant_128(sub_0_, sub_1_, sub_2_);
+
+			// Row 2 - Shuffles of submatrix columns use sub_x_ instead of columnx to minimise chances of a cache miss
+			sub_0_ = EmuMath::SIMD::shuffle<0, 1, 3, 2>(sub_0_);
+			sub_1_ = EmuMath::SIMD::shuffle<0, 1, 3, 2>(sub_1_);
+			sub_2_ = EmuMath::SIMD::shuffle<0, 1, 3, 2>(sub_2_);
+			sub_3_ = EmuMath::SIMD::shuffle<0, 1, 3, 2>(sub_3_);
+
+			out_0_wz_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(out_0_wz_, EmuMath::SIMD::matrix_3x3_determinant_128(sub_1_, sub_2_, sub_3_));
+			out_1_wz_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(out_1_wz_, EmuMath::SIMD::matrix_3x3_determinant_128(sub_0_, sub_2_, sub_3_));
+			out_2_wz_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(out_2_wz_, EmuMath::SIMD::matrix_3x3_determinant_128(sub_0_, sub_1_, sub_3_));
+			out_3_wz_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(out_3_wz_, EmuMath::SIMD::matrix_3x3_determinant_128(sub_0_, sub_1_, sub_2_));
+
+			// Row 1 - Use new out_ registers so that output matrix columns can be formed from a single shuffle
+			sub_0_ = EmuMath::SIMD::shuffle<0, 3, 2, 1>(sub_0_);
+			sub_1_ = EmuMath::SIMD::shuffle<0, 3, 2, 1>(sub_1_);
+			sub_2_ = EmuMath::SIMD::shuffle<0, 3, 2, 1>(sub_2_);
+			sub_3_ = EmuMath::SIMD::shuffle<0, 3, 2, 1>(sub_3_);
+
+			__m128 out_0_yx_ = EmuMath::SIMD::matrix_3x3_determinant_128(sub_1_, sub_2_, sub_3_);
+			__m128 out_1_yx_ = EmuMath::SIMD::matrix_3x3_determinant_128(sub_0_, sub_2_, sub_3_);
+			__m128 out_2_yx_ = EmuMath::SIMD::matrix_3x3_determinant_128(sub_0_, sub_1_, sub_3_);
+			__m128 out_3_yx_ = EmuMath::SIMD::matrix_3x3_determinant_128(sub_0_, sub_1_, sub_2_);
+
+			// Row 0
+			sub_0_ = EmuMath::SIMD::shuffle<3, 1, 2, 0>(sub_0_);
+			sub_1_ = EmuMath::SIMD::shuffle<3, 1, 2, 0>(sub_1_);
+			sub_2_ = EmuMath::SIMD::shuffle<3, 1, 2, 0>(sub_2_);
+			sub_3_ = EmuMath::SIMD::shuffle<3, 1, 2, 0>(sub_3_);
+
+			out_0_yx_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(out_0_yx_, EmuMath::SIMD::matrix_3x3_determinant_128(sub_1_, sub_2_, sub_3_));
+			out_1_yx_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(out_1_yx_, EmuMath::SIMD::matrix_3x3_determinant_128(sub_0_, sub_2_, sub_3_));
+			out_2_yx_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(out_2_yx_, EmuMath::SIMD::matrix_3x3_determinant_128(sub_0_, sub_1_, sub_3_));
+			out_3_yx_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(out_3_yx_, EmuMath::SIMD::matrix_3x3_determinant_128(sub_0_, sub_1_, sub_2_));
+
+			return FastMatrix4x4f_CM
+			(
+				EmuMath::SIMD::shuffle<2, 0, 2, 0>(out_0_yx_, out_0_wz_),
+				EmuMath::SIMD::shuffle<2, 0, 2, 0>(out_1_yx_, out_1_wz_),
+				EmuMath::SIMD::shuffle<2, 0, 2, 0>(out_2_yx_, out_2_wz_),
+				EmuMath::SIMD::shuffle<2, 0, 2, 0>(out_3_yx_, out_3_wz_)
+			);
+		}
+
+		/// <summary> 
+		/// <para> Calculates the matrix of cofactors to this matrix using laplace expansion. </para>
+		/// </summary>
+		/// <returns>Matrix of cofactors to this matrix.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM MatrixOfCofactorsLaplace() const
+		{
+			const FastMatrix4x4f_CM minors_ = MatrixOfMinorsLaplace();
+			__m128 mults_odd_column_ = _mm_set_ps(1.0f, -1.0f, 1.0f, -1.0f);
+			__m128 mults_even_column_ = EmuMath::SIMD::shuffle<1, 0, 1, 0>(mults_odd_column_);
+			return FastMatrix4x4f_CM
+			(
+				_mm_mul_ps(minors_.column0, mults_even_column_),
+				_mm_mul_ps(minors_.column1, mults_odd_column_),
+				_mm_mul_ps(minors_.column2, mults_even_column_),
+				_mm_mul_ps(minors_.column3, mults_odd_column_)
+			);
+		}
+
+		/// <summary> 
+		/// <para> Calculates the adjugate of this matrix using laplace expansion. </para>
+		/// </summary>
+		/// <returns>Adjugate of this matrix, which can be summarised as the tranpose of its matrix of cofactors.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM AdjugateLaplace() const
+		{
+			return MatrixOfCofactorsLaplace().Transpose();
+		}
+
+		/// <summary> 
+		/// <para> Calculates the inverse to this matrix using laplace expansion. </para>
+		/// <para> This function assumes that this matrix does have an inverse. </para>
+		/// </summary>
+		/// <param name="out_determinant_">Optional reference to output this matrix's determinant via.</param>
+		/// <returns>The inverse to this matrix, as long as this matrix satisfies the above assumptions.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM InverseLaplace() const
+		{
+			FastMatrix4x4f_CM adjugate_ = AdjugateLaplace();
+			__m128 determinant_reciprocal_ = _mm_set1_ps(1.0f / EmuMath::SIMD::horizontal_vector_sum_scalar(_mm_mul_ps(adjugate_.column0, GetRow<0>())));
+			return FastMatrix4x4f_CM
+			(
+				_mm_mul_ps(adjugate_.column0, determinant_reciprocal_),
+				_mm_mul_ps(adjugate_.column1, determinant_reciprocal_),
+				_mm_mul_ps(adjugate_.column2, determinant_reciprocal_),
+				_mm_mul_ps(adjugate_.column3, determinant_reciprocal_)
+			);
+		}
+		[[nodiscard]] inline FastMatrix4x4f_CM InverseLaplace(float& out_determinant_) const
+		{
+			FastMatrix4x4f_CM adjugate_ = AdjugateLaplace();
+			out_determinant_ = EmuMath::SIMD::horizontal_vector_sum_scalar(_mm_mul_ps(adjugate_.column0, GetRow<0>()));
+			__m128 determinant_reciprocal_ = _mm_set1_ps(1.0f / out_determinant_);
+			return FastMatrix4x4f_CM
+			(
+				_mm_mul_ps(adjugate_.column0, determinant_reciprocal_),
+				_mm_mul_ps(adjugate_.column1, determinant_reciprocal_),
+				_mm_mul_ps(adjugate_.column2, determinant_reciprocal_),
+				_mm_mul_ps(adjugate_.column3, determinant_reciprocal_)
+			);
 		}
 #pragma endregion
 
@@ -1863,7 +2042,14 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Provided an invalid Column Index for accessing an EmuMath::FastMatrix4x4f_CM. 0-3 (inclusive) is the valid Column Index range.");
+				if constexpr (RowIndex_ < 4)
+				{
+					static_assert(false, "Provided an invalid Column Index for accessing an EmuMath::FastMatrix4x4f_CM. 0-3 (inclusive) is the valid Column Index range.");
+				}
+				else
+				{
+					static_assert(false, "Provided invalid Column and Row indices for accessing an EmuMath::FastMAtrix4x4f_CM. 0-3 (inclusive) is the valid index range for both Columns and Rows.");
+				}
 				return false;
 			}
 		}
@@ -2033,6 +2219,31 @@ namespace EmuMath
 			out_inverse_trans_.column1 = _mm_div_ps(out_inverse_trans_.column1, EmuMath::SIMD::shuffle<1>(out_reff_trans_.column1));
 			out_inverse_trans_.column2 = _mm_div_ps(out_inverse_trans_.column2, EmuMath::SIMD::shuffle<2>(out_reff_trans_.column2));
 			out_inverse_trans_.column3 = _mm_div_ps(out_inverse_trans_.column3, EmuMath::SIMD::shuffle<3>(out_reff_trans_.column3));
+		}
+
+		template<std::size_t ExcludeRow_>
+		[[nodiscard]] static inline __m128 _index_excluding_shuffle(__m128 val_)
+		{
+			if constexpr (ExcludeRow_ == 0)
+			{
+				return EmuMath::SIMD::shuffle<1, 2, 3, 0>(val_);
+			}
+			else if constexpr (ExcludeRow_ == 1)
+			{
+				return EmuMath::SIMD::shuffle<0, 2, 3, 1>(val_);
+			}
+			else if constexpr (ExcludeRow_ == 2)
+			{
+				return EmuMath::SIMD::shuffle<0, 1, 3, 2>(val_);
+			}
+			else if constexpr (ExcludeRow_ == 3)
+			{
+				return val_;
+			}
+			else
+			{
+				static_assert(false, "Attempted to pass an invalid ExcludeRow_ index to EmuMath::FastMatrix4x4f_CM::_index_excluding_shuffle.");
+			}
 		}
 #pragma endregion
 	};
