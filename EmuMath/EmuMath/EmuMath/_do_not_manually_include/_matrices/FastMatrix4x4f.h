@@ -2616,7 +2616,7 @@ namespace EmuMath
 		}
 
 		/// <summary> 
-		/// <para> Calculates the matrix of minors to this matrix using laplace expansion. </para>
+		/// <para> Calculates the matrix of minors to this matrix. </para>
 		/// <para> Automatically applies a transpose without any extra operations if TransposeOutput_ is true, defaulting to false. </para>
 		/// </summary>
 		/// <returns>Matrix of minors to this matrix, which can be summarised as a matrix of determinants to all respective exclusive submatrices within this matrix.</returns>
@@ -2689,7 +2689,7 @@ namespace EmuMath
 		}
 
 		/// <summary> 
-		/// <para> Calculates the matrix of cofactors to this matrix using laplace expansion. </para>
+		/// <para> Calculates the matrix of cofactors to this matrix. </para>
 		/// <para> Automatically applies a transpose without any extra operations if TransposeOutput_ is true, defaulting to false. </para>
 		/// </summary>
 		/// <returns>Matrix of cofactors to this matrix.</returns>
@@ -2709,7 +2709,7 @@ namespace EmuMath
 		}
 
 		/// <summary> 
-		/// <para> Calculates the adjugate of this matrix using laplace expansion. </para>
+		/// <para> Calculates the adjugate of this matrix. </para>
 		/// <para> Effectively shorthand and clearer semantics for Cofactors&lt;true&gt;. </para>
 		/// </summary>
 		/// <returns>Adjugate of this matrix, which can be summarised as the tranpose of its matrix of cofactors.</returns>
