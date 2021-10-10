@@ -245,7 +245,7 @@ int main()
 		-1, 7, 4, 3,
 		1, 1, 1, 1
 	);
-	std::cout << "Mat:\n" << inv_test_ << "\nInverse:\n" << inv_test_.InverseGaussJordan() << "\n\n";
+	std::cout << "Mat:\n" << inv_test_ << "\nInverse:\n" << inv_test_.Inverse() << "\n\n";
 	std::cout << "\n\nSCALAR INVERSE:\n" << inv_test_.Store().InverseLaplace() << "\n\n";
 
 
@@ -270,11 +270,49 @@ int main()
 	std::cout << "Det (SISD) 2x2: " << det_test_scalar_.As<2, 2>().DeterminantLaplace() << "\n\n";
 	std::cout << "Det (SISD) 3x3: " << det_test_scalar_.As<3, 3>().DeterminantLaplace() << "\n\n";
 
-	std::cout << "Minors (SIMD):\n" << det_test_.MatrixOfMinorsLaplace<false>() << "\n";
-	std::cout << "Minors (SIMD Transposed):\n" << det_test_.MatrixOfMinorsLaplace<true>() << "\n";
+	std::cout << "Minors (SIMD):\n" << det_test_.Minors<false>() << "\n";
+	std::cout << "Minors (SIMD Transposed):\n" << det_test_.Minors<true>() << "\n";
 	std::cout << "Minors (SISD):\n" << det_test_scalar_.MatrixOfMinorsLaplace() << "\n";
 	std::cout << "Determinant [Sub[0, 0]]: " << det_test_scalar_.ExclusiveSubmatrix<3, 3>().ExclusiveSubmatrix<0, 0>().DeterminantLaplace() << "\n";
-	std::cout << "Inverse:\n" << det_test_.InverseLaplace() << "\nSISD Inverse:\n" << det_test_scalar_.InverseLaplace() << "\n\n";
+	std::cout << "Inverse (SIMD):\n" << det_test_.Inverse() << "\nInverse (SISD):\n" << det_test_scalar_.InverseLaplace() << "\n\n";
+
+	constexpr float det_ = EmuMath::Matrix<4, 4, float, true>
+	(
+		1, 2, 3, 4,
+		5, 6, 7, 8,
+		9, 10, 11, 12,
+		13, 14, 15, 16
+	).DeterminantLaplace();
+	EmuMath::FastMatrix4x4f_CM bad_det_test_ = EmuMath::FastMatrix4x4f_CM
+	(
+		1, 2, 3, 4,
+		5, 6, 7, 8,
+		9, 10, 11, 12,
+		13, 14, 15, 16
+	);
+	std::cout << bad_det_test_.Determinant() << "\n";
+	float out_det_;
+	std::cout << bad_det_test_.Inverse(out_det_) << "\n\n";
+	std::cout << bad_det_test_.Multiply(bad_det_test_.Inverse()) << "\n";
+	std::cout << "Det from InverseLaplace call: " << out_det_ << "\n";
+	std::cout << "Det from Determinant call: " << bad_det_test_.Determinant() << "\n";
+	std::cout << "Det from scalar calc: " << bad_det_test_.Store().DeterminantLaplace() << "\n\n";
+
+	std::cout << bad_det_test_.Multiply(bad_det_test_.Inverse()) << "\n\n";
+	std::cout << bad_det_test_.Minors() << "\n\n" << bad_det_test_.Store().MatrixOfMinorsLaplace() << "\n\n";
+
+	constexpr bool nearf_ = EmuCore::FpNearEqual(1.0f, 1.0f);
+	constexpr bool neard_ = EmuCore::FpNearEqual(1.0, 1.0);
+	constexpr bool nearld_ = EmuCore::FpNearEqual(1.0L, 1.0L);
+
+	constexpr std::int8_t dgfija9 = EmuCore::do_abs<std::int8_t>()(5);
+	constexpr std::int8_t dgfijo8 = EmuCore::do_abs<std::int8_t>()(-5);
+	constexpr std::int16_t dgfija16 = EmuCore::do_abs<std::int16_t>()(20150);
+	constexpr std::int16_t dgfijo16 = EmuCore::do_abs<std::int16_t>()(-20150);
+	constexpr std::int32_t dgfija32 = EmuCore::do_abs<std::int32_t>()(2);
+	constexpr std::int32_t dgfijo32 = EmuCore::do_abs<std::int32_t>()(-2);
+	constexpr std::int64_t dgfija64 = EmuCore::do_abs<std::int64_t>()(std::numeric_limits<std::int64_t>::max());
+	constexpr std::int64_t dgfijo64 = EmuCore::do_abs<std::int64_t>()(-(std::numeric_limits<std::int64_t>::max() - 26));
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

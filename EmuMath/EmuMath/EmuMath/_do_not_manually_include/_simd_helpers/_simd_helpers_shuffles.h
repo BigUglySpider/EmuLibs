@@ -55,6 +55,40 @@ namespace EmuMath::SIMD
 	{
 		return _mm_shuffle_ps(ab, ab, shuffle_arg_v<Index_, Index_, Index_, Index_>);
 	}
+
+	template<>
+	[[nodiscard]] inline __m128 shuffle<0, 0, 2, 2>(__m128 ab)
+	{
+		return _mm_moveldup_ps(ab);
+	}
+	
+	template<>
+	[[nodiscard]] inline __m128 shuffle<1, 1, 3, 3>(__m128 ab)
+	{
+		return _mm_movehdup_ps(ab);
+	}
+
+	template<>
+	[[nodiscard]] inline __m128 shuffle<0, 1, 0, 1>(__m128 a, __m128 b)
+	{
+		return _mm_movelh_ps(a, b);
+	}
+	template<>
+	[[nodiscard]] inline __m128 shuffle<0, 1, 0, 1>(__m128 ab)
+	{
+		return _mm_movelh_ps(ab, ab);
+	}
+
+	template<>
+	[[nodiscard]] inline __m128 shuffle<2, 3, 2, 3>(__m128 a, __m128 b)
+	{
+		return _mm_movehl_ps(b, a);
+	}
+	template<>
+	[[nodiscard]] inline __m128 shuffle<2, 3, 2, 3>(__m128 ab)
+	{
+		return _mm_movehl_ps(ab, ab);
+	}
 }
 
 #endif

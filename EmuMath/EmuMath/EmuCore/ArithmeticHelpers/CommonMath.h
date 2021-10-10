@@ -1,6 +1,7 @@
 #ifndef EMU_CORE_COMMON_MATH_H_INC_
 #define EMU_CORE_COMMON_MATH_H_INC_ 1
 
+#include "../TMPHelpers/TypeComparators.h"
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -628,6 +629,39 @@ namespace EmuCore
 		{
 			static_assert(false, "Attempted to perform Q_rsqrt with a non-floating-point output type.");
 		}
+	}
+
+	template<typename T_>
+	constexpr inline T_ AbsConstexpr(const T_ val_)
+	{
+		return val_ > T_() ? val_ : -val_;
+	}
+	template<>
+	constexpr inline std::int8_t AbsConstexpr(const std::int8_t val_)
+	{
+		return (val_ + (val_ >> 7)) ^ (val_ >> 7);
+	}
+	template<>
+	constexpr inline std::int16_t AbsConstexpr(const std::int16_t val_)
+	{
+		return (val_ + (val_ >> 15)) ^ (val_ >> 15);
+	}
+	template<>
+	constexpr inline std::int32_t AbsConstexpr(const std::int32_t val_)
+	{
+		return (val_ + (val_ >> 31)) ^ (val_ >> 31);
+	}
+	template<>
+	constexpr inline std::int64_t AbsConstexpr(const std::int64_t val_)
+	{
+		return (val_ + (val_ >> 63)) ^ (val_ >> 63);
+	}
+
+	template<typename FP_>
+	constexpr inline bool FpNearEqual(FP_ lhs_, FP_ rhs_, FP_ epsilon_ = std::numeric_limits<FP_>::epsilon())
+	{
+		FP_ delta_ = lhs_ - rhs_;
+		return AbsConstexpr<FP_>(delta_) <= epsilon_;
 	}
 }
 

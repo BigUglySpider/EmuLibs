@@ -1040,6 +1040,15 @@ namespace EmuMath
 				static_assert(false, "Attempted to retrieve an EmuMath::FastMatrix4x4f_CM's Max value using an output type that cannot be converted to from float.");
 			}
 		}
+
+		template<typename Out_ = float>
+		[[nodiscard]] inline Out_ TotalSum() const
+		{
+			__m128 sum_ = _mm_add_ps(column0, column1);
+			sum_ = _mm_add_ps(sum_, column2);
+			sum_ = _mm_add_ps(sum_, column3);
+			return EmuMath::SIMD::horizontal_vector_sum_scalar(sum_);
+		}
 #pragma endregion
 
 #pragma region BITWISE_FUNCS
@@ -1216,27 +1225,1086 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region COMPARISON_FUNCS_PER_ELEMENT
+		/// <summary> 
+		/// <para> Compares this matrix's columns to the respective passed column registers, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was equal to that of the respective passed columns; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare this matrix's 0th column with.</param>
+		/// <param name="rhs_column_1_">Register to compare this matrix's 1st column with.</param>
+		/// <param name="rhs_column_2_">Register to compare this matrix's 2nd column with.</param>
+		/// <param name="rhs_column_3_">Register to compare this matrix's 3rd column with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementEqual(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_cmpeq_ps(column0, rhs_column_0_),
+				_mm_cmpeq_ps(column1, rhs_column_1_),
+				_mm_cmpeq_ps(column2, rhs_column_2_),
+				_mm_cmpeq_ps(column3, rhs_column_3_)
+			);
+		}
+		/// <summary> 
+		/// <para> Compares this matrix's columns to the passed column register, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was equal to that of the passed column; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_all_columns_">Register to compare all of this matrix's columns with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementEqual(__m128 rhs_all_columns_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_cmpeq_ps(column0, rhs_all_columns_),
+				_mm_cmpeq_ps(column1, rhs_all_columns_),
+				_mm_cmpeq_ps(column2, rhs_all_columns_),
+				_mm_cmpeq_ps(column3, rhs_all_columns_)
+			);
+		}
+		/// <summary> 
+		/// <para> Compares this matrix's columns to those of the passed matrix, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was equal to that of the passed matrix; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to compare this matrix's elements with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementEqual(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return CmpPerElementEqual(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary> 
+		/// <para> Compares this matrix's columns to those of the passed value, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was equal to the passed value; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare all of this matrix's elements with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementEqual(const Rhs_& rhs_) const
+		{
+			return CmpPerElementEqual(_mm_set1_ps(static_cast<float>(rhs_)));
+		}
+
+		/// <summary> 
+		/// <para> Compares this matrix's columns to the respective passed column registers, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was not equal to that of the respective passed columns; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare this matrix's 0th column with.</param>
+		/// <param name="rhs_column_1_">Register to compare this matrix's 1st column with.</param>
+		/// <param name="rhs_column_2_">Register to compare this matrix's 2nd column with.</param>
+		/// <param name="rhs_column_3_">Register to compare this matrix's 3rd column with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementNotEqual(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_cmpneq_ps(column0, rhs_column_0_),
+				_mm_cmpneq_ps(column1, rhs_column_1_),
+				_mm_cmpneq_ps(column2, rhs_column_2_),
+				_mm_cmpneq_ps(column3, rhs_column_3_)
+			);
+		}
+		/// <summary> 
+		/// <para> Compares this matrix's columns to the passed column register, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was not equal to that of the passed column; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_all_columns_">Register to compare all of this matrix's columns with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementNotEqual(__m128 rhs_all_columns_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_cmpneq_ps(column0, rhs_all_columns_),
+				_mm_cmpneq_ps(column1, rhs_all_columns_),
+				_mm_cmpneq_ps(column2, rhs_all_columns_),
+				_mm_cmpneq_ps(column3, rhs_all_columns_)
+			);
+		}
+		/// <summary> 
+		/// <para> Compares this matrix's columns to those of the passed matrix, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was not equal to that of the passed matrix; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to compare this matrix's elements with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementNotEqual(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return CmpPerElementNotEqual(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary> 
+		/// <para> Compares this matrix's columns to those of the passed value, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was not equal to the passed value; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare all of this matrix's elements with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementNotEqual(const Rhs_& rhs_) const
+		{
+			return CmpPerElementNotEqual(_mm_set1_ps(static_cast<float>(rhs_)));
+		}
+
+		/// <summary> 
+		/// <para> Compares this matrix's columns to the respective passed column registers, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was greater than that of the respective passed columns; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare this matrix's 0th column with.</param>
+		/// <param name="rhs_column_1_">Register to compare this matrix's 1st column with.</param>
+		/// <param name="rhs_column_2_">Register to compare this matrix's 2nd column with.</param>
+		/// <param name="rhs_column_3_">Register to compare this matrix's 3rd column with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementGreater(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_cmpgt_ps(column0, rhs_column_0_),
+				_mm_cmpgt_ps(column1, rhs_column_1_),
+				_mm_cmpgt_ps(column2, rhs_column_2_),
+				_mm_cmpgt_ps(column3, rhs_column_3_)
+			);
+		}
+		/// <summary> 
+		/// <para> Compares this matrix's columns to the passed column register, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was greater than that of the passed column; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_all_columns_">Register to compare all of this matrix's columns with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementGreater(__m128 rhs_all_columns_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_cmpgt_ps(column0, rhs_all_columns_),
+				_mm_cmpgt_ps(column1, rhs_all_columns_),
+				_mm_cmpgt_ps(column2, rhs_all_columns_),
+				_mm_cmpgt_ps(column3, rhs_all_columns_)
+			);
+		}
+		/// <summary> 
+		/// <para> Compares this matrix's columns to those of the passed matrix, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was greater than that of the passed matrix; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to compare this matrix's elements with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementGreater(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return CmpPerElementGreater(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary> 
+		/// <para> Compares this matrix's columns to those of the passed value, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was greater than the passed value; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare all of this matrix's elements with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementGreater(const Rhs_& rhs_) const
+		{
+			return CmpPerElementGreater(_mm_set1_ps(static_cast<float>(rhs_)));
+		}
+
+		/// <summary> 
+		/// <para> Compares this matrix's columns to the respective passed column registers, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was less than that of the respective passed columns; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare this matrix's 0th column with.</param>
+		/// <param name="rhs_column_1_">Register to compare this matrix's 1st column with.</param>
+		/// <param name="rhs_column_2_">Register to compare this matrix's 2nd column with.</param>
+		/// <param name="rhs_column_3_">Register to compare this matrix's 3rd column with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementLess(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_cmplt_ps(column0, rhs_column_0_),
+				_mm_cmplt_ps(column1, rhs_column_1_),
+				_mm_cmplt_ps(column2, rhs_column_2_),
+				_mm_cmplt_ps(column3, rhs_column_3_)
+			);
+		}
+		/// <summary> 
+		/// <para> Compares this matrix's columns to the passed column register, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was less than that of the passed column; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_all_columns_">Register to compare all of this matrix's columns with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementLess(__m128 rhs_all_columns_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_cmplt_ps(column0, rhs_all_columns_),
+				_mm_cmplt_ps(column1, rhs_all_columns_),
+				_mm_cmplt_ps(column2, rhs_all_columns_),
+				_mm_cmplt_ps(column3, rhs_all_columns_)
+			);
+		}
+		/// <summary> 
+		/// <para> Compares this matrix's columns to those of the passed matrix, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was less than that of the passed matrix; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to compare this matrix's elements with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementLess(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return CmpPerElementLess(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary> 
+		/// <para> Compares this matrix's columns to those of the passed value, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was less than the passed value; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare all of this matrix's elements with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementLess(const Rhs_& rhs_) const
+		{
+			return CmpPerElementLess(_mm_set1_ps(static_cast<float>(rhs_)));
+		}
+
+		/// <summary> 
+		/// <para> Compares this matrix's columns to the respective passed column registers, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was 
+		///		greater than or equal tothat of the respective passed columns; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare this matrix's 0th column with.</param>
+		/// <param name="rhs_column_1_">Register to compare this matrix's 1st column with.</param>
+		/// <param name="rhs_column_2_">Register to compare this matrix's 2nd column with.</param>
+		/// <param name="rhs_column_3_">Register to compare this matrix's 3rd column with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementGreaterEqual(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_cmpge_ps(column0, rhs_column_0_),
+				_mm_cmpge_ps(column1, rhs_column_1_),
+				_mm_cmpge_ps(column2, rhs_column_2_),
+				_mm_cmpge_ps(column3, rhs_column_3_)
+			);
+		}
+		/// <summary> 
+		/// <para> Compares this matrix's columns to the passed column register, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was greater than or equal to that of the passed column; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_all_columns_">Register to compare all of this matrix's columns with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementGreaterEqual(__m128 rhs_all_columns_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_cmpge_ps(column0, rhs_all_columns_),
+				_mm_cmpge_ps(column1, rhs_all_columns_),
+				_mm_cmpge_ps(column2, rhs_all_columns_),
+				_mm_cmpge_ps(column3, rhs_all_columns_)
+			);
+		}
+		/// <summary> 
+		/// <para> Compares this matrix's columns to those of the passed matrix, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was greater than or equal to that of the passed matrix; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to compare this matrix's elements with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementGreaterEqual(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return CmpPerElementGreaterEqual(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary> 
+		/// <para> Compares this matrix's columns to those of the passed value, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was greater than or equal to the passed value; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare all of this matrix's elements with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementGreaterEqual(const Rhs_& rhs_) const
+		{
+			return CmpPerElementGreaterEqual(_mm_set1_ps(static_cast<float>(rhs_)));
+		}
+
+		/// <summary> 
+		/// <para> Compares this matrix's columns to the respective passed column registers, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was 
+		///		less than or equal to that of the respective passed columns; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare this matrix's 0th column with.</param>
+		/// <param name="rhs_column_1_">Register to compare this matrix's 1st column with.</param>
+		/// <param name="rhs_column_2_">Register to compare this matrix's 2nd column with.</param>
+		/// <param name="rhs_column_3_">Register to compare this matrix's 3rd column with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementLessEqual(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_cmple_ps(column0, rhs_column_0_),
+				_mm_cmple_ps(column1, rhs_column_1_),
+				_mm_cmple_ps(column2, rhs_column_2_),
+				_mm_cmple_ps(column3, rhs_column_3_)
+			);
+		}
+		/// <summary> 
+		/// <para> Compares this matrix's columns to the passed column register, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was less than or equal to that of the passed column; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_all_columns_">Register to compare all of this matrix's columns with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementLessEqual(__m128 rhs_all_columns_) const
+		{
+			return FastMatrix4x4f_CM
+			(
+				_mm_cmple_ps(column0, rhs_all_columns_),
+				_mm_cmple_ps(column1, rhs_all_columns_),
+				_mm_cmple_ps(column2, rhs_all_columns_),
+				_mm_cmple_ps(column3, rhs_all_columns_)
+			);
+		}
+		/// <summary> 
+		/// <para> Compares this matrix's columns to those of the passed matrix, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was less than or equal to that of the passed matrix; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to compare this matrix's elements with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementLessEqual(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return CmpPerElementLessEqual(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary> 
+		/// <para> Compares this matrix's columns to those of the passed value, creating a matrix of vectorwise masks. </para>
+		/// <para>
+		///		Elements in the output matrix will be have all bits set to 1 if this matrix's respective element was less than or equal to the passed value; 
+		///		otherwise all bits will be set to 0 for that element.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare all of this matrix's elements with.</param>
+		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementLessEqual(const Rhs_& rhs_) const
+		{
+			return CmpPerElementLessEqual(_mm_set1_ps(static_cast<float>(rhs_)));
+		}
+#pragma endregion
+
+#pragma region COMPARISON_FUNCS_ANY
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the respective passed column registers. </para>
+		/// <para> If at least one element is equal to that of the respective rhs, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare this matrix's 0th column with.</param>
+		/// <param name="rhs_column_1_">Register to compare this matrix's 1st column with.</param>
+		/// <param name="rhs_column_2_">Register to compare this matrix's 2nd column with.</param>
+		/// <param name="rhs_column_3_">Register to compare this matrix's 3rd column with.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and those of the respective passed columns returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAnyEqual(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			// NOTE FOR ALL ANYCOMPARISON FUNCS
+			// --- We bitwise OR vector masks together and then extract a scalar movemask at the end
+			// --- This is chosen instead of a logical OR of all masks due to instruction latency
+			// --- _mm_or_ps = 1 cycle latency, _mm_movemask_ps = 2 cycle latency
+			// --- Although there is potential for short-circuits with scalar bool checks, the latency adds up quickly
+			// ------ e.g. 2 checks == as much latency as a full check with bitwise ORed masks
+			// --- This results in a consistent instruction latency of 5, versus the worst cases of 6 or 8 when attempting to allow short-circuit optimisations
+			__m128 cmp_mask_ = _mm_cmpeq_ps(column0, rhs_column_0_);
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpeq_ps(column1, rhs_column_1_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpeq_ps(column2, rhs_column_2_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpeq_ps(column3, rhs_column_3_));
+			return _mm_movemask_ps(cmp_mask_);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed column register. </para>
+		/// <para> If at least one element is equal to that of the rhs, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_all_columns_">Register to compare all of this matrix's columns with.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and those of the passed register returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAnyEqual(__m128 rhs_all_columns_) const
+		{
+			__m128 cmp_mask_ = _mm_cmpeq_ps(column0, rhs_all_columns_);
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpeq_ps(column1, rhs_all_columns_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpeq_ps(column2, rhs_all_columns_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpeq_ps(column3, rhs_all_columns_));
+			return _mm_movemask_ps(cmp_mask_);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
+		/// <para> If at least one element is equal to that of the rhs, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to compare all of this matrix's respective elements with.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and those of the passed matrix returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAnyEqual(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return CmpAnyEqual(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed value. </para>
+		/// <para> If at least one element is equal to rhs_, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and the passed value returned true; otherwise false.</returns>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		[[nodiscard]] inline bool CmpAnyEqual(const Rhs_& rhs_) const
+		{
+			return CmpAnyEqual(_mm_set1_ps(static_cast<float>(rhs_)));
+		}
+
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the respective passed column registers. </para>
+		/// <para> If at least one element is not equal to that of the respective rhs, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare this matrix's 0th column with.</param>
+		/// <param name="rhs_column_1_">Register to compare this matrix's 1st column with.</param>
+		/// <param name="rhs_column_2_">Register to compare this matrix's 2nd column with.</param>
+		/// <param name="rhs_column_3_">Register to compare this matrix's 3rd column with.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and those of the respective passed columns returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAnyNotEqual(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			__m128 cmp_mask_ = _mm_cmpneq_ps(column0, rhs_column_0_);
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpneq_ps(column1, rhs_column_1_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpneq_ps(column2, rhs_column_2_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpneq_ps(column3, rhs_column_3_));
+			return _mm_movemask_ps(cmp_mask_);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed column register. </para>
+		/// <para> If at least one element is not equal to that of the rhs, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare all of this matrix's columns with.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and those of the passed register returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAnyNotEqual(__m128 rhs_all_columns_) const
+		{
+			__m128 cmp_mask_ = _mm_cmpneq_ps(column0, rhs_all_columns_);
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpneq_ps(column1, rhs_all_columns_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpneq_ps(column2, rhs_all_columns_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpneq_ps(column3, rhs_all_columns_));
+			return _mm_movemask_ps(cmp_mask_);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
+		/// <para> If at least one element is not equal to that of the rhs, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to compare all of this matrix's respective elements with.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and those of the passed matrix returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAnyNotEqual(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return CmpAnyNotEqual(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed value. </para>
+		/// <para> If at least one element is equal to rhs_, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and the passed value returned true; otherwise false.</returns>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		[[nodiscard]] inline bool CmpAnyNotEqual(const Rhs_& rhs_) const
+		{
+			return CmpAnyNotEqual(_mm_set1_ps(static_cast<float>(rhs_)));
+		}
+
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the respective passed column registers. </para>
+		/// <para> If at least one element is greater than that of the respective rhs, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare this matrix's 0th column with.</param>
+		/// <param name="rhs_column_1_">Register to compare this matrix's 1st column with.</param>
+		/// <param name="rhs_column_2_">Register to compare this matrix's 2nd column with.</param>
+		/// <param name="rhs_column_3_">Register to compare this matrix's 3rd column with.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and those of the respective passed columns returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAnyGreater(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			__m128 cmp_mask_ = _mm_cmpgt_ps(column0, rhs_column_0_);
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpgt_ps(column1, rhs_column_1_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpgt_ps(column2, rhs_column_2_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpgt_ps(column3, rhs_column_3_));
+			return _mm_movemask_ps(cmp_mask_);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed column register. </para>
+		/// <para> If at least one element is greater than that of the rhs, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare all of this matrix's columns with.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and those of the passed register returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAnyGreater(__m128 rhs_all_columns_) const
+		{
+			__m128 cmp_mask_ = _mm_cmpgt_ps(column0, rhs_all_columns_);
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpgt_ps(column1, rhs_all_columns_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpgt_ps(column2, rhs_all_columns_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpgt_ps(column3, rhs_all_columns_));
+			return _mm_movemask_ps(cmp_mask_);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
+		/// <para> If at least one element is greater than that of the rhs, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to compare all of this matrix's respective elements with.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and those of the passed matrix returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAnyGreater(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return CmpAnyGreater(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed value. </para>
+		/// <para> If at least one element is greater than rhs_, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and the passed value returned true; otherwise false.</returns>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		[[nodiscard]] inline bool CmpAnyGreater(const Rhs_& rhs_) const
+		{
+			return CmpAnyGreater(_mm_set1_ps(static_cast<float>(rhs_)));
+		}
+
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the respective passed column registers. </para>
+		/// <para> If at least one element is less than that of the respective rhs, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare this matrix's 0th column with.</param>
+		/// <param name="rhs_column_1_">Register to compare this matrix's 1st column with.</param>
+		/// <param name="rhs_column_2_">Register to compare this matrix's 2nd column with.</param>
+		/// <param name="rhs_column_3_">Register to compare this matrix's 3rd column with.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and those of the respective passed columns returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAnyLess(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			__m128 cmp_mask_ = _mm_cmplt_ps(column0, rhs_column_0_);
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmplt_ps(column1, rhs_column_1_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmplt_ps(column2, rhs_column_2_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmplt_ps(column3, rhs_column_3_));
+			return _mm_movemask_ps(cmp_mask_);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed column register. </para>
+		/// <para> If at least one element is less than that of the rhs, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare all of this matrix's columns with.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and those of the passed register returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAnyLess(__m128 rhs_all_columns_) const
+		{
+			__m128 cmp_mask_ = _mm_cmplt_ps(column0, rhs_all_columns_);
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmplt_ps(column1, rhs_all_columns_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmplt_ps(column2, rhs_all_columns_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmplt_ps(column3, rhs_all_columns_));
+			return _mm_movemask_ps(cmp_mask_);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
+		/// <para> If at least one element is less than that of the rhs, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to compare all of this matrix's respective elements with.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and those of the passed matrix returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAnyLess(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return CmpAnyLess(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed value. </para>
+		/// <para> If at least one element is less than rhs_, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and the passed value returned true; otherwise false.</returns>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		[[nodiscard]] inline bool CmpAnyLess(const Rhs_& rhs_) const
+		{
+			return CmpAnyLess(_mm_set1_ps(static_cast<float>(rhs_)));
+		}
+
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the respective passed column registers. </para>
+		/// <para>
+		///		If at least one element is greater than or equal to that of the respective rhs, this funcion will return true; 
+		///		if all comparisons are false, it will return false.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare this matrix's 0th column with.</param>
+		/// <param name="rhs_column_1_">Register to compare this matrix's 1st column with.</param>
+		/// <param name="rhs_column_2_">Register to compare this matrix's 2nd column with.</param>
+		/// <param name="rhs_column_3_">Register to compare this matrix's 3rd column with.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and those of the respective passed columns returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAnyGreaterEqual(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			__m128 cmp_mask_ = _mm_cmpge_ps(column0, rhs_column_0_);
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpge_ps(column1, rhs_column_1_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpge_ps(column2, rhs_column_2_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpge_ps(column3, rhs_column_3_));
+			return _mm_movemask_ps(cmp_mask_);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed column register. </para>
+		/// <para> If at least one element is greater than or equal to that of the rhs, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare all of this matrix's columns with.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and those of the passed register returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAnyGreaterEqual(__m128 rhs_all_columns_) const
+		{
+			__m128 cmp_mask_ = _mm_cmpge_ps(column0, rhs_all_columns_);
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpge_ps(column1, rhs_all_columns_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpge_ps(column2, rhs_all_columns_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmpge_ps(column3, rhs_all_columns_));
+			return _mm_movemask_ps(cmp_mask_);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
+		/// <para> If at least one element is greater than or equal to that of the rhs, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to compare all of this matrix's respective elements with.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and those of the passed matrix returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAnyGreaterEqual(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return CmpAnyGreaterEqual(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed value. </para>
+		/// <para> If at least one element is greater than or equal to rhs_, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and the passed value returned true; otherwise false.</returns>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		[[nodiscard]] inline bool CmpAnyGreaterEqual(const Rhs_& rhs_) const
+		{
+			return CmpAnyGreaterEqual(_mm_set1_ps(static_cast<float>(rhs_)));
+		}
+
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the respective passed column registers. </para>
+		/// <para>
+		///		If at least one element is less than or equal to that of the respective rhs, this funcion will return true; 
+		///		if all comparisons are false, it will return false. 
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare this matrix's 0th column with.</param>
+		/// <param name="rhs_column_1_">Register to compare this matrix's 1st column with.</param>
+		/// <param name="rhs_column_2_">Register to compare this matrix's 2nd column with.</param>
+		/// <param name="rhs_column_3_">Register to compare this matrix's 3rd column with.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and those of the respective passed columns returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAnyLessEqual(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			__m128 cmp_mask_ = _mm_cmple_ps(column0, rhs_column_0_);
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmple_ps(column1, rhs_column_1_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmple_ps(column2, rhs_column_2_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmple_ps(column3, rhs_column_3_));
+			return _mm_movemask_ps(cmp_mask_);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed column register. </para>
+		/// <para> If at least one element is less than or equal to that of the rhs, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare all of this matrix's columns with.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and those of the passed register returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAnyLessEqual(__m128 rhs_all_columns_) const
+		{
+			__m128 cmp_mask_ = _mm_cmple_ps(column0, rhs_all_columns_);
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmple_ps(column1, rhs_all_columns_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmple_ps(column2, rhs_all_columns_));
+			cmp_mask_ = _mm_or_ps(cmp_mask_, _mm_cmple_ps(column3, rhs_all_columns_));
+			return _mm_movemask_ps(cmp_mask_);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
+		/// <para> If at least one element is less than or equal to that of the rhs, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to compare all of this matrix's respective elements with.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and those of the passed matrix returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAnyLessEqual(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return CmpAnyLessEqual(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed value. </para>
+		/// <para> If at least one element is less than or equal to rhs_, this funcion will return true; if all comparisons are false, it will return false. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
+		/// <returns>True if at least one comparison between this matrix's elements and the passed value returned true; otherwise false.</returns>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		[[nodiscard]] inline bool CmpAnyLessEqual(const Rhs_& rhs_) const
+		{
+			return CmpAnyLessEqual(_mm_set1_ps(static_cast<float>(rhs_)));
+		}
+#pragma endregion
+
+#pragma region COMPARISON_FUNCS_ALL
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the respective passed column registers. </para>
+		/// <para> If all elements are equal to their respective rhs values, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare this matrix's 0th column with.</param>
+		/// <param name="rhs_column_1_">Register to compare this matrix's 1st column with.</param>
+		/// <param name="rhs_column_2_">Register to compare this matrix's 2nd column with.</param>
+		/// <param name="rhs_column_3_">Register to compare this matrix's 3rd column with.</param>
+		/// <returns>True if all comparisons between this matrix's elements and those of the respective passed columns returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAllEqual(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			__m128 cmp_mask_ = _mm_cmpeq_ps(column0, rhs_column_0_);
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpeq_ps(column1, rhs_column_1_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpeq_ps(column2, rhs_column_2_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpeq_ps(column3, rhs_column_3_));
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed column register. </para>
+		/// <para> If all elements are equal to their respective rhs values, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_all_columns_">Register to compare all of this matrix's columns with.</param>
+		/// <returns>True if all comparisons between this matrix's elements and those of the passed register returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAllEqual(__m128 rhs_all_columns_) const
+		{
+			__m128 cmp_mask_ = _mm_cmpeq_ps(column0, rhs_all_columns_);
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpeq_ps(column1, rhs_all_columns_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpeq_ps(column2, rhs_all_columns_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpeq_ps(column3, rhs_all_columns_));
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
+		/// <para> If all elements are equal to their respective rhs values, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to compare all of this matrix's respective elements with.</param>
+		/// <returns>True if all comparisons between this matrix's elements and those of the passed matrix returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAllEqual(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return CmpAllEqual(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed value. </para>
+		/// <para> If all elements are equal to the rhs value, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
+		/// <returns>True if all comparisons between this matrix's elements and the passed value; otherwise false.</returns>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		[[nodiscard]] inline bool CmpAllEqual(const Rhs_& rhs_) const
+		{
+			return CmpAllEqual(_mm_set1_ps(static_cast<float>(rhs_)));
+		}
+
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the respective passed column registers. </para>
+		/// <para> If all elements are not equal to their respective rhs values, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare this matrix's 0th column with.</param>
+		/// <param name="rhs_column_1_">Register to compare this matrix's 1st column with.</param>
+		/// <param name="rhs_column_2_">Register to compare this matrix's 2nd column with.</param>
+		/// <param name="rhs_column_3_">Register to compare this matrix's 3rd column with.</param>
+		/// <returns>True if all comparisons between this matrix's elements and those of the respective passed columns returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAllNotEqual(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			__m128 cmp_mask_ = _mm_cmpneq_ps(column0, rhs_column_0_);
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpneq_ps(column1, rhs_column_1_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpneq_ps(column2, rhs_column_2_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpneq_ps(column3, rhs_column_3_));
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed column register. </para>
+		/// <para> If all elements are not equal to their respective rhs values, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_all_columns_">Register to compare all of this matrix's columns with.</param>
+		/// <returns>True if all comparisons between this matrix's elements and those of the passed register returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAllNotEqual(__m128 rhs_all_columns_) const
+		{
+			__m128 cmp_mask_ = _mm_cmpneq_ps(column0, rhs_all_columns_);
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpneq_ps(column1, rhs_all_columns_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpneq_ps(column2, rhs_all_columns_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpneq_ps(column3, rhs_all_columns_));
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
+		/// <para> If all elements are not equal to their respective rhs values, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to compare all of this matrix's respective elements with.</param>
+		/// <returns>True if all comparisons between this matrix's elements and those of the passed matrix returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAllNotEqual(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return CmpAllNotEqual(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed value. </para>
+		/// <para> If all elements are not equal to the rhs value, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
+		/// <returns>True if all comparisons between this matrix's elements and the passed value; otherwise false.</returns>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		[[nodiscard]] inline bool CmpAllNotEqual(const Rhs_& rhs_) const
+		{
+			return CmpAllNotEqual(_mm_set1_ps(static_cast<float>(rhs_)));
+		}
+
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the respective passed column registers. </para>
+		/// <para> If all elements are greater than their respective rhs values, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare this matrix's 0th column with.</param>
+		/// <param name="rhs_column_1_">Register to compare this matrix's 1st column with.</param>
+		/// <param name="rhs_column_2_">Register to compare this matrix's 2nd column with.</param>
+		/// <param name="rhs_column_3_">Register to compare this matrix's 3rd column with.</param>
+		/// <returns>True if all comparisons between this matrix's elements and those of the respective passed columns returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAllGreater(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			__m128 cmp_mask_ = _mm_cmpgt_ps(column0, rhs_column_0_);
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpgt_ps(column1, rhs_column_1_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpgt_ps(column2, rhs_column_2_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpgt_ps(column3, rhs_column_3_));
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed column register. </para>
+		/// <para> If all elements are greater than their respective rhs values, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_all_columns_">Register to compare all of this matrix's columns with.</param>
+		/// <returns>True if all comparisons between this matrix's elements and those of the passed register returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAllGreater(__m128 rhs_all_columns_) const
+		{
+			__m128 cmp_mask_ = _mm_cmpgt_ps(column0, rhs_all_columns_);
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpgt_ps(column1, rhs_all_columns_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpgt_ps(column2, rhs_all_columns_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpgt_ps(column3, rhs_all_columns_));
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
+		/// <para> If all elements are greater than their respective rhs values, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to compare all of this matrix's respective elements with.</param>
+		/// <returns>True if all comparisons between this matrix's elements and those of the passed matrix returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAllGreater(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return CmpAllGreater(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed value. </para>
+		/// <para> If all elements are greater than the rhs value, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
+		/// <returns>True if all comparisons between this matrix's elements and the passed value; otherwise false.</returns>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		[[nodiscard]] inline bool CmpAllGreater(const Rhs_& rhs_) const
+		{
+			return CmpAllGreater(_mm_set1_ps(static_cast<float>(rhs_)));
+		}
+
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the respective passed column registers. </para>
+		/// <para> If all elements are less than their respective rhs values, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare this matrix's 0th column with.</param>
+		/// <param name="rhs_column_1_">Register to compare this matrix's 1st column with.</param>
+		/// <param name="rhs_column_2_">Register to compare this matrix's 2nd column with.</param>
+		/// <param name="rhs_column_3_">Register to compare this matrix's 3rd column with.</param>
+		/// <returns>True if all comparisons between this matrix's elements and those of the respective passed columns returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAllLess(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			__m128 cmp_mask_ = _mm_cmplt_ps(column0, rhs_column_0_);
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmplt_ps(column1, rhs_column_1_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmplt_ps(column2, rhs_column_2_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmplt_ps(column3, rhs_column_3_));
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed column register. </para>
+		/// <para> If all elements are less than their respective rhs values, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_all_columns_">Register to compare all of this matrix's columns with.</param>
+		/// <returns>True if all comparisons between this matrix's elements and those of the passed register returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAllLess(__m128 rhs_all_columns_) const
+		{
+			__m128 cmp_mask_ = _mm_cmplt_ps(column0, rhs_all_columns_);
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmplt_ps(column1, rhs_all_columns_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmplt_ps(column2, rhs_all_columns_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmplt_ps(column3, rhs_all_columns_));
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
+		/// <para> If all elements are less than their respective rhs values, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to compare all of this matrix's respective elements with.</param>
+		/// <returns>True if all comparisons between this matrix's elements and those of the passed matrix returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAllLess(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return CmpAllLess(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed value. </para>
+		/// <para> If all elements are less than the rhs value, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
+		/// <returns>True if all comparisons between this matrix's elements and the passed value; otherwise false.</returns>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		[[nodiscard]] inline bool CmpAllLess(const Rhs_& rhs_) const
+		{
+			return CmpAllLess(_mm_set1_ps(static_cast<float>(rhs_)));
+		}
+
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the respective passed column registers. </para>
+		/// <para> If all elements are greater than or equal to their respective rhs values, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare this matrix's 0th column with.</param>
+		/// <param name="rhs_column_1_">Register to compare this matrix's 1st column with.</param>
+		/// <param name="rhs_column_2_">Register to compare this matrix's 2nd column with.</param>
+		/// <param name="rhs_column_3_">Register to compare this matrix's 3rd column with.</param>
+		/// <returns>True if all comparisons between this matrix's elements and those of the respective passed columns returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAllGreaterEqual(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			__m128 cmp_mask_ = _mm_cmpge_ps(column0, rhs_column_0_);
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpge_ps(column1, rhs_column_1_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpge_ps(column2, rhs_column_2_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpge_ps(column3, rhs_column_3_));
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed column register. </para>
+		/// <para> If all elements are greater than or equal to their respective rhs values, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_all_columns_">Register to compare all of this matrix's columns with.</param>
+		/// <returns>True if all comparisons between this matrix's elements and those of the passed register returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAllGreaterEqual(__m128 rhs_all_columns_) const
+		{
+			__m128 cmp_mask_ = _mm_cmpge_ps(column0, rhs_all_columns_);
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpge_ps(column1, rhs_all_columns_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpge_ps(column2, rhs_all_columns_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpge_ps(column3, rhs_all_columns_));
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
+		/// <para> If all elements are greater than or equal to their respective rhs values, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to compare all of this matrix's respective elements with.</param>
+		/// <returns>True if all comparisons between this matrix's elements and those of the passed matrix returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAllGreaterEqual(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return CmpAllGreaterEqual(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed value. </para>
+		/// <para> If all elements are greater than or equal to the rhs value, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
+		/// <returns>True if all comparisons between this matrix's elements and the passed value; otherwise false.</returns>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		[[nodiscard]] inline bool CmpAllGreaterEqual(const Rhs_& rhs_) const
+		{
+			return CmpAllGreaterEqual(_mm_set1_ps(static_cast<float>(rhs_)));
+		}
+
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the respective passed column registers. </para>
+		/// <para> If all elements are less than or equal to their respective rhs values, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_column_0_">Register to compare this matrix's 0th column with.</param>
+		/// <param name="rhs_column_1_">Register to compare this matrix's 1st column with.</param>
+		/// <param name="rhs_column_2_">Register to compare this matrix's 2nd column with.</param>
+		/// <param name="rhs_column_3_">Register to compare this matrix's 3rd column with.</param>
+		/// <returns>True if all comparisons between this matrix's elements and those of the respective passed columns returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAllLessEqual(__m128 rhs_column_0_, __m128 rhs_column_1_, __m128 rhs_column_2_, __m128 rhs_column_3_) const
+		{
+			__m128 cmp_mask_ = _mm_cmple_ps(column0, rhs_column_0_);
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmple_ps(column1, rhs_column_1_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmple_ps(column2, rhs_column_2_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmple_ps(column3, rhs_column_3_));
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed column register. </para>
+		/// <para> If all elements are less than or equal to their respective rhs values, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_all_columns_">Register to compare all of this matrix's columns with.</param>
+		/// <returns>True if all comparisons between this matrix's elements and those of the passed register returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAllLessEqual(__m128 rhs_all_columns_) const
+		{
+			__m128 cmp_mask_ = _mm_cmple_ps(column0, rhs_all_columns_);
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmple_ps(column1, rhs_all_columns_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmple_ps(column2, rhs_all_columns_));
+			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmple_ps(column3, rhs_all_columns_));
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
+		/// <para> If all elements are less than or equal to their respective rhs values, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_">Matrix to compare all of this matrix's respective elements with.</param>
+		/// <returns>True if all comparisons between this matrix's elements and those of the passed matrix returned true; otherwise false.</returns>
+		[[nodiscard]] inline bool CmpAllLessEqual(const FastMatrix4x4f_CM& rhs_) const
+		{
+			return CmpAllLessEqual(rhs_.column0, rhs_.column1, rhs_.column2, rhs_.column3);
+		}
+		/// <summary>
+		/// <para> Compares all columns of this matrix to the passed value. </para>
+		/// <para> If all elements are less than or equal to the rhs value, this function will return true; otherwise, it will be false. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
+		/// <returns>True if all comparisons between this matrix's elements and the passed value; otherwise false.</returns>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		[[nodiscard]] inline bool CmpAllLessEqual(const Rhs_& rhs_) const
+		{
+			return CmpAllLessEqual(_mm_set1_ps(static_cast<float>(rhs_)));
+		}
+#pragma endregion
+
 #pragma region CONST_OPERATORS
 		[[nodiscard]] inline bool operator==(const FastMatrix4x4f_CM& rhs_) const
 		{
-			return
-			(
-				EmuMath::SIMD::all_equal(column0, rhs_.column0) &&
-				EmuMath::SIMD::all_equal(column1, rhs_.column1) &&
-				EmuMath::SIMD::all_equal(column2, rhs_.column2) &&
-				EmuMath::SIMD::all_equal(column3, rhs_.column3)
-			);
+			return CmpAllEqual(rhs_);
 		}
 
 		[[nodiscard]] inline bool operator!=(const FastMatrix4x4f_CM& rhs_) const
 		{
-			return
-			(
-				EmuMath::SIMD::any_not_equal(column0, rhs_.column0) ||
-				EmuMath::SIMD::any_not_equal(column1, rhs_.column1) ||
-				EmuMath::SIMD::any_not_equal(column2, rhs_.column2) ||
-				EmuMath::SIMD::any_not_equal(column3, rhs_.column3)
-			);
+			return CmpAnyNotEqual(rhs_);
 		}
 
 		[[nodiscard]] inline FastMatrix4x4f_CM operator+(const FastMatrix4x4f_CM& rhs_) const
@@ -1486,31 +2554,7 @@ namespace EmuMath
 
 		[[nodiscard]] inline float Determinant() const
 		{
-			FastMatrix4x4f_CM reff_transpose_ = Transpose();
-			_make_row_echelon_transpose(reff_transpose_);
-			return reff_transpose_.MainDiagonal().HorizontalProduct<float>();
-		}
-
-		/// <summary> 
-		/// <para> Calculates the inverse to this matrix using gauss-jordan elimination. </para>
-		/// <para> This function's output assumes that this matrix does have an inverse, and that all elements along its main diagonal are non-zero. </para>
-		/// </summary>
-		/// <param name="out_determinant_">Optional reference to output this matrix's determinant via.</param>
-		/// <returns>The inverse to this matrix, as long as this matrix satisfies the above assumptions.</returns>
-		[[nodiscard]] inline FastMatrix4x4f_CM InverseGaussJordan() const
-		{
-			FastMatrix4x4f_CM transpose_row_echelon_ = Transpose();
-			FastMatrix4x4f_CM out_transpose_ = Identity();
-			_make_inverse_transpose(out_transpose_, transpose_row_echelon_);
-			return out_transpose_.Transpose();
-		}
-		[[nodiscard]] inline FastMatrix4x4f_CM InverseGaussJordan(float& out_determinant_) const
-		{
-			FastMatrix4x4f_CM transpose_row_echelon_ = Transpose();
-			FastMatrix4x4f_CM out_transpose_ = Identity();
-			_make_inverse_transpose(out_transpose_, transpose_row_echelon_);
-			out_determinant_ = transpose_row_echelon_.MainDiagonal().HorizontalProduct<float>();
-			return out_transpose_.Transpose();
+			return EmuMath::SIMD::horizontal_vector_sum_scalar(_mm_mul_ps(GetRow<0>(), Cofactors<true>().column0));
 		}
 
 		/// <summary> 
@@ -1577,7 +2621,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>Matrix of minors to this matrix, which can be summarised as a matrix of determinants to all respective exclusive submatrices within this matrix.</returns>
 		template<bool TransposeOutput_ = false>
-		[[nodiscard]] inline FastMatrix4x4f_CM MatrixOfMinorsLaplace() const
+		[[nodiscard]] inline FastMatrix4x4f_CM Minors() const
 		{
 			// Shuffled columns to store 2x2 submatrices within singular SIMD registers
 			__m128 submat_c01_r01_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(column0, column1);
@@ -1650,9 +2694,9 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>Matrix of cofactors to this matrix.</returns>
 		template<bool TransposeOutput_ = false>
-		[[nodiscard]] inline FastMatrix4x4f_CM MatrixOfCofactorsLaplace() const
+		[[nodiscard]] inline FastMatrix4x4f_CM Cofactors() const
 		{
-			const FastMatrix4x4f_CM minors_ = MatrixOfMinorsLaplace<TransposeOutput_>();
+			const FastMatrix4x4f_CM minors_ = Minors<TransposeOutput_>();
 			__m128 mults_odd_column_ = _mm_set_ps(1.0f, -1.0f, 1.0f, -1.0f);
 			__m128 mults_even_column_ = EmuMath::SIMD::shuffle<1, 0, 1, 0>(mults_odd_column_);
 			return FastMatrix4x4f_CM
@@ -1666,23 +2710,23 @@ namespace EmuMath
 
 		/// <summary> 
 		/// <para> Calculates the adjugate of this matrix using laplace expansion. </para>
-		/// <para> Effectively shorthand and clearer semantics for MatrixOfCofactorsLaplace&lt;true&gt;. </para>
+		/// <para> Effectively shorthand and clearer semantics for Cofactors&lt;true&gt;. </para>
 		/// </summary>
 		/// <returns>Adjugate of this matrix, which can be summarised as the tranpose of its matrix of cofactors.</returns>
-		[[nodiscard]] inline FastMatrix4x4f_CM AdjugateLaplace() const
+		[[nodiscard]] inline FastMatrix4x4f_CM Adjugate() const
 		{
-			return MatrixOfCofactorsLaplace<true>();
+			return Cofactors<true>();
 		}
 
 		/// <summary> 
-		/// <para> Calculates the inverse to this matrix using laplace expansion. </para>
-		/// <para> This function assumes that this matrix does have an inverse. </para>
+		/// <para> Calculates the inverse to this matrix. </para>
+		/// <para> This function assumes that this matrix does have an inverse. If it is uncertain that this matrix has an inverse, use TryInverse instead.</para>
 		/// </summary>
 		/// <param name="out_determinant_">Optional reference to output this matrix's determinant via.</param>
 		/// <returns>The inverse to this matrix, as long as this matrix satisfies the above assumptions.</returns>
-		[[nodiscard]] inline FastMatrix4x4f_CM InverseLaplace() const
+		[[nodiscard]] inline FastMatrix4x4f_CM Inverse() const
 		{
-			FastMatrix4x4f_CM adjugate_ = MatrixOfCofactorsLaplace<true>();
+			FastMatrix4x4f_CM adjugate_ = Cofactors<true>();
 			__m128 determinant_reciprocal_ = _mm_set1_ps(1.0f / EmuMath::SIMD::horizontal_vector_sum_scalar(_mm_mul_ps(adjugate_.column0, GetRow<0>())));
 			return FastMatrix4x4f_CM
 			(
@@ -1692,9 +2736,9 @@ namespace EmuMath
 				_mm_mul_ps(adjugate_.column3, determinant_reciprocal_)
 			);
 		}
-		[[nodiscard]] inline FastMatrix4x4f_CM InverseLaplace(float& out_determinant_) const
+		[[nodiscard]] inline FastMatrix4x4f_CM Inverse(float& out_determinant_) const
 		{
-			FastMatrix4x4f_CM adjugate_ = MatrixOfCofactorsLaplace<true>();
+			FastMatrix4x4f_CM adjugate_ = Cofactors<true>();
 			out_determinant_ = EmuMath::SIMD::horizontal_vector_sum_scalar(_mm_mul_ps(adjugate_.column0, GetRow<0>()));
 			__m128 determinant_reciprocal_ = _mm_set1_ps(1.0f / out_determinant_);
 			return FastMatrix4x4f_CM
@@ -1704,6 +2748,40 @@ namespace EmuMath
 				_mm_mul_ps(adjugate_.column2, determinant_reciprocal_),
 				_mm_mul_ps(adjugate_.column3, determinant_reciprocal_)
 			);
+		}
+
+		/// <summary>
+		/// <para> Calculates the inverse of this matrix if it has an inverse, returning a boolean to indicate success. </para>
+		/// <para>
+		///		If it is unknown whether or not this matrix has an inverse it is recommended to use this function, as a non-try inverse call 
+		///		does not have safety checks, resulting in an inaccurate output matrix where the matrix does not have an inverse.
+		/// </para>
+		/// </summary>
+		/// <param name="out_inverse_">Reference to a matrix to output the inverse to if this matrix has an inverse. Only used if this function returns true.</param>
+		/// <param name="out_determinant_">Reference to output this matrix's determinant to. Always output to, even when this function returns false.</param>
+		/// <returns>Boolean indicating if this matrix has an inverse and that said inverse was calculated.</returns>
+		inline bool TryInverse(FastMatrix4x4f_CM& out_inverse_) const
+		{
+			float dummy_float_;
+			return TryInverse(out_inverse_, dummy_float_);
+		}
+		inline bool TryInverse(FastMatrix4x4f_CM& out_inverse_, float& out_determinant_) const
+		{
+			FastMatrix4x4f_CM adjugate_ = Cofactors<true>();
+			out_determinant_ = EmuMath::SIMD::horizontal_vector_sum_scalar(_mm_mul_ps(adjugate_.column0, GetRow<0>()));
+			if (out_determinant_ != 0.0f)
+			{
+				__m128 determinant_reciprocal_ = _mm_set1_ps(1.0f / out_determinant_);
+				out_inverse_.column0 = _mm_mul_ps(adjugate_.column0, determinant_reciprocal_);
+				out_inverse_.column1 = _mm_mul_ps(adjugate_.column1, determinant_reciprocal_);
+				out_inverse_.column2 = _mm_mul_ps(adjugate_.column2, determinant_reciprocal_);
+				out_inverse_.column3 = _mm_mul_ps(adjugate_.column3, determinant_reciprocal_);
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 #pragma endregion
 
@@ -2129,110 +3207,6 @@ namespace EmuMath
 
 			rhs_shuffled_ = EmuMath::SIMD::shuffle<3, 3, 3, 3>(rhs_column_);
 			return _mm_add_ps(out_, _mm_mul_ps(column3, rhs_shuffled_));
-		}
-
-		inline void _make_row_echelon_transpose(FastMatrix4x4f_CM& in_transpose_out_reff_) const
-		{
-			// PIVOT[0, 0]
-			__m128 neg_pivot_ = EmuMath::SIMD::vector_negate(EmuMath::SIMD::shuffle<0>(in_transpose_out_reff_.column0));
-			__m128 mults_ = _mm_div_ps(column0, neg_pivot_);
-			in_transpose_out_reff_.column1 = _mm_add_ps(in_transpose_out_reff_.column1, _mm_mul_ps(in_transpose_out_reff_.column0, EmuMath::SIMD::shuffle<1>(mults_)));
-			in_transpose_out_reff_.column2 = _mm_add_ps(in_transpose_out_reff_.column2, _mm_mul_ps(in_transpose_out_reff_.column0, EmuMath::SIMD::shuffle<2>(mults_)));
-			in_transpose_out_reff_.column3 = _mm_add_ps(in_transpose_out_reff_.column3, _mm_mul_ps(in_transpose_out_reff_.column0, EmuMath::SIMD::shuffle<3>(mults_)));
-
-			// PIVOT[1, 1]
-			neg_pivot_ = EmuMath::SIMD::vector_negate(EmuMath::SIMD::shuffle<1>(in_transpose_out_reff_.column1));
-			mults_ = _mm_div_ps(in_transpose_out_reff_.GetRow<1>(), neg_pivot_);
-			in_transpose_out_reff_.column0 = _mm_add_ps(in_transpose_out_reff_.column0, _mm_mul_ps(in_transpose_out_reff_.column1, EmuMath::SIMD::shuffle<0>(mults_)));
-			in_transpose_out_reff_.column2 = _mm_add_ps(in_transpose_out_reff_.column2, _mm_mul_ps(in_transpose_out_reff_.column1, EmuMath::SIMD::shuffle<2>(mults_)));
-			in_transpose_out_reff_.column3 = _mm_add_ps(in_transpose_out_reff_.column3, _mm_mul_ps(in_transpose_out_reff_.column1, EmuMath::SIMD::shuffle<3>(mults_)));
-
-			// PIVOT[2, 2]
-			neg_pivot_ = EmuMath::SIMD::vector_negate(EmuMath::SIMD::shuffle<2>(in_transpose_out_reff_.column2));
-			mults_ = _mm_div_ps(in_transpose_out_reff_.GetRow<2>(), neg_pivot_);
-			in_transpose_out_reff_.column0 = _mm_add_ps(in_transpose_out_reff_.column0, _mm_mul_ps(in_transpose_out_reff_.column2, EmuMath::SIMD::shuffle<0>(mults_)));
-			in_transpose_out_reff_.column1 = _mm_add_ps(in_transpose_out_reff_.column1, _mm_mul_ps(in_transpose_out_reff_.column2, EmuMath::SIMD::shuffle<1>(mults_)));
-			in_transpose_out_reff_.column3 = _mm_add_ps(in_transpose_out_reff_.column3, _mm_mul_ps(in_transpose_out_reff_.column2, EmuMath::SIMD::shuffle<3>(mults_)));
-
-			// PIVOT[3, 3]
-			neg_pivot_ = EmuMath::SIMD::vector_negate(EmuMath::SIMD::shuffle<3>(in_transpose_out_reff_.column3));
-			mults_ = _mm_div_ps(in_transpose_out_reff_.GetRow<3>(), neg_pivot_);
-			in_transpose_out_reff_.column0 = _mm_add_ps(in_transpose_out_reff_.column0, _mm_mul_ps(in_transpose_out_reff_.column3, EmuMath::SIMD::shuffle<0>(mults_)));
-			in_transpose_out_reff_.column1 = _mm_add_ps(in_transpose_out_reff_.column1, _mm_mul_ps(in_transpose_out_reff_.column3, EmuMath::SIMD::shuffle<1>(mults_)));
-			in_transpose_out_reff_.column2 = _mm_add_ps(in_transpose_out_reff_.column2, _mm_mul_ps(in_transpose_out_reff_.column3, EmuMath::SIMD::shuffle<2>(mults_)));
-		}
-
-		inline void _make_inverse_transpose(FastMatrix4x4f_CM& out_inverse_trans_, FastMatrix4x4f_CM& out_reff_trans_) const
-		{
-			__m128 neg_pivot_ = EmuMath::SIMD::vector_negate(EmuMath::SIMD::shuffle<0>(out_reff_trans_.column0));
-			// We can get away using our column here since no changes have been made, but will have to use transpose_.GetRow for future pivots
-			__m128 mults_ = _mm_div_ps(column0, neg_pivot_);
-
-			__m128 current_mult_ = EmuMath::SIMD::shuffle<1>(mults_);
-			out_reff_trans_.column1 = _mm_add_ps(out_reff_trans_.column1, _mm_mul_ps(out_reff_trans_.column0, current_mult_));
-			out_inverse_trans_.column1 = _mm_add_ps(out_inverse_trans_.column1, _mm_mul_ps(out_inverse_trans_.column0, current_mult_));
-
-			current_mult_ = EmuMath::SIMD::shuffle<2>(mults_);
-			out_reff_trans_.column2 = _mm_add_ps(out_reff_trans_.column2, _mm_mul_ps(out_reff_trans_.column0, current_mult_));
-			out_inverse_trans_.column2 = _mm_add_ps(out_inverse_trans_.column2, _mm_mul_ps(out_inverse_trans_.column0, current_mult_));
-
-			current_mult_ = EmuMath::SIMD::shuffle<3>(mults_);
-			out_reff_trans_.column3 = _mm_add_ps(out_reff_trans_.column3, _mm_mul_ps(out_reff_trans_.column0, current_mult_));
-			out_inverse_trans_.column3 = _mm_add_ps(out_inverse_trans_.column3, _mm_mul_ps(out_inverse_trans_.column0, current_mult_));
-
-			// PIVOT[1, 1]
-			neg_pivot_ = EmuMath::SIMD::vector_negate(EmuMath::SIMD::shuffle<1>(out_reff_trans_.column1));
-			mults_ = _mm_div_ps(out_reff_trans_.GetRow<1>(), neg_pivot_);
-
-			current_mult_ = EmuMath::SIMD::shuffle<0>(mults_);
-			out_reff_trans_.column0 = _mm_add_ps(out_reff_trans_.column0, _mm_mul_ps(out_reff_trans_.column1, current_mult_));
-			out_inverse_trans_.column0 = _mm_add_ps(out_inverse_trans_.column0, _mm_mul_ps(out_inverse_trans_.column1, current_mult_));
-
-			current_mult_ = EmuMath::SIMD::shuffle<2>(mults_);
-			out_reff_trans_.column2 = _mm_add_ps(out_reff_trans_.column2, _mm_mul_ps(out_reff_trans_.column1, current_mult_));
-			out_inverse_trans_.column2 = _mm_add_ps(out_inverse_trans_.column2, _mm_mul_ps(out_inverse_trans_.column1, current_mult_));
-
-			current_mult_ = EmuMath::SIMD::shuffle<3>(mults_);
-			out_reff_trans_.column3 = _mm_add_ps(out_reff_trans_.column3, _mm_mul_ps(out_reff_trans_.column1, current_mult_));
-			out_inverse_trans_.column3 = _mm_add_ps(out_inverse_trans_.column3, _mm_mul_ps(out_inverse_trans_.column1, current_mult_));
-
-			// PIVOT[2, 2]
-			neg_pivot_ = EmuMath::SIMD::vector_negate(EmuMath::SIMD::shuffle<2>(out_reff_trans_.column2));
-			mults_ = _mm_div_ps(out_reff_trans_.GetRow<2>(), neg_pivot_);
-
-			current_mult_ = EmuMath::SIMD::shuffle<0>(mults_);
-			out_reff_trans_.column0 = _mm_add_ps(out_reff_trans_.column0, _mm_mul_ps(out_reff_trans_.column2, current_mult_));
-			out_inverse_trans_.column0 = _mm_add_ps(out_inverse_trans_.column0, _mm_mul_ps(out_inverse_trans_.column2, current_mult_));
-
-			current_mult_ = EmuMath::SIMD::shuffle<1>(mults_);
-			out_reff_trans_.column1 = _mm_add_ps(out_reff_trans_.column1, _mm_mul_ps(out_reff_trans_.column2, current_mult_));
-			out_inverse_trans_.column1 = _mm_add_ps(out_inverse_trans_.column1, _mm_mul_ps(out_inverse_trans_.column2, current_mult_));
-
-			current_mult_ = EmuMath::SIMD::shuffle<3>(mults_);
-			out_reff_trans_.column3 = _mm_add_ps(out_reff_trans_.column3, _mm_mul_ps(out_reff_trans_.column2, current_mult_));
-			out_inverse_trans_.column3 = _mm_add_ps(out_inverse_trans_.column3, _mm_mul_ps(out_inverse_trans_.column2, current_mult_));
-
-			// PIVOT[3, 3]
-			neg_pivot_ = EmuMath::SIMD::vector_negate(EmuMath::SIMD::shuffle<3>(out_reff_trans_.column3));
-			mults_ = _mm_div_ps(out_reff_trans_.GetRow<3>(), neg_pivot_);
-
-			current_mult_ = EmuMath::SIMD::shuffle<0>(mults_);
-			out_reff_trans_.column0 = _mm_add_ps(out_reff_trans_.column0, _mm_mul_ps(out_reff_trans_.column3, current_mult_));
-			out_inverse_trans_.column0 = _mm_add_ps(out_inverse_trans_.column0, _mm_mul_ps(out_inverse_trans_.column3, current_mult_));
-
-			current_mult_ = EmuMath::SIMD::shuffle<1>(mults_);
-			out_reff_trans_.column1 = _mm_add_ps(out_reff_trans_.column1, _mm_mul_ps(out_reff_trans_.column3, current_mult_));
-			out_inverse_trans_.column1 = _mm_add_ps(out_inverse_trans_.column1, _mm_mul_ps(out_inverse_trans_.column3, current_mult_));
-
-			current_mult_ = EmuMath::SIMD::shuffle<2>(mults_);
-			out_reff_trans_.column2 = _mm_add_ps(out_reff_trans_.column2, _mm_mul_ps(out_reff_trans_.column3, current_mult_));
-			out_inverse_trans_.column2 = _mm_add_ps(out_inverse_trans_.column2, _mm_mul_ps(out_inverse_trans_.column3, current_mult_));
-
-			// Scale our output so that all pivots are 1
-			out_inverse_trans_.column0 = _mm_div_ps(out_inverse_trans_.column0, EmuMath::SIMD::shuffle<0>(out_reff_trans_.column0));
-			out_inverse_trans_.column1 = _mm_div_ps(out_inverse_trans_.column1, EmuMath::SIMD::shuffle<1>(out_reff_trans_.column1));
-			out_inverse_trans_.column2 = _mm_div_ps(out_inverse_trans_.column2, EmuMath::SIMD::shuffle<2>(out_reff_trans_.column2));
-			out_inverse_trans_.column3 = _mm_div_ps(out_inverse_trans_.column3, EmuMath::SIMD::shuffle<3>(out_reff_trans_.column3));
 		}
 
 		template<std::size_t ExcludeRow_>

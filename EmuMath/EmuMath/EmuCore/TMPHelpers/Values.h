@@ -38,7 +38,7 @@ namespace EmuCore::TMPHelpers
 	/// <param name="ref_if_false">Reference that will be returned if Condition_ evaluates to false.</param>
 	/// <returns>ref_if_true if Condition_ evaluates to true; ref_if_false if Condition_ evaluates to false.</returns>
 	template<bool Condition_, typename T_>
-	static constexpr T_ get_conditional_ref(T_& ref_if_true, T_& ref_if_false)
+	static constexpr T_& get_conditional_ref(T_& ref_if_true, T_& ref_if_false)
 	{
 		return get_conditional_value<Condition_, T_&>(ref_if_false, ref_if_false);
 	}
@@ -50,7 +50,7 @@ namespace EmuCore::TMPHelpers
 	/// <param name="ref_if_false">Reference that will be returned if Condition_ evaluates to false.</param>
 	/// <returns>ref_if_true if Condition_ evaluates to true; ref_if_false if Condition_ evaluates to false.</returns>
 	template<bool Condition_, typename T_>
-	static constexpr T_ get_conditional_const_ref(const T_& ref_if_true, const T_& ref_if_false)
+	static constexpr const T_& get_conditional_const_ref(const T_& ref_if_true, const T_& ref_if_false)
 	{
 		return get_conditional_value<Condition_, const T_&>(ref_if_false, ref_if_false);
 	}

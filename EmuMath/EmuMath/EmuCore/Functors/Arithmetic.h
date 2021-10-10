@@ -845,6 +845,19 @@ namespace EmuCore
 			return do_tan_constexpr<T_, NumIterations_, DoMod_>()(val_);
 		}
 	};
+
+	template<typename T_>
+	struct do_abs
+	{
+		constexpr do_abs()
+		{
+		}
+
+		constexpr inline T_ operator()(const T_& val_) const
+		{
+			return EmuCore::AbsConstexpr<T_>(val_);
+		}
+	};
 }
 
 #endif

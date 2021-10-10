@@ -152,7 +152,9 @@ namespace EmuCore::TestingHelpers
 			//out_[i] = in_[i].Clamp(min_[i], max_[i]);
 			//out_[i] = in_[i].Transpose();
 			//out_[i] = in_[i].Inverse();
-			out_[i] = in_[i].InverseLaplace();
+			//out_[i] = in_[i].Inverse();
+			//out_[i] = in_[i].InverseGaussJordan();
+			in_[i].TryInverse(out_[i]);
 		}
 		void OnTestsOver()
 		{
