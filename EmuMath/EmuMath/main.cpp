@@ -285,10 +285,10 @@ int main()
 	).DeterminantLaplace();
 	EmuMath::FastMatrix4x4f_CM bad_det_test_ = EmuMath::FastMatrix4x4f_CM
 	(
-		1, 2, 3, 4,
-		5, 6, 7, 8,
-		9, 10, 11, 12,
-		13, 14, 15, 16
+		1, 2, 3533, 4,
+		5, 611, 7, 8,
+		9, 10, 121, 12,
+		13, 14, 115, 16
 	);
 	std::cout << bad_det_test_.Determinant() << "\n";
 	float out_det_;
@@ -313,6 +313,13 @@ int main()
 	constexpr std::int32_t dgfijo32 = EmuCore::do_abs<std::int32_t>()(-2);
 	constexpr std::int64_t dgfija64 = EmuCore::do_abs<std::int64_t>()(std::numeric_limits<std::int64_t>::max());
 	constexpr std::int64_t dgfijo64 = EmuCore::do_abs<std::int64_t>()(-(std::numeric_limits<std::int64_t>::max() - 26));
+
+	bad_det_test_.TryInverse(bad_det_test_);
+	std::cout << bad_det_test_.Inverse() << "\n\n";
+	std::cout << bad_det_test_.Inverse().Inverse().Inverse() << "\n\n";
+	std::cout << bad_det_test_.Inverse().Inverse().Inverse().Inverse().Inverse() << "\n\n";
+	std::cout << bad_det_test_.Inverse().Inverse().Inverse().Inverse().Inverse().Inverse().Inverse() << "\n\n";
+	std::cout << bad_det_test_.Inverse().Inverse().Inverse().Inverse().Inverse().Inverse().Inverse().Inverse().Inverse() << "\n\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
