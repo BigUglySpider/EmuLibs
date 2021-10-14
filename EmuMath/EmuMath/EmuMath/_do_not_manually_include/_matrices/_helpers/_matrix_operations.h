@@ -699,13 +699,14 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<bool OutColumnMajor_, class Matrix_, typename OutDeterminant_>
-	[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::value_type, OutColumnMajor_, Matrix_>::type MatrixInverseLaplace
+	[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::preferred_floating_point, OutColumnMajor_, Matrix_>::type
+	MatrixInverseLaplace
 	(
 		const Matrix_& matrix_,
 		OutDeterminant_& outDeterminant_
 	)
 	{
-		return MatrixInverseLaplace<typename Matrix_::value_type, OutColumnMajor_, Matrix_, OutDeterminant_>(matrix_, outDeterminant_);
+		return MatrixInverseLaplace<typename Matrix_::preferred_floating_point, OutColumnMajor_, Matrix_, OutDeterminant_>(matrix_, outDeterminant_);
 	}
 	template<typename out_contained_type, class Matrix_, typename OutDeterminant_>
 	[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, Matrix_::is_column_major, Matrix_>::type MatrixInverseLaplace
@@ -717,13 +718,14 @@ namespace EmuMath::Helpers
 		return MatrixInverseLaplace<out_contained_type, Matrix_::is_column_major, Matrix_, OutDeterminant_>(matrix_, outDeterminant_);
 	}
 	template<class Matrix_, typename OutDeterminant_>
-	[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>::type MatrixInverseLaplace
+	[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::preferred_floating_point, Matrix_::is_column_major, Matrix_>::type
+	MatrixInverseLaplace
 	(
 		const Matrix_& matrix_,
 		OutDeterminant_& outDeterminant_
 	)
 	{
-		return MatrixInverseLaplace<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, OutDeterminant_>(matrix_, outDeterminant_);
+		return MatrixInverseLaplace<typename Matrix_::preferred_floating_point, Matrix_::is_column_major, Matrix_, OutDeterminant_>(matrix_, outDeterminant_);
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
 	[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, OutColumnMajor_, Matrix_>::type MatrixInverseLaplace
@@ -736,12 +738,13 @@ namespace EmuMath::Helpers
 		return MatrixInverseLaplace<out_contained_type, OutColumnMajor_, Matrix_, dummy_output_type>(matrix_, reciprocal_dummy_output_);
 	}
 	template<bool OutColumnMajor_, class Matrix_>
-	[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::value_type, OutColumnMajor_, Matrix_>::type MatrixInverseLaplace
+	[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::preferred_floating_point, OutColumnMajor_, Matrix_>::type
+	MatrixInverseLaplace
 	(
 		const Matrix_& matrix_
 	)
 	{
-		return MatrixInverseLaplace<typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+		return MatrixInverseLaplace<typename Matrix_::preferred_floating_point, OutColumnMajor_, Matrix_>(matrix_);
 	}
 	template<typename out_contained_type, class Matrix_>
 	[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, Matrix_::is_column_major, Matrix_>::type MatrixInverseLaplace
@@ -752,12 +755,149 @@ namespace EmuMath::Helpers
 		return MatrixInverseLaplace<out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 	template<class Matrix_>
-	[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>::type MatrixInverseLaplace
+	[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_transpose<typename Matrix_::preferred_floating_point, Matrix_::is_column_major, Matrix_>::type
+	MatrixInverseLaplace
 	(
 		const Matrix_& matrix_
 	)
 	{
-		return MatrixInverseLaplace<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+		return MatrixInverseLaplace<typename Matrix_::preferred_floating_point, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+
+	/// <summary>
+	/// <para> Calculates the inverse to the passed matrix using Gauss-Jordan elimination. May optionally output the determinant as a customisable type. </para>
+	/// <para> Note that this operation does not check that the determinant is not 0. </para>
+	/// <para> NOTE: Gauss-Jordan's time complexity may be considered O(n*n*n), where n is the size of the passed matrix in any one dimension. </para>
+	/// <para> Especially recommended over laplace expansion when working with large matrices. </para>
+	/// </summary>
+	/// <typeparam name="out_contained_type">Type to be contained in the output inverse matrix.</typeparam>
+	/// <typeparam name="OutDeterminant_">Type to optionally output the matrix's determinant as.</typeparam>
+	/// <param name="matrix_">EmuMath matrix to find the inverse of.</param>
+	/// <param name="out_determinant_">Optional reference to output the passed matrix's determinant to.</param>
+	/// <returns>Inverted version of the passed matrix if it is invertible. Otherwise, a matrix resulting from simultaneous Gauss-Jordan elimination with its values.</returns>
+	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixInverseGaussJordan
+	(
+		const Matrix_& matrix_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			if constexpr (Matrix_::is_square)
+			{
+				return _underlying_matrix_funcs::_calculate_matrix_inverse_gj
+				<
+					EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_>,
+					Matrix_,
+					typename EmuCore::TMPHelpers::first_floating_point
+					<
+						out_contained_type,
+						typename Matrix_::value_type,
+						typename EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_>::preferred_floating_point
+					>::type
+				>(matrix_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to calculate an inverse matrix, but provided a non-square EmuMath matrix. Only square matrices are valid for this operation.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to calculate an inverse matrix, but provided a non-EmuMath-matrix argument.");
+		}
+	}
+	template<bool OutColumnMajor_, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::preferred_floating_point, OutColumnMajor_>
+	MatrixInverseGaussJordan
+	(
+		const Matrix_& matrix_
+	)
+	{
+		return MatrixInverseGaussJordan<typename Matrix_::preferred_floating_point, OutColumnMajor_, Matrix_>(matrix_);
+	}
+	template<typename out_contained_type, class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major>
+	MatrixInverseGaussJordan
+	(
+		const Matrix_& matrix_
+	)
+	{
+		return MatrixInverseGaussJordan<out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+	template<class Matrix_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::preferred_floating_point, Matrix_::is_column_major>
+	MatrixInverseGaussJordan
+	(
+		const Matrix_& matrix_
+	)
+	{
+		return MatrixInverseGaussJordan<typename Matrix_::preferred_floating_point, Matrix_::is_column_major, Matrix_>(matrix_);
+	}
+	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_, typename OutDeterminant_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixInverseGaussJordan
+	(
+		const Matrix_& matrix_,
+		OutDeterminant_& out_determinant_
+	)
+	{
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
+		{
+			if constexpr (Matrix_::is_square)
+			{
+				return _underlying_matrix_funcs::_calculate_matrix_inverse_gj
+				<
+					EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_>,
+					Matrix_,
+					typename EmuCore::TMPHelpers::first_floating_point
+					<
+						out_contained_type,
+						OutDeterminant_,
+						typename Matrix_::value_type,
+						typename EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_>::preferred_floating_point
+					>::type,
+					OutDeterminant_
+				>(matrix_, out_determinant_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to calculate an inverse matrix, but provided a non-square EmuMath matrix. Only square matrices are valid for this operation.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to calculate an inverse matrix, but provided a non-EmuMath-matrix argument.");
+		}
+	}
+	template<bool OutColumnMajor_, class Matrix_, typename OutDeterminant_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::preferred_floating_point, OutColumnMajor_>
+	MatrixInverseGaussJordan
+	(
+		const Matrix_& matrix_,
+		OutDeterminant_& out_determinant_
+	)
+	{
+		return MatrixInverseGaussJordan<typename Matrix_::preferred_floating_point, OutColumnMajor_, Matrix_, OutDeterminant_>(matrix_, out_determinant_);
+	}
+	template<typename out_contained_type, class Matrix_, typename OutDeterminant_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major>
+	MatrixInverseGaussJordan
+	(
+		const Matrix_& matrix_,
+		OutDeterminant_& out_determinant_
+	)
+	{
+		return MatrixInverseGaussJordan<out_contained_type, Matrix_::is_column_major, Matrix_, OutDeterminant_>(matrix_, out_determinant_);
+	}
+	template<class Matrix_, typename OutDeterminant_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::preferred_floating_point, Matrix_::is_column_major>
+	MatrixInverseGaussJordan
+	(
+		const Matrix_& matrix_,
+		OutDeterminant_& out_determinant_
+	)
+	{
+		return MatrixInverseGaussJordan<typename Matrix_::preferred_floating_point, Matrix_::is_column_major, Matrix_, OutDeterminant_>(matrix_, out_determinant_);
 	}
 }
 

@@ -26,7 +26,7 @@ namespace EmuCore::TestingHelpers
 		template<typename T_>
 		constexpr inline T_ operator()(const T_& dummy_) const
 		{
-			static constexpr typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type MULT_ = 
+			typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type MULT_ = 
 			static_cast<typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type>(0.001f);
 
 			if constexpr (std::numeric_limits<T_>::max() < std::numeric_limits<int>::max())
@@ -397,10 +397,119 @@ namespace EmuCore::TestingHelpers
 		std::vector<DirectX::XMFLOAT4X4> out_readable_;
 	};
 
+	struct ScalarInverseLaplace
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+		static constexpr std::string_view NAME = "Inverse Laplace (Scalar)";
+		static constexpr std::size_t MatSize_ = 4;
+
+		ScalarInverseLaplace()
+		{
+		}
+		void Prepare()
+		{
+			in_.resize(NUM_LOOPS);
+			out_.resize(NUM_LOOPS);
+			VectorFiller filler_ = VectorFiller();
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				in_[i] = in_[i].Mutate(filler_);
+				out_[i] = out_[i].Mutate(filler_);
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			out_[i] = in_[i].InverseLaplace();
+		}
+		void OnTestsOver()
+		{
+			std::size_t i = static_cast<std::size_t>(rand()) % NUM_LOOPS;
+			std::cout << in_[i] << "\nINVERSE:\n" << out_[i] << "\n\n\n";
+		}
+
+		std::vector<EmuMath::Matrix<MatSize_, MatSize_, float, true>> in_;
+		std::vector<EmuMath::Matrix<MatSize_, MatSize_, float, true>> out_;
+	};
+	struct ScalarInverseGaussJordan
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+		static constexpr std::string_view NAME = "Inverse Gauss Jordan (Scalar)";
+		static constexpr std::size_t MatSize_ = 4;
+
+		ScalarInverseGaussJordan()
+		{
+		}
+		void Prepare()
+		{
+			in_.resize(NUM_LOOPS);
+			out_.resize(NUM_LOOPS);
+			VectorFiller filler_ = VectorFiller();
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				in_[i] = in_[i].Mutate(filler_);
+				out_[i] = out_[i].Mutate(filler_);
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			out_[i] = in_[i].InverseGaussJordan();
+		}
+		void OnTestsOver()
+		{
+			std::size_t i = static_cast<std::size_t>(rand()) % NUM_LOOPS;
+			std::cout << in_[i] << "\nINVERSE:\n" << out_[i] << "\n\n\n";
+		}
+
+		std::vector<EmuMath::Matrix<MatSize_, MatSize_, float, true>> in_;
+		std::vector<EmuMath::Matrix<MatSize_, MatSize_, float, true>> out_;
+	};
+	struct FastInverse
+	{
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr bool DO_TEST = true;
+		static constexpr std::string_view NAME = "Inverse (SIMD)";
+
+		FastInverse()
+		{
+		}
+		void Prepare()
+		{
+			in_.resize(NUM_LOOPS);
+			out_.resize(NUM_LOOPS);
+			VectorFiller filler_ = VectorFiller();
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				in_[i] = in_[i].Mutate(filler_);
+				out_[i] = out_[i].Mutate(filler_);
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			EmuMath::FastMatrix4x4f_CM(in_[i]).Inverse().Store(out_[i]);
+		}
+		void OnTestsOver()
+		{
+			std::size_t i = static_cast<std::size_t>(rand()) % NUM_LOOPS;
+			std::cout << in_[i] << "\nINVERSE:\n" << out_[i] << "\n\n\n";
+		}
+
+		std::vector<EmuMath::Matrix<4, 4, float, true>> in_;
+		std::vector<EmuMath::Matrix<4, 4, float, true>> out_;
+	};
+
 	using AllTests = std::tuple
 	<
-		MatEmu,
-		MatDXM
+		ScalarInverseLaplace,
+		ScalarInverseGaussJordan,
+		FastInverse
 	>;
 
 
