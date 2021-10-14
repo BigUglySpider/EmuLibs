@@ -124,6 +124,8 @@ int main()
 	perms_.TryIncreaseToPowerOf2(true);
 	std::cout << perms_ << " | " << perms_.size() << " | " << perms_.MaxValue() << "\n";
 
+	std::cout << EmuMath::Functors::make_noise_1d<EmuMath::NoiseType::PERLIN_SMOOTH>()(23.175f, 0.675f, EmuMath::ShuffledIntSequence<std::int32_t>(128, 2u)) << "\n";
+	std::cout << EmuMath::Functors::make_noise_1d<EmuMath::NoiseType::PERLIN_SMOOTH>()(23.575f, 0.675f, EmuMath::ShuffledIntSequence<std::int32_t>(128, 2u)) << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

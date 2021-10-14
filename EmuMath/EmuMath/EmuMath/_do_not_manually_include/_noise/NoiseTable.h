@@ -1,6 +1,7 @@
 #ifndef EMU_MATH_NOISE_TABLE_H_INC_
 #define EMU_MATH_NOISE_TABLE_H_INC_ 1
 
+#include "_noise_gen_functors/NoiseGen1D.h"
 #include "../../../EmuCore/TMPHelpers/TypeComparators.h"
 #include "../../../EmuCore/TMPHelpers/TypeConvertors.h"
 #include <vector>
