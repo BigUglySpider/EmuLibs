@@ -517,21 +517,19 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 
 		CalcType_ right_minus_left_ = sub_(right_calc_cast_, left_calc_cast_);
 		CalcType_ top_minus_bottom_ = sub_(top_calc_cast_, bottom_calc_cast_);
-		CalcType_ far_minus_near_reciprocal = div_(one_, sub_(far_calc_cast_, near_calc_cast_));
+		CalcType_ neg_far_minus_near_reciprocal = negate_(div_(one_, sub_(far_calc_cast_, near_calc_cast_)));
 
 		// Fill matrix
 		using out_value = typename OutMatrix_::value_type;
 		OutMatrix_ out_ = OutMatrix_();
 		// Column 0
-		_get_matrix_data<0, 0>(out_) = static_cast<out_value>(div_(two_, right_minus_left_));
+		_get_matrix_data<0, 0>(out_) = static_cast<out_value>(div_(two_, right_minus_left_)); // 2 / (right - left)
 		// Column 1
-		_get_matrix_data<1, 1>(out_) = static_cast<out_value>(div_(two_, top_minus_bottom_));
+		_get_matrix_data<1, 1>(out_) = static_cast<out_value>(div_(two_, top_minus_bottom_)); // 2 / (top - bottom)
 		// Column 2
-		_get_matrix_data<2, 2>(out_) = static_cast<out_value>(negate_(far_minus_near_reciprocal));
+		_get_matrix_data<2, 2>(out_) = static_cast<out_value>(neg_far_minus_near_reciprocal); // 1 / -(far - near)
 		// Column 3
-		//_get_matrix_data<3, 0>(out_) = static_cast<out_value>(div_(negate_(add_(right_calc_cast_, left_calc_cast_)), right_minus_left_));
-		//_get_matrix_data<3, 1>(out_) = static_cast<out_value>(div_(negate_(add_(top_calc_cast_, bottom_calc_cast_)), top_minus_bottom_));
-		_get_matrix_data<3, 2>(out_) = static_cast<out_value>(mul_(negate_(near_calc_cast_), far_minus_near_reciprocal));
+		_get_matrix_data<3, 2>(out_) = static_cast<out_value>(mul_(near_calc_cast_, neg_far_minus_near_reciprocal)); // near / -(far - near)
 		_get_matrix_data<3, 3>(out_) = out_value(1);
 
 		return out_;

@@ -196,7 +196,7 @@ namespace EmuMath::Helpers
 		else
 		{
 			using rot_z_floating_point = typename EmuCore::TMPHelpers::first_floating_point<RotZ_, float>::type;
-			return MatrixRotationY<true, out_contained_type, OutColumnMajor_, rot_z_floating_point>
+			return MatrixRotationZ<true, out_contained_type, OutColumnMajor_, rot_z_floating_point>
 			(
 				EmuCore::Pi::DegsToRads(static_cast<rot_z_floating_point>(rot_z_))
 			);

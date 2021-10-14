@@ -525,9 +525,9 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			return MatrixPerspectiveGL<true, out_contained_type, OutColumnMajor_, NumTanIterations_, DoTanMod_, FovY_, Near_, Far_, AspectRatio_>
+			return MatrixPerspectiveVK<true, out_contained_type, OutColumnMajor_, NumTanIterations_, DoTanMod_, calc_type, Near_, Far_, AspectRatio_>
 			(
-				fov_angle_y_,
+				EmuCore::Pi::DegsToRads(static_cast<calc_type>(fov_angle_y_)),
 				near_,
 				far_,
 				aspect_ratio_
