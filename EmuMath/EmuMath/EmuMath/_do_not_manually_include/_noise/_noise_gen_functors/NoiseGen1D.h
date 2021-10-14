@@ -5,6 +5,10 @@
 
 namespace EmuMath::Functors
 {
+	/// <summary>
+	/// <para> Noise generation functor for 1-dimensional noise. </para>
+	/// <para> Valid EmuMath::NoiseType arguments have been specialised for this functor. Invalid arguments will result in an empty struct. </para>
+	/// </summary>
 	template<EmuMath::NoiseType NoiseType_>
 	struct make_noise_1d
 	{
