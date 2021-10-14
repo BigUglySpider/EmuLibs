@@ -1,7 +1,7 @@
 #ifndef EMU_MATH_VECTOR_T_HELPERS_UNDERLYING_H_INC_
 #define EMU_MATH_VECTOR_T_HELPERS_UNDERLYING_H_INC_ 1
 
-#include "../../EmuCore/TMPHelpers/TypeComparators.h"
+#include "../../../EmuCore/TMPHelpers/TypeComparators.h"
 #include "VectorTMP.h"
 
 /// <summary> Underlying functions for performing vector operations. These should not be called directly. </summary>
@@ -290,6 +290,20 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		{
 			_set_vector<0>(lhs_, rhs_);
 		}
+	}
+#pragma endregion
+
+#pragma region REINTERPRETATIONS
+	template<class Vector_, class OutTuple_, std::size_t...Indices_>
+	constexpr inline OutTuple_ _vector_to_tuple(const Vector_& vector_, std::index_sequence<Indices_...>)
+	{
+		return OutTuple_
+		(
+			static_cast<std::tuple_element_t<Indices_, OutTuple_>>
+			(
+				_get_vector_data<Indices_>(vector_)
+			)...
+		);
 	}
 #pragma endregion
 

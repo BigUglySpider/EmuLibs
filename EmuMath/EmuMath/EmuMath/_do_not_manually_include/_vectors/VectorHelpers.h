@@ -1,10 +1,11 @@
 #ifndef EMU_MATH_VECTOR_T_HELPERS_H_INC_
 #define EMU_MATH_VECTOR_T_HELPERS_H_INC_ 1
 
-#include "../../EmuCore/Functors/Arithmetic.h"
-#include "../../EmuCore/Functors/Bitwise.h"
-#include "../../EmuCore/Functors/Comparators.h"
-#include "../../EmuCore/TMPHelpers/TypeConvertors.h"
+#include "../../../EmuCore/Functors/Arithmetic.h"
+#include "../../../EmuCore/Functors/Bitwise.h"
+#include "../../../EmuCore/Functors/Comparators.h"
+#include "../../../EmuCore/TMPHelpers/Tuples.h"
+#include "../../../EmuCore/TMPHelpers/TypeConvertors.h"
 #include "VectorHelpersUnderlying.h"
 #include <functional>
 
@@ -171,6 +172,29 @@ namespace EmuMath::Helpers
 		else
 		{
 			static_assert(false, "Attempted to set the internal data of a vector, but the provided destination was not an EmuMath vector.");
+		}
+	}
+#pragma endregion
+
+#pragma region REINTERPRETATIONS
+	/// <summary> Converts the passed EmuMath vector to a tuple. The tuple will effectively be a copy of the vector. </summary>
+	/// <typeparam name="Vector_">Type of EmuMath vector to convert to a tuple.</typeparam>
+	/// <param name="vector_">EmuMath vector to convert to a tuple.</param>
+	/// <returns>Tuple representation of the passed EmuMath vector. Note that this is a copy, and may not be used to modify the vector itself's data.</returns>
+	template<class Vector_>
+	constexpr inline typename EmuCore::TMPHelpers::tuple_n<Vector_::size, typename Vector_::value_type>::type VectorAsTuple(const Vector_& vector_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
+		{
+			return _underlying_vector_funcs::_vector_to_tuple<Vector_,typename  EmuCore::TMPHelpers::tuple_n<Vector_::size, typename Vector_::value_type>::type>
+			(
+				vector_,
+				std::make_index_sequence<Vector_::size>()
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to convert a vector to a tuple, but the provided argument was not an EmuMath vector.");
 		}
 	}
 #pragma endregion
@@ -490,7 +514,7 @@ namespace EmuMath::Helpers
 	template<class LhsVector_, class Rhs_>
 	[[nodiscard]] constexpr inline auto VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorDivide<LhsVector_::size, typename LhsVector_::value_type, Rhs_>(lhs_, rhs_);
+		return VectorDivide<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
 	/// <summary>

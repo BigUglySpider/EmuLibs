@@ -1,11 +1,18 @@
 #include "EmuMath/Vector.h"
 #include "EmuMath/FastVector.h"
+#include "EmuMath/Matrix.h"
+#include "EmuMath/FastMatrix.h"
 #include "EmuMath/NoOverflowT.h"
+#include "EmuCore/TMPHelpers/Tuples.h"
 #include <array>
 #include <bitset>
 #include <iomanip>
 
 #include "Tests.hpp"
+
+#include "EmuCore/Events/Event.h"
+#include "EmuCore/Events/ThreadSafeEvent.h"
+
 using namespace EmuCore::TestingHelpers;
 
 template<typename T_>
@@ -52,250 +59,280 @@ bool boolfunc(bool bool_)
 	return bool(bool_);
 }
 
+template<std::size_t X_, std::size_t Y_, typename Type_, bool ColumnMajor_>
+void TestFunc(const EmuMath::Matrix<X_, Y_, Type_, ColumnMajor_>& matrix_)
+{
+	std::cout << matrix_ << "\n";
+}
+template<std::size_t X_, std::size_t Y_, typename Type_, bool ColumnMajor_>
+void TestFunc(EmuMath::Matrix<X_, Y_, Type_, ColumnMajor_>&& matrix_)
+{
+	TestFunc(std::forward<EmuMath::Matrix<X_, Y_, Type_, ColumnMajor_>>(matrix_));
+}
+template<std::size_t FirstX_, std::size_t FirstY_, typename FirstType_, bool FirstColumnMajor_, std::size_t...X_, std::size_t...Y_, typename...Types_, bool...ColumnMajors_>
+void TestFunc(const EmuMath::Matrix<FirstX_, FirstY_, FirstType_, FirstColumnMajor_>& first_, const EmuMath::Matrix<X_, Y_, Types_, ColumnMajors_>&...matrices_)
+{
+	TestFunc(first_);
+	TestFunc(matrices_...);
+}
+
+void _up(int val_)
+{
+	std::cout << val_ << "\n";
+}
+void _down(int val_)
+{
+	std::cout << -val_ << "\n";
+}
+float _upf(int val_)
+{
+	_up(val_);
+	return static_cast<float>(val_);
+}
+
+struct SomeStructForTestingEdges
+{
+	template<typename Fov_, typename Near_, typename AspectRatio_>
+	constexpr SomeStructForTestingEdges(const Fov_& in_fov_angle_y_, const Near_& in_near_, const AspectRatio_& in_aspect_ratio_) :
+		left_(0.0f), right_(0.0f), bottom_(0.0f), top_(0.0f)
+	{
+		EmuMath::Helpers::MatrixPerspectiveFrustumEdges<false>(in_fov_angle_y_, in_near_, in_aspect_ratio_, left_, right_, bottom_, top_);
+	}
+
+	float left_;
+	float right_;
+	float bottom_;
+	float top_;
+};
+
 int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
 
-	auto vectorf = EmuMath::TMP::make_emu_vector<float>(1.0f);
-	auto vectord = EmuMath::TMP::make_emu_vector<double>(1.0, 3.0, 5.0, 6.5, 21.345);
+	EmuMath::FastMatrix4x4f_CM fast_4x4_from_scalars(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << "\n\n";
+	std::cout << fast_4x4_from_scalars << "\n";
+	std::cout << "Row[0]: " << fast_4x4_from_scalars.GetRowReadable<0>() << "\n";
+	std::cout << "Row[1]: " << fast_4x4_from_scalars.GetRowReadable<1>() << "\n";
+	std::cout << "Row[2]: " << fast_4x4_from_scalars.GetRowReadable<2>() << "\n";
+	std::cout << "Row[3]: " << fast_4x4_from_scalars.GetRowReadable<3>() << "\n";
+	std::cout << "Column[0]: " << fast_4x4_from_scalars.GetColumnReadable<0>() << "\n";
+	std::cout << "Column[1]: " << fast_4x4_from_scalars.GetColumnReadable<1>() << "\n";
+	std::cout << "Column[2]: " << fast_4x4_from_scalars.GetColumnReadable<2>() << "\n";
+	std::cout << "Column[3]: " << fast_4x4_from_scalars.GetColumnReadable<3>() << "\n";
+	std::cout << "Trace: " << fast_4x4_from_scalars.Trace() << "\n";
+	std::cout << "Stored as column-major matrix:\n" << fast_4x4_from_scalars.Store<float, true>() << "\n";
+	std::cout << "Stored as row-major matrix:\n" << fast_4x4_from_scalars.Store<float, false>() << "\n";
+	std::cout << (fast_4x4_from_scalars != fast_4x4_from_scalars) << " | " << (fast_4x4_from_scalars == fast_4x4_from_scalars) << "\n";
+	std::cout << fast_4x4_from_scalars * 2.5L << "\n\n";
+	std::cout << fast_4x4_from_scalars.Multiply(fast_4x4_from_scalars) << "\n\n";
+	std::cout << "(Above as SISD):\n" << fast_4x4_from_scalars.Store().Multiply(fast_4x4_from_scalars.Store()) << "\n\n";
 
-	auto ref_d_ = EmuMath::Helpers::VectorShuffledReference<4, 3, 2, 1, 0>(vectord);
-	std::cout << "D: " << vectord << "\nRef: " << ref_d_ << "\n";
-	ref_d_.at<2>() = 255.0;
-	ref_d_.at<0>() = std::numeric_limits<double>::infinity();
-	std::cout << "D: " << vectord << "\nRef: " << ref_d_ << "\n";
+	std::cout << "TRANSFORMATIONS\n";
+	std::cout << "Translation(1, 2, 3) SIMD:\n" << EmuMath::FastMatrix4x4f_CM::Translation(1, 2, 3) << "\n";
+	std::cout << "Translation(1, 2, 3) SISD:\n" << EmuMath::Matrix4x4<float, true>::Translation(1, 2, 3) << "\n\n";
+	std::cout << "Scale(1.5, -2, 3.3) SIMD:\n" << EmuMath::FastMatrix4x4f_CM::Scale(1.5, -2, 3.3) << "\n";
+	std::cout << "Scale(1.5, -2, 3.3) SISD:\n" << EmuMath::Matrix4x4<float, true>::Scale(1.5, -2, 3.3) << "\n\n";
+	std::cout << "RotationX<false>(33) SIMD:\n" << EmuMath::FastMatrix4x4f_CM::RotationX<false>(33.0f) << "\n";
+	std::cout << "RotationX<false>(33) SISD:\n" << EmuMath::Matrix4x4<float, true>::RotationX<false>(33.0f) << "\n\n";
+	std::cout << "RotationY<false>(33) SIMD:\n" << EmuMath::FastMatrix4x4f_CM::RotationY<false>(33) << "\n";
+	std::cout << "RotationY<false>(33) SISD:\n" << EmuMath::Matrix4x4<float, true>::RotationY<false>(33) << "\n\n";
+	std::cout << "RotationZ<false>(33) SIMD:\n" << EmuMath::FastMatrix4x4f_CM::RotationZ<false>(33) << "\n";
+	std::cout << "RotationZ<false>(33) SISD:\n" << EmuMath::Matrix4x4<float, true>::RotationZ<false>(33) << "\n\n";
 
+	std::cout << "Ortho(0.01f, 25.0f, 1920.0f, 1080.0f) (SIMD):\n" << EmuMath::FastMatrix4x4f_CM::OrthographicRhVK(1920.0f, 1080.0f, 0.01f, 25.0f) << "\n\n";
+	std::cout << "Ortho(0.01f, 25.0f, 1920.0f, 1080.0f) (SISD):\n" << EmuMath::Matrix4x4<float>::OrthographicVK(1920.0f, 1080.0f, 0.01f, 25.0f) << "\n\n";
+	std::cout << "Ortho(0.01f, 25.0f, 1920.0f, 1080.0f) (DXM):\n";
+	auto dxm_proj_ = DirectX::XMMatrixOrthographicRH(1920.0f, 1080.0f, 0.01f, 25.0f);
+	DirectX::XMFLOAT4X4 readable_dxm_mat_;
+	DirectX::XMStoreFloat4x4(&readable_dxm_mat_, dxm_proj_);
+	for (std::size_t x = 0; x < 4; ++x)
+	{
+		std::cout << "{ ";
+		for (std::size_t y = 0; y < 4; ++y)
+		{
+			std::cout << readable_dxm_mat_(x, y);
+			if (y != 3)
+			{
+				std::cout << ", ";
+			}
+		}
+		std::cout << " }\n";
+	}
+	std::cout << "\n\n";
 
-	EmuMath::Helpers::VectorCopy(ref_d_, EmuMath::Helpers::VectorFloor(EmuMath::Helpers::VectorNegate(ref_d_)));
-	std::cout << "D: " << vectord << "\nRef: " << ref_d_ << "\n";
+	std::cout << "Projection(75.0f, 0.01f, 25.0f, 1920.0f / 1080.0f) (SIMD):\n" << EmuMath::FastMatrix4x4f_CM::PerspectiveRhVK<false>(75.0f, 0.01f, 25.0f, 1920.0f / 1080.0f) << "\n\n";
+	std::cout << "Projection(75.0f, 0.01f, 25.0f, 1920.0f / 1080.0f) (SISD):\n" << EmuMath::Matrix4x4<float>::PerspectiveVK<false>(75.0f, 0.01f, 25.0f, 1920.0f / 1080.0f) << "\n\n";
+	std::cout << "Projection(75.0f, 0.01f, 25.0f, 1920.0f / 1080.0f) (DXM):\n";
+	dxm_proj_ = DirectX::XMMatrixPerspectiveFovRH(EmuCore::Pi::DegsToRads(75.0f), 1920.0f / 1080.0f, 0.01f, 25.0f);
+	DirectX::XMStoreFloat4x4(&readable_dxm_mat_, dxm_proj_);
+	for (std::size_t x = 0; x < 4; ++x)
+	{
+		std::cout << "{ ";
+		for (std::size_t y = 0; y < 4; ++y)
+		{
+			std::cout << readable_dxm_mat_(x, y);
+			if (y != 3)
+			{
+				std::cout << ", ";
+			}
+		}
+		std::cout << " }\n";
+	}
+	std::cout << "\n\n";
 
-	auto some_vector = EmuMath::TMP::make_emu_vector<float>(102, 13.0f, 27.6, 100, 10000, 1000000);
-	std::cout << "Sqrt(" << some_vector << "): " << EmuMath::Helpers::VectorSqrt(some_vector) << "\n";
-	constexpr auto some_other_vector = EmuMath::TMP::make_emu_vector<double>(100.0, 0.25, 1.0f, 2.0f, EmuCore::Pi::PI<long double>);
-	constexpr auto some_other_vector_sqrt = EmuMath::Helpers::VectorSqrtConstexpr(some_other_vector);
-	std::cout << "SqrtConstexpr(" << some_other_vector << "): " << some_other_vector_sqrt << "\n";
+	std::cout << fast_4x4_from_scalars << "\n\n";
+	std::cout << ~fast_4x4_from_scalars << "\n\n";
+	std::cout << ~~fast_4x4_from_scalars << "\n\n";
+	std::cout << ~~~fast_4x4_from_scalars << "\n\n";
 
-	constexpr auto some_uint_vector = EmuMath::TMP::make_emu_vector<std::uint32_t>(1, 2, 4, 8, 16, 32, 64, 128);
-	constexpr auto shifted_left_uint_vector = EmuMath::Helpers::VectorShiftLeft(some_uint_vector, 1);
-	constexpr auto shifted_right_uint_vector = EmuMath::Helpers::VectorShiftRight(some_uint_vector, float(2));
-	constexpr auto shifted_left_vector_shifts = EmuMath::Helpers::VectorShiftLeft(some_uint_vector, EmuMath::TMP::make_emu_vector<float>(1, 2, 3, 4, 5, 6, 7, 8));
-	constexpr auto shifted_right_vector_shifts = EmuMath::Helpers::VectorShiftRight(some_uint_vector, EmuMath::TMP::make_emu_vector<float>(1, 1, 1, 1, 5));
-
-	constexpr auto vec_a = EmuMath::TMP::make_emu_vector<float>(1.0f, 2.0f, 3.0f);
-	constexpr auto vec_b = EmuMath::TMP::make_emu_vector<std::uint64_t>(1, 2, 3);
-	constexpr auto vec_c = EmuMath::TMP::make_emu_vector<float>(1.1f, 2.2f, 3.0f);
-	auto vec_d = EmuMath::Helpers::VectorShuffledReference<0, 1, 2, 0>(vec_a);
-	auto vec_e = EmuMath::Vector<10, double>(vec_d);
-	std::cout << vec_e << "\n";
-
-
-	// NOTE: TESTING EmuMath::VectorCmpEqualTo
-	std::cout << vec_a << " == " << vec_b << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_a, vec_b) << "\n";
-	std::cout << vec_b << " == " << vec_c << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_b, vec_c) << "\n";
-	std::cout << vec_a << " == " << vec_d << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_a, vec_d) << "\n";
-	std::cout << vec_a << " == " << vec_d << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpEqualTo<false>(vec_a, vec_d) << "\n";
-	std::cout << "----------\n";
-
-
-	std::cout << vec_a << " != " << vec_b << ": " << EmuMath::Helpers::VectorCmpNotEqualTo(vec_a, vec_b) << "\n";
-	std::cout << vec_b << " != " << vec_c << ": " << EmuMath::Helpers::VectorCmpNotEqualTo(vec_b, vec_c) << "\n";
-	std::cout << vec_a << " != " << vec_d << ": " << EmuMath::Helpers::VectorCmpNotEqualTo(vec_a, vec_d) << "\n";
-	std::cout << vec_a << " != " << vec_d << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpNotEqualTo<false>(vec_a, vec_d) << "\n";
-	std::cout << "----------\n";
-
-
-	constexpr auto vec_a_sqr_mag_ = EmuMath::Helpers::VectorSquareMagnitude<float>(vec_a);
-	constexpr auto vec_a_mag_ = EmuMath::Helpers::VectorMagnitudeConstexpr<float>(vec_a);
-	constexpr auto vec_a_mag_mult_vec_a_mag_ = vec_a_mag_ * vec_a_mag_;
-	std::cout << vec_a << " == " << EmuMath::Helpers::VectorMagnitude(vec_a) << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_a, vec_a_mag_) << "\n";
-	std::cout << vec_b << " == " << 2 << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_b, 2) << "\n";
-	std::cout << vec_a << " == " << 5 << ": " << EmuMath::Helpers::VectorCmpEqualTo(vec_a, 5) << "\n";
-	std::cout << vec_a << " == " << 4 << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpEqualTo<false>(vec_a, 4) << "\n";
-	std::cout << "----------\n";
-
-
-	std::cout << vec_a << " ALL == " << vec_b << ": " << EmuMath::Helpers::VectorCmpAllEqualTo(vec_a, vec_b) << "\n";
-	std::cout << vec_b << " ALL != " << vec_c << ": " << EmuMath::Helpers::VectorCmpAllNotEqualTo(vec_b, std::uint64_t(2)) << "\n";
-	std::cout << vec_a << " ALL <= " << vec_d << ": " << EmuMath::Helpers::VectorCmpAllLessEqual(vec_a, vec_d) << "\n";
-	std::cout << vec_a << " ALL > " << vec_a << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpAllGreater<false>(vec_a, vec_a) << "\n";
-	std::cout << vec_a << " ALL == " << EmuMath::Helpers::VectorShuffle<0, 1, 2, 2, 1, 0>(vec_a) << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpAllEqualTo<false>(vec_a, EmuMath::Helpers::VectorShuffle<0, 1, 2, 2, 1, 0>(vec_a)) << "\n";
-	std::cout << vec_a << " ALL == " << EmuMath::Helpers::VectorShuffle<0, 1>(vec_a) << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpAllEqualTo<false>(vec_a, EmuMath::Helpers::VectorShuffle<0, 1>(vec_a)) << "\n";
-	std::cout << "----------\n";
-
-
-	std::cout << vec_a << " ANY == " << vec_b << ": " << EmuMath::Helpers::VectorCmpAnyEqualTo(vec_a, vec_b) << "\n";
-	std::cout << vec_b << " ANY != " << std::uint64_t(2) << ": " << EmuMath::Helpers::VectorCmpAnyNotEqualTo(vec_b, std::uint64_t(2)) << "\n";
-	std::cout << vec_a << " ANY <= " << vec_a << ": " << EmuMath::Helpers::VectorCmpAnyLessEqual(vec_a, vec_a) << "\n";
-	std::cout << vec_a << " ANY > " << vec_a << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpAnyGreater<false>(vec_a, vec_a) << "\n";
-	std::cout << vec_a << " ANY < " << EmuMath::Helpers::VectorShuffle<2, 1, 0>(vec_a) << " (Don't include non-contained): " << EmuMath::Helpers::VectorCmpAnyLess<false>(vec_a, EmuMath::Helpers::VectorShuffle<2, 1, 0>(vec_a)) << "\n";
-	std::cout << "----------\n";
-
-	constexpr auto vec_a_mag_recip_constexpr = EmuMath::Helpers::VectorMagnitudeReciprocalConstexpr(vec_a);
-	std::cout << "MagRecipConstexpr(" << vec_a << "): " << vec_a_mag_recip_constexpr << "\n";
-	std::cout << "MagRecipQrsqrt(" << vec_a << "): " << EmuMath::Helpers::VectorMagnitudeReciprocalQrsqrt<float, 1>(vec_a) << "\n";
-
-	using x_val_type = std::uint16_t;
-	using y_val_type = std::uint16_t;
-	EmuMath::Vector<4, x_val_type> x_(128, 7, 255, 16);
-	EmuMath::Vector<3, y_val_type> y_(128, 6, 231);
-	EmuMath::Vector<4, simple_bitset<x_val_type>> x_bits_(x_);
-	EmuMath::Vector<3, simple_bitset<y_val_type>> y_bits_(y_);
-	std::cout << x_bits_ << " &\n" << y_bits_ << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorAnd(x_, y_)) << "\n\n";
-	std::cout << x_bits_ << " |\n" << y_bits_ << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorOr(x_, y_)) << "\n\n";
-	std::cout << x_bits_ << " ^\n" << y_bits_ << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorXor(x_, y_)) << "\n\n";
-	std::cout << x_bits_ << ".NOT():\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorNot(x_)) << "\n\n";
-
-	x_val_type some_constant_ = 0xE28F;
-	std::cout << x_bits_ << " &\n  " << simple_bitset<x_val_type>(some_constant_) << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorAnd(x_, some_constant_)) << "\n\n";
-	std::cout << x_bits_ << " |\n  " << simple_bitset<x_val_type>(some_constant_) << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorOr(x_, some_constant_)) << "\n\n";
-	std::cout << x_bits_ << " ^\n  " << simple_bitset<x_val_type>(some_constant_) << ":\n" << EmuMath::Vector<4, simple_bitset<x_val_type>>(EmuMath::Helpers::VectorXor(x_, some_constant_)) << "\n\n";
-
-	constexpr auto a_norm = EmuMath::Helpers::VectorNormaliseConstexpr(vec_a);
-	constexpr auto a_norm_mag = EmuMath::Helpers::VectorMagnitudeConstexpr(a_norm);
-
-	auto a_norm_nonconst = EmuMath::Helpers::VectorNormalise(vec_a);
-	auto a_norm_qrsqrt_1 = EmuMath::Helpers::VectorNormaliseQrsqrt<float, 1>(vec_a);
-	auto a_norm_qrsqrt_2 = EmuMath::Helpers::VectorNormaliseQrsqrt<float, 2>(vec_a);
-	auto a_norm_nonconst_mag = EmuMath::Helpers::VectorMagnitude(a_norm_nonconst);
-	auto a_norm_qrsqrt_1_mag = EmuMath::Helpers::VectorMagnitude(a_norm_qrsqrt_1);
-	auto a_norm_qrsqrt_2_mag = EmuMath::Helpers::VectorMagnitude(a_norm_qrsqrt_2);
-
-	std::cout << "a_norm_nonconst: " << a_norm_nonconst << " | Mag: " << a_norm_nonconst_mag << "\n";
-	std::cout << "a_norm_qrsqrt (1 newton iteration): " << a_norm_qrsqrt_1 << " | Mag: " << a_norm_qrsqrt_1_mag << "\n";
-	std::cout << "a_norm_qrsqrt (2 newton iterations): " << a_norm_qrsqrt_2 << " | Mag: " << a_norm_qrsqrt_2_mag << "\n";
-
-	std::cout << "AngleRads(" << vec_a << ", " << vec_d << "): " << EmuMath::Helpers::VectorAngle<true>(vec_a, vec_d) << "\n";
-	std::cout << "AngleDegs(" << vec_a << ", " << vec_d << "): " << EmuMath::Helpers::VectorAngle<false>(vec_a, vec_d) << "\n";
-	std::cout << "AngleRads(" << vec_d << ", " << vec_a << "): " << EmuMath::Helpers::VectorAngle<true>(vec_d, vec_a) << "\n";
-	std::cout << "AngleDegs(" << vec_d << ", " << vec_a << "): " << EmuMath::Helpers::VectorAngle<false>(vec_d, vec_a) << "\n";
-
-	EmuMath::RefVector<2, float> a_norm_nonconst_ref(a_norm_nonconst);
-	std::cout << "Ref:" << a_norm_nonconst_ref << " | Act: " << a_norm_nonconst << "\n";
-	a_norm_nonconst_ref = EmuMath::Helpers::VectorShuffle<7, 1, 0>(some_uint_vector);
-	std::cout << "Ref:" << a_norm_nonconst_ref << " | Act: " << a_norm_nonconst << "\n";
+	EmuMath::FastMatrix4x4f_CM a_mat_
+	(
+		0.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f
+	);
+	EmuMath::FastMatrix4x4f_CM b_mat_
+	(
+		10.0f, 10.0f, 10.0f, 10.0f,
+		10.0f, 10.0f, 10.0f, 10.0f,
+		10.0f, 10.0f, 10.0f, 10.0f,
+		10.0f, 10.0f, 10.0f, 10.0f
+	);
+	EmuMath::FastMatrix4x4f_CM t_mat_
+	(
+		0.1f, 0.2f, 0.3f, 0.4f,
+		0.5f, 0.6f, 0.7f, 0.8f,
+		0.9f, 1.0f, 1.1f, 1.2f,
+		1.3f, 1.4f, 1.5f, 1.6f
+	);
+	std::cout << "A:\n" << a_mat_ << "\nB:\n" << b_mat_ << "\nT:\n" << t_mat_ << "\nLERPED:\n" << a_mat_.Lerp(b_mat_, t_mat_) << "\n\n";
+	std::cout << "A:\n" << a_mat_ << "\nB:\n" << b_mat_ << "\nT:\n" << t_mat_ << "\nLERPED:\n" << a_mat_.Lerp(10.0L, 0.5f) << "\n\n";
 
 
-	EmuMath::ConstRefVector<7, float> const_ref_(EmuMath::Helpers::VectorShuffledReference<0, 1, 0, 1, 0, 1, 0>(a_norm_nonconst_ref));
-	std::cout << "Another, constant reference: " << const_ref_ << "\n";
-	a_norm_nonconst_ref.at<1>() = 1337.0f;
-	std::cout << const_ref_ << "\n\n\n";
+	EmuMath::FastMatrix4x4f_CM original_mat_
+	(
+		-5.0f, 0.0f, 1.0f, 12.0f,
+		66.0f, -555.0f, 12.0f, 1,
+		1.0f, 2.0f, 3.0f, 1337.1f,
+		1.0f, 3.0f, 3.0f, 7.331f
+	);
+	EmuMath::FastMatrix4x4f_CM min_mat_
+	(
+		0.0f, 0.0f, -5.0f, 0.0f,
+		1.0f, -500.0f, 2.0f, 0.0f,
+		6.0f, 1.0f, 3.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f
+	);
+	EmuMath::FastMatrix4x4f_CM max_mat_
+	(
+		1.0f, 2.0f, 3.0f, 4.0f,
+		5.0f, 6.0f, 7.0f, 8.0f,
+		9.0f, 10.0f, 11.0f, 12.0f,
+		13.0f, 14.0f, 15.0f, 16.0f
+	);
+	std::cout << "Original:\n" << original_mat_ << "\nMin:\n" << min_mat_ << "\nMax:\n" << max_mat_ << "\nClamped:\n" << original_mat_.Clamp(min_mat_, max_mat_) << "\n\n";
+	std::cout << "Original min: " << original_mat_.Min() << " | Original max: " << original_mat_.Max() << "\n\n";
 
-	auto bigBoiRef = a_norm_nonconst_ref.ShuffledReference<0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1>();
-	std::cout << bigBoiRef << "\n";
-	bigBoiRef = bigBoiRef.ClampMin(50000);
-	std::cout << bigBoiRef << "\n";
-	bigBoiRef.at<0>() = 42;
-	std::cout << bigBoiRef << "\n\n\n";
-
-	std::cout << a_norm_nonconst_ref << "\n";
-	a_norm_nonconst_ref.Set(bigBoiRef);
-	std::cout << a_norm_nonconst_ref << "\n";
-	bigBoiRef.at<1>() = 42424242.0f;
-	std::cout << a_norm_nonconst_ref << "\n";
+	std::cout << original_mat_ << "\nTRANSPOSE:\n" << original_mat_.Transpose() << "\n\n";
 	
-	std::cout << static_cast<bool>(bigBoiRef) << " | " << !bigBoiRef << "\n";
 
-	auto cross_a_ = EmuMath::Vector3<float>(1.0f, 2.0f, 3.0f);
-	auto cross_b_ = EmuMath::Vector4<double>(-5.0f, 0.0f, 5.0f, 203.0f);
-	std::cout << "CROSS(" << cross_a_ << ", " << cross_b_ << "): " << cross_a_.CrossProduct3D(cross_b_) << "\n";
-	std::cout << "CROSS<0, 1, 2, 1, 2, 3>(" << cross_a_ << ", " << cross_b_ << "): " << cross_a_.CrossProduct3D<0, 1, 2, 1, 2, 3>(cross_b_) << "\n";
+	EmuMath::FastMatrix4x4f_CM inv_test_
+	(
+		-3, 6, 3, 1,
+		2, -6, -4, 2,
+		-1, 7, 4, 3,
+		1, 1, 1, 1
+	);
+	std::cout << "Mat:\n" << inv_test_ << "\nInverse:\n" << inv_test_.Inverse() << "\n\n";
+	std::cout << "\n\nSCALAR INVERSE:\n" << inv_test_.Store().InverseLaplace() << "\n\n";
 
 
-	std::cout << cross_a_ << ": [" << cross_a_[0] << " | " << cross_a_[1] << " | " << cross_a_[2] << "]\n\n\n";
+	std::cout << "Mat:\n" << inv_test_ << "\nDeterminant: " << inv_test_.Determinant() << "\n\n";
+	std::cout << "\n\nSCALAR DETERMINANT: " << inv_test_.Store().DeterminantLaplace() << "\n\n";
 
-	EmuMath::Vector4<float> scalar_(1.0f, 2.0f, 3.0f, 4.0f);
-	EmuMath::FastVector4f simd_(scalar_);
-	std::cout << "Scalar: " << scalar_ << "\n";
-	std::cout << "SIMD  : " << simd_ << "\n";
-	simd_.Set<2>(0.0f);
-	simd_.Set<3>(1337.0f);
-	std::cout << simd_ << "\n";
-	simd_.data_ = _mm_mul_ps(simd_.data_, _mm_set_ps1(3.0f));
-	simd_.Store(scalar_);
-	std::cout << simd_ << " | " << scalar_ << "\n";
+	EmuMath::FastMatrix4x4f_CM det_test_
+	(
+		1, 2, 4, 3,
+		1, 36, -7, 8,
+		10, 22, 44, 12,
+		333, -666, 12, 1
+	);
+	EmuMath::Matrix<4, 4, float, true> det_test_scalar_
+	(
+		1, 2, 4, 3,
+		1, 36, -7, 8,
+		10, 22, 44, 12,
+		333, -666, 12, 1
+	);
+	std::cout << "Matrix:\n" << det_test_ << "\n";
+	std::cout << "Det (SISD) 2x2: " << det_test_scalar_.As<2, 2>().DeterminantLaplace() << "\n\n";
+	std::cout << "Det (SISD) 3x3: " << det_test_scalar_.As<3, 3>().DeterminantLaplace() << "\n\n";
 
-	std::cout << simd_.Store<3, 8, double>() << "\n";
-	std::cout << simd_.Store() << "\n";
+	std::cout << "Minors (SIMD):\n" << det_test_.Minors<false>() << "\n";
+	std::cout << "Minors (SIMD Transposed):\n" << det_test_.Minors<true>() << "\n";
+	std::cout << "Minors (SISD):\n" << det_test_scalar_.MatrixOfMinorsLaplace() << "\n";
+	std::cout << "Determinant [Sub[0, 0]]: " << det_test_scalar_.ExclusiveSubmatrix<3, 3>().ExclusiveSubmatrix<0, 0>().DeterminantLaplace() << "\n";
+	std::cout << "Inverse (SIMD):\n" << det_test_.Inverse() << "\nInverse (SISD):\n" << det_test_scalar_.InverseLaplace() << "\n\n";
 
-	simd_.Set<3>(200000.0f);
-	std::cout << "Cast to Vector<16, std::uint16_t>: " << static_cast<EmuMath::Vector<16, std::uint16_t>>(simd_) << "\n";
-	std::cout << "Cast to Vector<16, NoOverflowT<std::uint16_t>>: " << static_cast<EmuMath::Vector<16, EmuMath::NoOverflowT<std::uint16_t>>>(simd_) << "\n";
+	constexpr float det_ = EmuMath::Matrix<4, 4, float, true>
+	(
+		1, 2, 3, 4,
+		5, 6, 7, 8,
+		9, 10, 11, 12,
+		13, 14, 15, 16
+	).DeterminantLaplace();
+	EmuMath::FastMatrix4x4f_CM bad_det_test_ = EmuMath::FastMatrix4x4f_CM
+	(
+		1, 2, 353, 4,
+		5, 611, 7, 8,
+		9, 10, 121, 12,
+		13, 14, 115, 16
+	);
+	std::cout << bad_det_test_.Determinant() << "\n";
+	float out_det_;
+	std::cout << bad_det_test_.Inverse(out_det_) << "\n\n";
+	std::cout << bad_det_test_.Multiply(bad_det_test_.Inverse()) << "\n";
+	std::cout << "Det from InverseLaplace call: " << out_det_ << "\n";
+	std::cout << "Det from Determinant call: " << bad_det_test_.Determinant() << "\n";
+	std::cout << "Det from scalar calc: " << bad_det_test_.Store().DeterminantLaplace() << "\n\n";
 
-	simd_.Set(2.0f, 4.0f, 6.0f, 8.0f);
-	std::cout << "Data: " << simd_ << "\n";
-	std::cout << "Norm: " << simd_.Normalise() << "\n";
+	std::cout << bad_det_test_.Multiply(bad_det_test_.Inverse()) << "\n\n";
+	std::cout << bad_det_test_.Minors() << "\n\n" << bad_det_test_.Store().MatrixOfMinorsLaplace() << "\n\n";
 
-	EmuMath::Vector<4, float> blooble_a(1.0f, 2.0f, 3.0f, 4.0f);
-	EmuMath::Vector<4, float> blooble_b(5.0f, 4.0, 3.0f, 2.0f);
-	EmuMath::FastVector4f blobbo_a(1.0f, 2.0f, 3.0f, 4.0f);
-	EmuMath::FastVector4f blobbo_b(5.0f, 4.0, 3.0f, 2.0f);
-	std::cout << "Normal Angle Cosine: " << blooble_a.AngleCosine(blooble_b) << "\n";
-	std::cout << "SIMD Angle Cosine:   " << blobbo_a.AngleCosine(blobbo_b) << "\n";
-	std::cout << "Normal Angle (RADS): " << blooble_a.Angle<true>(blooble_b) << "\n";
-	std::cout << "SIMD Angle (RADS):   " << blobbo_a.Angle<true>(blobbo_b) << "\n";
-	std::cout << "Normal Angle (DEGS): " << blooble_a.Angle<false>(blooble_b) << "\n";
-	std::cout << "SIMD Angle (DEGS):   " << blobbo_a.Angle<false>(blobbo_b) << "\n";
-	std::cout << "Normal Cross: " << blooble_a.CrossProduct3D(blooble_b) << "\n";
-	std::cout << "SIMD Cross: " << blobbo_a.CrossProduct(blobbo_b) << "\n";
+	constexpr bool nearf_ = EmuCore::FpNearEqual(1.0f, 1.0f);
+	constexpr bool neard_ = EmuCore::FpNearEqual(1.0, 1.0);
+	constexpr bool nearld_ = EmuCore::FpNearEqual(1.0L, 1.0L);
 
-	std::cout << "Min(5): " << blobbo_a.ClampMin(5.0f) << "\n";
-	std::cout << "Min(2): " << blobbo_a.ClampMin(2.0f) << "\n";
-	std::cout << "Max(5): " << blobbo_a.ClampMax(5.0f) << "\n";
-	std::cout << "Max(2): " << blobbo_a.ClampMax(2.0f) << "\n";
-	std::cout << "Clamp(2, 3): " << blobbo_a.Clamp(2.0f, 5.0f) << "\n";
+	constexpr std::int8_t dgfija9 = EmuCore::do_abs<std::int8_t>()(5);
+	constexpr std::int8_t dgfijo8 = EmuCore::do_abs<std::int8_t>()(-5);
+	constexpr std::int16_t dgfija16 = EmuCore::do_abs<std::int16_t>()(20150);
+	constexpr std::int16_t dgfijo16 = EmuCore::do_abs<std::int16_t>()(-20150);
+	constexpr std::int32_t dgfija32 = EmuCore::do_abs<std::int32_t>()(2);
+	constexpr std::int32_t dgfijo32 = EmuCore::do_abs<std::int32_t>()(-2);
+	constexpr std::int64_t dgfija64 = EmuCore::do_abs<std::int64_t>()(std::numeric_limits<std::int64_t>::max());
+	constexpr std::int64_t dgfijo64 = EmuCore::do_abs<std::int64_t>()(-(std::numeric_limits<std::int64_t>::max() - 26));
 
-	EmuMath::FastVector4f to_product(2.0f, 3.0f, 5.0f, 7.0f);
-	std::cout << "Horizontal Product(" << to_product << "): " << to_product.HorizontalProduct() << "\n";
-	std::cout << "MIN(" << to_product << "): " << to_product.Min() << "\n";
-	std::cout << "MAX(" << to_product << "): " << to_product.Max() << "\n";
-	to_product.Set<1>(-to_product.at<1>());
-	std::cout << "MIN(" << to_product << "): " << to_product.Min() << "\n";
-	std::cout << "MAX(" << to_product << "): " << to_product.Max() << "\n";
-	to_product.Set<2>(-to_product.at<2>());
-	std::cout << "MIN(" << to_product << "): " << to_product.Min() << "\n";
-	std::cout << "MAX(" << to_product << "): " << to_product.Max() << "\n";
-	to_product.Set<3>(-to_product.at<3>());
-	std::cout << "MIN(" << to_product << "): " << to_product.Min() << "\n";
-	std::cout << "MAX(" << to_product << "): " << to_product.Max() << "\n";
+	bad_det_test_.TryInverse(bad_det_test_);
+	std::cout << bad_det_test_.Inverse() << "\n\n";
+	std::cout << bad_det_test_.Inverse().Inverse().Inverse() << "\n\n";
+	std::cout << bad_det_test_.Inverse().Inverse().Inverse().Inverse().Inverse() << "\n\n";
+	std::cout << bad_det_test_.Inverse().Inverse().Inverse().Inverse().Inverse().Inverse().Inverse() << "\n\n";
+	std::cout << bad_det_test_.Inverse().Inverse().Inverse().Inverse().Inverse().Inverse().Inverse().Inverse().Inverse() << "\n\n";
 
-	float min_, max_;
-	to_product.MinMax(min_, max_);
-	std::cout << "MINMAX(" << to_product << "): [" << min_ << ", " << max_ << "]\n";
-
-	std::cout << (EmuMath::FastVector4f(1.0f, 2.0f, 3.0f, 4.0f) % 1.5f) << "\n";
-
-	EmuMath::FastVector4f fast_a_(rand(), rand(), rand(), rand());
-	EmuMath::FastVector4f fast_b_(rand(), rand(), rand(), rand());
-	std::cout << "A: " << fast_a_ << "\nB: " << fast_b_ << "\n";
-	std::cout << "Min(" << fast_a_ << ", " << fast_b_ << "): " << fast_a_.MinVector(fast_b_) << "\n";
-	std::cout << "Max(" << fast_a_ << ", " << fast_b_ << "): " << fast_a_.MaxVector(fast_b_) << "\n";
-	std::cout << "MinMax<true, false, false, true>(" << fast_a_ << ", " << fast_b_ << "): " << fast_a_.MinMaxVector<1, 0, 0, 1>(fast_b_) << "\n";
-
-	EmuMath::Vector<7, float> vec_c_(rand(), rand(), rand(), rand(), rand(), rand(), rand());
-	EmuMath::Vector<4, std::uint64_t> vec_d_(rand(), rand(), rand(), rand());
-	std::cout << "C: " << vec_c_ << "\nD: " << vec_d_ << "\n";
-	std::cout << "Min(C, D): " << vec_c_.MinVector(vec_d_) << "\n";
-	std::cout << "Max(C, D): " << vec_c_.MaxVector(vec_d_) << "\n";
-	float rand_ = rand() * 0.99f;
-	std::cout << "MinMax<false, true, true, true, false, false, true>(C, D): " << vec_c_.MinMaxVector<0, 1, 1, 1, 0, 0, 1>(vec_d_) << "\n";
-	std::cout << "MinMax<false, true, true, true, false, false, true>(C, " << rand_ << "): " << vec_c_.MinMaxVector<0, 1, 1, 1, 0, 0, 1>(rand_) << "\n";
-
-	EmuMath::Vector<5, float> wee_(1.0f, 2.0f, 3.0f, 4.0f, 5.0f);
-	auto wee_ref_ = wee_.As<EmuMath::RefVector<3, float>>();
-	auto wee_const_ref_ = wee_.As<EmuMath::ConstRefVector<3, float>>();
-	std::cout << wee_ << " | " << wee_ref_ << " | " << wee_const_ref_ << "\n";
-	wee_ref_[0] = 1.0f;
-	wee_ref_[1] = 33.0f;
-	wee_ref_[2] = 7.0f;
-	std::cout << wee_ << " | " << wee_ref_ << " | " << wee_const_ref_ << "\n";
-
-	fast_a_.Set(1.0f, 2.0f, 3.0f, 4.0f);
-	std::cout << fast_a_ << "\n";
-	std::cout << fast_a_.Not() << "\n";
-	std::cout << fast_a_.Not().Not() << "\n";
-
-	EmuMath::FastVector4f test_a_(1.0f, 2.0f, 3.0f, 4.0f);
-	std::cout << test_a_ * EmuMath::Vector<12, float>(12.0f, 11.0f, 10.0f, 9.0f, 8.0f, 7.0f, 6.0f, 5.0f, 4.0f, 3.0f, 2.0f, 1.0f) << "\n";
+	EmuMath::Matrix4x4<float> mat_4x4_scalar_
+	(
+		1, 12, 13, 4,
+		4, 13, 12, 1,
+		6, 3, 2, 1,
+		1, 3, 5, 5
+	);
+	std::cout << mat_4x4_scalar_ << "\n";
+	float test_output_det_;
+	std::cout << "Inv (Laplace):\n" << mat_4x4_scalar_.InverseLaplace(test_output_det_) << "\nDeterminant: " << test_output_det_ << "\n";
+	std::cout << "Inv (Gauss Jordan):\n" << mat_4x4_scalar_.InverseGaussJordan(test_output_det_) << "\nDeterminant: " << test_output_det_ << "\n";
+	std::cout << "Inv (Gauss Jordan : long double):\n" << mat_4x4_scalar_.InverseGaussJordan<long double>(test_output_det_) << "\nDeterminant: " << test_output_det_ << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

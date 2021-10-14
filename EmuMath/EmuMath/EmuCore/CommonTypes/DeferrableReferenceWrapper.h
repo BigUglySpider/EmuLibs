@@ -2,6 +2,7 @@
 #define EMU_CORE_DEFERRABLE_REFERENCE_WRAPPER_H_INC_
 
 #include "../TMPHelpers/TypeComparators.h"
+#include "../TMPHelpers/TypeConvertors.h"
 #include <functional>
 
 namespace EmuCore
@@ -33,6 +34,20 @@ namespace EmuCore
 		{
 		}
 		constexpr DeferrableReferenceWrapper(T& val_) : ptr_(&val_)
+		{
+		}
+		constexpr DeferrableReferenceWrapper(this_type& to_copy_) : ptr_(to_copy_.ptr_)
+		{
+		}
+		template<typename OnlyIfConstRef = std::enable_if_t<std::is_const_v<value_type>>>
+		constexpr DeferrableReferenceWrapper(const this_type& to_copy_) : ptr_(to_copy_.ptr_)
+		{
+		}
+		constexpr DeferrableReferenceWrapper(std_wrapper& std_to_copy_) : ptr_(&(std_to_copy_.get()))
+		{
+		}
+		template<typename OnlyIfConstRef = std::enable_if_t<std::is_const_v<value_type>>>
+		constexpr DeferrableReferenceWrapper(const std_wrapper& std_to_copy_) : ptr_(&(std_to_copy_.get()))
 		{
 		}
 

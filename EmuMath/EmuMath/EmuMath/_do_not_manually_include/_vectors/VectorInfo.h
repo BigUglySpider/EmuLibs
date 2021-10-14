@@ -1,7 +1,7 @@
 #ifndef EMU_MATH_VECTOR_INFO_H_INC_
 #define EMU_MATH_VECTOR_INFO_H_INC_
 
-#include "../../EmuCore/TMPHelpers/TypeConvertors.h"
+#include "../../../EmuCore/TMPHelpers/TypeConvertors.h"
 
 
 namespace EmuMath::_underlying_components
