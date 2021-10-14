@@ -1,4 +1,5 @@
 #include "EmuMath/Noise.h"
+
 #include "EmuMath/Random.h"
 
 #include "Tests.hpp"
@@ -105,6 +106,23 @@ int main()
 
 	std::cout << rng_32.NextInt() << " | " << rng_32.NextInt<unsigned short>() << " | " << rng_32.NextInt<std::int64_t>(0, 100) << " | " << rng_32.NextReal() << " | " << rng_32.NextReal<long double>() << "\n";
 	std::cout << rng_64.NextInt() << " | " << rng_64.NextInt<unsigned short>() << " | " << rng_64.NextInt<std::int64_t>(0, 100) << " | " << rng_64.NextReal() << " | " << rng_64.NextReal<long double>() << "\n";
+
+	EmuMath::ShuffledIntSequence perms_(33, true);
+	std::cout << perms_ << "\n";
+	for (std::size_t i = 0; i < perms_.size() + 1; ++i)
+	{
+		std::cout << (perms_ << i) << "\n";
+	}
+	std::cout << "\n\n";
+	for (std::size_t i = 0; i < perms_.size() + 1; ++i)
+	{
+		std::cout << (perms_ >> i) << "\n";
+	}
+	perms_.TryShortenToPowerOf2(true);
+	std::cout << perms_ << " | " << perms_.size() << " | " << perms_.MaxValue() << "\n";
+	perms_.resize(33);
+	perms_.TryIncreaseToPowerOf2(true);
+	std::cout << perms_ << " | " << perms_.size() << " | " << perms_.MaxValue() << "\n";
 
 
 #pragma region TEST_HARNESS_EXECUTION
