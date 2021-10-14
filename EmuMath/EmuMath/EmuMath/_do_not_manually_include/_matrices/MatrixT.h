@@ -623,14 +623,16 @@ namespace EmuMath
 		///		Note that this operation does not check that the determinant is not 0. As matrices with a determinant of 0 have no inverse, it is recommended to 
 		///		use the outDeterminant argument to test if the output matrix is valid if there should there be a chance that the passed matrix's determinant will be 0.
 		/// </para>
-		/// <para> NOTE: Laplace Expansion grows exponentially more expensive as the size of a matrix increases. </para>
+		/// <para>
+		///		NOTE: Laplace Expansion grows exponentially more expensive as the size of a matrix increases. 
+		///		Its time complexity may be considered O(n!), where n is the size of this matrix in any one dimension.
+		/// </para>
 		/// </summary>
 		/// <typeparam name="out_contained_type">Type to be contained in the output inverse matrix.</typeparam>
-		/// <typeparam name="OutDeterminant_">Type to optionally output the matrix's determinant as.</typeparam>
-		/// <param name="matrix_">EmuMath matrix to find the inverse of.</param>
-		/// <param name="outDeterminant_">
-		///		Optional reference to output the passed matrix's determinant to. 
-		///		Useful to test if the determinant is 0 in cases where a non-invertible matrix may potentially be passed.
+		/// <typeparam name="OutDeterminant_">Type to optionally output this matrix's determinant as.</typeparam>
+		/// <param name="out_determinant_">
+		///		Optional reference to output this matrix's determinant to. 
+		///		Useful to test if the determinant is 0 in cases where this matrix is not invertible.
 		/// </param>
 		/// <returns>Inverted version of this matrix if it is invertible. Otherwise, a matrix containing the results of multiplying its adjugate by (1/0).</returns>
 		template<typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = is_column_major>
@@ -645,6 +647,37 @@ namespace EmuMath
 		) const
 		{
 			return EmuMath::Helpers::MatrixInverseLaplace<out_contained_type, OutColumnMajor_, this_type, OutDeterminant_>(*this, out_determinant_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the inverse to this matrix using Gauss-Jordan elimination. May optionally output the determinant as a customisable type. </para>
+		/// <para> Note that this operation does not check that the determinant is not 0. </para>
+		/// <para> NOTE: Gauss-Jordan's time complexity may be considered O(n*n*n), where n is the size of this matrix in any one dimension. </para>
+		/// <para> Especially recommended over laplace expansion when working with large matrices. </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type to be contained in the output inverse matrix.</typeparam>
+		/// <typeparam name="OutDeterminant_">Type to optionally output this matrix's determinant as.</typeparam>
+		/// <param name="out_determinant_">Optional reference to output this matrix's determinant to.</param>
+		/// <returns>Inverted version of this matrix if it is invertible. Otherwise, a matrix resulting from simultaneous Gauss-Jordan elimination with its values.</returns>
+		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major>
+		constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> InverseGaussJordan() const
+		{
+			return EmuMath::Helpers::MatrixInverseGaussJordan<out_contained_type, OutColumnMajor_, this_type>(*this);
+		}
+		template<bool OutColumnMajor_ = is_column_major>
+		constexpr inline EmuMath::Matrix<num_columns, num_rows, preferred_floating_point, OutColumnMajor_> InverseGaussJordan() const
+		{
+			return EmuMath::Helpers::MatrixInverseGaussJordan<preferred_floating_point, OutColumnMajor_, this_type>(*this);
+		}
+		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, typename OutDeterminant_>
+		constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> InverseGaussJordan(OutDeterminant_& out_determinant_) const
+		{
+			return EmuMath::Helpers::MatrixInverseGaussJordan<out_contained_type, OutColumnMajor_, this_type>(*this, out_determinant_);
+		}
+		template<bool OutColumnMajor_ = is_column_major, typename OutDeterminant_>
+		constexpr inline EmuMath::Matrix<num_columns, num_rows, preferred_floating_point, OutColumnMajor_> InverseGaussJordan(OutDeterminant_& out_determinant_) const
+		{
+			return EmuMath::Helpers::MatrixInverseGaussJordan<preferred_floating_point, OutColumnMajor_, this_type>(*this, out_determinant_);
 		}
 #pragma endregion
 

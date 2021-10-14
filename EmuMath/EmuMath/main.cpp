@@ -285,7 +285,7 @@ int main()
 	).DeterminantLaplace();
 	EmuMath::FastMatrix4x4f_CM bad_det_test_ = EmuMath::FastMatrix4x4f_CM
 	(
-		1, 2, 3533, 4,
+		1, 2, 353, 4,
 		5, 611, 7, 8,
 		9, 10, 121, 12,
 		13, 14, 115, 16
@@ -320,6 +320,19 @@ int main()
 	std::cout << bad_det_test_.Inverse().Inverse().Inverse().Inverse().Inverse() << "\n\n";
 	std::cout << bad_det_test_.Inverse().Inverse().Inverse().Inverse().Inverse().Inverse().Inverse() << "\n\n";
 	std::cout << bad_det_test_.Inverse().Inverse().Inverse().Inverse().Inverse().Inverse().Inverse().Inverse().Inverse() << "\n\n";
+
+	EmuMath::Matrix4x4<float> mat_4x4_scalar_
+	(
+		1, 12, 13, 4,
+		4, 13, 12, 1,
+		6, 3, 2, 1,
+		1, 3, 5, 5
+	);
+	std::cout << mat_4x4_scalar_ << "\n";
+	float test_output_det_;
+	std::cout << "Inv (Laplace):\n" << mat_4x4_scalar_.InverseLaplace(test_output_det_) << "\nDeterminant: " << test_output_det_ << "\n";
+	std::cout << "Inv (Gauss Jordan):\n" << mat_4x4_scalar_.InverseGaussJordan(test_output_det_) << "\nDeterminant: " << test_output_det_ << "\n";
+	std::cout << "Inv (Gauss Jordan : long double):\n" << mat_4x4_scalar_.InverseGaussJordan<long double>(test_output_det_) << "\nDeterminant: " << test_output_det_ << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

@@ -10,6 +10,24 @@
 
 namespace EmuMath::Helpers::_underlying_matrix_funcs
 {
+	template<std::size_t Index_, typename Out_, class RowEchelonMatrix_, class Multiplier_>
+	constexpr inline void _calculate_determinant_from_row_echelon(Out_& out_, const RowEchelonMatrix_& row_echelon_, Multiplier_& mult_)
+	{
+		if constexpr (Index_ < RowEchelonMatrix_::num_rows)
+		{
+			out_ = mult_(out_, _get_matrix_data<Index_, Index_>(row_echelon_));
+			_calculate_determinant_from_row_echelon<Index_ + 1, Out_, RowEchelonMatrix_, Multiplier_>(out_, row_echelon_, mult_);
+		}
+	}
+	template<typename Out_, class RowEchelonMatrix_, class Multiplier_>
+	constexpr inline Out_ _calculate_determinant_from_row_echelon(const RowEchelonMatrix_& row_echelon_, Multiplier_& mult_)
+	{
+		// The determinant of a matrix may be calculated from the product of its main diagonal when covnerted to row-echelon form
+		Out_ out_ = Out_(1);
+		_calculate_determinant_from_row_echelon<0, Out_, RowEchelonMatrix_, Multiplier_>(out_, row_echelon_, mult_);
+		return out_;
+	}
+
 	template<class Matrix_>
 	[[nodiscard]] constexpr inline Matrix_ _make_identity_matrix()
 	{
@@ -136,22 +154,24 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 		else if constexpr (ColumnIndex_ < Matrix_::num_columns)
 		{
-			using mat_val = typename Matrix_::value_type;
-			using sub_mat_type = EmuMath::TMP::emu_matrix_submatrix_excluding_element_region_t<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>;
-			mat_val sub_det_ = mat_val();
-			sub_mat_type sub_mat_ = _get_submatrix_excluding_element_region<ColumnIndex_, 0, sub_mat_type, const Matrix_>(matrix_);
-			_calculate_matrix_determinant_laplace<0, mat_val, sub_mat_type, Adder_, Subtractor_, Multiplier_>(sub_mat_, sub_det_, add_, sub_, mult_);
-			sub_det_ = mult_(sub_det_, _get_matrix_data<ColumnIndex_, 0>(matrix_));
+			{
+				using mat_val = typename Matrix_::value_type;
+				using sub_mat_type = EmuMath::TMP::emu_matrix_submatrix_excluding_element_region_t<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>;
+				mat_val sub_det_ = mat_val();
+				sub_mat_type sub_mat_ = _get_submatrix_excluding_element_region<ColumnIndex_, 0, sub_mat_type, const Matrix_>(matrix_);
+				_calculate_matrix_determinant_laplace<0, mat_val, sub_mat_type, Adder_, Subtractor_, Multiplier_>(sub_mat_, sub_det_, add_, sub_, mult_);
+				sub_det_ = mult_(sub_det_, _get_matrix_data<ColumnIndex_, 0>(matrix_));
 
-			if constexpr ((ColumnIndex_ % 2) == 0)
-			{
-				// EVEN: Add to existing out_.
-				out_ = static_cast<Out_>(add_(out_, sub_det_));
-			}
-			else
-			{
-				// ODD: Subtract from existing out_.
-				out_ = static_cast<Out_>(sub_(out_, sub_det_));
+				if constexpr ((ColumnIndex_ % 2) == 0)
+				{
+					// EVEN: Add to existing out_.
+					out_ = static_cast<Out_>(add_(out_, sub_det_));
+				}
+				else
+				{
+					// ODD: Subtract from existing out_.
+					out_ = static_cast<Out_>(sub_(out_, sub_det_));
+				}
 			}
 			_calculate_matrix_determinant_laplace<ColumnIndex_ + 1, Out_, Matrix_, Adder_, Subtractor_, Multiplier_>(matrix_, out_, add_, sub_, mult_);
 		}
@@ -179,14 +199,16 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		{
 			if constexpr (RowIndex_ < OutMatrix_::num_rows)
 			{
-				using out_value = typename OutMatrix_::value_type;
-				using sub_mat = typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>::type;
-				const out_value val_ = _calculate_matrix_determinant_laplace
+				{
+					using out_value = typename OutMatrix_::value_type;
+					using sub_mat = typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>::type;
+					const out_value val_ = _calculate_matrix_determinant_laplace
 					<
-					out_value,
-					sub_mat
+						out_value,
+						sub_mat
 					>(_get_submatrix_excluding_element_region<ColumnIndex_, RowIndex_, sub_mat, const Matrix_>(matrix_));
-				_get_matrix_data<ColumnIndex_, RowIndex_>(out_) = val_;
+					_get_matrix_data<ColumnIndex_, RowIndex_>(out_) = val_;
+				}
 				_calculate_matrix_of_minors_laplace<ColumnIndex_, RowIndex_ + 1, OutMatrix_, Matrix_>(matrix_, out_);
 			}
 			else
@@ -320,6 +342,160 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		using reciprocal_type = EmuCore::TMPHelpers::first_floating_point_t<OutDeterminant_, float>;
 		reciprocal_type det_reciprocal_ = reciprocal_type(1) / static_cast<reciprocal_type>(outDeterminant_);
 		return _matrix_multi_arg_operation<EmuCore::do_multiply, OutMatrix_, OutMatrix_, reciprocal_type>(adjugate_, det_reciprocal_);
+	}
+
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, std::size_t PivotIndex_, class OutMatrix_, class InMatrix_, class Adder_, class Multiplier_, typename RowMult_>
+	constexpr inline void _calculate_matrix_inverse_gj_eliminate_row
+	(
+		OutMatrix_& out_,
+		InMatrix_& in_calc_,
+		Adder_& add_,
+		Multiplier_& mult_,
+		RowMult_ row_multiplier_
+	)
+	{
+		if constexpr (ColumnIndex_ < OutMatrix_::num_columns)
+		{
+			auto& in_element_ = _get_matrix_data<ColumnIndex_, RowIndex_>(in_calc_);
+			in_element_ = add_(in_element_, mult_(row_multiplier_, _get_matrix_data<ColumnIndex_, PivotIndex_>(in_calc_)));
+
+			auto& out_element_ = _get_matrix_data<ColumnIndex_, RowIndex_>(out_);
+			out_element_ = add_(out_element_, mult_(row_multiplier_, _get_matrix_data<ColumnIndex_, PivotIndex_>(out_)));
+
+			_calculate_matrix_inverse_gj_eliminate_row
+			<
+				ColumnIndex_ + 1,
+				RowIndex_,
+				PivotIndex_,
+				OutMatrix_,
+				InMatrix_,
+				Adder_,
+				Multiplier_,
+				RowMult_
+			>(out_, in_calc_, add_, mult_, row_multiplier_);
+		}
+	}
+	template<std::size_t RowIndex_, std::size_t PivotIndex_, class OutMatrix_, class InMatrix_, class Adder_, class Multiplier_, class Divider_, typename PivotNeg_>
+	constexpr inline void _calculate_matrix_inverse_gj_with_pivot
+	(
+		OutMatrix_& out_,
+		InMatrix_& in_calc_,
+		Adder_& add_,
+		Multiplier_& mult_,
+		Divider_& div_,
+		PivotNeg_ pivot_neg_
+	)
+	{
+		if constexpr (RowIndex_ < OutMatrix_::num_rows)
+		{
+			if constexpr (RowIndex_ != PivotIndex_)
+			{
+				typename OutMatrix_::value_type multiplier_ = div_(_get_matrix_data<PivotIndex_, RowIndex_>(in_calc_), pivot_neg_);
+				_calculate_matrix_inverse_gj_eliminate_row
+				<
+					0,
+					RowIndex_,
+					PivotIndex_,
+					OutMatrix_,
+					InMatrix_,
+					Adder_,
+					Multiplier_,
+					decltype(multiplier_)
+				>(out_, in_calc_, add_, mult_, multiplier_);
+			}
+			_calculate_matrix_inverse_gj_with_pivot
+			<
+				RowIndex_ + 1,
+				PivotIndex_,
+				OutMatrix_,
+				InMatrix_,
+				Adder_,
+				Multiplier_,
+				Divider_,
+				PivotNeg_
+			>(out_, in_calc_, add_, mult_, div_, pivot_neg_);
+		}
+	}
+	template<std::size_t PivotIndex_, class OutMatrix_, class InMatrix_, class Adder_, class Multiplier_, class Divider_, class Negator_>
+	constexpr inline void _calculate_matrix_inverse_gj(OutMatrix_& out_, InMatrix_& in_calc_, Adder_& add_, Multiplier_& mult_, Divider_& div_, Negator_& negate_)
+	{
+		if constexpr (PivotIndex_ < OutMatrix_::num_rows)
+		{
+			typename OutMatrix_::value_type pivot_neg_ = negate_(_get_matrix_data<PivotIndex_, PivotIndex_>(in_calc_));
+			_calculate_matrix_inverse_gj_with_pivot
+			<
+				0,
+				PivotIndex_,
+				OutMatrix_,
+				InMatrix_,
+				Adder_,
+				Multiplier_,
+				Divider_,
+				decltype(pivot_neg_)
+			>(out_, in_calc_, add_, mult_, div_, pivot_neg_);
+			_calculate_matrix_inverse_gj<PivotIndex_ + 1, OutMatrix_, InMatrix_, Adder_, Multiplier_, Divider_, Negator_>(out_, in_calc_, add_, mult_, div_, negate_);
+		}
+	}
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class OutMatrix_, class Multiplier_, typename PivotReciprocal_>
+	constexpr inline void _calculate_matrix_inverse_gj_make_row_pivot_1(OutMatrix_& out_, Multiplier_& mult_, PivotReciprocal_ pivot_reciprocal_)
+	{
+		if constexpr (ColumnIndex_ < OutMatrix_::num_columns)
+		{
+			auto& out_element_ = _get_matrix_data<ColumnIndex_, RowIndex_>(out_);
+			out_element_ = mult_(out_element_, pivot_reciprocal_);
+			_calculate_matrix_inverse_gj_make_row_pivot_1<ColumnIndex_ + 1, RowIndex_, OutMatrix_, Multiplier_, PivotReciprocal_>(out_, mult_, pivot_reciprocal_);
+		}
+	}
+	template<std::size_t PivotIndex_, class OutMatrix_, class InMatrix_, class Multiplier_, class Divider_>
+	constexpr inline void _calculate_matrix_inverse_gj_make_pivots_1(OutMatrix_& out_, const InMatrix_& in_calc_, Multiplier_& mult_, Divider_& div_)
+	{
+		if constexpr (PivotIndex_ < OutMatrix_::num_rows)
+		{
+			typename OutMatrix_::value_type pivot_reciprocal_ = div_(typename OutMatrix_::value_type(1), _get_matrix_data<PivotIndex_, PivotIndex_>(in_calc_));
+			_calculate_matrix_inverse_gj_make_row_pivot_1<0, PivotIndex_, OutMatrix_, Multiplier_, decltype(pivot_reciprocal_)>(out_, mult_, pivot_reciprocal_);
+			_calculate_matrix_inverse_gj_make_pivots_1<PivotIndex_ + 1, OutMatrix_, InMatrix_, Multiplier_, Divider_>(out_, in_calc_, mult_, div_);
+		}
+	}
+	template<class OutMatrix_, class InMatrix_, typename CalcType_>
+	[[nodiscard]] constexpr inline OutMatrix_ _calculate_matrix_inverse_gj(const InMatrix_& in_)
+	{
+		using Adder_ = EmuCore::do_add<CalcType_, CalcType_>;
+		using Multiplier_ = EmuCore::do_multiply<CalcType_, CalcType_>;
+		using Divider_ = EmuCore::do_divide<CalcType_, CalcType_>;
+		using Negator_ = EmuCore::do_negate<CalcType_>;
+
+		EmuMath::Matrix<InMatrix_::num_columns, InMatrix_::num_rows, CalcType_, InMatrix_::is_column_major> in_calc_(in_);
+		EmuMath::Matrix<OutMatrix_::num_columns, OutMatrix_::num_rows, CalcType_, OutMatrix_::is_column_major> out_ = _make_identity_matrix<decltype(out_)>();
+		Adder_ add_ = Adder_();
+		Multiplier_ mult_ = Multiplier_();
+		Divider_ div_ = Divider_();
+		Negator_ negate_ = Negator_();
+
+		_calculate_matrix_inverse_gj<0, decltype(out_), decltype(in_calc_), Adder_, Multiplier_, Divider_, Negator_>(out_, in_calc_, add_, mult_, div_, negate_);
+		_calculate_matrix_inverse_gj_make_pivots_1<0, decltype(out_), decltype(in_calc_), Multiplier_, Divider_>(out_, in_calc_, mult_, div_);
+
+		return out_;
+	}
+	template<class OutMatrix_, class InMatrix_, typename CalcType_, typename OutDeterminant_>
+	[[nodiscard]] constexpr inline OutMatrix_ _calculate_matrix_inverse_gj(const InMatrix_& in_, OutDeterminant_& out_determinant_)
+	{
+		using Adder_ = EmuCore::do_add<CalcType_, CalcType_>;
+		using Multiplier_ = EmuCore::do_multiply<CalcType_, CalcType_>;
+		using Divider_ = EmuCore::do_divide<CalcType_, CalcType_>;
+		using Negator_ = EmuCore::do_negate<CalcType_>;
+
+		EmuMath::Matrix<InMatrix_::num_columns, InMatrix_::num_rows, CalcType_, InMatrix_::is_column_major> in_calc_(in_);
+		EmuMath::Matrix<OutMatrix_::num_columns, OutMatrix_::num_rows, CalcType_, OutMatrix_::is_column_major> out_ = _make_identity_matrix<decltype(out_)>();
+		Adder_ add_ = Adder_();
+		Multiplier_ mult_ = Multiplier_();
+		Divider_ div_ = Divider_();
+		Negator_ negate_ = Negator_();
+
+		_calculate_matrix_inverse_gj<0, decltype(out_), decltype(in_calc_), Adder_, Multiplier_, Divider_, Negator_>(out_, in_calc_, add_, mult_, div_, negate_);
+		_calculate_matrix_inverse_gj_make_pivots_1<0, decltype(out_), decltype(in_calc_), Multiplier_, Divider_>(out_, in_calc_, mult_, div_);
+		out_determinant_ = static_cast<OutDeterminant_>(_calculate_determinant_from_row_echelon<CalcType_, decltype(in_calc_), Multiplier_>(in_calc_, mult_));
+
+		return out_;
 	}
 }
 
