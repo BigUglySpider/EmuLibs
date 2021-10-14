@@ -8,6 +8,7 @@
 
 namespace EmuMath
 {
+	/// <summary> Wrapper for easy use of the std::mt19937 engine. If Is64Bit_ is true, the 64-bit counterpart of said engine will be used. </summary>
 	template<bool Is64Bit_ = false>
 	class RngWrapper
 	{
@@ -23,9 +24,9 @@ namespace EmuMath
 		using unsigned_int_type = typename std::make_unsigned<int_type>::type;
 
 		/// <summary> Default minimum value to use in construction when a custom range is not provided. </summary>
-		static constexpr float default_min = std::numeric_limits<float>::lowest();
+		static constexpr double default_min = std::numeric_limits<double>::lowest();
 		/// <summary> Default maximum value to use in construction when a custom range is not provided. </summary>
-		static constexpr float default_max = std::numeric_limits<float>::max();
+		static constexpr double default_max = std::numeric_limits<double>::max();
 		/// <summary> The lowest value that may be stored for an int of the bit-size that this wrapper's underlying engine makes use of. </summary>
 		static constexpr int_type lowest_possible_int = std::numeric_limits<int_type>::lowest();
 		/// <summary> The highest value that may be stored for an int of the bit-size that this wrapper's underlying engine makes use of. </summary>
@@ -41,7 +42,7 @@ namespace EmuMath
 		/// <summary> Creates an integer of this wrapper's int_type from the provided float, clamped within its minimum and maximum range. </summary>
 		/// <param name="in_float_">Float to form the output integer from.</param>
 		/// <returns>Provided float cast to an integer, and clamped within the range of valid values for this wrapper's int_type.</returns>
-		static inline int_type IntFromFloat(const float in_float_)
+		static inline int_type IntFromFloat(const double in_float_)
 		{
 			if (in_float_ <= lowest_possible_int)
 			{
@@ -110,14 +111,14 @@ namespace EmuMath
 		/// <summary> Creates a wrapper with a custom min-max range and the default seed. See RngWrapper::default_seed. </summary>
 		/// <param name="min_">Minimum value for this wrapper to output.</param>
 		/// <param name="max_">Maximum value for this wrapper to output.</param>
-		RngWrapper(const float min_, const float max_) : RngWrapper(min_, max_, default_seed())
+		RngWrapper(const double min_, const double max_) : RngWrapper(min_, max_, default_seed())
 		{
 		}
 		/// <summary> Creates a fully custom wrapper, making use of no defaults. </summary>
 		/// <param name="min_">Minimum value for this wrapper to output.</param>
 		/// <param name="max_">Maximum value for this wrapper to output.</param>
 		/// <param name="seed_">Seed to initialise this wrapper's underlying engine with.</param>
-		RngWrapper(const float min_, const float max_, unsigned_int_type seed_) : rng(seed_)
+		RngWrapper(const double min_, const double max_, unsigned_int_type seed_) : rng(seed_)
 		{
 			SetMinMax(min_, max_);
 		}
@@ -136,7 +137,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="min_">Value to set the minimum output from this wrapper to.</param>
 		/// <param name="max_">Value to set the maximum output from this wrapper to.</param>
-		inline void SetMinMax(float min_, float max_)
+		inline void SetMinMax(double min_, double max_)
 		{
 			if (min_ <= max_)
 			{
@@ -153,13 +154,13 @@ namespace EmuMath
 
 		/// <summary> Provides a copy of the minimum value this wrapper may output. </summary>
 		/// <returns>The minimum value that this wrapper may output.</returns>
-		inline float GetMin() const
+		inline double GetMin() const
 		{
 			return min_float;
 		}
 		/// <summary> Provides a copy of the maximum value this wrapper may output. </summary>
 		/// <returns>The maximum value that this wrapper may output.</returns>
-		inline float GetMax() const
+		inline double GetMax() const
 		{
 			return max_float;
 		}
@@ -232,8 +233,8 @@ namespace EmuMath
 
 	private:
 		underlying_engine rng;
-		float min_float;
-		float max_float;
+		double min_float;
+		double max_float;
 		int_type min_int;
 		int_type max_int;
 

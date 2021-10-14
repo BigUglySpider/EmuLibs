@@ -101,10 +101,10 @@ int main()
 
 	EmuMath::NoiseTable<float> noise;
 	EmuMath::RngWrapper<true> rng_64(2, 5);
-	EmuMath::RngWrapper<false> rng_32(5, 2);
+	EmuMath::RngWrapper<false> rng_32(2, 5);
 
-	std::cout << rng_32.NextInt() << " | " << rng_32.NextInt<unsigned short>() << " | " << rng_32.NextInt<std::int64_t>() << " | " << rng_32.NextReal() << " | " << rng_32.NextReal<long double>() << "\n";
-	std::cout << rng_64.NextInt() << " | " << rng_64.NextInt<unsigned short>() << " | " << rng_64.NextInt<std::int64_t>() << " | " << rng_64.NextReal() << " | " << rng_64.NextReal<long double>() << "\n";
+	std::cout << rng_32.NextInt() << " | " << rng_32.NextInt<unsigned short>() << " | " << rng_32.NextInt<std::int64_t>(0, 100) << " | " << rng_32.NextReal() << " | " << rng_32.NextReal<long double>() << "\n";
+	std::cout << rng_64.NextInt() << " | " << rng_64.NextInt<unsigned short>() << " | " << rng_64.NextInt<std::int64_t>(0, 100) << " | " << rng_64.NextReal() << " | " << rng_64.NextReal<long double>() << "\n";
 
 
 #pragma region TEST_HARNESS_EXECUTION
