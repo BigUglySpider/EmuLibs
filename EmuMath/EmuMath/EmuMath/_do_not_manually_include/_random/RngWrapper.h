@@ -13,38 +13,53 @@ namespace EmuMath
 	{
 	public:
 #pragma region STATIC_INFO
-		using int_type = typename std::conditional<Is64Bit_, std::int64_t, std::int32_t>::type;
-		using unsigned_int_type = typename std::make_unsigned<int_type>::type;
+		/// <summary> Boolean indicating if this wrapper is for a 32-bit or 64-bit engine. Equal to this type's boolean template argument. </summary>
 		static constexpr bool is_64_bit = Is64Bit_;
+		/// <summary> The engine that this item acts as a wrapper for. </summary>
+		using underlying_engine = typename std::conditional<is_64_bit, std::mt19937_64, std::mt19937>::type;
+		/// <summary> Correct bit-size integer for this wrapper's underlying engine. </summary>
+		using int_type = typename std::conditional<is_64_bit, std::int64_t, std::int32_t>::type;
+		/// <summary> Matching bit-size unsigned type of the integer for this wrapper's underlying engine. Used primarily for seeding. </summary>
+		using unsigned_int_type = typename std::make_unsigned<int_type>::type;
 
 		/// <summary> Default minimum value to use in construction when a custom range is not provided. </summary>
-		static constexpr float _default_min = std::numeric_limits<float>::lowest();
+		static constexpr float default_min = std::numeric_limits<float>::lowest();
 		/// <summary> Default maximum value to use in construction when a custom range is not provided. </summary>
-		static constexpr float _default_max = std::numeric_limits<float>::max();
-		static constexpr int_type _lowest_possible_int = std::numeric_limits<int_type>::lowest();
-		static constexpr int_type _highest_possible_int = std::numeric_limits<int_type>::max();
+		static constexpr float default_max = std::numeric_limits<float>::max();
+		/// <summary> The lowest value that may be stored for an int of the bit-size that this wrapper's underlying engine makes use of. </summary>
+		static constexpr int_type lowest_possible_int = std::numeric_limits<int_type>::lowest();
+		/// <summary> The highest value that may be stored for an int of the bit-size that this wrapper's underlying engine makes use of. </summary>
+		static constexpr int_type highest_possible_int = std::numeric_limits<int_type>::max();
 
 		/// <summary> Default seed used when one is not provided. Equates to a cast of time(0) to this wrapper's unsigned_int_type at the time of calling. </summary>
 		/// <returns>Default seed to be used by constructors where a seed is not provided.</returns>
-		static inline unsigned_int_type _default_seed()
+		static inline unsigned_int_type default_seed()
 		{
 			return static_cast<unsigned_int_type>(time(0));
 		}
+
+		/// <summary> Creates an integer of this wrapper's int_type from the provided float, clamped within its minimum and maximum range. </summary>
+		/// <param name="in_float_">Float to form the output integer from.</param>
+		/// <returns>Provided float cast to an integer, and clamped within the range of valid values for this wrapper's int_type.</returns>
 		static inline int_type IntFromFloat(const float in_float_)
 		{
-			if (in_float_ <= _lowest_possible_int)
+			if (in_float_ <= lowest_possible_int)
 			{
-				return _lowest_possible_int;
+				return lowest_possible_int;
 			}
-			else if (in_float_ >= _highest_possible_int)
+			else if (in_float_ >= highest_possible_int)
 			{
-				return _highest_possible_int;
+				return highest_possible_int;
 			}
 			else
 			{
 				return static_cast<int_type>(in_float_);
 			}
 		}
+		/// <summary> Creates a value from this wrapper's int_type, performing safely clamped conversions to the provided Out_ type. </summary>
+		/// <typeparam name="Out_">Type to convert the passed in_int_ to.</typeparam>
+		/// <param name="in_int_">Value to convert to the provided Out_ type.</param>
+		/// <returns>Provided in_int_ safely converted to a clamped range of the provided Out_ type.</returns>
 		template<typename Out_>
 		static inline Out_ ValueFromInt(const int_type in_int_)
 		{
@@ -55,6 +70,10 @@ namespace EmuMath
 			else if constexpr (std::is_integral_v<Out_> && std::is_unsigned_v<Out_> && sizeof(Out_) >= sizeof(int_type))
 			{
 				return (in_int_ <= 0) ? 0 : static_cast<Out_>(in_int_);
+			}
+			else if constexpr (std::is_floating_point_v<Out_>)
+			{
+				return static_cast<Out_>(in_int_);
 			}
 			else
 			{
@@ -80,18 +99,18 @@ namespace EmuMath
 #pragma endregion
 
 		/// <summary> Creates a wrapper with all default arguments. See all static RngWrapper items prefixed with _default_. </summary>
-		RngWrapper() : RngWrapper(_default_seed())
+		RngWrapper() : RngWrapper(default_seed())
 		{
 		}
-		/// <summary> Creates a wrapper with a custom seed and the default min-max range. See RngWrapper::_default_min and RngWrapper::_default_max. </summary>
+		/// <summary> Creates a wrapper with a custom seed and the default min-max range. See RngWrapper::default_min and RngWrapper::default_max. </summary>
 		/// <param name="seed_">Seed to initialise this wrapper's underlying engine with.</param>
-		RngWrapper(unsigned_int_type seed_) : RngWrapper(_default_min, _default_max, seed_)
+		RngWrapper(unsigned_int_type seed_) : RngWrapper(default_min, default_max, seed_)
 		{
 		}
-		/// <summary> Creates a wrapper with a custom min-max range and the default seed. See RngWrapper::_default_seed. </summary>
+		/// <summary> Creates a wrapper with a custom min-max range and the default seed. See RngWrapper::default_seed. </summary>
 		/// <param name="min_">Minimum value for this wrapper to output.</param>
 		/// <param name="max_">Maximum value for this wrapper to output.</param>
-		RngWrapper(const float min_, const float max_) : RngWrapper(min_, max_, _default_seed())
+		RngWrapper(const float min_, const float max_) : RngWrapper(min_, max_, default_seed())
 		{
 		}
 		/// <summary> Creates a fully custom wrapper, making use of no defaults. </summary>
@@ -101,6 +120,13 @@ namespace EmuMath
 		RngWrapper(const float min_, const float max_, unsigned_int_type seed_) : rng(seed_)
 		{
 			SetMinMax(min_, max_);
+		}
+
+		/// <summary> Provides a copy of this wrapper's underlying engine. Note that the wrapper's engine itself may not be directly accessed. </summary>
+		/// <returns>Copy of this wrapper's underlying engine.</returns>
+		inline underlying_engine CopyEngine() const
+		{
+			return underlying_engine(rng);
 		}
 
 		/// <summary>
@@ -114,13 +140,13 @@ namespace EmuMath
 		{
 			if (min_ <= max_)
 			{
-				minf = min_;
-				maxf = max_;
+				min_float = min_;
+				max_float = max_;
 			}
 			else
 			{
-				minf = max_;
-				maxf = min_;
+				min_float = max_;
+				max_float = min_;
 			}
 			_set_min_max_ints_from_floats();
 		}
@@ -129,13 +155,13 @@ namespace EmuMath
 		/// <returns>The minimum value that this wrapper may output.</returns>
 		inline float GetMin() const
 		{
-			return minf;
+			return min_float;
 		}
 		/// <summary> Provides a copy of the maximum value this wrapper may output. </summary>
 		/// <returns>The maximum value that this wrapper may output.</returns>
 		inline float GetMax() const
 		{
-			return maxf;
+			return max_float;
 		}
 		/// <summary> Provides a copy of the clamped minimum integral value this wrapper may output. </summary>
 		/// <returns>The clamped minimum integral value that this wrapper may output.</returns>
@@ -189,7 +215,7 @@ namespace EmuMath
 		template<typename OutFP_ = double, typename RequiresFloatingPointOutput_ = std::enable_if_t<std::is_floating_point_v<OutFP_>>>
 		inline OutFP_ NextReal()
 		{
-			std::uniform_real_distribution<OutFP_> dist_(static_cast<OutFP_>(minf), static_cast<OutFP_>(maxf));
+			std::uniform_real_distribution<OutFP_> dist_(static_cast<OutFP_>(min_float), static_cast<OutFP_>(max_float));
 			return dist_(rng);
 		}
 		/// <summary>
@@ -205,17 +231,16 @@ namespace EmuMath
 		}
 
 	private:
-		using rng_type = typename std::conditional<Is64Bit_, std::mt19937_64, std::mt19937>::type;
-		rng_type rng;
-		float minf;
-		float maxf;
+		underlying_engine rng;
+		float min_float;
+		float max_float;
 		int_type min_int;
 		int_type max_int;
 
 		inline void _set_min_max_ints_from_floats()
 		{
-			min_int = IntFromFloat(minf);
-			max_int = IntFromFloat(maxf);
+			min_int = IntFromFloat(min_float);
+			max_int = IntFromFloat(max_float);
 		}
 	};
 }
