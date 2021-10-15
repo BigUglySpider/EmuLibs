@@ -58,7 +58,7 @@ namespace EmuMath::Functors
 			std::int32_t i0 = static_cast<std::int32_t>(floorf(point_));
 			float t_ = EmuMath::Functors::_underlying_noise_gen::SmoothT(point_ - i0);
 			i0 &= mask_;
-			std::int32_t i1 = i0 + 1;
+			std::int32_t i1 = (i0 + 1) & mask_;
 
 			float perm_0_ = static_cast<float>(permutations_[i0]);
 			float perm_1_ = static_cast<float>(permutations_[i1]);
@@ -92,7 +92,7 @@ namespace EmuMath::Functors
 			float t0_ = point_ - static_cast<float>(i0);
 			float t1_ = t0_ - 1.0f;
 			i0 &= mask_;
-			std::int32_t i1 = i0 + 1;
+			std::int32_t i1 = (i0 + 1) & mask_;
 
 			float gradient_0_ = _gradients[permutations_[i0] & _gradient_mask];
 			float gradient_1_ = _gradients[permutations_[i1] & _gradient_mask];

@@ -49,6 +49,13 @@ namespace EmuCore::ArithmeticHelpers
 		UintT_ highest_bit_ = highest_set_uint_bit<UintT_>(val_);
 		return highest_bit_ == 0 ? UintT_(1) : (highest_bit_ << 1);
 	}
+
+	template<typename UintT_>
+	constexpr inline UintT_ previous_unsigned_power_of_2(UintT_ val_)
+	{
+		UintT_ highest_bit_ = highest_set_uint_bit<UintT_>(val_);
+		return (highest_bit_ <= 1) ? UintT_(1) : (highest_bit_ >> 1);
+	}
 }
 
 #endif

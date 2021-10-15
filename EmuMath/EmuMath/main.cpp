@@ -100,49 +100,75 @@ int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
 
-	EmuMath::NoiseTable<float> noise;
-	EmuMath::RngWrapper<true> rng_64(2, 5);
-	EmuMath::RngWrapper<false> rng_32(2, 5);
-
-	std::cout << rng_32.NextInt() << " | " << rng_32.NextInt<unsigned short>() << " | " << rng_32.NextInt<std::int64_t>(0, 100) << " | " << rng_32.NextReal() << " | " << rng_32.NextReal<long double>() << "\n";
-	std::cout << rng_64.NextInt() << " | " << rng_64.NextInt<unsigned short>() << " | " << rng_64.NextInt<std::int64_t>(0, 100) << " | " << rng_64.NextReal() << " | " << rng_64.NextReal<long double>() << "\n";
-
-	EmuMath::ShuffledIntSequence perms_(33, true);
-	std::cout << perms_ << "\n";
-	for (std::size_t i = 0; i < perms_.size() + 1; ++i)
-	{
-		std::cout << (perms_ << i) << "\n";
-	}
-	std::cout << "\n\n";
-	for (std::size_t i = 0; i < perms_.size() + 1; ++i)
-	{
-		std::cout << (perms_ >> i) << "\n";
-	}
-	perms_.TryShortenToPowerOf2(true);
-	std::cout << perms_ << " | " << perms_.size() << " | " << perms_.MaxValue() << "\n";
-	perms_.resize(33);
-	perms_.TryIncreaseToPowerOf2(true);
-	std::cout << perms_ << " | " << perms_.size() << " | " << perms_.MaxValue() << "\n";
-
-	std::cout << EmuMath::Functors::make_noise_1d<EmuMath::NoiseType::PERLIN>()(23.175f, 0.675f, EmuMath::ShuffledIntSequence<std::int32_t>(128, 2u)) << "\n";
-	std::cout << EmuMath::Functors::make_noise_1d<EmuMath::NoiseType::PERLIN>()(23.575f, 0.675f, EmuMath::ShuffledIntSequence<std::int32_t>(128, 2u)) << "\n";
-
-	constexpr EmuMath::Vector<3, float> white_(1.0f, 1.0f, 1.0f);
-	constexpr EmuMath::Vector<3, float> start_(0.0f, 0.0f, 0.0f);
-	constexpr EmuMath::Vector<3, float> end_(1.0f, 1.0f, 1.0f);
-	constexpr EmuMath::Vector<3, std::size_t> resolution_(1024, 1024, 4);
-	constexpr EmuMath::Vector<3, float> step_ = (end_ - start_) / resolution_;
-	constexpr float freq_ = 32.0f;
 	constexpr std::size_t num_permutations_ = 1024;
 	constexpr EmuMath::NoiseType noise_type_ = EmuMath::NoiseType::PERLIN;
+	using sample_processor = EmuMath::Functors::noise_sample_processor_perlin3d_normalise;
+	constexpr float freq_ = 32.0f;
+	constexpr EmuMath::Vector<3, float> start_(0.0f, 0.0f, 0.0f);
+	constexpr EmuMath::Vector<3, float> end_(1.0f, 1.0f, 1.0f);
+	constexpr EmuMath::Vector<3, float> custom_step(0.001f, 0.001f, 0.001f);
+	constexpr EmuMath::Vector<3, std::size_t> resolution_(32, 32, 32);
+
+	constexpr std::size_t table_size = 3;
+	EmuMath::NoiseTable<table_size> noise_table;
+
+	constexpr EmuMath::NoiseTableOptions<table_size> options_no_step = EmuMath::NoiseTableOptions<3>
+	(
+		resolution_,
+		start_,
+		end_,
+		freq_,
+		false,
+		EmuMath::Info::NoisePermutationInfo
+		(
+			num_permutations_,
+			EmuMath::Info::NoisePermutationInfo::ShuffleMode::SEED_64,
+			EmuMath::Info::NoisePermutationInfo::_default_bool_input,
+			1337,
+			1337
+		)
+	);
+	constexpr EmuMath::NoiseTableOptions<table_size> options_with_step = EmuMath::NoiseTableOptions<3>
+	(
+		resolution_,
+		start_,
+		custom_step,
+		freq_,
+		true,
+		EmuMath::Info::NoisePermutationInfo
+		(
+			num_permutations_,
+			EmuMath::Info::NoisePermutationInfo::ShuffleMode::SEED_64,
+			EmuMath::Info::NoisePermutationInfo::_default_bool_input,
+			1337,
+			1337
+		)
+	);
+
+	constexpr auto auto_step = options_no_step.MakeStep();
+	constexpr auto custom_step_from_options = options_with_step.MakeStep();
+	
+	std::cout << "Generating table...\n";
+	if (noise_table.GenerateNoise<noise_type_, sample_processor>(options_with_step))
+	{
+		std::cout << "Success! (" << noise_table.size() << ")\n";
+	}
+	else
+	{
+		std::cout << "Failure!\n";
+	}
+	std::cout << noise_table << "\n";
+
+#pragma region OLD_NOISE_TESTS
+	constexpr EmuMath::Vector<3, float> white_(1.0f, 1.0f, 1.0f);
+	constexpr EmuMath::Vector<3, float> step_ = (end_ - start_) / resolution_;
 	constexpr bool seed_arg_bool_ = true;
 	constexpr std::uint32_t seed_arg_32_ = 25;
 	constexpr std::uint64_t seed_arg_64_ = 14154;
-	constexpr auto seed_arg_ = seed_arg_64_;
+	constexpr auto seed_arg_ = seed_arg_bool_;
 
 	constexpr bool DO_2D_ = false;
-	using noise_generator = EmuMath::noise_gen_functor<DO_2D_ ? 2 : 3, noise_type_>;
-	using sample_processor = EmuMath::Functors::noise_sample_processor_perlin3d_normalise;
+	using noise_generator = EmuMath::NoiseGenFunctor<DO_2D_ ? 2 : 3, noise_type_>;
 
 	std::vector<EmuMath::Vector<3, float>> colour_grid_(resolution_.x * resolution_.y * (DO_2D_ ? 1 : resolution_.z));
 	EmuMath::Vector<3, float> point_ = start_;
@@ -162,7 +188,7 @@ int main()
 			{
 				float sample_ = noise_generator_(point_, freq_, permutations);
 				sample_ = sample_processor_(sample_);
-				if (false) std::cout << sample_ << "\n";
+				if (true) std::cout << sample_ << "\n";
 				colour_grid_[sample_i] = ((white_ * sample_) * 255.0f).Clamp(0.0f, 255.0f); // Clamp instead of fmod since we know we're producing 0:1 range; this is to correct fp errors
 				point_.x += step_.x;
 				++sample_i;
@@ -203,6 +229,7 @@ int main()
 			out_ppm_.close();
 		}
 	}
+#pragma endregion
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

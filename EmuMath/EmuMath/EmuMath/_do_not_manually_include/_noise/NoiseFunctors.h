@@ -37,7 +37,7 @@ namespace EmuMath
 {
 	/// <summary> Alias to easily identify an EmuMath noise generation functor using purely template arguments. </summary>
 	template<std::size_t Dimensions_, EmuMath::NoiseType NoiseType_>
-	using noise_gen_functor = typename EmuMath::Functors::find_noise_functor<Dimensions_, NoiseType_>::type;
+	using NoiseGenFunctor = typename EmuMath::Functors::find_noise_functor<Dimensions_, NoiseType_>::type;
 }
 
 #endif

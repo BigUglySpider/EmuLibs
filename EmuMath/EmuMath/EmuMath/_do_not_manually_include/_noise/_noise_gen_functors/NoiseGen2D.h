@@ -60,25 +60,25 @@ namespace EmuMath::Functors
 			float ty = point_.at<1>() - iy_0_;
 			ix_0_ &= mask_;
 			iy_0_ &= mask_;
-			std::int32_t ix_1_ = ix_0_ + 1;
-			std::int32_t iy_1_ = iy_0_ + 1;
+			std::int32_t ix_1_ = (ix_0_ + 1) & mask_;
+			std::int32_t iy_1_ = (iy_0_ + 1) & mask_;
 
 			// Prepare permutations for interpolation
-			std::int32_t perm_0_ = permutations_[ix_0_];
-			std::int32_t perm_1_ = permutations_[ix_1_];
+			std::size_t perm_0_ = static_cast<std::size_t>(permutations_[ix_0_]);
+			std::size_t perm_1_ = static_cast<std::size_t>(permutations_[ix_1_]);
 			
-			std::int32_t perm_00_ = permutations_[static_cast<std::size_t>(perm_0_) + iy_0_];
-			std::int32_t perm_01_ = permutations_[static_cast<std::size_t>(perm_0_) + iy_1_];
-			std::int32_t perm_10_ = permutations_[static_cast<std::size_t>(perm_1_) + iy_0_];
-			std::int32_t perm_11_ = permutations_[static_cast<std::size_t>(perm_1_) + iy_1_];
+			float perm_00_ = static_cast<float>(permutations_[(perm_0_ + iy_0_) & mask_]);
+			float perm_01_ = static_cast<float>(permutations_[(perm_0_ + iy_1_) & mask_]);
+			float perm_10_ = static_cast<float>(permutations_[(perm_1_ + iy_0_) & mask_]);
+			float perm_11_ = static_cast<float>(permutations_[(perm_1_ + iy_1_) & mask_]);
 
 			tx = EmuMath::Functors::_underlying_noise_gen::SmoothT(tx);
 			ty = EmuMath::Functors::_underlying_noise_gen::SmoothT(ty);
 
 			return lerp_
 			(
-				lerp_(static_cast<float>(perm_00_), static_cast<float>(perm_10_), tx),
-				lerp_(static_cast<float>(perm_01_), static_cast<float>(perm_11_), tx),
+				lerp_(perm_00_, perm_10_, tx),
+				lerp_(perm_01_, perm_11_, tx),
 				ty
 			) * (1.0f / mask_);
 		}
@@ -123,15 +123,15 @@ namespace EmuMath::Functors
 			float ty1 = ty0 - 1.0f;
 			ix0 &= mask_;
 			iy0 &= mask_;
-			std::int32_t ix1 = ix0 + 1;
-			std::int32_t iy1 = iy0 + 1;
+			std::int32_t ix1 = (ix0 + 1) & mask_;
+			std::int32_t iy1 = (iy0 + 1) & mask_;
 			
-			std::int32_t h0 = permutations_[ix0];
-			std::int32_t h1 = permutations_[ix1];
-			EmuMath::Vector<2, float> g00 = _gradients[permutations_[static_cast<std::size_t>(h0) + iy0] & _gradient_mask];
-			EmuMath::Vector<2, float> g10 = _gradients[permutations_[static_cast<std::size_t>(h1) + iy0] & _gradient_mask];
-			EmuMath::Vector<2, float> g01 = _gradients[permutations_[static_cast<std::size_t>(h0) + iy1] & _gradient_mask];
-			EmuMath::Vector<2, float> g11 = _gradients[permutations_[static_cast<std::size_t>(h1) + iy1] & _gradient_mask];
+			std::size_t h0 = static_cast<std::size_t>(permutations_[static_cast<std::size_t>(ix0)]);
+			std::size_t h1 = static_cast<std::size_t>(permutations_[static_cast<std::size_t>(ix1)]);
+			EmuMath::Vector<2, float> g00 = _gradients[permutations_[(h0 + iy0) & mask_] & _gradient_mask];
+			EmuMath::Vector<2, float> g10 = _gradients[permutations_[(h1 + iy0) & mask_] & _gradient_mask];
+			EmuMath::Vector<2, float> g01 = _gradients[permutations_[(h0 + iy1) & mask_] & _gradient_mask];
+			EmuMath::Vector<2, float> g11 = _gradients[permutations_[(h1 + iy1) & mask_] & _gradient_mask];
 
 			float v00 = EmuMath::Functors::_underlying_noise_gen::DotWithScalar(g00, tx0, ty0);
 			float v10 = EmuMath::Functors::_underlying_noise_gen::DotWithScalar(g10, tx1, ty0);
