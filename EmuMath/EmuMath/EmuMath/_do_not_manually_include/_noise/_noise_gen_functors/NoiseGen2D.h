@@ -15,6 +15,7 @@ namespace EmuMath::Functors
 		}
 	};
 
+	/// <summary> Functor to produce 2-dimensional value noise. Produced noise is in the range 0:1. </summary>
 	template<>
 	struct make_noise_2d<EmuMath::NoiseType::VALUE>
 	{
@@ -29,15 +30,16 @@ namespace EmuMath::Functors
 			std::int32_t ix = static_cast<std::int32_t>(floorf(point_.at<0>())) & mask_;
 			std::int32_t iy = static_cast<std::int32_t>(floorf(point_.at<1>())) & mask_;
 
-			return permutations_[(permutations_[ix] + iy) & mask_] * (1.0f / mask_);
+			return permutations_[static_cast<std::size_t>(permutations_[ix] + iy) & mask_] * (1.0f / mask_);
 		}
 		template<std::size_t Size_, typename T_, typename OnlyNonV2f = std::enable_if_t<Size_ != 2 || !std::is_same_v<float, T_>>>
 		inline float operator()(const EmuMath::Vector<Size_, T_>& point_, float freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
-			return operator()(EmuMath::Vector<2, float>(point_));
+			return operator()(EmuMath::Vector<2, float>(point_), freq_, permutations_);
 		}
 	};
 
+	/// <summary> Functor to produce 2-dimensional smooth value noise. Produced noise is in the range 0:1. </summary>
 	template<>
 	struct make_noise_2d<EmuMath::NoiseType::VALUE_SMOOTH>
 	{
@@ -65,10 +67,10 @@ namespace EmuMath::Functors
 			std::int32_t perm_0_ = permutations_[ix_0_];
 			std::int32_t perm_1_ = permutations_[ix_1_];
 			
-			std::int32_t perm_00_ = permutations_[perm_0_ + iy_0_];
-			std::int32_t perm_01_ = permutations_[perm_0_ + iy_1_];
-			std::int32_t perm_10_ = permutations_[perm_1_ + iy_0_];
-			std::int32_t perm_11_ = permutations_[perm_1_ + iy_1_];
+			std::int32_t perm_00_ = permutations_[static_cast<std::size_t>(perm_0_) + iy_0_];
+			std::int32_t perm_01_ = permutations_[static_cast<std::size_t>(perm_0_) + iy_1_];
+			std::int32_t perm_10_ = permutations_[static_cast<std::size_t>(perm_1_) + iy_0_];
+			std::int32_t perm_11_ = permutations_[static_cast<std::size_t>(perm_1_) + iy_1_];
 
 			tx = EmuMath::Functors::_underlying_noise_gen::SmoothT(tx);
 			ty = EmuMath::Functors::_underlying_noise_gen::SmoothT(ty);
@@ -87,7 +89,7 @@ namespace EmuMath::Functors
 		template<std::size_t Size_, typename T_, typename OnlyNonV2f = std::enable_if_t<Size_ != 2 || !std::is_same_v<float, T_>>>
 		inline float operator()(const EmuMath::Vector<Size_, T_>& point_, float freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
-			return operator()(EmuMath::Vector<2, float>(point_));
+			return operator()(EmuMath::Vector<2, float>(point_), freq_, permutations_);
 		}
 	};
 
@@ -117,23 +119,23 @@ namespace EmuMath::Functors
 		{
 			std::int32_t mask_ = permutations_.MaxValue();
 			point_ *= freq_;
-			int ix0 = static_cast<int>(floorf(point_.x));
-			int iy0 = static_cast<int>(floorf(point_.y));
+			std::int32_t ix0 = static_cast<int>(floorf(point_.x));
+			std::int32_t iy0 = static_cast<int>(floorf(point_.y));
 			float tx0 = point_.x - ix0;
 			float ty0 = point_.y - iy0;
 			float tx1 = tx0 - 1.0f;
 			float ty1 = ty0 - 1.0f;
 			ix0 &= mask_;
 			iy0 &= mask_;
-			int ix1 = ix0 + 1;
-			int iy1 = iy0 + 1;
+			std::int32_t ix1 = ix0 + 1;
+			std::int32_t iy1 = iy0 + 1;
 			
-			int h0 = permutations_[ix0];
-			int h1 = permutations_[ix1];
-			EmuMath::Vector<2, float> g00 = _gradients[permutations_[h0 + iy0] & _gradient_mask];
-			EmuMath::Vector<2, float> g10 = _gradients[permutations_[h1 + iy0] & _gradient_mask];
-			EmuMath::Vector<2, float> g01 = _gradients[permutations_[h0 + iy1] & _gradient_mask];
-			EmuMath::Vector<2, float> g11 = _gradients[permutations_[h1 + iy1] & _gradient_mask];
+			std::int32_t h0 = permutations_[ix0];
+			std::int32_t h1 = permutations_[ix1];
+			EmuMath::Vector<2, float> g00 = _gradients[permutations_[static_cast<std::size_t>(h0) + iy0] & _gradient_mask];
+			EmuMath::Vector<2, float> g10 = _gradients[permutations_[static_cast<std::size_t>(h1) + iy0] & _gradient_mask];
+			EmuMath::Vector<2, float> g01 = _gradients[permutations_[static_cast<std::size_t>(h0) + iy1] & _gradient_mask];
+			EmuMath::Vector<2, float> g11 = _gradients[permutations_[static_cast<std::size_t>(h1) + iy1] & _gradient_mask];
 
 			float v00 = EmuMath::Functors::_underlying_noise_gen::DotWithScalar(g00, tx0, ty0);
 			float v10 = EmuMath::Functors::_underlying_noise_gen::DotWithScalar(g10, tx1, ty0);
@@ -147,7 +149,7 @@ namespace EmuMath::Functors
 		template<std::size_t Size_, typename T_, typename OnlyNonV2f = std::enable_if_t<Size_ != 2 || !std::is_same_v<float, T_>>>
 		inline float operator()(const EmuMath::Vector<Size_, T_>& point_, float freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
-			return operator()(EmuMath::Vector<2, float>(point_));
+			return operator()(EmuMath::Vector<2, float>(point_), freq_, permutations_);
 		}
 	};
 }

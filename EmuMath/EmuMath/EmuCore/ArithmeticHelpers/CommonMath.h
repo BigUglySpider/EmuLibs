@@ -87,6 +87,97 @@ namespace EmuCore
 		}
 	}
 
+	template<typename T_, std::size_t Power_>
+	struct do_pow
+	{
+		constexpr do_pow()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_)
+		{
+			return val_ * do_pow<T_, Power_ - 1>()(val_);
+		}
+	};
+	template<typename T_>
+	struct do_pow<T_, 1>
+	{
+		constexpr do_pow()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_)
+		{
+			// x^1 always == x
+			return val_;
+		}
+	};
+	template<typename T_>
+	struct do_pow<T_, 0>
+	{
+		constexpr do_pow()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_)
+		{
+			// x^0 always == 1
+			return T_(1);
+		}
+	};
+
+	struct Pi
+	{
+		Pi() = delete;
+
+		/// <summary> Approximation of pi represented as the provided type T. </summary>
+		template<typename T>
+		static constexpr T PI = T(3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148086513282306647093844L);
+		/// <summary> Approximation of pi / 180, which may be used to convert degree units to radian units. </summary>
+		template<typename T>
+		static constexpr T PI_DIV_180 = PI<T> / T(180);
+		/// <summary> Approximation of 180 / pi, which may be used to convert radian units to degree units. </summary>
+		template<typename T>
+		static constexpr T HUNDRED80_DIV_PI = T(180) / PI<T>;
+		template<typename T>
+		static constexpr T SQRT_PI = EmuCore::SqrtConstexpr<T, T>(PI<T>);
+		template<typename T_, std::size_t Power_>
+		static constexpr T_ PI_POW = do_pow<T_, Power_>()(PI<T_>);
+		template<typename T>
+		static constexpr T PI_SQR = PI_POW<T, 2>;
+		template<typename T>
+		static constexpr T PI_CUBE = PI_POW<T, 3>;
+
+		template<typename T>
+		static constexpr T RadsToDegs(const T rads_)
+		{
+			return rads_ * HUNDRED80_DIV_PI<T>;
+		}
+		template<typename T>
+		static constexpr T DegsToRads(const T degs_)
+		{
+			return degs_ * PI_DIV_180<T>;
+		}
+		template<typename OutT, typename InT, InT rads_>
+		static constexpr OutT RadsToDegs_v = RadsToDegs<OutT>(static_cast<OutT>(rads_));
+		template<typename OutT, typename InT, InT degs_>
+		static constexpr OutT DegsToRads_v = DegsToRads<OutT>(static_cast<OutT>(degs_));
+	};
+
+	namespace CommonConstants
+	{
+		/// <summary> Alias of the EmuCore::Pi struct. </summary>
+		using Pi_ = Pi;
+
+		/// <summary> Square root of the provided value N_ stores as the type OutT. </summary>
+		template<typename OutT, typename N, N N_>
+		static constexpr OutT SQRT_N = EmuCore::SqrtConstexpr<OutT, N>(N_);
+
+		/// <summary> Square root of 2 stored as the provided type. </summary>
+		template<typename T>
+		static constexpr T SQRT_2 = SQRT_N<T, std::uint8_t, 2>;
+		/// <summary> Square root of 3 stored as the provided type. </summary>
+		template<typename T>
+		static constexpr T SQRT_3 = SQRT_N<T, std::uint8_t, 3>;
+	};
+
 	template<typename FloatingPointOut_ = float, typename FloatingPointIn_>
 	FloatingPointOut_ DoMatchingCos(const FloatingPointIn_ val_)
 	{
@@ -468,42 +559,6 @@ namespace EmuCore
 		}
 	}
 
-	template<typename T_, std::size_t Power_>
-	struct do_pow
-	{
-		constexpr do_pow()
-		{
-		}
-		[[nodiscard]] constexpr inline T_ operator()(const T_& val_)
-		{
-			return val_ * do_pow<T_, Power_ - 1>()(val_);
-		}
-	};
-	template<typename T_>
-	struct do_pow<T_, 1>
-	{
-		constexpr do_pow()
-		{
-		}
-		[[nodiscard]] constexpr inline T_ operator()(const T_& val_)
-		{
-			// x^1 always == x
-			return val_;
-		}
-	};
-	template<typename T_>
-	struct do_pow<T_, 0>
-	{
-		constexpr do_pow()
-		{
-		}
-		[[nodiscard]] constexpr inline T_ operator()(const T_& val_)
-		{
-			// x^0 always == 1
-			return T_(1);
-		}
-	};
-
 	/// <summary> Variant of fmod which may be used to calculate floating-point modulo at compile time. </summary>
 	/// <typeparam name="Lhs_">Type of lhs argument. Should ideally be floating-point considering the use of this function.</typeparam>
 	/// <typeparam name="Rhs_">Type of rhs argument.</typeparam>
@@ -515,62 +570,6 @@ namespace EmuCore
 	{
 		return static_cast<Lhs_>(lhs_ - (static_cast<std::int64_t>(lhs_ / rhs_) * rhs_));
 	}
-
-	struct Pi
-	{
-		Pi() = delete;
-
-		/// <summary> Approximation of pi represented as the provided type T. </summary>
-		template<typename T>
-		static constexpr T PI = T(3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148086513282306647093844L);
-		/// <summary> Approximation of pi / 180, which may be used to convert degree units to radian units. </summary>
-		template<typename T>
-		static constexpr T PI_DIV_180 = PI<T> / T(180);
-		/// <summary> Approximation of 180 / pi, which may be used to convert radian units to degree units. </summary>
-		template<typename T>
-		static constexpr T HUNDRED80_DIV_PI = T(180) / PI<T>;
-		template<typename T>
-		static constexpr T SQRT_PI = EmuCore::SqrtConstexpr<T, T>(PI<T>);
-		template<typename T_, std::size_t Power_>
-		static constexpr T_ PI_POW = do_pow<T_, Power_>()(PI<T_>);
-		template<typename T>
-		static constexpr T PI_SQR = PI_POW<T, 2>;
-		template<typename T>
-		static constexpr T PI_CUBE = PI_POW<T, 3>;
-
-		template<typename T>
-		static constexpr T RadsToDegs(const T rads_)
-		{
-			return rads_ * HUNDRED80_DIV_PI<T>;
-		}
-		template<typename T>
-		static constexpr T DegsToRads(const T degs_)
-		{
-			return degs_ * PI_DIV_180<T>;
-		}
-		template<typename OutT, typename InT, InT rads_>
-		static constexpr OutT RadsToDegs_v = RadsToDegs<OutT>(static_cast<OutT>(rads_));
-		template<typename OutT, typename InT, InT degs_>
-		static constexpr OutT DegsToRads_v = DegsToRads<OutT>(static_cast<OutT>(degs_));
-	};
-
-	struct CommonConstants
-	{
-		/// <summary> Alias of the EmuCore::Pi struct. </summary>
-		using Pi_ = Pi;
-
-		CommonConstants() = delete;
-
-		/// <summary> Square root of the provided value N_ stores as the type OutT. </summary>
-		template<typename OutT, typename N, N N_>
-		static constexpr OutT SQRT_N = EmuCore::SqrtConstexpr<OutT, N>(N_);
-		/// <summary> Square root of 2 stored as the provided type. </summary>
-		template<typename T>
-		static constexpr T SQRT_2 = SQRT_N<T, std::uint8_t, 2>;
-		/// <summary> Square root of 3 stored as the provided type. </summary>
-		template<typename T>
-		static constexpr T SQRT_3 = SQRT_N<T, std::uint8_t, 3>;
-	};
 
 	/// <summary>
 	/// <para> Performs Newton's Method for a specified number of iterations, using the provided. </para>

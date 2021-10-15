@@ -4,5 +4,6 @@
 #include "_noise_gen_functors/_common_noise_gen_functor_includes.h"
 #include "_noise_gen_functors/NoiseGen1D.h"
 #include "_noise_gen_functors/NoiseGen2D.h"
+#include "_noise_gen_functors/NoiseGen3D.h"
 
 #endif
