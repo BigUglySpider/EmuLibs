@@ -74,10 +74,6 @@ namespace EmuMath::Functors
 
 			tx = EmuMath::Functors::_underlying_noise_gen::SmoothT(tx);
 			ty = EmuMath::Functors::_underlying_noise_gen::SmoothT(ty);
-			float a_ = static_cast<float>(perm_00_);
-			float b_ = static_cast<float>(perm_10_ - perm_00_);
-			float c_ = static_cast<float>(perm_01_ - perm_00_);
-			float d_ = static_cast<float>(perm_11_ - perm_01_ - perm_10_ + perm_00_);
 
 			return lerp_
 			(

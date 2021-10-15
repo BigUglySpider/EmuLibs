@@ -13,7 +13,7 @@ namespace EmuMath
 		// Value noise with no smoothing
 		VALUE = 0x02,
 		// Value noise with smoothing applied
-		VALUE_SMOOTH = 0x08
+		VALUE_SMOOTH = 0x04
 	};
 
 	namespace Validity

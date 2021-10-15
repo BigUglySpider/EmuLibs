@@ -130,19 +130,19 @@ int main()
 	constexpr EmuMath::Vector<3, float> white_(1.0f, 1.0f, 1.0f);
 	constexpr EmuMath::Vector<3, float> start_(0.0f, 0.0f, 0.0f);
 	constexpr EmuMath::Vector<3, float> end_(1.0f, 1.0f, 1.0f);
-	constexpr EmuMath::Vector<3, std::size_t> resolution_(1920, 1080, 5);
+	constexpr EmuMath::Vector<3, std::size_t> resolution_(1024, 1024, 4);
 	constexpr EmuMath::Vector<3, float> step_ = (end_ - start_) / resolution_;
 	constexpr float freq_ = 32.0f;
 	constexpr std::size_t num_permutations_ = 1024;
-	constexpr EmuMath::NoiseType noise_type_ = EmuMath::NoiseType::VALUE;
+	constexpr EmuMath::NoiseType noise_type_ = EmuMath::NoiseType::PERLIN;
 	constexpr bool seed_arg_bool_ = true;
 	constexpr std::uint32_t seed_arg_32_ = 25;
 	constexpr std::uint64_t seed_arg_64_ = 14154;
 	constexpr auto seed_arg_ = seed_arg_64_;
 
 	constexpr bool DO_2D_ = false;
-	using noise_generator = std::conditional_t<DO_2D_, EmuMath::Functors::make_noise_2d<noise_type_>, EmuMath::Functors::make_noise_3d<noise_type_>>;
-	using sample_processor = EmuMath::Functors::noise_sample_processor_default;
+	using noise_generator = EmuMath::noise_gen_functor<DO_2D_ ? 2 : 3, noise_type_>;
+	using sample_processor = EmuMath::Functors::noise_sample_processor_perlin3d_normalise;
 
 	std::vector<EmuMath::Vector<3, float>> colour_grid_(resolution_.x * resolution_.y * (DO_2D_ ? 1 : resolution_.z));
 	EmuMath::Vector<3, float> point_ = start_;
@@ -162,7 +162,7 @@ int main()
 			{
 				float sample_ = noise_generator_(point_, freq_, permutations);
 				sample_ = sample_processor_(sample_);
-				//std::cout << sample_ << "\n";
+				if (false) std::cout << sample_ << "\n";
 				colour_grid_[sample_i] = ((white_ * sample_) * 255.0f).Clamp(0.0f, 255.0f); // Clamp instead of fmod since we know we're producing 0:1 range; this is to correct fp errors
 				point_.x += step_.x;
 				++sample_i;
