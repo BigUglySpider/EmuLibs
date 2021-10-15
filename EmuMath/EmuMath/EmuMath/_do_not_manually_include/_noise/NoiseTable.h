@@ -2,6 +2,7 @@
 #define EMU_MATH_NOISE_TABLE_H_INC_ 1
 
 #include "NoiseFunctors.h"
+#include "NoiseSampleProcessors.h"
 #include "../../../EmuCore/TMPHelpers/TypeComparators.h"
 #include "../../../EmuCore/TMPHelpers/TypeConvertors.h"
 #include <vector>

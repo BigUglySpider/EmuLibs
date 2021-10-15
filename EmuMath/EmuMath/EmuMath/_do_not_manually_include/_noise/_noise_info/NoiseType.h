@@ -8,12 +8,10 @@ namespace EmuMath
 	/// <summary> Enum flags to specify specific noise types defined within EmuMath. </summary>
 	enum class NoiseType : std::uint8_t
 	{
-		// Perlin noise with no smoothing
+		// Smooth Perlin noise
 		PERLIN = 0x01,
 		// Value noise with no smoothing
 		VALUE = 0x02,
-		// Perlin noise with smoothing applied
-		PERLIN_SMOOTH = 0x04,
 		// Value noise with smoothing applied
 		VALUE_SMOOTH = 0x08
 	};
@@ -26,7 +24,6 @@ namespace EmuMath
 			(
 				noise_type_ == NoiseType::PERLIN ||
 				noise_type_ == NoiseType::VALUE ||
-				noise_type_ == NoiseType::PERLIN_SMOOTH ||
 				noise_type_ == NoiseType::VALUE_SMOOTH
 			);
 		}
