@@ -139,8 +139,8 @@ int main()
 	constexpr std::uint32_t seed_arg_32_ = 25;
 	constexpr std::uint64_t seed_arg_64_ = 14154;
 	constexpr auto seed_arg_ = seed_arg_64_;
-	using noise_generator = EmuMath::Functors::make_noise_1d<noise_type_>;
-	using sample_processor = EmuMath::Functors::noise_sample_processor_perlin1d_normalise;
+	using noise_generator = EmuMath::Functors::make_noise_2d<noise_type_>;
+	using sample_processor = EmuMath::Functors::noise_sample_processor_perlin2d_normalise;
 
 	std::vector<EmuMath::Vector<3, float>> colour_grid_(resolution_.x * resolution_.y);
 	EmuMath::Vector<2, float> point_ = start_;
@@ -155,7 +155,7 @@ int main()
 		{
 			float sample_= noise_generator_(point_, freq_, permutations);
 			sample_ = sample_processor_(sample_);
-			//std::cout << sample_ << "\n";
+			std::cout << sample_ << "\n";
 			colour_grid_[i] = ((white_ * sample_) * 255.0f).Clamp(0.0f, 255.0f); // Clamp instead of fmod since we know we're producing 0:1 range; this is to correct fp errors
 			point_.x += step_.x;
 			++i;

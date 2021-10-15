@@ -91,15 +91,58 @@ namespace EmuMath::Functors
 		}
 	};
 
+	/// <summary> Functor to produce 2-dimensional smooth perlin noise. Produced noise targets the range -(sqrt(2)/2):(sqrt(2)/2). </summary>
 	template<>
 	struct make_noise_2d<EmuMath::NoiseType::PERLIN>
 	{
-		constexpr make_noise_2d()
+		static constexpr std::size_t _num_gradients = 8;
+		static constexpr EmuMath::Vector<2, float> _gradients[_num_gradients] =
+		{
+			EmuMath::Vector<2, float>(1.0f, 0.0f),
+			EmuMath::Vector<2, float>(-1.0f, 0.0f),
+			EmuMath::Vector<2, float>(0.0f, 1.0f),
+			EmuMath::Vector<2, float>(0.0f,-1.0f),
+			EmuMath::Vector<2, float>(1.0f, 1.0f).NormaliseConstexpr(),
+			EmuMath::Vector<2, float>(-1.0f, 1.0f).NormaliseConstexpr(),
+			EmuMath::Vector<2, float>(1.0f,-1.0f).NormaliseConstexpr(),
+			EmuMath::Vector<2, float>(-1.0f,-1.0f).NormaliseConstexpr()
+		};
+		static constexpr std::size_t _gradient_mask = 7;
+
+		EmuCore::do_lerp<float, float, float> lerp_;
+		constexpr make_noise_2d() : lerp_()
 		{
 		}
 		inline float operator()(EmuMath::Vector<2, float> point_, float freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
-			return point_.x;
+			std::int32_t mask_ = permutations_.MaxValue();
+			point_ *= freq_;
+			int ix0 = static_cast<int>(floorf(point_.x));
+			int iy0 = static_cast<int>(floorf(point_.y));
+			float tx0 = point_.x - ix0;
+			float ty0 = point_.y - iy0;
+			float tx1 = tx0 - 1.0f;
+			float ty1 = ty0 - 1.0f;
+			ix0 &= mask_;
+			iy0 &= mask_;
+			int ix1 = ix0 + 1;
+			int iy1 = iy0 + 1;
+			
+			int h0 = permutations_[ix0];
+			int h1 = permutations_[ix1];
+			EmuMath::Vector<2, float> g00 = _gradients[permutations_[h0 + iy0] & _gradient_mask];
+			EmuMath::Vector<2, float> g10 = _gradients[permutations_[h1 + iy0] & _gradient_mask];
+			EmuMath::Vector<2, float> g01 = _gradients[permutations_[h0 + iy1] & _gradient_mask];
+			EmuMath::Vector<2, float> g11 = _gradients[permutations_[h1 + iy1] & _gradient_mask];
+
+			float v00 = EmuMath::Functors::_underlying_noise_gen::DotWithScalar(g00, tx0, ty0);
+			float v10 = EmuMath::Functors::_underlying_noise_gen::DotWithScalar(g10, tx1, ty0);
+			float v01 = EmuMath::Functors::_underlying_noise_gen::DotWithScalar(g01, tx0, ty1);
+			float v11 = EmuMath::Functors::_underlying_noise_gen::DotWithScalar(g11, tx1, ty1);
+			
+			float tx = EmuMath::Functors::_underlying_noise_gen::SmoothT(tx0);
+			float ty = EmuMath::Functors::_underlying_noise_gen::SmoothT(ty0);
+			return lerp_(lerp_(v00, v10, tx), lerp_(v01, v11, tx), ty);
 		}
 		template<std::size_t Size_, typename T_, typename OnlyNonV2f = std::enable_if_t<Size_ != 2 || !std::is_same_v<float, T_>>>
 		inline float operator()(const EmuMath::Vector<Size_, T_>& point_, float freq_, const EmuMath::NoisePermutations& permutations_) const
