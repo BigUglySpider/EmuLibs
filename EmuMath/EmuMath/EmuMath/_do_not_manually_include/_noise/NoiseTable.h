@@ -11,16 +11,18 @@
 #include <sstream>
 #include <vector>
 
-#include <iostream>
-
 namespace EmuMath
 {
+	/// <summary> Class used to generate and store X-dimensional noise with customisable parameters. </summary>
 	template<std::size_t Dimensions_>
 	class NoiseTable
 	{
 	public:
 		static_assert(EmuMath::TMP::assert_valid_noise_dimensions<Dimensions_>(), "Provided invalid Dimensions_ value to instantiate an EmuMath::NoiseTable template.");
+
+		/// <summary> Number of dimensions covered by this table. </summary>
 		static constexpr std::size_t num_dimensions = Dimensions_;
+		/// <summary> Type used to store individual samples within this table. </summary>
 		using value_type = float;
 
 	private:
@@ -34,12 +36,29 @@ namespace EmuMath
 		>::type;
 
 	public:
+		/// <summary> Type returned when accessing this table via a single scalar index. </summary>
 		using return_single_index = typename EmuMath::TMP::_noise_table_access<1, num_dimensions, value_type>::type;
+		/// <summary> Type returned when accessing this table via 2 scalar indices. If void, 2-scalar index accesses are invalid on this table. </summary>
 		using return_double_index = typename EmuMath::TMP::_noise_table_access<2, num_dimensions, value_type>::type;
+		/// <summary> Type returned when accessing this table via 3 scalar indices. If void, 3-scalar index accesses are invalid on this table. </summary>
 		using return_triple_index = typename EmuMath::TMP::_noise_table_access<3, num_dimensions, value_type>::type;
 
+		/// <summary> Default constructor which creates an empty noise table. </summary>
 		NoiseTable() : table_data(), table_size()
 		{
+		}
+		/// <summary> Copy constructor which mimics the passed table without modifying it. </summary>
+		/// <param name="to_copy_">Noise table to copy the data of.</param>
+		NoiseTable(const EmuMath::NoiseTable<num_dimensions>& to_copy_) : table_data(to_copy_.table_data), table_size(to_copy_.table_size)
+		{
+		}
+		/// <summary> Move constructor which transfers data from one table to this. The moved-from table is left in a default-constructed state. </summary>
+		/// <param name="to_move_">Modifiable noise table to move into this newly constructed table, which will additionally be left in a default-constructed state.</param>
+		NoiseTable(EmuMath::NoiseTable<num_dimensions>&& to_move_) : NoiseTable()
+		{
+			table_data.swap(to_move_.table_data);
+			table_size = to_move_.table_size;
+			to_move_.table_size = EmuMath::Vector<num_dimensions, std::size_t>();
 		}
 
 #pragma region RANDOM_ACCESS
@@ -148,14 +167,33 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region INFO
+#pragma region STL_MIMICS
+		/// <summary> Returns a vector showing this table's size in each of its stored dimensions. </summary>
+		/// <returns>Vector with this table's size in each respective dimension.</returns>
 		[[nodiscard]] inline EmuMath::Vector<Dimensions_, std::size_t> size() const
 		{
 			return table_size;
 		}
+
+		/// <summary> Swaps the data of this table with that of the passed table. </summary>
+		/// <param name="to_swap_with_">Table of equal dimensions with which to swap data.</param>
+		inline void swap(EmuMath::NoiseTable<num_dimensions>& to_swap_with_)
+		{
+			table_data.swap(to_swap_with_.table_data);
+			decltype(table_size) temp_(table_size);
+			table_size = to_swap_with_.table_size;
+			to_swap_with_.table_size = temp_;
+		}
 #pragma endregion
 
 #pragma region GENERATION
+		/// <summary>
+		/// <para> Resizes and fills this table with noise samples created via the passed options. </para>
+		/// <para> The returned boolean indicates success. If this function returns false, the generation operation did not fully complete. </para>
+		/// </summary>
+		/// <typeparam name="SampleProcessor_">Functor to process noise samples further after generation. The default argument for this makes no change to samples.</typeparam>
+		/// <param name="options_">Options to create this table's samples via.</param>
+		/// <returns>Boolean indicating the success of this generation operation; true only when generation is not cancelled.</returns>
 		template<EmuMath::NoiseType NoiseType_, class SampleProcessor_ = EmuMath::Functors::noise_sample_processor_default>
 		inline bool GenerateNoise(const EmuMath::NoiseTableOptions<num_dimensions>& options_)
 		{
@@ -263,7 +301,6 @@ namespace EmuMath
 						{
 							value_type sample_ = generator_(point_, freq_, permutations_);
 							sample_ = sample_processor_(sample_);
-							//std::cout << "SAMPLE: " << sample_ << "\n";
 							layer_y_[z_] = sample_;
 							point_.at<2>() += step_.at<2>();
 						}

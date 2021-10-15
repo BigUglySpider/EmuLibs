@@ -3,8 +3,6 @@
 
 #include "_common_noise_gen_functor_includes.h"
 
-#include <iostream>
-
 namespace EmuMath::Functors
 {
 	template<EmuMath::NoiseType NoiseType_>
@@ -137,7 +135,6 @@ namespace EmuMath::Functors
 		}
 		inline float operator()(EmuMath::Vector<3, float> point_, float freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
-			//std::cout << "(" << point_ << ", " << freq_ << ", " << permutations_.size() << ", " << permutations_.MaxValue() << ")\n";
 			std::int32_t mask_ = permutations_.MaxValue();
 			point_ *= freq_;
 

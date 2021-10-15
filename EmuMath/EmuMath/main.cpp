@@ -96,10 +96,43 @@ struct SomeStructForTestingEdges
 	float top_;
 };
 
+template<std::size_t num_dimensions>
+inline void WriteNoiseTableToPPM(const EmuMath::NoiseTable<num_dimensions>& noise_table_)
+{
+	EmuMath::Vector3<float> white_(255.0f, 255.0f, 255.0f);
+
+	if constexpr (num_dimensions == 3)
+	{
+		EmuMath::Vector3<std::size_t> resolution_ = noise_table_.size();
+		for (std::size_t z = 0; z < resolution_.z; ++z)
+		{
+			std::cout << "\nOutputting image layer #" << z << "...\n";
+
+			std::ostringstream name_;
+			name_ << "./test_noise_" << z << ".ppm";
+			std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
+			out_ppm_ << "P6" << std::endl << resolution_.x << ' ' << resolution_.y << std::endl << "255" << std::endl;
+
+			for (std::size_t y = 0; y < resolution_.y; ++y)
+			{
+				for (std::size_t x = 0; x < resolution_.x; ++x)
+				{
+					// Clamp is merely to cancel out fp-rounding errors
+					EmuMath::Vector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.at(x, y, z)).Clamp(0.0f, 255.0f));
+					out_ppm_ << (char)colour_byte_.x << (char)colour_byte_.y << (char)colour_byte_.z;
+				}
+			}
+			out_ppm_.close();
+		}
+	}
+}
+
 int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
 
+	constexpr EmuMath::NoisePermutations::seed_32_type seed_32 = 1337;
+	constexpr EmuMath::NoisePermutations::seed_64_type seed_64 = 1337;
 	constexpr std::size_t num_permutations_ = 1024;
 	constexpr EmuMath::NoiseType noise_type_ = EmuMath::NoiseType::PERLIN;
 	using sample_processor = EmuMath::Functors::noise_sample_processor_perlin3d_normalise;
@@ -124,8 +157,8 @@ int main()
 			num_permutations_,
 			EmuMath::Info::NoisePermutationInfo::ShuffleMode::SEED_64,
 			EmuMath::Info::NoisePermutationInfo::_default_bool_input,
-			1337,
-			1337
+			seed_32,
+			seed_64
 		)
 	);
 	constexpr EmuMath::NoiseTableOptions<table_size> options_with_step = EmuMath::NoiseTableOptions<3>
@@ -140,8 +173,8 @@ int main()
 			num_permutations_,
 			EmuMath::Info::NoisePermutationInfo::ShuffleMode::SEED_64,
 			EmuMath::Info::NoisePermutationInfo::_default_bool_input,
-			1337,
-			1337
+			seed_32,
+			seed_64
 		)
 	);
 
@@ -157,79 +190,16 @@ int main()
 	{
 		std::cout << "Failure!\n";
 	}
+	WriteNoiseTableToPPM(noise_table);
+
+	EmuMath::NoiseTable<table_size> babby_table(std::move(noise_table));
+	std::cout << "Main Size (Preswap): " << noise_table.size() << "\n";
+	std::cout << "Babby Size (Preswap): " << babby_table.size() << "\n";
+	babby_table.swap(noise_table);
+	std::cout << "Main Size (Postswap): " << noise_table.size() << "\n";
+	std::cout << "Babby Size (Postswap): " << babby_table.size() << "\n";
 	std::cout << noise_table << "\n";
-
-#pragma region OLD_NOISE_TESTS
-	constexpr EmuMath::Vector<3, float> white_(1.0f, 1.0f, 1.0f);
-	constexpr EmuMath::Vector<3, float> step_ = (end_ - start_) / resolution_;
-	constexpr bool seed_arg_bool_ = true;
-	constexpr std::uint32_t seed_arg_32_ = 25;
-	constexpr std::uint64_t seed_arg_64_ = 14154;
-	constexpr auto seed_arg_ = seed_arg_bool_;
-
-	constexpr bool DO_2D_ = false;
-	using noise_generator = EmuMath::NoiseGenFunctor<DO_2D_ ? 2 : 3, noise_type_>;
-
-	std::vector<EmuMath::Vector<3, float>> colour_grid_(resolution_.x * resolution_.y * (DO_2D_ ? 1 : resolution_.z));
-	EmuMath::Vector<3, float> point_ = start_;
-	noise_generator noise_generator_ = noise_generator();
-	EmuMath::NoisePermutations permutations(num_permutations_, seed_arg_);
-	sample_processor sample_processor_ = sample_processor();
-
-	std::size_t sample_i = 0;
-	for (std::size_t z = 0, end_z = (DO_2D_ ? 1 : resolution_.z); z < end_z; ++z)
-	{
-		std::cout << "Processing layer #" << z << "...\n";
-		point_.y = start_.y;
-		for (std::size_t y = 0; y < resolution_.y; ++y)
-		{
-			point_.x = start_.x;
-			for (std::size_t x = 0; x < resolution_.x; ++x)
-			{
-				float sample_ = noise_generator_(point_, freq_, permutations);
-				sample_ = sample_processor_(sample_);
-				if (true) std::cout << sample_ << "\n";
-				colour_grid_[sample_i] = ((white_ * sample_) * 255.0f).Clamp(0.0f, 255.0f); // Clamp instead of fmod since we know we're producing 0:1 range; this is to correct fp errors
-				point_.x += step_.x;
-				++sample_i;
-			}
-			point_.y += step_.y;
-		}
-		point_.z += step_.z;
-	}
-
-	if constexpr (DO_2D_)
-	{
-		std::ofstream out_ppm_("./test_noise.ppm", std::ios_base::out | std::ios_base::binary);
-		out_ppm_ << "P6" << std::endl << resolution_.x << ' ' << resolution_.y << std::endl << "255" << std::endl;
-		std::cout << "\nOutputting image...\n";
-		for (std::size_t i = 0, end = colour_grid_.size() / (DO_2D_ ? 1 : resolution_.z); i < end; ++i)
-		{
-			EmuMath::Vector<3, std::uint8_t> colour_byte_(colour_grid_[i]);
-			out_ppm_ << (char)colour_byte_.x << (char)colour_byte_.y << (char)colour_byte_.z;
-		}
-		out_ppm_.close();
-	}
-	else
-	{
-		for (std::size_t z = 0; z < resolution_.z; ++z)
-		{
-			std::cout << "\nOutputting image layer #" << z << "...\n";
-
-			std::ostringstream name_;
-			name_ << "./test_noise_" << z << ".ppm";
-			std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
-			out_ppm_ << "P6" << std::endl << resolution_.x << ' ' << resolution_.y << std::endl << "255" << std::endl;
-
-			for (std::size_t i = resolution_.x * resolution_.y * z, end_i = resolution_.x * resolution_.y * (z + 1); i < end_i; ++i)
-			{
-				EmuMath::Vector<3, std::uint8_t> colour_byte_(colour_grid_[i]);
-				out_ppm_ << (char)colour_byte_.x << (char)colour_byte_.y << (char)colour_byte_.z;
-			}
-			out_ppm_.close();
-		}
-	}
-#pragma endregion
+	std::cout << babby_table << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
