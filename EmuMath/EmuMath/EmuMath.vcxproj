@@ -157,6 +157,7 @@
     <ClInclude Include="EmuCore\Events\EventInvoker.h" />
     <ClInclude Include="EmuCore\Events\ThreadSafeEvent.h" />
     <ClInclude Include="EmuCore\FileHelpers\PathValidation.h" />
+    <ClInclude Include="EmuCore\Functors\Analytics.h" />
     <ClInclude Include="EmuCore\Functors\Arithmetic.h" />
     <ClInclude Include="EmuCore\Functors\Bitwise.h" />
     <ClInclude Include="EmuCore\Functors\Comparators.h" />

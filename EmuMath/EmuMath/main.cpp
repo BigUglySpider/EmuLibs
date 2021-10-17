@@ -135,16 +135,16 @@ int main()
 	constexpr EmuMath::NoisePermutations::seed_64_type seed_64 = 13337;
 	constexpr std::size_t num_permutations_ = 1024;
 	constexpr EmuMath::NoiseType noise_type_ = EmuMath::NoiseType::PERLIN;
-	constexpr float freq_ = 80.0f;
+	constexpr float freq_ = 128.0f;
 	constexpr EmuMath::Vector<3, float> start_(0.0f, 0.0f, 0.0f);
 	constexpr EmuMath::Vector<3, float> end_(1.0f, 1.0f, 1.0f);
 	constexpr EmuMath::Vector<3, float> custom_step(0.001f, 0.001f, 0.001f);
 	constexpr EmuMath::Vector<3, std::size_t> resolution_(1920, 1920, 5);
 	constexpr std::size_t total_samples_ = resolution_.TotalProduct<std::size_t>();
-	constexpr bool use_fractal_noise_ = true;
+	constexpr bool use_fractal_noise_ = false;
 	constexpr std::size_t fractal_octaves_ = 3;
-	constexpr float fractal_lacunarity_ = 5.0f;
-	constexpr float fractal_gain_ = 2.0f;
+	constexpr float fractal_lacunarity_ = 2.0f;
+	constexpr float fractal_gain_ = 0.5;
 	constexpr EmuMath::Info::FractalNoiseInfo fractal_noise_info_ = EmuMath::Info::FractalNoiseInfo
 	(
 		fractal_octaves_,
