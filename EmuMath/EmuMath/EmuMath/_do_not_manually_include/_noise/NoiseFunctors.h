@@ -5,6 +5,7 @@
 #include "_noise_gen_functors/NoiseGen1D.h"
 #include "_noise_gen_functors/NoiseGen2D.h"
 #include "_noise_gen_functors/NoiseGen3D.h"
+#include "_noise_gen_functors/FractalNoiseWrapper.h"
 
 namespace EmuMath::Functors
 {

@@ -3,7 +3,8 @@
 
 #include "NoiseTMP.h"
 #include "NoiseFunctors.h"
-#include "NoisePermutationInfo.h"
+#include "_noise_info/NoisePermutationInfo.h"
+#include "_noise_info/FractalNoiseInfo.h"
 
 namespace EmuMath
 {
@@ -43,6 +44,7 @@ namespace EmuMath
 		static constexpr EmuMath::Vector<num_dimensions, std::size_t> _default_table_resolution = make_correctly_sized_vector(32, 32, 32);
 		static constexpr float _default_freq = 32.0f;
 		static constexpr bool _default_step_mode = false;
+		static constexpr bool _default_use_fractal_noise = false;
 
 		NoiseTableOptions() : 
 			NoiseTableOptions
@@ -52,7 +54,9 @@ namespace EmuMath
 				_default_end_point,
 				_default_freq,
 				_default_step_mode,
-				EmuMath::Info::NoisePermutationInfo()
+				_default_use_fractal_noise,
+				EmuMath::Info::NoisePermutationInfo(),
+				EmuMath::Info::FractalNoiseInfo()
 			)
 		{
 		}
@@ -63,14 +67,18 @@ namespace EmuMath
 			const EmuMath::Vector<num_dimensions, value_type>& end_point_or_step_,
 			float freq_,
 			bool step_mode_,
-			const EmuMath::Info::NoisePermutationInfo& permutation_info_
+			bool use_fractal_noise_,
+			const EmuMath::Info::NoisePermutationInfo& permutation_info_,
+			const EmuMath::Info::FractalNoiseInfo& fractal_noise_info_
 		) : 
 			table_resolution(table_resolution_),
 			start_point(start_point_),
 			end_point_or_step(end_point_or_step_),
 			freq(freq_),
 			step_mode(step_mode_),
-			permutation_info(permutation_info_)
+			use_fractal_noise(use_fractal_noise_),
+			permutation_info(permutation_info_),
+			fractal_noise_info(fractal_noise_info_)
 		{
 		}
 		constexpr NoiseTableOptions(const NoiseTableOptions& to_copy_) :
@@ -81,13 +89,14 @@ namespace EmuMath
 				to_copy_.end_point_or_step,
 				to_copy_.freq,
 				to_copy_.step_mode,
-				to_copy_.permutation_info
+				to_copy_.permutation_info,
+				to_copy_.fractal_noise_info
 			)
 		{
 		}
 
 		/// <summary>
-		/// <para> Provides the relevant step for these options. </para>
+		/// <para> Provides the relevant step for these options. Step is the difference between adjacent points when calculating individual samples. </para>
 		/// <para> If step_mode is true, this will return a copy of end_point_or_step. </para>
 		/// <para>
 		///		If step_mode is false, this will calculate a step for each axis based on the rable resolution and the distance between start_point and end_point_or_step.
@@ -125,8 +134,12 @@ namespace EmuMath
 		/// </para>
 		/// </summary>
 		bool step_mode;
+		/// <summary> Boolean indicating if fractal noise generation should be used. </summary>
+		bool use_fractal_noise;
 		/// <summary> Informative data structure for creating a power-of-2 collection of permutations for generating noise masks. </summary>
 		EmuMath::Info::NoisePermutationInfo permutation_info;
+		/// <summary> Informative data structure for use when use_fractal_noise is true only. </summary>
+		EmuMath::Info::FractalNoiseInfo fractal_noise_info;
 
 	};
 }

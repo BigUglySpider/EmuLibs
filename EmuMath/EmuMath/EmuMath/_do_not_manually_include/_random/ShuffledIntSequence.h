@@ -24,11 +24,11 @@ namespace EmuMath
 
 	private:
 		using item_storage = std::vector<value_type>;
-		explicit ShuffledIntSequence(std::size_t size_) : items(size_), max_value(static_cast<value_type>(size_) - 1)
+		explicit ShuffledIntSequence(std::size_t size_) : items(size_), max_contained_value(static_cast<value_type>(size_) - 1)
 		{
 			_fill_items_pre_shuffle();
 		}
-		explicit ShuffledIntSequence(const item_storage& items_to_copy_) : items(items_to_copy_), max_value(static_cast<value_type>(items_to_copy_.size()) - 1)
+		explicit ShuffledIntSequence(const item_storage& items_to_copy_) : items(items_to_copy_), max_contained_value(static_cast<value_type>(items_to_copy_.size()) - 1)
 		{
 		}
 
@@ -37,7 +37,7 @@ namespace EmuMath
 		using const_reverse_iterator = typename item_storage::const_reverse_iterator;
 
 		ShuffledIntSequence() = delete;
-		ShuffledIntSequence(const ShuffledIntSequence<value_type>& to_copy_) : ShuffledIntSequence(to_copy_.items), max_value(to_copy_.max_value)
+		ShuffledIntSequence(const ShuffledIntSequence<value_type>& to_copy_) : items(to_copy_.items), max_contained_value(to_copy_.max_contained_value)
 		{
 		}
 		ShuffledIntSequence(std::size_t size_, bool do_64_bit_shuffle_) : ShuffledIntSequence(size_)
@@ -52,11 +52,17 @@ namespace EmuMath
 		{
 			Shuffle(shuffle_seed_64_);
 		}
+		ShuffledIntSequence(ShuffledIntSequence<value_type>&& to_move_) noexcept : ShuffledIntSequence()
+		{
+			items.swap(to_move_.items);
+			max_contained_value = to_move_.max_contained_value;
+			to_move_.max_contained_value = value_type(0);
+		}
 
 		inline ShuffledIntSequence<value_type>& operator=(const ShuffledIntSequence<value_type>& to_copy_)
 		{
 			items = to_copy_.items;
-			max_value = to_copy_.max_value;
+			max_contained_value = to_copy_.max_contained_value;
 		}
 
 		inline bool operator!() const
@@ -158,9 +164,9 @@ namespace EmuMath
 		inline void swap(ShuffledIntSequence& to_swap_with_)
 		{
 			items.swap(to_swap_with_.items);
-			value_type temp_ = max_value;
-			max_value = to_swap_with_.max_value;
-			to_swap_with_.max_value = temp_;
+			value_type temp_ = max_contained_value;
+			max_contained_value = to_swap_with_.max_contained_value;
+			to_swap_with_.max_contained_value = temp_;
 		}
 
 		inline const_iterator cbegin() const
@@ -242,7 +248,7 @@ namespace EmuMath
 		/// <summary> The highest value in this sequence. Effectively shorthand for size() - 1. </summary>
 		inline value_type MaxValue() const
 		{
-			return max_value;
+			return max_contained_value;
 		}
 
 		/// <summary>
@@ -293,7 +299,7 @@ namespace EmuMath
 
 	private:
 		item_storage items;
-		value_type max_value;
+		value_type max_contained_value;
 
 		template<typename SeedOrBool_>
 		inline void _do_resize(std::size_t new_size_, SeedOrBool_ seed_or_do_64_bit_shuffle_bool_)
@@ -307,7 +313,7 @@ namespace EmuMath
 				items.resize(new_size_);
 				_fill_items_pre_shuffle();
 			}
-			max_value = static_cast<value_type>(new_size_) - 1;
+			max_contained_value = static_cast<value_type>(new_size_) - 1;
 			Shuffle(seed_or_do_64_bit_shuffle_bool_);
 		}
 
@@ -322,7 +328,7 @@ namespace EmuMath
 					power_ = 1;
 				}
 				items.resize(power_);
-				max_value = static_cast<value_type>(power_) - 1;
+				max_contained_value = static_cast<value_type>(power_) - 1;
 				Shuffle(seed_or_do_64_bit_shuffle_bool_);
 			}
 		}
@@ -336,7 +342,7 @@ namespace EmuMath
 				if (power_ > size())
 				{
 					items.resize(power_);
-					max_value = static_cast<value_type>(power_) - 1;
+					max_contained_value = static_cast<value_type>(power_) - 1;
 					_fill_items_pre_shuffle();
 					Shuffle(seed_or_do_64_bit_shuffle_bool_);
 				}
@@ -371,7 +377,7 @@ namespace EmuMath
 			{
 				items[i] = static_cast<value_type>(i);
 			}
-			max_value = static_cast<value_type>(items.size()) - 1;
+			max_contained_value = static_cast<value_type>(items.size()) - 1;
 		}
 	};
 }

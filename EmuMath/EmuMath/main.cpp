@@ -1,5 +1,5 @@
+#include "EmuCore/Functors/Analytics.h"
 #include "EmuMath/Noise.h"
-
 #include "EmuMath/Random.h"
 
 #include "Tests.hpp"
@@ -132,57 +132,87 @@ int main()
 	srand(static_cast<unsigned int>(time(0)));
 
 	constexpr EmuMath::NoisePermutations::seed_32_type seed_32 = 1337;
-	constexpr EmuMath::NoisePermutations::seed_64_type seed_64 = 1337;
+	constexpr EmuMath::NoisePermutations::seed_64_type seed_64 = 13337;
 	constexpr std::size_t num_permutations_ = 1024;
 	constexpr EmuMath::NoiseType noise_type_ = EmuMath::NoiseType::PERLIN;
-	using sample_processor = EmuMath::Functors::noise_sample_processor_perlin3d_normalise;
-	constexpr float freq_ = 32.0f;
+	constexpr float freq_ = 80.0f;
 	constexpr EmuMath::Vector<3, float> start_(0.0f, 0.0f, 0.0f);
 	constexpr EmuMath::Vector<3, float> end_(1.0f, 1.0f, 1.0f);
 	constexpr EmuMath::Vector<3, float> custom_step(0.001f, 0.001f, 0.001f);
-	constexpr EmuMath::Vector<3, std::size_t> resolution_(32, 32, 32);
+	constexpr EmuMath::Vector<3, std::size_t> resolution_(1920, 1920, 5);
+	constexpr std::size_t total_samples_ = resolution_.TotalProduct<std::size_t>();
+	constexpr bool use_fractal_noise_ = true;
+	constexpr std::size_t fractal_octaves_ = 3;
+	constexpr float fractal_lacunarity_ = 5.0f;
+	constexpr float fractal_gain_ = 2.0f;
+	constexpr EmuMath::Info::FractalNoiseInfo fractal_noise_info_ = EmuMath::Info::FractalNoiseInfo
+	(
+		fractal_octaves_,
+		fractal_lacunarity_,
+		fractal_gain_
+	);
+	constexpr EmuMath::Info::NoisePermutationInfo::ShuffleMode shuffle_mode_ = EmuMath::Info::NoisePermutationInfo::ShuffleMode::SEED_64;
 
 	constexpr std::size_t table_size = 3;
 	EmuMath::NoiseTable<table_size> noise_table;
 
-	constexpr EmuMath::NoiseTableOptions<table_size> options_no_step = EmuMath::NoiseTableOptions<3>
+	using underlying_sample_processor = EmuMath::Functors::noise_sample_processor_perlin3d_normalise;
+	using sample_processor_with_analytics = EmuMath::Functors::noise_sample_processor_with_analytics
+	<
+		underlying_sample_processor,
+		EmuCore::analytic_track_min<float>,
+		EmuCore::analytic_track_max<float>,
+		EmuCore::analytic_sum<float>,
+		EmuCore::analytic_count<std::size_t>
+	>;
+
+	constexpr bool use_analytics = true;
+	using sample_processor = std::conditional_t<!use_analytics, underlying_sample_processor, sample_processor_with_analytics>;
+
+	constexpr EmuMath::NoiseTableOptions<table_size> options_no_step = EmuMath::NoiseTableOptions<table_size>
 	(
 		resolution_,
 		start_,
 		end_,
 		freq_,
 		false,
+		use_fractal_noise_,
 		EmuMath::Info::NoisePermutationInfo
 		(
 			num_permutations_,
-			EmuMath::Info::NoisePermutationInfo::ShuffleMode::SEED_64,
+			shuffle_mode_,
 			EmuMath::Info::NoisePermutationInfo::_default_bool_input,
 			seed_32,
 			seed_64
-		)
+		),
+		fractal_noise_info_
 	);
-	constexpr EmuMath::NoiseTableOptions<table_size> options_with_step = EmuMath::NoiseTableOptions<3>
+	constexpr EmuMath::NoiseTableOptions<table_size> options_with_step = EmuMath::NoiseTableOptions<table_size>
 	(
 		resolution_,
 		start_,
 		custom_step,
 		freq_,
 		true,
+		use_fractal_noise_,
 		EmuMath::Info::NoisePermutationInfo
 		(
 			num_permutations_,
-			EmuMath::Info::NoisePermutationInfo::ShuffleMode::SEED_64,
+			shuffle_mode_,
 			EmuMath::Info::NoisePermutationInfo::_default_bool_input,
 			seed_32,
 			seed_64
-		)
+		),
+		fractal_noise_info_
 	);
 
 	constexpr auto auto_step = options_no_step.MakeStep();
 	constexpr auto custom_step_from_options = options_with_step.MakeStep();
+
+	sample_processor sample_processor_;
 	
 	std::cout << "Generating table...\n";
-	if (noise_table.GenerateNoise<noise_type_, sample_processor>(options_with_step))
+	if (noise_table.GenerateNoise<noise_type_, sample_processor&>(options_no_step, sample_processor_))
 	{
 		std::cout << "Success! (" << noise_table.size() << ")\n";
 	}
@@ -192,14 +222,44 @@ int main()
 	}
 	WriteNoiseTableToPPM(noise_table);
 
-	EmuMath::NoiseTable<table_size> babby_table(std::move(noise_table));
-	std::cout << "Main Size (Preswap): " << noise_table.size() << "\n";
-	std::cout << "Babby Size (Preswap): " << babby_table.size() << "\n";
-	babby_table.swap(noise_table);
-	std::cout << "Main Size (Postswap): " << noise_table.size() << "\n";
-	std::cout << "Babby Size (Postswap): " << babby_table.size() << "\n";
-	std::cout << noise_table << "\n";
-	std::cout << babby_table << "\n";
+	std::cout << "Min: " << sample_processor_.at<0>().min_value << "\n";
+	std::cout << "Max: " << sample_processor_.at<1>().max_value << "\n";
+	std::cout << "Sum: " << sample_processor_.at<2>().total_sum << "\n";
+	std::cout << "Count: " << sample_processor_.at<3>().total_calls << "\n";
+	std::cout << "Mean: " << sample_processor_.at<2>().total_sum / sample_processor_.at<3>().total_calls << "\n";
+
+	system("pause");
+	for (std::size_t z = 0, end_z_ = noise_table.size<2>(); z < end_z_; ++z)
+	{
+		for (std::size_t y = 0, end_y_ = noise_table.size<1>(); y < end_y_; ++y)
+		{
+			for (std::size_t x = 0, end_x_ = noise_table.size<0>(); x < end_x_; ++x)
+			{
+				float sample_ = noise_table(x, y, z);
+				if (sample_ <= 0.0f || sample_ >= 1.0f)
+				{
+					std::cout << sample_ << "\n";
+				}
+			}
+		}
+	}
+
+	//std::cout << noise_table << "\n";
+
+	//EmuMath::NoiseTable<table_size> babby_table = EmuMath::NoiseTable<table_size>(noise_table);
+	//std::cout << "Main Size (Copy-construct):\n" << noise_table << "\n";
+	//std::cout << "Babby Size (Copy-construct):\n" << babby_table << "\n\n###\n\n";
+	//noise_table = EmuMath::NoiseTable<table_size>(std::move(babby_table));
+	//std::cout << "Main Size (Reversed std::move construct):\n" << noise_table << "\n";
+	//std::cout << "Babby Size (Reversed std::move construct):\n" << babby_table << "\n\n###\n\n";
+	//babby_table = noise_table;
+	//std::cout << "Main Size (Copy assign):\n" << noise_table << "\n";
+	//std::cout << "Babby Size (Copy assign):\n" << babby_table << "\n\n###\n\n";
+	//babby_table = std::move(noise_table);
+	//std::cout << "Main Size (std::move assign):\n" << noise_table << "\n";
+	//std::cout << "Babby Size (std::move assign):\n" << babby_table << "\n\n###\n\n";
+
+	noise_table.Deallocate();
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

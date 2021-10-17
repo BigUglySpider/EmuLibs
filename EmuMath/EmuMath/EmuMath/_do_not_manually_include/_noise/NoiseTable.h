@@ -54,12 +54,26 @@ namespace EmuMath
 		}
 		/// <summary> Move constructor which transfers data from one table to this. The moved-from table is left in a default-constructed state. </summary>
 		/// <param name="to_move_">Modifiable noise table to move into this newly constructed table, which will additionally be left in a default-constructed state.</param>
-		NoiseTable(EmuMath::NoiseTable<num_dimensions>&& to_move_) : NoiseTable()
+		NoiseTable(EmuMath::NoiseTable<num_dimensions>&& to_move_) noexcept : NoiseTable()
 		{
 			table_data.swap(to_move_.table_data);
 			table_size = to_move_.table_size;
 			to_move_.table_size = EmuMath::Vector<num_dimensions, std::size_t>();
 		}
+
+#pragma region ASSIGNMENT
+		NoiseTable<num_dimensions>& operator=(const NoiseTable<num_dimensions>& to_copy_)
+		{
+			table_data = to_copy_.table_data;
+			table_size = to_copy_.table_size;
+			return *this;
+		}
+		NoiseTable<num_dimensions>& operator=(NoiseTable<num_dimensions>&& to_move_) noexcept
+		{
+			swap(to_move_);
+			return *this;
+		}
+#pragma endregion
 
 #pragma region RANDOM_ACCESS
 		/// <summary>
@@ -174,6 +188,18 @@ namespace EmuMath
 		{
 			return table_size;
 		}
+		template<std::size_t Dimension_>
+		[[nodiscard]] inline std::size_t size() const
+		{
+			if constexpr (Dimension_ < num_dimensions)
+			{
+				return table_size.at<Dimension_>();
+			}
+			else
+			{
+				static_assert(false, "Attempted to get the size of an EmuMath NoiseTable in a specific dimension, but the provided dimension index exceeded the table's dimensions.");
+			}
+		}
 
 		/// <summary> Swaps the data of this table with that of the passed table. </summary>
 		/// <param name="to_swap_with_">Table of equal dimensions with which to swap data.</param>
@@ -184,7 +210,66 @@ namespace EmuMath
 			table_size = to_swap_with_.table_size;
 			to_swap_with_.table_size = temp_;
 		}
+
+		inline void clear()
+		{
+			table_data.clear();
+		}
+
+		inline void shrink_to_fit()
+		{
+			table_data.shrink_to_fit();
+			if constexpr (num_dimensions >= 2)
+			{
+				for (std::size_t x = 0, end_x_ = table_size.at<0>(); x < end_x_; ++x)
+				{
+					auto& layer_x_ = table_data[x];
+					layer_x_.shrink_to_fit();
+					if constexpr (num_dimensions >= 3)
+					{
+						for (std::size_t y = 0, end_y_ = table_data.at<1>(); y < end_y_; ++y)
+						{
+							auto& layer_y_ = layer_x_[y];
+							layer_y_.shrink_to_fit();
+						}
+					}
+				}
+			}
+		}
 #pragma endregion
+
+		/// <summary> Clears this table, and provides a guarantee to deallocate the used memory (unlike clear). </summary>
+		inline void Deallocate()
+		{
+			table_storage().swap(table_data);
+		}
+
+		/// <summary>
+		/// <para> Normalises this noise table's values to the range 0:1, as though they are currently stored in the range min_:max_. </para>
+		/// <para> To track the min_ and max_ of a table when it is generating to normalise straight after, consider using the noise_sample_processor_with_analytics functor. </para>
+		/// </summary>
+		/// <param name="min_">Low-bound value for perceived range to normalise</param>
+		/// <param name="max_">High-bound value for perceived range to normalise</param>
+		inline void NormaliseForRange(value_type min_, value_type max_)
+		{
+			if (min_ > max_)
+			{
+				NormaliseForRange(max_, min_);
+			}
+			else
+			{
+				value_type max_minus_min_ = max_ - min_;
+				if (EmuCore::FpNearEqual<value_type>(max_minus_min_, value_type(0), std::numeric_limits<value_type>::epsilon()))
+				{
+					// In this scenario, max and min are very likely the same (and if not, different only by epsilon which is likely a fp rounding error)
+					_set_all(max_);
+				}
+				else
+				{
+					_do_normalise(value_type(1) / max_minus_min_, min_);
+				}
+			}
+		}
 
 #pragma region GENERATION
 		/// <summary>
@@ -193,24 +278,48 @@ namespace EmuMath
 		/// </summary>
 		/// <typeparam name="SampleProcessor_">Functor to process noise samples further after generation. The default argument for this makes no change to samples.</typeparam>
 		/// <param name="options_">Options to create this table's samples via.</param>
+		/// <param name="SampleProcessor_">Functor to process final samples via. May be omitted to use the default construction of this functor.</param>
 		/// <returns>Boolean indicating the success of this generation operation; true only when generation is not cancelled.</returns>
 		template<EmuMath::NoiseType NoiseType_, class SampleProcessor_ = EmuMath::Functors::noise_sample_processor_default>
-		inline bool GenerateNoise(const EmuMath::NoiseTableOptions<num_dimensions>& options_)
+		inline bool GenerateNoise(const EmuMath::NoiseTableOptions<num_dimensions>& options_, SampleProcessor_ sample_processor_)
 		{
 			if (_valid_resolution(options_.table_resolution))
 			{
 				_do_resize(options_.table_resolution);
-				_do_generation
-				<
-					EmuMath::NoiseGenFunctor<num_dimensions, NoiseType_>,
-					SampleProcessor_
-				>(options_.start_point, options_.MakeStep(), options_.freq, options_.permutation_info.MakePermutations());
+				if (options_.use_fractal_noise)
+				{
+					using FractalGenerator_ = EmuMath::Functors::fractal_noise_wrapper<EmuMath::NoiseGenFunctor<num_dimensions, NoiseType_>, value_type>;
+					_do_generation<FractalGenerator_, SampleProcessor_&>
+					(
+						FractalGenerator_(options_.freq, std::move(options_.permutation_info.MakePermutations()), options_.fractal_noise_info),
+						sample_processor_,
+						options_.start_point,
+						options_.MakeStep()
+					);
+				}
+				else
+				{
+					using Generator_ = EmuMath::Functors::no_fractal_noise_wrapper<EmuMath::NoiseGenFunctor<num_dimensions, NoiseType_>, value_type>;
+					_do_generation<Generator_, SampleProcessor_&>
+					(
+						Generator_(options_.freq, std::move(options_.permutation_info.MakePermutations())),
+						sample_processor_,
+						options_.start_point,
+						options_.MakeStep()
+					);
+				}
 				return true;
 			}
 			else
 			{
 				return false;
 			}
+		}
+		template<EmuMath::NoiseType NoiseType_, class SampleProcessor_ = EmuMath::Functors::noise_sample_processor_default>
+		inline bool GenerateNoise(const EmuMath::NoiseTableOptions<num_dimensions>& options_)
+		{
+			SampleProcessor_ sample_processor_ = SampleProcessor_();
+			return GenerateNoise<NoiseType_, SampleProcessor_&>(options_, sample_processor_);
 		}
 #pragma endregion
 
@@ -255,21 +364,18 @@ namespace EmuMath
 		template<typename Generator_, typename SampleProcessor_>
 		inline void _do_generation
 		(
+			Generator_ generator_,
+			SampleProcessor_ sample_processor_,
 			EmuMath::Vector<num_dimensions, value_type> start_,
-			EmuMath::Vector3<value_type> step_,
-			float freq_,
-			const EmuMath::NoisePermutations& permutations_
+			EmuMath::Vector3<value_type> step_
 		)
 		{
-			Generator_ generator_ = Generator_();
-			SampleProcessor_ sample_processor_ = SampleProcessor_();
-
 			EmuMath::Vector<num_dimensions, value_type> point_(start_);
 			if constexpr (num_dimensions == 1)
 			{
 				for (std::size_t x_ = 0, end_x_ = table_data.size(); x_ < end_x_; ++x_)
 				{
-					table_data[x_] = sample_processor_(generator_(point_, freq_, permutations_));
+					table_data[x_] = sample_processor_(generator_(point_));
 					point_.at<0>() += step_.at<0>();
 				}
 			}
@@ -281,7 +387,7 @@ namespace EmuMath
 					point_.at<1>() = start_.at<1>();
 					for (std::size_t y_ = 0, end_y_ = layer_x_.size(); y_ < end_y_; ++y_)
 					{
-						layer_x_[y_] = sample_processor_(generator_(point_, freq_, permutations_));
+						layer_x_[y_] = sample_processor_(generator_(point_));
 						point_.at<1>() += step_.at<1>();
 					}
 					point_.at<0>() += step_.at<0>();
@@ -299,9 +405,7 @@ namespace EmuMath
 						point_.at<2>() = start_.at<2>();
 						for (std::size_t z_ = 0, end_z_ = table_size.at<2>(); z_ < end_z_; ++z_)
 						{
-							value_type sample_ = generator_(point_, freq_, permutations_);
-							sample_ = sample_processor_(sample_);
-							layer_y_[z_] = sample_;
+							layer_y_[z_] = sample_processor_(generator_(point_));
 							point_.at<2>() += step_.at<2>();
 						}
 						point_.at<1>() += step_.at<1>();
@@ -312,6 +416,91 @@ namespace EmuMath
 			else
 			{
 				static_assert(false, "Attempted to generate an impossibly-dimensioned EmuMath::NoiseTable.");
+			}
+		}
+
+		inline void _set_all(value_type val_)
+		{
+			if constexpr (num_dimensions == 1)
+			{
+				for (std::size_t x_ = 0, x_end_ = size<0>(); x_ < x_end_; ++x_)
+				{
+					table_data[x_] = val_;
+				}
+			}
+			else if constexpr (num_dimensions == 2)
+			{
+				for (std::size_t x_ = 0, x_end_ = size<0>(); x_ < x_end_; ++x_)
+				{
+					auto& layer_x_ = table_data[x_];
+					for (std::size_t y_ = 0, y_end_ = size<1>(); y_ < y_end_; ++y_)
+					{
+						layer_x_[y_] = val_;
+					}
+				}
+			}
+			else if constexpr (num_dimensions == 3)
+			{
+				for (std::size_t x_ = 0, x_end_ = size<0>(); x_ < x_end_; ++x_)
+				{
+					auto& layer_x_ = table_data[x_];
+					for (std::size_t y_ = 0, y_end_ = size<1>(); y_ < y_end_; ++y_)
+					{
+						auto& layer_y_ = layer_x_[y_];
+						for (std::size_t z_ = 0, z_end_ = size<2>(); z_ < z_end_; ++z_)
+						{
+							layer_y_[z_] = val_;
+						}
+					}
+				}
+			}
+			else
+			{
+				static_assert(false, "NoiseTable::_multiply_all not implemented for instance dimensions.");
+			}
+		}
+
+		inline void _do_normalise(value_type reciprocal_multiplier_, value_type min_)
+		{
+			if constexpr (num_dimensions == 1)
+			{
+				for (std::size_t x_ = 0, x_end_ = size<0>(); x_ < x_end_; ++x_)
+				{
+					auto& val_ = table_data[x_];
+					val_ = (val_ - min_) * reciprocal_multiplier_;
+				}
+			}
+			else if constexpr (num_dimensions == 2)
+			{
+				for (std::size_t x_ = 0, x_end_ = size<0>(); x_ < x_end_; ++x_)
+				{
+					auto& layer_x_ = table_data[x_];
+					for (std::size_t y_ = 0, y_end_ = size<1>(); y_ < y_end_; ++y_)
+					{
+						auto& val_ = layer_x_[y_];
+						val_ = (val_ - min_) * reciprocal_multiplier_;
+					}
+				}
+			}
+			else if constexpr (num_dimensions == 3)
+			{
+				for (std::size_t x_ = 0, x_end_ = size<0>(); x_ < x_end_; ++x_)
+				{
+					auto& layer_x_ = table_data[x_];
+					for (std::size_t y_ = 0, y_end_ = size<1>(); y_ < y_end_; ++y_)
+					{
+						auto& layer_y_ = layer_x_[y_];
+						for (std::size_t z_ = 0, z_end_ = size<2>(); z_ < z_end_; ++z_)
+						{
+							auto& val_ = layer_y_[z_];
+							val_ = (val_ - min_) * reciprocal_multiplier_;
+						}
+					}
+				}
+			}
+			else
+			{
+				static_assert(false, "NoiseTable::_set_all not implemented for instance dimensions.");
 			}
 		}
 	};

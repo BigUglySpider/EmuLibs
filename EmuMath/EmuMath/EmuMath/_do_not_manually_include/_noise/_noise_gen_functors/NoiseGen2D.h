@@ -30,7 +30,7 @@ namespace EmuMath::Functors
 			std::int32_t ix = static_cast<std::int32_t>(floorf(point_.at<0>())) & mask_;
 			std::int32_t iy = static_cast<std::int32_t>(floorf(point_.at<1>())) & mask_;
 
-			return permutations_[static_cast<std::size_t>(permutations_[ix] + iy) & mask_] * (1.0f / mask_);
+			return permutations_[(static_cast<std::size_t>(permutations_[ix]) + iy) & mask_] * (1.0f / mask_);
 		}
 		template<std::size_t Size_, typename T_, typename OnlyNonV2f = std::enable_if_t<Size_ != 2 || !std::is_same_v<float, T_>>>
 		inline float operator()(const EmuMath::Vector<Size_, T_>& point_, float freq_, const EmuMath::NoisePermutations& permutations_) const

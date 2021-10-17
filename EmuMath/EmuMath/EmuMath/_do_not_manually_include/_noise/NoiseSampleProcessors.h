@@ -103,8 +103,8 @@ namespace EmuMath::Functors
 		template<typename T_>
 		constexpr inline T_ operator()(T_ sample_) const
 		{
-			constexpr T_ min_ = -(EmuCore::CommonConstants::SQRT_3<T_> * T_(0.5));
-			constexpr T_ max_ = EmuCore::CommonConstants::SQRT_3<T_> * T_(0.5);
+			constexpr T_ min_ = -(EmuCore::CommonConstants::SQRT_3<T_> / T_(2));
+			constexpr T_ max_ = EmuCore::CommonConstants::SQRT_3<T_> / T_(2);
 			constexpr T_ denominator_reciprocal_ = T_(1) / (max_ - min_);
 
 			return (sample_ - min_) * denominator_reciprocal_;

@@ -272,7 +272,16 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseTableOptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoisePermutationInfo.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_info\NoisePermutationInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_info\FractalNoiseInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FractalNoiseWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseSampleProcessorAnalytics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
