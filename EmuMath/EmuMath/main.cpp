@@ -124,6 +124,28 @@ inline void WriteNoiseTableToPPM(const EmuMath::NoiseTable<num_dimensions>& nois
 			}
 			out_ppm_.close();
 		}
+		std::cout << "Finished outputting all 3D noise layers.\n";
+	}
+	else if constexpr (num_dimensions == 2)
+	{
+		std::cout << "\nOutputting image...\n";
+
+		std::ostringstream name_;
+		name_ << "./2d_test_noise_.ppm";
+		std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
+		out_ppm_ << "P6" << std::endl << noise_table_.size<0>() << ' ' << noise_table_.size<1>() << std::endl << "255" << std::endl;
+
+		for (std::size_t y = 0, end_y = noise_table_.size<1>(); y < end_y; ++y)
+		{
+			for (std::size_t x = 0, end_x = noise_table_.size<0>(); x < end_x; ++x)
+			{
+				// Clamp is merely to cancel out fp-rounding errors
+				EmuMath::Vector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.at(x, y)).Clamp(0.0f, 255.0f));
+				out_ppm_ << (char)colour_byte_.x << (char)colour_byte_.y << (char)colour_byte_.z;
+			}
+		}
+		out_ppm_.close();
+		std::cout << "Finished outputting 2D noise layer.\n";
 	}
 }
 
@@ -131,9 +153,10 @@ int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
 
+	constexpr std::int32_t perm_pow_ = 20;
 	constexpr EmuMath::NoisePermutations::seed_32_type seed_32 = 1337;
 	constexpr EmuMath::NoisePermutations::seed_64_type seed_64 = 13337;
-	constexpr std::size_t num_permutations_ = 1024;
+	constexpr std::size_t num_permutations_ = static_cast<std::size_t>(1 << perm_pow_);
 	constexpr EmuMath::NoiseType noise_type_ = EmuMath::NoiseType::PERLIN;
 	constexpr float freq_ = 128.0f;
 	constexpr EmuMath::Vector<3, float> start_(0.0f, 0.0f, 0.0f);
@@ -156,7 +179,7 @@ int main()
 	constexpr std::size_t table_size = 3;
 	EmuMath::NoiseTable<table_size> noise_table;
 
-	using underlying_sample_processor = EmuMath::Functors::noise_sample_processor_perlin3d_normalise;
+	using underlying_sample_processor = EmuMath::Functors::noise_sample_processor_perlin_normalise<table_size>;
 	using sample_processor_with_analytics = EmuMath::Functors::noise_sample_processor_with_analytics
 	<
 		underlying_sample_processor,
@@ -211,7 +234,7 @@ int main()
 
 	sample_processor sample_processor_;
 	
-	std::cout << "Generating table...\n";
+	std::cout << "Generating table with " << options_no_step.permutation_info.TargetCountToPowerOf2() << " permutations...\n";
 	if (noise_table.GenerateNoise<noise_type_, sample_processor&>(options_no_step, sample_processor_))
 	{
 		std::cout << "Success! (" << noise_table.size() << ")\n";
@@ -221,6 +244,31 @@ int main()
 		std::cout << "Failure!\n";
 	}
 	WriteNoiseTableToPPM(noise_table);
+
+
+	EmuMath::NoiseTable<2> noise_2d_;
+	EmuMath::Functors::noise_sample_processor_with_analytics
+	<
+		EmuMath::Functors::noise_sample_processor_perlin_normalise<2>, EmuCore::analytic_track_min<float>, EmuCore::analytic_track_max<float>
+	> sample_processor_for_2d_;
+	noise_2d_.GenerateNoise<EmuMath::NoiseType::PERLIN>
+	(
+		EmuMath::NoiseTableOptions<2>
+		(
+			{ 1024, 1024 },
+			{ 0.0f, 0.0f },
+			{ 1.0, 1.0f },
+			16.0f,
+			false,
+			true,
+			EmuMath::Info::NoisePermutationInfo(1024, EmuMath::Info::NoisePermutationInfo::ShuffleMode::SEED_64, true, 0, 1337),
+			EmuMath::Info::FractalNoiseInfo(5, 2.0f, 0.5f)
+		),
+		sample_processor_for_2d_
+	);
+	WriteNoiseTableToPPM(noise_2d_);
+	std::cout << noise_2d_ << "\n";
+	system("pause");
 
 	std::cout << "Min: " << sample_processor_.at<0>().min_value << "\n";
 	std::cout << "Max: " << sample_processor_.at<1>().max_value << "\n";
