@@ -5,6 +5,7 @@
 #include "../_noise_info/NoiseType.h"
 #include "../../../Random.h"
 #include "../../../Vector.h"
+#include "../../../../EmuCore/Functors/Arithmetic.h"
 #include "../../../../EmuCore/TMPHelpers/TypeComparators.h"
 
 namespace EmuMath::Functors::_underlying_noise_gen
