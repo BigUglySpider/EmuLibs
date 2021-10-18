@@ -65,10 +65,6 @@ namespace EmuMath
 		{
 			EmuMath::Helpers::VectorSet(*this, toCopy_);
 		}
-		constexpr Vector(const contained_type* pDataToLoad, std::size_t numBytes_) : Vector()
-		{
-			memcpy(data(), pDataToLoad, numBytes_);
-		}
 		/// <summary>
 		/// <para> Constructs this vector with its elements matching the passed data, in contiguous order of the 0th to the (size - 1)th element. </para>
 		/// <para> This constructor requires a number of arguments equal to the number of elements in the vector. </para>
@@ -76,8 +72,17 @@ namespace EmuMath
 		/// <typeparam name="Args">All arguments passed to construct this vector via.</typeparam>
 		/// <typeparam name="RequiresArgumentCountEqualToSize">Dummy parameter used to make use of std::enable_if.</typeparam>
 		/// <param name="contiguousData_">Arguments to create this vector's elements, in contiguous order from the 0th-(size - 1)th element in this vector.</param>
-		template<typename...Args, typename RequiresArgumentCountEqualToSize = std::enable_if_t<sizeof...(Args) == size>>
-		constexpr Vector(Args&&...contiguousData_) : data_({ static_cast<contained_type>(std::forward<Args>(contiguousData_))... })// data_({ static_cast<contained_type>(std::forward<Args>(contiguousData_))... })
+		template
+		<
+			typename...Args,
+			typename RequiresArgumentCountEqualToSizeAndNonVectorArg_ = std::enable_if_t
+			<
+				sizeof...(Args) == size &&
+				// Additional check for size:1 vectors so as to differentiate between this and the vector copy constructor
+				!(size == 1 && EmuMath::TMP::is_emu_vector_v<typename EmuCore::TMPHelpers::first_packed_arg<Args...>::type>)
+			>
+		>
+		explicit constexpr Vector(Args&&...contiguousData_) : data_({ static_cast<contained_type>(std::forward<Args>(contiguousData_))... })
 		{
 			static_assert(sizeof...(Args) == size, "Provided an amount of arguments to an EmuMath Vector constructor that is not equal to the number of elements in the Vector.");
 			static_assert

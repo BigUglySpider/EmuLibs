@@ -237,6 +237,29 @@ int main()
 
 	sample_processor sample_processor_;
 
+	EmuMath::NoiseTable<3, float> to_print_;
+	EmuMath::NoiseTable<3, double> to_print_;
+
+	to_print_.GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::noise_sample_processor_perlin_normalise<1>>
+	(
+		to_print_.MakeOptions
+		(
+			EmuMath::Vector<3, std::size_t>(10, 10, 10),
+			EmuMath::Vector<3, float>(0.0f, 0.0f, 0.0f),
+			EmuMath::Vector<3, float>(0.0005f, 0.0005f, 0.0005f),
+			16.0f,
+			true,
+			false,
+			EmuMath::Info::NoisePermutationInfo(2048, EmuMath::Info::NoisePermutationShuffleMode::BOOL_INPUT, true, 0, 0),
+			EmuMath::Info::FractalNoiseInfo<float>()
+		)
+	);
+	std::cout << to_print_ << "\n";
+	std::wostringstream w_str_;
+	w_str_ << to_print_;
+	std::cout << "\nWide length: " << w_str_.str().size() << "\n";
+	system("pause");
+
 	std::cout << "Generating table with " << options_no_step.permutation_info.TargetCountToPowerOf2() << " permutations...\n";
 	if (noise_table.GenerateNoise<noise_type_, sample_processor&>(options_no_step, sample_processor_))
 	{
@@ -311,7 +334,7 @@ int main()
 	//std::cout << "Main Size (std::move assign):\n" << noise_table << "\n";
 	//std::cout << "Babby Size (std::move assign):\n" << babby_table << "\n\n###\n\n";
 
-	noise_table.Deallocate();
+	noise_table.Release();
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
