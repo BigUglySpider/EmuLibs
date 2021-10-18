@@ -158,11 +158,11 @@ int main()
 	constexpr EmuMath::NoisePermutations::seed_64_type seed_64 = 13337;
 	constexpr std::size_t num_permutations_ = static_cast<std::size_t>(1 << perm_pow_);
 	constexpr EmuMath::NoiseType noise_type_ = EmuMath::NoiseType::PERLIN;
-	constexpr float freq_ = 128.0f;
+	constexpr float freq_ = 32.0f;
 	constexpr EmuMath::Vector<3, float> start_(0.0f, 0.0f, 0.0f);
 	constexpr EmuMath::Vector<3, float> end_(1.0f, 1.0f, 1.0f);
 	constexpr EmuMath::Vector<3, float> custom_step(0.001f, 0.001f, 0.001f);
-	constexpr EmuMath::Vector<3, std::size_t> resolution_(1920, 1920, 5);
+	constexpr EmuMath::Vector<3, std::size_t> resolution_(1024, 1024, 5);
 	constexpr std::size_t total_samples_ = resolution_.TotalProduct<std::size_t>();
 	constexpr bool use_fractal_noise_ = false;
 	constexpr std::size_t fractal_octaves_ = 3;
@@ -174,12 +174,14 @@ int main()
 		fractal_lacunarity_,
 		fractal_gain_
 	);
-	constexpr EmuMath::Info::NoisePermutationInfo::ShuffleMode shuffle_mode_ = EmuMath::Info::NoisePermutationInfo::ShuffleMode::SEED_64;
+	constexpr EmuMath::Info::NoisePermutationShuffleMode shuffle_mode_ = EmuMath::Info::NoisePermutationShuffleMode::SEED_64;
 
 	constexpr std::size_t table_size = 3;
 	EmuMath::NoiseTable<table_size> noise_table;
 
-	using underlying_sample_processor = EmuMath::Functors::noise_sample_processor_perlin_normalise<table_size>;
+	using perlin_normaliser_0_1 = EmuMath::Functors::noise_sample_processor_perlin_normalise<table_size>;
+	using perlin_normaliser_neg1_1 = EmuMath::Functors::noise_sample_processor_perlin_neg1_to_1<table_size>;
+	using underlying_sample_processor = perlin_normaliser_0_1;
 	using sample_processor_with_analytics = EmuMath::Functors::noise_sample_processor_with_analytics
 	<
 		underlying_sample_processor,
@@ -233,7 +235,7 @@ int main()
 	constexpr auto custom_step_from_options = options_with_step.MakeStep();
 
 	sample_processor sample_processor_;
-	
+
 	std::cout << "Generating table with " << options_no_step.permutation_info.TargetCountToPowerOf2() << " permutations...\n";
 	if (noise_table.GenerateNoise<noise_type_, sample_processor&>(options_no_step, sample_processor_))
 	{
@@ -261,7 +263,7 @@ int main()
 			16.0f,
 			false,
 			true,
-			EmuMath::Info::NoisePermutationInfo(1024, EmuMath::Info::NoisePermutationInfo::ShuffleMode::SEED_64, true, 0, 1337),
+			EmuMath::Info::NoisePermutationInfo(1024, EmuMath::Info::NoisePermutationShuffleMode::SEED_64, true, 0, 1337),
 			EmuMath::Info::FractalNoiseInfo(5, 2.0f, 0.5f)
 		),
 		sample_processor_for_2d_

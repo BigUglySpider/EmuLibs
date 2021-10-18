@@ -12,7 +12,7 @@ namespace EmuMath
 	/// <para> Class to produce a shuffled sequence of integers. Defaults to storing signed 32-bit integers. </para>
 	/// <para> Created sequences will contain values within the range of 0 (inclusive) : size (exclusive). </para>
 	/// </summary>
-	template<typename T_ = std::int32_t>
+	template<typename T_>
 	class ShuffledIntSequence
 	{
 	public:

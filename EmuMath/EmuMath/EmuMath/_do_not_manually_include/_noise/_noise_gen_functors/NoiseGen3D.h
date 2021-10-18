@@ -23,15 +23,16 @@ namespace EmuMath::Functors
 		}
 		inline float operator()(EmuMath::Vector<3, float> point_, float freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
-			std::int32_t mask_ = permutations_.MaxValue();
+			EmuMath::NoisePermutationValue mask_ = permutations_.MaxValue();
 			point_ *= freq_;
-			int ix = static_cast<int>(floorf(point_.at<0>()));
-			int iy = static_cast<int>(floorf(point_.at<1>()));
-			int iz = static_cast<int>(floorf(point_.at<2>()));
+			EmuMath::NoisePermutationValue ix = static_cast<EmuMath::NoisePermutationValue>(floorf(point_.at<0>()));
+			EmuMath::NoisePermutationValue iy = static_cast<EmuMath::NoisePermutationValue>(floorf(point_.at<1>()));
+			EmuMath::NoisePermutationValue iz = static_cast<EmuMath::NoisePermutationValue>(floorf(point_.at<2>()));
 			ix &= mask_;
 			iy &= mask_;
 			iz &= mask_;
 
+			// Forced store as size_t so we can handle width changes if EmuMath::NoisePermutationValue is of different width
 			std::size_t perm_x_ = static_cast<std::size_t>(permutations_[ix]);
 			std::size_t perm_xyz_ = (static_cast<std::size_t>(permutations_[(perm_x_ + iy) & mask_]) + iz) & mask_;
 			return permutations_[perm_xyz_] * (1.0f / mask_);
@@ -52,12 +53,12 @@ namespace EmuMath::Functors
 		}
 		inline float operator()(EmuMath::Vector<3, float> point_, float freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
-			std::int32_t mask_ = permutations_.MaxValue();
+			EmuMath::NoisePermutationValue mask_ = permutations_.MaxValue();
 			point_ *= freq_;
 
-			std::int32_t ix_0_ = static_cast<std::int32_t>(floorf(point_.at<0>()));
-			std::int32_t iy_0_ = static_cast<std::int32_t>(floorf(point_.at<1>()));
-			std::int32_t iz_0_ = static_cast<std::int32_t>(floorf(point_.at<2>()));
+			EmuMath::NoisePermutationValue ix_0_ = static_cast<EmuMath::NoisePermutationValue>(floorf(point_.at<0>()));
+			EmuMath::NoisePermutationValue iy_0_ = static_cast<EmuMath::NoisePermutationValue>(floorf(point_.at<1>()));
+			EmuMath::NoisePermutationValue iz_0_ = static_cast<EmuMath::NoisePermutationValue>(floorf(point_.at<2>()));
 
 			float tx = EmuMath::Functors::_underlying_noise_gen::SmoothT(point_.x - ix_0_);
 			float ty = EmuMath::Functors::_underlying_noise_gen::SmoothT(point_.y - iy_0_);
@@ -66,26 +67,28 @@ namespace EmuMath::Functors
 			ix_0_ &= mask_;
 			iy_0_ &= mask_;
 			iz_0_ &= mask_;
-			std::int32_t ix_1_ = (ix_0_ + 1) & mask_;
-			std::int32_t iy_1_ = (iy_0_ + 1) & mask_;
-			std::int32_t iz_1_ = (iz_0_ + 1) & mask_;
+			EmuMath::NoisePermutationValue ix_1_ = (ix_0_ + 1) & mask_;
+			EmuMath::NoisePermutationValue iy_1_ = (iy_0_ + 1) & mask_;
+			EmuMath::NoisePermutationValue iz_1_ = (iz_0_ + 1) & mask_;
 
-			std::int32_t perm_0_ = permutations_[ix_0_];
-			std::int32_t perm_1_ = permutations_[ix_1_];
 
-			std::int32_t perm_00_ = permutations_[static_cast<std::size_t>(perm_0_ + iy_0_) & mask_];
-			std::int32_t perm_01_ = permutations_[static_cast<std::size_t>(perm_0_ + iy_1_) & mask_];
-			std::int32_t perm_10_ = permutations_[static_cast<std::size_t>(perm_1_ + iy_0_) & mask_];
-			std::int32_t perm_11_ = permutations_[static_cast<std::size_t>(perm_1_ + iy_1_) & mask_];
+			// Forced store as size_t so we can handle width changes if EmuMath::NoisePermutationValue is not size_t width
+			std::size_t perm_0_ = static_cast<std::size_t>(permutations_[ix_0_]);
+			std::size_t perm_1_ = static_cast<std::size_t>(permutations_[ix_1_]);
 
-			float perm_000_ = static_cast<float>(permutations_[static_cast<std::size_t>(perm_00_ + iz_0_) & mask_]);
-			float perm_001_ = static_cast<float>(permutations_[static_cast<std::size_t>(perm_00_ + iz_1_) & mask_]);
-			float perm_010_ = static_cast<float>(permutations_[static_cast<std::size_t>(perm_01_ + iz_0_) & mask_]);
-			float perm_011_ = static_cast<float>(permutations_[static_cast<std::size_t>(perm_01_ + iz_1_) & mask_]);
-			float perm_100_ = static_cast<float>(permutations_[static_cast<std::size_t>(perm_10_ + iz_0_) & mask_]);
-			float perm_101_ = static_cast<float>(permutations_[static_cast<std::size_t>(perm_10_ + iz_1_) & mask_]);
-			float perm_110_ = static_cast<float>(permutations_[static_cast<std::size_t>(perm_11_ + iz_0_) & mask_]);
-			float perm_111_ = static_cast<float>(permutations_[static_cast<std::size_t>(perm_11_ + iz_1_) & mask_]);
+			std::size_t perm_00_ = static_cast<std::size_t>(permutations_[(perm_0_ + iy_0_) & mask_]);
+			std::size_t perm_01_ = static_cast<std::size_t>(permutations_[(perm_0_ + iy_1_) & mask_]);
+			std::size_t perm_10_ = static_cast<std::size_t>(permutations_[(perm_1_ + iy_0_) & mask_]);
+			std::size_t perm_11_ = static_cast<std::size_t>(permutations_[(perm_1_ + iy_1_) & mask_]);
+
+			float perm_000_ = static_cast<float>(permutations_[(perm_00_ + iz_0_) & mask_]);
+			float perm_001_ = static_cast<float>(permutations_[(perm_00_ + iz_1_) & mask_]);
+			float perm_010_ = static_cast<float>(permutations_[(perm_01_ + iz_0_) & mask_]);
+			float perm_011_ = static_cast<float>(permutations_[(perm_01_ + iz_1_) & mask_]);
+			float perm_100_ = static_cast<float>(permutations_[(perm_10_ + iz_0_) & mask_]);
+			float perm_101_ = static_cast<float>(permutations_[(perm_10_ + iz_1_) & mask_]);
+			float perm_110_ = static_cast<float>(permutations_[(perm_11_ + iz_0_) & mask_]);
+			float perm_111_ = static_cast<float>(permutations_[(perm_11_ + iz_1_) & mask_]);
 
 			return lerp_
 			(
@@ -127,7 +130,7 @@ namespace EmuMath::Functors
 			EmuMath::Vector<3, float>(0.0f, -1.0f, 1.0f),
 			EmuMath::Vector<3, float>(0.0f, -1.0f, -1.0f)
 		};
-		static constexpr std::size_t _gradient_mask = 15;
+		static constexpr EmuMath::NoisePermutationValue _gradient_mask = 15;
 
 		EmuCore::do_lerp<float, float, float> lerp_;
 		constexpr make_noise_3d() : lerp_()
@@ -135,12 +138,12 @@ namespace EmuMath::Functors
 		}
 		inline float operator()(EmuMath::Vector<3, float> point_, float freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
-			std::int32_t mask_ = permutations_.MaxValue();
+			EmuMath::NoisePermutationValue mask_ = permutations_.MaxValue();
 			point_ *= freq_;
 
-			std::int32_t ix_0_ = static_cast<std::int32_t>(floorf(point_.x));
-			std::int32_t iy_0_ = static_cast<std::int32_t>(floorf(point_.y));
-			std::int32_t iz_0_ = static_cast<std::int32_t>(floorf(point_.z));
+			EmuMath::NoisePermutationValue ix_0_ = static_cast<EmuMath::NoisePermutationValue>(floorf(point_.x));
+			EmuMath::NoisePermutationValue iy_0_ = static_cast<EmuMath::NoisePermutationValue>(floorf(point_.y));
+			EmuMath::NoisePermutationValue iz_0_ = static_cast<EmuMath::NoisePermutationValue>(floorf(point_.z));
 
 			float tx_0_ = point_.x - ix_0_;
 			float ty_0_ = point_.y - iy_0_;
@@ -152,10 +155,12 @@ namespace EmuMath::Functors
 			ix_0_ &= mask_;
 			iy_0_ &= mask_;
 			iz_0_ &= mask_;
-			std::int32_t ix_1_ = (ix_0_ + 1) & mask_;
-			std::int32_t iy_1_ = (iy_0_ + 1) & mask_;
-			std::int32_t iz_1_ = (iz_0_ + 1) & mask_;
+			EmuMath::NoisePermutationValue ix_1_ = (ix_0_ + 1) & mask_;
+			EmuMath::NoisePermutationValue iy_1_ = (iy_0_ + 1) & mask_;
+			EmuMath::NoisePermutationValue iz_1_ = (iz_0_ + 1) & mask_;
 
+
+			// Forced store as size_t so we can handle width changes if EmuMath::NoisePermutationValue is not size_t width
 			std::size_t perm_0_ = static_cast<std::size_t>(permutations_[ix_0_]);
 			std::size_t perm_1_ = static_cast<std::size_t>(permutations_[ix_1_]);
 

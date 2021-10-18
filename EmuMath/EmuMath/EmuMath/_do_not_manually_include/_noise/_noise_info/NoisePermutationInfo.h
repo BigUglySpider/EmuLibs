@@ -5,30 +5,43 @@
 
 namespace EmuMath::Info
 {
+	/// <summary> Simple enum for identifying a shuffle type to perform for noise permutation arrays. </summary>
+	enum class NoisePermutationShuffleMode : std::uint8_t
+	{
+		BOOL_INPUT = 0x00,
+		SEED_32 = 0x01,
+		SEED_64 = 0x02,
+
+		DEFAULT = BOOL_INPUT
+	};
+
+	/// <summary> Returns a boolean indicating if the passed NoisePermutationShuffleMode is valid for use with NoisePermutationInfo. </summary>
+	[[nodiscard]] constexpr inline bool is_valid_noise_permutation_shuffle_mode(const EmuMath::Info::NoisePermutationShuffleMode in_shuffle_mode_)
+	{
+		return
+		(
+			in_shuffle_mode_ == EmuMath::Info::NoisePermutationShuffleMode::BOOL_INPUT ||
+			in_shuffle_mode_ == EmuMath::Info::NoisePermutationShuffleMode::SEED_32 ||
+			in_shuffle_mode_ == EmuMath::Info::NoisePermutationShuffleMode::SEED_64
+		);
+	}
+	/// <summary> Returns the passed NoisePermutationShuffleMode if it is valid for use with NoisePermutationInfo, otherwise returns the default mode. </summary>
+	[[nodiscard]] constexpr inline EmuMath::Info::NoisePermutationShuffleMode validate_noise_permutation_shuffle_mode
+	(
+		const EmuMath::Info::NoisePermutationShuffleMode in_shuffle_mode_
+	)
+	{
+		return is_valid_noise_permutation_shuffle_mode(in_shuffle_mode_) ? in_shuffle_mode_ : EmuMath::Info::NoisePermutationShuffleMode::DEFAULT;
+	}
+
 	struct NoisePermutationInfo
 	{
 	public:
-		enum class ShuffleMode : std::uint8_t
-		{
-			BOOL_INPUT = 0x01,
-			SEED_32 = 0x02,
-			SEED_64 = 0x04
-		};
-		static constexpr inline bool valid_shuffle_mode(const ShuffleMode& in_shuffle_mode_)
-		{
-			return 
-			(
-				in_shuffle_mode_ == ShuffleMode::BOOL_INPUT ||
-				in_shuffle_mode_ == ShuffleMode::SEED_32 ||
-				in_shuffle_mode_ == ShuffleMode::SEED_64
-			);
-		}
-
 		using seed_32_type = EmuMath::NoisePermutations::seed_32_type;
 		using seed_64_type = EmuMath::NoisePermutations::seed_64_type;
 
 		static constexpr std::size_t _default_permutation_count = 512;
-		static constexpr ShuffleMode _default_shuffle_mode = ShuffleMode::BOOL_INPUT;
+		static constexpr EmuMath::Info::NoisePermutationShuffleMode _default_shuffle_mode = EmuMath::Info::NoisePermutationShuffleMode::DEFAULT;
 		static constexpr bool _default_bool_input = true;
 		static seed_32_type _default_seed_32() { return EmuMath::NoisePermutations::default_seed_32(); }
 		static seed_64_type _default_seed_64() { return EmuMath::NoisePermutations::default_seed_64(); }
@@ -47,7 +60,7 @@ namespace EmuMath::Info
 		constexpr NoisePermutationInfo
 		(
 			std::size_t target_num_permutations_,
-			ShuffleMode shuffle_mode_,
+			EmuMath::Info::NoisePermutationShuffleMode shuffle_mode_,
 			bool bool_input_,
 			seed_32_type seed_32_,
 			seed_64_type seed_64_
@@ -104,27 +117,22 @@ namespace EmuMath::Info
 
 		EmuMath::NoisePermutations MakePermutations() const
 		{
-			ShuffleMode using_shuffle_mode = valid_shuffle_mode(shuffle_mode) ? shuffle_mode : _default_shuffle_mode;
-			if (using_shuffle_mode == ShuffleMode::BOOL_INPUT)
+			switch (EmuMath::Info::validate_noise_permutation_shuffle_mode(shuffle_mode))
 			{
-				return EmuMath::NoisePermutations(TargetCountToPowerOf2(), bool_input);
-			}
-			else if (using_shuffle_mode == ShuffleMode::SEED_32)
-			{
-				return EmuMath::NoisePermutations(TargetCountToPowerOf2(), seed_32);
-			}
-			else if (using_shuffle_mode == ShuffleMode::SEED_64)
-			{
-				return EmuMath::NoisePermutations(TargetCountToPowerOf2(), seed_64);
-			}
-			else
-			{
-				return EmuMath::NoisePermutations(TargetCountToPowerOf2(), bool_input);
+				case EmuMath::Info::NoisePermutationShuffleMode::SEED_32:
+					return EmuMath::NoisePermutations(TargetCountToPowerOf2(), seed_32);
+					break;
+				case EmuMath::Info::NoisePermutationShuffleMode::SEED_64:
+					return EmuMath::NoisePermutations(TargetCountToPowerOf2(), seed_64);
+					break;
+				default:
+					return EmuMath::NoisePermutations(TargetCountToPowerOf2(), bool_input);
+					break;
 			}
 		}
 
 		std::size_t target_num_permutations;
-		ShuffleMode shuffle_mode;
+		EmuMath::Info::NoisePermutationShuffleMode shuffle_mode;
 		bool bool_input;
 		seed_32_type seed_32;
 		seed_64_type seed_64;

@@ -206,6 +206,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_validity_checks_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseFunctors.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FractalNoiseWrapper.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\NoisePermutations.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_info\FractalNoiseInfo.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_info\NoisePermutationInfo.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseSampleProcessors.h" />

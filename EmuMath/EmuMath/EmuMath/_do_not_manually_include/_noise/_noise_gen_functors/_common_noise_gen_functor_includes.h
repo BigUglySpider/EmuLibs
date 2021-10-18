@@ -1,16 +1,11 @@
 #ifndef EMU_MATH_COMMON_NOISE_GEN_FUNCTOR_INCLUDES_H_INC_
 #define EMU_MATH_COMMON_NOISE_GEN_FUNCTOR_INCLUDES_H_INC_ 1
 
+#include "NoisePermutations.h"
 #include "../_noise_info/NoiseType.h"
 #include "../../../Random.h"
 #include "../../../Vector.h"
 #include "../../../../EmuCore/TMPHelpers/TypeComparators.h"
-
-namespace EmuMath
-{
-	/// <summary> Integer sequence used as noise permutations for default-defined EmuMath noise generation functors. </summary>
-	using NoisePermutations = EmuMath::ShuffledIntSequence<std::int32_t>;
-}
 
 namespace EmuMath::Functors::_underlying_noise_gen
 {
