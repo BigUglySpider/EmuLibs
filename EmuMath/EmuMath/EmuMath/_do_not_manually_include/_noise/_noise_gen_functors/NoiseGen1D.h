@@ -9,10 +9,11 @@ namespace EmuMath::Functors
 	/// <para> Noise generation functor for 1-dimensional noise. </para>
 	/// <para> Valid EmuMath::NoiseType arguments have been specialised for this functor. Invalid arguments will result in an empty struct. </para>
 	/// </summary>
-	template<EmuMath::NoiseType NoiseType_>
+	template<EmuMath::NoiseType NoiseType_, typename FP_ = float>
 	struct make_noise_1d
 	{
 		static_assert(EmuMath::Validity::AssertValidNoiseType<NoiseType_>(), "Invalid NoiseType_ argument provided to EmuMath::Functors::make_noise_1d.");
+		static_assert(std::is_floating_point_v<FP_>, "Invalid FP_ type argument provided to EmuMath::Functors::make_noise_1d; the type must be a floating point.");
 		constexpr make_noise_1d()
 		{
 			static_assert(false, "Attempted to construct a make_noise_1d instance for a NoiseType that has not been implemented.");
@@ -20,92 +21,105 @@ namespace EmuMath::Functors
 	};
 
 	/// <summary> Functor to produce 1-dimensional value noise. Produced noise is in the range 0:1. </summary>
-	template<>
-	struct make_noise_1d<EmuMath::NoiseType::VALUE>
+	template<typename FP_>
+	struct make_noise_1d<EmuMath::NoiseType::VALUE, FP_>
 	{
-		constexpr make_noise_1d()
+		static_assert(std::is_floating_point_v<FP_>, "Invalid FP_ type argument provided to EmuMath::Functors::make_noise_1d; the type must be a floating point.");
+		using value_type = FP_;
+
+		EmuCore::do_floor<value_type> floor_;
+		constexpr make_noise_1d() : floor_()
 		{
 		}
-		inline float operator()(float point_, float freq_, const EmuMath::NoisePermutations& permutations_) const
+		[[nodiscard]] inline FP_ operator()(value_type point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
 			EmuMath::NoisePermutationValue mask_ = permutations_.MaxValue();
 			point_ *= freq_;
 
-			EmuMath::NoisePermutationValue i = static_cast<EmuMath::NoisePermutationValue>(floorf(point_)) & mask_;
+			EmuMath::NoisePermutationValue i = static_cast<EmuMath::NoisePermutationValue>(floor_(point_)) & mask_;
 
-			return permutations_[i] * (1.0f / mask_);
+			return permutations_[i] * (value_type(1) / mask_);
 		}
 		template<std::size_t Size_, typename T_>
-		inline float operator()(const EmuMath::Vector<Size_, T_>& point_, float freq_, const EmuMath::NoisePermutations& permutations_) const
+		inline value_type operator()(const EmuMath::Vector<Size_, T_>& point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
-			return operator()(static_cast<float>(point_.at<0>()), freq_, permutations_);
+			return operator()(static_cast<value_type>(point_.at<0>()), freq_, permutations_);
 		}
 	};
 
 	/// <summary> Functor to produce 1-dimensional smooth value noise. Produced noise is in the range 0:1. </summary>
-	template<>
-	struct make_noise_1d<EmuMath::NoiseType::VALUE_SMOOTH>
+	template<typename FP_>
+	struct make_noise_1d<EmuMath::NoiseType::VALUE_SMOOTH, FP_>
 	{
-		EmuCore::do_lerp<float, float, float> lerp_;
-		constexpr make_noise_1d() : lerp_()
+		static_assert(std::is_floating_point_v<FP_>, "Invalid FP_ type argument provided to EmuMath::Functors::make_noise_1d; the type must be a floating point.");
+		using value_type = FP_;
+
+		EmuCore::do_lerp<value_type, value_type, value_type> lerp_;
+		EmuCore::do_floor<value_type> floor_;
+		constexpr make_noise_1d() : lerp_(), floor_()
 		{
 		}
-		inline float operator()(float point_, float freq_, const EmuMath::NoisePermutations& permutations_) const
+		inline value_type operator()(value_type point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
 			EmuMath::NoisePermutationValue mask_ = permutations_.MaxValue();
 			point_ *= freq_;
 
-			EmuMath::NoisePermutationValue i0 = static_cast<EmuMath::NoisePermutationValue>(floorf(point_));
-			float t_ = EmuMath::Functors::_underlying_noise_gen::SmoothT(point_ - i0);
+			EmuMath::NoisePermutationValue i0 = static_cast<EmuMath::NoisePermutationValue>(floor_(point_));
+			value_type t_ = EmuMath::Functors::_underlying_noise_gen::SmoothT(point_ - i0);
 			i0 &= mask_;
 			EmuMath::NoisePermutationValue i1 = (i0 + 1) & mask_;
 
-			float perm_0_ = static_cast<float>(permutations_[i0]);
-			float perm_1_ = static_cast<float>(permutations_[i1]);
+			value_type perm_0_ = static_cast<value_type>(permutations_[i0]);
+			value_type perm_1_ = static_cast<value_type>(permutations_[i1]);
 
-			return lerp_(perm_0_, perm_1_, t_) * (1.0f / mask_);
+			return lerp_(perm_0_, perm_1_, t_) * (value_type(1) / mask_);
 		}
 		template<std::size_t Size_, typename T_>
-		inline float operator()(const EmuMath::Vector<Size_, T_>& point_, float freq_, const EmuMath::NoisePermutations& permutations_) const
+		inline value_type operator()(const EmuMath::Vector<Size_, T_>& point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
-			return operator()(static_cast<float>(point_.at<0>()), freq_, permutations_);
+			return operator()(static_cast<value_type>(point_.at<0>()), freq_, permutations_);
 		}
 	};
 
 	/// <summary> Functor to produce 1-dimensional smooth perlin noise. Produced noise is in the range -0.5:0.5. </summary>
-	template<>
-	struct make_noise_1d<EmuMath::NoiseType::PERLIN>
+	template<typename FP_>
+	struct make_noise_1d<EmuMath::NoiseType::PERLIN, FP_>
 	{
+		static_assert(std::is_floating_point_v<FP_>, "Invalid FP_ type argument provided to EmuMath::Functors::make_noise_1d; the type must be a floating point.");
+		using value_type = FP_;
+		using gradient_type = value_type;
+
 		static constexpr std::size_t _num_gradients = 2;
-		static constexpr float _gradients[_num_gradients] = { 1.0f, -1.0f };
+		static constexpr gradient_type _gradients[_num_gradients] = { gradient_type(1), gradient_type(-1) };
 		static constexpr EmuMath::NoisePermutationValue _gradient_mask = 1;
 
-		EmuCore::do_lerp<float, float, float> lerp_;
-		constexpr make_noise_1d() : lerp_()
+		EmuCore::do_lerp<value_type, value_type, value_type> lerp_;
+		EmuCore::do_floor<value_type> floor_;
+		constexpr make_noise_1d() : lerp_(), floor_()
 		{
 		}
-		inline float operator()(float point_, float freq_, const EmuMath::NoisePermutations& permutations_) const
+		inline value_type operator()(value_type point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
 			EmuMath::NoisePermutationValue mask_ = permutations_.MaxValue();
 			point_ *= freq_;
-			EmuMath::NoisePermutationValue i0 = static_cast<EmuMath::NoisePermutationValue>(floorf(point_));
-			float t0_ = point_ - static_cast<float>(i0);
-			float t1_ = t0_ - 1.0f;
+			EmuMath::NoisePermutationValue i0 = static_cast<EmuMath::NoisePermutationValue>(floor_(point_));
+			value_type t0_ = point_ - static_cast<value_type>(i0);
+			value_type t1_ = t0_ - value_type(1);
 			i0 &= mask_;
 			EmuMath::NoisePermutationValue i1 = (i0 + 1) & mask_;
 
-			float gradient_0_ = _gradients[permutations_[i0] & _gradient_mask];
-			float gradient_1_ = _gradients[permutations_[i1] & _gradient_mask];
+			gradient_type gradient_0_ = _gradients[permutations_[i0] & _gradient_mask];
+			gradient_type gradient_1_ = _gradients[permutations_[i1] & _gradient_mask];
 
-			float val_0_ = gradient_0_ * t0_;
-			float val_1_ = gradient_1_ * t1_;
+			value_type val_0_ = gradient_0_ * t0_;
+			value_type val_1_ = gradient_1_ * t1_;
 
 			return lerp_(val_0_, val_1_, EmuMath::Functors::_underlying_noise_gen::SmoothT(t0_));
 		}
 		template<std::size_t Size_, typename T_>
-		inline float operator()(const EmuMath::Vector<Size_, T_>& point_, float freq_, const EmuMath::NoisePermutations& permutations_) const
+		inline value_type operator()(const EmuMath::Vector<Size_, T_>& point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
-			return operator()(static_cast<float>(point_.at<0>()), freq_, permutations_);
+			return operator()(static_cast<value_type>(point_.at<0>()), freq_, permutations_);
 		}
 	};
 }

@@ -35,6 +35,20 @@ namespace EmuMath::TMP
 		}
 	}
 
+	template<typename T_>
+	constexpr inline bool assert_valid_noise_table_sample_type()
+	{
+		if constexpr (std::is_floating_point_v<T_>)
+		{
+			return true;
+		}
+		else
+		{
+			static_assert(false, "Invalid EmuMath::NoiseTable sample type provided. Only floating-point types may be provided.");
+			return false;
+		}
+	}
+
 	template<std::size_t Dimensions_, class If1_, class If2_, class If3_>
 	struct _noise_table_dimension_conditional
 	{

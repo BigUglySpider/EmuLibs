@@ -2,31 +2,36 @@
 #define EMU_MATH_FRACTAL_NOISE_INFO_H_INC_ 1
 
 #include <cstddef>
+#include "../NoiseTMP.h"
 
 namespace EmuMath::Info
 {
+	template<typename FP_>
 	struct FractalNoiseInfo
 	{
 	public:
+		static_assert(EmuMath::TMP::assert_valid_noise_table_sample_type<FP_>(), "Provided an invalid FP_ to instantiate an EmuMath::Info::FractalNoiseInfo template.");
+		using value_type = FP_;
+
 		static constexpr std::size_t _default_octaves = 1;
-		static constexpr float _default_lacunarity = 2.0f;
-		static constexpr float _default_gain = 0.5f;
+		static constexpr value_type _default_lacunarity = value_type(2);
+		static constexpr value_type _default_gain = value_type(0.5);
 
 		static constexpr std::size_t min_octaves = 1;
-		static constexpr float min_lacunarity = 1.0f;
-		static constexpr float min_gain = 0.000001f;
+		static constexpr value_type min_lacunarity = value_type(1);
+		static constexpr value_type min_gain = value_type(0.000001);
 
-		static constexpr inline std::size_t make_valid_octaves(std::size_t val_)
+		[[nodiscard]] static constexpr inline std::size_t make_valid_octaves(std::size_t val_)
 		{
 			return _get_valid_min_clamp<std::size_t>(val_, min_octaves);
 		}
-		static constexpr inline float make_valid_lacunarity(float val_)
+		[[nodiscard]] static constexpr inline value_type make_valid_lacunarity(value_type val_)
 		{
-			return _get_valid_min_clamp<float>(val_, min_lacunarity);
+			return _get_valid_min_clamp<value_type>(val_, min_lacunarity);
 		}
-		static constexpr inline float make_valid_gain(float val_)
+		[[nodiscard]] static constexpr inline value_type make_valid_gain(value_type val_)
 		{
-			return _get_valid_min_clamp<float>(val_, min_gain);
+			return _get_valid_min_clamp<value_type>(val_, min_gain);
 		}
 
 		constexpr FractalNoiseInfo() noexcept : 
@@ -35,7 +40,7 @@ namespace EmuMath::Info
 			gain(_default_gain)
 		{
 		}
-		constexpr FractalNoiseInfo(std::size_t octaves_, float lacunarity_, float gain_) noexcept :
+		constexpr FractalNoiseInfo(std::size_t octaves_, value_type lacunarity_, value_type gain_) noexcept :
 			octaves(make_valid_octaves(octaves_)),
 			lacunarity(make_valid_lacunarity(lacunarity_)),
 			gain(make_valid_gain(gain_))
@@ -59,11 +64,11 @@ namespace EmuMath::Info
 		{
 			return octaves;
 		}
-		[[nodiscard]] constexpr inline float GetLacunarity() const noexcept
+		[[nodiscard]] constexpr inline value_type GetLacunarity() const noexcept
 		{
 			return lacunarity;
 		}
-		[[nodiscard]] constexpr inline float GetGain() const noexcept
+		[[nodiscard]] constexpr inline value_type GetGain() const noexcept
 		{
 			return gain;
 		}
@@ -73,12 +78,12 @@ namespace EmuMath::Info
 			octaves = make_valid_octaves(octaves_);
 			return octaves;
 		}
-		inline float SetLacunarity(float lacunarity_) noexcept
+		inline value_type SetLacunarity(value_type lacunarity_) noexcept
 		{
 			lacunarity = make_valid_lacunarity(lacunarity_);
 			return lacunarity;
 		}
-		inline float SetGain(float gain_) noexcept
+		inline value_type SetGain(value_type gain_) noexcept
 		{
 			gain = make_valid_gain(gain_);
 			return gain;
@@ -86,8 +91,8 @@ namespace EmuMath::Info
 
 	private:
 		std::size_t octaves;
-		float lacunarity;
-		float gain;
+		value_type lacunarity;
+		value_type gain;
 
 		template<typename T_>
 		static constexpr inline T_ _get_valid_min_clamp(T_ val_, T_ min_)

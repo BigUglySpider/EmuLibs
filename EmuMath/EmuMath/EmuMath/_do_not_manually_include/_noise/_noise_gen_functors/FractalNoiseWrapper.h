@@ -15,7 +15,7 @@ namespace EmuMath::Functors
 		template<typename...GeneratorConstructorArgs_, typename = std::enable_if_t<std::is_constructible_v<generator_type, GeneratorConstructorArgs_...>>>
 		constexpr no_fractal_noise_wrapper
 		(
-			float freq_,
+			value_type freq_,
 			const EmuMath::NoisePermutations& permutations_,
 			GeneratorConstructorArgs_&&...generator_constructor_args_
 		) :
@@ -27,7 +27,7 @@ namespace EmuMath::Functors
 		template<typename...GeneratorConstructorArgs_, typename = std::enable_if_t<std::is_constructible_v<generator_type, GeneratorConstructorArgs_...>>>
 		constexpr no_fractal_noise_wrapper
 		(
-			float freq_,
+			value_type freq_,
 			EmuMath::NoisePermutations&& permutations_,
 			GeneratorConstructorArgs_&&...generator_constructor_args_
 		) :
@@ -45,7 +45,7 @@ namespace EmuMath::Functors
 
 		generator_type generator;
 		EmuMath::NoisePermutations permutations;
-		float freq;
+		value_type freq;
 	};
 
 	template<class PerIterationGenerator_, typename Out_>
@@ -54,13 +54,14 @@ namespace EmuMath::Functors
 	public:
 		using generator_type = PerIterationGenerator_;
 		using value_type = Out_;
+		using fractal_info_type = EmuMath::Info::FractalNoiseInfo<value_type>;
 
 		template<typename...GeneratorConstructorArgs_, typename = std::enable_if_t<std::is_constructible_v<generator_type, GeneratorConstructorArgs_...>>>
 		constexpr fractal_noise_wrapper
 		(
 			float freq_,
 			const EmuMath::NoisePermutations& permutations_,
-			const EmuMath::Info::FractalNoiseInfo& fractal_info_,
+			const fractal_info_type& fractal_info_,
 			GeneratorConstructorArgs_&&...generator_constructor_args_
 		) :
 			freq(freq_),
@@ -72,9 +73,9 @@ namespace EmuMath::Functors
 		template<typename...GeneratorConstructorArgs_, typename = std::enable_if_t<std::is_constructible_v<generator_type, GeneratorConstructorArgs_...>>>
 		constexpr fractal_noise_wrapper
 		(
-			float freq_,
+			value_type freq_,
 			EmuMath::NoisePermutations&& permutations_,
-			const EmuMath::Info::FractalNoiseInfo& fractal_info_,
+			const fractal_info_type& fractal_info_,
 			GeneratorConstructorArgs_&&...generator_constructor_args_
 		) :
 			freq(freq_),
@@ -87,12 +88,12 @@ namespace EmuMath::Functors
 		template<typename Point_>
 		constexpr inline value_type operator()(const Point_& point_)
 		{
-			float freq_ = freq;
+			value_type freq_ = freq;
 			value_type result_ = generator(point_, freq_, permutations);
-			float range_ = 1.0f;
-			float amplitude_ = 1.0f;
-			float lacunarity_ = fractal_info.GetLacunarity();
-			float gain_ = fractal_info.GetGain();
+			value_type range_ = value_type(1);
+			value_type amplitude_ = value_type(1);
+			value_type lacunarity_ = fractal_info.GetLacunarity();
+			value_type gain_ = fractal_info.GetGain();
 			for (std::size_t octave_ = 1, end_ = fractal_info.GetOctaves(); octave_ < end_; ++octave_)
 			{
 				freq_ *= lacunarity_;
@@ -100,13 +101,13 @@ namespace EmuMath::Functors
 				range_ += amplitude_;
 				result_ += generator(point_, freq_, permutations) * amplitude_;
 			}
-			return result_ / static_cast<value_type>(range_);
+			return result_ / range_;
 		}
 
-		EmuMath::Info::FractalNoiseInfo fractal_info;
+		fractal_info_type fractal_info;
 		generator_type generator;
 		EmuMath::NoisePermutations permutations;
-		float freq;
+		value_type freq;
 	};
 }
 

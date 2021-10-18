@@ -14,16 +14,19 @@
 namespace EmuMath
 {
 	/// <summary> Class used to generate and store X-dimensional noise with customisable parameters. </summary>
-	template<std::size_t Dimensions_>
+	template<std::size_t Dimensions_, typename SampleTypeFP_>
 	class NoiseTable
 	{
 	public:
 		static_assert(EmuMath::TMP::assert_valid_noise_dimensions<Dimensions_>(), "Provided invalid Dimensions_ value to instantiate an EmuMath::NoiseTable template.");
+		static_assert(EmuMath::TMP::assert_valid_noise_table_sample_type<SampleTypeFP_>(), "Provided an invalid SampleTypeFP_ to instantiate an EmuMath::NoiseTable template.");
 
 		/// <summary> Number of dimensions covered by this table. </summary>
 		static constexpr std::size_t num_dimensions = Dimensions_;
 		/// <summary> Type used to store individual samples within this table. </summary>
-		using value_type = float;
+		using value_type = SampleTypeFP_;
+		using this_type = NoiseTable<num_dimensions, value_type>;
+		using options_type = EmuMath::NoiseTableOptions<num_dimensions, value_type>;
 
 	private:
 		/// <summary>table_storage will be a Dimensions_-dimensional vector of value_types.</summary>
@@ -49,12 +52,12 @@ namespace EmuMath
 		}
 		/// <summary> Copy constructor which mimics the passed table without modifying it. </summary>
 		/// <param name="to_copy_">Noise table to copy the data of.</param>
-		NoiseTable(const EmuMath::NoiseTable<num_dimensions>& to_copy_) : table_data(to_copy_.table_data), table_size(to_copy_.table_size)
+		NoiseTable(const this_type& to_copy_) : table_data(to_copy_.table_data), table_size(to_copy_.table_size)
 		{
 		}
 		/// <summary> Move constructor which transfers data from one table to this. The moved-from table is left in a default-constructed state. </summary>
 		/// <param name="to_move_">Modifiable noise table to move into this newly constructed table, which will additionally be left in a default-constructed state.</param>
-		NoiseTable(EmuMath::NoiseTable<num_dimensions>&& to_move_) noexcept : NoiseTable()
+		NoiseTable(this_type&& to_move_) noexcept : NoiseTable()
 		{
 			table_data.swap(to_move_.table_data);
 			table_size = to_move_.table_size;
@@ -62,13 +65,13 @@ namespace EmuMath
 		}
 
 #pragma region ASSIGNMENT
-		NoiseTable<num_dimensions>& operator=(const NoiseTable<num_dimensions>& to_copy_)
+		this_type& operator=(const this_type& to_copy_)
 		{
 			table_data = to_copy_.table_data;
 			table_size = to_copy_.table_size;
 			return *this;
 		}
-		NoiseTable<num_dimensions>& operator=(NoiseTable<num_dimensions>&& to_move_) noexcept
+		this_type& operator=(this_type&& to_move_) noexcept
 		{
 			swap(to_move_);
 			return *this;
@@ -203,7 +206,7 @@ namespace EmuMath
 
 		/// <summary> Swaps the data of this table with that of the passed table. </summary>
 		/// <param name="to_swap_with_">Table of equal dimensions with which to swap data.</param>
-		inline void swap(EmuMath::NoiseTable<num_dimensions>& to_swap_with_)
+		inline void swap(this_type& to_swap_with_)
 		{
 			table_data.swap(to_swap_with_.table_data);
 			decltype(table_size) temp_(table_size);
@@ -281,14 +284,15 @@ namespace EmuMath
 		/// <param name="SampleProcessor_">Functor to process final samples via. May be omitted to use the default construction of this functor.</param>
 		/// <returns>Boolean indicating the success of this generation operation; true only when generation is not cancelled.</returns>
 		template<EmuMath::NoiseType NoiseType_, class SampleProcessor_ = EmuMath::Functors::noise_sample_processor_default>
-		inline bool GenerateNoise(const EmuMath::NoiseTableOptions<num_dimensions>& options_, SampleProcessor_ sample_processor_)
+		inline bool GenerateNoise(const options_type& options_, SampleProcessor_ sample_processor_)
 		{
+			using underlying_noise_gen_functor = EmuMath::NoiseGenFunctor<num_dimensions, NoiseType_, value_type>;
 			if (_valid_resolution(options_.table_resolution))
 			{
 				_do_resize(options_.table_resolution);
 				if (options_.use_fractal_noise)
 				{
-					using FractalGenerator_ = EmuMath::Functors::fractal_noise_wrapper<EmuMath::NoiseGenFunctor<num_dimensions, NoiseType_>, value_type>;
+					using FractalGenerator_ = EmuMath::Functors::fractal_noise_wrapper<underlying_noise_gen_functor, value_type>;
 					_do_generation<FractalGenerator_, SampleProcessor_&>
 					(
 						FractalGenerator_(options_.freq, std::move(options_.permutation_info.MakePermutations()), options_.fractal_noise_info),
@@ -299,7 +303,7 @@ namespace EmuMath
 				}
 				else
 				{
-					using Generator_ = EmuMath::Functors::no_fractal_noise_wrapper<EmuMath::NoiseGenFunctor<num_dimensions, NoiseType_>, value_type>;
+					using Generator_ = EmuMath::Functors::no_fractal_noise_wrapper<underlying_noise_gen_functor, value_type>;
 					_do_generation<Generator_, SampleProcessor_&>
 					(
 						Generator_(options_.freq, std::move(options_.permutation_info.MakePermutations())),
@@ -316,10 +320,39 @@ namespace EmuMath
 			}
 		}
 		template<EmuMath::NoiseType NoiseType_, class SampleProcessor_ = EmuMath::Functors::noise_sample_processor_default>
-		inline bool GenerateNoise(const EmuMath::NoiseTableOptions<num_dimensions>& options_)
+		inline bool GenerateNoise(const options_type& options_)
 		{
 			SampleProcessor_ sample_processor_ = SampleProcessor_();
 			return GenerateNoise<NoiseType_, SampleProcessor_&>(options_, sample_processor_);
+		}
+
+		/// <summary>
+		/// <para> Helper to construct options for generating noise for this table with the provided arguments. </para>
+		/// <para> Provided arguments are the respective arguments (including order) for the full custom constructor of this table's options. </para>
+		/// </summary>
+		[[nodiscard]] static inline options_type MakeOptions
+		(
+			const EmuMath::Vector<num_dimensions, std::size_t>& table_resolution_,
+			const EmuMath::Vector<num_dimensions, value_type>& start_point_,
+			const EmuMath::Vector<num_dimensions, value_type>& end_point_or_step_,
+			value_type freq_,
+			bool step_mode_,
+			bool use_fractal_noise_,
+			const EmuMath::Info::NoisePermutationInfo& permutation_info_,
+			const typename options_type::fractal_info_type& fractal_noise_info_
+		)
+		{
+			return options_type
+			(
+				table_resolution_,
+				start_point_,
+				end_point_or_step_,
+				freq_,
+				step_mode_,
+				use_fractal_noise_,
+				permutation_info_,
+				fractal_noise_info_
+			);
 		}
 #pragma endregion
 
@@ -506,8 +539,8 @@ namespace EmuMath
 	};
 }
 
-template<std::size_t num_dimensions>
-std::ostream& operator<<(std::ostream& str_, const EmuMath::NoiseTable<num_dimensions>& noise_table_)
+template<std::size_t num_dimensions, typename FP_>
+std::ostream& operator<<(std::ostream& str_, const EmuMath::NoiseTable<num_dimensions, FP_>& noise_table_)
 {
 	auto size_ = noise_table_.size();
 	if constexpr (num_dimensions == 1)

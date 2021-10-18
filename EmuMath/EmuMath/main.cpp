@@ -96,10 +96,10 @@ struct SomeStructForTestingEdges
 	float top_;
 };
 
-template<std::size_t num_dimensions>
-inline void WriteNoiseTableToPPM(const EmuMath::NoiseTable<num_dimensions>& noise_table_)
+template<std::size_t num_dimensions, typename FP_>
+inline void WriteNoiseTableToPPM(const EmuMath::NoiseTable<num_dimensions, FP_>& noise_table_)
 {
-	EmuMath::Vector3<float> white_(255.0f, 255.0f, 255.0f);
+	EmuMath::Vector3<FP_> white_(255.0f, 255.0f, 255.0f);
 
 	if constexpr (num_dimensions == 3)
 	{
@@ -153,21 +153,22 @@ int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
 
+	using sample_type = float;
 	constexpr std::int32_t perm_pow_ = 20;
 	constexpr EmuMath::NoisePermutations::seed_32_type seed_32 = 1337;
 	constexpr EmuMath::NoisePermutations::seed_64_type seed_64 = 13337;
 	constexpr std::size_t num_permutations_ = static_cast<std::size_t>(1 << perm_pow_);
 	constexpr EmuMath::NoiseType noise_type_ = EmuMath::NoiseType::PERLIN;
-	constexpr float freq_ = 32.0f;
-	constexpr EmuMath::Vector<3, float> start_(0.0f, 0.0f, 0.0f);
-	constexpr EmuMath::Vector<3, float> end_(1.0f, 1.0f, 1.0f);
-	constexpr EmuMath::Vector<3, float> custom_step(0.001f, 0.001f, 0.001f);
+	constexpr sample_type freq_ = sample_type(32.0f);
+	constexpr EmuMath::Vector<3, sample_type> start_(0.0, 0.0, 0.0);
+	constexpr EmuMath::Vector<3, sample_type> end_(1.0, 1.0, 1.0);
+	constexpr EmuMath::Vector<3, sample_type> custom_step(0.001, 0.001, 0.001);
 	constexpr EmuMath::Vector<3, std::size_t> resolution_(1024, 1024, 5);
 	constexpr std::size_t total_samples_ = resolution_.TotalProduct<std::size_t>();
 	constexpr bool use_fractal_noise_ = false;
 	constexpr std::size_t fractal_octaves_ = 3;
-	constexpr float fractal_lacunarity_ = 2.0f;
-	constexpr float fractal_gain_ = 0.5;
+	constexpr sample_type fractal_lacunarity_ = sample_type(2.0);
+	constexpr sample_type fractal_gain_ = sample_type(0.5);
 	constexpr EmuMath::Info::FractalNoiseInfo fractal_noise_info_ = EmuMath::Info::FractalNoiseInfo
 	(
 		fractal_octaves_,
@@ -177,7 +178,7 @@ int main()
 	constexpr EmuMath::Info::NoisePermutationShuffleMode shuffle_mode_ = EmuMath::Info::NoisePermutationShuffleMode::SEED_64;
 
 	constexpr std::size_t table_size = 3;
-	EmuMath::NoiseTable<table_size> noise_table;
+	EmuMath::NoiseTable<table_size, sample_type> noise_table;
 
 	using perlin_normaliser_0_1 = EmuMath::Functors::noise_sample_processor_perlin_normalise<table_size>;
 	using perlin_normaliser_neg1_1 = EmuMath::Functors::noise_sample_processor_perlin_neg1_to_1<table_size>;
@@ -185,16 +186,16 @@ int main()
 	using sample_processor_with_analytics = EmuMath::Functors::noise_sample_processor_with_analytics
 	<
 		underlying_sample_processor,
-		EmuCore::analytic_track_min<float>,
-		EmuCore::analytic_track_max<float>,
-		EmuCore::analytic_sum<float>,
+		EmuCore::analytic_track_min<sample_type>,
+		EmuCore::analytic_track_max<sample_type>,
+		EmuCore::analytic_sum<sample_type>,
 		EmuCore::analytic_count<std::size_t>
 	>;
 
 	constexpr bool use_analytics = true;
 	using sample_processor = std::conditional_t<!use_analytics, underlying_sample_processor, sample_processor_with_analytics>;
 
-	constexpr EmuMath::NoiseTableOptions<table_size> options_no_step = EmuMath::NoiseTableOptions<table_size>
+	constexpr EmuMath::NoiseTableOptions<table_size, sample_type> options_no_step = EmuMath::NoiseTableOptions<table_size, sample_type>
 	(
 		resolution_,
 		start_,
@@ -212,7 +213,7 @@ int main()
 		),
 		fractal_noise_info_
 	);
-	constexpr EmuMath::NoiseTableOptions<table_size> options_with_step = EmuMath::NoiseTableOptions<table_size>
+	constexpr EmuMath::NoiseTableOptions<table_size, sample_type> options_with_step = EmuMath::NoiseTableOptions<table_size, sample_type>
 	(
 		resolution_,
 		start_,
@@ -248,26 +249,27 @@ int main()
 	WriteNoiseTableToPPM(noise_table);
 
 
-	EmuMath::NoiseTable<2> noise_2d_;
+	EmuMath::NoiseTable<2, sample_type> noise_2d_;
 	EmuMath::Functors::noise_sample_processor_with_analytics
 	<
-		EmuMath::Functors::noise_sample_processor_perlin_normalise<2>, EmuCore::analytic_track_min<float>, EmuCore::analytic_track_max<float>
+		EmuMath::Functors::noise_sample_processor_perlin_normalise<2>, EmuCore::analytic_track_min<sample_type>, EmuCore::analytic_track_max<sample_type>
 	> sample_processor_for_2d_;
 	noise_2d_.GenerateNoise<EmuMath::NoiseType::PERLIN>
 	(
-		EmuMath::NoiseTableOptions<2>
+		noise_2d_.MakeOptions
 		(
-			{ 1024, 1024 },
-			{ 0.0f, 0.0f },
-			{ 1.0, 1.0f },
-			16.0f,
+			EmuMath::Vector<2, sample_type>(1024, 1024),
+			EmuMath::Vector<2, sample_type>(0.0, 0.0),
+			EmuMath::Vector<2, sample_type>(1.0, 1.0),
+			sample_type(16),
 			false,
 			true,
 			EmuMath::Info::NoisePermutationInfo(1024, EmuMath::Info::NoisePermutationShuffleMode::SEED_64, true, 0, 1337),
-			EmuMath::Info::FractalNoiseInfo(5, 2.0f, 0.5f)
+			EmuMath::Info::FractalNoiseInfo<sample_type>(5, sample_type(2), sample_type(0.5))
 		),
 		sample_processor_for_2d_
 	);
+
 	WriteNoiseTableToPPM(noise_2d_);
 	std::cout << noise_2d_ << "\n";
 	system("pause");
@@ -285,7 +287,7 @@ int main()
 		{
 			for (std::size_t x = 0, end_x_ = noise_table.size<0>(); x < end_x_; ++x)
 			{
-				float sample_ = noise_table(x, y, z);
+				sample_type sample_ = noise_table(x, y, z);
 				if (sample_ <= 0.0f || sample_ >= 1.0f)
 				{
 					std::cout << sample_ << "\n";

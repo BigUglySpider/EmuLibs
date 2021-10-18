@@ -8,12 +8,16 @@
 
 namespace EmuMath
 {
-	template<std::size_t Dimensions_>
+	template<std::size_t Dimensions_, typename SampleTypeFP_>
 	struct NoiseTableOptions
 	{
 	public:
-		using value_type = float;
 		static constexpr std::size_t num_dimensions = Dimensions_;
+		static_assert(EmuMath::TMP::assert_valid_noise_dimensions<num_dimensions>(), "Invalid Dimensions_ provided to EmuMath::NoiseTableOptions.");
+		static_assert(EmuMath::TMP::assert_valid_noise_table_sample_type<SampleTypeFP_>(), "Provided an invalid SampleTypeFP_ to instantiate an EmuMath::NoiseTableOptions template.");
+		
+		using value_type = SampleTypeFP_;
+		using fractal_info_type = EmuMath::Info::FractalNoiseInfo<value_type>;
 
 		template<typename X_, typename Y_, typename Z_>
 		static constexpr inline EmuMath::Vector<num_dimensions, value_type> make_correctly_sized_vector(X_ x_, Y_ y_, Z_ z_)
@@ -37,12 +41,11 @@ namespace EmuMath
 			}
 		}
 
-		static_assert(EmuMath::TMP::assert_valid_noise_dimensions<num_dimensions>(), "Invalid Dimensions_ provided to EmuMath::NoiseTableOptions.");
 
 		static constexpr EmuMath::Vector<num_dimensions, value_type> _default_start_point = make_correctly_sized_vector(0, 0, 0);
 		static constexpr EmuMath::Vector<num_dimensions, value_type> _default_end_point = make_correctly_sized_vector(1, 1, 1);
 		static constexpr EmuMath::Vector<num_dimensions, std::size_t> _default_table_resolution = make_correctly_sized_vector(32, 32, 32);
-		static constexpr float _default_freq = 32.0f;
+		static constexpr value_type _default_freq = value_type(1);
 		static constexpr bool _default_step_mode = false;
 		static constexpr bool _default_use_fractal_noise = false;
 
@@ -56,7 +59,7 @@ namespace EmuMath
 				_default_step_mode,
 				_default_use_fractal_noise,
 				EmuMath::Info::NoisePermutationInfo(),
-				EmuMath::Info::FractalNoiseInfo()
+				fractal_info_type()
 			)
 		{
 		}
@@ -65,11 +68,11 @@ namespace EmuMath
 			const EmuMath::Vector<num_dimensions, std::size_t>& table_resolution_,
 			const EmuMath::Vector<num_dimensions, value_type>& start_point_,
 			const EmuMath::Vector<num_dimensions, value_type>& end_point_or_step_,
-			float freq_,
+			value_type freq_,
 			bool step_mode_,
 			bool use_fractal_noise_,
 			const EmuMath::Info::NoisePermutationInfo& permutation_info_,
-			const EmuMath::Info::FractalNoiseInfo& fractal_noise_info_
+			const fractal_info_type& fractal_noise_info_
 		) : 
 			table_resolution(table_resolution_),
 			start_point(start_point_),
@@ -103,7 +106,7 @@ namespace EmuMath
 		/// </para>
 		/// </summary>
 		/// <returns>Step to use based on these options.</returns>
-		constexpr inline EmuMath::Vector<num_dimensions, float> MakeStep() const
+		constexpr inline EmuMath::Vector<num_dimensions, value_type> MakeStep() const
 		{
 			if (step_mode)
 			{
@@ -125,7 +128,7 @@ namespace EmuMath
 		/// </summary>
 		EmuMath::Vector<num_dimensions, value_type> end_point_or_step;
 		/// <summary> Frequency multiplier to apply to points when generating samples. </summary>
-		float freq;
+		value_type freq;
 		/// <summary>
 		/// <para> If true, end_point_or_step will be interpreted as a custom step. </para>
 		/// <para> 
@@ -139,7 +142,7 @@ namespace EmuMath
 		/// <summary> Informative data structure for creating a power-of-2 collection of permutations for generating noise masks. </summary>
 		EmuMath::Info::NoisePermutationInfo permutation_info;
 		/// <summary> Informative data structure for use when use_fractal_noise is true only. </summary>
-		EmuMath::Info::FractalNoiseInfo fractal_noise_info;
+		fractal_info_type fractal_noise_info;
 
 	};
 }
