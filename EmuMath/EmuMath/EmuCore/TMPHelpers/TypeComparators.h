@@ -354,6 +354,19 @@ namespace EmuCore::TMPHelpers
 	};
 	template<bool Condition_, typename T_>
 	using conditional_const_t = typename conditional_const<Condition_, T_>::type;
+
+	template<typename ToConvertTo_, typename FirstToConvertFrom_, typename...OthersToConvertFrom_>
+	struct are_all_convertible
+	{
+		static constexpr bool value = std::is_convertible_v<FirstToConvertFrom_, ToConvertTo_> ? are_all_convertible<ToConvertTo_, OthersToConvertFrom_...>::value : false;
+	};
+	template<typename ToConvertTo_, typename FirstToConvertFrom_>
+	struct are_all_convertible<ToConvertTo_, FirstToConvertFrom_>
+	{
+		static constexpr bool value = std::is_convertible_v<FirstToConvertFrom_, ToConvertTo_>;
+	};
+	template<typename ToConvertTo_, typename...ToConvertFrom_>
+	static constexpr bool are_all_convertible_v = are_all_convertible<ToConvertTo_, ToConvertFrom_...>::value;
 }
 
 #endif

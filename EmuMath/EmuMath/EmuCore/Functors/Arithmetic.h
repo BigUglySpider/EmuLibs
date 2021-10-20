@@ -119,6 +119,134 @@ namespace EmuCore
 		}
 	};
 
+	/// <summary> 
+	/// <para> Constexpr flooring functor. </para>
+	/// <para> Unless specialised, the valid range for values this can take is min(int64_t):max(uint64_t). </para>
+	/// </summary>
+	template<typename T_>
+	struct do_floor_constexpr
+	{
+		constexpr do_floor_constexpr()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			if constexpr (std::is_integral_v<T_>)
+			{
+				return val_;
+			}
+			else
+			{
+				if (val_ < T_(0))
+				{
+					// If trunc is different, we will have done a ceil since negative trunc == negative ceil
+					// --- As such, we need to subtract 1 from the truncated value if we do need to perform a round
+					T_ truncated_ = static_cast<T_>(static_cast<std::int64_t>(val_));
+					return (truncated_ == val_) ? val_ : (truncated_ - T_(1));
+				}
+				else
+				{
+					// Can take advantage of a higher range from an unsigned int if we know we're positive
+					// --- Additionally, positive trunc == positive floor
+					return static_cast<T_>(static_cast<std::uint64_t>(val_));
+				}
+			}
+		}
+	};
+	template<>
+	struct do_floor_constexpr<void>
+	{
+		constexpr do_floor_constexpr()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			return do_floor_constexpr<T_>()(val_);
+		}
+	};
+
+	/// <summary> 
+	/// <para> Constexpr ceiling functor. </para>
+	/// <para> Unless specialised, the valid range for values this can take is min(int64_t):max(uint64_t). </para>
+	/// </summary>
+	template<typename T_>
+	struct do_ceil_constexpr
+	{
+		constexpr do_ceil_constexpr()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			if constexpr (std::is_integral_v<T_>)
+			{
+				return val_;
+			}
+			else
+			{
+				if (val_ < T_(0))
+				{
+					// Negative trunc == negative ceil
+					return static_cast<T_>(static_cast<std::int64_t>(val_));
+				}
+				else
+				{
+					// When truncated, a positive value is equal to its floored value
+					// --- As such, when a truncation indicates a round should occur, we need to add 1 to the truncated value when positive
+					T_ truncated_ = static_cast<T_>(static_cast<std::uint64_t>(val_));
+					return (truncated_ == val_) ? val_ : (truncated_ + T_(1));
+				}
+			}
+		}
+	};
+	template<>
+	struct do_ceil_constexpr<void>
+	{
+		constexpr do_ceil_constexpr()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			return do_ceil_constexpr<T_>()(val_);
+		}
+	};
+
+	/// <summary> 
+	/// <para> Constexpr flooring functor. </para>
+	/// <para> Unless specialised, the valid range for values this can take is min(int64_t):max(int64_t). </para>
+	/// </summary>
+	template<typename T_>
+	struct do_trunc_constexpr
+	{
+		constexpr do_trunc_constexpr()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			if constexpr (std::is_integral_v<T_>)
+			{
+				return val_;
+			}
+			else
+			{
+				return static_cast<T_>(static_cast<std::int64_t>(val_));
+			}
+		}
+	};
+	template<>
+	struct do_trunc_constexpr<void>
+	{
+		constexpr do_trunc_constexpr()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			return do_trunc_constexpr<T_>()(val_);
+		}
+	};
+
 	template<typename T_>
 	struct do_floor
 	{
