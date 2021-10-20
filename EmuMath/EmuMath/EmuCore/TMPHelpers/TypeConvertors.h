@@ -348,6 +348,47 @@ namespace EmuCore::TMPHelpers
 	{
 		using type = typename remove_all_pointers<std::remove_pointer_t<T_>>::type;
 	};
+
+	template<typename...PackedArgs_>
+	struct first_packed_arg
+	{
+		using type = void;
+	};
+	template<typename FirstPackedArg_, typename...FurtherArgs_>
+	struct first_packed_arg<FirstPackedArg_, FurtherArgs_...>
+	{
+		using type = FirstPackedArg_;
+	};
+	template<typename OnlyPackedArg_>
+	struct first_packed_arg<OnlyPackedArg_>
+	{
+		using type = OnlyPackedArg_;
+	};
+	template<>
+	struct first_packed_arg<>
+	{
+		using type = void;
+	};
+	template<typename...PackedArgs_>
+	using first_packed_arg_t = typename first_packed_arg<PackedArgs_...>::type;
+
+	template<std::size_t N_, typename...PackedArgs_>
+	struct nth_packed_arg
+	{
+		using type = void;
+	};
+	template<std::size_t N_, typename FirstPackedArg_, typename...FurtherArgs_>
+	struct nth_packed_arg<N_, FirstPackedArg_, FurtherArgs_...>
+	{
+		using type = std::conditional_t<N_ == 0, FirstPackedArg_, typename nth_packed_arg<N_ - 1, FurtherArgs_...>::type>;
+	};
+	template<std::size_t N_, typename OnlyPackedArg_>
+	struct nth_packed_arg<N_, OnlyPackedArg_>
+	{
+		using type = std::conditional_t<N_ == 0, OnlyPackedArg_, void>;
+	};
+	template<std::size_t N_, typename...PackedArgs_>
+	using nth_packed_arg_t = typename nth_packed_arg<N_, PackedArgs_...>::type;
 }
 
 #endif

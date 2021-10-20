@@ -1,17 +1,8 @@
-#include "EmuMath/Vector.h"
-#include "EmuMath/FastVector.h"
-#include "EmuMath/Matrix.h"
-#include "EmuMath/FastMatrix.h"
-#include "EmuMath/NoOverflowT.h"
-#include "EmuCore/TMPHelpers/Tuples.h"
-#include <array>
-#include <bitset>
-#include <iomanip>
+#include "EmuCore/Functors/Analytics.h"
+#include "EmuMath/Noise.h"
+#include "EmuMath/Random.h"
 
 #include "Tests.hpp"
-
-#include "EmuCore/Events/Event.h"
-#include "EmuCore/Events/ThreadSafeEvent.h"
 
 using namespace EmuCore::TestingHelpers;
 
@@ -105,234 +96,245 @@ struct SomeStructForTestingEdges
 	float top_;
 };
 
+template<std::size_t num_dimensions, typename FP_>
+inline void WriteNoiseTableToPPM(const EmuMath::NoiseTable<num_dimensions, FP_>& noise_table_)
+{
+	EmuMath::Vector3<FP_> white_(255.0f, 255.0f, 255.0f);
+
+	if constexpr (num_dimensions == 3)
+	{
+		EmuMath::Vector3<std::size_t> resolution_ = noise_table_.size();
+		for (std::size_t z = 0; z < resolution_.z; ++z)
+		{
+			std::cout << "\nOutputting image layer #" << z << "...\n";
+
+			std::ostringstream name_;
+			name_ << "./test_noise_" << z << ".ppm";
+			std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
+			out_ppm_ << "P6" << std::endl << resolution_.x << ' ' << resolution_.y << std::endl << "255" << std::endl;
+
+			for (std::size_t y = 0; y < resolution_.y; ++y)
+			{
+				for (std::size_t x = 0; x < resolution_.x; ++x)
+				{
+					// Clamp is merely to cancel out fp-rounding errors
+					EmuMath::Vector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.at(x, y, z)).Clamp(0.0f, 255.0f));
+					out_ppm_ << (char)colour_byte_.x << (char)colour_byte_.y << (char)colour_byte_.z;
+				}
+			}
+			out_ppm_.close();
+		}
+		std::cout << "Finished outputting all 3D noise layers.\n";
+	}
+	else if constexpr (num_dimensions == 2)
+	{
+		std::cout << "\nOutputting image...\n";
+
+		std::ostringstream name_;
+		name_ << "./2d_test_noise_.ppm";
+		std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
+		out_ppm_ << "P6" << std::endl << noise_table_.size<0>() << ' ' << noise_table_.size<1>() << std::endl << "255" << std::endl;
+
+		for (std::size_t y = 0, end_y = noise_table_.size<1>(); y < end_y; ++y)
+		{
+			for (std::size_t x = 0, end_x = noise_table_.size<0>(); x < end_x; ++x)
+			{
+				// Clamp is merely to cancel out fp-rounding errors
+				EmuMath::Vector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.at(x, y)).Clamp(0.0f, 255.0f));
+				out_ppm_ << (char)colour_byte_.x << (char)colour_byte_.y << (char)colour_byte_.z;
+			}
+		}
+		out_ppm_.close();
+		std::cout << "Finished outputting 2D noise layer.\n";
+	}
+}
+
 int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
 
-	EmuMath::FastMatrix4x4f_CM fast_4x4_from_scalars(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-	std::cout << "\n\n";
-	std::cout << fast_4x4_from_scalars << "\n";
-	std::cout << "Row[0]: " << fast_4x4_from_scalars.GetRowReadable<0>() << "\n";
-	std::cout << "Row[1]: " << fast_4x4_from_scalars.GetRowReadable<1>() << "\n";
-	std::cout << "Row[2]: " << fast_4x4_from_scalars.GetRowReadable<2>() << "\n";
-	std::cout << "Row[3]: " << fast_4x4_from_scalars.GetRowReadable<3>() << "\n";
-	std::cout << "Column[0]: " << fast_4x4_from_scalars.GetColumnReadable<0>() << "\n";
-	std::cout << "Column[1]: " << fast_4x4_from_scalars.GetColumnReadable<1>() << "\n";
-	std::cout << "Column[2]: " << fast_4x4_from_scalars.GetColumnReadable<2>() << "\n";
-	std::cout << "Column[3]: " << fast_4x4_from_scalars.GetColumnReadable<3>() << "\n";
-	std::cout << "Trace: " << fast_4x4_from_scalars.Trace() << "\n";
-	std::cout << "Stored as column-major matrix:\n" << fast_4x4_from_scalars.Store<float, true>() << "\n";
-	std::cout << "Stored as row-major matrix:\n" << fast_4x4_from_scalars.Store<float, false>() << "\n";
-	std::cout << (fast_4x4_from_scalars != fast_4x4_from_scalars) << " | " << (fast_4x4_from_scalars == fast_4x4_from_scalars) << "\n";
-	std::cout << fast_4x4_from_scalars * 2.5L << "\n\n";
-	std::cout << fast_4x4_from_scalars.Multiply(fast_4x4_from_scalars) << "\n\n";
-	std::cout << "(Above as SISD):\n" << fast_4x4_from_scalars.Store().Multiply(fast_4x4_from_scalars.Store()) << "\n\n";
+	using sample_type = float;
+	constexpr std::int32_t perm_pow_ = 20;
+	constexpr EmuMath::NoisePermutations::seed_32_type seed_32 = 1337;
+	constexpr EmuMath::NoisePermutations::seed_64_type seed_64 = 13337;
+	constexpr std::size_t num_permutations_ = static_cast<std::size_t>(1 << perm_pow_);
+	constexpr EmuMath::NoiseType noise_type_ = EmuMath::NoiseType::PERLIN;
+	constexpr sample_type freq_ = sample_type(32.0f);
+	constexpr EmuMath::Vector<3, sample_type> start_(0.0, 0.0, 0.0);
+	constexpr EmuMath::Vector<3, sample_type> end_(1.0, 1.0, 1.0);
+	constexpr EmuMath::Vector<3, sample_type> custom_step(0.001, 0.001, 0.001);
+	constexpr EmuMath::Vector<3, std::size_t> resolution_(1024, 1024, 5);
+	constexpr std::size_t total_samples_ = resolution_.TotalProduct<std::size_t>();
+	constexpr bool use_fractal_noise_ = false;
+	constexpr std::size_t fractal_octaves_ = 3;
+	constexpr sample_type fractal_lacunarity_ = sample_type(2.0);
+	constexpr sample_type fractal_gain_ = sample_type(0.5);
+	constexpr EmuMath::Info::FractalNoiseInfo fractal_noise_info_ = EmuMath::Info::FractalNoiseInfo
+	(
+		fractal_octaves_,
+		fractal_lacunarity_,
+		fractal_gain_
+	);
+	constexpr EmuMath::Info::NoisePermutationShuffleMode shuffle_mode_ = EmuMath::Info::NoisePermutationShuffleMode::SEED_64;
 
-	std::cout << "TRANSFORMATIONS\n";
-	std::cout << "Translation(1, 2, 3) SIMD:\n" << EmuMath::FastMatrix4x4f_CM::Translation(1, 2, 3) << "\n";
-	std::cout << "Translation(1, 2, 3) SISD:\n" << EmuMath::Matrix4x4<float, true>::Translation(1, 2, 3) << "\n\n";
-	std::cout << "Scale(1.5, -2, 3.3) SIMD:\n" << EmuMath::FastMatrix4x4f_CM::Scale(1.5, -2, 3.3) << "\n";
-	std::cout << "Scale(1.5, -2, 3.3) SISD:\n" << EmuMath::Matrix4x4<float, true>::Scale(1.5, -2, 3.3) << "\n\n";
-	std::cout << "RotationX<false>(33) SIMD:\n" << EmuMath::FastMatrix4x4f_CM::RotationX<false>(33.0f) << "\n";
-	std::cout << "RotationX<false>(33) SISD:\n" << EmuMath::Matrix4x4<float, true>::RotationX<false>(33.0f) << "\n\n";
-	std::cout << "RotationY<false>(33) SIMD:\n" << EmuMath::FastMatrix4x4f_CM::RotationY<false>(33) << "\n";
-	std::cout << "RotationY<false>(33) SISD:\n" << EmuMath::Matrix4x4<float, true>::RotationY<false>(33) << "\n\n";
-	std::cout << "RotationZ<false>(33) SIMD:\n" << EmuMath::FastMatrix4x4f_CM::RotationZ<false>(33) << "\n";
-	std::cout << "RotationZ<false>(33) SISD:\n" << EmuMath::Matrix4x4<float, true>::RotationZ<false>(33) << "\n\n";
+	constexpr std::size_t table_size = 3;
+	EmuMath::NoiseTable<table_size, sample_type> noise_table;
 
-	std::cout << "Ortho(0.01f, 25.0f, 1920.0f, 1080.0f) (SIMD):\n" << EmuMath::FastMatrix4x4f_CM::OrthographicRhVK(1920.0f, 1080.0f, 0.01f, 25.0f) << "\n\n";
-	std::cout << "Ortho(0.01f, 25.0f, 1920.0f, 1080.0f) (SISD):\n" << EmuMath::Matrix4x4<float>::OrthographicVK(1920.0f, 1080.0f, 0.01f, 25.0f) << "\n\n";
-	std::cout << "Ortho(0.01f, 25.0f, 1920.0f, 1080.0f) (DXM):\n";
-	auto dxm_proj_ = DirectX::XMMatrixOrthographicRH(1920.0f, 1080.0f, 0.01f, 25.0f);
-	DirectX::XMFLOAT4X4 readable_dxm_mat_;
-	DirectX::XMStoreFloat4x4(&readable_dxm_mat_, dxm_proj_);
-	for (std::size_t x = 0; x < 4; ++x)
+	using perlin_normaliser_0_1 = EmuMath::Functors::noise_sample_processor_perlin_normalise<table_size>;
+	using perlin_normaliser_neg1_1 = EmuMath::Functors::noise_sample_processor_perlin_neg1_to_1<table_size>;
+	using underlying_sample_processor = perlin_normaliser_0_1;
+	using sample_processor_with_analytics = EmuMath::Functors::noise_sample_processor_with_analytics
+	<
+		underlying_sample_processor,
+		EmuCore::analytic_track_min<sample_type>,
+		EmuCore::analytic_track_max<sample_type>,
+		EmuCore::analytic_sum<sample_type>,
+		EmuCore::analytic_count<std::size_t>
+	>;
+
+	constexpr bool use_analytics = true;
+	using sample_processor = std::conditional_t<!use_analytics, underlying_sample_processor, sample_processor_with_analytics>;
+
+	constexpr EmuMath::NoiseTableOptions<table_size, sample_type> options_no_step = EmuMath::NoiseTableOptions<table_size, sample_type>
+	(
+		resolution_,
+		start_,
+		end_,
+		freq_,
+		false,
+		use_fractal_noise_,
+		EmuMath::Info::NoisePermutationInfo
+		(
+			num_permutations_,
+			shuffle_mode_,
+			EmuMath::Info::NoisePermutationInfo::_default_bool_input,
+			seed_32,
+			seed_64
+		),
+		fractal_noise_info_
+	);
+	constexpr EmuMath::NoiseTableOptions<table_size, sample_type> options_with_step = EmuMath::NoiseTableOptions<table_size, sample_type>
+	(
+		resolution_,
+		start_,
+		custom_step,
+		freq_,
+		true,
+		use_fractal_noise_,
+		EmuMath::Info::NoisePermutationInfo
+		(
+			num_permutations_,
+			shuffle_mode_,
+			EmuMath::Info::NoisePermutationInfo::_default_bool_input,
+			seed_32,
+			seed_64
+		),
+		fractal_noise_info_
+	);
+
+	constexpr auto auto_step = options_no_step.MakeStep();
+	constexpr auto custom_step_from_options = options_with_step.MakeStep();
+
+	sample_processor sample_processor_;
+
+	EmuMath::NoiseTable<3, float> to_print_;
+	EmuMath::NoiseTable<3, double> to_print_;
+
+	to_print_.GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::noise_sample_processor_perlin_normalise<1>>
+	(
+		to_print_.MakeOptions
+		(
+			EmuMath::Vector<3, std::size_t>(10, 10, 10),
+			EmuMath::Vector<3, float>(0.0f, 0.0f, 0.0f),
+			EmuMath::Vector<3, float>(0.0005f, 0.0005f, 0.0005f),
+			16.0f,
+			true,
+			false,
+			EmuMath::Info::NoisePermutationInfo(2048, EmuMath::Info::NoisePermutationShuffleMode::BOOL_INPUT, true, 0, 0),
+			EmuMath::Info::FractalNoiseInfo<float>()
+		)
+	);
+	std::cout << to_print_ << "\n";
+	std::wostringstream w_str_;
+	w_str_ << to_print_;
+	std::cout << "\nWide length: " << w_str_.str().size() << "\n";
+	system("pause");
+
+	std::cout << "Generating table with " << options_no_step.permutation_info.TargetCountToPowerOf2() << " permutations...\n";
+	if (noise_table.GenerateNoise<noise_type_, sample_processor&>(options_no_step, sample_processor_))
 	{
-		std::cout << "{ ";
-		for (std::size_t y = 0; y < 4; ++y)
+		std::cout << "Success! (" << noise_table.size() << ")\n";
+	}
+	else
+	{
+		std::cout << "Failure!\n";
+	}
+	WriteNoiseTableToPPM(noise_table);
+
+
+	EmuMath::NoiseTable<2, sample_type> noise_2d_;
+	EmuMath::Functors::noise_sample_processor_with_analytics
+	<
+		EmuMath::Functors::noise_sample_processor_perlin_normalise<2>, EmuCore::analytic_track_min<sample_type>, EmuCore::analytic_track_max<sample_type>
+	> sample_processor_for_2d_;
+	noise_2d_.GenerateNoise<EmuMath::NoiseType::PERLIN>
+	(
+		noise_2d_.MakeOptions
+		(
+			EmuMath::Vector<2, sample_type>(1024, 1024),
+			EmuMath::Vector<2, sample_type>(0.0, 0.0),
+			EmuMath::Vector<2, sample_type>(1.0, 1.0),
+			sample_type(16),
+			false,
+			true,
+			EmuMath::Info::NoisePermutationInfo(1024, EmuMath::Info::NoisePermutationShuffleMode::SEED_64, true, 0, 1337),
+			EmuMath::Info::FractalNoiseInfo<sample_type>(5, sample_type(2), sample_type(0.5))
+		),
+		sample_processor_for_2d_
+	);
+
+	WriteNoiseTableToPPM(noise_2d_);
+	std::cout << noise_2d_ << "\n";
+	system("pause");
+
+	std::cout << "Min: " << sample_processor_.at<0>().min_value << "\n";
+	std::cout << "Max: " << sample_processor_.at<1>().max_value << "\n";
+	std::cout << "Sum: " << sample_processor_.at<2>().total_sum << "\n";
+	std::cout << "Count: " << sample_processor_.at<3>().total_calls << "\n";
+	std::cout << "Mean: " << sample_processor_.at<2>().total_sum / sample_processor_.at<3>().total_calls << "\n";
+
+	system("pause");
+	for (std::size_t z = 0, end_z_ = noise_table.size<2>(); z < end_z_; ++z)
+	{
+		for (std::size_t y = 0, end_y_ = noise_table.size<1>(); y < end_y_; ++y)
 		{
-			std::cout << readable_dxm_mat_(x, y);
-			if (y != 3)
+			for (std::size_t x = 0, end_x_ = noise_table.size<0>(); x < end_x_; ++x)
 			{
-				std::cout << ", ";
+				sample_type sample_ = noise_table(x, y, z);
+				if (sample_ <= 0.0f || sample_ >= 1.0f)
+				{
+					std::cout << sample_ << "\n";
+				}
 			}
 		}
-		std::cout << " }\n";
 	}
-	std::cout << "\n\n";
 
-	std::cout << "Projection(75.0f, 0.01f, 25.0f, 1920.0f / 1080.0f) (SIMD):\n" << EmuMath::FastMatrix4x4f_CM::PerspectiveRhVK<false>(75.0f, 0.01f, 25.0f, 1920.0f / 1080.0f) << "\n\n";
-	std::cout << "Projection(75.0f, 0.01f, 25.0f, 1920.0f / 1080.0f) (SISD):\n" << EmuMath::Matrix4x4<float>::PerspectiveVK<false>(75.0f, 0.01f, 25.0f, 1920.0f / 1080.0f) << "\n\n";
-	std::cout << "Projection(75.0f, 0.01f, 25.0f, 1920.0f / 1080.0f) (DXM):\n";
-	dxm_proj_ = DirectX::XMMatrixPerspectiveFovRH(EmuCore::Pi::DegsToRads(75.0f), 1920.0f / 1080.0f, 0.01f, 25.0f);
-	DirectX::XMStoreFloat4x4(&readable_dxm_mat_, dxm_proj_);
-	for (std::size_t x = 0; x < 4; ++x)
-	{
-		std::cout << "{ ";
-		for (std::size_t y = 0; y < 4; ++y)
-		{
-			std::cout << readable_dxm_mat_(x, y);
-			if (y != 3)
-			{
-				std::cout << ", ";
-			}
-		}
-		std::cout << " }\n";
-	}
-	std::cout << "\n\n";
+	//std::cout << noise_table << "\n";
 
-	std::cout << fast_4x4_from_scalars << "\n\n";
-	std::cout << ~fast_4x4_from_scalars << "\n\n";
-	std::cout << ~~fast_4x4_from_scalars << "\n\n";
-	std::cout << ~~~fast_4x4_from_scalars << "\n\n";
+	//EmuMath::NoiseTable<table_size> babby_table = EmuMath::NoiseTable<table_size>(noise_table);
+	//std::cout << "Main Size (Copy-construct):\n" << noise_table << "\n";
+	//std::cout << "Babby Size (Copy-construct):\n" << babby_table << "\n\n###\n\n";
+	//noise_table = EmuMath::NoiseTable<table_size>(std::move(babby_table));
+	//std::cout << "Main Size (Reversed std::move construct):\n" << noise_table << "\n";
+	//std::cout << "Babby Size (Reversed std::move construct):\n" << babby_table << "\n\n###\n\n";
+	//babby_table = noise_table;
+	//std::cout << "Main Size (Copy assign):\n" << noise_table << "\n";
+	//std::cout << "Babby Size (Copy assign):\n" << babby_table << "\n\n###\n\n";
+	//babby_table = std::move(noise_table);
+	//std::cout << "Main Size (std::move assign):\n" << noise_table << "\n";
+	//std::cout << "Babby Size (std::move assign):\n" << babby_table << "\n\n###\n\n";
 
-	EmuMath::FastMatrix4x4f_CM a_mat_
-	(
-		0.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f
-	);
-	EmuMath::FastMatrix4x4f_CM b_mat_
-	(
-		10.0f, 10.0f, 10.0f, 10.0f,
-		10.0f, 10.0f, 10.0f, 10.0f,
-		10.0f, 10.0f, 10.0f, 10.0f,
-		10.0f, 10.0f, 10.0f, 10.0f
-	);
-	EmuMath::FastMatrix4x4f_CM t_mat_
-	(
-		0.1f, 0.2f, 0.3f, 0.4f,
-		0.5f, 0.6f, 0.7f, 0.8f,
-		0.9f, 1.0f, 1.1f, 1.2f,
-		1.3f, 1.4f, 1.5f, 1.6f
-	);
-	std::cout << "A:\n" << a_mat_ << "\nB:\n" << b_mat_ << "\nT:\n" << t_mat_ << "\nLERPED:\n" << a_mat_.Lerp(b_mat_, t_mat_) << "\n\n";
-	std::cout << "A:\n" << a_mat_ << "\nB:\n" << b_mat_ << "\nT:\n" << t_mat_ << "\nLERPED:\n" << a_mat_.Lerp(10.0L, 0.5f) << "\n\n";
-
-
-	EmuMath::FastMatrix4x4f_CM original_mat_
-	(
-		-5.0f, 0.0f, 1.0f, 12.0f,
-		66.0f, -555.0f, 12.0f, 1,
-		1.0f, 2.0f, 3.0f, 1337.1f,
-		1.0f, 3.0f, 3.0f, 7.331f
-	);
-	EmuMath::FastMatrix4x4f_CM min_mat_
-	(
-		0.0f, 0.0f, -5.0f, 0.0f,
-		1.0f, -500.0f, 2.0f, 0.0f,
-		6.0f, 1.0f, 3.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f
-	);
-	EmuMath::FastMatrix4x4f_CM max_mat_
-	(
-		1.0f, 2.0f, 3.0f, 4.0f,
-		5.0f, 6.0f, 7.0f, 8.0f,
-		9.0f, 10.0f, 11.0f, 12.0f,
-		13.0f, 14.0f, 15.0f, 16.0f
-	);
-	std::cout << "Original:\n" << original_mat_ << "\nMin:\n" << min_mat_ << "\nMax:\n" << max_mat_ << "\nClamped:\n" << original_mat_.Clamp(min_mat_, max_mat_) << "\n\n";
-	std::cout << "Original min: " << original_mat_.Min() << " | Original max: " << original_mat_.Max() << "\n\n";
-
-	std::cout << original_mat_ << "\nTRANSPOSE:\n" << original_mat_.Transpose() << "\n\n";
-	
-
-	EmuMath::FastMatrix4x4f_CM inv_test_
-	(
-		-3, 6, 3, 1,
-		2, -6, -4, 2,
-		-1, 7, 4, 3,
-		1, 1, 1, 1
-	);
-	std::cout << "Mat:\n" << inv_test_ << "\nInverse:\n" << inv_test_.Inverse() << "\n\n";
-	std::cout << "\n\nSCALAR INVERSE:\n" << inv_test_.Store().InverseLaplace() << "\n\n";
-
-
-	std::cout << "Mat:\n" << inv_test_ << "\nDeterminant: " << inv_test_.Determinant() << "\n\n";
-	std::cout << "\n\nSCALAR DETERMINANT: " << inv_test_.Store().DeterminantLaplace() << "\n\n";
-
-	EmuMath::FastMatrix4x4f_CM det_test_
-	(
-		1, 2, 4, 3,
-		1, 36, -7, 8,
-		10, 22, 44, 12,
-		333, -666, 12, 1
-	);
-	EmuMath::Matrix<4, 4, float, true> det_test_scalar_
-	(
-		1, 2, 4, 3,
-		1, 36, -7, 8,
-		10, 22, 44, 12,
-		333, -666, 12, 1
-	);
-	std::cout << "Matrix:\n" << det_test_ << "\n";
-	std::cout << "Det (SISD) 2x2: " << det_test_scalar_.As<2, 2>().DeterminantLaplace() << "\n\n";
-	std::cout << "Det (SISD) 3x3: " << det_test_scalar_.As<3, 3>().DeterminantLaplace() << "\n\n";
-
-	std::cout << "Minors (SIMD):\n" << det_test_.Minors<false>() << "\n";
-	std::cout << "Minors (SIMD Transposed):\n" << det_test_.Minors<true>() << "\n";
-	std::cout << "Minors (SISD):\n" << det_test_scalar_.MatrixOfMinorsLaplace() << "\n";
-	std::cout << "Determinant [Sub[0, 0]]: " << det_test_scalar_.ExclusiveSubmatrix<3, 3>().ExclusiveSubmatrix<0, 0>().DeterminantLaplace() << "\n";
-	std::cout << "Inverse (SIMD):\n" << det_test_.Inverse() << "\nInverse (SISD):\n" << det_test_scalar_.InverseLaplace() << "\n\n";
-
-	constexpr float det_ = EmuMath::Matrix<4, 4, float, true>
-	(
-		1, 2, 3, 4,
-		5, 6, 7, 8,
-		9, 10, 11, 12,
-		13, 14, 15, 16
-	).DeterminantLaplace();
-	EmuMath::FastMatrix4x4f_CM bad_det_test_ = EmuMath::FastMatrix4x4f_CM
-	(
-		1, 2, 353, 4,
-		5, 611, 7, 8,
-		9, 10, 121, 12,
-		13, 14, 115, 16
-	);
-	std::cout << bad_det_test_.Determinant() << "\n";
-	float out_det_;
-	std::cout << bad_det_test_.Inverse(out_det_) << "\n\n";
-	std::cout << bad_det_test_.Multiply(bad_det_test_.Inverse()) << "\n";
-	std::cout << "Det from InverseLaplace call: " << out_det_ << "\n";
-	std::cout << "Det from Determinant call: " << bad_det_test_.Determinant() << "\n";
-	std::cout << "Det from scalar calc: " << bad_det_test_.Store().DeterminantLaplace() << "\n\n";
-
-	std::cout << bad_det_test_.Multiply(bad_det_test_.Inverse()) << "\n\n";
-	std::cout << bad_det_test_.Minors() << "\n\n" << bad_det_test_.Store().MatrixOfMinorsLaplace() << "\n\n";
-
-	constexpr bool nearf_ = EmuCore::FpNearEqual(1.0f, 1.0f);
-	constexpr bool neard_ = EmuCore::FpNearEqual(1.0, 1.0);
-	constexpr bool nearld_ = EmuCore::FpNearEqual(1.0L, 1.0L);
-
-	constexpr std::int8_t dgfija9 = EmuCore::do_abs<std::int8_t>()(5);
-	constexpr std::int8_t dgfijo8 = EmuCore::do_abs<std::int8_t>()(-5);
-	constexpr std::int16_t dgfija16 = EmuCore::do_abs<std::int16_t>()(20150);
-	constexpr std::int16_t dgfijo16 = EmuCore::do_abs<std::int16_t>()(-20150);
-	constexpr std::int32_t dgfija32 = EmuCore::do_abs<std::int32_t>()(2);
-	constexpr std::int32_t dgfijo32 = EmuCore::do_abs<std::int32_t>()(-2);
-	constexpr std::int64_t dgfija64 = EmuCore::do_abs<std::int64_t>()(std::numeric_limits<std::int64_t>::max());
-	constexpr std::int64_t dgfijo64 = EmuCore::do_abs<std::int64_t>()(-(std::numeric_limits<std::int64_t>::max() - 26));
-
-	bad_det_test_.TryInverse(bad_det_test_);
-	std::cout << bad_det_test_.Inverse() << "\n\n";
-	std::cout << bad_det_test_.Inverse().Inverse().Inverse() << "\n\n";
-	std::cout << bad_det_test_.Inverse().Inverse().Inverse().Inverse().Inverse() << "\n\n";
-	std::cout << bad_det_test_.Inverse().Inverse().Inverse().Inverse().Inverse().Inverse().Inverse() << "\n\n";
-	std::cout << bad_det_test_.Inverse().Inverse().Inverse().Inverse().Inverse().Inverse().Inverse().Inverse().Inverse() << "\n\n";
-
-	EmuMath::Matrix4x4<float> mat_4x4_scalar_
-	(
-		1, 12, 13, 4,
-		4, 13, 12, 1,
-		6, 3, 2, 1,
-		1, 3, 5, 5
-	);
-	std::cout << mat_4x4_scalar_ << "\n";
-	float test_output_det_;
-	std::cout << "Inv (Laplace):\n" << mat_4x4_scalar_.InverseLaplace(test_output_det_) << "\nDeterminant: " << test_output_det_ << "\n";
-	std::cout << "Inv (Gauss Jordan):\n" << mat_4x4_scalar_.InverseGaussJordan(test_output_det_) << "\nDeterminant: " << test_output_det_ << "\n";
-	std::cout << "Inv (Gauss Jordan : long double):\n" << mat_4x4_scalar_.InverseGaussJordan<long double>(test_output_det_) << "\nDeterminant: " << test_output_det_ << "\n";
+	noise_table.Release();
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
