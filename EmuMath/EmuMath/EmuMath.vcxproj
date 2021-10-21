@@ -173,7 +173,6 @@
     <ClInclude Include="EmuMath\FastVector.h" />
     <ClInclude Include="EmuMath\Matrix.h" />
     <ClInclude Include="EmuMath\Noise.h" />
-    <ClInclude Include="EmuMath\NoOverflowT.h" />
     <ClInclude Include="EmuMath\Random.h" />
     <ClInclude Include="EmuMath\SIMDHelpers.h" />
     <ClInclude Include="EmuMath\Vector.h" />

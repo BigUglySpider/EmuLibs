@@ -536,55 +536,57 @@ namespace EmuMath::Helpers
 		>(lhs_, rhs_);
 	}
 
-	//template<typename lhs_contained_type, typename rhs_type>
-	//[[nodiscard]] constexpr inline EmuMath::ColourRGB<lhs_contained_type> colour_multiply(const EmuMath::ColourRGB<lhs_contained_type>& lhs_, const rhs_type& rhs_)
-	//{
-	//	if constexpr (EmuMath::TMP::is_emu_colour_v<rhs_type>)
-	//	{
-	//		using rhs_contained_type = typename rhs_type::value_type;
-	//		using ratio_type = typename EmuCore::TMPHelpers::first_floating_point<lhs_contained_type, rhs_contained_type, float>::type;
-	//		return colour_multiply<lhs_contained_type, EmuMath::Vector<3, ratio_type>>
-	//		(
-	//			lhs_,
-	//			EmuMath::Vector<3, ratio_type>
-	//			(
-	//				colour_channel_ratio<ratio_type, rhs_contained_type>(rhs_.R()),
-	//				colour_channel_ratio<ratio_type, rhs_contained_type>(rhs_.G()),
-	//				colour_channel_ratio<ratio_type, rhs_contained_type>(rhs_.B())
-	//			)
-	//		);
-	//	}
-	//	else
-	//	{
-	//		return EmuMath::ColourRGB<lhs_contained_type>(lhs_.channels.Multiply(rhs_));
-	//	}
-	//}
-	//
-	//template<typename lhs_contained_type, typename rhs_type>
-	//[[nodiscard]] constexpr inline EmuMath::ColourRGB<lhs_contained_type> colour_divide(const EmuMath::ColourRGB<lhs_contained_type>& lhs_, const rhs_type& rhs_)
-	//{
-	//	if constexpr (EmuMath::TMP::is_emu_colour_v<rhs_type>)
-	//	{
-	//		using rhs_contained_type = typename rhs_type::value_type;
-	//		using ratio_type = typename EmuCore::TMPHelpers::first_floating_point<lhs_contained_type, rhs_contained_type, float>::type;
-	//		constexpr ratio_type zero_ = ratio_type(0);
-	//		constexpr ratio_type one_ = ratio_type(1);
-	//		return colour_multiply<lhs_contained_type, EmuMath::Vector<3, ratio_type>>
-	//		(
-	//			lhs_,
-	//			EmuMath::Vector<3, ratio_type>
-	//			(
-	//				rhs_.R() == zero_ ? one_ : (one_ / colour_channel_ratio<ratio_type, rhs_contained_type>(rhs_.R())),
-	//				rhs_.G() == zero_ ? one_ : (one_ / colour_channel_ratio<ratio_type, rhs_contained_type>(rhs_.G())),
-	//				rhs_.B() == zero_ ? one_ : (one_ / colour_channel_ratio<ratio_type, rhs_contained_type>(rhs_.B()))
-	//			)
-	//		);
-	//	}
-	//	else
-	//	{
-	//		return EmuMath::ColourRGB<lhs_contained_type>(lhs_.channels.Divide(rhs_));
-	//	}
-	//}
+	template<typename OutColour_, bool IncludeAlpha_ = true, class LhsColour_, class Rhs_>
+	[[nodiscard]] constexpr inline OutColour_ colour_divide(const LhsColour_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_colour_funcs::colour_arithmetic
+		<
+			IncludeAlpha_,
+			EmuCore::do_divide,
+			OutColour_,
+			LhsColour_,
+			Rhs_
+		>(lhs_, rhs_);
+	}
+
+	template<typename OutColour_, bool IncludeAlpha_ = true, class LhsColour_, class Rhs_>
+	[[nodiscard]] constexpr inline OutColour_ colour_add(const LhsColour_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_colour_funcs::colour_arithmetic
+		<
+			IncludeAlpha_,
+			EmuCore::do_add,
+			OutColour_,
+			LhsColour_,
+			Rhs_
+		>(lhs_, rhs_);
+	}
+
+	template<typename OutColour_, bool IncludeAlpha_ = true, class LhsColour_, class Rhs_>
+	[[nodiscard]] constexpr inline OutColour_ colour_subtract(const LhsColour_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_colour_funcs::colour_arithmetic
+		<
+			IncludeAlpha_,
+			EmuCore::do_subtract,
+			OutColour_,
+			LhsColour_,
+			Rhs_
+		>(lhs_, rhs_);
+	}
+
+	template<typename OutColour_, bool IncludeAlpha_ = true, class LhsColour_, class Rhs_>
+	[[nodiscard]] constexpr inline OutColour_ colour_mod(const LhsColour_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_colour_funcs::colour_arithmetic
+		<
+			IncludeAlpha_,
+			EmuCore::do_mod,
+			OutColour_,
+			LhsColour_,
+			Rhs_
+		>(lhs_, rhs_);
+	}
 }
 
 #endif

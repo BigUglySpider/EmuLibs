@@ -44,9 +44,6 @@
     <ClInclude Include="EmuCore\TMPHelpers\Functors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\NoOverflowT.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EmuMath\SIMDHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>

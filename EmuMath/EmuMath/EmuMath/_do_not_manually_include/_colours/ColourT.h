@@ -427,9 +427,33 @@ namespace EmuMath
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
+		[[nodiscard]] constexpr inline this_type operator+(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::colour_add<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
+		[[nodiscard]] constexpr inline this_type operator-(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::colour_subtract<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		[[nodiscard]] constexpr inline this_type operator*(const Rhs_& rhs_) const
 		{
 			return EmuMath::Helpers::colour_multiply<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
+		[[nodiscard]] constexpr inline this_type operator/(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::colour_divide<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
+		[[nodiscard]] constexpr inline this_type operator%(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::colour_mod<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
 		}
 #pragma endregion
 

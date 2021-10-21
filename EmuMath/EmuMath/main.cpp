@@ -189,7 +189,7 @@ int main()
 
 	constexpr EmuMath::ColourRGB<float> to_mult_f_rgb_ = EmuMath::ColourRGB<float>(0.2f, 1.0f, 0.5f);
 	constexpr EmuMath::ColourRGBA<double> to_mult_d_rgba_ = EmuMath::ColourRGBA<double>(1.0, 0.5, 1.0, 0.2);
-	constexpr EmuMath::ColourRGB<std::uint8_t> to_mult_byte_rgb_ = EmuMath::ColourRGB<std::uint8_t>(0, 255, 255/4);
+	constexpr EmuMath::ColourRGB<std::uint8_t> to_mult_byte_rgb_ = EmuMath::ColourRGB<std::uint8_t>(1, 255, 255/4);
 	constexpr EmuMath::ColourRGBA<std::uint8_t> to_mult_byte_rgba_ = EmuMath::ColourRGBA<std::uint8_t>(255, 255, 127, 255);
 	constexpr float to_mult_scalar_f_ = 2.5f;
 	constexpr std::uint32_t to_mult_scalar_i_ = 2;
@@ -197,6 +197,46 @@ int main()
 	constexpr auto to_mult_vector2d_ = EmuMath::Vector<2, double>(0.5, 0.5);
 	constexpr auto to_mult_vector3ld_ = EmuMath::Vector<3, long double>(1.0L, 0.5L, 0.25L);
 	constexpr auto to_mult_vector4i_ = EmuMath::Vector<4, std::int32_t>(-1, 1, -2, 2);
+
+	//constexpr auto mult_result_0a_ = to_mult_f_rgb_ - to_mult_d_rgba_;
+	//constexpr auto mult_result_0b_ = to_mult_f_rgb_ - to_mult_byte_rgb_;
+	//constexpr auto mult_result_0c_ = to_mult_f_rgb_ - to_mult_byte_rgba_;
+	//constexpr auto mult_result_0d_ = to_mult_f_rgb_ - to_mult_scalar_f_;
+	//constexpr auto mult_result_0e_ = to_mult_f_rgb_ - to_mult_scalar_i_;
+	//constexpr auto mult_result_0f_ = to_mult_f_rgb_ - to_mult_vector1f_;
+	//constexpr auto mult_result_0g_ = to_mult_f_rgb_ - to_mult_vector2d_;
+	//constexpr auto mult_result_0h_ = to_mult_f_rgb_ - to_mult_vector3ld_;
+	//constexpr auto mult_result_0i_ = to_mult_f_rgb_ - to_mult_vector4i_;
+	//
+	//constexpr auto mult_result_1a_ = to_mult_d_rgba_ - to_mult_f_rgb_;
+	//constexpr auto mult_result_1b_ = to_mult_d_rgba_ - to_mult_byte_rgb_;
+	//constexpr auto mult_result_1c_ = to_mult_d_rgba_ - to_mult_byte_rgba_;
+	//constexpr auto mult_result_1d_ = to_mult_d_rgba_ - to_mult_scalar_f_;
+	//constexpr auto mult_result_1e_ = to_mult_d_rgba_ - to_mult_scalar_i_;
+	//constexpr auto mult_result_1f_ = to_mult_d_rgba_ - to_mult_vector1f_;
+	//constexpr auto mult_result_1g_ = to_mult_d_rgba_ - to_mult_vector2d_;
+	//constexpr auto mult_result_1h_ = to_mult_d_rgba_ - to_mult_vector3ld_;
+	//constexpr auto mult_result_1i_ = to_mult_d_rgba_ - to_mult_vector4i_;
+	//
+	//constexpr auto mult_result_2a_ = to_mult_byte_rgb_ - to_mult_f_rgb_;
+	//constexpr auto mult_result_2b_ = to_mult_byte_rgb_ - to_mult_byte_rgb_;
+	//constexpr auto mult_result_2c_ = to_mult_byte_rgb_ - to_mult_byte_rgba_;
+	//constexpr auto mult_result_2d_ = to_mult_byte_rgb_ - to_mult_scalar_f_;
+	//constexpr auto mult_result_2e_ = to_mult_byte_rgb_ - to_mult_scalar_i_;
+	//constexpr auto mult_result_2f_ = to_mult_byte_rgb_ - to_mult_vector1f_;
+	//constexpr auto mult_result_2g_ = to_mult_byte_rgb_ - to_mult_vector2d_;
+	//constexpr auto mult_result_2h_ = to_mult_byte_rgb_ - to_mult_vector3ld_;
+	//constexpr auto mult_result_2i_ = to_mult_byte_rgb_ - to_mult_vector4i_;
+	//
+	//constexpr auto mult_result_3a_ = to_mult_byte_rgba_ - to_mult_f_rgb_;
+	//constexpr auto mult_result_3b_ = to_mult_byte_rgba_ - to_mult_byte_rgb_;
+	//constexpr auto mult_result_3c_ = to_mult_byte_rgba_ - to_mult_byte_rgba_;
+	//constexpr auto mult_result_3d_ = to_mult_byte_rgba_ - to_mult_scalar_f_;
+	//constexpr auto mult_result_3e_ = to_mult_byte_rgba_ - to_mult_scalar_i_;
+	//constexpr auto mult_result_3f_ = to_mult_byte_rgba_ - to_mult_vector1f_;
+	//constexpr auto mult_result_3g_ = to_mult_byte_rgba_ - to_mult_vector2d_;
+	//constexpr auto mult_result_3h_ = to_mult_byte_rgba_ - to_mult_vector3ld_;
+	//constexpr auto mult_result_3i_ = to_mult_byte_rgba_ - to_mult_vector4i_;
 
 	EmuMath::ColourRGBA<float> runtime_rgba_f_(0.1f, -0.1f, 1.0f, 1.5f);
 	std::cout << runtime_rgba_f_ << "\n";
