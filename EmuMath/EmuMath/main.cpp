@@ -253,6 +253,9 @@ int main()
 	std::cout << (runtime_rgba_f_ == runtime_rgba_f_) << "\n";
 	std::cout << (runtime_rgba_f_ != runtime_rgba_f_) << "\n";
 
+	constexpr EmuMath::ColourRGB<float> from_rgba_ = EmuMath::ColourRGBA<float>(1, 2, 3, 4);
+
+
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

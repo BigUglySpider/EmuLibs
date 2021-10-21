@@ -218,26 +218,60 @@ namespace EmuMath
 		constexpr Colour() : channels(_default_colour)
 		{
 		}
+		/// <summary> Constructs a copy of the passed colour. </summary>
+		/// <param name="to_copy_">Colour to copy.</param>
+		constexpr Colour(const this_type& to_copy_) : channels(to_copy_.channels)
+		{
+		}
+		/// <summary>
+		/// <para> Constructs a copy of the passed colour. </para>
+		/// <para> If this colour DOES NOT contain an explicit Alpha channel: the passed colour's Alpha channel will be ignored. </para>
+		/// <para> If this colour DOES contain an explicit Alpha channel: this colour's Alpha channel will be initialised at max_intensity. </para>
+		/// </summary>
+		/// <param name="to_copy_">Colour to copy the Red, Green, and Blue channels of.</param>
+		constexpr Colour(const EmuMath::Colour<value_type, !contains_alpha>& to_copy_) :
+			channels
+			(
+				_make_colour
+				(
+					to_copy_.channels.at<0>(),
+					to_copy_.channels.at<1>(),
+					to_copy_.channels.at<2>()
+				)
+			)
+		{
+		}
+		/// <summary> Move constructor to create a colour from moved colour data. </summary>
+		/// <param name="to_move_">Colour to move the data of into the newly constructed colour.</param>
+		constexpr Colour(this_type&& to_move_) noexcept : channels(std::move(to_move_.channels))
+		{
+		}
+		/// <summary>
+		/// <para> Creates a colour with its contained channels being a direct copy of the passed EmuMath vector. </para>
+		/// </summary>
+		/// <param name="channels_to_copy_">EmuMath vector representing channels to copy.</param>
+		explicit constexpr Colour(const channels_vector& channels_to_copy_) : channels(channels_to_copy_)
+		{
+		}
+		/// <summary> Creates a colour by moving the passed channels vector into its stored channel data. </summary>
+		/// <param name="channels_to_move_">EmuMath vector to move into the constructed colour's channel data.</param>
+		explicit constexpr Colour(channels_vector&& channels_to_move_) noexcept : channels(std::forward(channels_to_move_))
+		{
+		}
 		/// <summary>
 		/// <para> Constructs a copy of the passed colour, matching intensities in each respective channel. </para>
 		/// <para> Performs any necessary conversions (e.g. converting 0:255 byte ranges to 0:1 floating-point ranges) to represent the same colour. </para>
 		/// </summary>
 		/// <typeparam name="CopyChannelType_">Type of channel contained in the passed colour to copy.</typeparam>
 		/// <param name="to_copy_">Colour to copy to the newly constructed colour.</param>
-		template<typename CopyChannelType_, bool RhsContainsAlpha_>
+		template
+		<
+			typename CopyChannelType_,
+			bool RhsContainsAlpha_,
+			typename = std::enable_if_t<!std::is_same_v<value_type, CopyChannelType_>>
+		>
 		explicit constexpr Colour(const EmuMath::Colour<CopyChannelType_, RhsContainsAlpha_>& to_copy_) :
 			channels(_make_colour_from_arbitrary_other<CopyChannelType_, RhsContainsAlpha_>(to_copy_))
-		{
-		}
-		/// <summary> Constructs a copy of the passed colour. </summary>
-		/// <param name="to_copy_">Colour to copy.</param>
-		template<>
-		constexpr Colour(const this_type& to_copy_) : channels(to_copy_.channels)
-		{
-		}
-		/// <summary> Move constructor to create a colour from moved colour data. </summary>
-		/// <param name="to_move_">Colour to move the data of into the newly constructed colour.</param>
-		constexpr Colour(this_type&& to_move_) noexcept : channels(std::move(to_move_.channels))
 		{
 		}
 		/// <summary>
@@ -278,18 +312,6 @@ namespace EmuMath
 		{
 		}
 		/// <summary>
-		/// <para> Creates a colour with its contained channels being a direct copy of the passed EmuMath vector. </para>
-		/// </summary>
-		/// <param name="channels_to_copy_">EmuMath vector representing channels to copy.</param>
-		explicit constexpr Colour(const channels_vector& channels_to_copy_) : channels(channels_to_copy_)
-		{
-		}
-		/// <summary> Creates a colour by moving the passed channels vector into its stored channel data. </summary>
-		/// <param name="channels_to_move_">EmuMath vector to move into the constructed colour's channel data.</param>
-		explicit constexpr Colour(channels_vector&& channels_to_move_) noexcept : channels(std::forward(channels_to_move_))
-		{
-		}
-		/// <summary>
 		/// <para> Constructs a colour whichz copies the RGB channels of the passed colour, and initialises its Alpha channel as a custom provided value. </para>
 		/// <para> This constructor is only available for colours which explicitly contain a modifiable Alpha channel. </para>
 		/// </summary>
@@ -302,7 +324,7 @@ namespace EmuMath
 			typename A_,
 			typename OnlyAvailableWith4Channels_ = std::enable_if_t<contains_alpha && EmuCore::TMPHelpers::are_all_convertible_v<value_type, ToCopyChannel_, A_>>
 		>
-		explicit constexpr Colour(const EmuMath::Colour<ToCopyChannel_, ToCopyContainsAlpha_>& to_copy_rgb_, A_&& a_) :
+		constexpr Colour(const EmuMath::Colour<ToCopyChannel_, ToCopyContainsAlpha_>& to_copy_rgb_, A_&& a_) :
 			channels
 			(
 				EmuMath::Helpers::convert_colour_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<0>()),
@@ -468,6 +490,11 @@ namespace EmuMath
 			channels = std::move(rhs_.channels);
 			return *this;
 		}
+		inline this_type& operator=(const EmuMath::Colour<value_type, !contains_alpha>& rhs_)
+		{
+			_set_channels_from_other_channels_vector(rhs_.channels);
+			return *this;
+		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		inline this_type& operator+=(const Rhs_& rhs_)
@@ -577,6 +604,14 @@ namespace EmuMath
 		/// <para> If this colour DOES contain an explicit Alpha channel: Stored in RGBA order. </para>
 		/// </summary>
 		channels_vector channels;
+
+	private:
+		inline void _set_channels_from_other_channels_vector(const typename EmuMath::Colour<value_type, !contains_alpha>::channels_vector& to_copy_)
+		{
+			channels.at<0>() = to_copy_.template at<0>();
+			channels.at<1>() = to_copy_.template at<1>();
+			channels.at<2>() = to_copy_.template at<2>();
+		}
 	};
 
 	/// <summary> Colour contains Red, Green, and Blue channels of the provided Channel_ type. Shorthand for EmuMath::Colour with a false boolean argument. </summary>
