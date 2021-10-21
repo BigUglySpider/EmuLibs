@@ -425,6 +425,12 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::colour_cmp_not_equal<contains_alpha || RhsContainsAlpha_>(*this, rhs_);
 		}
+
+		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
+		[[nodiscard]] constexpr inline this_type operator*(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::colour_multiply<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+		}
 #pragma endregion
 
 #pragma region CONVERSIONS

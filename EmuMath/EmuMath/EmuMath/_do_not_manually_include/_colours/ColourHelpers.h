@@ -9,31 +9,24 @@ namespace EmuMath::Helpers
 	template<typename ChannelType_>
 	[[nodiscard]] constexpr inline ChannelType_ max_channel_intensity_force_fp()
 	{
-		return ChannelType_(1);
+		return _underlying_colour_funcs::_max_channel_intensity_force_fp<ChannelType_>();
 	}
 	template<typename ChannelType_>
 	[[nodiscard]] constexpr inline ChannelType_ max_channel_intensity_force_int()
 	{
-		return std::numeric_limits<ChannelType_>::max();
+		return _underlying_colour_funcs::_max_channel_intensity_force_int<ChannelType_>();
 	}
 
 	template<typename ChannelType_>
 	[[nodiscard]] constexpr inline ChannelType_ min_channel_intensity()
 	{
-		return ChannelType_(0);
+		return _underlying_colour_funcs::_min_channel_intensity<ChannelType_>();
 	}
 
 	template<typename ChannelType_>
 	[[nodiscard]] constexpr inline ChannelType_ max_channel_intensity()
 	{
-		if constexpr (std::is_floating_point_v<ChannelType_>)
-		{
-			return max_channel_intensity_force_fp<ChannelType_>();
-		}
-		else
-		{
-			return max_channel_intensity_force_int<ChannelType_>();
-		}
+		return _underlying_colour_funcs::_max_channel_intensity<ChannelType_>();
 	}
 
 	template<typename OutChannel_, typename InChannelInt_>
@@ -79,76 +72,19 @@ namespace EmuMath::Helpers
 	template<typename OutRatio_, typename InChannel_>
 	[[nodiscard]] constexpr inline OutRatio_ colour_channel_ratio(InChannel_ in_)
 	{
-		static_assert(std::is_floating_point_v<OutRatio_>, "Provided a non-floating-point OutRatio_ type to colour_channel_ratio. The output ratio must be a floating-point.");
-
-		if constexpr (std::is_floating_point_v<InChannel_>)
-		{
-			return static_cast<OutRatio_>(in_);
-		}
-		else
-		{
-			constexpr OutRatio_ max_reciprocal_ = OutRatio_(1) / max_channel_intensity<InChannel_>();
-			return static_cast<OutRatio_>(in_) * max_reciprocal_;
-		}
+		return _underlying_colour_funcs::_colour_channel_ratio<OutRatio_, InChannel_>(in_);
 	}
 
 	template<typename OutChannel_, typename InChannel_>
 	[[nodiscard]] constexpr inline OutChannel_ get_colour_intensity_from_other_ratio(InChannel_ to_convert_)
 	{
-		using calc_type = typename EmuCore::TMPHelpers::first_floating_point<OutChannel_, InChannel_, double>::type;
-		constexpr calc_type max_out_calc = static_cast<calc_type>(max_channel_intensity<OutChannel_>());
-
-		if constexpr (std::is_floating_point_v<InChannel_>)
-		{
-			if constexpr (std::is_floating_point_v<OutChannel_>)
-			{
-				return static_cast<OutChannel_>(to_convert_);
-			}
-			else
-			{
-				constexpr calc_type min_ratio_ = std::is_unsigned_v<OutChannel_> ? calc_type(0) : calc_type(-1);
-				constexpr calc_type max_ratio_ = calc_type(1);
-				constexpr EmuCore::do_clamp<calc_type, calc_type, calc_type> clamp_(min_ratio_, max_ratio_);
-				calc_type ratio_ = clamp_(static_cast<calc_type>(to_convert_));
-				return static_cast<OutChannel_>(max_out_calc * ratio_);
-			}
-		}
-		else
-		{
-			constexpr calc_type max_in_calc_reciprocal = calc_type(1) / static_cast<calc_type>(max_channel_intensity_force_int<InChannel_>());
-			calc_type ratio_ = to_convert_ * max_in_calc_reciprocal;
-			if constexpr (std::is_floating_point_v<OutChannel_>)
-			{
-				return static_cast<OutChannel_>(ratio_);
-			}
-			else
-			{
-				constexpr calc_type min_ratio_ = std::is_unsigned_v<OutChannel_> ? calc_type(0) : calc_type(-1);
-				constexpr calc_type max_ratio_ = calc_type(1);
-				constexpr EmuCore::do_clamp<calc_type, calc_type, calc_type> clamp_(min_ratio_, max_ratio_);
-				ratio_ = clamp_(ratio_);
-				return static_cast<OutChannel_>(max_out_calc * ratio_);
-			}
-		}
+		return _underlying_colour_funcs::_get_colour_intensity_from_other_ratio<OutChannel_, InChannel_>(to_convert_);
 	}
 
 	template<typename OutChannel_, typename InChannel_>
 	[[nodiscard]] constexpr inline OutChannel_ convert_colour_channel(InChannel_ to_convert_)
 	{
-		if constexpr (std::is_same_v<OutChannel_, InChannel_>)
-		{
-			// Same type so just return the input
-			return to_convert_;
-		}
-		else if constexpr (std::is_floating_point_v<OutChannel_> && std::is_floating_point_v<InChannel_>)
-		{
-			// No need for more than a cast since all floats reside in the same 0:1 range as far as min:max intensity goes.
-			return static_cast<OutChannel_>(to_convert_);
-		}
-		else
-		{
-			return get_colour_intensity_from_other_ratio<OutChannel_, InChannel_>(to_convert_);
-		}
+		return _underlying_colour_funcs::_convert_colour_channel<OutChannel_, InChannel_>(to_convert_);
 	}
 
 	template<typename OutChannel_, typename InChannelFP_>
@@ -564,7 +500,7 @@ namespace EmuMath::Helpers
 	[[nodiscard]] constexpr inline bool colour_cmp_equal(const LhsColour_& lhs_, const RhsColour_& rhs_)
 	{
 		using Combiner_ = std::logical_and<bool>;
-		return EmuMath::Helpers::_underlying_colour_funcs::colour_cmp
+		return _underlying_colour_funcs::colour_cmp
 		<
 			IncludeAlpha_,
 			EmuCore::do_cmp_equal_to,
@@ -577,7 +513,7 @@ namespace EmuMath::Helpers
 	[[nodiscard]] constexpr inline bool colour_cmp_not_equal(const LhsColour_& lhs_, const RhsColour_& rhs_)
 	{
 		using Combiner_ = std::logical_or<bool>;
-		return EmuMath::Helpers::_underlying_colour_funcs::colour_cmp
+		return _underlying_colour_funcs::colour_cmp
 		<
 			IncludeAlpha_,
 			EmuCore::do_cmp_not_equal_to,
@@ -587,27 +523,19 @@ namespace EmuMath::Helpers
 		>(lhs_, rhs_, Combiner_());
 	}
 
-	//template<typename lhs_channel_type, typename rhs_channel_type>
-	//[[nodiscard]] constexpr inline bool colour_cmp_equal(const EmuMath::ColourRGB<lhs_channel_type>& lhs_, const EmuMath::ColourRGB<rhs_channel_type>& rhs_)
-	//{
-	//	if constexpr (std::is_same_v<lhs_channel_type, rhs_channel_type>)
-	//	{
-	//		return lhs_.channels.CmpAllEqualTo(rhs_.channels);
-	//	}
-	//	else if constexpr (std::is_floating_point_v<lhs_channel_type> && std::is_floating_point_v<rhs_channel_type>)
-	//	{
-	//		return lhs_.channels.CmpAllEqualTo(rhs_.channels);
-	//	}
-	//	else if constexpr (std::is_floating_point_v<rhs_channel_type>)
-	//	{
-	//		return colour_cmp_equal(EmuMath::ColourRGB<rhs_channel_type>(lhs_), rhs_);
-	//	}
-	//	else
-	//	{
-	//		return colour_cmp_equal(lhs_, EmuMath::ColourRGB<lhs_channel_type>(rhs_));
-	//	}
-	//}
-	//
+	template<class OutColour_, bool IncludeAlpha_ = true, class LhsColour_, class Rhs_>
+	[[nodiscard]] constexpr inline OutColour_ colour_multiply(const LhsColour_& lhs_, const Rhs_& rhs_)
+	{
+		return _underlying_colour_funcs::colour_arithmetic
+		<
+			IncludeAlpha_,
+			EmuCore::do_multiply,
+			OutColour_,
+			LhsColour_,
+			Rhs_
+		>(lhs_, rhs_);
+	}
+
 	//template<typename lhs_contained_type, typename rhs_type>
 	//[[nodiscard]] constexpr inline EmuMath::ColourRGB<lhs_contained_type> colour_multiply(const EmuMath::ColourRGB<lhs_contained_type>& lhs_, const rhs_type& rhs_)
 	//{

@@ -187,6 +187,17 @@ int main()
 	constexpr EmuMath::ColourRGB<std::uint32_t> colour128_from_byte_(byte_from_float_rgba_inverted_);
 	constexpr EmuMath::ColourRGBA<float> colour128f_from_colour128i_(colour128_from_byte_);
 
+	constexpr EmuMath::ColourRGB<float> to_mult_f_rgb_ = EmuMath::ColourRGB<float>(0.2f, 1.0f, 0.5f);
+	constexpr EmuMath::ColourRGBA<double> to_mult_d_rgba_ = EmuMath::ColourRGBA<double>(1.0, 0.5, 1.0, 0.2);
+	constexpr EmuMath::ColourRGB<std::uint8_t> to_mult_byte_rgb_ = EmuMath::ColourRGB<std::uint8_t>(0, 255, 255/4);
+	constexpr EmuMath::ColourRGBA<std::uint8_t> to_mult_byte_rgba_ = EmuMath::ColourRGBA<std::uint8_t>(255, 255, 127, 255);
+	constexpr float to_mult_scalar_f_ = 2.5f;
+	constexpr std::uint32_t to_mult_scalar_i_ = 2;
+	constexpr auto to_mult_vector1f_ = EmuMath::Vector<1, float>(2.0f);
+	constexpr auto to_mult_vector2d_ = EmuMath::Vector<2, double>(0.5, 0.5);
+	constexpr auto to_mult_vector3ld_ = EmuMath::Vector<3, long double>(1.0L, 0.5L, 0.25L);
+	constexpr auto to_mult_vector4i_ = EmuMath::Vector<4, std::int32_t>(-1, 1, -2, 2);
+
 	EmuMath::ColourRGBA<float> runtime_rgba_f_(0.1f, -0.1f, 1.0f, 1.5f);
 	std::cout << runtime_rgba_f_ << "\n";
 	runtime_rgba_f_.Wrap();
