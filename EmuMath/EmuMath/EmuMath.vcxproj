@@ -180,6 +180,8 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourHelpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourT.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourTMP.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_helpers_underlying\_colour_helpers_underlying.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_helpers_underlying\_colour_helpers_underlying_common_includes.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseSampleProcessorAnalytics.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\FastMatrix4x4f.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\Matrix4x4.h" />

@@ -290,7 +290,7 @@ namespace EmuMath
 		{
 		}
 		/// <summary>
-		/// <para> Constructs a colour which copies the RGB channels of the passed colour, and initialises its Alpha channel as a custom provided value. </para>
+		/// <para> Constructs a colour whichz copies the RGB channels of the passed colour, and initialises its Alpha channel as a custom provided value. </para>
 		/// <para> This constructor is only available for colours which explicitly contain a modifiable Alpha channel. </para>
 		/// </summary>
 		/// <param name="to_copy_rgb_">Colour to copy the Red, Green, and Blue channels of.</param>
@@ -413,6 +413,17 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline bool operator==(const EmuMath::Colour<rhs_contained_type, RhsContainsAlpha_>& rhs_) const
 		{
 			return EmuMath::Helpers::colour_cmp_equal<contains_alpha || RhsContainsAlpha_>(*this, rhs_);
+		}
+
+		template<bool IncludeAlpha_, typename rhs_contained_type, bool RhsContainsAlpha_>
+		[[nodiscard]] constexpr inline bool operator!=(const EmuMath::Colour<rhs_contained_type, RhsContainsAlpha_>& rhs_) const
+		{
+			return EmuMath::Helpers::colour_cmp_not_equal<IncludeAlpha_>(*this, rhs_);
+		}
+		template<typename rhs_contained_type, bool RhsContainsAlpha_>
+		[[nodiscard]] constexpr inline bool operator!=(const EmuMath::Colour<rhs_contained_type, RhsContainsAlpha_>& rhs_) const
+		{
+			return EmuMath::Helpers::colour_cmp_not_equal<contains_alpha || RhsContainsAlpha_>(*this, rhs_);
 		}
 #pragma endregion
 

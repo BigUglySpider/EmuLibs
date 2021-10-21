@@ -172,6 +172,14 @@ int main()
 	constexpr bool cmp_result_e_ = white_byte_ == overkill4_;
 	constexpr bool cmp_result_f_ = white_ == white_byte_half_visible_;
 
+	constexpr bool cmp_result_g_ = white_ != white4_;
+	constexpr bool cmp_result_h_ = white_ != white_byte_;
+	constexpr bool cmp_result_i_ = overkill4_ != white4_;
+	constexpr bool cmp_result_j_ = overkill4_ != white_byte_;
+	constexpr bool cmp_result_k_ = white_byte_ != overkill4_;
+	constexpr bool cmp_result_l_ = white_ != white_byte_half_visible_;
+	constexpr bool cmp_result_m_ = white_.operator!=<false>(white_byte_half_visible_);
+
 	constexpr EmuMath::ColourRGB<float> some_inverted_colour_ = EmuMath::ColourRGB<float>(0.2f, 0.95f, 0.4f).Inverse();
 	constexpr auto inverted_rgba_no_alpha_ = EmuMath::ColourRGBA<float>(1.0f, 0.5f, 0.2f).Inverse();
 	constexpr EmuMath::ColourRGB<std::uint8_t> byte_from_float_rgba_inverted_(inverted_rgba_no_alpha_);
@@ -183,6 +191,8 @@ int main()
 	std::cout << runtime_rgba_f_ << "\n";
 	runtime_rgba_f_.Wrap();
 	std::cout << runtime_rgba_f_ << "\n";
+	std::cout << (runtime_rgba_f_ == runtime_rgba_f_) << "\n";
+	std::cout << (runtime_rgba_f_ != runtime_rgba_f_) << "\n";
 
 
 #pragma region TEST_HARNESS_EXECUTION
