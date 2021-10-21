@@ -457,6 +457,49 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region NON_CONST_OPERATORS
+		inline this_type& operator=(const this_type& rhs_)
+		{
+			channels = rhs_.channels;
+			return *this;
+		}
+		inline this_type& operator=(this_type&& rhs_) noexcept
+		{
+			channels = std::move(rhs_.channels);
+			return *this;
+		}
+
+		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
+		inline this_type& operator+=(const Rhs_& rhs_)
+		{
+			return this->operator=(EmuMath::Helpers::colour_add<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_));
+		}
+
+		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
+		inline this_type& operator-=(const Rhs_& rhs_)
+		{
+			return this->operator=(EmuMath::Helpers::colour_subtract<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_));
+		}
+
+		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
+		inline this_type& operator*=(const Rhs_& rhs_)
+		{
+			return this->operator=(EmuMath::Helpers::colour_multiply<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_));
+		}
+
+		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
+		inline this_type& operator/=(const Rhs_& rhs_)
+		{
+			return this->operator=(EmuMath::Helpers::colour_divide<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_));
+		}
+
+		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
+		inline this_type& operator%=(const Rhs_& rhs_)
+		{
+			return this->operator=(EmuMath::Helpers::colour_mod<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_));
+		}
+#pragma endregion
+
 #pragma region CONVERSIONS
 		/// <summary> Shorthand to construct this colour as an alternate channel representation. May optionally change if output contains an Alpha channel. </summary>
 		/// <typeparam name="out_contained_type">Type to be contained in the output colour.</typeparam>

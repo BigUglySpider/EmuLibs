@@ -242,6 +242,14 @@ int main()
 	std::cout << runtime_rgba_f_ << "\n";
 	runtime_rgba_f_.Wrap();
 	std::cout << runtime_rgba_f_ << "\n";
+	runtime_rgba_f_ *= 0.5f;
+	std::cout << runtime_rgba_f_ << "\n";
+	runtime_rgba_f_ += 0.1;
+	std::cout << runtime_rgba_f_ << "\n";
+	runtime_rgba_f_ -= 0.1;
+	std::cout << runtime_rgba_f_ << "\n";
+	runtime_rgba_f_ /= 2;
+	std::cout << runtime_rgba_f_ << "\n";
 	std::cout << (runtime_rgba_f_ == runtime_rgba_f_) << "\n";
 	std::cout << (runtime_rgba_f_ != runtime_rgba_f_) << "\n";
 
