@@ -5,11 +5,8 @@
 
 namespace EmuMath
 {
-	template<typename Channel_>
-	struct ColourRGB;
-
-	template<typename Channel_>
-	struct ColourRGBA;
+	template<typename Channel_, bool ContainsAlpha_>
+	struct Colour;
 }
 
 namespace EmuMath::TMP
@@ -25,13 +22,8 @@ namespace EmuMath::TMP
 			is_emu_colour<std::remove_reference_t<std::remove_cv_t<T_>>>
 		>::value;
 	};
-	template<typename T_>
-	struct is_emu_colour<EmuMath::ColourRGB<T_>>
-	{
-		static constexpr bool value = true;
-	};
-	template<typename T_>
-	struct is_emu_colour<EmuMath::ColourRGBA<T_>>
+	template<typename T_, bool ContainsAlpha_>
+	struct is_emu_colour<EmuMath::Colour<T_, ContainsAlpha_>>
 	{
 		static constexpr bool value = true;
 	};

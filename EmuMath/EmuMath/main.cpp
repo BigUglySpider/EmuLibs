@@ -2,7 +2,7 @@
 #include "EmuMath/Noise.h"
 #include "EmuMath/Random.h"
 
-#include "EmuMath/Colours.h"
+#include "EmuMath/Colour.h"
 
 #include "Tests.hpp"
 
@@ -155,37 +155,22 @@ int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
 
-	constexpr EmuMath::ColourRGB<float> colour_ = EmuMath::ColourRGB<float>(-0.2f, 2.5, 0.0f).MakeWrapped();
-	constexpr EmuMath::ColourRGB<std::uint8_t> byte_colour_(colour_);
-	constexpr EmuMath::ColourRGB<std::int8_t> byte_colour_from_overflow_(EmuMath::ColourRGB<float>(2.5f, -20.1f, 0.5f));
-	constexpr EmuMath::ColourRGB<std::uint8_t> byte_colour_from_wrapped_byte_overflow_ = byte_colour_from_overflow_.MakeWrapped<std::uint8_t>();
-	constexpr EmuMath::ColourRGB<std::uint8_t> byte_colour_from_byte_overflow_ = EmuMath::ColourRGB<std::uint8_t>(byte_colour_from_overflow_);
+	constexpr EmuMath::ColourRGB<float> colour_(-0.2f, 2.5, 2.0f);
+	constexpr auto wrapped_ = colour_.Wrapped<std::uint8_t, true>();
+	constexpr auto clamped_ = colour_.Clamped<std::uint8_t, true>();
 
-	constexpr EmuMath::ColourRGB<float> test_float_(0.0f, 1.0f, 0.0f);
-	constexpr EmuMath::ColourRGB<std::uint16_t> test_int_(0, std::numeric_limits<std::uint16_t>::max(), 0);
-	constexpr EmuMath::ColourRGB<std::uint32_t> test_int32_(0, std::numeric_limits<std::uint32_t>::max(), 0);
-	constexpr bool test_bool_a_lhsint_rhsfloat_ = test_int_ == test_float_;
-	constexpr bool test_bool_b_lhsfloat_rhsint_ = test_float_ == test_int_;
-	constexpr bool test_lhsint32_rhsint16_ = test_int32_ == test_int_;
-	constexpr bool test_lhsint16_rhsint32_ = test_int_ == test_int32_;
+	constexpr EmuMath::ColourRGB<float> some_inverted_colour_ = EmuMath::ColourRGB<float>(0.2f, 0.95f, 0.4f).Inverse();
+	constexpr auto inverted_rgba_no_alpha_ = EmuMath::ColourRGBA<float>(1.0f, 0.5f, 0.2f).Inverse();
+	constexpr EmuMath::ColourRGB<std::uint8_t> byte_from_float_rgba_inverted_(inverted_rgba_no_alpha_);
+	constexpr EmuMath::ColourRGB<std::int8_t> seven_bits_from_byte_(byte_from_float_rgba_inverted_);
+	constexpr EmuMath::ColourRGB<std::uint32_t> colour128_from_byte_(byte_from_float_rgba_inverted_);
+	constexpr EmuMath::ColourRGBA<float> colour128f_from_colour128i_(colour128_from_byte_);
 
-	constexpr EmuMath::ColourRGB<float> white_float_(1.0f, 1.0f, 1.0f);
-	constexpr EmuMath::ColourRGB<float> modifier_float_(1.0f, 0.5f, 0.25f);
-	constexpr EmuMath::ColourRGB<std::uint8_t> modifier_uint8_(255, 255 / 2, 255 / 4);
-	constexpr EmuMath::ColourRGB<float> result_ff_ = white_float_ * modifier_float_;
-	constexpr EmuMath::ColourRGB<float> result_fb_ = white_float_ * modifier_uint8_;
-	constexpr EmuMath::ColourRGB<std::uint8_t> result_bf_ = modifier_uint8_ * white_float_;
+	EmuMath::ColourRGBA<float> runtime_rgba_f_(0.1f, -0.1f, 1.0f, 1.5f);
+	std::cout << runtime_rgba_f_ << "\n";
+	runtime_rgba_f_.Wrap();
+	std::cout << runtime_rgba_f_ << "\n";
 
-	constexpr EmuMath::ColourRGB<std::uint8_t> two_float(255, 127, 64);
-	constexpr EmuMath::ColourRGB<float> white_div_two_ = white_float_ / two_float;
-
-	constexpr auto white_cast_ = white_float_.As<std::uint16_t>();
-	constexpr auto white_div_two_cast_ = white_div_two_.As<std::uint16_t>();
-	constexpr auto result_fb_cast_ = result_fb_.As<std::uint16_t>();
-	constexpr auto rest_fb_cast_cast_again_ = result_fb_cast_.As<std::uint8_t>();
-
-	constexpr auto white_mult_5_ = white_float_ * 5;
-	constexpr auto white_mult_10_100_1000_ = white_float_ * EmuMath::Vector<3, std::uint64_t>(10, 100, 1000);
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

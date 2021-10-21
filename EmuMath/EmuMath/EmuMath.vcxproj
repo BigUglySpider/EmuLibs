@@ -168,7 +168,7 @@
     <ClInclude Include="EmuCore\TMPHelpers\TypeComparators.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TypeConvertors.h" />
     <ClInclude Include="EmuCore\TMPHelpers\Values.h" />
-    <ClInclude Include="EmuMath\Colours.h" />
+    <ClInclude Include="EmuMath\Colour.h" />
     <ClInclude Include="EmuMath\FastMatrix.h" />
     <ClInclude Include="EmuMath\FastVector.h" />
     <ClInclude Include="EmuMath\Matrix.h" />
@@ -178,7 +178,7 @@
     <ClInclude Include="EmuMath\SIMDHelpers.h" />
     <ClInclude Include="EmuMath\Vector.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourHelpers.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourRGB.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourT.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourTMP.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseSampleProcessorAnalytics.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\FastMatrix4x4f.h" />

@@ -290,10 +290,10 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\NoisePermutations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\Colours.h">
+    <ClInclude Include="EmuMath\Colour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourRGB.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourTMP.h">

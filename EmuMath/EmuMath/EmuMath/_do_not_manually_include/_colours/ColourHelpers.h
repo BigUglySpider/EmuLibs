@@ -210,53 +210,17 @@ namespace EmuMath::Helpers
 		}
 	}
 
-	template<typename out_contained_type, typename in_contained_type>
-	[[nodiscard]] constexpr inline EmuMath::ColourRGB<out_contained_type> wrap_colour(const EmuMath::ColourRGB<in_contained_type>& to_wrap_)
+	template<typename OutChannel_, typename InChannel_>
+	[[nodiscard]] constexpr inline OutChannel_ wrap_colour_channel(const InChannel_& in_)
 	{
-		if constexpr (std::is_floating_point_v<in_contained_type>)
+		if constexpr (std::is_floating_point_v<InChannel_>)
 		{
-			return EmuMath::ColourRGB<out_contained_type>
-			(
-				wrap_colour_channel_fp<out_contained_type, in_contained_type>(to_wrap_.R()),
-				wrap_colour_channel_fp<out_contained_type, in_contained_type>(to_wrap_.G()),
-				wrap_colour_channel_fp<out_contained_type, in_contained_type>(to_wrap_.B())
-			);
+			return wrap_colour_channel_fp<OutChannel_, InChannel_>(in_);
 		}
 		else
 		{
-			return EmuMath::ColourRGB<out_contained_type>
-			(
-				wrap_colour_channel_int<out_contained_type, in_contained_type>(to_wrap_.R()),
-				wrap_colour_channel_int<out_contained_type, in_contained_type>(to_wrap_.G()),
-				wrap_colour_channel_int<out_contained_type, in_contained_type>(to_wrap_.B())
-			);
+			return wrap_colour_channel_int<OutChannel_, InChannel_>(in_);
 		}
-	}
-	template<typename in_contained_type>
-	[[nodiscard]] constexpr inline EmuMath::ColourRGB<in_contained_type> wrap_colour(const EmuMath::ColourRGB<in_contained_type>& to_wrap_)
-	{
-		return wrap_colour<in_contained_type, in_contained_type>(to_wrap_);
-	}
-	template<typename in_contained_type, typename out_contained_type>
-	constexpr inline EmuMath::ColourRGB<out_contained_type>& wrap_colour
-	(
-		const EmuMath::ColourRGB<in_contained_type>& to_wrap_, 
-		EmuMath::ColourRGB<out_contained_type>& out_
-	)
-	{
-		if constexpr (std::is_floating_point_v<in_contained_type>)
-		{
-			out_.R() = wrap_colour_channel_fp<out_contained_type, in_contained_type>(to_wrap_.R());
-			out_.G() = wrap_colour_channel_fp<out_contained_type, in_contained_type>(to_wrap_.G());
-			out_.B() = wrap_colour_channel_fp<out_contained_type, in_contained_type>(to_wrap_.B());
-		}
-		else
-		{
-			out_.R() = wrap_colour_channel_int<out_contained_type, in_contained_type>(to_wrap_.R());
-			out_.G() = wrap_colour_channel_int<out_contained_type, in_contained_type>(to_wrap_.G());
-			out_.B() = wrap_colour_channel_int<out_contained_type, in_contained_type>(to_wrap_.B());
-		}
-		return out_;
 	}
 
 	template<typename OutChannel_, typename InChannel_>
@@ -307,104 +271,367 @@ namespace EmuMath::Helpers
 		}
 	}
 
-	template<typename out_contained_type, typename in_contained_type>
-	[[nodiscard]] constexpr inline EmuMath::ColourRGB<out_contained_type> clamp_colour(const EmuMath::ColourRGB<in_contained_type>& in_)
+	template<typename OutChannel_, typename InChannel_>
+	[[nodiscard]] constexpr inline OutChannel_ colour_channel_invert(InChannel_ in_)
 	{
-		return EmuMath::ColourRGB<out_contained_type>
-		(
-			clamp_colour_channel<out_contained_type, in_contained_type>(in_.R()),
-			clamp_colour_channel<out_contained_type, in_contained_type>(in_.G()),
-			clamp_colour_channel<out_contained_type, in_contained_type>(in_.B())
-		);
-	}
-	template<typename in_contained_type>
-	[[nodiscard]] constexpr inline EmuMath::ColourRGB<in_contained_type> clamp_colour(const EmuMath::ColourRGB<in_contained_type>& in_)
-	{
-		return clamp_colour<in_contained_type, in_contained_type>(in_);
-	}
-	template<typename in_contained_type, typename out_contained_type>
-	constexpr inline EmuMath::ColourRGB<out_contained_type>& clamp_colour
-	(
-		const EmuMath::ColourRGB<in_contained_type>& in_,
-		EmuMath::ColourRGB<out_contained_type>& out_
-	)
-	{
-		out_.R() = clamp_colour_channel<out_contained_type, in_contained_type>(in_.R());
-		out_.G() = clamp_colour_channel<out_contained_type, in_contained_type>(in_.G());
-		out_.B() = clamp_colour_channel<out_contained_type, in_contained_type>(in_.B());
-		return out_;
-	}
-
-	template<typename lhs_channel_type, typename rhs_channel_type>
-	[[nodiscard]] constexpr inline bool colour_cmp_equal(const EmuMath::ColourRGB<lhs_channel_type>& lhs_, const EmuMath::ColourRGB<rhs_channel_type>& rhs_)
-	{
-		if constexpr (std::is_same_v<lhs_channel_type, rhs_channel_type>)
+		constexpr InChannel_ max_in = max_channel_intensity<InChannel_>();
+		if constexpr (std::is_same_v<OutChannel_, InChannel_>)
 		{
-			return lhs_.channels.CmpAllEqualTo(rhs_.channels);
+			return max_in - in_;
 		}
-		else if constexpr (std::is_floating_point_v<lhs_channel_type> && std::is_floating_point_v<rhs_channel_type>)
+		else if constexpr(std::is_floating_point_v<OutChannel_> && std::is_floating_point_v<InChannel_>)
 		{
-			return lhs_.channels.CmpAllEqualTo(rhs_.channels);
-		}
-		else if constexpr (std::is_floating_point_v<rhs_channel_type>)
-		{
-			return colour_cmp_equal(EmuMath::ColourRGB<rhs_channel_type>(lhs_), rhs_);
+			return static_cast<OutChannel_>(max_in - in_);
 		}
 		else
 		{
-			return colour_cmp_equal(lhs_, EmuMath::ColourRGB<lhs_channel_type>(rhs_));
+			return get_colour_intensity_from_other_ratio<OutChannel_, InChannel_>(max_in - in_);
 		}
 	}
 
-	template<typename lhs_contained_type, typename rhs_type>
-	[[nodiscard]] constexpr inline EmuMath::ColourRGB<lhs_contained_type> colour_multiply(const EmuMath::ColourRGB<lhs_contained_type>& lhs_, const rhs_type& rhs_)
+	template<bool IncludeAlpha_ = false, class InColour_>
+	[[nodiscard]] constexpr inline InColour_ colour_invert(const InColour_& in_)
 	{
-		if constexpr (EmuMath::TMP::is_emu_colour_v<rhs_type>)
+		if constexpr (EmuMath::TMP::is_emu_colour_v<InColour_>)
 		{
-			using rhs_contained_type = typename rhs_type::value_type;
-			using ratio_type = typename EmuCore::TMPHelpers::first_floating_point<lhs_contained_type, rhs_contained_type, float>::type;
-			return colour_multiply<lhs_contained_type, EmuMath::Vector<3, ratio_type>>
-			(
-				lhs_,
-				EmuMath::Vector<3, ratio_type>
+			using channel_type = typename InColour_::value_type;
+			if constexpr (!InColour_::contains_alpha)
+			{
+				return InColour_
 				(
-					colour_channel_ratio<ratio_type, rhs_contained_type>(rhs_.R()),
-					colour_channel_ratio<ratio_type, rhs_contained_type>(rhs_.G()),
-					colour_channel_ratio<ratio_type, rhs_contained_type>(rhs_.B())
-				)
-			);
+					colour_channel_invert<channel_type, channel_type>(in_.R()),
+					colour_channel_invert<channel_type, channel_type>(in_.G()),
+					colour_channel_invert<channel_type, channel_type>(in_.B())
+				);
+			}
+			else
+			{
+				if constexpr (IncludeAlpha_)
+				{
+					return InColour_
+					(
+						colour_channel_invert<channel_type, channel_type>(in_.R()),
+						colour_channel_invert<channel_type, channel_type>(in_.G()),
+						colour_channel_invert<channel_type, channel_type>(in_.B()),
+						colour_channel_invert<channel_type, channel_type>(in_.A())
+					);
+				}
+				else
+				{
+					return InColour_
+					(
+						colour_channel_invert<channel_type, channel_type>(in_.R()),
+						colour_channel_invert<channel_type, channel_type>(in_.G()),
+						colour_channel_invert<channel_type, channel_type>(in_.B()),
+						in_.A()
+					);
+				}
+			}
 		}
 		else
 		{
-			return EmuMath::ColourRGB<lhs_contained_type>(lhs_.channels.Multiply(rhs_));
+			static_assert(false, "Attempted to invert a colour, but provided a non-EmuMath-Colour in_ type.");
+		}
+	}
+	template<bool IncludeAlpha_ = false, class InOutColour_>
+	constexpr inline InOutColour_& colour_invert(const InOutColour_& in_, InOutColour_& out_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_colour_v<InOutColour_>)
+		{
+			using channel_type = typename InOutColour_::value_type;
+			if constexpr (!InOutColour_::contains_alpha)
+			{
+				out_.R(colour_channel_invert<channel_type, channel_type>(in_.R()));
+				out_.G(colour_channel_invert<channel_type, channel_type>(in_.G()));
+				out_.B(colour_channel_invert<channel_type, channel_type>(in_.B()));
+			}
+			else
+			{
+				if constexpr (IncludeAlpha_)
+				{
+					out_.R(colour_channel_invert<channel_type, channel_type>(in_.R()));
+					out_.G(colour_channel_invert<channel_type, channel_type>(in_.G()));
+					out_.B(colour_channel_invert<channel_type, channel_type>(in_.B()));
+					out_.A(colour_channel_invert<channel_type, channel_type>(in_.A()));
+				}
+				else
+				{
+					out_.R(colour_channel_invert<channel_type, channel_type>(in_.R()));
+					out_.G(colour_channel_invert<channel_type, channel_type>(in_.G()));
+					out_.B(colour_channel_invert<channel_type, channel_type>(in_.B()));
+				}
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to invert a colour, but provided a non-EmuMath-Colour in_ type.");
 		}
 	}
 
-	template<typename lhs_contained_type, typename rhs_type>
-	[[nodiscard]] constexpr inline EmuMath::ColourRGB<lhs_contained_type> colour_divide(const EmuMath::ColourRGB<lhs_contained_type>& lhs_, const rhs_type& rhs_)
+	template<class OutColour_, class InColour_>
+	[[nodiscard]] constexpr inline OutColour_ colour_wrap(const InColour_& in_)
 	{
-		if constexpr (EmuMath::TMP::is_emu_colour_v<rhs_type>)
+		if constexpr (EmuMath::TMP::is_emu_colour_v<InColour_>)
 		{
-			using rhs_contained_type = typename rhs_type::value_type;
-			using ratio_type = typename EmuCore::TMPHelpers::first_floating_point<lhs_contained_type, rhs_contained_type, float>::type;
-			constexpr ratio_type zero_ = ratio_type(0);
-			constexpr ratio_type one_ = ratio_type(1);
-			return colour_multiply<lhs_contained_type, EmuMath::Vector<3, ratio_type>>
-			(
-				lhs_,
-				EmuMath::Vector<3, ratio_type>
-				(
-					rhs_.R() == zero_ ? one_ : (one_ / colour_channel_ratio<ratio_type, rhs_contained_type>(rhs_.R())),
-					rhs_.G() == zero_ ? one_ : (one_ / colour_channel_ratio<ratio_type, rhs_contained_type>(rhs_.G())),
-					rhs_.B() == zero_ ? one_ : (one_ / colour_channel_ratio<ratio_type, rhs_contained_type>(rhs_.B()))
-				)
-			);
+			if constexpr (EmuMath::TMP::is_emu_colour_v<OutColour_>)
+			{
+				using in_channel_type = typename InColour_::value_type;
+				using out_channel_type = typename OutColour_::value_type;
+				if constexpr (OutColour_::contains_alpha)
+				{
+					if constexpr (InColour_::contains_alpha)
+					{
+						return OutColour_
+						(
+							wrap_colour_channel<out_channel_type, in_channel_type>(in_.R()),
+							wrap_colour_channel<out_channel_type, in_channel_type>(in_.G()),
+							wrap_colour_channel<out_channel_type, in_channel_type>(in_.B()),
+							wrap_colour_channel<out_channel_type, in_channel_type>(in_.A())
+						);
+					}
+					else
+					{
+						return OutColour_
+						(
+							wrap_colour_channel<out_channel_type, in_channel_type>(in_.R()),
+							wrap_colour_channel<out_channel_type, in_channel_type>(in_.G()),
+							wrap_colour_channel<out_channel_type, in_channel_type>(in_.B()),
+							OutColour_::max_intensity
+						);
+					}
+				}
+				else
+				{
+					return OutColour_
+					(
+						wrap_colour_channel<out_channel_type, in_channel_type>(in_.R()),
+						wrap_colour_channel<out_channel_type, in_channel_type>(in_.G()),
+						wrap_colour_channel<out_channel_type, in_channel_type>(in_.B())
+					);
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to wrap an EmuMath Colour, but the provided OutColour_ type was not an EmuMath colour.");
+			}
 		}
 		else
 		{
-			return EmuMath::ColourRGB<lhs_contained_type>(lhs_.channels.Divide(rhs_));
+			static_assert(false, "Attempted to wrap an EmuMath Colour, but the provided in_ colour was not an EmuMath colour.");
 		}
 	}
+	template<class OutColour_, class InColour_>
+	constexpr inline OutColour_& colour_wrap(const InColour_& in_, OutColour_& out_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_colour_v<InColour_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_colour_v<OutColour_>)
+			{
+				using in_channel_type = typename InColour_::value_type;
+				using out_channel_type = typename OutColour_::value_type;
+				if constexpr (OutColour_::contains_alpha)
+				{
+					if constexpr (InColour_::contains_alpha)
+					{
+						out_.R(wrap_colour_channel<out_channel_type, in_channel_type>(in_.R()));
+						out_.G(wrap_colour_channel<out_channel_type, in_channel_type>(in_.G()));
+						out_.B(wrap_colour_channel<out_channel_type, in_channel_type>(in_.B()));
+						out_.A(wrap_colour_channel<out_channel_type, in_channel_type>(in_.A()));
+					}
+					else
+					{
+						out_.R(wrap_colour_channel<out_channel_type, in_channel_type>(in_.R()));
+						out_.G(wrap_colour_channel<out_channel_type, in_channel_type>(in_.G()));
+						out_.B(wrap_colour_channel<out_channel_type, in_channel_type>(in_.B()));
+						out_.A(OutColour_::max_intensity);
+					}
+				}
+				else
+				{
+					out_.R(wrap_colour_channel<out_channel_type, in_channel_type>(in_.R()));
+					out_.G(wrap_colour_channel<out_channel_type, in_channel_type>(in_.G()));
+					out_.B(wrap_colour_channel<out_channel_type, in_channel_type>(in_.B()));
+				}
+				return out_;
+			}
+			else
+			{
+				static_assert(false, "Attempted to wrap an EmuMath Colour, but the provided OutColour_ type was not an EmuMath colour.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to wrap an EmuMath Colour, but the provided in_ colour was not an EmuMath colour.");
+		}
+	}
+
+	template<class OutColour_, class InColour_>
+	[[nodiscard]] constexpr inline OutColour_ colour_clamp(const InColour_& in_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_colour_v<InColour_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_colour_v<OutColour_>)
+			{
+				using in_channel_type = typename InColour_::value_type;
+				using out_channel_type = typename OutColour_::value_type;
+				if constexpr (OutColour_::contains_alpha)
+				{
+					if constexpr (InColour_::contains_alpha)
+					{
+						return OutColour_
+						(
+							clamp_colour_channel<out_channel_type, in_channel_type>(in_.R()),
+							clamp_colour_channel<out_channel_type, in_channel_type>(in_.G()),
+							clamp_colour_channel<out_channel_type, in_channel_type>(in_.B()),
+							clamp_colour_channel<out_channel_type, in_channel_type>(in_.A())
+						);
+					}
+					else
+					{
+						return OutColour_
+						(
+							clamp_colour_channel<out_channel_type, in_channel_type>(in_.R()),
+							clamp_colour_channel<out_channel_type, in_channel_type>(in_.G()),
+							clamp_colour_channel<out_channel_type, in_channel_type>(in_.B()),
+							OutColour_::max_intensity
+						);
+					}
+				}
+				else
+				{
+					return OutColour_
+					(
+						clamp_colour_channel<out_channel_type, in_channel_type>(in_.R()),
+						clamp_colour_channel<out_channel_type, in_channel_type>(in_.G()),
+						clamp_colour_channel<out_channel_type, in_channel_type>(in_.B())
+					);
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to clamp an EmuMath Colour, but the provided OutColour_ type was not an EmuMath colour.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to clamp an EmuMath Colour, but the provided in_ colour was not an EmuMath colour.");
+		}
+	}
+	template<class OutColour_, class InColour_>
+	constexpr inline OutColour_& colour_clamp(const InColour_& in_, OutColour_& out_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_colour_v<InColour_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_colour_v<OutColour_>)
+			{
+				using in_channel_type = typename InColour_::value_type;
+				using out_channel_type = typename OutColour_::value_type;
+				if constexpr (OutColour_::contains_alpha)
+				{
+					if constexpr (InColour_::contains_alpha)
+					{
+						out_.R(clamp_colour_channel<out_channel_type, in_channel_type>(in_.R()));
+						out_.G(clamp_colour_channel<out_channel_type, in_channel_type>(in_.G()));
+						out_.B(clamp_colour_channel<out_channel_type, in_channel_type>(in_.B()));
+						out_.A(clamp_colour_channel<out_channel_type, in_channel_type>(in_.A()));
+					}
+					else
+					{
+						out_.R(clamp_colour_channel<out_channel_type, in_channel_type>(in_.R()));
+						out_.G(clamp_colour_channel<out_channel_type, in_channel_type>(in_.G()));
+						out_.B(clamp_colour_channel<out_channel_type, in_channel_type>(in_.B()));
+						out_.A(OutColour_::max_intensity);
+					}
+				}
+				else
+				{
+					out_.R(clamp_colour_channel<out_channel_type, in_channel_type>(in_.R()));
+					out_.G(clamp_colour_channel<out_channel_type, in_channel_type>(in_.G()));
+					out_.B(clamp_colour_channel<out_channel_type, in_channel_type>(in_.B()));
+				}
+				return out_;
+			}
+			else
+			{
+				static_assert(false, "Attempted to clamp an EmuMath Colour, but the provided OutColour_ type was not an EmuMath colour.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to clamp an EmuMath Colour, but the provided in_ colour was not an EmuMath colour.");
+		}
+	}
+
+	//template<typename lhs_channel_type, typename rhs_channel_type>
+	//[[nodiscard]] constexpr inline bool colour_cmp_equal(const EmuMath::ColourRGB<lhs_channel_type>& lhs_, const EmuMath::ColourRGB<rhs_channel_type>& rhs_)
+	//{
+	//	if constexpr (std::is_same_v<lhs_channel_type, rhs_channel_type>)
+	//	{
+	//		return lhs_.channels.CmpAllEqualTo(rhs_.channels);
+	//	}
+	//	else if constexpr (std::is_floating_point_v<lhs_channel_type> && std::is_floating_point_v<rhs_channel_type>)
+	//	{
+	//		return lhs_.channels.CmpAllEqualTo(rhs_.channels);
+	//	}
+	//	else if constexpr (std::is_floating_point_v<rhs_channel_type>)
+	//	{
+	//		return colour_cmp_equal(EmuMath::ColourRGB<rhs_channel_type>(lhs_), rhs_);
+	//	}
+	//	else
+	//	{
+	//		return colour_cmp_equal(lhs_, EmuMath::ColourRGB<lhs_channel_type>(rhs_));
+	//	}
+	//}
+	//
+	//template<typename lhs_contained_type, typename rhs_type>
+	//[[nodiscard]] constexpr inline EmuMath::ColourRGB<lhs_contained_type> colour_multiply(const EmuMath::ColourRGB<lhs_contained_type>& lhs_, const rhs_type& rhs_)
+	//{
+	//	if constexpr (EmuMath::TMP::is_emu_colour_v<rhs_type>)
+	//	{
+	//		using rhs_contained_type = typename rhs_type::value_type;
+	//		using ratio_type = typename EmuCore::TMPHelpers::first_floating_point<lhs_contained_type, rhs_contained_type, float>::type;
+	//		return colour_multiply<lhs_contained_type, EmuMath::Vector<3, ratio_type>>
+	//		(
+	//			lhs_,
+	//			EmuMath::Vector<3, ratio_type>
+	//			(
+	//				colour_channel_ratio<ratio_type, rhs_contained_type>(rhs_.R()),
+	//				colour_channel_ratio<ratio_type, rhs_contained_type>(rhs_.G()),
+	//				colour_channel_ratio<ratio_type, rhs_contained_type>(rhs_.B())
+	//			)
+	//		);
+	//	}
+	//	else
+	//	{
+	//		return EmuMath::ColourRGB<lhs_contained_type>(lhs_.channels.Multiply(rhs_));
+	//	}
+	//}
+	//
+	//template<typename lhs_contained_type, typename rhs_type>
+	//[[nodiscard]] constexpr inline EmuMath::ColourRGB<lhs_contained_type> colour_divide(const EmuMath::ColourRGB<lhs_contained_type>& lhs_, const rhs_type& rhs_)
+	//{
+	//	if constexpr (EmuMath::TMP::is_emu_colour_v<rhs_type>)
+	//	{
+	//		using rhs_contained_type = typename rhs_type::value_type;
+	//		using ratio_type = typename EmuCore::TMPHelpers::first_floating_point<lhs_contained_type, rhs_contained_type, float>::type;
+	//		constexpr ratio_type zero_ = ratio_type(0);
+	//		constexpr ratio_type one_ = ratio_type(1);
+	//		return colour_multiply<lhs_contained_type, EmuMath::Vector<3, ratio_type>>
+	//		(
+	//			lhs_,
+	//			EmuMath::Vector<3, ratio_type>
+	//			(
+	//				rhs_.R() == zero_ ? one_ : (one_ / colour_channel_ratio<ratio_type, rhs_contained_type>(rhs_.R())),
+	//				rhs_.G() == zero_ ? one_ : (one_ / colour_channel_ratio<ratio_type, rhs_contained_type>(rhs_.G())),
+	//				rhs_.B() == zero_ ? one_ : (one_ / colour_channel_ratio<ratio_type, rhs_contained_type>(rhs_.B()))
+	//			)
+	//		);
+	//	}
+	//	else
+	//	{
+	//		return EmuMath::ColourRGB<lhs_contained_type>(lhs_.channels.Divide(rhs_));
+	//	}
+	//}
 }
 
 #endif
