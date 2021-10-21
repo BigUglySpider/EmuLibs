@@ -159,6 +159,19 @@ int main()
 	constexpr auto wrapped_ = colour_.Wrapped<std::uint8_t, true>();
 	constexpr auto clamped_ = colour_.Clamped<std::uint8_t, true>();
 
+	constexpr EmuMath::ColourRGB<float> white_(1.0f, 1.0f, 1.0f);
+	constexpr EmuMath::ColourRGBA<float> white4_(1.0f, 1.0f, 1.0f, 1.0f);
+	constexpr EmuMath::ColourRGBA<float> overkill4_(1.5f, 1.6f, 1.7f, 1.5f);
+	constexpr EmuMath::ColourRGB<std::uint8_t> white_byte_(255, 255, 255);
+	constexpr EmuMath::ColourRGBA<std::uint8_t> white_byte_half_visible_(255, 255, 255, 255 / 2);
+	constexpr EmuMath::ColourRGBA<float> overkill_inisible_(overkill4_, 0.0f);
+	constexpr bool cmp_result_a_ = white_ == white4_;
+	constexpr bool cmp_result_b_ = white_ == white_byte_;
+	constexpr bool cmp_result_c_ = overkill4_ == white4_;
+	constexpr bool cmp_result_d_ = overkill4_ == white_byte_;
+	constexpr bool cmp_result_e_ = white_byte_ == overkill4_;
+	constexpr bool cmp_result_f_ = white_ == white_byte_half_visible_;
+
 	constexpr EmuMath::ColourRGB<float> some_inverted_colour_ = EmuMath::ColourRGB<float>(0.2f, 0.95f, 0.4f).Inverse();
 	constexpr auto inverted_rgba_no_alpha_ = EmuMath::ColourRGBA<float>(1.0f, 0.5f, 0.2f).Inverse();
 	constexpr EmuMath::ColourRGB<std::uint8_t> byte_from_float_rgba_inverted_(inverted_rgba_no_alpha_);

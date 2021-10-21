@@ -289,7 +289,29 @@ namespace EmuMath
 		explicit constexpr Colour(channels_vector&& channels_to_move_) noexcept : channels(std::forward(channels_to_move_))
 		{
 		}
-
+		/// <summary>
+		/// <para> Constructs a colour which copies the RGB channels of the passed colour, and initialises its Alpha channel as a custom provided value. </para>
+		/// <para> This constructor is only available for colours which explicitly contain a modifiable Alpha channel. </para>
+		/// </summary>
+		/// <param name="to_copy_rgb_">Colour to copy the Red, Green, and Blue channels of.</param>
+		/// <param name="a_">Value to initialise this colour's Alpha channel via.</param>
+		template
+		<
+			typename ToCopyChannel_,
+			bool ToCopyContainsAlpha_,
+			typename A_,
+			typename OnlyAvailableWith4Channels_ = std::enable_if_t<contains_alpha && EmuCore::TMPHelpers::are_all_convertible_v<value_type, ToCopyChannel_, A_>>
+		>
+		explicit constexpr Colour(const EmuMath::Colour<ToCopyChannel_, ToCopyContainsAlpha_>& to_copy_rgb_, A_&& a_) :
+			channels
+			(
+				EmuMath::Helpers::convert_colour_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<0>()),
+				EmuMath::Helpers::convert_colour_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<1>()),
+				EmuMath::Helpers::convert_colour_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<2>()),
+				static_cast<value_type>(a_)
+			)
+		{
+		}
 
 #pragma region ACCESS
 		/// <summary> 
@@ -378,6 +400,19 @@ namespace EmuMath
 		inline void A(A_&& a_)
 		{
 			channels.at<3>() = static_cast<value_type>(a_);
+		}
+#pragma endregion
+
+#pragma region CONST_OPERATORS
+		template<bool IncludeAlpha_, typename rhs_contained_type, bool RhsContainsAlpha_>
+		[[nodiscard]] constexpr inline bool operator==(const EmuMath::Colour<rhs_contained_type, RhsContainsAlpha_>& rhs_) const
+		{
+			return EmuMath::Helpers::colour_cmp_equal<IncludeAlpha_>(*this, rhs_);
+		}
+		template<typename rhs_contained_type, bool RhsContainsAlpha_>
+		[[nodiscard]] constexpr inline bool operator==(const EmuMath::Colour<rhs_contained_type, RhsContainsAlpha_>& rhs_) const
+		{
+			return EmuMath::Helpers::colour_cmp_equal<contains_alpha || RhsContainsAlpha_>(*this, rhs_);
 		}
 #pragma endregion
 
