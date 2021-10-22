@@ -200,13 +200,43 @@ int main()
 
 	constexpr EmuMath::ColourRGB<float> from_rgba_ = EmuMath::ColourRGBA<float>(1, 2, 3, 4);
 
-	constexpr auto some_vec_ = EmuMath::Vector<1, long double>(colour_a_.ChannelVector());
+	constexpr auto some_vec_ = EmuMath::Vector<1, long double>(colour_a_.AsVector());
 
-	auto bloob = EmuMath::ColourRGB<float>().ChannelVectorRGB();
-	auto bloob_ = EmuMath::ColourRGBA<float>().ChannelVectorRGB();
-	auto bloob__ = EmuMath::ColourRGB<float>().ChannelVectorRGBA();
-	auto bloob___ = EmuMath::ColourRGBA<float>().ChannelVectorRGBA();
+	auto bloob = EmuMath::ColourRGB<float>().AsVectorRGB();
+	auto bloob_ = EmuMath::ColourRGBA<float>().AsVectorRGB();
+	auto bloob__ = EmuMath::ColourRGB<float>().AsVectorRGBA();
+	auto bloob___ = EmuMath::ColourRGBA<float>().AsVectorRGBA();
 
+
+	constexpr EmuMath::WrappedColour<float, true> wrapped_colour_(-0.2, 0.2, 0.5, 1.1);
+
+	std::cout << "\n\n";
+	auto wrapped_runtime_ = wrapped_colour_;
+	std::cout << wrapped_runtime_ << "\n";
+	wrapped_runtime_.G(25);
+	std::cout << wrapped_runtime_ << "\n";
+	std::cout << (wrapped_runtime_ * 2) << "\n";
+	std::cout << (wrapped_runtime_ * EmuMath::WrappedColour<std::uint8_t, true>(255, 0, 255)) << "\n";
+
+	EmuMath::WrappedColourRGBA<float> some_wrapped_colour_(2, 3.2, -4.6, 1.0);
+	EmuMath::ColourRGB<float> some_colour_again_( some_wrapped_colour_ );
+
+	std::cout << "\n\n";
+	std::cout << some_wrapped_colour_ << "\n";
+	EmuMath::WrappedColourRGBA<float> wee = some_wrapped_colour_.Add(2.1);
+	std::cout << wee << "\n";
+	std::cout << wee.Lerp<false>(EmuMath::ColourRGBA<double>(1, 2, 3, 1), 0.5f) << "\n";
+	std::cout << wee.Lerp<true>(EmuMath::ColourRGBA<double>(1, 2, 3, 1), 0.5f) << "\n";
+
+	decltype(wee)::underlying_colour wee_unwrapped_(wee);
+
+	constexpr auto wrapped_colour_greyscale_basic_ = wrapped_colour_.GreyscaleBasic();
+	constexpr auto wrapped_colour_greyscale_luminance_ = wrapped_colour_.GreyscaleLuminance();
+	constexpr auto wrapped_colour_greyscale_desaturate_ = wrapped_colour_.GreyscaleDesaturate();
+	constexpr auto wrapped_colour_greyscale_decompose_min_ = wrapped_colour_.GreyscaleMin();
+	constexpr auto wrapped_colour_greyscale_decompose_max_ = wrapped_colour_.GreyscaleMax();
+
+	constexpr EmuMath::ClampedColourRGBA<float> some_clamped_colour_(-0.1, 0.0, 0.8, 1.5);
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
