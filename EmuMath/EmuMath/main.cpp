@@ -170,6 +170,10 @@ int main()
 	constexpr auto lerp_a_ = colour_a_.Lerp(colour_b_, 0.5f);
 	constexpr auto lerp_b_ = colour_a_.Lerp(colour_b_, colour_c_);
 	constexpr auto lerp_c_ = colour_a_.Lerp(colour_b_, vector_a_);
+	constexpr auto lerp_c_min_false_ = lerp_c_.Min<false>();
+	constexpr auto lerp_c_min_true_ = lerp_c_.Min<true>();
+	constexpr auto lerp_c_max_false_ = lerp_c_.Max<false>();
+	constexpr auto lerp_c_max_true_ = lerp_c_.Max<true>();
 
 	EmuMath::ColourRGBA<float> runtime_rgba_f_(0.1f, -0.1f, 1.0f, 1.5f);
 	std::cout << runtime_rgba_f_ << "\n";
@@ -185,8 +189,18 @@ int main()
 	std::cout << runtime_rgba_f_ << "\n";
 	std::cout << (runtime_rgba_f_ == runtime_rgba_f_) << "\n";
 	std::cout << (runtime_rgba_f_ != runtime_rgba_f_) << "\n";
+	runtime_rgba_f_.Set(0.1, 0.2f, 0.53L, 1);
+	std::cout << runtime_rgba_f_ << "\n";
+	std::cout << "---Grey---\n";
+	std::cout << "Basic Average: " << runtime_rgba_f_.GreyscaleBasic() << "\n";
+	std::cout << "Luminance Average: " << runtime_rgba_f_.GreyscaleLuminance() << "\n";
+	std::cout << "Desaturated: " << runtime_rgba_f_.GreyscaleDesaturate() << "\n";
+	std::cout << "Decomposed (Min): " << runtime_rgba_f_.GreyscaleMin() << "\n";
+	std::cout << "Decomposed (Max): " << runtime_rgba_f_.GreyscaleMax() << "\n";
 
 	constexpr EmuMath::ColourRGB<float> from_rgba_ = EmuMath::ColourRGBA<float>(1, 2, 3, 4);
+
+	constexpr auto some_vec_ = EmuMath::Vector<1, long double>(colour_a_.ChannelVector());
 
 
 

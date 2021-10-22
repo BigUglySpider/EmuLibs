@@ -423,6 +423,45 @@ namespace EmuMath
 		{
 			channels.at<3>() = static_cast<value_type>(a_);
 		}
+
+		/// <summary> Shorthand to set via the R, G, and B functions with the respective provided arguments. </summary>
+		/// <param name="r_">Value to set this colour's Red channel to. This will not be modified.</param>
+		/// <param name="g_">Value to set this colour's Green channel to. This will not be modified.</param>
+		/// <param name="b_">Value to set this colour's Blue channel to. This will not be modified.</param>
+		/// <returns>Reference to this colour.</returns>
+		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMPHelpers::are_all_convertible_v<value_type, R_, G_, B_>>>
+		inline this_type& Set(R_&& r_, G_&& g_, B_&& b_)
+		{
+			R(r_);
+			G(g_);
+			B(b_);
+			return *this;
+		}
+		/// <summary> 
+		///		Shorthand to set via the R, G, and B functions with the respective provided arguments. 
+		///		May only provide Alpha if this colour contains an explicit Alpha channel. 
+		/// </summary>
+		/// <param name="r_">Value to set this colour's Red channel to. This will not be modified.</param>
+		/// <param name="g_">Value to set this colour's Green channel to. This will not be modified.</param>
+		/// <param name="b_">Value to set this colour's Blue channel to. This will not be modified.</param>
+		/// <param name="a_">Value to set this colour's Alpha channel to. This will not be modified.</param>
+		/// <returns>Reference to this colour.</returns>
+		template
+		<
+			typename R_,
+			typename G_,
+			typename B_,
+			typename A_,
+			typename MayOnlyModifyAlphaIfContained_ = std::enable_if_t<EmuCore::TMPHelpers::are_all_convertible_v<value_type, R_, G_, B_, A_> && contains_alpha>
+		>
+		inline this_type& Set(R_&& r_, G_&& g_, B_&& b_, A_&& a_)
+		{
+			R(r_);
+			G(g_);
+			B(b_);
+			A(a_);
+			return *this;
+		}
 #pragma endregion
 
 #pragma region CONST_OPERATORS
@@ -527,18 +566,17 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region CONVERSIONS
-		/// <summary> Shorthand to construct this colour as an alternate channel representation. May optionally change if output contains an Alpha channel. </summary>
-		/// <typeparam name="out_contained_type">Type to be contained in the output colour.</typeparam>
-		/// <returns>This colour converted to one containing the provided channel type.</returns>
-		template<typename out_contained_type, bool OutContainsAlpha_ = contains_alpha>
-		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> As() const
-		{
-			return EmuMath::Colour<out_contained_type, OutContainsAlpha_>(*this);
-		}
-#pragma endregion
-
 #pragma region ARITHMETIC_FUNCTIONS
+		/// <summary>
+		/// <para> Returns a copy of this colour with the provided rhs_ added to it. </para>
+		/// <para> If rhs_ is an EmuMath Colour: the amount added will be based on the colour's intensity translation, rather than the raw stored values. </para>
+		/// <para> If rhs_ is an EmuMath Vector: elements in the vector will be added to the output colour's respective channels. </para>
+		/// <para> If rhs_ is none of the above: rhs_ will be added directly to each of the output colour's channels. </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type used to store the output colour's channels. Defaults to this Colour's value_type./</typeparam>
+		/// <typeparam name="Rhs_">Type of item to add to this colour.</typeparam>
+		/// <param name="rhs_">Item to add to this colour as described above.</param>
+		/// <returns>Copy of this colour with the provided rhs_ added to it.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Add(const Rhs_& rhs_) const
 		{
@@ -550,6 +588,16 @@ namespace EmuMath
 			return EmuMath::Helpers::colour_add<EmuMath::Colour<value_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
 		}
 
+		/// <summary>
+		/// <para> Returns a copy of this colour with the provided rhs_ subtracted it. </para>
+		/// <para> If rhs_ is an EmuMath Colour: the amount subtracted will be based on the colour's intensity translation, rather than the raw stored values. </para>
+		/// <para> If rhs_ is an EmuMath Vector: elements in the vector will be subtracted from the output colour's respective channels. </para>
+		/// <para> If rhs_ is none of the above: rhs_ will be subtracted directly from each of the output colour's channels. </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type used to store the output colour's channels. Defaults to this Colour's value_type./</typeparam>
+		/// <typeparam name="Rhs_">Type of item to subtract from this colour.</typeparam>
+		/// <param name="rhs_">Item to subtract from this colour as described above.</param>
+		/// <returns>Copy of this colour with the provided rhs_ subtracted from it.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Subtract(const Rhs_& rhs_) const
 		{
@@ -561,6 +609,19 @@ namespace EmuMath
 			return EmuMath::Helpers::colour_subtract<EmuMath::Colour<value_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
 		}
 
+		/// <summary>
+		/// <para> Returns a copy of this colour multiplied by the provided rhs_. </para>
+		/// <para> If rhs_ is an EmuMath Colour: the amount multiplied will be based on the colour's intensity translation, rather than the raw stored values. </para>
+		/// <para> 
+		///		If rhs_ is an EmuMath Vector: elements in the vector will be used as multipliers for the output colour's respective channels. 
+		///		Non-contained elements will be interpreted as 1, and will make no changes to respective channels.
+		/// </para>
+		/// <para> If rhs_ is none of the above: rhs_ will be used as a multiplier directly for each of the output colour's channels. </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type used to store the output colour's channels. Defaults to this Colour's value_type./</typeparam>
+		/// <typeparam name="Rhs_">Type of item to multiply this colour by.</typeparam>
+		/// <param name="rhs_">Item to multiply this colour by as described above.</param>
+		/// <returns>Copy of this colour multiplied by the provided rhs_.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Multiply(const Rhs_& rhs_) const
 		{
@@ -572,6 +633,19 @@ namespace EmuMath
 			return EmuMath::Helpers::colour_multiply<EmuMath::Colour<value_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
 		}
 
+		/// <summary>
+		/// <para> Returns a copy of this colour divided by the provided rhs_. </para>
+		/// <para> If rhs_ is an EmuMath Colour: the amount divided will be based on the colour's intensity translation, rather than the raw stored values. </para>
+		/// <para> 
+		///		If rhs_ is an EmuMath Vector: elements in the vector will be used as divisors for the output colour's respective channels. 
+		///		Non-contained elements will be interpreted as 1, and will make no changes to respective channels.
+		/// </para>
+		/// <para> If rhs_ is none of the above: rhs_ will be used as a divisor directly for each of the output colour's channels. </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type used to store the output colour's channels. Defaults to this Colour's value_type./</typeparam>
+		/// <typeparam name="Rhs_">Type of item to divide this colour by.</typeparam>
+		/// <param name="rhs_">Item to divide this colour by as described above.</param>
+		/// <returns>Copy of this colour divided by the provided rhs_.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Divide(const Rhs_& rhs_) const
 		{
@@ -583,6 +657,19 @@ namespace EmuMath
 			return EmuMath::Helpers::colour_divide<EmuMath::Colour<value_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
 		}
 
+		/// <summary>
+		/// <para> Returns a copy of this colour resulting from a modulo division by the provided rhs_. </para>
+		/// <para> If rhs_ is an EmuMath Colour: the amount divided will be based on the colour's intensity translation, rather than the raw stored values. </para>
+		/// <para> 
+		///		If rhs_ is an EmuMath Vector: elements in the vector will be used as divisors for the output colour's respective channels. 
+		///		Non-contained elements will be interpreted as 1, and will make no changes to respective channels.
+		/// </para>
+		/// <para> If rhs_ is none of the above: rhs_ will be used as a divisor directly for each of the output colour's channels. </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type used to store the output colour's channels. Defaults to this Colour's value_type./</typeparam>
+		/// <typeparam name="Rhs_">Type of item to divide this colour by.</typeparam>
+		/// <param name="rhs_">Item to divide this colour by as described above.</param>
+		/// <returns>Copy of this colour resulting from a modulo division by the provided rhs_.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Mod(const Rhs_& rhs_) const
 		{
@@ -594,6 +681,18 @@ namespace EmuMath
 			return EmuMath::Helpers::colour_mod<EmuMath::Colour<value_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
 		}
 
+		/// <summary>
+		/// <para> Linearly interpolates this colour (a) with the passed colour, b_, using the provided t_ as weightings for each channel's interpolation. </para>
+		/// <para> If t_ is an EmuMath Colour: the value of t_ will be based on the colour's intensity translation, rather than the raw stored values. </para>
+		/// <para> If t_ is an EmuMath Vector: elements in the vector will be used as weightings for the the interpolation of respective channels in each colour. </para>
+		/// <para> If t_ is none of the above: t_ will be used directly as the weighting for all linear interpolations. </para>
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type used to store the output colour's channels. Defaults to this Colour's value_type./</typeparam>
+		/// <typeparam name="ColourB_">Type of EmuMath Colour appearing as b in linear interpolation.</typeparam>
+		/// <typeparam name="T_">Type used to provide weighting(s) for linear interpolations.</typeparam>
+		/// <param name="b_">EmuMath Colour appearing as b in the equation `a + ((b - a) * t)`.</param>
+		/// <param name="t_">Weightings appearing as t in the equation `a + ((b - a) * t), used as described above.</param>
+		/// <returns>Copy of this colour linearly interpolated with the provided colour and weightings, resulting from the equation `a + ((b - a) * t)`.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha, bool IncludeAlpha_ = OutContainsAlpha_, class ColourB_, class T_>
 		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Lerp(const ColourB_& b_, const T_& t_) const
 		{
@@ -603,6 +702,24 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> Lerp(const ColourB_& b_, const T_& t_) const
 		{
 			return EmuMath::Helpers::colour_lerp<EmuMath::Colour<value_type, OutContainsAlpha_>, IncludeAlpha_, this_type, ColourB_, T_>(*this, b_, t_);
+		}
+#pragma endregion
+
+#pragma region CONVERSIONS
+		/// <summary> Shorthand to construct this colour as an alternate channel representation. May optionally change if output contains an Alpha channel. </summary>
+		/// <typeparam name="out_contained_type">Type to be contained in the output colour.</typeparam>
+		/// <returns>This colour converted to one containing the provided channel type.</returns>
+		template<typename out_contained_type, bool OutContainsAlpha_ = contains_alpha>
+		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> As() const
+		{
+			return EmuMath::Colour<out_contained_type, OutContainsAlpha_>(*this);
+		}
+
+		/// <summary> Provides non-writable access to this Colour's channels as an EmuMath Vector. </summary>
+		/// <returns> Constant reference to this colour's underlying channels. </returns>
+		[[nodiscard]] constexpr inline const channels_vector& ChannelVector() const
+		{
+			return channels;
 		}
 #pragma endregion
 
@@ -635,6 +752,9 @@ namespace EmuMath
 			EmuMath::Helpers::colour_invert<IncludeAlpha_, this_type>(*this, *this);
 		}
 
+		/// <summary> Returns a copy of this colour with all of its channels wrapped into a valid range. </summary>
+		/// <typeparam name="out_contained_type">Type used to store the output colour's channels. Defaults to this Colour's value_type./</typeparam>
+		/// <returns>Copy of this colour with all channels wrapped into a valid intensity range.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha>
 		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Wrapped() const
 		{
@@ -645,11 +765,16 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::colour_wrap<EmuMath::Colour<value_type, OutContainsAlpha_>, this_type>(*this);
 		}
+
+		/// <summary> Wraps the stored channels within this colour instance so they are in a valid intensity range. </summary>
 		inline void Wrap()
 		{
 			EmuMath::Helpers::colour_wrap<this_type, this_type>(*this, *this);
 		}
 
+		/// <summary> Returns a copy of this colour with all of its channels clamped into the range min_intensity:max_intensity. </summary>
+		/// <typeparam name="out_contained_type">Type used to store the output colour's channels. Defaults to this Colour's value_type./</typeparam>
+		/// <returns>Copy of this colour with all channels clamped into a valid intensity range.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha>
 		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Clamped() const
 		{
@@ -660,9 +785,92 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::colour_clamp<EmuMath::Colour<value_type, OutContainsAlpha_>, this_type>(*this);
 		}
+
+		/// <summary> Clamps the stored channels within this colour instance into the range min_intensity:max_intensity. </summary>
 		inline void Clamp()
 		{
 			EmuMath::Helpers::colour_clamp<this_type, this_type>(*this, *this);
+		}
+
+		/// <summary> Finds the lowest-valued channel within this Colour. Excludes Alpha by default, but may include it if provided a `true` template argument. </summary>
+		/// <returns>Copy of the highest value stored within this Colour's channels.</returns>
+		template<bool IncludeAlpha_ = false>
+		[[nodiscard]] constexpr inline value_type Min() const
+		{
+			return EmuMath::Helpers::colour_min<value_type, IncludeAlpha_, this_type>(*this);
+		}
+
+		/// <summary> Finds the highest-valued channel within this Colour. Excludes Alpha by default, but may include it if provided a `true` template argument. </summary>
+		/// <returns>Copy of the highest value stored within this Colour's channels.</returns>
+		template<bool IncludeAlpha_ = false>
+		[[nodiscard]] constexpr inline value_type Max() const
+		{
+			return EmuMath::Helpers::colour_max<value_type, IncludeAlpha_, this_type>(*this);
+		}
+
+		/// <summary> Returns a copy of this colour converted to greyscale using a basic average of its RGB channels. </summary>
+		/// <returns>Copy of this channel with each channel set to the mean average of this colour's RGB channels.</returns>
+		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha>
+		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> GreyscaleBasic() const
+		{
+			return EmuMath::Helpers::colour_greyscale_basic_average<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, this_type>(*this);
+		}
+		template<bool OutContainsAlpha_>
+		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> GreyscaleBasic() const
+		{
+			return EmuMath::Helpers::colour_greyscale_basic_average<EmuMath::Colour<value_type, OutContainsAlpha_>, this_type>(*this);
+		}
+
+		/// <summary> Returns a copy of this colour converted to greyscale using a luminance average of its RGB channels. </summary>
+		/// <returns>Copy of this channel with each channel set to a scaled luminance average of this colour's RGB channels.</returns>
+		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha>
+		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> GreyscaleLuminance() const
+		{
+			return EmuMath::Helpers::colour_greyscale_luminance_average<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, this_type>(*this);
+		}
+		template<bool OutContainsAlpha_>
+		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> GreyscaleLuminance() const
+		{
+			return EmuMath::Helpers::colour_greyscale_luminance_average<EmuMath::Colour<value_type, OutContainsAlpha_>, this_type>(*this);
+		}
+
+		/// <summary> Returns a copy of this colour converted to greyscale via desaturation. </summary>
+		/// <returns>Copy of this channel with each channel set to a value resulting from desaturating this colour's RGB channels.</returns>
+		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha>
+		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> GreyscaleDesaturate() const
+		{
+			return EmuMath::Helpers::colour_greyscale_desaturate<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, this_type>(*this);
+		}
+		template<bool OutContainsAlpha_>
+		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> GreyscaleDesaturate() const
+		{
+			return EmuMath::Helpers::colour_greyscale_desaturate<EmuMath::Colour<value_type, OutContainsAlpha_>, this_type>(*this);
+		}
+
+		/// <summary> Returns a copy of this colour converted to greyscale via its lowest RGB channel. </summary>
+		/// <returns>Copy of this channel with each channel set to the value of this colour's lowest RGB channel..</returns>
+		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha>
+		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> GreyscaleMin() const
+		{
+			return EmuMath::Helpers::colour_greyscale_decompose_min<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, this_type>(*this);
+		}
+		template<bool OutContainsAlpha_>
+		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> GreyscaleMin() const
+		{
+			return EmuMath::Helpers::colour_greyscale_decompose_min<EmuMath::Colour<value_type, OutContainsAlpha_>, this_type>(*this);
+		}
+
+		/// <summary> Returns a copy of this colour converted to greyscale via its highest RGB channel. </summary>
+		/// <returns>Copy of this channel with each channel set to the value of this colour's highest RGB channel..</returns>
+		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha>
+		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> GreyscaleMax() const
+		{
+			return EmuMath::Helpers::colour_greyscale_decompose_max<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, this_type>(*this);
+		}
+		template<bool OutContainsAlpha_>
+		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> GreyscaleMax() const
+		{
+			return EmuMath::Helpers::colour_greyscale_decompose_max<EmuMath::Colour<value_type, OutContainsAlpha_>, this_type>(*this);
 		}
 #pragma endregion
 
@@ -670,6 +878,10 @@ namespace EmuMath
 		/// <para> Underlying colour channels represented by this colour. </para>
 		/// <para> If this colour DOES NOT contain an explicit Alpha channel: Stored in RGB order. </para>
 		/// <para> If this colour DOES contain an explicit Alpha channel: Stored in RGBA order. </para>
+		/// <para> 
+		///		This is not guaranteed to be available, as per the EmuMath Colour contract, 
+		///		and must not be referred to in templates for EmuMath colour interactions. 
+		/// </para>
 		/// </summary>
 		channels_vector channels;
 

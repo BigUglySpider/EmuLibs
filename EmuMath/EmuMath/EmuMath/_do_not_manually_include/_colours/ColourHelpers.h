@@ -600,6 +600,58 @@ namespace EmuMath::Helpers
 			T_
 		>(a_, b_, t_);
 	}
+
+	template<typename Out_, bool IncludeAlpha_ = false, class Colour_>
+	[[nodiscard]] constexpr inline Out_ colour_min(const Colour_& colour_)
+	{
+		return _underlying_colour_funcs::colour_min_or_max
+		<
+			IncludeAlpha_,
+			Out_,
+			Colour_,
+			EmuCore::do_min<typename Colour_::value_type, typename Colour_::value_type>
+		>(colour_);
+	}
+
+	template<typename Out_, bool IncludeAlpha_ = false, class Colour_>
+	[[nodiscard]] constexpr inline Out_ colour_max(const Colour_& colour_)
+	{
+		return _underlying_colour_funcs::colour_min_or_max
+		<
+			IncludeAlpha_,
+			Out_,
+			Colour_,
+			EmuCore::do_max<typename Colour_::value_type, typename Colour_::value_type>
+		>(colour_);
+	}
+
+	template<class OutColour_, class InColour_>
+	[[nodiscard]] constexpr inline OutColour_ colour_greyscale_basic_average(const InColour_& in_)
+	{
+		return _underlying_colour_funcs::_colour_greyscale_basic_average<OutColour_, InColour_>(in_);
+	}
+	template<class OutColour_, class InColour_>
+	[[nodiscard]] constexpr inline OutColour_ colour_greyscale_luminance_average(const InColour_& in_)
+	{
+		return _underlying_colour_funcs::_colour_greyscale_luminance_average<OutColour_, InColour_>(in_);
+	}
+	template<class OutColour_, class InColour_>
+	[[nodiscard]] constexpr inline OutColour_ colour_greyscale_desaturate(const InColour_& in_)
+	{
+		return _underlying_colour_funcs::_colour_greyscale_desaturate<OutColour_, InColour_>(in_);
+	}
+	template<class OutColour_, class InColour_>
+	[[nodiscard]] constexpr inline OutColour_ colour_greyscale_decompose_min(const InColour_& in_)
+	{
+		using in_channel_type = typename InColour_::value_type;
+		return _underlying_colour_funcs::_colour_greyscale_decompose<OutColour_, InColour_, EmuCore::do_min<in_channel_type, in_channel_type>>(in_);
+	}
+	template<class OutColour_, class InColour_>
+	[[nodiscard]] constexpr inline OutColour_ colour_greyscale_decompose_max(const InColour_& in_)
+	{
+		using in_channel_type = typename InColour_::value_type;
+		return _underlying_colour_funcs::_colour_greyscale_decompose<OutColour_, InColour_, EmuCore::do_max<in_channel_type, in_channel_type>>(in_);
+	}
 }
 
 #endif

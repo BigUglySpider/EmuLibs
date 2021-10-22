@@ -682,6 +682,181 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			static_assert(false, "Attempted to linearly interpolate two EmuMath Colours, but the provided output OutColour_ was not an EmuMath Colour type.");
 		}
 	}
+
+	template<bool IncludeAlpha_, typename Out_, class Colour_, class Func_>
+	[[nodiscard]] constexpr inline Out_ colour_min_or_max(const Colour_& in_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_colour_v<Colour_>)
+		{
+			Func_ func_ = Func_();
+			using in_channel_type = typename Colour_::value_type;
+			in_channel_type min_or_max_ = func_(in_.R(), in_.G());
+			if constexpr (IncludeAlpha_)
+			{
+				// Need to check Alpha as well, so perform an additional store
+				min_or_max_ = func_(min_or_max_, in_.B());
+				return static_cast<Out_>(func_(min_or_max_, in_.A()));
+			}
+			else
+			{
+				// Only need to compare result to Blue channel, so just output that result directly
+				return static_cast<Out_>(func_(min_or_max_, in_.B()));
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to find an EmuMath Colour's min or max element, but the provided input Colour_ was not an EmuMath Colour.");
+		}
+	}
+
+	template<class OutColour_, class InColour_>
+	[[nodiscard]] constexpr inline bool _assert_colour_greyscale()
+	{
+		if constexpr (EmuMath::TMP::is_emu_colour_v<OutColour_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_colour_v<InColour_>)
+			{
+				return true;
+			}
+			else
+			{
+				static_assert(false, "Attempted to greyscale an EmuMath Colour, but the provided in_ colour was not an EmuMath Colour.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to greyscale an EmuMath Colour, but the provided output OutColour_ type was not an EmuMath Colour type.");
+		}
+	}
+
+	template<class OutColour_, class InColour_>
+	[[nodiscard]] constexpr inline OutColour_ _colour_greyscale_basic_average(const InColour_& in_)
+	{
+		if constexpr (_assert_colour_greyscale<OutColour_, InColour_>())
+		{
+			// Ensure safe calculation by enforcing ratios rather than integers
+			using in_channel_type = typename InColour_::value_type;
+			using out_channel_type = typename OutColour_::value_type;
+			using in_ratio_type = EmuCore::TMPHelpers::first_floating_point_t<in_channel_type, out_channel_type, float>;
+			in_ratio_type average_ratio_ = _colour_channel_ratio<in_ratio_type, in_channel_type>(in_.R());
+			average_ratio_ += _colour_channel_ratio<in_ratio_type, in_channel_type>(in_.G());
+			average_ratio_ += _colour_channel_ratio<in_ratio_type, in_channel_type>(in_.B());
+
+			constexpr in_ratio_type div_by_3_reciprocal = in_ratio_type(1) / in_ratio_type(3);
+			average_ratio_ *= div_by_3_reciprocal;
+			out_channel_type out_average_ = _convert_colour_channel<out_channel_type, in_ratio_type>(average_ratio_);
+
+			if constexpr (OutColour_::contains_alpha)
+			{
+				return OutColour_(out_average_, out_average_, out_average_, _convert_colour_channel<out_channel_type, in_channel_type>(in_.A()));
+			}
+			else
+			{
+				return OutColour_(out_average_, out_average_, out_average_);
+			}
+		}
+		else
+		{
+			static_assert(false, "Invalid arguments provided to colour_greyscale_basic_average.");
+		}
+	}
+
+	template<class OutColour_, class InColour_>
+	[[nodiscard]] constexpr inline OutColour_ _colour_greyscale_luminance_average(const InColour_& in_)
+	{
+		if constexpr (_assert_colour_greyscale<OutColour_, InColour_>())
+		{
+			// Ensure safe calculation by enforcing ratios rather than integers
+			using in_channel_type = typename InColour_::value_type;
+			using out_channel_type = typename OutColour_::value_type;
+			using in_ratio_type = EmuCore::TMPHelpers::first_floating_point_t<in_channel_type, out_channel_type, float>;
+			constexpr in_ratio_type red_mult_ = in_ratio_type(0.3L);
+			constexpr in_ratio_type green_mult_ = in_ratio_type(0.59L);
+			constexpr in_ratio_type blue_mult_ = in_ratio_type(0.11L);
+
+			in_ratio_type average_ratio_ = _colour_channel_ratio<in_ratio_type, in_channel_type>(in_.R()) * red_mult_;
+			average_ratio_ += _colour_channel_ratio<in_ratio_type, in_channel_type>(in_.G()) * green_mult_;
+			average_ratio_ += _colour_channel_ratio<in_ratio_type, in_channel_type>(in_.B()) * blue_mult_;
+
+			out_channel_type out_average_ = _convert_colour_channel<out_channel_type, in_ratio_type>(average_ratio_);
+			if constexpr (OutColour_::contains_alpha)
+			{
+				return OutColour_(out_average_, out_average_, out_average_, _convert_colour_channel<out_channel_type, in_channel_type>(in_.A()));
+			}
+			else
+			{
+				return OutColour_(out_average_, out_average_, out_average_);
+			}
+		}
+		else
+		{
+			static_assert(false, "Invalid arguments provided to colour_greyscale_luminance_average.");
+		}
+	}
+
+	template<class OutColour_, class InColour_>
+	[[nodiscard]] constexpr inline OutColour_ _colour_greyscale_desaturate(const InColour_& in_)
+	{
+		if constexpr (_assert_colour_greyscale<OutColour_, InColour_>())
+		{
+			// Ensure safe calculation by enforcing ratios rather than integers
+			using in_channel_type = typename InColour_::value_type;
+			using out_channel_type = typename OutColour_::value_type;
+			using in_ratio_type = EmuCore::TMPHelpers::first_floating_point_t<in_channel_type, out_channel_type, float>;
+			constexpr in_ratio_type two_reciprocal_ = in_ratio_type(1) / in_ratio_type(2);
+			in_ratio_type min_ratio_ = _colour_channel_ratio<in_ratio_type, in_channel_type>
+			(
+				colour_min_or_max<false, in_channel_type, InColour_, EmuCore::do_min<in_channel_type, in_channel_type>>(in_)
+			);
+			in_ratio_type max_ratio_ = _colour_channel_ratio<in_ratio_type, in_channel_type>
+			(
+				colour_min_or_max<false, in_channel_type, InColour_, EmuCore::do_max<in_channel_type, in_channel_type>>(in_)
+			);
+
+			out_channel_type out_grey_ = _convert_colour_channel<out_channel_type, in_ratio_type>((min_ratio_ + max_ratio_) * two_reciprocal_);
+
+			if constexpr (OutColour_::contains_alpha)
+			{
+				return OutColour_(out_grey_, out_grey_, out_grey_, _convert_colour_channel<out_channel_type, in_channel_type>(in_.A()));
+			}
+			else
+			{
+				return OutColour_(out_grey_, out_grey_, out_grey_);
+			}
+		}
+		else
+		{
+			static_assert(false, "Invalid arguments provided to colour_greyscale_desaturate.");
+		}
+	}
+
+	template<class OutColour_, class InColour_, class MinOrMaxFunc_>
+	[[nodiscard]] constexpr inline OutColour_ _colour_greyscale_decompose(const InColour_& in_)
+	{
+		if constexpr (_assert_colour_greyscale<OutColour_, InColour_>())
+		{
+			using in_channel_type = typename InColour_::value_type;
+			using out_channel_type = typename OutColour_::value_type;
+
+			out_channel_type out_grey_ = _convert_colour_channel<out_channel_type, in_channel_type>
+			(
+				colour_min_or_max<false, in_channel_type, InColour_, MinOrMaxFunc_>(in_)
+			);
+
+			if constexpr (OutColour_::contains_alpha)
+			{
+				return OutColour_(out_grey_, out_grey_, out_grey_, _convert_colour_channel<out_channel_type, in_channel_type>(in_.A()));
+			}
+			else
+			{
+				return OutColour_(out_grey_, out_grey_, out_grey_);
+			}
+		}
+		else
+		{
+			static_assert(false, "Invalid arguments provided to colour_greyscale_decompose.");
+		}
+	}
 }
 
 #endif
