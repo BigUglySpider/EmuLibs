@@ -424,6 +424,264 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			static_assert(false, "Attempted to compare two EmuMath Colours, but the provided lhs_ was not an EmuMath colour.");
 		}
 	}
+
+	template<bool IncludeAlpha_, class OutColour_, class ColourA_, class ColourB_, class ColourT_>
+	[[nodiscard]] constexpr inline OutColour_ _colour_lerp_t_colour(const ColourA_& a_, const ColourB_& b_, const ColourT_& t_)
+	{
+		using a_channel_type = typename ColourA_::value_type;
+		using b_channel_type = typename ColourB_::value_type;
+
+		if constexpr (compatible_channel_types<a_channel_type, b_channel_type>())
+		{
+			using out_channel_type = typename OutColour_::value_type;
+			using t_channel_type = typename ColourT_::value_type;
+			using t_ratio_type = typename EmuCore::TMPHelpers::first_floating_point<t_channel_type, double>::type;
+			using Lerp_ = EmuCore::do_lerp<a_channel_type, b_channel_type, t_ratio_type>;
+			Lerp_ lerp_ = Lerp_();
+
+			// Only need to lerp alpha if at least A or B contains manual alpha, since implicit alpha is always 1.0 (or integral translation of such)
+			// --- Additionally lerp(x, x, t) == x in all cases, so lerping the default with any other default would still result in the default
+			if constexpr (IncludeAlpha_ && OutColour_::contains_alpha && (ColourA_::contains_alpha || ColourB_::contains_alpha))
+			{
+				return OutColour_
+				(
+					_convert_colour_channel<out_channel_type, a_channel_type>
+					(
+						static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), _colour_channel_ratio<t_ratio_type, t_channel_type>(t_.R())))
+					),
+					_convert_colour_channel<out_channel_type, a_channel_type>
+					(
+						static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), _colour_channel_ratio<t_ratio_type, t_channel_type>(t_.G())))
+					),
+					_convert_colour_channel<out_channel_type, a_channel_type>
+					(
+						static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), _colour_channel_ratio<t_ratio_type, t_channel_type>(t_.B())))
+					),
+					_convert_colour_channel<out_channel_type, a_channel_type>
+					(
+						static_cast<a_channel_type>(lerp_(a_.A(), b_.A(), _colour_channel_ratio<t_ratio_type, t_channel_type>(t_.A())))
+					)
+				);
+			}
+			else
+			{
+				return OutColour_
+				(
+					_convert_colour_channel<out_channel_type, a_channel_type>
+					(
+						static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), _colour_channel_ratio<t_ratio_type, t_channel_type>(t_.R())))
+					),
+					_convert_colour_channel<out_channel_type, a_channel_type>
+					(
+						static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), _colour_channel_ratio<t_ratio_type, t_channel_type>(t_.G())))
+					),
+					_convert_colour_channel<out_channel_type, a_channel_type>
+					(
+						static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), _colour_channel_ratio<t_ratio_type, t_channel_type>(t_.B())))
+					)
+				);
+			}
+		}
+		else
+		{
+			static_assert(false, "Provided a_ and b_ colours with incompatible channels to _colour_lerp_t_colour. Channel compatibility should be resolved via colour_lerp.");
+		}
+	}
+
+	template<bool IncludeAlpha_, class OutColour_, class ColourA_, class ColourB_, class VectorT_>
+	[[nodiscard]] constexpr inline OutColour_ _colour_lerp_t_vector(const ColourA_& a_, const ColourB_& b_, const VectorT_& t_)
+	{
+		using a_channel_type = typename ColourA_::value_type;
+		using b_channel_type = typename ColourB_::value_type;
+
+		if constexpr (compatible_channel_types<a_channel_type, b_channel_type>())
+		{
+			using out_channel_type = typename OutColour_::value_type;
+			using t_value_type = typename VectorT_::value_type;
+			using Lerp_ = EmuCore::do_lerp<a_channel_type, b_channel_type, t_value_type>;
+			Lerp_ lerp_ = Lerp_();
+
+			// Only need to lerp alpha if at least A or B contains manual alpha, since implicit alpha is always 1.0 (or integral translation of such)
+			// --- Additionally lerp(x, x, t) == x in all cases, so lerping the default with any other default would still result in the default
+			// --- Furthermore, lerp(x, y, 0) == x in all cases, so only lerp A when an alpha t is provided.
+			if constexpr (IncludeAlpha_ && OutColour_::contains_alpha && (ColourA_::contains_alpha || ColourB_::contains_alpha) && VectorT_::size >= 4)
+			{
+				return OutColour_
+				(
+					_convert_colour_channel<out_channel_type, a_channel_type>
+					(
+						static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::VectorGet<0>(t_)))
+					),
+					_convert_colour_channel<out_channel_type, a_channel_type>
+					(
+						static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), EmuMath::Helpers::VectorGet<1>(t_)))
+					),
+					_convert_colour_channel<out_channel_type, a_channel_type>
+					(
+						static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), EmuMath::Helpers::VectorGet<2>(t_)))
+					),
+					_convert_colour_channel<out_channel_type, a_channel_type>
+					(
+						static_cast<a_channel_type>(lerp_(a_.A(), b_.A(), EmuMath::Helpers::VectorGet<3>(t_)))
+					)
+				);
+			}
+			else
+			{
+				// Omit lerps in any cases where t_ is implied 0 (i.e. does not exist), since any lerp(a, b, 0) == a
+				if constexpr (VectorT_::size == 0)
+				{
+					// All indices in t_ are implied 0, so just return a_ converted to our output type
+					return OutColour_(a_);
+				}
+				else if constexpr (VectorT_::size == 1)
+				{
+					return OutColour_
+					(
+						_convert_colour_channel<out_channel_type, a_channel_type>
+						(
+							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::VectorGet<0>(t_)))
+						),
+						_convert_colour_channel<out_channel_type, a_channel_type>(a_.G()),
+						_convert_colour_channel<out_channel_type, a_channel_type>(a_.B())
+					);
+				}
+				else if constexpr (VectorT_::size == 2)
+				{
+					return OutColour_
+					(
+						_convert_colour_channel<out_channel_type, a_channel_type>
+						(
+							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::VectorGet<0>(t_)))
+						),
+						_convert_colour_channel<out_channel_type, a_channel_type>
+						(
+							static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), EmuMath::Helpers::VectorGet<1>(t_)))
+						),
+						_convert_colour_channel<out_channel_type, a_channel_type>(a_.B())
+					);
+				}
+				else
+				{
+					return OutColour_
+					(
+						_convert_colour_channel<out_channel_type, a_channel_type>
+						(
+							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::VectorGet<0>(t_)))
+						),
+						_convert_colour_channel<out_channel_type, a_channel_type>
+						(
+							static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), EmuMath::Helpers::VectorGet<1>(t_)))
+						),
+						_convert_colour_channel<out_channel_type, a_channel_type>
+						(
+							static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), EmuMath::Helpers::VectorGet<2>(t_)))
+						)
+					);
+				}
+			}
+		}
+		else
+		{
+			static_assert(false, "Provided a_ and b_ colours with incompatible channels to _colour_lerp_t_vector. Channel compatibility should be resolved via colour_lerp.");
+		}
+	}
+
+	template<bool IncludeAlpha_, class OutColour_, class ColourA_, class ColourB_, class ScalarT_>
+	[[nodiscard]] constexpr inline OutColour_ _colour_lerp_t_scalar(const ColourA_& a_, const ColourB_& b_, const ScalarT_& t_)
+	{
+		using a_channel_type = typename ColourA_::value_type;
+		using b_channel_type = typename ColourB_::value_type;
+
+		if constexpr (compatible_channel_types<a_channel_type, b_channel_type>())
+		{
+			using out_channel_type = typename OutColour_::value_type;
+			using Lerp_ = EmuCore::do_lerp<a_channel_type, b_channel_type, ScalarT_>;
+			Lerp_ lerp_ = Lerp_();
+
+			// Only need to lerp alpha if at least A or B contains manual alpha, since implicit alpha is always 1.0 (or integral translation of such)
+			// --- Additionally lerp(x, x, t) == x in all cases, so lerping the default with any other default would still result in the default
+			if constexpr (IncludeAlpha_ && OutColour_::contains_alpha && (ColourA_::contains_alpha || ColourB_::contains_alpha))
+			{
+				return OutColour_
+				(
+					_convert_colour_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), t_))),
+					_convert_colour_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), t_))),
+					_convert_colour_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), t_))),
+					_convert_colour_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.A(), b_.A(), t_)))
+				);
+			}
+			else
+			{
+				return OutColour_
+				(
+					_convert_colour_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), t_))),
+					_convert_colour_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), t_))),
+					_convert_colour_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), t_)))
+				);
+			}
+		}
+		else
+		{
+			static_assert(false, "Provided a_ and b_ colours with incompatible channels to _colour_lerp_t_scalar. Channel compatibility should be resolved via colour_lerp.");
+		}
+	}
+
+	template<bool IncludeAlpha_, class OutColour_, class ColourA_, class ColourB_, class T_>
+	[[nodiscard]] constexpr inline OutColour_ colour_lerp(const ColourA_& a_, const ColourB_& b_, const T_& t_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_colour_v<OutColour_>)
+		{
+			if constexpr (EmuMath::TMP::is_emu_colour_v<ColourA_>)
+			{
+				if constexpr (EmuMath::TMP::is_emu_colour_v<ColourB_>)
+				{
+					using a_channel_type = typename ColourA_::value_type;
+					using b_channel_type = typename ColourB_::value_type;
+					if constexpr (compatible_channel_types<a_channel_type, b_channel_type>())
+					{
+						if constexpr (EmuMath::TMP::is_emu_colour_v<T_>)
+						{
+							return _colour_lerp_t_colour<IncludeAlpha_, OutColour_, ColourA_, ColourB_, T_>(a_, b_, t_);
+						}
+						else if constexpr (EmuMath::TMP::is_emu_vector_v<T_>)
+						{
+							return _colour_lerp_t_vector<IncludeAlpha_, OutColour_, ColourA_, ColourB_, T_>(a_, b_, t_);
+						}
+						else
+						{
+							return _colour_lerp_t_scalar<IncludeAlpha_, OutColour_, ColourA_, ColourB_, T_>(a_, b_, t_);
+						}
+					}
+					else
+					{
+						if constexpr (std::is_floating_point_v<b_channel_type>)
+						{
+							using a_conversion_type = EmuMath::Colour<b_channel_type, ColourA_::contains_alpha>;
+							return colour_lerp<IncludeAlpha_, OutColour_>(a_conversion_type(a_), b_, t_);
+						}
+						else
+						{
+							using b_conversion_type = EmuMath::Colour<a_channel_type, ColourB_::contains_alpha>;
+							return colour_lerp<IncludeAlpha_, OutColour_>(a_, b_conversion_type(b_), t_);
+						}
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to linearly interpolate two EmuMath Colours, but the provided input a_ was not an EmuMath Colour.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to linearly interpolate two EmuMath Colours, but the provided input a_ was not an EmuMath Colour.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to linearly interpolate two EmuMath Colours, but the provided output OutColour_ was not an EmuMath Colour type.");
+		}
+	}
 }
 
 #endif

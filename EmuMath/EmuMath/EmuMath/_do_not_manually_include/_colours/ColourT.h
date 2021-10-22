@@ -538,6 +538,74 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region ARITHMETIC_FUNCTIONS
+		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Add(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::colour_add<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+		}
+		template<bool OutContainsAlpha_, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> Add(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::colour_add<EmuMath::Colour<value_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Subtract(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::colour_subtract<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+		}
+		template<bool OutContainsAlpha_, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> Subtract(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::colour_subtract<EmuMath::Colour<value_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Multiply(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::colour_multiply<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+		}
+		template<bool OutContainsAlpha_, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> Multiply(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::colour_multiply<EmuMath::Colour<value_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Divide(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::colour_divide<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+		}
+		template<bool OutContainsAlpha_, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> Divide(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::colour_divide<EmuMath::Colour<value_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Mod(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::colour_mod<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+		}
+		template<bool OutContainsAlpha_, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> Mod(const Rhs_& rhs_) const
+		{
+			return EmuMath::Helpers::colour_mod<EmuMath::Colour<value_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+		}
+
+		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha, bool IncludeAlpha_ = OutContainsAlpha_, class ColourB_, class T_>
+		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Lerp(const ColourB_& b_, const T_& t_) const
+		{
+			return EmuMath::Helpers::colour_lerp<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, IncludeAlpha_, this_type, ColourB_, T_>(*this, b_, t_);
+		}
+		template<bool OutContainsAlpha_, bool IncludeAlpha_ = OutContainsAlpha_, class ColourB_, class T_>
+		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> Lerp(const ColourB_& b_, const T_& t_) const
+		{
+			return EmuMath::Helpers::colour_lerp<EmuMath::Colour<value_type, OutContainsAlpha_>, IncludeAlpha_, this_type, ColourB_, T_>(*this, b_, t_);
+		}
+#pragma endregion
+
 #pragma region COLOUR_OPERATIONS
 		/// <summary>
 		/// <para> Inverts the channels of this colour and outputs the inverted form as a new colour. </para>

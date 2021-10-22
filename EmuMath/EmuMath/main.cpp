@@ -160,83 +160,16 @@ int main()
 	constexpr auto clamped_ = colour_.Clamped<std::uint8_t, true>();
 
 	constexpr EmuMath::ColourRGB<float> white_(1.0f, 1.0f, 1.0f);
-	constexpr EmuMath::ColourRGBA<float> white4_(1.0f, 1.0f, 1.0f, 1.0f);
-	constexpr EmuMath::ColourRGBA<float> overkill4_(1.5f, 1.6f, 1.7f, 1.5f);
-	constexpr EmuMath::ColourRGB<std::uint8_t> white_byte_(255, 255, 255);
-	constexpr EmuMath::ColourRGBA<std::uint8_t> white_byte_half_visible_(255, 255, 255, 255 / 2);
-	constexpr EmuMath::ColourRGBA<float> overkill_inisible_(overkill4_, 0.0f);
-	constexpr bool cmp_result_a_ = white_ == white4_;
-	constexpr bool cmp_result_b_ = white_ == white_byte_;
-	constexpr bool cmp_result_c_ = overkill4_ == white4_;
-	constexpr bool cmp_result_d_ = overkill4_ == white_byte_;
-	constexpr bool cmp_result_e_ = white_byte_ == overkill4_;
-	constexpr bool cmp_result_f_ = white_ == white_byte_half_visible_;
+	constexpr EmuMath::ColourRGB<float> black_(0.0f, 0.0f, 0.0f);
+	constexpr auto white_lerp_black_ = white_.Lerp(black_, 0.5f);
 
-	constexpr bool cmp_result_g_ = white_ != white4_;
-	constexpr bool cmp_result_h_ = white_ != white_byte_;
-	constexpr bool cmp_result_i_ = overkill4_ != white4_;
-	constexpr bool cmp_result_j_ = overkill4_ != white_byte_;
-	constexpr bool cmp_result_k_ = white_byte_ != overkill4_;
-	constexpr bool cmp_result_l_ = white_ != white_byte_half_visible_;
-	constexpr bool cmp_result_m_ = white_.operator!=<false>(white_byte_half_visible_);
-
-	constexpr EmuMath::ColourRGB<float> some_inverted_colour_ = EmuMath::ColourRGB<float>(0.2f, 0.95f, 0.4f).Inverse();
-	constexpr auto inverted_rgba_no_alpha_ = EmuMath::ColourRGBA<float>(1.0f, 0.5f, 0.2f).Inverse();
-	constexpr EmuMath::ColourRGB<std::uint8_t> byte_from_float_rgba_inverted_(inverted_rgba_no_alpha_);
-	constexpr EmuMath::ColourRGB<std::int8_t> seven_bits_from_byte_(byte_from_float_rgba_inverted_);
-	constexpr EmuMath::ColourRGB<std::uint32_t> colour128_from_byte_(byte_from_float_rgba_inverted_);
-	constexpr EmuMath::ColourRGBA<float> colour128f_from_colour128i_(colour128_from_byte_);
-
-	constexpr EmuMath::ColourRGB<float> to_mult_f_rgb_ = EmuMath::ColourRGB<float>(0.2f, 1.0f, 0.5f);
-	constexpr EmuMath::ColourRGBA<double> to_mult_d_rgba_ = EmuMath::ColourRGBA<double>(1.0, 0.5, 1.0, 0.2);
-	constexpr EmuMath::ColourRGB<std::uint8_t> to_mult_byte_rgb_ = EmuMath::ColourRGB<std::uint8_t>(1, 255, 255/4);
-	constexpr EmuMath::ColourRGBA<std::uint8_t> to_mult_byte_rgba_ = EmuMath::ColourRGBA<std::uint8_t>(255, 255, 127, 255);
-	constexpr float to_mult_scalar_f_ = 2.5f;
-	constexpr std::uint32_t to_mult_scalar_i_ = 2;
-	constexpr auto to_mult_vector1f_ = EmuMath::Vector<1, float>(2.0f);
-	constexpr auto to_mult_vector2d_ = EmuMath::Vector<2, double>(0.5, 0.5);
-	constexpr auto to_mult_vector3ld_ = EmuMath::Vector<3, long double>(1.0L, 0.5L, 0.25L);
-	constexpr auto to_mult_vector4i_ = EmuMath::Vector<4, std::int32_t>(-1, 1, -2, 2);
-
-	//constexpr auto mult_result_0a_ = to_mult_f_rgb_ - to_mult_d_rgba_;
-	//constexpr auto mult_result_0b_ = to_mult_f_rgb_ - to_mult_byte_rgb_;
-	//constexpr auto mult_result_0c_ = to_mult_f_rgb_ - to_mult_byte_rgba_;
-	//constexpr auto mult_result_0d_ = to_mult_f_rgb_ - to_mult_scalar_f_;
-	//constexpr auto mult_result_0e_ = to_mult_f_rgb_ - to_mult_scalar_i_;
-	//constexpr auto mult_result_0f_ = to_mult_f_rgb_ - to_mult_vector1f_;
-	//constexpr auto mult_result_0g_ = to_mult_f_rgb_ - to_mult_vector2d_;
-	//constexpr auto mult_result_0h_ = to_mult_f_rgb_ - to_mult_vector3ld_;
-	//constexpr auto mult_result_0i_ = to_mult_f_rgb_ - to_mult_vector4i_;
-	//
-	//constexpr auto mult_result_1a_ = to_mult_d_rgba_ - to_mult_f_rgb_;
-	//constexpr auto mult_result_1b_ = to_mult_d_rgba_ - to_mult_byte_rgb_;
-	//constexpr auto mult_result_1c_ = to_mult_d_rgba_ - to_mult_byte_rgba_;
-	//constexpr auto mult_result_1d_ = to_mult_d_rgba_ - to_mult_scalar_f_;
-	//constexpr auto mult_result_1e_ = to_mult_d_rgba_ - to_mult_scalar_i_;
-	//constexpr auto mult_result_1f_ = to_mult_d_rgba_ - to_mult_vector1f_;
-	//constexpr auto mult_result_1g_ = to_mult_d_rgba_ - to_mult_vector2d_;
-	//constexpr auto mult_result_1h_ = to_mult_d_rgba_ - to_mult_vector3ld_;
-	//constexpr auto mult_result_1i_ = to_mult_d_rgba_ - to_mult_vector4i_;
-	//
-	//constexpr auto mult_result_2a_ = to_mult_byte_rgb_ - to_mult_f_rgb_;
-	//constexpr auto mult_result_2b_ = to_mult_byte_rgb_ - to_mult_byte_rgb_;
-	//constexpr auto mult_result_2c_ = to_mult_byte_rgb_ - to_mult_byte_rgba_;
-	//constexpr auto mult_result_2d_ = to_mult_byte_rgb_ - to_mult_scalar_f_;
-	//constexpr auto mult_result_2e_ = to_mult_byte_rgb_ - to_mult_scalar_i_;
-	//constexpr auto mult_result_2f_ = to_mult_byte_rgb_ - to_mult_vector1f_;
-	//constexpr auto mult_result_2g_ = to_mult_byte_rgb_ - to_mult_vector2d_;
-	//constexpr auto mult_result_2h_ = to_mult_byte_rgb_ - to_mult_vector3ld_;
-	//constexpr auto mult_result_2i_ = to_mult_byte_rgb_ - to_mult_vector4i_;
-	//
-	//constexpr auto mult_result_3a_ = to_mult_byte_rgba_ - to_mult_f_rgb_;
-	//constexpr auto mult_result_3b_ = to_mult_byte_rgba_ - to_mult_byte_rgb_;
-	//constexpr auto mult_result_3c_ = to_mult_byte_rgba_ - to_mult_byte_rgba_;
-	//constexpr auto mult_result_3d_ = to_mult_byte_rgba_ - to_mult_scalar_f_;
-	//constexpr auto mult_result_3e_ = to_mult_byte_rgba_ - to_mult_scalar_i_;
-	//constexpr auto mult_result_3f_ = to_mult_byte_rgba_ - to_mult_vector1f_;
-	//constexpr auto mult_result_3g_ = to_mult_byte_rgba_ - to_mult_vector2d_;
-	//constexpr auto mult_result_3h_ = to_mult_byte_rgba_ - to_mult_vector3ld_;
-	//constexpr auto mult_result_3i_ = to_mult_byte_rgba_ - to_mult_vector4i_;
+	constexpr auto colour_a_ = EmuMath::ColourRGBA<double>(0.8, 1.0, 0.5, 1.0);
+	constexpr auto colour_b_ = EmuMath::ColourRGBA<std::uint8_t>(0, 255 / 2, 255 / 4, 255);
+	constexpr auto colour_c_ = EmuMath::ColourRGBA<std::uint8_t>(255, 0, 255 / 2, 255 / 4);
+	constexpr auto vector_a_ = EmuMath::Vector<2, double>(0.5, 0.25);
+	constexpr auto lerp_a_ = colour_a_.Lerp(colour_b_, 0.5f);
+	constexpr auto lerp_b_ = colour_a_.Lerp(colour_b_, colour_c_);
+	constexpr auto lerp_c_ = colour_a_.Lerp(colour_b_, vector_a_);
 
 	EmuMath::ColourRGBA<float> runtime_rgba_f_(0.1f, -0.1f, 1.0f, 1.5f);
 	std::cout << runtime_rgba_f_ << "\n";

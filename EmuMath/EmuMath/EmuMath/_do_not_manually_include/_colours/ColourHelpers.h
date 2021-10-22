@@ -587,6 +587,19 @@ namespace EmuMath::Helpers
 			Rhs_
 		>(lhs_, rhs_);
 	}
+
+	template<class OutColour_, bool IncludeAlpha_ = true, class ColourA_, class ColourB_, class T_>
+	[[nodiscard]] constexpr inline OutColour_ colour_lerp(const ColourA_& a_, const ColourB_& b_, const T_& t_)
+	{
+		return _underlying_colour_funcs::colour_lerp
+		<
+			IncludeAlpha_,
+			OutColour_,
+			ColourA_,
+			ColourB_,
+			T_
+		>(a_, b_, t_);
+	}
 }
 
 #endif
