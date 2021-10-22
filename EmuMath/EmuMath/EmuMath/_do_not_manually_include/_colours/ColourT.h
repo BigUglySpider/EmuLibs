@@ -27,6 +27,8 @@ namespace EmuMath
 		using value_type = Channel_;
 		using this_type = EmuMath::Colour<value_type, ContainsAlpha_>;
 		using channels_vector = EmuMath::Vector<size, value_type>;
+		using channels_rgb_return_type = std::conditional_t<contains_alpha, EmuMath::Vector<3, value_type>, const channels_vector&>;
+		using channels_rgba_return_type = std::conditional_t<contains_alpha, const channels_vector&, EmuMath::Vector<4, value_type>>;
 
 		static constexpr bool is_floating_point = std::is_floating_point_v<value_type>;
 		static constexpr bool is_integral = std::is_integral_v<value_type>;
@@ -720,6 +722,38 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline const channels_vector& ChannelVector() const
 		{
 			return channels;
+		}
+
+		/// <summary>
+		/// <para> Provides non-writable access to this Colour's RGB channels as an EmuMath Vector. </para>
+		/// </summary>
+		/// <returns> EmuMath Vector representation of this colour's channels in RGB format. </returns>
+		[[nodiscard]] constexpr inline channels_rgb_return_type ChannelVectorRGB() const
+		{
+			if constexpr (contains_alpha)
+			{
+				return channels_rgb_return_type(channels.at<0>(), channels.at<1>(), channels.at<2>());
+			}
+			else
+			{
+				return channels;
+			}
+		}
+
+		/// <summary>
+		/// <para> Provides non-writable access to this Colour's RGBA channels as an EmuMath Vector. </para>
+		/// </summary>
+		/// <returns> EmuMath Vector representation of this colour's channels in RGBA format. </returns>
+		[[nodiscard]] constexpr inline channels_rgba_return_type ChannelVectorRGBA() const
+		{
+			if constexpr (contains_alpha)
+			{
+				return channels;
+			}
+			else
+			{
+				return channels_rgba_return_type(channels.at<0>(), channels.at<1>(), channels.at<2>(), max_intensity);
+			}
 		}
 #pragma endregion
 

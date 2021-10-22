@@ -202,6 +202,10 @@ int main()
 
 	constexpr auto some_vec_ = EmuMath::Vector<1, long double>(colour_a_.ChannelVector());
 
+	auto bloob = EmuMath::ColourRGB<float>().ChannelVectorRGB();
+	auto bloob_ = EmuMath::ColourRGBA<float>().ChannelVectorRGB();
+	auto bloob__ = EmuMath::ColourRGB<float>().ChannelVectorRGBA();
+	auto bloob___ = EmuMath::ColourRGBA<float>().ChannelVectorRGBA();
 
 
 #pragma region TEST_HARNESS_EXECUTION
