@@ -6,6 +6,9 @@
 
 #include "Tests.hpp"
 
+#include <chrono>
+#include <thread>
+
 using namespace EmuCore::TestingHelpers;
 
 template<typename T_>
@@ -237,6 +240,44 @@ int main()
 	constexpr auto wrapped_colour_greyscale_decompose_max_ = wrapped_colour_.GreyscaleMax();
 
 	constexpr EmuMath::ClampedColourRGBA<float> some_clamped_colour_(-0.1, 0.0, 0.8, 1.5);
+
+	std::cout << "\n\n\n";
+	using grad_type = EmuMath::Gradient<float>;
+	grad_type gradient_;
+	gradient_.AddColourAnchor(1.0f, EmuMath::ColourRGB<float>(0.75f, 0.1f, 0.0f));
+	gradient_.AddColourAnchor(0.5f, EmuMath::ColourRGB<float>(0.5f, 0.5f, 0.5f));
+	gradient_.AddColourAnchor(123.5f, EmuMath::ColourRGB<float>(0.2f, 1.0f, 1.0f));
+	gradient_.AddAlphaAnchor(1.0f, 0.0f);
+	std::cout << gradient_ << "\n";
+	std::cout << "---\n";
+	std::cout << "at(0.0): " << gradient_.GetColour(0.0f) << "\n";
+	std::cout << "at(1.0): " << gradient_.GetColour(1.0f) << "\n";
+	std::cout << "at(0.5): " << gradient_.GetColour(0.5f) << "\n";
+	std::cout << "at(0.75): " << gradient_.GetColour(0.75f) << "\n";
+	std::cout << "at(0.25): " << gradient_.GetColour(0.25f) << "\n";
+	std::cout << "---\n";
+	std::cout << "at(0.0): " << gradient_.GetAlpha(0.0f) << "\n";
+	std::cout << "at(1.0): " << gradient_.GetAlpha(1.0f) << "\n";
+	std::cout << "at(0.5): " << gradient_.GetAlpha(0.5f) << "\n";
+	std::cout << "at(0.75): " << gradient_.GetAlpha(0.75f) << "\n";
+	std::cout << "at(0.25): " << gradient_.GetAlpha(0.25f) << "\n";
+	std::cout << "---\n";
+	std::cout << "at(0.0): " << gradient_.Get(0.0f) << "\n";
+	std::cout << "at(1.0): " << gradient_.Get(1.0f) << "\n";
+	std::cout << "at(0.5): " << gradient_.Get(0.5f) << "\n";
+	std::cout << "at(0.75): " << gradient_.Get(0.75f) << "\n";
+	std::cout << "at(0.25): " << gradient_.Get(0.25f) << "\n";
+
+	constexpr auto wrap_test_ = grad_type::wrap_anchor(-0.3f);
+
+	grad_type::anchor_type anchor_ = 0.0f;
+	while (true)
+	{
+		using namespace std::chrono_literals;
+		std::cout << "at(" << anchor_ << "): " << gradient_.GetColourWrapped(anchor_) << "\n";
+		anchor_ -= 0.001f;
+		std::this_thread::sleep_for(100ms);
+	}
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

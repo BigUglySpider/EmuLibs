@@ -986,6 +986,44 @@ namespace EmuCore
 			return EmuCore::AbsConstexpr<T_>(val_);
 		}
 	};
+
+	/// <summary> 
+	/// <para> Functor for wrapping values that are assumed to lie in a normalised range 0:1, where -0.1 is wrapped to 0.9, and 1.1 wrapped to 1.1. </para>
+	/// <para> Default, non-specialised forms of this functor are presented in a branchless manner. </para>
+	/// <para> If WrapToOne_ is TRUE: non-zero whole numbers will be wrapped to 1. </para>
+	/// <para> If WrapToOne_ is FALSE: non-zero whole numbers will be wrapped to 0. </para>
+	/// </summary>
+	template<typename T_, bool WrapToOne_>
+	struct do_normalised_wrap
+	{
+		constexpr do_normalised_wrap()
+		{
+		}
+
+		[[nodiscard]] constexpr inline T_ operator()(T_ val_) const
+		{
+			constexpr T_ zero_ = T_(0);
+			constexpr T_ one_ = T_(1);
+			
+			if constexpr (!WrapToOne_)
+			{
+				// Subtraction of a trunc brings us into the non-inclusive range -1:1
+				val_ = val_ - EmuCore::do_trunc_constexpr<T_>()(val_);
+
+				// Value will be wrapped if positive, but we need to invert the magnitude if negative
+				// --- This can be done by adding 1 (i.e. -0.9 -> 0.1)
+				return val_ + (one_ * (val_ < zero_));
+			}
+			else
+			{
+				// Same as above, but addition of 1 is done if result is negative OR 0
+				// --- This OR 0 only applies to the wrapped variant if it did not start at 0
+				bool started_not_zero_ = val_ != zero_;
+				val_ = val_ - EmuCore::do_trunc_constexpr<T_>()(val_);
+				return val_ + (one_ * ((val_ <= zero_) && started_not_zero_));
+			}
+		}
+	};
 }
 
 #endif
