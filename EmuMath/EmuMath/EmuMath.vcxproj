@@ -177,6 +177,7 @@
     <ClInclude Include="EmuMath\SIMDHelpers.h" />
     <ClInclude Include="EmuMath\Vector.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourArithmeticFunctors.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourConstants.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourHelpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourT.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourTMP.h" />

@@ -320,5 +320,8 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourArithmeticFunctors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -154,6 +154,39 @@ inline void WriteNoiseTableToPPM(const EmuMath::NoiseTable<num_dimensions, FP_>&
 	}
 }
 
+template<std::size_t num_dimensions, typename FP_, class GradientChannel_>
+inline void WriteNoiseTableToPPM(const EmuMath::NoiseTable<num_dimensions, FP_>& noise_table_, const EmuMath::Gradient<GradientChannel_>& gradient_)
+{
+	EmuMath::Vector3<FP_> white_(255.0f, 255.0f, 255.0f);
+
+	if constexpr (num_dimensions == 3)
+	{
+		EmuMath::Vector3<std::size_t> resolution_ = noise_table_.size();
+		for (std::size_t z = 0; z < resolution_.z; ++z)
+		{
+			std::cout << "\nOutputting image layer #" << z << "...\n";
+
+			std::ostringstream name_;
+			name_ << "./test_noise_" << z << ".ppm";
+			std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
+			out_ppm_ << "P6" << std::endl << resolution_.x << ' ' << resolution_.y << std::endl << "255" << std::endl;
+
+			for (std::size_t y = 0; y < resolution_.y; ++y)
+			{
+				for (std::size_t x = 0; x < resolution_.x; ++x)
+				{
+					// Clamp is merely to cancel out fp-rounding errors
+					//EmuMath::Vector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.at(x, y, z)).Clamp(0.0f, 255.0f));
+					EmuMath::ColourRGB<std::uint8_t> colour_byte_(gradient_.GetColour(noise_table_.at(x, y, z)));
+					out_ppm_ << (char)colour_byte_.R() << (char)colour_byte_.G() << (char)colour_byte_.B();
+				}
+			}
+			out_ppm_.close();
+		}
+		std::cout << "Finished outputting all 3D noise layers.\n";
+	}
+}
+
 int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
@@ -270,14 +303,42 @@ int main()
 
 	constexpr auto wrap_test_ = grad_type::wrap_anchor(-0.3f);
 
+	constexpr auto red_ = EmuMath::Colours::Lime();
+
 	grad_type::anchor_type anchor_ = 0.0f;
-	while (true)
-	{
-		using namespace std::chrono_literals;
-		std::cout << "at(" << anchor_ << "): " << gradient_.GetColourWrapped(anchor_) << "\n";
-		anchor_ -= 0.001f;
-		std::this_thread::sleep_for(100ms);
-	}
+
+	EmuMath::NoiseTable<3, float> noise_;
+
+	grad_type gradient_colours_;
+	gradient_colours_.AddColourAnchor(0.0f, EmuMath::Colours::Blue());
+	gradient_colours_.AddColourAnchor(0.35f, EmuMath::Colours::Blue());
+	gradient_colours_.AddColourAnchor(0.45f, EmuMath::Colours::White());
+	gradient_colours_.AddColourAnchor(0.5f, EmuMath::Colours::Black());
+	gradient_colours_.AddColourAnchor(0.65f, EmuMath::Colours::Yellow());
+	gradient_colours_.AddColourAnchor(0.85f, EmuMath::Colours::Green());
+	gradient_colours_.AddColourAnchor(1.0f, EmuMath::Colours::Red());
+
+	grad_type gradient_greyscale_;
+	gradient_greyscale_.AddColourAnchor(0.0f, EmuMath::Colours::White());
+	gradient_greyscale_.AddColourAnchor(1.0f, EmuMath::Colours::Black());
+
+	grad_type& noise_gradient_ = gradient_greyscale_;
+
+	noise_.GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::noise_sample_processor_perlin_normalise<3>>
+	(
+		noise_.MakeOptions
+		(
+			EmuMath::Vector<3, std::size_t>(1024, 1024, 1),
+			EmuMath::Vector<3, float>(0.0f, 0.0f, 0.0f),
+			EmuMath::Vector<3, float>(1.0f, 1.0f, 1.0f),
+			3.0f,
+			false,
+			true,
+			EmuMath::Info::NoisePermutationInfo(4096, EmuMath::Info::NoisePermutationShuffleMode::SEED_32, true, 1337, 1337),
+			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+		)
+	);
+	WriteNoiseTableToPPM(noise_, noise_gradient_);
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
