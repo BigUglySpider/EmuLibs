@@ -95,7 +95,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to extract the theoretical value for the provided index of.</param>
 	/// <returns>If Index_ is within the passed vector's index range: copy of the given index within the vector. Otherwise, a default-constructed value_type, inferring 0.</returns>
 	template<std::size_t Index_, typename OutT_, class Vector_>
-	[[nodiscard]] OutT_ VectorGetTheoretical(const Vector_& vector_)
+	[[nodiscard]] constexpr inline OutT_ VectorGetTheoretical(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -114,7 +114,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t Index_, class Vector_>
-	[[nodiscard]] typename Vector_::value_type VectorGetTheoretical(const Vector_& vector_)
+	[[nodiscard]] constexpr inline typename Vector_::value_type VectorGetTheoretical(const Vector_& vector_)
 	{
 		return VectorGetTheoretical<Index_, typename Vector_::value_type, Vector_>(vector_);
 	}

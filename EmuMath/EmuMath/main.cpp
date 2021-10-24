@@ -2,7 +2,12 @@
 #include "EmuMath/Noise.h"
 #include "EmuMath/Random.h"
 
+#include "EmuMath/Colour.h"
+
 #include "Tests.hpp"
+
+#include <chrono>
+#include <thread>
 
 using namespace EmuCore::TestingHelpers;
 
@@ -149,11 +154,221 @@ inline void WriteNoiseTableToPPM(const EmuMath::NoiseTable<num_dimensions, FP_>&
 	}
 }
 
+template<std::size_t num_dimensions, typename FP_, class GradientChannel_>
+inline void WriteNoiseTableToPPM(const EmuMath::NoiseTable<num_dimensions, FP_>& noise_table_, const EmuMath::Gradient<GradientChannel_>& gradient_)
+{
+	EmuMath::Vector3<FP_> white_(255.0f, 255.0f, 255.0f);
+
+	if constexpr (num_dimensions == 3)
+	{
+		EmuMath::Vector3<std::size_t> resolution_ = noise_table_.size();
+		for (std::size_t z = 0; z < resolution_.z; ++z)
+		{
+			std::cout << "\nOutputting image layer #" << z << "...\n";
+
+			std::ostringstream name_;
+			name_ << "./test_noise_" << z << ".ppm";
+			std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
+			out_ppm_ << "P6" << std::endl << resolution_.x << ' ' << resolution_.y << std::endl << "255" << std::endl;
+
+			for (std::size_t y = 0; y < resolution_.y; ++y)
+			{
+				for (std::size_t x = 0; x < resolution_.x; ++x)
+				{
+					// Clamp is merely to cancel out fp-rounding errors
+					//EmuMath::Vector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.at(x, y, z)).Clamp(0.0f, 255.0f));
+					EmuMath::ColourRGB<std::uint8_t> colour_byte_ = gradient_.GetColour<std::uint8_t>(noise_table_.at(x, y, z));
+					out_ppm_ << (char)colour_byte_.R() << (char)colour_byte_.G() << (char)colour_byte_.B();
+				}
+			}
+			out_ppm_.close();
+		}
+		std::cout << "Finished outputting all 3D noise layers.\n";
+	}
+}
+
 int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
 
+	constexpr EmuMath::ColourRGB<float> colour_(-0.2f, 2.5, 2.0f);
+	constexpr auto wrapped_ = colour_.Wrapped<std::uint8_t, true>();
+	constexpr auto clamped_ = colour_.Clamped<std::uint8_t, true>();
 
+	constexpr EmuMath::ColourRGB<float> white_(1.0f, 1.0f, 1.0f);
+	constexpr EmuMath::ColourRGB<float> black_(0.0f, 0.0f, 0.0f);
+	constexpr auto white_lerp_black_ = white_.Lerp(black_, 0.5f);
+
+	constexpr auto colour_a_ = EmuMath::ColourRGBA<double>(0.8, 1.0, 0.5, 1.0);
+	constexpr auto colour_b_ = EmuMath::ColourRGBA<std::uint8_t>(0, 255 / 2, 255 / 4, 255);
+	constexpr auto colour_c_ = EmuMath::ColourRGBA<std::uint8_t>(255, 0, 255 / 2, 255 / 4);
+	constexpr auto vector_a_ = EmuMath::Vector<2, double>(0.5, 0.25);
+	constexpr auto lerp_a_ = colour_a_.Lerp(colour_b_, 0.5f);
+	constexpr auto lerp_b_ = colour_a_.Lerp(colour_b_, colour_c_);
+	constexpr auto lerp_c_ = colour_a_.Lerp(colour_b_, vector_a_);
+	constexpr auto lerp_c_min_false_ = lerp_c_.Min<false>();
+	constexpr auto lerp_c_min_true_ = lerp_c_.Min<true>();
+	constexpr auto lerp_c_max_false_ = lerp_c_.Max<false>();
+	constexpr auto lerp_c_max_true_ = lerp_c_.Max<true>();
+
+	EmuMath::ColourRGBA<float> runtime_rgba_f_(0.1f, -0.1f, 1.0f, 1.5f);
+	std::cout << runtime_rgba_f_ << "\n";
+	runtime_rgba_f_.Wrap();
+	std::cout << runtime_rgba_f_ << "\n";
+	runtime_rgba_f_ *= 0.5f;
+	std::cout << runtime_rgba_f_ << "\n";
+	runtime_rgba_f_ += 0.1;
+	std::cout << runtime_rgba_f_ << "\n";
+	runtime_rgba_f_ -= 0.1;
+	std::cout << runtime_rgba_f_ << "\n";
+	runtime_rgba_f_ /= 2;
+	std::cout << runtime_rgba_f_ << "\n";
+	std::cout << (runtime_rgba_f_ == runtime_rgba_f_) << "\n";
+	std::cout << (runtime_rgba_f_ != runtime_rgba_f_) << "\n";
+	runtime_rgba_f_.Set(0.1, 0.2f, 0.53L, 1);
+	std::cout << runtime_rgba_f_ << "\n";
+	std::cout << "---Grey---\n";
+	std::cout << "Basic Average: " << runtime_rgba_f_.GreyscaleBasic() << "\n";
+	std::cout << "Luminance Average: " << runtime_rgba_f_.GreyscaleLuminance() << "\n";
+	std::cout << "Desaturated: " << runtime_rgba_f_.GreyscaleDesaturate() << "\n";
+	std::cout << "Decomposed (Min): " << runtime_rgba_f_.GreyscaleMin() << "\n";
+	std::cout << "Decomposed (Max): " << runtime_rgba_f_.GreyscaleMax() << "\n";
+
+	constexpr EmuMath::ColourRGB<float> from_rgba_ = EmuMath::ColourRGBA<float>(1, 2, 3, 4);
+
+	constexpr auto some_vec_ = EmuMath::Vector<1, long double>(colour_a_.AsVector());
+
+	auto bloob = EmuMath::ColourRGB<float>().AsVectorRGB();
+	auto bloob_ = EmuMath::ColourRGBA<float>().AsVectorRGB();
+	auto bloob__ = EmuMath::ColourRGB<float>().AsVectorRGBA();
+	auto bloob___ = EmuMath::ColourRGBA<float>().AsVectorRGBA();
+
+
+	constexpr EmuMath::WrappedColour<float, true> wrapped_colour_(-0.2, 0.2, 0.5, 1.1);
+
+	std::cout << "\n\n";
+	auto wrapped_runtime_ = wrapped_colour_;
+	std::cout << wrapped_runtime_ << "\n";
+	wrapped_runtime_.G(25);
+	std::cout << wrapped_runtime_ << "\n";
+	std::cout << (wrapped_runtime_ * 2) << "\n";
+	std::cout << (wrapped_runtime_ * EmuMath::WrappedColour<std::uint8_t, true>(255, 0, 255)) << "\n";
+
+	EmuMath::WrappedColourRGBA<float> some_wrapped_colour_(2, 3.2, -4.6, 1.0);
+	EmuMath::ColourRGB<float> some_colour_again_( some_wrapped_colour_ );
+
+	std::cout << "\n\n";
+	std::cout << some_wrapped_colour_ << "\n";
+	EmuMath::WrappedColourRGBA<float> wee = some_wrapped_colour_.Add(2.1);
+	std::cout << wee << "\n";
+	std::cout << wee.Lerp<false>(EmuMath::ColourRGBA<double>(1, 2, 3, 1), 0.5f) << "\n";
+	std::cout << wee.Lerp<true>(EmuMath::ColourRGBA<double>(1, 2, 3, 1), 0.5f) << "\n";
+
+	decltype(wee)::underlying_colour wee_unwrapped_(wee);
+
+	constexpr auto wrapped_colour_greyscale_basic_ = wrapped_colour_.GreyscaleBasic();
+	constexpr auto wrapped_colour_greyscale_luminance_ = wrapped_colour_.GreyscaleLuminance();
+	constexpr auto wrapped_colour_greyscale_desaturate_ = wrapped_colour_.GreyscaleDesaturate();
+	constexpr auto wrapped_colour_greyscale_decompose_min_ = wrapped_colour_.GreyscaleMin();
+	constexpr auto wrapped_colour_greyscale_decompose_max_ = wrapped_colour_.GreyscaleMax();
+
+	constexpr EmuMath::ClampedColourRGBA<float> some_clamped_colour_(-0.1, 0.0, 0.8, 1.5);
+
+	std::cout << "\n\n\n";
+	using grad_type = EmuMath::Gradient<float>;
+	grad_type gradient_;
+	gradient_.AddClampedColourAnchor(1.0f, EmuMath::ColourRGB<float>(0.75f, 0.1f, 0.0f));
+	gradient_.AddClampedColourAnchor(0.5f, EmuMath::ColourRGB<float>(0.5f, 0.5f, 0.5f));
+	gradient_.AddClampedColourAnchor(123.5f, EmuMath::ColourRGB<float>(0.2f, 1.0f, 1.0f));
+	gradient_.AddClampedAlphaAnchor(1.0f, 0.0f);
+	gradient_.AddClampedColourAnchor(0.9f, EmuMath::ColourRGB<std::uint8_t>(255 / 4, 255 / 2, 255));
+	std::size_t dummy_index_ = gradient_.AddWrappedColourAnchor_GetIndex(0.3f, EmuMath::ColourRGBA<std::int8_t>(-1, -2, -3));
+	std::cout << gradient_ << "\n";
+	gradient_.EraseColourIndex(dummy_index_);
+	gradient_.EraseColourAnchor(0.9f);
+	std::cout << "---\n" << gradient_ << "\n";
+	std::cout << "---\n" << EmuMath::Gradient<std::uint8_t>(gradient_) << "\n";
+	std::cout << "---\n";
+	std::cout << "at(0.0): " << gradient_.GetColour(0.0f) << "\n";
+	std::cout << "at(1.0): " << gradient_.GetColour(1.0f) << "\n";
+	std::cout << "at(0.5): " << gradient_.GetColour(0.5f) << "\n";
+	std::cout << "at(0.75): " << gradient_.GetColour(0.75f) << "\n";
+	std::cout << "at(0.25): " << gradient_.GetColour(0.25f) << "\n";
+	std::cout << "---\n";
+	std::cout << "at(0.0): " << gradient_.GetAlpha(0.0f) << "\n";
+	std::cout << "at(1.0): " << gradient_.GetAlpha(1.0f) << "\n";
+	std::cout << "at(0.5): " << gradient_.GetAlpha(0.5f) << "\n";
+	std::cout << "at(0.75): " << gradient_.GetAlpha(0.75f) << "\n";
+	std::cout << "at(0.25): " << gradient_.GetAlpha(0.25f) << "\n";
+	std::cout << "---\n";
+	std::cout << "at(0.0): " << gradient_.Get(0.0f) << "\n";
+	std::cout << "at(1.0): " << gradient_.Get(1.0f) << "\n";
+	std::cout << "at(0.5): " << gradient_.Get(0.5f) << "\n";
+	std::cout << "at(0.75): " << gradient_.Get(0.75f) << "\n";
+	std::cout << "at(0.25): " << gradient_.Get(0.25f) << "\n";
+	std::cout << "---\n";
+	std::cout << (gradient_ == gradient_) << "\n";
+	std::cout << (EmuMath::Gradient<std::int8_t>(gradient_) == EmuMath::Gradient<std::uint8_t>(gradient_)) << "\n";
+	std::cout << (gradient_ == grad_type()) << "\n";
+	std::cout << "---\n";
+	std::cout << (gradient_ != gradient_) << "\n";
+	std::cout << (EmuMath::Gradient<std::int8_t>(gradient_) != EmuMath::Gradient<std::uint8_t>(gradient_)) << "\n";
+	std::cout << (gradient_ != grad_type()) << "\n";
+	std::cout << "---\n";
+	std::cout << gradient_.HasMatchingAlphaAnchors(gradient_) << "\n";
+	std::cout << EmuMath::Gradient<std::int8_t>(gradient_).HasMatchingAlphaAnchors(EmuMath::Gradient<std::uint8_t>(gradient_)) << "\n";
+	std::cout << gradient_.HasMatchingAlphaAnchors(grad_type()) << "\n";
+	std::cout << "---\n";
+	std::cout << gradient_.HasMatchingColourAnchors(gradient_) << "\n";
+	std::cout << EmuMath::Gradient<std::int8_t>(gradient_).HasMatchingColourAnchors(EmuMath::Gradient<std::uint8_t>(gradient_)) << "\n";
+	std::cout << gradient_.HasMatchingColourAnchors(grad_type()) << "\n";
+	std::cout << "---\n";
+	grad_type ______;
+	______.AddClampedColourAnchor<float, true>(0.5f, {});
+	std::cout << (______ == grad_type()) << "\n";
+	std::cout << (______ != grad_type()) << "\n";
+	std::cout << ______.HasMatchingAlphaAnchors(grad_type()) << "\n";
+	std::cout << ______.HasMatchingColourAnchors(grad_type()) << "\n";
+	std::cout << "---\n";
+
+	constexpr auto wrap_test_ = grad_type::wrap_anchor(-0.3f);
+
+	constexpr auto red_ = EmuMath::Colours::Lime();
+
+	grad_type::anchor_type anchor_ = 0.0f;
+
+	EmuMath::NoiseTable<3, float> noise_;
+
+	grad_type gradient_colours_;
+	gradient_colours_.AddClampedColourAnchor(0.0f, EmuMath::Colours::Blue());
+	gradient_colours_.AddClampedColourAnchor(0.35f, EmuMath::Colours::Blue());
+	gradient_colours_.AddClampedColourAnchor(0.45f, EmuMath::Colours::White());
+	gradient_colours_.AddClampedColourAnchor(0.5f, EmuMath::Colours::Black());
+	gradient_colours_.AddClampedColourAnchor(0.65f, EmuMath::Colours::Yellow());
+	gradient_colours_.AddClampedColourAnchor(0.85f, EmuMath::Colours::Green());
+	gradient_colours_.AddClampedColourAnchor(1.0f, EmuMath::Colours::Red());
+
+	grad_type gradient_greyscale_;
+	gradient_greyscale_.AddClampedColourAnchor(0.0f, EmuMath::Colours::White());
+	gradient_greyscale_.AddClampedColourAnchor(1.0f, EmuMath::Colours::Black());
+
+	grad_type& noise_gradient_ = gradient_colours_;
+
+	noise_.GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::noise_sample_processor_perlin_normalise<3>>
+	(
+		noise_.MakeOptions
+		(
+			EmuMath::Vector<3, std::size_t>(1024, 1024, 1),
+			EmuMath::Vector<3, float>(0.0f, 0.0f, 0.0f),
+			EmuMath::Vector<3, float>(1.0f, 1.0f, 1.0f),
+			3.0f,
+			false,
+			true,
+			EmuMath::Info::NoisePermutationInfo(4096, EmuMath::Info::NoisePermutationShuffleMode::SEED_32, true, 1337, 1337),
+			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+		)
+	);
+	WriteNoiseTableToPPM(noise_, noise_gradient_);
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
