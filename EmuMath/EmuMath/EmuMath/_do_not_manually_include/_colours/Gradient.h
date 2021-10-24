@@ -3,6 +3,7 @@
 
 #include "ColourT.h"
 #include "ColourArithmeticFunctors.h"
+#include "ColourComparisonFunctors.h"
 #include <algorithm>
 #include <map>
 #include <ostream>
@@ -130,6 +131,32 @@ namespace EmuMath
 		{
 			return Get<OutChannel_>(colour_anchor_point_, alpha_anchor_point_);
 		}
+
+		/// <summary>
+		/// <para> Returns a boolean indicating if this gradient contains equal anchors for colours and alphas compared to the passed gradient. </para>
+		/// <para> Channel conversions are performed where necessary. </para>
+		/// <para> Note that channel conversions are lossy when switching between floating-point and integral channel types. </para>
+		/// </summary>
+		/// <param name="rhs_">Gradient to compare this gradient to.</param>
+		/// <returns>True if all of this gradient's anchor points match up with the provided rhs_ gradient; otherwise false.</returns>
+		template<class RhsChannel_>
+		[[nodiscard]] inline bool operator==(const EmuMath::Gradient<RhsChannel_>& rhs_) const
+		{
+			return _do_cmp_equal(rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns a boolean indicating if this gradient contains different anchors for colours and alphas compared to the passed gradient. </para>
+		/// <para> Channel conversions are performed where necessary. </para>
+		/// <para> Note that channel conversions are lossy when switching between floating-point and integral channel types. </para>
+		/// </summary>
+		/// <param name="rhs_">Gradient to compare this gradient to.</param>
+		/// <returns>True if at least one of this gradient's anchor points do not match up with the provided rhs_ gradient; otherwise false.</returns>
+		template<class RhsChannel_>
+		[[nodiscard]] inline bool operator!=(const EmuMath::Gradient<RhsChannel_>& rhs_) const
+		{
+			return !_do_cmp_equal(rhs_);
+		}
 #pragma endregion
 
 #pragma region NON_CONST_OPERATORS
@@ -147,6 +174,71 @@ namespace EmuMath
 		{
 			_copy_gradient(to_copy_);
 			return *this;
+		}
+#pragma endregion
+
+#pragma region COMPARISON_FUNCS
+		/// <summary>
+		/// <para> Returns a boolean indicating if this gradient contains equal anchors for colours and alphas compared to the passed gradient. </para>
+		/// <para> Channel conversions are performed where necessary. </para>
+		/// <para> Note that channel conversions are lossy when switching between floating-point and integral channel types. </para>
+		/// </summary>
+		/// <param name="rhs_">Gradient to compare this gradient to.</param>
+		/// <returns>True if all of this gradient's anchor points match up with the provided rhs_ gradient; otherwise false.</returns>
+		template<class RhsChannel_>
+		[[nodiscard]] inline bool HasMatchingAnchors(const EmuMath::Gradient<RhsChannel_>& rhs_) const
+		{
+			return _do_cmp_equal(rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns a boolean indicating if this gradient contains equal anchors for colours compared to the passed gradient. </para>
+		/// <para> Channel conversions are performed where necessary. </para>
+		/// <para> Note that channel conversions are lossy when switching between floating-point and integral channel types. </para>
+		/// </summary>
+		/// <param name="rhs_">Gradient to compare this gradient to.</param>
+		/// <returns>True if all of this gradient's colour anchor points match up with the provided rhs_ gradient; otherwise false.</returns>
+		template<class RhsChannel_>
+		[[nodiscard]] inline bool HasMatchingColourAnchors(const EmuMath::Gradient<RhsChannel_>& rhs_) const
+		{
+			return _do_single_container_cmp_equal
+			(
+				colours,
+				rhs_.ViewColours(),
+				[](const auto& a_, const auto& b_) 
+				{ 
+					return 
+					(
+						(a_.first == b_.first) && 
+						(a_.second == b_.second)
+					);
+				}
+			);
+		}
+
+		/// <summary>
+		/// <para> Returns a boolean indicating if this gradient contains equal anchors for alpha compared to the passed gradient. </para>
+		/// <para> Channel conversions are performed where necessary. </para>
+		/// <para> Note that channel conversions are lossy when switching between floating-point and integral channel types. </para>
+		/// </summary>
+		/// <param name="rhs_">Gradient to compare this gradient to.</param>
+		/// <returns>True if all of this gradient's alpha anchor points match up with the provided rhs_ gradient; otherwise false.</returns>
+		template<class RhsChannel_>
+		[[nodiscard]] inline bool HasMatchingAlphaAnchors(const EmuMath::Gradient<RhsChannel_>& rhs_) const
+		{
+			return _do_single_container_cmp_equal
+			(
+				alphas,
+				rhs_.ViewAlphas(),
+				[](const auto& a_, const auto& b_)
+				{
+					return 
+					(
+						(a_.first == b_.first) &&
+						(a_.second == EmuMath::Helpers::convert_colour_channel<channel_type, RhsChannel_>(b_.second))
+					); 
+				}
+			);
 		}
 #pragma endregion
 
@@ -821,6 +913,19 @@ namespace EmuMath
 			out_.insert(std::pair<anchor_type, channel_type>(min_anchor, colour_type::max_intensity));
 			return out_;
 		}
+
+		template<class LhsContainer_, class RhsContainer_, class ValueCmp_>
+		[[nodiscard]] static inline bool _do_single_container_cmp_equal(const LhsContainer_& lhs_, const RhsContainer_& rhs_, ValueCmp_ cmp_)
+		{
+			if (lhs_.size() == rhs_.size())
+			{
+				return std::equal(lhs_.begin(), lhs_.end(), rhs_.begin(), cmp_);
+			}
+			else
+			{
+				return false;
+			}
+		}
 #pragma endregion
 
 #pragma region PRIVATE_MEMBER_HELPERS
@@ -875,6 +980,56 @@ namespace EmuMath
 			colours = to_copy_.colours;
 			alphas = to_copy_.colours;
 			ForceValidation();
+		}
+
+		/// <summary> Performs an equality comparison with the rhs_ gradient, performing any necessary conversions if RhsChannel_ is incompatible. </summary>
+		/// <param name="rhs_">Gradient of any Channel_ type to compare this gradient to.</param>
+		/// <returns>True if the comparisons returned true, otherwise false.</returns>
+		template<class RhsChannel_>
+		[[nodiscard]] inline bool _do_cmp_equal(const EmuMath::Gradient<RhsChannel_>& rhs_) const
+		{
+			const auto& rhs_alphas_ = rhs_.ViewAlphas();
+			const auto& rhs_colours_ = rhs_.ViewColours();
+
+			if ((alphas.size() == rhs_alphas_.size()) && (colours.size() == rhs_colours_.size()))
+			{
+				bool equal_ = std::equal
+				(
+					alphas.begin(),
+					alphas.end(),
+					rhs_alphas_.begin(),
+					[](const auto& a_, const auto& b_)
+					{
+						return 
+						(
+							(a_.first == b_.first) &&
+							(a_.second == EmuMath::Helpers::convert_colour_channel<channel_type, RhsChannel_>(b_.second))
+						);
+					}
+				);
+
+				if (!equal_)
+				{
+					return false;
+				}
+				else
+				{
+					return std::equal
+					(
+						colours.begin(),
+						colours.end(),
+						rhs_colours_.begin(),
+						[](const auto& a_, const auto& b_)
+						{
+							return (a_.first == b_.first) && (a_.second == b_.second);
+						}
+					);
+				}
+			}
+			else
+			{
+				return false;
+			}
 		}
 #pragma endregion
 

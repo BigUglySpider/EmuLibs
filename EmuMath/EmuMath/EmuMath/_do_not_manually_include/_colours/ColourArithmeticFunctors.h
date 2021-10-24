@@ -3,6 +3,7 @@
 
 #include "ColourT.h"
 #include "ColourValidationLayer.h"
+#include "../../../EmuCore/Functors/Arithmetic.h"
 
 namespace EmuCore
 {

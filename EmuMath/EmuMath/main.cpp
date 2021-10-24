@@ -306,6 +306,30 @@ int main()
 	std::cout << "at(0.5): " << gradient_.Get(0.5f) << "\n";
 	std::cout << "at(0.75): " << gradient_.Get(0.75f) << "\n";
 	std::cout << "at(0.25): " << gradient_.Get(0.25f) << "\n";
+	std::cout << "---\n";
+	std::cout << (gradient_ == gradient_) << "\n";
+	std::cout << (EmuMath::Gradient<std::int8_t>(gradient_) == EmuMath::Gradient<std::uint8_t>(gradient_)) << "\n";
+	std::cout << (gradient_ == grad_type()) << "\n";
+	std::cout << "---\n";
+	std::cout << (gradient_ != gradient_) << "\n";
+	std::cout << (EmuMath::Gradient<std::int8_t>(gradient_) != EmuMath::Gradient<std::uint8_t>(gradient_)) << "\n";
+	std::cout << (gradient_ != grad_type()) << "\n";
+	std::cout << "---\n";
+	std::cout << gradient_.HasMatchingAlphaAnchors(gradient_) << "\n";
+	std::cout << EmuMath::Gradient<std::int8_t>(gradient_).HasMatchingAlphaAnchors(EmuMath::Gradient<std::uint8_t>(gradient_)) << "\n";
+	std::cout << gradient_.HasMatchingAlphaAnchors(grad_type()) << "\n";
+	std::cout << "---\n";
+	std::cout << gradient_.HasMatchingColourAnchors(gradient_) << "\n";
+	std::cout << EmuMath::Gradient<std::int8_t>(gradient_).HasMatchingColourAnchors(EmuMath::Gradient<std::uint8_t>(gradient_)) << "\n";
+	std::cout << gradient_.HasMatchingColourAnchors(grad_type()) << "\n";
+	std::cout << "---\n";
+	grad_type ______;
+	______.AddClampedColourAnchor<float, true>(0.5f, {});
+	std::cout << (______ == grad_type()) << "\n";
+	std::cout << (______ != grad_type()) << "\n";
+	std::cout << ______.HasMatchingAlphaAnchors(grad_type()) << "\n";
+	std::cout << ______.HasMatchingColourAnchors(grad_type()) << "\n";
+	std::cout << "---\n";
 
 	constexpr auto wrap_test_ = grad_type::wrap_anchor(-0.3f);
 
