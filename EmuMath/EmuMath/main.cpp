@@ -353,6 +353,11 @@ int main()
 	gradient_greyscale_.AddClampedColourAnchor(1.0f, EmuMath::Colours::Black());
 
 	grad_type& noise_gradient_ = gradient_colours_;
+	std::cout << "\nNoise Gradient:\n";
+	std::cout << noise_gradient_ << "\n";
+	std::cout << "\nNoise Gradient Reversed:\n";
+	noise_gradient_.ReverseColours();
+	std::cout << noise_gradient_ << "\n";
 
 	noise_.GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::noise_sample_processor_perlin_normalise<3>>
 	(

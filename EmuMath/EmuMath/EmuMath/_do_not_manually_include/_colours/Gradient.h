@@ -415,6 +415,39 @@ namespace EmuMath
 		{
 			return _add_item_to_container_with_index_return(clamp_anchor(anchor_), wrap_alpha(static_cast<channel_type>(alpha_)), alphas);
 		}
+
+		inline void ReverseColours()
+		{
+			_reverse_container(colours);
+		}
+
+		inline void ReverseAlphas()
+		{
+			_reverse_container(alphas);
+		}
+
+		inline void Reverse()
+		{
+			_reverse_container(colours);
+			_reverse_container(alphas);
+		}
+
+		template<class Container_>
+		static inline void _reverse_container(Container_& container_)
+		{
+			Container_ reversed_ = Container_();
+			std::transform
+			(
+				container_.rbegin(),
+				container_.rend(),
+				std::inserter(reversed_, reversed_.end()),
+				[](const auto& pair_) 
+				{
+					return typename Container_::value_type(max_anchor - pair_.first, pair_.second);
+				}
+			);
+			container_.swap(reversed_);
+		}
 #pragma endregion
 
 #pragma region ACCESS_FUNCTIONS
