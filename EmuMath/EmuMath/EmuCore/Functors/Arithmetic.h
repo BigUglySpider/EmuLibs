@@ -1003,24 +1003,40 @@ namespace EmuCore
 		[[nodiscard]] constexpr inline T_ operator()(T_ val_) const
 		{
 			constexpr T_ zero_ = T_(0);
-			constexpr T_ one_ = T_(1);
-			
-			if constexpr (!WrapToOne_)
+			if constexpr (std::is_integral_v<T_>)
 			{
-				// Subtraction of a trunc brings us into the non-inclusive range -1:1
-				val_ = val_ - EmuCore::do_trunc_constexpr<T_>()(val_);
-
-				// Value will be wrapped if positive, but we need to invert the magnitude if negative
-				// --- This can be done by adding 1 (i.e. -0.9 -> 0.1)
-				return val_ + (one_ * (val_ < zero_));
+				// Any non-zero integer will wrap to 1, so we just return whatever any non-zero would wrap to in that case
+				if constexpr (WrapToOne_)
+				{
+					return static_cast<T_>(val_ != zero_);
+				}
+				else
+				{
+					return zero_;
+				}
 			}
 			else
 			{
-				// Same as above, but addition of 1 is done if result is negative OR 0
-				// --- This OR 0 only applies to the wrapped variant if it did not start at 0
-				bool started_not_zero_ = val_ != zero_;
-				val_ = val_ - EmuCore::do_trunc_constexpr<T_>()(val_);
-				return val_ + (one_ * ((val_ <= zero_) && started_not_zero_));
+				// More complex with non-integral types as we need to invert magnitude and direction of the fractions
+				// --- E.g. -0.8 would wrap around to +0.2, so we need to perform that transformation
+				constexpr T_ one_ = T_(1);
+				if constexpr (!WrapToOne_)
+				{
+					// Subtraction of a trunc brings us into the non-inclusive range -1:1
+					val_ = val_ - EmuCore::do_trunc_constexpr<T_>()(val_);
+
+					// Value will be wrapped if positive, but we need to invert the magnitude if negative
+					// --- This can be done by adding 1 (i.e. -0.9 -> 0.1)
+					return val_ + (one_ * (val_ < zero_));
+				}
+				else
+				{
+					// Same as above, but addition of 1 is done if result is negative OR 0
+					// --- This OR 0 only applies to the wrapped variant if it did not start at 0
+					bool started_not_zero_ = val_ != zero_;
+					val_ = val_ - EmuCore::do_trunc_constexpr<T_>()(val_);
+					return val_ + (one_ * ((val_ <= zero_) && started_not_zero_));
+				}
 			}
 		}
 	};

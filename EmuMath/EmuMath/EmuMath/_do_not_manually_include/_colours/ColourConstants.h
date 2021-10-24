@@ -37,6 +37,37 @@ namespace EmuMath::Colours
 			static_assert(false, "Attempted to use EmuMath::Colours::_make_colour with a non-EmuMath-Colour output type.");
 		}
 	}
+	template<class OutColour_, typename R_, typename G_, typename B_, typename A_>
+	[[nodiscard]] constexpr inline OutColour_ _make_colour(const R_& r_, const G_& g_, const B_& b_, const A_& a_)
+	{
+		if constexpr (EmuMath::TMP::is_emu_colour_v<OutColour_>)
+		{
+			using out_channel_type = typename OutColour_::value_type;
+			if constexpr (OutColour_::contains_alpha)
+			{
+				return OutColour_
+				(
+					EmuMath::Helpers::convert_colour_channel<out_channel_type, R_>(r_),
+					EmuMath::Helpers::convert_colour_channel<out_channel_type, G_>(g_),
+					EmuMath::Helpers::convert_colour_channel<out_channel_type, B_>(b_),
+					EmuMath::Helpers::convert_colour_channel<out_channel_type, A_>(a_)
+				);
+			}
+			else
+			{
+				return OutColour_
+				(
+					EmuMath::Helpers::convert_colour_channel<out_channel_type, R_>(r_),
+					EmuMath::Helpers::convert_colour_channel<out_channel_type, G_>(g_),
+					EmuMath::Helpers::convert_colour_channel<out_channel_type, B_>(b_)
+				);
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to use EmuMath::Colours::_make_colour with a non-EmuMath-Colour output type.");
+		}
+	}
 
 	/// <summary> { R: 0.0, G: 0.0, B: 0.0 } </summary>
 	template<typename Channel_ = float, bool OutContainsAlpha_ = false>

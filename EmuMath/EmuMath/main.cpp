@@ -177,7 +177,7 @@ inline void WriteNoiseTableToPPM(const EmuMath::NoiseTable<num_dimensions, FP_>&
 				{
 					// Clamp is merely to cancel out fp-rounding errors
 					//EmuMath::Vector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.at(x, y, z)).Clamp(0.0f, 255.0f));
-					EmuMath::ColourRGB<std::uint8_t> colour_byte_(gradient_.GetColour(noise_table_.at(x, y, z)));
+					EmuMath::ColourRGB<std::uint8_t> colour_byte_ = gradient_.GetColour<std::uint8_t>(noise_table_.at(x, y, z));
 					out_ppm_ << (char)colour_byte_.R() << (char)colour_byte_.G() << (char)colour_byte_.B();
 				}
 			}
@@ -277,11 +277,17 @@ int main()
 	std::cout << "\n\n\n";
 	using grad_type = EmuMath::Gradient<float>;
 	grad_type gradient_;
-	gradient_.AddColourAnchor(1.0f, EmuMath::ColourRGB<float>(0.75f, 0.1f, 0.0f));
-	gradient_.AddColourAnchor(0.5f, EmuMath::ColourRGB<float>(0.5f, 0.5f, 0.5f));
-	gradient_.AddColourAnchor(123.5f, EmuMath::ColourRGB<float>(0.2f, 1.0f, 1.0f));
-	gradient_.AddAlphaAnchor(1.0f, 0.0f);
+	gradient_.AddClampedColourAnchor(1.0f, EmuMath::ColourRGB<float>(0.75f, 0.1f, 0.0f));
+	gradient_.AddClampedColourAnchor(0.5f, EmuMath::ColourRGB<float>(0.5f, 0.5f, 0.5f));
+	gradient_.AddClampedColourAnchor(123.5f, EmuMath::ColourRGB<float>(0.2f, 1.0f, 1.0f));
+	gradient_.AddClampedAlphaAnchor(1.0f, 0.0f);
+	gradient_.AddClampedColourAnchor(0.9f, EmuMath::ColourRGB<std::uint8_t>(255 / 4, 255 / 2, 255));
+	std::size_t dummy_index_ = gradient_.AddWrappedColourAnchor_GetIndex(0.3f, EmuMath::ColourRGBA<std::int8_t>(-1, -2, -3));
 	std::cout << gradient_ << "\n";
+	gradient_.EraseColourIndex(dummy_index_);
+	gradient_.EraseColourAnchor(0.9f);
+	std::cout << "---\n" << gradient_ << "\n";
+	std::cout << "---\n" << EmuMath::Gradient<std::uint8_t>(gradient_) << "\n";
 	std::cout << "---\n";
 	std::cout << "at(0.0): " << gradient_.GetColour(0.0f) << "\n";
 	std::cout << "at(1.0): " << gradient_.GetColour(1.0f) << "\n";
@@ -310,19 +316,19 @@ int main()
 	EmuMath::NoiseTable<3, float> noise_;
 
 	grad_type gradient_colours_;
-	gradient_colours_.AddColourAnchor(0.0f, EmuMath::Colours::Blue());
-	gradient_colours_.AddColourAnchor(0.35f, EmuMath::Colours::Blue());
-	gradient_colours_.AddColourAnchor(0.45f, EmuMath::Colours::White());
-	gradient_colours_.AddColourAnchor(0.5f, EmuMath::Colours::Black());
-	gradient_colours_.AddColourAnchor(0.65f, EmuMath::Colours::Yellow());
-	gradient_colours_.AddColourAnchor(0.85f, EmuMath::Colours::Green());
-	gradient_colours_.AddColourAnchor(1.0f, EmuMath::Colours::Red());
+	gradient_colours_.AddClampedColourAnchor(0.0f, EmuMath::Colours::Blue());
+	gradient_colours_.AddClampedColourAnchor(0.35f, EmuMath::Colours::Blue());
+	gradient_colours_.AddClampedColourAnchor(0.45f, EmuMath::Colours::White());
+	gradient_colours_.AddClampedColourAnchor(0.5f, EmuMath::Colours::Black());
+	gradient_colours_.AddClampedColourAnchor(0.65f, EmuMath::Colours::Yellow());
+	gradient_colours_.AddClampedColourAnchor(0.85f, EmuMath::Colours::Green());
+	gradient_colours_.AddClampedColourAnchor(1.0f, EmuMath::Colours::Red());
 
 	grad_type gradient_greyscale_;
-	gradient_greyscale_.AddColourAnchor(0.0f, EmuMath::Colours::White());
-	gradient_greyscale_.AddColourAnchor(1.0f, EmuMath::Colours::Black());
+	gradient_greyscale_.AddClampedColourAnchor(0.0f, EmuMath::Colours::White());
+	gradient_greyscale_.AddClampedColourAnchor(1.0f, EmuMath::Colours::Black());
 
-	grad_type& noise_gradient_ = gradient_greyscale_;
+	grad_type& noise_gradient_ = gradient_colours_;
 
 	noise_.GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::noise_sample_processor_perlin_normalise<3>>
 	(

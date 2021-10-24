@@ -940,11 +940,11 @@ namespace EmuMath
 		}
 	};
 
-	/// <summary> Colour contains Red, Green, and Blue channels of the provided Channel_ type. Shorthand for EmuMath::Colour with a false boolean argument. </summary>
+	/// <summary> Colour containing Red, Green, and Blue channels of the provided Channel_ type. Shorthand for EmuMath::Colour with a false boolean argument. </summary>
 	template<typename Channel_>
 	using ColourRGB = EmuMath::Colour<Channel_, false>;
 
-	/// <summary> Colour contains Red, Green, Blue, and Alpha channels of the provided Channel_ type. Shorthand for EmuMath::Colour with a true boolean argument. </summary>
+	/// <summary> Colour containing Red, Green, Blue, and Alpha channels of the provided Channel_ type. Shorthand for EmuMath::Colour with a true boolean argument. </summary>
 	template<typename Channel_>
 	using ColourRGBA = EmuMath::Colour<Channel_, true>;
 }
@@ -952,14 +952,50 @@ namespace EmuMath
 template<typename T_, bool ContainsAlpha_>
 std::ostream& operator<<(std::ostream& str_, const EmuMath::Colour<T_, ContainsAlpha_>& colour_)
 {
-	str_ << colour_.AsVector();
+	using unqualified_channel_type = std::remove_reference_t<std::remove_cv_t<T_>>;
+	str_ << "{ ";
+	if constexpr (EmuCore::TMPHelpers::is_any_same_v<unqualified_channel_type, std::uint8_t, std::int8_t>)
+	{
+		str_ << (+colour_.R()) << ", " << (+colour_.G()) << ", " << (+colour_.B());
+		if constexpr (ContainsAlpha_)
+		{
+			str_ << ", " << (+colour_.A());
+		}
+	}
+	else
+	{
+		str_ << colour_.R() << ", " << colour_.G() << ", " << colour_.B();
+		if constexpr (ContainsAlpha_)
+		{
+			str_ << ", " << colour_.A();
+		}
+	}
+	str_ << " }";
 	return str_;
 }
 
 template<typename T_, bool ContainsAlpha_>
 std::wostream& operator<<(std::wostream& str_, const EmuMath::Colour<T_, ContainsAlpha_>& colour_)
 {
-	str_ << colour_.AsVector();
+	using unqualified_channel_type = std::remove_reference_t<std::remove_cv_t<T_>>;
+	str_ << L"{ ";
+	if constexpr (EmuCore::TMPHelpers::is_any_same_v<unqualified_channel_type, std::uint8_t, std::int8_t>)
+	{
+		str_ << (+colour_.R()) << L", " << (+colour_.G()) << L", " << (+colour_.B());
+		if constexpr (ContainsAlpha_)
+		{
+			str_ << L", " << (+colour_.A());
+		}
+	}
+	else
+	{
+		str_ << colour_.R() << L", " << colour_.G() << L", " << colour_.B();
+		if constexpr (ContainsAlpha_)
+		{
+			str_ << L", " << colour_.A();
+		}
+	}
+	str_ << L" }";
 	return str_;
 }
 
