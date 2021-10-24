@@ -416,16 +416,19 @@ namespace EmuMath
 			return _add_item_to_container_with_index_return(clamp_anchor(anchor_), wrap_alpha(static_cast<channel_type>(alpha_)), alphas);
 		}
 
+		/// <summary> Reverses the colour map of this gradient, flipping the left to the right and vice versa. </summary>
 		inline void ReverseColours()
 		{
 			_reverse_container(colours);
 		}
 
+		/// <summary> Reverses the alpha map of this gradient, flipping the left to the right and vice versa. </summary>
 		inline void ReverseAlphas()
 		{
 			_reverse_container(alphas);
 		}
 
+		/// <summary> Reverses the colour and alpha maps of this gradient, flipping the left to the right and vice versa. </summary>
 		inline void Reverse()
 		{
 			_reverse_container(colours);
