@@ -315,7 +315,7 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region INSERTION_FUNCS
+#pragma region INSERTION_AND_MODIFICATION_FUNCS
 		/// <summary>
 		/// <para> Adds the provided colour_ at the provided anchor_ point, clamping the provided colour into a valid intensity range. </para>
 		/// <para> If the provided anchor_ point is already in use, this will replace the existing colour at that point. </para>
