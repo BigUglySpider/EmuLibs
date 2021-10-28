@@ -6,6 +6,8 @@
 
 #include "Tests.hpp"
 
+#include "EmuMath/FastNoise.h"
+
 #include <chrono>
 #include <thread>
 
@@ -101,9 +103,11 @@ struct SomeStructForTestingEdges
 	float top_;
 };
 
-template<std::size_t num_dimensions, typename FP_>
-inline void WriteNoiseTableToPPM(const EmuMath::NoiseTable<num_dimensions, FP_>& noise_table_)
+template<class NoiseTable_>
+inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_)
 {
+	using FP_ = typename NoiseTable_::value_type;
+	constexpr std::size_t num_dimensions = NoiseTable_::num_dimensions;
 	EmuMath::Vector3<FP_> white_(255.0f, 255.0f, 255.0f);
 
 	if constexpr (num_dimensions == 3)
@@ -359,11 +363,13 @@ int main()
 	noise_gradient_.ReverseColours();
 	std::cout << noise_gradient_ << "\n";
 
+	std::cout << "GENERATING SCALAR NOISE...\n";
+	auto begin_ = std::chrono::steady_clock::now();
 	noise_.GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::noise_sample_processor_perlin_normalise<3>>
 	(
 		noise_.MakeOptions
 		(
-			EmuMath::Vector<3, std::size_t>(1024, 1024, 1),
+			EmuMath::Vector<3, std::size_t>(1024, 1024, 4),
 			EmuMath::Vector<3, float>(0.0f, 0.0f, 0.0f),
 			EmuMath::Vector<3, float>(1.0f, 1.0f, 1.0f),
 			3.0f,
@@ -373,7 +379,44 @@ int main()
 			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
 		)
 	);
-	WriteNoiseTableToPPM(noise_, noise_gradient_);
+	auto end_ = std::chrono::steady_clock::now();
+	std::cout << "FINISHED SCALAR NOISE IN: " << std::chrono::duration<double, std::milli>(end_ - begin_).count() << "ms\n";
+	//WriteNoiseTableToPPM(noise_, noise_gradient_);
+
+	std::cout << "GENERATING FAST NOISE...\n";
+	EmuMath::FastNoiseTable<3, 0> fast_noise_;
+	begin_ = std::chrono::steady_clock::now();
+	fast_noise_.GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<3>>
+	(
+		fast_noise_.make_options
+		(
+			EmuMath::Vector<3, std::size_t>(1024, 1024, 4),
+			EmuMath::Vector<3, float>(0.0f, 0.0f, 0.0f),
+			EmuMath::Vector<3, float>(1.0f, 1.0f, 1.0f),
+			3.0f,
+			false,
+			true,
+			EmuMath::Info::NoisePermutationInfo(4096, EmuMath::Info::NoisePermutationShuffleMode::SEED_32, true, 1337, 1337),
+			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+		)
+	);
+	end_ = std::chrono::steady_clock::now();
+	std::cout << "FINISHED FAST NOISE IN: " << std::chrono::duration<double, std::milli>(end_ - begin_).count() << "ms\n";
+
+	system("pause");
+	WriteNoiseTableToPPM(fast_noise_);
+
+	EmuMath::Functors::make_fast_noise_3d<EmuMath::NoiseType::PERLIN, __m128> fast_generator_;
+	__m128 test_128_ = fast_generator_(_mm_set1_ps(0.4f), _mm_set1_ps(0.0f), _mm_set1_ps(1.0f), _mm_set1_ps(16.0f), _mm_set1_epi32(1023), EmuMath::NoisePermutations(1024, 0U));
+	std::cout << "\n\n";
+	std::cout << EmuMath::FastVector4f(test_128_) << "\n";
+	std::cout << EmuMath::Functors::make_noise_3d<EmuMath::NoiseType::PERLIN, float>()({ 0.4f, 0.0f, 1.0f }, 16.0f, EmuMath::NoisePermutations(1024, 0U)) << "\n";
+
+
+	__m128 some_float_ = _mm_set_ps(1.0f, 2.0f, 3.0f, 4.0f);
+	std::cout << EmuMath::FastVector4f(some_float_) << "\n";
+	__m128i some_ints_ = _mm_cvtps_epi32(some_float_);
+	std::cout << EmuMath::FastVector4f(_mm_cvtepi32_ps(some_ints_)) << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

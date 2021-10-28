@@ -205,6 +205,7 @@ namespace EmuMath::Functors
 			value_type tx = EmuMath::Functors::_underlying_noise_gen::SmoothT(tx_0_);
 			value_type ty = EmuMath::Functors::_underlying_noise_gen::SmoothT(ty_0_);
 			value_type tz = EmuMath::Functors::_underlying_noise_gen::SmoothT(tz_0_);
+
 			return lerp_
 			(
 				lerp_(lerp_(val_000_, val_100_, tx), lerp_(val_010_, val_110_, tx), ty),

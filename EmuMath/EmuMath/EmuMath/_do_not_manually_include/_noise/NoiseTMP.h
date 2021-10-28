@@ -2,14 +2,15 @@
 #define EMU_MATH_NOISE_TMP_H_INC_ 1
 
 #include <type_traits>
+#include <vector>
 
 namespace EmuMath::TMP
 {
-	template<typename value_type>
-	using noise_table_internal_layer = std::vector<value_type>;
-
 	static constexpr std::size_t min_noise_dimensions = 1;
 	static constexpr std::size_t max_noise_dimensions = 3;
+
+	template<typename value_type>
+	using noise_table_internal_layer = std::vector<value_type>;
 
 	template<std::size_t Dimensions_>
 	constexpr inline bool valid_noise_dimensions()
@@ -112,6 +113,15 @@ namespace EmuMath::TMP
 			value_type
 		>::type;
 	};
+
+	template<std::size_t NumDimensions_, typename value_type>
+	using _full_noise_table_storage = typename EmuMath::TMP::_noise_table_dimension_conditional
+	<
+		NumDimensions_,
+		EmuMath::TMP::noise_table_internal_layer<value_type>,
+		EmuMath::TMP::noise_table_internal_layer<EmuMath::TMP::noise_table_internal_layer<value_type>>,
+		EmuMath::TMP::noise_table_internal_layer<EmuMath::TMP::noise_table_internal_layer<EmuMath::TMP::noise_table_internal_layer<value_type>>>
+	>::type;
 }
 
 #endif

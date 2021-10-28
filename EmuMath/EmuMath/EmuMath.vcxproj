@@ -170,6 +170,7 @@
     <ClInclude Include="EmuCore\TMPHelpers\Values.h" />
     <ClInclude Include="EmuMath\Colour.h" />
     <ClInclude Include="EmuMath\FastMatrix.h" />
+    <ClInclude Include="EmuMath\FastNoise.h" />
     <ClInclude Include="EmuMath\FastVector.h" />
     <ClInclude Include="EmuMath\Matrix.h" />
     <ClInclude Include="EmuMath\Noise.h" />
@@ -188,6 +189,9 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourValidationLayer.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_helpers_underlying\_colour_helpers_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_helpers_underlying\_colour_helpers_underlying_common_includes.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\FastNoiseFunctors.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\FastNoiseSampleProcessors.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\FastNoiseTable.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseSampleProcessorAnalytics.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\FastMatrix4x4f.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\Matrix4x4.h" />
@@ -217,6 +221,8 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_transformations_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_validity_checks_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseFunctors.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FastFractalNoiseWrapper.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FastNoiseGen3D.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FractalNoiseWrapper.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\NoisePermutations.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_info\FractalNoiseInfo.h" />

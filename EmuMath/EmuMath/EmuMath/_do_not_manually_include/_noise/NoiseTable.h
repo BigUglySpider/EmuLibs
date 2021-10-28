@@ -30,13 +30,7 @@ namespace EmuMath
 
 	private:
 		/// <summary>table_storage will be a Dimensions_-dimensional vector of value_types.</summary>
-		using table_storage = typename EmuMath::TMP::_noise_table_dimension_conditional
-		<
-			num_dimensions,
-			EmuMath::TMP::noise_table_internal_layer<value_type>,
-			EmuMath::TMP::noise_table_internal_layer<EmuMath::TMP::noise_table_internal_layer<value_type>>,
-			EmuMath::TMP::noise_table_internal_layer<EmuMath::TMP::noise_table_internal_layer<EmuMath::TMP::noise_table_internal_layer<value_type>>>
-		>::type;
+		using table_storage = EmuMath::TMP::_full_noise_table_storage<num_dimensions, value_type>;
 
 	public:
 		/// <summary> Type returned when accessing this table via a single scalar index. </summary>
