@@ -403,7 +403,6 @@ int main()
 	end_ = std::chrono::steady_clock::now();
 	std::cout << "FINISHED FAST NOISE IN: " << std::chrono::duration<double, std::milli>(end_ - begin_).count() << "ms\n";
 
-	system("pause");
 	WriteNoiseTableToPPM(fast_noise_);
 
 	EmuMath::Functors::make_fast_noise_3d<EmuMath::NoiseType::PERLIN, __m128> fast_generator_;
@@ -411,7 +410,6 @@ int main()
 	std::cout << "\n\n";
 	std::cout << EmuMath::FastVector4f(test_128_) << "\n";
 	std::cout << EmuMath::Functors::make_noise_3d<EmuMath::NoiseType::PERLIN, float>()({ 0.4f, 0.0f, 1.0f }, 16.0f, EmuMath::NoisePermutations(1024, 0U)) << "\n";
-
 
 	__m128 some_float_ = _mm_set_ps(1.0f, 2.0f, 3.0f, 4.0f);
 	std::cout << EmuMath::FastVector4f(some_float_) << "\n";

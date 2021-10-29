@@ -62,6 +62,8 @@ namespace EmuMath::Functors
 		};
 		static constexpr EmuMath::NoisePermutationValue _gradient_mask = 15;
 
+		std::array<__m128, _num_gradients> _gradients_128;
+
 		make_fast_noise_3d() :
 			ix_0(),
 			ix_1(),
@@ -71,7 +73,26 @@ namespace EmuMath::Functors
 			iz_1(),
 			six_128(_mm_set1_ps(6.0f)),
 			ten_128(_mm_set1_ps(10.0f)),
-			fifteen_128(_mm_set1_ps(15.0f))
+			fifteen_128(_mm_set1_ps(15.0f)),
+			_gradients_128
+			({
+				_mm_set_ps(0.0f, 0.0f, 1.0f, 1.0f),
+				_mm_set_ps(0.0f, 0.0f, 1.0f, -1.0f),
+				_mm_set_ps(0.0f, 0.0f, -1.0f, 1.0f),
+				_mm_set_ps(0.0f, 0.0f, -1.0f, -1.0f),
+				_mm_set_ps(0.0f, 1.0f, 0.0f, 1.0f),
+				_mm_set_ps(0.0f, 1.0f, 0.0f, -1.0f),
+				_mm_set_ps(0.0f, -1.0f, 0.0f, 1.0f),
+				_mm_set_ps(0.0f, -1.0f, 0.0f, -1.0f),
+				_mm_set_ps(0.0f, 1.0f, 1.0f, 0.0f),
+				_mm_set_ps(0.0f, 1.0f, -1.0f, 0.0f),
+				_mm_set_ps(0.0f, -1.0f, 1.0f, 0.0f),
+				_mm_set_ps(0.0f, -1.0f, -1.0f, 0.0f),
+				_mm_set_ps(0.0f, 0.0f, 1.0f, 1.0f),
+				_mm_set_ps(0.0f, 0.0f, 1.0f, -1.0f),
+				_mm_set_ps(0.0f, 1.0f, -1.0f, 0.0f),
+				_mm_set_ps(0.0f, -1.0f, -1.0f, 0.0f)
+			})
 		{
 		}
 
@@ -155,7 +176,6 @@ namespace EmuMath::Functors
 			ty_0_128_ = _smooth_t(ty_0_128_);
 			tz_0_128_ = _smooth_t(tz_0_128_);
 
-
 			// Primary lerps
 			__m128 lerp_0_ = EmuMath::SIMD::vector_lerp(vals_000_, vals_100_, tx_0_128_);
 			__m128 lerp_1_ = EmuMath::SIMD::vector_lerp(vals_010_, vals_110_, tx_0_128_);
@@ -214,104 +234,173 @@ namespace EmuMath::Functors
 			_find_permutations_indices(permutations_, perm_000_, perm_001_, perm_010_, perm_011_, perm_100_, perm_101_, perm_110_, perm_111_);
 
 			// 000
-			const std::size_t* perms_ = perm_000_;
-			__m128 gradient_ = _make_gradient<0>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_000_ = _mm_mul_ps(gradient_, tx_0_);
+			__m128 gradient_0_ = _gradients_128[perm_000_[0]];
+			__m128 gradient_1_ = _gradients_128[perm_000_[1]];
+			__m128 gradient_2_ = _gradients_128[perm_000_[2]];
+			__m128 gradient_3_ = _gradients_128[perm_000_[3]];
 
-			gradient_ = _make_gradient<1>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_000_ = _mm_add_ps(vals_000_, _mm_mul_ps(gradient_, ty_0_));
+			// X - Pre-store the Y components in the indices [1] and [3] from each temp shuffle
+			__m128 temp_0_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_0_, gradient_1_);
+			__m128 temp_1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_2_, gradient_3_);
+			__m128 row_ = EmuMath::SIMD::shuffle<0, 2, 0, 2>(temp_0_, temp_1_);
+			vals_000_ = _mm_mul_ps(row_, tx_0_);
 
-			gradient_ = _make_gradient<2>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_000_ = _mm_add_ps(vals_000_, _mm_mul_ps(gradient_, tz_0_));
+			// Y - Already prestored Y in previous two shuffles, so we can form row straight away
+			row_ = EmuMath::SIMD::shuffle<1, 3, 1, 3>(temp_0_, temp_1_);
+			vals_000_ = _mm_add_ps(vals_000_, _mm_mul_ps(row_, ty_0_));
 
+			// Z - One more batch of shuffles to extract the Z-coordinates of the gradients
+			temp_0_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_0_, gradient_1_);
+			temp_1_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_2_, gradient_3_);
+			vals_000_ = _mm_add_ps(vals_000_, _mm_mul_ps(row_, tz_0_));
+
+			// ABOVE COMMENTS APPLY TO SUBSEQUENT OUTPUTS
 			// 001
-			perms_ = perm_001_;
-			gradient_ = _make_gradient<0>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_001_ = _mm_mul_ps(gradient_, tx_0_);
+			gradient_0_ = _gradients_128[perm_001_[0]];
+			gradient_1_ = _gradients_128[perm_001_[1]];
+			gradient_2_ = _gradients_128[perm_001_[2]];
+			gradient_3_ = _gradients_128[perm_001_[3]];
 
-			gradient_ = _make_gradient<1>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_001_ = _mm_add_ps(vals_001_, _mm_mul_ps(gradient_, ty_0_));
+			// X
+			temp_0_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_0_, gradient_1_);
+			temp_1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_2_, gradient_3_);
+			row_ = EmuMath::SIMD::shuffle<0, 2, 0, 2>(temp_0_, temp_1_);
+			vals_001_ = _mm_mul_ps(row_, tx_0_);
 
-			gradient_ = _make_gradient<2>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_001_ = _mm_add_ps(vals_001_, _mm_mul_ps(gradient_, tz_1_));
+			// Y
+			row_ = EmuMath::SIMD::shuffle<1, 3, 1, 3>(temp_0_, temp_1_);
+			vals_001_ = _mm_add_ps(vals_001_, _mm_mul_ps(row_, ty_0_));
+
+			// Z
+			temp_0_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_0_, gradient_1_);
+			temp_1_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_2_, gradient_3_);
+			vals_001_ = _mm_add_ps(vals_001_, _mm_mul_ps(row_, tz_1_));
 
 			// 010
-			perms_ = perm_010_;
-			gradient_ = _make_gradient<0>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_010_ = _mm_mul_ps(gradient_, tx_0_);
+			gradient_0_ = _gradients_128[perm_010_[0]];
+			gradient_1_ = _gradients_128[perm_010_[1]];
+			gradient_2_ = _gradients_128[perm_010_[2]];
+			gradient_3_ = _gradients_128[perm_010_[3]];
 
-			gradient_ = _make_gradient<1>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_010_ = _mm_add_ps(vals_010_, _mm_mul_ps(gradient_, ty_1_));
+			// X
+			temp_0_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_0_, gradient_1_);
+			temp_1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_2_, gradient_3_);
+			row_ = EmuMath::SIMD::shuffle<0, 2, 0, 2>(temp_0_, temp_1_);
+			vals_010_ = _mm_mul_ps(row_, tx_0_);
 
-			gradient_ = _make_gradient<2>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_010_ = _mm_add_ps(vals_010_, _mm_mul_ps(gradient_, tz_0_));
+			// Y
+			row_ = EmuMath::SIMD::shuffle<1, 3, 1, 3>(temp_0_, temp_1_);
+			vals_010_ = _mm_add_ps(vals_010_, _mm_mul_ps(row_, ty_1_));
+
+			// Z
+			temp_0_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_0_, gradient_1_);
+			temp_1_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_2_, gradient_3_);
+			vals_010_ = _mm_add_ps(vals_010_, _mm_mul_ps(row_, tz_0_));
 
 			// 011
-			perms_ = perm_011_;
-			gradient_ = _make_gradient<0>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_011_ = _mm_mul_ps(gradient_, tx_0_);
+			gradient_0_ = _gradients_128[perm_011_[0]];
+			gradient_1_ = _gradients_128[perm_011_[1]];
+			gradient_2_ = _gradients_128[perm_011_[2]];
+			gradient_3_ = _gradients_128[perm_011_[3]];
 
-			gradient_ = _make_gradient<1>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_011_ = _mm_add_ps(vals_011_, _mm_mul_ps(gradient_, ty_1_));
+			// X
+			temp_0_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_0_, gradient_1_);
+			temp_1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_2_, gradient_3_);
+			row_ = EmuMath::SIMD::shuffle<0, 2, 0, 2>(temp_0_, temp_1_);
+			vals_011_ = _mm_mul_ps(row_, tx_0_);
 
-			gradient_ = _make_gradient<2>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_011_ = _mm_add_ps(vals_011_, _mm_mul_ps(gradient_, tz_1_));
+			// Y
+			row_ = EmuMath::SIMD::shuffle<1, 3, 1, 3>(temp_0_, temp_1_);
+			vals_011_ = _mm_add_ps(vals_011_, _mm_mul_ps(row_, ty_1_));
+
+			// Z
+			temp_0_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_0_, gradient_1_);
+			temp_1_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_2_, gradient_3_);
+			vals_011_ = _mm_add_ps(vals_011_, _mm_mul_ps(row_, tz_1_));
 
 			// 100
-			perms_ = perm_100_;
-			gradient_ = _make_gradient<0>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_100_ = _mm_mul_ps(gradient_, tx_1_);
+			gradient_0_ = _gradients_128[perm_100_[0]];
+			gradient_1_ = _gradients_128[perm_100_[1]];
+			gradient_2_ = _gradients_128[perm_100_[2]];
+			gradient_3_ = _gradients_128[perm_100_[3]];
 
-			gradient_ = _make_gradient<1>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_100_ = _mm_add_ps(vals_100_, _mm_mul_ps(gradient_, ty_0_));
+			// X - Pre-store the Y components in the indices [1] and [3] from each temp shuffle
+			temp_0_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_0_, gradient_1_);
+			temp_1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_2_, gradient_3_);
+			row_ = EmuMath::SIMD::shuffle<0, 2, 0, 2>(temp_0_, temp_1_);
+			vals_100_ = _mm_mul_ps(row_, tx_1_);
 
-			gradient_ = _make_gradient<2>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_100_ = _mm_add_ps(vals_100_, _mm_mul_ps(gradient_, tz_0_));
+			// Y - Already prestored Y in previous two shuffles, so we can form row straight away
+			row_ = EmuMath::SIMD::shuffle<1, 3, 1, 3>(temp_0_, temp_1_);
+			vals_100_ = _mm_add_ps(vals_100_, _mm_mul_ps(row_, ty_0_));
+
+			// Z - One more batch of shuffles to extract the Z-coordinates of the gradients
+			temp_0_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_0_, gradient_1_);
+			temp_1_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_2_, gradient_3_);
+			vals_100_ = _mm_add_ps(vals_100_, _mm_mul_ps(row_, tz_0_));
 
 			// 101
-			perms_ = perm_101_;
-			gradient_ = _make_gradient<0>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_101_ = _mm_mul_ps(gradient_, tx_1_);
+			gradient_0_ = _gradients_128[perm_101_[0]];
+			gradient_1_ = _gradients_128[perm_101_[1]];
+			gradient_2_ = _gradients_128[perm_101_[2]];
+			gradient_3_ = _gradients_128[perm_101_[3]];
 
-			gradient_ = _make_gradient<1>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_101_ = _mm_add_ps(vals_101_, _mm_mul_ps(gradient_, ty_0_));
+			// X
+			temp_0_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_0_, gradient_1_);
+			temp_1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_2_, gradient_3_);
+			row_ = EmuMath::SIMD::shuffle<0, 2, 0, 2>(temp_0_, temp_1_);
+			vals_101_ = _mm_mul_ps(row_, tx_1_);
 
-			gradient_ = _make_gradient<2>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_101_ = _mm_add_ps(vals_101_, _mm_mul_ps(gradient_, tz_1_));
+			// Y
+			row_ = EmuMath::SIMD::shuffle<1, 3, 1, 3>(temp_0_, temp_1_);
+			vals_101_ = _mm_add_ps(vals_101_, _mm_mul_ps(row_, ty_0_));
+
+			// Z
+			temp_0_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_0_, gradient_1_);
+			temp_1_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_2_, gradient_3_);
+			vals_101_ = _mm_add_ps(vals_101_, _mm_mul_ps(row_, tz_1_));
 
 			// 110
-			perms_ = perm_110_;
-			gradient_ = _make_gradient<0>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_110_ = _mm_mul_ps(gradient_, tx_1_);
+			gradient_0_ = _gradients_128[perm_110_[0]];
+			gradient_1_ = _gradients_128[perm_110_[1]];
+			gradient_2_ = _gradients_128[perm_110_[2]];
+			gradient_3_ = _gradients_128[perm_110_[3]];
 
-			gradient_ = _make_gradient<1>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_110_ = _mm_add_ps(vals_110_, _mm_mul_ps(gradient_, ty_1_));
+			// X
+			temp_0_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_0_, gradient_1_);
+			temp_1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_2_, gradient_3_);
+			row_ = EmuMath::SIMD::shuffle<0, 2, 0, 2>(temp_0_, temp_1_);
+			vals_110_ = _mm_mul_ps(row_, tx_1_);
 
-			gradient_ = _make_gradient<2>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_110_ = _mm_add_ps(vals_110_, _mm_mul_ps(gradient_, tz_0_));
+			// Y
+			row_ = EmuMath::SIMD::shuffle<1, 3, 1, 3>(temp_0_, temp_1_);
+			vals_110_ = _mm_add_ps(vals_110_, _mm_mul_ps(row_, ty_1_));
+
+			// Z
+			temp_0_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_0_, gradient_1_);
+			temp_1_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_2_, gradient_3_);
+			vals_110_ = _mm_add_ps(vals_110_, _mm_mul_ps(row_, tz_0_));
 
 			// 111
-			perms_ = perm_111_;
-			gradient_ = _make_gradient<0>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_111_ = _mm_mul_ps(gradient_, tx_1_);
+			gradient_0_ = _gradients_128[perm_111_[0]];
+			gradient_1_ = _gradients_128[perm_111_[1]];
+			gradient_2_ = _gradients_128[perm_111_[2]];
+			gradient_3_ = _gradients_128[perm_111_[3]];
 
-			gradient_ = _make_gradient<1>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_111_ = _mm_add_ps(vals_111_, _mm_mul_ps(gradient_, ty_1_));
+			// X
+			temp_0_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_0_, gradient_1_);
+			temp_1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_2_, gradient_3_);
+			row_ = EmuMath::SIMD::shuffle<0, 2, 0, 2>(temp_0_, temp_1_);
+			vals_111_ = _mm_mul_ps(row_, tx_1_);
 
-			gradient_ = _make_gradient<2>(perms_[0], perms_[1], perms_[2], perms_[3]);
-			vals_111_ = _mm_add_ps(vals_111_, _mm_mul_ps(gradient_, tz_1_));
-		}
+			// Y
+			row_ = EmuMath::SIMD::shuffle<1, 3, 1, 3>(temp_0_, temp_1_);
+			vals_111_ = _mm_add_ps(vals_111_, _mm_mul_ps(row_, ty_1_));
 
-		template<std::size_t DimensionIndex_>
-		[[nodiscard]] inline __m128 _make_gradient(std::size_t i0_, std::size_t i1_, std::size_t i2_, std::size_t i3_)
-		{
-			return _mm_set_ps
-			(
-				_gradients[i3_ & _gradient_mask].at<DimensionIndex_>(),
-				_gradients[i2_ & _gradient_mask].at<DimensionIndex_>(),
-				_gradients[i1_ & _gradient_mask].at<DimensionIndex_>(),
-				_gradients[i0_ & _gradient_mask].at<DimensionIndex_>()
-			);
+			// Z
+			temp_0_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_0_, gradient_1_);
+			temp_1_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_2_, gradient_3_);
+			vals_111_ = _mm_add_ps(vals_111_, _mm_mul_ps(row_, tz_1_));
 		}
 
 		inline void _find_permutations_indices
@@ -339,14 +428,14 @@ namespace EmuMath::Functors
 				perm_10_ = static_cast<std::size_t>(permutations_[(perm_1_ + iy_0[i]) & mask_]);
 				perm_11_ = static_cast<std::size_t>(permutations_[(perm_1_ + iy_1[i]) & mask_]);
 
-				*(perm_000_ + i) = static_cast<std::size_t>(permutations_[(perm_00_ + iz_0[i]) & mask_]);
-				*(perm_001_ + i) = static_cast<std::size_t>(permutations_[(perm_00_ + iz_1[i]) & mask_]);
-				*(perm_010_ + i) = static_cast<std::size_t>(permutations_[(perm_01_ + iz_0[i]) & mask_]);
-				*(perm_011_ + i) = static_cast<std::size_t>(permutations_[(perm_01_ + iz_1[i]) & mask_]);
-				*(perm_100_ + i) = static_cast<std::size_t>(permutations_[(perm_10_ + iz_0[i]) & mask_]);
-				*(perm_101_ + i) = static_cast<std::size_t>(permutations_[(perm_10_ + iz_1[i]) & mask_]);
-				*(perm_110_ + i) = static_cast<std::size_t>(permutations_[(perm_11_ + iz_0[i]) & mask_]);
-				*(perm_111_ + i) = static_cast<std::size_t>(permutations_[(perm_11_ + iz_1[i]) & mask_]);
+				*(perm_000_ + i) = static_cast<std::size_t>(permutations_[(perm_00_ + iz_0[i]) & mask_]) & _gradient_mask;
+				*(perm_001_ + i) = static_cast<std::size_t>(permutations_[(perm_00_ + iz_1[i]) & mask_]) & _gradient_mask;
+				*(perm_010_ + i) = static_cast<std::size_t>(permutations_[(perm_01_ + iz_0[i]) & mask_]) & _gradient_mask;
+				*(perm_011_ + i) = static_cast<std::size_t>(permutations_[(perm_01_ + iz_1[i]) & mask_]) & _gradient_mask;
+				*(perm_100_ + i) = static_cast<std::size_t>(permutations_[(perm_10_ + iz_0[i]) & mask_]) & _gradient_mask;
+				*(perm_101_ + i) = static_cast<std::size_t>(permutations_[(perm_10_ + iz_1[i]) & mask_]) & _gradient_mask;
+				*(perm_110_ + i) = static_cast<std::size_t>(permutations_[(perm_11_ + iz_0[i]) & mask_]) & _gradient_mask;
+				*(perm_111_ + i) = static_cast<std::size_t>(permutations_[(perm_11_ + iz_1[i]) & mask_]) & _gradient_mask;
 			}
 		}
 
