@@ -152,6 +152,7 @@ namespace EmuMath::Functors
 			_mm_store_si128(reinterpret_cast<__m128i*>(ix_0.data()), ix_0_128_);
 
 			// Find the gradients we'll be making use of in interpolations
+			// --- No benefit from manually inlining this part within the function in release, so best to just keep this function cleaner
 			__m128 vals_000_, vals_001_, vals_010_, vals_011_, vals_100_, vals_101_, vals_110_, vals_111_;
 			_calculate_values_to_lerp
 			(
@@ -172,22 +173,24 @@ namespace EmuMath::Functors
 				vals_111_
 			);
 			
+			// Apply smooth (or fade) function to our weightings
 			tx_0_128_ = _smooth_t(tx_0_128_);
 			ty_0_128_ = _smooth_t(ty_0_128_);
 			tz_0_128_ = _smooth_t(tz_0_128_);
 
 			// Primary lerps
-			__m128 lerp_0_ = EmuMath::SIMD::vector_lerp(vals_000_, vals_100_, tx_0_128_);
-			__m128 lerp_1_ = EmuMath::SIMD::vector_lerp(vals_010_, vals_110_, tx_0_128_);
-			__m128 lerp_2_ = EmuMath::SIMD::vector_lerp(vals_001_, vals_101_, tx_0_128_);
-			__m128 lerp_3_ = EmuMath::SIMD::vector_lerp(vals_011_, vals_111_, tx_0_128_);
+			// --- Use fused lerps to skip 7 floating-point rounding operations
+			__m128 lerp_0_ = EmuMath::SIMD::vector_lerp_fused(vals_000_, vals_100_, tx_0_128_);
+			__m128 lerp_1_ = EmuMath::SIMD::vector_lerp_fused(vals_010_, vals_110_, tx_0_128_);
+			__m128 lerp_2_ = EmuMath::SIMD::vector_lerp_fused(vals_001_, vals_101_, tx_0_128_);
+			__m128 lerp_3_ = EmuMath::SIMD::vector_lerp_fused(vals_011_, vals_111_, tx_0_128_);
 
 			// Secondary lerps
-			lerp_0_ = EmuMath::SIMD::vector_lerp(lerp_0_, lerp_1_, ty_0_128_);
-			lerp_2_ = EmuMath::SIMD::vector_lerp(lerp_2_, lerp_3_, ty_0_128_);
+			lerp_0_ = EmuMath::SIMD::vector_lerp_fused(lerp_0_, lerp_1_, ty_0_128_);
+			lerp_2_ = EmuMath::SIMD::vector_lerp_fused(lerp_2_, lerp_3_, ty_0_128_);
 
 			// Final tertiary lerp
-			return EmuMath::SIMD::vector_lerp(lerp_0_, lerp_2_, tz_0_128_);
+			return EmuMath::SIMD::vector_lerp_fused(lerp_0_, lerp_2_, tz_0_128_);
 		}
 
 	private:
@@ -223,6 +226,7 @@ namespace EmuMath::Functors
 			__m128& vals_111_
 		)
 		{
+			// Find our permutation values; all will be initialised in the upcoming loop
 			std::size_t perm_000_[4];
 			std::size_t perm_001_[4];
 			std::size_t perm_010_[4];
@@ -231,8 +235,31 @@ namespace EmuMath::Functors
 			std::size_t perm_101_[4];
 			std::size_t perm_110_[4];
 			std::size_t perm_111_[4];
-			_find_permutations_indices(permutations_, perm_000_, perm_001_, perm_010_, perm_011_, perm_100_, perm_101_, perm_110_, perm_111_);
+			std::size_t perm_0_, perm_1_, perm_00_, perm_01_, perm_10_, perm_11_;
+			std::size_t mask_ = static_cast<std::size_t>(permutations_.MaxValue());
 
+			// One permutation per value per item; since we're working with 4 outputs, this means we need to loop 4 times
+			for (std::size_t i = 0; i < 4; ++i)
+			{
+				perm_0_ = static_cast<std::size_t>(permutations_[ix_0[i]]);
+				perm_1_ = static_cast<std::size_t>(permutations_[ix_1[i]]);
+
+				perm_00_ = static_cast<std::size_t>(permutations_[(perm_0_ + iy_0[i]) & mask_]);
+				perm_01_ = static_cast<std::size_t>(permutations_[(perm_0_ + iy_1[i]) & mask_]);
+				perm_10_ = static_cast<std::size_t>(permutations_[(perm_1_ + iy_0[i]) & mask_]);
+				perm_11_ = static_cast<std::size_t>(permutations_[(perm_1_ + iy_1[i]) & mask_]);
+
+				perm_000_[i] = static_cast<std::size_t>(permutations_[(perm_00_ + iz_0[i]) & mask_]) & _gradient_mask;
+				perm_001_[i] = static_cast<std::size_t>(permutations_[(perm_00_ + iz_1[i]) & mask_]) & _gradient_mask;
+				perm_010_[i] = static_cast<std::size_t>(permutations_[(perm_01_ + iz_0[i]) & mask_]) & _gradient_mask;
+				perm_011_[i] = static_cast<std::size_t>(permutations_[(perm_01_ + iz_1[i]) & mask_]) & _gradient_mask;
+				perm_100_[i] = static_cast<std::size_t>(permutations_[(perm_10_ + iz_0[i]) & mask_]) & _gradient_mask;
+				perm_101_[i] = static_cast<std::size_t>(permutations_[(perm_10_ + iz_1[i]) & mask_]) & _gradient_mask;
+				perm_110_[i] = static_cast<std::size_t>(permutations_[(perm_11_ + iz_0[i]) & mask_]) & _gradient_mask;
+				perm_111_[i] = static_cast<std::size_t>(permutations_[(perm_11_ + iz_1[i]) & mask_]) & _gradient_mask;
+			}
+
+			// Use discovered permutations to form gradient dot products for our output values
 			// 000
 			__m128 gradient_0_ = _gradients_128[perm_000_[0]];
 			__m128 gradient_1_ = _gradients_128[perm_000_[1]];
@@ -416,27 +443,7 @@ namespace EmuMath::Functors
 			std::size_t* perm_111_
 		) const
 		{
-			std::size_t perm_0_, perm_1_, perm_00_, perm_01_, perm_10_, perm_11_;
-			std::size_t mask_ = static_cast<std::size_t>(permutations_.MaxValue());
-			for (std::size_t i = 0; i < 4; ++i)
-			{
-				perm_0_ = static_cast<std::size_t>(permutations_[ix_0[i]]);
-				perm_1_ = static_cast<std::size_t>(permutations_[ix_1[i]]);
-
-				perm_00_ = static_cast<std::size_t>(permutations_[(perm_0_ + iy_0[i]) & mask_]);
-				perm_01_ = static_cast<std::size_t>(permutations_[(perm_0_ + iy_1[i]) & mask_]);
-				perm_10_ = static_cast<std::size_t>(permutations_[(perm_1_ + iy_0[i]) & mask_]);
-				perm_11_ = static_cast<std::size_t>(permutations_[(perm_1_ + iy_1[i]) & mask_]);
-
-				*(perm_000_ + i) = static_cast<std::size_t>(permutations_[(perm_00_ + iz_0[i]) & mask_]) & _gradient_mask;
-				*(perm_001_ + i) = static_cast<std::size_t>(permutations_[(perm_00_ + iz_1[i]) & mask_]) & _gradient_mask;
-				*(perm_010_ + i) = static_cast<std::size_t>(permutations_[(perm_01_ + iz_0[i]) & mask_]) & _gradient_mask;
-				*(perm_011_ + i) = static_cast<std::size_t>(permutations_[(perm_01_ + iz_1[i]) & mask_]) & _gradient_mask;
-				*(perm_100_ + i) = static_cast<std::size_t>(permutations_[(perm_10_ + iz_0[i]) & mask_]) & _gradient_mask;
-				*(perm_101_ + i) = static_cast<std::size_t>(permutations_[(perm_10_ + iz_1[i]) & mask_]) & _gradient_mask;
-				*(perm_110_ + i) = static_cast<std::size_t>(permutations_[(perm_11_ + iz_0[i]) & mask_]) & _gradient_mask;
-				*(perm_111_ + i) = static_cast<std::size_t>(permutations_[(perm_11_ + iz_1[i]) & mask_]) & _gradient_mask;
-			}
+			
 		}
 
 		std::array<int, 4> ix_0;
