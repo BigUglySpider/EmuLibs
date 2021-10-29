@@ -14,6 +14,15 @@
 
 namespace EmuMath
 {
+	/// <summary>
+	/// <para> Noise table that makes use of SIMD-optimised sample generation methods. </para>
+	/// <para> The MajorDimensionIndex_ must be a valid dimension index, where 0 is X, 1 is Y, and 2 is Z. </para>
+	/// <para> 
+	///		The MajorDimensionIndex_ identifies the dimension in which samples will be contiguously stored 
+	///		(as they will be separated to allow better access to large tables). 
+	/// </para>
+	/// <para> It is recommended to use a MajorDimensionIndex_ that best suits the largest dimension in which noise will be generated (e.g. Y for a 256x2048 table). </para>
+	/// </summary>
 	template<std::size_t NumDimensions_, std::size_t MajorDimensionIndex_ = NumDimensions_ - 1>
 	class FastNoiseTable
 	{
@@ -179,8 +188,8 @@ namespace EmuMath
 		}
 
 #pragma region GENERATION
-		template<EmuMath::NoiseType NoiseType_, class SampleProcessor_ = EmuMath::Functors::fast_noise_sample_processor_default>
-		inline bool GenerateNoise(const options_type& options_)
+		template<EmuMath::NoiseType NoiseType_, class SampleProcessor_>
+		inline bool GenerateNoise(const options_type& options_, SampleProcessor_ sample_processor_)
 		{
 			if (_valid_resolution(options_.table_resolution))
 			{
@@ -189,15 +198,16 @@ namespace EmuMath
 				// TODO: OTHER RESOLUTIONS
 				if (options_.use_fractal_noise)
 				{
-					_do_generation_128
+					using fractal_generator = EmuMath::Functors::fractal_noise_wrapper<EmuMath::Functors::make_fast_noise_3d<NoiseType_, __m128>, __m128>;
+					_do_generation_128<fractal_generator, SampleProcessor_&>
 					(
-						EmuMath::Functors::fractal_noise_wrapper<EmuMath::Functors::make_fast_noise_3d<NoiseType_, __m128>, __m128>
+						fractal_generator
 						(
 							options_.freq,
 							options_.permutation_info.MakePermutations(),
 							options_.fractal_noise_info
 						),
-						SampleProcessor_(),
+						sample_processor_,
 						options_.start_point,
 						options_.MakeStep()
 					);
@@ -222,6 +232,11 @@ namespace EmuMath
 			{
 				return false;
 			}
+		}
+		template<EmuMath::NoiseType NoiseType_, class SampleProcessor_ = EmuMath::Functors::fast_noise_sample_processor_default>
+		inline bool GenerateNoise(const options_type& options_)
+		{
+			return GenerateNoise<NoiseType_, SampleProcessor_>(options_, SampleProcessor_());
 		}
 #pragma endregion
 

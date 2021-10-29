@@ -369,7 +369,7 @@ int main()
 	(
 		noise_.MakeOptions
 		(
-			EmuMath::Vector<3, std::size_t>(1024, 1024, 4),
+			EmuMath::Vector<3, std::size_t>(1024, 1024, 1),
 			EmuMath::Vector<3, float>(0.0f, 0.0f, 0.0f),
 			EmuMath::Vector<3, float>(1.0f, 1.0f, 1.0f),
 			3.0f,
@@ -383,6 +383,8 @@ int main()
 	std::cout << "FINISHED SCALAR NOISE IN: " << std::chrono::duration<double, std::milli>(end_ - begin_).count() << "ms\n";
 	//WriteNoiseTableToPPM(noise_, noise_gradient_);
 
+
+
 	std::cout << "GENERATING FAST NOISE...\n";
 	EmuMath::FastNoiseTable<3, 0> fast_noise_;
 	begin_ = std::chrono::steady_clock::now();
@@ -390,7 +392,7 @@ int main()
 	(
 		fast_noise_.make_options
 		(
-			EmuMath::Vector<3, std::size_t>(1024, 1024, 4),
+			EmuMath::Vector<3, std::size_t>(1024, 1024, 1),
 			EmuMath::Vector<3, float>(0.0f, 0.0f, 0.0f),
 			EmuMath::Vector<3, float>(1.0f, 1.0f, 1.0f),
 			3.0f,
