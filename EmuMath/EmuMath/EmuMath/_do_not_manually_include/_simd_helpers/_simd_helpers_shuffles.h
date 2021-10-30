@@ -2,92 +2,107 @@
 #define EMU_MATH_SIMD_HELPERS_SHUFFLES_H_INC_ 1
 
 #include "_common_simd_helpers_includes.h"
+#include "_underlying_template_helpers/_simd_helpers_underlying_shuffle.h"
 
 namespace EmuMath::SIMD
 {
-	/// <summary>
-	/// <para> Creates a compile-time shuffle argument for a call to _mm_shuffle_ps, where X_ is the first item in memory and W_ is the last contiguous item in memory. </para>
-	/// <para> X_ and Y_ correlate to indices in argument a of a shuffle, Z_ and W_ correlate to indices in argument b of a shuffle. </para>
-	/// <para> As such, the result of a shuffle with this argument would be { a[X_}, a[Y_], b[Z_], b[W_] }. </para>
-	/// </summary>
-	template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_>
-	struct shuffle_arg
+	template<class Register_, std::size_t...Indices_>
+	struct shuffle_mask : public _underlying_simd_helpers::_shuffle_mask<Register_, Indices_...>
 	{
-		static_assert(X_ <= 3 && Y_ <= 3 && Z_ <= 3 && W_ <= 3, "Provided a shuffle argument parameter which does not match any index for a 4-dimensional SIMD vector.");
-		constexpr static unsigned int value = ((W_ << 6) | (Z_ << 4) | (Y_ << 2) | X_);
+		static constexpr bool is_valid = _underlying_simd_helpers::is_valid_shuffle_mask_instance
+		<
+			shuffle_mask<Register_, Indices_...>
+		>::value;
 	};
-	/// <summary> Compile-time shuffle argument for a call to _mm_shuffle_ps, where X_ is the first item in memory and W_ is the last contiguous item in memory. </summary>
-	template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_>
-	constexpr unsigned int shuffle_arg_v = shuffle_arg<X_, Y_, Z_, W_>::value;
 
-	/// <summary>
-	///	<para> Returns the result of a SIMD shuffle with the provided 2 operands, using the value of shuffle_arg with the passed template params as the third argument. </para>
-	/// <para> The resulting SIMD vector will be { a[X_}, a[Y_], b[Z_], b[W_] }. </para>
-	/// </summary>
-	/// <param name="a">Left-hand SIMD vector, accessed with the X_ and Y_ template arguments. </param>
-	/// <param name="b">Right-hand SIMD vector, accessed with the Z_ and W_ template arguments.</param>
-	/// <returns>Result of shuffling the passed two SIMD vectors based on the provided template arguments.</returns>
-	template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_>
-	[[nodiscard]] inline __m128 shuffle(const __m128 a, const __m128 b)
-	{
-		return _mm_shuffle_ps(a, b, shuffle_arg_v<X_, Y_, Z_, W_>);
-	}
-	/// <summary>
-	/// <para> Returns a SIMD vector shuffled with indices correlating to the provided arguments. </para>
-	/// <para> X_ through W_ refer to indices in order in the resultant vector, and take values from the indices of the passed vector ab. </para>
-	/// <para> The resulting SIMD vector will be { ab[X_], ab[Y_], ab[Z_], ab[W_] }. </para>
-	/// </summary>
-	/// <param name="ab">SIMD vector to return a shuffled variant of. Used as both vector arguments in a call to _mm_shuffle_ps.</param>
-	/// <returns>Shuffled variant of the passed SIMD vector, using the passed template arguments to identify indices for the output vector.	</returns>
-	template<std::size_t X_, std::size_t Y_, std::size_t Z_, std::size_t W_>
-	[[nodiscard]] inline __m128 shuffle(const __m128 ab)
-	{
-		return _mm_shuffle_ps(ab, ab, shuffle_arg_v<X_, Y_, Z_, W_>);
-	}
-	/// <summary>
-	/// <para> Returns a SIMD vector shuffled so that all indices correlate to the provided index within the passed vector. </para>
-	/// <para> The resulting SIMD vector will be { ab[Index_], ab[Index_], ab[Index_], ab[Index_] }. </para>
-	/// </summary>
-	/// <param name="ab">SIMD vector to perform the shuffle on.</param>
-	/// <returns>Passed SIMD vector shuffled so that all elements match the provided index.</returns>
-	template<std::size_t Index_>
-	[[nodiscard]] inline __m128 shuffle(__m128 ab)
-	{
-		return _mm_shuffle_ps(ab, ab, shuffle_arg_v<Index_, Index_, Index_, Index_>);
-	}
+#pragma region SHUFFLE_MASK_ALIASES
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
+	using shuffle_mask_m128 = shuffle_mask<__m128, I0_, I1_, I2_, I3_>;
 
-	template<>
-	[[nodiscard]] inline __m128 shuffle<0, 0, 2, 2>(__m128 ab)
-	{
-		return _mm_moveldup_ps(ab);
-	}
-	
-	template<>
-	[[nodiscard]] inline __m128 shuffle<1, 1, 3, 3>(__m128 ab)
-	{
-		return _mm_movehdup_ps(ab);
-	}
+	template<std::size_t I0_, std::size_t I1_>
+	using shuffle_mask_m128d = shuffle_mask<__m128d, I0_, I1_>;
 
-	template<>
-	[[nodiscard]] inline __m128 shuffle<0, 1, 0, 1>(__m128 a, __m128 b)
-	{
-		return _mm_movelh_ps(a, b);
-	}
-	template<>
-	[[nodiscard]] inline __m128 shuffle<0, 1, 0, 1>(__m128 ab)
-	{
-		return _mm_movelh_ps(ab, ab);
-	}
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
+	using shuffle_mask_m128i16 = shuffle_mask<__m128i, I0_, I1_, I2_, I3_>;
 
-	template<>
-	[[nodiscard]] inline __m128 shuffle<2, 3, 2, 3>(__m128 a, __m128 b)
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
+	using shuffle_mask_m128i32 = shuffle_mask<__m128i, I0_, I1_, I2_, I3_>;
+
+	template
+	<
+		std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, std::size_t I4_, std::size_t I5_, std::size_t I6_, std::size_t I7_,
+		std::size_t I8_, std::size_t I9_, std::size_t I10_, std::size_t I11_, std::size_t I12_, std::size_t I13_, std::size_t I14_, std::size_t I15_
+	>
+	using shuffle_mask_m128i8 = shuffle_mask<__m128i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>;
+
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
+	using shuffle_mask_m256 = shuffle_mask<__m256, I0_, I1_, I2_, I3_>;
+
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
+	using shuffle_mask_m256d = shuffle_mask<__m256d, I0_, I1_, I2_, I3_>;
+
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
+	using shuffle_mask_m256i16 = shuffle_mask<__m256i, I0_, I1_, I2_, I3_>;
+
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
+	using shuffle_mask_m256i32 = shuffle_mask<__m256i, I0_, I1_, I2_, I3_>;
+
+	template
+	<
+		std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, std::size_t I4_, std::size_t I5_, std::size_t I6_, std::size_t I7_,
+		std::size_t I8_, std::size_t I9_, std::size_t I10_, std::size_t I11_, std::size_t I12_, std::size_t I13_, std::size_t I14_, std::size_t I15_,
+		std::size_t I16_, std::size_t I17_, std::size_t I18_, std::size_t I19_, std::size_t I20_, std::size_t I21_, std::size_t I22_, std::size_t I23_,
+		std::size_t I24_, std::size_t I25_, std::size_t I26_, std::size_t I27_, std::size_t I28_, std::size_t I29_, std::size_t I30_, std::size_t I31_
+	>
+	using shuffle_mask_m256i8 = shuffle_mask
+	<
+		__m256i,
+		I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_,
+		I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_
+	>;
+
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
+	using shuffle_mask_m512 = shuffle_mask<__m512, I0_, I1_, I2_, I3_>;
+
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, std::size_t I4_, std::size_t I5_, std::size_t I6_, std::size_t I7_>
+	using shuffle_mask_m512d = shuffle_mask<__m512d, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>;
+
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
+	using shuffle_mask_m512i16 = shuffle_mask<__m512i, I0_, I1_, I2_, I3_>;
+
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
+	using shuffle_mask_m512i32 = shuffle_mask<__m512i, I0_, I1_, I2_, I3_>;
+
+	template
+	<
+		std::size_t I0_,  std::size_t I1_,  std::size_t I2_,  std::size_t I3_,  std::size_t I4_,  std::size_t I5_,  std::size_t I6_,  std::size_t I7_,
+		std::size_t I8_,  std::size_t I9_,  std::size_t I10_, std::size_t I11_, std::size_t I12_, std::size_t I13_, std::size_t I14_, std::size_t I15_,
+		std::size_t I16_, std::size_t I17_, std::size_t I18_, std::size_t I19_, std::size_t I20_, std::size_t I21_, std::size_t I22_, std::size_t I23_,
+		std::size_t I24_, std::size_t I25_, std::size_t I26_, std::size_t I27_, std::size_t I28_, std::size_t I29_, std::size_t I30_, std::size_t I31_,
+		std::size_t I32_, std::size_t I33_, std::size_t I34_, std::size_t I35_, std::size_t I36_, std::size_t I37_, std::size_t I38_, std::size_t I39_,
+		std::size_t I40_, std::size_t I41_, std::size_t I42_, std::size_t I43_, std::size_t I44_, std::size_t I45_, std::size_t I46_, std::size_t I47_,
+		std::size_t I48_, std::size_t I49_, std::size_t I50_, std::size_t I51_, std::size_t I52_, std::size_t I53_, std::size_t I54_, std::size_t I55_,
+		std::size_t I56_, std::size_t I57_, std::size_t I58_, std::size_t I59_, std::size_t I60_, std::size_t I61_, std::size_t I62_, std::size_t I63_
+	>
+	using shuffle_mask_m512i8 = shuffle_mask
+	<
+		__m512i,
+		I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_,  I8_,  I9_,  I10_, I11_, I12_, I13_, I14_, I15_,
+		I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_,
+		I32_, I33_, I34_, I35_, I36_, I37_, I38_, I39_, I40_, I41_, I42_, I43_, I44_, I45_, I46_, I47_,
+		I48_, I49_, I50_, I51_, I52_, I53_, I54_, I55_, I56_, I57_, I58_, I59_, I60_, I61_, I62_, I63_
+	>;
+#pragma endregion
+
+	template<std::size_t...Indices_, class Register_>
+	[[nodiscard]] inline Register_ shuffle(Register_ ab_)
 	{
-		return _mm_movehl_ps(b, a);
+		return _underlying_simd_helpers::_execute_shuffle<Indices_...>(ab_);
 	}
-	template<>
-	[[nodiscard]] inline __m128 shuffle<2, 3, 2, 3>(__m128 ab)
+	template<std::size_t...Indices_, class Register_>
+	[[nodiscard]] inline Register_ shuffle(Register_ a_, Register_ b_)
 	{
-		return _mm_movehl_ps(ab, ab);
+		return _underlying_simd_helpers::_execute_shuffle<Indices_...>(a_, b_);
 	}
 }
 

@@ -219,6 +219,51 @@ namespace EmuMath::SIMD::TMP
 	};
 	template<class Register_>
 	static constexpr bool is_floating_point_simd_register_v = is_floating_point_simd_register<Register_>::value;
+
+	template<class Register_>
+	struct floating_point_register_element_count
+	{
+		// Formed as a recursive call on itself if the passed type is a FP SIMD register, since unqualified specialisations are used for value sets.
+
+		static constexpr std::size_t value = std::conditional_t
+		<
+			is_floating_point_simd_register_v<Register_>,
+			floating_point_register_element_count<typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type>,
+			0
+		>;
+	};
+	template<>
+	struct floating_point_register_element_count<__m128>
+	{
+		static constexpr std::size_t value = 4;
+	};
+	template<>
+	struct floating_point_register_element_count<__m128d>
+	{
+		static constexpr std::size_t value = 2;
+	};
+	template<>
+	struct floating_point_register_element_count<__m256>
+	{
+		static constexpr std::size_t value = 8;
+	};
+	template<>
+	struct floating_point_register_element_count<__m256d>
+	{
+		static constexpr std::size_t value = 4;
+	};
+	template<>
+	struct floating_point_register_element_count<__m512>
+	{
+		static constexpr std::size_t value = 16;
+	};
+	template<>
+	struct floating_point_register_element_count<__m512d>
+	{
+		static constexpr std::size_t value = 8;
+	};
+	template<class Register_>
+	static constexpr std::size_t floating_point_register_element_count_v = floating_point_register_element_count<Register_>::value;
 }
 
 #endif

@@ -154,6 +154,29 @@ namespace EmuCore::TMPHelpers
 		>
 	>;
 
+	template<std::size_t NumBytes_>
+	using int_of_size_t = std::conditional_t
+	<
+		NumBytes_ == sizeof(std::int8_t),
+		std::int8_t,
+		std::conditional_t
+		<
+			NumBytes_ == sizeof(std::int16_t),
+			std::int16_t,
+			std::conditional_t
+			<
+				NumBytes_ == sizeof(std::int32_t),
+				std::int32_t,
+				std::conditional_t
+				<
+					NumBytes_ == sizeof(std::int64_t),
+					std::int64_t,
+					std::false_type
+				>
+			>
+		>
+	>;
+
 	template<typename T>
 	struct next_size_up
 	{

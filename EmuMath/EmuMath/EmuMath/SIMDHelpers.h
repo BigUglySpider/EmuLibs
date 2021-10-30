@@ -12,4 +12,6 @@
 #include "_do_not_manually_include/_simd_helpers/_simd_helpers_template_funcs.h"
 #include "_do_not_manually_include/_simd_helpers/_simd_helpers_tmp.h"
 
+#include "_do_not_manually_include/_simd_helpers/_simd_helpers_template_funcs.h"
+
 #endif

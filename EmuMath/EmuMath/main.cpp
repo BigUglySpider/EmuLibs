@@ -158,11 +158,10 @@ inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_)
 	}
 }
 
-template<std::size_t num_dimensions, typename FP_, class GradientChannel_>
-inline void WriteNoiseTableToPPM(const EmuMath::NoiseTable<num_dimensions, FP_>& noise_table_, const EmuMath::Gradient<GradientChannel_>& gradient_)
+template<class NoiseTable_, class GradientChannel_>
+inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const EmuMath::Gradient<GradientChannel_>& gradient_)
 {
-	EmuMath::Vector3<FP_> white_(255.0f, 255.0f, 255.0f);
-
+	constexpr std::size_t num_dimensions = NoiseTable_::num_dimensions;
 	if constexpr (num_dimensions == 3)
 	{
 		EmuMath::Vector3<std::size_t> resolution_ = noise_table_.size();
@@ -179,8 +178,6 @@ inline void WriteNoiseTableToPPM(const EmuMath::NoiseTable<num_dimensions, FP_>&
 			{
 				for (std::size_t x = 0; x < resolution_.x; ++x)
 				{
-					// Clamp is merely to cancel out fp-rounding errors
-					//EmuMath::Vector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.at(x, y, z)).Clamp(0.0f, 255.0f));
 					EmuMath::ColourRGB<std::uint8_t> colour_byte_ = gradient_.GetColour<std::uint8_t>(noise_table_.at(x, y, z));
 					out_ppm_ << (char)colour_byte_.R() << (char)colour_byte_.G() << (char)colour_byte_.B();
 				}
@@ -363,6 +360,18 @@ int main()
 	noise_gradient_.ReverseColours();
 	std::cout << noise_gradient_ << "\n";
 
+	__m128 some_a_128_ = _mm_set_ps(3.0f, 2.0f, 1.0f, 0.0f);
+	__m128 some_b_128_ = _mm_set_ps(7.0f, 6.0f, 5.0f, 4.0f);
+	std::cout << EmuMath::FastVector4f(EmuMath::SIMD::_underlying_simd_helpers::_execute_shuffle<1, 1, 3, 3>(some_a_128_, some_b_128_)) << "\n";
+
+	EmuMath::SIMD::append_simd_vector_to_stream<8>
+	(
+		std::cout,
+		_mm256_set_epi8(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31)
+	) << "\n";
+
+	system("pause");
+
 	std::cout << "GENERATING SCALAR NOISE...\n";
 	auto begin_ = std::chrono::steady_clock::now();
 	noise_.GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::noise_sample_processor_perlin_normalise<3>>
@@ -382,7 +391,6 @@ int main()
 	auto end_ = std::chrono::steady_clock::now();
 	std::cout << "FINISHED SCALAR NOISE IN: " << std::chrono::duration<double, std::milli>(end_ - begin_).count() << "ms\n";
 	//WriteNoiseTableToPPM(noise_, noise_gradient_);
-
 
 
 	std::cout << "GENERATING FAST NOISE...\n";
@@ -405,7 +413,7 @@ int main()
 	end_ = std::chrono::steady_clock::now();
 	std::cout << "FINISHED FAST NOISE IN: " << std::chrono::duration<double, std::milli>(end_ - begin_).count() << "ms\n";
 
-	WriteNoiseTableToPPM(fast_noise_);
+	WriteNoiseTableToPPM(noise_, noise_gradient_);
 
 	EmuMath::Functors::make_fast_noise_3d<EmuMath::NoiseType::PERLIN, __m128> fast_generator_;
 	__m128 test_128_ = fast_generator_(_mm_set1_ps(0.4f), _mm_set1_ps(0.0f), _mm_set1_ps(1.0f), _mm_set1_ps(16.0f), _mm_set1_epi32(1023), EmuMath::NoisePermutations(1024, 0U));

@@ -248,6 +248,12 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_shuffles.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_template_funcs.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_tmp.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_underlying_template_helpers\_common_underlying_simd_template_helper_includes.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_underlying_template_helpers\_simd_helpers_underlying_set.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_underlying_template_helpers\_simd_helpers_underlying_shuffle.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_underlying_template_helpers\_simd_helpers_underlying_shuffle_masks.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_underlying_template_helpers\_simd_helpers_underlying_stream.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_underlying_template_helpers\_simd_helpers_underlying_get.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\FastVector4f.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\Vector2.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\Vector3.h" />
