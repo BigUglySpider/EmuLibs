@@ -370,6 +370,15 @@ int main()
 		_mm256_set_epi8(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31)
 	) << "\n";
 
+
+	__m256i _8_bit_256_ = _mm256_setr_epi8    (1,  2,  3,  4,  5,  6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32);
+	__m256i _8_bit_mul_256_ = _mm256_setr_epi8(32, 31, 30, 29, 28, 1, 2, 3, 4, 10, 5,  2,  1,  3,  4,  4,  5,  2,  6,  5,  4,  3,  2,  1,  1,  0,  3,  4,  5,  1,  2,  3);
+	EmuMath::SIMD::append_simd_vector_to_stream<8, false>
+	(
+		std::cout,
+		EmuMath::SIMD::_underlying_simd_helpers::_mul_all_int<8>(_8_bit_256_, _8_bit_mul_256_)
+	);
+
 	system("pause");
 
 	std::cout << "GENERATING SCALAR NOISE...\n";
