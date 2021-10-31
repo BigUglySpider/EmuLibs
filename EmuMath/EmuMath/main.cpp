@@ -443,7 +443,7 @@ int main()
 	end_ = std::chrono::steady_clock::now();
 	std::cout << "FINISHED FAST NOISE IN: " << std::chrono::duration<double, std::milli>(end_ - begin_).count() << "ms\n";
 
-	WriteNoiseTableToPPM(noise_, noise_gradient_);
+	WriteNoiseTableToPPM(fast_noise_, noise_gradient_);
 
 	EmuMath::Functors::make_fast_noise_3d<EmuMath::NoiseType::PERLIN, __m128> fast_generator_;
 	__m128 test_128_ = fast_generator_(_mm_set1_ps(0.4f), _mm_set1_ps(0.0f), _mm_set1_ps(1.0f), _mm_set1_ps(16.0f), _mm_set1_epi32(1023), EmuMath::NoisePermutations(1024, 0U));

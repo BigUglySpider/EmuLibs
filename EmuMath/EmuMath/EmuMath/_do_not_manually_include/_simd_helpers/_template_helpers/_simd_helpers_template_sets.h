@@ -7,7 +7,7 @@
 namespace EmuMath::SIMD
 {
 	template<class Register_, std::size_t ElementWidthIfInt_ = 32, typename...Args_>
-	[[nodiscard]] inline Register_ simd_set(Args_&&...args_)
+	[[nodiscard]] inline Register_ set(Args_&&...args_)
 	{
 		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
 		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
@@ -19,13 +19,26 @@ namespace EmuMath::SIMD
 			}
 			else
 			{
-				// Integral
 				return _underlying_simd_helpers::_set_int<Register_, ElementWidthIfInt_>(args_...);
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuMath::SIMD::simd_set with an unsupported type as the passed Register_.");
+			static_assert(false, "Attempted to perform EmuMath::SIMD::set with an unsupported type as the passed Register_.");
+		}
+	}
+
+	template<class Register_, std::size_t ElementWidthIfInt_ = 32, typename Val_>
+	[[nodiscard]] inline Register_ set1(const Val_& val_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _underlying_simd_helpers::_set1<Register_, ElementWidthIfInt_>(val_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform EmuMath::SIMD::set1 with an unsupported type as the passed Register_.");
 		}
 	}
 }

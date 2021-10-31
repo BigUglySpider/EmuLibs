@@ -294,18 +294,18 @@ namespace EmuMath
 				end_store_batch_ -= end_store_batch_ % 4;
 
 
-				__m128 points_x_ = _mm_set1_ps(start_.at<0>());
-				__m128 points_y_ = _mm_set1_ps(start_.at<1>());
-				__m128 points_z_ = _mm_set1_ps(start_.at<2>());
-				__m128 step_x_ = _mm_set1_ps(step_.at<0>());
-				__m128 step_y_ = _mm_set1_ps(step_.at<1>());
-				__m128 step_z_ = _mm_set1_ps(step_.at<2>());
+				__m128 points_x_ = EmuMath::SIMD::set1<__m128>(start_.at<0>());
+				__m128 points_y_ = EmuMath::SIMD::set1<__m128>(start_.at<1>());
+				__m128 points_z_ = EmuMath::SIMD::set1<__m128>(start_.at<2>());
+				__m128 step_x_ = EmuMath::SIMD::set1<__m128>(step_.at<0>());
+				__m128 step_y_ = EmuMath::SIMD::set1<__m128>(step_.at<1>());
+				__m128 step_z_ = EmuMath::SIMD::set1<__m128>(step_.at<2>());
 
 				if constexpr (major_dimension == 0)
 				{
-					__m128 start_x_ = _mm_add_ps(points_x_, _mm_mul_ps(step_x_, _mm_set_ps(3.0f, 2.0f, 1.0f, 0.0f)));
+					__m128 start_x_ = EmuMath::SIMD::add(points_x_, EmuMath::SIMD::mul_all(step_x_, EmuMath::SIMD::set<__m128>(3.0f, 2.0f, 1.0f, 0.0f)));
 					__m128 start_z_ = points_z_;
-					step_x_ = _mm_mul_ps(step_x_, _mm_set1_ps(4.0f));
+					step_x_ = EmuMath::SIMD::mul(step_x_, EmuMath::SIMD::set1<__m128>(4.0f));
 
 					for (std::size_t y = 0; y < end_y_; ++y)
 					{
@@ -321,19 +321,19 @@ namespace EmuMath
 							for (; x < end_store_batch_; x += 4)
 							{
 								_mm_store_ps(&(layer_1_[x]), sample_processor_(generator_(points_x_, points_y_, points_z_)));
-								points_x_ = _mm_add_ps(points_x_, step_x_);
+								points_x_ = EmuMath::SIMD::add(points_x_, step_x_);
 							}
 							_finish_major_segment_partial(generator_, sample_processor_, layer_1_, points_x_, points_y_, points_z_, x, end_x_);
-							points_z_ = _mm_add_ps(points_z_, step_z_);
+							points_z_ = EmuMath::SIMD::add(points_z_, step_z_);
 						}
-						points_y_ = _mm_add_ps(points_y_, step_y_);
+						points_y_ = EmuMath::SIMD::add(points_y_, step_y_);
 					}
 				}
 				else if constexpr (major_dimension == 1)
 				{
-					__m128 start_y_ = _mm_add_ps(points_y_, _mm_mul_ps(step_y_, _mm_set_ps(3.0f, 2.0f, 1.0f, 0.0f)));
+					__m128 start_y_ = EmuMath::SIMD::add(points_y_, EmuMath::SIMD::mul_all(step_y_, EmuMath::SIMD::set<__m128>(3.0f, 2.0f, 1.0f, 0.0f)));
 					__m128 start_z_ = points_z_;
-					step_y_ = _mm_mul_ps(step_y_, _mm_set1_ps(4.0f));
+					step_y_ = _mm_mul_ps(step_y_, EmuMath::SIMD::set1<__m128>(4.0f));
 
 					for (std::size_t x = 0; x < end_x_; ++x)
 					{
@@ -349,19 +349,19 @@ namespace EmuMath
 							for (; y < end_store_batch_; y += 4)
 							{
 								_mm_store_ps(&(layer_1_[y]), sample_processor_(generator_(points_x_, points_y_, points_z_)));
-								points_y_ = _mm_add_ps(points_y_, step_y_);
+								points_y_ = EmuMath::SIMD::add(points_y_, step_y_);
 							}
 							_finish_major_segment_partial(generator_, sample_processor_, layer_1_, points_x_, points_y_, points_z_, y, end_y_);
-							points_z_ = _mm_add_ps(points_z_, step_z_);
+							points_z_ = EmuMath::SIMD::add(points_z_, step_z_);
 						}
-						points_x_ = _mm_add_ps(points_x_, step_x_);
+						points_x_ = EmuMath::SIMD::add(points_x_, step_x_);
 					}
 				}
 				else
 				{
 					__m128 start_y_ = points_y_;
-					__m128 start_z_ = _mm_add_ps(points_z_, _mm_mul_ps(step_z_, _mm_set_ps(3.0f, 2.0f, 1.0f, 0.0f)));
-					step_z_ = _mm_mul_ps(step_z_, _mm_set1_ps(4.0f));
+					__m128 start_z_ = EmuMath::SIMD::add(points_z_, EmuMath::SIMD::mul(step_z_, EmuMath::SIMD::set<__m128>(3.0f, 2.0f, 1.0f, 0.0f)));
+					step_z_ = _mm_mul_ps(step_z_, EmuMath::SIMD::set1<__m128>(4.0f));
 
 					for (std::size_t x = 0; x < end_x_; ++x)
 					{
@@ -377,12 +377,12 @@ namespace EmuMath
 							for (; z < end_store_batch_; z += 4)
 							{
 								_mm_store_ps(&(layer_1_[z]), sample_processor_(generator_(points_x_, points_y_, points_z_)));
-								points_z_ = _mm_add_ps(points_z_, step_z_);
+								points_z_ = EmuMath::SIMD::add(points_z_, step_z_);
 							}
 							_finish_major_segment_partial(generator_, sample_processor_, layer_1_, points_x_, points_y_, points_z_, z, end_z_);
-							points_y_ = _mm_add_ps(points_y_, step_y_);
+							points_y_ = EmuMath::SIMD::add(points_y_, step_y_);
 						}
-						points_x_ = _mm_add_ps(points_x_, step_x_);
+						points_x_ = EmuMath::SIMD::add(points_x_, step_x_);
 					}
 				}
 			}
