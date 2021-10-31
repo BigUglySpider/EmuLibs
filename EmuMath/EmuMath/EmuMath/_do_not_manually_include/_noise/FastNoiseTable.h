@@ -303,7 +303,7 @@ namespace EmuMath
 
 				if constexpr (major_dimension == 0)
 				{
-					__m128 start_x_ = EmuMath::SIMD::add(points_x_, EmuMath::SIMD::mul_all(step_x_, EmuMath::SIMD::set<__m128>(3.0f, 2.0f, 1.0f, 0.0f)));
+					__m128 start_x_ = EmuMath::SIMD::add(points_x_, EmuMath::SIMD::mul_all(step_x_, EmuMath::SIMD::setr_incrementing<__m128, 0>()));
 					__m128 start_z_ = points_z_;
 					step_x_ = EmuMath::SIMD::mul(step_x_, EmuMath::SIMD::set1<__m128>(4.0f));
 
@@ -331,9 +331,9 @@ namespace EmuMath
 				}
 				else if constexpr (major_dimension == 1)
 				{
-					__m128 start_y_ = EmuMath::SIMD::add(points_y_, EmuMath::SIMD::mul_all(step_y_, EmuMath::SIMD::set<__m128>(3.0f, 2.0f, 1.0f, 0.0f)));
+					__m128 start_y_ = EmuMath::SIMD::add(points_y_, EmuMath::SIMD::mul_all(step_y_, EmuMath::SIMD::setr_incrementing<__m128, 0>()));
 					__m128 start_z_ = points_z_;
-					step_y_ = _mm_mul_ps(step_y_, EmuMath::SIMD::set1<__m128>(4.0f));
+					step_y_ = EmuMath::SIMD::mul(step_y_, EmuMath::SIMD::set1<__m128>(4.0f));
 
 					for (std::size_t x = 0; x < end_x_; ++x)
 					{
@@ -360,8 +360,8 @@ namespace EmuMath
 				else
 				{
 					__m128 start_y_ = points_y_;
-					__m128 start_z_ = EmuMath::SIMD::add(points_z_, EmuMath::SIMD::mul(step_z_, EmuMath::SIMD::set<__m128>(3.0f, 2.0f, 1.0f, 0.0f)));
-					step_z_ = _mm_mul_ps(step_z_, EmuMath::SIMD::set1<__m128>(4.0f));
+					__m128 start_z_ = EmuMath::SIMD::add(points_z_, EmuMath::SIMD::mul(step_z_, EmuMath::SIMD::setr_incrementing<__m128, 0>()));
+					step_z_ = EmuMath::SIMD::mul(step_z_, EmuMath::SIMD::set1<__m128>(4.0f));
 
 					for (std::size_t x = 0; x < end_x_; ++x)
 					{

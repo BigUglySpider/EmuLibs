@@ -399,7 +399,7 @@ int main()
 		std::cout,
 		EmuMath::SIMD::_underlying_simd_helpers::_rem_int<32, true>(mod_a_256_, mod_b_256_)
 	) << "\n";
-
+	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, EmuMath::SIMD::setallone<__m256>()) << "\n";
 	system("pause");
 
 	std::cout << "GENERATING SCALAR NOISE...\n";
