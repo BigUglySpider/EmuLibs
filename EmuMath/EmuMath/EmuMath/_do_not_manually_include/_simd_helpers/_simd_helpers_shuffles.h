@@ -2,7 +2,7 @@
 #define EMU_MATH_SIMD_HELPERS_SHUFFLES_H_INC_ 1
 
 #include "_common_simd_helpers_includes.h"
-#include "_underlying_template_helpers/_simd_helpers_underlying_shuffle.h"
+#include "_template_helpers/_underlying_template_helpers/_simd_helpers_underlying_shuffle.h"
 
 namespace EmuMath::SIMD
 {

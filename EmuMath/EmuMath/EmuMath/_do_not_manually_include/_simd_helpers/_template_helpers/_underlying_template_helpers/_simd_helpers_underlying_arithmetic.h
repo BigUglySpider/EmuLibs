@@ -2,6 +2,9 @@
 #define EMU_MATH_SIMD_HELPERS_UNDERLYING_ARITHMETIC_H_INC_ 1
 
 #include "_common_underlying_simd_template_helper_includes.h"
+#include "_simd_helpers_underlying_bitwise.h"
+#include "_simd_helpers_underlying_cmp.h"
+#include "_simd_helpers_underlying_set.h"
 
 namespace EmuMath::SIMD::_underlying_simd_helpers
 {
@@ -673,6 +676,220 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		{
 			static_assert(false, "Attempted to perform division of integral SIMD registers via EmuMath SIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
 		}
+	}
+#pragma endregion
+
+#pragma region MOD_FUNCS
+	template<class Register_>
+	[[nodiscard]] inline Register_ _mod_fp(Register_ lhs_, Register_ rhs_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_fmod_ps(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_fmod_ps(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			{
+				return _mm512_fmod_ps(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_fmod_pd(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_fmod_pd(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			{
+				return _mm512_fmod_pd(lhs_, rhs_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform modulo division of floating-point SIMD registers via EmuMath SIMD helpers, but the provided Register_ type was not a supported floating-point SIMD register.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform modulo division of floating-point SIMD registers via EmuMath SIMD helpers, but the provided Register_ type is not a supported SIMD register.");
+		}
+	}
+
+	template<std::size_t PerElementWidth_, bool Signed_, class Register_>
+	[[nodiscard]] inline Register_ _rem_int(Register_ lhs_, Register_ rhs_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (EmuMath::SIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
+			{
+				if constexpr (std::is_same_v<register_type_uq, __m128i>)
+				{
+					if constexpr (PerElementWidth_ == 8)
+					{
+						if constexpr (Signed_)
+						{
+							return _mm_rem_epi8(lhs_, rhs_);
+						}
+						else
+						{
+							return _mm_rem_epu8(lhs_, rhs_);
+						}
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						if constexpr (Signed_)
+						{
+							return _mm_rem_epi16(lhs_, rhs_);
+						}
+						else
+						{
+							return _mm_rem_epu16(lhs_, rhs_);
+						}
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						if constexpr (Signed_)
+						{
+							return _mm_rem_epi32(lhs_, rhs_);
+						}
+						else
+						{
+							return _mm_rem_epu32(lhs_, rhs_);
+						}
+					}
+					else
+					{
+						if constexpr (Signed_)
+						{
+							return _mm_rem_epi64(lhs_, rhs_);
+						}
+						else
+						{
+							return _mm_rem_epu64(lhs_, rhs_);
+						}
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, __m256i>)
+				{
+					if constexpr (PerElementWidth_ == 8)
+					{
+						if constexpr (Signed_)
+						{
+							return _mm256_rem_epi8(lhs_, rhs_);
+						}
+						else
+						{
+							return _mm256_rem_epu8(lhs_, rhs_);
+						}
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						if constexpr (Signed_)
+						{
+							return _mm256_rem_epi16(lhs_, rhs_);
+						}
+						else
+						{
+							return _mm256_rem_epu16(lhs_, rhs_);
+						}
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						if constexpr (Signed_)
+						{
+							return _mm256_rem_epi32(lhs_, rhs_);
+						}
+						else
+						{
+							return _mm256_rem_epu32(lhs_, rhs_);
+						}
+					}
+					else
+					{
+						if constexpr (Signed_)
+						{
+							return _mm256_rem_epi64(lhs_, rhs_);
+						}
+						else
+						{
+							return _mm256_rem_epu64(lhs_, rhs_);
+						}
+					}
+				}
+				else if constexpr (std::is_same_v<register_type_uq, __m512i>)
+				{
+					if constexpr (PerElementWidth_ == 8)
+					{
+						if constexpr (Signed_)
+						{
+							return _mm512_rem_epi8(lhs_, rhs_);
+						}
+						else
+						{
+							return _mm512_rem_epu8(lhs_, rhs_);
+						}
+					}
+					else if constexpr (PerElementWidth_ == 16)
+					{
+						if constexpr (Signed_)
+						{
+							return _mm512_rem_epi16(lhs_, rhs_);
+						}
+						else
+						{
+							return _mm512_rem_epu16(lhs_, rhs_);
+						}
+					}
+					else if constexpr (PerElementWidth_ == 32)
+					{
+						if constexpr (Signed_)
+						{
+							return _mm512_rem_epi32(lhs_, rhs_);
+						}
+						else
+						{
+							return _mm512_rem_epu32(lhs_, rhs_);
+						}
+					}
+					else
+					{
+						if constexpr (Signed_)
+						{
+							return _mm512_rem_epi64(lhs_, rhs_);
+						}
+						else
+						{
+							return _mm512_rem_epu64(lhs_, rhs_);
+						}
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to perform remainder division of integral SIMD registers via EmuMath SIMD helpers, but provided an unsupported integral SIMD register.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform remainder division of integral SIMD registers via EmuMath SIMD helpers, but provided an invalid PerElementWidth_.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform remainder division of integral SIMD registers via EmuMath SIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
+		}
+	}
+
+	template<std::size_t PerElementWidth_, bool Signed_, class Register_>
+	[[nodiscard]] inline Register_ _mod_int(Register_ lhs_, Register_ rhs_)
+	{
+		return _rem_int<PerElementWidth_, Signed_, Register_>(lhs_, rhs_);
 	}
 #pragma endregion
 }

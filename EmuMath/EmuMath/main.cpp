@@ -377,7 +377,28 @@ int main()
 	(
 		std::cout,
 		EmuMath::SIMD::_underlying_simd_helpers::_mul_all_int<8>(_8_bit_256_, _8_bit_mul_256_)
-	);
+	) << "\n";
+
+	__m256 cmp_a_ = _mm256_set_ps(2.0f, 1.0f, 3.0f, 4.0f, 0.0f, 2.0f, 3.0f, 3.0f);
+	__m256 cmp_b_ = _mm256_set_ps(2.0f, 5.0f, 6.6f, 4.0f, 3.0f, 1.0f, 2.0f, 3.0f);
+	EmuMath::SIMD::append_simd_vector_to_stream
+	(
+		std::cout,
+		EmuMath::SIMD::_underlying_simd_helpers::_make_register_from_movemask_fp<__m256>(_mm256_movemask_ps(_mm256_cmp_ps(cmp_a_, cmp_b_, _CMP_EQ_OS)))
+	) << "\n";
+
+	__m128i mod_a_256_ = _mm_setr_epi32(10, 3, -4, 4);
+	__m128i mod_b_256_ = _mm_setr_epi32(1,  2,  3, 4);
+	EmuMath::SIMD::append_simd_vector_to_stream
+	(
+		std::cout,
+		EmuMath::SIMD::_underlying_simd_helpers::_mod_int<32, true>(mod_a_256_, mod_b_256_)
+	) << "\n";
+	EmuMath::SIMD::append_simd_vector_to_stream
+	(
+		std::cout,
+		EmuMath::SIMD::_underlying_simd_helpers::_rem_int<32, true>(mod_a_256_, mod_b_256_)
+	) << "\n";
 
 	system("pause");
 

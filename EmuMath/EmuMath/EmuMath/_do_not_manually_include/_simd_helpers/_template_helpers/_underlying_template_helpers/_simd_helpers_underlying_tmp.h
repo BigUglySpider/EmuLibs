@@ -1,8 +1,13 @@
-#ifndef EMU_MATH_SIMD_HELPERS_TMP_H_INC_
-#define EMU_MATH_SIMD_HELPERS_TMP_H_INC_ 1
+#ifndef EMU_MATH_UNDERLYING_SIMD_HELPERS_TMP_H_INC_
+#define EMU_MATH_UNDERLYING_SIMD_HELPERS_TMP_H_INC_ 1
 
-#include "_common_simd_helpers_includes.h"
-#include "../../../EmuCore/TMPHelpers/TypeConvertors.h"
+#include "../../../../../EmuCore/ArithmeticHelpers/BitHelpers.h"
+#include "../../../../../EmuCore/TMPHelpers/TypeComparators.h"
+#include "../../../../../EmuCore/TMPHelpers/TypeConvertors.h"
+#include "../../../../../EmuCore/TMPHelpers/Values.h"
+#include <cstdlib>
+#include <immintrin.h>
+#include <stdexcept>
 
 namespace EmuMath::SIMD::TMP
 {
@@ -264,6 +269,86 @@ namespace EmuMath::SIMD::TMP
 	};
 	template<class Register_>
 	static constexpr std::size_t floating_point_register_element_count_v = floating_point_register_element_count<Register_>::value;
+
+	template<class Register_, std::size_t Index_, std::size_t PerElementWidthIfIntegral_ = 32>
+	struct valid_register_index
+	{
+		// Formed as a recursive call on itself if the passed type is a SIMD register, since unqualified specialisations are used for value sets.
+
+		static constexpr bool value = std::conditional_t
+		<
+			is_simd_register_v<Register_> && !std::is_same_v<Register_, typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type>,
+			valid_register_index<typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type>,
+			std::false_type
+		>::value;
+	};
+	template<std::size_t Index_, std::size_t PerElementWidthIfIntegral_>
+	struct valid_register_index<__m128, Index_, PerElementWidthIfIntegral_>
+	{
+		static constexpr std::size_t max_index = std::size_t(3);
+		static constexpr bool value = Index_ <= max_index;
+	};
+	template<std::size_t Index_, std::size_t PerElementWidthIfIntegral_>
+	struct valid_register_index<__m256, Index_, PerElementWidthIfIntegral_>
+	{
+		static constexpr std::size_t max_index = std::size_t(7);
+		static constexpr bool value = Index_ <= max_index;
+	};
+	template<std::size_t Index_, std::size_t PerElementWidthIfIntegral_>
+	struct valid_register_index<__m512, Index_, PerElementWidthIfIntegral_>
+	{
+		static constexpr std::size_t max_index = std::size_t(15);
+		static constexpr bool value = Index_ <= max_index;
+	};
+
+	template<std::size_t Index_, std::size_t PerElementWidthIfIntegral_>
+	struct valid_register_index<__m128d, Index_, PerElementWidthIfIntegral_>
+	{
+		static constexpr std::size_t max_index = std::size_t(1);
+		static constexpr bool value = Index_ <= max_index;
+	};
+	template<std::size_t Index_, std::size_t PerElementWidthIfIntegral_>
+	struct valid_register_index<__m256d, Index_, PerElementWidthIfIntegral_>
+	{
+		static constexpr std::size_t max_index = std::size_t(3);
+		static constexpr bool value = Index_ <= max_index;
+	};
+	template<std::size_t Index_, std::size_t PerElementWidthIfIntegral_>
+	struct valid_register_index<__m512d, Index_, PerElementWidthIfIntegral_>
+	{
+		static constexpr std::size_t max_index = std::size_t(7);
+		static constexpr bool value = Index_ <= max_index;
+	};
+
+	template<std::size_t Index_, std::size_t PerElementWidth_>
+	struct valid_register_index<__m128i, Index_, PerElementWidth_>
+	{
+		static constexpr bool valid_element_width = _assert_valid_simd_int_element_width<PerElementWidth_>();
+		static_assert(valid_element_width, "Invalid per-element width provided when checking for a valid integral SIMD register index via valid_register_index.");
+
+		static constexpr std::size_t max_index = (simd_register_width_v<__m128i> / PerElementWidth_) - std::size_t(1);
+		static constexpr bool value = Index_ <= max_index;
+	};
+	template<std::size_t Index_, std::size_t PerElementWidth_>
+	struct valid_register_index<__m256i, Index_, PerElementWidth_>
+	{
+		static constexpr bool valid_element_width = _assert_valid_simd_int_element_width<PerElementWidth_>();
+		static_assert(valid_element_width, "Invalid per-element width provided when checking for a valid integral SIMD register index via valid_register_index.");
+
+		static constexpr std::size_t max_index = (simd_register_width_v<__m256i> / PerElementWidth_) - std::size_t(1);
+		static constexpr bool value = Index_ <= max_index;
+	};
+	template<std::size_t Index_, std::size_t PerElementWidth_>
+	struct valid_register_index<__m512i, Index_, PerElementWidth_>
+	{
+		static constexpr bool valid_element_width = _assert_valid_simd_int_element_width<PerElementWidth_>();
+		static_assert(valid_element_width, "Invalid per-element width provided when checking for a valid integral SIMD register index via valid_register_index.");
+
+		static constexpr std::size_t max_index = (simd_register_width_v<__m512i> / PerElementWidth_) - std::size_t(1);
+		static constexpr bool value = Index_ <= max_index;
+	};
+	template<class Register_, std::size_t Index_, std::size_t PerElementWidthIfIntegral_ = 32>
+	static constexpr bool valid_register_index_v = valid_register_index<Register_, Index_, PerElementWidthIfIntegral_>::value;
 }
 
 #endif

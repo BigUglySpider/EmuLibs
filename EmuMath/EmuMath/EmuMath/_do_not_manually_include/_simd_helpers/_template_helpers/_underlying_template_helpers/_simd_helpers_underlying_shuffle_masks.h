@@ -2,6 +2,7 @@
 #define EMU_MATH_SIMD_TEMPLATE_HELPERS_UNDERLYING_SHUFFLE_MASKS_H_INC_ 1
 
 #include "_common_underlying_simd_template_helper_includes.h"
+#include "../../../../../EmuCore/TMPHelpers/TypeComparators.h"
 
 namespace EmuMath::SIMD::_underlying_simd_helpers
 {
@@ -518,14 +519,18 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	};
 #pragma endregion
 
-	template<class ShuffleMaskInstance_, typename = void>
-	struct is_valid_shuffle_mask_instance : std::false_type
-	{
-	};
+#pragma region VALIDITY_TMP
 	template<class ShuffleMaskInstance_>
-	struct is_valid_shuffle_mask_instance<ShuffleMaskInstance_, std::void_t<decltype(ShuffleMaskInstance_::get)>> : std::true_type
+	struct is_valid_shuffle_mask_instance
 	{
+		static constexpr bool value = false;
 	};
+	template<class Register_, std::size_t...Indices_>
+	struct is_valid_shuffle_mask_instance<_shuffle_mask<Register_, Indices_...>>
+	{
+		static constexpr bool value = EmuCore::TMPHelpers::has_static_get<_shuffle_mask<Register_, Indices_...>>::value;
+	};
+#pragma endregion
 }
 
 #endif

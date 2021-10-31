@@ -1,7 +1,8 @@
 #ifndef EMU_MATH_SIMD_HELPERS_ALIASES_H_INC_
 #define EMU_MATH_SIMD_HELPERS_ALIASES_H_INC_ 1
 
-#include "_common_simd_helpers_includes.h"
+#include "_underlying_template_helpers/_common_underlying_simd_template_helper_includes.h"
+#include "_underlying_template_helpers/_simd_helpers_underlying_tmp.h"
 
 namespace EmuMath::SIMD::TMP
 {
@@ -23,7 +24,7 @@ namespace EmuMath::SIMD::TMP
 		}
 	}
 
-	template<std::size_t Width_>
+	template<std::size_t Width_ = 128>
 	struct integer_register_type
 	{
 		static_assert(_assert_valid_simd_register_width<Width_>(), "Provided invalid width for integer_register_type finder.");
@@ -44,7 +45,7 @@ namespace EmuMath::SIMD::TMP
 			>
 		>;
 	};
-	template<std::size_t Width_>
+	template<std::size_t Width_ = 128>
 	using integer_register_type_t = typename integer_register_type<Width_>::type;
 
 	template<typename T_, std::size_t Width_ = 128>
