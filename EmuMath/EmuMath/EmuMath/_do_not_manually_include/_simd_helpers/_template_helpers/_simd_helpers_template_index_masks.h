@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_SIMD_HELPERS_TEMPLATE_MASKS_H_INC_
-#define EMU_MATH_SIMD_HELPERS_TEMPLATE_MASKS_H_INC_ 1
+#ifndef EMU_MATH_SIMD_HELPERS_TEMPLATE_INDEX_MASKS_H_INC_
+#define EMU_MATH_SIMD_HELPERS_TEMPLATE_INDEX_MASKS_H_INC_ 1
 
 #include "_underlying_template_helpers/_simd_helpers_underlying_index_masks.h"
 
