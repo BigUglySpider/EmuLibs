@@ -7,6 +7,5 @@
 #include "_do_not_manually_include/_simd_helpers/_simd_helpers_bits.h"
 #include "_do_not_manually_include/_simd_helpers/_simd_helpers_comparisons.h"
 #include "_do_not_manually_include/_simd_helpers/_simd_helpers_masks.h"
-#include "_do_not_manually_include/_simd_helpers/_simd_helpers_shuffles.h"
 
 #endif

@@ -239,6 +239,8 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_random\RngWrapper.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_random\ShuffledIntSequence.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_common_simd_helpers_includes.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_gets.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_index_masks.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_sets.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_aliases.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_access.h" />
@@ -246,7 +248,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_bits.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_comparisons.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_masks.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_shuffles.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_shuffles.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_arithmetic.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_bitwise.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_streams.h" />

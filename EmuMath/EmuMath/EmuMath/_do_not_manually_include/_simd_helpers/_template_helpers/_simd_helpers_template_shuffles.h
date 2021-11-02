@@ -1,8 +1,8 @@
 #ifndef EMU_MATH_SIMD_HELPERS_SHUFFLES_H_INC_
 #define EMU_MATH_SIMD_HELPERS_SHUFFLES_H_INC_ 1
 
-#include "_common_simd_helpers_includes.h"
-#include "_template_helpers/_underlying_template_helpers/_simd_helpers_underlying_shuffle.h"
+#include "_underlying_template_helpers/_common_underlying_simd_template_helper_includes.h"
+#include "_underlying_template_helpers/_simd_helpers_underlying_shuffle.h"
 
 namespace EmuMath::SIMD
 {

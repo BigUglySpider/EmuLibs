@@ -218,7 +218,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_arithmetic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_shuffles.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_shuffles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_access.h">
@@ -390,6 +390,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_cmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_gets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_index_masks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

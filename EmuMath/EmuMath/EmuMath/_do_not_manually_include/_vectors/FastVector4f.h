@@ -123,7 +123,7 @@ namespace EmuMath
 			{
 				if constexpr (Index_ < size)
 				{
-					__m128 mask_ = EmuMath::SIMD::index_mask<__m128, Index_, register_element_8bit_num_bits>();
+					__m128 mask_ = EmuMath::SIMD::index_mask<__m128, Index_, register_element_8bit_num_bits>::get();
 					data_ = _mm_or_ps
 					(
 						_mm_andnot_ps(mask_, data_),

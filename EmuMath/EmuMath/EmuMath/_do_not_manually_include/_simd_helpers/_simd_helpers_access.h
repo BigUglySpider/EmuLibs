@@ -2,7 +2,6 @@
 #define EMU_MATH_SIMD_HELPERS_ACCESS_H_INC_ 1
 
 #include "_common_simd_helpers_includes.h"
-#include "_simd_helpers_shuffles.h"
 
 namespace EmuMath::SIMD
 {
