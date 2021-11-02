@@ -262,7 +262,7 @@ namespace EmuMath
 				__m128 sample_batch_ = sample_processor_(generator_(points_x_, points_y_, points_z_));
 				if ((i_ + 1) == end_)
 				{
-					out_layer_[i_] = EmuMath::SIMD::get_m128_index<0>(sample_batch_);
+					out_layer_[i_] = EmuMath::SIMD::get_index<0, value_type>(sample_batch_);
 				}
 				else
 				{

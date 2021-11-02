@@ -402,27 +402,14 @@ int main()
 	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, EmuMath::SIMD::setallone<__m256>()) << "\n";
 
 
-	__m256i some_inty_bois_ = _mm256_set_epi16(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-	constexpr std::size_t some_inty_width_ = 16;
-	std::cout << "---\n";
-	EmuMath::SIMD::append_simd_vector_to_stream<some_inty_width_>(std::cout, some_inty_bois_) << "\n";
-	std::cout << "[0]: " << EmuMath::SIMD::_underlying_simd_helpers::_get_register_index<0, float, some_inty_width_>(some_inty_bois_) << "\n";
-	std::cout << "[1]: " << EmuMath::SIMD::_underlying_simd_helpers::_get_register_index<1, float, some_inty_width_>(some_inty_bois_) << "\n";
-	std::cout << "[2]: " << EmuMath::SIMD::_underlying_simd_helpers::_get_register_index<2, float, some_inty_width_>(some_inty_bois_) << "\n";
-	std::cout << "[3]: " << EmuMath::SIMD::_underlying_simd_helpers::_get_register_index<3, float, some_inty_width_>(some_inty_bois_) << "\n";
-	std::cout << "[4]: " << EmuMath::SIMD::_underlying_simd_helpers::_get_register_index<4, float, some_inty_width_>(some_inty_bois_) << "\n";
-	std::cout << "[5]: " << EmuMath::SIMD::_underlying_simd_helpers::_get_register_index<5, float, some_inty_width_>(some_inty_bois_) << "\n";
-	std::cout << "[6]: " << EmuMath::SIMD::_underlying_simd_helpers::_get_register_index<6, float, some_inty_width_>(some_inty_bois_) << "\n";
-	std::cout << "[7]: " << EmuMath::SIMD::_underlying_simd_helpers::_get_register_index<7, float, some_inty_width_>(some_inty_bois_) << "\n";
-	std::cout << "[8]: " << EmuMath::SIMD::_underlying_simd_helpers::_get_register_index<8, float, some_inty_width_>(some_inty_bois_) << "\n";
-	std::cout << "[9]: " << EmuMath::SIMD::_underlying_simd_helpers::_get_register_index<9, float, some_inty_width_>(some_inty_bois_) << "\n";
-	std::cout << "[10]: " << EmuMath::SIMD::_underlying_simd_helpers::_get_register_index<10, float, some_inty_width_>(some_inty_bois_) << "\n";
-	std::cout << "[11]: " << EmuMath::SIMD::_underlying_simd_helpers::_get_register_index<11, float, some_inty_width_>(some_inty_bois_) << "\n";
-	std::cout << "[12]: " << EmuMath::SIMD::_underlying_simd_helpers::_get_register_index<12, float, some_inty_width_>(some_inty_bois_) << "\n";
-	std::cout << "[13]: " << EmuMath::SIMD::_underlying_simd_helpers::_get_register_index<13, float, some_inty_width_>(some_inty_bois_) << "\n";
-	std::cout << "[14]: " << EmuMath::SIMD::_underlying_simd_helpers::_get_register_index<14, float, some_inty_width_>(some_inty_bois_) << "\n";
-	std::cout << "[15]: " << EmuMath::SIMD::_underlying_simd_helpers::_get_register_index<15, float, some_inty_width_>(some_inty_bois_) << "\n";
+	std::cout << "---\n\n";
 
+
+	using testing_register = __m256i;
+	constexpr std::size_t testing_element_width = 8;
+	testing_register a_simd_ = EmuMath::SIMD::set<testing_register, testing_element_width>(1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4);
+	EmuMath::SIMD::append_simd_vector_to_stream<testing_element_width>(std::cout, a_simd_) << "\n";
+	EmuMath::SIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, EmuMath::SIMD::horizontal_sum<testing_element_width>(a_simd_)) << "\n";
 
 	system("pause");
 

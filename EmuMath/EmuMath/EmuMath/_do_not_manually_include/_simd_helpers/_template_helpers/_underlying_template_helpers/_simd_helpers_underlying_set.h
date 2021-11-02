@@ -5,7 +5,7 @@
 
 namespace EmuMath::SIMD::_underlying_simd_helpers
 {
-	template<class Register_, std::size_t ElementWidth_, typename...Args_>
+	template<class Register_, std::size_t ElementWidth_, bool Reverse_, typename...Args_>
 	[[nodiscard]] inline Register_ _set_int(Args_&&...args_)
 	{
 		static_assert
@@ -30,19 +30,47 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 						// 128-bit
 						if constexpr (ElementWidth_ == 8)
 						{
-							return _mm_set_epi8(static_cast<width_int>(args_)...);
+							if constexpr (Reverse_)
+							{
+								return _mm_setr_epi8(static_cast<width_int>(args_)...);
+							}
+							else
+							{
+								return _mm_set_epi8(static_cast<width_int>(args_)...);
+							}
 						}
 						else if constexpr (ElementWidth_ == 16)
 						{
-							return _mm_set_epi16(static_cast<width_int>(args_)...);
+							if constexpr (Reverse_)
+							{
+								return _mm_setr_epi16(static_cast<width_int>(args_)...);
+							}
+							else
+							{
+								return _mm_set_epi16(static_cast<width_int>(args_)...);
+							}
 						}
 						else if constexpr (ElementWidth_ == 32)
 						{
-							return _mm_set_epi32(static_cast<width_int>(args_)...);
+							if constexpr (Reverse_)
+							{
+								return _mm_setr_epi32(static_cast<width_int>(args_)...);
+							}
+							else
+							{
+								return _mm_set_epi32(static_cast<width_int>(args_)...);
+							}
 						}
 						else
 						{
-							return _mm_set_epi64x(static_cast<width_int>(args_)...);
+							if constexpr (Reverse_)
+							{
+								return _mm_setr_epi64x(static_cast<width_int>(args_)...);
+							}
+							else
+							{
+								return _mm_set_epi64x(static_cast<width_int>(args_)...);
+							}
 						}
 					}
 					else if constexpr (std::is_same_v<register_type_uq, __m256i>)
@@ -50,19 +78,47 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 						// 256-bit
 						if constexpr (ElementWidth_ == 8)
 						{
-							return _mm256_set_epi8(static_cast<width_int>(args_)...);
+							if constexpr (Reverse_)
+							{
+								return _mm256_setr_epi8(static_cast<width_int>(args_)...);
+							}
+							else
+							{
+								return _mm256_set_epi8(static_cast<width_int>(args_)...);
+							}
 						}
 						else if constexpr (ElementWidth_ == 16)
 						{
-							return _mm256_set_epi16(static_cast<width_int>(args_)...);
+							if constexpr (Reverse_)
+							{
+								return _mm256_setr_epi16(static_cast<width_int>(args_)...);
+							}
+							else
+							{
+								return _mm256_set_epi16(static_cast<width_int>(args_)...);
+							}
 						}
 						else if constexpr (ElementWidth_ == 32)
 						{
-							return _mm256_set_epi32(static_cast<width_int>(args_)...);
+							if constexpr (Reverse_)
+							{
+								return _mm256_setr_epi32(static_cast<width_int>(args_)...);
+							}
+							else
+							{
+								return _mm256_set_epi32(static_cast<width_int>(args_)...);
+							}
 						}
 						else
 						{
-							return _mm256_set_epi64x(static_cast<width_int>(args_)...);
+							if constexpr (Reverse_)
+							{
+								return _mm256_setr_epi64x(static_cast<width_int>(args_)...);
+							}
+							else
+							{
+								return _mm256_set_epi64x(static_cast<width_int>(args_)...);
+							}
 						}
 					}
 					else if constexpr (std::is_same_v<register_type_uq, __m512i>)
@@ -70,19 +126,47 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 						// 512-bit
 						if constexpr (ElementWidth_ == 8)
 						{
-							return _mm512_set_epi8(static_cast<width_int>(args_)...);
+							if constexpr (Reverse_)
+							{
+								return _mm512_setr_epi8(static_cast<width_int>(args_)...);
+							}
+							else
+							{
+								return _mm512_set_epi8(static_cast<width_int>(args_)...);
+							}
 						}
 						else if constexpr (ElementWidth_ == 16)
 						{
-							return _mm512_set_epi16(static_cast<width_int>(args_)...);
+							if constexpr (Reverse_)
+							{
+								return _mm512_setr_epi16(static_cast<width_int>(args_)...);
+							}
+							else
+							{
+								return _mm512_set_epi16(static_cast<width_int>(args_)...);
+							}
 						}
 						else if constexpr (ElementWidth_ == 32)
 						{
-							return _mm512_set_epi32(static_cast<width_int>(args_)...);
+							if constexpr (Reverse_)
+							{
+								return _mm512_setr_epi32(static_cast<width_int>(args_)...);
+							}
+							else
+							{
+								return _mm512_set_epi32(static_cast<width_int>(args_)...);
+							}
 						}
 						else
 						{
-							return _mm512_set_epi64(static_cast<width_int>(args_)...);
+							if constexpr (Reverse_)
+							{
+								return _mm512_setr_epi64(static_cast<width_int>(args_)...);
+							}
+							else
+							{
+								return _mm512_set_epi64(static_cast<width_int>(args_)...);
+							}
 						}
 					}
 					else
@@ -111,7 +195,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		}
 	}
 
-	template<class Register_, typename...Args_>
+	template<class Register_, bool Reverse_, typename...Args_>
 	[[nodiscard]] inline Register_ _set_fp(Args_&&...args_)
 	{
 		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
@@ -129,15 +213,36 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 				{
 					if constexpr (std::is_same_v<register_type_uq, __m128>)
 					{
-						return _mm_set_ps(static_cast<float>(args_)...);
+						if constexpr (Reverse_)
+						{
+							return _mm_setr_ps(static_cast<float>(args_)...);
+						}
+						else
+						{
+							return _mm_set_ps(static_cast<float>(args_)...);
+						}
 					}
 					else if constexpr (std::is_same_v<register_type_uq, __m256>)
 					{
-						return _mm256_set_ps(static_cast<float>(args_)...);
+						if constexpr (Reverse_)
+						{
+							return _mm256_setr_ps(static_cast<float>(args_)...);
+						}
+						else
+						{
+							return _mm256_set_ps(static_cast<float>(args_)...);
+						}
 					}
 					else
 					{
-						return _mm512_set_ps(static_cast<float>(args_)...);
+						if constexpr (Reverse_)
+						{
+							return _mm512_setr_ps(static_cast<float>(args_)...);
+						}
+						else
+						{
+							return _mm512_set_ps(static_cast<float>(args_)...);
+						}
 					}
 				}
 				else
@@ -163,15 +268,36 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 				{
 					if constexpr (std::is_same_v<register_type_uq, __m128d>)
 					{
-						return _mm_set_pd(static_cast<double>(args_)...);
+						if constexpr (Reverse_)
+						{
+							return _mm_setr_pd(static_cast<double>(args_)...);
+						}
+						else
+						{
+							return _mm_set_pd(static_cast<double>(args_)...);
+						}
 					}
 					else if constexpr (std::is_same_v<register_type_uq, __m256d>)
 					{
-						return _mm256_set_pd(static_cast<double>(args_)...);
+						if constexpr (Reverse_)
+						{
+							return _mm256_setr_pd(static_cast<double>(args_)...);
+						}
+						else
+						{
+							return _mm256_set_pd(static_cast<double>(args_)...);
+						}
 					}
 					else
 					{
-						return _mm512_set_pd(static_cast<double>(args_)...);
+						if constexpr (Reverse_)
+						{
+							return _mm512_setr_pd(static_cast<double>(args_)...);
+						}
+						else
+						{
+							return _mm512_set_pd(static_cast<double>(args_)...);
+						}
 					}
 				}
 				else

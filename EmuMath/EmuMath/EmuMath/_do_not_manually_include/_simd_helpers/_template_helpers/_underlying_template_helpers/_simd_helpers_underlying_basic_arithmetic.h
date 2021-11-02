@@ -892,6 +892,443 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		return _rem_int<PerElementWidth_, Signed_, Register_>(lhs_, rhs_);
 	}
 #pragma endregion
+
+#pragma region NEGATION_OPERATIONS
+	template<std::size_t PerElementWidthIfInt_, class Register_>
+	[[nodiscard]] inline Register_ _negate(Register_ register_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (EmuMath::SIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
+			{
+				return _sub_fp(_setzero<register_type_uq>(), register_);
+			}
+			else if constexpr (EmuMath::SIMD::TMP::is_integral_simd_register_v<register_type_uq>)
+			{
+				return _sub_int<PerElementWidthIfInt_>(_setzero<register_type_uq>(), register_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to negate a SIMD register via EmuMath SIMD helpers, but the provided SIMD register is not supported for this operation.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to negate a SIMD register via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+		}
+	}
+#pragma endregion
+
+#pragma region ALTERNATING_OPERATIONS
+	template<class Register_>
+	[[nodiscard]] inline Register_ _addsub_fp(Register_ lhs_, Register_ rhs_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_addsub_ps(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_addsub_ps(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_addsub_pd(lhs_, rhs_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_addsub_pd(lhs_, rhs_);
+			}
+			else if constexpr (EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, register_type_uq, __m512, __m512d>::value)
+			{
+				// Covers both __m512 and __m512d without needing any register-specific functionality thanks to previously created functions
+				using mask_generator = _underlying_simd_helpers::_alternating_index_mask<register_type_uq, true>;
+				if constexpr (_underlying_simd_helpers::_is_valid_alternating_index_mask_instance<mask_generator>::value)
+				{
+					register_type_uq mask_ = mask_generator::get();
+					register_type_uq out_ = _add_fp(lhs_, _and(mask_, rhs_));
+					return _sub_fp(out_, _andnot(mask_, rhs_));
+				}
+				else
+				{
+					static_assert(false, "Attempted to emulate add/subtract operation of two floating-point SIMD registers which do not have a built-in addsub operation, but a mask could not be successfully generated to perform alternating operations.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to add/subtract (addsub) two SIMD registers via EmuMath SIMD helpers, but the provided SIMD register is not a supported floating-point SIMD register.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to add/subtract (addsub) two SIMD registers via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+		}
+	}
+
+	template<std::size_t PerElementWidth_, class Register_>
+	[[nodiscard]] inline Register_ _addsub_int(Register_ lhs_, Register_ rhs_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (EmuMath::SIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
+			{
+				using mask_generator = _underlying_simd_helpers::_alternating_index_mask<register_type_uq, true, PerElementWidth_>;
+				if constexpr (_underlying_simd_helpers::_is_valid_alternating_index_mask_instance<mask_generator>::value)
+				{
+					register_type_uq mask_ = mask_generator::get();
+					register_type_uq out_ = _add_int<PerElementWidth_>(lhs_, _and(mask_, rhs_));
+					return _sub_int<PerElementWidth_>(out_, _andnot(mask_, rhs_));
+				}
+				else
+				{
+					static_assert(false, "Attempted to emulate a add/subtract (addsub) operation of two integral SIMD registers via EmuMath SIMD helpers, but a mask could not be successfully created to perform alternating operations.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to emulate a add/subtract (addsub) operation of two integral SIMD registers via EmuMath SIMD helpers, but the provided SIMD register is not a supported integral SIMD register for this operation.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to emulate a add/subtract (addsub) operation of two integral SIMD registers via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+		}
+	}
+
+	template<class Register_>
+	[[nodiscard]] inline Register_ _subadd_fp(Register_ lhs_, Register_ rhs_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			using mask_generator = _underlying_simd_helpers::_alternating_index_mask<register_type_uq, true>;
+			if constexpr (_underlying_simd_helpers::_is_valid_alternating_index_mask_instance<mask_generator>::value)
+			{
+				register_type_uq mask_ = mask_generator::get();
+				register_type_uq out_ = _sub_fp(lhs_, _and(mask_, rhs_));
+				return _add_fp(out_, _andnot(mask_, rhs_));
+			}
+			else
+			{
+				static_assert(false, "Attempted to emulate a subtract/add (subadd) operation of two floating-point SIMD registers via EmuMath SIMD helpers, but a mask could not be successfully created to perform alternating operations.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to emulate a subtract/add (subadd) operation of two floating-point SIMD registers via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+		}
+	}
+
+	template<std::size_t PerElementWidth_, class Register_>
+	[[nodiscard]] inline Register_ _subadd_int(Register_ lhs_, Register_ rhs_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (EmuMath::SIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
+			{
+				using mask_generator = _underlying_simd_helpers::_alternating_index_mask<register_type_uq, true, PerElementWidth_>;
+				if constexpr (_underlying_simd_helpers::_is_valid_alternating_index_mask_instance<mask_generator>::value)
+				{
+					register_type_uq mask_ = mask_generator::get();
+					register_type_uq out_ = _sub_int<PerElementWidth_>(lhs_, _and(mask_, rhs_));
+					return _add_int<PerElementWidth_>(out_, _andnot(mask_, rhs_));
+				}
+				else
+				{
+					static_assert(false, "Attempted to emulate a subtract/add (subadd) operation of two integral SIMD registers via EmuMath SIMD helpers, but a mask could not be successfully created to perform alternating operations.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to emulate a subtract/add (subadd) operation of two integral SIMD registers via EmuMath SIMD helpers, but the provided SIMD register is not a supported integral SIMD register for this operation.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to emulate a subtract/add (subadd) operation of two integral SIMD registers via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+		}
+	}
+#pragma endregion
+
+#pragma region FUSED_OPERATIONS
+	template<class Register_>
+	[[nodiscard]] inline Register_ _fmadd_fp(Register_ to_mult_lhs_, Register_ to_mult_rhs_, Register_ to_add_after_mult_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_fmadd_ps(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_fmadd_ps(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			{
+				return _mm512_fmadd_ps(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_fmadd_pd(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_fmadd_pd(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			{
+				return _mm512_fmadd_pd(to_mult_lhs_, to_mult_rhs_, to_add_after_mult_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to fused multiply add (fmadd) three SIMD registers via EmuMath SIMD helpers, but the provided SIMD register is not a supported floating-point SIMD register.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to fused multiply add (fmadd) three SIMD registers via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+		}
+	}
+	template<std::size_t PerElementWidth_, class Register_>
+	[[nodiscard]] inline Register_ _fmadd_int(Register_ to_mult_lhs_, Register_ to_mult_rhs_, Register_ to_add_after_mult_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (EmuMath::SIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
+			{
+				return _add_int<PerElementWidth_>(_mul_all_int<PerElementWidth_>(to_mult_lhs_, to_mult_rhs_), to_add_after_mult_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to emulate a fused multiply add (fmadd) of three integral SIMD registers via EmuMath SIMD helpers, but the provided PerElementWidth_ is invalid.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to fused multiply add (fmadd) three SIMD registers via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+		}
+	}
+
+	template<class Register_>
+	[[nodiscard]] inline Register_ _fmsub_fp(Register_ to_mult_lhs_, Register_ to_mult_rhs_, Register_ to_sub_after_mult_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_fmsub_ps(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_fmsub_ps(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			{
+				return _mm512_fmsub_ps(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_fmsub_pd(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_fmsub_pd(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			{
+				return _mm512_fmsub_pd(to_mult_lhs_, to_mult_rhs_, to_sub_after_mult_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuMath SIMD helpers, but the provided SIMD register is not a supported floating-point SIMD register.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+		}
+	}
+	template<std::size_t PerElementWidth_, class Register_>
+	[[nodiscard]] inline Register_ _fmsub_int(Register_ to_mult_lhs_, Register_ to_mult_rhs_, Register_ to_sub_after_mult_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (EmuMath::SIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
+			{
+				return _sub_int<PerElementWidth_>(_mul_all_int<PerElementWidth_>(to_mult_lhs_, to_mult_rhs_), to_sub_after_mult_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to emulate a fused multiply subtract (fmsub) of three integral SIMD registers via EmuMath SIMD helpers, but the provided PerElementWidth_ is invalid.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+		}
+	}
+
+	template<class Register_>
+	[[nodiscard]] inline Register_ _fmaddsub_fp(Register_ to_mult_lhs_, Register_ to_mult_rhs_, Register_ to_add_sub_after_mult_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_fmaddsub_ps(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_fmaddsub_ps(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			{
+				return _mm512_fmaddsub_ps(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_fmaddsub_pd(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_fmaddsub_pd(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			{
+				return _mm512_fmaddsub_pd(to_mult_lhs_, to_mult_rhs_, to_add_sub_after_mult_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to fused multiply add/subtract (fmaddsub) three SIMD registers via EmuMath SIMD helpers, but the provided SIMD register is not a supported floating-point SIMD register.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to fused multiply add/subtract (fmaddsub) three SIMD registers via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+		}
+	}
+	template<std::size_t PerElementWidth_, class Register_>
+	[[nodiscard]] inline Register_ _fmaddsub_int(Register_ to_mult_lhs_, Register_ to_mult_rhs_, Register_ to_add_sub_after_mult_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (EmuMath::SIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
+			{
+				using mask_generator = _underlying_simd_helpers::_alternating_index_mask<register_type_uq, true, PerElementWidth_>;
+				if constexpr(_underlying_simd_helpers::_is_valid_alternating_index_mask_instance<mask_generator>::value)
+				{
+					register_type_uq out_ = _mul_all_int<PerElementWidth_>(to_mult_lhs_, to_mult_rhs_);
+					register_type_uq mask_ = mask_generator::get();
+					out_ = _add_int<PerElementWidth_>(out_, _and(mask_, to_add_sub_after_mult_));
+					return _sub_int<PerElementWidth_>(out_, _andnot(mask_, to_add_sub_after_mult_));
+				}
+				else
+				{
+					static_assert(false, "Attempted to emulate a fused multiply add/subtract (fmaddsub) of three integral SIMD registers via EmuMath SIMD helpers, but an alternating mask could not be formed successfully.");
+				}
+
+			}
+			else
+			{
+				static_assert(false, "Attempted to emulate a fused multiply add/subtract (fmaddsub) of three integral SIMD registers via EmuMath SIMD helpers, but the provided PerElementWidth_ is invalid.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+		}
+	}
+
+	template<class Register_>
+	[[nodiscard]] inline Register_ _fmsubadd_fp(Register_ to_mult_lhs_, Register_ to_mult_rhs_, Register_ to_sub_add_after_mult_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_fmsubadd_ps(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_fmsubadd_ps(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			{
+				return _mm512_fmsubadd_ps(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_fmsubadd_pd(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_fmsubadd_pd(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			{
+				return _mm512_fmsubadd_pd(to_mult_lhs_, to_mult_rhs_, to_sub_add_after_mult_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to fused multiply subtract/add (fmsubadd) three SIMD registers via EmuMath SIMD helpers, but the provided SIMD register is not a supported floating-point SIMD register.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to fused multiply subtract/add (fmsubadd) three SIMD registers via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+		}
+	}
+	template<std::size_t PerElementWidth_, class Register_>
+	[[nodiscard]] inline Register_ _fmsubadd_int(Register_ to_mult_lhs_, Register_ to_mult_rhs_, Register_ to_add_sub_after_mult_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (EmuMath::SIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
+			{
+				using mask_generator = _underlying_simd_helpers::_alternating_index_mask<register_type_uq, true, PerElementWidth_>;
+				if constexpr(_underlying_simd_helpers::_is_valid_alternating_index_mask_instance<mask_generator>::value)
+				{
+					register_type_uq out_ = _mul_all_int<PerElementWidth_>(to_mult_lhs_, to_mult_rhs_);
+					register_type_uq mask_ = mask_generator::get();
+					out_ = _sub_int<PerElementWidth_>(out_, _and(mask_, to_add_sub_after_mult_));
+					return _add_int<PerElementWidth_>(out_, _andnot(mask_, to_add_sub_after_mult_));
+				}
+				else
+				{
+					static_assert(false, "Attempted to emulate a fused multiply subtract/add (fmsubadd) of three integral SIMD registers via EmuMath SIMD helpers, but an alternating mask could not be formed successfully.");
+				}
+
+			}
+			else
+			{
+				static_assert(false, "Attempted to emulate a fused multiply subtract/add (fmsubadd) of three integral SIMD registers via EmuMath SIMD helpers, but the provided PerElementWidth_ is invalid.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+		}
+	}
+#pragma endregion
 }
 
 #endif

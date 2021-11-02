@@ -48,32 +48,6 @@ namespace EmuMath::SIMD
 		return _mm_cvtss_f32(a_);
 	}
 
-	/// <summary> Performs a linear interpolation using a_ as initial values, b_ as target values, and t_ as interpolation weightings. </summary>
-	/// <param name="a_">SIMD vector to use as starting values.</param>
-	/// <param name="b_">SIMD vector to use as target values.</param>
-	/// <param name="t_">SIMD vector to use as weightings for each interpolation.</param>
-	/// <returns>Result of linear interpolation, summarised as a + ((b - a) * t)</returns>
-	[[nodiscard]] inline __m128 vector_lerp(__m128 a_, __m128 b_, __m128 t_)
-	{
-		b_ = _mm_sub_ps(b_, a_);
-		b_ = _mm_mul_ps(b_, t_);
-		return _mm_add_ps(a_, b_);
-	}
-
-	/// <summary> 
-	/// <para> Performs a linear interpolation using a_ as initial values, b_ as target values, and t_ as interpolation weightings. </para>
-	/// <para> Uses fused arithmetic instructions where possible. </para>
-	/// </summary>
-	/// <param name="a_">SIMD vector to use as starting values.</param>
-	/// <param name="b_">SIMD vector to use as target values.</param>
-	/// <param name="t_">SIMD vector to use as weightings for each interpolation.</param>
-	/// <returns>Result of linear interpolation, summarised as a + ((b - a) * t)</returns>
-	[[nodiscard]] inline __m128 vector_lerp_fused(__m128 a_, __m128 b_, __m128 t_)
-	{
-		b_ = _mm_sub_ps(b_, a_);
-		return _mm_fmadd_ps(b_, t_, a_);
-	}
-
 	[[nodiscard]]inline  __m128 vector_clamp(__m128 val_, __m128 min_, __m128 max_)
 	{
 		val_ = _mm_max_ps(val_, min_);

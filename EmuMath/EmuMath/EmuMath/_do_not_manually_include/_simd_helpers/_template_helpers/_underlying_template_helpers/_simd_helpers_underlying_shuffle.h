@@ -39,7 +39,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 				{
 					return _mm512_shuffle_pd(a_, b_, shuffle_mask_inst::get());
 				}
-				else if constexpr (EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>)
+				else if constexpr (EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>::value)
 				{
 					static_assert(false, "Attempted to shuffle 2 integral SIMD registers using EmuMath SIMD helpers, but only one integral register may be shuffled.");
 				}

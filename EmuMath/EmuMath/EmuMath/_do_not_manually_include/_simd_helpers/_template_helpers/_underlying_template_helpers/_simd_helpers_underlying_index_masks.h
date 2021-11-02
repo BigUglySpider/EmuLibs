@@ -258,7 +258,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_
 	>
 	{
-		[[nodiscard]] inline __m256i get()
+		[[nodiscard]] static inline __m256i get()
 		{
 			return _mm256_set_epi8
 			(
@@ -305,7 +305,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
 	>
 	{
-		[[nodiscard]] inline __m256i get()
+		[[nodiscard]] static inline __m256i get()
 		{
 			return _per_index_mask<__m256i, false>::get();
 		}
@@ -318,7 +318,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true
 	>
 	{
-		[[nodiscard]] inline __m256i get()
+		[[nodiscard]] static inline __m256i get()
 		{
 			return _per_index_mask<__m256i, true>::get();
 		}
@@ -331,7 +331,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	>
 	struct _per_index_mask<__m256i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>
 	{
-		[[nodiscard]] inline __m256i get()
+		[[nodiscard]] static inline __m256i get()
 		{
 			return _mm256_set_epi16
 			(
@@ -357,7 +357,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	template<>
 	struct _per_index_mask<__m256i, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false>
 	{
-		[[nodiscard]] inline __m256i get()
+		[[nodiscard]] static inline __m256i get()
 		{
 			return _per_index_mask<__m256i, false>::get();
 		}
@@ -365,7 +365,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	template<>
 	struct _per_index_mask<__m256i, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true>
 	{
-		[[nodiscard]] inline __m256i get()
+		[[nodiscard]] static inline __m256i get()
 		{
 			return _per_index_mask<__m256i, true>::get();
 		}
@@ -374,7 +374,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_>
 	struct _per_index_mask<__m256i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>
 	{
-		[[nodiscard]] inline __m256i get()
+		[[nodiscard]] static inline __m256i get()
 		{
 			return _mm256_set_epi32
 			(
@@ -392,7 +392,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	template<>
 	struct _per_index_mask<__m256i, false, false, false, false, false, false, false, false>
 	{
-		[[nodiscard]] inline __m256i get()
+		[[nodiscard]] static inline __m256i get()
 		{
 			return _per_index_mask<__m256i, false>::get();
 		}
@@ -400,7 +400,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	template<>
 	struct _per_index_mask<__m256i, true, true, true, true, true, true, true, true>
 	{
-		[[nodiscard]] inline __m256i get()
+		[[nodiscard]] static inline __m256i get()
 		{
 			return _per_index_mask<__m256i, true>::get();
 		}
@@ -409,7 +409,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	template<bool I0_, bool I1_, bool I2_, bool I3_>
 	struct _per_index_mask<__m256i, I0_, I1_, I2_, I3_>
 	{
-		[[nodiscard]] inline __m256i get()
+		[[nodiscard]] static inline __m256i get()
 		{
 			return _mm256_set_epi64x
 			(
@@ -423,7 +423,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	template<>
 	struct _per_index_mask<__m256i, false, false, false, false>
 	{
-		[[nodiscard]] inline __m256i get()
+		[[nodiscard]] static inline __m256i get()
 		{
 			return _per_index_mask<__m256i, false>::get();
 		}
@@ -431,7 +431,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	template<>
 	struct _per_index_mask<__m256i, true, true, true, true>
 	{
-		[[nodiscard]] inline __m256i get()
+		[[nodiscard]] static inline __m256i get()
 		{
 			return _per_index_mask<__m256i, true>::get();
 		}
@@ -526,7 +526,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		I48_, I49_, I50_, I51_, I52_, I53_, I54_, I55_, I56_, I57_, I58_, I59_, I60_, I61_, I62_, I63_
 	>
 	{
-		[[nodiscard]] inline __m512i get()
+		[[nodiscard]] static inline __m512i get()
 		{
 			return _mm512_set_epi8
 			(
@@ -607,7 +607,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
 	>
 	{
-		[[nodiscard]] inline __m512i get()
+		[[nodiscard]] static inline __m512i get()
 		{
 			return _per_index_mask<__m512i, false>::get();
 		}
@@ -622,7 +622,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true
 	>
 	{
-		[[nodiscard]] inline __m512i get()
+		[[nodiscard]] static inline __m512i get()
 		{
 			return _per_index_mask<__m512i, true>::get();
 		}
@@ -642,7 +642,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_
 	>
 	{
-		[[nodiscard]] inline __m512i get()
+		[[nodiscard]] static inline __m512i get()
 		{
 			return _mm256_set_epi16
 			(
@@ -689,7 +689,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
 	>
 	{
-		[[nodiscard]] inline __m512i get()
+		[[nodiscard]] static inline __m512i get()
 		{
 			return _per_index_mask<__m512i, false>::get();
 		}
@@ -702,7 +702,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true
 	>
 	{
-		[[nodiscard]] inline __m512i get()
+		[[nodiscard]] static inline __m512i get()
 		{
 			return _per_index_mask<__m512i, true>::get();
 		}
@@ -715,7 +715,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	>
 	struct _per_index_mask<__m512i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>
 	{
-		[[nodiscard]] inline __m512i get()
+		[[nodiscard]] static inline __m512i get()
 		{
 			return _mm512_set_epi32
 			(
@@ -741,7 +741,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	template<>
 	struct _per_index_mask<__m512i, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false>
 	{
-		[[nodiscard]] inline __m512i get()
+		[[nodiscard]] static inline __m512i get()
 		{
 			return _per_index_mask<__m512i, false>::get();
 		}
@@ -749,7 +749,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	template<>
 	struct _per_index_mask<__m512i, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true>
 	{
-		[[nodiscard]] inline __m512i get()
+		[[nodiscard]] static inline __m512i get()
 		{
 			return _per_index_mask<__m512i, true>::get();
 		}
@@ -758,7 +758,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_>
 	struct _per_index_mask<__m512i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>
 	{
-		[[nodiscard]] inline __m512i get()
+		[[nodiscard]] static inline __m512i get()
 		{
 			return _mm512_set_epi64
 			(
@@ -776,7 +776,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	template<>
 	struct _per_index_mask<__m512i, false, false, false, false, false, false, false, false>
 	{
-		[[nodiscard]] inline __m512i get()
+		[[nodiscard]] static inline __m512i get()
 		{
 			return _per_index_mask<__m512i, false>::get();
 		}
@@ -784,7 +784,7 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	template<>
 	struct _per_index_mask<__m512i, true, true, true, true, true, true, true, true>
 	{
-		[[nodiscard]] inline __m512i get()
+		[[nodiscard]] static inline __m512i get()
 		{
 			return _per_index_mask<__m512i, true>::get();
 		}
@@ -1431,6 +1431,291 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		}
 	};
 #pragma endregion
+
+#pragma region VARYING_MASK_TEMPLATE
+	template<class Register_, bool FirstActive_, std::size_t PerElementWidthIfIntegral_ = 32>
+	struct _alternating_index_mask
+	{
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfIntegral_>
+	struct _alternating_index_mask<__m128, FirstActive_, PerElementWidthIfIntegral_>
+	{
+	private:
+		static constexpr bool even = FirstActive_;
+		static constexpr bool odd = !even;
+		using _mask_generator = _per_index_mask<__m128, even, odd, even, odd>;
+
+	public:
+		[[nodiscard]] static inline __m128 get()
+		{
+			return _mask_generator::get();
+		}
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfIntegral_>
+	struct _alternating_index_mask<__m256, FirstActive_, PerElementWidthIfIntegral_>
+	{
+	private:
+		static constexpr bool even = FirstActive_;
+		static constexpr bool odd = !even;
+		using _mask_generator = _per_index_mask<__m256, even, odd, even, odd, even, odd, even, odd>;
+
+	public:
+		[[nodiscard]] static inline __m256 get()
+		{
+			return _mask_generator::get();
+		}
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfIntegral_>
+	struct _alternating_index_mask<__m512, FirstActive_, PerElementWidthIfIntegral_>
+	{
+	private:
+		static constexpr bool even = FirstActive_;
+		static constexpr bool odd = !even;
+		using _mask_generator = _per_index_mask<__m512, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd>;
+
+	public:
+		[[nodiscard]] static inline __m512 get()
+		{
+			return _mask_generator::get();
+		}
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfIntegral_>
+	struct _alternating_index_mask<__m128d, FirstActive_, PerElementWidthIfIntegral_>
+	{
+	private:
+		static constexpr bool even = FirstActive_;
+		static constexpr bool odd = !even;
+		using _mask_generator = _per_index_mask<__m128d, even, odd>;
+
+	public:
+		[[nodiscard]] static inline __m128d get()
+		{
+			return _mask_generator::get();
+		}
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfIntegral_>
+	struct _alternating_index_mask<__m256d, FirstActive_, PerElementWidthIfIntegral_>
+	{
+	private:
+		static constexpr bool even = FirstActive_;
+		static constexpr bool odd = !even;
+		using _mask_generator = _per_index_mask<__m256d, even, odd, even, odd>;
+
+	public:
+		[[nodiscard]] static inline __m256d get()
+		{
+			return _mask_generator::get();
+		}
+	};
+
+	template<bool FirstActive_, std::size_t PerElementWidthIfIntegral_>
+	struct _alternating_index_mask<__m512d, FirstActive_, PerElementWidthIfIntegral_>
+	{
+	private:
+		static constexpr bool even = FirstActive_;
+		static constexpr bool odd = !even;
+		using _mask_generator = _per_index_mask<__m512d, even, odd, even, odd, even, odd, even, odd>;
+
+	public:
+		[[nodiscard]] static inline __m512d get()
+		{
+			return _mask_generator::get();
+		}
+	};
+
+	template<bool FirstActive_>
+	struct _alternating_index_mask<__m128i, FirstActive_, 8>
+	{
+	private:
+		static constexpr bool even = FirstActive_;
+		static constexpr bool odd = !even;
+		using _mask_generator = _per_index_mask<__m128i, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd>;
+
+	public:
+		[[nodiscard]] static inline __m128i get()
+		{
+			return _mask_generator::get();
+		}
+	};
+	template<bool FirstActive_>
+	struct _alternating_index_mask<__m128i, FirstActive_, 16>
+	{
+	private:
+		static constexpr bool even = FirstActive_;
+		static constexpr bool odd = !even;
+		using _mask_generator = _per_index_mask<__m128i, even, odd, even, odd, even, odd, even, odd>;
+
+	public:
+		[[nodiscard]] static inline __m128i get()
+		{
+			return _mask_generator::get();
+		}
+	};
+	template<bool FirstActive_>
+	struct _alternating_index_mask<__m128i, FirstActive_, 32>
+	{
+	private:
+		static constexpr bool even = FirstActive_;
+		static constexpr bool odd = !even;
+		using _mask_generator = _per_index_mask<__m128i, even, odd, even, odd>;
+
+	public:
+		[[nodiscard]] static inline __m128i get()
+		{
+			return _mask_generator::get();
+		}
+	};
+	template<bool FirstActive_>
+	struct _alternating_index_mask<__m128i, FirstActive_, 64>
+	{
+	private:
+		static constexpr bool even = FirstActive_;
+		static constexpr bool odd = !even;
+		using _mask_generator = _per_index_mask<__m128i, even, odd>;
+
+	public:
+		[[nodiscard]] static inline __m128i get()
+		{
+			return _mask_generator::get();
+		}
+	};
+
+	template<bool FirstActive_>
+	struct _alternating_index_mask<__m256i, FirstActive_, 8>
+	{
+	private:
+		static constexpr bool even = FirstActive_;
+		static constexpr bool odd = !even;
+		using _mask_generator = _per_index_mask
+		<
+			__m256i,
+			even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd,
+			even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd
+		>;
+
+	public:
+		[[nodiscard]] static inline __m256i get()
+		{
+			return _mask_generator::get();
+		}
+	};
+	template<bool FirstActive_>
+	struct _alternating_index_mask<__m256i, FirstActive_, 16>
+	{
+	private:
+		static constexpr bool even = FirstActive_;
+		static constexpr bool odd = !even;
+		using _mask_generator = _per_index_mask<__m256i, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd>;
+
+	public:
+		[[nodiscard]] static inline __m256i get()
+		{
+			return _mask_generator::get();
+		}
+	};
+	template<bool FirstActive_>
+	struct _alternating_index_mask<__m256i, FirstActive_, 32>
+	{
+	private:
+		static constexpr bool even = FirstActive_;
+		static constexpr bool odd = !even;
+		using _mask_generator = _per_index_mask<__m256i, even, odd, even, odd, even, odd, even, odd>;
+
+	public:
+		[[nodiscard]] static inline __m256i get()
+		{
+			return _mask_generator::get();
+		}
+	};
+	template<bool FirstActive_>
+	struct _alternating_index_mask<__m256i, FirstActive_, 64>
+	{
+	private:
+		static constexpr bool even = FirstActive_;
+		static constexpr bool odd = !even;
+		using _mask_generator = _per_index_mask<__m256i, even, odd, even, odd>;
+
+	public:
+		[[nodiscard]] static inline __m256i get()
+		{
+			return _mask_generator::get();
+		}
+	};
+
+	template<bool FirstActive_>
+	struct _alternating_index_mask<__m512i, FirstActive_, 8>
+	{
+	private:
+		static constexpr bool even = FirstActive_;
+		static constexpr bool odd = !even;
+		using _mask_generator = _per_index_mask
+		<
+			__m512i,
+			even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd,
+			even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd,
+			even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd,
+			even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd
+		>;
+
+	public:
+		[[nodiscard]] static inline __m512i get()
+		{
+			return _mask_generator::get();
+		}
+	};
+	template<bool FirstActive_>
+	struct _alternating_index_mask<__m512i, FirstActive_, 16>
+	{
+	private:
+		static constexpr bool even = FirstActive_;
+		static constexpr bool odd = !even;
+		using _mask_generator = _per_index_mask
+		<
+			__m512i,
+			even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd,
+			even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd
+		>;
+
+	public:
+		[[nodiscard]] static inline __m512i get()
+		{
+			return _mask_generator::get();
+		}
+	};
+	template<bool FirstActive_>
+	struct _alternating_index_mask<__m512i, FirstActive_, 32>
+	{
+	private:
+		static constexpr bool even = FirstActive_;
+		static constexpr bool odd = !even;
+		using _mask_generator = _per_index_mask<__m512i, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd, even, odd>;
+
+	public:
+		[[nodiscard]] static inline __m512i get()
+		{
+			return _mask_generator::get();
+		}
+	};
+	template<bool FirstActive_>
+	struct _alternating_index_mask<__m512i, FirstActive_, 64>
+	{
+	private:
+		static constexpr bool even = FirstActive_;
+		static constexpr bool odd = !even;
+		using _mask_generator = _per_index_mask<__m512i, even, odd, even, odd, even, odd, even, odd>;
+
+	public:
+		[[nodiscard]] static inline __m512i get()
+		{
+			return _mask_generator::get();
+		}
+	};
+#pragma endregion
 	
 #pragma region VALIDITY_TMP
 	template<class PerIndexMaskInstance_>
@@ -1453,6 +1738,17 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	struct _is_valid_single_index_mask_instance<_single_index_mask<Register_, Index_, PerElementWidthIfInt_>>
 	{
 		static constexpr bool value = EmuCore::TMPHelpers::has_static_get<_single_index_mask<Register_, Index_, PerElementWidthIfInt_>>::value;
+	};
+
+	template<class AlternatingIndexMaskInstance_>
+	struct _is_valid_alternating_index_mask_instance
+	{
+		static constexpr bool value = false;
+	};
+	template<class Register_, bool FirstActive_, std::size_t PerElementWidthIfInt_>
+	struct _is_valid_alternating_index_mask_instance<_alternating_index_mask<Register_, FirstActive_, PerElementWidthIfInt_>>
+	{
+		static constexpr bool value = EmuCore::TMPHelpers::has_static_get<_alternating_index_mask<Register_, FirstActive_, PerElementWidthIfInt_>>::value;
 	};
 #pragma endregion
 }

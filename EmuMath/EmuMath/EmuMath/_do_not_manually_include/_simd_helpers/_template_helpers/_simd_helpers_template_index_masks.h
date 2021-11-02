@@ -69,6 +69,32 @@ namespace EmuMath::SIMD
 			}
 		}
 	};
+
+	template<class Register_, bool FirstActive_, std::size_t PerElementWidthIfInt_ = 32>
+	struct alternating_index_mask
+	{
+	private:
+		using mask_generator = _underlying_simd_helpers::_alternating_index_mask<Register_, FirstActive_, PerElementWidthIfInt_>;
+		static constexpr bool _is_valid = _underlying_simd_helpers::_is_valid_alternating_index_mask_instance<mask_generator>::value;
+		static_assert
+		(
+			_is_valid,
+			"Attempted to form an invalid EmuMath::SIMD::alternating_index_mask. The provided register type is not supported, or an invalid PerElementWidth may have been provided if the register is integral."
+		);
+
+	public:
+		[[nodiscard]] static inline Register_ get()
+		{
+			if constexpr (_is_valid)
+			{
+				return mask_generator::get();
+			}
+			else
+			{
+				return Register_();
+			}
+		}
+	};
 	
 	// NOTE FOR FUNCS: Integral functions have their adaptive nature based on arguments as _per_index_mask does, but an extra subset of _width functions are provided
 	// --- These functions are used to enforce safety and sanity checks when working with known size integral registers, if desired
@@ -221,6 +247,55 @@ namespace EmuMath::SIMD
 	[[nodiscard]] inline __m128i single_index_mask_m128i_64()
 	{
 		return single_index_mask<__m128i, Index_, 64>::get();
+	}
+
+	template<bool FirstActive_>
+	[[nodiscard]] inline __m128 alternating_index_mask_m128()
+	{
+		return alternating_index_mask<__m128, FirstActive_>::get();
+	}
+
+	template<bool FirstActive_>
+	[[nodiscard]] inline __m128d alternating_index_mask_m128d()
+	{
+		return alternating_index_mask<__m128d, FirstActive_>::get();
+	}
+
+	template<bool FirstActive_, std::size_t PerElementWidth_>
+	[[nodiscard]] inline __m128i alternating_index_mask_m128i()
+	{
+		if constexpr (EmuMath::SIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
+		{
+			return alternating_index_mask<__m128i, FirstActive_>::get();
+		}
+		else
+		{
+			static_assert(false, "Provided an invalid PerElementWidth_ when calling EmuMath::SIMD::alternating_index_mask_m128i.");
+		}
+	}
+
+	template<bool FirstActive_>
+	[[nodiscard]] inline __m128i alternating_index_mask_m128i_8()
+	{
+		return alternating_index_mask<__m128i, FirstActive_, 8>::get();
+	}
+
+	template<bool FirstActive_>
+	[[nodiscard]] inline __m128i alternating_index_mask_m128i_16()
+	{
+		return alternating_index_mask<__m128i, FirstActive_, 16>::get();
+	}
+
+	template<bool FirstActive_>
+	[[nodiscard]] inline __m128i alternating_index_mask_m128i_32()
+	{
+		return alternating_index_mask<__m128i, FirstActive_, 32>::get();
+	}
+
+	template<bool FirstActive_>
+	[[nodiscard]] inline __m128i alternating_index_mask_m128i_64()
+	{
+		return alternating_index_mask<__m128i, FirstActive_, 64>::get();
 	}
 #pragma endregion
 
@@ -394,6 +469,55 @@ namespace EmuMath::SIMD
 	[[nodiscard]] inline __m256i single_index_mask_m256i_64()
 	{
 		return single_index_mask<__m256i, Index_, 64>::get();
+	}
+
+	template<bool FirstActive_>
+	[[nodiscard]] inline __m256 alternating_index_mask_m256()
+	{
+		return alternating_index_mask<__m256, FirstActive_>::get();
+	}
+
+	template<bool FirstActive_>
+	[[nodiscard]] inline __m256d alternating_index_mask_m256d()
+	{
+		return alternating_index_mask<__m256d, FirstActive_>::get();
+	}
+
+	template<bool FirstActive_, std::size_t PerElementWidth_>
+	[[nodiscard]] inline __m256i alternating_index_mask_m256i()
+	{
+		if constexpr (EmuMath::SIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
+		{
+			return alternating_index_mask<__m256i, FirstActive_>::get();
+		}
+		else
+		{
+			static_assert(false, "Provided an invalid PerElementWidth_ when calling EmuMath::SIMD::alternating_index_mask_m256i.");
+		}
+	}
+
+	template<bool FirstActive_>
+	[[nodiscard]] inline __m256i alternating_index_mask_m256i_8()
+	{
+		return alternating_index_mask<__m256i, FirstActive_, 8>::get();
+	}
+
+	template<bool FirstActive_>
+	[[nodiscard]] inline __m256i alternating_index_mask_m256i_16()
+	{
+		return alternating_index_mask<__m256i, FirstActive_, 16>::get();
+	}
+
+	template<bool FirstActive_>
+	[[nodiscard]] inline __m256i alternating_index_mask_m256i_32()
+	{
+		return alternating_index_mask<__m256i, FirstActive_, 32>::get();
+	}
+
+	template<bool FirstActive_>
+	[[nodiscard]] inline __m256i alternating_index_mask_m256i_64()
+	{
+		return alternating_index_mask<__m256i, FirstActive_, 64>::get();
 	}
 #pragma endregion
 
@@ -605,6 +729,57 @@ namespace EmuMath::SIMD
 	[[nodiscard]] inline __m512i single_index_mask_m512i_64()
 	{
 		return single_index_mask<__m512i, Index_, 64>::get();
+	}
+
+
+
+	template<bool FirstActive_>
+	[[nodiscard]] inline __m512 alternating_index_mask_m512()
+	{
+		return alternating_index_mask<__m512, FirstActive_>::get();
+	}
+
+	template<bool FirstActive_>
+	[[nodiscard]] inline __m512d alternating_index_mask_m512d()
+	{
+		return alternating_index_mask<__m512d, FirstActive_>::get();
+	}
+
+	template<bool FirstActive_, std::size_t PerElementWidth_>
+	[[nodiscard]] inline __m512i alternating_index_mask_m512i()
+	{
+		if constexpr (EmuMath::SIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
+		{
+			return alternating_index_mask<__m512i, FirstActive_>::get();
+		}
+		else
+		{
+			static_assert(false, "Provided an invalid PerElementWidth_ when calling EmuMath::SIMD::alternating_index_mask_m512i.");
+		}
+	}
+
+	template<bool FirstActive_>
+	[[nodiscard]] inline __m512i alternating_index_mask_m512i_8()
+	{
+		return alternating_index_mask<__m512i, FirstActive_, 8>::get();
+	}
+
+	template<bool FirstActive_>
+	[[nodiscard]] inline __m512i alternating_index_mask_m512i_16()
+	{
+		return alternating_index_mask<__m512i, FirstActive_, 16>::get();
+	}
+
+	template<bool FirstActive_>
+	[[nodiscard]] inline __m512i alternating_index_mask_m512i_32()
+	{
+		return alternating_index_mask<__m512i, FirstActive_, 32>::get();
+	}
+
+	template<bool FirstActive_>
+	[[nodiscard]] inline __m512i alternating_index_mask_m512i_64()
+	{
+		return alternating_index_mask<__m512i, FirstActive_, 64>::get();
 	}
 #pragma endregion
 }

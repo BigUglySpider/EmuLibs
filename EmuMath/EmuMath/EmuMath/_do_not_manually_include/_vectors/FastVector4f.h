@@ -752,7 +752,7 @@ namespace EmuMath
 		/// <param name="t_">Scalar or vector weighting to use for each linear interpolation. t in the equation a + ((b - a) * t).</param>
 		[[nodiscard]] inline FastVector4f Lerp(__m128 b_, __m128 t_) const
 		{
-			return FastVector4f(EmuMath::SIMD::vector_lerp(data_, b_, t_));
+			return FastVector4f(EmuMath::SIMD::fused_lerp(data_, b_, t_));
 		}
 		[[nodiscard]] inline FastVector4f Lerp(__m128 b_, const FastVector4f& t_) const
 		{
@@ -1777,7 +1777,7 @@ namespace EmuMath
 		/// <returns>Inverted form of this vector resulting from a bitwise NOT.</returns>
 		[[nodiscard]] inline FastVector4f Not() const
 		{
-			return FastVector4f(_mm_andnot_ps(data_, EmuMath::SIMD::index_mask_m128<true, true, true, true>()));
+			return FastVector4f(EmuMath::SIMD::bitwise_not(data_));
 		}
 #pragma endregion
 

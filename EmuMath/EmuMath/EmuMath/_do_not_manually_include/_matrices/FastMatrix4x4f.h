@@ -256,7 +256,7 @@ namespace EmuMath
 			{
 				if constexpr (_assert_valid_cast_to<Out_>())
 				{
-					return static_cast<Out_>(EmuMath::SIMD::get_m128_index<RowIndex_>(GetColumn<ColumnIndex_>()));
+					return EmuMath::SIMD::get_index<RowIndex_, Out_>(GetColumn<ColumnIndex_>());
 				}
 				else
 				{
@@ -799,40 +799,40 @@ namespace EmuMath
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_lerp(column0, b_0_, t_0_),
-				EmuMath::SIMD::vector_lerp(column1, b_1_, t_1_),
-				EmuMath::SIMD::vector_lerp(column2, b_2_, t_2_),
-				EmuMath::SIMD::vector_lerp(column3, b_3_, t_3_)
+				EmuMath::SIMD::fused_lerp(column0, b_0_, t_0_),
+				EmuMath::SIMD::fused_lerp(column1, b_1_, t_1_),
+				EmuMath::SIMD::fused_lerp(column2, b_2_, t_2_),
+				EmuMath::SIMD::fused_lerp(column3, b_3_, t_3_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(__m128 b_, __m128 t_) const
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_lerp(column0, b_, t_),
-				EmuMath::SIMD::vector_lerp(column1, b_, t_),
-				EmuMath::SIMD::vector_lerp(column2, b_, t_),
-				EmuMath::SIMD::vector_lerp(column3, b_, t_)
+				EmuMath::SIMD::fused_lerp(column0, b_, t_),
+				EmuMath::SIMD::fused_lerp(column1, b_, t_),
+				EmuMath::SIMD::fused_lerp(column2, b_, t_),
+				EmuMath::SIMD::fused_lerp(column3, b_, t_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(const FastMatrix4x4f_CM& b_, __m128 t_) const
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_lerp(column0, b_.column0, t_),
-				EmuMath::SIMD::vector_lerp(column1, b_.column1, t_),
-				EmuMath::SIMD::vector_lerp(column2, b_.column2, t_),
-				EmuMath::SIMD::vector_lerp(column3, b_.column3, t_)
+				EmuMath::SIMD::fused_lerp(column0, b_.column0, t_),
+				EmuMath::SIMD::fused_lerp(column1, b_.column1, t_),
+				EmuMath::SIMD::fused_lerp(column2, b_.column2, t_),
+				EmuMath::SIMD::fused_lerp(column3, b_.column3, t_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(__m128 b_, const FastMatrix4x4f_CM& t_) const
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_lerp(column0, b_, t_.column0),
-				EmuMath::SIMD::vector_lerp(column1, b_, t_.column1),
-				EmuMath::SIMD::vector_lerp(column2, b_, t_.column2),
-				EmuMath::SIMD::vector_lerp(column3, b_, t_.column3)
+				EmuMath::SIMD::fused_lerp(column0, b_, t_.column0),
+				EmuMath::SIMD::fused_lerp(column1, b_, t_.column1),
+				EmuMath::SIMD::fused_lerp(column2, b_, t_.column2),
+				EmuMath::SIMD::fused_lerp(column3, b_, t_.column3)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(const FastMatrix4x4f_CM& b_, const FastMatrix4x4f_CM& t_) const
@@ -1217,10 +1217,10 @@ namespace EmuMath
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::not_128(column0),
-				EmuMath::SIMD::not_128(column1),
-				EmuMath::SIMD::not_128(column2),
-				EmuMath::SIMD::not_128(column3)
+				EmuMath::SIMD::bitwise_not(column0),
+				EmuMath::SIMD::bitwise_not(column1),
+				EmuMath::SIMD::bitwise_not(column2),
+				EmuMath::SIMD::bitwise_not(column3)
 			);
 		}
 #pragma endregion

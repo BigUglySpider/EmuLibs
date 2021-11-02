@@ -180,17 +180,17 @@ namespace EmuMath::Functors
 
 			// Primary lerps
 			// --- Use fused lerps to skip 7 floating-point rounding operations
-			__m128 lerp_0_ = EmuMath::SIMD::vector_lerp_fused(vals_000_, vals_100_, tx_0_128_);
-			__m128 lerp_1_ = EmuMath::SIMD::vector_lerp_fused(vals_010_, vals_110_, tx_0_128_);
-			__m128 lerp_2_ = EmuMath::SIMD::vector_lerp_fused(vals_001_, vals_101_, tx_0_128_);
-			__m128 lerp_3_ = EmuMath::SIMD::vector_lerp_fused(vals_011_, vals_111_, tx_0_128_);
+			__m128 lerp_0_ = EmuMath::SIMD::fused_lerp(vals_000_, vals_100_, tx_0_128_);
+			__m128 lerp_1_ = EmuMath::SIMD::fused_lerp(vals_010_, vals_110_, tx_0_128_);
+			__m128 lerp_2_ = EmuMath::SIMD::fused_lerp(vals_001_, vals_101_, tx_0_128_);
+			__m128 lerp_3_ = EmuMath::SIMD::fused_lerp(vals_011_, vals_111_, tx_0_128_);
 
 			// Secondary lerps
-			lerp_0_ = EmuMath::SIMD::vector_lerp_fused(lerp_0_, lerp_1_, ty_0_128_);
-			lerp_2_ = EmuMath::SIMD::vector_lerp_fused(lerp_2_, lerp_3_, ty_0_128_);
+			lerp_0_ = EmuMath::SIMD::fused_lerp(lerp_0_, lerp_1_, ty_0_128_);
+			lerp_2_ = EmuMath::SIMD::fused_lerp(lerp_2_, lerp_3_, ty_0_128_);
 
 			// Final tertiary lerp
-			return EmuMath::SIMD::vector_lerp_fused(lerp_0_, lerp_2_, tz_0_128_);
+			return EmuMath::SIMD::fused_lerp(lerp_0_, lerp_2_, tz_0_128_);
 		}
 
 	private:
