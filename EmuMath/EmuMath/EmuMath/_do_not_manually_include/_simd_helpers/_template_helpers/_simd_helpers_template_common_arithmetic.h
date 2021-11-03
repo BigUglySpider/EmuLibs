@@ -294,7 +294,7 @@ namespace EmuMath::SIMD
 		}
 		else
 		{
-
+			static_assert(false, "Attempted to perform EmuMath::SIMD::horizontal_sum_fill with an unsupported type as the passed Register_.");
 		}
 	}
 

@@ -4,6 +4,7 @@
 #include "_template_helpers/_simd_helpers_template_aliases.h"
 #include "_template_helpers/_simd_helpers_template_basic_arithmetic.h"
 #include "_template_helpers/_simd_helpers_template_bitwise.h"
+#include "_template_helpers/_simd_helpers_template_blend.h"
 #include "_template_helpers/_simd_helpers_template_common_arithmetic.h"
 #include "_template_helpers/_simd_helpers_template_gets.h"
 #include "_template_helpers/_simd_helpers_template_index_masks.h"

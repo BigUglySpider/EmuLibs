@@ -405,17 +405,24 @@ int main()
 	std::cout << "---\n\n";
 
 
-	using testing_register = __m256;
-	constexpr std::size_t testing_element_width = 32;
-	testing_register a_simd_ = EmuMath::SIMD::set<testing_register, testing_element_width>(1, 2, 3, 4, 5, 6, 7, 8);
-	EmuMath::SIMD::append_simd_vector_to_stream<testing_element_width>(std::cout, a_simd_) << "\n";
-	EmuMath::SIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, EmuMath::SIMD::horizontal_sum_fill<testing_element_width>(a_simd_)) << "\n";
-
-	__m128 weeeeee = _mm_set_ps(1.0f, 2.0f, 3.0f, 4.0f);
-	__m128 woooooo = _mm_set_ps(5.0f, 6.0f, 7.0f, 8.0f);
-	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, weeeeee) << " BLEND\n";
-	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, woooooo) << " (0011)\n";
-	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, _mm_blend_ps(weeeeee, woooooo, 0b0011)) << "\n";
+	using testing_register = __m256i;
+	constexpr std::size_t testing_element_width = 8;
+	testing_register a_simd_ = EmuMath::SIMD::set_incrementing<testing_register, 1, testing_element_width>();
+	testing_register b_simd_ = EmuMath::SIMD::set_incrementing<testing_register, 33, testing_element_width>();
+	testing_register mask_simd_ = EmuMath::SIMD::index_mask<testing_register, true, false, false, false, false, true, false, false>::get();
+	EmuMath::SIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, a_simd_) << " BLEND\n";
+	EmuMath::SIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, b_simd_) << " WITH MASK\n";
+	EmuMath::SIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, mask_simd_) << ":\n";
+	EmuMath::SIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, EmuMath::SIMD::blendv(a_simd_, b_simd_, mask_simd_)) << "\n";
+	EmuMath::SIMD::append_simd_vector_to_stream<testing_element_width, false>
+	(
+		std::cout,
+		EmuMath::SIMD::blend
+		<
+			false, false, true, true, true, false, true, false, false, false, false, true, true, true, true, false,
+			true, true, true, true, true, false, true, false, false, false, false, true, true, true, true, true
+		>(a_simd_, b_simd_)
+	) << "\n";
 
 	system("pause");
 

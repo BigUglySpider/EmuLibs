@@ -44,22 +44,22 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		{
 			return _mm_set_epi8
 			(
-				EmuCore::TMPHelpers::conditional_value_v<I0_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I1_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I2_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I3_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I4_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I5_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I6_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I7_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I8_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I9_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I10_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I11_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I12_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I13_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I14_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I15_, std::int8_t, 0xFF, 0x00>
+				EmuCore::TMPHelpers::conditional_value_v<I0_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I1_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I2_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I3_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I4_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I5_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I6_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I7_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I8_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I9_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I10_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I11_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I12_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I13_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I14_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I15_, std::int8_t, std::int8_t(0xFF), 0x00>
 			);
 		}
 	};
@@ -87,14 +87,14 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		{
 			return _mm_set_epi16
 			(
-				EmuCore::TMPHelpers::conditional_value_v<I0_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I1_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I2_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I3_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I4_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I5_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I6_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I7_, std::int16_t, 0xFFFF, 0x0000>
+				EmuCore::TMPHelpers::conditional_value_v<I0_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I1_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I2_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I3_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I4_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I5_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I6_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I7_, std::int16_t, std::int16_t(0xFFFF), 0x0000>
 			);
 		}
 	};
@@ -122,10 +122,10 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		{
 			return _mm_set_epi32
 			(
-				EmuCore::TMPHelpers::conditional_value_v<I0_, std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I1_, std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I2_, std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I3_, std::int32_t, 0xFFFFFFFF, 0x00000000>
+				EmuCore::TMPHelpers::conditional_value_v<I0_, std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I1_, std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I2_, std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I3_, std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>
 			);
 		}
 	};
@@ -153,8 +153,8 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		{
 			return _mm_set_epi64x
 			(
-				EmuCore::TMPHelpers::conditional_value_v<I0_, std::int64_t, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I1_, std::int64_t, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000>
+				EmuCore::TMPHelpers::conditional_value_v<I0_, std::int64_t, std::int64_t(0xFFFFFFFFFFFFFFFF), 0x0000000000000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I1_, std::int64_t, std::int64_t(0xFFFFFFFFFFFFFFFF), 0x0000000000000000>
 			);
 		}
 	};
@@ -262,38 +262,38 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		{
 			return _mm256_set_epi8
 			(
-				EmuCore::TMPHelpers::conditional_value_v<I0_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I1_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I2_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I3_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I4_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I5_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I6_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I7_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I8_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I9_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I10_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I11_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I12_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I13_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I14_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I15_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I16_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I17_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I18_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I19_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I20_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I21_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I22_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I23_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I24_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I25_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I26_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I27_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I28_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I29_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I30_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I31_, std::int8_t, 0xFF, 0x00>
+				EmuCore::TMPHelpers::conditional_value_v<I0_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I1_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I2_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I3_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I4_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I5_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I6_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I7_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I8_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I9_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I10_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I11_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I12_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I13_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I14_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I15_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I16_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I17_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I18_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I19_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I20_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I21_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I22_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I23_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I24_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I25_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I26_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I27_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I28_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I29_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I30_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I31_, std::int8_t, std::int8_t(0xFF), 0x00>
 			);
 		}
 	};
@@ -335,22 +335,22 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		{
 			return _mm256_set_epi16
 			(
-				EmuCore::TMPHelpers::conditional_value_v<I0_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I1_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I2_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I3_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I4_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I5_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I6_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I7_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I8_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I9_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I10_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I11_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I12_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I13_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I14_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I15_, std::int16_t, 0xFFFF, 0x0000>
+				EmuCore::TMPHelpers::conditional_value_v<I0_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I1_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I2_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I3_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I4_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I5_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I6_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I7_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I8_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I9_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I10_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I11_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I12_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I13_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I14_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I15_, std::int16_t, std::int16_t(0xFFFF), 0x0000>
 			);
 		}
 	};
@@ -378,14 +378,14 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		{
 			return _mm256_set_epi32
 			(
-				EmuCore::TMPHelpers::conditional_value_v<I0_,  std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I1_,  std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I2_,  std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I3_,  std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I4_,  std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I5_,  std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I6_,  std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I7_,  std::int32_t, 0xFFFFFFFF, 0x00000000>
+				EmuCore::TMPHelpers::conditional_value_v<I0_,  std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I1_,  std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I2_,  std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I3_,  std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I4_,  std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I5_,  std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I6_,  std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I7_,  std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>
 			);
 		}
 	};
@@ -413,10 +413,10 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		{
 			return _mm256_set_epi64x
 			(
-				EmuCore::TMPHelpers::conditional_value_v<I0_,  std::int64_t, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I1_,  std::int64_t, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I2_,  std::int64_t, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I3_,  std::int64_t, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000>
+				EmuCore::TMPHelpers::conditional_value_v<I0_,  std::int64_t, std::int64_t(0xFFFFFFFFFFFFFFFF), 0x0000000000000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I1_,  std::int64_t, std::int64_t(0xFFFFFFFFFFFFFFFF), 0x0000000000000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I2_,  std::int64_t, std::int64_t(0xFFFFFFFFFFFFFFFF), 0x0000000000000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I3_,  std::int64_t, std::int64_t(0xFFFFFFFFFFFFFFFF), 0x0000000000000000>
 			);
 		}
 	};
@@ -530,70 +530,70 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		{
 			return _mm512_set_epi8
 			(
-				EmuCore::TMPHelpers::conditional_value_v<I0_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I1_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I2_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I3_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I4_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I5_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I6_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I7_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I8_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I9_,  std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I10_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I11_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I12_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I13_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I14_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I15_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I16_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I17_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I18_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I19_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I20_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I21_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I22_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I23_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I24_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I25_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I26_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I27_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I28_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I29_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I30_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I31_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I32_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I33_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I34_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I35_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I36_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I37_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I38_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I39_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I40_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I41_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I42_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I43_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I44_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I45_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I46_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I47_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I48_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I49_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I50_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I51_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I52_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I53_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I54_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I55_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I56_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I57_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I58_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I59_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I60_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I61_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I62_, std::int8_t, 0xFF, 0x00>,
-				EmuCore::TMPHelpers::conditional_value_v<I63_, std::int8_t, 0xFF, 0x00>
+				EmuCore::TMPHelpers::conditional_value_v<I0_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I1_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I2_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I3_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I4_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I5_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I6_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I7_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I8_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I9_,  std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I10_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I11_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I12_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I13_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I14_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I15_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I16_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I17_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I18_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I19_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I20_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I21_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I22_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I23_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I24_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I25_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I26_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I27_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I28_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I29_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I30_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I31_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I32_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I33_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I34_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I35_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I36_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I37_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I38_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I39_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I40_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I41_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I42_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I43_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I44_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I45_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I46_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I47_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I48_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I49_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I50_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I51_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I52_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I53_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I54_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I55_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I56_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I57_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I58_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I59_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I60_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I61_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I62_, std::int8_t, std::int8_t(0xFF), 0x00>,
+				EmuCore::TMPHelpers::conditional_value_v<I63_, std::int8_t, std::int8_t(0xFF), 0x00>
 			);
 		}
 	};
@@ -646,38 +646,38 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		{
 			return _mm256_set_epi16
 			(
-				EmuCore::TMPHelpers::conditional_value_v<I0_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I1_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I2_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I3_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I4_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I5_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I6_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I7_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I8_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I9_,  std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I10_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I11_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I12_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I13_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I14_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I15_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I16_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I17_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I18_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I19_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I20_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I21_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I22_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I23_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I24_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I25_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I26_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I27_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I28_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I29_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I30_, std::int16_t, 0xFFFF, 0x0000>,
-				EmuCore::TMPHelpers::conditional_value_v<I31_, std::int16_t, 0xFFFF, 0x0000>
+				EmuCore::TMPHelpers::conditional_value_v<I0_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I1_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I2_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I3_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I4_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I5_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I6_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I7_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I8_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I9_,  std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I10_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I11_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I12_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I13_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I14_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I15_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I16_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I17_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I18_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I19_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I20_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I21_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I22_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I23_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I24_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I25_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I26_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I27_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I28_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I29_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I30_, std::int16_t, std::int16_t(0xFFFF), 0x0000>,
+				EmuCore::TMPHelpers::conditional_value_v<I31_, std::int16_t, std::int16_t(0xFFFF), 0x0000>
 			);
 		}
 	};
@@ -719,22 +719,22 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		{
 			return _mm512_set_epi32
 			(
-				EmuCore::TMPHelpers::conditional_value_v<I0_,  std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I1_,  std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I2_,  std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I3_,  std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I4_,  std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I5_,  std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I6_,  std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I7_,  std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I8_,  std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I9_,  std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I10_, std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I11_, std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I12_, std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I13_, std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I14_, std::int32_t, 0xFFFFFFFF, 0x00000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I15_, std::int32_t, 0xFFFFFFFF, 0x00000000>
+				EmuCore::TMPHelpers::conditional_value_v<I0_,  std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I1_,  std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I2_,  std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I3_,  std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I4_,  std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I5_,  std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I6_,  std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I7_,  std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I8_,  std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I9_,  std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I10_, std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I11_, std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I12_, std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I13_, std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I14_, std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I15_, std::int32_t, std::int32_t(0xFFFFFFFF), 0x00000000>
 			);
 		}
 	};
@@ -762,14 +762,14 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		{
 			return _mm512_set_epi64
 			(
-				EmuCore::TMPHelpers::conditional_value_v<I0_,  std::int64_t, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I1_,  std::int64_t, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I2_,  std::int64_t, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I3_,  std::int64_t, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I4_,  std::int64_t, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I5_,  std::int64_t, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I6_,  std::int64_t, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000>,
-				EmuCore::TMPHelpers::conditional_value_v<I7_,  std::int64_t, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000>
+				EmuCore::TMPHelpers::conditional_value_v<I0_,  std::int64_t, std::int64_t(0xFFFFFFFFFFFFFFFF), 0x0000000000000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I1_,  std::int64_t, std::int64_t(0xFFFFFFFFFFFFFFFF), 0x0000000000000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I2_,  std::int64_t, std::int64_t(0xFFFFFFFFFFFFFFFF), 0x0000000000000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I3_,  std::int64_t, std::int64_t(0xFFFFFFFFFFFFFFFF), 0x0000000000000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I4_,  std::int64_t, std::int64_t(0xFFFFFFFFFFFFFFFF), 0x0000000000000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I5_,  std::int64_t, std::int64_t(0xFFFFFFFFFFFFFFFF), 0x0000000000000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I6_,  std::int64_t, std::int64_t(0xFFFFFFFFFFFFFFFF), 0x0000000000000000>,
+				EmuCore::TMPHelpers::conditional_value_v<I7_,  std::int64_t, std::int64_t(0xFFFFFFFFFFFFFFFF), 0x0000000000000000>
 			);
 		}
 	};
