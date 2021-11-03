@@ -268,6 +268,35 @@ namespace EmuMath::SIMD
 			static_assert(false, "Attempted to perform EmuMath::SIMD::horizontal_sum with an unsupported type as the passed Register_.");
 		}
 	}
+	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
+	[[nodiscard]] inline Register_ horizontal_sum_fill(Register_ register_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _underlying_simd_helpers::_execute_shuffle<0>(horizontal_sum(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _underlying_simd_helpers::_execute_shuffle<0>(horizontal_sum(register_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				__m128 result_ = _underlying_simd_helpers::_execute_shuffle<0>
+				(
+					_mm256_castps256_ps128(horizontal_sum(register_))
+				);
+
+				return _mm256_insertf128_ps(_mm256_castps128_ps256(result_), result_, 1);
+			}
+		}
+		else
+		{
+
+		}
+	}
 
 	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
 	[[nodiscard]] inline Register_ dot(Register_ a_, Register_ b_)

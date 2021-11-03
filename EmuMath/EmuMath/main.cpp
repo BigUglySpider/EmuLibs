@@ -405,11 +405,17 @@ int main()
 	std::cout << "---\n\n";
 
 
-	using testing_register = __m256i;
-	constexpr std::size_t testing_element_width = 8;
-	testing_register a_simd_ = EmuMath::SIMD::set<testing_register, testing_element_width>(1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4);
+	using testing_register = __m256;
+	constexpr std::size_t testing_element_width = 32;
+	testing_register a_simd_ = EmuMath::SIMD::set<testing_register, testing_element_width>(1, 2, 3, 4, 5, 6, 7, 8);
 	EmuMath::SIMD::append_simd_vector_to_stream<testing_element_width>(std::cout, a_simd_) << "\n";
-	EmuMath::SIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, EmuMath::SIMD::horizontal_sum<testing_element_width>(a_simd_)) << "\n";
+	EmuMath::SIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, EmuMath::SIMD::horizontal_sum_fill<testing_element_width>(a_simd_)) << "\n";
+
+	__m128 weeeeee = _mm_set_ps(1.0f, 2.0f, 3.0f, 4.0f);
+	__m128 woooooo = _mm_set_ps(5.0f, 6.0f, 7.0f, 8.0f);
+	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, weeeeee) << " BLEND\n";
+	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, woooooo) << " (0011)\n";
+	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, _mm_blend_ps(weeeeee, woooooo, 0b0011)) << "\n";
 
 	system("pause");
 
@@ -419,11 +425,11 @@ int main()
 	(
 		noise_.MakeOptions
 		(
-			EmuMath::Vector<3, std::size_t>(1024, 1024, 1),
+			EmuMath::Vector<3, std::size_t>(1024, 1024, 4),
 			EmuMath::Vector<3, float>(0.0f, 0.0f, 0.0f),
-			EmuMath::Vector<3, float>(1.0f, 1.0f, 1.0f),
+			EmuMath::Vector<3, float>(1.0f / 1024.0f, 1.0f / 1024.0f, 1.0f / 1024.0f),
 			3.0f,
-			false,
+			true,
 			true,
 			EmuMath::Info::NoisePermutationInfo(4096, EmuMath::Info::NoisePermutationShuffleMode::SEED_32, true, 1337, 1337),
 			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
@@ -441,11 +447,11 @@ int main()
 	(
 		fast_noise_.make_options
 		(
-			EmuMath::Vector<3, std::size_t>(1024, 1024, 1),
+			EmuMath::Vector<3, std::size_t>(1024, 1024, 4),
 			EmuMath::Vector<3, float>(0.0f, 0.0f, 0.0f),
-			EmuMath::Vector<3, float>(1.0f, 1.0f, 1.0f),
+			EmuMath::Vector<3, float>(1.0f/1024.0f, 1.0f/1024.0f, 1.0f/1024.0f),
 			3.0f,
-			false,
+			true,
 			true,
 			EmuMath::Info::NoisePermutationInfo(4096, EmuMath::Info::NoisePermutationShuffleMode::SEED_32, true, 1337, 1337),
 			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)

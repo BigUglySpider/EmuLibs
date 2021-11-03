@@ -62,6 +62,7 @@ namespace EmuMath::Functors
 		};
 		static constexpr EmuMath::NoisePermutationValue _gradient_mask = 15;
 
+		/// <summary> Gradients for calculation. W index contains a duplicate of the Z index. </summary>
 		std::array<__m128, _num_gradients> _gradients_128;
 
 		make_fast_noise_3d() :
@@ -80,18 +81,18 @@ namespace EmuMath::Functors
 				_mm_set_ps(0.0f, 0.0f, 1.0f, -1.0f),
 				_mm_set_ps(0.0f, 0.0f, -1.0f, 1.0f),
 				_mm_set_ps(0.0f, 0.0f, -1.0f, -1.0f),
-				_mm_set_ps(0.0f, 1.0f, 0.0f, 1.0f),
-				_mm_set_ps(0.0f, 1.0f, 0.0f, -1.0f),
-				_mm_set_ps(0.0f, -1.0f, 0.0f, 1.0f),
-				_mm_set_ps(0.0f, -1.0f, 0.0f, -1.0f),
-				_mm_set_ps(0.0f, 1.0f, 1.0f, 0.0f),
-				_mm_set_ps(0.0f, 1.0f, -1.0f, 0.0f),
-				_mm_set_ps(0.0f, -1.0f, 1.0f, 0.0f),
-				_mm_set_ps(0.0f, -1.0f, -1.0f, 0.0f),
+				_mm_set_ps(1.0f, 1.0f, 0.0f, 1.0f),
+				_mm_set_ps(1.0f, 1.0f, 0.0f, -1.0f),
+				_mm_set_ps(-1.0f, -1.0f, 0.0f, 1.0f),
+				_mm_set_ps(-1.0f, -1.0f, 0.0f, -1.0f),
+				_mm_set_ps(1.0f, 1.0f, 1.0f, 0.0f),
+				_mm_set_ps(1.0f, 1.0f, -1.0f, 0.0f),
+				_mm_set_ps(-1.0f, -1.0f, 1.0f, 0.0f),
+				_mm_set_ps(-1.0f, -1.0f, -1.0f, 0.0f),
 				_mm_set_ps(0.0f, 0.0f, 1.0f, 1.0f),
 				_mm_set_ps(0.0f, 0.0f, 1.0f, -1.0f),
-				_mm_set_ps(0.0f, 1.0f, -1.0f, 0.0f),
-				_mm_set_ps(0.0f, -1.0f, -1.0f, 0.0f)
+				_mm_set_ps(1.0f, 1.0f, -1.0f, 0.0f),
+				_mm_set_ps(-1.0f, -1.0f, -1.0f, 0.0f)
 			})
 		{
 		}
@@ -265,168 +266,177 @@ namespace EmuMath::Functors
 			__m128 gradient_1_ = _gradients_128[perm_000_[1]];
 			__m128 gradient_2_ = _gradients_128[perm_000_[2]];
 			__m128 gradient_3_ = _gradients_128[perm_000_[3]];
-
+			
 			// X - Pre-store the Y components in the indices [1] and [3] from each temp shuffle
 			__m128 temp_0_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_0_, gradient_1_);
 			__m128 temp_1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_2_, gradient_3_);
 			__m128 row_ = EmuMath::SIMD::shuffle<0, 2, 0, 2>(temp_0_, temp_1_);
 			vals_000_ = _mm_mul_ps(row_, tx_0_);
-
+			
 			// Y - Already prestored Y in previous two shuffles, so we can form row straight away
 			row_ = EmuMath::SIMD::shuffle<1, 3, 1, 3>(temp_0_, temp_1_);
 			vals_000_ = _mm_add_ps(vals_000_, _mm_mul_ps(row_, ty_0_));
-
+			
 			// Z - One more batch of shuffles to extract the Z-coordinates of the gradients
-			temp_0_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_0_, gradient_1_);
-			temp_1_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_2_, gradient_3_);
+			// --- We can, however, take advantage of the duplicate Z in the W-element to use blends and a "shuffle" (optimised by templates)
+			temp_0_ = _mm_blend_ps(gradient_0_, gradient_1_, 0b1000);
+			temp_1_ = _mm_blend_ps(gradient_2_, gradient_3_, 0b1000);
+			row_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(temp_0_, temp_1_);
 			vals_000_ = _mm_add_ps(vals_000_, _mm_mul_ps(row_, tz_0_));
-
+			
 			// ABOVE COMMENTS APPLY TO SUBSEQUENT OUTPUTS
 			// 001
 			gradient_0_ = _gradients_128[perm_001_[0]];
 			gradient_1_ = _gradients_128[perm_001_[1]];
 			gradient_2_ = _gradients_128[perm_001_[2]];
 			gradient_3_ = _gradients_128[perm_001_[3]];
-
+			
 			// X
 			temp_0_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_0_, gradient_1_);
 			temp_1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_2_, gradient_3_);
 			row_ = EmuMath::SIMD::shuffle<0, 2, 0, 2>(temp_0_, temp_1_);
 			vals_001_ = _mm_mul_ps(row_, tx_0_);
-
+			
 			// Y
 			row_ = EmuMath::SIMD::shuffle<1, 3, 1, 3>(temp_0_, temp_1_);
 			vals_001_ = _mm_add_ps(vals_001_, _mm_mul_ps(row_, ty_0_));
-
+			
 			// Z
-			temp_0_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_0_, gradient_1_);
-			temp_1_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_2_, gradient_3_);
+			temp_0_ = _mm_blend_ps(gradient_0_, gradient_1_, 0b1000);
+			temp_1_ = _mm_blend_ps(gradient_2_, gradient_3_, 0b1000);
+			row_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(temp_0_, temp_1_);
 			vals_001_ = _mm_add_ps(vals_001_, _mm_mul_ps(row_, tz_1_));
-
+			
 			// 010
 			gradient_0_ = _gradients_128[perm_010_[0]];
 			gradient_1_ = _gradients_128[perm_010_[1]];
 			gradient_2_ = _gradients_128[perm_010_[2]];
 			gradient_3_ = _gradients_128[perm_010_[3]];
-
+			
 			// X
 			temp_0_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_0_, gradient_1_);
 			temp_1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_2_, gradient_3_);
 			row_ = EmuMath::SIMD::shuffle<0, 2, 0, 2>(temp_0_, temp_1_);
 			vals_010_ = _mm_mul_ps(row_, tx_0_);
-
+			
 			// Y
 			row_ = EmuMath::SIMD::shuffle<1, 3, 1, 3>(temp_0_, temp_1_);
 			vals_010_ = _mm_add_ps(vals_010_, _mm_mul_ps(row_, ty_1_));
-
+			
 			// Z
-			temp_0_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_0_, gradient_1_);
-			temp_1_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_2_, gradient_3_);
+			temp_0_ = _mm_blend_ps(gradient_0_, gradient_1_, 0b1000);
+			temp_1_ = _mm_blend_ps(gradient_2_, gradient_3_, 0b1000);
+			row_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(temp_0_, temp_1_);
 			vals_010_ = _mm_add_ps(vals_010_, _mm_mul_ps(row_, tz_0_));
-
+			
 			// 011
 			gradient_0_ = _gradients_128[perm_011_[0]];
 			gradient_1_ = _gradients_128[perm_011_[1]];
 			gradient_2_ = _gradients_128[perm_011_[2]];
 			gradient_3_ = _gradients_128[perm_011_[3]];
-
+			
 			// X
 			temp_0_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_0_, gradient_1_);
 			temp_1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_2_, gradient_3_);
 			row_ = EmuMath::SIMD::shuffle<0, 2, 0, 2>(temp_0_, temp_1_);
 			vals_011_ = _mm_mul_ps(row_, tx_0_);
-
+			
 			// Y
 			row_ = EmuMath::SIMD::shuffle<1, 3, 1, 3>(temp_0_, temp_1_);
 			vals_011_ = _mm_add_ps(vals_011_, _mm_mul_ps(row_, ty_1_));
-
+			
 			// Z
-			temp_0_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_0_, gradient_1_);
-			temp_1_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_2_, gradient_3_);
+			temp_0_ = _mm_blend_ps(gradient_0_, gradient_1_, 0b1000);
+			temp_1_ = _mm_blend_ps(gradient_2_, gradient_3_, 0b1000);
+			row_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(temp_0_, temp_1_);
 			vals_011_ = _mm_add_ps(vals_011_, _mm_mul_ps(row_, tz_1_));
-
+			
 			// 100
 			gradient_0_ = _gradients_128[perm_100_[0]];
 			gradient_1_ = _gradients_128[perm_100_[1]];
 			gradient_2_ = _gradients_128[perm_100_[2]];
 			gradient_3_ = _gradients_128[perm_100_[3]];
-
-			// X - Pre-store the Y components in the indices [1] and [3] from each temp shuffle
+			
+			// X
 			temp_0_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_0_, gradient_1_);
 			temp_1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_2_, gradient_3_);
 			row_ = EmuMath::SIMD::shuffle<0, 2, 0, 2>(temp_0_, temp_1_);
 			vals_100_ = _mm_mul_ps(row_, tx_1_);
-
-			// Y - Already prestored Y in previous two shuffles, so we can form row straight away
+			
+			// Y
 			row_ = EmuMath::SIMD::shuffle<1, 3, 1, 3>(temp_0_, temp_1_);
 			vals_100_ = _mm_add_ps(vals_100_, _mm_mul_ps(row_, ty_0_));
-
-			// Z - One more batch of shuffles to extract the Z-coordinates of the gradients
-			temp_0_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_0_, gradient_1_);
-			temp_1_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_2_, gradient_3_);
+			
+			// Z
+			temp_0_ = _mm_blend_ps(gradient_0_, gradient_1_, 0b1000);
+			temp_1_ = _mm_blend_ps(gradient_2_, gradient_3_, 0b1000);
+			row_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(temp_0_, temp_1_);
 			vals_100_ = _mm_add_ps(vals_100_, _mm_mul_ps(row_, tz_0_));
-
+			
 			// 101
 			gradient_0_ = _gradients_128[perm_101_[0]];
 			gradient_1_ = _gradients_128[perm_101_[1]];
 			gradient_2_ = _gradients_128[perm_101_[2]];
 			gradient_3_ = _gradients_128[perm_101_[3]];
-
+			
 			// X
 			temp_0_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_0_, gradient_1_);
 			temp_1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_2_, gradient_3_);
 			row_ = EmuMath::SIMD::shuffle<0, 2, 0, 2>(temp_0_, temp_1_);
 			vals_101_ = _mm_mul_ps(row_, tx_1_);
-
+			
 			// Y
 			row_ = EmuMath::SIMD::shuffle<1, 3, 1, 3>(temp_0_, temp_1_);
 			vals_101_ = _mm_add_ps(vals_101_, _mm_mul_ps(row_, ty_0_));
-
+			
 			// Z
-			temp_0_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_0_, gradient_1_);
-			temp_1_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_2_, gradient_3_);
+			temp_0_ = _mm_blend_ps(gradient_0_, gradient_1_, 0b1000);
+			temp_1_ = _mm_blend_ps(gradient_2_, gradient_3_, 0b1000);
+			row_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(temp_0_, temp_1_);
 			vals_101_ = _mm_add_ps(vals_101_, _mm_mul_ps(row_, tz_1_));
-
+			
 			// 110
 			gradient_0_ = _gradients_128[perm_110_[0]];
 			gradient_1_ = _gradients_128[perm_110_[1]];
 			gradient_2_ = _gradients_128[perm_110_[2]];
 			gradient_3_ = _gradients_128[perm_110_[3]];
-
+			
 			// X
 			temp_0_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_0_, gradient_1_);
 			temp_1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_2_, gradient_3_);
 			row_ = EmuMath::SIMD::shuffle<0, 2, 0, 2>(temp_0_, temp_1_);
 			vals_110_ = _mm_mul_ps(row_, tx_1_);
-
+			
 			// Y
 			row_ = EmuMath::SIMD::shuffle<1, 3, 1, 3>(temp_0_, temp_1_);
 			vals_110_ = _mm_add_ps(vals_110_, _mm_mul_ps(row_, ty_1_));
-
+			
 			// Z
-			temp_0_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_0_, gradient_1_);
-			temp_1_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_2_, gradient_3_);
+			temp_0_ = _mm_blend_ps(gradient_0_, gradient_1_, 0b1000);
+			temp_1_ = _mm_blend_ps(gradient_2_, gradient_3_, 0b1000);
+			row_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(temp_0_, temp_1_);
 			vals_110_ = _mm_add_ps(vals_110_, _mm_mul_ps(row_, tz_0_));
-
+			
 			// 111
 			gradient_0_ = _gradients_128[perm_111_[0]];
 			gradient_1_ = _gradients_128[perm_111_[1]];
 			gradient_2_ = _gradients_128[perm_111_[2]];
 			gradient_3_ = _gradients_128[perm_111_[3]];
-
+			
 			// X
 			temp_0_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_0_, gradient_1_);
 			temp_1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(gradient_2_, gradient_3_);
 			row_ = EmuMath::SIMD::shuffle<0, 2, 0, 2>(temp_0_, temp_1_);
 			vals_111_ = _mm_mul_ps(row_, tx_1_);
-
+			
 			// Y
 			row_ = EmuMath::SIMD::shuffle<1, 3, 1, 3>(temp_0_, temp_1_);
 			vals_111_ = _mm_add_ps(vals_111_, _mm_mul_ps(row_, ty_1_));
-
+			
 			// Z
-			temp_0_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_0_, gradient_1_);
-			temp_1_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(gradient_2_, gradient_3_);
+			temp_0_ = _mm_blend_ps(gradient_0_, gradient_1_, 0b1000);
+			temp_1_ = _mm_blend_ps(gradient_2_, gradient_3_, 0b1000);
+			row_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(temp_0_, temp_1_);
 			vals_111_ = _mm_add_ps(vals_111_, _mm_mul_ps(row_, tz_1_));
 		}
 
