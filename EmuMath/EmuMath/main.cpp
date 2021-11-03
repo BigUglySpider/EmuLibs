@@ -432,7 +432,7 @@ int main()
 	(
 		noise_.MakeOptions
 		(
-			EmuMath::Vector<3, std::size_t>(1024, 1024, 4),
+			EmuMath::Vector<3, std::size_t>(1024, 1024, 1),
 			EmuMath::Vector<3, float>(0.0f, 0.0f, 0.0f),
 			EmuMath::Vector<3, float>(1.0f / 1024.0f, 1.0f / 1024.0f, 1.0f / 1024.0f),
 			3.0f,
@@ -454,7 +454,7 @@ int main()
 	(
 		fast_noise_.make_options
 		(
-			EmuMath::Vector<3, std::size_t>(1024, 1024, 4),
+			EmuMath::Vector<3, std::size_t>(1024, 1024, 1),
 			EmuMath::Vector<3, float>(0.0f, 0.0f, 0.0f),
 			EmuMath::Vector<3, float>(1.0f/1024.0f, 1.0f/1024.0f, 1.0f/1024.0f),
 			3.0f,
@@ -467,7 +467,7 @@ int main()
 	end_ = std::chrono::steady_clock::now();
 	std::cout << "FINISHED FAST NOISE IN: " << std::chrono::duration<double, std::milli>(end_ - begin_).count() << "ms\n";
 
-	WriteNoiseTableToPPM(fast_noise_, noise_gradient_);
+	WriteNoiseTableToPPM(noise_, noise_gradient_);
 
 	EmuMath::Functors::make_fast_noise_3d<EmuMath::NoiseType::PERLIN, __m128> fast_generator_;
 	__m128 test_128_ = fast_generator_(_mm_set1_ps(0.4f), _mm_set1_ps(0.0f), _mm_set1_ps(1.0f), _mm_set1_ps(16.0f), _mm_set1_epi32(1023), EmuMath::NoisePermutations(1024, 0U));
