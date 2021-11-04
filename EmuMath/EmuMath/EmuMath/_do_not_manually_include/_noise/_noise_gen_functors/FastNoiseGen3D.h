@@ -72,9 +72,6 @@ namespace EmuMath::Functors
 			iy_1(),
 			iz_0(),
 			iz_1(),
-			six_128(_mm_set1_ps(6.0f)),
-			ten_128(_mm_set1_ps(10.0f)),
-			fifteen_128(_mm_set1_ps(15.0f)),
 			_gradients_128
 			({
 				_mm_set_ps(0.0f, 0.0f, 1.0f, 1.0f),
@@ -137,7 +134,7 @@ namespace EmuMath::Functors
 			ix_0_128_ = _mm_and_si128(permutations_mask_128_, ix_0_128_);
 			iy_0_128_ = _mm_and_si128(permutations_mask_128_, iy_0_128_);
 			iz_0_128_ = _mm_and_si128(permutations_mask_128_, iz_0_128_);
-			__m128i one_128i_ = _mm_set1_epi32(1);
+			__m128i one_128i_ = _mm_cvtps_epi32(temp_0_128_);
 			__m128i ix_1_128_ = _mm_and_si128(permutations_mask_128_, _mm_add_epi32(ix_0_128_, one_128i_));
 			__m128i iy_1_128_ = _mm_and_si128(permutations_mask_128_, _mm_add_epi32(iy_0_128_, one_128i_));
 			__m128i iz_1_128_ = _mm_and_si128(permutations_mask_128_, _mm_add_epi32(iz_0_128_, one_128i_));
@@ -195,13 +192,14 @@ namespace EmuMath::Functors
 		}
 
 	private:
-		[[nodiscard]] inline __m128 _smooth_t(__m128 t_) const
+		[[nodiscard]] static inline __m128 _smooth_t(__m128 t_)
 		{
-			__m128 result_ = _mm_mul_ps(t_, six_128);
-			result_ = _mm_sub_ps(result_, fifteen_128);
+			__m128 six_fifteen_ten_ = _mm_set_ps(0.0f, 10.0f, 15.0f, 6.0f);
+			__m128 result_ = _mm_mul_ps(t_, EmuMath::SIMD::shuffle<0>(six_fifteen_ten_));
+			result_ = _mm_sub_ps(result_, EmuMath::SIMD::shuffle<1>(six_fifteen_ten_));
 
 			result_ = _mm_mul_ps(t_, result_);
-			result_ = _mm_add_ps(result_, ten_128);
+			result_ = _mm_add_ps(result_, EmuMath::SIMD::shuffle<2>(six_fifteen_ten_));
 
 			__m128 t_cubed_ = _mm_mul_ps(t_, t_);
 			t_cubed_ = _mm_mul_ps(t_cubed_, t_);
@@ -440,21 +438,6 @@ namespace EmuMath::Functors
 			vals_111_ = _mm_add_ps(vals_111_, _mm_mul_ps(row_, tz_1_));
 		}
 
-		inline void _find_permutations_indices
-		(
-			const EmuMath::NoisePermutations& permutations_,
-			std::size_t* perm_000_,
-			std::size_t* perm_001_,
-			std::size_t* perm_010_,
-			std::size_t* perm_011_,
-			std::size_t* perm_100_,
-			std::size_t* perm_101_,
-			std::size_t* perm_110_,
-			std::size_t* perm_111_
-		) const
-		{
-			
-		}
 
 		std::array<int, 4> ix_0;
 		std::array<int, 4> ix_1;
@@ -462,9 +445,6 @@ namespace EmuMath::Functors
 		std::array<int, 4> iy_1;
 		std::array<int, 4> iz_0;
 		std::array<int, 4> iz_1;
-		__m128 six_128;
-		__m128 ten_128;
-		__m128 fifteen_128;
 	};
 }
 

@@ -404,5 +404,11 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_blend.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_cast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_cast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
