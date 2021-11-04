@@ -424,6 +424,12 @@ int main()
 		>(a_simd_, b_simd_)
 	) << "\n";
 
+	__m256 lhs_ = EmuMath::SIMD::set<__m256>(1, 2, 3, 4, 5, 6, 7, 8);
+	__m256 rhs_ = EmuMath::SIMD::set<__m256>(9, 10, 11, 12, 13, 14, 15, 16);
+	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, lhs_) << "\n";
+	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, rhs_) << "\n";
+	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, _mm256_permute2f128_ps(lhs_, rhs_, 0b00110001)) << "\n";
+
 	system("pause");
 
 	std::cout << "GENERATING SCALAR NOISE...\n";
@@ -467,7 +473,7 @@ int main()
 	end_ = std::chrono::steady_clock::now();
 	std::cout << "FINISHED FAST NOISE IN: " << std::chrono::duration<double, std::milli>(end_ - begin_).count() << "ms\n";
 
-	WriteNoiseTableToPPM(noise_, noise_gradient_);
+	WriteNoiseTableToPPM(fast_noise_, noise_gradient_);
 
 	EmuMath::Functors::make_fast_noise_3d<EmuMath::NoiseType::PERLIN, __m128> fast_generator_;
 	__m128 test_128_ = fast_generator_(_mm_set1_ps(0.4f), _mm_set1_ps(0.0f), _mm_set1_ps(1.0f), _mm_set1_ps(16.0f), _mm_set1_epi32(1023), EmuMath::NoisePermutations(1024, 0U));

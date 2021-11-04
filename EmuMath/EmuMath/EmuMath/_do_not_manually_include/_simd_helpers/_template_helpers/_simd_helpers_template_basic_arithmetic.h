@@ -515,6 +515,62 @@ namespace EmuMath::SIMD
 			static_assert(false, "Attempted to perform EmuMath::SIMD::subadd with an unsupported type as the passed Register_.");
 		}
 	}
+
+	template<int RoundingMode_, class Register_>
+	[[nodiscard]] inline Register_ round(Register_ register_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _underlying_simd_helpers::_round<RoundingMode_>(register_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform EmuMath::SIMD::round with an unsupported type as the passed Register_.");
+		}
+	}
+
+	template<class Register_>
+	[[nodiscard]] inline Register_ floor(Register_ register_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _underlying_simd_helpers::_floor(register_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform EmuMath::SIMD::floor with an unsupported type as the passed Register_.");
+		}
+	}
+
+	template<class Register_>
+	[[nodiscard]] inline Register_ ceil(Register_ register_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _underlying_simd_helpers::_ceil(register_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform EmuMath::SIMD::ceil with an unsupported type as the passed Register_.");
+		}
+	}
+
+	template<class Register_>
+	[[nodiscard]] inline Register_ trunc(Register_ register_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _underlying_simd_helpers::_trunc(register_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform EmuMath::SIMD::trunc with an unsupported type as the passed Register_.");
+		}
+	}
 }
 
 #endif

@@ -1299,7 +1299,6 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	[[nodiscard]] inline Register_ _fmsubadd_int(Register_ to_mult_lhs_, Register_ to_mult_rhs_, Register_ to_add_sub_after_mult_)
 	{
 		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
 		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (EmuMath::SIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidth_>())
@@ -1326,6 +1325,196 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		else
 		{
 			static_assert(false, "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+		}
+	}
+#pragma endregion
+
+#pragma region ROUNDS
+	template<int RoundingMode_, class Register_>
+	[[nodiscard]] inline Register_ _round(Register_ register_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_round_ps(register_, RoundingMode_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_round_ps(register_, RoundingMode_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			{
+				static_assert(false, "Attempted to call a non-specific round function (round) on a __m512 SIMD register via EmuMath SIMD helpers. These registers are not supported for this operation. Consider the floor, trunc, or ceil operations instead.");
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_round_pd(register_, RoundingMode_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_round_pd(register_, RoundingMode_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			{
+				static_assert(false, "Attempted to call a non-specific round function (round) on a __m512d SIMD register via EmuMath SIMD helpers. These registers are not supported for this operation. Consider the floor, trunc, or ceil operations instead.");
+			}
+			else if constexpr (EmuMath::SIMD::TMP::is_integral_simd_register_v<register_type_uq>)
+			{
+				// If integral, there is no round to be done
+				return register_;
+			}
+			else
+			{
+				// Potentially requires a round but we don't know how to do it
+				static_assert(false, "Attempted to floor a SIMD register via EmuMath SIMD helpers, but the provided non-integral SIMD register is not supported for this operation.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to floor a SIMD register via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+		}
+	}
+
+	template<class Register_>
+	[[nodiscard]] inline Register_ _floor(Register_ register_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_floor_ps(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_floor_ps(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			{
+				return _mm512_floor_ps(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_floor_pd(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_floor_pd(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			{
+				return _mm512_floor_pd(register_);
+			}
+			else if constexpr (EmuMath::SIMD::TMP::is_integral_simd_register_v<register_type_uq>)
+			{
+				// If integral, there is no round to be done
+				return register_;
+			}
+			else
+			{
+				// Potentially requires a round but we don't know how to do it
+				static_assert(false, "Attempted to floor a SIMD register via EmuMath SIMD helpers, but the provided non-integral SIMD register is not supported for this operation.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to floor a SIMD register via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+		}
+	}
+
+	template<class Register_>
+	[[nodiscard]] inline Register_ _ceil(Register_ register_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_ceil_ps(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_ceil_ps(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			{
+				return _mm512_ceil_ps(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_ceil_pd(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_ceil_pd(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			{
+				return _mm512_ceil_pd(register_);
+			}
+			else if constexpr (EmuMath::SIMD::TMP::is_integral_simd_register_v<register_type_uq>)
+			{
+				// If integral, there is no round to be done
+				return register_;
+			}
+			else
+			{
+				// Potentially requires a round but we don't know how to do it
+				static_assert(false, "Attempted to ceil a SIMD register via EmuMath SIMD helpers, but the provided non-integral SIMD register is not supported for this operation.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to ceil a SIMD register via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+		}
+	}
+
+	template<class Register_>
+	[[nodiscard]] inline Register_ _trunc(Register_ register_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_trunc_ps(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_trunc_ps(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			{
+				return _mm512_trunc_ps(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_trunc_pd(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_trunc_pd(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			{
+				return _mm512_trunc_pd(register_);
+			}
+			else if constexpr (EmuMath::SIMD::TMP::is_integral_simd_register_v<register_type_uq>)
+			{
+				// If integral, there is no round to be done
+				return register_;
+			}
+			else
+			{
+				// Potentially requires a round but we don't know how to do it
+				static_assert(false, "Attempted to truncate a SIMD register via EmuMath SIMD helpers, but the provided non-integral SIMD register is not supported for this operation.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to truncate a SIMD register via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 #pragma endregion
