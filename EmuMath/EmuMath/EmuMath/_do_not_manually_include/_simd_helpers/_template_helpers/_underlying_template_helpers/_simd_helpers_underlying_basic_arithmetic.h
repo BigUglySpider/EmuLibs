@@ -1518,6 +1518,438 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 		}
 	}
 #pragma endregion
+
+#pragma region MIN_MAX_OPS
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
+	[[nodiscard]] inline Register_ _min(Register_ a_, Register_ b_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_min_ps(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_min_ps(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			{
+				return _mm512_min_ps(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_min_pd(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_min_pd(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			{
+				return _mm512_min_pd(a_, b_);
+			}
+			else if constexpr (EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>::value)
+			{
+				if constexpr (EmuMath::SIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfInt_>())
+				{
+					if constexpr (std::is_same_v<register_type_uq, __m128i>)
+					{
+						if constexpr (PerElementWidthIfInt_ == 8)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm_min_epi8(a_, b_);
+							}
+							else
+							{
+								return _mm_min_epu8(a_, b_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 16)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm_min_epi16(a_, b_);
+							}
+							else
+							{
+								return _mm_min_epu16(a_, b_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 32)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm_min_epi32(a_, b_);
+							}
+							else
+							{
+								return _mm_min_epu32(a_, b_);
+							}
+						}
+						else
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm_min_epi64(a_, b_);
+							}
+							else
+							{
+								return _mm_min_epu64(a_, b_);
+							}
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, __m256i>)
+					{
+						if constexpr (PerElementWidthIfInt_ == 8)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm256_min_epi8(a_, b_);
+							}
+							else
+							{
+								return _mm256_min_epu8(a_, b_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 16)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm256_min_epi16(a_, b_);
+							}
+							else
+							{
+								return _mm256_min_epu16(a_, b_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 32)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm256_min_epi32(a_, b_);
+							}
+							else
+							{
+								return _mm256_min_epu32(a_, b_);
+							}
+						}
+						else
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm256_min_epi64(a_, b_);
+							}
+							else
+							{
+								return _mm256_min_epu64(a_, b_);
+							}
+						}
+					}
+					else
+					{
+						if constexpr (PerElementWidthIfInt_ == 8)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm512_min_epi8(a_, b_);
+							}
+							else
+							{
+								return _mm512_min_epu8(a_, b_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 16)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm512_min_epi16(a_, b_);
+							}
+							else
+							{
+								return _mm512_min_epu16(a_, b_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 32)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm512_min_epi32(a_, b_);
+							}
+							else
+							{
+								return _mm512_min_epu32(a_, b_);
+							}
+						}
+						else
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm512_min_epi64(a_, b_);
+							}
+							else
+							{
+								return _mm512_min_epu64(a_, b_);
+							}
+						}
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to find the minimum elements in two SIMD registers via EmuMath SIMD helpers, but the provided PerElementWidth_ is invalid.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to find the minimum elements in two SIMD registers via EmuMath SIMD registers, but the passed Register_ type is not supported for this operation.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to find the minimum elements in two SIMD registers via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+		}
+	}
+
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
+	[[nodiscard]] inline Register_ _max(Register_ a_, Register_ b_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_max_ps(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_max_ps(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			{
+				return _mm512_max_ps(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_max_pd(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_max_pd(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			{
+				return _mm512_max_pd(a_, b_);
+			}
+			else if constexpr (EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>::value)
+			{
+				if constexpr (EmuMath::SIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfInt_>())
+				{
+					if constexpr (std::is_same_v<register_type_uq, __m128i>)
+					{
+						if constexpr (PerElementWidthIfInt_ == 8)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm_max_epi8(a_, b_);
+							}
+							else
+							{
+								return _mm_max_epu8(a_, b_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 16)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm_max_epi16(a_, b_);
+							}
+							else
+							{
+								return _mm_max_epu16(a_, b_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 32)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm_max_epi32(a_, b_);
+							}
+							else
+							{
+								return _mm_max_epu32(a_, b_);
+							}
+						}
+						else
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm_max_epi64(a_, b_);
+							}
+							else
+							{
+								return _mm_max_epu64(a_, b_);
+							}
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, __m256i>)
+					{
+						if constexpr (PerElementWidthIfInt_ == 8)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm256_max_epi8(a_, b_);
+							}
+							else
+							{
+								return _mm256_max_epu8(a_, b_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 16)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm256_max_epi16(a_, b_);
+							}
+							else
+							{
+								return _mm256_max_epu16(a_, b_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 32)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm256_max_epi32(a_, b_);
+							}
+							else
+							{
+								return _mm256_max_epu32(a_, b_);
+							}
+						}
+						else
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm256_max_epi64(a_, b_);
+							}
+							else
+							{
+								return _mm256_max_epu64(a_, b_);
+							}
+						}
+					}
+					else
+					{
+						if constexpr (PerElementWidthIfInt_ == 8)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm512_max_epi8(a_, b_);
+							}
+							else
+							{
+								return _mm512_max_epu8(a_, b_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 16)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm512_max_epi16(a_, b_);
+							}
+							else
+							{
+								return _mm512_max_epu16(a_, b_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 32)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm512_max_epi32(a_, b_);
+							}
+							else
+							{
+								return _mm512_max_epu32(a_, b_);
+							}
+						}
+						else
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return _mm512_max_epi64(a_, b_);
+							}
+							else
+							{
+								return _mm512_max_epu64(a_, b_);
+							}
+						}
+					}
+				}
+				else
+				{
+					static_assert(false, "Attempted to find the maximum elements in two SIMD registers via EmuMath SIMD helpers, but the provided PerElementWidth_ is invalid.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to find the maximum elements in two SIMD registers via EmuMath SIMD registers, but the passed Register_ type is not supported for this operation.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to find the maximum elements in two SIMD registers via EmuMath SIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+		}
+	}
+
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
+	[[nodiscard]] inline Register_ _clamp_min(Register_ register_, Register_ min_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _max<PerElementWidthIfInt_, SignedIfInt_>(register_, min_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to clamp the values in a SIMD register to a minimum amount, but the provided Register_ type is not recognised as a supported SIMD register.");
+		}
+	}
+
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
+	[[nodiscard]] inline Register_ _clamp_max(Register_ register_, Register_ max_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _min<PerElementWidthIfInt_, SignedIfInt_>(register_, max_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to clamp the values in a SIMD register to a maximum amount, but the provided Register_ type is not recognised as a supported SIMD register.");
+		}
+	}
+
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
+	[[nodiscard]] inline Register_ _clamp(Register_ register_, Register_ min_, Register_ max_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _min<PerElementWidthIfInt_, SignedIfInt_>
+			(
+				_max<PerElementWidthIfInt_, SignedIfInt_>(register_, min_),
+				max_
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to clamp the values in a SIMD register to an inclusive min:max range, but the provided Register_ type is not recognised as a supported SIMD register.");
+		}
+	}
+#pragma endregion
 }
 
 #endif

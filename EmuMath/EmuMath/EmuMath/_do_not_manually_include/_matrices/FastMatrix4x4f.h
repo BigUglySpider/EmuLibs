@@ -874,40 +874,40 @@ namespace EmuMath
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_clamp(column0, min_0_, max_0_),
-				EmuMath::SIMD::vector_clamp(column1, min_1_, max_1_),
-				EmuMath::SIMD::vector_clamp(column2, min_2_, max_2_),
-				EmuMath::SIMD::vector_clamp(column3, min_3_, max_3_)
+				EmuMath::SIMD::clamp(column0, min_0_, max_0_),
+				EmuMath::SIMD::clamp(column1, min_1_, max_1_),
+				EmuMath::SIMD::clamp(column2, min_2_, max_2_),
+				EmuMath::SIMD::clamp(column3, min_3_, max_3_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(__m128 min_, __m128 max_) const
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_clamp(column0, min_, max_),
-				EmuMath::SIMD::vector_clamp(column1, min_, max_),
-				EmuMath::SIMD::vector_clamp(column2, min_, max_),
-				EmuMath::SIMD::vector_clamp(column3, min_, max_)
+				EmuMath::SIMD::clamp(column0, min_, max_),
+				EmuMath::SIMD::clamp(column1, min_, max_),
+				EmuMath::SIMD::clamp(column2, min_, max_),
+				EmuMath::SIMD::clamp(column3, min_, max_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(const FastMatrix4x4f_CM& min_, __m128 max_) const
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_clamp(column0, min_.column0, max_),
-				EmuMath::SIMD::vector_clamp(column1, min_.column1, max_),
-				EmuMath::SIMD::vector_clamp(column2, min_.column2, max_),
-				EmuMath::SIMD::vector_clamp(column3, min_.column3, max_)
+				EmuMath::SIMD::clamp(column0, min_.column0, max_),
+				EmuMath::SIMD::clamp(column1, min_.column1, max_),
+				EmuMath::SIMD::clamp(column2, min_.column2, max_),
+				EmuMath::SIMD::clamp(column3, min_.column3, max_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(__m128 min_, const FastMatrix4x4f_CM& max_) const
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_clamp(column0, min_, max_.column0),
-				EmuMath::SIMD::vector_clamp(column1, min_, max_.column1),
-				EmuMath::SIMD::vector_clamp(column2, min_, max_.column2),
-				EmuMath::SIMD::vector_clamp(column3, min_, max_.column3)
+				EmuMath::SIMD::clamp(column0, min_, max_.column0),
+				EmuMath::SIMD::clamp(column1, min_, max_.column1),
+				EmuMath::SIMD::clamp(column2, min_, max_.column2),
+				EmuMath::SIMD::clamp(column3, min_, max_.column3)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(const FastMatrix4x4f_CM& min_, const FastMatrix4x4f_CM& max_) const
@@ -949,20 +949,20 @@ namespace EmuMath
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_clamp_min(column0, min_0_),
-				EmuMath::SIMD::vector_clamp_min(column1, min_1_),
-				EmuMath::SIMD::vector_clamp_min(column2, min_2_),
-				EmuMath::SIMD::vector_clamp_min(column3, min_3_)
+				EmuMath::SIMD::clamp_min(column0, min_0_),
+				EmuMath::SIMD::clamp_min(column1, min_1_),
+				EmuMath::SIMD::clamp_min(column2, min_2_),
+				EmuMath::SIMD::clamp_min(column3, min_3_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM ClampMin(__m128 min_) const
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_clamp_min(column0, min_),
-				EmuMath::SIMD::vector_clamp_min(column1, min_),
-				EmuMath::SIMD::vector_clamp_min(column2, min_),
-				EmuMath::SIMD::vector_clamp_min(column3, min_)
+				EmuMath::SIMD::clamp_min(column0, min_),
+				EmuMath::SIMD::clamp_min(column1, min_),
+				EmuMath::SIMD::clamp_min(column2, min_),
+				EmuMath::SIMD::clamp_min(column3, min_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM ClampMin(const FastMatrix4x4f_CM& min_) const
@@ -979,20 +979,20 @@ namespace EmuMath
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_clamp_max(column0, max_0_),
-				EmuMath::SIMD::vector_clamp_max(column1, max_1_),
-				EmuMath::SIMD::vector_clamp_max(column2, max_2_),
-				EmuMath::SIMD::vector_clamp_max(column3, max_3_)
+				EmuMath::SIMD::clamp_max(column0, max_0_),
+				EmuMath::SIMD::clamp_max(column1, max_1_),
+				EmuMath::SIMD::clamp_max(column2, max_2_),
+				EmuMath::SIMD::clamp_max(column3, max_3_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM ClampMax(__m128 max_) const
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_clamp_max(column0, max_),
-				EmuMath::SIMD::vector_clamp_max(column1, max_),
-				EmuMath::SIMD::vector_clamp_max(column2, max_),
-				EmuMath::SIMD::vector_clamp_max(column3, max_)
+				EmuMath::SIMD::clamp_max(column0, max_),
+				EmuMath::SIMD::clamp_max(column1, max_),
+				EmuMath::SIMD::clamp_max(column2, max_),
+				EmuMath::SIMD::clamp_max(column3, max_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM ClampMax(const FastMatrix4x4f_CM& max_) const

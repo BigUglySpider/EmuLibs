@@ -571,6 +571,76 @@ namespace EmuMath::SIMD
 			static_assert(false, "Attempted to perform EmuMath::SIMD::trunc with an unsupported type as the passed Register_.");
 		}
 	}
+
+	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
+	[[nodiscard]] inline Register_ vector_min(Register_ a_, Register_ b_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _underlying_simd_helpers::_min<PerElementWidthIfInt_, SignedIfInt_>(a_, b_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform EmuMath::SIMD::vector_min with an unsupported type as the passed Register_.");
+		}
+	}
+
+	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
+	[[nodiscard]] inline Register_ vector_max(Register_ a_, Register_ b_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _underlying_simd_helpers::_max<PerElementWidthIfInt_, SignedIfInt_>(a_, b_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform EmuMath::SIMD::vector_max with an unsupported type as the passed Register_.");
+		}
+	}
+
+	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
+	[[nodiscard]] inline Register_ clamp_min(Register_ register_, Register_ min_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _underlying_simd_helpers::_clamp_min<PerElementWidthIfInt_, SignedIfInt_>(register_, min_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform EmuMath::SIMD::clamp_min with an unsupported type as the passed Register_.");
+		}
+	}
+
+	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
+	[[nodiscard]] inline Register_ clamp_max(Register_ register_, Register_ max_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _underlying_simd_helpers::_clamp_max<PerElementWidthIfInt_, SignedIfInt_>(register_, max_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform EmuMath::SIMD::clamp_max with an unsupported type as the passed Register_.");
+		}
+	}
+
+	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
+	[[nodiscard]] inline Register_ clamp(Register_ register_, Register_ min_, Register_ max_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			return _underlying_simd_helpers::_clamp<PerElementWidthIfInt_, SignedIfInt_>(register_, min_, max_);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform EmuMath::SIMD::clamp with an unsupported type as the passed Register_.");
+		}
+	}
 }
 
 #endif

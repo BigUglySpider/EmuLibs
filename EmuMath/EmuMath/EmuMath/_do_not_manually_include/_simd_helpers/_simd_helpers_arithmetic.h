@@ -31,11 +31,6 @@ namespace EmuMath::SIMD
 		return _mm_cvtss_f32(horizontal_vector_sum(a));
 	}
 
-	[[nodiscard]] inline __m128 dot_product(__m128 a_, __m128 b_)
-	{
-		a_ = _mm_mul_ps(a_, b_);
-		return EmuMath::SIMD::horizontal_vector_sum(a_);
-	}
 	[[nodiscard]] inline __m128 dot_product_fill(__m128 a_, __m128 b_)
 	{
 		a_ = _mm_mul_ps(a_, b_);
@@ -46,22 +41,6 @@ namespace EmuMath::SIMD
 		a_ = _mm_mul_ps(a_, b_);
 		a_ = EmuMath::SIMD::horizontal_vector_sum(a_);
 		return _mm_cvtss_f32(a_);
-	}
-
-	[[nodiscard]]inline  __m128 vector_clamp(__m128 val_, __m128 min_, __m128 max_)
-	{
-		val_ = _mm_max_ps(val_, min_);
-		return _mm_min_ps(val_, max_);
-	}
-
-	[[nodiscard]] inline __m128 vector_clamp_min(__m128 val_, __m128 min_)
-	{
-		return _mm_max_ps(val_, min_);
-	}
-
-	[[nodiscard]] inline __m128 vector_clamp_max(__m128 val_, __m128 max_)
-	{
-		return _mm_min_ps(val_, max_);
 	}
 
 	/// <summary> Finds the lowest value in the passed SIMD register and returns a register containing the lowest value in its x-component.. </summary>

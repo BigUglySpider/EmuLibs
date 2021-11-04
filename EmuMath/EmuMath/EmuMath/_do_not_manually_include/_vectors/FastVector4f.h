@@ -697,7 +697,7 @@ namespace EmuMath
 		template<typename OutT_ = float>
 		[[nodiscard]] inline OutT_ DotProduct(__m128 b_) const
 		{
-			return static_cast<OutT_>(_mm_cvtss_f32(EmuMath::SIMD::dot_product(data_, b_)));
+			return static_cast<OutT_>(_mm_cvtss_f32(EmuMath::SIMD::dot(data_, b_)));
 		}
 		template<typename OutT_ = float>
 		[[nodiscard]] inline OutT_ DotProduct(const FastVector4f& b_) const
@@ -729,7 +729,7 @@ namespace EmuMath
 		template<typename OutT_ = float>
 		[[nodiscard]] inline OutT_ MagnitudeReciprocal() const
 		{
-			__m128 mag_reciprocal = EmuMath::SIMD::dot_product(data_, data_);
+			__m128 mag_reciprocal = EmuMath::SIMD::dot(data_, data_);
 			mag_reciprocal = _mm_rsqrt_ps(mag_reciprocal);
 			return _mm_cvtss_f32(mag_reciprocal);
 		}
@@ -782,10 +782,10 @@ namespace EmuMath
 		template<typename OutCosine_ = float>
 		[[nodiscard]] inline OutCosine_ AngleCosine(__m128 b_) const
 		{
-			__m128 a_sqr_mag_ = EmuMath::SIMD::dot_product(data_, data_);
-			__m128 b_sqr_mag_ = EmuMath::SIMD::dot_product(b_, b_);
+			__m128 a_sqr_mag_ = EmuMath::SIMD::dot(data_, data_);
+			__m128 b_sqr_mag_ = EmuMath::SIMD::dot(b_, b_);
 			__m128 out_ = _mm_rsqrt_ps(_mm_mul_ps(a_sqr_mag_, b_sqr_mag_));
-			out_ = _mm_mul_ps(out_, EmuMath::SIMD::dot_product(data_, b_));
+			out_ = _mm_mul_ps(out_, EmuMath::SIMD::dot(data_, b_));
 			return _mm_cvtss_f32(out_);
 		}
 		template<typename OutCosine_ = float>
@@ -806,8 +806,8 @@ namespace EmuMath
 		{
 			__m128 b_sqr_mag_ = _mm_mul_ps(b_, b_);
 			b_sqr_mag_ = EmuMath::SIMD::horizontal_vector_sum(b_sqr_mag_);
-			__m128 out_ = _mm_rsqrt_ps(_mm_mul_ps(b_sqr_mag_, EmuMath::SIMD::dot_product(data_, data_)));
-			out_ = _mm_mul_ps(out_, EmuMath::SIMD::dot_product(data_, b_));
+			__m128 out_ = _mm_rsqrt_ps(_mm_mul_ps(b_sqr_mag_, EmuMath::SIMD::dot(data_, data_)));
+			out_ = _mm_mul_ps(out_, EmuMath::SIMD::dot(data_, b_));
 			out_ = _mm_acos_ps(out_);
 			if constexpr (!Rads_)
 			{
@@ -881,7 +881,7 @@ namespace EmuMath
 		/// <returns>Copy of this vector with all elements clamped to not be less than min_.</returns>
 		[[nodiscard]] inline FastVector4f ClampMin(__m128 min_) const
 		{
-			return FastVector4f(EmuMath::SIMD::vector_clamp_min(data_, min_));
+			return FastVector4f(EmuMath::SIMD::clamp_min(data_, min_));
 		}
 		[[nodiscard]] inline FastVector4f ClampMin(const FastVector4f& min_) const
 		{
@@ -896,7 +896,7 @@ namespace EmuMath
 		/// <returns>Copy of this vector with all elements clamped to not be greater than max_.</returns>
 		[[nodiscard]] inline FastVector4f ClampMax(__m128 max_) const
 		{
-			return FastVector4f(EmuMath::SIMD::vector_clamp_max(data_, max_));
+			return FastVector4f(EmuMath::SIMD::clamp_max(data_, max_));
 		}
 		[[nodiscard]] inline FastVector4f ClampMax(const FastVector4f& max_) const
 		{
@@ -915,7 +915,7 @@ namespace EmuMath
 		/// <returns>Copy of this vector with all elements clamped to not be greater than max_.</returns>
 		[[nodiscard]] inline FastVector4f Clamp(__m128 min_, __m128 max_) const
 		{
-			return FastVector4f(EmuMath::SIMD::vector_clamp(data_, min_, max_));
+			return FastVector4f(EmuMath::SIMD::clamp(data_, min_, max_));
 		}
 		[[nodiscard]] inline FastVector4f Clamp(const FastVector4f& min_, __m128 max_) const
 		{
