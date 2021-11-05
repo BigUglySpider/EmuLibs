@@ -738,7 +738,7 @@ namespace EmuMath
 		/// <returns>Copy of this vector with its elements normalised to result in a magnitude of 1.</returns>
 		[[nodiscard]] inline FastVector4f Normalise() const
 		{
-			__m128 mag_reciprocal = EmuMath::SIMD::dot_product_fill(data_, data_);
+			__m128 mag_reciprocal = EmuMath::SIMD::dot_fill(data_, data_);
 			mag_reciprocal = _mm_rsqrt_ps(mag_reciprocal);
 			return FastVector4f(_mm_mul_ps(data_, mag_reciprocal));
 		}
@@ -957,7 +957,7 @@ namespace EmuMath
 		template<typename OutT_ = float>
 		[[nodiscard]] inline OutT_ HorizontalSum() const
 		{
-			return static_cast<OutT_>(EmuMath::SIMD::horizontal_vector_sum_scalar(data_));
+			return static_cast<OutT_>(EmuMath::SIMD::horizontal_sum_scalar<OutT_>(data_));
 		}
 
 		/// <summary> Calculates the total of multiplying all elements within this vector together. </summary>
@@ -1132,7 +1132,7 @@ namespace EmuMath
 		/// </returns>
 		[[nodiscard]] inline bool CmpGreater(__m128 rhs_) const
 		{
-			return this->SquareMagnitude() > EmuMath::SIMD::dot_product_scalar(rhs_, rhs_);
+			return this->SquareMagnitude() > EmuMath::SIMD::dot_scalar<float>(rhs_, rhs_);
 		}
 		[[nodiscard]] inline bool CmpGreater(const FastVector4f& rhs_) const
 		{
@@ -1153,7 +1153,7 @@ namespace EmuMath
 		/// </returns>
 		[[nodiscard]] inline bool CmpLess(__m128 rhs_) const
 		{
-			return this->SquareMagnitude() < EmuMath::SIMD::dot_product_scalar(rhs_, rhs_);
+			return this->SquareMagnitude() < EmuMath::SIMD::dot_scalar<float>(rhs_, rhs_);
 		}
 		[[nodiscard]] inline bool CmpLess(const FastVector4f& rhs_) const
 		{
@@ -1175,7 +1175,7 @@ namespace EmuMath
 		/// </returns>
 		[[nodiscard]] inline bool CmpGreaterEqual(__m128 rhs_) const
 		{
-			return this->SquareMagnitude() >= EmuMath::SIMD::dot_product_scalar(rhs_, rhs_);
+			return this->SquareMagnitude() >= EmuMath::SIMD::dot_scalar<float>(rhs_, rhs_);
 		}
 		[[nodiscard]] inline bool CmpGreaterEqual(const FastVector4f& rhs_) const
 		{
@@ -1197,7 +1197,7 @@ namespace EmuMath
 		/// </returns>
 		[[nodiscard]] inline bool CmpLessEqual(__m128 rhs_) const
 		{
-			return this->SquareMagnitude() <= EmuMath::SIMD::dot_product_scalar(rhs_, rhs_);
+			return this->SquareMagnitude() <= EmuMath::SIMD::dot_scalar<float>(rhs_, rhs_);
 		}
 		[[nodiscard]] inline bool CmpLessEqual(const FastVector4f& rhs_) const
 		{

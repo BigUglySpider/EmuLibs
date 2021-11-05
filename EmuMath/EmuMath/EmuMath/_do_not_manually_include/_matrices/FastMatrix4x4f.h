@@ -1047,7 +1047,7 @@ namespace EmuMath
 			__m128 sum_ = _mm_add_ps(column0, column1);
 			sum_ = _mm_add_ps(sum_, column2);
 			sum_ = _mm_add_ps(sum_, column3);
-			return EmuMath::SIMD::horizontal_vector_sum_scalar(sum_);
+			return EmuMath::SIMD::horizontal_sum_scalar<Out_>(sum_);
 		}
 #pragma endregion
 
@@ -2554,7 +2554,7 @@ namespace EmuMath
 
 		[[nodiscard]] inline float Determinant() const
 		{
-			return EmuMath::SIMD::horizontal_vector_sum_scalar(_mm_mul_ps(GetRow<0>(), Cofactors<true>().column0));
+			return EmuMath::SIMD::horizontal_sum_scalar<float>(_mm_mul_ps(GetRow<0>(), Cofactors<true>().column0));
 		}
 
 		/// <summary> 
@@ -2727,7 +2727,7 @@ namespace EmuMath
 		[[nodiscard]] inline FastMatrix4x4f_CM Inverse() const
 		{
 			FastMatrix4x4f_CM adjugate_ = Cofactors<true>();
-			__m128 determinant_reciprocal_ = _mm_set1_ps(1.0f / EmuMath::SIMD::horizontal_vector_sum_scalar(_mm_mul_ps(adjugate_.column0, GetRow<0>())));
+			__m128 determinant_reciprocal_ = _mm_set1_ps(1.0f / EmuMath::SIMD::horizontal_sum_scalar<float>(_mm_mul_ps(adjugate_.column0, GetRow<0>())));
 			return FastMatrix4x4f_CM
 			(
 				_mm_mul_ps(adjugate_.column0, determinant_reciprocal_),
@@ -2739,7 +2739,7 @@ namespace EmuMath
 		[[nodiscard]] inline FastMatrix4x4f_CM Inverse(float& out_determinant_) const
 		{
 			FastMatrix4x4f_CM adjugate_ = Cofactors<true>();
-			out_determinant_ = EmuMath::SIMD::horizontal_vector_sum_scalar(_mm_mul_ps(adjugate_.column0, GetRow<0>()));
+			out_determinant_ = EmuMath::SIMD::horizontal_sum_scalar<float>(_mm_mul_ps(adjugate_.column0, GetRow<0>()));
 			__m128 determinant_reciprocal_ = _mm_set1_ps(1.0f / out_determinant_);
 			return FastMatrix4x4f_CM
 			(
@@ -2768,7 +2768,7 @@ namespace EmuMath
 		inline bool TryInverse(FastMatrix4x4f_CM& out_inverse_, float& out_determinant_) const
 		{
 			FastMatrix4x4f_CM adjugate_ = Cofactors<true>();
-			out_determinant_ = EmuMath::SIMD::horizontal_vector_sum_scalar(_mm_mul_ps(adjugate_.column0, GetRow<0>()));
+			out_determinant_ = EmuMath::SIMD::horizontal_sum_scalar<float>(_mm_mul_ps(adjugate_.column0, GetRow<0>()));
 			if (out_determinant_ != 0.0f)
 			{
 				__m128 determinant_reciprocal_ = _mm_set1_ps(1.0f / out_determinant_);
