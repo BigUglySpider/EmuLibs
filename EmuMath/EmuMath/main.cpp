@@ -430,6 +430,11 @@ int main()
 	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, rhs_) << "\n";
 	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, _mm256_permute2f128_ps(lhs_, rhs_, 0b00110001)) << "\n";
 
+	__m256i lhs_int_ = _mm256_set_epi32(1, 2, 3, 4, 5, 6, 7, 8);
+	__m256i rhs_int_ = _mm256_set_epi32(1, 4, 3, 2, 5, 6, 7, 8);
+	std::cout << std::bitset<32>(_mm256_movemask_epi8(_mm256_cmpeq_epi32(lhs_int_, rhs_int_))) << "\n";
+	std::cout << EmuMath::SIMD::cmp_all_eq<true, true, true, true, true, false, true, false, true>(lhs_int_, rhs_int_) << "\n";
+
 	system("pause");
 
 	std::cout << "GENERATING SCALAR NOISE...\n";
@@ -456,7 +461,7 @@ int main()
 	std::cout << "GENERATING FAST NOISE...\n";
 	EmuMath::FastNoiseTable<3, 1> fast_noise_;
 	begin_ = std::chrono::steady_clock::now();
-	fast_noise_.GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<3>>
+	fast_noise_.GenerateNoise<EmuMath::NoiseType::PERLIN, 128, EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<3>>
 	(
 		fast_noise_.make_options
 		(

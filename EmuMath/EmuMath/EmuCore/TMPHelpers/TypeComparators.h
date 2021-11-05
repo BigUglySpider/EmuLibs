@@ -376,6 +376,15 @@ namespace EmuCore::TMPHelpers
 	struct has_static_get<T_, std::void_t<decltype(T_::get)>> : std::true_type
 	{
 	};
+
+	template<class T_, typename = void>
+	struct has_static_value : std::false_type
+	{
+	};
+	template<class T_>
+	struct has_static_value<T_, std::void_t<decltype(T_::value)>> : std::true_type
+	{
+	};
 }
 
 #endif

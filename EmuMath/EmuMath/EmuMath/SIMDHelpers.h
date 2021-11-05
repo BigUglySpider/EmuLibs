@@ -3,7 +3,5 @@
 
 #include "_do_not_manually_include/_simd_helpers/_common_simd_helpers_includes.h"
 #include "_do_not_manually_include/_simd_helpers/_simd_helpers_arithmetic.h"
-#include "_do_not_manually_include/_simd_helpers/_simd_helpers_comparisons.h"
-#include "_do_not_manually_include/_simd_helpers/_simd_helpers_masks.h"
 
 #endif

@@ -1089,7 +1089,7 @@ namespace EmuMath
 		/// <returns>True if all elements in rhs_ are equal to respective elements in this vector, or if the magnitude of this vector is equal to rhs_ if it is scalar.</returns>
 		[[nodiscard]] inline bool CmpEqualTo(__m128 rhs_) const
 		{
-			return EmuMath::SIMD::all_equal<true, true, true, true>(data_, rhs_);
+			return EmuMath::SIMD::cmp_all_eq<true, true, true, true, true>(data_, rhs_);
 		}
 		[[nodiscard]] inline bool CmpEqualTo(const FastVector4f& rhs_) const
 		{
@@ -1110,7 +1110,7 @@ namespace EmuMath
 		/// </returns>
 		[[nodiscard]] inline bool CmpNotEqualTo(__m128 rhs_) const
 		{
-			return EmuMath::SIMD::any_not_equal(data_, rhs_);
+			return EmuMath::SIMD::cmp_any_neq(data_, rhs_);
 		}
 		[[nodiscard]] inline bool CmpNotEqualTo(const FastVector4f& rhs_) const
 		{
@@ -1216,7 +1216,7 @@ namespace EmuMath
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
 		[[nodiscard]] inline bool CmpAllEqual(__m128 rhs_) const
 		{
-			return EmuMath::SIMD::all_equal<TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
+			return EmuMath::SIMD::cmp_all_eq<true, TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
 		}
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
 		[[nodiscard]] inline bool CmpAllEqual(const FastVector4f& rhs_) const
@@ -1238,7 +1238,7 @@ namespace EmuMath
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
 		[[nodiscard]] inline bool CmpAllNotEqual(__m128 rhs_) const
 		{
-			return EmuMath::SIMD::all_not_equal<TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
+			return EmuMath::SIMD::cmp_all_neq<true, TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
 		}
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
 		[[nodiscard]] inline bool CmpAllNotEqual(const FastVector4f& rhs_) const
@@ -1263,7 +1263,7 @@ namespace EmuMath
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
 		[[nodiscard]] inline bool CmpAllGreater(__m128 rhs_) const
 		{
-			return EmuMath::SIMD::all_greater_than<TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
+			return EmuMath::SIMD::cmp_all_gt<true, TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
 		}
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
 		[[nodiscard]] inline bool CmpAllGreater(const FastVector4f& rhs_) const
@@ -1288,7 +1288,7 @@ namespace EmuMath
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
 		[[nodiscard]] inline bool CmpAllLess(__m128 rhs_) const
 		{
-			return EmuMath::SIMD::all_less_than<TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
+			return EmuMath::SIMD::cmp_all_lt<true, TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
 		}
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
 		[[nodiscard]] inline bool CmpAllLess(const FastVector4f& rhs_) const
@@ -1313,7 +1313,7 @@ namespace EmuMath
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
 		[[nodiscard]] inline bool CmpAllGreaterEqual(__m128 rhs_) const
 		{
-			return EmuMath::SIMD::all_greater_equal<TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
+			return EmuMath::SIMD::cmp_all_ge<true, TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
 		}
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
 		[[nodiscard]] inline bool CmpAllGreaterEqual(const FastVector4f& rhs_) const
@@ -1338,7 +1338,7 @@ namespace EmuMath
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
 		[[nodiscard]] inline bool CmpAllLessEqual(__m128 rhs_) const
 		{
-			return EmuMath::SIMD::all_less_equal<TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
+			return EmuMath::SIMD::cmp_all_le<true, TestX_, TestY_, TestZ_, TestW_>(data_, rhs_);
 		}
 		template<bool TestX_ = true, bool TestY_ = true, bool TestZ_ = true, bool TestW_ = true>
 		[[nodiscard]] inline bool CmpAllLessEqual(const FastVector4f& rhs_) const
@@ -1358,7 +1358,7 @@ namespace EmuMath
 		/// <returns>True if any elements' comparisons were true, otherwise false.</returns>
 		[[nodiscard]] inline bool CmpAnyEqual(__m128 rhs_) const
 		{
-			return EmuMath::SIMD::any_equal(data_, rhs_);
+			return EmuMath::SIMD::cmp_any_eq(data_, rhs_);
 		}
 		[[nodiscard]] inline bool CmpAnyEqual(const FastVector4f& rhs_) const
 		{
@@ -1376,7 +1376,7 @@ namespace EmuMath
 		/// <returns>True if any elements' comparisons were true, otherwise false.</returns>
 		[[nodiscard]] inline bool CmpAnyNotEqual(__m128 rhs_) const
 		{
-			return EmuMath::SIMD::any_not_equal(data_, rhs_);
+			return EmuMath::SIMD::cmp_any_neq(data_, rhs_);
 		}
 		[[nodiscard]] inline bool CmpAnyNotEqual(const FastVector4f& rhs_) const
 		{
@@ -1397,7 +1397,7 @@ namespace EmuMath
 		/// <returns>True if any elements' comparisons were true, otherwise false.</returns>
 		[[nodiscard]] inline bool CmpAnyGreater(__m128 rhs_) const
 		{
-			return EmuMath::SIMD::any_greater_than(data_, rhs_);
+			return EmuMath::SIMD::cmp_any_gt(data_, rhs_);
 		}
 		[[nodiscard]] inline bool CmpAnyGreater(const FastVector4f& rhs_) const
 		{
@@ -1418,7 +1418,7 @@ namespace EmuMath
 		/// <returns>True if any elements' comparisons were true, otherwise false.</returns>
 		[[nodiscard]] inline bool CmpAnyLess(__m128 rhs_) const
 		{
-			return EmuMath::SIMD::any_less_than(data_, rhs_);
+			return EmuMath::SIMD::cmp_any_lt(data_, rhs_);
 		}
 		[[nodiscard]] inline bool CmpAnyLess(const FastVector4f& rhs_) const
 		{
@@ -1439,7 +1439,7 @@ namespace EmuMath
 		/// <returns>True if any elements' comparisons were true, otherwise false.</returns>
 		[[nodiscard]] inline bool CmpAnyGreaterEqual(__m128 rhs_) const
 		{
-			return EmuMath::SIMD::any_greater_equal(data_, rhs_);
+			return EmuMath::SIMD::cmp_any_ge(data_, rhs_);
 		}
 		[[nodiscard]] inline bool CmpAnyGreaterEqual(const FastVector4f& rhs_) const
 		{
@@ -1460,7 +1460,7 @@ namespace EmuMath
 		/// <returns>True if any elements' comparisons were true, otherwise false.</returns>
 		[[nodiscard]] inline bool CmpAnyLessEqual(__m128 rhs_) const
 		{
-			return EmuMath::SIMD::any_less_equal(data_, rhs_);
+			return EmuMath::SIMD::cmp_any_le(data_, rhs_);
 		}
 		[[nodiscard]] inline bool CmpAnyLessEqual(const FastVector4f& rhs_) const
 		{
@@ -1898,7 +1898,7 @@ namespace EmuMath
 		}
 		explicit inline operator bool() const
 		{
-			return EmuMath::SIMD::any_not_equal(data_, _mm_setzero_ps());
+			return EmuMath::SIMD::cmp_any_neq(data_, EmuMath::SIMD::setzero<__m128>());
 		}
 		inline bool operator!() const
 		{

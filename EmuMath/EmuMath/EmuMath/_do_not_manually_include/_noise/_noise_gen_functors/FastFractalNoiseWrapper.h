@@ -162,6 +162,50 @@ namespace EmuMath::Functors
 	};
 
 	template<class PerIterationGenerator_>
+	struct no_fractal_noise_wrapper<PerIterationGenerator_, __m256>
+	{
+		using generator_type = PerIterationGenerator_;
+		using value_type = __m256;
+
+		template<typename...GeneratorConstructorArgs_, typename = std::enable_if_t<std::is_constructible_v<generator_type, GeneratorConstructorArgs_...>>>
+		no_fractal_noise_wrapper
+		(
+			float freq_,
+			const EmuMath::NoisePermutations& permutations_,
+			GeneratorConstructorArgs_&&...generator_constructor_args_
+		) :
+			freq(EmuMath::SIMD::set1<__m256>(freq_)),
+			permutations(permutations_),
+			generator(generator_constructor_args_...)
+		{
+			permutations_mask = EmuMath::SIMD::set1<__m256i, 32>(permutations.MaxValue());
+		}
+		template<typename...GeneratorConstructorArgs_, typename = std::enable_if_t<std::is_constructible_v<generator_type, GeneratorConstructorArgs_...>>>
+		no_fractal_noise_wrapper
+		(
+			float freq_,
+			EmuMath::NoisePermutations&& permutations_,
+			GeneratorConstructorArgs_&&...generator_constructor_args_
+		) :
+			freq(EmuMath::SIMD::set1<__m256>(freq_)),
+			permutations(permutations_),
+			generator(generator_constructor_args_...)
+		{
+			permutations_mask = EmuMath::SIMD::set1<__m256i, 32>(permutations.MaxValue());
+		}
+
+		[[nodiscard]] inline __m256 operator()(__m256 points_x_, __m256 points_y_, __m256 points_z_)
+		{
+			return generator(points_x_, points_y_, points_z_, freq, permutations_mask, permutations);
+		}
+
+		generator_type generator;
+		EmuMath::NoisePermutations permutations;
+		__m256i permutations_mask;
+		__m256 freq;
+	};
+
+	template<class PerIterationGenerator_>
 	struct fractal_noise_wrapper<PerIterationGenerator_, __m128> : public _underlying_implementations::_fast_fractal_noise_wrapper<PerIterationGenerator_, __m128>
 	{
 	private:

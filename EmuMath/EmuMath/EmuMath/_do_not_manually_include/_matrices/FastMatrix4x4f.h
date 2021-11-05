@@ -1992,7 +1992,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpeq_ps(column1, rhs_column_1_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpeq_ps(column2, rhs_column_2_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpeq_ps(column3, rhs_column_3_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to the passed column register. </para>
@@ -2006,7 +2006,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpeq_ps(column1, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpeq_ps(column2, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpeq_ps(column3, rhs_all_columns_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
@@ -2045,7 +2045,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpneq_ps(column1, rhs_column_1_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpneq_ps(column2, rhs_column_2_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpneq_ps(column3, rhs_column_3_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to the passed column register. </para>
@@ -2059,7 +2059,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpneq_ps(column1, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpneq_ps(column2, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpneq_ps(column3, rhs_all_columns_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
@@ -2098,7 +2098,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpgt_ps(column1, rhs_column_1_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpgt_ps(column2, rhs_column_2_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpgt_ps(column3, rhs_column_3_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to the passed column register. </para>
@@ -2112,7 +2112,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpgt_ps(column1, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpgt_ps(column2, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpgt_ps(column3, rhs_all_columns_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
@@ -2151,7 +2151,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmplt_ps(column1, rhs_column_1_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmplt_ps(column2, rhs_column_2_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmplt_ps(column3, rhs_column_3_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to the passed column register. </para>
@@ -2165,7 +2165,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmplt_ps(column1, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmplt_ps(column2, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmplt_ps(column3, rhs_all_columns_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
@@ -2204,7 +2204,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpge_ps(column1, rhs_column_1_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpge_ps(column2, rhs_column_2_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpge_ps(column3, rhs_column_3_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to the passed column register. </para>
@@ -2218,7 +2218,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpge_ps(column1, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpge_ps(column2, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpge_ps(column3, rhs_all_columns_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
@@ -2257,7 +2257,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmple_ps(column1, rhs_column_1_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmple_ps(column2, rhs_column_2_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmple_ps(column3, rhs_column_3_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to the passed column register. </para>
@@ -2271,7 +2271,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmple_ps(column1, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmple_ps(column2, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmple_ps(column3, rhs_all_columns_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>

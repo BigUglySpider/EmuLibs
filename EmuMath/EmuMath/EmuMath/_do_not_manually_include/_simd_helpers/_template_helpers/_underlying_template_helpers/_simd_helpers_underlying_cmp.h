@@ -2,6 +2,7 @@
 #define EMU_MATH_SIMD_HELPERS_UNDERLYING_CMP_H_INC_ 1
 
 #include "_common_underlying_simd_template_helper_includes.h"
+#include "_simd_helpers_underlying_cast.h"
 
 namespace EmuMath::SIMD::_underlying_simd_helpers
 {
@@ -400,6 +401,65 @@ namespace EmuMath::SIMD::_underlying_simd_helpers
 	[[nodiscard]] inline Register_ _make_register_from_movemask(const signed long long mask_)
 	{
 		return _make_register_from_movemask<Register_, PerElementWidthIfIntegral_, Bits_>(*reinterpret_cast<const unsigned long long*>(mask_));
+	}
+#pragma endregion
+
+#pragma region MOVEMASK_EXTRACTION
+	template<class Register_>
+	[[nodiscard]] inline auto _movemask(Register_ register_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_movemask_ps(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_movemask_ps(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			{
+				int mask_ = _mm256_movemask_ps(_cast<__m256>(register_)) << 8;
+				return mask_ | _mm256_movemask_ps(_mm512_extractf32x8_ps(register_, 1));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_movemask_pd(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_movemask_pd(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			{
+				int mask_ = _mm256_movemask_pd(_cast<__m256d>(register_)) << 4;
+				return mask_ | _mm256_movemask_ps(_mm512_extractf64x4_pd(register_, 1));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128i>)
+			{
+				return _mm_movemask_epi8(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256i>)
+			{
+				return _mm256_movemask_epi8(register_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256i>)
+			{
+				std::int64_t mask_ = _mm256_movemask_epi8(_cast<__m256i>(register_));
+				mask_ <<= 32;
+				return mask_ | _mm256_movemask_epi8(_mm512_extracti32x8_epi32(register_, 1));
+			}
+			else
+			{
+				static_assert(false, "Attempted to acquire a movemask via EmuMath SIMD helpers, but the provided SIMD register is not supported for this operation.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to acquire a movemask via EmuMath SIMD helpers, but the passed Register_ type is not recognised as a supported SIMD register.");
+		}
 	}
 #pragma endregion
 
