@@ -36,6 +36,7 @@ namespace EmuMath
 
 		static constexpr std::size_t num_dimensions = NumDimensions_;
 		static constexpr std::size_t major_dimension = MajorDimensionIndex_;
+		static constexpr std::size_t default_register_width = 128;
 		using value_type = float;
 		using this_type = FastNoiseTable<NumDimensions_, MajorDimensionIndex_>;
 		using options_type = EmuMath::NoiseTableOptions<NumDimensions_, value_type>;
@@ -188,18 +189,19 @@ namespace EmuMath
 		}
 
 #pragma region GENERATION
-		template<EmuMath::NoiseType NoiseType_, class SampleProcessor_>
+		template<EmuMath::NoiseType NoiseType_, std::size_t RegisterWidth_ = default_register_width, class SampleProcessor_>
 		inline bool GenerateNoise(const options_type& options_, SampleProcessor_ sample_processor_)
 		{
 			if (_valid_resolution(options_.table_resolution))
 			{
 				_do_resize(options_.table_resolution);
+				using register_type = typename EmuMath::SIMD::TMP::register_type<value_type, RegisterWidth_>::type;
 
 				// TODO: OTHER RESOLUTIONS
 				if (options_.use_fractal_noise)
 				{
-					using fractal_generator = EmuMath::Functors::fractal_noise_wrapper<EmuMath::Functors::make_fast_noise_3d<NoiseType_, __m128>, __m128>;
-					_do_generation_128<fractal_generator, SampleProcessor_&>
+					using fractal_generator = EmuMath::Functors::fractal_noise_wrapper<EmuMath::Functors::make_fast_noise_3d<NoiseType_, register_type>, register_type>;
+					_do_generation<register_type, fractal_generator, SampleProcessor_&>
 					(
 						fractal_generator
 						(
@@ -214,14 +216,15 @@ namespace EmuMath
 				}
 				else
 				{
-					_do_generation_128
+					using no_fractal_generator = EmuMath::Functors::no_fractal_noise_wrapper<EmuMath::Functors::make_fast_noise_3d<NoiseType_, register_type>, register_type>;
+					_do_generation<register_type, no_fractal_generator, SampleProcessor_&>
 					(
-						EmuMath::Functors::no_fractal_noise_wrapper<EmuMath::Functors::make_fast_noise_3d<NoiseType_, __m128>, __m128>
+						no_fractal_generator
 						(
 							options_.freq,
 							options_.permutation_info.MakePermutations()
 						),
-						SampleProcessor_(),
+						sample_processor_,
 						options_.start_point,
 						options_.MakeStep()
 					);
@@ -233,10 +236,15 @@ namespace EmuMath
 				return false;
 			}
 		}
+		template<EmuMath::NoiseType NoiseType_, std::size_t RegisterWidth_, class SampleProcessor_ = EmuMath::Functors::fast_noise_sample_processor_default>
+		inline bool GenerateNoise(const options_type& options_)
+		{
+			return GenerateNoise<NoiseType_, RegisterWidth_, SampleProcessor_>(options_, SampleProcessor_());
+		}
 		template<EmuMath::NoiseType NoiseType_, class SampleProcessor_ = EmuMath::Functors::fast_noise_sample_processor_default>
 		inline bool GenerateNoise(const options_type& options_)
 		{
-			return GenerateNoise<NoiseType_, SampleProcessor_>(options_, SampleProcessor_());
+			return GenerateNoise<NoiseType_, default_register_width, SampleProcessor_>(options_);
 		}
 #pragma endregion
 
@@ -244,30 +252,30 @@ namespace EmuMath
 		table_storage samples;
 		coordinate_type table_size;
 
-		template<class Generator_, class SampleProcessor_, class OutLayer_>
+		template<class Generator_, class SampleProcessor_, class OutLayer_, class Register_>
 		inline void _finish_major_segment_partial
 		(
 			Generator_& generator_,
 			SampleProcessor_& sample_processor_,
 			OutLayer_& out_layer_,
-			__m128 points_x_,
-			__m128 points_y_,
-			__m128 points_z_,
+			Register_ points_x_,
+			Register_ points_y_,
+			Register_ points_z_,
 			std::size_t i_,
 			const std::size_t end_
 		)
 		{
 			if (i_ < end_)
 			{
-				__m128 sample_batch_ = sample_processor_(generator_(points_x_, points_y_, points_z_));
+				Register_ sample_batch_ = sample_processor_(generator_(points_x_, points_y_, points_z_));
 				if ((i_ + 1) == end_)
 				{
 					out_layer_[i_] = EmuMath::SIMD::get_index<0, value_type>(sample_batch_);
 				}
 				else
 				{
-					float calculated_values_[4];
-					_mm_store_ps(calculated_values_, sample_batch_);
+					value_type calculated_values_[EmuMath::SIMD::TMP::simd_register_width_v<Register_> / (sizeof(value_type) * 8)] = {};
+					EmuMath::SIMD::store(sample_batch_, calculated_values_);
 					for (std::size_t index_ = 0; i_ < end_; ++i_, ++index_)
 					{
 						out_layer_[i_] = calculated_values_[index_];
@@ -276,8 +284,8 @@ namespace EmuMath
 			}
 		}
 
-		template<class Generator_, class SampleProcessor_>
-		inline void _do_generation_128
+		template<class Register_, class Generator_, class SampleProcessor_>
+		inline void _do_generation
 		(
 			Generator_ generator_,
 			SampleProcessor_ sample_processor_,
@@ -285,27 +293,30 @@ namespace EmuMath
 			const EmuMath::Vector<num_dimensions, value_type> step_
 		)
 		{
+			constexpr std::size_t num_elements_per_batch = EmuMath::SIMD::TMP::simd_register_width_v<Register_> / (sizeof(value_type) * 8);
+			constexpr value_type num_elements_per_batch_value_cast = static_cast<value_type>(num_elements_per_batch);
+
 			if constexpr (num_dimensions == 3)
 			{
 				std::size_t end_x_ = table_size.at<0>();
 				std::size_t end_y_ = table_size.at<1>();
 				std::size_t end_z_ = table_size.at<2>();
 				std::size_t end_store_batch_ = table_size.at<major_dimension>();
-				end_store_batch_ -= end_store_batch_ % 4;
+				end_store_batch_ -= end_store_batch_ % num_elements_per_batch;
 
 
-				__m128 points_x_ = EmuMath::SIMD::set1<__m128>(start_.at<0>());
-				__m128 points_y_ = EmuMath::SIMD::set1<__m128>(start_.at<1>());
-				__m128 points_z_ = EmuMath::SIMD::set1<__m128>(start_.at<2>());
-				__m128 step_x_ = EmuMath::SIMD::set1<__m128>(step_.at<0>());
-				__m128 step_y_ = EmuMath::SIMD::set1<__m128>(step_.at<1>());
-				__m128 step_z_ = EmuMath::SIMD::set1<__m128>(step_.at<2>());
+				Register_ points_x_ = EmuMath::SIMD::set1<Register_>(start_.at<0>());
+				Register_ points_y_ = EmuMath::SIMD::set1<Register_>(start_.at<1>());
+				Register_ points_z_ = EmuMath::SIMD::set1<Register_>(start_.at<2>());
+				Register_ step_x_ = EmuMath::SIMD::set1<Register_>(step_.at<0>());
+				Register_ step_y_ = EmuMath::SIMD::set1<Register_>(step_.at<1>());
+				Register_ step_z_ = EmuMath::SIMD::set1<Register_>(step_.at<2>());
 
 				if constexpr (major_dimension == 0)
 				{
-					__m128 start_x_ = EmuMath::SIMD::add(points_x_, EmuMath::SIMD::mul_all(step_x_, EmuMath::SIMD::setr_incrementing<__m128, 0>()));
-					__m128 start_z_ = points_z_;
-					step_x_ = EmuMath::SIMD::mul(step_x_, EmuMath::SIMD::set1<__m128>(4.0f));
+					Register_ start_x_ = EmuMath::SIMD::add(points_x_, EmuMath::SIMD::mul_all(step_x_, EmuMath::SIMD::setr_incrementing<Register_, 0>()));
+					Register_ start_z_ = points_z_;
+					step_x_ = EmuMath::SIMD::mul(step_x_, EmuMath::SIMD::set1<Register_>(num_elements_per_batch_value_cast));
 
 					for (std::size_t y = 0; y < end_y_; ++y)
 					{
@@ -318,7 +329,7 @@ namespace EmuMath
 							std::size_t x = 0;
 							points_x_ = start_x_;
 
-							for (; x < end_store_batch_; x += 4)
+							for (; x < end_store_batch_; x += num_elements_per_batch)
 							{
 								_mm_store_ps(&(layer_1_[x]), sample_processor_(generator_(points_x_, points_y_, points_z_)));
 								points_x_ = EmuMath::SIMD::add(points_x_, step_x_);
@@ -331,9 +342,9 @@ namespace EmuMath
 				}
 				else if constexpr (major_dimension == 1)
 				{
-					__m128 start_y_ = EmuMath::SIMD::add(points_y_, EmuMath::SIMD::mul_all(step_y_, EmuMath::SIMD::setr_incrementing<__m128, 0>()));
-					__m128 start_z_ = points_z_;
-					step_y_ = EmuMath::SIMD::mul(step_y_, EmuMath::SIMD::set1<__m128>(4.0f));
+					Register_ start_y_ = EmuMath::SIMD::add(points_y_, EmuMath::SIMD::mul_all(step_y_, EmuMath::SIMD::setr_incrementing<Register_, 0>()));
+					Register_ start_z_ = points_z_;
+					step_y_ = EmuMath::SIMD::mul(step_y_, EmuMath::SIMD::set1<Register_>(num_elements_per_batch_value_cast));
 
 					for (std::size_t x = 0; x < end_x_; ++x)
 					{
@@ -346,7 +357,7 @@ namespace EmuMath
 							std::size_t y = 0;
 							points_y_ = start_y_;
 
-							for (; y < end_store_batch_; y += 4)
+							for (; y < end_store_batch_; y += num_elements_per_batch)
 							{
 								_mm_store_ps(&(layer_1_[y]), sample_processor_(generator_(points_x_, points_y_, points_z_)));
 								points_y_ = EmuMath::SIMD::add(points_y_, step_y_);
@@ -359,9 +370,9 @@ namespace EmuMath
 				}
 				else
 				{
-					__m128 start_y_ = points_y_;
-					__m128 start_z_ = EmuMath::SIMD::add(points_z_, EmuMath::SIMD::mul(step_z_, EmuMath::SIMD::setr_incrementing<__m128, 0>()));
-					step_z_ = EmuMath::SIMD::mul(step_z_, EmuMath::SIMD::set1<__m128>(4.0f));
+					Register_ start_y_ = points_y_;
+					Register_ start_z_ = EmuMath::SIMD::add(points_z_, EmuMath::SIMD::mul(step_z_, EmuMath::SIMD::setr_incrementing<Register_, 0>()));
+					step_z_ = EmuMath::SIMD::mul(step_z_, EmuMath::SIMD::set1<Register_>(num_elements_per_batch_value_cast));
 
 					for (std::size_t x = 0; x < end_x_; ++x)
 					{
@@ -374,7 +385,7 @@ namespace EmuMath
 							std::size_t z = 0;
 							points_z_ = start_z_;
 
-							for (; z < end_store_batch_; z += 4)
+							for (; z < end_store_batch_; z += num_elements_per_batch)
 							{
 								_mm_store_ps(&(layer_1_[z]), sample_processor_(generator_(points_x_, points_y_, points_z_)));
 								points_z_ = EmuMath::SIMD::add(points_z_, step_z_);

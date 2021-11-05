@@ -473,7 +473,7 @@ int main()
 	end_ = std::chrono::steady_clock::now();
 	std::cout << "FINISHED FAST NOISE IN: " << std::chrono::duration<double, std::milli>(end_ - begin_).count() << "ms\n";
 
-	WriteNoiseTableToPPM(noise_, noise_gradient_);
+	WriteNoiseTableToPPM(fast_noise_, noise_gradient_);
 
 
 	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, EmuMath::SIMD::cast<__m256>(_mm_set_ps(1.0f, 2.0f, 3.0f, 4.0f))) << "\n";
