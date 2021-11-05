@@ -89,14 +89,6 @@ namespace EmuMath::SIMD
 		return _mm_cvtss_f32(vector_max_128(val_));
 	}
 
-	/// <summary> Negates the passed SIMD vector. </summary>
-	/// <param name="val_">SIMD vector to negate.</param>
-	/// <returns>Negated form of the passed SIMD vector, such that the output matrix can be summarised as { -val_[0], -val_[1], -val_[2], -val_[3] }.</returns>
-	[[nodiscard]] inline __m128 vector_negate(__m128 val_)
-	{
-		return _mm_sub_ps(_mm_setzero_ps(), val_);
-	}
-
 	/// <summary> Multiplies lhs_mat_cm_ by rhs_mat_cm_ as though they are both contiguously column-major 2x2 matrices. </summary>
 	/// <param name="lhs_mat_cm_">SIMD vector representing a contiguously column-major 2x2 matrix which appears on the left of a matrix multiplication.</param>
 	/// <param name="rhs_mat_cm_">SIMD vector representing a contiguously column-major 2x2 matrix which appears on the right of a matrix multiplication.</param>

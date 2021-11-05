@@ -804,16 +804,17 @@ namespace EmuMath
 		template<bool Rads_ = true, typename OutAngle_ = float>
 		[[nodiscard]] inline OutAngle_ Angle(__m128 b_) const
 		{
-			__m128 b_sqr_mag_ = _mm_mul_ps(b_, b_);
-			b_sqr_mag_ = EmuMath::SIMD::horizontal_vector_sum(b_sqr_mag_);
-			__m128 out_ = _mm_rsqrt_ps(_mm_mul_ps(b_sqr_mag_, EmuMath::SIMD::dot(data_, data_)));
+			__m128 out_ = _mm_rsqrt_ps(_mm_mul_ps(EmuMath::SIMD::dot(b_, b_), EmuMath::SIMD::dot(data_, data_)));
 			out_ = _mm_mul_ps(out_, EmuMath::SIMD::dot(data_, b_));
 			out_ = _mm_acos_ps(out_);
 			if constexpr (!Rads_)
 			{
-				out_ = _mm_mul_ps(out_, _mm_set_ps1(EmuCore::Pi::HUNDRED80_DIV_PI<float>));
+				return static_cast<OutAngle_>(_mm_cvtss_f32(out_) * EmuCore::Pi::HUNDRED80_DIV_PI<float>);
 			}
-			return _mm_cvtss_f32(out_);
+			else
+			{
+				return static_cast<OutAngle_>(_mm_cvtss_f32(out_));
+			}
 		}
 		template<bool Rads_ = true, typename OutAngle_ = float>
 		[[nodiscard]] inline OutAngle_ Angle(FastVector4f b_) const

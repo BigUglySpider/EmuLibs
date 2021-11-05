@@ -434,7 +434,7 @@ int main()
 	__m256i rhs_int_ = _mm256_set_epi32(1, 4, 3, 2, 5, 6, 7, 8);
 	std::cout << std::bitset<32>(_mm256_movemask_epi8(_mm256_cmpeq_epi32(lhs_int_, rhs_int_))) << "\n";
 	std::cout << EmuMath::SIMD::cmp_all_eq<true, true, true, true, true, false, true, false, true>(lhs_int_, rhs_int_) << "\n";
-
+	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, EmuMath::SIMD::horizontal_sum_fill(lhs_)) << "\n";
 	system("pause");
 
 	std::cout << "GENERATING SCALAR NOISE...\n";

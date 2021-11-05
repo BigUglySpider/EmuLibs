@@ -2,6 +2,8 @@
 #define EMU_MATH_SIMD_HELPERS_TEMPLATE_COMMON_ARITHMETIC 1
 
 #include "_underlying_template_helpers/_simd_helpers_underlying_basic_arithmetic.h"
+#include "_simd_helpers_template_cast.h"
+#include "_simd_helpers_template_gets.h"
 #include "_simd_helpers_template_shuffles.h"
 
 namespace EmuMath::SIMD
@@ -284,12 +286,46 @@ namespace EmuMath::SIMD
 			}
 			else if constexpr (std::is_same_v<register_type_uq, __m256>)
 			{
-				__m128 result_ = _underlying_simd_helpers::_execute_shuffle<0>
+				__m256 result_ = _underlying_simd_helpers::_cast<__m256>
 				(
-					_mm256_castps256_ps128(horizontal_sum(register_))
+					_underlying_simd_helpers::_execute_shuffle<0>
+					(
+						_underlying_simd_helpers::_cast<__m128>(horizontal_sum(register_))
+					)
 				);
-
-				return _mm256_insertf128_ps(_mm256_castps128_ps256(result_), result_, 1);
+				return _mm256_permute2f128_ps(result_, result_, 0);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				__m256d result_ = _underlying_simd_helpers::_cast<__m256d>
+				(
+					_underlying_simd_helpers::_execute_shuffle<0>
+					(
+						_underlying_simd_helpers::_cast<__m128d>(horizontal_sum(register_))
+					)
+				);
+				return _mm256_permute2f128_pd(result_, result_, 0);
+			}
+			else if constexpr (EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i>::value)
+			{
+				if constexpr (EmuMath::SIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfInt_>())
+				{
+					return _underlying_simd_helpers::_set1<register_type_uq, PerElementWidthIfInt_>
+					(
+						_underlying_simd_helpers::_get_register_index<0, EmuCore::TMPHelpers::int_of_size_t<PerElementWidthIfInt_ / 8>>
+						(
+							horizontal_sum<PerElementWidthIfInt_>(register_)
+						)
+					);
+				}
+				else
+				{
+					static_assert(false, "Attempted to perform EmuMath::SIMD::horizontal_sum_fill with an integral SIMD register, but the provided bit-width per element is invalid.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform EmuMath::SIMD::horizontal_sum_fill with a SIMD register type that is not supported for this operation.");
 			}
 		}
 		else
@@ -320,6 +356,37 @@ namespace EmuMath::SIMD
 		else
 		{
 			static_assert(false, "Attempted to perform EmuMath::SIMD::dot with an unsupported type as the passed Register_.");
+		}
+	}
+
+	template<typename Out_, std::size_t PerElementWidthIfInt_ = 32, class Register_>
+	[[nodiscard]] inline Register_ dot_scalar(Register_ a_, Register_ b_)
+	{
+		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		if constexpr (EmuMath::SIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (EmuMath::SIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
+			{
+				return _underlying_simd_helpers::_get_register_index<0, Out_, PerElementWidthIfInt_>
+				(
+					horizontal_sum(_underlying_simd_helpers::_mul_fp(a_, b_))
+				);
+			}
+			else if constexpr (EmuMath::SIMD::TMP::is_integral_simd_register_v<register_type_uq>)
+			{
+				return _underlying_simd_helpers::_get_register_index<0, Out_, PerElementWidthIfInt_>
+				(
+					horizontal_sum<PerElementWidthIfInt_>(_underlying_simd_helpers::_mul_all_int<PerElementWidthIfInt_>(a_, b_))
+				);
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform EmuMath::SIMD::dot_scalar, but the provided SIMD register type is unsupported for this operation.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform EmuMath::SIMD::dot_scalar with an unsupported type as the passed Register_.");
 		}
 	}
 }
