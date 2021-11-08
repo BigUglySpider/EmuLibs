@@ -5,6 +5,14 @@
 
 namespace EmuCore::TMPHelpers
 {
+	template<typename T_>
+	struct remove_ref_cv
+	{
+		using type = std::remove_cv_t<std::remove_reference_t<T_>>;
+	};
+	template<typename T_>
+	using remove_ref_cv_t = typename remove_ref_cv<T_>::type;
+
 	/// <summary> The floating-point type best suited to representing the passed type based on byte size. </summary>
 	/// <typeparam name="T">Type to provide the best suited floating point representing type of.</typeparam>
 	template<typename T>
@@ -140,6 +148,29 @@ namespace EmuCore::TMPHelpers
 				<
 					NumBytes_ == sizeof(std::uint64_t),
 					std::uint64_t,
+					std::false_type
+				>
+			>
+		>
+	>;
+
+	template<std::size_t NumBytes_>
+	using int_of_size_t = std::conditional_t
+	<
+		NumBytes_ == sizeof(std::int8_t),
+		std::int8_t,
+		std::conditional_t
+		<
+			NumBytes_ == sizeof(std::int16_t),
+			std::int16_t,
+			std::conditional_t
+			<
+				NumBytes_ == sizeof(std::int32_t),
+				std::int32_t,
+				std::conditional_t
+				<
+					NumBytes_ == sizeof(std::int64_t),
+					std::int64_t,
 					std::false_type
 				>
 			>

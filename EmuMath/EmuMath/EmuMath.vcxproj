@@ -104,7 +104,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -135,7 +135,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -175,7 +175,7 @@
     <ClInclude Include="EmuMath\Matrix.h" />
     <ClInclude Include="EmuMath\Noise.h" />
     <ClInclude Include="EmuMath\Random.h" />
-    <ClInclude Include="EmuMath\SIMDHelpers.h" />
+    <ClInclude Include="EmuSIMD\SIMDHelpers.h" />
     <ClInclude Include="EmuMath\Vector.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourArithmeticFunctors.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourComparisonFunctors.h" />
@@ -238,13 +238,36 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_info\NoiseType.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_random\RngWrapper.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_random\ShuffledIntSequence.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_common_simd_helpers_includes.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_access.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_arithmetic.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_bits.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_comparisons.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_masks.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_simd_helpers\_simd_helpers_shuffles.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_common_simd_helpers_includes.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_blend.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_cast.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_cmp.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_common_arithmetic.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_gets.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_index_masks.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_movemask.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_sets.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_aliases.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_simd_helpers_arithmetic.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_shuffles.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_basic_arithmetic.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_bitwise.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_streams.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_blend.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_blend_mask.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_cast.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_cmp.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_movemasks.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_tmp.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_common_underlying_simd_template_helper_includes.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_basic_arithmetic.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_bitwise.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_index_masks.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_set.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_shuffle.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_shuffle_masks.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_stream.h" />
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_simd_helpers_underlying_get.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\FastVector4f.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\Vector2.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\Vector3.h" />

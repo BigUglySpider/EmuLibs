@@ -146,12 +146,12 @@ namespace EmuMath
 			return *this;
 		}
 
-		inline value_type operator[](std::size_t index_) const
+		inline const value_type& operator[](std::size_t index_) const
 		{
 			return at(index_);
 		}
 
-		inline value_type at(std::size_t index_) const
+		inline const value_type& at(std::size_t index_) const
 		{
 			return items[index_];
 		}
