@@ -1,8 +1,8 @@
 #ifndef EMU_MATH_FAST_NOISE_SAMPLE_PROCESSORS_H_INC_
 #define EMU_MATH_FAST_NOISE_SAMPLE_PROCESSORS_H_INC_ 1
 
-#include "../../SIMDHelpers.h"
 #include "../../../EmuCore/Functors/Arithmetic.h"
+#include "../../../EmuSIMD/SIMDHelpers.h"
 
 namespace EmuMath::Functors
 {
@@ -23,19 +23,19 @@ namespace EmuMath::Functors
 	{
 	public:
 		fast_noise_sample_processor_perlin_normalise() :
-			min_256(EmuMath::SIMD::set1<__m256>(min_)),
-			denominator_reciprocal_256(EmuMath::SIMD::set1<__m256>(denominator_reciprocal_))
+			min_256(EmuSIMD::set1<__m256>(min_)),
+			denominator_reciprocal_256(EmuSIMD::set1<__m256>(denominator_reciprocal_))
 		{
 		}
 		inline __m128 operator()(__m128 samples_) const
 		{
-			samples_ = EmuMath::SIMD::sub(samples_, _mm256_castps256_ps128(min_256));
-			return EmuMath::SIMD::mul(samples_, _mm256_castps256_ps128(denominator_reciprocal_256));
+			samples_ = EmuSIMD::sub(samples_, _mm256_castps256_ps128(min_256));
+			return EmuSIMD::mul(samples_, _mm256_castps256_ps128(denominator_reciprocal_256));
 		}
 		inline __m256 operator()(__m256 samples_) const
 		{
-			samples_ = EmuMath::SIMD::sub(samples_, min_256);
-			return EmuMath::SIMD::mul(samples_, denominator_reciprocal_256);
+			samples_ = EmuSIMD::sub(samples_, min_256);
+			return EmuSIMD::mul(samples_, denominator_reciprocal_256);
 		}
 
 	private:
@@ -52,16 +52,16 @@ namespace EmuMath::Functors
 	{
 	public:
 		constexpr fast_noise_sample_processor_perlin_neg1_to_1() : 
-			multiplier_256(EmuMath::SIMD::set1<__m256>(multiplier_))
+			multiplier_256(EmuSIMD::set1<__m256>(multiplier_))
 		{
 		}
 		constexpr inline __m128 operator()(__m128 sample_) const
 		{
-			return EmuMath::SIMD::mul_all(sample_, _mm256_castps256_ps128(multiplier_256));
+			return EmuSIMD::mul_all(sample_, _mm256_castps256_ps128(multiplier_256));
 		}
 		constexpr inline __m256 operator()(__m256 sample_) const
 		{
-			return EmuMath::SIMD::mul_all(sample_, multiplier_256);
+			return EmuSIMD::mul_all(sample_, multiplier_256);
 		}
 
 	private:

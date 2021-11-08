@@ -338,7 +338,6 @@ int main()
 
 	grad_type::anchor_type anchor_ = 0.0f;
 
-	EmuMath::NoiseTable<3, float> noise_;
 
 	grad_type gradient_colours_;
 	gradient_colours_.AddClampedColourAnchor(0.0f, EmuMath::Colours::Blue());
@@ -362,9 +361,9 @@ int main()
 
 	__m128 some_a_128_ = _mm_set_ps(3.0f, 2.0f, 1.0f, 0.0f);
 	__m128 some_b_128_ = _mm_set_ps(7.0f, 6.0f, 5.0f, 4.0f);
-	std::cout << EmuMath::FastVector4f(EmuMath::SIMD::_underlying_simd_helpers::_execute_shuffle<1, 1, 3, 3>(some_a_128_, some_b_128_)) << "\n";
+	std::cout << EmuMath::FastVector4f(EmuSIMD::_underlying_simd_helpers::_execute_shuffle<1, 1, 3, 3>(some_a_128_, some_b_128_)) << "\n";
 
-	EmuMath::SIMD::append_simd_vector_to_stream<8>
+	EmuSIMD::append_simd_vector_to_stream<8>
 	(
 		std::cout,
 		_mm256_set_epi8(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31)
@@ -373,33 +372,33 @@ int main()
 
 	__m256i _8_bit_256_ = _mm256_setr_epi8    (1,  2,  3,  4,  5,  6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32);
 	__m256i _8_bit_mul_256_ = _mm256_setr_epi8(32, 31, 30, 29, 28, 1, 2, 3, 4, 10, 5,  2,  1,  3,  4,  4,  5,  2,  6,  5,  4,  3,  2,  1,  1,  0,  3,  4,  5,  1,  2,  3);
-	EmuMath::SIMD::append_simd_vector_to_stream<8, false>
+	EmuSIMD::append_simd_vector_to_stream<8, false>
 	(
 		std::cout,
-		EmuMath::SIMD::_underlying_simd_helpers::_mul_all_int<8>(_8_bit_256_, _8_bit_mul_256_)
+		EmuSIMD::_underlying_simd_helpers::_mul_all_int<8>(_8_bit_256_, _8_bit_mul_256_)
 	) << "\n";
 
 	__m256 cmp_a_ = _mm256_set_ps(2.0f, 1.0f, 3.0f, 4.0f, 0.0f, 2.0f, 3.0f, 3.0f);
 	__m256 cmp_b_ = _mm256_set_ps(2.0f, 5.0f, 6.6f, 4.0f, 3.0f, 1.0f, 2.0f, 3.0f);
-	EmuMath::SIMD::append_simd_vector_to_stream
+	EmuSIMD::append_simd_vector_to_stream
 	(
 		std::cout,
-		EmuMath::SIMD::_underlying_simd_helpers::_make_register_from_movemask_fp<__m256>(_mm256_movemask_ps(_mm256_cmp_ps(cmp_a_, cmp_b_, _CMP_EQ_OS)))
+		EmuSIMD::_underlying_simd_helpers::_make_register_from_movemask_fp<__m256>(_mm256_movemask_ps(_mm256_cmp_ps(cmp_a_, cmp_b_, _CMP_EQ_OS)))
 	) << "\n";
 
 	__m128i mod_a_256_ = _mm_setr_epi32(10, 3, -4, 4);
 	__m128i mod_b_256_ = _mm_setr_epi32(1,  2,  3, 4);
-	EmuMath::SIMD::append_simd_vector_to_stream
+	EmuSIMD::append_simd_vector_to_stream
 	(
 		std::cout,
-		EmuMath::SIMD::_underlying_simd_helpers::_mod_int<32, true>(mod_a_256_, mod_b_256_)
+		EmuSIMD::_underlying_simd_helpers::_mod_int<32, true>(mod_a_256_, mod_b_256_)
 	) << "\n";
-	EmuMath::SIMD::append_simd_vector_to_stream
+	EmuSIMD::append_simd_vector_to_stream
 	(
 		std::cout,
-		EmuMath::SIMD::_underlying_simd_helpers::_rem_int<32, true>(mod_a_256_, mod_b_256_)
+		EmuSIMD::_underlying_simd_helpers::_rem_int<32, true>(mod_a_256_, mod_b_256_)
 	) << "\n";
-	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, EmuMath::SIMD::setallone<__m256>()) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::setallone<__m256>()) << "\n";
 
 
 	std::cout << "---\n\n";
@@ -407,38 +406,39 @@ int main()
 
 	using testing_register = __m256i;
 	constexpr std::size_t testing_element_width = 8;
-	testing_register a_simd_ = EmuMath::SIMD::set_incrementing<testing_register, 1, testing_element_width>();
-	testing_register b_simd_ = EmuMath::SIMD::set_incrementing<testing_register, 33, testing_element_width>();
-	testing_register mask_simd_ = EmuMath::SIMD::index_mask<testing_register, true, false, false, false, false, true, false, false>::get();
-	EmuMath::SIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, a_simd_) << " BLEND\n";
-	EmuMath::SIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, b_simd_) << " WITH MASK\n";
-	EmuMath::SIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, mask_simd_) << ":\n";
-	EmuMath::SIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, EmuMath::SIMD::blendv(a_simd_, b_simd_, mask_simd_)) << "\n";
-	EmuMath::SIMD::append_simd_vector_to_stream<testing_element_width, false>
+	testing_register a_simd_ = EmuSIMD::set_incrementing<testing_register, 1, testing_element_width>();
+	testing_register b_simd_ = EmuSIMD::set_incrementing<testing_register, 33, testing_element_width>();
+	testing_register mask_simd_ = EmuSIMD::index_mask<testing_register, true, false, false, false, false, true, false, false>::get();
+	EmuSIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, a_simd_) << " BLEND\n";
+	EmuSIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, b_simd_) << " WITH MASK\n";
+	EmuSIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, mask_simd_) << ":\n";
+	EmuSIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, EmuSIMD::blendv(a_simd_, b_simd_, mask_simd_)) << "\n";
+	EmuSIMD::append_simd_vector_to_stream<testing_element_width, false>
 	(
 		std::cout,
-		EmuMath::SIMD::blend
+		EmuSIMD::blend
 		<
 			false, false, true, true, true, false, true, false, false, false, false, true, true, true, true, false,
 			true, true, true, true, true, false, true, false, false, false, false, true, true, true, true, true
 		>(a_simd_, b_simd_)
 	) << "\n";
 
-	__m256 lhs_ = EmuMath::SIMD::set<__m256>(1, 2, 3, 4, 5, 6, 7, 8);
-	__m256 rhs_ = EmuMath::SIMD::set<__m256>(9, 10, 11, 12, 13, 14, 15, 16);
-	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, lhs_) << "\n";
-	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, rhs_) << "\n";
-	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, _mm256_permute2f128_ps(lhs_, rhs_, 0b00110001)) << "\n";
+	__m256 lhs_ = EmuSIMD::set<__m256>(1, 2, 3, 4, 5, 6, 7, 8);
+	__m256 rhs_ = EmuSIMD::set<__m256>(9, 10, 11, 12, 13, 14, 15, 16);
+	EmuSIMD::append_simd_vector_to_stream(std::cout, lhs_) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, rhs_) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, _mm256_permute2f128_ps(lhs_, rhs_, 0b00110001)) << "\n";
 
 	__m256i lhs_int_ = _mm256_set_epi32(1, 2, 3, 4, 5, 6, 7, 8);
 	__m256i rhs_int_ = _mm256_set_epi32(1, 4, 3, 2, 5, 6, 7, 8);
 	std::cout << std::bitset<32>(_mm256_movemask_epi8(_mm256_cmpeq_epi32(lhs_int_, rhs_int_))) << "\n";
-	std::cout << EmuMath::SIMD::cmp_all_eq<true, true, true, true, true, false, true, false, true>(lhs_int_, rhs_int_) << "\n";
-	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, EmuMath::SIMD::horizontal_sum_fill(lhs_)) << "\n";
+	std::cout << EmuSIMD::cmp_all_eq<true, true, true, true, true, false, true, false, true>(lhs_int_, rhs_int_) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::horizontal_sum_fill(lhs_)) << "\n";
 	system("pause");
 
 	std::cout << "GENERATING SCALAR NOISE...\n";
 	auto begin_ = std::chrono::steady_clock::now();
+	EmuMath::NoiseTable<3, float> noise_;
 	noise_.GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::noise_sample_processor_perlin_normalise<3>>
 	(
 		noise_.MakeOptions
@@ -461,7 +461,7 @@ int main()
 	std::cout << "GENERATING FAST NOISE...\n";
 	EmuMath::FastNoiseTable<3, 1> fast_noise_;
 	begin_ = std::chrono::steady_clock::now();
-	fast_noise_.GenerateNoise<EmuMath::NoiseType::PERLIN, 128, EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<3>>
+	fast_noise_.GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<3>>
 	(
 		fast_noise_.make_options
 		(
@@ -481,7 +481,7 @@ int main()
 	WriteNoiseTableToPPM(fast_noise_, noise_gradient_);
 
 
-	EmuMath::SIMD::append_simd_vector_to_stream(std::cout, EmuMath::SIMD::cast<__m256>(_mm_set_ps(1.0f, 2.0f, 3.0f, 4.0f))) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::cast<__m256>(_mm_set_ps(1.0f, 2.0f, 3.0f, 4.0f))) << "\n";
 	EmuMath::Functors::make_fast_noise_3d<EmuMath::NoiseType::PERLIN, __m128> fast_generator_;
 	__m128 test_128_ = fast_generator_(_mm_set1_ps(0.4f), _mm_set1_ps(0.0f), _mm_set1_ps(1.0f), _mm_set1_ps(16.0f), _mm_set1_epi32(1023), EmuMath::NoisePermutations(1024, 0U));
 	std::cout << "\n\n";

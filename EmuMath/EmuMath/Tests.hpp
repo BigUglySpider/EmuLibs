@@ -75,7 +75,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr bool DO_TEST = true;
-		static constexpr std::string_view NAME = "Matrix (EmuMath SIMD)";
+		static constexpr std::string_view NAME = "Matrix (EmuMath w/SIMD)";
 
 		MatEmu()
 		{

@@ -2,7 +2,7 @@
 #define EMU_MATH_FAST_FRACTAL_NOISE_WRAPPER_H_INC_ 1
 
 #include "FractalNoiseWrapper.h"
-#include "../../../SIMDHelpers.h"
+#include "../../../../EmuSIMD/SIMDHelpers.h"
 
 namespace EmuMath::Functors
 {
@@ -14,7 +14,7 @@ namespace EmuMath::Functors
 		public:
 			using generator_type = PerIterationGenerator_;
 			using register_type = EmuCore::TMPHelpers::remove_ref_cv_t<Register_>;
-			using integral_register_type = typename EmuMath::SIMD::TMP::integer_register_type<EmuMath::SIMD::TMP::simd_register_width_v<register_type>>::type;
+			using integral_register_type = typename EmuSIMD::TMP::integer_register_type<EmuSIMD::TMP::simd_register_width_v<register_type>>::type;
 			/// <summary> Float if __m128, __m256, or __m512 is the register type. Otherwise double, due to implied __m128d, __m256d, or __m512d. </summary>
 			using value_type = std::conditional_t
 			<
@@ -48,10 +48,10 @@ namespace EmuMath::Functors
 				const fractal_info_type& fractal_info_,
 				GeneratorConstructorArgs_&&...generator_constructor_args_
 			) :
-				starting_freq_simd(EmuMath::SIMD::set1<register_type>(freq_)),
-				lacunarity_simd(EmuMath::SIMD::set1<register_type>(fractal_info_.GetLacunarity())),
-				gain_simd(EmuMath::SIMD::set1<register_type>(fractal_info_.GetGain())),
-				permutation_mask_simd(EmuMath::SIMD::set1<integral_register_type>(permutations_.MaxValue())),
+				starting_freq_simd(EmuSIMD::set1<register_type>(freq_)),
+				lacunarity_simd(EmuSIMD::set1<register_type>(fractal_info_.GetLacunarity())),
+				gain_simd(EmuSIMD::set1<register_type>(fractal_info_.GetGain())),
+				permutation_mask_simd(EmuSIMD::set1<integral_register_type>(permutations_.MaxValue())),
 				fractal_info(fractal_info_),
 				permutations(permutations_),
 				generator(generator_constructor_args_...)
@@ -65,10 +65,10 @@ namespace EmuMath::Functors
 				const fractal_info_type& fractal_info_,
 				GeneratorConstructorArgs_&&...generator_constructor_args_
 			) :
-				starting_freq_simd(EmuMath::SIMD::set1<register_type>(freq_)),
-				lacunarity_simd(EmuMath::SIMD::set1<register_type>(fractal_info_.GetLacunarity())),
-				gain_simd(EmuMath::SIMD::set1<register_type>(fractal_info_.GetGain())),
-				permutation_mask_simd(EmuMath::SIMD::set1<integral_register_type>(permutations_.MaxValue())),
+				starting_freq_simd(EmuSIMD::set1<register_type>(freq_)),
+				lacunarity_simd(EmuSIMD::set1<register_type>(fractal_info_.GetLacunarity())),
+				gain_simd(EmuSIMD::set1<register_type>(fractal_info_.GetGain())),
+				permutation_mask_simd(EmuSIMD::set1<integral_register_type>(permutations_.MaxValue())),
 				fractal_info(fractal_info_),
 				permutations(permutations_),
 				generator(generator_constructor_args_...)
@@ -81,23 +81,23 @@ namespace EmuMath::Functors
 				if (1 < end_)
 				{
 					std::size_t octave_ = 1;
-					register_type range_ = EmuMath::SIMD::set1<register_type>(1);
+					register_type range_ = EmuSIMD::set1<register_type>(1);
 					register_type amplitude_ = range_;
 					register_type active_freq_ = starting_freq_simd;
 					register_type result_ = generator(points_x_, points_y_, points_z_, active_freq_, permutation_mask_simd, permutations);
 					do
 					{
-						active_freq_ = EmuMath::SIMD::mul_all(active_freq_, lacunarity_simd);
-						amplitude_ = EmuMath::SIMD::mul_all(amplitude_, gain_simd);
-						range_ = EmuMath::SIMD::add(range_, amplitude_);
-						result_ = EmuMath::SIMD::add
+						active_freq_ = EmuSIMD::mul_all(active_freq_, lacunarity_simd);
+						amplitude_ = EmuSIMD::mul_all(amplitude_, gain_simd);
+						range_ = EmuSIMD::add(range_, amplitude_);
+						result_ = EmuSIMD::add
 						(
 							result_,
-							EmuMath::SIMD::mul(generator(points_x_, points_y_, points_z_, active_freq_, permutation_mask_simd, permutations), amplitude_)
+							EmuSIMD::mul(generator(points_x_, points_y_, points_z_, active_freq_, permutation_mask_simd, permutations), amplitude_)
 						);
 						++octave_;
 					} while(octave_ < end_);
-					return EmuMath::SIMD::div(result_, range_);
+					return EmuSIMD::div(result_, range_);
 				}
 				else
 				{
@@ -174,11 +174,11 @@ namespace EmuMath::Functors
 			const EmuMath::NoisePermutations& permutations_,
 			GeneratorConstructorArgs_&&...generator_constructor_args_
 		) :
-			freq(EmuMath::SIMD::set1<__m256>(freq_)),
+			freq(EmuSIMD::set1<__m256>(freq_)),
 			permutations(permutations_),
 			generator(generator_constructor_args_...)
 		{
-			permutations_mask = EmuMath::SIMD::set1<__m256i, 32>(permutations.MaxValue());
+			permutations_mask = EmuSIMD::set1<__m256i, 32>(permutations.MaxValue());
 		}
 		template<typename...GeneratorConstructorArgs_, typename = std::enable_if_t<std::is_constructible_v<generator_type, GeneratorConstructorArgs_...>>>
 		no_fractal_noise_wrapper
@@ -187,11 +187,11 @@ namespace EmuMath::Functors
 			EmuMath::NoisePermutations&& permutations_,
 			GeneratorConstructorArgs_&&...generator_constructor_args_
 		) :
-			freq(EmuMath::SIMD::set1<__m256>(freq_)),
+			freq(EmuSIMD::set1<__m256>(freq_)),
 			permutations(permutations_),
 			generator(generator_constructor_args_...)
 		{
-			permutations_mask = EmuMath::SIMD::set1<__m256i, 32>(permutations.MaxValue());
+			permutations_mask = EmuSIMD::set1<__m256i, 32>(permutations.MaxValue());
 		}
 
 		[[nodiscard]] inline __m256 operator()(__m256 points_x_, __m256 points_y_, __m256 points_z_)
