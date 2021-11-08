@@ -8,6 +8,9 @@
 
 #include "EmuMath/FastNoise.h"
 
+#include "EmuThreads/ThreadPool.h"
+#include "EmuThreads/ThreadSafeHelpers.h"
+
 #include <chrono>
 #include <thread>
 
@@ -29,6 +32,12 @@ inline std::ostream& operator<<(std::ostream& stream_, const std::array<T_, Size
 	str << " }";
 	stream_ << str.str();
 	return stream_;
+}
+
+void some_test(int& yo_)
+{
+	std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(rand() % 1000));
+	EmuThreads::thread_safe_stream_append<true>(std::cout, ++yo_, " : ", &yo_);
 }
 
 template<typename T_, int Max_ = std::numeric_limits<int>::max()>
@@ -434,7 +443,23 @@ int main()
 	std::cout << std::bitset<32>(_mm256_movemask_epi8(_mm256_cmpeq_epi32(lhs_int_, rhs_int_))) << "\n";
 	std::cout << EmuSIMD::cmp_all_eq<true, true, true, true, true, false, true, false, true>(lhs_int_, rhs_int_) << "\n";
 	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::horizontal_sum_fill(lhs_)) << "\n";
+
+
+
+	std::cout << "\n\n\n\n";
+	std::vector<EmuThreads::ThreadPool<std::thread>> thread_pool_;
+	thread_pool_.push_back({ 5 });
+	int some_random_val_ = 2;
+	std::cout << "Non-threaded address: " << &some_random_val_ << "\n";
+	thread_pool_[0].AllocateTask<int&>(some_test, some_random_val_);
+	thread_pool_[0].AllocateTask<int&>(some_test, some_random_val_);
+	thread_pool_[0].AllocateTask<int&>(some_test, some_random_val_);
+	std::cout << "Finished allocating tasks to pool...\n";
+	thread_pool_[0].AllocateTask<int&>(some_test, some_random_val_);
 	system("pause");
+	//thread_pool_[0].DeallocateThreads();
+	system("pause");
+
 
 	std::cout << "GENERATING SCALAR NOISE...\n";
 	auto begin_ = std::chrono::steady_clock::now();
