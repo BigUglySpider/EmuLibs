@@ -14,14 +14,11 @@ namespace EmuThreads::Functors
 {
 	class default_work_allocator
 	{
-	private:
-		using work_type = std::function<void()>;
-
 	public:
 		using this_type = default_work_allocator;
 
 		/// <summary> The waiting time (in milliseconds) used when no other time is provided. </summary>
-		static constexpr double default_waiting_time_ms = 0.1;
+		static constexpr double default_waiting_time_ms = 0.01;
 		/// <summary> Minimum waiting time (in milliseconds) that may be used in this allocator's downtime. </summary>
 		static constexpr double min_waiting_time_ms = 0.0000000001;
 		/// <summary> Maximum waiting time (in milliseconds) that may be used in this allocator's downtime. </summary>
@@ -106,7 +103,7 @@ namespace EmuThreads::Functors
 		template<class Thread_>
 		[[nodiscard]] inline Thread_ LaunchThread()
 		{
-			return Thread_(&this_type::worker_execution, this);
+			return Thread_(&this_type::_worker_execution, this);
 		}
 
 		/// <summary>
@@ -115,7 +112,7 @@ namespace EmuThreads::Functors
 		/// </summary>
 		inline void ClearWorkQueue()
 		{
-			std::lock_guard lock_(queue_mutex);
+			std::lock_guard<mutex_type> lock_(queue_mutex);
 			decltype(work_queue)().swap(work_queue);
 		}
 
@@ -164,7 +161,7 @@ namespace EmuThreads::Functors
 			// The waiting thread will contribute to work as it is allowed to pop the queue
 			while (HasWork())
 			{
-				look_for_work();
+				_look_for_work();
 			}
 		}
 		inline void WaitForAllTasksToComplete() const
@@ -222,7 +219,7 @@ namespace EmuThreads::Functors
 			if constexpr (std::is_invocable_v<Func_, Args_...>)
 			{
 				auto wrapped_func_ = std::make_shared<std::packaged_task<decltype(func_(args_...))(Args_...)>>(func_);
-				std::lock_guard lock_(queue_mutex);
+				std::lock_guard<mutex_type> lock_(queue_mutex);
 				work_queue.emplace([=]() { (*wrapped_func_)(args_...); });
 				++num_queued_tasks;
 				return wrapped_func_->get_future();
@@ -234,26 +231,30 @@ namespace EmuThreads::Functors
 		}
 
 	private:
+		using work_type = std::function<void()>;
+		using work_queue_type = std::queue<work_type>;
+		using mutex_type = std::mutex;
+
 		/// <summary> This is designed to run on a separate worker thread, and not the main thread. Constantly looks for work. </summary>
-		inline void worker_execution()
+		inline void _worker_execution()
 		{
 			while (is_active)
 			{
-				look_for_work();
+				_look_for_work();
 			}
 		}
 
-		inline void look_for_work()
+		inline void _look_for_work()
 		{
 			std::unique_lock<mutex_type> lock_(queue_mutex);
 			if (is_active && num_queued_tasks != 0)
 			{
 				// Get task and unlock as soon as reasonable
-				work_type next_task_ = pop_next_task();
+				work_type next_task_ = std::move(_pop_next_task());
 				lock_.unlock();
 
 				// Include incrementing/decrementing work counter as a part of the task
-				// --- Since it's atomic, we don't need to worry about the lockm
+				// --- Since it's atomic, we don't need to worry about the lock
 				++working_thread_count;
 				next_task_();
 				--working_thread_count;
@@ -265,7 +266,7 @@ namespace EmuThreads::Functors
 			}
 		}
 
-		inline work_type pop_next_task()
+		inline work_type _pop_next_task()
 		{
 			work_type out_task_ = std::move(work_queue.front());
 			work_queue.pop();
@@ -273,14 +274,11 @@ namespace EmuThreads::Functors
 			return out_task_;
 		}
 
-		using work_queue_type = std::queue<work_type>;
-		using mutex_type = std::mutex;
-
-		work_queue_type work_queue;
-		mutex_type queue_mutex;
 		std::atomic_bool is_active;
 		std::atomic_size_t working_thread_count;
 		std::atomic_size_t num_queued_tasks;
+		mutex_type queue_mutex;
+		work_queue_type work_queue;
 		double waiting_time_ms;
 	};
 }

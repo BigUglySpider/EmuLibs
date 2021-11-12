@@ -9,6 +9,7 @@
 #include "EmuMath/FastNoise.h"
 
 #include "EmuThreads/ThreadPool.h"
+#include "EmuThreads/Functors/prioritised_work_allocator.h"
 #include "EmuThreads/ThreadSafeHelpers.h"
 
 #include <chrono>
@@ -37,7 +38,7 @@ inline std::ostream& operator<<(std::ostream& stream_, const std::array<T_, Size
 void some_test(int& yo_)
 {
 	std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(rand() % 1000));
-	EmuThreads::thread_safe_stream_append<true>(std::cout, ++yo_, " : ", &yo_);
+	EmuThreads::thread_safe_stream_append(std::cout, ++yo_, " : ", &yo_, "\n");
 }
 
 template<typename T_, int Max_ = std::numeric_limits<int>::max()>
@@ -455,11 +456,34 @@ int main()
 	thread_pool_[0].AllocateTask<int&>(some_test, some_random_val_);
 	thread_pool_[0].AllocateTask<int&>(some_test, some_random_val_);
 	std::cout << "Finished allocating tasks to pool...\n";
+	system("pause");
 	thread_pool_[0].AllocateTask<int&>(some_test, some_random_val_);
+	thread_pool_[0].AllocateTask
+	(
+		EmuThreads::thread_safe_stream_append<decltype(std::cout), std::string, int, std::string>,
+		std::ref(std::cout),
+		"Old thread pool :) | ",
+		some_random_val_,
+		"\n"
+	);
 	system("pause");
-	//thread_pool_[0].DeallocateThreads();
+	std::cout << "Making new thread pool...\n";
+	EmuThreads::ThreadPool<std::thread, EmuThreads::Functors::prioritised_work_allocator<std::int16_t>> another_pool_;
+	another_pool_.AllocateTask<decltype(std::cout)&, std::string, std::string>
+	(
+		EmuThreads::thread_safe_stream_append<decltype(std::cout), std::string, std::string>,
+		std::cout,
+		"New thread pool :)",
+		" hehe\n"
+	);
 	system("pause");
+	std::cout << "Num Threads: " << another_pool_.NumThreads() << "\n";
 
+	static constexpr bool oigtjreo = EmuThreads::TMP::has_const_waiting_time_ms_member_func<EmuThreads::Functors::default_work_allocator, double>::value;
+	system("pause");
+	std::cout << "Num Threads: " << another_pool_.NumThreads() << "\n";
+	another_pool_.AllocateWorkers(1);
+	system("pause");
 
 	std::cout << "GENERATING SCALAR NOISE...\n";
 	auto begin_ = std::chrono::steady_clock::now();

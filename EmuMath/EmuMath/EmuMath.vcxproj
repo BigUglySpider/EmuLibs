@@ -278,9 +278,12 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\VectorInfo.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\VectorT.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\VectorTMP.h" />
+    <ClInclude Include="EmuThreads\Functors\default_thread_allocator.h" />
     <ClInclude Include="EmuThreads\Functors\default_work_allocator.h" />
+    <ClInclude Include="EmuThreads\Functors\prioritised_work_allocator.h" />
     <ClInclude Include="EmuThreads\ThreadPool.h" />
     <ClInclude Include="EmuThreads\ThreadSafeHelpers.h" />
+    <ClInclude Include="EmuThreads\TMP\ThreadPoolTMP.h" />
     <ClInclude Include="Tests.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

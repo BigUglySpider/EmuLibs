@@ -31,15 +31,11 @@ namespace EmuThreads
 	/// <param name="str_">Stream to append to.</param>
 	/// <param name="args_">Arguments to append to the stream in the provided order.</param>
 	/// <returns>Stream with the provided args_ appended to it, and an optional std::endl at the end if `AppendEndl_` is true.</returns>
-	template<bool AppendEndl_ = false, class OStream_, class...Args_>
+	template<class OStream_, class...Args_>
 	inline OStream_& thread_safe_stream_append(OStream_& str_, Args_...args_)
 	{
 		std::ostringstream temp_str_;
 		_underlying_thread_helpers::_thread_safe_stream_append_iteration(temp_str_, args_...);
-		if constexpr (AppendEndl_)
-		{
-			temp_str_ << std::endl;
-		}
 		return str_ << temp_str_.str();
 	}
 }
