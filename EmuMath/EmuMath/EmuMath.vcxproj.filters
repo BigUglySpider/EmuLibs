@@ -431,5 +431,8 @@
     <ClInclude Include="EmuThreads\Functors\prioritised_work_allocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuThreads\TMP\BindTMP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

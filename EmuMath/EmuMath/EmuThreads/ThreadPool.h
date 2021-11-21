@@ -69,10 +69,36 @@ namespace EmuThreads
 	public:
 		static constexpr bool has_task_priorities = EmuThreads::TMP::work_allocator_has_priority<work_allocator_type>();
 
+		/// <summary>
+		/// <para> Makes a priority value for this thread pool's priority type. Only useful when the WorkAllocator_ supports prioritised tasks. </para>
+		/// <para> If no arguments are passed AND WorkAllocator_ has a static default_priority function: Defers to `WorkAllocator_::default_priority`. </para>
+		/// <para> If none of the above conditions are met: Will construct a priority type with the provided arguments. </para>
+		/// </summary>
 		template<class...Args_, typename = std::enable_if_t<std::is_constructible_v<priority_type, Args_...>>>
 		[[nodiscard]] static constexpr inline priority_type make_priority(Args_&&...construction_args_)
 		{
-			return priority_type(construction_args_...);
+			if constexpr (sizeof...(Args_) == 0)
+			{
+				if constexpr (EmuThreads::TMP::has_static_default_priority_func<work_allocator_type, priority_type>::value)
+				{
+					if constexpr (EmuThreads::TMP::has_static_default_priority_func<work_allocator_type, priority_type>::return_matches_out)
+					{
+						return work_allocator_type::default_priority();
+					}
+					else
+					{
+						return static_cast<priority_type>(work_allocator_type::default_priority());
+					}
+				}
+				else
+				{
+					return priority_type();
+				}
+			}
+			else
+			{
+				return priority_type(construction_args_...);
+			}
 		}
 
 		/// <summary>
@@ -202,7 +228,7 @@ namespace EmuThreads
 		/// <para> Performs allocation of any valid generic task to be performed by one of this pool's worker threads. </para>
 		/// <para> The provided args_ must be valid arguments to invoke the provided func_ via the syntax `func_(args_...)`. </para>
 		/// <para> A future to the task's results is also returned by this allocation. </para>
-		/// <para> If non-value arguments are being provided, it is highly recommended to explicitly type provided Args_ template types. </para>
+		/// <para> If non-value arguments are being provided, it is highly recommended to explicitly type provided Args_ template types, or use std wrappers. </para>
 		/// <para> If this thread pool's work allocator supports prorities, this will apply the default priority to the provided task. </para>
 		/// </summary>
 		/// <typeparam name="Args_">All argument types to pass in the provided order when invoking the provided func_.</typeparam>
@@ -218,20 +244,19 @@ namespace EmuThreads
 		{
 			if constexpr (has_task_priorities)
 			{
-				return work_allocator.AllocateTask(make_priority(), std::bind(func_, _get_suitable_arg<Args_>(args_)...));
+				return work_allocator.AllocateTask(make_priority(), std::bind(func_, EmuThreads::TMP::get_suitable_bind_arg<Args_>(args_)...));
 			}
 			else
 			{
-				return work_allocator.AllocateTask(std::bind(func_, _get_suitable_arg<Args_>(args_)...));
+				return work_allocator.AllocateTask(std::bind(func_, EmuThreads::TMP::get_suitable_bind_arg<Args_>(args_)...));
 			}
-			return work_allocator.AllocateTask(std::bind(func_, _get_suitable_arg<Args_>(args_)...));
 		}
 
 		/// <summary>
 		/// <para> Performs allocation of any valid generic task to be performed by one of this pool's worker threads. </para>
 		/// <para> The provided args_ must be valid arguments to invoke the provided func_ via the syntax `func_(args_...)`. </para>
 		/// <para> A future to the task's results is also returned by this allocation. </para>
-		/// <para> If non-value arguments are being provided, it is highly recommended to explicitly type provided Args_ template types. </para>
+		/// <para> If non-value arguments are being provided, it is highly recommended to explicitly type provided Args_ template types, or use std wrappers. </para>
 		/// <para> If this thread pool's work allocator does not support priorities, this will trigger a static assertion as the priority cannot be used as intended. </para>
 		/// </summary>
 		/// <typeparam name="Args_">All argument types to pass in the provided order when invoking the provided func_.</typeparam>
@@ -248,7 +273,7 @@ namespace EmuThreads
 		{
 			if constexpr (has_task_priorities)
 			{
-				return work_allocator.AllocateTask(priority_, std::bind(func_, _get_suitable_arg<Args_>(args_)...));
+				return work_allocator.AllocateTask(priority_, std::bind(func_, EmuThreads::TMP::get_suitable_bind_arg<Args_>(args_)...));
 			}
 			else
 			{
@@ -257,24 +282,6 @@ namespace EmuThreads
 		}
 
 	private:
-		/// <summary> 
-		/// <para> Transforms a reference Arg_ to a suitable type if needed. </para>
-		/// <para> If Arg_ is a reference type: returns a std::ref wrapped reference to arg_. </para>
-		/// <para> If none of the above is true: returns the passed arg_ reference. </para>
-		/// </summary>
-		template<class Arg_>
-		[[nodiscard]] inline std::conditional_t<std::is_reference_v<Arg_>, std::reference_wrapper<std::remove_reference_t<Arg_>>, Arg_&> _get_suitable_arg(Arg_& arg_)
-		{
-			if constexpr (std::is_reference_v<Arg_>)
-			{
-				return std::ref(arg_);
-			}
-			else
-			{
-				return arg_;
-			}
-		}
-
 		thread_allocator_type thread_allocator;
 		work_allocator_type work_allocator;
 	};

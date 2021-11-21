@@ -49,6 +49,7 @@ namespace EmuThreads::Functors
 			waiting_time_ms(default_waiting_time_ms)
 		{
 		}
+
 		default_work_allocator(double waiting_time_ms_) :
 			is_active(true),
 			work_queue(),
@@ -57,28 +58,34 @@ namespace EmuThreads::Functors
 			waiting_time_ms(validate_waiting_time_ms(waiting_time_ms_))
 		{
 		}
+
 		/// <summary>
 		/// <para> Creates a work allocator from the passed allocator, taking tasks from the passed to_move_ allocator. </para>
-		/// <para> This construction will not retain the linked threads of the moved allocator, only its queued. </para>
+		/// <para> This construction will not retain the linked threads of the moved allocator, only its queued tasks. </para>
 		/// </summary>
 		/// <param name="to_move_">Work allocator to move into the newly constructed allocator.</param>
 		/// <param name="waiting_time_ms_">Custom time for threads linked to this allocator to wait for during downtime (in milliseconds).</param>
-		default_work_allocator(this_type&& to_move_, double waiting_time_ms_) noexcept :
+		inline default_work_allocator(this_type&& to_move_, double waiting_time_ms_) noexcept :
 			is_active(true),
-			work_queue(std::move(to_move_.work_queue)),
+			work_queue(),
 			queue_mutex(),
 			working_thread_count(0),
 			waiting_time_ms(validate_waiting_time_ms(waiting_time_ms_))
 		{
+			std::lock_guard<mutex_type> lock_(to_move_.queue_mutex);
+			work_queue.swap(to_move_.work_queue);
+			to_move_.num_queued_tasks = 0;
 		}
 		/// <summary>
 		/// <para> Creates a work allocator from the passed allocator, taking tasks from the passed to_move_ allocator. </para>
 		/// <para> This construction will not retain the linked threads of the moved allocator, only its queued tasks and waiting time. </para>
 		/// </summary>
 		/// <param name="to_move_">Work allocator to move into the newly constructed allocator.</param>
-		default_work_allocator(this_type&& to_move_) noexcept : default_work_allocator(std::forward<this_type>(to_move_), to_move_.waiting_time_ms)
+		inline default_work_allocator(this_type&& to_move_) noexcept : default_work_allocator(std::forward<this_type>(to_move_), to_move_.waiting_time_ms)
 		{
 		}
+
+		default_work_allocator(const this_type&) = delete;
 
 		inline ~default_work_allocator()
 		{
@@ -166,8 +173,8 @@ namespace EmuThreads::Functors
 		}
 		inline void WaitForAllTasksToComplete() const
 		{
-			WaitForAllTasksToCompleteNoJoin();
-			//const_cast<this_type*>(this)->WaitForAllTasksToComplete();
+			// Work will only be poppable (and well-formed) if this is non-const, so this is conceptually safe to allow the calling thread to join in with work.
+			const_cast<this_type*>(this)->WaitForAllTasksToComplete();
 		}
 
 		/// <summary> Returns the amount of time that this allocator's linked threads will wait before checking for a new task, in milliseconds. </summary>

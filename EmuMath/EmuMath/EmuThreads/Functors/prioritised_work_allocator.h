@@ -14,6 +14,10 @@
 
 namespace EmuThreads::Functors
 {
+	/// <summary>
+	/// <para> </para>
+	/// </summary>
+	/// <typeparam name="PriorityType_"></typeparam>
 	template<class PriorityType_ = std::int16_t>
 	class prioritised_work_allocator
 	{
@@ -80,6 +84,7 @@ namespace EmuThreads::Functors
 			waiting_time_ms(default_waiting_time_ms)
 		{
 		}
+
 		prioritised_work_allocator(double waiting_time_ms_) :
 			is_active(true),
 			work_queues(),
@@ -88,17 +93,23 @@ namespace EmuThreads::Functors
 			waiting_time_ms(validate_waiting_time_ms(waiting_time_ms_))
 		{
 		}
-		prioritised_work_allocator(this_type&& to_move_, double waiting_time_ms_) noexcept :
+
+		inline prioritised_work_allocator(this_type&& to_move_, double waiting_time_ms_) noexcept :
 			is_active(true),
-			work_queues(std::move(to_move_.work_queues)),
+			work_queues(),
 			queues_mutex(),
 			working_thread_count(0),
 			waiting_time_ms(validate_waiting_time_ms(waiting_time_ms_))
 		{
+			std::lock_guard<mutex_type> lock_(to_move_.queues_mutex);
+			work_queues.swap(to_move_.work_queues);
+			to_move_.num_queued_tasks = 0;
 		}
-		prioritised_work_allocator(this_type&& to_move_) noexcept : prioritised_work_allocator(std::forward<this_type>(to_move_), to_move_.waiting_time_ms)
+		inline prioritised_work_allocator(this_type&& to_move_) noexcept : prioritised_work_allocator(std::forward<this_type>(to_move_), to_move_.waiting_time_ms)
 		{
 		}
+
+		prioritised_work_allocator(const this_type&) = delete;
 
 		inline ~prioritised_work_allocator()
 		{
@@ -158,10 +169,10 @@ namespace EmuThreads::Functors
 				_look_for_work();
 			}
 		}
-
 		inline void WaitForAllTasksToComplete() const
 		{
-			WaitForAllTasksToCompleteNoJoin();
+			// Work will only be poppable (and well-formed) if this is non-const, so this is conceptually safe to allow the calling thread to join in with work.
+			const_cast<this_type*>(this)->WaitForAllTasksToComplete();
 		}
 
 		[[nodiscard]] inline double WaitingTimeMs() const

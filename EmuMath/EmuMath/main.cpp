@@ -38,7 +38,7 @@ inline std::ostream& operator<<(std::ostream& stream_, const std::array<T_, Size
 void some_test(int& yo_)
 {
 	std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(rand() % 1000));
-	EmuThreads::thread_safe_stream_append(std::cout, ++yo_, " : ", &yo_, "\n");
+	EmuThreads::stream_append_all_in_one(std::cout, ++yo_, " : ", &yo_, "\n");
 }
 
 template<typename T_, int Max_ = std::numeric_limits<int>::max()>
@@ -59,6 +59,15 @@ struct SettyBoi
 	T_ operator()(const std::size_t x_, const std::size_t y_) const
 	{
 		return T_(rand() % (x_ + y_ + 1));
+	}
+};
+
+struct FunctorThisTime
+{
+	inline void operator()() const
+	{
+		using namespace std::chrono_literals;
+		std::this_thread::sleep_for(3000ms);
 	}
 };
 
@@ -460,18 +469,26 @@ int main()
 	thread_pool_[0].AllocateTask<int&>(some_test, some_random_val_);
 	thread_pool_[0].AllocateTask
 	(
-		EmuThreads::thread_safe_stream_append<decltype(std::cout), std::string, int, std::string>,
+		EmuThreads::stream_append_all_in_one<decltype(std::cout), std::string, int, std::string>,
 		std::ref(std::cout),
 		"Old thread pool :) | ",
 		some_random_val_,
-		"\n"
+		" hehe\n"
 	);
 	system("pause");
+	thread_pool_[0].ViewWorkAllocator().WaitForAllTasksToComplete();
+	std::cout << "Allocating long task...\n";
+	auto long_begin_ = std::chrono::steady_clock::now();
+	thread_pool_[0].AllocateTask(FunctorThisTime()).wait();
+	auto long_end_ = std::chrono::steady_clock::now();
+	std::cout << "Finished long task in " << std::chrono::duration<double, std::milli>(long_end_ - long_begin_).count() << "ms.\n";
+	system("pause");
+
 	std::cout << "Making new thread pool...\n";
 	EmuThreads::ThreadPool<std::thread, EmuThreads::Functors::prioritised_work_allocator<std::int16_t>> another_pool_;
 	another_pool_.AllocateTask<decltype(std::cout)&, std::string, std::string>
 	(
-		EmuThreads::thread_safe_stream_append<decltype(std::cout), std::string, std::string>,
+		EmuThreads::stream_append_all_in_one<decltype(std::cout), std::string, std::string>,
 		std::cout,
 		"New thread pool :)",
 		" hehe\n"

@@ -1,6 +1,7 @@
 #ifndef EMU_THREADS_THREAD_POOL_TMP_H_INC_
 #define EMU_THREADS_THREAD_POOL_TMP_H_INC_ 1
 
+#include "BindTMP.h"
 #include <type_traits>
 
 namespace EmuThreads::TMP
@@ -278,6 +279,22 @@ namespace EmuThreads::TMP
 			return false;
 		}
 	}
+
+	template<class T_, typename Out_, typename = void>
+	struct has_static_default_priority_func
+	{
+		static constexpr bool value = false;
+	};
+	template<class T_, typename Out_>
+	struct has_static_default_priority_func<T_, Out_, std::void_t<std::invoke_result_t<decltype(T_::default_priority)>>>
+	{
+	private:
+		using return_type = typename std::invoke_result<decltype(T_::default_priority)>::type;
+
+	public:
+		static constexpr bool return_matches_out = std::is_same_v<return_type, Out_>;
+		static constexpr bool value = return_matches_out || std::is_convertible_v<return_type, Out_>;
+	};
 }
 
 #endif

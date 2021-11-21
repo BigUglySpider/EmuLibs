@@ -283,6 +283,7 @@
     <ClInclude Include="EmuThreads\Functors\prioritised_work_allocator.h" />
     <ClInclude Include="EmuThreads\ThreadPool.h" />
     <ClInclude Include="EmuThreads\ThreadSafeHelpers.h" />
+    <ClInclude Include="EmuThreads\TMP\BindTMP.h" />
     <ClInclude Include="EmuThreads\TMP\ThreadPoolTMP.h" />
     <ClInclude Include="Tests.hpp" />
   </ItemGroup>
