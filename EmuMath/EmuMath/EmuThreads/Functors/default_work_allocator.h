@@ -17,11 +17,11 @@ namespace EmuThreads::Functors
 	public:
 		using this_type = default_work_allocator;
 
-		/// <summary> The waiting time (in milliseconds) used when no other time is provided. </summary>
-		static constexpr double default_waiting_time_ms = 0.01;
-		/// <summary> Minimum waiting time (in milliseconds) that may be used in this allocator's downtime. </summary>
-		static constexpr double min_waiting_time_ms = 0.0000000001;
-		/// <summary> Maximum waiting time (in milliseconds) that may be used in this allocator's downtime. </summary>
+		/// <summary> The waiting time (in milliseconds) used when no other time is provided. Equivalent to 1 microsecond. </summary>
+		static constexpr double default_waiting_time_ms = 0.001;
+		/// <summary> Minimum waiting time (in milliseconds) that may be used in this allocator's downtime. Equivalent to 1 picosecond. </summary>
+		static constexpr double min_waiting_time_ms = 0.000000001;
+		/// <summary> Maximum waiting time (in milliseconds) that may be used in this allocator's downtime. Equivalent to the maximum value of a double. </summary>
 		static constexpr double max_waiting_time_ms = std::numeric_limits<double>::max();
 
 		/// <summary> Helper to reduce verbosity when creating a duration in milliseconds. The passed time value is not validated. </summary>

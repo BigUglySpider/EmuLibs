@@ -457,7 +457,7 @@ int main()
 
 
 	std::cout << "\n\n\n\n";
-	std::vector<EmuThreads::ThreadPool<std::thread>> thread_pool_;
+	std::vector<EmuThreads::DefaultThreadPool> thread_pool_;
 	thread_pool_.push_back({ 5 });
 	int some_random_val_ = 2;
 	std::cout << "Non-threaded address: " << &some_random_val_ << "\n";
@@ -485,7 +485,7 @@ int main()
 	system("pause");
 
 	std::cout << "Making new thread pool...\n";
-	EmuThreads::ThreadPool<std::thread, EmuThreads::Functors::prioritised_work_allocator<std::int16_t>> another_pool_;
+	EmuThreads::DefaultPrioritisedThreadPool another_pool_;
 	another_pool_.AllocateTask<decltype(std::cout)&, std::string, std::string>
 	(
 		EmuThreads::stream_append_all_in_one<decltype(std::cout), std::string, std::string>,
@@ -498,8 +498,13 @@ int main()
 
 	static constexpr bool oigtjreo = EmuThreads::TMP::has_const_waiting_time_ms_member_func<EmuThreads::Functors::default_work_allocator, double>::value;
 	system("pause");
-	std::cout << "Num Threads: " << another_pool_.NumThreads() << "\n";
 	another_pool_.AllocateWorkers(1);
+	std::cout << "Num Threads: " << another_pool_.NumThreads() << "\n";
+	system("pause");
+	std::cout << another_pool_.WaitingTimeMs() << "\n";
+	std::cout << another_pool_.WaitingTimeUs() << "\n";
+	std::cout << another_pool_.WaitingTimeMs(-1) << "\n";
+	std::cout << another_pool_.WaitingTimeUs(-1) << "\n";
 	system("pause");
 
 	std::cout << "GENERATING SCALAR NOISE...\n";

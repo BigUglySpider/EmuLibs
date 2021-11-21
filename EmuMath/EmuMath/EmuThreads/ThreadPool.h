@@ -4,9 +4,11 @@
 #include <functional>
 #include <queue>
 #include <thread>
-#include "TMP/ThreadPoolTMP.h"
 #include "Functors/default_thread_allocator.h"
 #include "Functors/default_work_allocator.h"
+#include "Functors/prioritised_work_allocator.h"
+#include "TMP/CommonThreadingAliases.h"
+#include "TMP/ThreadPoolTMP.h"
 
 namespace EmuThreads
 {
@@ -210,7 +212,18 @@ namespace EmuThreads
 		/// <summary> Returns the time that an individual thread will sleep for if there is no work available for it to execute, measured in milliseconds. </summary>
 		[[nodiscard]] inline double WaitingTimeMs() const
 		{
-			return static_cast<double>(work_allocator.WaitingTimeMs());
+			// APPLIES FOR ALL WaitingTime FUNCTIONS:
+			// If work_allocator_type does not implement the function of the same measurement, the function of the other measurement is assumed to be implemented.
+			// --- Well-formed thread pools are guaranteed to have at least one time scale implemented as a static_assert will be triggered otherwise.
+			// --- As such, we emulate a scale if it is not implemented by the underlying work_allocator_type.
+			if constexpr (EmuThreads::TMP::has_const_waiting_time_ms_member_func<work_allocator_type, double>::value)
+			{
+				return static_cast<double>(work_allocator.WaitingTimeMs());
+			}
+			else
+			{
+				return WaitingTimeUs() * 0.001;
+			}
 		}
 		/// <summary>
 		/// <para> Updates the time that an individual thread will sleep for if there is no work available for it to execute, measured in milliseconds. </para>
@@ -220,8 +233,46 @@ namespace EmuThreads
 		/// <returns>Waiting time (in milliseconds) that threads are set to sleep for by this function. Typically matches new_waiting_time_ms_ if it is fully valid.</returns>
 		inline double WaitingTimeMs(double new_waiting_time_ms_)
 		{
-			work_allocator.WaitingTimeMs(new_waiting_time_ms_);
+			if constexpr (EmuThreads::TMP::has_modifying_waiting_time_ms_member_func<work_allocator_type, double>::value)
+			{
+				work_allocator.WaitingTimeMs(new_waiting_time_ms_);
+			}
+			else
+			{
+				WaitingTimeUs(new_waiting_time_ms_ * 1000.0);
+			}
 			return WaitingTimeMs();
+		}
+
+		/// <summary> Returns the time that an individual thread will sleep for if there is no work available for it to execute, measured in microseconds. </summary>
+		[[nodiscard]] inline double WaitingTimeUs() const
+		{
+			if constexpr (EmuThreads::TMP::has_const_waiting_time_us_member_func<work_allocator_type, double>::value)
+			{
+				return static_cast<double>(work_allocator.WaitingTimeUs());
+			}
+			else
+			{
+				return WaitingTimeMs() * 1000;
+			}
+		}
+		/// <summary>
+		/// <para> Updates the time that an individual thread will sleep for if there is no work available for it to execute, measured in microseconds. </para>
+		/// <para> The passed value may be subject to validation, which is performed by this thread pool's underlying work allocator. </para>
+		/// </summary>
+		/// <param name="new_waiting_time_us_">Time for threads to wait when idle, in microseconds.</param>
+		/// <returns>Waiting time (in microseconds) that threads are set to sleep for by this function. Typically matches new_waiting_time_us_ if it is fully valid.</returns>
+		inline double WaitingTimeUs(double new_waiting_time_us_)
+		{
+			if constexpr (EmuThreads::TMP::has_modifying_waiting_time_us_member_func<work_allocator_type, double>::value)
+			{
+				work_allocator.WaitingTimeUs(new_waiting_time_us_);
+			}
+			else
+			{
+				WaitingTimeMs(new_waiting_time_us_ * 0.001);
+			}
+			return WaitingTimeUs();
 		}
 
 		/// <summary>
@@ -285,6 +336,34 @@ namespace EmuThreads
 		thread_allocator_type thread_allocator;
 		work_allocator_type work_allocator;
 	};
+
+	/// <summary>
+	/// <para> Alias for EmuThreads::ThreadPool with all default arguments. </para>
+	/// <para> Recommended when wanting the default parameters in a context where at least some arguments are required. </para>
+	/// </summary>
+	using DefaultThreadPool = ThreadPool
+	<
+		std::thread,
+		EmuThreads::Functors::default_work_allocator,
+		EmuThreads::Functors::default_thread_allocator<std::thread>
+	>;
+
+	/// <summary>
+	/// <para>
+	///		Alias for EmuThreads::ThreadPool with default arguments except for the work allocator, which is the default EmuThreads::Functors::prioritised_work_allocator.
+	/// </para>
+	/// </summary>
+	template<typename PriorityType_>
+	using PrioritisedThreadPool = ThreadPool
+	<
+		std::thread,
+		EmuThreads::Functors::prioritised_work_allocator<PriorityType_>,
+		EmuThreads::Functors::default_thread_allocator<std::thread>
+	>;
+	/// <summary>
+	/// <para> Alias for EmuThreads::PrioritisedThreadPool with EmuThreads::TMP::default_priority_type as the priority type. </para>
+	/// </summary>
+	using DefaultPrioritisedThreadPool = PrioritisedThreadPool<EmuThreads::TMP::default_priority_type>;
 }
 
 #endif

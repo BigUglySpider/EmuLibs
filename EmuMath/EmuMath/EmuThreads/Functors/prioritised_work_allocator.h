@@ -11,6 +11,7 @@
 #include <queue>
 #include <type_traits>
 #include "default_work_allocator.h"
+#include "../TMP/CommonThreadingAliases.h"
 
 namespace EmuThreads::Functors
 {
@@ -18,7 +19,7 @@ namespace EmuThreads::Functors
 	/// <para> </para>
 	/// </summary>
 	/// <typeparam name="PriorityType_"></typeparam>
-	template<class PriorityType_ = std::int16_t>
+	template<class PriorityType_ = EmuThreads::TMP::default_priority_type>
 	class prioritised_work_allocator
 	{
 	public:

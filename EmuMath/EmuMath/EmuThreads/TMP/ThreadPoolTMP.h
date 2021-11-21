@@ -165,6 +165,28 @@ namespace EmuThreads::TMP
 		static constexpr bool value = true;
 	};
 
+	template<class Item_, class DesiredOutputType_, typename = void>
+	struct has_const_waiting_time_us_member_func
+	{
+		static constexpr bool value = false;
+	};
+	template<class Item_, class DesiredOutputType_>
+	struct has_const_waiting_time_us_member_func<Item_, DesiredOutputType_, std::void_t<decltype(std::declval<const Item_>().WaitingTimeUs())>>
+	{
+		static constexpr bool value = std::is_convertible_v<decltype(std::declval<const Item_>().WaitingTimeUs()), DesiredOutputType_>;
+	};
+
+	template<class Item_, class InputType_, typename = void>
+	struct has_modifying_waiting_time_us_member_func
+	{
+		static constexpr bool value = false;
+	};
+	template<class Item_, class InputType_>
+	struct has_modifying_waiting_time_us_member_func<Item_, InputType_, std::void_t<decltype(std::declval<Item_>().WaitingTimeUs(std::declval<InputType_>()))>>
+	{
+		static constexpr bool value = true;
+	};
+
 	template<class ThreadAllocator_, class Launcher_, bool DoAssertion_>
 	[[nodiscard]] constexpr inline bool is_valid_thread_allocator_for_thread_pool()
 	{
@@ -237,21 +259,29 @@ namespace EmuThreads::TMP
 					using return_type = decltype(std::declval<WorkAllocator_>().template LaunchThread<std::thread>());
 					if constexpr (std::is_same_v<return_type, Thread_>)
 					{
-						if constexpr(has_const_waiting_time_ms_member_func<WorkAllocator_, double>::value)
+						if constexpr
+						(
+							has_const_waiting_time_ms_member_func<WorkAllocator_, double>::value ||
+							has_const_waiting_time_us_member_func<WorkAllocator_, double>::value
+						)
 						{
-							if constexpr (has_modifying_waiting_time_ms_member_func<WorkAllocator_, double>::value)
+							if constexpr
+							(
+								has_modifying_waiting_time_ms_member_func<WorkAllocator_, double>::value ||
+								has_modifying_waiting_time_us_member_func<WorkAllocator_, double>::value
+							)
 							{
 								return true;
 							}
 							else
 							{
-								static_assert(!DoAssertion_, "Assertion failed for an EmuThreads::ThreadPool Work Allocator: A Work Allocator must have a public `WaitingTimeMs` member function which takes a `double` argument.");
+								static_assert(!DoAssertion_, "Assertion failed for an EmuThreads::ThreadPool Work Allocator: A Work Allocator must have a public `WaitingTimeMs` and/or `WaitingTimeUs` member function which takes a `double` argument.");
 								return false;
 							}
 						}
 						else
 						{
-							static_assert(!DoAssertion_, "Assertion failed for an EmuThreads::ThreadPool Work Allocator: A Work Allocator must have a public constant `WaitingTimeMs` member function which returns a type of or static_cast-able to `double`.");
+							static_assert(!DoAssertion_, "Assertion failed for an EmuThreads::ThreadPool Work Allocator: A Work Allocator must have a public constant `WaitingTimeMs` and/or `WaitingTimeUs` member function which returns a type of or static_cast-able to `double`.");
 							return false;
 						}
 					}
