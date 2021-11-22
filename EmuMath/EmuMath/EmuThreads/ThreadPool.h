@@ -111,10 +111,33 @@ namespace EmuThreads
 			work_allocator()
 		{
 		}
+
 		/// <summary> Constructs a thread pool with the specified number of threads to perform allocated tasks, clamped into a valid range. </summary>
 		/// <param name="num_threads_">Number of threads to attempt to allocate. Will be clamped to the inclusive range min_num_threads:max_num_threads.</param>
 		inline ThreadPool(size_type num_threads_) : ThreadPool()
 		{
+			AllocateWorkers(num_threads_);
+		}
+
+		inline ThreadPool(size_type num_threads_, double waiting_time_ms_) : ThreadPool()
+		{
+			WaitingTimeMs(waiting_time_ms_);
+			AllocateWorkers(num_threads_);
+		}
+		
+		/// <summary>
+		/// <para> Constructs a thread pool from the provided pool, transferring data to the newly formed pool. </para>
+		/// <para> Queued work will be transferred to the new pool, but new threads will have to be allocated for it. </para>
+		/// </summary>
+		/// <param name="to_move_">Thread pool to move for constructing this new pool.</param>
+		/// <param name="num_threads_">Custom number of threads to allocate to this pool. Will be clamped to the inclusive range min_num_threads:max_num_threads.</param>
+		/// <param name="waiting_time_ms_">Time (in milliseconds) for threads in this pool to wait if there is no work available to be allocated to them.</param>
+		inline ThreadPool(this_type&& to_move_, size_type num_threads_, double waiting_time_ms_) noexcept :
+			thread_allocator(),
+			work_allocator(std::move(to_move_.work_allocator))
+		{
+			WaitingTimeMs(waiting_time_ms_);
+			work_allocator.Activate();
 			AllocateWorkers(num_threads_);
 		}
 		/// <summary>

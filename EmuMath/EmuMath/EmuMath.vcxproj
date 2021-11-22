@@ -281,6 +281,7 @@
     <ClInclude Include="EmuThreads\Functors\default_thread_allocator.h" />
     <ClInclude Include="EmuThreads\Functors\default_work_allocator.h" />
     <ClInclude Include="EmuThreads\Functors\prioritised_work_allocator.h" />
+    <ClInclude Include="EmuThreads\ParallelFor.h" />
     <ClInclude Include="EmuThreads\ThreadPool.h" />
     <ClInclude Include="EmuThreads\ThreadSafeHelpers.h" />
     <ClInclude Include="EmuThreads\TMP\BindTMP.h" />

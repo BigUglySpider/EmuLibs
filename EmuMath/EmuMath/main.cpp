@@ -11,6 +11,7 @@
 #include "EmuThreads/ThreadPool.h"
 #include "EmuThreads/Functors/prioritised_work_allocator.h"
 #include "EmuThreads/ThreadSafeHelpers.h"
+#include "EmuThreads/ParallelFor.h"
 
 #include <chrono>
 #include <thread>
@@ -106,6 +107,36 @@ float _upf(int val_)
 	_up(val_);
 	return static_cast<float>(val_);
 }
+
+struct SafeOutputter
+{
+	SafeOutputter() : mutex_()
+	{
+	}
+	SafeOutputter(SafeOutputter&&) noexcept : SafeOutputter()
+	{
+	}
+	SafeOutputter(const SafeOutputter&) : SafeOutputter()
+	{
+	}
+
+	inline void operator()(std::size_t index_)
+	{
+		std::lock_guard lock_(mutex_);
+		std::cout << index_ << "\n";
+	}
+	inline void operator()(std::size_t x_, std::size_t y_)
+	{
+		std::lock_guard lock_(mutex_);
+		std::cout << EmuMath::Vector2<std::size_t>(x_, y_) << "\n";
+	}
+	inline void operator()(std::tuple<std::size_t, std::size_t> xy_)
+	{
+		operator()(std::get<0>(xy_), std::get<1>(xy_));
+	}
+
+	std::mutex mutex_;
+};
 
 struct SomeStructForTestingEdges
 {
@@ -456,7 +487,13 @@ int main()
 
 
 
-	std::cout << "\n\n\n\n";
+	std::cout << "\n\n---PARALLEL FOR---\n\n";
+	EmuThreads::DefaultParallelFor<SafeOutputter> parallel_for_(1);
+
+	parallel_for_.ExecuteAsync(std::make_tuple(0, 0), std::make_tuple(100, 1000));
+	system("pause");
+
+	std::cout << "\n\n---THREAD POOLS---\n\n";
 	std::vector<EmuThreads::DefaultThreadPool> thread_pool_;
 	thread_pool_.push_back({ 5 });
 	int some_random_val_ = 2;

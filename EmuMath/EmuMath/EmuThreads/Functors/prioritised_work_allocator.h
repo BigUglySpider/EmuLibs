@@ -311,7 +311,16 @@ namespace EmuThreads::Functors
 			work_type out_task_ = std::move(queue_.front());
 			queue_.pop();
 			--num_queued_tasks;
-			if (queue_.size() == 0)
+
+			// Queue clearance if we've hit 0 to free memory in cases where many tasks have been provided
+			// --- Safe to do this way as this function should only be called when in a locked state
+			// --- Large allocations (such as a parallel loop) can waste a lot of space even with built-in clearance, so do this to play safe
+			// --- If there are no queues left, we can instead perform a complete erasure instead
+			if (num_queued_tasks == 0)
+			{
+				decltype(work_queues)().swap(work_queues);
+			}
+			else if (queue_.size() == 0)
 			{
 				work_queues.erase(queue_iterator_);
 			}

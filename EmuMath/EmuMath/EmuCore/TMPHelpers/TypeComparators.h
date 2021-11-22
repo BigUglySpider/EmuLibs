@@ -219,6 +219,11 @@ namespace EmuCore::TMPHelpers
 	template<class T, template<class...> class ToFind_>
 	static constexpr bool is_instance_of_typeparams_only_v = is_instance_of_typeparams_only<T, ToFind_>::value;
 
+	template<class T_>
+	using is_tuple = is_instance_of_typeparams_only<T_, std::tuple>;
+	template<class T_>
+	static constexpr bool is_tuple_v = is_instance_of_typeparams_only_v<T_, std::tuple>;
+
 	/// <summary> The number of bits contained within the passed type T. </summary>
 	template<typename T>
 	static constexpr std::size_t bits_in_type_v = sizeof(T) * CHAR_BIT;

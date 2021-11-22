@@ -437,5 +437,8 @@
     <ClInclude Include="EmuThreads\TMP\CommonThreadingAliases.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuThreads\ParallelFor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
