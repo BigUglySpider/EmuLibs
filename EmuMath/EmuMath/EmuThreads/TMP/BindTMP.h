@@ -35,7 +35,14 @@ namespace EmuThreads::TMP
 		>;
 	};
 
-	/// <summary> Transforms the passed </summary>
+	/// <summary>
+	/// <para> Transforms the passed argument reference intended for std::bind to a suitable value to pass to std::bind, returning one of the following: </para>
+	/// <para> When Arg_ is an lvalue reference (i.e. Arg_&amp;): reference represented as a std::reference_wrapper. </para>
+	/// <para> When Arg_ is an rvalue reference (i.e. Arg_&amp;&amp;): result of std::forward-ing the reference. </para>
+	/// <para> When Arg_ is a move-constructible value (i.e. Arg_): result of std::move-ing the value. </para>
+	/// <para> When Arg_ is none of the above: reference to the Arg_. </para>
+	/// <para> NOTE: It is important to provide the type of Arg_ that is being passed as a template argument in cases where the qualifiers of Arg_ may be ambiguous. </para>
+	/// </summary>
 	/// <typeparam name="Arg_">Type of argument being passed.</typeparam>
 	/// <param name="arg_">Argument to pass, performing a transformation if necessary</param>
 	/// <returns></returns>

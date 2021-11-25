@@ -13,7 +13,7 @@ namespace EmuThreads::Functors
 		}
 		
 		template<typename = std::enable_if_t<std::is_move_constructible_v<Increment_>>>
-		constexpr default_parallel_loop_custom_incrementer(this_type&& to_move_) : increment(std::move(to_move_.increment))
+		constexpr default_parallel_loop_custom_incrementer(this_type&& to_move_) : increment(to_move_.increment)
 		{
 		}
 

@@ -9,6 +9,7 @@
 #include "Functors/ParallelLoopFunctors/default_parallel_loop_custom_incrementer.h"
 #include "Functors/ParallelLoopFunctors/default_parallel_loop_incrementer.h"
 #include "Functors/ParallelLoopFunctors/default_parallel_loop_iteration_allocator.h"
+#include "TMP/BindTMP.h"
 #include <tuple>
 
 namespace EmuThreads
@@ -36,6 +37,41 @@ namespace EmuThreads
 		struct _non_reference_iterator<std::reference_wrapper<Iterator_>>
 		{
 			using type = std::remove_cv_t<Iterator_>;
+		};
+
+		template<class Iterator_, class Comparator_, class Incrementer_>
+		struct _async_execution
+		{
+			using iterator_arg = typename EmuThreads::TMP::_suitable_bind_arg_return<Iterator_>::type;
+			using comparator_arg = typename EmuThreads::TMP::_suitable_bind_arg_return<Comparator_>::type;
+			using incrementer_arg = typename EmuThreads::TMP::_suitable_bind_arg_return<Incrementer_>::type;
+
+			constexpr _async_execution()
+			{
+			}
+
+			constexpr inline std::future<void> operator()
+			(
+				ParallelFor<Func_, ThreadPool_, IterationAllocator_>* this_ptr_,
+				iterator_arg begin_,
+				iterator_arg end_,
+				comparator_arg cmp_,
+				incrementer_arg incrementer_
+			) const
+			{
+				return std::async
+				(
+					std::bind
+					(
+						&ParallelFor<Func_, ThreadPool_, IterationAllocator_>::template Execute<Iterator_, Comparator_, Incrementer_>,
+						this_ptr_,
+						EmuThreads::TMP::get_suitable_bind_arg<iterator_arg>(begin_),
+						EmuThreads::TMP::get_suitable_bind_arg<iterator_arg>(end_),
+						EmuThreads::TMP::get_suitable_bind_arg<comparator_arg>(cmp_),
+						EmuThreads::TMP::get_suitable_bind_arg<incrementer_arg>(incrementer_)
+					)
+				);
+			}
 		};
 
 	public:
@@ -99,18 +135,22 @@ namespace EmuThreads
 			return _get_thread_pool();
 		}
 
+		/// <summary> Allocates the provided target number of worker threads to this parallel for's underlying thread pool. </summary>
 		inline void AllocateWorkers(std::size_t target_num_threads_)
 		{
-			thread_pool.AllocateWorkers(target_num_threads_);
+			_get_thread_pool().AllocateWorkers(target_num_threads_);
 		}
 
+		/// <summary> Sets the waiting time (in milliseconds_ that pooled threads will wait for when idle there there are no iterations to execute. </summary>
 		inline void ThreadWaitingTimeMs(double waiting_time_ms_)
 		{
-			thread_pool.WaitingTimeMs(waiting_time_ms_);
+			_get_thread_pool().WaitingTimeMs(waiting_time_ms_);
 		}
+		/// <summary> Provides the waiting time (in milliseconds) that pooled threads will wait for when idle if there are no iterations to execute. </summary>
+		/// <returns>Double representing the time (in milliseconds) that underlying pooled threads will wait for when idle.</returns>
 		[[nodiscard]] inline double ThreadWaitingTimeMs() const
 		{
-			return thread_pool.WaitingTimeMs();
+			return _get_thread_pool().WaitingTimeMs();
 		}
 #pragma endregion
 
@@ -256,7 +296,25 @@ namespace EmuThreads
 			}
 		}
 
-
+		/// <summary>
+		/// <para> Executes a parallel for loop using the provided begin_ and end_ iterators. </para>
+		/// <para> Dimensions of the loop may scale infinitely using tuple arguments. </para>
+		/// <para> 
+		///		If an argument is the same throughout (e.g. all comparisons use the same functor), 
+		///		that argument may be a single non-tuple even if tuple iterators are provided. 
+		/// </para>
+		/// <para> This function only allocates iterations to the thread pool; the return of control to the calling thread does not indicate completion of the loop. </para>
+		/// <para> 
+		///		Uses `EmuThreads::Functors::default_parallel_loop_custom_incrementer&lt;Increment_&gt; constructed with CustomIncrement_ as the incrementer. 
+		///		This will be used as the increment for all dimensions within the full loop.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Iterator_">Single type of iterator or tuple of iterators for loop iterations to work with.</typeparam>
+		/// <typeparam name="Comparator_">Single type of comparator or tuple of comparators to determine if loop iterations should continue.</typeparam>
+		/// <typeparam name="Incrementer_">Single type of incrementer or tuple of incrementers to use for modifying an iterator after a loop iteration.</typeparam>
+		/// <param name="begin_">Value or tuple of values at which iterators should begin at. Shares its type with end_.</param>
+		/// <param name="end_">Value or tuple of values at which iterators should end at. Shares its type with begin_.</param>
+		/// <param name="cmp_">Function or tuple of functions (or functors) to use to determine if a loop iteration should execute.</param>
 		template<class Increment_, Increment_ CustomIncrement_, class Iterator_, class Comparator_ = std::less<void>>
 		inline void Execute(Iterator_ begin_, Iterator_ end_, Comparator_ cmp_ = Comparator_())
 		{
@@ -273,6 +331,35 @@ namespace EmuThreads
 		/// <para> Performs `Execute` with the same arguments asynchronously, allowing the calling thread to perform other tasks while iterations are allocated. </para>
 		/// <para> Results of this function's execution upon completion are the same as `Execute` with the same arguments. </para>
 		/// <para> Additional details regarding this function are mimicked by `Execute`, and may be found there. </para>
+		/// <para> 
+		///		Uses `EmuThreads::Functors::default_parallel_loop_custom_incrementer&lt;Increment_&gt; constructed with CustomIncrement_ as the incrementer. 
+		///		This will be used as the increment for all dimensions within the full loop.
+		/// </para>
+		/// </summary>
+		/// <param name="begin_">Value or tuple of values at which iterators should begin at. Shares its type with end_.</param>
+		/// <param name="end_">Value or tuple of values at which iterators should end at. Shares its type with begin_.</param>
+		/// <param name="cmp_">Function or tuple of functions (or functors) to use to determine if a loop iteration should execute.</param>
+		/// <returns>
+		///		Future for the allocation of loop iterations.
+		///		This only indicates when loop iterations are allocated, and does not guarantee that they have all been executed.
+		/// </returns>
+		template<class Iterator_, class Comparator_ = std::less<void>, class Incrementer_ = EmuThreads::Functors::default_parallel_loop_incrementer>
+		inline std::future<void> ExecuteAsync(Iterator_ begin_, Iterator_ end_, Comparator_ cmp_ = Comparator_(), Incrementer_ incrementer_ = Incrementer_())
+		{
+			return _async_execution<Iterator_, Comparator_, Incrementer_>()
+			(
+				this,
+				EmuThreads::TMP::get_suitable_bind_arg<Iterator_>(begin_),
+				EmuThreads::TMP::get_suitable_bind_arg<Iterator_>(end_),
+				EmuThreads::TMP::get_suitable_bind_arg<Comparator_>(cmp_),
+				EmuThreads::TMP::get_suitable_bind_arg<Incrementer_>(incrementer_)
+			);
+		}
+
+		/// <summary>
+		/// <para> Performs `Execute` with the same arguments asynchronously, allowing the calling thread to perform other tasks while iterations are allocated. </para>
+		/// <para> Results of this function's execution upon completion are the same as `Execute` with the same arguments. </para>
+		/// <para> Additional details regarding this function are mimicked by `Execute`, and may be found there. </para>
 		/// </summary>
 		/// <param name="begin_">Value or tuple of values at which iterators should begin at. Shares its type with end_.</param>
 		/// <param name="end_">Value or tuple of values at which iterators should end at. Shares its type with begin_.</param>
@@ -282,21 +369,18 @@ namespace EmuThreads
 		///		Future for the allocation of loop iterations.
 		///		This only indicates when loop iterations are allocated, and does not guarantee that they have all been executed.
 		/// </returns>
-		template<class Iterator_, class Comparator_ = std::less<void>, class Incrementer_ = EmuThreads::Functors::default_parallel_loop_incrementer>
-		inline std::future<void> ExecuteAsync(Iterator_ begin_, Iterator_ end_, Comparator_ cmp_ = Comparator_(), Incrementer_ incrementer_ = Incrementer_())
+		template<class Increment_, Increment_ CustomIncrement_, class Iterator_, class Comparator_ = std::less<void>>
+		inline std::future<void> ExecuteAsync(Iterator_ begin_, Iterator_ end_, Comparator_ cmp_ = Comparator_())
 		{
-			return std::async
+			using incrementer_type = EmuThreads::Functors::default_parallel_loop_custom_incrementer<Increment_>;
+			incrementer_type incrementer_ = incrementer_type(CustomIncrement_);
+			return _async_execution<Iterator_, Comparator_, incrementer_type>()
 			(
-				[=]()
-				{
-					Execute<Iterator_, Comparator_, Incrementer_>
-					(
-						EmuThreads::TMP::get_suitable_bind_arg(begin_),
-						EmuThreads::TMP::get_suitable_bind_arg(end_),
-						EmuThreads::TMP::get_suitable_bind_arg(cmp_),
-						EmuThreads::TMP::get_suitable_bind_arg(incrementer_)
-					); 
-				}
+				this,
+				EmuThreads::TMP::get_suitable_bind_arg<Iterator_>(begin_),
+				EmuThreads::TMP::get_suitable_bind_arg<Iterator_>(end_),
+				EmuThreads::TMP::get_suitable_bind_arg<Comparator_>(cmp_),
+				EmuThreads::TMP::get_suitable_bind_arg<incrementer_type>(incrementer_)
 			);
 		}
 #pragma endregion

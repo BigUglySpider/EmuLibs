@@ -528,10 +528,10 @@ int main()
 	system("pause");
 
 
-	EmuThreads::DefaultThreadPool pool_for_parallel_for_;
+	EmuThreads::DefaultThreadPool pool_for_parallel_for_(2);
 	pf_begin_ = std::chrono::steady_clock::now();
 	EmuThreads::DefaultParallelFor<SafeOutputter, EmuThreads::DefaultThreadPool*> parallel_for_(&pool_for_parallel_for_);
-	parallel_for_.Execute<std::size_t, 1>(pf_begin_coords_, pf_end_coords_);
+	parallel_for_.ExecuteAsync<std::size_t, 1>(pf_begin_coords_, pf_end_coords_);
 	parallel_for_.ViewThreadPool().ViewWorkAllocator().WaitForAllTasksToComplete();
 	pf_end_ = std::chrono::steady_clock::now();
 	std::cout << "Parallel for ended in " << std::chrono::duration<double, std::milli>(pf_end_ - pf_begin_).count() << "ms. | " << parallel_for_.func_unsynced.count_ << "\n";
