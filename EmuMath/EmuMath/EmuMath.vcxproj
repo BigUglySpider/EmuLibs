@@ -280,6 +280,9 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\VectorTMP.h" />
     <ClInclude Include="EmuThreads\Functors\default_thread_allocator.h" />
     <ClInclude Include="EmuThreads\Functors\default_work_allocator.h" />
+    <ClInclude Include="EmuThreads\Functors\ParallelLoopFunctors\default_parallel_loop_custom_incrementer.h" />
+    <ClInclude Include="EmuThreads\Functors\ParallelLoopFunctors\default_parallel_loop_incrementer.h" />
+    <ClInclude Include="EmuThreads\Functors\ParallelLoopFunctors\default_parallel_loop_iteration_allocator.h" />
     <ClInclude Include="EmuThreads\Functors\prioritised_work_allocator.h" />
     <ClInclude Include="EmuThreads\ParallelFor.h" />
     <ClInclude Include="EmuThreads\ThreadPool.h" />

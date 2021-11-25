@@ -259,7 +259,7 @@ namespace EmuThreads::Functors
 		using mutex_type = std::mutex;
 
 		std::atomic_bool is_active;
-		std::atomic_size_t working_thread_count;
+		std::size_t working_thread_count;
 		std::atomic_size_t num_queued_tasks;
 		mutex_type queues_mutex;
 		priority_queue_type work_queues;
@@ -287,10 +287,10 @@ namespace EmuThreads::Functors
 			std::unique_lock<mutex_type> lock_(queues_mutex);
 			if (is_active && num_queued_tasks != 0)
 			{
+				++working_thread_count;
 				work_type next_task_ = std::move(_pop_next_task());
 				lock_.unlock();
 
-				++working_thread_count;
 				next_task_();
 				--working_thread_count;
 			}

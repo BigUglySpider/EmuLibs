@@ -153,7 +153,7 @@ namespace EmuThreads::Functors
 		/// </summary>
 		inline void WaitForAllTasksToCompleteNoJoin() const
 		{
-			while (HasWork())
+			while (HasWork() || working_thread_count != 0)
 			{
 				std::this_thread::sleep_for(time_in_ms(waiting_time_ms));
 			}
@@ -166,7 +166,7 @@ namespace EmuThreads::Functors
 		inline void WaitForAllTasksToComplete()
 		{
 			// The waiting thread will contribute to work as it is allowed to pop the queue
-			while (HasWork())
+			while (HasWork() || working_thread_count != 0)
 			{
 				_look_for_work();
 			}
@@ -257,12 +257,10 @@ namespace EmuThreads::Functors
 			if (is_active && num_queued_tasks != 0)
 			{
 				// Get task and unlock as soon as reasonable
+				++working_thread_count;
 				work_type next_task_ = std::move(_pop_next_task());
 				lock_.unlock();
 
-				// Include incrementing/decrementing work counter as a part of the task
-				// --- Since it's atomic, we don't need to worry about the lock
-				++working_thread_count;
 				next_task_();
 				--working_thread_count;
 			}

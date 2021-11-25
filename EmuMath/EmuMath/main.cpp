@@ -110,7 +110,7 @@ float _upf(int val_)
 
 struct SafeOutputter
 {
-	SafeOutputter() : mutex_()
+	SafeOutputter() : mutex_(), count_(0), total(0.0)
 	{
 	}
 	SafeOutputter(SafeOutputter&&) noexcept : SafeOutputter()
@@ -120,15 +120,34 @@ struct SafeOutputter
 	{
 	}
 
+	inline void _action(std::size_t x_, std::size_t y_)
+	{
+		for (std::size_t i = 0; i < 255; ++i)
+		{
+			srand(static_cast<unsigned int>(i));
+			std::size_t val_ = (x_ << ((rand() % 32) + (rand() % 33)));
+			val_ <<= (y_ % 4);
+			x_ *= 3;
+			x_ |= std::size_t(-1);
+			y_ &= ~x_;
+			x_ -= y_ * y_;
+			total += x_ % 64;
+		}
+	}
+
 	inline void operator()(std::size_t index_)
 	{
+		using namespace std::chrono_literals;
 		std::lock_guard lock_(mutex_);
-		std::cout << index_ << "\n";
+		_action(index_, 0);
+		++count_;
 	}
 	inline void operator()(std::size_t x_, std::size_t y_)
 	{
+		using namespace std::chrono_literals;
 		std::lock_guard lock_(mutex_);
-		std::cout << EmuMath::Vector2<std::size_t>(x_, y_) << "\n";
+		_action(x_, y_);
+		++count_;
 	}
 	inline void operator()(std::tuple<std::size_t, std::size_t> xy_)
 	{
@@ -136,6 +155,8 @@ struct SafeOutputter
 	}
 
 	std::mutex mutex_;
+	std::size_t count_;
+	double total;
 };
 
 struct SomeStructForTestingEdges
@@ -488,9 +509,34 @@ int main()
 
 
 	std::cout << "\n\n---PARALLEL FOR---\n\n";
-	EmuThreads::DefaultParallelFor<SafeOutputter> parallel_for_(1);
+	system("pause");
+	using pf_iterator_type = std::tuple<std::size_t, std::size_t>;
+	constexpr pf_iterator_type pf_begin_coords_(0, 0);
+	constexpr pf_iterator_type pf_end_coords_(100, 100);
+	auto pf_begin_ = std::chrono::steady_clock::now();
+	SafeOutputter safe_outputter_ = SafeOutputter();
+	for (std::size_t x = std::get<0>(pf_begin_coords_), endx_ = std::get<0>(pf_end_coords_); x < endx_; ++x)
+	{
+		for (std::size_t y = std::get<1>(pf_begin_coords_), endy_ = std::get<1>(pf_end_coords_); y < endy_; ++y)
+		{
+			safe_outputter_(x, y);
+		}
+	}
+	auto pf_end_ = std::chrono::steady_clock::now();
+	std::cout << "Non-parallel for ended in " << std::chrono::duration<double, std::milli>(pf_end_ - pf_begin_).count() << "ms. | " << safe_outputter_.count_ << "\n";
+	std::cout << "Total: " << safe_outputter_.total << "\n";
+	system("pause");
 
-	parallel_for_.ExecuteAsync(std::make_tuple(0, 0), std::make_tuple(100, 1000));
+
+	EmuThreads::DefaultThreadPool pool_for_parallel_for_;
+	pf_begin_ = std::chrono::steady_clock::now();
+	EmuThreads::DefaultParallelFor<SafeOutputter, EmuThreads::DefaultThreadPool*> parallel_for_(&pool_for_parallel_for_);
+	parallel_for_.Execute<std::size_t, 1>(pf_begin_coords_, pf_end_coords_);
+	parallel_for_.ViewThreadPool().ViewWorkAllocator().WaitForAllTasksToComplete();
+	pf_end_ = std::chrono::steady_clock::now();
+	std::cout << "Parallel for ended in " << std::chrono::duration<double, std::milli>(pf_end_ - pf_begin_).count() << "ms. | " << parallel_for_.func_unsynced.count_ << "\n";
+	std::cout << "Total: " << parallel_for_.func_unsynced.total << "\n";
+	std::cout << parallel_for_.ViewThreadPool().NumThreads() << "\n";
 	system("pause");
 
 	std::cout << "\n\n---THREAD POOLS---\n\n";

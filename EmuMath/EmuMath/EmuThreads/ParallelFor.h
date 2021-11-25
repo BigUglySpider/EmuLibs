@@ -6,99 +6,24 @@
 #include "../EmuCore/TMPHelpers/TypeComparators.h"
 #include "../EmuCore/TMPHelpers/TypeConvertors.h"
 #include "ThreadPool.h"
+#include "Functors/ParallelLoopFunctors/default_parallel_loop_custom_incrementer.h"
+#include "Functors/ParallelLoopFunctors/default_parallel_loop_incrementer.h"
+#include "Functors/ParallelLoopFunctors/default_parallel_loop_iteration_allocator.h"
 #include <tuple>
 
 namespace EmuThreads
 {
-	template<class Executor_>
-	struct default_parallel_loop_iteration_allocator
-	{
-		template<class Func_, class...Iterators_>
-		inline void operator()(Executor_& executor_, Func_& func_, const std::tuple<Iterators_...>& iterators_) const
-		{
-			if constexpr (std::is_copy_constructible_v<Func_>)
-			{
-				if constexpr (std::is_invocable_v<Func_, std::tuple<Iterators_...>>)
-				{
-					executor_.AllocateTask(func_, iterators_);
-				}
-				else if constexpr (sizeof...(Iterators_) == 1)
-				{
-					if constexpr (std::is_invocable_v<Func_, std::tuple_element_t<0, std::tuple<Iterators_...>>>)
-					{
-						executor_.AllocateTask(func_, std::get<0>(iterators_));
-					}
-					else
-					{
-						static_assert(false, "Attempted to allocate a parallel loop iteration via default_parallel_loop_iteration_allocator, but the provided Func_ cannot be invoked with a tuple of the provided iterators, and the single iterator in the tuple cannot be used as a lone argument in the fallback operation.");
-					}
-				}
-				else
-				{
-					static_assert(false, "Attempted to allocate a parallel loop iteration via default_parallel_loop_iteration_allocator, but the provided Func_ cannot be invoked with a tuple of the provided iterators.");
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to allocate a parallel loop iteration via default_parallel_loop_iteration_allocator, but the provided Func_ cannot be copy constructed. As this can cause undesirable behaviours with task allocation, this behaviour has been blocked.");
-			}
-		}
-
-		template<class Func_, class Iterator_, typename = std::enable_if_t<!EmuCore::TMPHelpers::is_tuple_v<Iterator_>>>
-		inline void operator()(Executor_& executor_, Func_& func_, const Iterator_& iterator_) const
-		{
-			if constexpr (std::is_copy_constructible_v<Func_>)
-			{
-				if constexpr (std::is_invocable_v<Func_, Iterator_>)
-				{
-					executor_.AllocateTask(func_, iterator_);
-				}
-				else
-				{
-					static_assert(false, "Attempted to allocate a parallel loop iteration via default_parallel_loop_iteration_allocator, but the provided Func_ cannot be invoked with the provided single non-tuple Iterator_ argument type.");
-				}
-			}
-			else
-			{
-				static_assert(false, "Attempted to allocate a parallel loop iteration via default_parallel_loop_iteration_allocator, but the provided Func_ cannot be copy constructed. As this can cause undesirable behaviours with task allocation, this behaviour has been blocked.");
-			}
-		}
-	};
-
-	struct default_parallel_loop_incrementer
-	{
-		constexpr default_parallel_loop_incrementer()
-		{
-		}
-
-		template<class T_>
-		constexpr inline T_& operator()(T_& iterator_) const
-		{
-			++iterator_;
-			return iterator_;
-		}
-	};
-
-	template<class Increment_>
-	struct default_parallel_loop_custom_incrementer
-	{
-		template<class...IncrementConstructionArgs_>
-		constexpr default_parallel_loop_custom_incrementer(IncrementConstructionArgs_&&...increment_construction_args_) : 
-			increment(increment_construction_args_...)
-		{
-		}
-
-		template<class T_>
-		constexpr inline T_& operator()(T_& iterator_) const
-		{
-			iterator_ += increment;
-			return iterator_;
-		}
-
-		const Increment_ increment;
-	};
-
-	template<class Func_, class ThreadPool_ = EmuThreads::DefaultThreadPool, class IterationAllocator_ = default_parallel_loop_iteration_allocator<ThreadPool_>>
+	/// <summary>
+	/// <para> Functor for performing a for-loop of arbitrary depth which invokes the provided Func_ with provided iterators, executed via a thread pool. </para>
+	/// <para> This is not intended to make an individual loop faster, but to allow it to be executed in parallel to the main thread's execution. </para>
+	/// <para> Task allocation may still take a significant sum of time, although this may be alleviated with built-in async execution. </para>
+	/// </summary>
+	template
+	<
+		class Func_,
+		class ThreadPool_ = EmuThreads::DefaultThreadPool,
+		class IterationAllocator_ = EmuThreads::Functors::default_parallel_loop_iteration_allocator<std::remove_pointer_t<ThreadPool_>>
+	>
 	class ParallelFor
 	{
 	private:
@@ -114,7 +39,7 @@ namespace EmuThreads
 		};
 
 	public:
-		using this_type = ParallelFor<ThreadPool_, IterationAllocator_>;
+		using this_type = ParallelFor<Func_, ThreadPool_, IterationAllocator_>;
 		using thread_pool_type = std::remove_pointer_t<std::remove_reference_t<ThreadPool_>>;
 		using stored_thread_pool_type = std::conditional_t
 		<
@@ -123,17 +48,18 @@ namespace EmuThreads
 			ThreadPool_
 		>;
 		using function_type = Func_;
+		using iteration_allocator_type = IterationAllocator_;
 
 #pragma region CONSTRUCTORS
 		template
 		<
 			class...ThreadPoolConstructionParams_,
-			typename = std::enable_if_t<std::is_constructible_v<stored_thread_pool_type, ThreadPoolConstructionParams_...> && std::is_copy_constructible_v<function_type>>
+			typename = std::enable_if_t<std::is_constructible_v<stored_thread_pool_type, ThreadPoolConstructionParams_...>>
 		>
 		explicit ParallelFor(ThreadPoolConstructionParams_&&...thread_pool_construction_params_) :
 			thread_pool(thread_pool_construction_params_...),
 			iteration_allocator(),
-			func_unsafe()
+			func_unsynced()
 		{
 		}
 
@@ -145,7 +71,7 @@ namespace EmuThreads
 		explicit ParallelFor(const Func_& func_to_copy_, ThreadPoolConstructionParams_&&...thread_pool_construction_params_) :
 			thread_pool(thread_pool_construction_params_...),
 			iteration_allocator(),
-			func_unsafe(func_to_copy_)
+			func_unsynced(func_to_copy_)
 		{
 		}
 
@@ -157,10 +83,11 @@ namespace EmuThreads
 		explicit ParallelFor(Func_&& func_to_move_, ThreadPoolConstructionParams_&&...thread_pool_construction_params_) :
 			thread_pool(thread_pool_construction_params_...),
 			iteration_allocator(),
-			func_unsafe(func_to_move_)
+			func_unsynced(func_to_move_)
 		{
 		}
 
+		ParallelFor() = delete;
 		ParallelFor(this_type&&) = delete;
 		ParallelFor(const this_type&) = delete;
 #pragma endregion
@@ -204,7 +131,7 @@ namespace EmuThreads
 		/// <param name="end_">Value or tuple of values at which iterators should end at. Shares its type with begin_.</param>
 		/// <param name="cmp_">Function or tuple of functions (or functors) to use to determine if a loop iteration should execute.</param>
 		/// <param name="incrementer_">Function or tuple of functions (or functors) to increment an iterator per iteration of a loop.</param>
-		template<class Iterator_, class Comparator_ = std::less<void>, class Incrementer_ = default_parallel_loop_incrementer>
+		template<class Iterator_, class Comparator_ = std::less<void>, class Incrementer_ = EmuThreads::Functors::default_parallel_loop_incrementer>
 		inline void Execute(Iterator_ begin_, Iterator_ end_, Comparator_ cmp_ = Comparator_(), Incrementer_ incrementer_ = Incrementer_())
 		{
 			typename _non_reference_iterator<Iterator_>::type iterator_(begin_);
@@ -225,7 +152,7 @@ namespace EmuThreads
 								if constexpr (num_incrementers_ == 1 || num_incrementers_ == num_iterators_)
 								{
 									// All valid tuples
-									_do_execution<0, num_iterators_, Iterator_, Comparator_, Incrementer_>(iterator_, begin_, end_, cmp_, incrementer_, std::ref(func_unsafe));
+									_do_execution<0, num_iterators_, Iterator_&, Comparator_&, Incrementer_&>(iterator_, begin_, end_, cmp_, incrementer_, std::ref(func_unsynced));
 								}
 								else
 								{
@@ -236,7 +163,7 @@ namespace EmuThreads
 							{
 								// TUPLES: Iterator_, Comparator_
 								// SCALAR: Incrementer_
-								_do_execution<0, num_iterators_, Iterator_, Comparator_, Incrementer_>(iterator_, begin_, end_, cmp_, incrementer_, std::ref(func_unsafe));
+								_do_execution<0, num_iterators_, Iterator_&, Comparator_&, Incrementer_&>(iterator_, begin_, end_, cmp_, incrementer_, std::ref(func_unsynced));
 							}
 						}
 						else
@@ -253,7 +180,7 @@ namespace EmuThreads
 							{
 								// TUPLES: Iterator_, Incrementer_
 								// SCALAR: Comparator_
-								_do_execution<0, num_iterators_, Iterator_, Comparator_, Incrementer_>(iterator_, begin_, end_, cmp_, incrementer_, std::ref(func_unsafe));
+								_do_execution<0, num_iterators_, Iterator_&, Comparator_&, Incrementer_&>(iterator_, begin_, end_, cmp_, incrementer_, std::ref(func_unsynced));
 							}
 							else
 							{
@@ -264,7 +191,7 @@ namespace EmuThreads
 						{
 							// TUPLES: Iterator_
 							// SCALAR: Comparator_, Incrementer_
-							_do_execution<0, num_iterators_, Iterator_, Comparator_, Incrementer_>(iterator_, begin_, end_, cmp_, incrementer_, std::ref(func_unsafe));
+							_do_execution<0, num_iterators_, Iterator_&, Comparator_&, Incrementer_&>(iterator_, begin_, end_, cmp_, incrementer_, std::ref(func_unsynced));
 						}
 					}
 				}
@@ -287,7 +214,7 @@ namespace EmuThreads
 							{
 								// TUPLES: Comparator_, Incrementer_
 								// SCALAR: Iterator_
-								_do_execution<0, 1, Iterator_, Comparator_, Incrementer_>(iterator_, begin_, end_, cmp_, incrementer_, std::ref(func_unsafe));
+								_do_execution<0, 1, Iterator_&, Comparator_&, Incrementer_&>(iterator_, begin_, end_, cmp_, incrementer_, std::ref(func_unsynced));
 							}
 							else
 							{
@@ -298,7 +225,7 @@ namespace EmuThreads
 						{
 							// TUPLES: Comparator_
 							// SCALAR: Iterator_, Incrementer_
-							_do_execution<0, 1, Iterator_, Comparator_, Incrementer_>(iterator_, begin_, end_, cmp_, incrementer_, std::ref(func_unsafe));
+							_do_execution<0, 1, Iterator_&, Comparator_&, Incrementer_&>(iterator_, begin_, end_, cmp_, incrementer_, std::ref(func_unsynced));
 						}
 					}
 					else
@@ -313,7 +240,7 @@ namespace EmuThreads
 						constexpr std::size_t num_incrementers_ = std::tuple_size_v<Incrementer_>;
 						if constexpr (num_incrementers_ == 1)
 						{
-							_do_execution<0, 1, Iterator_, Comparator_, Incrementer_>(iterator_, begin_, end_, cmp_, incrementer_, std::ref(func_unsafe));
+							_do_execution<0, 1, Iterator_&, Comparator_&, Incrementer_&>(iterator_, begin_, end_, cmp_, incrementer_, std::ref(func_unsynced));
 						}
 						else
 						{
@@ -323,10 +250,23 @@ namespace EmuThreads
 					else
 					{
 						// All scalars
-						_do_execution<0, 1, Iterator_, Comparator_, Incrementer_>(iterator_, begin_, end_, cmp_, incrementer_, std::ref(func_unsafe));
+						_do_execution<0, 1, Iterator_&, Comparator_&, Incrementer_&>(iterator_, begin_, end_, cmp_, incrementer_, std::ref(func_unsynced));
 					}
 				}
 			}
+		}
+
+
+		template<class Increment_, Increment_ CustomIncrement_, class Iterator_, class Comparator_ = std::less<void>>
+		inline void Execute(Iterator_ begin_, Iterator_ end_, Comparator_ cmp_ = Comparator_())
+		{
+			return Execute
+			(
+				EmuThreads::TMP::get_suitable_bind_arg<Iterator_>(begin_),
+				EmuThreads::TMP::get_suitable_bind_arg<Iterator_>(end_),
+				EmuThreads::TMP::get_suitable_bind_arg<Comparator_>(cmp_),
+				EmuThreads::Functors::default_parallel_loop_custom_incrementer<Increment_>(CustomIncrement_)
+			);
 		}
 
 		/// <summary>
@@ -342,23 +282,33 @@ namespace EmuThreads
 		///		Future for the allocation of loop iterations.
 		///		This only indicates when loop iterations are allocated, and does not guarantee that they have all been executed.
 		/// </returns>
-		template<class Iterator_, class Comparator_ = std::less<void>, class Incrementer_ = default_parallel_loop_incrementer>
+		template<class Iterator_, class Comparator_ = std::less<void>, class Incrementer_ = EmuThreads::Functors::default_parallel_loop_incrementer>
 		inline std::future<void> ExecuteAsync(Iterator_ begin_, Iterator_ end_, Comparator_ cmp_ = Comparator_(), Incrementer_ incrementer_ = Incrementer_())
 		{
-			return std::async([=]() { Execute<Iterator_, Comparator_, Incrementer_>(begin_, end_, cmp_, incrementer_); });
+			return std::async
+			(
+				[=]()
+				{
+					Execute<Iterator_, Comparator_, Incrementer_>
+					(
+						EmuThreads::TMP::get_suitable_bind_arg(begin_),
+						EmuThreads::TMP::get_suitable_bind_arg(end_),
+						EmuThreads::TMP::get_suitable_bind_arg(cmp_),
+						EmuThreads::TMP::get_suitable_bind_arg(incrementer_)
+					); 
+				}
+			);
 		}
 #pragma endregion
 
 		/// <summary>
 		/// <para> The underlying function performed whenever this ParallelFor is executed. </para>
-		/// <para> This is publicly visible to allow for easy modifications to state, but there is no enforced thread safety. </para>
+		/// <para> This is publicly visible to allow for easy modifications to state and access to results, but there is no enforced thread safety. </para>
 		/// <para> It is the user's responsibility to ensure that changes made to this do not interfere currently executing loops. </para>
 		/// </summary>
-		function_type func_unsafe;
+		function_type func_unsynced;
 
 	private:
-		using iteration_allocator_type = IterationAllocator_;
-
 		template<std::size_t Index_, class Item_>
 		struct _item_get_result
 		{
@@ -448,8 +398,8 @@ namespace EmuThreads
 		iteration_allocator_type iteration_allocator;
 	};
 
-	template<class Func_>
-	using DefaultParallelFor = ParallelFor<Func_, EmuThreads::DefaultThreadPool, default_parallel_loop_iteration_allocator<EmuThreads::DefaultThreadPool>>;
+	template<class Func_, class ThreadPool_ = EmuThreads::DefaultThreadPool>
+	using DefaultParallelFor = ParallelFor<Func_, ThreadPool_, EmuThreads::Functors::default_parallel_loop_iteration_allocator<std::remove_pointer_t<ThreadPool_>>>;
 }
 
 #endif
