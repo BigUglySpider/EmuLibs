@@ -6,6 +6,15 @@
 namespace EmuCore::TMPHelpers
 {
 #pragma region CONST_LHS
+	/// <summary> Template function to easily cast a provided Enum to its underlying type. </summary>
+	/// <param name="to_cast_">Enum value to cast to its underlying type.</param>
+	/// <returns>Result of a static cast of the passed enum to_cast_ to its underlying type.</returns>
+	template<class Enum_, typename = std::enable_if_t<std::is_enum_v<Enum_>>>
+	[[nodiscard]] constexpr inline std::underlying_type_t<Enum_> underlying_cast(Enum_ to_cast_)
+	{
+		return static_cast<std::underlying_type_t<Enum_>>(to_cast_);
+	}
+
 	/// <summary> Template function to form a value of zero for a safe enum. </summary>
 	/// <returns>The passed Enum_ type's underlying type at value 0, cast to the Enum_ type.</returns>
 	template<class Enum_, typename = std::enable_if_t<std::is_enum_v<Enum_>>>
@@ -26,8 +35,7 @@ namespace EmuCore::TMPHelpers
 	template<class Enum_, typename = std::enable_if_t<std::is_enum_v<Enum_>>>
 	[[nodiscard]] constexpr inline Enum_ safe_enum_and(Enum_ lhs_, Enum_ rhs_)
 	{
-		using underlying_type = std::underlying_type_t<Enum_>;
-		return static_cast<Enum_>(static_cast<underlying_type>(lhs_) & static_cast<underlying_type>(rhs_));
+		return static_cast<Enum_>(underlying_cast<Enum_>(lhs_) & underlying_cast<Enum_>(rhs_));
 	}
 
 	/// <summary> Template function to provide bitwise OR functionality to a safe enum type. </summary>
@@ -37,8 +45,7 @@ namespace EmuCore::TMPHelpers
 	template<class Enum_, typename = std::enable_if_t<std::is_enum_v<Enum_>>>
 	[[nodiscard]] constexpr inline Enum_ safe_enum_or(Enum_ lhs_, Enum_ rhs_)
 	{
-		using underlying_type = std::underlying_type_t<Enum_>;
-		return static_cast<Enum_>(static_cast<underlying_type>(lhs_) | static_cast<underlying_type>(rhs_));
+		return static_cast<Enum_>(underlying_cast<Enum_>(lhs_) | underlying_cast<Enum_>(rhs_));
 	}
 
 	/// <summary> Template function to provide bitwise XOR functionality to a safe enum type. </summary>
@@ -48,8 +55,7 @@ namespace EmuCore::TMPHelpers
 	template<class Enum_, typename = std::enable_if_t<std::is_enum_v<Enum_>>>
 	[[nodiscard]] constexpr inline Enum_ safe_enum_xor(Enum_ lhs_, Enum_ rhs_)
 	{
-		using underlying_type = std::underlying_type_t<Enum_>;
-		return static_cast<Enum_>(static_cast<underlying_type>(lhs_) ^ static_cast<underlying_type>(rhs_));
+		return static_cast<Enum_>(underlying_cast<Enum_>(lhs_) ^ underlying_cast<Enum_>(rhs_));
 	}
 
 	/// <summary> Template function to provide bitwise left-shift functionality to a safe enum type. </summary>
@@ -59,8 +65,7 @@ namespace EmuCore::TMPHelpers
 	template<class Enum_, typename = std::enable_if_t<std::is_enum_v<Enum_>>>
 	[[nodiscard]] constexpr inline Enum_ safe_enum_left_shift(Enum_ lhs_, std::size_t num_shifts_)
 	{
-		using underlying_type = std::underlying_type_t<Enum_>;
-		return static_cast<Enum_>(static_cast<underlying_type>(lhs_) << num_shifts_);
+		return static_cast<Enum_>(underlying_cast<Enum_>(lhs_) << num_shifts_);
 	}
 
 	/// <summary> Template function to provide bitwise right-shift functionality to a safe enum type. </summary>
@@ -70,8 +75,7 @@ namespace EmuCore::TMPHelpers
 	template<class Enum_, typename = std::enable_if_t<std::is_enum_v<Enum_>>>
 	[[nodiscard]] constexpr inline Enum_ safe_enum_right_shift(Enum_ lhs_, std::size_t num_shifts_)
 	{
-		using underlying_type = std::underlying_type_t<Enum_>;
-		return static_cast<Enum_>(static_cast<underlying_type>(lhs_) >> num_shifts_);
+		return static_cast<Enum_>(underlying_cast<Enum_>(lhs_) >> num_shifts_);
 	}
 
 	/// <summary> Template function to provide bitwise NOT functionality to a safe enum type. </summary>
@@ -81,7 +85,7 @@ namespace EmuCore::TMPHelpers
 	[[nodiscard]] constexpr inline Enum_ safe_enum_not(Enum_ to_invert_)
 	{
 		using underlying_type = std::underlying_type_t<Enum_>;
-		return static_cast<Enum_>(~static_cast<underlying_type>(to_invert_));
+		return static_cast<Enum_>(~underlying_cast<Enum_>(to_invert_));
 	}
 #pragma endregion
 
