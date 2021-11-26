@@ -449,5 +449,11 @@
     <ClInclude Include="EmuThreads\Functors\ParallelLoopFunctors\default_parallel_loop_custom_incrementer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuCore\CommonTypes\Timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuCore\TMPHelpers\TimeTMP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -152,6 +152,7 @@
     <ClInclude Include="EmuCore\ArithmeticHelpers\BitHelpers.h" />
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonMath.h" />
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonValues.h" />
+    <ClInclude Include="EmuCore\CommonTypes\Timer.h" />
     <ClInclude Include="EmuCore\Events\Event.h" />
     <ClInclude Include="EmuCore\Events\EventDispatcher.h" />
     <ClInclude Include="EmuCore\Events\EventInvoker.h" />
@@ -164,6 +165,7 @@
     <ClInclude Include="EmuCore\Functors\MiscMath.h" />
     <ClInclude Include="EmuCore\TestingHelpers\LoopingTestHarness.h" />
     <ClInclude Include="EmuCore\TMPHelpers\Functors.h" />
+    <ClInclude Include="EmuCore\TMPHelpers\TimeTMP.h" />
     <ClInclude Include="EmuCore\TMPHelpers\Tuples.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TypeComparators.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TypeConvertors.h" />

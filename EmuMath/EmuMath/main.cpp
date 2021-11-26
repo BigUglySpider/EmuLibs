@@ -16,6 +16,8 @@
 #include <chrono>
 #include <thread>
 
+#include "EmuCore/CommonTypes/Timer.h"
+
 using namespace EmuCore::TestingHelpers;
 
 template<typename T_>
@@ -262,6 +264,7 @@ inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const EmuMath:
 int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
+	EmuCore::Timer<std::milli> timer_;
 
 	constexpr EmuMath::ColourRGB<float> colour_(-0.2f, 2.5, 2.0f);
 	constexpr auto wrapped_ = colour_.Wrapped<std::uint8_t, true>();
@@ -513,7 +516,7 @@ int main()
 	using pf_iterator_type = std::tuple<std::size_t, std::size_t>;
 	constexpr pf_iterator_type pf_begin_coords_(0, 0);
 	constexpr pf_iterator_type pf_end_coords_(100, 100);
-	auto pf_begin_ = std::chrono::steady_clock::now();
+	timer_.Restart();
 	SafeOutputter safe_outputter_ = SafeOutputter();
 	for (std::size_t x = std::get<0>(pf_begin_coords_), endx_ = std::get<0>(pf_end_coords_); x < endx_; ++x)
 	{
@@ -522,21 +525,24 @@ int main()
 			safe_outputter_(x, y);
 		}
 	}
-	auto pf_end_ = std::chrono::steady_clock::now();
-	std::cout << "Non-parallel for ended in " << std::chrono::duration<double, std::milli>(pf_end_ - pf_begin_).count() << "ms. | " << safe_outputter_.count_ << "\n";
+	timer_.Pause();
+	std::cout << "Non-parallel for ended in " << timer_.GetMilli() << "ms. | " << safe_outputter_.count_ << "\n";
 	std::cout << "Total: " << safe_outputter_.total << "\n";
+
+
+	EmuThreads::DefaultThreadPool pool_for_parallel_for_(4);
 	system("pause");
 
-
-	EmuThreads::DefaultThreadPool pool_for_parallel_for_(2);
-	pf_begin_ = std::chrono::steady_clock::now();
+	timer_.Restart();
 	EmuThreads::DefaultParallelFor<SafeOutputter, EmuThreads::DefaultThreadPool*> parallel_for_(&pool_for_parallel_for_);
-	parallel_for_.ExecuteAsync<std::size_t, 1>(pf_begin_coords_, pf_end_coords_);
+	parallel_for_.Execute(pf_begin_coords_, pf_end_coords_);
 	parallel_for_.ViewThreadPool().ViewWorkAllocator().WaitForAllTasksToComplete();
-	pf_end_ = std::chrono::steady_clock::now();
-	std::cout << "Parallel for ended in " << std::chrono::duration<double, std::milli>(pf_end_ - pf_begin_).count() << "ms. | " << parallel_for_.func_unsynced.count_ << "\n";
+	timer_.Pause();
+	std::cout << "Parallel for ended in " << timer_.Get() << "ms. | " << parallel_for_.func_unsynced.count_ << "\n";
 	std::cout << "Total: " << parallel_for_.func_unsynced.total << "\n";
 	std::cout << parallel_for_.ViewThreadPool().NumThreads() << "\n";
+	std::cout << parallel_for_.ViewThreadPool().ViewWorkAllocator().NumQueuedTasks() << "\n";
+	std::cout << parallel_for_.ViewThreadPool().ViewWorkAllocator().NumWorkingThreads() << "\n";
 	system("pause");
 
 	std::cout << "\n\n---THREAD POOLS---\n\n";
@@ -561,10 +567,10 @@ int main()
 	system("pause");
 	thread_pool_[0].ViewWorkAllocator().WaitForAllTasksToComplete();
 	std::cout << "Allocating long task...\n";
-	auto long_begin_ = std::chrono::steady_clock::now();
+	timer_.Restart();
 	thread_pool_[0].AllocateTask(FunctorThisTime()).wait();
-	auto long_end_ = std::chrono::steady_clock::now();
-	std::cout << "Finished long task in " << std::chrono::duration<double, std::milli>(long_end_ - long_begin_).count() << "ms.\n";
+	timer_.Pause();
+	std::cout << "Finished long task in " << timer_.GetMilli() << "ms.\n";
 	system("pause");
 
 	std::cout << "Making new thread pool...\n";
@@ -591,7 +597,7 @@ int main()
 	system("pause");
 
 	std::cout << "GENERATING SCALAR NOISE...\n";
-	auto begin_ = std::chrono::steady_clock::now();
+	timer_.Restart();
 	EmuMath::NoiseTable<3, float> noise_;
 	noise_.GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::noise_sample_processor_perlin_normalise<3>>
 	(
@@ -607,14 +613,14 @@ int main()
 			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
 		)
 	);
-	auto end_ = std::chrono::steady_clock::now();
-	std::cout << "FINISHED SCALAR NOISE IN: " << std::chrono::duration<double, std::milli>(end_ - begin_).count() << "ms\n";
+	timer_.Pause();
+	std::cout << "FINISHED SCALAR NOISE IN: " << timer_.GetMilli() << "ms\n";
 	//WriteNoiseTableToPPM(noise_, noise_gradient_);
 
 
 	std::cout << "GENERATING FAST NOISE...\n";
 	EmuMath::FastNoiseTable<3, 1> fast_noise_;
-	begin_ = std::chrono::steady_clock::now();
+	timer_.Restart();
 	fast_noise_.GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<3>>
 	(
 		fast_noise_.make_options
@@ -629,8 +635,8 @@ int main()
 			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
 		)
 	);
-	end_ = std::chrono::steady_clock::now();
-	std::cout << "FINISHED FAST NOISE IN: " << std::chrono::duration<double, std::milli>(end_ - begin_).count() << "ms\n";
+	timer_.Pause();
+	std::cout << "FINISHED FAST NOISE IN: " << timer_.GetMilli() << "ms\n";
 
 	WriteNoiseTableToPPM(fast_noise_, noise_gradient_);
 
