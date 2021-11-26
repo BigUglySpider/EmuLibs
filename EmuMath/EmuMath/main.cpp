@@ -8,8 +8,16 @@
 
 #include "EmuMath/FastNoise.h"
 
+#include "EmuThreads/ThreadPool.h"
+#include "EmuThreads/Functors/prioritised_work_allocator.h"
+#include "EmuThreads/ThreadSafeHelpers.h"
+#include "EmuThreads/ParallelFor.h"
+
 #include <chrono>
 #include <thread>
+
+#include "EmuCore/CommonTypes/Timer.h"
+#include "EmuCore/CommonTypes/Stopwatch.h"
 
 using namespace EmuCore::TestingHelpers;
 
@@ -31,6 +39,12 @@ inline std::ostream& operator<<(std::ostream& stream_, const std::array<T_, Size
 	return stream_;
 }
 
+void some_test(int& yo_)
+{
+	std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(rand() % 1000));
+	EmuThreads::stream_append_all_in_one(std::cout, ++yo_, " : ", &yo_, "\n");
+}
+
 template<typename T_, int Max_ = std::numeric_limits<int>::max()>
 struct SettyBoi
 {
@@ -49,6 +63,15 @@ struct SettyBoi
 	T_ operator()(const std::size_t x_, const std::size_t y_) const
 	{
 		return T_(rand() % (x_ + y_ + 1));
+	}
+};
+
+struct FunctorThisTime
+{
+	inline void operator()() const
+	{
+		using namespace std::chrono_literals;
+		std::this_thread::sleep_for(3000ms);
 	}
 };
 
@@ -87,6 +110,57 @@ float _upf(int val_)
 	_up(val_);
 	return static_cast<float>(val_);
 }
+
+struct SafeOutputter
+{
+	SafeOutputter() : mutex_(), count_(0), total(0.0)
+	{
+	}
+	SafeOutputter(SafeOutputter&&) noexcept : SafeOutputter()
+	{
+	}
+	SafeOutputter(const SafeOutputter&) : SafeOutputter()
+	{
+	}
+
+	inline void _action(std::size_t x_, std::size_t y_)
+	{
+		for (std::size_t i = 0; i < 255; ++i)
+		{
+			srand(static_cast<unsigned int>(i));
+			std::size_t val_ = (x_ << ((rand() % 32) + (rand() % 33)));
+			val_ <<= (y_ % 4);
+			x_ *= 3;
+			x_ |= std::size_t(-1);
+			y_ &= ~x_;
+			x_ -= y_ * y_;
+			total += x_ % 64;
+		}
+	}
+
+	inline void operator()(std::size_t index_)
+	{
+		using namespace std::chrono_literals;
+		std::lock_guard lock_(mutex_);
+		_action(index_, 0);
+		++count_;
+	}
+	inline void operator()(std::size_t x_, std::size_t y_)
+	{
+		using namespace std::chrono_literals;
+		std::lock_guard lock_(mutex_);
+		_action(x_, y_);
+		++count_;
+	}
+	inline void operator()(std::tuple<std::size_t, std::size_t> xy_)
+	{
+		operator()(std::get<0>(xy_), std::get<1>(xy_));
+	}
+
+	std::mutex mutex_;
+	std::size_t count_;
+	double total;
+};
 
 struct SomeStructForTestingEdges
 {
@@ -191,6 +265,7 @@ inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const EmuMath:
 int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
+	EmuCore::Timer<std::milli> timer_;
 
 	constexpr EmuMath::ColourRGB<float> colour_(-0.2f, 2.5, 2.0f);
 	constexpr auto wrapped_ = colour_.Wrapped<std::uint8_t, true>();
@@ -434,10 +509,9 @@ int main()
 	std::cout << std::bitset<32>(_mm256_movemask_epi8(_mm256_cmpeq_epi32(lhs_int_, rhs_int_))) << "\n";
 	std::cout << EmuSIMD::cmp_all_eq<true, true, true, true, true, false, true, false, true>(lhs_int_, rhs_int_) << "\n";
 	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::horizontal_sum_fill(lhs_)) << "\n";
-	system("pause");
 
 	std::cout << "GENERATING SCALAR NOISE...\n";
-	auto begin_ = std::chrono::steady_clock::now();
+	timer_.Restart();
 	EmuMath::NoiseTable<3, float> noise_;
 	noise_.GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::noise_sample_processor_perlin_normalise<3>>
 	(
@@ -453,14 +527,14 @@ int main()
 			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
 		)
 	);
-	auto end_ = std::chrono::steady_clock::now();
-	std::cout << "FINISHED SCALAR NOISE IN: " << std::chrono::duration<double, std::milli>(end_ - begin_).count() << "ms\n";
+	timer_.Pause();
+	std::cout << "FINISHED SCALAR NOISE IN: " << timer_.GetMilli() << "ms\n";
 	//WriteNoiseTableToPPM(noise_, noise_gradient_);
 
 
 	std::cout << "GENERATING FAST NOISE...\n";
 	EmuMath::FastNoiseTable<3, 1> fast_noise_;
-	begin_ = std::chrono::steady_clock::now();
+	timer_.Restart();
 	fast_noise_.GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<3>>
 	(
 		fast_noise_.make_options
@@ -475,8 +549,71 @@ int main()
 			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
 		)
 	);
-	end_ = std::chrono::steady_clock::now();
-	std::cout << "FINISHED FAST NOISE IN: " << std::chrono::duration<double, std::milli>(end_ - begin_).count() << "ms\n";
+	timer_.Pause();
+	std::cout << "FINISHED FAST NOISE IN: " << timer_.GetMilli() << "ms\n";
+
+	std::cout << "GENERATING FAST NOISE VIA THREAD POOL...\n";
+	timer_.Restart();
+	EmuThreads::DefaultThreadPool thread_pool_(6);
+	using fast_noise_array_type = std::vector<std::vector<EmuMath::FastNoiseTable<3, 1>>>;
+	fast_noise_array_type fast_noise_array_(8, fast_noise_array_type::value_type(8, EmuMath::FastNoiseTable<3, 1>()));
+	for (std::size_t x = 0, end_x_ = fast_noise_array_.size(); x < end_x_; ++x)
+	{
+		auto& array_ = fast_noise_array_[x];
+		for (std::size_t y = 0, end_y_ = fast_noise_array_.size(); y < end_y_; ++y)
+		{
+			auto* p_table_ = &(array_[y]);
+			auto options_ = EmuMath::FastNoiseTable<3, 1>::make_options
+			(
+				EmuMath::Vector<3, std::size_t>(128, 128, 1),
+				EmuMath::Vector<3, float>((1.0f / 1024.0f) * (x * 128), (1.0f / 1024.0f) * (y * 128), 0.0f),
+				EmuMath::Vector<3, float>(1.0f / 1024.0f, 1.0f / 1024.0f, 1.0f / 1024.0f),
+				3.0f,
+				true,
+				true,
+				EmuMath::Info::NoisePermutationInfo(4096, EmuMath::Info::NoisePermutationShuffleMode::SEED_32, true, 1337, 1337),
+				EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+			);
+
+			using func_type = bool(EmuMath::FastNoiseTable<3, 1>::*)(const EmuMath::FastNoiseTable<3, 1>::options_type&);
+
+			thread_pool_.AllocateTask
+			(
+				std::bind<func_type>
+				(
+					&EmuMath::FastNoiseTable<3, 1>::GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<3>>,
+					p_table_,
+					options_
+				)
+			);
+		}
+	}
+	thread_pool_.ViewWorkAllocator().WaitForAllTasksToComplete();
+	timer_.Pause();
+	std::cout << "FINISHED FAST NOISE VIA THREAD POOL IN: " << timer_.GetMilli() << "ms\n";
+	EmuMath::Vector3<std::size_t> resolution_ = fast_noise_.size();
+	for (std::size_t z = 0; z < resolution_.z; ++z)
+	{
+		std::cout << "\nOutputting threaded image layer #" << z << "...\n";
+
+		std::ostringstream name_;
+		name_ << "./test_noise_threaded_" << z << ".ppm";
+		std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
+		out_ppm_ << "P6" << std::endl << resolution_.x << ' ' << resolution_.y << std::endl << "255" << std::endl;
+
+		for (std::size_t y = 0; y < resolution_.y; ++y)
+		{
+			for (std::size_t x = 0; x < resolution_.x; ++x)
+			{
+				auto& array_ = fast_noise_array_[x / 128];
+				auto& noise_table_ = array_[y / 128];
+				EmuMath::ColourRGB<std::uint8_t> colour_byte_ = noise_gradient_.GetColour<std::uint8_t>(noise_table_.at(x % 128, y % 128, z % 1));
+				out_ppm_ << (char)colour_byte_.R() << (char)colour_byte_.G() << (char)colour_byte_.B();
+			}
+		}
+		out_ppm_.close();
+	}
+	std::cout << "Finished outputting all 3D noise layers from array.\n";
 
 	WriteNoiseTableToPPM(fast_noise_, noise_gradient_);
 

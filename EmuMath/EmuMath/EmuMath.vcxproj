@@ -152,6 +152,8 @@
     <ClInclude Include="EmuCore\ArithmeticHelpers\BitHelpers.h" />
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonMath.h" />
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonValues.h" />
+    <ClInclude Include="EmuCore\CommonTypes\Stopwatch.h" />
+    <ClInclude Include="EmuCore\CommonTypes\Timer.h" />
     <ClInclude Include="EmuCore\Events\Event.h" />
     <ClInclude Include="EmuCore\Events\EventDispatcher.h" />
     <ClInclude Include="EmuCore\Events\EventInvoker.h" />
@@ -164,6 +166,7 @@
     <ClInclude Include="EmuCore\Functors\MiscMath.h" />
     <ClInclude Include="EmuCore\TestingHelpers\LoopingTestHarness.h" />
     <ClInclude Include="EmuCore\TMPHelpers\Functors.h" />
+    <ClInclude Include="EmuCore\TMPHelpers\TimeTMP.h" />
     <ClInclude Include="EmuCore\TMPHelpers\Tuples.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TypeComparators.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TypeConvertors.h" />
@@ -278,6 +281,18 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\VectorInfo.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\VectorT.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\VectorTMP.h" />
+    <ClInclude Include="EmuThreads\Functors\default_thread_allocator.h" />
+    <ClInclude Include="EmuThreads\Functors\default_work_allocator.h" />
+    <ClInclude Include="EmuThreads\Functors\ParallelLoopFunctors\default_parallel_loop_custom_incrementer.h" />
+    <ClInclude Include="EmuThreads\Functors\ParallelLoopFunctors\default_parallel_loop_incrementer.h" />
+    <ClInclude Include="EmuThreads\Functors\ParallelLoopFunctors\default_parallel_loop_iteration_allocator.h" />
+    <ClInclude Include="EmuThreads\Functors\prioritised_work_allocator.h" />
+    <ClInclude Include="EmuThreads\ParallelFor.h" />
+    <ClInclude Include="EmuThreads\ThreadPool.h" />
+    <ClInclude Include="EmuThreads\ThreadSafeHelpers.h" />
+    <ClInclude Include="EmuThreads\TMP\BindTMP.h" />
+    <ClInclude Include="EmuThreads\TMP\CommonThreadingAliases.h" />
+    <ClInclude Include="EmuThreads\TMP\ThreadPoolTMP.h" />
     <ClInclude Include="Tests.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
