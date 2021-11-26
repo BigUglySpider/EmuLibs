@@ -458,5 +458,8 @@
     <ClInclude Include="EmuCore\CommonTypes\Stopwatch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuCore\TMPHelpers\SafeEnumFuncs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

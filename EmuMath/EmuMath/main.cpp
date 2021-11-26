@@ -510,6 +510,8 @@ int main()
 	std::cout << EmuSIMD::cmp_all_eq<true, true, true, true, true, false, true, false, true>(lhs_int_, rhs_int_) << "\n";
 	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::horizontal_sum_fill(lhs_)) << "\n";
 
+
+	system("pause");
 	std::cout << "GENERATING SCALAR NOISE...\n";
 	timer_.Restart();
 	EmuMath::NoiseTable<3, float> noise_;
