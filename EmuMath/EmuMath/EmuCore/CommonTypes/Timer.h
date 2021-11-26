@@ -2,13 +2,14 @@
 #define EMU_CORE_TIMER_H_INC_ 1
 
 #include <chrono>
+#include <limits>
+#include <type_traits>
 #include "../TMPHelpers/TimeTMP.h"
 
 namespace EmuCore
 {
 	/// <summary>
 	/// <para> Wrapper for using std::chrono::steady_clock to mark points in time and use them to create a duration. </para>
-	/// <para> Effectively used as a stopwatch. </para>
 	/// </summary>
 	template<class DefaultRatio_ = EmuCore::TMPHelpers::ratio_micro>
 	class Timer
@@ -102,14 +103,7 @@ namespace EmuCore
 				Out_ out_ = Get<Out_, OutRatio_>();
 				_reset();
 				has_started = true;
-				if constexpr (std::is_move_constructible_v<Out_>)
-				{
-					return Out_(std::move<Out_>(out_));
-				}
-				else
-				{
-					return out_;
-				}
+				return out_;
 			}
 			else
 			{

@@ -17,6 +17,7 @@
 #include <thread>
 
 #include "EmuCore/CommonTypes/Timer.h"
+#include "EmuCore/CommonTypes/Stopwatch.h"
 
 using namespace EmuCore::TestingHelpers;
 
@@ -509,6 +510,27 @@ int main()
 	std::cout << EmuSIMD::cmp_all_eq<true, true, true, true, true, false, true, false, true>(lhs_int_, rhs_int_) << "\n";
 	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::horizontal_sum_fill(lhs_)) << "\n";
 
+
+	using namespace std::chrono_literals;
+	std::cout << "\n\n---STOPWATCH---\n\n";
+	EmuCore::Stopwatch<std::milli> stopwatch_;
+	std::cout << "Time: " << stopwatch_.Get() << "\n";
+	std::cout << "Time on restart: " << stopwatch_.Restart<double>() << "\n";
+	std::this_thread::sleep_for(25ms);
+	double temp_double_ = stopwatch_.Stop<double>();
+	std::cout << "Stopping after 25ms: " << temp_double_ << "\n";
+	std::this_thread::sleep_for(25ms);
+	std::cout << "Getting after additional 25ms: " << stopwatch_.Get<double>() << "\n";
+	stopwatch_.Start();
+	std::this_thread::sleep_for(1s);
+	temp_double_ = stopwatch_.Get<double>();
+	std::cout << "Getting after starting and additional 1s: " << temp_double_ << "\n";
+	std::this_thread::sleep_for(13ms);
+	std::cout << "Time on restart after additional 13ms: " << stopwatch_.Restart<double>() << "\n";
+	std::this_thread::sleep_for(15ms);
+	temp_double_ = stopwatch_.Stop<double>();
+	std::cout << "Time on stop after 15ms: " << temp_double_ << "\n";
+	system("pause");
 
 
 	std::cout << "\n\n---PARALLEL FOR---\n\n";

@@ -455,5 +455,8 @@
     <ClInclude Include="EmuCore\TMPHelpers\TimeTMP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuCore\CommonTypes\Stopwatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
