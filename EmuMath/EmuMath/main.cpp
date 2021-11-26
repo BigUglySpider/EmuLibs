@@ -510,114 +510,6 @@ int main()
 	std::cout << EmuSIMD::cmp_all_eq<true, true, true, true, true, false, true, false, true>(lhs_int_, rhs_int_) << "\n";
 	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::horizontal_sum_fill(lhs_)) << "\n";
 
-
-	using namespace std::chrono_literals;
-	std::cout << "\n\n---STOPWATCH---\n\n";
-	EmuCore::Stopwatch<std::milli> stopwatch_;
-	std::cout << "Time: " << stopwatch_.Get() << "\n";
-	std::cout << "Time on restart: " << stopwatch_.Restart<double>() << "\n";
-	std::this_thread::sleep_for(25ms);
-	double temp_double_ = stopwatch_.Stop<double>();
-	std::cout << "Stopping after 25ms: " << temp_double_ << "\n";
-	std::this_thread::sleep_for(25ms);
-	std::cout << "Getting after additional 25ms: " << stopwatch_.Get<double>() << "\n";
-	stopwatch_.Start();
-	std::this_thread::sleep_for(1s);
-	temp_double_ = stopwatch_.Get<double>();
-	std::cout << "Getting after starting and additional 1s: " << temp_double_ << "\n";
-	std::this_thread::sleep_for(13ms);
-	std::cout << "Time on restart after additional 13ms: " << stopwatch_.Restart<double>() << "\n";
-	std::this_thread::sleep_for(15ms);
-	temp_double_ = stopwatch_.Stop<double>();
-	std::cout << "Time on stop after 15ms: " << temp_double_ << "\n";
-	system("pause");
-
-
-	std::cout << "\n\n---PARALLEL FOR---\n\n";
-	system("pause");
-	using pf_iterator_type = std::tuple<std::size_t, std::size_t>;
-	constexpr pf_iterator_type pf_begin_coords_(0, 0);
-	constexpr pf_iterator_type pf_end_coords_(100, 100);
-	timer_.Restart();
-	SafeOutputter safe_outputter_ = SafeOutputter();
-	for (std::size_t x = std::get<0>(pf_begin_coords_), endx_ = std::get<0>(pf_end_coords_); x < endx_; ++x)
-	{
-		for (std::size_t y = std::get<1>(pf_begin_coords_), endy_ = std::get<1>(pf_end_coords_); y < endy_; ++y)
-		{
-			safe_outputter_(x, y);
-		}
-	}
-	timer_.Pause();
-	std::cout << "Non-parallel for ended in " << timer_.GetMilli() << "ms. | " << safe_outputter_.count_ << "\n";
-	std::cout << "Total: " << safe_outputter_.total << "\n";
-
-
-	EmuThreads::DefaultThreadPool pool_for_parallel_for_(4);
-	system("pause");
-
-	timer_.Restart();
-	EmuThreads::DefaultParallelFor<SafeOutputter, EmuThreads::DefaultThreadPool*> parallel_for_(&pool_for_parallel_for_);
-	parallel_for_.Execute(pf_begin_coords_, pf_end_coords_);
-	parallel_for_.ViewThreadPool().ViewWorkAllocator().WaitForAllTasksToComplete();
-	timer_.Pause();
-	std::cout << "Parallel for ended in " << timer_.Get() << "ms. | " << parallel_for_.func_unsynced.count_ << "\n";
-	std::cout << "Total: " << parallel_for_.func_unsynced.total << "\n";
-	std::cout << parallel_for_.ViewThreadPool().NumThreads() << "\n";
-	std::cout << parallel_for_.ViewThreadPool().ViewWorkAllocator().NumQueuedTasks() << "\n";
-	std::cout << parallel_for_.ViewThreadPool().ViewWorkAllocator().NumWorkingThreads() << "\n";
-	system("pause");
-
-	std::cout << "\n\n---THREAD POOLS---\n\n";
-	std::vector<EmuThreads::DefaultThreadPool> thread_pool_;
-	thread_pool_.push_back({ 5 });
-	int some_random_val_ = 2;
-	std::cout << "Non-threaded address: " << &some_random_val_ << "\n";
-	thread_pool_[0].AllocateTask<int&>(some_test, some_random_val_);
-	thread_pool_[0].AllocateTask<int&>(some_test, some_random_val_);
-	thread_pool_[0].AllocateTask<int&>(some_test, some_random_val_);
-	std::cout << "Finished allocating tasks to pool...\n";
-	system("pause");
-	thread_pool_[0].AllocateTask<int&>(some_test, some_random_val_);
-	thread_pool_[0].AllocateTask
-	(
-		EmuThreads::stream_append_all_in_one<decltype(std::cout), std::string, int, std::string>,
-		std::ref(std::cout),
-		"Old thread pool :) | ",
-		some_random_val_,
-		" hehe\n"
-	);
-	system("pause");
-	thread_pool_[0].ViewWorkAllocator().WaitForAllTasksToComplete();
-	std::cout << "Allocating long task...\n";
-	timer_.Restart();
-	thread_pool_[0].AllocateTask(FunctorThisTime()).wait();
-	timer_.Pause();
-	std::cout << "Finished long task in " << timer_.GetMilli() << "ms.\n";
-	system("pause");
-
-	std::cout << "Making new thread pool...\n";
-	EmuThreads::DefaultPrioritisedThreadPool another_pool_;
-	another_pool_.AllocateTask<decltype(std::cout)&, std::string, std::string>
-	(
-		EmuThreads::stream_append_all_in_one<decltype(std::cout), std::string, std::string>,
-		std::cout,
-		"New thread pool :)",
-		" hehe\n"
-	);
-	system("pause");
-	std::cout << "Num Threads: " << another_pool_.NumThreads() << "\n";
-
-	static constexpr bool oigtjreo = EmuThreads::TMP::has_const_waiting_time_ms_member_func<EmuThreads::Functors::default_work_allocator, double>::value;
-	system("pause");
-	another_pool_.AllocateWorkers(1);
-	std::cout << "Num Threads: " << another_pool_.NumThreads() << "\n";
-	system("pause");
-	std::cout << another_pool_.WaitingTimeMs() << "\n";
-	std::cout << another_pool_.WaitingTimeUs() << "\n";
-	std::cout << another_pool_.WaitingTimeMs(-1) << "\n";
-	std::cout << another_pool_.WaitingTimeUs(-1) << "\n";
-	system("pause");
-
 	std::cout << "GENERATING SCALAR NOISE...\n";
 	timer_.Restart();
 	EmuMath::NoiseTable<3, float> noise_;
@@ -659,6 +551,69 @@ int main()
 	);
 	timer_.Pause();
 	std::cout << "FINISHED FAST NOISE IN: " << timer_.GetMilli() << "ms\n";
+
+	std::cout << "GENERATING FAST NOISE VIA THREAD POOL...\n";
+	timer_.Restart();
+	EmuThreads::DefaultThreadPool thread_pool_(6);
+	using fast_noise_array_type = std::vector<std::vector<EmuMath::FastNoiseTable<3, 1>>>;
+	fast_noise_array_type fast_noise_array_(8, fast_noise_array_type::value_type(8, EmuMath::FastNoiseTable<3, 1>()));
+	for (std::size_t x = 0, end_x_ = fast_noise_array_.size(); x < end_x_; ++x)
+	{
+		auto& array_ = fast_noise_array_[x];
+		for (std::size_t y = 0, end_y_ = fast_noise_array_.size(); y < end_y_; ++y)
+		{
+			auto* p_table_ = &(array_[y]);
+			auto options_ = EmuMath::FastNoiseTable<3, 1>::make_options
+			(
+				EmuMath::Vector<3, std::size_t>(128, 128, 1),
+				EmuMath::Vector<3, float>((1.0f / 1024.0f) * (x * 128), (1.0f / 1024.0f) * (y * 128), 0.0f),
+				EmuMath::Vector<3, float>(1.0f / 1024.0f, 1.0f / 1024.0f, 1.0f / 1024.0f),
+				3.0f,
+				true,
+				true,
+				EmuMath::Info::NoisePermutationInfo(4096, EmuMath::Info::NoisePermutationShuffleMode::SEED_32, true, 1337, 1337),
+				EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+			);
+
+			using func_type = bool(EmuMath::FastNoiseTable<3, 1>::*)(const EmuMath::FastNoiseTable<3, 1>::options_type&);
+
+			thread_pool_.AllocateTask
+			(
+				std::bind<func_type>
+				(
+					&EmuMath::FastNoiseTable<3, 1>::GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<3>>,
+					p_table_,
+					options_
+				)
+			);
+		}
+	}
+	thread_pool_.ViewWorkAllocator().WaitForAllTasksToComplete();
+	timer_.Pause();
+	std::cout << "FINISHED FAST NOISE VIA THREAD POOL IN: " << timer_.GetMilli() << "ms\n";
+	EmuMath::Vector3<std::size_t> resolution_ = fast_noise_.size();
+	for (std::size_t z = 0; z < resolution_.z; ++z)
+	{
+		std::cout << "\nOutputting threaded image layer #" << z << "...\n";
+
+		std::ostringstream name_;
+		name_ << "./test_noise_threaded_" << z << ".ppm";
+		std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
+		out_ppm_ << "P6" << std::endl << resolution_.x << ' ' << resolution_.y << std::endl << "255" << std::endl;
+
+		for (std::size_t y = 0; y < resolution_.y; ++y)
+		{
+			for (std::size_t x = 0; x < resolution_.x; ++x)
+			{
+				auto& array_ = fast_noise_array_[x / 128];
+				auto& noise_table_ = array_[y / 128];
+				EmuMath::ColourRGB<std::uint8_t> colour_byte_ = noise_gradient_.GetColour<std::uint8_t>(noise_table_.at(x % 128, y % 128, z % 1));
+				out_ppm_ << (char)colour_byte_.R() << (char)colour_byte_.G() << (char)colour_byte_.B();
+			}
+		}
+		out_ppm_.close();
+	}
+	std::cout << "Finished outputting all 3D noise layers from array.\n";
 
 	WriteNoiseTableToPPM(fast_noise_, noise_gradient_);
 
