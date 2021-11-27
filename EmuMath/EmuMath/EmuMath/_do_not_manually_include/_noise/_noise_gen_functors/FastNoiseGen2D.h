@@ -33,6 +33,43 @@ namespace EmuMath::Functors
 			static_assert(false, "Attempted to construct a make_fast_noise_2d instance for a NoiseType that has not been implemented.");
 		}
 	};
+
+	template<>
+	struct make_fast_noise_2d<EmuMath::NoiseType::VALUE, __m128>
+	{
+		inline make_fast_noise_2d()
+		{
+		}
+
+		[[nodiscard]] inline __m128 operator()
+		(
+			__m128 points_x_,
+			__m128 points_y_,
+			__m128 points_z_,
+			__m128 freq_,
+			__m128i permutations_mask_128_,
+			const EmuMath::NoisePermutations& permutations_
+		)
+		{
+			points_x_ = EmuSIMD::floor(EmuSIMD::mul_all(points_x_, freq_));
+			points_y_ = EmuSIMD::floor(EmuSIMD::mul_all(points_y_, freq_));
+
+			__m128i ix_128_ = EmuSIMD::bitwise_and(_mm_cvtps_epi32(points_x_), permutations_mask_128_);
+			__m128i iy_128_ = EmuSIMD::bitwise_and(_mm_cvtps_epi32(points_y_), permutations_mask_128_);
+			int ix_[4];
+			int iy_[4];
+			EmuSIMD::store(iy_128_, iy_);
+			EmuSIMD::store(ix_128_, ix_);
+			float perms_[4];
+			std::size_t mask_ = static_cast<std::size_t>(permutations_.MaxValue());
+
+			for (std::size_t i = 0; i < 4; ++i)
+			{
+				perms_[i] = static_cast<float>(permutations_[(static_cast<std::size_t>(permutations_[ix_[i]]) + iy_[i]) & mask_]);
+			}
+			return EmuSIMD::div(EmuSIMD::load<__m128>(perms_), _mm_cvtepi32_ps(permutations_mask_128_));
+		}
+	};
 }
 
 #endif

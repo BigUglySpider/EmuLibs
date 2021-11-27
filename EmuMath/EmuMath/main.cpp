@@ -260,6 +260,27 @@ inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const EmuMath:
 		}
 		std::cout << "Finished outputting all 3D noise layers.\n";
 	}
+	else if constexpr (num_dimensions == 2)
+	{
+		EmuMath::Vector2<std::size_t> resolution_ = noise_table_.size();
+		std::cout << "\nOutputting 2D noise image layer...\n";
+
+		std::ostringstream name_;
+		name_ << "./" << out_name_ << ".ppm";
+		std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
+		out_ppm_ << "P6" << std::endl << resolution_.x << ' ' << resolution_.y << std::endl << "255" << std::endl;
+
+		for (std::size_t y = 0; y < resolution_.y; ++y)
+		{
+			for (std::size_t x = 0; x < resolution_.x; ++x)
+			{
+				EmuMath::ColourRGB<std::uint8_t> colour_byte_ = gradient_.GetColour<std::uint8_t>(noise_table_.at(x, y));
+				out_ppm_ << (char)colour_byte_.R() << (char)colour_byte_.G() << (char)colour_byte_.B();
+			}
+		}
+		out_ppm_.close();
+		std::cout << "Finished outputting all 2D noise.\n";
+	}
 }
 
 int main()
@@ -517,7 +538,7 @@ int main()
 	system("pause");
 	std::cout << "GENERATING SCALAR NOISE...\n";
 	timer_.Restart();
-	EmuMath::NoiseTable<3, float> noise_;
+	EmuMath::NoiseTable<2, float> noise_;
 	noise_.GenerateNoise<test_noise_type_flag, test_noise_processor>
 	(
 		noise_.MakeOptions
@@ -538,7 +559,7 @@ int main()
 
 
 	std::cout << "GENERATING FAST NOISE...\n";
-	EmuMath::FastNoiseTable<3, 1> fast_noise_;
+	EmuMath::FastNoiseTable<2, 1> fast_noise_;
 	timer_.Restart();
 	fast_noise_.GenerateNoise<test_noise_type_flag, test_noise_processor>
 	(

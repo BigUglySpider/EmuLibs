@@ -394,6 +394,58 @@ namespace EmuMath
 					}
 				}
 			}
+			else if constexpr (num_dimensions == 2)
+			{
+				Register_ empty_ = Register_();
+
+				std::size_t end_x_ = table_size.at<0>();
+				std::size_t end_y_ = table_size.at<1>();
+				std::size_t end_store_batch_ = table_size.at<major_dimension>();
+				end_store_batch_ -= end_store_batch_ % num_elements_per_batch;
+
+
+				Register_ points_x_ = EmuSIMD::set1<Register_>(start_.at<0>());
+				Register_ points_y_ = EmuSIMD::set1<Register_>(start_.at<1>());
+				Register_ step_x_ = EmuSIMD::set1<Register_>(step_.at<0>());
+				Register_ step_y_ = EmuSIMD::set1<Register_>(step_.at<1>());
+
+				if constexpr (major_dimension == 0)
+				{
+					Register_ start_x_ = EmuSIMD::add(points_x_, EmuSIMD::mul_all(step_x_, EmuSIMD::setr_incrementing<Register_, 0>()));
+					step_x_ = EmuSIMD::mul(step_x_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
+					for (std::size_t y = 0; y < end_y_; ++y)
+					{
+						auto& layer_ = samples[y];
+						std::size_t x = 0;
+						points_x_ = start_x_;
+						for (; x < end_store_batch_; x += num_elements_per_batch)
+						{
+							EmuSIMD::store(sample_processor_(generator_(points_x_, points_y_, empty_)), &(layer_[x]));
+							points_x_ = EmuSIMD::add(points_x_, step_x_);
+						}
+						_finish_major_segment_partial(generator_, sample_processor_, layer_, points_x_, points_y_, empty_, x, end_x_);
+						points_y_ = EmuSIMD::add(points_y_, step_y_);
+					}
+				}
+				else
+				{
+					Register_ start_y_ = EmuSIMD::add(points_y_, EmuSIMD::mul_all(step_y_, EmuSIMD::setr_incrementing<Register_, 0>()));
+					step_y_ = EmuSIMD::mul(step_y_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
+					for (std::size_t x = 0; x < end_x_; ++x)
+					{
+						auto& layer_ = samples[x];
+						std::size_t y = 0;
+						points_y_ = start_y_;
+						for (; y < end_store_batch_; y += num_elements_per_batch)
+						{
+							EmuSIMD::store(sample_processor_(generator_(points_x_, points_y_, empty_)), &(layer_[y]));
+							points_y_ = EmuSIMD::add(points_y_, step_y_);
+						}
+						_finish_major_segment_partial(generator_, sample_processor_, layer_, points_x_, points_y_, empty_, y, end_y_);
+						points_x_ = EmuSIMD::add(points_x_, step_x_);
+					}
+				}
+			}
 			else
 			{
 				static_assert(false, "Attempted to generate an impossibly-dimensioned EmuMath::FastNoiseTable.");
@@ -425,11 +477,11 @@ namespace EmuMath
 					// Simple resize for 2-dimensions, since major_dimension differences are a simple swap
 					if constexpr (major_dimension == 0)
 					{
-						samples.resize(new_size_.at<1>(), layer_0_type(table_size.at<0>()));
+						samples.resize(new_size_.at<1>(), layer_0_type(new_size_.at<0>()));
 					}
 					else
 					{
-						samples.resize(new_size_.at<0>(), layer_0_type(table_size.at<1>()));
+						samples.resize(new_size_.at<0>(), layer_0_type(new_size_.at<1>()));
 					}
 				}
 				else if constexpr (num_dimensions == 3)

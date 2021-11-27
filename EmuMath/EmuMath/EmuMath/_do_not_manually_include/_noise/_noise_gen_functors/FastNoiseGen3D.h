@@ -67,7 +67,7 @@ namespace EmuMath::Functors
 			EmuSIMD::store(ix_128i_, ix_);
 
 			float perms_[4];
-			std::size_t mask_ = permutations_.MaxValue();
+			std::size_t mask_ = static_cast<std::size_t>(permutations_.MaxValue());
 			for (std::size_t i = 0; i < 4; ++i)
 			{
 				std::size_t perm_x_ = static_cast<std::size_t>(permutations_[ix_[i]]) & mask_;
