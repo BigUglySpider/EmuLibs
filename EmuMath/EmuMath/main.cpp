@@ -178,7 +178,7 @@ struct SomeStructForTestingEdges
 };
 
 template<class NoiseTable_>
-inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_)
+inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::string& out_name_ = "test_noise")
 {
 	using FP_ = typename NoiseTable_::value_type;
 	constexpr std::size_t num_dimensions = NoiseTable_::num_dimensions;
@@ -192,7 +192,7 @@ inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_)
 			std::cout << "\nOutputting image layer #" << z << "...\n";
 
 			std::ostringstream name_;
-			name_ << "./test_noise_" << z << ".ppm";
+			name_ << "./" << out_name_ << "_" << z << ".ppm";
 			std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
 			out_ppm_ << "P6" << std::endl << resolution_.x << ' ' << resolution_.y << std::endl << "255" << std::endl;
 
@@ -233,7 +233,7 @@ inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_)
 }
 
 template<class NoiseTable_, class GradientChannel_>
-inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const EmuMath::Gradient<GradientChannel_>& gradient_)
+inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const EmuMath::Gradient<GradientChannel_>& gradient_, const std::string& out_name_ = "test_noise")
 {
 	constexpr std::size_t num_dimensions = NoiseTable_::num_dimensions;
 	if constexpr (num_dimensions == 3)
@@ -244,7 +244,7 @@ inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const EmuMath:
 			std::cout << "\nOutputting image layer #" << z << "...\n";
 
 			std::ostringstream name_;
-			name_ << "./test_noise_" << z << ".ppm";
+			name_ << "./" << out_name_ << "_" << z << ".ppm";
 			std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
 			out_ppm_ << "P6" << std::endl << resolution_.x << ' ' << resolution_.y << std::endl << "255" << std::endl;
 
@@ -511,11 +511,12 @@ int main()
 	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::horizontal_sum_fill(lhs_)) << "\n";
 
 
+	using test_noise_processor = EmuMath::Functors::fast_noise_sample_processor_default;
 	system("pause");
 	std::cout << "GENERATING SCALAR NOISE...\n";
 	timer_.Restart();
 	EmuMath::NoiseTable<3, float> noise_;
-	noise_.GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::noise_sample_processor_perlin_normalise<3>>
+	noise_.GenerateNoise<EmuMath::NoiseType::VALUE_SMOOTH, test_noise_processor>
 	(
 		noise_.MakeOptions
 		(
@@ -531,13 +532,13 @@ int main()
 	);
 	timer_.Pause();
 	std::cout << "FINISHED SCALAR NOISE IN: " << timer_.GetMilli() << "ms\n";
-	//WriteNoiseTableToPPM(noise_, noise_gradient_);
+	WriteNoiseTableToPPM(noise_, noise_gradient_, "test_noise_scalar");
 
 
 	std::cout << "GENERATING FAST NOISE...\n";
 	EmuMath::FastNoiseTable<3, 1> fast_noise_;
 	timer_.Restart();
-	fast_noise_.GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<3>>
+	fast_noise_.GenerateNoise<EmuMath::NoiseType::VALUE_SMOOTH, test_noise_processor>
 	(
 		fast_noise_.make_options
 		(
@@ -553,6 +554,7 @@ int main()
 	);
 	timer_.Pause();
 	std::cout << "FINISHED FAST NOISE IN: " << timer_.GetMilli() << "ms\n";
+	WriteNoiseTableToPPM(fast_noise_, noise_gradient_, "test_noise_simd");
 
 	std::cout << "GENERATING FAST NOISE VIA THREAD POOL...\n";
 	timer_.Restart();
@@ -583,7 +585,7 @@ int main()
 			(
 				std::bind<func_type>
 				(
-					&EmuMath::FastNoiseTable<3, 1>::GenerateNoise<EmuMath::NoiseType::PERLIN, EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<3>>,
+					&EmuMath::FastNoiseTable<3, 1>::GenerateNoise<EmuMath::NoiseType::VALUE_SMOOTH, test_noise_processor>,
 					p_table_,
 					options_
 				)
@@ -617,7 +619,6 @@ int main()
 	}
 	std::cout << "Finished outputting all 3D noise layers from array.\n";
 
-	WriteNoiseTableToPPM(fast_noise_, noise_gradient_);
 
 
 	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::cast<__m256>(_mm_set_ps(1.0f, 2.0f, 3.0f, 4.0f))) << "\n";

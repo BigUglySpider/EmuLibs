@@ -1,7 +1,7 @@
 #ifndef EMU_MATH_FAST_NOISE_GEN_FUNCTOR_3D_H_INC_
 #define EMU_MATH_FAST_NOISE_GEN_FUNCTOR_3D_H_INC_ 1
 
-#include "_common_noise_gen_functor_includes.h"
+#include "_common_fast_noise_gen_functors_includes.h"
 #include "../../../../EmuSIMD/SIMDHelpers.h"
 
 namespace EmuMath::Validity
@@ -32,6 +32,109 @@ namespace EmuMath::Functors
 		{
 			static_assert(false, "Attempted to construct a make_fast_noise_3d instance for a NoiseType that has not been implemented.");
 		}
+	};
+
+	template<>
+	struct make_fast_noise_3d<EmuMath::NoiseType::VALUE_SMOOTH, __m128>
+	{
+		[[nodiscard]] inline __m128 operator()
+		(
+			__m128 points_x_,
+			__m128 points_y_,
+			__m128 points_z_,
+			__m128 freq_,
+			__m128i permutations_mask_128_,
+			const EmuMath::NoisePermutations& permutations_
+		)
+		{
+			points_x_ = EmuSIMD::mul_all(points_x_, freq_);
+			points_y_ = EmuSIMD::mul_all(points_y_, freq_);
+			points_z_ = EmuSIMD::mul_all(points_z_, freq_);
+
+			// Weightings and start of indices
+			__m128 tx_ = EmuSIMD::floor(points_x_);
+			__m128i ix_0_128i_ = _mm_cvtps_epi32(tx_);
+			tx_ = smooth_t(EmuSIMD::sub(points_x_, tx_));
+
+			__m128 ty_ = EmuSIMD::floor(points_y_);
+			__m128i iy_0_128i_ = _mm_cvtps_epi32(ty_);
+			ty_ = smooth_t(EmuSIMD::sub(points_y_, ty_));
+
+			__m128 tz_ = EmuSIMD::floor(points_z_);
+			__m128i iz_0_128i_ = _mm_cvtps_epi32(tz_);
+			tz_ = smooth_t(EmuSIMD::sub(points_z_, tz_));
+
+			// Mask indices and get alternatives to lerp
+			ix_0_128i_ = EmuSIMD::bitwise_and(ix_0_128i_, permutations_mask_128_);
+			iy_0_128i_ = EmuSIMD::bitwise_and(iy_0_128i_, permutations_mask_128_);
+			iz_0_128i_ = EmuSIMD::bitwise_and(iz_0_128i_, permutations_mask_128_);
+			__m128i one_128i_ = EmuSIMD::set1<__m128i, 32>(1);
+			__m128i iz_1_128i_ = EmuSIMD::bitwise_and(EmuSIMD::add(iz_0_128i_, one_128i_), permutations_mask_128_);
+			__m128i iy_1_128i_ = EmuSIMD::bitwise_and(EmuSIMD::add(iy_0_128i_, one_128i_), permutations_mask_128_);
+			__m128i ix_1_128i_ = EmuSIMD::bitwise_and(EmuSIMD::add(ix_0_128i_, one_128i_), permutations_mask_128_);
+
+			// Store 0 indices
+			int ix_0_[4];
+			int iy_0_[4];
+			int iz_0_[4];
+			EmuSIMD::store(ix_0_128i_, ix_0_);
+			EmuSIMD::store(iy_0_128i_, iy_0_);
+			EmuSIMD::store(iz_0_128i_, iz_0_);
+
+			// Store 1 indices
+			int ix_1_[4];
+			int iy_1_[4];
+			int iz_1_[4];
+			EmuSIMD::store(ix_1_128i_, ix_1_);
+			EmuSIMD::store(iy_1_128i_, iy_1_);
+			EmuSIMD::store(iz_1_128i_, iz_1_);
+
+			float perms_000_[4];
+			float perms_001_[4];
+			float perms_010_[4];
+			float perms_011_[4];
+			float perms_100_[4];
+			float perms_101_[4];
+			float perms_110_[4];
+			float perms_111_[4];
+			std::size_t mask_ = permutations_.MaxValue();
+
+			for (std::size_t i = 0; i < 4; ++i)
+			{
+				// Forced store as size_t so we can handle width changes if EmuMath::NoisePermutationValue is not size_t width
+				std::size_t perm_0_ = static_cast<std::size_t>(permutations_[ix_0_[i]]);
+				std::size_t perm_1_ = static_cast<std::size_t>(permutations_[ix_1_[i]]);
+
+				std::size_t perm_00_ = static_cast<std::size_t>(permutations_[(perm_0_ + iy_0_[i]) & mask_]);
+				std::size_t perm_01_ = static_cast<std::size_t>(permutations_[(perm_0_ + iy_1_[i]) & mask_]);
+				std::size_t perm_10_ = static_cast<std::size_t>(permutations_[(perm_1_ + iy_0_[i]) & mask_]);
+				std::size_t perm_11_ = static_cast<std::size_t>(permutations_[(perm_1_ + iy_1_[i]) & mask_]);
+
+				perms_000_[i] = static_cast<float>(permutations_[(perm_00_ + iz_0_[i]) & mask_]);
+				perms_001_[i] = static_cast<float>(permutations_[(perm_00_ + iz_1_[i]) & mask_]);
+				perms_010_[i] = static_cast<float>(permutations_[(perm_01_ + iz_0_[i]) & mask_]);
+				perms_011_[i] = static_cast<float>(permutations_[(perm_01_ + iz_1_[i]) & mask_]);
+				perms_100_[i] = static_cast<float>(permutations_[(perm_10_ + iz_0_[i]) & mask_]);
+				perms_101_[i] = static_cast<float>(permutations_[(perm_10_ + iz_1_[i]) & mask_]);
+				perms_110_[i] = static_cast<float>(permutations_[(perm_11_ + iz_0_[i]) & mask_]);
+				perms_111_[i] = static_cast<float>(permutations_[(perm_11_ + iz_1_[i]) & mask_]);
+			}
+
+			// X-lerps
+			__m128 lerp_0_ = EmuSIMD::fused_lerp(EmuSIMD::load<__m128>(perms_000_), EmuSIMD::load<__m128>(perms_100_), tx_);
+			__m128 lerp_1_ = EmuSIMD::fused_lerp(EmuSIMD::load<__m128>(perms_010_), EmuSIMD::load<__m128>(perms_110_), tx_);
+			__m128 lerp_2_ = EmuSIMD::fused_lerp(EmuSIMD::load<__m128>(perms_001_), EmuSIMD::load<__m128>(perms_101_), tx_);
+			__m128 lerp_3_ = EmuSIMD::fused_lerp(EmuSIMD::load<__m128>(perms_011_), EmuSIMD::load<__m128>(perms_111_), tx_);
+
+			// Y-lerps
+			lerp_0_ = EmuSIMD::fused_lerp(lerp_0_, lerp_1_, ty_);
+			lerp_2_ = EmuSIMD::fused_lerp(lerp_2_, lerp_3_, ty_);
+
+			// Final Z-lerp and normalise
+			return EmuSIMD::div(EmuSIMD::fused_lerp(lerp_0_, lerp_2_, tz_), _mm_cvtepi32_ps(permutations_mask_128_));
+		}
+
+		EmuMath::Functors::_underlying_noise_gen::_fast_smooth_t<__m128> smooth_t;
 	};
 
 	template<>
@@ -172,9 +275,9 @@ namespace EmuMath::Functors
 			);
 			
 			// Apply smooth (or fade) function to our weightings
-			tx_0_128_ = _smooth_t(tx_0_128_);
-			ty_0_128_ = _smooth_t(ty_0_128_);
-			tz_0_128_ = _smooth_t(tz_0_128_);
+			tx_0_128_ = smooth_t(tx_0_128_);
+			ty_0_128_ = smooth_t(ty_0_128_);
+			tz_0_128_ = smooth_t(tz_0_128_);
 
 			// Primary lerps
 			// --- Use fused lerps to skip 7 floating-point rounding operations
@@ -192,16 +295,6 @@ namespace EmuMath::Functors
 		}
 
 	private:
-		[[nodiscard]] static inline __m128 _smooth_t(__m128 t_)
-		{
-			__m128 six_fifteen_ten_ = EmuSIMD::set<__m128>(0.0f, 10.0f, 15.0f, 6.0f);
-			__m128 result_ = EmuSIMD::fmsub(t_, EmuSIMD::shuffle<0>(six_fifteen_ten_), EmuSIMD::shuffle<1>(six_fifteen_ten_));
-			result_ = EmuSIMD::fmadd(t_, result_, EmuSIMD::shuffle<2>(six_fifteen_ten_));
-
-			__m128 t_squared_ = EmuSIMD::mul_all(t_, t_);
-			return EmuSIMD::mul_all(EmuSIMD::mul_all(t_squared_, t_), result_);
-		}
-
 		inline void _calculate_values_to_lerp
 		(
 			const EmuMath::NoisePermutations& permutations_,
@@ -441,6 +534,7 @@ namespace EmuMath::Functors
 		std::array<int, 4> iy_1;
 		std::array<int, 4> iz_0;
 		std::array<int, 4> iz_1;
+		EmuMath::Functors::_underlying_noise_gen::_fast_smooth_t<__m128> smooth_t;
 	};
 }
 

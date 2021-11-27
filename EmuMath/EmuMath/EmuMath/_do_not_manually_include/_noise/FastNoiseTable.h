@@ -21,7 +21,7 @@ namespace EmuMath
 	///		The MajorDimensionIndex_ identifies the dimension in which samples will be contiguously stored 
 	///		(as they will be separated to allow better access to large tables). 
 	/// </para>
-	/// <para> It is recommended to use a MajorDimensionIndex_ that best suits the largest dimension in which noise will be generated (e.g. Y for a 256x2048 table). </para>
+	/// <para> It is recommended to use a MajorDimensionIndex_ that best suits the largest dimension in which noise will be generated (e.g. Y (1) for a 256x2048 table). </para>
 	/// </summary>
 	template<std::size_t NumDimensions_, std::size_t MajorDimensionIndex_ = NumDimensions_ - 1>
 	class FastNoiseTable
