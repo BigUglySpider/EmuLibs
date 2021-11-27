@@ -533,12 +533,13 @@ int main()
 
 
 	using test_noise_processor = EmuMath::Functors::fast_noise_sample_processor_default;
-	constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::VALUE;
+	constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::VALUE_SMOOTH;
+	constexpr std::size_t test_noise_dimensions = 2;
 
 	system("pause");
 	std::cout << "GENERATING SCALAR NOISE...\n";
 	timer_.Restart();
-	EmuMath::NoiseTable<2, float> noise_;
+	EmuMath::NoiseTable<test_noise_dimensions, float> noise_;
 	noise_.GenerateNoise<test_noise_type_flag, test_noise_processor>
 	(
 		noise_.MakeOptions
@@ -559,7 +560,7 @@ int main()
 
 
 	std::cout << "GENERATING FAST NOISE...\n";
-	EmuMath::FastNoiseTable<2, 1> fast_noise_;
+	EmuMath::FastNoiseTable<test_noise_dimensions, 1> fast_noise_;
 	timer_.Restart();
 	fast_noise_.GenerateNoise<test_noise_type_flag, test_noise_processor>
 	(

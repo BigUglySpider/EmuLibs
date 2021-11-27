@@ -70,7 +70,7 @@ namespace EmuMath::Functors
 			std::size_t mask_ = static_cast<std::size_t>(permutations_.MaxValue());
 			for (std::size_t i = 0; i < 4; ++i)
 			{
-				std::size_t perm_x_ = static_cast<std::size_t>(permutations_[ix_[i]]) & mask_;
+				std::size_t perm_x_ = static_cast<std::size_t>(permutations_[ix_[i]]);
 				std::size_t perm_xyz_ = (static_cast<std::size_t>(permutations_[(perm_x_ + iy_[i]) & mask_]) + iz_[i]) & mask_;
 				perms_[i] = static_cast<float>(permutations_[perm_xyz_]);
 			}

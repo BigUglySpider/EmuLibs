@@ -38,7 +38,7 @@ namespace EmuMath::Functors
 			iz &= mask_;
 
 			// Forced store as size_t so we can handle width changes if EmuMath::NoisePermutationValue is of different width
-			std::size_t perm_x_ = static_cast<std::size_t>(permutations_[ix]) & mask_;
+			std::size_t perm_x_ = static_cast<std::size_t>(permutations_[ix]);
 			std::size_t perm_xyz_ = (static_cast<std::size_t>(permutations_[(perm_x_ + iy) & mask_]) + iz) & mask_;
 			return permutations_[perm_xyz_] * (value_type(1) / mask_);
 		}
