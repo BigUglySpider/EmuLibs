@@ -35,8 +35,57 @@ namespace EmuMath::Functors
 	};
 
 	template<>
+	struct make_fast_noise_3d<EmuMath::NoiseType::VALUE, __m128>
+	{
+		inline make_fast_noise_3d()
+		{
+		}
+
+		[[nodiscard]] inline __m128 operator()
+		(
+			__m128 points_x_,
+			__m128 points_y_,
+			__m128 points_z_,
+			__m128 freq_,
+			__m128i permutations_mask_128_,
+			const EmuMath::NoisePermutations& permutations_
+		)
+		{
+			points_x_ = EmuSIMD::floor(EmuSIMD::mul_all(points_x_, freq_));
+			points_y_ = EmuSIMD::floor(EmuSIMD::mul_all(points_y_, freq_));
+			points_z_ = EmuSIMD::floor(EmuSIMD::mul_all(points_z_, freq_));
+
+			__m128i ix_128i_ = EmuSIMD::bitwise_and(_mm_cvtps_epi32(points_x_), permutations_mask_128_);
+			__m128i iy_128i_ = EmuSIMD::bitwise_and(_mm_cvtps_epi32(points_y_), permutations_mask_128_);
+			__m128i iz_128i_ = EmuSIMD::bitwise_and(_mm_cvtps_epi32(points_z_), permutations_mask_128_);
+
+			int ix_[4];
+			int iy_[4];
+			int iz_[4];
+			EmuSIMD::store(iz_128i_, iz_);
+			EmuSIMD::store(iy_128i_, iy_);
+			EmuSIMD::store(ix_128i_, ix_);
+
+			float perms_[4];
+			std::size_t mask_ = permutations_.MaxValue();
+			for (std::size_t i = 0; i < 4; ++i)
+			{
+				std::size_t perm_x_ = static_cast<std::size_t>(permutations_[ix_[i]]) & mask_;
+				std::size_t perm_xyz_ = (static_cast<std::size_t>(permutations_[(perm_x_ + iy_[i]) & mask_]) + iz_[i]) & mask_;
+				perms_[i] = static_cast<float>(permutations_[perm_xyz_]);
+			}
+
+			return EmuSIMD::div(EmuSIMD::load<__m128>(perms_), _mm_cvtepi32_ps(permutations_mask_128_));
+		}
+	};
+
+	template<>
 	struct make_fast_noise_3d<EmuMath::NoiseType::VALUE_SMOOTH, __m128>
 	{
+		inline make_fast_noise_3d() : smooth_t()
+		{
+		}
+
 		[[nodiscard]] inline __m128 operator()
 		(
 			__m128 points_x_,
@@ -169,6 +218,7 @@ namespace EmuMath::Functors
 		std::array<__m128, _num_gradients> _gradients_128;
 
 		make_fast_noise_3d() :
+			smooth_t(),
 			ix_0(),
 			ix_1(),
 			iy_0(),

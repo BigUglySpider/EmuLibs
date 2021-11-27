@@ -512,11 +512,13 @@ int main()
 
 
 	using test_noise_processor = EmuMath::Functors::fast_noise_sample_processor_default;
+	constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::VALUE;
+
 	system("pause");
 	std::cout << "GENERATING SCALAR NOISE...\n";
 	timer_.Restart();
 	EmuMath::NoiseTable<3, float> noise_;
-	noise_.GenerateNoise<EmuMath::NoiseType::VALUE_SMOOTH, test_noise_processor>
+	noise_.GenerateNoise<test_noise_type_flag, test_noise_processor>
 	(
 		noise_.MakeOptions
 		(
@@ -538,7 +540,7 @@ int main()
 	std::cout << "GENERATING FAST NOISE...\n";
 	EmuMath::FastNoiseTable<3, 1> fast_noise_;
 	timer_.Restart();
-	fast_noise_.GenerateNoise<EmuMath::NoiseType::VALUE_SMOOTH, test_noise_processor>
+	fast_noise_.GenerateNoise<test_noise_type_flag, test_noise_processor>
 	(
 		fast_noise_.make_options
 		(
@@ -556,68 +558,69 @@ int main()
 	std::cout << "FINISHED FAST NOISE IN: " << timer_.GetMilli() << "ms\n";
 	WriteNoiseTableToPPM(fast_noise_, noise_gradient_, "test_noise_simd");
 
-	std::cout << "GENERATING FAST NOISE VIA THREAD POOL...\n";
-	timer_.Restart();
-	EmuThreads::DefaultThreadPool thread_pool_(6);
-	using fast_noise_array_type = std::vector<std::vector<EmuMath::FastNoiseTable<3, 1>>>;
-	fast_noise_array_type fast_noise_array_(8, fast_noise_array_type::value_type(8, EmuMath::FastNoiseTable<3, 1>()));
-	for (std::size_t x = 0, end_x_ = fast_noise_array_.size(); x < end_x_; ++x)
-	{
-		auto& array_ = fast_noise_array_[x];
-		for (std::size_t y = 0, end_y_ = fast_noise_array_.size(); y < end_y_; ++y)
-		{
-			auto* p_table_ = &(array_[y]);
-			auto options_ = EmuMath::FastNoiseTable<3, 1>::make_options
-			(
-				EmuMath::Vector<3, std::size_t>(128, 128, 1),
-				EmuMath::Vector<3, float>((1.0f / 1024.0f) * (x * 128), (1.0f / 1024.0f) * (y * 128), 0.0f),
-				EmuMath::Vector<3, float>(1.0f / 1024.0f, 1.0f / 1024.0f, 1.0f / 1024.0f),
-				3.0f,
-				true,
-				true,
-				EmuMath::Info::NoisePermutationInfo(4096, EmuMath::Info::NoisePermutationShuffleMode::SEED_32, true, 1337, 1337),
-				EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
-			);
-
-			using func_type = bool(EmuMath::FastNoiseTable<3, 1>::*)(const EmuMath::FastNoiseTable<3, 1>::options_type&);
-
-			thread_pool_.AllocateTask
-			(
-				std::bind<func_type>
-				(
-					&EmuMath::FastNoiseTable<3, 1>::GenerateNoise<EmuMath::NoiseType::VALUE_SMOOTH, test_noise_processor>,
-					p_table_,
-					options_
-				)
-			);
-		}
-	}
-	thread_pool_.ViewWorkAllocator().WaitForAllTasksToComplete();
-	timer_.Pause();
-	std::cout << "FINISHED FAST NOISE VIA THREAD POOL IN: " << timer_.GetMilli() << "ms\n";
-	EmuMath::Vector3<std::size_t> resolution_ = fast_noise_.size();
-	for (std::size_t z = 0; z < resolution_.z; ++z)
-	{
-		std::cout << "\nOutputting threaded image layer #" << z << "...\n";
-
-		std::ostringstream name_;
-		name_ << "./test_noise_threaded_" << z << ".ppm";
-		std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
-		out_ppm_ << "P6" << std::endl << resolution_.x << ' ' << resolution_.y << std::endl << "255" << std::endl;
-
-		for (std::size_t y = 0; y < resolution_.y; ++y)
-		{
-			for (std::size_t x = 0; x < resolution_.x; ++x)
-			{
-				auto& array_ = fast_noise_array_[x / 128];
-				auto& noise_table_ = array_[y / 128];
-				EmuMath::ColourRGB<std::uint8_t> colour_byte_ = noise_gradient_.GetColour<std::uint8_t>(noise_table_.at(x % 128, y % 128, z % 1));
-				out_ppm_ << (char)colour_byte_.R() << (char)colour_byte_.G() << (char)colour_byte_.B();
-			}
-		}
-		out_ppm_.close();
-	}
-	std::cout << "Finished outputting all 3D noise layers from array.\n";
+	// #### THREADED_NOISE_EXAMPLE ####
+	//std::cout << "GENERATING FAST NOISE VIA THREAD POOL...\n";
+	//timer_.Restart();
+	//EmuThreads::DefaultThreadPool thread_pool_(6);
+	//using fast_noise_array_type = std::vector<std::vector<EmuMath::FastNoiseTable<3, 1>>>;
+	//fast_noise_array_type fast_noise_array_(8, fast_noise_array_type::value_type(8, EmuMath::FastNoiseTable<3, 1>()));
+	//for (std::size_t x = 0, end_x_ = fast_noise_array_.size(); x < end_x_; ++x)
+	//{
+	//	auto& array_ = fast_noise_array_[x];
+	//	for (std::size_t y = 0, end_y_ = fast_noise_array_.size(); y < end_y_; ++y)
+	//	{
+	//		auto* p_table_ = &(array_[y]);
+	//		auto options_ = EmuMath::FastNoiseTable<3, 1>::make_options
+	//		(
+	//			EmuMath::Vector<3, std::size_t>(128, 128, 1),
+	//			EmuMath::Vector<3, float>((1.0f / 1024.0f) * (x * 128), (1.0f / 1024.0f) * (y * 128), 0.0f),
+	//			EmuMath::Vector<3, float>(1.0f / 1024.0f, 1.0f / 1024.0f, 1.0f / 1024.0f),
+	//			3.0f,
+	//			true,
+	//			true,
+	//			EmuMath::Info::NoisePermutationInfo(4096, EmuMath::Info::NoisePermutationShuffleMode::SEED_32, true, 1337, 1337),
+	//			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+	//		);
+	//
+	//		using func_type = bool(EmuMath::FastNoiseTable<3, 1>::*)(const EmuMath::FastNoiseTable<3, 1>::options_type&);
+	//
+	//		thread_pool_.AllocateTask
+	//		(
+	//			std::bind<func_type>
+	//			(
+	//				&EmuMath::FastNoiseTable<3, 1>::GenerateNoise<test_noise_type_flag, test_noise_processor>,
+	//				p_table_,
+	//				options_
+	//			)
+	//		);
+	//	}
+	//}
+	//thread_pool_.ViewWorkAllocator().WaitForAllTasksToComplete();
+	//timer_.Pause();
+	//std::cout << "FINISHED FAST NOISE VIA THREAD POOL IN: " << timer_.GetMilli() << "ms\n";
+	//EmuMath::Vector3<std::size_t> resolution_ = fast_noise_.size();
+	//for (std::size_t z = 0; z < resolution_.z; ++z)
+	//{
+	//	std::cout << "\nOutputting threaded image layer #" << z << "...\n";
+	//
+	//	std::ostringstream name_;
+	//	name_ << "./test_noise_threaded_" << z << ".ppm";
+	//	std::ofstream out_ppm_(name_.str(), std::ios_base::out | std::ios_base::binary);
+	//	out_ppm_ << "P6" << std::endl << resolution_.x << ' ' << resolution_.y << std::endl << "255" << std::endl;
+	//
+	//	for (std::size_t y = 0; y < resolution_.y; ++y)
+	//	{
+	//		for (std::size_t x = 0; x < resolution_.x; ++x)
+	//		{
+	//			auto& array_ = fast_noise_array_[x / 128];
+	//			auto& noise_table_ = array_[y / 128];
+	//			EmuMath::ColourRGB<std::uint8_t> colour_byte_ = noise_gradient_.GetColour<std::uint8_t>(noise_table_.at(x % 128, y % 128, z % 1));
+	//			out_ppm_ << (char)colour_byte_.R() << (char)colour_byte_.G() << (char)colour_byte_.B();
+	//		}
+	//	}
+	//	out_ppm_.close();
+	//}
+	//std::cout << "Finished outputting all 3D noise layers from array.\n";
 
 
 

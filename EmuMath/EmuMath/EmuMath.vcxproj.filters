@@ -464,5 +464,11 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_common_fast_noise_gen_functors_includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FastNoiseGen2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FastNoiseGen1D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

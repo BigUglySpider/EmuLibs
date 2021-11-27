@@ -193,6 +193,7 @@ namespace EmuMath
 		inline bool GenerateNoise(const options_type& options_, SampleProcessor_ sample_processor_)
 		{
 			using register_type = __m128;
+			using underlying_noise_gen_functor = EmuMath::FastNoiseGenFunctor<num_dimensions, NoiseType_, register_type>;
 
 			if (_valid_resolution(options_.table_resolution))
 			{
@@ -201,7 +202,7 @@ namespace EmuMath
 				// TODO: OTHER RESOLUTIONS
 				if (options_.use_fractal_noise)
 				{
-					using fractal_generator = EmuMath::Functors::fractal_noise_wrapper<EmuMath::Functors::make_fast_noise_3d<NoiseType_, register_type>, register_type>;
+					using fractal_generator = EmuMath::Functors::fractal_noise_wrapper<underlying_noise_gen_functor, register_type>;
 					_do_generation<register_type, fractal_generator, SampleProcessor_&>
 					(
 						fractal_generator
@@ -217,7 +218,7 @@ namespace EmuMath
 				}
 				else
 				{
-					using no_fractal_generator = EmuMath::Functors::no_fractal_noise_wrapper<EmuMath::Functors::make_fast_noise_3d<NoiseType_, register_type>, register_type>;
+					using no_fractal_generator = EmuMath::Functors::no_fractal_noise_wrapper<underlying_noise_gen_functor, register_type>;
 					_do_generation<register_type, no_fractal_generator, SampleProcessor_&>
 					(
 						no_fractal_generator
