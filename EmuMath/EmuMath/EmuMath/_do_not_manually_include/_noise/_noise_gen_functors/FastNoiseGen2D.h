@@ -179,9 +179,9 @@ namespace EmuMath::Functors
 
 			// Finish off indices
 			ix_0_128_ = EmuSIMD::bitwise_and(ix_0_128_, permutations_mask_128_);
-			__m128i ix_1_128_ = EmuSIMD::bitwise_and(EmuSIMD::add(ix_0_128_, one_128i_), permutations_mask_128_);
+			__m128i ix_1_128_ = EmuSIMD::bitwise_and(EmuSIMD::add<32>(ix_0_128_, one_128i_), permutations_mask_128_);
 			iy_0_128_ = EmuSIMD::bitwise_and(iy_0_128_, permutations_mask_128_);
-			__m128i iy_1_128_ = EmuSIMD::bitwise_and(EmuSIMD::add(iy_0_128_, one_128i_), permutations_mask_128_);
+			__m128i iy_1_128_ = EmuSIMD::bitwise_and(EmuSIMD::add<32>(iy_0_128_, one_128i_), permutations_mask_128_);
 
 			int ix_0_[4];
 			int ix_1_[4];
