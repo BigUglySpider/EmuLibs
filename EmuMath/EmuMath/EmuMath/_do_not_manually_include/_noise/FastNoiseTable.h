@@ -183,9 +183,21 @@ namespace EmuMath
 		}
 #pragma endregion
 
-		coordinate_type size() const
+		[[nodiscard]] inline coordinate_type size() const
 		{
 			return table_size;
+		}
+		template<std::size_t Index_>
+		[[nodiscard]] inline std::size_t size() const
+		{
+			if constexpr (Index_ < num_dimensions)
+			{
+				return table_size.at<Index_>();
+			}
+			else
+			{
+				static_assert(false, "Provided an invalid index to EmuMath::FastNoiseTable::size. The provided Index_ must be less than the number of dimensions the table covers.");
+			}
 		}
 
 #pragma region GENERATION
@@ -265,6 +277,65 @@ namespace EmuMath
 			if (i_ < end_)
 			{
 				Register_ sample_batch_ = sample_processor_(generator_(points_x_, points_y_, points_z_));
+				if ((i_ + 1) == end_)
+				{
+					out_layer_[i_] = EmuSIMD::get_index<0, value_type>(sample_batch_);
+				}
+				else
+				{
+					value_type calculated_values_[EmuSIMD::TMP::simd_register_width_v<Register_> / (sizeof(value_type) * 8)] = {};
+					EmuSIMD::store(sample_batch_, calculated_values_);
+					for (std::size_t index_ = 0; i_ < end_; ++i_, ++index_)
+					{
+						out_layer_[i_] = calculated_values_[index_];
+					}
+				}
+			}
+		}
+		template<class Generator_, class SampleProcessor_, class OutLayer_, class Register_>
+		inline void _finish_major_segment_partial
+		(
+			Generator_& generator_,
+			SampleProcessor_& sample_processor_,
+			OutLayer_& out_layer_,
+			Register_ points_x_,
+			Register_ points_y_,
+			std::size_t i_,
+			const std::size_t end_
+		)
+		{
+			if (i_ < end_)
+			{
+				Register_ sample_batch_ = sample_processor_(generator_(points_x_, points_y_));
+				if ((i_ + 1) == end_)
+				{
+					out_layer_[i_] = EmuSIMD::get_index<0, value_type>(sample_batch_);
+				}
+				else
+				{
+					value_type calculated_values_[EmuSIMD::TMP::simd_register_width_v<Register_> / (sizeof(value_type) * 8)] = {};
+					EmuSIMD::store(sample_batch_, calculated_values_);
+					for (std::size_t index_ = 0; i_ < end_; ++i_, ++index_)
+					{
+						out_layer_[i_] = calculated_values_[index_];
+					}
+				}
+			}
+		}
+		template<class Generator_, class SampleProcessor_, class OutLayer_, class Register_>
+		inline void _finish_major_segment_partial
+		(
+			Generator_& generator_,
+			SampleProcessor_& sample_processor_,
+			OutLayer_& out_layer_,
+			Register_ points_x_,
+			std::size_t i_,
+			const std::size_t end_
+		)
+		{
+			if (i_ < end_)
+			{
+				Register_ sample_batch_ = sample_processor_(generator_(points_x_));
 				if ((i_ + 1) == end_)
 				{
 					out_layer_[i_] = EmuSIMD::get_index<0, value_type>(sample_batch_);
@@ -396,8 +467,6 @@ namespace EmuMath
 			}
 			else if constexpr (num_dimensions == 2)
 			{
-				Register_ empty_ = Register_();
-
 				std::size_t end_x_ = table_size.at<0>();
 				std::size_t end_y_ = table_size.at<1>();
 				std::size_t end_store_batch_ = table_size.at<major_dimension>();
@@ -420,10 +489,10 @@ namespace EmuMath
 						points_x_ = start_x_;
 						for (; x < end_store_batch_; x += num_elements_per_batch)
 						{
-							EmuSIMD::store(sample_processor_(generator_(points_x_, points_y_, empty_)), &(layer_[x]));
+							EmuSIMD::store(sample_processor_(generator_(points_x_, points_y_)), &(layer_[x]));
 							points_x_ = EmuSIMD::add(points_x_, step_x_);
 						}
-						_finish_major_segment_partial(generator_, sample_processor_, layer_, points_x_, points_y_, empty_, x, end_x_);
+						_finish_major_segment_partial(generator_, sample_processor_, layer_, points_x_, points_y_, x, end_x_);
 						points_y_ = EmuSIMD::add(points_y_, step_y_);
 					}
 				}
@@ -438,13 +507,33 @@ namespace EmuMath
 						points_y_ = start_y_;
 						for (; y < end_store_batch_; y += num_elements_per_batch)
 						{
-							EmuSIMD::store(sample_processor_(generator_(points_x_, points_y_, empty_)), &(layer_[y]));
+							EmuSIMD::store(sample_processor_(generator_(points_x_, points_y_)), &(layer_[y]));
 							points_y_ = EmuSIMD::add(points_y_, step_y_);
 						}
-						_finish_major_segment_partial(generator_, sample_processor_, layer_, points_x_, points_y_, empty_, y, end_y_);
+						_finish_major_segment_partial(generator_, sample_processor_, layer_, points_x_, points_y_, y, end_y_);
 						points_x_ = EmuSIMD::add(points_x_, step_x_);
 					}
 				}
+			}
+			else if constexpr (num_dimensions == 1)
+			{
+				std::size_t end_ = table_size.at<0>();
+				std::size_t end_store_batch_ = table_size.at<0>();
+				end_store_batch_ -= end_store_batch_ % num_elements_per_batch;
+
+
+				Register_ points_simd_ = EmuSIMD::set1<Register_>(start_.at<0>());
+				Register_ step_simd_ = EmuSIMD::set1<Register_>(step_.at<0>());
+				points_simd_ = EmuSIMD::add(points_simd_, EmuSIMD::mul_all(step_simd_, EmuSIMD::setr_incrementing<Register_, 0>()));
+				step_simd_ = EmuSIMD::mul(step_simd_, EmuSIMD::set1<Register_>(num_elements_per_batch_value_cast));
+
+				std::size_t i = 0;
+				for (; i < end_store_batch_; i += num_elements_per_batch)
+				{
+					EmuSIMD::store(sample_processor_(generator_(points_simd_)), &(samples[i]));
+					points_simd_ = EmuSIMD::add(points_simd_, step_simd_);
+				}
+				_finish_major_segment_partial(generator_, sample_processor_, samples, points_simd_, i, end_);
 			}
 			else
 			{

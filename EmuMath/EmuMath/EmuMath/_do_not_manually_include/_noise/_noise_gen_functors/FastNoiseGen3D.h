@@ -190,32 +190,11 @@ namespace EmuMath::Functors
 	struct make_fast_noise_3d<EmuMath::NoiseType::PERLIN, __m128>
 	{
 	public:
-		using gradient_type = EmuMath::Vector<3, float>;
-		static constexpr std::size_t _num_gradients = 16;
-		static constexpr gradient_type _gradients[_num_gradients] =
-		{
-			gradient_type(1, 1, 0),
-			gradient_type(-1, 1, 0),
-			gradient_type(1, -1, 0),
-			gradient_type(-1, -1, 0),
-			gradient_type(1, 0, 1),
-			gradient_type(-1, 0, 1),
-			gradient_type(1, 0, -1),
-			gradient_type(-1, 0, -1),
-			gradient_type(0, 1,  1),
-			gradient_type(0, -1,  1),
-			gradient_type(0, 1, -1),
-			gradient_type(0, -1, -1),
-			// Filler values for successful bit masking; specific values are used to introduce no directional bias as per Ken Perlin
-			gradient_type(1, 1, 0),
-			gradient_type(-1, 1, 0),
-			gradient_type(0, -1, 1),
-			gradient_type(0, -1, -1)
-		};
-		static constexpr EmuMath::NoisePermutationValue _gradient_mask = 15;
+		using gradients = EmuMath::Functors::_underlying_noise_gen::perlin_gradients<3, __m128>;
 
 		/// <summary> Gradients for calculation. W index contains a duplicate of the Z index. </summary>
-		std::array<__m128, _num_gradients> _gradients_128;
+		const typename gradients::register_array _gradients_128;
+		static constexpr std::size_t _duplicate_gradient_index = 2;
 
 		make_fast_noise_3d() :
 			smooth_t(),
@@ -225,25 +204,7 @@ namespace EmuMath::Functors
 			iy_1(),
 			iz_0(),
 			iz_1(),
-			_gradients_128
-			({
-				EmuSIMD::set<__m128>(0.0f, 0.0f, 1.0f, 1.0f),
-				EmuSIMD::set<__m128>(0.0f, 0.0f, 1.0f, -1.0f),
-				EmuSIMD::set<__m128>(0.0f, 0.0f, -1.0f, 1.0f),
-				EmuSIMD::set<__m128>(0.0f, 0.0f, -1.0f, -1.0f),
-				EmuSIMD::set<__m128>(1.0f, 1.0f, 0.0f, 1.0f),
-				EmuSIMD::set<__m128>(1.0f, 1.0f, 0.0f, -1.0f),
-				EmuSIMD::set<__m128>(-1.0f, -1.0f, 0.0f, 1.0f),
-				EmuSIMD::set<__m128>(-1.0f, -1.0f, 0.0f, -1.0f),
-				EmuSIMD::set<__m128>(1.0f, 1.0f, 1.0f, 0.0f),
-				EmuSIMD::set<__m128>(1.0f, 1.0f, -1.0f, 0.0f),
-				EmuSIMD::set<__m128>(-1.0f, -1.0f, 1.0f, 0.0f),
-				EmuSIMD::set<__m128>(-1.0f, -1.0f, -1.0f, 0.0f),
-				EmuSIMD::set<__m128>(0.0f, 0.0f, 1.0f, 1.0f),
-				EmuSIMD::set<__m128>(0.0f, 0.0f, 1.0f, -1.0f),
-				EmuSIMD::set<__m128>(1.0f, 1.0f, -1.0f, 0.0f),
-				EmuSIMD::set<__m128>(-1.0f, -1.0f, -1.0f, 0.0f)
-			})
+			_gradients_128(gradients::init_registers<_duplicate_gradient_index>())
 		{
 		}
 
@@ -387,14 +348,14 @@ namespace EmuMath::Functors
 				perm_10_ = static_cast<std::size_t>(permutations_[(perm_1_ + iy_0[i]) & mask_]);
 				perm_11_ = static_cast<std::size_t>(permutations_[(perm_1_ + iy_1[i]) & mask_]);
 
-				perm_000_[i] = static_cast<std::size_t>(permutations_[(perm_00_ + iz_0[i]) & mask_]) & _gradient_mask;
-				perm_001_[i] = static_cast<std::size_t>(permutations_[(perm_00_ + iz_1[i]) & mask_]) & _gradient_mask;
-				perm_010_[i] = static_cast<std::size_t>(permutations_[(perm_01_ + iz_0[i]) & mask_]) & _gradient_mask;
-				perm_011_[i] = static_cast<std::size_t>(permutations_[(perm_01_ + iz_1[i]) & mask_]) & _gradient_mask;
-				perm_100_[i] = static_cast<std::size_t>(permutations_[(perm_10_ + iz_0[i]) & mask_]) & _gradient_mask;
-				perm_101_[i] = static_cast<std::size_t>(permutations_[(perm_10_ + iz_1[i]) & mask_]) & _gradient_mask;
-				perm_110_[i] = static_cast<std::size_t>(permutations_[(perm_11_ + iz_0[i]) & mask_]) & _gradient_mask;
-				perm_111_[i] = static_cast<std::size_t>(permutations_[(perm_11_ + iz_1[i]) & mask_]) & _gradient_mask;
+				perm_000_[i] = static_cast<std::size_t>(permutations_[(perm_00_ + iz_0[i]) & mask_]) & gradients::mask;
+				perm_001_[i] = static_cast<std::size_t>(permutations_[(perm_00_ + iz_1[i]) & mask_]) & gradients::mask;
+				perm_010_[i] = static_cast<std::size_t>(permutations_[(perm_01_ + iz_0[i]) & mask_]) & gradients::mask;
+				perm_011_[i] = static_cast<std::size_t>(permutations_[(perm_01_ + iz_1[i]) & mask_]) & gradients::mask;
+				perm_100_[i] = static_cast<std::size_t>(permutations_[(perm_10_ + iz_0[i]) & mask_]) & gradients::mask;
+				perm_101_[i] = static_cast<std::size_t>(permutations_[(perm_10_ + iz_1[i]) & mask_]) & gradients::mask;
+				perm_110_[i] = static_cast<std::size_t>(permutations_[(perm_11_ + iz_0[i]) & mask_]) & gradients::mask;
+				perm_111_[i] = static_cast<std::size_t>(permutations_[(perm_11_ + iz_1[i]) & mask_]) & gradients::mask;
 			}
 
 			// Use discovered permutations to form gradient dot products for our output values

@@ -104,21 +104,8 @@ namespace EmuMath::Functors
 	{
 		static_assert(std::is_floating_point_v<FP_>, "Invalid FP_ type argument provided to EmuMath::Functors::make_noise_2d; the type must be a floating point.");
 		using value_type = FP_;
-		using gradient_type = EmuMath::Vector<2, value_type>;
-
-		static constexpr std::size_t _num_gradients = 8;
-		static constexpr gradient_type _gradients[_num_gradients] =
-		{
-			gradient_type(1, 0),
-			gradient_type(-1, 0),
-			gradient_type(0, 1),
-			gradient_type(0, -1),
-			gradient_type(1, 1).NormaliseConstexpr(),
-			gradient_type(-1, 1).NormaliseConstexpr(),
-			gradient_type(1, -1).NormaliseConstexpr(),
-			gradient_type(-1, -1).NormaliseConstexpr()
-		};
-		static constexpr EmuMath::NoisePermutationValue _gradient_mask = 7;
+		using gradients = EmuMath::Functors::_underlying_noise_gen::perlin_gradients<2, FP_>;
+		using gradient_type = typename gradients::gradient_type;
 
 		EmuCore::do_lerp<value_type, value_type, value_type> lerp_;
 		EmuCore::do_floor<value_type> floor_;
@@ -143,10 +130,10 @@ namespace EmuMath::Functors
 			// Forced store as size_t so we can handle width changes if EmuMath::NoisePermutationValue is not size_t width
 			std::size_t h0 = static_cast<std::size_t>(permutations_[ix0]);
 			std::size_t h1 = static_cast<std::size_t>(permutations_[ix1]);
-			gradient_type g00 = _gradients[permutations_[(h0 + iy0) & mask_] & _gradient_mask];
-			gradient_type g10 = _gradients[permutations_[(h1 + iy0) & mask_] & _gradient_mask];
-			gradient_type g01 = _gradients[permutations_[(h0 + iy1) & mask_] & _gradient_mask];
-			gradient_type g11 = _gradients[permutations_[(h1 + iy1) & mask_] & _gradient_mask];
+			gradient_type g00 = gradients::values[permutations_[(h0 + iy0) & mask_] & gradients::mask];
+			gradient_type g10 = gradients::values[permutations_[(h1 + iy0) & mask_] & gradients::mask];
+			gradient_type g01 = gradients::values[permutations_[(h0 + iy1) & mask_] & gradients::mask];
+			gradient_type g11 = gradients::values[permutations_[(h1 + iy1) & mask_] & gradients::mask];
 
 			value_type v00 = EmuMath::Functors::_underlying_noise_gen::DotWithScalar(g00, tx0, ty0);
 			value_type v10 = EmuMath::Functors::_underlying_noise_gen::DotWithScalar(g10, tx1, ty0);
