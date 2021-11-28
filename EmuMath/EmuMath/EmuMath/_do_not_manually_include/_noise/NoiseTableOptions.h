@@ -107,7 +107,7 @@ namespace EmuMath
 		/// </para>
 		/// </summary>
 		/// <returns>Step to use based on these options.</returns>
-		constexpr inline EmuMath::Vector<num_dimensions, value_type> MakeStep() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_dimensions, value_type> MakeStep() const
 		{
 			if (step_mode)
 			{

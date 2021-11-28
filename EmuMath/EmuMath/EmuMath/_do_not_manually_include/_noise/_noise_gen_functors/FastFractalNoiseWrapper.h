@@ -41,7 +41,7 @@ namespace EmuMath::Functors
 				starting_freq_simd(EmuSIMD::set1<register_type>(freq_)),
 				lacunarity_simd(EmuSIMD::set1<register_type>(fractal_info_.GetLacunarity())),
 				gain_simd(EmuSIMD::set1<register_type>(fractal_info_.GetGain())),
-				permutation_mask_simd(EmuSIMD::set1<integral_register_type>(permutations_.MaxValue())),
+				permutation_mask_simd(EmuSIMD::set1<integral_register_type>(permutations_.HighestStoredValue())),
 				fractal_info(fractal_info_),
 				permutations(permutations_),
 				generator(generator_constructor_args_...)
@@ -58,7 +58,7 @@ namespace EmuMath::Functors
 				starting_freq_simd(EmuSIMD::set1<register_type>(freq_)),
 				lacunarity_simd(EmuSIMD::set1<register_type>(fractal_info_.GetLacunarity())),
 				gain_simd(EmuSIMD::set1<register_type>(fractal_info_.GetGain())),
-				permutation_mask_simd(EmuSIMD::set1<integral_register_type>(permutations_.MaxValue())),
+				permutation_mask_simd(EmuSIMD::set1<integral_register_type>(permutations_.HighestStoredValue())),
 				fractal_info(fractal_info_),
 				permutations(permutations_),
 				generator(generator_constructor_args_...)
@@ -233,7 +233,7 @@ namespace EmuMath::Functors
 			permutations(permutations_),
 			generator(generator_constructor_args_...)
 		{
-			permutations_mask_128 = _mm_set1_epi32(static_cast<std::int32_t>(permutations.MaxValue()));
+			permutations_mask_128 = _mm_set1_epi32(static_cast<std::int32_t>(permutations.HighestStoredValue()));
 		}
 		template<typename...GeneratorConstructorArgs_, typename = std::enable_if_t<std::is_constructible_v<generator_type, GeneratorConstructorArgs_...>>>
 		no_fractal_noise_wrapper
@@ -246,7 +246,7 @@ namespace EmuMath::Functors
 			permutations(permutations_),
 			generator(generator_constructor_args_...)
 		{
-			permutations_mask_128 = _mm_set1_epi32(static_cast<std::int32_t>(permutations.MaxValue()));
+			permutations_mask_128 = _mm_set1_epi32(static_cast<std::int32_t>(permutations.HighestStoredValue()));
 		}
 
 		[[nodiscard]] inline __m128 operator()(__m128 points_x_, __m128 points_y_, __m128 points_z_)

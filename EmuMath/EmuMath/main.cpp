@@ -168,7 +168,7 @@ struct SomeStructForTestingEdges
 	constexpr SomeStructForTestingEdges(const Fov_& in_fov_angle_y_, const Near_& in_near_, const AspectRatio_& in_aspect_ratio_) :
 		left_(0.0f), right_(0.0f), bottom_(0.0f), top_(0.0f)
 	{
-		EmuMath::Helpers::MatrixPerspectiveFrustumEdges<false>(in_fov_angle_y_, in_near_, in_aspect_ratio_, left_, right_, bottom_, top_);
+		EmuMath::Helpers::matrix_perspective_frustum_edges<false>(in_fov_angle_y_, in_near_, in_aspect_ratio_, left_, right_, bottom_, top_);
 	}
 
 	float left_;
@@ -319,6 +319,10 @@ int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
 	EmuCore::Timer<std::milli> timer_;
+
+	EmuMath::Vector<5, float> aaaaa;
+	EmuMath::Matrix<1, 27, int> bbbbb;
+
 
 	constexpr EmuMath::ColourRGB<float> colour_(-0.2f, 2.5, 2.0f);
 	constexpr auto wrapped_ = colour_.Wrapped<std::uint8_t, true>();

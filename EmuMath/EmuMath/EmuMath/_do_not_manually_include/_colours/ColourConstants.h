@@ -27,9 +27,9 @@ namespace EmuMath::Colours
 			using out_channel_type = typename OutColour_::value_type;
 			return OutColour_
 			(
-				EmuMath::Helpers::convert_colour_channel<out_channel_type, R_>(r_),
-				EmuMath::Helpers::convert_colour_channel<out_channel_type, G_>(g_),
-				EmuMath::Helpers::convert_colour_channel<out_channel_type, B_>(b_)
+				EmuMath::Helpers::colour_convert_channel<out_channel_type, R_>(r_),
+				EmuMath::Helpers::colour_convert_channel<out_channel_type, G_>(g_),
+				EmuMath::Helpers::colour_convert_channel<out_channel_type, B_>(b_)
 			);
 		}
 		else
@@ -47,19 +47,19 @@ namespace EmuMath::Colours
 			{
 				return OutColour_
 				(
-					EmuMath::Helpers::convert_colour_channel<out_channel_type, R_>(r_),
-					EmuMath::Helpers::convert_colour_channel<out_channel_type, G_>(g_),
-					EmuMath::Helpers::convert_colour_channel<out_channel_type, B_>(b_),
-					EmuMath::Helpers::convert_colour_channel<out_channel_type, A_>(a_)
+					EmuMath::Helpers::colour_convert_channel<out_channel_type, R_>(r_),
+					EmuMath::Helpers::colour_convert_channel<out_channel_type, G_>(g_),
+					EmuMath::Helpers::colour_convert_channel<out_channel_type, B_>(b_),
+					EmuMath::Helpers::colour_convert_channel<out_channel_type, A_>(a_)
 				);
 			}
 			else
 			{
 				return OutColour_
 				(
-					EmuMath::Helpers::convert_colour_channel<out_channel_type, R_>(r_),
-					EmuMath::Helpers::convert_colour_channel<out_channel_type, G_>(g_),
-					EmuMath::Helpers::convert_colour_channel<out_channel_type, B_>(b_)
+					EmuMath::Helpers::colour_convert_channel<out_channel_type, R_>(r_),
+					EmuMath::Helpers::colour_convert_channel<out_channel_type, G_>(g_),
+					EmuMath::Helpers::colour_convert_channel<out_channel_type, B_>(b_)
 				);
 			}
 		}

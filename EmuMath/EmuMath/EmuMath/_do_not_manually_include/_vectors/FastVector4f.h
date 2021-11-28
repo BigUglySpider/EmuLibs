@@ -50,10 +50,10 @@ namespace EmuMath
 		explicit FastVector4f(const EmuMath::Vector<ToCopySize_, to_copy_contained_type>& toCopy_) : 
 			FastVector4f
 			(
-				EmuMath::Helpers::VectorGetTheoretical<0, float>(toCopy_),
-				EmuMath::Helpers::VectorGetTheoretical<1, float>(toCopy_),
-				EmuMath::Helpers::VectorGetTheoretical<2, float>(toCopy_),
-				EmuMath::Helpers::VectorGetTheoretical<3, float>(toCopy_)
+				EmuMath::Helpers::vector_get_theoretical<0, float>(toCopy_),
+				EmuMath::Helpers::vector_get_theoretical<1, float>(toCopy_),
+				EmuMath::Helpers::vector_get_theoretical<2, float>(toCopy_),
+				EmuMath::Helpers::vector_get_theoretical<3, float>(toCopy_)
 			)
 		{
 		}
@@ -152,10 +152,10 @@ namespace EmuMath
 				// Defer to set (x, y, z, w) since passing an EmuMath vector is assumed to mean "copy the data of this vector"
 				this->Set
 				(
-					EmuMath::Helpers::VectorGetTheoretical<0, float>(toCopy_),
-					EmuMath::Helpers::VectorGetTheoretical<1, float>(toCopy_),
-					EmuMath::Helpers::VectorGetTheoretical<2, float>(toCopy_),
-					EmuMath::Helpers::VectorGetTheoretical<3, float>(toCopy_)
+					EmuMath::Helpers::vector_get_theoretical<0, float>(toCopy_),
+					EmuMath::Helpers::vector_get_theoretical<1, float>(toCopy_),
+					EmuMath::Helpers::vector_get_theoretical<2, float>(toCopy_),
+					EmuMath::Helpers::vector_get_theoretical<3, float>(toCopy_)
 				);
 			}
 			else
@@ -209,10 +209,10 @@ namespace EmuMath
 		{
 			this->Set
 			(
-				EmuMath::Helpers::VectorGetTheoretical<X_, float>(toLoad_),
-				EmuMath::Helpers::VectorGetTheoretical<Y_, float>(toLoad_),
-				EmuMath::Helpers::VectorGetTheoretical<Z_, float>(toLoad_),
-				EmuMath::Helpers::VectorGetTheoretical<W_, float>(toLoad_)
+				EmuMath::Helpers::vector_get_theoretical<X_, float>(toLoad_),
+				EmuMath::Helpers::vector_get_theoretical<Y_, float>(toLoad_),
+				EmuMath::Helpers::vector_get_theoretical<Z_, float>(toLoad_),
+				EmuMath::Helpers::vector_get_theoretical<W_, float>(toLoad_)
 			);
 		}
 
@@ -269,10 +269,10 @@ namespace EmuMath
 			{
 				this->Set
 				(
-					EmuMath::Helpers::VectorGetTheoretical<IndexOffset_ + 0, float>(toLoad_),
-					EmuMath::Helpers::VectorGetTheoretical<IndexOffset_ + 1, float>(toLoad_),
-					EmuMath::Helpers::VectorGetTheoretical<IndexOffset_ + 2, float>(toLoad_),
-					EmuMath::Helpers::VectorGetTheoretical<IndexOffset_ + 3, float>(toLoad_)
+					EmuMath::Helpers::vector_get_theoretical<IndexOffset_ + 0, float>(toLoad_),
+					EmuMath::Helpers::vector_get_theoretical<IndexOffset_ + 1, float>(toLoad_),
+					EmuMath::Helpers::vector_get_theoretical<IndexOffset_ + 2, float>(toLoad_),
+					EmuMath::Helpers::vector_get_theoretical<IndexOffset_ + 3, float>(toLoad_)
 				);
 			}
 		}

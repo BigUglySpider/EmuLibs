@@ -135,11 +135,11 @@ namespace EmuMath
 			}
 			else if constexpr (num_dimensions == 2)
 			{
-				return at(indices_.at<0>(), EmuMath::Helpers::VectorGetTheoretical<1>(indices_));
+				return at(indices_.at<0>(), EmuMath::Helpers::vector_get_theoretical<1>(indices_));
 			}
 			else if constexpr (num_dimensions == 3)
 			{
-				return at(indices_.at<0>(), EmuMath::Helpers::VectorGetTheoretical<1>(indices_), EmuMath::Helpers::VectorGetTheoretical<2>(indices_));
+				return at(indices_.at<0>(), EmuMath::Helpers::vector_get_theoretical<1>(indices_), EmuMath::Helpers::vector_get_theoretical<2>(indices_));
 			}
 			else
 			{
@@ -520,7 +520,7 @@ namespace EmuMath
 		template<EmuMath::NoiseType NoiseType_, class SampleProcessor_ = EmuMath::Functors::noise_sample_processor_default>
 		inline bool GenerateNoise(const options_type& options_, SampleProcessor_ sample_processor_)
 		{
-			using underlying_noise_gen_functor = EmuMath::NoiseGenFunctor<num_dimensions, NoiseType_, value_type>;
+			using underlying_noise_gen_functor = EmuMath::noise_gen_functor<num_dimensions, NoiseType_, value_type>;
 			if (_valid_resolution(options_.table_resolution))
 			{
 				_do_resize(options_.table_resolution);

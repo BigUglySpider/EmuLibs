@@ -301,12 +301,12 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i)
 		{
-			//out_[i] = DirectX::XMMatrixMultiply(lhs_[i], rhs_[i]);
-			//out_[i] = DirectX::XMMatrixRotationX(EmuCore::Pi::DegsToRads(angles_[i]));
+			//out_[i] = DirectX::XMmatrix_multiply(lhs_[i], rhs_[i]);
+			//out_[i] = DirectX::XMmatrix_rotation_x(EmuCore::Pi::DegsToRads(angles_[i]));
 			//out_[i] = DirectX::XMMatrixPerspectiveFovRH(EmuCore::Pi::DegsToRads(fov_angle_y_degs_[i]), aspect_ratios_[i], nears_[i], fars_[i]);
 			//DirectX::XMMATRIX lhs_mat_ = DirectX::XMLoadFloat4x4(&lhs_readable_[i]);
 			//DirectX::XMMATRIX rhs_mat_ = DirectX::XMLoadFloat4x4(&rhs_readable_[i]);
-			//DirectX::XMStoreFloat4x4(&out_readable_[i], DirectX::XMMatrixMultiply(lhs_mat_, rhs_mat_));
+			//DirectX::XMStoreFloat4x4(&out_readable_[i], DirectX::XMmatrix_multiply(lhs_mat_, rhs_mat_));
 
 			DirectX::XMStoreFloat4x4(&out_readable_[i], DirectX::XMMatrixInverse(nullptr, in_[i]));
 		}

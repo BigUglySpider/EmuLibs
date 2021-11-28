@@ -17,7 +17,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right of a bitwise AND.</param>
 	/// <returns>Matrix resulting from a bitwise AND between lhs_ and rhs_.</returns>
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixAnd
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> matrix_and
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
@@ -39,68 +39,68 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixAnd
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_> matrix_and
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixAnd<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_and<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_> MatrixAnd
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_> matrix_and
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixAnd<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_and<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_> MatrixAnd
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_> matrix_and
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixAnd<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_and<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major> MatrixAnd
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major> matrix_and
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixAnd<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_and<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<typename out_contained_type, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major> MatrixAnd
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major> matrix_and
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixAnd<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_and<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major> MatrixAnd
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major> matrix_and
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixAnd<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_and<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major> MatrixAnd
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major> matrix_and
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixAnd<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_and<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -115,7 +115,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right of a bitwise OR.</param>
 	/// <returns>Matrix resulting from a bitwise OR between lhs_ and rhs_.</returns>
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixOr
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> matrix_or
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
@@ -137,68 +137,68 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixOr
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_> matrix_or
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixOr<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_or<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_> MatrixOr
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_> matrix_or
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixOr<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_or<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_> MatrixOr
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_> matrix_or
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixOr<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_or<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major> MatrixOr
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major> matrix_or
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixOr<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_or<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<typename out_contained_type, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major> MatrixOr
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major> matrix_or
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixOr<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_or<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major> MatrixOr
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major> matrix_or
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixOr<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_or<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major> MatrixOr
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major> matrix_or
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixOr<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_or<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -213,7 +213,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Item appearing on the right of a bitwise XOR.</param>
 	/// <returns>Matrix resulting from a bitwise XOR between lhs_ and rhs_.</returns>
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixXor
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> matrix_xor
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
@@ -235,68 +235,68 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixXor
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_> matrix_xor
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixXor<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_xor<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_> MatrixXor
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_> matrix_xor
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixXor<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_xor<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_> MatrixXor
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_> matrix_xor
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixXor<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_xor<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, OutColumnMajor_, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major> MatrixXor
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major> matrix_xor
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixXor<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_xor<OutNumColumns_, OutNumRows_, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<typename out_contained_type, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major> MatrixXor
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major> matrix_xor
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixXor<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_xor<LhsMatrix_::num_columns, LhsMatrix_::num_rows, out_contained_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major> MatrixXor
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major> matrix_xor
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixXor<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_xor<OutNumColumns_, OutNumRows_, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 	template<class LhsMatrix_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major> MatrixXor
+	[[nodiscard]] constexpr inline EmuMath::Matrix<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major> matrix_xor
 	(
 		const LhsMatrix_& lhs_,
 		const Rhs_& rhs_
 	)
 	{
-		return MatrixXor<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
+		return matrix_xor<LhsMatrix_::num_columns, LhsMatrix_::num_rows, typename LhsMatrix_::value_type, LhsMatrix_::is_column_major, LhsMatrix_, Rhs_>(lhs_, rhs_);
 	}
 
 	/// <summary> Returns a bit-inverted version of the passed EmuMath matrix, where all elements [x][y] can be summarised as ~[x][y]. </summary>
@@ -305,7 +305,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to negate.</param>
 	/// <returns>Copy of the provided matrix after a bitwise NOT operation.</returns>
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Matrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixNot(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> matrix_not(const Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
@@ -322,47 +322,47 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixNot(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> matrix_not(const Matrix_& matrix_)
 	{
-		return MatrixNot<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_, Matrix_>(matrix_);
+		return matrix_not<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_, Matrix_>(matrix_);
 	}
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Matrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> MatrixNot(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> matrix_not(const Matrix_& matrix_)
 	{
-		return MatrixNot<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+		return matrix_not<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
 	}
 	template<bool OutColumnMajor_, class Matrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixNot
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> matrix_not
 	(
 		const Matrix_& matrix_
 	)
 	{
-		return MatrixNot<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+		return matrix_not<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
 	}
 
 
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Matrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> MatrixNot(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> matrix_not(const Matrix_& matrix_)
 	{
-		return MatrixNot<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+		return matrix_not<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 	template<typename out_contained_type, class Matrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixNot(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> matrix_not(const Matrix_& matrix_)
 	{
-		return MatrixNot<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+		return matrix_not<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Matrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> MatrixNot(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> matrix_not(const Matrix_& matrix_)
 	{
-		return MatrixNot<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+		return matrix_not<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 	template<class Matrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixNot
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> matrix_not
 	(
 		const Matrix_& matrix_
 	)
 	{
-		return MatrixNot<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+		return matrix_not<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 
 	/// <summary>
@@ -377,7 +377,7 @@ namespace EmuMath::Helpers
 	/// <param name="num_shifts_">Number of shifts to perform on the passed matrix as defined above.</param>
 	/// <returns>EmuMath matrix copy of the passed matrix with each element shifted to the left a number of times indicated by num_shifts_.</returns>
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixShiftLeft
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> matrix_shift_left
 	(
 		const Matrix_& matrix_,
 		const Shifts_& num_shifts_
@@ -399,67 +399,67 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixShiftLeft
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> matrix_shift_left
 	(
 		const Matrix_& matrix_,
 		const Shifts_& num_shifts_
 	)
 	{
-		return MatrixShiftLeft<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_, Matrix_, Shifts_>(matrix_, num_shifts_);
+		return matrix_shift_left<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_, Matrix_, Shifts_>(matrix_, num_shifts_);
 	}
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Matrix_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> MatrixShiftLeft
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> matrix_shift_left
 	(
 		const Matrix_& matrix_,
 		const Shifts_& num_shifts_
 	)
 	{
-		return MatrixShiftLeft<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_, Matrix_, Shifts_>(matrix_, num_shifts_);
+		return matrix_shift_left<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_, Matrix_, Shifts_>(matrix_, num_shifts_);
 	}
 	template<bool OutColumnMajor_, class Matrix_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixShiftLeft
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> matrix_shift_left
 	(
 		const Matrix_& matrix_,
 		const Shifts_& num_shifts_
 	)
 	{
-		return MatrixShiftLeft<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_, Matrix_, Shifts_>(matrix_, num_shifts_);
+		return matrix_shift_left<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_, Matrix_, Shifts_>(matrix_, num_shifts_);
 	}
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Matrix_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> MatrixShiftLeft
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> matrix_shift_left
 	(
 		const Matrix_& matrix_,
 		const Shifts_& num_shifts_
 	)
 	{
-		return MatrixShiftLeft<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
+		return matrix_shift_left<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
 	}
 	template<typename out_contained_type, class Matrix_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixShiftLeft
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> matrix_shift_left
 	(
 		const Matrix_& matrix_,
 		const Shifts_& num_shifts_
 	)
 	{
-		return MatrixShiftLeft<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
+		return matrix_shift_left<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
 	}
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Matrix_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> MatrixShiftLeft
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> matrix_shift_left
 	(
 		const Matrix_& matrix_,
 		const Shifts_& num_shifts_
 	)
 	{
-		return MatrixShiftLeft<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
+		return matrix_shift_left<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
 	}
 	template<class Matrix_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixShiftLeft
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> matrix_shift_left
 	(
 		const Matrix_& matrix_,
 		const Shifts_& num_shifts_
 	)
 	{
-		return MatrixShiftLeft<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
+		return matrix_shift_left<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
 	}
 
 	/// <summary>
@@ -474,7 +474,7 @@ namespace EmuMath::Helpers
 	/// <param name="num_shifts_">Number of shifts to perform on the passed matrix as defined above.</param>
 	/// <returns>EmuMath matrix copy of the passed matrix with each element shifted to the right a number of times indicated by num_shifts_.</returns>
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixShiftRight
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> matrix_shift_right
 	(
 		const Matrix_& matrix_,
 		const Shifts_& num_shifts_
@@ -496,67 +496,67 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixShiftRight
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> matrix_shift_right
 	(
 		const Matrix_& matrix_,
 		const Shifts_& num_shifts_
 	)
 	{
-		return MatrixShiftRight<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_, Matrix_, Shifts_>(matrix_, num_shifts_);
+		return matrix_shift_right<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_, Matrix_, Shifts_>(matrix_, num_shifts_);
 	}
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Matrix_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> MatrixShiftRight
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> matrix_shift_right
 	(
 		const Matrix_& matrix_,
 		const Shifts_& num_shifts_
 	)
 	{
-		return MatrixShiftRight<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_, Matrix_, Shifts_>(matrix_, num_shifts_);
+		return matrix_shift_right<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_, Matrix_, Shifts_>(matrix_, num_shifts_);
 	}
 	template<bool OutColumnMajor_, class Matrix_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixShiftRight
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> matrix_shift_right
 	(
 		const Matrix_& matrix_,
 		const Shifts_& num_shifts_
 	)
 	{
-		return MatrixShiftRight<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_, Matrix_, Shifts_>(matrix_, num_shifts_);
+		return matrix_shift_right<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_, Matrix_, Shifts_>(matrix_, num_shifts_);
 	}
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Matrix_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> MatrixShiftRight
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> matrix_shift_right
 	(
 		const Matrix_& matrix_,
 		const Shifts_& num_shifts_
 	)
 	{
-		return MatrixShiftRight<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
+		return matrix_shift_right<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
 	}
 	template<typename out_contained_type, class Matrix_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixShiftRight
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> matrix_shift_right
 	(
 		const Matrix_& matrix_,
 		const Shifts_& num_shifts_
 	)
 	{
-		return MatrixShiftRight<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
+		return matrix_shift_right<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
 	}
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Matrix_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> MatrixShiftRight
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> matrix_shift_right
 	(
 		const Matrix_& matrix_,
 		const Shifts_& num_shifts_
 	)
 	{
-		return MatrixShiftRight<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
+		return matrix_shift_right<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
 	}
 	template<class Matrix_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> MatrixShiftRight
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major> matrix_shift_right
 	(
 		const Matrix_& matrix_,
 		const Shifts_& num_shifts_
 	)
 	{
-		return MatrixShiftRight<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
+		return matrix_shift_right<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_, Shifts_>(matrix_, num_shifts_);
 	}
 }
 

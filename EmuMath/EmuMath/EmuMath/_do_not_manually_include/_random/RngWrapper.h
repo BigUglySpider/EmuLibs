@@ -34,7 +34,7 @@ namespace EmuMath
 
 		/// <summary> Default seed used when one is not provided. Equates to a cast of time(0) to this wrapper's unsigned_int_type at the time of calling. </summary>
 		/// <returns>Default seed to be used by constructors where a seed is not provided.</returns>
-		static inline unsigned_int_type default_seed()
+		[[nodiscard]] static inline unsigned_int_type default_seed()
 		{
 			return static_cast<unsigned_int_type>(time(0));
 		}
@@ -42,7 +42,7 @@ namespace EmuMath
 		/// <summary> Creates an integer of this wrapper's int_type from the provided float, clamped within its minimum and maximum range. </summary>
 		/// <param name="in_float_">Float to form the output integer from.</param>
 		/// <returns>Provided float cast to an integer, and clamped within the range of valid values for this wrapper's int_type.</returns>
-		static inline int_type IntFromFloat(const double in_float_)
+		[[nodiscard]] static inline int_type IntFromFloat(const double in_float_)
 		{
 			if (in_float_ <= lowest_possible_int)
 			{
@@ -62,7 +62,7 @@ namespace EmuMath
 		/// <param name="in_int_">Value to convert to the provided Out_ type.</param>
 		/// <returns>Provided in_int_ safely converted to a clamped range of the provided Out_ type.</returns>
 		template<typename Out_>
-		static inline Out_ ValueFromInt(const int_type in_int_)
+		[[nodiscard]] static inline Out_ ValueFromInt(const int_type in_int_)
 		{
 			if constexpr (std::is_integral_v<Out_> && std::is_signed_v<Out_> && sizeof(Out_) >= sizeof(int_type))
 			{
@@ -93,7 +93,7 @@ namespace EmuMath
 			}
 		}
 		template<>
-		static inline int_type ValueFromInt<int_type>(const int_type in_int_)
+		[[nodiscard]] static inline int_type ValueFromInt<int_type>(const int_type in_int_)
 		{
 			return in_int_;
 		}
@@ -125,7 +125,7 @@ namespace EmuMath
 
 		/// <summary> Provides a copy of this wrapper's underlying engine. Note that the wrapper's engine itself may not be directly accessed. </summary>
 		/// <returns>Copy of this wrapper's underlying engine.</returns>
-		inline underlying_engine CopyEngine() const
+		[[nodiscard]] inline underlying_engine CopyEngine() const
 		{
 			return underlying_engine(rng);
 		}
@@ -154,25 +154,25 @@ namespace EmuMath
 
 		/// <summary> Provides a copy of the minimum value this wrapper may output. </summary>
 		/// <returns>The minimum value that this wrapper may output.</returns>
-		inline double GetMin() const
+		[[nodiscard]] inline double GetMin() const
 		{
 			return min_float;
 		}
 		/// <summary> Provides a copy of the maximum value this wrapper may output. </summary>
 		/// <returns>The maximum value that this wrapper may output.</returns>
-		inline double GetMax() const
+		[[nodiscard]] inline double GetMax() const
 		{
 			return max_float;
 		}
 		/// <summary> Provides a copy of the clamped minimum integral value this wrapper may output. </summary>
 		/// <returns>The clamped minimum integral value that this wrapper may output.</returns>
-		inline int_type GetMinInt() const
+		[[nodiscard]] inline int_type GetMinInt() const
 		{
 			return min_int;
 		}
 		/// <summary> Provides a copy of the clamped maximum integral value this wrapper may output. </summary>
 		/// <returns>The clamped maximum integral value that this wrapper may output.</returns>
-		inline int_type GetMaxInt() const
+		[[nodiscard]] inline int_type GetMaxInt() const
 		{
 			return max_int;
 		}
@@ -191,7 +191,7 @@ namespace EmuMath
 		/// <typeparam name="OutInt_">Type to output, defaulting to this wrapper's int_type. Must be integral.</typeparam>
 		/// <returns>Next value from this wrapper's engine using a uniform int distribution.</returns>
 		template<typename OutInt_ = int_type, typename RequiresIntOutput_ = std::enable_if_t<std::is_integral_v<OutInt_>>>
-		inline OutInt_ NextInt()
+		[[nodiscard]] inline OutInt_ NextInt()
 		{
 			std::uniform_int_distribution<OutInt_> dist_(ValueFromInt<OutInt_>(min_int), ValueFromInt<OutInt_>(max_int));
 			return dist_(rng);
@@ -202,7 +202,7 @@ namespace EmuMath
 		/// <typeparam name="OutInt_">Type to output, defaulting to this wrapper's int_type. Must be integral.</typeparam>
 		/// <returns>Next value from this wrapper's engine using a uniform int distribution.</returns>
 		template<typename OutInt_ = int_type, typename RequiresIntOutput_ = std::enable_if_t<std::is_integral_v<OutInt_>>>
-		inline OutInt_ NextInt(OutInt_ custom_min_, OutInt_ custom_max_)
+		[[nodiscard]] inline OutInt_ NextInt(OutInt_ custom_min_, OutInt_ custom_max_)
 		{
 			std::uniform_int_distribution<OutInt_> dist_(custom_min_, custom_max_);
 			return dist_(rng);
@@ -214,7 +214,7 @@ namespace EmuMath
 		/// <typeparam name="OutFP_">Type to output, defaulting to this wrapper's int_type. Must be a floating point type.</typeparam>
 		/// <returns>Next value from this wrapper's engine using a uniform real distribution.</returns>
 		template<typename OutFP_ = double, typename RequiresFloatingPointOutput_ = std::enable_if_t<std::is_floating_point_v<OutFP_>>>
-		inline OutFP_ NextReal()
+		[[nodiscard]] inline OutFP_ NextReal()
 		{
 			std::uniform_real_distribution<OutFP_> dist_(static_cast<OutFP_>(min_float), static_cast<OutFP_>(max_float));
 			return dist_(rng);
@@ -225,24 +225,24 @@ namespace EmuMath
 		/// <typeparam name="OutFP_">Type to output, defaulting to this wrapper's int_type. Must be a floating point type.</typeparam>
 		/// <returns>Next value from this wrapper's engine using a uniform real distribution.</returns>
 		template<typename OutFP_ = double, typename RequiresFloatingPointOutput_ = std::enable_if_t<std::is_floating_point_v<OutFP_>>>
-		inline OutFP_ NextReal(OutFP_ custom_min_, OutFP_ custom_max_)
+		[[nodiscard]] inline OutFP_ NextReal(OutFP_ custom_min_, OutFP_ custom_max_)
 		{
 			std::uniform_real_distribution<OutFP_> dist_(custom_min_, custom_max_);
 			return dist_(rng);
 		}
 
 	private:
-		underlying_engine rng;
-		double min_float;
-		double max_float;
-		int_type min_int;
-		int_type max_int;
-
 		inline void _set_min_max_ints_from_floats()
 		{
 			min_int = IntFromFloat(min_float);
 			max_int = IntFromFloat(max_float);
 		}
+
+		underlying_engine rng;
+		double min_float;
+		double max_float;
+		int_type min_int;
+		int_type max_int;
 	};
 }
 

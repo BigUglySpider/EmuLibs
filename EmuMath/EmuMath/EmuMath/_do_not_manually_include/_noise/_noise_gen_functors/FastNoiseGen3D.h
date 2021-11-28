@@ -26,7 +26,7 @@ namespace EmuMath::Functors
 	template<EmuMath::NoiseType NoiseType_, class Register_ = __m128>
 	struct make_fast_noise_3d
 	{
-		static_assert(EmuMath::Validity::AssertValidNoiseType<NoiseType_>(), "Invalid NoiseType_ argument provided to EmuMath::Functors::make_fast_noise_3d.");
+		static_assert(EmuMath::Validity::assert_valid_noise_type<NoiseType_>(), "Invalid NoiseType_ argument provided to EmuMath::Functors::make_fast_noise_3d.");
 		static_assert(EmuMath::Validity::_assert_fast_noise_3d_valid_register<Register_>(), "Invalid Register_ type argument provided to EmuMath::Functors::make_fast_noise_3d.");
 		constexpr make_fast_noise_3d()
 		{
@@ -67,7 +67,7 @@ namespace EmuMath::Functors
 			EmuSIMD::store(ix_128i_, ix_);
 
 			float perms_[4];
-			std::size_t mask_ = static_cast<std::size_t>(permutations_.MaxValue());
+			std::size_t mask_ = static_cast<std::size_t>(permutations_.HighestStoredValue());
 			for (std::size_t i = 0; i < 4; ++i)
 			{
 				std::size_t perm_x_ = static_cast<std::size_t>(permutations_[ix_[i]]);
@@ -146,7 +146,7 @@ namespace EmuMath::Functors
 			float perms_101_[4];
 			float perms_110_[4];
 			float perms_111_[4];
-			std::size_t mask_ = permutations_.MaxValue();
+			std::size_t mask_ = permutations_.HighestStoredValue();
 
 			for (std::size_t i = 0; i < 4; ++i)
 			{
@@ -335,7 +335,7 @@ namespace EmuMath::Functors
 			std::size_t perm_110_[4];
 			std::size_t perm_111_[4];
 			std::size_t perm_0_, perm_1_, perm_00_, perm_01_, perm_10_, perm_11_;
-			std::size_t mask_ = static_cast<std::size_t>(permutations_.MaxValue());
+			std::size_t mask_ = static_cast<std::size_t>(permutations_.HighestStoredValue());
 
 			// One permutation per value per item; since we're working with 4 outputs, this means we need to loop 4 times
 			for (std::size_t i = 0; i < 4; ++i)

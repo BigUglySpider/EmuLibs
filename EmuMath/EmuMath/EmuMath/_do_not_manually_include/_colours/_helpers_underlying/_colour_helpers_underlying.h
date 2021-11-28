@@ -6,32 +6,32 @@
 namespace EmuMath::Helpers::_underlying_colour_funcs
 {
 	template<typename ChannelType_>
-	[[nodiscard]] constexpr inline ChannelType_ _max_channel_intensity_force_fp()
+	[[nodiscard]] constexpr inline ChannelType_ _colour_colour_max_channel_intensity_force_fp()
 	{
 		return ChannelType_(1);
 	}
 	template<typename ChannelType_>
-	[[nodiscard]] constexpr inline ChannelType_ _max_channel_intensity_force_int()
+	[[nodiscard]] constexpr inline ChannelType_ _colour_colour_max_channel_intensity_force_int()
 	{
 		return std::numeric_limits<ChannelType_>::max();
 	}
 
 	template<typename ChannelType_>
-	[[nodiscard]] constexpr inline ChannelType_ _min_channel_intensity()
+	[[nodiscard]] constexpr inline ChannelType_ _colour_min_channel_intensity()
 	{
 		return ChannelType_(0);
 	}
 
 	template<typename ChannelType_>
-	[[nodiscard]] constexpr inline ChannelType_ _max_channel_intensity()
+	[[nodiscard]] constexpr inline ChannelType_ _colour_max_channel_intensity()
 	{
 		if constexpr (std::is_floating_point_v<ChannelType_>)
 		{
-			return _max_channel_intensity_force_fp<ChannelType_>();
+			return _colour_colour_max_channel_intensity_force_fp<ChannelType_>();
 		}
 		else
 		{
-			return _max_channel_intensity_force_int<ChannelType_>();
+			return _colour_colour_max_channel_intensity_force_int<ChannelType_>();
 		}
 	}
 
@@ -46,16 +46,16 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			constexpr OutRatio_ max_reciprocal_ = OutRatio_(1) / _max_channel_intensity<InChannel_>();
+			constexpr OutRatio_ max_reciprocal_ = OutRatio_(1) / _colour_max_channel_intensity<InChannel_>();
 			return static_cast<OutRatio_>(in_) * max_reciprocal_;
 		}
 	}
 
 	template<typename OutChannel_, typename InChannel_>
-	[[nodiscard]] constexpr inline OutChannel_ _get_colour_intensity_from_other_ratio(InChannel_ to_convert_)
+	[[nodiscard]] constexpr inline OutChannel_ _colour_get_intensity_from_other_ratio(InChannel_ to_convert_)
 	{
 		using calc_type = typename EmuCore::TMPHelpers::first_floating_point<OutChannel_, InChannel_, double>::type;
-		constexpr calc_type max_out_calc = static_cast<calc_type>(_max_channel_intensity<OutChannel_>());
+		constexpr calc_type max_out_calc = static_cast<calc_type>(_colour_max_channel_intensity<OutChannel_>());
 
 		if constexpr (std::is_floating_point_v<InChannel_>)
 		{
@@ -74,7 +74,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			constexpr calc_type max_in_calc_reciprocal = calc_type(1) / static_cast<calc_type>(_max_channel_intensity_force_int<InChannel_>());
+			constexpr calc_type max_in_calc_reciprocal = calc_type(1) / static_cast<calc_type>(_colour_colour_max_channel_intensity_force_int<InChannel_>());
 			calc_type ratio_ = to_convert_ * max_in_calc_reciprocal;
 			if constexpr (std::is_floating_point_v<OutChannel_>)
 			{
@@ -92,7 +92,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 	}
 
 	template<typename OutChannel_, typename InChannel_>
-	[[nodiscard]] constexpr inline OutChannel_ _convert_colour_channel(InChannel_ to_convert_)
+	[[nodiscard]] constexpr inline OutChannel_ _colour_convert_channel(InChannel_ to_convert_)
 	{
 		if constexpr (std::is_same_v<OutChannel_, InChannel_>)
 		{
@@ -106,7 +106,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			return _get_colour_intensity_from_other_ratio<OutChannel_, InChannel_>(to_convert_);
+			return _colour_get_intensity_from_other_ratio<OutChannel_, InChannel_>(to_convert_);
 		}
 	}
 
@@ -137,20 +137,20 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 				{
 					return OutColour_
 					(
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.R()))),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_.G()))),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.B(), rhs_.B()))),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.A(), rhs_.A())))
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.R()))),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_.G()))),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.B(), rhs_.B()))),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.A(), rhs_.A())))
 					);
 				}
 				else
 				{
 					return OutColour_
 					(
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.R()))),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_.G()))),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.B(), rhs_.B()))),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(lhs_.A()))
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.R()))),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_.G()))),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.B(), rhs_.B()))),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(lhs_.A()))
 					);
 				}
 			}
@@ -158,9 +158,9 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			{
 				return OutColour_
 				(
-					_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.R()))),
-					_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_.G()))),
-					_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.B(), rhs_.B())))
+					_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.R()))),
+					_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_.G()))),
+					_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.B(), rhs_.B())))
 				);
 			}
 			
@@ -205,30 +205,30 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 				{
 					return OutColour_
 					(
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.template at<0>()))),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(lhs_.G()),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(lhs_.B()),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(lhs_.A())
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.template at<0>()))),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(lhs_.G()),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(lhs_.B()),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(lhs_.A())
 					);
 				}
 				else if constexpr (RhsVector_::size == 2)
 				{
 					return OutColour_
 					(
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.template at<0>()))),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_.template at<1>()))),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(lhs_.B()),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(lhs_.A())
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.template at<0>()))),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_.template at<1>()))),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(lhs_.B()),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(lhs_.A())
 					);
 				}
 				else if constexpr (RhsVector_::size == 3)
 				{
 					return OutColour_
 					(
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.template at<0>()))),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_.template at<1>()))),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.B(), rhs_.template at<2>()))),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(lhs_.A())
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.template at<0>()))),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_.template at<1>()))),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.B(), rhs_.template at<2>()))),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(lhs_.A())
 					);
 				}
 				else
@@ -237,20 +237,20 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 					{
 						return OutColour_
 						(
-							_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.template at<0>()))),
-							_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_.template at<1>()))),
-							_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.B(), rhs_.template at<2>()))),
-							_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.A(), rhs_.template at<3>())))
+							_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.template at<0>()))),
+							_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_.template at<1>()))),
+							_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.B(), rhs_.template at<2>()))),
+							_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.A(), rhs_.template at<3>())))
 						);
 					}
 					else
 					{
 						return OutColour_
 						(
-							_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.template at<0>()))),
-							_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_.template at<1>()))),
-							_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.B(), rhs_.template at<2>()))),
-							_convert_colour_channel<out_channel_type, lhs_channel_type>(lhs_.A())
+							_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.template at<0>()))),
+							_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_.template at<1>()))),
+							_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.B(), rhs_.template at<2>()))),
+							_colour_convert_channel<out_channel_type, lhs_channel_type>(lhs_.A())
 						);
 					}
 				}
@@ -261,27 +261,27 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 				{
 					return OutColour_
 					(
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.template at<0>()))),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(lhs_.G()),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(lhs_.B())
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.template at<0>()))),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(lhs_.G()),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(lhs_.B())
 					);
 				}
 				else if constexpr (RhsVector_::size == 2)
 				{
 					return OutColour_
 					(
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.template at<0>()))),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_.template at<1>()))),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(lhs_.B())
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.template at<0>()))),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_.template at<1>()))),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(lhs_.B())
 					);
 				}
 				else
 				{
 					return OutColour_
 					(
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.template at<0>()))),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_.template at<1>()))),
-						_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.B(), rhs_.template at<2>())))
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_.template at<0>()))),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_.template at<1>()))),
+						_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.B(), rhs_.template at<2>())))
 					);
 				}
 			}
@@ -299,19 +299,19 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		{
 			return OutColour_
 			(
-				_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_))),
-				_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_))),
-				_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.B(), rhs_))),
-				_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.A(), rhs_)))
+				_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_))),
+				_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_))),
+				_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.B(), rhs_))),
+				_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.A(), rhs_)))
 			);
 		}
 		else
 		{
 			return OutColour_
 			(
-				_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_))),
-				_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_))),
-				_convert_colour_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.B(), rhs_)))
+				_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.R(), rhs_))),
+				_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.G(), rhs_))),
+				_colour_convert_channel<out_channel_type, lhs_channel_type>(static_cast<lhs_channel_type>(func_(lhs_.B(), rhs_)))
 			);
 		}
 	}
@@ -445,19 +445,19 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			{
 				return OutColour_
 				(
-					_convert_colour_channel<out_channel_type, a_channel_type>
+					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
 						static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), _colour_channel_ratio<t_ratio_type, t_channel_type>(t_.R())))
 					),
-					_convert_colour_channel<out_channel_type, a_channel_type>
+					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
 						static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), _colour_channel_ratio<t_ratio_type, t_channel_type>(t_.G())))
 					),
-					_convert_colour_channel<out_channel_type, a_channel_type>
+					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
 						static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), _colour_channel_ratio<t_ratio_type, t_channel_type>(t_.B())))
 					),
-					_convert_colour_channel<out_channel_type, a_channel_type>
+					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
 						static_cast<a_channel_type>(lerp_(a_.A(), b_.A(), _colour_channel_ratio<t_ratio_type, t_channel_type>(t_.A())))
 					)
@@ -467,15 +467,15 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			{
 				return OutColour_
 				(
-					_convert_colour_channel<out_channel_type, a_channel_type>
+					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
 						static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), _colour_channel_ratio<t_ratio_type, t_channel_type>(t_.R())))
 					),
-					_convert_colour_channel<out_channel_type, a_channel_type>
+					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
 						static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), _colour_channel_ratio<t_ratio_type, t_channel_type>(t_.G())))
 					),
-					_convert_colour_channel<out_channel_type, a_channel_type>
+					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
 						static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), _colour_channel_ratio<t_ratio_type, t_channel_type>(t_.B())))
 					)
@@ -508,21 +508,21 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			{
 				return OutColour_
 				(
-					_convert_colour_channel<out_channel_type, a_channel_type>
+					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
-						static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::VectorGet<0>(t_)))
+						static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::vector_get<0>(t_)))
 					),
-					_convert_colour_channel<out_channel_type, a_channel_type>
+					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
-						static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), EmuMath::Helpers::VectorGet<1>(t_)))
+						static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), EmuMath::Helpers::vector_get<1>(t_)))
 					),
-					_convert_colour_channel<out_channel_type, a_channel_type>
+					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
-						static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), EmuMath::Helpers::VectorGet<2>(t_)))
+						static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), EmuMath::Helpers::vector_get<2>(t_)))
 					),
-					_convert_colour_channel<out_channel_type, a_channel_type>
+					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
-						static_cast<a_channel_type>(lerp_(a_.A(), b_.A(), EmuMath::Helpers::VectorGet<3>(t_)))
+						static_cast<a_channel_type>(lerp_(a_.A(), b_.A(), EmuMath::Helpers::vector_get<3>(t_)))
 					)
 				);
 			}
@@ -538,44 +538,44 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 				{
 					return OutColour_
 					(
-						_convert_colour_channel<out_channel_type, a_channel_type>
+						_colour_convert_channel<out_channel_type, a_channel_type>
 						(
-							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::VectorGet<0>(t_)))
+							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::vector_get<0>(t_)))
 						),
-						_convert_colour_channel<out_channel_type, a_channel_type>(a_.G()),
-						_convert_colour_channel<out_channel_type, a_channel_type>(a_.B())
+						_colour_convert_channel<out_channel_type, a_channel_type>(a_.G()),
+						_colour_convert_channel<out_channel_type, a_channel_type>(a_.B())
 					);
 				}
 				else if constexpr (VectorT_::size == 2)
 				{
 					return OutColour_
 					(
-						_convert_colour_channel<out_channel_type, a_channel_type>
+						_colour_convert_channel<out_channel_type, a_channel_type>
 						(
-							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::VectorGet<0>(t_)))
+							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::vector_get<0>(t_)))
 						),
-						_convert_colour_channel<out_channel_type, a_channel_type>
+						_colour_convert_channel<out_channel_type, a_channel_type>
 						(
-							static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), EmuMath::Helpers::VectorGet<1>(t_)))
+							static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), EmuMath::Helpers::vector_get<1>(t_)))
 						),
-						_convert_colour_channel<out_channel_type, a_channel_type>(a_.B())
+						_colour_convert_channel<out_channel_type, a_channel_type>(a_.B())
 					);
 				}
 				else
 				{
 					return OutColour_
 					(
-						_convert_colour_channel<out_channel_type, a_channel_type>
+						_colour_convert_channel<out_channel_type, a_channel_type>
 						(
-							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::VectorGet<0>(t_)))
+							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::vector_get<0>(t_)))
 						),
-						_convert_colour_channel<out_channel_type, a_channel_type>
+						_colour_convert_channel<out_channel_type, a_channel_type>
 						(
-							static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), EmuMath::Helpers::VectorGet<1>(t_)))
+							static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), EmuMath::Helpers::vector_get<1>(t_)))
 						),
-						_convert_colour_channel<out_channel_type, a_channel_type>
+						_colour_convert_channel<out_channel_type, a_channel_type>
 						(
-							static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), EmuMath::Helpers::VectorGet<2>(t_)))
+							static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), EmuMath::Helpers::vector_get<2>(t_)))
 						)
 					);
 				}
@@ -605,19 +605,19 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			{
 				return OutColour_
 				(
-					_convert_colour_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), t_))),
-					_convert_colour_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), t_))),
-					_convert_colour_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), t_))),
-					_convert_colour_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.A(), b_.A(), t_)))
+					_colour_convert_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), t_))),
+					_colour_convert_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), t_))),
+					_colour_convert_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), t_))),
+					_colour_convert_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.A(), b_.A(), t_)))
 				);
 			}
 			else
 			{
 				return OutColour_
 				(
-					_convert_colour_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), t_))),
-					_convert_colour_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), t_))),
-					_convert_colour_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), t_)))
+					_colour_convert_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), t_))),
+					_colour_convert_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), t_))),
+					_colour_convert_channel<out_channel_type, a_channel_type>(static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), t_)))
 				);
 			}
 		}
@@ -744,11 +744,11 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 
 			constexpr in_ratio_type div_by_3_reciprocal = in_ratio_type(1) / in_ratio_type(3);
 			average_ratio_ *= div_by_3_reciprocal;
-			out_channel_type out_average_ = _convert_colour_channel<out_channel_type, in_ratio_type>(average_ratio_);
+			out_channel_type out_average_ = _colour_convert_channel<out_channel_type, in_ratio_type>(average_ratio_);
 
 			if constexpr (OutColour_::contains_alpha)
 			{
-				return OutColour_(out_average_, out_average_, out_average_, _convert_colour_channel<out_channel_type, in_channel_type>(in_.A()));
+				return OutColour_(out_average_, out_average_, out_average_, _colour_convert_channel<out_channel_type, in_channel_type>(in_.A()));
 			}
 			else
 			{
@@ -778,10 +778,10 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			average_ratio_ += _colour_channel_ratio<in_ratio_type, in_channel_type>(in_.G()) * green_mult_;
 			average_ratio_ += _colour_channel_ratio<in_ratio_type, in_channel_type>(in_.B()) * blue_mult_;
 
-			out_channel_type out_average_ = _convert_colour_channel<out_channel_type, in_ratio_type>(average_ratio_);
+			out_channel_type out_average_ = _colour_convert_channel<out_channel_type, in_ratio_type>(average_ratio_);
 			if constexpr (OutColour_::contains_alpha)
 			{
-				return OutColour_(out_average_, out_average_, out_average_, _convert_colour_channel<out_channel_type, in_channel_type>(in_.A()));
+				return OutColour_(out_average_, out_average_, out_average_, _colour_convert_channel<out_channel_type, in_channel_type>(in_.A()));
 			}
 			else
 			{
@@ -813,11 +813,11 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 				colour_min_or_max<false, in_channel_type, InColour_, EmuCore::do_max<in_channel_type, in_channel_type>>(in_)
 			);
 
-			out_channel_type out_grey_ = _convert_colour_channel<out_channel_type, in_ratio_type>((min_ratio_ + max_ratio_) * two_reciprocal_);
+			out_channel_type out_grey_ = _colour_convert_channel<out_channel_type, in_ratio_type>((min_ratio_ + max_ratio_) * two_reciprocal_);
 
 			if constexpr (OutColour_::contains_alpha)
 			{
-				return OutColour_(out_grey_, out_grey_, out_grey_, _convert_colour_channel<out_channel_type, in_channel_type>(in_.A()));
+				return OutColour_(out_grey_, out_grey_, out_grey_, _colour_convert_channel<out_channel_type, in_channel_type>(in_.A()));
 			}
 			else
 			{
@@ -838,14 +838,14 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			using in_channel_type = typename InColour_::value_type;
 			using out_channel_type = typename OutColour_::value_type;
 
-			out_channel_type out_grey_ = _convert_colour_channel<out_channel_type, in_channel_type>
+			out_channel_type out_grey_ = _colour_convert_channel<out_channel_type, in_channel_type>
 			(
 				colour_min_or_max<false, in_channel_type, InColour_, MinOrMaxFunc_>(in_)
 			);
 
 			if constexpr (OutColour_::contains_alpha)
 			{
-				return OutColour_(out_grey_, out_grey_, out_grey_, _convert_colour_channel<out_channel_type, in_channel_type>(in_.A()));
+				return OutColour_(out_grey_, out_grey_, out_grey_, _colour_convert_channel<out_channel_type, in_channel_type>(in_.A()));
 			}
 			else
 			{

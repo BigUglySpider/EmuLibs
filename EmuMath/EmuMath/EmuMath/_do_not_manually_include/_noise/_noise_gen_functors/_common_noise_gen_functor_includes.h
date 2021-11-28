@@ -126,7 +126,7 @@ namespace EmuMath::Functors::_underlying_noise_gen
 	/// <summary>Function applied to t_ to smooth it for smooth noise generation algorithms defined in EmuMath. </summary>
 	/// <returns>Smoothed float t_, resulting from 6(t^5) - 15(t^4) + 10(t^3) (where t^x == t to the power of x).</returns>
 	template<typename T_>
-	constexpr inline T_ SmoothT(T_ t_)
+	constexpr inline T_ smooth_t(T_ t_)
 	{
 		return t_ * t_ * t_ * (t_ * (t_ * T_(6) - T_(15)) + T_(10));
 	}
@@ -137,7 +137,7 @@ namespace EmuMath::Functors::_underlying_noise_gen
 	/// <param name="y_">Y-component of a theoretical vector to form a dot product with.</param>
 	/// <returns>Dot product of the passed vector and scalar values.</returns>
 	template<typename T_>
-	constexpr inline T_ DotWithScalar(const EmuMath::Vector<2, T_>& vector_, T_ x_, T_ y_)
+	constexpr inline T_ dot_with_scalar(const EmuMath::Vector<2, T_>& vector_, T_ x_, T_ y_)
 	{
 		return vector_.at<0>() * x_ + vector_.at<1>() * y_;
 	}
@@ -148,7 +148,7 @@ namespace EmuMath::Functors::_underlying_noise_gen
 	/// <param name="z_">Z-component of a theoretical vector to form a dot product with.</param>
 	/// <returns>Dot product of the passed vector and scalar values.</returns>
 	template<typename T_>
-	constexpr inline T_ DotWithScalar(const EmuMath::Vector<3, T_>& vector_, T_ x_, T_ y_, T_ z_)
+	constexpr inline T_ dot_with_scalar(const EmuMath::Vector<3, T_>& vector_, T_ x_, T_ y_, T_ z_)
 	{
 		return (vector_.at<0>() * x_) + (vector_.at<1>() * y_) + (vector_.at<2>() * z_);
 	}

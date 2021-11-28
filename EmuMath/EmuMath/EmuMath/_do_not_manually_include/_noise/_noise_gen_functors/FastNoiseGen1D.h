@@ -26,7 +26,7 @@ namespace EmuMath::Functors
 	template<EmuMath::NoiseType NoiseType_, class Register_ = __m128>
 	struct make_fast_noise_1d
 	{
-		static_assert(EmuMath::Validity::AssertValidNoiseType<NoiseType_>(), "Invalid NoiseType_ argument provided to EmuMath::Functors::make_fast_noise_1d.");
+		static_assert(EmuMath::Validity::assert_valid_noise_type<NoiseType_>(), "Invalid NoiseType_ argument provided to EmuMath::Functors::make_fast_noise_1d.");
 		static_assert(EmuMath::Validity::_assert_fast_noise_1d_valid_register<Register_>(), "Invalid Register_ type argument provided to EmuMath::Functors::make_fast_noise_1d.");
 		constexpr make_fast_noise_1d()
 		{

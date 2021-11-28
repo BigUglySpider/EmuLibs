@@ -1,6 +1,7 @@
 #ifndef EMU_MATH_COLOUR_TMP_H_INC_
 #define EMU_MATH_COLOUR_TMP_H_INC_ 1
 
+#include "../../../EmuCore/TMPHelpers/TypeConvertors.h"
 #include <type_traits>
 
 namespace EmuMath
@@ -17,9 +18,9 @@ namespace EmuMath::TMP
 		static constexpr bool value = std::conditional_t
 		<
 			// This is a recursive check to make sure that T_ does not have modifiers that may lead to false negatives
-			std::is_same_v<T_, std::remove_reference_t<std::remove_cv_t<T_>>>,
+			std::is_same_v<T_, typename EmuCore::TMPHelpers::remove_ref_cv<T_>::type>,
 			std::false_type,
-			is_emu_colour<std::remove_reference_t<std::remove_cv_t<T_>>>
+			is_emu_colour<typename EmuCore::TMPHelpers::remove_ref_cv<T_>::type>
 		>::value;
 	};
 	template<typename T_, bool ContainsAlpha_>

@@ -65,12 +65,12 @@ namespace EmuMath
 			max_contained_value = to_copy_.max_contained_value;
 		}
 
-		inline bool operator!() const
+		[[nodiscard]] inline bool operator!() const
 		{
 			return items.size() == 0;
 		}
 
-		inline ShuffledIntSequence<value_type> operator<<(std::size_t num_shifts_) const
+		[[nodiscard]] inline ShuffledIntSequence<value_type> operator<<(std::size_t num_shifts_) const
 		{
 			const std::size_t size_ = size();
 			if (size_ >= 2)
@@ -101,7 +101,7 @@ namespace EmuMath
 			}
 		}
 
-		inline ShuffledIntSequence<value_type> operator>>(std::size_t num_shifts_) const
+		[[nodiscard]] inline ShuffledIntSequence<value_type> operator>>(std::size_t num_shifts_) const
 		{
 			const std::size_t size_ = size();
 			if (size_ >= 2)
@@ -146,17 +146,17 @@ namespace EmuMath
 			return *this;
 		}
 
-		inline const value_type& operator[](std::size_t index_) const
+		[[nodiscard]] inline const value_type& operator[](std::size_t index_) const
 		{
 			return at(index_);
 		}
 
-		inline const value_type& at(std::size_t index_) const
+		[[nodiscard]] inline const value_type& at(std::size_t index_) const
 		{
 			return items[index_];
 		}
 
-		inline std::size_t size() const
+		[[nodiscard]] inline std::size_t size() const
 		{
 			return items.size();
 		}
@@ -169,20 +169,20 @@ namespace EmuMath
 			to_swap_with_.max_contained_value = temp_;
 		}
 
-		inline const_iterator cbegin() const
+		[[nodiscard]] inline const_iterator cbegin() const
 		{
 			return items.cbegin();
 		}
-		inline const_iterator cend() const
+		[[nodiscard]] inline const_iterator cend() const
 		{
 			return items.cend();
 		}
 
-		inline const_reverse_iterator crbegin() const
+		[[nodiscard]] inline const_reverse_iterator crbegin() const
 		{
 			return items.crbegin();
 		}
-		inline const_reverse_iterator crend() const
+		[[nodiscard]] inline const_reverse_iterator crend() const
 		{
 			return items.crend();
 		}
@@ -208,7 +208,7 @@ namespace EmuMath
 		}
 
 		/// <summary> Shuffles the items contained within this sequence. </summary>
-		inline void Shuffle(bool do_64_bit_shuffle_)
+		inline void Shuffle(const bool& do_64_bit_shuffle_)
 		{
 			if (do_64_bit_shuffle_)
 			{
@@ -219,11 +219,11 @@ namespace EmuMath
 				_do_shuffle<EmuMath::RngWrapper<false>, seed_32_type>(default_seed_32());
 			}
 		}
-		inline void Shuffle(seed_32_type seed_32_)
+		inline void Shuffle(const seed_32_type& seed_32_)
 		{
 			_do_shuffle<EmuMath::RngWrapper<false>, seed_32_type>(seed_32_);
 		}
-		inline void Shuffle(seed_64_type seed_64_)
+		inline void Shuffle(const seed_64_type& seed_64_)
 		{
 			_do_shuffle<EmuMath::RngWrapper<true>, seed_64_type>(seed_64_);
 		}
@@ -238,7 +238,7 @@ namespace EmuMath
 
 		/// <summary> Provides a reversed form of this sequence without modifying this instance. </summary>
 		/// <returns>Copy of this instance with its contained elements reversed.</returns>
-		inline ShuffledIntSequence<value_type> AsReversed() const
+		[[nodiscard]] inline ShuffledIntSequence<value_type> AsReversed() const
 		{
 			item_storage out_(size());
 			std::copy(items.rbegin(), items.rend(), out_.begin());
@@ -246,17 +246,17 @@ namespace EmuMath
 		}
 
 		/// <summary> The highest value in this sequence. Effectively shorthand for size() - 1. </summary>
-		inline value_type MaxValue() const
+		[[nodiscard]] inline value_type HighestStoredValue() const
 		{
 			return max_contained_value;
 		}
 
 		/// <summary>
 		/// <para> Returns a boolean indicating if this sequence contains a number of items equal to a power of 2. </para>
-		/// <para> Sequences where this value is true have the special attribute of a MaxValue which may be used to mask all bits of all contained values. </para>
+		/// <para> Sequences where this value is true have the special attribute of a HighestContainedValue which may be used to mask all bits of all contained values. </para>
 		/// </summary>
 		/// <returns>True if this sequence's size is a power of 2; otherwise false.</returns>
-		inline bool ContainsPowerOf2() const
+		[[nodiscard]] inline bool ContainsPowerOf2() const
 		{
 			return EmuCore::ArithmeticHelpers::is_integral_power_of_2<std::size_t>(size());
 		}

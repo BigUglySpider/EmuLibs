@@ -65,7 +65,7 @@ namespace EmuMath::_underlying_components
 	/// <summary>
 	/// <para> Type used to perform a consistent static_assertion across EmuMath::Matrix specialisations. </para>
 	/// <para> What items are asserted may be customised with the additional boolean arguments. By default, all assertion checks will always be performed. </para>
-	/// <para> For any specialisations of EmuMath::Matrix, it is highly recommended to use this MatrixAssert to mimic any required static_asserts that should be made. </para>
+	/// <para> For any specialisations of EmuMath::Matrix, it is highly recommended to use this matrix_assert to mimic any required static_asserts that should be made. </para>
 	/// </summary>
 	template
 	<
@@ -79,9 +79,9 @@ namespace EmuMath::_underlying_components
 		bool NoBasicRef_ = true,
 		bool RequireArithmetic_ = true
 	>
-	struct MatrixAssert
+	struct matrix_assert
 	{
-		constexpr MatrixAssert()
+		constexpr matrix_assert()
 		{
 		}
 

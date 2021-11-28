@@ -89,40 +89,40 @@ namespace EmuMath
 			(
 				_mm_set_ps
 				(
-					EmuMath::Helpers::MatrixGetTheoretical<0, 3>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<0, 2>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<0, 1>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<0, 0>(to_copy_)
+					EmuMath::Helpers::matrix_get_theoretical<0, 3>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<0, 2>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<0, 1>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<0, 0>(to_copy_)
 				)
 			),
 			column1
 			(
 				_mm_set_ps
 				(
-					EmuMath::Helpers::MatrixGetTheoretical<1, 3>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<1, 2>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<1, 1>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<1, 0>(to_copy_)
+					EmuMath::Helpers::matrix_get_theoretical<1, 3>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<1, 2>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<1, 1>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<1, 0>(to_copy_)
 				)
 			),
 			column2
 			(
 				_mm_set_ps
 				(
-					EmuMath::Helpers::MatrixGetTheoretical<2, 3>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<2, 2>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<2, 1>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<2, 0>(to_copy_)
+					EmuMath::Helpers::matrix_get_theoretical<2, 3>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<2, 2>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<2, 1>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<2, 0>(to_copy_)
 				)
 			),
 			column3
 			(
 				_mm_set_ps
 				(
-					EmuMath::Helpers::MatrixGetTheoretical<3, 3>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<3, 2>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<3, 1>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<3, 0>(to_copy_)
+					EmuMath::Helpers::matrix_get_theoretical<3, 3>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<3, 2>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<3, 1>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<3, 0>(to_copy_)
 				)
 			)
 		{
@@ -2409,31 +2409,31 @@ namespace EmuMath
 		{
 			column0 = _mm_set_ps
 			(
-				EmuMath::Helpers::MatrixGetTheoretical<0, 0>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<0, 1>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<0, 2>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<0, 3>(rhs_)
+				EmuMath::Helpers::matrix_get_theoretical<0, 0>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<0, 1>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<0, 2>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<0, 3>(rhs_)
 			);
 			column1 = _mm_set_ps
 			(
-				EmuMath::Helpers::MatrixGetTheoretical<1, 0>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<1, 1>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<1, 2>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<1, 3>(rhs_)
+				EmuMath::Helpers::matrix_get_theoretical<1, 0>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<1, 1>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<1, 2>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<1, 3>(rhs_)
 			);
 			column2 = _mm_set_ps
 			(
-				EmuMath::Helpers::MatrixGetTheoretical<2, 0>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<2, 1>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<2, 2>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<2, 3>(rhs_)
+				EmuMath::Helpers::matrix_get_theoretical<2, 0>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<2, 1>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<2, 2>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<2, 3>(rhs_)
 			);
 			column3 = _mm_set_ps
 			(
-				EmuMath::Helpers::MatrixGetTheoretical<3, 0>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<3, 1>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<3, 2>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<3, 3>(rhs_)
+				EmuMath::Helpers::matrix_get_theoretical<3, 0>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<3, 1>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<3, 2>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<3, 3>(rhs_)
 			);
 			return *this;
 		}

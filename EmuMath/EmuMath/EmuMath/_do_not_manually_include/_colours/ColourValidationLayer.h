@@ -42,8 +42,9 @@ namespace EmuMath::Helpers
 		/// <para> Private constructor which can be used to move an underlying_colour without performing validation. </para>
 		/// <para> Only for use in functions returning this_type where it is guaranteed that the output colour will be in a valid state without validation. </para>
 		/// </summary>
-		template<typename Dummy_>
-		constexpr _colour_validation_layer(underlying_colour&& safe_colour_to_set_, Dummy_&& dummy_arg_) noexcept : colour(safe_colour_to_set_)
+		template<typename Dummy_, typename = std::enable_if_t<std::is_move_constructible_v<underlying_colour>>>
+		constexpr _colour_validation_layer(underlying_colour&& safe_colour_to_set_, Dummy_&& dummy_arg_) noexcept : 
+			colour(std::forward<underlying_colour>(safe_colour_to_set_))
 		{
 		}
 

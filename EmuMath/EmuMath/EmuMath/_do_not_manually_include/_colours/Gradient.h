@@ -35,7 +35,7 @@ namespace EmuMath
 		/// <summary> Static helper used to clamp an alpha value for this gradient's channel type into a valid min_intensity:max_intensity range. </summary>
 		[[nodiscard]] static constexpr inline channel_type clamp_alpha(const channel_type alpha_)
 		{
-			return EmuMath::Helpers::clamp_colour_channel<channel_type, channel_type>(alpha_);
+			return EmuMath::Helpers::colour_clamp_channel<channel_type, channel_type>(alpha_);
 		}
 
 		/// <summary> Static helper used to wrap an anchor value for this gradient into a valid 0:1 range. </summary>
@@ -48,7 +48,7 @@ namespace EmuMath
 		/// <summary> Static helper used to wrap an alpha value for this gradient's channel type into a valid min_intensity:max_intensity range. </summary>
 		[[nodiscard]] static constexpr inline channel_type wrap_alpha(const channel_type alpha_)
 		{
-			return EmuMath::Helpers::wrap_colour_channel<channel_type, channel_type>(alpha_);
+			return EmuMath::Helpers::colour_wrap_channel<channel_type, channel_type>(alpha_);
 		}
 #pragma endregion
 
@@ -235,7 +235,7 @@ namespace EmuMath
 					return 
 					(
 						(a_.first == b_.first) &&
-						(a_.second == EmuMath::Helpers::convert_colour_channel<channel_type, RhsChannel_>(b_.second))
+						(a_.second == EmuMath::Helpers::colour_convert_channel<channel_type, RhsChannel_>(b_.second))
 					); 
 				}
 			);
@@ -526,7 +526,7 @@ namespace EmuMath
 		template<typename OutChannel_ = channel_type>
 		[[nodiscard]] inline channel_type GetAlpha(anchor_type anchor_point_) const
 		{
-			return EmuMath::Helpers::convert_colour_channel<OutChannel_, channel_type>(_find_item(clamp_anchor(anchor_point_), alphas));
+			return EmuMath::Helpers::colour_convert_channel<OutChannel_, channel_type>(_find_item(clamp_anchor(anchor_point_), alphas));
 		}
 
 		/// <summary>
@@ -540,7 +540,7 @@ namespace EmuMath
 		template<typename OutChannel_ = channel_type>
 		[[nodiscard]] inline channel_type GetAlphaWrapped(anchor_type anchor_point_) const
 		{
-			return EmuMath::Helpers::convert_colour_channel<OutChannel_, channel_type>(_find_item(wrap_anchor(anchor_point_), alphas));
+			return EmuMath::Helpers::colour_convert_channel<OutChannel_, channel_type>(_find_item(wrap_anchor(anchor_point_), alphas));
 		}
 
 		/// <summary>
@@ -560,7 +560,7 @@ namespace EmuMath
 			return EmuMath::ColourRGBA<OutChannel_>
 			(
 				_find_item(anchor_point_, colours),
-				EmuMath::Helpers::convert_colour_channel<OutChannel_, channel_type>(_find_item(anchor_point_, alphas))
+				EmuMath::Helpers::colour_convert_channel<OutChannel_, channel_type>(_find_item(anchor_point_, alphas))
 			);
 		}
 		template<typename OutChannel_ = channel_type>
@@ -569,7 +569,7 @@ namespace EmuMath
 			return EmuMath::ColourRGBA<OutChannel_>
 			(
 				_find_item(clamp_anchor(colour_anchor_point_), colours),
-				EmuMath::Helpers::convert_colour_channel<OutChannel_, channel_type>(_find_item(clamp_anchor(alpha_anchor_point_), alphas))
+				EmuMath::Helpers::colour_convert_channel<OutChannel_, channel_type>(_find_item(clamp_anchor(alpha_anchor_point_), alphas))
 			);
 		}
 
@@ -590,7 +590,7 @@ namespace EmuMath
 			return EmuMath::ColourRGBA<OutChannel_>
 			(
 				_find_item(anchor_point_, colours),
-				EmuMath::Helpers::convert_colour_channel<OutChannel_, channel_type>(_find_item(anchor_point_, alphas))
+				EmuMath::Helpers::colour_convert_channel<OutChannel_, channel_type>(_find_item(anchor_point_, alphas))
 			);
 		}
 		template<typename OutChannel_ = channel_type>
@@ -599,7 +599,7 @@ namespace EmuMath
 			return EmuMath::ColourRGBA<OutChannel_>
 			(
 				_find_item(wrap_anchor(colour_anchor_point_), colours),
-				EmuMath::Helpers::convert_colour_channel<OutChannel_, channel_type>(_find_item(wrap_anchor(alpha_anchor_point_), alphas))
+				EmuMath::Helpers::colour_convert_channel<OutChannel_, channel_type>(_find_item(wrap_anchor(alpha_anchor_point_), alphas))
 			);
 		}
 
@@ -1001,7 +1001,7 @@ namespace EmuMath
 					return typename alpha_map::value_type
 					(
 						item_.first,
-						EmuMath::Helpers::convert_colour_channel<channel_type, OtherChannel_>(item_.second)
+						EmuMath::Helpers::colour_convert_channel<channel_type, OtherChannel_>(item_.second)
 					); 
 				}
 			);
@@ -1039,7 +1039,7 @@ namespace EmuMath
 						return 
 						(
 							(a_.first == b_.first) &&
-							(a_.second == EmuMath::Helpers::convert_colour_channel<channel_type, RhsChannel_>(b_.second))
+							(a_.second == EmuMath::Helpers::colour_convert_channel<channel_type, RhsChannel_>(b_.second))
 						);
 					}
 				);

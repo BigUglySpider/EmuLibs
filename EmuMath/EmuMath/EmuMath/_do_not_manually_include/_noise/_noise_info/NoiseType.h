@@ -18,7 +18,7 @@ namespace EmuMath
 
 	namespace Validity
 	{
-		constexpr inline bool IsValidNoiseType(const NoiseType noise_type_)
+		[[nodiscard]] constexpr inline bool is_valid_noise_type(const NoiseType noise_type_)
 		{
 			return
 			(
@@ -29,9 +29,9 @@ namespace EmuMath
 		}
 
 		template<NoiseType NoiseType_>
-		constexpr inline bool AssertValidNoiseType()
+		constexpr inline bool assert_valid_noise_type()
 		{
-			if constexpr (IsValidNoiseType(NoiseType_))
+			if constexpr (is_valid_noise_type(NoiseType_))
 			{
 				return true;
 			}

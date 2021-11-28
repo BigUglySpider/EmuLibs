@@ -47,23 +47,23 @@ namespace EmuMath
 		{
 			if constexpr (num_dimensions == 1)
 			{
-				return coordinate_type(EmuMath::Helpers::VectorGetTheoretical<0>(vector_));
+				return coordinate_type(EmuMath::Helpers::vector_get_theoretical<0>(vector_));
 			}
 			else if constexpr (num_dimensions == 2)
 			{
 				return coordinate_type
 				(
-					EmuMath::Helpers::VectorGetTheoretical<0>(vector_),
-					EmuMath::Helpers::VectorGetTheoretical<1>(vector_)
+					EmuMath::Helpers::vector_get_theoretical<0>(vector_),
+					EmuMath::Helpers::vector_get_theoretical<1>(vector_)
 				);
 			}
 			else if constexpr (num_dimensions == 3)
 			{
 				return coordinate_type
 				(
-					EmuMath::Helpers::VectorGetTheoretical<0>(vector_),
-					EmuMath::Helpers::VectorGetTheoretical<1>(vector_),
-					EmuMath::Helpers::VectorGetTheoretical<2>(vector_)
+					EmuMath::Helpers::vector_get_theoretical<0>(vector_),
+					EmuMath::Helpers::vector_get_theoretical<1>(vector_),
+					EmuMath::Helpers::vector_get_theoretical<2>(vector_)
 				);
 			}
 			else
@@ -205,7 +205,7 @@ namespace EmuMath
 		inline bool GenerateNoise(const options_type& options_, SampleProcessor_ sample_processor_)
 		{
 			using register_type = __m128;
-			using underlying_noise_gen_functor = EmuMath::FastNoiseGenFunctor<num_dimensions, NoiseType_, register_type>;
+			using underlying_noise_gen_functor = EmuMath::fast_noise_gen_functor<num_dimensions, NoiseType_, register_type>;
 
 			if (_valid_resolution(options_.table_resolution))
 			{

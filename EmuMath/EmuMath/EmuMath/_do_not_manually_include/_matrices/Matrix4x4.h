@@ -10,7 +10,7 @@ namespace EmuMath
 	{
 		private:
 		// Formed using decltype on a constructor call in order to trigger an assertion before doing anything further
-		using _matrix_assert = decltype(EmuMath::_underlying_components::MatrixAssert<4, 4, T_, ColumnMajor_>());
+		using _matrix_assert = decltype(EmuMath::_underlying_components::matrix_assert<4, 4, T_, ColumnMajor_>());
 
 	public:
 		/// <summary> Underlying default MatrixInfo regarding this matrix's static information, including common type aliases. </summary>
@@ -93,7 +93,7 @@ namespace EmuMath
 		template<std::size_t InNumColumns_, std::size_t InNumRows_, typename in_contained_type, bool InColumnMajor_>
 		explicit constexpr Matrix(const EmuMath::Matrix<InNumColumns_, InNumRows_, in_contained_type, InColumnMajor_>& to_copy_) : data_()
 		{
-			EmuMath::Helpers::MatrixCopy<this_type, EmuMath::Matrix<InNumColumns_, InNumRows_, in_contained_type, InColumnMajor_>>(*this, to_copy_);
+			EmuMath::Helpers::matrix_copy<this_type, EmuMath::Matrix<InNumColumns_, InNumRows_, in_contained_type, InColumnMajor_>>(*this, to_copy_);
 		}
 		template<typename NotAvailableIfContainsNonConstReferenceWrappers = std::enable_if_t<!contains_non_const_reference_wrappers>>
 		constexpr Matrix(const this_type& toCopy_) : data_(toCopy_.data_)
@@ -311,33 +311,33 @@ namespace EmuMath
 		template<std::size_t RowIndex_>
 		[[nodiscard]] constexpr inline random_access_row GetRow()
 		{
-			return EmuMath::Helpers::MatrixGetRow<RowIndex_, this_type>(*this);
+			return EmuMath::Helpers::matrix_get_row<RowIndex_, this_type>(*this);
 		}
 		template<std::size_t RowIndex_>
 		[[nodiscard]] constexpr inline const_random_access_row GetRow() const
 		{
-			return EmuMath::Helpers::MatrixGetRow<RowIndex_, this_type>(*this);
+			return EmuMath::Helpers::matrix_get_row<RowIndex_, this_type>(*this);
 		}
 		template<std::size_t RowIndex_>
 		[[nodiscard]] constexpr inline const_random_access_row GetRowConst() const
 		{
-			return EmuMath::Helpers::MatrixGetRow<RowIndex_, this_type>(*this);
+			return EmuMath::Helpers::matrix_get_row<RowIndex_, this_type>(*this);
 		}
 
 		template<std::size_t ColumnIndex_>
 		[[nodiscard]] constexpr inline random_access_column GetColumn()
 		{
-			return EmuMath::Helpers::MatrixGetColumn<ColumnIndex_, this_type>(*this);
+			return EmuMath::Helpers::matrix_get_column<ColumnIndex_, this_type>(*this);
 		}
 		template<std::size_t ColumnIndex_>
 		[[nodiscard]] constexpr inline const_random_access_column GetColumn() const
 		{
-			return EmuMath::Helpers::MatrixGetColumn<ColumnIndex_, this_type>(*this);
+			return EmuMath::Helpers::matrix_get_column<ColumnIndex_, this_type>(*this);
 		}
 		template<std::size_t ColumnIndex_>
 		[[nodiscard]] constexpr inline const_random_access_column GetColumnConst() const
 		{
-			return EmuMath::Helpers::MatrixGetColumn<ColumnIndex_, this_type>(*this);
+			return EmuMath::Helpers::matrix_get_column<ColumnIndex_, this_type>(*this);
 		}
 
 		/// <summary> Provides a pointer to this matrix's underlying data. </summary>
@@ -358,7 +358,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = false, std::size_t LhsNumColumns_, std::size_t RhsNumColumns_, typename rhs_contained_type, bool RhsColumnMajor_>
 		[[nodiscard]] constexpr inline bool operator==(const EmuMath::Matrix<LhsNumColumns_, RhsNumColumns_, rhs_contained_type, RhsColumnMajor_>& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpEqual<TestAllIndices_, this_type, EmuMath::Matrix<LhsNumColumns_, RhsNumColumns_, rhs_contained_type, RhsColumnMajor_>>
+			return EmuMath::Helpers::matrix_cmp_equal<TestAllIndices_, this_type, EmuMath::Matrix<LhsNumColumns_, RhsNumColumns_, rhs_contained_type, RhsColumnMajor_>>
 			(
 				*this,
 				rhs_
@@ -368,7 +368,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = false, std::size_t LhsNumColumns_, std::size_t RhsNumColumns_, typename rhs_contained_type, bool RhsColumnMajor_>
 		[[nodiscard]] constexpr inline bool operator!=(const EmuMath::Matrix<LhsNumColumns_, RhsNumColumns_, rhs_contained_type, RhsColumnMajor_>& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpNotEqual<TestAllIndices_, this_type, EmuMath::Matrix<LhsNumColumns_, RhsNumColumns_, rhs_contained_type, RhsColumnMajor_>>
+			return EmuMath::Helpers::matrix_cmp_not_equal<TestAllIndices_, this_type, EmuMath::Matrix<LhsNumColumns_, RhsNumColumns_, rhs_contained_type, RhsColumnMajor_>>
 			(
 				*this,
 				rhs_
@@ -378,74 +378,74 @@ namespace EmuMath
 		template<typename Rhs_>
 		[[nodiscard]] constexpr inline copy_type operator+(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixAdd<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_add<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
 		}
 		[[nodiscard]] constexpr inline copy_type operator+() const
 		{
-			return EmuMath::Helpers::MatrixAs<num_columns, num_rows, value_type, is_column_major, this_type>(*this);
+			return EmuMath::Helpers::matrix_as<num_columns, num_rows, value_type, is_column_major, this_type>(*this);
 		}
 
 		template<typename Rhs_>
 		[[nodiscard]] constexpr inline copy_type operator-(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixSubtract<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_subtract<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
 		}
 		[[nodiscard]] constexpr inline copy_type operator-() const
 		{
-			return EmuMath::Helpers::MatrixNegate<num_columns, num_rows, value_type, is_column_major, this_type>(*this);
+			return EmuMath::Helpers::matrix_negate<num_columns, num_rows, value_type, is_column_major, this_type>(*this);
 		}
 
 		template<typename Rhs_>
 		[[nodiscard]] constexpr inline auto operator*(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixMultiply(*this, rhs_);
+			return EmuMath::Helpers::matrix_multiply(*this, rhs_);
 		}
 
 		template<typename Rhs_>
 		[[nodiscard]] constexpr inline copy_type operator/(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixDivideBasic<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_divide_basic<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
 		}
 
 		template<typename Rhs_>
 		[[nodiscard]] constexpr inline copy_type operator%(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixModBasic<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_mod_basic<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
 		}
 
 		template<typename Rhs_>
 		[[nodiscard]] constexpr inline copy_type operator&(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixAnd<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_and<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
 		}
 
 		template<typename Rhs_>
 		[[nodiscard]] constexpr inline copy_type operator|(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixOr<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_or<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
 		}
 
 		template<typename Rhs_>
 		[[nodiscard]] constexpr inline copy_type operator^(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixXor<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_xor<num_columns, num_rows, value_type, is_column_major, this_type, Rhs_>(*this, rhs_);
 		}
 
 		template<typename Shifts_>
 		[[nodiscard]] constexpr inline copy_type operator<<(const Shifts_& num_shifts_) const
 		{
-			return EmuMath::Helpers::MatrixShiftLeft<num_columns, num_rows, value_type, is_column_major, this_type, Shifts_>(*this, num_shifts_);
+			return EmuMath::Helpers::matrix_shift_left<num_columns, num_rows, value_type, is_column_major, this_type, Shifts_>(*this, num_shifts_);
 		}
 
 		template<typename Shifts_>
 		[[nodiscard]] constexpr inline copy_type operator>>(const Shifts_& num_shifts_) const
 		{
-			return EmuMath::Helpers::MatrixShiftRight<num_columns, num_rows, value_type, is_column_major, this_type, Shifts_>(*this, num_shifts_);
+			return EmuMath::Helpers::matrix_shift_right<num_columns, num_rows, value_type, is_column_major, this_type, Shifts_>(*this, num_shifts_);
 		}
 
 		[[nodiscard]] constexpr inline copy_type operator~() const
 		{
-			return EmuMath::Helpers::MatrixNot<num_columns, num_rows, value_type, is_column_major, this_type>(*this);
+			return EmuMath::Helpers::matrix_not<num_columns, num_rows, value_type, is_column_major, this_type>(*this);
 		}
 #pragma endregion
 
@@ -453,7 +453,7 @@ namespace EmuMath
 		template<typename Rhs_>
 		constexpr inline this_type& operator=(const Rhs_& to_copy_)
 		{
-			return EmuMath::Helpers::MatrixCopy(*this, to_copy_);
+			return EmuMath::Helpers::matrix_copy(*this, to_copy_);
 		}
 
 		template<typename Rhs_>
@@ -534,42 +534,42 @@ namespace EmuMath
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Func_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> Mutate(Func_ func_) const
 		{
-			return EmuMath::Helpers::MatrixMutate<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, Func_&, this_type>(*this, func_);
+			return EmuMath::Helpers::matrix_mutate<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, Func_&, this_type>(*this, func_);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_, class Func_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> Mutate(Func_ func_) const
 		{
-			return EmuMath::Helpers::MatrixMutate<num_columns, num_rows, out_contained_type, OutColumnMajor_, Func_&, this_type>(*this, func_);
+			return EmuMath::Helpers::matrix_mutate<num_columns, num_rows, out_contained_type, OutColumnMajor_, Func_&, this_type>(*this, func_);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Func_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> Mutate(Func_ func_) const
 		{
-			return EmuMath::Helpers::MatrixMutate<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, Func_&, this_type>(*this, func_);
+			return EmuMath::Helpers::matrix_mutate<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, Func_&, this_type>(*this, func_);
 		}
 		template<bool OutColumnMajor_, class Func_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Mutate(Func_ func_) const
 		{
-			return EmuMath::Helpers::MatrixMutate<num_columns, num_rows, value_type, OutColumnMajor_, Func_&, this_type>(*this, func_);
+			return EmuMath::Helpers::matrix_mutate<num_columns, num_rows, value_type, OutColumnMajor_, Func_&, this_type>(*this, func_);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Func_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, is_column_major> Mutate(Func_ func_) const
 		{
-			return EmuMath::Helpers::MatrixMutate<OutNumColumns_, OutNumRows_, out_contained_type, is_column_major, Func_&, this_type>(*this, func_);
+			return EmuMath::Helpers::matrix_mutate<OutNumColumns_, OutNumRows_, out_contained_type, is_column_major, Func_&, this_type>(*this, func_);
 		}
 		template<typename out_contained_type, class Func_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, is_column_major> Mutate(Func_ func_) const
 		{
-			return EmuMath::Helpers::MatrixMutate<num_columns, num_rows, out_contained_type, is_column_major, Func_&, this_type>(*this, func_);
+			return EmuMath::Helpers::matrix_mutate<num_columns, num_rows, out_contained_type, is_column_major, Func_&, this_type>(*this, func_);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Func_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, is_column_major> Mutate(Func_ func_) const
 		{
-			return EmuMath::Helpers::MatrixMutate<OutNumColumns_, OutNumRows_, value_type, is_column_major, Func_&, this_type>(*this, func_);
+			return EmuMath::Helpers::matrix_mutate<OutNumColumns_, OutNumRows_, value_type, is_column_major, Func_&, this_type>(*this, func_);
 		}
 		template<class Func_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, is_column_major> Mutate(Func_ func_) const
 		{
-			return EmuMath::Helpers::MatrixMutate<num_columns, num_rows, value_type, is_column_major, Func_&, this_type>(*this, func_);
+			return EmuMath::Helpers::matrix_mutate<num_columns, num_rows, value_type, is_column_major, Func_&, this_type>(*this, func_);
 		}
 
 		/// <summary>
@@ -581,7 +581,7 @@ namespace EmuMath
 		template<typename out_contained_type = value_type, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, OutColumnMajor_, this_type>::type Transpose() const
 		{
-			return EmuMath::Helpers::MatrixTranspose<out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_transpose<out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -593,7 +593,7 @@ namespace EmuMath
 		template<typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline OutT_ Trace() const
 		{
-			return EmuMath::Helpers::MatrixTrace<OutT_, this_type>(*this);
+			return EmuMath::Helpers::matrix_trace<OutT_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -606,13 +606,13 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<out_contained_type, OutColumnMajor_, this_type>::type
 			ExclusiveSubmatrix()
 		{
-			return EmuMath::Helpers::MatrixExclusiveSubmatrix<ExcludeColumn_, ExcludeRow_, out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_submatrix_exclusive<ExcludeColumn_, ExcludeRow_, out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<std::size_t ExcludeColumn_, std::size_t ExcludeRow_, typename out_contained_type = value_type, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_submatrix_excluding_element_region<out_contained_type, OutColumnMajor_, this_type>::type
 			ExclusiveSubmatrix() const
 		{
-			return EmuMath::Helpers::MatrixExclusiveSubmatrix<ExcludeColumn_, ExcludeRow_, out_contained_type, OutColumnMajor_, const this_type>(*this);
+			return EmuMath::Helpers::matrix_submatrix_exclusive<ExcludeColumn_, ExcludeRow_, out_contained_type, OutColumnMajor_, const this_type>(*this);
 		}
 
 		/// <summary>
@@ -624,7 +624,7 @@ namespace EmuMath
 		template<typename OutDet_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline OutDet_ DeterminantLaplace() const
 		{
-			return EmuMath::Helpers::MatrixDeterminantLaplace<OutDet_, this_type>(*this);
+			return EmuMath::Helpers::matrix_determinant_laplace<OutDet_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -635,9 +635,9 @@ namespace EmuMath
 		/// <typeparam name="out_contained_type">Type to be contained in the output minor matrix.</typeparam>
 		/// <returns>Matrix of minors to this matrix.</returns>
 		template<typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = is_column_major>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> MatrixOfMinorsLaplace() const
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> matrix_minors_laplace() const
 		{
-			return EmuMath::Helpers::MatrixOfMinorsLaplace<out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_minors_laplace<out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -647,9 +647,9 @@ namespace EmuMath
 		/// <typeparam name="out_contained_type">Type to be contained in the output cofactor matrix.</typeparam>
 		/// <returns>Matrix of cofactors to this matrix.</returns>
 		template<typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = is_column_major>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> MatrixOfCofactorsLaplace() const
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> matrix_cofactors_laplace() const
 		{
-			return EmuMath::Helpers::MatrixOfCofactorsLaplace<out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_cofactors_laplace<out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -662,7 +662,7 @@ namespace EmuMath
 		template<typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, OutColumnMajor_, this_type>::type AdjugateLaplace() const
 		{
-			return EmuMath::Helpers::MatrixAdjugateLaplace<out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_adjugate_laplace<out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -686,7 +686,7 @@ namespace EmuMath
 		template<typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, OutColumnMajor_, this_type>::type InverseLaplace() const
 		{
-			return EmuMath::Helpers::MatrixInverseLaplace<out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_inverse_laplace<out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = is_column_major, typename OutDeterminant_>
 		[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_transpose<out_contained_type, OutColumnMajor_, this_type>::type InverseLaplace
@@ -694,7 +694,7 @@ namespace EmuMath
 			OutDeterminant_& out_determinant_
 		) const
 		{
-			return EmuMath::Helpers::MatrixInverseLaplace<out_contained_type, OutColumnMajor_, this_type, OutDeterminant_>(*this, out_determinant_);
+			return EmuMath::Helpers::matrix_inverse_laplace<out_contained_type, OutColumnMajor_, this_type, OutDeterminant_>(*this, out_determinant_);
 		}
 
 		/// <summary>
@@ -710,22 +710,22 @@ namespace EmuMath
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major>
 		constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> InverseGaussJordan() const
 		{
-			return EmuMath::Helpers::MatrixInverseGaussJordan<out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_inverse_gauss_jordan<out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<bool OutColumnMajor_ = is_column_major>
 		constexpr inline EmuMath::Matrix<num_columns, num_rows, preferred_floating_point, OutColumnMajor_> InverseGaussJordan() const
 		{
-			return EmuMath::Helpers::MatrixInverseGaussJordan<preferred_floating_point, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_inverse_gauss_jordan<preferred_floating_point, OutColumnMajor_, this_type>(*this);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, typename OutDeterminant_>
 		constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> InverseGaussJordan(OutDeterminant_& out_determinant_) const
 		{
-			return EmuMath::Helpers::MatrixInverseGaussJordan<out_contained_type, OutColumnMajor_, this_type>(*this, out_determinant_);
+			return EmuMath::Helpers::matrix_inverse_gauss_jordan<out_contained_type, OutColumnMajor_, this_type>(*this, out_determinant_);
 		}
 		template<bool OutColumnMajor_ = is_column_major, typename OutDeterminant_>
 		constexpr inline EmuMath::Matrix<num_columns, num_rows, preferred_floating_point, OutColumnMajor_> InverseGaussJordan(OutDeterminant_& out_determinant_) const
 		{
-			return EmuMath::Helpers::MatrixInverseGaussJordan<preferred_floating_point, OutColumnMajor_, this_type>(*this, out_determinant_);
+			return EmuMath::Helpers::matrix_inverse_gauss_jordan<preferred_floating_point, OutColumnMajor_, this_type>(*this, out_determinant_);
 		}
 #pragma endregion
 
@@ -744,37 +744,37 @@ namespace EmuMath
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> As() const
 		{
-			return EmuMath::Helpers::MatrixAs<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_as<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> As() const
 		{
-			return EmuMath::Helpers::MatrixAs<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_as<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> As() const
 		{
-			return EmuMath::Helpers::MatrixAs<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_as<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<bool OutColumnMajor_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, typename value_type, OutColumnMajor_> As() const
 		{
-			return EmuMath::Helpers::MatrixAs<num_columns, num_rows, value_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_as<num_columns, num_rows, value_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, is_column_major> As() const
 		{
-			return EmuMath::Helpers::MatrixAs<OutNumColumns_, OutNumRows_, out_contained_type, is_column_major, this_type>(*this);
+			return EmuMath::Helpers::matrix_as<OutNumColumns_, OutNumRows_, out_contained_type, is_column_major, this_type>(*this);
 		}
 		template<typename out_contained_type>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, is_column_major> As() const
 		{
-			return EmuMath::Helpers::MatrixAs<num_columns, num_rows, out_contained_type, is_column_major, this_type>(*this);
+			return EmuMath::Helpers::matrix_as<num_columns, num_rows, out_contained_type, is_column_major, this_type>(*this);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, is_column_major> As() const
 		{
-			return EmuMath::Helpers::MatrixAs<OutNumColumns_, OutNumRows_, value_type, is_column_major, this_type>(*this);
+			return EmuMath::Helpers::matrix_as<OutNumColumns_, OutNumRows_, value_type, is_column_major, this_type>(*this);
 		}
 
 		/// <summary>
@@ -806,7 +806,7 @@ namespace EmuMath
 		/// <returns>Identity to this matrix type.</returns>
 		[[nodiscard]] constexpr static inline copy_type Identity()
 		{
-			return EmuMath::Helpers::MatrixIdentity<this_type>();
+			return EmuMath::Helpers::matrix_identity<this_type>();
 		}
 #pragma endregion
 
@@ -826,22 +826,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> Add(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixAdd<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_add<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> Add(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixAdd<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_add<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> Add(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixAdd<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_add<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Add(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixAdd<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_add<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -862,22 +862,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> Subtract(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixSubtract<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_subtract<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> Subtract(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixSubtract<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_subtract<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> Subtract(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixSubtract<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_subtract<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Subtract(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixSubtract<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_subtract<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -899,22 +899,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MultiplyBasic(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixMultiplyBasic<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_multiply_basic<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> MultiplyBasic(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixMultiplyBasic<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_multiply_basic<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> MultiplyBasic(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixMultiplyBasic<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_multiply_basic<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> MultiplyBasic(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixMultiplyBasic<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_multiply_basic<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -936,22 +936,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> DivideBasic(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixDivideBasic<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_divide_basic<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> DivideBasic(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixDivideBasic<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_divide_basic<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> DivideBasic(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixDivideBasic<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_divide_basic<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> DivideBasic(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixDivideBasic<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_divide_basic<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -973,22 +973,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> ModBasic(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixModBasic<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_mod_basic<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> ModBasic(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixModBasic<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_mod_basic<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> ModBasic(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixModBasic<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_mod_basic<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> ModBasic(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixModBasic<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_mod_basic<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1010,12 +1010,12 @@ namespace EmuMath
 		template<typename out_contained_type, class RhsVector_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<RhsVector_::size, out_contained_type> MultiplyVector(const RhsVector_& rhs_vector_) const
 		{
-			return EmuMath::Helpers::MatrixMultiplyVector<out_contained_type, this_type, RhsVector_>(*this, rhs_vector_);
+			return EmuMath::Helpers::matrix_multiply_vector<out_contained_type, this_type, RhsVector_>(*this, rhs_vector_);
 		}
 		template<class RhsVector_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<RhsVector_::size, typename RhsVector_::value_type> MultiplyVector(const RhsVector_& rhs_vector_) const
 		{
-			return EmuMath::Helpers::MatrixMultiplyVector<typename RhsVector_::value_type, this_type, RhsVector_>(*this, rhs_vector_);
+			return EmuMath::Helpers::matrix_multiply_vector<typename RhsVector_::value_type, this_type, RhsVector_>(*this, rhs_vector_);
 		}
 
 		/// <summary>
@@ -1036,7 +1036,7 @@ namespace EmuMath
 		template<typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline auto Multiply(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixMultiply<out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_multiply<out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1050,22 +1050,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> Negate() const
 		{
-			return EmuMath::Helpers::MatrixNegate<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_negate<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> Negate() const
 		{
-			return EmuMath::Helpers::MatrixNegate<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_negate<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> Negate() const
 		{
-			return EmuMath::Helpers::MatrixNegate<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_negate<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Negate() const
 		{
-			return EmuMath::Helpers::MatrixNegate<num_columns, num_rows, value_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_negate<num_columns, num_rows, value_type, OutColumnMajor_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -1079,22 +1079,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> Floor() const
 		{
-			return EmuMath::Helpers::MatrixFloor<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_floor<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> Floor() const
 		{
-			return EmuMath::Helpers::MatrixFloor<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_floor<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> Floor() const
 		{
-			return EmuMath::Helpers::MatrixFloor<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_floor<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Floor() const
 		{
-			return EmuMath::Helpers::MatrixFloor<num_columns, num_rows, value_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_floor<num_columns, num_rows, value_type, OutColumnMajor_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -1108,22 +1108,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> Ceil() const
 		{
-			return EmuMath::Helpers::MatrixCeil<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_ceil<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> Ceil() const
 		{
-			return EmuMath::Helpers::MatrixCeil<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_ceil<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> Ceil() const
 		{
-			return EmuMath::Helpers::MatrixCeil<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_ceil<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Ceil() const
 		{
-			return EmuMath::Helpers::MatrixCeil<num_columns, num_rows, value_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_ceil<num_columns, num_rows, value_type, OutColumnMajor_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -1137,22 +1137,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> Trunc() const
 		{
-			return EmuMath::Helpers::MatrixTrunc<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_trunc<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> Trunc() const
 		{
-			return EmuMath::Helpers::MatrixTrunc<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_trunc<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> Trunc() const
 		{
-			return EmuMath::Helpers::MatrixTrunc<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_trunc<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Trunc() const
 		{
-			return EmuMath::Helpers::MatrixTrunc<num_columns, num_rows, value_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_trunc<num_columns, num_rows, value_type, OutColumnMajor_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -1170,22 +1170,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> Min(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixMin<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_min<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> Min(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixMin<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_min<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> Min(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixMin<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_min<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Min(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixMin<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_min<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1196,7 +1196,7 @@ namespace EmuMath
 		/// <returns>EmuMath vector containing the column and row index of the lowest element within this matrix.</returns>
 		[[nodiscard]] constexpr EmuMath::Vector<2, std::size_t> MinIndex() const
 		{
-			return EmuMath::Helpers::MatrixMinIndex<this_type>(*this);
+			return EmuMath::Helpers::matrix_min_index<this_type>(*this);
 		}
 
 		/// <summary>
@@ -1208,12 +1208,12 @@ namespace EmuMath
 		template<typename Out_ = raw_value_type&>
 		[[nodiscard]] constexpr inline Out_ Min()
 		{
-			return EmuMath::Helpers::MatrixMin<Out_, this_type>(*this);
+			return EmuMath::Helpers::matrix_min<Out_, this_type>(*this);
 		}
 		template<typename Out_ = const raw_value_type&>
 		[[nodiscard]] constexpr inline Out_ Min() const
 		{
-			return EmuMath::Helpers::MatrixMin<Out_, const this_type>(*this);
+			return EmuMath::Helpers::matrix_min<Out_, const this_type>(*this);
 		}
 
 		/// <summary>
@@ -1231,22 +1231,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> Max(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixMax<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_max<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> Max(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixMax<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_max<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> Max(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixMax<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_max<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Max(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixMax<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_max<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1257,7 +1257,7 @@ namespace EmuMath
 		/// <returns>EmuMath vector containing the column and row index of the highest element within this matrix.</returns>
 		[[nodiscard]] constexpr EmuMath::Vector<2, std::size_t> MaxIndex() const
 		{
-			return EmuMath::Helpers::MatrixMaxIndex<this_type>(*this);
+			return EmuMath::Helpers::matrix_max_index<this_type>(*this);
 		}
 
 		/// <summary>
@@ -1269,12 +1269,12 @@ namespace EmuMath
 		template<typename Out_ = raw_value_type&>
 		[[nodiscard]] constexpr inline Out_ Max()
 		{
-			return EmuMath::Helpers::MatrixMax<Out_, this_type>(*this);
+			return EmuMath::Helpers::matrix_max<Out_, this_type>(*this);
 		}
 		template<typename Out_ = const raw_value_type&>
 		[[nodiscard]] constexpr inline Out_ Max() const
 		{
-			return EmuMath::Helpers::MatrixMax<Out_, const this_type>(*this);
+			return EmuMath::Helpers::matrix_max<Out_, const this_type>(*this);
 		}
 
 		/// <summary>
@@ -1292,22 +1292,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Min_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> ClampMin(const Min_& min_) const
 		{
-			return EmuMath::Helpers::MatrixClampMin<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Min_>(*this, min_);
+			return EmuMath::Helpers::matrix_clamp_min<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Min_>(*this, min_);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Min_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> ClampMin(const Min_& min_) const
 		{
-			return EmuMath::Helpers::MatrixClampMin<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Min_>(*this, min_);
+			return EmuMath::Helpers::matrix_clamp_min<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Min_>(*this, min_);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Min_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> ClampMin(const Min_& min_) const
 		{
-			return EmuMath::Helpers::MatrixClampMin<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Min_>(*this, min_);
+			return EmuMath::Helpers::matrix_clamp_min<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Min_>(*this, min_);
 		}
 		template<bool OutColumnMajor_ = is_column_major, class Min_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> ClampMin(const Min_& min_) const
 		{
-			return EmuMath::Helpers::MatrixClampMin<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Min_>(*this, min_);
+			return EmuMath::Helpers::matrix_clamp_min<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Min_>(*this, min_);
 		}
 
 		/// <summary>
@@ -1325,22 +1325,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Max_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> ClampMax(const Max_& max_) const
 		{
-			return EmuMath::Helpers::MatrixClampMax<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Max_>(*this, max_);
+			return EmuMath::Helpers::matrix_clamp_max<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Max_>(*this, max_);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Max_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> ClampMax(const Max_& max_) const
 		{
-			return EmuMath::Helpers::MatrixClampMax<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Max_>(*this, max_);
+			return EmuMath::Helpers::matrix_clamp_max<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Max_>(*this, max_);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Max_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> ClampMax(const Max_& max_) const
 		{
-			return EmuMath::Helpers::MatrixClampMax<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Max_>(*this, max_);
+			return EmuMath::Helpers::matrix_clamp_max<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Max_>(*this, max_);
 		}
 		template<bool OutColumnMajor_ = is_column_major, class Max_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> ClampMax(const Max_& max_) const
 		{
-			return EmuMath::Helpers::MatrixClampMax<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Max_>(*this, max_);
+			return EmuMath::Helpers::matrix_clamp_max<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Max_>(*this, max_);
 		}
 
 		/// <summary>
@@ -1359,22 +1359,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Min_, class Max_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> Clamp(const Min_& min_, const Max_& max_) const
 		{
-			return EmuMath::Helpers::MatrixClamp<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Min_, Max_>(*this, min_, max_);
+			return EmuMath::Helpers::matrix_clamp<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Min_, Max_>(*this, min_, max_);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Min_, class Max_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> Clamp(const Min_& min_, const Max_& max_) const
 		{
-			return EmuMath::Helpers::MatrixClamp<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Min_, Max_>(*this, min_, max_);
+			return EmuMath::Helpers::matrix_clamp<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, Min_, Max_>(*this, min_, max_);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Min_, class Max_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> Clamp(const Min_& min_, const Max_& max_) const
 		{
-			return EmuMath::Helpers::MatrixClamp<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Min_, Max_>(*this, min_, max_);
+			return EmuMath::Helpers::matrix_clamp<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Min_, Max_>(*this, min_, max_);
 		}
 		template<bool OutColumnMajor_ = is_column_major, class Min_, class Max_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Clamp(const Min_& min_, const Max_& max_) const
 		{
-			return EmuMath::Helpers::MatrixClamp<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Min_, Max_>(*this, min_, max_);
+			return EmuMath::Helpers::matrix_clamp<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Min_, Max_>(*this, min_, max_);
 		}
 
 		/// <summary>
@@ -1395,22 +1395,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class B_, class T__>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> Lerp(const B_& b_, const T__& t_) const
 		{
-			return EmuMath::Helpers::MatrixLerp<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, B_, T__>(*this, b_, t_);
+			return EmuMath::Helpers::matrix_lerp<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, B_, T__>(*this, b_, t_);
 		}
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class B_, class T__>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> Lerp(const B_& b_, const T__& t_) const
 		{
-			return EmuMath::Helpers::MatrixLerp<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, B_, T__>(*this, b_, t_);
+			return EmuMath::Helpers::matrix_lerp<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_, this_type, B_, T__>(*this, b_, t_);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class B_, class T__>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> Lerp(const B_& b_, const T__& t_) const
 		{
-			return EmuMath::Helpers::MatrixLerp<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, B_, T__>(*this, b_, t_);
+			return EmuMath::Helpers::matrix_lerp<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, B_, T__>(*this, b_, t_);
 		}
 		template<bool OutColumnMajor_ = is_column_major, class B_, class T__>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Lerp(const B_& b_, const T__& t_) const
 		{
-			return EmuMath::Helpers::MatrixLerp<num_columns, num_rows, value_type, OutColumnMajor_, this_type, B_, T__>(*this, b_, t_);
+			return EmuMath::Helpers::matrix_lerp<num_columns, num_rows, value_type, OutColumnMajor_, this_type, B_, T__>(*this, b_, t_);
 		}
 #pragma endregion
 
@@ -1430,22 +1430,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_> And(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixAnd<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_and<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<std::size_t OutNumColumns, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_> And(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixAnd<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_and<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> And(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixAnd<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_and<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> And(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixAnd<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_and<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1463,22 +1463,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_> Or(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixOr<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_or<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<std::size_t OutNumColumns, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_> Or(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixOr<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_or<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> Or(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixOr<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_or<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Or(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixOr<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_or<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1496,22 +1496,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_> Xor(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixXor<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_xor<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<std::size_t OutNumColumns, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_> Xor(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixXor<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_xor<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> Xor(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixXor<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_xor<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Xor(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixXor<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_xor<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1525,22 +1525,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_> Not() const
 		{
-			return EmuMath::Helpers::MatrixNot<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_not<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<std::size_t OutNumColumns, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_> Not() const
 		{
-			return EmuMath::Helpers::MatrixNot<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_not<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> Not() const
 		{
-			return EmuMath::Helpers::MatrixNot<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_not<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type>(*this);
 		}
 		template<bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Not() const
 		{
-			return EmuMath::Helpers::MatrixNot<num_columns, num_rows, value_type, OutColumnMajor_, this_type>(*this);
+			return EmuMath::Helpers::matrix_not<num_columns, num_rows, value_type, OutColumnMajor_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -1558,22 +1558,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Shifts_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_> ShiftLeft(const Shifts_& num_shifts_) const
 		{
-			return EmuMath::Helpers::MatrixShiftLeft<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
+			return EmuMath::Helpers::matrix_shift_left<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
 		}
 		template<std::size_t OutNumColumns, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Shifts_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_> ShiftLeft(const Shifts_& num_shifts_) const
 		{
-			return EmuMath::Helpers::MatrixShiftLeft<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
+			return EmuMath::Helpers::matrix_shift_left<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Shifts_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> ShiftLeft(const Shifts_& num_shifts_) const
 		{
-			return EmuMath::Helpers::MatrixShiftLeft<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
+			return EmuMath::Helpers::matrix_shift_left<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
 		}
 		template<bool OutColumnMajor_ = is_column_major, class Shifts_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> ShiftLeft(const Shifts_& num_shifts_) const
 		{
-			return EmuMath::Helpers::MatrixShiftLeft<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
+			return EmuMath::Helpers::matrix_shift_left<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
 		}
 
 		/// <summary>
@@ -1591,22 +1591,22 @@ namespace EmuMath
 		template<std::size_t OutNumColumns, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Shifts_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_> ShiftRight(const Shifts_& num_shifts_) const
 		{
-			return EmuMath::Helpers::MatrixShiftRight<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
+			return EmuMath::Helpers::matrix_shift_right<OutNumColumns, OutNumRows_, out_contained_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
 		}
 		template<std::size_t OutNumColumns, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major, class Shifts_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_> ShiftRight(const Shifts_& num_shifts_) const
 		{
-			return EmuMath::Helpers::MatrixShiftRight<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
+			return EmuMath::Helpers::matrix_shift_right<OutNumColumns, OutNumRows_, value_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
 		}
 		template<typename out_contained_type, bool OutColumnMajor_ = is_column_major, class Shifts_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, out_contained_type, OutColumnMajor_> ShiftRight(const Shifts_& num_shifts_) const
 		{
-			return EmuMath::Helpers::MatrixShiftRight<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
+			return EmuMath::Helpers::matrix_shift_right<num_columns, num_rows, out_contained_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
 		}
 		template<bool OutColumnMajor_ = is_column_major, class Shifts_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> ShiftRight(const Shifts_& num_shifts_) const
 		{
-			return EmuMath::Helpers::MatrixShiftRight<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
+			return EmuMath::Helpers::matrix_shift_right<num_columns, num_rows, value_type, OutColumnMajor_, this_type, Shifts_>(*this, num_shifts_);
 		}
 #pragma endregion
 
@@ -1622,7 +1622,7 @@ namespace EmuMath
 		template<std::size_t NumColumnsToTest_ = num_columns, std::size_t NumRowsToTest_ = num_rows, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> CmpPerElementEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpPerElementEqual<NumColumnsToTest_, NumRowsToTest_, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_cmp_per_element_equal<NumColumnsToTest_, NumRowsToTest_, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		/// <summary>
 		/// <para> Compares the inequality of each element in this matrix to rhs_ and returns the results of comparisons in respective indices of a matrix of booleans. </para>
@@ -1635,7 +1635,7 @@ namespace EmuMath
 		template<std::size_t NumColumnsToTest_ = num_columns, std::size_t NumRowsToTest_ = num_rows, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> CmpPerElementNotEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpPerElementNotEqual<NumColumnsToTest_, NumRowsToTest_, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_cmp_per_element_not_equal<NumColumnsToTest_, NumRowsToTest_, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		/// <summary>
 		/// <para> Compares the magnitude of each element in this matrix to rhs_ and returns the results of comparisons in respective indices of a matrix of booleans. </para>
@@ -1648,7 +1648,7 @@ namespace EmuMath
 		template<std::size_t NumColumnsToTest_ = num_columns, std::size_t NumRowsToTest_ = num_rows, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> CmpPerElementGreater(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpPerElementGreater<NumColumnsToTest_, NumRowsToTest_, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_cmp_per_element_greater<NumColumnsToTest_, NumRowsToTest_, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		/// <summary>
 		/// <para> Compares the magnitude of each element in this matrix to rhs_ and returns the results of comparisons in respective indices of a matrix of booleans. </para>
@@ -1661,7 +1661,7 @@ namespace EmuMath
 		template<std::size_t NumColumnsToTest_ = num_columns, std::size_t NumRowsToTest_ = num_rows, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> CmpPerElementLess(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpPerElementLess<NumColumnsToTest_, NumRowsToTest_, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_cmp_per_element_less<NumColumnsToTest_, NumRowsToTest_, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		/// <summary>
 		/// <para> Compares the magnitude of each element in this matrix to rhs_ and returns the results of comparisons in respective indices of a matrix of booleans. </para>
@@ -1674,7 +1674,7 @@ namespace EmuMath
 		template<std::size_t NumColumnsToTest_ = num_columns, std::size_t NumRowsToTest_ = num_rows, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> CmpPerElementGreaterEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpPerElementGreaterEqual<NumColumnsToTest_, NumRowsToTest_, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_cmp_per_element_greater_equal<NumColumnsToTest_, NumRowsToTest_, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 		/// <summary>
 		/// <para> Compares the magnitude of each element in this matrix to rhs_ and returns the results of comparisons in respective indices of a matrix of booleans. </para>
@@ -1687,7 +1687,7 @@ namespace EmuMath
 		template<std::size_t NumColumnsToTest_ = num_columns, std::size_t NumRowsToTest_ = num_rows, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumnsToTest_, NumRowsToTest_, bool, OutColumnMajor_> CmpPerElementLessEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpPerElementLessEqual<NumColumnsToTest_, NumRowsToTest_, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_cmp_per_element_less_equal<NumColumnsToTest_, NumRowsToTest_, OutColumnMajor_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1703,7 +1703,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = false, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpAllEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_cmp_all_equal<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 		/// <summary>
 		/// <para> Returns true if all not_equal_to comparisons between this matrix and rhs_ return true. </para>
@@ -1718,7 +1718,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = false, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllNotEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpAllNotEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_cmp_all_not_equal<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 		/// <summary>
 		/// <para> Returns true if all greater_than comparisons between this matrix and rhs_ return true. </para>
@@ -1733,7 +1733,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = false, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllGreater(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpAllGreater<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_cmp_all_greater<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 		/// <summary>
 		/// <para> Returns true if all less_than comparisons between this matrix and rhs_ return true. </para>
@@ -1748,7 +1748,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = false, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllLess(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpAllLess<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_cmp_all_less<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 		/// <summary>
 		/// <para> Returns true if all greater_equal comparisons between this matrix and rhs_ return true. </para>
@@ -1763,7 +1763,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = false, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllGreaterEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpAllGreaterEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_cmp_all_greater_equal<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 		/// <summary>
 		/// <para> Returns true if all less_equal comparisons between this matrix and rhs_ return true. </para>
@@ -1778,7 +1778,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = false, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllLessEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpAllLessEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_cmp_all_less_equal<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1794,7 +1794,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = false, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpAnyEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_cmp_any_equal<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 		/// <summary>
 		/// <para> Returns true if at least one not_equal_to comparison between this matrix and rhs_ returns true. </para>
@@ -1809,7 +1809,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = false, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyNotEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpAnyNotEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_cmp_any_not_equal<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 		/// <summary>
 		/// <para> Returns true if at least one greater_than comparison between this matrix and rhs_ returns true. </para>
@@ -1824,7 +1824,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = false, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyGreater(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpAnyGreater<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_cmp_any_greater<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 		/// <summary>
 		/// <para> Returns true if at least one less_than comparison between this matrix and rhs_ returns true. </para>
@@ -1839,7 +1839,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = false, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyLess(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpAnyLess<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_cmp_any_less<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 		/// <summary>
 		/// <para> Returns true if at least one greater_equal comparison between this matrix and rhs_ returns true. </para>
@@ -1854,7 +1854,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = false, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyGreaterEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpAnyGreaterEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_cmp_any_greater_equal<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 		/// <summary>
 		/// <para> Returns true if at least one less_equal comparison between this matrix and rhs_ returns true. </para>
@@ -1869,7 +1869,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = false, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyLessEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::MatrixCmpAnyLessEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::matrix_cmp_any_less_equal<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1886,7 +1886,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = false, class RhsMatrix_>
 		[[nodiscard]] constexpr inline bool CmpEqual(const RhsMatrix_& rhs_matrix_) const
 		{
-			return EmuMath::Helpers::MatrixCmpEqual<TestAllIndices_, this_type, RhsMatrix_>(*this, rhs_matrix_);
+			return EmuMath::Helpers::matrix_cmp_equal<TestAllIndices_, this_type, RhsMatrix_>(*this, rhs_matrix_);
 		}
 		/// <summary>
 		/// <para> Returns true if the passed matrix is not equal to this matrix. </para>
@@ -1902,7 +1902,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = false, class RhsMatrix_>
 		[[nodiscard]] constexpr inline bool CmpNotEqual(const RhsMatrix_& rhs_matrix_) const
 		{
-			return EmuMath::Helpers::MatrixCmpNotEqual<TestAllIndices_, this_type, RhsMatrix_>(*this, rhs_matrix_);
+			return EmuMath::Helpers::matrix_cmp_not_equal<TestAllIndices_, this_type, RhsMatrix_>(*this, rhs_matrix_);
 		}
 #pragma endregion
 
@@ -1925,7 +1925,7 @@ namespace EmuMath
 		template<typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = is_column_major, typename X_, typename Y_, typename Z_>
 		[[nodiscard]] static constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> Translation(const X_& x_, const Y_& y_, const Z_& z_)
 		{
-			return EmuMath::Helpers::MatrixTranslation<out_contained_type, OutColumnMajor_, X_, Y_, Z_>(x_, y_, z_);
+			return EmuMath::Helpers::matrix_translation<out_contained_type, OutColumnMajor_, X_, Y_, Z_>(x_, y_, z_);
 		}
 
 		/// <summary>
@@ -1946,7 +1946,7 @@ namespace EmuMath
 		template<typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = is_column_major, typename X_, typename Y_, typename Z_>
 		[[nodiscard]] static constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> Scale(const X_& x_, const Y_& y_, const Z_& z_)
 		{
-			return EmuMath::Helpers::MatrixScale<out_contained_type, OutColumnMajor_, X_, Y_, Z_>(x_, y_, z_);
+			return EmuMath::Helpers::matrix_scale<out_contained_type, OutColumnMajor_, X_, Y_, Z_>(x_, y_, z_);
 		}
 
 		/// <summary>
@@ -1961,7 +1961,7 @@ namespace EmuMath
 		template<bool RotIsRads_ = true, std::size_t NumIterations_ = 3, bool DoMod_ = true, typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = true, typename RotX_>
 		[[nodiscard]] static constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> RotationXConstexpr(const RotX_& rot_x_)
 		{
-			return EmuMath::Helpers::MatrixRotationXConstexpr<RotIsRads_, NumIterations_, DoMod_, out_contained_type, OutColumnMajor_, RotX_>(rot_x_);
+			return EmuMath::Helpers::matrix_rotation_x_constexpr<RotIsRads_, NumIterations_, DoMod_, out_contained_type, OutColumnMajor_, RotX_>(rot_x_);
 		}
 
 		/// <summary>
@@ -1976,7 +1976,7 @@ namespace EmuMath
 		template<bool RotIsRads_ = true, std::size_t NumIterations_ = 3, bool DoMod_ = true, typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = true, typename RotY_>
 		[[nodiscard]] static constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> RotationYConstexpr(const RotY_& rot_y_)
 		{
-			return EmuMath::Helpers::MatrixRotationYConstexpr<RotIsRads_, NumIterations_, DoMod_, out_contained_type, OutColumnMajor_, RotY_>(rot_y_);
+			return EmuMath::Helpers::matrix_rotation_y_constexpr<RotIsRads_, NumIterations_, DoMod_, out_contained_type, OutColumnMajor_, RotY_>(rot_y_);
 		}
 
 		/// <summary>
@@ -1991,7 +1991,7 @@ namespace EmuMath
 		template<bool RotIsRads_ = true, std::size_t NumIterations_ = 3, bool DoMod_ = true, typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = true, typename RotZ_>
 		[[nodiscard]] static constexpr inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> RotationZConstexpr(const RotZ_& rot_z_)
 		{
-			return EmuMath::Helpers::MatrixRotationZConstexpr<RotIsRads_, NumIterations_, DoMod_, out_contained_type, OutColumnMajor_, RotZ_>(rot_z_);
+			return EmuMath::Helpers::matrix_rotation_z_constexpr<RotIsRads_, NumIterations_, DoMod_, out_contained_type, OutColumnMajor_, RotZ_>(rot_z_);
 		}
 
 		/// <summary> Creates a 4x4 transformation matrix which may be used to rotate a point about the X-axis by the provided number of radians or degrees. </summary>
@@ -2002,7 +2002,7 @@ namespace EmuMath
 		template<bool RotIsRads_ = true, typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = true, typename RotX_>
 		[[nodiscard]] static inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> RotationX(const RotX_& rot_x_)
 		{
-			return EmuMath::Helpers::MatrixRotationX<RotIsRads_, out_contained_type, OutColumnMajor_, RotX_>(rot_x_);
+			return EmuMath::Helpers::matrix_rotation_x<RotIsRads_, out_contained_type, OutColumnMajor_, RotX_>(rot_x_);
 		}
 
 		/// <summary> Creates a 4x4 transformation matrix which may be used to rotate a point about the Y-axis by the provided number of radians or degrees. </summary>
@@ -2013,7 +2013,7 @@ namespace EmuMath
 		template<bool RotIsRads_ = true, typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = true, typename RotY_>
 		[[nodiscard]] static inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> RotationY(const RotY_& rot_y_)
 		{
-			return EmuMath::Helpers::MatrixRotationY<RotIsRads_, out_contained_type, OutColumnMajor_, RotY_>(rot_y_);
+			return EmuMath::Helpers::matrix_rotation_y<RotIsRads_, out_contained_type, OutColumnMajor_, RotY_>(rot_y_);
 		}
 
 		/// <summary> Creates a 4x4 transformation matrix which may be used to rotate a point about the Z-axis by the provided number of radians or degrees. </summary>
@@ -2024,7 +2024,7 @@ namespace EmuMath
 		template<bool RotIsRads_ = true, typename out_contained_type = preferred_floating_point, bool OutColumnMajor_ = true, typename RotZ_>
 		[[nodiscard]] static inline EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_> RotationZ(const RotZ_& rot_z_)
 		{
-			return EmuMath::Helpers::MatrixRotationZ<RotIsRads_, out_contained_type, OutColumnMajor_, RotZ_>(rot_z_);
+			return EmuMath::Helpers::matrix_rotation_z<RotIsRads_, out_contained_type, OutColumnMajor_, RotZ_>(rot_z_);
 		}
 #pragma endregion
 
@@ -2058,7 +2058,7 @@ namespace EmuMath
 			const Fov_& fov_y_angle_
 		)
 		{
-			return EmuMath::Helpers::MatrixBasicPerspective<NumIterations_, RadsFov_, out_contained_type, OutColumnMajor_, Near_, Far_, Fov_>(near_, far_, fov_y_angle_);
+			return EmuMath::Helpers::matrix_basic_perspective<NumIterations_, RadsFov_, out_contained_type, OutColumnMajor_, Near_, Far_, Fov_>(near_, far_, fov_y_angle_);
 		}
 
 		/// <summary>
@@ -2101,7 +2101,7 @@ namespace EmuMath
 			const AspectRatio_& aspect_ratio_
 		)
 		{
-			return EmuMath::Helpers::MatrixPerspectiveVK<FovYIsRads_, out_contained_type, OutColumnMajor_, NumTanIterations_, DoTanMod_, FovY_, Near_, Far_, AspectRatio_>
+			return EmuMath::Helpers::matrix_perspective_vk<FovYIsRads_, out_contained_type, OutColumnMajor_, NumTanIterations_, DoTanMod_, FovY_, Near_, Far_, AspectRatio_>
 			(
 				fov_angle_y_, near_, far_, aspect_ratio_
 			);
@@ -2150,7 +2150,7 @@ namespace EmuMath
 			const Top_& top_
 		)
 		{
-			return EmuMath::Helpers::MatrixPerspectiveVK<out_contained_type, OutColumnMajor_, Near_, Far_, Left_, Right_, Bottom_, top_>
+			return EmuMath::Helpers::matrix_perspective_vk<out_contained_type, OutColumnMajor_, Near_, Far_, Left_, Right_, Bottom_, top_>
 			(
 				near_, far_, left_, right_, bottom_, top_
 			);
@@ -2192,7 +2192,7 @@ namespace EmuMath
 			const Far_& far_
 		)
 		{
-			return EmuMath::Helpers::MatrixOrthographicVK<out_contained_type, OutColumnMajor_, Left_, Right_, Bottom_, Top_, Near_, Far_>
+			return EmuMath::Helpers::matrix_orthographic_vk<out_contained_type, OutColumnMajor_, Left_, Right_, Bottom_, Top_, Near_, Far_>
 			(
 				left_, right_, bottom_, top_, near_, far_
 			);
@@ -2233,7 +2233,7 @@ namespace EmuMath
 			const Far_& far_
 		)
 		{
-			return EmuMath::Helpers::MatrixOrthographicVK<out_contained_type, OutColumnMajor_, Width_, Height_, Near_, Far_>
+			return EmuMath::Helpers::matrix_orthographic_vk<out_contained_type, OutColumnMajor_, Width_, Height_, Near_, Far_>
 			(
 				width_, height_, near_, far_
 			);
@@ -2334,7 +2334,7 @@ namespace EmuMath
 #pragma endregion
 	};
 
-	/// <summary> Alias for the specialised EmuMath::Matrix which contains 4 columns and 4 rows. </summary>
+	/// <summary> Alias for the partially-specialised EmuMath::Matrix which contains 4 columns and 4 rows. </summary>
 	template<typename T_, bool ColumnMajor_ = true>
 	using Matrix4x4 = EmuMath::Matrix<4, 4, T_, ColumnMajor_>;
 }

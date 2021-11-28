@@ -133,19 +133,19 @@ namespace EmuMath
 					{
 						return channels_vector
 						(
-							EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<0>()),
-							EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<1>()),
-							EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<2>()),
-							EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<3>())
+							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<0>()),
+							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<1>()),
+							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<2>()),
+							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<3>())
 						);
 					}
 					else
 					{
 						return channels_vector
 						(
-							EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<0>()),
-							EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<1>()),
-							EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<2>()),
+							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<0>()),
+							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<1>()),
+							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<2>()),
 							max_intensity
 						);
 					}
@@ -154,9 +154,9 @@ namespace EmuMath
 				{
 					return channels_vector
 					(
-						EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<0>()),
-						EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<1>()),
-						EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<2>())
+						EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<0>()),
+						EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<1>()),
+						EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<2>())
 					);
 				}
 			}
@@ -191,9 +191,9 @@ namespace EmuMath
 						// --- and we know there is no <3> element, we need to manually give max_intensity for the alpha
 						return channels_vector
 						(
-							EmuMath::Helpers::VectorGetTheoretical<0>(channels_to_copy_),
-							EmuMath::Helpers::VectorGetTheoretical<1>(channels_to_copy_),
-							EmuMath::Helpers::VectorGetTheoretical<2>(channels_to_copy_),
+							EmuMath::Helpers::vector_get_theoretical<0>(channels_to_copy_),
+							EmuMath::Helpers::vector_get_theoretical<1>(channels_to_copy_),
+							EmuMath::Helpers::vector_get_theoretical<2>(channels_to_copy_),
 							max_intensity
 						);
 					}
@@ -202,9 +202,9 @@ namespace EmuMath
 				{
 					return channels_vector
 					(
-						EmuMath::Helpers::VectorGetTheoretical<0>(channels_to_copy_),
-						EmuMath::Helpers::VectorGetTheoretical<1>(channels_to_copy_),
-						EmuMath::Helpers::VectorGetTheoretical<2>(channels_to_copy_)
+						EmuMath::Helpers::vector_get_theoretical<0>(channels_to_copy_),
+						EmuMath::Helpers::vector_get_theoretical<1>(channels_to_copy_),
+						EmuMath::Helpers::vector_get_theoretical<2>(channels_to_copy_)
 					);
 				}
 			}
@@ -330,9 +330,9 @@ namespace EmuMath
 		constexpr Colour(const EmuMath::Colour<ToCopyChannel_, ToCopyContainsAlpha_>& to_copy_rgb_, A_&& a_) :
 			channels
 			(
-				EmuMath::Helpers::convert_colour_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<0>()),
-				EmuMath::Helpers::convert_colour_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<1>()),
-				EmuMath::Helpers::convert_colour_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<2>()),
+				EmuMath::Helpers::colour_convert_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<0>()),
+				EmuMath::Helpers::colour_convert_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<1>()),
+				EmuMath::Helpers::colour_convert_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<2>()),
 				static_cast<value_type>(a_)
 			)
 		{

@@ -12,7 +12,7 @@ namespace EmuMath::Functors
 		{
 		}
 		template<typename T_>
-		constexpr inline T_ operator()(T_ sample_) const
+		[[nodiscard]] constexpr inline T_ operator()(T_ sample_) const
 		{
 			return sample_;
 		}
@@ -27,12 +27,12 @@ namespace EmuMath::Functors
 			denominator_reciprocal_256(EmuSIMD::set1<__m256>(denominator_reciprocal_))
 		{
 		}
-		inline __m128 operator()(__m128 samples_) const
+		[[nodiscard]] inline __m128 operator()(__m128 samples_) const
 		{
 			samples_ = EmuSIMD::sub(samples_, _mm256_castps256_ps128(min_256));
 			return EmuSIMD::mul(samples_, _mm256_castps256_ps128(denominator_reciprocal_256));
 		}
-		inline __m256 operator()(__m256 samples_) const
+		[[nodiscard]] inline __m256 operator()(__m256 samples_) const
 		{
 			samples_ = EmuSIMD::sub(samples_, min_256);
 			return EmuSIMD::mul(samples_, denominator_reciprocal_256);
@@ -55,11 +55,11 @@ namespace EmuMath::Functors
 			multiplier_256(EmuSIMD::set1<__m256>(multiplier_))
 		{
 		}
-		constexpr inline __m128 operator()(__m128 sample_) const
+		[[nodiscard]] constexpr inline __m128 operator()(__m128 sample_) const
 		{
 			return EmuSIMD::mul_all(sample_, _mm256_castps256_ps128(multiplier_256));
 		}
-		constexpr inline __m256 operator()(__m256 sample_) const
+		[[nodiscard]] constexpr inline __m256 operator()(__m256 sample_) const
 		{
 			return EmuSIMD::mul_all(sample_, multiplier_256);
 		}
