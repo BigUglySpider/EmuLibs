@@ -9,10 +9,10 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<std::size_t Index_, typename OutT_, std::size_t PerElementWidthIfInt_ = 32, class Register_>
 	[[nodiscard]] inline OutT_ _get_register_index(Register_ register_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
-			if constexpr (EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, register_type_uq, __m128, __m256, __m512>::value)
+			if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128, __m256, __m512>::value)
 			{
 				if constexpr (std::is_convertible_v<float, OutT_>)
 				{
@@ -63,7 +63,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 					static_assert(false, "Attempted to extract an index from a float-containing SIMD register using EmuSIMD helpers, but the provided output type cannot be created from a float value.");
 				}
 			}
-			else if constexpr (EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, register_type_uq, __m128d, __m256d, __m512d>::value)
+			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128d, __m256d, __m512d>::value)
 			{
 				if constexpr (std::is_convertible_v<double, OutT_>)
 				{
@@ -114,11 +114,11 @@ namespace EmuSIMD::_underlying_simd_helpers
 					static_assert(false, "Attempted to extract an index from a double-containing SIMD register using EmuSIMD helpers, but the provided output type cannot be created from a double value.");
 				}
 			}
-			else if constexpr (EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>::value)
+			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>::value)
 			{
 				if constexpr(EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfInt_>())
 				{
-					using int_type = EmuCore::TMPHelpers::int_of_size_t<PerElementWidthIfInt_ / 8>;
+					using int_type = EmuCore::TMP::int_of_size_t<PerElementWidthIfInt_ / 8>;
 					if constexpr (std::is_convertible_v<int_type, OutT_>)
 					{
 						constexpr std::size_t chunk_divisor_ = std::size_t(128) / PerElementWidthIfInt_;
@@ -205,7 +205,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	{
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<Register_>)
 		{
-			using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+			using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 			if constexpr (std::is_same_v<register_type_uq, __m128>)
 			{
 				_mm_store_ps(reinterpret_cast<float*>(p_out_), register_);

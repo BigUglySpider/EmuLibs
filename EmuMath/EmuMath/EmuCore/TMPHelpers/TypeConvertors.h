@@ -3,7 +3,7 @@
 
 #include <type_traits>
 
-namespace EmuCore::TMPHelpers
+namespace EmuCore::TMP
 {
 	template<typename T_>
 	struct remove_ref_cv
@@ -224,7 +224,7 @@ namespace EmuCore::TMPHelpers
 		static constexpr bool is_new_type = !std::is_same_v<T, type>;
 	};
 	template<typename T>
-	using next_size_up_t = typename EmuCore::TMPHelpers::next_size_up<T>::type;
+	using next_size_up_t = typename EmuCore::TMP::next_size_up<T>::type;
 
 	template<typename T>
 	struct unsigned_if_int
@@ -312,7 +312,7 @@ namespace EmuCore::TMPHelpers
 	/// </summary>
 	/// <typeparam name="UintT_">Type to provide the lossless signed rep of. If it is already signed, the determined type will be the same as this.</typeparam>
 	template<typename UintT_>
-	using uint_lossless_signed_rep_t = typename EmuCore::TMPHelpers::uint_lossless_signed_rep<UintT_>::type;
+	using uint_lossless_signed_rep_t = typename EmuCore::TMP::uint_lossless_signed_rep<UintT_>::type;
 
 	template<typename T_>
 	struct get_value_type

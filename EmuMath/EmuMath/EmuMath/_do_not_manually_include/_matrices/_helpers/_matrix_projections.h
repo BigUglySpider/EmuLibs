@@ -61,7 +61,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			auto rads_ = fov_ * EmuCore::Pi::PI_DIV_180<EmuCore::TMPHelpers::first_floating_point_t<Fov_, float>>;
+			auto rads_ = fov_ * EmuCore::Pi::PI_DIV_180<EmuCore::TMP::first_floating_point_t<Fov_, float>>;
 			return _underlying_matrix_funcs::_calculate_basic_perspective_fov_scale_rads<NumIterations_, decltype(rads_), Out_>(rads_);
 		}
 	}
@@ -99,7 +99,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			auto fov_rads_ = fov_ * EmuCore::Pi::PI_DIV_180<EmuCore::TMPHelpers::first_floating_point_t<Fov_, float>>;
+			auto fov_rads_ = fov_ * EmuCore::Pi::PI_DIV_180<EmuCore::TMP::first_floating_point_t<Fov_, float>>;
 			return _underlying_matrix_funcs::_make_basic_perspective_projection_matrix_rads
 			<
 				NumIterations_,
@@ -122,7 +122,7 @@ namespace EmuMath::Helpers
 	[[nodiscard]] constexpr inline Out_ matrix_perspective_frustum_scale(const FovY_& fov_angle_y_, const Near_& near_)
 	{
 		// Output type takes priority for calculation type; this way if less precision than input values, we can save time; if more precision, we can get better approximations
-		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<Out_, FovY_, Near_, float>;
+		using calc_type = EmuCore::TMP::first_floating_point_t<Out_, FovY_, Near_, float>;
 		if constexpr (FovYIsRads_)
 		{
 			return _underlying_matrix_funcs::_calculate_matrix_perspective_projection_scale_rads
@@ -154,7 +154,7 @@ namespace EmuMath::Helpers
 	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_>
 	[[nodiscard]] constexpr inline Out_ matrix_perspective_frustum_edge_top(const FovY_& fov_angle_y_, const Near_& near_)
 	{
-		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<Out_, FovY_, Near_, float>;
+		using calc_type = EmuCore::TMP::first_floating_point_t<Out_, FovY_, Near_, float>;
 		if constexpr (FovYIsRads_)
 		{
 			return _underlying_matrix_funcs::_calculate_matrix_perspective_edge_top_rads
@@ -186,7 +186,7 @@ namespace EmuMath::Helpers
 	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_>
 	[[nodiscard]] constexpr inline Out_ matrix_perspective_frustum_edge_bottom(const FovY_& fov_angle_y_, const Near_& near_)
 	{
-		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<Out_, FovY_, Near_, float>;
+		using calc_type = EmuCore::TMP::first_floating_point_t<Out_, FovY_, Near_, float>;
 		if constexpr (FovYIsRads_)
 		{
 			return _underlying_matrix_funcs::_calculate_matrix_perspective_edge_bottom_rads
@@ -220,7 +220,7 @@ namespace EmuMath::Helpers
 	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_, typename AspectRatio_>
 	[[nodiscard]] constexpr inline Out_ matrix_perspective_frustum_edge_right(const FovY_& fov_angle_y_, const Near_& near_, const AspectRatio_& aspect_ratio_)
 	{
-		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<Out_, FovY_, Near_, AspectRatio_, float>;
+		using calc_type = EmuCore::TMP::first_floating_point_t<Out_, FovY_, Near_, AspectRatio_, float>;
 		if constexpr (FovYIsRads_)
 		{
 			return _underlying_matrix_funcs::_calculate_matrix_perspective_edge_right_rads
@@ -256,7 +256,7 @@ namespace EmuMath::Helpers
 	template<bool FovYIsRads_ = true, typename Out_ = float, std::size_t NumTanIterations_ = 5, bool DoTanMod_ = true, typename FovY_, typename Near_, typename AspectRatio_>
 	[[nodiscard]] constexpr inline Out_ matrix_perspective_frustum_edge_left(const FovY_& fov_angle_y_, const Near_& near_, const AspectRatio_& aspect_ratio_)
 	{
-		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<Out_, FovY_, Near_, AspectRatio_, float>;
+		using calc_type = EmuCore::TMP::first_floating_point_t<Out_, FovY_, Near_, AspectRatio_, float>;
 		if constexpr (FovYIsRads_)
 		{
 			return _underlying_matrix_funcs::_calculate_matrix_perspective_edge_left_rads
@@ -319,7 +319,7 @@ namespace EmuMath::Helpers
 		OutTop_& out_top_
 	)
 	{
-		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<FovY_, Near_, AspectRatio_, OutLeft_, OutRight_, OutBottom_, OutTop_, float>;
+		using calc_type = EmuCore::TMP::first_floating_point_t<FovY_, Near_, AspectRatio_, OutLeft_, OutRight_, OutBottom_, OutTop_, float>;
 		if constexpr (FovYIsRads_)
 		{
 			_underlying_matrix_funcs::_calculate_matrix_perspective_edges_rads
@@ -388,7 +388,7 @@ namespace EmuMath::Helpers
 		const AspectRatio_& aspect_ratio_
 	)
 	{
-		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, FovY_, Near_, Far_, AspectRatio_, float>;
+		using calc_type = EmuCore::TMP::first_floating_point_t<out_contained_type, FovY_, Near_, Far_, AspectRatio_, float>;
 		if constexpr (FovYIsRads_)
 		{
 			return _underlying_matrix_funcs::_make_perspective_matrix_with_frustum_rads_gl
@@ -457,7 +457,7 @@ namespace EmuMath::Helpers
 		const Top_& top_
 	)
 	{
-		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, Near_, Far_, Left_, Right_, Bottom_, Top_, float>;
+		using calc_type = EmuCore::TMP::first_floating_point_t<out_contained_type, Near_, Far_, Left_, Right_, Bottom_, Top_, float>;
 		return _underlying_matrix_funcs::_make_perspective_matrix_with_frustum_rads_gl
 		<
 			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
@@ -509,7 +509,7 @@ namespace EmuMath::Helpers
 		const AspectRatio_& aspect_ratio_
 	)
 	{
-		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, FovY_, Near_, Far_, AspectRatio_, float>;
+		using calc_type = EmuCore::TMP::first_floating_point_t<out_contained_type, FovY_, Near_, Far_, AspectRatio_, float>;
 		if constexpr (FovYIsRads_)
 		{
 			return _underlying_matrix_funcs::_make_perspective_matrix_with_frustum_rads_vk
@@ -578,7 +578,7 @@ namespace EmuMath::Helpers
 		const Top_& top_
 	)
 	{
-		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, Near_, Far_, Left_, Right_, Bottom_, Top_, float>;
+		using calc_type = EmuCore::TMP::first_floating_point_t<out_contained_type, Near_, Far_, Left_, Right_, Bottom_, Top_, float>;
 		return _underlying_matrix_funcs::_make_perspective_matrix_with_frustum_rads_vk
 		<
 			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
@@ -618,7 +618,7 @@ namespace EmuMath::Helpers
 		const Far_& far_
 	)
 	{
-		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, Left_, Right_, Bottom_, Top_, Near_, Far_, float>;
+		using calc_type = EmuCore::TMP::first_floating_point_t<out_contained_type, Left_, Right_, Bottom_, Top_, Near_, Far_, float>;
 		return _underlying_matrix_funcs::_make_orthograhpic_projection_matrix_gl
 		<
 			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
@@ -659,7 +659,7 @@ namespace EmuMath::Helpers
 		const Far_& far_
 	)
 	{
-		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, Width_, Height_, Near_, Far_, float>;
+		using calc_type = EmuCore::TMP::first_floating_point_t<out_contained_type, Width_, Height_, Near_, Far_, float>;
 		const calc_type zero_ = calc_type(0);
 		return _underlying_matrix_funcs::_make_orthograhpic_projection_matrix_gl
 		<
@@ -700,7 +700,7 @@ namespace EmuMath::Helpers
 		const Far_& far_
 	)
 	{
-		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, Left_, Right_, Bottom_, Top_, Near_, Far_, float>;
+		using calc_type = EmuCore::TMP::first_floating_point_t<out_contained_type, Left_, Right_, Bottom_, Top_, Near_, Far_, float>;
 		return _underlying_matrix_funcs::_make_orthograhpic_projection_matrix_vk
 		<
 			EmuMath::Matrix<4, 4, out_contained_type, OutColumnMajor_>,
@@ -741,7 +741,7 @@ namespace EmuMath::Helpers
 		const Far_& far_
 	)
 	{
-		using calc_type = EmuCore::TMPHelpers::first_floating_point_t<out_contained_type, Width_, Height_, Near_, Far_, float>;
+		using calc_type = EmuCore::TMP::first_floating_point_t<out_contained_type, Width_, Height_, Near_, Far_, float>;
 		const calc_type zero_ = calc_type(0);
 		return _underlying_matrix_funcs::_make_orthograhpic_projection_matrix_vk
 		<

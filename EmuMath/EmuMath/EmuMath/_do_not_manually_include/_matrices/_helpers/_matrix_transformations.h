@@ -47,7 +47,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			using rot_x_floating_point = typename EmuCore::TMPHelpers::first_floating_point<RotX_, float>::type;
+			using rot_x_floating_point = typename EmuCore::TMP::first_floating_point<RotX_, float>::type;
 			return matrix_rotation_x_constexpr<true, NumIterations_, DoMod_, out_contained_type, OutColumnMajor_, rot_x_floating_point>
 			(
 				EmuCore::Pi::DegsToRads(static_cast<rot_x_floating_point>(rot_x_))
@@ -79,7 +79,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			using rot_y_floating_point = typename EmuCore::TMPHelpers::first_floating_point<RotY_, float>::type;
+			using rot_y_floating_point = typename EmuCore::TMP::first_floating_point<RotY_, float>::type;
 			return matrix_rotation_y_constexpr<true, NumIterations_, DoMod_, out_contained_type, OutColumnMajor_, rot_y_floating_point>
 			(
 				EmuCore::Pi::DegsToRads(static_cast<rot_y_floating_point>(rot_y_))
@@ -111,7 +111,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			using rot_z_floating_point = typename EmuCore::TMPHelpers::first_floating_point<RotZ_, float>::type;
+			using rot_z_floating_point = typename EmuCore::TMP::first_floating_point<RotZ_, float>::type;
 			return matrix_rotation_z_constexpr<true, NumIterations_, DoMod_, out_contained_type, OutColumnMajor_, rot_z_floating_point>
 			(
 				EmuCore::Pi::DegsToRads(static_cast<rot_z_floating_point>(rot_z_))
@@ -139,7 +139,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			using rot_x_floating_point = typename EmuCore::TMPHelpers::first_floating_point<RotX_, float>::type;
+			using rot_x_floating_point = typename EmuCore::TMP::first_floating_point<RotX_, float>::type;
 			return matrix_rotation_x<true, out_contained_type, OutColumnMajor_, rot_x_floating_point>
 			(
 				EmuCore::Pi::DegsToRads(static_cast<rot_x_floating_point>(rot_x_))
@@ -167,7 +167,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			using rot_y_floating_point = typename EmuCore::TMPHelpers::first_floating_point<RotY_, float>::type;
+			using rot_y_floating_point = typename EmuCore::TMP::first_floating_point<RotY_, float>::type;
 			return matrix_rotation_y<true, out_contained_type, OutColumnMajor_, rot_y_floating_point>
 			(
 				EmuCore::Pi::DegsToRads(static_cast<rot_y_floating_point>(rot_y_))
@@ -195,7 +195,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			using rot_z_floating_point = typename EmuCore::TMPHelpers::first_floating_point<RotZ_, float>::type;
+			using rot_z_floating_point = typename EmuCore::TMP::first_floating_point<RotZ_, float>::type;
 			return matrix_rotation_z<true, out_contained_type, OutColumnMajor_, rot_z_floating_point>
 			(
 				EmuCore::Pi::DegsToRads(static_cast<rot_z_floating_point>(rot_z_))

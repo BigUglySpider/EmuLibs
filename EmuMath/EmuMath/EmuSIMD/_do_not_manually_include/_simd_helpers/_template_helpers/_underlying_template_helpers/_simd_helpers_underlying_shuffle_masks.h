@@ -528,7 +528,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<class Register_, std::size_t...Indices_>
 	struct is_valid_shuffle_mask_instance<_shuffle_mask<Register_, Indices_...>>
 	{
-		static constexpr bool value = EmuCore::TMPHelpers::has_static_get<_shuffle_mask<Register_, Indices_...>>::value;
+		static constexpr bool value = EmuCore::TMP::has_static_get<_shuffle_mask<Register_, Indices_...>>::value;
 	};
 #pragma endregion
 }

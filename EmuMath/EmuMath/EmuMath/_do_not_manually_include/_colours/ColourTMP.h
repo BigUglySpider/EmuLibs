@@ -18,9 +18,9 @@ namespace EmuMath::TMP
 		static constexpr bool value = std::conditional_t
 		<
 			// This is a recursive check to make sure that T_ does not have modifiers that may lead to false negatives
-			std::is_same_v<T_, typename EmuCore::TMPHelpers::remove_ref_cv<T_>::type>,
+			std::is_same_v<T_, typename EmuCore::TMP::remove_ref_cv<T_>::type>,
 			std::false_type,
-			is_emu_colour<typename EmuCore::TMPHelpers::remove_ref_cv<T_>::type>
+			is_emu_colour<typename EmuCore::TMP::remove_ref_cv<T_>::type>
 		>::value;
 	};
 	template<typename T_, bool ContainsAlpha_>

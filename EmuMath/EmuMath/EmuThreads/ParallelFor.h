@@ -31,7 +31,7 @@ namespace EmuThreads
 		template<class Iterator_>
 		struct _non_reference_iterator
 		{
-			using type = EmuCore::TMPHelpers::remove_ref_cv_t<Iterator_>;
+			using type = EmuCore::TMP::remove_ref_cv_t<Iterator_>;
 		};
 		template<class Iterator_>
 		struct _non_reference_iterator<std::reference_wrapper<Iterator_>>
@@ -452,7 +452,7 @@ namespace EmuThreads
 		template<class T_>
 		[[nodiscard]] static constexpr inline bool _is_tuple()
 		{
-			return EmuCore::TMPHelpers::is_tuple_v<EmuCore::TMPHelpers::remove_ref_cv_t<T_>>;
+			return EmuCore::TMP::is_tuple_v<EmuCore::TMP::remove_ref_cv_t<T_>>;
 		}
 
 		[[nodiscard]] constexpr inline thread_pool_type& _get_thread_pool()

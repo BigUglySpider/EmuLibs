@@ -16,10 +16,10 @@ namespace EmuSIMD
 	template<class ToRegister_, class FromRegister_>
 	[[nodiscard]] inline ToRegister_ cast(FromRegister_ from_)
 	{
-		using from_uq = EmuCore::TMPHelpers::remove_ref_cv_t<FromRegister_>;
+		using from_uq = EmuCore::TMP::remove_ref_cv_t<FromRegister_>;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<from_uq>)
 		{
-			using to_uq = EmuCore::TMPHelpers::remove_ref_cv_t<ToRegister_>;
+			using to_uq = EmuCore::TMP::remove_ref_cv_t<ToRegister_>;
 			if constexpr (EmuSIMD::TMP::is_simd_register_v<to_uq>)
 			{
 				return _underlying_simd_helpers::_cast<ToRegister_>(from_);

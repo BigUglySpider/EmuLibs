@@ -2871,7 +2871,7 @@ namespace EmuMath
 			}
 			else
 			{
-				using rot_x_fp = typename EmuCore::TMPHelpers::first_floating_point_t<RotX_, float>;
+				using rot_x_fp = typename EmuCore::TMP::first_floating_point_t<RotX_, float>;
 				return RotationX<true>(EmuCore::Pi::DegsToRads(static_cast<rot_x_fp>(rot_x_)));
 			}
 		}
@@ -2902,7 +2902,7 @@ namespace EmuMath
 			}
 			else
 			{
-				using rot_y_fp = typename EmuCore::TMPHelpers::first_floating_point_t<RotY_, float>;
+				using rot_y_fp = typename EmuCore::TMP::first_floating_point_t<RotY_, float>;
 				return RotationY<true>(EmuCore::Pi::DegsToRads(static_cast<rot_y_fp>(rot_y_)));
 			}
 		}
@@ -2933,7 +2933,7 @@ namespace EmuMath
 			}
 			else
 			{
-				using rot_z_fp = typename EmuCore::TMPHelpers::first_floating_point_t<RotZ_, float>;
+				using rot_z_fp = typename EmuCore::TMP::first_floating_point_t<RotZ_, float>;
 				return RotationZ<true>(EmuCore::Pi::DegsToRads(static_cast<rot_z_fp>(rot_z_)));
 			}
 		}
@@ -3015,7 +3015,7 @@ namespace EmuMath
 		template<bool FovIsRads_ = true, typename FovY_, typename Near_, typename Far_, typename AspectRatio_>
 		[[nodiscard]] static inline FastMatrix4x4f_CM PerspectiveRhVK(const FovY_& fov_y_angle_, const Near_& near_, const Far_& far_, const AspectRatio_& aspect_ratio_)
 		{
-			using fov_y_fp = typename EmuCore::TMPHelpers::first_floating_point<FovY_, float>::type;
+			using fov_y_fp = typename EmuCore::TMP::first_floating_point<FovY_, float>::type;
 			if constexpr (!FovIsRads_)
 			{
 				return PerspectiveRhVK<true, fov_y_fp, Near_, Far_, AspectRatio_>

@@ -3,7 +3,7 @@
 
 #include <type_traits>
 
-namespace EmuCore::TMPHelpers
+namespace EmuCore::TMP
 {
 #pragma region CONST_LHS
 	/// <summary> Template function to easily cast a provided Enum to its underlying type. </summary>

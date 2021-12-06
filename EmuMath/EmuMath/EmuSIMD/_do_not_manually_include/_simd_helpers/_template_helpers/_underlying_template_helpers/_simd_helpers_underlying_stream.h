@@ -13,7 +13,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		{
 			if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<OutputIntWidth_>())
 			{
-				using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+				using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 				if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<register_type_uq>)
 				{
 					if constexpr (IsWide_)
@@ -28,8 +28,8 @@ namespace EmuSIMD::_underlying_simd_helpers
 					using int_type = std::conditional_t
 					<
 						OutputIntSigned_,
-						EmuCore::TMPHelpers::int_of_size_t<OutputIntWidth_ / 8>,
-						EmuCore::TMPHelpers::uint_of_size_t<OutputIntWidth_ / 8>
+						EmuCore::TMP::int_of_size_t<OutputIntWidth_ / 8>,
+						EmuCore::TMP::uint_of_size_t<OutputIntWidth_ / 8>
 					>;
 					constexpr std::size_t num_elements_ = EmuSIMD::TMP::simd_register_width_v<register_type_uq> / OutputIntWidth_;
 					int_type data_[num_elements_] = {};
@@ -73,7 +73,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	{
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<Register_>)
 		{
-			using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+			using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 			if constexpr (EmuSIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
 			{
 				if constexpr (IsWide_)
@@ -87,7 +87,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 
 				using fp_type = std::conditional_t
 				<
-					EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, register_type_uq, __m128, __m256, __m512>::value,
+					EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128, __m256, __m512>::value,
 					float,
 					double
 				>;

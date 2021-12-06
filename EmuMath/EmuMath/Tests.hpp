@@ -26,8 +26,8 @@ namespace EmuCore::TestingHelpers
 		template<typename T_>
 		constexpr inline T_ operator()(const T_& dummy_) const
 		{
-			typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type MULT_ = 
-			static_cast<typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type>(0.001f);
+			typename EmuCore::TMP::first_floating_point<T_, float>::type MULT_ = 
+			static_cast<typename EmuCore::TMP::first_floating_point<T_, float>::type>(0.001f);
 
 			if constexpr (std::numeric_limits<T_>::max() < std::numeric_limits<int>::max())
 			{

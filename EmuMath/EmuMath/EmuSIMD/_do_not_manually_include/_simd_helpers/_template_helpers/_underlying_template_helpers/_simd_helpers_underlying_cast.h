@@ -8,7 +8,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<class ToRegister_>
 	[[nodiscard]] inline ToRegister_ _cast_m128(__m128 from_)
 	{
-		using to_uq = EmuCore::TMPHelpers::remove_ref_cv_t<ToRegister_>;
+		using to_uq = EmuCore::TMP::remove_ref_cv_t<ToRegister_>;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<to_uq>)
 		{
 			if constexpr (std::is_same_v<to_uq, __m128>)
@@ -61,7 +61,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<class ToRegister_>
 	[[nodiscard]] inline ToRegister_ _cast_m256(__m256 from_)
 	{
-		using to_uq = EmuCore::TMPHelpers::remove_ref_cv_t<ToRegister_>;
+		using to_uq = EmuCore::TMP::remove_ref_cv_t<ToRegister_>;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<to_uq>)
 		{
 			if constexpr (std::is_same_v<to_uq, __m128>)
@@ -114,7 +114,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<class ToRegister_>
 	[[nodiscard]] inline ToRegister_ _cast_m512(__m512 from_)
 	{
-		using to_uq = EmuCore::TMPHelpers::remove_ref_cv_t<ToRegister_>;
+		using to_uq = EmuCore::TMP::remove_ref_cv_t<ToRegister_>;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<to_uq>)
 		{
 			if constexpr (std::is_same_v<to_uq, __m128>)
@@ -167,7 +167,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<class ToRegister_>
 	[[nodiscard]] inline ToRegister_ _cast_m128d(__m128d from_)
 	{
-		using to_uq = EmuCore::TMPHelpers::remove_ref_cv_t<ToRegister_>;
+		using to_uq = EmuCore::TMP::remove_ref_cv_t<ToRegister_>;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<to_uq>)
 		{
 			if constexpr (std::is_same_v<to_uq, __m128>)
@@ -220,7 +220,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<class ToRegister_>
 	[[nodiscard]] inline ToRegister_ _cast_m256d(__m256d from_)
 	{
-		using to_uq = EmuCore::TMPHelpers::remove_ref_cv_t<ToRegister_>;
+		using to_uq = EmuCore::TMP::remove_ref_cv_t<ToRegister_>;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<to_uq>)
 		{
 			if constexpr (std::is_same_v<to_uq, __m128>)
@@ -273,7 +273,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<class ToRegister_>
 	[[nodiscard]] inline ToRegister_ _cast_m512d(__m512d from_)
 	{
-		using to_uq = EmuCore::TMPHelpers::remove_ref_cv_t<ToRegister_>;
+		using to_uq = EmuCore::TMP::remove_ref_cv_t<ToRegister_>;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<to_uq>)
 		{
 			if constexpr (std::is_same_v<to_uq, __m128>)
@@ -326,7 +326,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<class ToRegister_>
 	[[nodiscard]] inline ToRegister_ _cast_m128i(__m128i from_)
 	{
-		using to_uq = EmuCore::TMPHelpers::remove_ref_cv_t<ToRegister_>;
+		using to_uq = EmuCore::TMP::remove_ref_cv_t<ToRegister_>;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<to_uq>)
 		{
 			if constexpr (std::is_same_v<to_uq, __m128>)
@@ -379,7 +379,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<class ToRegister_>
 	[[nodiscard]] inline ToRegister_ _cast_m256i(__m256i from_)
 	{
-		using to_uq = EmuCore::TMPHelpers::remove_ref_cv_t<ToRegister_>;
+		using to_uq = EmuCore::TMP::remove_ref_cv_t<ToRegister_>;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<to_uq>)
 		{
 			if constexpr (std::is_same_v<to_uq, __m128>)
@@ -432,7 +432,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<class ToRegister_>
 	[[nodiscard]] inline ToRegister_ _cast_m512i(__m512i from_)
 	{
-		using to_uq = EmuCore::TMPHelpers::remove_ref_cv_t<ToRegister_>;
+		using to_uq = EmuCore::TMP::remove_ref_cv_t<ToRegister_>;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<to_uq>)
 		{
 			if constexpr (std::is_same_v<to_uq, __m128>)
@@ -485,10 +485,10 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<class ToRegister_, class FromRegister_>
 	[[nodiscard]] ToRegister_ _cast(FromRegister_ from_)
 	{
-		using from_uq = EmuCore::TMPHelpers::remove_ref_cv_t<FromRegister_>;
+		using from_uq = EmuCore::TMP::remove_ref_cv_t<FromRegister_>;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<from_uq>)
 		{
-			using to_uq = EmuCore::TMPHelpers::remove_ref_cv_t<ToRegister_>;
+			using to_uq = EmuCore::TMP::remove_ref_cv_t<ToRegister_>;
 			if constexpr (EmuSIMD::TMP::is_simd_register_v<to_uq>)
 			{
 				if constexpr (std::is_same_v<from_uq, __m128>)

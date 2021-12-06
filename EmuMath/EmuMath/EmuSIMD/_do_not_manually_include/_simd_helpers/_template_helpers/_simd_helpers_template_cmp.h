@@ -10,7 +10,7 @@ namespace EmuSIMD
 	template<class Register_>
 	[[nodiscard]] inline auto movemask(Register_ register_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_movemask(register_);
@@ -24,7 +24,7 @@ namespace EmuSIMD
 	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
 	[[nodiscard]] inline Register_ cmpeq(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_cmp_eq<PerElementWidthIfInt_, SignedIfInt_>(lhs_, rhs_);
@@ -38,7 +38,7 @@ namespace EmuSIMD
 	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
 	[[nodiscard]] inline Register_ cmpneq(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_cmp_neq<PerElementWidthIfInt_, SignedIfInt_>(lhs_, rhs_);
@@ -52,7 +52,7 @@ namespace EmuSIMD
 	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
 	[[nodiscard]] inline Register_ cmplt(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_cmp_lt<PerElementWidthIfInt_, SignedIfInt_>(lhs_, rhs_);
@@ -66,7 +66,7 @@ namespace EmuSIMD
 	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
 	[[nodiscard]] inline Register_ cmpgt(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_cmp_gt<PerElementWidthIfInt_, SignedIfInt_>(lhs_, rhs_);
@@ -80,7 +80,7 @@ namespace EmuSIMD
 	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
 	[[nodiscard]] inline Register_ cmple(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_cmp_le<PerElementWidthIfInt_, SignedIfInt_>(lhs_, rhs_);
@@ -94,7 +94,7 @@ namespace EmuSIMD
 	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
 	[[nodiscard]] inline Register_ cmpge(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_cmp_ge<PerElementWidthIfInt_, SignedIfInt_>(lhs_, rhs_);
@@ -108,7 +108,7 @@ namespace EmuSIMD
 	template<int CmpFlags_, std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
 	[[nodiscard]] inline Register_ cmp(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_cmp<CmpFlags_, PerElementWidthIfInt_, SignedIfInt_>(lhs_, rhs_);
@@ -122,7 +122,7 @@ namespace EmuSIMD
 	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
 	[[nodiscard]] inline bool cmp_any_eq(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_movemask
@@ -139,7 +139,7 @@ namespace EmuSIMD
 	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
 	[[nodiscard]] inline bool cmp_any_neq(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_movemask
@@ -156,7 +156,7 @@ namespace EmuSIMD
 	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
 	[[nodiscard]] inline bool cmp_any_lt(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_movemask
@@ -173,7 +173,7 @@ namespace EmuSIMD
 	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
 	[[nodiscard]] inline bool cmp_any_gt(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_movemask
@@ -190,7 +190,7 @@ namespace EmuSIMD
 	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
 	[[nodiscard]] inline bool cmp_any_le(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_movemask
@@ -207,7 +207,7 @@ namespace EmuSIMD
 	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
 	[[nodiscard]] inline bool cmp_any_ge(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_movemask
@@ -224,7 +224,7 @@ namespace EmuSIMD
 	template<int CmpFlags_, std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
 	[[nodiscard]] inline bool cmp_any(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_movemask
@@ -241,7 +241,7 @@ namespace EmuSIMD
 	template<bool SignedIfInt_, bool...IndexMustBeTrue_, class Register_>
 	[[nodiscard]] inline bool cmp_all_eq(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			using movemask_generator = _underlying_simd_helpers::_make_movemask<register_type_uq, IndexMustBeTrue_...>;
@@ -277,7 +277,7 @@ namespace EmuSIMD
 	template<bool SignedIfInt_, bool...ResultAtIndex_, class Register_>
 	[[nodiscard]] inline bool cmp_all_neq(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			using movemask_generator = _underlying_simd_helpers::_make_movemask<register_type_uq, ResultAtIndex_...>;
@@ -310,7 +310,7 @@ namespace EmuSIMD
 	template<bool SignedIfInt_, bool...ResultAtIndex_, class Register_>
 	[[nodiscard]] inline bool cmp_all_lt(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			using movemask_generator = _underlying_simd_helpers::_make_movemask<register_type_uq, ResultAtIndex_...>;
@@ -343,7 +343,7 @@ namespace EmuSIMD
 	template<bool SignedIfInt_, bool...ResultAtIndex_, class Register_>
 	[[nodiscard]] inline bool cmp_all_gt(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			using movemask_generator = _underlying_simd_helpers::_make_movemask<register_type_uq, ResultAtIndex_...>;
@@ -376,7 +376,7 @@ namespace EmuSIMD
 	template<bool SignedIfInt_, bool...ResultAtIndex_, class Register_>
 	[[nodiscard]] inline bool cmp_all_le(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			using movemask_generator = _underlying_simd_helpers::_make_movemask<register_type_uq, ResultAtIndex_...>;
@@ -409,7 +409,7 @@ namespace EmuSIMD
 	template<bool SignedIfInt_, bool...ResultAtIndex_, class Register_>
 	[[nodiscard]] inline bool cmp_all_ge(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			using movemask_generator = _underlying_simd_helpers::_make_movemask<register_type_uq, ResultAtIndex_...>;
@@ -442,7 +442,7 @@ namespace EmuSIMD
 	template<int CmpFlags_, bool SignedIfInt_, bool...ResultAtIndex_, class Register_>
 	[[nodiscard]] inline bool cmp_all(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			using movemask_generator = _underlying_simd_helpers::_make_movemask<register_type_uq, ResultAtIndex_...>;

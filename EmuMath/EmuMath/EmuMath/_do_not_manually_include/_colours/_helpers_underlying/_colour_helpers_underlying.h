@@ -54,7 +54,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 	template<typename OutChannel_, typename InChannel_>
 	[[nodiscard]] constexpr inline OutChannel_ _colour_get_intensity_from_other_ratio(InChannel_ to_convert_)
 	{
-		using calc_type = typename EmuCore::TMPHelpers::first_floating_point<OutChannel_, InChannel_, double>::type;
+		using calc_type = typename EmuCore::TMP::first_floating_point<OutChannel_, InChannel_, double>::type;
 		constexpr calc_type max_out_calc = static_cast<calc_type>(_colour_max_channel_intensity<OutChannel_>());
 
 		if constexpr (std::is_floating_point_v<InChannel_>)
@@ -435,7 +435,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		{
 			using out_channel_type = typename OutColour_::value_type;
 			using t_channel_type = typename ColourT_::value_type;
-			using t_ratio_type = typename EmuCore::TMPHelpers::first_floating_point<t_channel_type, double>::type;
+			using t_ratio_type = typename EmuCore::TMP::first_floating_point<t_channel_type, double>::type;
 			using Lerp_ = EmuCore::do_lerp<a_channel_type, b_channel_type, t_ratio_type>;
 			Lerp_ lerp_ = Lerp_();
 
@@ -737,7 +737,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			// Ensure safe calculation by enforcing ratios rather than integers
 			using in_channel_type = typename InColour_::value_type;
 			using out_channel_type = typename OutColour_::value_type;
-			using in_ratio_type = EmuCore::TMPHelpers::first_floating_point_t<in_channel_type, out_channel_type, float>;
+			using in_ratio_type = EmuCore::TMP::first_floating_point_t<in_channel_type, out_channel_type, float>;
 			in_ratio_type average_ratio_ = _colour_channel_ratio<in_ratio_type, in_channel_type>(in_.R());
 			average_ratio_ += _colour_channel_ratio<in_ratio_type, in_channel_type>(in_.G());
 			average_ratio_ += _colour_channel_ratio<in_ratio_type, in_channel_type>(in_.B());
@@ -769,7 +769,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			// Ensure safe calculation by enforcing ratios rather than integers
 			using in_channel_type = typename InColour_::value_type;
 			using out_channel_type = typename OutColour_::value_type;
-			using in_ratio_type = EmuCore::TMPHelpers::first_floating_point_t<in_channel_type, out_channel_type, float>;
+			using in_ratio_type = EmuCore::TMP::first_floating_point_t<in_channel_type, out_channel_type, float>;
 			constexpr in_ratio_type red_mult_ = in_ratio_type(0.3L);
 			constexpr in_ratio_type green_mult_ = in_ratio_type(0.59L);
 			constexpr in_ratio_type blue_mult_ = in_ratio_type(0.11L);
@@ -802,7 +802,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			// Ensure safe calculation by enforcing ratios rather than integers
 			using in_channel_type = typename InColour_::value_type;
 			using out_channel_type = typename OutColour_::value_type;
-			using in_ratio_type = EmuCore::TMPHelpers::first_floating_point_t<in_channel_type, out_channel_type, float>;
+			using in_ratio_type = EmuCore::TMP::first_floating_point_t<in_channel_type, out_channel_type, float>;
 			constexpr in_ratio_type two_reciprocal_ = in_ratio_type(1) / in_ratio_type(2);
 			in_ratio_type min_ratio_ = _colour_channel_ratio<in_ratio_type, in_channel_type>
 			(

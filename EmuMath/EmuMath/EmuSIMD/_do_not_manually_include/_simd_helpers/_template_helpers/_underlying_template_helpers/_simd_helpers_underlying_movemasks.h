@@ -307,7 +307,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<class Register_, bool...ActiveIndices_>
 	struct _is_valid_make_movemask_instance<_make_movemask<Register_, ActiveIndices_...>>
 	{
-		static constexpr bool value = EmuCore::TMPHelpers::has_static_value<_make_movemask<Register_, ActiveIndices_...>>::value;
+		static constexpr bool value = EmuCore::TMP::has_static_value<_make_movemask<Register_, ActiveIndices_...>>::value;
 	};
 }
 

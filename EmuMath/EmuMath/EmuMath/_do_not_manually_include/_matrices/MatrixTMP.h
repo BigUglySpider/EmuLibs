@@ -271,7 +271,7 @@ namespace EmuMath::TMP
 		using type = typename std::conditional_t
 		<
 			std::is_same_v<Matrix_, std::remove_cv_t<std::remove_reference_t<Matrix_>>>,
-			EmuCore::TMPHelpers::void_type,
+			EmuCore::TMP::void_type,
 			emu_matrix_submatrix_excluding_element_region<out_contained_type, OutColumnMajor_, std::remove_cv_t<std::remove_reference_t<Matrix_>>>
 		>::type;
 	};

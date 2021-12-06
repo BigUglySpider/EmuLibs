@@ -1410,7 +1410,7 @@ namespace EmuMath::Helpers
 			(
 				std::is_convertible_v
 				<
-					EmuCore::TMPHelpers::conditional_const_t<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>,
+					EmuCore::TMP::conditional_const_t<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>,
 					Out_
 				>
 			)
@@ -1432,9 +1432,9 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class Matrix_>
-	[[nodiscard]] constexpr inline typename EmuCore::TMPHelpers::conditional_const<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>::type matrix_min(Matrix_& matrix_)
+	[[nodiscard]] constexpr inline typename EmuCore::TMP::conditional_const<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>::type matrix_min(Matrix_& matrix_)
 	{
-		return matrix_min<typename EmuCore::TMPHelpers::conditional_const<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>::type, Matrix_>(matrix_);
+		return matrix_min<typename EmuCore::TMP::conditional_const<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>::type, Matrix_>(matrix_);
 	}
 
 	/// <summary>
@@ -1475,7 +1475,7 @@ namespace EmuMath::Helpers
 			(
 				std::is_convertible_v
 				<
-					EmuCore::TMPHelpers::conditional_const_t<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>,
+					EmuCore::TMP::conditional_const_t<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>,
 					Out_
 				>
 			)
@@ -1497,9 +1497,9 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class Matrix_>
-	[[nodiscard]] constexpr inline typename EmuCore::TMPHelpers::conditional_const<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>::type matrix_max(Matrix_& matrix_)
+	[[nodiscard]] constexpr inline typename EmuCore::TMP::conditional_const<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>::type matrix_max(Matrix_& matrix_)
 	{
-		return matrix_max<typename EmuCore::TMPHelpers::conditional_const<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>::type, Matrix_>(matrix_);
+		return matrix_max<typename EmuCore::TMP::conditional_const<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>::type, Matrix_>(matrix_);
 	}
 
 	/// <summary>

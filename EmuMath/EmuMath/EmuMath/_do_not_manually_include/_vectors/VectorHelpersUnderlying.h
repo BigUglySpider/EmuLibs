@@ -1491,7 +1491,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 		// Note: there is no direct magnitude calculation function as SqrMag(X) == Dot(X, X).
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
 		{
-			using floating_point_type = EmuCore::TMPHelpers::highest_byte_size_t<typename LhsVector_::preferred_floating_point, typename Rhs_::preferred_floating_point>;
+			using floating_point_type = EmuCore::TMP::highest_byte_size_t<typename LhsVector_::preferred_floating_point, typename Rhs_::preferred_floating_point>;
 			using Comparator_ = CmpTemplate_<floating_point_type, floating_point_type>;
 			const floating_point_type lhs_sqr_mag_ = _calculate_vector_dot_product(lhs_, lhs_);
 			const floating_point_type rhs_sqr_mag_ = _calculate_vector_dot_product(rhs_, rhs_);
@@ -1506,7 +1506,7 @@ namespace EmuMath::Helpers::_underlying_vector_funcs
 			using floating_point_type = std::conditional_t
 			<
 				std::is_floating_point_v<rhs_value>,
-				EmuCore::TMPHelpers::highest_byte_size_t<typename LhsVector_::preferred_floating_point, rhs_value>,
+				EmuCore::TMP::highest_byte_size_t<typename LhsVector_::preferred_floating_point, rhs_value>,
 				typename LhsVector_::preferred_floating_point
 			>;
 			using Comparator_ = CmpTemplate_<floating_point_type, Rhs_>;

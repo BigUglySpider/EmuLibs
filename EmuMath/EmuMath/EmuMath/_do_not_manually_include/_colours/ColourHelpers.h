@@ -32,7 +32,7 @@ namespace EmuMath::Helpers
 	template<typename OutChannel_, typename InChannelInt_>
 	[[nodiscard]] constexpr inline OutChannel_ colour_wrap_channel_int(InChannelInt_ to_wrap_int_)
 	{
-		using calc_type = typename EmuCore::TMPHelpers::first_floating_point<OutChannel_, double>::type;
+		using calc_type = typename EmuCore::TMP::first_floating_point<OutChannel_, double>::type;
 		constexpr OutChannel_ min_out = colour_min_channel_intensity<OutChannel_>();
 		constexpr OutChannel_ max_out = colour_max_channel_intensity<OutChannel_>();
 		constexpr InChannelInt_ max_in = colour_colour_max_channel_intensity_force_int<InChannelInt_>();
@@ -191,7 +191,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			using calc_type = typename EmuCore::TMPHelpers::first_floating_point<OutChannel_, double>::type;
+			using calc_type = typename EmuCore::TMP::first_floating_point<OutChannel_, double>::type;
 			constexpr calc_type max_in_reciprocal_ = calc_type(1) / static_cast<calc_type>(max_in);
 			calc_type ratio_ = static_cast<calc_type>(to_clamp_) * max_in_reciprocal_;
 			if constexpr (std::is_floating_point_v<OutChannel_>)

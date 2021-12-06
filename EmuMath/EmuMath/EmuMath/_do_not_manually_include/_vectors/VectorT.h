@@ -79,7 +79,7 @@ namespace EmuMath
 			<
 				sizeof...(Args) == size &&
 				// Additional check for size:1 vectors so as to differentiate between this and the vector copy constructor
-				!(size == 1 && EmuMath::TMP::is_emu_vector_v<typename EmuCore::TMPHelpers::first_packed_arg<Args...>::type>)
+				!(size == 1 && EmuMath::TMP::is_emu_vector_v<typename EmuCore::TMP::first_packed_arg<Args...>::type>)
 			>
 		>
 		explicit constexpr Vector(Args&&...contiguousData_) : data_({ static_cast<contained_type>(std::forward<Args>(contiguousData_))... })
@@ -87,7 +87,7 @@ namespace EmuMath
 			static_assert(sizeof...(Args) == size, "Provided an amount of arguments to an EmuMath Vector constructor that is not equal to the number of elements in the Vector.");
 			static_assert
 			(
-				EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, Args...>::value,
+				EmuCore::TMP::are_all_comparisons_true<std::is_constructible, contained_type, Args...>::value,
 				"Attempted to construct an EmuMath Vector via it's template constructor, but at least one provided argument cannot be used to construct the Vector's contained_type."
 			);
 		}

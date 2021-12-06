@@ -420,7 +420,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<class Register_, bool...IndexArgs_>
 	struct _is_valid_blend_mask<_blend_mask<Register_, IndexArgs_...>>
 	{
-		static constexpr bool value = EmuCore::TMPHelpers::has_static_get<_blend_mask<Register_, IndexArgs_...>>::value;
+		static constexpr bool value = EmuCore::TMP::has_static_get<_blend_mask<Register_, IndexArgs_...>>::value;
 	};
 
 	template<class BlendMaskInstance_>

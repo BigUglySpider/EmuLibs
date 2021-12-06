@@ -13,12 +13,12 @@ namespace EmuMath::Functors
 		{
 		public:
 			using generator_type = PerIterationGenerator_;
-			using register_type = EmuCore::TMPHelpers::remove_ref_cv_t<Register_>;
+			using register_type = EmuCore::TMP::remove_ref_cv_t<Register_>;
 			using integral_register_type = typename EmuSIMD::TMP::integer_register_type<EmuSIMD::TMP::simd_register_width_v<register_type>>::type;
 			/// <summary> Float if __m128, __m256, or __m512 is the register type. Otherwise double, due to implied __m128d, __m256d, or __m512d. </summary>
 			using value_type = std::conditional_t
 			<
-				EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, register_type, __m128, __m256, __m512>::value,
+				EmuCore::TMP::is_any_comparison_true<std::is_same, register_type, __m128, __m256, __m512>::value,
 				float,
 				double
 			>;
@@ -26,7 +26,7 @@ namespace EmuMath::Functors
 
 			static_assert
 			(
-				EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, register_type, __m128, __m256, __m512, __m128d, __m256d, __m512d>::value,
+				EmuCore::TMP::is_any_comparison_true<std::is_same, register_type, __m128, __m256, __m512, __m128d, __m256d, __m512d>::value,
 				"Invalid register type provided for a fast_fractal_noise_wrapper. Valid register types: __m128, __m256, __m512, __m128d, __m256d, __m512d."
 			);
 

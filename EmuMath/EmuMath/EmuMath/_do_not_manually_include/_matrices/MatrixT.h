@@ -132,7 +132,7 @@ namespace EmuMath
 			typename...ScalarArgs_,
 			typename RequiresNumberOfValidArgsEqualToSize = std::enable_if_t
 			<
-				EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, ScalarArgs_...>::value &&
+				EmuCore::TMP::are_all_comparisons_true<std::is_constructible, contained_type, ScalarArgs_...>::value &&
 				sizeof...(ScalarArgs_) == size
 			>
 		>
@@ -140,7 +140,7 @@ namespace EmuMath
 		{
 			if constexpr (sizeof...(ScalarArgs_) == size)
 			{
-				if constexpr (EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, ScalarArgs_...>::value)
+				if constexpr (EmuCore::TMP::are_all_comparisons_true<std::is_constructible, contained_type, ScalarArgs_...>::value)
 				{
 					EmuMath::Helpers::_underlying_matrix_funcs::_matrix_maker<this_type>()(*this, std::make_index_sequence<size>(), contiguous_scalar_args_...);
 				}

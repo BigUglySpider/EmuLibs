@@ -10,7 +10,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
 	[[nodiscard]] inline Register_ _blendv(Register_ a_, Register_ b_, Register_ mask_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (std::is_same_v<register_type_uq, __m128>)
@@ -42,7 +42,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 				__m256d hi_ = _blendv(_mm512_extractf64x4_pd(a_, 1), _mm512_extractf64x4_pd(b_, 1), _mm512_extractf64x4_pd(mask_, 1));
 				return _mm512_insertf64x4(_mm512_castpd256_pd512(lo_), hi_, 1);
 			}
-			else if constexpr (EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>::value)
+			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>::value)
 			{
 				// COVERS ALL SUPPORTED INTS
 				if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfInt_>())
@@ -151,7 +151,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<bool...IndexUsesB_, class Register_>
 	[[nodiscard]] inline Register_ _blend(Register_ a_, Register_ b_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			using mask_generator = _underlying_simd_helpers::_blend_mask<register_type_uq, IndexUsesB_...>;
@@ -160,12 +160,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 				if constexpr (_underlying_simd_helpers::_blend_mask_is_simd_register<mask_generator>::value)
 				{
 					// Defer to blendv for executing a register mask
-					if constexpr (EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, register_type_uq, __m128, __m256, __m512, __m128d, __m256d, __m512d>::value)
+					if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128, __m256, __m512, __m128d, __m256d, __m512d>::value)
 					{
 						// Nothing extra needed
 						return _blendv(a_, b_, mask_generator::get());
 					}
-					else if constexpr (EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>::value)
+					else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>::value)
 					{
 						constexpr std::size_t register_width_ = EmuSIMD::TMP::simd_register_width_v<register_type_uq>;
 						constexpr std::size_t num_index_args_ = sizeof...(IndexUsesB_);
@@ -211,7 +211,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 					{
 						return _mm512_mask_blend_pd(mask_generator::get(), a_, b_);
 					}
-					else if constexpr (EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>::value)
+					else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>::value)
 					{
 						constexpr std::size_t register_width_ = EmuSIMD::TMP::simd_register_width_v<register_type_uq>;
 						constexpr std::size_t num_index_args_ = sizeof...(IndexUsesB_);

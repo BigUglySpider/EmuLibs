@@ -62,7 +62,7 @@ namespace EmuMath
 		{
 			static_assert
 			(
-				EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, X_, Y_, Z_, W_>::value,
+				EmuCore::TMP::are_all_comparisons_true<std::is_constructible, contained_type, X_, Y_, Z_, W_>::value,
 				"Attempted to construct an EmuMath Vector via it's template constructor, but at least one provided argument cannot be used to construct the Vector's contained_type."
 			);
 		}

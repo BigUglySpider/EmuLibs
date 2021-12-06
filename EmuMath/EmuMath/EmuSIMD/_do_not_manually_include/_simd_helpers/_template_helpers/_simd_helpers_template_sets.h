@@ -20,7 +20,7 @@ namespace EmuSIMD
 	template<class Register_, std::size_t ElementWidthIfInt_ = 32, typename...Args_>
 	[[nodiscard]] inline Register_ set(Args_&&...args_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			constexpr std::size_t num_args_ = sizeof...(Args_);
@@ -53,7 +53,7 @@ namespace EmuSIMD
 	template<class Register_, std::size_t ElementWidthIfInt_ = 32, typename...Args_>
 	[[nodiscard]] inline Register_ setr(Args_&&...args_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			constexpr std::size_t num_args_ = sizeof...(Args_);
@@ -82,7 +82,7 @@ namespace EmuSIMD
 	template<class Register_, std::size_t ElementWidthIfInt_ = 32, typename Val_>
 	[[nodiscard]] inline Register_ set1(const Val_& val_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_set1<Register_, ElementWidthIfInt_>(val_);
@@ -100,7 +100,7 @@ namespace EmuSIMD
 	template<class Register_>
 	[[nodiscard]] inline Register_ setzero()
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_setzero<Register_>();
@@ -118,7 +118,7 @@ namespace EmuSIMD
 	template<class Register_>
 	[[nodiscard]] inline Register_ setallone()
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			using mask_generator_instance = _underlying_simd_helpers::_per_index_mask<register_type_uq, true>;
@@ -145,7 +145,7 @@ namespace EmuSIMD
 	template<class Register_, std::int64_t StartingVal_, std::size_t ElementWidthIfInt_ = 32>
 	[[nodiscard]] inline Register_ set_decrementing()
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_set_from_starting_value<register_type_uq, StartingVal_, EmuCore::do_subtract, false, ElementWidthIfInt_>();
@@ -163,7 +163,7 @@ namespace EmuSIMD
 	template<class Register_, std::int64_t StartingVal_, std::size_t ElementWidthIfInt_ = 32>
 	[[nodiscard]] inline Register_ setr_decrementing()
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_set_from_starting_value<register_type_uq, StartingVal_, EmuCore::do_subtract, true, ElementWidthIfInt_>();
@@ -182,7 +182,7 @@ namespace EmuSIMD
 	template<class Register_, std::int64_t StartingVal_, std::size_t ElementWidthIfInt_ = 32>
 	[[nodiscard]] inline Register_ set_incrementing()
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_set_from_starting_value<register_type_uq, StartingVal_, EmuCore::do_add, false, ElementWidthIfInt_>();
@@ -200,7 +200,7 @@ namespace EmuSIMD
 	template<class Register_, std::int64_t StartingVal_, std::size_t ElementWidthIfInt_ = 32>
 	[[nodiscard]] inline Register_ setr_incrementing()
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_set_from_starting_value<register_type_uq, StartingVal_, EmuCore::do_add, true, ElementWidthIfInt_>();
@@ -226,7 +226,7 @@ namespace EmuSIMD
 	template<class Register_, typename In_>
 	[[nodiscard]] inline Register_ load(const In_* p_to_load_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			return _underlying_simd_helpers::_load<Register_>(p_to_load_);

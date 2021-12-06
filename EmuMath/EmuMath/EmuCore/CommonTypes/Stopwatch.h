@@ -12,7 +12,7 @@ namespace EmuCore
 	/// <summary>
 	/// <para> Timer wrapper that may be used as a stopwatch to combine several timed segments. </para>
 	/// </summary>
-	template<class DefaultRatio_ = EmuCore::TMPHelpers::ratio_micro>
+	template<class DefaultRatio_ = EmuCore::TMP::ratio_micro>
 	class Stopwatch
 	{
 	public:
@@ -414,7 +414,7 @@ namespace EmuCore
 		template<class Out_, class OutRatio_>
 		[[nodiscard]] static inline Out_ _convert_to_output(const duration_type& duration_) noexcept
 		{
-			if constexpr (EmuCore::TMPHelpers::is_duration_v<Out_>)
+			if constexpr (EmuCore::TMP::is_duration_v<Out_>)
 			{
 				return std::chrono::duration_cast<Out_>(duration_);
 			}

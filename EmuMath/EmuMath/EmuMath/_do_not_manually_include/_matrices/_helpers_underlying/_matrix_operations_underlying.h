@@ -339,7 +339,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		OutMatrix_ adjugate_ = _transpose_matrix<OutMatrix_, mat_copy>(cofactors_);
 
 		// Multiply the adjugate by the reciprocal to the original matrix's determinant
-		using reciprocal_type = EmuCore::TMPHelpers::first_floating_point_t<OutDeterminant_, float>;
+		using reciprocal_type = EmuCore::TMP::first_floating_point_t<OutDeterminant_, float>;
 		reciprocal_type det_reciprocal_ = reciprocal_type(1) / static_cast<reciprocal_type>(outDeterminant_);
 		return _matrix_multi_arg_operation<EmuCore::do_multiply, OutMatrix_, OutMatrix_, reciprocal_type>(adjugate_, det_reciprocal_);
 	}

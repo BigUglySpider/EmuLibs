@@ -4,7 +4,7 @@
 #include <tuple>
 #include <type_traits>
 
-namespace EmuCore::TMPHelpers
+namespace EmuCore::TMP
 {
 	/// <summary> Finds the largest byte-sized type of the passed options. For matching type sizes, the leftmost type receives priority. </summary>
 	/// <typeparam name="X_">First type to compare. Required.</typeparam>
@@ -257,7 +257,7 @@ namespace EmuCore::TMPHelpers
 				(sizeof(LhsFloat_) == sizeof(RhsFloat_)),
 				std::conditional_t
 				<
-					EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, long double, LhsFloat_, RhsFloat_>::value,
+					EmuCore::TMP::is_any_comparison_true<std::is_same, long double, LhsFloat_, RhsFloat_>::value,
 					long double,
 					Lhs_
 				>,
@@ -272,12 +272,12 @@ namespace EmuCore::TMPHelpers
 	public:
 		using type = std::conditional_t
 		<
-			EmuCore::TMPHelpers::is_any_floating_point_v<Lhs_, Rhs_>,
+			EmuCore::TMP::is_any_floating_point_v<Lhs_, Rhs_>,
 			std::conditional_t
 			<
-				EmuCore::TMPHelpers::are_all_check<std::is_floating_point, Lhs_, Rhs_>::value,
+				EmuCore::TMP::are_all_check<std::is_floating_point, Lhs_, Rhs_>::value,
 				typename largest_of_guaranteed_floating_points<Lhs_, Rhs_>::type,
-				typename EmuCore::TMPHelpers::first_floating_point<Lhs_, Rhs_>::type
+				typename EmuCore::TMP::first_floating_point<Lhs_, Rhs_>::type
 			>,
 			void
 		>;
@@ -292,7 +292,7 @@ namespace EmuCore::TMPHelpers
 		{
 			using type = typename find_largest_floating_point
 			<
-				typename EmuCore::TMPHelpers::larger_float<Highest_, First__>::type,
+				typename EmuCore::TMP::larger_float<Highest_, First__>::type,
 				Others__...
 			>::type;
 		};
@@ -336,6 +336,7 @@ namespace EmuCore::TMPHelpers
 	template<class A_, class B_>
 	constexpr bool is_two_way_convertible_v = is_two_way_convertible<A_, B_>::value;
 
+	/// <summary> Type used to encapsualate a void type. Not to be confused with std::void_t. </summary>
 	struct void_type
 	{
 		using type = void;

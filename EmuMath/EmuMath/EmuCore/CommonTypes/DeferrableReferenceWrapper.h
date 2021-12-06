@@ -103,7 +103,7 @@ namespace EmuCore
 	};
 }
 
-namespace EmuCore::TMPHelpers
+namespace EmuCore::TMP
 {
 	template<typename T_>
 	struct is_reference_wrapper<EmuCore::DeferrableReferenceWrapper<T_>>

@@ -22,7 +22,7 @@ namespace EmuCore::Events
 		template<class Listener_, class...Args_>
 		constexpr static bool valid_invocation()
 		{
-			return std::is_invocable_v<typename EmuCore::TMPHelpers::remove_all_pointers<Listener_>::type, Args_...>;
+			return std::is_invocable_v<typename EmuCore::TMP::remove_all_pointers<Listener_>::type, Args_...>;
 		}
 
 		template<typename = std::enable_if_t<std::is_default_constructible_v<EventInvoker_>>>

@@ -34,9 +34,9 @@ namespace EmuSIMD::TMP
 	{
 		static constexpr bool value = std::conditional_t
 		<
-			std::is_same_v<RegisterType_, typename EmuCore::TMPHelpers::remove_ref_cv<RegisterType_>::type>,
+			std::is_same_v<RegisterType_, typename EmuCore::TMP::remove_ref_cv<RegisterType_>::type>,
 			std::false_type,
-			is_simd_register<typename EmuCore::TMPHelpers::remove_ref_cv<RegisterType_>::type>
+			is_simd_register<typename EmuCore::TMP::remove_ref_cv<RegisterType_>::type>
 		>::value;
 	};
 	template<>
@@ -97,7 +97,7 @@ namespace EmuSIMD::TMP
 		static constexpr std::size_t value = std::conditional_t
 		<
 			is_simd_register_v<Register_>,
-			simd_register_width<typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type>,
+			simd_register_width<typename EmuCore::TMP::remove_ref_cv<Register_>::type>,
 			std::integral_constant<std::size_t, 0>
 		>::value;
 	};
@@ -157,7 +157,7 @@ namespace EmuSIMD::TMP
 		static constexpr bool value = std::conditional_t
 		<
 			is_simd_register_v<Register_>,
-			is_integral_simd_register<typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type>,
+			is_integral_simd_register<typename EmuCore::TMP::remove_ref_cv<Register_>::type>,
 			std::false_type
 		>::value;
 	};
@@ -233,7 +233,7 @@ namespace EmuSIMD::TMP
 		static constexpr std::size_t value = std::conditional_t
 		<
 			is_floating_point_simd_register_v<Register_>,
-			floating_point_register_element_count<typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type>,
+			floating_point_register_element_count<typename EmuCore::TMP::remove_ref_cv<Register_>::type>,
 			0
 		>;
 	};
@@ -277,8 +277,8 @@ namespace EmuSIMD::TMP
 
 		static constexpr bool value = std::conditional_t
 		<
-			is_simd_register_v<Register_> && !std::is_same_v<Register_, typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type>,
-			valid_register_index<typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type>,
+			is_simd_register_v<Register_> && !std::is_same_v<Register_, typename EmuCore::TMP::remove_ref_cv<Register_>::type>,
+			valid_register_index<typename EmuCore::TMP::remove_ref_cv<Register_>::type>,
 			std::false_type
 		>::value;
 	};

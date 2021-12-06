@@ -126,7 +126,7 @@ namespace EmuCore
 		}
 		[[nodiscard]] inline float operator()(const float val_) const
 		{
-			using uint_type = EmuCore::TMPHelpers::uint_of_size_t<sizeof(float)>;
+			using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(float)>;
 			if constexpr (!std::is_same_v<uint_type, std::false_type>)
 			{
 				const uint_type as_uint_ = ~(*reinterpret_cast<const uint_type*>(&val_));
@@ -146,7 +146,7 @@ namespace EmuCore
 		}
 		[[nodiscard]] inline double operator()(const double val_) const
 		{
-			using uint_type = EmuCore::TMPHelpers::uint_of_size_t<sizeof(double)>;
+			using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(double)>;
 			if constexpr (!std::is_same_v<uint_type, std::false_type>)
 			{
 				const uint_type as_uint_ = ~(*reinterpret_cast<const uint_type*>(&val_));
@@ -166,7 +166,7 @@ namespace EmuCore
 		}
 		[[nodiscard]] inline long double operator()(const long double val_) const
 		{
-			using uint_type = EmuCore::TMPHelpers::uint_of_size_t<sizeof(long double)>;
+			using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(long double)>;
 			if constexpr (!std::is_same_v<uint_type, std::false_type>)
 			{
 				const uint_type as_uint_ = ~(*reinterpret_cast<const uint_type*>(&val_));
@@ -224,7 +224,7 @@ namespace EmuCore
 		}
 		inline float operator()(const float val_, const Shifts_& num_shifts_) const
 		{
-			using uint_type = EmuCore::TMPHelpers::uint_of_size_t<sizeof(float)>;
+			using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(float)>;
 			if constexpr (!std::is_same_v<uint_type, std::false_type>)
 			{
 				const uint_type as_uint_ = (*reinterpret_cast<const uint_type*>(&val_)) << static_cast<std::size_t>(num_shifts_);
@@ -244,7 +244,7 @@ namespace EmuCore
 		}
 		inline double operator()(const double val_, const Shifts_& num_shifts_) const
 		{
-			using uint_type = EmuCore::TMPHelpers::uint_of_size_t<sizeof(double)>;
+			using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(double)>;
 			if constexpr (!std::is_same_v<uint_type, std::false_type>)
 			{
 				const uint_type as_uint_ = (*reinterpret_cast<const uint_type*>(&val_)) << static_cast<std::size_t>(num_shifts_);
@@ -264,7 +264,7 @@ namespace EmuCore
 		}
 		inline double operator()(const long double val_, const Shifts_& num_shifts_) const
 		{
-			using uint_type = EmuCore::TMPHelpers::uint_of_size_t<sizeof(long double)>;
+			using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(long double)>;
 			if constexpr (!std::is_same_v<uint_type, std::false_type>)
 			{
 				const uint_type as_uint_ = (*reinterpret_cast<const uint_type*>(&val_)) << static_cast<std::size_t>(num_shifts_);
@@ -322,7 +322,7 @@ namespace EmuCore
 		}
 		inline float operator()(const float val_, const Shifts_& num_shifts_) const
 		{
-			using uint_type = EmuCore::TMPHelpers::uint_of_size_t<sizeof(float)>;
+			using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(float)>;
 			if constexpr (!std::is_same_v<uint_type, std::false_type>)
 			{
 				const uint_type as_uint_ = (*reinterpret_cast<const uint_type*>(&val_)) >> static_cast<std::size_t>(num_shifts_);
@@ -342,7 +342,7 @@ namespace EmuCore
 		}
 		inline double operator()(const double val_, const Shifts_& num_shifts_) const
 		{
-			using uint_type = EmuCore::TMPHelpers::uint_of_size_t<sizeof(double)>;
+			using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(double)>;
 			if constexpr (!std::is_same_v<uint_type, std::false_type>)
 			{
 				const uint_type as_uint_ = (*reinterpret_cast<const uint_type*>(&val_)) >> static_cast<std::size_t>(num_shifts_);
@@ -362,7 +362,7 @@ namespace EmuCore
 		}
 		inline double operator()(const long double val_, const Shifts_& num_shifts_) const
 		{
-			using uint_type = EmuCore::TMPHelpers::uint_of_size_t<sizeof(long double)>;
+			using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(long double)>;
 			if constexpr (!std::is_same_v<uint_type, std::false_type>)
 			{
 				const uint_type as_uint_ = (*reinterpret_cast<const uint_type*>(&val_)) >> static_cast<std::size_t>(num_shifts_);

@@ -6,7 +6,7 @@
 #include "TypeComparators.h"
 #include "TypeConvertors.h"
 
-namespace EmuCore::TMPHelpers
+namespace EmuCore::TMP
 {
 	/// <summary> Ratio alias used to represent a picosecond, relative to seconds. </summary>
 	using ratio_pico = std::pico;
@@ -32,9 +32,9 @@ namespace EmuCore::TMPHelpers
 	{
 		static constexpr bool value = std::conditional_t
 		<
-			std::is_same_v<T_, EmuCore::TMPHelpers::remove_ref_cv_t<T_>>,
+			std::is_same_v<T_, EmuCore::TMP::remove_ref_cv_t<T_>>,
 			std::false_type,
-			is_duration<EmuCore::TMPHelpers::remove_ref_cv_t<T_>>
+			is_duration<EmuCore::TMP::remove_ref_cv_t<T_>>
 		>::value;
 	};
 	template<class Rep_, class Period_>

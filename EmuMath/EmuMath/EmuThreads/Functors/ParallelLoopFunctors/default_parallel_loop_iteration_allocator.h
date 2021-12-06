@@ -37,7 +37,7 @@ namespace EmuThreads::Functors
 			}
 		}
 
-		template<class Func_, class Iterator_, typename = std::enable_if_t<!EmuCore::TMPHelpers::is_tuple_v<Iterator_>>>
+		template<class Func_, class Iterator_, typename = std::enable_if_t<!EmuCore::TMP::is_tuple_v<Iterator_>>>
 		inline void operator()(Executor_& executor_, Func_& func_, const Iterator_& iterator_) const
 		{
 			if constexpr (std::is_copy_constructible_v<Func_>)

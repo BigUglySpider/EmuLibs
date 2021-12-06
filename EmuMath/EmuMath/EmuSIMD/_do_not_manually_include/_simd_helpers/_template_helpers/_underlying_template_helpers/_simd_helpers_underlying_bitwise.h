@@ -9,7 +9,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<class Register_>
 	[[nodiscard]] inline Register_ _and(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (std::is_same_v<register_type_uq, __m128>)
@@ -62,7 +62,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<class Register_>
 	[[nodiscard]] inline Register_ _or(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (std::is_same_v<register_type_uq, __m128>)
@@ -115,7 +115,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<class Register_>
 	[[nodiscard]] inline Register_ _xor(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (std::is_same_v<register_type_uq, __m128>)
@@ -168,7 +168,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<class Register_>
 	[[nodiscard]] inline Register_ _andnot(Register_ lhs_, Register_ rhs_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (std::is_same_v<register_type_uq, __m128>)
@@ -221,10 +221,10 @@ namespace EmuSIMD::_underlying_simd_helpers
 	template<class Register_>
 	[[nodiscard]] inline Register_ _not(Register_ to_not_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
-			constexpr bool is_supported_register_ = EmuCore::TMPHelpers::is_any_comparison_true
+			constexpr bool is_supported_register_ = EmuCore::TMP::is_any_comparison_true
 			<
 				std::is_same,
 				register_type_uq,

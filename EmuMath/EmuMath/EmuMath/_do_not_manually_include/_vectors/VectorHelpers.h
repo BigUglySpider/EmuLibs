@@ -182,11 +182,11 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to convert to a tuple.</param>
 	/// <returns>Tuple representation of the passed EmuMath vector. Note that this is a copy, and may not be used to modify the vector itself's data.</returns>
 	template<class Vector_>
-	constexpr inline typename EmuCore::TMPHelpers::tuple_n<Vector_::size, typename Vector_::value_type>::type vector_as_tuple(const Vector_& vector_)
+	constexpr inline typename EmuCore::TMP::tuple_n<Vector_::size, typename Vector_::value_type>::type vector_as_tuple(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_vector_to_tuple<Vector_,typename  EmuCore::TMPHelpers::tuple_n<Vector_::size, typename Vector_::value_type>::type>
+			return _underlying_vector_funcs::_vector_to_tuple<Vector_,typename  EmuCore::TMP::tuple_n<Vector_::size, typename Vector_::value_type>::type>
 			(
 				vector_,
 				std::make_index_sequence<Vector_::size>()
@@ -729,7 +729,7 @@ namespace EmuMath::Helpers
 	template<typename OutT_, class Vector_>
 	[[nodiscard]] constexpr inline OutT_ vector_magnitude_constexpr(const Vector_& vector_)
 	{
-		using FloatingPoint_ = EmuCore::TMPHelpers::first_floating_point_t<OutT_, typename Vector_::value_type, float>;
+		using FloatingPoint_ = EmuCore::TMP::first_floating_point_t<OutT_, typename Vector_::value_type, float>;
 		return static_cast<OutT_>(EmuCore::SqrtConstexpr<FloatingPoint_, FloatingPoint_>(vector_square_magnitude<FloatingPoint_, Vector_>(vector_)));
 	}
 	template<class Vector_>
@@ -748,7 +748,7 @@ namespace EmuMath::Helpers
 	template<typename OutT_, class Vector_>
 	[[nodiscard]] inline OutT_ vector_magnitude(const Vector_& vector_)
 	{
-		using FloatingPoint_ = EmuCore::TMPHelpers::first_floating_point_t<OutT_, typename Vector_::value_type, float>;
+		using FloatingPoint_ = EmuCore::TMP::first_floating_point_t<OutT_, typename Vector_::value_type, float>;
 		return EmuCore::DoMatchingStandardSqrt<FloatingPoint_>(vector_square_magnitude<FloatingPoint_, Vector_>(vector_));
 	}
 	template<class Vector_>
@@ -1825,7 +1825,7 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (EmuMath::TMP::is_emu_vector_v<RhsVector_>)
 			{
-				using floating_point = EmuCore::TMPHelpers::first_floating_point_t<OutCosine_, float>;
+				using floating_point = EmuCore::TMP::first_floating_point_t<OutCosine_, float>;
 				return static_cast<OutCosine_>
 				(
 					vector_dot_product<floating_point>(lhs_, rhs_) / EmuCore::do_sqrt_constexpr<floating_point>()
@@ -1868,7 +1868,7 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (EmuMath::TMP::is_emu_vector_v<RhsVector_>)
 			{
-				using floating_point = EmuCore::TMPHelpers::first_floating_point_t<OutCosine_, float>;
+				using floating_point = EmuCore::TMP::first_floating_point_t<OutCosine_, float>;
 				return static_cast<OutCosine_>
 				(
 					vector_dot_product<floating_point>(lhs_, rhs_) / EmuCore::do_sqrt<floating_point>()
@@ -1907,7 +1907,7 @@ namespace EmuMath::Helpers
 	template<typename OutAngle_, bool Rads_ = true, class VectorA_, class VectorB_>
 	[[nodiscard]] inline OutAngle_ vector_angle(const VectorA_& a_, const VectorB_& b_)
 	{
-		using floating_point = EmuCore::TMPHelpers::first_floating_point_t<OutAngle_, float>;
+		using floating_point = EmuCore::TMP::first_floating_point_t<OutAngle_, float>;
 		if constexpr (Rads_)
 		{
 			return static_cast<OutAngle_>(EmuCore::do_acos<floating_point>()(vector_angle_cosine<floating_point>(a_, b_)));
@@ -2859,7 +2859,7 @@ namespace EmuMath::Helpers
 				EmuMath::Vector<OutSize_, out_contained_type>,
 				LhsVector_,
 				Rhs_,
-				EmuCore::do_bitwise_and<typename LhsVector_::value_type, EmuCore::TMPHelpers::get_value_type_t<Rhs_>>
+				EmuCore::do_bitwise_and<typename LhsVector_::value_type, EmuCore::TMP::get_value_type_t<Rhs_>>
 			>
 			(
 				lhs_,
@@ -2908,7 +2908,7 @@ namespace EmuMath::Helpers
 				EmuMath::Vector<OutSize_, out_contained_type>,
 				LhsVector_,
 				Rhs_,
-				EmuCore::do_bitwise_or<typename LhsVector_::value_type, EmuCore::TMPHelpers::get_value_type_t<Rhs_>>
+				EmuCore::do_bitwise_or<typename LhsVector_::value_type, EmuCore::TMP::get_value_type_t<Rhs_>>
 			>
 			(
 				lhs_,
@@ -2957,7 +2957,7 @@ namespace EmuMath::Helpers
 				EmuMath::Vector<OutSize_, out_contained_type>,
 				LhsVector_,
 				Rhs_,
-				EmuCore::do_bitwise_xor<typename LhsVector_::value_type, EmuCore::TMPHelpers::get_value_type_t<Rhs_>>
+				EmuCore::do_bitwise_xor<typename LhsVector_::value_type, EmuCore::TMP::get_value_type_t<Rhs_>>
 			>
 			(
 				lhs_,

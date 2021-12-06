@@ -11,7 +11,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	{
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<Register_>)
 		{
-			using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+			using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 			using shuffle_mask_inst = EmuSIMD::_underlying_simd_helpers::_shuffle_mask<register_type_uq, Indices_...>;
 			if constexpr (EmuSIMD::_underlying_simd_helpers::is_valid_shuffle_mask_instance<shuffle_mask_inst>::value)
 			{
@@ -39,7 +39,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 				{
 					return _mm512_shuffle_pd(a_, b_, shuffle_mask_inst::get());
 				}
-				else if constexpr (EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>::value)
+				else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>::value)
 				{
 					static_assert(false, "Attempted to shuffle 2 integral SIMD registers using EmuSIMD helpers, but only one integral register may be shuffled.");
 				}
@@ -63,7 +63,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	{
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<Register_>)
 		{
-			using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+			using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 			if constexpr (EmuSIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
 			{
 				return _execute_shuffle<Indices_...>(ab_, ab_);

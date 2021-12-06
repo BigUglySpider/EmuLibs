@@ -789,7 +789,7 @@ namespace EmuMath::Helpers
 				<
 					EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_>,
 					Matrix_,
-					typename EmuCore::TMPHelpers::first_floating_point
+					typename EmuCore::TMP::first_floating_point
 					<
 						out_contained_type,
 						typename Matrix_::value_type,
@@ -849,7 +849,7 @@ namespace EmuMath::Helpers
 				<
 					EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_>,
 					Matrix_,
-					typename EmuCore::TMPHelpers::first_floating_point
+					typename EmuCore::TMP::first_floating_point
 					<
 						out_contained_type,
 						OutDeterminant_,

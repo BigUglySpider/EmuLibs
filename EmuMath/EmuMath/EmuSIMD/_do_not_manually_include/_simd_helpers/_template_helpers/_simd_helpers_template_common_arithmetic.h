@@ -23,7 +23,7 @@ namespace EmuSIMD
 	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
 	[[nodiscard]] inline Register_ lerp(Register_ a_, Register_ b_, Register_ t_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (EmuSIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
@@ -63,7 +63,7 @@ namespace EmuSIMD
 	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
 	[[nodiscard]] inline Register_ fused_lerp(Register_ a_, Register_ b_, Register_ t_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (EmuSIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
@@ -110,7 +110,7 @@ namespace EmuSIMD
 	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
 	[[nodiscard]] inline Register_ horizontal_sum(Register_ register_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (EmuSIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
@@ -273,7 +273,7 @@ namespace EmuSIMD
 	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
 	[[nodiscard]] inline Register_ horizontal_sum_fill(Register_ register_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (std::is_same_v<register_type_uq, __m128>)
@@ -307,13 +307,13 @@ namespace EmuSIMD
 				);
 				return _mm256_permute2f128_pd(result_, result_, 0);
 			}
-			else if constexpr (EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i>::value)
+			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i>::value)
 			{
 				if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfInt_>())
 				{
 					return _underlying_simd_helpers::_set1<register_type_uq, PerElementWidthIfInt_>
 					(
-						_underlying_simd_helpers::_get_register_index<0, EmuCore::TMPHelpers::int_of_size_t<PerElementWidthIfInt_ / 8>>
+						_underlying_simd_helpers::_get_register_index<0, EmuCore::TMP::int_of_size_t<PerElementWidthIfInt_ / 8>>
 						(
 							horizontal_sum<PerElementWidthIfInt_>(register_)
 						)
@@ -338,7 +338,7 @@ namespace EmuSIMD
 	template<typename Out_, std::size_t PerElementWidthIfInt_ = 32, class Register_>
 	[[nodiscard]] inline Out_ horizontal_sum_scalar(Register_ register_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (EmuSIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
@@ -369,7 +369,7 @@ namespace EmuSIMD
 	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
 	[[nodiscard]] inline Register_ dot(Register_ a_, Register_ b_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (EmuSIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
@@ -394,7 +394,7 @@ namespace EmuSIMD
 	template<typename Out_, std::size_t PerElementWidthIfInt_ = 32, class Register_>
 	[[nodiscard]] inline Out_ dot_scalar(Register_ a_, Register_ b_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (EmuSIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
@@ -425,7 +425,7 @@ namespace EmuSIMD
 	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
 	[[nodiscard]] inline Register_ dot_fill(Register_ a_, Register_ b_)
 	{
-		using register_type_uq = typename EmuCore::TMPHelpers::remove_ref_cv<Register_>::type;
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
 			if constexpr (EmuSIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)

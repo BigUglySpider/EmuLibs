@@ -11,7 +11,7 @@ namespace EmuCore
 	/// <summary>
 	/// <para> Wrapper for using std::chrono::steady_clock to mark points in time and use them to create a duration. </para>
 	/// </summary>
-	template<class DefaultRatio_ = EmuCore::TMPHelpers::ratio_micro>
+	template<class DefaultRatio_ = EmuCore::TMP::ratio_micro>
 	class Timer
 	{
 	public:
@@ -23,23 +23,23 @@ namespace EmuCore
 		using time_point = std::chrono::steady_clock::time_point;
 
 		/// <summary> Ratio alias used to represent a picosecond, relative to seconds. </summary>
-		using ratio_pico = EmuCore::TMPHelpers::ratio_pico;
+		using ratio_pico = EmuCore::TMP::ratio_pico;
 		/// <summary> Ratio alias used to represent a nanosecond, relative to seconds. </summary>
-		using ratio_nano = EmuCore::TMPHelpers::ratio_nano;
+		using ratio_nano = EmuCore::TMP::ratio_nano;
 		/// <summary> Ratio alias used to represent a microsecond, relative to seconds. </summary>
-		using ratio_micro = EmuCore::TMPHelpers::ratio_micro;
+		using ratio_micro = EmuCore::TMP::ratio_micro;
 		/// <summary> Ratio alias used to represent a millisecond, relative to seconds. </summary>
-		using ratio_milli = EmuCore::TMPHelpers::ratio_milli;
+		using ratio_milli = EmuCore::TMP::ratio_milli;
 		/// <summary> Ratio alias used to represent a second, relative to seconds. </summary>
-		using ratio_second = EmuCore::TMPHelpers::ratio_second;
+		using ratio_second = EmuCore::TMP::ratio_second;
 		/// <summary> Ratio alias used to represent a minute, relative to seconds. </summary>
-		using ratio_minute = EmuCore::TMPHelpers::ratio_minute;
+		using ratio_minute = EmuCore::TMP::ratio_minute;
 		/// <summary> Ratio alias used to represent an hour, relative to seconds. </summary>
-		using ratio_hour = EmuCore::TMPHelpers::ratio_hour;
+		using ratio_hour = EmuCore::TMP::ratio_hour;
 		/// <summary> Ratio alias used to represent a day, relative to seconds. </summary>
-		using ratio_day = EmuCore::TMPHelpers::ratio_day;
+		using ratio_day = EmuCore::TMP::ratio_day;
 		/// <summary> Ratio alias used to represent a week, relative to seconds. </summary>
-		using ratio_week = EmuCore::TMPHelpers::ratio_week;
+		using ratio_week = EmuCore::TMP::ratio_week;
 		/// <summary> Ratio used by default when no alternative argument is provided. </summary>
 		using ratio_default = DefaultRatio_;
 
@@ -160,7 +160,7 @@ namespace EmuCore
 		template<class Out_ = double, class OutRatio_ = ratio_default>
 		[[nodiscard]] inline Out_ Get() const noexcept
 		{
-			if constexpr (EmuCore::TMPHelpers::is_duration_v<Out_>)
+			if constexpr (EmuCore::TMP::is_duration_v<Out_>)
 			{
 				if (has_started)
 				{
@@ -303,7 +303,7 @@ namespace EmuCore
 		template<class Duration_>
 		[[nodiscard]] inline Duration_ _get_duration() const noexcept
 		{
-			if constexpr (EmuCore::TMPHelpers::is_duration_v<Duration_>)
+			if constexpr (EmuCore::TMP::is_duration_v<Duration_>)
 			{
 				return Duration_(end - begin);
 			}
@@ -316,7 +316,7 @@ namespace EmuCore
 		template<class Duration_>
 		[[nodiscard]] inline Duration_ _peek_duration() const noexcept
 		{
-			if constexpr (EmuCore::TMPHelpers::is_duration_v<Duration_>)
+			if constexpr (EmuCore::TMP::is_duration_v<Duration_>)
 			{
 				return Duration_(now() - begin);
 			}
