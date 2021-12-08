@@ -19,6 +19,8 @@
 #include "EmuCore/CommonTypes/Timer.h"
 #include "EmuCore/CommonTypes/Stopwatch.h"
 
+#include "EmuMath/NewVector.h"
+
 using namespace EmuCore::TestingHelpers;
 
 template<typename T_>
@@ -323,7 +325,45 @@ int main()
 	EmuMath::Vector<5, float> aaaaa;
 	EmuMath::Matrix<1, 27, int> bbbbb;
 
+	constexpr EmuMath::NewVector<4, float> newvector_a_(1, 2, 3, 4);
+	constexpr bool hoigjheor = EmuMath::NewVector<4, float>().valid_template_construction_args<int, int, int, int>();
+	constexpr auto val_0_ = newvector_a_.at<0>();
+	constexpr auto val_1_ = newvector_a_.at<1>();
+	constexpr auto val_2_ = newvector_a_.at<2>();
+	constexpr auto val_3_ = newvector_a_.at<3>();
+	EmuMath::NewVector<4, const float&> newvector_b_(val_0_, val_1_, val_2_, val_3_);
+	EmuMath::NewVector<4, EmuMath::vector_internal_ref<const float>> newvector_c_(newvector_b_);
 
+	constexpr auto ct_theoretical_0_ = EmuMath::Helpers::new_vector_get_theoretical<0>(newvector_a_);
+	constexpr auto ct_theoretical_1_ = EmuMath::Helpers::new_vector_get_theoretical<1>(newvector_a_);
+	constexpr auto ct_theoretical_2_ = EmuMath::Helpers::new_vector_get_theoretical<2>(newvector_a_);
+	constexpr auto ct_theoretical_3_ = EmuMath::Helpers::new_vector_get_theoretical<3>(newvector_a_);
+	constexpr auto ct_theoretical_4_ = EmuMath::Helpers::new_vector_get_theoretical<4>(newvector_a_);
+
+	auto& rt_theoretical_0_ = EmuMath::Helpers::new_vector_get_theoretical<0>(newvector_b_);
+	auto& rt_theoretical_1_ = EmuMath::Helpers::new_vector_get_theoretical<1>(newvector_b_);
+	auto& rt_theoretical_2_ = EmuMath::Helpers::new_vector_get_theoretical<2>(newvector_b_);
+	auto& rt_theoretical_3_ = EmuMath::Helpers::new_vector_get_theoretical<3>(newvector_b_);
+	auto rt_theoretical_4_ = EmuMath::Helpers::new_vector_get_theoretical<4>(newvector_b_);
+	
+	std::cout << newvector_b_ << "\n";
+	std::cout << newvector_c_ << "\n";
+	std::cout << EmuMath::NewVector<4, const float&>(  std::move(newvector_c_)) << "\n";
+	std::cout << EmuMath::NewVector<4, const float&>(  newvector_c_) << "\n";
+	std::cout << EmuMath::NewVector<4, const float&>(  const_cast<const decltype(newvector_c_)&>(newvector_c_)) << "\n";
+
+	float new_num_ = 45;
+	int blombo = 2;
+	newvector_b_.Set<0>(new_num_);
+	std::cout << newvector_b_ << "\n";
+	newvector_b_.Set<2>(new_num_);
+	newvector_b_.Set<3>(newvector_a_.at<2>());
+	new_num_ = 12;
+	std::cout << newvector_b_ << "\n";
+
+
+	system("pause");
+	std::cout << "\n---\n\n\n";
 	constexpr EmuMath::ColourRGB<float> colour_(-0.2f, 2.5, 2.0f);
 	constexpr auto wrapped_ = colour_.Wrapped<std::uint8_t, true>();
 	constexpr auto clamped_ = colour_.Clamped<std::uint8_t, true>();

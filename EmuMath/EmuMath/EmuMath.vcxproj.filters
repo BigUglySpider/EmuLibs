@@ -470,5 +470,32 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FastNoiseGen1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_vector_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_tmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_common_vector_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_info.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\NewVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_get_underlying.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_get.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_set_underlying.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

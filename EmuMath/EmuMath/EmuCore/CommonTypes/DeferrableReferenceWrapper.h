@@ -30,25 +30,33 @@ namespace EmuCore
 		/// <summary> The std::reference_wrapper alternative to this wrapper. </summary>
 		using std_wrapper = std::reference_wrapper<T>;
 
+		static constexpr bool is_const = std::is_const_v<value_type>;
+
 		constexpr DeferrableReferenceWrapper() : ptr_(nullptr)
 		{
 		}
 		constexpr DeferrableReferenceWrapper(T& val_) : ptr_(&val_)
 		{
 		}
+
+		constexpr DeferrableReferenceWrapper(T&&) = delete;
+
 		constexpr DeferrableReferenceWrapper(this_type& to_copy_) : ptr_(to_copy_.ptr_)
 		{
 		}
-		template<typename OnlyIfConstRef = std::enable_if_t<std::is_const_v<value_type>>>
+
 		constexpr DeferrableReferenceWrapper(const this_type& to_copy_) : ptr_(to_copy_.ptr_)
 		{
+			static_assert(is_const, "Attempted to construct a DeferrableReferenceWrapper via a const-copy, but the contained reference is not const.");
 		}
+
 		constexpr DeferrableReferenceWrapper(std_wrapper& std_to_copy_) : ptr_(&(std_to_copy_.get()))
 		{
 		}
-		template<typename OnlyIfConstRef = std::enable_if_t<std::is_const_v<value_type>>>
+
 		constexpr DeferrableReferenceWrapper(const std_wrapper& std_to_copy_) : ptr_(&(std_to_copy_.get()))
 		{
+			static_assert(is_const, "Attempted to construct a DeferrableReferenceWrapper via a const-copy, but the contained reference is not const.");
 		}
 
 		constexpr inline operator T& ()
@@ -82,16 +90,50 @@ namespace EmuCore
 			return ptr_ != nullptr;
 		}
 
-		constexpr inline this_type& operator=(DeferrableReferenceWrapper<T> toSetTo_)
+		constexpr inline void Set(reference_type ref_)
+		{
+			ptr_ = &ref_;
+		}
+
+		constexpr inline this_type& operator=(DeferrableReferenceWrapper<T>& toSetTo_)
 		{
 			ptr_ = toSetTo_.ptr_;
 			return *this;
 		}
-		constexpr inline this_type& operator=(std_wrapper toSetTo_)
+
+		constexpr inline this_type& operator=(const DeferrableReferenceWrapper<T>& toSetTo_)
+		{
+			if constexpr (is_const)
+			{
+				ptr_ = toSetTo_.ptr_;
+				return *this;
+			}
+			else
+			{
+				static_assert(is_const, "Attempted to assign a DeferrableReferenceWrapper via a const-copy, but the contained reference is not const.");
+			}
+		}
+
+		constexpr inline this_type& operator=(std_wrapper& toSetTo_)
 		{
 			ptr_ = &(toSetTo_.get());
 			return *this;
 		}
+
+		constexpr inline this_type& operator=(const std_wrapper& toSetTo_)
+		{
+			if constexpr (is_const)
+			{
+				ptr_ = &(toSetTo_.get());
+				return *this;
+			}
+			else
+			{
+				static_assert(is_const, "Attempted to assign a DeferrableReferenceWrapper via a const-copy, but the contained reference is not const.");
+			}
+		}
+
+
 		template<typename...Args_>
 		constexpr inline std::invoke_result_t<T&, Args_...> operator()(Args_&&...args_) const
 		{
