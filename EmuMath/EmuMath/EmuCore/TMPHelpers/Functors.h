@@ -6,7 +6,7 @@
 #include <functional>
 #include <type_traits>
 
-namespace EmuCore::TMPHelpers
+namespace EmuCore::TMP
 {
 	/// <summary> Common info used by general arithmetic functors. </summary>
 	/// <typeparam name="Lhs_">Left-handed argument type in the arithmetic operation.</typeparam>
@@ -15,7 +15,7 @@ namespace EmuCore::TMPHelpers
 	template<typename Lhs_, typename Rhs_, typename Out_>
 	struct _common_arithmetic_functor_info
 	{
-		static constexpr bool any_fp = EmuCore::TMPHelpers::is_any_floating_point_v<Lhs_, Rhs_, Out_>;
+		static constexpr bool any_fp = EmuCore::TMP::is_any_floating_point_v<Lhs_, Rhs_, Out_>;
 		static constexpr bool lhs_rhs_same = std::is_same_v<Lhs_, Rhs_>;
 		static constexpr bool lhs_output_same = std::is_same_v<Lhs_, Out_>;
 		static constexpr bool rhs_output_same = std::is_same_v<Rhs_, Out_>;
@@ -28,13 +28,13 @@ namespace EmuCore::TMPHelpers
 			std::conditional_t
 			<
 				any_fp,
-				EmuCore::TMPHelpers::highest_byte_size_t
+				EmuCore::TMP::highest_byte_size_t
 				<
-					EmuCore::TMPHelpers::best_floating_point_rep_t<Lhs_>,
-					EmuCore::TMPHelpers::best_floating_point_rep_t<Rhs_>,
-					EmuCore::TMPHelpers::best_floating_point_rep_t<Out_>
+					EmuCore::TMP::best_floating_point_rep_t<Lhs_>,
+					EmuCore::TMP::best_floating_point_rep_t<Rhs_>,
+					EmuCore::TMP::best_floating_point_rep_t<Out_>
 				>,
-				EmuCore::TMPHelpers::highest_byte_size_t<Lhs_, Rhs_, Out_>
+				EmuCore::TMP::highest_byte_size_t<Lhs_, Rhs_, Out_>
 			>
 		>;
 		static constexpr bool cast_result = std::is_same_v<result_type, Out_>;
@@ -203,7 +203,7 @@ namespace EmuCore::TMPHelpers
 	template<typename Lhs_, typename Rhs_, typename Out_ = Lhs_>
 	struct _common_bitwise_functor_info
 	{
-		static constexpr bool any_fp = EmuCore::TMPHelpers::is_any_floating_point_v<Lhs_, Rhs_, Out_>;
+		static constexpr bool any_fp = EmuCore::TMP::is_any_floating_point_v<Lhs_, Rhs_, Out_>;
 		static constexpr bool lhs_rhs_same = std::is_same_v<Lhs_, Rhs_>;
 		static constexpr bool lhs_output_same = std::is_same_v<Lhs_, Out_>;
 		static constexpr bool all_same = lhs_rhs_same && lhs_output_same;
@@ -289,7 +289,7 @@ namespace EmuCore::TMPHelpers
 		template<typename Lhs_, typename Rhs_, typename Out_>
 		Out_ Execute(const Lhs_& lhs, const Rhs_& rhs) const
 		{
-			using HighestT = EmuCore::TMPHelpers::highest_byte_size_t<Lhs_, Rhs_, Out_>;
+			using HighestT = EmuCore::TMP::highest_byte_size_t<Lhs_, Rhs_, Out_>;
 			HighestT lhsHighest = HighestT();
 			HighestT rhsHighest = HighestT();
 			memcpy(&lhsHighest, &lhs, sizeof(Lhs_));
@@ -353,7 +353,7 @@ namespace EmuCore::TMPHelpers
 			}
 			else
 			{
-				using HighestT = EmuCore::TMPHelpers::highest_byte_size_t<Lhs_, Rhs_, Out_>;
+				using HighestT = EmuCore::TMP::highest_byte_size_t<Lhs_, Rhs_, Out_>;
 				if constexpr (std::is_same_v<HighestT, Out_>)
 				{
 					return static_cast<Out_>(lhs) & rhs;
@@ -386,7 +386,7 @@ namespace EmuCore::TMPHelpers
 			}
 			else
 			{
-				using HighestT = EmuCore::TMPHelpers::highest_byte_size_t<Lhs_, Rhs_, Out_>;
+				using HighestT = EmuCore::TMP::highest_byte_size_t<Lhs_, Rhs_, Out_>;
 				if constexpr (std::is_same_v<HighestT, Out_>)
 				{
 					return static_cast<Out_>(lhs) | rhs;
@@ -419,7 +419,7 @@ namespace EmuCore::TMPHelpers
 			}
 			else
 			{
-				using HighestT = EmuCore::TMPHelpers::highest_byte_size_t<Lhs_, Rhs_, Out_>;
+				using HighestT = EmuCore::TMP::highest_byte_size_t<Lhs_, Rhs_, Out_>;
 				if constexpr (std::is_same_v<HighestT, Out_>)
 				{
 					return static_cast<Out_>(lhs) ^ rhs;
@@ -469,7 +469,7 @@ namespace EmuCore::TMPHelpers
 					{
 						const Lhs_ shifted = lhs << numShifts;
 						Out_ out = Out_();
-						memcpy(&out, &shifted, EmuCore::TMPHelpers::lowest_byte_size_v<Lhs_, Out_>);
+						memcpy(&out, &shifted, EmuCore::TMP::lowest_byte_size_v<Lhs_, Out_>);
 						return out;
 					}
 				}
@@ -480,7 +480,7 @@ namespace EmuCore::TMPHelpers
 			}
 			else
 			{
-				using LhsInt = EmuCore::TMPHelpers::uint_of_size_t<sizeof(Lhs_)>;
+				using LhsInt = EmuCore::TMP::uint_of_size_t<sizeof(Lhs_)>;
 				if constexpr (!std::is_same_v<LhsInt, std::false_type>)
 				{
 					LhsInt lhsInt = 0;
@@ -488,7 +488,7 @@ namespace EmuCore::TMPHelpers
 					memcpy(pLhsInt, &lhs, sizeof(Lhs_));
 					lhsInt = bitwise_shift_left_diff_types<LhsInt, Rhs_, LhsInt>()(lhsInt, numShifts);
 					Out_ out = Out_();
-					memcpy(&out, pLhsInt, EmuCore::TMPHelpers::lowest_byte_size_v<LhsInt, Out_>);
+					memcpy(&out, pLhsInt, EmuCore::TMP::lowest_byte_size_v<LhsInt, Out_>);
 					return out;
 				}
 				else
@@ -525,7 +525,7 @@ namespace EmuCore::TMPHelpers
 					{
 						const Lhs_ shifted = lhs >> numShifts;
 						Out_ out = Out_();
-						memcpy(&out, &shifted, EmuCore::TMPHelpers::lowest_byte_size_v<Lhs_, Out_>);
+						memcpy(&out, &shifted, EmuCore::TMP::lowest_byte_size_v<Lhs_, Out_>);
 						return out;
 					}
 				}
@@ -536,7 +536,7 @@ namespace EmuCore::TMPHelpers
 			}
 			else
 			{
-				using LhsInt = EmuCore::TMPHelpers::uint_of_size_t<sizeof(Lhs_)>;
+				using LhsInt = EmuCore::TMP::uint_of_size_t<sizeof(Lhs_)>;
 				if constexpr (!std::is_same_v<LhsInt, std::false_type>)
 				{
 					LhsInt lhsInt = 0;
@@ -544,7 +544,7 @@ namespace EmuCore::TMPHelpers
 					memcpy(pLhsInt, &lhs, sizeof(Lhs_));
 					lhsInt = bitwise_shift_right_diff_types<LhsInt, Rhs_, LhsInt>()(lhsInt, numShifts);
 					Out_ out = Out_();
-					memcpy(&out, pLhsInt, EmuCore::TMPHelpers::lowest_byte_size_v<LhsInt, Out_>);
+					memcpy(&out, pLhsInt, EmuCore::TMP::lowest_byte_size_v<LhsInt, Out_>);
 					return out;
 				}
 				else
@@ -695,7 +695,7 @@ namespace EmuCore::TMPHelpers
 			else
 			{
 				// Cast to an integer to truncate (faster than standard trunc funcs).
-				using BestIntCast_ = EmuCore::TMPHelpers::best_int_rep_t<In_>;
+				using BestIntCast_ = EmuCore::TMP::best_int_rep_t<In_>;
 				if constexpr (std::is_same_v<Out_, BestIntCast_>)
 				{
 					return static_cast<Out_>(in_);
@@ -762,7 +762,7 @@ namespace EmuCore::TMPHelpers
 			}
 			else
 			{
-				using BestIntCast_ = EmuCore::TMPHelpers::best_int_rep_t<In_>;
+				using BestIntCast_ = EmuCore::TMP::best_int_rep_t<In_>;
 				const BestIntCast_ cast_in_ = static_cast<BestIntCast_>(in_);
 				
 				// Cast truncation is enough to floor when positive.
@@ -826,7 +826,7 @@ namespace EmuCore::TMPHelpers
 			}
 			else
 			{
-				using BestIntCast_ = EmuCore::TMPHelpers::best_int_rep_t<In_>;
+				using BestIntCast_ = EmuCore::TMP::best_int_rep_t<In_>;
 				const BestIntCast_ cast_in_ = static_cast<BestIntCast_>(in_);
 
 				// Cast truncation is enough to ceil when negative.

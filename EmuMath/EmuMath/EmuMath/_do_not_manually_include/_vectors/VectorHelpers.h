@@ -17,7 +17,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to retrieve the specified index of.</param>
 	/// <returns>Reference to the element at the provided index of the passed EmuMath vector.</returns>
 	template<std::size_t Index_, class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::raw_value_type& VectorGet(Vector_& vector_)
+	[[nodiscard]] constexpr inline typename Vector_::raw_value_type& vector_get(Vector_& vector_)
 	{
 		if constexpr (_underlying_vector_funcs::_validity_check_vector_get<Index_, Vector_>())
 		{
@@ -28,12 +28,12 @@ namespace EmuMath::Helpers
 			static_assert
 			(
 				false,
-				"A validity check on arguments provided for EmuMath::Helpers::VectorGet has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
+				"A validity check on arguments provided for EmuMath::Helpers::vector_get has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
 			);
 		}
 	}
 	template<std::size_t Index_, class Vector_>
-	[[nodiscard]] constexpr inline const typename Vector_::raw_value_type& VectorGet(const Vector_& vector_)
+	[[nodiscard]] constexpr inline const typename Vector_::raw_value_type& vector_get(const Vector_& vector_)
 	{
 		if constexpr (_underlying_vector_funcs::_validity_check_vector_get<Index_, Vector_>())
 		{
@@ -44,13 +44,13 @@ namespace EmuMath::Helpers
 			static_assert
 			(
 				false,
-				"A validity check on arguments provided for EmuMath::Helpers::VectorGet has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
+				"A validity check on arguments provided for EmuMath::Helpers::vector_get has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
 			);
 		}
 	}
 
 	template<class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::raw_value_type& VectorGet(Vector_& vector_, const std::size_t index_)
+	[[nodiscard]] constexpr inline typename Vector_::raw_value_type& vector_get(Vector_& vector_, const std::size_t index_)
 	{
 		if constexpr (_underlying_vector_funcs::_validity_check_vector_get<Vector_>())
 		{
@@ -61,12 +61,12 @@ namespace EmuMath::Helpers
 			static_assert
 			(
 				false,
-				"A validity check on arguments provided for EmuMath::Helpers::VectorGet has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
+				"A validity check on arguments provided for EmuMath::Helpers::vector_get has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
 			);
 		}
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline const typename Vector_::raw_value_type& VectorGet(const Vector_& vector_, const std::size_t index_)
+	[[nodiscard]] constexpr inline const typename Vector_::raw_value_type& vector_get(const Vector_& vector_, const std::size_t index_)
 	{
 		if constexpr (_underlying_vector_funcs::_validity_check_vector_get<Vector_>())
 		{
@@ -77,7 +77,7 @@ namespace EmuMath::Helpers
 			static_assert
 			(
 				false,
-				"A validity check on arguments provided for EmuMath::Helpers::VectorGet has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
+				"A validity check on arguments provided for EmuMath::Helpers::vector_get has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
 			);
 		}
 	}
@@ -95,13 +95,13 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to extract the theoretical value for the provided index of.</param>
 	/// <returns>If Index_ is within the passed vector's index range: copy of the given index within the vector. Otherwise, a default-constructed value_type, inferring 0.</returns>
 	template<std::size_t Index_, typename OutT_, class Vector_>
-	[[nodiscard]] constexpr inline OutT_ VectorGetTheoretical(const Vector_& vector_)
+	[[nodiscard]] constexpr inline OutT_ vector_get_theoretical(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
 			if constexpr (Index_ < Vector_::size)
 			{
-				return static_cast<OutT_>(VectorGet<Index_>(vector_));
+				return static_cast<OutT_>(vector_get<Index_>(vector_));
 			}
 			else
 			{
@@ -114,9 +114,9 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t Index_, class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::value_type VectorGetTheoretical(const Vector_& vector_)
+	[[nodiscard]] constexpr inline typename Vector_::value_type vector_get_theoretical(const Vector_& vector_)
 	{
-		return VectorGetTheoretical<Index_, typename Vector_::value_type, Vector_>(vector_);
+		return vector_get_theoretical<Index_, typename Vector_::value_type, Vector_>(vector_);
 	}
 #pragma endregion
 
@@ -134,7 +134,7 @@ namespace EmuMath::Helpers
 	/// <param name="data_">EmuMath vector or scalar to copy the data of.</param>
 	/// <returns>Reference to the destination_ vector after copying.</returns>
 	template<class DestinationVector_, class Data_>
-	constexpr inline DestinationVector_& VectorCopy(DestinationVector_& destination_, const Data_& data_)
+	constexpr inline DestinationVector_& vector_copy(DestinationVector_& destination_, const Data_& data_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<DestinationVector_>)
 		{
@@ -153,7 +153,7 @@ namespace EmuMath::Helpers
 	///		If data_ is an EmuMath vector, elements of destination_ will be set to their respective elements in data_. 
 	///		Otherwise, all elements of destination_ will be set to data_.
 	/// </para>
-	/// <para> This is effectively the same as VectorCopy for value-type vectors. </para>
+	/// <para> This is effectively the same as vector_copy for value-type vectors. </para>
 	/// <para> If the vector contains references, this will change the memory location that the internal refernces point to, to the location(s) of data_. </para>
 	/// </summary>
 	/// <typeparam name="DestinationVector_">Type of vector that is the destination of this set.</typeparam>
@@ -162,7 +162,7 @@ namespace EmuMath::Helpers
 	/// <param name="data_">EmuMath vector or scalar to set the data in the destination via.</param>
 	/// <returns>Reference to the destination_ vector after setting.</returns>
 	template<class DestinationVector_, class Data_>
-	constexpr inline DestinationVector_& VectorSet(DestinationVector_& destination_, Data_& data_)
+	constexpr inline DestinationVector_& vector_set(DestinationVector_& destination_, Data_& data_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<DestinationVector_>)
 		{
@@ -182,11 +182,11 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to convert to a tuple.</param>
 	/// <returns>Tuple representation of the passed EmuMath vector. Note that this is a copy, and may not be used to modify the vector itself's data.</returns>
 	template<class Vector_>
-	constexpr inline typename EmuCore::TMPHelpers::tuple_n<Vector_::size, typename Vector_::value_type>::type VectorAsTuple(const Vector_& vector_)
+	constexpr inline typename EmuCore::TMP::tuple_n<Vector_::size, typename Vector_::value_type>::type vector_as_tuple(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return _underlying_vector_funcs::_vector_to_tuple<Vector_,typename  EmuCore::TMPHelpers::tuple_n<Vector_::size, typename Vector_::value_type>::type>
+			return _underlying_vector_funcs::_vector_to_tuple<Vector_,typename  EmuCore::TMP::tuple_n<Vector_::size, typename Vector_::value_type>::type>
 			(
 				vector_,
 				std::make_index_sequence<Vector_::size>()
@@ -212,7 +212,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to shuffle. May be any size, but must support the range of indices provided as template arguments.</param>
 	/// <returns>Shuffled EmuMath vector containing a number of elements equal to the number of indices provided, stored as the provided out_value_type.</returns>
 	template<typename out_value_type, std::size_t X_, std::size_t...RemainingShuffleIndices_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(RemainingShuffleIndices_) + 1, out_value_type> VectorShuffle(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(RemainingShuffleIndices_) + 1, out_value_type> vector_shuffle(const Vector_& vector_)
 	{
 		if constexpr(_underlying_vector_funcs::_validity_check_vector_shuffle<Vector_, X_, RemainingShuffleIndices_...>())
 		{
@@ -227,7 +227,7 @@ namespace EmuMath::Helpers
 			static_assert
 			(
 				false,
-				"A validity check on arguments provided for EmuMath::Helpers::VectorShuffle has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
+				"A validity check on arguments provided for EmuMath::Helpers::vector_shuffle has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
 			);
 		}
 	}
@@ -241,11 +241,11 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to shuffle. May be any size, but must support the range of indices provided as template arguments.</param>
 	/// <returns>Shuffled EmuMath vector containing a number of elements equal to the number of indices provided.</returns>
 	template<std::size_t X_, std::size_t...RemainingShuffleIndices_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(RemainingShuffleIndices_) + 1, typename Vector_::value_type> VectorShuffle(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(RemainingShuffleIndices_) + 1, typename Vector_::value_type> vector_shuffle(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			return VectorShuffle<typename Vector_::value_type, X_, RemainingShuffleIndices_...>(vector_);
+			return vector_shuffle<typename Vector_::value_type, X_, RemainingShuffleIndices_...>(vector_);
 		}
 		else
 		{
@@ -267,7 +267,7 @@ namespace EmuMath::Helpers
 	///		Elements are references to the elements at specified indices within the passed vector.
 	/// </returns>
 	template<std::size_t X_, std::size_t...RemainingShuffleIndices_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::ConstRefVector<sizeof...(RemainingShuffleIndices_) + 1, typename Vector_::value_type> VectorShuffledConstReference
+	[[nodiscard]] constexpr inline EmuMath::ConstRefVector<sizeof...(RemainingShuffleIndices_) + 1, typename Vector_::value_type> vector_shuffle_const_ref
 	(
 		const Vector_& vector_
 	)
@@ -300,7 +300,7 @@ namespace EmuMath::Helpers
 	///		Elements are references to the elements at specified indices within the passed vector.
 	/// </returns>
 	template<std::size_t X_, std::size_t...RemainingShuffleIndices_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::RefVector<sizeof...(RemainingShuffleIndices_) + 1, typename Vector_::value_type> VectorShuffledReference
+	[[nodiscard]] constexpr inline EmuMath::RefVector<sizeof...(RemainingShuffleIndices_) + 1, typename Vector_::value_type> vector_shuffle_ref
 	(
 		Vector_& vector_
 	)
@@ -319,12 +319,12 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t X_, std::size_t...RemainingShuffleIndices_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::ConstRefVector<sizeof...(RemainingShuffleIndices_) + 1, typename Vector_::value_type> VectorShuffledReference
+	[[nodiscard]] constexpr inline EmuMath::ConstRefVector<sizeof...(RemainingShuffleIndices_) + 1, typename Vector_::value_type> vector_shuffle_ref
 	(
 		const Vector_& vector_
 	)
 	{
-		return VectorShuffledConstReference<X_, RemainingShuffleIndices_...>(vector_);
+		return vector_shuffle_const_ref<X_, RemainingShuffleIndices_...>(vector_);
 	}
 #pragma endregion
 
@@ -338,7 +338,7 @@ namespace EmuMath::Helpers
 	/// <param name="lhs_">Right-hand vector in the addition operation.</param>
 	/// <returns>Vector containing the results of the addition.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorAdd(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_add(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
 		if constexpr (_underlying_vector_funcs::_validity_check_vector_arithmetic<LhsVector_, RhsVector_>())
 		{
@@ -350,24 +350,24 @@ namespace EmuMath::Helpers
 			static_assert
 			(
 				false,
-				"A validity check on arguments provided for EmuMath::Helpers::VectorAdd has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
+				"A validity check on arguments provided for EmuMath::Helpers::vector_add has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
 			);
 		}
 	}
 	template<std::size_t OutSize_, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline auto VectorAdd(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	[[nodiscard]] constexpr inline auto vector_add(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
-		return VectorAdd<OutSize_, typename LhsVector_::value_type, LhsVector_, RhsVector_>(lhs_, rhs_);
+		return vector_add<OutSize_, typename LhsVector_::value_type, LhsVector_, RhsVector_>(lhs_, rhs_);
 	}
 	template<typename out_contained_type, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline auto VectorAdd(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	[[nodiscard]] constexpr inline auto vector_add(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
-		return VectorAdd<LhsVector_::size, out_contained_type, LhsVector_, RhsVector_>(lhs_, rhs_);
+		return vector_add<LhsVector_::size, out_contained_type, LhsVector_, RhsVector_>(lhs_, rhs_);
 	}
 	template<class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline LhsVector_ VectorAdd(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	[[nodiscard]] constexpr inline LhsVector_ vector_add(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
-		return VectorAdd<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, RhsVector_>(lhs_, rhs_);
+		return vector_add<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, RhsVector_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -380,7 +380,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector of amounts to subtract from respective elements.</param>
 	/// <returns>Vector containing the results of the subtraction.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorSubtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_subtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
 		if constexpr (_underlying_vector_funcs::_validity_check_vector_arithmetic<LhsVector_, RhsVector_>())
 		{
@@ -392,24 +392,24 @@ namespace EmuMath::Helpers
 			static_assert
 			(
 				false,
-				"A validity check on arguments provided for EmuMath::Helpers::VectorSubtract has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
+				"A validity check on arguments provided for EmuMath::Helpers::vector_subtract has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
 			);
 		}
 	}
 	template<std::size_t OutSize_, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline auto VectorSubtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	[[nodiscard]] constexpr inline auto vector_subtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
-		return VectorSubtract<OutSize_, typename LhsVector_::value_type, LhsVector_, RhsVector_>(lhs_, rhs_);
+		return vector_subtract<OutSize_, typename LhsVector_::value_type, LhsVector_, RhsVector_>(lhs_, rhs_);
 	}
 	template<typename out_contained_type, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline LhsVector_ VectorSubtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	[[nodiscard]] constexpr inline LhsVector_ vector_subtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
-		return VectorSubtract<LhsVector_::size, out_contained_type, LhsVector_, RhsVector_>(lhs_, rhs_);
+		return vector_subtract<LhsVector_::size, out_contained_type, LhsVector_, RhsVector_>(lhs_, rhs_);
 	}
 	template<class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline LhsVector_ VectorSubtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	[[nodiscard]] constexpr inline LhsVector_ vector_subtract(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
-		return VectorSubtract<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, RhsVector_>(lhs_, rhs_);
+		return vector_subtract<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, RhsVector_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -421,7 +421,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector to multiply respective elements by, or a scalar to multiply every element by.</param>
 	/// <returns>Vector containing the results of the multiplication.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMultiply(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_multiply(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (_underlying_vector_funcs::_validity_check_vector_arithmetic_potential_scalar<LhsVector_>())
 		{
@@ -441,24 +441,24 @@ namespace EmuMath::Helpers
 			static_assert
 			(
 				false,
-				"A validity check on arguments provided for EmuMath::Helpers::VectorMultiply has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
+				"A validity check on arguments provided for EmuMath::Helpers::vector_multiply has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
 			);
 		}
 	}
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline auto VectorMultiply(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline auto vector_multiply(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorMultiply<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_multiply<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 	template<typename out_contained_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline auto VectorMultiply(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline auto vector_multiply(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorMultiply<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_multiply<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline auto VectorMultiply(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline auto vector_multiply(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorMultiply<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_multiply<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -473,7 +473,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector to divide respective elements by, or a scalar to divide every element by.</param>
 	/// <returns>Vector containing the results of the division.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_divide(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr
 		(
@@ -497,24 +497,24 @@ namespace EmuMath::Helpers
 			static_assert
 			(
 				false,
-				"A validity check on arguments provided for EmuMath::Helpers::VectorDivide has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
+				"A validity check on arguments provided for EmuMath::Helpers::vector_divide has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
 			);
 		}
 	}
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline auto VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline auto vector_divide(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorDivide<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_divide<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 	template<typename out_contained_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline auto VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline auto vector_divide(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorDivide<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_divide<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline auto VectorDivide(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline auto vector_divide(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorDivide<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_divide<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -532,7 +532,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector to divide respective elements by, or a scalar to divide every element by.</param>
 	/// <returns>Vector containing the results of the mod division.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMod(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_mod(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr
 			(
@@ -556,24 +556,24 @@ namespace EmuMath::Helpers
 			static_assert
 				(
 					false,
-					"A validity check on arguments provided for EmuMath::Helpers::VectorMod has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
+					"A validity check on arguments provided for EmuMath::Helpers::vector_mod has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
 					);
 		}
 	}
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline auto VectorMod(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline auto vector_mod(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorMod<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_mod<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 	template<typename out_contained_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline auto VectorMod(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline auto vector_mod(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorMod<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_mod<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline auto VectorMod(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline auto vector_mod(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorMod<LhsVector_::size, typename LhsVector_::value_type, Rhs_>(lhs_, rhs_);
+		return vector_mod<LhsVector_::size, typename LhsVector_::value_type, Rhs_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -584,7 +584,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to negate the elements of.</param>
 	/// <returns>Vector whose elements are the negated form of the respective elements in the passed vector_.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorNegate(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_negate(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -597,19 +597,19 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, class Vector_>
-	[[nodiscard]] constexpr inline auto VectorNegate(const Vector_& vector_)
+	[[nodiscard]] constexpr inline auto vector_negate(const Vector_& vector_)
 	{
-		return VectorNegate<Vector_::size, out_contained_type>(vector_);
+		return vector_negate<Vector_::size, out_contained_type>(vector_);
 	}
 	template<std::size_t OutSize_, class Vector_>
-	[[nodiscard]] constexpr inline auto VectorNegate(const Vector_& vector_)
+	[[nodiscard]] constexpr inline auto vector_negate(const Vector_& vector_)
 	{
-		return VectorNegate<OutSize_, typename Vector_::value_type>(vector_);
+		return vector_negate<OutSize_, typename Vector_::value_type>(vector_);
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline auto VectorNegate(const Vector_& vector_)
+	[[nodiscard]] constexpr inline auto vector_negate(const Vector_& vector_)
 	{
-		return VectorNegate<Vector_::size, typename Vector_::value_type>(vector_);
+		return vector_negate<Vector_::size, typename Vector_::value_type>(vector_);
 	}
 #pragma endregion
 
@@ -620,7 +620,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to multiply all elements of.</param>
 	/// <returns>Product of all elements within the passed vector.</returns>
 	template<typename OutT_, class Vector_>
-	[[nodiscard]] constexpr inline OutT_ VectorElementProduct(const Vector_& vector_)
+	[[nodiscard]] constexpr inline OutT_ vector_element_product(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -633,9 +633,9 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::value_type VectorElementProduct(const Vector_& vector_)
+	[[nodiscard]] constexpr inline typename Vector_::value_type vector_element_product(const Vector_& vector_)
 	{
-		return VectorElementProduct<typename Vector_::value_type, Vector_>(vector_);
+		return vector_element_product<typename Vector_::value_type, Vector_>(vector_);
 	}
 
 	/// <summary> Calculates the sum of adding all elements within the passed vector and returns it as the optional provided OutT_. </summary>
@@ -644,7 +644,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to multiply all elements of.</param>
 	/// <returns>Sum of all elements within the passed vector.</returns>
 	template<typename OutT_, class Vector_>
-	[[nodiscard]] constexpr inline OutT_ VectorElementSum(const Vector_& vector_)
+	[[nodiscard]] constexpr inline OutT_ vector_element_sum(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -657,9 +657,9 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::value_type VectorElementSum(const Vector_& vector_)
+	[[nodiscard]] constexpr inline typename Vector_::value_type vector_element_sum(const Vector_& vector_)
 	{
-		return VectorElementSum<typename Vector_::value_type, Vector_>(vector_);
+		return vector_element_sum<typename Vector_::value_type, Vector_>(vector_);
 	}
 
 	/// <summary>
@@ -672,7 +672,7 @@ namespace EmuMath::Helpers
 	/// <param name="b_">EmuMath vector B in the equation A DOT B.</param>
 	/// <returns>Dot product of the passed vectors, represented as the provided OutT_.</returns>
 	template<typename OutT_ = float, class VectorA_, class VectorB_>
-	[[nodiscard]] constexpr inline OutT_ VectorDotProduct(const VectorA_& a_, const VectorB_& b_)
+	[[nodiscard]] constexpr inline OutT_ vector_dot_product(const VectorA_& a_, const VectorB_& b_)
 	{
 		if constexpr (_underlying_vector_funcs::_validity_check_vector_dot_product<VectorA_, VectorB_>())
 		{
@@ -683,7 +683,7 @@ namespace EmuMath::Helpers
 			static_assert
 			(
 				false,
-				"A validity check on arguments provided for EmuMath::Helpers::VectorDotProduct has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
+				"A validity check on arguments provided for EmuMath::Helpers::vector_dot_product has failed. Review additional assertions from the file \"VectorHelpersUnderlying.h\" for more information."
 			);
 		}
 	}
@@ -698,7 +698,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to calculate the square magnitude of.</param>
 	/// <returns>Square magnitude of the passed vector, represented as OutT_ if provided, otherwise represented as the passed vector's value_type.</returns>
 	template<typename OutT_, class Vector_>
-	[[nodiscard]] constexpr inline OutT_ VectorSquareMagnitude(const Vector_& vector_)
+	[[nodiscard]] constexpr inline OutT_ vector_square_magnitude(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -710,9 +710,9 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::preferred_floating_point VectorSquareMagnitude(const Vector_& vector_)
+	[[nodiscard]] constexpr inline typename Vector_::preferred_floating_point vector_square_magnitude(const Vector_& vector_)
 	{
-		return VectorSquareMagnitude<typename Vector_::preferred_floating_point, Vector_>(vector_);
+		return vector_square_magnitude<typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 
 	/// <summary>
@@ -720,22 +720,22 @@ namespace EmuMath::Helpers
 	///		Calculates the passed vector's magnitude via means which may be evaluated at compile time for constant expressions, 
 	///		and outputs it as the optional provided OutT_ type, which defaults to the vector's preferred floating point type.
 	/// </para>
-	/// <para> If this will be executed at runtime, it is recommended to use VectorMagnitude(vector_) instead as this function may sacrifice performance to be constexpr. </para>
+	/// <para> If this will be executed at runtime, it is recommended to use vector_magnitude(vector_) instead as this function may sacrifice performance to be constexpr. </para>
 	/// </summary>
 	/// <typeparam name="Vector_">Type of vector to calculate the magnitude of.</typeparam>
 	/// <typeparam name="OutT_">Optional type to output the magnitude as.</typeparam>
 	/// <param name="vector_">EmuMath vector to calculate the magnitude of.</param>
 	/// <returns>Magnitude of the passed vector, represented as OutT_ if provided, otherwise represented as the passed vector's value_type.</returns>
 	template<typename OutT_, class Vector_>
-	[[nodiscard]] constexpr inline OutT_ VectorMagnitudeConstexpr(const Vector_& vector_)
+	[[nodiscard]] constexpr inline OutT_ vector_magnitude_constexpr(const Vector_& vector_)
 	{
-		using FloatingPoint_ = EmuCore::TMPHelpers::first_floating_point_t<OutT_, typename Vector_::value_type, float>;
-		return static_cast<OutT_>(EmuCore::SqrtConstexpr<FloatingPoint_, FloatingPoint_>(VectorSquareMagnitude<FloatingPoint_, Vector_>(vector_)));
+		using FloatingPoint_ = EmuCore::TMP::first_floating_point_t<OutT_, typename Vector_::value_type, float>;
+		return static_cast<OutT_>(EmuCore::SqrtConstexpr<FloatingPoint_, FloatingPoint_>(vector_square_magnitude<FloatingPoint_, Vector_>(vector_)));
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::preferred_floating_point VectorMagnitudeConstexpr(const Vector_& vector_)
+	[[nodiscard]] constexpr inline typename Vector_::preferred_floating_point vector_magnitude_constexpr(const Vector_& vector_)
 	{
-		return VectorMagnitudeConstexpr<typename Vector_::preferred_floating_point, Vector_>(vector_);
+		return vector_magnitude_constexpr<typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 
 	/// <summary>
@@ -746,22 +746,22 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to calculate the magnitude of.</param>
 	/// <returns>Magnitude of the passed vector, represented as OutT_ if provided, otherwise represented as the passed vector's value_type.</returns>
 	template<typename OutT_, class Vector_>
-	[[nodiscard]] inline OutT_ VectorMagnitude(const Vector_& vector_)
+	[[nodiscard]] inline OutT_ vector_magnitude(const Vector_& vector_)
 	{
-		using FloatingPoint_ = EmuCore::TMPHelpers::first_floating_point_t<OutT_, typename Vector_::value_type, float>;
-		return EmuCore::DoMatchingStandardSqrt<FloatingPoint_>(VectorSquareMagnitude<FloatingPoint_, Vector_>(vector_));
+		using FloatingPoint_ = EmuCore::TMP::first_floating_point_t<OutT_, typename Vector_::value_type, float>;
+		return EmuCore::DoMatchingStandardSqrt<FloatingPoint_>(vector_square_magnitude<FloatingPoint_, Vector_>(vector_));
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::preferred_floating_point VectorMagnitude(const Vector_& vector_)
+	[[nodiscard]] constexpr inline typename Vector_::preferred_floating_point vector_magnitude(const Vector_& vector_)
 	{
-		return VectorMagnitude<typename Vector_::preferred_floating_point, Vector_>(vector_);
+		return vector_magnitude<typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 
 	/// <summary>
 	/// <para> Calculates the reciprocal to the passed EmuMath vector's magnitude. </para>
 	/// <para>
 	///		To be executed at compile-time, this function may make some sacrifices. 
-	///		As such, VectorMagnitudeReciprocal or VectorMagnitudeReciprocalQrsqrt are recommended to be used instead if this is being called at runtime.
+	///		As such, vector_magnitude_reciprocal or vector_magnitude_reciprocal_qrsqrt are recommended to be used instead if this is being called at runtime.
 	/// </para>
 	/// </summary>
 	/// <typeparam name="OutFloatingPoint_">Type to output the magnitude reciprocal as.</typeparam>
@@ -769,11 +769,11 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to find the reciprocal to the magnitude of.</param>
 	/// <returns>Reciprocal to the passed EmuMath vector's magnitude, represented as the provided OutFloatingPoint_ type.</returns>
 	template<typename OutFloatingPoint_, class Vector_>
-	[[nodiscard]] constexpr inline OutFloatingPoint_ VectorMagnitudeReciprocalConstexpr(const Vector_& vector_)
+	[[nodiscard]] constexpr inline OutFloatingPoint_ vector_magnitude_reciprocal_constexpr(const Vector_& vector_)
 	{
 		if constexpr (std::is_floating_point_v<OutFloatingPoint_>)
 		{
-			return OutFloatingPoint_(1.0) / VectorMagnitudeConstexpr<OutFloatingPoint_, Vector_>(vector_);
+			return OutFloatingPoint_(1.0) / vector_magnitude_constexpr<OutFloatingPoint_, Vector_>(vector_);
 		}
 		else
 		{
@@ -781,9 +781,9 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::preferred_floating_point VectorMagnitudeReciprocalConstexpr(const Vector_& vector_)
+	[[nodiscard]] constexpr inline typename Vector_::preferred_floating_point vector_magnitude_reciprocal_constexpr(const Vector_& vector_)
 	{
-		return VectorMagnitudeReciprocalConstexpr<typename Vector_::preferred_floating_point, Vector_>(vector_);
+		return vector_magnitude_reciprocal_constexpr<typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 
 	/// <summary>
@@ -794,11 +794,11 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to find the reciprocal to the magnitude of.</param>
 	/// <returns>Reciprocal to the passed EmuMath vector's magnitude, represented as the provided OutFloatingPoint_ type.</returns>
 	template<typename OutFloatingPoint_ = float, class Vector_>
-	[[nodiscard]] inline OutFloatingPoint_ VectorMagnitudeReciprocal(const Vector_& vector_)
+	[[nodiscard]] inline OutFloatingPoint_ vector_magnitude_reciprocal(const Vector_& vector_)
 	{
 		if constexpr (std::is_floating_point_v<OutFloatingPoint_>)
 		{
-			return OutFloatingPoint_(1.0) / VectorMagnitude<OutFloatingPoint_, Vector_>(vector_);
+			return OutFloatingPoint_(1.0) / vector_magnitude<OutFloatingPoint_, Vector_>(vector_);
 		}
 		else
 		{
@@ -806,9 +806,9 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class Vector_>
-	[[nodiscard]] inline typename Vector_::preferred_floating_point VectorMagnitudeReciprocal(const Vector_& vector_)
+	[[nodiscard]] inline typename Vector_::preferred_floating_point vector_magnitude_reciprocal(const Vector_& vector_)
 	{
-		return VectorMagnitudeReciprocal<typename Vector_::preferred_floating_point, Vector_>(vector_);
+		return vector_magnitude_reciprocal<typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 
 	/// <summary>
@@ -820,13 +820,13 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to find the reciprocal to the magnitude of.</param>
 	/// <returns>Reciprocal to the passed EmuMath vector's magnitude, represented as the provided OutFloatingPoint_ type.</returns>
 	template<typename OutFloatingPoint_ = float, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, class Vector_>
-	[[nodiscard]] inline OutFloatingPoint_ VectorMagnitudeReciprocalQrsqrt(const Vector_& vector_)
+	[[nodiscard]] inline OutFloatingPoint_ vector_magnitude_reciprocal_qrsqrt(const Vector_& vector_)
 	{
 		if constexpr (std::is_floating_point_v<OutFloatingPoint_>)
 		{
 			return EmuCore::Q_rsqrt<OutFloatingPoint_, NumNewtonIterations_, MagicConstant_, OutFloatingPoint_>
 			(
-				VectorSquareMagnitude<OutFloatingPoint_, Vector_>(vector_)
+				vector_square_magnitude<OutFloatingPoint_, Vector_>(vector_)
 			);
 		}
 		else
@@ -835,9 +835,9 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, class Vector_>
-	[[nodiscard]] inline typename Vector_::preferred_floating_point VectorMagnitudeReciprocalQrsqrt(const Vector_& vector_)
+	[[nodiscard]] inline typename Vector_::preferred_floating_point vector_magnitude_reciprocal_qrsqrt(const Vector_& vector_)
 	{
-		return VectorMagnitudeReciprocalQrsqrt<typename Vector_::preferred_floating_point, NumNewtonIterations_, MagicConstant_, Vector_>(vector_);
+		return vector_magnitude_reciprocal_qrsqrt<typename Vector_::preferred_floating_point, NumNewtonIterations_, MagicConstant_, Vector_>(vector_);
 	}
 
 	/// <summary> Returns a copy of the lowest value within the passed EmuMath vector. </summary>
@@ -845,7 +845,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to find the lowest value of.</param>
 	/// <returns>Copy of the lowest value within the passed vector.</returns>
 	template<typename OutT_, class Vector_>
-	[[nodiscard]] constexpr inline OutT_ VectorMin(const Vector_& vector_)
+	[[nodiscard]] constexpr inline OutT_ vector_min(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -857,9 +857,9 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::value_type VectorMin(const Vector_& vector_)
+	[[nodiscard]] constexpr inline typename Vector_::value_type vector_min(const Vector_& vector_)
 	{
-		return VectorMin<typename Vector_::value_type, Vector_>(vector_);
+		return vector_min<typename Vector_::value_type, Vector_>(vector_);
 	}
 
 	/// <summary> Returns a copy of the highest value within the passed EmuMath vector. </summary>
@@ -867,7 +867,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to find the highest value of.</param>
 	/// <returns>Copy of the highest value within the passed vector.</returns>
 	template<typename OutT_, class Vector_>
-	[[nodiscard]] constexpr inline typename OutT_ VectorMax(const Vector_& vector_)
+	[[nodiscard]] constexpr inline typename OutT_ vector_max(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -879,9 +879,9 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline typename Vector_::value_type VectorMax(const Vector_& vector_)
+	[[nodiscard]] constexpr inline typename Vector_::value_type vector_max(const Vector_& vector_)
 	{
-		return VectorMax<typename Vector_::value_type, Vector_>(vector_);
+		return vector_max<typename Vector_::value_type, Vector_>(vector_);
 	}
 
 	/// <summary> Returns a vector containing a copy of the passed vector's lowest and highest values at indices 0 and 1, respectively. </summary>
@@ -889,7 +889,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to find the lowest and highest values of.</param>
 	/// <returns>EmuMath vector containing 2 elements; index 0 is a copy of the lowest value of the passed vector, and index 1 is a copy of the highest value.</returns>
 	template<typename OutT_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<2, OutT_> VectorMinMax(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<2, OutT_> vector_min_max(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -901,9 +901,9 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<2, typename Vector_::value_type> VectorMinMax(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<2, typename Vector_::value_type> vector_min_max(const Vector_& vector_)
 	{
-		return VectorMinMax<typename Vector_::value_type, Vector_>(vector_);
+		return vector_min_max<typename Vector_::value_type, Vector_>(vector_);
 	}
 	/// <summary> Finds the lowest and highest values within the passed vector, and outputs copies of them via the passed min_ and max_ arguments respectively. </summary>
 	/// <typeparam name="Vector_">Type of vector to find the lowest and highest values of.</typeparam>
@@ -911,7 +911,7 @@ namespace EmuMath::Helpers
 	/// <param name="min_">Reference to output a copy of the lowest value to.</param>
 	/// <param name="max_">Reference to output a copy of the highest value to.</param>
 	template<typename OutMin_, typename OutMax_, class Vector_>
-	constexpr inline void VectorMinMax(const Vector_& vector_, typename OutMin_& min_, typename OutMax_& max_)
+	constexpr inline void vector_min_max(const Vector_& vector_, typename OutMin_& min_, typename OutMax_& max_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -928,7 +928,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to find the lowest-valued index of.</param>
 	/// <returns>Index within the passed vector of its lowest element.</returns>
 	template<class Vector_>
-	[[nodiscard]] constexpr inline std::size_t VectorMinIndex(const Vector_& vector_)
+	[[nodiscard]] constexpr inline std::size_t vector_min_index(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -945,7 +945,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to find the highest-valued index of.</param>
 	/// <returns>Index within the passed vector of its highest element.</returns>
 	template<class Vector_>
-	[[nodiscard]] constexpr inline std::size_t VectorMaxIndex(const Vector_& vector_)
+	[[nodiscard]] constexpr inline std::size_t vector_max_index(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -962,7 +962,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to find the lowest- and highest-valued indices of.</param>
 	/// <returns>EmuMath vector containing 2 elements; index 0 is the index of the lowest value in the passed vector, and index 1 is the index of the highest value.</returns>
 	template<class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<2, std::size_t> VectorMinMaxIndices(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<2, std::size_t> vector_min_max_indices(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -982,7 +982,7 @@ namespace EmuMath::Helpers
 	/// <param name="min_">Reference to output the index of the lowest value to.</param>
 	/// <param name="max_">Reference to output the index of the highest value to.</param>
 	template<class Vector_>
-	constexpr inline void VectorMinMaxIndices(const Vector_& vector_, std::size_t& outMinIndex_, std::size_t& outMaxIndex_)
+	constexpr inline void vector_min_max_indices(const Vector_& vector_, std::size_t& outMinIndex_, std::size_t& outMaxIndex_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -995,7 +995,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<std::size_t OutSize_, typename out_contained_type, class VectorA_, class B_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMinVector(const VectorA_& a_, const B_& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_min_vector(const VectorA_& a_, const B_& b_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<VectorA_>)
 		{
@@ -1007,23 +1007,23 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t OutSize_, class VectorA_, class B_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename VectorA_::value_type> VectorMinVector(const VectorA_& a_, const B_& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename VectorA_::value_type> vector_min_vector(const VectorA_& a_, const B_& b_)
 	{
-		return VectorMinVector<OutSize_, typename VectorA_::value_type, VectorA_, B_>(a_, b_);
+		return vector_min_vector<OutSize_, typename VectorA_::value_type, VectorA_, B_>(a_, b_);
 	}
 	template<typename out_contained_type, class VectorA_, class B_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<VectorA_::size, out_contained_type> VectorMinVector(const VectorA_& a_, const B_& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<VectorA_::size, out_contained_type> vector_min_vector(const VectorA_& a_, const B_& b_)
 	{
-		return VectorMinVector<VectorA_::size, out_contained_type, VectorA_, B_>(a_, b_);
+		return vector_min_vector<VectorA_::size, out_contained_type, VectorA_, B_>(a_, b_);
 	}
 	template<class VectorA_, class B_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<VectorA_::size, typename VectorA_::value_type> VectorMinVector(const VectorA_& a_, const B_& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<VectorA_::size, typename VectorA_::value_type> vector_min_vector(const VectorA_& a_, const B_& b_)
 	{
-		return VectorMinVector<VectorA_::size, typename VectorA_::value_type, VectorA_, B_>(a_, b_);
+		return vector_min_vector<VectorA_::size, typename VectorA_::value_type, VectorA_, B_>(a_, b_);
 	}
 
 	template<std::size_t OutSize_, typename out_contained_type, class VectorA_, class B_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMaxVector(const VectorA_& a_, const B_& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_max_vector(const VectorA_& a_, const B_& b_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<VectorA_>)
 		{
@@ -1035,23 +1035,23 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t OutSize_, class VectorA_, class B_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename VectorA_::value_type> VectorMaxVector(const VectorA_& a_, const B_& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename VectorA_::value_type> vector_max_vector(const VectorA_& a_, const B_& b_)
 	{
-		return VectorMaxVector<OutSize_, typename VectorA_::value_type, VectorA_, B_>(a_, b_);
+		return vector_max_vector<OutSize_, typename VectorA_::value_type, VectorA_, B_>(a_, b_);
 	}
 	template<typename out_contained_type, class VectorA_, class B_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<VectorA_::size, out_contained_type> VectorMaxVector(const VectorA_& a_, const B_& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<VectorA_::size, out_contained_type> vector_max_vector(const VectorA_& a_, const B_& b_)
 	{
-		return VectorMaxVector<VectorA_::size, out_contained_type, VectorA_, B_>(a_, b_);
+		return vector_max_vector<VectorA_::size, out_contained_type, VectorA_, B_>(a_, b_);
 	}
 	template<class VectorA_, class B_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<VectorA_::size, typename VectorA_::value_type> VectorMaxVector(const VectorA_& a_, const B_& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<VectorA_::size, typename VectorA_::value_type> vector_max_vector(const VectorA_& a_, const B_& b_)
 	{
-		return VectorMaxVector<VectorA_::size, typename VectorA_::value_type, VectorA_, B_>(a_, b_);
+		return vector_max_vector<VectorA_::size, typename VectorA_::value_type, VectorA_, B_>(a_, b_);
 	}
 
 	template<typename out_contained_type, bool Min0_, bool...OthersMins_, class VectorA_, class B_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(OthersMins_) + 1, out_contained_type> VectorMinMaxVector(const VectorA_& a_, const B_& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(OthersMins_) + 1, out_contained_type> vector_min_max_vector(const VectorA_& a_, const B_& b_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<VectorA_>)
 		{
@@ -1067,9 +1067,9 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<bool Min0_, bool...OthersMins_, class VectorA_, class B_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(OthersMins_) + 1, typename VectorA_::value_type> VectorMinMaxVector(const VectorA_& a_, const B_& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(OthersMins_) + 1, typename VectorA_::value_type> vector_min_max_vector(const VectorA_& a_, const B_& b_)
 	{
-		return VectorMinMaxVector<typename VectorA_::value_type, Min0_, OthersMins_...>(a_, b_);
+		return vector_min_max_vector<typename VectorA_::value_type, Min0_, OthersMins_...>(a_, b_);
 	}
 
 	/// <summary>
@@ -1094,7 +1094,7 @@ namespace EmuMath::Helpers
 	/// <param name="t_">EmuMath vector or scalar that acts as t in the equation a + ((b - a) * t).</param>
 	/// <returns>Vector containing the result of linear interpolation with the provided arguments.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class AVector_, class B_, class T_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorLerp(const AVector_& a_, const B_& b_, const T_& t_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_lerp(const AVector_& a_, const B_& b_, const T_& t_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<AVector_>)
 		{
@@ -1106,19 +1106,19 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, class AVector_, class B_, class T_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<AVector_::size, out_contained_type> VectorLerp(const AVector_& a_, const B_& b_, const T_& t_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<AVector_::size, out_contained_type> vector_lerp(const AVector_& a_, const B_& b_, const T_& t_)
 	{
-		return VectorLerp<AVector_::size, out_contained_type, AVector_, B_, T_>(a_, b_, t_);
+		return vector_lerp<AVector_::size, out_contained_type, AVector_, B_, T_>(a_, b_, t_);
 	}
 	template<std::size_t OutSize_, class AVector_, class B_, class T_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename AVector_::value_type> VectorLerp(const AVector_& a_, const B_& b_, const T_& t_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename AVector_::value_type> vector_lerp(const AVector_& a_, const B_& b_, const T_& t_)
 	{
-		return VectorLerp<OutSize_, typename AVector_::value_type, AVector_, B_, T_>(a_, b_, t_);
+		return vector_lerp<OutSize_, typename AVector_::value_type, AVector_, B_, T_>(a_, b_, t_);
 	}
 	template<class AVector_, class B_, class T_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<AVector_::size, typename AVector_::value_type> VectorLerp(const AVector_& a_, const B_& b_, const T_& t_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<AVector_::size, typename AVector_::value_type> vector_lerp(const AVector_& a_, const B_& b_, const T_& t_)
 	{
-		return VectorLerp<AVector_::size, typename AVector_::value_type, AVector_, B_, T_>(a_, b_, t_);
+		return vector_lerp<AVector_::size, typename AVector_::value_type, AVector_, B_, T_>(a_, b_, t_);
 	}
 
 	/// <summary>
@@ -1143,7 +1143,7 @@ namespace EmuMath::Helpers
 	/// <param name="v_">EmuMath vector or scalar representing v in the equation LERP(LERP(a, b, u), LERP(d, c, u), v).</param>
 	/// <returns>Vector containing the result of bilinear interpolation with the provided arguments.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class AVector_, class B_, class C_, class DVector_, class U_, class V_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorBlerp
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_blerp
 	(
 		const AVector_& a_,
 		const B_& b_,
@@ -1157,10 +1157,10 @@ namespace EmuMath::Helpers
 		{
 			if constexpr (EmuMath::TMP::is_emu_vector_v<DVector_>)
 			{
-				return VectorLerp<OutSize_, out_contained_type, EmuMath::Vector<OutSize_, out_contained_type>, EmuMath::Vector<OutSize_, out_contained_type>, V_>
+				return vector_lerp<OutSize_, out_contained_type, EmuMath::Vector<OutSize_, out_contained_type>, EmuMath::Vector<OutSize_, out_contained_type>, V_>
 				(
-					VectorLerp<OutSize_, out_contained_type, AVector_, B_, U_>(a_, b_, u_),
-					VectorLerp<OutSize_, out_contained_type, DVector_, C_, U_>(d_, c_, u_),
+					vector_lerp<OutSize_, out_contained_type, AVector_, B_, U_>(a_, b_, u_),
+					vector_lerp<OutSize_, out_contained_type, DVector_, C_, U_>(d_, c_, u_),
 					v_
 				);
 			}
@@ -1175,7 +1175,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, class AVector_, class B_, class C_, class DVector_, class U_, class V_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<AVector_::size, out_contained_type> VectorBlerp
+	[[nodiscard]] constexpr inline EmuMath::Vector<AVector_::size, out_contained_type> vector_blerp
 	(
 		const AVector_& a_,
 		const B_& b_,
@@ -1185,10 +1185,10 @@ namespace EmuMath::Helpers
 		const V_& v_
 	)
 	{
-		return VectorBlerp<AVector_::size, out_contained_type, AVector_, B_, C_, DVector_, U_, V_>(a_, b_, c_, d_, u_, v_);
+		return vector_blerp<AVector_::size, out_contained_type, AVector_, B_, C_, DVector_, U_, V_>(a_, b_, c_, d_, u_, v_);
 	}
 	template<std::size_t OutSize_, class AVector_, class B_, class C_, class DVector_, class U_, class V_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename AVector_::value_type> VectorBlerp
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename AVector_::value_type> vector_blerp
 	(
 		const AVector_& a_,
 		const B_& b_,
@@ -1198,10 +1198,10 @@ namespace EmuMath::Helpers
 		const V_& v_
 	)
 	{
-		return VectorBlerp<OutSize_, typename AVector_::value_type, AVector_, B_, C_, DVector_, U_, V_>(a_, b_, c_, d_, u_, v_);
+		return vector_blerp<OutSize_, typename AVector_::value_type, AVector_, B_, C_, DVector_, U_, V_>(a_, b_, c_, d_, u_, v_);
 	}
 	template<class AVector_, class B_, class C_, class DVector_, class U_, class V_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<AVector_::size, typename AVector_::value_type> VectorBlerp
+	[[nodiscard]] constexpr inline EmuMath::Vector<AVector_::size, typename AVector_::value_type> vector_blerp
 	(
 		const AVector_& a_,
 		const B_& b_,
@@ -1211,7 +1211,7 @@ namespace EmuMath::Helpers
 		const V_& v_
 	)
 	{
-		return VectorBlerp<AVector_::size, typename AVector_::value_type, AVector_, B_, C_, DVector_, U_, V_>(a_, b_, c_, d_, u_, v_);
+		return vector_blerp<AVector_::size, typename AVector_::value_type, AVector_, B_, C_, DVector_, U_, V_>(a_, b_, c_, d_, u_, v_);
 	}
 
 	/// <summary>
@@ -1227,7 +1227,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to calculate the reciprocal of.</param>
 	/// <returns>Vector of floating-points containing reciprocals of respective elements in the passed vector, or infinity in indices exceeding those of said vector.</returns>
 	template<std::size_t OutSize_, typename out_floating_point_contained_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_floating_point_contained_type> VectorReciprocal(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_floating_point_contained_type> vector_reciprocal(const Vector_& vector_)
 	{
 		if constexpr (std::is_floating_point_v<std::remove_cv_t<std::remove_reference_t<out_floating_point_contained_type>>>)
 		{
@@ -1246,19 +1246,19 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_floating_point_contained_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_floating_point_contained_type> VectorReciprocal(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_floating_point_contained_type> vector_reciprocal(const Vector_& vector_)
 	{
-		return VectorReciprocal<Vector_::size, out_floating_point_contained_type, Vector_>(vector_);
+		return vector_reciprocal<Vector_::size, out_floating_point_contained_type, Vector_>(vector_);
 	}
 	template<std::size_t OutSize_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::preferred_floating_point> VectorReciprocal(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::preferred_floating_point> vector_reciprocal(const Vector_& vector_)
 	{
-		return VectorReciprocal<OutSize_, typename Vector_::preferred_floating_point, Vector_>(vector_);
+		return vector_reciprocal<OutSize_, typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::preferred_floating_point> VectorReciprocal(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::preferred_floating_point> vector_reciprocal(const Vector_& vector_)
 	{
-		return VectorReciprocal<Vector_::size, typename Vector_::preferred_floating_point, Vector_>(vector_);
+		return vector_reciprocal<Vector_::size, typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 
 	/// <summary>
@@ -1275,7 +1275,7 @@ namespace EmuMath::Helpers
 	/// <param name="min_">EmuMath vector or scalar to be using as the minimum value(s).</param>
 	/// <returns>EmuMath vector copy of the passed vector with its values clamped to an inclusive minimum as dictacted by min_.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class Vector_, class Min_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorClampMin(const Vector_& vector_, const Min_& min_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_clamp_min(const Vector_& vector_, const Min_& min_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -1287,19 +1287,19 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, class Vector_, class Min_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorClampMin(const Vector_& vector_, const Min_& min_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> vector_clamp_min(const Vector_& vector_, const Min_& min_)
 	{
-		return VectorClampMin<Vector_::size, out_contained_type, Vector_, Min_>(vector_, min_);
+		return vector_clamp_min<Vector_::size, out_contained_type, Vector_, Min_>(vector_, min_);
 	}
 	template<std::size_t OutSize_, class Vector_, class Min_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorClampMin(const Vector_& vector_, const Min_& min_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> vector_clamp_min(const Vector_& vector_, const Min_& min_)
 	{
-		return VectorClampMin<OutSize_, typename Vector_::value_type, Vector_, Min_>(vector_, min_);
+		return vector_clamp_min<OutSize_, typename Vector_::value_type, Vector_, Min_>(vector_, min_);
 	}
 	template<class Vector_, class Min_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorClampMin(const Vector_& vector_, const Min_& min_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> vector_clamp_min(const Vector_& vector_, const Min_& min_)
 	{
-		return VectorClampMin<Vector_::size, typename Vector_::value_type, Vector_, Min_>(vector_, min_);
+		return vector_clamp_min<Vector_::size, typename Vector_::value_type, Vector_, Min_>(vector_, min_);
 	}
 
 	/// <summary>
@@ -1316,7 +1316,7 @@ namespace EmuMath::Helpers
 	/// <param name="max_">EmuMath vector or scalar to be using as the maximum value(s).</param>
 	/// <returns>EmuMath vector copy of the passed vector with its values clamped to an inclusive maximum as dictacted by max_.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class Vector_, class Max_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorClampMax(const Vector_& vector_, const Max_& max_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_clamp_max(const Vector_& vector_, const Max_& max_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -1328,19 +1328,19 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, class Vector_, class Max_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorClampMax(const Vector_& vector_, const Max_& max_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> vector_clamp_max(const Vector_& vector_, const Max_& max_)
 	{
-		return VectorClampMax<Vector_::size, out_contained_type, Vector_, Max_>(vector_, max_);
+		return vector_clamp_max<Vector_::size, out_contained_type, Vector_, Max_>(vector_, max_);
 	}
 	template<std::size_t OutSize_, class Vector_, class Max_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorClampMax(const Vector_& vector_, const Max_& max_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> vector_clamp_max(const Vector_& vector_, const Max_& max_)
 	{
-		return VectorClampMax<OutSize_, typename Vector_::value_type, Vector_, Max_>(vector_, max_);
+		return vector_clamp_max<OutSize_, typename Vector_::value_type, Vector_, Max_>(vector_, max_);
 	}
 	template<class Vector_, class Max_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorClampMax(const Vector_& vector_, const Max_& max_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> vector_clamp_max(const Vector_& vector_, const Max_& max_)
 	{
-		return VectorClampMax<Vector_::size, typename Vector_::value_type, Vector_, Max_>(vector_, max_);
+		return vector_clamp_max<Vector_::size, typename Vector_::value_type, Vector_, Max_>(vector_, max_);
 	}
 
 	/// <summary>
@@ -1364,7 +1364,7 @@ namespace EmuMath::Helpers
 	/// <param name="max_">EmuMath vector or scalar to be using as the maximum value(s).</param>
 	/// <returns>EmuMath vector copy of the passed vector with its values clamped to between an inclusive minimum and maximum as dictacted by min_ and max_.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class Vector_, class Min_, class Max_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorClamp(const Vector_& vector_, const Min_& min_, const Max_& max_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_clamp(const Vector_& vector_, const Min_& min_, const Max_& max_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -1376,19 +1376,19 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, class Vector_, class Min_, class Max_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorClamp(const Vector_& vector_, const Min_& min_, const Max_& max_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> vector_clamp(const Vector_& vector_, const Min_& min_, const Max_& max_)
 	{
-		return VectorClamp<Vector_::size, out_contained_type, Vector_, Min_, Max_>(vector_, min_, max_);
+		return vector_clamp<Vector_::size, out_contained_type, Vector_, Min_, Max_>(vector_, min_, max_);
 	}
 	template<std::size_t OutSize_, class Vector_, class Min_, class Max_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorClamp(const Vector_& vector_, const Min_& min_, const Max_& max_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> vector_clamp(const Vector_& vector_, const Min_& min_, const Max_& max_)
 	{
-		return VectorClamp<OutSize_, typename Vector_::value_type, Vector_, Min_, Max_>(vector_, min_, max_);
+		return vector_clamp<OutSize_, typename Vector_::value_type, Vector_, Min_, Max_>(vector_, min_, max_);
 	}
 	template<class Vector_, class Min_, class Max_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorClamp(const Vector_& vector_, const Min_& min_, const Max_& max_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> vector_clamp(const Vector_& vector_, const Min_& min_, const Max_& max_)
 	{
-		return VectorClamp<Vector_::size, typename Vector_::value_type, Vector_, Min_, Max_>(vector_, min_, max_);
+		return vector_clamp<Vector_::size, typename Vector_::value_type, Vector_, Min_, Max_>(vector_, min_, max_);
 	}
 
 	/// <summary> Mutates the elements of a vector with a provided function and outputs them via the returned vector. </summary>
@@ -1402,7 +1402,7 @@ namespace EmuMath::Helpers
 	/// </param>
 	/// <returns>Vector containing the results of the mutation of the passed vector_ via the passed func_.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class Func_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMutate(const Vector_& vector_, Func_ func_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_mutate(const Vector_& vector_, Func_ func_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -1414,39 +1414,39 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t OutSize_, typename out_contained_type, class Func_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorMutate(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_mutate(const Vector_& vector_)
 	{
-		return VectorMutate<OutSize_, out_contained_type, Func_, Vector_>(vector_, Func_());
+		return vector_mutate<OutSize_, out_contained_type, Func_, Vector_>(vector_, Func_());
 	}
 	template<typename out_contained_type, class Func_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorMutate(const Vector_& vector_, Func_ func_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> vector_mutate(const Vector_& vector_, Func_ func_)
 	{
-		return VectorMutate<Vector_::size, out_contained_type, Func_&, Vector_>(vector_, func_);
+		return vector_mutate<Vector_::size, out_contained_type, Func_&, Vector_>(vector_, func_);
 	}
 	template<std::size_t OutSize_, class Func_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorMutate(const Vector_& vector_, Func_ func_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> vector_mutate(const Vector_& vector_, Func_ func_)
 	{
-		return VectorMutate<OutSize_, typename Vector_::value_type, Func_&, Vector_>(vector_, func_);
+		return vector_mutate<OutSize_, typename Vector_::value_type, Func_&, Vector_>(vector_, func_);
 	}
 	template<class Func_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorMutate(const Vector_& vector_, Func_ func_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> vector_mutate(const Vector_& vector_, Func_ func_)
 	{
-		return VectorMutate<Vector_::size, typename Vector_::value_type, Func_&, Vector_>(vector_, func_);
+		return vector_mutate<Vector_::size, typename Vector_::value_type, Func_&, Vector_>(vector_, func_);
 	}
 	template<typename out_contained_type, class Func_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorMutate(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> vector_mutate(const Vector_& vector_)
 	{
-		return VectorMutate<Vector_::size, out_contained_type, Func_, Vector_>(vector_, Func_());
+		return vector_mutate<Vector_::size, out_contained_type, Func_, Vector_>(vector_, Func_());
 	}
 	template<std::size_t OutSize_, class Func_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorMutate(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> vector_mutate(const Vector_& vector_)
 	{
-		return VectorMutate<OutSize_, typename Vector_::value_type, Func_, Vector_>(vector_, Func_());
+		return vector_mutate<OutSize_, typename Vector_::value_type, Func_, Vector_>(vector_, Func_());
 	}
 	template<class Func_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorMutate(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> vector_mutate(const Vector_& vector_)
 	{
-		return VectorMutate<Vector_::size, typename Vector_::value_type, Func_, Vector_>(vector_, Func_());
+		return vector_mutate<Vector_::size, typename Vector_::value_type, Func_, Vector_>(vector_, Func_());
 	}
 
 	/// <summary>
@@ -1457,7 +1457,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to round the elements of.</param>
 	/// <returns>EmuMath vector containing the results of rounding respective elements in the passed vector_.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorFloor(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_floor(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -1472,19 +1472,19 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorFloor(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> vector_floor(const Vector_& vector_)
 	{
-		return VectorFloor<Vector_::size, out_contained_type, Vector_>(vector_);
+		return vector_floor<Vector_::size, out_contained_type, Vector_>(vector_);
 	}
 	template<std::size_t OutSize_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorFloor(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> vector_floor(const Vector_& vector_)
 	{
-		return VectorFloor<OutSize_, typename Vector_::value_type, Vector_>(vector_);
+		return vector_floor<OutSize_, typename Vector_::value_type, Vector_>(vector_);
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorFloor(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> vector_floor(const Vector_& vector_)
 	{
-		return VectorFloor<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
+		return vector_floor<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
 	}
 
 	/// <summary>
@@ -1495,7 +1495,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to round the elements of.</param>
 	/// <returns>EmuMath vector containing the results of rounding respective elements in the passed vector_.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorCeil(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_ceil(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -1510,19 +1510,19 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorCeil(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> vector_ceil(const Vector_& vector_)
 	{
-		return VectorCeil<Vector_::size, out_contained_type, Vector_>(vector_);
+		return vector_ceil<Vector_::size, out_contained_type, Vector_>(vector_);
 	}
 	template<std::size_t OutSize_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorCeil(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> vector_ceil(const Vector_& vector_)
 	{
-		return VectorCeil<OutSize_, typename Vector_::value_type, Vector_>(vector_);
+		return vector_ceil<OutSize_, typename Vector_::value_type, Vector_>(vector_);
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorCeil(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> vector_ceil(const Vector_& vector_)
 	{
-		return VectorCeil<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
+		return vector_ceil<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
 	}
 
 	/// <summary>
@@ -1533,7 +1533,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to round the elements of.</param>
 	/// <returns>EmuMath vector containing the results of rounding respective elements in the passed vector_.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorTrunc(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_trunc(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -1548,24 +1548,24 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorTrunc(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> vector_trunc(const Vector_& vector_)
 	{
-		return VectorTrunc<Vector_::size, out_contained_type, Vector_>(vector_);
+		return vector_trunc<Vector_::size, out_contained_type, Vector_>(vector_);
 	}
 	template<std::size_t OutSize_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorTrunc(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> vector_trunc(const Vector_& vector_)
 	{
-		return VectorTrunc<OutSize_, typename Vector_::value_type, Vector_>(vector_);
+		return vector_trunc<OutSize_, typename Vector_::value_type, Vector_>(vector_);
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorTrunc(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> vector_trunc(const Vector_& vector_)
 	{
-		return VectorTrunc<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
+		return vector_trunc<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
 	}
 
 	/// <summary>
 	/// <para> Performs a square root calculation of elements within the passed vector and returns the resulting vector. </para>
-	/// <para> This calculation may make some sacrifices to be executable at compile time. If it is being called at runtime, it is recommended to use VectorSqrt instead. </para>
+	/// <para> This calculation may make some sacrifices to be executable at compile time. If it is being called at runtime, it is recommended to use vector_sqrt instead. </para>
 	/// <para> This function makes use of the EmuMath::do_sqrt_constexpr functor. The specialisation for the passed vector's value_type will be used, if one exists. </para>
 	/// </summary>
 	/// <typeparam name="out_contained_type">Type to be stored in the output vector.</typeparam>
@@ -1573,7 +1573,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to calculate the square root of elements of.</param>
 	/// <returns>EmuMath vector containing the results of the square root calculation for each respective element within the passed vector.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorSqrtConstexpr(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_sqrt_constexpr(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -1590,19 +1590,19 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorSqrtConstexpr(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> vector_sqrt_constexpr(const Vector_& vector_)
 	{
-		return VectorSqrtConstexpr<Vector_::size, out_contained_type, Vector_>(vector_);
+		return vector_sqrt_constexpr<Vector_::size, out_contained_type, Vector_>(vector_);
 	}
 	template<std::size_t OutSize_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorSqrtConstexpr(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> vector_sqrt_constexpr(const Vector_& vector_)
 	{
-		return VectorSqrtConstexpr<OutSize_, typename Vector_::preferred_floating_point, Vector_>(vector_);
+		return vector_sqrt_constexpr<OutSize_, typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorSqrtConstexpr(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> vector_sqrt_constexpr(const Vector_& vector_)
 	{
-		return VectorSqrtConstexpr<Vector_::size, typename Vector_::preferred_floating_point, Vector_>(vector_);
+		return vector_sqrt_constexpr<Vector_::size, typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 
 	/// <summary>
@@ -1614,7 +1614,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to calculate the square root of elements of.</param>
 	/// <returns>EmuMath vector containing the results of the square root calculation for each respective element within the passed vector.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class Vector_>
-	[[nodiscard]] inline EmuMath::Vector<OutSize_, out_contained_type> VectorSqrt(const Vector_& vector_)
+	[[nodiscard]] inline EmuMath::Vector<OutSize_, out_contained_type> vector_sqrt(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -1631,26 +1631,26 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, class Vector_>
-	[[nodiscard]] inline EmuMath::Vector<Vector_::size, out_contained_type> VectorSqrt(const Vector_& vector_)
+	[[nodiscard]] inline EmuMath::Vector<Vector_::size, out_contained_type> vector_sqrt(const Vector_& vector_)
 	{
-		return VectorSqrt<Vector_::size, out_contained_type, Vector_>(vector_);
+		return vector_sqrt<Vector_::size, out_contained_type, Vector_>(vector_);
 	}
 	template<std::size_t OutSize_, class Vector_>
-	[[nodiscard]] inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorSqrt(const Vector_& vector_)
+	[[nodiscard]] inline EmuMath::Vector<OutSize_, typename Vector_::value_type> vector_sqrt(const Vector_& vector_)
 	{
-		return VectorSqrt<OutSize_, typename Vector_::value_type, Vector_>(vector_);
+		return vector_sqrt<OutSize_, typename Vector_::value_type, Vector_>(vector_);
 	}
 	template<class Vector_>
-	[[nodiscard]] inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorSqrt(const Vector_& vector_)
+	[[nodiscard]] inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> vector_sqrt(const Vector_& vector_)
 	{
-		return VectorSqrt<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
+		return vector_sqrt<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
 	}
 
 	/// <summary>
 	/// <para> Creates a copy of the passed vector with its elements normalised. </para>
 	/// <para>
 	///		This function may make some sacrifices to be evaluable at compile time. 
-	///		If it is being called at compile time, it is recommended to use VectorNormalise or VectorNormaliseQrsqrt instead.
+	///		If it is being called at compile time, it is recommended to use vector_normalise or vector_normalise_qrsqrt instead.
 	/// </para>
 	/// </summary>
 	/// <typeparam name="MagFloatingPointType_">Type of floating-point to calculate the magnitude as and use for arithmetic in normalisation. Defaults to float.</typeparam>
@@ -1658,7 +1658,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to calculate the normalised form of.</param>
 	/// <returns>Copy of the passed EmuMath vector with its elements normalised.</returns>
 	template<typename out_floating_point_contained_type, typename MagFloatingPointType_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_floating_point_contained_type> VectorNormaliseConstexpr(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_floating_point_contained_type> vector_normalise_constexpr(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -1666,10 +1666,10 @@ namespace EmuMath::Helpers
 			{
 				if constexpr(std::is_floating_point_v<out_floating_point_contained_type>)
 				{
-					return VectorMultiply<Vector_::size, out_floating_point_contained_type, Vector_, MagFloatingPointType_>
+					return vector_multiply<Vector_::size, out_floating_point_contained_type, Vector_, MagFloatingPointType_>
 					(
 						vector_,
-						VectorMagnitudeReciprocalConstexpr<MagFloatingPointType_>(vector_)
+						vector_magnitude_reciprocal_constexpr<MagFloatingPointType_>(vector_)
 					);
 				}
 				else
@@ -1688,14 +1688,14 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_floating_point_contained_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_floating_point_contained_type> VectorNormaliseConstexpr(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_floating_point_contained_type> vector_normalise_constexpr(const Vector_& vector_)
 	{
-		return VectorNormaliseConstexpr<out_floating_point_contained_type, out_floating_point_contained_type, Vector_>(vector_);
+		return vector_normalise_constexpr<out_floating_point_contained_type, out_floating_point_contained_type, Vector_>(vector_);
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::preferred_floating_point> VectorNormaliseConstexpr(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::preferred_floating_point> vector_normalise_constexpr(const Vector_& vector_)
 	{
-		return VectorNormaliseConstexpr<typename Vector_::preferred_floating_point, typename Vector_::preferred_floating_point, Vector_>(vector_);
+		return vector_normalise_constexpr<typename Vector_::preferred_floating_point, typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 
 	/// <summary>
@@ -1706,7 +1706,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to calculate the normalised form of.</param>
 	/// <returns>Copy of the passed EmuMath vector with its elements normalised.</returns>
 	template<typename out_floating_point_contained_type, typename MagFloatingPointType_, class Vector_>
-	[[nodiscard]] inline EmuMath::Vector<Vector_::size, out_floating_point_contained_type> VectorNormalise(const Vector_& vector_)
+	[[nodiscard]] inline EmuMath::Vector<Vector_::size, out_floating_point_contained_type> vector_normalise(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -1714,10 +1714,10 @@ namespace EmuMath::Helpers
 			{
 				if constexpr (std::is_floating_point_v<out_floating_point_contained_type>)
 				{
-					return VectorMultiply<Vector_::size, out_floating_point_contained_type, Vector_, MagFloatingPointType_>
+					return vector_multiply<Vector_::size, out_floating_point_contained_type, Vector_, MagFloatingPointType_>
 					(
 						vector_,
-						VectorMagnitudeReciprocal<MagFloatingPointType_>(vector_)
+						vector_magnitude_reciprocal<MagFloatingPointType_>(vector_)
 					);
 				}
 				else
@@ -1736,14 +1736,14 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_floating_point_contained_type, class Vector_>
-	[[nodiscard]] inline EmuMath::Vector<Vector_::size, out_floating_point_contained_type> VectorNormalise(const Vector_& vector_)
+	[[nodiscard]] inline EmuMath::Vector<Vector_::size, out_floating_point_contained_type> vector_normalise(const Vector_& vector_)
 	{
-		return VectorNormalise<out_floating_point_contained_type, out_floating_point_contained_type, Vector_>(vector_);
+		return vector_normalise<out_floating_point_contained_type, out_floating_point_contained_type, Vector_>(vector_);
 	}
 	template<class Vector_>
-	[[nodiscard]] inline EmuMath::Vector<Vector_::size, typename Vector_::preferred_floating_point> VectorNormalise(const Vector_& vector_)
+	[[nodiscard]] inline EmuMath::Vector<Vector_::size, typename Vector_::preferred_floating_point> vector_normalise(const Vector_& vector_)
 	{
-		return VectorNormalise<typename Vector_::preferred_floating_point, typename Vector_::preferred_floating_point, Vector_>(vector_);
+		return vector_normalise<typename Vector_::preferred_floating_point, typename Vector_::preferred_floating_point, Vector_>(vector_);
 	}
 
 	/// <summary>
@@ -1764,7 +1764,7 @@ namespace EmuMath::Helpers
 		std::int32_t MagicConstant_ = 0x5F3759DF,
 		class Vector_
 	>
-	[[nodiscard]] inline typename EmuMath::Vector<Vector_::size, out_floating_point_contained_type> VectorNormaliseQrsqrt(const Vector_& vector_)
+	[[nodiscard]] inline typename EmuMath::Vector<Vector_::size, out_floating_point_contained_type> vector_normalise_qrsqrt(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -1772,10 +1772,10 @@ namespace EmuMath::Helpers
 			{
 				if constexpr (std::is_floating_point_v<out_floating_point_contained_type>)
 				{
-					return VectorMultiply<Vector_::size, out_floating_point_contained_type, Vector_, MagFloatingPointType_>
+					return vector_multiply<Vector_::size, out_floating_point_contained_type, Vector_, MagFloatingPointType_>
 					(
 						vector_,
-						VectorMagnitudeReciprocalQrsqrt<MagFloatingPointType_, NumNewtonIterations_, MagicConstant_, Vector_>(vector_)
+						vector_magnitude_reciprocal_qrsqrt<MagFloatingPointType_, NumNewtonIterations_, MagicConstant_, Vector_>(vector_)
 					);
 				}
 				else
@@ -1794,14 +1794,14 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_floating_point_contained_type, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, class Vector_>
-	[[nodiscard]] inline typename EmuMath::Vector<Vector_::size, out_floating_point_contained_type> VectorNormaliseQrsqrt(const Vector_& vector_)
+	[[nodiscard]] inline typename EmuMath::Vector<Vector_::size, out_floating_point_contained_type> vector_normalise_qrsqrt(const Vector_& vector_)
 	{
-		return VectorNormaliseQrsqrt<out_floating_point_contained_type, out_floating_point_contained_type, NumNewtonIterations_, MagicConstant_, Vector_>(vector_);
+		return vector_normalise_qrsqrt<out_floating_point_contained_type, out_floating_point_contained_type, NumNewtonIterations_, MagicConstant_, Vector_>(vector_);
 	}
 	template<std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, class Vector_>
-	[[nodiscard]] inline typename EmuMath::Vector<Vector_::size, typename Vector_::preferred_floating_point> VectorNormaliseQrsqrt(const Vector_& vector_)
+	[[nodiscard]] inline typename EmuMath::Vector<Vector_::size, typename Vector_::preferred_floating_point> vector_normalise_qrsqrt(const Vector_& vector_)
 	{
-		return VectorNormaliseQrsqrt<typename Vector_::preferred_floating_point, typename Vector_::preferred_floating_point, NumNewtonIterations_, MagicConstant_, Vector_>
+		return vector_normalise_qrsqrt<typename Vector_::preferred_floating_point, typename Vector_::preferred_floating_point, NumNewtonIterations_, MagicConstant_, Vector_>
 		(
 			vector_
 		);
@@ -1810,7 +1810,7 @@ namespace EmuMath::Helpers
 	/// <summary>
 	/// <para> Calculates the cosine of the angle between the two provided vectors. </para>
 	/// <para> It is recommended, but not enforced, that you output the cosine as a floating-point type. Defaults to lhs_ vector's preferred_floating_point. </para>
-	/// <para> This function may make sacrifices to be evaluable at compile time. If it is being used at runtime, it is recommended to use VectorAngleCosine. </para>
+	/// <para> This function may make sacrifices to be evaluable at compile time. If it is being used at runtime, it is recommended to use vector_angle_cosine. </para>
 	/// </summary>
 	/// <typeparam name="OutCosine_">Type to output the cosine as. Defaults to the lhs_ vector's preferred floating point type.</typeparam>
 	/// <typeparam name="LhsVector_">Type of vector appearing on the left-hand side of arguments.</typeparam>
@@ -1819,19 +1819,19 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Second EmuMath vector in the calculation.</param>
 	/// <returns>Cosine of the angle between vectors lhs_ and rhs_, represented as the provided OutCosine_ type.</returns>
 	template<typename OutCosine_, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline OutCosine_ VectorAngleCosineConstexpr(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	[[nodiscard]] constexpr inline OutCosine_ vector_angle_cosine_constexpr(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
 			if constexpr (EmuMath::TMP::is_emu_vector_v<RhsVector_>)
 			{
-				using floating_point = EmuCore::TMPHelpers::first_floating_point_t<OutCosine_, float>;
+				using floating_point = EmuCore::TMP::first_floating_point_t<OutCosine_, float>;
 				return static_cast<OutCosine_>
 				(
-					VectorDotProduct<floating_point>(lhs_, rhs_) / EmuCore::do_sqrt_constexpr<floating_point>()
+					vector_dot_product<floating_point>(lhs_, rhs_) / EmuCore::do_sqrt_constexpr<floating_point>()
 					(
-						VectorSquareMagnitude<floating_point, LhsVector_>(lhs_) *
-						VectorSquareMagnitude<floating_point, RhsVector_>(rhs_)
+						vector_square_magnitude<floating_point, LhsVector_>(lhs_) *
+						vector_square_magnitude<floating_point, RhsVector_>(rhs_)
 					)
 				);
 			}
@@ -1846,9 +1846,9 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline typename LhsVector_::preferred_floating_point VectorAngleCosineConstexpr(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	[[nodiscard]] constexpr inline typename LhsVector_::preferred_floating_point vector_angle_cosine_constexpr(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
-		return VectorAngleCosineConstexpr<typename LhsVector_::preferred_floating_point, LhsVector_, RhsVector_>(lhs_, rhs_);
+		return vector_angle_cosine_constexpr<typename LhsVector_::preferred_floating_point, LhsVector_, RhsVector_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -1862,19 +1862,19 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">Second EmuMath vector in the calculation.</param>
 	/// <returns>Cosine of the angle between vectors lhs_ and rhs_, represented as the provided OutCosine_ type.</returns>
 	template<typename OutCosine_, class LhsVector_, class RhsVector_>
-	[[nodiscard]] inline OutCosine_ VectorAngleCosine(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	[[nodiscard]] inline OutCosine_ vector_angle_cosine(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
 			if constexpr (EmuMath::TMP::is_emu_vector_v<RhsVector_>)
 			{
-				using floating_point = EmuCore::TMPHelpers::first_floating_point_t<OutCosine_, float>;
+				using floating_point = EmuCore::TMP::first_floating_point_t<OutCosine_, float>;
 				return static_cast<OutCosine_>
 				(
-					VectorDotProduct<floating_point>(lhs_, rhs_) / EmuCore::do_sqrt<floating_point>()
+					vector_dot_product<floating_point>(lhs_, rhs_) / EmuCore::do_sqrt<floating_point>()
 					(
-						VectorSquareMagnitude<floating_point, LhsVector_>(lhs_) *
-						VectorSquareMagnitude<floating_point, RhsVector_>(rhs_)
+						vector_square_magnitude<floating_point, LhsVector_>(lhs_) *
+						vector_square_magnitude<floating_point, RhsVector_>(rhs_)
 					)
 				);
 			}
@@ -1889,9 +1889,9 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class LhsVector_, class RhsVector_>
-	[[nodiscard]] inline typename LhsVector_::preferred_floating_point VectorAngleCosine(const LhsVector_& lhs_, const RhsVector_& rhs_)
+	[[nodiscard]] inline typename LhsVector_::preferred_floating_point vector_angle_cosine(const LhsVector_& lhs_, const RhsVector_& rhs_)
 	{
-		return VectorAngleCosine<typename LhsVector_::preferred_floating_point, LhsVector_, RhsVector_>(lhs_, rhs_);
+		return vector_angle_cosine<typename LhsVector_::preferred_floating_point, LhsVector_, RhsVector_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -1905,16 +1905,16 @@ namespace EmuMath::Helpers
 	/// <param name="b_">Second EmuMath vector in the calculation.</param>
 	/// <returns>The angle between the two vectors represented as the provided OutAngle_ type. Units will be radians if Rads_ is true, otherwise they will be degrees.</returns>
 	template<typename OutAngle_, bool Rads_ = true, class VectorA_, class VectorB_>
-	[[nodiscard]] inline OutAngle_ VectorAngle(const VectorA_& a_, const VectorB_& b_)
+	[[nodiscard]] inline OutAngle_ vector_angle(const VectorA_& a_, const VectorB_& b_)
 	{
-		using floating_point = EmuCore::TMPHelpers::first_floating_point_t<OutAngle_, float>;
+		using floating_point = EmuCore::TMP::first_floating_point_t<OutAngle_, float>;
 		if constexpr (Rads_)
 		{
-			return static_cast<OutAngle_>(EmuCore::do_acos<floating_point>()(VectorAngleCosine<floating_point>(a_, b_)));
+			return static_cast<OutAngle_>(EmuCore::do_acos<floating_point>()(vector_angle_cosine<floating_point>(a_, b_)));
 		}
 		else
 		{
-			return static_cast<OutAngle_>(EmuCore::Pi::RadsToDegs(EmuCore::do_acos<floating_point>()(VectorAngleCosine<floating_point>(a_, b_))));
+			return static_cast<OutAngle_>(EmuCore::Pi::RadsToDegs(EmuCore::do_acos<floating_point>()(vector_angle_cosine<floating_point>(a_, b_))));
 		}
 	}
 	/// <summary>
@@ -1928,14 +1928,14 @@ namespace EmuMath::Helpers
 	/// <param name="b_">Second EmuMath vector in the calculation.</param>
 	/// <returns>The angle between the two vectors represented as the provided OutAngle_ type. Units will be radians if Rads_ is true, otherwise they will be degrees.</returns>
 	template<bool Rads_ = true, class VectorA_, class VectorB_>
-	[[nodiscard]] inline typename VectorA_::preferred_floating_point VectorAngle(const VectorA_& a_, const VectorB_& b_)
+	[[nodiscard]] inline typename VectorA_::preferred_floating_point vector_angle(const VectorA_& a_, const VectorB_& b_)
 	{
-		return VectorAngle<typename VectorA_::preferred_floating_point, Rads_, VectorA_, VectorB_>(a_, b_);
+		return vector_angle<typename VectorA_::preferred_floating_point, Rads_, VectorA_, VectorB_>(a_, b_);
 	}
 
 	/// <summary>
 	/// <para> Returns a vector containing the distance that may be added to the vector from_ to reach the values of the vector to_. </para>
-	/// <para> This is effectively syntactic sugar for VectorSubtract(to_, from_). </para>
+	/// <para> This is effectively syntactic sugar for vector_subtract(to_, from_). </para>
 	/// </summary>
 	/// <typeparam name="out_contained_type">Type to be contained in the output vector.</typeparam>
 	/// <typeparam name="FromVector_">Type of vector to calculate the distance from.</typeparam>
@@ -1944,13 +1944,13 @@ namespace EmuMath::Helpers
 	/// <param name="to_">EmuMath vector to calculate the distance to.</param>
 	/// <returns>Vector that may be added to from_ to reach the respective elements of to_.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class FromVector_, class ToVector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorDistance(const FromVector_& from_, const ToVector_& to_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_distance(const FromVector_& from_, const ToVector_& to_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<FromVector_>)
 		{
 			if constexpr (EmuMath::TMP::is_emu_vector_v<FromVector_>)
 			{
-				return VectorSubtract<OutSize_, out_contained_type, ToVector_, FromVector_>(to_, from_);
+				return vector_subtract<OutSize_, out_contained_type, ToVector_, FromVector_>(to_, from_);
 			}
 			else
 			{
@@ -1963,19 +1963,19 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, class FromVector_, class ToVector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<FromVector_::size, out_contained_type> VectorDistance(const FromVector_& from_, const ToVector_& to_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<FromVector_::size, out_contained_type> vector_distance(const FromVector_& from_, const ToVector_& to_)
 	{
-		return VectorDistance<FromVector_::size, out_contained_type, FromVector_, ToVector_>(from_, to_);
+		return vector_distance<FromVector_::size, out_contained_type, FromVector_, ToVector_>(from_, to_);
 	}
 	template<std::size_t OutSize_, class FromVector_, class ToVector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename FromVector_::value_type> VectorDistance(const FromVector_& from_, const ToVector_& to_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename FromVector_::value_type> vector_distance(const FromVector_& from_, const ToVector_& to_)
 	{
-		return VectorDistance<OutSize_, typename FromVector_::value_type, FromVector_, ToVector_>(from_, to_);
+		return vector_distance<OutSize_, typename FromVector_::value_type, FromVector_, ToVector_>(from_, to_);
 	}
 	template<class FromVector_, class ToVector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<FromVector_::size, typename FromVector_::value_type> VectorDistance(const FromVector_& from_, const ToVector_& to_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<FromVector_::size, typename FromVector_::value_type> vector_distance(const FromVector_& from_, const ToVector_& to_)
 	{
-		return VectorDistance<FromVector_::size, typename FromVector_::value_type, FromVector_, ToVector_>(from_, to_);
+		return vector_distance<FromVector_::size, typename FromVector_::value_type, FromVector_, ToVector_>(from_, to_);
 	}
 
 	/// <summary>
@@ -2009,7 +2009,7 @@ namespace EmuMath::Helpers
 		class VectorA_,
 		class VectorB_
 	>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorCrossProduct3D(const VectorA_& a_, const VectorB_& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_cross_product_3d(const VectorA_& a_, const VectorB_& b_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<VectorA_>)
 		{
@@ -2062,9 +2062,9 @@ namespace EmuMath::Helpers
 		class VectorA_,
 		class VectorB_
 	>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename VectorA_::value_type> VectorCrossProduct3D(const VectorA_& a_, const VectorB_& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename VectorA_::value_type> vector_cross_product_3d(const VectorA_& a_, const VectorB_& b_)
 	{
-		return VectorCrossProduct3D<AX_, AY_, AZ_, BX_, BY_, BZ_, OutSize_, typename VectorA_::value_type, VectorA_, VectorB_>(a_, b_);
+		return vector_cross_product_3d<AX_, AY_, AZ_, BX_, BY_, BZ_, OutSize_, typename VectorA_::value_type, VectorA_, VectorB_>(a_, b_);
 	}
 	template
 	<
@@ -2078,9 +2078,9 @@ namespace EmuMath::Helpers
 		class VectorA_,
 		class VectorB_
 	>
-	[[nodiscard]] constexpr inline EmuMath::Vector<3, out_contained_type> VectorCrossProduct3D(const VectorA_& a_, const VectorB_& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, out_contained_type> vector_cross_product_3d(const VectorA_& a_, const VectorB_& b_)
 	{
-		return VectorCrossProduct3D<AX_, AY_, AZ_, BX_, BY_, BZ_, 3, out_contained_type, VectorA_, VectorB_>(a_, b_);
+		return vector_cross_product_3d<AX_, AY_, AZ_, BX_, BY_, BZ_, 3, out_contained_type, VectorA_, VectorB_>(a_, b_);
 	}
 	template
 	<
@@ -2093,9 +2093,9 @@ namespace EmuMath::Helpers
 		class VectorA_,
 		class VectorB_
 	>
-	[[nodiscard]] constexpr inline EmuMath::Vector<3, typename VectorA_::value_type> VectorCrossProduct3D(const VectorA_& a_, const VectorB_& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, typename VectorA_::value_type> vector_cross_product_3d(const VectorA_& a_, const VectorB_& b_)
 	{
-		return VectorCrossProduct3D<AX_, AY_, AZ_, BX_, BY_, BZ_, 3, typename VectorA_::value_type, VectorA_, VectorB_>(a_, b_);
+		return vector_cross_product_3d<AX_, AY_, AZ_, BX_, BY_, BZ_, 3, typename VectorA_::value_type, VectorA_, VectorB_>(a_, b_);
 	}
 #pragma endregion
 
@@ -2111,7 +2111,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
 	/// <returns>True if any executed comparisons returned true, otherwise false.</returns>
 	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline bool VectorCmpAnyEqualTo(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2134,7 +2134,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
 	/// <returns>True if any executed comparisons returned true, otherwise false.</returns>
 	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline bool VectorCmpAnyNotEqualTo(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_not_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2157,7 +2157,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
 	/// <returns>True if any executed comparisons returned true, otherwise false.</returns>
 	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline bool VectorCmpAnyGreater(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_greater(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2180,7 +2180,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
 	/// <returns>True if any executed comparisons returned true, otherwise false.</returns>
 	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline bool VectorCmpAnyLess(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_less(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2203,7 +2203,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
 	/// <returns>True if any executed comparisons returned true, otherwise false.</returns>
 	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline bool VectorCmpAnyGreaterEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_greater_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2226,7 +2226,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
 	/// <returns>True if any executed comparisons returned true, otherwise false.</returns>
 	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline bool VectorCmpAnyLessEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_less_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2249,7 +2249,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
 	/// <returns>True if all executed comparisons returned true, otherwise false.</returns>
 	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline bool VectorCmpAllEqualTo(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2272,7 +2272,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
 	/// <returns>True if all executed comparisons returned true, otherwise false.</returns>
 	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline bool VectorCmpAllNotEqualTo(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_not_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2295,7 +2295,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
 	/// <returns>True if all executed comparisons returned true, otherwise false.</returns>
 	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline bool VectorCmpAllGreater(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_greater(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2318,7 +2318,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
 	/// <returns>True if all executed comparisons returned true, otherwise false.</returns>
 	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline bool VectorCmpAllLess(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_less(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2341,7 +2341,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
 	/// <returns>True if all executed comparisons returned true, otherwise false.</returns>
 	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline bool VectorCmpAllGreaterEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_greater_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2364,7 +2364,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar that appears on the right hand side of comparisons.</param>
 	/// <returns>True if all executed comparisons returned true, otherwise false.</returns>
 	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline bool VectorCmpAllLessEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_less_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2398,7 +2398,7 @@ namespace EmuMath::Helpers
 	///		<para>If rhs_ is NOT an EmuMath vector: Result of comparing the lhs_ vector's magnitude with the passed rhs_ value.</para>
 	/// </returns>
 	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline bool VectorCmpEqualTo(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2432,7 +2432,7 @@ namespace EmuMath::Helpers
 	///		<para>If rhs_ is NOT an EmuMath vector: Result of comparing the lhs_ vector's magnitude with the passed rhs_ value.</para>
 	/// </returns>
 	template<bool TestAllIndices_ = true, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline bool VectorCmpNotEqualTo(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_not_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2453,7 +2453,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar appearing on the left of the magnitude comparison.</param>
 	/// <returns>True if the magnitude of lhs_ is greater than that of rhs_ if rhs_ is an EmuMath vector, or greater than rhs_ itself if it is a scalar.</returns>
 	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline bool VectorCmpGreater(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_greater(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2474,7 +2474,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar appearing on the left of the magnitude comparison.</param>
 	/// <returns>True if the magnitude of lhs_ is less than that of rhs_ if rhs_ is an EmuMath vector, or less than rhs_ itself if it is a scalar.</returns>
 	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline bool VectorCmpLess(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_less(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2495,7 +2495,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar appearing on the left of the magnitude comparison.</param>
 	/// <returns>True if the magnitude of lhs_ is greater than or equal to that of rhs_ if rhs_ is an EmuMath vector, or greater than or equal to rhs_ itself if it is a scalar.</returns>
 	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline bool VectorCmpGreaterEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_greater_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2516,7 +2516,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar appearing on the left of the magnitude comparison.</param>
 	/// <returns>True if the magnitude of lhs_ is less than or equal that of rhs_ if rhs_ is an EmuMath vector, or less than or equal to rhs_ itself if it is a scalar.</returns>
 	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline bool VectorCmpLessEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_less_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2547,7 +2547,7 @@ namespace EmuMath::Helpers
 	/// </param>
 	/// <returns>Vector of booleans containing the results of the comparison of respective elements within lhs_ with rhs_.</returns>
 	template<std::size_t OutSize_, class Comparison_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> VectorPerElementComparison(const LhsVector_& lhs_, const Rhs_& rhs_, Comparison_ cmpFunc_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> vector_cmp_per_element(const LhsVector_& lhs_, const Rhs_& rhs_, Comparison_ cmpFunc_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2559,19 +2559,19 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t OutSize_, class Comparison_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> VectorPerElementComparison(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> vector_cmp_per_element(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorPerElementComparison<OutSize_, Comparison_, LhsVector_, Rhs_>(lhs_, rhs_, Comparison_());
+		return vector_cmp_per_element<OutSize_, Comparison_, LhsVector_, Rhs_>(lhs_, rhs_, Comparison_());
 	}
 	template<class Comparison_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, bool> VectorPerElementComparison(const LhsVector_& lhs_, const Rhs_& rhs_, Comparison_ cmpFunc_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, bool> vector_cmp_per_element(const LhsVector_& lhs_, const Rhs_& rhs_, Comparison_ cmpFunc_)
 	{
-		return VectorPerElementComparison<EmuMath::Vector<LhsVector_::size, bool>, Comparison_, LhsVector_, Rhs_>(lhs_, rhs_, cmpFunc_);
+		return vector_cmp_per_element<EmuMath::Vector<LhsVector_::size, bool>, Comparison_, LhsVector_, Rhs_>(lhs_, rhs_, cmpFunc_);
 	}
 	template<class Comparison_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, bool> VectorPerElementComparison(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, bool> vector_cmp_per_element(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorPerElementComparison<EmuMath::Vector<LhsVector_::size, bool>, Comparison_, LhsVector_, Rhs_>(lhs_, rhs_, Comparison_());
+		return vector_cmp_per_element<EmuMath::Vector<LhsVector_::size, bool>, Comparison_, LhsVector_, Rhs_>(lhs_, rhs_, Comparison_());
 	}
 
 	/// <summary>
@@ -2589,14 +2589,14 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector to compare respective elements of the left-hand vector with, or scalar to compare all elements of the left-hand vector with.</param>
 	/// <returns>Vector of booleans containing the results of the comparison of respective elements within lhs_ with rhs_.</returns>
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> VectorPerElementCmpEqualTo(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> vector_cmp_per_element_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorPerElementComparison<OutSize_, std::equal_to<void>, LhsVector_, Rhs_>(lhs_, rhs_, std::equal_to<void>());
+		return vector_cmp_per_element<OutSize_, std::equal_to<void>, LhsVector_, Rhs_>(lhs_, rhs_, std::equal_to<void>());
 	}
 	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, bool> VectorPerElementCmpEqualTo(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, bool> vector_cmp_per_element_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorPerElementCmpEqualTo<LhsVector_::size, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_cmp_per_element_equal<LhsVector_::size, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -2614,14 +2614,14 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector to compare respective elements of the left-hand vector with, or scalar to compare all elements of the left-hand vector with.</param>
 	/// <returns>Vector of booleans containing the results of the comparison of respective elements within lhs_ with rhs_.</returns>
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> VectorPerElementCmpNotEqualTo(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> vector_cmp_per_element_not_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorPerElementComparison<OutSize_, std::not_equal_to<void>, LhsVector_, Rhs_>(lhs_, rhs_, std::not_equal_to<void>());
+		return vector_cmp_per_element<OutSize_, std::not_equal_to<void>, LhsVector_, Rhs_>(lhs_, rhs_, std::not_equal_to<void>());
 	}
 	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, bool> VectorPerElementCmpNotEqualTo(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, bool> vector_cmp_per_element_not_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorPerElementCmpNotEqualTo<LhsVector_::size, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_cmp_per_element_not_equal<LhsVector_::size, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -2639,14 +2639,14 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector to compare respective elements of the left-hand vector with, or scalar to compare all elements of the left-hand vector with.</param>
 	/// <returns>Vector of booleans containing the results of the comparison of respective elements within lhs_ with rhs_.</returns>
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> VectorPerElementCmpGreater(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> vector_cmp_per_element_greater(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorPerElementComparison<OutSize_, std::greater<void>, LhsVector_, Rhs_>(lhs_, rhs_, std::greater<void>());
+		return vector_cmp_per_element<OutSize_, std::greater<void>, LhsVector_, Rhs_>(lhs_, rhs_, std::greater<void>());
 	}
 	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, bool> VectorPerElementCmpGreater(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, bool> vector_cmp_per_element_greater(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorPerElementCmpGreater<LhsVector_::size, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_cmp_per_element_greater<LhsVector_::size, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -2664,14 +2664,14 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector to compare respective elements of the left-hand vector with, or scalar to compare all elements of the left-hand vector with.</param>
 	/// <returns>Vector of booleans containing the results of the comparison of respective elements within lhs_ with rhs_.</returns>
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> VectorPerElementCmpLess(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> vector_cmp_per_element_less(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorPerElementComparison<OutSize_, std::less<void>, LhsVector_, Rhs_>(lhs_, rhs_, std::less<void>());
+		return vector_cmp_per_element<OutSize_, std::less<void>, LhsVector_, Rhs_>(lhs_, rhs_, std::less<void>());
 	}
 	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, bool> VectorPerElementCmpLess(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, bool> vector_cmp_per_element_less(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorPerElementCmpLess<LhsVector_::size, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_cmp_per_element_less<LhsVector_::size, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -2689,14 +2689,14 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector to compare respective elements of the left-hand vector with, or scalar to compare all elements of the left-hand vector with.</param>
 	/// <returns>Vector of booleans containing the results of the comparison of respective elements within lhs_ with rhs_.</returns>
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> VectorPerElementCmpGreaterEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> vector_cmp_per_element_greater_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorPerElementComparison<OutSize_, std::greater_equal<void>, LhsVector_, Rhs_>(lhs_, rhs_, std::greater_equal<void>());
+		return vector_cmp_per_element<OutSize_, std::greater_equal<void>, LhsVector_, Rhs_>(lhs_, rhs_, std::greater_equal<void>());
 	}
 	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, bool> VectorPerElementCmpGreaterEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, bool> vector_cmp_per_element_greater_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorPerElementCmpGreaterEqual<LhsVector_::size, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_cmp_per_element_greater_equal<LhsVector_::size, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -2714,14 +2714,14 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector to compare respective elements of the left-hand vector with, or scalar to compare all elements of the left-hand vector with.</param>
 	/// <returns>Vector of booleans containing the results of the comparison of respective elements within lhs_ with rhs_.</returns>
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> VectorPerElementCmpLessEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> vector_cmp_per_element_less_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorPerElementComparison<OutSize_, std::less_equal<void>, LhsVector_, Rhs_>(lhs_, rhs_, std::less_equal<void>());
+		return vector_cmp_per_element<OutSize_, std::less_equal<void>, LhsVector_, Rhs_>(lhs_, rhs_, std::less_equal<void>());
 	}
 	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, bool> VectorPerElementCmpLessEqual(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, bool> vector_cmp_per_element_less_equal(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorPerElementCmpLessEqual<LhsVector_::size, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_cmp_per_element_less_equal<LhsVector_::size, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 #pragma endregion
 
@@ -2742,7 +2742,7 @@ namespace EmuMath::Helpers
 	/// <param name="num_shifts_">Scalar or EmuMath vector representing the number of shifts to apply to every element or to each respective element.</param>
 	/// <returns>Result of left-shifting the elements of the passed EmuMath vector the specified number of times in num_shifts_.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class Vector_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorShiftLeft(const Vector_& vector_, const Shifts_& num_shifts_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_shift_left(const Vector_& vector_, const Shifts_& num_shifts_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -2767,19 +2767,19 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, class Vector_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorShiftLeft(const Vector_& vector_, const Shifts_& num_shifts_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> vector_shift_left(const Vector_& vector_, const Shifts_& num_shifts_)
 	{
-		return VectorShiftLeft<Vector_::size, out_contained_type, Vector_, Shifts_>(vector_, num_shifts_);
+		return vector_shift_left<Vector_::size, out_contained_type, Vector_, Shifts_>(vector_, num_shifts_);
 	}
 	template<std::size_t OutSize_, class Vector_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorShiftLeft(const Vector_& vector_, const Shifts_& num_shifts_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> vector_shift_left(const Vector_& vector_, const Shifts_& num_shifts_)
 	{
-		return VectorShiftLeft<OutSize_, typename Vector_::value_type, Vector_, Shifts_>(vector_, num_shifts_);
+		return vector_shift_left<OutSize_, typename Vector_::value_type, Vector_, Shifts_>(vector_, num_shifts_);
 	}
 	template<class Vector_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorShiftLeft(const Vector_& vector_, const Shifts_& num_shifts_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> vector_shift_left(const Vector_& vector_, const Shifts_& num_shifts_)
 	{
-		return VectorShiftLeft<Vector_::size, typename Vector_::value_type, Vector_, Shifts_>(vector_, num_shifts_);
+		return vector_shift_left<Vector_::size, typename Vector_::value_type, Vector_, Shifts_>(vector_, num_shifts_);
 	}
 
 	/// <summary>
@@ -2798,7 +2798,7 @@ namespace EmuMath::Helpers
 	/// <param name="num_shifts_">Scalar or EmuMath vector representing the number of shifts to apply to every element or to each respective element.</param>
 	/// <returns>Result of right-shifting the elements of the passed EmuMath vector the specified number of times in num_shifts_.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class Vector_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorShiftRight(const Vector_& vector_, const Shifts_& num_shifts_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_shift_right(const Vector_& vector_, const Shifts_& num_shifts_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -2823,19 +2823,19 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, class Vector_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorShiftRight(const Vector_& vector_, const Shifts_& num_shifts_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> vector_shift_right(const Vector_& vector_, const Shifts_& num_shifts_)
 	{
-		return VectorShiftRight<Vector_::size, out_contained_type, Vector_, Shifts_>(vector_, num_shifts_);
+		return vector_shift_right<Vector_::size, out_contained_type, Vector_, Shifts_>(vector_, num_shifts_);
 	}
 	template<std::size_t OutSize_, class Vector_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorShiftRight(const Vector_& vector_, const Shifts_& num_shifts_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> vector_shift_right(const Vector_& vector_, const Shifts_& num_shifts_)
 	{
-		return VectorShiftRight<OutSize_, typename Vector_::value_type, Vector_, Shifts_>(vector_, num_shifts_);
+		return vector_shift_right<OutSize_, typename Vector_::value_type, Vector_, Shifts_>(vector_, num_shifts_);
 	}
 	template<class Vector_, class Shifts_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorShiftRight(const Vector_& vector_, const Shifts_& num_shifts_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> vector_shift_right(const Vector_& vector_, const Shifts_& num_shifts_)
 	{
-		return VectorShiftRight<Vector_::size, typename Vector_::value_type, Vector_, Shifts_>(vector_, num_shifts_);
+		return vector_shift_right<Vector_::size, typename Vector_::value_type, Vector_, Shifts_>(vector_, num_shifts_);
 	}
 
 	/// <summary>
@@ -2850,7 +2850,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar appearing on the right-hand side of AND operations.</param>
 	/// <returns>EmuMath vector containing the results of bitwise ANDing the provided operands.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorAnd(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_and(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2859,7 +2859,7 @@ namespace EmuMath::Helpers
 				EmuMath::Vector<OutSize_, out_contained_type>,
 				LhsVector_,
 				Rhs_,
-				EmuCore::do_bitwise_and<typename LhsVector_::value_type, EmuCore::TMPHelpers::get_value_type_t<Rhs_>>
+				EmuCore::do_bitwise_and<typename LhsVector_::value_type, EmuCore::TMP::get_value_type_t<Rhs_>>
 			>
 			(
 				lhs_,
@@ -2872,19 +2872,19 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, out_contained_type> VectorAnd(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, out_contained_type> vector_and(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorAnd<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_and<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename LhsVector_::value_type> VectorAnd(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename LhsVector_::value_type> vector_and(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorAnd<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_and<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, typename LhsVector_::value_type> VectorAnd(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, typename LhsVector_::value_type> vector_and(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorAnd<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_and<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -2899,7 +2899,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar appearing on the right-hand side of OR operations.</param>
 	/// <returns>EmuMath vector containing the results of bitwise ORing the provided operands.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorOr(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_or(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2908,7 +2908,7 @@ namespace EmuMath::Helpers
 				EmuMath::Vector<OutSize_, out_contained_type>,
 				LhsVector_,
 				Rhs_,
-				EmuCore::do_bitwise_or<typename LhsVector_::value_type, EmuCore::TMPHelpers::get_value_type_t<Rhs_>>
+				EmuCore::do_bitwise_or<typename LhsVector_::value_type, EmuCore::TMP::get_value_type_t<Rhs_>>
 			>
 			(
 				lhs_,
@@ -2921,19 +2921,19 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, out_contained_type> VectorOr(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, out_contained_type> vector_or(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorOr<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_or<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename LhsVector_::value_type> VectorOr(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename LhsVector_::value_type> vector_or(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorOr<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_or<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, typename LhsVector_::value_type> VectorOr(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, typename LhsVector_::value_type> vector_or(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorOr<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_or<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -2948,7 +2948,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath vector or scalar appearing on the right-hand side of XOR operations.</param>
 	/// <returns>EmuMath vector containing the results of bitwise XOR the provided operands.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorXor(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_xor(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<LhsVector_>)
 		{
@@ -2957,7 +2957,7 @@ namespace EmuMath::Helpers
 				EmuMath::Vector<OutSize_, out_contained_type>,
 				LhsVector_,
 				Rhs_,
-				EmuCore::do_bitwise_xor<typename LhsVector_::value_type, EmuCore::TMPHelpers::get_value_type_t<Rhs_>>
+				EmuCore::do_bitwise_xor<typename LhsVector_::value_type, EmuCore::TMP::get_value_type_t<Rhs_>>
 			>
 			(
 				lhs_,
@@ -2970,19 +2970,19 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, out_contained_type> VectorXor(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, out_contained_type> vector_xor(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorXor<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_xor<LhsVector_::size, out_contained_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 	template<std::size_t OutSize_, class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename LhsVector_::value_type> VectorXor(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename LhsVector_::value_type> vector_xor(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorXor<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_xor<OutSize_, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 	template<class LhsVector_, class Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, typename LhsVector_::value_type> VectorXor(const LhsVector_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<LhsVector_::size, typename LhsVector_::value_type> vector_xor(const LhsVector_& lhs_, const Rhs_& rhs_)
 	{
-		return VectorXor<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
+		return vector_xor<LhsVector_::size, typename LhsVector_::value_type, LhsVector_, Rhs_>(lhs_, rhs_);
 	}
 
 	/// <summary>
@@ -2994,7 +2994,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to perform the bitwise NOT operation on.</param>
 	/// <returns>EmuMath vector containing the results of the bitwise NOT operation on the passed vector_.</returns>
 	template<std::size_t OutSize_, typename out_contained_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> VectorNot(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> vector_not(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -3011,19 +3011,19 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> VectorNot(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, out_contained_type> vector_not(const Vector_& vector_)
 	{
-		return VectorNot<Vector_::size, out_contained_type, Vector_>(vector_);
+		return vector_not<Vector_::size, out_contained_type, Vector_>(vector_);
 	}
 	template<std::size_t OutSize_, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> VectorNot(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename Vector_::value_type> vector_not(const Vector_& vector_)
 	{
-		return VectorNot<OutSize_, typename Vector_::value_type, Vector_>(vector_);
+		return vector_not<OutSize_, typename Vector_::value_type, Vector_>(vector_);
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> VectorNot(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size, typename Vector_::value_type> vector_not(const Vector_& vector_)
 	{
-		return VectorNot<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
+		return vector_not<Vector_::size, typename Vector_::value_type, Vector_>(vector_);
 	}
 #pragma endregion
 }
@@ -3032,7 +3032,7 @@ namespace EmuMath::Helpers
 namespace EmuCore
 {
 #pragma region ARITHMETIC
-	/// <summary> do_lerp specialisation which defers the calculation to EmuMath::Helpers::VectorLerp. Leaves room for specific vectors to be specialised. </summary>
+	/// <summary> do_lerp specialisation which defers the calculation to EmuMath::Helpers::vector_lerp. Leaves room for specific vectors to be specialised. </summary>
 	/// <typeparam name="a_value_type">Type contained within the vector used for argument A_.<typeparam>
 	template<std::size_t ASize_, typename a_value_type, class B_, class T_>
 	struct do_lerp<EmuMath::Vector<ASize_, a_value_type>, B_, T_>
@@ -3042,11 +3042,11 @@ namespace EmuCore
 		}
 		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<ASize_, a_value_type>& a_, const B_& b_, const T_& t_) const
 		{
-			return EmuMath::Helpers::VectorLerp(a_, b_, t_);
+			return EmuMath::Helpers::vector_lerp(a_, b_, t_);
 		}
 	};
 
-	/// <summary> do_floor specialisation which defers a flooring calculation to EmuMath::Helpers::VectorFloor. Leaves room for specific vectors to be specialised. </summary>
+	/// <summary> do_floor specialisation which defers a flooring calculation to EmuMath::Helpers::vector_floor. Leaves room for specific vectors to be specialised. </summary>
 	/// <typeparam name="T_">Type contained within the passed EmuMath vector.</typeparam>
 	template<std::size_t Size_, typename T_>
 	struct do_floor<EmuMath::Vector<Size_, T_>>
@@ -3056,11 +3056,11 @@ namespace EmuCore
 		}
 		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorFloor(vector_);
+			return EmuMath::Helpers::vector_floor(vector_);
 		}
 	};
 
-	/// <summary> do_ceil specialisation which defers a ceiling calculation to EmuMath::Helpers::VectorCeil. Leaves room for specific vectors to be specialised. </summary>
+	/// <summary> do_ceil specialisation which defers a ceiling calculation to EmuMath::Helpers::vector_ceil. Leaves room for specific vectors to be specialised. </summary>
 	/// <typeparam name="T_">Type contained within the passed EmuMath vector.</typeparam>
 	template<std::size_t Size_, typename T_>
 	struct do_ceil<EmuMath::Vector<Size_, T_>>
@@ -3070,11 +3070,11 @@ namespace EmuCore
 		}
 		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorCeil(vector_);
+			return EmuMath::Helpers::vector_ceil(vector_);
 		}
 	};
 
-	/// <summary> do_trunc specialisation which defers a truncating calculation to EmuMath::Helpers::VectorTrunc. Leaves room for specific vectors to be specialised. </summary>
+	/// <summary> do_trunc specialisation which defers a truncating calculation to EmuMath::Helpers::vector_trunc. Leaves room for specific vectors to be specialised. </summary>
 	/// <typeparam name="T_">Type contained within the passed EmuMath vector.</typeparam>
 	template<std::size_t Size_, typename T_>
 	struct do_trunc<EmuMath::Vector<Size_, T_>>
@@ -3084,12 +3084,12 @@ namespace EmuCore
 		}
 		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorTrunc(vector_);
+			return EmuMath::Helpers::vector_trunc(vector_);
 		}
 	};
 
 	/// <summary> 
-	///		do_sqrt_constexpr specialisation which defers a constexpr sqrt calculation to EmuMath::Helpers::VectorSqrtConstexpr. 
+	///		do_sqrt_constexpr specialisation which defers a constexpr sqrt calculation to EmuMath::Helpers::vector_sqrt_constexpr. 
 	///		Leaves room for specific vectors to be specialised.
 	/// </summary>
 	/// <typeparam name="T_">Type contained within the passed EmuMath vector.</typeparam>
@@ -3101,11 +3101,11 @@ namespace EmuCore
 		}
 		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorSqrtConstexpr(vector_);
+			return EmuMath::Helpers::vector_sqrt_constexpr(vector_);
 		}
 	};
 
-	/// <summary> do_sqrt specialisation which defers a square root calculation to EmuMath::Helpers::VectorSqrt. Leaves room for specific vectors to be specialised. </summary>
+	/// <summary> do_sqrt specialisation which defers a square root calculation to EmuMath::Helpers::vector_sqrt. Leaves room for specific vectors to be specialised. </summary>
 	/// <typeparam name="T_">Type contained within the passed EmuMath vector.</typeparam>
 	template<std::size_t Size_, typename T_>
 	struct do_sqrt<EmuMath::Vector<Size_, T_>>
@@ -3115,7 +3115,7 @@ namespace EmuCore
 		}
 		[[nodiscard]] inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorSqrt(vector_);
+			return EmuMath::Helpers::vector_sqrt(vector_);
 		}
 	};
 
@@ -3125,9 +3125,9 @@ namespace EmuCore
 		constexpr do_add()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorAdd(lhs_, rhs_);
+			return EmuMath::Helpers::vector_add(lhs_, rhs_);
 		}
 	};
 
@@ -3137,9 +3137,9 @@ namespace EmuCore
 		constexpr do_subtract()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorSubtract(lhs_, rhs_);
+			return EmuMath::Helpers::vector_subtract(lhs_, rhs_);
 		}
 	};
 
@@ -3149,9 +3149,9 @@ namespace EmuCore
 		constexpr do_multiply()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorMultiply(lhs_, rhs_);
+			return EmuMath::Helpers::vector_multiply(lhs_, rhs_);
 		}
 	};
 
@@ -3161,9 +3161,9 @@ namespace EmuCore
 		constexpr do_divide()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorDivide(lhs_, rhs_);
+			return EmuMath::Helpers::vector_divide(lhs_, rhs_);
 		}
 	};
 
@@ -3173,9 +3173,9 @@ namespace EmuCore
 		constexpr do_mod()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorMod(lhs_, rhs_);
+			return EmuMath::Helpers::vector_mod(lhs_, rhs_);
 		}
 	};
 
@@ -3185,9 +3185,9 @@ namespace EmuCore
 		constexpr do_negate()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorNegate(vector_);
+			return EmuMath::Helpers::vector_negate(vector_);
 		}
 	};
 #pragma endregion
@@ -3201,7 +3201,7 @@ namespace EmuCore
 		}
 		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_)
 		{
-			return EmuMath::Helpers::VectorAnd<Size_, T_, EmuMath::Vector<Size_, T_>, Rhs_>(lhs_, rhs_);
+			return EmuMath::Helpers::vector_and<Size_, T_, EmuMath::Vector<Size_, T_>, Rhs_>(lhs_, rhs_);
 		}
 	};
 
@@ -3213,7 +3213,7 @@ namespace EmuCore
 		}
 		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_)
 		{
-			return EmuMath::Helpers::VectorOr<Size_, T_, EmuMath::Vector<Size_, T_>, Rhs_>(lhs_, rhs_);
+			return EmuMath::Helpers::vector_or<Size_, T_, EmuMath::Vector<Size_, T_>, Rhs_>(lhs_, rhs_);
 		}
 	};
 
@@ -3225,7 +3225,7 @@ namespace EmuCore
 		}
 		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& lhs_, const Rhs_& rhs_)
 		{
-			return EmuMath::Helpers::VectorXor<Size_, T_, EmuMath::Vector<Size_, T_>, Rhs_>(lhs_, rhs_);
+			return EmuMath::Helpers::vector_xor<Size_, T_, EmuMath::Vector<Size_, T_>, Rhs_>(lhs_, rhs_);
 		}
 	};
 
@@ -3237,7 +3237,7 @@ namespace EmuCore
 		}
 		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_)
 		{
-			return EmuMath::Helpers::VectorNot<Size_, T_, EmuMath::Vector<Size_, T_>>(vector_);
+			return EmuMath::Helpers::vector_not<Size_, T_, EmuMath::Vector<Size_, T_>>(vector_);
 		}
 	};
 
@@ -3251,11 +3251,11 @@ namespace EmuCore
 		{
 			if constexpr (std::is_arithmetic_v<Shifts_>)
 			{
-				return EmuMath::Helpers::VectorShiftLeft(vector_, static_cast<std::size_t>(num_shifts_));
+				return EmuMath::Helpers::vector_shift_left(vector_, static_cast<std::size_t>(num_shifts_));
 			}
 			else
 			{
-				return EmuMath::Helpers::VectorShiftLeft(vector_, num_shifts_);
+				return EmuMath::Helpers::vector_shift_left(vector_, num_shifts_);
 			}
 		}
 	};
@@ -3270,11 +3270,11 @@ namespace EmuCore
 		{
 			if constexpr (std::is_arithmetic_v<Shifts_>)
 			{
-				return EmuMath::Helpers::VectorShiftRight(vector_, static_cast<std::size_t>(num_shifts_));
+				return EmuMath::Helpers::vector_shift_right(vector_, static_cast<std::size_t>(num_shifts_));
 			}
 			else
 			{
-				return EmuMath::Helpers::VectorShiftRight(vector_, num_shifts_);
+				return EmuMath::Helpers::vector_shift_right(vector_, num_shifts_);
 			}
 		}
 	};
@@ -3287,9 +3287,9 @@ namespace EmuCore
 		constexpr do_cmp_equal_to()
 		{
 		}
-		constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpEqualTo(lhs_, rhs_);
+			return EmuMath::Helpers::vector_cmp_equal(lhs_, rhs_);
 		}
 	};
 
@@ -3299,9 +3299,9 @@ namespace EmuCore
 		constexpr do_cmp_not_equal_to()
 		{
 		}
-		constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpNotEqualTo(lhs_, rhs_);
+			return EmuMath::Helpers::vector_cmp_not_equal(lhs_, rhs_);
 		}
 	};
 
@@ -3311,9 +3311,9 @@ namespace EmuCore
 		constexpr do_cmp_greater()
 		{
 		}
-		constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpGreater(lhs_, rhs_);
+			return EmuMath::Helpers::vector_cmp_greater(lhs_, rhs_);
 		}
 	};
 
@@ -3323,9 +3323,9 @@ namespace EmuCore
 		constexpr do_cmp_less()
 		{
 		}
-		constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpLess(lhs_, rhs_);
+			return EmuMath::Helpers::vector_cmp_less(lhs_, rhs_);
 		}
 	};
 
@@ -3335,9 +3335,9 @@ namespace EmuCore
 		constexpr do_cmp_greater_equal()
 		{
 		}
-		constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpGreaterEqual(lhs_, rhs_);
+			return EmuMath::Helpers::vector_cmp_greater_equal(lhs_, rhs_);
 		}
 	};
 
@@ -3347,9 +3347,9 @@ namespace EmuCore
 		constexpr do_cmp_less_equal()
 		{
 		}
-		constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline bool operator()(const EmuMath::Vector<Size_, T_> lhs_, const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpLessEqual(lhs_, rhs_);
+			return EmuMath::Helpers::vector_cmp_less_equal(lhs_, rhs_);
 		}
 	};
 
@@ -3359,9 +3359,9 @@ namespace EmuCore
 		constexpr do_cos()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorMutate(vector_, EmuCore::do_cos<typename EmuMath::Vector<Size_, T_>::value_type>());
+			return EmuMath::Helpers::vector_mutate(vector_, EmuCore::do_cos<typename EmuMath::Vector<Size_, T_>::value_type>());
 		}
 	};
 
@@ -3371,9 +3371,9 @@ namespace EmuCore
 		constexpr do_acos()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorMutate(vector_, EmuCore::do_acos<typename EmuMath::Vector<Size_, T_>::value_type>());
+			return EmuMath::Helpers::vector_mutate(vector_, EmuCore::do_acos<typename EmuMath::Vector<Size_, T_>::value_type>());
 		}
 	};
 
@@ -3383,9 +3383,9 @@ namespace EmuCore
 		constexpr do_sin()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorMutate(vector_, EmuCore::do_sin<typename EmuMath::Vector<Size_, T_>::value_type>());
+			return EmuMath::Helpers::vector_mutate(vector_, EmuCore::do_sin<typename EmuMath::Vector<Size_, T_>::value_type>());
 		}
 	};
 
@@ -3395,9 +3395,9 @@ namespace EmuCore
 		constexpr do_asin()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorMutate(vector_, EmuCore::do_asin<typename EmuMath::Vector<Size_, T_>::value_type>());
+			return EmuMath::Helpers::vector_mutate(vector_, EmuCore::do_asin<typename EmuMath::Vector<Size_, T_>::value_type>());
 		}
 	};
 
@@ -3407,9 +3407,9 @@ namespace EmuCore
 		constexpr do_tan()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorMutate(vector_, EmuCore::do_tan<typename EmuMath::Vector<Size_, T_>::value_type>());
+			return EmuMath::Helpers::vector_mutate(vector_, EmuCore::do_tan<typename EmuMath::Vector<Size_, T_>::value_type>());
 		}
 	};
 
@@ -3419,9 +3419,9 @@ namespace EmuCore
 		constexpr do_atan()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorMutate(vector_, EmuCore::do_atan<typename EmuMath::Vector<Size_, T_>::value_type>());
+			return EmuMath::Helpers::vector_mutate(vector_, EmuCore::do_atan<typename EmuMath::Vector<Size_, T_>::value_type>());
 		}
 	};
 
@@ -3431,9 +3431,9 @@ namespace EmuCore
 		constexpr do_degs_to_rads()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorMutate(vector_, EmuCore::do_degs_to_rads<typename EmuMath::Vector<Size_, T_>::value_type>());
+			return EmuMath::Helpers::vector_mutate(vector_, EmuCore::do_degs_to_rads<typename EmuMath::Vector<Size_, T_>::value_type>());
 		}
 	};
 
@@ -3443,9 +3443,9 @@ namespace EmuCore
 		constexpr do_rads_to_degs()
 		{
 		}
-		constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
+		[[nodiscard]] constexpr inline auto operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
-			return EmuMath::Helpers::VectorMutate(vector_, EmuCore::do_rads_to_degs<typename EmuMath::Vector<Size_, T_>::value_type>());
+			return EmuMath::Helpers::vector_mutate(vector_, EmuCore::do_rads_to_degs<typename EmuMath::Vector<Size_, T_>::value_type>());
 		}
 	};
 #pragma endregion

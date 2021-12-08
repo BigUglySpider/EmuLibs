@@ -20,7 +20,7 @@ namespace EmuMath
 				colour_.Wrap();
 			}
 			template<typename Val_, typename = std::enable_if_t<!EmuMath::TMP::is_emu_colour_v<Val_>>>
-			constexpr inline TargetChannelType_ operator()(Val_ set_val_) const
+			[[nodiscard]] constexpr inline TargetChannelType_ operator()(Val_ set_val_) const
 			{
 				// We can do a direct conversion if compatible, but otherwise we'll need a cast
 				// --- This is due to sets viewing all passed values as a form of the stored channel_type
@@ -29,11 +29,11 @@ namespace EmuMath
 				// ------ which would make sets highly prone to bugs.
 				if constexpr (EmuMath::Helpers::_underlying_colour_funcs::compatible_channel_types<TargetChannelType_, Val_>())
 				{
-					return EmuMath::Helpers::wrap_colour_channel<TargetChannelType_, Val_>(set_val_);
+					return EmuMath::Helpers::colour_wrap_channel<TargetChannelType_, Val_>(set_val_);
 				}
 				else
 				{
-					return EmuMath::Helpers::wrap_colour_channel<TargetChannelType_, TargetChannelType_>(static_cast<TargetChannelType_>(set_val_));
+					return EmuMath::Helpers::colour_wrap_channel<TargetChannelType_, TargetChannelType_>(static_cast<TargetChannelType_>(set_val_));
 				}
 			}
 		};

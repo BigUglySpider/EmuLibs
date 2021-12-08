@@ -7,35 +7,35 @@
 namespace EmuMath::Helpers
 {
 	template<typename ChannelType_>
-	[[nodiscard]] constexpr inline ChannelType_ max_channel_intensity_force_fp()
+	[[nodiscard]] constexpr inline ChannelType_ colour_colour_max_channel_intensity_force_fp()
 	{
-		return _underlying_colour_funcs::_max_channel_intensity_force_fp<ChannelType_>();
+		return _underlying_colour_funcs::_colour_colour_max_channel_intensity_force_fp<ChannelType_>();
 	}
 	template<typename ChannelType_>
-	[[nodiscard]] constexpr inline ChannelType_ max_channel_intensity_force_int()
+	[[nodiscard]] constexpr inline ChannelType_ colour_colour_max_channel_intensity_force_int()
 	{
-		return _underlying_colour_funcs::_max_channel_intensity_force_int<ChannelType_>();
-	}
-
-	template<typename ChannelType_>
-	[[nodiscard]] constexpr inline ChannelType_ min_channel_intensity()
-	{
-		return _underlying_colour_funcs::_min_channel_intensity<ChannelType_>();
+		return _underlying_colour_funcs::_colour_colour_max_channel_intensity_force_int<ChannelType_>();
 	}
 
 	template<typename ChannelType_>
-	[[nodiscard]] constexpr inline ChannelType_ max_channel_intensity()
+	[[nodiscard]] constexpr inline ChannelType_ colour_min_channel_intensity()
 	{
-		return _underlying_colour_funcs::_max_channel_intensity<ChannelType_>();
+		return _underlying_colour_funcs::_colour_min_channel_intensity<ChannelType_>();
+	}
+
+	template<typename ChannelType_>
+	[[nodiscard]] constexpr inline ChannelType_ colour_max_channel_intensity()
+	{
+		return _underlying_colour_funcs::_colour_max_channel_intensity<ChannelType_>();
 	}
 
 	template<typename OutChannel_, typename InChannelInt_>
-	[[nodiscard]] constexpr inline OutChannel_ wrap_colour_channel_int(InChannelInt_ to_wrap_int_)
+	[[nodiscard]] constexpr inline OutChannel_ colour_wrap_channel_int(InChannelInt_ to_wrap_int_)
 	{
-		using calc_type = typename EmuCore::TMPHelpers::first_floating_point<OutChannel_, double>::type;
-		constexpr OutChannel_ min_out = min_channel_intensity<OutChannel_>();
-		constexpr OutChannel_ max_out = max_channel_intensity<OutChannel_>();
-		constexpr InChannelInt_ max_in = max_channel_intensity_force_int<InChannelInt_>();
+		using calc_type = typename EmuCore::TMP::first_floating_point<OutChannel_, double>::type;
+		constexpr OutChannel_ min_out = colour_min_channel_intensity<OutChannel_>();
+		constexpr OutChannel_ max_out = colour_max_channel_intensity<OutChannel_>();
+		constexpr InChannelInt_ max_in = colour_colour_max_channel_intensity_force_int<InChannelInt_>();
 		constexpr calc_type max_in_reciprocal = calc_type(1) / static_cast<calc_type>(max_in);
 
 		// No need for negative checks when the integer is unsigned; free branch dodge
@@ -76,27 +76,27 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename OutChannel_, typename InChannel_>
-	[[nodiscard]] constexpr inline OutChannel_ get_colour_intensity_from_other_ratio(InChannel_ to_convert_)
+	[[nodiscard]] constexpr inline OutChannel_ colour_get_intensity_from_other_ratio(InChannel_ to_convert_)
 	{
-		return _underlying_colour_funcs::_get_colour_intensity_from_other_ratio<OutChannel_, InChannel_>(to_convert_);
+		return _underlying_colour_funcs::_colour_get_intensity_from_other_ratio<OutChannel_, InChannel_>(to_convert_);
 	}
 
 	template<typename OutChannel_, typename InChannel_>
-	[[nodiscard]] constexpr inline OutChannel_ convert_colour_channel(InChannel_ to_convert_)
+	[[nodiscard]] constexpr inline OutChannel_ colour_convert_channel(InChannel_ to_convert_)
 	{
-		return _underlying_colour_funcs::_convert_colour_channel<OutChannel_, InChannel_>(to_convert_);
+		return _underlying_colour_funcs::_colour_convert_channel<OutChannel_, InChannel_>(to_convert_);
 	}
 
 	template<typename OutChannel_, typename InChannelFP_>
-	[[nodiscard]] constexpr inline OutChannel_ wrap_colour_channel_fp(InChannelFP_ to_wrap_fp_)
+	[[nodiscard]] constexpr inline OutChannel_ colour_wrap_channel_fp(InChannelFP_ to_wrap_fp_)
 	{
-		constexpr OutChannel_ min_out = min_channel_intensity<OutChannel_>();
-		constexpr OutChannel_ max_out = max_channel_intensity<OutChannel_>();
+		constexpr OutChannel_ min_out = colour_min_channel_intensity<OutChannel_>();
+		constexpr OutChannel_ max_out = colour_max_channel_intensity<OutChannel_>();
 		constexpr InChannelFP_ in_zero = InChannelFP_(0);
 
 		if constexpr (std::is_floating_point_v<InChannelFP_>)
 		{
-			constexpr InChannelFP_ max_in = max_channel_intensity_force_fp<InChannelFP_>();
+			constexpr InChannelFP_ max_in = colour_colour_max_channel_intensity_force_fp<InChannelFP_>();
 
 			if (to_wrap_fp_ == in_zero)
 			{
@@ -145,24 +145,24 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename OutChannel_, typename InChannel_>
-	[[nodiscard]] constexpr inline OutChannel_ wrap_colour_channel(const InChannel_& in_)
+	[[nodiscard]] constexpr inline OutChannel_ colour_wrap_channel(const InChannel_& in_)
 	{
 		if constexpr (std::is_floating_point_v<InChannel_>)
 		{
-			return wrap_colour_channel_fp<OutChannel_, InChannel_>(in_);
+			return colour_wrap_channel_fp<OutChannel_, InChannel_>(in_);
 		}
 		else
 		{
-			return wrap_colour_channel_int<OutChannel_, InChannel_>(in_);
+			return colour_wrap_channel_int<OutChannel_, InChannel_>(in_);
 		}
 	}
 
 	template<typename OutChannel_, typename InChannel_>
-	[[nodiscard]] constexpr inline OutChannel_ clamp_colour_channel(InChannel_ to_clamp_)
+	[[nodiscard]] constexpr inline OutChannel_ colour_clamp_channel(InChannel_ to_clamp_)
 	{
-		constexpr InChannel_ min_in = min_channel_intensity<InChannel_>();
-		constexpr InChannel_ max_in = max_channel_intensity<InChannel_>();
-		constexpr OutChannel_ max_out = max_channel_intensity<OutChannel_>();
+		constexpr InChannel_ min_in = colour_min_channel_intensity<InChannel_>();
+		constexpr InChannel_ max_in = colour_max_channel_intensity<InChannel_>();
+		constexpr OutChannel_ max_out = colour_max_channel_intensity<OutChannel_>();
 
 		if (to_clamp_ <= min_in)
 		{
@@ -191,7 +191,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			using calc_type = typename EmuCore::TMPHelpers::first_floating_point<OutChannel_, double>::type;
+			using calc_type = typename EmuCore::TMP::first_floating_point<OutChannel_, double>::type;
 			constexpr calc_type max_in_reciprocal_ = calc_type(1) / static_cast<calc_type>(max_in);
 			calc_type ratio_ = static_cast<calc_type>(to_clamp_) * max_in_reciprocal_;
 			if constexpr (std::is_floating_point_v<OutChannel_>)
@@ -208,7 +208,7 @@ namespace EmuMath::Helpers
 	template<typename OutChannel_, typename InChannel_>
 	[[nodiscard]] constexpr inline OutChannel_ colour_channel_invert(InChannel_ in_)
 	{
-		constexpr InChannel_ max_in = max_channel_intensity<InChannel_>();
+		constexpr InChannel_ max_in = colour_max_channel_intensity<InChannel_>();
 		if constexpr (std::is_same_v<OutChannel_, InChannel_>)
 		{
 			return max_in - in_;
@@ -219,7 +219,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			return get_colour_intensity_from_other_ratio<OutChannel_, InChannel_>(max_in - in_);
+			return colour_get_intensity_from_other_ratio<OutChannel_, InChannel_>(max_in - in_);
 		}
 	}
 
@@ -317,19 +317,19 @@ namespace EmuMath::Helpers
 					{
 						return OutColour_
 						(
-							wrap_colour_channel<out_channel_type, in_channel_type>(in_.R()),
-							wrap_colour_channel<out_channel_type, in_channel_type>(in_.G()),
-							wrap_colour_channel<out_channel_type, in_channel_type>(in_.B()),
-							wrap_colour_channel<out_channel_type, in_channel_type>(in_.A())
+							colour_wrap_channel<out_channel_type, in_channel_type>(in_.R()),
+							colour_wrap_channel<out_channel_type, in_channel_type>(in_.G()),
+							colour_wrap_channel<out_channel_type, in_channel_type>(in_.B()),
+							colour_wrap_channel<out_channel_type, in_channel_type>(in_.A())
 						);
 					}
 					else
 					{
 						return OutColour_
 						(
-							wrap_colour_channel<out_channel_type, in_channel_type>(in_.R()),
-							wrap_colour_channel<out_channel_type, in_channel_type>(in_.G()),
-							wrap_colour_channel<out_channel_type, in_channel_type>(in_.B()),
+							colour_wrap_channel<out_channel_type, in_channel_type>(in_.R()),
+							colour_wrap_channel<out_channel_type, in_channel_type>(in_.G()),
+							colour_wrap_channel<out_channel_type, in_channel_type>(in_.B()),
 							OutColour_::max_intensity
 						);
 					}
@@ -338,9 +338,9 @@ namespace EmuMath::Helpers
 				{
 					return OutColour_
 					(
-						wrap_colour_channel<out_channel_type, in_channel_type>(in_.R()),
-						wrap_colour_channel<out_channel_type, in_channel_type>(in_.G()),
-						wrap_colour_channel<out_channel_type, in_channel_type>(in_.B())
+						colour_wrap_channel<out_channel_type, in_channel_type>(in_.R()),
+						colour_wrap_channel<out_channel_type, in_channel_type>(in_.G()),
+						colour_wrap_channel<out_channel_type, in_channel_type>(in_.B())
 					);
 				}
 			}
@@ -367,24 +367,24 @@ namespace EmuMath::Helpers
 				{
 					if constexpr (InColour_::contains_alpha)
 					{
-						out_.R(wrap_colour_channel<out_channel_type, in_channel_type>(in_.R()));
-						out_.G(wrap_colour_channel<out_channel_type, in_channel_type>(in_.G()));
-						out_.B(wrap_colour_channel<out_channel_type, in_channel_type>(in_.B()));
-						out_.A(wrap_colour_channel<out_channel_type, in_channel_type>(in_.A()));
+						out_.R(colour_wrap_channel<out_channel_type, in_channel_type>(in_.R()));
+						out_.G(colour_wrap_channel<out_channel_type, in_channel_type>(in_.G()));
+						out_.B(colour_wrap_channel<out_channel_type, in_channel_type>(in_.B()));
+						out_.A(colour_wrap_channel<out_channel_type, in_channel_type>(in_.A()));
 					}
 					else
 					{
-						out_.R(wrap_colour_channel<out_channel_type, in_channel_type>(in_.R()));
-						out_.G(wrap_colour_channel<out_channel_type, in_channel_type>(in_.G()));
-						out_.B(wrap_colour_channel<out_channel_type, in_channel_type>(in_.B()));
+						out_.R(colour_wrap_channel<out_channel_type, in_channel_type>(in_.R()));
+						out_.G(colour_wrap_channel<out_channel_type, in_channel_type>(in_.G()));
+						out_.B(colour_wrap_channel<out_channel_type, in_channel_type>(in_.B()));
 						out_.A(OutColour_::max_intensity);
 					}
 				}
 				else
 				{
-					out_.R(wrap_colour_channel<out_channel_type, in_channel_type>(in_.R()));
-					out_.G(wrap_colour_channel<out_channel_type, in_channel_type>(in_.G()));
-					out_.B(wrap_colour_channel<out_channel_type, in_channel_type>(in_.B()));
+					out_.R(colour_wrap_channel<out_channel_type, in_channel_type>(in_.R()));
+					out_.G(colour_wrap_channel<out_channel_type, in_channel_type>(in_.G()));
+					out_.B(colour_wrap_channel<out_channel_type, in_channel_type>(in_.B()));
 				}
 				return out_;
 			}
@@ -414,19 +414,19 @@ namespace EmuMath::Helpers
 					{
 						return OutColour_
 						(
-							clamp_colour_channel<out_channel_type, in_channel_type>(in_.R()),
-							clamp_colour_channel<out_channel_type, in_channel_type>(in_.G()),
-							clamp_colour_channel<out_channel_type, in_channel_type>(in_.B()),
-							clamp_colour_channel<out_channel_type, in_channel_type>(in_.A())
+							colour_clamp_channel<out_channel_type, in_channel_type>(in_.R()),
+							colour_clamp_channel<out_channel_type, in_channel_type>(in_.G()),
+							colour_clamp_channel<out_channel_type, in_channel_type>(in_.B()),
+							colour_clamp_channel<out_channel_type, in_channel_type>(in_.A())
 						);
 					}
 					else
 					{
 						return OutColour_
 						(
-							clamp_colour_channel<out_channel_type, in_channel_type>(in_.R()),
-							clamp_colour_channel<out_channel_type, in_channel_type>(in_.G()),
-							clamp_colour_channel<out_channel_type, in_channel_type>(in_.B()),
+							colour_clamp_channel<out_channel_type, in_channel_type>(in_.R()),
+							colour_clamp_channel<out_channel_type, in_channel_type>(in_.G()),
+							colour_clamp_channel<out_channel_type, in_channel_type>(in_.B()),
 							OutColour_::max_intensity
 						);
 					}
@@ -435,9 +435,9 @@ namespace EmuMath::Helpers
 				{
 					return OutColour_
 					(
-						clamp_colour_channel<out_channel_type, in_channel_type>(in_.R()),
-						clamp_colour_channel<out_channel_type, in_channel_type>(in_.G()),
-						clamp_colour_channel<out_channel_type, in_channel_type>(in_.B())
+						colour_clamp_channel<out_channel_type, in_channel_type>(in_.R()),
+						colour_clamp_channel<out_channel_type, in_channel_type>(in_.G()),
+						colour_clamp_channel<out_channel_type, in_channel_type>(in_.B())
 					);
 				}
 			}
@@ -464,24 +464,24 @@ namespace EmuMath::Helpers
 				{
 					if constexpr (InColour_::contains_alpha)
 					{
-						out_.R(clamp_colour_channel<out_channel_type, in_channel_type>(in_.R()));
-						out_.G(clamp_colour_channel<out_channel_type, in_channel_type>(in_.G()));
-						out_.B(clamp_colour_channel<out_channel_type, in_channel_type>(in_.B()));
-						out_.A(clamp_colour_channel<out_channel_type, in_channel_type>(in_.A()));
+						out_.R(colour_clamp_channel<out_channel_type, in_channel_type>(in_.R()));
+						out_.G(colour_clamp_channel<out_channel_type, in_channel_type>(in_.G()));
+						out_.B(colour_clamp_channel<out_channel_type, in_channel_type>(in_.B()));
+						out_.A(colour_clamp_channel<out_channel_type, in_channel_type>(in_.A()));
 					}
 					else
 					{
-						out_.R(clamp_colour_channel<out_channel_type, in_channel_type>(in_.R()));
-						out_.G(clamp_colour_channel<out_channel_type, in_channel_type>(in_.G()));
-						out_.B(clamp_colour_channel<out_channel_type, in_channel_type>(in_.B()));
+						out_.R(colour_clamp_channel<out_channel_type, in_channel_type>(in_.R()));
+						out_.G(colour_clamp_channel<out_channel_type, in_channel_type>(in_.G()));
+						out_.B(colour_clamp_channel<out_channel_type, in_channel_type>(in_.B()));
 						out_.A(OutColour_::max_intensity);
 					}
 				}
 				else
 				{
-					out_.R(clamp_colour_channel<out_channel_type, in_channel_type>(in_.R()));
-					out_.G(clamp_colour_channel<out_channel_type, in_channel_type>(in_.G()));
-					out_.B(clamp_colour_channel<out_channel_type, in_channel_type>(in_.B()));
+					out_.R(colour_clamp_channel<out_channel_type, in_channel_type>(in_.R()));
+					out_.G(colour_clamp_channel<out_channel_type, in_channel_type>(in_.G()));
+					out_.B(colour_clamp_channel<out_channel_type, in_channel_type>(in_.B()));
 				}
 				return out_;
 			}

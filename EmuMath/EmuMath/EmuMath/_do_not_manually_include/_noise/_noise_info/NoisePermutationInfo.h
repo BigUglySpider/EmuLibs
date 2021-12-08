@@ -5,7 +5,7 @@
 
 namespace EmuMath::Info
 {
-	/// <summary> Simple enum for identifying a shuffle type to perform for noise permutation arrays. </summary>
+	/// <summary> Simple enum for identifying a shuffle type to perform for noise permutation arrays, for use with EmuMath::Info::NoisePermutationInfo. </summary>
 	enum class NoisePermutationShuffleMode : std::uint8_t
 	{
 		BOOL_INPUT = 0x00,
@@ -115,7 +115,7 @@ namespace EmuMath::Info
 			target_num_permutations = TargetCountToPowerOf2();
 		}
 
-		EmuMath::NoisePermutations MakePermutations() const
+		[[nodiscard]] inline EmuMath::NoisePermutations MakePermutations() const
 		{
 			switch (EmuMath::Info::validate_noise_permutation_shuffle_mode(shuffle_mode))
 			{

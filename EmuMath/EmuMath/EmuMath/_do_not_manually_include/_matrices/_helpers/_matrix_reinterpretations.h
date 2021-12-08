@@ -11,7 +11,7 @@ namespace EmuMath::Helpers
 	/// <para> Converts the passed EmuMath vector to an EmuMath matrix as though it represents a single column. </para>
 	/// <para>
 	///		The vector data will be stored as columns regardless of the ColumnMajor_ argument. 
-	///		To store the vector as a row matrix instead, use VectorToRowMatrix.
+	///		To store the vector as a row matrix instead, use vector_to_row_matrix.
 	/// </para>
 	/// </summary>
 	/// <typeparam name="Vector_">Type of EmuMath vector to convert to a column matrix.</typeparam>
@@ -19,7 +19,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to convert to a column matrix.</param>
 	/// <returns>Column matrix containing a copy of the passed vector's data. The matrix will be a single column which contains the full data of the passed vector.</returns>
 	template<typename out_contained_type, bool ColumnMajor_ = true, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<1, Vector_::size, out_contained_type, ColumnMajor_> VectorToColumnMatrix(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<1, Vector_::size, out_contained_type, ColumnMajor_> vector_to_column_matrix(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -34,16 +34,16 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<bool ColumnMajor_ = true, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<1, Vector_::size, typename Vector_::value_type, ColumnMajor_> VectorToColumnMatrix(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<1, Vector_::size, typename Vector_::value_type, ColumnMajor_> vector_to_column_matrix(const Vector_& vector_)
 	{
-		return VectorToColumnMatrix<typename Vector_::value_type, ColumnMajor_, Vector_>(vector_);
+		return vector_to_column_matrix<typename Vector_::value_type, ColumnMajor_, Vector_>(vector_);
 	}
 
 	/// <summary>
 	/// <para> Converts the passed EmuMath vector to an EmuMath matrix as though it represents a single row. </para>
 	/// <para>
 	///		The vector data will be stored as rows regardless of the ColumnMajor_ argument. 
-	///		To store the vector as a column matrix instead, use VectorToColumnMatrix.
+	///		To store the vector as a column matrix instead, use vector_to_column_matrix.
 	/// </para>
 	/// </summary>
 	/// <typeparam name="Vector_">Type of EmuMath vector to convert to a row matrix.</typeparam>
@@ -51,7 +51,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to convert to a row matrix.</param>
 	/// <returns>Row matrix containing a copy of the passed vector's data. The matrix will be a single row which contains the full data of the passed vector.</returns>
 	template<typename out_contained_type, bool ColumnMajor_ = true, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<Vector_::size, 1, out_contained_type, ColumnMajor_> VectorToRowMatrix(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Vector_::size, 1, out_contained_type, ColumnMajor_> vector_to_row_matrix(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -66,9 +66,9 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<bool ColumnMajor_ = true, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<Vector_::size, 1, typename Vector_::value_type, ColumnMajor_> VectorToRowMatrix(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Vector_::size, 1, typename Vector_::value_type, ColumnMajor_> vector_to_row_matrix(const Vector_& vector_)
 	{
-		return VectorToRowMatrix<typename Vector_::value_type, ColumnMajor_, Vector_>(vector_);
+		return vector_to_row_matrix<typename Vector_::value_type, ColumnMajor_, Vector_>(vector_);
 	}
 
 	/// <summary>
@@ -81,7 +81,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to prepare for transformation.</param>
 	/// <returns>Copy of the provided vector_, with one additional element appended to the end set to 1.</returns>
 	template<typename out_contained_type, class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size + 1, out_contained_type> VectorPrepareToTransform(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size + 1, out_contained_type> vector_prepare_to_transform(const Vector_& vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
@@ -95,9 +95,9 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class Vector_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size + 1, typename Vector_::value_type> VectorPrepareToTransform(const Vector_& vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Vector_::size + 1, typename Vector_::value_type> vector_prepare_to_transform(const Vector_& vector_)
 	{
-		return VectorPrepareToTransform<typename Vector_::value_type, Vector_>(vector_);
+		return vector_prepare_to_transform<typename Vector_::value_type, Vector_>(vector_);
 	}
 
 	/// <summary>
@@ -112,7 +112,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">Matrix to cast into the desired matrix type.</param>
 	/// <returns>Copy of the passed matrix cast to a matrix with the desired template arguments on instantiation.</returns>
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class Matrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> MatrixAs(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, OutColumnMajor_> matrix_as(const Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
@@ -128,34 +128,34 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> MatrixAs(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_> matrix_as(const Matrix_& matrix_)
 	{
-		return MatrixAs<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_, Matrix_>(matrix_);
+		return matrix_as<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, OutColumnMajor_, Matrix_>(matrix_);
 	}
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, class Matrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> MatrixAs(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_> matrix_as(const Matrix_& matrix_)
 	{
-		return MatrixAs<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+		return matrix_as<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
 	}
 	template<bool OutColumnMajor_, class Matrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> MatrixAs(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_> matrix_as(const Matrix_& matrix_)
 	{
-		return MatrixAs<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
+		return matrix_as<Matrix_::num_columns, Matrix_::num_rows, typename Matrix_::value_type, OutColumnMajor_, Matrix_>(matrix_);
 	}
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, class Matrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> MatrixAs(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major> matrix_as(const Matrix_& matrix_)
 	{
-		return MatrixAs<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+		return matrix_as<OutNumColumns_, OutNumRows_, out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 	template<typename out_contained_type, class Matrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> MatrixAs(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major> matrix_as(const Matrix_& matrix_)
 	{
-		return MatrixAs<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
+		return matrix_as<Matrix_::num_columns, Matrix_::num_rows, out_contained_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, class Matrix_>
-	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> MatrixAs(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major> matrix_as(const Matrix_& matrix_)
 	{
-		return MatrixAs<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
+		return matrix_as<OutNumColumns_, OutNumRows_, typename Matrix_::value_type, Matrix_::is_column_major, Matrix_>(matrix_);
 	}
 #pragma endregion
 }

@@ -27,11 +27,11 @@ namespace EmuCore
 		{
 			if constexpr
 			(
-				EmuCore::TMPHelpers::is_any_floating_point_v<A_, B_, T_> &&
-				!EmuCore::TMPHelpers::are_all_comparisons_true<std::is_same, A_, B_, T_>::value
+				EmuCore::TMP::is_any_floating_point_v<A_, B_, T_> &&
+				!EmuCore::TMP::are_all_comparisons_true<std::is_same, A_, B_, T_>::value
 			)
 			{
-				using floating_point = typename EmuCore::TMPHelpers::largest_floating_point<A_, B_, T_>::type;
+				using floating_point = typename EmuCore::TMP::largest_floating_point<A_, B_, T_>::type;
 				floating_point a_cast_ = static_cast<floating_point>(a_);
 				return a_cast_ + ((static_cast<floating_point>(b_) - a_cast_) * static_cast<floating_point>(t_));
 			}
@@ -467,7 +467,7 @@ namespace EmuCore
 	template<typename T_>
 	struct do_cos
 	{
-		using out_t = typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type;
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
 		constexpr do_cos()
 		{
 		}
@@ -492,7 +492,7 @@ namespace EmuCore
 	template<typename T_>
 	struct do_acos
 	{
-		using out_t = typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type;
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
 		constexpr do_acos()
 		{
 		}
@@ -517,7 +517,7 @@ namespace EmuCore
 	template<typename T_>
 	struct do_sin
 	{
-		using out_t = typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type;
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
 		constexpr do_sin()
 		{
 		}
@@ -542,7 +542,7 @@ namespace EmuCore
 	template<typename T_>
 	struct do_asin
 	{
-		using out_t = typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type;
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
 		constexpr do_asin()
 		{
 		}
@@ -567,7 +567,7 @@ namespace EmuCore
 	template<typename T_>
 	struct do_tan
 	{
-		using out_t = typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type;
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
 		constexpr do_tan()
 		{
 		}
@@ -592,7 +592,7 @@ namespace EmuCore
 	template<typename T_>
 	struct do_atan
 	{
-		using out_t = typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type;
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
 		constexpr do_atan()
 		{
 		}
@@ -741,7 +741,7 @@ namespace EmuCore
 		using out_t = std::conditional_t
 		<
 			std::is_arithmetic_v<T_>,
-			EmuCore::TMPHelpers::first_floating_point_t<T_, float>,
+			EmuCore::TMP::first_floating_point_t<T_, float>,
 			T_
 		>;
 		static constexpr out_t full_circle = EmuCore::Pi::DegsToRads_v<out_t, int, 360>;
@@ -830,7 +830,7 @@ namespace EmuCore
 		using out_t = std::conditional_t
 		<
 			std::is_arithmetic_v<T_>,
-			EmuCore::TMPHelpers::first_floating_point_t<T_, float>,
+			EmuCore::TMP::first_floating_point_t<T_, float>,
 			T_
 		>;
 		static constexpr out_t full_circle = EmuCore::Pi::DegsToRads_v<out_t, int, 360>;
@@ -921,7 +921,7 @@ namespace EmuCore
 		using out_t = std::conditional_t
 		<
 			std::is_arithmetic_v<T_>,
-			EmuCore::TMPHelpers::first_floating_point_t<T_, float>,
+			EmuCore::TMP::first_floating_point_t<T_, float>,
 			T_
 		>;
 		static constexpr out_t full_circle = EmuCore::Pi::DegsToRads_v<out_t, int, 360>;

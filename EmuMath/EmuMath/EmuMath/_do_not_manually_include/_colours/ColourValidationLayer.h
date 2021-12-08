@@ -42,8 +42,9 @@ namespace EmuMath::Helpers
 		/// <para> Private constructor which can be used to move an underlying_colour without performing validation. </para>
 		/// <para> Only for use in functions returning this_type where it is guaranteed that the output colour will be in a valid state without validation. </para>
 		/// </summary>
-		template<typename Dummy_>
-		constexpr _colour_validation_layer(underlying_colour&& safe_colour_to_set_, Dummy_&& dummy_arg_) noexcept : colour(safe_colour_to_set_)
+		template<typename Dummy_, typename = std::enable_if_t<std::is_move_constructible_v<underlying_colour>>>
+		constexpr _colour_validation_layer(underlying_colour&& safe_colour_to_set_, Dummy_&& dummy_arg_) noexcept : 
+			colour(std::forward<underlying_colour>(safe_colour_to_set_))
 		{
 		}
 
@@ -156,7 +157,7 @@ namespace EmuMath::Helpers
 		/// <param name="r_">Value to initiaalise this colour's Red channel via.</param>
 		/// <param name="g_">Value to initiaalise this colour's Green channel via.</param>
 		/// <param name="b_">Value to initiaalise this colour's Blue channel via.</param>
-		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMPHelpers::are_all_convertible_v<value_type, R_, G_, B_>>>
+		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMP::are_all_convertible_v<value_type, R_, G_, B_>>>
 		constexpr _colour_validation_layer(R_&& r_, G_&& g_, B_&& b_) : colour(r_, g_, b_)
 		{
 			validate_func()(colour);
@@ -179,7 +180,7 @@ namespace EmuMath::Helpers
 			typename G_,
 			typename B_,
 			typename A_,
-			typename OnlyAvailableWith4Channels_ = std::enable_if_t<EmuCore::TMPHelpers::are_all_convertible_v<value_type, R_, G_, B_, A_> && contains_alpha>
+			typename OnlyAvailableWith4Channels_ = std::enable_if_t<EmuCore::TMP::are_all_convertible_v<value_type, R_, G_, B_, A_> && contains_alpha>
 		>
 		constexpr _colour_validation_layer(R_&& r_, G_&& g_, B_&& b_, A_&& a_) : colour(r_, g_, b_, a_)
 		{
@@ -196,7 +197,7 @@ namespace EmuMath::Helpers
 			typename ToCopyChannel_,
 			bool ToCopyContainsAlpha_,
 			typename A_,
-			typename OnlyAvailableWith4Channels_ = std::enable_if_t<contains_alpha && EmuCore::TMPHelpers::are_all_convertible_v<value_type, ToCopyChannel_, A_>>
+			typename OnlyAvailableWith4Channels_ = std::enable_if_t<contains_alpha && EmuCore::TMP::are_all_convertible_v<value_type, ToCopyChannel_, A_>>
 		>
 		constexpr _colour_validation_layer(const EmuMath::Colour<ToCopyChannel_, ToCopyContainsAlpha_>& to_copy_rgb_, A_&& a_) : colour(to_copy_rgb_, a_)
 		{
@@ -298,7 +299,7 @@ namespace EmuMath::Helpers
 		/// <param name="g_">Value to set this colour's Green channel to. This will not be modified.</param>
 		/// <param name="b_">Value to set this colour's Blue channel to. This will not be modified.</param>
 		/// <returns>Reference to this colour.</returns>
-		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMPHelpers::are_all_convertible_v<value_type, R_, G_, B_>>>
+		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMP::are_all_convertible_v<value_type, R_, G_, B_>>>
 		constexpr inline this_type& Set(R_&& r_, G_&& g_, B_&& b_)
 		{
 			validate_func validate_ = validate_func();
@@ -322,7 +323,7 @@ namespace EmuMath::Helpers
 			typename G_,
 			typename B_,
 			typename A_,
-			typename MayOnlyModifyAlphaIfContained_ = std::enable_if_t<EmuCore::TMPHelpers::are_all_convertible_v<value_type, R_, G_, B_, A_> && contains_alpha>
+			typename MayOnlyModifyAlphaIfContained_ = std::enable_if_t<EmuCore::TMP::are_all_convertible_v<value_type, R_, G_, B_, A_> && contains_alpha>
 		>
 		constexpr inline this_type& Set(R_&& r_, G_&& g_, B_&& b_, A_&& a_)
 		{

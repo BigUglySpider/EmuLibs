@@ -57,7 +57,7 @@ namespace EmuMath
 		template<typename R_, typename G_, typename B_>
 		[[nodiscard]] static constexpr inline channels_vector _make_colour(R_&& r_, G_&& g_, B_&& b_)
 		{
-			if constexpr (EmuCore::TMPHelpers::are_all_convertible_v<value_type, R_, G_, B_>)
+			if constexpr (EmuCore::TMP::are_all_convertible_v<value_type, R_, G_, B_>)
 			{
 				if constexpr (contains_alpha)
 				{
@@ -79,8 +79,8 @@ namespace EmuMath
 			using check_type = std::conditional_t
 			<
 				contains_alpha,
-				EmuCore::TMPHelpers::are_all_convertible<value_type, R_, G_, B_, A_>,
-				EmuCore::TMPHelpers::are_all_convertible<value_type, R_, G_, B_>
+				EmuCore::TMP::are_all_convertible<value_type, R_, G_, B_, A_>,
+				EmuCore::TMP::are_all_convertible<value_type, R_, G_, B_>
 			>;
 			if constexpr (check_type::value)
 			{
@@ -133,19 +133,19 @@ namespace EmuMath
 					{
 						return channels_vector
 						(
-							EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<0>()),
-							EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<1>()),
-							EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<2>()),
-							EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<3>())
+							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<0>()),
+							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<1>()),
+							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<2>()),
+							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<3>())
 						);
 					}
 					else
 					{
 						return channels_vector
 						(
-							EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<0>()),
-							EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<1>()),
-							EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<2>()),
+							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<0>()),
+							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<1>()),
+							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<2>()),
 							max_intensity
 						);
 					}
@@ -154,9 +154,9 @@ namespace EmuMath
 				{
 					return channels_vector
 					(
-						EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<0>()),
-						EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<1>()),
-						EmuMath::Helpers::convert_colour_channel<value_type, RhsT_>(rhs_.channels.at<2>())
+						EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<0>()),
+						EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<1>()),
+						EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<2>())
 					);
 				}
 			}
@@ -191,9 +191,9 @@ namespace EmuMath
 						// --- and we know there is no <3> element, we need to manually give max_intensity for the alpha
 						return channels_vector
 						(
-							EmuMath::Helpers::VectorGetTheoretical<0>(channels_to_copy_),
-							EmuMath::Helpers::VectorGetTheoretical<1>(channels_to_copy_),
-							EmuMath::Helpers::VectorGetTheoretical<2>(channels_to_copy_),
+							EmuMath::Helpers::vector_get_theoretical<0>(channels_to_copy_),
+							EmuMath::Helpers::vector_get_theoretical<1>(channels_to_copy_),
+							EmuMath::Helpers::vector_get_theoretical<2>(channels_to_copy_),
 							max_intensity
 						);
 					}
@@ -202,9 +202,9 @@ namespace EmuMath
 				{
 					return channels_vector
 					(
-						EmuMath::Helpers::VectorGetTheoretical<0>(channels_to_copy_),
-						EmuMath::Helpers::VectorGetTheoretical<1>(channels_to_copy_),
-						EmuMath::Helpers::VectorGetTheoretical<2>(channels_to_copy_)
+						EmuMath::Helpers::vector_get_theoretical<0>(channels_to_copy_),
+						EmuMath::Helpers::vector_get_theoretical<1>(channels_to_copy_),
+						EmuMath::Helpers::vector_get_theoretical<2>(channels_to_copy_)
 					);
 				}
 			}
@@ -287,7 +287,7 @@ namespace EmuMath
 		/// <param name="r_">Value to initiaalise this colour's Red channel via.</param>
 		/// <param name="g_">Value to initiaalise this colour's Green channel via.</param>
 		/// <param name="b_">Value to initiaalise this colour's Blue channel via.</param>
-		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMPHelpers::are_all_convertible_v<value_type, R_, G_, B_>>>
+		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMP::are_all_convertible_v<value_type, R_, G_, B_>>>
 		constexpr Colour(R_&& r_, G_&& g_, B_&& b_) : channels(_make_colour(r_, g_, b_))
 		{
 		}
@@ -309,7 +309,7 @@ namespace EmuMath
 			typename G_,
 			typename B_,
 			typename A_,
-			typename OnlyAvailableWith4Channels_ = std::enable_if_t<EmuCore::TMPHelpers::are_all_convertible_v<value_type, R_, G_, B_, A_> && contains_alpha>
+			typename OnlyAvailableWith4Channels_ = std::enable_if_t<EmuCore::TMP::are_all_convertible_v<value_type, R_, G_, B_, A_> && contains_alpha>
 		>
 		constexpr Colour(R_&& r_, G_&& g_, B_&& b_, A_&& a_) : channels(_make_colour(r_, g_, b_, a_))
 		{
@@ -325,14 +325,14 @@ namespace EmuMath
 			typename ToCopyChannel_,
 			bool ToCopyContainsAlpha_,
 			typename A_,
-			typename OnlyAvailableWith4Channels_ = std::enable_if_t<contains_alpha && EmuCore::TMPHelpers::are_all_convertible_v<value_type, ToCopyChannel_, A_>>
+			typename OnlyAvailableWith4Channels_ = std::enable_if_t<contains_alpha && EmuCore::TMP::are_all_convertible_v<value_type, ToCopyChannel_, A_>>
 		>
 		constexpr Colour(const EmuMath::Colour<ToCopyChannel_, ToCopyContainsAlpha_>& to_copy_rgb_, A_&& a_) :
 			channels
 			(
-				EmuMath::Helpers::convert_colour_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<0>()),
-				EmuMath::Helpers::convert_colour_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<1>()),
-				EmuMath::Helpers::convert_colour_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<2>()),
+				EmuMath::Helpers::colour_convert_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<0>()),
+				EmuMath::Helpers::colour_convert_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<1>()),
+				EmuMath::Helpers::colour_convert_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<2>()),
 				static_cast<value_type>(a_)
 			)
 		{
@@ -447,7 +447,7 @@ namespace EmuMath
 		/// <param name="g_">Value to set this colour's Green channel to. This will not be modified.</param>
 		/// <param name="b_">Value to set this colour's Blue channel to. This will not be modified.</param>
 		/// <returns>Reference to this colour.</returns>
-		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMPHelpers::are_all_convertible_v<value_type, R_, G_, B_>>>
+		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMP::are_all_convertible_v<value_type, R_, G_, B_>>>
 		constexpr inline this_type& Set(R_&& r_, G_&& g_, B_&& b_)
 		{
 			R(r_);
@@ -470,7 +470,7 @@ namespace EmuMath
 			typename G_,
 			typename B_,
 			typename A_,
-			typename MayOnlyModifyAlphaIfContained_ = std::enable_if_t<EmuCore::TMPHelpers::are_all_convertible_v<value_type, R_, G_, B_, A_> && contains_alpha>
+			typename MayOnlyModifyAlphaIfContained_ = std::enable_if_t<EmuCore::TMP::are_all_convertible_v<value_type, R_, G_, B_, A_> && contains_alpha>
 		>
 		constexpr inline this_type& Set(R_&& r_, G_&& g_, B_&& b_, A_&& a_)
 		{
@@ -954,7 +954,7 @@ std::ostream& operator<<(std::ostream& str_, const EmuMath::Colour<T_, ContainsA
 {
 	using unqualified_channel_type = std::remove_reference_t<std::remove_cv_t<T_>>;
 	str_ << "{ ";
-	if constexpr (EmuCore::TMPHelpers::is_any_same_v<unqualified_channel_type, std::uint8_t, std::int8_t>)
+	if constexpr (EmuCore::TMP::is_any_same_v<unqualified_channel_type, std::uint8_t, std::int8_t>)
 	{
 		str_ << (+colour_.R()) << ", " << (+colour_.G()) << ", " << (+colour_.B());
 		if constexpr (ContainsAlpha_)
@@ -979,7 +979,7 @@ std::wostream& operator<<(std::wostream& str_, const EmuMath::Colour<T_, Contain
 {
 	using unqualified_channel_type = std::remove_reference_t<std::remove_cv_t<T_>>;
 	str_ << L"{ ";
-	if constexpr (EmuCore::TMPHelpers::is_any_same_v<unqualified_channel_type, std::uint8_t, std::int8_t>)
+	if constexpr (EmuCore::TMP::is_any_same_v<unqualified_channel_type, std::uint8_t, std::int8_t>)
 	{
 		str_ << (+colour_.R()) << L", " << (+colour_.G()) << L", " << (+colour_.B());
 		if constexpr (ContainsAlpha_)

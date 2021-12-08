@@ -46,7 +46,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 	template<std::size_t NumIterations_, typename Fov_, typename Out_>
 	[[nodiscard]] constexpr inline Out_ _calculate_basic_perspective_fov_scale_rads(const Fov_& fov_rads_)
 	{
-		using floating_point = EmuCore::TMPHelpers::first_floating_point_t<Fov_, Out_, float>;
+		using floating_point = EmuCore::TMP::first_floating_point_t<Fov_, Out_, float>;
 		constexpr floating_point one_ = floating_point(1);
 		constexpr floating_point half_ = floating_point(0.5);
 
@@ -127,7 +127,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		}
 		else
 		{
-			using floating_point = EmuCore::TMPHelpers::first_floating_point_t<Out_, AspectRatio_, Scale_, float>;
+			using floating_point = EmuCore::TMP::first_floating_point_t<Out_, AspectRatio_, Scale_, float>;
 			return static_cast<Out_>
 			(
 				EmuCore::do_multiply<floating_point, floating_point>()
