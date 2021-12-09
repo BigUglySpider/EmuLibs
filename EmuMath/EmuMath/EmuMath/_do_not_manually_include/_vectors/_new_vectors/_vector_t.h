@@ -47,6 +47,12 @@ namespace EmuMath
 		}
 
 		template<std::size_t OtherSize_, typename OtherT_>
+		[[nodiscard]] static constexpr inline bool valid_template_vector_const_copy_construct_arg()
+		{
+			return vector_info::template valid_template_vector_const_copy_construct_arg<OtherSize_, OtherT_>();
+		}
+
+		template<std::size_t OtherSize_, typename OtherT_>
 		[[nodiscard]] static constexpr inline bool valid_template_vector_move_construct_arg()
 		{
 			return vector_info::template valid_template_vector_move_construct_arg<OtherSize_, OtherT_>();
@@ -69,6 +75,12 @@ namespace EmuMath
 		{
 			return vector_info::template is_valid_type_for_set_all<T_>();
 		}
+
+	private:
+		struct _dummy_arg_for_private_lazy_default
+		{
+			constexpr inline _dummy_arg_for_private_lazy_default() {}
+		};
 #pragma endregion
 
 #pragma region CONSTRUCTORS
@@ -85,7 +97,9 @@ namespace EmuMath
 		/// <summary>
 		/// <para> Constructs a copy of the passed non-const Vector reference. </para>
 		/// </summary>
-		/// <param name="to_copy_">Non-const reference to a Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.</param>
+		/// <param name="to_copy_">
+		///		: Non-const reference to an EmuMath Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.
+		/// </param>
 		constexpr inline NewVector(this_type& to_copy_) : _data(to_copy_._data)
 		{
 		}
@@ -94,7 +108,9 @@ namespace EmuMath
 		/// <para> Constructs a copy of the passed const Vector reference. </para>
 		/// <para> This is only avaialble for Vectors which do not contain non-const references. </para>
 		/// </summary>
-		/// <param name="to_copy_">Const reference to a Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.</param>
+		/// <param name="to_copy_">
+		///		: Const reference to an EmuMath Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.
+		/// </param>
 		template<typename = std::enable_if_t<!contains_non_const_ref>>
 		constexpr inline NewVector(const this_type& to_copy_) : _data(to_copy_._data)
 		{
@@ -103,7 +119,7 @@ namespace EmuMath
 		/// <summary>
 		/// <para> Moves the data of the passed Vector reference into a newly constructed Vector. </para>
 		/// </summary>
-		/// <param name="to_move_">Vector to move into the newly constructed vector.</param>
+		/// <param name="to_move_">: Vector to move into the newly constructed vector.</param>
 		constexpr inline NewVector(this_type&& to_move_) noexcept : _data(std::move(to_move_._data))
 		{
 		}
@@ -116,7 +132,9 @@ namespace EmuMath
 		/// <para> This is only available for reference-containing Vectors, where has_alternative_representation is true. </para>
 		/// <para> If this construction method is invalid, the input type for this constructor will be std::false_type. </para>
 		/// </summary>
-		/// <param name="to_copy_">Non-const reference to a Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.</param>
+		/// <param name="to_copy_">
+		///		: Non-const reference to an EmuMath Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.
+		/// </param>
 		template<typename OnlyIfAlternativeRepExists_ = std::enable_if_t<has_alternative_representation>>
 		constexpr inline NewVector(alternative_rep& to_copy_) : _data(to_copy_._data)
 		{
@@ -130,7 +148,9 @@ namespace EmuMath
 		/// <para> This is only available for const-reference-containing Vectors, where has_alternative_representation is true. </para>
 		/// <para> If there is no alternative representation, the input type for this constructor will be std::false_type. </para>
 		/// </summary>
-		/// <param name="to_copy_">Non-const reference to a Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.</param>
+		/// <param name="to_copy_">
+		///		: Const reference to an EmuMath Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.
+		/// </param>
 		template<typename OnlyIfAlternativeRepExists_ = std::enable_if_t<has_alternative_representation && !contains_non_const_ref>>
 		constexpr inline NewVector(const alternative_rep& to_copy_) : _data(to_copy_._data)
 		{
@@ -144,7 +164,7 @@ namespace EmuMath
 		/// <para> This is only available for reference-containing Vectors, where has_alternative_representation is true. </para>
 		/// <para> If there is no alternative representation, the input type for this constructor will be std::false_type. </para>
 		/// </summary>
-		/// <param name="to_move_">Vector to move into the newly constructed vector.</param>
+		/// <param name="to_move_">: EmuMath Vector to move into the newly constructed vector.</param>
 		template<typename OnlyIfAlternativeRepExists_ = std::enable_if_t<has_alternative_representation>>
 		constexpr inline NewVector(alternative_rep&& to_move_) noexcept : _data(std::move(to_move_._data))
 		{
@@ -157,8 +177,8 @@ namespace EmuMath
 		/// <para> Provided arguments represent elements in order from index 0 to the final index (e.g. 0, 1, 2...n-1 in a vector of size n). </para>
 		/// </summary>
 		/// <typeparam name="ConstructionArgs_">Types of all provided arguments provided for construction.</typeparam>
-		/// <param name="construction_args_">
-		///		Ordered arguments representing respective elements within the constructed Vector, used to construct their respective element.
+		/// <param name="construction_args_"> 
+		///		: Ordered arguments representing respective elements within the constructed Vector, used to construct their respective element.
 		/// </param>
 		template
 		<
@@ -170,17 +190,83 @@ namespace EmuMath
 		{
 		}
 
+		/// <summary>
+		/// <para> Constructs this Vector as a copy of the provided EmuMath Vector. </para>
+		/// <para> If this Vector contains more elements than the passed Vector to_copy_, non-contained elements will be interpreted as implied zeroes. </para>
+		/// <para> If this Vector contains references, the passed Vector to_copy_ must contain at least as many elements as this Vector. </para>
+		/// </summary>
+		/// <param name="to_copy_">: Non-constant reference to an EmuMath Vector to copy into the newly constructed Vector.</param>
 		template
 		<
 			std::size_t OtherSize_,
 			typename OtherT_,
-			typename = std::enable_if_t<valid_template_vector_copy_construct_arg<OtherSize_, OtherT_>() && !contains_non_const_ref>
+			typename = std::enable_if_t<valid_template_vector_copy_construct_arg<OtherSize_, OtherT_>()>
 		>
-		explicit constexpr inline NewVector(const EmuMath::NewVector<OtherSize_, OtherT_>& to_copy_) : NewVector()
+		explicit constexpr inline NewVector(EmuMath::NewVector<OtherSize_, OtherT_>& to_copy_) : NewVector(_dummy_arg_for_private_lazy_default())
 		{
 			EmuMath::Helpers::new_vector_set(*this, to_copy_);
 		}
 
+		/// <summary>
+		/// <para> Constructs this Vector as a copy of the provided EmuMath Vector. </para>
+		/// <para> If this Vector contains more elements than the passed Vector to_copy_, non-contained elements will be interpreted as implied zeroes. </para>
+		/// <para> If this Vector contains references, the passed Vector to_copy_ must contain at least as many elements as this Vector. </para>
+		/// <para> This constructor is not available for Vectors which contain non-const references.</para>
+		/// </summary>
+		/// <param name="to_copy_">: Constant reference to an EmuMath Vector to copy into the newly constructed Vector.</param>
+		template
+		<
+			std::size_t OtherSize_,
+			typename OtherT_,
+			typename = std::enable_if_t<valid_template_vector_const_copy_construct_arg<OtherSize_, OtherT_>() && !contains_non_const_ref>
+		>
+		explicit constexpr inline NewVector(const EmuMath::NewVector<OtherSize_, OtherT_>& to_copy_) : NewVector(_dummy_arg_for_private_lazy_default())
+		{
+			EmuMath::Helpers::new_vector_set(*this, to_copy_);
+		}
+
+		/// <summary>
+		/// <para> Constructs this Vector as a copy of the provided EmuMath Vector, which attempts to move its contained elements. </para>
+		/// <para> If this Vector contains more elements than the passed Vector to_move_, non-contained elements will be interpreted as implied zeroes. </para>
+		/// <para> If this Vector contains references, the passed Vector to_move_ must contain at least as many elements as this Vector. </para>
+		/// <para> This constructor is not available for Vectors which contain non-const references. </para>
+		/// </summary>
+		/// <param name="to_move_">: rvalue reference to an EmuMath Vector to copy into the newly constructed Vector, with attempts to move used elements.</param>
+		template
+		<
+			std::size_t OtherSize_,
+			typename OtherT_,
+			typename = std::enable_if_t<valid_template_vector_move_construct_arg<OtherSize_, OtherT_>()>
+		>
+		explicit constexpr inline NewVector(EmuMath::NewVector<OtherSize_, OtherT_>&& to_move_) : NewVector(_dummy_arg_for_private_lazy_default())
+		{
+			// Checks are here so that temporaries aren't resolved to the const copy constructor
+			// --- This comes with the unfortunate effect that this constructor may appear usable in TMP in situations where it is not
+			// ------ This is, however, considered better than allowing silent dangling references to form
+			if constexpr (contains_ref)
+			{
+				if constexpr (!EmuMath::NewVector<OtherSize_, OtherT_>::contains_ref)
+				{
+					static_assert(false, "Attempted to construct a reference-containing EmuMath Vector via a temporary EmuMath Vector that does not contain references. This behaviour will result in dangling references, and has been prohibited as a result.");
+				}
+				else
+				{
+					EmuMath::Helpers::new_vector_set(*this, std::move(to_move_));
+				}
+			}
+			else
+			{
+				EmuMath::Helpers::new_vector_set(*this, std::move(to_move_));
+			}
+		}
+
+	private:
+		// Empty constructor used to perform a lazy-default when construction is executed within the constructor body; inaccessible out of this struct
+		// --- Disable warning about uninitialised data since that's the point of this constructor
+#pragma warning(disable : 26495)
+		explicit constexpr inline NewVector(_dummy_arg_for_private_lazy_default dummy_arg_)
+		{
+		}
 #pragma endregion
 
 #pragma region ACCESS

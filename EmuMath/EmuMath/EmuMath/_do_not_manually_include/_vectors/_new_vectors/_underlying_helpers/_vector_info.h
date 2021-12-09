@@ -188,7 +188,8 @@ namespace EmuMath::TMP
 		template<std::size_t OtherSize_, typename OtherT_>
 		[[nodiscard]] static constexpr inline bool valid_template_vector_copy_construct_arg()
 		{
-			if constexpr (valid_template_construct_args<EmuMath::NewVector<OtherSize_, OtherT_>>())
+			using other_vector = EmuMath::NewVector<OtherSize_, OtherT_>;
+			if constexpr (valid_template_construct_args<EmuMath::NewVector<OtherSize_, other_vector>>())
 			{
 				// If this is a valid vector arg for template construction, defer to that as the instantiation speed is likely improved.
 				// --- This is because a copy is likely to be a default-then-copy-in-the-body situation.
@@ -196,7 +197,6 @@ namespace EmuMath::TMP
 			}
 			else
 			{
-				using other_info = EmuMath::TMP::common_vector_info<OtherSize_, OtherT_, false>;
 				constexpr bool same_size = Size_ == OtherSize_;
 				constexpr bool same_vector = std::is_same_v<T_, OtherT_> && same_size;
 				if constexpr (same_vector)
@@ -206,7 +206,7 @@ namespace EmuMath::TMP
 				}
 				else
 				{
-					constexpr bool same_contained_type = std::is_same_v<stored_type, typename other_info::stored_type>;
+					constexpr bool same_contained_type = std::is_same_v<stored_type, typename other_vector::stored_type>;
 					if constexpr (same_contained_type && same_size)
 					{
 						// Same size and contained type means we can have an alternative representation of this vector type while being the same under-the-hood
@@ -218,9 +218,30 @@ namespace EmuMath::TMP
 					else
 					{
 						// No other conflicts
-						return true;
+						if constexpr (contains_ref)
+						{
+							// Require a Vector large enough to initialise all references
+							return other_vector::size >= size;
+						}
+						else
+						{
+							return true;
+						}
 					}
 				}
+			}
+		}
+
+		template<std::size_t OtherSize_, typename OtherT_>
+		[[nodiscard]] static constexpr inline bool valid_template_vector_const_copy_construct_arg()
+		{
+			if constexpr (valid_template_vector_copy_construct_arg<OtherSize_, OtherT_>())
+			{
+				return !contains_non_const_ref;
+			}
+			else
+			{
+				return false;
 			}
 		}
 

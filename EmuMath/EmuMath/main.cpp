@@ -452,6 +452,41 @@ int main()
 	);
 	std::cout << "Mat<1, 4>: " << new_mat_1x4f_ << "\nMat<4, 1>: " << new_mat_4x1f_ << "\nMat<4, 4>: " << new_mat_4x4f_ << "\n|\n";
 
+	EmuMath::NewVector<4, float> reeeeeeeeeeeeeeeee(1, 2, 3, 4);
+	EmuMath::NewVector<4, const float&> ree_ref_(const_cast<const decltype(reeeeeeeeeeeeeeeee)&>(reeeeeeeeeeeeeeeee));
+
+	std::cout << "---\n";
+	// Some tests to make sure TryGet works nicely
+	float some_value_to_ref_ = 2.0f;
+	EmuCore::DeferrableReferenceWrapper<float> test_refwrapper_;
+	test_refwrapper_.Set(some_value_to_ref_);
+	float* p_out_;
+	if (test_refwrapper_.TryGet(&p_out_))
+	{
+		std::cout << *(p_out_) << "\n";
+	}
+	some_value_to_ref_ = 5.0f;
+	const float* p_const_out_;
+	if (test_refwrapper_.TryGet(&p_const_out_))
+	{
+		std::cout << *p_const_out_ << "\n";
+	}
+
+	test_refwrapper_ = decltype(test_refwrapper_)();
+	if (test_refwrapper_.TryGet<true>(&p_out_))
+	{
+		std::cout << "This shouldn't be printed: " << *p_out_ << "\n";
+	}
+	else
+	{
+		std::cout << "No reference held in DeferrableReferenceWrapper instance when TryGet was used.\n";
+	}
+
+	std::cout << "---\n";
+	EmuMath::NewVector<5, const float> some_other_ref_vector_target_(1, 2, 3, 4, 5);
+	EmuMath::NewVector<4, const float&> some_other_ref_vector_ = decltype(some_other_ref_vector_)(some_other_ref_vector_target_);
+	std::cout << some_other_ref_vector_ << "\n";
+
 	std::cout << "\n\n";
 	system("pause");
 	std::cout << "\n---\n\n\n";
