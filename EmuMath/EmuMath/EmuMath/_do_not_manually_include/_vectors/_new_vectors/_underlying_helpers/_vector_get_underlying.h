@@ -92,6 +92,17 @@ namespace EmuMath::Helpers::_vector_underlying
 			return _vector_get_non_contained_value<Size_, T_>();
 		}
 	}
+
+	template<std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::stored_type* _vector_data(EmuMath::NewVector<Size_, T_>& vector_)
+	{
+		return vector_.data();
+	}
+	template<std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline const typename EmuMath::NewVector<Size_, T_>::stored_type* _vector_data(const EmuMath::NewVector<Size_, T_>& vector_)
+	{
+		return vector_.data();
+	}
 }
 
 #endif

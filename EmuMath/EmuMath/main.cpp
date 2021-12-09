@@ -388,6 +388,14 @@ int main()
 	new_num_ = 1337.0f;
 	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
 
+	std::cout << "---\n";
+	std::array<float, 4> some_random_arr_ = std::array<float, 4>();
+	std::cout << "Arr: " << some_random_arr_ << "\n";
+	memcpy(some_random_arr_.data(), EmuMath::Helpers::new_vector_data(some_new_vector_), sizeof(float) * 4);
+	std::cout << "Arr: " << some_random_arr_ << "\n";
+	memcpy(EmuMath::Helpers::new_vector_data(some_new_vector_) + 2, some_random_arr_.data(), sizeof(float) * 3);
+	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
+
 	system("pause");
 	std::cout << "\n---\n\n\n";
 	constexpr EmuMath::ColourRGB<float> colour_(-0.2f, 2.5, 2.0f);

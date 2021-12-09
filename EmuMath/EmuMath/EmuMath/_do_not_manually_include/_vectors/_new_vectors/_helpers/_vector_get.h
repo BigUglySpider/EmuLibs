@@ -129,6 +129,30 @@ namespace EmuMath::Helpers
 	{
 		return _vector_underlying::_vector_get_theoretical<Index_, Size_, T_>(vector_);
 	}
+
+	/// <summary>
+	/// <para> Retrieves a pointer to the contiguous data stored within the passed EmuMath Vector. </para>
+	/// <para> This behaviour is prohibited with reference-containing Vectors by default. </para>
+	/// </summary>
+	/// <param name="vector_">EmuMath Vector to retrieve a data pointer for.</param>
+	/// <returns>Pointer to the start of the provided EmuMath Vector's contiguous data.</returns>
+	template<std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::stored_type* new_vector_data(EmuMath::NewVector<Size_, T_>& vector_)
+	{
+		return _vector_underlying::_vector_data<Size_, T_>(vector_);
+	}
+
+	/// <summary>
+	/// <para> Retrieves a constant pointer to the contiguous data stored within the passed EmuMath Vector. </para>
+	/// <para> This behaviour is prohibited with reference-containing Vectors by default. </para>
+	/// </summary>
+	/// <param name="vector_">EmuMath Vector to retrieve a data pointer for.</param>
+	/// <returns>Constant pointer to the start of the provided EmuMath Vector's contiguous data.</returns>
+	template<std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline const typename EmuMath::NewVector<Size_, T_>::stored_type* new_vector_data(const EmuMath::NewVector<Size_, T_>& vector_)
+	{
+		return _vector_underlying::_vector_data<Size_, T_>(vector_);
+	}
 }
 
 #endif
