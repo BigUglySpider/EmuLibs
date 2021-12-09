@@ -328,6 +328,23 @@ namespace EmuMath::TMP
 		{
 			return is_valid_type_for_single_set<T_>();
 		}
+
+		template<typename T_, bool WhenConst_>
+		[[nodiscard]] static constexpr inline bool is_valid_try_get_output_ref()
+		{
+			using get_return_type = EmuCore::TMP::conditional_const_t<WhenConst_, value_type>&;
+			return 
+			(
+				!std::is_const_v<T_> && // Can't output to const
+				!std::is_rvalue_reference_v<T_> && // ravlue output is pointless
+				!EmuCore::TMP::is_any_comparison_true<std::is_same, T_, value_type**, const value_type**>::value && // Reserved for outputting a reference pointer
+				(
+					std::is_assignable_v<T_, get_return_type> ||
+					std::is_constructible_v<T_, get_return_type> ||
+					std::is_convertible_v<get_return_type, T_>
+				) // Must be possible to create in one of these standard ways
+			);
+		}
 #pragma endregion
 
 	private:

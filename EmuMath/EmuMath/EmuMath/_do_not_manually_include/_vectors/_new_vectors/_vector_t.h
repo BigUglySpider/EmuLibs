@@ -76,6 +76,12 @@ namespace EmuMath
 			return vector_info::template is_valid_type_for_set_all<T_>();
 		}
 
+		template<typename T_, bool WhileConst_>
+		[[nodiscard]] static constexpr inline bool is_valid_try_get_output_ref()
+		{
+			return vector_info::template is_valid_try_get_output_ref<T_, WhileConst_>();
+		}
+
 	private:
 		struct _dummy_arg_for_private_lazy_default
 		{
@@ -332,6 +338,44 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline const value_type& operator[](const std::size_t index_) const
 		{
 			return at(index_);
+		}
+
+		template<typename Out_, typename = std::enable_if_t<is_valid_try_get_output_ref<Out_, false>()>>
+		[[nodiscard]] constexpr inline bool TryAt(const std::size_t index_, Out_& out_)
+		{
+			return EmuMath::Helpers::vector_try_get(*this, index_, out_);
+		}
+		template<typename Out_, typename = std::enable_if_t<is_valid_try_get_output_ref<Out_, true>()>>
+		[[nodiscard]] constexpr inline bool TryAt(const std::size_t index_, Out_& out_) const
+		{
+			return EmuMath::Helpers::vector_try_get<Out_, Size_, T_>(*this, index_, out_);
+		}
+		[[nodiscard]] constexpr inline bool TryAt(const std::size_t index_, value_type** pp_out_)
+		{
+			return EmuMath::Helpers::vector_try_get<Size_, T_>(*this, index_, pp_out_);
+		}
+		[[nodiscard]] constexpr inline bool TryAt(const std::size_t index_, const value_type** pp_const_out_) const
+		{
+			return EmuMath::Helpers::vector_try_get<Size_, T_>(*this, index_, pp_const_out_);
+		}
+
+		template<typename Out_, typename = std::enable_if_t<is_valid_try_get_output_ref<Out_, false>()>>
+		[[nodiscard]] constexpr inline bool operator()(const std::size_t index_, Out_& out_)
+		{
+			return TryAt(index_, out_);
+		}
+		template<typename Out_, typename = std::enable_if_t<is_valid_try_get_output_ref<Out_, true>()>>
+		[[nodiscard]] constexpr inline bool operator()(const std::size_t index_, Out_& out_) const
+		{
+			return TryAt(index_, out_);
+		}
+		[[nodiscard]] constexpr inline bool operator()(const std::size_t index_, value_type** pp_out_)
+		{
+			return TryAt(index_, pp_out_);
+		}
+		[[nodiscard]] constexpr inline bool operator()(const std::size_t index_, const value_type** pp_const_out_) const
+		{
+			return TryAt(index_, pp_const_out_);
 		}
 
 		/// <summary>

@@ -103,6 +103,109 @@ namespace EmuMath::Helpers::_vector_underlying
 	{
 		return vector_.data();
 	}
+
+	template<class Out_, std::size_t Size_, typename T_, typename = std::enable_if_t<EmuMath::NewVector<Size_, T_>::template is_valid_try_get_output_ref<Out_, false>()>>
+	[[nodiscard]] constexpr inline bool _vector_try_get(EmuMath::NewVector<Size_, T_>& vector_, std::size_t index_, Out_& out_)
+	{
+		using vector_type = EmuMath::NewVector<Size_, T_>;
+		using value_type = typename vector_type::value_type;
+
+		if (index_ < vector_type::size)
+		{
+			if constexpr (std::is_assignable_v<Out_, value_type&>)
+			{
+				out_ = _vector_get(vector_, index_);
+			}
+			else if constexpr (std::is_constructible_v<Out_, value_type&>)
+			{
+				out_ = Out_(_vector_get(vector_, index_));
+			}
+			else if constexpr (std::is_convertible_v<Out_, value_type&>)
+			{
+				out_ = static_cast<Out_>(_vector_get(vector_, index_));
+			}
+			else
+			{
+				static_assert(false, "Attempted to retrieve an element within an EmuMath Vector via try_get (non-const), but the provided out_ type cannot be assigned, constructed, or converted-to from a non-const reference to the Vector's value_type.");
+			}
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	template<class Out_, std::size_t Size_, typename T_, typename = std::enable_if_t<EmuMath::NewVector<Size_, T_>::template is_valid_try_get_output_ref<Out_, true>()>>
+	[[nodiscard]] constexpr inline bool _vector_try_get(const EmuMath::NewVector<Size_, T_>& vector_, std::size_t index_, Out_& out_)
+	{
+		// We repeat this function definition as the provided Out_ type may interact differently with const/non-const value_type references.
+		using vector_type = EmuMath::NewVector<Size_, T_>;
+		using value_type = typename vector_type::value_type;
+
+		if (index_ < vector_type::size)
+		{
+			if constexpr (std::is_assignable_v<Out_, const value_type&>)
+			{
+				out_ = _vector_get(vector_, index_);
+			}
+			else if constexpr (std::is_constructible_v<Out_, const value_type&>)
+			{
+				out_ = Out_(_vector_get(vector_, index_));
+			}
+			else if constexpr (std::is_convertible_v<Out_, const value_type&>)
+			{
+				out_ = static_cast<Out_>(_vector_get(vector_, index_));
+			}
+			else
+			{
+				static_assert(false, "Attempted to retrieve an element within an EmuMath Vector via try_get (const), but the provided out_ type cannot be assigned, constructed, or converted-to from a constant reference to the Vector's value_type.");
+			}
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	template<std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline bool _vector_try_get
+	(
+		EmuMath::NewVector<Size_, T_>& vector_,
+		std::size_t index_,
+		typename EmuMath::NewVector<Size_, T_>::value_type** pp_out_
+	)
+	{
+		if (index_ < EmuMath::NewVector<Size_, T_>::size)
+		{
+			*pp_out_ = &(_vector_get(vector_, index_));
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	template<std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline bool _vector_try_get
+	(
+		const EmuMath::NewVector<Size_, T_>& vector_,
+		std::size_t index_,
+		const typename EmuMath::NewVector<Size_, T_>::value_type** pp_const_out_
+	)
+	{
+		if (index_ < EmuMath::NewVector<Size_, T_>::size)
+		{
+			*pp_const_out_ = &(_vector_get(vector_, index_));
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 }
 
 #endif

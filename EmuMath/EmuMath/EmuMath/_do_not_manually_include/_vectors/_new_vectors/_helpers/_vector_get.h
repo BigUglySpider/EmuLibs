@@ -153,6 +153,40 @@ namespace EmuMath::Helpers
 	{
 		return _vector_underlying::_vector_data<Size_, T_>(vector_);
 	}
+
+	template<class Out_, std::size_t Size_, typename T_, typename = std::enable_if_t<EmuMath::NewVector<Size_, T_>::template is_valid_try_get_output_ref<Out_, false>()>>
+	[[nodiscard]] constexpr inline bool vector_try_get(EmuMath::NewVector<Size_, T_>& vector_, std::size_t index_, Out_& out_)
+	{
+		return _vector_underlying::_vector_try_get<Out_>(vector_, index_, out_);
+	}
+
+	template<class Out_, std::size_t Size_, typename T_, typename = std::enable_if_t<EmuMath::NewVector<Size_, T_>::template is_valid_try_get_output_ref<Out_, true>()>>
+	[[nodiscard]] constexpr inline bool vector_try_get(const EmuMath::NewVector<Size_, T_>& vector_, std::size_t index_, Out_& out_)
+	{
+		return _vector_underlying::_vector_try_get<Out_, Size_, T_>(vector_, index_, out_);
+	}
+
+	template<std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline bool vector_try_get
+	(
+		EmuMath::NewVector<Size_, T_>& vector_,
+		std::size_t index_,
+		typename EmuMath::NewVector<Size_, T_>::value_type** pp_out_
+	)
+	{
+		return _vector_underlying::_vector_try_get<Size_, T_>(vector_, index_, pp_out_);
+	}
+
+	template<std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline bool vector_try_get
+	(
+		const EmuMath::NewVector<Size_, T_>& vector_,
+		std::size_t index_,
+		const typename EmuMath::NewVector<Size_, T_>::value_type** pp_const_out_
+	)
+	{
+		return _vector_underlying::_vector_try_get<Size_, T_>(vector_, index_, pp_const_out_);
+	}
 }
 
 #endif

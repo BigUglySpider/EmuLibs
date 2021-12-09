@@ -487,6 +487,87 @@ int main()
 	EmuMath::NewVector<4, const float&> some_other_ref_vector_ = decltype(some_other_ref_vector_)(some_other_ref_vector_target_);
 	std::cout << some_other_ref_vector_ << "\n";
 
+	EmuMath::NewVector<4, float> bloobongo_(1, 2, 3, 4);
+	EmuCore::DeferrableReferenceWrapper<float> ref_wrapper_;
+	if (bloobongo_(0, ref_wrapper_))
+	{
+		ref_wrapper_.get() = 1337.0f;
+		std::cout << bloobongo_ << "[0]: " << ref_wrapper_ << "\n";
+	}
+	if (bloobongo_(1, ref_wrapper_))
+	{
+		std::cout << bloobongo_ << "[1]: " << ref_wrapper_ << "\n";
+	}
+	if (bloobongo_(2, ref_wrapper_))
+	{
+		std::cout << bloobongo_ << "[2]: " << ref_wrapper_ << "\n";
+	}
+	if (bloobongo_(3, ref_wrapper_))
+	{
+		std::cout << bloobongo_ << "[3]: " << ref_wrapper_ << "\n";
+	}
+	if (bloobongo_(4, ref_wrapper_))
+	{
+		std::cout << bloobongo_ << "[4]: " << ref_wrapper_ << "\n";
+	}
+	else
+	{
+		std::cout << bloobongo_ << "[4]: Not found\n";
+	}
+
+	float* p_out_float_;
+	if (bloobongo_(0, &p_out_float_))
+	{
+		std::cout << bloobongo_ << "[0]: " << *p_out_float_ << "\n";
+	}
+	if (bloobongo_(1, &p_out_float_))
+	{
+		*p_out_float_ = -5.0f;
+		std::cout << bloobongo_ << "[1]: " << *p_out_float_ << "\n";
+	}
+	if (bloobongo_(2, &p_out_float_))
+	{
+		std::cout << bloobongo_ << "[2]: " << *p_out_float_ << "\n";
+	}
+	if (bloobongo_(3, &p_out_float_))
+	{
+		std::cout << bloobongo_ << "[3]: " << *p_out_float_ << "\n";
+	}
+	if (bloobongo_(4, &p_out_float_))
+	{
+		std::cout << bloobongo_ << "[4]: " << *p_out_float_ << "\n";
+	}
+	else
+	{
+		std::cout << bloobongo_ << "[4]: Not found\n";
+	}
+
+	const float* p_out_const_float_;
+	if (bloobongo_(0, &p_out_const_float_))
+	{
+		std::cout << bloobongo_ << "[0]: " << *p_out_const_float_ << "\n";
+	}
+	if (bloobongo_(1, &p_out_const_float_))
+	{
+		std::cout << bloobongo_ << "[1]: " << *p_out_const_float_ << "\n";
+	}
+	if (bloobongo_(2, &p_out_const_float_))
+	{
+		std::cout << bloobongo_ << "[2]: " << *p_out_const_float_ << "\n";
+	}
+	if (bloobongo_(3, &p_out_const_float_))
+	{
+		std::cout << bloobongo_ << "[3]: " << *p_out_const_float_ << "\n";
+	}
+	if (bloobongo_(4, &p_out_const_float_))
+	{
+		std::cout << bloobongo_ << "[4]: " << *p_out_const_float_ << "\n";
+	}
+	else
+	{
+		std::cout << bloobongo_ << "[4]: Not found\n";
+	}
+
 	std::cout << "\n\n";
 	system("pause");
 	std::cout << "\n---\n\n\n";
