@@ -169,7 +169,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 	}
 
-	template<std::size_t Size_, typename T_>
+	template<bool NullptrIfFailed_, std::size_t Size_, typename T_>
 	[[nodiscard]] constexpr inline bool _vector_try_get
 	(
 		EmuMath::NewVector<Size_, T_>& vector_,
@@ -179,16 +179,20 @@ namespace EmuMath::Helpers::_vector_underlying
 	{
 		if (index_ < EmuMath::NewVector<Size_, T_>::size)
 		{
-			*pp_out_ = &(_vector_get(vector_, index_));
+			(*pp_out_) = &(_vector_get(vector_, index_));
 			return true;
 		}
 		else
 		{
+			if constexpr (NullptrIfFailed_)
+			{
+				(*pp_out_) = nullptr;
+			}
 			return false;
 		}
 	}
 
-	template<std::size_t Size_, typename T_>
+	template<bool NullptrIfFailed_, std::size_t Size_, typename T_>
 	[[nodiscard]] constexpr inline bool _vector_try_get
 	(
 		const EmuMath::NewVector<Size_, T_>& vector_,
@@ -198,11 +202,15 @@ namespace EmuMath::Helpers::_vector_underlying
 	{
 		if (index_ < EmuMath::NewVector<Size_, T_>::size)
 		{
-			*pp_const_out_ = &(_vector_get(vector_, index_));
+			(*pp_const_out_) = &(_vector_get(vector_, index_));
 			return true;
 		}
 		else
 		{
+			if constexpr (NullptrIfFailed_)
+			{
+				(*pp_const_out_) = nullptr;
+			}
 			return false;
 		}
 	}
