@@ -362,28 +362,35 @@ int main()
 	std::cout << newvector_b_ << "\n";
 
 	std::cout << "---\n";
-	EmuMath::Helpers::new_vector_set(newvector_c_, newvector_b_);
+	//EmuMath::Helpers::new_vector_set(newvector_c_, newvector_b_);
+	newvector_c_.Set(newvector_b_);
 	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << "\n";
-	EmuMath::Helpers::new_vector_set(newvector_c_, newvector_a_);
+	//EmuMath::Helpers::new_vector_set(newvector_c_, newvector_a_);
+	newvector_c_.Set(newvector_a_);
 	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << "\n";
-	EmuMath::Helpers::new_vector_set(newvector_b_, newvector_a_);
+	//EmuMath::Helpers::new_vector_set(newvector_b_, newvector_a_);
+	newvector_b_.Set(newvector_a_);
 	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << "\n";
 	EmuMath::NewVector<5, float> some_new_vector_(1.0f, 10.0f, 100.0f, 1000.0f, 6.0f);
 
-	EmuMath::Helpers::new_vector_set(newvector_b_, some_new_vector_);
+	newvector_b_.Set(some_new_vector_);
 	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
 	some_new_vector_.at<2>() = 3.0f;
 	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
-	EmuMath::Helpers::new_vector_set(some_new_vector_, newvector_a_);
+	some_new_vector_.Set(newvector_a_);
+	//EmuMath::Helpers::new_vector_set(some_new_vector_, newvector_a_);
 	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
 	some_new_vector_.at<1>() = 1.234f;
 	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
-	EmuMath::Helpers::new_vector_set(some_new_vector_, std::move(newvector_b_));
+	//EmuMath::Helpers::new_vector_set(some_new_vector_, std::move(newvector_b_));
+	some_new_vector_.Set(std::move(newvector_b_));
 	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
 	new_num_ = 33.5f;
-	EmuMath::Helpers::new_vector_set_all(newvector_b_, new_num_);
+	//EmuMath::Helpers::new_vector_set_all(newvector_b_, new_num_);
+	newvector_b_.SetAll(new_num_);
 	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
-	EmuMath::Helpers::new_vector_set_all<1, 3>(some_new_vector_, new_num_);
+	//EmuMath::Helpers::new_vector_set_all<1, 3>(some_new_vector_, new_num_);
+	some_new_vector_.SetAll(new_num_);
 	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
 	new_num_ = 1337.0f;
 	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
@@ -396,6 +403,56 @@ int main()
 	memcpy(EmuMath::Helpers::new_vector_data(some_new_vector_) + 2, some_random_arr_.data(), sizeof(float) * 3);
 	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
 
+	std::cout << "---\n";
+	decltype(newvector_b_) c_alt_rep_ = newvector_c_;
+	EmuMath::NewVector<2, const EmuMath::NewVector<4, const float&>> vector_of_ref_vectors_(newvector_b_, newvector_c_.AsAlternativeRep());
+	EmuMath::NewVector<2, const EmuMath::NewVector<4, const float&>&> ref_vector_of_ref_vectors_(newvector_b_, c_alt_rep_);
+	std::cout << "Vector of refs: " << vector_of_ref_vectors_ << "\nRef vector of refs: " << ref_vector_of_ref_vectors_ << "\n|\n";
+	float bloobledy_ = 13.37f;
+	newvector_b_.Set<3>(bloobledy_);
+	float gongo_ = -42.0f;
+	c_alt_rep_.Set<2>(gongo_);
+	std::cout << "Vector of refs: " << vector_of_ref_vectors_ << "\nRef vector of refs: " << ref_vector_of_ref_vectors_ << "\n|\n";
+	ref_vector_of_ref_vectors_.SetAll(EmuMath::NewVector<4, const float&>(newvector_c_));
+	std::cout << "Vector of refs: " << vector_of_ref_vectors_ << "\nRef vector of refs: " << ref_vector_of_ref_vectors_ << "\n|\n";
+	ref_vector_of_ref_vectors_.Set<1>(newvector_b_);
+	std::cout << "Vector of refs: " << vector_of_ref_vectors_ << "\nRef vector of refs: " << ref_vector_of_ref_vectors_ << "\n|\n";
+
+	std::cout << "---\n";
+	EmuMath::NewVector<1, EmuMath::NewVector<4, float>> new_mat_1x4f_;
+	EmuMath::NewVector<4, EmuMath::NewVector<1, float>> new_mat_4x1f_;
+	EmuMath::NewVector<4, EmuMath::NewVector<4, float>> new_mat_4x4f_;
+	std::cout << "Mat<1, 4>: " << new_mat_1x4f_ << "\nMat<4, 1>: " << new_mat_4x1f_ << "\nMat<4, 4>: " << new_mat_4x4f_ << "\n|\n";
+	new_mat_1x4f_ = decltype(new_mat_1x4f_)(decltype(new_mat_1x4f_)::value_type(1.0f, 2.0f, 3.0f, 4.0f));
+	std::cout << "Mat<1, 4>: " << new_mat_1x4f_ << "\nMat<4, 1>: " << new_mat_4x1f_ << "\nMat<4, 4>: " << new_mat_4x4f_ << "\n|\n";
+	new_mat_4x1f_ = decltype(new_mat_4x1f_)(5.0f, 6.0f, 7.0f, 8.0f);
+	std::cout << "Mat<1, 4>: " << new_mat_1x4f_ << "\nMat<4, 1>: " << new_mat_4x1f_ << "\nMat<4, 4>: " << new_mat_4x4f_ << "\n|\n";
+	new_mat_4x4f_ = decltype(new_mat_4x4f_)
+	(
+		decltype(new_mat_4x4f_)::value_type(1, 2, 3, 4),
+		decltype(new_mat_4x4f_)::value_type(5, 6, 7, 8),
+		decltype(new_mat_4x4f_)::value_type(9, 10, 11, 12),
+		decltype(new_mat_4x4f_)::value_type(13, 14, 15, 16)
+	);
+	std::cout << "Mat<1, 4>: " << new_mat_1x4f_ << "\nMat<4, 1>: " << new_mat_4x1f_ << "\nMat<4, 4>: " << new_mat_4x4f_ << "\n|\n";
+	using new_vec_4i32 = EmuMath::NewVector<4, std::int32_t>;
+	new_mat_4x4f_ = decltype(new_mat_4x4f_)
+	(
+		new_vec_4i32(17, 18, 19, 20),
+		new_vec_4i32(21, 22, 23, 24),
+		new_vec_4i32(25, 26, 27, 28),
+		new_vec_4i32(29, 30, 31, 32)
+	);
+	std::cout << "Mat<1, 4>: " << new_mat_1x4f_ << "\nMat<4, 1>: " << new_mat_4x1f_ << "\nMat<4, 4>: " << new_mat_4x4f_ << "\n|\n";
+	new_mat_1x4f_ = decltype(new_mat_1x4f_)(EmuMath::NewVector<4, float>(11, 22, 33, 44));
+	std::cout << "Mat<1, 4>: " << new_mat_1x4f_ << "\nMat<4, 1>: " << new_mat_4x1f_ << "\nMat<4, 4>: " << new_mat_4x4f_ << "\n|\n";
+	new_mat_4x1f_ = decltype(new_mat_4x1f_)
+	(
+		EmuMath::NewVector<1, float>(55), EmuMath::NewVector<1, float>(66), EmuMath::NewVector<1, float>(77), EmuMath::NewVector<1, float>(88)
+	);
+	std::cout << "Mat<1, 4>: " << new_mat_1x4f_ << "\nMat<4, 1>: " << new_mat_4x1f_ << "\nMat<4, 4>: " << new_mat_4x4f_ << "\n|\n";
+
+	std::cout << "\n\n";
 	system("pause");
 	std::cout << "\n---\n\n\n";
 	constexpr EmuMath::ColourRGB<float> colour_(-0.2f, 2.5, 2.0f);

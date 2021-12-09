@@ -15,6 +15,10 @@ namespace EmuCore
 	/// </para>
 	/// <para> In all other scenarios, it is recommended to use the standard std::reference_wrapper&lt;T&gt; to maintain safety and avoid null references. </para>
 	/// <para> This wrapper may implicitly be considered a std::reference_wrapper&lt;T&gt;, but be aware that this results in a new wrapper being constructed. </para>
+	/// <para>
+	///		FOR SPECIALISATIONS: These wrappers are designed to not be directly-assignable as a normal reference would be; 
+	///		implementations contrary to this will make the program ill-formed for any use of said implementation with any Emu libraries.
+	/// </para>
 	/// </summary>
 	/// <typeparam name="T">Type to be referenced by this wrapper. Should not be a reference type; the reference is applied automatically.</typeparam>
 	template<typename T>

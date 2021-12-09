@@ -51,6 +51,24 @@ namespace EmuMath
 		{
 			return vector_info::template valid_template_vector_move_construct_arg<OtherSize_, OtherT_>();
 		}
+
+		template<std::size_t InSize_, typename InT_, bool in_is_const, bool in_is_temp>
+		[[nodiscard]] static constexpr inline bool is_valid_vector_for_set()
+		{
+			return vector_info::template is_valid_vector_for_set<InSize_, InT_, in_is_const, in_is_temp>();
+		}
+
+		template<typename T_>
+		[[nodiscard]] static constexpr inline bool is_valid_type_for_single_set()
+		{
+			return vector_info::template is_valid_type_for_single_set<T_>();
+		}
+
+		template<typename T_>
+		[[nodiscard]] static constexpr inline bool is_valid_type_for_set_all()
+		{
+			return vector_info::template is_valid_type_for_set_all<T_>();
+		}
 #pragma endregion
 
 #pragma region CONSTRUCTORS
@@ -86,7 +104,7 @@ namespace EmuMath
 		/// <para> Moves the data of the passed Vector reference into a newly constructed Vector. </para>
 		/// </summary>
 		/// <param name="to_move_">Vector to move into the newly constructed vector.</param>
-		constexpr inline NewVector(this_type&& to_move_) : _data(std::move(to_move_._data))
+		constexpr inline NewVector(this_type&& to_move_) noexcept : _data(std::move(to_move_._data))
 		{
 		}
 
@@ -113,7 +131,7 @@ namespace EmuMath
 		/// <para> If there is no alternative representation, the input type for this constructor will be std::false_type. </para>
 		/// </summary>
 		/// <param name="to_copy_">Non-const reference to a Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.</param>
-		template<typename OnlyIfAlternativeRepExists_  = std::enable_if_t<has_alternative_representation && !contains_non_const_ref>>
+		template<typename OnlyIfAlternativeRepExists_ = std::enable_if_t<has_alternative_representation && !contains_non_const_ref>>
 		constexpr inline NewVector(const alternative_rep& to_copy_) : _data(to_copy_._data)
 		{
 		}
@@ -126,9 +144,9 @@ namespace EmuMath
 		/// <para> This is only available for reference-containing Vectors, where has_alternative_representation is true. </para>
 		/// <para> If there is no alternative representation, the input type for this constructor will be std::false_type. </para>
 		/// </summary>
-		/// <param name="to_copy_">Non-const reference to a Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.</param>
-		template<typename OnlyIfAlternativeRepExists_  = std::enable_if_t<has_alternative_representation>>
-		constexpr inline NewVector(alternative_rep&& to_move_) : _data(std::move(to_move_._data))
+		/// <param name="to_move_">Vector to move into the newly constructed vector.</param>
+		template<typename OnlyIfAlternativeRepExists_ = std::enable_if_t<has_alternative_representation>>
+		constexpr inline NewVector(alternative_rep&& to_move_) noexcept : _data(std::move(to_move_._data))
 		{
 		}
 
@@ -158,9 +176,9 @@ namespace EmuMath
 			typename OtherT_,
 			typename = std::enable_if_t<valid_template_vector_copy_construct_arg<OtherSize_, OtherT_>() && !contains_non_const_ref>
 		>
-		explicit constexpr inline NewVector(const EmuMath::Vector<OtherSize_, OtherT_>& to_copy_)
+		explicit constexpr inline NewVector(const EmuMath::NewVector<OtherSize_, OtherT_>& to_copy_) : NewVector()
 		{
-
+			EmuMath::Helpers::new_vector_set(*this, to_copy_);
 		}
 
 #pragma endregion
@@ -257,23 +275,104 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region ASSIGNMENT_OPERATORS
+		constexpr inline this_type& operator=(this_type& rhs_)
+		{
+			_data = rhs_._data;
+			return *this;
+		}
+
+		template<typename = std::enable_if_t<has_alternative_representation>>
+		constexpr inline this_type& operator=(alternative_rep& rhs_)
+		{
+			_data = rhs_._data;
+			return *this;
+		}
+
+		template<typename = std::enable_if_t<!contains_non_const_ref>>
+		constexpr inline this_type& operator=(const this_type& rhs_)
+		{
+			_data = rhs_._data;
+			return *this;
+		}
+
+		template<typename = std::enable_if_t<has_alternative_representation && !contains_non_const_ref>>
+		constexpr inline this_type& operator=(const alternative_rep& rhs_)
+		{
+			_data = rhs_._data;
+			return *this;
+		}
+
+		constexpr inline this_type& operator=(this_type&& rhs_) noexcept
+		{
+			_data = std::move(rhs_._data);
+			return *this;
+		}
+		template<typename = std::enable_if_t<has_alternative_representation>>
+		constexpr inline this_type& operator=(alternative_rep&& rhs_) noexcept
+		{
+			_data = std::move(rhs_._data);
+			return *this;
+		}
+#pragma endregion
+
+#pragma region CONVERSIONS
+		template<typename = std::enable_if_t<has_alternative_representation>>
+		[[nodiscard]] constexpr inline alternative_rep AsAlternativeRep()
+		{
+			return alternative_rep(*this);
+		}
+
+		template<typename = std::enable_if_t<has_alternative_representation>>
+		[[nodiscard]] constexpr inline alternative_rep AsAlternativeRep() const
+		{
+			return alternative_rep(*this);
+		}
+#pragma endregion
+
 #pragma region SETS
 		template
 		<
 			std::size_t InSize_,
 			typename InT_,
-			typename = std::enable_if_t
-			<
-				(
-					std::is_assignable_v<stored_type, InT_> ||
-					std::is_constructible_v<stored_type, InT_> ||
-					std::is_convertible_v<InT_, stored_type>
-				)
-			>
+			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, false, true>()>
 		>
 		constexpr inline void Set(EmuMath::NewVector<InSize_, InT_>&& to_move_set_)
 		{
+			EmuMath::Helpers::new_vector_set<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
+		}
 
+		template
+		<
+			std::size_t InSize_,
+			typename InT_,
+			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, true, true>()>
+		>
+		constexpr inline void Set(const EmuMath::NewVector<InSize_, InT_>&& to_move_set_)
+		{
+			EmuMath::Helpers::new_vector_set<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
+		}
+
+		template
+		<
+			std::size_t InSize_,
+			typename InT_,
+			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, false, false>()>
+		>
+		constexpr inline void Set(EmuMath::NewVector<InSize_, InT_>& to_copy_set_)
+		{
+			EmuMath::Helpers::new_vector_set<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
+		}
+
+		template
+		<
+			std::size_t InSize_,
+			typename InT_,
+			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, true, false>()>
+		>
+		constexpr inline void Set(const EmuMath::NewVector<InSize_, InT_>& to_copy_set_)
+		{
+			EmuMath::Helpers::new_vector_set<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
 		}
 
 		/// <summary>
@@ -286,15 +385,7 @@ namespace EmuMath
 		<
 			std::size_t Index_,
 			typename Arg_,
-			typename = std::enable_if_t
-			<
-				(!EmuMath::TMP::is_emu_new_vector_v<Arg_>) &&
-				(
-					std::is_assignable_v<stored_type, Arg_> ||
-					std::is_constructible_v<stored_type, Arg_> ||
-					std::is_convertible_v<Arg_, stored_type>
-				)
-			>
+			typename = std::enable_if_t<is_valid_type_for_single_set<Arg_>()>
 		>
 		constexpr inline void Set(Arg_&& arg_)
 		{
@@ -302,7 +393,7 @@ namespace EmuMath
 			{
 				if constexpr (std::is_assignable_v<stored_type, Arg_>)
 				{
-					_data.at(Index_) = std::forward<Arg_>(arg_);
+					std::get<Index_>(_data) = std::forward<Arg_>(arg_);
 				}
 				else if constexpr (std::is_constructible_v<stored_type, Arg_>)
 				{
@@ -310,7 +401,7 @@ namespace EmuMath
 				}
 				else if constexpr(std::is_convertible_v<Arg_, stored_type>)
 				{
-					_data.at(Index_) = static_cast<stored_type>(arg_);
+					std::get<Index_>(_data) = static_cast<stored_type>(arg_);
 				}
 				else
 				{
@@ -351,6 +442,42 @@ namespace EmuMath
 			{
 				static_assert(false, "Attempted to `Set` an invalid Index_ within an EmuMath Vector.");
 			}
+		}
+
+		template
+		<
+			std::size_t BeginIndex_ = 0,
+			std::size_t EndIndex_ = size,
+			typename Arg_,
+			typename = std::enable_if_t<is_valid_type_for_set_all<Arg_&&>()>
+		>
+		constexpr inline void SetAll(Arg_&& arg_)
+		{
+			EmuMath::Helpers::new_vector_set_all<BeginIndex_, EndIndex_>(*this, std::move(arg_));
+		}
+
+		template
+		<
+			std::size_t BeginIndex_ = 0,
+			std::size_t EndIndex_ = size,
+			typename Arg_,
+			typename = std::enable_if_t<is_valid_type_for_set_all<Arg_&>()>
+		>
+		constexpr inline void SetAll(Arg_& arg_)
+		{
+			EmuMath::Helpers::new_vector_set_all<BeginIndex_, EndIndex_>(*this, arg_);
+		}
+
+		template
+		<
+			std::size_t BeginIndex_ = 0,
+			std::size_t EndIndex_ = size,
+			typename Arg_,
+			typename = std::enable_if_t<is_valid_type_for_set_all<const Arg_&>()>
+		>
+		constexpr inline void SetAll(const Arg_& arg_)
+		{
+			EmuMath::Helpers::new_vector_set_all<BeginIndex_, EndIndex_>(*this, arg_);
 		}
 #pragma endregion
 

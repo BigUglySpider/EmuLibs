@@ -8,6 +8,7 @@ namespace EmuMath::TMP
 	template<std::size_t Size_, typename T_, bool AllowAssertions_ = true>
 	struct common_vector_info
 	{
+#pragma region HELPER_STRUCTS
 	private:
 		using this_info = common_vector_info<Size_, T_, AllowAssertions_>;
 
@@ -37,9 +38,64 @@ namespace EmuMath::TMP
 		{
 			using type = EmuMath::NewVector<Size_, InReferencedType_&>;
 		};
+		
+		template<std::size_t Size_, typename InT_, bool in_is_const, bool in_is_temp>
+		struct _is_valid_vector_for_set
+		{
+			static constexpr inline bool _may_be_created_from_get_return()
+			{
+				using in_vector_type = EmuMath::NewVector<Size_, InT_>;
+				using in_get_type = typename EmuCore::TMP::conditional_const_t<in_is_const, typename in_vector_type::value_type>&;
+				return
+				(
+					std::is_assignable_v<stored_type, in_get_type> ||
+					std::is_constructible_v<stored_type, in_get_type> ||
+					std::is_convertible_v<in_get_type, stored_type>
+				);
+			}
 
-	public:
+			[[nodiscard]] static constexpr inline bool get()
+			{
+				using in_vector_type = EmuMath::NewVector<Size_, InT_>;
+				using in_get_type = typename EmuCore::TMP::conditional_const_t<in_is_const, typename in_vector_type::value_type>&;
+
+				if constexpr (contains_ref)
+				{
+					if constexpr (in_is_temp && !(in_vector_type::contains_ref))
+					{
+						// Dangling references formed in this case
+						return false;
+					}
+					else
+					{
+						if constexpr (contains_non_const_ref)
+						{
+							// Must be non-const input to maintain const safety
+							if constexpr (in_is_const || std::is_const_v<in_get_type>)
+							{
+								return false;
+							}
+							else
+							{
+								return _may_be_created_from_get_return();
+							}
+						}
+						else
+						{
+							// Fine to return true as const will be fine, and non-const will implicitly cast to const
+							return _may_be_created_from_get_return();
+						}
+					}
+				}
+				else
+				{
+					return _may_be_created_from_get_return();
+				}
+			}
+		};
+#pragma endregion
 #pragma region TYPE_ALIASES
+	public:
 		/// <summary>
 		/// <para> The underlying type stored within vectors initialised with the provided Size_ and T_ args. </para>
 		/// <para> If the provided type is an lvalue reference (e.g. Type&amp; or const Type&amp;): `EmuMath::vector_internal_ref&lt;std::remove_reference_t&lt;T_&gt;&gt;`. </para>
@@ -77,6 +133,7 @@ namespace EmuMath::TMP
 #pragma endregion
 
 #pragma region STATIC_INFO
+	public:
 		static constexpr std::size_t size = Size_;
 
 		/// <summary> Boolean indicating if a vector initialised with the provided Size_ and T_ args contains references. </summary>
@@ -103,7 +160,9 @@ namespace EmuMath::TMP
 		static constexpr bool is_default_constructible = !contains_ref && std::is_default_constructible_v<stored_type>;
 
 		static constexpr bool has_alternative_representation = !std::is_same_v<std::false_type, alternative_vector_rep>;
+#pragma endregion
 
+#pragma region PUBLIC_HELPER_FUNCS
 		template<class...Args_>
 		[[nodiscard]] static constexpr inline bool valid_template_construct_args()
 		{
@@ -138,8 +197,8 @@ namespace EmuMath::TMP
 			else
 			{
 				using other_info = EmuMath::TMP::common_vector_info<OtherSize_, OtherT_, false>;
-				static constexpr bool same_size = Size_ == OtherSize_;
-				static constexpr bool same_vector = std::is_same_v<T_, OtherT_> && same_size;
+				constexpr bool same_size = Size_ == OtherSize_;
+				constexpr bool same_vector = std::is_same_v<T_, OtherT_> && same_size;
 				if constexpr (same_vector)
 				{
 					// Explicit constructor will be provided for same-vector copies to avoid default-then-copy-in-the-body.
@@ -147,7 +206,7 @@ namespace EmuMath::TMP
 				}
 				else
 				{
-					static constexpr bool same_contained_type = std::is_same_v<stored_type, typename other_info::stored_type>;
+					constexpr bool same_contained_type = std::is_same_v<stored_type, typename other_info::stored_type>;
 					if constexpr (same_contained_type && same_size)
 					{
 						// Same size and contained type means we can have an alternative representation of this vector type while being the same under-the-hood
@@ -171,7 +230,87 @@ namespace EmuMath::TMP
 			return valid_template_vector_copy_construct_arg<OtherSize_, OtherT_>();
 		}
 
+		template<std::size_t InSize_, typename InT_, bool in_is_const, bool in_is_temp>
+		[[nodiscard]] static constexpr inline bool is_valid_vector_for_set()
+		{
+			return _is_valid_vector_for_set<InSize_, InT_, in_is_const, in_is_temp>::get();
+		}
+
+		template<typename T_>
+		[[nodiscard]] static constexpr inline bool is_stored_type_settable_via_type()
+		{
+			return
+			(
+				std::is_assignable_v<stored_type, T_> ||
+				std::is_constructible_v<stored_type, T_> ||
+				std::is_convertible_v<T_, stored_type>
+			);
+		}
+
+		template<typename T_>
+		[[nodiscard]] static constexpr inline bool is_valid_type_for_single_set()
+		{
+			if constexpr (contains_ref)
+			{
+				if constexpr (!std::is_lvalue_reference_v<T_>)
+				{
+					// Temp, so will result in dangling references
+					// --- We allow EmuMath Vectors of references for this, however, 
+					// --- to allow Vectors of references to Vectors of references (not a typo).
+					if constexpr (is_stored_type_settable_via_type<T_>() && EmuMath::TMP::is_emu_new_vector_v<T_>)
+					{
+						if constexpr (contains_non_const_ref)
+						{
+							// We need non-const references to maintain const safety
+							return T_::contains_non_const_ref;
+						}
+						else
+						{
+							// Don't care about T_ ref constness as non-const will implicitly cast to const
+							return T_::contains_ref;
+						}
+					}
+					else
+					{
+						return false;
+					}
+				}
+				else
+				{
+					if constexpr (contains_non_const_ref)
+					{
+						// We need a non-const T_ to be able to assign our non-const references to maintain const safety.
+						if constexpr (std::is_const_v<T_>)
+						{
+							return false;
+						}
+						else
+						{
+							return is_stored_type_settable_via_type<T_>();
+						}
+					}
+					else
+					{
+						// No need to worry about constness as non-const will implicitly cast to const
+						return is_stored_type_settable_via_type<T_>();
+					}
+				}
+			}
+			else
+			{
+				return is_stored_type_settable_via_type<T_>();
+			}
+		}
+
+		template<typename T_>
+		[[nodiscard]] static constexpr inline bool is_valid_type_for_set_all()
+		{
+			return is_valid_type_for_single_set<T_>();
+		}
+#pragma endregion
+
 	private:
+#pragma region ASSERTION_MANAGEMENT
 		[[nodiscard]] static constexpr inline bool _do_assertion()
 		{
 			if constexpr (AllowAssertions_)
