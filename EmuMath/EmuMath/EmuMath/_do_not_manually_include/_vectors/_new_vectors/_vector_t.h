@@ -258,6 +258,24 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region SETS
+		template
+		<
+			std::size_t InSize_,
+			typename InT_,
+			typename = std::enable_if_t
+			<
+				(
+					std::is_assignable_v<stored_type, InT_> ||
+					std::is_constructible_v<stored_type, InT_> ||
+					std::is_convertible_v<InT_, stored_type>
+				)
+			>
+		>
+		constexpr inline void Set(EmuMath::NewVector<InSize_, InT_>&& to_move_set_)
+		{
+
+		}
+
 		/// <summary>
 		/// <para> Sets the stored_type at the provided Index_ within this Vector via the provided arg_. </para>
 		/// <para> If this Vector contains references, this will update what is referenced by said reference. </para>
@@ -270,9 +288,12 @@ namespace EmuMath
 			typename Arg_,
 			typename = std::enable_if_t
 			<
-				std::is_assignable_v<stored_type, Arg_> ||
-				std::is_constructible_v<stored_type, Arg_> ||
-				std::is_convertible_v<Arg_, stored_type>
+				(!EmuMath::TMP::is_emu_new_vector_v<Arg_>) &&
+				(
+					std::is_assignable_v<stored_type, Arg_> ||
+					std::is_constructible_v<stored_type, Arg_> ||
+					std::is_convertible_v<Arg_, stored_type>
+				)
 			>
 		>
 		constexpr inline void Set(Arg_&& arg_)

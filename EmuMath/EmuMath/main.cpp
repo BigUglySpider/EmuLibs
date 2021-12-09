@@ -361,6 +361,32 @@ int main()
 	new_num_ = 12;
 	std::cout << newvector_b_ << "\n";
 
+	std::cout << "---\n";
+	EmuMath::Helpers::new_vector_set(newvector_c_, newvector_b_);
+	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << "\n";
+	EmuMath::Helpers::new_vector_set(newvector_c_, newvector_a_);
+	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << "\n";
+	EmuMath::Helpers::new_vector_set(newvector_b_, newvector_a_);
+	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << "\n";
+	EmuMath::NewVector<5, float> some_new_vector_(1.0f, 10.0f, 100.0f, 1000.0f, 6.0f);
+
+	EmuMath::Helpers::new_vector_set(newvector_b_, some_new_vector_);
+	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
+	some_new_vector_.at<2>() = 3.0f;
+	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
+	EmuMath::Helpers::new_vector_set(some_new_vector_, newvector_a_);
+	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
+	some_new_vector_.at<1>() = 1.234f;
+	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
+	EmuMath::Helpers::new_vector_set(some_new_vector_, std::move(newvector_b_));
+	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
+	new_num_ = 33.5f;
+	EmuMath::Helpers::new_vector_set_all(newvector_b_, new_num_);
+	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
+	EmuMath::Helpers::new_vector_set_all<1, 3>(some_new_vector_, new_num_);
+	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
+	new_num_ = 1337.0f;
+	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
 
 	system("pause");
 	std::cout << "\n---\n\n\n";

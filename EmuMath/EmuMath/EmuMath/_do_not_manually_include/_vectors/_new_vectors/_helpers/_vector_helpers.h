@@ -3,5 +3,6 @@
 
 #include "_common_vector_helpers.h"
 #include "_vector_get.h"
+#include "_vector_set.h"
 
 #endif
