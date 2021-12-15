@@ -586,9 +586,6 @@ int main()
 	std::cout << some_newvec4f_ << "\n";
 	std::cout << EmuMath::NewVector<20, float>(0.5) << "\n";
 
-	some_newvec4f_.AtTheoretical<5>();
-	some_newvec4f_.AtTheoretical<2>();
-
 	std::cout << "\n\n";
 	system("pause");
 	std::cout << "\n---\n\n\n";

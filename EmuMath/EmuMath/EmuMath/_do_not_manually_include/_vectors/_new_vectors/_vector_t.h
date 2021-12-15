@@ -112,7 +112,7 @@ namespace EmuMath
 			return vector_info::template is_valid_lone_type_for_set_all_construction<T_>();
 		}
 
-		[[nodiscard]] static constexpr inline value_type_uq get_implied_zero() const
+		[[nodiscard]] static constexpr inline value_type_uq get_implied_zero()
 		{
 			return EmuMath::Helpers::new_vector_get_non_contained<this_type>();
 		}
