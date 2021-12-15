@@ -66,7 +66,7 @@ namespace EmuMath::Helpers
 	)
 	{
 		using arg_type = EmuMath::NewVector<ArgSize_, ArgT_>;
-		_vector_underlying::_vector_set_vector<arg_type, Size_, T_>(to_set_, std::forward<arg_type>(move_arg_));
+		_vector_underlying::_vector_set_vector<true, arg_type, Size_, T_>(to_set_, std::forward<arg_type>(move_arg_));
 	}
 
 	/// <summary>
@@ -85,7 +85,7 @@ namespace EmuMath::Helpers
 	)
 	{
 		using arg_type = EmuMath::NewVector<ArgSize_, ArgT_>;
-		_vector_underlying::_vector_set_vector<arg_type, Size_, T_>(to_set_, copy_arg_);
+		_vector_underlying::_vector_set_vector<true, arg_type, Size_, T_>(to_set_, copy_arg_);
 	}
 
 	/// <summary>
@@ -104,7 +104,64 @@ namespace EmuMath::Helpers
 	)
 	{
 		using arg_type = const EmuMath::NewVector<ArgSize_, ArgT_>;
-		_vector_underlying::_vector_set_vector<arg_type, Size_, T_>(to_set_, copy_arg_);
+		_vector_underlying::_vector_set_vector<true, arg_type, Size_, T_>(to_set_, copy_arg_);
+	}
+
+	/// <summary>
+	/// <para> Sets EmuMath Vector to_Set_ via all respective shared indices in the passed move_arg_ EmuMath Vector. </para>
+	/// <para> If move_arg_ contains less elements than to_set_, non-shared indices within to_set_ will not be modified. </para>
+	/// <para> If to_set_ contains references of any type, move_arg_ must have at least as many elements as to_set_, and must not be temporary. </para>
+	/// <para> If to_set_ contains non-const references of any type, move_arg_ must additionally not be constant or contain constant values. </para>
+	/// </summary>
+	/// <param name="to_set_">EmuMath Vector to set elements of.</param>
+	/// <param name="move_arg_">EmuMath Vector to set to_set_ via.</param>
+	template<typename T_, std::size_t Size_, std::size_t ArgSize_, typename ArgT_>
+	constexpr inline void new_vector_set_contained_only
+	(
+		EmuMath::NewVector<Size_, T_>& to_set_,
+		EmuMath::NewVector<ArgSize_, ArgT_>&& move_arg_
+	)
+	{
+		using arg_type = EmuMath::NewVector<ArgSize_, ArgT_>;
+		_vector_underlying::_vector_set_vector<false, arg_type, Size_, T_>(to_set_, std::forward<arg_type>(move_arg_));
+	}
+
+	/// <summary>
+	/// <para> Sets EmuMath Vector to_Set_ via all respective shared indices in the passed copy_arg_ EmuMath Vector. </para>
+	/// <para> If copy_arg_ contains less elements than to_set_, non-shared indices within to_set_ will not be modified. </para>
+	/// <para> If to_set_ contains references of any type, copy_arg_ must have at least as many elements as to_set_, and must not be temporary. </para>
+	/// <para> If to_set_ contains non-const references of any type, copy_arg_ must additionally not be constant or contain constant values. </para>
+	/// </summary>
+	/// <param name="to_set_">EmuMath Vector to set elements of.</param>
+	/// <param name="copy_arg_">EmuMath Vector to set to_set_ via.</param>
+	template<typename T_, std::size_t Size_, std::size_t ArgSize_, typename ArgT_>
+	constexpr inline void new_vector_set_contained_only
+	(
+		EmuMath::NewVector<Size_, T_>& to_set_,
+		EmuMath::NewVector<ArgSize_, ArgT_>& copy_arg_
+	)
+	{
+		using arg_type = EmuMath::NewVector<ArgSize_, ArgT_>;
+		_vector_underlying::_vector_set_vector<false, arg_type, Size_, T_>(to_set_, copy_arg_);
+	}
+
+	/// <summary>
+	/// <para> Sets EmuMath Vector to_Set_ via all respective shared indices in the passed copy_arg_ EmuMath Vector. </para>
+	/// <para> If copy_arg_ contains less elements than to_set_, non-shared indices within to_set_ will not be modified. </para>
+	/// <para> If to_set_ contains references of any type, copy_arg_ must have at least as many elements as to_set_, and must not be temporary. </para>
+	/// <para> If to_set_ contains non-const references of any type, copy_arg_ must additionally not be constant or contain constant values. </para>
+	/// </summary>
+	/// <param name="to_set_">EmuMath Vector to set elements of.</param>
+	/// <param name="copy_arg_">EmuMath Vector to set to_set_ via.</param>
+	template<typename T_, std::size_t Size_, std::size_t ArgSize_, typename ArgT_>
+	constexpr inline void new_vector_set_contained_only
+	(
+		EmuMath::NewVector<Size_, T_>& to_set_,
+		const EmuMath::NewVector<ArgSize_, ArgT_>& copy_arg_
+	)
+	{
+		using arg_type = const EmuMath::NewVector<ArgSize_, ArgT_>;
+		_vector_underlying::_vector_set_vector<false, arg_type, Size_, T_>(to_set_, copy_arg_);
 	}
 }
 

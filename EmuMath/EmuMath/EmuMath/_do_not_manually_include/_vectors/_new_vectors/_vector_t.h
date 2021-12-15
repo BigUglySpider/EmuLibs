@@ -266,6 +266,37 @@ namespace EmuMath
 			}
 		}
 
+		template
+		<
+			typename InT_,
+			// Covered by variadic template constructor for size-1 Vectors
+			typename = std::enable_if_t<(size > 1) && !EmuMath::TMP::is_emu_new_vector_v<InT_> && is_valid_type_for_set_all<InT_&&>>
+		>
+		explicit constexpr inline NewVector(InT_&& to_set_all_to_) : NewVector(_dummy_arg_for_private_lazy_default())
+		{
+			SetAll(std::forward<InT_>(to_set_all_to_));
+		}
+
+		template
+		<
+			typename InT_,
+			typename = std::enable_if_t<(size > 1) && !EmuMath::TMP::is_emu_new_vector_v<InT_>&& is_valid_type_for_set_all<InT_&>>
+		>
+		explicit constexpr inline NewVector(InT_& to_set_all_to_) : NewVector(_dummy_arg_for_private_lazy_default())
+		{
+			SetAll(to_set_all_to_);
+		}
+
+		template
+		<
+			typename InT_,
+			typename = std::enable_if_t<(size > 1) && !EmuMath::TMP::is_emu_new_vector_v<InT_>&& is_valid_type_for_set_all<const InT_&>>
+		>
+		explicit constexpr inline NewVector(const InT_& to_set_all_to_) : NewVector(_dummy_arg_for_private_lazy_default())
+		{
+			SetAll(to_set_all_to_);
+		}
+
 	private:
 		// Empty constructor used to perform a lazy-default when construction is executed within the constructor body; inaccessible out of this struct
 		// --- Disable warning about uninitialised data since that's the point of this constructor
@@ -515,6 +546,34 @@ namespace EmuMath
 		{
 			return const_cast<this_type*>(this)->data();
 		}
+
+		/// <summary>
+		/// <para> Provides a pointer to the start of contiguous data within this Vector from the specified Index_. </para>
+		/// <para> If this Vector contains references, this will generate a compile-time error, since contiguous data is not guaranteed to be referenced. </para>
+		/// </summary>
+		/// <returns>Pointer to the start of the element within this Vector at the provided Index_.</returns>
+		template<std::size_t Index_>
+		[[nodiscard]] constexpr inline stored_type* data()
+		{
+			if constexpr (Index_ < size)
+			{
+				return data() + Index_;
+			}
+			else
+			{
+				static_assert(false, "Attempted to access a contiguous data pointer of an EmuMath Vector from a specified Index_, but the provided Index_ was invalid. The valid index range is 0:size-1 (inclusive).");
+			}
+		}
+		/// <summary>
+		/// <para> Provides a const pointer to the start of contiguous data within this Vector from the specified Index_. </para>
+		/// <para> If this Vector contains references, this will generate a compile-time error, since contiguous data is not guaranteed to be referenced. </para>
+		/// </summary>
+		/// <returns>Const pointer to the start of the element within this Vector at the provided Index_.</returns>
+		template<std::size_t Index_>
+		[[nodiscard]] constexpr inline const stored_type* data() const
+		{
+			return const_cast<this_type*>(this)->template data<Index_>();
+		}
 #pragma endregion
 
 #pragma region ASSIGNMENT_OPERATORS
@@ -559,13 +618,34 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONVERSIONS
+		/// <summary>
+		/// <para> Converts this Vector to its alternative template representation, if it has one. </para>
+		/// <para> This is purely to convert reference-containing vectors between their `T_&amp;` and `internal_vector_reference&lt;T_&gt;` variants. </para>
+		/// <para>
+		///		For example, `Vector&lt;size, float&amp;&gt;` instantiates an identical type to `Vector&lt;size, internal_vector_reference&lt;float&gt;&gt;`,
+		///		in terms of implementation and functionality; the only difference is the type in the template signature.
+		/// </para>
+		/// <para> This is not available for Vectors that do not have an alternative template representation. </para>
+		/// </summary>
+		/// <returns>Alternative template representation of this Vector to create the same underlying structure, (non-const) copying this Vector's internals.</returns>
 		template<typename = std::enable_if_t<has_alternative_representation>>
 		[[nodiscard]] constexpr inline alternative_rep AsAlternativeRep()
 		{
 			return alternative_rep(*this);
 		}
 
-		template<typename = std::enable_if_t<has_alternative_representation>>
+		/// <summary>
+		/// <para> Converts this Vector to its alternative template representation, if it has one. </para>
+		/// <para> This is purely to convert reference-containing vectors between their `T_&amp;` and `internal_vector_reference&lt;T_&gt;` variants. </para>
+		/// <para>
+		///		For example, `Vector&lt;size, float&amp;&gt;` instantiates an identical type to `Vector&lt;size, internal_vector_reference&lt;float&gt;&gt;`,
+		///		in terms of implementation and functionality; the only difference is the type in the template signature.
+		/// </para>
+		/// <para> This is not available for Vectors that do not have an alternative template representation. </para>
+		/// <para> This const variant is further not available for Vectors that contain non-const references. </para>
+		/// </summary>
+		/// <returns>Alternative template representation of this Vector to create the same underlying structure, (const) copying this Vector's internals.</returns>
+		template<typename = std::enable_if_t<has_alternative_representation && !contains_non_const_ref>>
 		[[nodiscard]] constexpr inline alternative_rep AsAlternativeRep() const
 		{
 			return alternative_rep(*this);
@@ -615,6 +695,50 @@ namespace EmuMath
 		constexpr inline void Set(const EmuMath::NewVector<InSize_, InT_>& to_copy_set_)
 		{
 			EmuMath::Helpers::new_vector_set<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
+		}
+
+		template
+		<
+			std::size_t InSize_,
+			typename InT_,
+			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, false, true>()>
+		>
+		constexpr inline void SetContainedOnly(EmuMath::NewVector<InSize_, InT_>&& to_move_set_)
+		{
+			EmuMath::Helpers::new_vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
+		}
+
+		template
+		<
+			std::size_t InSize_,
+			typename InT_,
+			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, true, true>()>
+		>
+		constexpr inline void SetContainedOnly(const EmuMath::NewVector<InSize_, InT_>&& to_move_set_)
+		{
+			EmuMath::Helpers::new_vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
+		}
+
+		template
+		<
+			std::size_t InSize_,
+			typename InT_,
+			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, false, false>()>
+		>
+		constexpr inline void SetContainedOnly(EmuMath::NewVector<InSize_, InT_>& to_copy_set_)
+		{
+			EmuMath::Helpers::new_vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
+		}
+
+		template
+		<
+			std::size_t InSize_,
+			typename InT_,
+			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, true, false>()>
+		>
+		constexpr inline void SetContainedOnly(const EmuMath::NewVector<InSize_, InT_>& to_copy_set_)
+		{
+			EmuMath::Helpers::new_vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
 		}
 
 		/// <summary>
@@ -686,6 +810,13 @@ namespace EmuMath
 			}
 		}
 
+		/// <summary>
+		/// <para> Sets all stored_types at indices in the specified range within this Vector via the provided arg_. </para>
+		/// <para> If this Vector contains references, this will update what is referenced by all references. </para>
+		/// <para> BeginIndex_ indicates the inclusive index to start setting stored elements from. This defaults to 0.</para>
+		/// <para> EndIndex_ indicates the exclusive index to stop setting stored elements at. This defaults to the size of this Vector. </para>
+		/// </summary>
+		/// <param name="arg_">Argument to set all stored_types in the specified index range within this Vector via.</param>
 		template
 		<
 			std::size_t BeginIndex_ = 0,
@@ -698,6 +829,13 @@ namespace EmuMath
 			EmuMath::Helpers::new_vector_set_all<BeginIndex_, EndIndex_>(*this, std::move(arg_));
 		}
 
+		/// <summary>
+		/// <para> Sets all stored_types at indices in the specified range within this Vector via the provided arg_. </para>
+		/// <para> If this Vector contains references, this will update what is referenced by all references. </para>
+		/// <para> BeginIndex_ indicates the inclusive index to start setting stored elements from. This defaults to 0.</para>
+		/// <para> EndIndex_ indicates the exclusive index to stop setting stored elements at. This defaults to the size of this Vector. </para>
+		/// </summary>
+		/// <param name="arg_">Argument to set all stored_types in the specified index range within this Vector via.</param>
 		template
 		<
 			std::size_t BeginIndex_ = 0,
@@ -710,6 +848,13 @@ namespace EmuMath
 			EmuMath::Helpers::new_vector_set_all<BeginIndex_, EndIndex_>(*this, arg_);
 		}
 
+		/// <summary>
+		/// <para> Sets all stored_types at indices in the specified range within this Vector via the provided arg_. </para>
+		/// <para> If this Vector contains references, this will update what is referenced by all references. </para>
+		/// <para> BeginIndex_ indicates the inclusive index to start setting stored elements from. This defaults to 0.</para>
+		/// <para> EndIndex_ indicates the exclusive index to stop setting stored elements at. This defaults to the size of this Vector. </para>
+		/// </summary>
+		/// <param name="arg_">Argument to set all stored_types in the specified index range within this Vector via.</param>
 		template
 		<
 			std::size_t BeginIndex_ = 0,
@@ -726,25 +871,6 @@ namespace EmuMath
 	private:
 		data_storage_type _data;
 	};
-}
-
-template<std::size_t Size_, typename T_>
-inline std::ostream& operator<<(std::ostream& str_, const EmuMath::NewVector<Size_, T_>& vector_)
-{
-	std::size_t i = 0;
-	str_ << "{";
-	if (i < Size_)
-	{
-		str_ << " " << vector_[i];
-		++i;
-		while (i < Size_)
-		{
-			str_ << ", " << vector_[i];
-			++i;
-		}
-	}
-	str_ << " }";
-	return str_;
 }
 
 #endif

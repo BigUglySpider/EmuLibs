@@ -344,13 +344,13 @@ int main()
 	auto& rt_theoretical_1_ = EmuMath::Helpers::new_vector_get_theoretical<1>(newvector_b_);
 	auto& rt_theoretical_2_ = EmuMath::Helpers::new_vector_get_theoretical<2>(newvector_b_);
 	auto& rt_theoretical_3_ = EmuMath::Helpers::new_vector_get_theoretical<3>(newvector_b_);
-	auto rt_theoretical_4_ = EmuMath::Helpers::new_vector_get_theoretical<4>(newvector_b_);
+	auto  rt_theoretical_4_ = EmuMath::Helpers::new_vector_get_theoretical<4>(newvector_b_);
 	
 	std::cout << newvector_b_ << "\n";
 	std::cout << newvector_c_ << "\n";
-	std::cout << EmuMath::NewVector<4, const float&>(  std::move(newvector_c_)) << "\n";
-	std::cout << EmuMath::NewVector<4, const float&>(  newvector_c_) << "\n";
-	std::cout << EmuMath::NewVector<4, const float&>(  const_cast<const decltype(newvector_c_)&>(newvector_c_)) << "\n";
+	std::cout << EmuMath::NewVector<4, const float&>(newvector_c_) << "\n";
+	std::cout << EmuMath::NewVector<4, const float&>(const_cast<const decltype(newvector_c_)&>(newvector_c_)) << "\n";
+	std::cout << EmuMath::NewVector<4, const float&>(std::move(newvector_c_)) << "\n";
 
 	float new_num_ = 45;
 	int blombo = 2;
@@ -363,7 +363,7 @@ int main()
 
 	std::cout << "---\n";
 	//EmuMath::Helpers::new_vector_set(newvector_c_, newvector_b_);
-	newvector_c_.Set(newvector_b_);
+	newvector_c_ = decltype(newvector_c_)(newvector_b_);
 	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << "\n";
 	//EmuMath::Helpers::new_vector_set(newvector_c_, newvector_a_);
 	newvector_c_.Set(newvector_a_);
@@ -384,6 +384,7 @@ int main()
 	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
 	//EmuMath::Helpers::new_vector_set(some_new_vector_, std::move(newvector_b_));
 	some_new_vector_.Set(std::move(newvector_b_));
+	newvector_b_ = decltype(newvector_b_)(some_new_vector_);
 	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
 	new_num_ = 33.5f;
 	//EmuMath::Helpers::new_vector_set_all(newvector_b_, new_num_);
@@ -567,6 +568,22 @@ int main()
 	{
 		std::cout << bloobongo_ << "[4]: Not found\n";
 	}
+
+	std::cout << "---\n";
+	EmuMath::NewVector<3, float> some_newvec3f_(1.0f, 1.25f, 1.5f);
+	std::cout << some_newvec3f_ << "\n";
+	std::cout << "Memory locations:\n";
+	std::cout << "[0]: " << some_newvec3f_.data<0>() << "\n";
+	std::cout << "[1]: " << some_newvec3f_.data<1>() << "\n";
+	std::cout << "[2]: " << some_newvec3f_.data<2>() << "\n";
+	EmuMath::NewVector<4, float> some_newvec4f_(10.0f, 20.0f, 30.0f, 40.0f);
+	std::cout << some_newvec4f_ << "\n";
+	some_newvec4f_.Set(some_newvec3f_);
+	std::cout << some_newvec4f_ << "\n";
+	some_newvec4f_ = decltype(some_newvec4f_)(10.0f, 20.0f, 30.0f, 40.0f);
+	std::cout << some_newvec4f_ << "\n";
+	some_newvec4f_.SetContainedOnly(some_newvec3f_);
+	std::cout << some_newvec4f_ << "\n";
 
 	std::cout << "\n\n";
 	system("pause");
@@ -835,7 +852,7 @@ int main()
 		timer_.Restart();
 		noise_[i].GenerateNoise<test_noise_type_flag, scalar_test_noise_processor>
 		(
-			noise_[i].MakeOptions
+			decltype(noise_)::value_type::MakeOptions
 			(
 				sample_count,
 				EmuMath::Vector<3, float>(0.0f, 0.0f, 0.0f),
@@ -854,7 +871,7 @@ int main()
 		timer_.Restart();
 		fast_noise_[i].GenerateNoise<test_noise_type_flag, fast_test_noise_processor>
 		(
-			fast_noise_[i].make_options
+			decltype(fast_noise_)::value_type::make_options
 			(
 				sample_count,
 				EmuMath::Vector<3, float>(0.0f, 0.0f, 0.0f),
