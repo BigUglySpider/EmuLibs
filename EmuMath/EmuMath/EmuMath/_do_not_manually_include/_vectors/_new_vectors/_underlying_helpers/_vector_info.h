@@ -185,72 +185,6 @@ namespace EmuMath::TMP
 			}
 		}
 
-		template<std::size_t OtherSize_, typename OtherT_>
-		[[nodiscard]] static constexpr inline bool valid_template_vector_copy_construct_arg()
-		{
-			using other_vector = EmuMath::NewVector<OtherSize_, OtherT_>;
-			if constexpr (valid_template_construct_args<EmuMath::NewVector<OtherSize_, other_vector>>())
-			{
-				// If this is a valid vector arg for template construction, defer to that as the instantiation speed is likely improved.
-				// --- This is because a copy is likely to be a default-then-copy-in-the-body situation.
-				return false;
-			}
-			else
-			{
-				constexpr bool same_size = Size_ == OtherSize_;
-				constexpr bool same_vector = std::is_same_v<T_, OtherT_> && same_size;
-				if constexpr (same_vector)
-				{
-					// Explicit constructor will be provided for same-vector copies to avoid default-then-copy-in-the-body.
-					return false;
-				}
-				else
-				{
-					constexpr bool same_contained_type = std::is_same_v<stored_type, typename other_vector::stored_type>;
-					if constexpr (same_contained_type && same_size)
-					{
-						// Same size and contained type means we can have an alternative representation of this vector type while being the same under-the-hood
-						// --- Exists purely for `Type&` syntactic sugar when forming reference vectors, 
-						// --- as the actual contained type is EmuMath::vector_internal_ref<Type_>
-						// ------ Explicit construction for alternatives is provided where applicable
-						return false;
-					}
-					else
-					{
-						// No other conflicts
-						if constexpr (contains_ref)
-						{
-							// Require a Vector large enough to initialise all references
-							return other_vector::size >= size;
-						}
-						else
-						{
-							return true;
-						}
-					}
-				}
-			}
-		}
-
-		template<std::size_t OtherSize_, typename OtherT_>
-		[[nodiscard]] static constexpr inline bool valid_template_vector_const_copy_construct_arg()
-		{
-			if constexpr (valid_template_vector_copy_construct_arg<OtherSize_, OtherT_>())
-			{
-				return !contains_non_const_ref;
-			}
-			else
-			{
-				return false;
-			}
-		}
-
-		template<std::size_t OtherSize_, typename OtherT_>
-		[[nodiscard]] static constexpr inline bool valid_template_vector_move_construct_arg()
-		{
-			return valid_template_vector_copy_construct_arg<OtherSize_, OtherT_>();
-		}
-
 		template<std::size_t InSize_, typename InT_, bool in_is_const, bool in_is_temp>
 		[[nodiscard]] static constexpr inline bool is_valid_vector_for_set()
 		{
@@ -327,6 +261,102 @@ namespace EmuMath::TMP
 		[[nodiscard]] static constexpr inline bool is_valid_type_for_set_all()
 		{
 			return is_valid_type_for_single_set<T_>();
+		}
+
+		template<typename T_>
+		[[nodiscard]] static constexpr inline bool is_valid_lone_type_for_set_all_construction()
+		{
+			if constexpr (size <= 1)
+			{
+				// Never true if size == 1, as this is covered by variadic construction.
+				return false;
+			}
+			else
+			{
+				using t_uq = EmuCore::TMP::remove_ref_cv_t<T_>;
+				if constexpr (std::is_same_v<vector_rep, t_uq> || (has_alternative_representation && std::is_same_v<t_uq, alternative_vector_rep>))
+				{
+					// These constructors are covered explicitly and perform full moves/copies; alternative behaviour is not allowed.
+					return false;
+				}
+				else
+				{
+					if constexpr (is_valid_type_for_set_all<T_>())
+					{
+						return true;
+					}
+					else
+					{
+						return false;
+					}
+				}
+			}
+		}
+
+		template<std::size_t OtherSize_, typename OtherT_>
+		[[nodiscard]] static constexpr inline bool valid_template_vector_copy_construct_arg()
+		{
+			using other_vector = EmuMath::NewVector<OtherSize_, OtherT_>;
+			if constexpr (valid_template_construct_args<EmuMath::NewVector<OtherSize_, other_vector>>())
+			{
+				// If this is a valid vector arg for template construction, defer to that as the instantiation speed is likely improved.
+				// --- This is because a copy is likely to be a default-then-copy-in-the-body situation.
+				return false;
+			}
+			else
+			{
+				constexpr bool same_size = Size_ == OtherSize_;
+				constexpr bool same_vector = std::is_same_v<T_, OtherT_> && same_size;
+				if constexpr (same_vector)
+				{
+					// Explicit constructor will be provided for same-vector copies to avoid default-then-copy-in-the-body.
+					return false;
+				}
+				else
+				{
+					constexpr bool same_contained_type = std::is_same_v<stored_type, typename other_vector::stored_type>;
+					if constexpr (same_contained_type && same_size)
+					{
+						// Same size and contained type means we can have an alternative representation of this vector type while being the same under-the-hood
+						// --- Exists purely for `Type&` syntactic sugar when forming reference vectors, 
+						// --- as the actual contained type is EmuMath::vector_internal_ref<Type_>
+						// ------ Explicit construction for alternatives is provided where applicable
+						return false;
+					}
+					else
+					{
+						// No other conflicts
+						if constexpr (contains_ref)
+						{
+							// Require a Vector large enough to initialise all references
+							return other_vector::size >= size;
+						}
+						else
+						{
+							return true;
+						}
+					}
+				}
+			}
+		}
+
+		template<std::size_t OtherSize_, typename OtherT_>
+		[[nodiscard]] static constexpr inline bool valid_template_vector_const_copy_construct_arg()
+		{
+			if constexpr (valid_template_vector_copy_construct_arg<OtherSize_, OtherT_>())
+			{
+				return !contains_non_const_ref;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		template<std::size_t OtherSize_, typename OtherT_>
+		[[nodiscard]] static constexpr inline bool valid_template_vector_move_construct_arg()
+		{
+			return valid_template_vector_copy_construct_arg<OtherSize_, OtherT_>();
 		}
 
 		template<typename T_, bool WhenConst_>

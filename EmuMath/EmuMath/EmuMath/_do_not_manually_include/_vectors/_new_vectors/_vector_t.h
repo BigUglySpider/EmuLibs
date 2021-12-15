@@ -43,19 +43,31 @@ namespace EmuMath
 		template<std::size_t OtherSize_, typename OtherT_>
 		[[nodiscard]] static constexpr inline bool valid_template_vector_copy_construct_arg()
 		{
-			return vector_info::template valid_template_vector_copy_construct_arg<OtherSize_, OtherT_>();
+			return 
+			(
+				vector_info::template valid_template_vector_copy_construct_arg<OtherSize_, OtherT_>() &&
+				!vector_info::template is_valid_lone_type_for_set_all_construction<EmuMath::NewVector<OtherSize_, OtherT_>&>()
+			);
 		}
 
 		template<std::size_t OtherSize_, typename OtherT_>
 		[[nodiscard]] static constexpr inline bool valid_template_vector_const_copy_construct_arg()
 		{
-			return vector_info::template valid_template_vector_const_copy_construct_arg<OtherSize_, OtherT_>();
+			return 
+			(
+				vector_info::template valid_template_vector_const_copy_construct_arg<OtherSize_, OtherT_>() &&
+				!vector_info::template is_valid_lone_type_for_set_all_construction<const EmuMath::NewVector<OtherSize_, OtherT_>&>()
+			);
 		}
 
 		template<std::size_t OtherSize_, typename OtherT_>
 		[[nodiscard]] static constexpr inline bool valid_template_vector_move_construct_arg()
 		{
-			return vector_info::template valid_template_vector_move_construct_arg<OtherSize_, OtherT_>();
+			return
+			(
+				vector_info::template valid_template_vector_move_construct_arg<OtherSize_, OtherT_>() &&
+				!vector_info::template is_valid_lone_type_for_set_all_construction<EmuMath::NewVector<OtherSize_, OtherT_>&&>()
+			);
 		}
 
 		template<std::size_t InSize_, typename InT_, bool in_is_const, bool in_is_temp>
@@ -80,6 +92,12 @@ namespace EmuMath
 		[[nodiscard]] static constexpr inline bool is_valid_try_get_output_ref()
 		{
 			return vector_info::template is_valid_try_get_output_ref<T_, WhileConst_>();
+		}
+
+		template<typename T_>
+		[[nodiscard]] static constexpr inline bool is_valid_lone_type_for_set_all_construction()
+		{
+			return vector_info::template is_valid_lone_type_for_set_all_construction<T_>();
 		}
 
 	private:
@@ -269,8 +287,7 @@ namespace EmuMath
 		template
 		<
 			typename InT_,
-			// Covered by variadic template constructor for size-1 Vectors
-			typename = std::enable_if_t<(size > 1) && !EmuMath::TMP::is_emu_new_vector_v<InT_> && is_valid_type_for_set_all<InT_&&>>
+			typename = std::enable_if_t<is_valid_lone_type_for_set_all_construction<InT_&&>()>
 		>
 		explicit constexpr inline NewVector(InT_&& to_set_all_to_) : NewVector(_dummy_arg_for_private_lazy_default())
 		{
@@ -280,7 +297,7 @@ namespace EmuMath
 		template
 		<
 			typename InT_,
-			typename = std::enable_if_t<(size > 1) && !EmuMath::TMP::is_emu_new_vector_v<InT_>&& is_valid_type_for_set_all<InT_&>>
+			typename = std::enable_if_t<is_valid_lone_type_for_set_all_construction<InT_&>()>
 		>
 		explicit constexpr inline NewVector(InT_& to_set_all_to_) : NewVector(_dummy_arg_for_private_lazy_default())
 		{
@@ -290,7 +307,7 @@ namespace EmuMath
 		template
 		<
 			typename InT_,
-			typename = std::enable_if_t<(size > 1) && !EmuMath::TMP::is_emu_new_vector_v<InT_>&& is_valid_type_for_set_all<const InT_&>>
+			typename = std::enable_if_t<is_valid_lone_type_for_set_all_construction<const InT_&>()>
 		>
 		explicit constexpr inline NewVector(const InT_& to_set_all_to_) : NewVector(_dummy_arg_for_private_lazy_default())
 		{
