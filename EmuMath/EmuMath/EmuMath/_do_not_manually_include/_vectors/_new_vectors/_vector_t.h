@@ -7,6 +7,18 @@
 
 namespace EmuMath
 {
+	/// <summary>
+	/// <para> Mathematical Vector of any number of dimensions. </para>
+	/// <para> 
+	///		Provides support for Vectors of lvalue references.
+	///		References to a type T are intended to be stored as vector_internal_ref&lt;T&gt;.
+	///		As such, instantiations of `Vector&lt;size, T&amp;&gt;` are identical to instantiations of `Vector&lt;size, vector_internal_ref&lt;T&gt;&gt;`.
+	/// </para>
+	/// </summary>
+	/// <typeparam name="T_">
+	///		Type for this Vector to store.
+	///		If T_ is an l-value reference type, it will be reinterpreted as `vector_internal_ref&lt;std::remove_ref_t&lt;T_&gt;&gt;`.
+	/// </typeparam>
 	template<std::size_t Size_, typename T_>
 	struct NewVector
 	{
@@ -98,6 +110,11 @@ namespace EmuMath
 		[[nodiscard]] static constexpr inline bool is_valid_lone_type_for_set_all_construction()
 		{
 			return vector_info::template is_valid_lone_type_for_set_all_construction<T_>();
+		}
+
+		[[nodiscard]] static constexpr inline value_type_uq get_implied_zero() const
+		{
+			return EmuMath::Helpers::new_vector_get_non_contained<this_type>();
 		}
 
 	private:
@@ -389,16 +406,39 @@ namespace EmuMath
 		}
 
 		/// <summary>
+		/// <para> Returns the item theoretically stored at the provided index within this Vector. </para>
+		/// <para> If Index_ is a valid contained index within this Vector (0:size-1, inclusive): Returns a value_type reference to the item at the provided Index_. </para>
+		/// <para> If none of the above is true: Returns an implied-zero, newly constructed value_type_uq. </para>
+		/// </summary>
+		/// <returns>Result of `at&lt;Index_&gt;()` if Index_ is a valid contained index in this Vector; otherwise, result of `get_implied_zero()`.</returns>
+		template<std::size_t Index_>
+		[[nodiscard]] constexpr inline EmuMath::TMP::emu_vector_theoretical_return_t<Index_, this_type> AtTheoretical()
+		{
+			return EmuMath::Helpers::new_vector_get_theoretical<Index_>(*this);
+		}
+		/// <summary>
+		/// <para> Returns the item theoretically stored at the provided index within this Vector. </para>
+		/// <para> If Index_ is a valid contained index within this Vector (0:size-1, inclusive): Returns a const value_type reference to the item at the provided Index_. </para>
+		/// <para> If none of the above is true: Returns an implied-zero, newly constructed value_type_uq. </para>
+		/// </summary>
+		/// <returns>Result of `at&lt;Index_&gt;()` if Index_ is a valid contained index in this Vector; otherwise, result of `get_implied_zero()`.</returns>
+		template<std::size_t Index_>
+		[[nodiscard]] constexpr inline EmuMath::TMP::emu_vector_theoretical_return_t<Index_, const this_type> AtTheoretical() const
+		{
+			return EmuMath::Helpers::new_vector_get_theoretical<Index_>(*this);
+		}
+
+		/// <summary>
 		/// <para> Attempts to retrieve the specified index_ within this Vector, outputting the element via out_ if the index_ is valid. </para>
 		/// <para>
-		///		Out_ must be assignable, constructible, or convertible-to from a reference to this Vector's value_type. 
-		///		Assignment will be prioritised over construction, and construction will be prioritised over conversion.
+		///		Out_ must be assignable, convertible-to, or constructible from a reference to this Vector's value_type. 
+		///		Assignment will be prioritised over conversion, and conversion will be prioritised over construction.
 		/// </para>
 		/// </summary>
 		/// <typeparam name="Out_">Type of reference provided to output to via out_.</typeparam>
 		/// <param name="index_">: Index to try and retrieve an element from within this Vector.</param>
 		/// <param name="out_"> 
-		///		: Reference to output to if the get is successful. Must be assignable, constructible, or convertible-to from a reference to this Vector's value_type.
+		///		: Reference to output to if the get is successful. Must be assignable, convertible-to, or constructible from a reference to this Vector's value_type.
 		/// </param>
 		/// <returns>True if the provided index is valid, otherwise false.</returns>
 		template<typename Out_, typename = std::enable_if_t<is_valid_try_get_output_ref<Out_, false>()>>
@@ -409,14 +449,14 @@ namespace EmuMath
 		/// <summary>
 		/// <para> Attempts to retrieve the specified index_ within this Vector, outputting the element via out_ if the index_ is valid. </para>
 		/// <para>
-		///		Out_ must be assignable, constructible, or convertible-to from a const reference to this Vector's value_type. 
-		///		Assignment will be prioritised over construction, and construction will be prioritised over conversion.
+		///		Out_ must be assignable, convertible-to, or constructible from a reference to this Vector's value_type. 
+		///		Assignment will be prioritised over conversion, and conversion will be prioritised over construction.
 		/// </para>
 		/// </summary>
 		/// <typeparam name="Out_">Type of reference provided to output to via out_.</typeparam>
 		/// <param name="index_">: Index to try and retrieve an element from within this Vector.</param>
 		/// <param name="out_"> 
-		///		: Reference to output to if the get is successful. Must be assignable, constructible, or convertible-to from a const reference to this Vector's value_type.
+		///		: Reference to output to if the get is successful. Must be assignable, convertible-to, or constructible from a const reference to this Vector's value_type.
 		/// </param>
 		/// <returns>True if the provided index is valid, otherwise false.</returns>
 		template<typename Out_, typename = std::enable_if_t<is_valid_try_get_output_ref<Out_, true>()>>
@@ -465,14 +505,14 @@ namespace EmuMath
 		/// <para> Shorthand for `TryAt` with the same arguments and const state. </para>
 		/// <para> Attempts to retrieve the specified index_ within this Vector, outputting the element via out_ if the index_ is valid. </para>
 		/// <para>
-		///		Out_ must be assignable, constructible, or convertible-to from a reference to this Vector's value_type. 
-		///		Assignment will be prioritised over construction, and construction will be prioritised over conversion.
+		///		Out_ must be assignable, convertible-to, or constructible from a reference to this Vector's value_type. 
+		///		Assignment will be prioritised over conversion, and conversion will be prioritised over construction.
 		/// </para>
 		/// </summary>
 		/// <typeparam name="Out_">Type of reference provided to output to via out_.</typeparam>
 		/// <param name="index_">: Index to try and retrieve an element from within this Vector.</param>
 		/// <param name="out_"> 
-		///		: Reference to output to if the get is successful. Must be assignable, constructible, or convertible-to from a reference to this Vector's value_type.
+		///		: Reference to output to if the get is successful. Must be assignable, convertible-to, or constructible from a reference to this Vector's value_type.
 		/// </param>
 		/// <returns>True if the provided index is valid, otherwise false.</returns>
 		template<typename Out_, typename = std::enable_if_t<is_valid_try_get_output_ref<Out_, false>()>>
@@ -484,14 +524,14 @@ namespace EmuMath
 		/// <para> Shorthand for `TryAt` with the same arguments and const state. </para>
 		/// <para> Attempts to retrieve the specified index_ within this Vector, outputting the element via out_ if the index_ is valid. </para>
 		/// <para>
-		///		Out_ must be assignable, constructible, or convertible-to from a const reference to this Vector's value_type. 
-		///		Assignment will be prioritised over construction, and construction will be prioritised over conversion.
+		///		Out_ must be assignable, convertible-to, or constructible from a reference to this Vector's value_type. 
+		///		Assignment will be prioritised over conversion, and conversion will be prioritised over construction.
 		/// </para>
 		/// </summary>
 		/// <typeparam name="Out_">Type of reference provided to output to via out_.</typeparam>
 		/// <param name="index_">: Index to try and retrieve an element from within this Vector.</param>
 		/// <param name="out_"> 
-		///		: Reference to output to if the get is successful. Must be assignable, constructible, or convertible-to from a const reference to this Vector's value_type.
+		///		: Reference to output to if the get is successful. Must be assignable, convertible-to, or constructible from a const reference to this Vector's value_type.
 		/// </param>
 		/// <returns>True if the provided index is valid, otherwise false.</returns>
 		template<typename Out_, typename = std::enable_if_t<is_valid_try_get_output_ref<Out_, true>()>>
@@ -778,13 +818,13 @@ namespace EmuMath
 				{
 					std::get<Index_>(_data) = std::forward<Arg_>(arg_);
 				}
+				else if constexpr (std::is_convertible_v<Arg_, stored_type>)
+				{
+					std::get<Index_>(_data) = static_cast<stored_type>(arg_);
+				}
 				else if constexpr (std::is_constructible_v<stored_type, Arg_>)
 				{
 					std::get<Index_>(_data) = stored_type(std::forward<Arg_>(arg_));
-				}
-				else if constexpr(std::is_convertible_v<Arg_, stored_type>)
-				{
-					std::get<Index_>(_data) = static_cast<stored_type>(arg_);
 				}
 				else
 				{

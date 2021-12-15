@@ -7,7 +7,7 @@ namespace EmuMath::Helpers
 {
 	/// <summary>
 	/// <para> Sets the specified index of the passed EmuMath Vector via the passed arguments. </para>
-	/// <para> If 1 args_ is provided: The stored_type of `to_set_` must be assignable, constructible, or convertible-to from the provided argument type. </para>
+	/// <para> If 1 args_ is provided: The stored_type of `to_set_` must be assignable, convertible-to, or constructible from the provided argument type. </para>
 	/// <para> If more than 1 args_ is provided: The stored_type of `to_set_` must be constructible from the provided argument types in the provided order. </para>
 	/// </summary>
 	/// <typeparam name="Args_">Arguments to use for setting the specified index.</typeparam>
@@ -26,7 +26,7 @@ namespace EmuMath::Helpers
 	/// </para>
 	/// <para> By default, this affects all indices. EndIndex_ will be clamped into a valid range 0:size (inclusive). </para>
 	/// <para> If `BeginIndex_ == EndIndex_`, this will do nothing. </para>
-	/// <para> The stored_type of to_set_ must be assignable, constructible, or convertible-to from the provided arg_ type. </para>
+	/// <para> The stored_type of to_set_ must be assignable, convertible-to, or constructible from the provided arg_ type. </para>
 	/// <para> If to_set_ contains references of any type, arg_ must not be temporary. </para>
 	/// <para> If to_set_ contains non-const references of any type, arg_ must additionally not be constant </para>
 	/// <para> Note that EndIndex_ is exclusive; if the final index to be updated is 3, for example, then the provided EndIndex_ should be 4. </para>
