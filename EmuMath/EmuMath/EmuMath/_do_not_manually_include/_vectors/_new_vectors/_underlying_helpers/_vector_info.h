@@ -359,21 +359,86 @@ namespace EmuMath::TMP
 			return valid_template_vector_copy_construct_arg<OtherSize_, OtherT_>();
 		}
 
-		template<typename T_, bool WhenConst_>
+		template<typename Out_, bool WhenConst_>
 		[[nodiscard]] static constexpr inline bool is_valid_try_get_output_ref()
 		{
 			using get_return_type = EmuCore::TMP::conditional_const_t<WhenConst_, value_type>&;
 			return 
 			(
-				!std::is_const_v<T_> && // Can't output to const
-				!std::is_rvalue_reference_v<T_> && // ravlue output is pointless
-				!EmuCore::TMP::is_any_comparison_true<std::is_same, T_, value_type**, const value_type**>::value && // Reserved for outputting a reference pointer
+				!std::is_const_v<Out_> && // Can't output to const
+				!std::is_rvalue_reference_v<Out_> && // ravlue output is pointless
+				!EmuCore::TMP::is_any_comparison_true<std::is_same, Out_, value_type**, const value_type**>::value && // Reserved for outputting a reference pointer
 				(
-					std::is_assignable_v<T_, get_return_type> ||
-					std::is_constructible_v<T_, get_return_type> ||
-					std::is_convertible_v<get_return_type, T_>
+					std::is_assignable_v<Out_, get_return_type> ||
+					std::is_constructible_v<Out_, get_return_type> ||
+					std::is_convertible_v<get_return_type, Out_>
 				) // Must be possible to create in one of these standard ways
 			);
+		}
+
+		template<typename Arg_>
+		[[nodiscard]] static constexpr inline bool is_valid_single_copy_type()
+		{
+			return
+			(
+				std::is_assignable_v<value_type, Arg_> ||
+				std::is_convertible_v<Arg_, value_type> ||
+				std::is_constructible_v<value_type, Arg_>
+			);
+		}
+
+		template<typename Arg_, bool Assigning_>
+		[[nodiscard]] static constexpr inline bool is_valid_template_copy_arg()
+		{
+			if constexpr (std::is_const_v<value_type>)
+			{
+				// Cannot modify const
+				return false;
+			}
+			else
+			{
+				using arg_no_ref = std::remove_reference_t<Arg_>;
+				if constexpr (std::is_same_v<arg_no_ref, vector_rep> && Assigning_)
+				{
+					// Explicit function exists
+					return false;
+				}
+				else
+				{
+					if constexpr (has_alternative_representation && std::is_same_v<arg_no_ref, alternative_vector_rep> && Assigning_)
+					{
+						// Explicit alt function exists
+						return false;
+					}
+					else
+					{
+						if constexpr (EmuMath::TMP::is_emu_new_vector_v<value_type> && EmuMath::TMP::is_emu_vector_v<arg_no_ref>)
+						{
+							using arg_value_type = typename arg_no_ref::value_type;
+							using value_type_info = typename value_type::vector_info;
+							if constexpr (EmuMath::TMP::is_emu_new_vector_v<arg_value_type>)
+							{
+								return value_type_info::template is_valid_template_copy_arg<arg_value_type, Assigning_>();
+							}
+							else
+							{
+								return value_type_info::template is_valid_template_copy_arg<Arg_, false>();
+							}
+						}
+						else
+						{
+							if constexpr (EmuMath::TMP::is_emu_new_vector_v<arg_no_ref>)
+							{
+								return is_valid_single_copy_type<typename arg_no_ref::value_type>();
+							}
+							else
+							{
+								return is_valid_single_copy_type<Arg_>();
+							}
+						}
+					}
+				}
+			}
 		}
 #pragma endregion
 

@@ -117,6 +117,18 @@ namespace EmuMath
 			return EmuMath::Helpers::new_vector_get_non_contained<this_type>();
 		}
 
+		template<typename Arg_>
+		[[nodiscard]] static constexpr inline bool is_valid_template_copy_arg()
+		{
+			return vector_info::template is_valid_template_copy_arg<Arg_, false>();
+		}
+
+		template<typename Arg_>
+		[[nodiscard]] static constexpr inline bool is_valid_template_assign_arg()
+		{
+			return vector_info::template is_valid_template_copy_arg<Arg_, true>();
+		}
+
 	private:
 		struct _dummy_arg_for_private_lazy_default
 		{
@@ -634,42 +646,81 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region ASSIGNMENT_OPERATORS
-		constexpr inline this_type& operator=(this_type& rhs_)
+		constexpr inline this_type& operator=(this_type&& to_move_) noexcept
 		{
-			_data = rhs_._data;
+			_data = std::move(to_move_._data);
 			return *this;
 		}
 
 		template<typename = std::enable_if_t<has_alternative_representation>>
-		constexpr inline this_type& operator=(alternative_rep& rhs_)
+		constexpr inline this_type& operator=(alternative_rep&& to_move_) noexcept
 		{
-			_data = rhs_._data;
+			_data = std::move(to_move_._data);
 			return *this;
 		}
 
-		template<typename = std::enable_if_t<!contains_non_const_ref>>
-		constexpr inline this_type& operator=(const this_type& rhs_)
+		constexpr inline this_type& operator=(this_type& to_copy_)
 		{
-			_data = rhs_._data;
-			return *this;
-		}
-
-		template<typename = std::enable_if_t<has_alternative_representation && !contains_non_const_ref>>
-		constexpr inline this_type& operator=(const alternative_rep& rhs_)
-		{
-			_data = rhs_._data;
-			return *this;
-		}
-
-		constexpr inline this_type& operator=(this_type&& rhs_) noexcept
-		{
-			_data = std::move(rhs_._data);
+			if constexpr (contains_ref)
+			{
+				Copy(to_copy_);
+			}
+			else
+			{
+				_data = to_copy_._data;
+			}
 			return *this;
 		}
 		template<typename = std::enable_if_t<has_alternative_representation>>
-		constexpr inline this_type& operator=(alternative_rep&& rhs_) noexcept
+		constexpr inline this_type& operator=(alternative_rep& to_copy_)
 		{
-			_data = std::move(rhs_._data);
+			if constexpr (contains_ref)
+			{
+				Copy(to_copy_);
+			}
+			else
+			{
+				_data = to_copy_._data;
+			}
+			return *this;
+		}
+
+		constexpr inline this_type& operator=(const this_type& to_copy_)
+		{
+			if constexpr (contains_ref)
+			{
+				Copy(to_copy_);
+			}
+			else
+			{
+				_data = to_copy_._data;
+			}
+			return *this;
+		}
+		template<typename = std::enable_if_t<has_alternative_representation>>
+		constexpr inline this_type& operator=(const alternative_rep& to_copy_)
+		{
+			if constexpr (contains_ref)
+			{
+				Copy(to_copy_);
+			}
+			else
+			{
+				_data = to_copy_._data;
+			}
+			return *this;
+		}
+
+		template<class Arg_, typename = std::enable_if_t<is_valid_template_assign_arg<Arg_>()>>
+		constexpr inline this_type& operator=(Arg_& to_copy_)
+		{
+			Copy(to_copy_);
+			return *this;
+		}
+		template<class Arg_, typename = std::enable_if_t<is_valid_template_assign_arg<const Arg_>()>>
+		constexpr inline this_type& operator=(const Arg_& to_copy_)
+		{
+			Copy(to_copy_);
 			return *this;
 		}
 #pragma endregion
@@ -709,7 +760,122 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region COPIES
+		/// <summary>
+		/// <para> Copies the provided argument to this Vector's elements. </para>
+		/// <para> If this Vector contains references, this will copy the provided Arg_ to the referenced value_types. </para>
+		/// <para>
+		///		If to_copy_ is an EmuMath Vector: Respective indices will be copied (e.g. this[1] = to_copy_[1]).
+		///		Non-contained elements will be interpreted as implied-zeroes.
+		/// </para>
+		/// <para> If to_copy_ is none of the above: All indices will be set as a copy of to_copy_. </para>
+		/// </summary>
+		/// <param name="to_copy_">Argument to copy to indices as described.</param>
+		template<typename Arg_, typename = std::enable_if_t<is_valid_template_copy_arg<Arg_&>()>>
+		constexpr inline void Copy(Arg_& to_copy_)
+		{
+			EmuMath::Helpers::new_vector_copy<Arg_>(*this, to_copy_);
+		}
+		template<typename Arg_, typename = std::enable_if_t<is_valid_template_copy_arg<Arg_&>()>>
+		constexpr inline void Copy(const Arg_& to_copy_)
+		{
+			EmuMath::Helpers::new_vector_copy<Arg_>(*this, to_copy_);
+		}
+
+		/// <summary>
+		/// <para> Copies the provided argument to this Vector's elements within the provided index range. </para>
+		/// <para> If this Vector contains references, this will copy the provided Arg_ to the referenced value_types. </para>
+		/// <para>
+		///		If to_copy_ is an EmuMath Vector: Respective indices will be copied (e.g. this[1] = to_copy_[1]).
+		///		Non-contained elements will be interpreted as implied-zeroes.
+		/// </para>
+		/// <para> If to_copy_ is none of the above: All indices will be set as a copy of to_copy_. </para>
+		/// </summary>
+		/// <param name="to_copy_">Argument to copy to the provided index range as described.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Arg_>
+		constexpr inline void Copy(Arg_& to_copy_)
+		{
+			EmuMath::Helpers::new_vector_copy<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Arg_>
+		constexpr inline void Copy(const Arg_& to_copy_)
+		{
+			EmuMath::Helpers::new_vector_copy<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
+		}
+
+		/// <summary>
+		/// <para> Copies the provided argument to this Vector's elements within the provided index range. </para>
+		/// <para> If this Vector contains references, this will copy the provided Arg_ to the referenced value_types. </para>
+		/// <para>
+		///		If to_copy_ is an EmuMath Vector: Respective indices will be copied (e.g. this[1] = to_copy_[1]).
+		///		Non-contained elements will be interpreted as implied-zeroes if CopyNonContained_ is true; otherwise, non-shared indices will not be modified.
+		/// </para>
+		/// <para> If to_copy_ is none of the above: All indices will be set as a copy of to_copy_. </para>
+		/// </summary>
+		/// <param name="to_copy_">Argument to copy to the provided index range as described.</param>
+		template<bool CopyNonContained_, typename Arg_>
+		constexpr inline void Copy(Arg_& to_copy_)
+		{
+			EmuMath::Helpers::new_vector_copy<CopyNonContained_, Arg_>(*this, to_copy_);
+		}
+		template<bool CopyNonContained_, typename Arg_>
+		constexpr inline void Copy(const Arg_& to_copy_)
+		{
+			EmuMath::Helpers::new_vector_copy<CopyNonContained_, Arg_>(*this, to_copy_);
+		}
+
+		/// <summary>
+		/// <para> Copies the provided argument to this Vector's elements within the provided index range. </para>
+		/// <para> If this Vector contains references, this will copy the provided Arg_ to the referenced value_types. </para>
+		/// <para>
+		///		If to_copy_ is an EmuMath Vector: Progressively iterating indices from 0 will be copied (e.g. this[BeginIndex_ + 1] = to_copy_[1]).
+		///		Non-contained elements will be interpreted as implied-zeroes. 
+		///		Reading of to_copy_ will start at index 0; to begin reading from BeginIndex_, use `Copy`.
+		/// </para>
+		/// <para> If to_copy_ is none of the above: All indices will be set as a copy of to_copy_. </para>
+		/// </summary>
+		/// <param name="to_copy_">Argument to copy to the provided index range as described.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_ = size, typename Arg_>
+		constexpr inline void CopyFromStart(Arg_& to_copy_)
+		{
+			EmuMath::Helpers::new_vector_copy_from_start<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_ = size, typename Arg_>
+		constexpr inline void CopyFromStart(const Arg_& to_copy_)
+		{
+			EmuMath::Helpers::new_vector_copy_from_start<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
+		}
+
+		/// <summary>
+		/// <para> Copies the provided argument to this Vector's elements within the provided index range. </para>
+		/// <para> If this Vector contains references, this will copy the provided Arg_ to the referenced value_types. </para>
+		/// <para>
+		///		If to_copy_ is an EmuMath Vector: Progressively iterating indices from 0 will be copied (e.g. this[BeginIndex_ + 1] = to_copy_[1]).
+		///		Non-shared indices will not be modified. 
+		///		Reading of to_copy_ will start at index 0; to begin reading from BeginIndex_, use `Copy`.
+		/// </para>
+		/// <para> If to_copy_ is none of the above: All indices will be set as a copy of to_copy_. </para>
+		/// </summary>
+		/// <param name="to_copy_">Argument to copy to the provided index range as described.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_ = size, typename Arg_>
+		constexpr inline void CopyFromStartContainedOnly(Arg_& to_copy_)
+		{
+			EmuMath::Helpers::new_vector_copy_from_start_contained_only<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_ = size, typename Arg_>
+		constexpr inline void CopyFromStartContainedOnly(const Arg_& to_copy_)
+		{
+			EmuMath::Helpers::new_vector_copy_from_start_contained_only<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
+		}
+#pragma endregion
+
 #pragma region SETS
+		/// <summary>
+		/// <para> Sets the stored elements of this Vector to via moving respective elements in the passed Vector. </para>
+		/// <para> If to_move_set_ contains less elements than this Vector, non-contained elements will be interpreted as implied zeroes. </para>
+		/// <para> If this Vector contains references, this will update what is referenced by respective references. </para>
+		/// </summary>
+		/// <param name="to_move_set_">EmuMath Vector to move stored elements from when assigning this Vector's stored elements.</param>
 		template
 		<
 			std::size_t InSize_,
@@ -721,6 +887,12 @@ namespace EmuMath
 			EmuMath::Helpers::new_vector_set<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
 		}
 
+		/// <summary>
+		/// <para> Sets the stored elements of this Vector to via moving respective elements in the passed Vector. </para>
+		/// <para> If to_move_set_ contains less elements than this Vector, non-contained elements will be interpreted as implied zeroes. </para>
+		/// <para> If this Vector contains references, this will update what is referenced by respective references. </para>
+		/// </summary>
+		/// <param name="to_move_set_">EmuMath Vector to move stored elements from when assigning this Vector's stored elements.</param>
 		template
 		<
 			std::size_t InSize_,
@@ -732,6 +904,12 @@ namespace EmuMath
 			EmuMath::Helpers::new_vector_set<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
 		}
 
+		/// <summary>
+		/// <para> Sets the stored elements of this Vector to via copying respective elements in the passed Vector. </para>
+		/// <para> If to_copy_set_ contains less elements than this Vector, non-contained elements will be interpreted as implied zeroes. </para>
+		/// <para> If this Vector contains references, this will update what is referenced by respective references. </para>
+		/// </summary>
+		/// <param name="to_copy_set_">EmuMath Vector to copy stored elements from when assigning this Vector's stored elements.</param>
 		template
 		<
 			std::size_t InSize_,
@@ -743,6 +921,12 @@ namespace EmuMath
 			EmuMath::Helpers::new_vector_set<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
 		}
 
+		/// <summary>
+		/// <para> Sets the stored elements of this Vector to via copying respective elements in the passed Vector. </para>
+		/// <para> If to_copy_set_ contains less elements than this Vector, non-contained elements will be interpreted as implied zeroes. </para>
+		/// <para> If this Vector contains references, this will update what is referenced by respective references. </para>
+		/// </summary>
+		/// <param name="to_copy_set_">EmuMath Vector to copy stored elements from when assigning this Vector's stored elements.</param>
 		template
 		<
 			std::size_t InSize_,
@@ -754,6 +938,12 @@ namespace EmuMath
 			EmuMath::Helpers::new_vector_set<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
 		}
 
+		/// <summary>
+		/// <para> Sets the stored elements of this Vector to via moving respective elements in the passed Vector. </para>
+		/// <para> If to_move_set_ contains less elements than this Vector, elements in non-shared indices will not be modified. </para>
+		/// <para> If this Vector contains references, this will update what is referenced by respective references. </para>
+		/// </summary>
+		/// <param name="to_move_set_">EmuMath Vector to move stored elements from when assigning this Vector's stored elements.</param>
 		template
 		<
 			std::size_t InSize_,
@@ -765,6 +955,12 @@ namespace EmuMath
 			EmuMath::Helpers::new_vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
 		}
 
+		/// <summary>
+		/// <para> Sets the stored elements of this Vector to via moving respective elements in the passed Vector. </para>
+		/// <para> If to_move_set_ contains less elements than this Vector, elements in non-shared indices will not be modified. </para>
+		/// <para> If this Vector contains references, this will update what is referenced by respective references. </para>
+		/// </summary>
+		/// <param name="to_move_set_">EmuMath Vector to move stored elements from when assigning this Vector's stored elements.</param>
 		template
 		<
 			std::size_t InSize_,
@@ -776,6 +972,12 @@ namespace EmuMath
 			EmuMath::Helpers::new_vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
 		}
 
+		/// <summary>
+		/// <para> Sets the stored elements of this Vector to via copying respective elements in the passed Vector. </para>
+		/// <para> If to_move_set_ contains less elements than this Vector, elements in non-shared indices will not be modified. </para>
+		/// <para> If this Vector contains references, this will update what is referenced by respective references. </para>
+		/// </summary>
+		/// <param name="to_copy_set_">EmuMath Vector to copy stored elements from when assigning this Vector's stored elements.</param>
 		template
 		<
 			std::size_t InSize_,
@@ -787,6 +989,12 @@ namespace EmuMath
 			EmuMath::Helpers::new_vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
 		}
 
+		/// <summary>
+		/// <para> Sets the stored elements of this Vector to via copying respective elements in the passed Vector. </para>
+		/// <para> If to_move_set_ contains less elements than this Vector, elements in non-shared indices will not be modified. </para>
+		/// <para> If this Vector contains references, this will update what is referenced by respective references. </para>
+		/// </summary>
+		/// <param name="to_copy_set_">EmuMath Vector to copy stored elements from when assigning this Vector's stored elements.</param>
 		template
 		<
 			std::size_t InSize_,

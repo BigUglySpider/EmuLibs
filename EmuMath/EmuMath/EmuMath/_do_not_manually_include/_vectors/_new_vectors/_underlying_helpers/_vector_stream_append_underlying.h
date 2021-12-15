@@ -6,6 +6,46 @@
 
 namespace EmuMath::Helpers::_vector_underlying
 {
+	template<bool IsWide_, class StreamType_>
+	constexpr inline void _vector_append_open_indicator(StreamType_& str_)
+	{
+		if constexpr (IsWide_)
+		{
+			str_ << L"{ ";
+		}
+		else
+		{
+			str_ << "{ ";
+		}
+	}
+
+	template<bool IsWide_, class StreamType_>
+	constexpr inline void _vector_append_close_indicator(StreamType_& str_)
+	{
+		if constexpr (IsWide_)
+		{
+			str_ << L" }";
+		}
+		else
+		{
+			str_ << " }";
+		}
+	}
+
+	template<bool IsWide_, class StreamType_>
+	constexpr inline void _vector_append_element_separation(StreamType_& str_)
+	{
+		if constexpr (IsWide_)
+		{
+			str_ << L", ";
+		}
+		else
+		{
+			str_ << ", ";
+		}
+	}
+
+
 	template<std::size_t Index_, std::size_t EndIndex_, bool IsWide_, class StreamType_, std::size_t Size_, typename T_>
 	constexpr inline void _vector_append_to_stream(StreamType_& str_, const EmuMath::NewVector<Size_, T_>& vector_)
 	{
@@ -17,7 +57,9 @@ namespace EmuMath::Helpers::_vector_underlying
 			if constexpr (EmuMath::TMP::is_emu_new_vector_v<get_result>)
 			{
 				using get_result_uq = EmuCore::TMP::remove_ref_cv_t<get_result>;
+				_vector_append_open_indicator<IsWide_, StreamType_>(str_);
 				_vector_append_to_stream<0, get_result_uq::size, IsWide_, StreamType_>(str_, _vector_get<Index_>(vector_));
+				_vector_append_close_indicator<IsWide_, StreamType_>(str_);
 			}
 			else
 			{
@@ -26,16 +68,7 @@ namespace EmuMath::Helpers::_vector_underlying
 			
 			if constexpr ((Index_ + 1) != EndIndex_)
 			{
-				// Append separator if this is not the end, and recursively call next iteration
-				if constexpr (IsWide_)
-				{
-					str_ << L", ";
-				}
-				else
-				{
-					str_ << ", ";
-				}
-
+				_vector_append_element_separation<IsWide_, StreamType_>(str_);
 				_vector_append_to_stream<Index_ + 1, EndIndex_, IsWide_, StreamType_, Size_, T_>(str_, vector_);
 			}
 		}
@@ -44,27 +77,9 @@ namespace EmuMath::Helpers::_vector_underlying
 	template<std::size_t EndIndex_, bool IsWide_,class StreamType_, std::size_t Size_, typename T_>
 	constexpr inline void _vector_append_to_stream(StreamType_& str_, const EmuMath::NewVector<Size_, T_>& vector_)
 	{
-		// Open brace to indicate next elements will be contained within the same Vector.
-		if constexpr (IsWide_)
-		{
-			str_ << L"{ ";
-		}
-		else
-		{
-			str_ << "{ ";
-		}
-
+		_vector_append_open_indicator<IsWide_, StreamType_>(str_);
 		_vector_append_to_stream<0, EndIndex_, IsWide_, StreamType_, Size_, T_>(str_, vector_);
-
-		// Close brace to indicate end of Vector.
-		if constexpr (IsWide_)
-		{
-			str_ << L" }";
-		}
-		else
-		{
-			str_ << " }";
-		}
+		_vector_append_close_indicator<IsWide_, StreamType_>(str_);
 	}
 
 	template<bool IsWide_, class StreamType_, std::size_t Size_, typename T_>

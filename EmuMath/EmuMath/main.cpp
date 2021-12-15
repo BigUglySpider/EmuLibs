@@ -585,6 +585,82 @@ int main()
 	some_newvec4f_.SetContainedOnly(some_newvec3f_);
 	std::cout << some_newvec4f_ << "\n";
 	std::cout << EmuMath::NewVector<20, float>(0.5) << "\n";
+	//EmuMath::Helpers::new_vector_copy(some_newvec4f_, 15.0f);
+	some_newvec4f_.Copy(15.0f);
+	std::cout << some_newvec4f_ << "\n";
+	//EmuMath::Helpers::new_vector_copy(some_newvec4f_, some_newvec3f_);
+	some_newvec4f_.Copy(some_newvec3f_);
+	some_newvec4f_.at<3>() = 25.0f;
+	std::cout << some_newvec4f_ << "\n";
+	EmuMath::NewVector<2, float> some_newvec2f_(-77.7f, +77.7f);
+	//EmuMath::Helpers::new_vector_copy<1, 3>(some_newvec4f_, some_newvec2f_);
+	some_newvec4f_.Copy<1, 3>(some_newvec2f_);
+	std::cout << some_newvec4f_ << "\n";
+	//EmuMath::Helpers::new_vector_copy<false>(some_newvec4f_, some_newvec3f_);
+	some_newvec4f_.Copy<false>(some_newvec3f_);
+	std::cout << some_newvec4f_ << "\n";
+	//EmuMath::Helpers::new_vector_copy<true>(some_newvec4f_, some_newvec2f_);
+	some_newvec4f_.Copy<true>(some_newvec2f_);
+	std::cout << some_newvec4f_ << "\n";
+	some_newvec4f_ = decltype(some_newvec4f_)(5, 10, 15, 20);
+	std::cout << some_newvec4f_ << "\n";
+	//EmuMath::Helpers::new_vector_copy_from_start<1>(some_newvec4f_, some_newvec2f_);
+	some_newvec4f_.CopyFromStart<1>(some_newvec2f_);
+	std::cout << some_newvec4f_ << "\n";
+	some_newvec4f_ = decltype(some_newvec4f_)(5, 10, 15, 20);
+	std::cout << some_newvec4f_ << "\n";
+	//EmuMath::Helpers::new_vector_copy_from_start_contained_only<1>(some_newvec4f_, some_newvec2f_);
+	some_newvec4f_.CopyFromStartContainedOnly<1>(some_newvec2f_);
+	std::cout << some_newvec4f_ << "\n";
+
+	std::cout << "---\n";
+	EmuMath::NewVector<4, EmuMath::NewVector<4, float>> some_newmat4x4f_a_
+	(
+		EmuMath::NewVector<4, float>(1, 2, 3, 4),
+		EmuMath::NewVector<4, float>(5, 6, 7, 8),
+		EmuMath::NewVector<4, float>(9, 10, 11, 12),
+		EmuMath::NewVector<4, float>(13, 14, 15, 16)
+	);
+	EmuMath::NewVector<4, EmuMath::NewVector<4, float>> some_newmat4x4f_b_
+	(
+		EmuMath::NewVector<4, float>(17, 18, 19, 20),
+		EmuMath::NewVector<4, float>(21, 22, 23, 24),
+		EmuMath::NewVector<4, float>(25, 26, 27, 28),
+		EmuMath::NewVector<4, float>(29, 30, 31, 32)
+	);
+	std::cout << some_newmat4x4f_a_ << "\n";
+	std::cout << some_newmat4x4f_b_ << "\n";
+	some_newmat4x4f_a_.Copy(some_newmat4x4f_b_);
+	std::cout << some_newmat4x4f_a_ << "\n";
+	std::cout << some_newmat4x4f_b_ << "\n";
+	some_newmat4x4f_a_.Copy(EmuMath::NewVector<4, float>(33, 34, 35, 36));
+	std::cout << some_newmat4x4f_a_ << "\n";
+	std::cout << some_newmat4x4f_b_ << "\n";
+	some_newmat4x4f_a_.Copy(some_newvec4f_);
+	std::cout << some_newmat4x4f_a_ << "\n";
+	std::cout << some_newmat4x4f_b_ << "\n";
+	//some_newmat4x4f_b_.Copy
+	//(
+	//	EmuMath::NewVector<4, EmuMath::NewVector<4, long double>>
+	//	(
+	//		EmuMath::NewVector<4, long double>(6, 12, 18, 24),
+	//		EmuMath::NewVector<4, long double>(-6, -12, -18, -24),
+	//		EmuMath::NewVector<4, long double>(66, 112, 118, 224),
+	//		EmuMath::NewVector<4, long double>(-66, -112, -118, -224)
+	//	)
+	//);
+	some_newmat4x4f_b_ = EmuMath::NewVector<4, EmuMath::NewVector<4, long double>>
+	(
+		EmuMath::NewVector<4, long double>(6, 12, 18, 24),
+		EmuMath::NewVector<4, long double>(-6, -12, -18, -24),
+		EmuMath::NewVector<4, long double>(66, 112, 118, 224),
+		EmuMath::NewVector<4, long double>(-66, -112, -118, -224)
+	);
+	std::cout << some_newmat4x4f_a_ << "\n";
+	std::cout << some_newmat4x4f_b_ << "\n";
+	some_newmat4x4f_b_.Copy(2);
+	std::cout << some_newmat4x4f_a_ << "\n";
+	std::cout << some_newmat4x4f_b_ << "\n";
 
 	std::cout << "\n\n";
 	system("pause");
