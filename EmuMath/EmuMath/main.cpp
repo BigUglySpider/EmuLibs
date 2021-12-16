@@ -662,6 +662,11 @@ int main()
 	std::cout << some_newmat4x4f_a_ << "\n";
 	std::cout << some_newmat4x4f_b_ << "\n";
 
+	std::cout << "---\n";
+	constexpr EmuMath::NewVector<4, float> another_newvec4f_(1, 2, 3, 4);
+	constexpr auto shuffled_newvec4f_ = EmuMath::Helpers::new_vector_shuffle<3, 2, 1, 0>(another_newvec4f_);
+	constexpr auto shuffled_newvec8d_ = EmuMath::Helpers::new_vector_shuffle<double, 0, 2, 1, 3, 1, 1, 0, 0>(another_newvec4f_);
+
 	std::cout << "\n\n";
 	system("pause");
 	std::cout << "\n---\n\n\n";

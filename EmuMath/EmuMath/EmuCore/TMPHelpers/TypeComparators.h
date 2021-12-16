@@ -6,6 +6,18 @@
 
 namespace EmuCore::TMP
 {
+	template<typename Out_, typename In_>
+	struct is_compatible
+	{
+		static constexpr bool is_constructible = std::is_constructible_v<Out_, In_>;
+		static constexpr bool is_convertible = std::is_convertible_v<In_, Out_>;
+		static constexpr bool is_assignable = std::is_assignable_v<Out_, In_>;
+
+		static constexpr bool value = is_constructible || is_convertible || is_assignable;
+	};
+	template<typename Out_, typename In_>
+	static constexpr bool is_compatible_v = is_compatible<Out_, In_>::value;
+
 	/// <summary> Finds the largest byte-sized type of the passed options. For matching type sizes, the leftmost type receives priority. </summary>
 	/// <typeparam name="X_">First type to compare. Required.</typeparam>
 	/// <typeparam name="Y_">Second type to compare. Required.</typeparam>
