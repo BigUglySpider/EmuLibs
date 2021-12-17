@@ -111,6 +111,98 @@ namespace EmuMath::Helpers::_vector_underlying
 			static_assert(false, "Attempted to shuffle an EmuMath Vector, but the provided input Vector is not recognised as an EmuMath Vector.");
 		}
 	}
+
+	template<std::size_t Index_, std::size_t EndIndex_, std::size_t ArgIndex_, class Func_, class OutVector_, class...Args_>
+	constexpr inline void _vector_mutate_execution(Func_& func_, OutVector_& out_vector_, Args_&&...args_)
+	{
+		if constexpr (Index_ < EndIndex_)
+		{
+			if constexpr (std::is_invocable_v<Func_, decltype(_vector_get_theoretical_if_vector<ArgIndex_>(std::declval<Args_>()))...>)
+			{
+				using invocation_result = std::invoke_result_t<Func_, decltype(_vector_get_theoretical_if_vector<ArgIndex_>(std::declval<Args_>()))...>;
+				if constexpr (EmuCore::TMP::is_compatible_v<typename OutVector_::value_type, invocation_result>)
+				{
+					_vector_copy_index<Index_>(out_vector_, func_(_vector_get_theoretical_if_vector<ArgIndex_>(args_)...));
+					_vector_mutate_execution<Index_ + 1, EndIndex_, ArgIndex_ + 1, Func_, OutVector_, Args_...>(func_, out_vector_, args_...);
+				}
+				else
+				{
+					static_assert(false, "Attempted to mutate an EmuMath Vector, but at least one iteration of mutation resulted in the mutation function providing a result that cannot be used to copy to the output Vector's value_type.");
+				}
+			}
+			else
+			{
+				static_assert(false, "Attempted to mutate an EmuMath Vector, but at least one iteration of mutation resulted in arguments which the provided mutation function does not support.");
+			}
+		}
+	}
+
+	template<class Func_, class OutVector_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgIndex_, class...Args_>
+	constexpr inline void _vector_mutate(Func_ func_, OutVector_& out_vector_, Args_&&...args_)
+	{
+		constexpr std::size_t clamped_end_index_ = (EndIndex_ <= OutVector_::size) ? EndIndex_ : OutVector_::size;
+		if constexpr (BeginIndex_ <= clamped_end_index_)
+		{
+			_vector_mutate_execution<BeginIndex_, EndIndex_, ArgIndex_, Func_, OutVector_>(func_, out_vector_, std::forward<Args_>(args_)...);
+		}
+		else
+		{
+			static_assert(false, "Attempted to mutate an EmuMath Vector, but the provided BeginIndex_ is greater than the provided EndIndex_ after clamping.");
+		}
+	}
+
+	template<class OutVector_, class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgIndex_, class...Args_>
+	[[nodiscard]] constexpr inline OutVector_ _vector_mutate_return_out(Func_ func_, Args_&&...args_)
+	{
+		if constexpr (std::is_default_constructible_v<OutVector_>)
+		{
+			OutVector_ out_vector_ = OutVector_();
+			_vector_mutate<Func_, OutVector_, BeginIndex_, EndIndex_, ArgIndex_>(func_, out_vector_, std::forward<Args_>(args_)...);
+			return out_vector_;
+		}
+		else
+		{
+			static_assert(false, "Attempted to mutate an EmuMath Vector without passing an out_vector_ to output to. This is only allowed where the provided output Vector is default-constructible.");
+		}
+	}
+
+	template<class Func_, class OutVector_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgIndex_, class...Args_>
+	constexpr inline void _vector_mutate_no_func_passed(OutVector_& out_vector_, Args_&&...args_)
+	{
+		if constexpr (std::is_default_constructible_v<Func_>)
+		{
+			Func_ func_ = Func_();
+			_vector_mutate<Func_, OutVector_, BeginIndex_, EndIndex_, ArgIndex_>(func_, out_vector_, std::forward<Args_>(args_)...);
+		}
+		else
+		{
+			static_assert(false, "Attempted to mutate an EmuMath Vector without passing a func_ argument to perform mutation. This is only allowed where the provided Func_ type is default-constructible.");
+		}
+	}
+
+	template<class Func_, class OutVector_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgIndex_, class...Args_>
+	constexpr inline OutVector_ _vector_mutate_args_only(Args_&&...args_)
+	{
+		if constexpr (std::is_default_constructible_v<Func_>)
+		{
+			if constexpr (std::is_default_constructible_v<OutVector_>)
+			{
+				Func_ func_ = Func_();
+				OutVector_ out_vector_ = OutVector_();
+				_vector_mutate<Func_, OutVector_, BeginIndex_, EndIndex_, ArgIndex_>(func_, out_vector_, std::forward<Args_>(args_)...);
+				return out_vector_;
+			}
+			else
+			{
+
+				static_assert(false, "Attempted to mutate an EmuMath Vector without passing an out_vector_ to output to. This is only allowed where the provided output Vector is default-constructible.");
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to mutate an EmuMath Vector without passing a func_ argument to perform mutation. This is only allowed where the provided Func_ type is default-constructible.");
+		}
+	}
 }
 
 #endif

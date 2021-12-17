@@ -690,6 +690,20 @@ int main()
 	auto some_arbitrarily_sized_newvector_ = EmuMath::Helpers::new_vector_make<const float&>(another_ref_.at<2>(), (another_ref_.at<0>()));
 	std::cout << some_arbitrarily_sized_newvector_ << "\n";
 
+	std::cout << "---\n";
+	constexpr EmuMath::NewVector<3, float> oh_boi_another_v3f_(15, 30, 45);
+	//constexpr auto oh_boi_another_v3f_negated_ = EmuMath::Helpers::new_vector_negate<4, float>(oh_boi_another_v3f_);
+	constexpr auto oh_boi_another_v3f_negated_ = oh_boi_another_v3f_.operator-<4>();
+	constexpr auto first_newvector_ui32_ = EmuMath::Helpers::new_vector_make<std::uint32_t>(0, 5, 6, std::numeric_limits<std::uint32_t>::max());
+	//constexpr auto first_newvector_ui32_negated_to_float_ = EmuMath::Helpers::new_vector_negate<4, float>(first_newvector_ui32_);
+	constexpr auto first_newvector_ui32_negated_to_float_ = first_newvector_ui32_.operator-<float>();
+	constexpr std::uint8_t test_part_0_ = 231;
+	constexpr auto test_part_1_ = EmuCore::do_negate<std::uint8_t>()(test_part_0_);
+	constexpr std::uint8_t test_part_2_ = static_cast<std::uint8_t>(test_part_1_);
+	constexpr std::uint8_t test_part_3_ = -test_part_0_;
+
+	constexpr double some_double = std::negate()(1u);
+
 	std::cout << "\n\n";
 	system("pause");
 	std::cout << "\n---\n\n\n";

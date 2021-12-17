@@ -725,7 +725,37 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region CONST_ARITHMETIC_OPERATORS
+	public:
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator-() const
+		{
+			return EmuMath::Helpers::new_vector_negate<OutSize_, OutT_>(*this);
+		}
+
+		template<typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator-() const
+		{
+			return EmuMath::Helpers::new_vector_negate<size, OutT_>(*this);
+		}
+#pragma endregion
+
+#pragma region CONST_ARITHMETIC_FUNCS
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Negate() const
+		{
+			return EmuMath::Helpers::new_vector_negate<OutSize_, OutT_>(*this);
+		}
+
+		template<typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Negate() const
+		{
+			return EmuMath::Helpers::new_vector_negate<size, OutT_>(*this);
+		}
+#pragma endregion
+
 #pragma region MUTATIONS
+	public:
 		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> Shuffle()
 		{

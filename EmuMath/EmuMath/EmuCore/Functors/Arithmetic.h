@@ -435,6 +435,19 @@ namespace EmuCore
 		}
 	};
 
+	/// <summary>
+	/// <para> Template negation functor, which provides additional wrapping to provide better-expected results if T_ is unsigned. </para>
+	/// <para> Note that the additional wrapping is performed at compile time, and is only within the default functor. </para>
+	/// <para> 
+	///		If T_ is unsigned, it will be cast to the next signed integral width before negation, if possible; otherwise it will be cast to a double before negation. 
+	///		(e.g. T_ = uint32_t will be cast to int64_t, T_ = uint64_t will be cast to double). 
+	///		It is most likely that the cast will result in a different output type to the passed type.
+	/// </para>
+	/// <para>
+	///		Unless specialised to do otherwise, invoking this with a type that is not unsigned 
+	///		will always be identical to invoking std::negate&lt;void&gt; with the same argument.
+	/// </para>
+	/// </summary>
 	template<typename T_>
 	struct do_negate
 	{
@@ -447,7 +460,22 @@ namespace EmuCore
 		}
 		[[nodiscard]] constexpr inline auto operator()(const T_& val_) const
 		{
-			return negator_(val_);
+			if constexpr (std::is_unsigned_v<T_>)
+			{
+				using next_size = EmuCore::TMP::next_size_up_t<std::make_signed_t<T_>>;
+				if constexpr (sizeof(next_size) > sizeof(T_))
+				{
+					return negator_(static_cast<next_size>(val_));
+				}
+				else
+				{
+					return negator_(static_cast<double>(val_));
+				}
+			}
+			else
+			{
+				return negator_(val_);
+			}
 		}
 	};
 	template<>

@@ -80,6 +80,27 @@ namespace EmuMath::Helpers
 	{
 		return _vector_underlying::_vector_shuffle<typename EmuMath::NewVector<Size_, T_>::value_type_uq, true, Indices_...>(vector_);
 	}
+
+	/// <summary>
+	/// <para> 
+	///		Creates an EmuMath Vector using the provided mutation Func_ type,
+	///		with the output Vector type using the provided OutSize_ and OutT_ as its Size_ and T_ arguments.
+	/// </para>
+	/// <para> The provided arguments will be provided to an instance of Func_ for every index within the output Vector. </para>
+	/// <para> For any Arg_ that is an EmuMath Vector: The argument at the matching index will be passed to the Func_ instance, instead of the full Vector. </para>
+	/// </summary>
+	/// <typeparam name="Func_">Mutation function to invoke for every index within the output Vector.</typeparam>
+	/// <typeparam name="Args_">All argument types being passed to the mutation function.</typeparam>
+	/// <param name="args_">All arguments to pass to the mutation function on every iteration. May provide EmuMath Vectors for unique arguments per iteration. </param>
+	/// <returns>EmuMath Vector created from mutating the provided arguments via an instance of the provided Func_ at every index within the output Vector.</returns>
+	template<std::size_t OutSize_, typename OutT_, class Func_, class...Args_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_mutate(Args_&&...args_)
+	{
+		return _vector_underlying::_vector_mutate_args_only<Func_, EmuMath::NewVector<OutSize_, OutT_>, 0, EmuMath::NewVector<OutSize_, OutT_>::size, 0>
+		(
+			std::forward<Args_>(args_)...
+		);
+	}
 }
 
 #endif

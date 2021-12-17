@@ -7,20 +7,20 @@
 namespace EmuMath::Helpers::_vector_underlying
 {
 	template<std::size_t Index_, typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void _vector_copy_index(EmuMath::NewVector<Size_, T_>& to_copy_to_, Arg_& arg_)
+	constexpr inline void _vector_copy_index(EmuMath::NewVector<Size_, T_>& to_copy_to_, Arg_&& arg_)
 	{
 		using value_type = typename EmuMath::NewVector<Size_, T_>::value_type;
 		if constexpr (std::is_assignable_v<value_type, Arg_>)
 		{
-			_vector_get<Index_>(to_copy_to_) = arg_;
+			_vector_get<Index_>(to_copy_to_) = std::forward<Arg_>(arg_);
 		}
 		else if constexpr (std::is_convertible_v<Arg_, value_type>)
 		{
-			_vector_get<Index_>(to_copy_to_) = static_cast<value_type>(arg_);
+			_vector_get<Index_>(to_copy_to_) = static_cast<value_type>(std::forward<Arg_>(arg_));
 		}
 		else if constexpr (std::is_constructible_v<value_type, Arg_>)
 		{
-			_vector_get<Index_>(to_copy_to_) = value_type(arg_);
+			_vector_get<Index_>(to_copy_to_) = value_type(std::forward<Arg_>(arg_));
 		}
 		else
 		{
@@ -33,7 +33,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	{
 		if constexpr (Index_ < EndIndex_)
 		{
-			_vector_copy_index<Index_, Arg_, Size_, T_>(vector_, to_copy_);
+			_vector_copy_index<Index_>(vector_, to_copy_);
 			_vector_copy_scalar<Index_ + 1, EndIndex_, Arg_, Size_, T_>(vector_, to_copy_);
 		}
 	}
@@ -63,7 +63,7 @@ namespace EmuMath::Helpers::_vector_underlying
 				{
 					if constexpr (ArgIndex_ < ArgVector_::size)
 					{
-						_vector_copy_index<Index_, arg_value_type_cq>(vector_, _vector_get<ArgIndex_>(to_copy_));
+						_vector_copy_index<Index_>(vector_, _vector_get<ArgIndex_>(to_copy_));
 						_vector_copy_vector<Index_ + 1, EndIndex_, ArgIndex_ + 1, ArgVector_, Size_, T_>(vector_, to_copy_);
 					}
 					else
