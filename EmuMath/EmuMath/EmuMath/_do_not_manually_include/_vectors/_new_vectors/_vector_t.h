@@ -725,6 +725,52 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region MUTATIONS
+		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> Shuffle()
+		{
+			return EmuMath::Helpers::new_vector_shuffle<OutT_, Indices_...>(*this);
+		}
+		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> Shuffle() const
+		{
+			return EmuMath::Helpers::new_vector_shuffle<OutT_, Indices_...>(*this);
+		}
+
+		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), value_type_uq> Shuffle()
+		{
+			return EmuMath::Helpers::new_vector_shuffle<value_type_uq, Indices_...>(*this);
+		}
+		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), value_type_uq> Shuffle() const
+		{
+			return EmuMath::Helpers::new_vector_shuffle<value_type_uq, Indices_...>(*this);
+		}
+
+		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> ShuffleTheoretical()
+		{
+			return EmuMath::Helpers::new_vector_shuffle_theoretical<OutT_, Indices_...>(*this);
+		}
+		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> ShuffleTheoretical() const
+		{
+			return EmuMath::Helpers::new_vector_shuffle_theoretical<OutT_, Indices_...>(*this);
+		}
+
+		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), value_type_uq> ShuffleTheoretical()
+		{
+			return EmuMath::Helpers::new_vector_shuffle_theoretical<value_type_uq, Indices_...>(*this);
+		}
+		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), value_type_uq> ShuffleTheoretical() const
+		{
+			return EmuMath::Helpers::new_vector_shuffle_theoretical<value_type_uq, Indices_...>(*this);
+		}
+#pragma endregion
+
 #pragma region CONVERSIONS
 		/// <summary>
 		/// <para> Converts this Vector to its alternative template representation, if it has one. </para>

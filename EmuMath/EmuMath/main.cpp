@@ -664,8 +664,31 @@ int main()
 
 	std::cout << "---\n";
 	constexpr EmuMath::NewVector<4, float> another_newvec4f_(1, 2, 3, 4);
-	constexpr auto shuffled_newvec4f_ = EmuMath::Helpers::new_vector_shuffle<3, 2, 1, 0>(another_newvec4f_);
-	constexpr auto shuffled_newvec8d_ = EmuMath::Helpers::new_vector_shuffle<double, 0, 2, 1, 3, 1, 1, 0, 0>(another_newvec4f_);
+	//constexpr auto shuffled_newvec4f_ = EmuMath::Helpers::new_vector_shuffle<3, 2, 1, 0>(another_newvec4f_);
+	constexpr auto shuffled_newvec4f_ = another_newvec4f_.Shuffle<3, 2, 1, 0>();
+	//constexpr auto shuffled_newvec8d_ = EmuMath::Helpers::new_vector_shuffle<double, 0, 2, 1, 3, 1, 1, 0, 0>(another_newvec4f_);
+	constexpr auto shuffled_newvec8d_ = another_newvec4f_.Shuffle<double, 0, 2, 1, 3, 1, 1, 0, 0>();
+
+	EmuMath::NewVector<4, float> runtime_other_newvec4f_(1, 2, 3, 4);
+	//auto shuffled_newvec7f_ref_ = EmuMath::Helpers::new_vector_shuffle_theoretical<float&, 0, 1, 2, 3, 2, 1, 0>(runtime_other_newvec4f_);
+	auto shuffled_newvec7f_ref_ = runtime_other_newvec4f_.ShuffleTheoretical<float&, 0, 1, 2, 3, 2, 1, 0>();
+	std::cout << runtime_other_newvec4f_ << "\n";
+	std::cout << shuffled_newvec7f_ref_ << "\n";
+	runtime_other_newvec4f_.at<0>() = 25.0f;
+	shuffled_newvec7f_ref_.at<1>() = 50.0f;
+	std::cout << runtime_other_newvec4f_ << "\n";
+	std::cout << shuffled_newvec7f_ref_ << "\n";
+	//EmuMath::NewVector<12, long double> some_newvec12ld_(EmuMath::Helpers::new_vector_shuffle_theoretical<float, 0, 1, 2, 3, 4, 5, 6, 7>(shuffled_newvec7f_ref_));
+	EmuMath::NewVector<12, long double> some_newvec12ld_(shuffled_newvec7f_ref_.ShuffleTheoretical<float, 0, 1, 2, 3, 4, 5, 6, 7>());
+	//std::cout << EmuMath::Helpers::new_vector_shuffle_theoretical<0, 1, 2, 3, 4, 5, 6, 7>(shuffled_newvec7f_ref_) << "\n";
+	std::cout << shuffled_newvec7f_ref_.ShuffleTheoretical<0, 1, 2, 3, 4, 5, 6, 7>() << "\n";
+	std::cout << some_newvec12ld_ << "\n";
+
+	EmuMath::NewVector<4, float> yet_another_newvec4f_ = EmuMath::NewVector<4, float>(10, 20, 30, 40);
+	EmuMath::NewVector<4, float&> another_ref_ = yet_another_newvec4f_.Shuffle<float&, 3, 2, 1, 0>();
+
+	auto some_arbitrarily_sized_newvector_ = EmuMath::Helpers::new_vector_make<const float&>(another_ref_.at<2>(), (another_ref_.at<0>()));
+	std::cout << some_arbitrarily_sized_newvector_ << "\n";
 
 	std::cout << "\n\n";
 	system("pause");

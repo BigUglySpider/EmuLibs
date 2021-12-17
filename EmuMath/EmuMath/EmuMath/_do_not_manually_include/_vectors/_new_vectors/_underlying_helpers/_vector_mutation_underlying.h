@@ -75,8 +75,7 @@ namespace EmuMath::Helpers::_vector_underlying
 				{
 					if constexpr (std::is_constructible_v<out_stored_type, get_return_type>)
 					{
-						using get_non_contained_return_type = typename InVector_::value_type_uq;
-						if constexpr (std::is_constructible_v<out_stored_type, get_non_contained_return_type>)
+						if constexpr (std::is_constructible_v<out_stored_type, typename InVector_::value_type_uq>)
 						{
 							return out_vector(_vector_get_theoretical<Indices_>(in_vector_)...);
 						}
