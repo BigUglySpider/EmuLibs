@@ -813,13 +813,13 @@ namespace EmuMath::Helpers
 
 	/// <summary>
 	/// <para> Calculates the reciprocal to the passed EmuMath vector's magnitude, using the Q_rsqrt method. </para>
-	/// <para> A custom number of newton iterations may be provided to increase accuracy. Additionally, the magic constant may also be changed from 0x5F3759DF. </para>
+	/// <para> A custom number of newton iterations may be provided to increase accuracy. Additionally, the magic constant may also be changed from 0x5F375A86. </para>
 	/// </summary>
 	/// <typeparam name="OutFloatingPoint_">Type to output the magnitude reciprocal as.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to find the reciprocal to the magnitude of.</typeparam>
 	/// <param name="vector_">EmuMath vector to find the reciprocal to the magnitude of.</param>
 	/// <returns>Reciprocal to the passed EmuMath vector's magnitude, represented as the provided OutFloatingPoint_ type.</returns>
-	template<typename OutFloatingPoint_ = float, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, class Vector_>
+	template<typename OutFloatingPoint_ = float, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F375A86, class Vector_>
 	[[nodiscard]] inline OutFloatingPoint_ vector_magnitude_reciprocal_qrsqrt(const Vector_& vector_)
 	{
 		if constexpr (std::is_floating_point_v<OutFloatingPoint_>)
@@ -834,7 +834,7 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to retrieve an EmuMath vector's magnitude reciprocal with a non-floating-point output type.");
 		}
 	}
-	template<std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, class Vector_>
+	template<std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F375A86, class Vector_>
 	[[nodiscard]] inline typename Vector_::preferred_floating_point vector_magnitude_reciprocal_qrsqrt(const Vector_& vector_)
 	{
 		return vector_magnitude_reciprocal_qrsqrt<typename Vector_::preferred_floating_point, NumNewtonIterations_, MagicConstant_, Vector_>(vector_);
@@ -1750,7 +1750,7 @@ namespace EmuMath::Helpers
 	/// <para> Creates a copy of the passed vector with its elements normalised. </para>
 	/// <para> Uses Q_rsqrt to find the magnitude reciprocal to multiply all elements by. </para>
 	///	<para> NumNewtonIterations_ can be increased to improve accuracy. </para>
-	///	<para> MagicConstant_ may be changed to modify bitwise operations, but is recommended to be left to the default (0x5F3759DF) unless you know what you are doing. </para>
+	///	<para> MagicConstant_ may be changed to modify bitwise operations, but is recommended to be left to the default (0x5F375A86) unless you know what you are doing. </para>
 	/// </summary>
 	/// <typeparam name="MagFloatingPointType_">Type of floating-point to calculate the magnitude as and use for arithmetic in normalisation. Defaults to float.</typeparam>
 	/// <typeparam name="Vector_">Type of vector to return a normalised copy of.</typeparam>
@@ -1761,7 +1761,7 @@ namespace EmuMath::Helpers
 		typename out_floating_point_contained_type,
 		typename MagFloatingPointType_,
 		std::size_t NumNewtonIterations_ = 1,
-		std::int32_t MagicConstant_ = 0x5F3759DF,
+		std::int32_t MagicConstant_ = 0x5F375A86,
 		class Vector_
 	>
 	[[nodiscard]] inline typename EmuMath::Vector<Vector_::size, out_floating_point_contained_type> vector_normalise_qrsqrt(const Vector_& vector_)
@@ -1793,12 +1793,12 @@ namespace EmuMath::Helpers
 			static_assert(false, "Attempted to normalise a vector, but provided a non-EmuMath-vector argument.");
 		}
 	}
-	template<typename out_floating_point_contained_type, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, class Vector_>
+	template<typename out_floating_point_contained_type, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F375A86, class Vector_>
 	[[nodiscard]] inline typename EmuMath::Vector<Vector_::size, out_floating_point_contained_type> vector_normalise_qrsqrt(const Vector_& vector_)
 	{
 		return vector_normalise_qrsqrt<out_floating_point_contained_type, out_floating_point_contained_type, NumNewtonIterations_, MagicConstant_, Vector_>(vector_);
 	}
-	template<std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, class Vector_>
+	template<std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F375A86, class Vector_>
 	[[nodiscard]] inline typename EmuMath::Vector<Vector_::size, typename Vector_::preferred_floating_point> vector_normalise_qrsqrt(const Vector_& vector_)
 	{
 		return vector_normalise_qrsqrt<typename Vector_::preferred_floating_point, typename Vector_::preferred_floating_point, NumNewtonIterations_, MagicConstant_, Vector_>

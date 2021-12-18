@@ -58,6 +58,15 @@ namespace EmuCore
 		}
 	};
 
+	/// <summary>
+	/// <para> Template square root functor, used to calculate the square root of a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this functor provides a guarantee to perform a constexpr sqrt. Specialisations must follow this behaviour. 
+	///		It should be noted that constexpr sqrts could potentially make performance sacrifices, and as such this should not be used for items that are guaranteed 
+	///		to be executed at runtime.
+	/// </para>
+	/// </summary>
 	template<typename T_>
 	struct do_sqrt_constexpr
 	{
@@ -84,6 +93,11 @@ namespace EmuCore
 		}
 	};
 
+	/// <summary>
+	/// <para> Template square root functor, used to calculate the square root of a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_sqrt_constexpr` template. </para>
+	/// </summary>
 	template<typename T_>
 	struct do_sqrt
 	{
@@ -119,9 +133,14 @@ namespace EmuCore
 		}
 	};
 
-	/// <summary> 
-	/// <para> Constexpr flooring functor. </para>
-	/// <para> Unless specialised, the valid range for values this can take is min(int64_t):max(uint64_t). </para>
+	/// <summary>
+	/// <para> Template floor-rounding functor, used to round a value of type T_ toward negative infinity. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this functor provides a guarantee to perform a constexpr round. Specialisations must follow this behaviour. 
+	///		It should be noted that constexpr rounds could potentially make performance sacrifices, and as such this should not be used for items that are guaranteed 
+	///		to be executed at runtime.
+	/// </para>
 	/// </summary>
 	template<typename T_>
 	struct do_floor_constexpr
@@ -166,9 +185,14 @@ namespace EmuCore
 		}
 	};
 
-	/// <summary> 
-	/// <para> Constexpr ceiling functor. </para>
-	/// <para> Unless specialised, the valid range for values this can take is min(int64_t):max(uint64_t). </para>
+	/// <summary>
+	/// <para> Template ceil-rounding functor, used to round a value of type T_ toward positive infinity. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this functor provides a guarantee to perform a constexpr round. Specialisations must follow this behaviour. 
+	///		It should be noted that constexpr rounds could potentially make performance sacrifices, and as such this should not be used for items that are guaranteed 
+	///		to be executed at runtime.
+	/// </para>
 	/// </summary>
 	template<typename T_>
 	struct do_ceil_constexpr
@@ -212,9 +236,14 @@ namespace EmuCore
 		}
 	};
 
-	/// <summary> 
-	/// <para> Constexpr flooring functor. </para>
-	/// <para> Unless specialised, the valid range for values this can take is min(int64_t):max(int64_t). </para>
+	/// <summary>
+	/// <para> Template truncation functor, used to round a value of type T_ toward 0. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this functor provides a guarantee to perform a constexpr round. Specialisations must follow this behaviour. 
+	///		It should be noted that constexpr rounds could potentially make performance sacrifices, and as such this should not be used for items that are guaranteed 
+	///		to be executed at runtime.
+	/// </para>
 	/// </summary>
 	template<typename T_>
 	struct do_trunc_constexpr
@@ -247,6 +276,11 @@ namespace EmuCore
 		}
 	};
 
+	/// <summary>
+	/// <para> Template floor-rounding functor, used to round a value of type T_ toward negative infinity. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_floor_constexpr` template. </para>
+	/// </summary>
 	template<typename T_>
 	struct do_floor
 	{
@@ -271,6 +305,11 @@ namespace EmuCore
 		}
 	};
 
+	/// <summary>
+	/// <para> Template ceil-rounding functor, used to round a value of type T_ toward positive infinity. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_ceil_constexpr` template. </para>
+	/// </summary>
 	template<typename T_>
 	struct do_ceil
 	{
@@ -295,6 +334,11 @@ namespace EmuCore
 		}
 	};
 
+	/// <summary>
+	/// <para> Template truncation functor, used to round a value of type T_ toward 0. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_trunc_constexpr` template. </para>
+	/// </summary>
 	template<typename T_>
 	struct do_trunc
 	{
@@ -319,7 +363,12 @@ namespace EmuCore
 		}
 	};
 
-	template<typename Lhs_, typename Rhs_ = Lhs_>
+	/// <summary>
+	/// <para> Template addition functor which allows specialisation for separate left-hand and right-hand argument types. </para>
+	/// <para> Rhs_ will default to Lhs_ unless an explicit argument for Rhs_ is provided. </para>
+	/// <para> If Lhs_ and Rhs_ are void, the correct specialisation of this functor will be invoked based on arguments passed on invocation. </para>
+	/// </summary>
+	template<typename Lhs_ = void, typename Rhs_ = Lhs_>
 	struct do_add
 	{
 	private:
@@ -348,7 +397,12 @@ namespace EmuCore
 		}
 	};
 
-	template<typename Lhs_, typename Rhs_ = Lhs_>
+	/// <summary>
+	/// <para> Template subtraction functor which allows specialisation for separate left-hand and right-hand argument types. </para>
+	/// <para> Rhs_ will default to Lhs_ unless an explicit argument for Rhs_ is provided. </para>
+	/// <para> If Lhs_ and Rhs_ are void, the correct specialisation of this functor will be invoked based on arguments passed on invocation. </para>
+	/// </summary>
+	template<typename Lhs_ = void, typename Rhs_ = Lhs_>
 	struct do_subtract
 	{
 	private:
@@ -377,7 +431,12 @@ namespace EmuCore
 		}
 	};
 
-	template<typename Lhs_, typename Rhs_ = Lhs_>
+	/// <summary>
+	/// <para> Template multiplication functor which allows specialisation for separate left-hand and right-hand argument types. </para>
+	/// <para> Rhs_ will default to Lhs_ unless an explicit argument for Rhs_ is provided. </para>
+	/// <para> If Lhs_ and Rhs_ are void, the correct specialisation of this functor will be invoked based on arguments passed on invocation. </para>
+	/// </summary>
+	template<typename Lhs_ = void, typename Rhs_ = Lhs_>
 	struct do_multiply
 	{
 	private:
@@ -406,7 +465,12 @@ namespace EmuCore
 		}
 	};
 
-	template<typename Lhs_, typename Rhs_ = Lhs_>
+	/// <summary>
+	/// <para> Template division functor which allows specialisation for separate left-hand and right-hand argument types. </para>
+	/// <para> Rhs_ will default to Lhs_ unless an explicit argument for Rhs_ is provided. </para>
+	/// <para> If Lhs_ and Rhs_ are void, the correct specialisation of this functor will be invoked based on arguments passed on invocation. </para>
+	/// </summary>
+	template<typename Lhs_ = void, typename Rhs_ = Lhs_>
 	struct do_divide
 	{
 	private:
@@ -436,6 +500,47 @@ namespace EmuCore
 	};
 
 	/// <summary>
+	/// <para> Template modulo-division functor which allows specialisation for separate left-hand and right-hand argument types. </para>
+	/// <para> Rhs_ will default to Lhs_ unless an explicit argument for Rhs_ is provided. </para>
+	/// <para> If Lhs_ and Rhs_ are void, the correct specialisation of this functor will be invoked based on arguments passed on invocation. </para>
+	/// </summary>
+	template<typename Lhs_, typename Rhs_>
+	struct do_mod
+	{
+	private:
+		std::modulus<void> modder_;
+		static constexpr bool is_floating_point_mod = std::is_floating_point_v<Lhs_> || std::is_floating_point_v<Rhs_>;
+
+	public:
+		constexpr do_mod() : modder_()
+		{
+		}
+		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			if constexpr (!is_floating_point_mod)
+			{
+				return modder_(lhs_, rhs_);
+			}
+			else
+			{
+				return EmuCore::FmodConstexpr<Lhs_, Rhs_>(lhs_, rhs_);
+			}
+		}
+	};
+	template<>
+	struct do_mod<void, void>
+	{
+		constexpr do_mod()
+		{
+		}
+		template<typename Lhs_, typename Rhs_>
+		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			return do_mod<Lhs_, Rhs_>()(lhs_, rhs_);
+		}
+	};
+
+	/// <summary>
 	/// <para> Template negation functor, which provides additional wrapping to provide better-expected results if T_ is unsigned. </para>
 	/// <para> Note that the additional wrapping is performed at compile time, and is only within the default functor. </para>
 	/// <para> 
@@ -447,8 +552,9 @@ namespace EmuCore
 	///		Unless specialised to do otherwise, invoking this with a type that is not unsigned 
 	///		will always be identical to invoking std::negate&lt;void&gt; with the same argument.
 	/// </para>
+	/// <para> Defaults to T_ = void, which may be invoked with any type argument and will invoke the do_negate for the type passed on invocation. </para>
 	/// </summary>
-	template<typename T_>
+	template<typename T_ = void>
 	struct do_negate
 	{
 	private:
@@ -492,6 +598,67 @@ namespace EmuCore
 		}
 	};
 
+	/// <summary>
+	/// <para> Template functor for converting a value of type T_ from radians to degrees. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// </summary>
+	template<typename T_>
+	struct do_rads_to_degs
+	{
+		constexpr do_rads_to_degs()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			return EmuCore::Pi::RadsToDegs<T_>(val_);
+		}
+	};
+	template<>
+	struct do_rads_to_degs<void>
+	{
+		constexpr do_rads_to_degs()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			return do_rads_to_degs<T_>()(val_);
+		}
+	};
+
+	/// <summary>
+	/// <para> Template functor for converting a value of type T_ from degrees to radians. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// </summary>
+	template<typename T_>
+	struct do_degs_to_rads
+	{
+		constexpr do_degs_to_rads()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			return EmuCore::Pi::DegsToRads<T_>(val_);
+		}
+	};
+	template<>
+	struct do_degs_to_rads<void>
+	{
+		constexpr do_degs_to_rads()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			return do_degs_to_rads<T_>()(val_);
+		}
+	};
+
+	/// <summary>
+	/// <para> Template cos functor, used to perform the cos(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_cos_constexpr` template. </para>
+	/// </summary>
 	template<typename T_>
 	struct do_cos
 	{
@@ -517,6 +684,11 @@ namespace EmuCore
 		}
 	};
 
+	/// <summary>
+	/// <para> Template acos functor, used to perform the acos(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_acos_constexpr` template. </para>
+	/// </summary>
 	template<typename T_>
 	struct do_acos
 	{
@@ -542,6 +714,11 @@ namespace EmuCore
 		}
 	};
 
+	/// <summary>
+	/// <para> Template sin functor, used to perform the sin(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_sin_constexpr` template. </para>
+	/// </summary>
 	template<typename T_>
 	struct do_sin
 	{
@@ -567,6 +744,11 @@ namespace EmuCore
 		}
 	};
 
+	/// <summary>
+	/// <para> Template asin functor, used to perform the asin(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_asin_constexpr` template. </para>
+	/// </summary>
 	template<typename T_>
 	struct do_asin
 	{
@@ -592,6 +774,11 @@ namespace EmuCore
 		}
 	};
 
+	/// <summary>
+	/// <para> Template tan functor, used to perform the tan(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_tan_constexpr` template. </para>
+	/// </summary>
 	template<typename T_>
 	struct do_tan
 	{
@@ -617,6 +804,11 @@ namespace EmuCore
 		}
 	};
 
+	/// <summary>
+	/// <para> Template atan functor, used to perform the atan(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_atan_constexpr` template. </para>
+	/// </summary>
 	template<typename T_>
 	struct do_atan
 	{
@@ -642,124 +834,20 @@ namespace EmuCore
 		}
 	};
 
-	template<typename T_>
-	struct do_degs_to_rads
-	{
-		constexpr do_degs_to_rads()
-		{
-		}
-		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
-		{
-			return EmuCore::Pi::DegsToRads<T_>(val_);
-		}
-	};
-	template<>
-	struct do_degs_to_rads<void>
-	{
-		constexpr do_degs_to_rads()
-		{
-		}
-		template<typename T_>
-		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
-		{
-			return do_degs_to_rads<T_>()(val_);
-		}
-	};
-
-	template<typename T_>
-	struct do_rads_to_degs
-	{
-		constexpr do_rads_to_degs()
-		{
-		}
-		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
-		{
-			return EmuCore::Pi::RadsToDegs<T_>(val_);
-		}
-	};
-	template<>
-	struct do_rads_to_degs<void>
-	{
-		constexpr do_rads_to_degs()
-		{
-		}
-		template<typename T_>
-		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
-		{
-			return do_rads_to_degs<T_>()(val_);
-		}
-	};
-
-	template<typename Lhs_, typename Rhs_>
-	struct do_mod
-	{
-	private:
-		std::modulus<void> modder_;
-
-	public:
-		constexpr do_mod() : modder_()
-		{
-		}
-		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
-		{
-			return modder_(lhs_, rhs_);
-		}
-	};
-	template<>
-	struct do_mod<void, void>
-	{
-		constexpr do_mod()
-		{
-		}
-		template<typename Lhs_, typename Rhs_>
-		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
-		{
-			return do_mod<Lhs_, Rhs_>()(lhs_, rhs_);
-		}
-	};
-	template<typename Rhs_>
-	struct do_mod<float, Rhs_>
-	{
-		constexpr do_mod()
-		{
-		}
-		constexpr inline auto operator()(const float& lhs_, const Rhs_& rhs_) const
-		{
-			return FmodConstexpr<float, Rhs_>(lhs_, rhs_);
-		}
-	};
-	template<typename Rhs_>
-	struct do_mod<double, Rhs_>
-	{
-		constexpr do_mod()
-		{
-		}
-		constexpr inline auto operator()(const double& lhs_, const Rhs_& rhs_) const
-		{
-			return FmodConstexpr<double, Rhs_>(lhs_, rhs_);
-		}
-	};
-	template<typename Rhs_>
-	struct do_mod<long double, Rhs_>
-	{
-		constexpr do_mod()
-		{
-		}
-		constexpr inline auto operator()(const long double& lhs_, const Rhs_& rhs_) const
-		{
-			return FmodConstexpr<long double, Rhs_>(lhs_, rhs_);
-		}
-	};
-
 	/// <summary>
-	/// <para> Functor to calculate cosine (radian units) at compile time using Taylor Series, using the specified number of iterations of said series to do so. </para>
+	/// <para> Template cos functor, used to perform the cos(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this provides a guarantee to perform a constexpr implementation of cos if possible. 
+	///		Specialisations are expected to follow this guarantee.
+	/// </para>
+	/// <para> By default, uses Taylor Series implmentation for the specified number of iterations specified by NumIterations_, which defaults to 3. </para>
 	/// <para>
 	///		DoMod_ is true by default, and will only have an effect on values greater than 6.28319. 
 	///		In cases where input ranges are unknown, it is recommended to keep it as true.
 	///		In cases where you know inputs will not exceed the provided range, it will do nothing and thus setting the argument to false will avoid a useless fmod operation.
 	/// </para>
 	/// </summary>
-	/// <typeparam name="T_"></typeparam>
 	template<typename T_, std::size_t NumIterations_ = 3, bool DoMod_ = true>
 	struct do_cos_constexpr
 	{
@@ -850,6 +938,20 @@ namespace EmuCore
 		}
 	};
 
+	/// <summary>
+	/// <para> Template sin functor, used to perform the sin(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this provides a guarantee to perform a constexpr implementation of sin if possible. 
+	///		Specialisations are expected to follow this guarantee.
+	/// </para>
+	/// <para> By default, uses Taylor Series implmentation for the specified number of iterations specified by NumIterations_, which defaults to 3. </para>
+	/// <para>
+	///		DoMod_ is true by default, and will only have an effect on values greater than 6.28319. 
+	///		In cases where input ranges are unknown, it is recommended to keep it as true.
+	///		In cases where you know inputs will not exceed the provided range, it will do nothing and thus setting the argument to false will avoid a useless fmod operation.
+	/// </para>
+	/// </summary>
 	template<typename T_, std::size_t NumIterations_ = 3, bool DoMod_ = true>
 	struct do_sin_constexpr
 	{
@@ -861,7 +963,7 @@ namespace EmuCore
 			EmuCore::TMP::first_floating_point_t<T_, float>,
 			T_
 		>;
-		static constexpr out_t full_circle = EmuCore::Pi::DegsToRads_v<out_t, int, 360>;
+		static constexpr out_t full_circle = EmuCore::Pi::DegsToRads_v<float, int, 360>;
 
 		constexpr do_sin_constexpr() : add_(), sub_(), mul_(), div_(), mod_()
 		{
@@ -940,6 +1042,20 @@ namespace EmuCore
 		}
 	};
 
+	/// <summary>
+	/// <para> Template sin functor, used to perform the sin(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this provides a guarantee to perform a constexpr implementation of sin if possible. 
+	///		Specialisations are expected to follow this guarantee.
+	/// </para>
+	/// <para> By default, uses the results of cos and sin to create the result of tan. </para>
+	/// <para>
+	///		DoMod_ is true by default, and will only have an effect on values greater than 6.28319. 
+	///		In cases where input ranges are unknown, it is recommended to keep it as true.
+	///		In cases where you know inputs will not exceed the provided range, it will do nothing and thus setting the argument to false will avoid a useless fmod operation.
+	/// </para>
+	/// </summary>
 	template<typename T_, std::size_t NumIterations_ = 3, bool DoMod_ = true>
 	struct do_tan_constexpr
 	{
@@ -1002,6 +1118,10 @@ namespace EmuCore
 		}
 	};
 
+	/// <summary>
+	/// <para> Template functor for finding the absolute value of a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// </summary>
 	template<typename T_>
 	struct do_abs
 	{
@@ -1016,7 +1136,8 @@ namespace EmuCore
 	};
 
 	/// <summary> 
-	/// <para> Functor for wrapping values that are assumed to lie in a normalised range 0:1, where -0.1 is wrapped to 0.9, and 1.1 wrapped to 1.1. </para>
+	/// <para> Functor for wrapping values that are assumed to lie in a normalised range 0:1, where -0.1 is wrapped to 0.9, and 1.1 wrapped to 0.1. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
 	/// <para> Default, non-specialised forms of this functor are presented in a branchless manner. </para>
 	/// <para> If WrapToOne_ is TRUE: non-zero whole numbers will be wrapped to 1. </para>
 	/// <para> If WrapToOne_ is FALSE: non-zero whole numbers will be wrapped to 0. </para>
@@ -1066,6 +1187,19 @@ namespace EmuCore
 					return val_ + (one_ * ((val_ <= zero_) && started_not_zero_));
 				}
 			}
+		}
+	};
+	template<bool WrapToOne_>
+	struct do_normalised_wrap<void, WrapToOne_>
+	{
+		constexpr do_normalised_wrap()
+		{
+		}
+
+		template<typename T_>
+		[[nodiscard]] constexpr inline auto operator()(T_&& val_) const
+		{
+			return do_normalised_wrap<EmuCore::TMP::remove_ref_cv_t<T_>, WrapToOne_>()(std::forward<T_>(val_));
 		}
 	};
 }

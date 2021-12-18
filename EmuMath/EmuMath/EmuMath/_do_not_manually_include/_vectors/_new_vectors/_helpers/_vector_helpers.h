@@ -6,6 +6,7 @@
 #include "_vector_copy.h"
 #include "_vector_get.h"
 #include "_vector_mutation.h"
+#include "_vector_rounds.h"
 #include "_vector_set.h"
 #include "_vector_stream_append.h"
 

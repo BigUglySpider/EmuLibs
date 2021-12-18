@@ -6,6 +6,7 @@
 
 namespace EmuMath::Helpers
 {
+#pragma region NEGATION
 	/// <summary>
 	/// <para> Outputs a negated form of the provided EmuMath Vector, with the output Vector using the provided OutSize_ and OutT_ template arguments. </para>
 	/// <para> OutSize_: Optional argument used as the Size_ argument for the output EmuMath Vector type. Defaults to the input Vector's Size_. </para>
@@ -67,6 +68,25 @@ namespace EmuMath::Helpers
 			0
 		>(in_vector_);
 	}
+
+	/// <summary>
+	/// <para> Outputs a negated form of the provided in_vector_ to the provided out_vector_. </para>
+	/// </summary>
+	/// <param name="out_vector_">EmuMath Vector to output to.</param>
+	/// <param name="in_vector_">EmuMath Vector to output the negated form of.</param>
+	template<std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_>
+	constexpr inline void new_vector_negate(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	{
+		_vector_underlying::_vector_mutate_no_func_passed
+		<
+			EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>,
+			EmuMath::NewVector<OutSize_, OutT_>,
+			0,
+			EmuMath::NewVector<OutSize_, OutT_>::size,
+			0
+		>(out_vector_, in_vector_);
+	}
+#pragma endregion
 }
 
 #endif

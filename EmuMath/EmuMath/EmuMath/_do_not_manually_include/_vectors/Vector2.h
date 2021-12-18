@@ -598,13 +598,13 @@ namespace EmuMath
 		///		Calculates the reciprocal to this vector's magnitude (i.e. the number that may be multiplied by to achieve the same effect as dividing by magnitude),
 		///		using the Q_rsqrt method.
 		/// </para>
-		/// <para> A custom number of newton iterations may be provided to increase accuracy. Additionally, the magic constant may also be changed from 0x5F3759DF. </para>
+		/// <para> A custom number of newton iterations may be provided to increase accuracy. Additionally, the magic constant may also be changed from 0x5F375A86. </para>
 		/// </summary>
 		/// <typeparam name="OutFloatingPoint_">Type to output the magnitude reciprocal as.</typeparam>
 		/// <typeparam name="Vector_">Type of vector to find the reciprocal to the magnitude of.</typeparam>
 		/// <param name="vector_">EmuMath vector to find the reciprocal to the magnitude of.</param>
 		/// <returns>Reciprocal to the passed EmuMath vector's magnitude, represented as the provided OutFloatingPoint_ type.</returns>
-		template<typename OutFloatingPoint_ = preferred_floating_point, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF>
+		template<typename OutFloatingPoint_ = preferred_floating_point, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F375A86>
 		[[nodiscard]] inline OutFloatingPoint_ MagnitudeReciprocalQrsqrt() const
 		{
 			return EmuMath::Helpers::vector_magnitude_reciprocal_qrsqrt<OutFloatingPoint_, NumNewtonIterations_, MagicConstant_, this_type>(*this);
@@ -952,7 +952,7 @@ namespace EmuMath
 		/// <para> Calculates the normalised form of this vector using the magnitude reciprocal calculated via Q_rsqrt. </para>
 		///	<para> NumNewtonIterations_ can be increased to improve accuracy. </para>
 		///	<para>
-		///		MagicConstant_ may be changed to modify bitwise operations, but is recommended to be left to the default (0x5F3759DF) unless you know what you are doing.
+		///		MagicConstant_ may be changed to modify bitwise operations, but is recommended to be left to the default (0x5F375A86) unless you know what you are doing.
 		/// </para>
 		/// </summary>
 		/// <typeparam name="MagFloatingPointType_">Type of floating-point to calculate the magnitude as and use for arithmetic in normalisation. Defaults to float.</typeparam>
@@ -962,7 +962,7 @@ namespace EmuMath
 			typename out_floating_point_contained_type = preferred_floating_point,
 			typename MagFloatingPointType_ = out_floating_point_contained_type,
 			std::size_t NumNewtonIterations_ = 1,
-			std::int32_t MagicConstant_ = 0x5F3759DF,
+			std::int32_t MagicConstant_ = 0x5F375A86,
 			class Vector_
 		>
 			[[nodiscard]] inline EmuMath::Vector<size, out_floating_point_contained_type> NormaliseQrsqrt() const

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -120,6 +120,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -166,11 +167,13 @@
     <ClInclude Include="EmuCore\Functors\MiscMath.h" />
     <ClInclude Include="EmuCore\TestingHelpers\LoopingTestHarness.h" />
     <ClInclude Include="EmuCore\TMPHelpers\Functors.h" />
+    <ClInclude Include="EmuCore\TMPHelpers\OperatorChecks.h" />
     <ClInclude Include="EmuCore\TMPHelpers\SafeEnumFuncs.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TimeTMP.h" />
     <ClInclude Include="EmuCore\TMPHelpers\Tuples.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TypeComparators.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TypeConvertors.h" />
+    <ClInclude Include="EmuCore\TMPHelpers\TypeObfuscation.h" />
     <ClInclude Include="EmuCore\TMPHelpers\Values.h" />
     <ClInclude Include="EmuMath\Colour.h" />
     <ClInclude Include="EmuMath\FastMatrix.h" />
@@ -189,6 +192,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_get.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_helpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_mutation.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_rounds.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_set.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_stream_append.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_copy_underlying.h" />

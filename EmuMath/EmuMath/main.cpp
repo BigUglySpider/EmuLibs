@@ -21,6 +21,8 @@
 
 #include "EmuMath/NewVector.h"
 
+#include "EmuCore/TMPHelpers/TypeObfuscation.h"
+
 using namespace EmuCore::TestingHelpers;
 
 template<typename T_>
@@ -702,7 +704,26 @@ int main()
 	constexpr std::uint8_t test_part_2_ = static_cast<std::uint8_t>(test_part_1_);
 	constexpr std::uint8_t test_part_3_ = -test_part_0_;
 
-	constexpr double some_double = std::negate()(1u);
+	constexpr double some_safe_double = double(EmuCore::do_negate()(1u));
+
+	std::cout << "---\n";
+	constexpr EmuMath::NewVector<12, float> new_vec_to_round_(0.1, 0.2, -0.3, 0.4, 0.5, 0.6, -0.7, 0.8, 0.9, 1.0, -2.4, 2.5);
+	constexpr auto new_vec_floored_ = EmuMath::Helpers::new_vector_floor_constexpr(new_vec_to_round_);
+	constexpr auto new_vec_ceiled_ = EmuMath::Helpers::new_vector_ceil_constexpr(new_vec_to_round_);
+	constexpr auto new_vec_trunced_ = EmuMath::Helpers::new_vector_trunc_constexpr(new_vec_to_round_);
+	constexpr auto new_vec_abs_ = EmuMath::Helpers::new_vector_abs(new_vec_to_round_);
+
+	constexpr auto bloobegreg = EmuCore::TMP::obfuscate(3);
+	auto ieohugr = &bloobegreg;
+	constexpr auto eiorhj = bloobegreg || false;
+	constexpr auto lejgerp = bloobegreg + 13.5f;
+
+	std::cout << *(&bloobegreg) << "\n";
+
+	constexpr auto some_vector_to_obfuscate_ = EmuMath::NewVector<4, float>(1, 2, 3, 4);
+	constexpr auto vector_from_obfuscated_ = EmuMath::NewVector<4, float>(EmuCore::TMP::obfuscate(some_vector_to_obfuscate_));
+
+	std::cout << EmuCore::TMP::obfuscate(EmuMath::NewVector<8, double>(-1, 267, -1, 25, 42, 33.0f, 2L, 6.66L)) << "\n";
 
 	std::cout << "\n\n";
 	system("pause");

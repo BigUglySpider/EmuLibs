@@ -566,9 +566,10 @@ namespace EmuCore
 	/// <param name="rhs_">Value to divide by, acting as rhs_ in the expression lhs_ % rhs_.</param>
 	/// <returns>Floating-point mod of the provided arguments, expressed as the type Lhs_.</returns>
 	template<typename Lhs_, typename Rhs_>
-	constexpr inline Lhs_ FmodConstexpr(const Lhs_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuCore::TMP::remove_ref_cv_t<Lhs_> FmodConstexpr(const Lhs_& lhs_, const Rhs_& rhs_)
 	{
-		return static_cast<Lhs_>(lhs_ - (static_cast<std::int64_t>(lhs_ / rhs_) * rhs_));
+		using lhs_uq = EmuCore::TMP::remove_ref_cv_t<Lhs_>;
+		return static_cast<lhs_uq>(lhs_ - (static_cast<std::int64_t>(lhs_ / rhs_) * rhs_));
 	}
 
 	/// <summary>
@@ -600,7 +601,7 @@ namespace EmuCore
 	/// <summary>
 	/// <para> Calculates the reciprocal to the square root of the passed in_ value, represented as the provided OutFloatingPoint_ type. </para>
 	/// <para> By default, performs 1 Newton's Method iteration to improve accuracy. More iterations may be requested to increase accuracy. </para>
-	/// <para> A magic constant is used for some bit manipulation. It is recommended to only change this from the default (0x5F3759DF) if you know what you are doing. </para>
+	/// <para> A magic constant is used for some bit manipulation. It is recommended to only change this from the default (0x5F375A86) if you know what you are doing. </para>
 	/// <para> More information regarding the algorithm may be found here: https://en.wikipedia.org/wiki/Fast_inverse_square_root#Overview_of_the_code </para>
 	/// </summary>
 	/// <typeparam name="InT_">Type being input to find the reciprocal to the square root of.</typeparam>
@@ -610,7 +611,7 @@ namespace EmuCore
 	///		Close approximation of the reciprocal to the provided in_ value's square root, represented as the provided OutFloatingPoint_. 
 	///		The accuracy of this value increases with more newton iterations.
 	/// </returns>
-	template<typename OutFloatingPoint_ = float, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, typename InT_>
+	template<typename OutFloatingPoint_ = float, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F375A86, typename InT_>
 	inline OutFloatingPoint_ Q_rsqrt(const InT_ in_)
 	{
 		if constexpr (std::is_floating_point_v<OutFloatingPoint_>)

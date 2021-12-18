@@ -130,10 +130,22 @@ namespace EmuMath
 		}
 
 	private:
+		struct _dummy_arg_for_private_constexpr_default
+		{
+			constexpr inline _dummy_arg_for_private_constexpr_default() {}
+		};
+
 		struct _dummy_arg_for_private_lazy_default
 		{
 			constexpr inline _dummy_arg_for_private_lazy_default() {}
 		};
+
+		using _dummy_arg_for_private_default = std::conditional_t
+		<
+			is_default_constructible,
+			_dummy_arg_for_private_constexpr_default,
+			_dummy_arg_for_private_lazy_default
+		>;
 #pragma endregion
 
 #pragma region CONSTRUCTORS
@@ -255,7 +267,7 @@ namespace EmuMath
 			typename OtherT_,
 			typename = std::enable_if_t<valid_template_vector_copy_construct_arg<OtherSize_, OtherT_>()>
 		>
-		explicit constexpr inline NewVector(EmuMath::NewVector<OtherSize_, OtherT_>& to_copy_) : NewVector(_dummy_arg_for_private_lazy_default())
+		explicit constexpr inline NewVector(EmuMath::NewVector<OtherSize_, OtherT_>& to_copy_) : NewVector(_dummy_arg_for_private_default())
 		{
 			EmuMath::Helpers::new_vector_set(*this, to_copy_);
 		}
@@ -273,7 +285,7 @@ namespace EmuMath
 			typename OtherT_,
 			typename = std::enable_if_t<valid_template_vector_const_copy_construct_arg<OtherSize_, OtherT_>() && !contains_non_const_ref>
 		>
-		explicit constexpr inline NewVector(const EmuMath::NewVector<OtherSize_, OtherT_>& to_copy_) : NewVector(_dummy_arg_for_private_lazy_default())
+		explicit constexpr inline NewVector(const EmuMath::NewVector<OtherSize_, OtherT_>& to_copy_) : NewVector(_dummy_arg_for_private_default())
 		{
 			EmuMath::Helpers::new_vector_set(*this, to_copy_);
 		}
@@ -291,7 +303,7 @@ namespace EmuMath
 			typename OtherT_,
 			typename = std::enable_if_t<valid_template_vector_move_construct_arg<OtherSize_, OtherT_>()>
 		>
-		explicit constexpr inline NewVector(EmuMath::NewVector<OtherSize_, OtherT_>&& to_move_) : NewVector(_dummy_arg_for_private_lazy_default())
+		explicit constexpr inline NewVector(EmuMath::NewVector<OtherSize_, OtherT_>&& to_move_) : NewVector(_dummy_arg_for_private_default())
 		{
 			// Checks are here so that temporaries aren't resolved to the const copy constructor
 			// --- This comes with the unfortunate effect that this constructor may appear usable in TMP in situations where it is not
@@ -318,7 +330,7 @@ namespace EmuMath
 			typename InT_,
 			typename = std::enable_if_t<is_valid_lone_type_for_set_all_construction<InT_&&>()>
 		>
-		explicit constexpr inline NewVector(InT_&& to_set_all_to_) : NewVector(_dummy_arg_for_private_lazy_default())
+		explicit constexpr inline NewVector(InT_&& to_set_all_to_) : NewVector(_dummy_arg_for_private_default())
 		{
 			SetAll(std::forward<InT_>(to_set_all_to_));
 		}
@@ -328,7 +340,7 @@ namespace EmuMath
 			typename InT_,
 			typename = std::enable_if_t<is_valid_lone_type_for_set_all_construction<InT_&>()>
 		>
-		explicit constexpr inline NewVector(InT_& to_set_all_to_) : NewVector(_dummy_arg_for_private_lazy_default())
+		explicit constexpr inline NewVector(InT_& to_set_all_to_) : NewVector(_dummy_arg_for_private_default())
 		{
 			SetAll(to_set_all_to_);
 		}
@@ -338,16 +350,22 @@ namespace EmuMath
 			typename InT_,
 			typename = std::enable_if_t<is_valid_lone_type_for_set_all_construction<const InT_&>()>
 		>
-		explicit constexpr inline NewVector(const InT_& to_set_all_to_) : NewVector(_dummy_arg_for_private_lazy_default())
+		explicit constexpr inline NewVector(const InT_& to_set_all_to_) : NewVector(_dummy_arg_for_private_default())
 		{
 			SetAll(to_set_all_to_);
 		}
 
 	private:
 		// Empty constructor used to perform a lazy-default when construction is executed within the constructor body; inaccessible out of this struct
+		// --- Only available when we cannot default construct
 		// --- Disable warning about uninitialised data since that's the point of this constructor
 #pragma warning(disable : 26495)
 		explicit constexpr inline NewVector(_dummy_arg_for_private_lazy_default dummy_arg_)
+		{
+		}
+		// Empty constructor used to perform a default-construction when full construction is executed within the constructor body; inaccessible out of this struct
+		// --- Only available when we can default construct
+		explicit constexpr inline NewVector(_dummy_arg_for_private_constexpr_default dummy_arg_) : NewVector()
 		{
 		}
 #pragma endregion
@@ -746,11 +764,16 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::new_vector_negate<OutSize_, OutT_>(*this);
 		}
-
 		template<typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Negate() const
 		{
 			return EmuMath::Helpers::new_vector_negate<size, OutT_>(*this);
+		}
+
+		template<std::size_t OutSize_, typename OutT_>
+		constexpr inline void NegateTo(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_negate(out_vector_, *this);
 		}
 #pragma endregion
 
@@ -798,6 +821,224 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), value_type_uq> ShuffleTheoretical() const
 		{
 			return EmuMath::Helpers::new_vector_shuffle_theoretical<value_type_uq, Indices_...>(*this);
+		}
+
+		/// <summary>
+		/// <para> Crates a Vector of this Vector's size and value_type_uq using the provided mutation func_. </para>
+		/// <para> The provided arguments will be provided to func_ for every index within the output Vector. </para>
+		/// <para> For any Arg_ that is an EmuMath Vector: The argument at the matching index will be passed to the Func_ instance, instead of the full Vector. </para>
+		/// <para> IncludeSelf_ indicates if (and how) this Vector should be included as an argument for mutation. </para>
+		/// <para> If IncludeSelf_ == 0: This Vector will not be passed as an argument for mutation. </para>
+		/// <para> If IncludeSelf &lt; 0: This Vector will be passed as the first argument for mutation. </para>
+		/// <para> If IncludeSelf &gt; 0: This Vector will be passed as the final argument for mutation. </para>
+		/// </summary>
+		/// <typeparam name="Func_">Mutation function to invoke for every index within the output Vector.</typeparam>
+		/// <typeparam name="Args_">All (or additional, if this Vector is also being passed based on IncludeSelf_) argument types being passed to the mutation function.</typeparam>
+		/// <param name="args_">All (or additional, if this Vector is being passed based on IncludeSelf_) arguments to pass to the mutation function.</param>
+		/// <returns>EmuMath Vector created from mutating the provided arguments via an instance of the provided Func_ at every index within the output Vector.</returns>
+		template<std::size_t IncludeSelf_, class Func_, class...Args_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, value_type_uq> Mutate(Func_ func_, Args_&&...args_)
+		{
+			if constexpr (IncludeSelf_ < 0)
+			{
+				return EmuMath::Helpers::new_vector_mutate<size, value_type_uq, Func_&>(func_, *this, std::forward<Args_>(args_)...);
+			}
+			else if constexpr (IncludeSelf_ > 0)
+			{
+				return EmuMath::Helpers::new_vector_mutate<size, value_type_uq, Func_&>(func_, std::forward<Args_>(args_)..., *this);
+			}
+			else
+			{
+				return EmuMath::Helpers::new_vector_mutate<size, value_type_uq, Func_&>(func_, std::forward<Args_>(args_)...);
+			}
+		}
+		template<std::size_t IncludeSelf_, class Func_, class...Args_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, value_type_uq> Mutate(Func_ func_, Args_&&...args_) const
+		{
+			if constexpr (IncludeSelf_ < 0)
+			{
+				return EmuMath::Helpers::new_vector_mutate<size, value_type_uq, Func_&>(func_, *this, std::forward<Args_>(args_)...);
+			}
+			else if constexpr (IncludeSelf_ > 0)
+			{
+				return EmuMath::Helpers::new_vector_mutate<size, value_type_uq, Func_&>(func_, std::forward<Args_>(args_)..., *this);
+			}
+			else
+			{
+				return EmuMath::Helpers::new_vector_mutate<size, value_type_uq, Func_&>(func_, std::forward<Args_>(args_)...);
+			}
+		}
+
+		/// <summary>
+		/// <para> Crates a Vector of this Vector's size and value_type_uq using the provided mutation Func_ type. </para>
+		/// <para> The provided arguments will be provided to an instance of Func_ for every index within the output Vector. </para>
+		/// <para> For any Arg_ that is an EmuMath Vector: The argument at the matching index will be passed to the Func_ instance, instead of the full Vector. </para>
+		/// <para> IncludeSelf_ indicates if (and how) this Vector should be included as an argument for mutation. </para>
+		/// <para> If IncludeSelf_ == 0: This Vector will not be passed as an argument for mutation. </para>
+		/// <para> If IncludeSelf &lt; 0: This Vector will be passed as the first argument for mutation. </para>
+		/// <para> If IncludeSelf &gt; 0: This Vector will be passed as the final argument for mutation. </para>
+		/// </summary>
+		/// <typeparam name="Func_">Mutation function to invoke for every index within the output Vector.</typeparam>
+		/// <typeparam name="Args_">All (or additional, if this Vector is also being passed based on IncludeSelf_) argument types being passed to the mutation function.</typeparam>
+		/// <param name="args_">All (or additional, if this Vector is being passed based on IncludeSelf_) arguments to pass to the mutation function.</param>
+		/// <returns>EmuMath Vector created from mutating the provided arguments via an instance of the provided Func_ at every index within the output Vector.</returns>
+		template<class Func_, std::size_t IncludeSelf_, class...Args_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, value_type_uq> Mutate(Args_&&...args_)
+		{
+			if constexpr (IncludeSelf_ < 0)
+			{
+				return EmuMath::Helpers::new_vector_mutate<Func_, size, value_type_uq>(*this, std::forward<Args_>(args_)...);
+			}
+			else if constexpr (IncludeSelf_ > 0)
+			{
+				return EmuMath::Helpers::new_vector_mutate<Func_, size, value_type_uq>(std::forward<Args_>(args_)..., *this);
+			}
+			else
+			{
+				return EmuMath::Helpers::new_vector_mutate<Func_, size, value_type_uq>(std::forward<Args_>(args_)...);
+			}
+		}
+		template<class Func_, std::size_t IncludeSelf_, class...Args_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, value_type_uq> Mutate(Args_&&...args_) const
+		{
+			if constexpr (IncludeSelf_ < 0)
+			{
+				return EmuMath::Helpers::new_vector_mutate<Func_, size, value_type_uq>(*this, std::forward<Args_>(args_)...);
+			}
+			else if constexpr (IncludeSelf_ > 0)
+			{
+				return EmuMath::Helpers::new_vector_mutate<Func_, size, value_type_uq>(std::forward<Args_>(args_)..., *this);
+			}
+			else
+			{
+				return EmuMath::Helpers::new_vector_mutate<Func_, size, value_type_uq>(std::forward<Args_>(args_)...);
+			}
+		}
+
+		/// <summary>
+		/// <para> Outputs to the provided EmuMath Vector using the provided mutation func_. </para>
+		/// <para> The provided arguments will be provided to func_ for every index within the output Vector. </para>
+		/// <para> For any Arg_ that is an EmuMath Vector: The argument at the matching index will be passed to the Func_ instance, instead of the full Vector. </para>
+		/// <para> IncludeSelf_ indicates if (and how) this Vector should be included as an argument for mutation. </para>
+		/// <para> If IncludeSelf_ == 0: This Vector will not be passed as an argument for mutation. </para>
+		/// <para> If IncludeSelf &lt; 0: This Vector will be passed as the first argument for mutation. </para>
+		/// <para> If IncludeSelf &gt; 0: This Vector will be passed as the final argument for mutation. </para>
+		/// </summary>
+		/// <typeparam name="Func_">Mutation function to invoke for every index within the output Vector.</typeparam>
+		/// <typeparam name="Args_">All (or additional, if this Vector is also being passed based on IncludeSelf_) argument types being passed to the mutation function.</typeparam>
+		/// <param name="args_">All (or additional, if this Vector is being passed based on IncludeSelf_) arguments to pass to the mutation function.</param>
+		template<std::size_t IncludeSelf_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void MutateTo(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Func_ func_, Args_&&...args_)
+		{
+			if constexpr (IncludeSelf_ < 0)
+			{
+				EmuMath::Helpers::new_vector_mutate_to<size, value_type_uq, Func_&>(out_vector_, func_, *this, std::forward<Args_>(args_)...);
+			}
+			else if constexpr (IncludeSelf_ > 0)
+			{
+				EmuMath::Helpers::new_vector_mutate_to<size, value_type_uq, Func_&>(out_vector_, func_, std::forward<Args_>(args_)..., *this);
+			}
+			else
+			{
+				EmuMath::Helpers::new_vector_mutate_to<size, value_type_uq, Func_&>(out_vector_, func_, std::forward<Args_>(args_)...);
+			}
+		}
+		template<std::size_t IncludeSelf_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void MutateTo(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Func_ func_, Args_&&...args_) const
+		{
+			if constexpr (IncludeSelf_ < 0)
+			{
+				EmuMath::Helpers::new_vector_mutate_to<size, value_type_uq, Func_&>(out_vector_, func_, *this, std::forward<Args_>(args_)...);
+			}
+			else if constexpr (IncludeSelf_ > 0)
+			{
+				EmuMath::Helpers::new_vector_mutate_to<size, value_type_uq, Func_&>(out_vector_, func_, std::forward<Args_>(args_)..., *this);
+			}
+			else
+			{
+				EmuMath::Helpers::new_vector_mutate_to<size, value_type_uq, Func_&>(out_vector_, func_, std::forward<Args_>(args_)...);
+			}
+		}
+
+		/// <summary>
+		/// <para> Outputs to the provided EmuMath Vector using the provided mutation func_. </para>
+		/// <para> The provided arguments will be provided to func_ for every index within the output Vector. </para>
+		/// <para> For any Arg_ that is an EmuMath Vector: The argument at the matching index will be passed to the Func_ instance, instead of the full Vector. </para>
+		/// <para> IncludeSelf_ indicates if (and how) this Vector should be included as an argument for mutation. </para>
+		/// <para> If IncludeSelf_ == 0: This Vector will not be passed as an argument for mutation. </para>
+		/// <para> If IncludeSelf &lt; 0: This Vector will be passed as the first argument for mutation. </para>
+		/// <para> If IncludeSelf &gt; 0: This Vector will be passed as the final argument for mutation. </para>
+		/// </summary>
+		/// <typeparam name="Func_">Mutation function to invoke for every index within the output Vector.</typeparam>
+		/// <typeparam name="Args_">All (or additional, if this Vector is also being passed based on IncludeSelf_) argument types being passed to the mutation function.</typeparam>
+		/// <param name="args_">All (or additional, if this Vector is being passed based on IncludeSelf_) arguments to pass to the mutation function.</param>
+		template<class Func_, std::size_t IncludeSelf_, class...Args_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void MutateTo(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
+		{
+			if constexpr (IncludeSelf_ < 0)
+			{
+				EmuMath::Helpers::new_vector_mutate_to<Func_, size, value_type_uq>(out_vector_, *this, std::forward<Args_>(args_)...);
+			}
+			else if constexpr (IncludeSelf_ > 0)
+			{
+				EmuMath::Helpers::new_vector_mutate_to<Func_, size, value_type_uq>(out_vector_, std::forward<Args_>(args_)..., *this);
+			}
+			else
+			{
+				EmuMath::Helpers::new_vector_mutate_to<Func_, size, value_type_uq>(out_vector_, std::forward<Args_>(args_)...);
+			}
+		}
+		template<class Func_, std::size_t IncludeSelf_, class...Args_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void MutateTo(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
+		{
+			if constexpr (IncludeSelf_ < 0)
+			{
+				EmuMath::Helpers::new_vector_mutate_to<Func_, size, value_type_uq>(out_vector_, *this, std::forward<Args_>(args_)...);
+			}
+			else if constexpr (IncludeSelf_ > 0)
+			{
+				EmuMath::Helpers::new_vector_mutate_to<Func_, size, value_type_uq>(out_vector_, std::forward<Args_>(args_)..., *this);
+			}
+			else
+			{
+				EmuMath::Helpers::new_vector_mutate_to<Func_, size, value_type_uq>(out_vector_, std::forward<Args_>(args_)...);
+			}
+		}
+
+		/// <summary>
+		/// <para> Outputs to this Vector using the provided mutation func_. </para>
+		/// <para> The provided arguments will be provided to func_ for every index within this Vector. </para>
+		/// <para> For any Arg_ that is an EmuMath Vector: The argument at the matching index will be passed to the Func_ instance, instead of the full Vector. </para>
+		/// <para> IncludeSelf_ indicates if (and how) this Vector should be included as an argument for mutation. </para>
+		/// <para> If IncludeSelf_ == 0: This Vector will not be passed as an argument for mutation. </para>
+		/// <para> If IncludeSelf &lt; 0: This Vector will be passed as the first argument for mutation. </para>
+		/// <para> If IncludeSelf &gt; 0: This Vector will be passed as the final argument for mutation. </para>
+		/// </summary>
+		/// <typeparam name="Func_">Mutation function to invoke for every index within this Vector.</typeparam>
+		/// <typeparam name="Args_">All (or additional, if this Vector is also being passed based on IncludeSelf_) argument types being passed to the mutation function.</typeparam>
+		/// <param name="args_">All (or additional, if this Vector is being passed based on IncludeSelf_) arguments to pass to the mutation function.</param>
+		template<std::size_t IncludeSelf_, class Func_, class...Args_>
+		constexpr inline void MutateSelf(Func_ func_, Args_&&...args_)
+		{
+			MutateTo<IncludeSelf_, Func_&>(*this, func_, std::forward<Args_>(args_)...);
+		}
+
+		/// <summary>
+		/// <para> Outputs to this Vector using the provided mutation Func_ type. </para>
+		/// <para> The provided arguments will be provided to an instance of Func_ for every index within this Vector. </para>
+		/// <para> For any Arg_ that is an EmuMath Vector: The argument at the matching index will be passed to the Func_ instance, instead of the full Vector. </para>
+		/// <para> IncludeSelf_ indicates if (and how) this Vector should be included as an argument for mutation. </para>
+		/// <para> If IncludeSelf_ == 0: This Vector will not be passed as an argument for mutation. </para>
+		/// <para> If IncludeSelf &lt; 0: This Vector will be passed as the first argument for mutation. </para>
+		/// <para> If IncludeSelf &gt; 0: This Vector will be passed as the final argument for mutation. </para>
+		/// </summary>
+		/// <typeparam name="Func_">Mutation function to invoke for every index within this Vector.</typeparam>
+		/// <typeparam name="Args_">All (or additional, if this Vector is also being passed based on IncludeSelf_) argument types being passed to the mutation function.</typeparam>
+		/// <param name="args_">All (or additional, if this Vector is being passed based on IncludeSelf_) arguments to pass to the mutation function.</param>
+		template<class Func_, std::size_t IncludeSelf_, class...Args_>
+		constexpr inline void MutateSelf(Args_&&...args_)
+		{
+			MutateTo<Func_, IncludeSelf_>(*this, std::forward<Args_>(args_)...);
 		}
 #pragma endregion
 
