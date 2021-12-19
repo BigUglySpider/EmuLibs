@@ -214,33 +214,6 @@ namespace EmuMath::Helpers::_vector_underlying
 			return false;
 		}
 	}
-
-	template<std::size_t Index_, class Arg_>
-	[[nodiscard]] constexpr inline auto& _vector_get_index_if_vector(Arg_& arg_)
-	{
-		if constexpr (EmuMath::TMP::is_emu_new_vector_v<Arg_>)
-		{
-			return _vector_get<Index_>(arg_);
-		}
-		else
-		{
-			return arg_;
-		}
-	}
-
-	template<std::size_t Index_, class Arg_>
-	[[nodiscard]] constexpr inline std::conditional_t<EmuMath::TMP::is_emu_new_vector_v<Arg_>, EmuMath::TMP::emu_vector_theoretical_return_t<Index_, Arg_>, Arg_&>
-	_vector_get_theoretical_if_vector(Arg_& arg_)
-	{
-		if constexpr (EmuMath::TMP::is_emu_new_vector_v<Arg_>)
-		{
-			return _vector_get_theoretical<Index_>(arg_);
-		}
-		else
-		{
-			return arg_;
-		}
-	}
 }
 
 #endif

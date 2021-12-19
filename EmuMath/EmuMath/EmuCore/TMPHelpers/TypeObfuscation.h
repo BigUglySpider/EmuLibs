@@ -11,6 +11,7 @@ namespace EmuCore::TMP
 	template<class T_>
 	struct type_obfuscator
 	{
+	public:
 		using this_type = type_obfuscator<T_>;
 
 		using value_type = T_;
@@ -67,7 +68,7 @@ namespace EmuCore::TMP
 		{
 			return wrapped_value;
 		}
-
+		
 		constexpr inline operator const_ref_type() const
 		{
 			return wrapped_value;
@@ -891,7 +892,7 @@ namespace EmuCore::TMP
 		}
 #pragma endregion
 
-		/// <summary> The underlying value wrapped by this obfuscator. </summary>
+		/// <summary> The underlying item wrapped by this obfuscator. </summary>
 		T_ wrapped_value;
 	};
 
@@ -902,10 +903,14 @@ namespace EmuCore::TMP
 	///		This is intended for use in avoiding template specialisations that may result in undesirable results, 
 	///		or to avoid compile-time decisions based on an item's type.
 	/// </para>
+	/// <para> Note that implicit conversion may not be possible for all cases, but this exposes the following operators if required: </para>
+	/// <para> --- Arithmetic (+, -, *, /, %, ++, --, +=, -=, *=, /=, %=) </para>
+	/// <para> --- Bitwise (&amp;, |, ^, &lt;&lt;, &gt;&gt;, ~, &amp;=, |=, ^=, &lt;&lt;=, &gt;&gt;=) </para>
+	/// <para> --- Logical (!, ||, &amp;&amp;) </para>
+	/// <para> --- Others ([], (), =) </para>
 	/// </summary>
-	/// <typeparam name="T_"></typeparam>
-	/// <param name="val_"></param>
-	/// <returns></returns>
+	/// <param name="val_">Item to obfuscate the type of.</param>
+	/// <returns>The passed item wrapped in an type_obfuscator instance.</returns>
 	template<typename T_>
 	[[nodiscard]] constexpr inline EmuCore::TMP::type_obfuscator<T_> obfuscate(T_&& val_)
 	{

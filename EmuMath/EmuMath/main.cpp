@@ -22,6 +22,7 @@
 #include "EmuMath/NewVector.h"
 
 #include "EmuCore/TMPHelpers/TypeObfuscation.h"
+#include "EmuCore/TMPHelpers/VariadicHelpers.h"
 
 using namespace EmuCore::TestingHelpers;
 
@@ -713,17 +714,16 @@ int main()
 	constexpr auto new_vec_trunced_ = EmuMath::Helpers::new_vector_trunc_constexpr(new_vec_to_round_);
 	constexpr auto new_vec_abs_ = EmuMath::Helpers::new_vector_abs(new_vec_to_round_);
 
-	constexpr auto bloobegreg = EmuCore::TMP::obfuscate(3);
-	auto ieohugr = &bloobegreg;
-	constexpr auto eiorhj = bloobegreg || false;
-	constexpr auto lejgerp = bloobegreg + 13.5f;
+	std::cout << "---\n";
+	constexpr auto pre_negate_vec_ = EmuMath::Helpers::new_vector_make<float>(-5.0f, 0.0f, 12.0f, -66.66f);
+	constexpr auto full_negate_vec_ = EmuMath::Helpers::new_vector_negate(pre_negate_vec_);
+	constexpr auto partial_negate_vec_ = EmuMath::Helpers::new_vector_negate_range<27, long double, 3, 4>(pre_negate_vec_);
 
-	std::cout << *(&bloobegreg) << "\n";
-
-	constexpr auto some_vector_to_obfuscate_ = EmuMath::NewVector<4, float>(1, 2, 3, 4);
-	constexpr auto vector_from_obfuscated_ = EmuMath::NewVector<4, float>(EmuCore::TMP::obfuscate(some_vector_to_obfuscate_));
-
-	std::cout << EmuCore::TMP::obfuscate(EmuMath::NewVector<8, double>(-1, 267, -1, 25, 42, 33.0f, 2L, 6.66L)) << "\n";
+	constexpr auto some_other_negation_ = EmuMath::Helpers::new_vector_mutate<4, long double>(EmuCore::do_negate<void>(), EmuMath::Helpers::new_vector_make<float>(1, -2, 3, -4));
+	constexpr auto negated_negation_ = some_other_negation_.Negate();
+	constexpr auto negated_negation_full_range_ = EmuMath::Helpers::new_vector_negate_range<0, 10>(some_other_negation_);
+	constexpr auto negated_negation_full_range_mut_ = EmuMath::Helpers::new_vector_mutate_range<4, float, 0, 10>(EmuCore::do_negate<void>(), some_other_negation_);
+	constexpr auto negated_negated_negation_full_range_mut_ = EmuMath::Helpers::new_vector_mutate_range<4, float, 0, 10, 1>(EmuCore::do_negate<void>(), negated_negation_full_range_mut_);
 
 	std::cout << "\n\n";
 	system("pause");

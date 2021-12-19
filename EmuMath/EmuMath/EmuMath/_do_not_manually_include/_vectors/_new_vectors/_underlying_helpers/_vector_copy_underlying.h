@@ -46,7 +46,8 @@ namespace EmuMath::Helpers::_vector_underlying
 			if constexpr (EmuMath::TMP::is_emu_new_vector_v<ArgVector_>)
 			{
 				using lhs_value_type = typename EmuMath::NewVector<Size_, T_>::value_type;
-				using arg_value_type_cq = EmuCore::TMP::conditional_const_t<std::is_const_v<ArgVector_>, typename ArgVector_::value_type>;
+				using arg_vector_uq = EmuCore::TMP::remove_ref_cv_t<ArgVector_>;
+				using arg_value_type_cq = EmuCore::TMP::conditional_const_t<std::is_const_v<ArgVector_>, typename arg_vector_uq::value_type>;
 				if constexpr (EmuMath::TMP::is_emu_new_vector_v<lhs_value_type> && !EmuMath::TMP::is_emu_new_vector_v<arg_value_type_cq>)
 				{
 					// If vector_ contains Vectors, but to_copy_ does not, we want the containe Vectors to fully copy to_copy_.
@@ -61,14 +62,14 @@ namespace EmuMath::Helpers::_vector_underlying
 				}
 				else
 				{
-					if constexpr (ArgIndex_ < ArgVector_::size)
+					if constexpr (ArgIndex_ < arg_vector_uq::size)
 					{
 						_vector_copy_index<Index_>(vector_, _vector_get<ArgIndex_>(to_copy_));
 						_vector_copy_vector<Index_ + 1, EndIndex_, ArgIndex_ + 1, ArgVector_, Size_, T_>(vector_, to_copy_);
 					}
 					else
 					{
-						auto implied_zero_ = _vector_get_non_contained_value<ArgVector_>();
+						auto implied_zero_ = _vector_get_non_contained_value<arg_vector_uq>();
 						_vector_copy_scalar<Index_, EndIndex_, decltype(implied_zero_), Size_, T_>(vector_, implied_zero_);
 					}
 				}

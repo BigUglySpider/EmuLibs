@@ -138,9 +138,9 @@ namespace EmuMath::Helpers
 	/// <param name="out_vector_">: EmuMath Vector to output the results of mutation to.</param>
 	/// <param name="args_">: All arguments to pass to the mutation function on every iteration. May provide EmuMath Vectors for unique arguments per iteration. </param>
 	template<class Func_, std::size_t OutSize_, typename OutT_, class...Args_>
-	[[nodiscard]] constexpr inline void new_vector_mutate_to(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
+	constexpr inline void new_vector_mutate_to(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
 	{
-		return _vector_underlying::_vector_mutate_no_func_passed<Func_, EmuMath::NewVector<OutSize_, OutT_>, 0, EmuMath::NewVector<OutSize_, OutT_>::size, 0>
+		_vector_underlying::_vector_mutate_no_func_passed<Func_, EmuMath::NewVector<OutSize_, OutT_>, 0, EmuMath::NewVector<OutSize_, OutT_>::size, 0>
 		(
 			out_vector_,
 			std::forward<Args_>(args_)...
@@ -157,13 +157,104 @@ namespace EmuMath::Helpers
 	/// <param name="out_vector_">: EmuMath Vector to output the results of mutation to.</param>
 	/// <param name="func_">Mutation function to execute with all passed arguments (as described) for every index within the output Vector.</param>
 	/// <param name="args_">All arguments to pass to the mutation function on every iteration. May provide EmuMath Vectors for unique arguments per iteration. </param>
-	template<std::size_t OutSize_, typename OutT_, class Func_, class...Args_>
-	[[nodiscard]] constexpr inline void new_vector_mutate_to(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Func_ func_, Args_&&...args_)
+	template<class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
+	constexpr inline void new_vector_mutate_to(Func_ func_, EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
 	{
-		return _vector_underlying::_vector_mutate<Func_&, EmuMath::NewVector<OutSize_, OutT_>, 0, EmuMath::NewVector<OutSize_, OutT_>::size, 0>
+		_vector_underlying::_vector_mutate<Func_&, EmuMath::NewVector<OutSize_, OutT_>, 0, EmuMath::NewVector<OutSize_, OutT_>::size, 0>
 		(
 			func_,
 			out_vector_,
+			std::forward<Args_>(args_)...
+		);
+	}
+
+	/// <summary>
+	/// <para>
+	///		Outputs to the provided index range within the passed EmuMath Vector using the results of the provided mutation Func_ type,
+	///		 when invoked with all of the provided args_.
+	/// </para>
+	/// <para> For any Arg_ that is an EmuMath Vector: The argument at the current ArgIndex_ will be used. This is increased by 1 for every iteration. </para>
+	/// <para> BeginIndex_ is the inclusive first index at which to start writing to out_vector_. This is required. </para>
+	/// <para> EndIndex_ is the exclusive final index at which to stop writing to out_vector_. This is required. </para>
+	/// <para> ArgBeginIndex_ indicates is the inclusive first index to read EmuMath Vector arguments from. This is optional, and defaults to 0. </para>
+	/// </summary>
+	/// <typeparam name="Func_">Type of mutation function to invoke. This must be default-constructible.</typeparam>
+	/// <typeparam name="Args_">All argument types that will be used to pass arguments to the mutation function on every iteration.</typeparam>
+	/// <param name="out_vector_">: Non-const EmuMath Vector reference to output to.</param>
+	/// <param name="args_">: All arguments that will be used to pass arguments to the mutation function on every iteration, as described.</param>
+	template<class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_ = 0, class...Args_, std::size_t OutSize_, typename OutT_>
+	constexpr inline void new_vector_mutate_range(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
+	{
+		_vector_underlying::_vector_mutate_no_func_passed<Func_, EmuMath::NewVector<OutSize_, OutT_>, BeginIndex_, EndIndex_, ArgBeginIndex_>
+		(
+			out_vector_,
+			std::forward<Args_>(args_)...
+		);
+	}
+
+	/// <summary>
+	/// <para>
+	///		Outputs to the provided index range within the passed EmuMath Vector using the results of the provided mutation func_,
+	///		when invoked with all of the provided args_.
+	/// </para>
+	/// <para> For any Arg_ that is an EmuMath Vector: The argument at the current ArgIndex_ will be used. This is increased by 1 for every iteration. </para>
+	/// <para> BeginIndex_ is the inclusive first index at which to start writing to out_vector_. This is required. </para>
+	/// <para> EndIndex_ is the exclusive final index at which to stop writing to out_vector_. This is required. </para>
+	/// <para> ArgBeginIndex_ indicates is the inclusive first index to read EmuMath Vector arguments from. This is optional, and defaults to 0. </para>
+	/// </summary>
+	/// <typeparam name="Func_">Type of mutation function being passed.</typeparam>
+	/// <typeparam name="Args_">All argument types that will be used to pass arguments to the mutation function on every iteration.</typeparam>
+	/// <param name="func_">
+	///		: Function invocable with each of the provided arguments (or theoretical index equivalents for EmuMath Vector args_), 
+	///		which additionally returns a type that may be copied to a value within out_vector_.
+	/// </param>
+	/// <param name="out_vector_">: Non-const EmuMath Vector reference to output to.</param>
+	/// <param name="args_">: All arguments that will be used to pass arguments to the mutation function on every iteration, as described.</param>
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
+	constexpr inline void new_vector_mutate_range(Func_ func_, EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
+	{
+		_vector_underlying::_vector_mutate<Func_&, EmuMath::NewVector<OutSize_, OutT_>, BeginIndex_, EndIndex_, ArgBeginIndex_>
+		(
+			func_,
+			out_vector_,
+			std::forward<Args_>(args_)...
+		);
+	}
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
+	constexpr inline void new_vector_mutate_range(Func_ func_, EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
+	{
+		_vector_underlying::_vector_mutate<Func_&, EmuMath::NewVector<OutSize_, OutT_>, BeginIndex_, EndIndex_, 0>
+		(
+			func_,
+			out_vector_,
+			std::forward<Args_>(args_)...
+		);
+	}
+
+	template<class Func_, std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_ = 0, class...Args_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_mutate_range(Args_&&...args_)
+	{
+		return _vector_underlying::_vector_mutate_args_only<Func_, EmuMath::NewVector<OutSize_, OutT_>, BeginIndex_, EndIndex_, ArgBeginIndex_>
+		(
+			std::forward<Args_>(args_)...
+		);
+	}
+
+	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_, class Func_, class...Args_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_mutate_range(Func_ func_, Args_&&...args_)
+	{
+		return _vector_underlying::_vector_mutate_return_out<EmuMath::NewVector<OutSize_, OutT_>, Func_&, BeginIndex_, EndIndex_, ArgBeginIndex_>
+		(
+			func_,
+			std::forward<Args_>(args_)...
+		);
+	}
+	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, class Func_, class...Args_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_mutate_range(Func_ func_, Args_&&...args_)
+	{
+		return _vector_underlying::_vector_mutate_return_out<EmuMath::NewVector<OutSize_, OutT_>, Func_&, BeginIndex_, EndIndex_, 0>
+		(
+			func_,
 			std::forward<Args_>(args_)...
 		);
 	}

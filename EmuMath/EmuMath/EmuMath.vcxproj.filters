@@ -530,5 +530,8 @@
     <ClInclude Include="EmuCore\TMPHelpers\TypeObfuscation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuCore\TMPHelpers\VariadicHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

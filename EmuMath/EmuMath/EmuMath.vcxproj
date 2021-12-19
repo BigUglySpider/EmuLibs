@@ -175,6 +175,7 @@
     <ClInclude Include="EmuCore\TMPHelpers\TypeConvertors.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TypeObfuscation.h" />
     <ClInclude Include="EmuCore\TMPHelpers\Values.h" />
+    <ClInclude Include="EmuCore\TMPHelpers\VariadicHelpers.h" />
     <ClInclude Include="EmuMath\Colour.h" />
     <ClInclude Include="EmuMath\FastMatrix.h" />
     <ClInclude Include="EmuMath\FastNoise.h" />
