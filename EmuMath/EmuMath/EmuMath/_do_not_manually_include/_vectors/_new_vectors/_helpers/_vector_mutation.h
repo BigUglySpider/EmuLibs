@@ -176,7 +176,7 @@ namespace EmuMath::Helpers
 	/// <para> For any Arg_ that is an EmuMath Vector: The argument at the current ArgIndex_ will be used. This is increased by 1 for every iteration. </para>
 	/// <para> BeginIndex_ is the inclusive first index at which to start writing to out_vector_. This is required. </para>
 	/// <para> EndIndex_ is the exclusive final index at which to stop writing to out_vector_. This is required. </para>
-	/// <para> ArgBeginIndex_ indicates is the inclusive first index to read EmuMath Vector arguments from. This is optional, and defaults to 0. </para>
+	/// <para> ArgBeginIndex_ is the inclusive first index to read EmuMath Vector arguments from. This is optional, and defaults to 0. </para>
 	/// </summary>
 	/// <typeparam name="Func_">Type of mutation function to invoke. This must be default-constructible.</typeparam>
 	/// <typeparam name="Args_">All argument types that will be used to pass arguments to the mutation function on every iteration.</typeparam>
@@ -200,7 +200,7 @@ namespace EmuMath::Helpers
 	/// <para> For any Arg_ that is an EmuMath Vector: The argument at the current ArgIndex_ will be used. This is increased by 1 for every iteration. </para>
 	/// <para> BeginIndex_ is the inclusive first index at which to start writing to out_vector_. This is required. </para>
 	/// <para> EndIndex_ is the exclusive final index at which to stop writing to out_vector_. This is required. </para>
-	/// <para> ArgBeginIndex_ indicates is the inclusive first index to read EmuMath Vector arguments from. This is optional, and defaults to 0. </para>
+	/// <para> ArgBeginIndex_ is the inclusive first index to read EmuMath Vector arguments from. This is optional, and defaults to 0. </para>
 	/// </summary>
 	/// <typeparam name="Func_">Type of mutation function being passed.</typeparam>
 	/// <typeparam name="Args_">All argument types that will be used to pass arguments to the mutation function on every iteration.</typeparam>
@@ -231,6 +231,20 @@ namespace EmuMath::Helpers
 		);
 	}
 
+	/// <summary>
+	/// <para>
+	///		Outputs an EmuMath Vector with the provided OutSize_ and OutT_ template arguments,
+	///		using the results of invoking a default instance of Func_ with all provided args_ for all indices in the specified range.
+	/// </para>
+	/// <para> For any Arg_ that is an EmuMath Vector: The argument at the current ArgIndex_ will be used. This is increased by 1 for every iteration. </para>
+	/// <para> BeginIndex_ is the inclusive first index at which to start writing mutation results to the output Vector. This is required. </para>
+	/// <para> EndIndex_ is the exclusive final index at which to stop writing mutation results to the output Vector. This is required. </para>
+	/// <para> ArgBeginIndex_ is the inclusive first index to read EmuMath Vector arguments from. This is optional, and defaults to 0. </para>
+	/// </summary>
+	/// <typeparam name="Func_">Type of function to invoke with the provided arguments. Must be default-constructible.</typeparam>
+	/// <typeparam name="Args_">All argument types that will be used to pass arguments to the mutation function on every iteration.</typeparam>
+	/// <param name="args_">: All arguments that will be used to pass arguments to the mutation function on every iteration, as described.</param>
+	/// <returns>A new instance of an EmuMath Vector of the specified OutSize_ and OutT_, with indices in the specified range set to mutation results.</returns>
 	template<class Func_, std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_ = 0, class...Args_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_mutate_range(Args_&&...args_)
 	{
@@ -240,6 +254,19 @@ namespace EmuMath::Helpers
 		);
 	}
 
+	/// <summary>
+	/// <para>
+	///		Outputs an EmuMath Vector with the provided OutSize_ and OutT_ template arguments,
+	///		using the results of invoking func_ with all provided args_ for all indices in the specified range.
+	/// </para>
+	/// <para> For any Arg_ that is an EmuMath Vector: The argument at the current ArgIndex_ will be used. This is increased by 1 for every iteration. </para>
+	/// <para> BeginIndex_ is the inclusive first index at which to start writing mutation results to the output Vector. This is required. </para>
+	/// <para> EndIndex_ is the exclusive final index at which to stop writing mutation results to the output Vector. This is required. </para>
+	/// <para> ArgBeginIndex_ is the inclusive first index to read EmuMath Vector arguments from. This is optional, and defaults to 0. </para>
+	/// </summary>
+	/// <typeparam name="Args_">All argument types that will be used to pass arguments to the mutation function on every iteration.</typeparam>
+	/// <param name="args_">: All arguments that will be used to pass arguments to the mutation function on every iteration, as described.</param>
+	/// <returns>A new instance of an EmuMath Vector of the specified OutSize_ and OutT_, with indices in the specified range set to mutation results.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_, class Func_, class...Args_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_mutate_range(Func_ func_, Args_&&...args_)
 	{

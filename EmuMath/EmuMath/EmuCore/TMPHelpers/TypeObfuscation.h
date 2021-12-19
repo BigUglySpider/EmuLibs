@@ -916,6 +916,40 @@ namespace EmuCore::TMP
 	{
 		return type_obfuscator<T_>(std::forward<T_>(val_));
 	}
+
+	/// <summary> Type used to check if the passed type T_ is an obfuscation of an other type, such as a type_obfuscator. </summary>
+	template<typename T_>
+	struct is_obfuscation
+	{
+		static constexpr bool value = std::conditional_t
+		<
+			std::is_same_v<T_, EmuCore::TMP::remove_ref_cv_t<T_>>,
+			std::false_type,
+			is_obfuscation<EmuCore::TMP::remove_ref_cv_t<T_>>
+		>::value;
+	};
+	template<typename T_>
+	struct is_obfuscation<EmuCore::TMP::type_obfuscator<T_>>
+	{
+		static constexpr bool value = false;
+	};
+	template<typename T_>
+	static constexpr bool is_obfuscation_v = is_obfuscation<T_>::value;
+
+
+	/// <summary> Type used to check if the passed type Item_ is an obfuscation of the provided type ToFind_, such as type_obfuscator&lt;ToFind_&gt;. </summary>
+	template<class Item_, class ToFind_>
+	struct is_obfuscation_of
+	{
+		static constexpr bool value = false;
+	};
+	template<class T_, class ToFind_>
+	struct is_obfuscation_of<EmuCore::TMP::type_obfuscator<T_>, ToFind_>
+	{
+		static constexpr bool value = std::is_same_v<T_, ToFind_>;
+	};
+	template<class T_, class ToFind_>
+	static constexpr bool is_obfuscation_of_v = is_obfuscation_of<T_, ToFind_>::value;
 }
 
 template

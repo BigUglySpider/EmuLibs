@@ -14,23 +14,6 @@ namespace EmuMath::Helpers::_vector_underlying
 	<
 		EmuMath::TMP::is_emu_new_vector_v<Arg_>,
 		EmuMath::TMP::emu_vector_theoretical_return_t<Index_, Arg_>,
-		const std::remove_reference_t<Arg_>&
-	> _vector_mutate_get_theoretical_if_vector(Arg_&& arg_)
-	{
-		if constexpr (EmuMath::TMP::is_emu_new_vector_v<Arg_>)
-		{
-			return _vector_get_theoretical<Index_>(arg_);
-		}
-		else
-		{
-			return arg_;
-		}
-	}
-	template<std::size_t Index_, class Arg_>
-	[[nodiscard]] constexpr inline std::conditional_t
-	<
-		EmuMath::TMP::is_emu_new_vector_v<Arg_>,
-		EmuMath::TMP::emu_vector_theoretical_return_t<Index_, Arg_>,
 		Arg_&
 	> _vector_mutate_get_theoretical_if_vector(Arg_& arg_)
 	{
@@ -115,6 +98,101 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
+			return false;
+		}
+	}
+
+	template<std::size_t ArgIndex_, class Func_, class...Args_>
+	[[nodiscard]] constexpr inline std::invoke_result_t<Func_, _vector_mutate_get_theoretical_if_vector_result_t<ArgIndex_, Args_>...> _vector_mutate_invoke_func(Func_ func_, Args_&&...args_)
+	{
+		return func_(_vector_mutate_get_theoretical_if_vector<ArgIndex_>(std::forward<Args_>(args_))...);
+	}
+
+
+	template<class OutVector_, class Func_, std::size_t CurrentIndex_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgIndex_, class...Args_>
+	[[nodiscard]] constexpr inline auto _vector_mutate_get_construction_arg(Func_ func_, Args_&&...args_)
+	{
+		if constexpr ((CurrentIndex_ >= BeginIndex_) && (CurrentIndex_ < EndIndex_))
+		{
+			if constexpr (_vector_mutate_is_valid_invocation_for_construction<ArgIndex_, OutVector_, Func_&, Args_...>())
+			{
+				return _vector_mutate_invoke_func<ArgIndex_, Func_&>(func_, std::forward<Args_>(args_)...);
+			}
+			else
+			{
+				static_assert(false, "Attempted to get an EmuMath Vector construction arg from mutation for an index which is to be mutated, but the output Vector's elements are not compatible with the result of mutation invocation.");
+			}
+		}
+		else
+		{
+			using out_stored_type = typename OutVector_::stored_type;
+			using out_value_uq = typename OutVector_::value_type_uq;
+			if constexpr (std::is_constructible_v<out_stored_type, out_stored_type> && std::is_default_constructible_v<out_stored_type>)
+			{
+				return out_stored_type();
+			}
+			else if constexpr (std::is_constructible_v<out_stored_type, out_value_uq> && std::is_default_constructible_v<out_value_uq>)
+			{
+				return out_value_uq();
+			}
+			else
+			{
+				static_assert(false, "Attempted to get an EmuMath Vector construction arg from mutation for an index which will not be mutated, but the output Vector cannot have its stored_type constructed from the Vector's stored_type or value_type_uq, or if it can then neither of said types can be default-constructed.");
+			}
+		}
+	}
+
+	template<std::size_t OutIndex_, std::size_t ArgIndex_, std::size_t MutBeginIndex_, std::size_t MutEndIndex_, class OutVector_, class Func_, class...Args_>
+	[[nodiscard]] constexpr inline bool _vector_mutate_valid_for_partial_construction()
+	{
+		if constexpr (OutIndex_ >= MutBeginIndex_ && OutIndex_ < MutEndIndex_)
+		{
+			return _vector_mutate_is_valid_invocation_for_construction<ArgIndex_, OutVector_, Func_&, Args_...>();
+		}
+		else
+		{
+			using out_stored_type = typename OutVector_::stored_type;
+			using out_value_uq = typename OutVector_::value_type_uq;
+			return
+			(
+				(std::is_constructible_v<out_stored_type, out_stored_type> && std::is_default_constructible_v<out_stored_type>) ||
+				(std::is_constructible_v<out_stored_type, out_value_uq> && std::is_default_constructible_v<out_value_uq>)
+			);
+		}
+	}
+	template<class OutVector_, class Func_, std::size_t MutBeginIndex_, std::size_t MutEndIndex_, class...Args_, std::size_t...OutIndices_, std::size_t...ArgIndices_>
+	[[nodiscard]] constexpr inline bool _vector_mutate_valid_for_partial_construction
+	(
+		std::index_sequence<OutIndices_...> out_indices_,
+		std::index_sequence<ArgIndices_...> arg_indices_
+	)
+	{
+		return EmuCore::TMP::variadic_and_v
+		<
+			_vector_mutate_valid_for_partial_construction<OutIndices_, ArgIndices_, MutBeginIndex_, MutEndIndex_, OutVector_, Func_&, Args_...>()...
+		>;
+	}
+
+	template<class OutVector_, class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgIndex_, class...Args_>
+	[[nodiscard]] constexpr inline bool _vector_mutate_valid_for_partial_construction()
+	{
+		using out_vector_uq = EmuCore::TMP::remove_ref_cv_t<OutVector_>;
+		if constexpr (BeginIndex_ < out_vector_uq::size)
+		{
+			// No need to check for 0-size since BeginIndex_ cannot be < 0.
+
+			using arg_indices_before_mutation = EmuCore::TMP::make_duplicated_index_sequence<ArgIndex_, BeginIndex_>;
+			using arg_indices_during_after_mutation = EmuCore::TMP::make_offset_index_sequence<BeginIndex_, out_vector_uq::size - BeginIndex_>;
+			using all_arg_indices = EmuCore::TMP::splice_index_sequences_t<arg_indices_before_mutation, arg_indices_during_after_mutation>;
+			return _vector_mutate_valid_for_partial_construction<OutVector_, Func_&, BeginIndex_, EndIndex_, Args_...>
+			(
+				std::make_index_sequence<out_vector_uq::size>(),
+				all_arg_indices()
+			);
+		}
+		else
+		{
+			// Can't produce a clear test due to invalid index, but no assertion as this isn't an _assert func
 			return false;
 		}
 	}
@@ -268,12 +346,6 @@ namespace EmuMath::Helpers::_vector_underlying
 #pragma endregion
 
 #pragma region MUTATION_FUNCS
-	template<std::size_t ArgIndex_, class Func_, class...Args_>
-	[[nodiscard]] constexpr inline std::invoke_result_t<Func_, _vector_mutate_get_theoretical_if_vector_result_t<ArgIndex_, Args_>...> _vector_mutate_invoke_func(Func_ func_, Args_&&...args_)
-	{
-		return func_(_vector_mutate_get_theoretical_if_vector<ArgIndex_>(std::forward<Args_>(args_)...));
-	}
-
 	template<std::size_t Index_, std::size_t EndIndex_, std::size_t ArgIndex_, class Func_, class OutVector_, class...Args_>
 	constexpr inline void _vector_mutate_execution(Func_& func_, OutVector_& out_vector_, Args_&&...args_)
 	{
@@ -324,6 +396,25 @@ namespace EmuMath::Helpers::_vector_underlying
 		return OutVector_(_vector_mutate_invoke_func<ArgIndices_, Func_&>(func_, std::forward<Args_>(args_)...)...);
 	}
 
+	template<class OutVector_, class Func_, std::size_t MutBeginIndex_, std::size_t MutEndIndex_, class...Args_, std::size_t...OutIndices_, std::size_t...ArgIndices_>
+	[[nodiscard]] constexpr inline OutVector_ _vector_mutate_do_partial_mut_construction
+	(
+		std::index_sequence<OutIndices_...> out_indices_,
+		std::index_sequence<ArgIndices_...> arg_indices_,
+		Func_ func_,
+		Args_&&...args_
+	)
+	{
+		return OutVector_
+		(
+			_vector_mutate_get_construction_arg<OutVector_, Func_&, OutIndices_, MutBeginIndex_, MutEndIndex_, ArgIndices_>
+			(
+				func_,
+				std::forward<Args_>(args_)...
+			)...
+		);
+	}
+
 	template<class OutVector_, class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgIndex_, class...Args_>
 	[[nodiscard]] constexpr inline OutVector_ _vector_mutate_return_out(Func_ func_, Args_&&...args_)
 	{
@@ -337,7 +428,6 @@ namespace EmuMath::Helpers::_vector_underlying
 			using arg_index_sequence = EmuCore::TMP::make_offset_index_sequence<ArgIndex_, num_calls_>;
 			if constexpr (_is_constructible_from_mutation_results<OutVector_, Func_&, arg_index_sequence, Args_...>::value)
 			{
-				// TODO: Direct construction
 				return _vector_mutate_return_out_from_construct<OutVector_, Func_&>(arg_index_sequence(), func_, std::forward<Args_>(args_)...);
 			}
 			else if constexpr(std::is_default_constructible_v<OutVector_>)
@@ -354,10 +444,21 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			// Only a partial mutation, so default construct unaffected elements
-			// --- We don't care about percent mutated-to as we don't know the complexity of Func_
-			// ------ E.g. even if we mutate all but 1 index, the overhead of an additional Func_ invoke could easily be heavier
-			if constexpr (std::is_default_constructible_v<OutVector_>)
+			// We output defaults to the constructor where no mutations are performed, 
+			if constexpr (_vector_mutate_valid_for_partial_construction<OutVector_, Func_&, BeginIndex_, EndIndex_, ArgIndex_, Args_...>())
+			{
+				using arg_indices_before_mutation = EmuCore::TMP::make_duplicated_index_sequence<ArgIndex_, BeginIndex_>;
+				using arg_indices_during_after_mutation = EmuCore::TMP::make_offset_index_sequence<ArgIndex_, OutVector_::size - BeginIndex_>;
+				using all_arg_indices = EmuCore::TMP::splice_index_sequences_t<arg_indices_before_mutation, arg_indices_during_after_mutation>;
+				return _vector_mutate_do_partial_mut_construction<OutVector_, Func_&, BeginIndex_, EndIndex_>
+				(
+					std::make_index_sequence<OutVector_::size>(),
+					all_arg_indices(),
+					func_,
+					std::forward<Args_>(args_)...
+				);
+			}
+			else if constexpr (std::is_default_constructible_v<OutVector_>)
 			{
 				OutVector_ out_vector_ = OutVector_();
 				_vector_mutate<Func_&, OutVector_, BeginIndex_, EndIndex_, ArgIndex_>(func_, out_vector_, std::forward<Args_>(args_)...);
@@ -365,7 +466,7 @@ namespace EmuMath::Helpers::_vector_underlying
 			}
 			else
 			{
-				static_assert(false, "Attempted to partially mutate an EmuMath Vector without passing an out_vector_ to output to. This is only allowed where the provided output Vector is default-constructible.");
+				static_assert(false, "Attempted to partially mutate an EmuMath Vector without passing an out_vector_ to output to. This is only allowed where the provided output Vector is default-constructible, or can be constructed from mutation results at the mutation indices and from default stored_type or value_type_uq items.");
 			}
 		}
 	}

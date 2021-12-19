@@ -320,6 +320,23 @@ inline void WriteNoiseTableToPPM
 	}
 }
 
+
+
+template<std::size_t...IndexArgs_, std::size_t OutSize_, typename OutT_, class...Args_>
+[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _some_new_vec_func_test_helper(const EmuMath::NewVector<OutSize_, OutT_>& starting_out_, Args_&&...args_)
+{
+	EmuMath::NewVector<OutSize_, OutT_> out_(starting_out_);
+	EmuMath::Helpers::new_vector_negate_range_no_copy<IndexArgs_...>(out_, std::forward<Args_>(args_)...);
+	return out_;
+}
+template<std::size_t OutSize_, typename OutT_, class...Args_>
+[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _some_new_vec_func_test_helper(const EmuMath::NewVector<OutSize_, OutT_>& starting_out_, Args_&&...args_)
+{
+	EmuMath::NewVector<OutSize_, OutT_> out_(starting_out_);
+	EmuMath::Helpers::new_vector_negate_range_no_copy<2, 3>(out_, std::forward<Args_>(args_)...);
+	return out_;
+}
+
 int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
@@ -724,6 +741,17 @@ int main()
 	constexpr auto negated_negation_full_range_ = EmuMath::Helpers::new_vector_negate_range<0, 10>(some_other_negation_);
 	constexpr auto negated_negation_full_range_mut_ = EmuMath::Helpers::new_vector_mutate_range<4, float, 0, 10>(EmuCore::do_negate<void>(), some_other_negation_);
 	constexpr auto negated_negated_negation_full_range_mut_ = EmuMath::Helpers::new_vector_mutate_range<4, float, 0, 10, 1>(EmuCore::do_negate<void>(), negated_negation_full_range_mut_);
+	constexpr auto another_negation_again_ = EmuMath::Helpers::new_vector_negate_range_no_copy<4, float, 2, 4, 0>(some_other_negation_);
+
+	EmuCore::TMP::variadic_or_v<false, false, false, false, false, false, false>;
+	EmuCore::TMP::variadic_xor_v<false, false, true, false, false, false, true>;
+	EmuCore::TMP::variadic_and_v<false, false, true, false, false, false, true>;
+
+	std::cout << "---\n";
+	// NOTE: Test done this way to allow an easily readable constexpr
+	constexpr auto partial_test_to_negate_ = EmuMath::Helpers::new_vector_make<float>(1, -2, -3, -4, -5, 6, -7, 8, 9, 10);
+	constexpr auto partial_test_to_not_negate_ = EmuMath::Helpers::new_vector_make<float>(10, 20, 30, 40, 50, 60, 70, 80, 90, 100);
+	constexpr auto partial_test_negation_result_ = _some_new_vec_func_test_helper<2, 5, 4>(partial_test_to_not_negate_, partial_test_to_negate_);
 
 	std::cout << "\n\n";
 	system("pause");
