@@ -175,6 +175,14 @@ namespace EmuMath::Helpers
 		return _vector_underlying::_vector_copy_mutate_invoke_only_no_func_passed<true, Func_, Size_, value_type_uq, 0, Size_>(vector_, vector_);
 	}
 #pragma endregion
+
+#pragma region PRE_DECREMENT_FUNCS
+	// TODO: DECREMENTS
+#pragma endregion
+
+#pragma region POST_DECREMENT_FUNCS
+	// TODO: DECREMENTS
+#pragma endregion
 }
 
 #endif
