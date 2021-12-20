@@ -2,6 +2,7 @@
 #define EMU_CORE_ARITHMETIC_FUNCTORS_H_INC_ 1
 
 #include "../ArithmeticHelpers/CommonMath.h"
+#include "../TMPHelpers/OperatorChecks.h"
 #include "../TMPHelpers/TypeComparators.h"
 #include <cstddef>
 #include <functional>
@@ -360,6 +361,196 @@ namespace EmuCore
 		[[nodiscard]] constexpr inline auto operator()(const T_& val_) const
 		{
 			return do_trunc<T_>()(val_);
+		}
+	};
+
+	/// <summary>
+	/// <para> Functor to perform and output the result of a pre-increment on a value of type T_, with the format ++value. </para>
+	/// <para> If a type does not implement the correct operator, this will attempt to emulate it by default with += operators if possible. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// </summary>
+	template<typename T_>
+	struct do_pre_increment
+	{
+		constexpr do_pre_increment()
+		{
+		}
+		constexpr inline auto operator()(T_& val_) const
+		{
+			if constexpr (EmuCore::TMP::has_pre_increment_operator_v<T_&>)
+			{
+				return ++val_;
+			}
+			else if constexpr (EmuCore::TMP::has_plus_assign_operator_v<T_&, decltype(1)>)
+			{
+				val_ += 1;
+				return val_;
+			}
+			else if constexpr (EmuCore::TMP::has_plus_assign_operator_v<T_&, 1.0f>)
+			{
+				val_ += 1.0f;
+				return val_;
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a pre-increment on a type that does not have a pre-increment operator defined, or an plus-assign operator that can take an argument of 1 or 1.0f to emulate such behaviour.");
+			}
+		}
+	};
+	template<>
+	struct do_pre_increment<void>
+	{
+		constexpr do_pre_increment()
+		{
+		}
+		template<typename T_>
+		constexpr inline auto operator()(T_& val_) const
+		{
+			return do_pre_increment<T_>()(val_);
+		}
+	};
+
+	/// <summary>
+	/// <para> Functor to perform and output the result of a post-increment on a value of type T_, with the format value++. </para>
+	/// <para> If a type does not implement the correct operator, this will attempt to emulate it by default with += operators if possible. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// </summary>
+	template<typename T_>
+	struct do_post_increment
+	{
+		constexpr do_post_increment()
+		{
+		}
+		constexpr inline auto operator()(T_& val_) const
+		{
+			if constexpr (EmuCore::TMP::has_post_increment_operator_v<T_&>)
+			{
+				return val_++;
+			}
+			else
+			{
+				EmuCore::TMP::remove_ref_cv_t<T_> out_(val_);
+				if constexpr (EmuCore::TMP::has_plus_assign_operator_v<T_&, decltype(1)>)
+				{
+					val_ += 1;
+				}
+				else if constexpr (EmuCore::TMP::has_plus_assign_operator_v<T_&, 1.0f>)
+				{
+					val_ += 1.0f;
+				}
+				else
+				{
+					static_assert(false, "Attempted to perform a post-increment on a type that does not have a post-increment operator defined, or a plus-assign operator that can take an argument of 1 or 1.0f to emulate such behaviour.");
+				}
+				return out_;
+			}
+		}
+	};
+	template<>
+	struct do_post_increment<void>
+	{
+		constexpr do_post_increment()
+		{
+		}
+		template<typename T_>
+		constexpr inline auto operator()(T_& val_) const
+		{
+			return do_post_increment<T_>()(val_);
+		}
+	};
+
+	/// <summary>
+	/// <para> Functor to perform and output the result of a pre-decrement on a value of type T_, with the format --value. </para>
+	/// <para> If a type does not implement the correct operator, this will attempt to emulate it by default with -= operators if possible. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// </summary>
+	template<typename T_>
+	struct do_pre_decrement
+	{
+		constexpr do_pre_decrement()
+		{
+		}
+		constexpr inline auto operator()(T_& val_) const
+		{
+			if constexpr (EmuCore::TMP::has_pre_decrement_operator_v<T_&>)
+			{
+				return --val_;
+			}
+			else if constexpr (EmuCore::TMP::has_subtract_assign_operator_v<T_&, decltype(1)>)
+			{
+				val_ -= 1;
+				return val_;
+			}
+			else if constexpr (EmuCore::TMP::has_subtract_assign_operator_v<T_&, 1.0f>)
+			{
+				val_ -= 1.0f;
+				return val_;
+			}
+			else
+			{
+				static_assert(false, "Attempted to perform a pre-decrement on a type that does not have a pre-decrement operator defined, or a subtract-assign operator that can take an argument of 1 or 1.0f to emulate such behaviour.");
+			}
+		}
+	};
+	template<>
+	struct do_pre_decrement<void>
+	{
+		constexpr do_pre_decrement()
+		{
+		}
+		template<typename T_>
+		constexpr inline auto operator()(T_& val_) const
+		{
+			return do_pre_decrement<T_>()(val_);
+		}
+	};
+
+	/// <summary>
+	/// <para> Functor to perform and output the result of a post-decrement on a value of type T_, with the format value--. </para>
+	/// <para> If a type does not implement the correct operator, this will attempt to emulate it by default with -= operators if possible. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// </summary>
+	template<typename T_>
+	struct do_post_decrement
+	{
+		constexpr do_post_decrement()
+		{
+		}
+		constexpr inline auto operator()(T_& val_) const
+		{
+			if constexpr (EmuCore::TMP::has_post_decrement_operator_v<T_&>)
+			{
+				return val_--;
+			}
+			else
+			{
+				EmuCore::TMP::remove_ref_cv_t<T_> out_(val_);
+				if constexpr (EmuCore::TMP::has_subtract_assign_operator_v<T_&, decltype(1)>)
+				{
+					val_ -= 1;
+				}
+				else if constexpr (EmuCore::TMP::has_subtract_assign_operator_v<T_&, 1.0f>)
+				{
+					val_ -= 1.0f;
+				}
+				else
+				{
+					static_assert(false, "Attempted to perform a post-decrement on a type that does not have a post-decrement operator defined, or a subtract-assign operator that can take an argument of 1 or 1.0f to emulate such behaviour.");
+				}
+				return out_;
+			}
+		}
+	};
+	template<>
+	struct do_post_decrement<void>
+	{
+		constexpr do_post_decrement()
+		{
+		}
+		template<typename T_>
+		constexpr inline auto operator()(T_& val_) const
+		{
+			return do_post_decrement<T_>()(val_);
 		}
 	};
 

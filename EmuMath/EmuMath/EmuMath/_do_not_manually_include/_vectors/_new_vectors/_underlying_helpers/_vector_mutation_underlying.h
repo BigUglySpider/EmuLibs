@@ -54,12 +54,33 @@ namespace EmuMath::Helpers::_vector_underlying
 #pragma endregion
 
 #pragma region CHECKING_FUNCS
+
+	template<std::size_t ArgIndex_, class Func_, class...Args_>
+	[[nodiscard]] constexpr inline bool _vector_mutate_func_is_invocable()
+	{
+		return std::is_invocable_v<Func_, _vector_mutate_get_theoretical_if_vector_result_t<ArgIndex_, Args_>...>;
+	}
+
+	template<std::size_t ArgIndex_, class Func_, class...Args_>
+	[[nodiscard]] constexpr inline bool _assert_vector_mutate_func_is_invocable()
+	{
+		if constexpr (_vector_mutate_func_is_invocable<ArgIndex_, Func_, Args_...>())
+		{
+			return true;
+		}
+		else
+		{
+			static_assert(false, "Attempted to mutate an EmuMath Vector, but at least one iteration of mutation resulted in arguments which the provided mutation function does not support.");
+			return false;
+		}
+	}
+
 	// Returns true if a the provided mutation Func_, when supplied with the provided Args_, is invocable and returns a type compatible with OutVector::value_type.
 	// --- Additionally, triggers a static_assert if returning false
 	template<std::size_t ArgIndex_, class OutVector_, class Func_, class...Args_>
 	[[nodiscard]] constexpr inline bool _assert_vector_mutate_is_valid_invocation()
 	{
-		if constexpr (std::is_invocable_v<Func_, _vector_mutate_get_theoretical_if_vector_result_t<ArgIndex_, Args_>...>)
+		if constexpr (_vector_mutate_func_is_invocable<ArgIndex_, Func_, Args_...>())
 		{
 			using invoke_result = std::invoke_result_t<Func_, _vector_mutate_get_theoretical_if_vector_result_t<ArgIndex_, Args_>...>;
 			if constexpr (EmuCore::TMP::is_compatible_v<typename OutVector_::value_type, invoke_result>)
@@ -103,9 +124,27 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<std::size_t ArgIndex_, class Func_, class...Args_>
-	[[nodiscard]] constexpr inline std::invoke_result_t<Func_, _vector_mutate_get_theoretical_if_vector_result_t<ArgIndex_, Args_>...> _vector_mutate_invoke_func(Func_ func_, Args_&&...args_)
+	[[nodiscard]] constexpr inline std::invoke_result_t<Func_, _vector_mutate_get_theoretical_if_vector_result_t<ArgIndex_, Args_>...>
+	_vector_mutate_invoke_func(Func_ func_, Args_&&...args_)
 	{
-		return func_(_vector_mutate_get_theoretical_if_vector<ArgIndex_>(std::forward<Args_>(args_))...);
+		return func_
+		(
+			_vector_mutate_get_theoretical_if_vector<ArgIndex_>
+			(
+				EmuCore::TMP::lval_ref_cast<Args_>(std::forward<Args_>(args_))
+			)...
+		);
+	}
+	template<std::size_t ArgIndex_, class Func_, class...Args_>
+	[[nodiscard]] constexpr inline void _vector_mutate_invoke_func_no_ret(Func_ func_, Args_&&...args_)
+	{
+		func_
+		(
+			_vector_mutate_get_theoretical_if_vector<ArgIndex_>
+			(
+				EmuCore::TMP::lval_ref_cast<Args_>(std::forward<Args_>(args_))
+			)...
+		);
 	}
 
 
@@ -392,8 +431,16 @@ namespace EmuMath::Helpers::_vector_underlying
 		Args_&&...args_
 	)
 	{
-		// Args will be forwarded when passed on func invocation; knowing this, we can settle r-value references here
-		return OutVector_(_vector_mutate_invoke_func<ArgIndices_, Func_&>(func_, std::forward<Args_>(args_)...)...);
+		// We cast to lval-refs because VS seems to be producing a (upon analysis, most likely false-positive) "Use of a moved from object" warning.
+		// --- We convert to lvalues so there's no chance of a move occurring, since lvalues can only be copied unless explicitly std::moved (or equivalent)
+		return OutVector_
+		(
+			_vector_mutate_invoke_func<ArgIndices_, Func_&>
+			(
+				func_,
+				EmuCore::TMP::lval_ref_cast<Args_>(std::forward<Args_>(args_))...
+			)...
+		);
 	}
 
 	template<class OutVector_, class Func_, std::size_t MutBeginIndex_, std::size_t MutEndIndex_, class...Args_, std::size_t...OutIndices_, std::size_t...ArgIndices_>
@@ -421,6 +468,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		using out_vector_uq = EmuCore::TMP::remove_ref_cv_t<OutVector_>;
 		if constexpr (BeginIndex_ == 0 && EndIndex_ >= out_vector_uq::size)
 		{
+			// FULLY MUTATED VECTOR
 			constexpr std::size_t clamped_end_index_ = out_vector_uq::size; // We already know clamped is this as we're doing a full mutation
 			constexpr std::size_t num_calls_ = clamped_end_index_ - BeginIndex_;
 
@@ -444,6 +492,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
+			// PARTIALLY MUTATED VECTOR
 			// We output defaults to the constructor where no mutations are performed, 
 			if constexpr (_vector_mutate_valid_for_partial_construction<OutVector_, Func_&, BeginIndex_, EndIndex_, ArgIndex_, Args_...>())
 			{
@@ -615,7 +664,94 @@ namespace EmuMath::Helpers::_vector_underlying
 			static_assert(false, "Attempted to create a new EmuMath Vector for output as a hybrid copy/mutate function, but the desired output type is not default-constructible. Output Vectors must be default-constructible.");
 		}
 	}
+
+	template<std::size_t Index_, std::size_t EndIndex_, class Func_, class...Args_>
+	constexpr inline void _vector_mutate_invoke_only_execution(Func_& func_, Args_&&...args_)
+	{
+		if constexpr (Index_ < EndIndex_)
+		{
+			if constexpr (_assert_vector_mutate_func_is_invocable<Index_, Func_&, Args_...>())
+			{
+				_vector_mutate_invoke_func_no_ret<Index_, Func_&>(func_, std::forward<Args_>(args_)...);
+				_vector_mutate_invoke_only_execution<Index_ + 1, EndIndex_>(func_, std::forward<Args_>(args_)...);
+			}
+			else
+			{
+				static_assert
+				(
+					false,
+					"Attempted to perform EmuMath Vector mutation with invocation only (i.e. returns are ignored), but at least one invocation of the provided func_ was invalid. Are you attempting to invoke a function requiring non-const references, but accessing theoretical (rvalue-only) indices?"
+				);
+			}
+		}
+	}
+
+	template<class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, class...Args_>
+	constexpr inline void _vector_mutate_invoke_only(Func_ func_, Args_&&...args_)
+	{
+		_vector_mutate_invoke_only_execution<BeginIndex_, EndIndex_, Func_&>(func_, std::forward<Args_>(args_)...);
+	}
+
+	template<class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, class...Args_>
+	constexpr inline void _vector_mutate_invoke_only_no_func_passed(Args_&&...args_)
+	{
+		if constexpr (std::is_default_constructible_v<Func_>)
+		{
+			Func_ func_ = Func_();
+			_vector_mutate_invoke_only<Func_&, BeginIndex_, EndIndex_>(func_, std::forward<Args_>(args_)...);
+		}
+		else
+		{
+			static_assert(false, "Attempted to perform an EmuMath Vector mutation without passing a func_, using a Func_ type that is not default-constructible. This is only possible for default-constructible Func_ types.");
+		}
+	}
+
+	template<bool CopyBeforeMut_, class Func_, std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_, class...Args_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_copy_mutate_invoke_only(Func_ func_, EmuMath::NewVector<Size_, T_>& vector_, Args_&&...args_)
+	{
+		if constexpr (std::is_constructible_v<EmuMath::NewVector<OutSize_, OutT_>, EmuMath::NewVector<Size_, T_>&>)
+		{
+			if constexpr (CopyBeforeMut_)
+			{
+				EmuMath::NewVector<OutSize_, OutT_> out_vector_(vector_);
+				_vector_mutate_invoke_only<Func_&, BeginIndex_, EndIndex_>(func_, std::forward<Args_>(args_)...);
+				return out_vector_;
+			}
+			else
+			{
+				_vector_mutate_invoke_only<Func_&, BeginIndex_, EndIndex_>(func_, std::forward<Args_>(args_)...);
+				return EmuMath::NewVector<OutSize_, OutT_>(vector_);
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to copy an EmuMath Vector to an output Vector directly before or after performing a mutation operation, but the desired output Vector cannot be constructed from the input Vector.");
+		}
+	}
+	template<bool CopyBeforeMut_, class Func_, std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_, class...Args_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_copy_mutate_invoke_only_no_func_passed(EmuMath::NewVector<Size_, T_>& vector_, Args_&&...args_)
+	{
+		if constexpr (std::is_constructible_v<EmuMath::NewVector<OutSize_, OutT_>, EmuMath::NewVector<Size_, T_>&>)
+		{
+			if constexpr (CopyBeforeMut_)
+			{
+				EmuMath::NewVector<OutSize_, OutT_> out_vector_(vector_);
+				_vector_mutate_invoke_only_no_func_passed<Func_, BeginIndex_, EndIndex_>(std::forward<Args_>(args_)...);
+				return out_vector_;
+			}
+			else
+			{
+				_vector_mutate_invoke_only_no_func_passed<Func_, BeginIndex_, EndIndex_>(std::forward<Args_>(args_)...);
+				return EmuMath::NewVector<OutSize_, OutT_>(vector_);
+			}
+		}
+		else
+		{
+			static_assert(false, "Attempted to copy an EmuMath Vector to an output Vector directly before or after performing a mutation operation, but the desired output Vector cannot be constructed from the input Vector.");
+		}
+	}
 #pragma endregion
 }
 
 #endif
+

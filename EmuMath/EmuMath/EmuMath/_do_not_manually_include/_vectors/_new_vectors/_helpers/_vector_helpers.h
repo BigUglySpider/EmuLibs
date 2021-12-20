@@ -11,5 +11,6 @@
 #include "_vector_rounds_constexpr.h"
 #include "_vector_set.h"
 #include "_vector_stream_append.h"
+#include "_vector_unary_arithmetic.h"
 
 #endif

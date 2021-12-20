@@ -161,5 +161,8 @@ EmuMath::Helpers::_vector_underlying::_vector_mutate_no_func_passed\
 	(_out_end),\
 	(_read_begin)\
 >
+#ifdef EMU_MATH_VECTOR_MUTATION_INVOKE_ONLY
+#undef EMU_MATH_VECTOR_MUTATION_INVOKE_ONLY
+#endif
 
 #endif

@@ -767,6 +767,19 @@ int main()
 	constexpr auto a_mess_floored_ = EmuMath::Helpers::new_vector_floor_range_no_copy_constexpr<2, 4, 1>(a_mess_);
 	constexpr auto a_mess_absed_ = EmuMath::Helpers::new_vector_abs_range_no_copy<2, 4, 1>(a_mess_);
 
+	std::is_constructible_v<EmuMath::NewVector<4, float>, EmuMath::NewVector<1, std::uint8_t>>;
+	constexpr auto tru432t = EmuMath::NewVector<4, float>(  EmuMath::Helpers::new_vector_make<float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16));
+	constexpr auto oij =  EmuMath::NewVector<4, float>::valid_template_vector_move_construct_arg<16, EmuMath::NewVector<4, float>>();
+
+	std::cout << "---\n";
+	EmuMath::NewVector<4, float> runtime_unary_vec_test_(10, -20, 30.0L, 40.5f);
+	std::cout << "BEFORE MODS: " << runtime_unary_vec_test_ << "\n";
+	std::cout << "PRE-INC RESULT: " << EmuMath::Helpers::new_vector_pre_increment(runtime_unary_vec_test_) << "\n";
+	std::cout << "POST-INC RESULT: " << EmuMath::Helpers::new_vector_post_increment<10, float>(runtime_unary_vec_test_) << "\n";
+	std::cout << "AFTER FIRST MODS: " << runtime_unary_vec_test_ << "\n";
+	std::cout << "POST-INC REF RESULT: " << EmuMath::Helpers::new_vector_post_increment<4, float&>(runtime_unary_vec_test_) << "\n";
+	std::cout << "AFTER SECOND MODS: " << runtime_unary_vec_test_ << "\n";
+
 	// GRADIENTS START
 	std::cout << "\n\n";
 	system("pause");

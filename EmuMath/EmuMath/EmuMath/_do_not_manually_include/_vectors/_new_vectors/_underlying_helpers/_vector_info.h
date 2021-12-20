@@ -325,15 +325,22 @@ namespace EmuMath::TMP
 					}
 					else
 					{
-						// No other conflicts
-						if constexpr (contains_ref)
+						if constexpr (EmuCore::TMP::is_compatible_v<value_type, typename other_vector::value_type&>)
 						{
-							// Require a Vector large enough to initialise all references
-							return other_vector::size >= size;
+							// No other conflicts
+							if constexpr (contains_ref)
+							{
+								// Require a Vector large enough to initialise all references
+								return other_vector::size >= size;
+							}
+							else
+							{
+								return true;
+							}
 						}
 						else
 						{
-							return true;
+							return false;
 						}
 					}
 				}
