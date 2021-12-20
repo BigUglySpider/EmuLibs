@@ -188,12 +188,14 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FastNoiseGen2D.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_common_fast_noise_gen_functors_includes.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_common_vector_helpers.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_abs.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_basic_arithmetic.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_copy.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_get.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_helpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_mutation.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_rounds.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_rounds_constexpr.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_set.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_stream_append.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_copy_underlying.h" />

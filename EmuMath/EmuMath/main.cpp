@@ -44,6 +44,11 @@ inline std::ostream& operator<<(std::ostream& stream_, const std::array<T_, Size
 	return stream_;
 }
 
+template<typename T_>
+void _any_type_test(T_&& t_)
+{
+}
+
 void some_test(int& yo_)
 {
 	std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(rand() % 1000));
@@ -753,6 +758,16 @@ int main()
 	constexpr auto partial_test_to_not_negate_ = EmuMath::Helpers::new_vector_make<float>(10, 20, 30, 40, 50, 60, 70, 80, 90, 100);
 	constexpr auto partial_test_negation_result_ = _some_new_vec_func_test_helper<2, 5, 4>(partial_test_to_not_negate_, partial_test_to_negate_);
 
+	constexpr EmuMath::NewVector<4, float> a_mess_ = EmuMath::NewVector<4, float>
+	(
+		EmuCore::TMP::deobfuscate(EmuCore::TMP::obfuscate(EmuMath::NewVector<6, float>(2, -17.1, 25.2, 0, 255.812L, -12.7f)))
+	);
+	constexpr auto a_mess_trunced_ = EmuMath::Helpers::new_vector_trunc_range_no_copy_constexpr<2, 4, 1>(a_mess_);
+	constexpr auto a_mess_ceiled_ = EmuMath::Helpers::new_vector_ceil_range_no_copy_constexpr<2, 4, 1>(a_mess_);
+	constexpr auto a_mess_floored_ = EmuMath::Helpers::new_vector_floor_range_no_copy_constexpr<2, 4, 1>(a_mess_);
+	constexpr auto a_mess_absed_ = EmuMath::Helpers::new_vector_abs_range_no_copy<2, 4, 1>(a_mess_);
+
+	// GRADIENTS START
 	std::cout << "\n\n";
 	system("pause");
 	std::cout << "\n---\n\n\n";
@@ -838,7 +853,6 @@ int main()
 	constexpr auto wrapped_colour_greyscale_decompose_max_ = wrapped_colour_.GreyscaleMax();
 
 	constexpr EmuMath::ClampedColourRGBA<float> some_clamped_colour_(-0.1, 0.0, 0.8, 1.5);
-
 	std::cout << "\n\n\n";
 	using grad_type = EmuMath::Gradient<float>;
 	grad_type gradient_;

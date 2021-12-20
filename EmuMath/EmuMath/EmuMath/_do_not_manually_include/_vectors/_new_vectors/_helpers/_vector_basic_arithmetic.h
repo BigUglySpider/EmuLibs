@@ -17,56 +17,30 @@ namespace EmuMath::Helpers
 	template<std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_negate(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
-		return _vector_underlying::_vector_mutate_args_only
-		<
-			EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>,
-			EmuMath::NewVector<OutSize_, OutT_>,
-			0,
-			EmuMath::NewVector<OutSize_, OutT_>::size,
-			0
-		>(in_vector_);
+		using Func_ = EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
+		return EMU_MATH_VECTOR_MUTATION(Func_, OutSize_, OutT_, InSize_, InT_)(in_vector_);
 	}
-	template<typename OutT_, std::size_t Size_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, OutT_> new_vector_negate(const EmuMath::NewVector<Size_, InT_>& in_vector_)
+	template<typename OutT_, std::size_t InSize_, typename InT_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> new_vector_negate(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
-		return _vector_underlying::_vector_mutate_args_only
-		<
-			EmuCore::do_negate<typename EmuMath::NewVector<Size_, InT_>::value_type_uq>,
-			EmuMath::NewVector<Size_, OutT_>,
-			0,
-			EmuMath::NewVector<Size_, OutT_>::size,
-			0
-		>(in_vector_);
+		using Func_ = EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
+		return EMU_MATH_VECTOR_MUTATION(Func_, InSize_, OutT_, InSize_, InT_)(in_vector_);
 	}
 	template<std::size_t OutSize_, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq> new_vector_negate
-	(
-		const EmuMath::NewVector<InSize_, InT_>& in_vector_
-	)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>
+	new_vector_negate(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
-		return _vector_underlying::_vector_mutate_args_only
-		<
-			EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>,
-			EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>,
-			0,
-			EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>::size,
-			0
-		>(in_vector_);
+		using in_value_uq = typename EmuMath::NewVector<InSize_, InT_>::value_type_uq;
+		using Func_ = EmuCore::do_negate<in_value_uq>;
+		return EMU_MATH_VECTOR_MUTATION(Func_, OutSize_, in_value_uq, InSize_, InT_)(in_vector_);
 	}
-	template<typename T_, std::size_t Size_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, typename EmuMath::NewVector<Size_, T_>::value_type_uq> new_vector_negate
-	(
-		const EmuMath::NewVector<Size_, T_>& in_vector_
-	)
+	template<typename InT_, std::size_t InSize_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>
+	new_vector_negate(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
-		return _vector_underlying::_vector_mutate_args_only
-		<
-			EmuCore::do_negate<typename EmuMath::NewVector<Size_, T_>::value_type_uq>,
-			EmuMath::NewVector<Size_, typename EmuMath::NewVector<Size_, T_>::value_type_uq>,
-			0,
-			EmuMath::NewVector<Size_, typename EmuMath::NewVector<Size_, T_>::value_type_uq>::size,
-			0
-		>(in_vector_);
+		using in_value_uq = typename EmuMath::NewVector<InSize_, InT_>::value_type_uq;
+		using Func_ = EmuCore::do_negate<in_value_uq>;
+		return EMU_MATH_VECTOR_MUTATION(Func_, InSize_, in_value_uq, InSize_, InT_)(in_vector_);
 	}
 
 	/// <summary>
@@ -77,14 +51,8 @@ namespace EmuMath::Helpers
 	template<std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_>
 	constexpr inline void new_vector_negate(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
-		_vector_underlying::_vector_mutate_no_func_passed
-		<
-			EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>,
-			EmuMath::NewVector<OutSize_, OutT_>,
-			0,
-			EmuMath::NewVector<OutSize_, OutT_>::size,
-			0
-		>(out_vector_, in_vector_);
+		using Func_ = EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
+		return EMU_MATH_VECTOR_MUTATION_REF(Func_, OutSize_, OutT_, InSize_, InT_)(out_vector_, in_vector_);
 	}
 
 	/// <summary>
@@ -97,64 +65,30 @@ namespace EmuMath::Helpers
 	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t InSize_, typename InT_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_negate_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
-		return _vector_underlying::_vector_partial_mutation_copy_args_only
-		<
-			OutSize_,
-			OutT_,
-			EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>,
-			const EmuMath::NewVector<InSize_, InT_>&,
-			BeginIndex_,
-			EndIndex_,
-			BeginIndex_
-		>(in_vector_, in_vector_);
+		using Func_ = EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
+		return EMU_MATH_VECTOR_MUTATION_RANGE(Func_, OutSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_)(in_vector_, in_vector_);
 	}
-	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_, typename InT_, std::size_t InSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq> new_vector_negate_range
-	(
-		const EmuMath::NewVector<InSize_, InT_>& in_vector_
-	)
-	{
-		return _vector_underlying::_vector_partial_mutation_copy_args_only
-		<
-			OutSize_,
-			typename EmuMath::NewVector<InSize_, InT_>::value_type_uq,
-			EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>,
-			const EmuMath::NewVector<InSize_, InT_>&,
-			BeginIndex_,
-			EndIndex_,
-			BeginIndex_
-		>(in_vector_, in_vector_);
-	}	
 	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, typename InT_, std::size_t InSize_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> new_vector_negate_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
-		return _vector_underlying::_vector_partial_mutation_copy_args_only
-		<
-			InSize_,
-			OutT_,
-			EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>,
-			const EmuMath::NewVector<InSize_, InT_>&,
-			BeginIndex_,
-			EndIndex_,
-			BeginIndex_
-		>(in_vector_, in_vector_);
+		using Func_ = EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
+		return EMU_MATH_VECTOR_MUTATION_RANGE(Func_, InSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_)(in_vector_, in_vector_);
+	}
+	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_, typename InT_, std::size_t InSize_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>
+	new_vector_negate_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	{
+		using in_value_uq = typename EmuMath::NewVector<InSize_, InT_>::value_type_uq;
+		using Func_ = EmuCore::do_negate<in_value_uq>;
+		return EMU_MATH_VECTOR_MUTATION_RANGE(Func_, OutSize_, in_value_uq, InSize_, InT_, BeginIndex_, EndIndex_)(in_vector_, in_vector_);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename InT_, std::size_t InSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq> new_vector_negate_range
-	(
-		const EmuMath::NewVector<InSize_, InT_>& in_vector_
-	)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>
+	new_vector_negate_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
-		return _vector_underlying::_vector_partial_mutation_copy_args_only
-		<
-			InSize_,
-			typename EmuMath::NewVector<InSize_, InT_>::value_type_uq,
-			EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>,
-			const EmuMath::NewVector<InSize_, InT_>&,
-			BeginIndex_,
-			EndIndex_,
-			BeginIndex_
-		>(in_vector_, in_vector_);
+		using in_value_uq = typename EmuMath::NewVector<InSize_, InT_>::value_type_uq;
+		using Func_ = EmuCore::do_negate<in_value_uq>;
+		return EMU_MATH_VECTOR_MUTATION_RANGE(Func_, InSize_, in_value_uq, InSize_, InT_, BeginIndex_, EndIndex_)(in_vector_, in_vector_);
 	}
 
 	/// <summary>
@@ -167,15 +101,8 @@ namespace EmuMath::Helpers
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_>
 	constexpr inline void new_vector_negate_range(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
-		_vector_underlying::_vector_partial_mutation_copy_no_func_passed
-		<
-			EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>,
-			EmuMath::NewVector<OutSize_, OutT_>,
-			const EmuMath::NewVector<InSize_, InT_>&,
-			BeginIndex_,
-			EndIndex_,
-			BeginIndex_
-		>(out_vector_, in_vector_, in_vector_);
+		using Func_ = EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
+		EMU_MATH_VECTOR_MUTATION_REF_RANGE(Func_, OutT_, OutSize_, InSize_, InT_, BeginIndex_, EndIndex_, BeginIndex_)(out_vector_, in_vector_, in_vector_);
 	}
 
 	/// <summary>
@@ -196,57 +123,35 @@ namespace EmuMath::Helpers
 	template<std::size_t OutSize_, typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NegateBegin_, typename InT_, std::size_t InSize_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_negate_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
-		return _vector_underlying::_vector_mutate_args_only
-		<
-			EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>,
-			EmuMath::NewVector<OutSize_, OutT_>,
-			OutBegin_,
-			OutEnd_,
-			NegateBegin_
-		>(in_vector_);
+		using Func_ = EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
+		return EMU_MATH_VECTOR_MUTATION_RANGE_NO_COPY(Func_, OutSize_, OutT_, InSize_, InT_, OutBegin_, OutEnd_, NegateBegin_)(in_vector_);
 	}
 	template<typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NegateBegin_, typename InT_, std::size_t InSize_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> new_vector_negate_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
-		return _vector_underlying::_vector_mutate_args_only
-		<
-			EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>,
-			EmuMath::NewVector<InSize_, OutT_>,
-			OutBegin_,
-			OutEnd_,
-			NegateBegin_
-		>(in_vector_);
+		using Func_ = EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
+		return EMU_MATH_VECTOR_MUTATION_RANGE_NO_COPY(Func_, InSize_, OutT_, InSize_, InT_, OutBegin_, OutEnd_, NegateBegin_)(in_vector_);
 	}
 	template<std::size_t OutSize_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NegateBegin_, typename InT_, std::size_t InSize_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>
 	new_vector_negate_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
-		return _vector_underlying::_vector_mutate_args_only
-		<
-			EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>,
-			EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>,
-			OutBegin_,
-			OutEnd_,
-			NegateBegin_
-		>(in_vector_);
+		using in_value_uq = typename EmuMath::NewVector<InSize_, InT_>::value_type_uq;
+		using Func_ = EmuCore::do_negate<in_value_uq>;
+		return EMU_MATH_VECTOR_MUTATION_RANGE_NO_COPY(Func_, OutSize_, in_value_uq, InSize_, InT_, OutBegin_, OutEnd_, NegateBegin_)(in_vector_);
 	}
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NegateBegin_, typename InT_, std::size_t InSize_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>
 	new_vector_negate_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
-		return _vector_underlying::_vector_mutate_args_only
-		<
-			EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>,
-			EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>,
-			OutBegin_,
-			OutEnd_,
-			NegateBegin_
-		>(in_vector_);
+		using in_value_uq = typename EmuMath::NewVector<InSize_, InT_>::value_type_uq;
+		using Func_ = EmuCore::do_negate<in_value_uq>;
+		return EMU_MATH_VECTOR_MUTATION_RANGE_NO_COPY(Func_, InSize_, in_value_uq, InSize_, InT_, OutBegin_, OutEnd_, NegateBegin_)(in_vector_);
 	}
 
 	/// <summary>
 	/// <para> Outputs a partial negated copy of the provided in_vector_ to the provided out_vector_ </para>
-	/// <para> Indices in out_vector_ not in the spcified range will not be modified. </para>
+	/// <para> Indices in out_vector_ not in the specified range will not be modified. </para>
 	/// <para> OutBegin_ is the inclusve index at which to start writing negated values to the output Vector. </para>
 	/// <para> OutEnd_ is the exclusive index at which to stop writing negated values to the output Vector. </para>
 	/// <para> 
@@ -259,14 +164,8 @@ namespace EmuMath::Helpers
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NegateBegin_ = 0, typename OutT_, std::size_t OutSize_, typename InT_, std::size_t InSize_>
 	constexpr inline void new_vector_negate_range_no_copy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
-		_vector_underlying::_vector_mutate_no_func_passed
-		<
-			EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>,
-			EmuMath::NewVector<OutSize_, OutT_>,
-			OutBegin_,
-			OutEnd_,
-			NegateBegin_
-		>(out_vector_, in_vector_);
+		using Func_ = EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
+		return EMU_MATH_VECTOR_MUTATION_REF_RANGE_NO_COPY(Func_, OutSize_, OutT_, InSize_, InT_, OutBegin_, OutEnd_, NegateBegin_)(out_vector_, in_vector_);
 	}
 #pragma endregion
 }

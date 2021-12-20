@@ -910,11 +910,48 @@ namespace EmuCore::TMP
 	/// <para> --- Others ([], (), =) </para>
 	/// </summary>
 	/// <param name="val_">Item to obfuscate the type of.</param>
-	/// <returns>The passed item wrapped in an type_obfuscator instance.</returns>
+	/// <returns>The passed item wrapped in a type_obfuscator instance.</returns>
 	template<typename T_>
 	[[nodiscard]] constexpr inline EmuCore::TMP::type_obfuscator<T_> obfuscate(T_&& val_)
 	{
 		return type_obfuscator<T_>(std::forward<T_>(val_));
+	}
+
+	/// <summary>
+	/// <para> Unwraps the passed argument from obfuscation. </para>
+	/// <para> If the passed reference is not an EmuCore::TMP::type_obfuscator instance, this will return the provided reference. </para>
+	/// <para> If the passed reference is an EmuCore::TMP::type_obfuscator instance, this will return a reference to the underlying wrapped item. </para>
+	/// <para> Constness of the returned reference will match that of the provided argument and, if it is an obfuscator, the underlying item. </para>
+	/// </summary>
+	/// <param name="arg_">Item to remove a type_obfuscator layer from.</param>
+	/// <returns>Deobfuscated reference to the passed arg_. This will be the passed arg_ if it is not determined to be obfuscated.</returns>
+	template<typename T_>
+	[[nodiscard]] constexpr inline T_& deobfuscate(T_& arg_)
+	{
+		return arg_;
+	}
+	template<typename T_>
+	[[nodiscard]] constexpr inline const T_& deobfuscate(const T_& arg_)
+	{
+		return arg_;
+	}
+	/// <summary>
+	/// <para> Unwraps the passed argument from obfuscation. </para>
+	/// <para> If the passed reference is not an EmuCore::TMP::type_obfuscator instance, this will return the provided reference. </para>
+	/// <para> If the passed reference is an EmuCore::TMP::type_obfuscator instance, this will return a reference to the underlying wrapped item. </para>
+	/// <para> Constness of the returned reference will match that of the provided argument and, if it is an obfuscator, the underlying item. </para>
+	/// </summary>
+	/// <param name="arg_">Item to remove a type_obfuscator layer from.</param>
+	/// <returns>Deobfuscated reference to the passed arg_. This will be the passed arg_ if it is not determined to be obfuscated.</returns>
+	template<typename T_>
+	[[nodiscard]] constexpr inline T_& deobfuscate(EmuCore::TMP::type_obfuscator<T_>& obfuscated_)
+	{
+		return obfuscated_.wrapped_value;
+	}
+	template<typename T_>
+	[[nodiscard]] constexpr inline const T_& deobfuscate(const EmuCore::TMP::type_obfuscator<T_>& obfuscated_)
+	{
+		return obfuscated_.wrapped_value;
 	}
 
 	/// <summary> Type used to check if the passed type T_ is an obfuscation of an other type, such as a type_obfuscator. </summary>

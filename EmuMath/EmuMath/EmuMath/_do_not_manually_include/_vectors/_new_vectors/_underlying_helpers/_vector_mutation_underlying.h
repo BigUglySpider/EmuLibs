@@ -354,7 +354,7 @@ namespace EmuMath::Helpers::_vector_underlying
 			if constexpr (_assert_vector_mutate_is_valid_invocation<ArgIndex_, OutVector_, Func_, Args_...>())
 			{
 				_vector_copy_index<Index_>(out_vector_, _vector_mutate_invoke_func<ArgIndex_, Func_&>(func_, std::forward<Args_>(args_)...));
-				_vector_mutate_execution<Index_ + 1, EndIndex_, ArgIndex_ + 1, Func_, OutVector_, Args_...>(func_, out_vector_, std::forward<Args_>(args_)...);
+				_vector_mutate_execution<Index_ + 1, EndIndex_, ArgIndex_ + 1, Func_, OutVector_>(func_, out_vector_, std::forward<Args_>(args_)...);
 			}
 			else
 			{

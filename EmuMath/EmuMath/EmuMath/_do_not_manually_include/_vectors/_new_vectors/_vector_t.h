@@ -664,6 +664,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region ASSIGNMENT_OPERATORS
+	public:
 		constexpr inline this_type& operator=(this_type&& to_move_) noexcept
 		{
 			_data = std::move(to_move_._data);
