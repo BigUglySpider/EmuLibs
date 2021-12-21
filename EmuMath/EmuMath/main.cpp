@@ -780,7 +780,6 @@ int main()
 	std::cout << "POST-INC REF RESULT: " << runtime_unary_vec_test_.operator++<4, float&>(int()) << "\n";
 	std::cout << "AFTER SECOND MODS: " << runtime_unary_vec_test_ << "\n";
 
-
 	std::cout << "\n!BATCH 2!\n";
 	std::cout << "BEFORE MODS: " << runtime_unary_vec_test_ << "\n";
 	std::cout << "PRE-DEC RESULT: " << --runtime_unary_vec_test_ << "\n";

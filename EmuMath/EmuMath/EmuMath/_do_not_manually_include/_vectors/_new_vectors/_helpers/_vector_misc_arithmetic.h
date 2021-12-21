@@ -1,11 +1,12 @@
-#ifndef EMU_MATH_NEW_VECTOR_ABS_H_INC_
-#define EMU_MATH_NEW_VECTOR_ABS_H_INC_ 1
+#ifndef EMU_MATH_NEW_VECTOR_MISC_ARITHMETIC_H_INC_
+#define EMU_MATH_NEW_VECTOR_MISC_ARITHMETIC_H_INC_ 1
 
 #include "_common_vector_helpers.h"
 #include "../../../../../EmuCore/Functors/Arithmetic.h"
 
 namespace EmuMath::Helpers
 {
+#pragma region ABS_FUNCS
 	/// <summary>
 	/// <para> Outputs the absolute form of the provided EmuMath Vector, with the output Vector using the provided OutSize_ and OutT_ template arguments. </para>
 	/// <para> OutSize_: Optional argument used as the Size_ argument for the output EmuMath Vector type. Defaults to the input Vector's Size_. </para>
@@ -166,6 +167,7 @@ namespace EmuMath::Helpers
 		using Func_ = EmuCore::do_abs<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
 		return EMU_MATH_VECTOR_MUTATION_REF_RANGE_NO_COPY(Func_, OutSize_, OutT_, InSize_, InT_, OutBegin_, OutEnd_, AbsBegin_)(out_vector_, in_vector_);
 	}
+#pragma endregion
 }
 
 #endif

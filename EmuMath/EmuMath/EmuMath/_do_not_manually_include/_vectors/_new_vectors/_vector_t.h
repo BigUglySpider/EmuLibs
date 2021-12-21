@@ -947,6 +947,29 @@ namespace EmuMath
 
 #pragma endregion
 
+#pragma region MISC_ARITHMETIC_FUNCS
+		/// <summary> Returns the absolute form of this Vector. </summary>
+		/// <returns>Copy of this Vector with its elements made absolute, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Abs() const
+		{
+			return EmuMath::Helpers::new_vector_abs<OutSize_, OutT_>(*this);
+		}
+		template<typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Abs() const
+		{
+			return EmuMath::Helpers::new_vector_abs<size, OutT_>(*this);
+		}
+
+		/// <summary> Outputs the absolute form of this Vector to the provided out_vector_. </summary>
+		/// <param name="out_vector_">EmuMath Vector to output absolute elements to.</param>
+		template<std::size_t OutSize_, typename OutT_>
+		[[nodiscard]] constexpr inline void AbsTo(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_abs(out_vector_, *this);
+		}
+#pragma endregion
+
 #pragma region ROUNDING_FUNCS
 		/// <summary>
 		/// <para> Returns a copy of this Vector with its elements rounded toward negative infinity. </para>
@@ -1848,6 +1871,7 @@ namespace EmuMath
 #pragma endregion
 
 	private:
+		/// <summary> Contiguous element data stored within this Vector. </summary>
 		data_storage_type _data;
 	};
 }
