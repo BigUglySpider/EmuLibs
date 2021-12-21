@@ -146,6 +146,17 @@ namespace EmuMath
 			_dummy_arg_for_private_constexpr_default,
 			_dummy_arg_for_private_lazy_default
 		>;
+
+		template<std::size_t Size__, typename T__, typename = void>
+		struct _conditional_void
+		{
+			using type = EmuMath::NewVector<Size__, T__>;
+		};
+		template<std::size_t Size__, typename T__>
+		struct _conditional_void<Size__, T__, std::enable_if_t<std::is_void_v<T__>>>
+		{
+			using type = void;
+		};
 #pragma endregion
 
 #pragma region CONSTRUCTORS
@@ -746,6 +757,75 @@ namespace EmuMath
 
 #pragma region CONST_ARITHMETIC_OPERATORS
 	public:
+		// INCREMENT OPERATORS
+		constexpr inline this_type& operator++()
+		{
+			return EmuMath::Helpers::new_vector_pre_increment(*this);
+		}
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator++()
+		{
+			return EmuMath::Helpers::new_vector_pre_increment<OutSize_, OutT_>(*this);
+		}
+		template<typename OutT_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator++()
+		{
+			return EmuMath::Helpers::new_vector_pre_increment<size, OutT_>(*this);
+		}
+
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator++(int)
+		{
+			return EmuMath::Helpers::new_vector_post_increment<OutSize_, OutT_>(*this);
+		}
+		template<typename OutT_ = value_type_uq>
+		constexpr inline typename _conditional_void<size, OutT_>::type operator++(int)
+		{
+			if constexpr (std::is_void_v<OutT_>)
+			{
+				EmuMath::Helpers::new_vector_post_increment_no_copy(*this);
+			}
+			else
+			{
+				return EmuMath::Helpers::new_vector_post_increment<size, OutT_>(*this);
+			}
+		}
+
+		// DECREMENT OPERATORS
+		constexpr inline this_type& operator--()
+		{
+			return EmuMath::Helpers::new_vector_pre_decrement(*this);
+		}
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator--()
+		{
+			return EmuMath::Helpers::new_vector_pre_decrement<OutSize_, OutT_>(*this);
+		}
+		template<typename OutT_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator--()
+		{
+			return EmuMath::Helpers::new_vector_pre_decrement<size, OutT_>(*this);
+		}
+
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator--(int)
+		{
+			return EmuMath::Helpers::new_vector_post_decrement<OutSize_, OutT_>(*this);
+		}
+		template<typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline typename _conditional_void<size, OutT_>::type operator--(int)
+		{
+			if constexpr (std::is_void_v<OutT_>)
+			{
+				EmuMath::Helpers::new_vector_post_decrement_no_copy(*this);
+			}
+			else
+			{
+				return EmuMath::Helpers::new_vector_post_decrement<size, OutT_>(*this);
+			}
+		}
+		
+		// NEGATION OPERATORS
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator-() const
 		{
@@ -759,7 +839,101 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region CONST_ARITHMETIC_FUNCS
+#pragma region UNARY_ARITHMETIC_FUNCS
+		/// <summary> Ouputs a negated form of this Vector to the provided out_vector_, equivalent to `out_vector_ = -this_vector`. </summary>
+		/// <param name="out_vector_">EmuMath Vector to output the negated form of this Vector to.</param>
+		template<std::size_t OutSize_, typename OutT_>
+		constexpr inline void NegateTo(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_negate(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para> Peforms a pre-increment on this Vector, equivalent to `++this_vector`. </para>
+		/// </summary>
+		/// <returns>Reference to this Vector if no template args are provided; otherwise, a copy of this Vector after the increment.</returns>
+		constexpr inline this_type& PreIncrement()
+		{
+			return EmuMath::Helpers::new_vector_pre_increment(*this);
+		}
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> PreIncrement()
+		{
+			return EmuMath::Helpers::new_vector_pre_increment<OutSize_, OutT_>(*this);
+		}
+		template<typename OutT_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> PreIncrement()
+		{
+			return EmuMath::Helpers::new_vector_pre_increment<size, OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Performs a post-increment on this Vector, equivalent to `this_vector++`. </para>
+		/// <para> Creating an unwanted copy may be avoided by passing `void` as the only template argument. </para>
+		/// </summary>
+		/// <returns>Copy of this Vector before the increment if not provided with only `void` as a template argument; otherwise, no return.</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> PostIncrement()
+		{
+			return EmuMath::Helpers::new_vector_post_increment<OutSize_, OutT_>(*this);
+		}
+		template<typename OutT_ = value_type_uq>
+		constexpr inline typename _conditional_void<size, OutT_>::type PostIncrement()
+		{
+			if constexpr (std::is_void_v<OutT_>)
+			{
+				EmuMath::Helpers::new_vector_post_increment_no_copy(*this);
+			}
+			else
+			{
+				return EmuMath::Helpers::new_vector_post_increment<size, OutT_>(*this);
+			}
+		}
+
+		/// <summary>
+		/// <para> Peforms a pre-decrement on this Vector, equivalent to `--this_vector`. </para>
+		/// </summary>
+		/// <returns>Reference to this Vector if no template args are provided; otherwise, a copy of this Vector after the decrement.</returns>
+		constexpr inline this_type& PreDecrement()
+		{
+			return EmuMath::Helpers::new_vector_pre_decrement(*this);
+		}
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> PreDecrement()
+		{
+			return EmuMath::Helpers::new_vector_pre_decrement<OutSize_, OutT_>(*this);
+		}
+		template<typename OutT_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> PreDecrement()
+		{
+			return EmuMath::Helpers::new_vector_pre_decrement<size, OutT_>();
+		}
+
+		/// <summary>
+		/// <para> Performs a post-decrement on this Vector, equivalent to `this_vector--`. </para>
+		/// <para> Creating an unwanted copy may be avoided by passing `void` as the only template argument. </para>
+		/// </summary>
+		/// <returns>Copy of this Vector before the decrement if not provided with only `void` as a template argument; otherwise, no return.</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> PostDecrement()
+		{
+			return EmuMath::Helpers::new_vector_post_decrement<OutSize_, OutT_>(*this);
+		}
+		template<typename OutT_ = value_type_uq>
+		constexpr inline typename _conditional_void<size, OutT_>::type PostDecrement()
+		{
+			if constexpr (std::is_void_v<OutT_>)
+			{
+				EmuMath::Helpers::new_vector_post_decrement_no_copy(*this);
+			}
+			else
+			{
+				return EmuMath::Helpers::new_vector_post_decrement<size, OutT_>(*this);
+			}
+		}
+
+		/// <summary> Returns a negated form of this Vector, equivalent to `-this_vector`. </summary>
+		/// <returns>Copy of this Vector with its elements negated, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Negate() const
 		{
@@ -771,14 +945,14 @@ namespace EmuMath
 			return EmuMath::Helpers::new_vector_negate<size, OutT_>(*this);
 		}
 
-		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void NegateTo(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
-		{
-			EmuMath::Helpers::new_vector_negate(out_vector_, *this);
-		}
 #pragma endregion
 
 #pragma region ROUNDING_FUNCS
+		/// <summary>
+		/// <para> Returns a copy of this Vector with its elements rounded toward negative infinity. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `FloorConstexpr` instead. </para>
+		/// </summary>
+		/// <returns>Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq>, containing a floored copy of this Vector.</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Floor() const
 		{
@@ -790,10 +964,146 @@ namespace EmuMath
 			return EmuMath::Helpers::new_vector_floor<size, OutT_>(*this);
 		}
 
+		/// <summary>
+		/// <para> Outputs a copy of this Vector, with its elements rounded toward negative infinity, to the provided out_vector_. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `FloorToConstexpr` instead. </para>
+		/// </summary>
 		template<std::size_t OutSize_, typename OutT_>
 		constexpr inline void FloorTo(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			return EmuMath::Helpers::new_vector_floor(out_vector_, *this);
+			return EmuMath::Helpers::new_vector_ceil(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a copy of this Vector with its elements rounded toward positive infinity. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `CeilConstexpr` instead. </para>
+		/// </summary>
+		/// <returns>Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq>, containing a ceiled copy of this Vector.</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Ceil() const
+		{
+			return EmuMath::Helpers::new_vector_ceil<OutSize_, OutT_>(*this);
+		}
+		template<typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Ceil() const
+		{
+			return EmuMath::Helpers::new_vector_ceil<size, OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a copy of this Vector, with its elements rounded toward positive infinity, to the provided out_vector_. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `CeilToConstexpr` instead. </para>
+		/// </summary>
+		template<std::size_t OutSize_, typename OutT_>
+		constexpr inline void CeilTo(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			return EmuMath::Helpers::new_vector_ceil(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a copy of this Vector with its elements rounded toward 0. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `TruncConstexpr` instead. </para>
+		/// </summary>
+		/// <returns>Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq>, containing a truncated copy of this Vector.</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Trunc() const
+		{
+			return EmuMath::Helpers::new_vector_trunc<OutSize_, OutT_>(*this);
+		}
+		template<typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Trunc() const
+		{
+			return EmuMath::Helpers::new_vector_trunc<size, OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a copy of this Vector, with its elements rounded toward 0, to the provided out_vector_. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `TruncToConstexpr` instead. </para>
+		/// </summary>
+		template<std::size_t OutSize_, typename OutT_>
+		constexpr inline void TruncTo(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			return EmuMath::Helpers::new_vector_trunc(out_vector_, *this);
+		}
+#pragma endregion
+
+#pragma region CONSTEXPR_ROUNDING_FUNCS
+		/// <summary>
+		/// <para> Returns a copy of this Vector with its elements rounded toward negative infinity. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `Floor` if calling at runtime. </para>
+		/// </summary>
+		/// <returns>Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq>, containing a floored copy of this Vector.</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> FloorConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_floor_constexpr<OutSize_, OutT_>(*this);
+		}
+		template<typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> FloorConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_floor_constexpr<size, OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a copy of this Vector, with its elements rounded toward negative infinity, to the provided out_vector_. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `Floor` if calling at runtime. </para>
+		/// </summary>
+		template<std::size_t OutSize_, typename OutT_>
+		constexpr inline void FloorToConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			return EmuMath::Helpers::new_vector_floor_constexpr(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a copy of this Vector with its elements rounded toward positive infinity. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `Ceil` if calling at runtime. </para>
+		/// </summary>
+		/// <returns>Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq>, containing a ceiled copy of this Vector.</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> CeilConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_ceil_constexpr<OutSize_, OutT_>(*this);
+		}
+		template<typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> CeilConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_ceil_constexpr<size, OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a copy of this Vector, with its elements rounded toward positive infinity, to the provided out_vector_. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `Ceil` if calling at runtime. </para>
+		/// </summary>
+		template<std::size_t OutSize_, typename OutT_>
+		constexpr inline void CeilToConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			return EmuMath::Helpers::new_vector_ceil_constexpr(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a copy of this Vector with its elements rounded toward 0. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `Trunc` if calling at runtime. </para>
+		/// </summary>
+		/// <returns>Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq>, containing a truncated copy of this Vector.</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> TruncConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_trunc_constexpr<OutSize_, OutT_>(*this);
+		}
+		template<typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> TruncConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_trunc_constexpr<size, OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a copy of this Vector, with its elements rounded toward 0, to the provided out_vector_. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `TruncTo` if calling at runtime. </para>
+		/// </summary>
+		template<std::size_t OutSize_, typename OutT_>
+		constexpr inline void TruncToConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			return EmuMath::Helpers::new_vector_trunc_constexpr(out_vector_, *this);
 		}
 #pragma endregion
 

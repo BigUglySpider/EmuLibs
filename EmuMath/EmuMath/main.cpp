@@ -774,11 +774,21 @@ int main()
 	std::cout << "---\n";
 	EmuMath::NewVector<4, float> runtime_unary_vec_test_(10, -20, 30.0L, 40.5f);
 	std::cout << "BEFORE MODS: " << runtime_unary_vec_test_ << "\n";
-	std::cout << "PRE-INC RESULT: " << EmuMath::Helpers::new_vector_pre_increment(runtime_unary_vec_test_) << "\n";
-	std::cout << "POST-INC RESULT: " << EmuMath::Helpers::new_vector_post_increment<10, float>(runtime_unary_vec_test_) << "\n";
+	std::cout << "PRE-INC RESULT: " << ++runtime_unary_vec_test_ << "\n";
+	std::cout << "POST-INC RESULT: " << runtime_unary_vec_test_.PostIncrement<10, float>() << "\n";
 	std::cout << "AFTER FIRST MODS: " << runtime_unary_vec_test_ << "\n";
-	std::cout << "POST-INC REF RESULT: " << EmuMath::Helpers::new_vector_post_increment<4, float&>(runtime_unary_vec_test_) << "\n";
+	std::cout << "POST-INC REF RESULT: " << runtime_unary_vec_test_.operator++<4, float&>(int()) << "\n";
 	std::cout << "AFTER SECOND MODS: " << runtime_unary_vec_test_ << "\n";
+
+
+	std::cout << "\n!BATCH 2!\n";
+	std::cout << "BEFORE MODS: " << runtime_unary_vec_test_ << "\n";
+	std::cout << "PRE-DEC RESULT: " << --runtime_unary_vec_test_ << "\n";
+	std::cout << "POST-DEC RESULT: " << runtime_unary_vec_test_.PostDecrement<10, float>() << "\n";
+	std::cout << "AFTER FIRST MODS: " << runtime_unary_vec_test_ << "\n";
+	std::cout << "POST-DEC REF RESULT: " << runtime_unary_vec_test_.operator--<4, float&>(int()) << "\n";
+	std::cout << "AFTER SECOND MODS: " << runtime_unary_vec_test_ << "\n";
+
 
 	// GRADIENTS START
 	std::cout << "\n\n";
