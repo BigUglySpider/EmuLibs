@@ -790,6 +790,8 @@ int main()
 	constexpr auto trunced_test_b_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).TruncRangeConstexpr<5, 10>();
 	constexpr auto trunced_test_c_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).TruncRangeNoCopyConstexpr<5, 10, 5>();
 
+
+
 	// GRADIENTS START
 	std::cout << "\n\n";
 	system("pause");
