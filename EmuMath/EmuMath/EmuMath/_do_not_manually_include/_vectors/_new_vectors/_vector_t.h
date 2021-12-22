@@ -147,13 +147,15 @@ namespace EmuMath
 			_dummy_arg_for_private_lazy_default
 		>;
 
+		// Helper to decide if a type should be an EmuMath Vector of size Size__ and type T__, or void.
+		// --- If std::is_void_v<T__> is true, the underlying type will be void; otherwise, it will be Vector<Size__, T__>.
 		template<std::size_t Size__, typename T__, typename = void>
-		struct _conditional_void
+		struct _vector_or_void
 		{
 			using type = EmuMath::NewVector<Size__, T__>;
 		};
 		template<std::size_t Size__, typename T__>
-		struct _conditional_void<Size__, T__, std::enable_if_t<std::is_void_v<T__>>>
+		struct _vector_or_void<Size__, T__, std::enable_if_t<std::is_void_v<T__>>>
 		{
 			using type = void;
 		};
@@ -755,7 +757,7 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region CONST_ARITHMETIC_OPERATORS
+#pragma region UNARY_ARITHMETIC_OPERATORS
 	public:
 		// INCREMENT OPERATORS
 		constexpr inline this_type& operator++()
@@ -779,7 +781,7 @@ namespace EmuMath
 			return EmuMath::Helpers::new_vector_post_increment<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
-		constexpr inline typename _conditional_void<size, OutT_>::type operator++(int)
+		constexpr inline typename _vector_or_void<size, OutT_>::type operator++(int)
 		{
 			if constexpr (std::is_void_v<OutT_>)
 			{
@@ -813,7 +815,7 @@ namespace EmuMath
 			return EmuMath::Helpers::new_vector_post_decrement<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline typename _conditional_void<size, OutT_>::type operator--(int)
+		[[nodiscard]] constexpr inline typename _vector_or_void<size, OutT_>::type operator--(int)
 		{
 			if constexpr (std::is_void_v<OutT_>)
 			{
@@ -840,14 +842,6 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region UNARY_ARITHMETIC_FUNCS
-		/// <summary> Ouputs a negated form of this Vector to the provided out_vector_, equivalent to `out_vector_ = -this_vector`. </summary>
-		/// <param name="out_vector_">EmuMath Vector to output the negated form of this Vector to.</param>
-		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void NegateTo(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
-		{
-			EmuMath::Helpers::new_vector_negate(out_vector_, *this);
-		}
-
 		/// <summary>
 		/// <para> Peforms a pre-increment on this Vector, equivalent to `++this_vector`. </para>
 		/// </summary>
@@ -878,7 +872,7 @@ namespace EmuMath
 			return EmuMath::Helpers::new_vector_post_increment<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
-		constexpr inline typename _conditional_void<size, OutT_>::type PostIncrement()
+		constexpr inline typename _vector_or_void<size, OutT_>::type PostIncrement()
 		{
 			if constexpr (std::is_void_v<OutT_>)
 			{
@@ -920,7 +914,7 @@ namespace EmuMath
 			return EmuMath::Helpers::new_vector_post_decrement<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
-		constexpr inline typename _conditional_void<size, OutT_>::type PostDecrement()
+		constexpr inline typename _vector_or_void<size, OutT_>::type PostDecrement()
 		{
 			if constexpr (std::is_void_v<OutT_>)
 			{
@@ -944,7 +938,85 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::new_vector_negate<size, OutT_>(*this);
 		}
+		
+		/// <summary> Ouputs a negated form of this Vector to the provided out_vector_, equivalent to `out_vector_ = -this_vector`. </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output the negated form of this Vector to.</param>
+		template<std::size_t OutSize_, typename OutT_>
+		constexpr inline void Negate(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_negate(out_vector_, *this);
+		}
 
+		/// <summary>
+		/// <para> Returns a copy of this Vector with the provided index range negated. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start negating elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop negating elements. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq),
+		///		containing a copy of this Vector with the provided index range negated.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NegateRange() const
+		{
+			return EmuMath::Helpers::new_vector_negate_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> NegateRange() const
+		{
+			return EmuMath::Helpers::new_vector_negate_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a copy of this Vector, with the provided index range negated, to the provided out_vector_. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start negating elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop negating elements. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void NegateRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_negate_range<BeginIndex_, EndIndex_>(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Returns a new EmuMath Vector with its indices outside of the specified range index default-constructed, 
+		///		and elements within the provided range constructed as negated forms of this Vector's elements, starting at index NegateBegin_.
+		/// </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing negated forms of this Vector's elements. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing negated forms of this Vector's elements. </para>
+		/// <para> NegateBegin_: Inclusive index at which to start reading elements from this Vector in order to perform negations. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq),
+		///		containing a partial negated copy of this Vector in the specified range, and default values outside of said range.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NegateBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NegateRangeNoCopy() const
+		{
+			return EmuMath::Helpers::new_vector_negate_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, NegateBegin_>(*this);
+		}
+		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t NegateBegin_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> NegateRangeNoCopy() const
+		{
+			return EmuMath::Helpers::new_vector_negate_range_no_copy<size, OutT_, OutBegin, OutEnd_, NegateBegin_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs sequential negated elements within this Vector, starting at index RoundBegin_, to the provided index range in out_vector_.
+		/// </para>
+		/// <para> Indices outside of the specified range in out_vector_ will not be modified. </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing negated forms of this Vector's elements. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing negated forms of this Vector's elements. </para>
+		/// <para> NegateBegin_: Inclusive index at which to start reading elements from this Vector in order to perform negations. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NegateBegin_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void NegateRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_negate_range_no_copy<OutBegin_, OutEnd_, NegateBegin_>(out_vector_, *this);
+		}
 #pragma endregion
 
 #pragma region MISC_ARITHMETIC_FUNCS
@@ -962,11 +1034,81 @@ namespace EmuMath
 		}
 
 		/// <summary> Outputs the absolute form of this Vector to the provided out_vector_. </summary>
-		/// <param name="out_vector_">EmuMath Vector to output absolute elements to.</param>
+		/// <param name="out_vector_">: EmuMath Vector to output absolute elements to.</param>
 		template<std::size_t OutSize_, typename OutT_>
-		[[nodiscard]] constexpr inline void AbsTo(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		[[nodiscard]] constexpr inline void Abs(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::new_vector_abs(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a copy of this Vector with the provided index range converted to absolute form. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start converting elements to absolute forms. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop converting elements to absolute forms. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq),
+		///		containing a copy of this Vector with the provided index range converted to absolute form.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> AbsRange() const
+		{
+			return EmuMath::Helpers::new_vector_abs_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> AbsRange() const
+		{
+			return EmuMath::Helpers::new_vector_abs_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a copy of this Vector, with the provided index range converted to absolute form, to the provided out_vector_. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start converting elements to absolute forms. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop converting elements to absolute forms. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void AbsRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_abs_range<BeginIndex_, EndIndex_>(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Returns a new EmuMath Vector with its indices outside of the specified range index default-constructed, 
+		///		and elements within the provided range constructed as absolute forms of this Vector's elements, starting at index AbsBegin_.
+		/// </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing absolute forms of this Vector's elements. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing absolute forms of this Vector's elements. </para>
+		/// <para> AbsBegin_: Inclusive index at which to start reading elements from this Vector in order to perform absolute conversions. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq),
+		///		containing a partial absolute copy of this Vector in the specified range, and default values outside of said range.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AbsBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> AbsRangeNoCopy() const
+		{
+			return EmuMath::Helpers::new_vector_abs_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, AbsBegin_>(*this);
+		}
+		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t AbsBegin_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> AbsRangeNoCopy() const
+		{
+			return EmuMath::Helpers::new_vector_abs_range_no_copy<size, OutT_, OutBegin, OutEnd_, AbsBegin_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs sequential absolute forms of this Vector's elements, starting at index AbsBegin_, to the provided index range in out_vector_. </para>
+		/// <para> Indices outside of the specified range in out_vector_ will not be modified. </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing absolute forms of this Vector's elements. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing absolute forms of this Vector's elements. </para>
+		/// <para> AbsBegin_: Inclusive index at which to start reading elements from this Vector in order to perform absolute conversions. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AbsBegin_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void AbsRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_abs_range_no_copy<OutBegin_, OutEnd_, AbsBegin_>(out_vector_, *this);
 		}
 #pragma endregion
 
@@ -989,12 +1131,86 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Outputs a copy of this Vector, with its elements rounded toward negative infinity, to the provided out_vector_. </para>
-		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `FloorToConstexpr` instead. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `FloorConstexpr` instead. </para>
 		/// </summary>
 		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void FloorTo(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void Floor(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			return EmuMath::Helpers::new_vector_ceil(out_vector_, *this);
+			EmuMath::Helpers::new_vector_ceil(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a copy of this Vector with the provided index range rounded toward negative infinity. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start rounding elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop rounding elements. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `FloorRangeConstexpr` instead. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq),
+		///		containing a copy of this Vector with the provided index range floored.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> FloorRange() const
+		{
+			return EmuMath::Helpers::new_vector_floor_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> FloorRange() const
+		{
+			return EmuMath::Helpers::new_vector_floor_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a copy of this Vector, with the provided index range rounded toward negative infinity, to the provided out_vector_. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start rounding elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop rounding elements. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `FloorRangeConstexpr` instead. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void FloorRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_floor_range<BeginIndex_, EndIndex_>(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Returns a new EmuMath Vector with its indices outside of the specified range index default-constructed, 
+		///		and elements within the provided range constructed as floored forms of this Vector's elements, starting at index RoundBegin_.
+		/// </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing rounded forms of this Vector's elements. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing rounded forms of this Vector's elements. </para>
+		/// <para> RoundBegin_: Inclusive index at which to start reading elements from this Vector in order to perform rounds. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `FloorRangeNoCopyConstexpr` instead. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq),
+		///		containing a partial floored copy of this Vector in the specified range, and default values outside of said range.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> FloorRangeNoCopy() const
+		{
+			return EmuMath::Helpers::new_vector_floor_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
+		}
+		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t RoundBegin_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> FloorRangeNoCopy() const
+		{
+			return EmuMath::Helpers::new_vector_floor_range_no_copy<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs sequential floored elements within this Vector, starting at index RoundBegin_, to the provided index range in out_vector_. </para>
+		/// <para> Indices outside of the specified range in out_vector_ will not be modified. </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing rounded forms of this Vector's elements. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing rounded forms of this Vector's elements. </para>
+		/// <para> RoundBegin_: Inclusive index at which to start reading elements from this Vector in order to perform rounds. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `FloorRangeNoCopyConstexpr` instead. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void FloorRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_floor_range_no_copy<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -1015,12 +1231,86 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Outputs a copy of this Vector, with its elements rounded toward positive infinity, to the provided out_vector_. </para>
-		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `CeilToConstexpr` instead. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `CeilConstexpr` instead. </para>
 		/// </summary>
 		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void CeilTo(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void Ceil(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			return EmuMath::Helpers::new_vector_ceil(out_vector_, *this);
+			EmuMath::Helpers::new_vector_ceil(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a copy of this Vector with the provided index range rounded toward positive infinity. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start rounding elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop rounding elements. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `CeilRangeConstexpr` instead. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq),
+		///		containing a copy of this Vector with the provided index range ceiled.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> CeilRange() const
+		{
+			return EmuMath::Helpers::new_vector_ceil_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> CeilRange() const
+		{
+			return EmuMath::Helpers::new_vector_ceil_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a copy of this Vector, with the provided index range rounded toward positive infinity, to the provided out_vector_. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start rounding elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop rounding elements. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `CeilRangeConstexpr` instead. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void CeilRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_ceil_range<BeginIndex_, EndIndex_>(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Returns a new EmuMath Vector with its indices outside of the specified range index default-constructed, 
+		///		and elements within the provided range constructed as ceiled forms of this Vector's elements, starting at index RoundBegin_.
+		/// </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing rounded forms of this Vector's elements. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing rounded forms of this Vector's elements. </para>
+		/// <para> RoundBegin_: Inclusive index at which to start reading elements from this Vector in order to perform rounds. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `CeilRangeNoCopyConstexpr` instead. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq),
+		///		containing a partial ceiled copy of this Vector in the specified range, and default values outside of said range.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> CeilRangeNoCopy() const
+		{
+			return EmuMath::Helpers::new_vector_ceil_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
+		}
+		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t RoundBegin_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> CeilRangeNoCopy() const
+		{
+			return EmuMath::Helpers::new_vector_ceil_range_no_copy<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs sequential ceiled elements within this Vector, starting at index RoundBegin_, to the provided index range in out_vector_. </para>
+		/// <para> Indices outside of the specified range in out_vector_ will not be modified. </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing rounded forms of this Vector's elements. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing rounded forms of this Vector's elements. </para>
+		/// <para> RoundBegin_: Inclusive index at which to start reading elements from this Vector in order to perform rounds. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `CeilRangeNoCopyConstexpr` instead. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void CeilRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_ceil_range_no_copy<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -1041,12 +1331,86 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Outputs a copy of this Vector, with its elements rounded toward 0, to the provided out_vector_. </para>
-		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `TruncToConstexpr` instead. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `TruncConstexpr` instead. </para>
 		/// </summary>
 		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void TruncTo(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void Trunc(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			return EmuMath::Helpers::new_vector_trunc(out_vector_, *this);
+			EmuMath::Helpers::new_vector_trunc(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a copy of this Vector with the provided index range rounded toward 0. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start rounding elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop rounding elements. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `TruncRangeConstexpr` instead. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq),
+		///		containing a copy of this Vector with the provided index range truncated.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> TruncRange() const
+		{
+			return EmuMath::Helpers::new_vector_trunc_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> TruncRange() const
+		{
+			return EmuMath::Helpers::new_vector_trunc_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a copy of this Vector, with the provided index range rounded toward 0, to the provided out_vector_. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start rounding elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop rounding elements. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `TruncRangeConstexpr` instead. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void TruncRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_trunc_range<BeginIndex_, EndIndex_>(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Returns a new EmuMath Vector with its indices outside of the specified range index default-constructed, 
+		///		and elements within the provided range constructed as truncated forms of this Vector's elements, starting at index RoundBegin_.
+		/// </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing rounded forms of this Vector's elements. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing rounded forms of this Vector's elements. </para>
+		/// <para> RoundBegin_: Inclusive index at which to start reading elements from this Vector in order to perform rounds. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `TruncRangeNoCopyConstexpr` instead. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq),
+		///		containing a partial truncated copy of this Vector in the specified range, and default values outside of said range.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> TruncRangeNoCopy() const
+		{
+			return EmuMath::Helpers::new_vector_trunc_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
+		}
+		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t RoundBegin_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> TruncRangeNoCopy() const
+		{
+			return EmuMath::Helpers::new_vector_trunc_range_no_copy<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs sequential truncated elements within this Vector, starting at index RoundBegin_, to the provided index range in out_vector_. </para>
+		/// <para> Indices outside of the specified range in out_vector_ will not be modified. </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing rounded forms of this Vector's elements. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing rounded forms of this Vector's elements. </para>
+		/// <para> RoundBegin_: Inclusive index at which to start reading elements from this Vector in order to perform rounds. </para>
+		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `TruncRangeNoCopyConstexpr` instead. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void TruncRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_trunc_range_no_copy<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
 		}
 #pragma endregion
 
@@ -1072,9 +1436,83 @@ namespace EmuMath
 		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `Floor` if calling at runtime. </para>
 		/// </summary>
 		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void FloorToConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void FloorConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
 			return EmuMath::Helpers::new_vector_floor_constexpr(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a copy of this Vector with the provided index range rounded toward negative infinity. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start rounding elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop rounding elements. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `FloorRange` if calling at runtime. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq),
+		///		containing a copy of this Vector with the provided index range floored.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> FloorRangeConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_floor_range_constexpr<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> FloorRangeConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_floor_range_constexpr<size, OutT_, BeginIndex_, EndIndex_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a copy of this Vector, with the provided index range rounded toward negative infinity, to the provided out_vector_. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start rounding elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop rounding elements. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `FloorRange` if calling at runtime. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void FloorRangeConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_floor_range_constexpr<BeginIndex_, EndIndex_>(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Returns a new EmuMath Vector with its indices outside of the specified range index default-constructed, 
+		///		and elements within the provided range constructed as floored forms of this Vector's elements, starting at index RoundBegin_.
+		/// </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing rounded forms of this Vector's elements. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing rounded forms of this Vector's elements. </para>
+		/// <para> RoundBegin_: Inclusive index at which to start reading elements from this Vector in order to perform rounds. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `FloorRangeNoCopy` if calling at runtime. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq),
+		///		containing a partial floored copy of this Vector in the specified range, and default values outside of said range.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> FloorRangeNoCopyConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_floor_range_no_copy_constexpr<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
+		}
+		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t RoundBegin_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> FloorRangeNoCopyConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_floor_range_no_copy_constexpr<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs sequential floored elements within this Vector, starting at index RoundBegin_, to the provided index range in out_vector_. </para>
+		/// <para> Indices outside of the specified range in out_vector_ will not be modified. </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing rounded forms of this Vector's elements. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing rounded forms of this Vector's elements. </para>
+		/// <para> RoundBegin_: Inclusive index at which to start reading elements from this Vector in order to perform rounds. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `FloorRangeNoCopy` if calling at runtime. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void FloorRangeNoCopyConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_floor_range_no_copy_constexpr<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -1098,9 +1536,83 @@ namespace EmuMath
 		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `Ceil` if calling at runtime. </para>
 		/// </summary>
 		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void CeilToConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void CeilConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
 			return EmuMath::Helpers::new_vector_ceil_constexpr(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a copy of this Vector with the provided index range rounded toward positive infinity. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start rounding elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop rounding elements. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `CeilRange` if calling at runtime. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq),
+		///		containing a copy of this Vector with the provided index range ceiled.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> CeilRangeConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_ceil_range_constexpr<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> CeilRangeConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_ceil_range_constexpr<size, OutT_, BeginIndex_, EndIndex_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a copy of this Vector, with the provided index range rounded toward positive infinity, to the provided out_vector_. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start rounding elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop rounding elements. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `CeilRange` if calling at runtime. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void CeilRangeConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_ceil_range_constexpr<BeginIndex_, EndIndex_>(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Returns a new EmuMath Vector with its indices outside of the specified range index default-constructed, 
+		///		and elements within the provided range constructed as ceiled forms of this Vector's elements, starting at index RoundBegin_.
+		/// </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing rounded forms of this Vector's elements. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing rounded forms of this Vector's elements. </para>
+		/// <para> RoundBegin_: Inclusive index at which to start reading elements from this Vector in order to perform rounds. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `CeilRangeNoCopy` if calling at runtime. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq),
+		///		containing a partial ceiled copy of this Vector in the specified range, and default values outside of said range.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> CeilRangeNoCopyConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_ceil_range_no_copy_constexpr<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
+		}
+		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t RoundBegin_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> CeilRangeNoCopyConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_ceil_range_no_copy_constexpr<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs sequential ceiled elements within this Vector, starting at index RoundBegin_, to the provided index range in out_vector_. </para>
+		/// <para> Indices outside of the specified range in out_vector_ will not be modified. </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing rounded forms of this Vector's elements. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing rounded forms of this Vector's elements. </para>
+		/// <para> RoundBegin_: Inclusive index at which to start reading elements from this Vector in order to perform rounds. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `CeilRangeNoCopy` if calling at runtime. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void CeilRangeNoCopyConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_ceil_range_no_copy_constexpr<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -1121,12 +1633,86 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Outputs a copy of this Vector, with its elements rounded toward 0, to the provided out_vector_. </para>
-		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `TruncTo` if calling at runtime. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `Trunc` if calling at runtime. </para>
 		/// </summary>
 		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void TruncToConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void TruncConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
 			return EmuMath::Helpers::new_vector_trunc_constexpr(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a copy of this Vector with the provided index range rounded toward 0. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start rounding elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop rounding elements. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `TruncRange` if calling at runtime. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq),
+		///		containing a copy of this Vector with the provided index range truncated.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> TruncRangeConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_trunc_range_constexpr<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> TruncRangeConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_trunc_range_constexpr<size, OutT_, BeginIndex_, EndIndex_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a copy of this Vector, with the provided index range rounded toward 0, to the provided out_vector_. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start rounding elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop rounding elements. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `TruncRange` if calling at runtime. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void TruncRangeConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_trunc_range_constexpr<BeginIndex_, EndIndex_>(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Returns a new EmuMath Vector with its indices outside of the specified range index default-constructed, 
+		///		and elements within the provided range constructed as truncated forms of this Vector's elements, starting at index RoundBegin_.
+		/// </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing rounded forms of this Vector's elements. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing rounded forms of this Vector's elements. </para>
+		/// <para> RoundBegin_: Inclusive index at which to start reading elements from this Vector in order to perform rounds. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `TruncRangeNoCopy` if calling at runtime. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq),
+		///		containing a partial truncated copy of this Vector in the specified range, and default values outside of said range.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> TruncRangeNoCopyConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_trunc_range_no_copy_constexpr<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
+		}
+		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t RoundBegin_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> TruncRangeNoCopyConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_trunc_range_no_copy_constexpr<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs sequential truncated elements within this Vector, starting at index RoundBegin_, to the provided index range in out_vector_. </para>
+		/// <para> Indices outside of the specified range in out_vector_ will not be modified. </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing rounded forms of this Vector's elements. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing rounded forms of this Vector's elements. </para>
+		/// <para> RoundBegin_: Inclusive index at which to start reading elements from this Vector in order to perform rounds. </para>
+		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `TruncRangeNoCopy` if calling at runtime. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void TruncRangeNoCopyConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_trunc_range_no_copy_constexpr<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
 		}
 #pragma endregion
 

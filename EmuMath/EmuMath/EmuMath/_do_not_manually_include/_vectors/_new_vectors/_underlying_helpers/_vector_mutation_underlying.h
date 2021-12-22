@@ -431,14 +431,12 @@ namespace EmuMath::Helpers::_vector_underlying
 		Args_&&...args_
 	)
 	{
-		// We cast to lval-refs because VS seems to be producing a (upon analysis, most likely false-positive) "Use of a moved from object" warning.
-		// --- We convert to lvalues so there's no chance of a move occurring, since lvalues can only be copied unless explicitly std::moved (or equivalent)
 		return OutVector_
 		(
 			_vector_mutate_invoke_func<ArgIndices_, Func_&>
 			(
 				func_,
-				EmuCore::TMP::lval_ref_cast<Args_>(std::forward<Args_>(args_))...
+				EmuCore::TMP::lval_ref_cast<Args_>(args_)...
 			)...
 		);
 	}
@@ -476,7 +474,12 @@ namespace EmuMath::Helpers::_vector_underlying
 			using arg_index_sequence = EmuCore::TMP::make_offset_index_sequence<ArgIndex_, num_calls_>;
 			if constexpr (_is_constructible_from_mutation_results<OutVector_, Func_&, arg_index_sequence, Args_...>::value)
 			{
-				return _vector_mutate_return_out_from_construct<OutVector_, Func_&>(arg_index_sequence(), func_, std::forward<Args_>(args_)...);
+				return _vector_mutate_return_out_from_construct<OutVector_, Func_&>
+				(
+					arg_index_sequence(),
+					func_,
+					EmuCore::TMP::lval_ref_cast<Args_>(std::forward<Args_>(args_))...
+				);
 			}
 			else if constexpr(std::is_default_constructible_v<OutVector_>)
 			{
@@ -504,7 +507,7 @@ namespace EmuMath::Helpers::_vector_underlying
 					std::make_index_sequence<OutVector_::size>(),
 					all_arg_indices(),
 					func_,
-					std::forward<Args_>(args_)...
+					EmuCore::TMP::lval_ref_cast<Args_>(std::forward<Args_>(args_))...
 				);
 			}
 			else if constexpr (std::is_default_constructible_v<OutVector_>)

@@ -375,7 +375,7 @@ int main()
 	std::cout << newvector_c_ << "\n";
 	std::cout << EmuMath::NewVector<4, const float&>(newvector_c_) << "\n";
 	std::cout << EmuMath::NewVector<4, const float&>(const_cast<const decltype(newvector_c_)&>(newvector_c_)) << "\n";
-	std::cout << EmuMath::NewVector<4, const float&>(std::move(newvector_c_)) << "\n";
+	//std::cout << EmuMath::NewVector<4, const float&>(std::move(newvector_c_)) << "\n";
 
 	float new_num_ = 45;
 	int blombo = 2;
@@ -408,7 +408,7 @@ int main()
 	some_new_vector_.at<1>() = 1.234f;
 	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
 	//EmuMath::Helpers::new_vector_set(some_new_vector_, std::move(newvector_b_));
-	some_new_vector_.Set(std::move(newvector_b_));
+	//some_new_vector_.Set(std::move(newvector_b_));
 	newvector_b_ = decltype(newvector_b_)(some_new_vector_);
 	std::cout << newvector_a_ << " | " << newvector_b_ << " | " << newvector_c_ << " | " << some_new_vector_ << "\n";
 	new_num_ = 33.5f;
@@ -716,25 +716,13 @@ int main()
 	std::cout << some_arbitrarily_sized_newvector_ << "\n";
 
 	std::cout << "---\n";
-	constexpr EmuMath::NewVector<3, float> oh_boi_another_v3f_(15, 30, 45);
-	//constexpr auto oh_boi_another_v3f_negated_ = EmuMath::Helpers::new_vector_negate<4, float>(oh_boi_another_v3f_);
-	constexpr auto oh_boi_another_v3f_negated_ = oh_boi_another_v3f_.operator-<4>();
-	constexpr auto first_newvector_ui32_ = EmuMath::Helpers::new_vector_make<std::uint32_t>(0, 5, 6, std::numeric_limits<std::uint32_t>::max());
-	//constexpr auto first_newvector_ui32_negated_to_float_ = EmuMath::Helpers::new_vector_negate<4, float>(first_newvector_ui32_);
-	constexpr auto first_newvector_ui32_negated_to_float_ = first_newvector_ui32_.operator-<float>();
-	constexpr std::uint8_t test_part_0_ = 231;
-	constexpr auto test_part_1_ = EmuCore::do_negate<std::uint8_t>()(test_part_0_);
-	constexpr std::uint8_t test_part_2_ = static_cast<std::uint8_t>(test_part_1_);
-	constexpr std::uint8_t test_part_3_ = -test_part_0_;
-
-	constexpr double some_safe_double = double(EmuCore::do_negate()(1u));
-
-	std::cout << "---\n";
 	constexpr EmuMath::NewVector<12, float> new_vec_to_round_(0.1, 0.2, -0.3, 0.4, 0.5, 0.6, -0.7, 0.8, 0.9, 1.0, -2.4, 2.5);
 	constexpr auto new_vec_floored_ = EmuMath::Helpers::new_vector_floor_constexpr(new_vec_to_round_);
 	constexpr auto new_vec_ceiled_ = EmuMath::Helpers::new_vector_ceil_constexpr(new_vec_to_round_);
 	constexpr auto new_vec_trunced_ = EmuMath::Helpers::new_vector_trunc_constexpr(new_vec_to_round_);
 	constexpr auto new_vec_abs_ = EmuMath::Helpers::new_vector_abs(new_vec_to_round_);
+
+
 
 	std::cout << "---\n";
 	constexpr auto pre_negate_vec_ = EmuMath::Helpers::new_vector_make<float>(-5.0f, 0.0f, 12.0f, -66.66f);
@@ -788,6 +776,19 @@ int main()
 	std::cout << "POST-DEC REF RESULT: " << runtime_unary_vec_test_.operator--<4, float&>(int()) << "\n";
 	std::cout << "AFTER SECOND MODS: " << runtime_unary_vec_test_ << "\n";
 
+	constexpr auto multi_test_ = EmuMath::NewVector<4, EmuMath::NewVector<4, float>>(EmuMath::NewVector<4, float>(1, 2, 3, 4));
+
+	constexpr auto ceiled_test_a_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).CeilConstexpr();
+	constexpr auto ceiled_test_b_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).CeilRangeConstexpr<5, 10>();
+	constexpr auto ceiled_test_c_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).CeilRangeNoCopyConstexpr<5, 10, 5>();
+
+	constexpr auto floored_test_a_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).FloorConstexpr();
+	constexpr auto floored_test_b_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).FloorRangeConstexpr<5, 10>();
+	constexpr auto floored_test_c_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).FloorRangeNoCopyConstexpr<5, 10, 5>();
+
+	constexpr auto trunced_test_a_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).TruncConstexpr();
+	constexpr auto trunced_test_b_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).TruncRangeConstexpr<5, 10>();
+	constexpr auto trunced_test_c_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).TruncRangeNoCopyConstexpr<5, 10, 5>();
 
 	// GRADIENTS START
 	std::cout << "\n\n";
