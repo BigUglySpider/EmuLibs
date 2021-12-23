@@ -790,7 +790,27 @@ int main()
 	constexpr auto trunced_test_b_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).TruncRangeConstexpr<5, 10>();
 	constexpr auto trunced_test_c_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).TruncRangeNoCopyConstexpr<5, 10, 5>();
 
-
+	constexpr auto trj439 = EmuMath::NewVector<4, double>(0, 1, 2, 3).Shuffle<1, 2, 3, 2, 1, 2, 3, 2, 1, 2, 3, 2, 1, 2, 3, 2, 1, 2, 3, 2, 1, 2, 3, 2, 1, 2, 3, 2, 1>();
+	float reeeeeeeeeeeeeeeeeeeeeeeeee_ = 0.5f;
+	auto yet_another_ref_vec_ = EmuMath::Helpers::new_vector_make<float&>(reeeeeeeeeeeeeeeeeeeeeeeeee_, reeeeeeeeeeeeeeeeeeeeeeeeee_);
+	std::cout << yet_another_ref_vec_ << " | " << reeeeeeeeeeeeeeeeeeeeeeeeee_ << "\n";
+	reeeeeeeeeeeeeeeeeeeeeeeeee_ = 5.0f;
+	std::cout << yet_another_ref_vec_ << " | " << reeeeeeeeeeeeeeeeeeeeeeeeee_ << "\n";
+	++yet_another_ref_vec_;
+	std::cout << yet_another_ref_vec_ << " | " << reeeeeeeeeeeeeeeeeeeeeeeeee_ << "\n";
+	float bobobobo_ = 13.37f;
+	yet_another_ref_vec_.Set<1>(bobobobo_);
+	std::cout << yet_another_ref_vec_ << " | " << reeeeeeeeeeeeeeeeeeeeeeeeee_ << "\n";
+	bobobobo_ = 8008135.0f;
+	std::cout << yet_another_ref_vec_ << " | " << reeeeeeeeeeeeeeeeeeeeeeeeee_ << "\n";
+	reeeeeeeeeeeeeeeeeeeeeeeeee_ = 0.0f;
+	std::cout << yet_another_ref_vec_ << " | " << reeeeeeeeeeeeeeeeeeeeeeeeee_ << "\n";
+	yet_another_ref_vec_.at<0>() = bobobobo_;
+	bobobobo_ *= yet_another_ref_vec_.at<0>() * 0.0001f;
+	std::cout << yet_another_ref_vec_ << " | " << reeeeeeeeeeeeeeeeeeeeeeeeee_ << "\n";
+	yet_another_ref_vec_ = EmuMath::NewVector<4, float>(10, 20, 30, 40);
+	std::cout << yet_another_ref_vec_ << " | " << reeeeeeeeeeeeeeeeeeeeeeeeee_ << "\n";
+	yet_another_ref_vec_.Set<0>(yet_another_ref_vec_.at<1>());
 
 	// GRADIENTS START
 	std::cout << "\n\n";

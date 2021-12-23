@@ -86,7 +86,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	{
 		if constexpr (BeginIndex_ <= EndIndex_)
 		{
-			using lhs_vector_type = EmuMath::Vector<Size_, T_>;
+			using lhs_vector_type = EmuMath::NewVector<Size_, T_>;
 			constexpr std::size_t end_index_ = (EndIndex_ <= lhs_vector_type::size) ? EndIndex_ : lhs_vector_type::size;
 
 			if constexpr (EmuMath::TMP::is_emu_new_vector_v<Arg_>)

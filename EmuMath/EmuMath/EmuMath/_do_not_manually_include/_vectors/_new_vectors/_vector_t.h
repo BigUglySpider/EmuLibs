@@ -1716,8 +1716,24 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region MUTATIONS
+#pragma region SHUFFLES
 	public:
+		/// <summary>
+		/// <para> Creates an EmuMath Vector containing the specified OutT_ (defaults to value_type_uq) from elements within this Vector. </para>
+		/// <para> The size of the output Vector will be equal to the number of provided Indices_ args. </para>
+		/// <para>
+		///		Indices_: Variadic sequence of 1 or more indices within this Vector to use to form the element for the output Vector's index at that arg's position. 
+		///		(e.g. with the args 2, 4, 0, the result will be out[0] = this[2], out[1] = this[4], out[2] = this[0]).
+		/// </para>
+		/// <para> At least one Indices_ arg must be provided. </para>
+		/// <para> This can be used to output a shuffled reference Vector, but it is recommended to use RefShuffle instead. </para>
+		/// <para> This may not be used to shuffle theoretical indices. For such behaviour, use ShuffleTheoretical. </para>
+		/// </summary>
+		/// <typeparam name="OutT_">Type to be contained in the output Vector. Defaults to this Vector's value_type_uq if not provided.</typeparam>
+		/// <returns>
+		///		EmuMath Vector containing the provided OutT_ (defaults to value_type_uq), containing a number of indices equal to the number of provided Indices_ args, 
+		///		with respective elements constructed from the provided Indices_ within this Vector.
+		/// </returns>
 		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> Shuffle()
 		{
@@ -1740,6 +1756,22 @@ namespace EmuMath
 			return EmuMath::Helpers::new_vector_shuffle<value_type_uq, Indices_...>(*this);
 		}
 
+		/// <summary>
+		/// <para> Creates an EmuMath Vector containing the specified OutT_ (defaults to value_type_uq) from elements within this Vector. </para>
+		/// <para> The size of the output Vector will be equal to the number of provided Indices_ args. </para>
+		/// <para>
+		///		Indices_: Variadic sequence of 1 or more indices within this Vector to use to form the element for the output Vector's index at that arg's position. 
+		///		(e.g. with the args 2, 4, 0, the result will be out[0] = this[2], out[1] = this[4], out[2] = this[0]).
+		/// </para>
+		/// <para> At least one Indices_ arg must be provided. </para>
+		/// <para> This can be used to output a shuffled reference Vector, but it is recommended to use RefShuffle instead. </para>
+		/// <para> This may be used to shuffle theoretical indices. To safely limit to only contained indices, use Shuffle. </para>
+		/// </summary>
+		/// <typeparam name="OutT_">Type to be contained in the output Vector. Defaults to this Vector's value_type_uq if not provided.</typeparam>
+		/// <returns>
+		///		EmuMath Vector containing the provided OutT_ (defaults to value_type_uq), containing a number of indices equal to the number of provided Indices_ args, 
+		///		with respective elements constructed from the provided theoretical Indices_ within this Vector.
+		/// </returns>
 		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> ShuffleTheoretical()
 		{
@@ -1762,6 +1794,48 @@ namespace EmuMath
 			return EmuMath::Helpers::new_vector_shuffle_theoretical<value_type_uq, Indices_...>(*this);
 		}
 
+		/// <summary>
+		/// <para> Creates an EmuMath Vector containing references to this Vector's elements at the specified Indices_. </para>
+		/// <para> The size of the output Vector will be equal to the number of provided Indices_ args. </para>
+		/// <para>
+		///		Indices_: Variadic sequence of 1 or more indices within this Vector to use to reference in the output Vector's index at that arg's position. 
+		///		(e.g. with the args 2, 4, 0, the result will be out[0] = this[2], out[1] = this[4], out[2] = this[0]).
+		/// </para>
+		/// <para> At least one Indices_ arg must be provided. </para>
+		/// <para> Theoretical indices may not be referenced, and using theoretical indices will result in a compile-time error. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector containing references to this Vector's data, or this Vector's references if it is also a reference-containing Vector.</returns>
+		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), value_type&> RefShuffle()
+		{
+			return EmuMath::Helpers::new_vector_shuffle<value_type&, Indices_...>(*this);
+		}
+		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), const value_type&> RefShuffle() const
+		{
+			return EmuMath::Helpers::new_vector_shuffle<const value_type&, Indices_...>(*this);
+		}
+
+		/// <summary>
+		/// <para> Creates an EmuMath Vector containing constant references to this Vector's elements at the specified Indices_. </para>
+		/// <para> The size of the output Vector will be equal to the number of provided Indices_ args. </para>
+		/// <para>
+		///		Indices_: Variadic sequence of 1 or more indices within this Vector to use to reference in the output Vector's index at that arg's position. 
+		///		(e.g. with the args 2, 4, 0, the result will be out[0] = this[2], out[1] = this[4], out[2] = this[0]).
+		/// </para>
+		/// <para> At least one Indices_ arg must be provided. </para>
+		/// <para> Theoretical indices may not be referenced, and using theoretical indices will result in a compile-time error. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector containing references to this Vector's data, or this Vector's references if it is also a reference-containing Vector.</returns>
+		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), const value_type&> ConstRefShuffle() const
+		{
+			return EmuMath::Helpers::new_vector_shuffle<const value_type&, Indices_...>(*this);
+		}
+#pragma endregion
+
+#pragma region MUTATIONS
+	public:
 		/// <summary>
 		/// <para> Crates a Vector of this Vector's size and value_type_uq using the provided mutation func_. </para>
 		/// <para> The provided arguments will be provided to func_ for every index within the output Vector. </para>
