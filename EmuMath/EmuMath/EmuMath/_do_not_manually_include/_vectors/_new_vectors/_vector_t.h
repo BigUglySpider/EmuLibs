@@ -1826,7 +1826,7 @@ namespace EmuMath
 		/// <para> At least one Indices_ arg must be provided. </para>
 		/// <para> Theoretical indices may not be referenced, and using theoretical indices will result in a compile-time error. </para>
 		/// </summary>
-		/// <returns>EmuMath Vector containing references to this Vector's data, or this Vector's references if it is also a reference-containing Vector.</returns>
+		/// <returns>EmuMath Vector containing const references to this Vector's data, or this Vector's references if it is also a reference-containing Vector.</returns>
 		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), const value_type&> ConstRefShuffle() const
 		{
