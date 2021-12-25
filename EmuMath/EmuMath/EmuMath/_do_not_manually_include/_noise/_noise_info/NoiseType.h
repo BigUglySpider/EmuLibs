@@ -2,6 +2,7 @@
 #define EMU_MATH_NOISE_TYPE_H_INC_ 1
 
 #include <cstdint>
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuMath
 {
@@ -37,7 +38,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Valid EmuMath::NoiseType assertion failed. A NoiseType may only be one of the defined EmuMath::NoiseType enum values.");
+				static_assert(EmuCore::TMP::get_false<NoiseType, NoiseType_>(), "Valid EmuMath::NoiseType assertion failed. A NoiseType may only be one of the defined EmuMath::NoiseType enum values.");
 				return false;
 			}
 		}

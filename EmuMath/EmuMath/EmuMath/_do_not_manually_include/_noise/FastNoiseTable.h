@@ -8,6 +8,7 @@
 #include "../../../EmuSIMD/SIMDHelpers.h"
 #include "../../../EmuCore/TMPHelpers/TypeComparators.h"
 #include "../../../EmuCore/TMPHelpers/TypeConvertors.h"
+#include "../../../EmuCore/TMPHelpers/Values.h"
 #include <ostream>
 #include <sstream>
 #include <vector>
@@ -68,7 +69,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to make coordinates from a vector for an EmuMath::FastNoiseTable with prohibited dimensions.");
+				static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to make coordinates from a vector for an EmuMath::FastNoiseTable with prohibited dimensions.");
 			}
 		}
 
@@ -196,7 +197,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Provided an invalid index to EmuMath::FastNoiseTable::size. The provided Index_ must be less than the number of dimensions the table covers.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, Index_>(), "Provided an invalid index to EmuMath::FastNoiseTable::size. The provided Index_ must be less than the number of dimensions the table covers.");
 			}
 		}
 
@@ -537,7 +538,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to generate an impossibly-dimensioned EmuMath::FastNoiseTable.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to generate an impossibly-dimensioned EmuMath::FastNoiseTable.");
 			}
 		}
 
@@ -621,7 +622,7 @@ namespace EmuMath
 				}
 				else
 				{
-					static_assert(false, "Attempted to resize an EmuMath::FastNoiseTable with a prohibited number of dimensions.");
+					static_assert(EmuCore::TMP::get_false<std::size_t, num_dimensions>(), "Attempted to resize an EmuMath::FastNoiseTable with a prohibited number of dimensions.");
 				}
 			}
 			table_size = new_size_;
@@ -665,7 +666,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to get an index of an EmuMath::FastNoiseTable with a prohibited number of dimensions.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, MajorDimensionIndex_>, "Attempted to get an index of an EmuMath::FastNoiseTable with a prohibited number of dimensions.");
 			}
 		}
 		[[nodiscard]] const value_type& _get_index(const coordinate_type& coords_) const

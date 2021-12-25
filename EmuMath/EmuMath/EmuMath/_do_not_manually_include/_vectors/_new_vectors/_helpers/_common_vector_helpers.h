@@ -161,8 +161,31 @@ EmuMath::Helpers::_vector_underlying::_vector_mutate_no_func_passed\
 	(_out_end),\
 	(_read_begin)\
 >
-#ifdef EMU_MATH_VECTOR_MUTATION_INVOKE_ONLY
-#undef EMU_MATH_VECTOR_MUTATION_INVOKE_ONLY
+
+#ifdef EMU_MATH_VECTOR_MUTATE_TEMPLATE
+#undef EMU_MATH_VECTOR_MUTATE_TEMPLATE
 #endif
+#define EMU_MATH_VECTOR_MUTATE_TEMPLATE(_func_template, _out_size, _out_t)\
+EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_args_only\
+<\
+	_func_template,\
+	EmuMath::NewVector<(_out_size), _out_t>,\
+	0,\
+	EmuMath::NewVector<(_out_size), _out_t>::size,\
+	0\
+>
+
+#ifdef EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE
+#undef EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE
+#endif
+#define EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE(_func_template, _out_size, _out_t)\
+EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_no_func_passed\
+<\
+	_func_template,\
+	EmuMath::NewVector<(_out_size), _out_t>,\
+	0,\
+	EmuMath::NewVector<(_out_size), _out_t>::size,\
+	0\
+>
 
 #endif

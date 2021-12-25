@@ -2,6 +2,7 @@
 #define EMU_MATH_NOISE_GEN_FUNCTOR_2D_H_INC_ 1
 
 #include "_common_noise_gen_functor_includes.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuMath::Functors
 {
@@ -12,7 +13,7 @@ namespace EmuMath::Functors
 		static_assert(std::is_floating_point_v<FP_>, "Invalid FP_ type argument provided to EmuMath::Functors::make_noise_2d; the type must be a floating point.");
 		constexpr make_noise_2d()
 		{
-			static_assert(false, "Attempted to construct a make_noise_2d instance for a NoiseType that has not been implemented.");
+			static_assert(EmuCore::TMP::get_false<FP_>(), "Attempted to construct a make_noise_2d instance for a NoiseType that has not been implemented.");
 		}
 	};
 

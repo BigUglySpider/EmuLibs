@@ -2,6 +2,7 @@
 #define EMU_MATH_NOISE_SAMPLE_PROCESSOR_ANALYTICS_H_INC_
 
 #include "NoiseSampleProcessors.h"
+#include "../../../EmuCore/TMPHelpers/Values.h"
 #include <tuple>
 
 namespace EmuMath::Functors
@@ -54,7 +55,7 @@ namespace EmuMath::Functors
 			}
 			else
 			{
-				static_assert(false, "Attempted to get an analytic component of a noise_sample_processor_with_analytics, but the provided Index_ exceeded the valid idnex range.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, Index_>(), "Attempted to get an analytic component of a noise_sample_processor_with_analytics, but the provided Index_ exceeded the valid idnex range.");
 			}
 		}
 		/// <summary> Accesses the analytic at the provided index. </summary>
@@ -68,7 +69,7 @@ namespace EmuMath::Functors
 			}
 			else
 			{
-				static_assert(false, "Attempted to get an analytic component of a noise_sample_processor_with_analytics, but the provided Index_ exceeded the valid idnex range.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, Index_>(), "Attempted to get an analytic component of a noise_sample_processor_with_analytics, but the provided Index_ exceeded the valid idnex range.");
 			}
 		}
 

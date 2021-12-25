@@ -3,6 +3,7 @@
 
 #include "TypeComparators.h"
 #include "TypeConvertors.h"
+#include "Values.h"
 #include <functional>
 #include <type_traits>
 
@@ -493,7 +494,7 @@ namespace EmuCore::TMP
 				}
 				else
 				{
-					static_assert(false, "Attempted to perform a bitwise left shift via bitwise_shift_left_diff_types using a type that cannot be accurately reinterpreted.");
+					static_assert(EmuCore::TMP::get_false<Lhs_>(), "Attempted to perform a bitwise left shift via bitwise_shift_left_diff_types using a type that cannot be accurately reinterpreted.");
 					return Out_();
 				}
 			}
@@ -549,7 +550,7 @@ namespace EmuCore::TMP
 				}
 				else
 				{
-					static_assert(false, "Attempted to perform a bitwise right shift via bitwise_shift_left_diff_types using a type that cannot be accurately reinterpreted.");
+					static_assert(EmuCore::TMP::get_false<Lhs_>(), "Attempted to perform a bitwise right shift via bitwise_shift_left_diff_types using a type that cannot be accurately reinterpreted.");
 					return Out_();
 				}
 			}

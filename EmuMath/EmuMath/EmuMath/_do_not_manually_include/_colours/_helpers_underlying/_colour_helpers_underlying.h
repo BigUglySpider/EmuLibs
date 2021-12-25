@@ -2,6 +2,7 @@
 #define EMU_MATH_COLOUR_HELPERS_UNDERLYING_H_INC_ 1
 
 #include "_colour_helpers_underlying_common_includes.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuMath::Helpers::_underlying_colour_funcs
 {
@@ -343,12 +344,12 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform arithmetic with an EmuMath Colour, but the provided lhs_ was not an EmuMath Colour type.");
+				static_assert(EmuCore::TMP::get_false<Rhs_>(), "Attempted to perform arithmetic with an EmuMath Colour, but the provided lhs_ was not an EmuMath Colour type.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform arithmetic with an EmuMath Colour, but provided a non-EmuMath-Colour output OutColour_ type.");
+			static_assert(EmuCore::TMP::get_false<Rhs_>(), "Attempted to perform arithmetic with an EmuMath Colour, but provided a non-EmuMath-Colour output OutColour_ type.");
 		}
 	}
 
@@ -416,12 +417,12 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			}
 			else
 			{
-				static_assert(false, "Attempted to compare two EmuMath Colours, but the provided rhs_ was not an EmuMath colour.");
+				static_assert(EmuCore::TMP::get_false<AndOr_>(), "Attempted to compare two EmuMath Colours, but the provided rhs_ was not an EmuMath colour.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to compare two EmuMath Colours, but the provided lhs_ was not an EmuMath colour.");
+			static_assert(EmuCore::TMP::get_false<AndOr_>(), "Attempted to compare two EmuMath Colours, but the provided lhs_ was not an EmuMath colour.");
 		}
 	}
 
@@ -484,7 +485,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			static_assert(false, "Provided a_ and b_ colours with incompatible channels to _colour_lerp_t_colour. Channel compatibility should be resolved via colour_lerp.");
+			static_assert(EmuCore::TMP::get_false<OutColour_>(), "Provided a_ and b_ colours with incompatible channels to _colour_lerp_t_colour. Channel compatibility should be resolved via colour_lerp.");
 		}
 	}
 
@@ -583,7 +584,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			static_assert(false, "Provided a_ and b_ colours with incompatible channels to _colour_lerp_t_vector. Channel compatibility should be resolved via colour_lerp.");
+			static_assert(EmuCore::TMP::get_false<OutColour_>(), "Provided a_ and b_ colours with incompatible channels to _colour_lerp_t_vector. Channel compatibility should be resolved via colour_lerp.");
 		}
 	}
 
@@ -623,7 +624,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			static_assert(false, "Provided a_ and b_ colours with incompatible channels to _colour_lerp_t_scalar. Channel compatibility should be resolved via colour_lerp.");
+			static_assert(EmuCore::TMP::get_false<OutColour_>(), "Provided a_ and b_ colours with incompatible channels to _colour_lerp_t_scalar. Channel compatibility should be resolved via colour_lerp.");
 		}
 	}
 
@@ -669,17 +670,17 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 				}
 				else
 				{
-					static_assert(false, "Attempted to linearly interpolate two EmuMath Colours, but the provided input a_ was not an EmuMath Colour.");
+					static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to linearly interpolate two EmuMath Colours, but the provided input a_ was not an EmuMath Colour.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to linearly interpolate two EmuMath Colours, but the provided input a_ was not an EmuMath Colour.");
+				static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to linearly interpolate two EmuMath Colours, but the provided input a_ was not an EmuMath Colour.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to linearly interpolate two EmuMath Colours, but the provided output OutColour_ was not an EmuMath Colour type.");
+			static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to linearly interpolate two EmuMath Colours, but the provided output OutColour_ was not an EmuMath Colour type.");
 		}
 	}
 
@@ -705,7 +706,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			static_assert(false, "Attempted to find an EmuMath Colour's min or max element, but the provided input Colour_ was not an EmuMath Colour.");
+			static_assert(EmuCore::TMP::get_false<Out_>(), "Attempted to find an EmuMath Colour's min or max element, but the provided input Colour_ was not an EmuMath Colour.");
 		}
 	}
 
@@ -720,12 +721,12 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			}
 			else
 			{
-				static_assert(false, "Attempted to greyscale an EmuMath Colour, but the provided in_ colour was not an EmuMath Colour.");
+				static_assert(EmuCore::TMP::get_false<InColour_>(), "Attempted to greyscale an EmuMath Colour, but the provided in_ colour was not an EmuMath Colour.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to greyscale an EmuMath Colour, but the provided output OutColour_ type was not an EmuMath Colour type.");
+			static_assert(EmuCore::TMP::get_false<InColour_>(), "Attempted to greyscale an EmuMath Colour, but the provided output OutColour_ type was not an EmuMath Colour type.");
 		}
 	}
 
@@ -757,7 +758,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			static_assert(false, "Invalid arguments provided to colour_greyscale_basic_average.");
+			static_assert(EmuCore::TMP::get_false<OutColour_>(), "Invalid arguments provided to colour_greyscale_basic_average.");
 		}
 	}
 
@@ -790,7 +791,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			static_assert(false, "Invalid arguments provided to colour_greyscale_luminance_average.");
+			static_assert(EmuCore::TMP::get_false<OutColour_>(), "Invalid arguments provided to colour_greyscale_luminance_average.");
 		}
 	}
 
@@ -826,7 +827,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			static_assert(false, "Invalid arguments provided to colour_greyscale_desaturate.");
+			static_assert(EmuCore::TMP::get_false<OutColour_>(), "Invalid arguments provided to colour_greyscale_desaturate.");
 		}
 	}
 
@@ -854,7 +855,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			static_assert(false, "Invalid arguments provided to colour_greyscale_decompose.");
+			static_assert(EmuCore::TMP::get_false<OutColour_>(), "Invalid arguments provided to colour_greyscale_decompose.");
 		}
 	}
 }

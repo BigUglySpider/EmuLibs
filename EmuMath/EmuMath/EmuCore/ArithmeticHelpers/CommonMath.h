@@ -2,6 +2,7 @@
 #define EMU_CORE_COMMON_MATH_H_INC_ 1
 
 #include "../TMPHelpers/TypeComparators.h"
+#include "../TMPHelpers/Values.h"
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -29,7 +30,7 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Attempted to use EmuCore SqrtConstexpr with an output type that is not a floating point.");
+				static_assert(EmuCore::TMP::get_false<Out_>(), "Attempted to use EmuCore SqrtConstexpr with an output type that is not a floating point.");
 			}
 		}
 	}
@@ -78,12 +79,12 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Attempted to use EmuCore::SqrtConstexpr with an input type that is neither floating point nor integral. Did you mean to use the do_sqrt_constexpr functor?");
+				static_assert(EmuCore::TMP::get_false<In_>(), "Attempted to use EmuCore::SqrtConstexpr with an input type that is neither floating point nor integral. Did you mean to use the do_sqrt_constexpr functor?");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to use EmuCore::SqrtConstexpr with an output type that is not a floating point.");
+			static_assert(EmuCore::TMP::get_false<In_>(), "Attempted to use EmuCore::SqrtConstexpr with an output type that is not a floating point.");
 		}
 	}
 
@@ -209,12 +210,12 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingCos.");
+				static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingCos.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Passed a non-floating-point output type to EmuCore::DoMatchingCos. Did you mean to use the do_cos functor?");
+			static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point output type to EmuCore::DoMatchingCos. Did you mean to use the do_cos functor?");
 		}
 	}
 	template<typename FloatingPointOut_ = float, typename FloatingPointIn_>
@@ -248,12 +249,12 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingAcos.");
+				static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingAcos.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Passed a non-floating-point output type to EmuCore::DoMatchingAcos. Did you mean to use the do_acos functor?");
+			static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point output type to EmuCore::DoMatchingAcos. Did you mean to use the do_acos functor?");
 		}
 	}
 
@@ -288,12 +289,12 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingSin.");
+				static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingSin.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Passed a non-floating-point output type to EmuCore::DoMatchingSin. Did you mean to use the do_sin functor?");
+			static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point output type to EmuCore::DoMatchingSin. Did you mean to use the do_sin functor?");
 		}
 	}
 	template<typename FloatingPointOut_ = float, typename FloatingPointIn_>
@@ -327,12 +328,12 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingAsin.");
+				static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingAsin.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Passed a non-floating-point output type to EmuCore::DoMatchingAsin. Did you mean to use the do_asin functor?");
+			static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point output type to EmuCore::DoMatchingAsin. Did you mean to use the do_asin functor?");
 		}
 	}
 
@@ -367,12 +368,12 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingTan.");
+				static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingTan.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Passed a non-floating-point output type to EmuCore::DoMatchingTan. Did you mean to use the do_tan functor?");
+			static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point output type to EmuCore::DoMatchingTan. Did you mean to use the do_tan functor?");
 		}
 	}
 	template<typename FloatingPointOut_ = float, typename FloatingPointIn_>
@@ -406,12 +407,12 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingAtan.");
+				static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingAtan.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Passed a non-floating-point output type to EmuCore::DoMatchingAtan. Did you mean to use the do_atan functor?");
+			static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point output type to EmuCore::DoMatchingAtan. Did you mean to use the do_atan functor?");
 		}
 	}
 
@@ -461,7 +462,7 @@ namespace EmuCore
 		}
 		else
 		{
-			static_assert(false, "Passed a non-floating-point output type to EmuCore::DoMatchingStandardSqrt. Did you mean to use the do_sqrt functor?");
+			static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point output type to EmuCore::DoMatchingStandardSqrt. Did you mean to use the do_sqrt functor?");
 		}
 	}
 
@@ -492,7 +493,7 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuCore::DoCorrectFloor with a non-arithmetic type. Did you mean to use the do_floor functor?");
+				static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to perform EmuCore::DoCorrectFloor with a non-arithmetic type. Did you mean to use the do_floor functor?");
 			}
 		}
 	}
@@ -523,7 +524,7 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuCore::DoCorrectCeil with a non-arithmetic type. Did you mean to use the do_ceil functor?");
+				static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to perform EmuCore::DoCorrectCeil with a non-arithmetic type. Did you mean to use the do_ceil functor?");
 			}
 		}
 	}
@@ -554,7 +555,7 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuCore::DoCorrectTrunc with a non-arithmetic type. Did you mean to use the do_trunc functor?");
+				static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to perform EmuCore::DoCorrectTrunc with a non-arithmetic type. Did you mean to use the do_trunc functor?");
 			}
 		}
 	}
@@ -627,7 +628,7 @@ namespace EmuCore
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform Q_rsqrt with a non-floating-point output type.");
+			static_assert(EmuCore::TMP::get_false<OutFloatingPoint_>(), "Attempted to perform Q_rsqrt with a non-floating-point output type.");
 		}
 	}
 

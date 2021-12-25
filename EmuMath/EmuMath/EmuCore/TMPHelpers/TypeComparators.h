@@ -404,6 +404,27 @@ namespace EmuCore::TMP
 	struct has_static_value<T_, std::void_t<decltype(T_::value)>> : std::true_type
 	{
 	};
+
+	template<template<class...> class Template_, class...TypeArgs_>
+	struct valid_template_args
+	{
+	private:
+		template<template<class...> class T_>
+		static constexpr bool _get(T_<TypeArgs_...>* p_dummy_)
+		{
+			return true;
+		};
+		template<template<class...> class T_>
+		static constexpr bool _get(...)
+		{
+			return false;
+		}
+
+	public:
+		static constexpr bool value = _get<Template_>(nullptr);
+	};
+	template<template<class...> class Template_, class...TypeArgs_>
+	static constexpr bool valid_template_args_v = valid_template_args<Template_, TypeArgs_...>::value;
 }
 
 #endif

@@ -12,6 +12,7 @@
 #include <type_traits>
 #include "default_work_allocator.h"
 #include "../TMP/CommonThreadingAliases.h"
+#include "../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuThreads::Functors
 {
@@ -220,7 +221,7 @@ namespace EmuThreads::Functors
 			}
 			else
 			{
-				static_assert(false, "Attempted to allocate a task via EmuThreading::Functors::prioritised_work_allocator, but the provided Func_ type cannot be invoked with the provided Args_.");
+				static_assert(EmuCore::TMP::get_false<Func_>(), "Attempted to allocate a task via EmuThreading::Functors::prioritised_work_allocator, but the provided Func_ type cannot be invoked with the provided Args_.");
 			}
 		}
 
@@ -248,7 +249,7 @@ namespace EmuThreads::Functors
 			}
 			else
 			{
-				static_assert(false, "Attempted to allocate a task via EmuThreading::Functors::prioritised_work_allocator, but the provided Func_ type cannot be invoked with the provided Args_.");
+				static_assert(EmuCore::TMP::get_false<Func_>(), "Attempted to allocate a task via EmuThreading::Functors::prioritised_work_allocator, but the provided Func_ type cannot be invoked with the provided Args_.");
 			}
 		}
 

@@ -1,6 +1,7 @@
 #ifndef EMU_MATH_NOISE_TMP_H_INC_
 #define EMU_MATH_NOISE_TMP_H_INC_ 1
 
+#include "../../../EmuCore/TMPHelpers/Values.h"
 #include <type_traits>
 #include <vector>
 
@@ -22,12 +23,12 @@ namespace EmuMath::TMP
 	{
 		if constexpr (Dimensions_ < min_noise_dimensions)
 		{
-			static_assert(false, "Invalid EmuMath noise dimensions: exceeded the maximum value, which is 1.");
+			static_assert(EmuCore::TMP::get_false<std::size_t, Dimensions_>(), "Invalid EmuMath noise dimensions: exceeded the maximum value, which is 1.");
 			return false;
 		}
 		else if constexpr (Dimensions_ > max_noise_dimensions)
 		{
-			static_assert(false, "Invalid EmuMath noise dimensions: exceeded the maximum value, which is 3.");
+			static_assert(EmuCore::TMP::get_false<std::size_t, Dimensions_>(), "Invalid EmuMath noise dimensions: exceeded the maximum value, which is 3.");
 			return false;
 		}
 		else
@@ -45,7 +46,7 @@ namespace EmuMath::TMP
 		}
 		else
 		{
-			static_assert(false, "Invalid EmuMath::NoiseTable sample type provided. Only floating-point types may be provided.");
+			static_assert(EmuCore::TMP::get_false<T_>(), "Invalid EmuMath::NoiseTable sample type provided. Only floating-point types may be provided.");
 			return false;
 		}
 	}

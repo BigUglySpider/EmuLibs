@@ -812,6 +812,18 @@ int main()
 	std::cout << yet_another_ref_vec_ << " | " << reeeeeeeeeeeeeeeeeeeeeeeeee_ << "\n";
 	yet_another_ref_vec_.Set<0>(yet_another_ref_vec_.at<1>());
 
+	std::cout << "--\n\n";
+	constexpr auto some_multi_test_ = EmuMath::Helpers::new_vector_lerp<std::uint16_t>
+	(
+		EmuMath::Helpers::new_vector_make<float>(15, 30, 45, 60),
+		char(30),
+		0.5L
+	);
+
+	EmuMath::NewVector<4, double> another_new_vec_4d_(1, 1, 1, 1);
+	std::cout << another_new_vec_4d_ << "\n";
+	EmuMath::Helpers::new_vector_lerp(another_new_vec_4d_, another_new_vec_4d_, EmuMath::NewVector<4, float>(10, 20, 30, 40), 0.5);
+	std::cout << another_new_vec_4d_ << "\n";
 
 	// GRADIENTS START
 	std::cout << "\n\n";

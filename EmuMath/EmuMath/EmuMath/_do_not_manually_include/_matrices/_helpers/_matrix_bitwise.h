@@ -1,7 +1,8 @@
 #ifndef EMU_MATH_HELPERS_MATRIX_BITWISE_H_INC_
-#define EMU_MATH_HELPERS_MATRIX_BITWISE_H_INC_
+#define EMU_MATH_HELPERS_MATRIX_BITWISE_H_INC_ 1
 
 #include "_common_matrix_helper_includes.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuMath::Helpers
 {
@@ -35,7 +36,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform matrix bitwise AND, but provided a non-EmuMath-matrix lhs_ argument.");
+			static_assert(EmuCore::TMP::get_false<Rhs_>(), "Attempted to perform matrix bitwise AND, but provided a non-EmuMath-matrix lhs_ argument.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
@@ -133,7 +134,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform matrix bitwise OR, but provided a non-EmuMath-matrix lhs_ argument.");
+			static_assert(EmuCore::TMP::get_false<Rhs_>(), "Attempted to perform matrix bitwise OR, but provided a non-EmuMath-matrix lhs_ argument.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
@@ -231,7 +232,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform matrix bitwise XOR, but provided a non-EmuMath-matrix lhs_ argument.");
+			static_assert(EmuCore::TMP::get_false<Rhs_>(), "Attempted to perform matrix bitwise XOR, but provided a non-EmuMath-matrix lhs_ argument.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
@@ -318,7 +319,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform a bitwise NOT on a matrix, but the passed matrix_ was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Matrix_>(), "Attempted to perform a bitwise NOT on a matrix, but the passed matrix_ was not an EmuMath matrix.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
@@ -395,7 +396,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to shift a matrix left, but the provided matrix_ argument was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Matrix_>(), "Attempted to shift a matrix left, but the provided matrix_ argument was not an EmuMath matrix.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Shifts_>
@@ -492,7 +493,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to shift a matrix right, but the provided matrix_ argument was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Matrix_>(), "Attempted to shift a matrix right, but the provided matrix_ argument was not an EmuMath matrix.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Shifts_>

@@ -44,12 +44,12 @@ namespace EmuMath::TMP
 		using no_ref_or_volatile_t = std::remove_reference_t<std::remove_volatile_t<T_>>;
 
 	public:
-		using type = std::conditional_t
+		using type = typename std::conditional_t
 		<
 			std::is_same_v<T_, no_ref_or_volatile_t>,
-			T_,
-			typename emu_vector_theoretical_return<Index_, no_ref_or_volatile_t>::type
-		>;
+			EmuCore::TMP::dummy_type_wrapper<T_&>,
+			emu_vector_theoretical_return<Index_, no_ref_or_volatile_t>
+		>::type;
 	};
 	template<std::size_t Index_, std::size_t Size_, typename T_>
 	struct emu_vector_theoretical_return<Index_, EmuMath::NewVector<Size_, T_>>
@@ -184,6 +184,22 @@ namespace EmuMath::TMP
 	};
 	template<class Lhs_, class Rhs_>
 	using largest_vector_t = typename largest_vector<Lhs_, Rhs_>::type;
+
+	template<class T_, bool IsEmuVector_ = EmuMath::TMP::is_emu_new_vector_v<T_>>
+	struct emu_vector_value_types
+	{
+		using value_type = std::remove_reference_t<T_>;
+		using value_type_uq = EmuCore::TMP::remove_ref_cv_t<T_>;
+	};
+	template<class T_>
+	struct emu_vector_value_types<T_, true>
+	{
+		using vector_type_uq = EmuCore::TMP::remove_ref_cv_t<T_>;
+		using value_type = typename vector_type_uq::value_type;
+		using value_type_uq = typename vector_type_uq::value_type_uq;
+	};
+	template<typename T_>
+	using emu_vector_value_type_uq = typename emu_vector_value_types<T_>::value_type_uq;
 }
 
 #endif

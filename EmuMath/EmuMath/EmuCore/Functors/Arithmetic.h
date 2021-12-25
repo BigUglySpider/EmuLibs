@@ -4,6 +4,7 @@
 #include "../ArithmeticHelpers/CommonMath.h"
 #include "../TMPHelpers/OperatorChecks.h"
 #include "../TMPHelpers/TypeComparators.h"
+#include "../TMPHelpers/Values.h"
 #include <cstddef>
 #include <functional>
 
@@ -393,7 +394,7 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform a pre-increment on a type that does not have a pre-increment operator defined, or an plus-assign operator that can take an argument of 1 or 1.0f to emulate such behaviour.");
+				static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to perform a pre-increment on a type that does not have a pre-increment operator defined, or an plus-assign operator that can take an argument of 1 or 1.0f to emulate such behaviour.");
 			}
 		}
 	};
@@ -440,7 +441,7 @@ namespace EmuCore
 				}
 				else
 				{
-					static_assert(false, "Attempted to perform a post-increment on a type that does not have a post-increment operator defined, or a plus-assign operator that can take an argument of 1 or 1.0f to emulate such behaviour.");
+					static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to perform a post-increment on a type that does not have a post-increment operator defined, or a plus-assign operator that can take an argument of 1 or 1.0f to emulate such behaviour.");
 				}
 				return out_;
 			}
@@ -488,7 +489,7 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform a pre-decrement on a type that does not have a pre-decrement operator defined, or a subtract-assign operator that can take an argument of 1 or 1.0f to emulate such behaviour.");
+				static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to perform a pre-decrement on a type that does not have a pre-decrement operator defined, or a subtract-assign operator that can take an argument of 1 or 1.0f to emulate such behaviour.");
 			}
 		}
 	};
@@ -535,7 +536,7 @@ namespace EmuCore
 				}
 				else
 				{
-					static_assert(false, "Attempted to perform a post-decrement on a type that does not have a post-decrement operator defined, or a subtract-assign operator that can take an argument of 1 or 1.0f to emulate such behaviour.");
+					static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to perform a post-decrement on a type that does not have a post-decrement operator defined, or a subtract-assign operator that can take an argument of 1 or 1.0f to emulate such behaviour.");
 				}
 				return out_;
 			}

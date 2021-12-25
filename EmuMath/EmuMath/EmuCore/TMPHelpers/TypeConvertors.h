@@ -441,6 +441,12 @@ namespace EmuCore::TMP
 	{
 		return static_cast<std::remove_reference_t<T_>&>(ref_);
 	}
+
+	template<typename T_>
+	struct dummy_type_wrapper
+	{
+		using type = T_;
+	};
 }
 
 #endif

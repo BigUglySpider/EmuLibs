@@ -3,6 +3,7 @@
 
 #include "_underlying_template_helpers/_common_underlying_simd_template_helper_includes.h"
 #include "_underlying_template_helpers/_simd_helpers_underlying_tmp.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD::TMP
 {
@@ -19,7 +20,7 @@ namespace EmuSIMD::TMP
 		}
 		else
 		{
-			static_assert(false, "Invalid SIMD register width provided. Supported widths: 128, 256, 512.");
+			static_assert(EmuCore::TMP::get_false<std::size_t, Width_>(), "Invalid SIMD register width provided. Supported widths: 128, 256, 512.");
 			return false;
 		}
 	}

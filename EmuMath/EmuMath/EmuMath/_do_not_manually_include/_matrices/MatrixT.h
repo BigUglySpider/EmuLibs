@@ -3,6 +3,7 @@
 
 #include "MatrixHelpers.h"
 #include "MatrixInfo.h"
+#include "../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuMath
 {
@@ -146,12 +147,12 @@ namespace EmuMath
 				}
 				else
 				{
-					static_assert(false, "Attempted to construct an EmuMath matrix using scalar arguments, but at least one of the provided arguments could not be used to construct an element within the matrix.");
+					static_assert(EmuCore::TMP::get_false<ScalarArgs_...>(), "Attempted to construct an EmuMath matrix using scalar arguments, but at least one of the provided arguments could not be used to construct an element within the matrix.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to construct an EmuMath matrix using scalar arguments, but the provided number of arguments did not match the number of elements within the matrix.");
+				static_assert(EmuCore::TMP::get_false<ScalarArgs_...>(), "Attempted to construct an EmuMath matrix using scalar arguments, but the provided number of arguments did not match the number of elements within the matrix.");
 			}
 		}
 #pragma endregion
@@ -166,7 +167,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Failed to retrieve an EmuMath matrix element due to invalid indices being provided.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, RowIndex_>(), "Failed to retrieve an EmuMath matrix element due to invalid indices being provided.");
 			}
 		}
 		template<std::size_t ColumnIndex_, std::size_t RowIndex_>
@@ -178,7 +179,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Failed to retrieve an EmuMath matrix element due to invalid indices being provided.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, RowIndex_>, "Failed to retrieve an EmuMath matrix element due to invalid indices being provided.");
 			}
 		}
 		[[nodiscard]] constexpr inline raw_value_type& at(const std::size_t columnIndex_, const std::size_t rowIndex_)
@@ -236,7 +237,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to access a major element within an EmuMath matrix using an invalid MajorIndex_.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, MajorIndex_>(), "Attempted to access a major element within an EmuMath matrix using an invalid MajorIndex_.");
 			}
 		}
 		template<std::size_t MajorIndex_>
@@ -248,7 +249,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to access a major element within an EmuMath matrix using an invalid MajorIndex_.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, MajorIndex_>(), "Attempted to access a major element within an EmuMath matrix using an invalid MajorIndex_.");
 			}
 		}
 
@@ -749,7 +750,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to convert an EmuMath matrix to another matrix type via AsMatrix, but the provided TargetCastMatrix_ type was not an EmuMath matrix.");
+				static_assert(EmuCore::TMP::get_false<TargetCastMatrix_>(), "Attempted to convert an EmuMath matrix to another matrix type via AsMatrix, but the provided TargetCastMatrix_ type was not an EmuMath matrix.");
 			}
 		}
 #pragma endregion
@@ -1873,13 +1874,13 @@ namespace EmuMath
 				}
 				else
 				{
-					static_assert(false, "Provided an invalid ColumnIndex_ when attempting to access a row of an EmuMath matrix.");
+					static_assert(EmuCore::TMP::get_false<std::size_t, RowIndex_>(), "Provided an invalid ColumnIndex_ when attempting to access a row of an EmuMath matrix.");
 					return false;
 				}
 			}
 			else
 			{
-				static_assert(false, "Provided an invalid ColumnIndex_ when attempting to access a column of an EmuMath matrix.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, RowIndex_>(), "Provided an invalid ColumnIndex_ when attempting to access a column of an EmuMath matrix.");
 				return false;
 			}
 		}

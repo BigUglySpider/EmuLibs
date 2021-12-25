@@ -537,6 +537,20 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 	}
 
+	template<template<class...> class FuncT_, class OutVector_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgIndex_, class...Args_>
+	constexpr inline void _vector_mutate_with_func_template_no_func_passed(OutVector_& out_vector_, Args_&&...args_)
+	{
+		if constexpr (EmuCore::TMP::valid_template_args_v<FuncT_, EmuMath::TMP::emu_vector_value_type_uq<Args_>...>)
+		{
+			using Func_ = FuncT_<EmuMath::TMP::emu_vector_value_type_uq<Args_>...>;
+			_vector_mutate_no_func_passed<Func_, OutVector_, BeginIndex_, EndIndex_, ArgIndex_>(out_vector_, std::forward<Args_>(args_)...);
+		}
+		else
+		{
+			static_assert(false, "Attempted to mutate an EmuMath Vector using a Func_ template whose template arguments are determined automatically based on unqualified arguments (or the value_type_uq of EmuMath Vector arguments). However, the provided Func_ template cannot be instantiated with said types for all provided arguments.");
+		}
+	}
+
 	template<class Func_, class OutVector_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgIndex_, class...Args_>
 	constexpr inline OutVector_ _vector_mutate_args_only(Args_&&...args_)
 	{
@@ -548,6 +562,20 @@ namespace EmuMath::Helpers::_vector_underlying
 		else
 		{
 			static_assert(false, "Attempted to mutate an EmuMath Vector without passing a func_ argument to perform mutation. This is only allowed where the provided Func_ type is default-constructible.");
+		}
+	}
+
+	template<template<class...> class FuncT_, class OutVector_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgIndex_, class...Args_>
+	constexpr inline OutVector_ _vector_mutate_with_func_template_args_only(Args_&&...args_)
+	{
+		if constexpr (EmuCore::TMP::valid_template_args_v<FuncT_, EmuMath::TMP::emu_vector_value_type_uq<Args_>...>)
+		{
+			using Func_ = FuncT_<EmuMath::TMP::emu_vector_value_type_uq<Args_>...>;
+			return _vector_mutate_args_only<Func_, OutVector_, BeginIndex_, EndIndex_, ArgIndex_>(std::forward<Args_>(args_)...);
+		}
+		else
+		{
+			static_assert(false, "Attempted to mutate an EmuMath Vector using a Func_ template whose template arguments are determined automatically based on unqualified arguments (or the value_type_uq of EmuMath Vector arguments). However, the provided Func_ template cannot be instantiated with said types for all provided arguments.");
 		}
 	}
 
@@ -600,6 +628,25 @@ namespace EmuMath::Helpers::_vector_underlying
 		else
 		{
 			static_assert(false, "Attempted to perform a hybrid copy/mutate function on an EmuMath Vector without passing a func_ argument to perform mutation. This is only allowed where the provided Func_ type is default-constructible.");
+		}
+	}
+
+	template<template<class...> class FuncT_, class OutVector_, class InVector_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgIndex_, class...Args_>
+	constexpr inline void _vector_partial_mutation_copy_with_func_template_no_func_passed(OutVector_& out_vector_, InVector_&& in_vector_, Args_&&...args_)
+	{
+		if constexpr (EmuCore::TMP::valid_template_args_v<FuncT_, EmuMath::TMP::emu_vector_value_type_uq<Args_>...>)
+		{
+			using Func_ = FuncT_<EmuMath::TMP::emu_vector_value_type_uq<Args_>...>;
+			_vector_partial_mutation_copy_no_func_passed<Func_, OutVector_, InVector_, BeginIndex_, EndIndex_, ArgIndex_>
+			(
+				out_vector_,
+				std::forward<InVector_>(in_vector_),
+				std::forward<Args_>(args_)...
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to copy and partially mutate an EmuMath Vector using a Func_ template whose template arguments are determined automatically based on unqualified arguments (or the value_type_uq of EmuMath Vector arguments). However, the provided Func_ template cannot be instantiated with said types for all provided arguments.");
 		}
 	}
 
@@ -665,6 +712,24 @@ namespace EmuMath::Helpers::_vector_underlying
 		else
 		{
 			static_assert(false, "Attempted to create a new EmuMath Vector for output as a hybrid copy/mutate function, but the desired output type is not default-constructible. Output Vectors must be default-constructible.");
+		}
+	}
+
+	template<template<class...> class FuncT_, std::size_t Size_, typename T_, class InVector_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgIndex_, class...Args_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, T_> _vector_partial_mutation_copy_with_func_template_args_only(InVector_&& in_vector_, Args_&&...args_)
+	{
+		if constexpr (EmuCore::TMP::valid_template_args_v<FuncT_, EmuMath::TMP::emu_vector_value_type_uq<Args_>...>)
+		{
+			using Func_ = FuncT_<EmuMath::TMP::emu_vector_value_type_uq<Args_>...>;
+			return _vector_partial_mutation_copy_args_only<Size_, T_, Func_, InVector_, BeginIndex_, EndIndex_, ArgIndex_>
+			(
+				std::forward<InVector_>(in_vector_),
+				std::forward<Args_>(args_)...
+			);
+		}
+		else
+		{
+			static_assert(false, "Attempted to copy and partially mutate an EmuMath Vector using a Func_ template whose template arguments are determined automatically based on unqualified arguments (or the value_type_uq of EmuMath Vector arguments). However, the provided Func_ template cannot be instantiated with said types for all provided arguments.");
 		}
 	}
 

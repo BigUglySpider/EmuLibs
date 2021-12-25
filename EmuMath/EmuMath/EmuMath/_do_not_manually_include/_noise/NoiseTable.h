@@ -7,6 +7,7 @@
 #include "NoiseTMP.h"
 #include "../../../EmuCore/TMPHelpers/TypeComparators.h"
 #include "../../../EmuCore/TMPHelpers/TypeConvertors.h"
+#include "../../../EmuCore/TMPHelpers/Values.h"
 #include <ostream>
 #include <sstream>
 #include <vector>
@@ -143,7 +144,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to retrieve an index of an impossibly-dimensioned EmuMath::NoiseTable.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, Size_>, "Attempted to retrieve an index of an impossibly-dimensioned EmuMath::NoiseTable.");
 			}
 		}
 
@@ -406,7 +407,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Stream append of EmuMath::NoiseTable not available for any dimensions other than: 1, 2, 3.");
+				static_assert(EmuCore::TMP::get_false<Stream_>(), "Stream append of EmuMath::NoiseTable not available for any dimensions other than: 1, 2, 3.");
 			}
 			return str_;
 		}
@@ -430,7 +431,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to get the size of an EmuMath NoiseTable in a specific dimension, but the provided dimension index exceeded the table's dimensions.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, Layer_>(), "Attempted to get the size of an EmuMath NoiseTable in a specific dimension, but the provided dimension index exceeded the table's dimensions.");
 			}
 		}
 
@@ -687,7 +688,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to generate an impossibly-dimensioned EmuMath::NoiseTable.");
+				static_assert(EmuCore::TMP::get_false<Generator_>(), "Attempted to generate an impossibly-dimensioned EmuMath::NoiseTable.");
 			}
 		}
 
@@ -728,7 +729,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "NoiseTable::_multiply_all not implemented for instance dimensions.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, num_dimensions>(), "NoiseTable::_multiply_all not implemented for instance dimensions.");
 			}
 		}
 
@@ -772,7 +773,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "NoiseTable::_set_all not implemented for instance dimensions.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, num_dimensions>(), "NoiseTable::_set_all not implemented for instance dimensions.");
 			}
 		}
 	};

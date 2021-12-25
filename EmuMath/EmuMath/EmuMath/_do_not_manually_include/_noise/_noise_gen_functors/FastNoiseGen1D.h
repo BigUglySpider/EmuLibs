@@ -3,6 +3,7 @@
 
 #include "_common_fast_noise_gen_functors_includes.h"
 #include "../../../../EmuSIMD/SIMDHelpers.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuMath::Validity
 {
@@ -15,7 +16,7 @@ namespace EmuMath::Validity
 		}
 		else
 		{
-			static_assert(false, "Provided an unsupported register for fast_noise_1d. There is only support for the following floating-point SIMD registers: __m128.");
+			static_assert(EmuCore::TMP::get_false<Reg_>(), "Provided an unsupported register for fast_noise_1d. There is only support for the following floating-point SIMD registers: __m128.");
 			return false;
 		}
 	}
@@ -30,7 +31,7 @@ namespace EmuMath::Functors
 		static_assert(EmuMath::Validity::_assert_fast_noise_1d_valid_register<Register_>(), "Invalid Register_ type argument provided to EmuMath::Functors::make_fast_noise_1d.");
 		constexpr make_fast_noise_1d()
 		{
-			static_assert(false, "Attempted to construct a make_fast_noise_1d instance for a NoiseType that has not been implemented.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to construct a make_fast_noise_1d instance for a NoiseType that has not been implemented.");
 		}
 	};
 

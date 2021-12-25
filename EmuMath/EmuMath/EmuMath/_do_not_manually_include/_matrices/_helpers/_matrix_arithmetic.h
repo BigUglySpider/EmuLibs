@@ -3,6 +3,7 @@
 
 #include "_common_matrix_helper_includes.h"
 #include "_matrix_reinterpretations.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuMath::Helpers
 {
@@ -26,7 +27,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempting to perform an operation on an EmuMath matrix which takes a rhs_ argument, but the lhs_ argument was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Func_>(), "Attempting to perform an operation on an EmuMath matrix which takes a rhs_ argument, but the lhs_ argument was not an EmuMath matrix.");
 		}
 	}
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_, class Func_>
@@ -241,7 +242,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform matrix addition, but provided a non-EmuMath-matrix lhs_ argument.");
+			static_assert(EmuCore::TMP::get_false<Rhs_>(), "Attempted to perform matrix addition, but provided a non-EmuMath-matrix lhs_ argument.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
@@ -342,7 +343,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform matrix subtraction, but provided a non-EmuMath-matrix lhs_ argument.");
+			static_assert(EmuCore::TMP::get_false<Rhs_>(), "Attempted to perform matrix subtraction, but provided a non-EmuMath-matrix lhs_ argument.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
@@ -444,7 +445,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform basic matrix multiplication, but provided a non-EmuMath-matrix lhs_ argument.");
+			static_assert(EmuCore::TMP::get_false<Rhs_>(), "Attempted to perform basic matrix multiplication, but provided a non-EmuMath-matrix lhs_ argument.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
@@ -547,7 +548,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform basic matrix division, but provided a non-EmuMath-matrix lhs_ argument.");
+			static_assert(EmuCore::TMP::get_false<Rhs_>(), "Attempted to perform basic matrix division, but provided a non-EmuMath-matrix lhs_ argument.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
@@ -649,7 +650,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform basic matrix modulo division, but provided a non-EmuMath-matrix lhs_ argument.");
+			static_assert(EmuCore::TMP::get_false<Rhs_>(), "Attempted to perform basic matrix modulo division, but provided a non-EmuMath-matrix lhs_ argument.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
@@ -764,17 +765,17 @@ namespace EmuMath::Helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to multiply a left-hand EmuMath matrix and right-hand EmuMath vector, but the provided vector is not a valid size. The vector must have a size equal to the matrix's number of rows, or the matrix's number of rows - 1, to be correctly reinterpreted as a single-column matrix.");
+					static_assert(EmuCore::TMP::get_false<RhsVector_>(), "Attempted to multiply a left-hand EmuMath matrix and right-hand EmuMath vector, but the provided vector is not a valid size. The vector must have a size equal to the matrix's number of rows, or the matrix's number of rows - 1, to be correctly reinterpreted as a single-column matrix.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to multiply a matrix and vector, but the provided rhs_vector_ argument was not an EmuMath vector.");
+				static_assert(EmuCore::TMP::get_false<RhsVector_>(), "Attempted to multiply a matrix and vector, but the provided rhs_vector_ argument was not an EmuMath vector.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to multiply a matrix and vector, but the provided lhs_matrix_ argument was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<RhsVector_>(), "Attempted to multiply a matrix and vector, but the provided lhs_matrix_ argument was not an EmuMath matrix.");
 		}
 	}
 	template<class LhsMatrix_, class RhsVector_>
@@ -790,7 +791,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to multiply a matrix and vector, but the provided rhs_vector_ argument was not an EmuMath vector.");
+			static_assert(EmuCore::TMP::get_false<RhsVector_>(), "Attempted to multiply a matrix and vector, but the provided rhs_vector_ argument was not an EmuMath vector.");
 		}
 	}
 
@@ -838,12 +839,12 @@ namespace EmuMath::Helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to multiply two EmuMath matrices which can not be multiplied together. When multiplying matrices, the left-hand matrix must have the same number of columns as the right-hand matrix's number of rows.");
+				static_assert(EmuCore::TMP::get_false<Rhs_>(), "Attempted to multiply two EmuMath matrices which can not be multiplied together. When multiplying matrices, the left-hand matrix must have the same number of columns as the right-hand matrix's number of rows.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform matrix multiplication with a lhs_ argument that is not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Rhs_>(), "Attempted to perform matrix multiplication with a lhs_ argument that is not an EmuMath matrix.");
 		}
 	}
 	template<typename out_contained_type, class LhsMatrix_, class Rhs_>
@@ -907,12 +908,12 @@ namespace EmuMath::Helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to mutate a matrix with an invalid mutation Func_. The provided Func_ must return a type castable to the provided out_contained_type (defaults to the passed matrix's value_type if not provided). Additionally, the Func_ must be callable via operator() with a single argument - a constant reference to the matrix's raw_value_type. This does not have to be the same type, as long as an implicit cast is possible. Warnings for unusual inputs (e.g. passing floats as int value arguments) will not be suppressed.");
+				static_assert(EmuCore::TMP::get_false<Func_>(), "Attempted to mutate a matrix with an invalid mutation Func_. The provided Func_ must return a type castable to the provided out_contained_type (defaults to the passed matrix's value_type if not provided). Additionally, the Func_ must be callable via operator() with a single argument - a constant reference to the matrix's raw_value_type. This does not have to be the same type, as long as an implicit cast is possible. Warnings for unusual inputs (e.g. passing floats as int value arguments) will not be suppressed.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to mutate a matrix, but the passed in_matrix_ was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Func_>(), "Attempted to mutate a matrix, but the passed in_matrix_ was not an EmuMath matrix.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class Func_, class InMatrix_>
@@ -1010,12 +1011,12 @@ namespace EmuMath::Helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to mutate a matrix, but the passed out_matrix_ was not an EmuMath matrix.");
+				static_assert(EmuCore::TMP::get_false<Func_>(), "Attempted to mutate a matrix, but the passed out_matrix_ was not an EmuMath matrix.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to mutate a matrix, but the passed in_matrix_ was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Func_>(), "Attempted to mutate a matrix, but the passed in_matrix_ was not an EmuMath matrix.");
 		}
 	}
 
@@ -1038,7 +1039,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to negate a matrix, but the passed matrix_ was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Matrix_>(), "Attempted to negate a matrix, but the passed matrix_ was not an EmuMath matrix.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
@@ -1102,7 +1103,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to floor a matrix, but the passed matrix_ was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Matrix_>(), "Attempted to floor a matrix, but the passed matrix_ was not an EmuMath matrix.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
@@ -1166,7 +1167,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to ceil a matrix, but the passed matrix_ was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Matrix_>(), "Attempted to ceil a matrix, but the passed matrix_ was not an EmuMath matrix.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
@@ -1230,7 +1231,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to trunc a matrix, but the passed matrix_ was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Matrix_>(), "Attempted to trunc a matrix, but the passed matrix_ was not an EmuMath matrix.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_>
@@ -1305,7 +1306,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to find the minimum of elements between a lhs_matrix_ and a rhs_ arg, but the passed lhs_matrix_ was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Rhs_>(), "Attempted to find the minimum of elements between a lhs_matrix_ and a rhs_ arg, but the passed lhs_matrix_ was not an EmuMath matrix.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
@@ -1391,7 +1392,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to retrieve the minimum value's index within a matrix, but the provided matrix_ argument was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Matrix_>(), "Attempted to retrieve the minimum value's index within a matrix, but the provided matrix_ argument was not an EmuMath matrix.");
 		}
 	}
 
@@ -1423,12 +1424,12 @@ namespace EmuMath::Helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to retrieve the minimum value within a matrix, but the provided Out_ type is not a valid conversion for the provided matrix's elements.");
+				static_assert(EmuCore::TMP::get_false<Out_>(), "Attempted to retrieve the minimum value within a matrix, but the provided Out_ type is not a valid conversion for the provided matrix's elements.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to retrieve the minimum value within a matrix, but the provided matrix_ argument was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Out_>(), "Attempted to retrieve the minimum value within a matrix, but the provided matrix_ argument was not an EmuMath matrix.");
 		}
 	}
 	template<class Matrix_>
@@ -1456,7 +1457,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to retrieve the maximum value's index within a matrix, but the provided matrix_ argument was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Matrix_>(), "Attempted to retrieve the maximum value's index within a matrix, but the provided matrix_ argument was not an EmuMath matrix.");
 		}
 	}
 
@@ -1488,12 +1489,12 @@ namespace EmuMath::Helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to retrieve the maximum value within a matrix, but the provided Out_ type is not a valid conversion for the provided matrix's elements.");
+				static_assert(EmuCore::TMP::get_false<Out_>(), "Attempted to retrieve the maximum value within a matrix, but the provided Out_ type is not a valid conversion for the provided matrix's elements.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to retrieve the maximum value within a matrix, but the provided matrix_ argument was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Out_>(), "Attempted to retrieve the maximum value within a matrix, but the provided matrix_ argument was not an EmuMath matrix.");
 		}
 	}
 	template<class Matrix_>
@@ -1532,7 +1533,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to find the maximum of elements between a lhs_matrix_ and a rhs_ arg, but the passed lhs_matrix_ was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Rhs_>(), "Attempted to find the maximum of elements between a lhs_matrix_ and a rhs_ arg, but the passed lhs_matrix_ was not an EmuMath matrix.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class LhsMatrix_, class Rhs_>
@@ -1629,7 +1630,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to clamp the elements of an EmuMath matrix to minimum values, but the passed matrix_ was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Matrix_>(), "Attempted to clamp the elements of an EmuMath matrix to minimum values, but the passed matrix_ was not an EmuMath matrix.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Min_>
@@ -1726,7 +1727,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to clamp the elements of an EmuMath matrix to maximum values, but the passed matrix_ was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Matrix_>(), "Attempted to clamp the elements of an EmuMath matrix to maximum values, but the passed matrix_ was not an EmuMath matrix.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Max_>
@@ -1830,7 +1831,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to clamp the elements of an EmuMath matrix, but the passed matrix_ was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<Matrix_>(), "Attempted to clamp the elements of an EmuMath matrix, but the passed matrix_ was not an EmuMath matrix.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class Matrix_, class Min_, class Max_>
@@ -1941,7 +1942,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to lineraly interpolate the elements of an EmuMath matrix, but the passed matrix_a_ was not an EmuMath matrix.");
+			static_assert(EmuCore::TMP::get_false<B_>(), "Attempted to lineraly interpolate the elements of an EmuMath matrix, but the passed matrix_a_ was not an EmuMath matrix.");
 		}
 	}
 	template<typename out_contained_type, bool OutColumnMajor_, class MatrixA_, class B_, class T_>

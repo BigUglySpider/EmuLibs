@@ -5,6 +5,7 @@
 #include "NoiseFunctors.h"
 #include "_noise_info/NoisePermutationInfo.h"
 #include "_noise_info/FractalNoiseInfo.h"
+#include "../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuMath
 {
@@ -36,7 +37,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Cannot created correctly sized vector for invalidly sized EmuMath::NoiseTableOptions.");
+				static_assert(EmuCore::TMP::get_false<X_>(), "Cannot created correctly sized vector for invalidly sized EmuMath::NoiseTableOptions.");
 				return {};
 			}
 		}

@@ -159,6 +159,23 @@ namespace EmuMath
 		{
 			using type = void;
 		};
+
+		template<typename In_>
+		[[nodiscard]] constexpr inline std::conditional_t<std::is_constructible_v<stored_type, In_>, In_&&, stored_type> _do_stored_type_construction(In_&& in_)
+		{
+			if constexpr (std::is_constructible_v<stored_type, In_>)
+			{
+				return std::forward<In_>(in_);
+			}
+			else if constexpr (std::is_convertible_v<In_, stored_type>)
+			{
+				return static_cast<stored_type>(in_);
+			}
+			else
+			{
+				static_assert(false, "Attempted to construct an EmuMath Vector with an input type that is neither usable in construction of or conversion to the Vector's stored_type.");
+			}
+		}
 #pragma endregion
 
 #pragma region CONSTRUCTORS

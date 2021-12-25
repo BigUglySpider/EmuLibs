@@ -4,6 +4,7 @@
 #include "../../Matrix.h"
 #include "../../../EmuSIMD/SIMDHelpers.h"
 #include "../../FastVector.h"
+#include "../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuMath
 {
@@ -260,12 +261,12 @@ namespace EmuMath
 				}
 				else
 				{
-					static_assert(false, "Invalid Out_ type provided to EmuMath::FastMatrix4x4f_CM::at.");
+					static_assert(EmuCore::TMP::get_false<Out_>(), "Invalid Out_ type provided to EmuMath::FastMatrix4x4f_CM::at.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Invalid indices provided to EmuMath::FastMatrix4x4f_CM::at<ColumnIndex_, RowIndex_>.");
+				static_assert(EmuCore::TMP::get_false<Out_>(), "Invalid indices provided to EmuMath::FastMatrix4x4f_CM::at<ColumnIndex_, RowIndex_>.");
 			}
 		}
 		/// <summary> Returns a copy of the major register at the provided major index. </summary>
@@ -279,7 +280,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Invalid Major Index provided to EmuMath::FastMatrix4x4f_CM::at<MajorIndex_>.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, MajorIndex_>(), "Invalid Major Index provided to EmuMath::FastMatrix4x4f_CM::at<MajorIndex_>.");
 			}
 		}
 
@@ -336,7 +337,7 @@ namespace EmuMath
 				}
 				else
 				{
-					static_assert(false, "Invalid out_contained_type provided to EmuMath::FastMatrix4x4f_CM::Store.");
+					static_assert(EmuCore::TMP::get_false<out_contained_type>(), "Invalid out_contained_type provided to EmuMath::FastMatrix4x4f_CM::Store.");
 				}
 			}
 		}
@@ -371,7 +372,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to get a column with an invalid index from an EmuMath::FastMatrix4x4f_CM.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, Column_>(), "Attempted to get a column with an invalid index from an EmuMath::FastMatrix4x4f_CM.");
 			}
 		}
 		/// <summary> Provides an easily-readable EmuMath vector representing the column at the provided index. </summary>
@@ -397,7 +398,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to get a column with an invalid index from an EmuMath::FastMatrix4x4f_CM.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, Row_>(), "Attempted to get a column with an invalid index from an EmuMath::FastMatrix4x4f_CM.");
 			}
 		}
 		/// <summary>
@@ -1019,7 +1020,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to retrieve an EmuMath::FastMatrix4x4f_CM's Min value using an output type that cannot be converted to from float.");
+				static_assert(EmuCore::TMP::get_false<Out_>(), "Attempted to retrieve an EmuMath::FastMatrix4x4f_CM's Min value using an output type that cannot be converted to from float.");
 			}
 		}
 
@@ -1037,7 +1038,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to retrieve an EmuMath::FastMatrix4x4f_CM's Max value using an output type that cannot be converted to from float.");
+				static_assert(EmuCore::TMP::get_false<Out_>(), "Attempted to retrieve an EmuMath::FastMatrix4x4f_CM's Max value using an output type that cannot be converted to from float.");
 			}
 		}
 
@@ -2611,7 +2612,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Invalid column and/or row index passed to EmuMath::FastMatrix4x4f_CM::ExclusiveSubmatrix.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, ExcludeColumn_>(), "Invalid column and/or row index passed to EmuMath::FastMatrix4x4f_CM::ExclusiveSubmatrix.");
 			}
 		}
 
@@ -3128,7 +3129,7 @@ namespace EmuMath
 				}
 				else
 				{
-					static_assert(false, "Provided an invalid Row Index for accessing an EmuMath::FastMatrix4x4f_CM. 0-3 (inclusive) is the valid Row Index range.");
+					static_assert(EmuCore::TMP::get_false<std::size_t, ColumnIndex_>(), "Provided an invalid Row Index for accessing an EmuMath::FastMatrix4x4f_CM. 0-3 (inclusive) is the valid Row Index range.");
 					return false;
 				}
 			}
@@ -3136,11 +3137,11 @@ namespace EmuMath
 			{
 				if constexpr (RowIndex_ < 4)
 				{
-					static_assert(false, "Provided an invalid Column Index for accessing an EmuMath::FastMatrix4x4f_CM. 0-3 (inclusive) is the valid Column Index range.");
+					static_assert(EmuCore::TMP::get_false<std::size_t, ColumnIndex_>(), "Provided an invalid Column Index for accessing an EmuMath::FastMatrix4x4f_CM. 0-3 (inclusive) is the valid Column Index range.");
 				}
 				else
 				{
-					static_assert(false, "Provided invalid Column and Row indices for accessing an EmuMath::FastMAtrix4x4f_CM. 0-3 (inclusive) is the valid index range for both Columns and Rows.");
+					static_assert(EmuCore::TMP::get_false<std::size_t, ColumnIndex_>(), "Provided invalid Column and Row indices for accessing an EmuMath::FastMAtrix4x4f_CM. 0-3 (inclusive) is the valid index range for both Columns and Rows.");
 				}
 				return false;
 			}
@@ -3155,7 +3156,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Provided an invalid type to cast a value from an EmuMath::FastMatrix4x4f_CM to. The provided type must be possible to convert to from float.");
+				static_assert(EmuCore::TMP::get_false<To_>(), "Provided an invalid type to cast a value from an EmuMath::FastMatrix4x4f_CM to. The provided type must be possible to convert to from float.");
 				return false;
 			}
 		}
@@ -3169,7 +3170,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Provided an invalid type to cast to a value within an EmuMath::FastMatrix4x4f_CM. The provided type must be possible to convert to a float.");
+				static_assert(EmuCore::TMP::get_false<From_>(), "Provided an invalid type to cast to a value within an EmuMath::FastMatrix4x4f_CM. The provided type must be possible to convert to a float.");
 				return false;
 			}
 		}
@@ -3184,7 +3185,7 @@ namespace EmuMath
 			else
 			{
 				return false;
-				static_assert(false, "Provided an invalid Major Index for accessing an EmuMath::FastMatrix4x4f_CM. 0-3 (inclusive) is the valid Major Index range, the same as its Column range.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, MajorIndex_>(), "Provided an invalid Major Index for accessing an EmuMath::FastMatrix4x4f_CM. 0-3 (inclusive) is the valid Major Index range, the same as its Column range.");
 			}
 		}
 #pragma endregion
@@ -3230,7 +3231,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to pass an invalid ExcludeRow_ index to EmuMath::FastMatrix4x4f_CM::_index_excluding_shuffle.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, ExcludeRow_>(), "Attempted to pass an invalid ExcludeRow_ index to EmuMath::FastMatrix4x4f_CM::_index_excluding_shuffle.");
 			}
 		}
 #pragma endregion

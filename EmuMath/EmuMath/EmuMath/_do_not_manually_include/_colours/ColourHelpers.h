@@ -3,6 +3,7 @@
 
 #include "_helpers_underlying/_colour_helpers_underlying_common_includes.h"
 #include "_helpers_underlying/_colour_helpers_underlying.h"
+#include "../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuMath::Helpers
 {
@@ -264,7 +265,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to invert a colour, but provided a non-EmuMath-Colour in_ type.");
+			static_assert(EmuCore::TMP::get_false<InColour_>(), "Attempted to invert a colour, but provided a non-EmuMath-Colour in_ type.");
 		}
 	}
 	template<bool IncludeAlpha_ = false, class InOutColour_>
@@ -298,7 +299,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to invert a colour, but provided a non-EmuMath-Colour in_ type.");
+			static_assert(EmuCore::TMP::get_false<InOutColour_>(), "Attempted to invert a colour, but provided a non-EmuMath-Colour in_ type.");
 		}
 	}
 
@@ -346,12 +347,12 @@ namespace EmuMath::Helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to wrap an EmuMath Colour, but the provided OutColour_ type was not an EmuMath colour.");
+				static_assert(EmuCore::TMP::get_false<OutColour_>(), "Attempted to wrap an EmuMath Colour, but the provided OutColour_ type was not an EmuMath colour.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to wrap an EmuMath Colour, but the provided in_ colour was not an EmuMath colour.");
+			static_assert(EmuCore::TMP::get_false<OutColour_>(), "Attempted to wrap an EmuMath Colour, but the provided in_ colour was not an EmuMath colour.");
 		}
 	}
 	template<class OutColour_, class InColour_>
@@ -390,12 +391,12 @@ namespace EmuMath::Helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to wrap an EmuMath Colour, but the provided OutColour_ type was not an EmuMath colour.");
+				static_assert(EmuCore::TMP::get_false<OutColour_>(), "Attempted to wrap an EmuMath Colour, but the provided OutColour_ type was not an EmuMath colour.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to wrap an EmuMath Colour, but the provided in_ colour was not an EmuMath colour.");
+			static_assert(EmuCore::TMP::get_false<OutColour_>(), "Attempted to wrap an EmuMath Colour, but the provided in_ colour was not an EmuMath colour.");
 		}
 	}
 
@@ -443,12 +444,12 @@ namespace EmuMath::Helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to clamp an EmuMath Colour, but the provided OutColour_ type was not an EmuMath colour.");
+				static_assert(EmuCore::TMP::get_false<OutColour_>(), "Attempted to clamp an EmuMath Colour, but the provided OutColour_ type was not an EmuMath colour.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to clamp an EmuMath Colour, but the provided in_ colour was not an EmuMath colour.");
+			static_assert(EmuCore::TMP::get_false<OutColour_>(), "Attempted to clamp an EmuMath Colour, but the provided in_ colour was not an EmuMath colour.");
 		}
 	}
 	template<class OutColour_, class InColour_>
@@ -487,12 +488,12 @@ namespace EmuMath::Helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to clamp an EmuMath Colour, but the provided OutColour_ type was not an EmuMath colour.");
+				static_assert(EmuCore::TMP::get_false<OutColour_>(), "Attempted to clamp an EmuMath Colour, but the provided OutColour_ type was not an EmuMath colour.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to clamp an EmuMath Colour, but the provided in_ colour was not an EmuMath colour.");
+			static_assert(EmuCore::TMP::get_false<OutColour_>(), "Attempted to clamp an EmuMath Colour, but the provided in_ colour was not an EmuMath colour.");
 		}
 	}
 

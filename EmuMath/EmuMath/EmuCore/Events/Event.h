@@ -7,6 +7,7 @@
 #include <unordered_map>
 
 #include "EventDispatcher.h"
+#include "../TMPHelpers/Values.h"
 
 namespace EmuCore::Events
 {
@@ -135,14 +136,15 @@ namespace EmuCore::Events
 		template<typename = std::enable_if_t<std::is_default_constructible_v<listener_type>>>
 		inline id_type ConstructListener()
 		{
+			static_assert
+			(
+				std::is_default_constructible_v<listener_type>,
+				"Attempted to default-construct a listener for an EmuCore Event with invalid construction arguments."
+			);
 			if constexpr (std::is_default_constructible_v<listener_type>)
 			{
 				listener_type listener_ = listener_type();
 				return AddListener(listener_);
-			}
-			else
-			{
-				static_assert(false, "Attempted to default-construct a listener for an EmuCore Event with invalid construction arguments.");
 			}
 		}
 		/// <summary>
@@ -152,14 +154,15 @@ namespace EmuCore::Events
 		template<class FirstArg_, class...AdditionalArgs_, typename = std::enable_if_t<std::is_constructible_v<listener_type, FirstArg_, AdditionalArgs_...>>>
 		inline id_type ConstructListener(FirstArg_ firstArg_, AdditionalArgs_...additionalArgs_)
 		{
+			static_assert
+			(
+				std::is_constructible_v<listener_type, FirstArg_, AdditionalArgs_...>,
+				"Attempted to construct a listener for an EmuCore Event with invalid construction arguments."
+			);
 			if constexpr (std::is_constructible_v<listener_type, FirstArg_, AdditionalArgs_...>)
 			{
 				listener_type listener_ = listener_type(firstArg_, additionalArgs_...);
 				return AddListener(listener_);
-			}
-			else
-			{
-				static_assert(false, "Attempted to construct a listener for an EmuCore Event with invalid construction arguments.");
 			}
 		}
 

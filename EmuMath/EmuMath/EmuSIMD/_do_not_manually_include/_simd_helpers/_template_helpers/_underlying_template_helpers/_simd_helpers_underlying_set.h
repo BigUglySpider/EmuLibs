@@ -2,6 +2,7 @@
 #define EMU_SIMD_TEMPLATE_HELPERS_UNDERLYING_SET_H_INC_ 1
 
 #include "_common_underlying_simd_template_helper_includes.h"
+#include "../../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD::_underlying_simd_helpers
 {
@@ -174,24 +175,24 @@ namespace EmuSIMD::_underlying_simd_helpers
 						// UNSUPPORTED
 						static_assert
 						(
-							false,
+							EmuCore::TMP::get_false<Register_>(),
 							"Attempted to set an integral SIMD register via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register."
 						);
 					}
 				}
 				else
 				{
-					static_assert(false, "Attempted to set an integral SIMD register via EmuSIMD helpers, but at least one provided argument could not be converted to the type being used to set the register.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set an integral SIMD register via EmuSIMD helpers, but at least one provided argument could not be converted to the type being used to set the register.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to set an integral SIMD register via EmuSIMD helpers, but an invalid number of arguments was provided. The following argument counts are required, with element bit-widths contained in square parantheses []: (__m128i[8]: 16), (__m128i[16]: 8), (__m128i[32]: 4), (__m128i[64]: 2), (__m256i[8]: 32), (__m256i[16]: 16), (__m256i[32]: 8), (__m256i[64]: 4), (__m512i[8]: 64), (__m512i[16]: 32), (__m512i[32] : 16), (__m512i[64]: 8).");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set an integral SIMD register via EmuSIMD helpers, but an invalid number of arguments was provided. The following argument counts are required, with element bit-widths contained in square parantheses []: (__m128i[8]: 16), (__m128i[16]: 8), (__m128i[32]: 4), (__m128i[64]: 2), (__m256i[8]: 32), (__m256i[16]: 16), (__m256i[32]: 8), (__m256i[64]: 4), (__m512i[8]: 64), (__m512i[16]: 32), (__m512i[32] : 16), (__m512i[64]: 8).");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to set an integral SIMD register via EmuSIMD helpers, but a valid integral scalar type for set casts could not be determined.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set an integral SIMD register via EmuSIMD helpers, but a valid integral scalar type for set casts could not be determined.");
 		}
 	}
 
@@ -247,12 +248,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to set a SIMD float register via EmuSIMD helpers, but at least one provided argument was not convertible to `float`.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set a SIMD float register via EmuSIMD helpers, but at least one provided argument was not convertible to `float`.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to set a SIMD float register via EmuSIMD helpers, but an invalid number of arguments was provided. The following argument counts are required: (__m128: 4), (__m256: 8), (__m512: 16).");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set a SIMD float register via EmuSIMD helpers, but an invalid number of arguments was provided. The following argument counts are required: (__m128: 4), (__m256: 8), (__m512: 16).");
 			}
 		}
 		else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128d, __m256d, __m512d>::value)
@@ -302,12 +303,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to set a SIMD double register via EmuSIMD helpers, but at least one provided argument was not convertible to `double`.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set a SIMD double register via EmuSIMD helpers, but at least one provided argument was not convertible to `double`.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to set a SIMD double register via EmuSIMD helpers, but an invalid number of arguments was provided. The following argument counts are required: (__m128d: 2), (__m256d: 4), (__m512d: 8).");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set a SIMD double register via EmuSIMD helpers, but an invalid number of arguments was provided. The following argument counts are required: (__m128d: 2), (__m256d: 4), (__m512d: 8).");
 			}
 		}
 		else
@@ -365,12 +366,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to set a SIMD register to zero via EmuSIMD helpers, but the provided SIMD register is not supported for this feature.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set a SIMD register to zero via EmuSIMD helpers, but the provided SIMD register is not supported for this feature.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to set a SIMD register to zero via EmuSIMD helpers, but the provided type was not a SIMD register type, or was not a supported SIMD type.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set a SIMD register to zero via EmuSIMD helpers, but the provided type was not a SIMD register type, or was not a supported SIMD type.");
 		}
 	}
 
@@ -399,7 +400,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to set a SIMD register of floats to the same value, but the provided Val_ was a type that cannot be converted to float.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set a SIMD register of floats to the same value, but the provided Val_ was a type that cannot be converted to float.");
 				}
 			}
 			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128d, __m256d, __m512d>::value)
@@ -421,7 +422,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to set a SIMD register of doubles to the same value, but the provided Val_ was a type that cannot be converted to double.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set a SIMD register of doubles to the same value, but the provided Val_ was a type that cannot be converted to double.");
 				}
 			}
 			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>::value)
@@ -491,22 +492,22 @@ namespace EmuSIMD::_underlying_simd_helpers
 					}
 					else
 					{
-						static_assert(false, "Attempted to set an integral SIMD register with all elements at the same value via EmuSIMD helpers, but the provided value cannot be converted to an integer of the specified bit width.");
+						static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set an integral SIMD register with all elements at the same value via EmuSIMD helpers, but the provided value cannot be converted to an integer of the specified bit width.");
 					}
 				}
 				else
 				{
-					static_assert(false, "Attempted to set an integral SIMD register with all elements at the same value via EmuSIMD helpers, but the provided per-element width is invalid.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set an integral SIMD register with all elements at the same value via EmuSIMD helpers, but the provided per-element width is invalid.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to set a SIMD register with all elements at the same value via EmuSIMD helpers, but the provided SIMD register is not supported for this feature.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set a SIMD register with all elements at the same value via EmuSIMD helpers, but the provided SIMD register is not supported for this feature.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to set a SIMD register with all elements at the same value via EmuSIMD helpers, but the provided type was not a SIMD register type, or was not a supported SIMD type.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set a SIMD register with all elements at the same value via EmuSIMD helpers, but the provided type was not a SIMD register type, or was not a supported SIMD type.");
 		}
 	}
 
@@ -999,17 +1000,17 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to set an integral SIMD register with a progressively modified value via EmuSIMD helpers, but the provided bit-width per element is invalid.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set an integral SIMD register with a progressively modified value via EmuSIMD helpers, but the provided bit-width per element is invalid.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to set a SIMD register with a progressively modified value via EmuSIMD helpers, but the provided SIMD register is not supported for this feature.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set a SIMD register with a progressively modified value via EmuSIMD helpers, but the provided SIMD register is not supported for this feature.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to set a SIMD register with a progressively modified value via EmuSIMD helpers, but the provided type was not a SIMD register type, or was not a supported SIMD type.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to set a SIMD register with a progressively modified value via EmuSIMD helpers, but the provided type was not a SIMD register type, or was not a supported SIMD type.");
 		}
 	}
 
@@ -1057,12 +1058,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to load a SIMD register from memory via EmuSIMD helpers, but the provided SIMD register type is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to load a SIMD register from memory via EmuSIMD helpers, but the provided SIMD register type is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to load a SIMD register from memory via EmuSIMD helpers, but the provided Register_ type was not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to load a SIMD register from memory via EmuSIMD helpers, but the provided Register_ type was not recognised as a supported SIMD register.");
 		}
 	}
 }

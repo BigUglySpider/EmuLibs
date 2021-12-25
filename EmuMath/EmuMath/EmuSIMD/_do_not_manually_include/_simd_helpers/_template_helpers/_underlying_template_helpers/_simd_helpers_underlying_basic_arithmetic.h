@@ -5,6 +5,7 @@
 #include "_simd_helpers_underlying_bitwise.h"
 #include "_simd_helpers_underlying_cmp.h"
 #include "_simd_helpers_underlying_set.h"
+#include "../../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD::_underlying_simd_helpers
 {
@@ -41,12 +42,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform addition of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported floating-point SIMD register.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform addition of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported floating-point SIMD register.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform addition of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type is not a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform addition of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type is not a supported SIMD register.");
 		}
 	}
 
@@ -117,17 +118,17 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to perform addition of integral SIMD registers via EmuSIMD helpers, but provided an unsupported integral SIMD register.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform addition of integral SIMD registers via EmuSIMD helpers, but provided an unsupported integral SIMD register.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform addition of integral SIMD registers via EmuSIMD helpers, but provided an invalid PerElementWidth_.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform addition of integral SIMD registers via EmuSIMD helpers, but provided an invalid PerElementWidth_.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform addition of integral SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform addition of integral SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
 		}
 	}
 #pragma endregion
@@ -165,12 +166,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform subtraction of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported floating-point SIMD register.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform subtraction of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported floating-point SIMD register.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform subtraction of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type is not a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform subtraction of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type is not a supported SIMD register.");
 		}
 	}
 
@@ -241,17 +242,17 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to perform subtraction of integral SIMD registers via EmuSIMD helpers, but provided an unsupported integral SIMD register.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform subtraction of integral SIMD registers via EmuSIMD helpers, but provided an unsupported integral SIMD register.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform subtraction of integral SIMD registers via EmuSIMD helpers, but provided an invalid PerElementWidth_.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform subtraction of integral SIMD registers via EmuSIMD helpers, but provided an invalid PerElementWidth_.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform subtraction of integral SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform subtraction of integral SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
 		}
 	}
 #pragma endregion
@@ -289,12 +290,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform multiplication of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported floating-point SIMD register.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform multiplication of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported floating-point SIMD register.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform multiplication of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type is not a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform multiplication of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type is not a supported SIMD register.");
 		}
 	}
 
@@ -341,12 +342,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform multiplication of integral SIMD registers via EmuSIMD helpers, but provided an unsupported integral SIMD register.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform multiplication of integral SIMD registers via EmuSIMD helpers, but provided an unsupported integral SIMD register.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform multiplication of integral SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform multiplication of integral SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
 		}
 	}
 
@@ -428,17 +429,17 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to perform lo multiplication of integral SIMD registers via EmuSIMD helpers, but provided an unsupported integral SIMD register.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform lo multiplication of integral SIMD registers via EmuSIMD helpers, but provided an unsupported integral SIMD register.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform lo multiplication of integral SIMD registers via EmuSIMD helpers, but provided an invalid PerElementWidth_.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform lo multiplication of integral SIMD registers via EmuSIMD helpers, but provided an invalid PerElementWidth_.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform lo multiplication of integral SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform lo multiplication of integral SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
 		}
 	}
 
@@ -456,17 +457,17 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to perform all-element multiplication of integral SIMD registers via EmuSIMD helpers, but provided a non-integral (or unsupported integral) SIMD register.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform all-element multiplication of integral SIMD registers via EmuSIMD helpers, but provided a non-integral (or unsupported integral) SIMD register.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform all-element multiplication of integral SIMD registers via EmuSIMD helpers, but provided an invalid PerElementWidth_.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform all-element multiplication of integral SIMD registers via EmuSIMD helpers, but provided an invalid PerElementWidth_.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform all-element multiplication of integral SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform all-element multiplication of integral SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
 		}
 	}
 #pragma endregion
@@ -504,12 +505,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform division of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported floating-point SIMD register.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform division of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported floating-point SIMD register.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform division of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type is not a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform division of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type is not a supported SIMD register.");
 		}
 	}
 
@@ -664,17 +665,17 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to perform division of integral SIMD registers via EmuSIMD helpers, but provided an unsupported integral SIMD register.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform division of integral SIMD registers via EmuSIMD helpers, but provided an unsupported integral SIMD register.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform division of integral SIMD registers via EmuSIMD helpers, but provided an invalid PerElementWidth_.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform division of integral SIMD registers via EmuSIMD helpers, but provided an invalid PerElementWidth_.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform division of integral SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform division of integral SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
 		}
 	}
 #pragma endregion
@@ -712,12 +713,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform modulo division of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported floating-point SIMD register.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform modulo division of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported floating-point SIMD register.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform modulo division of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type is not a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform modulo division of floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type is not a supported SIMD register.");
 		}
 	}
 
@@ -872,17 +873,17 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to perform remainder division of integral SIMD registers via EmuSIMD helpers, but provided an unsupported integral SIMD register.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform remainder division of integral SIMD registers via EmuSIMD helpers, but provided an unsupported integral SIMD register.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform remainder division of integral SIMD registers via EmuSIMD helpers, but provided an invalid PerElementWidth_.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform remainder division of integral SIMD registers via EmuSIMD helpers, but provided an invalid PerElementWidth_.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform remainder division of integral SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform remainder division of integral SIMD registers via EmuSIMD helpers, but the provided Register_ type was not a supported integral SIMD register.");
 		}
 	}
 
@@ -910,12 +911,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to negate a SIMD register via EmuSIMD helpers, but the provided SIMD register is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to negate a SIMD register via EmuSIMD helpers, but the provided SIMD register is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to negate a SIMD register via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to negate a SIMD register via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
 		}
 	}
 #pragma endregion
@@ -955,17 +956,17 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to emulate add/subtract operation of two floating-point SIMD registers which do not have a built-in addsub operation, but a mask could not be successfully generated to perform alternating operations.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate add/subtract operation of two floating-point SIMD registers which do not have a built-in addsub operation, but a mask could not be successfully generated to perform alternating operations.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to add/subtract (addsub) two SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported floating-point SIMD register.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to add/subtract (addsub) two SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported floating-point SIMD register.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to add/subtract (addsub) two SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to add/subtract (addsub) two SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -986,17 +987,17 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to emulate a add/subtract (addsub) operation of two integral SIMD registers via EmuSIMD helpers, but a mask could not be successfully created to perform alternating operations.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a add/subtract (addsub) operation of two integral SIMD registers via EmuSIMD helpers, but a mask could not be successfully created to perform alternating operations.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to emulate a add/subtract (addsub) operation of two integral SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported integral SIMD register for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a add/subtract (addsub) operation of two integral SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported integral SIMD register for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to emulate a add/subtract (addsub) operation of two integral SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a add/subtract (addsub) operation of two integral SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -1015,12 +1016,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to emulate a subtract/add (subadd) operation of two floating-point SIMD registers via EmuSIMD helpers, but a mask could not be successfully created to perform alternating operations.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a subtract/add (subadd) operation of two floating-point SIMD registers via EmuSIMD helpers, but a mask could not be successfully created to perform alternating operations.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to emulate a subtract/add (subadd) operation of two floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a subtract/add (subadd) operation of two floating-point SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -1041,17 +1042,17 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to emulate a subtract/add (subadd) operation of two integral SIMD registers via EmuSIMD helpers, but a mask could not be successfully created to perform alternating operations.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a subtract/add (subadd) operation of two integral SIMD registers via EmuSIMD helpers, but a mask could not be successfully created to perform alternating operations.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to emulate a subtract/add (subadd) operation of two integral SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported integral SIMD register for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a subtract/add (subadd) operation of two integral SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported integral SIMD register for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to emulate a subtract/add (subadd) operation of two integral SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a subtract/add (subadd) operation of two integral SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 #pragma endregion
@@ -1089,12 +1090,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to fused multiply add (fmadd) three SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported floating-point SIMD register.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply add (fmadd) three SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported floating-point SIMD register.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to fused multiply add (fmadd) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply add (fmadd) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
 		}
 	}
 	template<std::size_t PerElementWidth_, class Register_>
@@ -1110,12 +1111,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to emulate a fused multiply add (fmadd) of three integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a fused multiply add (fmadd) of three integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to fused multiply add (fmadd) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply add (fmadd) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
 		}
 	}
 
@@ -1151,12 +1152,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported floating-point SIMD register.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported floating-point SIMD register.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
 		}
 	}
 	template<std::size_t PerElementWidth_, class Register_>
@@ -1172,12 +1173,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to emulate a fused multiply subtract (fmsub) of three integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a fused multiply subtract (fmsub) of three integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
 		}
 	}
 
@@ -1213,12 +1214,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to fused multiply add/subtract (fmaddsub) three SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported floating-point SIMD register.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply add/subtract (fmaddsub) three SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported floating-point SIMD register.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to fused multiply add/subtract (fmaddsub) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply add/subtract (fmaddsub) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
 		}
 	}
 	template<std::size_t PerElementWidth_, class Register_>
@@ -1240,18 +1241,18 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to emulate a fused multiply add/subtract (fmaddsub) of three integral SIMD registers via EmuSIMD helpers, but an alternating mask could not be formed successfully.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a fused multiply add/subtract (fmaddsub) of three integral SIMD registers via EmuSIMD helpers, but an alternating mask could not be formed successfully.");
 				}
 
 			}
 			else
 			{
-				static_assert(false, "Attempted to emulate a fused multiply add/subtract (fmaddsub) of three integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a fused multiply add/subtract (fmaddsub) of three integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
 		}
 	}
 
@@ -1287,12 +1288,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to fused multiply subtract/add (fmsubadd) three SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported floating-point SIMD register.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply subtract/add (fmsubadd) three SIMD registers via EmuSIMD helpers, but the provided SIMD register is not a supported floating-point SIMD register.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to fused multiply subtract/add (fmsubadd) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply subtract/add (fmsubadd) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
 		}
 	}
 	template<std::size_t PerElementWidth_, class Register_>
@@ -1313,18 +1314,18 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to emulate a fused multiply subtract/add (fmsubadd) of three integral SIMD registers via EmuSIMD helpers, but an alternating mask could not be formed successfully.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a fused multiply subtract/add (fmsubadd) of three integral SIMD registers via EmuSIMD helpers, but an alternating mask could not be formed successfully.");
 				}
 
 			}
 			else
 			{
-				static_assert(false, "Attempted to emulate a fused multiply subtract/add (fmsubadd) of three integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to emulate a fused multiply subtract/add (fmsubadd) of three integral SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to fused multiply subtract (fmsub) three SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a support SIMD register.");
 		}
 	}
 #pragma endregion
@@ -1346,7 +1347,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else if constexpr (std::is_same_v<register_type_uq, __m512>)
 			{
-				static_assert(false, "Attempted to call a non-specific round function (round) on a __m512 SIMD register via EmuSIMD helpers. These registers are not supported for this operation. Consider the floor, trunc, or ceil operations instead.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to call a non-specific round function (round) on a __m512 SIMD register via EmuSIMD helpers. These registers are not supported for this operation. Consider the floor, trunc, or ceil operations instead.");
 			}
 			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
 			{
@@ -1358,7 +1359,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
 			{
-				static_assert(false, "Attempted to call a non-specific round function (round) on a __m512d SIMD register via EmuSIMD helpers. These registers are not supported for this operation. Consider the floor, trunc, or ceil operations instead.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to call a non-specific round function (round) on a __m512d SIMD register via EmuSIMD helpers. These registers are not supported for this operation. Consider the floor, trunc, or ceil operations instead.");
 			}
 			else if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<register_type_uq>)
 			{
@@ -1368,12 +1369,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			else
 			{
 				// Potentially requires a round but we don't know how to do it
-				static_assert(false, "Attempted to floor a SIMD register via EmuSIMD helpers, but the provided non-integral SIMD register is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to floor a SIMD register via EmuSIMD helpers, but the provided non-integral SIMD register is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to floor a SIMD register via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to floor a SIMD register via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -1415,12 +1416,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			else
 			{
 				// Potentially requires a round but we don't know how to do it
-				static_assert(false, "Attempted to floor a SIMD register via EmuSIMD helpers, but the provided non-integral SIMD register is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to floor a SIMD register via EmuSIMD helpers, but the provided non-integral SIMD register is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to floor a SIMD register via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to floor a SIMD register via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -1462,12 +1463,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			else
 			{
 				// Potentially requires a round but we don't know how to do it
-				static_assert(false, "Attempted to ceil a SIMD register via EmuSIMD helpers, but the provided non-integral SIMD register is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to ceil a SIMD register via EmuSIMD helpers, but the provided non-integral SIMD register is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to ceil a SIMD register via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to ceil a SIMD register via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -1509,12 +1510,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			else
 			{
 				// Potentially requires a round but we don't know how to do it
-				static_assert(false, "Attempted to truncate a SIMD register via EmuSIMD helpers, but the provided non-integral SIMD register is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to truncate a SIMD register via EmuSIMD helpers, but the provided non-integral SIMD register is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to truncate a SIMD register via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to truncate a SIMD register via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 #pragma endregion
@@ -1698,17 +1699,17 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to find the minimum elements in two SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to find the minimum elements in two SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to find the minimum elements in two SIMD registers via EmuSIMD registers, but the passed Register_ type is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to find the minimum elements in two SIMD registers via EmuSIMD registers, but the passed Register_ type is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to find the minimum elements in two SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to find the minimum elements in two SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -1890,17 +1891,17 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to find the maximum elements in two SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to find the maximum elements in two SIMD registers via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to find the maximum elements in two SIMD registers via EmuSIMD registers, but the passed Register_ type is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to find the maximum elements in two SIMD registers via EmuSIMD registers, but the passed Register_ type is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to find the maximum elements in two SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to find the maximum elements in two SIMD registers via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -1914,7 +1915,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to clamp the values in a SIMD register to a minimum amount, but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to clamp the values in a SIMD register to a minimum amount, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -1928,7 +1929,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to clamp the values in a SIMD register to a maximum amount, but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to clamp the values in a SIMD register to a maximum amount, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -1946,7 +1947,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 		else
 		{
-			static_assert(false, "Attempted to clamp the values in a SIMD register to an inclusive min:max range, but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to clamp the values in a SIMD register to an inclusive min:max range, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 #pragma endregion

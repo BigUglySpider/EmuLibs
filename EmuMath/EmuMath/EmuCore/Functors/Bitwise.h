@@ -2,6 +2,7 @@
 #define EMU_CORE_BITWISE_FUNCTORS_H_INC_ 1
 
 #include "../TMPHelpers/TypeConvertors.h"
+#include "../TMPHelpers/Values.h"
 #include <cstddef>
 #include <functional>
 
@@ -195,7 +196,7 @@ namespace EmuCore
 				}
 				else
 				{
-					static_assert(false, "Attempted to left-shift an unspecialised non-integral arithmetic type via EmuCore::do_left_shift.");
+					static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to left-shift an unspecialised non-integral arithmetic type via EmuCore::do_left_shift.");
 				}
 			}
 			else
@@ -293,7 +294,7 @@ namespace EmuCore
 				}
 				else
 				{
-					static_assert(false, "Attempted to right-shift an unspecialised non-integral arithmetic type via EmuCore::do_right_shift.");
+					static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to right-shift an unspecialised non-integral arithmetic type via EmuCore::do_right_shift.");
 				}
 			}
 			else

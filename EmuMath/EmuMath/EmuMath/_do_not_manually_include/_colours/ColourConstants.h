@@ -3,6 +3,7 @@
 
 #include "ColourT.h"
 #include "ColourValidationLayer.h"
+#include "../../../EmuCore/TMPHelpers/Values.h"
 
 /// <summary> Namespace for constant colour definitions. </summary>
 namespace EmuMath::Colours
@@ -34,7 +35,7 @@ namespace EmuMath::Colours
 		}
 		else
 		{
-			static_assert(false, "Attempted to use EmuMath::Colours::_make_colour with a non-EmuMath-Colour output type.");
+			static_assert(EmuCore::TMP::get_false<R_>(), "Attempted to use EmuMath::Colours::_make_colour with a non-EmuMath-Colour output type.");
 		}
 	}
 	template<class OutColour_, typename R_, typename G_, typename B_, typename A_>
@@ -65,7 +66,7 @@ namespace EmuMath::Colours
 		}
 		else
 		{
-			static_assert(false, "Attempted to use EmuMath::Colours::_make_colour with a non-EmuMath-Colour output type.");
+			static_assert(EmuCore::TMP::get_false<R_>(), "Attempted to use EmuMath::Colours::_make_colour with a non-EmuMath-Colour output type.");
 		}
 	}
 

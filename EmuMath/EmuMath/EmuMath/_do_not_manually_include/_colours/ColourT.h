@@ -4,6 +4,7 @@
 #include "ColourHelpers.h"
 #include "../../../EmuCore/Functors/Arithmetic.h"
 #include "../../../EmuCore/TMPHelpers/TypeComparators.h"
+#include "../../../EmuCore/TMPHelpers/Values.h"
 #include "../../Vector.h"
 #include <limits>
 #include <ostream>
@@ -70,7 +71,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to make an EmuMath colour using at least one input channel argument that is not convertible to the colour's value type.");
+				static_assert(EmuCore::TMP::get_false<R_>(), "Attempted to make an EmuMath colour using at least one input channel argument that is not convertible to the colour's value type.");
 			}
 		}
 		template<typename R_, typename G_, typename B_, typename A_>
@@ -95,7 +96,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to make an EmuMath colour using at least one input channel argument that is not convertible to the colour's value type.");
+				static_assert(EmuCore::TMP::get_false<R_>(), "Attempted to make an EmuMath colour using at least one input channel argument that is not convertible to the colour's value type.");
 			}
 		}
 
@@ -368,7 +369,7 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to access an invalid channel index within an EmuMath Colour.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, Index_>(), "Attempted to access an invalid channel index within an EmuMath Colour.");
 			}
 		}
 
