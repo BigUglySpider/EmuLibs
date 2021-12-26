@@ -457,7 +457,11 @@ namespace EmuMath::TMP
 			{
 				if constexpr (std::is_rvalue_reference_v<T_>)
 				{
-					static_assert(false, "Provided an rvalue reference for forming an EmuMath Vector (e.g. `T_` = `Type&&`). Only values or lvalue references may be stored within EmuMath Vectors.");
+					static_assert
+					(
+						EmuCore::TMP::get_false<T_>(),
+						"Provided an rvalue reference for forming an EmuMath Vector (e.g. `T_` = `Type&&`). Only values or lvalue references may be stored within EmuMath Vectors."
+					);
 					return false;
 				}
 				else
@@ -467,6 +471,7 @@ namespace EmuMath::TMP
 			}
 			else
 			{
+				// Return value is used for a static_assert, but since we aren't allowed to do assertions we shouldn't trigger it, so this is always true
 				return true;
 			}
 		}

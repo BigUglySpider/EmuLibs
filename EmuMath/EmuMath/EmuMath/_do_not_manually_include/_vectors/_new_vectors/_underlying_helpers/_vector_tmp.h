@@ -5,6 +5,7 @@
 #include "../../../../../EmuCore/TMPHelpers/TypeComparators.h"
 #include "../../../../../EmuCore/TMPHelpers/TypeConvertors.h"
 #include "../../../../../EmuCore/CommonTypes/DeferrableReferenceWrapper.h"
+#include "../../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuMath
 {

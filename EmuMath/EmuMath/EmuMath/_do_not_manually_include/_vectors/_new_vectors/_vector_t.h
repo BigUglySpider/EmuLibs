@@ -173,7 +173,11 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to construct an EmuMath Vector with an input type that is neither usable in construction of or conversion to the Vector's stored_type.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<In_>(),
+					"Attempted to construct an EmuMath Vector with an input type that is neither usable in construction of or conversion to the Vector's stored_type."
+				);
 			}
 		}
 #pragma endregion
@@ -342,7 +346,11 @@ namespace EmuMath
 			{
 				if constexpr (!EmuMath::NewVector<OtherSize_, OtherT_>::contains_ref)
 				{
-					static_assert(false, "Attempted to construct a reference-containing EmuMath Vector via a temporary EmuMath Vector that does not contain references. This behaviour will result in dangling references, and has been prohibited as a result.");
+					static_assert
+					(
+						EmuCore::TMP::get_false<OtherT_>(),
+						"Attempted to construct a reference-containing EmuMath Vector via a temporary EmuMath Vector that does not contain references. This behaviour will result in dangling references, and has been prohibited as a result."
+					);
 				}
 				else
 				{
@@ -415,7 +423,11 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to access an element at an invalid Index_ within an EmuMath Vector via its template `at<Index_>` member. Valid indices are in the inclusive range 0:size-1.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, Index_>(),
+					"Attempted to access an element at an invalid Index_ within an EmuMath Vector via its template `at<Index_>` member. Valid indices are in the inclusive range 0:size-1."
+				);
 			}
 		}
 		/// <summary>
@@ -651,7 +663,11 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to access a contiguous data pointer of an EmuMath Vector which contains references. This behaviour is prohibited.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<T_>(),
+					"Attempted to access a contiguous data pointer of an EmuMath Vector which contains references. This behaviour is prohibited."
+				);
 			}
 		}
 		/// <summary>
@@ -678,7 +694,11 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to access a contiguous data pointer of an EmuMath Vector from a specified Index_, but the provided Index_ was invalid. The valid index range is 0:size-1 (inclusive).");
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, Index_>(),
+					"Attempted to access a contiguous data pointer of an EmuMath Vector from a specified Index_, but the provided Index_ was invalid. The valid index range is 0:size-1 (inclusive)."
+				);
 			}
 		}
 		/// <summary>
@@ -2111,7 +2131,11 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to use an EmuMath Vector's MutateRange member without passing a func_, but the provided Func_ type is not default-constructible. Only default-constructible Func_ types may be omitted.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<Func_>(),
+					"Attempted to use an EmuMath Vector's MutateRange member without passing a func_, but the provided Func_ type is not default-constructible. Only default-constructible Func_ types may be omitted."
+				);
 			}
 		}
 		template<class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_, std::size_t IncludeSelf_, class...Args_, std::size_t OutSize_, typename OutT_>
@@ -2124,7 +2148,11 @@ namespace EmuMath
 			}
 			else
 			{
-				static_assert(false, "Attempted to use an EmuMath Vector's MutateRange member without passing a func_, but the provided Func_ type is not default-constructible. Only default-constructible Func_ types may be omitted.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<Func_>(),
+					"Attempted to use an EmuMath Vector's MutateRange member without passing a func_, but the provided Func_ type is not default-constructible. Only default-constructible Func_ types may be omitted."
+				);
 			}
 		}
 		template<class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t IncludeSelf_, class...Args_, std::size_t OutSize_, typename OutT_>
@@ -2450,12 +2478,20 @@ namespace EmuMath
 				}
 				else
 				{
-					static_assert(false, "Attempted to `Set` an Index_ within an EmuMath Vector, but the provided Arg_ cannot be used to assign, construct, or convert-to the Vector's stored_type.");
+					static_assert
+					(
+						EmuCore::TMP::get_false<Arg_>(),
+						"Attempted to `Set` an Index_ within an EmuMath Vector, but the provided Arg_ cannot be used to assign, construct, or convert-to the Vector's stored_type."
+					);
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to `Set` an invalid Index_ within an EmuMath Vector.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<Arg_>(),
+					"Attempted to `Set` an invalid Index_ within an EmuMath Vector."
+				);
 			}
 		}
 
@@ -2480,12 +2516,16 @@ namespace EmuMath
 				}
 				else
 				{
-					static_assert(false, "Attempted to `Set` an Index_ within an EmuMath Vector with multiple arguments, but the stored_type cannot be constructed from the provided arguments.");
+					static_assert
+					(
+						EmuCore::TMP::get_false<Args_...>(),
+						"Attempted to `Set` an Index_ within an EmuMath Vector with multiple arguments, but the stored_type cannot be constructed from the provided arguments."
+					);
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to `Set` an invalid Index_ within an EmuMath Vector.");
+				static_assert(EmuCore::TMP::get_false<Args_...>(), "Attempted to `Set` an invalid Index_ within an EmuMath Vector.");
 			}
 		}
 

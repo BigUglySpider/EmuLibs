@@ -24,7 +24,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			static_assert(false, "Attempted to copy a value into an EmuMath Vector at a specified index, but the provided Arg_ cannot be used to assign, convert-to, or construct the Vector's value_type.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<T_>(),
+				"Attempted to copy a value into an EmuMath Vector at a specified index, but the provided Arg_ cannot be used to assign, convert-to, or construct the Vector's value_type."
+			);
 		}
 	}
 
@@ -76,7 +80,11 @@ namespace EmuMath::Helpers::_vector_underlying
 			}
 			else
 			{
-				static_assert(false, "Attempted to copy an EmuMath Vector into another EmuMath Vector, but the provided to_copy_ argument was not an EmuMath Vector.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<T_>(),
+					"Attempted to copy an EmuMath Vector into another EmuMath Vector, but the provided to_copy_ argument was not an EmuMath Vector."
+				);
 			}
 		}
 	}
@@ -100,7 +108,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			static_assert(false, "Attempted to copy to an EmuMath Vector within a range of contiguous indices, but the provided BeginIndex_ is higher than the provided EndIndex_.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<T_>(),
+				"Attempted to copy to an EmuMath Vector within a range of contiguous indices, but the provided BeginIndex_ is higher than the provided EndIndex_."
+			);
 		}
 	}
 
@@ -147,7 +159,11 @@ namespace EmuMath::Helpers::_vector_underlying
 				}
 				else
 				{
-					static_assert(false, "Attempted to copy to an EmuMath Vector within a range of contiguous indices, but the provided BeginIndex_ is higher than the provided EndIndex_.");
+					static_assert
+					(
+						EmuCore::TMP::get_false<T_>(),
+						"Attempted to copy to an EmuMath Vector within a range of contiguous indices, but the provided BeginIndex_ is higher than the provided EndIndex_."
+					);
 				}
 			}
 			else

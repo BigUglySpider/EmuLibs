@@ -38,7 +38,11 @@ namespace EmuMath::Helpers::_vector_underlying
 				{
 					if constexpr (std::is_rvalue_reference_v<Arg_> || !std::is_reference_v<Arg_>)
 					{
-						static_assert(false, "Attempted to set all elements in a specified range within a reference-containing EmuMath Vector via an rvalue-reference (e.g. Arg_&&), which will result in a dangling reference; as such, this behaviour is prohibited.");
+						static_assert
+						(
+							EmuCore::TMP::get_false<T_>(),
+							"Attempted to set all elements in a specified range within a reference-containing EmuMath Vector via an rvalue-reference (e.g. Arg_&&), which will result in a dangling reference; as such, this behaviour is prohibited."
+						);
 					}
 					else
 					{
@@ -46,7 +50,11 @@ namespace EmuMath::Helpers::_vector_underlying
 						{
 							if constexpr (std::is_const_v<Arg_>)
 							{
-								static_assert(false, "Attempted to set all elements in a specified range within a const-reference-containing EmuMath Vector via a constant arg_. To maintain const-safety, this behaviour is prohibited.");
+								static_assert
+								(
+									EmuCore::TMP::get_false<T_>(),
+									"Attempted to set all elements in a specified range within a const-reference-containing EmuMath Vector via a constant arg_. To maintain const-safety, this behaviour is prohibited."
+								);
 							}
 							else
 							{
@@ -78,13 +86,21 @@ namespace EmuMath::Helpers::_vector_underlying
 					}
 					else
 					{
-						static_assert(false, "Attempted to set all elements in a specified range within an EmuMath Vector via a single argument, but the Vector's stored_type cannot be assigned, constructed, or converted-to from the provided arg_ type.");
+						static_assert
+						(
+							EmuCore::TMP::get_false<T_>(),
+							"Attempted to set all elements in a specified range within an EmuMath Vector via a single argument, but the Vector's stored_type cannot be assigned, constructed, or converted-to from the provided arg_ type."
+						);
 					}
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to set all elements in a specified range within an EmuMath Vector via a single argument, but the provided BeginIndex_ exceeds the provided EndIndex_.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<T_>(),
+					"Attempted to set all elements in a specified range within an EmuMath Vector via a single argument, but the provided BeginIndex_ exceeds the provided EndIndex_."
+				);
 			}
 		}
 	}
@@ -144,7 +160,11 @@ namespace EmuMath::Helpers::_vector_underlying
 			{
 				if constexpr (lhs_vector_type::size > rhs_vector_type::size)
 				{
-					static_assert(false, "Attempted to set an EmuMath Vector containing references via a Vector containing less elements than itself. This behaviour will result in dangling references, and as such is prohibited.");
+					static_assert
+					(
+						EmuCore::TMP::get_false<T_>(),
+						"Attempted to set an EmuMath Vector containing references via a Vector containing less elements than itself. This behaviour will result in dangling references, and as such is prohibited."
+					);
 				}
 				else
 				{
@@ -152,7 +172,11 @@ namespace EmuMath::Helpers::_vector_underlying
 					{
 						if constexpr (std::is_const_v<VectorArg_> || std::is_const_v<typename rhs_vector_type::value_type>)
 						{
-							static_assert(false, "Attempted to set an EmuMath Vector containing non-const references via a constant Vector or a Vector with a constant value_type.");
+							static_assert
+							(
+								EmuCore::TMP::get_false<T_>(),
+								"Attempted to set an EmuMath Vector containing non-const references via a constant Vector or a Vector with a constant value_type."
+							);
 						}
 						else
 						{
@@ -173,7 +197,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			static_assert(false, "Attempted to set an EmuMath Vector via another Vector, but the provided vector_arg_ was not an EmuMath Vector.");
+			static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to set an EmuMath Vector via another Vector, but the provided vector_arg_ was not an EmuMath Vector.");
 		}
 	}
 
@@ -194,13 +218,21 @@ namespace EmuMath::Helpers::_vector_underlying
 				// Ref vectors require additional checks to prevent dangling references
 				if constexpr ((!VectorArg_::contains_ref) && (std::is_rvalue_reference_v<VectorArg_> || !std::is_reference_v<VectorArg_>))
 				{
-					static_assert(false, "Attempted to set an EmuMath Vector containing references via an rvalue-referenced Vector (e.g. Vector&&) which does not contain references. This will result in dangling references, and is prohibited as a result.");
+					static_assert
+					(
+						EmuCore::TMP::get_false<T_>(),
+						"Attempted to set an EmuMath Vector containing references via an rvalue-referenced Vector (e.g. Vector&&) which does not contain references. This will result in dangling references, and is prohibited as a result."
+					);
 				}
 				else
 				{
 					if constexpr (lhs_vector_type::size > VectorArg_::size)
 					{
-						static_assert(false, "Attempted to set an EmuMath Vector containing references via a Vector containing less elements than itself. This behaviour will result in dangling references, and as such is prohibited.");
+						static_assert
+						(
+							EmuCore::TMP::get_false<T_>(),
+							"Attempted to set an EmuMath Vector containing references via a Vector containing less elements than itself. This behaviour will result in dangling references, and as such is prohibited."
+						);
 					}
 					else
 					{
@@ -208,7 +240,11 @@ namespace EmuMath::Helpers::_vector_underlying
 						{
 							if constexpr (std::is_const_v<VectorArg_> || std::is_const_v<typename VectorArg_::value_type>)
 							{
-								static_assert(false, "Attempted to set an EmuMath Vector containing non-const references via a constant Vector or a Vector with a constant value_type.");
+								static_assert
+								(
+									EmuCore::TMP::get_false<T_>(),
+									"Attempted to set an EmuMath Vector containing non-const references via a constant Vector or a Vector with a constant value_type."
+								);
 							}
 							else
 							{
@@ -253,7 +289,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			static_assert(false, "Attempted to set an EmuMath Vector via another Vector, but the provided vector_arg_ was not an EmuMath Vector.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<T_>(),
+				"Attempted to set an EmuMath Vector via another Vector, but the provided vector_arg_ was not an EmuMath Vector."
+			);
 		}
 	}
 }

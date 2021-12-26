@@ -70,7 +70,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			static_assert(false, "Attempted to mutate an EmuMath Vector, but at least one iteration of mutation resulted in arguments which the provided mutation function does not support.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<Func_>(),
+				"Attempted to mutate an EmuMath Vector, but at least one iteration of mutation resulted in arguments which the provided mutation function does not support."
+			);
 			return false;
 		}
 	}
@@ -89,13 +93,21 @@ namespace EmuMath::Helpers::_vector_underlying
 			}
 			else
 			{
-				static_assert(false, "Attempted to mutate an EmuMath Vector, but at least one iteration of mutation resulted in the mutation function providing a result that cannot be used to copy to the output Vector's value_type.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<Func_>(),
+					"Attempted to mutate an EmuMath Vector, but at least one iteration of mutation resulted in the mutation function providing a result that cannot be used to copy to the output Vector's value_type."
+				);
 				return false;
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to mutate an EmuMath Vector, but at least one iteration of mutation resulted in arguments which the provided mutation function does not support.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<Func_>(),
+				"Attempted to mutate an EmuMath Vector, but at least one iteration of mutation resulted in arguments which the provided mutation function does not support."
+			);
 			return false;
 		}
 	}
@@ -159,7 +171,11 @@ namespace EmuMath::Helpers::_vector_underlying
 			}
 			else
 			{
-				static_assert(false, "Attempted to get an EmuMath Vector construction arg from mutation for an index which is to be mutated, but the output Vector's elements are not compatible with the result of mutation invocation.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<Func_>(),
+					"Attempted to get an EmuMath Vector construction arg from mutation for an index which is to be mutated, but the output Vector's elements are not compatible with the result of mutation invocation."
+				);
 			}
 		}
 		else
@@ -176,7 +192,11 @@ namespace EmuMath::Helpers::_vector_underlying
 			}
 			else
 			{
-				static_assert(false, "Attempted to get an EmuMath Vector construction arg from mutation for an index which will not be mutated, but the output Vector cannot have its stored_type constructed from the Vector's stored_type or value_type_uq, or if it can then neither of said types can be default-constructed.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<Func_>(),
+					"Attempted to get an EmuMath Vector construction arg from mutation for an index which will not be mutated, but the output Vector cannot have its stored_type constructed from the Vector's stored_type or value_type_uq, or if it can then neither of said types can be default-constructed."
+				);
 			}
 		}
 	}
@@ -352,17 +372,29 @@ namespace EmuMath::Helpers::_vector_underlying
 						}
 						else
 						{
-							static_assert(false, "Attempted to shuffle an EmuMath Vector with theoretical indices, but the provided OutVector_ type cannot construct its stored_type from one of the passed Vector's non-contained elements.");
+							static_assert
+							(
+								EmuCore::TMP::get_false<OutT_>(),
+								"Attempted to shuffle an EmuMath Vector with theoretical indices, but the provided OutVector_ type cannot construct its stored_type from one of the passed Vector's non-contained elements."
+							);
 						}
 					}
 					else
 					{
-						static_assert(false, "Attempted to shuffle an EmuMath Vector with theoretical indices, but the provided OutVector_ type cannot construct its stored_type from one of the passed input Vector's contained elements.");
+						static_assert
+						(
+							EmuCore::TMP::get_false<OutT_>(),
+							"Attempted to shuffle an EmuMath Vector with theoretical indices, but the provided OutVector_ type cannot construct its stored_type from one of the passed input Vector's contained elements."
+						);
 					}
 				}
 				else
 				{
-					static_assert(false, "Attempted to shuffle an EmuMath Vector, but one of the provided indices refers to a non-contained index within the input Vector. This behaviour is allowed, but you must explicitly state that you wish to use theoretical indices.");
+					static_assert
+					(
+						EmuCore::TMP::get_false<OutT_>(),
+						"Attempted to shuffle an EmuMath Vector, but one of the provided indices refers to a non-contained index within the input Vector. This behaviour is allowed, but you must explicitly state that you wish to use theoretical indices."
+					);
 				}
 			}
 			else
@@ -373,13 +405,21 @@ namespace EmuMath::Helpers::_vector_underlying
 				}
 				else
 				{
-					static_assert(false, "Attempted to shuffle an EmuMath Vector, but the provided OutVector_ type cannot construct its stored_type from one of the passed input Vector's elements.");
+					static_assert
+					(
+						EmuCore::TMP::get_false<OutT_>(),
+						"Attempted to shuffle an EmuMath Vector, but the provided OutVector_ type cannot construct its stored_type from one of the passed input Vector's elements."
+					);
 				}
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to shuffle an EmuMath Vector, but the provided input Vector is not recognised as an EmuMath Vector.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<OutT_>(),
+				"Attempted to shuffle an EmuMath Vector, but the provided input Vector is not recognised as an EmuMath Vector."
+			);
 		}
 	}
 #pragma endregion
@@ -392,12 +432,28 @@ namespace EmuMath::Helpers::_vector_underlying
 		{
 			if constexpr (_assert_vector_mutate_is_valid_invocation<ArgIndex_, OutVector_, Func_, Args_...>())
 			{
-				_vector_copy_index<Index_>(out_vector_, _vector_mutate_invoke_func<ArgIndex_, Func_&>(func_, std::forward<Args_>(args_)...));
+				// Copy the results of function invocation to the output Vector directly
+				// --- Arguments are cast to lval-refs to avoid moves when scalar arguments are provided
+				_vector_copy_index<Index_>
+				(
+					out_vector_,
+					_vector_mutate_invoke_func<ArgIndex_, Func_&>
+					(
+						func_,
+						EmuCore::TMP::lval_ref_cast<Args_>(std::forward<Args_>(args_))...
+					)
+				);
+
+				// Move on to next static iteration
 				_vector_mutate_execution<Index_ + 1, EndIndex_, ArgIndex_ + 1, Func_, OutVector_>(func_, out_vector_, std::forward<Args_>(args_)...);
 			}
 			else
 			{
-				static_assert(false, "Unable to mutate an EmuMath Vector. Review previous assertions.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<Func_>(),
+					"Unable to mutate an EmuMath Vector due to invocation of the provided Func_ being invalid with the provided Args_."
+				);
 			}
 		}
 	}
@@ -414,12 +470,20 @@ namespace EmuMath::Helpers::_vector_underlying
 			}
 			else
 			{
-				static_assert(false, "Attempted to mutate an EmuMath Vector, but the provided BeginIndex_ is greater than the provided EndIndex_ after clamping.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<Func_>(),
+					"Attempted to mutate an EmuMath Vector, but the provided BeginIndex_ is greater than the provided EndIndex_ after clamping."
+				);
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to mutate an EmuMath Vector, but the provided BeginIndex_ is greater than the highest valid index within the Vector. The inclusive valid index range is 0:size-1.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<Func_>(),
+				"Attempted to mutate an EmuMath Vector, but the provided BeginIndex_ is greater than the highest valid index within the Vector. The inclusive valid index range is 0:size-1."
+			);
 		}
 	}
 
@@ -490,7 +554,11 @@ namespace EmuMath::Helpers::_vector_underlying
 			}
 			else
 			{
-				static_assert(false, "Attempted to fully mutate an EmuMath Vector without passing an out_vector_ to output to. This is only allowed when the provided output Vector is constructible from all mutation function results, or is default-constructible.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<Func_>(),
+					"Attempted to fully mutate an EmuMath Vector without passing an out_vector_ to output to. This is only allowed when the provided output Vector is constructible from all mutation function results, or is default-constructible."
+				);
 			}
 		}
 		else
@@ -518,7 +586,11 @@ namespace EmuMath::Helpers::_vector_underlying
 			}
 			else
 			{
-				static_assert(false, "Attempted to partially mutate an EmuMath Vector without passing an out_vector_ to output to. This is only allowed where the provided output Vector is default-constructible, or can be constructed from mutation results at the mutation indices and from default stored_type or value_type_uq items.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<Func_>(),
+					"Attempted to partially mutate an EmuMath Vector without passing an out_vector_ to output to. This is only allowed where the provided output Vector is default-constructible, or can be constructed from mutation results at the mutation indices and from default stored_type or value_type_uq items."
+				);
 			}
 		}
 	}
@@ -533,7 +605,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			static_assert(false, "Attempted to mutate an EmuMath Vector without passing a func_ argument to perform mutation. This is only allowed where the provided Func_ type is default-constructible.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<Func_>(),
+				"Attempted to mutate an EmuMath Vector without passing a func_ argument to perform mutation. This is only allowed where the provided Func_ type is default-constructible."
+			);
 		}
 	}
 
@@ -547,7 +623,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			static_assert(false, "Attempted to mutate an EmuMath Vector using a Func_ template whose template arguments are determined automatically based on unqualified arguments (or the value_type_uq of EmuMath Vector arguments). However, the provided Func_ template cannot be instantiated with said types for all provided arguments.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<OutVector_>(),
+				"Attempted to mutate an EmuMath Vector using a Func_ template whose template arguments are determined automatically based on unqualified arguments (or the value_type_uq of EmuMath Vector arguments). However, the provided Func_ template cannot be instantiated with said types for all provided arguments."
+			);
 		}
 	}
 
@@ -561,7 +641,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			static_assert(false, "Attempted to mutate an EmuMath Vector without passing a func_ argument to perform mutation. This is only allowed where the provided Func_ type is default-constructible.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<Func_>(),
+				"Attempted to mutate an EmuMath Vector without passing a func_ argument to perform mutation. This is only allowed where the provided Func_ type is default-constructible."
+			);
 		}
 	}
 
@@ -575,7 +659,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			static_assert(false, "Attempted to mutate an EmuMath Vector using a Func_ template whose template arguments are determined automatically based on unqualified arguments (or the value_type_uq of EmuMath Vector arguments). However, the provided Func_ template cannot be instantiated with said types for all provided arguments.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<OutVector_>(),
+				"Attempted to mutate an EmuMath Vector using a Func_ template whose template arguments are determined automatically based on unqualified arguments (or the value_type_uq of EmuMath Vector arguments). However, the provided Func_ template cannot be instantiated with said types for all provided arguments."
+			);
 		}
 	}
 
@@ -627,7 +715,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform a hybrid copy/mutate function on an EmuMath Vector without passing a func_ argument to perform mutation. This is only allowed where the provided Func_ type is default-constructible.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<Func_>(),
+				"Attempted to perform a hybrid copy/mutate function on an EmuMath Vector without passing a func_ argument to perform mutation. This is only allowed where the provided Func_ type is default-constructible."
+			);
 		}
 	}
 
@@ -646,7 +738,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			static_assert(false, "Attempted to copy and partially mutate an EmuMath Vector using a Func_ template whose template arguments are determined automatically based on unqualified arguments (or the value_type_uq of EmuMath Vector arguments). However, the provided Func_ template cannot be instantiated with said types for all provided arguments.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<OutVector_>(),
+				"Attempted to copy and partially mutate an EmuMath Vector using a Func_ template whose template arguments are determined automatically based on unqualified arguments (or the value_type_uq of EmuMath Vector arguments). However, the provided Func_ template cannot be instantiated with said types for all provided arguments."
+			);
 		}
 	}
 
@@ -675,7 +771,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			static_assert(false, "Attempted to create a new EmuMath Vector for output as a hybrid copy/mutate function, but the desired output type is not default-constructible. Output Vectors must be default-constructible.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<Func_>(),
+				"Attempted to create a new EmuMath Vector for output as a hybrid copy/mutate function, but the desired output type is not default-constructible. Output Vectors must be default-constructible."
+			);
 		}
 	}
 
@@ -706,12 +806,20 @@ namespace EmuMath::Helpers::_vector_underlying
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform a hybrid copy/mutate function on an EmuMath Vector without passing a func_ argument to perform mutation. This is only allowed where the provided Func_ type is default-constructible.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<Func_>(),
+					"Attempted to perform a hybrid copy/mutate function on an EmuMath Vector without passing a func_ argument to perform mutation. This is only allowed where the provided Func_ type is default-constructible."
+				);
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to create a new EmuMath Vector for output as a hybrid copy/mutate function, but the desired output type is not default-constructible. Output Vectors must be default-constructible.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<Func_>(),
+				"Attempted to create a new EmuMath Vector for output as a hybrid copy/mutate function, but the desired output type is not default-constructible. Output Vectors must be default-constructible."
+			);
 		}
 	}
 
@@ -729,7 +837,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			static_assert(false, "Attempted to copy and partially mutate an EmuMath Vector using a Func_ template whose template arguments are determined automatically based on unqualified arguments (or the value_type_uq of EmuMath Vector arguments). However, the provided Func_ template cannot be instantiated with said types for all provided arguments.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<T_>(),
+				"Attempted to copy and partially mutate an EmuMath Vector using a Func_ template whose template arguments are determined automatically based on unqualified arguments (or the value_type_uq of EmuMath Vector arguments). However, the provided Func_ template cannot be instantiated with said types for all provided arguments."
+			);
 		}
 	}
 
@@ -770,7 +882,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform an EmuMath Vector mutation without passing a func_, using a Func_ type that is not default-constructible. This is only possible for default-constructible Func_ types.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<Func_>(),
+				"Attempted to perform an EmuMath Vector mutation without passing a func_, using a Func_ type that is not default-constructible. This is only possible for default-constructible Func_ types."
+			);
 		}
 	}
 
@@ -793,7 +909,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			static_assert(false, "Attempted to copy an EmuMath Vector to an output Vector directly before or after performing a mutation operation, but the desired output Vector cannot be constructed from the input Vector.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<Func_>(),
+				"Attempted to copy an EmuMath Vector to an output Vector directly before or after performing a mutation operation, but the desired output Vector cannot be constructed from the input Vector."
+			);
 		}
 	}
 	template<bool CopyBeforeMut_, class Func_, std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_, class...Args_>
@@ -815,7 +935,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			static_assert(false, "Attempted to copy an EmuMath Vector to an output Vector directly before or after performing a mutation operation, but the desired output Vector cannot be constructed from the input Vector.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<Func_>(),
+				"Attempted to copy an EmuMath Vector to an output Vector directly before or after performing a mutation operation, but the desired output Vector cannot be constructed from the input Vector."
+			);
 		}
 	}
 #pragma endregion

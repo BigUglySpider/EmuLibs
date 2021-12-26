@@ -79,7 +79,7 @@ namespace EmuCore::TMP
 	/// <summary> Function used to return a false bool based on a provided type. This is to allow static_assert(false) statements without compilation failure. </summary>
 	/// <param name="dummy_">Dummy argument to use if a typename is not especially easily available. Note that this should be template-based.</param>
 	/// <returns>False.</returns>
-	template<typename...T_, typename = std::enable_if_t<(sizeof...(T_) >= 1)>>
+	template<typename...T_, typename = std::enable_if_t<(sizeof...(T_) != 0)>>
 	[[nodiscard]] constexpr inline bool get_false(T_&&...dummy_)
 	{
 		return false;

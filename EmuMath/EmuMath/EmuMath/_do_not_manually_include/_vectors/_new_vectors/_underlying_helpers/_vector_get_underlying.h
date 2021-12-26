@@ -23,7 +23,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			static_assert(false, "Attempted to safely retrieve a non-contained value from an EmuMath Vector, but the contained type cannot be default-constructed or constructed with an argument of either `0` or `0.0`. As non-contained elements are implied default/zero, this behaviour is required to safely retrieve a non-contained element.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<Vector_>(),
+				"Attempted to safely retrieve a non-contained value from an EmuMath Vector, but the contained type cannot be default-constructed or constructed with an argument of either `0` or `0.0`. As non-contained elements are implied default/zero, this behaviour is required to safely retrieve a non-contained element."
+			);
 		}
 	}
 	template<std::size_t Size_, typename T_>
@@ -126,7 +130,11 @@ namespace EmuMath::Helpers::_vector_underlying
 			}
 			else
 			{
-				static_assert(false, "Attempted to retrieve an element within an EmuMath Vector via try_get (non-const), but the provided out_ type cannot be assigned, constructed, or converted-to from a non-const reference to the Vector's value_type.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<T_>(),
+					"Attempted to retrieve an element within an EmuMath Vector via try_get (non-const), but the provided out_ type cannot be assigned, constructed, or converted-to from a non-const reference to the Vector's value_type."
+				);
 			}
 			return true;
 		}
@@ -159,7 +167,11 @@ namespace EmuMath::Helpers::_vector_underlying
 			}
 			else
 			{
-				static_assert(false, "Attempted to retrieve an element within an EmuMath Vector via try_get (const), but the provided out_ type cannot be assigned, constructed, or converted-to from a constant reference to the Vector's value_type.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<T_>(),
+					"Attempted to retrieve an element within an EmuMath Vector via try_get (const), but the provided out_ type cannot be assigned, constructed, or converted-to from a constant reference to the Vector's value_type."
+				);
 			}
 			return true;
 		}
