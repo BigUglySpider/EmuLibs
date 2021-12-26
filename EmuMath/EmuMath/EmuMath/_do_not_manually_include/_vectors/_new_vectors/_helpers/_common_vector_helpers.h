@@ -9,6 +9,11 @@
 #include "../_underlying_helpers/_vector_stream_append_underlying.h"
 #include "../_underlying_helpers/_vector_tmp.h"
 
+// CONTAINS:
+// --- All macros used within this _helpers folder.
+// ------ Macros to type an underlying vector helper with minimal whitespace to maintain readability and conciseness in "public" helper funcs
+// --------- "public" in this context refers to global EmuMath Helper functions for Vectors that are not preceded with an underscore.
+
 #ifdef EMU_MATH_VECTOR_MUTATION
 #undef EMU_MATH_VECTOR_MUTATION
 #endif
@@ -107,9 +112,9 @@ EmuMath::Helpers::_vector_underlying::_vector_partial_mutation_copy_no_func_pass
 	_func_type,\
 	EmuMath::NewVector<(_out_size), _out_t>,\
 	const EmuMath::NewVector<(_in_size), InT_>&,\
-	(BeginIndex_),\
-	(EndIndex_),\
-	(BeginIndex_)\
+	(_out_begin),\
+	(_out_end),\
+	(_out_begin)\
 >
 
 #ifdef EMU_MATH_VECTOR_MUTATION_RANGE_NO_COPY
@@ -186,6 +191,61 @@ EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_no_func_
 	0,\
 	EmuMath::NewVector<(_out_size), _out_t>::size,\
 	0\
+>
+
+#ifdef EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE
+#undef EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE
+#endif
+#define EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE(_func_template, _out_size, _out_t, _in_size, _in_t, _begin_index, _end_index)\
+EmuMath::Helpers::_vector_underlying::_vector_partial_mutation_copy_with_func_template_args_only\
+<\
+	_func_template,\
+	(_out_size),\
+	_out_t,\
+	const EmuMath::NewVector<(_in_size), _in_t>&,\
+	(_begin_index),\
+	(_end_index),\
+	(_begin_index)\
+>
+
+#ifdef EMU_MATH_VECTOR_MUTATE_REF_RANGE_TEMPLATE
+#undef EMU_MATH_VECTOR_MUTATE_REF_RANGE_TEMPLATE
+#endif
+#define EMU_MATH_VECTOR_MUTATE_REF_RANGE_TEMPLATE(_func_template, _out_size, _out_t, _in_size, _in_t, _begin_index, _end_index)\
+EmuMath::Helpers::_vector_underlying::_vector_partial_mutation_copy_with_func_template_no_func_passed\
+<\
+	_func_template,\
+	EmuMath::NewVector<(_out_size), _out_t>,\
+	const EmuMath::NewVector<(_in_size), _in_t>&,\
+	(_begin_index),\
+	(_end_index),\
+	(_begin_index)\
+>
+
+#ifdef EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE
+#undef EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE
+#endif
+#define EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE(_func_template, _out_size, _out_t, _begin_index, _end_index, _arg_index)\
+EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_args_only\
+<\
+	_func_template,\
+	EmuMath::NewVector<(_out_size), _out_t>,\
+	(_begin_index),\
+	(_end_index),\
+	(_arg_index)\
+>
+
+#ifdef EMU_MATH_VECTOR_MUTATE_REF_RANGE_NO_COPY_TEMPLATE
+#undef EMU_MATH_VECTOR_MUTATE_REF_RANGE_NO_COPY_TEMPLATE
+#endif
+#define EMU_MATH_VECTOR_MUTATE_REF_RANGE_NO_COPY_TEMPLATE(_func_template, _out_size, _out_t, _begin_index, _end_index, _arg_index)\
+EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_no_func_passed\
+<\
+	_func_template,\
+	EmuMath::NewVector<(_out_size), _out_t>,\
+	(_begin_index),\
+	(_end_index),\
+	(_arg_index)\
 >
 
 #endif

@@ -466,7 +466,12 @@ namespace EmuMath::Helpers::_vector_underlying
 			constexpr std::size_t clamped_end_index_ = (EndIndex_ <= OutVector_::size) ? EndIndex_ : OutVector_::size;
 			if constexpr (BeginIndex_ <= clamped_end_index_)
 			{
-				_vector_mutate_execution<BeginIndex_, clamped_end_index_, ArgIndex_, Func_, OutVector_>(func_, out_vector_, std::forward<Args_>(args_)...);
+				_vector_mutate_execution<BeginIndex_, clamped_end_index_, ArgIndex_, Func_, OutVector_>
+				(
+					func_,
+					out_vector_,
+					std::forward<Args_>(args_)...
+				);
 			}
 			else
 			{
@@ -852,14 +857,18 @@ namespace EmuMath::Helpers::_vector_underlying
 		{
 			if constexpr (_assert_vector_mutate_func_is_invocable<Index_, Func_&, Args_...>())
 			{
-				_vector_mutate_invoke_func_no_ret<Index_, Func_&>(func_, std::forward<Args_>(args_)...);
+				_vector_mutate_invoke_func_no_ret<Index_, Func_&>
+				(
+					func_,
+					EmuCore::TMP::lval_ref_cast<Args_>(std::forward<Args_>(args_))...
+				);
 				_vector_mutate_invoke_only_execution<Index_ + 1, EndIndex_>(func_, std::forward<Args_>(args_)...);
 			}
 			else
 			{
 				static_assert
 				(
-					false,
+					EmuCore::TMP::get_false<Func_>(),
 					"Attempted to perform EmuMath Vector mutation with invocation only (i.e. returns are ignored), but at least one invocation of the provided func_ was invalid. Are you attempting to invoke a function requiring non-const references, but accessing theoretical (rvalue-only) indices?"
 				);
 			}

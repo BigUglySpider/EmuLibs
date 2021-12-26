@@ -3,6 +3,12 @@
 
 #include "_common_vector_helpers.h"
 
+// CONTAINS:
+// --- set
+// --- set_all
+// --- set_contained_only
+// --- make
+
 namespace EmuMath::Helpers
 {
 	/// <summary>

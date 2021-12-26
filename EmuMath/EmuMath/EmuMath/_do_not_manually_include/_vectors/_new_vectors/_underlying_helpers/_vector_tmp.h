@@ -201,6 +201,36 @@ namespace EmuMath::TMP
 	};
 	template<typename T_>
 	using emu_vector_value_type_uq = typename emu_vector_value_types<T_>::value_type_uq;
+
+	/// <summary>
+	/// <para> Helper to instantiate a template using the provided arguments' value_type_uq as template arguments. </para>
+	/// <para> If an Arg_ is not an EmuMath Vector: The provided template argument at that position will be the Arg_ type with const, volatile, and reference removed. </para>
+	/// <para> If an Arg_ is an EmuMath Vector: The provided template argument at that position will be the Vector's value_type_uq. </para>
+	/// <para> Contains two items: </para>
+	/// <para> --- `value`: Boolean indicating if the template could successfully be instantiated. </para>
+	/// <para> --- `type`: If `value` is true, this will be the instantiated template; otherwise, it will be void. </para>
+	/// </summary>
+	template<template<class...> class Template_, class...Args_>
+	struct template_for_emu_vector_args
+	{
+	private:
+		template<template<class...> class TemplateToBuild_, bool Valid_>
+		struct _instance_builder
+		{
+			using type = void;
+		};
+		template<template<class...> class TemplateToBuild_>
+		struct _instance_builder<TemplateToBuild_, true>
+		{
+			using type = TemplateToBuild_<emu_vector_value_type_uq<Args_>...>;
+		};
+
+	public:
+		static constexpr bool value = EmuCore::TMP::valid_template_args_v<Template_, emu_vector_value_type_uq<Args_>...>;
+		using type = typename _instance_builder<Template_, value>::type;
+	};
+	template<template<class...> class Template_, class...Args_>
+	using template_for_emu_vector_args_t = typename template_for_emu_vector_args<Template_, Args_...>::type;
 }
 
 #endif

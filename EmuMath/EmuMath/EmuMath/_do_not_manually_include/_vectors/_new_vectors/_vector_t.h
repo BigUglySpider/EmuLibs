@@ -1073,7 +1073,7 @@ namespace EmuMath
 		/// <summary> Outputs the absolute form of this Vector to the provided out_vector_. </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output absolute elements to.</param>
 		template<std::size_t OutSize_, typename OutT_>
-		[[nodiscard]] constexpr inline void Abs(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void Abs(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::new_vector_abs(out_vector_, *this);
 		}
@@ -1146,6 +1146,120 @@ namespace EmuMath
 		constexpr inline void AbsRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::new_vector_abs_range_no_copy<OutBegin_, OutEnd_, AbsBegin_>(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns the result of linearly interpolating this Vector with the provided b_ and t_ args, summarised as `a + ((b - a) * t). </para>
+		/// <para> If either b_ or t_ is an EmuMath Vector, respective indices in said Vector(s) will be used for interpolation arguments. </para>
+		/// </summary>
+		/// <param name="b_">Scalar or EmuMath Vector to use as target point(s) for interpolation.</param>
+		/// <param name="t_">Scalar or EmuMath Vector to use as weighting(s) for interpolation.</param>
+		/// <returns>EmuMath Vector of the provided OutSize (defaults to size) and OutT_ (defaults to value_type_uq) containing interpolation results.</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename ArgB_, typename ArgT_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Lerp(ArgB_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::new_vector_lerp<OutSize_, OutT_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
+		}
+		template<typename OutT_ = value_type_uq, typename ArgB_, typename ArgT_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Lerp(ArgB_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::new_vector_lerp<size, OutT_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of linearly interpolating this Vector with the provided b_ and t_ args, summarised as `a + ((b - a) * t), to out_vector_. </para>
+		/// <para> If either b_ or t_ is an EmuMath Vector, respective indices in said Vector(s) will be used for interpolation arguments. </para>
+		/// </summary>
+		/// <param name="out_vector_">EmuMath Vector to output to.</param>
+		/// <param name="b_">Scalar or EmuMath Vector to use as target point(s) for interpolation.</param>
+		/// <param name="t_">Scalar or EmuMath Vector to use as weighting(s) for interpolation.</param>
+		template<typename ArgB_, typename ArgT_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void Lerp(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, ArgB_&& b_, ArgT_&& t_) const
+		{
+			EmuMath::Helpers::new_vector_lerp(out_vector_, *this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
+		}
+
+		/// <summary>
+		/// <para> 
+		///		Returns a copy of this Vector, with indices in the provided range set to the result of linearly interpolating this Vector with the provided b_ and t_ args,
+		///		summarised as `a + ((b - a) * t).
+		/// </para>
+		/// <para> If either b_ or t_ is an EmuMath Vector, respective indices in said Vector(s) will be used for interpolation arguments. </para>
+		/// </summary>
+		/// <param name="b_">Scalar or EmuMath Vector to use as target point(s) for interpolation.</param>
+		/// <param name="t_">Scalar or EmuMath Vector to use as weighting(s) for interpolation.</param>
+		/// <returns>EmuMath Vector copy of this Vector, with the provided index range linearly interpolated.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename ArgB_, typename ArgT_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> LerpRange(ArgB_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::new_vector_lerp_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename ArgB_, typename ArgT_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> LerpRange(ArgB_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::new_vector_lerp_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
+		}
+
+		/// <summary>
+		/// <para> 
+		///		Outputs a copy of this Vector to the provided out_vector_,
+		///		with indices in the provided range set to the result of linearly interpolating this Vector with the provided b_ and t_ args, summarised as `a + ((b - a) * t).
+		/// </para>
+		/// <para> If either b_ or t_ is an EmuMath Vector, respective indices in said Vector(s) will be used for interpolation arguments. </para>
+		/// </summary>
+		/// <param name="out_vector_">EmuMath Vector to output to.</param>
+		/// <param name="b_">Scalar or EmuMath Vector to use as target point(s) for interpolation.</param>
+		/// <param name="t_">Scalar or EmuMath Vector to use as weighting(s) for interpolation.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_, typename ArgB_, typename ArgT_>
+		constexpr inline void LerpRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, ArgB_&& b_, ArgT_&& t_) const
+		{
+			EmuMath::Helpers::new_vector_lerp_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
+		}
+
+
+		/// <summary>
+		/// <para> 
+		///		Returns the results of linearly interpolating this Vector with the provided b_ and t_ args, starting from index LerpBegin_,
+		///		summarised as `a + ((b - a) * t), to the provided index range within an EmuMath Vector.
+		/// </para>
+		/// <para> If either b_ or t_ is an EmuMath Vector, respective indices in said Vector(s) will be used for interpolation arguments. </para>
+		/// <para> Indices outside of the specified range will be default-constructed. </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing interpolation results. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing interpolation results. </para>
+		/// <para> AbsBegin_: Inclusive index at which to start reading elements from this Vector (and Vector args) to perform interpolations. </para>
+		/// </summary>
+		/// <param name="b_">Scalar or EmuMath Vector to use as target point(s) for interpolation.</param>
+		/// <param name="t_">Scalar or EmuMath Vector to use as weighting(s) for interpolation.</param>
+		/// <returns>EmuMath Vector with results of linearly interpolating this vector with the provided arguments in the specified index range, and defaults elsewhere.</returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t LerpBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename ArgB_, typename ArgT_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> LerpRangeNoCopy(ArgB_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::new_vector_lerp_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, LerpBegin_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
+		}
+		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t LerpBegin_, typename OutT_ = value_type_uq, typename ArgB_, typename ArgT_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> LerpRangeNoCopy(ArgB_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::new_vector_lerp_range_no_copy<size, OutT_, OutBegin, OutEnd_, LerpBegin_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
+		}
+
+		/// <summary>
+		/// <para> 
+		///		Outputs the results of linearly interpolating this Vector with the provided b_ and t_ args, starting from index LerpBegin_,
+		///		summarised as `a + ((b - a) * t), to the provided index range within the passed out_vector_.
+		/// </para>
+		/// <para> If either b_ or t_ is an EmuMath Vector, respective indices in said Vector(s) will be used for interpolation arguments. </para>
+		/// <para> Indices outside of the specified range will not be modified. </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing interpolation results. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing interpolation results. </para>
+		/// <para> AbsBegin_: Inclusive index at which to start reading elements from this Vector (and Vector args) to perform interpolations. </para>
+		/// </summary>
+		/// <param name="out_vector_">EmuMath Vector to output to.</param>
+		/// <param name="b_">Scalar or EmuMath Vector to use as target point(s) for interpolation.</param>
+		/// <param name="t_">Scalar or EmuMath Vector to use as weighting(s) for interpolation.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t LerpBegin_, std::size_t OutSize_, typename OutT_, typename ArgB_, typename ArgT_>
+		constexpr inline void LerpRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, ArgB_&& b_, ArgT_&& t_) const
+		{
+			EmuMath::Helpers::new_vector_lerp_range_no_copy<OutBegin_, OutEnd_, LerpBegin_>(out_vector_, *this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
 #pragma endregion
 

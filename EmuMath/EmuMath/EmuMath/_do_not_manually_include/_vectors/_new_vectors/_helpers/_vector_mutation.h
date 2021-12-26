@@ -3,6 +3,11 @@
 
 #include "_common_vector_helpers.h"
 
+// CONTAINS:
+// --- shuffle
+// --- shuffle_theoretical
+// --- mutate
+
 namespace EmuMath::Helpers
 {
 #pragma region SHUFFLE_FUNCS

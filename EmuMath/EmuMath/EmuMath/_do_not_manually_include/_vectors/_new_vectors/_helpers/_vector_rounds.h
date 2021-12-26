@@ -4,6 +4,11 @@
 #include "_common_vector_helpers.h"
 #include "../../../../../EmuCore/Functors/Arithmetic.h"
 
+// CONTAINS:
+// --- floor
+// --- ceil
+// --- trunc
+
 namespace EmuMath::Helpers
 {
 #pragma region FLOOR_FUNCS

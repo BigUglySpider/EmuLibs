@@ -4,6 +4,9 @@
 #include "_common_vector_helpers.h"
 #include <ostream>
 
+// CONTAINS:
+// --- stream_append
+
 namespace EmuMath::Helpers
 {
 	/// <summary>

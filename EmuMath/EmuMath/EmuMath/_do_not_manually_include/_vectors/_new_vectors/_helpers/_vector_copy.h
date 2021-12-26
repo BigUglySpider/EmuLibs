@@ -3,6 +3,11 @@
 
 #include "_common_vector_helpers.h"
 
+// CONTAINS:
+// --- copy
+// --- copy_from_start
+// --- copy_from_start_contained_only
+
 namespace EmuMath::Helpers
 {
 	template<typename Arg_, std::size_t Size_, typename T_>

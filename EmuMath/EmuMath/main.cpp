@@ -813,17 +813,34 @@ int main()
 	yet_another_ref_vec_.Set<0>(yet_another_ref_vec_.at<1>());
 
 	std::cout << "--\n\n";
-	constexpr auto some_multi_test_ = EmuMath::Helpers::new_vector_lerp<std::uint16_t>
+	constexpr auto some_multi_test_ = EmuMath::Helpers::new_vector_make<float>(15, 30, 45, 60).Lerp
 	(
-		EmuMath::Helpers::new_vector_make<float>(15, 30, 45, 60),
 		char(30),
 		0.5L
 	);
 
+	constexpr auto new_lerp_test_b_ = EmuMath::Helpers::new_vector_make<float>(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f).LerpRange<1, 5>
+	(
+		10.0f,
+		EmuMath::Helpers::new_vector_make<double>(1.0f, 0.5f, 1.0f, -0.5f, 0.75f, -1.0f, 25.0f)
+	);
+
+	constexpr auto new_lerp_test_c_ = EmuMath::Helpers::new_vector_make<float>(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f).LerpRangeNoCopy<1, 5, 8>
+	(
+		10.0f,
+		EmuMath::Helpers::new_vector_make<double>(1.0f, 0.5f, 1.0f, -0.5f, 0.75f, -1.0f, 25.0f)
+	);
+
 	EmuMath::NewVector<4, double> another_new_vec_4d_(1, 1, 1, 1);
 	std::cout << another_new_vec_4d_ << "\n";
-	EmuMath::Helpers::new_vector_lerp(another_new_vec_4d_, another_new_vec_4d_, EmuMath::NewVector<4, float>(10, 20, 30, 40), 0.5);
+	//EmuMath::Helpers::new_vector_lerp(another_new_vec_4d_, another_new_vec_4d_, EmuMath::NewVector<4, float>(10, 20, 30, 40), 0.5);
+	another_new_vec_4d_.Lerp(another_new_vec_4d_, EmuMath::NewVector<4, float>(10, 20, 30, 40), 0.5);
 	std::cout << another_new_vec_4d_ << "\n";
+
+	std::cout << "\n\n";
+	constexpr auto new_add_res_a_ = EmuMath::Helpers::new_vector_add(EmuMath::Helpers::new_vector_make<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f), 2.5L);
+	constexpr auto new_add_res_b_ = EmuMath::Helpers::new_vector_add_range<1, 5>(EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_add_res_c_ = EmuMath::Helpers::new_vector_add_range_no_copy<1, 5, 0>(EmuMath::Helpers::new_vector_make<float>(1.5, 0, 3.9, -2.5, -5, 2.5), 2.5);
 
 	// GRADIENTS START
 	std::cout << "\n\n";

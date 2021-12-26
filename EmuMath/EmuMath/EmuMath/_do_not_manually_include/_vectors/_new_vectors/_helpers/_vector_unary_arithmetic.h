@@ -4,6 +4,13 @@
 #include "_common_vector_helpers.h"
 #include "../../../../../EmuCore/Functors/Arithmetic.h"
 
+// CONTAINS:
+// --- pre_increment
+// --- post_increment
+// --- pre_decrement
+// --- post_decrement
+// --- negate
+
 namespace EmuMath::Helpers
 {
 #pragma region PRE_INCREMENT_FUNCS

@@ -3,6 +3,12 @@
 
 #include "_common_vector_helpers.h"
 
+// CONTAINS:
+// --- get_non_contained
+// --- get
+// --- get_theoretical
+// --- try_get
+
 namespace EmuMath::Helpers
 {
 	/// <summary>
