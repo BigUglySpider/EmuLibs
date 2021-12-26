@@ -76,7 +76,10 @@ namespace EmuCore::TMP
 	template<bool Condition_, typename T_, T_ val_if_true, T_ val_if_false>
 	static constexpr T_ conditional_value_v = conditional_value<Condition_, T_, val_if_true, val_if_false>::value;
 
-	/// <summary> Function used to return a false bool based on a provided type. This is to allow static_assert(false) statements without compilation failure. </summary>
+	/// <summary>
+	/// <para> Function used to return a false bool based on a provided type. This is to allow static_assert(false) statements without compilation failure. </para>
+	/// <para> Specialisations of this function to return true are ill-formed, and ultimately make a program's Emu library static_assertion diagnoses ill-formed. </para>
+	/// </summary>
 	/// <param name="dummy_">Dummy argument to use if a typename is not especially easily available. Note that this should be template-based.</param>
 	/// <returns>False.</returns>
 	template<typename...T_, typename = std::enable_if_t<(sizeof...(T_) != 0)>>
@@ -84,14 +87,20 @@ namespace EmuCore::TMP
 	{
 		return false;
 	}
-	/// <summary> Function used to return a false bool based on a provided type. This is to allow static_assert(false) statements without compilation failure. </summary>
+	/// <summary>
+	/// <para> Function used to return a false bool based on a provided type. This is to allow static_assert(false) statements without compilation failure. </para>
+	/// <para> Specialisations of this function to return true are ill-formed, and ultimately make a program's Emu library static_assertion diagnoses ill-formed. </para>
+	/// </summary>
 	/// <returns>False.</returns>
 	template<typename...T_>
 	[[nodiscard]] constexpr inline bool get_false()
 	{
 		return false;
 	}
-	/// <summary> Function used to return a false bool based on a provided type. This is to allow static_assert(false) statements without compilation failure. </summary>
+	/// <summary>
+	/// <para> Function used to return a false bool based on a provided type. This is to allow static_assert(false) statements without compilation failure. </para>
+	/// <para> Specialisations of this function to return true are ill-formed, and ultimately make a program's Emu library static_assertion diagnoses ill-formed. </para>
+	/// </summary>
 	/// <returns>False.</returns>
 	template<typename T_, T_ Dummy_>
 	[[nodiscard]] constexpr inline bool get_false()
