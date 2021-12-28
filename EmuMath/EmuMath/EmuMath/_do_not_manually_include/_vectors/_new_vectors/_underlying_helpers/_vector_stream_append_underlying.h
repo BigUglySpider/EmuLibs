@@ -7,6 +7,19 @@
 namespace EmuMath::Helpers::_vector_underlying
 {
 	template<bool IsWide_, class StreamType_>
+	constexpr inline void _vector_append_empty_vector(StreamType_& str_)
+	{
+		if constexpr (IsWide_)
+		{
+			str_ << L"{ }";
+		}
+		else
+		{
+			str_ << "{ }";
+		}
+	}
+
+	template<bool IsWide_, class StreamType_>
 	constexpr inline void _vector_append_open_indicator(StreamType_& str_)
 	{
 		if constexpr (IsWide_)
@@ -77,9 +90,16 @@ namespace EmuMath::Helpers::_vector_underlying
 	template<std::size_t EndIndex_, bool IsWide_,class StreamType_, std::size_t Size_, typename T_>
 	constexpr inline void _vector_append_to_stream(StreamType_& str_, const EmuMath::NewVector<Size_, T_>& vector_)
 	{
-		_vector_append_open_indicator<IsWide_, StreamType_>(str_);
-		_vector_append_to_stream<0, EndIndex_, IsWide_, StreamType_, Size_, T_>(str_, vector_);
-		_vector_append_close_indicator<IsWide_, StreamType_>(str_);
+		if constexpr (Size_ != 0)
+		{
+			_vector_append_open_indicator<IsWide_, StreamType_>(str_);
+			_vector_append_to_stream<0, EndIndex_, IsWide_, StreamType_, Size_, T_>(str_, vector_);
+			_vector_append_close_indicator<IsWide_, StreamType_>(str_);
+		}
+		else
+		{
+			_vector_append_empty_vector<IsWide_, StreamType_>(str_);
+		}
 	}
 
 	template<bool IsWide_, class StreamType_, std::size_t Size_, typename T_>

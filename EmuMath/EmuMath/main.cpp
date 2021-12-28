@@ -838,9 +838,47 @@ int main()
 	std::cout << another_new_vec_4d_ << "\n";
 
 	std::cout << "\n\n";
-	constexpr auto new_add_res_a_ = EmuMath::Helpers::new_vector_add(EmuMath::Helpers::new_vector_make<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f), 2.5L);
-	constexpr auto new_add_res_b_ = EmuMath::Helpers::new_vector_add_range<1, 5>(EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5), 2.5);
-	constexpr auto new_add_res_c_ = EmuMath::Helpers::new_vector_add_range_no_copy<1, 5, 0>(EmuMath::Helpers::new_vector_make<float>(1.5, 0, 3.9, -2.5, -5, 2.5), 2.5);
+	//constexpr auto new_add_res_a_ = EmuMath::Helpers::new_vector_add(EmuMath::Helpers::new_vector_make<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f), 2.5L);
+	constexpr auto new_add_res_a_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5) + 2.5;
+	//constexpr auto new_add_res_b_ = EmuMath::Helpers::new_vector_add_range<1, 5>(EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_add_res_b_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).AddRange<1, 5>(2.5);
+	//constexpr auto new_add_res_c_ = EmuMath::Helpers::new_vector_add_range_no_copy<1, 5, 0>(EmuMath::Helpers::new_vector_make<float>(1.5, 0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_add_res_c_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).AddRangeNoCopy<1, 5, 0>(2.5);
+
+	//constexpr auto new_sub_res_a_ = EmuMath::Helpers::new_vector_subtract(EmuMath::Helpers::new_vector_make<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f), 2.5L);
+	constexpr auto new_sub_res_a_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5) - 2.5L;
+	//constexpr auto new_sub_res_b_ = EmuMath::Helpers::new_vector_subtract_range<1, 5>(EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_sub_res_b_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).SubtractRange<1, 5>(2.5);
+	//constexpr auto new_sub_res_c_ = EmuMath::Helpers::new_vector_subtract_range_no_copy<1, 5, 0>(EmuMath::Helpers::new_vector_make<float>(1.5, 0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_sub_res_c_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).SubtractRangeNoCopy<1, 5, 0>(2.5);
+
+	//constexpr auto new_mul_res_a_ = EmuMath::Helpers::new_vector_multiply(EmuMath::Helpers::new_vector_make<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f), 2.5L);
+	constexpr auto new_mul_res_a_ = EmuMath::Helpers::new_vector_make<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f) * 2.5L;
+	//constexpr auto new_mul_res_b_ = EmuMath::Helpers::new_vector_multiply_range<1, 5>(EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_mul_res_b_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).MultiplyRange<1, 5>(2.5);
+	//constexpr auto new_mul_res_c_ = EmuMath::Helpers::new_vector_multiply_range_no_copy<1, 5, 0>(EmuMath::Helpers::new_vector_make<float>(1.5, 0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_mul_res_c_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).MultiplyRangeNoCopy<1, 5, 0>(2.5);
+
+	//constexpr auto new_div_res_a_ = EmuMath::Helpers::new_vector_divide(EmuMath::Helpers::new_vector_make<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f), 2.5L);
+	constexpr auto new_div_res_a_ = EmuMath::Helpers::new_vector_make<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f) / 2.5L;
+	//constexpr auto new_div_res_b_ = EmuMath::Helpers::new_vector_divide_range<1, 5>(EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_div_res_b_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).DivideRange<1, 5>(2.5);
+	//constexpr auto new_div_res_c_ = EmuMath::Helpers::new_vector_divide_range_no_copy<1, 5, 0>(EmuMath::Helpers::new_vector_make<float>(1.5, 0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_div_res_c_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).DivideRangeNoCopy<1, 5, 0>(2.5);
+
+	//constexpr auto new_mod_res_a_ = EmuMath::Helpers::new_vector_mod(EmuMath::Helpers::new_vector_make<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f), 2.5L);
+	constexpr auto new_mod_res_a_ = EmuMath::Helpers::new_vector_make<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f) % 2.5L;
+	//constexpr auto new_mod_res_b_ = EmuMath::Helpers::new_vector_mod_range<1, 5>(EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_mod_res_b_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).ModRange<1, 5>(2.5);
+	//constexpr auto new_mod_res_c_ = EmuMath::Helpers::new_vector_mod_range_no_copy<1, 5, 0>(EmuMath::Helpers::new_vector_make<float>(1.5, 0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_mod_res_c_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).ModRangeNoCopy<1, 5, 0>(2.5);
+
+	std::cout << "---\n\n";
+	EmuMath::NewVector<0, float> zero_vector_;
+	constexpr EmuMath::NewVector<0, float> constexpr_zero_vector_;
+	std::cout << zero_vector_ << "\n";
+	std::cout << zero_vector_ << "\n";
+	std::cout << zero_vector_.Add<30>(25.0f);
 
 	// GRADIENTS START
 	std::cout << "\n\n";

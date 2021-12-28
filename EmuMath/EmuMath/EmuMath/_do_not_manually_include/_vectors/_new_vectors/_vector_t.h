@@ -878,7 +878,66 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region CONST_ARITHMETIC_OPERATORS
+	public:
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator+(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_add<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator+(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_add<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator-(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_subtract<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator-(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_subtract<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator*(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_multiply<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator*(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_multiply<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator/(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_divide<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator/(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_divide<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator%(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_mod<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator%(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_mod<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+#pragma endregion
+
 #pragma region UNARY_ARITHMETIC_FUNCS
+	public:
 		/// <summary>
 		/// <para> Peforms a pre-increment on this Vector, equivalent to `++this_vector`. </para>
 		/// </summary>
@@ -1056,7 +1115,548 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region CONST_ARITHMETIC_FUNCS
+	public:
+		/// <summary>
+		/// <para> Returns the result of adding rhs_ to this Vector. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be added. Otherwise, all elements have rhs_ added. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to add to this Vector.</param>
+		/// <returns>Copy of this Vector with rhs_ added, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Add(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_add<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Add(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_add<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of adding rhs_ to this Vector, via the provided out_vector_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be added. Otherwise, all elements have rhs_ added. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to add to this Vector.</param>
+		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void Add(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_add(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of adding rhs_ to this Vector within the provided index range, with copies of elements in indices outside of said range. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be added. Otherwise, all elements have rhs_ added. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start adding elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop adding elements. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to add to elements in the specified range.</param>
+		/// <returns>Copy of this Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq), with rhs_ added to indices in the provided range.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> AddRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_add_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> AddRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_add_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of adding rhs_ to this Vector within the provided index range,
+		///		with copies of elements in indices outside of said range, via the provided out_vector_.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be added. Otherwise, all elements have rhs_ added. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start adding elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop adding elements. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to add to elements in the specified range.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void AddRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_add_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of adding rhs_ to this Vector within the provided index range. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be added. Otherwise, all elements have rhs_ added. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
+		/// <para> AddBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform arithmetic. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to add to elements in the specified range.</param>
+		/// <returns>
+		///		EmuMath Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq),
+		///		with rhs_ added to indices within this Vector in the provided range, and default-constructed elements elsewhere.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AddBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> AddRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_add_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, AddBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AddBegin_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> AddRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_add_range_no_copy<size, OutT_, OutBegin_, OutEnd_, AddBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of adding rhs_ to this Vector within the provided index range, via the provided out_vector_. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be added. Otherwise, all elements have rhs_ added. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
+		/// <para> AddBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform arithmetic. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to add to elements in the specified range.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AddBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void AddRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_add_range_no_copy<OutBegin_, OutEnd_, AddBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of subtracting rhs_ from this Vector. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be added. Otherwise, all elements have rhs_ added. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to subtract from this Vector.</param>
+		/// <returns>Copy of this Vector with rhs_ subtracted, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Subtract(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_subtract<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Subtract(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_subtract<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of subtracting rhs_ from this Vector, via the provided out_vector_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be subtracted. Otherwise, all elements have rhs_ subtracted. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to subtract from this Vector.</param>
+		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void Subtract(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_subtract(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of subtracting rhs_ from this Vector within the provided index range, with copies of elements in indices outside of said range. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be subtracted. Otherwise, all elements have rhs_ subtracted. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start subtracting elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop subtracting elements. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to subtract from elements in the specified range.</param>
+		/// <returns>
+		///		Copy of this Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq), 
+		///		with rhs_ subtracted from indices in the provided range.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> SubtractRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_subtract_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> SubtractRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_subtract_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of subtracting rhs_ from this Vector within the provided index range,
+		///		with copies of elements in indices outside of said range, via the provided out_vector_.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be subtracted. Otherwise, all elements have rhs_ subtracted. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start subtracting elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop subtracting elements. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to subtract from elements in the specified range.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void SubtractRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_subtract_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of subtracting rhs_ from this Vector within the provided index range. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be subtracted. Otherwise, all elements have rhs_ subtracted. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
+		/// <para> SubBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform arithmetic. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to subtract from elements in the specified range.</param>
+		/// <returns>
+		///		EmuMath Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq),
+		///		with rhs_ subtracted from indices within this Vector in the provided range, and default-constructed elements elsewhere.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t SubBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> SubtractRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_subtract_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, SubBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t SubBegin_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> SubtractRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_subtract_range_no_copy<size, OutT_, OutBegin_, OutEnd_, SubBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of subtracting rhs_ from this Vector within the provided index range, via the provided out_vector_. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be subtracted. Otherwise, all elements have rhs_ subtracted. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
+		/// <para> SubBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform arithmetic. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to subtract from elements in the specified range.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t SubBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void SubtractRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_subtract_range_no_copy<OutBegin_, OutEnd_, SubBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of multiplying this Vector by rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be multiplied. Otherwise, all elements are multiplied by rhs_. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to multiply this Vector by.</param>
+		/// <returns>Copy of this Vector multiplied by rhs_, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Multiply(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_multiply<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Multiply(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_multiply<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of multiplying this Vector by rhs_, via the provided out_vector_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be multiplied. Otherwise, all elements are multiplied by rhs_. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to multiply this Vector by.</param>
+		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void Multiply(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_multiply(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of multiplying this Vector by rhs_ within the provided index range, with copies of elements in indices outside of said range. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be multiplied. Otherwise, all elements are multiplied by rhs_. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start multiplying elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop multiplying elements. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to multiply elements by in the specified range.</param>
+		/// <returns>
+		///		Copy of this Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq), 
+		///		with indices in the provided range multiplied by rhs_.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> MultiplyRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_multiply_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> MultiplyRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_multiply_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of multiplying this Vector by rhs_ within the provided index range,
+		///		with copies of elements in indices outside of said range, via the provided out_vector_.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be multiplied. Otherwise, all elements are multiplied by rhs_. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start multiplying elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop multiplying elements. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to multiply elements by in the specified range.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void MultiplyRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_multiply_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of multiplying this Vector by rhs_ within the provided index range. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be multiplied. Otherwise, all elements are multiplied by rhs_. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
+		/// <para> MulBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform arithmetic. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to multiply elements by in the specified range.</param>
+		/// <returns>
+		///		EmuMath Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq),
+		///		with indices within this Vector multiplied by rhs_ in the provided range, and default-constructed elements elsewhere.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MulBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> MultiplyRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_multiply_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, MulBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MulBegin_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> MultiplyRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_multiply_range_no_copy<size, OutT_, OutBegin_, OutEnd_, MulBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of multiplying this Vector by rhs_ within the provided index range, via the provided out_vector_. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be multiplied. Otherwise, all elements are multiplied by rhs_. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
+		/// <para> MulBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform arithmetic. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to multiply elements by in the specified range.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MulBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void MultiplyRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_multiply_range_no_copy<OutBegin_, OutEnd_, MulBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of dividing this Vector by rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be divided. Otherwise, all elements are divided by rhs_. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to divide this Vector by.</param>
+		/// <returns>Copy of this Vector divided by rhs_, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Divide(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_divide<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Divide(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_divide<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of dividing this Vector by rhs_, via the provided out_vector_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be divided. Otherwise, all elements are divided by rhs_. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to divide this Vector by.</param>
+		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void Divide(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_divide(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of dividing this Vector by rhs_ within the provided index range, with copies of elements in indices outside of said range. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be divided. Otherwise, all elements are divided by rhs_. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start dividing elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop dividing elements. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to divide elements by in the specified range.</param>
+		/// <returns>
+		///		Copy of this Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq), 
+		///		with indices in the provided range divided by rhs_.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> DivideRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_divide_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> DivideRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_divide_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of dividing this Vector by rhs_ within the provided index range,
+		///		with copies of elements in indices outside of said range, via the provided out_vector_.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be divided. Otherwise, all elements are divided by rhs_. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start dividing elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop dividing elements. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to divide elements by in the specified range.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void DivideRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_divide_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of dividing this Vector by rhs_ within the provided index range. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be divided. Otherwise, all elements are divided by rhs_. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
+		/// <para> DivBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform arithmetic. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to divide elements by in the specified range.</param>
+		/// <returns>
+		///		EmuMath Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq),
+		///		with indices within this Vector divided by rhs_ in the provided range, and default-constructed elements elsewhere.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t DivBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> DivideRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_divide_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, DivBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t DivBegin_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> DivideRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_divide_range_no_copy<size, OutT_, OutBegin_, OutEnd_, DivBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of dividing this Vector by rhs_ within the provided index range, via the provided out_vector_. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be divided. Otherwise, all elements are divided by rhs_. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
+		/// <para> DivBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform arithmetic. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to divide elements by in the specified range.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t DivBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void DivideRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_divide_range_no_copy<OutBegin_, OutEnd_, DivBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of modulo-dividing this Vector by rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be modulo-divided. Otherwise, all elements are modulo-divided by rhs_. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to modulo-divide this Vector by.</param>
+		/// <returns>Copy of this Vector modulo-divided by rhs_, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Mod(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_mod<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Mod(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_mod<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of modulo-dividing this Vector by rhs_, via the provided out_vector_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be modulo-divided. Otherwise, all elements are modulo-divided by rhs_. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to modulo-divide this Vector by.</param>
+		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void Mod(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_mod(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of modulo-dividing this Vector by rhs_ within the provided index range, with copies of elements in indices outside of said range. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be modulo-divided. Otherwise, all elements are modulo-divided by rhs_. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start modulo-dividing elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop modulo-dividing elements. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to modulo-divide elements by in the specified range.</param>
+		/// <returns>
+		///		Copy of this Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq), 
+		///		with indices in the provided range modulo-divided by rhs_.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ModRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_mod_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ModRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_mod_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of modulo-dividing this Vector by rhs_ within the provided index range,
+		///		with copies of elements in indices outside of said range, via the provided out_vector_.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be modulo-divided. Otherwise, all elements are divided by rhs_. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start modulo-dividing elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop modulo-dividing elements. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to modulo-divide elements by in the specified range.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void ModRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_mod_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of modulo-dividing this Vector by rhs_ within the provided index range. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be modulo-divided. Otherwise, all elements are modulo-divided by rhs_. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
+		/// <para> ModBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform arithmetic. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to modulo-divide elements by in the specified range.</param>
+		/// <returns>
+		///		EmuMath Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq),
+		///		with indices within this Vector modulo-divided by rhs_ in the provided range, and default-constructed elements elsewhere.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ModBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ModRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_mod_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ModBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ModBegin_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ModRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_mod_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ModBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of modulo-dividing this Vector by rhs_ within the provided index range, via the provided out_vector_. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be modulo-divided. Otherwise, all elements are modulo-divided by rhs_. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
+		/// <para> ModBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform arithmetic. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to modulo-divide elements by in the specified range.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ModBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void ModRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_mod_range_no_copy<OutBegin_, OutEnd_, ModBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+#pragma endregion
+
 #pragma region MISC_ARITHMETIC_FUNCS
+	public:
 		/// <summary> Returns the absolute form of this Vector. </summary>
 		/// <returns>Copy of this Vector with its elements made absolute, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
@@ -1264,6 +1864,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region ROUNDING_FUNCS
+	public:
 		/// <summary>
 		/// <para> Returns a copy of this Vector with its elements rounded toward negative infinity. </para>
 		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `FloorConstexpr` instead. </para>
@@ -1566,6 +2167,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONSTEXPR_ROUNDING_FUNCS
+	public:
 		/// <summary>
 		/// <para> Returns a copy of this Vector with its elements rounded toward negative infinity. </para>
 		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `Floor` if calling at runtime. </para>
@@ -2282,6 +2884,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONVERSIONS
+	public:
 		/// <summary>
 		/// <para> Converts this Vector to its alternative template representation, if it has one. </para>
 		/// <para> This is purely to convert reference-containing vectors between their `T_&amp;` and `internal_vector_reference&lt;T_&gt;` variants. </para>
@@ -2317,6 +2920,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region COPIES
+	public:
 		/// <summary>
 		/// <para> Copies the provided argument to this Vector's elements. </para>
 		/// <para> If this Vector contains references, this will copy the provided Arg_ to the referenced value_types. </para>
@@ -2426,6 +3030,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region SETS
+	public:
 		/// <summary>
 		/// <para> Sets the stored elements of this Vector to via moving respective elements in the passed Vector. </para>
 		/// <para> If to_move_set_ contains less elements than this Vector, non-contained elements will be interpreted as implied zeroes. </para>

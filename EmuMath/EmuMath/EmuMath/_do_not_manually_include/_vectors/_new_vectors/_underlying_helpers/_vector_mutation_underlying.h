@@ -426,26 +426,21 @@ namespace EmuMath::Helpers::_vector_underlying
 
 #pragma region MUTATION_FUNCS
 	template<std::size_t Index_, std::size_t EndIndex_, std::size_t ArgIndex_, class Func_, class OutVector_, class...Args_>
-	constexpr inline void _vector_mutate_execution(Func_& func_, OutVector_& out_vector_, Args_&&...args_)
+	constexpr inline void _vector_mutate_execution(Func_& func_, OutVector_& out_vector_, Args_&...args_)
 	{
 		if constexpr (Index_ < EndIndex_)
 		{
-			if constexpr (_assert_vector_mutate_is_valid_invocation<ArgIndex_, OutVector_, Func_, Args_...>())
+			if constexpr (_assert_vector_mutate_is_valid_invocation<ArgIndex_, OutVector_, Func_, Args_&...>())
 			{
 				// Copy the results of function invocation to the output Vector directly
-				// --- Arguments are cast to lval-refs to avoid moves when scalar arguments are provided
 				_vector_copy_index<Index_>
 				(
 					out_vector_,
-					_vector_mutate_invoke_func<ArgIndex_, Func_&>
-					(
-						func_,
-						EmuCore::TMP::lval_ref_cast<Args_>(std::forward<Args_>(args_))...
-					)
+					_vector_mutate_invoke_func<ArgIndex_, Func_&>(func_, args_...)
 				);
 
 				// Move on to next static iteration
-				_vector_mutate_execution<Index_ + 1, EndIndex_, ArgIndex_ + 1, Func_, OutVector_>(func_, out_vector_, std::forward<Args_>(args_)...);
+				_vector_mutate_execution<Index_ + 1, EndIndex_, ArgIndex_ + 1, Func_, OutVector_, Args_...>(func_, out_vector_, args_...);
 			}
 			else
 			{
@@ -461,34 +456,38 @@ namespace EmuMath::Helpers::_vector_underlying
 	template<class Func_, class OutVector_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgIndex_, class...Args_>
 	constexpr inline void _vector_mutate(Func_ func_, OutVector_& out_vector_, Args_&&...args_)
 	{
-		if constexpr (BeginIndex_ < OutVector_::size)
+		// Zero-length vector will always contain nothing, so no need to even execute
+		if constexpr(OutVector_::size != 0)
 		{
-			constexpr std::size_t clamped_end_index_ = (EndIndex_ <= OutVector_::size) ? EndIndex_ : OutVector_::size;
-			if constexpr (BeginIndex_ <= clamped_end_index_)
+			if constexpr (BeginIndex_ < OutVector_::size)
 			{
-				_vector_mutate_execution<BeginIndex_, clamped_end_index_, ArgIndex_, Func_, OutVector_>
-				(
-					func_,
-					out_vector_,
-					std::forward<Args_>(args_)...
-				);
+				constexpr std::size_t clamped_end_index_ = (EndIndex_ <= OutVector_::size) ? EndIndex_ : OutVector_::size;
+				if constexpr (BeginIndex_ <= clamped_end_index_)
+				{
+					_vector_mutate_execution<BeginIndex_, clamped_end_index_, ArgIndex_, Func_, OutVector_>
+					(
+						func_,
+						out_vector_,
+						EmuCore::TMP::lval_ref_cast<Args_>(std::forward<Args_>(args_))...
+					);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Func_>(),
+						"Attempted to mutate an EmuMath Vector, but the provided BeginIndex_ is greater than the provided EndIndex_ after clamping."
+					);
+				}
 			}
 			else
 			{
 				static_assert
 				(
 					EmuCore::TMP::get_false<Func_>(),
-					"Attempted to mutate an EmuMath Vector, but the provided BeginIndex_ is greater than the provided EndIndex_ after clamping."
+					"Attempted to mutate an EmuMath Vector, but the provided BeginIndex_ is greater than the highest valid index within the Vector. The inclusive valid index range is 0:size-1."
 				);
 			}
-		}
-		else
-		{
-			static_assert
-			(
-				EmuCore::TMP::get_false<Func_>(),
-				"Attempted to mutate an EmuMath Vector, but the provided BeginIndex_ is greater than the highest valid index within the Vector. The inclusive valid index range is 0:size-1."
-			);
 		}
 	}
 
