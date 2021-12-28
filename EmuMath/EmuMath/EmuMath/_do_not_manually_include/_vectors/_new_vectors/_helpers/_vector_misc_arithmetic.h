@@ -17,7 +17,7 @@ namespace EmuMath::Helpers
 	/// <para> OutT_: Optional argument used as the T_ argument for the output EmuMath Vector type. Defaults to the input Vector's T_. </para>
 	/// </summary>
 	/// <param name="in_vector_">EmuMath Vector to output the absolute form of.</param>
-	/// <returns>Absolute form of in_vector_ toward 0 as an EmuMath Vector type formed from the provided OutSize_ and OutT_ arguments.</returns>
+	/// <returns>Absolute form of in_vector_ as an EmuMath Vector type formed from the provided OutSize_ and OutT_ arguments.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_abs(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
@@ -159,7 +159,7 @@ namespace EmuMath::Helpers
 	/// <para> OutBegin_ is the inclusve index at which to start writing absolute values to the output Vector. </para>
 	/// <para> OutEnd_ is the exclusive index at which to stop writing absolute values to the output Vector. </para>
 	/// <para> 
-	///		RoundBegin_ is the inclusive index at which to start reading values from in_vector_ in order to perform absolute conversion. 
+	///		AbsBegin_ is the inclusive index at which to start reading values from in_vector_ in order to perform absolute conversion. 
 	///		This is incremented per mutation, but is not changed when not in the absolute conversion range. 
 	/// </para>
 	/// </summary>

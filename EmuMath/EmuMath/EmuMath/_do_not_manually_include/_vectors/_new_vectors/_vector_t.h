@@ -936,6 +936,74 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region CONST_BITWISE_OPERATORS
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator~() const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_not<OutSize_, OutT_>(*this);
+		}
+		template<typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator~() const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_not<size, OutT_>(*this);
+		}
+
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator&(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_and<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator&(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_and<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator|(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_or<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator|(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_or<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator^(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_xor<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator^(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_xor<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator<<(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_shift_left<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator<<(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_shift_left<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator>>(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_shift_right<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator>>(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_shift_right<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+#pragma endregion
+
 #pragma region UNARY_ARITHMETIC_FUNCS
 	public:
 		/// <summary>

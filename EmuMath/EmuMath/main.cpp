@@ -873,12 +873,28 @@ int main()
 	//constexpr auto new_mod_res_c_ = EmuMath::Helpers::new_vector_mod_range_no_copy<1, 5, 0>(EmuMath::Helpers::new_vector_make<float>(1.5, 0, 3.9, -2.5, -5, 2.5), 2.5);
 	constexpr auto new_mod_res_c_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).ModRangeNoCopy<1, 5, 0>(2.5);
 
-	std::cout << "---\n\n";
-	EmuMath::NewVector<0, float> zero_vector_;
-	constexpr EmuMath::NewVector<0, float> constexpr_zero_vector_;
-	std::cout << zero_vector_ << "\n";
-	std::cout << zero_vector_ << "\n";
-	std::cout << zero_vector_.Add<30>(25.0f);
+
+	constexpr auto new_bitwise_test_ = EmuMath::Helpers::new_vector_make<int>(0, 2, 4, 3, 9, 10);
+
+	//constexpr auto new_and_res_a_ = EmuMath::Helpers::new_vector_bitwise_and(new_bitwise_test_, 3);
+	constexpr auto new_and_res_a_ = new_bitwise_test_ & 3;
+
+	//constexpr auto new_or_res_a_ = EmuMath::Helpers::new_vector_bitwise_or(new_bitwise_test_, 3);
+	constexpr auto new_or_res_a_ = new_bitwise_test_ | 3;
+
+	//constexpr auto new_xor_res_a_ = EmuMath::Helpers::new_vector_bitwise_xor(new_bitwise_test_, 3);
+	constexpr auto new_xor_res_a_ = new_bitwise_test_ ^ 3;
+
+	//constexpr auto new_lshift_res_a_ = EmuMath::Helpers::new_vector_shift_left(new_bitwise_test_, 2);
+	constexpr auto new_lshift_res_a_ = new_bitwise_test_ << 2;
+
+	//constexpr auto new_rshift_res_a_ = EmuMath::Helpers::new_vector_shift_right(new_bitwise_test_, 2);
+	constexpr auto new_rshift_res_a_ = new_bitwise_test_ >> 2;
+
+	//constexpr auto new_not_res_a_ = EmuMath::Helpers::new_vector_bitwise_not(EmuMath::Helpers::new_vector_make<std::uint16_t>(0xFFFF, 0xFFFE, 0));
+	constexpr auto new_not_res_a_ = ~EmuMath::Helpers::new_vector_make<std::uint16_t>(0xFFFF, 0xFFFE, 0);
+
+	std::cout << new_rshift_res_a_ << " --- And extra\n";
 
 	// GRADIENTS START
 	std::cout << "\n\n";
