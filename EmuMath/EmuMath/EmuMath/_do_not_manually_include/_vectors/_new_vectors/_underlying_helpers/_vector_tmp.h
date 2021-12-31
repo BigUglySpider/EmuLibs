@@ -140,6 +140,22 @@ namespace EmuMath::TMP
 	template<class Lhs_, class Rhs_>
 	using smallest_vector_t = typename smallest_vector<Lhs_, Rhs_>::type;
 
+	template<typename T_>
+	struct preferred_vector_fp
+	{
+		using type = EmuCore::TMP::first_floating_point_t<typename EmuCore::TMP::remove_ref_cv<T_>::type, float>;
+	};
+	template<typename T_>
+	struct preferred_vector_fp<EmuMath::vector_internal_ref<T_>>
+	{
+		using type = typename preferred_vector_fp<T_>::type;
+	};
+	template<std::size_t Size_, typename T_>
+	struct preferred_vector_fp<EmuMath::NewVector<Size_, T_>>
+	{
+		using type = EmuMath::NewVector<Size_, typename preferred_vector_fp<T_>::type>;
+	};
+
 	template<class Lhs_, class Rhs_>
 	struct largest_vector
 	{

@@ -30,6 +30,7 @@ namespace EmuMath
 		using stored_type = typename vector_info::stored_type;
 		using value_type = typename vector_info::value_type;
 		using value_type_uq = typename vector_info::value_type_uq;
+		using preferred_floating_point = typename vector_info::preferred_floating_point;
 		using alternative_rep = typename vector_info::alternative_vector_rep;
 		friend typename alternative_rep;
 

@@ -127,9 +127,16 @@ namespace EmuMath::TMP
 		/// <para> Where `value_type` does not have any `const` or `volatile` qualifiers, this will be the same as `value_type`. </para>
 		/// </summary>
 		using value_type_uq = std::remove_cv_t<value_type>;
+
+		/// <summary>
+		/// <para> Floating-point type to be used with Vector's initialised with the provided Size_ and T_ args in cases where real numbers are preferred. </para>
+		/// <para> By default, if value_type_uq is a floating-point type, this will be value_type_uq. Otherwise, it will be float. </para>
+		/// </summary>
+		using preferred_floating_point = typename EmuMath::TMP::preferred_vector_fp<T_>::type;
 		
 		using vector_rep = EmuMath::NewVector<Size_, T_>;
 		using alternative_vector_rep = typename _find_alternative_vector_rep<T_>::type;
+
 #pragma endregion
 
 #pragma region STATIC_INFO
