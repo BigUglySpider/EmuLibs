@@ -896,6 +896,38 @@ int main()
 
 	std::cout << new_rshift_res_a_ << " --- And extra\n";
 
+	std::cout << "---\n\n";
+	EmuMath::NewVector<4, double> assign_op_test_(1, 2, 3, 4);
+	std::cout << assign_op_test_ << "\n";
+	assign_op_test_ += 5;
+	std::cout << "+ 5: " << assign_op_test_ << "\n";
+	assign_op_test_ -= 2.3f;
+	std::cout << "- 2.3f: " << assign_op_test_ << "\n";
+	assign_op_test_ *= 10ULL;
+	std::cout << "* 10ULL: " << assign_op_test_ << "\n";
+	assign_op_test_ /= std::uint8_t(2);
+	std::cout << "/ uint8_t(2): " << assign_op_test_ << "\n";
+	assign_op_test_ %= 2;
+	std::cout << "% 2: " << assign_op_test_ << "\n";
+	auto to_add_ = assign_op_test_.Shuffle<3, 1, 0, 2>();
+	assign_op_test_ += to_add_;
+	std::cout << "+ " << to_add_ << ": " << assign_op_test_ << "\n";
+	assign_op_test_ *= 3;
+	std::cout << "* 3: " << assign_op_test_ << "\n";
+	assign_op_test_ += EmuMath::Helpers::new_vector_make<long double>(1, 2, 3, 4, 5);
+	std::cout << "+ " << EmuMath::Helpers::new_vector_make<long double>(1, 2, 3, 4, 5) << ": " << assign_op_test_ << "\n";
+
+	std::cout << "---\n\n";
+	EmuMath::NewVector<4, std::uint16_t> bitwise_assign_op_test_(1, 2, 3, 10);
+	std::cout << bitwise_assign_op_test_ << " (" << EmuMath::NewVector<4, std::bitset<16>>(bitwise_assign_op_test_) << ")\n";
+	bitwise_assign_op_test_ ^= 2;
+	std::cout << bitwise_assign_op_test_ << " (" << EmuMath::NewVector<4, std::bitset<16>>(bitwise_assign_op_test_) << ")\n";
+	bitwise_assign_op_test_ &= ~2;
+	std::cout << bitwise_assign_op_test_ << " (" << EmuMath::NewVector<4, std::bitset<16>>(bitwise_assign_op_test_) << ")\n";
+	bitwise_assign_op_test_ |= 2048;
+	std::cout << bitwise_assign_op_test_ << " (" << EmuMath::NewVector<4, std::bitset<16>>(bitwise_assign_op_test_) << ")\n";
+	bitwise_assign_op_test_ ^= EmuMath::Helpers::new_vector_make<int>(0xFFFFFFFF, 0xFFFFFFFE, 0x1, 0x7);
+	std::cout << bitwise_assign_op_test_ << " (" << EmuMath::NewVector<4, std::bitset<16>>(bitwise_assign_op_test_) << ")\n";
 
 	// GRADIENTS START
 	std::cout << "\n\n";

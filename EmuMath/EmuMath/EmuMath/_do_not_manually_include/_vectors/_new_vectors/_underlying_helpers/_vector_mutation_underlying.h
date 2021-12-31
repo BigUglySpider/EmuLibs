@@ -898,6 +898,24 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 	}
 
+	template<template<class...> class FuncT_, std::size_t BeginIndex_, std::size_t EndIndex_, class...Args_>
+	constexpr inline void _vector_mutate_with_func_template_invoke_only_no_func_passed(Args_&&...args_)
+	{
+		if constexpr (EmuCore::TMP::valid_template_args_v<FuncT_, EmuMath::TMP::emu_vector_value_type_uq<Args_>...>)
+		{
+			using Func_ = FuncT_<EmuMath::TMP::emu_vector_value_type_uq<Args_>...>;
+			_vector_mutate_invoke_only_no_func_passed<Func_, BeginIndex_, EndIndex_>(std::forward<Args_>(args_)...);
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<std::size_t, BeginIndex_>(),
+				"Attempted to perform an EmuMath Vector mutation with invocation only, using a Func_ template whose arguments are determined automatically based on the provided arguments. However, the provided arguments are not valid for forming a template instance of the provided Func_ template."
+			);
+		}
+	}
+
 	template<bool CopyBeforeMut_, class Func_, std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_, class...Args_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_copy_mutate_invoke_only(Func_ func_, EmuMath::NewVector<Size_, T_>& vector_, Args_&&...args_)
 	{
@@ -947,6 +965,43 @@ namespace EmuMath::Helpers::_vector_underlying
 			(
 				EmuCore::TMP::get_false<Func_>(),
 				"Attempted to copy an EmuMath Vector to an output Vector directly before or after performing a mutation operation, but the desired output Vector cannot be constructed from the input Vector."
+			);
+		}
+	}
+
+	template
+	<
+		bool CopyBeforeMut_,
+		template<class...> class FuncT_,
+		std::size_t OutSize_,
+		typename OutT_,
+		std::size_t BeginIndex_,
+		std::size_t EndIndex_,
+		std::size_t Size_,
+		typename T_,
+		class...Args_
+	>
+	constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_copy_mutate_with_func_template_invoke_only_no_func_passed
+	(
+		EmuMath::NewVector<Size_, T_>& vector_,
+		Args_&&...args_
+	)
+	{
+		if constexpr (EmuCore::TMP::valid_template_args_v<FuncT_, EmuMath::TMP::emu_vector_value_type_uq<Args_>...>)
+		{
+			using Func_ = FuncT_<EmuMath::TMP::emu_vector_value_type_uq<Args_>...>;
+			return _vector_copy_mutate_invoke_only_no_func_passed<CopyBeforeMut_, Func_, OutSize_, OutT_, BeginIndex_, EndIndex_, Size_, T_>
+			(
+				vector_,
+				std::forward<Args_>(args_)...
+			);
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<std::size_t, BeginIndex_>(),
+				"Attempted to perform an EmuMath Vector mutation with invocation only, using a Func_ template whose arguments are determined automatically based on the provided arguments. However, the provided arguments are not valid for forming a template instance of the provided Func_ template."
 			);
 		}
 	}

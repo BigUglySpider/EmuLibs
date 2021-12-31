@@ -9,13 +9,14 @@
 
 namespace EmuCore
 {
+#pragma region CONST_BITWISE_FUNCTORS
 	template<typename Lhs_, typename Rhs_ = Lhs_>
 	struct do_bitwise_and
 	{
 		constexpr do_bitwise_and()
 		{
 		}
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline EmuCore::TMP::bitwise_and_operator_result_t<const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			if constexpr (EmuCore::TMP::has_bitwise_and_operator_v<const Lhs_&, const Rhs_&>)
 			{
@@ -47,7 +48,7 @@ namespace EmuCore
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline std::invoke_result_t<do_bitwise_and<Lhs_, Rhs_>, const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			return do_bitwise_and<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
@@ -59,7 +60,7 @@ namespace EmuCore
 		constexpr do_bitwise_or()
 		{
 		}
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline EmuCore::TMP::bitwise_or_operator_result_t<const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			if constexpr (EmuCore::TMP::has_bitwise_or_operator_v<const Lhs_&, const Rhs_&>)
 			{
@@ -91,7 +92,7 @@ namespace EmuCore
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_bitwise_or<Lhs_, Rhs_>, const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			return do_bitwise_or<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
@@ -103,7 +104,7 @@ namespace EmuCore
 		constexpr do_bitwise_xor()
 		{
 		}
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline EmuCore::TMP::bitwise_xor_operator_result_t<const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			if constexpr (EmuCore::TMP::has_bitwise_xor_operator_v<const Lhs_&, const Rhs_&>)
 			{
@@ -135,7 +136,7 @@ namespace EmuCore
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline std::invoke_result_t<do_bitwise_xor<Lhs_, Rhs_>, const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			return do_bitwise_xor<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
@@ -147,7 +148,7 @@ namespace EmuCore
 		constexpr do_bitwise_not()
 		{
 		}
-		[[nodiscard]] constexpr inline auto operator()(const T_& val_) const
+		constexpr inline EmuCore::TMP::bitwise_not_operator_result_t<const T_&> operator()(const T_& val_) const
 		{
 			if constexpr (EmuCore::TMP::has_bitwise_not_operator_v<const T_&>)
 			{
@@ -179,7 +180,7 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline auto operator()(const T_& val_) const
+		constexpr inline std::invoke_result_t<do_bitwise_not<T_>, const T_&> operator()(const T_& val_) const
 		{
 			return do_bitwise_not<T_>()(val_);
 		}
@@ -191,7 +192,7 @@ namespace EmuCore
 		constexpr do_left_shift()
 		{
 		}
-		constexpr inline auto operator()(const T_& val_, const Shifts_& num_shifts_) const
+		constexpr inline EmuCore::TMP::left_shift_operator_result_t<const T_&, const Shifts_&> operator()(const T_& val_, const Shifts_& num_shifts_) const
 		{
 			if constexpr (EmuCore::TMP::has_left_shift_operator_v<const T_&, const Shifts_&>)
 			{
@@ -223,7 +224,7 @@ namespace EmuCore
 		{
 		}
 		template<typename T_, typename Shifts_>
-		constexpr inline auto operator()(const T_& val_, const Shifts_& num_shifts_) const
+		constexpr inline std::invoke_result_t<do_left_shift<T_, Shifts_>, const T_&, const Shifts_&> operator()(const T_& val_, const Shifts_& num_shifts_) const
 		{
 			return do_left_shift<T_, Shifts_>()(val_, num_shifts_);
 		}
@@ -235,7 +236,7 @@ namespace EmuCore
 		constexpr do_right_shift()
 		{
 		}
-		constexpr inline auto operator()(const T_& val_, const Shifts_& num_shifts_) const
+		constexpr inline EmuCore::TMP::right_shift_operator_result_t<const T_&, const Shifts_&> operator()(const T_& val_, const Shifts_& num_shifts_) const
 		{
 			if constexpr (EmuCore::TMP::has_right_shift_operator_v<const T_&, const Shifts_&>)
 			{
@@ -267,11 +268,249 @@ namespace EmuCore
 		{
 		}
 		template<typename T_, typename Shifts_>
-		constexpr inline auto operator()(const T_& val_, const Shifts_& num_shifts_) const
+		constexpr inline std::invoke_result_t<do_right_shift<T_, Shifts_>, const T_&, const Shifts_&> operator()(const T_& val_, const Shifts_& num_shifts_) const
 		{
 			return do_right_shift<T_, Shifts_>()(val_, num_shifts_);
 		}
 	};
+#pragma endregion
+
+#pragma region BITWISE_OP_ASSIGN_FUNCTORS
+	template<typename Lhs_, typename Rhs_ = Lhs_>
+	struct do_bitwise_and_assign
+	{
+		using result_type = std::conditional_t
+		<
+			EmuCore::TMP::has_bitwise_and_assign_operator_v<Lhs_&, const Rhs_&>,
+			EmuCore::TMP::bitwise_and_assign_operator_result_t<Lhs_&, const Rhs_&>,
+			Lhs_&
+		>;
+		constexpr do_bitwise_and_assign()
+		{
+		}
+		constexpr inline result_type operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			if constexpr (EmuCore::TMP::has_bitwise_and_assign_operator_v<Lhs_&, const Rhs_&>)
+			{
+				return lhs_ &= rhs_;
+			}
+			else
+			{
+				using const_op = do_bitwise_and<Lhs_, Rhs_>;
+				using const_op_result = std::invoke_result_t<const_op, Lhs_&, const Rhs_&>;
+				if constexpr (std::is_assignable_v<Lhs_&, const_op_result>)
+				{
+					lhs_ = const_op()(lhs_, rhs_);
+					return lhs_;
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<const_op_result>(), "Unable to perform bitwise-AND-assign operation via EmuCore::do_bitwise_and_assign, as the provided Lhs_ type does not have a valid &= operator, and cannot be assigned via the result of do_bitwise_and in order to emulate such behaviour, when used with the provided Rhs_ argument.");
+				}
+			}
+		}
+	};
+	template<>
+	struct do_bitwise_and_assign<void, void>
+	{
+		constexpr do_bitwise_and_assign()
+		{
+		}
+		template<typename Lhs_, typename Rhs_>
+		constexpr inline std::invoke_result_t<do_bitwise_and_assign<Lhs_, Rhs_>, Lhs_&, const Rhs_&> operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			return do_bitwise_and_assign<Lhs_, Rhs_>()(lhs_, rhs_);
+		}
+	};
+
+	template<typename Lhs_, typename Rhs_ = Lhs_>
+	struct do_bitwise_or_assign
+	{
+		using result_type = std::conditional_t
+		<
+			EmuCore::TMP::has_bitwise_or_assign_operator_v<Lhs_&, const Rhs_&>,
+			EmuCore::TMP::bitwise_or_assign_operator_result_t<Lhs_&, const Rhs_&>,
+			Lhs_&
+		>;
+		constexpr do_bitwise_or_assign()
+		{
+		}
+		constexpr inline result_type operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			if constexpr (EmuCore::TMP::has_bitwise_or_assign_operator_v<Lhs_&, const Rhs_&>)
+			{
+				return lhs_ |= rhs_;
+			}
+			else
+			{
+				using const_op = do_bitwise_or<Lhs_, Rhs_>;
+				using const_op_result = std::invoke_result_t<const_op, Lhs_&, const Rhs_&>;
+				if constexpr (std::is_assignable_v<Lhs_&, const_op_result>)
+				{
+					lhs_ = const_op()(lhs_, rhs_);
+					return lhs_;
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<const_op_result>(), "Unable to perform bitwise-OR-assign operation via EmuCore::do_bitwise_or_assign, as the provided Lhs_ type does not have a valid |= operator, and cannot be assigned via the result of do_bitwise_or in order to emulate such behaviour, when used with the provided Rhs_ argument.");
+				}
+			}
+		}
+	};
+	template<>
+	struct do_bitwise_or_assign<void, void>
+	{
+		constexpr do_bitwise_or_assign()
+		{
+		}
+		template<typename Lhs_, typename Rhs_>
+		constexpr inline std::invoke_result_t<do_bitwise_or_assign<Lhs_, Rhs_>, Lhs_&, const Rhs_&> operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			return do_bitwise_or_assign<Lhs_, Rhs_>()(lhs_, rhs_);
+		}
+	};
+
+	template<typename Lhs_, typename Rhs_ = Lhs_>
+	struct do_bitwise_xor_assign
+	{
+		using result_type = std::conditional_t
+		<
+			EmuCore::TMP::has_bitwise_xor_assign_operator_v<Lhs_&, const Rhs_&>,
+			EmuCore::TMP::bitwise_xor_assign_operator_result_t<Lhs_&, const Rhs_&>,
+			Lhs_&
+		>;
+		constexpr do_bitwise_xor_assign()
+		{
+		}
+		constexpr inline result_type operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			if constexpr (EmuCore::TMP::has_bitwise_xor_assign_operator_v<Lhs_&, const Rhs_&>)
+			{
+				return lhs_ ^= rhs_;
+			}
+			else
+			{
+				using const_op = do_bitwise_xor<Lhs_, Rhs_>;
+				using const_op_result = std::invoke_result_t<const_op, Lhs_&, const Rhs_&>;
+				if constexpr (std::is_assignable_v<Lhs_&, const_op_result>)
+				{
+					lhs_ = const_op()(lhs_, rhs_);
+					return lhs_;
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<const_op_result>(), "Unable to perform bitwise-XOR-assign operation via EmuCore::do_bitwise_xor_assign, as the provided Lhs_ type does not have a valid ^= operator, and cannot be assigned via the result of do_bitwise_xor in order to emulate such behaviour, when used with the provided Rhs_ argument.");
+				}
+			}
+		}
+	};
+	template<>
+	struct do_bitwise_xor_assign<void, void>
+	{
+		constexpr do_bitwise_xor_assign()
+		{
+		}
+		template<typename Lhs_, typename Rhs_>
+		constexpr inline std::invoke_result_t<do_bitwise_xor_assign<Lhs_, Rhs_>, Lhs_&, const Rhs_&> operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			return do_bitwise_xor_assign<Lhs_, Rhs_>()(lhs_, rhs_);
+		}
+	};
+
+	template<typename Lhs_, typename Rhs_ = Lhs_>
+	struct do_left_shift_assign
+	{
+		using result_type = std::conditional_t
+		<
+			EmuCore::TMP::has_left_shift_assign_operator_v<Lhs_&, const Rhs_&>,
+			EmuCore::TMP::left_shift_assign_operator_result_t<Lhs_&, const Rhs_&>,
+			Lhs_&
+		>;
+		constexpr do_left_shift_assign()
+		{
+		}
+		constexpr inline result_type operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			if constexpr (EmuCore::TMP::has_left_shift_assign_operator_v<Lhs_&, const Rhs_&>)
+			{
+				return lhs_ <<= rhs_;
+			}
+			else
+			{
+				using const_op = do_left_shift<Lhs_, Rhs_>;
+				using const_op_result = std::invoke_result_t<const_op, Lhs_&, const Rhs_&>;
+				if constexpr (std::is_assignable_v<Lhs_&, const_op_result>)
+				{
+					lhs_ = const_op()(lhs_, rhs_);
+					return lhs_;
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<const_op_result>(), "Unable to perform left-shift-assign operation via EmuCore::do_left_shift_assign, as the provided Lhs_ type does not have a valid <<= operator, and cannot be assigned via the result of do_left_shift in order to emulate such behaviour, when used with the provided Rhs_ argument.");
+				}
+			}
+		}
+	};
+	template<>
+	struct do_left_shift_assign<void, void>
+	{
+		constexpr do_left_shift_assign()
+		{
+		}
+		template<typename Lhs_, typename Rhs_>
+		constexpr inline std::invoke_result_t<do_left_shift_assign<Lhs_, Rhs_>, Lhs_&, const Rhs_&> operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			return do_left_shift_assign<Lhs_, Rhs_>()(lhs_, rhs_);
+		}
+	};
+
+	template<typename Lhs_, typename Rhs_ = Lhs_>
+	struct do_right_shift_assign
+	{
+		using result_type = std::conditional_t
+		<
+			EmuCore::TMP::has_right_shift_assign_operator_v<Lhs_&, const Rhs_&>,
+			EmuCore::TMP::right_shift_assign_operator_result_t<Lhs_&, const Rhs_&>,
+			Lhs_&
+		>;
+		constexpr do_right_shift_assign()
+		{
+		}
+		constexpr inline result_type operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			if constexpr (EmuCore::TMP::has_right_shift_assign_operator_v<Lhs_&, const Rhs_&>)
+			{
+				return lhs_ >>= rhs_;
+			}
+			else
+			{
+				using const_op = do_right_shift<Lhs_, Rhs_>;
+				using const_op_result = std::invoke_result_t<const_op, Lhs_&, const Rhs_&>;
+				if constexpr (std::is_assignable_v<Lhs_&, const_op_result>)
+				{
+					lhs_ = const_op()(lhs_, rhs_);
+					return lhs_;
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<const_op_result>(), "Unable to perform right-shift-assign operation via EmuCore::do_right_shift_assign, as the provided Lhs_ type does not have a valid >>= operator, and cannot be assigned via the result of do_right_shift in order to emulate such behaviour, when used with the provided Rhs_ argument.");
+				}
+			}
+		}
+	};
+	template<>
+	struct do_right_shift_assign<void, void>
+	{
+		constexpr do_right_shift_assign()
+		{
+		}
+		template<typename Lhs_, typename Rhs_>
+		constexpr inline std::invoke_result_t<do_right_shift_assign<Lhs_, Rhs_>, Lhs_&, const Rhs_&> operator()(Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			return do_right_shift_assign<Lhs_, Rhs_>()(lhs_, rhs_);
+		}
+	};
+#pragma endregion
 }
 
 #endif

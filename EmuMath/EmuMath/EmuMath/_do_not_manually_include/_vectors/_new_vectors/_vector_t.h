@@ -1005,6 +1005,100 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region ARITHMETIC_ASSIGN_OPERATORS
+	public:
+		template<typename Rhs_>
+		constexpr inline this_type& operator+=(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_add_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
+		constexpr inline this_type& operator+=(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_add_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename Rhs_>
+		constexpr inline this_type& operator-=(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_subtract_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
+		constexpr inline this_type& operator-=(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_subtract_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename Rhs_>
+		constexpr inline this_type& operator*=(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_multiply_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
+		constexpr inline this_type& operator*=(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_multiply_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename Rhs_>
+		constexpr inline this_type& operator/=(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_divide_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
+		constexpr inline this_type& operator/=(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_divide_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename Rhs_>
+		constexpr inline this_type& operator%=(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_mod_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
+		constexpr inline this_type& operator%=(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_mod_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+#pragma endregion
+
+#pragma region BITWISE_ASSIGN_OPERATORS
+	public:
+		template<typename Rhs_>
+		constexpr inline this_type& operator&=(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_bitwise_and_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
+		constexpr inline this_type& operator&=(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_bitwise_and_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename Rhs_>
+		constexpr inline this_type& operator|=(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_bitwise_or_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
+		constexpr inline this_type& operator|=(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_bitwise_or_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename Rhs_>
+		constexpr inline this_type& operator^=(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_bitwise_xor_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
+		constexpr inline this_type& operator^=(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_bitwise_xor_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+#pragma endregion
+
 #pragma region UNARY_ARITHMETIC_FUNCS
 	public:
 		/// <summary>
@@ -2356,6 +2450,155 @@ namespace EmuMath
 		constexpr inline void NotRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::new_vector_bitwise_not_range_no_copy<OutBegin_, OutEnd_, NotBegin_>(out_vector_, *this);
+		}
+#pragma endregion
+
+#pragma region ARITHMETIC_ASSIGN_FUNCS
+	public:
+		/// <summary>
+		/// <para> Performs an add-assign operation on this Vector, equivalent to `this_vector += rhs_`. </para>
+		/// <para> If rhs_ is an EmuMath Vector: Respective indices will be used for each arithmetic operation; otherwise, all operations will use rhs_ directly. </para>
+		/// <para> If both a BeginIndex_ and EndIndex_ is provided, the operation will only be performed for indices within the specified range. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of arithmetic operations.</param>
+		/// <returns>Reference to this Vector.</returns>
+		template<typename Rhs_>
+		constexpr inline this_type& AddAssign(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_add_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
+		constexpr inline this_type& AddAssign(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_add_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a subtract-assign operation on this Vector, equivalent to `this_vector -= rhs_`. </para>
+		/// <para> If rhs_ is an EmuMath Vector: Respective indices will be used for each arithmetic operation; otherwise, all operations will use rhs_ directly. </para>
+		/// <para> If both a BeginIndex_ and EndIndex_ is provided, the operation will only be performed for indices within the specified range. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of arithmetic operations.</param>
+		/// <returns>Reference to this Vector.</returns>
+		template<typename Rhs_>
+		constexpr inline this_type& SubtractAssign(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_subtract_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
+		constexpr inline this_type& SubtractAssign(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_subtract_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a multiply-assign operation on this Vector, equivalent to `this_vector *= rhs_`. </para>
+		/// <para> If rhs_ is an EmuMath Vector: Respective indices will be used for each arithmetic operation; otherwise, all operations will use rhs_ directly. </para>
+		/// <para> If both a BeginIndex_ and EndIndex_ is provided, the operation will only be performed for indices within the specified range. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of arithmetic operations.</param>
+		/// <returns>Reference to this Vector.</returns>
+		template<typename Rhs_>
+		constexpr inline this_type& MultiplyAssign(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_multiply_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
+		constexpr inline this_type& MultiplyAssign(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_multiply_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a divide-assign operation on this Vector, equivalent to `this_vector /= rhs_`. </para>
+		/// <para> If rhs_ is an EmuMath Vector: Respective indices will be used for each arithmetic operation; otherwise, all operations will use rhs_ directly. </para>
+		/// <para> If both a BeginIndex_ and EndIndex_ is provided, the operation will only be performed for indices within the specified range. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of arithmetic operations.</param>
+		/// <returns>Reference to this Vector.</returns>
+		template<typename Rhs_>
+		constexpr inline this_type& DivideAssign(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_divide_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
+		constexpr inline this_type& DivideAssign(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_divide_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a modulo-divide-assign operation on this Vector, equivalent to `this_vector %= rhs_`. </para>
+		/// <para> If rhs_ is an EmuMath Vector: Respective indices will be used for each arithmetic operation; otherwise, all operations will use rhs_ directly. </para>
+		/// <para> If both a BeginIndex_ and EndIndex_ is provided, the operation will only be performed for indices within the specified range. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of arithmetic operations.</param>
+		/// <returns>Reference to this Vector.</returns>
+		template<typename Rhs_>
+		constexpr inline this_type& ModAssign(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_mod_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
+		constexpr inline this_type& ModAssign(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_mod_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+#pragma endregion
+
+#pragma region BITWISE_ASSIGN_FUNCS
+		/// <summary>
+		/// <para> Performs a bitwise AND-assign operation on this Vector, equivalent to `this_vector &= rhs_`. </para>
+		/// <para> If rhs_ is an EmuMath Vector: Respective indices will be used for each bitwise operation; otherwise, all operations will use rhs_ directly. </para>
+		/// <para> If both a BeginIndex_ and EndIndex_ is provided, the operation will only be performed for indices within the specified range. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of bitwise operations.</param>
+		/// <returns>Reference to this Vector.</returns>
+		template<typename Rhs_>
+		constexpr inline this_type& BitwiseAndAssign(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_bitwise_and_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
+		constexpr inline this_type& BitwiseAndAssign(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_bitwise_and_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a bitwise OR-assign operation on this Vector, equivalent to `this_vector |= rhs_`. </para>
+		/// <para> If rhs_ is an EmuMath Vector: Respective indices will be used for each bitwise operation; otherwise, all operations will use rhs_ directly. </para>
+		/// <para> If both a BeginIndex_ and EndIndex_ is provided, the operation will only be performed for indices within the specified range. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of bitwise operations.</param>
+		/// <returns>Reference to this Vector.</returns>
+		template<typename Rhs_>
+		constexpr inline this_type& BitwiseOrAssign(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_bitwise_or_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
+		constexpr inline this_type& BitwiseOrAssign(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_bitwise_or_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs a bitwise XOR-assign operation on this Vector, equivalent to `this_vector ^= rhs_`. </para>
+		/// <para> If rhs_ is an EmuMath Vector: Respective indices will be used for each bitwise operation; otherwise, all operations will use rhs_ directly. </para>
+		/// <para> If both a BeginIndex_ and EndIndex_ is provided, the operation will only be performed for indices within the specified range. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of bitwise operations.</param>
+		/// <returns>Reference to this Vector.</returns>
+		template<typename Rhs_>
+		constexpr inline this_type& BitwiseXorAssign(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_bitwise_xor_assign(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
+		constexpr inline this_type& BitwiseXorAssign(Rhs_&& rhs_)
+		{
+			return EmuMath::Helpers::new_vector_bitwise_xor_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 

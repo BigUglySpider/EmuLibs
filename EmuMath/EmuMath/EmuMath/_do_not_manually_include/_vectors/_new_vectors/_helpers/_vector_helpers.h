@@ -6,7 +6,9 @@
 
 #include "_common_vector_helpers.h"
 #include "_vector_basic_arithmetic.h"
+#include "_vector_basic_arithmetic_assign.h"
 #include "_vector_bitwise.h"
+#include "_vector_bitwise_assign.h"
 #include "_vector_copy.h"
 #include "_vector_get.h"
 #include "_vector_misc_arithmetic.h"
