@@ -68,8 +68,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			{
 				constexpr calc_type min_ratio_ = std::is_unsigned_v<OutChannel_> ? calc_type(0) : calc_type(-1);
 				constexpr calc_type max_ratio_ = calc_type(1);
-				constexpr EmuCore::do_clamp<calc_type, calc_type, calc_type> clamp_(min_ratio_, max_ratio_);
-				calc_type ratio_ = clamp_(static_cast<calc_type>(to_convert_));
+				calc_type ratio_ = EmuCore::do_clamp<calc_type, calc_type, calc_type>()(static_cast<calc_type>(to_convert_), min_ratio_, max_ratio_);
 				return static_cast<OutChannel_>(max_out_calc * ratio_);
 			}
 		}
@@ -85,8 +84,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			{
 				constexpr calc_type min_ratio_ = std::is_unsigned_v<OutChannel_> ? calc_type(0) : calc_type(-1);
 				constexpr calc_type max_ratio_ = calc_type(1);
-				constexpr EmuCore::do_clamp<calc_type, calc_type, calc_type> clamp_(min_ratio_, max_ratio_);
-				ratio_ = clamp_(ratio_);
+				ratio_ = EmuCore::do_clamp<calc_type, calc_type, calc_type>()(ratio_, min_ratio_, max_ratio_);
 				return static_cast<OutChannel_>(max_out_calc * ratio_);
 			}
 		}

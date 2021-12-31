@@ -5,6 +5,21 @@
 
 namespace EmuCore::TMP
 {
+#pragma region TYPE_EXTRACTORS
+	/// <summary>
+	/// <para> Aliases a type T_, and ignores the provided Discarded_ type. </para>
+	/// <para> Primarily exists for producing a variadic sequence of the same type, with a count based on variadic types that are unused. </para>
+	/// <para> Useful for forming generic EmuCore functors with fixed outputs (such as do_clamp&lt;void, void, void, float&gt;) in allowing situations. </para>
+	/// </summary>
+	template<class T_, class Discarded_>
+	struct type_and_discard
+	{
+		using type = T_;
+	};
+	template<class T_, class Discarded_>
+	using type_and_discard_t = typename type_and_discard<T_, Discarded_>::type;
+#pragma endregion
+
 #pragma region VARIADIC_BOOLS
 	/// <summary> Type to easily produce the result of a logical AND with variadic template argument results. </summary>
 	template<bool...Bools_>

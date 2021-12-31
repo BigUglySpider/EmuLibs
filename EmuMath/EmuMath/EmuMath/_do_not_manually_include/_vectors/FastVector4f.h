@@ -2215,8 +2215,8 @@ namespace EmuCore
 		}
 	};
 
-	template<typename B_>
-	struct do_min<EmuMath::FastVector4f, B_>
+	template<typename B_, typename Out_>
+	struct do_min<EmuMath::FastVector4f, B_, Out_>
 	{
 		constexpr do_min()
 		{
@@ -2227,8 +2227,8 @@ namespace EmuCore
 		}
 	};
 
-	template<typename B_>
-	struct do_max<EmuMath::FastVector4f, B_>
+	template<typename B_, typename Out_>
+	struct do_max<EmuMath::FastVector4f, B_, Out_>
 	{
 		constexpr do_max()
 		{
