@@ -27,8 +27,12 @@ namespace EmuCore
 				using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(Lhs_)>;
 				if constexpr (!std::is_same_v<uint_type, std::false_type>)
 				{
-					const uint_type as_uint_ = do_bitwise_and<uint_type, Rhs_>()(*reinterpret_cast<const uint_type*>(&lhs_), rhs_);
-					return *reinterpret_cast<const Lhs_*>(&as_uint_);
+					uint_type as_uint_;
+					std::memcpy(&as_uint_, &lhs_, sizeof(uint_type));
+					as_uint_ = do_bitwise_and<uint_type, Rhs_>()(as_uint_, rhs_);
+					Lhs_ out_lhs_;
+					std::memcpy(&out_lhs_, &as_uint_, sizeof(uint_type));
+					return out_lhs_;
 				}
 				else
 				{
@@ -71,8 +75,12 @@ namespace EmuCore
 				using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(Lhs_)>;
 				if constexpr (!std::is_same_v<uint_type, std::false_type>)
 				{
-					const uint_type as_uint_ = do_bitwise_or<uint_type, Rhs_>()(*reinterpret_cast<const uint_type*>(&lhs_), rhs_);
-					return *reinterpret_cast<const Lhs_*>(&as_uint_);
+					uint_type as_uint_;
+					std::memcpy(&as_uint_, &lhs_, sizeof(uint_type));
+					as_uint_ = do_bitwise_or<uint_type, Rhs_>()(as_uint_, rhs_);
+					Lhs_ out_lhs_;
+					std::memcpy(&out_lhs_, &as_uint_, sizeof(uint_type));
+					return out_lhs_;
 				}
 				else
 				{
@@ -115,8 +123,12 @@ namespace EmuCore
 				using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(Lhs_)>;
 				if constexpr (!std::is_same_v<uint_type, std::false_type>)
 				{
-					const uint_type as_uint_ = do_bitwise_xor<uint_type, Rhs_>()(*reinterpret_cast<const uint_type*>(&lhs_), rhs_);
-					return *reinterpret_cast<const Lhs_*>(&as_uint_);
+					uint_type as_uint_;
+					std::memcpy(&as_uint_, &lhs_, sizeof(uint_type));
+					as_uint_ = do_bitwise_xor<uint_type, Rhs_>()(as_uint_, rhs_);
+					Lhs_ out_lhs_;
+					std::memcpy(&out_lhs_, &as_uint_, sizeof(uint_type));
+					return out_lhs_;
 				}
 				else
 				{
@@ -159,8 +171,12 @@ namespace EmuCore
 				using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(T_)>;
 				if constexpr (!std::is_same_v<uint_type, std::false_type>)
 				{
-					const uint_type as_uint_ = do_bitwise_not<uint_type>()(*reinterpret_cast<const uint_type*>(&val_));
-					return *reinterpret_cast<const T_*>(&as_uint_);
+					uint_type as_uint_;
+					std::memcpy(&as_uint_, &val_, sizeof(uint_type));
+					as_uint_ = do_bitwise_not<uint_type>()(as_uint_);
+					T_ out_;
+					std::memcpy(&out_, &as_uint_, sizeof(uint_type));
+					return out_;
 				}
 				else
 				{
@@ -203,8 +219,12 @@ namespace EmuCore
 				using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(T_)>;
 				if constexpr (!std::is_same_v<uint_type, std::false_type>)
 				{
-					const uint_type as_uint_ = do_left_shift<uint_type, Shifts_>()(*reinterpret_cast<const uint_type*>(&val_), num_shifts_);
-					return *reinterpret_cast<const T_*>(&as_uint_);
+					uint_type as_uint_;
+					std::memcpy(&as_uint_, &val_, sizeof(uint_type));
+					as_uint_ = do_left_shift<uint_type, Shifts_>()(as_uint_, num_shifts_);
+					T_ out_;
+					std::memcpy(&out_, &as_uint_, sizeof(uint_type));
+					return out_;
 				}
 				else
 				{
@@ -247,8 +267,12 @@ namespace EmuCore
 				using uint_type = EmuCore::TMP::uint_of_size_t<sizeof(T_)>;
 				if constexpr (!std::is_same_v<uint_type, std::false_type>)
 				{
-					const uint_type as_uint_ = do_right_shift<uint_type, Shifts_>()(*reinterpret_cast<const uint_type*>(&val_), num_shifts_);
-					return *reinterpret_cast<const T_*>(&as_uint_);
+					uint_type as_uint_;
+					std::memcpy(&as_uint_, &val_, sizeof(uint_type));
+					as_uint_ = do_right_shift<uint_type, Shifts_>()(as_uint_, num_shifts_);
+					T_ out_;
+					std::memcpy(&out_, &as_uint_, sizeof(uint_type));
+					return out_;
 				}
 				else
 				{

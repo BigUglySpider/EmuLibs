@@ -877,7 +877,11 @@ namespace EmuMath::Helpers::_vector_underlying
 	template<class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, class...Args_>
 	constexpr inline void _vector_mutate_invoke_only(Func_ func_, Args_&&...args_)
 	{
-		_vector_mutate_invoke_only_execution<BeginIndex_, EndIndex_, Func_&>(func_, std::forward<Args_>(args_)...);
+		_vector_mutate_invoke_only_execution<BeginIndex_, EndIndex_, Func_&>
+		(
+			func_,
+			EmuCore::TMP::lval_ref_cast<Args_>(std::forward<Args_>(args_))...
+		);
 	}
 
 	template<class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, class...Args_>

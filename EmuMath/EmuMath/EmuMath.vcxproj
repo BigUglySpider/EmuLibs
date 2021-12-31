@@ -166,7 +166,6 @@
     <ClInclude Include="EmuCore\Functors\Comparators.h" />
     <ClInclude Include="EmuCore\Functors\MiscMath.h" />
     <ClInclude Include="EmuCore\TestingHelpers\LoopingTestHarness.h" />
-    <ClInclude Include="EmuCore\TMPHelpers\Functors.h" />
     <ClInclude Include="EmuCore\TMPHelpers\OperatorChecks.h" />
     <ClInclude Include="EmuCore\TMPHelpers\SafeEnumFuncs.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TimeTMP.h" />

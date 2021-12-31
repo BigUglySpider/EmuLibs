@@ -41,9 +41,6 @@
     <ClInclude Include="EmuCore\TMPHelpers\TypeConvertors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuCore\TMPHelpers\Functors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EmuSIMD\SIMDHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
