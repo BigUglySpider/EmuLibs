@@ -896,6 +896,7 @@ int main()
 
 	std::cout << new_rshift_res_a_ << " --- And extra\n";
 
+
 	// GRADIENTS START
 	std::cout << "\n\n";
 	system("pause");

@@ -1723,6 +1723,641 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region CONST_BITWISE_FUNCS
+		/// <summary>
+		/// <para> Returns the result of bitwise ANDing this Vector with rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be ANDed. Otherwise, all elements be ANDed with rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to AND with this Vector.</param>
+		/// <returns>Copy of this Vector ANDed with rhs_, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> And(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_and<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> And(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_and<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of bitwise ANDing this Vector with rhs_, via the provided out_vector_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be ANDed. Otherwise, all elements be ANDed with rhs_ directly. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to AND with this Vector.</param>
+		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void And(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_bitwise_and(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of bitwise ANDing this Vector with rhs_ within the provided index range, with copies of elements in indices outside of said range. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be ANDed. Otherwise, all elements be ANDed with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start performing bitwise operations. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop performing bitwise operations. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to AND with this Vector within the specified index range.</param>
+		/// <returns>
+		///		Copy of this Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq),
+		///		with rhs_ ANDed with indices in the provided range.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> AndRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_and_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> AndRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_and_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of bitwise ANDing this Vector with rhs_ within the provided index range,
+		///		with copies of elements in indices outside of said range, via the provided out_vector_.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be ANDed. Otherwise, all elements be ANDed with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start performing bitwise operations. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop performing bitwise operations. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to AND with this Vector within the specified index range.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void AndRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_bitwise_and_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of bitwise ANDing this Vector with rhs_ within the provided index range. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be ANDed. Otherwise, all elements be ANDed with rhs_ directly. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing bitwise operation results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing bitwise operation results to the output Vector. </para>
+		/// <para> AndBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform bitwise operations. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to AND with this Vector's elements in the specified range.</param>
+		/// <returns>
+		///		EmuMath Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq),
+		///		with indices within the provided range containing AND results starting AndBegin_, and default-constructed elements elsewhere.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AndBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> AndRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_and_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, AndBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AndBegin_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> AndRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_and_range_no_copy<size, OutT_, OutBegin_, OutEnd_, AndBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of bitwise ANDing this Vector with rhs_ within the provided index range, via the provided out_vector_. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be ANDed. Otherwise, all elements be ANDed with rhs_ directly. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing bitwise operation results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing bitwise operation results to the output Vector. </para>
+		/// <para> AndBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform bitwise operations. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to AND with this Vector's elements in the specified range.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AndBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void AndRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_bitwise_and_range_no_copy<OutBegin_, OutEnd_, AndBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of bitwise ORing this Vector with rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be ORed. Otherwise, all elements be ORed with rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to OR with this Vector.</param>
+		/// <returns>Copy of this Vector ORed with rhs_, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Or(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_or<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Or(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_or<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of bitwise ORing this Vector with rhs_, via the provided out_vector_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be ORed. Otherwise, all elements be ORed with rhs_ directly. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to OR with this Vector.</param>
+		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void Or(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_bitwise_or(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of bitwise ORing this Vector with rhs_ within the provided index range, with copies of elements in indices outside of said range. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be ORed. Otherwise, all elements be ORed with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start performing bitwise operations. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop performing bitwise operations. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to OR with this Vector within the specified index range.</param>
+		/// <returns>
+		///		Copy of this Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq),
+		///		with rhs_ ORed with indices in the provided range.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> OrRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_or_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> OrRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_or_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of bitwise ORing this Vector with rhs_ within the provided index range,
+		///		with copies of elements in indices outside of said range, via the provided out_vector_.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be ORed. Otherwise, all elements be ORed with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start performing bitwise operations. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop performing bitwise operations. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to OR with this Vector within the specified index range.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void OrRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_bitwise_or_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of bitwise ORing this Vector with rhs_ within the provided index range. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be ORed. Otherwise, all elements be ORed with rhs_ directly. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing bitwise operation results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing bitwise operation results to the output Vector. </para>
+		/// <para> OrBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform bitwise operations. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to OR with this Vector's elements in the specified range.</param>
+		/// <returns>
+		///		EmuMath Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq),
+		///		with indices within the provided range containing OR results starting OrBegin_, and default-constructed elements elsewhere.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t OrBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> OrRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_or_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, OrBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t OrBegin_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> OrRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_or_range_no_copy<size, OutT_, OutBegin_, OutEnd_, OrBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of bitwise ORing this Vector with rhs_ within the provided index range, via the provided out_vector_. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be ORed. Otherwise, all elements be ORed with rhs_ directly. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing bitwise operation results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing bitwise operation results to the output Vector. </para>
+		/// <para> OrBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform bitwise operations. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to OR with this Vector's elements in the specified range.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t OrBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void OrRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_bitwise_or_range_no_copy<OutBegin_, OutEnd_, OrBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of bitwise XORing this Vector with rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be ORed. Otherwise, all elements be XORed with rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to XOR with this Vector.</param>
+		/// <returns>Copy of this Vector XORed with rhs_, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Xor(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_xor<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Xor(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_xor<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of bitwise XORing this Vector with rhs_, via the provided out_vector_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be XORed. Otherwise, all elements be XORed with rhs_ directly. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to XOR with this Vector.</param>
+		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void Xor(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_bitwise_xor(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of bitwise XORing this Vector with rhs_ within the provided index range, with copies of elements in indices outside of said range. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be XORed. Otherwise, all elements be XORed with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start performing bitwise operations. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop performing bitwise operations. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to XOR with this Vector within the specified index range.</param>
+		/// <returns>
+		///		Copy of this Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq),
+		///		with rhs_ XORed with indices in the provided range.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> XorRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_xor_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> XorRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_xor_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of bitwise XORing this Vector with rhs_ within the provided index range,
+		///		with copies of elements in indices outside of said range, via the provided out_vector_.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be XORed. Otherwise, all elements be XORed with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start performing bitwise operations. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop performing bitwise operations. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to XOR with this Vector within the specified index range.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void XorRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_bitwise_xor_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of bitwise XORing this Vector with rhs_ within the provided index range. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be XORed. Otherwise, all elements be ORed with rhs_ directly. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing bitwise operation results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing bitwise operation results to the output Vector. </para>
+		/// <para> XorBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform bitwise operations. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to XOR with this Vector's elements in the specified range.</param>
+		/// <returns>
+		///		EmuMath Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq),
+		///		with indices within the provided range containing XOR results starting XorBegin_, and default-constructed elements elsewhere.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t XorBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> XorRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_or_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, XorBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t XorBegin_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> XorRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_or_range_no_copy<size, OutT_, OutBegin_, OutEnd_, XorBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of bitwise XORing this Vector with rhs_ within the provided index range, via the provided out_vector_. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be XORed. Otherwise, all elements be XORed with rhs_ directly. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing bitwise operation results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing bitwise operation results to the output Vector. </para>
+		/// <para> XorBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform bitwise operations. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to XOR with this Vector's elements in the specified range.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t XorBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void XorRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_bitwise_or_range_no_copy<OutBegin_, OutEnd_, XorBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of left-shifting this Vector with rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be used for shifts. Otherwise, all elements will be shifted with rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
+		/// <returns>Copy of this Vector left-shifted with rhs_, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ShiftLeft(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_shift_left<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ShiftLeft(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_shift_left<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of bitwise left-shifting this Vector with rhs_, via the provided out_vector_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be used for shifts. Otherwise, all elements will be shifted with rhs_ directly. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
+		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void ShiftLeft(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_shift_left(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of left-shifting this Vector with rhs_ within the provided index range, with copies of elements in indices outside of said range. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be used for shifts. Otherwise, all elements will be shifted with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start performing shift operations. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop performing shift operations. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
+		/// <returns>
+		///		Copy of this Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq),
+		///		with indices in the provided range left-shifted using rhs_.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ShiftLeftRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_shift_left_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ShiftLeftRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_shift_left_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of left-shifting this Vector with rhs_ within the provided index range,
+		///		with copies of elements in indices outside of said range, via the provided out_vector_.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be used for shifts. Otherwise, all elements will be shifted with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start performing shift operations. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop performing shift operations. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void ShiftLeftRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_shift_left_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of left-shifting this Vector with rhs_ within the provided index range. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be used for shifts. Otherwise, all elements will be shifted with rhs_ directly. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing shift operation results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing shift operation results to the output Vector. </para>
+		/// <para> ShiftBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform shift operations. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
+		/// <returns>
+		///		EmuMath Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq),
+		///		with indices within the provided range containing left-shift results starting at ShiftBegin_, and default-constructed elements elsewhere.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ShiftBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ShiftLeftRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_shift_left_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ShiftBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ShiftBegin_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ShiftLeftRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_shift_left_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ShiftBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of left-shifting this Vector with rhs_ within the provided index range, via the provided out_vector_. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be used for shifts. Otherwise, all elements will be shifted with rhs_ directly. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing shift operation results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing shift operation results to the output Vector. </para>
+		/// <para> ShiftBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform shift operations. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ShiftBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void ShiftLeftRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_shift_left_range_no_copy<OutBegin_, OutEnd_, ShiftBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of right-shifting this Vector with rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be used for shifts. Otherwise, all elements will be shifted with rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
+		/// <returns>Copy of this Vector right-shifted with rhs_, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ShiftRight(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_shift_right<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ShiftRight(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_shift_right<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of bitwise right-shifting this Vector with rhs_, via the provided out_vector_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be used for shifts. Otherwise, all elements will be shifted with rhs_ directly. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
+		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void ShiftRight(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_shift_right(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of right-shifting this Vector with rhs_ within the provided index range, with copies of elements in indices outside of said range. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be used for shifts. Otherwise, all elements will be shifted with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start performing shift operations. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop performing shift operations. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
+		/// <returns>
+		///		Copy of this Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq),
+		///		with indices in the provided range right-shifted using rhs_.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ShiftRightRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_shift_right_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ShiftRightRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_shift_right_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of right-shifting this Vector with rhs_ within the provided index range,
+		///		with copies of elements in indices outside of said range, via the provided out_vector_.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be used for shifts. Otherwise, all elements will be shifted with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start performing shift operations. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop performing shift operations. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void ShiftRightRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_shift_right_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns the result of right-shifting this Vector with rhs_ within the provided index range. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be used for shifts. Otherwise, all elements will be shifted with rhs_ directly. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing shift operation results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing shift operation results to the output Vector. </para>
+		/// <para> ShiftBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform shift operations. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
+		/// <returns>
+		///		EmuMath Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq),
+		///		with indices within the provided range containing right-shift results starting at ShiftBegin_, and default-constructed elements elsewhere.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ShiftBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ShiftRightRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_shift_right_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ShiftBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ShiftBegin_, typename OutT_ = value_type_uq, typename Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ShiftRightRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_shift_right_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ShiftBegin_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of right-shifting this Vector with rhs_ within the provided index range, via the provided out_vector_. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be used for shifts. Otherwise, all elements will be shifted with rhs_ directly. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing shift operation results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing shift operation results to the output Vector. </para>
+		/// <para> ShiftBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform shift operations. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ShiftBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void ShiftRightRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::new_vector_shift_right_range_no_copy<OutBegin_, OutEnd_, ShiftBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary> Returns a bitwise NOT form of this Vector, equivalent to `-this_vector`. </summary>
+		/// <returns>Copy of this Vector with its elements bitwise NOT-ed, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Not() const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_not<OutSize_, OutT_>(*this);
+		}
+		template<typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Not() const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_not<size, OutT_>(*this);
+		}
+		
+		/// <summary> Ouputs a bitwise NOT form of this Vector to the provided out_vector_, equivalent to `out_vector_ = ~this_vector`. </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t OutSize_, typename OutT_>
+		constexpr inline void Not(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_bitwise_not(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a copy of this Vector with the provided index range bitwise NOT-ed. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start bitwise NOT-ing elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop bitwise NOT-ing elements. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq),
+		///		containing a copy of this Vector with the provided index range bitwise NOT-ed.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NotRange() const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_not_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> NotRange() const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_not_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a copy of this Vector, with the provided index range bitwise NOT-ed, to the provided out_vector_. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start bitwise NOT-ing elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop bitwise NOT-ing elements. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void NotRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_bitwise_not_range<BeginIndex_, EndIndex_>(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Returns a new EmuMath Vector with its indices outside of the specified range index default-constructed, 
+		///		and elements within the provided range constructed as bitwise NOT-ed forms of this Vector's elements, starting at index NotBegin_.
+		/// </para>
+		/// <para> Indices outside of the specified range in out_vector_ will be default-constructed. </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing bitwise NOT-ed forms of this Vector's elements. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing bitwise NOT-ed forms of this Vector's elements. </para>
+		/// <para> NotBegin_: Inclusive index at which to start reading elements from this Vector in order to perform bitwise operations. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq),
+		///		containing a partial bitwise NOT copy of this Vector in the specified range, and default values outside of said range.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NotBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NotRangeNoCopy() const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_not_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, NotBegin_>(*this);
+		}
+		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t NotBegin_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> NotRangeNoCopy() const
+		{
+			return EmuMath::Helpers::new_vector_bitwise_not_range_no_copy<size, OutT_, OutBegin, OutEnd_, NotBegin_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs sequential bitwise NOT-ed elements within this Vector, starting at index NotBegin_, to the provided index range in out_vector_.
+		/// </para>
+		/// <para> Indices outside of the specified range in out_vector_ will not be modified. </para>
+		/// <para> OutBegin_: Inclusive index in the output vector at which to start writing bitwise NOT-ed forms of this Vector's elements. </para>
+		/// <para> OutEnd_: Exclusive index in the output vector at which to stop writing bitwise NOT-ed forms of this Vector's elements. </para>
+		/// <para> NotBegin_: Inclusive index at which to start reading elements from this Vector in order to perform bitwise operations. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NotBegin_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void NotRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_bitwise_not_range_no_copy<OutBegin_, OutEnd_, NotBegin_>(out_vector_, *this);
+		}
+#pragma endregion
+
 #pragma region MISC_ARITHMETIC_FUNCS
 	public:
 		/// <summary> Returns the absolute form of this Vector. </summary>
