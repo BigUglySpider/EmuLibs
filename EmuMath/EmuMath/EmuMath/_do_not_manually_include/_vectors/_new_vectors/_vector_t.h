@@ -4271,8 +4271,10 @@ namespace std
 	private:
 		using _element_hash = std::hash<typename EmuMath::NewVector<Size_, T_>::value_type_uq>;
 
+		// Recursive call to allow constexpr-evaluation
+		// --- Constexpr is not guaranteed with standard, but there's no reason to not allow it in case of change/user specialisations
 		template<std::size_t Index_, std::size_t MultiplierPrimeConstant_>
-		static inline void _do_all_elements(const EmuMath::NewVector<Size_, T_>& vector_, std::size_t& out_)
+		static constexpr inline void _do_all_elements(const EmuMath::NewVector<Size_, T_>& vector_, std::size_t& out_)
 		{
 			if constexpr (Index_ < EmuMath::NewVector<Size_, T_>::size)
 			{
@@ -4287,6 +4289,10 @@ namespace std
 		}
 
 	public:
+		constexpr hash()
+		{
+		}
+
 		constexpr inline std::size_t operator()(const EmuMath::NewVector<Size_, T_>& vector_) const
 		{
 			constexpr std::size_t starting_prime_ = 37;
