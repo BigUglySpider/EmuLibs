@@ -929,6 +929,7 @@ int main()
 	bitwise_assign_op_test_ ^= EmuMath::Helpers::new_vector_make<int>(0xFFFFFFFF, 0xFFFFFFFE, 0x1, 0x7);
 	std::cout << bitwise_assign_op_test_ << " (" << EmuMath::NewVector<4, std::bitset<16>>(bitwise_assign_op_test_) << ")\n";
 
+
 	// GRADIENTS START
 	std::cout << "\n\n";
 	system("pause");

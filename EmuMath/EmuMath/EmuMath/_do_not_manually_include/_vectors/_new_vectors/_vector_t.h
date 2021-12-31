@@ -4271,17 +4271,17 @@ namespace std
 	private:
 		using _element_hash = std::hash<typename EmuMath::NewVector<Size_, T_>::value_type_uq>;
 
-		template<std::size_t Index_, std::size_t MultiplierConstant_>
+		template<std::size_t Index_, std::size_t MultiplierPrimeConstant_>
 		static inline void _do_all_elements(const EmuMath::NewVector<Size_, T_>& vector_, std::size_t& out_)
 		{
 			if constexpr (Index_ < EmuMath::NewVector<Size_, T_>::size)
 			{
-				out_ *= MultiplierConstant_;
+				out_ *= MultiplierPrimeConstant_;
 				out_ += _element_hash()(vector_.at<Index_>());
 
 				if constexpr ((Index_ + 1) < EmuMath::NewVector<Size_, T_>::size)
 				{
-					_do_all_elements<Index_ + 1, MultiplierConstant_>(vector_, out_);
+					_do_all_elements<Index_ + 1, MultiplierPrimeConstant_>(vector_, out_);
 				}
 			}
 		}
@@ -4289,7 +4289,8 @@ namespace std
 	public:
 		constexpr inline std::size_t operator()(const EmuMath::NewVector<Size_, T_>& vector_) const
 		{
-			std::size_t out_ = 37;
+			constexpr std::size_t starting_prime_ = 37;
+			std::size_t out_ = starting_prime_;
 			_do_all_elements<0, 397>(vector_, out_);
 			return out_;
 		}
