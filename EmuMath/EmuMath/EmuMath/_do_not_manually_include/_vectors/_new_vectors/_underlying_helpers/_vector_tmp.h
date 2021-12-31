@@ -155,6 +155,8 @@ namespace EmuMath::TMP
 	{
 		using type = EmuMath::NewVector<Size_, typename preferred_vector_fp<T_>::type>;
 	};
+	template<typename T_>
+	using preferred_vector_fp_t = typename preferred_vector_fp<T_>::type;
 
 	template<class Lhs_, class Rhs_>
 	struct largest_vector
