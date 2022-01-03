@@ -58,7 +58,7 @@ namespace EmuMath
 		template<typename R_, typename G_, typename B_>
 		[[nodiscard]] static constexpr inline channels_vector _make_colour(R_&& r_, G_&& g_, B_&& b_)
 		{
-			if constexpr (EmuCore::TMP::are_all_convertible_v<value_type, R_, G_, B_>)
+			if constexpr (EmuCore::TMP::are_all_static_castable_v<value_type, R_, G_, B_>)
 			{
 				if constexpr (contains_alpha)
 				{
@@ -80,8 +80,8 @@ namespace EmuMath
 			using check_type = std::conditional_t
 			<
 				contains_alpha,
-				EmuCore::TMP::are_all_convertible<value_type, R_, G_, B_, A_>,
-				EmuCore::TMP::are_all_convertible<value_type, R_, G_, B_>
+				EmuCore::TMP::are_all_static_castable<value_type, R_, G_, B_, A_>,
+				EmuCore::TMP::are_all_static_castable<value_type, R_, G_, B_>
 			>;
 			if constexpr (check_type::value)
 			{
@@ -288,7 +288,7 @@ namespace EmuMath
 		/// <param name="r_">Value to initiaalise this colour's Red channel via.</param>
 		/// <param name="g_">Value to initiaalise this colour's Green channel via.</param>
 		/// <param name="b_">Value to initiaalise this colour's Blue channel via.</param>
-		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMP::are_all_convertible_v<value_type, R_, G_, B_>>>
+		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMP::are_all_static_castable_v<value_type, R_, G_, B_>>>
 		constexpr Colour(R_&& r_, G_&& g_, B_&& b_) : channels(_make_colour(r_, g_, b_))
 		{
 		}
@@ -310,7 +310,7 @@ namespace EmuMath
 			typename G_,
 			typename B_,
 			typename A_,
-			typename OnlyAvailableWith4Channels_ = std::enable_if_t<EmuCore::TMP::are_all_convertible_v<value_type, R_, G_, B_, A_> && contains_alpha>
+			typename OnlyAvailableWith4Channels_ = std::enable_if_t<EmuCore::TMP::are_all_static_castable_v<value_type, R_, G_, B_, A_> && contains_alpha>
 		>
 		constexpr Colour(R_&& r_, G_&& g_, B_&& b_, A_&& a_) : channels(_make_colour(r_, g_, b_, a_))
 		{
@@ -326,7 +326,7 @@ namespace EmuMath
 			typename ToCopyChannel_,
 			bool ToCopyContainsAlpha_,
 			typename A_,
-			typename OnlyAvailableWith4Channels_ = std::enable_if_t<contains_alpha && EmuCore::TMP::are_all_convertible_v<value_type, ToCopyChannel_, A_>>
+			typename OnlyAvailableWith4Channels_ = std::enable_if_t<contains_alpha && EmuCore::TMP::are_all_static_castable_v<value_type, ToCopyChannel_, A_>>
 		>
 		constexpr Colour(const EmuMath::Colour<ToCopyChannel_, ToCopyContainsAlpha_>& to_copy_rgb_, A_&& a_) :
 			channels
@@ -416,28 +416,28 @@ namespace EmuMath
 #pragma region SETS
 		/// <summary> Sets this colour's Red channel to the passed value. </summary>
 		/// <param name="r_">Value to set this colour's Red channel to. This will not be modified.</param>
-		template<typename R_, typename = std::enable_if_t<std::is_convertible_v<R_, value_type>>>
+		template<typename R_, typename = std::enable_if_t<EmuCore::TMP::is_static_castable_v<R_, value_type>>>
 		constexpr inline void R(R_&& r_)
 		{
 			channels.at<0>() = static_cast<value_type>(r_);
 		}
 		/// <summary> Sets this colour's Green channel to the passed value. </summary>
 		/// <param name="g_">Value to set this colour's Green channel to. This will not be modified.</param>
-		template<typename G_, typename = std::enable_if_t<std::is_convertible_v<G_, value_type>>>
+		template<typename G_, typename = std::enable_if_t<EmuCore::TMP::is_static_castable_v<G_, value_type>>>
 		constexpr inline void G(G_&& g_)
 		{
 			channels.at<1>() = static_cast<value_type>(g_);
 		}
 		/// <summary> Sets this colour's Blue channel to the passed value. </summary>
 		/// <param name="b_">Value to set this colour's Blue channel to. This will not be modified.</param>
-		template<typename B_, typename = std::enable_if_t<std::is_convertible_v<B_, value_type>>>
+		template<typename B_, typename = std::enable_if_t<EmuCore::TMP::is_static_castable_v<B_, value_type>>>
 		constexpr inline void B(B_&& b_)
 		{
 			channels.at<2>() = static_cast<value_type>(b_);
 		}
 		/// <summary> Sets this colour's Alpha channel to the passed value. Only available if this colour contains an explicit Alpha channel. </summary>
 		/// <param name="a_">Value to set this colour's Alpha channel to. This will not be modified.</param>
-		template<typename A_, typename MayOnlyModifyAlphaIfContained_ = std::enable_if_t<std::is_convertible_v<A_, value_type> && contains_alpha>>
+		template<typename A_, typename MayOnlyModifyAlphaIfContained_ = std::enable_if_t<EmuCore::TMP::is_static_castable_v<A_, value_type> && contains_alpha>>
 		constexpr inline void A(A_&& a_)
 		{
 			channels.at<3>() = static_cast<value_type>(a_);
@@ -448,7 +448,7 @@ namespace EmuMath
 		/// <param name="g_">Value to set this colour's Green channel to. This will not be modified.</param>
 		/// <param name="b_">Value to set this colour's Blue channel to. This will not be modified.</param>
 		/// <returns>Reference to this colour.</returns>
-		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMP::are_all_convertible_v<value_type, R_, G_, B_>>>
+		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMP::are_all_static_castable_v<value_type, R_, G_, B_>>>
 		constexpr inline this_type& Set(R_&& r_, G_&& g_, B_&& b_)
 		{
 			R(r_);
@@ -471,7 +471,7 @@ namespace EmuMath
 			typename G_,
 			typename B_,
 			typename A_,
-			typename MayOnlyModifyAlphaIfContained_ = std::enable_if_t<EmuCore::TMP::are_all_convertible_v<value_type, R_, G_, B_, A_> && contains_alpha>
+			typename MayOnlyModifyAlphaIfContained_ = std::enable_if_t<EmuCore::TMP::are_all_static_castable_v<value_type, R_, G_, B_, A_> && contains_alpha>
 		>
 		constexpr inline this_type& Set(R_&& r_, G_&& g_, B_&& b_, A_&& a_)
 		{

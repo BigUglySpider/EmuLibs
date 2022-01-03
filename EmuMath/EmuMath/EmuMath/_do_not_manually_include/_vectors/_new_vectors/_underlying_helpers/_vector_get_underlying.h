@@ -124,7 +124,7 @@ namespace EmuMath::Helpers::_vector_underlying
 			{
 				out_ = Out_(_vector_get(vector_, index_));
 			}
-			else if constexpr (std::is_convertible_v<Out_, value_type&>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<Out_, value_type&>)
 			{
 				out_ = static_cast<Out_>(_vector_get(vector_, index_));
 			}
@@ -161,7 +161,7 @@ namespace EmuMath::Helpers::_vector_underlying
 			{
 				out_ = Out_(_vector_get(vector_, index_));
 			}
-			else if constexpr (std::is_convertible_v<Out_, const value_type&>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<Out_, const value_type&>)
 			{
 				out_ = static_cast<Out_>(_vector_get(vector_, index_));
 			}

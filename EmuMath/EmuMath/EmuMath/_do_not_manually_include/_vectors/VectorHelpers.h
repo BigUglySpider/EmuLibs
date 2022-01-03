@@ -2746,7 +2746,7 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			if constexpr(EmuMath::TMP::is_emu_vector_v<Shifts_> || std::is_convertible_v<Shifts_, std::size_t>)
+			if constexpr(EmuMath::TMP::is_emu_vector_v<Shifts_> || EmuCore::TMP::is_static_castable_v<Shifts_, std::size_t>)
 			{
 				return _underlying_vector_funcs::_vector_bitwise_shift_per_element
 				<
@@ -2802,7 +2802,7 @@ namespace EmuMath::Helpers
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 		{
-			if constexpr (EmuMath::TMP::is_emu_vector_v<Shifts_> || std::is_convertible_v<Shifts_, std::size_t>)
+			if constexpr (EmuMath::TMP::is_emu_vector_v<Shifts_> || EmuCore::TMP::is_static_castable_v<Shifts_, std::size_t>)
 			{
 				return _underlying_vector_funcs::_vector_bitwise_shift_per_element
 				<

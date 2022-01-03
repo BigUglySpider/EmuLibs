@@ -119,7 +119,7 @@ namespace EmuMath
 		template<std::size_t Index_, typename ToCopy_>
 		inline void Set(ToCopy_&& toCopyAtIndex_)
 		{
-			if constexpr (std::is_convertible_v<ToCopy_, float>)
+			if constexpr (EmuCore::TMP::is_static_castable_v<ToCopy_, float>)
 			{
 				if constexpr (Index_ < size)
 				{
@@ -165,7 +165,7 @@ namespace EmuMath
 					// Simple register copy
 					data_ = std::forward<ToCopy_>(toCopy_).data_;
 				}
-				else if constexpr (std::is_convertible_v<ToCopy_, float>)
+				else if constexpr (EmuCore::TMP::is_static_castable_v<ToCopy_, float>)
 				{
 					data_ = _mm_set_ps1(static_cast<float>(std::forward<ToCopy_>(toCopy_)));
 				}

@@ -36,7 +36,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 			if constexpr (RowIndex_ < Matrix_::num_rows)
 			{
 				using out_value = typename Matrix_::value_type;
-				if constexpr (std::is_convertible_v<Arg_, out_value>)
+				if constexpr (EmuCore::TMP::is_static_castable_v<Arg_, out_value>)
 				{
 					_get_matrix_data<Matrix_::num_columns - 1, RowIndex_, Matrix_>(out_) = static_cast<out_value>(arg_);
 				}

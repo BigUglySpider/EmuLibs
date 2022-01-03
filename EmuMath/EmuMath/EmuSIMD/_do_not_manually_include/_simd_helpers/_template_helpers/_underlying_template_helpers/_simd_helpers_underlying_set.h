@@ -24,7 +24,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		{
 			if constexpr (num_args_ == expected_num_args_)
 			{
-				if constexpr (EmuCore::TMP::are_all_convertible_v<width_int, Args_...>)
+				if constexpr (EmuCore::TMP::are_all_static_castable_v<width_int, Args_...>)
 				{
 					if constexpr (std::is_same_v<register_type_uq, __m128i>)
 					{
@@ -210,7 +210,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 
 			if constexpr (num_args_ == expected_num_args_)
 			{
-				if constexpr (EmuCore::TMP::are_all_convertible_v<float, Args_...>)
+				if constexpr (EmuCore::TMP::are_all_static_castable_v<float, Args_...>)
 				{
 					if constexpr (std::is_same_v<register_type_uq, __m128>)
 					{
@@ -265,7 +265,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 
 			if constexpr (num_args_ == expected_num_args_)
 			{
-				if constexpr (EmuCore::TMP::are_all_convertible_v<double, Args_...>)
+				if constexpr (EmuCore::TMP::are_all_static_castable_v<double, Args_...>)
 				{
 					if constexpr (std::is_same_v<register_type_uq, __m128d>)
 					{
@@ -383,7 +383,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		{
 			if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128, __m256, __m512>::value)
 			{
-				if constexpr (std::is_convertible_v<Val_, float>)
+				if constexpr (EmuCore::TMP::is_static_castable_v<Val_, float>)
 				{
 					if constexpr (std::is_same_v<register_type_uq, __m128>)
 					{
@@ -430,7 +430,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 				if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfInt_>())
 				{
 					using int_type = EmuCore::TMP::int_of_size_t<PerElementWidthIfInt_ / 8>;
-					if constexpr (std::is_convertible_v<Val_, int_type>)
+					if constexpr (EmuCore::TMP::is_static_castable_v<Val_, int_type>)
 					{
 						if constexpr (std::is_same_v<register_type_uq, __m128i>)
 						{

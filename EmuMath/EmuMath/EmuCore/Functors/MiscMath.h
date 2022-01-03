@@ -26,7 +26,7 @@ namespace EmuCore
 				{
 					return Out_(value_);
 				}
-				else if constexpr(std::is_convertible_v<const Value_&, Out_>)
+				else if constexpr(EmuCore::TMP::is_static_castable_v<const Value_&, Out_>)
 				{
 					return static_cast<Out_>(value_);
 				}
@@ -46,7 +46,7 @@ namespace EmuCore
 				{
 					return Out_(min_);
 				}
-				else if constexpr (std::is_convertible_v<const Min_&, Out_>)
+				else if constexpr (EmuCore::TMP::is_static_castable_v<const Min_&, Out_>)
 				{
 					return static_cast<Out_>(min_);
 				}
@@ -105,7 +105,7 @@ namespace EmuCore
 				{
 					return Out_(value_);
 				}
-				else if constexpr(std::is_convertible_v<const Value_&, Out_>)
+				else if constexpr(EmuCore::TMP::is_static_castable_v<const Value_&, Out_>)
 				{
 					return static_cast<Out_>(value_);
 				}
@@ -125,7 +125,7 @@ namespace EmuCore
 				{
 					return Out_(max_);
 				}
-				else if constexpr (std::is_convertible_v<const Max_&, Out_>)
+				else if constexpr (EmuCore::TMP::is_static_castable_v<const Max_&, Out_>)
 				{
 					return static_cast<Out_>(max_);
 				}
@@ -186,7 +186,7 @@ namespace EmuCore
 				{
 					return Out_(min_);
 				}
-				else if constexpr(std::is_convertible_v<const Min_&, Out_>)
+				else if constexpr(EmuCore::TMP::is_static_castable_v<const Min_&, Out_>)
 				{
 					return static_cast<Out_>(min_);
 				}
@@ -206,7 +206,7 @@ namespace EmuCore
 				{
 					return Out_(max_);
 				}
-				else if constexpr(std::is_convertible_v<const Max_&, Out_>)
+				else if constexpr(EmuCore::TMP::is_static_castable_v<const Max_&, Out_>)
 				{
 					return static_cast<Out_>(max_);
 				}
@@ -226,7 +226,7 @@ namespace EmuCore
 				{
 					return Out_(value_);
 				}
-				else if constexpr(std::is_convertible_v<const Value_&, Out_>)
+				else if constexpr(EmuCore::TMP::is_static_castable_v<const Value_&, Out_>)
 				{
 					return static_cast<Out_>(value_);
 				}

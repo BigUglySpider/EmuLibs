@@ -23,14 +23,14 @@ namespace EmuMath
 		/// <summary> Matching bit-size unsigned type of the integer for this wrapper's underlying engine. Used primarily for seeding. </summary>
 		using unsigned_int_type = typename std::make_unsigned<int_type>::type;
 
-		/// <summary> Default minimum value to use in construction when a custom range is not provided. </summary>
-		static constexpr double default_min = std::numeric_limits<double>::lowest();
-		/// <summary> Default maximum value to use in construction when a custom range is not provided. </summary>
-		static constexpr double default_max = std::numeric_limits<double>::max();
 		/// <summary> The lowest value that may be stored for an int of the bit-size that this wrapper's underlying engine makes use of. </summary>
 		static constexpr int_type lowest_possible_int = std::numeric_limits<int_type>::lowest();
 		/// <summary> The highest value that may be stored for an int of the bit-size that this wrapper's underlying engine makes use of. </summary>
 		static constexpr int_type highest_possible_int = std::numeric_limits<int_type>::max();
+		/// <summary> Default minimum value to use in construction when a custom range is not provided. </summary>
+		static constexpr double default_min = static_cast<double>(lowest_possible_int);
+		/// <summary> Default maximum value to use in construction when a custom range is not provided. </summary>
+		static constexpr double default_max = static_cast<double>(highest_possible_int);
 
 		/// <summary> Default seed used when one is not provided. Equates to a cast of time(0) to this wrapper's unsigned_int_type at the time of calling. </summary>
 		/// <returns>Default seed to be used by constructors where a seed is not provided.</returns>

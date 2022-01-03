@@ -83,7 +83,7 @@ namespace EmuMath
 			std::size_t InRows_,
 			typename in_contained_type,
 			bool InColumnMajor_,
-			typename RequiresInContainedTypeCastableToFloat = std::enable_if_t<std::is_convertible_v<in_contained_type, float>>
+			typename RequiresInContainedTypeCastableToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<in_contained_type, float>>
 		>
 		explicit FastMatrix4x4f_CM(const EmuMath::Matrix<InColumns_, InRows_, in_contained_type, InColumnMajor_>& to_copy_) :
 			column0
@@ -516,7 +516,7 @@ namespace EmuMath
 		/// <typeparam name="T_">Type to multiply by.</typeparam>
 		/// <param name="val_">Value to multiply all elements of this matrix by.</param>
 		/// <returns>Resulting matrix after multiply all of this matrix's elements by the passed val_.</returns>
-		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<T_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM MultiplyBasic(const T_& val_) const
 		{
 			return MultiplyBasic(_mm_set1_ps(static_cast<float>(val_)));
@@ -623,7 +623,7 @@ namespace EmuMath
 		/// <typeparam name="T_">Type to multiply by.</typeparam>
 		/// <param name="val_">Value to multiply all elements of this matrix by.</param>
 		/// <returns>Resulting matrix after multiply all of this matrix's elements by the passed val_.</returns>
-		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<T_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM Multiply(const T_& val_) const
 		{
 			return MultiplyBasic<T_>(val_);
@@ -680,7 +680,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="divisor_">Scalar to divide each respective value of this matrix by.</param>
 		/// <returns>Resulting matrix after this matrix's elements are divided by the passed scalar divisor_.</returns>
-		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<T_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM DivideBasic(const T_& divisor_) const
 		{
 			return DivideBasic(_mm_set1_ps(static_cast<float>(divisor_)));
@@ -737,7 +737,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Scalar to divide each respective value of this matrix by.</param>
 		/// <returns>Resulting matrix after floating-point modulo division between this matrix's elements and the passed scalar divisor_.</returns>
-		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<T_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM ModBasic(const T_& divisor_) const
 		{
 			return ModBasic(_mm_set1_ps(static_cast<float>(divisor_)));
@@ -840,27 +840,27 @@ namespace EmuMath
 		{
 			return Lerp(b_.column0, b_.column1, b_.column2, b_.column3, t_.column0, t_.column1, t_.column2, t_.column3);
 		}
-		template<typename B_, typename RequiresBConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<B_, float>>>
+		template<typename B_, typename RequiresBConvertibleToFloat_ = std::enable_if_t<EmuCore::TMP::is_static_castable_v<B_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(const B_& b_, __m128 t_) const
 		{
 			return Lerp(_mm_set1_ps(static_cast<float>(b_)), t_);
 		}
-		template<typename T_, typename RequiresTConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		template<typename T_, typename RequiresTConvertibleToFloat_ = std::enable_if_t<EmuCore::TMP::is_static_castable_v<T_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(__m128 b_, const T_& t_) const
 		{
 			return Lerp(b_, _mm_set1_ps(static_cast<float>(t_)));
 		}
-		template<typename B_, typename RequiresBConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<B_, float>>>
+		template<typename B_, typename RequiresBConvertibleToFloat_ = std::enable_if_t<EmuCore::TMP::is_static_castable_v<B_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(const B_& b_, const FastMatrix4x4f_CM& t_) const
 		{
 			return Lerp(_mm_set1_ps(static_cast<float>(b_)), t_);
 		}
-		template<typename T_, typename RequiresTConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		template<typename T_, typename RequiresTConvertibleToFloat_ = std::enable_if_t<EmuCore::TMP::is_static_castable_v<T_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(const FastMatrix4x4f_CM& b_, const T_& t_) const
 		{
 			return Lerp(b_, _mm_set1_ps(static_cast<float>(t_)));
 		}
-		template<typename B_, typename T_, typename RequiresArgsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float> && std::is_convertible_v<B_, float>>>
+		template<typename B_, typename T_, typename RequiresArgsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<T_, float> && EmuCore::TMP::is_static_castable_v<B_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(const B_& b_, const T_& t_) const
 		{
 			return Lerp(_mm_set1_ps(static_cast<float>(b_)), _mm_set1_ps(static_cast<float>(t_)));
@@ -915,22 +915,22 @@ namespace EmuMath
 		{
 			return Clamp(min_.column0, min_.column1, min_.column2, min_.column3, max_.column0, max_.column1, max_.column2, max_.column3);
 		}
-		template<typename Min_, typename RequiresMinConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<Min_, float>>>
+		template<typename Min_, typename RequiresMinConvertibleToFloat_ = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Min_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(const Min_& min_, __m128 max_) const
 		{
 			return Clamp(_mm_set1_ps(static_cast<float>(min_)), max_);
 		}
-		template<typename Max_, typename RequiresMaxConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<Max_, float>>>
+		template<typename Max_, typename RequiresMaxConvertibleToFloat_ = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Max_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(__m128 min_, const Max_& max_) const
 		{
 			return Clamp(min_, _mm_set1_ps(static_cast<float>(max_)));
 		}
-		template<typename Min_, typename RequiresMinConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<Min_, float>>>
+		template<typename Min_, typename RequiresMinConvertibleToFloat_ = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Min_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(const Min_& min_, const FastMatrix4x4f_CM& max_) const
 		{
 			return Clamp(_mm_set1_ps(static_cast<float>(min_)), max_);
 		}
-		template<typename Min_, typename RequiresMinConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<Min_, float>>>
+		template<typename Min_, typename RequiresMinConvertibleToFloat_ = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Min_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(const FastMatrix4x4f_CM& min_, const Min_& max_) const
 		{
 			return Clamp(min_, _mm_set1_ps(static_cast<float>(max_)));
@@ -939,7 +939,7 @@ namespace EmuMath
 		<
 			typename Min_,
 			typename Max_,
-			typename RequiresArgsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Max_, float>&& std::is_convertible_v<Min_, float>>
+			typename RequiresArgsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Max_, float>&& EmuCore::TMP::is_static_castable_v<Min_, float>>
 		>
 		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(const Min_& min_, const Max_& max_) const
 		{
@@ -970,7 +970,7 @@ namespace EmuMath
 		{
 			return ClampMin(min_.column0, min_.column1, min_.column2, min_.column3);
 		}
-		template<typename Min_, typename RequiresMinConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<Min_, float>>>
+		template<typename Min_, typename RequiresMinConvertibleToFloat_ = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Min_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM ClampMin(const Min_& min_) const
 		{
 			return ClampMin(_mm_set1_ps(static_cast<float>(min_)));
@@ -1000,7 +1000,7 @@ namespace EmuMath
 		{
 			return ClampMax(max_.column0, max_.column1, max_.column2, max_.column3);
 		}
-		template<typename Max_, typename RequiresMaxConvertibleToFloat_ = std::enable_if_t<std::is_convertible_v<Max_, float>>>
+		template<typename Max_, typename RequiresMaxConvertibleToFloat_ = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Max_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM ClampMax(const Max_& max_) const
 		{
 			return ClampMax(_mm_set1_ps(static_cast<float>(max_)));
@@ -1290,7 +1290,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Value to compare all of this matrix's elements with.</param>
 		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
-		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Rhs_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementEqual(const Rhs_& rhs_) const
 		{
 			return CmpPerElementEqual(_mm_set1_ps(static_cast<float>(rhs_)));
@@ -1359,7 +1359,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Value to compare all of this matrix's elements with.</param>
 		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
-		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Rhs_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementNotEqual(const Rhs_& rhs_) const
 		{
 			return CmpPerElementNotEqual(_mm_set1_ps(static_cast<float>(rhs_)));
@@ -1428,7 +1428,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Value to compare all of this matrix's elements with.</param>
 		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
-		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Rhs_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementGreater(const Rhs_& rhs_) const
 		{
 			return CmpPerElementGreater(_mm_set1_ps(static_cast<float>(rhs_)));
@@ -1497,7 +1497,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Value to compare all of this matrix's elements with.</param>
 		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
-		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Rhs_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementLess(const Rhs_& rhs_) const
 		{
 			return CmpPerElementLess(_mm_set1_ps(static_cast<float>(rhs_)));
@@ -1567,7 +1567,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Value to compare all of this matrix's elements with.</param>
 		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
-		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Rhs_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementGreaterEqual(const Rhs_& rhs_) const
 		{
 			return CmpPerElementGreaterEqual(_mm_set1_ps(static_cast<float>(rhs_)));
@@ -1637,7 +1637,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Value to compare all of this matrix's elements with.</param>
 		/// <returns>Matrix containing the results of comparisons for respective elements, with bits set to all 1s if true, and all 0s if false.</returns>
-		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Rhs_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM CmpPerElementLessEqual(const Rhs_& rhs_) const
 		{
 			return CmpPerElementLessEqual(_mm_set1_ps(static_cast<float>(rhs_)));
@@ -1699,7 +1699,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
 		/// <returns>True if at least one comparison between this matrix's elements and the passed value returned true; otherwise false.</returns>
-		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Rhs_, float>>>
 		[[nodiscard]] inline bool CmpAnyEqual(const Rhs_& rhs_) const
 		{
 			return CmpAnyEqual(_mm_set1_ps(static_cast<float>(rhs_)));
@@ -1752,7 +1752,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
 		/// <returns>True if at least one comparison between this matrix's elements and the passed value returned true; otherwise false.</returns>
-		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Rhs_, float>>>
 		[[nodiscard]] inline bool CmpAnyNotEqual(const Rhs_& rhs_) const
 		{
 			return CmpAnyNotEqual(_mm_set1_ps(static_cast<float>(rhs_)));
@@ -1805,7 +1805,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
 		/// <returns>True if at least one comparison between this matrix's elements and the passed value returned true; otherwise false.</returns>
-		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Rhs_, float>>>
 		[[nodiscard]] inline bool CmpAnyGreater(const Rhs_& rhs_) const
 		{
 			return CmpAnyGreater(_mm_set1_ps(static_cast<float>(rhs_)));
@@ -1858,7 +1858,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
 		/// <returns>True if at least one comparison between this matrix's elements and the passed value returned true; otherwise false.</returns>
-		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Rhs_, float>>>
 		[[nodiscard]] inline bool CmpAnyLess(const Rhs_& rhs_) const
 		{
 			return CmpAnyLess(_mm_set1_ps(static_cast<float>(rhs_)));
@@ -1914,7 +1914,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
 		/// <returns>True if at least one comparison between this matrix's elements and the passed value returned true; otherwise false.</returns>
-		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Rhs_, float>>>
 		[[nodiscard]] inline bool CmpAnyGreaterEqual(const Rhs_& rhs_) const
 		{
 			return CmpAnyGreaterEqual(_mm_set1_ps(static_cast<float>(rhs_)));
@@ -1970,7 +1970,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
 		/// <returns>True if at least one comparison between this matrix's elements and the passed value returned true; otherwise false.</returns>
-		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Rhs_, float>>>
 		[[nodiscard]] inline bool CmpAnyLessEqual(const Rhs_& rhs_) const
 		{
 			return CmpAnyLessEqual(_mm_set1_ps(static_cast<float>(rhs_)));
@@ -2025,7 +2025,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
 		/// <returns>True if all comparisons between this matrix's elements and the passed value; otherwise false.</returns>
-		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Rhs_, float>>>
 		[[nodiscard]] inline bool CmpAllEqual(const Rhs_& rhs_) const
 		{
 			return CmpAllEqual(_mm_set1_ps(static_cast<float>(rhs_)));
@@ -2078,7 +2078,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
 		/// <returns>True if all comparisons between this matrix's elements and the passed value; otherwise false.</returns>
-		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Rhs_, float>>>
 		[[nodiscard]] inline bool CmpAllNotEqual(const Rhs_& rhs_) const
 		{
 			return CmpAllNotEqual(_mm_set1_ps(static_cast<float>(rhs_)));
@@ -2131,7 +2131,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
 		/// <returns>True if all comparisons between this matrix's elements and the passed value; otherwise false.</returns>
-		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Rhs_, float>>>
 		[[nodiscard]] inline bool CmpAllGreater(const Rhs_& rhs_) const
 		{
 			return CmpAllGreater(_mm_set1_ps(static_cast<float>(rhs_)));
@@ -2184,7 +2184,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
 		/// <returns>True if all comparisons between this matrix's elements and the passed value; otherwise false.</returns>
-		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Rhs_, float>>>
 		[[nodiscard]] inline bool CmpAllLess(const Rhs_& rhs_) const
 		{
 			return CmpAllLess(_mm_set1_ps(static_cast<float>(rhs_)));
@@ -2237,7 +2237,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
 		/// <returns>True if all comparisons between this matrix's elements and the passed value; otherwise false.</returns>
-		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Rhs_, float>>>
 		[[nodiscard]] inline bool CmpAllGreaterEqual(const Rhs_& rhs_) const
 		{
 			return CmpAllGreaterEqual(_mm_set1_ps(static_cast<float>(rhs_)));
@@ -2290,7 +2290,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Value to compare all of this matrix's elements with. Must be convertible to float.</param>
 		/// <returns>True if all comparisons between this matrix's elements and the passed value; otherwise false.</returns>
-		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<std::is_convertible_v<Rhs_, float>>>
+		template<typename Rhs_, typename RequiresRhsConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<Rhs_, float>>>
 		[[nodiscard]] inline bool CmpAllLessEqual(const Rhs_& rhs_) const
 		{
 			return CmpAllLessEqual(_mm_set1_ps(static_cast<float>(rhs_)));
@@ -2326,7 +2326,7 @@ namespace EmuMath
 		{
 			return Multiply(rhs_);
 		}
-		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<T_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM operator*(const T_& rhs_) const
 		{
 			return MultiplyBasic<T_>(rhs_);
@@ -2336,7 +2336,7 @@ namespace EmuMath
 		{
 			return DivideBasic(rhs_);
 		}
-		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<T_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM operator/(const T_& rhs_) const
 		{
 			return DivideBasic<T_>(rhs_);
@@ -2346,7 +2346,7 @@ namespace EmuMath
 		{
 			return ModBasic(rhs_);
 		}
-		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<T_, float>>>
 		[[nodiscard]] inline FastMatrix4x4f_CM operator%(const T_& rhs_) const
 		{
 			return ModBasic<T_>(rhs_);
@@ -2462,7 +2462,7 @@ namespace EmuMath
 		{
 			return operator=(Multiply(rhs_));
 		}
-		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<T_, float>>>
 		inline FastMatrix4x4f_CM& operator*=(const T_& rhs_)
 		{
 			return operator=(MultiplyBasic<T_>(rhs_));
@@ -2472,7 +2472,7 @@ namespace EmuMath
 		{
 			return operator=(DivideBasic(rhs_));
 		}
-		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<T_, float>>>
 		inline FastMatrix4x4f_CM& operator/=(const T_& rhs_)
 		{
 			return operator=(DivideBasic<T_>(rhs_));
@@ -2482,7 +2482,7 @@ namespace EmuMath
 		{
 			return operator=(ModBasic(rhs_));
 		}
-		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<std::is_convertible_v<T_, float>>>
+		template<typename T_, typename RequiresTConvertibleToFloat = std::enable_if_t<EmuCore::TMP::is_static_castable_v<T_, float>>>
 		inline FastMatrix4x4f_CM& operator%=(const T_& rhs_)
 		{
 			return operator=(ModBasic<T_>(rhs_));
@@ -3150,7 +3150,7 @@ namespace EmuMath
 		template<typename To_>
 		static constexpr inline bool _assert_valid_cast_to()
 		{
-			if constexpr (std::is_convertible_v<float, To_>)
+			if constexpr (EmuCore::TMP::is_static_castable_v<float, To_>)
 			{
 				return true;
 			}
@@ -3164,7 +3164,7 @@ namespace EmuMath
 		template<typename From_>
 		static constexpr inline bool _assert_valid_cast_from()
 		{
-			if constexpr (std::is_convertible_v<From_, float>)
+			if constexpr (EmuCore::TMP::is_static_castable_v<From_, float>)
 			{
 				return true;
 			}

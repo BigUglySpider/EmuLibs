@@ -15,7 +15,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		{
 			if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128, __m256, __m512>::value)
 			{
-				if constexpr (std::is_convertible_v<float, OutT_>)
+				if constexpr (EmuCore::TMP::is_static_castable_v<float, OutT_>)
 				{
 					if constexpr (std::is_same_v<register_type_uq, __m128>)
 					{
@@ -66,7 +66,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128d, __m256d, __m512d>::value)
 			{
-				if constexpr (std::is_convertible_v<double, OutT_>)
+				if constexpr (EmuCore::TMP::is_static_castable_v<double, OutT_>)
 				{
 					if constexpr (std::is_same_v<register_type_uq, __m128d>)
 					{
@@ -120,7 +120,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 				if constexpr(EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfInt_>())
 				{
 					using int_type = EmuCore::TMP::int_of_size_t<PerElementWidthIfInt_ / 8>;
-					if constexpr (std::is_convertible_v<int_type, OutT_>)
+					if constexpr (EmuCore::TMP::is_static_castable_v<int_type, OutT_>)
 					{
 						constexpr std::size_t chunk_divisor_ = std::size_t(128) / PerElementWidthIfInt_;
 						if constexpr (std::is_same_v<register_type_uq, __m128i>)

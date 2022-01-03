@@ -74,12 +74,12 @@ namespace EmuCore::TMP
 			return wrapped_value;
 		}
 
-		template<typename Out_, typename = std::enable_if_t<std::is_convertible_v<T_, Out_>>>
+		template<typename Out_, typename = std::enable_if_t<EmuCore::TMP::is_static_castable_v<T_, Out_>>>
 		explicit constexpr inline operator Out_()
 		{
 			return static_cast<Out_>(wrapped_value);
 		}
-		template<typename Out_, typename = std::enable_if_t<std::is_convertible_v<const T_, Out_>>>
+		template<typename Out_, typename = std::enable_if_t<EmuCore::TMP::is_static_castable_v<const T_, Out_>>>
 		explicit constexpr inline operator Out_() const
 		{
 			return static_cast<Out_>(wrapped_value);

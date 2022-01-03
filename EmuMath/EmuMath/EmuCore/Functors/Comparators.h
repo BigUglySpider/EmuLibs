@@ -2,6 +2,7 @@
 #define EMU_CORE_COMPARATOR_FUNCTORS_H_INC_ 1
 
 #include <functional>
+#include "../TMPHelpers/OperatorChecks.h"
 
 namespace EmuCore
 {
@@ -192,7 +193,7 @@ namespace EmuCore
 				{
 					return Out_(a_);
 				}
-				else if constexpr (std::is_convertible_v<const A_&, Out_>)
+				else if constexpr (EmuCore::TMP::is_static_castable_v<const A_&, Out_>)
 				{
 					return static_cast<Out_>(a_);
 				}
@@ -212,7 +213,7 @@ namespace EmuCore
 				{
 					return Out_(b_);
 				}
-				else if constexpr (std::is_convertible_v<const B_&, Out_>)
+				else if constexpr (EmuCore::TMP::is_static_castable_v<const B_&, Out_>)
 				{
 					return static_cast<Out_>(b_);
 				}
@@ -271,7 +272,7 @@ namespace EmuCore
 				{
 					return Out_(a_);
 				}
-				else if constexpr (std::is_convertible_v<const A_&, Out_>)
+				else if constexpr (EmuCore::TMP::is_static_castable_v<const A_&, Out_>)
 				{
 					return static_cast<Out_>(a_);
 				}
@@ -291,7 +292,7 @@ namespace EmuCore
 				{
 					return Out_(b_);
 				}
-				else if constexpr (std::is_convertible_v<const B_&, Out_>)
+				else if constexpr (EmuCore::TMP::is_static_castable_v<const B_&, Out_>)
 				{
 					return static_cast<Out_>(b_);
 				}

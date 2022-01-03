@@ -14,7 +14,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		{
 			_vector_get<Index_>(to_copy_to_) = std::forward<Arg_>(arg_);
 		}
-		else if constexpr (std::is_convertible_v<Arg_, value_type>)
+		else if constexpr (EmuCore::TMP::is_static_castable_v<Arg_, value_type>)
 		{
 			_vector_get<Index_>(to_copy_to_) = static_cast<value_type>(std::forward<Arg_>(arg_));
 		}

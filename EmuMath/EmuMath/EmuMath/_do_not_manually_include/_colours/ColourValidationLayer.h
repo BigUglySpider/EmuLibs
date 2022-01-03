@@ -157,7 +157,7 @@ namespace EmuMath::Helpers
 		/// <param name="r_">Value to initiaalise this colour's Red channel via.</param>
 		/// <param name="g_">Value to initiaalise this colour's Green channel via.</param>
 		/// <param name="b_">Value to initiaalise this colour's Blue channel via.</param>
-		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMP::are_all_convertible_v<value_type, R_, G_, B_>>>
+		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMP::are_all_static_castable_v<value_type, R_, G_, B_>>>
 		constexpr _colour_validation_layer(R_&& r_, G_&& g_, B_&& b_) : colour(r_, g_, b_)
 		{
 			validate_func()(colour);
@@ -180,7 +180,7 @@ namespace EmuMath::Helpers
 			typename G_,
 			typename B_,
 			typename A_,
-			typename OnlyAvailableWith4Channels_ = std::enable_if_t<EmuCore::TMP::are_all_convertible_v<value_type, R_, G_, B_, A_> && contains_alpha>
+			typename OnlyAvailableWith4Channels_ = std::enable_if_t<EmuCore::TMP::are_all_static_castable_v<value_type, R_, G_, B_, A_> && contains_alpha>
 		>
 		constexpr _colour_validation_layer(R_&& r_, G_&& g_, B_&& b_, A_&& a_) : colour(r_, g_, b_, a_)
 		{
@@ -197,7 +197,7 @@ namespace EmuMath::Helpers
 			typename ToCopyChannel_,
 			bool ToCopyContainsAlpha_,
 			typename A_,
-			typename OnlyAvailableWith4Channels_ = std::enable_if_t<contains_alpha && EmuCore::TMP::are_all_convertible_v<value_type, ToCopyChannel_, A_>>
+			typename OnlyAvailableWith4Channels_ = std::enable_if_t<contains_alpha && EmuCore::TMP::are_all_static_castable_v<value_type, ToCopyChannel_, A_>>
 		>
 		constexpr _colour_validation_layer(const EmuMath::Colour<ToCopyChannel_, ToCopyContainsAlpha_>& to_copy_rgb_, A_&& a_) : colour(to_copy_rgb_, a_)
 		{
@@ -267,28 +267,28 @@ namespace EmuMath::Helpers
 #pragma region SETS
 		/// <summary> Sets this colour's Red channel to the passed value. </summary>
 		/// <param name="r_">Value to set this colour's Red channel to. This will not be modified.</param>
-		template<typename R_, typename = std::enable_if_t<std::is_convertible_v<R_, value_type>>>
+		template<typename R_, typename = std::enable_if_t<EmuCore::TMP::is_static_castable_v<R_, value_type>>>
 		constexpr inline void R(R_&& r_)
 		{
 			colour.R(validate_func()(r_));
 		}
 		/// <summary> Sets this colour's Green channel to the passed value. </summary>
 		/// <param name="g_">Value to set this colour's Green channel to. This will not be modified.</param>
-		template<typename G_, typename = std::enable_if_t<std::is_convertible_v<G_, value_type>>>
+		template<typename G_, typename = std::enable_if_t<EmuCore::TMP::is_static_castable_v<G_, value_type>>>
 		constexpr inline void G(G_&& g_)
 		{
 			colour.G(validate_func()(g_));
 		}
 		/// <summary> Sets this colour's Blue channel to the passed value. </summary>
 		/// <param name="b_">Value to set this colour's Blue channel to. This will not be modified.</param>
-		template<typename B_, typename = std::enable_if_t<std::is_convertible_v<B_, value_type>>>
+		template<typename B_, typename = std::enable_if_t<EmuCore::TMP::is_static_castable_v<B_, value_type>>>
 		constexpr inline void B(B_&& b_)
 		{
 			colour.B(validate_func()(b_));
 		}
 		/// <summary> Sets this colour's Alpha channel to the passed value. Only available if this colour contains an explicit Alpha channel. </summary>
 		/// <param name="a_">Value to set this colour's Alpha channel to. This will not be modified.</param>
-		template<typename A_, typename MayOnlyModifyAlphaIfContained_ = std::enable_if_t<std::is_convertible_v<A_, value_type> && contains_alpha>>
+		template<typename A_, typename MayOnlyModifyAlphaIfContained_ = std::enable_if_t<EmuCore::TMP::is_static_castable_v<A_, value_type> && contains_alpha>>
 		constexpr inline void A(A_&& a_)
 		{
 			colour.A(validate_func()(a_));
@@ -299,7 +299,7 @@ namespace EmuMath::Helpers
 		/// <param name="g_">Value to set this colour's Green channel to. This will not be modified.</param>
 		/// <param name="b_">Value to set this colour's Blue channel to. This will not be modified.</param>
 		/// <returns>Reference to this colour.</returns>
-		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMP::are_all_convertible_v<value_type, R_, G_, B_>>>
+		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMP::are_all_static_castable_v<value_type, R_, G_, B_>>>
 		constexpr inline this_type& Set(R_&& r_, G_&& g_, B_&& b_)
 		{
 			validate_func validate_ = validate_func();
@@ -323,7 +323,7 @@ namespace EmuMath::Helpers
 			typename G_,
 			typename B_,
 			typename A_,
-			typename MayOnlyModifyAlphaIfContained_ = std::enable_if_t<EmuCore::TMP::are_all_convertible_v<value_type, R_, G_, B_, A_> && contains_alpha>
+			typename MayOnlyModifyAlphaIfContained_ = std::enable_if_t<EmuCore::TMP::are_all_static_castable_v<value_type, R_, G_, B_, A_> && contains_alpha>
 		>
 		constexpr inline this_type& Set(R_&& r_, G_&& g_, B_&& b_, A_&& a_)
 		{

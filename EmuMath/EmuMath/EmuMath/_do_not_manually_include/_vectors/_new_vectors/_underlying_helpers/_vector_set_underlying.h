@@ -74,7 +74,7 @@ namespace EmuMath::Helpers::_vector_underlying
 					{
 						_vector_set_all_execution<BeginIndex_, to_index_>(out_vector_, arg_);
 					}
-					else if constexpr (std::is_convertible_v<Arg_, lhs_stored_type>)
+					else if constexpr (EmuCore::TMP::is_static_castable_v<Arg_, lhs_stored_type>)
 					{
 						lhs_stored_type converted_arg_ = static_cast<lhs_stored_type>(std::forward<Arg_>(arg_));
 						_vector_set_all_execution<BeginIndex_, to_index_>(out_vector_, converted_arg_);

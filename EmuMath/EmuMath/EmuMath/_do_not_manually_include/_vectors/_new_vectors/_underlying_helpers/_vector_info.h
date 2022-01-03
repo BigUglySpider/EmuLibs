@@ -50,7 +50,7 @@ namespace EmuMath::TMP
 				(
 					std::is_assignable_v<stored_type, in_get_type> ||
 					std::is_constructible_v<stored_type, in_get_type> ||
-					std::is_convertible_v<in_get_type, stored_type>
+					EmuCore::TMP::is_static_castable_v<in_get_type, stored_type>
 				);
 			}
 
@@ -205,7 +205,7 @@ namespace EmuMath::TMP
 			(
 				std::is_assignable_v<stored_type, T_> ||
 				std::is_constructible_v<stored_type, T_> ||
-				std::is_convertible_v<T_, stored_type>
+				EmuCore::TMP::is_static_castable_v<T_, stored_type>
 			);
 		}
 
@@ -385,7 +385,7 @@ namespace EmuMath::TMP
 				(
 					std::is_assignable_v<Out_, get_return_type> ||
 					std::is_constructible_v<Out_, get_return_type> ||
-					std::is_convertible_v<get_return_type, Out_>
+					EmuCore::TMP::is_static_castable_v<get_return_type, Out_>
 				) // Must be possible to create in one of these standard ways
 			);
 		}
@@ -396,7 +396,7 @@ namespace EmuMath::TMP
 			return
 			(
 				std::is_assignable_v<value_type, Arg_> ||
-				std::is_convertible_v<Arg_, value_type> ||
+				EmuCore::TMP::is_static_castable_v<Arg_, value_type> ||
 				std::is_constructible_v<value_type, Arg_>
 			);
 		}

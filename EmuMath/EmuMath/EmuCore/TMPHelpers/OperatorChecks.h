@@ -546,6 +546,19 @@ namespace EmuCore::TMP
 	};
 	template<class T_>
 	static constexpr bool has_logical_not_operator_v = has_logical_not_operator<T_>::value;
+
+	template<class From_, class To_, typename = void>
+	struct is_static_castable
+	{
+		static constexpr bool value = false;
+	};
+	template<class From_, class To_>
+	struct is_static_castable<From_, To_, std::void_t<decltype(static_cast<To_>(std::declval<From_>()))>>
+	{
+		static constexpr bool value = true;
+	};
+	template<class From_, class To_>
+	static constexpr bool is_static_castable_v = is_static_castable<From_, To_>::value;
 #pragma endregion
 
 #pragma region RESULT_CHECKS

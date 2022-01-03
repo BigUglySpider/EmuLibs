@@ -76,7 +76,7 @@ namespace EmuMath
 		/// <para> The passed gradient's channel intensity values will be converted to this gradient's channel intensity values. </para>
 		/// </summary>
 		/// <param name="to_copy_">Gradient to copy the colours and alphas of; necessary channel conversions will be performed by the constructor.</param>
-		template<class OtherChannel_, typename = std::enable_if_t<std::is_convertible_v<OtherChannel_, channel_type> && !std::is_same_v<OtherChannel_, channel_type>>>
+		template<class OtherChannel_, typename = std::enable_if_t<EmuCore::TMP::is_static_castable_v<OtherChannel_, channel_type> && !std::is_same_v<OtherChannel_, channel_type>>>
 		inline Gradient(const Gradient<OtherChannel_>& to_copy_) : colours(), alphas()
 		{
 			_copy_gradient(to_copy_);
@@ -169,7 +169,7 @@ namespace EmuMath
 			return *this;
 		}
 
-		template<class OtherChannel_, typename = std::enable_if_t<std::is_convertible_v<OtherChannel_, channel_type> || std::is_same_v<OtherChannel_, channel_type>>>
+		template<class OtherChannel_, typename = std::enable_if_t<EmuCore::TMP::is_static_castable_v<OtherChannel_, channel_type> || std::is_same_v<OtherChannel_, channel_type>>>
 		inline Gradient<channel_type>& operator=(const EmuMath::Gradient<OtherChannel_>& to_copy_)
 		{
 			_copy_gradient(to_copy_);
@@ -345,7 +345,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="anchor_">Normalised 0:1 anchor point at which to place the passed alpha. This will be clamped into the range 0:1.</param>
 		/// <param name="alpha_">Alpha to set at the stated anchor_ point. This is read as-is, and will not be converted if incompatible.</param>
-		template<typename InAlpha_, typename = std::enable_if_t<std::is_convertible_v<InAlpha_, channel_type>>>
+		template<typename InAlpha_, typename = std::enable_if_t<EmuCore::TMP::is_static_castable_v<InAlpha_, channel_type>>>
 		inline void AddClampedAlphaAnchor(anchor_type anchor_, const InAlpha_& alpha_)
 		{
 			_add_item_to_container(clamp_anchor(anchor_), clamp_alpha(static_cast<channel_type>(alpha_)), alphas);
@@ -356,7 +356,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="anchor_">Normalised 0:1 anchor point at which to place the passed alpha. This will be clamped into the range 0:1.</param>
 		/// <param name="alpha_">Alpha to set at the stated anchor_ point. This is read as-is, and will not be converted if incompatible.</param>
-		template<typename InAlpha_, typename = std::enable_if_t<std::is_convertible_v<InAlpha_, channel_type>>>
+		template<typename InAlpha_, typename = std::enable_if_t<EmuCore::TMP::is_static_castable_v<InAlpha_, channel_type>>>
 		inline void AddWrappedAlphaAnchor(anchor_type anchor_, const InAlpha_& alpha_)
 		{
 			_add_item_to_container(clamp_anchor(anchor_), wrap_alpha(static_cast<channel_type>(alpha_)), alphas);
@@ -397,7 +397,7 @@ namespace EmuMath
 		/// <param name="anchor_">Normalised 0:1 anchor point at which to place the passed alpha. This will be clamped into the range 0:1.</param>
 		/// <param name="alpha_">Alpha to set at the stated anchor_ point. This is read as-is, and will not be converted if incompatible.</param>
 		/// <returns>Index at which the anchor was placed.</returns>
-		template<typename InAlpha_, typename = std::enable_if_t<std::is_convertible_v<InAlpha_, channel_type>>>
+		template<typename InAlpha_, typename = std::enable_if_t<EmuCore::TMP::is_static_castable_v<InAlpha_, channel_type>>>
 		[[nodiscard]] inline std::size_t AddClampedAlphaAnchor_GetIndex(anchor_type anchor_, const InAlpha_& alpha_)
 		{
 			return _add_item_to_container_with_index_return(clamp_anchor(anchor_), clamp_alpha(static_cast<channel_type>(alpha_)), alphas);
@@ -410,7 +410,7 @@ namespace EmuMath
 		/// <param name="anchor_">Normalised 0:1 anchor point at which to place the passed alpha. This will be clamped into the range 0:1.</param>
 		/// <param name="alpha_">Alpha to set at the stated anchor_ point. This is read as-is, and will not be converted if incompatible.</param>
 		/// <returns>Index at which the anchor was placed.</returns>
-		template<typename InAlpha_, typename = std::enable_if_t<std::is_convertible_v<InAlpha_, channel_type>>>
+		template<typename InAlpha_, typename = std::enable_if_t<EmuCore::TMP::is_static_castable_v<InAlpha_, channel_type>>>
 		[[nodiscard]] inline std::size_t AddWrappedAlphaAnchor_GetIndex(anchor_type anchor_, const InAlpha_& alpha_)
 		{
 			return _add_item_to_container_with_index_return(clamp_anchor(anchor_), wrap_alpha(static_cast<channel_type>(alpha_)), alphas);

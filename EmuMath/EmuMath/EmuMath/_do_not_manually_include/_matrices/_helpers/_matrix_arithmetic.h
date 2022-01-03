@@ -1409,7 +1409,7 @@ namespace EmuMath::Helpers
 		{
 			if constexpr
 			(
-				std::is_convertible_v
+				EmuCore::TMP::is_static_castable_v
 				<
 					EmuCore::TMP::conditional_const_t<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>,
 					Out_
@@ -1474,7 +1474,7 @@ namespace EmuMath::Helpers
 		{
 			if constexpr
 			(
-				std::is_convertible_v
+				EmuCore::TMP::is_static_castable_v
 				<
 					EmuCore::TMP::conditional_const_t<std::is_const_v<Matrix_>, typename Matrix_::raw_value_type&>,
 					Out_

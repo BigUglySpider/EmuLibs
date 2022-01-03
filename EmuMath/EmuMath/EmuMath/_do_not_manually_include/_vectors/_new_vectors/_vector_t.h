@@ -169,7 +169,7 @@ namespace EmuMath
 			{
 				return std::forward<In_>(in_);
 			}
-			else if constexpr (std::is_convertible_v<In_, stored_type>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<In_, stored_type>)
 			{
 				return static_cast<stored_type>(in_);
 			}
@@ -3831,6 +3831,40 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region VECTOR_OPERATIONS
+		/// <summary>
+		/// <para>
+		///		Calculates the dot product of this Vector and the passed vector_b_,
+		///		output as the provided Out_ type (defaults to this Vector's preferred_floating_point).
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Out_">Type to output the calculated dot product as. Defaults to preferred_floating_point.</typeparam>
+		/// <param name="vector_b_">EmuMath Vector to calculate the dot product of this Vector with.</param>
+		/// <returns>Dot product of this Vector and the passed vector_b_.</returns>
+		template<typename Out_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
+		[[nodiscard]] constexpr inline Out_ Dot(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		{
+			return EmuMath::Helpers::new_vector_dot<Out_>(*this, vector_b_);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Calculates the dot product of this Vector and the passed vector_b_, using indices in the provided range,
+		///		and outputted as the provided Out_ type (defaults to this Vector's preferred_floating_point).
+		/// </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading from both Vectors to form a dot product. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading from both Vectors to form a dot product. </para>
+		/// </summary>
+		/// <typeparam name="Out_">Type to output the calculated dot product as. Defaults to preferred_floating_point.</typeparam>
+		/// <param name="vector_b_">EmuMath Vector to calculate the dot product of this Vector with.</param>
+		/// <returns>Dot product of this Vector and the passed vector_b_.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
+		[[nodiscard]] constexpr inline Out_ Dot(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		{
+			return EmuMath::Helpers::new_vector_dot<BeginIndex_, EndIndex_, Out_>(*this, vector_b_);
+		}
+#pragma endregion
+
 #pragma region CONVERSIONS
 	public:
 		/// <summary>
@@ -4135,7 +4169,7 @@ namespace EmuMath
 				{
 					std::get<Index_>(_data) = std::forward<Arg_>(arg_);
 				}
-				else if constexpr (std::is_convertible_v<Arg_, stored_type>)
+				else if constexpr (EmuCore::TMP::is_static_castable_v<Arg_, stored_type>)
 				{
 					std::get<Index_>(_data) = static_cast<stored_type>(arg_);
 				}

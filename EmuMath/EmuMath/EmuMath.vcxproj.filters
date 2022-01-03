@@ -548,5 +548,11 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_bitwise_assign.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_special_operations_underlying.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_special_operations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

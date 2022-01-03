@@ -70,7 +70,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 				constexpr bool is_same_type = std::is_same_v<lhs_value, std::remove_cv_t<std::remove_reference_t<RhsScalar_>>>;
 				static_assert
 				(
-					is_same_type || std::is_convertible_v<RhsScalar_, lhs_value>,
+					is_same_type || EmuCore::TMP::is_static_castable_v<RhsScalar_, lhs_value>,
 					"Attempted to copy a type to a matrix which cannot be converted to the matrix's value_type."
 				);
 				if constexpr (is_same_type)
@@ -96,7 +96,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 				constexpr bool is_same_type = std::is_same_v<lhs_value, std::remove_cv_t<std::remove_reference_t<RhsScalar_>>>;
 				static_assert
 				(
-					is_same_type || std::is_convertible_v<RhsScalar_, lhs_value>,
+					is_same_type || EmuCore::TMP::is_static_castable_v<RhsScalar_, lhs_value>,
 					"Attempted to copy a type to a matrix which cannot be converted to the matrix's value_type."
 				);
 				if constexpr (is_same_type)
@@ -127,7 +127,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 				using rhs_value = typename RhsMatrix_::value_type;
 				static_assert
 				(
-					std::is_convertible_v<rhs_value, lhs_value>,
+					EmuCore::TMP::is_static_castable_v<rhs_value, lhs_value>,
 					"Attempted to copy a matrix to another matrix, but the right-hand (source) matrix contains types which cannot be converted to those in the left-hand (destination) matrix."
 				);
 				if constexpr (ColumnIndex_ < RhsMatrix_::num_columns)

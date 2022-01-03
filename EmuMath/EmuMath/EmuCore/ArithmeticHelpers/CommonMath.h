@@ -1,6 +1,7 @@
 #ifndef EMU_CORE_COMMON_MATH_H_INC_
 #define EMU_CORE_COMMON_MATH_H_INC_ 1
 
+#include "../TMPHelpers/OperatorChecks.h"
 #include "../TMPHelpers/TypeComparators.h"
 #include "../TMPHelpers/Values.h"
 #include <cstddef>
@@ -196,11 +197,11 @@ namespace EmuCore
 			{
 				return static_cast<FloatingPointOut_>(cosl(static_cast<long double>(val_)));
 			}
-			else if constexpr(std::is_convertible_v<FloatingPointIn_, float>)
+			else if constexpr(EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
 			{
 				return DoMatchingCos<FloatingPointOut_, float>(static_cast<float>(val_));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, double>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, double>)
 			{
 				return DoMatchingCos<FloatingPointOut_, double>(static_cast<double>(val_));
 			}
@@ -235,11 +236,11 @@ namespace EmuCore
 			{
 				return static_cast<FloatingPointOut_>(acosl(static_cast<long double>(val_)));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, float>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
 			{
 				return DoMatchingAcos<FloatingPointOut_, float>(static_cast<float>(val_));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, double>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, double>)
 			{
 				return DoMatchingAcos<FloatingPointOut_, double>(static_cast<double>(val_));
 			}
@@ -275,11 +276,11 @@ namespace EmuCore
 			{
 				return static_cast<FloatingPointOut_>(sinl(static_cast<long double>(val_)));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, float>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
 			{
 				return DoMatchingSin<FloatingPointOut_, float>(static_cast<float>(val_));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, double>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, double>)
 			{
 				return DoMatchingSin<FloatingPointOut_, double>(static_cast<double>(val_));
 			}
@@ -314,11 +315,11 @@ namespace EmuCore
 			{
 				return static_cast<FloatingPointOut_>(asinl(static_cast<long double>(val_)));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, float>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
 			{
 				return DoMatchingAsin<FloatingPointOut_, float>(static_cast<float>(val_));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, double>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, double>)
 			{
 				return DoMatchingAsin<FloatingPointOut_, double>(static_cast<double>(val_));
 			}
@@ -354,11 +355,11 @@ namespace EmuCore
 			{
 				return static_cast<FloatingPointOut_>(tanl(static_cast<long double>(val_)));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, float>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
 			{
 				return DoMatchingTan<FloatingPointOut_, float>(static_cast<float>(val_));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, double>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, double>)
 			{
 				return DoMatchingTan<FloatingPointOut_, double>(static_cast<double>(val_));
 			}
@@ -393,11 +394,11 @@ namespace EmuCore
 			{
 				return static_cast<FloatingPointOut_>(atanl(static_cast<long double>(val_)));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, float>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
 			{
 				return DoMatchingAtan<FloatingPointOut_, float>(static_cast<float>(val_));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, double>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, double>)
 			{
 				return DoMatchingAtan<FloatingPointOut_, double>(static_cast<double>(val_));
 			}
