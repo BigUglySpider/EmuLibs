@@ -4078,6 +4078,62 @@ namespace EmuMath
 		{
 			EmuMath::Helpers::new_vector_normalise_range<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
+
+		/// <summary>
+		/// <para> Calculates the cosine of the angle between this Vector and the passed vector_b_. </para>
+		/// <para> Radians_: If true, output will be in radians; otherwise, it will be in degrees. Defaults to true. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <param name="vector_b_">EmuMath Vector to find the cosine of the angle between itself and this Vector.</param>
+		/// <returns>Cosine of the angle between this Vector and vector_b_, in radians or degrees depending on the Radians_ arg.</returns>
+		template<typename Out_, bool Radians_ = true, std::size_t SizeB_, typename TB_>
+		[[nodiscard]] constexpr inline Out_ AngleCosConstexpr(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		{
+			return EmuMath::Helpers::new_vector_angle_cos_constexpr<Out_, Radians_>(*this, vector_b_);
+		}
+		template<bool Radians_ = true, std::size_t SizeB_, typename TB_>
+		[[nodiscard]] constexpr inline preferred_floating_point AngleCosConstexpr(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		{
+			return EmuMath::Helpers::new_vector_angle_cos_constexpr<preferred_floating_point, Radians_>(*this, vector_b_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the cosine of the angle between this Vector and the passed vector_b_. </para>
+		/// <para> Radians_: If true, output will be in radians; otherwise, it will be in degrees. Defaults to true. </para>
+		/// <para> For a guarantee to produce a compile-time result if possible, use `AngleCosConstexpr` instead. </para>
+		/// </summary>
+		/// <param name="vector_b_">EmuMath Vector to find the cosine of the angle between itself and this Vector.</param>
+		/// <returns>Cosine of the angle between this Vector and vector_b_, in radians or degrees depending on the Radians_ arg.</returns>
+		template<typename Out_, bool Radians_ = true, std::size_t SizeB_, typename TB_>
+		[[nodiscard]] constexpr inline Out_ AngleCos(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		{
+			return EmuMath::Helpers::new_vector_angle_cos<Out_, Radians_>(*this, vector_b_);
+		}
+		template<bool Radians_ = true, std::size_t SizeB_, typename TB_>
+		[[nodiscard]] constexpr inline preferred_floating_point AngleCos(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		{
+			return EmuMath::Helpers::new_vector_angle_cos<preferred_floating_point, Radians_>(*this, vector_b_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the angle between this Vector and the passed vector_b_. </para>
+		/// <para> Radians_: If true, output will be in radians; otherwise, it will be in degrees. Defaults to true. </para>
+		/// </summary>
+		/// <param name="vector_b_">EmuMath Vector to find the angle between itself and this Vector.</param>
+		/// <returns>Angle between this Vector and vector_b_, in radians or degrees depending on the Radians_ arg.</returns>
+		template<typename Out_, bool Radians_ = true, std::size_t SizeB_, typename TB_>
+		[[nodiscard]] constexpr inline Out_ Angle(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		{
+			return EmuMath::Helpers::new_vector_angle<Out_, Radians_>(*this, vector_b_);
+		}
+		template<bool Radians_ = true, std::size_t SizeB_, typename TB_>
+		[[nodiscard]] constexpr inline preferred_floating_point Angle(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		{
+			return EmuMath::Helpers::new_vector_angle<preferred_floating_point, Radians_>(*this, vector_b_);
+		}
 #pragma endregion
 
 #pragma region CONVERSIONS

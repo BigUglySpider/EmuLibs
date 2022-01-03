@@ -968,6 +968,20 @@ int main()
 
 	constexpr auto some_norm_vec_ = EmuMath::Helpers::new_vector_make<float>(1, 2, 3).NormaliseConstexpr();
 
+	constexpr auto vec_left_ = EmuMath::Helpers::new_vector_make<float>(-1, 0, 0);
+	constexpr auto vec_up_ = EmuMath::Helpers::new_vector_make<int>(0, 1, 0);
+	constexpr auto vec_up_left_ = EmuMath::Helpers::new_vector_lerp(vec_left_, vec_up_, 0.5f);
+	constexpr auto vec_angle_cos_a_ = EmuMath::Helpers::new_vector_angle_cos_constexpr(vector_for_mag_, vector_for_mag_);
+	constexpr auto vec_angle_cos_b_ = EmuMath::Helpers::new_vector_angle_cos_constexpr(vec_left_, vec_up_);
+	constexpr auto vec_angle_cos_c_ = EmuMath::Helpers::new_vector_angle_cos_constexpr(vec_up_left_, vec_up_);
+
+	std::cout << vec_up_left_.AngleCosConstexpr<true>(vec_up_) << "\n";
+	std::cout << vec_up_left_.AngleCos<true>(vec_up_) << "\n";
+	std::cout << vec_up_left_.Angle<true>(vec_up_) << "\n";
+	std::cout << vec_up_left_.AngleCosConstexpr<double, false>(vec_up_) << "\n";
+	std::cout << vec_up_left_.AngleCos<double, false>(vec_up_) << "\n";
+	std::cout << vec_up_left_.Angle<double, false>(vec_up_) << "\n";
+
 	std::cout << "---\n\n";
 
 

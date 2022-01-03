@@ -112,29 +112,30 @@ namespace EmuCore::TestingHelpers
 		}
 	};
 
-	struct mag_test_new
+	struct angle_test_new
 	{
 		static constexpr bool DO_TEST = true;
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Vector Norm (New)";
+		static constexpr std::string_view NAME = "Vector Angle (New)";
 
 		static constexpr std::size_t vec_size = 12;
 		using vector_type_arg = float;
 		using vector_type = EmuMath::NewVector<vec_size, vector_type_arg>;
 		using float_type = typename vector_type::preferred_floating_point;
 
-		mag_test_new()
+		angle_test_new()
 		{
 		}
 		void Prepare()
 		{
 			// RESIZES
-			norm_result.resize(NUM_LOOPS);
+			out_angle.resize(NUM_LOOPS);
 
 			// RESERVES
 			in_a.reserve(NUM_LOOPS);
+			in_b.reserve(NUM_LOOPS);
 
 			// FILL RESERVES
 			RngFunctor rng_ = RngFunctor(shared_fill_seed_);
@@ -143,46 +144,48 @@ namespace EmuCore::TestingHelpers
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
 				emplace_back_new_vector<vec_size, vector_type_arg>(in_a, rng_);
+				emplace_back_new_vector<vec_size, vector_type_arg>(in_b, rng_);
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			norm_result[i] = in_a[i].Normalise();
-			//in_a[i].NormaliseConstexpr(norm_result[i]);
+			out_angle[i] = in_a[i].Angle<false>(in_b[i]);
 		}
 		void OnTestsOver()
 		{
 			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
-			std::cout << "NORM(" << in_a[i_] << "):\n" << norm_result[i_] << "\n\n";
+			std::cout << "ANGLE\n(\n\t" << in_a[i_] << "\n\t" << in_b[i_] << "\n" << "): " << out_angle[i_] << "\n\n";
 		}
 
 		std::vector<vector_type> in_a;
-		std::vector<vector_type> norm_result;
+		std::vector<vector_type> in_b;
+		std::vector<float_type> out_angle;
 	};
 
-	struct mag_test_old
+	struct angle_test_old
 	{
 		static constexpr bool DO_TEST = true;
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Vector Norm (Old)";
+		static constexpr std::string_view NAME = "Vector Angle (Old)";
 
 		static constexpr std::size_t vec_size = 12;
 		using vector_type_arg = float;
 		using vector_type = EmuMath::Vector<vec_size, vector_type_arg>;
 		using float_type = typename vector_type::preferred_floating_point;
 
-		mag_test_old()
+		angle_test_old()
 		{
 		}
 		void Prepare()
 		{
 			// RESIZES
-			norm_result.resize(NUM_LOOPS);
+			out_angle.resize(NUM_LOOPS);
 
 			// RESERVES
 			in_a.reserve(NUM_LOOPS);
+			in_b.reserve(NUM_LOOPS);
 
 			// FILL RESERVES
 			RngFunctor rng_ = RngFunctor(shared_fill_seed_);
@@ -191,29 +194,30 @@ namespace EmuCore::TestingHelpers
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
 				emplace_back_old_vector<vector_type>(in_a, rng_);
-				//emplace_back_new_vector<vec_size, vector_type_arg>(in_a, rng_);
+				emplace_back_old_vector<vector_type>(in_b, rng_);
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			norm_result[i] = in_a[i].Normalise();
+			out_angle[i] = in_a[i].Angle<false>(in_b[i]);
 		}
 		void OnTestsOver()
 		{
 			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
-			std::cout << "NORM(" << in_a[i_] << "):\n" << norm_result[i_] << "\n\n";
+			std::cout << "ANGLE\n(\n\t" << in_a[i_] << "\n\t" << in_b[i_] << "\n" << "): " << out_angle[i_] << "\n\n";
 		}
 
 		std::vector<vector_type> in_a;
-		std::vector<vector_type> norm_result;
+		std::vector<vector_type> in_b;
+		std::vector<float_type> out_angle;
 	};
 
 
 	// ----------- TESTS SELECTION -----------
 	using AllTests = std::tuple
 	<
-		mag_test_new,
-		mag_test_old
+		angle_test_new,
+		angle_test_old
 	>;
 
 	// ----------- TESTS BEGIN -----------

@@ -99,6 +99,38 @@ namespace EmuMath::Helpers::_vector_underlying
 
 		const Mag_ _mag;
 	};
+
+	template<bool OutputRads_>
+	struct _conditional_rad_converter
+	{
+		constexpr _conditional_rad_converter()
+		{
+		}
+
+		template<typename Rads_>
+		[[nodiscard]] constexpr inline auto operator()(const Rads_& rads_) const
+		{
+			if constexpr (OutputRads_)
+			{
+				return rads_;
+			}
+			else
+			{
+				if constexpr (std::is_invocable_v<EmuCore::do_rads_to_degs<Rads_>, const Rads_&>)
+				{
+					return EmuCore::do_rads_to_degs<Rads_>()(rads_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Rads_>(),
+						"Attempted to convert from radians to degrees for an EmuMath Vector operation, but the provided input Rads_ type cannot be used to invoke a `do_rads_to_degs<Rads_>` instance."
+					);
+				}
+			}
+		}
+	};
 #pragma endregion
 
 #pragma region TYPE_HELPERS
@@ -119,7 +151,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	};
 #pragma endregion
 
-	// SQUARE MAG
+	// DOT
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
 	[[nodiscard]] constexpr inline Out_ _vector_dot(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
 	{
@@ -188,6 +220,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		return _vector_dot<0, (SizeA_ <= SizeB_) ? SizeA_ : SizeB_, Out_>(a_, b_);
 	}
 
+	// SQUARE MAG
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_, std::size_t Size_, typename T_>
 	[[nodiscard]] constexpr inline Out_ _vector_square_mag(const EmuMath::NewVector<Size_, T_>& vector_)
 	{
@@ -356,6 +389,136 @@ namespace EmuMath::Helpers::_vector_underlying
 			in_vector_,
 			in_vector_
 		);
+	}
+
+	// ANGLES
+	template<template<class> class SqrtTemplate_, class Out_, bool Radians_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline Out_ _vector_angle_cos(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	{
+		using calc_type = typename _types_vector_dot<SizeA_, TA_, SizeB_, TB_, Out_>::out_processing;
+		using mul_ = EmuCore::do_multiply<calc_type, calc_type>;
+		using unit_converter = _conditional_rad_converter<Radians_>;
+
+		if constexpr (std::is_invocable_v<mul_, calc_type, calc_type>)
+		{
+			using mul_result = std::invoke_result_t<mul_, calc_type, calc_type>;
+			using sqrt_ = SqrtTemplate_<mul_result>;
+			if constexpr (std::is_invocable_v<sqrt_, mul_result>)
+			{
+				using sqrt_result = std::invoke_result_t<sqrt_, mul_result>;
+				using div_ = EmuCore::do_divide<calc_type, sqrt_result>;
+				if constexpr (std::is_invocable_v<div_, calc_type, sqrt_result>)
+				{
+					using div_result = std::invoke_result_t<div_, calc_type, sqrt_result>;
+					using rad_conversion_result = std::invoke_result_t<unit_converter, div_result>;
+
+					if constexpr (std::is_constructible_v<Out_, rad_conversion_result>)
+					{
+						return Out_
+						(
+							unit_converter()
+							(
+								div_()
+								(
+									_vector_dot<calc_type>(a_, b_),
+									sqrt_()(mul_()(_vector_square_mag<calc_type>(a_), _vector_square_mag<calc_type>(b_)))
+								)
+							)
+						);
+					}
+					else if constexpr (std::is_convertible_v<Out_, rad_conversion_result>)
+					{
+						return static_cast<Out_>
+						(
+							unit_converter()
+							(
+								div_()
+								(
+									_vector_dot<calc_type>(a_, b_),
+									sqrt_()(mul_()(_vector_square_mag<calc_type>(a_), _vector_square_mag<calc_type>(b_)))
+								)
+							)
+						);
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<Out_>(),
+							"Attempted to calculate the cosine of the angle between two EmuMath Vectors, but the provided Out_ type cannot be formed from the type resulting from calculations."
+						);
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Out_>(),
+						"Attempted to calculate the cosine of the angle between two EmuMath Vectors, but a division operation could not successfully be invoked."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Out_>(),
+					"Attempted to calculate the cosine of the angle between two EmuMath Vectors, but a square-root operation could not successfully be invoked."
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<Out_>(),
+				"Attempted to calculate the cosine of the angle between two EmuMath Vectors, but a multiplication operation could not successfully be invoked."
+			);
+		}
+	}
+
+	template<template<class> class SqrtTempate_, class Acos_, class Out_, bool Radians_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline Out_ _vector_angle(Acos_ acos_, const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	{
+		using calc_type = typename _types_vector_dot<SizeA_, TA_, SizeB_, TB_, Out_>::out_processing;
+		using unit_converter = _conditional_rad_converter<Radians_>;
+		if constexpr (std::is_invocable_v<Acos_&, calc_type>)
+		{
+			using acos_result = std::invoke_result_t<Acos_&, calc_type>;
+			using unit_conversion_result = std::invoke_result_t<unit_converter, acos_result>;
+			
+			if constexpr (std::is_constructible_v<Out_, unit_conversion_result>)
+			{
+				return Out_(unit_converter()(acos_(_vector_angle_cos<SqrtTempate_, calc_type, true>(a_, b_))));
+			}
+			else if constexpr (EmuCore::TMP::is_static_castable_v<unit_conversion_result, Out_>)
+			{
+				return static_cast<Out_>(unit_converter()(acos_(_vector_angle_cos<SqrtTempate_, calc_type, true>(a_, b_))));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Out_>(),
+					"Attempted to calculate the angle between two EmuMath Vectors, but the provided Out_ type cannot be invoked with the result of invoking the provided Acos_ functor."
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<Out_>(),
+				"Attempted to calculate the angle between two EmuMath Vectors, but the provided Acos_ functor cannot be invoked with the result of finding the angle cosine."
+			);
+		}
+	}
+
+	template<template<class> class SqrtTemplate_, template<class> class AcosTemplate_, class Out_, bool Radians_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline Out_ _vector_angle(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	{
+		using Acos_ = AcosTemplate_<typename _types_vector_dot<SizeA_, TA_, SizeB_, TB_, Out_>::out_processing>;
+		return _vector_angle<SqrtTemplate_, Acos_, Out_, Radians_>(Acos_(), a_, b_);
 	}
 }
 

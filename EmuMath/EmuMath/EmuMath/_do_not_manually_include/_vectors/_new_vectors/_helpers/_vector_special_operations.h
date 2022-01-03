@@ -2,6 +2,7 @@
 #define EMU_MATH_NEW_VECTOR_SPECIAL_OPERATIONS_H_INC_ 1
 
 #include "_common_vector_helpers.h"
+#include "../../../../../EmuCore/Functors/Arithmetic.h"
 
 // CONTAINS:
 // --- dot
@@ -9,6 +10,10 @@
 // --- magnitude_constexpr
 // --- magnitude
 // --- normalise_constexpr
+// --- normalise
+// --- angle_cos_constexpr
+// --- angle_cos
+// --- angle
 
 namespace EmuMath::Helpers
 {
@@ -403,6 +408,82 @@ namespace EmuMath::Helpers
 	constexpr inline void new_vector_normalise_range(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt, BeginIndex_, EndIndex_>(out_vector_, in_vector_);
+	}
+#pragma endregion
+
+#pragma region ANGLE_FUNCS
+	/// <summary>
+	/// <para> Calculates the cosine of the angle between the two passed EmuMath Vectors. </para>
+	/// <para> Radians_: If true, output will be in radians; otherwise, it will be in degrees. Defaults to true. </para>
+	/// <para>
+	///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+	///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+	/// </para>
+	/// </summary>
+	/// <param name="vector_a_">First EmuMath Vector of the two to find the cosine of the angle between.</param>
+	/// <param name="vector_b_">Second EmuMath Vector of the two to find the cosine of the angle between.</param>
+	/// <returns>Cosine of the angle between the two provided EmuMath Vectors, in radians or degrees depending on the Radians_ arg.</returns>
+	template<typename Out_, bool Radians_ = true, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline Out_ new_vector_angle_cos_constexpr(const EmuMath::NewVector<SizeA_, TA_>& vector_a_, const EmuMath::NewVector<SizeB_, TB_>& vector_b_)
+	{
+		return _vector_underlying::_vector_angle_cos<EmuCore::do_sqrt_constexpr, Out_, Radians_>(vector_a_, vector_b_);
+	}
+	template<bool Radians_ = true, typename TA_, std::size_t SizeA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point new_vector_angle_cos_constexpr
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
+		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+	)
+	{
+		using out_type_arg = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		return _vector_underlying::_vector_angle_cos<EmuCore::do_sqrt_constexpr, out_type_arg, Radians_>(vector_a_, vector_b_);
+	}
+
+	/// <summary>
+	/// <para> Calculates the cosine of the angle between the two passed EmuMath Vectors. </para>
+	/// <para> Radians_: If true, output will be in radians; otherwise, it will be in degrees. Defaults to true. </para>
+	/// <para> For a guarantee to produce a compile-time result if possible, use `vector_angle_cos_constexpr` instead. </para>
+	/// </summary>
+	/// <param name="vector_a_">First EmuMath Vector of the two to find the cosine of the angle between.</param>
+	/// <param name="vector_b_">Second EmuMath Vector of the two to find the cosine of the angle between.</param>
+	/// <returns>Cosine of the angle between the two provided EmuMath Vectors, in radians or degrees depending on the Radians_ arg.</returns>
+	template<typename Out_, bool Radians_ = true, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline Out_ new_vector_angle_cos(const EmuMath::NewVector<SizeA_, TA_>& vector_a_, const EmuMath::NewVector<SizeB_, TB_>& vector_b_)
+	{
+		return _vector_underlying::_vector_angle_cos<EmuCore::do_sqrt, Out_, Radians_>(vector_a_, vector_b_);
+	}
+	template<bool Radians_ = true, typename TA_, std::size_t SizeA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point new_vector_angle_cos
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
+		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+	)
+	{
+		using out_type_arg = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		return _vector_underlying::_vector_angle_cos<EmuCore::do_sqrt, out_type_arg, Radians_>(vector_a_, vector_b_);
+	}
+
+	/// <summary>
+	/// <para> Calculates the angle between the two passed EmuMath Vectors. </para>
+	/// <para> Radians_: If true, output will be in radians; otherwise, it will be in degrees. Defaults to true. </para>
+	/// </summary>
+	/// <param name="vector_a_">First EmuMath Vector of the two to find the angle between.</param>
+	/// <param name="vector_b_">Second EmuMath Vector of the two to find the angle between.</param>
+	/// <returns>Angle between the two provided EmuMath Vectors, in radians or degrees depending on the Radians_ arg.</returns>
+	template<typename Out_, bool Radians_ = true, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline Out_ new_vector_angle(const EmuMath::NewVector<SizeA_, TA_>& vector_a_, const EmuMath::NewVector<SizeB_, TB_>& vector_b_)
+	{
+		return _vector_underlying::_vector_angle<EmuCore::do_sqrt, EmuCore::do_acos, Out_, Radians_>(vector_a_, vector_b_);
+	}
+	template<bool Radians_ = true, typename TA_, std::size_t SizeA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point new_vector_angle
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
+		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+	)
+	{
+		using out_type_arg = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		return _vector_underlying::_vector_angle<EmuCore::do_sqrt, EmuCore::do_acos, out_type_arg, Radians_>(vector_a_, vector_b_);
 	}
 #pragma endregion
 }

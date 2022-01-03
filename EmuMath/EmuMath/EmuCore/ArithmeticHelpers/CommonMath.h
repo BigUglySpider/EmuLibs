@@ -659,12 +659,31 @@ namespace EmuCore
 		return (val_ + (val_ >> 63)) ^ (val_ >> 63);
 	}
 
-	template<typename FP_>
-	constexpr inline bool FpNearEqual(FP_ lhs_, FP_ rhs_, FP_ epsilon_ = std::numeric_limits<FP_>::epsilon())
+	template<typename T_>
+	struct epsilon
 	{
-		FP_ delta_ = lhs_ - rhs_;
-		return AbsConstexpr<FP_>(delta_) <= epsilon_;
-	}
+		[[nodiscard]] static constexpr inline T_ get()
+		{
+			return std::numeric_limits<T_>::epsilon();
+		}
+	};
+
+	template<typename Lhs_, typename Rhs_ = Lhs_, typename Epsilon_ = Lhs_>
+	struct near_equal
+	{
+		constexpr near_equal()
+		{
+		}
+
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_, const Epsilon_& epsilon_)
+		{
+			return AbsConstexpr(lhs_ - rhs_) <= epsilon_;
+		}
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_)
+		{
+			return operator()(lhs_, rhs_, epsilon<Epsilon_>::get());
+		}
+	};
 }
 
 #endif
