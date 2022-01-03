@@ -55,6 +55,25 @@ void some_test(int& yo_)
 	EmuThreads::stream_append_all_in_one(std::cout, ++yo_, " : ", &yo_, "\n");
 }
 
+struct IncrementingFunc
+{
+	constexpr IncrementingFunc() : _val(0)
+	{
+	}
+
+	[[nodiscard]] constexpr inline std::int32_t operator()()
+	{
+		return _val++;
+	}
+	template<typename T_>
+	[[nodiscard]] constexpr inline std::int32_t operator()(T_&& dummy_)
+	{
+		return operator()();
+	}
+
+	std::int32_t _val;
+};
+
 template<typename T_, int Max_ = std::numeric_limits<int>::max()>
 struct SettyBoi
 {
@@ -942,6 +961,19 @@ int main()
 	).Dot(EmuMath::Helpers::new_vector_make<int>(1, 2, 3));
 
 	constexpr auto ranged_dp_ = EmuMath::Helpers::new_vector_make<int>(0, 25, 50, 10000).Dot<0, 3>(EmuMath::Helpers::new_vector_make<int>(5, 10, 2, 6));
+
+	constexpr auto vector_for_mag_ = EmuMath::Helpers::new_vector_make<float>(2, 4, 6);
+	constexpr auto some_sqr_mag_ = vector_for_mag_.SquareMagnitude();
+	constexpr auto some_mag_ = vector_for_mag_.MagnitudeConstexpr();
+
+	std::cout << "---\n\n";
+	IncrementingFunc incrementing_func_ = IncrementingFunc();
+	constexpr auto some_vec_ = EmuMath::Helpers::new_vector_mutate<12, float>(IncrementingFunc());
+	constexpr auto some_old_vec_ = EmuMath::Helpers::vector_mutate(EmuMath::Vector<12, float>(), IncrementingFunc());
+	std::cout << some_vec_ << "\n";
+	std::cout << some_old_vec_ << "\n";
+
+
 
 	// GRADIENTS START
 	//std::cout << "\n\n";

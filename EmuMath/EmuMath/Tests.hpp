@@ -32,6 +32,13 @@ namespace EmuCore::TestingHelpers
 		);
 	}
 
+	template<class Vector_, class OutColl_, class RngFunc_>
+	inline void emplace_back_old_vector(OutColl_& out_coll_, RngFunc_& func_)
+	{
+		Vector_ vec_ = Vector_();
+		out_coll_.emplace_back(EmuMath::Helpers::vector_mutate(vec_, std::ref(func_)));
+	}
+
 	struct RngFunctor
 	{
 	private:
@@ -105,30 +112,29 @@ namespace EmuCore::TestingHelpers
 		}
 	};
 
-	struct vector_dp_test_mutate
+	struct mag_test_new
 	{
 		static constexpr bool DO_TEST = true;
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Vector Dot Product (Member Func)";
+		static constexpr std::string_view NAME = "Vector Mag (New)";
 
 		static constexpr std::size_t vec_size = 12;
 		using vector_type_arg = float;
 		using vector_type = EmuMath::NewVector<vec_size, vector_type_arg>;
 		using float_type = typename vector_type::preferred_floating_point;
 
-		vector_dp_test_mutate()
+		mag_test_new()
 		{
 		}
 		void Prepare()
 		{
 			// RESIZES
-			dot_result.resize(NUM_LOOPS);
+			mag_result.resize(NUM_LOOPS);
 
 			// RESERVES
 			in_a.reserve(NUM_LOOPS);
-			in_b.reserve(NUM_LOOPS);
 
 			// FILL RESERVES
 			RngFunctor rng_ = RngFunctor(shared_fill_seed_);
@@ -137,48 +143,45 @@ namespace EmuCore::TestingHelpers
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
 				emplace_back_new_vector<vec_size, vector_type_arg>(in_a, rng_);
-				emplace_back_new_vector<vec_size, vector_type_arg>(in_b, rng_);
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			dot_result[i] = in_a[i].Dot(in_b[i]);
+			mag_result[i] = in_a[i].Magnitude();
 		}
 		void OnTestsOver()
 		{
 			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
-			std::cout << in_a[i_] << " DOT\n" << in_b[i_] << ":\n" << dot_result[i_] << "\n\n";
+			std::cout << "MAG(" << in_a[i_] << "): " << mag_result[i_] << "\n\n";
 		}
 
 		std::vector<vector_type> in_a;
-		std::vector<vector_type> in_b;
-		std::vector<float_type> dot_result;
+		std::vector<float_type> mag_result;
 	};
 
-	struct vector_dp_test_alt
+	struct mag_test_old
 	{
 		static constexpr bool DO_TEST = true;
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Vector Dot Product (Global Func)";
+		static constexpr std::string_view NAME = "Vector Mag (Old)";
 
 		static constexpr std::size_t vec_size = 12;
 		using vector_type_arg = float;
-		using vector_type = EmuMath::NewVector<vec_size, vector_type_arg>;
+		using vector_type = EmuMath::Vector<vec_size, vector_type_arg>;
 		using float_type = typename vector_type::preferred_floating_point;
 
-		vector_dp_test_alt()
+		mag_test_old()
 		{
 		}
 		void Prepare()
 		{
 			// RESIZES
-			dot_result.resize(NUM_LOOPS);
+			mag_result.resize(NUM_LOOPS);
 
 			// RESERVES
 			in_a.reserve(NUM_LOOPS);
-			in_b.reserve(NUM_LOOPS);
 
 			// FILL RESERVES
 			RngFunctor rng_ = RngFunctor(shared_fill_seed_);
@@ -186,31 +189,29 @@ namespace EmuCore::TestingHelpers
 
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				emplace_back_new_vector<vec_size, vector_type_arg>(in_a, rng_);
-				emplace_back_new_vector<vec_size, vector_type_arg>(in_b, rng_);
+				emplace_back_old_vector<vector_type>(in_a, rng_);
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			dot_result[i] = EmuMath::Helpers::new_vector_dot<float_type>(in_a[i], in_b[i]);
+			mag_result[i] = in_a[i].Magnitude();
 		}
 		void OnTestsOver()
 		{
 			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
-			std::cout << in_a[i_] << " DOT\n" << in_b[i_] << ":\n" << dot_result[i_] << "\n\n";
+			std::cout << "MAG(" << in_a[i_] << "): " << mag_result[i_] << "\n\n";
 		}
 
 		std::vector<vector_type> in_a;
-		std::vector<vector_type> in_b;
-		std::vector<float_type> dot_result;
+		std::vector<float_type> mag_result;
 	};
 
 
 	// ----------- TESTS SELECTION -----------
 	using AllTests = std::tuple
 	<
-		vector_dp_test_mutate,
-		vector_dp_test_alt
+		mag_test_new,
+		mag_test_old
 	>;
 
 	// ----------- TESTS BEGIN -----------

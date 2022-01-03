@@ -3833,6 +3833,90 @@ namespace EmuMath
 
 #pragma region VECTOR_OPERATIONS
 		/// <summary>
+		/// <para> Calculates the squared magnitude of this Vector, output as the provided Out_ type (defaults to this Vector's preferred_floating_point). </para>
+		/// <para> This is equivalent to forming the dot product of this Vector with itself. </para>
+		/// </summary>
+		/// <typeparam name="Out_">Type to output the calculated square magnitude as. Defaults to preferred_floating_point.</typeparam>
+		/// <returns>Squared magnitude of this Vector.</returns>
+		template<typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline Out_ SquareMagnitude() const
+		{
+			return EmuMath::Helpers::new_vector_square_magnitude<Out_>(*this);
+		}
+		/// <summary>
+		/// <para>
+		///		Calculates the squared magnitude of this Vector, using only indices in the provided range,
+		///		and outputted as the provided Out_ type (defaults to this Vector's preferred_floating_point).
+		/// </para>
+		/// <para> This is equivalent to forming the dot product of this Vector with itself within the specified range. </para>
+		/// </summary>
+		/// <typeparam name="Out_">Type to output the calculated square magnitude as. Defaults to preferred_floating_point.</typeparam>
+		/// <returns>Squared magnitude of this Vector, using the provided index range.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline Out_ SquareMagnitude() const
+		{
+			return EmuMath::Helpers::new_vector_square_magnitude<BeginIndex_, EndIndex_, Out_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Calculates the magnitude of this Vector, output as the provided Out_ type (defaults to this Vector's preferred_floating_point). </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Out_">Type to output the calculated magnitude as. Defaults to preferred_floating_point.</typeparam>
+		/// <returns>Magnitude of this Vector.</returns>
+		template<typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline Out_ MagnitudeConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_magnitude_constexpr<Out_>(*this);
+		}
+		/// <summary>
+		/// <para>
+		///		Calculates the magnitude of this Vector, using only indices in the provided range,
+		///		and outputted as the provided Out_ type (defaults to this Vector's preferred_floating_point).
+		/// </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Out_">Type to output the calculated magnitude as. Defaults to preferred_floating_point.</typeparam>
+		/// <returns>Magnitude of this Vector, using the provided index range.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline Out_ MagnitudeConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_magnitude_constexpr<BeginIndex_, EndIndex_, Out_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Calculates the magnitude of this Vector, output as the provided Out_ type (defaults to this Vector's preferred_floating_point). </para>
+		/// <para> For a guarantee to produce a compile-time result if possible, use `MagnitudeConstexpr` instead. </para>
+		/// </summary>
+		/// <typeparam name="Out_">Type to output the calculated magnitude as. Defaults to preferred_floating_point.</typeparam>
+		/// <returns>Magnitude of this Vector.</returns>
+		template<typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline Out_ Magnitude() const
+		{
+			return EmuMath::Helpers::new_vector_magnitude<Out_>(*this);
+		}
+		/// <summary>
+		/// <para>
+		///		Calculates the magnitude of this Vector, using only indices in the provided range,
+		///		and outputted as the provided Out_ type (defaults to this Vector's preferred_floating_point).
+		/// </para>
+		/// <para> For a guarantee to produce a compile-time result if possible, use `MagnitudeConstexpr` instead. </para>
+		/// </summary>
+		/// <typeparam name="Out_">Type to output the calculated magnitude as. Defaults to preferred_floating_point.</typeparam>
+		/// <returns>Magnitude of this Vector, using the provided index range.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline Out_ Magnitude() const
+		{
+			return EmuMath::Helpers::new_vector_magnitude<BeginIndex_, EndIndex_, Out_>(*this);
+		}
+
+		/// <summary>
 		/// <para>
 		///		Calculates the dot product of this Vector and the passed vector_b_,
 		///		output as the provided Out_ type (defaults to this Vector's preferred_floating_point).
@@ -3846,7 +3930,6 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::new_vector_dot<Out_>(*this, vector_b_);
 		}
-
 		/// <summary>
 		/// <para>
 		///		Calculates the dot product of this Vector and the passed vector_b_, using indices in the provided range,

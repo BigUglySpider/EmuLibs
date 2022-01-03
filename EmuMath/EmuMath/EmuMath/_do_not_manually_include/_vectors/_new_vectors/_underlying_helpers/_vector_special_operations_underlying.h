@@ -52,6 +52,22 @@ namespace EmuMath::Helpers::_vector_underlying
 		_do_multiply _mul;
 	};
 
+	template<std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_, typename Out_>
+	struct _types_vector_dot
+	{
+		using a_value_uq = typename EmuMath::NewVector<SizeA_, TA_>::value_type_uq;
+		using b_value_uq = typename EmuMath::NewVector<SizeB_, TB_>::value_type_uq;
+		using a_b_fp = EmuCore::TMP::largest_floating_point_t<a_value_uq, b_value_uq, float>;
+
+		using out_uq = EmuCore::TMP::remove_ref_cv_t<Out_>;
+		using out_processing = std::conditional_t
+		<
+			std::is_arithmetic_v<Out_>,
+			EmuCore::TMP::first_floating_point_t<out_uq, a_b_fp>,
+			out_uq
+		>;
+	};
+
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
 	[[nodiscard]] constexpr inline Out_ _vector_dot(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
 	{
@@ -118,6 +134,69 @@ namespace EmuMath::Helpers::_vector_underlying
 	[[nodiscard]] constexpr inline Out_ _vector_dot(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
 	{
 		return _vector_dot<0, (SizeA_ <= SizeB_) ? SizeA_ : SizeB_, Out_>(a_, b_);
+	}
+
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline Out_ _vector_square_mag(const EmuMath::NewVector<Size_, T_>& vector_)
+	{
+		return _vector_dot<BeginIndex_, EndIndex_, Out_>(vector_, vector_);
+	}
+	template<typename Out_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline Out_ _vector_square_mag(const EmuMath::NewVector<Size_, T_>& vector_)
+	{
+		return _vector_dot<Out_>(vector_, vector_);
+	}
+
+	template<class Sqrt_, std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline Out_ _vector_mag(Sqrt_ sqrt_, const EmuMath::NewVector<Size_, T_>& vector_)
+	{
+		using out_processing = typename _types_vector_dot<Size_, T_, Size_, T_, Out_>::out_processing;
+		if constexpr (std::is_invocable_v<Sqrt_&, out_processing>)
+		{
+			using sqrt_result = std::invoke_result_t<Sqrt_, out_processing>;
+			if constexpr (std::is_constructible_v<Out_, sqrt_result>)
+			{
+				return Out_(Sqrt_()(_vector_square_mag<BeginIndex_, EndIndex_, out_processing>(vector_)));
+			}
+			else if constexpr (EmuCore::TMP::is_static_castable_v<sqrt_result, Out_>)
+			{
+				return static_cast<Out_>(Sqrt_()(_vector_square_mag<BeginIndex_, EndIndex_, out_processing>(vector_)));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Out_>(),
+					"Attempted to calculate the magnitude of an EmuMath Vector, but the result of the invoked Sqrt_ func cannot be used to construct or convert-to the desired Out_ type."
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<Out_>(),
+				"Attempted to calculate the magnitude of an EmuMath Vector, but the provided Sqrt_ func cannot be invoked with the determined processing type."
+			);
+		}
+	}
+	template<template<class> class SqrtTemplate_, std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline Out_ _vector_mag(const EmuMath::NewVector<Size_, T_>& vector_)
+	{
+		using out_processing = typename _types_vector_dot<Size_, T_, Size_, T_, Out_>::out_processing;
+		using Sqrt_ = SqrtTemplate_<out_processing>;
+		return _vector_mag<Sqrt_, BeginIndex_, EndIndex_, Out_>(Sqrt_(), vector_);
+	}
+
+	template<class Sqrt_, typename Out_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline Out_ _vector_mag(Sqrt_ sqrt_, const EmuMath::NewVector<Size_, T_>& vector_)
+	{
+		return _vector_mag<Sqrt_&, 0, EmuMath::NewVector<Size_, T_>::size, Out_>(sqrt_, vector_);
+	}
+	template<template<class> class SqrtTemplate_, typename Out_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline Out_ _vector_mag(const EmuMath::NewVector<Size_, T_>& vector_)
+	{
+		return _vector_mag<SqrtTemplate_, 0, EmuMath::NewVector<Size_, T_>::size, Out_>(vector_);
 	}
 }
 
