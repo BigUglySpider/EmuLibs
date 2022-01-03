@@ -118,7 +118,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Vector Mag (New)";
+		static constexpr std::string_view NAME = "Vector Norm (New)";
 
 		static constexpr std::size_t vec_size = 12;
 		using vector_type_arg = float;
@@ -131,7 +131,7 @@ namespace EmuCore::TestingHelpers
 		void Prepare()
 		{
 			// RESIZES
-			mag_result.resize(NUM_LOOPS);
+			norm_result.resize(NUM_LOOPS);
 
 			// RESERVES
 			in_a.reserve(NUM_LOOPS);
@@ -147,16 +147,17 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i)
 		{
-			mag_result[i] = in_a[i].Magnitude();
+			norm_result[i] = in_a[i].Normalise();
+			//in_a[i].NormaliseConstexpr(norm_result[i]);
 		}
 		void OnTestsOver()
 		{
 			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
-			std::cout << "MAG(" << in_a[i_] << "): " << mag_result[i_] << "\n\n";
+			std::cout << "NORM(" << in_a[i_] << "):\n" << norm_result[i_] << "\n\n";
 		}
 
 		std::vector<vector_type> in_a;
-		std::vector<float_type> mag_result;
+		std::vector<vector_type> norm_result;
 	};
 
 	struct mag_test_old
@@ -165,7 +166,7 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Vector Mag (Old)";
+		static constexpr std::string_view NAME = "Vector Norm (Old)";
 
 		static constexpr std::size_t vec_size = 12;
 		using vector_type_arg = float;
@@ -178,7 +179,7 @@ namespace EmuCore::TestingHelpers
 		void Prepare()
 		{
 			// RESIZES
-			mag_result.resize(NUM_LOOPS);
+			norm_result.resize(NUM_LOOPS);
 
 			// RESERVES
 			in_a.reserve(NUM_LOOPS);
@@ -190,20 +191,21 @@ namespace EmuCore::TestingHelpers
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
 				emplace_back_old_vector<vector_type>(in_a, rng_);
+				//emplace_back_new_vector<vec_size, vector_type_arg>(in_a, rng_);
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			mag_result[i] = in_a[i].Magnitude();
+			norm_result[i] = in_a[i].Normalise();
 		}
 		void OnTestsOver()
 		{
 			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
-			std::cout << "MAG(" << in_a[i_] << "): " << mag_result[i_] << "\n\n";
+			std::cout << "NORM(" << in_a[i_] << "):\n" << norm_result[i_] << "\n\n";
 		}
 
 		std::vector<vector_type> in_a;
-		std::vector<float_type> mag_result;
+		std::vector<vector_type> norm_result;
 	};
 
 

@@ -684,7 +684,7 @@ namespace EmuMath::Helpers::_vector_underlying
 			}
 
 			// Copy in mutated values
-			// --- If BeginIndex_ == EndIndex_, no updates will be made.
+			// --- If BeginIndex_ == EndIndex_, no mutations will be made.
 			if constexpr (BeginIndex_ != EndIndex_)
 			{
 				_vector_mutate<Func_&, OutVector_, BeginIndex_, EndIndex_, ArgIndex_>(func_, out_vector_, std::forward<Args_>(args_)...);

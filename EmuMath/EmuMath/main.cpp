@@ -966,12 +966,9 @@ int main()
 	constexpr auto some_sqr_mag_ = vector_for_mag_.SquareMagnitude();
 	constexpr auto some_mag_ = vector_for_mag_.MagnitudeConstexpr();
 
+	constexpr auto some_norm_vec_ = EmuMath::Helpers::new_vector_make<float>(1, 2, 3).NormaliseConstexpr();
+
 	std::cout << "---\n\n";
-	IncrementingFunc incrementing_func_ = IncrementingFunc();
-	constexpr auto some_vec_ = EmuMath::Helpers::new_vector_mutate<12, float>(IncrementingFunc());
-	constexpr auto some_old_vec_ = EmuMath::Helpers::vector_mutate(EmuMath::Vector<12, float>(), IncrementingFunc());
-	std::cout << some_vec_ << "\n";
-	std::cout << some_old_vec_ << "\n";
 
 
 

@@ -2556,12 +2556,12 @@ namespace EmuMath
 		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of bitwise operations.</param>
 		/// <returns>Reference to this Vector.</returns>
 		template<typename Rhs_>
-		constexpr inline this_type& BitwiseAndAssign(Rhs_&& rhs_)
+		constexpr inline this_type& AndAssign(Rhs_&& rhs_)
 		{
 			return EmuMath::Helpers::new_vector_bitwise_and_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
-		constexpr inline this_type& BitwiseAndAssign(Rhs_&& rhs_)
+		constexpr inline this_type& AndAssign(Rhs_&& rhs_)
 		{
 			return EmuMath::Helpers::new_vector_bitwise_and_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -2574,12 +2574,12 @@ namespace EmuMath
 		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of bitwise operations.</param>
 		/// <returns>Reference to this Vector.</returns>
 		template<typename Rhs_>
-		constexpr inline this_type& BitwiseOrAssign(Rhs_&& rhs_)
+		constexpr inline this_type& OrAssign(Rhs_&& rhs_)
 		{
 			return EmuMath::Helpers::new_vector_bitwise_or_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
-		constexpr inline this_type& BitwiseOrAssign(Rhs_&& rhs_)
+		constexpr inline this_type& OrAssign(Rhs_&& rhs_)
 		{
 			return EmuMath::Helpers::new_vector_bitwise_or_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -2592,12 +2592,12 @@ namespace EmuMath
 		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of bitwise operations.</param>
 		/// <returns>Reference to this Vector.</returns>
 		template<typename Rhs_>
-		constexpr inline this_type& BitwiseXorAssign(Rhs_&& rhs_)
+		constexpr inline this_type& XorAssign(Rhs_&& rhs_)
 		{
 			return EmuMath::Helpers::new_vector_bitwise_xor_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
-		constexpr inline this_type& BitwiseXorAssign(Rhs_&& rhs_)
+		constexpr inline this_type& XorAssign(Rhs_&& rhs_)
 		{
 			return EmuMath::Helpers::new_vector_bitwise_xor_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -3833,6 +3833,37 @@ namespace EmuMath
 
 #pragma region VECTOR_OPERATIONS
 		/// <summary>
+		/// <para>
+		///		Calculates the dot product of this Vector and the passed vector_b_,
+		///		output as the provided Out_ type (defaults to this Vector's preferred_floating_point).
+		/// </para>
+		/// </summary>
+		/// <typeparam name="Out_">Type to output the calculated dot product as. Defaults to preferred_floating_point.</typeparam>
+		/// <param name="vector_b_">: EmuMath Vector to calculate the dot product of this Vector with.</param>
+		/// <returns>Dot product of this Vector and the passed vector_b_.</returns>
+		template<typename Out_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
+		[[nodiscard]] constexpr inline Out_ Dot(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		{
+			return EmuMath::Helpers::new_vector_dot<Out_>(*this, vector_b_);
+		}
+		/// <summary>
+		/// <para>
+		///		Calculates the dot product of this Vector and the passed vector_b_, using indices in the provided range,
+		///		and outputted as the provided Out_ type (defaults to this Vector's preferred_floating_point).
+		/// </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading from both Vectors to form a dot product. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading from both Vectors to form a dot product. </para>
+		/// </summary>
+		/// <typeparam name="Out_">Type to output the calculated dot product as. Defaults to preferred_floating_point.</typeparam>
+		/// <param name="vector_b_">: EmuMath Vector to calculate the dot product of this Vector with.</param>
+		/// <returns>Dot product of this Vector and the passed vector_b_.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
+		[[nodiscard]] constexpr inline Out_ Dot(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		{
+			return EmuMath::Helpers::new_vector_dot<BeginIndex_, EndIndex_, Out_>(*this, vector_b_);
+		}
+
+		/// <summary>
 		/// <para> Calculates the squared magnitude of this Vector, output as the provided Out_ type (defaults to this Vector's preferred_floating_point). </para>
 		/// <para> This is equivalent to forming the dot product of this Vector with itself. </para>
 		/// </summary>
@@ -3917,34 +3948,135 @@ namespace EmuMath
 		}
 
 		/// <summary>
+		/// <para> Calculates and outputs a copy of this Vector with normalised elements. </para>
 		/// <para>
-		///		Calculates the dot product of this Vector and the passed vector_b_,
-		///		output as the provided Out_ type (defaults to this Vector's preferred_floating_point).
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
 		/// </para>
 		/// </summary>
-		/// <typeparam name="Out_">Type to output the calculated dot product as. Defaults to preferred_floating_point.</typeparam>
-		/// <param name="vector_b_">EmuMath Vector to calculate the dot product of this Vector with.</param>
-		/// <returns>Dot product of this Vector and the passed vector_b_.</returns>
-		template<typename Out_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
-		[[nodiscard]] constexpr inline Out_ Dot(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		/// <returns>EmuMath Vector copy of this Vector normalised.</returns>
+		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NormaliseConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_dot<Out_>(*this, vector_b_);
+			return EmuMath::Helpers::new_vector_normalise_constexpr<OutSize_, OutT_>(*this);
 		}
-		/// <summary>
-		/// <para>
-		///		Calculates the dot product of this Vector and the passed vector_b_, using indices in the provided range,
-		///		and outputted as the provided Out_ type (defaults to this Vector's preferred_floating_point).
-		/// </para>
-		/// <para> BeginIndex_: Inclusive index at which to start reading from both Vectors to form a dot product. </para>
-		/// <para> EndIndex_: Exclusive index at which to stop reading from both Vectors to form a dot product. </para>
-		/// </summary>
-		/// <typeparam name="Out_">Type to output the calculated dot product as. Defaults to preferred_floating_point.</typeparam>
-		/// <param name="vector_b_">EmuMath Vector to calculate the dot product of this Vector with.</param>
-		/// <returns>Dot product of this Vector and the passed vector_b_.</returns>
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
-		[[nodiscard]] constexpr inline Out_ Dot(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> NormaliseConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_dot<BeginIndex_, EndIndex_, Out_>(*this, vector_b_);
+			return EmuMath::Helpers::new_vector_normalise_constexpr<size, OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Calculates and outputs a copy of this Vector with normalised elements, via the provided out_vector_. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t OutSize_, typename OutT_>
+		constexpr inline void NormaliseConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_normalise_constexpr(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para> Calculates and outputs a copy of this Vector with normalised elements. </para>
+		/// <para> Only indices in the provided range will be normalised; indices outside of said range will be copied without modification. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start normalising elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop normalising elements. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <returns>EmuMath Vector copy of this Vector normalised.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NormaliseConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_normalise_range_constexpr<BeginIndex_, EndIndex_, OutSize_, OutT_>(*this);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> NormaliseConstexpr() const
+		{
+			return EmuMath::Helpers::new_vector_normalise_range_constexpr<BeginIndex_, EndIndex_, size, OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Calculates and outputs a copy of this Vector with normalised elements. </para>
+		/// <para> Only indices in the provided range will be normalised; indices outside of said range will be copied without modification. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start normalising elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop normalising elements. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void NormaliseConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_normalise_range_constexpr<BeginIndex_, EndIndex_>(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para> Calculates and outputs a copy of this Vector with normalised elements. </para>
+		/// <para> For a guarantee to produce a compile-time result if possible, use `NormaliseConstexpr` instead. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector copy of this Vector normalised.</returns>
+		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Normalise() const
+		{
+			return EmuMath::Helpers::new_vector_normalise<OutSize_, OutT_>(*this);
+		}
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Normalise() const
+		{
+			return EmuMath::Helpers::new_vector_normalise<size, OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Calculates and outputs a copy of this Vector with normalised elements, via the provided out_vector_. </para>
+		/// <para> For a guarantee to produce a compile-time result if possible, use `NormaliseConstexpr` instead. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t OutSize_, typename OutT_>
+		constexpr inline void Normalise(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_normalise(out_vector_, *this);
+		}
+
+		/// <summary>
+		/// <para> Calculates and outputs a copy of this Vector with normalised elements. </para>
+		/// <para> Only indices in the provided range will be normalised; indices outside of said range will be copied without modification. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start normalising elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop normalising elements. </para>
+		/// <para> For a guarantee to produce a compile-time result if possible, use `NormaliseConstexpr` instead. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector copy of this Vector normalised.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Normalise() const
+		{
+			return EmuMath::Helpers::new_vector_normalise_range<BeginIndex_, EndIndex_, OutSize_, OutT_>(*this);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Normalise() const
+		{
+			return EmuMath::Helpers::new_vector_normalise_range<BeginIndex_, EndIndex_, size, OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Calculates and outputs a copy of this Vector with normalised elements. </para>
+		/// <para> Only indices in the provided range will be normalised; indices outside of said range will be copied without modification. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start normalising elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop normalising elements. </para>
+		/// <para> For a guarantee to produce a compile-time result if possible, use `NormaliseConstexpr` instead. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void Normalise(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		{
+			EmuMath::Helpers::new_vector_normalise_range<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
 #pragma endregion
 
