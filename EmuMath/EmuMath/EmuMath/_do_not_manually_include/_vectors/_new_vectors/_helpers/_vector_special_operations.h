@@ -7,6 +7,7 @@
 // --- dot
 // --- square_magnitude
 // --- magnitude_constexpr
+// --- magnitude
 
 namespace EmuMath::Helpers
 {
