@@ -983,8 +983,28 @@ int main()
 	std::cout << vec_up_left_.Angle<double, false>(vec_up_) << "\n";
 
 	std::cout << "---\n\n";
+	constexpr auto vec_for_min_a_ = EmuMath::Helpers::new_vector_make<float>(1, 2, 3, 4);
+	constexpr auto vec_for_min_b_ = EmuMath::Helpers::new_vector_make<float>(-1, -2, 5, 27);
+	constexpr auto min_a_ = EmuMath::Helpers::new_vector_min(vec_for_min_a_, -1);
+	constexpr auto min_b_ = EmuMath::Helpers::new_vector_min(vec_for_min_b_, -1.5L);
+	constexpr auto min_c_ = EmuMath::Helpers::new_vector_min(vec_for_min_a_, vec_for_min_b_);
+
+	constexpr auto min_range_a_ = EmuMath::Helpers::new_vector_min_range<1, 3>(vec_for_min_a_, vec_for_min_b_);
+	constexpr auto min_range_b_ = EmuMath::Helpers::new_vector_min_range<1, 3>(vec_for_min_b_, vec_for_min_a_);
+
+	constexpr auto min_range_no_copy_a_ = EmuMath::Helpers::new_vector_min_range_no_copy<1, 3, 0>(vec_for_min_a_, vec_for_min_b_);
+	constexpr auto min_range_no_copy_b_ = EmuMath::Helpers::new_vector_min_range_no_copy<1, 3, 0>(vec_for_min_b_, vec_for_min_a_);
 
 
+	constexpr auto max_a_ = EmuMath::Helpers::new_vector_max(vec_for_min_a_, -1);
+	constexpr auto max_b_ = EmuMath::Helpers::new_vector_max(vec_for_min_b_, -1.5L);
+	constexpr auto max_c_ = EmuMath::Helpers::new_vector_max(vec_for_min_a_, vec_for_min_b_);
+
+	constexpr auto max_range_a_ = EmuMath::Helpers::new_vector_max_range<1, 3>(vec_for_min_a_, vec_for_min_b_);
+	constexpr auto max_range_b_ = EmuMath::Helpers::new_vector_max_range<1, 3>(vec_for_min_b_, vec_for_min_a_);
+
+	constexpr auto max_range_no_copy_a_ = EmuMath::Helpers::new_vector_max_range_no_copy<1, 3, 0>(vec_for_min_a_, vec_for_min_b_);
+	constexpr auto max_range_no_copy_b_ = EmuMath::Helpers::new_vector_max_range_no_copy<1, 3, 0>(vec_for_min_b_, vec_for_min_a_);
 
 	// GRADIENTS START
 	//std::cout << "\n\n";

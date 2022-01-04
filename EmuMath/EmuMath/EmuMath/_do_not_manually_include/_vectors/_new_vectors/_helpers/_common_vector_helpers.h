@@ -249,4 +249,98 @@ EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_no_func_
 	(_arg_index)\
 >
 
+#ifdef EMU_MATH_VECTOR_MUTATE_TEMPLATE_APPEND_OUT
+#undef EMU_MATH_VECTOR_MUTATE_TEMPLATE_APPEND_OUT
+#endif
+// Macro for providing a template for an underlying functions to determine the arguments for, with the value_type_uq of the out vector appended as the 0th or final argument.
+#define EMU_MATH_VECTOR_MUTATE_TEMPLATE_APPEND_OUT(_func_template, _custom_args_at_start, _out_size, _out_t)\
+EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_extra_args_args_only\
+<\
+	_func_template,\
+	EmuMath::NewVector<(_out_size), _out_t>,\
+	std::tuple<EmuMath::NewVector<(_out_size), _out_t>>,\
+	(_custom_args_at_start),\
+	0,\
+	EmuMath::NewVector<(_out_size), _out_t>::size,\
+	0\
+>
+
+#ifdef EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE_APPEND_OUT
+#undef EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE_APPEND_OUT
+#endif
+#define EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE_APPEND_OUT(_func_template, _custom_args_at_start, _out_size, _out_t)\
+EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_extra_args_no_func_passed\
+<\
+	_func_template,\
+	EmuMath::NewVector<(_out_size), _out_t>,\
+	std::tuple<EmuMath::NewVector<(_out_size), _out_t>>,\
+	(_custom_args_at_start),\
+	0,\
+	EmuMath::NewVector<(_out_size), _out_t>::size,\
+	0\
+>
+
+#ifdef EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE_APPEND_OUT
+#undef EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE_APPEND_OUT
+#endif
+#define EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE_APPEND_OUT(_func_template, _custom_args_at_start, _out_size, _out_t, _in_size, _in_t, _begin_index, _end_index)\
+EmuMath::Helpers::_vector_underlying::_vector_partial_mutation_copy_with_func_template_extra_args_args_only\
+<\
+	_func_template,\
+	(_out_size),\
+	_out_t,\
+	const EmuMath::NewVector<(_in_size), _in_t>&,\
+	std::tuple<EmuMath::NewVector<(_out_size), _out_t>>,\
+	(_custom_args_at_start),\
+	(_begin_index),\
+	(_end_index),\
+	(_begin_index)\
+>
+
+#ifdef EMU_MATH_VECTOR_MUTATE_REF_RANGE_TEMPLATE_APPEND_OUT
+#undef EMU_MATH_VECTOR_MUTATE_REF_RANGE_TEMPLATE_APPEND_OUT
+#endif
+#define EMU_MATH_VECTOR_MUTATE_REF_RANGE_TEMPLATE_APPEND_OUT(_func_template, _custom_args_at_start, _out_size, _out_t, _in_size, _in_t, _begin_index, _end_index)\
+EmuMath::Helpers::_vector_underlying::_vector_partial_mutation_copy_with_func_template_extra_args_no_func_passed\
+<\
+	_func_template,\
+	EmuMath::NewVector<(_out_size), _out_t>,\
+	const EmuMath::NewVector<(_in_size), _in_t>&,\
+	std::tuple<EmuMath::NewVector<(_out_size), _out_t>>,\
+	_custom_args_at_start,\
+	(_begin_index),\
+	(_end_index),\
+	(_begin_index)\
+>
+
+#ifdef EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT
+#undef EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT
+#endif
+#define EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(_func_template, _custom_args_at_start, _out_size, _out_t, _begin_index, _end_index, _arg_index)\
+EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_extra_args_args_only\
+<\
+	_func_template,\
+	EmuMath::NewVector<(_out_size), _out_t>,\
+	std::tuple<EmuMath::NewVector<(_out_size), _out_t>>,\
+	(_custom_args_at_start),\
+	(_begin_index),\
+	(_end_index),\
+	(_arg_index)\
+>
+
+#ifdef EMU_MATH_VECTOR_MUTATE_REF_RANGE_NO_COPY_TEMPLATE_APPEND_OUT
+#undef EMU_MATH_VECTOR_MUTATE_REF_RANGE_NO_COPY_TEMPLATE_APPEND_OUT
+#endif
+#define EMU_MATH_VECTOR_MUTATE_REF_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(_func_template, _custom_args_at_start, _out_size, _out_t, _begin_index, _end_index, _arg_index)\
+EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_extra_args_no_func_passed\
+<\
+	_func_template,\
+	EmuMath::NewVector<(_out_size), _out_t>,\
+	std::tuple<EmuMath::NewVector<(_out_size), _out_t>>,\
+	(_custom_args_at_start),\
+	(_begin_index),\
+	(_end_index),\
+	(_arg_index)\
+>
+
 #endif

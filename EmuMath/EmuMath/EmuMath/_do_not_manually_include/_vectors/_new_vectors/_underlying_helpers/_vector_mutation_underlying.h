@@ -54,7 +54,6 @@ namespace EmuMath::Helpers::_vector_underlying
 #pragma endregion
 
 #pragma region CHECKING_FUNCS
-
 	template<std::size_t ArgIndex_, class Func_, class...Args_>
 	[[nodiscard]] constexpr inline bool _vector_mutate_func_is_invocable()
 	{
@@ -348,6 +347,63 @@ namespace EmuMath::Helpers::_vector_underlying
 	public:
 		static constexpr bool value = _valid_for_arg_indices<ArgIndices_...>::value;
 	};
+
+	template<template<class...> class FuncTemplate_, class ArgTuple_, class...Args_>
+	struct _vector_mutate_custom_func_instance
+	{
+		static_assert
+		(
+			EmuCore::TMP::is_tuple_v<ArgTuple_>,
+			"Attempted to provide custom arguments via a tuple to a template via an EmuMath Vector mutation function, but the provided type of custom arguments was not a tuple."
+		);
+
+		static constexpr bool is_valid_with_tuple_first = false;
+		static constexpr bool is_valid_with_tuple_last = false;
+		using func_with_tuple_first = void;
+		using func_with_tuple_second = void;
+	};
+	template<template<class...> class FuncTemplate_, class...Args_, class...TupleArgs_>
+	struct _vector_mutate_custom_func_instance<FuncTemplate_, std::tuple<TupleArgs_...>, Args_...>
+	{
+	private:
+		template<template<class...> class Template_, bool IsValid_>
+		struct _instantiate_template_tuple_first
+		{
+			using type = void;
+		};
+		template<template<class...> class Template_>
+		struct _instantiate_template_tuple_first<Template_, true>
+		{
+			using type = Template_<EmuMath::TMP::emu_vector_value_type_uq<TupleArgs_>..., EmuMath::TMP::emu_vector_value_type_uq<Args_>...>;
+		};
+
+		template<template<class...> class Template_, bool IsValid_>
+		struct _instantiate_template_tuple_last
+		{
+			using type = void;
+		};
+		template<template<class...> class Template_>
+		struct _instantiate_template_tuple_last<Template_, true>
+		{
+			using type = Template_<EmuMath::TMP::emu_vector_value_type_uq<Args_>..., EmuMath::TMP::emu_vector_value_type_uq<TupleArgs_>...>;
+		};
+
+	public:
+		static constexpr bool is_valid_with_tuple_first = EmuCore::TMP::valid_template_args_v
+		<
+			FuncTemplate_,
+			EmuMath::TMP::emu_vector_value_type_uq<TupleArgs_>...,
+			EmuMath::TMP::emu_vector_value_type_uq<Args_>...
+		>;
+		static constexpr bool is_valid_with_tuple_last = EmuCore::TMP::valid_template_args_v
+		<
+			FuncTemplate_,
+			EmuMath::TMP::emu_vector_value_type_uq<Args_>...,
+			EmuMath::TMP::emu_vector_value_type_uq<TupleArgs_>...
+		>;
+		using func_with_tuple_first = typename _instantiate_template_tuple_first<FuncTemplate_, is_valid_with_tuple_first>::type;
+		using func_with_tuple_last = typename _instantiate_template_tuple_last<FuncTemplate_, is_valid_with_tuple_last>::type;
+	};
 #pragma endregion
 
 #pragma region SHUFFLES
@@ -635,6 +691,40 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 	}
 
+	template
+	<
+		template<class...> class FuncT_,
+		class OutVector_,
+		class ArgTuple_,
+		bool CustomArgsFirst_,
+		std::size_t BeginIndex_,
+		std::size_t EndIndex_,
+		std::size_t ArgIndex_,
+		class...Args_
+	>
+	constexpr inline void _vector_mutate_with_func_template_extra_args_no_func_passed(OutVector_& out_vector_, Args_&&...args_)
+	{
+		using instance_info = _vector_mutate_custom_func_instance<FuncT_, ArgTuple_, Args_...>;
+		if constexpr (CustomArgsFirst_ ? instance_info::is_valid_with_tuple_first : instance_info::is_valid_with_tuple_last)
+		{
+			using Func_ = std::conditional_t
+			<
+				CustomArgsFirst_,
+				typename instance_info::func_with_tuple_first,
+				typename instance_info::func_with_tuple_last
+			>;
+			_vector_mutate_no_func_passed<Func_, OutVector_, BeginIndex_, EndIndex_, ArgIndex_>(out_vector_, std::forward<Args_>(args_)...);
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<ArgTuple_>(),
+				"Attempted to mutate an EmuMath Vector using a Func_ template whose template arguments are partially determined automatically based on unqualified arguments (or the value_type_uq) of provided arguments and a custom tuple of types to append at the start or end under the same conversion condition. However, the provided Func_ template cannot be instantiated with the resulting list of types."
+			);
+		}
+	}
+
 	template<class Func_, class OutVector_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgIndex_, class...Args_>
 	constexpr inline OutVector_ _vector_mutate_args_only(Args_&&...args_)
 	{
@@ -667,6 +757,40 @@ namespace EmuMath::Helpers::_vector_underlying
 			(
 				EmuCore::TMP::get_false<OutVector_>(),
 				"Attempted to mutate an EmuMath Vector using a Func_ template whose template arguments are determined automatically based on unqualified arguments (or the value_type_uq of EmuMath Vector arguments). However, the provided Func_ template cannot be instantiated with said types for all provided arguments."
+			);
+		}
+	}
+
+	template
+	<
+		template<class...> class FuncT_,
+		class OutVector_,
+		class ArgTuple_,
+		bool CustomArgsFirst_,
+		std::size_t BeginIndex_,
+		std::size_t EndIndex_,
+		std::size_t ArgIndex_,
+		class...Args_
+	>
+	[[nodiscard]] constexpr inline OutVector_ _vector_mutate_with_func_template_extra_args_args_only(Args_&&...args_)
+	{
+		using instance_info = _vector_mutate_custom_func_instance<FuncT_, ArgTuple_, Args_...>;
+		if constexpr (CustomArgsFirst_ ? instance_info::is_valid_with_tuple_first : instance_info::is_valid_with_tuple_last)
+		{
+			using Func_ = std::conditional_t
+			<
+				CustomArgsFirst_,
+				typename instance_info::func_with_tuple_first,
+				typename instance_info::func_with_tuple_last
+			>;
+			return _vector_mutate_args_only<Func_, OutVector_, BeginIndex_, EndIndex_, ArgIndex_>(std::forward<Args_>(args_)...);
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<ArgTuple_>(),
+				"Attempted to mutate an EmuMath Vector using a Func_ template whose template arguments are partially determined automatically based on unqualified arguments (or the value_type_uq) of provided arguments and a custom tuple of types to append at the start or end under the same conversion condition. However, the provided Func_ template cannot be instantiated with the resulting list of types."
 			);
 		}
 	}
@@ -746,6 +870,46 @@ namespace EmuMath::Helpers::_vector_underlying
 			(
 				EmuCore::TMP::get_false<OutVector_>(),
 				"Attempted to copy and partially mutate an EmuMath Vector using a Func_ template whose template arguments are determined automatically based on unqualified arguments (or the value_type_uq of EmuMath Vector arguments). However, the provided Func_ template cannot be instantiated with said types for all provided arguments."
+			);
+		}
+	}
+
+	template
+	<
+		template<class...> class FuncT_,
+		class OutVector_,
+		class InVector_,
+		class ArgTuple_,
+		bool CustomArgsFirst_,
+		std::size_t BeginIndex_,
+		std::size_t EndIndex_,
+		std::size_t ArgIndex_,
+		class...Args_
+	>
+	[[nodiscard]] constexpr inline void _vector_partial_mutation_copy_with_func_template_extra_args_no_func_passed(OutVector_& out_vector_, InVector_&& in_vector_, Args_&&...args_)
+	{
+		using instance_info = _vector_mutate_custom_func_instance<FuncT_, ArgTuple_, Args_...>;
+		if constexpr (CustomArgsFirst_ ? instance_info::is_valid_with_tuple_first : instance_info::is_valid_with_tuple_last)
+		{
+			using Func_ = std::conditional_t
+			<
+				CustomArgsFirst_,
+				typename instance_info::func_with_tuple_first,
+				typename instance_info::func_with_tuple_last
+			>;
+			_vector_partial_mutation_copy_no_func_passed<Func_, OutVector_, InVector_, BeginIndex_, EndIndex_, ArgIndex_>
+			(
+				out_vector_,
+				std::forward<InVector_>(in_vector_),
+				std::forward<Args_>(args_)...
+			);
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<ArgTuple_>(),
+				"Attempted to partially mutate an EmuMath Vector using a Func_ template whose template arguments are partially determined automatically based on unqualified arguments (or the value_type_uq) of provided arguments and a custom tuple of types to append at the start or end under the same conversion condition. However, the provided Func_ template cannot be instantiated with the resulting list of types."
 			);
 		}
 	}
@@ -849,6 +1013,46 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 	}
 
+	template
+	<
+		template<class...> class FuncT_,
+		std::size_t OutSize_,
+		typename OutT_,
+		class InVector_,
+		class ArgTuple_,
+		bool CustomArgsFirst_,
+		std::size_t BeginIndex_,
+		std::size_t EndIndex_,
+		std::size_t ArgIndex_,
+		class...Args_
+	>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_partial_mutation_copy_with_func_template_extra_args_args_only(InVector_&& in_vector_, Args_&&...args_)
+	{
+		using instance_info = _vector_mutate_custom_func_instance<FuncT_, ArgTuple_, Args_...>;
+		if constexpr (CustomArgsFirst_ ? instance_info::is_valid_with_tuple_first : instance_info::is_valid_with_tuple_last)
+		{
+			using Func_ = std::conditional_t
+			<
+				CustomArgsFirst_,
+				typename instance_info::func_with_tuple_first,
+				typename instance_info::func_with_tuple_last
+			>;
+			return _vector_partial_mutation_copy_args_only<OutSize_, OutT_, Func_, InVector_, BeginIndex_, EndIndex_, ArgIndex_>
+			(
+				std::forward<InVector_>(in_vector_),
+				std::forward<Args_>(args_)...
+			);
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<ArgTuple_>(),
+				"Attempted to partially mutate an EmuMath Vector using a Func_ template whose template arguments are partially determined automatically based on unqualified arguments (or the value_type_uq) of provided arguments and a custom tuple of types to append at the start or end under the same conversion condition. However, the provided Func_ template cannot be instantiated with the resulting list of types."
+			);
+		}
+	}
+
 	template<std::size_t Index_, std::size_t EndIndex_, class Func_, class...Args_>
 	constexpr inline void _vector_mutate_invoke_only_execution(Func_& func_, Args_&&...args_)
 	{
@@ -916,6 +1120,39 @@ namespace EmuMath::Helpers::_vector_underlying
 			(
 				EmuCore::TMP::get_false<std::size_t, BeginIndex_>(),
 				"Attempted to perform an EmuMath Vector mutation with invocation only, using a Func_ template whose arguments are determined automatically based on the provided arguments. However, the provided arguments are not valid for forming a template instance of the provided Func_ template."
+			);
+		}
+	}
+
+	template
+	<
+		template<class...> class FuncT_,
+		class ArgTuple_,
+		bool CustomArgsFirst_,
+		std::size_t BeginIndex_,
+		std::size_t EndIndex_,
+		std::size_t ArgIndex_,
+		class...Args_
+	>
+	[[nodiscard]] constexpr inline void _vector_mutate_with_func_template_extra_args_invoke_only_no_func_passed(Args_&&...args_)
+	{
+		using instance_info = _vector_mutate_custom_func_instance<FuncT_, ArgTuple_, Args_...>;
+		if constexpr (CustomArgsFirst_ ? instance_info::is_valid_with_tuple_first : instance_info::is_valid_with_tuple_last)
+		{
+			using Func_ = std::conditional_t
+			<
+				CustomArgsFirst_,
+				typename instance_info::func_with_tuple_first,
+				typename instance_info::func_with_tuple_last
+			>;
+			_vector_mutate_invoke_only_no_func_passed<Func_, BeginIndex_, EndIndex_>(std::forward<Args_>(args_)...);
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<ArgTuple_>(),
+				"Attempted to invoke mutation of an EmuMath Vector using a Func_ template whose template arguments are partially determined automatically based on unqualified arguments (or the value_type_uq) of provided arguments and a custom tuple of types to append at the start or end under the same conversion condition. However, the provided Func_ template cannot be instantiated with the resulting list of types."
 			);
 		}
 	}
@@ -1006,6 +1243,52 @@ namespace EmuMath::Helpers::_vector_underlying
 			(
 				EmuCore::TMP::get_false<std::size_t, BeginIndex_>(),
 				"Attempted to perform an EmuMath Vector mutation with invocation only, using a Func_ template whose arguments are determined automatically based on the provided arguments. However, the provided arguments are not valid for forming a template instance of the provided Func_ template."
+			);
+		}
+	}
+
+	template
+	<
+		bool CopyBeforeMut_,
+		template<class...> class FuncT_,
+		std::size_t OutSize_,
+		typename OutT_,
+		class ArgTuple_,
+		bool CustomArgsFirst_,
+		std::size_t BeginIndex_,
+		std::size_t EndIndex_,
+		std::size_t ArgIndex_,
+		std::size_t InSize_,
+		typename InT_,
+		class...Args_
+	>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_copy_mutate_with_func_template_extra_args_invoke_only_no_func_passed
+	(
+		EmuMath::NewVector<InSize_, InT_>& in_vector_,
+		Args_&&...args_
+	)
+	{
+		using instance_info = _vector_mutate_custom_func_instance<FuncT_, ArgTuple_, Args_...>;
+		if constexpr (CustomArgsFirst_ ? instance_info::is_valid_with_tuple_first : instance_info::is_valid_with_tuple_last)
+		{
+			using Func_ = std::conditional_t
+			<
+				CustomArgsFirst_,
+				typename instance_info::func_with_tuple_first,
+				typename instance_info::func_with_tuple_last
+			>;
+			return _vector_copy_mutate_invoke_only_no_func_passed<CopyBeforeMut_, Func_, OutSize_, OutT_, BeginIndex_, EndIndex_, InSize_, InT_>
+			(
+				in_vector_,
+				std::forward<Args_>(args_)...
+			);
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<ArgTuple_>(),
+				"Attempted to invoke mutation of an EmuMath Vector using a Func_ template whose template arguments are partially determined automatically based on unqualified arguments (or the value_type_uq) of provided arguments and a custom tuple of types to append at the start or end under the same conversion condition. However, the provided Func_ template cannot be instantiated with the resulting list of types."
 			);
 		}
 	}
