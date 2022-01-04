@@ -4,6 +4,7 @@
 #include "../_underlying_helpers/_vector_copy_underlying.h"
 #include "../_underlying_helpers/_vector_get_underlying.h"
 #include "../_underlying_helpers/_vector_info.h"
+#include "../_underlying_helpers/_vector_misc_arithmetic_underlying.h"
 #include "../_underlying_helpers/_vector_mutation_underlying.h"
 #include "../_underlying_helpers/_vector_set_underlying.h"
 #include "../_underlying_helpers/_vector_special_operations_underlying.h"
@@ -11,6 +12,7 @@
 #include "../_underlying_helpers/_vector_tmp.h"
 
 // CONTAINS:
+// --- All underlying helper includes
 // --- All macros used within this _helpers folder.
 // ------ Macros to type an underlying vector helper with minimal whitespace to maintain readability and conciseness in "public" helper funcs
 // --------- "public" in this context refers to global EmuMath Helper functions for Vectors that are not preceded with an underscore.

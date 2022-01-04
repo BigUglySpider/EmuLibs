@@ -7,6 +7,7 @@
 // --- shuffle
 // --- shuffle_theoretical
 // --- mutate
+// --- concat
 
 namespace EmuMath::Helpers
 {
@@ -288,6 +289,125 @@ namespace EmuMath::Helpers
 		(
 			func_,
 			std::forward<Args_>(args_)...
+		);
+	}
+#pragma endregion
+
+#pragma region CONCAT_FUNCS
+	/// <summary>
+	/// <para> Concatenates the two provided EmuMath Vectors to form a single Vector. </para>
+	/// </summary>
+	/// <typeparam name="OutT_">Type to be contained within the output Vector.</typeparam>
+	/// <param name="lhs_vector_">: EmuMath Vector that will appear in the left side of the output Vector.</param>
+	/// <param name="rhs_vector_">: EmuMath Vector that will appear in the right side of the output Vector.</param>
+	/// <returns>EmuMath Vector formed from concatenating the two provided Vectors.</returns>
+	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, std::size_t RhsSize_, typename RhsT_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> new_vector_concat
+	(
+		const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_,
+		const EmuMath::NewVector<RhsSize_, RhsT_>& rhs_vector_
+	)
+	{
+		return _vector_underlying::_vector_concat<OutT_>(lhs_vector_, rhs_vector_);
+	}
+
+	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, std::size_t RhsSize_, typename RhsT_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> new_vector_concat
+	(
+		EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_,
+		const EmuMath::NewVector<RhsSize_, RhsT_>& rhs_vector_
+	)
+	{
+		return _vector_underlying::_vector_concat<OutT_>(lhs_vector_, rhs_vector_);
+	}
+
+	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, std::size_t RhsSize_, typename RhsT_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> new_vector_concat
+	(
+		EmuMath::NewVector<LhsSize_, LhsT_>&& lhs_vector_,
+		const EmuMath::NewVector<RhsSize_, RhsT_>& rhs_vector_
+	)
+	{
+		return _vector_underlying::_vector_concat<OutT_>
+		(
+			std::forward<EmuMath::NewVector<LhsSize_, LhsT_>>(lhs_vector_),
+			rhs_vector_
+		);
+	}
+
+	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, std::size_t RhsSize_, typename RhsT_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> new_vector_concat
+	(
+		const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_,
+		EmuMath::NewVector<RhsSize_, RhsT_>& rhs_vector_
+	)
+	{
+		return _vector_underlying::_vector_concat<OutT_>(lhs_vector_, rhs_vector_);
+	}
+
+	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, std::size_t RhsSize_, typename RhsT_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> new_vector_concat
+	(
+		EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_,
+		EmuMath::NewVector<RhsSize_, RhsT_>& rhs_vector_
+	)
+	{
+		return _vector_underlying::_vector_concat<OutT_>(lhs_vector_, rhs_vector_);
+	}
+
+	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, std::size_t RhsSize_, typename RhsT_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> new_vector_concat
+	(
+		EmuMath::NewVector<LhsSize_, LhsT_>&& lhs_vector_,
+		EmuMath::NewVector<RhsSize_, RhsT_>& rhs_vector_
+	)
+	{
+		return _vector_underlying::_vector_concat<OutT_>
+		(
+			std::forward<EmuMath::NewVector<LhsSize_, LhsT_>>(lhs_vector_),
+			rhs_vector_
+		);
+	}
+
+	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, std::size_t RhsSize_, typename RhsT_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> new_vector_concat
+	(
+		const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_,
+		EmuMath::NewVector<RhsSize_, RhsT_>&& rhs_vector_
+	)
+	{
+		return _vector_underlying::_vector_concat<OutT_>
+		(
+			lhs_vector_,
+			std::forward<EmuMath::NewVector<RhsSize_, RhsT_>>(rhs_vector_)
+		);
+	}
+
+	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, std::size_t RhsSize_, typename RhsT_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> new_vector_concat
+	(
+		EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_,
+		EmuMath::NewVector<RhsSize_, RhsT_>&& rhs_vector_
+	)
+	{
+		return _vector_underlying::_vector_concat<OutT_>
+		(
+			lhs_vector_,
+			std::forward<EmuMath::NewVector<RhsSize_, RhsT_>>(rhs_vector_)
+		);
+	}
+
+	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, std::size_t RhsSize_, typename RhsT_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> new_vector_concat
+	(
+		EmuMath::NewVector<LhsSize_, LhsT_>&& lhs_vector_,
+		EmuMath::NewVector<RhsSize_, RhsT_>&& rhs_vector_
+	)
+	{
+		return _vector_underlying::_vector_concat<OutT_>
+		(
+			std::forward<EmuMath::NewVector<LhsSize_, LhsT_>>(lhs_vector_),
+			std::forward<EmuMath::NewVector<RhsSize_, RhsT_>>(rhs_vector_)
 		);
 	}
 #pragma endregion

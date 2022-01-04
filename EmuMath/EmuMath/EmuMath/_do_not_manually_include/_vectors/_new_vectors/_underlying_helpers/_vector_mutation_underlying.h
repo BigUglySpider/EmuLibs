@@ -1293,6 +1293,151 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 	}
 #pragma endregion
+
+#pragma region CONCAT_FUNCS
+	template<std::size_t Index_, class OutVector_, class LhsVector_, class RhsVector_>
+	[[nodiscard]] constexpr inline typename OutVector_::stored_type _vector_concat_get_construction_arg(LhsVector_&& lhs_vector_, RhsVector_&& rhs_vector_)
+	{
+		using out_stored_type = typename OutVector_::stored_type;
+		if constexpr (Index_ < EmuCore::TMP::remove_ref_cv_t<LhsVector_>::size)
+		{
+			using get_lhs_result = decltype(_vector_get<Index_>(lhs_vector_));
+			if constexpr (std::is_constructible_v<out_stored_type, get_lhs_result>)
+			{
+				return out_stored_type(_vector_get<Index_>(lhs_vector_));
+			}
+			else if constexpr (EmuCore::TMP::is_static_castable_v<get_lhs_result, out_stored_type>)
+			{
+				return static_cast<out_stored_type>(_vector_get<Index_>(lhs_vector_));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<LhsVector_>(),
+					"Attempted to concatenate two EmuMath Vectors into a single Vector, but the output Vector's stored_type cannot be formed with the result of getting an index from the left-hand Vector."
+				);
+			}
+		}
+		else
+		{
+			constexpr std::size_t rhs_index_ = Index_ - EmuCore::TMP::remove_ref_cv_t<LhsVector_>::size;
+			if constexpr (rhs_index_ < EmuCore::TMP::remove_ref_cv_t<RhsVector_>::size)
+			{
+				using get_rhs_result = decltype(_vector_get<rhs_index_>(rhs_vector_));
+				if constexpr (std::is_constructible_v<out_stored_type, get_rhs_result>)
+				{
+					return out_stored_type(_vector_get<rhs_index_>(rhs_vector_));
+				}
+				else if constexpr (EmuCore::TMP::is_static_castable_v<get_rhs_result, out_stored_type>)
+				{
+					return static_cast<out_stored_type>(_vector_get<rhs_index_>(rhs_vector_));
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<RhsVector_>(),
+						"Attempted to concatenate two EmuMath Vectors into a single Vector, but the output Vector's stored_type cannot be formed with the result of getting an index from the right-hand Vector."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<LhsVector_>(),
+					"Attempted to concatenate two EmuMath Vectors into a single Vector, but an erroneous number of index arguments was formed."
+				);
+			}
+		}
+	}
+
+	template<class OutVector_, class LhsVector_, class RhsVector_, std::size_t...Indices_>
+	[[nodiscard]] constexpr inline OutVector_ _vector_concat_execution(std::index_sequence<Indices_...> indices_, LhsVector_&& lhs_vector_, RhsVector_&& rhs_vector_)
+	{
+		if constexpr (!OutVector_::contains_ref)
+		{
+			return OutVector_(_vector_concat_get_construction_arg<Indices_, OutVector_>(lhs_vector_, rhs_vector_)...);
+		}
+		else
+		{
+			// Extra checks needed to ensure both reference validity and that no dangling references are created
+			using lhs_vector_uq = EmuCore::TMP::remove_ref_cv_t<LhsVector_>;
+			if constexpr (std::is_lvalue_reference_v<LhsVector_> || lhs_vector_uq::contains_ref)
+			{
+				using rhs_vector_uq = EmuCore::TMP::remove_ref_cv_t<RhsVector_>;
+				if constexpr (std::is_lvalue_reference_v<RhsVector_> || rhs_vector_uq::contains_ref)
+				{
+					if constexpr (OutVector_::contains_const_ref)
+					{
+						// No extra checks needed for const ref Vector
+						return OutVector_(_vector_concat_get_construction_arg<Indices_, OutVector_>(lhs_vector_, rhs_vector_)...);
+					}
+					else
+					{
+						// Need to ensure we have correct constness for non-const ref Vector
+						if constexpr (!std::is_const_v<std::remove_reference_t<LhsVector_>> && !std::is_const_v<typename lhs_vector_uq::value_type>)
+						{
+							if constexpr (!std::is_const_v<std::remove_reference_t<RhsVector_>> && !std::is_const_v<typename rhs_vector_uq::value_type>)
+							{
+								return OutVector_(_vector_concat_get_construction_arg<Indices_, OutVector_>(lhs_vector_, rhs_vector_)...);
+							}
+							else
+							{
+								static_assert
+								(
+									EmuCore::TMP::get_false<RhsVector_>(),
+									"Attempted to concatenate two EmuMath Vectors into a single non-const-reference-containing Vector, but the right-hand Vector is const-qualified or contains a const-qualified value_type."
+								);
+							}
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<LhsVector_>(),
+								"Attempted to concatenate two EmuMath Vectors into a single non-const-reference-containing Vector, but the left-hand Vector is const-qualified or contains a const-qualified value_type."
+							);
+						}
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<RhsVector_>(),
+						"Attempted to concatenate two EmuMath Vectors into a single reference-containing Vector, but the right-hand Vector was invalid for forming references as it is a known temporary which does not contain references. A non-temporary Vector or reference-containing temporary is required to prevent dangling references."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<LhsVector_>(),
+					"Attempted to concatenate two EmuMath Vectors into a single reference-containing Vector, but the left-hand Vector was invalid for forming references as it is a known temporary which does not contain references. A non-temporary Vector or reference-containing temporary is required to prevent dangling references."
+				);
+			}
+		}
+	}
+
+	template<typename OutT_, class LhsVector_, class RhsVector_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector
+	<
+		EmuCore::TMP::remove_ref_cv_t<LhsVector_>::size + EmuCore::TMP::remove_ref_cv_t<RhsVector_>::size,
+		OutT_
+	> _vector_concat(LhsVector_&& lhs_vector_, RhsVector_&& rhs_vector_)
+	{
+		constexpr std::size_t out_size_ = EmuCore::TMP::remove_ref_cv_t<LhsVector_>::size + EmuCore::TMP::remove_ref_cv_t<RhsVector_>::size;
+		return _vector_concat_execution<EmuMath::NewVector<out_size_, OutT_>>
+		(
+			std::make_index_sequence<out_size_>(),
+			std::forward<LhsVector_>(lhs_vector_),
+			std::forward<RhsVector_>(rhs_vector_)
+		);
+	}
+#pragma endregion
 }
 
 #endif

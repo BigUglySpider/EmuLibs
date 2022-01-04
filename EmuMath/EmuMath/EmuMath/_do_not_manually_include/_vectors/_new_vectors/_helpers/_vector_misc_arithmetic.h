@@ -463,6 +463,40 @@ namespace EmuMath::Helpers
 
 #pragma region MIN_FUNCS
 	/// <summary>
+	/// <para> Finds the lowest value within the passed EmuMath Vector. </para>
+	/// </summary>
+	/// <param name="in_vector_">EmuMath Vector to find the lowest value of.</param>
+	/// <returns>Lowest value within in_vector_, represented as the provided Out_ type (defaults to in_vector_'s value_type_uq).</returns>
+	template<typename Out_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline Out_ new_vector_min(const EmuMath::NewVector<Size_, T_>& in_vector_)
+	{
+		return _vector_underlying::_vector_min<Out_>(in_vector_);
+	}
+	template<std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::value_type_uq new_vector_min(const EmuMath::NewVector<Size_, T_>& in_vector_)
+	{
+		return _vector_underlying::_vector_min<typename EmuMath::NewVector<Size_, T_>::value_type_uq>(in_vector_);
+	}
+
+	/// <summary>
+	/// <para> Finds the lowest value within the passed EmuMath Vector, using only indices within the provided (theoretical) range. </para>
+	/// <para> BeginIndex_: Inclusive index at which to start reading values from the input Vector. </para>
+	/// <para> EndIndex_: Exclusive index at which to stop reading values from the input Vector. </para>
+	/// </summary>
+	/// <param name="in_vector_">EmuMath Vector to find the lowest value of.</param>
+	/// <returns>Lowest value within in_vector_, represented as the provided Out_ type (defaults to in_vector_'s value_type_uq).</returns>
+	template<typename Out_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline Out_ new_vector_min(const EmuMath::NewVector<Size_, T_>& in_vector_)
+	{
+		return _vector_underlying::_vector_min<Out_, BeginIndex_, EndIndex_>(in_vector_);
+	}
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::value_type_uq new_vector_min(const EmuMath::NewVector<Size_, T_>& in_vector_)
+	{
+		return _vector_underlying::_vector_min<typename EmuMath::NewVector<Size_, T_>::value_type_uq, BeginIndex_, EndIndex_>(in_vector_);
+	}
+
+	/// <summary>
 	/// <para> Outputs a Vector containing the lowest element in each respective index between vector_a_ and b_. </para>
 	/// <para> If B_ is an EmuMath Vector: Respective indices will be compared. Otherwise, all indices in vector_a_ will be compared with b_ directly. </para>
 	/// </summary>
@@ -600,7 +634,7 @@ namespace EmuMath::Helpers
 	/// <para> If B_ is an EmuMath Vector: Respective indices will be compared. Otherwise, all indices in vector_a_ will be compared with b_ directly. </para>
 	/// <para> OutBegin_: Inclusive index at which to start writing min values to the output Vector. </para>
 	/// <para> OutEnd_: Exclusive index at which to stop writing min values to the output Vector. </para>
-	/// <para> MinBegin_: Inclusive index at which to start reading values from vector_a_ (and b_ if it is an EmuMath Vector) for operations. Incremented per operation. </para>
+	/// <para> MinBegin_: Inclusive index at which to start reading values from vector_a_ (and b_ if it is an EmuMath Vector) for operations. Incremented per iteration. </para>
 	/// </summary>
 	/// <param name="vector_a_">: EmuMath Vector appearing as the first argument in comparisons.</param>
 	/// <param name="b_">: Scalar or EmuMath Vector appearing as the second argument in comparisons.</param>
@@ -658,7 +692,7 @@ namespace EmuMath::Helpers
 	/// <para> If B_ is an EmuMath Vector: Respective indices will be compared. Otherwise, all indices in vector_a_ will be compared with b_ directly. </para>
 	/// <para> OutBegin_: Inclusive index at which to start writing min values to the output Vector. </para>
 	/// <para> OutEnd_: Exclusive index at which to stop writing min values to the output Vector. </para>
-	/// <para> MinBegin_: Inclusive index at which to start reading values from vector_a_ (and b_ if it is an EmuMath Vector) for operations. Incremented per operation. </para>
+	/// <para> MinBegin_: Inclusive index at which to start reading values from vector_a_ (and b_ if it is an EmuMath Vector) for operations. Incremented per iteration. </para>
 	/// </summary>
 	/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 	/// <param name="vector_a_">: EmuMath Vector appearing as the first argument in comparisons.</param>
@@ -676,6 +710,40 @@ namespace EmuMath::Helpers
 #pragma endregion
 
 #pragma region MAX_FUNCS
+	/// <summary>
+	/// <para> Finds the greatest value within the passed EmuMath Vector. </para>
+	/// </summary>
+	/// <param name="in_vector_">EmuMath Vector to find the greatest value of.</param>
+	/// <returns>Greatest value within in_vector_, represented as the provided Out_ type (defaults to in_vector_'s value_type_uq).</returns>
+	template<typename Out_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline Out_ new_vector_max(const EmuMath::NewVector<Size_, T_>& in_vector_)
+	{
+		return _vector_underlying::_vector_max<Out_>(in_vector_);
+	}
+	template<std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::value_type_uq new_vector_max(const EmuMath::NewVector<Size_, T_>& in_vector_)
+	{
+		return _vector_underlying::_vector_max<typename EmuMath::NewVector<Size_, T_>::value_type_uq>(in_vector_);
+	}
+
+	/// <summary>
+	/// <para> Finds the greatest value within the passed EmuMath Vector, using only indices within the provided (theoretical) range. </para>
+	/// <para> BeginIndex_: Inclusive index at which to start reading values from the input Vector. </para>
+	/// <para> EndIndex_: Exclusive index at which to stop reading values from the input Vector. </para>
+	/// </summary>
+	/// <param name="in_vector_">EmuMath Vector to find the greatest value of.</param>
+	/// <returns>Greatest value in the provided index range within in_vector_, represented as the provided Out_ type (defaults to in_vector_'s value_type_uq).</returns>
+	template<typename Out_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline Out_ new_vector_max(const EmuMath::NewVector<Size_, T_>& in_vector_)
+	{
+		return _vector_underlying::_vector_max<Out_, BeginIndex_, EndIndex_>(in_vector_);
+	}
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::value_type_uq new_vector_max(const EmuMath::NewVector<Size_, T_>& in_vector_)
+	{
+		return _vector_underlying::_vector_max<typename EmuMath::NewVector<Size_, T_>::value_type_uq, BeginIndex_, EndIndex_>(in_vector_);
+	}
+
 	/// <summary>
 	/// <para> Outputs a Vector containing the greatest element in each respective index between vector_a_ and b_. </para>
 	/// <para> If B_ is an EmuMath Vector: Respective indices will be compared. Otherwise, all indices in vector_a_ will be compared with b_ directly. </para>
@@ -810,49 +878,49 @@ namespace EmuMath::Helpers
 	/// <para> If B_ is an EmuMath Vector: Respective indices will be compared. Otherwise, all indices in vector_a_ will be compared with b_ directly. </para>
 	/// <para> OutBegin_: Inclusive index at which to start writing min values to the output Vector. </para>
 	/// <para> OutEnd_: Exclusive index at which to stop writing min values to the output Vector. </para>
-	/// <para> MinBegin_: Inclusive index at which to start reading values from vector_a_ (and b_ if it is an EmuMath Vector) for operations. Incremented per operation. </para>
+	/// <para> MaxBegin_: Inclusive index at which to start reading values from vector_a_ (and b_ if it is an EmuMath Vector) for operations. Incremented per iteration. </para>
 	/// </summary>
 	/// <param name="vector_a_">: EmuMath Vector appearing as the first argument in comparisons.</param>
 	/// <param name="b_">: Scalar or EmuMath Vector appearing as the second argument in comparisons.</param>
 	/// <returns>EmuMath Vector containing max results in the provided range, and default-constructed elements elsewhere.</returns>
-	template<std::size_t OutSize_, typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MinBegin_, std::size_t SizeA_, typename TA_, typename B_>
+	template<std::size_t OutSize_, typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MaxBegin_, std::size_t SizeA_, typename TA_, typename B_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_max_range_no_copy(const EmuMath::NewVector<SizeA_, TA_>& vector_a_, B_&& b_)
 	{
-		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_max, false, OutSize_, OutT_, OutBegin_, OutEnd_, MinBegin_)
+		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_max, false, OutSize_, OutT_, OutBegin_, OutEnd_, MaxBegin_)
 		(
 			vector_a_,
 			std::forward<B_>(b_)
 		);
 	}
 
-	template<typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MinBegin_, std::size_t SizeA_, typename TA_, typename B_>
+	template<typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MaxBegin_, std::size_t SizeA_, typename TA_, typename B_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<SizeA_, OutT_> new_vector_max_range_no_copy(const EmuMath::NewVector<SizeA_, TA_>& vector_a_, B_&& b_)
 	{
-		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_max, false, SizeA_, OutT_, OutBegin_, OutEnd_, MinBegin_)
+		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_max, false, SizeA_, OutT_, OutBegin_, OutEnd_, MaxBegin_)
 		(
 			vector_a_,
 			std::forward<B_>(b_)
 		);
 	}
 
-	template<std::size_t OutSize_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MinBegin_, std::size_t SizeA_, typename TA_, typename B_>
+	template<std::size_t OutSize_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MaxBegin_, std::size_t SizeA_, typename TA_, typename B_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point>
 	new_vector_max_range_no_copy(const EmuMath::NewVector<SizeA_, TA_>& vector_a_, B_&& b_)
 	{
 		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
-		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_max, false, OutSize_, a_fp, OutBegin_, OutEnd_, MinBegin_)
+		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_max, false, OutSize_, a_fp, OutBegin_, OutEnd_, MaxBegin_)
 		(
 			vector_a_,
 			std::forward<B_>(b_)
 		);
 	}
 
-	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MinBegin_, std::size_t SizeA_, typename TA_, typename B_>
+	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MaxBegin_, std::size_t SizeA_, typename TA_, typename B_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<SizeA_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point>
 	new_vector_max_range_no_copy(const EmuMath::NewVector<SizeA_, TA_>& vector_a_, B_&& b_)
 	{
 		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
-		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_max, false, SizeA_, a_fp, OutBegin_, OutEnd_, MinBegin_)
+		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_max, false, SizeA_, a_fp, OutBegin_, OutEnd_, MaxBegin_)
 		(
 			vector_a_,
 			std::forward<B_>(b_)
@@ -868,15 +936,15 @@ namespace EmuMath::Helpers
 	/// <para> If B_ is an EmuMath Vector: Respective indices will be compared. Otherwise, all indices in vector_a_ will be compared with b_ directly. </para>
 	/// <para> OutBegin_: Inclusive index at which to start writing min values to the output Vector. </para>
 	/// <para> OutEnd_: Exclusive index at which to stop writing min values to the output Vector. </para>
-	/// <para> MinBegin_: Inclusive index at which to start reading values from vector_a_ (and b_ if it is an EmuMath Vector) for operations. Incremented per operation. </para>
+	/// <para> MaxBegin_: Inclusive index at which to start reading values from vector_a_ (and b_ if it is an EmuMath Vector) for operations. Incremented per iteration. </para>
 	/// </summary>
 	/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 	/// <param name="vector_a_">: EmuMath Vector appearing as the first argument in comparisons.</param>
 	/// <param name="b_">: Scalar or EmuMath Vector appearing as the second argument in comparisons.</param>
-	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MinBegin_, std::size_t OutSize_, typename OutT_, std::size_t SizeA_, typename TA_, typename B_>
+	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MaxBegin_, std::size_t OutSize_, typename OutT_, std::size_t SizeA_, typename TA_, typename B_>
 	constexpr inline void new_vector_max_range_no_copy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<SizeA_, TA_>& vector_a_, B_&& b_)
 	{
-		EMU_MATH_VECTOR_MUTATE_REF_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_max, false, OutSize_, OutT_, OutBegin_, OutEnd_, MinBegin_)
+		EMU_MATH_VECTOR_MUTATE_REF_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_max, false, OutSize_, OutT_, OutBegin_, OutEnd_, MaxBegin_)
 		(
 			out_vector_,
 			vector_a_,

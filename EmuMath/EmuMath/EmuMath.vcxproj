@@ -205,6 +205,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_copy_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_get_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_info.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_misc_arithmetic_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_mutation_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_set_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_special_operations_underlying.h" />

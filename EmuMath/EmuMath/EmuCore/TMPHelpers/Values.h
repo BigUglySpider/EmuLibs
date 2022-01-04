@@ -1,6 +1,8 @@
 #ifndef EMU_CORE_TMP_HELPERS_VALUES_H_INC_
 #define EMU_CORE_TMP_HELPERS_VALUES_H_INC_ 1
 
+#include <limits>
+
 namespace EmuCore::TMP
 {
 	/// <summary> 
@@ -107,6 +109,32 @@ namespace EmuCore::TMP
 	{
 		return false;
 	}
+
+	/// <summary> 
+	/// <para> Struct for retrieving the lowest value that may be stored in a type T_. </para>
+	/// <para> Defaults to shorhand for std::numeric_limits::lowest() for T_, but may be specialised for types that do not fit having a std::numeric_limits specialisation. </para>
+	/// </summary>
+	template<class T_>
+	struct lowest_value
+	{
+		[[nodiscard]] static constexpr inline T_ get()
+		{
+			return std::numeric_limits<T_>::lowest();
+		}
+	};
+
+	/// <summary> 
+	/// <para> Struct for retrieving the highest value that may be stored in a type T_. </para>
+	/// <para> Defaults to shorhand for std::numeric_limits::max() for T_, but may be specialised for types that do not fit having a std::numeric_limits specialisation. </para>
+	/// </summary>
+	template<class T_>
+	struct highest_value
+	{
+		[[nodiscard]] static constexpr inline T_ get()
+		{
+			return std::numeric_limits<T_>::max();
+		}
+	};
 }
 
 #endif

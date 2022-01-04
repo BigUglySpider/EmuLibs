@@ -985,15 +985,23 @@ int main()
 	std::cout << "---\n\n";
 	constexpr auto vec_for_min_a_ = EmuMath::Helpers::new_vector_make<float>(1, 2, 3, 4);
 	constexpr auto vec_for_min_b_ = EmuMath::Helpers::new_vector_make<float>(-1, -2, 5, 27);
-	constexpr auto min_a_ = EmuMath::Helpers::new_vector_min(vec_for_min_a_, -1);
-	constexpr auto min_b_ = EmuMath::Helpers::new_vector_min(vec_for_min_b_, -1.5L);
-	constexpr auto min_c_ = EmuMath::Helpers::new_vector_min(vec_for_min_a_, vec_for_min_b_);
+	
+	//constexpr auto min_a_ = EmuMath::Helpers::new_vector_min(vec_for_min_a_, -1);
+	constexpr auto min_a_ = vec_for_min_a_.Min(-1);
+	//constexpr auto min_b_ = EmuMath::Helpers::new_vector_min(vec_for_min_b_, -1.5L);
+	constexpr auto min_b_ = vec_for_min_b_.Min(-1.5L);
+	//constexpr auto min_c_ = EmuMath::Helpers::new_vector_min(vec_for_min_a_, vec_for_min_b_);
+	constexpr auto min_c_ = vec_for_min_a_.Min(vec_for_min_b_);
 
-	constexpr auto min_range_a_ = EmuMath::Helpers::new_vector_min_range<1, 3>(vec_for_min_a_, vec_for_min_b_);
-	constexpr auto min_range_b_ = EmuMath::Helpers::new_vector_min_range<1, 3>(vec_for_min_b_, vec_for_min_a_);
+	//constexpr auto min_range_a_ = EmuMath::Helpers::new_vector_min_range<1, 3>(vec_for_min_a_, vec_for_min_b_);
+	constexpr auto min_range_a_ = vec_for_min_a_.MinRange<1, 3>(vec_for_min_b_);
+	//constexpr auto min_range_b_ = EmuMath::Helpers::new_vector_min_range<1, 3>(vec_for_min_b_, vec_for_min_a_);
+	constexpr auto min_range_b_ = vec_for_min_b_.MinRange<1, 3>(vec_for_min_a_);
 
-	constexpr auto min_range_no_copy_a_ = EmuMath::Helpers::new_vector_min_range_no_copy<1, 3, 0>(vec_for_min_a_, vec_for_min_b_);
-	constexpr auto min_range_no_copy_b_ = EmuMath::Helpers::new_vector_min_range_no_copy<1, 3, 0>(vec_for_min_b_, vec_for_min_a_);
+	//constexpr auto min_range_no_copy_a_ = EmuMath::Helpers::new_vector_min_range_no_copy<1, 3, 0>(vec_for_min_a_, vec_for_min_b_);
+	constexpr auto min_range_no_copy_a_ = vec_for_min_a_.MinRangeNoCopy<1, 3, 0>(vec_for_min_b_);
+	//constexpr auto min_range_no_copy_b_ = EmuMath::Helpers::new_vector_min_range_no_copy<1, 3, 0>(vec_for_min_b_, vec_for_min_a_);
+	constexpr auto min_range_no_copy_b_ = vec_for_min_b_.MinRangeNoCopy<1, 3, 0>(vec_for_min_a_);
 
 
 	constexpr auto max_a_ = EmuMath::Helpers::new_vector_max(vec_for_min_a_, -1);
@@ -1005,6 +1013,37 @@ int main()
 
 	constexpr auto max_range_no_copy_a_ = EmuMath::Helpers::new_vector_max_range_no_copy<1, 3, 0>(vec_for_min_a_, vec_for_min_b_);
 	constexpr auto max_range_no_copy_b_ = EmuMath::Helpers::new_vector_max_range_no_copy<1, 3, 0>(vec_for_min_b_, vec_for_min_a_);
+
+	constexpr auto concat_result_ab_ = vec_for_min_a_.Concat(vec_for_min_b_);
+	constexpr auto concat_result_ba_ = vec_for_min_b_.Concat(vec_for_min_a_);
+
+	constexpr auto min_val_a_ = vec_for_min_a_.Min();
+	constexpr auto min_val_b_ = vec_for_min_b_.Min();
+	constexpr auto min_val_ab_ = vec_for_min_a_.Concat(vec_for_min_b_).Min();
+
+	constexpr auto max_val_a_ = vec_for_min_a_.Max();
+	constexpr auto max_val_b_ = vec_for_min_b_.Max();
+	constexpr auto max_val_ab_ = vec_for_min_a_.Concat(vec_for_min_b_).Max();
+
+	constexpr auto chain_result_ = concat_result_ab_.Shuffle<0, 4, 1, 5, 7, 2, 2, 2>().Concat(EmuMath::NewVector<4, float>()).Concat(EmuMath::NewVector<12, int>(1337));
+
+	std::cout << "---\n";
+	auto test_run_vec_a_ = EmuMath::Helpers::new_vector_make<float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+	auto test_run_vec_b_ = EmuMath::Helpers::new_vector_make<float>(-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1);
+	auto test_run_vec_ab_ = test_run_vec_a_.Concat<float&>(test_run_vec_b_);
+	auto test_run_vec_ba_ = test_run_vec_b_.Concat<const float&>(test_run_vec_a_);
+	std::cout << test_run_vec_a_ << "\n";
+	std::cout << test_run_vec_b_ << "\n";
+	std::cout << test_run_vec_ab_ << "\n";
+	std::cout << test_run_vec_ba_ << "\n\n";
+	test_run_vec_ab_.at<0>() = 23.0f;
+	test_run_vec_ab_.at<20>() = -1337.0f;
+	std::cout << test_run_vec_a_ << "\n";
+	std::cout << test_run_vec_b_ << "\n";
+	std::cout << test_run_vec_ab_ << "\n";
+	std::cout << test_run_vec_ba_ << "\n\n";
+
+	system("pause");
 
 	// GRADIENTS START
 	//std::cout << "\n\n";
