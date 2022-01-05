@@ -3,10 +3,16 @@
 
 #include "_common_vector_helpers.h"
 #include "../../../../../EmuCore/Functors/Arithmetic.h"
+#include "../../../../../EmuCore/Functors/MiscMath.h"
 
 // CONTAINS:
 // --- abs
 // --- lerp
+// --- min
+// --- max
+// --- clamp_min
+// --- clamp_max
+// --- clamp
 
 namespace EmuMath::Helpers
 {
@@ -949,6 +955,658 @@ namespace EmuMath::Helpers
 			out_vector_,
 			vector_a_,
 			std::forward<B_>(b_)
+		);
+	}
+#pragma endregion
+
+#pragma region CLAMP_MIN_FUNCS
+	/// <summary>
+	/// <para> Outputs a copy of in_vector_ with elements clamped to a minimum of min_. </para>
+	/// <para> If Min_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to min_ directly. </para>
+	/// </summary>
+	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
+	/// <param name="min_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a minimum of.</param>
+	/// <returns>EmuMath Vector copy of in_vector_ with elements clamped to a minimum of min_.</returns>
+	template<std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_, typename Min_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, InT_> new_vector_clamp_min(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_)
+	{
+		return EMU_MATH_VECTOR_MUTATE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, OutSize_, OutT_)(in_vector_, std::forward<Min_>(min_));
+	}
+
+	template<typename OutT_, std::size_t InSize_, typename InT_, typename Min_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> new_vector_clamp_min(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_)
+	{
+		return EMU_MATH_VECTOR_MUTATE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, InSize_, OutT_)(in_vector_, std::forward<Min_>(min_));
+	}
+
+	template<std::size_t OutSize_, std::size_t InSize_, typename InT_, typename Min_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point>
+	new_vector_clamp_min(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_)
+	{
+		using in_fp = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		return EMU_MATH_VECTOR_MUTATE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, OutSize_, in_fp)(in_vector_, std::forward<Min_>(min_));
+	}
+
+	template<typename InT_, typename Min_, std::size_t InSize_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point>
+	new_vector_clamp_min(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_)
+	{
+		using in_fp = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		return EMU_MATH_VECTOR_MUTATE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, InSize_, in_fp)(in_vector_, std::forward<Min_>(min_));
+	}
+
+	/// <summary>
+	/// <para> Outputs a copy of in_vector_ with elements clamped to a minimum of min_, via the passed out_vector_. </para>
+	/// <para> If Min_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to min_ directly. </para>
+	/// </summary>
+	/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
+	/// <param name="min_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a minimum of.</param>
+	template<std::size_t OutSize_, typename OutT_, typename InT_, typename Min_, std::size_t InSize_>
+	constexpr inline void new_vector_clamp_min(EmuMath::NewVector<OutSize_, OutT_&> out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_)
+	{
+		EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, OutSize_, OutT_)(out_vector_, in_vector_, std::forward<Min_>(min_));
+	}
+
+	/// <summary>
+	/// <para> Outputs a copy of in_vector_ with elements in the provided range clamped to a minimum of min_. </para>
+	/// <para> If Min_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to min_ directly. </para>
+	/// <para> BeginIndex_: Inclusive index at which to start clamping elements. </para>
+	/// <para> EndIndex_: Inclusive index at which to stop clamping elements. </para>
+	/// </summary>
+	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
+	/// <param name="min_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a minimum of.</param>
+	/// <returns>EmuMath Vector copy of in_vector_ with elements in the provided range clamped to a minimum of min_.</returns>
+	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_,  std::size_t InSize_, typename InT_, typename Min_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, InT_> new_vector_clamp_min_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_)
+	{
+		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, OutSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_)
+		(
+			in_vector_,
+			in_vector_,
+			std::forward<Min_>(min_)
+		);
+	}
+
+	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_,  std::size_t InSize_, typename InT_, typename Min_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> new_vector_clamp_min_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_)
+	{
+		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, InSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_)
+		(
+			in_vector_,
+			in_vector_,
+			std::forward<Min_>(min_)
+		);
+	}
+
+	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_,  std::size_t InSize_, typename InT_, typename Min_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point>
+	new_vector_clamp_min_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_)
+	{
+		using in_fp = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, OutSize_, in_fp, InSize_, InT_, BeginIndex_, EndIndex_)
+		(
+			in_vector_,
+			in_vector_,
+			std::forward<Min_>(min_)
+		);
+	}
+
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename InT_, typename Min_, std::size_t InSize_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point>
+	new_vector_clamp_min_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_)
+	{
+		using in_fp = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, InSize_, in_fp, InSize_, InT_, BeginIndex_, EndIndex_)
+		(
+			in_vector_,
+			in_vector_,
+			std::forward<Min_>(min_)
+		);
+	}
+
+	/// <summary>
+	/// <para> Outputs a copy of in_vector_ with elements in the provided range clamped to a minimum of min_. </para>
+	/// <para> If Min_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to min_ directly. </para>
+	/// <para> BeginIndex_: Inclusive index at which to start clamping elements. </para>
+	/// <para> EndIndex_: Inclusive index at which to stop clamping elements. </para>
+	/// </summary>
+	/// <param name="out_vector_">EmuMath Vector to output to.</param>
+	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
+	/// <param name="min_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a minimum of.</param>
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_, typename InT_, typename Min_, std::size_t InSize_>
+	constexpr inline void new_vector_clamp_min_range(EmuMath::NewVector<OutSize_, OutT_&> out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_)
+	{
+		EMU_MATH_VECTOR_MUTATE_REF_RANGE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, OutSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_)
+		(
+			out_vector_,
+			in_vector_,
+			in_vector_,
+			std::forward<Min_>(min_)
+		);
+	}
+
+	/// <summary>
+	/// <para>
+	///		Outputs an EmuMath Vector with values in the provided range containing the results of clamping in_vector_ to a minimum of min_,
+	///		starting from index ClampBegin_.
+	/// </para>
+	/// <para> Indices outside of the specified range will be default-constructed. </para>
+	/// <para> If Min_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to min_ directly. </para>
+	/// <para> OutBegin_: Inclusive index at which to start writing clamp results to the output Vector. </para>
+	/// <para> OutEnd_: Exclusive index at which to stop writing clamp results to the output Vector. </para>
+	/// <para> ClampBegin_: Inclusive index at which to start reading from EmuMath Vector arguments to perform clamps. Incremented by 1 after each clamp. </para>
+	/// </summary>
+	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
+	/// <param name="min_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a minimum of.</param>
+	/// <returns>EmuMath Vector containing clamp results in the specified output range, and default elements outside of said range.</returns>
+	template<std::size_t OutSize_, typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_,  std::size_t InSize_, typename InT_, typename Min_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, InT_> new_vector_clamp_min_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_)
+	{
+		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, OutSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_)
+		(
+			in_vector_,
+			std::forward<Min_>(min_)
+		);
+	}
+
+	template<typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_,  std::size_t InSize_, typename InT_, typename Min_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> new_vector_clamp_min_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_)
+	{
+		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, InSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_)
+		(
+			in_vector_,
+			std::forward<Min_>(min_)
+		);
+	}
+
+	template<std::size_t OutSize_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_,  std::size_t InSize_, typename InT_, typename Min_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point>
+	new_vector_clamp_min_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_)
+	{
+		using in_fp = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, OutSize_, in_fp, OutBegin_, OutEnd_, ClampBegin_)
+		(
+			in_vector_,
+			std::forward<Min_>(min_)
+		);
+	}
+
+	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, typename InT_, typename Min_, std::size_t InSize_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point>
+	new_vector_clamp_min_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_)
+	{
+		using in_fp = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, InSize_, in_fp, OutBegin_, OutEnd_, ClampBegin_)
+		(
+			in_vector_,
+			std::forward<Min_>(min_)
+		);
+	}
+
+	/// <summary>
+	/// <para> Outputs the results of clamping in_vector_ to a minimum of min_, starting from index ClampBegin_, via the passed out_vector_. </para>
+	/// <para> Indices outside of the specified range will be not be modified. </para>
+	/// <para> If Min_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to min_ directly. </para>
+	/// <para> OutBegin_: Inclusive index at which to start writing clamp results to the output Vector. </para>
+	/// <para> OutEnd_: Exclusive index at which to stop writing clamp results to the output Vector. </para>
+	/// <para> ClampBegin_: Inclusive index at which to start reading from EmuMath Vector arguments to perform clamps. Incremented by 1 after each clamp. </para>
+	/// </summary>
+	/// <param name="out_vector_">EmuMath Vector to output to.</param>
+	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
+	/// <param name="min_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a minimum of.</param>
+	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, std::size_t OutSize_, typename OutT_, typename InT_, typename Min_, std::size_t InSize_>
+	constexpr inline void new_vector_clamp_min_range_no_copy(EmuMath::NewVector<OutSize_, OutT_&> out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_)
+	{
+		EMU_MATH_VECTOR_MUTATE_REF_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, OutSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_)
+		(
+			out_vector_,
+			in_vector_,
+			std::forward<Min_>(min_)
+		);
+	}
+#pragma endregion
+
+#pragma region CLAMP_MAX_FUNCS
+	/// <summary>
+	/// <para> Outputs a copy of in_vector_ with elements clamped to a maximum of max_. </para>
+	/// <para> If Max_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to max_ directly. </para>
+	/// </summary>
+	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
+	/// <param name="max_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a maximum of.</param>
+	/// <returns>EmuMath Vector copy of in_vector_ with elements clamped to a maximum of max_.</returns>
+	template<std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_, typename Max_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, InT_> new_vector_clamp_max(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Max_&& max_)
+	{
+		return EMU_MATH_VECTOR_MUTATE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_max, false, OutSize_, OutT_)(in_vector_, std::forward<Max_>(max_));
+	}
+
+	template<typename OutT_, std::size_t InSize_, typename InT_, typename Max_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> new_vector_clamp_max(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Max_&& max_)
+	{
+		return EMU_MATH_VECTOR_MUTATE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_max, false, InSize_, OutT_)(in_vector_, std::forward<Max_>(max_));
+	}
+
+	template<std::size_t OutSize_, std::size_t InSize_, typename InT_, typename Max_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point>
+	new_vector_clamp_max(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Max_&& max_)
+	{
+		using in_fp = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		return EMU_MATH_VECTOR_MUTATE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_max, false, OutSize_, in_fp)(in_vector_, std::forward<Max_>(max_));
+	}
+
+	template<typename InT_, typename Max_, std::size_t InSize_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point>
+	new_vector_clamp_max(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Max_&& max_)
+	{
+		using in_fp = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		return EMU_MATH_VECTOR_MUTATE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_max, false, InSize_, in_fp)(in_vector_, std::forward<Max_>(max_));
+	}
+
+	/// <summary>
+	/// <para> Outputs a copy of in_vector_ with elements clamped to a maximum of max_, via the passed out_vector_. </para>
+	/// <para> If Max_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to max_ directly. </para>
+	/// </summary>
+	/// <param name="out_vector_">EmuMath Vector to output to.</param>
+	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
+	/// <param name="max_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a maximum of.</param>
+	template<std::size_t OutSize_, typename OutT_, typename InT_, typename Max_, std::size_t InSize_>
+	constexpr inline void new_vector_clamp_max(EmuMath::NewVector<OutSize_, OutT_&> out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_, Max_&& max_)
+	{
+		EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_max, false, OutSize_, OutT_)(out_vector_, in_vector_, std::forward<Max_>(max_));
+	}
+
+	/// <summary>
+	/// <para> Outputs a copy of in_vector_ with elements in the provided range clamped to a maximum of max_. </para>
+	/// <para> If Max_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to max_ directly. </para>
+	/// <para> BeginIndex_: Inclusive index at which to start clamping elements. </para>
+	/// <para> EndIndex_: Inclusive index at which to stop clamping elements. </para>
+	/// </summary>
+	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
+	/// <param name="max_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a maximum of.</param>
+	/// <returns>EmuMath Vector copy of in_vector_ with elements in the provided range clamped to a maximum of max_.</returns>
+	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_,  std::size_t InSize_, typename InT_, typename Max_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, InT_> new_vector_clamp_max_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Max_&& max_)
+	{
+		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_max, false, OutSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_)
+		(
+			in_vector_,
+			in_vector_,
+			std::forward<Max_>(max_)
+		);
+	}
+
+	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_,  std::size_t InSize_, typename InT_, typename Max_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> new_vector_clamp_max_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Max_&& max_)
+	{
+		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_max, false, InSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_)
+		(
+			in_vector_,
+			in_vector_,
+			std::forward<Max_>(max_)
+		);
+	}
+
+	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_,  std::size_t InSize_, typename InT_, typename Max_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point>
+	new_vector_clamp_max_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Max_&& max_)
+	{
+		using in_fp = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_max, false, OutSize_, in_fp, InSize_, InT_, BeginIndex_, EndIndex_)
+		(
+			in_vector_,
+			in_vector_,
+			std::forward<Max_>(max_)
+		);
+	}
+
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename InT_, typename Max_, std::size_t InSize_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point>
+	new_vector_clamp_max_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Max_&& max_)
+	{
+		using in_fp = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_max, false, InSize_, in_fp, InSize_, InT_, BeginIndex_, EndIndex_)
+		(
+			in_vector_,
+			in_vector_,
+			std::forward<Max_>(max_)
+		);
+	}
+
+	/// <summary>
+	/// <para> Outputs a copy of in_vector_ with elements in the provided range clamped to a maximum of max_. </para>
+	/// <para> If Max_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to max_ directly. </para>
+	/// <para> BeginIndex_: Inclusive index at which to start clamping elements. </para>
+	/// <para> EndIndex_: Inclusive index at which to stop clamping elements. </para>
+	/// </summary>
+	/// <param name="out_vector_">EmuMath Vector to output to.</param>
+	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
+	/// <param name="max_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a maximum of.</param>
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_, typename InT_, typename Max_, std::size_t InSize_>
+	constexpr inline void new_vector_clamp_max_range(EmuMath::NewVector<OutSize_, OutT_&> out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_, Max_&& max_)
+	{
+		EMU_MATH_VECTOR_MUTATE_REF_RANGE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_max, false, OutSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_)
+		(
+			out_vector_,
+			in_vector_,
+			in_vector_,
+			std::forward<Max_>(max_)
+		);
+	}
+
+	/// <summary>
+	/// <para>
+	///		Outputs an EmuMath Vector with values in the provided range containing the results of clamping in_vector_ to a maximum of max_,
+	///		starting from index ClampBegin_.
+	/// </para>
+	/// <para> Indices outside of the specified range will be default-constructed. </para>
+	/// <para> If Max_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to max_ directly. </para>
+	/// <para> OutBegin_: Inclusive index at which to start writing clamp results to the output Vector. </para>
+	/// <para> OutEnd_: Exclusive index at which to stop writing clamp results to the output Vector. </para>
+	/// <para> ClampBegin_: Inclusive index at which to start reading from EmuMath Vector arguments to perform clamps. Incremented by 1 after each clamp. </para>
+	/// </summary>
+	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
+	/// <param name="max_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a maximum of.</param>
+	/// <returns>EmuMath Vector containing clamp results in the specified output range, and default elements outside of said range.</returns>
+	template<std::size_t OutSize_, typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_,  std::size_t InSize_, typename InT_, typename Max_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, InT_> new_vector_clamp_max_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Max_&& max_)
+	{
+		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, OutSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_)
+		(
+			in_vector_,
+			std::forward<Max_>(max_)
+		);
+	}
+
+	template<typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_,  std::size_t InSize_, typename InT_, typename Max_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> new_vector_clamp_max_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Max_&& max_)
+	{
+		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, InSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_)
+		(
+			in_vector_,
+			std::forward<Max_>(max_)
+		);
+	}
+
+	template<std::size_t OutSize_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_,  std::size_t InSize_, typename InT_, typename Max_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point>
+	new_vector_clamp_max_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Max_&& max_)
+	{
+		using in_fp = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, OutSize_, in_fp, OutBegin_, OutEnd_, ClampBegin_)
+		(
+			in_vector_,
+			std::forward<Max_>(max_)
+		);
+	}
+
+	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, typename InT_, typename Max_, std::size_t InSize_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point>
+	new_vector_clamp_max_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Max_&& max_)
+	{
+		using in_fp = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, InSize_, in_fp, OutBegin_, OutEnd_, ClampBegin_)
+		(
+			in_vector_,
+			std::forward<Max_>(max_)
+		);
+	}
+
+	/// <summary>
+	/// <para> Outputs the results of clamping in_vector_ to a maximum of max_, starting from index ClampBegin_, via the passed out_vector_. </para>
+	/// <para> Indices outside of the specified range will be not be modified. </para>
+	/// <para> If Max_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to max_ directly. </para>
+	/// <para> OutBegin_: Inclusive index at which to start writing clamp results to the output Vector. </para>
+	/// <para> OutEnd_: Exclusive index at which to stop writing clamp results to the output Vector. </para>
+	/// <para> ClampBegin_: Inclusive index at which to start reading from EmuMath Vector arguments to perform clamps. Incremented by 1 after each clamp. </para>
+	/// </summary>
+	/// <param name="out_vector_">EmuMath Vector to output to.</param>
+	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
+	/// <param name="max_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a maximum of.</param>
+	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, std::size_t OutSize_, typename OutT_, typename InT_, typename Max_, std::size_t InSize_>
+	constexpr inline void new_vector_clamp_max_range_no_copy(EmuMath::NewVector<OutSize_, OutT_&> out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_, Max_&& max_)
+	{
+		EMU_MATH_VECTOR_MUTATE_REF_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_clamp_min, false, OutSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_)
+		(
+			out_vector_,
+			in_vector_,
+			std::forward<Max_>(max_)
+		);
+	}
+#pragma endregion
+
+#pragma region CLAMP_FUNCS
+	/// <summary>
+	/// <para> Outputs a copy of in_vector_ with elements clamped to the inclusive range min_:max_. </para>
+	/// <para> If Min_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to min_ directly. </para>
+	/// <para> If Max_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to max_ directly. </para>
+	/// </summary>
+	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
+	/// <param name="min_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a minimum of.</param>
+	/// <param name="max_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a maximum of.</param>
+	/// <returns>EmuMath Vector copy of in_vector_ with elements clamped to the inclusive range min_:max_.</returns>
+	template<std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_, typename Min_, typename Max_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, InT_> new_vector_clamp(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_, Max_&& max_)
+	{
+		return EMU_MATH_VECTOR_MUTATE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp, false, OutSize_, OutT_)(in_vector_, std::forward<Min_>(min_), std::forward<Max_>(max_));
+	}
+
+	template<typename OutT_, std::size_t InSize_, typename InT_, typename Min_, typename Max_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> new_vector_clamp(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_, Max_&& max_)
+	{
+		return EMU_MATH_VECTOR_MUTATE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp, false, InSize_, OutT_)(in_vector_, std::forward<Min_>(min_), std::forward<Max_>(max_));
+	}
+
+	template<std::size_t OutSize_, std::size_t InSize_, typename InT_, typename Min_, typename Max_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point>
+	new_vector_clamp(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_, Max_&& max_)
+	{
+		using in_fp = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		return EMU_MATH_VECTOR_MUTATE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp, false, OutSize_, in_fp)(in_vector_, std::forward<Min_>(min_), std::forward<Max_>(max_));
+	}
+
+	template<typename InT_, typename Min_, typename Max_, std::size_t InSize_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point>
+	new_vector_clamp(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_, Max_&& max_)
+	{
+		using in_fp = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		return EMU_MATH_VECTOR_MUTATE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp, false, InSize_, in_fp)(in_vector_, std::forward<Min_>(min_), std::forward<Max_>(max_));
+	}
+
+	/// <summary>
+	/// <para> Outputs a copy of in_vector_ with elements clamped to the inclusive range min_:max_, via the passed out_vector_. </para>
+	/// <para> If Min_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to min_ directly. </para>
+	/// <para> If Max_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to max_ directly. </para>
+	/// </summary>
+	/// <param name="out_vector_">EmuMath Vector to output to.</param>
+	/// <param name="in_vector_">: EmuMath Vector to clamp.</param>
+	/// <param name="min_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a minimum of.</param>
+	/// <param name="max_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a maximum of.</param>
+	template<std::size_t OutSize_, typename OutT_, typename InT_, typename Min_, typename Max_, std::size_t InSize_>
+	constexpr inline void new_vector_clamp(EmuMath::NewVector<OutSize_, OutT_&> out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_, Max_&& max_)
+	{
+		EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE_APPEND_OUT(EmuCore::do_clamp, false, OutSize_, OutT_)(out_vector_, in_vector_, std::forward<Min_>(min_), std::forward<Max_>(max_));
+	}
+
+	/// <summary>
+	/// <para> Outputs a copy of in_vector_ with elements in the provided range clamped to the inclusive range min_:max_. </para>
+	/// <para> If Min_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to min_ directly. </para>
+	/// <para> If Max_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to max_ directly. </para>
+	/// <para> BeginIndex_: Inclusive index at which to start clamping elements. </para>
+	/// <para> EndIndex_: Inclusive index at which to stop clamping elements. </para>
+	/// </summary>
+	/// <param name="vector_a_">: EmuMath Vector to clamp.</param>
+	/// <param name="min_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a minimum of.</param>
+	/// <param name="max_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a maximum of.</param>
+	/// <returns>EmuMath Vector copy of in_vector_ with elements in the provided range clamped to the inclusive range min_:max_.</returns>
+	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_,  std::size_t InSize_, typename InT_, typename Min_, typename Max_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, InT_> new_vector_clamp_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_, Max_&& max_)
+	{
+		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp, false, OutSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_)
+		(
+			in_vector_,
+			in_vector_,
+			std::forward<Min_>(min_),
+			std::forward<Max_>(max_)
+		);
+	}
+
+	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_,  std::size_t InSize_, typename InT_, typename Min_, typename Max_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> new_vector_clamp_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_, Max_&& max_)
+	{
+		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp, false, InSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_)
+		(
+			in_vector_,
+			in_vector_,
+			std::forward<Min_>(min_),
+			std::forward<Max_>(max_)
+		);
+	}
+
+	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_,  std::size_t InSize_, typename InT_, typename Min_, typename Max_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point>
+	new_vector_clamp_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_, Max_&& max_)
+	{
+		using in_fp = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp, false, OutSize_, in_fp, InSize_, InT_, BeginIndex_, EndIndex_)
+		(
+			in_vector_,
+			in_vector_,
+			std::forward<Min_>(min_),
+			std::forward<Max_>(max_)
+		);
+	}
+
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename InT_, typename Min_, typename Max_, std::size_t InSize_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point>
+	new_vector_clamp_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_, Max_&& max_)
+	{
+		using in_fp = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp, false, InSize_, in_fp, InSize_, InT_, BeginIndex_, EndIndex_)
+		(
+			in_vector_,
+			in_vector_,
+			std::forward<Min_>(min_),
+			std::forward<Max_>(max_)
+		);
+	}
+
+	/// <summary>
+	/// <para> Outputs a copy of in_vector_ with elements in the provided range clamped to the inclusive range min_:max_. </para>
+	/// <para> If Min_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to min_ directly. </para>
+	/// <para> If Max_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to max_ directly. </para>
+	/// <para> BeginIndex_: Inclusive index at which to start clamping elements. </para>
+	/// <para> EndIndex_: Inclusive index at which to stop clamping elements. </para>
+	/// </summary>
+	/// <param name="out_vector_">EmuMath Vector to output to.</param>
+	/// <param name="vector_a_">: EmuMath Vector to clamp.</param>
+	/// <param name="min_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a minimum of.</param>
+	/// <param name="max_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a maximum of.</param>
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_, typename InT_, typename Min_, typename Max_, std::size_t InSize_>
+	constexpr inline void new_vector_clamp_range(EmuMath::NewVector<OutSize_, OutT_&> out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_, Max_&& max_)
+	{
+		EMU_MATH_VECTOR_MUTATE_REF_RANGE_TEMPLATE_APPEND_OUT(EmuCore::do_clamp, false, OutSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_)
+		(
+			out_vector_,
+			in_vector_,
+			in_vector_,
+			std::forward<Min_>(min_),
+			std::forward<Max_>(max_)
+		);
+	}
+
+	/// <summary>
+	/// <para>
+	///		Outputs an EmuMath Vector with values in the provided range containing the results of clamping in_vector_ to the inclusive range min_:max_,
+	///		starting from index ClampBegin_.
+	/// </para>
+	/// <para> Indices outside of the specified range will be default-constructed. </para>
+	/// <para> If Min_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to min_ directly. </para>
+	/// <para> If Max_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to max_ directly. </para>
+	/// <para> OutBegin_: Inclusive index at which to start writing clamp results to the output Vector. </para>
+	/// <para> OutEnd_: Exclusive index at which to stop writing clamp results to the output Vector. </para>
+	/// <para> ClampBegin_: Inclusive index at which to start reading from EmuMath Vector arguments to perform clamps. Incremented by 1 after each clamp. </para>
+	/// </summary>
+	/// <param name="vector_a_">: EmuMath Vector to clamp.</param>
+	/// <param name="min_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a minimum of.</param>
+	/// <param name="max_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a maximum of.</param>
+	/// <returns>EmuMath Vector containing clamp results in the specified output range, and default elements outside of said range.</returns>
+	template<std::size_t OutSize_, typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_,  std::size_t InSize_, typename InT_, typename Min_, typename Max_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, InT_> new_vector_clamp_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_, Max_&& max_)
+	{
+		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_clamp, false, OutSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_)
+		(
+			in_vector_,
+			std::forward<Min_>(min_),
+			std::forward<Max_>(max_)
+		);
+	}
+
+	template<typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_,  std::size_t InSize_, typename InT_, typename Min_, typename Max_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> new_vector_clamp_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_, Max_&& max_)
+	{
+		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_clamp, false, InSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_)
+		(
+			in_vector_,
+			std::forward<Min_>(min_),
+			std::forward<Max_>(max_)
+		);
+	}
+
+	template<std::size_t OutSize_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_,  std::size_t InSize_, typename InT_, typename Min_, typename Max_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point>
+	new_vector_clamp_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_, Max_&& max_)
+	{
+		using in_fp = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_clamp, false, OutSize_, in_fp, OutBegin_, OutEnd_, ClampBegin_)
+		(
+			in_vector_,
+			std::forward<Min_>(min_),
+			std::forward<Max_>(max_)
+		);
+	}
+
+	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, typename InT_, typename Min_, typename Max_, std::size_t InSize_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point>
+	new_vector_clamp_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_, Min_&& min_, Max_&& max_)
+	{
+		using in_fp = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_clamp, false, InSize_, in_fp, OutBegin_, OutEnd_, ClampBegin_)
+		(
+			in_vector_,
+			std::forward<Min_>(min_),
+			std::forward<Max_>(max_)
+		);
+	}
+
+	/// <summary>
+	/// <para> Outputs the results of clamping in_vector_ to the inclusive range min_:max_, starting from index ClampBegin_, via the passed out_vector_. </para>
+	/// <para> Indices outside of the specified range will be default-constructed. </para>
+	/// <para> If Min_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to min_ directly. </para>
+	/// <para> If Max_ is an EmuMath Vector: Respective indices will be clamped to. Otherwise, all indices in in_vector_ will be clamped to max_ directly. </para>
+	/// <para> OutBegin_: Inclusive index at which to start writing clamp results to the output Vector. </para>
+	/// <para> OutEnd_: Exclusive index at which to stop writing clamp results to the output Vector. </para>
+	/// <para> ClampBegin_: Inclusive index at which to start reading from EmuMath Vector arguments to perform clamps. Incremented by 1 after each clamp. </para>
+	/// </summary>
+	/// <param name="out_vector_">EmuMath Vector to output to.</param>
+	/// <param name="vector_a_">: EmuMath Vector to clamp.</param>
+	/// <param name="min_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a minimum of.</param>
+	/// <param name="max_">: Scalar or EmuMath Vector to clamp the passed Vector's elements to a maximum of.</param>
+	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, std::size_t OutSize_, typename OutT_, typename InT_, typename Min_, typename Max_, std::size_t InSize_>
+	constexpr inline void new_vector_clamp_range_no_copy
+	(
+		EmuMath::NewVector<OutSize_, OutT_&> out_vector_,
+		const EmuMath::NewVector<InSize_, InT_>& in_vector_,
+		Min_&& min_,
+		Max_&& max_
+	)
+	{
+		EMU_MATH_VECTOR_MUTATE_REF_RANGE_NO_COPY_TEMPLATE_APPEND_OUT(EmuCore::do_clamp, false, OutSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_)
+		(
+			out_vector_,
+			in_vector_,
+			std::forward<Min_>(min_),
+			std::forward<Max_>(max_)
 		);
 	}
 #pragma endregion

@@ -1054,6 +1054,12 @@ int main()
 		std::cout << e.what() << "\n";
 	}
 
+	std::cout << "\n---\n";
+	constexpr auto to_clamp_ = EmuMath::Helpers::new_vector_make<float>(-5, 1, 27, -4.5, 0.3, -2.1, 77, 2415125151512521.0f);
+	constexpr auto clamped_min_ = to_clamp_.ClampMin(-2.5);
+	constexpr auto clamped_max_ = to_clamp_.ClampMax(26.5);
+	constexpr auto clamped_ = to_clamp_.Clamp(-2.5, 26.5);
+
 	system("pause");
 
 	// GRADIENTS START
