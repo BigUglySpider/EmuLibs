@@ -329,7 +329,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 				else
 				{
 					// Arithmetic with non-colour rhs, so we're working with raw values
-					if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
+					if constexpr (EmuMath::TMP::is_emu_new_vector_v<Rhs_>)
 					{
 						// Special case for vectors so we can apply specific operations to each channel in just one call
 						return _colour_arithmetic_rhs_vector<IncludeAlpha_, FuncTemplate_, OutColour_, LhsColour_, Rhs_>(lhs_, rhs_);
@@ -509,19 +509,19 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 				(
 					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
-						static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::vector_get<0>(t_)))
+						static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), t_.template at<0>()))
 					),
 					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
-						static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), EmuMath::Helpers::vector_get<1>(t_)))
+						static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), t_.template at<1>()))
 					),
 					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
-						static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), EmuMath::Helpers::vector_get<2>(t_)))
+						static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), t_.template at<2>()))
 					),
 					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
-						static_cast<a_channel_type>(lerp_(a_.A(), b_.A(), EmuMath::Helpers::vector_get<3>(t_)))
+						static_cast<a_channel_type>(lerp_(a_.A(), b_.A(), t_.template at<3>()))
 					)
 				);
 			}
@@ -539,7 +539,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 					(
 						_colour_convert_channel<out_channel_type, a_channel_type>
 						(
-							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::vector_get<0>(t_)))
+							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), t_.template at<0>()))
 						),
 						_colour_convert_channel<out_channel_type, a_channel_type>(a_.G()),
 						_colour_convert_channel<out_channel_type, a_channel_type>(a_.B())
@@ -551,11 +551,11 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 					(
 						_colour_convert_channel<out_channel_type, a_channel_type>
 						(
-							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::vector_get<0>(t_)))
+							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), t_.template at<0>()))
 						),
 						_colour_convert_channel<out_channel_type, a_channel_type>
 						(
-							static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), EmuMath::Helpers::vector_get<1>(t_)))
+							static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), t_.template at<1>()))
 						),
 						_colour_convert_channel<out_channel_type, a_channel_type>(a_.B())
 					);
@@ -566,15 +566,15 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 					(
 						_colour_convert_channel<out_channel_type, a_channel_type>
 						(
-							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::vector_get<0>(t_)))
+							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), t_.template at<0>()))
 						),
 						_colour_convert_channel<out_channel_type, a_channel_type>
 						(
-							static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), EmuMath::Helpers::vector_get<1>(t_)))
+							static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), t_.template at<1>()))
 						),
 						_colour_convert_channel<out_channel_type, a_channel_type>
 						(
-							static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), EmuMath::Helpers::vector_get<2>(t_)))
+							static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), t_.template at<2>()))
 						)
 					);
 				}
@@ -643,7 +643,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 						{
 							return _colour_lerp_t_colour<IncludeAlpha_, OutColour_, ColourA_, ColourB_, T_>(a_, b_, t_);
 						}
-						else if constexpr (EmuMath::TMP::is_emu_vector_v<T_>)
+						else if constexpr (EmuMath::TMP::is_emu_new_vector_v<T_>)
 						{
 							return _colour_lerp_t_vector<IncludeAlpha_, OutColour_, ColourA_, ColourB_, T_>(a_, b_, t_);
 						}

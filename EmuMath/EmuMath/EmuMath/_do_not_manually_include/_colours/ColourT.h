@@ -27,9 +27,9 @@ namespace EmuMath
 
 		using value_type = Channel_;
 		using this_type = EmuMath::Colour<value_type, ContainsAlpha_>;
-		using channels_vector = EmuMath::Vector<size, value_type>;
-		using vector_rgb_return_type = std::conditional_t<contains_alpha, EmuMath::Vector<3, value_type>, const channels_vector&>;
-		using vector_rgba_return_type = std::conditional_t<contains_alpha, const channels_vector&, EmuMath::Vector<4, value_type>>;
+		using channels_vector = EmuMath::NewVector<size, value_type>;
+		using vector_rgb_return_type = std::conditional_t<contains_alpha, EmuMath::NewVector<3, value_type>, const channels_vector&>;
+		using vector_rgba_return_type = std::conditional_t<contains_alpha, const channels_vector&, EmuMath::NewVector<4, value_type>>;
 
 		static constexpr bool is_floating_point = std::is_floating_point_v<value_type>;
 		static constexpr bool is_integral = std::is_integral_v<value_type>;
@@ -164,9 +164,9 @@ namespace EmuMath
 		}
 
 		template<std::size_t Size_, typename VectorT_>
-		[[nodiscard]] static constexpr inline channels_vector _make_colour_from_vector(const EmuMath::Vector<Size_, VectorT_>& channels_to_copy_)
+		[[nodiscard]] static constexpr inline channels_vector _make_colour_from_vector(const EmuMath::NewVector<Size_, VectorT_>& channels_to_copy_)
 		{
-			if constexpr (std::is_same_v<EmuMath::Vector<Size_, VectorT_>, channels_vector>)
+			if constexpr (std::is_same_v<EmuMath::NewVector<Size_, VectorT_>, channels_vector>)
 			{
 				return channels_to_copy_;
 			}

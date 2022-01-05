@@ -6,6 +6,6 @@
 #include "_do_not_manually_include/_vectors/Vector3.h"
 #include "_do_not_manually_include/_vectors/Vector4.h"
 
-#include "_do_not_manually_include/_vectors/_new_vectors/_vector_t.h"
+#include "NewVector.h"
 
 #endif
