@@ -5,6 +5,8 @@
 #include <array>
 #include <functional>
 #include <ostream>
+#include <sstream>
+#include <stdexcept>
 
 namespace EmuMath
 {
@@ -443,19 +445,50 @@ namespace EmuMath
 		}
 
 		/// <summary>
-		/// <para> Provides access to the provided Index_ within this Vector. If the Index_ is invalid, behaviour is undefined. </para>
+		/// <para> Provides access to the provided Index_ within this Vector. If the Index_ is invalid, a runtime exception will be thrown. </para>
 		/// <para> If the provided index_ is known at compile-time, it is recommended to use the template version of this function to enforce index safety. </para>
 		/// </summary>
 		/// <returns>Reference to the element at the provided index within this Vector.</returns>
 		[[nodiscard]] constexpr inline value_type& at(const std::size_t index_)
 		{
-			return _data.at(index_);
+			if(index_ < size)
+			{
+				return _data[index_];
+			}
+			else
+			{
+				if constexpr (size != 0)
+				{
+					// NOTE: Under MSVC, constexpr_str_ will always be false without the /Zc:__cplusplus switch enabled, as of 2022/01/05
+					constexpr bool constexpr_str_ = __cplusplus >= 201907L;
+					if constexpr (constexpr_str_)
+					{
+						// We can provide some extra information if we have access to constexpr strings
+						// --- This is to allow `at(index_)` to still satisfy constexpr constraints in standards before C++20
+						std::string out_str_;
+						out_str_.reserve(150); // Reserves enough space for all literal chars, alongside some extra for size-1 and index_ after conversion.
+						out_str_ += "Attempted to access an invalid contained index of an EmuMath Vector.\nProvided index: ";
+						out_str_ += std::to_string(index_);
+						out_str_ += "\nInclusive valid index range: 0:";
+						out_str_ += std::to_string(size - 1);
+						throw std::out_of_range(out_str_);
+					}
+					else
+					{
+						throw std::out_of_range("Attempted to access an invalid contained index of an EmuMath Vector.");
+					}
+				}
+				else
+				{
+					throw std::out_of_range("Attempted to access a contained index of an EmuMath Vector which contains 0 elements.");
+				}
+			}
 		}
 		/// <summary>
-		/// <para> Provides const access to the provided Index_ within this Vector. If the Index_ is invalid, behaviour is undefined. </para>
+		/// <para> Provides const access to the provided Index_ within this Vector. If the Index_ is invalid, a runtime exception may be thrown. </para>
 		/// <para> If the provided index_ is known at compile-time, it is recommended to use the template version of this function to enforce index safety. </para>
 		/// </summary>
-		/// <returns>Reference to the element at the provided index within this Vector.</returns>
+		/// <returns>Const reference to the element at the provided index within this Vector.</returns>
 		[[nodiscard]] constexpr inline const value_type& at(const std::size_t index_) const
 		{
 			return const_cast<this_type*>(this)->at(index_);
@@ -467,16 +500,16 @@ namespace EmuMath
 		/// <returns>Reference to the element at the provided index within this Vector.</returns>
 		[[nodiscard]] constexpr inline value_type& operator[](const std::size_t index_)
 		{
-			return at(index_);
+			return _data[index_];
 		}
 		/// <summary>
 		/// <para> Provides const access to the provided Index_ within this Vector. If the Index_ is invalid, behaviour is undefined. </para>
 		/// <para> If the provided index_ is known at compile-time, it is recommended to use the template version of the `at` function to enforce index safety. </para>
 		/// </summary>
-		/// <returns>Reference to the element at the provided index within this Vector.</returns>
+		/// <returns>Const reference to the element at the provided index within this Vector.</returns>
 		[[nodiscard]] constexpr inline const value_type& operator[](const std::size_t index_) const
 		{
-			return at(index_);
+			return const_cast<this_type*>(this)->operator[](index_);
 		}
 
 		/// <summary>

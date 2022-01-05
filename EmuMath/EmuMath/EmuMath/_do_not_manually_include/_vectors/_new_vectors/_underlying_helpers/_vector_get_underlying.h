@@ -118,15 +118,15 @@ namespace EmuMath::Helpers::_vector_underlying
 		{
 			if constexpr (std::is_assignable_v<Out_, value_type&>)
 			{
-				out_ = _vector_get(vector_, index_);
+				out_ = vector_[index_];
 			}
 			else if constexpr (std::is_constructible_v<Out_, value_type&>)
 			{
-				out_ = Out_(_vector_get(vector_, index_));
+				out_ = Out_(vector_[index_]);
 			}
 			else if constexpr (EmuCore::TMP::is_static_castable_v<Out_, value_type&>)
 			{
-				out_ = static_cast<Out_>(_vector_get(vector_, index_));
+				out_ = static_cast<Out_>(vector_[index_]);
 			}
 			else
 			{
@@ -155,15 +155,15 @@ namespace EmuMath::Helpers::_vector_underlying
 		{
 			if constexpr (std::is_assignable_v<Out_, const value_type&>)
 			{
-				out_ = _vector_get(vector_, index_);
+				out_ = vector_[index_];
 			}
 			else if constexpr (std::is_constructible_v<Out_, const value_type&>)
 			{
-				out_ = Out_(_vector_get(vector_, index_));
+				out_ = Out_(vector_[index_]);
 			}
 			else if constexpr (EmuCore::TMP::is_static_castable_v<Out_, const value_type&>)
 			{
-				out_ = static_cast<Out_>(_vector_get(vector_, index_));
+				out_ = static_cast<Out_>(vector_[index_]);
 			}
 			else
 			{
@@ -191,7 +191,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	{
 		if (index_ < EmuMath::NewVector<Size_, T_>::size)
 		{
-			(*pp_out_) = &(_vector_get(vector_, index_));
+			(*pp_out_) = &(vector_[index_]);
 			return true;
 		}
 		else
@@ -214,7 +214,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	{
 		if (index_ < EmuMath::NewVector<Size_, T_>::size)
 		{
-			(*pp_const_out_) = &(_vector_get(vector_, index_));
+			(*pp_const_out_) = &(vector_[index_]);
 			return true;
 		}
 		else

@@ -1043,6 +1043,17 @@ int main()
 	std::cout << test_run_vec_ab_ << "\n";
 	std::cout << test_run_vec_ba_ << "\n\n";
 
+	constexpr auto gjerjgioer = concat_result_ab_.at(4);
+
+	try
+	{
+		std::cout << concat_result_ab_.at(255) << "\n";
+	}
+	catch (std::exception& e)
+	{
+		std::cout << e.what() << "\n";
+	}
+
 	system("pause");
 
 	// GRADIENTS START
