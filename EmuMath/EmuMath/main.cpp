@@ -1098,11 +1098,59 @@ int main()
 	std::cout << "\n---\n";
 	constexpr auto cmp_vec_a_ = EmuMath::Helpers::new_vector_make<int>(1, 2, 3, 4, 5, 6, 7, 8);
 	constexpr auto cmp_vec_b_ = EmuMath::Helpers::new_vector_make<float>(1, 2, 3, 4, 5, 6, 7, 8);
+	constexpr auto cmp_vec_c_ = EmuMath::Helpers::new_vector_make<float>(8, 7, 6, 5, 4, 3, 2, 1);
+	constexpr auto cmp_vec_a_mag_ = cmp_vec_a_.MagnitudeConstexpr();
+	constexpr auto cmp_vec_b_mag_ = cmp_vec_b_.MagnitudeConstexpr();
+	constexpr auto cmp_vec_c_mag_ = cmp_vec_c_.MagnitudeConstexpr();
+	constexpr auto cmp_vec_a_square_mag_ = cmp_vec_a_.SquareMagnitude();
+	constexpr auto cmp_vec_b_square_mag_ = cmp_vec_b_.SquareMagnitude();
+	constexpr auto cmp_vec_c_square_mag_ = cmp_vec_c_.SquareMagnitude();
+
 	//constexpr bool cmp_result_0_ = EmuMath::Helpers::new_vector_cmp_all<EmuCore::do_cmp_equal_to>(cmp_vec_a_, cmp_vec_b_);
-	constexpr bool cmp_result_0_ = cmp_vec_a_.CmpAll<EmuCore::do_cmp_equal_to>(cmp_vec_b_);
-	constexpr bool cmp_result_1_ = cmp_vec_b_.CmpAny<EmuCore::do_cmp_not_equal_to>(cmp_vec_b_);
-	constexpr bool cmp_result_2_ = cmp_vec_a_.CmpAll<EmuCore::do_cmp_greater_equal>(7);
-	constexpr bool cmp_result_3_ = cmp_vec_a_.CmpAny<EmuCore::do_cmp_greater_equal>(7);
+	//constexpr bool cmp_result_0_ = cmp_vec_a_.CmpAll<EmuCore::do_cmp_equal_to>(cmp_vec_b_);
+	constexpr bool cmp_result_0_ = cmp_vec_a_.CmpAllEqual(cmp_vec_b_);
+	//constexpr bool cmp_result_1_ = cmp_vec_b_.CmpAny<EmuCore::do_cmp_not_equal_to>(cmp_vec_b_);
+	constexpr bool cmp_result_1_ = cmp_vec_a_.CmpAnyNotEqual(cmp_vec_b_);
+	//constexpr bool cmp_result_2_ = cmp_vec_a_.CmpAll<EmuCore::do_cmp_greater_equal>(7);
+	constexpr bool cmp_result_2_ = cmp_vec_a_.CmpAllGreater(cmp_vec_b_);
+	//constexpr bool cmp_result_3_ = cmp_vec_a_.CmpAny<EmuCore::do_cmp_greater_equal>(7);
+	constexpr bool cmp_result_3_ = cmp_vec_a_.CmpAnyGreater(cmp_vec_b_);
+	constexpr bool cmp_result_4_ = cmp_vec_a_.CmpAnyLess(cmp_vec_b_);
+	constexpr bool cmp_result_5_ = cmp_vec_b_.CmpAnyGreater(cmp_vec_a_);
+	constexpr bool cmp_result_6_ = cmp_vec_b_.CmpAnyLess(cmp_vec_a_);
+	//constexpr bool cmp_result_7_ = cmp_vec_a_.CmpEqual(cmp_vec_b_.MagnitudeConstexpr());
+	constexpr bool cmp_result_7_ = cmp_vec_a_ == cmp_vec_b_.MagnitudeConstexpr();
+	//constexpr bool cmp_result_8_ = cmp_vec_a_.CmpEqual(cmp_vec_b_);
+	constexpr bool cmp_result_8_ = cmp_vec_a_ == cmp_vec_b_;
+	//constexpr bool cmp_result_9_ = cmp_vec_a_.CmpEqual(cmp_vec_c_.MagnitudeConstexpr());
+	constexpr bool cmp_result_9_ = cmp_vec_a_ == cmp_vec_c_.MagnitudeConstexpr();
+	//constexpr bool cmp_result_10_ = cmp_vec_a_.CmpEqual(cmp_vec_c_);
+	constexpr bool cmp_result_10_ = cmp_vec_a_ == cmp_vec_c_;
+	constexpr bool cmp_result_11_ = cmp_vec_a_ != cmp_vec_b_;
+	constexpr bool cmp_result_12_ = cmp_vec_a_ != cmp_vec_b_.MagnitudeConstexpr();
+	constexpr bool cmp_rseult_13_ = cmp_vec_a_ != cmp_vec_c_;
+	constexpr bool cmp_result_14_ = cmp_vec_a_ != cmp_vec_c_.MagnitudeConstexpr();
+
+	constexpr bool cmp_result_15_ = cmp_vec_a_ > cmp_vec_b_;
+	constexpr bool cmp_result_16_ = cmp_vec_a_ > cmp_vec_b_.MagnitudeConstexpr();
+	constexpr bool cmp_rseult_17_ = cmp_vec_a_ > cmp_vec_c_;
+	constexpr bool cmp_result_18_ = cmp_vec_a_ > cmp_vec_c_.MagnitudeConstexpr();
+
+	constexpr bool cmp_result_19_ = cmp_vec_a_ < cmp_vec_b_;
+	constexpr bool cmp_result_20_ = cmp_vec_a_ < cmp_vec_b_.MagnitudeConstexpr();
+	constexpr bool cmp_rseult_21_ = cmp_vec_a_ < cmp_vec_c_;
+	constexpr bool cmp_result_22_ = cmp_vec_a_ < cmp_vec_c_.MagnitudeConstexpr();
+
+	constexpr bool cmp_result_23_ = cmp_vec_a_ >= cmp_vec_b_;
+	constexpr bool cmp_result_24_ = cmp_vec_a_ >= cmp_vec_b_.MagnitudeConstexpr();
+	constexpr bool cmp_rseult_25_ = cmp_vec_a_ >= cmp_vec_c_;
+	constexpr bool cmp_result_26_ = cmp_vec_a_ >= cmp_vec_c_.MagnitudeConstexpr();
+
+	constexpr bool cmp_result_27_ = cmp_vec_a_ <= cmp_vec_b_;
+	constexpr bool cmp_result_28_ = cmp_vec_a_ <= cmp_vec_b_.MagnitudeConstexpr();
+	constexpr bool cmp_rseult_29_ = cmp_vec_a_ <= cmp_vec_c_;
+	constexpr bool cmp_result_30_ = cmp_vec_a_ <= cmp_vec_c_.MagnitudeConstexpr();
+
 
 	system("pause");
 

@@ -1039,6 +1039,75 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region CMP_OPERATORS
+	public:
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool operator==(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool operator==(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool operator!=(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_not_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool operator!=(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_not_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool operator>(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_greater<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool operator>(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_greater<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool operator<(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_less<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool operator<(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_less<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool operator>=(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_greater_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool operator>=(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_greater_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool operator<=(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_less_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool operator<=(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_less_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+#pragma endregion
+
 #pragma region ARITHMETIC_ASSIGN_OPERATORS
 	public:
 		template<typename Rhs_>
@@ -5013,7 +5082,790 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region CMP_NEAR_FUNCS
+		/// <summary>
+		/// <para> Adaptive near-equality comparison which changes behaviour based on the provided Rhs_ type, intended for safer floating-point equality checks. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Equivalent to CmpAllNear. </para>
+		/// <para> If Rhs_ is none of the above: Compares the magnitude of this Vector to rhs_, or the square magnitude in allowing situations (where rhs_ may be squared). </para>
+		/// <para> IncludeNonContained_: Unused if Rhs_ is not an EmuMath Vector, otherwise used as in CmpAllNear. </para>
+		/// </summary>
+		/// <param name="rhs_">EmuMath Vector appearing on the right of per-element comparison, or scalar appearing on the right of magnitude comparison.</param>
+		/// <returns>If Rhs_: is an EmuMath Vector: true if all comparisons are true, otherwise false. Otherwise, true if rhs_ is near-equal to this Vector's magnitude.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
 
+		/// <summary>
+		/// <para> Adaptive near-equality comparison which changes behaviour based on the provided Rhs_ type, intended for safer floating-point equality checks. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Equivalent to CmpAllNear. </para>
+		/// <para> If Rhs_ is none of the above: Compares the magnitude of this Vector to rhs_, or the square magnitude in allowing situations (where rhs_ may be squared). </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for either performing comparisons or calculating magnitude. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for either performing comparisons or calculating magnitude. </para>
+		/// </summary>
+		/// <param name="rhs_">EmuMath Vector appearing on the right of per-element comparison, or scalar appearing on the right of magnitude comparison.</param>
+		/// <returns>
+		///		If Rhs_: is an EmuMath Vector: true if all comparisons in the provided range are true, otherwise false. 
+		///		Otherwise, true if rhs_ is near-equal to this Vector's magnitude when calculated using only indices within the provided range.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_near<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all indices within this Vector are near-equal to rhs_, intended for safer floating-point equality checks. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, non-contained indices will be compared until the largest Vector is fully compared. 
+		///		If false, comparisons will only be performed until the end of the smallest Vector. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if all comparisons are true, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_all_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all indices in the provided range within this Vector are near-equal to rhs_, intended for safer floating-point equality checks. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for comparisons. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if all comparisons within the provided range are true, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_all_near<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any indices within this Vector are near-equal to rhs_, intended for safer floating-point equality checks. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, non-contained indices will be compared until the largest Vector is fully compared. 
+		///		If false, comparisons will only be performed until the end of the smallest Vector. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if at least 1 comparison is true, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_any_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any indices in the provided range within this Vector are near-equal to rhs_, intended for safer floating-point equality checks. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for comparisons. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if at least 1 comparison within the provided range is true, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_any_near<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
+		}
+#pragma endregion
+
+#pragma region CMP_NOT_NEAR_FUNCS
+		/// <summary>
+		/// <para> Adaptive not near-equality comparison which changes behaviour based on the provided Rhs_ type, intended for safer floating-point inequality checks. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Equivalent to CmpAllNear. </para>
+		/// <para> If Rhs_ is none of the above: Compares the magnitude of this Vector to rhs_, or the square magnitude in allowing situations (where rhs_ may be squared). </para>
+		/// <para> IncludeNonContained_: Unused if Rhs_ is not an EmuMath Vector, otherwise used as in CmpAllNear. </para>
+		/// </summary>
+		/// <param name="rhs_">EmuMath Vector appearing on the right of per-element comparison, or scalar appearing on the right of magnitude comparison.</param>
+		/// <returns>If Rhs_: is an EmuMath Vector: true if all comparisons are true, otherwise false. Otherwise, true if rhs_ is not near-equal to this Vector's magnitude.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpNotNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_not_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Adaptive not near-equality comparison which changes behaviour based on the provided Rhs_ type, intended for safer floating-point inequality checks. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Equivalent to CmpAllNear. </para>
+		/// <para> If Rhs_ is none of the above: Compares the magnitude of this Vector to rhs_, or the square magnitude in allowing situations (where rhs_ may be squared). </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for either performing comparisons or calculating magnitude. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for either performing comparisons or calculating magnitude. </para>
+		/// </summary>
+		/// <param name="rhs_">EmuMath Vector appearing on the right of per-element comparison, or scalar appearing on the right of magnitude comparison.</param>
+		/// <returns>
+		///		If Rhs_: is an EmuMath Vector: true if all comparisons in the provided range are true, otherwise false. 
+		///		Otherwise, true if rhs_ is not near-equal to this Vector's magnitude when calculated using only indices within the provided range.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpNotNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_not_near<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all indices within this Vector are not near-equal to rhs_, intended for safer floating-point equality checks. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, non-contained indices will be compared until the largest Vector is fully compared. 
+		///		If false, comparisons will only be performed until the end of the smallest Vector. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if all comparisons are true, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllNotNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_all_not_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all indices in the provided range within this Vector are not near-equal to rhs_, intended for safer floating-point equality checks. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for comparisons. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if all comparisons within the provided range are true, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllNotNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_all_not_near<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any indices within this Vector are not near-equal to rhs_, intended for safer floating-point equality checks. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, non-contained indices will be compared until the largest Vector is fully compared. 
+		///		If false, comparisons will only be performed until the end of the smallest Vector. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if at least 1 comparison is true, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyNotNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_any_not_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any indices in the provided range within this Vector are not near-equal to rhs_, intended for safer floating-point equality checks. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for comparisons. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if at least 1 comparison within the provided range is true, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyNotNear(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_any_not_near<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
+		}
+#pragma endregion
+
+#pragma region CMP_EQUAL_FUNCS
+		/// <summary>
+		/// <para> Adaptive equality comparison which changes behaviour based on the provided Rhs_ type. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Equivalent to CmpAllNear. </para>
+		/// <para> If Rhs_ is none of the above: Compares the magnitude of this Vector to rhs_, or the square magnitude in allowing situations (where rhs_ may be squared). </para>
+		/// <para> IncludeNonContained_: Unused if Rhs_ is not an EmuMath Vector, otherwise used as in CmpAllNear. </para>
+		/// </summary>
+		/// <param name="rhs_">EmuMath Vector appearing on the right of per-element comparison, or scalar appearing on the right of magnitude comparison.</param>
+		/// <returns>If Rhs_: is an EmuMath Vector: true if all comparisons are true, otherwise false. Otherwise, true if rhs_ is equal to this Vector's magnitude.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Adaptive equality comparison which changes behaviour based on the provided Rhs_ type. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Equivalent to CmpAllNear. </para>
+		/// <para> If Rhs_ is none of the above: Compares the magnitude of this Vector to rhs_, or the square magnitude in allowing situations (where rhs_ may be squared). </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for either performing comparisons or calculating magnitude. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for either performing comparisons or calculating magnitude. </para>
+		/// </summary>
+		/// <param name="rhs_">EmuMath Vector appearing on the right of per-element comparison, or scalar appearing on the right of magnitude comparison.</param>
+		/// <returns>
+		///		If Rhs_: is an EmuMath Vector: true if all comparisons in the provided range are true, otherwise false. 
+		///		Otherwise, true if rhs_ is equal to this Vector's magnitude when calculated using only indices within the provided range.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all indices within this Vector are equal to rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, non-contained indices will be compared until the largest Vector is fully compared. 
+		///		If false, comparisons will only be performed until the end of the smallest Vector. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if all comparisons are true, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_all_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all indices in the provided range within this Vector are equal to rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for comparisons. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if all comparisons within the provided range are true, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_all_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any indices within this Vector are equal to rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, non-contained indices will be compared until the largest Vector is fully compared. 
+		///		If false, comparisons will only be performed until the end of the smallest Vector. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if at least 1 comparison is true, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_any_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any indices in the provided range within this Vector are equal to rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for comparisons. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if at least 1 comparison within the provided range is true, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_any_equal<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
+		}
+#pragma endregion
+
+#pragma region CMP_NOT_EQUAL_FUNCS
+	public:
+		/// <summary>
+		/// <para> Adaptive inequality comparison which changes behaviour based on the provided Rhs_ type. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Equivalent to CmpAllNear. </para>
+		/// <para> If Rhs_ is none of the above: Compares the magnitude of this Vector to rhs_, or the square magnitude in allowing situations (where rhs_ may be squared). </para>
+		/// <para> IncludeNonContained_: Unused if Rhs_ is not an EmuMath Vector, otherwise used as in CmpAllNear. </para>
+		/// </summary>
+		/// <param name="rhs_">EmuMath Vector appearing on the right of per-element comparison, or scalar appearing on the right of magnitude comparison.</param>
+		/// <returns>If Rhs_: is an EmuMath Vector: true if all comparisons are true, otherwise false. Otherwise, true if rhs_ is not equal to this Vector's magnitude.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpNotEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_not_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Adaptive inequality comparison which changes behaviour based on the provided Rhs_ type. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Equivalent to CmpAllNear. </para>
+		/// <para> If Rhs_ is none of the above: Compares the magnitude of this Vector to rhs_, or the square magnitude in allowing situations (where rhs_ may be squared). </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for either performing comparisons or calculating magnitude. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for either performing comparisons or calculating magnitude. </para>
+		/// </summary>
+		/// <param name="rhs_">EmuMath Vector appearing on the right of per-element comparison, or scalar appearing on the right of magnitude comparison.</param>
+		/// <returns>
+		///		If Rhs_: is an EmuMath Vector: true if all comparisons in the provided range are true, otherwise false. 
+		///		Otherwise, true if rhs_ is not equal to this Vector's magnitude when calculated using only indices within the provided range.
+		/// </returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpNotEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_not_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all indices within this Vector are not equal to rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, non-contained indices will be compared until the largest Vector is fully compared. 
+		///		If false, comparisons will only be performed until the end of the smallest Vector. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if all comparisons are true, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllNotEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_all_not_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all indices in the provided range within this Vector are not equal to rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for comparisons. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if all comparisons within the provided range are true, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllNotEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_all_not_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any indices within this Vector are not equal to rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, non-contained indices will be compared until the largest Vector is fully compared. 
+		///		If false, comparisons will only be performed until the end of the smallest Vector. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if at least 1 comparison is true, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyNotEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_any_not_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any indices in the provided range within this Vector are not equal to rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for comparisons. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if at least 1 comparison within the provided range is true, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyNotEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_any_not_equal<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
+		}
+#pragma endregion
+
+#pragma region CMP_GREATER_FUNCS
+		/// <summary>
+		/// <para> Returns true if the magnitude of this Vector is greater than that of rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Both Vector's magnitudes will be compared. Otherwise, this Vector's magnitude will be compared with rhs_ directly. </para>
+		/// <para> 
+		///		IncludeNonContained_: If true, all elements of each Vector will be used to determine their magnitude. 
+		///		If false, only elements up to the end of the smallest Vector will be used to determine magnitude. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">EmuMath Vector whose magnitude appears on the right of comparison, or scalar appearing on the right of comparison.</param>
+		/// <returns>True if this Vector's magnitude is greater than that of rhs_, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpGreater(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_greater<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if the magnitude of this Vector is greater than that of rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Both Vector's magnitudes will be compared. Otherwise, this Vector's magnitude will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors to calculate their magnitude. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors to calculate their magnitude. </para>
+		/// </summary>
+		/// <param name="rhs_">EmuMath Vector whose magnitude appears on the right of comparison, or scalar appearing on the right of comparison.</param>
+		/// <returns>True if this Vector's magnitude is greater than that of rhs_, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpGreater(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_greater<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all indices within this Vector are greater than rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, non-contained indices will be compared until the largest Vector is fully compared. 
+		///		If false, comparisons will only be performed until the end of the smallest Vector. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if all comparisons are true, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllGreater(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_all_greater<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all indices in the provided range within this Vector are greater than rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for comparisons. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if all comparisons within the provided range are true, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllGreater(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_all_greater<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any indices within this Vector are greater than rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, non-contained indices will be compared until the largest Vector is fully compared. 
+		///		If false, comparisons will only be performed until the end of the smallest Vector. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if at least 1 comparison is true, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyGreater(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_any_greater<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any indices in the provided range within this Vector are greater than rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for comparisons. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if at least 1 comparison within the provided range is true, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyGreater(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_any_greater<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
+		}
+#pragma endregion
+
+#pragma region CMP_LESS_FUNCS
+		/// <summary>
+		/// <para> Returns true if the magnitude of this Vector is less than that of rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Both Vector's magnitudes will be compared. Otherwise, this Vector's magnitude will be compared with rhs_ directly. </para>
+		/// <para> 
+		///		IncludeNonContained_: If true, all elements of each Vector will be used to determine their magnitude. 
+		///		If false, only elements up to the end of the smallest Vector will be used to determine magnitude. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">EmuMath Vector whose magnitude appears on the right of comparison, or scalar appearing on the right of comparison.</param>
+		/// <returns>True if this Vector's magnitude is less than that of rhs_, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpLess(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_less<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if the magnitude of this Vector is less than that of rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Both Vector's magnitudes will be compared. Otherwise, this Vector's magnitude will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors to calculate their magnitude. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors to calculate their magnitude. </para>
+		/// </summary>
+		/// <param name="rhs_">EmuMath Vector whose magnitude appears on the right of comparison, or scalar appearing on the right of comparison.</param>
+		/// <returns>True if this Vector's magnitude is less than that of rhs_, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpLess(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_less<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all indices within this Vector are less than rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, non-contained indices will be compared until the largest Vector is fully compared. 
+		///		If false, comparisons will only be performed until the end of the smallest Vector. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if all comparisons are true, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllLess(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_all_less<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all indices in the provided range within this Vector are less than rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for comparisons. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if all comparisons within the provided range are true, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllLess(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_all_less<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any indices within this Vector are less than rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, non-contained indices will be compared until the largest Vector is fully compared. 
+		///		If false, comparisons will only be performed until the end of the smallest Vector. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if at least 1 comparison is true, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyLess(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_any_less<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any indices in the provided range within this Vector are less than rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for comparisons. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if at least 1 comparison within the provided range is true, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyLess(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_any_less<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
+		}
+#pragma endregion
+
+#pragma region CMP_GREATER_EQUAL_FUNCS
+		/// <summary>
+		/// <para> Returns true if the magnitude of this Vector is greater than or equal to that of rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Both Vector's magnitudes will be compared. Otherwise, this Vector's magnitude will be compared with rhs_ directly. </para>
+		/// <para> 
+		///		IncludeNonContained_: If true, all elements of each Vector will be used to determine their magnitude. 
+		///		If false, only elements up to the end of the smallest Vector will be used to determine magnitude. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">EmuMath Vector whose magnitude appears on the right of comparison, or scalar appearing on the right of comparison.</param>
+		/// <returns>True if this Vector's magnitude is greater than or equal to that of rhs_, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpGreaterEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_greater_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if the magnitude of this Vector is greater than or equal to that of rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Both Vector's magnitudes will be compared. Otherwise, this Vector's magnitude will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors to calculate their magnitude. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors to calculate their magnitude. </para>
+		/// </summary>
+		/// <param name="rhs_">EmuMath Vector whose magnitude appears on the right of comparison, or scalar appearing on the right of comparison.</param>
+		/// <returns>True if this Vector's magnitude is greater than or equal to that of rhs_, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpGreaterEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_greater_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all indices within this Vector are greater than or equal to rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, non-contained indices will be compared until the largest Vector is fully compared. 
+		///		If false, comparisons will only be performed until the end of the smallest Vector. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if all comparisons are true, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllGreaterEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_all_greater_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all indices in the provided range within this Vector are greater than or equal to rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for comparisons. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if all comparisons within the provided range are true, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllGreaterEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_all_greater_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any indices within this Vector are greater than or equal to rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, non-contained indices will be compared until the largest Vector is fully compared. 
+		///		If false, comparisons will only be performed until the end of the smallest Vector. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if at least 1 comparison is true, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyGreaterEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_any_greater_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any indices in the provided range within this Vector are greater than or equal to rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for comparisons. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if at least 1 comparison within the provided range is true, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyGreaterEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_any_greater_equal<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
+		}
+#pragma endregion
+
+#pragma region CMP_GREATER_EQUAL_FUNCS
+		/// <summary>
+		/// <para> Returns true if the magnitude of this Vector is less than or equal to that of rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Both Vector's magnitudes will be compared. Otherwise, this Vector's magnitude will be compared with rhs_ directly. </para>
+		/// <para> 
+		///		IncludeNonContained_: If true, all elements of each Vector will be used to determine their magnitude. 
+		///		If false, only elements up to the end of the smallest Vector will be used to determine magnitude. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">EmuMath Vector whose magnitude appears on the right of comparison, or scalar appearing on the right of comparison.</param>
+		/// <returns>True if this Vector's magnitude is less than or equal to that of rhs_, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpLessEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_less_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if the magnitude of this Vector is less than or equal to that of rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Both Vector's magnitudes will be compared. Otherwise, this Vector's magnitude will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors to calculate their magnitude. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors to calculate their magnitude. </para>
+		/// </summary>
+		/// <param name="rhs_">EmuMath Vector whose magnitude appears on the right of comparison, or scalar appearing on the right of comparison.</param>
+		/// <returns>True if this Vector's magnitude is less than or equal to that of rhs_, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpLessEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_less_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all indices within this Vector are less than or equal to rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, non-contained indices will be compared until the largest Vector is fully compared. 
+		///		If false, comparisons will only be performed until the end of the smallest Vector. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if all comparisons are true, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllLessEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_all_less_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all indices in the provided range within this Vector are less than or equal to rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for comparisons. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if all comparisons within the provided range are true, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAllLessEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_all_less_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any indices within this Vector are less than or equal to rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, non-contained indices will be compared until the largest Vector is fully compared. 
+		///		If false, comparisons will only be performed until the end of the smallest Vector. 
+		///		Has no effect if Rhs_ is not an EmuMath Vector. 
+		///		Defaults to true.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if at least 1 comparison is true, otherwise false.</returns>
+		template<bool IncludeNonContained_ = true, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyLessEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_any_less_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any indices in the provided range within this Vector are less than or equal to rhs_. </para>
+		/// <para> If Rhs_ is an EmuMath Vector: Respective index elements will be compared. Otherwise, indices in this Vector will be compared with rhs_ directly. </para>
+		/// <para> BeginIndex_: Inclusive index at which to start reading elements from Vectors for comparisons. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop reading elements from Vectors for comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
+		/// <returns>True if at least 1 comparison within the provided range is true, otherwise false.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
+		[[nodiscard]] constexpr inline bool CmpAnyLessEqual(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::new_vector_cmp_any_less_equal<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
+		}
+#pragma endregion
 
 #pragma region CONVERSIONS
 	public:

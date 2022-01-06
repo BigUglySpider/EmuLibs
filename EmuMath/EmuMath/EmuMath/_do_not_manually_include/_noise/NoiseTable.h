@@ -496,7 +496,7 @@ namespace EmuMath
 			else
 			{
 				value_type max_minus_min_ = max_ - min_;
-				if (EmuCore::near_equal<value_type>()(max_minus_min_, value_type(0)))
+				if (EmuCore::do_cmp_near_equal<value_type>()(max_minus_min_, value_type(0)))
 				{
 					// In this scenario, max and min are very likely the same (and if not, different only by epsilon which is likely a fp rounding error)
 					_set_all(max_);

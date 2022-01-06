@@ -30,14 +30,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 	}
 	template<std::size_t OutSize_, typename OutT_, class InVector_, std::size_t...Indices_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_cast_execution(InVector_&& in_vector_, std::index_sequence<Indices_...> indices_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_cast_execution(InVector_& in_vector_, std::index_sequence<Indices_...> indices_)
 	{
 		return EmuMath::NewVector<OutSize_, OutT_>
 		(
-			_vector_cast_make_stored_type<Indices_, OutSize_, OutT_, InVector_>
-			(
-				std::forward<InVector_>(in_vector_)
-			)...
+			_vector_cast_make_stored_type<Indices_, OutSize_, OutT_, std::add_lvalue_reference_t<InVector_>>(in_vector_)...
 		);
 	}
 
@@ -57,9 +54,9 @@ namespace EmuMath::Helpers::_vector_underlying
 		if constexpr (is_valid)
 		{
 			// Safe to continue since the value is supposedly named, or we're not outputting references anyway
-			return _vector_cast_execution<OutSize_, OutT_, InVector_>
+			return _vector_cast_execution<OutSize_, OutT_, decltype(EmuCore::TMP::lval_ref_cast<InVector_>(in_vector_))>
 			(
-				std::forward<InVector_>(in_vector_),
+				EmuCore::TMP::lval_ref_cast<InVector_>(in_vector_),
 				EmuCore::TMP::make_offset_index_sequence<Offset_, OutSize_>()
 			);
 		}

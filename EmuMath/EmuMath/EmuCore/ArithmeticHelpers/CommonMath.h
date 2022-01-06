@@ -662,26 +662,130 @@ namespace EmuCore
 	template<typename T_>
 	struct epsilon
 	{
+		constexpr epsilon()
+		{
+		}
+
 		[[nodiscard]] static constexpr inline T_ get()
 		{
 			return std::numeric_limits<T_>::epsilon();
 		}
+
+		[[nodiscard]] constexpr inline T_ operator()() const
+		{
+			return get();
+		}
 	};
 
-	template<typename Lhs_, typename Rhs_ = Lhs_, typename Epsilon_ = Lhs_>
-	struct near_equal
+	template
+	<
+		typename Lhs_,
+		typename Rhs_ = Lhs_,
+		typename Epsilon_ = std::conditional_t<EmuCore::TMP::is_any_floating_point_v<Lhs_, Rhs_>, EmuCore::TMP::first_floating_point_t<Lhs_, Rhs_>, Lhs_>
+	>
+	struct do_cmp_near_equal
 	{
-		constexpr near_equal()
+		constexpr do_cmp_near_equal()
 		{
 		}
 
-		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_, const Epsilon_& epsilon_)
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_, const Epsilon_& epsilon_) const
 		{
 			return AbsConstexpr(lhs_ - rhs_) <= epsilon_;
 		}
-		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_)
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			return operator()(lhs_, rhs_, epsilon<Epsilon_>::get());
+		}
+	};
+	template<>
+	struct do_cmp_near_equal<void, void, void>
+	{
+		constexpr do_cmp_near_equal()
+		{
+		}
+
+		template<class Lhs_, class Rhs_>
+		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			using lhs_uq = EmuCore::TMP::remove_ref_cv_t<Lhs_>;
+			using rhs_uq = EmuCore::TMP::remove_ref_cv_t<Rhs_>;
+			if constexpr (std::is_floating_point_v<lhs_uq> || !std::is_floating_point_v<rhs_uq>)
+			{
+				// If neither are floating points, Epsilon is lhs; if Lhs_ is floating point, always default to Lhs_ for epsilon
+				return do_cmp_near_equal<lhs_uq, rhs_uq, lhs_uq>()(lhs_, rhs_);
+			}
+			else
+			{
+				// Lhs_ not fp, but Rhs_ is fp
+				return do_cmp_near_equal<lhs_uq, rhs_uq, rhs_uq>()(lhs_, rhs_);
+			}
+		}
+		template<class Lhs_, class Rhs_, class Epsilon_>
+		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_, const Epsilon_& epsilon_) const
+		{
+			using lhs_uq = EmuCore::TMP::remove_ref_cv_t<Lhs_>;
+			using rhs_uq = EmuCore::TMP::remove_ref_cv_t<Rhs_>;
+			using epsilon_uq = EmuCore::TMP::remove_ref_cv_t<Epsilon_>;
+			return do_cmp_near_equal<lhs_uq, rhs_uq, epsilon_uq>()(lhs_, rhs_, epsilon_);
+		}
+	};
+
+	template
+	<
+		typename Lhs_,
+		typename Rhs_ = Lhs_,
+		typename Epsilon_ = std::conditional_t<EmuCore::TMP::is_any_floating_point_v<Lhs_, Rhs_>, EmuCore::TMP::first_floating_point_t<Lhs_, Rhs_>, Lhs_>
+	>
+	struct do_cmp_not_near_equal
+	{
+	private:
+		using _do_cmp_near_equal = do_cmp_near_equal<Lhs_, Rhs_, Epsilon_>;
+
+	public:
+		constexpr do_cmp_not_near_equal()
+		{
+		}
+
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_, const Epsilon_& epsilon_) const
+		{
+			return !_do_cmp_near_equal()(lhs_, rhs_, epsilon_);
+		}
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_)
+		{
+			return !_do_cmp_near_equal()(lhs_, rhs_);
+		}
+	};
+	template<>
+	struct do_cmp_not_near_equal<void, void, void>
+	{
+		constexpr do_cmp_not_near_equal()
+		{
+		}
+
+		template<class Lhs_, class Rhs_>
+		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			using lhs_uq = EmuCore::TMP::remove_ref_cv_t<Lhs_>;
+			using rhs_uq = EmuCore::TMP::remove_ref_cv_t<Rhs_>;
+			if constexpr (std::is_floating_point_v<lhs_uq> || !std::is_floating_point_v<rhs_uq>)
+			{
+				// If neither are floating points, Epsilon is lhs; if Lhs_ is floating point, always default to Lhs_ for epsilon
+				return do_cmp_not_near_equal<lhs_uq, rhs_uq, lhs_uq>()(lhs_, rhs_);
+			}
+			else
+			{
+				// Lhs_ not fp, but Rhs_ is fp
+				return do_cmp_not_near_equal<lhs_uq, rhs_uq, rhs_uq>()(lhs_, rhs_);
+			}
+		}
+		template<class Lhs_, class Rhs_, class Epsilon_>
+		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_, const Epsilon_& epsilon_) const
+		{
+			using lhs_uq = EmuCore::TMP::remove_ref_cv_t<Lhs_>;
+			using rhs_uq = EmuCore::TMP::remove_ref_cv_t<Rhs_>;
+			using epsilon_uq = EmuCore::TMP::remove_ref_cv_t<Epsilon_>;
+			return do_cmp_not_near_equal<lhs_uq, rhs_uq, epsilon_uq>()(lhs_, rhs_, epsilon_);
 		}
 	};
 }
