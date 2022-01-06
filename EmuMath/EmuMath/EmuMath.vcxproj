@@ -192,6 +192,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_bitwise.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_bitwise_assign.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_cast.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_cmp.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_misc_arithmetic.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_basic_arithmetic.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_copy.h" />
@@ -205,6 +206,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_stream_append.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_unary_arithmetic.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_cast_underlying.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_cmp_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_copy_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_get_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_info.h" />

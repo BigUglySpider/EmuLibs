@@ -432,16 +432,18 @@ namespace EmuCore::TMP
 	/// <param name="ref_">Reference to cast to an lvalue reference.</param>
 	/// <returns>The passed ref_ cast to an lvalue reference.</returns>
 	template<typename T_>
-	[[nodiscard]] constexpr inline std::remove_reference_t<T_>& lval_ref_cast(std::remove_reference_t<T_>& ref_)
+	[[nodiscard]] constexpr inline std::add_lvalue_reference_t<T_> lval_ref_cast(std::remove_reference_t<T_>& ref_)
 	{
 		return ref_;
 	}
 	template<typename T_>
-	[[nodiscard]] constexpr inline std::remove_reference_t<T_>& lval_ref_cast(std::remove_reference_t<T_>&& ref_)
+	[[nodiscard]] constexpr inline std::add_lvalue_reference_t<T_> lval_ref_cast(std::remove_reference_t<T_>&& ref_)
 	{
-		return static_cast<std::remove_reference_t<T_>&>(ref_);
+		return static_cast<std::add_lvalue_reference_t<T_>>(ref_);
 	}
 
+	/// <summary> Type used to alias type T_ as its internal type alias. Mainly for use in conditions such as `std::conditional_t&lt;bool, x, y&gt;::type`. </summary>
+	/// <typeparam name="T_">Type to be accessible by the defined type alias.</typeparam>
 	template<typename T_>
 	struct dummy_type_wrapper
 	{

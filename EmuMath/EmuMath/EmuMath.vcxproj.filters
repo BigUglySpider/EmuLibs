@@ -563,5 +563,11 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_cast_underlying.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_underlying_helpers\_vector_cmp_underlying.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_new_vectors\_helpers\_vector_cmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

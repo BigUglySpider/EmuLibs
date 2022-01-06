@@ -1095,6 +1095,15 @@ int main()
 	runtime_vec_ref_cast_.at<1>() = 22;
 	std::cout << runtime_vec_to_cast_ << "\n" << runtime_vec_ref_cast_ << "\n\n";
 
+	std::cout << "\n---\n";
+	constexpr auto cmp_vec_a_ = EmuMath::Helpers::new_vector_make<int>(1, 2, 3, 4, 5, 6, 7, 8);
+	constexpr auto cmp_vec_b_ = EmuMath::Helpers::new_vector_make<float>(1, 2, 3, 4, 5, 6, 7, 8);
+	//constexpr bool cmp_result_0_ = EmuMath::Helpers::new_vector_cmp_all<EmuCore::do_cmp_equal_to>(cmp_vec_a_, cmp_vec_b_);
+	constexpr bool cmp_result_0_ = cmp_vec_a_.CmpAll<EmuCore::do_cmp_equal_to>(cmp_vec_b_);
+	constexpr bool cmp_result_1_ = cmp_vec_b_.CmpAny<EmuCore::do_cmp_not_equal_to>(cmp_vec_b_);
+	constexpr bool cmp_result_2_ = cmp_vec_a_.CmpAll<EmuCore::do_cmp_greater_equal>(7);
+	constexpr bool cmp_result_3_ = cmp_vec_a_.CmpAny<EmuCore::do_cmp_greater_equal>(7);
+
 	system("pause");
 
 	// GRADIENTS START
