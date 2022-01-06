@@ -1081,6 +1081,20 @@ int main()
 	auto& const_vec_max_const_ref_b_ = const_vec_for_min_max_ref_b_.Max<const float&>();
 	std::cout << const_vec_for_min_max_ref_b_ << "\nMin: " << const_vec_min_const_ref_b_ << "\nMax: " << const_vec_max_const_ref_b_ << "\n";
 
+	std::cout << "\n---\n";
+	constexpr auto vec_to_cast_ = EmuMath::Helpers::new_vector_make<int>(-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5);
+	constexpr auto vec_cast_4f_ = EmuMath::Helpers::new_vector_cast<4, float>(vec_to_cast_);
+	constexpr auto vec_cast_20f_ = EmuMath::Helpers::new_vector_cast<20, float>(vec_to_cast_);
+	constexpr auto vec_cast_xld_ = EmuMath::Helpers::new_vector_cast<long double>(vec_to_cast_);
+	constexpr auto vec_cast_xf_offset_ = EmuMath::Helpers::new_vector_cast<float, 5>(vec_to_cast_);
+	constexpr auto rval_vec_cast_4f_offset_ = EmuMath::Helpers::new_vector_cast<5, float, 3>(EmuMath::Helpers::new_vector_make<std::uint16_t>(1, 2, 3, 4, 5, 6, 7, 8));
+	constexpr auto static_cast_vec_to_cast_ = static_cast<EmuMath::NewVector<12, long double>>(vec_to_cast_);
+	auto runtime_vec_to_cast_ = vec_to_cast_;
+	auto runtime_vec_ref_cast_ = runtime_vec_to_cast_.Cast<3, int&, 2>();
+	std::cout << runtime_vec_to_cast_ << "\n" << runtime_vec_ref_cast_ << "\n\n";
+	runtime_vec_ref_cast_.at<1>() = 22;
+	std::cout << runtime_vec_to_cast_ << "\n" << runtime_vec_ref_cast_ << "\n\n";
+
 	system("pause");
 
 	// GRADIENTS START

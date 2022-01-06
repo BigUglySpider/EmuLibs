@@ -111,6 +111,16 @@ namespace EmuCore::TMP
 	{
 		return false;
 	}
+	/// <summary>
+	/// <para> Function used to return a false bool based on a provided type. This is to allow static_assert(false) statements without compilation failure. </para>
+	/// <para> Specialisations of this function to return true are ill-formed, and ultimately make a program's Emu library static_assertion diagnoses ill-formed. </para>
+	/// </summary>
+	/// <returns>False.</returns>
+	template<auto Dummy_>
+	[[nodiscard]] constexpr inline bool get_false()
+	{
+		return false;
+	}
 
 	/// <summary> 
 	/// <para> Struct for retrieving the lowest value that may be stored in a type T_. </para>

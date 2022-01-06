@@ -4837,6 +4837,59 @@ namespace EmuMath
 #pragma region CONVERSIONS
 	public:
 		/// <summary>
+		/// <para> Outputs a cast of this Vector as an EmuMath Vector composed of the provided OutSize_ and OutT_ args. </para>
+		/// <para> OutSize_: Size of the output Vector. If not provided, this will default to this Vector's size. </para>
+		/// <para> OutT_: Typearg for the output Vector. If not provided, this will default to the this Vector's value_type_uq. </para>
+		/// <para> At least 1 of OutSize_ or OutT_ must be provided. </para>
+		/// <para> Offset_: Optional offset at which to start reading this Vector for forming the output cast. Defaults to 0. </para>
+		/// </summary>
+		/// <returns>Cast of this Vector as an EmuMath Vector with the provided OutSize_ and OutT_ args.</returns>
+		template<std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Cast() const
+		{
+			return EmuMath::Helpers::new_vector_cast<OutSize_, OutT_, Offset_>(*this);
+		}
+		template<std::size_t OutSize_, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, value_type_uq> Cast() const
+		{
+			return EmuMath::Helpers::new_vector_cast<OutSize_, value_type_uq, Offset_>(*this);
+		}
+		template<typename OutT_, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Cast() const
+		{
+			return EmuMath::Helpers::new_vector_cast<size, OutT_, Offset_>(*this);
+		}
+
+		template<std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Cast()
+		{
+			return EmuMath::Helpers::new_vector_cast<OutSize_, OutT_, Offset_>(*this);
+		}
+		template<std::size_t OutSize_, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, value_type_uq> Cast()
+		{
+			return EmuMath::Helpers::new_vector_cast<OutSize_, value_type_uq, Offset_>(*this);
+		}
+		template<typename OutT_, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Cast()
+		{
+			return EmuMath::Helpers::new_vector_cast<size, OutT_, Offset_>(*this);
+		}
+
+		/// <summary> Explicit cast operator for converting this Vector to an alternative EmuMath Vector instance. </summary>
+		template<std::size_t OutSize_, typename OutT_>
+		explicit constexpr inline operator EmuMath::NewVector<OutSize_, OutT_>() const
+		{
+			return EmuMath::Helpers::new_vector_cast<OutSize_, OutT_, 0>(*this);
+		}
+
+		template<std::size_t OutSize_, typename OutT_>
+		explicit constexpr inline operator EmuMath::NewVector<OutSize_, OutT_>()
+		{
+			return EmuMath::Helpers::new_vector_cast<OutSize_, OutT_, 0>(*this);
+		}
+
+		/// <summary>
 		/// <para> Converts this Vector to its alternative template representation, if it has one. </para>
 		/// <para> This is purely to convert reference-containing vectors between their `T_&amp;` and `internal_vector_reference&lt;T_&gt;` variants. </para>
 		/// <para>
