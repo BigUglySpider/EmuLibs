@@ -484,6 +484,17 @@ namespace EmuMath::Helpers
 		return _vector_underlying::_vector_min<typename EmuMath::NewVector<Size_, T_>::value_type_uq>(in_vector_);
 	}
 
+	template<typename Out_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline Out_ new_vector_min(EmuMath::NewVector<Size_, T_>& in_vector_)
+	{
+		return _vector_underlying::_vector_min<Out_>(in_vector_);
+	}
+	template<std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::value_type_uq new_vector_min(EmuMath::NewVector<Size_, T_>& in_vector_)
+	{
+		return _vector_underlying::_vector_min<typename EmuMath::NewVector<Size_, T_>::value_type_uq>(in_vector_);
+	}
+
 	/// <summary>
 	/// <para> Finds the lowest value within the passed EmuMath Vector, using only indices within the provided (theoretical) range. </para>
 	/// <para> BeginIndex_: Inclusive index at which to start reading values from the input Vector. </para>
@@ -498,6 +509,17 @@ namespace EmuMath::Helpers
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
 	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::value_type_uq new_vector_min(const EmuMath::NewVector<Size_, T_>& in_vector_)
+	{
+		return _vector_underlying::_vector_min<typename EmuMath::NewVector<Size_, T_>::value_type_uq, BeginIndex_, EndIndex_>(in_vector_);
+	}
+
+	template<typename Out_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline Out_ new_vector_min(EmuMath::NewVector<Size_, T_>& in_vector_)
+	{
+		return _vector_underlying::_vector_min<Out_, BeginIndex_, EndIndex_>(in_vector_);
+	}
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::value_type_uq new_vector_min(EmuMath::NewVector<Size_, T_>& in_vector_)
 	{
 		return _vector_underlying::_vector_min<typename EmuMath::NewVector<Size_, T_>::value_type_uq, BeginIndex_, EndIndex_>(in_vector_);
 	}
@@ -732,6 +754,17 @@ namespace EmuMath::Helpers
 		return _vector_underlying::_vector_max<typename EmuMath::NewVector<Size_, T_>::value_type_uq>(in_vector_);
 	}
 
+	template<typename Out_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline Out_ new_vector_max(EmuMath::NewVector<Size_, T_>& in_vector_)
+	{
+		return _vector_underlying::_vector_max<Out_>(in_vector_);
+	}
+	template<std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::value_type_uq new_vector_max(EmuMath::NewVector<Size_, T_>& in_vector_)
+	{
+		return _vector_underlying::_vector_max<typename EmuMath::NewVector<Size_, T_>::value_type_uq>(in_vector_);
+	}
+
 	/// <summary>
 	/// <para> Finds the greatest value within the passed EmuMath Vector, using only indices within the provided (theoretical) range. </para>
 	/// <para> BeginIndex_: Inclusive index at which to start reading values from the input Vector. </para>
@@ -746,6 +779,17 @@ namespace EmuMath::Helpers
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
 	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::value_type_uq new_vector_max(const EmuMath::NewVector<Size_, T_>& in_vector_)
+	{
+		return _vector_underlying::_vector_max<typename EmuMath::NewVector<Size_, T_>::value_type_uq, BeginIndex_, EndIndex_>(in_vector_);
+	}
+
+	template<typename Out_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline Out_ new_vector_max(EmuMath::NewVector<Size_, T_>& in_vector_)
+	{
+		return _vector_underlying::_vector_max<Out_, BeginIndex_, EndIndex_>(in_vector_);
+	}
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::value_type_uq new_vector_max(EmuMath::NewVector<Size_, T_>& in_vector_)
 	{
 		return _vector_underlying::_vector_max<typename EmuMath::NewVector<Size_, T_>::value_type_uq, BeginIndex_, EndIndex_>(in_vector_);
 	}

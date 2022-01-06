@@ -24,7 +24,7 @@ namespace EmuMath
 			{
 				// We can do a direct conversion if compatible, but otherwise we'll need a cast
 				// --- This is due to sets viewing all passed values as a form of the stored channel_type
-				// ------ This in itself is to remove ambiguity when providing integral constants for sets,
+				// ------ This in itself is to remove ambiguity when providing integral literals for sets,
 				// ------ since converting them to an intensity would mean knowing exactly what byte-width a user desires,
 				// ------ which would make sets highly prone to bugs.
 				if constexpr (EmuMath::Helpers::_underlying_colour_funcs::compatible_channel_types<TargetChannelType_, Val_>())

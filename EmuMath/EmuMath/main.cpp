@@ -1060,6 +1060,27 @@ int main()
 	constexpr auto new_clamped_max_ = new_to_clamp_.ClampMax(26.5);
 	constexpr auto new_clamped_ = new_to_clamp_.Clamp(-2.5, 26.5);
 
+	auto vec_for_min_max_ref_ = EmuMath::Helpers::new_vector_make<float>(1.0f, 2.0f, 3, -5, 27, 2.0f, 1337.5f, 22.2, 13L, 1337.0f);
+	auto& vec_min_ref_ = vec_for_min_max_ref_.Min<float&>();
+	auto& vec_max_ref_ = vec_for_min_max_ref_.Max<float&>();
+	auto& vec_min_const_ref_ = vec_for_min_max_ref_.Min<const float&>();
+	std::cout << vec_for_min_max_ref_ << "\nMin: " << vec_min_ref_ << "\nMax: " << vec_max_ref_ << "\nMin (const): " << vec_min_const_ref_ << "\n";
+	vec_min_ref_ = 0.0f;
+	vec_max_ref_ = 3.4f;
+	std::cout << vec_for_min_max_ref_ << "\nMin: " << vec_min_ref_ << "\nMax: " << vec_max_ref_ << "\nMin (const): " << vec_min_const_ref_ << "\n";
+
+	std::cout << "\n";
+	const auto const_vec_for_min_max_ref_ = EmuMath::Helpers::new_vector_make<float>(12.0f, 2.0f, 3.0f, 4.0f, 5.0f, -1.0f, -2.0f, -3.0f, 2);
+	auto& const_vec_min_const_ref_ = const_vec_for_min_max_ref_.Min<const float&>();
+	auto& const_vec_max_const_ref_ = const_vec_for_min_max_ref_.Max<const float&>();
+	std::cout << const_vec_for_min_max_ref_ << "\nMin: " << const_vec_min_const_ref_ << "\nMax: " << const_vec_max_const_ref_ << "\n";
+
+	std::cout << "\n";
+	auto const_vec_for_min_max_ref_b_ = EmuMath::Helpers::new_vector_make<const float>(12.0f, 2.0f, 3.0f, 4.0f, 5.0f, -1.0f, -2.0f, -3.0f, 2);
+	auto& const_vec_min_const_ref_b_ = const_vec_for_min_max_ref_b_.Min<const float&>();
+	auto& const_vec_max_const_ref_b_ = const_vec_for_min_max_ref_b_.Max<const float&>();
+	std::cout << const_vec_for_min_max_ref_b_ << "\nMin: " << const_vec_min_const_ref_b_ << "\nMax: " << const_vec_max_const_ref_b_ << "\n";
+
 	system("pause");
 
 	// GRADIENTS START

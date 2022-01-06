@@ -2850,6 +2850,11 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::new_vector_min<Out_>(*this);
 		}
+		template<typename Out_ = value_type_uq>
+		[[nodiscard]] constexpr inline Out_ Min()
+		{
+			return EmuMath::Helpers::new_vector_min<Out_>(*this);
+		}
 
 		/// <summary>
 		/// <para> Finds the lowest value within this Vector. </para>
@@ -2859,6 +2864,11 @@ namespace EmuMath
 		/// <returns>Lowest value in the provided index range within this Vector, represented as the provided Out_ type (defaults to value_type_uq).</returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = value_type_uq>
 		[[nodiscard]] constexpr inline Out_ Min() const
+		{
+			return EmuMath::Helpers::new_vector_min<Out_, BeginIndex_, EndIndex_>(*this);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = value_type_uq>
+		[[nodiscard]] constexpr inline Out_ Min()
 		{
 			return EmuMath::Helpers::new_vector_min<Out_, BeginIndex_, EndIndex_>(*this);
 		}
@@ -2972,6 +2982,11 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::new_vector_max<Out_>(*this);
 		}
+		template<typename Out_ = value_type_uq>
+		[[nodiscard]] constexpr inline Out_ Max()
+		{
+			return EmuMath::Helpers::new_vector_max<Out_>(*this);
+		}
 
 		/// <summary>
 		/// <para> Finds the greatest value within this Vector, using only indices within the provided (theoretical) range. </para>
@@ -2981,6 +2996,11 @@ namespace EmuMath
 		/// <returns>Greatest value in the provided index range within this Vector, represented as the provided Out_ type (defaults to value_type_uq).</returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = value_type_uq>
 		[[nodiscard]] constexpr inline Out_ Max() const
+		{
+			return EmuMath::Helpers::new_vector_max<Out_, BeginIndex_, EndIndex_>(*this);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = value_type_uq>
+		[[nodiscard]] constexpr inline Out_ Max()
 		{
 			return EmuMath::Helpers::new_vector_max<Out_, BeginIndex_, EndIndex_>(*this);
 		}
