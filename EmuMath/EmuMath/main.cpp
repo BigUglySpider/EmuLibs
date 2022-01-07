@@ -1151,6 +1151,11 @@ int main()
 	constexpr bool cmp_rseult_29_ = cmp_vec_a_ <= cmp_vec_c_;
 	constexpr bool cmp_result_30_ = cmp_vec_a_ <= cmp_vec_c_.MagnitudeConstexpr();
 
+	std::cout << "\n---\n";
+	constexpr auto cross_a_ = EmuMath::Helpers::new_vector_make<float>(2, 3, 4);
+	constexpr auto cross_b_ = EmuMath::Helpers::new_vector_make<int>(5, 6, 7);
+	constexpr auto cross_ab_ = cross_a_.Cross3<2, 1, 4, 0, 1, 2, long double>(cross_b_);
+
 
 	system("pause");
 

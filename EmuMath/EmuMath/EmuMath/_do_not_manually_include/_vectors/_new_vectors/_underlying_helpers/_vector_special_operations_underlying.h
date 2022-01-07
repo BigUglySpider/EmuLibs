@@ -520,6 +520,280 @@ namespace EmuMath::Helpers::_vector_underlying
 		using Acos_ = AcosTemplate_<typename _types_vector_dot<SizeA_, TA_, SizeB_, TB_, Out_>::out_processing>;
 		return _vector_angle<SqrtTemplate_, Acos_, Out_, Radians_>(Acos_(), a_, b_);
 	}
+
+	template
+	<
+		template<class...> class MulTemplate_,
+		template<class...> class SubTemplate_,
+		typename Out_,
+		std::size_t LhsA_,
+		std::size_t RhsA_,
+		std::size_t LhsB_,
+		std::size_t RhsB_,
+		typename TA_,
+		std::size_t SizeA_,
+		typename TB_,
+		std::size_t SizeB_
+	>
+	[[nodiscard]] constexpr inline Out_ _vector_cross_3d_calculate_value(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	{
+		using get_a_lhs_t = decltype(_vector_get_theoretical<LhsA_>(a_));
+		using get_b_lhs_t = decltype(_vector_get_theoretical<LhsB_>(b_));
+		using a_lhs_t_uq = EmuCore::TMP::remove_ref_cv_t<get_a_lhs_t>;
+		using b_lhs_t_uq = EmuCore::TMP::remove_ref_cv_t<get_b_lhs_t>;
+		if constexpr (EmuCore::TMP::valid_template_args_v<MulTemplate_, a_lhs_t_uq, b_lhs_t_uq>)
+		{
+			using MulLhs_ = MulTemplate_<a_lhs_t_uq, b_lhs_t_uq>;
+
+			using get_a_rhs_t = decltype(_vector_get_theoretical<RhsA_>(a_));
+			using get_b_rhs_t = decltype(_vector_get_theoretical<RhsB_>(b_));
+			using a_rhs_t_uq = EmuCore::TMP::remove_ref_cv_t<get_a_rhs_t>;
+			using b_rhs_t_uq = EmuCore::TMP::remove_ref_cv_t<get_b_rhs_t>;
+
+			if constexpr (EmuCore::TMP::valid_template_args_v<MulTemplate_, a_rhs_t_uq, b_rhs_t_uq>)
+			{
+				using MulRhs_ = MulTemplate_<a_rhs_t_uq, b_rhs_t_uq>;
+				constexpr bool lhs_mul_invocable = std::is_invocable_v<MulLhs_, get_a_lhs_t, get_b_lhs_t>;
+				constexpr bool rhs_mul_invocable = std::is_invocable_v<MulRhs_, get_a_rhs_t, get_b_rhs_t>;
+
+				if constexpr (lhs_mul_invocable && rhs_mul_invocable)
+				{
+					using lhs_mul_result = std::invoke_result_t<MulLhs_, get_a_lhs_t, get_b_lhs_t>;
+					using rhs_mul_result = std::invoke_result_t<MulRhs_, get_a_rhs_t, get_b_rhs_t>;
+					using lhs_mul_result_uq = EmuCore::TMP::remove_ref_cv_t<lhs_mul_result>;
+					using rhs_mul_result_uq = EmuCore::TMP::remove_ref_cv_t<rhs_mul_result>;
+
+					if constexpr (EmuCore::TMP::valid_template_args_v<SubTemplate_, lhs_mul_result_uq, rhs_mul_result_uq>)
+					{
+						using Sub_ = SubTemplate_<lhs_mul_result_uq, rhs_mul_result_uq>;
+
+						if constexpr (std::is_invocable_v<Sub_, lhs_mul_result, rhs_mul_result>)
+						{
+							using sub_result = std::invoke_result_t<Sub_, lhs_mul_result, rhs_mul_result>;
+
+							// After all the safety metaprogramming we can finally output a single index
+							// --- Returns (a[LhsA] * b[LhsB]) - (a[RhsA] * b[RhsB]); provided indices are expected to be meaningful for a cross product
+							if constexpr (std::is_constructible_v<Out_, sub_result>)
+							{
+								return Out_
+								(
+									Sub_()
+									(
+										MulLhs_()(_vector_get_theoretical<LhsA_>(a_), _vector_get_theoretical<LhsB_>(b_)),
+										MulRhs_()(_vector_get_theoretical<RhsA_>(a_), _vector_get_theoretical<RhsB_>(b_))
+									)
+								);
+							}
+							else if constexpr (EmuCore::TMP::is_static_castable_v<sub_result, Out_>)
+							{
+								return static_cast<Out_>
+								(
+									Sub_()
+									(
+										MulLhs_()(_vector_get_theoretical<LhsA_>(a_), _vector_get_theoretical<LhsB_>(b_)),
+										MulRhs_()(_vector_get_theoretical<RhsA_>(a_), _vector_get_theoretical<RhsB_>(b_))
+									)
+								);
+							}
+							else
+							{
+								static_assert
+								(
+									EmuCore::TMP::get_false<Out_>(),
+									"Attempted to calculate the 3D cross product of two EmuMath Vectors, but the result for at least one index could not be used to form the stored_type of the output Vector."
+								);
+							}
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<Out_>(),
+								"Attempted to calculate the 3D cross product of two EmuMath Vectors, but the determined subtraction functor cannot be invoked with the results from invoking the two multiplication functors."
+							);
+						}
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<Out_>(),
+							"Attempted to calculate the 3D cross product of two EmuMath Vectors, but the unqualified results of invoking both multiplication functors are not valid when provided as two typeargs for the provided Subtraction template."
+						);
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Out_>(),
+						"Attempted to calculate the 3D cross product of two EmuMath Vectors, but at least one of the determined Multiplication functors could not be invoked with the results of getting an index from both Vectors."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Out_>(),
+					"Attempted to calculate the 3D cross product of two EmuMath Vectors, but the used MulTemplate_ cannot be instantiated with the unqualified results of getting at least one index from both Vectors."
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<Out_>(),
+				"Attempted to calculate the 3D cross product of two EmuMath Vectors, but the used MulTemplate_ cannot be instantiated with the unqualified results of getting at least one index from both Vectors."
+			);
+		}
+	}
+
+	template
+	<
+		std::size_t Index_,
+		template<class...> class MulTemplate_,
+		template<class...> class SubTemplate_,
+		std::size_t OutSize_,
+		typename OutT_,
+		std::size_t A0_,
+		std::size_t A1_,
+		std::size_t A2_,
+		std::size_t B0_,
+		std::size_t B1_,
+		std::size_t B2_,
+		typename TA_,
+		std::size_t SizeA_,
+		typename TB_,
+		std::size_t SizeB_
+	>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<OutSize_, OutT_>::stored_type _vector_cross_3d_output_index
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& a_,
+		const EmuMath::NewVector<SizeB_, TB_>& b_
+	)
+	{
+		using out_stored_type = typename EmuMath::NewVector<OutSize_, OutT_>::stored_type;
+		if constexpr (Index_ == 0)
+		{
+			// (a[1] * b[2]) - (a[2] * b[1])
+			return _vector_cross_3d_calculate_value<MulTemplate_, SubTemplate_, out_stored_type, A1_, A2_, B2_, B1_>(a_, b_);
+		}
+		else if constexpr (Index_ == 1)
+		{
+			// (a[2] * b[0]) - (a[0] * b[2])
+			return _vector_cross_3d_calculate_value<MulTemplate_, SubTemplate_, out_stored_type, A2_, A0_, B0_, B2_>(a_, b_);
+		}
+		else if constexpr (Index_ == 2)
+		{
+			// (a[0] * b[1]) - (a[1] * b[0])
+			return _vector_cross_3d_calculate_value<MulTemplate_, SubTemplate_, out_stored_type, A0_, A1_, B1_, B0_>(a_, b_);
+		}
+		else
+		{
+			if constexpr (std::is_default_constructible_v<out_stored_type>)
+			{
+				return out_stored_type();
+			}
+			else
+			{
+				using implied_zero_type = decltype(_vector_get_non_contained_value<EmuMath::NewVector<OutSize_, OutT_>>());
+				if constexpr (std::is_constructible_v<out_stored_type, implied_zero_type>)
+				{
+					return out_stored_type(_vector_get_non_contained_value<EmuMath::NewVector<OutSize_, OutT_>>());
+				}
+				else if constexpr(EmuCore::TMP::is_static_castable_v<implied_zero_type, out_stored_type>)
+				{
+					return static_cast<out_stored_type>(_vector_get_non_contained_value<EmuMath::NewVector<OutSize_, OutT_>>());
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<OutT_>(),
+						"Attempted to calculate the 3D cross product of two EmuMath Vectors with an output type containing more than 3 indices. However, the output Vector's stored_type can neither be default-constructed nor constructed from a non-contained implied zero for the Vector type. Output as a 3D Vector is recommended for this case."
+					);
+				}
+			}
+
+		}
+	}
+
+	template
+	<
+		template<class...> class MulTemplate_,
+		template<class...> class SubTemplate_,
+		std::size_t OutSize_,
+		typename OutT_,
+		std::size_t A0_,
+		std::size_t A1_,
+		std::size_t A2_,
+		std::size_t B0_,
+		std::size_t B1_,
+		std::size_t B2_,
+		typename TA_,
+		std::size_t SizeA_,
+		typename TB_,
+		std::size_t SizeB_,
+		std::size_t...OutIndices_
+	>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_cross_3d_build_out
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& a_,
+		const EmuMath::NewVector<SizeB_, TB_>& b_,
+		std::index_sequence<OutIndices_...> out_indices_
+	)
+	{
+		if constexpr(OutSize_ != 0)
+		{
+			if constexpr (!EmuMath::NewVector<OutSize_, OutT_>::contains_ref)
+			{
+				return EmuMath::NewVector<OutSize_, OutT_>
+				(
+					_vector_cross_3d_output_index<OutIndices_, MulTemplate_, SubTemplate_, OutSize_, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>
+					(
+						a_,
+						b_
+					)...
+				);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<OutT_>(),
+					"Attempted to form a 3D cross product of two EmuMath Vectors, but the provided output Vector is a reference containing Vector. As the output results are temporary values, this would result in dangling references and thus has been prohibited."
+				);
+			}
+		}
+		else
+		{
+			return EmuMath::NewVector<OutSize_, OutT_>();
+		}
+	}
+
+	template
+	<
+		template<class...> class MulTemplate_,
+		template<class...> class SubTemplate_,
+		std::size_t OutSize_,
+		typename OutT_,
+		std::size_t A0_,
+		std::size_t A1_,
+		std::size_t A2_,
+		std::size_t B0_,
+		std::size_t B1_,
+		std::size_t B2_,
+		typename TA_,
+		std::size_t SizeA_,
+		typename TB_,
+		std::size_t SizeB_
+	>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_cross_3d(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	{
+		return _vector_cross_3d_build_out<MulTemplate_, SubTemplate_, OutSize_, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>(a_, b_, std::make_index_sequence<OutSize_>());
+	}
 }
 
 #endif

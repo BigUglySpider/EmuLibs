@@ -14,6 +14,7 @@
 // --- angle_cos_constexpr
 // --- angle_cos
 // --- angle
+// --- cross_3d
 
 namespace EmuMath::Helpers
 {
@@ -484,6 +485,198 @@ namespace EmuMath::Helpers
 	{
 		using out_type_arg = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_angle<EmuCore::do_sqrt, EmuCore::do_acos, out_type_arg, Radians_>(vector_a_, vector_b_);
+	}
+#pragma endregion
+
+#pragma region CROSS_PRODUCT_3D_FUNCS
+	/// <summary>
+	/// <para> Outputs the 3D cross product of the two passed EmuMath Vectors, using theoretical indices 0, 1, 2. </para>
+	/// <para> Listed output will be provided for output Vectors which contain at least up to that element: </para>
+	/// <para> [0] = (a_[1] * b_[2]) - (a_[2] * b_[1]) </para>
+	/// <para> [1] = (a_[2] * b_[0]) - (a_[0] * b_[2]) </para>
+	/// <para> [2] = (a_[0] * b_[1]) - (a_[1] * b_[0]) </para>
+	/// <para> [...] = default, or implied 0 if default construction is not possible. </para>
+	/// <para> Unlike most EmuMath Vector functions, if no OutSize_ is provided this will always default to 3 instead of SizeA_, due to the meaning of cross products. </para>
+	/// </summary>
+	/// <param name="a_">: EmuMath Vector appearing as `a_` in the listed calculations.</param>
+	/// <param name="b_">: EmuMath Vector appearing as `b_` in the listed calculations.</param>
+	/// <returns>3D cross product of EmuMath Vectors a_ and b_, using theoretical indices 0, 1, 2.</returns>
+	template<std::size_t OutSize_, typename OutT_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_cross_3d(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	{
+		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, OutSize_, OutT_, 0, 1, 2, 0, 1, 2>(a_, b_);
+	}
+
+	template<typename OutT_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> new_vector_cross_3d(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	{
+		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, 3, OutT_, 0, 1, 2, 0, 1, 2>(a_, b_);
+	}
+
+	template<std::size_t OutSize_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> new_vector_cross_3d
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& a_,
+		const EmuMath::NewVector<SizeB_, TB_>& b_
+	)
+	{
+		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, OutSize_, a_fp, 0, 1, 2, 0, 1, 2>(a_, b_);
+	}
+
+	template<typename TA_, std::size_t SizeA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<3, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> new_vector_cross_3d
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& a_,
+		const EmuMath::NewVector<SizeB_, TB_>& b_
+	)
+	{
+		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, 3, a_fp, 0, 1, 2, 0, 1, 2>(a_, b_);
+	}
+
+	/// <summary>
+	/// <para> Outputs the 3D cross product of the two passed EmuMath Vectors, using theoretical indices I0_, I1_, I2_. </para>
+	/// <para> Listed output will be provided for output Vectors which contain at least up to that element: </para>
+	/// <para> [0] = (a_[I1_] * b_[I2_]) - (a_[I2_] * b_[I1_]) </para>
+	/// <para> [1] = (a_[I2_] * b_[I0_]) - (a_[I0_] * b_[I2_]) </para>
+	/// <para> [2] = (a_[I0_] * b_[I1_]) - (a_[I1_] * b_[I0_]) </para>
+	/// <para> [...] = default, or implied 0 if default construction is not possible. </para>
+	/// <para> Unlike most EmuMath Vector functions, if no OutSize_ is provided this will always default to 3 instead of SizeA_, due to the meaning of cross products. </para>
+	/// </summary>
+	/// <param name="a_">: EmuMath Vector appearing as `a_` in the listed calculations.</param>
+	/// <param name="b_">: EmuMath Vector appearing as `b_` in the listed calculations.</param>
+	/// <returns>3D cross product of EmuMath Vectors a_ and b_, using theoretical indices I0_, I1_, I2_.</returns>
+	template<std::size_t OutSize_, typename OutT_, std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_cross_3d(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	{
+		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, OutSize_, OutT_, I0_, I1_, I2_, I0_, I1_, I2_>(a_, b_);
+	}
+
+	template<typename OutT_, std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> new_vector_cross_3d(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	{
+		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, 3, OutT_, I0_, I1_, I2_, I0_, I1_, I2_>(a_, b_);
+	}
+
+	template<std::size_t OutSize_, std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> new_vector_cross_3d
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& a_,
+		const EmuMath::NewVector<SizeB_, TB_>& b_
+	)
+	{
+		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, OutSize_, a_fp, I0_, I1_, I2_, I0_, I1_, I2_>(a_, b_);
+	}
+
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, typename TA_, std::size_t SizeA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<3, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> new_vector_cross_3d
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& a_,
+		const EmuMath::NewVector<SizeB_, TB_>& b_
+	)
+	{
+		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, 3, a_fp, I0_, I1_, I2_, I0_, I1_, I2_>(a_, b_);
+	}
+
+	/// <summary>
+	/// <para> Outputs the 3D cross product of the two passed EmuMath Vectors, using theoretical indices A0_, A1_, A2_ from a_, and B0_, B1_, B2_ from b_. </para>
+	/// <para> Listed output will be provided for output Vectors which contain at least up to that element: </para>
+	/// <para> [0] = (a_[A1_] * b_[B2_]) - (a_[A2_] * b_[B1_]) </para>
+	/// <para> [1] = (a_[A2_] * b_[B0_]) - (a_[A0_] * b_[B2_]) </para>
+	/// <para> [2] = (a_[A0_] * b_[B1_]) - (a_[A1_] * b_[B0_]) </para>
+	/// <para> [...] = default, or implied 0 if default construction is not possible. </para>
+	/// <para> Unlike most EmuMath Vector functions, if no OutSize_ is provided this will always default to 3 instead of SizeA_, due to the meaning of cross products. </para>
+	/// </summary>
+	/// <param name="a_">: EmuMath Vector appearing as `a_` in the listed calculations.</param>
+	/// <param name="b_">: EmuMath Vector appearing as `b_` in the listed calculations.</param>
+	/// <returns>3D cross product of EmuMath Vectors a_ and b_, using theoretical indices A0_, A1_, A2_ from a_, and B0_, B1_, B2_ from b_.</returns>
+	template
+	<
+		std::size_t OutSize_,
+		typename OutT_,
+		std::size_t A0_,
+		std::size_t A1_,
+		std::size_t A2_,
+		std::size_t B0_,
+		std::size_t B1_,
+		std::size_t B2_,
+		std::size_t SizeA_,
+		typename TA_,
+		std::size_t SizeB_,
+		typename TB_
+	>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_cross_3d(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	{
+		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, OutSize_, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>(a_, b_);
+	}
+
+	template
+	<
+		typename OutT_,
+		std::size_t A0_,
+		std::size_t A1_,
+		std::size_t A2_,
+		std::size_t B0_,
+		std::size_t B1_,
+		std::size_t B2_,
+		std::size_t SizeA_,
+		typename TA_,
+		std::size_t SizeB_,
+		typename TB_
+	>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> new_vector_cross_3d(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	{
+		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, 3, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>(a_, b_);
+	}
+
+	template
+	<
+		std::size_t OutSize_,
+		std::size_t A0_,
+		std::size_t A1_,
+		std::size_t A2_,
+		std::size_t B0_,
+		std::size_t B1_,
+		std::size_t B2_,
+		std::size_t SizeA_,
+		typename TA_,
+		std::size_t SizeB_,
+		typename TB_
+	>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> new_vector_cross_3d
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& a_,
+		const EmuMath::NewVector<SizeB_, TB_>& b_
+	)
+	{
+		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, OutSize_, a_fp, A0_, A1_, A2_, B0_, B1_, B2_>(a_, b_);
+	}
+
+	template
+	<
+		std::size_t A0_,
+		std::size_t A1_,
+		std::size_t A2_,
+		std::size_t B0_,
+		std::size_t B1_,
+		std::size_t B2_,
+		typename TA_,
+		std::size_t SizeA_,
+		std::size_t SizeB_,
+		typename TB_
+	>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<3, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> new_vector_cross_3d
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& a_,
+		const EmuMath::NewVector<SizeB_, TB_>& b_
+	)
+	{
+		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, 3, a_fp, A0_, A1_, A2_, B0_, B1_, B2_>(a_, b_);
 	}
 #pragma endregion
 }

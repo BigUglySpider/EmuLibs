@@ -4901,6 +4901,95 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::new_vector_angle<preferred_floating_point, Radians_>(*this, vector_b_);
 		}
+
+		/// <summary>
+		/// <para> Outputs the 3D cross product of this Vector and b_, using theoretical indices 0, 1, 2. </para>
+		/// <para> Listed output will be provided for output Vectors which contain at least up to that element (note that this Vector is `a_`): </para>
+		/// <para> [0] = (a_[1] * b_[2]) - (a_[2] * b_[1]) </para>
+		/// <para> [1] = (a_[2] * b_[0]) - (a_[0] * b_[2]) </para>
+		/// <para> [2] = (a_[0] * b_[1]) - (a_[1] * b_[0]) </para>
+		/// <para> [...] = default, or implied 0 if default construction is not possible. </para>
+		/// <para> Unlike most member functions, if no OutSize_ is provided this will always default to 3 instead of this Vector's size, due to the meaning of cross products. </para>
+		/// </summary>
+		/// <param name="b_">: EmuMath Vector appearing as `b_` in the listed calculations.</param>
+		/// <returns>3D cross product of this Vector and b_, using theoretical indices 0, 1, 2.</returns>
+		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
+		{
+			return EmuMath::Helpers::new_vector_cross_3d<OutSize_, OutT_>(*this, b_);
+		}
+		template<typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
+		{
+			return EmuMath::Helpers::new_vector_cross_3d<3, OutT_>(*this, b_);
+		}
+
+		/// <summary>
+		/// <para> Outputs the 3D cross product of this Vector and b_, using theoretical indices I0_, I1_, I2_. </para>
+		/// <para> Listed output will be provided for output Vectors which contain at least up to that element (note that this Vector is `a_`): </para>
+		/// <para> [0] = (a_[I1_] * b_[I2_]) - (a_[I2_] * b_[I1_]) </para>
+		/// <para> [1] = (a_[I2_] * b_[I0_]) - (a_[I0_] * b_[I2_]) </para>
+		/// <para> [2] = (a_[I0_] * b_[I1_]) - (a_[I1_] * b_[I0_]) </para>
+		/// <para> [...] = default, or implied 0 if default construction is not possible. </para>
+		/// <para> Unlike most member functions, if no OutSize_ is provided this will always default to 3 instead of this Vector's size, due to the meaning of cross products. </para>
+		/// </summary>
+		/// <param name="b_">: EmuMath Vector appearing as `b_` in the listed calculations.</param>
+		/// <returns>3D cross product of this Vector and b_, using theoretical indices I0_, I1_, I2_.</returns>
+		template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
+		{
+			return EmuMath::Helpers::new_vector_cross_3d<OutSize_, OutT_, I0_, I1_, I2_>(*this, b_);
+		}
+		template<std::size_t I0_, std::size_t I1_, std::size_t I2_, typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
+		{
+			return EmuMath::Helpers::new_vector_cross_3d<3, OutT_, I0_, I1_, I2_>(*this, b_);
+		}
+
+		/// <summary>
+		/// <para> Outputs the 3D cross product of this Vector and b_, using theoretical indices A0_, A1_, A2_ from this Vector, and B0_, B1_, B2_ from b_. </para>
+		/// <para> Listed output will be provided for output Vectors which contain at least up to that element (note that this Vector is `a_`): </para>
+		/// <para> [0] = (a_[A1_] * b_[B2_]) - (a_[A2_] * b_[B1_]) </para>
+		/// <para> [1] = (a_[A2_] * b_[B0_]) - (a_[A0_] * b_[B2_]) </para>
+		/// <para> [2] = (a_[A0_] * b_[B1_]) - (a_[A1_] * b_[B0_]) </para>
+		/// <para> [...] = default, or implied 0 if default construction is not possible. </para>
+		/// <para> Unlike most member functions, if no OutSize_ is provided this will always default to 3 instead of this Vector's size, due to the meaning of cross products. </para>
+		/// </summary>
+		/// <param name="b_">: EmuMath Vector appearing as `b_` in the listed calculations.</param>
+		/// <returns>3D cross product of this Vector and b_ using theoretical indices A0_, A1_, A2_ from this Vector, and B0_, B1_, B2_ from b_.</returns>
+		template
+		<
+			std::size_t A0_,
+			std::size_t A1_,
+			std::size_t A2_,
+			std::size_t B0_,
+			std::size_t B1_,
+			std::size_t B2_,
+			std::size_t OutSize_,
+			typename OutT_ = preferred_floating_point,
+			std::size_t SizeB_,
+			typename TB_
+		>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
+		{
+			return EmuMath::Helpers::new_vector_cross_3d<OutSize_, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>(*this, b_);
+		}
+		template
+		<
+			std::size_t A0_,
+			std::size_t A1_,
+			std::size_t A2_,
+			std::size_t B0_,
+			std::size_t B1_,
+			std::size_t B2_,
+			typename OutT_ = preferred_floating_point,
+			std::size_t SizeB_,
+			typename TB_
+		>
+			[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
+		{
+			return EmuMath::Helpers::new_vector_cross_3d<3, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>(*this, b_);
+		}
 #pragma endregion
 
 #pragma region GENERIC_CMP_FUNCS

@@ -17,16 +17,24 @@ namespace EmuMath::Helpers::_vector_underlying
 		{
 			return out_type(0);
 		}
-		else if constexpr (std::is_constructible_v<out_type, decltype(0.0)>)
+		else if constexpr (std::is_constructible_v<out_type, decltype(0.0f)>)
 		{
-			return out_type(0.0);
+			return out_type(0.0f);
+		}
+		else if constexpr (EmuCore::TMP::is_static_castable_v<decltype(0), out_type>)
+		{
+			return static_cast<out_type>(0);
+		}
+		else if constexpr (EmuCore::TMP::is_static_castable_v<decltype(0.0f), out_type>)
+		{
+			return static_cast<out_type>(0.0f);
 		}
 		else
 		{
 			static_assert
 			(
 				EmuCore::TMP::get_false<Vector_>(),
-				"Attempted to safely retrieve a non-contained value from an EmuMath Vector, but the contained type cannot be default-constructed or constructed with an argument of either `0` or `0.0`. As non-contained elements are implied default/zero, this behaviour is required to safely retrieve a non-contained element."
+				"Attempted to safely retrieve a non-contained value from an EmuMath Vector, but the contained type cannot be default-constructed or constructed/static_cast to with an argument of either `0` or `0.0f`. As non-contained elements are implied default/zero, this behaviour is required to safely retrieve a non-contained element."
 			);
 		}
 	}
