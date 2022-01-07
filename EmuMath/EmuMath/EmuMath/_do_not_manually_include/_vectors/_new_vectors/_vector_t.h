@@ -4986,9 +4986,121 @@ namespace EmuMath
 			std::size_t SizeB_,
 			typename TB_
 		>
-			[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
+		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
 		{
 			return EmuMath::Helpers::new_vector_cross_3d<3, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>(*this, b_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the squared distance between this Vector and to_. Equivalent to the square magnitude of (to_ - this_vector). </para>
+		/// <para> IncludeNonContained_: If true, all contained-indices will be used for forming the distance. Otherwise, only the indices of the smallest Vector will be used. </para>
+		/// </summary>
+		/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
+		/// <returns>Distance between this Vector and to_ before a square root operation is performed.</returns>
+		template<typename Out_ = preferred_floating_point, bool IncludeNonContained_ = true, std::size_t ToSize_, typename ToT_>
+		[[nodiscard]] constexpr inline Out_ SquareDistance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		{
+			return EmuMath::Helpers::new_vector_square_distance<Out_, IncludeNonContained_>(*this, to_);
+		}
+		template<bool IncludeNonContained_, std::size_t ToSize_, typename ToT_>
+		[[nodiscard]] constexpr inline preferred_floating_point SquareDistance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		{
+			return EmuMath::Helpers::new_vector_square_distance<preferred_floating_point, IncludeNonContained_>(*this, to_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the squared distance between this Vector and to_. Equivalent to the square magnitude of (to_ - this_vector). </para>
+		/// <para> IncludeNonContained_: If true, all contained-indices will be used for forming the distance. Otherwise, only the indices of the smallest Vector will be used. </para>
+		/// </summary>
+		/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
+		/// <returns>Distance between this Vector and to_ before a square root operation is performed.</returns>
+		template<typename Out_ = preferred_floating_point, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ToSize_, typename ToT_>
+		[[nodiscard]] constexpr inline Out_ SquareDistance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		{
+			return EmuMath::Helpers::new_vector_square_distance<Out_, BeginIndex_, EndIndex_>(*this, to_);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ToSize_, typename ToT_>
+		[[nodiscard]] constexpr inline preferred_floating_point SquareDistance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		{
+			return EmuMath::Helpers::new_vector_square_distance<preferred_floating_point, BeginIndex_, EndIndex_>(*this, to_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the distance between this Vector and to_. Equivalent to the magnitude of (to_ - this_vector). </para>
+		/// <para> IncludeNonContained_: If true, all contained-indices will be used for forming the distance. Otherwise, only the indices of the smallest Vector will be used. </para>
+		/// <para> For a guarantee to be constexpr-evaluable if possible, use DistanceConstexpr instead. </para>
+		/// </summary>
+		/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
+		/// <returns>Distance between this Vector and to_ before a square root operation is performed.</returns>
+		template<typename Out_ = preferred_floating_point, bool IncludeNonContained_ = true, std::size_t ToSize_, typename ToT_>
+		[[nodiscard]] constexpr inline Out_ Distance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		{
+			return EmuMath::Helpers::new_vector_distance<Out_, IncludeNonContained_>(*this, to_);
+		}
+		template<bool IncludeNonContained_, std::size_t ToSize_, typename ToT_>
+		[[nodiscard]] constexpr inline preferred_floating_point Distance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		{
+			return EmuMath::Helpers::new_vector_distance<preferred_floating_point, IncludeNonContained_>(*this, to_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the distance between this Vector and to_. Equivalent to the magnitude of (to_ - this_vector). </para>
+		/// <para> IncludeNonContained_: If true, all contained-indices will be used for forming the distance. Otherwise, only the indices of the smallest Vector will be used. </para>
+		/// <para> For a guarantee to be constexpr-evaluable if possible, use DistanceConstexpr instead. </para>
+		/// </summary>
+		/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
+		/// <returns>Distance between this Vector and to_.</returns>
+		template<typename Out_ = preferred_floating_point, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ToSize_, typename ToT_>
+		[[nodiscard]] constexpr inline Out_ Distance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		{
+			return EmuMath::Helpers::new_vector_distance<Out_, BeginIndex_, EndIndex_>(*this, to_);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ToSize_, typename ToT_>
+		[[nodiscard]] constexpr inline preferred_floating_point Distance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		{
+			return EmuMath::Helpers::new_vector_distance<preferred_floating_point, BeginIndex_, EndIndex_>(*this, to_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the distance between this Vector and to_. Equivalent to the magnitude of (to_ - this_vector). </para>
+		/// <para> IncludeNonContained_: If true, all contained-indices will be used for forming the distance. Otherwise, only the indices of the smallest Vector will be used. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
+		/// <returns>Distance between this Vector and to_ before a square root operation is performed.</returns>
+		template<typename Out_ = preferred_floating_point, bool IncludeNonContained_ = true, std::size_t ToSize_, typename ToT_>
+		[[nodiscard]] constexpr inline Out_ DistanceConstexpr(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		{
+			return EmuMath::Helpers::new_vector_distance_constexpr<Out_, IncludeNonContained_>(*this, to_);
+		}
+		template<bool IncludeNonContained_, std::size_t ToSize_, typename ToT_>
+		[[nodiscard]] constexpr inline preferred_floating_point DistanceConstexpr(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		{
+			return EmuMath::Helpers::new_vector_distance_constexpr<preferred_floating_point, IncludeNonContained_>(*this, to_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the distance between this Vector and to_. Equivalent to the magnitude of (to_ - this_vector). </para>
+		/// <para> IncludeNonContained_: If true, all contained-indices will be used for forming the distance. Otherwise, only the indices of the smallest Vector will be used. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
+		/// <returns>Distance between this Vector and to_.</returns>
+		template<typename Out_ = preferred_floating_point, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ToSize_, typename ToT_>
+		[[nodiscard]] constexpr inline Out_ DistanceConstexpr(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		{
+			return EmuMath::Helpers::new_vector_distance_constexpr<Out_, BeginIndex_, EndIndex_>(*this, to_);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ToSize_, typename ToT_>
+		[[nodiscard]] constexpr inline preferred_floating_point DistanceConstexpr(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		{
+			return EmuMath::Helpers::new_vector_distance_constexpr<preferred_floating_point, BeginIndex_, EndIndex_>(*this, to_);
 		}
 #pragma endregion
 

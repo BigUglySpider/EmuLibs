@@ -15,6 +15,9 @@
 // --- angle_cos
 // --- angle
 // --- cross_3d
+// --- square_distance
+// --- distance
+// --- distance_constexpr
 
 namespace EmuMath::Helpers
 {
@@ -677,6 +680,165 @@ namespace EmuMath::Helpers
 	{
 		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, 3, a_fp, A0_, A1_, A2_, B0_, B1_, B2_>(a_, b_);
+	}
+#pragma endregion
+
+#pragma region SQUARE_DISTANCE_FUNCS
+	/// <summary>
+	/// <para> Calculates the squared distance between EmuMath Vectors from_ and to_. Equivalent to the square magnitude of (to_ - from_). </para>
+	/// <para> IncludeNonContained_: If true, all contained-indices will be used for forming the distance. Otherwise, only the indices of the smallest Vector will be used. </para>
+	/// </summary>
+	/// <param name="from_">: EmuMath Vector to calculate the distance from.</param>
+	/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
+	/// <returns>Distance between the two passed EmuMath Vectors before a square root operation is performed.</returns>
+	template<typename Out_, bool IncludeNonContained_ = true, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
+	[[nodiscard]] constexpr inline Out_ new_vector_square_distance(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	{
+		return _vector_underlying::_vector_square_distance<IncludeNonContained_, Out_>(from_, to_);
+	}
+
+	template<bool IncludeNonContained_ = true, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point new_vector_square_distance
+	(
+		const EmuMath::NewVector<FromSize_, FromT_>& from_,
+		const EmuMath::NewVector<ToSize_, ToT_>& to_
+	)
+	{
+		return _vector_underlying::_vector_square_distance<IncludeNonContained_, typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point>(from_, to_);
+	}
+
+	/// <summary>
+	/// <para> Calculates the squared distance between EmuMath Vectors from_ and to_. Equivalent to the square magnitude of (to_ - from_). </para>
+	/// <para> BeginIndex_: Inclusive index at which to start reading from Vectors for calculating distance. </para>
+	/// <para> EndIndex_: Exclusive index at which to stop reading from Vectors for calculating distance. </para>
+	/// </summary>
+	/// <param name="from_">: EmuMath Vector to calculate the distance from.</param>
+	/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
+	/// <returns>Distance between the two passed EmuMath Vectors before a square root operation is performed.</returns>
+	template<typename Out_, std::size_t BeginIndex_, std::size_t EndIndex_, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
+	[[nodiscard]] constexpr inline Out_ new_vector_square_distance(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	{
+		return _vector_underlying::_vector_square_distance<BeginIndex_, EndIndex_, Out_>(from_, to_);
+	}
+
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point new_vector_square_distance
+	(
+		const EmuMath::NewVector<FromSize_, FromT_>& from_,
+		const EmuMath::NewVector<ToSize_, ToT_>& to_
+	)
+	{
+		return _vector_underlying::_vector_square_distance<BeginIndex_, EndIndex_, typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point>(from_, to_);
+	}
+#pragma endregion
+
+#pragma region DISTANCE_FUNCS
+	/// <summary>
+	/// <para> Calculates the distance between EmuMath Vectors from_ and to_. Equivalent to the magnitude of (to_ - from_). </para>
+	/// <para> IncludeNonContained_: If true, all contained-indices will be used for forming the distance. Otherwise, only the indices of the smallest Vector will be used. </para>
+	/// <para> For a guarantee to be constexpr-evaluable if possible, use vector_distance_constexpr instead. </para>
+	/// </summary>
+	/// <param name="from_">: EmuMath Vector to calculate the distance from.</param>
+	/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
+	/// <returns>Distance between the two passed EmuMath Vectors.</returns>
+	template<typename Out_, bool IncludeNonContained_ = true, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
+	[[nodiscard]] constexpr inline Out_ new_vector_distance(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	{
+		return _vector_underlying::_vector_distance<EmuCore::do_sqrt, IncludeNonContained_, Out_>(from_, to_);
+	}
+
+	template<bool IncludeNonContained_ = true, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point new_vector_distance
+	(
+		const EmuMath::NewVector<FromSize_, FromT_>& from_,
+		const EmuMath::NewVector<ToSize_, ToT_>& to_
+	)
+	{
+		return _vector_underlying::_vector_distance<EmuCore::do_sqrt, IncludeNonContained_, typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point>(from_, to_);
+	}
+
+	/// <summary>
+	/// <para> Calculates the distance between EmuMath Vectors from_ and to_. Equivalent to the magnitude of (to_ - from_). </para>
+	/// <para> BeginIndex_: Inclusive index at which to start reading from Vectors for calculating distance. </para>
+	/// <para> EndIndex_: Exclusive index at which to stop reading from Vectors for calculating distance. </para>
+	/// <para> For a guarantee to be constexpr-evaluable if possible, use vector_distance_constexpr instead. </para>
+	/// </summary>
+	/// <param name="from_">: EmuMath Vector to calculate the distance from.</param>
+	/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
+	/// <returns>Distance between the two passed EmuMath Vectors.</returns>
+	template<typename Out_, std::size_t BeginIndex_, std::size_t EndIndex_, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
+	[[nodiscard]] constexpr inline Out_ new_vector_distance(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	{
+		return _vector_underlying::_vector_distance<EmuCore::do_sqrt, BeginIndex_, EndIndex_, Out_>(from_, to_);
+	}
+
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point new_vector_distance
+	(
+		const EmuMath::NewVector<FromSize_, FromT_>& from_,
+		const EmuMath::NewVector<ToSize_, ToT_>& to_
+	)
+	{
+		return _vector_underlying::_vector_distance<EmuCore::do_sqrt, BeginIndex_, EndIndex_, typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point>(from_, to_);
+	}
+#pragma endregion
+
+#pragma region DISTANCE_CONSTEXPR_FUNCS
+	/// <summary>
+	/// <para> Calculates the distance between EmuMath Vectors from_ and to_. Equivalent to the magnitude of (to_ - from_). </para>
+	/// <para> IncludeNonContained_: If true, all contained-indices will be used for forming the distance. Otherwise, only the indices of the smallest Vector will be used. </para>
+	/// <para>
+	///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+	///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+	/// </para>
+	/// </summary>
+	/// <param name="from_">: EmuMath Vector to calculate the distance from.</param>
+	/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
+	/// <returns>Distance between the two passed EmuMath Vectors.</returns>
+	template<typename Out_, bool IncludeNonContained_ = true, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
+	[[nodiscard]] constexpr inline Out_ new_vector_distance_constexpr(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	{
+		return _vector_underlying::_vector_distance<EmuCore::do_sqrt_constexpr, IncludeNonContained_, Out_>(from_, to_);
+	}
+
+	template<bool IncludeNonContained_ = true, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point new_vector_distance_constexpr
+	(
+		const EmuMath::NewVector<FromSize_, FromT_>& from_,
+		const EmuMath::NewVector<ToSize_, ToT_>& to_
+	)
+	{
+		using from_fp = typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point;
+		return _vector_underlying::_vector_distance<EmuCore::do_sqrt_constexpr, IncludeNonContained_, from_fp>(from_, to_);
+	}
+
+	/// <summary>
+	/// <para> Calculates the distance between EmuMath Vectors from_ and to_. Equivalent to the magnitude of (to_ - from_). </para>
+	/// <para> BeginIndex_: Inclusive index at which to start reading from Vectors for calculating distance. </para>
+	/// <para> EndIndex_: Exclusive index at which to stop reading from Vectors for calculating distance. </para>
+	/// <para>
+	///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+	///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+	/// </para>
+	/// </summary>
+	/// <param name="from_">: EmuMath Vector to calculate the distance from.</param>
+	/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
+	/// <returns>Distance between the two passed EmuMath Vectors.</returns>
+	template<typename Out_, std::size_t BeginIndex_, std::size_t EndIndex_, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
+	[[nodiscard]] constexpr inline Out_ new_vector_distance_constexpr(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	{
+		return _vector_underlying::_vector_distance<EmuCore::do_sqrt_constexpr, BeginIndex_, EndIndex_, Out_>(from_, to_);
+	}
+
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
+	[[nodiscard]] constexpr inline typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point new_vector_distance_constexpr
+	(
+		const EmuMath::NewVector<FromSize_, FromT_>& from_,
+		const EmuMath::NewVector<ToSize_, ToT_>& to_
+	)
+	{
+		using from_fp = typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point;
+		return _vector_underlying::_vector_distance<EmuCore::do_sqrt_constexpr, BeginIndex_, EndIndex_, from_fp>(from_, to_);
 	}
 #pragma endregion
 }

@@ -1159,7 +1159,19 @@ int main()
 	std::is_convertible_v<EmuMath::NewVector<3, float>, EmuMath::NewVector<4, float>>;
 	EmuCore::TMP::is_static_castable_v<EmuMath::NewVector<3, float>, EmuMath::NewVector<12, float>>;
 
-
+	std::cout << "\n---\n";
+	constexpr auto dist_a_ = EmuMath::Helpers::new_vector_make<int>(1, 2, 3);
+	constexpr auto dist_b_ = EmuMath::Helpers::new_vector_make<float>(0.5, 2.5, 3);
+	constexpr auto sqr_dist_ab_ = dist_a_.SquareDistance(dist_b_);
+	constexpr auto sqr_dist_ba_ = dist_b_.SquareDistance(dist_a_);
+	constexpr auto b_minus_a_ = dist_b_.Subtract(dist_a_);
+	constexpr auto a_minus_b_ = dist_a_.Subtract<float>(dist_b_);
+	constexpr auto sqr_mag_b_minus_a_ = dist_b_.Subtract(dist_a_).SquareMagnitude();
+	constexpr auto sqr_mag_a_minus_b_ = dist_a_.Subtract<float>(dist_b_).SquareMagnitude();
+	constexpr auto dist_ab_ = dist_a_.DistanceConstexpr(dist_b_);
+	constexpr auto dist_ab_squared_ = dist_ab_ * dist_ab_;
+	constexpr auto equal_check_ = EmuCore::do_cmp_equal_to<void>()(dist_ab_squared_, sqr_dist_ab_);
+	constexpr auto near_check_ = EmuCore::do_cmp_near_equal<void>()(dist_ab_squared_, sqr_dist_ab_);
 
 	system("pause");
 

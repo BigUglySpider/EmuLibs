@@ -131,6 +131,119 @@ namespace EmuMath::Helpers::_vector_underlying
 			}
 		}
 	};
+
+	template
+	<
+		template<class...> class SubTemplate_,
+		template<class...> class AddAssignTemplate_,
+		template<class...> class MulTemplate_,
+		std::size_t FromSize_,
+		typename FromT_,
+		std::size_t ToSize_,
+		typename ToT_
+	>
+	struct _vector_dist_square_calculator
+	{
+	public:
+		using from_vector = EmuMath::NewVector<FromSize_, FromT_>;
+		using to_vector = EmuMath::NewVector<ToSize_, ToT_>;
+		using from_value = typename from_vector::value_type;
+		using to_value = typename to_vector::value_type;
+		using from_value_uq = EmuCore::TMP::remove_ref_cv_t<from_value>;
+		using to_value_uq = EmuCore::TMP::remove_ref_cv_t<to_value>;
+
+		using sub_instantiator = EmuCore::TMP::safe_template_instantiate<SubTemplate_, to_value_uq, from_value_uq>;
+		using Sub_ = typename sub_instantiator::type;
+		using sub_result_checker = EmuCore::TMP::safe_invoke_result<Sub_, const to_value&, const from_value&>;
+		using sub_result = typename sub_result_checker::type;
+		using sub_result_uq = EmuCore::TMP::remove_ref_cv_t<sub_result>;
+
+		using mul_instantiator = EmuCore::TMP::safe_template_instantiate<MulTemplate_, sub_result_uq, sub_result_uq>;
+		using Mul_ = typename mul_instantiator::type;
+		using mul_result_checker = EmuCore::TMP::safe_invoke_result<Mul_, sub_result, sub_result>;
+		using mul_result = typename mul_result_checker::type;
+
+		using result_type = std::conditional_t<std::is_void_v<mul_result>, char, mul_result>;
+
+		constexpr _vector_dist_square_calculator() : square_distance()
+		{
+		}
+
+		constexpr inline void operator()(const from_value& from_, const to_value& to_)
+		{
+			if constexpr (sub_instantiator::value)
+			{
+				if constexpr (sub_result_checker::value)
+				{
+					if constexpr (mul_instantiator::value)
+					{
+						if constexpr (mul_result_checker::value)
+						{
+							if constexpr (EmuCore::TMP::valid_template_args_v<AddAssignTemplate_, result_type, mul_result>)
+							{
+								using AddAssign_ = AddAssignTemplate_<result_type, mul_result>;
+								if constexpr (std::is_invocable_v<AddAssign_, result_type&, mul_result>)
+								{
+									sub_result to_sub_from_ = Sub_()(to_, from_);
+									AddAssign_()(square_distance, Mul_()(to_sub_from_, to_sub_from_));
+								}
+								else
+								{
+									static_assert
+									(
+										EmuCore::TMP::get_false<AddAssign_>(),
+										"Attempted to calculate the square distance between two EmuMath Vectors, but the instantiated add-assign functor could not be invoked with a reference to the result type and a value of the multiplication result type as arguments."
+									);
+								}
+							}
+							else
+							{
+								static_assert
+								(
+									EmuCore::TMP::get_false<result_type>(),
+									"Attempted to calculate the square distance between two EmuMath Vectors, but an add-assign functor could not be successfully instantiated with the result type and multiplication result type as type arguments."
+								);
+							}
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<mul_result_checker>(),
+								"Attempted to calculate the square distance between two EmuMath Vectors, but the instantiated multiplication functor could not be invoked with two subtraction results as arguments."
+							);
+						}
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<mul_instantiator>(),
+							"Attempted to calculate the square distance between two EmuMath Vectors, but a multiplication functor could not be successfully instantiated with the result of subtraction used twice as type arguments."
+						);
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<sub_result_checker>(),
+						"Attempted to calculate the square distance between two EmuMath Vectors, but the instaniated subtraction functor could not be invoked with a const reference to each Vector's value_type as arguments."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<sub_instantiator>(),
+					"Attempted to calculate the square distance between two EmuMath Vectors, but a subtraction functor could not be successfully instantiated with the unqualified value_type of both Vectors as type arguments."
+				);
+			}
+		}
+
+		result_type square_distance;
+	};
 #pragma endregion
 
 #pragma region TYPE_HELPERS
@@ -794,6 +907,192 @@ namespace EmuMath::Helpers::_vector_underlying
 	{
 		using index_sequence_ = std::make_index_sequence<EmuMath::NewVector<OutSize_, OutT_>::size>;
 		return _vector_cross_3d_build_out<MulTemplate_, SubTemplate_, OutSize_, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>(a_, b_, index_sequence_());
+	}
+
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_, std::size_t FromSize_, typename FromT_, std::size_t ToSize_, typename ToT_>
+	[[nodiscard]] constexpr inline Out_ _vector_square_distance(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	{
+		if constexpr (BeginIndex_ < EndIndex_)
+		{
+			using Func_ = _vector_dist_square_calculator<EmuCore::do_subtract, EmuCore::do_add_assign, EmuCore::do_multiply, FromSize_, FromT_, ToSize_, ToT_>;
+			Func_ func_ = Func_();
+			_vector_mutate_invoke_only<Func_&, BeginIndex_, EndIndex_>(func_, from_, to_);
+
+			using result_moved = decltype(std::move(func_.square_distance));
+			if constexpr (std::is_constructible_v<Out_, result_moved>)
+			{
+				return Out_(std::move(func_.square_distance));
+			}
+			else if constexpr (EmuCore::TMP::is_static_castable_v<result_moved, Out_>)
+			{
+				return static_cast<Out_>(std::move(func_.square_distance));
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Out_>(),
+					"Attempted to calculate the square distance between two EmuMath Vectors, but the type used for calculation cannot be used to form the provided Out_ type."
+				);
+			}
+		}
+		else
+		{
+			if constexpr (std::is_default_constructible_v<Out_>())
+			{
+				return Out_();
+			}
+			else if constexpr(std::is_constructible_v<Out_, decltype(0)>)
+			{
+				return Out_(0);
+			}
+			else if constexpr (std::is_constructible_v<Out_, decltype(0.0f)>)
+			{
+				return Out_(0.0f);
+			}
+			else if constexpr (EmuCore::TMP::is_static_castable_v<decltype(0), Out_>)
+			{
+				return static_cast<Out_>(0);
+			}
+			else if constexpr (EmuCore::TMP::is_static_castable_v<decltype(0.0f), Out_>)
+			{
+				return static_cast<Out_>(0.0f);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Out_>(),
+					"Attempted to calculate the square distance between two EmuMath Vectors, but the provided index range would result in no axes to compare. This is okay, but results in output of default-or-zero, which is not possible with the provided Out_ type."
+				);
+			}
+		}
+	}
+
+	template<bool IncludeNonContained_, typename Out_, std::size_t FromSize_, typename FromT_, std::size_t ToSize_, typename ToT_>
+	[[nodiscard]] constexpr inline Out_ _vector_square_distance(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	{
+		constexpr std::size_t from_size_ = EmuMath::NewVector<FromSize_, FromT_>::size;
+		constexpr std::size_t to_size_ = EmuMath::NewVector<ToSize_, ToT_>::size;
+		constexpr std::size_t smallest_size_ = (from_size_ <= to_size_) ? from_size_ : to_size_;
+		constexpr std::size_t greatest_size_ = (from_size_ >= to_size_) ? from_size_ : to_size_;
+
+		return _vector_square_distance<0, IncludeNonContained_ ? greatest_size_ : smallest_size_, Out_>(from_, to_);
+	}
+
+	template
+	<
+		template<class...> class SqrtTemplate_,
+		std::size_t BeginIndex_,
+		std::size_t EndIndex_,
+		typename Out_,
+		std::size_t FromSize_,
+		typename FromT_,
+		std::size_t ToSize_,
+		typename ToT_
+	>
+	[[nodiscard]] constexpr inline Out_ _vector_distance(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	{
+		if constexpr (BeginIndex_ < EndIndex_)
+		{
+			using Func_ = _vector_dist_square_calculator<EmuCore::do_subtract, EmuCore::do_add_assign, EmuCore::do_multiply, FromSize_, FromT_, ToSize_, ToT_>;
+			Func_ func_ = Func_();
+			_vector_mutate_invoke_only<Func_&, BeginIndex_, EndIndex_>(func_, from_, to_);
+
+			using square_mag_type = typename Func_::result_type;
+			using square_mag_type_uq = EmuCore::TMP::remove_ref_cv_t<square_mag_type>;
+			if constexpr (EmuCore::TMP::valid_template_args_v<SqrtTemplate_, square_mag_type_uq>)
+			{
+				using Sqrt_ = SqrtTemplate_<square_mag_type_uq>;
+				if constexpr (std::is_invocable_v<Sqrt_, std::add_lvalue_reference_t<square_mag_type>>)
+				{
+					using sqrt_result = std::invoke_result_t<Sqrt_, std::add_lvalue_reference_t<square_mag_type>>;
+					if constexpr (std::is_constructible_v<Out_, sqrt_result>)
+					{
+						return Out_(Sqrt_()(func_.square_distance));
+					}
+					else if constexpr (EmuCore::TMP::is_static_castable_v<sqrt_result, Out_>)
+					{
+						return static_cast<Out_>(Sqrt_()(func_.square_distance));
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<Sqrt_>(),
+							"Attempted to calculate the distance between two EmuMath Vectors, but the provided Out_ type could not be formed from the result of obtaining the square root of the squared distance."
+						);
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Sqrt_>(),
+						"Attempted to calculate the distance between two EmuMath Vectors, but the square-root functor could not be invoked with a reference to the squared distance."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<square_mag_type>(),
+					"Attempted to calculate distance between two EmuMath Vectors, but the square-root template could not be instantiated with the result type for calculating the squared distance."
+				);
+			}
+		}
+		else
+		{
+			if constexpr (std::is_default_constructible_v<Out_>())
+			{
+				return Out_();
+			}
+			else if constexpr(std::is_constructible_v<Out_, decltype(0)>)
+			{
+				return Out_(0);
+			}
+			else if constexpr (std::is_constructible_v<Out_, decltype(0.0f)>)
+			{
+				return Out_(0.0f);
+			}
+			else if constexpr (EmuCore::TMP::is_static_castable_v<decltype(0), Out_>)
+			{
+				return static_cast<Out_>(0);
+			}
+			else if constexpr (EmuCore::TMP::is_static_castable_v<decltype(0.0f), Out_>)
+			{
+				return static_cast<Out_>(0.0f);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Out_>(),
+					"Attempted to calculate the distance between two EmuMath Vectors, but the provided index range would result in no axes to compare. This is okay, but results in output of default-or-zero, which is not possible with the provided Out_ type."
+				);
+			}
+		}
+	}
+
+	template
+	<
+		template<class...> class SqrtTemplate_,
+		bool IncludeNonContained_,
+		typename Out_,
+		std::size_t FromSize_,
+		typename FromT_,
+		std::size_t ToSize_,
+		typename ToT_
+	>
+	[[nodiscard]] constexpr inline Out_ _vector_distance(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	{
+		constexpr std::size_t from_size_ = EmuMath::NewVector<FromSize_, FromT_>::size;
+		constexpr std::size_t to_size_ = EmuMath::NewVector<ToSize_, ToT_>::size;
+		constexpr std::size_t smallest_size_ = (from_size_ <= to_size_) ? from_size_ : to_size_;
+		constexpr std::size_t greatest_size_ = (from_size_ >= to_size_) ? from_size_ : to_size_;
+
+		return _vector_distance<SqrtTemplate_, 0, IncludeNonContained_ ? greatest_size_ : smallest_size_, Out_>(from_, to_);
 	}
 }
 

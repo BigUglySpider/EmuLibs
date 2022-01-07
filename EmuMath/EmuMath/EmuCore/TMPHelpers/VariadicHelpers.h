@@ -1,10 +1,72 @@
 #ifndef EMU_CORE_VARIADIC_HELPERS_H_INC_
 #define EMU_CORE_VARIADIC_HELPERS_H_INC_ 1
 
+#include "TypeComparators.h"
 #include <utility>
 
 namespace EmuCore::TMP
 {
+#pragma region TEMPLATE_HELPERS
+	/// <summary>
+	/// <para> Helper to safely instantiate a Template_ from variadic Args_, cancelling instantiation if it is a failure. </para>
+	/// <para> If instantiation fails, type will be void. Otherwise, it will be an instance of Template_ instantiated with the provided Args_. </para>
+	/// <para> Static member value may also be used to determine success (true if successful, otherwise false). </para>
+	/// </summary>
+	/// <typeparam name="Args_">All type arguments to attempt to instantiate Template_ with.</typeparam>
+	template<template<class...> class Template_, class...Args_>
+	struct safe_template_instantiate
+	{
+	private:
+		template<template<class...> class ToInstantiate_, bool IsValid_ = EmuCore::TMP::valid_template_args_v<ToInstantiate_, Args_...>>
+		struct _instantiator
+		{
+			static constexpr bool value = false;
+			using type = void;
+		};
+		template<template<class...> class ToInstantiate_>
+		struct _instantiator<ToInstantiate_, true>
+		{
+			static constexpr bool value = true;
+			using type = ToInstantiate_<Args_...>;
+		};
+
+		using _make_instance = _instantiator<Template_>;
+
+	public:
+		static constexpr bool value = _make_instance::value;
+		using type = typename _make_instance::type;
+	};
+
+	/// <summary>
+	/// <para> Helper to safely use std::invoke_result on a Func_ that may or may not be invocable with the provided Args_. </para>
+	/// <para> Type will be void upon failure, but does not directly indicate failure. For such checks, use value, which will be true on success and false on failure. </para>
+	/// </summary>
+	/// <typeparam name="Args_">All types to invoke Func_ with.</typeparam>
+	template<class Func_, class...Args_>
+	struct safe_invoke_result
+	{
+	private:
+		template<class ToInvoke_, bool IsInvocable_ = std::is_invocable_v<ToInvoke_, Args_...>>
+		struct _checker
+		{
+			static constexpr bool value = false;
+			using type = void;
+		};
+		template<class ToInvoke_>
+		struct _checker<ToInvoke_, true>
+		{
+			static constexpr bool value = true;
+			using type = std::invoke_result_t<ToInvoke_, Args_...>;
+		};
+
+		using _check = _checker<Func_>;
+
+	public:
+		static constexpr bool value = _check::value;
+		using type = typename _check::type;
+	};
+#pragma endregion
+
 #pragma region TYPE_EXTRACTORS
 	/// <summary>
 	/// <para> Aliases a type T_, and ignores the provided Discarded_ type. </para>
