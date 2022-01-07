@@ -5858,7 +5858,7 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region CMP_GREATER_EQUAL_FUNCS
+#pragma region CMP_LESS_EQUAL_FUNCS
 		/// <summary>
 		/// <para> Returns true if the magnitude of this Vector is less than or equal to that of rhs_. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Both Vector's magnitudes will be compared. Otherwise, this Vector's magnitude will be compared with rhs_ directly. </para>
@@ -5966,46 +5966,78 @@ namespace EmuMath
 		/// <para> Offset_: Optional offset at which to start reading this Vector for forming the output cast. Defaults to 0. </para>
 		/// </summary>
 		/// <returns>Cast of this Vector as an EmuMath Vector with the provided OutSize_ and OutT_ args.</returns>
-		template<std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0>
+		template
+		<
+			std::size_t OutSize_,
+			typename OutT_,
+			std::size_t Offset_ = 0,
+			typename = std::enable_if_t<EmuMath::Helpers::new_vector_cast_is_valid<const this_type&, OutSize_, OutT_, Offset_>()>
+		>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Cast() const
 		{
 			return EmuMath::Helpers::new_vector_cast<OutSize_, OutT_, Offset_>(*this);
 		}
-		template<std::size_t OutSize_, std::size_t Offset_ = 0>
+		template
+		<
+			std::size_t OutSize_,
+			std::size_t Offset_ = 0,
+			typename = std::enable_if_t<EmuMath::Helpers::new_vector_cast_is_valid<const this_type&, OutSize_, value_type_uq, Offset_>()>
+		>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, value_type_uq> Cast() const
 		{
 			return EmuMath::Helpers::new_vector_cast<OutSize_, value_type_uq, Offset_>(*this);
 		}
-		template<typename OutT_, std::size_t Offset_ = 0>
+		template
+		<
+			typename OutT_,
+			std::size_t Offset_ = 0,
+			typename = std::enable_if_t<EmuMath::Helpers::new_vector_cast_is_valid<const this_type&, size, OutT_, Offset_>()>
+		>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Cast() const
 		{
 			return EmuMath::Helpers::new_vector_cast<size, OutT_, Offset_>(*this);
 		}
 
-		template<std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0>
+		template
+		<
+			std::size_t OutSize_,
+			typename OutT_,
+			std::size_t Offset_ = 0,
+			typename = std::enable_if_t<EmuMath::Helpers::new_vector_cast_is_valid<this_type&, OutSize_, OutT_, Offset_>()>
+		>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Cast()
 		{
 			return EmuMath::Helpers::new_vector_cast<OutSize_, OutT_, Offset_>(*this);
 		}
-		template<std::size_t OutSize_, std::size_t Offset_ = 0>
+		template
+		<
+			std::size_t OutSize_,
+			std::size_t Offset_ = 0,
+			typename = std::enable_if_t<EmuMath::Helpers::new_vector_cast_is_valid<this_type&, OutSize_, value_type_uq, Offset_>()>
+		>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, value_type_uq> Cast()
 		{
 			return EmuMath::Helpers::new_vector_cast<OutSize_, value_type_uq, Offset_>(*this);
 		}
-		template<typename OutT_, std::size_t Offset_ = 0>
+		template
+		<
+			typename OutT_,
+			std::size_t Offset_ = 0,
+			typename = std::enable_if_t<EmuMath::Helpers::new_vector_cast_is_valid<this_type&, size, OutT_, Offset_>()>
+		>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Cast()
 		{
 			return EmuMath::Helpers::new_vector_cast<size, OutT_, Offset_>(*this);
 		}
 
 		/// <summary> Explicit cast operator for converting this Vector to an alternative EmuMath Vector instance. </summary>
-		template<std::size_t OutSize_, typename OutT_>
+		template<std::size_t OutSize_, typename OutT_, typename = std::enable_if_t<EmuMath::Helpers::new_vector_cast_is_valid<const this_type&, OutSize_, OutT_, 0>()>>
 		explicit constexpr inline operator EmuMath::NewVector<OutSize_, OutT_>() const
 		{
 			return EmuMath::Helpers::new_vector_cast<OutSize_, OutT_, 0>(*this);
 		}
 
-		template<std::size_t OutSize_, typename OutT_>
+		template<std::size_t OutSize_, typename OutT_, typename = std::enable_if_t<EmuMath::Helpers::new_vector_cast_is_valid<this_type&, OutSize_, OutT_, 0>()>>
 		explicit constexpr inline operator EmuMath::NewVector<OutSize_, OutT_>()
 		{
 			return EmuMath::Helpers::new_vector_cast<OutSize_, OutT_, 0>(*this);

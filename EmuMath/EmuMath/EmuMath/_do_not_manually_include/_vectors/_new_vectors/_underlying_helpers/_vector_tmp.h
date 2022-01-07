@@ -259,6 +259,32 @@ namespace EmuMath::TMP
 	};
 	template<template<class...> class Template_, class...Args_>
 	using template_for_emu_vector_args_t = typename template_for_emu_vector_args<Template_, Args_...>::type;
+
+	template<class Vector_>
+	struct emu_vector_template_args
+	{
+	private:
+		template<class In_>
+		struct _generator
+		{
+			static constexpr std::size_t size_ = 0;
+			using t_ = void;
+		};
+		template<std::size_t Size_, typename T_>
+		struct _generator<EmuMath::NewVector<Size_, T_>>
+		{
+			static constexpr std::size_t size_ = Size_;
+			using t_ = T_;
+		};
+
+		using _results = _generator<EmuCore::TMP::remove_ref_cv_t<Vector_>>;
+
+	public:
+		static constexpr bool is_vector = is_emu_new_vector_v<Vector_>;
+		static constexpr std::size_t Size_ = _results::size_;
+		using T_ = typename _results::t_;
+	};
+
 }
 
 #endif

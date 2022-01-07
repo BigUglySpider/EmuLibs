@@ -1157,7 +1157,9 @@ int main()
 	constexpr auto cross_ab_ = cross_a_.Cross3<float>(cross_b_);
 
 	std::is_convertible_v<EmuMath::NewVector<3, float>, EmuMath::NewVector<4, float>>;
-	EmuCore::TMP::is_static_castable_v<EmuMath::NewVector<3, float>, EmuMath::NewVector<4, float>>;
+	EmuCore::TMP::is_static_castable_v<EmuMath::NewVector<3, float>, EmuMath::NewVector<12, float>>;
+
+
 
 	system("pause");
 
