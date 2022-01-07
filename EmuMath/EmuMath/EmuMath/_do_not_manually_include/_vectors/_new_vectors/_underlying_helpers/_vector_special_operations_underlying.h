@@ -792,7 +792,8 @@ namespace EmuMath::Helpers::_vector_underlying
 	>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_cross_3d(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
 	{
-		return _vector_cross_3d_build_out<MulTemplate_, SubTemplate_, OutSize_, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>(a_, b_, std::make_index_sequence<OutSize_>());
+		using index_sequence_ = std::make_index_sequence<EmuMath::NewVector<OutSize_, OutT_>::size>;
+		return _vector_cross_3d_build_out<MulTemplate_, SubTemplate_, OutSize_, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>(a_, b_, index_sequence_());
 	}
 }
 

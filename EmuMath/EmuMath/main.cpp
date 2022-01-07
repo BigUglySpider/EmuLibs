@@ -1152,10 +1152,12 @@ int main()
 	constexpr bool cmp_result_30_ = cmp_vec_a_ <= cmp_vec_c_.MagnitudeConstexpr();
 
 	std::cout << "\n---\n";
-	constexpr auto cross_a_ = EmuMath::Helpers::new_vector_make<float>(2, 3, 4);
-	constexpr auto cross_b_ = EmuMath::Helpers::new_vector_make<int>(5, 6, 7);
-	constexpr auto cross_ab_ = cross_a_.Cross3<2, 1, 4, 0, 1, 2, long double>(cross_b_);
+	constexpr auto cross_a_ = EmuMath::Helpers::new_vector_make<int>(2, 3, 4);
+	constexpr auto cross_b_ = EmuMath::Helpers::new_vector_make<float>(5, 6.5, 7.3);
+	constexpr auto cross_ab_ = cross_a_.Cross3<float>(cross_b_);
 
+	std::is_convertible_v<EmuMath::NewVector<3, float>, EmuMath::NewVector<4, float>>;
+	EmuCore::TMP::is_static_castable_v<EmuMath::NewVector<3, float>, EmuMath::NewVector<4, float>>;
 
 	system("pause");
 
