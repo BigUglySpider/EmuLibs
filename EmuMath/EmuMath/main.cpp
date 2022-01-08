@@ -1185,6 +1185,26 @@ int main()
 	DirectX::XMStoreFloat3(&reflect_dxm_, reflect_dxm_simd_);
 	std::cout << "DXM: " << "{ " << reflect_dxm_.x << ", " << reflect_dxm_.y << ", " << reflect_dxm_.z << " }\n";
 
+	std::cout << "\n---\n";
+	constexpr auto p0_ = EmuMath::Helpers::new_vector_make<float>(-1, 1, 2);
+	constexpr auto p1_ = EmuMath::Helpers::new_vector_make<int>(-4, 2, 2);
+	constexpr auto p2_ = EmuMath::Helpers::new_vector_make<long double>(-2, 1, 5);
+	//constexpr auto norm_p0p1p2_no_norm_ = EmuMath::Helpers::new_vector_normal_to_plane_3d_no_norm(p0_, p1_, p2_);
+	constexpr auto norm_p0p1p2_no_norm_ = p0_.NormalToPlane3NoNorm(p1_, p2_);
+	//constexpr auto norm_p0p1p2_ = EmuMath::Helpers::new_vector_normal_to_plane_3d_constexpr(p0_, p1_, p2_);
+	constexpr auto norm_p0p1p2_ = p0_.NormalToPlane3Constexpr(p1_, p2_);
+
+	constexpr DirectX::XMFLOAT3 p0_xm_ = DirectX::XMFLOAT3(p0_.at<0>(), p0_.at<1>(), p0_.at<2>());
+	constexpr DirectX::XMFLOAT3 p1_xm_ = DirectX::XMFLOAT3(float(p1_.at<0>()), float(p1_.at<1>()), float(p1_.at<2>()));
+	constexpr DirectX::XMFLOAT3 p2_xm_ = DirectX::XMFLOAT3(float(p2_.at<0>()), float(p2_.at<1>()), float(p2_.at<2>()));
+	auto xm_plane_simd_ = DirectX::XMPlaneFromPoints(DirectX::XMLoadFloat3(&p0_xm_), DirectX::XMLoadFloat3(&p1_xm_), DirectX::XMLoadFloat3(&p2_xm_));
+	DirectX::XMFLOAT3 xm_plane_;
+	DirectX::XMStoreFloat3(&xm_plane_, xm_plane_simd_);
+
+	std::cout << "Emu: " << norm_p0p1p2_no_norm_ << "\n";
+	std::cout << "Emu: " << norm_p0p1p2_ << "\n";
+	std::cout << "DXM: " << "{ " << xm_plane_.x << ", " << xm_plane_.y << ", " << xm_plane_.z << " }\n";
+
 	system("pause");
 
 	// COLOURS START

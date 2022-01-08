@@ -1205,6 +1205,70 @@ namespace EmuMath::Helpers::_vector_underlying
 			OutT_
 		>(ray_, normal_);
 	}
+
+	template
+	<
+		template<class...> class MulTemplate_,
+		template<class...> class SubTemplate_,
+		std::size_t OutSize_,
+		typename OutT_,
+		std::size_t ReadOffset_,
+		std::size_t SizeA_,
+		typename TA_,
+		std::size_t SizeB_,
+		typename TB_,
+		std::size_t SizeC_,
+		typename TC_
+	>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_normal_to_plane_3d_no_norm
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& a_,
+		const EmuMath::NewVector<SizeB_, TB_>& b_,
+		const EmuMath::NewVector<SizeC_, TC_>& c_
+	)
+	{
+		using out_fp = typename EmuMath::NewVector<OutSize_, OutT_>::preferred_floating_point;
+		using calc_vector = EmuMath::NewVector<3, out_fp>;
+		return _vector_cross_3d<MulTemplate_, SubTemplate_, OutSize_, OutT_, 0, 1, 2, 0, 1, 2>
+		(
+			_vector_mutate_with_func_template_args_only<SubTemplate_, calc_vector, 0, 3, ReadOffset_>(b_, a_),
+			_vector_mutate_with_func_template_args_only<SubTemplate_, calc_vector, 0, 3, ReadOffset_>(c_, a_)
+		);
+	}
+
+	template
+	<
+		template<class...> class MulTemplate_,
+		template<class...> class SubTemplate_,
+		template<class...> class SqrtTemplate_,
+		std::size_t OutSize_,
+		typename OutT_,
+		std::size_t ReadOffset_,
+		std::size_t SizeA_,
+		typename TA_,
+		std::size_t SizeB_,
+		typename TB_,
+		std::size_t SizeC_,
+		typename TC_
+	>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_normal_to_plane_3d
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& a_,
+		const EmuMath::NewVector<SizeB_, TB_>& b_,
+		const EmuMath::NewVector<SizeC_, TC_>& c_
+	)
+	{
+		using out_fp = typename EmuMath::NewVector<OutSize_, OutT_>::preferred_floating_point;
+		using calc_vector = EmuMath::NewVector<3, out_fp>;
+		return _vector_normalise<SqrtTemplate_, OutSize_, OutT_, 0, 3>
+		(
+			_vector_cross_3d<MulTemplate_, SubTemplate_, 3, out_fp, 0, 1, 2, 0, 1, 2>
+			(
+				_vector_mutate_with_func_template_args_only<SubTemplate_, calc_vector, 0, 3, ReadOffset_>(b_, a_),
+				_vector_mutate_with_func_template_args_only<SubTemplate_, calc_vector, 0, 3, ReadOffset_>(c_, a_)
+			)
+		);
+	}
 }
 
 #endif

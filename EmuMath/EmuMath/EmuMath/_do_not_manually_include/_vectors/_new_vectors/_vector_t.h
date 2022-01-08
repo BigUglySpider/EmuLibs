@@ -5140,6 +5140,97 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::new_vector_reflect_normal<size, OutT_, BeginIndex_, EndIndex_>(*this, surface_normal_);
 		}
+
+		/// <summary>
+		/// <para> Calculates the Vector normal to a plane defined by this Vector and 2 other points in 3D space, before normalisation. </para>
+		/// <para> The result may be summarised as Cross(point_b_ - point_a_, point_c_ - point_a_), where this Vector is `point_a_`. </para>
+		/// <para> ReadOffset_: Optional inclusive index offset at which to start reading Vectors. Defaults to 0. </para>
+		/// <para> Unlike most member functions, if no OutSize_ is provided this will always default to 3 instead of this Vector's size, due to its 3D focus. </para>
+		/// </summary>
+		/// <param name="point_b_">EmuMath Vector to interpret as a 3D cartesian coordinate, appearing as `point_b_` in described calculations.</param>
+		/// <param name="point_c_">EmuMath Vector to interpret as a 3D cartesian coordinate, appearing as `point_c_` in described calculations.</param>
+		/// <returns>EmuMath Vector normal to the plane defined by this Vector and the passed 2 other coordinates, before normalisation.</returns>
+		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t ReadOffset_ = 0, std::size_t SizeB_, typename TB_, std::size_t SizeC_, typename TC_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NormalToPlane3NoNorm
+		(
+			const EmuMath::NewVector<SizeB_, TB_>& point_b_,
+			const EmuMath::NewVector<SizeC_, TC_>& point_c_
+		) const
+		{
+			return EmuMath::Helpers::new_vector_normal_to_plane_3d_no_norm<OutSize_, OutT_, ReadOffset_>(*this, point_b_, point_c_);
+		}
+		template<typename OutT_ = preferred_floating_point, std::size_t ReadOffset_ = 0, std::size_t SizeB_, typename TB_, std::size_t SizeC_, typename TC_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> NormalToPlane3NoNorm
+		(
+			const EmuMath::NewVector<SizeB_, TB_>& point_b_,
+			const EmuMath::NewVector<SizeC_, TC_>& point_c_
+		) const
+		{
+			return EmuMath::Helpers::new_vector_normal_to_plane_3d_no_norm<3, OutT_, ReadOffset_>(*this, point_b_, point_c_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the Vector normal to a plane defined by this Vector and 2 other points in 3D space. </para>
+		/// <para> The result may be summarised as Normalise(Cross(point_b_ - point_a_, point_c_ - point_a_)), where this Vector is `point_a_`. </para>
+		/// <para> ReadOffset_: Optional inclusive index offset at which to start reading Vectors. Defaults to 0. </para>
+		/// <para> Unlike most member functions, if no OutSize_ is provided this will always default to 3 instead of this Vector's size, due to its 3D focus. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <param name="point_b_">EmuMath Vector to interpret as a 3D cartesian coordinate, appearing as `point_b_` in described calculations.</param>
+		/// <param name="point_c_">EmuMath Vector to interpret as a 3D cartesian coordinate, appearing as `point_c_` in described calculations.</param>
+		/// <returns>EmuMath Vector normal to the plane defined by this Vector and the passed 2 other coordinates.</returns>
+		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t ReadOffset_ = 0, std::size_t SizeB_, typename TB_, std::size_t SizeC_, typename TC_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NormalToPlane3Constexpr
+		(
+			const EmuMath::NewVector<SizeB_, TB_>& point_b_,
+			const EmuMath::NewVector<SizeC_, TC_>& point_c_
+		) const
+		{
+			return EmuMath::Helpers::new_vector_normal_to_plane_3d_constexpr<OutSize_, OutT_, ReadOffset_>(*this, point_b_, point_c_);
+		}
+		template<typename OutT_ = preferred_floating_point, std::size_t ReadOffset_ = 0, std::size_t SizeB_, typename TB_, std::size_t SizeC_, typename TC_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> NormalToPlane3Constexpr
+		(
+			const EmuMath::NewVector<SizeB_, TB_>& point_b_,
+			const EmuMath::NewVector<SizeC_, TC_>& point_c_
+		) const
+		{
+			return EmuMath::Helpers::new_vector_normal_to_plane_3d_constexpr<3, OutT_, ReadOffset_>(*this, point_b_, point_c_);
+		}
+
+
+
+		/// <summary>
+		/// <para> Calculates the Vector normal to a plane defined by this Vector and 2 other points in 3D space. </para>
+		/// <para> The result may be summarised as Normalise(Cross(point_b_ - point_a_, point_c_ - point_a_)), where this Vector is `point_a_`. </para>
+		/// <para> ReadOffset_: Optional inclusive index offset at which to start reading Vectors. Defaults to 0. </para>
+		/// <para> Unlike most member functions, if no OutSize_ is provided this will always default to 3 instead of this Vector's size, due to its 3D focus. </para>
+		/// <para> For a guarantee to be constexpr-evaluable if possible, use NormalToPlane3Constexpr instead. </para>
+		/// </summary>
+		/// <param name="point_b_">EmuMath Vector to interpret as a 3D cartesian coordinate, appearing as `point_b_` in described calculations.</param>
+		/// <param name="point_c_">EmuMath Vector to interpret as a 3D cartesian coordinate, appearing as `point_c_` in described calculations.</param>
+		/// <returns>EmuMath Vector normal to the plane defined by this Vector and the passed 2 other coordinates.</returns>
+		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t ReadOffset_ = 0, std::size_t SizeB_, typename TB_, std::size_t SizeC_, typename TC_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NormalToPlane3
+		(
+			const EmuMath::NewVector<SizeB_, TB_>& point_b_,
+			const EmuMath::NewVector<SizeC_, TC_>& point_c_
+		) const
+		{
+			return EmuMath::Helpers::new_vector_normal_to_plane_3d<OutSize_, OutT_, ReadOffset_>(*this, point_b_, point_c_);
+		}
+		template<typename OutT_ = preferred_floating_point, std::size_t ReadOffset_ = 0, std::size_t SizeB_, typename TB_, std::size_t SizeC_, typename TC_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> NormalToPlane3
+		(
+			const EmuMath::NewVector<SizeB_, TB_>& point_b_,
+			const EmuMath::NewVector<SizeC_, TC_>& point_c_
+		) const
+		{
+			return EmuMath::Helpers::new_vector_normal_to_plane_3d<3, OutT_, ReadOffset_>(*this, point_b_, point_c_);
+		}
 #pragma endregion
 
 #pragma region GENERIC_CMP_FUNCS
