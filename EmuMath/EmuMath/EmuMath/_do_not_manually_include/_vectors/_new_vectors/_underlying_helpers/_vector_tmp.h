@@ -284,7 +284,17 @@ namespace EmuMath::TMP
 		static constexpr std::size_t Size_ = _results::size_;
 		using T_ = typename _results::t_;
 	};
-
 }
+
+#pragma region EMU_CORE_TMP_SPECIALISATIONS
+namespace EmuCore::TMP
+{
+	template<std::size_t Size_, typename T_>
+	struct floating_point_equivalent<EmuMath::NewVector<Size_, T_>>
+	{
+		using type = EmuMath::NewVector<Size_, typename EmuMath::NewVector<Size_, T_>::preferred_floating_point>;
+	};
+}
+#pragma endregion
 
 #endif

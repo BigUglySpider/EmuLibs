@@ -1176,7 +1176,8 @@ int main()
 	std::cout << "\n---\n";
 	constexpr auto reflect_normal_ = EmuMath::NewVector<3, float>(0.321, 1.52f, 0.0f).NormaliseConstexpr();
 	constexpr auto ray_vector_ = EmuMath::NewVector<3, float>(2.0f, 0.0f, 1.0f);
-	constexpr auto reflection_vector_ = ray_vector_.ReflectNormal(reflect_normal_);
+	constexpr auto reflection_vector_ = ray_vector_.Reflect(reflect_normal_);
+	constexpr auto normalised_ray_reflection_vector_ = ray_vector_.NormaliseConstexpr().Reflect(reflect_normal_);
 	std::cout << "Emu: " << reflection_vector_ << "\n";
 	constexpr auto reflect_normal_dxm_ = DirectX::XMFLOAT3(reflect_normal_.at<0>(), reflect_normal_.at<1>(), reflect_normal_.at<2>());
 	constexpr auto ray_vector_dxm_ = DirectX::XMFLOAT3(ray_vector_.at<0>(), ray_vector_.at<1>(), ray_vector_.at<2>());
@@ -1204,6 +1205,11 @@ int main()
 	std::cout << "Emu: " << norm_p0p1p2_no_norm_ << "\n";
 	std::cout << "Emu: " << norm_p0p1p2_ << "\n";
 	std::cout << "DXM: " << "{ " << xm_plane_.x << ", " << xm_plane_.y << ", " << xm_plane_.z << " }\n";
+
+	std::cout << "\n---\n";
+	constexpr auto projection_vector_ = EmuMath::Helpers::new_vector_make<float>(7, 3, -8);
+	constexpr auto project_onto_vector_ = EmuMath::Helpers::new_vector_make<int>(5, 1, 2);
+	constexpr auto projection_result_ = projection_vector_.Project<1, 3>(project_onto_vector_);
 
 	system("pause");
 

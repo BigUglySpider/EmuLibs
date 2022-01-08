@@ -5109,12 +5109,12 @@ namespace EmuMath
 		/// <param name="surface_normal_">: Normal describing a reflection surface. This is expected to be normalised, and treated as such.</param>
 		/// <returns>EmuMath Vector representing the reflection of this Vector on the provided surface_normal_.</returns>
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t NormalSize_, typename NormalT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ReflectNormal(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Reflect(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
 		{
 			return EmuMath::Helpers::new_vector_reflect_normal<OutSize_, OutT_>(*this, surface_normal_);
 		}
 		template<typename OutT_ = preferred_floating_point, std::size_t NormalSize_, typename NormalT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ReflectNormal(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Reflect(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
 		{
 			return EmuMath::Helpers::new_vector_reflect_normal<size, OutT_>(*this, surface_normal_);
 		}
@@ -5131,12 +5131,12 @@ namespace EmuMath
 		/// <param name="surface_normal_">: Normal describing a reflection surface. This is expected to be normalised, and treated as such.</param>
 		/// <returns>EmuMath Vector representing the reflection of this Vector on the provided surface_normal_, using indices within the provided range.</returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t NormalSize_, typename NormalT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ReflectNormal(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Reflect(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
 		{
 			return EmuMath::Helpers::new_vector_reflect_normal<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, surface_normal_);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point, std::size_t NormalSize_, typename NormalT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ReflectNormal(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Reflect(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
 		{
 			return EmuMath::Helpers::new_vector_reflect_normal<size, OutT_, BeginIndex_, EndIndex_>(*this, surface_normal_);
 		}
@@ -5230,6 +5230,38 @@ namespace EmuMath
 		) const
 		{
 			return EmuMath::Helpers::new_vector_normal_to_plane_3d<3, OutT_, ReadOffset_>(*this, point_b_, point_c_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the Vector resulting from projecting this Vector onto the Vector onto_. </para>
+		/// </summary>
+		/// <param name="onto_">: EmuMath Vector to project this Vector onto.</param>
+		/// <returns>EmuMath Vector resulting from a projection of this Vector onto the Vector onto_.</returns>
+		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Project(const EmuMath::NewVector<SizeB_, TB_>& onto_) const
+		{
+			return EmuMath::Helpers::new_vector_project<OutSize_, OutT_>(*this, onto_);
+		}
+		template<typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Project(const EmuMath::NewVector<SizeB_, TB_>& onto_) const
+		{
+			return EmuMath::Helpers::new_vector_project<size, OutT_>(*this, onto_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the Vector resulting from projecting this Vector onto the Vector onto_, using indices within the specified range. </para>
+		/// </summary>
+		/// <param name="onto_">: EmuMath Vector to project this Vector onto.</param>
+		/// <returns>EmuMath Vector resulting from a projection of this Vector onto the Vector onto_, using indices within the specified range.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Project(const EmuMath::NewVector<SizeB_, TB_>& onto_) const
+		{
+			return EmuMath::Helpers::new_vector_project<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, onto_);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Project(const EmuMath::NewVector<SizeB_, TB_>& onto_) const
+		{
+			return EmuMath::Helpers::new_vector_project<size, OutT_, BeginIndex_, EndIndex_>(*this, onto_);
 		}
 #pragma endregion
 

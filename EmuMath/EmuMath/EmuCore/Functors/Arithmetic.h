@@ -4,7 +4,9 @@
 #include "../ArithmeticHelpers/CommonMath.h"
 #include "../TMPHelpers/OperatorChecks.h"
 #include "../TMPHelpers/TypeComparators.h"
+#include "../TMPHelpers/TypeConvertors.h"
 #include "../TMPHelpers/Values.h"
+#include "../TMPHelpers/VariadicHelpers.h"
 #include <cstddef>
 #include <functional>
 
@@ -1006,6 +1008,90 @@ namespace EmuCore
 		constexpr inline std::invoke_result_t<do_post_decrement<T_>, T_&> operator()(T_& val_) const
 		{
 			return do_post_decrement<T_>()(val_);
+		}
+	};
+#pragma endregion
+
+#pragma region RECIPROCAL_FUNCTORS
+	template<typename In_>
+	struct do_reciprocal
+	{
+	private:
+		using _fp_type = EmuCore::TMP::remove_ref_cv_t<EmuCore::TMP::floating_point_equivalent_t<In_>>;
+		using _in_uq = EmuCore::TMP::remove_ref_cv_t<In_>;
+		using _make_div = EmuCore::TMP::safe_template_instantiate<EmuCore::do_divide, _fp_type, _in_uq>;
+		using _make_one = EmuCore::TMP::try_make_constant<_fp_type, 1>;
+		using _div = typename _make_div::type;
+		using _make_div_result = EmuCore::TMP::safe_invoke_result<_div, _fp_type, const In_&>;
+
+	public:
+		using out_type = typename _make_div_result::type;
+
+		constexpr do_reciprocal()
+		{
+		}
+
+		[[nodiscard]] constexpr inline out_type operator()(const In_& in_) const
+		{
+			if constexpr(!std::is_void_v<_fp_type>)
+			{
+				if constexpr (_make_div::value)
+				{
+					if constexpr (_make_div_result::value)
+					{
+						if constexpr (_make_one::is_valid)
+						{
+							return _div()(_make_one::get(), in_);
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<_make_one>(),
+								"Attempted to calculate a reciprocal via EmuCore::do_reciprocal, but the unqualified floating-point equivalent to In_ could not be used to generate a constant of 1 via EmuCore::TMP::try_make_constant."
+							);
+						}
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<_make_div_result>(),
+							"Attempted to calculate a reciprocal via EmuCore::do_reciprocal, but the generated instance of EmuCore::do_divide could not be invoked with a value of the unqualified floating-point equivalent to In_ and a const reference to In_ as arguments."
+						);
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<_make_div>(),
+						"Attempted to calculate a reciprocal via EmuCore::do_reciprocal, but an instance of EmuCore::do_divide could not be instantiated with the unqualified floating-point equivalent of In_ and the unqualified form of In_ as type arguments."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<_fp_type>(),
+					"Attempted to calculate a reciprocal via EmuCore::do_reciprocal, but the provided In_ type does not have a floating-point equivalent defined by EmuCore::TMP::floating_point_equivalent."
+				);
+			}
+		}
+	};
+
+	template<>
+	struct do_reciprocal<void>
+	{
+		constexpr do_reciprocal()
+		{
+		}
+
+		template<typename In_>
+		constexpr inline std::invoke_result_t<do_reciprocal<In_>, const In_&> operator()(const In_& in_) const
+		{
+			return do_reciprocal<In_>()(in_);
 		}
 	};
 #pragma endregion

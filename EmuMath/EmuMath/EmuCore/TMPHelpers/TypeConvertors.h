@@ -449,6 +449,48 @@ namespace EmuCore::TMP
 	{
 		using type = T_;
 	};
+
+	/// <summary>
+	/// <para> Type to determine a floating-point equivalent of any given type. </para>
+	/// <para> Unless specialised, type will branch into one of the following outcomes: </para>
+	/// <para> 1: If T_ has const, volatile, or reference qualifiers, floating_point_equivalent&lt;EmuCore::TMP::remove_ref_cv_t&lt;T_&gt;&gt;::type. </para>
+	/// <para> 2: If T_ is an arithmetic type that is also a floating-point type, EmuCore::TMP::remove_ref_cv_t&lt;T_&gt;. </para>
+	/// <para> 3: If T_ is an arithmetic type containing less than 4 bytes and that is not a floating-point type, float. </para>
+	/// <para> 4: If T_ is an arithmetic type containing 4 or more bytes and that is not a floating-point type, double. </para>
+	/// <para> 5: If T_ is not an arithmetic type, void. These types require explicit specialisations. </para>
+	/// </summary>
+	template<typename T_>
+	struct floating_point_equivalent
+	{
+	private:
+		using _t_uq = EmuCore::TMP::remove_ref_cv_t<T_>;
+
+	public:
+		using type = typename std::conditional_t
+		<
+			std::is_same_v<T_, _t_uq>,
+			std::conditional
+			<
+				std::is_arithmetic_v<_t_uq>,
+				std::conditional_t
+				<
+					std::is_floating_point_v<_t_uq>,
+					_t_uq,
+					std::conditional_t
+					<
+						(sizeof(_t_uq) < 4),
+						float,
+						double
+					>
+				>,
+				void
+			>,
+			floating_point_equivalent<_t_uq>
+		>::type;
+	};
+
+	template<typename T_>
+	using floating_point_equivalent_t = typename floating_point_equivalent<T_>::type;
 }
 
 #endif

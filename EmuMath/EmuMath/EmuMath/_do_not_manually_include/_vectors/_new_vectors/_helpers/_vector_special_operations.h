@@ -22,6 +22,7 @@
 // --- normal_to_plane_3d_no_norm
 // --- normal_to_plane_3d_constexpr
 // --- normal_to_plane_3d
+// --- project
 
 namespace EmuMath::Helpers
 {
@@ -1166,6 +1167,106 @@ namespace EmuMath::Helpers
 			point_b_,
 			point_c_
 		);
+	}
+#pragma endregion
+
+#pragma region PROJECT_FUNCS
+	/// <summary>
+	/// <para> Calculates the Vector resulting from projecting vector_a_ onto vector_b_. </para>
+	/// </summary>
+	/// <param name="vector_a_">EmuMath Vector to project via.</param>
+	/// <param name="vector_b_">EmuMath Vector to project onto.</param>
+	/// <returns>EmuMath Vector resulting from a projection of vector_a_ onto vector_b_.</returns>
+	template<std::size_t OutSize_, typename OutT_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_project
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
+		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+	)
+	{
+		return _vector_underlying::_vector_project<EmuCore::do_multiply, EmuCore::do_reciprocal, OutSize_, OutT_>(vector_a_, vector_b_);
+	}
+
+	template<typename OutT_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<SizeA_, OutT_> new_vector_project
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
+		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+	)
+	{
+		return _vector_underlying::_vector_project<EmuCore::do_multiply, EmuCore::do_reciprocal, SizeA_, OutT_>(vector_a_, vector_b_);
+	}
+
+	template<std::size_t OutSize_, std::size_t SizeA_, typename TA_, typename TB_, std::size_t SizeB_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> new_vector_project
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
+		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+	)
+	{
+		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preffered_floating_point;
+		return _vector_underlying::_vector_project<EmuCore::do_multiply, EmuCore::do_reciprocal, OutSize_, a_fp>(vector_a_, vector_b_);
+	}
+
+	template<typename TA_, typename TB_, std::size_t SizeA_, std::size_t SizeB_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<SizeA_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> new_vector_project
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
+		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+	)
+	{
+		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		return _vector_underlying::_vector_project<EmuCore::do_multiply, EmuCore::do_reciprocal, SizeA_, a_fp>(vector_a_, vector_b_);
+	}
+
+	/// <summary>
+	/// <para> Calculates the Vector resulting from projecting vector_a_ onto vector_b_, using indices within the specified range. </para>
+	/// <para> BeginIndex_: Inclusive index at which to start reading/writing from/to Vectors. </para>
+	/// <para> EndIndex_: Exclusive index at which to stop reading/writing from/to Vectors. </para>
+	/// </summary>
+	/// <param name="vector_a_">EmuMath Vector to project via.</param>
+	/// <param name="vector_b_">EmuMath Vector to project onto.</param>
+	/// <returns>EmuMath Vector resulting from a projection of vector_a_ onto vector_b_, using indices within the specified range.</returns>
+	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_project
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
+		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+	)
+	{
+		return _vector_underlying::_vector_project<EmuCore::do_multiply, EmuCore::do_reciprocal, OutSize_, OutT_, BeginIndex_, EndIndex_>(vector_a_, vector_b_);
+	}
+
+	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<SizeA_, OutT_> new_vector_project
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
+		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+	)
+	{
+		return _vector_underlying::_vector_project<EmuCore::do_multiply, EmuCore::do_reciprocal, SizeA_, OutT_, BeginIndex_, EndIndex_>(vector_a_, vector_b_);
+	}
+
+	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_, typename TA_, std::size_t SizeA_, typename TB_, std::size_t SizeB_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> new_vector_project
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
+		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+	)
+	{
+		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preffered_floating_point;
+		return _vector_underlying::_vector_project<EmuCore::do_multiply, EmuCore::do_reciprocal, OutSize_, a_fp, BeginIndex_, EndIndex_>(vector_a_, vector_b_);
+	}
+
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename TA_, typename TB_, std::size_t SizeA_, std::size_t SizeB_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<SizeA_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> new_vector_project
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
+		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+	)
+	{
+		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		return _vector_underlying::_vector_project<EmuCore::do_multiply, EmuCore::do_reciprocal, SizeA_, a_fp, BeginIndex_, EndIndex_>(vector_a_, vector_b_);
 	}
 #pragma endregion
 }

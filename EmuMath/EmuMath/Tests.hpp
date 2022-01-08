@@ -151,7 +151,7 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i)
 		{
-			out_reflection[i] = in_ray[i].ReflectNormal(in_norm[i]);
+			out_reflection[i] = in_ray[i].Reflect(in_norm[i]);
 		}
 		void OnTestsOver()
 		{

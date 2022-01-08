@@ -1269,6 +1269,103 @@ namespace EmuMath::Helpers::_vector_underlying
 			)
 		);
 	}
+
+	template
+	<
+		template<class...> class MulTemplate_,
+		template<class...> class ReciprocalTemplate_,
+		std::size_t OutSize_,
+		typename OutT_,
+		std::size_t BeginIndex_,
+		std::size_t EndIndex_,
+		std::size_t SizeA_,
+		typename TA_,
+		std::size_t SizeB_,
+		typename TB_
+	>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_project
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& a_,
+		const EmuMath::NewVector<SizeB_, TB_>& b_
+	)
+	{
+		using out_fp = typename EmuMath::NewVector<OutSize_, OutT_>::preferred_floating_point;
+		if constexpr (EmuCore::TMP::valid_template_args_v<ReciprocalTemplate_, out_fp>)
+		{
+			using Reciprocal_ = ReciprocalTemplate_<out_fp>;
+			if constexpr (std::is_invocable_v<Reciprocal_, out_fp>)
+			{
+				if constexpr (EmuCore::TMP::valid_template_args_v<MulTemplate_, out_fp, out_fp>)
+				{
+					using Mul_ = MulTemplate_<out_fp, out_fp>;
+					if constexpr (std::is_invocable_v<Mul_, out_fp, out_fp>)
+					{
+						return _vector_mutate_with_func_template_args_only<MulTemplate_, EmuMath::NewVector<OutSize_, OutT_>, BeginIndex_, EndIndex_, BeginIndex_>
+						(
+							b_,
+							Mul_()
+							(
+								_vector_dot<BeginIndex_, EndIndex_, out_fp>(a_, b_),
+								Reciprocal_()(_vector_square_mag<BeginIndex_, EndIndex_, out_fp>(b_))
+							)
+						);
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<out_fp>(),
+							"Attempted to project an EmuMath Vector a onto an EmuMath Vector b, but the multiplication functor cannot be invoked with two arguments of the output Vector's preferred_floating_point type."
+						);
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<out_fp>(),
+						"Attempted to project an EmuMath Vector a onto an EmuMath Vector b, but the provided multiplication template could not be instantiated with two typeargs of the output Vector's preferred_floating_point type."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<out_fp>(),
+					"Attempted to project an EmuMath Vector a onto an EmuMath Vector b, but the reciprocal functor cannot be invoked with an argument of the output Vector's preferred_floating_point type."
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<out_fp>(),
+				"Attempted to project an EmuMath Vector a onto an EmuMath Vector b, but the provided reciprocal template could not be instantiated with a typearg of the output Vector's preferred_floating_point type."
+			);
+		}
+	}
+
+	template
+	<
+		template<class...> class MulTemplate_,
+		template<class...> class ReciprocalTemplate_,
+		std::size_t OutSize_,
+		typename OutT_,
+		std::size_t SizeA_,
+		typename TA_,
+		std::size_t SizeB_,
+		typename TB_
+	>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_project
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& a_,
+		const EmuMath::NewVector<SizeB_, TB_>& b_
+	)
+	{
+		return _vector_project<MulTemplate_, ReciprocalTemplate_, OutSize_, OutT_, 0, EmuMath::NewVector<OutSize_, OutT_>::size>(a_, b_);
+	}
 }
 
 #endif
