@@ -112,30 +112,31 @@ namespace EmuCore::TestingHelpers
 		}
 	};
 
-	struct angle_test_new
+	struct reflect_test_emu
 	{
 		static constexpr bool DO_TEST = true;
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Vector Angle (New)";
+		static constexpr std::string_view NAME = "Vector Reflect (Emu)";
 
-		static constexpr std::size_t vec_size = 12;
+		static constexpr std::size_t vec_size = 3;
 		using vector_type_arg = float;
 		using vector_type = EmuMath::NewVector<vec_size, vector_type_arg>;
 		using float_type = typename vector_type::preferred_floating_point;
+		using vector_type_fp = EmuMath::NewVector<vec_size, float_type>;
 
-		angle_test_new()
+		reflect_test_emu()
 		{
 		}
 		void Prepare()
 		{
 			// RESIZES
-			out_angle.resize(NUM_LOOPS);
+			out_reflection.resize(NUM_LOOPS);
 
 			// RESERVES
-			in_a.reserve(NUM_LOOPS);
-			in_b.reserve(NUM_LOOPS);
+			in_ray.reserve(NUM_LOOPS);
+			in_norm.reserve(NUM_LOOPS);
 
 			// FILL RESERVES
 			RngFunctor rng_ = RngFunctor(shared_fill_seed_);
@@ -143,49 +144,45 @@ namespace EmuCore::TestingHelpers
 
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				emplace_back_new_vector<vec_size, vector_type_arg>(in_a, rng_);
-				emplace_back_new_vector<vec_size, vector_type_arg>(in_b, rng_);
+				emplace_back_new_vector<vec_size, vector_type_arg>(in_ray, rng_);
+				emplace_back_new_vector<vec_size, float_type>(in_norm, rng_);
+				in_norm[i] = in_norm[i].Normalise();
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			out_angle[i] = in_a[i].Angle<false>(in_b[i]);
+			out_reflection[i] = in_ray[i].ReflectNormal(in_norm[i]);
 		}
 		void OnTestsOver()
 		{
 			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
-			std::cout << "ANGLE\n(\n\t" << in_a[i_] << "\n\t" << in_b[i_] << "\n" << "): " << out_angle[i_] << "\n\n";
+			std::cout << "REFLECT\n(\n\t" << in_ray[i_] << "\n\t" << in_norm[i_] << "\n" << "): " << out_reflection[i_] << "\n\n";
 		}
 
-		std::vector<vector_type> in_a;
-		std::vector<vector_type> in_b;
-		std::vector<float_type> out_angle;
+		std::vector<vector_type> in_ray;
+		std::vector<vector_type_fp> in_norm;
+		std::vector<vector_type_fp> out_reflection;
 	};
 
-	struct angle_test_old
+	struct reflect_test_dxm
 	{
 		static constexpr bool DO_TEST = true;
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Vector Angle (Old)";
+		static constexpr std::string_view NAME = "Vector Reflect (DXM)";
 
-		static constexpr std::size_t vec_size = 12;
-		using vector_type_arg = float;
-		using vector_type = EmuMath::Vector<vec_size, vector_type_arg>;
-		using float_type = typename vector_type::preferred_floating_point;
-
-		angle_test_old()
+		reflect_test_dxm()
 		{
 		}
 		void Prepare()
 		{
 			// RESIZES
-			out_angle.resize(NUM_LOOPS);
+			out_reflection.resize(NUM_LOOPS);
 
 			// RESERVES
-			in_a.reserve(NUM_LOOPS);
-			in_b.reserve(NUM_LOOPS);
+			in_ray.reserve(NUM_LOOPS);
+			in_norm.reserve(NUM_LOOPS);
 
 			// FILL RESERVES
 			RngFunctor rng_ = RngFunctor(shared_fill_seed_);
@@ -193,31 +190,60 @@ namespace EmuCore::TestingHelpers
 
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				emplace_back_old_vector<vector_type>(in_a, rng_);
-				emplace_back_old_vector<vector_type>(in_b, rng_);
+				in_ray.emplace_back
+				(
+					rng_(0.0f), rng_(0.0f), rng_(0.0f)
+				);
+				in_norm.emplace_back
+				(
+					rng_(0.0f), rng_(0.0f), rng_(0.0f)
+				);
+				DirectX::XMStoreFloat3
+				(
+					&(in_norm[i]), 
+					DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&(in_norm[i])))
+				);
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			out_angle[i] = in_a[i].Angle<false>(in_b[i]);
+			DirectX::XMStoreFloat3
+			(
+				&(out_reflection[i]),
+				DirectX::XMVector3Reflect
+				(
+					DirectX::XMLoadFloat3(&(in_ray[i])),
+					DirectX::XMLoadFloat3(&(in_norm[i]))
+				)
+			);
 		}
 		void OnTestsOver()
 		{
 			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
-			std::cout << "ANGLE\n(\n\t" << in_a[i_] << "\n\t" << in_b[i_] << "\n" << "): " << out_angle[i_] << "\n\n";
+			std::cout << "REFLECT\n(\n\t";
+			Print(in_ray[i_]);
+			std::cout << "\n\t";
+			Print(in_norm[i_]);
+			std::cout << "\n" << "): ";
+			Print(out_reflection[i_]);
+			std::cout << "\n\n";
+		}
+		void Print(const DirectX::XMFLOAT3& vector_)
+		{
+			std::cout << "{ " << vector_.x << ", " << vector_.y << ", " << vector_.z << " }";
 		}
 
-		std::vector<vector_type> in_a;
-		std::vector<vector_type> in_b;
-		std::vector<float_type> out_angle;
+		std::vector<DirectX::XMFLOAT3> in_ray;
+		std::vector<DirectX::XMFLOAT3> in_norm;
+		std::vector<DirectX::XMFLOAT3> out_reflection;
 	};
 
 
 	// ----------- TESTS SELECTION -----------
 	using AllTests = std::tuple
 	<
-		angle_test_new,
-		angle_test_old
+		reflect_test_emu,
+		reflect_test_dxm
 	>;
 
 	// ----------- TESTS BEGIN -----------

@@ -1174,7 +1174,7 @@ int main()
 	constexpr auto near_check_ = EmuCore::do_cmp_near_equal<void>()(dist_ab_squared_, sqr_dist_ab_);
 
 	std::cout << "\n---\n";
-	constexpr auto reflect_normal_ = EmuMath::NewVector<3, float>(1.0f, 0.0f, 0.0f).NormaliseConstexpr();
+	constexpr auto reflect_normal_ = EmuMath::NewVector<3, float>(0.321, 1.52f, 0.0f).NormaliseConstexpr();
 	constexpr auto ray_vector_ = EmuMath::NewVector<3, float>(2.0f, 0.0f, 1.0f);
 	constexpr auto reflection_vector_ = ray_vector_.ReflectNormal(reflect_normal_);
 	std::cout << "Emu: " << reflection_vector_ << "\n";
@@ -1187,309 +1187,309 @@ int main()
 
 	system("pause");
 
-	// GRADIENTS START
-	std::cout << "\n\n";
-	system("pause");
-	std::cout << "\n---\n\n\n";
-	constexpr EmuMath::ColourRGB<float> colour_(-0.2f, 2.5, 2.0f);
-	constexpr auto wrapped_ = colour_.Wrapped<std::uint8_t, true>();
-	constexpr auto clamped_ = colour_.Clamped<std::uint8_t, true>();
-	
-	constexpr EmuMath::ColourRGB<float> white_(1.0f, 1.0f, 1.0f);
-	constexpr EmuMath::ColourRGB<float> black_(0.0f, 0.0f, 0.0f);
-	constexpr auto white_lerp_black_ = white_.Lerp(black_, 0.5f);
-	
-	constexpr auto colour_a_ = EmuMath::ColourRGBA<double>(0.8, 1.0, 0.5, 1.0);
-	constexpr auto colour_b_ = EmuMath::ColourRGBA<std::uint8_t>(0, 255 / 2, 255 / 4, 255);
-	constexpr auto colour_c_ = EmuMath::ColourRGBA<std::uint8_t>(255, 0, 255 / 2, 255 / 4);
-	constexpr auto vector_a_ = EmuMath::NewVector<2, double>(0.5, 0.25);
-	constexpr auto lerp_a_ = colour_a_.Lerp(colour_b_, 0.5f);
-	constexpr auto lerp_b_ = colour_a_.Lerp(colour_b_, colour_c_);
-	constexpr auto lerp_c_ = colour_a_.Lerp(colour_b_, vector_a_);
-	constexpr auto lerp_c_min_false_ = lerp_c_.Min<false>();
-	constexpr auto lerp_c_min_true_ = lerp_c_.Min<true>();
-	constexpr auto lerp_c_max_false_ = lerp_c_.Max<false>();
-	constexpr auto lerp_c_max_true_ = lerp_c_.Max<true>();
-	
-	EmuMath::ColourRGBA<float> runtime_rgba_f_(0.1f, -0.1f, 1.0f, 1.5f);
-	std::cout << runtime_rgba_f_ << "\n";
-	runtime_rgba_f_.Wrap();
-	std::cout << runtime_rgba_f_ << "\n";
-	runtime_rgba_f_ *= 0.5f;
-	std::cout << runtime_rgba_f_ << "\n";
-	runtime_rgba_f_ += 0.1;
-	std::cout << runtime_rgba_f_ << "\n";
-	runtime_rgba_f_ -= 0.1;
-	std::cout << runtime_rgba_f_ << "\n";
-	runtime_rgba_f_ /= 2;
-	std::cout << runtime_rgba_f_ << "\n";
-	std::cout << (runtime_rgba_f_ == runtime_rgba_f_) << "\n";
-	std::cout << (runtime_rgba_f_ != runtime_rgba_f_) << "\n";
-	runtime_rgba_f_.Set(0.1, 0.2f, 0.53L, 1);
-	std::cout << runtime_rgba_f_ << "\n";
-	std::cout << "---Grey---\n";
-	std::cout << "Basic Average: " << runtime_rgba_f_.GreyscaleBasic() << "\n";
-	std::cout << "Luminance Average: " << runtime_rgba_f_.GreyscaleLuminance() << "\n";
-	std::cout << "Desaturated: " << runtime_rgba_f_.GreyscaleDesaturate() << "\n";
-	std::cout << "Decomposed (Min): " << runtime_rgba_f_.GreyscaleMin() << "\n";
-	std::cout << "Decomposed (Max): " << runtime_rgba_f_.GreyscaleMax() << "\n";
-	
-	constexpr EmuMath::ColourRGB<float> from_rgba_ = EmuMath::ColourRGBA<float>(1, 2, 3, 4);
-	
-	constexpr auto some_vec_ = EmuMath::NewVector<1, long double>(colour_a_.AsVector());
-	
-	auto bloob = EmuMath::ColourRGB<float>().AsVectorRGB();
-	auto bloob_ = EmuMath::ColourRGBA<float>().AsVectorRGB();
-	auto bloob__ = EmuMath::ColourRGB<float>().AsVectorRGBA();
-	auto bloob___ = EmuMath::ColourRGBA<float>().AsVectorRGBA();
-	
-	
-	constexpr EmuMath::WrappedColour<float, true> wrapped_colour_(-0.2, 0.2, 0.5, 1.1);
-	
-	std::cout << "\n\n";
-	auto wrapped_runtime_ = wrapped_colour_;
-	std::cout << wrapped_runtime_ << "\n";
-	wrapped_runtime_.G(25);
-	std::cout << wrapped_runtime_ << "\n";
-	std::cout << (wrapped_runtime_ * 2) << "\n";
-	std::cout << (wrapped_runtime_ * EmuMath::WrappedColour<std::uint8_t, true>(255, 0, 255)) << "\n";
-	
-	EmuMath::WrappedColourRGBA<float> some_wrapped_colour_(2, 3.2, -4.6, 1.0);
-	EmuMath::ColourRGB<float> some_colour_again_( some_wrapped_colour_ );
-	
-	std::cout << "\n\n";
-	std::cout << some_wrapped_colour_ << "\n";
-	EmuMath::WrappedColourRGBA<float> wee = some_wrapped_colour_.Add(2.1);
-	std::cout << wee << "\n";
-	std::cout << wee.Lerp<false>(EmuMath::ColourRGBA<double>(1, 2, 3, 1), 0.5f) << "\n";
-	std::cout << wee.Lerp<true>(EmuMath::ColourRGBA<double>(1, 2, 3, 1), 0.5f) << "\n";
-	
-	decltype(wee)::underlying_colour wee_unwrapped_(wee);
-	
-	constexpr auto wrapped_colour_greyscale_basic_ = wrapped_colour_.GreyscaleBasic();
-	constexpr auto wrapped_colour_greyscale_luminance_ = wrapped_colour_.GreyscaleLuminance();
-	constexpr auto wrapped_colour_greyscale_desaturate_ = wrapped_colour_.GreyscaleDesaturate();
-	constexpr auto wrapped_colour_greyscale_decompose_min_ = wrapped_colour_.GreyscaleMin();
-	constexpr auto wrapped_colour_greyscale_decompose_max_ = wrapped_colour_.GreyscaleMax();
-	
-	constexpr EmuMath::ClampedColourRGBA<float> some_clamped_colour_(-0.1, 0.0, 0.8, 1.5);
-	std::cout << "\n\n\n";
-	using grad_type = EmuMath::Gradient<float>;
-	grad_type gradient_;
-	gradient_.AddClampedColourAnchor(1.0f, EmuMath::ColourRGB<float>(0.75f, 0.1f, 0.0f));
-	gradient_.AddClampedColourAnchor(0.5f, EmuMath::ColourRGB<float>(0.5f, 0.5f, 0.5f));
-	gradient_.AddClampedColourAnchor(123.5f, EmuMath::ColourRGB<float>(0.2f, 1.0f, 1.0f));
-	gradient_.AddClampedAlphaAnchor(1.0f, 0.0f);
-	gradient_.AddClampedColourAnchor(0.9f, EmuMath::ColourRGB<std::uint8_t>(255 / 4, 255 / 2, 255));
-	std::size_t dummy_index_ = gradient_.AddWrappedColourAnchor_GetIndex(0.3f, EmuMath::ColourRGBA<std::int8_t>(-1, -2, -3));
-	std::cout << gradient_ << "\n";
-	gradient_.EraseColourIndex(dummy_index_);
-	gradient_.EraseColourAnchor(0.9f);
-	std::cout << "---\n" << gradient_ << "\n";
-	std::cout << "---\n" << EmuMath::Gradient<std::uint8_t>(gradient_) << "\n";
-	std::cout << "---\n";
-	std::cout << "at(0.0): " << gradient_.GetColour(0.0f) << "\n";
-	std::cout << "at(1.0): " << gradient_.GetColour(1.0f) << "\n";
-	std::cout << "at(0.5): " << gradient_.GetColour(0.5f) << "\n";
-	std::cout << "at(0.75): " << gradient_.GetColour(0.75f) << "\n";
-	std::cout << "at(0.25): " << gradient_.GetColour(0.25f) << "\n";
-	std::cout << "---\n";
-	std::cout << "at(0.0): " << gradient_.GetAlpha(0.0f) << "\n";
-	std::cout << "at(1.0): " << gradient_.GetAlpha(1.0f) << "\n";
-	std::cout << "at(0.5): " << gradient_.GetAlpha(0.5f) << "\n";
-	std::cout << "at(0.75): " << gradient_.GetAlpha(0.75f) << "\n";
-	std::cout << "at(0.25): " << gradient_.GetAlpha(0.25f) << "\n";
-	std::cout << "---\n";
-	std::cout << "at(0.0): " << gradient_.Get(0.0f) << "\n";
-	std::cout << "at(1.0): " << gradient_.Get(1.0f) << "\n";
-	std::cout << "at(0.5): " << gradient_.Get(0.5f) << "\n";
-	std::cout << "at(0.75): " << gradient_.Get(0.75f) << "\n";
-	std::cout << "at(0.25): " << gradient_.Get(0.25f) << "\n";
-	std::cout << "---\n";
-	std::cout << (gradient_ == gradient_) << "\n";
-	std::cout << (EmuMath::Gradient<std::int8_t>(gradient_) == EmuMath::Gradient<std::uint8_t>(gradient_)) << "\n";
-	std::cout << (gradient_ == grad_type()) << "\n";
-	std::cout << "---\n";
-	std::cout << (gradient_ != gradient_) << "\n";
-	std::cout << (EmuMath::Gradient<std::int8_t>(gradient_) != EmuMath::Gradient<std::uint8_t>(gradient_)) << "\n";
-	std::cout << (gradient_ != grad_type()) << "\n";
-	std::cout << "---\n";
-	std::cout << gradient_.HasMatchingAlphaAnchors(gradient_) << "\n";
-	std::cout << EmuMath::Gradient<std::int8_t>(gradient_).HasMatchingAlphaAnchors(EmuMath::Gradient<std::uint8_t>(gradient_)) << "\n";
-	std::cout << gradient_.HasMatchingAlphaAnchors(grad_type()) << "\n";
-	std::cout << "---\n";
-	std::cout << gradient_.HasMatchingColourAnchors(gradient_) << "\n";
-	std::cout << EmuMath::Gradient<std::int8_t>(gradient_).HasMatchingColourAnchors(EmuMath::Gradient<std::uint8_t>(gradient_)) << "\n";
-	std::cout << gradient_.HasMatchingColourAnchors(grad_type()) << "\n";
-	std::cout << "---\n";
-	grad_type ______;
-	______.AddClampedColourAnchor<float, true>(0.5f, {});
-	std::cout << (______ == grad_type()) << "\n";
-	std::cout << (______ != grad_type()) << "\n";
-	std::cout << ______.HasMatchingAlphaAnchors(grad_type()) << "\n";
-	std::cout << ______.HasMatchingColourAnchors(grad_type()) << "\n";
-	std::cout << "---\n";
-	
-	constexpr auto wrap_test_ = grad_type::wrap_anchor(-0.3f);
-	
-	constexpr auto red_ = EmuMath::Colours::Lime();
-	
-	grad_type::anchor_type anchor_ = 0.0f;
-	
-	
-	grad_type gradient_colours_;
-	gradient_colours_.AddClampedColourAnchor(0.0f, EmuMath::Colours::Blue());
-	gradient_colours_.AddClampedColourAnchor(0.35f, EmuMath::Colours::Blue());
-	gradient_colours_.AddClampedColourAnchor(0.45f, EmuMath::Colours::White());
-	gradient_colours_.AddClampedColourAnchor(0.5f, EmuMath::Colours::Black());
-	gradient_colours_.AddClampedColourAnchor(0.65f, EmuMath::Colours::Yellow());
-	gradient_colours_.AddClampedColourAnchor(0.85f, EmuMath::Colours::Green());
-	gradient_colours_.AddClampedColourAnchor(1.0f, EmuMath::Colours::Red());
-	
-	grad_type gradient_greyscale_;
-	gradient_greyscale_.AddClampedColourAnchor(0.0f, EmuMath::Colours::White());
-	gradient_greyscale_.AddClampedColourAnchor(1.0f, EmuMath::Colours::Black());
-	
-	grad_type& noise_gradient_ = gradient_colours_;
-	std::cout << "\nNoise Gradient:\n";
-	std::cout << noise_gradient_ << "\n";
-	std::cout << "\nNoise Gradient Reversed:\n";
-	noise_gradient_.ReverseColours();
-	std::cout << noise_gradient_ << "\n";
-	
-	__m128 some_a_128_ = _mm_set_ps(3.0f, 2.0f, 1.0f, 0.0f);
-	__m128 some_b_128_ = _mm_set_ps(7.0f, 6.0f, 5.0f, 4.0f);
-	std::cout << EmuMath::FastVector4f(EmuSIMD::_underlying_simd_helpers::_execute_shuffle<1, 1, 3, 3>(some_a_128_, some_b_128_)) << "\n";
-	
-	EmuSIMD::append_simd_vector_to_stream<8>
-	(
-		std::cout,
-		_mm256_set_epi8(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31)
-	) << "\n";
-	
-	
-	__m256i _8_bit_256_ = _mm256_setr_epi8    (1,  2,  3,  4,  5,  6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32);
-	__m256i _8_bit_mul_256_ = _mm256_setr_epi8(32, 31, 30, 29, 28, 1, 2, 3, 4, 10, 5,  2,  1,  3,  4,  4,  5,  2,  6,  5,  4,  3,  2,  1,  1,  0,  3,  4,  5,  1,  2,  3);
-	EmuSIMD::append_simd_vector_to_stream<8, false>
-	(
-		std::cout,
-		EmuSIMD::_underlying_simd_helpers::_mul_all_int<8>(_8_bit_256_, _8_bit_mul_256_)
-	) << "\n";
-	
-	__m256 cmp_a_ = _mm256_set_ps(2.0f, 1.0f, 3.0f, 4.0f, 0.0f, 2.0f, 3.0f, 3.0f);
-	__m256 cmp_b_ = _mm256_set_ps(2.0f, 5.0f, 6.6f, 4.0f, 3.0f, 1.0f, 2.0f, 3.0f);
-	EmuSIMD::append_simd_vector_to_stream
-	(
-		std::cout,
-		EmuSIMD::_underlying_simd_helpers::_make_register_from_movemask_fp<__m256>(_mm256_movemask_ps(_mm256_cmp_ps(cmp_a_, cmp_b_, _CMP_EQ_OS)))
-	) << "\n";
-	
-	__m128i mod_a_256_ = _mm_setr_epi32(10, 3, -4, 4);
-	__m128i mod_b_256_ = _mm_setr_epi32(1,  2,  3, 4);
-	EmuSIMD::append_simd_vector_to_stream
-	(
-		std::cout,
-		EmuSIMD::_underlying_simd_helpers::_mod_int<32, true>(mod_a_256_, mod_b_256_)
-	) << "\n";
-	EmuSIMD::append_simd_vector_to_stream
-	(
-		std::cout,
-		EmuSIMD::_underlying_simd_helpers::_rem_int<32, true>(mod_a_256_, mod_b_256_)
-	) << "\n";
-	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::setallone<__m256>()) << "\n";
-	
-	
-	std::cout << "---\n\n";
-	
-	
-	using testing_register = __m256i;
-	constexpr std::size_t testing_element_width = 8;
-	testing_register a_simd_ = EmuSIMD::set_incrementing<testing_register, 1, testing_element_width>();
-	testing_register b_simd_ = EmuSIMD::set_incrementing<testing_register, 33, testing_element_width>();
-	testing_register mask_simd_ = EmuSIMD::index_mask<testing_register, true, false, false, false, false, true, false, false>::get();
-	EmuSIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, a_simd_) << " BLEND\n";
-	EmuSIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, b_simd_) << " WITH MASK\n";
-	EmuSIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, mask_simd_) << ":\n";
-	EmuSIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, EmuSIMD::blendv(a_simd_, b_simd_, mask_simd_)) << "\n";
-	EmuSIMD::append_simd_vector_to_stream<testing_element_width, false>
-	(
-		std::cout,
-		EmuSIMD::blend
-		<
-			false, false, true, true, true, false, true, false, false, false, false, true, true, true, true, false,
-			true, true, true, true, true, false, true, false, false, false, false, true, true, true, true, true
-		>(a_simd_, b_simd_)
-	) << "\n";
-	
-	__m256 lhs_ = EmuSIMD::set<__m256>(1, 2, 3, 4, 5, 6, 7, 8);
-	__m256 rhs_ = EmuSIMD::set<__m256>(9, 10, 11, 12, 13, 14, 15, 16);
-	EmuSIMD::append_simd_vector_to_stream(std::cout, lhs_) << "\n";
-	EmuSIMD::append_simd_vector_to_stream(std::cout, rhs_) << "\n";
-	EmuSIMD::append_simd_vector_to_stream(std::cout, _mm256_permute2f128_ps(lhs_, rhs_, 0b00110001)) << "\n";
-	
-	__m256i lhs_int_ = _mm256_set_epi32(1, 2, 3, 4, 5, 6, 7, 8);
-	__m256i rhs_int_ = _mm256_set_epi32(1, 4, 3, 2, 5, 6, 7, 8);
-	std::cout << std::bitset<32>(_mm256_movemask_epi8(_mm256_cmpeq_epi32(lhs_int_, rhs_int_))) << "\n";
-	std::cout << EmuSIMD::cmp_all_eq<true, true, true, true, true, false, true, false, true>(lhs_int_, rhs_int_) << "\n";
-	EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::horizontal_sum_fill(lhs_)) << "\n";
-	
-	
-	constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
-	constexpr std::size_t test_noise_dimensions = 3;
-	constexpr auto sample_count = EmuMath::Vector<3, std::size_t>(1024, 1024, 1);
-	constexpr bool use_fractal = true;
-	using scalar_test_noise_processor = EmuMath::Functors::noise_sample_processor_perlin_normalise<test_noise_dimensions>;
-	using fast_test_noise_processor = EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<test_noise_dimensions>;
-	
-	constexpr std::size_t num_iterations = 1;
-	std::vector<EmuMath::NoiseTable<test_noise_dimensions, float>> noise_;
-	std::vector<EmuMath::FastNoiseTable<test_noise_dimensions, 0>> fast_noise_;
-	noise_.resize(num_iterations, decltype(noise_)::value_type());
-	fast_noise_.resize(num_iterations, decltype(fast_noise_)::value_type());
-	
-	system("pause");
-	for (std::size_t i = 0; i < num_iterations; ++i)
-	{
-		std::cout << "\nNOISE BATCH " << i << "\n";
-		timer_.Restart();
-		noise_[i].GenerateNoise<test_noise_type_flag, scalar_test_noise_processor>
-		(
-			decltype(noise_)::value_type::MakeOptions
-			(
-				sample_count,
-				EmuMath::Vector<3, float>(0.0f, 0.0f, 0.0f),
-				EmuMath::Vector<3, float>(1.0f / 1024.0f, 1.0f / 1024.0f, 1.0f / 1024.0f),
-				3.0f,
-				true,
-				use_fractal,
-				EmuMath::Info::NoisePermutationInfo(4096, EmuMath::Info::NoisePermutationShuffleMode::SEED_32, true, 1337, 1337),
-				EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
-			)
-		);
-		timer_.Pause();
-		std::cout << "FINISHED SCALAR NOISE IN: " << timer_.GetMilli() << "ms\n";
-	
-	
-		timer_.Restart();
-		fast_noise_[i].GenerateNoise<test_noise_type_flag, fast_test_noise_processor>
-		(
-			decltype(fast_noise_)::value_type::make_options
-			(
-				sample_count,
-				EmuMath::Vector<3, float>(0.0f, 0.0f, 0.0f),
-				EmuMath::Vector<3, float>(1.0f / 1024.0f, 1.0f / 1024.0f, 1.0f / 1024.0f),
-				3.0f,
-				true,
-				use_fractal,
-				EmuMath::Info::NoisePermutationInfo(4096, EmuMath::Info::NoisePermutationShuffleMode::SEED_32, true, 1337, 1337),
-				EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
-			)
-		);
-		timer_.Pause();
-		std::cout << "FINISHED FAST NOISE IN: " << timer_.GetMilli() << "ms\n";
-	}
-	WriteNoiseTableToPPM(noise_, noise_gradient_, "test_noise_scalar");
-	WriteNoiseTableToPPM(fast_noise_, noise_gradient_, "test_noise_simd");
+	// COLOURS START
+	//std::cout << "\n\n";
+	//system("pause");
+	//std::cout << "\n---\n\n\n";
+	//constexpr EmuMath::ColourRGB<float> colour_(-0.2f, 2.5, 2.0f);
+	//constexpr auto wrapped_ = colour_.Wrapped<std::uint8_t, true>();
+	//constexpr auto clamped_ = colour_.Clamped<std::uint8_t, true>();
+	//
+	//constexpr EmuMath::ColourRGB<float> white_(1.0f, 1.0f, 1.0f);
+	//constexpr EmuMath::ColourRGB<float> black_(0.0f, 0.0f, 0.0f);
+	//constexpr auto white_lerp_black_ = white_.Lerp(black_, 0.5f);
+	//
+	//constexpr auto colour_a_ = EmuMath::ColourRGBA<double>(0.8, 1.0, 0.5, 1.0);
+	//constexpr auto colour_b_ = EmuMath::ColourRGBA<std::uint8_t>(0, 255 / 2, 255 / 4, 255);
+	//constexpr auto colour_c_ = EmuMath::ColourRGBA<std::uint8_t>(255, 0, 255 / 2, 255 / 4);
+	//constexpr auto vector_a_ = EmuMath::NewVector<2, double>(0.5, 0.25);
+	//constexpr auto lerp_a_ = colour_a_.Lerp(colour_b_, 0.5f);
+	//constexpr auto lerp_b_ = colour_a_.Lerp(colour_b_, colour_c_);
+	//constexpr auto lerp_c_ = colour_a_.Lerp(colour_b_, vector_a_);
+	//constexpr auto lerp_c_min_false_ = lerp_c_.Min<false>();
+	//constexpr auto lerp_c_min_true_ = lerp_c_.Min<true>();
+	//constexpr auto lerp_c_max_false_ = lerp_c_.Max<false>();
+	//constexpr auto lerp_c_max_true_ = lerp_c_.Max<true>();
+	//
+	//EmuMath::ColourRGBA<float> runtime_rgba_f_(0.1f, -0.1f, 1.0f, 1.5f);
+	//std::cout << runtime_rgba_f_ << "\n";
+	//runtime_rgba_f_.Wrap();
+	//std::cout << runtime_rgba_f_ << "\n";
+	//runtime_rgba_f_ *= 0.5f;
+	//std::cout << runtime_rgba_f_ << "\n";
+	//runtime_rgba_f_ += 0.1;
+	//std::cout << runtime_rgba_f_ << "\n";
+	//runtime_rgba_f_ -= 0.1;
+	//std::cout << runtime_rgba_f_ << "\n";
+	//runtime_rgba_f_ /= 2;
+	//std::cout << runtime_rgba_f_ << "\n";
+	//std::cout << (runtime_rgba_f_ == runtime_rgba_f_) << "\n";
+	//std::cout << (runtime_rgba_f_ != runtime_rgba_f_) << "\n";
+	//runtime_rgba_f_.Set(0.1, 0.2f, 0.53L, 1);
+	//std::cout << runtime_rgba_f_ << "\n";
+	//std::cout << "---Grey---\n";
+	//std::cout << "Basic Average: " << runtime_rgba_f_.GreyscaleBasic() << "\n";
+	//std::cout << "Luminance Average: " << runtime_rgba_f_.GreyscaleLuminance() << "\n";
+	//std::cout << "Desaturated: " << runtime_rgba_f_.GreyscaleDesaturate() << "\n";
+	//std::cout << "Decomposed (Min): " << runtime_rgba_f_.GreyscaleMin() << "\n";
+	//std::cout << "Decomposed (Max): " << runtime_rgba_f_.GreyscaleMax() << "\n";
+	//
+	//constexpr EmuMath::ColourRGB<float> from_rgba_ = EmuMath::ColourRGBA<float>(1, 2, 3, 4);
+	//
+	//constexpr auto some_vec_ = EmuMath::NewVector<1, long double>(colour_a_.AsVector());
+	//
+	//auto bloob = EmuMath::ColourRGB<float>().AsVectorRGB();
+	//auto bloob_ = EmuMath::ColourRGBA<float>().AsVectorRGB();
+	//auto bloob__ = EmuMath::ColourRGB<float>().AsVectorRGBA();
+	//auto bloob___ = EmuMath::ColourRGBA<float>().AsVectorRGBA();
+	//
+	//
+	//constexpr EmuMath::WrappedColour<float, true> wrapped_colour_(-0.2, 0.2, 0.5, 1.1);
+	//
+	//std::cout << "\n\n";
+	//auto wrapped_runtime_ = wrapped_colour_;
+	//std::cout << wrapped_runtime_ << "\n";
+	//wrapped_runtime_.G(25);
+	//std::cout << wrapped_runtime_ << "\n";
+	//std::cout << (wrapped_runtime_ * 2) << "\n";
+	//std::cout << (wrapped_runtime_ * EmuMath::WrappedColour<std::uint8_t, true>(255, 0, 255)) << "\n";
+	//
+	//EmuMath::WrappedColourRGBA<float> some_wrapped_colour_(2, 3.2, -4.6, 1.0);
+	//EmuMath::ColourRGB<float> some_colour_again_( some_wrapped_colour_ );
+	//
+	//std::cout << "\n\n";
+	//std::cout << some_wrapped_colour_ << "\n";
+	//EmuMath::WrappedColourRGBA<float> wee = some_wrapped_colour_.Add(2.1);
+	//std::cout << wee << "\n";
+	//std::cout << wee.Lerp<false>(EmuMath::ColourRGBA<double>(1, 2, 3, 1), 0.5f) << "\n";
+	//std::cout << wee.Lerp<true>(EmuMath::ColourRGBA<double>(1, 2, 3, 1), 0.5f) << "\n";
+	//
+	//decltype(wee)::underlying_colour wee_unwrapped_(wee);
+	//
+	//constexpr auto wrapped_colour_greyscale_basic_ = wrapped_colour_.GreyscaleBasic();
+	//constexpr auto wrapped_colour_greyscale_luminance_ = wrapped_colour_.GreyscaleLuminance();
+	//constexpr auto wrapped_colour_greyscale_desaturate_ = wrapped_colour_.GreyscaleDesaturate();
+	//constexpr auto wrapped_colour_greyscale_decompose_min_ = wrapped_colour_.GreyscaleMin();
+	//constexpr auto wrapped_colour_greyscale_decompose_max_ = wrapped_colour_.GreyscaleMax();
+	//
+	//constexpr EmuMath::ClampedColourRGBA<float> some_clamped_colour_(-0.1, 0.0, 0.8, 1.5);
+	//std::cout << "\n\n\n";
+	//using grad_type = EmuMath::Gradient<float>;
+	//grad_type gradient_;
+	//gradient_.AddClampedColourAnchor(1.0f, EmuMath::ColourRGB<float>(0.75f, 0.1f, 0.0f));
+	//gradient_.AddClampedColourAnchor(0.5f, EmuMath::ColourRGB<float>(0.5f, 0.5f, 0.5f));
+	//gradient_.AddClampedColourAnchor(123.5f, EmuMath::ColourRGB<float>(0.2f, 1.0f, 1.0f));
+	//gradient_.AddClampedAlphaAnchor(1.0f, 0.0f);
+	//gradient_.AddClampedColourAnchor(0.9f, EmuMath::ColourRGB<std::uint8_t>(255 / 4, 255 / 2, 255));
+	//std::size_t dummy_index_ = gradient_.AddWrappedColourAnchor_GetIndex(0.3f, EmuMath::ColourRGBA<std::int8_t>(-1, -2, -3));
+	//std::cout << gradient_ << "\n";
+	//gradient_.EraseColourIndex(dummy_index_);
+	//gradient_.EraseColourAnchor(0.9f);
+	//std::cout << "---\n" << gradient_ << "\n";
+	//std::cout << "---\n" << EmuMath::Gradient<std::uint8_t>(gradient_) << "\n";
+	//std::cout << "---\n";
+	//std::cout << "at(0.0): " << gradient_.GetColour(0.0f) << "\n";
+	//std::cout << "at(1.0): " << gradient_.GetColour(1.0f) << "\n";
+	//std::cout << "at(0.5): " << gradient_.GetColour(0.5f) << "\n";
+	//std::cout << "at(0.75): " << gradient_.GetColour(0.75f) << "\n";
+	//std::cout << "at(0.25): " << gradient_.GetColour(0.25f) << "\n";
+	//std::cout << "---\n";
+	//std::cout << "at(0.0): " << gradient_.GetAlpha(0.0f) << "\n";
+	//std::cout << "at(1.0): " << gradient_.GetAlpha(1.0f) << "\n";
+	//std::cout << "at(0.5): " << gradient_.GetAlpha(0.5f) << "\n";
+	//std::cout << "at(0.75): " << gradient_.GetAlpha(0.75f) << "\n";
+	//std::cout << "at(0.25): " << gradient_.GetAlpha(0.25f) << "\n";
+	//std::cout << "---\n";
+	//std::cout << "at(0.0): " << gradient_.Get(0.0f) << "\n";
+	//std::cout << "at(1.0): " << gradient_.Get(1.0f) << "\n";
+	//std::cout << "at(0.5): " << gradient_.Get(0.5f) << "\n";
+	//std::cout << "at(0.75): " << gradient_.Get(0.75f) << "\n";
+	//std::cout << "at(0.25): " << gradient_.Get(0.25f) << "\n";
+	//std::cout << "---\n";
+	//std::cout << (gradient_ == gradient_) << "\n";
+	//std::cout << (EmuMath::Gradient<std::int8_t>(gradient_) == EmuMath::Gradient<std::uint8_t>(gradient_)) << "\n";
+	//std::cout << (gradient_ == grad_type()) << "\n";
+	//std::cout << "---\n";
+	//std::cout << (gradient_ != gradient_) << "\n";
+	//std::cout << (EmuMath::Gradient<std::int8_t>(gradient_) != EmuMath::Gradient<std::uint8_t>(gradient_)) << "\n";
+	//std::cout << (gradient_ != grad_type()) << "\n";
+	//std::cout << "---\n";
+	//std::cout << gradient_.HasMatchingAlphaAnchors(gradient_) << "\n";
+	//std::cout << EmuMath::Gradient<std::int8_t>(gradient_).HasMatchingAlphaAnchors(EmuMath::Gradient<std::uint8_t>(gradient_)) << "\n";
+	//std::cout << gradient_.HasMatchingAlphaAnchors(grad_type()) << "\n";
+	//std::cout << "---\n";
+	//std::cout << gradient_.HasMatchingColourAnchors(gradient_) << "\n";
+	//std::cout << EmuMath::Gradient<std::int8_t>(gradient_).HasMatchingColourAnchors(EmuMath::Gradient<std::uint8_t>(gradient_)) << "\n";
+	//std::cout << gradient_.HasMatchingColourAnchors(grad_type()) << "\n";
+	//std::cout << "---\n";
+	//grad_type ______;
+	//______.AddClampedColourAnchor<float, true>(0.5f, {});
+	//std::cout << (______ == grad_type()) << "\n";
+	//std::cout << (______ != grad_type()) << "\n";
+	//std::cout << ______.HasMatchingAlphaAnchors(grad_type()) << "\n";
+	//std::cout << ______.HasMatchingColourAnchors(grad_type()) << "\n";
+	//std::cout << "---\n";
+	//
+	//constexpr auto wrap_test_ = grad_type::wrap_anchor(-0.3f);
+	//
+	//constexpr auto red_ = EmuMath::Colours::Lime();
+	//
+	//grad_type::anchor_type anchor_ = 0.0f;
+	//
+	//
+	//grad_type gradient_colours_;
+	//gradient_colours_.AddClampedColourAnchor(0.0f, EmuMath::Colours::Blue());
+	//gradient_colours_.AddClampedColourAnchor(0.35f, EmuMath::Colours::Blue());
+	//gradient_colours_.AddClampedColourAnchor(0.45f, EmuMath::Colours::White());
+	//gradient_colours_.AddClampedColourAnchor(0.5f, EmuMath::Colours::Black());
+	//gradient_colours_.AddClampedColourAnchor(0.65f, EmuMath::Colours::Yellow());
+	//gradient_colours_.AddClampedColourAnchor(0.85f, EmuMath::Colours::Green());
+	//gradient_colours_.AddClampedColourAnchor(1.0f, EmuMath::Colours::Red());
+	//
+	//grad_type gradient_greyscale_;
+	//gradient_greyscale_.AddClampedColourAnchor(0.0f, EmuMath::Colours::White());
+	//gradient_greyscale_.AddClampedColourAnchor(1.0f, EmuMath::Colours::Black());
+	//
+	//grad_type& noise_gradient_ = gradient_colours_;
+	//std::cout << "\nNoise Gradient:\n";
+	//std::cout << noise_gradient_ << "\n";
+	//std::cout << "\nNoise Gradient Reversed:\n";
+	//noise_gradient_.ReverseColours();
+	//std::cout << noise_gradient_ << "\n";
+	//
+	//__m128 some_a_128_ = _mm_set_ps(3.0f, 2.0f, 1.0f, 0.0f);
+	//__m128 some_b_128_ = _mm_set_ps(7.0f, 6.0f, 5.0f, 4.0f);
+	//std::cout << EmuMath::FastVector4f(EmuSIMD::_underlying_simd_helpers::_execute_shuffle<1, 1, 3, 3>(some_a_128_, some_b_128_)) << "\n";
+	//
+	//EmuSIMD::append_simd_vector_to_stream<8>
+	//(
+	//	std::cout,
+	//	_mm256_set_epi8(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31)
+	//) << "\n";
+	//
+	//
+	//__m256i _8_bit_256_ = _mm256_setr_epi8    (1,  2,  3,  4,  5,  6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32);
+	//__m256i _8_bit_mul_256_ = _mm256_setr_epi8(32, 31, 30, 29, 28, 1, 2, 3, 4, 10, 5,  2,  1,  3,  4,  4,  5,  2,  6,  5,  4,  3,  2,  1,  1,  0,  3,  4,  5,  1,  2,  3);
+	//EmuSIMD::append_simd_vector_to_stream<8, false>
+	//(
+	//	std::cout,
+	//	EmuSIMD::_underlying_simd_helpers::_mul_all_int<8>(_8_bit_256_, _8_bit_mul_256_)
+	//) << "\n";
+	//
+	//__m256 cmp_a_ = _mm256_set_ps(2.0f, 1.0f, 3.0f, 4.0f, 0.0f, 2.0f, 3.0f, 3.0f);
+	//__m256 cmp_b_ = _mm256_set_ps(2.0f, 5.0f, 6.6f, 4.0f, 3.0f, 1.0f, 2.0f, 3.0f);
+	//EmuSIMD::append_simd_vector_to_stream
+	//(
+	//	std::cout,
+	//	EmuSIMD::_underlying_simd_helpers::_make_register_from_movemask_fp<__m256>(_mm256_movemask_ps(_mm256_cmp_ps(cmp_a_, cmp_b_, _CMP_EQ_OS)))
+	//) << "\n";
+	//
+	//__m128i mod_a_256_ = _mm_setr_epi32(10, 3, -4, 4);
+	//__m128i mod_b_256_ = _mm_setr_epi32(1,  2,  3, 4);
+	//EmuSIMD::append_simd_vector_to_stream
+	//(
+	//	std::cout,
+	//	EmuSIMD::_underlying_simd_helpers::_mod_int<32, true>(mod_a_256_, mod_b_256_)
+	//) << "\n";
+	//EmuSIMD::append_simd_vector_to_stream
+	//(
+	//	std::cout,
+	//	EmuSIMD::_underlying_simd_helpers::_rem_int<32, true>(mod_a_256_, mod_b_256_)
+	//) << "\n";
+	//EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::setallone<__m256>()) << "\n";
+	//
+	//
+	//std::cout << "---\n\n";
+	//
+	//
+	//using testing_register = __m256i;
+	//constexpr std::size_t testing_element_width = 8;
+	//testing_register a_simd_ = EmuSIMD::set_incrementing<testing_register, 1, testing_element_width>();
+	//testing_register b_simd_ = EmuSIMD::set_incrementing<testing_register, 33, testing_element_width>();
+	//testing_register mask_simd_ = EmuSIMD::index_mask<testing_register, true, false, false, false, false, true, false, false>::get();
+	//EmuSIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, a_simd_) << " BLEND\n";
+	//EmuSIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, b_simd_) << " WITH MASK\n";
+	//EmuSIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, mask_simd_) << ":\n";
+	//EmuSIMD::append_simd_vector_to_stream<testing_element_width, false>(std::cout, EmuSIMD::blendv(a_simd_, b_simd_, mask_simd_)) << "\n";
+	//EmuSIMD::append_simd_vector_to_stream<testing_element_width, false>
+	//(
+	//	std::cout,
+	//	EmuSIMD::blend
+	//	<
+	//		false, false, true, true, true, false, true, false, false, false, false, true, true, true, true, false,
+	//		true, true, true, true, true, false, true, false, false, false, false, true, true, true, true, true
+	//	>(a_simd_, b_simd_)
+	//) << "\n";
+	//
+	//__m256 lhs_ = EmuSIMD::set<__m256>(1, 2, 3, 4, 5, 6, 7, 8);
+	//__m256 rhs_ = EmuSIMD::set<__m256>(9, 10, 11, 12, 13, 14, 15, 16);
+	//EmuSIMD::append_simd_vector_to_stream(std::cout, lhs_) << "\n";
+	//EmuSIMD::append_simd_vector_to_stream(std::cout, rhs_) << "\n";
+	//EmuSIMD::append_simd_vector_to_stream(std::cout, _mm256_permute2f128_ps(lhs_, rhs_, 0b00110001)) << "\n";
+	//
+	//__m256i lhs_int_ = _mm256_set_epi32(1, 2, 3, 4, 5, 6, 7, 8);
+	//__m256i rhs_int_ = _mm256_set_epi32(1, 4, 3, 2, 5, 6, 7, 8);
+	//std::cout << std::bitset<32>(_mm256_movemask_epi8(_mm256_cmpeq_epi32(lhs_int_, rhs_int_))) << "\n";
+	//std::cout << EmuSIMD::cmp_all_eq<true, true, true, true, true, false, true, false, true>(lhs_int_, rhs_int_) << "\n";
+	//EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::horizontal_sum_fill(lhs_)) << "\n";
+	//
+	//
+	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
+	//constexpr std::size_t test_noise_dimensions = 3;
+	//constexpr auto sample_count = EmuMath::Vector<3, std::size_t>(1024, 1024, 1);
+	//constexpr bool use_fractal = true;
+	//using scalar_test_noise_processor = EmuMath::Functors::noise_sample_processor_perlin_normalise<test_noise_dimensions>;
+	//using fast_test_noise_processor = EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<test_noise_dimensions>;
+	//
+	//constexpr std::size_t num_iterations = 1;
+	//std::vector<EmuMath::NoiseTable<test_noise_dimensions, float>> noise_;
+	//std::vector<EmuMath::FastNoiseTable<test_noise_dimensions, 0>> fast_noise_;
+	//noise_.resize(num_iterations, decltype(noise_)::value_type());
+	//fast_noise_.resize(num_iterations, decltype(fast_noise_)::value_type());
+	//
+	//system("pause");
+	//for (std::size_t i = 0; i < num_iterations; ++i)
+	//{
+	//	std::cout << "\nNOISE BATCH " << i << "\n";
+	//	timer_.Restart();
+	//	noise_[i].GenerateNoise<test_noise_type_flag, scalar_test_noise_processor>
+	//	(
+	//		decltype(noise_)::value_type::MakeOptions
+	//		(
+	//			sample_count,
+	//			EmuMath::Vector<3, float>(0.0f, 0.0f, 0.0f),
+	//			EmuMath::Vector<3, float>(1.0f / 1024.0f, 1.0f / 1024.0f, 1.0f / 1024.0f),
+	//			3.0f,
+	//			true,
+	//			use_fractal,
+	//			EmuMath::Info::NoisePermutationInfo(4096, EmuMath::Info::NoisePermutationShuffleMode::SEED_32, true, 1337, 1337),
+	//			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+	//		)
+	//	);
+	//	timer_.Pause();
+	//	std::cout << "FINISHED SCALAR NOISE IN: " << timer_.GetMilli() << "ms\n";
+	//
+	//
+	//	timer_.Restart();
+	//	fast_noise_[i].GenerateNoise<test_noise_type_flag, fast_test_noise_processor>
+	//	(
+	//		decltype(fast_noise_)::value_type::make_options
+	//		(
+	//			sample_count,
+	//			EmuMath::Vector<3, float>(0.0f, 0.0f, 0.0f),
+	//			EmuMath::Vector<3, float>(1.0f / 1024.0f, 1.0f / 1024.0f, 1.0f / 1024.0f),
+	//			3.0f,
+	//			true,
+	//			use_fractal,
+	//			EmuMath::Info::NoisePermutationInfo(4096, EmuMath::Info::NoisePermutationShuffleMode::SEED_32, true, 1337, 1337),
+	//			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+	//		)
+	//	);
+	//	timer_.Pause();
+	//	std::cout << "FINISHED FAST NOISE IN: " << timer_.GetMilli() << "ms\n";
+	//}
+	//WriteNoiseTableToPPM(noise_, noise_gradient_, "test_noise_scalar");
+	//WriteNoiseTableToPPM(fast_noise_, noise_gradient_, "test_noise_simd");
 
 	// #### THREADED_NOISE_EXAMPLE ####
 	//std::cout << "GENERATING FAST NOISE VIA THREAD POOL...\n";
