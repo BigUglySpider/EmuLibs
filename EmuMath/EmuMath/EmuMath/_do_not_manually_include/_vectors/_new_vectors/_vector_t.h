@@ -5102,6 +5102,44 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::new_vector_distance_constexpr<preferred_floating_point, BeginIndex_, EndIndex_>(*this, to_);
 		}
+
+		/// <summary>
+		/// <para> Calculates a reflection of this Vector using the provided surface_normal_ Vector. </para>
+		/// </summary>
+		/// <param name="surface_normal_">: Normal describing a reflection surface. This is expected to be normalised, and treated as such.</param>
+		/// <returns>EmuMath Vector representing the reflection of this Vector on the provided surface_normal_.</returns>
+		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t NormalSize_, typename NormalT_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ReflectNormal(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
+		{
+			return EmuMath::Helpers::new_vector_reflect_normal<OutSize_, OutT_>(*this, surface_normal_);
+		}
+		template<typename OutT_ = preferred_floating_point, std::size_t NormalSize_, typename NormalT_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ReflectNormal(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
+		{
+			return EmuMath::Helpers::new_vector_reflect_normal<size, OutT_>(*this, surface_normal_);
+		}
+
+		/// <summary>
+		/// <para> Calculates a reflection of this Vector using the provided surface_normal_ Vector, using indices within the provided range. </para>
+		/// <para>
+		///		Calculations will be performed as though the indices within the provided range form a Vector of that size. 
+		///		For example, if using 3 indices within a Vector of 8 indices, the reflection will be performed as though on a 3-element Vector.
+		/// </para>
+		/// <para> BeginIndex_: Inclusive index at which to start performing reflection calculations. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop performing reflection calculations. </para>
+		/// </summary>
+		/// <param name="surface_normal_">: Normal describing a reflection surface. This is expected to be normalised, and treated as such.</param>
+		/// <returns>EmuMath Vector representing the reflection of this Vector on the provided surface_normal_, using indices within the provided range.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t NormalSize_, typename NormalT_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ReflectNormal(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
+		{
+			return EmuMath::Helpers::new_vector_reflect_normal<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, surface_normal_);
+		}
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point, std::size_t NormalSize_, typename NormalT_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ReflectNormal(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
+		{
+			return EmuMath::Helpers::new_vector_reflect_normal<size, OutT_, BeginIndex_, EndIndex_>(*this, surface_normal_);
+		}
 #pragma endregion
 
 #pragma region GENERIC_CMP_FUNCS

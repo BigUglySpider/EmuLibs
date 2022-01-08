@@ -4,6 +4,7 @@
 #include <array>
 #include <limits>
 #include <string>
+#include "OperatorChecks.h"
 
 namespace EmuCore::TMP
 {
@@ -340,6 +341,162 @@ namespace EmuCore::TMP
 		{
 			constexpr std::size_t _buffer_size_without_terminator = _buffer_size() - 1;
 			return std::basic_string<Char_>(get(), _buffer_size_without_terminator);
+		}
+	};
+
+	/// <summary>
+	/// <para> Function which may be used to form a constant of type T_ using the provided Constant_ argument. </para>
+	/// <para> 
+	///		If Constant_ is an arithmetic type, and T_ cannot be formed from it, 
+	///		T_ will attempt to be formed from a static_cast of Constant_ to the provided AltConstantType_ (with ref/cv qualifiers).
+	/// </para>
+	/// <para>
+	///		AltConstantType_: Optional conversion type for casting when Constant_ is an arithmetic type that may not be used with T_. 
+	///		Defaults to a floating-point conversion if Constant_ is integral, or an integral conversion otherwise.
+	/// </para>
+	/// </summary>
+	/// <returns>
+	///		T_ constructed or static_cast to from the provided Constant_,
+	///		or from a static_cast of Constant_ to the (unqualified) AltConstantType_ if Constant_ is an arithmetic type that cannot be used.
+	/// </returns>
+	template
+	<
+		typename T_,
+		auto Constant_,
+		typename AltConstantType_ = std::conditional_t<std::is_integral_v<EmuCore::TMP::remove_ref_cv_t<decltype(Constant_)>>, double, std::int64_t>
+	>
+	[[nodiscard]] constexpr inline T_ make_constant()
+	{
+		using constant_type = decltype(Constant_);
+		using constant_uq = EmuCore::TMP::remove_ref_cv_t<constant_type>;
+		if constexpr (std::is_arithmetic_v<constant_uq>)
+		{
+			// Arithmetic should always be true as of writing, but this is provided in case non-arithmetic non-type arguments are standardised
+			if constexpr (std::is_constructible_v<T_, constant_type>)
+			{
+				return T_(Constant_);
+			}
+			else if constexpr (EmuCore::TMP::is_static_castable_v<constant_type, T_>)
+			{
+				return static_cast<T_>(Constant_);
+			}
+			else
+			{
+				using alt_constant_type_uq = EmuCore::TMP::remove_ref_cv_t<AltConstantType_>;
+				if constexpr (EmuCore::TMP::is_static_castable_v<constant_type, alt_constant_type_uq>)
+				{
+					if constexpr (std::is_constructible_v<T_, alt_constant_type_uq>)
+					{
+						return T_(static_cast<alt_constant_type_uq>(Constant_));
+					}
+					else if constexpr (EmuCore::TMP::is_static_castable_v<alt_constant_type_uq, T_>)
+					{
+						return static_cast<T_>
+						(
+							static_cast<alt_constant_type_uq>(Constant_)
+						);
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<T_>(),
+							"Attempted to form a constant of type T_ with an arithmetic constant, but the provided type T_ cannot be constructed with the passed Constant_ or its static_cast to the provided (unqualified) AltConstantType_."
+						);
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<T_>(),
+						"Attempted to form a constant of type T_ with an arithmetic constant, but the provided type T_ cannot be constructed with the passed Constant_ and the Constant_ cannot be static_cast to its provided (unqualified) AltConstantType_."
+					);
+				}
+			}
+		}
+		else
+		{
+			if constexpr (std::is_constructible_v<T_, constant_type>)
+			{
+				return T_(Constant_);
+			}
+			else if constexpr(EmuCore::TMP::is_static_castable_v<constant_type, T_>)
+			{
+				return static_cast<T_>(Constant_);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<T_>(),
+					"Attempted to form a constant of type T_, but the provided type T_ cannot be constructed or static-cast to from the passed non-arithmetic Constant_."
+				);
+			}
+		}
+	}
+
+	template
+	<
+		typename T_,
+		auto Constant_,
+		typename AltConstantType_ = std::conditional_t<std::is_integral_v<EmuCore::TMP::remove_ref_cv_t<decltype(Constant_)>>, double, std::int64_t>
+	>
+	[[nodiscard]] constexpr inline bool is_valid_make_constant_call()
+	{
+		using constant_type = decltype(Constant_);
+		using constant_uq = EmuCore::TMP::remove_ref_cv_t<constant_type>;
+		constexpr bool constant_is_arithmetic_ = std::is_arithmetic_v<constant_uq>;
+		if constexpr (constant_is_arithmetic_)
+		{
+			if constexpr (std::is_constructible_v<T_, constant_type> || EmuCore::TMP::is_static_castable_v<constant_type, T_>)
+			{
+				return true;
+			}
+			else
+			{
+				using alt_constant_type_uq = EmuCore::TMP::remove_ref_cv_t<AltConstantType_>;
+				return
+				(
+					EmuCore::TMP::is_static_castable_v<constant_type, alt_constant_type_uq> &&
+					(std::is_constructible_v<T_, alt_constant_type_uq> || EmuCore::TMP::is_static_castable_v<alt_constant_type_uq, T_>)
+				);
+			}
+		}
+		else
+		{
+			return std::is_constructible_v<T_, constant_type> || EmuCore::TMP::is_static_castable_v<constant_type, T_>;
+		}
+	}
+
+	/// <summary>
+	/// <para> Helper type to safely form a constant via make_constant if possible, and not call it if not valid. </para>
+	/// <para> The contained bool is_valid can be used to determine success (true if successful, otherwise false). </para>
+	/// <para>
+	///		The get() static function may be called to retrieve the result constant. 
+	///		If is_valid is true, this will be the result of EmuCore::TMP::make_constant with the same arguments. 
+	///		Otherwise, it will be the result of std::declval with the provided T_.
+	/// </para>
+	/// </summary>
+	template
+	<
+		typename T_,
+		auto Constant_,
+		typename AltConstantType_ = std::conditional_t<std::is_integral_v<EmuCore::TMP::remove_ref_cv_t<decltype(Constant_)>>, double, std::int64_t>
+	>
+	struct try_make_constant
+	{
+		static constexpr bool is_valid = EmuCore::TMP::is_valid_make_constant_call<T_, Constant_, AltConstantType_>();
+		static constexpr std::conditional_t<is_valid, T_, decltype(std::declval<T_>())> get()
+		{
+			if constexpr (is_valid)
+			{
+				return EmuCore::TMP::make_constant<T_, Constant_, AltConstantType_>();
+			}
+			else
+			{
+				return std::declval<T_>();
+			}
 		}
 	};
 }

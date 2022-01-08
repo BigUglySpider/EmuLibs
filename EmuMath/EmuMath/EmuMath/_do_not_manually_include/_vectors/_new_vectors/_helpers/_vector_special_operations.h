@@ -18,6 +18,7 @@
 // --- square_distance
 // --- distance
 // --- distance_constexpr
+// --- reflect_normal
 
 namespace EmuMath::Helpers
 {
@@ -839,6 +840,110 @@ namespace EmuMath::Helpers
 	{
 		using from_fp = typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point;
 		return _vector_underlying::_vector_distance<EmuCore::do_sqrt_constexpr, BeginIndex_, EndIndex_, from_fp>(from_, to_);
+	}
+#pragma endregion
+
+#pragma region REFLECT_NORMAL_FUNCS
+	/// <summary>
+	/// <para> Calculates a reflection Vector using the provided ray_ (direction) Vector and normal_ Vector. </para>
+	/// </summary>
+	/// <param name="ray_">: Vector to be reflected.</param>
+	/// <param name="normal_">: Normal describing a reflection surface. This is expected to be normalised, and treated as such.</param>
+	/// <returns>EmuMath Vector representing the reflection of the provided ray_ on the provided surface normal_.</returns>
+	template<std::size_t OutSize_, typename OutT_, std::size_t RaySize_, typename RayT_, std::size_t NormalSize_, typename NormalT_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_reflect_normal
+	(
+		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
+		const EmuMath::NewVector<NormalSize_, NormalT_>& normal_
+	)
+	{
+		return _vector_underlying::_vector_reflect_normal<EmuCore::do_subtract, EmuCore::do_multiply, OutSize_, OutT_>(ray_, normal_);
+	}
+
+	template<typename OutT_, std::size_t RaySize_, typename RayT_, std::size_t NormalSize_, typename NormalT_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<RaySize_, OutT_> new_vector_reflect_normal
+	(
+		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
+		const EmuMath::NewVector<NormalSize_, NormalT_>& normal_
+	)
+	{
+		return _vector_underlying::_vector_reflect_normal<EmuCore::do_subtract, EmuCore::do_multiply, RaySize_, OutT_>(ray_, normal_);
+	}
+
+	template<std::size_t OutSize_, std::size_t RaySize_, typename RayT_, std::size_t NormalSize_, typename NormalT_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<RaySize_, RayT_>::preferred_floating_point> new_vector_reflect_normal
+	(
+		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
+		const EmuMath::NewVector<NormalSize_, NormalT_>& normal_
+	)
+	{
+		using ray_fp = typename EmuMath::NewVector<RaySize_, RayT_>::preferred_floating_point;
+		return _vector_underlying::_vector_reflect_normal<EmuCore::do_subtract, EmuCore::do_multiply, OutSize_, ray_fp>(ray_, normal_);
+	}
+
+	template<typename RayT_, typename NormalT_, std::size_t RaySize_, std::size_t NormalSize_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<RaySize_, typename EmuMath::NewVector<RaySize_, RayT_>::preferred_floating_point> new_vector_reflect_normal
+	(
+		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
+		const EmuMath::NewVector<NormalSize_, NormalT_>& normal_
+	)
+	{
+		using ray_fp = typename EmuMath::NewVector<RaySize_, RayT_>::preferred_floating_point;
+		return _vector_underlying::_vector_reflect_normal<EmuCore::do_subtract, EmuCore::do_multiply, RaySize_, ray_fp>(ray_, normal_);
+	}
+
+	/// <summary>
+	/// <para> Calculates a reflection Vector using the provided ray_ (direction) Vector and normal_ Vector, using indices within the provided range. </para>
+	/// <para>
+	///		Calculations will be performed as though the indices within the provided range form a Vector of that size. 
+	///		For example, if using 3 indices within a Vector of 8 indices, the reflection will be performed as though on a 3-element Vector.
+	/// </para>
+	/// <para> BeginIndex_: Inclusive index at which to start performing reflection calculations. </para>
+	/// <para> EndIndex_: Exclusive index at which to stop performing reflection calculations. </para>
+	/// </summary>
+	/// <param name="ray_">: Vector to be reflected.</param>
+	/// <param name="normal_">: Normal describing a reflection surface. This is expected to be normalised, and treated as such.</param>
+	/// <returns>EmuMath Vector representing the reflection of the provided ray_ on the provided surface normal_, using indices within the provided range.</returns>
+	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t RaySize_, typename RayT_, std::size_t NormalSize_, typename NormalT_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_reflect_normal
+	(
+		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
+		const EmuMath::NewVector<NormalSize_, NormalT_>& normal_
+	)
+	{
+		return _vector_underlying::_vector_reflect_normal<EmuCore::do_subtract, EmuCore::do_multiply, BeginIndex_, EndIndex_, OutSize_, OutT_>(ray_, normal_);
+	}
+
+	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t RaySize_, typename RayT_, std::size_t NormalSize_, typename NormalT_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<RaySize_, OutT_> new_vector_reflect_normal
+	(
+		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
+		const EmuMath::NewVector<NormalSize_, NormalT_>& normal_
+	)
+	{
+		return _vector_underlying::_vector_reflect_normal<EmuCore::do_subtract, EmuCore::do_multiply, BeginIndex_, EndIndex_, RaySize_, OutT_>(ray_, normal_);
+	}
+
+	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t RaySize_, typename RayT_, std::size_t NormalSize_, typename NormalT_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<RaySize_, RayT_>::preferred_floating_point> new_vector_reflect_normal
+	(
+		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
+		const EmuMath::NewVector<NormalSize_, NormalT_>& normal_
+	)
+	{
+		using ray_fp = typename EmuMath::NewVector<RaySize_, RayT_>::preferred_floating_point;
+		return _vector_underlying::_vector_reflect_normal<EmuCore::do_subtract, EmuCore::do_multiply, BeginIndex_, EndIndex_, OutSize_, ray_fp>(ray_, normal_);
+	}
+
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename RayT_, std::size_t RaySize_, typename NormalT_, std::size_t NormalSize_>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<RaySize_, typename EmuMath::NewVector<RaySize_, RayT_>::preferred_floating_point> new_vector_reflect_normal
+	(
+		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
+		const EmuMath::NewVector<NormalSize_, NormalT_>& normal_
+	)
+	{
+		using ray_fp = typename EmuMath::NewVector<RaySize_, RayT_>::preferred_floating_point;
+		return _vector_underlying::_vector_reflect_normal<EmuCore::do_subtract, EmuCore::do_multiply, BeginIndex_, EndIndex_, RaySize_, ray_fp>(ray_, normal_);
 	}
 #pragma endregion
 }

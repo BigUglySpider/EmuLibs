@@ -1173,6 +1173,18 @@ int main()
 	constexpr auto equal_check_ = EmuCore::do_cmp_equal_to<void>()(dist_ab_squared_, sqr_dist_ab_);
 	constexpr auto near_check_ = EmuCore::do_cmp_near_equal<void>()(dist_ab_squared_, sqr_dist_ab_);
 
+	std::cout << "\n---\n";
+	constexpr auto reflect_normal_ = EmuMath::NewVector<3, float>(1.0f, 0.0f, 0.0f).NormaliseConstexpr();
+	constexpr auto ray_vector_ = EmuMath::NewVector<3, float>(2.0f, 0.0f, 1.0f);
+	constexpr auto reflection_vector_ = ray_vector_.ReflectNormal(reflect_normal_);
+	std::cout << "Emu: " << reflection_vector_ << "\n";
+	constexpr auto reflect_normal_dxm_ = DirectX::XMFLOAT3(reflect_normal_.at<0>(), reflect_normal_.at<1>(), reflect_normal_.at<2>());
+	constexpr auto ray_vector_dxm_ = DirectX::XMFLOAT3(ray_vector_.at<0>(), ray_vector_.at<1>(), ray_vector_.at<2>());
+	auto reflect_dxm_simd_ = DirectX::XMVector3Reflect(DirectX::XMLoadFloat3(&ray_vector_dxm_), DirectX::XMLoadFloat3(&reflect_normal_dxm_));
+	DirectX::XMFLOAT3 reflect_dxm_;
+	DirectX::XMStoreFloat3(&reflect_dxm_, reflect_dxm_simd_);
+	std::cout << "DXM: " << "{ " << reflect_dxm_.x << ", " << reflect_dxm_.y << ", " << reflect_dxm_.z << " }\n";
+
 	system("pause");
 
 	// GRADIENTS START

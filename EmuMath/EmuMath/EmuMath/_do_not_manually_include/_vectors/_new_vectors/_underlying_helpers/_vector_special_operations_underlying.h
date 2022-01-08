@@ -1094,6 +1094,117 @@ namespace EmuMath::Helpers::_vector_underlying
 
 		return _vector_distance<SqrtTemplate_, 0, IncludeNonContained_ ? greatest_size_ : smallest_size_, Out_>(from_, to_);
 	}
+
+
+	template
+	<
+		template<class...> class SubTemplate_,
+		template<class...> class MulTemplate_,
+		std::size_t BeginIndex_,
+		std::size_t EndIndex_,
+		std::size_t OutSize_,
+		typename OutT_,
+		std::size_t RaySize_,
+		typename RayT_,
+		std::size_t NormSize_,
+		typename NormT_
+	>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_reflect_normal
+	(
+		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
+		const EmuMath::NewVector<NormSize_, NormT_>& normal_
+	)
+	{
+		using ray_fp = typename EmuMath::NewVector<RaySize_, RayT_>::preferred_floating_point;
+		if constexpr (EmuCore::TMP::valid_template_args_v<MulTemplate_, ray_fp, ray_fp>)
+		{
+			// MulDot_: Used for 2 * dot(ray_, normal_)
+			using MulDot_ = MulTemplate_<ray_fp, ray_fp>;
+			if constexpr (std::is_invocable_v<MulDot_, ray_fp, ray_fp>)
+			{
+				using mul_dot_result = std::invoke_result_t<MulDot_, ray_fp, ray_fp>;
+				using make_two = EmuCore::TMP::try_make_constant<ray_fp, 2>;
+				if constexpr (make_two::is_valid)
+				{
+					// Select the smallest size for calculations since we don't want to be constructing unused indices
+					constexpr std::size_t norm_calc_size_ = OutSize_ <= NormSize_ ? OutSize_ : NormSize_;
+					using norm_fp = typename EmuMath::NewVector<NormSize_, NormT_>::preferred_floating_point;
+
+					// Calculates normal_ * (2 * dot(ray_, normal_))
+					EmuMath::NewVector<norm_calc_size_, norm_fp> norm_mult_ = _vector_mutate_with_func_template_args_only
+					<
+						MulTemplate_,
+						EmuMath::NewVector<norm_calc_size_, norm_fp>,
+						BeginIndex_,
+						EndIndex_,
+						BeginIndex_
+					>(normal_, MulDot_()(make_two::get(), _vector_dot<BeginIndex_, EndIndex_, ray_fp>(ray_, normal_)));
+
+					// Return the calculation of ray_ - (normal_ * (2 * dot(ray_, normal_)))
+					return _vector_mutate_with_func_template_args_only
+					<
+						SubTemplate_,
+						EmuMath::NewVector<OutSize_, OutT_>,
+						BeginIndex_,
+						EndIndex_,
+						BeginIndex_
+					>(ray_, norm_mult_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<ray_fp>(),
+						"Attempted to calculate an EmuMath Vector reflection based on a ray Vector and a normal Vector, but the constant 2 could not be formed with the ray Vector's preferred_floating_point type."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<ray_fp>(),
+					"Attempted to calculate an EmuMath Vector reflection based on a ray Vector and a normal Vector, but the determined multiplication functor could not be invoked with two arguments of the ray Vector's preferred_floating_point type."
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<ray_fp>(),
+				"Attempted to calculate an EmuMath Vector reflection based on a ray Vector and a normal Vector, but a multiplication template could not be instantiated with the ray Vector's preferred_floating_point type as two type arguments."
+			);
+		}
+	}
+
+	template
+	<
+		template<class...> class SubTemplate_,
+		template<class...> class MulTemplate_,
+		std::size_t OutSize_,
+		typename OutT_,
+		std::size_t RaySize_,
+		typename RayT_,
+		std::size_t NormSize_,
+		typename NormT_
+	>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_reflect_normal
+	(
+		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
+		const EmuMath::NewVector<NormSize_, NormT_>& normal_
+	)
+	{
+		return _vector_reflect_normal
+		<
+			SubTemplate_,
+			MulTemplate_,
+			0,
+			EmuMath::NewVector<OutSize_, OutT_>::size,
+			OutSize_,
+			OutT_
+		>(ray_, normal_);
+	}
 }
 
 #endif
