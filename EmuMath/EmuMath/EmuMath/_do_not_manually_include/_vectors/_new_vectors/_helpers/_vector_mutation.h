@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_NEW_VECTOR_MUTATION_H_INC_
-#define EMU_MATH_NEW_VECTOR_MUTATION_H_INC_ 1
+#ifndef EMU_MATH_vector_MUTATION_H_INC_
+#define EMU_MATH_vector_MUTATION_H_INC_ 1
 
 #include "_common_vector_helpers.h"
 
@@ -23,12 +23,12 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath Vector to retrieve indices from.</param>
 	/// <returns>EmuMath Vector with a number of elements equal to the number of Indices_ arguments, constructed from shuffled indices within the passed vector_.</returns>
 	template<typename OutT_, std::size_t...Indices_, std::size_t Size_, typename T_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> new_vector_shuffle(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> vector_shuffle(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		return _vector_underlying::_vector_shuffle<OutT_, false, Indices_...>(vector_);
 	}
 	template<std::size_t...Indices_, std::size_t Size_, typename T_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), typename EmuMath::NewVector<Size_, T_>::value_type_uq> new_vector_shuffle
+	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), typename EmuMath::NewVector<Size_, T_>::value_type_uq> vector_shuffle
 	(
 		EmuMath::NewVector<Size_, T_>& vector_
 	)
@@ -37,12 +37,12 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename OutT_, std::size_t...Indices_, std::size_t Size_, typename T_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> new_vector_shuffle(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> vector_shuffle(const EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		return _vector_underlying::_vector_shuffle<OutT_, false, Indices_...>(vector_);
 	}
 	template<std::size_t...Indices_, std::size_t Size_, typename T_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), typename EmuMath::NewVector<Size_, T_>::value_type_uq> new_vector_shuffle
+	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), typename EmuMath::NewVector<Size_, T_>::value_type_uq> vector_shuffle
 	(
 		const EmuMath::NewVector<Size_, T_>& vector_
 	)
@@ -61,12 +61,12 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath Vector to retrieve indices from.</param>
 	/// <returns>EmuMath Vector with a number of elements equal to the number of Indices_ arguments, constructed from shuffled indices within the passed vector_.</returns>
 	template<typename OutT_, std::size_t...Indices_, std::size_t Size_, typename T_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> new_vector_shuffle_theoretical(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> vector_shuffle_theoretical(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		return _vector_underlying::_vector_shuffle<OutT_, true, Indices_...>(vector_);
 	}
 	template<std::size_t...Indices_, std::size_t Size_, typename T_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), typename EmuMath::NewVector<Size_, T_>::value_type_uq> new_vector_shuffle_theoretical
+	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), typename EmuMath::NewVector<Size_, T_>::value_type_uq> vector_shuffle_theoretical
 	(
 		EmuMath::NewVector<Size_, T_>& vector_
 	)
@@ -75,12 +75,12 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename OutT_, std::size_t...Indices_, std::size_t Size_, typename T_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> new_vector_shuffle_theoretical(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> vector_shuffle_theoretical(const EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		return _vector_underlying::_vector_shuffle<OutT_, true, Indices_...>(vector_);
 	}
 	template<std::size_t...Indices_, std::size_t Size_, typename T_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), typename EmuMath::NewVector<Size_, T_>::value_type_uq> new_vector_shuffle_theoretical
+	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), typename EmuMath::NewVector<Size_, T_>::value_type_uq> vector_shuffle_theoretical
 	(
 		const EmuMath::NewVector<Size_, T_>& vector_
 	)
@@ -103,7 +103,7 @@ namespace EmuMath::Helpers
 	/// <param name="args_">All arguments to pass to the mutation function on every iteration. May provide EmuMath Vectors for unique arguments per iteration. </param>
 	/// <returns>EmuMath Vector created from mutating the provided arguments via an instance of the provided Func_ at every index within the output Vector.</returns>
 	template<class Func_, std::size_t OutSize_, typename OutT_, class...Args_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_mutate(Args_&&...args_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_mutate(Args_&&...args_)
 	{
 		return _vector_underlying::_vector_mutate_args_only<Func_, EmuMath::NewVector<OutSize_, OutT_>, 0, EmuMath::NewVector<OutSize_, OutT_>::size, 0>
 		(
@@ -125,7 +125,7 @@ namespace EmuMath::Helpers
 	/// <param name="args_">All arguments to pass to the mutation function on every iteration. May provide EmuMath Vectors for unique arguments per iteration. </param>
 	/// <returns>EmuMath Vector created from mutating the provided arguments via the provided func_ at every index within the output Vector.</returns>
 	template<std::size_t OutSize_, typename OutT_, class Func_, class...Args_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_mutate(Func_ func_, Args_&&...args_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_mutate(Func_ func_, Args_&&...args_)
 	{
 		return _vector_underlying::_vector_mutate_return_out<EmuMath::NewVector<OutSize_, OutT_>, Func_&,  0, EmuMath::NewVector<OutSize_, OutT_>::size, 0>
 		(
@@ -144,7 +144,7 @@ namespace EmuMath::Helpers
 	/// <param name="out_vector_">: EmuMath Vector to output the results of mutation to.</param>
 	/// <param name="args_">: All arguments to pass to the mutation function on every iteration. May provide EmuMath Vectors for unique arguments per iteration. </param>
 	template<class Func_, std::size_t OutSize_, typename OutT_, class...Args_>
-	constexpr inline void new_vector_mutate_to(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
+	constexpr inline void vector_mutate_to(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
 	{
 		_vector_underlying::_vector_mutate_no_func_passed<Func_, EmuMath::NewVector<OutSize_, OutT_>, 0, EmuMath::NewVector<OutSize_, OutT_>::size, 0>
 		(
@@ -164,7 +164,7 @@ namespace EmuMath::Helpers
 	/// <param name="func_">Mutation function to execute with all passed arguments (as described) for every index within the output Vector.</param>
 	/// <param name="args_">All arguments to pass to the mutation function on every iteration. May provide EmuMath Vectors for unique arguments per iteration. </param>
 	template<class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
-	constexpr inline void new_vector_mutate_to(Func_ func_, EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
+	constexpr inline void vector_mutate_to(Func_ func_, EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
 	{
 		_vector_underlying::_vector_mutate<Func_&, EmuMath::NewVector<OutSize_, OutT_>, 0, EmuMath::NewVector<OutSize_, OutT_>::size, 0>
 		(
@@ -189,7 +189,7 @@ namespace EmuMath::Helpers
 	/// <param name="out_vector_">: Non-const EmuMath Vector reference to output to.</param>
 	/// <param name="args_">: All arguments that will be used to pass arguments to the mutation function on every iteration, as described.</param>
 	template<class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_ = 0, class...Args_, std::size_t OutSize_, typename OutT_>
-	constexpr inline void new_vector_mutate_range(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
+	constexpr inline void vector_mutate_range(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
 	{
 		_vector_underlying::_vector_mutate_no_func_passed<Func_, EmuMath::NewVector<OutSize_, OutT_>, BeginIndex_, EndIndex_, ArgBeginIndex_>
 		(
@@ -217,7 +217,7 @@ namespace EmuMath::Helpers
 	/// <param name="out_vector_">: Non-const EmuMath Vector reference to output to.</param>
 	/// <param name="args_">: All arguments that will be used to pass arguments to the mutation function on every iteration, as described.</param>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
-	constexpr inline void new_vector_mutate_range(Func_ func_, EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
+	constexpr inline void vector_mutate_range(Func_ func_, EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
 	{
 		_vector_underlying::_vector_mutate<Func_&, EmuMath::NewVector<OutSize_, OutT_>, BeginIndex_, EndIndex_, ArgBeginIndex_>
 		(
@@ -227,7 +227,7 @@ namespace EmuMath::Helpers
 		);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
-	constexpr inline void new_vector_mutate_range(Func_ func_, EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
+	constexpr inline void vector_mutate_range(Func_ func_, EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
 	{
 		_vector_underlying::_vector_mutate<Func_&, EmuMath::NewVector<OutSize_, OutT_>, BeginIndex_, EndIndex_, 0>
 		(
@@ -252,7 +252,7 @@ namespace EmuMath::Helpers
 	/// <param name="args_">: All arguments that will be used to pass arguments to the mutation function on every iteration, as described.</param>
 	/// <returns>A new instance of an EmuMath Vector of the specified OutSize_ and OutT_, with indices in the specified range set to mutation results.</returns>
 	template<class Func_, std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_ = 0, class...Args_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_mutate_range(Args_&&...args_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_mutate_range(Args_&&...args_)
 	{
 		return _vector_underlying::_vector_mutate_args_only<Func_, EmuMath::NewVector<OutSize_, OutT_>, BeginIndex_, EndIndex_, ArgBeginIndex_>
 		(
@@ -274,7 +274,7 @@ namespace EmuMath::Helpers
 	/// <param name="args_">: All arguments that will be used to pass arguments to the mutation function on every iteration, as described.</param>
 	/// <returns>A new instance of an EmuMath Vector of the specified OutSize_ and OutT_, with indices in the specified range set to mutation results.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_, class Func_, class...Args_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_mutate_range(Func_ func_, Args_&&...args_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_mutate_range(Func_ func_, Args_&&...args_)
 	{
 		return _vector_underlying::_vector_mutate_return_out<EmuMath::NewVector<OutSize_, OutT_>, Func_&, BeginIndex_, EndIndex_, ArgBeginIndex_>
 		(
@@ -283,7 +283,7 @@ namespace EmuMath::Helpers
 		);
 	}
 	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, class Func_, class...Args_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_mutate_range(Func_ func_, Args_&&...args_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_mutate_range(Func_ func_, Args_&&...args_)
 	{
 		return _vector_underlying::_vector_mutate_return_out<EmuMath::NewVector<OutSize_, OutT_>, Func_&, BeginIndex_, EndIndex_, 0>
 		(
@@ -302,7 +302,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_vector_">: EmuMath Vector that will appear in the right side of the output Vector.</param>
 	/// <returns>EmuMath Vector formed from concatenating the two provided Vectors.</returns>
 	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, std::size_t RhsSize_, typename RhsT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> new_vector_concat
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> vector_concat
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_,
 		const EmuMath::NewVector<RhsSize_, RhsT_>& rhs_vector_
@@ -312,7 +312,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, std::size_t RhsSize_, typename RhsT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> new_vector_concat
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> vector_concat
 	(
 		EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_,
 		const EmuMath::NewVector<RhsSize_, RhsT_>& rhs_vector_
@@ -322,7 +322,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, std::size_t RhsSize_, typename RhsT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> new_vector_concat
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> vector_concat
 	(
 		EmuMath::NewVector<LhsSize_, LhsT_>&& lhs_vector_,
 		const EmuMath::NewVector<RhsSize_, RhsT_>& rhs_vector_
@@ -336,7 +336,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, std::size_t RhsSize_, typename RhsT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> new_vector_concat
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> vector_concat
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_,
 		EmuMath::NewVector<RhsSize_, RhsT_>& rhs_vector_
@@ -346,7 +346,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, std::size_t RhsSize_, typename RhsT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> new_vector_concat
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> vector_concat
 	(
 		EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_,
 		EmuMath::NewVector<RhsSize_, RhsT_>& rhs_vector_
@@ -356,7 +356,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, std::size_t RhsSize_, typename RhsT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> new_vector_concat
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> vector_concat
 	(
 		EmuMath::NewVector<LhsSize_, LhsT_>&& lhs_vector_,
 		EmuMath::NewVector<RhsSize_, RhsT_>& rhs_vector_
@@ -370,7 +370,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, std::size_t RhsSize_, typename RhsT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> new_vector_concat
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> vector_concat
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_,
 		EmuMath::NewVector<RhsSize_, RhsT_>&& rhs_vector_
@@ -384,7 +384,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, std::size_t RhsSize_, typename RhsT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> new_vector_concat
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> vector_concat
 	(
 		EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_,
 		EmuMath::NewVector<RhsSize_, RhsT_>&& rhs_vector_
@@ -398,7 +398,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, std::size_t RhsSize_, typename RhsT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> new_vector_concat
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_ + RhsSize_, OutT_> vector_concat
 	(
 		EmuMath::NewVector<LhsSize_, LhsT_>&& lhs_vector_,
 		EmuMath::NewVector<RhsSize_, RhsT_>&& rhs_vector_

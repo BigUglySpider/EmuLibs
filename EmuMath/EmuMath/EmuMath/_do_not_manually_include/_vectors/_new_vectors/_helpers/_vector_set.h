@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_NEW_VECTOR_SET_H_INC_
-#define EMU_MATH_NEW_VECTOR_SET_H_INC_
+#ifndef EMU_MATH_vector_SET_H_INC_
+#define EMU_MATH_vector_SET_H_INC_
 
 #include "_common_vector_helpers.h"
 
@@ -20,7 +20,7 @@ namespace EmuMath::Helpers
 	/// <param name="to_set_">EmuMath Vector to set the specified index of.</param>
 	/// <param name="args_">Argument(s) to set the specified index via as described.</param>
 	template<std::size_t Index_, class...Args_, typename T_, std::size_t Size_, typename = std::enable_if_t<sizeof...(Args_) != 0>>
-	constexpr inline void new_vector_set(EmuMath::NewVector<Size_, T_>& to_set_, Args_&&...args_)
+	constexpr inline void vector_set(EmuMath::NewVector<Size_, T_>& to_set_, Args_&&...args_)
 	{
 		_vector_underlying::_vector_set_scalar<Index_, Args_...>(to_set_, std::forward<Args_>(args_)...);
 	}
@@ -41,17 +41,17 @@ namespace EmuMath::Helpers
 	/// <param name="to_set_">EmuMath Vector to set all elements of in the specified inclusive:exclusive range of BeginIndex_:EndIndex_.</param>
 	/// <param name="arg_">Argument to set all elements via.</param>
 	template<std::size_t BeginIndex_ = 0, std::size_t EndIndex_ = std::numeric_limits<std::size_t>::max(), class Arg_, typename T_, std::size_t Size_>
-	constexpr inline void new_vector_set_all(EmuMath::NewVector<Size_, T_>& to_set_, Arg_&& arg_)
+	constexpr inline void vector_set_all(EmuMath::NewVector<Size_, T_>& to_set_, Arg_&& arg_)
 	{
 		_vector_underlying::_vector_set_all<BeginIndex_, EndIndex_, Arg_>(to_set_, std::forward<Arg_>(arg_));
 	}
 	template<std::size_t BeginIndex_ = 0, std::size_t EndIndex_ = std::numeric_limits<std::size_t>::max(), class Arg_, typename T_, std::size_t Size_>
-	constexpr inline void new_vector_set_all(EmuMath::NewVector<Size_, T_>& to_set_, const Arg_& arg_)
+	constexpr inline void vector_set_all(EmuMath::NewVector<Size_, T_>& to_set_, const Arg_& arg_)
 	{
 		_vector_underlying::_vector_set_all<BeginIndex_, EndIndex_, const Arg_&>(to_set_, arg_);
 	}
 	template<std::size_t BeginIndex_ = 0, std::size_t EndIndex_ = std::numeric_limits<std::size_t>::max(), class Arg_, typename T_, std::size_t Size_>
-	constexpr inline void new_vector_set_all(EmuMath::NewVector<Size_, T_>& to_set_, Arg_& arg_)
+	constexpr inline void vector_set_all(EmuMath::NewVector<Size_, T_>& to_set_, Arg_& arg_)
 	{
 		_vector_underlying::_vector_set_all<BeginIndex_, EndIndex_, Arg_&>(to_set_, arg_);
 	}
@@ -65,7 +65,7 @@ namespace EmuMath::Helpers
 	/// <param name="to_set_">EmuMath Vector to set all elements of.</param>
 	/// <param name="move_arg_">EmuMath Vector to set to_set_ via.</param>
 	template<typename T_, std::size_t Size_, std::size_t ArgSize_, typename ArgT_>
-	constexpr inline void new_vector_set
+	constexpr inline void vector_set
 	(
 		EmuMath::NewVector<Size_, T_>& to_set_,
 		EmuMath::NewVector<ArgSize_, ArgT_>&& move_arg_
@@ -84,7 +84,7 @@ namespace EmuMath::Helpers
 	/// <param name="to_set_">EmuMath Vector to set all elements of.</param>
 	/// <param name="copy_arg_">EmuMath Vector to set to_set_ via.</param>
 	template<typename T_, std::size_t Size_, std::size_t ArgSize_, typename ArgT_>
-	constexpr inline void new_vector_set
+	constexpr inline void vector_set
 	(
 		EmuMath::NewVector<Size_, T_>& to_set_,
 		EmuMath::NewVector<ArgSize_, ArgT_>& copy_arg_
@@ -103,7 +103,7 @@ namespace EmuMath::Helpers
 	/// <param name="to_set_">EmuMath Vector to set all elements of.</param>
 	/// <param name="copy_arg_">EmuMath Vector to set to_set_ via.</param>
 	template<typename T_, std::size_t Size_, std::size_t ArgSize_, typename ArgT_>
-	constexpr inline void new_vector_set
+	constexpr inline void vector_set
 	(
 		EmuMath::NewVector<Size_, T_>& to_set_,
 		const EmuMath::NewVector<ArgSize_, ArgT_>& copy_arg_
@@ -122,7 +122,7 @@ namespace EmuMath::Helpers
 	/// <param name="to_set_">EmuMath Vector to set elements of.</param>
 	/// <param name="move_arg_">EmuMath Vector to set to_set_ via.</param>
 	template<typename T_, std::size_t Size_, std::size_t ArgSize_, typename ArgT_>
-	constexpr inline void new_vector_set_contained_only
+	constexpr inline void vector_set_contained_only
 	(
 		EmuMath::NewVector<Size_, T_>& to_set_,
 		EmuMath::NewVector<ArgSize_, ArgT_>&& move_arg_
@@ -141,7 +141,7 @@ namespace EmuMath::Helpers
 	/// <param name="to_set_">EmuMath Vector to set elements of.</param>
 	/// <param name="copy_arg_">EmuMath Vector to set to_set_ via.</param>
 	template<typename T_, std::size_t Size_, std::size_t ArgSize_, typename ArgT_>
-	constexpr inline void new_vector_set_contained_only
+	constexpr inline void vector_set_contained_only
 	(
 		EmuMath::NewVector<Size_, T_>& to_set_,
 		EmuMath::NewVector<ArgSize_, ArgT_>& copy_arg_
@@ -160,7 +160,7 @@ namespace EmuMath::Helpers
 	/// <param name="to_set_">EmuMath Vector to set elements of.</param>
 	/// <param name="copy_arg_">EmuMath Vector to set to_set_ via.</param>
 	template<typename T_, std::size_t Size_, std::size_t ArgSize_, typename ArgT_>
-	constexpr inline void new_vector_set_contained_only
+	constexpr inline void vector_set_contained_only
 	(
 		EmuMath::NewVector<Size_, T_>& to_set_,
 		const EmuMath::NewVector<ArgSize_, ArgT_>& copy_arg_

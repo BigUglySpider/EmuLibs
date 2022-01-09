@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_NEW_VECTOR_CAST_UNDERLYING_H_INC_
-#define EMU_MATH_NEW_VECTOR_CAST_UNDERLYING_H_INC_ 1
+#ifndef EMU_MATH_vector_CAST_UNDERLYING_H_INC_
+#define EMU_MATH_vector_CAST_UNDERLYING_H_INC_ 1
 
 #include "_vector_tmp.h"
 #include "_vector_get_underlying.h"
@@ -49,7 +49,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	template<class InVector_, std::size_t OutSize_, typename OutT_, std::size_t Offset_>
 	[[nodiscard]] constexpr inline bool _vector_cast_valid()
 	{
-		if constexpr (EmuMath::TMP::is_emu_new_vector_v<InVector_>)
+		if constexpr (EmuMath::TMP::is_emu_vector_v<InVector_>)
 		{
 			if constexpr (_vector_cast_valid_ref_state<InVector_, OutSize_, OutT_, Offset_>())
 			{

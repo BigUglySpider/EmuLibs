@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_NEW_VECTOR_INFO_H_INC_
-#define EMU_MATH_NEW_VECTOR_INFO_H_INC_ 1
+#ifndef EMU_MATH_vector_INFO_H_INC_
+#define EMU_MATH_vector_INFO_H_INC_ 1
 
 #include "_vector_tmp.h"
 
@@ -219,7 +219,7 @@ namespace EmuMath::TMP
 					// Temp, so will result in dangling references
 					// --- We allow EmuMath Vectors of references for this, however, 
 					// --- to allow Vectors of references to Vectors of references (not a typo).
-					if constexpr (is_stored_type_settable_via_type<T_>() && EmuMath::TMP::is_emu_new_vector_v<T_>)
+					if constexpr (is_stored_type_settable_via_type<T_>() && EmuMath::TMP::is_emu_vector_v<T_>)
 					{
 						if constexpr (contains_non_const_ref)
 						{
@@ -426,11 +426,11 @@ namespace EmuMath::TMP
 					}
 					else
 					{
-						if constexpr (EmuMath::TMP::is_emu_new_vector_v<value_type> && EmuMath::TMP::is_emu_vector_v<arg_no_ref>)
+						if constexpr (EmuMath::TMP::is_emu_vector_v<value_type> && EmuMath::TMP::is_emu_vector_v<arg_no_ref>)
 						{
 							using arg_value_type = typename arg_no_ref::value_type;
 							using value_type_info = typename value_type::vector_info;
-							if constexpr (EmuMath::TMP::is_emu_new_vector_v<arg_value_type>)
+							if constexpr (EmuMath::TMP::is_emu_vector_v<arg_value_type>)
 							{
 								return value_type_info::template is_valid_template_copy_arg<arg_value_type, Assigning_>();
 							}
@@ -441,7 +441,7 @@ namespace EmuMath::TMP
 						}
 						else
 						{
-							if constexpr (EmuMath::TMP::is_emu_new_vector_v<arg_no_ref>)
+							if constexpr (EmuMath::TMP::is_emu_vector_v<arg_no_ref>)
 							{
 								return is_valid_single_copy_type<typename arg_no_ref::value_type>();
 							}

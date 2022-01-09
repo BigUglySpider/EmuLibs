@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_NEW_VECTOR_BASIC_ARITHMETIC_H_INC_
-#define EMU_MATH_NEW_VECTOR_BASIC_ARITHMETIC_H_INC_ 1
+#ifndef EMU_MATH_vector_BASIC_ARITHMETIC_H_INC_
+#define EMU_MATH_vector_BASIC_ARITHMETIC_H_INC_ 1
 
 #include "_common_vector_helpers.h"
 #include "../../../../../EmuCore/Functors/Arithmetic.h"
@@ -22,17 +22,17 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of addition.</param>
 	/// <returns>EmuMath Vector of the desired OutSize_ (defaults to LhsSize_) and OutT_ (defaults to vector_lhs_'s value_type_uq), containing addition results.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_add(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_add(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_add, OutSize_, OutT_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> new_vector_add(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> vector_add(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_add, LhsSize_, OutT_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<std::size_t OutSize_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_add
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_add
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -42,7 +42,7 @@ namespace EmuMath::Helpers
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_add, OutSize_, lhs_value_uq)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<typename Rhs_, typename LhsT_, std::size_t LhsSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_add
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_add
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -60,7 +60,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_lhs_">: EmuMath Vector appearing on the left-hand side of addition.</param>
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of addition.</param>
 	template<std::size_t OutSize_, typename OutT_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	constexpr inline void new_vector_add(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	constexpr inline void vector_add(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE(EmuCore::do_add, OutSize_, OutT_)(out_vector_, vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
@@ -75,7 +75,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of addition.</param>
 	/// <returns>Copy of vector_lhs_, with addition performed with the provided rhs_ as described within the specified index range.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_add_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_add_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE(EmuCore::do_add, OutSize_, OutT_, LhsSize_, LhsT_, BeginIndex_, EndIndex_)
 		(
@@ -85,7 +85,7 @@ namespace EmuMath::Helpers
 		);
 	}
 	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> new_vector_add_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> vector_add_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE(EmuCore::do_add, LhsSize_, OutT_, LhsSize_, LhsT_, BeginIndex_, EndIndex_)
 		(
@@ -95,7 +95,7 @@ namespace EmuMath::Helpers
 		);
 	}
 	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_add_range
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_add_range
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -110,7 +110,7 @@ namespace EmuMath::Helpers
 		);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_add_range
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_add_range
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -135,7 +135,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_lhs_">: EmuMath Vector to copy, and appearing on the left-hand side of addition.</param>
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of addition.</param>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_, std::size_t OutSize_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	constexpr inline void new_vector_add_range(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_> vector_lhs_, Rhs_&& rhs_)
+	constexpr inline void vector_add_range(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_> vector_lhs_, Rhs_&& rhs_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_RANGE_TEMPLATE(EmuCore::do_add, OutSize_, OutT_, LhsSize_, LhsT_, BeginIndex_, EndIndex_)
 		(
@@ -161,17 +161,17 @@ namespace EmuMath::Helpers
 	///		containing the results of addition in the specified index range as described, and default values outside of said range.
 	/// </returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AddBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_add_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_add_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE(EmuCore::do_add, OutSize_, OutT_, OutBegin_, OutEnd_, AddBegin_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AddBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> new_vector_add_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> vector_add_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE(EmuCore::do_add, LhsSize_, OutT_, OutBegin_, OutEnd_, AddBegin_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<std::size_t OutSize_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AddBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_add_range_no_copy
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_add_range_no_copy
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -181,7 +181,7 @@ namespace EmuMath::Helpers
 		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE(EmuCore::do_add, OutSize_, lhs_value_uq, OutBegin_, OutEnd_, AddBegin_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AddBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_add_range_no_copy
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_add_range_no_copy
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -203,7 +203,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_lhs_">EmuMath Vector appearing on the left-hand side of addition.</param>
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of addition.</param>
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AddBegin_, typename OutT_, std::size_t OutSize_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	constexpr inline void new_vector_add_range_no_copy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	constexpr inline void vector_add_range_no_copy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_RANGE_NO_COPY_TEMPLATE(EmuCore::do_add, OutSize_, OutT_, OutBegin_, OutEnd_, AddBegin_)
 		(
@@ -223,17 +223,17 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of subtraction.</param>
 	/// <returns>EmuMath Vector of the desired OutSize_ (defaults to LhsSize_) and OutT_ (defaults to vector_lhs_'s value_type_uq), containing subtraction results.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_subtract(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_subtract(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_subtract, OutSize_, OutT_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> new_vector_subtract(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> vector_subtract(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_subtract, LhsSize_, OutT_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<std::size_t OutSize_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_subtract
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_subtract
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -243,7 +243,7 @@ namespace EmuMath::Helpers
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_subtract, OutSize_, lhs_value_uq)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<typename Rhs_, typename LhsT_, std::size_t LhsSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_subtract
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_subtract
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -261,7 +261,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_lhs_">: EmuMath Vector appearing on the left-hand side of subtraction.</param>
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of subtraction.</param>
 	template<std::size_t OutSize_, typename OutT_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	constexpr inline void new_vector_subtract(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	constexpr inline void vector_subtract(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE(EmuCore::do_subtract, OutSize_, OutT_)(out_vector_, vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
@@ -276,7 +276,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of subtraction.</param>
 	/// <returns>Copy of vector_lhs_, with subtraction performed with the provided rhs_ as described within the specified index range.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_subtract_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_subtract_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE(EmuCore::do_subtract, OutSize_, OutT_, LhsSize_, LhsT_, BeginIndex_, EndIndex_)
 		(
@@ -286,7 +286,7 @@ namespace EmuMath::Helpers
 		);
 	}
 	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> new_vector_subtract_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> vector_subtract_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE(EmuCore::do_subtract, LhsSize_, OutT_, LhsSize_, LhsT_, BeginIndex_, EndIndex_)
 		(
@@ -296,7 +296,7 @@ namespace EmuMath::Helpers
 		);
 	}
 	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_subtract_range
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_subtract_range
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -311,7 +311,7 @@ namespace EmuMath::Helpers
 		);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_subtract_range
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_subtract_range
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -336,7 +336,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_lhs_">: EmuMath Vector to copy, and appearing on the left-hand side of subtraction.</param>
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of subtraction.</param>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_, std::size_t OutSize_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	constexpr inline void new_vector_subtract_range(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_> vector_lhs_, Rhs_&& rhs_)
+	constexpr inline void vector_subtract_range(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_> vector_lhs_, Rhs_&& rhs_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_RANGE_TEMPLATE(EmuCore::do_subtract, OutSize_, OutT_, LhsSize_, LhsT_, BeginIndex_, EndIndex_)
 		(
@@ -362,17 +362,17 @@ namespace EmuMath::Helpers
 	///		containing the results of subtraction in the specified index range as described, and default values outside of said range.
 	/// </returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t SubBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_subtract_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_subtract_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE(EmuCore::do_subtract, OutSize_, OutT_, OutBegin_, OutEnd_, SubBegin_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t SubBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> new_vector_subtract_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> vector_subtract_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE(EmuCore::do_subtract, LhsSize_, OutT_, OutBegin_, OutEnd_, SubBegin_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<std::size_t OutSize_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t SubBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_subtract_range_no_copy
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_subtract_range_no_copy
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -382,7 +382,7 @@ namespace EmuMath::Helpers
 		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE(EmuCore::do_subtract, OutSize_, lhs_value_uq, OutBegin_, OutEnd_, SubBegin_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t SubBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_subtract_range_no_copy
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_subtract_range_no_copy
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -404,7 +404,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_lhs_">EmuMath Vector appearing on the left-hand side of subtraction.</param>
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of subtraction.</param>
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t SubBegin_, typename OutT_, std::size_t OutSize_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	constexpr inline void new_vector_subtract_range_no_copy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	constexpr inline void vector_subtract_range_no_copy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_RANGE_NO_COPY_TEMPLATE(EmuCore::do_subtract, OutSize_, OutT_, OutBegin_, OutEnd_, SubBegin_)
 		(
@@ -424,17 +424,17 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of multiplication.</param>
 	/// <returns>EmuMath Vector of the desired OutSize_ (defaults to LhsSize_) and OutT_ (defaults to vector_lhs_'s value_type_uq), containing multiplication results.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_multiply(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_multiply(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_multiply, OutSize_, OutT_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> new_vector_multiply(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> vector_multiply(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_multiply, LhsSize_, OutT_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<std::size_t OutSize_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_multiply
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_multiply
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -444,7 +444,7 @@ namespace EmuMath::Helpers
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_multiply, OutSize_, lhs_value_uq)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<typename Rhs_, typename LhsT_, std::size_t LhsSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_multiply
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_multiply
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -462,7 +462,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_lhs_">: EmuMath Vector appearing on the left-hand side of multiplication.</param>
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of multiplication.</param>
 	template<std::size_t OutSize_, typename OutT_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	constexpr inline void new_vector_multiply(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	constexpr inline void vector_multiply(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE(EmuCore::do_multiply, OutSize_, OutT_)(out_vector_, vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
@@ -477,7 +477,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of multiplication.</param>
 	/// <returns>Copy of vector_lhs_, with multiplication performed with the provided rhs_ as described within the specified index range.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_multiply_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_multiply_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE(EmuCore::do_multiply, OutSize_, OutT_, LhsSize_, LhsT_, BeginIndex_, EndIndex_)
 		(
@@ -487,7 +487,7 @@ namespace EmuMath::Helpers
 		);
 	}
 	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> new_vector_multiply_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> vector_multiply_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE(EmuCore::do_multiply, LhsSize_, OutT_, LhsSize_, LhsT_, BeginIndex_, EndIndex_)
 		(
@@ -497,7 +497,7 @@ namespace EmuMath::Helpers
 		);
 	}
 	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_multiply_range
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_multiply_range
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -512,7 +512,7 @@ namespace EmuMath::Helpers
 		);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_multiply_range
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_multiply_range
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -537,7 +537,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_lhs_">: EmuMath Vector to copy, and appearing on the left-hand side of multiplication.</param>
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of multiplication.</param>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_, std::size_t OutSize_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	constexpr inline void new_vector_multiply_range(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_> vector_lhs_, Rhs_&& rhs_)
+	constexpr inline void vector_multiply_range(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_> vector_lhs_, Rhs_&& rhs_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_RANGE_TEMPLATE(EmuCore::do_multiply, OutSize_, OutT_, LhsSize_, LhsT_, BeginIndex_, EndIndex_)
 		(
@@ -563,17 +563,17 @@ namespace EmuMath::Helpers
 	///		containing the results of multiplication in the specified index range as described, and default values outside of said range.
 	/// </returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MulBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_multiply_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_multiply_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE(EmuCore::do_multiply, OutSize_, OutT_, OutBegin_, OutEnd_, MulBegin_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MulBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> new_vector_multiply_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> vector_multiply_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE(EmuCore::do_multiply, LhsSize_, OutT_, OutBegin_, OutEnd_, MulBegin_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<std::size_t OutSize_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MulBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_multiply_range_no_copy
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_multiply_range_no_copy
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -583,7 +583,7 @@ namespace EmuMath::Helpers
 		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE(EmuCore::do_multiply, OutSize_, lhs_value_uq, OutBegin_, OutEnd_, MulBegin_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MulBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_multiply_range_no_copy
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_multiply_range_no_copy
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -605,7 +605,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_lhs_">EmuMath Vector appearing on the left-hand side of multiplication.</param>
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of multiplication.</param>
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MulBegin_, typename OutT_, std::size_t OutSize_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	constexpr inline void new_vector_multiply_range_no_copy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	constexpr inline void vector_multiply_range_no_copy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_RANGE_NO_COPY_TEMPLATE(EmuCore::do_multiply, OutSize_, OutT_, OutBegin_, OutEnd_, MulBegin_)
 		(
@@ -625,17 +625,17 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of division.</param>
 	/// <returns>EmuMath Vector of the desired OutSize_ (defaults to LhsSize_) and OutT_ (defaults to vector_lhs_'s value_type_uq), containing division results.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_divide(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_divide(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_divide, OutSize_, OutT_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> new_vector_divide(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> vector_divide(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_divide, LhsSize_, OutT_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<std::size_t OutSize_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_divide
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_divide
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -645,7 +645,7 @@ namespace EmuMath::Helpers
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_divide, OutSize_, lhs_value_uq)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<typename Rhs_, typename LhsT_, std::size_t LhsSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_divide
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_divide
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -663,7 +663,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_lhs_">: EmuMath Vector appearing on the left-hand side of division.</param>
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of division.</param>
 	template<std::size_t OutSize_, typename OutT_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	constexpr inline void new_vector_divide(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	constexpr inline void vector_divide(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE(EmuCore::do_divide, OutSize_, OutT_)(out_vector_, vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
@@ -678,7 +678,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of division.</param>
 	/// <returns>Copy of vector_lhs_, with division performed with the provided rhs_ as described within the specified index range.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_divide_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_divide_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE(EmuCore::do_divide, OutSize_, OutT_, LhsSize_, LhsT_, BeginIndex_, EndIndex_)
 		(
@@ -688,7 +688,7 @@ namespace EmuMath::Helpers
 		);
 	}
 	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> new_vector_divide_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> vector_divide_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE(EmuCore::do_divide, LhsSize_, OutT_, LhsSize_, LhsT_, BeginIndex_, EndIndex_)
 		(
@@ -698,7 +698,7 @@ namespace EmuMath::Helpers
 		);
 	}
 	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_divide_range
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_divide_range
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -713,7 +713,7 @@ namespace EmuMath::Helpers
 		);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_divide_range
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_divide_range
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -738,7 +738,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_lhs_">: EmuMath Vector to copy, and appearing on the left-hand side of division.</param>
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of division.</param>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_, std::size_t OutSize_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	constexpr inline void new_vector_divide_range(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_> vector_lhs_, Rhs_&& rhs_)
+	constexpr inline void vector_divide_range(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_> vector_lhs_, Rhs_&& rhs_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_RANGE_TEMPLATE(EmuCore::do_divide, OutSize_, OutT_, LhsSize_, LhsT_, BeginIndex_, EndIndex_)
 		(
@@ -764,17 +764,17 @@ namespace EmuMath::Helpers
 	///		containing the results of division in the specified index range as described, and default values outside of said range.
 	/// </returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t DivBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_divide_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_divide_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE(EmuCore::do_divide, OutSize_, OutT_, OutBegin_, OutEnd_, DivBegin_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t DivBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> new_vector_divide_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> vector_divide_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE(EmuCore::do_divide, LhsSize_, OutT_, OutBegin_, OutEnd_, DivBegin_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<std::size_t OutSize_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t DivBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_divide_range_no_copy
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_divide_range_no_copy
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -784,7 +784,7 @@ namespace EmuMath::Helpers
 		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE(EmuCore::do_divide, OutSize_, lhs_value_uq, OutBegin_, OutEnd_, DivBegin_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t DivBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_divide_range_no_copy
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_divide_range_no_copy
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -806,7 +806,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_lhs_">EmuMath Vector appearing on the left-hand side of division.</param>
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of division.</param>
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t DivBegin_, typename OutT_, std::size_t OutSize_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	constexpr inline void new_vector_divide_range_no_copy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	constexpr inline void vector_divide_range_no_copy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_RANGE_NO_COPY_TEMPLATE(EmuCore::do_divide, OutSize_, OutT_, OutBegin_, OutEnd_, DivBegin_)
 		(
@@ -826,17 +826,17 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of modulo-division.</param>
 	/// <returns>EmuMath Vector of the desired OutSize_ (defaults to LhsSize_) and OutT_ (defaults to vector_lhs_'s value_type_uq), containing modulo-division results.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_mod(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_mod(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_mod, OutSize_, OutT_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> new_vector_mod(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> vector_mod(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_mod, LhsSize_, OutT_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<std::size_t OutSize_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_mod
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_mod
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -846,7 +846,7 @@ namespace EmuMath::Helpers
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_mod, OutSize_, lhs_value_uq)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<typename Rhs_, typename LhsT_, std::size_t LhsSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_mod
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_mod
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -864,7 +864,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_lhs_">: EmuMath Vector appearing on the left-hand side of modulo-division.</param>
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of modulo-division.</param>
 	template<std::size_t OutSize_, typename OutT_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	constexpr inline void new_vector_mod(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	constexpr inline void vector_mod(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE(EmuCore::do_mod, OutSize_, OutT_)(out_vector_, vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
@@ -879,7 +879,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of modulo-division.</param>
 	/// <returns>Copy of vector_lhs_, with modulo-division performed with the provided rhs_ as described within the specified index range.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_mod_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_mod_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE(EmuCore::do_mod, OutSize_, OutT_, LhsSize_, LhsT_, BeginIndex_, EndIndex_)
 		(
@@ -889,7 +889,7 @@ namespace EmuMath::Helpers
 		);
 	}
 	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> new_vector_mod_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> vector_mod_range(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_TEMPLATE(EmuCore::do_mod, LhsSize_, OutT_, LhsSize_, LhsT_, BeginIndex_, EndIndex_)
 		(
@@ -899,7 +899,7 @@ namespace EmuMath::Helpers
 		);
 	}
 	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_mod_range
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_mod_range
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -914,7 +914,7 @@ namespace EmuMath::Helpers
 		);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_mod_range
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_mod_range
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -939,7 +939,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_lhs_">: EmuMath Vector to copy, and appearing on the left-hand side of modulo-division.</param>
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of modulo-division.</param>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_, std::size_t OutSize_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	constexpr inline void new_vector_mod_range(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_> vector_lhs_, Rhs_&& rhs_)
+	constexpr inline void vector_mod_range(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_> vector_lhs_, Rhs_&& rhs_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_RANGE_TEMPLATE(EmuCore::do_mod, OutSize_, OutT_, LhsSize_, LhsT_, BeginIndex_, EndIndex_)
 		(
@@ -965,17 +965,17 @@ namespace EmuMath::Helpers
 	///		containing the results of modulo-division in the specified index range as described, and default values outside of said range.
 	/// </returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ModBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_mod_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_mod_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE(EmuCore::do_mod, OutSize_, OutT_, OutBegin_, OutEnd_, ModBegin_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ModBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> new_vector_mod_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, OutT_> vector_mod_range_no_copy(const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE(EmuCore::do_mod, LhsSize_, OutT_, OutBegin_, OutEnd_, ModBegin_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<std::size_t OutSize_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ModBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_mod_range_no_copy
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_mod_range_no_copy
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -985,7 +985,7 @@ namespace EmuMath::Helpers
 		return EMU_MATH_VECTOR_MUTATE_RANGE_NO_COPY_TEMPLATE(EmuCore::do_mod, OutSize_, lhs_value_uq, OutBegin_, OutEnd_, ModBegin_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ModBegin_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> new_vector_mod_range_no_copy
+	[[nodiscard]] constexpr inline EmuMath::NewVector<LhsSize_, typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq> vector_mod_range_no_copy
 	(
 		const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
@@ -1007,7 +1007,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_lhs_">EmuMath Vector appearing on the left-hand side of modulo-division.</param>
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of modulo-division.</param>
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ModBegin_, typename OutT_, std::size_t OutSize_, typename LhsT_, std::size_t LhsSize_, typename Rhs_>
-	constexpr inline void new_vector_mod_range_no_copy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	constexpr inline void vector_mod_range_no_copy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
 	{
 		EMU_MATH_VECTOR_MUTATE_REF_RANGE_NO_COPY_TEMPLATE(EmuCore::do_mod, OutSize_, OutT_, OutBegin_, OutEnd_, ModBegin_)
 		(

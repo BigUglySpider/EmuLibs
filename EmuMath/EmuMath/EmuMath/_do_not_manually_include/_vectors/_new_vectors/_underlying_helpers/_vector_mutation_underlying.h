@@ -12,12 +12,12 @@ namespace EmuMath::Helpers::_vector_underlying
 	template<std::size_t Index_, class Arg_>
 	[[nodiscard]] constexpr inline std::conditional_t
 	<
-		EmuMath::TMP::is_emu_new_vector_v<Arg_>,
+		EmuMath::TMP::is_emu_vector_v<Arg_>,
 		EmuMath::TMP::emu_vector_theoretical_return_t<Index_, Arg_>,
 		Arg_&
 	> _vector_mutate_get_theoretical_if_vector(Arg_& arg_)
 	{
-		if constexpr (EmuMath::TMP::is_emu_new_vector_v<Arg_>)
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Arg_>)
 		{
 			return _vector_get_theoretical<Index_>(arg_);
 		}
@@ -29,12 +29,12 @@ namespace EmuMath::Helpers::_vector_underlying
 	template<std::size_t Index_, class Arg_>
 	[[nodiscard]] constexpr inline std::conditional_t
 	<
-		EmuMath::TMP::is_emu_new_vector_v<Arg_>,
+		EmuMath::TMP::is_emu_vector_v<Arg_>,
 		EmuMath::TMP::emu_vector_theoretical_return_t<Index_, const Arg_>,
 		const Arg_&
 	> _vector_mutate_get_theoretical_if_vector(const Arg_& arg_)
 	{
-		if constexpr (EmuMath::TMP::is_emu_new_vector_v<Arg_>)
+		if constexpr (EmuMath::TMP::is_emu_vector_v<Arg_>)
 		{
 			return _vector_get_theoretical<Index_>(arg_);
 		}
@@ -263,13 +263,13 @@ namespace EmuMath::Helpers::_vector_underlying
 	{
 		static_assert
 		(
-			EmuMath::TMP::is_emu_new_vector_v<Vector_>,
+			EmuMath::TMP::is_emu_vector_v<Vector_>,
 			"Attempted to find if any variadic indices refer to a non-contained index within an EmuMath Vector, but the provided Vector_ type is not an EmuMath Vector."
 		);
 
 		[[nodiscard]] static constexpr inline bool _get()
 		{
-			if constexpr (EmuMath::TMP::is_emu_new_vector_v<Vector_>)
+			if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 			{
 				if constexpr (FirstIndex_ < Vector_::size)
 				{
@@ -293,13 +293,13 @@ namespace EmuMath::Helpers::_vector_underlying
 	{
 		static_assert
 		(
-			EmuMath::TMP::is_emu_new_vector_v<Vector_>,
+			EmuMath::TMP::is_emu_vector_v<Vector_>,
 			"Attempted to find if any variadic indices refer to a non-contained index within an EmuMath Vector, but the provided Vector_ type is not an EmuMath Vector."
 		);
 
 		[[nodiscard]] static constexpr inline bool _get()
 		{
-			if constexpr (EmuMath::TMP::is_emu_new_vector_v<Vector_>)
+			if constexpr (EmuMath::TMP::is_emu_vector_v<Vector_>)
 			{
 				return Index_ >= Vector_::size;
 			}
@@ -410,7 +410,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	template<typename OutT_, bool UseTheoreticalIndices_, std::size_t...Indices_, class InVector_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> _vector_shuffle(InVector_& in_vector_)
 	{
-		if constexpr (EmuMath::TMP::is_emu_new_vector_v<InVector_>)
+		if constexpr (EmuMath::TMP::is_emu_vector_v<InVector_>)
 		{
 			using out_vector = EmuMath::NewVector<sizeof...(Indices_), OutT_>;
 			using out_stored_type = typename out_vector::stored_type;

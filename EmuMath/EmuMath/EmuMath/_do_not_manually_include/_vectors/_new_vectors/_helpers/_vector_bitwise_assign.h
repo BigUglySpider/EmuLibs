@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_NEW_VECTOR_BITWISE_ASSIGN_H_INC_
-#define EMU_MATH_NEW_VECTOR_BITWISE_ASSIGN_H_INC_ 1
+#ifndef EMU_MATH_vector_BITWISE_ASSIGN_H_INC_
+#define EMU_MATH_vector_BITWISE_ASSIGN_H_INC_ 1
 
 #include "_common_vector_helpers.h"
 #include "../../../../../EmuCore/Functors/Bitwise.h"
@@ -20,7 +20,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of bitwise operations.</param>
 	/// <returns>Reference to lhs_vector_.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_, typename Rhs_>
-	constexpr inline EmuMath::NewVector<Size_, T_>& new_vector_bitwise_and_assign(EmuMath::NewVector<Size_, T_>& lhs_vector_, Rhs_&& rhs_)
+	constexpr inline EmuMath::NewVector<Size_, T_>& vector_bitwise_and_assign(EmuMath::NewVector<Size_, T_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		_vector_underlying::_vector_mutate_with_func_template_invoke_only_no_func_passed<EmuCore::do_bitwise_and_assign, BeginIndex_, EndIndex_>
 		(
@@ -30,7 +30,7 @@ namespace EmuMath::Helpers
 		return lhs_vector_;
 	}
 	template<typename T_, std::size_t Size_, typename Rhs_>
-	constexpr inline EmuMath::NewVector<Size_, T_>& new_vector_bitwise_and_assign(EmuMath::NewVector<Size_, T_>& lhs_vector_, Rhs_&& rhs_)
+	constexpr inline EmuMath::NewVector<Size_, T_>& vector_bitwise_and_assign(EmuMath::NewVector<Size_, T_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		_vector_underlying::_vector_mutate_with_func_template_invoke_only_no_func_passed<EmuCore::do_bitwise_and_assign, 0, Size_>
 		(
@@ -49,7 +49,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of bitwise operations.</param>
 	/// <returns>Reference to lhs_vector_.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_, typename Rhs_>
-	constexpr inline EmuMath::NewVector<Size_, T_>& new_vector_bitwise_or_assign(EmuMath::NewVector<Size_, T_>& lhs_vector_, Rhs_&& rhs_)
+	constexpr inline EmuMath::NewVector<Size_, T_>& vector_bitwise_or_assign(EmuMath::NewVector<Size_, T_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		_vector_underlying::_vector_mutate_with_func_template_invoke_only_no_func_passed<EmuCore::do_bitwise_or_assign, BeginIndex_, EndIndex_>
 		(
@@ -59,7 +59,7 @@ namespace EmuMath::Helpers
 		return lhs_vector_;
 	}
 	template<typename T_, std::size_t Size_, typename Rhs_>
-	constexpr inline EmuMath::NewVector<Size_, T_>& new_vector_bitwise_or_assign(EmuMath::NewVector<Size_, T_>& lhs_vector_, Rhs_&& rhs_)
+	constexpr inline EmuMath::NewVector<Size_, T_>& vector_bitwise_or_assign(EmuMath::NewVector<Size_, T_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		_vector_underlying::_vector_mutate_with_func_template_invoke_only_no_func_passed<EmuCore::do_bitwise_or_assign, 0, Size_>
 		(
@@ -78,7 +78,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of bitwise operations.</param>
 	/// <returns>Reference to lhs_vector_.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_, typename Rhs_>
-	constexpr inline EmuMath::NewVector<Size_, T_>& new_vector_bitwise_xor_assign(EmuMath::NewVector<Size_, T_>& lhs_vector_, Rhs_&& rhs_)
+	constexpr inline EmuMath::NewVector<Size_, T_>& vector_bitwise_xor_assign(EmuMath::NewVector<Size_, T_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		_vector_underlying::_vector_mutate_with_func_template_invoke_only_no_func_passed<EmuCore::do_bitwise_xor_assign, BeginIndex_, EndIndex_>
 		(
@@ -88,7 +88,7 @@ namespace EmuMath::Helpers
 		return lhs_vector_;
 	}
 	template<typename T_, std::size_t Size_, typename Rhs_>
-	constexpr inline EmuMath::NewVector<Size_, T_>& new_vector_bitwise_xor_assign(EmuMath::NewVector<Size_, T_>& lhs_vector_, Rhs_&& rhs_)
+	constexpr inline EmuMath::NewVector<Size_, T_>& vector_bitwise_xor_assign(EmuMath::NewVector<Size_, T_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		_vector_underlying::_vector_mutate_with_func_template_invoke_only_no_func_passed<EmuCore::do_bitwise_xor_assign, 0, Size_>
 		(

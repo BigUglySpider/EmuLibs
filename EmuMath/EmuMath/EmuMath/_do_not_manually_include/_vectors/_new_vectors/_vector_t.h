@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_NEW_VECTOR_T_H_INC_
-#define EMU_MATH_NEW_VECTOR_T_H_INC_ 1
+#ifndef EMU_MATH_vector_T_H_INC_
+#define EMU_MATH_vector_T_H_INC_ 1
 
 #include "_helpers/_vector_helpers.h"
 #include <array>
@@ -118,7 +118,7 @@ namespace EmuMath
 
 		[[nodiscard]] static constexpr inline value_type_uq get_implied_zero()
 		{
-			return EmuMath::Helpers::new_vector_get_non_contained<this_type>();
+			return EmuMath::Helpers::vector_get_non_contained<this_type>();
 		}
 
 		template<typename Arg_>
@@ -307,7 +307,7 @@ namespace EmuMath
 		>
 		explicit constexpr inline NewVector(EmuMath::NewVector<OtherSize_, OtherT_>& to_copy_) : NewVector(_dummy_arg_for_private_default())
 		{
-			EmuMath::Helpers::new_vector_set(*this, to_copy_);
+			EmuMath::Helpers::vector_set(*this, to_copy_);
 		}
 
 		/// <summary>
@@ -325,7 +325,7 @@ namespace EmuMath
 		>
 		explicit constexpr inline NewVector(const EmuMath::NewVector<OtherSize_, OtherT_>& to_copy_) : NewVector(_dummy_arg_for_private_default())
 		{
-			EmuMath::Helpers::new_vector_set(*this, to_copy_);
+			EmuMath::Helpers::vector_set(*this, to_copy_);
 		}
 
 		/// <summary>
@@ -358,12 +358,12 @@ namespace EmuMath
 				}
 				else
 				{
-					EmuMath::Helpers::new_vector_set(*this, std::move(to_move_));
+					EmuMath::Helpers::vector_set(*this, std::move(to_move_));
 				}
 			}
 			else
 			{
-				EmuMath::Helpers::new_vector_set(*this, std::move(to_move_));
+				EmuMath::Helpers::vector_set(*this, std::move(to_move_));
 			}
 		}
 
@@ -521,7 +521,7 @@ namespace EmuMath
 		template<std::size_t Index_>
 		[[nodiscard]] constexpr inline EmuMath::TMP::emu_vector_theoretical_return_t<Index_, this_type> AtTheoretical()
 		{
-			return EmuMath::Helpers::new_vector_get_theoretical<Index_>(*this);
+			return EmuMath::Helpers::vector_get_theoretical<Index_>(*this);
 		}
 		/// <summary>
 		/// <para> Returns the item theoretically stored at the provided index within this Vector. </para>
@@ -532,7 +532,7 @@ namespace EmuMath
 		template<std::size_t Index_>
 		[[nodiscard]] constexpr inline EmuMath::TMP::emu_vector_theoretical_return_t<Index_, const this_type> AtTheoretical() const
 		{
-			return EmuMath::Helpers::new_vector_get_theoretical<Index_>(*this);
+			return EmuMath::Helpers::vector_get_theoretical<Index_>(*this);
 		}
 
 		/// <summary>
@@ -834,68 +834,68 @@ namespace EmuMath
 		// INCREMENT OPERATORS
 		constexpr inline this_type& operator++()
 		{
-			return EmuMath::Helpers::new_vector_pre_increment(*this);
+			return EmuMath::Helpers::vector_pre_increment(*this);
 		}
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator++()
 		{
-			return EmuMath::Helpers::new_vector_pre_increment<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_pre_increment<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator++()
 		{
-			return EmuMath::Helpers::new_vector_pre_increment<size, OutT_>(*this);
+			return EmuMath::Helpers::vector_pre_increment<size, OutT_>(*this);
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator++(int)
 		{
-			return EmuMath::Helpers::new_vector_post_increment<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_post_increment<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
 		constexpr inline typename _vector_or_void<size, OutT_>::type operator++(int)
 		{
 			if constexpr (std::is_void_v<OutT_>)
 			{
-				EmuMath::Helpers::new_vector_post_increment_no_copy(*this);
+				EmuMath::Helpers::vector_post_increment_no_copy(*this);
 			}
 			else
 			{
-				return EmuMath::Helpers::new_vector_post_increment<size, OutT_>(*this);
+				return EmuMath::Helpers::vector_post_increment<size, OutT_>(*this);
 			}
 		}
 
 		// DECREMENT OPERATORS
 		constexpr inline this_type& operator--()
 		{
-			return EmuMath::Helpers::new_vector_pre_decrement(*this);
+			return EmuMath::Helpers::vector_pre_decrement(*this);
 		}
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator--()
 		{
-			return EmuMath::Helpers::new_vector_pre_decrement<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_pre_decrement<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator--()
 		{
-			return EmuMath::Helpers::new_vector_pre_decrement<size, OutT_>(*this);
+			return EmuMath::Helpers::vector_pre_decrement<size, OutT_>(*this);
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator--(int)
 		{
-			return EmuMath::Helpers::new_vector_post_decrement<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_post_decrement<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline typename _vector_or_void<size, OutT_>::type operator--(int)
 		{
 			if constexpr (std::is_void_v<OutT_>)
 			{
-				EmuMath::Helpers::new_vector_post_decrement_no_copy(*this);
+				EmuMath::Helpers::vector_post_decrement_no_copy(*this);
 			}
 			else
 			{
-				return EmuMath::Helpers::new_vector_post_decrement<size, OutT_>(*this);
+				return EmuMath::Helpers::vector_post_decrement<size, OutT_>(*this);
 			}
 		}
 		
@@ -903,13 +903,13 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator-() const
 		{
-			return EmuMath::Helpers::new_vector_negate<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_negate<OutSize_, OutT_>(*this);
 		}
 
 		template<typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator-() const
 		{
-			return EmuMath::Helpers::new_vector_negate<size, OutT_>(*this);
+			return EmuMath::Helpers::vector_negate<size, OutT_>(*this);
 		}
 #pragma endregion
 
@@ -918,56 +918,56 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator+(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_add<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_add<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator+(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_add<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_add<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator-(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_subtract<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_subtract<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator-(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_subtract<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_subtract<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator*(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_multiply<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_multiply<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator*(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_multiply<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_multiply<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator/(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_divide<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_divide<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator/(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_divide<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_divide<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator%(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_mod<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_mod<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator%(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_mod<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_mod<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
@@ -975,67 +975,67 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator~() const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_not<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_bitwise_not<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator~() const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_not<size, OutT_>(*this);
+			return EmuMath::Helpers::vector_bitwise_not<size, OutT_>(*this);
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator&(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_and<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_and<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator&(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_and<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_and<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator|(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_or<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_or<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator|(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_or<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_or<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator^(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_xor<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_xor<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator^(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_xor<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_xor<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator<<(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_shift_left<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_shift_left<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator<<(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_shift_left<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_shift_left<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator>>(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_shift_right<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_shift_right<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator>>(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_shift_right<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_shift_right<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
@@ -1044,67 +1044,67 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool operator==(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool operator==(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool operator!=(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_not_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_not_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool operator!=(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_not_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_not_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool operator>(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_greater<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_greater<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool operator>(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_greater<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_greater<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool operator<(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_less<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_less<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool operator<(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_less<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_less<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool operator>=(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_greater_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_greater_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool operator>=(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_greater_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_greater_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool operator<=(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_less_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_less_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool operator<=(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_less_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_less_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
@@ -1113,56 +1113,56 @@ namespace EmuMath
 		template<typename Rhs_>
 		constexpr inline this_type& operator+=(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_add_assign(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_add_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
 		constexpr inline this_type& operator+=(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_add_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_add_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<typename Rhs_>
 		constexpr inline this_type& operator-=(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_subtract_assign(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_subtract_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
 		constexpr inline this_type& operator-=(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_subtract_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_subtract_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<typename Rhs_>
 		constexpr inline this_type& operator*=(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_multiply_assign(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_multiply_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
 		constexpr inline this_type& operator*=(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_multiply_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_multiply_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<typename Rhs_>
 		constexpr inline this_type& operator/=(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_divide_assign(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_divide_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
 		constexpr inline this_type& operator/=(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_divide_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_divide_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<typename Rhs_>
 		constexpr inline this_type& operator%=(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_mod_assign(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_mod_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
 		constexpr inline this_type& operator%=(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_mod_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_mod_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
@@ -1171,34 +1171,34 @@ namespace EmuMath
 		template<typename Rhs_>
 		constexpr inline this_type& operator&=(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_bitwise_and_assign(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_and_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
 		constexpr inline this_type& operator&=(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_bitwise_and_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_and_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<typename Rhs_>
 		constexpr inline this_type& operator|=(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_bitwise_or_assign(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_or_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
 		constexpr inline this_type& operator|=(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_bitwise_or_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_or_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<typename Rhs_>
 		constexpr inline this_type& operator^=(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_bitwise_xor_assign(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_xor_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
 		constexpr inline this_type& operator^=(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_bitwise_xor_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_xor_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
@@ -1210,17 +1210,17 @@ namespace EmuMath
 		/// <returns>Reference to this Vector if no template args are provided; otherwise, a copy of this Vector after the increment.</returns>
 		constexpr inline this_type& PreIncrement()
 		{
-			return EmuMath::Helpers::new_vector_pre_increment(*this);
+			return EmuMath::Helpers::vector_pre_increment(*this);
 		}
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> PreIncrement()
 		{
-			return EmuMath::Helpers::new_vector_pre_increment<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_pre_increment<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> PreIncrement()
 		{
-			return EmuMath::Helpers::new_vector_pre_increment<size, OutT_>(*this);
+			return EmuMath::Helpers::vector_pre_increment<size, OutT_>(*this);
 		}
 
 		/// <summary>
@@ -1231,18 +1231,18 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> PostIncrement()
 		{
-			return EmuMath::Helpers::new_vector_post_increment<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_post_increment<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
 		constexpr inline typename _vector_or_void<size, OutT_>::type PostIncrement()
 		{
 			if constexpr (std::is_void_v<OutT_>)
 			{
-				EmuMath::Helpers::new_vector_post_increment_no_copy(*this);
+				EmuMath::Helpers::vector_post_increment_no_copy(*this);
 			}
 			else
 			{
-				return EmuMath::Helpers::new_vector_post_increment<size, OutT_>(*this);
+				return EmuMath::Helpers::vector_post_increment<size, OutT_>(*this);
 			}
 		}
 
@@ -1252,17 +1252,17 @@ namespace EmuMath
 		/// <returns>Reference to this Vector if no template args are provided; otherwise, a copy of this Vector after the decrement.</returns>
 		constexpr inline this_type& PreDecrement()
 		{
-			return EmuMath::Helpers::new_vector_pre_decrement(*this);
+			return EmuMath::Helpers::vector_pre_decrement(*this);
 		}
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> PreDecrement()
 		{
-			return EmuMath::Helpers::new_vector_pre_decrement<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_pre_decrement<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> PreDecrement()
 		{
-			return EmuMath::Helpers::new_vector_pre_decrement<size, OutT_>();
+			return EmuMath::Helpers::vector_pre_decrement<size, OutT_>();
 		}
 
 		/// <summary>
@@ -1273,18 +1273,18 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> PostDecrement()
 		{
-			return EmuMath::Helpers::new_vector_post_decrement<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_post_decrement<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
 		constexpr inline typename _vector_or_void<size, OutT_>::type PostDecrement()
 		{
 			if constexpr (std::is_void_v<OutT_>)
 			{
-				EmuMath::Helpers::new_vector_post_decrement_no_copy(*this);
+				EmuMath::Helpers::vector_post_decrement_no_copy(*this);
 			}
 			else
 			{
-				return EmuMath::Helpers::new_vector_post_decrement<size, OutT_>(*this);
+				return EmuMath::Helpers::vector_post_decrement<size, OutT_>(*this);
 			}
 		}
 
@@ -1293,12 +1293,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Negate() const
 		{
-			return EmuMath::Helpers::new_vector_negate<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_negate<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Negate() const
 		{
-			return EmuMath::Helpers::new_vector_negate<size, OutT_>(*this);
+			return EmuMath::Helpers::vector_negate<size, OutT_>(*this);
 		}
 		
 		/// <summary> Ouputs a negated form of this Vector to the provided out_vector_, equivalent to `out_vector_ = -this_vector`. </summary>
@@ -1306,7 +1306,7 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_>
 		constexpr inline void Negate(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_negate(out_vector_, *this);
+			EmuMath::Helpers::vector_negate(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -1321,12 +1321,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NegateRange() const
 		{
-			return EmuMath::Helpers::new_vector_negate_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_negate_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> NegateRange() const
 		{
-			return EmuMath::Helpers::new_vector_negate_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_negate_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 
 		/// <summary>
@@ -1338,7 +1338,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void NegateRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_negate_range<BeginIndex_, EndIndex_>(out_vector_, *this);
+			EmuMath::Helpers::vector_negate_range<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -1357,12 +1357,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NegateBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NegateRangeNoCopy() const
 		{
-			return EmuMath::Helpers::new_vector_negate_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, NegateBegin_>(*this);
+			return EmuMath::Helpers::vector_negate_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, NegateBegin_>(*this);
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t NegateBegin_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> NegateRangeNoCopy() const
 		{
-			return EmuMath::Helpers::new_vector_negate_range_no_copy<size, OutT_, OutBegin, OutEnd_, NegateBegin_>(*this);
+			return EmuMath::Helpers::vector_negate_range_no_copy<size, OutT_, OutBegin, OutEnd_, NegateBegin_>(*this);
 		}
 
 		/// <summary>
@@ -1377,7 +1377,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NegateBegin_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void NegateRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_negate_range_no_copy<OutBegin_, OutEnd_, NegateBegin_>(out_vector_, *this);
+			EmuMath::Helpers::vector_negate_range_no_copy<OutBegin_, OutEnd_, NegateBegin_>(out_vector_, *this);
 		}
 #pragma endregion
 
@@ -1392,12 +1392,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Add(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_add<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_add<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Add(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_add<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_add<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1409,7 +1409,7 @@ namespace EmuMath
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void Add(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_add(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_add(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1423,12 +1423,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> AddRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_add_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_add_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> AddRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_add_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_add_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1445,7 +1445,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void AddRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_add_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_add_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1464,12 +1464,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AddBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> AddRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_add_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, AddBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_add_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, AddBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AddBegin_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> AddRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_add_range_no_copy<size, OutT_, OutBegin_, OutEnd_, AddBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_add_range_no_copy<size, OutT_, OutBegin_, OutEnd_, AddBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1485,7 +1485,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AddBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void AddRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_add_range_no_copy<OutBegin_, OutEnd_, AddBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_add_range_no_copy<OutBegin_, OutEnd_, AddBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1497,12 +1497,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Subtract(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_subtract<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_subtract<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Subtract(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_subtract<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_subtract<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1514,7 +1514,7 @@ namespace EmuMath
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void Subtract(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_subtract(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_subtract(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1531,12 +1531,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> SubtractRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_subtract_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_subtract_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> SubtractRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_subtract_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_subtract_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1553,7 +1553,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void SubtractRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_subtract_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_subtract_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1572,12 +1572,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t SubBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> SubtractRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_subtract_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, SubBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_subtract_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, SubBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t SubBegin_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> SubtractRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_subtract_range_no_copy<size, OutT_, OutBegin_, OutEnd_, SubBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_subtract_range_no_copy<size, OutT_, OutBegin_, OutEnd_, SubBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1593,7 +1593,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t SubBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void SubtractRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_subtract_range_no_copy<OutBegin_, OutEnd_, SubBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_subtract_range_no_copy<OutBegin_, OutEnd_, SubBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1605,12 +1605,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Multiply(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_multiply<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_multiply<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Multiply(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_multiply<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_multiply<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1622,7 +1622,7 @@ namespace EmuMath
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void Multiply(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_multiply(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_multiply(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1639,12 +1639,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> MultiplyRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_multiply_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_multiply_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> MultiplyRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_multiply_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_multiply_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1661,7 +1661,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void MultiplyRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_multiply_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_multiply_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1680,12 +1680,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MulBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> MultiplyRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_multiply_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, MulBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_multiply_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, MulBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MulBegin_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> MultiplyRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_multiply_range_no_copy<size, OutT_, OutBegin_, OutEnd_, MulBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_multiply_range_no_copy<size, OutT_, OutBegin_, OutEnd_, MulBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1701,7 +1701,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MulBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void MultiplyRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_multiply_range_no_copy<OutBegin_, OutEnd_, MulBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_multiply_range_no_copy<OutBegin_, OutEnd_, MulBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1713,12 +1713,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Divide(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_divide<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_divide<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Divide(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_divide<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_divide<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1730,7 +1730,7 @@ namespace EmuMath
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void Divide(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_divide(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_divide(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1747,12 +1747,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> DivideRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_divide_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_divide_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> DivideRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_divide_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_divide_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1769,7 +1769,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void DivideRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_divide_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_divide_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1788,12 +1788,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t DivBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> DivideRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_divide_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, DivBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_divide_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, DivBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t DivBegin_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> DivideRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_divide_range_no_copy<size, OutT_, OutBegin_, OutEnd_, DivBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_divide_range_no_copy<size, OutT_, OutBegin_, OutEnd_, DivBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1809,7 +1809,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t DivBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void DivideRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_divide_range_no_copy<OutBegin_, OutEnd_, DivBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_divide_range_no_copy<OutBegin_, OutEnd_, DivBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1821,12 +1821,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Mod(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_mod<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_mod<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Mod(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_mod<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_mod<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1838,7 +1838,7 @@ namespace EmuMath
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void Mod(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_mod(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_mod(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1855,12 +1855,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ModRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_mod_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_mod_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ModRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_mod_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_mod_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1877,7 +1877,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void ModRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_mod_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_mod_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1896,12 +1896,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ModBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ModRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_mod_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ModBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_mod_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ModBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ModBegin_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ModRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_mod_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ModBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_mod_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ModBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1917,7 +1917,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ModBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void ModRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_mod_range_no_copy<OutBegin_, OutEnd_, ModBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_mod_range_no_copy<OutBegin_, OutEnd_, ModBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
@@ -1931,12 +1931,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> And(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_and<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_and<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> And(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_and<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_and<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1948,7 +1948,7 @@ namespace EmuMath
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void And(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_bitwise_and(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_bitwise_and(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1965,12 +1965,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> AndRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_and_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_and_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> AndRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_and_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_and_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -1987,7 +1987,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void AndRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_bitwise_and_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_bitwise_and_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2006,12 +2006,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AndBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> AndRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_and_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, AndBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_and_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, AndBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AndBegin_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> AndRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_and_range_no_copy<size, OutT_, OutBegin_, OutEnd_, AndBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_and_range_no_copy<size, OutT_, OutBegin_, OutEnd_, AndBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2027,7 +2027,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AndBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void AndRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_bitwise_and_range_no_copy<OutBegin_, OutEnd_, AndBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_bitwise_and_range_no_copy<OutBegin_, OutEnd_, AndBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2039,12 +2039,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Or(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_or<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_or<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Or(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_or<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_or<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2056,7 +2056,7 @@ namespace EmuMath
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void Or(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_bitwise_or(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_bitwise_or(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2073,12 +2073,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> OrRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_or_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_or_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> OrRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_or_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_or_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2095,7 +2095,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void OrRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_bitwise_or_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_bitwise_or_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2114,12 +2114,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t OrBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> OrRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_or_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, OrBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_or_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, OrBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t OrBegin_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> OrRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_or_range_no_copy<size, OutT_, OutBegin_, OutEnd_, OrBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_or_range_no_copy<size, OutT_, OutBegin_, OutEnd_, OrBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2135,7 +2135,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t OrBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void OrRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_bitwise_or_range_no_copy<OutBegin_, OutEnd_, OrBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_bitwise_or_range_no_copy<OutBegin_, OutEnd_, OrBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2147,12 +2147,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Xor(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_xor<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_xor<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Xor(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_xor<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_xor<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2164,7 +2164,7 @@ namespace EmuMath
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void Xor(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_bitwise_xor(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_bitwise_xor(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2181,12 +2181,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> XorRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_xor_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_xor_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> XorRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_xor_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_xor_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2203,7 +2203,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void XorRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_bitwise_xor_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_bitwise_xor_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2222,12 +2222,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t XorBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> XorRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_or_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, XorBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_or_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, XorBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t XorBegin_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> XorRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_or_range_no_copy<size, OutT_, OutBegin_, OutEnd_, XorBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_or_range_no_copy<size, OutT_, OutBegin_, OutEnd_, XorBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2243,7 +2243,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t XorBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void XorRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_bitwise_or_range_no_copy<OutBegin_, OutEnd_, XorBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_bitwise_or_range_no_copy<OutBegin_, OutEnd_, XorBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2255,12 +2255,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ShiftLeft(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_shift_left<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_shift_left<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ShiftLeft(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_shift_left<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_shift_left<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2272,7 +2272,7 @@ namespace EmuMath
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void ShiftLeft(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_shift_left(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_shift_left(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2289,12 +2289,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ShiftLeftRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_shift_left_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_shift_left_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ShiftLeftRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_shift_left_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_shift_left_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2311,7 +2311,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void ShiftLeftRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_shift_left_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_shift_left_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2330,12 +2330,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ShiftBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ShiftLeftRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_shift_left_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ShiftBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_shift_left_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ShiftBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ShiftBegin_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ShiftLeftRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_shift_left_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ShiftBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_shift_left_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ShiftBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2351,7 +2351,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ShiftBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void ShiftLeftRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_shift_left_range_no_copy<OutBegin_, OutEnd_, ShiftBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_shift_left_range_no_copy<OutBegin_, OutEnd_, ShiftBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2363,12 +2363,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ShiftRight(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_shift_right<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_shift_right<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ShiftRight(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_shift_right<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_shift_right<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2380,7 +2380,7 @@ namespace EmuMath
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void ShiftRight(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_shift_right(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_shift_right(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2397,12 +2397,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ShiftRightRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_shift_right_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_shift_right_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ShiftRightRange(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_shift_right_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_shift_right_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2419,7 +2419,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void ShiftRightRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_shift_right_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_shift_right_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2438,12 +2438,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ShiftBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ShiftRightRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_shift_right_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ShiftBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_shift_right_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ShiftBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ShiftBegin_, typename OutT_ = value_type_uq, typename Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ShiftRightRangeNoCopy(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_shift_right_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ShiftBegin_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_shift_right_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ShiftBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2459,7 +2459,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ShiftBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void ShiftRightRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
-			EmuMath::Helpers::new_vector_shift_right_range_no_copy<OutBegin_, OutEnd_, ShiftBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
+			EmuMath::Helpers::vector_shift_right_range_no_copy<OutBegin_, OutEnd_, ShiftBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary> Returns a bitwise NOT form of this Vector, equivalent to `-this_vector`. </summary>
@@ -2467,12 +2467,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Not() const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_not<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_bitwise_not<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Not() const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_not<size, OutT_>(*this);
+			return EmuMath::Helpers::vector_bitwise_not<size, OutT_>(*this);
 		}
 		
 		/// <summary> Ouputs a bitwise NOT form of this Vector to the provided out_vector_, equivalent to `out_vector_ = ~this_vector`. </summary>
@@ -2480,7 +2480,7 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_>
 		constexpr inline void Not(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_bitwise_not(out_vector_, *this);
+			EmuMath::Helpers::vector_bitwise_not(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -2495,12 +2495,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NotRange() const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_not_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_bitwise_not_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> NotRange() const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_not_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_bitwise_not_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 
 		/// <summary>
@@ -2512,7 +2512,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void NotRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_bitwise_not_range<BeginIndex_, EndIndex_>(out_vector_, *this);
+			EmuMath::Helpers::vector_bitwise_not_range<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -2532,12 +2532,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NotBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NotRangeNoCopy() const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_not_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, NotBegin_>(*this);
+			return EmuMath::Helpers::vector_bitwise_not_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, NotBegin_>(*this);
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t NotBegin_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> NotRangeNoCopy() const
 		{
-			return EmuMath::Helpers::new_vector_bitwise_not_range_no_copy<size, OutT_, OutBegin, OutEnd_, NotBegin_>(*this);
+			return EmuMath::Helpers::vector_bitwise_not_range_no_copy<size, OutT_, OutBegin, OutEnd_, NotBegin_>(*this);
 		}
 
 		/// <summary>
@@ -2552,7 +2552,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NotBegin_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void NotRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_bitwise_not_range_no_copy<OutBegin_, OutEnd_, NotBegin_>(out_vector_, *this);
+			EmuMath::Helpers::vector_bitwise_not_range_no_copy<OutBegin_, OutEnd_, NotBegin_>(out_vector_, *this);
 		}
 #pragma endregion
 
@@ -2568,12 +2568,12 @@ namespace EmuMath
 		template<typename Rhs_>
 		constexpr inline this_type& AddAssign(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_add_assign(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_add_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
 		constexpr inline this_type& AddAssign(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_add_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_add_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2586,12 +2586,12 @@ namespace EmuMath
 		template<typename Rhs_>
 		constexpr inline this_type& SubtractAssign(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_subtract_assign(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_subtract_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
 		constexpr inline this_type& SubtractAssign(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_subtract_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_subtract_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2604,12 +2604,12 @@ namespace EmuMath
 		template<typename Rhs_>
 		constexpr inline this_type& MultiplyAssign(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_multiply_assign(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_multiply_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
 		constexpr inline this_type& MultiplyAssign(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_multiply_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_multiply_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2622,12 +2622,12 @@ namespace EmuMath
 		template<typename Rhs_>
 		constexpr inline this_type& DivideAssign(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_divide_assign(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_divide_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
 		constexpr inline this_type& DivideAssign(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_divide_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_divide_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2640,12 +2640,12 @@ namespace EmuMath
 		template<typename Rhs_>
 		constexpr inline this_type& ModAssign(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_mod_assign(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_mod_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
 		constexpr inline this_type& ModAssign(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_mod_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_mod_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
@@ -2660,12 +2660,12 @@ namespace EmuMath
 		template<typename Rhs_>
 		constexpr inline this_type& AndAssign(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_bitwise_and_assign(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_and_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
 		constexpr inline this_type& AndAssign(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_bitwise_and_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_and_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2678,12 +2678,12 @@ namespace EmuMath
 		template<typename Rhs_>
 		constexpr inline this_type& OrAssign(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_bitwise_or_assign(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_or_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
 		constexpr inline this_type& OrAssign(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_bitwise_or_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_or_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -2696,12 +2696,12 @@ namespace EmuMath
 		template<typename Rhs_>
 		constexpr inline this_type& XorAssign(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_bitwise_xor_assign(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_xor_assign(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
 		constexpr inline this_type& XorAssign(Rhs_&& rhs_)
 		{
-			return EmuMath::Helpers::new_vector_bitwise_xor_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_bitwise_xor_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
@@ -2712,12 +2712,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Abs() const
 		{
-			return EmuMath::Helpers::new_vector_abs<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_abs<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Abs() const
 		{
-			return EmuMath::Helpers::new_vector_abs<size, OutT_>(*this);
+			return EmuMath::Helpers::vector_abs<size, OutT_>(*this);
 		}
 
 		/// <summary> Outputs the absolute form of this Vector to the provided out_vector_. </summary>
@@ -2725,7 +2725,7 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_>
 		constexpr inline void Abs(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_abs(out_vector_, *this);
+			EmuMath::Helpers::vector_abs(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -2740,12 +2740,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> AbsRange() const
 		{
-			return EmuMath::Helpers::new_vector_abs_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_abs_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> AbsRange() const
 		{
-			return EmuMath::Helpers::new_vector_abs_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_abs_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 
 		/// <summary>
@@ -2757,7 +2757,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void AbsRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_abs_range<BeginIndex_, EndIndex_>(out_vector_, *this);
+			EmuMath::Helpers::vector_abs_range<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -2776,12 +2776,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AbsBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> AbsRangeNoCopy() const
 		{
-			return EmuMath::Helpers::new_vector_abs_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, AbsBegin_>(*this);
+			return EmuMath::Helpers::vector_abs_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, AbsBegin_>(*this);
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t AbsBegin_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> AbsRangeNoCopy() const
 		{
-			return EmuMath::Helpers::new_vector_abs_range_no_copy<size, OutT_, OutBegin, OutEnd_, AbsBegin_>(*this);
+			return EmuMath::Helpers::vector_abs_range_no_copy<size, OutT_, OutBegin, OutEnd_, AbsBegin_>(*this);
 		}
 
 		/// <summary>
@@ -2795,7 +2795,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AbsBegin_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void AbsRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_abs_range_no_copy<OutBegin_, OutEnd_, AbsBegin_>(out_vector_, *this);
+			EmuMath::Helpers::vector_abs_range_no_copy<OutBegin_, OutEnd_, AbsBegin_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -2808,12 +2808,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename ArgB_, typename ArgT_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Lerp(ArgB_&& b_, ArgT_&& t_) const
 		{
-			return EmuMath::Helpers::new_vector_lerp<OutSize_, OutT_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
+			return EmuMath::Helpers::vector_lerp<OutSize_, OutT_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
 		template<typename OutT_ = value_type_uq, typename ArgB_, typename ArgT_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Lerp(ArgB_&& b_, ArgT_&& t_) const
 		{
-			return EmuMath::Helpers::new_vector_lerp<size, OutT_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
+			return EmuMath::Helpers::vector_lerp<size, OutT_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
 
 		/// <summary>
@@ -2826,7 +2826,7 @@ namespace EmuMath
 		template<typename ArgB_, typename ArgT_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void Lerp(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, ArgB_&& b_, ArgT_&& t_) const
 		{
-			EmuMath::Helpers::new_vector_lerp(out_vector_, *this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
+			EmuMath::Helpers::vector_lerp(out_vector_, *this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
 
 		/// <summary>
@@ -2842,12 +2842,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename ArgB_, typename ArgT_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> LerpRange(ArgB_&& b_, ArgT_&& t_) const
 		{
-			return EmuMath::Helpers::new_vector_lerp_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
+			return EmuMath::Helpers::vector_lerp_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename ArgB_, typename ArgT_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> LerpRange(ArgB_&& b_, ArgT_&& t_) const
 		{
-			return EmuMath::Helpers::new_vector_lerp_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
+			return EmuMath::Helpers::vector_lerp_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
 
 		/// <summary>
@@ -2863,7 +2863,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_, typename ArgB_, typename ArgT_>
 		constexpr inline void LerpRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, ArgB_&& b_, ArgT_&& t_) const
 		{
-			EmuMath::Helpers::new_vector_lerp_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
+			EmuMath::Helpers::vector_lerp_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
 
 
@@ -2884,12 +2884,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t LerpBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename ArgB_, typename ArgT_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> LerpRangeNoCopy(ArgB_&& b_, ArgT_&& t_) const
 		{
-			return EmuMath::Helpers::new_vector_lerp_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, LerpBegin_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
+			return EmuMath::Helpers::vector_lerp_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, LerpBegin_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t LerpBegin_, typename OutT_ = value_type_uq, typename ArgB_, typename ArgT_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> LerpRangeNoCopy(ArgB_&& b_, ArgT_&& t_) const
 		{
-			return EmuMath::Helpers::new_vector_lerp_range_no_copy<size, OutT_, OutBegin, OutEnd_, LerpBegin_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
+			return EmuMath::Helpers::vector_lerp_range_no_copy<size, OutT_, OutBegin, OutEnd_, LerpBegin_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
 
 		/// <summary>
@@ -2909,7 +2909,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t LerpBegin_, std::size_t OutSize_, typename OutT_, typename ArgB_, typename ArgT_>
 		constexpr inline void LerpRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, ArgB_&& b_, ArgT_&& t_) const
 		{
-			EmuMath::Helpers::new_vector_lerp_range_no_copy<OutBegin_, OutEnd_, LerpBegin_>(out_vector_, *this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
+			EmuMath::Helpers::vector_lerp_range_no_copy<OutBegin_, OutEnd_, LerpBegin_>(out_vector_, *this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
 
 		/// <summary> Finds the lowest value within this Vector. </summary>
@@ -2917,12 +2917,12 @@ namespace EmuMath
 		template<typename Out_ = value_type_uq>
 		[[nodiscard]] constexpr inline Out_ Min() const
 		{
-			return EmuMath::Helpers::new_vector_min<Out_>(*this);
+			return EmuMath::Helpers::vector_min<Out_>(*this);
 		}
 		template<typename Out_ = value_type_uq>
 		[[nodiscard]] constexpr inline Out_ Min()
 		{
-			return EmuMath::Helpers::new_vector_min<Out_>(*this);
+			return EmuMath::Helpers::vector_min<Out_>(*this);
 		}
 
 		/// <summary>
@@ -2934,12 +2934,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = value_type_uq>
 		[[nodiscard]] constexpr inline Out_ Min() const
 		{
-			return EmuMath::Helpers::new_vector_min<Out_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_min<Out_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = value_type_uq>
 		[[nodiscard]] constexpr inline Out_ Min()
 		{
-			return EmuMath::Helpers::new_vector_min<Out_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_min<Out_, BeginIndex_, EndIndex_>(*this);
 		}
 
 		/// <summary>
@@ -2951,12 +2951,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename B_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Min(B_&& b_) const
 		{
-			return EmuMath::Helpers::new_vector_min<OutSize_, OutT_>(*this, std::forward<B_>(b_));
+			return EmuMath::Helpers::vector_min<OutSize_, OutT_>(*this, std::forward<B_>(b_));
 		}
 		template<typename OutT_ = preferred_floating_point, typename B_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Min(B_&& b_) const
 		{
-			return EmuMath::Helpers::new_vector_min<size, OutT_>(*this, std::forward<B_>(b_));
+			return EmuMath::Helpers::vector_min<size, OutT_>(*this, std::forward<B_>(b_));
 		}
 
 		/// <summary>
@@ -2968,7 +2968,7 @@ namespace EmuMath
 		template<typename B_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void Min(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, B_&& b_) const
 		{
-			EmuMath::Helpers::new_vector_min(out_vector_, *this, std::forward<B_>(b_));
+			EmuMath::Helpers::vector_min(out_vector_, *this, std::forward<B_>(b_));
 		}
 
 		/// <summary>
@@ -2985,12 +2985,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename B_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> MinRange(B_&& b_) const
 		{
-			return EmuMath::Helpers::new_vector_min_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<B_>(b_));
+			return EmuMath::Helpers::vector_min_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<B_>(b_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point, typename B_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> MinRange(B_&& b_) const
 		{
-			return EmuMath::Helpers::new_vector_min_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<B_>(b_));
+			return EmuMath::Helpers::vector_min_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<B_>(b_));
 		}
 
 		/// <summary>
@@ -3004,7 +3004,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename B_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void MinRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, B_&& b_) const
 		{
-			EmuMath::Helpers::new_vector_min_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<B_>(b_));
+			EmuMath::Helpers::vector_min_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<B_>(b_));
 		}
 
 		/// <summary>
@@ -3020,12 +3020,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MinBegin_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename B_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> MinRangeNoCopy(B_&& b_) const
 		{
-			return EmuMath::Helpers::new_vector_min_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, MinBegin_>(*this, std::forward<B_>(b_));
+			return EmuMath::Helpers::vector_min_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, MinBegin_>(*this, std::forward<B_>(b_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MinBegin_, typename OutT_ = preferred_floating_point, typename B_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> MinRangeNoCopy(B_&& b_) const
 		{
-			return EmuMath::Helpers::new_vector_min_range_no_copy<size, OutT_, OutBegin_, OutEnd_, MinBegin_>(*this, std::forward<B_>(b_));
+			return EmuMath::Helpers::vector_min_range_no_copy<size, OutT_, OutBegin_, OutEnd_, MinBegin_>(*this, std::forward<B_>(b_));
 		}
 
 		/// <summary>
@@ -3041,7 +3041,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MinBegin_, typename B_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void MinRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, B_&& b_) const
 		{
-			EmuMath::Helpers::new_vector_min_range_no_copy<OutBegin_, OutEnd_, MinBegin_>(out_vector_, *this, std::forward<B_>(b_));
+			EmuMath::Helpers::vector_min_range_no_copy<OutBegin_, OutEnd_, MinBegin_>(out_vector_, *this, std::forward<B_>(b_));
 		}
 
 		/// <summary> Finds the greatest value within this Vector. </summary>
@@ -3049,12 +3049,12 @@ namespace EmuMath
 		template<typename Out_ = value_type_uq>
 		[[nodiscard]] constexpr inline Out_ Max() const
 		{
-			return EmuMath::Helpers::new_vector_max<Out_>(*this);
+			return EmuMath::Helpers::vector_max<Out_>(*this);
 		}
 		template<typename Out_ = value_type_uq>
 		[[nodiscard]] constexpr inline Out_ Max()
 		{
-			return EmuMath::Helpers::new_vector_max<Out_>(*this);
+			return EmuMath::Helpers::vector_max<Out_>(*this);
 		}
 
 		/// <summary>
@@ -3066,12 +3066,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = value_type_uq>
 		[[nodiscard]] constexpr inline Out_ Max() const
 		{
-			return EmuMath::Helpers::new_vector_max<Out_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_max<Out_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = value_type_uq>
 		[[nodiscard]] constexpr inline Out_ Max()
 		{
-			return EmuMath::Helpers::new_vector_max<Out_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_max<Out_, BeginIndex_, EndIndex_>(*this);
 		}
 
 		/// <summary>
@@ -3083,12 +3083,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename B_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Max(B_&& b_) const
 		{
-			return EmuMath::Helpers::new_vector_max<OutSize_, OutT_>(*this, std::forward<B_>(b_));
+			return EmuMath::Helpers::vector_max<OutSize_, OutT_>(*this, std::forward<B_>(b_));
 		}
 		template<typename OutT_ = preferred_floating_point, typename B_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Max(B_&& b_) const
 		{
-			return EmuMath::Helpers::new_vector_max<size, OutT_>(*this, std::forward<B_>(b_));
+			return EmuMath::Helpers::vector_max<size, OutT_>(*this, std::forward<B_>(b_));
 		}
 
 		/// <summary>
@@ -3100,7 +3100,7 @@ namespace EmuMath
 		template<typename B_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void Max(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, B_&& b_) const
 		{
-			EmuMath::Helpers::new_vector_max(out_vector_, *this, std::forward<B_>(b_));
+			EmuMath::Helpers::vector_max(out_vector_, *this, std::forward<B_>(b_));
 		}
 
 		/// <summary>
@@ -3117,12 +3117,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename B_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> MaxRange(B_&& b_) const
 		{
-			return EmuMath::Helpers::new_vector_max_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<B_>(b_));
+			return EmuMath::Helpers::vector_max_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<B_>(b_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point, typename B_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> MaxRange(B_&& b_) const
 		{
-			return EmuMath::Helpers::new_vector_max_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<B_>(b_));
+			return EmuMath::Helpers::vector_max_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<B_>(b_));
 		}
 
 		/// <summary>
@@ -3136,7 +3136,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename B_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void MaxRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, B_&& b_) const
 		{
-			EmuMath::Helpers::new_vector_max_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<B_>(b_));
+			EmuMath::Helpers::vector_max_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<B_>(b_));
 		}
 
 		/// <summary>
@@ -3152,12 +3152,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MaxBegin_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename B_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> MaxRangeNoCopy(B_&& b_) const
 		{
-			return EmuMath::Helpers::new_vector_max_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, MaxBegin_>(*this, std::forward<B_>(b_));
+			return EmuMath::Helpers::vector_max_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, MaxBegin_>(*this, std::forward<B_>(b_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MaxBegin_, typename OutT_ = preferred_floating_point, typename B_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> MaxRangeNoCopy(B_&& b_) const
 		{
-			return EmuMath::Helpers::new_vector_max_range_no_copy<size, OutT_, OutBegin_, OutEnd_, MaxBegin_>(*this, std::forward<B_>(b_));
+			return EmuMath::Helpers::vector_max_range_no_copy<size, OutT_, OutBegin_, OutEnd_, MaxBegin_>(*this, std::forward<B_>(b_));
 		}
 
 		/// <summary>
@@ -3173,7 +3173,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MaxBegin_, typename B_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void MaxRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, B_&& b_) const
 		{
-			EmuMath::Helpers::new_vector_max_range_no_copy<OutBegin_, OutEnd_, MaxBegin_>(out_vector_, *this, std::forward<B_>(b_));
+			EmuMath::Helpers::vector_max_range_no_copy<OutBegin_, OutEnd_, MaxBegin_>(out_vector_, *this, std::forward<B_>(b_));
 		}
 
 		/// <summary>
@@ -3185,12 +3185,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename Min_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ClampMin(Min_&& min_) const
 		{
-			return EmuMath::Helpers::new_vector_clamp_min<OutSize_, OutT_>(*this, std::forward<Min_>(min_));
+			return EmuMath::Helpers::vector_clamp_min<OutSize_, OutT_>(*this, std::forward<Min_>(min_));
 		}
 		template<typename OutT_ = preferred_floating_point, typename Min_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ClampMin(Min_&& min_) const
 		{
-			return EmuMath::Helpers::new_vector_clamp_min<size, OutT_>(*this, std::forward<Min_>(min_));
+			return EmuMath::Helpers::vector_clamp_min<size, OutT_>(*this, std::forward<Min_>(min_));
 		}
 
 		/// <summary>
@@ -3202,7 +3202,7 @@ namespace EmuMath
 		template<typename Min_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void ClampMin(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Min_&& min_) const
 		{
-			EmuMath::Helpers::new_vector_clamp_min(out_vector_, *this, std::forward<Min_>(min_));
+			EmuMath::Helpers::vector_clamp_min(out_vector_, *this, std::forward<Min_>(min_));
 		}
 
 		/// <summary>
@@ -3216,12 +3216,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename Min_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ClampMinRange(Min_&& min_) const
 		{
-			return EmuMath::Helpers::new_vector_clamp_min_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Min_>(min_));
+			return EmuMath::Helpers::vector_clamp_min_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Min_>(min_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point, typename Min_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ClampMinRange(Min_&& min_) const
 		{
-			return EmuMath::Helpers::new_vector_clamp_min_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Min_>(min_));
+			return EmuMath::Helpers::vector_clamp_min_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Min_>(min_));
 		}
 
 		/// <summary>
@@ -3235,7 +3235,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Min_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void ClampMinRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Min_&& min_) const
 		{
-			EmuMath::Helpers::new_vector_clamp_min_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Min_>(min_));
+			EmuMath::Helpers::vector_clamp_min_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Min_>(min_));
 		}
 
 		/// <summary>
@@ -3254,12 +3254,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename Min_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ClampMinRangeNoCopy(Min_&& min_) const
 		{
-			return EmuMath::Helpers::new_vector_clamp_min_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_>(*this, std::forward<Min_>(min_));
+			return EmuMath::Helpers::vector_clamp_min_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_>(*this, std::forward<Min_>(min_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, typename OutT_ = preferred_floating_point, typename Min_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ClampMinRangeNoCopy(Min_&& min_) const
 		{
-			return EmuMath::Helpers::new_vector_clamp_min_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ClampBegin_>(*this, std::forward<Min_>(min_));
+			return EmuMath::Helpers::vector_clamp_min_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ClampBegin_>(*this, std::forward<Min_>(min_));
 		}
 
 		/// <summary>
@@ -3275,7 +3275,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, typename Min_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void ClampMinRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Min_&& min_) const
 		{
-			EmuMath::Helpers::new_vector_clamp_min_range_no_copy<OutBegin_, OutEnd_, ClampBegin_>(out_vector_, *this, std::forward<Min_>(min_));
+			EmuMath::Helpers::vector_clamp_min_range_no_copy<OutBegin_, OutEnd_, ClampBegin_>(out_vector_, *this, std::forward<Min_>(min_));
 		}
 
 		/// <summary>
@@ -3287,12 +3287,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename Max_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ClampMax(Max_&& max_) const
 		{
-			return EmuMath::Helpers::new_vector_clamp_max<OutSize_, OutT_>(*this, std::forward<Max_>(max_));
+			return EmuMath::Helpers::vector_clamp_max<OutSize_, OutT_>(*this, std::forward<Max_>(max_));
 		}
 		template<typename OutT_ = preferred_floating_point, typename Max_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ClampMax(Max_&& max_) const
 		{
-			return EmuMath::Helpers::new_vector_clamp_max<size, OutT_>(*this, std::forward<Max_>(max_));
+			return EmuMath::Helpers::vector_clamp_max<size, OutT_>(*this, std::forward<Max_>(max_));
 		}
 
 		/// <summary>
@@ -3304,7 +3304,7 @@ namespace EmuMath
 		template<typename Max_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void ClampMax(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Max_&& max_) const
 		{
-			EmuMath::Helpers::new_vector_clamp_max(out_vector_, *this, std::forward<Max_>(max_));
+			EmuMath::Helpers::vector_clamp_max(out_vector_, *this, std::forward<Max_>(max_));
 		}
 
 		/// <summary>
@@ -3318,12 +3318,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename Max_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ClampMaxRange(Max_&& max_) const
 		{
-			return EmuMath::Helpers::new_vector_clamp_max_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Max_>(max_));
+			return EmuMath::Helpers::vector_clamp_max_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Max_>(max_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point, typename Max_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ClampMaxRange(Max_&& max_) const
 		{
-			return EmuMath::Helpers::new_vector_clamp_max_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Max_>(max_));
+			return EmuMath::Helpers::vector_clamp_max_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Max_>(max_));
 		}
 
 		/// <summary>
@@ -3337,7 +3337,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Max_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void ClampMaxRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Max_&& max_) const
 		{
-			EmuMath::Helpers::new_vector_clamp_max_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Max_>(max_));
+			EmuMath::Helpers::vector_clamp_max_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Max_>(max_));
 		}
 
 		/// <summary>
@@ -3356,12 +3356,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename Max_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ClampMaxRangeNoCopy(Max_&& max_) const
 		{
-			return EmuMath::Helpers::new_vector_clamp_max_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_>(*this, std::forward<Max_>(max_));
+			return EmuMath::Helpers::vector_clamp_max_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_>(*this, std::forward<Max_>(max_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, typename OutT_ = preferred_floating_point, typename Max_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ClampMaxRangeNoCopy(Max_&& max_) const
 		{
-			return EmuMath::Helpers::new_vector_clamp_max_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ClampBegin_>(*this, std::forward<Max_>(max_));
+			return EmuMath::Helpers::vector_clamp_max_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ClampBegin_>(*this, std::forward<Max_>(max_));
 		}
 
 		/// <summary>
@@ -3377,7 +3377,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, typename Max_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void ClampMaxRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Max_&& max_) const
 		{
-			EmuMath::Helpers::new_vector_clamp_max_range_no_copy<OutBegin_, OutEnd_, ClampBegin_>(out_vector_, *this, std::forward<Max_>(max_));
+			EmuMath::Helpers::vector_clamp_max_range_no_copy<OutBegin_, OutEnd_, ClampBegin_>(out_vector_, *this, std::forward<Max_>(max_));
 		}
 
 		/// <summary>
@@ -3391,12 +3391,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename Min_, typename Max_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Clamp(Min_&& min_, Max_&& max_) const
 		{
-			return EmuMath::Helpers::new_vector_clamp<OutSize_, OutT_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
+			return EmuMath::Helpers::vector_clamp<OutSize_, OutT_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
 		template<typename OutT_ = preferred_floating_point, typename Min_, typename Max_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Clamp(Min_&& min_, Max_&& max_) const
 		{
-			return EmuMath::Helpers::new_vector_clamp<size, OutT_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
+			return EmuMath::Helpers::vector_clamp<size, OutT_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
 
 		// <summary>
@@ -3410,7 +3410,7 @@ namespace EmuMath
 		template<typename Min_, typename Max_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void Clamp(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Min_&& min_, Max_&& max_) const
 		{
-			EmuMath::Helpers::new_vector_clamp(out_vector_, *this, std::forward<Min_>(min_), std::forward<Max_>(max_));
+			EmuMath::Helpers::vector_clamp(out_vector_, *this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
 
 		/// <summary>
@@ -3426,12 +3426,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename Min_, typename Max_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ClampRange(Min_&& min_, Max_&& max_) const
 		{
-			return EmuMath::Helpers::new_vector_clamp_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
+			return EmuMath::Helpers::vector_clamp_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point, typename Min_, typename Max_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ClampRange(Min_&& min_, Max_&& max_) const
 		{
-			return EmuMath::Helpers::new_vector_clamp_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
+			return EmuMath::Helpers::vector_clamp_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
 
 		/// <summary>
@@ -3447,7 +3447,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Min_, typename Max_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void ClampRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Min_&& min_, Max_&& max_) const
 		{
-			EmuMath::Helpers::new_vector_clamp_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Min_>(min_), std::forward<Max_>(max_));
+			EmuMath::Helpers::vector_clamp_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
 
 		/// <summary>
@@ -3468,12 +3468,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename Min_, typename Max_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ClampRangeNoCopy(Min_&& min_, Max_&& max_) const
 		{
-			return EmuMath::Helpers::new_vector_clamp_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
+			return EmuMath::Helpers::vector_clamp_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, typename OutT_ = preferred_floating_point, typename Min_, typename Max_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ClampRangeNoCopy(Min_&& min_, Max_&& max_) const
 		{
-			return EmuMath::Helpers::new_vector_clamp_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ClampBegin_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
+			return EmuMath::Helpers::vector_clamp_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ClampBegin_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
 
 		/// <summary>
@@ -3490,7 +3490,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, typename Min_, typename Max_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void ClampRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Min_&& min_, Max_&& max_) const
 		{
-			EmuMath::Helpers::new_vector_clamp_range_no_copy<OutBegin_, OutEnd_, ClampBegin_>(out_vector_, *this, std::forward<Min_>(min_), std::forward<Max_>(max_));
+			EmuMath::Helpers::vector_clamp_range_no_copy<OutBegin_, OutEnd_, ClampBegin_>(out_vector_, *this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
 #pragma endregion
 
@@ -3504,12 +3504,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Floor() const
 		{
-			return EmuMath::Helpers::new_vector_floor<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_floor<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Floor() const
 		{
-			return EmuMath::Helpers::new_vector_floor<size, OutT_>(*this);
+			return EmuMath::Helpers::vector_floor<size, OutT_>(*this);
 		}
 
 		/// <summary>
@@ -3519,7 +3519,7 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_>
 		constexpr inline void Floor(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_ceil(out_vector_, *this);
+			EmuMath::Helpers::vector_ceil(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -3535,12 +3535,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> FloorRange() const
 		{
-			return EmuMath::Helpers::new_vector_floor_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_floor_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> FloorRange() const
 		{
-			return EmuMath::Helpers::new_vector_floor_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_floor_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 
 		/// <summary>
@@ -3553,7 +3553,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void FloorRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_floor_range<BeginIndex_, EndIndex_>(out_vector_, *this);
+			EmuMath::Helpers::vector_floor_range<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -3573,12 +3573,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> FloorRangeNoCopy() const
 		{
-			return EmuMath::Helpers::new_vector_floor_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
+			return EmuMath::Helpers::vector_floor_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t RoundBegin_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> FloorRangeNoCopy() const
 		{
-			return EmuMath::Helpers::new_vector_floor_range_no_copy<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
+			return EmuMath::Helpers::vector_floor_range_no_copy<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
 		}
 
 		/// <summary>
@@ -3593,7 +3593,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void FloorRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_floor_range_no_copy<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
+			EmuMath::Helpers::vector_floor_range_no_copy<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -3604,12 +3604,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Ceil() const
 		{
-			return EmuMath::Helpers::new_vector_ceil<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_ceil<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Ceil() const
 		{
-			return EmuMath::Helpers::new_vector_ceil<size, OutT_>(*this);
+			return EmuMath::Helpers::vector_ceil<size, OutT_>(*this);
 		}
 
 		/// <summary>
@@ -3619,7 +3619,7 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_>
 		constexpr inline void Ceil(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_ceil(out_vector_, *this);
+			EmuMath::Helpers::vector_ceil(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -3635,12 +3635,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> CeilRange() const
 		{
-			return EmuMath::Helpers::new_vector_ceil_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_ceil_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> CeilRange() const
 		{
-			return EmuMath::Helpers::new_vector_ceil_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_ceil_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 
 		/// <summary>
@@ -3653,7 +3653,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void CeilRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_ceil_range<BeginIndex_, EndIndex_>(out_vector_, *this);
+			EmuMath::Helpers::vector_ceil_range<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -3673,12 +3673,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> CeilRangeNoCopy() const
 		{
-			return EmuMath::Helpers::new_vector_ceil_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
+			return EmuMath::Helpers::vector_ceil_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t RoundBegin_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> CeilRangeNoCopy() const
 		{
-			return EmuMath::Helpers::new_vector_ceil_range_no_copy<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
+			return EmuMath::Helpers::vector_ceil_range_no_copy<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
 		}
 
 		/// <summary>
@@ -3693,7 +3693,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void CeilRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_ceil_range_no_copy<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
+			EmuMath::Helpers::vector_ceil_range_no_copy<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -3704,12 +3704,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Trunc() const
 		{
-			return EmuMath::Helpers::new_vector_trunc<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_trunc<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Trunc() const
 		{
-			return EmuMath::Helpers::new_vector_trunc<size, OutT_>(*this);
+			return EmuMath::Helpers::vector_trunc<size, OutT_>(*this);
 		}
 
 		/// <summary>
@@ -3719,7 +3719,7 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_>
 		constexpr inline void Trunc(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_trunc(out_vector_, *this);
+			EmuMath::Helpers::vector_trunc(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -3735,12 +3735,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> TruncRange() const
 		{
-			return EmuMath::Helpers::new_vector_trunc_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_trunc_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> TruncRange() const
 		{
-			return EmuMath::Helpers::new_vector_trunc_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_trunc_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 
 		/// <summary>
@@ -3753,7 +3753,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void TruncRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_trunc_range<BeginIndex_, EndIndex_>(out_vector_, *this);
+			EmuMath::Helpers::vector_trunc_range<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -3773,12 +3773,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> TruncRangeNoCopy() const
 		{
-			return EmuMath::Helpers::new_vector_trunc_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
+			return EmuMath::Helpers::vector_trunc_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t RoundBegin_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> TruncRangeNoCopy() const
 		{
-			return EmuMath::Helpers::new_vector_trunc_range_no_copy<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
+			return EmuMath::Helpers::vector_trunc_range_no_copy<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
 		}
 
 		/// <summary>
@@ -3793,7 +3793,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void TruncRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_trunc_range_no_copy<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
+			EmuMath::Helpers::vector_trunc_range_no_copy<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
 		}
 #pragma endregion
 
@@ -3807,12 +3807,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> FloorConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_floor_constexpr<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_floor_constexpr<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> FloorConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_floor_constexpr<size, OutT_>(*this);
+			return EmuMath::Helpers::vector_floor_constexpr<size, OutT_>(*this);
 		}
 
 		/// <summary>
@@ -3822,7 +3822,7 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_>
 		constexpr inline void FloorConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			return EmuMath::Helpers::new_vector_floor_constexpr(out_vector_, *this);
+			return EmuMath::Helpers::vector_floor_constexpr(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -3838,12 +3838,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> FloorRangeConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_floor_range_constexpr<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_floor_range_constexpr<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> FloorRangeConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_floor_range_constexpr<size, OutT_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_floor_range_constexpr<size, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 
 		/// <summary>
@@ -3856,7 +3856,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void FloorRangeConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_floor_range_constexpr<BeginIndex_, EndIndex_>(out_vector_, *this);
+			EmuMath::Helpers::vector_floor_range_constexpr<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -3876,12 +3876,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> FloorRangeNoCopyConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_floor_range_no_copy_constexpr<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
+			return EmuMath::Helpers::vector_floor_range_no_copy_constexpr<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t RoundBegin_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> FloorRangeNoCopyConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_floor_range_no_copy_constexpr<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
+			return EmuMath::Helpers::vector_floor_range_no_copy_constexpr<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
 		}
 
 		/// <summary>
@@ -3896,7 +3896,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void FloorRangeNoCopyConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_floor_range_no_copy_constexpr<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
+			EmuMath::Helpers::vector_floor_range_no_copy_constexpr<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -3907,12 +3907,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> CeilConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_ceil_constexpr<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_ceil_constexpr<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> CeilConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_ceil_constexpr<size, OutT_>(*this);
+			return EmuMath::Helpers::vector_ceil_constexpr<size, OutT_>(*this);
 		}
 
 		/// <summary>
@@ -3922,7 +3922,7 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_>
 		constexpr inline void CeilConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			return EmuMath::Helpers::new_vector_ceil_constexpr(out_vector_, *this);
+			return EmuMath::Helpers::vector_ceil_constexpr(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -3938,12 +3938,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> CeilRangeConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_ceil_range_constexpr<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_ceil_range_constexpr<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> CeilRangeConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_ceil_range_constexpr<size, OutT_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_ceil_range_constexpr<size, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 
 		/// <summary>
@@ -3956,7 +3956,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void CeilRangeConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_ceil_range_constexpr<BeginIndex_, EndIndex_>(out_vector_, *this);
+			EmuMath::Helpers::vector_ceil_range_constexpr<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -3976,12 +3976,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> CeilRangeNoCopyConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_ceil_range_no_copy_constexpr<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
+			return EmuMath::Helpers::vector_ceil_range_no_copy_constexpr<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t RoundBegin_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> CeilRangeNoCopyConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_ceil_range_no_copy_constexpr<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
+			return EmuMath::Helpers::vector_ceil_range_no_copy_constexpr<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
 		}
 
 		/// <summary>
@@ -3996,7 +3996,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void CeilRangeNoCopyConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_ceil_range_no_copy_constexpr<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
+			EmuMath::Helpers::vector_ceil_range_no_copy_constexpr<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -4007,12 +4007,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> TruncConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_trunc_constexpr<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_trunc_constexpr<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> TruncConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_trunc_constexpr<size, OutT_>(*this);
+			return EmuMath::Helpers::vector_trunc_constexpr<size, OutT_>(*this);
 		}
 
 		/// <summary>
@@ -4022,7 +4022,7 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_>
 		constexpr inline void TruncConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			return EmuMath::Helpers::new_vector_trunc_constexpr(out_vector_, *this);
+			return EmuMath::Helpers::vector_trunc_constexpr(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -4038,12 +4038,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> TruncRangeConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_trunc_range_constexpr<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_trunc_range_constexpr<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> TruncRangeConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_trunc_range_constexpr<size, OutT_, BeginIndex_, EndIndex_>(*this);
+			return EmuMath::Helpers::vector_trunc_range_constexpr<size, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 
 		/// <summary>
@@ -4056,7 +4056,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void TruncRangeConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_trunc_range_constexpr<BeginIndex_, EndIndex_>(out_vector_, *this);
+			EmuMath::Helpers::vector_trunc_range_constexpr<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -4076,12 +4076,12 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> TruncRangeNoCopyConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_trunc_range_no_copy_constexpr<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
+			return EmuMath::Helpers::vector_trunc_range_no_copy_constexpr<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t RoundBegin_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> TruncRangeNoCopyConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_trunc_range_no_copy_constexpr<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
+			return EmuMath::Helpers::vector_trunc_range_no_copy_constexpr<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
 		}
 
 		/// <summary>
@@ -4096,7 +4096,7 @@ namespace EmuMath
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void TruncRangeNoCopyConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_trunc_range_no_copy_constexpr<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
+			EmuMath::Helpers::vector_trunc_range_no_copy_constexpr<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
 		}
 #pragma endregion
 
@@ -4121,23 +4121,23 @@ namespace EmuMath
 		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> Shuffle()
 		{
-			return EmuMath::Helpers::new_vector_shuffle<OutT_, Indices_...>(*this);
+			return EmuMath::Helpers::vector_shuffle<OutT_, Indices_...>(*this);
 		}
 		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> Shuffle() const
 		{
-			return EmuMath::Helpers::new_vector_shuffle<OutT_, Indices_...>(*this);
+			return EmuMath::Helpers::vector_shuffle<OutT_, Indices_...>(*this);
 		}
 
 		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), value_type_uq> Shuffle()
 		{
-			return EmuMath::Helpers::new_vector_shuffle<value_type_uq, Indices_...>(*this);
+			return EmuMath::Helpers::vector_shuffle<value_type_uq, Indices_...>(*this);
 		}
 		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), value_type_uq> Shuffle() const
 		{
-			return EmuMath::Helpers::new_vector_shuffle<value_type_uq, Indices_...>(*this);
+			return EmuMath::Helpers::vector_shuffle<value_type_uq, Indices_...>(*this);
 		}
 
 		/// <summary>
@@ -4159,23 +4159,23 @@ namespace EmuMath
 		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> ShuffleTheoretical()
 		{
-			return EmuMath::Helpers::new_vector_shuffle_theoretical<OutT_, Indices_...>(*this);
+			return EmuMath::Helpers::vector_shuffle_theoretical<OutT_, Indices_...>(*this);
 		}
 		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> ShuffleTheoretical() const
 		{
-			return EmuMath::Helpers::new_vector_shuffle_theoretical<OutT_, Indices_...>(*this);
+			return EmuMath::Helpers::vector_shuffle_theoretical<OutT_, Indices_...>(*this);
 		}
 
 		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), value_type_uq> ShuffleTheoretical()
 		{
-			return EmuMath::Helpers::new_vector_shuffle_theoretical<value_type_uq, Indices_...>(*this);
+			return EmuMath::Helpers::vector_shuffle_theoretical<value_type_uq, Indices_...>(*this);
 		}
 		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), value_type_uq> ShuffleTheoretical() const
 		{
-			return EmuMath::Helpers::new_vector_shuffle_theoretical<value_type_uq, Indices_...>(*this);
+			return EmuMath::Helpers::vector_shuffle_theoretical<value_type_uq, Indices_...>(*this);
 		}
 
 		/// <summary>
@@ -4192,12 +4192,12 @@ namespace EmuMath
 		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), value_type&> RefShuffle()
 		{
-			return EmuMath::Helpers::new_vector_shuffle<value_type&, Indices_...>(*this);
+			return EmuMath::Helpers::vector_shuffle<value_type&, Indices_...>(*this);
 		}
 		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), const value_type&> RefShuffle() const
 		{
-			return EmuMath::Helpers::new_vector_shuffle<const value_type&, Indices_...>(*this);
+			return EmuMath::Helpers::vector_shuffle<const value_type&, Indices_...>(*this);
 		}
 
 		/// <summary>
@@ -4214,7 +4214,7 @@ namespace EmuMath
 		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), const value_type&> ConstRefShuffle() const
 		{
-			return EmuMath::Helpers::new_vector_shuffle<const value_type&, Indices_...>(*this);
+			return EmuMath::Helpers::vector_shuffle<const value_type&, Indices_...>(*this);
 		}
 #pragma endregion
 
@@ -4238,15 +4238,15 @@ namespace EmuMath
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
-				return EmuMath::Helpers::new_vector_mutate<size, value_type_uq, Func_&>(func_, *this, std::forward<Args_>(args_)...);
+				return EmuMath::Helpers::vector_mutate<size, value_type_uq, Func_&>(func_, *this, std::forward<Args_>(args_)...);
 			}
 			else if constexpr (IncludeSelf_ > 0)
 			{
-				return EmuMath::Helpers::new_vector_mutate<size, value_type_uq, Func_&>(func_, std::forward<Args_>(args_)..., *this);
+				return EmuMath::Helpers::vector_mutate<size, value_type_uq, Func_&>(func_, std::forward<Args_>(args_)..., *this);
 			}
 			else
 			{
-				return EmuMath::Helpers::new_vector_mutate<size, value_type_uq, Func_&>(func_, std::forward<Args_>(args_)...);
+				return EmuMath::Helpers::vector_mutate<size, value_type_uq, Func_&>(func_, std::forward<Args_>(args_)...);
 			}
 		}
 		template<std::size_t IncludeSelf_, class Func_, class...Args_>
@@ -4254,15 +4254,15 @@ namespace EmuMath
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
-				return EmuMath::Helpers::new_vector_mutate<size, value_type_uq, Func_&>(func_, *this, std::forward<Args_>(args_)...);
+				return EmuMath::Helpers::vector_mutate<size, value_type_uq, Func_&>(func_, *this, std::forward<Args_>(args_)...);
 			}
 			else if constexpr (IncludeSelf_ > 0)
 			{
-				return EmuMath::Helpers::new_vector_mutate<size, value_type_uq, Func_&>(func_, std::forward<Args_>(args_)..., *this);
+				return EmuMath::Helpers::vector_mutate<size, value_type_uq, Func_&>(func_, std::forward<Args_>(args_)..., *this);
 			}
 			else
 			{
-				return EmuMath::Helpers::new_vector_mutate<size, value_type_uq, Func_&>(func_, std::forward<Args_>(args_)...);
+				return EmuMath::Helpers::vector_mutate<size, value_type_uq, Func_&>(func_, std::forward<Args_>(args_)...);
 			}
 		}
 
@@ -4284,15 +4284,15 @@ namespace EmuMath
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
-				return EmuMath::Helpers::new_vector_mutate<Func_, size, value_type_uq>(*this, std::forward<Args_>(args_)...);
+				return EmuMath::Helpers::vector_mutate<Func_, size, value_type_uq>(*this, std::forward<Args_>(args_)...);
 			}
 			else if constexpr (IncludeSelf_ > 0)
 			{
-				return EmuMath::Helpers::new_vector_mutate<Func_, size, value_type_uq>(std::forward<Args_>(args_)..., *this);
+				return EmuMath::Helpers::vector_mutate<Func_, size, value_type_uq>(std::forward<Args_>(args_)..., *this);
 			}
 			else
 			{
-				return EmuMath::Helpers::new_vector_mutate<Func_, size, value_type_uq>(std::forward<Args_>(args_)...);
+				return EmuMath::Helpers::vector_mutate<Func_, size, value_type_uq>(std::forward<Args_>(args_)...);
 			}
 		}
 		template<class Func_, std::size_t IncludeSelf_, class...Args_>
@@ -4300,15 +4300,15 @@ namespace EmuMath
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
-				return EmuMath::Helpers::new_vector_mutate<Func_, size, value_type_uq>(*this, std::forward<Args_>(args_)...);
+				return EmuMath::Helpers::vector_mutate<Func_, size, value_type_uq>(*this, std::forward<Args_>(args_)...);
 			}
 			else if constexpr (IncludeSelf_ > 0)
 			{
-				return EmuMath::Helpers::new_vector_mutate<Func_, size, value_type_uq>(std::forward<Args_>(args_)..., *this);
+				return EmuMath::Helpers::vector_mutate<Func_, size, value_type_uq>(std::forward<Args_>(args_)..., *this);
 			}
 			else
 			{
-				return EmuMath::Helpers::new_vector_mutate<Func_, size, value_type_uq>(std::forward<Args_>(args_)...);
+				return EmuMath::Helpers::vector_mutate<Func_, size, value_type_uq>(std::forward<Args_>(args_)...);
 			}
 		}
 
@@ -4331,15 +4331,15 @@ namespace EmuMath
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
-				EmuMath::Helpers::new_vector_mutate_to<Func_&>(func_, out_vector_, *this, std::forward<Args_>(args_)...);
+				EmuMath::Helpers::vector_mutate_to<Func_&>(func_, out_vector_, *this, std::forward<Args_>(args_)...);
 			}
 			else if constexpr (IncludeSelf_ > 0)
 			{
-				EmuMath::Helpers::new_vector_mutate_to<Func_&>(func_, out_vector_, std::forward<Args_>(args_)..., *this);
+				EmuMath::Helpers::vector_mutate_to<Func_&>(func_, out_vector_, std::forward<Args_>(args_)..., *this);
 			}
 			else
 			{
-				EmuMath::Helpers::new_vector_mutate_to<Func_&>(func_, out_vector_, std::forward<Args_>(args_)...);
+				EmuMath::Helpers::vector_mutate_to<Func_&>(func_, out_vector_, std::forward<Args_>(args_)...);
 			}
 		}
 		template<std::size_t IncludeSelf_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
@@ -4347,15 +4347,15 @@ namespace EmuMath
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
-				EmuMath::Helpers::new_vector_mutate_to<Func_&>(func_, out_vector_, *this, std::forward<Args_>(args_)...);
+				EmuMath::Helpers::vector_mutate_to<Func_&>(func_, out_vector_, *this, std::forward<Args_>(args_)...);
 			}
 			else if constexpr (IncludeSelf_ > 0)
 			{
-				EmuMath::Helpers::new_vector_mutate_to<Func_&>(func_, out_vector_, std::forward<Args_>(args_)..., *this);
+				EmuMath::Helpers::vector_mutate_to<Func_&>(func_, out_vector_, std::forward<Args_>(args_)..., *this);
 			}
 			else
 			{
-				EmuMath::Helpers::new_vector_mutate_to<Func_&>(func_, out_vector_, std::forward<Args_>(args_)...);
+				EmuMath::Helpers::vector_mutate_to<Func_&>(func_, out_vector_, std::forward<Args_>(args_)...);
 			}
 		}
 
@@ -4377,15 +4377,15 @@ namespace EmuMath
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
-				EmuMath::Helpers::new_vector_mutate_to<Func_>(out_vector_, *this, std::forward<Args_>(args_)...);
+				EmuMath::Helpers::vector_mutate_to<Func_>(out_vector_, *this, std::forward<Args_>(args_)...);
 			}
 			else if constexpr (IncludeSelf_ > 0)
 			{
-				EmuMath::Helpers::new_vector_mutate_to<Func_>(out_vector_, std::forward<Args_>(args_)..., *this);
+				EmuMath::Helpers::vector_mutate_to<Func_>(out_vector_, std::forward<Args_>(args_)..., *this);
 			}
 			else
 			{
-				EmuMath::Helpers::new_vector_mutate_to<Func_>(out_vector_, std::forward<Args_>(args_)...);
+				EmuMath::Helpers::vector_mutate_to<Func_>(out_vector_, std::forward<Args_>(args_)...);
 			}
 		}
 		template<class Func_, std::size_t IncludeSelf_, class...Args_, std::size_t OutSize_, typename OutT_>
@@ -4393,15 +4393,15 @@ namespace EmuMath
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
-				EmuMath::Helpers::new_vector_mutate_to<Func_>(out_vector_, *this, std::forward<Args_>(args_)...);
+				EmuMath::Helpers::vector_mutate_to<Func_>(out_vector_, *this, std::forward<Args_>(args_)...);
 			}
 			else if constexpr (IncludeSelf_ > 0)
 			{
-				EmuMath::Helpers::new_vector_mutate_to<Func_>(out_vector_, std::forward<Args_>(args_)..., *this);
+				EmuMath::Helpers::vector_mutate_to<Func_>(out_vector_, std::forward<Args_>(args_)..., *this);
 			}
 			else
 			{
-				EmuMath::Helpers::new_vector_mutate_to<Func_>(out_vector_, std::forward<Args_>(args_)...);
+				EmuMath::Helpers::vector_mutate_to<Func_>(out_vector_, std::forward<Args_>(args_)...);
 			}
 		}
 
@@ -4431,15 +4431,15 @@ namespace EmuMath
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
-				EmuMath::Helpers::new_vector_mutate_range<BeginIndex_, EndIndex_, ArgBeginIndex_, Func_&>(func_, out_vector_, *this, std::forward<Args_>(args_)...);
+				EmuMath::Helpers::vector_mutate_range<BeginIndex_, EndIndex_, ArgBeginIndex_, Func_&>(func_, out_vector_, *this, std::forward<Args_>(args_)...);
 			}
 			else if constexpr (IncludeSelf_ > 0)
 			{
-				EmuMath::Helpers::new_vector_mutate_range<BeginIndex_, EndIndex_, ArgBeginIndex_, Func_&>(func_, out_vector_, std::forward<Args_>(args_)..., *this);
+				EmuMath::Helpers::vector_mutate_range<BeginIndex_, EndIndex_, ArgBeginIndex_, Func_&>(func_, out_vector_, std::forward<Args_>(args_)..., *this);
 			}
 			else
 			{
-				EmuMath::Helpers::new_vector_mutate_range<BeginIndex_, EndIndex_, ArgBeginIndex_, Func_&>(func_, out_vector_, std::forward<Args_>(args_)...);
+				EmuMath::Helpers::vector_mutate_range<BeginIndex_, EndIndex_, ArgBeginIndex_, Func_&>(func_, out_vector_, std::forward<Args_>(args_)...);
 			}
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_, std::size_t IncludeSelf_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
@@ -4447,15 +4447,15 @@ namespace EmuMath
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
-				EmuMath::Helpers::new_vector_mutate_range<BeginIndex_, EndIndex_, ArgBeginIndex_, Func_&>(func_, out_vector_, *this, std::forward<Args_>(args_)...);
+				EmuMath::Helpers::vector_mutate_range<BeginIndex_, EndIndex_, ArgBeginIndex_, Func_&>(func_, out_vector_, *this, std::forward<Args_>(args_)...);
 			}
 			else if constexpr (IncludeSelf_ > 0)
 			{
-				EmuMath::Helpers::new_vector_mutate_range<BeginIndex_, EndIndex_, ArgBeginIndex_, Func_&>(func_, out_vector_, std::forward<Args_>(args_)..., *this);
+				EmuMath::Helpers::vector_mutate_range<BeginIndex_, EndIndex_, ArgBeginIndex_, Func_&>(func_, out_vector_, std::forward<Args_>(args_)..., *this);
 			}
 			else
 			{
-				EmuMath::Helpers::new_vector_mutate_range<BeginIndex_, EndIndex_, ArgBeginIndex_, Func_&>(func_, out_vector_, std::forward<Args_>(args_)...);
+				EmuMath::Helpers::vector_mutate_range<BeginIndex_, EndIndex_, ArgBeginIndex_, Func_&>(func_, out_vector_, std::forward<Args_>(args_)...);
 			}
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t IncludeSelf_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
@@ -4527,11 +4527,11 @@ namespace EmuMath
 		{
 			if constexpr (Left_)
 			{
-				return EmuMath::Helpers::new_vector_concat<OutT_>(*this, other_vector_);
+				return EmuMath::Helpers::vector_concat<OutT_>(*this, other_vector_);
 			}
 			else
 			{
-				return EmuMath::Helpers::new_vector_concat<OutT_>(other_vector_, *this);
+				return EmuMath::Helpers::vector_concat<OutT_>(other_vector_, *this);
 			}
 		}
 		template<typename OutT_ = value_type_uq, bool Left_ = true, std::size_t OtherSize_, typename OtherT_>
@@ -4539,11 +4539,11 @@ namespace EmuMath
 		{
 			if constexpr (Left_)
 			{
-				return EmuMath::Helpers::new_vector_concat<OutT_>(*this, other_vector_);
+				return EmuMath::Helpers::vector_concat<OutT_>(*this, other_vector_);
 			}
 			else
 			{
-				return EmuMath::Helpers::new_vector_concat<OutT_>(other_vector_, *this);
+				return EmuMath::Helpers::vector_concat<OutT_>(other_vector_, *this);
 			}
 		}
 
@@ -4552,11 +4552,11 @@ namespace EmuMath
 		{
 			if constexpr (Left_)
 			{
-				return EmuMath::Helpers::new_vector_concat<OutT_>(*this, other_vector_);
+				return EmuMath::Helpers::vector_concat<OutT_>(*this, other_vector_);
 			}
 			else
 			{
-				return EmuMath::Helpers::new_vector_concat<OutT_>(other_vector_, *this);
+				return EmuMath::Helpers::vector_concat<OutT_>(other_vector_, *this);
 			}
 		}
 		template<typename OutT_ = value_type_uq, bool Left_ = true, std::size_t OtherSize_, typename OtherT_>
@@ -4564,11 +4564,11 @@ namespace EmuMath
 		{
 			if constexpr (Left_)
 			{
-				return EmuMath::Helpers::new_vector_concat<OutT_>(*this, other_vector_);
+				return EmuMath::Helpers::vector_concat<OutT_>(*this, other_vector_);
 			}
 			else
 			{
-				return EmuMath::Helpers::new_vector_concat<OutT_>(other_vector_, *this);
+				return EmuMath::Helpers::vector_concat<OutT_>(other_vector_, *this);
 			}
 		}
 
@@ -4577,11 +4577,11 @@ namespace EmuMath
 		{
 			if constexpr (Left_)
 			{
-				return EmuMath::Helpers::new_vector_concat<OutT_>(*this, std::forward<EmuMath::NewVector<OtherSize_, OtherT_>>(other_vector_));
+				return EmuMath::Helpers::vector_concat<OutT_>(*this, std::forward<EmuMath::NewVector<OtherSize_, OtherT_>>(other_vector_));
 			}
 			else
 			{
-				return EmuMath::Helpers::new_vector_concat<OutT_>(std::forward<EmuMath::NewVector<OtherSize_, OtherT_>>(other_vector_), *this);
+				return EmuMath::Helpers::vector_concat<OutT_>(std::forward<EmuMath::NewVector<OtherSize_, OtherT_>>(other_vector_), *this);
 			}
 		}
 		template<typename OutT_ = value_type_uq, bool Left_ = true, std::size_t OtherSize_, typename OtherT_>
@@ -4589,11 +4589,11 @@ namespace EmuMath
 		{
 			if constexpr (Left_)
 			{
-				return EmuMath::Helpers::new_vector_concat<OutT_>(*this, std::forward<EmuMath::NewVector<OtherSize_, OtherT_>>(other_vector_));
+				return EmuMath::Helpers::vector_concat<OutT_>(*this, std::forward<EmuMath::NewVector<OtherSize_, OtherT_>>(other_vector_));
 			}
 			else
 			{
-				return EmuMath::Helpers::new_vector_concat<OutT_>(std::forward<EmuMath::NewVector<OtherSize_, OtherT_>>(other_vector_), *this);
+				return EmuMath::Helpers::vector_concat<OutT_>(std::forward<EmuMath::NewVector<OtherSize_, OtherT_>>(other_vector_), *this);
 			}
 		}
 #pragma endregion
@@ -4611,7 +4611,7 @@ namespace EmuMath
 		template<typename Out_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
 		[[nodiscard]] constexpr inline Out_ Dot(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
 		{
-			return EmuMath::Helpers::new_vector_dot<Out_>(*this, vector_b_);
+			return EmuMath::Helpers::vector_dot<Out_>(*this, vector_b_);
 		}
 		/// <summary>
 		/// <para>
@@ -4627,7 +4627,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
 		[[nodiscard]] constexpr inline Out_ Dot(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
 		{
-			return EmuMath::Helpers::new_vector_dot<BeginIndex_, EndIndex_, Out_>(*this, vector_b_);
+			return EmuMath::Helpers::vector_dot<BeginIndex_, EndIndex_, Out_>(*this, vector_b_);
 		}
 
 		/// <summary>
@@ -4639,7 +4639,7 @@ namespace EmuMath
 		template<typename Out_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline Out_ SquareMagnitude() const
 		{
-			return EmuMath::Helpers::new_vector_square_magnitude<Out_>(*this);
+			return EmuMath::Helpers::vector_square_magnitude<Out_>(*this);
 		}
 		/// <summary>
 		/// <para>
@@ -4653,7 +4653,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline Out_ SquareMagnitude() const
 		{
-			return EmuMath::Helpers::new_vector_square_magnitude<BeginIndex_, EndIndex_, Out_>(*this);
+			return EmuMath::Helpers::vector_square_magnitude<BeginIndex_, EndIndex_, Out_>(*this);
 		}
 
 		/// <summary>
@@ -4668,7 +4668,7 @@ namespace EmuMath
 		template<typename Out_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline Out_ MagnitudeConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_magnitude_constexpr<Out_>(*this);
+			return EmuMath::Helpers::vector_magnitude_constexpr<Out_>(*this);
 		}
 		/// <summary>
 		/// <para>
@@ -4685,7 +4685,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline Out_ MagnitudeConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_magnitude_constexpr<BeginIndex_, EndIndex_, Out_>(*this);
+			return EmuMath::Helpers::vector_magnitude_constexpr<BeginIndex_, EndIndex_, Out_>(*this);
 		}
 
 		/// <summary>
@@ -4697,7 +4697,7 @@ namespace EmuMath
 		template<typename Out_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline Out_ Magnitude() const
 		{
-			return EmuMath::Helpers::new_vector_magnitude<Out_>(*this);
+			return EmuMath::Helpers::vector_magnitude<Out_>(*this);
 		}
 		/// <summary>
 		/// <para>
@@ -4711,7 +4711,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline Out_ Magnitude() const
 		{
-			return EmuMath::Helpers::new_vector_magnitude<BeginIndex_, EndIndex_, Out_>(*this);
+			return EmuMath::Helpers::vector_magnitude<BeginIndex_, EndIndex_, Out_>(*this);
 		}
 
 		/// <summary>
@@ -4725,12 +4725,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NormaliseConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_normalise_constexpr<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_normalise_constexpr<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> NormaliseConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_normalise_constexpr<size, OutT_>(*this);
+			return EmuMath::Helpers::vector_normalise_constexpr<size, OutT_>(*this);
 		}
 
 		/// <summary>
@@ -4744,7 +4744,7 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_>
 		constexpr inline void NormaliseConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_normalise_constexpr(out_vector_, *this);
+			EmuMath::Helpers::vector_normalise_constexpr(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -4761,12 +4761,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NormaliseConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_normalise_range_constexpr<BeginIndex_, EndIndex_, OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_normalise_range_constexpr<BeginIndex_, EndIndex_, OutSize_, OutT_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> NormaliseConstexpr() const
 		{
-			return EmuMath::Helpers::new_vector_normalise_range_constexpr<BeginIndex_, EndIndex_, size, OutT_>(*this);
+			return EmuMath::Helpers::vector_normalise_range_constexpr<BeginIndex_, EndIndex_, size, OutT_>(*this);
 		}
 
 		/// <summary>
@@ -4783,7 +4783,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void NormaliseConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_normalise_range_constexpr<BeginIndex_, EndIndex_>(out_vector_, *this);
+			EmuMath::Helpers::vector_normalise_range_constexpr<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -4794,12 +4794,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Normalise() const
 		{
-			return EmuMath::Helpers::new_vector_normalise<OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_normalise<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Normalise() const
 		{
-			return EmuMath::Helpers::new_vector_normalise<size, OutT_>(*this);
+			return EmuMath::Helpers::vector_normalise<size, OutT_>(*this);
 		}
 
 		/// <summary>
@@ -4810,7 +4810,7 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_>
 		constexpr inline void Normalise(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_normalise(out_vector_, *this);
+			EmuMath::Helpers::vector_normalise(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -4824,12 +4824,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Normalise() const
 		{
-			return EmuMath::Helpers::new_vector_normalise_range<BeginIndex_, EndIndex_, OutSize_, OutT_>(*this);
+			return EmuMath::Helpers::vector_normalise_range<BeginIndex_, EndIndex_, OutSize_, OutT_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Normalise() const
 		{
-			return EmuMath::Helpers::new_vector_normalise_range<BeginIndex_, EndIndex_, size, OutT_>(*this);
+			return EmuMath::Helpers::vector_normalise_range<BeginIndex_, EndIndex_, size, OutT_>(*this);
 		}
 
 		/// <summary>
@@ -4843,7 +4843,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
 		constexpr inline void Normalise(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
 		{
-			EmuMath::Helpers::new_vector_normalise_range<BeginIndex_, EndIndex_>(out_vector_, *this);
+			EmuMath::Helpers::vector_normalise_range<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
 
 		/// <summary>
@@ -4859,12 +4859,12 @@ namespace EmuMath
 		template<typename Out_, bool Radians_ = true, std::size_t SizeB_, typename TB_>
 		[[nodiscard]] constexpr inline Out_ AngleCosConstexpr(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
 		{
-			return EmuMath::Helpers::new_vector_angle_cos_constexpr<Out_, Radians_>(*this, vector_b_);
+			return EmuMath::Helpers::vector_angle_cos_constexpr<Out_, Radians_>(*this, vector_b_);
 		}
 		template<bool Radians_ = true, std::size_t SizeB_, typename TB_>
 		[[nodiscard]] constexpr inline preferred_floating_point AngleCosConstexpr(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
 		{
-			return EmuMath::Helpers::new_vector_angle_cos_constexpr<preferred_floating_point, Radians_>(*this, vector_b_);
+			return EmuMath::Helpers::vector_angle_cos_constexpr<preferred_floating_point, Radians_>(*this, vector_b_);
 		}
 
 		/// <summary>
@@ -4877,12 +4877,12 @@ namespace EmuMath
 		template<typename Out_, bool Radians_ = true, std::size_t SizeB_, typename TB_>
 		[[nodiscard]] constexpr inline Out_ AngleCos(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
 		{
-			return EmuMath::Helpers::new_vector_angle_cos<Out_, Radians_>(*this, vector_b_);
+			return EmuMath::Helpers::vector_angle_cos<Out_, Radians_>(*this, vector_b_);
 		}
 		template<bool Radians_ = true, std::size_t SizeB_, typename TB_>
 		[[nodiscard]] constexpr inline preferred_floating_point AngleCos(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
 		{
-			return EmuMath::Helpers::new_vector_angle_cos<preferred_floating_point, Radians_>(*this, vector_b_);
+			return EmuMath::Helpers::vector_angle_cos<preferred_floating_point, Radians_>(*this, vector_b_);
 		}
 
 		/// <summary>
@@ -4894,12 +4894,12 @@ namespace EmuMath
 		template<typename Out_, bool Radians_ = true, std::size_t SizeB_, typename TB_>
 		[[nodiscard]] constexpr inline Out_ Angle(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
 		{
-			return EmuMath::Helpers::new_vector_angle<Out_, Radians_>(*this, vector_b_);
+			return EmuMath::Helpers::vector_angle<Out_, Radians_>(*this, vector_b_);
 		}
 		template<bool Radians_ = true, std::size_t SizeB_, typename TB_>
 		[[nodiscard]] constexpr inline preferred_floating_point Angle(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
 		{
-			return EmuMath::Helpers::new_vector_angle<preferred_floating_point, Radians_>(*this, vector_b_);
+			return EmuMath::Helpers::vector_angle<preferred_floating_point, Radians_>(*this, vector_b_);
 		}
 
 		/// <summary>
@@ -4916,12 +4916,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
 		{
-			return EmuMath::Helpers::new_vector_cross_3d<OutSize_, OutT_>(*this, b_);
+			return EmuMath::Helpers::vector_cross_3d<OutSize_, OutT_>(*this, b_);
 		}
 		template<typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
 		{
-			return EmuMath::Helpers::new_vector_cross_3d<3, OutT_>(*this, b_);
+			return EmuMath::Helpers::vector_cross_3d<3, OutT_>(*this, b_);
 		}
 
 		/// <summary>
@@ -4938,12 +4938,12 @@ namespace EmuMath
 		template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
 		{
-			return EmuMath::Helpers::new_vector_cross_3d<OutSize_, OutT_, I0_, I1_, I2_>(*this, b_);
+			return EmuMath::Helpers::vector_cross_3d<OutSize_, OutT_, I0_, I1_, I2_>(*this, b_);
 		}
 		template<std::size_t I0_, std::size_t I1_, std::size_t I2_, typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
 		{
-			return EmuMath::Helpers::new_vector_cross_3d<3, OutT_, I0_, I1_, I2_>(*this, b_);
+			return EmuMath::Helpers::vector_cross_3d<3, OutT_, I0_, I1_, I2_>(*this, b_);
 		}
 
 		/// <summary>
@@ -4972,7 +4972,7 @@ namespace EmuMath
 		>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
 		{
-			return EmuMath::Helpers::new_vector_cross_3d<OutSize_, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>(*this, b_);
+			return EmuMath::Helpers::vector_cross_3d<OutSize_, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>(*this, b_);
 		}
 		template
 		<
@@ -4988,7 +4988,7 @@ namespace EmuMath
 		>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
 		{
-			return EmuMath::Helpers::new_vector_cross_3d<3, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>(*this, b_);
+			return EmuMath::Helpers::vector_cross_3d<3, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>(*this, b_);
 		}
 
 		/// <summary>
@@ -5000,12 +5000,12 @@ namespace EmuMath
 		template<typename Out_ = preferred_floating_point, bool IncludeNonContained_ = true, std::size_t ToSize_, typename ToT_>
 		[[nodiscard]] constexpr inline Out_ SquareDistance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
 		{
-			return EmuMath::Helpers::new_vector_square_distance<Out_, IncludeNonContained_>(*this, to_);
+			return EmuMath::Helpers::vector_square_distance<Out_, IncludeNonContained_>(*this, to_);
 		}
 		template<bool IncludeNonContained_, std::size_t ToSize_, typename ToT_>
 		[[nodiscard]] constexpr inline preferred_floating_point SquareDistance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
 		{
-			return EmuMath::Helpers::new_vector_square_distance<preferred_floating_point, IncludeNonContained_>(*this, to_);
+			return EmuMath::Helpers::vector_square_distance<preferred_floating_point, IncludeNonContained_>(*this, to_);
 		}
 
 		/// <summary>
@@ -5017,12 +5017,12 @@ namespace EmuMath
 		template<typename Out_ = preferred_floating_point, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ToSize_, typename ToT_>
 		[[nodiscard]] constexpr inline Out_ SquareDistance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
 		{
-			return EmuMath::Helpers::new_vector_square_distance<Out_, BeginIndex_, EndIndex_>(*this, to_);
+			return EmuMath::Helpers::vector_square_distance<Out_, BeginIndex_, EndIndex_>(*this, to_);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ToSize_, typename ToT_>
 		[[nodiscard]] constexpr inline preferred_floating_point SquareDistance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
 		{
-			return EmuMath::Helpers::new_vector_square_distance<preferred_floating_point, BeginIndex_, EndIndex_>(*this, to_);
+			return EmuMath::Helpers::vector_square_distance<preferred_floating_point, BeginIndex_, EndIndex_>(*this, to_);
 		}
 
 		/// <summary>
@@ -5035,12 +5035,12 @@ namespace EmuMath
 		template<typename Out_ = preferred_floating_point, bool IncludeNonContained_ = true, std::size_t ToSize_, typename ToT_>
 		[[nodiscard]] constexpr inline Out_ Distance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
 		{
-			return EmuMath::Helpers::new_vector_distance<Out_, IncludeNonContained_>(*this, to_);
+			return EmuMath::Helpers::vector_distance<Out_, IncludeNonContained_>(*this, to_);
 		}
 		template<bool IncludeNonContained_, std::size_t ToSize_, typename ToT_>
 		[[nodiscard]] constexpr inline preferred_floating_point Distance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
 		{
-			return EmuMath::Helpers::new_vector_distance<preferred_floating_point, IncludeNonContained_>(*this, to_);
+			return EmuMath::Helpers::vector_distance<preferred_floating_point, IncludeNonContained_>(*this, to_);
 		}
 
 		/// <summary>
@@ -5053,12 +5053,12 @@ namespace EmuMath
 		template<typename Out_ = preferred_floating_point, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ToSize_, typename ToT_>
 		[[nodiscard]] constexpr inline Out_ Distance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
 		{
-			return EmuMath::Helpers::new_vector_distance<Out_, BeginIndex_, EndIndex_>(*this, to_);
+			return EmuMath::Helpers::vector_distance<Out_, BeginIndex_, EndIndex_>(*this, to_);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ToSize_, typename ToT_>
 		[[nodiscard]] constexpr inline preferred_floating_point Distance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
 		{
-			return EmuMath::Helpers::new_vector_distance<preferred_floating_point, BeginIndex_, EndIndex_>(*this, to_);
+			return EmuMath::Helpers::vector_distance<preferred_floating_point, BeginIndex_, EndIndex_>(*this, to_);
 		}
 
 		/// <summary>
@@ -5074,12 +5074,12 @@ namespace EmuMath
 		template<typename Out_ = preferred_floating_point, bool IncludeNonContained_ = true, std::size_t ToSize_, typename ToT_>
 		[[nodiscard]] constexpr inline Out_ DistanceConstexpr(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
 		{
-			return EmuMath::Helpers::new_vector_distance_constexpr<Out_, IncludeNonContained_>(*this, to_);
+			return EmuMath::Helpers::vector_distance_constexpr<Out_, IncludeNonContained_>(*this, to_);
 		}
 		template<bool IncludeNonContained_, std::size_t ToSize_, typename ToT_>
 		[[nodiscard]] constexpr inline preferred_floating_point DistanceConstexpr(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
 		{
-			return EmuMath::Helpers::new_vector_distance_constexpr<preferred_floating_point, IncludeNonContained_>(*this, to_);
+			return EmuMath::Helpers::vector_distance_constexpr<preferred_floating_point, IncludeNonContained_>(*this, to_);
 		}
 
 		/// <summary>
@@ -5095,12 +5095,12 @@ namespace EmuMath
 		template<typename Out_ = preferred_floating_point, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ToSize_, typename ToT_>
 		[[nodiscard]] constexpr inline Out_ DistanceConstexpr(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
 		{
-			return EmuMath::Helpers::new_vector_distance_constexpr<Out_, BeginIndex_, EndIndex_>(*this, to_);
+			return EmuMath::Helpers::vector_distance_constexpr<Out_, BeginIndex_, EndIndex_>(*this, to_);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ToSize_, typename ToT_>
 		[[nodiscard]] constexpr inline preferred_floating_point DistanceConstexpr(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
 		{
-			return EmuMath::Helpers::new_vector_distance_constexpr<preferred_floating_point, BeginIndex_, EndIndex_>(*this, to_);
+			return EmuMath::Helpers::vector_distance_constexpr<preferred_floating_point, BeginIndex_, EndIndex_>(*this, to_);
 		}
 
 		/// <summary>
@@ -5111,12 +5111,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t NormalSize_, typename NormalT_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Reflect(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
 		{
-			return EmuMath::Helpers::new_vector_reflect_normal<OutSize_, OutT_>(*this, surface_normal_);
+			return EmuMath::Helpers::vector_reflect_normal<OutSize_, OutT_>(*this, surface_normal_);
 		}
 		template<typename OutT_ = preferred_floating_point, std::size_t NormalSize_, typename NormalT_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Reflect(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
 		{
-			return EmuMath::Helpers::new_vector_reflect_normal<size, OutT_>(*this, surface_normal_);
+			return EmuMath::Helpers::vector_reflect_normal<size, OutT_>(*this, surface_normal_);
 		}
 
 		/// <summary>
@@ -5133,12 +5133,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t NormalSize_, typename NormalT_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Reflect(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
 		{
-			return EmuMath::Helpers::new_vector_reflect_normal<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, surface_normal_);
+			return EmuMath::Helpers::vector_reflect_normal<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, surface_normal_);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point, std::size_t NormalSize_, typename NormalT_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Reflect(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
 		{
-			return EmuMath::Helpers::new_vector_reflect_normal<size, OutT_, BeginIndex_, EndIndex_>(*this, surface_normal_);
+			return EmuMath::Helpers::vector_reflect_normal<size, OutT_, BeginIndex_, EndIndex_>(*this, surface_normal_);
 		}
 
 		/// <summary>
@@ -5157,7 +5157,7 @@ namespace EmuMath
 			const EmuMath::NewVector<SizeC_, TC_>& point_c_
 		) const
 		{
-			return EmuMath::Helpers::new_vector_normal_to_plane_3d_no_norm<OutSize_, OutT_, ReadOffset_>(*this, point_b_, point_c_);
+			return EmuMath::Helpers::vector_normal_to_plane_3d_no_norm<OutSize_, OutT_, ReadOffset_>(*this, point_b_, point_c_);
 		}
 		template<typename OutT_ = preferred_floating_point, std::size_t ReadOffset_ = 0, std::size_t SizeB_, typename TB_, std::size_t SizeC_, typename TC_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> NormalToPlane3NoNorm
@@ -5166,7 +5166,7 @@ namespace EmuMath
 			const EmuMath::NewVector<SizeC_, TC_>& point_c_
 		) const
 		{
-			return EmuMath::Helpers::new_vector_normal_to_plane_3d_no_norm<3, OutT_, ReadOffset_>(*this, point_b_, point_c_);
+			return EmuMath::Helpers::vector_normal_to_plane_3d_no_norm<3, OutT_, ReadOffset_>(*this, point_b_, point_c_);
 		}
 
 		/// <summary>
@@ -5189,7 +5189,7 @@ namespace EmuMath
 			const EmuMath::NewVector<SizeC_, TC_>& point_c_
 		) const
 		{
-			return EmuMath::Helpers::new_vector_normal_to_plane_3d_constexpr<OutSize_, OutT_, ReadOffset_>(*this, point_b_, point_c_);
+			return EmuMath::Helpers::vector_normal_to_plane_3d_constexpr<OutSize_, OutT_, ReadOffset_>(*this, point_b_, point_c_);
 		}
 		template<typename OutT_ = preferred_floating_point, std::size_t ReadOffset_ = 0, std::size_t SizeB_, typename TB_, std::size_t SizeC_, typename TC_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> NormalToPlane3Constexpr
@@ -5198,7 +5198,7 @@ namespace EmuMath
 			const EmuMath::NewVector<SizeC_, TC_>& point_c_
 		) const
 		{
-			return EmuMath::Helpers::new_vector_normal_to_plane_3d_constexpr<3, OutT_, ReadOffset_>(*this, point_b_, point_c_);
+			return EmuMath::Helpers::vector_normal_to_plane_3d_constexpr<3, OutT_, ReadOffset_>(*this, point_b_, point_c_);
 		}
 
 
@@ -5220,7 +5220,7 @@ namespace EmuMath
 			const EmuMath::NewVector<SizeC_, TC_>& point_c_
 		) const
 		{
-			return EmuMath::Helpers::new_vector_normal_to_plane_3d<OutSize_, OutT_, ReadOffset_>(*this, point_b_, point_c_);
+			return EmuMath::Helpers::vector_normal_to_plane_3d<OutSize_, OutT_, ReadOffset_>(*this, point_b_, point_c_);
 		}
 		template<typename OutT_ = preferred_floating_point, std::size_t ReadOffset_ = 0, std::size_t SizeB_, typename TB_, std::size_t SizeC_, typename TC_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> NormalToPlane3
@@ -5229,7 +5229,7 @@ namespace EmuMath
 			const EmuMath::NewVector<SizeC_, TC_>& point_c_
 		) const
 		{
-			return EmuMath::Helpers::new_vector_normal_to_plane_3d<3, OutT_, ReadOffset_>(*this, point_b_, point_c_);
+			return EmuMath::Helpers::vector_normal_to_plane_3d<3, OutT_, ReadOffset_>(*this, point_b_, point_c_);
 		}
 
 		/// <summary>
@@ -5240,12 +5240,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Project(const EmuMath::NewVector<SizeB_, TB_>& onto_) const
 		{
-			return EmuMath::Helpers::new_vector_project<OutSize_, OutT_>(*this, onto_);
+			return EmuMath::Helpers::vector_project<OutSize_, OutT_>(*this, onto_);
 		}
 		template<typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Project(const EmuMath::NewVector<SizeB_, TB_>& onto_) const
 		{
-			return EmuMath::Helpers::new_vector_project<size, OutT_>(*this, onto_);
+			return EmuMath::Helpers::vector_project<size, OutT_>(*this, onto_);
 		}
 
 		/// <summary>
@@ -5256,12 +5256,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Project(const EmuMath::NewVector<SizeB_, TB_>& onto_) const
 		{
-			return EmuMath::Helpers::new_vector_project<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, onto_);
+			return EmuMath::Helpers::vector_project<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, onto_);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Project(const EmuMath::NewVector<SizeB_, TB_>& onto_) const
 		{
-			return EmuMath::Helpers::new_vector_project<size, OutT_, BeginIndex_, EndIndex_>(*this, onto_);
+			return EmuMath::Helpers::vector_project<size, OutT_, BeginIndex_, EndIndex_>(*this, onto_);
 		}
 
 		/// <summary>
@@ -5272,12 +5272,12 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t NormSize_, typename NormT_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ProjectPlane(const EmuMath::NewVector<NormSize_, NormT_>& plane_normal_) const
 		{
-			return EmuMath::Helpers::new_vector_project_plane<OutSize_, OutT_>(*this, plane_normal_);
+			return EmuMath::Helpers::vector_project_plane<OutSize_, OutT_>(*this, plane_normal_);
 		}
 		template<typename OutT_ = preferred_floating_point, std::size_t NormSize_, typename NormT_>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ProjectPlane(const EmuMath::NewVector<NormSize_, NormT_>& plane_normal_) const
 		{
-			return EmuMath::Helpers::new_vector_project_plane<size, OutT_>(*this, plane_normal_);
+			return EmuMath::Helpers::vector_project_plane<size, OutT_>(*this, plane_normal_);
 		}
 
 		/// <summary>
@@ -5319,7 +5319,7 @@ namespace EmuMath
 			const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
 		) const
 		{
-			return EmuMath::Helpers::new_vector_project_plane_3d_constexpr<OutSize_, OutT_, PlaneReadOffset_>(*this, plane_point_a_, plane_point_b_, plane_point_c_);
+			return EmuMath::Helpers::vector_project_plane_3d_constexpr<OutSize_, OutT_, PlaneReadOffset_>(*this, plane_point_a_, plane_point_b_, plane_point_c_);
 		}
 		template
 		<
@@ -5339,7 +5339,7 @@ namespace EmuMath
 			const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
 		) const
 		{
-			return EmuMath::Helpers::new_vector_project_plane_3d_constexpr<3, OutT_, PlaneReadOffset_>(*this, plane_point_a_, plane_point_b_, plane_point_c_);
+			return EmuMath::Helpers::vector_project_plane_3d_constexpr<3, OutT_, PlaneReadOffset_>(*this, plane_point_a_, plane_point_b_, plane_point_c_);
 		}
 
 		/// <summary>
@@ -5378,7 +5378,7 @@ namespace EmuMath
 			const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
 		) const
 		{
-			return EmuMath::Helpers::new_vector_project_plane_3d<OutSize_, OutT_, PlaneReadOffset_>(*this, plane_point_a_, plane_point_b_, plane_point_c_);
+			return EmuMath::Helpers::vector_project_plane_3d<OutSize_, OutT_, PlaneReadOffset_>(*this, plane_point_a_, plane_point_b_, plane_point_c_);
 		}
 		template
 		<
@@ -5398,7 +5398,7 @@ namespace EmuMath
 			const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
 		) const
 		{
-			return EmuMath::Helpers::new_vector_project_plane_3d<3, OutT_, PlaneReadOffset_>(*this, plane_point_a_, plane_point_b_, plane_point_c_);
+			return EmuMath::Helpers::vector_project_plane_3d<3, OutT_, PlaneReadOffset_>(*this, plane_point_a_, plane_point_b_, plane_point_c_);
 		}
 #pragma endregion
 
@@ -5423,13 +5423,13 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Cmp_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAll(Rhs_&& rhs_, Cmp_ cmp_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all<IncludeNonContained_, std::add_lvalue_reference_t<Cmp_>>(*this, std::forward<Rhs_>(rhs_), cmp_);
+			return EmuMath::Helpers::vector_cmp_all<IncludeNonContained_, std::add_lvalue_reference_t<Cmp_>>(*this, std::forward<Rhs_>(rhs_), cmp_);
 		}
 
 		template<class Cmp_, bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAll(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all<Cmp_, IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all<Cmp_, IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5449,7 +5449,7 @@ namespace EmuMath
 		template<template<class...> class CmpTemplate_, bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAll(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all<CmpTemplate_, IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all<CmpTemplate_, IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5467,13 +5467,13 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Cmp_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAll(Rhs_&& rhs_, Cmp_ cmp_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all<BeginIndex_, EndIndex_, std::add_lvalue_reference_t<Cmp_>>(*this, std::forward<Rhs_>(rhs_), cmp_);
+			return EmuMath::Helpers::vector_cmp_all<BeginIndex_, EndIndex_, std::add_lvalue_reference_t<Cmp_>>(*this, std::forward<Rhs_>(rhs_), cmp_);
 		}
 
 		template<class Cmp_, std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAll(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all<Cmp_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all<Cmp_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5489,7 +5489,7 @@ namespace EmuMath
 		template<template<class...> class CmpTemplate_, std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAll(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all<CmpTemplate_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all<CmpTemplate_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5511,13 +5511,13 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Cmp_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAny(Rhs_&& rhs_, Cmp_ cmp_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any<IncludeNonContained_, std::add_lvalue_reference_t<Cmp_>>(*this, std::forward<Rhs_>(rhs_), cmp_);
+			return EmuMath::Helpers::vector_cmp_any<IncludeNonContained_, std::add_lvalue_reference_t<Cmp_>>(*this, std::forward<Rhs_>(rhs_), cmp_);
 		}
 
 		template<class Cmp_, bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAny(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any<Cmp_, IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any<Cmp_, IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5537,7 +5537,7 @@ namespace EmuMath
 		template<template<class...> class CmpTemplate_, bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAny(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any<CmpTemplate_, IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any<CmpTemplate_, IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5555,13 +5555,13 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Cmp_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAny(Rhs_&& rhs_, Cmp_ cmp_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any<BeginIndex_, EndIndex_, std::add_lvalue_reference_t<Cmp_>>(*this, std::forward<Rhs_>(rhs_), cmp_);
+			return EmuMath::Helpers::vector_cmp_any<BeginIndex_, EndIndex_, std::add_lvalue_reference_t<Cmp_>>(*this, std::forward<Rhs_>(rhs_), cmp_);
 		}
 
 		template<class Cmp_, std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAny(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any<Cmp_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any<Cmp_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5577,7 +5577,7 @@ namespace EmuMath
 		template<template<class...> class CmpTemplate_, std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAny(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any<CmpTemplate_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any<CmpTemplate_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
@@ -5593,7 +5593,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpNear(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5611,7 +5611,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpNear(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_near<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_near<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5629,7 +5629,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllNear(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5643,7 +5643,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllNear(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all_near<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all_near<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5661,7 +5661,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyNear(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5675,7 +5675,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyNear(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any_near<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any_near<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
@@ -5691,7 +5691,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpNotNear(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_not_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_not_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5709,7 +5709,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpNotNear(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_not_near<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_not_near<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5727,7 +5727,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllNotNear(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all_not_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all_not_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5741,7 +5741,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllNotNear(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all_not_near<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all_not_near<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5759,7 +5759,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyNotNear(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any_not_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any_not_near<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5773,7 +5773,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyNotNear(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any_not_near<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any_not_near<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
@@ -5789,7 +5789,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5807,7 +5807,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5825,7 +5825,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5839,7 +5839,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5857,7 +5857,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5871,7 +5871,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any_equal<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any_equal<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
@@ -5888,7 +5888,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpNotEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_not_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_not_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5906,7 +5906,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpNotEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_not_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_not_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5924,7 +5924,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllNotEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all_not_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all_not_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5938,7 +5938,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllNotEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all_not_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all_not_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5956,7 +5956,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyNotEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any_not_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any_not_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -5970,7 +5970,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyNotEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any_not_equal<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any_not_equal<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
@@ -5990,7 +5990,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpGreater(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_greater<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_greater<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6004,7 +6004,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpGreater(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_greater<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_greater<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6022,7 +6022,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllGreater(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all_greater<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all_greater<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6036,7 +6036,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllGreater(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all_greater<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all_greater<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6054,7 +6054,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyGreater(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any_greater<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any_greater<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6068,7 +6068,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyGreater(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any_greater<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any_greater<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
@@ -6088,7 +6088,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpLess(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_less<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_less<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6102,7 +6102,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpLess(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_less<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_less<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6120,7 +6120,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllLess(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all_less<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all_less<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6134,7 +6134,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllLess(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all_less<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all_less<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6152,7 +6152,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyLess(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any_less<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any_less<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6166,7 +6166,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyLess(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any_less<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any_less<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
@@ -6186,7 +6186,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpGreaterEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_greater_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_greater_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6200,7 +6200,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpGreaterEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_greater_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_greater_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6218,7 +6218,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllGreaterEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all_greater_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all_greater_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6232,7 +6232,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllGreaterEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all_greater_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all_greater_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6250,7 +6250,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyGreaterEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any_greater_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any_greater_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6264,7 +6264,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyGreaterEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any_greater_equal<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any_greater_equal<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
@@ -6284,7 +6284,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpLessEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_less_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_less_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6298,7 +6298,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpLessEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_less_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_less_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6316,7 +6316,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllLessEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all_less_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all_less_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6330,7 +6330,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllLessEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_all_less_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_all_less_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6348,7 +6348,7 @@ namespace EmuMath
 		template<bool IncludeNonContained_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyLessEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any_less_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any_less_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		/// <summary>
@@ -6362,7 +6362,7 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyLessEqual(Rhs_&& rhs_) const
 		{
-			return EmuMath::Helpers::new_vector_cmp_any_less_equal<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
+			return EmuMath::Helpers::vector_cmp_any_less_equal<BeginIndex_, EndIndex_>(std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
@@ -6381,31 +6381,31 @@ namespace EmuMath
 			std::size_t OutSize_,
 			typename OutT_,
 			std::size_t Offset_ = 0,
-			typename = std::enable_if_t<EmuMath::Helpers::new_vector_cast_is_valid<const this_type&, OutSize_, OutT_, Offset_>()>
+			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<const this_type&, OutSize_, OutT_, Offset_>()>
 		>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Cast() const
 		{
-			return EmuMath::Helpers::new_vector_cast<OutSize_, OutT_, Offset_>(*this);
+			return EmuMath::Helpers::vector_cast<OutSize_, OutT_, Offset_>(*this);
 		}
 		template
 		<
 			std::size_t OutSize_,
 			std::size_t Offset_ = 0,
-			typename = std::enable_if_t<EmuMath::Helpers::new_vector_cast_is_valid<const this_type&, OutSize_, value_type_uq, Offset_>()>
+			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<const this_type&, OutSize_, value_type_uq, Offset_>()>
 		>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, value_type_uq> Cast() const
 		{
-			return EmuMath::Helpers::new_vector_cast<OutSize_, value_type_uq, Offset_>(*this);
+			return EmuMath::Helpers::vector_cast<OutSize_, value_type_uq, Offset_>(*this);
 		}
 		template
 		<
 			typename OutT_,
 			std::size_t Offset_ = 0,
-			typename = std::enable_if_t<EmuMath::Helpers::new_vector_cast_is_valid<const this_type&, size, OutT_, Offset_>()>
+			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<const this_type&, size, OutT_, Offset_>()>
 		>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Cast() const
 		{
-			return EmuMath::Helpers::new_vector_cast<size, OutT_, Offset_>(*this);
+			return EmuMath::Helpers::vector_cast<size, OutT_, Offset_>(*this);
 		}
 
 		template
@@ -6413,44 +6413,44 @@ namespace EmuMath
 			std::size_t OutSize_,
 			typename OutT_,
 			std::size_t Offset_ = 0,
-			typename = std::enable_if_t<EmuMath::Helpers::new_vector_cast_is_valid<this_type&, OutSize_, OutT_, Offset_>()>
+			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<this_type&, OutSize_, OutT_, Offset_>()>
 		>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Cast()
 		{
-			return EmuMath::Helpers::new_vector_cast<OutSize_, OutT_, Offset_>(*this);
+			return EmuMath::Helpers::vector_cast<OutSize_, OutT_, Offset_>(*this);
 		}
 		template
 		<
 			std::size_t OutSize_,
 			std::size_t Offset_ = 0,
-			typename = std::enable_if_t<EmuMath::Helpers::new_vector_cast_is_valid<this_type&, OutSize_, value_type_uq, Offset_>()>
+			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<this_type&, OutSize_, value_type_uq, Offset_>()>
 		>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, value_type_uq> Cast()
 		{
-			return EmuMath::Helpers::new_vector_cast<OutSize_, value_type_uq, Offset_>(*this);
+			return EmuMath::Helpers::vector_cast<OutSize_, value_type_uq, Offset_>(*this);
 		}
 		template
 		<
 			typename OutT_,
 			std::size_t Offset_ = 0,
-			typename = std::enable_if_t<EmuMath::Helpers::new_vector_cast_is_valid<this_type&, size, OutT_, Offset_>()>
+			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<this_type&, size, OutT_, Offset_>()>
 		>
 		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Cast()
 		{
-			return EmuMath::Helpers::new_vector_cast<size, OutT_, Offset_>(*this);
+			return EmuMath::Helpers::vector_cast<size, OutT_, Offset_>(*this);
 		}
 
 		/// <summary> Explicit cast operator for converting this Vector to an alternative EmuMath Vector instance. </summary>
-		template<std::size_t OutSize_, typename OutT_, typename = std::enable_if_t<EmuMath::Helpers::new_vector_cast_is_valid<const this_type&, OutSize_, OutT_, 0>()>>
+		template<std::size_t OutSize_, typename OutT_, typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<const this_type&, OutSize_, OutT_, 0>()>>
 		explicit constexpr inline operator EmuMath::NewVector<OutSize_, OutT_>() const
 		{
-			return EmuMath::Helpers::new_vector_cast<OutSize_, OutT_, 0>(*this);
+			return EmuMath::Helpers::vector_cast<OutSize_, OutT_, 0>(*this);
 		}
 
-		template<std::size_t OutSize_, typename OutT_, typename = std::enable_if_t<EmuMath::Helpers::new_vector_cast_is_valid<this_type&, OutSize_, OutT_, 0>()>>
+		template<std::size_t OutSize_, typename OutT_, typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<this_type&, OutSize_, OutT_, 0>()>>
 		explicit constexpr inline operator EmuMath::NewVector<OutSize_, OutT_>()
 		{
-			return EmuMath::Helpers::new_vector_cast<OutSize_, OutT_, 0>(*this);
+			return EmuMath::Helpers::vector_cast<OutSize_, OutT_, 0>(*this);
 		}
 
 		/// <summary>
@@ -6502,12 +6502,12 @@ namespace EmuMath
 		template<typename Arg_, typename = std::enable_if_t<is_valid_template_copy_arg<Arg_&>()>>
 		constexpr inline void Copy(Arg_& to_copy_)
 		{
-			EmuMath::Helpers::new_vector_copy<Arg_>(*this, to_copy_);
+			EmuMath::Helpers::vector_copy<Arg_>(*this, to_copy_);
 		}
 		template<typename Arg_, typename = std::enable_if_t<is_valid_template_copy_arg<Arg_&>()>>
 		constexpr inline void Copy(const Arg_& to_copy_)
 		{
-			EmuMath::Helpers::new_vector_copy<Arg_>(*this, to_copy_);
+			EmuMath::Helpers::vector_copy<Arg_>(*this, to_copy_);
 		}
 
 		/// <summary>
@@ -6523,12 +6523,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Arg_>
 		constexpr inline void Copy(Arg_& to_copy_)
 		{
-			EmuMath::Helpers::new_vector_copy<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
+			EmuMath::Helpers::vector_copy<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Arg_>
 		constexpr inline void Copy(const Arg_& to_copy_)
 		{
-			EmuMath::Helpers::new_vector_copy<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
+			EmuMath::Helpers::vector_copy<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
 		}
 
 		/// <summary>
@@ -6544,12 +6544,12 @@ namespace EmuMath
 		template<bool CopyNonContained_, typename Arg_>
 		constexpr inline void Copy(Arg_& to_copy_)
 		{
-			EmuMath::Helpers::new_vector_copy<CopyNonContained_, Arg_>(*this, to_copy_);
+			EmuMath::Helpers::vector_copy<CopyNonContained_, Arg_>(*this, to_copy_);
 		}
 		template<bool CopyNonContained_, typename Arg_>
 		constexpr inline void Copy(const Arg_& to_copy_)
 		{
-			EmuMath::Helpers::new_vector_copy<CopyNonContained_, Arg_>(*this, to_copy_);
+			EmuMath::Helpers::vector_copy<CopyNonContained_, Arg_>(*this, to_copy_);
 		}
 
 		/// <summary>
@@ -6566,12 +6566,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_ = size, typename Arg_>
 		constexpr inline void CopyFromStart(Arg_& to_copy_)
 		{
-			EmuMath::Helpers::new_vector_copy_from_start<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
+			EmuMath::Helpers::vector_copy_from_start<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_ = size, typename Arg_>
 		constexpr inline void CopyFromStart(const Arg_& to_copy_)
 		{
-			EmuMath::Helpers::new_vector_copy_from_start<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
+			EmuMath::Helpers::vector_copy_from_start<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
 		}
 
 		/// <summary>
@@ -6588,12 +6588,12 @@ namespace EmuMath
 		template<std::size_t BeginIndex_, std::size_t EndIndex_ = size, typename Arg_>
 		constexpr inline void CopyFromStartContainedOnly(Arg_& to_copy_)
 		{
-			EmuMath::Helpers::new_vector_copy_from_start_contained_only<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
+			EmuMath::Helpers::vector_copy_from_start_contained_only<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_ = size, typename Arg_>
 		constexpr inline void CopyFromStartContainedOnly(const Arg_& to_copy_)
 		{
-			EmuMath::Helpers::new_vector_copy_from_start_contained_only<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
+			EmuMath::Helpers::vector_copy_from_start_contained_only<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
 		}
 #pragma endregion
 
@@ -6613,7 +6613,7 @@ namespace EmuMath
 		>
 		constexpr inline void Set(EmuMath::NewVector<InSize_, InT_>&& to_move_set_)
 		{
-			EmuMath::Helpers::new_vector_set<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
+			EmuMath::Helpers::vector_set<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
 		}
 
 		/// <summary>
@@ -6630,7 +6630,7 @@ namespace EmuMath
 		>
 		constexpr inline void Set(const EmuMath::NewVector<InSize_, InT_>&& to_move_set_)
 		{
-			EmuMath::Helpers::new_vector_set<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
+			EmuMath::Helpers::vector_set<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
 		}
 
 		/// <summary>
@@ -6647,7 +6647,7 @@ namespace EmuMath
 		>
 		constexpr inline void Set(EmuMath::NewVector<InSize_, InT_>& to_copy_set_)
 		{
-			EmuMath::Helpers::new_vector_set<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
+			EmuMath::Helpers::vector_set<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
 		}
 
 		/// <summary>
@@ -6664,7 +6664,7 @@ namespace EmuMath
 		>
 		constexpr inline void Set(const EmuMath::NewVector<InSize_, InT_>& to_copy_set_)
 		{
-			EmuMath::Helpers::new_vector_set<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
+			EmuMath::Helpers::vector_set<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
 		}
 
 		/// <summary>
@@ -6681,7 +6681,7 @@ namespace EmuMath
 		>
 		constexpr inline void SetContainedOnly(EmuMath::NewVector<InSize_, InT_>&& to_move_set_)
 		{
-			EmuMath::Helpers::new_vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
+			EmuMath::Helpers::vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
 		}
 
 		/// <summary>
@@ -6698,7 +6698,7 @@ namespace EmuMath
 		>
 		constexpr inline void SetContainedOnly(const EmuMath::NewVector<InSize_, InT_>&& to_move_set_)
 		{
-			EmuMath::Helpers::new_vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
+			EmuMath::Helpers::vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
 		}
 
 		/// <summary>
@@ -6715,7 +6715,7 @@ namespace EmuMath
 		>
 		constexpr inline void SetContainedOnly(EmuMath::NewVector<InSize_, InT_>& to_copy_set_)
 		{
-			EmuMath::Helpers::new_vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
+			EmuMath::Helpers::vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
 		}
 
 		/// <summary>
@@ -6732,7 +6732,7 @@ namespace EmuMath
 		>
 		constexpr inline void SetContainedOnly(const EmuMath::NewVector<InSize_, InT_>& to_copy_set_)
 		{
-			EmuMath::Helpers::new_vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
+			EmuMath::Helpers::vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
 		}
 
 		/// <summary>
@@ -6832,7 +6832,7 @@ namespace EmuMath
 		>
 		constexpr inline void SetAll(Arg_&& arg_)
 		{
-			EmuMath::Helpers::new_vector_set_all<BeginIndex_, EndIndex_>(*this, std::move(arg_));
+			EmuMath::Helpers::vector_set_all<BeginIndex_, EndIndex_>(*this, std::move(arg_));
 		}
 
 		/// <summary>
@@ -6851,7 +6851,7 @@ namespace EmuMath
 		>
 		constexpr inline void SetAll(Arg_& arg_)
 		{
-			EmuMath::Helpers::new_vector_set_all<BeginIndex_, EndIndex_>(*this, arg_);
+			EmuMath::Helpers::vector_set_all<BeginIndex_, EndIndex_>(*this, arg_);
 		}
 
 		/// <summary>
@@ -6870,7 +6870,7 @@ namespace EmuMath
 		>
 		constexpr inline void SetAll(const Arg_& arg_)
 		{
-			EmuMath::Helpers::new_vector_set_all<BeginIndex_, EndIndex_>(*this, arg_);
+			EmuMath::Helpers::vector_set_all<BeginIndex_, EndIndex_>(*this, arg_);
 		}
 #pragma endregion
 

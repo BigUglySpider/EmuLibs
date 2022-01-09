@@ -20,20 +20,20 @@ namespace EmuMath
 		using value_type = SampleTypeFP_;
 		using fractal_info_type = EmuMath::Info::FractalNoiseInfo<value_type>;
 
-		template<typename X_, typename Y_, typename Z_>
-		static constexpr inline EmuMath::Vector<num_dimensions, value_type> make_correctly_sized_vector(X_ x_, Y_ y_, Z_ z_)
+		template<typename OutT_, typename X_, typename Y_, typename Z_>
+		static constexpr inline EmuMath::NewVector<num_dimensions, OutT_> make_correctly_sized_vector(X_ x_, Y_ y_, Z_ z_)
 		{
 			if constexpr (num_dimensions == 1)
 			{
-				return EmuMath::Vector<1, value_type>(x_);
+				return EmuMath::NewVector<1, OutT_>(x_);
 			}
 			else if constexpr (num_dimensions == 2)
 			{
-				return EmuMath::Vector<2, value_type>(x_, y_);
+				return EmuMath::NewVector<2, OutT_>(x_, y_);
 			}
 			else if constexpr (num_dimensions == 3)
 			{
-				return EmuMath::Vector<3, value_type>(x_, y_, z_);
+				return EmuMath::NewVector<3, OutT_>(x_, y_, z_);
 			}
 			else
 			{
@@ -43,9 +43,9 @@ namespace EmuMath
 		}
 
 
-		static constexpr EmuMath::Vector<num_dimensions, value_type> _default_start_point = make_correctly_sized_vector(0, 0, 0);
-		static constexpr EmuMath::Vector<num_dimensions, value_type> _default_end_point = make_correctly_sized_vector(1, 1, 1);
-		static constexpr EmuMath::Vector<num_dimensions, std::size_t> _default_table_resolution = make_correctly_sized_vector(32, 32, 32);
+		static constexpr EmuMath::NewVector<num_dimensions, value_type> _default_start_point = make_correctly_sized_vector<value_type>(0, 0, 0);
+		static constexpr EmuMath::NewVector<num_dimensions, value_type> _default_end_point = make_correctly_sized_vector<value_type>(1, 1, 1);
+		static constexpr EmuMath::NewVector<num_dimensions, std::size_t> _default_table_resolution = make_correctly_sized_vector<std::size_t>(32, 32, 32);
 		static constexpr value_type _default_freq = value_type(1);
 		static constexpr bool _default_step_mode = false;
 		static constexpr bool _default_use_fractal_noise = false;
@@ -66,9 +66,9 @@ namespace EmuMath
 		}
 		constexpr NoiseTableOptions
 		(
-			const EmuMath::Vector<num_dimensions, std::size_t>& table_resolution_,
-			const EmuMath::Vector<num_dimensions, value_type>& start_point_,
-			const EmuMath::Vector<num_dimensions, value_type>& end_point_or_step_,
+			const EmuMath::NewVector<num_dimensions, std::size_t>& table_resolution_,
+			const EmuMath::NewVector<num_dimensions, value_type>& start_point_,
+			const EmuMath::NewVector<num_dimensions, value_type>& end_point_or_step_,
 			value_type freq_,
 			bool step_mode_,
 			bool use_fractal_noise_,
@@ -108,7 +108,7 @@ namespace EmuMath
 		/// </para>
 		/// </summary>
 		/// <returns>Step to use based on these options.</returns>
-		[[nodiscard]] constexpr inline EmuMath::Vector<num_dimensions, value_type> MakeStep() const
+		[[nodiscard]] constexpr inline EmuMath::NewVector<num_dimensions, value_type> MakeStep() const
 		{
 			if (step_mode)
 			{
@@ -121,14 +121,14 @@ namespace EmuMath
 		}
 
 		/// <summary> Number of items to be present on the table when using these options. </summary>
-		EmuMath::Vector<num_dimensions, std::size_t> table_resolution;
+		EmuMath::NewVector<num_dimensions, std::size_t> table_resolution;
 		/// <summary> Starting point when creating noise samples using these options. </summary>
-		EmuMath::Vector<num_dimensions, value_type> start_point;
+		EmuMath::NewVector<num_dimensions, value_type> start_point;
 		/// <summary>
 		///	<para> Target point to automatically calculate step if step_mode is false </para>
 		/// <para> The step per iteration (looping back every new iteration) if step_mode is true. </para>
 		/// </summary>
-		EmuMath::Vector<num_dimensions, value_type> end_point_or_step;
+		EmuMath::NewVector<num_dimensions, value_type> end_point_or_step;
 		/// <summary> Frequency multiplier to apply to points when generating samples. </summary>
 		value_type freq;
 		/// <summary>

@@ -28,7 +28,7 @@ namespace EmuMath::Functors
 		constexpr make_noise_2d() : floor_()
 		{
 		}
-		inline value_type operator()(EmuMath::Vector<2, value_type> point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
+		inline value_type operator()(EmuMath::NewVector<2, value_type> point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
 			EmuMath::NoisePermutationValue mask_ = permutations_.HighestStoredValue();
 			point_ *= freq_;
@@ -39,9 +39,9 @@ namespace EmuMath::Functors
 			return permutations_[(static_cast<std::size_t>(permutations_[ix_]) + iy_) & mask_] * (value_type(1) / mask_);
 		}
 		template<std::size_t Size_, typename T_, typename OnlyNonV2f = std::enable_if_t<Size_ != 2 || !std::is_same_v<value_type, T_>>>
-		inline value_type operator()(const EmuMath::Vector<Size_, T_>& point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
+		inline value_type operator()(const EmuMath::NewVector<Size_, T_>& point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
-			return operator()(EmuMath::Vector<2, value_type>(point_), freq_, permutations_);
+			return operator()(EmuMath::NewVector<2, value_type>(point_), freq_, permutations_);
 		}
 	};
 
@@ -58,7 +58,7 @@ namespace EmuMath::Functors
 		constexpr make_noise_2d() : lerp_(), floor_()
 		{
 		}
-		[[nodiscard]] inline value_type operator()(EmuMath::Vector<2, value_type> point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
+		[[nodiscard]] inline value_type operator()(EmuMath::NewVector<2, value_type> point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
 			EmuMath::NoisePermutationValue mask_ = permutations_.HighestStoredValue();
 			point_ *= freq_;
@@ -93,9 +93,9 @@ namespace EmuMath::Functors
 			) * (value_type(1) / mask_);
 		}
 		template<std::size_t Size_, typename T_, typename OnlyNonV2f = std::enable_if_t<Size_ != 2 || !std::is_same_v<value_type, T_>>>
-		[[nodiscard]] inline value_type operator()(const EmuMath::Vector<Size_, T_>& point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
+		[[nodiscard]] inline value_type operator()(const EmuMath::NewVector<Size_, T_>& point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
-			return operator()(EmuMath::Vector<2, value_type>(point_), freq_, permutations_);
+			return operator()(EmuMath::NewVector<2, value_type>(point_), freq_, permutations_);
 		}
 	};
 
@@ -113,14 +113,14 @@ namespace EmuMath::Functors
 		constexpr make_noise_2d() : lerp_(), floor_()
 		{
 		}
-		[[nodiscard]] inline value_type operator()(EmuMath::Vector<2, value_type> point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
+		[[nodiscard]] inline value_type operator()(EmuMath::NewVector<2, value_type> point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
 			EmuMath::NoisePermutationValue mask_ = permutations_.HighestStoredValue();
 			point_ *= freq_;
-			EmuMath::NoisePermutationValue ix_0_ = static_cast<EmuMath::NoisePermutationValue>(floor_(point_.x));
-			EmuMath::NoisePermutationValue iy_0_ = static_cast<EmuMath::NoisePermutationValue>(floor_(point_.y));
-			value_type tx_0_ = point_.x - ix_0_;
-			value_type ty_0_ = point_.y - iy_0_;
+			EmuMath::NoisePermutationValue ix_0_ = static_cast<EmuMath::NoisePermutationValue>(floor_(point_.at<0>()));
+			EmuMath::NoisePermutationValue iy_0_ = static_cast<EmuMath::NoisePermutationValue>(floor_(point_.at<1>()));
+			value_type tx_0_ = point_.at<0>() - ix_0_;
+			value_type ty_0_ = point_.at<1>() - iy_0_;
 			value_type tx_1_ = tx_0_ - value_type(1);
 			value_type ty_1_ = ty_0_ - value_type(1);
 			ix_0_ &= mask_;
@@ -146,9 +146,9 @@ namespace EmuMath::Functors
 			return lerp_(lerp_(val_00_, val_10_, tx_), lerp_(val_01_, val_11_, tx_), ty_);
 		}
 		template<std::size_t Size_, typename T_, typename OnlyNonV2f = std::enable_if_t<Size_ != 2 || !std::is_same_v<value_type, T_>>>
-		[[nodiscard]] inline value_type operator()(const EmuMath::Vector<Size_, T_>& point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
+		[[nodiscard]] inline value_type operator()(const EmuMath::NewVector<Size_, T_>& point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
-			return operator()(EmuMath::Vector<2, value_type>(point_), freq_, permutations_);
+			return operator()(EmuMath::NewVector<2, value_type>(point_), freq_, permutations_);
 		}
 	};
 }

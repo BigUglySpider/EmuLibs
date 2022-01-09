@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_NEW_VECTOR_TMP_H_INC_
-#define EMU_MATH_NEW_VECTOR_TMP_H_INC_ 1
+#ifndef EMU_MATH_vector_TMP_H_INC_
+#define EMU_MATH_vector_TMP_H_INC_ 1
 
 #include <cstddef>
 #include "../../../../../EmuCore/TMPHelpers/TypeComparators.h"
@@ -21,22 +21,22 @@ namespace EmuMath
 namespace EmuMath::TMP
 {
 	template<class T_>
-	struct is_emu_new_vector
+	struct is_emu_vector
 	{
 		static constexpr bool value = std::conditional_t
 		<
 			std::is_same_v<T_, EmuCore::TMP::remove_ref_cv_t<T_>>,
 			std::false_type,
-			is_emu_new_vector<EmuCore::TMP::remove_ref_cv_t<T_>>
+			is_emu_vector<EmuCore::TMP::remove_ref_cv_t<T_>>
 		>::value;
 	};
 	template<std::size_t Size_, typename T_>
-	struct is_emu_new_vector<EmuMath::NewVector<Size_, T_>>
+	struct is_emu_vector<EmuMath::NewVector<Size_, T_>>
 	{
 		static constexpr bool value = true;
 	};
 	template<class T_>
-	static constexpr bool is_emu_new_vector_v = is_emu_new_vector<T_>::value;
+	static constexpr bool is_emu_vector_v = is_emu_vector<T_>::value;
 
 	template<std::size_t Index_, class T_>
 	struct emu_vector_theoretical_return
@@ -101,7 +101,7 @@ namespace EmuMath::TMP
 		template<typename T_>
 		[[nodiscard]] static constexpr inline std::size_t _vector_size()
 		{
-			if constexpr (is_emu_new_vector_v<T_>)
+			if constexpr (is_emu_vector_v<T_>)
 			{
 				return T_::size;
 			}
@@ -115,8 +115,8 @@ namespace EmuMath::TMP
 		using lhs_uq = EmuCore::TMP::remove_ref_cv_t<Lhs_>;
 		using rhs_uq = EmuCore::TMP::remove_ref_cv_t<Rhs_>;
 
-		static constexpr bool lhs_is_vector = is_emu_new_vector_v<lhs_uq>;
-		static constexpr bool rhs_is_vector = is_emu_new_vector_v<rhs_uq>;
+		static constexpr bool lhs_is_vector = is_emu_vector_v<lhs_uq>;
+		static constexpr bool rhs_is_vector = is_emu_vector_v<rhs_uq>;
 
 		/// <summary>
 		/// <para> The smallest of the provided two types in terms of contained elements. </para>
@@ -160,7 +160,7 @@ namespace EmuMath::TMP
 		template<typename T_>
 		[[nodiscard]] static constexpr inline std::size_t _vector_size()
 		{
-			if constexpr (is_emu_new_vector_v<T_>)
+			if constexpr (is_emu_vector_v<T_>)
 			{
 				return T_::size;
 			}
@@ -174,8 +174,8 @@ namespace EmuMath::TMP
 		using lhs_uq = EmuCore::TMP::remove_ref_cv_t<Lhs_>;
 		using rhs_uq = EmuCore::TMP::remove_ref_cv_t<Rhs_>;
 
-		static constexpr bool lhs_is_vector = is_emu_new_vector_v<lhs_uq>;
-		static constexpr bool rhs_is_vector = is_emu_new_vector_v<rhs_uq>;
+		static constexpr bool lhs_is_vector = is_emu_vector_v<lhs_uq>;
+		static constexpr bool rhs_is_vector = is_emu_vector_v<rhs_uq>;
 
 		/// <summary>
 		/// <para> The largest of the provided two types in terms of contained elements. </para>
@@ -199,7 +199,7 @@ namespace EmuMath::TMP
 	template<class Lhs_, class Rhs_>
 	using largest_vector_t = typename largest_vector<Lhs_, Rhs_>::type;
 
-	template<class T_, bool IsEmuVector_ = EmuMath::TMP::is_emu_new_vector_v<T_>>
+	template<class T_, bool IsEmuVector_ = EmuMath::TMP::is_emu_vector_v<T_>>
 	struct emu_vector_value_types
 	{
 		using value_type = std::remove_reference_t<T_>;
@@ -265,7 +265,7 @@ namespace EmuMath::TMP
 		using _results = _generator<EmuCore::TMP::remove_ref_cv_t<Vector_>>;
 
 	public:
-		static constexpr bool is_vector = is_emu_new_vector_v<Vector_>;
+		static constexpr bool is_vector = is_emu_vector_v<Vector_>;
 		static constexpr std::size_t Size_ = _results::size_;
 		using T_ = typename _results::t_;
 	};

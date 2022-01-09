@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_NEW_VECTOR_UNARY_ARITHMETIC_H_INC_
-#define EMU_MATH_NEW_VECTOR_UNARY_ARITHMETIC_H_INC_ 1
+#ifndef EMU_MATH_vector_UNARY_ARITHMETIC_H_INC_
+#define EMU_MATH_vector_UNARY_ARITHMETIC_H_INC_ 1
 
 #include "_common_vector_helpers.h"
 #include "../../../../../EmuCore/Functors/Arithmetic.h"
@@ -27,14 +27,14 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to perform the increment operation on.</param>
 	/// <returns>Reference to vector_ if no OutSize_ or OutT_ argument is provided; otherwise, a copy of vector_ after incrementing.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_>
-	constexpr inline EmuMath::NewVector<Size_, T_>& new_vector_pre_increment(EmuMath::NewVector<Size_, T_>& vector_)
+	constexpr inline EmuMath::NewVector<Size_, T_>& vector_pre_increment(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_pre_increment<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		_vector_underlying::_vector_mutate_invoke_only_no_func_passed<Func_, BeginIndex_, EndIndex_>(vector_);
 		return vector_;
 	}
 	template<typename T_, std::size_t Size_>
-	constexpr inline EmuMath::NewVector<Size_, T_>& new_vector_pre_increment(EmuMath::NewVector<Size_, T_>& vector_)
+	constexpr inline EmuMath::NewVector<Size_, T_>& vector_pre_increment(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_pre_increment<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		_vector_underlying::_vector_mutate_invoke_only_no_func_passed<Func_, 0, Size_>(vector_);
@@ -52,20 +52,20 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to perform the increment operation on.</param>
 	/// <returns>Reference to vector_ if no OutSize_ or OutT_ argument is provided; otherwise, a copy of vector_ after incrementing.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_pre_increment(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_pre_increment(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_pre_increment<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		return _vector_underlying::_vector_copy_mutate_invoke_only_no_func_passed<false, Func_, OutSize_, OutT_, BeginIndex_, EndIndex_>(vector_, vector_);
 	}
 	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, OutT_> new_vector_pre_increment(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, OutT_> vector_pre_increment(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_pre_increment<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		return _vector_underlying::_vector_copy_mutate_invoke_only_no_func_passed<false, Func_, Size_, OutT_, BeginIndex_, EndIndex_>(vector_, vector_);
 	}
 	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<Size_, T_>::value_type_uq>
-	new_vector_pre_increment(EmuMath::NewVector<Size_, T_>& vector_)
+	vector_pre_increment(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_pre_increment<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		using value_type_uq = typename EmuMath::NewVector<Size_, T_>::value_type_uq;
@@ -85,20 +85,20 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to perform the increment operation on.</param>
 	/// <returns>Reference to vector_ if no OutSize_ or OutT_ argument is provided; otherwise, a copy of vector_ after incrementing.</returns>
 	template<std::size_t OutSize_, typename OutT_, typename T_, std::size_t Size_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_pre_increment(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_pre_increment(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_pre_increment<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		return _vector_underlying::_vector_copy_mutate_invoke_only_no_func_passed<false, Func_, OutSize_, OutT_, 0, Size_>(vector_, vector_);
 	}
 	template<typename OutT_, typename T_, std::size_t Size_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, OutT_> new_vector_pre_increment(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, OutT_> vector_pre_increment(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_pre_increment<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		return _vector_underlying::_vector_copy_mutate_invoke_only_no_func_passed<false, Func_, Size_, OutT_, 0, Size_>(vector_, vector_);
 	}
 	template<std::size_t OutSize_, std::size_t Size_, typename T_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<Size_, T_>::value_type_uq>
-	new_vector_pre_increment(EmuMath::NewVector<Size_, T_>& vector_)
+	vector_pre_increment(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_pre_increment<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		using value_type_uq = typename EmuMath::NewVector<Size_, T_>::value_type_uq;
@@ -116,14 +116,14 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to perform the increment operation on.</param>
 	/// <returns>EmuMath Vector of the specified OutSize_ (defaults to vector_'s size) and OutT_ (defaults to vector_'s value_type_uq), copying vector_ before incrementing.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_post_increment(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_post_increment(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_increment<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		return _vector_underlying::_vector_copy_mutate_invoke_only_no_func_passed<true, Func_, OutSize_, OutT_, BeginIndex_, EndIndex_>(vector_, vector_);
 	}
 
 	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, T_> new_vector_post_increment(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, T_> vector_post_increment(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_increment<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		return _vector_underlying::_vector_copy_mutate_invoke_only_no_func_passed<true, Func_, Size_, OutT_, BeginIndex_, EndIndex_>(vector_, vector_);
@@ -131,7 +131,7 @@ namespace EmuMath::Helpers
 
 	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<Size_, T_>::value_type_uq>
-	new_vector_post_increment(EmuMath::NewVector<Size_, T_>& vector_)
+	vector_post_increment(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_increment<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		using value_type_uq = typename EmuMath::NewVector<Size_, T_>::value_type_uq;
@@ -140,7 +140,7 @@ namespace EmuMath::Helpers
 
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, typename EmuMath::NewVector<Size_, T_>::value_type_uq>
-	new_vector_post_increment(EmuMath::NewVector<Size_, T_>& vector_)
+	vector_post_increment(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_increment<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		using value_type_uq = typename EmuMath::NewVector<Size_, T_>::value_type_uq;
@@ -154,20 +154,20 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to perform the increment operation on.</param>
 	/// <returns>EmuMath Vector of the specified OutSize_ (defaults to vector_'s size) and OutT_ (defaults to vector_'s value_type_uq), copying vector_ before incrementing.</returns>
 	template<std::size_t OutSize_, typename OutT_, typename T_, std::size_t Size_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_post_increment(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_post_increment(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_increment<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		return _vector_underlying::_vector_copy_mutate_invoke_only_no_func_passed<true, Func_, OutSize_, OutT_, 0, Size_>(vector_, vector_);
 	}
 	template<typename OutT_, typename T_, std::size_t Size_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, OutT_> new_vector_post_increment(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, OutT_> vector_post_increment(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_increment<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		return _vector_underlying::_vector_copy_mutate_invoke_only_no_func_passed<true, Func_, Size_, OutT_, 0, Size_>(vector_, vector_);
 	}
 	template<std::size_t OutSize_, std::size_t Size_, typename T_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<Size_, T_>::value_type_uq>
-	new_vector_post_increment(EmuMath::NewVector<Size_, T_>& vector_)
+	vector_post_increment(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_increment<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		using value_type_uq = typename EmuMath::NewVector<Size_, T_>::value_type_uq;
@@ -175,7 +175,7 @@ namespace EmuMath::Helpers
 	}
 	template<typename T_, std::size_t Size_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, typename EmuMath::NewVector<Size_, T_>::value_type_uq>
-	new_vector_post_increment(EmuMath::NewVector<Size_, T_>& vector_)
+	vector_post_increment(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_increment<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		using value_type_uq = typename EmuMath::NewVector<Size_, T_>::value_type_uq;
@@ -189,14 +189,14 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to perform the increment operation on.</param>
 	/// <returns>Reference to the provided vector_.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_>
-	constexpr inline EmuMath::NewVector<Size_, T_>& new_vector_post_increment_no_copy(EmuMath::NewVector<Size_, T_>& vector_)
+	constexpr inline EmuMath::NewVector<Size_, T_>& vector_post_increment_no_copy(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_increment<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		_vector_underlying::_vector_mutate_invoke_only_no_func_passed<Func_, BeginIndex_, EndIndex_>(vector_);
 		return vector_;
 	}
 	template<typename T_, std::size_t Size_>
-	constexpr inline EmuMath::NewVector<Size_, T_>& new_vector_post_increment_no_copy(EmuMath::NewVector<Size_, T_>& vector_)
+	constexpr inline EmuMath::NewVector<Size_, T_>& vector_post_increment_no_copy(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_increment<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		_vector_underlying::_vector_mutate_invoke_only_no_func_passed<Func_, 0, Size_>(vector_);
@@ -218,14 +218,14 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to perform the decrement operation on.</param>
 	/// <returns>Reference to vector_ if no OutSize_ or OutT_ argument is provided; otherwise, a copy of vector_ after dcrementing.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_>
-	constexpr inline EmuMath::NewVector<Size_, T_>& new_vector_pre_decrement(EmuMath::NewVector<Size_, T_>& vector_)
+	constexpr inline EmuMath::NewVector<Size_, T_>& vector_pre_decrement(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_pre_decrement<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		_vector_underlying::_vector_mutate_invoke_only_no_func_passed<Func_, BeginIndex_, EndIndex_>(vector_);
 		return vector_;
 	}
 	template<typename T_, std::size_t Size_>
-	constexpr inline EmuMath::NewVector<Size_, T_>& new_vector_pre_decrement(EmuMath::NewVector<Size_, T_>& vector_)
+	constexpr inline EmuMath::NewVector<Size_, T_>& vector_pre_decrement(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_pre_decrement<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		_vector_underlying::_vector_mutate_invoke_only_no_func_passed<Func_, 0, Size_>(vector_);
@@ -243,20 +243,20 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to perform the decrement operation on.</param>
 	/// <returns>Reference to vector_ if no OutSize_ or OutT_ argument is provided; otherwise, a copy of vector_ after decrementing.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_pre_decrement(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_pre_decrement(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_pre_decrement<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		return _vector_underlying::_vector_copy_mutate_invoke_only_no_func_passed<false, Func_, OutSize_, OutT_, BeginIndex_, EndIndex_>(vector_, vector_);
 	}
 	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, OutT_> new_vector_pre_decrement(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, OutT_> vector_pre_decrement(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_pre_decrement<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		return _vector_underlying::_vector_copy_mutate_invoke_only_no_func_passed<false, Func_, Size_, OutT_, BeginIndex_, EndIndex_>(vector_, vector_);
 	}
 	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<Size_, T_>::value_type_uq>
-	new_vector_pre_decrement(EmuMath::NewVector<Size_, T_>& vector_)
+	vector_pre_decrement(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_pre_decrement<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		using value_type_uq = typename EmuMath::NewVector<Size_, T_>::value_type_uq;
@@ -276,20 +276,20 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to perform the decrement operation on.</param>
 	/// <returns>Reference to vector_ if no OutSize_ or OutT_ argument is provided; otherwise, a copy of vector_ after decrementing.</returns>
 	template<std::size_t OutSize_, typename OutT_, typename T_, std::size_t Size_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_pre_decrement(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_pre_decrement(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_pre_decrement<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		return _vector_underlying::_vector_copy_mutate_invoke_only_no_func_passed<false, Func_, OutSize_, OutT_, 0, Size_>(vector_, vector_);
 	}
 	template<typename OutT_, typename T_, std::size_t Size_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, OutT_> new_vector_pre_decrement(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, OutT_> vector_pre_decrement(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_pre_decrement<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		return _vector_underlying::_vector_copy_mutate_invoke_only_no_func_passed<false, Func_, Size_, OutT_, 0, Size_>(vector_, vector_);
 	}
 	template<std::size_t OutSize_, std::size_t Size_, typename T_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<Size_, T_>::value_type_uq>
-	new_vector_pre_decrement(EmuMath::NewVector<Size_, T_>& vector_)
+	vector_pre_decrement(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_pre_decrement<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		using value_type_uq = typename EmuMath::NewVector<Size_, T_>::value_type_uq;
@@ -307,14 +307,14 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to perform the decrement operation on.</param>
 	/// <returns>EmuMath Vector of the specified OutSize_ (defaults to vector_'s size) and OutT_ (defaults to vector_'s value_type_uq), copying vector_ before decrementing.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_post_decrement(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_post_decrement(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_decrement<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		return _vector_underlying::_vector_copy_mutate_invoke_only_no_func_passed<true, Func_, OutSize_, OutT_, BeginIndex_, EndIndex_>(vector_, vector_);
 	}
 
 	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, T_> new_vector_post_decrement(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, T_> vector_post_decrement(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_decrement<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		return _vector_underlying::_vector_copy_mutate_invoke_only_no_func_passed<true, Func_, Size_, OutT_, BeginIndex_, EndIndex_>(vector_, vector_);
@@ -322,7 +322,7 @@ namespace EmuMath::Helpers
 
 	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<Size_, T_>::value_type_uq>
-	new_vector_post_decrement(EmuMath::NewVector<Size_, T_>& vector_)
+	vector_post_decrement(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_decrement<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		using value_type_uq = typename EmuMath::NewVector<Size_, T_>::value_type_uq;
@@ -331,7 +331,7 @@ namespace EmuMath::Helpers
 
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, typename EmuMath::NewVector<Size_, T_>::value_type_uq>
-	new_vector_post_decrement(EmuMath::NewVector<Size_, T_>& vector_)
+	vector_post_decrement(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_decrement<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		using value_type_uq = typename EmuMath::NewVector<Size_, T_>::value_type_uq;
@@ -345,20 +345,20 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to perform the decrement operation on.</param>
 	/// <returns>EmuMath Vector of the specified OutSize_ (defaults to vector_'s size) and OutT_ (defaults to vector_'s value_type_uq), copying vector_ before decrementing.</returns>
 	template<std::size_t OutSize_, typename OutT_, typename T_, std::size_t Size_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_post_decrement(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_post_decrement(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_decrement<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		return _vector_underlying::_vector_copy_mutate_invoke_only_no_func_passed<true, Func_, OutSize_, OutT_, 0, Size_>(vector_, vector_);
 	}
 	template<typename OutT_, typename T_, std::size_t Size_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, OutT_> new_vector_post_decrement(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, OutT_> vector_post_decrement(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_decrement<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		return _vector_underlying::_vector_copy_mutate_invoke_only_no_func_passed<true, Func_, Size_, OutT_, 0, Size_>(vector_, vector_);
 	}
 	template<std::size_t OutSize_, std::size_t Size_, typename T_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<Size_, T_>::value_type_uq>
-	new_vector_post_decrement(EmuMath::NewVector<Size_, T_>& vector_)
+	vector_post_decrement(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_decrement<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		using value_type_uq = typename EmuMath::NewVector<Size_, T_>::value_type_uq;
@@ -366,7 +366,7 @@ namespace EmuMath::Helpers
 	}
 	template<typename T_, std::size_t Size_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, typename EmuMath::NewVector<Size_, T_>::value_type_uq>
-	new_vector_post_decrement(EmuMath::NewVector<Size_, T_>& vector_)
+	vector_post_decrement(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_decrement<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		using value_type_uq = typename EmuMath::NewVector<Size_, T_>::value_type_uq;
@@ -380,14 +380,14 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath vector to perform the decrement operation on.</param>
 	/// <returns>Reference to the provided vector_.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename T_, std::size_t Size_>
-	constexpr inline EmuMath::NewVector<Size_, T_>& new_vector_post_decrement_no_copy(EmuMath::NewVector<Size_, T_>& vector_)
+	constexpr inline EmuMath::NewVector<Size_, T_>& vector_post_decrement_no_copy(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_decrement<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		_vector_underlying::_vector_mutate_invoke_only_no_func_passed<Func_, BeginIndex_, EndIndex_>(vector_);
 		return vector_;
 	}
 	template<typename T_, std::size_t Size_>
-	constexpr inline EmuMath::NewVector<Size_, T_>& new_vector_post_decrement_no_copy(EmuMath::NewVector<Size_, T_>& vector_)
+	constexpr inline EmuMath::NewVector<Size_, T_>& vector_post_decrement_no_copy(EmuMath::NewVector<Size_, T_>& vector_)
 	{
 		using Func_ = EmuCore::do_post_decrement<typename EmuMath::NewVector<Size_, T_>::value_type>;
 		_vector_underlying::_vector_mutate_invoke_only_no_func_passed<Func_, 0, Size_>(vector_);
@@ -404,20 +404,20 @@ namespace EmuMath::Helpers
 	/// <param name="in_vector_">EmuMath Vector to output the negated form of.</param>
 	/// <returns>Negated form of in_vector_ (i.e. -in_vector_) as an EmuMath Vector type formed from the provided OutSize_ and OutT_ arguments.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_negate(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_negate(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
 		using Func_ = EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
 		return EMU_MATH_VECTOR_MUTATION(Func_, OutSize_, OutT_, InSize_, InT_)(in_vector_);
 	}
 	template<typename OutT_, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> new_vector_negate(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> vector_negate(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
 		using Func_ = EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
 		return EMU_MATH_VECTOR_MUTATION(Func_, InSize_, OutT_, InSize_, InT_)(in_vector_);
 	}
 	template<std::size_t OutSize_, std::size_t InSize_, typename InT_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>
-	new_vector_negate(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	vector_negate(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
 		using in_value_uq = typename EmuMath::NewVector<InSize_, InT_>::value_type_uq;
 		using Func_ = EmuCore::do_negate<in_value_uq>;
@@ -425,7 +425,7 @@ namespace EmuMath::Helpers
 	}
 	template<typename InT_, std::size_t InSize_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>
-	new_vector_negate(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	vector_negate(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
 		using in_value_uq = typename EmuMath::NewVector<InSize_, InT_>::value_type_uq;
 		using Func_ = EmuCore::do_negate<in_value_uq>;
@@ -438,7 +438,7 @@ namespace EmuMath::Helpers
 	/// <param name="out_vector_">EmuMath Vector to output to.</param>
 	/// <param name="in_vector_">EmuMath Vector to output the negated form of.</param>
 	template<std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_>
-	constexpr inline void new_vector_negate(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	constexpr inline void vector_negate(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
 		using Func_ = EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
 		return EMU_MATH_VECTOR_MUTATION_REF(Func_, OutSize_, OutT_, InSize_, InT_)(out_vector_, in_vector_);
@@ -452,20 +452,20 @@ namespace EmuMath::Helpers
 	/// <param name="in_vector_">EmuMath Vector to copy, with negated values within the specified index range.</param>
 	/// <returns>EmuMath Vector copy of the provided in_vector_, formed with the provided OutSize_ and OutT_ args, with indices in the specified range negated. </returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_negate_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_negate_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
 		using Func_ = EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
 		return EMU_MATH_VECTOR_MUTATION_RANGE(Func_, OutSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_)(in_vector_, in_vector_);
 	}
 	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, typename InT_, std::size_t InSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> new_vector_negate_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> vector_negate_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
 		using Func_ = EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
 		return EMU_MATH_VECTOR_MUTATION_RANGE(Func_, InSize_, OutT_, InSize_, InT_, BeginIndex_, EndIndex_)(in_vector_, in_vector_);
 	}
 	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_, typename InT_, std::size_t InSize_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>
-	new_vector_negate_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	vector_negate_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
 		using in_value_uq = typename EmuMath::NewVector<InSize_, InT_>::value_type_uq;
 		using Func_ = EmuCore::do_negate<in_value_uq>;
@@ -473,7 +473,7 @@ namespace EmuMath::Helpers
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename InT_, std::size_t InSize_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>
-	new_vector_negate_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	vector_negate_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
 		using in_value_uq = typename EmuMath::NewVector<InSize_, InT_>::value_type_uq;
 		using Func_ = EmuCore::do_negate<in_value_uq>;
@@ -488,7 +488,7 @@ namespace EmuMath::Helpers
 	/// <param name="out_vector_">EmuMath Vector to write copied and negated values to.</param>
 	/// <param name="in_vector_">EmuMath Vector to copy, with negated values within the specified index range.</param>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_>
-	constexpr inline void new_vector_negate_range(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	constexpr inline void vector_negate_range(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
 		using Func_ = EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
 		EMU_MATH_VECTOR_MUTATION_REF_RANGE(Func_, OutT_, OutSize_, InSize_, InT_, BeginIndex_, EndIndex_, BeginIndex_)(out_vector_, in_vector_, in_vector_);
@@ -510,20 +510,20 @@ namespace EmuMath::Helpers
 	/// <param name="in_vector_">: EmuMath Vector to read elements from when performing negations.</param>
 	/// <returns>EmuMath Vector with negated values from the specified indices of in_vector_ within the OutBegin_:OutEnd_ range, and default values elsewhere.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NegateBegin_, typename InT_, std::size_t InSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> new_vector_negate_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_negate_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
 		using Func_ = EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
 		return EMU_MATH_VECTOR_MUTATION_RANGE_NO_COPY(Func_, OutSize_, OutT_, InSize_, InT_, OutBegin_, OutEnd_, NegateBegin_)(in_vector_);
 	}
 	template<typename OutT_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NegateBegin_, typename InT_, std::size_t InSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> new_vector_negate_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> vector_negate_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
 		using Func_ = EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
 		return EMU_MATH_VECTOR_MUTATION_RANGE_NO_COPY(Func_, InSize_, OutT_, InSize_, InT_, OutBegin_, OutEnd_, NegateBegin_)(in_vector_);
 	}
 	template<std::size_t OutSize_, std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NegateBegin_, typename InT_, std::size_t InSize_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>
-	new_vector_negate_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	vector_negate_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
 		using in_value_uq = typename EmuMath::NewVector<InSize_, InT_>::value_type_uq;
 		using Func_ = EmuCore::do_negate<in_value_uq>;
@@ -531,7 +531,7 @@ namespace EmuMath::Helpers
 	}
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NegateBegin_, typename InT_, std::size_t InSize_>
 	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>
-	new_vector_negate_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	vector_negate_range_no_copy(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
 		using in_value_uq = typename EmuMath::NewVector<InSize_, InT_>::value_type_uq;
 		using Func_ = EmuCore::do_negate<in_value_uq>;
@@ -551,7 +551,7 @@ namespace EmuMath::Helpers
 	/// <param name="out_vector_">: EmuMath Vector to write negated elements to.</param>
 	/// <param name="in_vector_">: EmuMath Vector to read elements from when performing negations.</param>
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NegateBegin_ = 0, typename OutT_, std::size_t OutSize_, typename InT_, std::size_t InSize_>
-	constexpr inline void new_vector_negate_range_no_copy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	constexpr inline void vector_negate_range_no_copy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
 	{
 		using Func_ = EmuCore::do_negate<typename EmuMath::NewVector<InSize_, InT_>::value_type_uq>;
 		return EMU_MATH_VECTOR_MUTATION_REF_RANGE_NO_COPY(Func_, OutSize_, OutT_, InSize_, InT_, OutBegin_, OutEnd_, NegateBegin_)(out_vector_, in_vector_);

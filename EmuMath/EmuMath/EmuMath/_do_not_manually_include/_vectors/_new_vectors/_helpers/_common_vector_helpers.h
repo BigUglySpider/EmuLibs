@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_NEW_VECTOR_COMMON_HELPERS_H_INC_
-#define EMU_MATH_NEW_VECTOR_COMMON_HELPERS_H_INC_ 1
+#ifndef EMU_MATH_vector_COMMON_HELPERS_H_INC_
+#define EMU_MATH_vector_COMMON_HELPERS_H_INC_ 1
 
 #include "../_underlying_helpers/_vector_cast_underlying.h"
 #include "../_underlying_helpers/_vector_cmp_underlying.h"

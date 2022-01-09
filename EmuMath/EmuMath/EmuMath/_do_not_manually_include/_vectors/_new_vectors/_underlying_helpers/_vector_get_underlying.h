@@ -1,11 +1,11 @@
-#ifndef EMU_MATH_NEW_VECTOR_GET_UNDERLYING_H_INC_
-#define EMU_MATH_NEW_VECTOR_GET_UNDERLYING_H_INC_ 1
+#ifndef EMU_MATH_vector_GET_UNDERLYING_H_INC_
+#define EMU_MATH_vector_GET_UNDERLYING_H_INC_ 1
 
 #include "_vector_tmp.h"
 
 namespace EmuMath::Helpers::_vector_underlying
 {
-	template<class Vector_, typename = std::enable_if_t<EmuMath::TMP::is_emu_new_vector_v<Vector_>>>
+	template<class Vector_, typename = std::enable_if_t<EmuMath::TMP::is_emu_vector_v<Vector_>>>
 	[[nodiscard]] constexpr inline typename Vector_::value_type_uq _vector_get_non_contained_value()
 	{
 		using out_type = typename Vector_::value_type_uq;

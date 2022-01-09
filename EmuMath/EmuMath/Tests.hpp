@@ -10,10 +10,7 @@
 
 // ADDITIONAL INCLUDES
 #include "EmuMath/Vector.h"
-#include "EmuMath/FastVector.h"
-#include "EmuMath/FastMatrix.h"
 #include "EmuMath/Random.h"
-#include "EmuMath/NewVector.h"
 #include <bitset>
 #include <DirectXMath.h>
 #include <string_view>
@@ -24,11 +21,11 @@ namespace EmuCore::TestingHelpers
 	static constexpr unsigned long long shared_select_seed_ = -25;
 
 	template<std::size_t Size_, typename OutT_, class OutColl_, class RngFunc_>
-	inline void emplace_back_new_vector(OutColl_& out_coll_, RngFunc_& func_)
+	inline void emplace_back_vector(OutColl_& out_coll_, RngFunc_& func_)
 	{
 		out_coll_.emplace_back
 		(
-			EmuMath::Helpers::new_vector_mutate<Size_, OutT_, RngFunc_&>(func_, OutT_())
+			EmuMath::Helpers::vector_mutate<Size_, OutT_, RngFunc_&>(func_, OutT_())
 		);
 	}
 
@@ -144,8 +141,8 @@ namespace EmuCore::TestingHelpers
 
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				emplace_back_new_vector<vec_size, vector_type_arg>(in_ray, rng_);
-				emplace_back_new_vector<vec_size, float_type>(in_norm, rng_);
+				emplace_back_vector<vec_size, vector_type_arg>(in_ray, rng_);
+				emplace_back_vector<vec_size, float_type>(in_norm, rng_);
 				in_norm[i] = in_norm[i].Normalise();
 			}
 		}

@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_NEW_VECTOR_SET_UNDERLYING_H_INC_
-#define EMU_MATH_NEW_VECTOR_SET_UNDERLYING_H_INC_ 1
+#ifndef EMU_MATH_vector_SET_UNDERLYING_H_INC_
+#define EMU_MATH_vector_SET_UNDERLYING_H_INC_ 1
 
 #include "_vector_tmp.h"
 #include "_vector_get_underlying.h"
@@ -148,7 +148,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	template<bool SetAll_, class VectorArg_, std::size_t Size_, typename T_>
 	constexpr inline void _vector_set_vector(EmuMath::NewVector<Size_, T_>& out_vector_, VectorArg_& vector_arg_)
 	{
-		if constexpr (EmuMath::TMP::is_emu_new_vector_v<VectorArg_>)
+		if constexpr (EmuMath::TMP::is_emu_vector_v<VectorArg_>)
 		{
 			using lhs_vector_type = EmuMath::NewVector<Size_, T_>;
 			using rhs_vector_type = EmuCore::TMP::remove_ref_cv_t<VectorArg_>;
@@ -204,7 +204,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	template<bool SetAll_, class VectorArg_, std::size_t Size_, typename T_>
 	constexpr inline void _vector_set_vector(EmuMath::NewVector<Size_, T_>& out_vector_, VectorArg_&& vector_arg_)
 	{
-		if constexpr (EmuMath::TMP::is_emu_new_vector_v<VectorArg_>)
+		if constexpr (EmuMath::TMP::is_emu_vector_v<VectorArg_>)
 		{
 			using lhs_vector_type = EmuMath::NewVector<Size_, T_>;
 			using rhs_vector_type = EmuCore::TMP::remove_ref_cv_t<VectorArg_>;

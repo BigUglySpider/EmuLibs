@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_NEW_VECTOR_COPY_UNDERLYING_H_INC_
-#define EMU_MATH_NEW_VECTOR_COPY_UNDERLYING_H_INC_ 1
+#ifndef EMU_MATH_vector_COPY_UNDERLYING_H_INC_
+#define EMU_MATH_vector_COPY_UNDERLYING_H_INC_ 1
 
 #include "_vector_tmp.h"
 #include "_vector_get_underlying.h"
@@ -47,12 +47,12 @@ namespace EmuMath::Helpers::_vector_underlying
 	{
 		if constexpr (Index_ < EndIndex_)
 		{
-			if constexpr (EmuMath::TMP::is_emu_new_vector_v<ArgVector_>)
+			if constexpr (EmuMath::TMP::is_emu_vector_v<ArgVector_>)
 			{
 				using lhs_value_type = typename EmuMath::NewVector<Size_, T_>::value_type;
 				using arg_vector_uq = EmuCore::TMP::remove_ref_cv_t<ArgVector_>;
 				using arg_value_type_cq = EmuCore::TMP::conditional_const_t<std::is_const_v<ArgVector_>, typename arg_vector_uq::value_type>;
-				if constexpr (EmuMath::TMP::is_emu_new_vector_v<lhs_value_type> && !EmuMath::TMP::is_emu_new_vector_v<arg_value_type_cq>)
+				if constexpr (EmuMath::TMP::is_emu_vector_v<lhs_value_type> && !EmuMath::TMP::is_emu_vector_v<arg_value_type_cq>)
 				{
 					// If vector_ contains Vectors, but to_copy_ does not, we want the containe Vectors to fully copy to_copy_.
 					// --- E.g., a Vector<4, Vector<4, float>> copying  Vector<4, float>(1, 2, 3, 4) will be set to ({ 1, 2, 3, 4 }, { 1, 2, 3, 4 }, etc...)
@@ -97,7 +97,7 @@ namespace EmuMath::Helpers::_vector_underlying
 			using lhs_vector_type = EmuMath::NewVector<Size_, T_>;
 			constexpr std::size_t end_index_ = (EndIndex_ <= lhs_vector_type::size) ? EndIndex_ : lhs_vector_type::size;
 
-			if constexpr (EmuMath::TMP::is_emu_new_vector_v<Arg_>)
+			if constexpr (EmuMath::TMP::is_emu_vector_v<Arg_>)
 			{
 				_vector_copy_vector<BeginIndex_, end_index_, ArgIndex_, Arg_, Size_, T_>(out_, in_);
 			}
@@ -146,7 +146,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			if constexpr (EmuMath::TMP::is_emu_new_vector_v<Arg_>)
+			if constexpr (EmuMath::TMP::is_emu_vector_v<Arg_>)
 			{
 				if constexpr (BeginIndex_ <= EndIndex_)
 				{

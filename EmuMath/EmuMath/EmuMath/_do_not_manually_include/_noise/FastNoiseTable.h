@@ -41,10 +41,10 @@ namespace EmuMath
 		using value_type = float;
 		using this_type = FastNoiseTable<NumDimensions_, MajorDimensionIndex_>;
 		using options_type = EmuMath::NoiseTableOptions<NumDimensions_, value_type>;
-		using coordinate_type = EmuMath::Vector<num_dimensions, std::size_t>;
+		using coordinate_type = EmuMath::NewVector<num_dimensions, std::size_t>;
 
 		template<std::size_t Size_, typename T_>
-		[[nodiscard]] static inline coordinate_type make_coords_from_vector(const EmuMath::Vector<Size_, T_>& vector_)
+		[[nodiscard]] static inline coordinate_type make_coords_from_vector(const EmuMath::NewVector<Size_, T_>& vector_)
 		{
 			if constexpr (num_dimensions == 1)
 			{
@@ -79,9 +79,9 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] static inline options_type make_options
 		(
-			const EmuMath::Vector<num_dimensions, std::size_t>& table_resolution_,
-			const EmuMath::Vector<num_dimensions, value_type>& start_point_,
-			const EmuMath::Vector<num_dimensions, value_type>& end_point_or_step_,
+			const EmuMath::NewVector<num_dimensions, std::size_t>& table_resolution_,
+			const EmuMath::NewVector<num_dimensions, value_type>& start_point_,
+			const EmuMath::NewVector<num_dimensions, value_type>& end_point_or_step_,
 			value_type freq_,
 			bool step_mode_,
 			bool use_fractal_noise_,
@@ -139,7 +139,7 @@ namespace EmuMath
 		}
 
 		template<std::size_t Size_>
-		[[nodiscard]] inline value_type at(const EmuMath::Vector<Size_, std::size_t> coords_) const
+		[[nodiscard]] inline value_type at(const EmuMath::NewVector<Size_, std::size_t> coords_) const
 		{
 			if constexpr (Size_ == num_dimensions)
 			{
@@ -157,7 +157,7 @@ namespace EmuMath
 			return at(x_);
 		}
 		template<std::size_t Size_>
-		[[nodiscard]] inline value_type operator[](const EmuMath::Vector<Size_, std::size_t> coords_) const
+		[[nodiscard]] inline value_type operator[](const EmuMath::NewVector<Size_, std::size_t> coords_) const
 		{
 			return at(coords_);
 		}
@@ -178,7 +178,7 @@ namespace EmuMath
 			return at(x_, y_, z_);
 		}
 		template<std::size_t Size_>
-		[[nodiscard]] inline value_type operator()(const EmuMath::Vector<Size_, std::size_t> coords_) const
+		[[nodiscard]] inline value_type operator()(const EmuMath::NewVector<Size_, std::size_t> coords_) const
 		{
 			return at(coords_);
 		}
@@ -358,8 +358,8 @@ namespace EmuMath
 		(
 			Generator_ generator_,
 			SampleProcessor_ sample_processor_,
-			const EmuMath::Vector<num_dimensions, value_type> start_,
-			const EmuMath::Vector<num_dimensions, value_type> step_
+			const EmuMath::NewVector<num_dimensions, value_type> start_,
+			const EmuMath::NewVector<num_dimensions, value_type> step_
 		)
 		{
 			constexpr std::size_t num_elements_per_batch = EmuSIMD::TMP::simd_register_width_v<Register_> / (sizeof(value_type) * 8);
@@ -542,9 +542,9 @@ namespace EmuMath
 			}
 		}
 
-		[[nodiscard]] static constexpr inline bool _valid_resolution(const EmuMath::Vector<num_dimensions, std::size_t>& new_size_)
+		[[nodiscard]] static constexpr inline bool _valid_resolution(const EmuMath::NewVector<num_dimensions, std::size_t>& new_size_)
 		{
-			return !new_size_.CmpAnyEqualTo<true, std::size_t>(0);
+			return !new_size_.CmpAnyEqual(std::size_t(0));
 		}
 
 		void _do_resize(const coordinate_type& new_size_)

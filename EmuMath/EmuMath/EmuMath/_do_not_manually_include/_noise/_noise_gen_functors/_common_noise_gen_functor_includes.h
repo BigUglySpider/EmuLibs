@@ -22,7 +22,7 @@ namespace EmuMath::Functors::_underlying_noise_gen
 	template<typename T_>
 	struct perlin_gradients<1, T_>
 	{
-		using gradient_type = EmuMath::Vector<1, T_>;
+		using gradient_type = EmuMath::NewVector<1, T_>;
 		static constexpr std::size_t num_gradients = 2;
 		static constexpr std::size_t mask = 1;
 		static constexpr gradient_type values[num_gradients] = { gradient_type(1), gradient_type(-1) };
@@ -47,7 +47,7 @@ namespace EmuMath::Functors::_underlying_noise_gen
 	template<typename T_>
 	struct perlin_gradients<2, T_>
 	{
-		using gradient_type = EmuMath::Vector<2, T_>;
+		using gradient_type = EmuMath::NewVector<2, T_>;
 		static constexpr std::size_t num_gradients = 8;
 		static constexpr std::size_t mask = 7;
 		static constexpr gradient_type values[num_gradients] = 
@@ -82,7 +82,7 @@ namespace EmuMath::Functors::_underlying_noise_gen
 	template<typename T_>
 	struct perlin_gradients<3, T_>
 	{
-		using gradient_type = EmuMath::Vector<3, T_>;
+		using gradient_type = EmuMath::NewVector<3, T_>;
 		static constexpr std::size_t num_gradients = 16;
 		static constexpr std::size_t mask = 15;
 		static constexpr gradient_type values[num_gradients] =
@@ -138,7 +138,7 @@ namespace EmuMath::Functors::_underlying_noise_gen
 	/// <param name="y_">Y-component of a theoretical vector to form a dot product with.</param>
 	/// <returns>Dot product of the passed vector and scalar values.</returns>
 	template<typename T_>
-	constexpr inline T_ dot_with_scalar(const EmuMath::Vector<2, T_>& vector_, T_ x_, T_ y_)
+	constexpr inline T_ dot_with_scalar(const EmuMath::NewVector<2, T_>& vector_, T_ x_, T_ y_)
 	{
 		return vector_.at<0>() * x_ + vector_.at<1>() * y_;
 	}
@@ -149,7 +149,7 @@ namespace EmuMath::Functors::_underlying_noise_gen
 	/// <param name="z_">Z-component of a theoretical vector to form a dot product with.</param>
 	/// <returns>Dot product of the passed vector and scalar values.</returns>
 	template<typename T_>
-	constexpr inline T_ dot_with_scalar(const EmuMath::Vector<3, T_>& vector_, T_ x_, T_ y_, T_ z_)
+	constexpr inline T_ dot_with_scalar(const EmuMath::NewVector<3, T_>& vector_, T_ x_, T_ y_, T_ z_)
 	{
 		return (vector_.at<0>() * x_) + (vector_.at<1>() * y_) + (vector_.at<2>() * z_);
 	}

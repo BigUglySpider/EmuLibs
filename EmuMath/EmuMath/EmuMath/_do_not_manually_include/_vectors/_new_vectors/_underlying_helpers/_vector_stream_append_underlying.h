@@ -67,7 +67,7 @@ namespace EmuMath::Helpers::_vector_underlying
 			// Append using additional _vector_append layer if the Vector contains more Vectors
 			// --- Allows this template to work with itself
 			using get_result = decltype(_vector_get<Index_>(std::declval<EmuMath::NewVector<Size_, T_>>()));
-			if constexpr (EmuMath::TMP::is_emu_new_vector_v<get_result>)
+			if constexpr (EmuMath::TMP::is_emu_vector_v<get_result>)
 			{
 				using get_result_uq = EmuCore::TMP::remove_ref_cv_t<get_result>;
 				_vector_append_open_indicator<IsWide_, StreamType_>(str_);

@@ -144,7 +144,7 @@ namespace EmuMath::Functors
 
 		/// <summary> Gradients for calculation. Z index contains a duplicate of X; W index contains a duplicate of Y. </summary>
 		const typename gradients::register_array _gradients_128;
-		static constexpr EmuMath::Vector<2, std::size_t> _duplicate_gradient_indices = EmuMath::Vector<2, std::size_t>(0, 1);
+		static constexpr EmuMath::NewVector<2, std::size_t> _duplicate_gradient_indices = EmuMath::NewVector<2, std::size_t>(0, 1);
 
 		inline make_fast_noise_2d() : 
 			smooth_t(),
