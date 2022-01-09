@@ -5263,6 +5263,143 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::new_vector_project<size, OutT_, BeginIndex_, EndIndex_>(*this, onto_);
 		}
+
+		/// <summary>
+		/// <para> Calculates the projection of this Vector onto the plane defined by the passed plane_normal_. </para>
+		/// </summary>
+		/// <param name="plane_normal_">: EmuMath Vector describing the plane to reflect onto. This is expected to be normalised, and treated as such.</param>
+		/// <returns>EmuMath Vector resulting from projecting this Vector onto the plane defined by the provided plane_normal_.</returns>
+		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t NormSize_, typename NormT_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ProjectPlane(const EmuMath::NewVector<NormSize_, NormT_>& plane_normal_) const
+		{
+			return EmuMath::Helpers::new_vector_project_plane<OutSize_, OutT_>(*this, plane_normal_);
+		}
+		template<typename OutT_ = preferred_floating_point, std::size_t NormSize_, typename NormT_>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ProjectPlane(const EmuMath::NewVector<NormSize_, NormT_>& plane_normal_) const
+		{
+			return EmuMath::Helpers::new_vector_project_plane<size, OutT_>(*this, plane_normal_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the resulting Vector from a projection of this Vector onto the 3D plane defined by the passed 3 points </para>
+		/// <para>
+		///		PlaneReadOffset_: Inclusive index at which to start reading the plane points. Defaults to 0.  
+		///		This offset does not apply to reads from this Vector, which will always read from 0.
+		/// </para>
+		/// <para> If a normal for the defined plane is already available, it is recommended to use vector_project_plane with that normal to minimise normalisation costs. </para>
+		/// <para> Unlike most member functions, if no OutSize_ is provided this will always default to 3 instead of this Vector's size, due to its 3D focus. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <param name="plane_point_a_">
+		///		: Cartesian point a defining the plane to project onto. For more information on how this is used, see NormalToPlane3 
+		///		(Note that `plane_point_a_` is this Vector when calling NormalToPlane3).
+		/// </param>
+		/// <param name="plane_point_b_">: Cartesian point b defining the plane to project onto. For more information on how this is used, see NormalToPlane3.</param>
+		/// <param name="plane_point_c_">: Cartesian point c defining the plane to project onto. For more information on how this is used, see NormalToPlane3.</param>
+		/// <returns>EmuMath Vector resulting from the projection of this Vector onto the 3D plane defined by the passed 3 points.</returns>
+		template
+		<
+			std::size_t OutSize_,
+			typename OutT_ = preferred_floating_point,
+			std::size_t PlaneReadOffset_ = 0,
+			std::size_t SizeA_,
+			typename TA_,
+			std::size_t SizeB_,
+			typename TB_,
+			std::size_t SizeC_,
+			typename TC_
+		>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ProjectPlane3Constexpr
+		(
+			const EmuMath::NewVector<SizeA_, TA_>& plane_point_a_,
+			const EmuMath::NewVector<SizeB_, TB_>& plane_point_b_,
+			const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
+		) const
+		{
+			return EmuMath::Helpers::new_vector_project_plane_3d_constexpr<OutSize_, OutT_, PlaneReadOffset_>(*this, plane_point_a_, plane_point_b_, plane_point_c_);
+		}
+		template
+		<
+			typename OutT_ = preferred_floating_point,
+			std::size_t PlaneReadOffset_ = 0,
+			std::size_t SizeA_,
+			typename TA_,
+			std::size_t SizeB_,
+			typename TB_,
+			std::size_t SizeC_,
+			typename TC_
+		>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> ProjectPlane3Constexpr
+		(
+			const EmuMath::NewVector<SizeA_, TA_>& plane_point_a_,
+			const EmuMath::NewVector<SizeB_, TB_>& plane_point_b_,
+			const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
+		) const
+		{
+			return EmuMath::Helpers::new_vector_project_plane_3d_constexpr<3, OutT_, PlaneReadOffset_>(*this, plane_point_a_, plane_point_b_, plane_point_c_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the resulting Vector from a projection of this Vector onto the 3D plane defined by the passed 3 points </para>
+		/// <para>
+		///		PlaneReadOffset_: Inclusive index at which to start reading the plane points. Defaults to 0.  
+		///		This offset does not apply to reads from this Vector, which will always read from 0.
+		/// </para>
+		/// <para> If a normal for the defined plane is already available, it is recommended to use vector_project_plane with that normal to minimise normalisation costs. </para>
+		/// <para> Unlike most member functions, if no OutSize_ is provided this will always default to 3 instead of this Vector's size, due to its 3D focus. </para>
+		/// <para> For a guarantee to be constexpr-evaluable if possible, use ProjectPlane3Constexpr instead. </para>
+		/// </summary>
+		/// <param name="plane_point_a_">
+		///		: Cartesian point a defining the plane to project onto. For more information on how this is used, see NormalToPlane3 
+		///		(Note that `plane_point_a_` is this Vector when calling NormalToPlane3).
+		/// </param>
+		/// <param name="plane_point_b_">: Cartesian point b defining the plane to project onto. For more information on how this is used, see NormalToPlane3.</param>
+		/// <param name="plane_point_c_">: Cartesian point c defining the plane to project onto. For more information on how this is used, see NormalToPlane3.</param>
+		/// <returns>EmuMath Vector resulting from the projection of this Vector onto the 3D plane defined by the passed 3 points.</returns>
+		template
+		<
+			std::size_t OutSize_,
+			typename OutT_ = preferred_floating_point,
+			std::size_t PlaneReadOffset_ = 0,
+			std::size_t SizeA_,
+			typename TA_,
+			std::size_t SizeB_,
+			typename TB_,
+			std::size_t SizeC_,
+			typename TC_
+		>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ProjectPlane3
+		(
+			const EmuMath::NewVector<SizeA_, TA_>& plane_point_a_,
+			const EmuMath::NewVector<SizeB_, TB_>& plane_point_b_,
+			const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
+		) const
+		{
+			return EmuMath::Helpers::new_vector_project_plane_3d<OutSize_, OutT_, PlaneReadOffset_>(*this, plane_point_a_, plane_point_b_, plane_point_c_);
+		}
+		template
+		<
+			typename OutT_ = preferred_floating_point,
+			std::size_t PlaneReadOffset_ = 0,
+			std::size_t SizeA_,
+			typename TA_,
+			std::size_t SizeB_,
+			typename TB_,
+			std::size_t SizeC_,
+			typename TC_
+		>
+		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> ProjectPlane3
+		(
+			const EmuMath::NewVector<SizeA_, TA_>& plane_point_a_,
+			const EmuMath::NewVector<SizeB_, TB_>& plane_point_b_,
+			const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
+		) const
+		{
+			return EmuMath::Helpers::new_vector_project_plane_3d<3, OutT_, PlaneReadOffset_>(*this, plane_point_a_, plane_point_b_, plane_point_c_);
+		}
 #pragma endregion
 
 #pragma region GENERIC_CMP_FUNCS

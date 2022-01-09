@@ -169,7 +169,10 @@ namespace EmuMath::Helpers
 		using arg_type = const EmuMath::NewVector<ArgSize_, ArgT_>;
 		_vector_underlying::_vector_set_vector<false, arg_type, Size_, T_>(to_set_, copy_arg_);
 	}
+}
 
+namespace EmuMath
+{
 	/// <summary>
 	/// <para> Creates an EmuMath Vector with the provided T_ argument, containing a number of elements equal to the provided number of construction_args_. </para>
 	/// <para> All passed construction_args_ must be be valid construction arguments for the output Vector type, otherwise this function is disabled. </para>
@@ -187,7 +190,7 @@ namespace EmuMath::Helpers
 		typename...ConstructionArgs_,
 		typename = std::enable_if_t<std::is_constructible_v<EmuMath::NewVector<sizeof...(ConstructionArgs_), T_>, ConstructionArgs_...>>
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(ConstructionArgs_), T_> new_vector_make(ConstructionArgs_&&...construction_args_)
+	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(ConstructionArgs_), T_> make_vector(ConstructionArgs_&&...construction_args_)
 	{
 		return EmuMath::NewVector<sizeof...(ConstructionArgs_), T_>(std::forward<ConstructionArgs_>(construction_args_)...);
 	}

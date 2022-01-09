@@ -143,27 +143,12 @@ namespace EmuMath::TMP
 	template<typename T_>
 	struct preferred_vector_fp
 	{
-		// Default: 4 possible branches
-		// 1: If T_ is an integer with 32 or less bits: float
-		// 2: If T_ is an integer with more than 32 bits: double
-		// 3: If T_ is a floating-point type: T_ with const, volatile, and ref qualifiers removed.
-		// 4: If none of the above conditions are true: float
-		using type = std::conditional_t
-		<
-			std::is_integral_v<T_>,
-			std::conditional_t<(sizeof(T_) <= 4), float, double>,
-			EmuCore::TMP::first_floating_point_t<typename EmuCore::TMP::remove_ref_cv<T_>::type, float>
-		>;
+		using type = typename EmuCore::TMP::floating_point_equivalent<T_>::type;
 	};
 	template<typename T_>
 	struct preferred_vector_fp<EmuMath::vector_internal_ref<T_>>
 	{
 		using type = typename preferred_vector_fp<T_>::type;
-	};
-	template<std::size_t Size_, typename T_>
-	struct preferred_vector_fp<EmuMath::NewVector<Size_, T_>>
-	{
-		using type = EmuMath::NewVector<Size_, typename preferred_vector_fp<T_>::type>;
 	};
 	template<typename T_>
 	using preferred_vector_fp_t = typename preferred_vector_fp<T_>::type;

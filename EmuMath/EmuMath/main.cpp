@@ -731,7 +731,7 @@ int main()
 	EmuMath::NewVector<4, float> yet_another_newvec4f_ = EmuMath::NewVector<4, float>(10, 20, 30, 40);
 	EmuMath::NewVector<4, float&> another_ref_ = yet_another_newvec4f_.Shuffle<float&, 3, 2, 1, 0>();
 
-	auto some_arbitrarily_sized_newvector_ = EmuMath::Helpers::new_vector_make<const float&>(another_ref_.at<2>(), (another_ref_.at<0>()));
+	auto some_arbitrarily_sized_newvector_ = EmuMath::make_vector<const float&>(another_ref_.at<2>(), (another_ref_.at<0>()));
 	std::cout << some_arbitrarily_sized_newvector_ << "\n";
 
 	std::cout << "---\n";
@@ -744,11 +744,11 @@ int main()
 
 
 	std::cout << "---\n";
-	constexpr auto pre_negate_vec_ = EmuMath::Helpers::new_vector_make<float>(-5.0f, 0.0f, 12.0f, -66.66f);
+	constexpr auto pre_negate_vec_ = EmuMath::make_vector<float>(-5.0f, 0.0f, 12.0f, -66.66f);
 	constexpr auto full_negate_vec_ = EmuMath::Helpers::new_vector_negate(pre_negate_vec_);
 	constexpr auto partial_negate_vec_ = EmuMath::Helpers::new_vector_negate_range<27, long double, 3, 4>(pre_negate_vec_);
 
-	constexpr auto some_other_negation_ = EmuMath::Helpers::new_vector_mutate<4, long double>(EmuCore::do_negate<void>(), EmuMath::Helpers::new_vector_make<float>(1, -2, 3, -4));
+	constexpr auto some_other_negation_ = EmuMath::Helpers::new_vector_mutate<4, long double>(EmuCore::do_negate<void>(), EmuMath::make_vector<float>(1, -2, 3, -4));
 	constexpr auto negated_negation_ = some_other_negation_.Negate();
 	constexpr auto negated_negation_full_range_ = EmuMath::Helpers::new_vector_negate_range<0, 10>(some_other_negation_);
 	constexpr auto negated_negation_full_range_mut_ = EmuMath::Helpers::new_vector_mutate_range<4, float, 0, 10>(EmuCore::do_negate<void>(), some_other_negation_);
@@ -761,8 +761,8 @@ int main()
 
 	std::cout << "---\n";
 	// NOTE: Test done this way to allow an easily readable constexpr
-	constexpr auto partial_test_to_negate_ = EmuMath::Helpers::new_vector_make<float>(1, -2, -3, -4, -5, 6, -7, 8, 9, 10);
-	constexpr auto partial_test_to_not_negate_ = EmuMath::Helpers::new_vector_make<float>(10, 20, 30, 40, 50, 60, 70, 80, 90, 100);
+	constexpr auto partial_test_to_negate_ = EmuMath::make_vector<float>(1, -2, -3, -4, -5, 6, -7, 8, 9, 10);
+	constexpr auto partial_test_to_not_negate_ = EmuMath::make_vector<float>(10, 20, 30, 40, 50, 60, 70, 80, 90, 100);
 	constexpr auto partial_test_negation_result_ = _some_new_vec_func_test_helper<2, 5, 4>(partial_test_to_not_negate_, partial_test_to_negate_);
 
 	constexpr EmuMath::NewVector<4, float> a_mess_ = EmuMath::NewVector<4, float>
@@ -775,7 +775,7 @@ int main()
 	constexpr auto a_mess_absed_ = EmuMath::Helpers::new_vector_abs_range_no_copy<2, 4, 1>(a_mess_);
 
 	std::is_constructible_v<EmuMath::NewVector<4, float>, EmuMath::NewVector<1, std::uint8_t>>;
-	constexpr auto tru432t = EmuMath::NewVector<4, float>(  EmuMath::Helpers::new_vector_make<float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16));
+	constexpr auto tru432t = EmuMath::NewVector<4, float>(  EmuMath::make_vector<float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16));
 	constexpr auto oij =  EmuMath::NewVector<4, float>::valid_template_vector_move_construct_arg<16, EmuMath::NewVector<4, float>>();
 
 	std::cout << "---\n";
@@ -797,21 +797,21 @@ int main()
 
 	constexpr auto multi_test_ = EmuMath::NewVector<4, EmuMath::NewVector<4, float>>(EmuMath::NewVector<4, float>(1, 2, 3, 4));
 
-	constexpr auto ceiled_test_a_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).CeilConstexpr();
-	constexpr auto ceiled_test_b_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).CeilRangeConstexpr<5, 10>();
-	constexpr auto ceiled_test_c_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).CeilRangeNoCopyConstexpr<5, 10, 5>();
+	constexpr auto ceiled_test_a_ = EmuMath::make_vector<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).CeilConstexpr();
+	constexpr auto ceiled_test_b_ = EmuMath::make_vector<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).CeilRangeConstexpr<5, 10>();
+	constexpr auto ceiled_test_c_ = EmuMath::make_vector<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).CeilRangeNoCopyConstexpr<5, 10, 5>();
 
-	constexpr auto floored_test_a_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).FloorConstexpr();
-	constexpr auto floored_test_b_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).FloorRangeConstexpr<5, 10>();
-	constexpr auto floored_test_c_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).FloorRangeNoCopyConstexpr<5, 10, 5>();
+	constexpr auto floored_test_a_ = EmuMath::make_vector<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).FloorConstexpr();
+	constexpr auto floored_test_b_ = EmuMath::make_vector<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).FloorRangeConstexpr<5, 10>();
+	constexpr auto floored_test_c_ = EmuMath::make_vector<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).FloorRangeNoCopyConstexpr<5, 10, 5>();
 
-	constexpr auto trunced_test_a_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).TruncConstexpr();
-	constexpr auto trunced_test_b_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).TruncRangeConstexpr<5, 10>();
-	constexpr auto trunced_test_c_ = EmuMath::Helpers::new_vector_make<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).TruncRangeNoCopyConstexpr<5, 10, 5>();
+	constexpr auto trunced_test_a_ = EmuMath::make_vector<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).TruncConstexpr();
+	constexpr auto trunced_test_b_ = EmuMath::make_vector<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).TruncRangeConstexpr<5, 10>();
+	constexpr auto trunced_test_c_ = EmuMath::make_vector<float>(-1.1, -1, 1, 1, 1, -1.5, 1.5, 1.7, 2.7, -3.759, 4.90005f).TruncRangeNoCopyConstexpr<5, 10, 5>();
 
 	constexpr auto trj439 = EmuMath::NewVector<4, double>(0, 1, 2, 3).Shuffle<1, 2, 3, 2, 1, 2, 3, 2, 1, 2, 3, 2, 1, 2, 3, 2, 1, 2, 3, 2, 1, 2, 3, 2, 1, 2, 3, 2, 1>();
 	float reeeeeeeeeeeeeeeeeeeeeeeeee_ = 0.5f;
-	auto yet_another_ref_vec_ = EmuMath::Helpers::new_vector_make<float&>(reeeeeeeeeeeeeeeeeeeeeeeeee_, reeeeeeeeeeeeeeeeeeeeeeeeee_);
+	auto yet_another_ref_vec_ = EmuMath::make_vector<float&>(reeeeeeeeeeeeeeeeeeeeeeeeee_, reeeeeeeeeeeeeeeeeeeeeeeeee_);
 	std::cout << yet_another_ref_vec_ << " | " << reeeeeeeeeeeeeeeeeeeeeeeeee_ << "\n";
 	reeeeeeeeeeeeeeeeeeeeeeeeee_ = 5.0f;
 	std::cout << yet_another_ref_vec_ << " | " << reeeeeeeeeeeeeeeeeeeeeeeeee_ << "\n";
@@ -832,22 +832,22 @@ int main()
 	yet_another_ref_vec_.Set<0>(yet_another_ref_vec_.at<1>());
 
 	std::cout << "--\n\n";
-	constexpr auto some_multi_test_ = EmuMath::Helpers::new_vector_make<float>(15, 30, 45, 60).Lerp
+	constexpr auto some_multi_test_ = EmuMath::make_vector<float>(15, 30, 45, 60).Lerp
 	(
 		char(30),
 		0.5L
 	);
 
-	constexpr auto new_lerp_test_b_ = EmuMath::Helpers::new_vector_make<float>(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f).LerpRange<1, 5>
+	constexpr auto new_lerp_test_b_ = EmuMath::make_vector<float>(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f).LerpRange<1, 5>
 	(
 		10.0f,
-		EmuMath::Helpers::new_vector_make<double>(1.0f, 0.5f, 1.0f, -0.5f, 0.75f, -1.0f, 25.0f)
+		EmuMath::make_vector<double>(1.0f, 0.5f, 1.0f, -0.5f, 0.75f, -1.0f, 25.0f)
 	);
 
-	constexpr auto new_lerp_test_c_ = EmuMath::Helpers::new_vector_make<float>(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f).LerpRangeNoCopy<1, 5, 8>
+	constexpr auto new_lerp_test_c_ = EmuMath::make_vector<float>(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f).LerpRangeNoCopy<1, 5, 8>
 	(
 		10.0f,
-		EmuMath::Helpers::new_vector_make<double>(1.0f, 0.5f, 1.0f, -0.5f, 0.75f, -1.0f, 25.0f)
+		EmuMath::make_vector<double>(1.0f, 0.5f, 1.0f, -0.5f, 0.75f, -1.0f, 25.0f)
 	);
 
 	EmuMath::NewVector<4, double> another_new_vec_4d_(1, 1, 1, 1);
@@ -857,43 +857,43 @@ int main()
 	std::cout << another_new_vec_4d_ << "\n";
 
 	std::cout << "\n\n";
-	//constexpr auto new_add_res_a_ = EmuMath::Helpers::new_vector_add(EmuMath::Helpers::new_vector_make<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f), 2.5L);
-	constexpr auto new_add_res_a_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5) + 2.5;
-	//constexpr auto new_add_res_b_ = EmuMath::Helpers::new_vector_add_range<1, 5>(EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5), 2.5);
-	constexpr auto new_add_res_b_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).AddRange<1, 5>(2.5);
-	//constexpr auto new_add_res_c_ = EmuMath::Helpers::new_vector_add_range_no_copy<1, 5, 0>(EmuMath::Helpers::new_vector_make<float>(1.5, 0, 3.9, -2.5, -5, 2.5), 2.5);
-	constexpr auto new_add_res_c_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).AddRangeNoCopy<1, 5, 0>(2.5);
+	//constexpr auto new_add_res_a_ = EmuMath::Helpers::new_vector_add(EmuMath::make_vector<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f), 2.5L);
+	constexpr auto new_add_res_a_ = EmuMath::make_vector<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5) + 2.5;
+	//constexpr auto new_add_res_b_ = EmuMath::Helpers::new_vector_add_range<1, 5>(EmuMath::make_vector<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_add_res_b_ = EmuMath::make_vector<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).AddRange<1, 5>(2.5);
+	//constexpr auto new_add_res_c_ = EmuMath::Helpers::new_vector_add_range_no_copy<1, 5, 0>(EmuMath::make_vector<float>(1.5, 0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_add_res_c_ = EmuMath::make_vector<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).AddRangeNoCopy<1, 5, 0>(2.5);
 
-	//constexpr auto new_sub_res_a_ = EmuMath::Helpers::new_vector_subtract(EmuMath::Helpers::new_vector_make<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f), 2.5L);
-	constexpr auto new_sub_res_a_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5) - 2.5L;
-	//constexpr auto new_sub_res_b_ = EmuMath::Helpers::new_vector_subtract_range<1, 5>(EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5), 2.5);
-	constexpr auto new_sub_res_b_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).SubtractRange<1, 5>(2.5);
-	//constexpr auto new_sub_res_c_ = EmuMath::Helpers::new_vector_subtract_range_no_copy<1, 5, 0>(EmuMath::Helpers::new_vector_make<float>(1.5, 0, 3.9, -2.5, -5, 2.5), 2.5);
-	constexpr auto new_sub_res_c_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).SubtractRangeNoCopy<1, 5, 0>(2.5);
+	//constexpr auto new_sub_res_a_ = EmuMath::Helpers::new_vector_subtract(EmuMath::make_vector<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f), 2.5L);
+	constexpr auto new_sub_res_a_ = EmuMath::make_vector<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5) - 2.5L;
+	//constexpr auto new_sub_res_b_ = EmuMath::Helpers::new_vector_subtract_range<1, 5>(EmuMath::make_vector<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_sub_res_b_ = EmuMath::make_vector<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).SubtractRange<1, 5>(2.5);
+	//constexpr auto new_sub_res_c_ = EmuMath::Helpers::new_vector_subtract_range_no_copy<1, 5, 0>(EmuMath::make_vector<float>(1.5, 0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_sub_res_c_ = EmuMath::make_vector<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).SubtractRangeNoCopy<1, 5, 0>(2.5);
 
-	//constexpr auto new_mul_res_a_ = EmuMath::Helpers::new_vector_multiply(EmuMath::Helpers::new_vector_make<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f), 2.5L);
-	constexpr auto new_mul_res_a_ = EmuMath::Helpers::new_vector_make<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f) * 2.5L;
-	//constexpr auto new_mul_res_b_ = EmuMath::Helpers::new_vector_multiply_range<1, 5>(EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5), 2.5);
-	constexpr auto new_mul_res_b_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).MultiplyRange<1, 5>(2.5);
-	//constexpr auto new_mul_res_c_ = EmuMath::Helpers::new_vector_multiply_range_no_copy<1, 5, 0>(EmuMath::Helpers::new_vector_make<float>(1.5, 0, 3.9, -2.5, -5, 2.5), 2.5);
-	constexpr auto new_mul_res_c_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).MultiplyRangeNoCopy<1, 5, 0>(2.5);
+	//constexpr auto new_mul_res_a_ = EmuMath::Helpers::new_vector_multiply(EmuMath::make_vector<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f), 2.5L);
+	constexpr auto new_mul_res_a_ = EmuMath::make_vector<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f) * 2.5L;
+	//constexpr auto new_mul_res_b_ = EmuMath::Helpers::new_vector_multiply_range<1, 5>(EmuMath::make_vector<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_mul_res_b_ = EmuMath::make_vector<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).MultiplyRange<1, 5>(2.5);
+	//constexpr auto new_mul_res_c_ = EmuMath::Helpers::new_vector_multiply_range_no_copy<1, 5, 0>(EmuMath::make_vector<float>(1.5, 0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_mul_res_c_ = EmuMath::make_vector<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).MultiplyRangeNoCopy<1, 5, 0>(2.5);
 
-	//constexpr auto new_div_res_a_ = EmuMath::Helpers::new_vector_divide(EmuMath::Helpers::new_vector_make<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f), 2.5L);
-	constexpr auto new_div_res_a_ = EmuMath::Helpers::new_vector_make<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f) / 2.5L;
-	//constexpr auto new_div_res_b_ = EmuMath::Helpers::new_vector_divide_range<1, 5>(EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5), 2.5);
-	constexpr auto new_div_res_b_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).DivideRange<1, 5>(2.5);
-	//constexpr auto new_div_res_c_ = EmuMath::Helpers::new_vector_divide_range_no_copy<1, 5, 0>(EmuMath::Helpers::new_vector_make<float>(1.5, 0, 3.9, -2.5, -5, 2.5), 2.5);
-	constexpr auto new_div_res_c_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).DivideRangeNoCopy<1, 5, 0>(2.5);
+	//constexpr auto new_div_res_a_ = EmuMath::Helpers::new_vector_divide(EmuMath::make_vector<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f), 2.5L);
+	constexpr auto new_div_res_a_ = EmuMath::make_vector<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f) / 2.5L;
+	//constexpr auto new_div_res_b_ = EmuMath::Helpers::new_vector_divide_range<1, 5>(EmuMath::make_vector<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_div_res_b_ = EmuMath::make_vector<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).DivideRange<1, 5>(2.5);
+	//constexpr auto new_div_res_c_ = EmuMath::Helpers::new_vector_divide_range_no_copy<1, 5, 0>(EmuMath::make_vector<float>(1.5, 0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_div_res_c_ = EmuMath::make_vector<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).DivideRangeNoCopy<1, 5, 0>(2.5);
 
-	//constexpr auto new_mod_res_a_ = EmuMath::Helpers::new_vector_mod(EmuMath::Helpers::new_vector_make<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f), 2.5L);
-	constexpr auto new_mod_res_a_ = EmuMath::Helpers::new_vector_make<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f) % 2.5L;
-	//constexpr auto new_mod_res_b_ = EmuMath::Helpers::new_vector_mod_range<1, 5>(EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5), 2.5);
-	constexpr auto new_mod_res_b_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).ModRange<1, 5>(2.5);
-	//constexpr auto new_mod_res_c_ = EmuMath::Helpers::new_vector_mod_range_no_copy<1, 5, 0>(EmuMath::Helpers::new_vector_make<float>(1.5, 0, 3.9, -2.5, -5, 2.5), 2.5);
-	constexpr auto new_mod_res_c_ = EmuMath::Helpers::new_vector_make<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).ModRangeNoCopy<1, 5, 0>(2.5);
+	//constexpr auto new_mod_res_a_ = EmuMath::Helpers::new_vector_mod(EmuMath::make_vector<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f), 2.5L);
+	constexpr auto new_mod_res_a_ = EmuMath::make_vector<float>(1.5f, 0.0, 3.9f, -2.5f, -5.0f, 2.5f) % 2.5L;
+	//constexpr auto new_mod_res_b_ = EmuMath::Helpers::new_vector_mod_range<1, 5>(EmuMath::make_vector<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_mod_res_b_ = EmuMath::make_vector<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).ModRange<1, 5>(2.5);
+	//constexpr auto new_mod_res_c_ = EmuMath::Helpers::new_vector_mod_range_no_copy<1, 5, 0>(EmuMath::make_vector<float>(1.5, 0, 3.9, -2.5, -5, 2.5), 2.5);
+	constexpr auto new_mod_res_c_ = EmuMath::make_vector<float>(1.5, 0.0, 3.9, -2.5, -5, 2.5).ModRangeNoCopy<1, 5, 0>(2.5);
 
 
-	constexpr auto new_bitwise_test_ = EmuMath::Helpers::new_vector_make<int>(0, 2, 4, 3, 9, 10);
+	constexpr auto new_bitwise_test_ = EmuMath::make_vector<int>(0, 2, 4, 3, 9, 10);
 
 	//constexpr auto new_and_res_a_ = EmuMath::Helpers::new_vector_bitwise_and(new_bitwise_test_, 3);
 	constexpr auto new_and_res_a_ = new_bitwise_test_ & 3;
@@ -910,8 +910,8 @@ int main()
 	//constexpr auto new_rshift_res_a_ = EmuMath::Helpers::new_vector_shift_right(new_bitwise_test_, 2);
 	constexpr auto new_rshift_res_a_ = new_bitwise_test_ >> 2;
 
-	//constexpr auto new_not_res_a_ = EmuMath::Helpers::new_vector_bitwise_not(EmuMath::Helpers::new_vector_make<std::uint16_t>(0xFFFF, 0xFFFE, 0));
-	constexpr auto new_not_res_a_ = ~EmuMath::Helpers::new_vector_make<std::uint16_t>(0xFFFF, 0xFFFE, 0);
+	//constexpr auto new_not_res_a_ = EmuMath::Helpers::new_vector_bitwise_not(EmuMath::make_vector<std::uint16_t>(0xFFFF, 0xFFFE, 0));
+	constexpr auto new_not_res_a_ = ~EmuMath::make_vector<std::uint16_t>(0xFFFF, 0xFFFE, 0);
 
 	std::cout << new_rshift_res_a_ << " --- And extra\n";
 
@@ -933,8 +933,8 @@ int main()
 	std::cout << "+ " << to_add_ << ": " << assign_op_test_ << "\n";
 	assign_op_test_ *= 3;
 	std::cout << "* 3: " << assign_op_test_ << "\n";
-	assign_op_test_ += EmuMath::Helpers::new_vector_make<long double>(1, 2, 3, 4, 5);
-	std::cout << "+ " << EmuMath::Helpers::new_vector_make<long double>(1, 2, 3, 4, 5) << ": " << assign_op_test_ << "\n";
+	assign_op_test_ += EmuMath::make_vector<long double>(1, 2, 3, 4, 5);
+	std::cout << "+ " << EmuMath::make_vector<long double>(1, 2, 3, 4, 5) << ": " << assign_op_test_ << "\n";
 
 	std::cout << "---\n\n";
 	EmuMath::NewVector<4, std::uint16_t> bitwise_assign_op_test_(1, 2, 3, 10);
@@ -946,11 +946,11 @@ int main()
 	std::cout << bitwise_assign_op_test_ << " (" << EmuMath::NewVector<4, vec_elem_bits>(bitwise_assign_op_test_) << ")\n";
 	bitwise_assign_op_test_ |= 2048;
 	std::cout << bitwise_assign_op_test_ << " (" << EmuMath::NewVector<4, vec_elem_bits>(bitwise_assign_op_test_) << ")\n";
-	bitwise_assign_op_test_ ^= EmuMath::Helpers::new_vector_make<int>(0xFFFFFFFF, 0xFFFFFFFE, 0x1, 0x7);
+	bitwise_assign_op_test_ ^= EmuMath::make_vector<int>(0xFFFFFFFF, 0xFFFFFFFE, 0x1, 0x7);
 	std::cout << bitwise_assign_op_test_ << " (" << EmuMath::NewVector<4, vec_elem_bits>(bitwise_assign_op_test_) << ")\n";
 
 	std::cout << "---\n\n";
-	constexpr auto some_dp_ = EmuMath::Helpers::new_vector_make<float>(1.9f, 2.0f, 2.5f).Dot<int>(EmuMath::Helpers::new_vector_make<double>(2.0, 0.5, 1, 25));
+	constexpr auto some_dp_ = EmuMath::make_vector<float>(1.9f, 2.0f, 2.5f).Dot<int>(EmuMath::make_vector<double>(2.0, 0.5, 1, 25));
 
 	constexpr auto another_dp_ = EmuMath::NewVector<4, EmuMath::NewVector<4, float>>
 	(
@@ -958,18 +958,18 @@ int main()
 		EmuMath::NewVector<4, float>(1.0f, 0.5f, 2.5f, 0.0f),
 		EmuMath::NewVector<4, float>(1.0f, 0.5f, 2.5f, 0.0f),
 		EmuMath::NewVector<4, float>()
-	).Dot(EmuMath::Helpers::new_vector_make<int>(1, 2, 3));
+	).Dot(EmuMath::make_vector<int>(1, 2, 3));
 
-	constexpr auto ranged_dp_ = EmuMath::Helpers::new_vector_make<int>(0, 25, 50, 10000).Dot<0, 3>(EmuMath::Helpers::new_vector_make<int>(5, 10, 2, 6));
+	constexpr auto ranged_dp_ = EmuMath::make_vector<int>(0, 25, 50, 10000).Dot<0, 3>(EmuMath::make_vector<int>(5, 10, 2, 6));
 
-	constexpr auto vector_for_mag_ = EmuMath::Helpers::new_vector_make<float>(2, 4, 6);
+	constexpr auto vector_for_mag_ = EmuMath::make_vector<float>(2, 4, 6);
 	constexpr auto some_sqr_mag_ = vector_for_mag_.SquareMagnitude();
 	constexpr auto some_mag_ = vector_for_mag_.MagnitudeConstexpr();
 
-	constexpr auto some_norm_vec_ = EmuMath::Helpers::new_vector_make<float>(1, 2, 3).NormaliseConstexpr();
+	constexpr auto some_norm_vec_ = EmuMath::make_vector<float>(1, 2, 3).NormaliseConstexpr();
 
-	constexpr auto vec_left_ = EmuMath::Helpers::new_vector_make<float>(-1, 0, 0);
-	constexpr auto vec_up_ = EmuMath::Helpers::new_vector_make<int>(0, 1, 0);
+	constexpr auto vec_left_ = EmuMath::make_vector<float>(-1, 0, 0);
+	constexpr auto vec_up_ = EmuMath::make_vector<int>(0, 1, 0);
 	constexpr auto vec_up_left_ = EmuMath::Helpers::new_vector_lerp(vec_left_, vec_up_, 0.5f);
 	constexpr auto vec_angle_cos_a_ = EmuMath::Helpers::new_vector_angle_cos_constexpr(vector_for_mag_, vector_for_mag_);
 	constexpr auto vec_angle_cos_b_ = EmuMath::Helpers::new_vector_angle_cos_constexpr(vec_left_, vec_up_);
@@ -983,8 +983,8 @@ int main()
 	std::cout << vec_up_left_.Angle<double, false>(vec_up_) << "\n";
 
 	std::cout << "---\n\n";
-	constexpr auto vec_for_min_a_ = EmuMath::Helpers::new_vector_make<float>(1, 2, 3, 4);
-	constexpr auto vec_for_min_b_ = EmuMath::Helpers::new_vector_make<float>(-1, -2, 5, 27);
+	constexpr auto vec_for_min_a_ = EmuMath::make_vector<float>(1, 2, 3, 4);
+	constexpr auto vec_for_min_b_ = EmuMath::make_vector<float>(-1, -2, 5, 27);
 	
 	//constexpr auto min_a_ = EmuMath::Helpers::new_vector_min(vec_for_min_a_, -1);
 	constexpr auto min_a_ = vec_for_min_a_.Min(-1);
@@ -1028,8 +1028,8 @@ int main()
 	constexpr auto chain_result_ = concat_result_ab_.Shuffle<0, 4, 1, 5, 7, 2, 2, 2>().Concat(EmuMath::NewVector<4, float>()).Concat(EmuMath::NewVector<12, int>(1337));
 
 	std::cout << "---\n";
-	auto test_run_vec_a_ = EmuMath::Helpers::new_vector_make<float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-	auto test_run_vec_b_ = EmuMath::Helpers::new_vector_make<float>(-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1);
+	auto test_run_vec_a_ = EmuMath::make_vector<float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+	auto test_run_vec_b_ = EmuMath::make_vector<float>(-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1);
 	auto test_run_vec_ab_ = test_run_vec_a_.Concat<float&>(test_run_vec_b_);
 	auto test_run_vec_ba_ = test_run_vec_b_.Concat<const float&>(test_run_vec_a_);
 	std::cout << test_run_vec_a_ << "\n";
@@ -1055,12 +1055,12 @@ int main()
 	}
 
 	std::cout << "\n---\n";
-	constexpr auto new_to_clamp_ = EmuMath::Helpers::new_vector_make<float>(-5, 1, 27, -4.5, 0.3, -2.1, 77, 2415125151512521.0f);
+	constexpr auto new_to_clamp_ = EmuMath::make_vector<float>(-5, 1, 27, -4.5, 0.3, -2.1, 77, 2415125151512521.0f);
 	constexpr auto new_clamped_min_ = new_to_clamp_.ClampMin(-2.5);
 	constexpr auto new_clamped_max_ = new_to_clamp_.ClampMax(26.5);
 	constexpr auto new_clamped_ = new_to_clamp_.Clamp(-2.5, 26.5);
 
-	auto vec_for_min_max_ref_ = EmuMath::Helpers::new_vector_make<float>(1.0f, 2.0f, 3, -5, 27, 2.0f, 1337.5f, 22.2, 13L, 1337.0f);
+	auto vec_for_min_max_ref_ = EmuMath::make_vector<float>(1.0f, 2.0f, 3, -5, 27, 2.0f, 1337.5f, 22.2, 13L, 1337.0f);
 	auto& vec_min_ref_ = vec_for_min_max_ref_.Min<float&>();
 	auto& vec_max_ref_ = vec_for_min_max_ref_.Max<float&>();
 	auto& vec_min_const_ref_ = vec_for_min_max_ref_.Min<const float&>();
@@ -1070,24 +1070,24 @@ int main()
 	std::cout << vec_for_min_max_ref_ << "\nMin: " << vec_min_ref_ << "\nMax: " << vec_max_ref_ << "\nMin (const): " << vec_min_const_ref_ << "\n";
 
 	std::cout << "\n";
-	const auto const_vec_for_min_max_ref_ = EmuMath::Helpers::new_vector_make<float>(12.0f, 2.0f, 3.0f, 4.0f, 5.0f, -1.0f, -2.0f, -3.0f, 2);
+	const auto const_vec_for_min_max_ref_ = EmuMath::make_vector<float>(12.0f, 2.0f, 3.0f, 4.0f, 5.0f, -1.0f, -2.0f, -3.0f, 2);
 	auto& const_vec_min_const_ref_ = const_vec_for_min_max_ref_.Min<const float&>();
 	auto& const_vec_max_const_ref_ = const_vec_for_min_max_ref_.Max<const float&>();
 	std::cout << const_vec_for_min_max_ref_ << "\nMin: " << const_vec_min_const_ref_ << "\nMax: " << const_vec_max_const_ref_ << "\n";
 
 	std::cout << "\n";
-	auto const_vec_for_min_max_ref_b_ = EmuMath::Helpers::new_vector_make<const float>(12.0f, 2.0f, 3.0f, 4.0f, 5.0f, -1.0f, -2.0f, -3.0f, 2);
+	auto const_vec_for_min_max_ref_b_ = EmuMath::make_vector<const float>(12.0f, 2.0f, 3.0f, 4.0f, 5.0f, -1.0f, -2.0f, -3.0f, 2);
 	auto& const_vec_min_const_ref_b_ = const_vec_for_min_max_ref_b_.Min<const float&>();
 	auto& const_vec_max_const_ref_b_ = const_vec_for_min_max_ref_b_.Max<const float&>();
 	std::cout << const_vec_for_min_max_ref_b_ << "\nMin: " << const_vec_min_const_ref_b_ << "\nMax: " << const_vec_max_const_ref_b_ << "\n";
 
 	std::cout << "\n---\n";
-	constexpr auto vec_to_cast_ = EmuMath::Helpers::new_vector_make<int>(-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5);
+	constexpr auto vec_to_cast_ = EmuMath::make_vector<int>(-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5);
 	constexpr auto vec_cast_4f_ = EmuMath::Helpers::new_vector_cast<4, float>(vec_to_cast_);
 	constexpr auto vec_cast_20f_ = EmuMath::Helpers::new_vector_cast<20, float>(vec_to_cast_);
 	constexpr auto vec_cast_xld_ = EmuMath::Helpers::new_vector_cast<long double>(vec_to_cast_);
 	constexpr auto vec_cast_xf_offset_ = EmuMath::Helpers::new_vector_cast<float, 5>(vec_to_cast_);
-	constexpr auto rval_vec_cast_4f_offset_ = EmuMath::Helpers::new_vector_cast<5, float, 3>(EmuMath::Helpers::new_vector_make<std::uint16_t>(1, 2, 3, 4, 5, 6, 7, 8));
+	constexpr auto rval_vec_cast_4f_offset_ = EmuMath::Helpers::new_vector_cast<5, float, 3>(EmuMath::make_vector<std::uint16_t>(1, 2, 3, 4, 5, 6, 7, 8));
 	constexpr auto static_cast_vec_to_cast_ = static_cast<EmuMath::NewVector<12, long double>>(vec_to_cast_);
 	auto runtime_vec_to_cast_ = vec_to_cast_;
 	auto runtime_vec_ref_cast_ = runtime_vec_to_cast_.Cast<3, int&, 2>();
@@ -1096,9 +1096,9 @@ int main()
 	std::cout << runtime_vec_to_cast_ << "\n" << runtime_vec_ref_cast_ << "\n\n";
 
 	std::cout << "\n---\n";
-	constexpr auto cmp_vec_a_ = EmuMath::Helpers::new_vector_make<int>(1, 2, 3, 4, 5, 6, 7, 8);
-	constexpr auto cmp_vec_b_ = EmuMath::Helpers::new_vector_make<float>(1, 2, 3, 4, 5, 6, 7, 8);
-	constexpr auto cmp_vec_c_ = EmuMath::Helpers::new_vector_make<float>(8, 7, 6, 5, 4, 3, 2, 1);
+	constexpr auto cmp_vec_a_ = EmuMath::make_vector<int>(1, 2, 3, 4, 5, 6, 7, 8);
+	constexpr auto cmp_vec_b_ = EmuMath::make_vector<float>(1, 2, 3, 4, 5, 6, 7, 8);
+	constexpr auto cmp_vec_c_ = EmuMath::make_vector<float>(8, 7, 6, 5, 4, 3, 2, 1);
 	constexpr auto cmp_vec_a_mag_ = cmp_vec_a_.MagnitudeConstexpr();
 	constexpr auto cmp_vec_b_mag_ = cmp_vec_b_.MagnitudeConstexpr();
 	constexpr auto cmp_vec_c_mag_ = cmp_vec_c_.MagnitudeConstexpr();
@@ -1152,16 +1152,16 @@ int main()
 	constexpr bool cmp_result_30_ = cmp_vec_a_ <= cmp_vec_c_.MagnitudeConstexpr();
 
 	std::cout << "\n---\n";
-	constexpr auto cross_a_ = EmuMath::Helpers::new_vector_make<int>(2, 3, 4);
-	constexpr auto cross_b_ = EmuMath::Helpers::new_vector_make<float>(5, 6.5, 7.3);
+	constexpr auto cross_a_ = EmuMath::make_vector<int>(2, 3, 4);
+	constexpr auto cross_b_ = EmuMath::make_vector<float>(5, 6.5, 7.3);
 	constexpr auto cross_ab_ = cross_a_.Cross3<float>(cross_b_);
 
 	std::is_convertible_v<EmuMath::NewVector<3, float>, EmuMath::NewVector<4, float>>;
 	EmuCore::TMP::is_static_castable_v<EmuMath::NewVector<3, float>, EmuMath::NewVector<12, float>>;
 
 	std::cout << "\n---\n";
-	constexpr auto dist_a_ = EmuMath::Helpers::new_vector_make<int>(1, 2, 3);
-	constexpr auto dist_b_ = EmuMath::Helpers::new_vector_make<float>(0.5, 2.5, 3);
+	constexpr auto dist_a_ = EmuMath::make_vector<int>(1, 2, 3);
+	constexpr auto dist_b_ = EmuMath::make_vector<float>(0.5, 2.5, 3);
 	constexpr auto sqr_dist_ab_ = dist_a_.SquareDistance(dist_b_);
 	constexpr auto sqr_dist_ba_ = dist_b_.SquareDistance(dist_a_);
 	constexpr auto b_minus_a_ = dist_b_.Subtract(dist_a_);
@@ -1187,9 +1187,9 @@ int main()
 	std::cout << "DXM: " << "{ " << reflect_dxm_.x << ", " << reflect_dxm_.y << ", " << reflect_dxm_.z << " }\n";
 
 	std::cout << "\n---\n";
-	constexpr auto p0_ = EmuMath::Helpers::new_vector_make<float>(-1, 1, 2);
-	constexpr auto p1_ = EmuMath::Helpers::new_vector_make<int>(-4, 2, 2);
-	constexpr auto p2_ = EmuMath::Helpers::new_vector_make<long double>(-2, 1, 5);
+	constexpr auto p0_ = EmuMath::make_vector<float>(-1, 1, 2);
+	constexpr auto p1_ = EmuMath::make_vector<int>(-4, 2, 2);
+	constexpr auto p2_ = EmuMath::make_vector<long double>(-2, 1, 5);
 	//constexpr auto norm_p0p1p2_no_norm_ = EmuMath::Helpers::new_vector_normal_to_plane_3d_no_norm(p0_, p1_, p2_);
 	constexpr auto norm_p0p1p2_no_norm_ = p0_.NormalToPlane3NoNorm(p1_, p2_);
 	//constexpr auto norm_p0p1p2_ = EmuMath::Helpers::new_vector_normal_to_plane_3d_constexpr(p0_, p1_, p2_);
@@ -1207,9 +1207,53 @@ int main()
 	std::cout << "DXM: " << "{ " << xm_plane_.x << ", " << xm_plane_.y << ", " << xm_plane_.z << " }\n";
 
 	std::cout << "\n---\n";
-	constexpr auto projection_vector_ = EmuMath::Helpers::new_vector_make<float>(7, 3, -8);
-	constexpr auto project_onto_vector_ = EmuMath::Helpers::new_vector_make<int>(5, 1, 2);
+	constexpr auto projection_vector_ = EmuMath::make_vector<float>(7, 3, -8);
+	constexpr auto project_onto_vector_ = EmuMath::make_vector<int>(5, 1, 2);
 	constexpr auto projection_result_ = projection_vector_.Project<1, 3>(project_onto_vector_);
+
+	std::cout << "\n---\n";
+	constexpr auto angle_vector_a_ = EmuMath::make_vector<int>(1, 2, 3, 44);
+	constexpr auto angle_vector_b_ = EmuMath::make_vector<int>(5, 6, 7, 8);
+	constexpr auto angle_ab_ = angle_vector_a_.AngleCosConstexpr<true>(angle_vector_b_);
+
+	constexpr DirectX::XMFLOAT4 angle_vector_a_xm_ = DirectX::XMFLOAT4
+	(
+		static_cast<float>(angle_vector_a_.AtTheoretical<0>()),
+		static_cast<float>(angle_vector_a_.AtTheoretical<1>()),
+		static_cast<float>(angle_vector_a_.AtTheoretical<2>()),
+		static_cast<float>(angle_vector_a_.AtTheoretical<3>())
+	);
+	constexpr DirectX::XMFLOAT4 angle_vector_b_xm_ = DirectX::XMFLOAT4
+	(
+		static_cast<float>(angle_vector_b_.AtTheoretical<0>()),
+		static_cast<float>(angle_vector_b_.AtTheoretical<1>()),
+		static_cast<float>(angle_vector_b_.AtTheoretical<2>()),
+		static_cast<float>(angle_vector_b_.AtTheoretical<3>())
+	);
+	DirectX::XMVECTOR xm_simd_a_ = DirectX::XMLoadFloat4(&angle_vector_a_xm_);
+	DirectX::XMVECTOR xm_simd_b_ = DirectX::XMLoadFloat4(&angle_vector_b_xm_);
+	DirectX::XMFLOAT4 out_xm_;
+	DirectX::XMStoreFloat4(&out_xm_, DirectX::XMVector3AngleBetweenVectors(xm_simd_a_, xm_simd_b_));
+
+	std::cout << "Angle (Rads): " << angle_vector_a_.Cast<3>().Angle<true>(angle_vector_b_.Cast<3>()) << "\n";
+	std::cout << "Angle (Degs): " << angle_vector_a_.Cast<3>().Angle<false>(angle_vector_b_.Cast<3>()) << "\n";
+	std::cout << "Angle (DXM): " << "{ " << out_xm_.x << ", " << out_xm_.y << ", " << out_xm_.z << ", " << out_xm_.w << " }\n";
+
+	std::cout << "\n";
+	DirectX::XMStoreFloat4(&out_xm_, DirectX::XMVector4AngleBetweenVectors(xm_simd_a_, xm_simd_b_));
+
+	std::cout << "Angle (Rads): " << angle_vector_a_.Cast<4>().Angle<true>(angle_vector_b_.Cast<4>()) << "\n";
+	std::cout << "Angle (Degs): " << angle_vector_a_.Cast<4>().Angle<false>(angle_vector_b_.Cast<4>()) << "\n";
+	std::cout << "Angle (DXM): " << "{ " << out_xm_.x << ", " << out_xm_.y << ", " << out_xm_.z << ", " << out_xm_.w << " }\n";
+
+	std::cout << "\n---\n";
+	constexpr auto plane_proj_vector_ = EmuMath::make_vector<float>(1, 2, 3);
+	constexpr auto plane_proj_point_a_ = EmuMath::make_vector<float>(0, 1, 2);
+	constexpr auto plane_proj_point_b_ = EmuMath::make_vector<float>(1, 1, 2);
+	constexpr auto plane_proj_point_c_ = EmuMath::make_vector<float>(1, 2, 1.5);
+	constexpr auto plane_proj_normal_ = plane_proj_point_a_.NormalToPlane3Constexpr(plane_proj_point_b_, plane_proj_point_c_);
+	constexpr auto vector_proj_plane_from_points_ = plane_proj_vector_.ProjectPlane3Constexpr(plane_proj_point_a_, plane_proj_point_b_, plane_proj_point_c_);
+	constexpr auto vector_proj_plane_from_normal_ = plane_proj_vector_.ProjectPlane(plane_proj_normal_);
 
 	system("pause");
 

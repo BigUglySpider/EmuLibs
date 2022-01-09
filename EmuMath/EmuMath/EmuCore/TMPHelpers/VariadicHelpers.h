@@ -2,6 +2,7 @@
 #define EMU_CORE_VARIADIC_HELPERS_H_INC_ 1
 
 #include "TypeComparators.h"
+#include "../Functors/Comparators.h"
 #include <utility>
 
 namespace EmuCore::TMP
@@ -178,32 +179,31 @@ namespace EmuCore::TMP
 
 #pragma region EXTRA_INDEX_SEQUENCES
 	/// <summary> Type to create an Index_ sequence of the specified size similar to std::make_index_sequence, but starting at the provided Offset_ instead of 0. </summary>
-	template<std::size_t Offset_, std::size_t Size_>
-	struct offset_index_sequence_maker
+	template<typename T_, T_ Offset_, T_ Size_>
+	struct offset_integer_sequence_maker
 	{
 	private:
-		template<std::size_t Remaining_, std::size_t Current_, typename Previous_>
-		struct _maker
+		template<std::size_t OffsetVal_, typename BaseSequence_, typename = void>
+		struct _apply_offset
 		{
-			using type = void;
+			using type = BaseSequence_;
 		};
-		template<std::size_t Remaining_, std::size_t Current_, std::size_t...PreviousIndices_>
-		struct _maker<Remaining_, Current_, std::index_sequence<PreviousIndices_...>>
+		template<std::size_t OffsetVal_, T_...Vals_>
+		struct _apply_offset<OffsetVal_, std::integer_sequence<T_, Vals_...>, std::enable_if_t<OffsetVal_ != 0>>
 		{
-			using type = typename _maker<Remaining_ - 1, Current_ + 1, std::index_sequence<PreviousIndices_..., Current_>>::type;
+			using type = std::integer_sequence<T_, (OffsetVal_ + Vals_)...>;
 		};
-		template<std::size_t Current_, std::size_t...PreviousIndices_>
-		struct _maker<0, Current_, std::index_sequence<PreviousIndices_...>>
-		{
-			using type = std::index_sequence<PreviousIndices_...>;
-		};
+
 
 	public:
-		using type = typename _maker<Size_, Offset_, std::index_sequence<>>::type;
+		using type = typename _apply_offset<Offset_, std::make_integer_sequence<T_, Size_>>::type;
 	};
 
+	template<typename T_, T_ Offset_, T_ Size_>
+	using make_offset_integer_sequence = typename offset_integer_sequence_maker<T_, Offset_, Size_>::type;
+
 	template<std::size_t Offset_, std::size_t Size_>
-	using make_offset_index_sequence = typename offset_index_sequence_maker<Offset_, Size_>::type;
+	using make_offset_index_sequence = typename offset_integer_sequence_maker<std::size_t, Offset_, Size_>::type;
 
 	/// <summary>
 	///	<para> Type used to splice to index sequences into a single one. Indices in the left-hand sequence will all appear first, then those in the right-hand sequence. </para>
@@ -254,6 +254,170 @@ namespace EmuCore::TMP
 	};
 	template<std::size_t Index_, std::size_t Count_>
 	using make_duplicated_index_sequence = typename duplicated_index_sequence<Index_, Count_>::type;
+
+	/// <summary>
+	/// <para> Helper type to perform a comparison of all constants to determine the last to compare true. </para>
+	/// <para> The provided CmpTemplate_ will be instantiated with a single T_ argument, and used to perform each comparison. </para>
+	/// <para> The instantiated template must be default-constructible, and constexpr invocable with two values of type T_ as arguments. </para>
+	/// <para> Comparisons are performed purely with the provided values. </para>
+	/// <para> If 0 Vals_ are provided: value will be a default-constructed T_. </para>
+	/// <para> If 1 Val_ is provided: value will the single passed Val_. </para>
+	/// <para>
+	///		If multiple Vals_ are provided: current_value will start as the first passed Val_.
+	///		When a comparison in the form cmp(Val_[x], current_value) returns true, current_val will be updated to Val_[x]. 
+	///		This will repeat until the final Val_ has been compared, and value will be set to the final state of current_val.
+	/// </para>
+	/// </summary>
+	template<template<class...> class CmpTemplate_, typename T_, T_...Vals_>
+	struct last_constant_to_compare_true
+	{
+	private:
+		using _cmp_maker = EmuCore::TMP::safe_template_instantiate<CmpTemplate_, T_>;
+		using _cmp = typename _cmp_maker::type;
+		static constexpr bool _cmp_invocable = std::is_invocable_v<_cmp, T_, T_>;
+		static constexpr bool _cmp_default_constructible = std::is_default_constructible_v<_cmp>;
+		static_assert
+		(
+			_cmp_maker::value,
+			"Attempted to find the last constant to compare true to a comparison template's invocation via last_constant_to_compare_true, but the provided CmpTemplate_ cannot be instantiated as CmpTemplate_<T_>."
+		);
+
+		template<bool AnyTrue_, T_...All_>
+		struct _find_last_true
+		{
+			// This is a dummy func and should never be called, but is here for consistent compilation
+			static constexpr inline decltype(std::declval<T_>()) get()
+			{
+				return std::declval<T_>();
+			}
+		};
+
+		template<bool AnyTrue_, T_ LastTrue_, T_ Current_, T_...Remaining_>
+		struct _find_last_true<AnyTrue_, LastTrue_, Current_, Remaining_...>
+		{
+			[[nodiscard]] static constexpr inline T_ get()
+			{
+				if constexpr (_cmp_invocable)
+				{
+					if constexpr (_cmp_default_constructible)
+					{
+						if constexpr (_cmp()(Current_, LastTrue_))
+						{
+							return _find_last_true<true, Current_, Remaining_...>::get();
+						}
+						else
+						{
+							return _find_last_true<AnyTrue_, LastTrue_, Remaining_...>::get();
+						}
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<T_>(),
+							"Attempted to find the last constant to comapre true to a comparison template's invocation via last_constant_to_compare_true, but the instantiated comparison type cannot be default-constructed."
+						);
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<T_>(),
+						"Attempted to find the last constant to compare true to a comparison template's invocation via last_constant_to_compare_true, but the instantiated comparison cannot be invoked with two values of type T_."
+					);
+				}
+			}
+		};
+
+		template<bool AnyTrue_, T_ LastTrue_, T_ Current_>
+		struct _find_last_true<AnyTrue_, LastTrue_, Current_>
+		{
+			[[nodiscard]] static constexpr inline T_ get()
+			{
+				if constexpr (_cmp_invocable)
+				{
+					if constexpr (_cmp_default_constructible)
+					{
+						if constexpr (_cmp()(Current_, LastTrue_))
+						{
+							return Current_;
+						}
+						else
+						{
+							return LastTrue_;
+						}
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<T_>(),
+							"Attempted to find the last constant to comapre true to a comparison template's invocation via last_constant_to_compare_true, but the instantiated comparison type cannot be default-constructed."
+						);
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<T_>(),
+						"Attempted to find the last constant to compare true to a comparison template's invocation via last_constant_to_compare_true, but the instantiated comparison cannot be invoked with a value of type T_."
+					);
+				}
+			}
+		};
+
+		template<bool AnyTrue_, T_ LastTrue_>
+		struct _find_last_true<AnyTrue_, LastTrue_>
+		{
+			[[nodiscard]] static constexpr inline T_ get()
+			{
+				return LastTrue_;
+			}
+		};
+
+		template<bool AnyTrue_>
+		struct _find_last_true<AnyTrue_>
+		{
+			[[nodiscard]] static constexpr inline T_ get()
+			{
+				if constexpr (std::is_default_constructible_v<T_>)
+				{
+					return T_();
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<T_>(),
+						"Attempted to find the last constant to comapre true to a comparison template's invocation via last_constant_to_compare_true, but no arguments were provided and T_ cannot be default constructed."
+					);
+				}
+			}
+		};
+
+	public:
+		static constexpr T_ value = _find_last_true<false, Vals_...>::get();
+	};
+
+	/// <summary> Type to determine the smallest out of any number of passed constant Vals_. If no Vals_ are passed, the value will be default-constructed. </summary>
+	template<typename T_, T_...Vals_>
+	struct smallest_constant
+	{
+		static constexpr T_ value = EmuCore::TMP::last_constant_to_compare_true<EmuCore::do_cmp_less, T_, Vals_...>::value;
+	};
+	template<typename T_, T_...Vals_>
+	static constexpr T_ smallest_constant_v = EmuCore::TMP::smallest_constant<T_, Vals_...>::value;
+
+	/// <summary> Type to determine the greatest out of any number of passed constant Vals_. If no Vals_ are passed, the value will be default-constructed. </summary>
+	template<typename T_, T_...Vals_>
+	struct greatest_constant
+	{
+		static constexpr T_ value = EmuCore::TMP::last_constant_to_compare_true<EmuCore::do_cmp_greater, T_, Vals_...>::value;
+	};
+	template<typename T_, T_...Vals_>
+	static constexpr T_ greatest_constant_v = EmuCore::TMP::greatest_constant<T_, Vals_...>::value;
 #pragma endregion
 }
 

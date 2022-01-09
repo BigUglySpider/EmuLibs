@@ -630,8 +630,20 @@ namespace EmuMath::Helpers::_vector_underlying
 	template<template<class> class SqrtTemplate_, template<class> class AcosTemplate_, class Out_, bool Radians_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
 	[[nodiscard]] constexpr inline Out_ _vector_angle(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
 	{
-		using Acos_ = AcosTemplate_<typename _types_vector_dot<SizeA_, TA_, SizeB_, TB_, Out_>::out_processing>;
-		return _vector_angle<SqrtTemplate_, Acos_, Out_, Radians_>(Acos_(), a_, b_);
+		using out_processing = typename _types_vector_dot<SizeA_, TA_, SizeB_, TB_, Out_>::out_processing;
+		if constexpr (EmuCore::TMP::valid_template_args_v<AcosTemplate_, out_processing>)
+		{
+			using Acos_ = AcosTemplate_<out_processing>;
+			return _vector_angle<SqrtTemplate_, Acos_, Out_, Radians_>(Acos_(), a_, b_);
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<Out_>(),
+				"Attempted to calculate the angle between two EmuMath Vectors, but the provided AcosTemplate_ cannot be instantiated with a single type argument."
+			);
+		}
 	}
 
 	template
@@ -1270,6 +1282,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		);
 	}
 
+#pragma region PROJECTION_ONTO_VECTOR_FUNCS
 	template
 	<
 		template<class...> class MulTemplate_,
@@ -1300,6 +1313,9 @@ namespace EmuMath::Helpers::_vector_underlying
 					using Mul_ = MulTemplate_<out_fp, out_fp>;
 					if constexpr (std::is_invocable_v<Mul_, out_fp, out_fp>)
 					{
+						// Returns the result of b_ * (dot(a_, b_) / square_mag(b_))
+						// --- We use reciprocal multiplication to perform division as we are likely to do >= 2 divisions,
+						// --- so we can optimise this by avoiding slower fp-division by doing a single 1/sqr_mag and multiplying by that result
 						return _vector_mutate_with_func_template_args_only<MulTemplate_, EmuMath::NewVector<OutSize_, OutT_>, BeginIndex_, EndIndex_, BeginIndex_>
 						(
 							b_,
@@ -1366,6 +1382,112 @@ namespace EmuMath::Helpers::_vector_underlying
 	{
 		return _vector_project<MulTemplate_, ReciprocalTemplate_, OutSize_, OutT_, 0, EmuMath::NewVector<OutSize_, OutT_>::size>(a_, b_);
 	}
+#pragma endregion
+
+#pragma region PROJECTION_ONTO_PLANE_FUNCS
+	template
+	<
+		template<class...> class SubTemplate_,
+		template<class...> class MulTemplate_,
+		template<class...> class ReciprocalTemplate_,
+		std::size_t OutSize_,
+		typename OutT_,
+		std::size_t BeginIndex_,
+		std::size_t EndIndex_,
+		std::size_t SizeA_,
+		typename TA_,
+		std::size_t SizeNorm_,
+		typename TNorm_
+	>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_project_plane
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& a_,
+		const EmuMath::NewVector<SizeNorm_, TNorm_>& plane_normal_
+	)
+	{
+		// Figure out the smallest size of our 3 Vectors (out, a_, plane_normal_), minimising construction of intermediate Vectors
+		// --- This can additionally minimise calculations being performed when not needed
+		constexpr std::size_t out_size_ = EmuMath::NewVector<OutSize_, OutT_>::size;
+		constexpr std::size_t a_size_ = EmuMath::NewVector<SizeA_, TA_>::size;
+		constexpr std::size_t norm_size_ = EmuMath::NewVector<SizeNorm_, TNorm_>::size;
+		constexpr std::size_t calc_size_ = EmuCore::TMP::smallest_constant_v<std::size_t, out_size_, a_size_, norm_size_>;
+
+		using out_fp = typename EmuMath::NewVector<OutSize_, OutT_>::preferred_floating_point;
+		return _vector_mutate_with_func_template_args_only<SubTemplate_, EmuMath::NewVector<OutSize_, OutT_>, BeginIndex_, EndIndex_, BeginIndex_>
+		(
+			a_,
+			_vector_project<MulTemplate_, ReciprocalTemplate_, calc_size_, out_fp>(a_, plane_normal_)
+		);
+	}
+	template
+	<
+		template<class...> class SubTemplate_,
+		template<class...> class MulTemplate_,
+		template<class...> class ReciprocalTemplate_,
+		std::size_t OutSize_,
+		typename OutT_,
+		std::size_t SizeA_,
+		typename TA_,
+		std::size_t SizeNorm_,
+		typename TNorm_
+	>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_project_plane
+	(
+		const EmuMath::NewVector<SizeA_, TA_>& a_,
+		const EmuMath::NewVector<SizeNorm_, TNorm_>& plane_normal_
+	)
+	{
+		constexpr std::size_t out_size_ = EmuMath::NewVector<OutSize_, OutT_>::size;
+		constexpr std::size_t a_size_ = EmuMath::NewVector<SizeA_, TA_>::size;
+		constexpr std::size_t norm_size_ = EmuMath::NewVector<SizeNorm_, TNorm_>::size;
+		return _vector_project_plane
+		<
+			SubTemplate_,
+			MulTemplate_,
+			ReciprocalTemplate_,
+			OutSize_,
+			OutT_,
+			0,
+			EmuCore::TMP::smallest_constant_v<std::size_t, out_size_, a_size_, norm_size_>
+		>(a_, plane_normal_);
+	}
+
+	template
+	<
+		template<class...> class SqrtTemplate_,
+		template<class...> class SubTemplate_,
+		template<class...> class MulTemplate_,
+		template<class...> class ReciprocalTemplate_,
+		std::size_t OutSize_,
+		typename OutT_,
+		std::size_t PlaneReadOffset_,
+		std::size_t ProjSize_,
+		typename ProjT_,
+		std::size_t SizeA_,
+		typename TA_,
+		std::size_t SizeB_,
+		typename TB_,
+		std::size_t SizeC_,
+		typename TC_
+	>
+	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_project_plane_3d
+	(
+		const EmuMath::NewVector<ProjSize_, ProjT_>& to_project_,
+		const EmuMath::NewVector<SizeA_, TA_>& plane_point_a_,
+		const EmuMath::NewVector<SizeB_, TB_>& plane_point_b_,
+		const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
+	)
+	{
+		using out_fp = typename EmuMath::NewVector<OutSize_, OutT_>::preferred_floating_point;
+
+		// This function is defined purely for 3D, so calculations will be performed in 3D as a result.
+		return _vector_project_plane<SubTemplate_, MulTemplate_, ReciprocalTemplate_, OutSize_, OutT_, 0, 3>
+		(
+			to_project_,
+			_vector_normal_to_plane_3d<MulTemplate_, SubTemplate_, SqrtTemplate_, 3, out_fp, PlaneReadOffset_>(plane_point_a_, plane_point_b_, plane_point_c_)
+		);
+	}
+#pragma endregion
 }
 
 #endif
