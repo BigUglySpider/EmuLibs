@@ -1,9 +1,10 @@
 #ifndef EMU_CORE_TMP_HELPERS_TYPE_COMPARATORS_H_INC_
 #define EMU_CORE_TMP_HELPERS_TYPE_COMPARATORS_H_INC_ 1
 
+#include <tuple>
 #include <type_traits>
 
-namespace EmuCore::TMPHelpers
+namespace EmuCore::TMP
 {
 	/// <summary> Finds the largest byte-sized type of the passed options. For matching type sizes, the leftmost type receives priority. </summary>
 	/// <typeparam name="X_">First type to compare. Required.</typeparam>
@@ -219,6 +220,11 @@ namespace EmuCore::TMPHelpers
 	template<class T, template<class...> class ToFind_>
 	static constexpr bool is_instance_of_typeparams_only_v = is_instance_of_typeparams_only<T, ToFind_>::value;
 
+	template<class T_>
+	using is_tuple = is_instance_of_typeparams_only<T_, std::tuple>;
+	template<class T_>
+	static constexpr bool is_tuple_v = is_instance_of_typeparams_only_v<T_, std::tuple>;
+
 	/// <summary> The number of bits contained within the passed type T. </summary>
 	template<typename T>
 	static constexpr std::size_t bits_in_type_v = sizeof(T) * CHAR_BIT;
@@ -251,7 +257,7 @@ namespace EmuCore::TMPHelpers
 				(sizeof(LhsFloat_) == sizeof(RhsFloat_)),
 				std::conditional_t
 				<
-					EmuCore::TMPHelpers::is_any_comparison_true<std::is_same, long double, LhsFloat_, RhsFloat_>::value,
+					EmuCore::TMP::is_any_comparison_true<std::is_same, long double, LhsFloat_, RhsFloat_>::value,
 					long double,
 					Lhs_
 				>,
@@ -266,12 +272,12 @@ namespace EmuCore::TMPHelpers
 	public:
 		using type = std::conditional_t
 		<
-			EmuCore::TMPHelpers::is_any_floating_point_v<Lhs_, Rhs_>,
+			EmuCore::TMP::is_any_floating_point_v<Lhs_, Rhs_>,
 			std::conditional_t
 			<
-				EmuCore::TMPHelpers::are_all_check<std::is_floating_point, Lhs_, Rhs_>::value,
+				EmuCore::TMP::are_all_check<std::is_floating_point, Lhs_, Rhs_>::value,
 				typename largest_of_guaranteed_floating_points<Lhs_, Rhs_>::type,
-				typename EmuCore::TMPHelpers::first_floating_point<Lhs_, Rhs_>::type
+				typename EmuCore::TMP::first_floating_point<Lhs_, Rhs_>::type
 			>,
 			void
 		>;
@@ -286,7 +292,7 @@ namespace EmuCore::TMPHelpers
 		{
 			using type = typename find_largest_floating_point
 			<
-				typename EmuCore::TMPHelpers::larger_float<Highest_, First__>::type,
+				typename EmuCore::TMP::larger_float<Highest_, First__>::type,
 				Others__...
 			>::type;
 		};
@@ -330,6 +336,7 @@ namespace EmuCore::TMPHelpers
 	template<class A_, class B_>
 	constexpr bool is_two_way_convertible_v = is_two_way_convertible<A_, B_>::value;
 
+	/// <summary> Type used to encapsualate a void type. Not to be confused with std::void_t. </summary>
 	struct void_type
 	{
 		using type = void;
@@ -354,6 +361,37 @@ namespace EmuCore::TMPHelpers
 	};
 	template<bool Condition_, typename T_>
 	using conditional_const_t = typename conditional_const<Condition_, T_>::type;
+
+	template<typename ToConvertTo_, typename FirstToConvertFrom_, typename...OthersToConvertFrom_>
+	struct are_all_convertible
+	{
+		static constexpr bool value = std::is_convertible_v<FirstToConvertFrom_, ToConvertTo_> ? are_all_convertible<ToConvertTo_, OthersToConvertFrom_...>::value : false;
+	};
+	template<typename ToConvertTo_, typename FirstToConvertFrom_>
+	struct are_all_convertible<ToConvertTo_, FirstToConvertFrom_>
+	{
+		static constexpr bool value = std::is_convertible_v<FirstToConvertFrom_, ToConvertTo_>;
+	};
+	template<typename ToConvertTo_, typename...ToConvertFrom_>
+	static constexpr bool are_all_convertible_v = are_all_convertible<ToConvertTo_, ToConvertFrom_...>::value;
+
+	template<class T_, typename = void>
+	struct has_static_get : std::false_type
+	{
+	};
+	template<class T_>
+	struct has_static_get<T_, std::void_t<decltype(T_::get)>> : std::true_type
+	{
+	};
+
+	template<class T_, typename = void>
+	struct has_static_value : std::false_type
+	{
+	};
+	template<class T_>
+	struct has_static_value<T_, std::void_t<decltype(T_::value)>> : std::true_type
+	{
+	};
 }
 
 #endif

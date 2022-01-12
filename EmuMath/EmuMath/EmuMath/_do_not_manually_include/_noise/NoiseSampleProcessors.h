@@ -12,7 +12,7 @@ namespace EmuMath::Functors
 		{
 		}
 		template<typename T_>
-		constexpr inline T_ operator()(T_ sample_) const
+		[[nodiscard]] constexpr inline T_ operator()(T_ sample_) const
 		{
 			return sample_;
 		}
@@ -26,7 +26,7 @@ namespace EmuMath::Functors
 		{
 		}
 		template<typename T_>
-		constexpr inline T_ operator()(T_ sample_) const
+		[[nodiscard]] constexpr inline T_ operator()(T_ sample_) const
 		{
 			constexpr T_ max_ = EmuCore::CommonConstants::SQRT_N<T_, std::size_t, N_> / T_(2);
 			constexpr T_ min_ = -max_;
@@ -44,7 +44,7 @@ namespace EmuMath::Functors
 		{
 		}
 		template<typename T_>
-		constexpr inline T_ operator()(T_ sample_) const
+		[[nodiscard]] constexpr inline T_ operator()(T_ sample_) const
 		{
 			// Highest absolute magnitude of N-dimensional perlin noise is (sqrt(N)/2).
 			constexpr T_ max_magnitude_ = EmuCore::CommonConstants::SQRT_N<T_, std::size_t, N_> / T_(2);

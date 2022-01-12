@@ -3,8 +3,16 @@
 
 #include <type_traits>
 
-namespace EmuCore::TMPHelpers
+namespace EmuCore::TMP
 {
+	template<typename T_>
+	struct remove_ref_cv
+	{
+		using type = std::remove_cv_t<std::remove_reference_t<T_>>;
+	};
+	template<typename T_>
+	using remove_ref_cv_t = typename remove_ref_cv<T_>::type;
+
 	/// <summary> The floating-point type best suited to representing the passed type based on byte size. </summary>
 	/// <typeparam name="T">Type to provide the best suited floating point representing type of.</typeparam>
 	template<typename T>
@@ -146,6 +154,29 @@ namespace EmuCore::TMPHelpers
 		>
 	>;
 
+	template<std::size_t NumBytes_>
+	using int_of_size_t = std::conditional_t
+	<
+		NumBytes_ == sizeof(std::int8_t),
+		std::int8_t,
+		std::conditional_t
+		<
+			NumBytes_ == sizeof(std::int16_t),
+			std::int16_t,
+			std::conditional_t
+			<
+				NumBytes_ == sizeof(std::int32_t),
+				std::int32_t,
+				std::conditional_t
+				<
+					NumBytes_ == sizeof(std::int64_t),
+					std::int64_t,
+					std::false_type
+				>
+			>
+		>
+	>;
+
 	template<typename T>
 	struct next_size_up
 	{
@@ -193,7 +224,7 @@ namespace EmuCore::TMPHelpers
 		static constexpr bool is_new_type = !std::is_same_v<T, type>;
 	};
 	template<typename T>
-	using next_size_up_t = typename EmuCore::TMPHelpers::next_size_up<T>::type;
+	using next_size_up_t = typename EmuCore::TMP::next_size_up<T>::type;
 
 	template<typename T>
 	struct unsigned_if_int
@@ -281,7 +312,7 @@ namespace EmuCore::TMPHelpers
 	/// </summary>
 	/// <typeparam name="UintT_">Type to provide the lossless signed rep of. If it is already signed, the determined type will be the same as this.</typeparam>
 	template<typename UintT_>
-	using uint_lossless_signed_rep_t = typename EmuCore::TMPHelpers::uint_lossless_signed_rep<UintT_>::type;
+	using uint_lossless_signed_rep_t = typename EmuCore::TMP::uint_lossless_signed_rep<UintT_>::type;
 
 	template<typename T_>
 	struct get_value_type

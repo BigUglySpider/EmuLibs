@@ -1,0 +1,6 @@
+#ifndef EMU_SIMD_COMMON_UNDERLYING_SIMD_HELPER_INCLUDES_H_INC_
+#define EMU_SIMD_COMMON_UNDERLYING_SIMD_HELPER_INCLUDES_H_INC_ 1
+
+#include "_simd_helpers_underlying_tmp.h"
+
+#endif

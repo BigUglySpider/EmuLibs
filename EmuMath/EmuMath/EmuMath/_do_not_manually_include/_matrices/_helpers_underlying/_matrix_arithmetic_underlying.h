@@ -96,7 +96,7 @@ namespace EmuMath::Helpers::_underlying_matrix_funcs
 		{
 			if constexpr (RowIndex_ < OutMatrix_::num_rows)
 			{
-				_get_matrix_data<ColumnIndex_, RowIndex_>(out_) = EmuMath::Helpers::VectorDotProduct<typename OutMatrix_::value_type>
+				_get_matrix_data<ColumnIndex_, RowIndex_>(out_) = EmuMath::Helpers::vector_dot_product<typename OutMatrix_::value_type>
 				(
 					std::get<RowIndex_>(lhs_rows_),
 					std::get<ColumnIndex_>(rhs_columns_)

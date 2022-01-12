@@ -1,7 +1,7 @@
 #ifndef EMU_CORE_TMP_HELPERS_VALUES_H_INC_
 #define EMU_CORE_TMP_HELPERS_VALUES_H_INC_ 1
 
-namespace EmuCore::TMPHelpers
+namespace EmuCore::TMP
 {
 	/// <summary> 
 	/// <para> Helper to avoid requiring a different branch while still forcing a condition to be checked at compile time to select a value. </para>

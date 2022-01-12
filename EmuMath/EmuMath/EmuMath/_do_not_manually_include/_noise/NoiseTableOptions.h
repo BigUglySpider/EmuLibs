@@ -92,6 +92,7 @@ namespace EmuMath
 				to_copy_.end_point_or_step,
 				to_copy_.freq,
 				to_copy_.step_mode,
+				to_copy_.use_fractal_noise,
 				to_copy_.permutation_info,
 				to_copy_.fractal_noise_info
 			)
@@ -106,7 +107,7 @@ namespace EmuMath
 		/// </para>
 		/// </summary>
 		/// <returns>Step to use based on these options.</returns>
-		constexpr inline EmuMath::Vector<num_dimensions, value_type> MakeStep() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_dimensions, value_type> MakeStep() const
 		{
 			if (step_mode)
 			{

@@ -13,7 +13,7 @@ namespace EmuMath::Functors
 	struct find_noise_functor
 	{
 		static_assert(Dimensions_ >= 1 && Dimensions_ <= 3, "Attempted to use EmuMath::Functors::find_noise_functor, but provided an invalid number of dimensions.");
-		static_assert(EmuMath::Validity::AssertValidNoiseType<NoiseType_>(), "Provided an invalid EmuMath::NoiseType to EmuMath::Functors::find_noise_functor.");
+		static_assert(EmuMath::Validity::assert_valid_noise_type<NoiseType_>(), "Provided an invalid EmuMath::NoiseType to EmuMath::Functors::find_noise_functor.");
 
 		using type = std::conditional_t
 		<
@@ -38,7 +38,7 @@ namespace EmuMath
 {
 	/// <summary> Alias to easily identify an EmuMath noise generation functor using purely template arguments. </summary>
 	template<std::size_t Dimensions_, EmuMath::NoiseType NoiseType_, typename FP_ = float>
-	using NoiseGenFunctor = typename EmuMath::Functors::find_noise_functor<Dimensions_, NoiseType_, FP_>::type;
+	using noise_gen_functor = typename EmuMath::Functors::find_noise_functor<Dimensions_, NoiseType_, FP_>::type;
 }
 
 #endif

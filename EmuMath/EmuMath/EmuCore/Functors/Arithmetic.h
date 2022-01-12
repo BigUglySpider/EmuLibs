@@ -27,11 +27,11 @@ namespace EmuCore
 		{
 			if constexpr
 			(
-				EmuCore::TMPHelpers::is_any_floating_point_v<A_, B_, T_> &&
-				!EmuCore::TMPHelpers::are_all_comparisons_true<std::is_same, A_, B_, T_>::value
+				EmuCore::TMP::is_any_floating_point_v<A_, B_, T_> &&
+				!EmuCore::TMP::are_all_comparisons_true<std::is_same, A_, B_, T_>::value
 			)
 			{
-				using floating_point = typename EmuCore::TMPHelpers::largest_floating_point<A_, B_, T_>::type;
+				using floating_point = typename EmuCore::TMP::largest_floating_point<A_, B_, T_>::type;
 				floating_point a_cast_ = static_cast<floating_point>(a_);
 				return a_cast_ + ((static_cast<floating_point>(b_) - a_cast_) * static_cast<floating_point>(t_));
 			}
@@ -116,6 +116,134 @@ namespace EmuCore
 		[[nodiscard]] inline auto operator()(const T_& val_) const
 		{
 			return do_sqrt<T_>()(val_);
+		}
+	};
+
+	/// <summary> 
+	/// <para> Constexpr flooring functor. </para>
+	/// <para> Unless specialised, the valid range for values this can take is min(int64_t):max(uint64_t). </para>
+	/// </summary>
+	template<typename T_>
+	struct do_floor_constexpr
+	{
+		constexpr do_floor_constexpr()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			if constexpr (std::is_integral_v<T_>)
+			{
+				return val_;
+			}
+			else
+			{
+				if (val_ < T_(0))
+				{
+					// If trunc is different, we will have done a ceil since negative trunc == negative ceil
+					// --- As such, we need to subtract 1 from the truncated value if we do need to perform a round
+					T_ truncated_ = static_cast<T_>(static_cast<std::int64_t>(val_));
+					return (truncated_ == val_) ? val_ : (truncated_ - T_(1));
+				}
+				else
+				{
+					// Can take advantage of a higher range from an unsigned int if we know we're positive
+					// --- Additionally, positive trunc == positive floor
+					return static_cast<T_>(static_cast<std::uint64_t>(val_));
+				}
+			}
+		}
+	};
+	template<>
+	struct do_floor_constexpr<void>
+	{
+		constexpr do_floor_constexpr()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			return do_floor_constexpr<T_>()(val_);
+		}
+	};
+
+	/// <summary> 
+	/// <para> Constexpr ceiling functor. </para>
+	/// <para> Unless specialised, the valid range for values this can take is min(int64_t):max(uint64_t). </para>
+	/// </summary>
+	template<typename T_>
+	struct do_ceil_constexpr
+	{
+		constexpr do_ceil_constexpr()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			if constexpr (std::is_integral_v<T_>)
+			{
+				return val_;
+			}
+			else
+			{
+				if (val_ < T_(0))
+				{
+					// Negative trunc == negative ceil
+					return static_cast<T_>(static_cast<std::int64_t>(val_));
+				}
+				else
+				{
+					// When truncated, a positive value is equal to its floored value
+					// --- As such, when a truncation indicates a round should occur, we need to add 1 to the truncated value when positive
+					T_ truncated_ = static_cast<T_>(static_cast<std::uint64_t>(val_));
+					return (truncated_ == val_) ? val_ : (truncated_ + T_(1));
+				}
+			}
+		}
+	};
+	template<>
+	struct do_ceil_constexpr<void>
+	{
+		constexpr do_ceil_constexpr()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			return do_ceil_constexpr<T_>()(val_);
+		}
+	};
+
+	/// <summary> 
+	/// <para> Constexpr flooring functor. </para>
+	/// <para> Unless specialised, the valid range for values this can take is min(int64_t):max(int64_t). </para>
+	/// </summary>
+	template<typename T_>
+	struct do_trunc_constexpr
+	{
+		constexpr do_trunc_constexpr()
+		{
+		}
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			if constexpr (std::is_integral_v<T_>)
+			{
+				return val_;
+			}
+			else
+			{
+				return static_cast<T_>(static_cast<std::int64_t>(val_));
+			}
+		}
+	};
+	template<>
+	struct do_trunc_constexpr<void>
+	{
+		constexpr do_trunc_constexpr()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		{
+			return do_trunc_constexpr<T_>()(val_);
 		}
 	};
 
@@ -339,7 +467,7 @@ namespace EmuCore
 	template<typename T_>
 	struct do_cos
 	{
-		using out_t = typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type;
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
 		constexpr do_cos()
 		{
 		}
@@ -364,7 +492,7 @@ namespace EmuCore
 	template<typename T_>
 	struct do_acos
 	{
-		using out_t = typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type;
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
 		constexpr do_acos()
 		{
 		}
@@ -389,7 +517,7 @@ namespace EmuCore
 	template<typename T_>
 	struct do_sin
 	{
-		using out_t = typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type;
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
 		constexpr do_sin()
 		{
 		}
@@ -414,7 +542,7 @@ namespace EmuCore
 	template<typename T_>
 	struct do_asin
 	{
-		using out_t = typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type;
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
 		constexpr do_asin()
 		{
 		}
@@ -439,7 +567,7 @@ namespace EmuCore
 	template<typename T_>
 	struct do_tan
 	{
-		using out_t = typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type;
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
 		constexpr do_tan()
 		{
 		}
@@ -464,7 +592,7 @@ namespace EmuCore
 	template<typename T_>
 	struct do_atan
 	{
-		using out_t = typename EmuCore::TMPHelpers::first_floating_point<T_, float>::type;
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
 		constexpr do_atan()
 		{
 		}
@@ -613,7 +741,7 @@ namespace EmuCore
 		using out_t = std::conditional_t
 		<
 			std::is_arithmetic_v<T_>,
-			EmuCore::TMPHelpers::first_floating_point_t<T_, float>,
+			EmuCore::TMP::first_floating_point_t<T_, float>,
 			T_
 		>;
 		static constexpr out_t full_circle = EmuCore::Pi::DegsToRads_v<out_t, int, 360>;
@@ -702,7 +830,7 @@ namespace EmuCore
 		using out_t = std::conditional_t
 		<
 			std::is_arithmetic_v<T_>,
-			EmuCore::TMPHelpers::first_floating_point_t<T_, float>,
+			EmuCore::TMP::first_floating_point_t<T_, float>,
 			T_
 		>;
 		static constexpr out_t full_circle = EmuCore::Pi::DegsToRads_v<out_t, int, 360>;
@@ -793,7 +921,7 @@ namespace EmuCore
 		using out_t = std::conditional_t
 		<
 			std::is_arithmetic_v<T_>,
-			EmuCore::TMPHelpers::first_floating_point_t<T_, float>,
+			EmuCore::TMP::first_floating_point_t<T_, float>,
 			T_
 		>;
 		static constexpr out_t full_circle = EmuCore::Pi::DegsToRads_v<out_t, int, 360>;
@@ -856,6 +984,60 @@ namespace EmuCore
 		constexpr inline T_ operator()(const T_& val_) const
 		{
 			return EmuCore::AbsConstexpr<T_>(val_);
+		}
+	};
+
+	/// <summary> 
+	/// <para> Functor for wrapping values that are assumed to lie in a normalised range 0:1, where -0.1 is wrapped to 0.9, and 1.1 wrapped to 1.1. </para>
+	/// <para> Default, non-specialised forms of this functor are presented in a branchless manner. </para>
+	/// <para> If WrapToOne_ is TRUE: non-zero whole numbers will be wrapped to 1. </para>
+	/// <para> If WrapToOne_ is FALSE: non-zero whole numbers will be wrapped to 0. </para>
+	/// </summary>
+	template<typename T_, bool WrapToOne_>
+	struct do_normalised_wrap
+	{
+		constexpr do_normalised_wrap()
+		{
+		}
+
+		[[nodiscard]] constexpr inline T_ operator()(T_ val_) const
+		{
+			constexpr T_ zero_ = T_(0);
+			if constexpr (std::is_integral_v<T_>)
+			{
+				// Any non-zero integer will wrap to 1, so we just return whatever any non-zero would wrap to in that case
+				if constexpr (WrapToOne_)
+				{
+					return static_cast<T_>(val_ != zero_);
+				}
+				else
+				{
+					return zero_;
+				}
+			}
+			else
+			{
+				// More complex with non-integral types as we need to invert magnitude and direction of the fractions
+				// --- E.g. -0.8 would wrap around to +0.2, so we need to perform that transformation
+				constexpr T_ one_ = T_(1);
+				if constexpr (!WrapToOne_)
+				{
+					// Subtraction of a trunc brings us into the non-inclusive range -1:1
+					val_ = val_ - EmuCore::do_trunc_constexpr<T_>()(val_);
+
+					// Value will be wrapped if positive, but we need to invert the magnitude if negative
+					// --- This can be done by adding 1 (i.e. -0.9 -> 0.1)
+					return val_ + (one_ * (val_ < zero_));
+				}
+				else
+				{
+					// Same as above, but addition of 1 is done if result is negative OR 0
+					// --- This OR 0 only applies to the wrapped variant if it did not start at 0
+					bool started_not_zero_ = val_ != zero_;
+					val_ = val_ - EmuCore::do_trunc_constexpr<T_>()(val_);
+					return val_ + (one_ * ((val_ <= zero_) && started_not_zero_));
+				}
+			}
 		}
 	};
 }

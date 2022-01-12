@@ -48,22 +48,22 @@ namespace EmuMath
 		}
 		constexpr Vector(this_type& toCopy_) : Vector()
 		{
-			EmuMath::Helpers::VectorSet(*this, toCopy_);
+			EmuMath::Helpers::vector_set(*this, toCopy_);
 		}
 		template<typename = std::enable_if_t<!contains_non_const_reference_wrappers>>
 		constexpr Vector(const this_type& toCopy_) : Vector()
 		{
-			EmuMath::Helpers::VectorSet(*this, toCopy_);
+			EmuMath::Helpers::vector_set(*this, toCopy_);
 		}
 		template<std::size_t ToCopySize_, typename ToCopyValueType_>
 		constexpr Vector(const EmuMath::Vector<ToCopySize_, ToCopyValueType_>& toCopy_) : Vector()
 		{
-			EmuMath::Helpers::VectorSet(*this, toCopy_);
+			EmuMath::Helpers::vector_set(*this, toCopy_);
 		}
 		template<std::size_t ToCopySize_, typename ToCopyValueType_>
 		constexpr Vector(EmuMath::Vector<ToCopySize_, ToCopyValueType_>& toCopy_) : Vector()
 		{
-			EmuMath::Helpers::VectorSet(*this, toCopy_);
+			EmuMath::Helpers::vector_set(*this, toCopy_);
 		}
 		/// <summary>
 		/// <para> Constructs this vector with its elements matching the passed data, in contiguous order of the 0th to the (size - 1)th element. </para>
@@ -79,7 +79,7 @@ namespace EmuMath
 			<
 				sizeof...(Args) == size &&
 				// Additional check for size:1 vectors so as to differentiate between this and the vector copy constructor
-				!(size == 1 && EmuMath::TMP::is_emu_vector_v<typename EmuCore::TMPHelpers::first_packed_arg<Args...>::type>)
+				!(size == 1 && EmuMath::TMP::is_emu_vector_v<typename EmuCore::TMP::first_packed_arg<Args...>::type>)
 			>
 		>
 		explicit constexpr Vector(Args&&...contiguousData_) : data_({ static_cast<contained_type>(std::forward<Args>(contiguousData_))... })
@@ -87,7 +87,7 @@ namespace EmuMath
 			static_assert(sizeof...(Args) == size, "Provided an amount of arguments to an EmuMath Vector constructor that is not equal to the number of elements in the Vector.");
 			static_assert
 			(
-				EmuCore::TMPHelpers::are_all_comparisons_true<std::is_constructible, contained_type, Args...>::value,
+				EmuCore::TMP::are_all_comparisons_true<std::is_constructible, contained_type, Args...>::value,
 				"Attempted to construct an EmuMath Vector via it's template constructor, but at least one provided argument cannot be used to construct the Vector's contained_type."
 			);
 		}
@@ -161,18 +161,18 @@ namespace EmuMath
 		template<typename In_>
 		constexpr inline void Set(In_& in_)
 		{
-			EmuMath::Helpers::VectorSet<this_type, In_>(*this, in_);
+			EmuMath::Helpers::vector_set<this_type, In_>(*this, in_);
 		}
 		template<typename In_>
 		constexpr inline void Set(const In_& in_)
 		{
-			EmuMath::Helpers::VectorSet<this_type, const In_>(*this, in_);
+			EmuMath::Helpers::vector_set<this_type, const In_>(*this, in_);
 		}
 
 		template<class ToCopy_>
 		constexpr inline this_type& Copy(const ToCopy_& toCopy_)
 		{
-			return EmuMath::Helpers::VectorCopy<this_type, ToCopy_>(*this, toCopy_);
+			return EmuMath::Helpers::vector_copy<this_type, ToCopy_>(*this, toCopy_);
 		}
 #pragma endregion
 
@@ -180,43 +180,43 @@ namespace EmuMath
 		template<class Rhs_>
 		[[nodiscard]] constexpr inline bool operator==(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpEqualTo(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_equal(*this, rhs_);
 		}
 
 		template<class Rhs_>
 		[[nodiscard]] constexpr inline bool operator!=(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpNotEqualTo(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_not_equal(*this, rhs_);
 		}
 
 		template<class Rhs_>
 		[[nodiscard]] constexpr inline bool operator>(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpGreater(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_greater(*this, rhs_);
 		}
 
 		template<class Rhs_>
 		[[nodiscard]] constexpr inline bool operator<(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpLess(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_less(*this, rhs_);
 		}
 
 		template<class Rhs_>
 		[[nodiscard]] constexpr inline bool operator>=(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpGreaterEqual(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_greater_equal(*this, rhs_);
 		}
 
 		template<class Rhs_>
 		[[nodiscard]] constexpr inline bool operator<=(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpLessEqual(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_less_equal(*this, rhs_);
 		}
 
 		template<class RhsVector_>
 		[[nodiscard]] constexpr inline copy_type operator+(const RhsVector_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorAdd<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
+			return EmuMath::Helpers::vector_add<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
 		}
 		[[nodiscard]] constexpr inline copy_type operator+() const
 		{
@@ -226,64 +226,64 @@ namespace EmuMath
 		template<class RhsVector_>
 		[[nodiscard]] constexpr inline copy_type operator-(const RhsVector_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorSubtract<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
+			return EmuMath::Helpers::vector_subtract<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
 		}
 		[[nodiscard]] constexpr inline copy_type operator-() const
 		{
-			return EmuMath::Helpers::VectorNegate<copy_type::size, typename copy_type::contained_type>(*this);
+			return EmuMath::Helpers::vector_negate<copy_type::size, typename copy_type::contained_type>(*this);
 		}
 
 		template<typename Rhs_>
 		[[nodiscard]] constexpr inline copy_type operator*(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorMultiply<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
+			return EmuMath::Helpers::vector_multiply<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
 		}
 
 		template<typename Rhs_>
 		[[nodiscard]] constexpr inline copy_type operator/(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorDivide<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
+			return EmuMath::Helpers::vector_divide<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
 		}
 
 		template<typename Rhs_>
 		[[nodiscard]] constexpr inline copy_type operator%(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorMod<copy_type::size, typename copy_type::contained_type, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_mod<copy_type::size, typename copy_type::contained_type, this_type, Rhs_>(*this, rhs_);
 		}
 
 		template<typename Rhs_>
 		[[nodiscard]] constexpr inline copy_type operator&(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorAnd<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
+			return EmuMath::Helpers::vector_and<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
 		}
 
 		template<typename Rhs_>
 		[[nodiscard]] constexpr inline copy_type operator|(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorOr<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
+			return EmuMath::Helpers::vector_or<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
 		}
 
 		template<typename Rhs_>
 		[[nodiscard]] constexpr inline copy_type operator^(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorXor<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
+			return EmuMath::Helpers::vector_xor<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
 		}
 
 		[[nodiscard]] constexpr inline copy_type operator~() const
 		{
-			return EmuMath::Helpers::VectorNot<copy_type::size, typename copy_type::contained_type>(*this);
+			return EmuMath::Helpers::vector_not<copy_type::size, typename copy_type::contained_type>(*this);
 		}
 
 		template<typename Rhs_>
 		[[nodiscard]] constexpr inline copy_type operator<<(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorShiftLeft<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
+			return EmuMath::Helpers::vector_shift_left<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
 		}
 
 		template<typename Rhs_>
 		[[nodiscard]] constexpr inline copy_type operator>>(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorShiftRight<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
+			return EmuMath::Helpers::vector_shift_right<copy_type::size, typename copy_type::contained_type>(*this, rhs_);
 		}
 #pragma endregion
 
@@ -293,7 +293,7 @@ namespace EmuMath
 		{
 			if constexpr (!vector_info::has_const_values)
 			{
-				return EmuMath::Helpers::VectorCopy(*this, toCopy_);
+				return EmuMath::Helpers::vector_copy(*this, toCopy_);
 			}
 			else
 			{
@@ -306,7 +306,7 @@ namespace EmuMath
 		{
 			if constexpr (!vector_info::has_const_values)
 			{
-				(*this) = EmuMath::Helpers::VectorAdd(*this, rhs_);
+				(*this) = EmuMath::Helpers::vector_add(*this, rhs_);
 				return *this;
 			}
 			else
@@ -320,7 +320,7 @@ namespace EmuMath
 		{
 			if constexpr (!vector_info::has_const_values)
 			{
-				(*this) = EmuMath::Helpers::VectorSubtract(*this, rhs_);
+				(*this) = EmuMath::Helpers::vector_subtract(*this, rhs_);
 				return *this;
 			}
 			else
@@ -334,7 +334,7 @@ namespace EmuMath
 		{
 			if constexpr (!vector_info::has_const_values)
 			{
-				(*this) = EmuMath::Helpers::VectorMultiply(*this, rhs_);
+				(*this) = EmuMath::Helpers::vector_multiply(*this, rhs_);
 				return *this;
 			}
 			else
@@ -348,7 +348,7 @@ namespace EmuMath
 		{
 			if constexpr (!vector_info::has_const_values)
 			{
-				(*this) = EmuMath::Helpers::VectorDivide(*this, rhs_);
+				(*this) = EmuMath::Helpers::vector_divide(*this, rhs_);
 				return *this;
 			}
 			else
@@ -362,7 +362,7 @@ namespace EmuMath
 		{
 			if constexpr (!vector_info::has_const_values)
 			{
-				(*this) = EmuMath::Helpers::VectorMod(*this, rhs_);
+				(*this) = EmuMath::Helpers::vector_mod(*this, rhs_);
 				return *this;
 			}
 			else
@@ -376,7 +376,7 @@ namespace EmuMath
 		{
 			if constexpr (!vector_info::has_const_values)
 			{
-				(*this) = EmuMath::Helpers::VectorAnd(*this, rhs_);
+				(*this) = EmuMath::Helpers::vector_and(*this, rhs_);
 				return *this;
 			}
 			else
@@ -390,7 +390,7 @@ namespace EmuMath
 		{
 			if constexpr (!vector_info::has_const_values)
 			{
-				(*this) = EmuMath::Helpers::VectorOr(*this, rhs_);
+				(*this) = EmuMath::Helpers::vector_or(*this, rhs_);
 				return *this;
 			}
 			else
@@ -404,7 +404,7 @@ namespace EmuMath
 		{
 			if constexpr (!vector_info::has_const_values)
 			{
-				(*this) = EmuMath::Helpers::VectorXor(*this, rhs_);
+				(*this) = EmuMath::Helpers::vector_xor(*this, rhs_);
 				return *this;
 			}
 			else
@@ -418,7 +418,7 @@ namespace EmuMath
 		{
 			if constexpr (!vector_info::has_const_values)
 			{
-				(*this) = EmuMath::Helpers::VectorShiftLeft(*this, rhs_);
+				(*this) = EmuMath::Helpers::vector_shift_left(*this, rhs_);
 				return *this;
 			}
 			else
@@ -432,7 +432,7 @@ namespace EmuMath
 		{
 			if constexpr (!vector_info::has_const_values)
 			{
-				(*this) = EmuMath::Helpers::VectorShiftLeft(*this, rhs_);
+				(*this) = EmuMath::Helpers::vector_shift_left(*this, rhs_);
 				return *this;
 			}
 			else
@@ -444,31 +444,31 @@ namespace EmuMath
 
 #pragma region PERMUTATIONS
 		template<std::size_t X_, std::size_t...RemainingShuffleIndices_>
-		constexpr EmuMath::Vector<sizeof...(RemainingShuffleIndices_) + 1, value_type> Shuffle() const
+		[[nodiscard]] constexpr EmuMath::Vector<sizeof...(RemainingShuffleIndices_) + 1, value_type> Shuffle() const
 		{
-			return EmuMath::Helpers::VectorShuffle<value_type, X_, RemainingShuffleIndices_...>(*this);
+			return EmuMath::Helpers::vector_shuffle<value_type, X_, RemainingShuffleIndices_...>(*this);
 		}
 		template<typename out_contained_type, std::size_t X_, std::size_t...RemainingShuffleIndices_>
-		constexpr EmuMath::Vector<sizeof...(RemainingShuffleIndices_) + 1, out_contained_type> Shuffle() const
+		[[nodiscard]] constexpr EmuMath::Vector<sizeof...(RemainingShuffleIndices_) + 1, out_contained_type> Shuffle() const
 		{
-			return EmuMath::Helpers::VectorShuffle<out_contained_type, X_, RemainingShuffleIndices_...>(*this);
+			return EmuMath::Helpers::vector_shuffle<out_contained_type, X_, RemainingShuffleIndices_...>(*this);
 		}
 
 		template<std::size_t X_, std::size_t...RemainingShuffleIndices_>
 		[[nodiscard]] constexpr inline EmuMath::ConstRefVector<sizeof...(RemainingShuffleIndices_) + 1, value_type> ShuffledConstReference() const
 		{
-			return EmuMath::Helpers::VectorShuffledConstReference<X_, RemainingShuffleIndices_...>(*this);
+			return EmuMath::Helpers::vector_shuffle_const_ref<X_, RemainingShuffleIndices_...>(*this);
 		}
 
 		template<std::size_t X_, std::size_t...RemainingShuffleIndices_>
 		[[nodiscard]] constexpr inline EmuMath::RefVector<sizeof...(RemainingShuffleIndices_) + 1, value_type> ShuffledReference()
 		{
-			return EmuMath::Helpers::VectorShuffledReference<X_, RemainingShuffleIndices_...>(*this);
+			return EmuMath::Helpers::vector_shuffle_ref<X_, RemainingShuffleIndices_...>(*this);
 		}
 		template<std::size_t X_, std::size_t...RemainingShuffleIndices_>
 		[[nodiscard]] constexpr inline EmuMath::ConstRefVector<sizeof...(RemainingShuffleIndices_) + 1, value_type> ShuffledReference() const
 		{
-			return EmuMath::Helpers::VectorShuffledReference<X_, RemainingShuffleIndices_...>(*this);
+			return EmuMath::Helpers::vector_shuffle_ref<X_, RemainingShuffleIndices_...>(*this);
 		}
 #pragma endregion
 
@@ -481,7 +481,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class RhsVector_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Add(const RhsVector_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorAdd<OutSize_, out_contained_type, this_type, RhsVector_>(*this, rhs_);
+			return EmuMath::Helpers::vector_add<OutSize_, out_contained_type, this_type, RhsVector_>(*this, rhs_);
 		}
 
 		/// <summary> Returns the result of subtracting the passed rhs_ vector from this vector. </summary>
@@ -492,7 +492,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class RhsVector_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Subtract(const RhsVector_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorSubtract<OutSize_, out_contained_type, this_type, RhsVector_>(*this, rhs_);
+			return EmuMath::Helpers::vector_subtract<OutSize_, out_contained_type, this_type, RhsVector_>(*this, rhs_);
 		}
 
 		/// <summary> Returns the result of multiplying this vector by the passed rhs_ argument. </summary>
@@ -503,7 +503,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Multiply(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorMultiply<OutSize_, out_contained_type, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_multiply<OutSize_, out_contained_type, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary> Returns the result of dividing this vector by the passed rhs_ argument. </summary>
@@ -514,7 +514,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Divide(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorDivide<OutSize_, out_contained_type, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_divide<OutSize_, out_contained_type, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary> Returns the result of modulo division of this vector by the passed rhs_ argument. </summary>
@@ -525,7 +525,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Mod(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorMod<OutSize_, out_contained_type, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_mod<OutSize_, out_contained_type, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary> Returns a negated form of this vector (i.e. one where each element is the negative of this vector's element at the respective index). </summary>
@@ -534,7 +534,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Negate() const
 		{
-			return EmuMath::Helpers::VectorNegate<OutSize_, out_contained_type, this_type>(*this);
+			return EmuMath::Helpers::vector_negate<OutSize_, out_contained_type, this_type>(*this);
 		}
 #pragma endregion
 
@@ -545,7 +545,7 @@ namespace EmuMath
 		template<typename OutT_ = value_type>
 		[[nodiscard]] constexpr inline OutT_ TotalProduct() const
 		{
-			return EmuMath::Helpers::VectorElementProduct<OutT_, this_type>(*this);
+			return EmuMath::Helpers::vector_element_product<OutT_, this_type>(*this);
 		}
 		/// <summary> Calculates the sum of all elements within this vector and outputs the result as the provided OutT_, defaulting to this vector's value_type. </summary>
 		/// <typeparam name="OutT_">Type to output the sum as.</typeparam>
@@ -553,7 +553,7 @@ namespace EmuMath
 		template<typename OutT_ = value_type>
 		[[nodiscard]] constexpr inline OutT_ TotalSum() const
 		{
-			return EmuMath::Helpers::VectorElementSum<OutT_, this_type>(*this);
+			return EmuMath::Helpers::vector_element_sum<OutT_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -567,7 +567,7 @@ namespace EmuMath
 		template<typename OutT_ = preferred_floating_point, class VectorB_>
 		[[nodiscard]] constexpr inline OutT_ DotProduct(const VectorB_& b_) const
 		{
-			return EmuMath::Helpers::VectorDotProduct<OutT_, this_type, VectorB_>(*this, b_);
+			return EmuMath::Helpers::vector_dot_product<OutT_, this_type, VectorB_>(*this, b_);
 		}
 
 		/// <summary>
@@ -578,7 +578,7 @@ namespace EmuMath
 		template<typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline OutT_ SquareMagnitude() const
 		{
-			return EmuMath::Helpers::VectorSquareMagnitude<OutT_, this_type>(*this);
+			return EmuMath::Helpers::vector_square_magnitude<OutT_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -590,7 +590,7 @@ namespace EmuMath
 		template<typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline OutT_ MagnitudeConstexpr() const
 		{
-			return EmuMath::Helpers::VectorMagnitudeConstexpr<OutT_, this_type>(*this);
+			return EmuMath::Helpers::vector_magnitude_constexpr<OutT_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -601,7 +601,7 @@ namespace EmuMath
 		template<typename OutT_ = preferred_floating_point>
 		[[nodiscard]] inline OutT_ Magnitude() const
 		{
-			return EmuMath::Helpers::VectorMagnitude<OutT_, this_type>(*this);
+			return EmuMath::Helpers::vector_magnitude<OutT_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -617,7 +617,7 @@ namespace EmuMath
 		template<typename OutFloatingPoint_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline OutFloatingPoint_ MagnitudeReciprocalConstexpr() const
 		{
-			return EmuMath::Helpers::VectorMagnitudeReciprocalConstexpr<OutFloatingPoint_, this_type>(*this);
+			return EmuMath::Helpers::vector_magnitude_reciprocal_constexpr<OutFloatingPoint_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -629,7 +629,7 @@ namespace EmuMath
 		template<typename OutFloatingPoint_ = preferred_floating_point>
 		[[nodiscard]] inline OutFloatingPoint_ MagnitudeReciprocal() const
 		{
-			return EmuMath::Helpers::VectorMagnitudeReciprocal<OutFloatingPoint_, this_type>(*this);
+			return EmuMath::Helpers::vector_magnitude_reciprocal<OutFloatingPoint_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -646,7 +646,7 @@ namespace EmuMath
 		template<typename OutFloatingPoint_ = preferred_floating_point, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF>
 		[[nodiscard]] inline OutFloatingPoint_ MagnitudeReciprocalQrsqrt() const
 		{
-			return EmuMath::Helpers::VectorMagnitudeReciprocalQrsqrt<OutFloatingPoint_, NumNewtonIterations_, MagicConstant_, this_type>(*this);
+			return EmuMath::Helpers::vector_magnitude_reciprocal_qrsqrt<OutFloatingPoint_, NumNewtonIterations_, MagicConstant_, this_type>(*this);
 		}
 
 		/// <summary> Returns a copy of the lowest value within this vector, represented as the provided OutT_ (which defaults to this vector's value_type). </summary>
@@ -655,7 +655,7 @@ namespace EmuMath
 		template<typename OutT_ = value_type>
 		[[nodiscard]] constexpr inline OutT_ Min() const
 		{
-			return EmuMath::Helpers::VectorMin<OutT_, this_type>(*this);
+			return EmuMath::Helpers::vector_min<OutT_, this_type>(*this);
 		}
 
 		/// <summary> Returns a copy of the greatest value within this vector, represented as the provided OutT_ (which defaults to this vector's value_type). </summary>
@@ -664,7 +664,7 @@ namespace EmuMath
 		template<typename OutT_ = value_type>
 		[[nodiscard]] constexpr inline OutT_ Max() const
 		{
-			return EmuMath::Helpers::VectorMax<OutT_, this_type>(*this);
+			return EmuMath::Helpers::vector_max<OutT_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -676,7 +676,7 @@ namespace EmuMath
 		template<typename OutT_ = value_type>
 		[[nodiscard]] constexpr inline EmuMath::Vector<2, OutT_> MinMax() const
 		{
-			return EmuMath::Helpers::VectorMinMax<OutT_, this_type>(*this);
+			return EmuMath::Helpers::vector_min_max<OutT_, this_type>(*this);
 		}
 		/// <summary> Finds the lowest and greatest values within this vector and outputs them via the passed min_ and max_ references, respectively. </summary>
 		/// <typeparam name="OutMin_">Type to output this vector's lowest value to.</typeparam>
@@ -686,7 +686,7 @@ namespace EmuMath
 		template<typename OutMin_, typename OutMax_>
 		constexpr inline void MinMax(OutMin_& min_, OutMax_& max_) const
 		{
-			return EmuMath::Helpers::VectorMinMax<OutMin_, OutMax_, this_type>(*this, min_, max_);
+			return EmuMath::Helpers::vector_min_max<OutMin_, OutMax_, this_type>(*this, min_, max_);
 		}
 
 		/// <summary> Returns a vector containing copies of values stored at the respective indices of this vector or b_, whichever contains the lowest value. </summary>
@@ -697,7 +697,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class B_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> MinVector(const B_& b_) const
 		{
-			return EmuMath::Helpers::VectorMinVector<OutSize_, out_contained_type, this_type, B_>(*this, b_);
+			return EmuMath::Helpers::vector_min_vector<OutSize_, out_contained_type, this_type, B_>(*this, b_);
 		}
 
 		/// <summary> Returns a vector containing copies of values stored at the respective indices of this vector or b_, whichever contains the greatest value. </summary>
@@ -708,7 +708,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class B_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> MaxVector(const B_& b_) const
 		{
-			return EmuMath::Helpers::VectorMaxVector<OutSize_, out_contained_type, this_type, B_>(*this, b_);
+			return EmuMath::Helpers::vector_max_vector<OutSize_, out_contained_type, this_type, B_>(*this, b_);
 		}
 
 		/// <summary>
@@ -725,28 +725,28 @@ namespace EmuMath
 		/// <param name="b_">EmuMath vector or scalar to compare the elements of this vector to.</param>
 		/// <returns>Vector containing the lowest or greatest values in respective indices between this vector and b_, depending on provided boolean template arguments.</returns>
 		template<typename out_contained_type, bool Min0_, bool...OtherMins_, class B_>
-		constexpr inline EmuMath::Vector<sizeof...(OtherMins_) + 1, out_contained_type> MinMaxVector(const B_& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(OtherMins_) + 1, out_contained_type> MinMaxVector(const B_& b_) const
 		{
-			return EmuMath::Helpers::VectorMinMaxVector<out_contained_type, Min0_, OtherMins_...>(*this, b_);
+			return EmuMath::Helpers::vector_min_max_vector<out_contained_type, Min0_, OtherMins_...>(*this, b_);
 		}
 		template<bool Min0_, bool...OtherMins_, class B_>
-		constexpr inline EmuMath::Vector<sizeof...(OtherMins_) + 1, value_type> MinMaxVector(const B_& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(OtherMins_) + 1, value_type> MinMaxVector(const B_& b_) const
 		{
-			return EmuMath::Helpers::VectorMinMaxVector<value_type, Min0_, OtherMins_...>(*this, b_);
+			return EmuMath::Helpers::vector_min_max_vector<value_type, Min0_, OtherMins_...>(*this, b_);
 		}
 
 		/// <summary> Finds the index of the lowest value within this vector. </summary>
 		/// <returns>Index of the lowest value within this vector.</returns>
 		[[nodiscard]] constexpr inline std::size_t MinIndex() const
 		{
-			return EmuMath::Helpers::VectorMinIndex<this_type>(*this);
+			return EmuMath::Helpers::vector_min_index<this_type>(*this);
 		}
 
 		/// <summary> Finds the index of the greatest value within this vector. </summary>
 		/// <returns>Index of the greatest value within this vector.</returns>
 		[[nodiscard]] constexpr inline std::size_t MaxIndex() const
 		{
-			return EmuMath::Helpers::VectorMaxIndex<this_type>(*this);
+			return EmuMath::Helpers::vector_max_index<this_type>(*this);
 		}
 
 		/// <summary>
@@ -756,14 +756,14 @@ namespace EmuMath
 		/// <returns>Two-dimensional EmuMath vector containing the idnex of the lowest value in this matrix at index 0, and the index of the greatest value at index 1.</returns>
 		[[nodiscard]] constexpr inline EmuMath::Vector<2, std::size_t> MinMaxIndices() const
 		{
-			return EmuMath::Helpers::VectorMinMaxIndices<this_type>(*this);
+			return EmuMath::Helpers::vector_min_max_indices<this_type>(*this);
 		}
 		/// <summary> Finds the lowest and greatest values within this vector and outputs their indices via the passed min_ and max_ references, respectively. </summary>
 		/// <param name="minIndex_">Reference to output the lowest value's index to.</param>
 		/// <param name="maxIndex_">Reference to output the greatest value's index to.</param>
 		[[nodiscard]] constexpr inline void MinMaxIndices(std::size_t& minIndex_, std::size_t& maxIndex_) const
 		{
-			return EmuMath::Helpers::VectorMinMaxIndices<this_type>(*this, minIndex_, maxIndex_);
+			return EmuMath::Helpers::vector_min_max_indices<this_type>(*this, minIndex_, maxIndex_);
 		}
 
 		/// <summary>
@@ -789,7 +789,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = preferred_floating_point, class B_, typename T_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Lerp(const B_& b_, const T_& t_) const
 		{
-			return EmuMath::Helpers::VectorLerp<OutSize_, out_contained_type, this_type, B_, T_>(*this, b_, t_);
+			return EmuMath::Helpers::vector_lerp<OutSize_, out_contained_type, this_type, B_, T_>(*this, b_, t_);
 		}
 
 		/// <summary>
@@ -804,7 +804,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_floating_point_contained_type = preferred_floating_point>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_floating_point_contained_type> Reciprocal() const
 		{
-			return EmuMath::Helpers::VectorReciprocal<OutSize_, out_floating_point_contained_type, this_type>(*this);
+			return EmuMath::Helpers::vector_reciprocal<OutSize_, out_floating_point_contained_type, this_type>(*this);
 		}
 
 		/// <summary>
@@ -821,7 +821,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Min_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> ClampMin(const Min_& min_) const
 		{
-			return EmuMath::Helpers::VectorClampMin<OutSize_, out_contained_type, this_type, Min_>(*this, min_);
+			return EmuMath::Helpers::vector_clamp_min<OutSize_, out_contained_type, this_type, Min_>(*this, min_);
 		}
 
 		/// <summary>
@@ -838,7 +838,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Max_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> ClampMax(const Max_& max_) const
 		{
-			return EmuMath::Helpers::VectorClampMax<OutSize_, out_contained_type, this_type, Max_>(*this, max_);
+			return EmuMath::Helpers::vector_clamp_max<OutSize_, out_contained_type, this_type, Max_>(*this, max_);
 		}
 
 		/// <summary>
@@ -862,7 +862,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Min_, class Max_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Clamp(const Min_& min_, const Max_& max_) const
 		{
-			return EmuMath::Helpers::VectorClamp<OutSize_, out_contained_type, this_type, Min_, Max_>(*this, min_, max_);
+			return EmuMath::Helpers::vector_clamp<OutSize_, out_contained_type, this_type, Min_, Max_>(*this, min_, max_);
 		}
 
 		/// <summary>
@@ -880,7 +880,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Func_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Mutate(Func_ func_) const
 		{
-			return EmuMath::Helpers::VectorMutate<OutSize_, out_contained_type, Func_&, this_type>(*this, func_);
+			return EmuMath::Helpers::vector_mutate<OutSize_, out_contained_type, Func_&, this_type>(*this, func_);
 		}
 		/// <summary>
 		/// <para> Mutates the elements of this vector, outputting the results in the returned vector. </para>
@@ -896,7 +896,7 @@ namespace EmuMath
 		template<class Func_, std::size_t OutSize_ = size, typename out_contained_type = value_type>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Mutate() const
 		{
-			return EmuMath::Helpers::VectorMutate<OutSize_, out_contained_type, Func_, this_type>(*this);
+			return EmuMath::Helpers::vector_mutate<OutSize_, out_contained_type, Func_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -908,7 +908,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Floor() const
 		{
-			return EmuMath::Helpers::VectorFloor<OutSize_, out_contained_type, this_type>(*this);
+			return EmuMath::Helpers::vector_floor<OutSize_, out_contained_type, this_type>(*this);
 		}
 
 		/// <summary>
@@ -920,7 +920,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Ceil() const
 		{
-			return EmuMath::Helpers::VectorCeil<OutSize_, out_contained_type, this_type>(*this);
+			return EmuMath::Helpers::vector_ceil<OutSize_, out_contained_type, this_type>(*this);
 		}
 
 		/// <summary>
@@ -932,7 +932,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Trunc() const
 		{
-			return EmuMath::Helpers::VectorTrunc<OutSize_, out_contained_type, this_type>(*this);
+			return EmuMath::Helpers::vector_trunc<OutSize_, out_contained_type, this_type>(*this);
 		}
 
 		/// <summary>
@@ -945,7 +945,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = preferred_floating_point>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> SqrtConstexpr() const
 		{
-			return EmuMath::Helpers::VectorSqrtConstexpr<OutSize_, out_contained_type, this_type>(*this);
+			return EmuMath::Helpers::vector_sqrt_constexpr<OutSize_, out_contained_type, this_type>(*this);
 		}
 
 		/// <summary>
@@ -958,7 +958,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = preferred_floating_point>
 		[[nodiscard]] inline EmuMath::Vector<OutSize_, out_contained_type> Sqrt() const
 		{
-			return EmuMath::Helpers::VectorSqrtConstexpr<OutSize_, out_contained_type, this_type>(*this);
+			return EmuMath::Helpers::vector_sqrt_constexpr<OutSize_, out_contained_type, this_type>(*this);
 		}
 
 		/// <summary>
@@ -974,7 +974,7 @@ namespace EmuMath
 		template<typename out_floating_point_contained_type = preferred_floating_point, typename MagFloatingPointType_ = out_floating_point_contained_type>
 		[[nodiscard]] constexpr inline EmuMath::Vector<size, out_floating_point_contained_type> NormaliseConstexpr() const
 		{
-			return EmuMath::Helpers::VectorNormaliseConstexpr<out_floating_point_contained_type, MagFloatingPointType_, this_type>(*this);
+			return EmuMath::Helpers::vector_normalise_constexpr<out_floating_point_contained_type, MagFloatingPointType_, this_type>(*this);
 		}
 
 		/// <summary> Calculates the normalised form of this vector. </summary>
@@ -984,7 +984,7 @@ namespace EmuMath
 		template<typename out_floating_point_contained_type = preferred_floating_point, typename MagFloatingPointType_ = out_floating_point_contained_type>
 		[[nodiscard]] inline EmuMath::Vector<size, out_floating_point_contained_type> Normalise() const
 		{
-			return EmuMath::Helpers::VectorNormalise<out_floating_point_contained_type, MagFloatingPointType_, this_type>(*this);
+			return EmuMath::Helpers::vector_normalise<out_floating_point_contained_type, MagFloatingPointType_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -1006,7 +1006,7 @@ namespace EmuMath
 		>
 		[[nodiscard]] inline EmuMath::Vector<size, out_floating_point_contained_type> NormaliseQrsqrt() const
 		{
-			return EmuMath::Helpers::VectorNormaliseQrsqrt<out_floating_point_contained_type, MagFloatingPointType_, NumNewtonIterations_, MagicConstant_, this_type>(*this);
+			return EmuMath::Helpers::vector_normalise_qrsqrt<out_floating_point_contained_type, MagFloatingPointType_, NumNewtonIterations_, MagicConstant_, this_type>(*this);
 		}
 
 		/// <summary>
@@ -1020,7 +1020,7 @@ namespace EmuMath
 		template<typename OutCosine_ = preferred_floating_point, class VectorB_>
 		[[nodiscard]] constexpr inline OutCosine_ AngleCosineConstexpr(const VectorB_& b_) const
 		{
-			return EmuMath::Helpers::VectorAngleCosineConstexpr<OutCosine_, this_type, VectorB_>(*this, b_);
+			return EmuMath::Helpers::vector_angle_cosine_constexpr<OutCosine_, this_type, VectorB_>(*this, b_);
 		}
 
 		/// <summary>
@@ -1033,7 +1033,7 @@ namespace EmuMath
 		template<typename OutCosine_ = preferred_floating_point, class VectorB_>
 		[[nodiscard]] inline OutCosine_ AngleCosine(const VectorB_& b_) const
 		{
-			return EmuMath::Helpers::VectorAngleCosine<OutCosine_, this_type, VectorB_>(*this, b_);
+			return EmuMath::Helpers::vector_angle_cosine<OutCosine_, this_type, VectorB_>(*this, b_);
 		}
 
 		/// <summary>
@@ -1047,7 +1047,7 @@ namespace EmuMath
 		template<bool Rads_ = true, typename OutAngle_ = preferred_floating_point, class VectorB_>
 		[[nodiscard]] inline OutAngle_ Angle(const VectorB_& b_) const
 		{
-			return EmuMath::Helpers::VectorAngle<OutAngle_, Rads_, this_type, VectorB_>(*this, b_);
+			return EmuMath::Helpers::vector_angle<OutAngle_, Rads_, this_type, VectorB_>(*this, b_);
 		}
 
 		/// <summary>
@@ -1060,7 +1060,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, typename out_contained_type = preferred_floating_point, class TargetVector_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Distance(const TargetVector_& target_) const
 		{
-			return EmuMath::Helpers::VectorDistance<OutSize_, out_contained_type, this_type, TargetVector_>(*this, target_);
+			return EmuMath::Helpers::vector_distance<OutSize_, out_contained_type, this_type, TargetVector_>(*this, target_);
 		}
 
 		/// <summary>
@@ -1093,7 +1093,7 @@ namespace EmuMath
 		>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> CrossProduct3D(const VectorB_& b_) const
 		{
-			return EmuMath::Helpers::VectorCrossProduct3D<AX_, AY_, AZ_, BX_, BY_, BZ_, OutSize_, out_contained_type, this_type, VectorB_>(*this, b_);
+			return EmuMath::Helpers::vector_cross_product_3d<AX_, AY_, AZ_, BX_, BY_, BZ_, OutSize_, out_contained_type, this_type, VectorB_>(*this, b_);
 		}
 #pragma endregion
 
@@ -1109,7 +1109,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyEqualTo(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpAnyEqualTo<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_any_equal<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1123,7 +1123,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyNotEqualTo(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpAnyNotEqualTo<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_any_not_equal<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1137,7 +1137,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyGreater(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpAnyGreater<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_any_greater<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1151,7 +1151,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyLess(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpAnyLess<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_any_less<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1165,7 +1165,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyGreaterEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpAnyGreaterEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_any_greater_equal<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1179,7 +1179,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAnyLessEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpAnyLessEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_any_less_equal<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1193,7 +1193,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllEqualTo(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpAllEqualTo<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_all_equal<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1207,7 +1207,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllNotEqualTo(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpAllNotEqualTo<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_all_not_equal<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1221,7 +1221,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllGreater(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpAllGreater<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_all_greater<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1235,7 +1235,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllLess(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpAllLess<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_all_less<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1249,7 +1249,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllGreaterEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpAllGreaterEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_all_greater_equal<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1263,7 +1263,7 @@ namespace EmuMath
 		template<bool TestAllIndices_ = true, class Rhs_>
 		[[nodiscard]] constexpr inline bool CmpAllLessEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorCmpAllLessEqual<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_all_less_equal<TestAllIndices_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1280,7 +1280,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> CmpPerElementEqualTo(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorPerElementCmpEqualTo<OutSize_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_per_element_equal<OutSize_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1297,7 +1297,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> CmpPerElementNotEqualTo(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorPerElementCmpNotEqualTo<OutSize_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_per_element_not_equal<OutSize_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1314,7 +1314,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> CmpPerElementGreater(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorPerElementCmpGreater<OutSize_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_per_element_greater<OutSize_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1331,7 +1331,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> CmpPerElementLess(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorPerElementCmpLess<OutSize_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_per_element_less<OutSize_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1348,7 +1348,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> CmpPerElementGreaterEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorPerElementCmpGreaterEqual<OutSize_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_per_element_greater_equal<OutSize_, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1365,7 +1365,7 @@ namespace EmuMath
 		template<std::size_t OutSize_ = size, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, bool> CmpPerElementLessEqual(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorPerElementCmpLessEqual<OutSize_, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_cmp_per_element_less_equal<OutSize_, this_type, Rhs_>(*this, rhs_);
 		}
 #pragma endregion
 
@@ -1384,9 +1384,9 @@ namespace EmuMath
 		/// <param name="num_shifts_">Scalar or EmuMath vector representing the number of shifts to apply to every element or to each respective element.</param>
 		/// <returns>Result of left-shifting the elements of this vector the specified number of times in num_shifts_.</returns>
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Shifts_>
-		constexpr inline EmuMath::Vector<OutSize_, out_contained_type> ShiftLeft(const Shifts_& num_shifts_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> ShiftLeft(const Shifts_& num_shifts_) const
 		{
-			return EmuMath::Helpers::VectorShiftLeft<OutSize_, out_contained_type, this_type, Shifts_>(*this, num_shifts_);
+			return EmuMath::Helpers::vector_shift_left<OutSize_, out_contained_type, this_type, Shifts_>(*this, num_shifts_);
 		}
 
 		/// <summary>
@@ -1403,9 +1403,9 @@ namespace EmuMath
 		/// <param name="num_shifts_">Scalar or EmuMath vector representing the number of shifts to apply to every element or to each respective element.</param>
 		/// <returns>Result of right-shifting the elements of this vector the specified number of times in num_shifts_.</returns>
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Shifts_>
-		constexpr inline EmuMath::Vector<OutSize_, out_contained_type> ShiftRight(const Shifts_& num_shifts_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> ShiftRight(const Shifts_& num_shifts_) const
 		{
-			return EmuMath::Helpers::VectorShiftRight<OutSize_, out_contained_type, this_type, Shifts_>(*this, num_shifts_);
+			return EmuMath::Helpers::vector_shift_right<OutSize_, out_contained_type, this_type, Shifts_>(*this, num_shifts_);
 		}
 
 		/// <summary>
@@ -1418,9 +1418,9 @@ namespace EmuMath
 		/// <param name="rhs_">EmuMath vector or scalar appearing on the right-hand side of AND operations.</param>
 		/// <returns>EmuMath vector containing the results of bitwise ANDing this vector with the passed rhs_.</returns>
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Rhs_>
-		constexpr inline EmuMath::Vector<OutSize_, out_contained_type> And(const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> And(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorAnd<OutSize_, out_contained_type, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_and<OutSize_, out_contained_type, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1433,9 +1433,9 @@ namespace EmuMath
 		/// <param name="rhs_">EmuMath vector or scalar appearing on the right-hand side of OR operations.</param>
 		/// <returns>EmuMath vector containing the results of bitwise ORing this vector with the passed rhs_.</returns>
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Rhs_>
-		constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Or(const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Or(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorOr<OutSize_, out_contained_type, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_or<OutSize_, out_contained_type, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1448,9 +1448,9 @@ namespace EmuMath
 		/// <param name="rhs_">EmuMath vector or scalar appearing on the right-hand side of XOR operations.</param>
 		/// <returns>EmuMath vector containing the results of bitwise XORing this vector with the passed rhs_.</returns>
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type, class Rhs_>
-		constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Xor(const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Xor(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::VectorXor<OutSize_, out_contained_type, this_type, Rhs_>(*this, rhs_);
+			return EmuMath::Helpers::vector_xor<OutSize_, out_contained_type, this_type, Rhs_>(*this, rhs_);
 		}
 
 		/// <summary>
@@ -1460,9 +1460,9 @@ namespace EmuMath
 		/// <typeparam name="out_contained_type">Type to be contained within the output vector.</typeparam>
 		/// <returns>EmuMath vector containing the results of the bitwise NOT operation on this vector_.</returns>
 		template<std::size_t OutSize_ = size, typename out_contained_type = value_type>
-		constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Not() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, out_contained_type> Not() const
 		{
-			return EmuMath::Helpers::VectorNot<OutSize_, out_contained_type, this_type>(*this);
+			return EmuMath::Helpers::vector_not<OutSize_, out_contained_type, this_type>(*this);
 		}
 #pragma endregion
 
@@ -1529,7 +1529,7 @@ namespace EmuMath
 		/// </summary>
 		explicit constexpr inline operator bool() const
 		{
-			return EmuMath::Helpers::VectorCmpAnyNotEqualTo<true, this_type, value_type>(*this, value_type());
+			return EmuMath::Helpers::vector_cmp_any_not_equal<true, this_type, value_type>(*this, value_type());
 		}
 		/// <summary>
 		///	Vectorwise boolean interpretation of this vector. 
@@ -1537,13 +1537,13 @@ namespace EmuMath
 		/// </summary>
 		explicit constexpr inline operator EmuMath::Vector<size, bool>() const
 		{
-			return EmuMath::Helpers::VectorPerElementCmpNotEqualTo<size, bool, this_type, value_type>(*this, value_type());
+			return EmuMath::Helpers::vector_cmp_per_element_not_equal<size, bool, this_type, value_type>(*this, value_type());
 		}
 		/// <summary>
 		///	Inversion of this vector's bool cast. As such, this will only be true if all values within this vactor are equal to its default-constructed value_type.
 		/// </summary>
 		/// <returns>True if all elements of this vector are equal to a default-constructed value_type, otherwise false.</returns>
-		constexpr inline bool operator!() const
+		[[nodiscard]] constexpr inline bool operator!() const
 		{
 			return !static_cast<bool>(*this);
 		}

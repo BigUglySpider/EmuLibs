@@ -3,7 +3,7 @@
 
 #include "_do_not_manually_include/_vectors/FastVector4f.h"
 
-namespace EmuMath::SIMD
+namespace EmuSIMD
 {
 	template<std::size_t Size_, typename contained_type>
 	__m128 m128_from_emu_math_vector(const EmuMath::Vector<Size_, contained_type>& vector_)

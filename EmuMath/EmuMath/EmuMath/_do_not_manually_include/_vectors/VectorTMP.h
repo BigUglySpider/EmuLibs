@@ -103,7 +103,7 @@ namespace EmuMath::TMP
 	template<typename value_type, typename...Args_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Args_), value_type> make_emu_vector(Args_&&...args_)
 	{
-		return EmuMath::Vector<sizeof...(Args_), value_type>(std::forward<Args_>(args_)...);
+		return EmuMath::Vector<sizeof...(Args_), value_type>(args_...);
 	}
 }
 

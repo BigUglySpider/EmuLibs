@@ -3,7 +3,7 @@
 
 #include <tuple>
 
-namespace EmuCore::TMPHelpers
+namespace EmuCore::TMP
 {
 	template<class Left_, class Right_>
 	struct join_tuples

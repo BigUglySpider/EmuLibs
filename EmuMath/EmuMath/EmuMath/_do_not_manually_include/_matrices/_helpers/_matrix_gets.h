@@ -10,7 +10,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to retrieve an element of.</param>
 	/// <returns>Reference to the element at the specified column+row index within the passed matrix.</returns>
 	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Matrix_>
-	[[nodiscard]] constexpr inline auto& MatrixGet(Matrix_& matrix_)
+	[[nodiscard]] constexpr inline auto& matrix_get(Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
@@ -22,7 +22,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Matrix_>
-	[[nodiscard]] constexpr inline const auto& MatrixGet(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline const auto& matrix_get(const Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
@@ -34,7 +34,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class Matrix_>
-	[[nodiscard]] constexpr inline auto& MatrixGet(Matrix_& matrix_, const std::size_t column_index_, const std::size_t row_index_)
+	[[nodiscard]] constexpr inline auto& matrix_get(Matrix_& matrix_, const std::size_t column_index_, const std::size_t row_index_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
@@ -46,7 +46,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<class Matrix_>
-	[[nodiscard]] constexpr inline auto& MatrixGet(const Matrix_& matrix_, const std::size_t column_index_, const std::size_t row_index_)
+	[[nodiscard]] constexpr inline auto& matrix_get(const Matrix_& matrix_, const std::size_t column_index_, const std::size_t row_index_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
@@ -63,7 +63,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to return the requested column of.</param>
 	/// <returns>EmuMath reference vector which may be used to interact with a column in the passed matrix regardless of its major order.</returns>
 	template<std::size_t Index_, class Matrix_>
-	[[nodiscard]] constexpr inline auto MatrixGetColumn(Matrix_& matrix_)
+	[[nodiscard]] constexpr inline auto matrix_get_column(Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
@@ -82,7 +82,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t Index_, class Matrix_>
-	[[nodiscard]] constexpr inline auto MatrixGetColumn(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline auto matrix_get_column(const Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
@@ -106,7 +106,7 @@ namespace EmuMath::Helpers
 	/// <param name="matrix_">EmuMath matrix to return the requested row of.</param>
 	/// <returns>EmuMath reference vector which may be used to interact with a row in the passed matrix regardless of its major order.</returns>
 	template<std::size_t Index_, class Matrix_>
-	[[nodiscard]] constexpr inline auto MatrixGetRow(Matrix_& matrix_)
+	[[nodiscard]] constexpr inline auto matrix_get_row(Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
@@ -125,7 +125,7 @@ namespace EmuMath::Helpers
 		}
 	}
 	template<std::size_t Index_, class Matrix_>
-	[[nodiscard]] constexpr inline auto MatrixGetRow(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline auto matrix_get_row(const Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{
@@ -145,7 +145,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Matrix_>
-	[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_theoretical_data<ColumnIndex_, RowIndex_, Matrix_>::type MatrixGetTheoretical(const Matrix_& matrix_)
+	[[nodiscard]] constexpr inline typename EmuMath::TMP::emu_matrix_theoretical_data<ColumnIndex_, RowIndex_, Matrix_>::type matrix_get_theoretical(const Matrix_& matrix_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_matrix_v<Matrix_>)
 		{

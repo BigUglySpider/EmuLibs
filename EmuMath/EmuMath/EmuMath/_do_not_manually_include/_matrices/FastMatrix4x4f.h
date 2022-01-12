@@ -2,7 +2,7 @@
 #define EMU_MATH_FAST_MATRIX_4X4_H_INC_ 1
 
 #include "../../Matrix.h"
-#include "../../SIMDHelpers.h"
+#include "../../../EmuSIMD/SIMDHelpers.h"
 #include "../../FastVector.h"
 
 namespace EmuMath
@@ -89,40 +89,40 @@ namespace EmuMath
 			(
 				_mm_set_ps
 				(
-					EmuMath::Helpers::MatrixGetTheoretical<0, 3>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<0, 2>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<0, 1>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<0, 0>(to_copy_)
+					EmuMath::Helpers::matrix_get_theoretical<0, 3>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<0, 2>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<0, 1>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<0, 0>(to_copy_)
 				)
 			),
 			column1
 			(
 				_mm_set_ps
 				(
-					EmuMath::Helpers::MatrixGetTheoretical<1, 3>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<1, 2>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<1, 1>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<1, 0>(to_copy_)
+					EmuMath::Helpers::matrix_get_theoretical<1, 3>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<1, 2>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<1, 1>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<1, 0>(to_copy_)
 				)
 			),
 			column2
 			(
 				_mm_set_ps
 				(
-					EmuMath::Helpers::MatrixGetTheoretical<2, 3>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<2, 2>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<2, 1>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<2, 0>(to_copy_)
+					EmuMath::Helpers::matrix_get_theoretical<2, 3>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<2, 2>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<2, 1>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<2, 0>(to_copy_)
 				)
 			),
 			column3
 			(
 				_mm_set_ps
 				(
-					EmuMath::Helpers::MatrixGetTheoretical<3, 3>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<3, 2>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<3, 1>(to_copy_),
-					EmuMath::Helpers::MatrixGetTheoretical<3, 0>(to_copy_)
+					EmuMath::Helpers::matrix_get_theoretical<3, 3>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<3, 2>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<3, 1>(to_copy_),
+					EmuMath::Helpers::matrix_get_theoretical<3, 0>(to_copy_)
 				)
 			)
 		{
@@ -160,10 +160,10 @@ namespace EmuMath
 			const EmuMath::Vector<Size2_, contained_type_2>& column_2_,
 			const EmuMath::Vector<Size3_, contained_type_3>& column_3_
 		) : 
-			column0(EmuMath::SIMD::m128_from_emu_math_vector(column_0_)),
-			column1(EmuMath::SIMD::m128_from_emu_math_vector(column_1_)),
-			column2(EmuMath::SIMD::m128_from_emu_math_vector(column_2_)),
-			column3(EmuMath::SIMD::m128_from_emu_math_vector(column_3_))
+			column0(EmuSIMD::m128_from_emu_math_vector(column_0_)),
+			column1(EmuSIMD::m128_from_emu_math_vector(column_1_)),
+			column2(EmuSIMD::m128_from_emu_math_vector(column_2_)),
+			column3(EmuSIMD::m128_from_emu_math_vector(column_3_))
 		{
 		}
 		/// <summary> Creates a 4x4 column-major matrix using the registers of the passed vectors to create each respective column's data. </summary>
@@ -256,7 +256,7 @@ namespace EmuMath
 			{
 				if constexpr (_assert_valid_cast_to<Out_>())
 				{
-					return static_cast<Out_>(EmuMath::SIMD::get_m128_index<RowIndex_>(GetColumn<ColumnIndex_>()));
+					return EmuSIMD::get_index<RowIndex_, Out_>(GetColumn<ColumnIndex_>());
 				}
 				else
 				{
@@ -391,9 +391,9 @@ namespace EmuMath
 		{
 			if constexpr (Row_ <= 3)
 			{
-				__m128 out_0_1 = EmuMath::SIMD::shuffle<Row_, 0, Row_, 0>(column0, column1);
-				__m128 out_2_3 = EmuMath::SIMD::shuffle<Row_, 0, Row_, 0>(column2, column3);
-				return EmuMath::SIMD::shuffle<0, 2, 0, 2>(out_0_1, out_2_3);
+				__m128 out_0_1 = EmuSIMD::shuffle<Row_, 0, Row_, 0>(column0, column1);
+				__m128 out_2_3 = EmuSIMD::shuffle<Row_, 0, Row_, 0>(column2, column3);
+				return EmuSIMD::shuffle<0, 2, 0, 2>(out_0_1, out_2_3);
 			}
 			else
 			{
@@ -560,9 +560,9 @@ namespace EmuMath
 		/// <returns>Resulting vector from multiplying the passed vector by this matrix, interpreted as defined above.</returns>
 		[[nodiscard]] inline EmuMath::FastVector4f MultiplyVector3(__m128 rhs_vector_) const
 		{
-			__m128 out_ = _mm_mul_ps(column0, EmuMath::SIMD::shuffle<0, 0, 0, 0>(rhs_vector_));
-			out_ = _mm_add_ps(out_, _mm_mul_ps(column1, EmuMath::SIMD::shuffle<1, 1, 1, 1>(rhs_vector_)));
-			out_ = _mm_add_ps(out_, _mm_mul_ps(column2, EmuMath::SIMD::shuffle<2, 2, 2, 2>(rhs_vector_)));
+			__m128 out_ = _mm_mul_ps(column0, EmuSIMD::shuffle<0, 0, 0, 0>(rhs_vector_));
+			out_ = _mm_add_ps(out_, _mm_mul_ps(column1, EmuSIMD::shuffle<1, 1, 1, 1>(rhs_vector_)));
+			out_ = _mm_add_ps(out_, _mm_mul_ps(column2, EmuSIMD::shuffle<2, 2, 2, 2>(rhs_vector_)));
 
 			// Add column3 to end result as we interpret the missing value to be 1 as per homogeneous coordinates default to
 			return FastVector4f(_mm_add_ps(out_, column3));
@@ -582,12 +582,12 @@ namespace EmuMath
 		{
 			// Add column3 as we interpret the missing w value to be 1 as per homogeneous coordinates default to, 
 			// and z is interpreted to be 0 since 2D space is implicitly at Z 0, so the resulting Z should always be 0.
-			__m128 out_ = _mm_mul_ps(column0, EmuMath::SIMD::shuffle<0, 0, 0, 0>(rhs_vector_));
-			out_ = _mm_add_ps(out_, _mm_mul_ps(column1, EmuMath::SIMD::shuffle<1, 1, 1, 1>(rhs_vector_)));
+			__m128 out_ = _mm_mul_ps(column0, EmuSIMD::shuffle<0, 0, 0, 0>(rhs_vector_));
+			out_ = _mm_add_ps(out_, _mm_mul_ps(column1, EmuSIMD::shuffle<1, 1, 1, 1>(rhs_vector_)));
 			out_ = _mm_add_ps(out_, column3);
 
 			// AND out the z coord to maintain implicit Z 0, and continue to add homogeneous 
-			return FastVector4f(_mm_and_ps(EmuMath::SIMD::index_mask_m128<true, true, false, true>(), out_));
+			return FastVector4f(_mm_and_ps(EmuSIMD::index_mask_m128<true, true, false, true>(), out_));
 		}
 		[[nodiscard]] inline EmuMath::FastVector4f MultiplyVector2(const EmuMath::FastVector4f& rhs_vector_) const
 		{
@@ -799,40 +799,40 @@ namespace EmuMath
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_lerp(column0, b_0_, t_0_),
-				EmuMath::SIMD::vector_lerp(column1, b_1_, t_1_),
-				EmuMath::SIMD::vector_lerp(column2, b_2_, t_2_),
-				EmuMath::SIMD::vector_lerp(column3, b_3_, t_3_)
+				EmuSIMD::fused_lerp(column0, b_0_, t_0_),
+				EmuSIMD::fused_lerp(column1, b_1_, t_1_),
+				EmuSIMD::fused_lerp(column2, b_2_, t_2_),
+				EmuSIMD::fused_lerp(column3, b_3_, t_3_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(__m128 b_, __m128 t_) const
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_lerp(column0, b_, t_),
-				EmuMath::SIMD::vector_lerp(column1, b_, t_),
-				EmuMath::SIMD::vector_lerp(column2, b_, t_),
-				EmuMath::SIMD::vector_lerp(column3, b_, t_)
+				EmuSIMD::fused_lerp(column0, b_, t_),
+				EmuSIMD::fused_lerp(column1, b_, t_),
+				EmuSIMD::fused_lerp(column2, b_, t_),
+				EmuSIMD::fused_lerp(column3, b_, t_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(const FastMatrix4x4f_CM& b_, __m128 t_) const
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_lerp(column0, b_.column0, t_),
-				EmuMath::SIMD::vector_lerp(column1, b_.column1, t_),
-				EmuMath::SIMD::vector_lerp(column2, b_.column2, t_),
-				EmuMath::SIMD::vector_lerp(column3, b_.column3, t_)
+				EmuSIMD::fused_lerp(column0, b_.column0, t_),
+				EmuSIMD::fused_lerp(column1, b_.column1, t_),
+				EmuSIMD::fused_lerp(column2, b_.column2, t_),
+				EmuSIMD::fused_lerp(column3, b_.column3, t_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(__m128 b_, const FastMatrix4x4f_CM& t_) const
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_lerp(column0, b_, t_.column0),
-				EmuMath::SIMD::vector_lerp(column1, b_, t_.column1),
-				EmuMath::SIMD::vector_lerp(column2, b_, t_.column2),
-				EmuMath::SIMD::vector_lerp(column3, b_, t_.column3)
+				EmuSIMD::fused_lerp(column0, b_, t_.column0),
+				EmuSIMD::fused_lerp(column1, b_, t_.column1),
+				EmuSIMD::fused_lerp(column2, b_, t_.column2),
+				EmuSIMD::fused_lerp(column3, b_, t_.column3)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM Lerp(const FastMatrix4x4f_CM& b_, const FastMatrix4x4f_CM& t_) const
@@ -874,40 +874,40 @@ namespace EmuMath
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_clamp(column0, min_0_, max_0_),
-				EmuMath::SIMD::vector_clamp(column1, min_1_, max_1_),
-				EmuMath::SIMD::vector_clamp(column2, min_2_, max_2_),
-				EmuMath::SIMD::vector_clamp(column3, min_3_, max_3_)
+				EmuSIMD::clamp(column0, min_0_, max_0_),
+				EmuSIMD::clamp(column1, min_1_, max_1_),
+				EmuSIMD::clamp(column2, min_2_, max_2_),
+				EmuSIMD::clamp(column3, min_3_, max_3_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(__m128 min_, __m128 max_) const
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_clamp(column0, min_, max_),
-				EmuMath::SIMD::vector_clamp(column1, min_, max_),
-				EmuMath::SIMD::vector_clamp(column2, min_, max_),
-				EmuMath::SIMD::vector_clamp(column3, min_, max_)
+				EmuSIMD::clamp(column0, min_, max_),
+				EmuSIMD::clamp(column1, min_, max_),
+				EmuSIMD::clamp(column2, min_, max_),
+				EmuSIMD::clamp(column3, min_, max_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(const FastMatrix4x4f_CM& min_, __m128 max_) const
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_clamp(column0, min_.column0, max_),
-				EmuMath::SIMD::vector_clamp(column1, min_.column1, max_),
-				EmuMath::SIMD::vector_clamp(column2, min_.column2, max_),
-				EmuMath::SIMD::vector_clamp(column3, min_.column3, max_)
+				EmuSIMD::clamp(column0, min_.column0, max_),
+				EmuSIMD::clamp(column1, min_.column1, max_),
+				EmuSIMD::clamp(column2, min_.column2, max_),
+				EmuSIMD::clamp(column3, min_.column3, max_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(__m128 min_, const FastMatrix4x4f_CM& max_) const
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_clamp(column0, min_, max_.column0),
-				EmuMath::SIMD::vector_clamp(column1, min_, max_.column1),
-				EmuMath::SIMD::vector_clamp(column2, min_, max_.column2),
-				EmuMath::SIMD::vector_clamp(column3, min_, max_.column3)
+				EmuSIMD::clamp(column0, min_, max_.column0),
+				EmuSIMD::clamp(column1, min_, max_.column1),
+				EmuSIMD::clamp(column2, min_, max_.column2),
+				EmuSIMD::clamp(column3, min_, max_.column3)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM Clamp(const FastMatrix4x4f_CM& min_, const FastMatrix4x4f_CM& max_) const
@@ -949,20 +949,20 @@ namespace EmuMath
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_clamp_min(column0, min_0_),
-				EmuMath::SIMD::vector_clamp_min(column1, min_1_),
-				EmuMath::SIMD::vector_clamp_min(column2, min_2_),
-				EmuMath::SIMD::vector_clamp_min(column3, min_3_)
+				EmuSIMD::clamp_min(column0, min_0_),
+				EmuSIMD::clamp_min(column1, min_1_),
+				EmuSIMD::clamp_min(column2, min_2_),
+				EmuSIMD::clamp_min(column3, min_3_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM ClampMin(__m128 min_) const
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_clamp_min(column0, min_),
-				EmuMath::SIMD::vector_clamp_min(column1, min_),
-				EmuMath::SIMD::vector_clamp_min(column2, min_),
-				EmuMath::SIMD::vector_clamp_min(column3, min_)
+				EmuSIMD::clamp_min(column0, min_),
+				EmuSIMD::clamp_min(column1, min_),
+				EmuSIMD::clamp_min(column2, min_),
+				EmuSIMD::clamp_min(column3, min_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM ClampMin(const FastMatrix4x4f_CM& min_) const
@@ -979,20 +979,20 @@ namespace EmuMath
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_clamp_max(column0, max_0_),
-				EmuMath::SIMD::vector_clamp_max(column1, max_1_),
-				EmuMath::SIMD::vector_clamp_max(column2, max_2_),
-				EmuMath::SIMD::vector_clamp_max(column3, max_3_)
+				EmuSIMD::clamp_max(column0, max_0_),
+				EmuSIMD::clamp_max(column1, max_1_),
+				EmuSIMD::clamp_max(column2, max_2_),
+				EmuSIMD::clamp_max(column3, max_3_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM ClampMax(__m128 max_) const
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::vector_clamp_max(column0, max_),
-				EmuMath::SIMD::vector_clamp_max(column1, max_),
-				EmuMath::SIMD::vector_clamp_max(column2, max_),
-				EmuMath::SIMD::vector_clamp_max(column3, max_)
+				EmuSIMD::clamp_max(column0, max_),
+				EmuSIMD::clamp_max(column1, max_),
+				EmuSIMD::clamp_max(column2, max_),
+				EmuSIMD::clamp_max(column3, max_)
 			);
 		}
 		[[nodiscard]] inline FastMatrix4x4f_CM ClampMax(const FastMatrix4x4f_CM& max_) const
@@ -1015,7 +1015,7 @@ namespace EmuMath
 			{
 				__m128 min_ = _mm_min_ps(column0, column1);
 				min_ = _mm_min_ps(min_, column2);
-				return static_cast<Out_>(EmuMath::SIMD::vector_min_scalar(_mm_min_ps(min_, column3)));
+				return static_cast<Out_>(EmuSIMD::vector_min_scalar(_mm_min_ps(min_, column3)));
 			}
 			else
 			{
@@ -1033,7 +1033,7 @@ namespace EmuMath
 			{
 				__m128 max_ = _mm_max_ps(column0, column1);
 				max_ = _mm_max_ps(max_, column2);
-				return static_cast<Out_>(EmuMath::SIMD::vector_max_scalar(_mm_max_ps(max_, column3)));
+				return static_cast<Out_>(EmuSIMD::vector_max_scalar(_mm_max_ps(max_, column3)));
 			}
 			else
 			{
@@ -1047,7 +1047,7 @@ namespace EmuMath
 			__m128 sum_ = _mm_add_ps(column0, column1);
 			sum_ = _mm_add_ps(sum_, column2);
 			sum_ = _mm_add_ps(sum_, column3);
-			return EmuMath::SIMD::horizontal_vector_sum_scalar(sum_);
+			return EmuSIMD::horizontal_sum_scalar<Out_>(sum_);
 		}
 #pragma endregion
 
@@ -1217,10 +1217,10 @@ namespace EmuMath
 		{
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::not_128(column0),
-				EmuMath::SIMD::not_128(column1),
-				EmuMath::SIMD::not_128(column2),
-				EmuMath::SIMD::not_128(column3)
+				EmuSIMD::bitwise_not(column0),
+				EmuSIMD::bitwise_not(column1),
+				EmuSIMD::bitwise_not(column2),
+				EmuSIMD::bitwise_not(column3)
 			);
 		}
 #pragma endregion
@@ -1992,7 +1992,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpeq_ps(column1, rhs_column_1_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpeq_ps(column2, rhs_column_2_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpeq_ps(column3, rhs_column_3_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuSIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to the passed column register. </para>
@@ -2006,7 +2006,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpeq_ps(column1, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpeq_ps(column2, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpeq_ps(column3, rhs_all_columns_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuSIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
@@ -2045,7 +2045,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpneq_ps(column1, rhs_column_1_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpneq_ps(column2, rhs_column_2_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpneq_ps(column3, rhs_column_3_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuSIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to the passed column register. </para>
@@ -2059,7 +2059,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpneq_ps(column1, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpneq_ps(column2, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpneq_ps(column3, rhs_all_columns_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuSIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
@@ -2098,7 +2098,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpgt_ps(column1, rhs_column_1_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpgt_ps(column2, rhs_column_2_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpgt_ps(column3, rhs_column_3_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuSIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to the passed column register. </para>
@@ -2112,7 +2112,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpgt_ps(column1, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpgt_ps(column2, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpgt_ps(column3, rhs_all_columns_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuSIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
@@ -2151,7 +2151,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmplt_ps(column1, rhs_column_1_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmplt_ps(column2, rhs_column_2_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmplt_ps(column3, rhs_column_3_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuSIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to the passed column register. </para>
@@ -2165,7 +2165,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmplt_ps(column1, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmplt_ps(column2, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmplt_ps(column3, rhs_all_columns_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuSIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
@@ -2204,7 +2204,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpge_ps(column1, rhs_column_1_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpge_ps(column2, rhs_column_2_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpge_ps(column3, rhs_column_3_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuSIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to the passed column register. </para>
@@ -2218,7 +2218,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpge_ps(column1, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpge_ps(column2, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmpge_ps(column3, rhs_all_columns_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuSIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
@@ -2257,7 +2257,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmple_ps(column1, rhs_column_1_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmple_ps(column2, rhs_column_2_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmple_ps(column3, rhs_column_3_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuSIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to the passed column register. </para>
@@ -2271,7 +2271,7 @@ namespace EmuMath
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmple_ps(column1, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmple_ps(column2, rhs_all_columns_));
 			cmp_mask_ = _mm_and_ps(cmp_mask_, _mm_cmple_ps(column3, rhs_all_columns_));
-			return _mm_movemask_ps(cmp_mask_) == EmuMath::SIMD::move_mask_v<true, true, true, true>;
+			return _mm_movemask_ps(cmp_mask_) == EmuSIMD::make_movemask<__m128, true, true, true, true>::value;
 		}
 		/// <summary>
 		/// <para> Compares all columns of this matrix to those of the passed matrix. </para>
@@ -2409,31 +2409,31 @@ namespace EmuMath
 		{
 			column0 = _mm_set_ps
 			(
-				EmuMath::Helpers::MatrixGetTheoretical<0, 0>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<0, 1>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<0, 2>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<0, 3>(rhs_)
+				EmuMath::Helpers::matrix_get_theoretical<0, 0>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<0, 1>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<0, 2>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<0, 3>(rhs_)
 			);
 			column1 = _mm_set_ps
 			(
-				EmuMath::Helpers::MatrixGetTheoretical<1, 0>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<1, 1>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<1, 2>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<1, 3>(rhs_)
+				EmuMath::Helpers::matrix_get_theoretical<1, 0>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<1, 1>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<1, 2>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<1, 3>(rhs_)
 			);
 			column2 = _mm_set_ps
 			(
-				EmuMath::Helpers::MatrixGetTheoretical<2, 0>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<2, 1>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<2, 2>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<2, 3>(rhs_)
+				EmuMath::Helpers::matrix_get_theoretical<2, 0>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<2, 1>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<2, 2>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<2, 3>(rhs_)
 			);
 			column3 = _mm_set_ps
 			(
-				EmuMath::Helpers::MatrixGetTheoretical<3, 0>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<3, 1>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<3, 2>(rhs_),
-				EmuMath::Helpers::MatrixGetTheoretical<3, 3>(rhs_)
+				EmuMath::Helpers::matrix_get_theoretical<3, 0>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<3, 1>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<3, 2>(rhs_),
+				EmuMath::Helpers::matrix_get_theoretical<3, 3>(rhs_)
 			);
 			return *this;
 		}
@@ -2522,17 +2522,17 @@ namespace EmuMath
 		{
 			// Preliminary shuffles to allow all resulting transposed rows to be created
 			// --- We do this instead of 4 calls to GetRow to complete the operation in 8 shuffles instead of 12.
-			__m128 c0r0_c0r1_c1r0_c1r1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(column0, column1);
-			__m128 c2r0_c2r1_c3r0_c3r1_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(column2, column3);
-			__m128 c0r2_c0r3_c1r2_c1r3_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(column0, column1);
-			__m128 c2r2_c2r3_c3r2_c3r3_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(column2, column3);
+			__m128 c0r0_c0r1_c1r0_c1r1_ = EmuSIMD::shuffle<0, 1, 0, 1>(column0, column1);
+			__m128 c2r0_c2r1_c3r0_c3r1_ = EmuSIMD::shuffle<0, 1, 0, 1>(column2, column3);
+			__m128 c0r2_c0r3_c1r2_c1r3_ = EmuSIMD::shuffle<2, 3, 2, 3>(column0, column1);
+			__m128 c2r2_c2r3_c3r2_c3r3_ = EmuSIMD::shuffle<2, 3, 2, 3>(column2, column3);
 			
 			return FastMatrix4x4f_CM
 			(
-				EmuMath::SIMD::shuffle<0, 2, 0, 2>(c0r0_c0r1_c1r0_c1r1_, c2r0_c2r1_c3r0_c3r1_),
-				EmuMath::SIMD::shuffle<1, 3, 1, 3>(c0r0_c0r1_c1r0_c1r1_, c2r0_c2r1_c3r0_c3r1_),
-				EmuMath::SIMD::shuffle<0, 2, 0, 2>(c0r2_c0r3_c1r2_c1r3_, c2r2_c2r3_c3r2_c3r3_),
-				EmuMath::SIMD::shuffle<1, 3, 1, 3>(c0r2_c0r3_c1r2_c1r3_, c2r2_c2r3_c3r2_c3r3_)
+				EmuSIMD::shuffle<0, 2, 0, 2>(c0r0_c0r1_c1r0_c1r1_, c2r0_c2r1_c3r0_c3r1_),
+				EmuSIMD::shuffle<1, 3, 1, 3>(c0r0_c0r1_c1r0_c1r1_, c2r0_c2r1_c3r0_c3r1_),
+				EmuSIMD::shuffle<0, 2, 0, 2>(c0r2_c0r3_c1r2_c1r3_, c2r2_c2r3_c3r2_c3r3_),
+				EmuSIMD::shuffle<1, 3, 1, 3>(c0r2_c0r3_c1r2_c1r3_, c2r2_c2r3_c3r2_c3r3_)
 			);
 		}
 
@@ -2540,9 +2540,9 @@ namespace EmuMath
 		/// <returns>Main diagonal of this matrix represented as a FastVector4f.</returns>
 		[[nodiscard]] inline EmuMath::FastVector4f MainDiagonal() const
 		{
-			__m128 out_01_ = EmuMath::SIMD::shuffle<0, 0, 1, 1>(column0, column1);
-			__m128 out_23_ = EmuMath::SIMD::shuffle<2, 2, 3, 3>(column2, column3);
-			return EmuMath::FastVector4f(EmuMath::SIMD::shuffle<0, 2, 0, 2>(out_01_, out_23_));
+			__m128 out_01_ = EmuSIMD::shuffle<0, 0, 1, 1>(column0, column1);
+			__m128 out_23_ = EmuSIMD::shuffle<2, 2, 3, 3>(column2, column3);
+			return EmuMath::FastVector4f(EmuSIMD::shuffle<0, 2, 0, 2>(out_01_, out_23_));
 		}
 
 		/// <summary> Calculates the trace of this matrix (the sum of all elements along its main diagonal). </summary>
@@ -2554,7 +2554,7 @@ namespace EmuMath
 
 		[[nodiscard]] inline float Determinant() const
 		{
-			return EmuMath::SIMD::horizontal_vector_sum_scalar(_mm_mul_ps(GetRow<0>(), Cofactors<true>().column0));
+			return EmuSIMD::horizontal_sum_scalar<float>(_mm_mul_ps(GetRow<0>(), Cofactors<true>().column0));
 		}
 
 		/// <summary> 
@@ -2567,7 +2567,7 @@ namespace EmuMath
 		{
 			if constexpr (_assert_valid_index<ExcludeColumn_, ExcludeRow_>())
 			{
-				__m128 mask_ = EmuMath::SIMD::index_mask_m128<true, true, true, false>();
+				__m128 mask_ = EmuSIMD::index_mask_m128<true, true, true, false>();
 				if constexpr (ExcludeColumn_ == 0)
 				{
 					return FastMatrix4x4f_CM
@@ -2624,45 +2624,45 @@ namespace EmuMath
 		[[nodiscard]] inline FastMatrix4x4f_CM Minors() const
 		{
 			// Shuffled columns to store 2x2 submatrices within singular SIMD registers
-			__m128 submat_c01_r01_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(column0, column1);
-			__m128 submat_c01_r23_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(column0, column1);
-			__m128 submat_c23_r01_ = EmuMath::SIMD::shuffle<0, 1, 0, 1>(column2, column3);
-			__m128 submat_c23_r23_ = EmuMath::SIMD::shuffle<2, 3, 2, 3>(column2, column3);
+			__m128 submat_c01_r01_ = EmuSIMD::shuffle<0, 1, 0, 1>(column0, column1);
+			__m128 submat_c01_r23_ = EmuSIMD::shuffle<2, 3, 2, 3>(column0, column1);
+			__m128 submat_c23_r01_ = EmuSIMD::shuffle<0, 1, 0, 1>(column2, column3);
+			__m128 submat_c23_r23_ = EmuSIMD::shuffle<2, 3, 2, 3>(column2, column3);
 
 			// Calculate determinants based on this matrix's columns with remaining 2x2 submatrices
 			// --- Each determinant will need to be used for a blanket mult, so each value populates a full register
 			__m128 determinants_ = _mm_sub_ps
 			(
-				_mm_mul_ps(EmuMath::SIMD::shuffle<0, 2, 0, 2>(column0, column2), EmuMath::SIMD::shuffle<1, 3, 1, 3>(column1, column3)),
-				_mm_mul_ps(EmuMath::SIMD::shuffle<1, 3, 1, 3>(column0, column2), EmuMath::SIMD::shuffle<0, 2, 0, 2>(column1, column3))
+				_mm_mul_ps(EmuSIMD::shuffle<0, 2, 0, 2>(column0, column2), EmuSIMD::shuffle<1, 3, 1, 3>(column1, column3)),
+				_mm_mul_ps(EmuSIMD::shuffle<1, 3, 1, 3>(column0, column2), EmuSIMD::shuffle<0, 2, 0, 2>(column1, column3))
 			);
 
 			// Multiply adjugates of the lhs submatrices by the rhs submatrices (non-adjugate)
-			__m128 c23r23_mult_c01r23_ = EmuMath::SIMD::matrix_2x2_multiply_adj_norm_cm(submat_c23_r23_, submat_c01_r23_);
-			__m128 c01r01_mult_c23r01_ = EmuMath::SIMD::matrix_2x2_multiply_adj_norm_cm(submat_c01_r01_, submat_c23_r01_);
+			__m128 c23r23_mult_c01r23_ = EmuSIMD::matrix_2x2_multiply_adj_norm_cm(submat_c23_r23_, submat_c01_r23_);
+			__m128 c01r01_mult_c23r01_ = EmuSIMD::matrix_2x2_multiply_adj_norm_cm(submat_c01_r01_, submat_c23_r01_);
 
 			// Calculate registers for output
 			// --- Registers with matching cxxyy names are shuffled together to form individual output columns if not transposed
 			// --- Registers with matching rxxyy names are shuffled together to form individual output columns if transposed
 			__m128 out_c1100_r1010_ = _mm_sub_ps
 			(
-				_mm_mul_ps(EmuMath::SIMD::shuffle<3>(determinants_), submat_c01_r01_),
-				EmuMath::SIMD::matrix_2x2_multiply_cm(submat_c23_r01_, c23r23_mult_c01r23_)
+				_mm_mul_ps(EmuSIMD::shuffle<3>(determinants_), submat_c01_r01_),
+				EmuSIMD::matrix_2x2_multiply_cm(submat_c23_r01_, c23r23_mult_c01r23_)
 			);
 			__m128 out_c1100_r3232_ = _mm_sub_ps
 			(
-				_mm_mul_ps(EmuMath::SIMD::shuffle<2>(determinants_), submat_c01_r23_),
-				EmuMath::SIMD::matrix_2x2_multiply_norm_adj_cm(submat_c23_r23_, c01r01_mult_c23r01_)
+				_mm_mul_ps(EmuSIMD::shuffle<2>(determinants_), submat_c01_r23_),
+				EmuSIMD::matrix_2x2_multiply_norm_adj_cm(submat_c23_r23_, c01r01_mult_c23r01_)
 			);
 			__m128 out_c3322_r1010_ = _mm_sub_ps
 			(
-				_mm_mul_ps(EmuMath::SIMD::shuffle<1>(determinants_), submat_c23_r01_),
-				EmuMath::SIMD::matrix_2x2_multiply_norm_adj_cm(submat_c01_r01_, c23r23_mult_c01r23_)
+				_mm_mul_ps(EmuSIMD::shuffle<1>(determinants_), submat_c23_r01_),
+				EmuSIMD::matrix_2x2_multiply_norm_adj_cm(submat_c01_r01_, c23r23_mult_c01r23_)
 			);
 			__m128 out_c3322_r3232_ = _mm_sub_ps
 			(
-				_mm_mul_ps(EmuMath::SIMD::shuffle<0>(determinants_), submat_c23_r23_),
-				EmuMath::SIMD::matrix_2x2_multiply_cm(submat_c01_r23_, c01r01_mult_c23r01_)
+				_mm_mul_ps(EmuSIMD::shuffle<0>(determinants_), submat_c23_r23_),
+				EmuSIMD::matrix_2x2_multiply_cm(submat_c01_r23_, c01r01_mult_c23r01_)
 			);
 
 			// Output final shuffles, performing transpose with output shuffles if desired
@@ -2670,20 +2670,20 @@ namespace EmuMath
 			{
 				return FastMatrix4x4f_CM
 				(
-					EmuMath::SIMD::shuffle<3, 1, 3, 1>(out_c1100_r1010_, out_c3322_r1010_),
-					EmuMath::SIMD::shuffle<2, 0, 2, 0>(out_c1100_r1010_, out_c3322_r1010_),
-					EmuMath::SIMD::shuffle<3, 1, 3, 1>(out_c1100_r3232_, out_c3322_r3232_),
-					EmuMath::SIMD::shuffle<2, 0, 2, 0>(out_c1100_r3232_, out_c3322_r3232_)
+					EmuSIMD::shuffle<3, 1, 3, 1>(out_c1100_r1010_, out_c3322_r1010_),
+					EmuSIMD::shuffle<2, 0, 2, 0>(out_c1100_r1010_, out_c3322_r1010_),
+					EmuSIMD::shuffle<3, 1, 3, 1>(out_c1100_r3232_, out_c3322_r3232_),
+					EmuSIMD::shuffle<2, 0, 2, 0>(out_c1100_r3232_, out_c3322_r3232_)
 				);
 			}
 			else
 			{
 				return FastMatrix4x4f_CM
 				(
-					EmuMath::SIMD::shuffle<3, 2, 3, 2>(out_c1100_r1010_, out_c1100_r3232_),
-					EmuMath::SIMD::shuffle<1, 0, 1, 0>(out_c1100_r1010_, out_c1100_r3232_),
-					EmuMath::SIMD::shuffle<3, 2, 3, 2>(out_c3322_r1010_, out_c3322_r3232_),
-					EmuMath::SIMD::shuffle<1, 0, 1, 0>(out_c3322_r1010_, out_c3322_r3232_)
+					EmuSIMD::shuffle<3, 2, 3, 2>(out_c1100_r1010_, out_c1100_r3232_),
+					EmuSIMD::shuffle<1, 0, 1, 0>(out_c1100_r1010_, out_c1100_r3232_),
+					EmuSIMD::shuffle<3, 2, 3, 2>(out_c3322_r1010_, out_c3322_r3232_),
+					EmuSIMD::shuffle<1, 0, 1, 0>(out_c3322_r1010_, out_c3322_r3232_)
 				);
 			}
 		}
@@ -2698,7 +2698,7 @@ namespace EmuMath
 		{
 			const FastMatrix4x4f_CM minors_ = Minors<TransposeOutput_>();
 			__m128 mults_odd_column_ = _mm_set_ps(1.0f, -1.0f, 1.0f, -1.0f);
-			__m128 mults_even_column_ = EmuMath::SIMD::shuffle<1, 0, 1, 0>(mults_odd_column_);
+			__m128 mults_even_column_ = EmuSIMD::shuffle<1, 0, 1, 0>(mults_odd_column_);
 			return FastMatrix4x4f_CM
 			(
 				_mm_mul_ps(minors_.column0, mults_even_column_),
@@ -2727,7 +2727,7 @@ namespace EmuMath
 		[[nodiscard]] inline FastMatrix4x4f_CM Inverse() const
 		{
 			FastMatrix4x4f_CM adjugate_ = Cofactors<true>();
-			__m128 determinant_reciprocal_ = _mm_set1_ps(1.0f / EmuMath::SIMD::horizontal_vector_sum_scalar(_mm_mul_ps(adjugate_.column0, GetRow<0>())));
+			__m128 determinant_reciprocal_ = _mm_set1_ps(1.0f / EmuSIMD::horizontal_sum_scalar<float>(_mm_mul_ps(adjugate_.column0, GetRow<0>())));
 			return FastMatrix4x4f_CM
 			(
 				_mm_mul_ps(adjugate_.column0, determinant_reciprocal_),
@@ -2739,7 +2739,7 @@ namespace EmuMath
 		[[nodiscard]] inline FastMatrix4x4f_CM Inverse(float& out_determinant_) const
 		{
 			FastMatrix4x4f_CM adjugate_ = Cofactors<true>();
-			out_determinant_ = EmuMath::SIMD::horizontal_vector_sum_scalar(_mm_mul_ps(adjugate_.column0, GetRow<0>()));
+			out_determinant_ = EmuSIMD::horizontal_sum_scalar<float>(_mm_mul_ps(adjugate_.column0, GetRow<0>()));
 			__m128 determinant_reciprocal_ = _mm_set1_ps(1.0f / out_determinant_);
 			return FastMatrix4x4f_CM
 			(
@@ -2768,7 +2768,7 @@ namespace EmuMath
 		inline bool TryInverse(FastMatrix4x4f_CM& out_inverse_, float& out_determinant_) const
 		{
 			FastMatrix4x4f_CM adjugate_ = Cofactors<true>();
-			out_determinant_ = EmuMath::SIMD::horizontal_vector_sum_scalar(_mm_mul_ps(adjugate_.column0, GetRow<0>()));
+			out_determinant_ = EmuSIMD::horizontal_sum_scalar<float>(_mm_mul_ps(adjugate_.column0, GetRow<0>()));
 			if (out_determinant_ != 0.0f)
 			{
 				__m128 determinant_reciprocal_ = _mm_set1_ps(1.0f / out_determinant_);
@@ -2871,7 +2871,7 @@ namespace EmuMath
 			}
 			else
 			{
-				using rot_x_fp = typename EmuCore::TMPHelpers::first_floating_point_t<RotX_, float>;
+				using rot_x_fp = typename EmuCore::TMP::first_floating_point_t<RotX_, float>;
 				return RotationX<true>(EmuCore::Pi::DegsToRads(static_cast<rot_x_fp>(rot_x_)));
 			}
 		}
@@ -2902,7 +2902,7 @@ namespace EmuMath
 			}
 			else
 			{
-				using rot_y_fp = typename EmuCore::TMPHelpers::first_floating_point_t<RotY_, float>;
+				using rot_y_fp = typename EmuCore::TMP::first_floating_point_t<RotY_, float>;
 				return RotationY<true>(EmuCore::Pi::DegsToRads(static_cast<rot_y_fp>(rot_y_)));
 			}
 		}
@@ -2933,7 +2933,7 @@ namespace EmuMath
 			}
 			else
 			{
-				using rot_z_fp = typename EmuCore::TMPHelpers::first_floating_point_t<RotZ_, float>;
+				using rot_z_fp = typename EmuCore::TMP::first_floating_point_t<RotZ_, float>;
 				return RotationZ<true>(EmuCore::Pi::DegsToRads(static_cast<rot_z_fp>(rot_z_)));
 			}
 		}
@@ -3015,7 +3015,7 @@ namespace EmuMath
 		template<bool FovIsRads_ = true, typename FovY_, typename Near_, typename Far_, typename AspectRatio_>
 		[[nodiscard]] static inline FastMatrix4x4f_CM PerspectiveRhVK(const FovY_& fov_y_angle_, const Near_& near_, const Far_& far_, const AspectRatio_& aspect_ratio_)
 		{
-			using fov_y_fp = typename EmuCore::TMPHelpers::first_floating_point<FovY_, float>::type;
+			using fov_y_fp = typename EmuCore::TMP::first_floating_point<FovY_, float>::type;
 			if constexpr (!FovIsRads_)
 			{
 				return PerspectiveRhVK<true, fov_y_fp, Near_, Far_, AspectRatio_>
@@ -3194,18 +3194,18 @@ namespace EmuMath
 		{
 			// We use a shuffle instead of dumping values and broadcasting as it tends to be better optimised by the compiler
 			// --- NOTE: this is slower in debug compared to the broadcasting of dumped values, but faster in release
-			__m128 rhs_shuffled_ = EmuMath::SIMD::shuffle<0, 0, 0, 0>(rhs_column_);
+			__m128 rhs_shuffled_ = EmuSIMD::shuffle<0, 0, 0, 0>(rhs_column_);
 			__m128 out_ = _mm_mul_ps(column0, rhs_shuffled_);
 
 			// Repeat above for each individual column index, performing dot product additions with each step
 			// --- We use separate add and mul operations instead of fmadd since it appears to be faster in most reasonable use cases
-			rhs_shuffled_ = EmuMath::SIMD::shuffle<1, 1, 1, 1>(rhs_column_);
+			rhs_shuffled_ = EmuSIMD::shuffle<1, 1, 1, 1>(rhs_column_);
 			out_ = _mm_add_ps(out_, _mm_mul_ps(column1, rhs_shuffled_));
 
-			rhs_shuffled_ = EmuMath::SIMD::shuffle<2, 2, 2, 2>(rhs_column_);
+			rhs_shuffled_ = EmuSIMD::shuffle<2, 2, 2, 2>(rhs_column_);
 			out_ = _mm_add_ps(out_, _mm_mul_ps(column2, rhs_shuffled_));
 
-			rhs_shuffled_ = EmuMath::SIMD::shuffle<3, 3, 3, 3>(rhs_column_);
+			rhs_shuffled_ = EmuSIMD::shuffle<3, 3, 3, 3>(rhs_column_);
 			return _mm_add_ps(out_, _mm_mul_ps(column3, rhs_shuffled_));
 		}
 
@@ -3214,15 +3214,15 @@ namespace EmuMath
 		{
 			if constexpr (ExcludeRow_ == 0)
 			{
-				return EmuMath::SIMD::shuffle<1, 2, 3, 0>(val_);
+				return EmuSIMD::shuffle<1, 2, 3, 0>(val_);
 			}
 			else if constexpr (ExcludeRow_ == 1)
 			{
-				return EmuMath::SIMD::shuffle<0, 2, 3, 1>(val_);
+				return EmuSIMD::shuffle<0, 2, 3, 1>(val_);
 			}
 			else if constexpr (ExcludeRow_ == 2)
 			{
-				return EmuMath::SIMD::shuffle<0, 1, 3, 2>(val_);
+				return EmuSIMD::shuffle<0, 1, 3, 2>(val_);
 			}
 			else if constexpr (ExcludeRow_ == 3)
 			{
