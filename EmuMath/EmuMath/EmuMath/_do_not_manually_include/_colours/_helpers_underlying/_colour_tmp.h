@@ -1,7 +1,7 @@
 #ifndef EMU_MATH_COLOUR_TMP_H_INC_
 #define EMU_MATH_COLOUR_TMP_H_INC_ 1
 
-#include "../../../EmuCore/TMPHelpers/TypeConvertors.h"
+#include "../../../../EmuCore/TMPHelpers/TypeConvertors.h"
 #include <type_traits>
 
 namespace EmuMath

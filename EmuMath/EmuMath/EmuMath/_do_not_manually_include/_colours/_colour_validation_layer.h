@@ -1,230 +1,93 @@
-#ifndef EMU_MATH_COLOUR_T_H_INC_
-#define EMU_MATH_COLOUR_T_H_INC_ 1
+#ifndef EMU_MATH_COLOUR_VALIDATION_LAYER_H_INC_
+#define EMU_MATH_COLOUR_VALIDATION_LAYER_H_INC_ 1
 
-#include "ColourHelpers.h"
-#include "../../../EmuCore/Functors/Arithmetic.h"
-#include "../../../EmuCore/TMPHelpers/TypeComparators.h"
-#include "../../../EmuCore/TMPHelpers/Values.h"
-#include "../../Vector.h"
-#include <limits>
-#include <ostream>
-#include <type_traits>
+#include "_colour_t.h"
 
-namespace EmuMath
+namespace EmuMath::Helpers
 {
-	/// <summary>
-	/// <para> Colour that contains intensities for Red, Green, Blue, and optionally Alpha channels. </para>
-	/// <para> Colours that do not store an alpha provide an implicit alpha value of the value_type's maximum intensity. </para>
-	/// <para> If the provided Channel_ type is a floating-point: intensities will be considered to have the valid range 0:1. </para>
-	/// <para> If the provided Channel_ type is an integer: intensities will be considered to have the valid range range 0:std::numeric_limits&lt;Channel_&gt;::max(). </para>
-	/// </summary>
-	template<typename Channel_, bool ContainsAlpha_>
-	struct Colour
+	/// <summary> Wrapper used to form a validation layer for EmuMath colour. This is for internal EmuMath use, and should not be used outside of alias indirection. </summary>
+	template<typename Channel_, bool ContainsAlpha_, class ValidationFunc_>
+	class _colour_validation_layer
 	{
 	public:
-		static constexpr bool contains_alpha = ContainsAlpha_;
-		static constexpr std::size_t size = contains_alpha ? 4 : 3;
+		/// <summary> Functor type used for validation. Constructed on demand as compiler is likely to optimise out, and helps with the byte size of colours. </summary>
+		using validate_func = ValidationFunc_;
+		using underlying_colour = EmuMath::Colour<Channel_, ContainsAlpha_>;
+		static constexpr bool contains_alpha = underlying_colour::contains_alpha;
+		static constexpr std::size_t size = underlying_colour::size;
 
-		using value_type = Channel_;
-		using this_type = EmuMath::Colour<value_type, ContainsAlpha_>;
-		using channels_vector = EmuMath::NewVector<size, value_type>;
-		using vector_rgb_return_type = std::conditional_t<contains_alpha, EmuMath::NewVector<3, value_type>, const channels_vector&>;
-		using vector_rgba_return_type = std::conditional_t<contains_alpha, const channels_vector&, EmuMath::NewVector<4, value_type>>;
+		using value_type = typename underlying_colour::value_type;
+		using this_type = _colour_validation_layer<value_type, contains_alpha, ValidationFunc_>;
+		using channels_vector = typename underlying_colour::channels_vector;
+		using vector_rgb_return_type = typename underlying_colour::vector_rgb_return_type;
+		using vector_rgba_return_type = typename underlying_colour::vector_rgba_return_type;
 
 		static constexpr bool is_floating_point = std::is_floating_point_v<value_type>;
 		static constexpr bool is_integral = std::is_integral_v<value_type>;
-		static_assert
-		(
-			is_floating_point || is_integral,
-			"Provided a type to an EmuMath::Colour template instantiation which is neither floating point nor integral. Contained Channel_ types must meet one of these criteria."
-		);
 
-		static constexpr value_type min_intensity = value_type(0);
-		static constexpr value_type max_intensity = is_floating_point ? value_type(1) : std::numeric_limits<value_type>::max();
+		static constexpr value_type min_intensity = underlying_colour::min_intensity;
+		static constexpr value_type max_intensity = underlying_colour::max_intensity;
+		static constexpr channels_vector _default_colour = underlying_colour::_default_colour;
 
 	private:
-		[[nodiscard]] static constexpr inline channels_vector _make_default_colour()
+		/// <summary>
+		/// <para> Private constructor which can be used to copy an underlying_colour without performing validation. </para>
+		/// <para> Only for use in functions returning this_type where it is guaranteed that the output colour will be in a valid state without validation. </para>
+		/// </summary>
+		template<typename Dummy_>
+		constexpr _colour_validation_layer(const underlying_colour& safe_colour_to_set_, Dummy_&& dummy_arg_) : colour(safe_colour_to_set_)
 		{
-			if constexpr (contains_alpha)
-			{
-				return channels_vector(min_intensity, min_intensity, min_intensity, max_intensity);
-			}
-			else
-			{
-				return channels_vector(min_intensity, min_intensity, min_intensity);
-			}
 		}
-
-		template<typename R_, typename G_, typename B_>
-		[[nodiscard]] static constexpr inline channels_vector _make_colour(R_&& r_, G_&& g_, B_&& b_)
+		/// <summary>
+		/// <para> Private constructor which can be used to move an underlying_colour without performing validation. </para>
+		/// <para> Only for use in functions returning this_type where it is guaranteed that the output colour will be in a valid state without validation. </para>
+		/// </summary>
+		template<typename Dummy_, typename = std::enable_if_t<std::is_move_constructible_v<underlying_colour>>>
+		constexpr _colour_validation_layer(underlying_colour&& safe_colour_to_set_, Dummy_&& dummy_arg_) noexcept : 
+			colour(std::forward<underlying_colour>(safe_colour_to_set_))
 		{
-			if constexpr (EmuCore::TMP::are_all_static_castable_v<value_type, R_, G_, B_>)
-			{
-				if constexpr (contains_alpha)
-				{
-					return channels_vector(r_, g_, b_, max_intensity);
-				}
-				else
-				{
-					return channels_vector(r_, g_, b_);
-				}
-			}
-			else
-			{
-				static_assert(EmuCore::TMP::get_false<R_>(), "Attempted to make an EmuMath colour using at least one input channel argument that is not convertible to the colour's value type.");
-			}
-		}
-		template<typename R_, typename G_, typename B_, typename A_>
-		[[nodiscard]] static constexpr inline channels_vector _make_colour(R_&& r_, G_&& g_, B_&& b_, A_&& a_)
-		{
-			using check_type = std::conditional_t
-			<
-				contains_alpha,
-				EmuCore::TMP::are_all_static_castable<value_type, R_, G_, B_, A_>,
-				EmuCore::TMP::are_all_static_castable<value_type, R_, G_, B_>
-			>;
-			if constexpr (check_type::value)
-			{
-				if constexpr (contains_alpha)
-				{
-					return channels_vector(r_, g_, b_, a_);
-				}
-				else
-				{
-					return channels_vector(r_, g_, b_);
-				}
-			}
-			else
-			{
-				static_assert(EmuCore::TMP::get_false<R_>(), "Attempted to make an EmuMath colour using at least one input channel argument that is not convertible to the colour's value type.");
-			}
-		}
-
-		[[nodiscard]] static constexpr inline channels_vector _make_colour_from_other_channels_with_diff_alpha(const EmuMath::Colour<value_type, !contains_alpha>& to_copy_)
-		{
-			if constexpr (contains_alpha)
-			{
-				return channels_vector(to_copy_.channels.at<0>(), to_copy_.channels.at<1>(), to_copy_.channels.at<2>(), max_intensity);
-			}
-			else
-			{
-				return channels_vector(to_copy_.channels.at<0>(), to_copy_.channels.at<1>(), to_copy_.channels.at<2>());
-			}
-		}
-
-		template<typename RhsT_, bool RhsAlpha_>
-		[[nodiscard]] static constexpr inline channels_vector _make_colour_from_arbitrary_other(const EmuMath::Colour<RhsT_, RhsAlpha_>& rhs_)
-		{
-			if constexpr (std::is_same_v<value_type, RhsT_>)
-			{
-				if constexpr (contains_alpha == RhsAlpha_)
-				{
-					return rhs_.channels;
-				}
-				else
-				{
-					return _make_colour_from_other_channels_with_diff_alpha(rhs_);
-				}
-			}
-			else
-			{
-				if constexpr (contains_alpha)
-				{
-					if constexpr (RhsAlpha_)
-					{
-						return channels_vector
-						(
-							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<0>()),
-							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<1>()),
-							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<2>()),
-							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<3>())
-						);
-					}
-					else
-					{
-						return channels_vector
-						(
-							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<0>()),
-							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<1>()),
-							EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<2>()),
-							max_intensity
-						);
-					}
-				}
-				else
-				{
-					return channels_vector
-					(
-						EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<0>()),
-						EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<1>()),
-						EmuMath::Helpers::colour_convert_channel<value_type, RhsT_>(rhs_.channels.at<2>())
-					);
-				}
-			}
-		}
-
-		template<std::size_t Size_, typename VectorT_>
-		[[nodiscard]] static constexpr inline channels_vector _make_colour_from_vector(const EmuMath::NewVector<Size_, VectorT_>& channels_to_copy_)
-		{
-			if constexpr (std::is_same_v<EmuMath::NewVector<Size_, VectorT_>, channels_vector>)
-			{
-				return channels_to_copy_;
-			}
-			else
-			{
-				if constexpr (contains_alpha)
-				{
-					if constexpr (Size_ >= 4)
-					{
-						// We know we have access to all required indices, so just use at instead of theoretical get
-						return channels_vector
-						(
-							channels_to_copy_.at<0>(),
-							channels_to_copy_.at<1>(),
-							channels_to_copy_.at<2>(),
-							channels_to_copy_.at<3>()
-						);
-					}
-					else
-					{
-						// Exceptional case for vector args: Non-provided arguments for alpha are determined to mean max_intensity instead of 0
-						// --- Since theoretical gets interpret non-contained elements as 0,
-						// --- and we know there is no <3> element, we need to manually give max_intensity for the alpha
-						return channels_vector
-						(
-							EmuMath::Helpers::vector_get_theoretical<0>(channels_to_copy_),
-							EmuMath::Helpers::vector_get_theoretical<1>(channels_to_copy_),
-							EmuMath::Helpers::vector_get_theoretical<2>(channels_to_copy_),
-							max_intensity
-						);
-					}
-				}
-				else
-				{
-					return channels_vector
-					(
-						EmuMath::Helpers::vector_get_theoretical<0>(channels_to_copy_),
-						EmuMath::Helpers::vector_get_theoretical<1>(channels_to_copy_),
-						EmuMath::Helpers::vector_get_theoretical<2>(channels_to_copy_)
-					);
-				}
-			}
 		}
 
 	public:
-		static constexpr channels_vector _default_colour = _make_default_colour();
-
 #pragma region CONSTRUCTORS
 		/// <summary>
 		/// <para> Constructs a default colour with its main channel intensities set to their minimum. </para>
 		/// <para> If this colour contains an alpha channel, that channel will be set to its maximum intensity. </para>
 		/// </summary>
-		constexpr Colour() : channels(_default_colour)
+		constexpr _colour_validation_layer() : colour()
 		{
 		}
 		/// <summary> Constructs a copy of the passed colour. </summary>
 		/// <param name="to_copy_">Colour to copy.</param>
-		constexpr Colour(const this_type& to_copy_) : channels(to_copy_.channels)
+		constexpr _colour_validation_layer(const this_type& to_copy_) : colour(to_copy_.colour)
+		{
+		}
+		/// <summary> Move constructor to create a colour from moved colour data. </summary>
+		/// <param name="to_move_">Colour to move the data of into the newly constructed colour.</param>
+		constexpr _colour_validation_layer(this_type&& to_move_) noexcept : colour(std::move(to_move_.colour))
+		{
+		}
+		/// <summary> Constructs a copy of the passed colour. </summary>
+		/// <param name="to_copy_">Colour to copy.</param>
+		constexpr _colour_validation_layer(const underlying_colour& to_copy_) : colour(to_copy_)
+		{
+			validate_func()(colour);
+		}
+		/// <summary> Move constructor to create a colour from moved colour data. </summary>
+		/// <param name="to_move_">Colour to move the data of into the newly constructed colour.</param>
+		constexpr _colour_validation_layer(underlying_colour&& to_move_) noexcept : colour(std::move(to_move_))
+		{
+			validate_func()(colour);
+		}
+		/// <summary>
+		/// <para> Constructs a copy of the passed colour. </para>
+		/// <para> If this colour DOES NOT contain an explicit Alpha channel: the passed colour's Alpha channel will be ignored. </para>
+		/// <para> If this colour DOES contain an explicit Alpha channel: this colour's Alpha channel will be initialised at max_intensity. </para>
+		/// </summary>
+		/// <param name="to_copy_">Colour to copy the Red, Green, and Blue channels of.</param>
+		template<class OtherFunc_>
+		constexpr _colour_validation_layer(const EmuMath::Helpers::_colour_validation_layer<value_type, !contains_alpha, OtherFunc_>& to_copy_) :
+			colour(to_copy_.Get())
 		{
 		}
 		/// <summary>
@@ -233,33 +96,39 @@ namespace EmuMath
 		/// <para> If this colour DOES contain an explicit Alpha channel: this colour's Alpha channel will be initialised at max_intensity. </para>
 		/// </summary>
 		/// <param name="to_copy_">Colour to copy the Red, Green, and Blue channels of.</param>
-		constexpr Colour(const EmuMath::Colour<value_type, !contains_alpha>& to_copy_) :
-			channels
-			(
-				_make_colour
-				(
-					to_copy_.channels.at<0>(),
-					to_copy_.channels.at<1>(),
-					to_copy_.channels.at<2>()
-				)
-			)
+		constexpr _colour_validation_layer(const EmuMath::Colour<value_type, !contains_alpha>& to_copy_) : colour(to_copy_)
 		{
-		}
-		/// <summary> Move constructor to create a colour from moved colour data. </summary>
-		/// <param name="to_move_">Colour to move the data of into the newly constructed colour.</param>
-		constexpr Colour(this_type&& to_move_) noexcept : channels(std::move(to_move_.channels))
-		{
+			validate_func()(colour);
 		}
 		/// <summary>
 		/// <para> Creates a colour with its contained channels being a direct copy of the passed EmuMath vector. </para>
 		/// </summary>
 		/// <param name="channels_to_copy_">EmuMath vector representing channels to copy.</param>
-		explicit constexpr Colour(const channels_vector& channels_to_copy_) : channels(channels_to_copy_)
+		explicit constexpr _colour_validation_layer(const channels_vector& channels_to_copy_) : colour(channels_to_copy_)
 		{
+			validate_func()(colour);
 		}
 		/// <summary> Creates a colour by moving the passed channels vector into its stored channel data. </summary>
 		/// <param name="channels_to_move_">EmuMath vector to move into the constructed colour's channel data.</param>
-		explicit constexpr Colour(channels_vector&& channels_to_move_) noexcept : channels(channels_to_move_)
+		explicit constexpr _colour_validation_layer(channels_vector&& channels_to_move_) noexcept : colour(channels_to_move_)
+		{
+			validate_func()(colour);
+		}
+		/// <summary>
+		/// <para> Constructs a copy of the passed colour, matching intensities in each respective channel. </para>
+		/// <para> Performs any necessary conversions (e.g. converting 0:255 byte ranges to 0:1 floating-point ranges) to represent the same colour. </para>
+		/// </summary>
+		/// <typeparam name="CopyChannelType_">Type of channel contained in the passed colour to copy.</typeparam>
+		/// <param name="to_copy_">Colour to copy to the newly constructed colour.</param>
+		template
+		<
+			typename CopyChannelType_,
+			bool RhsContainsAlpha_,
+			class OtherFunc_,
+			typename = std::enable_if_t<!std::is_same_v<value_type, CopyChannelType_>>
+		>
+		explicit constexpr _colour_validation_layer(const EmuMath::Helpers::_colour_validation_layer<CopyChannelType_, RhsContainsAlpha_, OtherFunc_>& to_copy_) :
+			colour(to_copy_)
 		{
 		}
 		/// <summary>
@@ -274,9 +143,9 @@ namespace EmuMath
 			bool RhsContainsAlpha_,
 			typename = std::enable_if_t<!std::is_same_v<value_type, CopyChannelType_>>
 		>
-		explicit constexpr Colour(const EmuMath::Colour<CopyChannelType_, RhsContainsAlpha_>& to_copy_) :
-			channels(_make_colour_from_arbitrary_other<CopyChannelType_, RhsContainsAlpha_>(to_copy_))
+		explicit constexpr _colour_validation_layer(const EmuMath::Colour<CopyChannelType_, RhsContainsAlpha_>& to_copy_) : colour(to_copy_)
 		{
+			validate_func()(colour);
 		}
 		/// <summary>
 		/// <para> Constructs a colour with its Red, Green, and Blue channels set via the passed r_, g_, and b_ values respectively. </para>
@@ -289,8 +158,9 @@ namespace EmuMath
 		/// <param name="g_">Value to initiaalise this colour's Green channel via.</param>
 		/// <param name="b_">Value to initiaalise this colour's Blue channel via.</param>
 		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMP::are_all_static_castable_v<value_type, R_, G_, B_>>>
-		constexpr Colour(R_&& r_, G_&& g_, B_&& b_) : channels(_make_colour(r_, g_, b_))
+		constexpr _colour_validation_layer(R_&& r_, G_&& g_, B_&& b_) : colour(r_, g_, b_)
 		{
+			validate_func()(colour);
 		}
 		/// <summary>
 		/// <para> Constructs a colour with its Red, Green, Blue, and Alpha channels set via the passed r_, g_, b_, and a_ values respectively. </para>
@@ -312,8 +182,9 @@ namespace EmuMath
 			typename A_,
 			typename OnlyAvailableWith4Channels_ = std::enable_if_t<EmuCore::TMP::are_all_static_castable_v<value_type, R_, G_, B_, A_> && contains_alpha>
 		>
-		constexpr Colour(R_&& r_, G_&& g_, B_&& b_, A_&& a_) : channels(_make_colour(r_, g_, b_, a_))
+		constexpr _colour_validation_layer(R_&& r_, G_&& g_, B_&& b_, A_&& a_) : colour(r_, g_, b_, a_)
 		{
+			validate_func()(colour);
 		}
 		/// <summary>
 		/// <para> Constructs a colour whichz copies the RGB channels of the passed colour, and initialises its Alpha channel as a custom provided value. </para>
@@ -328,15 +199,9 @@ namespace EmuMath
 			typename A_,
 			typename OnlyAvailableWith4Channels_ = std::enable_if_t<contains_alpha && EmuCore::TMP::are_all_static_castable_v<value_type, ToCopyChannel_, A_>>
 		>
-		constexpr Colour(const EmuMath::Colour<ToCopyChannel_, ToCopyContainsAlpha_>& to_copy_rgb_, A_&& a_) :
-			channels
-			(
-				EmuMath::Helpers::colour_convert_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<0>()),
-				EmuMath::Helpers::colour_convert_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<1>()),
-				EmuMath::Helpers::colour_convert_channel<value_type, ToCopyChannel_>(to_copy_rgb_.at<2>()),
-				static_cast<value_type>(a_)
-			)
+		constexpr _colour_validation_layer(const EmuMath::Colour<ToCopyChannel_, ToCopyContainsAlpha_>& to_copy_rgb_, A_&& a_) : colour(to_copy_rgb_, a_)
 		{
+			validate_func()(colour);
 		}
 #pragma endregion
 
@@ -349,28 +214,7 @@ namespace EmuMath
 		template<std::size_t Index_>
 		[[nodiscard]] constexpr inline value_type at() const
 		{
-			if constexpr (Index_ <= 3)
-			{
-				if constexpr (contains_alpha)
-				{
-					return channels.at<Index_>();
-				}
-				else
-				{
-					if constexpr (Index_ != 3)
-					{
-						return channels.at<Index_>();
-					}
-					else
-					{
-						return max_intensity;
-					}
-				}
-			}
-			else
-			{
-				static_assert(EmuCore::TMP::get_false<std::size_t, Index_>(), "Attempted to access an invalid channel index within an EmuMath Colour.");
-			}
+			return colour.at<Index_>();
 		}
 
 		/// <summary> 
@@ -380,36 +224,43 @@ namespace EmuMath
 		/// <returns>Copy of the channel value at the provided index within this Colour's channels.</returns>
 		[[nodiscard]] constexpr inline value_type at(const std::size_t index_) const
 		{
-			return channels.at(index_);
+			return colour.at(index_);
 		}
 		[[nodiscard]] constexpr inline value_type operator[](const std::size_t index_) const
 		{
-			return channels[index_];
+			return colour[index_];
 		}
 
 		/// <summary>Returns a copy of this colour's Red channel.</summary>
 		/// <returns>Copy of this colour's Red channel.</returns>
 		[[nodiscard]] constexpr inline value_type R() const
 		{
-			return at<0>();
+			return colour.R();
 		}
 		/// <summary>Returns a copy of this colour's Green channel.</summary>
 		/// <returns>Copy of this colour's Green channel.</returns>
 		[[nodiscard]] constexpr inline value_type G() const
 		{
-			return at<1>();
+			return colour.G();
 		}
 		/// <summary>Returns a copy of this colour's Blue channel.</summary>
 		/// <returns>Copy of this colour's Blue channel.</returns>
 		[[nodiscard]] constexpr inline value_type B() const
 		{
-			return at<2>();
+			return colour.B();
 		}
 		/// <summary>Returns a copy of this colour's Alpha channel.</summary>
 		/// <returns>Copy of this colour's Alpha channel. If this colour type does not contain an explicit Alpha value, this will always be max_intensity.</returns>
 		[[nodiscard]] constexpr inline value_type A() const
 		{
-			return at<3>();
+			return colour.A();
+		}
+
+		/// <summary>Provides read-only access to the colour wrapped by this validation layer.</summary>
+		/// <returns>Copy of the underlying EmuMath Colour stored within this item.</returns>
+		[[nodiscard]] constexpr inline const underlying_colour& Get() const
+		{
+			return colour;
 		}
 #pragma endregion
 
@@ -419,28 +270,28 @@ namespace EmuMath
 		template<typename R_, typename = std::enable_if_t<EmuCore::TMP::is_static_castable_v<R_, value_type>>>
 		constexpr inline void R(R_&& r_)
 		{
-			channels.at<0>() = static_cast<value_type>(r_);
+			colour.R(validate_func()(r_));
 		}
 		/// <summary> Sets this colour's Green channel to the passed value. </summary>
 		/// <param name="g_">Value to set this colour's Green channel to. This will not be modified.</param>
 		template<typename G_, typename = std::enable_if_t<EmuCore::TMP::is_static_castable_v<G_, value_type>>>
 		constexpr inline void G(G_&& g_)
 		{
-			channels.at<1>() = static_cast<value_type>(g_);
+			colour.G(validate_func()(g_));
 		}
 		/// <summary> Sets this colour's Blue channel to the passed value. </summary>
 		/// <param name="b_">Value to set this colour's Blue channel to. This will not be modified.</param>
 		template<typename B_, typename = std::enable_if_t<EmuCore::TMP::is_static_castable_v<B_, value_type>>>
 		constexpr inline void B(B_&& b_)
 		{
-			channels.at<2>() = static_cast<value_type>(b_);
+			colour.B(validate_func()(b_));
 		}
 		/// <summary> Sets this colour's Alpha channel to the passed value. Only available if this colour contains an explicit Alpha channel. </summary>
 		/// <param name="a_">Value to set this colour's Alpha channel to. This will not be modified.</param>
 		template<typename A_, typename MayOnlyModifyAlphaIfContained_ = std::enable_if_t<EmuCore::TMP::is_static_castable_v<A_, value_type> && contains_alpha>>
 		constexpr inline void A(A_&& a_)
 		{
-			channels.at<3>() = static_cast<value_type>(a_);
+			colour.A(validate_func()(a_));
 		}
 
 		/// <summary> Shorthand to set via the R, G, and B functions with the respective provided arguments. </summary>
@@ -451,9 +302,10 @@ namespace EmuMath
 		template<typename R_, typename G_, typename B_, typename = std::enable_if_t<EmuCore::TMP::are_all_static_castable_v<value_type, R_, G_, B_>>>
 		constexpr inline this_type& Set(R_&& r_, G_&& g_, B_&& b_)
 		{
-			R(r_);
-			G(g_);
-			B(b_);
+			validate_func validate_ = validate_func();
+			colour.R(validate_(r_));
+			colour.G(validate_(g_));
+			colour.B(validate_(b_));
 			return *this;
 		}
 		/// <summary> 
@@ -475,10 +327,11 @@ namespace EmuMath
 		>
 		constexpr inline this_type& Set(R_&& r_, G_&& g_, B_&& b_, A_&& a_)
 		{
-			R(r_);
-			G(g_);
-			B(b_);
-			A(a_);
+			validate_func validate_ = validate_func();
+			colour.R(validate_(r_));
+			colour.G(validate_(g_));
+			colour.B(validate_(b_));
+			colour.A(validate_(a_));
 			return *this;
 		}
 #pragma endregion
@@ -487,101 +340,150 @@ namespace EmuMath
 		template<bool IncludeAlpha_, typename rhs_contained_type, bool RhsContainsAlpha_>
 		[[nodiscard]] constexpr inline bool operator==(const EmuMath::Colour<rhs_contained_type, RhsContainsAlpha_>& rhs_) const
 		{
-			return EmuMath::Helpers::colour_cmp_equal<IncludeAlpha_>(*this, rhs_);
+			return colour.operator==<IncludeAlpha_, rhs_contained_type, RhsContainsAlpha_>(rhs_);
 		}
 		template<typename rhs_contained_type, bool RhsContainsAlpha_>
 		[[nodiscard]] constexpr inline bool operator==(const EmuMath::Colour<rhs_contained_type, RhsContainsAlpha_>& rhs_) const
 		{
-			return EmuMath::Helpers::colour_cmp_equal<contains_alpha || RhsContainsAlpha_>(*this, rhs_);
+			return colour.operator==<rhs_contained_type, RhsContainsAlpha_>(rhs_);
+		}
+		template<bool IncludeAlpha_, typename rhs_contained_type, bool RhsContainsAlpha_, class RhsValidationFunc_>
+		[[nodiscard]] constexpr inline bool operator==
+		(
+			const EmuMath::Helpers::_colour_validation_layer<rhs_contained_type, RhsContainsAlpha_, RhsValidationFunc_>& rhs_
+		) const
+		{
+			return colour.operator==<IncludeAlpha_>(rhs_.Get());
+		}
+		template<typename rhs_contained_type, bool RhsContainsAlpha_, class RhsValidationFunc_>
+		[[nodiscard]] constexpr inline bool operator==
+		(
+			const EmuMath::Helpers::_colour_validation_layer<rhs_contained_type, RhsContainsAlpha_, RhsValidationFunc_>& rhs_
+		) const
+		{
+			return colour.operator==(rhs_.Get());
 		}
 
 		template<bool IncludeAlpha_, typename rhs_contained_type, bool RhsContainsAlpha_>
 		[[nodiscard]] constexpr inline bool operator!=(const EmuMath::Colour<rhs_contained_type, RhsContainsAlpha_>& rhs_) const
 		{
-			return EmuMath::Helpers::colour_cmp_not_equal<IncludeAlpha_>(*this, rhs_);
+			return colour.operator!=<IncludeAlpha_>(rhs_);
 		}
 		template<typename rhs_contained_type, bool RhsContainsAlpha_>
 		[[nodiscard]] constexpr inline bool operator!=(const EmuMath::Colour<rhs_contained_type, RhsContainsAlpha_>& rhs_) const
 		{
-			return EmuMath::Helpers::colour_cmp_not_equal<contains_alpha || RhsContainsAlpha_>(*this, rhs_);
+			return colour.operator!=(rhs_);
+		}
+		template<bool IncludeAlpha_, typename rhs_contained_type, bool RhsContainsAlpha_, class RhsValidationFunc_>
+		[[nodiscard]] constexpr inline bool operator!=
+		(
+			const EmuMath::Helpers::_colour_validation_layer<rhs_contained_type, RhsContainsAlpha_, RhsValidationFunc_>& rhs_
+		) const
+		{
+			return colour.operator!=<IncludeAlpha_>(rhs_.Get());
+		}
+		template<typename rhs_contained_type, bool RhsContainsAlpha_, class RhsValidationFunc_>
+		[[nodiscard]] constexpr inline bool operator!=
+		(
+			const EmuMath::Helpers::_colour_validation_layer<rhs_contained_type, RhsContainsAlpha_, RhsValidationFunc_>& rhs_
+		) const
+		{
+			return colour.operator!=(rhs_.Get());
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		[[nodiscard]] constexpr inline this_type operator+(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::colour_add<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+			return this_type(colour.operator+<IncludeAlpha_>(_get_rhs(rhs_)));
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		[[nodiscard]] constexpr inline this_type operator-(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::colour_subtract<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+			return this_type(colour.operator-<IncludeAlpha_>(_get_rhs(rhs_)));
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		[[nodiscard]] constexpr inline this_type operator*(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::colour_multiply<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+			return this_type(colour.operator*<IncludeAlpha_>(_get_rhs(rhs_)));
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		[[nodiscard]] constexpr inline this_type operator/(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::colour_divide<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+			return this_type(colour.operator/<IncludeAlpha_>(_get_rhs(rhs_)));
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		[[nodiscard]] constexpr inline this_type operator%(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::colour_mod<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+			return this_type(colour.operator%<IncludeAlpha_>(_get_rhs(rhs_)));
 		}
 #pragma endregion
 
 #pragma region NON_CONST_OPERATORS
 		constexpr inline this_type& operator=(const this_type& rhs_)
 		{
-			channels = rhs_.channels;
+			colour = rhs_.colour;
 			return *this;
 		}
 		constexpr inline this_type& operator=(this_type&& rhs_) noexcept
 		{
-			channels = std::move(rhs_.channels);
+			colour = std::move(rhs_.colour);
+			return *this;
+		}
+		constexpr inline this_type& operator=(const underlying_colour& rhs_)
+		{
+			colour = rhs_;
+			validate_func()(colour);
+			return *this;
+		}
+		constexpr inline this_type& operator=(underlying_colour&& rhs_) noexcept
+		{
+			colour = std::move(rhs_);
+			validate_func()(colour);
 			return *this;
 		}
 		constexpr inline this_type& operator=(const EmuMath::Colour<value_type, !contains_alpha>& rhs_)
 		{
-			_set_channels_from_other_channels_vector(rhs_.channels);
+			colour = rhs_;
 			return *this;
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		constexpr inline this_type& operator+=(const Rhs_& rhs_)
 		{
-			return this->operator=(EmuMath::Helpers::colour_add<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_));
+			validate_func()(colour.operator+=<IncludeAlpha_>(_get_rhs(rhs_)));
+			return *this;
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		constexpr inline this_type& operator-=(const Rhs_& rhs_)
 		{
-			return this->operator=(EmuMath::Helpers::colour_subtract<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_));
+			validate_func()(colour.operator-=<IncludeAlpha_>(_get_rhs(rhs_)));
+			return *this;
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		constexpr inline this_type& operator*=(const Rhs_& rhs_)
 		{
-			return this->operator=(EmuMath::Helpers::colour_multiply<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_));
+			validate_func()(colour.operator*=<IncludeAlpha_>(_get_rhs(rhs_)));
+			return *this;
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		constexpr inline this_type& operator/=(const Rhs_& rhs_)
 		{
-			return this->operator=(EmuMath::Helpers::colour_divide<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_));
+			validate_func()(colour.operator/=<IncludeAlpha_>(_get_rhs(rhs_)));
+			return *this;
 		}
 
 		template<bool IncludeAlpha_ = contains_alpha, class Rhs_>
 		constexpr inline this_type& operator%=(const Rhs_& rhs_)
 		{
-			return this->operator=(EmuMath::Helpers::colour_mod<this_type, IncludeAlpha_, this_type, Rhs_>(*this, rhs_));
+			validate_func()(colour.operator%=<IncludeAlpha_>(_get_rhs(rhs_)));
+			return *this;
 		}
 #pragma endregion
 
@@ -597,14 +499,20 @@ namespace EmuMath
 		/// <param name="rhs_">Item to add to this colour as described above.</param>
 		/// <returns>Copy of this colour with the provided rhs_ added to it.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Add(const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func> Add(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::colour_add<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+			return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>
+			(
+				colour.Add<out_contained_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+			);
 		}
 		template<bool OutContainsAlpha_, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> Add(const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline _colour_validation_layer<value_type, OutContainsAlpha_, validate_func> Add(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::colour_add<EmuMath::Colour<value_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+			return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>
+			(
+				colour.Add<value_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+			);
 		}
 
 		/// <summary>
@@ -618,14 +526,20 @@ namespace EmuMath
 		/// <param name="rhs_">Item to subtract from this colour as described above.</param>
 		/// <returns>Copy of this colour with the provided rhs_ subtracted from it.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Subtract(const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func> Subtract(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::colour_subtract<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+			return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>
+			(
+				colour.Subtract<out_contained_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+			);
 		}
 		template<bool OutContainsAlpha_, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> Subtract(const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline _colour_validation_layer<value_type, OutContainsAlpha_, validate_func> Subtract(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::colour_subtract<EmuMath::Colour<value_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+			return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>
+			(
+				colour.Subtract<value_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+			);
 		}
 
 		/// <summary>
@@ -642,14 +556,20 @@ namespace EmuMath
 		/// <param name="rhs_">Item to multiply this colour by as described above.</param>
 		/// <returns>Copy of this colour multiplied by the provided rhs_.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Multiply(const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func> Multiply(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::colour_multiply<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+			return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>
+			(
+				colour.Multiply<out_contained_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+			);
 		}
 		template<bool OutContainsAlpha_, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> Multiply(const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline _colour_validation_layer<value_type, OutContainsAlpha_, validate_func> Multiply(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::colour_multiply<EmuMath::Colour<value_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+			return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>
+			(
+				colour.Multiply<value_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+			);
 		}
 
 		/// <summary>
@@ -666,14 +586,20 @@ namespace EmuMath
 		/// <param name="rhs_">Item to divide this colour by as described above.</param>
 		/// <returns>Copy of this colour divided by the provided rhs_.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Divide(const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func> Divide(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::colour_divide<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+			return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>
+			(
+				colour.Divide<out_contained_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+			);
 		}
 		template<bool OutContainsAlpha_, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> Divide(const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline _colour_validation_layer<value_type, OutContainsAlpha_, validate_func> Divide(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::colour_divide<EmuMath::Colour<value_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+			return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>
+			(
+				colour.Divide<value_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+			);
 		}
 
 		/// <summary>
@@ -690,14 +616,20 @@ namespace EmuMath
 		/// <param name="rhs_">Item to divide this colour by as described above.</param>
 		/// <returns>Copy of this colour resulting from a modulo division by the provided rhs_.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Mod(const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func> Mod(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::colour_mod<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+			return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>
+			(
+				colour.Mod<out_contained_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+			);
 		}
 		template<bool OutContainsAlpha_, bool IncludeAlpha_ = OutContainsAlpha_, class Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> Mod(const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline _colour_validation_layer<value_type, OutContainsAlpha_, validate_func> Mod(const Rhs_& rhs_) const
 		{
-			return EmuMath::Helpers::colour_mod<EmuMath::Colour<value_type, OutContainsAlpha_>, IncludeAlpha_, this_type, Rhs_>(*this, rhs_);
+			return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>
+			(
+				colour.Mod<value_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(rhs_))
+			);
 		}
 
 		/// <summary>
@@ -713,14 +645,20 @@ namespace EmuMath
 		/// <param name="t_">Weightings appearing as t in the equation `a + ((b - a) * t), used as described above.</param>
 		/// <returns>Copy of this colour linearly interpolated with the provided colour and weightings, resulting from the equation `a + ((b - a) * t)`.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha, bool IncludeAlpha_ = OutContainsAlpha_, class ColourB_, class T_>
-		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Lerp(const ColourB_& b_, const T_& t_) const
+		[[nodiscard]] constexpr inline _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func> Lerp(const ColourB_& b_, const T_& t_) const
 		{
-			return EmuMath::Helpers::colour_lerp<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, IncludeAlpha_, this_type, ColourB_, T_>(*this, b_, t_);
+			return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>
+			(
+				colour.Lerp<out_contained_type, OutContainsAlpha_, IncludeAlpha_>(_get_rhs(b_), _get_rhs(t_))
+			);
 		}
 		template<bool OutContainsAlpha_, bool IncludeAlpha_ = OutContainsAlpha_, class ColourB_, class T_>
-		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> Lerp(const ColourB_& b_, const T_& t_) const
+		[[nodiscard]] constexpr inline _colour_validation_layer<value_type, OutContainsAlpha_, validate_func> Lerp(const ColourB_& b_, const T_& t_) const
 		{
-			return EmuMath::Helpers::colour_lerp<EmuMath::Colour<value_type, OutContainsAlpha_>, IncludeAlpha_, this_type, ColourB_, T_>(*this, b_, t_);
+			return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>
+			(
+				colour.Lerp<OutContainsAlpha_, IncludeAlpha_>(_get_rhs(b_), _get_rhs(t_))
+			);
 		}
 #pragma endregion
 
@@ -729,44 +667,48 @@ namespace EmuMath
 		/// <typeparam name="out_contained_type">Type to be contained in the output colour.</typeparam>
 		/// <returns>This colour converted to one containing the provided channel type.</returns>
 		template<typename out_contained_type, bool OutContainsAlpha_ = contains_alpha>
-		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> As() const
+		[[nodiscard]] constexpr inline EmuMath::Helpers::_colour_validation_layer<out_contained_type, OutContainsAlpha_, ValidationFunc_> As() const
 		{
-			return EmuMath::Colour<out_contained_type, OutContainsAlpha_>(*this);
+			return EmuMath::Helpers::_colour_validation_layer<out_contained_type, OutContainsAlpha_, ValidationFunc_>(*this);
+		}
+
+		/// <summary> 
+		///	Shorthand to construct this colour as an alternate channel representation, outside of a validation wrapper. 
+		///	May optionally change if output contains an Alpha channel.
+		/// </summary>
+		/// <typeparam name="out_contained_type">Type to be contained in the output colour.</typeparam>
+		/// <returns>This colour converted to one containing the provided channel type, without a validation layer.</returns>
+		template<typename out_contained_type, bool OutContainsAlpha_ = contains_alpha>
+		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> AsUnvalidated() const
+		{
+			return colour.As<out_contained_type, OutContainsAlpha_>();
 		}
 
 		/// <summary> Provides read-only access to this Colour's channels as an EmuMath Vector. </summary>
 		/// <returns> Constant reference to this colour's underlying channels. </returns>
 		[[nodiscard]] constexpr inline const channels_vector& AsVector() const
 		{
-			return channels;
+			return colour.AsVector();
 		}
 
 		/// <summary> Provides read-only access to this Colour's RGB channels as an EmuMath Vector. </summary>
 		/// <returns> EmuMath Vector representation of this colour's underlying channels in RGB format. </returns>
 		[[nodiscard]] constexpr inline vector_rgb_return_type AsVectorRGB() const
 		{
-			if constexpr (contains_alpha)
-			{
-				return vector_rgb_return_type(channels.at<0>(), channels.at<1>(), channels.at<2>());
-			}
-			else
-			{
-				return channels;
-			}
+			return colour.AsVectorRGB();
 		}
 
 		/// <summary> Provides read-only access to this Colour's RGBA channels as an EmuMath Vector. </summary>
 		/// <returns> EmuMath Vector representation of this colour's underlying channels in RGBA format. </returns>
 		[[nodiscard]] constexpr inline vector_rgba_return_type AsVectorRGBA() const
 		{
-			if constexpr (contains_alpha)
-			{
-				return channels;
-			}
-			else
-			{
-				return vector_rgba_return_type(channels.at<0>(), channels.at<1>(), channels.at<2>(), max_intensity);
-			}
+			return colour.AsVectorRGBA();
+		}
+
+		template<typename OutChannel_, bool OutContainsAlpha_>
+		explicit constexpr inline operator EmuMath::Colour<OutChannel_, OutContainsAlpha_>() const
+		{
+			return EmuMath::Colour<OutChannel_, OutContainsAlpha_>(colour);
 		}
 #pragma endregion
 
@@ -783,8 +725,9 @@ namespace EmuMath
 		template<bool IncludeAlpha_ = false>
 		[[nodiscard]] constexpr inline this_type Inverse() const
 		{
-			return EmuMath::Helpers::colour_invert<IncludeAlpha_, this_type>(*this);
+			return this_type(colour.Inverse<IncludeAlpha_>(), 0);
 		}
+
 		/// <summary>
 		/// <para> Inverts the channels of this colour. </para>
 		/// <para> Inverted channels can be summarised as "channel[x]` = max_intensity - channel[x]". </para>
@@ -796,47 +739,86 @@ namespace EmuMath
 		template<bool IncludeAlpha_ = false>
 		constexpr inline void Invert()
 		{
-			EmuMath::Helpers::colour_invert<IncludeAlpha_, this_type>(*this, *this);
+			// If the colour is already valid, inversion will not make it invalid
+			colour.Invert();
 		}
 
-		/// <summary> Returns a copy of this colour with all of its channels wrapped into a valid range. </summary>
+		/// <summary> 
+		/// <para> Returns a copy of this colour with all of its channels wrapped into a valid range. </para>
+		/// <para> As this colour includes a validation layer, it is assumed to always be valid and as such this function will simply return a copy of this colour. </para>
+		/// </summary>
 		/// <typeparam name="out_contained_type">Type used to store the output colour's channels. Defaults to this Colour's value_type./</typeparam>
 		/// <returns>Copy of this colour with all channels wrapped into a valid intensity range.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha>
-		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Wrapped() const
+		[[nodiscard]] constexpr inline _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func> Wrapped() const
 		{
-			return EmuMath::Helpers::colour_wrap<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, this_type>(*this);
+			if constexpr (std::is_same_v<out_contained_type, value_type> && OutContainsAlpha_ == contains_alpha)
+			{
+				return this_type(colour, 0);
+			}
+			else
+			{
+				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour);
+			}
 		}
 		template<bool OutContainsAlpha_>
 		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> Wrapped() const
 		{
-			return EmuMath::Helpers::colour_wrap<EmuMath::Colour<value_type, OutContainsAlpha_>, this_type>(*this);
+			if constexpr (OutContainsAlpha_ == contains_alpha)
+			{
+				return this_type(colour, 0);
+			}
+			else
+			{
+				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour);
+			}
 		}
 
-		/// <summary> Wraps the stored channels within this colour instance so they are in a valid intensity range. </summary>
+		/// <summary> 
+		/// <para> Wraps the stored channels within this colour instance so they are in a valid intensity range. </para>
+		/// <para> As this colour includes a validation layer, it is assumed to always be valid and as such this function will do nothing. </para>
+		/// </summary>
 		constexpr inline void Wrap()
 		{
-			EmuMath::Helpers::colour_wrap<this_type, this_type>(*this, *this);
 		}
 
-		/// <summary> Returns a copy of this colour with all of its channels clamped into the range min_intensity:max_intensity. </summary>
+		/// <summary> 
+		/// <para> Returns a copy of this colour with all of its channels clamped into the range min_intensity:max_intensity. </para>
+		/// <para> As this colour includes a validation layer, it is assumed to always be valid and as such this function will simply return a copy of this colour. </para>
+		/// </summary>
 		/// <typeparam name="out_contained_type">Type used to store the output colour's channels. Defaults to this Colour's value_type./</typeparam>
 		/// <returns>Copy of this colour with all channels clamped into a valid intensity range.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha>
 		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> Clamped() const
 		{
-			return EmuMath::Helpers::colour_clamp<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, this_type>(*this);
+			if constexpr (std::is_same_v<out_contained_type, value_type> && OutContainsAlpha_ == contains_alpha)
+			{
+				return this_type(colour, 0);
+			}
+			else
+			{
+				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour);
+			}
 		}
 		template<bool OutContainsAlpha_>
 		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> Clamped() const
 		{
-			return EmuMath::Helpers::colour_clamp<EmuMath::Colour<value_type, OutContainsAlpha_>, this_type>(*this);
+			if constexpr (OutContainsAlpha_ == contains_alpha)
+			{
+				return this_type(colour, 0);
+			}
+			else
+			{
+				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour);
+			}
 		}
 
-		/// <summary> Clamps the stored channels within this colour instance into the range min_intensity:max_intensity. </summary>
-		constexpr inline void Clamp()
+		/// <summary>
+		/// <para> Clamps the stored channels within this colour instance into the range min_intensity:max_intensity. </para>
+		/// <para> As this colour includes a validation layer, it is assumed to always be valid and as such this function will do nothing. </para>
+		/// </summary>
+		inline void Clamp()
 		{
-			EmuMath::Helpers::colour_clamp<this_type, this_type>(*this, *this);
 		}
 
 		/// <summary> Finds the lowest-valued channel within this Colour. Excludes Alpha by default, but may include it if provided a `true` template argument. </summary>
@@ -844,7 +826,7 @@ namespace EmuMath
 		template<bool IncludeAlpha_ = false>
 		[[nodiscard]] constexpr inline value_type Min() const
 		{
-			return EmuMath::Helpers::colour_min<value_type, IncludeAlpha_, this_type>(*this);
+			return colour.Min<IncludeAlpha_>();
 		}
 
 		/// <summary> Finds the highest-valued channel within this Colour. Excludes Alpha by default, but may include it if provided a `true` template argument. </summary>
@@ -852,151 +834,209 @@ namespace EmuMath
 		template<bool IncludeAlpha_ = false>
 		[[nodiscard]] constexpr inline value_type Max() const
 		{
-			return EmuMath::Helpers::colour_max<value_type, IncludeAlpha_, this_type>(*this);
+			return colour.Max<IncludeAlpha_>();
 		}
 
 		/// <summary> Returns a copy of this colour converted to greyscale using a basic average of its RGB channels. </summary>
 		/// <returns>Copy of this channel with each channel set to the mean average of this colour's RGB channels.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha>
-		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> GreyscaleBasic() const
+		[[nodiscard]] constexpr inline _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func> GreyscaleBasic() const
 		{
-			return EmuMath::Helpers::colour_greyscale_basic_average<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, this_type>(*this);
+			// APPLIES TO ALL GREYSCALE FUNCTIONS UNLESS STATED OTHERWISE IN BODY:
+			// --- As this wrapper is assumed to keep its contained colour valid, the result of grayscaling will also be valid
+			// --- As such, we skip validation whenever possible.
+			if constexpr (std::is_same_v<out_contained_type, value_type> && OutContainsAlpha_ == contains_alpha)
+			{
+				return this_type(colour.GreyscaleBasic<out_contained_type, OutContainsAlpha_>(), 0);
+			}
+			else
+			{
+				return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>(colour.GreyscaleBasic<out_contained_type, OutContainsAlpha_>());
+			}
 		}
 		template<bool OutContainsAlpha_>
-		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> GreyscaleBasic() const
+		[[nodiscard]] constexpr inline _colour_validation_layer<value_type, OutContainsAlpha_, validate_func> GreyscaleBasic() const
 		{
-			return EmuMath::Helpers::colour_greyscale_basic_average<EmuMath::Colour<value_type, OutContainsAlpha_>, this_type>(*this);
+			if constexpr (OutContainsAlpha_ == contains_alpha)
+			{
+				return this_type(colour.GreyscaleBasic<OutContainsAlpha_>(), 0);
+			}
+			else
+			{
+				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour.GreyscaleBasic<OutContainsAlpha_>());
+			}
 		}
 
 		/// <summary> Returns a copy of this colour converted to greyscale using a luminance average of its RGB channels. </summary>
 		/// <returns>Copy of this channel with each channel set to a scaled luminance average of this colour's RGB channels.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha>
-		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> GreyscaleLuminance() const
+		[[nodiscard]] constexpr inline _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func> GreyscaleLuminance() const
 		{
-			return EmuMath::Helpers::colour_greyscale_luminance_average<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, this_type>(*this);
+			if constexpr (std::is_same_v<out_contained_type, value_type> && OutContainsAlpha_ == contains_alpha)
+			{
+				return this_type(colour.GreyscaleLuminance<out_contained_type, OutContainsAlpha_>(), 0);
+			}
+			else
+			{
+				return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>(colour.GreyscaleLuminance<out_contained_type, OutContainsAlpha_>());
+			}
 		}
 		template<bool OutContainsAlpha_>
-		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> GreyscaleLuminance() const
+		[[nodiscard]] constexpr inline _colour_validation_layer<value_type, OutContainsAlpha_, validate_func> GreyscaleLuminance() const
 		{
-			return EmuMath::Helpers::colour_greyscale_luminance_average<EmuMath::Colour<value_type, OutContainsAlpha_>, this_type>(*this);
+			if constexpr (OutContainsAlpha_ == contains_alpha)
+			{
+				return this_type(colour.GreyscaleLuminance<OutContainsAlpha_>(), 0);
+			}
+			else
+			{
+				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour.GreyscaleLuminance<OutContainsAlpha_>());
+			}
 		}
 
 		/// <summary> Returns a copy of this colour converted to greyscale via desaturation. </summary>
 		/// <returns>Copy of this channel with each channel set to a value resulting from desaturating this colour's RGB channels.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha>
-		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> GreyscaleDesaturate() const
+		[[nodiscard]] constexpr inline _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func> GreyscaleDesaturate() const
 		{
-			return EmuMath::Helpers::colour_greyscale_desaturate<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, this_type>(*this);
+			if constexpr (std::is_same_v<out_contained_type, value_type> && OutContainsAlpha_ == contains_alpha)
+			{
+				return this_type(colour.GreyscaleDesaturate<out_contained_type, OutContainsAlpha_>(), 0);
+			}
+			else
+			{
+				return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>(colour.GreyscaleDesaturate<out_contained_type, OutContainsAlpha_>());
+			}
 		}
 		template<bool OutContainsAlpha_>
-		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> GreyscaleDesaturate() const
+		[[nodiscard]] constexpr inline _colour_validation_layer<value_type, OutContainsAlpha_, validate_func> GreyscaleDesaturate() const
 		{
-			return EmuMath::Helpers::colour_greyscale_desaturate<EmuMath::Colour<value_type, OutContainsAlpha_>, this_type>(*this);
+			if constexpr (OutContainsAlpha_ == contains_alpha)
+			{
+				return this_type(colour.GreyscaleDesaturate<OutContainsAlpha_>(), 0);
+			}
+			else
+			{
+				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour.GreyscaleDesaturate<OutContainsAlpha_>());
+			}
 		}
 
 		/// <summary> Returns a copy of this colour converted to greyscale via its lowest RGB channel. </summary>
 		/// <returns>Copy of this channel with each channel set to the value of this colour's lowest RGB channel.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha>
-		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> GreyscaleMin() const
+		[[nodiscard]] constexpr inline _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func> GreyscaleMin() const
 		{
-			return EmuMath::Helpers::colour_greyscale_decompose_min<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, this_type>(*this);
+			if constexpr (std::is_same_v<out_contained_type, value_type> && OutContainsAlpha_ == contains_alpha)
+			{
+				return this_type(colour.GreyscaleMin<out_contained_type, OutContainsAlpha_>(), 0);
+			}
+			else
+			{
+				return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>(colour.GreyscaleMin<out_contained_type, OutContainsAlpha_>());
+			}
 		}
 		template<bool OutContainsAlpha_>
-		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> GreyscaleMin() const
+		[[nodiscard]] constexpr inline _colour_validation_layer<value_type, OutContainsAlpha_, validate_func> GreyscaleMin() const
 		{
-			return EmuMath::Helpers::colour_greyscale_decompose_min<EmuMath::Colour<value_type, OutContainsAlpha_>, this_type>(*this);
+			if constexpr (OutContainsAlpha_ == contains_alpha)
+			{
+				return this_type(colour.GreyscaleMin<OutContainsAlpha_>(), 0);
+			}
+			else
+			{
+				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour.GreyscaleMin<OutContainsAlpha_>());
+			}
 		}
 
 		/// <summary> Returns a copy of this colour converted to greyscale via its highest RGB channel. </summary>
 		/// <returns>Copy of this channel with each channel set to the value of this colour's highest RGB channel.</returns>
 		template<typename out_contained_type = value_type, bool OutContainsAlpha_ = contains_alpha>
-		[[nodiscard]] constexpr inline EmuMath::Colour<out_contained_type, OutContainsAlpha_> GreyscaleMax() const
+		[[nodiscard]] constexpr inline _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func> GreyscaleMax() const
 		{
-			return EmuMath::Helpers::colour_greyscale_decompose_max<EmuMath::Colour<out_contained_type, OutContainsAlpha_>, this_type>(*this);
+			if constexpr (std::is_same_v<out_contained_type, value_type> && OutContainsAlpha_ == contains_alpha)
+			{
+				return this_type(colour.GreyscaleMax<out_contained_type, OutContainsAlpha_>(), 0);
+			}
+			else
+			{
+				return _colour_validation_layer<out_contained_type, OutContainsAlpha_, validate_func>(colour.GreyscaleMax<out_contained_type, OutContainsAlpha_>());
+			}
 		}
 		template<bool OutContainsAlpha_>
-		[[nodiscard]] constexpr inline EmuMath::Colour<value_type, OutContainsAlpha_> GreyscaleMax() const
+		[[nodiscard]] constexpr inline _colour_validation_layer<value_type, OutContainsAlpha_, validate_func> GreyscaleMax() const
 		{
-			return EmuMath::Helpers::colour_greyscale_decompose_max<EmuMath::Colour<value_type, OutContainsAlpha_>, this_type>(*this);
+			if constexpr (OutContainsAlpha_ == contains_alpha)
+			{
+				return this_type(colour.GreyscaleMax<OutContainsAlpha_>(), 0);
+			}
+			else
+			{
+				return _colour_validation_layer<value_type, OutContainsAlpha_, validate_func>(colour.GreyscaleMax<OutContainsAlpha_>());
+			}
 		}
 #pragma endregion
 
-		/// <summary> 
-		/// <para> Underlying colour channels represented by this colour. </para>
-		/// <para> If this colour DOES NOT contain an explicit Alpha channel: Stored in RGB order. </para>
-		/// <para> If this colour DOES contain an explicit Alpha channel: Stored in RGBA order. </para>
-		/// <para> 
-		///		This is not guaranteed to be available, as per the EmuMath Colour contract, 
-		///		and must not be referred to in templates for EmuMath colour interactions. 
-		/// </para>
-		/// </summary>
-		channels_vector channels;
+		underlying_colour colour;
 
-	private:
-		inline void _set_channels_from_other_channels_vector(const typename EmuMath::Colour<value_type, !contains_alpha>::channels_vector& to_copy_)
+		template<class T_>
+		struct _is_colour_validation_layer
 		{
-			channels.at<0>() = to_copy_.template at<0>();
-			channels.at<1>() = to_copy_.template at<1>();
-			channels.at<2>() = to_copy_.template at<2>();
+			static constexpr bool value = std::conditional_t
+			<
+				std::is_same_v<T_, std::remove_cv_t<T_>>,
+				std::conditional_t
+				<
+					std::is_same_v<T_, std::remove_reference_t<T_>>,
+					std::false_type,
+					_is_colour_validation_layer<std::remove_reference_t<T_>>
+				>,
+				_is_colour_validation_layer<std::remove_cv_t<T_>>
+			>::value;
+		};
+		template<class ChannelType__, bool ContainsAlpha__, class ValidationFunc__>
+		struct _is_colour_validation_layer<EmuMath::Helpers::_colour_validation_layer<ChannelType__, ContainsAlpha__, ValidationFunc__>>
+		{
+			static constexpr bool value = true;
+		};
+
+		/// <summary>
+		/// <para> Helper function for getting a reference to a colour if the rhs_ is a validation layer. Returns the passed reference if not. </para>
+		/// </summary>
+		template<class Rhs_>
+		[[nodiscard]] static constexpr inline const auto& _get_rhs(const Rhs_& rhs_)
+		{
+			if constexpr (_is_colour_validation_layer<Rhs_>::value)
+			{
+				return rhs_.Get();
+			}
+			else
+			{
+				return rhs_;
+			}
 		}
 	};
-
-	/// <summary> Colour containing Red, Green, and Blue channels of the provided Channel_ type. Shorthand for EmuMath::Colour with a false boolean argument. </summary>
-	template<typename Channel_>
-	using ColourRGB = EmuMath::Colour<Channel_, false>;
-
-	/// <summary> Colour containing Red, Green, Blue, and Alpha channels of the provided Channel_ type. Shorthand for EmuMath::Colour with a true boolean argument. </summary>
-	template<typename Channel_>
-	using ColourRGBA = EmuMath::Colour<Channel_, true>;
 }
 
-template<typename T_, bool ContainsAlpha_>
-std::ostream& operator<<(std::ostream& str_, const EmuMath::Colour<T_, ContainsAlpha_>& colour_)
+namespace EmuMath::TMP
 {
-	using unqualified_channel_type = std::remove_reference_t<std::remove_cv_t<T_>>;
-	str_ << "{ ";
-	if constexpr (EmuCore::TMP::is_any_same_v<unqualified_channel_type, std::uint8_t, std::int8_t>)
+	template<typename Channel_, bool ContainsAlpha_, class ValidationFunc_>
+	struct is_emu_colour<EmuMath::Helpers::_colour_validation_layer<Channel_, ContainsAlpha_, ValidationFunc_>>
 	{
-		str_ << (+colour_.R()) << ", " << (+colour_.G()) << ", " << (+colour_.B());
-		if constexpr (ContainsAlpha_)
-		{
-			str_ << ", " << (+colour_.A());
-		}
-	}
-	else
-	{
-		str_ << colour_.R() << ", " << colour_.G() << ", " << colour_.B();
-		if constexpr (ContainsAlpha_)
-		{
-			str_ << ", " << colour_.A();
-		}
-	}
-	str_ << " }";
+		static constexpr bool value = true;
+	};
+}
+
+template<typename T_, bool ContainsAlpha_, class ValidationFunc_>
+std::ostream& operator<<(std::ostream& str_, const EmuMath::Helpers::_colour_validation_layer<T_, ContainsAlpha_, ValidationFunc_>& colour_)
+{
+	str_ << colour_.Get();
 	return str_;
 }
 
-template<typename T_, bool ContainsAlpha_>
-std::wostream& operator<<(std::wostream& str_, const EmuMath::Colour<T_, ContainsAlpha_>& colour_)
+template<typename T_, bool ContainsAlpha_, class ValidationFunc_>
+std::wostream& operator<<(std::wostream& str_, const EmuMath::Helpers::_colour_validation_layer<T_, ContainsAlpha_, ValidationFunc_>& colour_)
 {
-	using unqualified_channel_type = std::remove_reference_t<std::remove_cv_t<T_>>;
-	str_ << L"{ ";
-	if constexpr (EmuCore::TMP::is_any_same_v<unqualified_channel_type, std::uint8_t, std::int8_t>)
-	{
-		str_ << (+colour_.R()) << L", " << (+colour_.G()) << L", " << (+colour_.B());
-		if constexpr (ContainsAlpha_)
-		{
-			str_ << L", " << (+colour_.A());
-		}
-	}
-	else
-	{
-		str_ << colour_.R() << L", " << colour_.G() << L", " << colour_.B();
-		if constexpr (ContainsAlpha_)
-		{
-			str_ << L", " << colour_.A();
-		}
-	}
-	str_ << L" }";
+	str_ << colour_.Get();
 	return str_;
 }
 

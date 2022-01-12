@@ -1,9 +1,9 @@
 #ifndef EMU_MATH_GRADIENT_H_INC_
 #define EMU_MATH_GRADIENT_H_INC_ 1
 
-#include "ColourT.h"
-#include "ColourArithmeticFunctors.h"
-#include "ColourComparisonFunctors.h"
+#include "_colour_t.h"
+#include "_colour_arithmetic_functors.h"
+#include "_colour_cmp_functors.h"
 #include <algorithm>
 #include <map>
 #include <ostream>

@@ -1,8 +1,8 @@
 #ifndef EMU_MATH_COLOUR_CONSTANTS_H_INC_
 #define EMU_MATH_COLOUR_CONSTANTS_H_INC_ 1
 
-#include "ColourT.h"
-#include "ColourValidationLayer.h"
+#include "_colour_t.h"
+#include "_colour_validation_layer.h"
 #include "../../../EmuCore/TMPHelpers/Values.h"
 
 /// <summary> Namespace for constant colour definitions. </summary>

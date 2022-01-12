@@ -158,13 +158,13 @@
     <ClInclude Include="EmuMath\Colour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourT.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_colour_t.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourTMP.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_helpers_underlying\_colour_tmp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourHelpers.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_colour_helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_helpers_underlying\_colour_helpers_underlying.h">
@@ -173,25 +173,25 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_helpers_underlying\_colour_helpers_underlying_common_includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\WrappedColour.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_wrapped_colour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourValidationLayer.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_colour_validation_layer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ClampedColour.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_clamped_colour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\Gradient.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_gradient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourArithmeticFunctors.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_colour_arithmetic_functors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourConstants.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_colour_constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourComparisonFunctors.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_colour_cmp_functors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\FastNoiseTable.h">
