@@ -11,7 +11,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	[[nodiscard]] constexpr inline bool _vector_cast_valid_ref_state()
 	{
 		constexpr bool in_is_lval_ref = std::is_lvalue_reference_v<InVector_>;
-		constexpr bool out_contains_ref = EmuMath::NewVector<OutSize_, OutT_>::contains_ref;
+		constexpr bool out_contains_ref = EmuMath::Vector<OutSize_, OutT_>::contains_ref;
 		constexpr bool in_contains_ref = EmuCore::TMP::remove_ref_cv_t<InVector_>::contains_ref;
 
 		// Only valid in the following circumstances:
@@ -29,7 +29,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	template<std::size_t Index_, class InVector_, std::size_t OutSize_, typename OutT_>
 	[[nodiscard]] constexpr inline bool _vector_cast_input_at_index_valid_for_construction()
 	{
-		using out_stored_type = typename EmuMath::NewVector<OutSize_, OutT_>::stored_type;
+		using out_stored_type = typename EmuMath::Vector<OutSize_, OutT_>::stored_type;
 		using in_declval = decltype(std::declval<InVector_>());
 		using in_lval = decltype(EmuCore::TMP::lval_ref_cast<in_declval>(std::declval<InVector_>()));
 		using get_result = decltype(_vector_get_theoretical<Index_>(EmuCore::TMP::lval_ref_cast<in_declval>(std::declval<InVector_>())));
@@ -53,7 +53,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		{
 			if constexpr (_vector_cast_valid_ref_state<InVector_, OutSize_, OutT_, Offset_>())
 			{
-				using input_index_sequence = EmuCore::TMP::make_offset_index_sequence<Offset_, EmuMath::NewVector<OutSize_, OutT_>::size>;
+				using input_index_sequence = EmuCore::TMP::make_offset_index_sequence<Offset_, EmuMath::Vector<OutSize_, OutT_>::size>;
 				return _vector_cast_valid_construction<InVector_, OutSize_, OutT_, Offset_>(input_index_sequence());
 			}
 			else
@@ -68,10 +68,10 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<std::size_t Index_, std::size_t OutSize_, typename OutT_, class InVector_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<OutSize_, OutT_>::stored_type _vector_cast_make_stored_type(InVector_&& in_vector_)
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<OutSize_, OutT_>::stored_type _vector_cast_make_stored_type(InVector_&& in_vector_)
 	{
 		using get_result = decltype(_vector_get_theoretical<Index_>(std::forward<InVector_>(in_vector_)));
-		using out_stored_type = typename EmuMath::NewVector<OutSize_, OutT_>::stored_type;
+		using out_stored_type = typename EmuMath::Vector<OutSize_, OutT_>::stored_type;
 		if constexpr (std::is_constructible_v<out_stored_type, get_result>)
 		{
 			return out_stored_type(_vector_get_theoretical<Index_>(std::forward<InVector_>(in_vector_)));
@@ -91,24 +91,24 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<std::size_t OutSize_, typename OutT_, class InVector_, std::size_t...Indices_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_cast_execution(InVector_& in_vector_, std::index_sequence<Indices_...> indices_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_cast_execution(InVector_& in_vector_, std::index_sequence<Indices_...> indices_)
 	{
-		return EmuMath::NewVector<OutSize_, OutT_>
+		return EmuMath::Vector<OutSize_, OutT_>
 		(
 			_vector_cast_make_stored_type<Indices_, OutSize_, OutT_, std::add_lvalue_reference_t<InVector_>>(in_vector_)...
 		);
 	}
 
 	template<std::size_t OutSize_, typename OutT_, class InVector_, std::size_t Offset_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_cast(InVector_&& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_cast(InVector_&& in_vector_)
 	{
 		constexpr bool in_is_lval_ref = std::is_lvalue_reference_v<InVector_>;
-		constexpr bool out_contains_ref = EmuMath::NewVector<OutSize_, OutT_>::contains_ref;
+		constexpr bool out_contains_ref = EmuMath::Vector<OutSize_, OutT_>::contains_ref;
 		constexpr bool in_contains_ref = EmuCore::TMP::remove_ref_cv_t<InVector_>::contains_ref;
 
 		if constexpr (_vector_cast_valid_ref_state<InVector_, OutSize_, OutT_, Offset_>())
 		{
-			using input_index_sequence = EmuCore::TMP::make_offset_index_sequence<Offset_, EmuMath::NewVector<OutSize_, OutT_>::size>;
+			using input_index_sequence = EmuCore::TMP::make_offset_index_sequence<Offset_, EmuMath::Vector<OutSize_, OutT_>::size>;
 			if constexpr (_vector_cast_valid_construction<InVector_, OutSize_, OutT_, Offset_>(input_index_sequence()))
 			{
 				// Safe to continue since the value is supposedly named, or we're not outputting references anyway

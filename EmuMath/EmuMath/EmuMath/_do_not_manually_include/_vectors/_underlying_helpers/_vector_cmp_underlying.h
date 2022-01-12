@@ -10,7 +10,7 @@
 namespace EmuMath::Helpers::_vector_underlying
 {
 	template<bool NoCmpReturn_, std::size_t Index_, std::size_t EndIndex_, class Cmp_, class Joiner_, std::size_t LhsSize_, typename LhsT_, class RhsVector_>
-	[[nodiscard]] constexpr inline bool _vector_cmp_rhs_vector(Cmp_& cmp_, Joiner_& joiner_, const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_, RhsVector_&& rhs_)
+	[[nodiscard]] constexpr inline bool _vector_cmp_rhs_vector(Cmp_& cmp_, Joiner_& joiner_, const EmuMath::Vector<LhsSize_, LhsT_>& lhs_, RhsVector_&& rhs_)
 	{
 		if constexpr (Index_ < EndIndex_)
 		{
@@ -53,7 +53,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	(
 		Cmp_& cmp_,
 		Joiner_& joiner_,
-		const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_,
+		const EmuMath::Vector<LhsSize_, LhsT_>& lhs_,
 		std::add_lvalue_reference_t<RhsScalar_> rhs_
 	)
 	{
@@ -92,7 +92,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<bool NoCmpReturn_, std::size_t BeginIndex_, std::size_t EndIndex_, class Cmp_, class Joiner_, std::size_t LhsSize_, typename LhsT_, class Rhs_>
-	[[nodiscard]] constexpr inline bool _vector_cmp(Cmp_ cmp_, Joiner_ joiner_, const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool _vector_cmp(Cmp_ cmp_, Joiner_ joiner_, const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
 		{
@@ -117,9 +117,9 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<bool NoCmpReturn_, std::size_t BeginIndex_, std::size_t EndIndex_, template<class...> class CmpTemplate_, class Joiner_, std::size_t LhsSize_, typename LhsT_, class Rhs_>
-	[[nodiscard]] constexpr inline bool _vector_cmp(Joiner_ joiner_, const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool _vector_cmp(Joiner_ joiner_, const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
-		using lhs_value_uq = typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq;
+		using lhs_value_uq = typename EmuMath::Vector<LhsSize_, LhsT_>::value_type_uq;
 		using rhs_value_uq = EmuMath::TMP::emu_vector_value_type_uq<Rhs_>;
 		if constexpr (EmuCore::TMP::valid_template_args_v<CmpTemplate_, lhs_value_uq, rhs_value_uq>)
 		{
@@ -143,12 +143,12 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<bool NoCmpReturn_, bool IncludeNonContained_, class Cmp_, class Joiner_, std::size_t LhsSize_, typename LhsT_, class Rhs_>
-	[[nodiscard]] constexpr inline bool _vector_cmp(Cmp_ cmp_, Joiner_ joiner_, const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool _vector_cmp(Cmp_ cmp_, Joiner_ joiner_, const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
-		constexpr std::size_t lhs_size_ = EmuMath::NewVector<LhsSize_, LhsT_>::size;
+		constexpr std::size_t lhs_size_ = EmuMath::Vector<LhsSize_, LhsT_>::size;
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
 		{
-			constexpr std::size_t rhs_size_ = EmuMath::NewVector<LhsSize_, LhsT_>::size;
+			constexpr std::size_t rhs_size_ = EmuMath::Vector<LhsSize_, LhsT_>::size;
 			constexpr std::size_t smallest_size_ = (lhs_size_ <= rhs_size_) ? lhs_size_ : rhs_size_;
 			constexpr std::size_t largest_size_ = (lhs_size_ >= rhs_size_) ? lhs_size_ : rhs_size_;
 			constexpr std::size_t end_index_ = IncludeNonContained_ ? largest_size_ : smallest_size_;
@@ -176,9 +176,9 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<bool NoCmpReturn_, bool IncludeNonContained_, template<class...> class CmpTemplate_, class Joiner_, std::size_t LhsSize_, typename LhsT_, class Rhs_>
-	[[nodiscard]] constexpr inline bool _vector_cmp(Joiner_ joiner_, const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool _vector_cmp(Joiner_ joiner_, const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
-		using lhs_value_uq = typename EmuMath::NewVector<LhsSize_, LhsT_>::value_type_uq;
+		using lhs_value_uq = typename EmuMath::Vector<LhsSize_, LhsT_>::value_type_uq;
 		using rhs_value_uq = EmuMath::TMP::emu_vector_value_type_uq<Rhs_>;
 		if constexpr (EmuCore::TMP::valid_template_args_v<CmpTemplate_, lhs_value_uq, rhs_value_uq>)
 		{
@@ -203,9 +203,9 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, template<class...> class CmpTemplate_, std::size_t LhsSize_, typename LhsT_, class Rhs_>
-	[[nodiscard]] constexpr inline bool _vector_cmp_mag(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool _vector_cmp_mag(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_, Rhs_&& rhs_)
 	{
-		using lhs_preferred_fp = typename EmuMath::NewVector<LhsSize_, LhsT_>::preferred_floating_point;
+		using lhs_preferred_fp = typename EmuMath::Vector<LhsSize_, LhsT_>::preferred_floating_point;
 		using rhs_uq = EmuCore::TMP::remove_ref_cv_t<Rhs_>;
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
 		{
@@ -349,12 +349,12 @@ namespace EmuMath::Helpers::_vector_underlying
 
 
 	template<bool IncludeNonContained_, template<class...> class CmpTemplate_, std::size_t LhsSize_, typename LhsT_, class Rhs_>
-	[[nodiscard]] constexpr inline bool _vector_cmp_mag(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool _vector_cmp_mag(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_, Rhs_&& rhs_)
 	{
-		constexpr std::size_t lhs_size_ = EmuMath::NewVector<LhsSize_, LhsT_>::size;
+		constexpr std::size_t lhs_size_ = EmuMath::Vector<LhsSize_, LhsT_>::size;
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
 		{
-			constexpr std::size_t rhs_size_ = EmuMath::NewVector<LhsSize_, LhsT_>::size;
+			constexpr std::size_t rhs_size_ = EmuMath::Vector<LhsSize_, LhsT_>::size;
 			constexpr std::size_t smallest_size_ = (lhs_size_ <= rhs_size_) ? lhs_size_ : rhs_size_;
 			constexpr std::size_t largest_size_ = (lhs_size_ >= rhs_size_) ? lhs_size_ : rhs_size_;
 			constexpr std::size_t end_index_ = IncludeNonContained_ ? largest_size_ : smallest_size_;
@@ -380,7 +380,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		typename LhsT_,
 		class Rhs_
 	>
-	[[nodiscard]] constexpr inline bool _vector_cmp_mag_if_rhs_scalar(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool _vector_cmp_mag_if_rhs_scalar(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
 		{
@@ -404,7 +404,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		typename LhsT_,
 		class Rhs_
 	>
-	[[nodiscard]] constexpr inline bool _vector_cmp_mag_if_rhs_scalar(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool _vector_cmp_mag_if_rhs_scalar(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<Rhs_>)
 		{

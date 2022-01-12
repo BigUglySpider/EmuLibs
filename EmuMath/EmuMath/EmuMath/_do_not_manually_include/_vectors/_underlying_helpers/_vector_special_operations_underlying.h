@@ -145,8 +145,8 @@ namespace EmuMath::Helpers::_vector_underlying
 	struct _vector_dist_square_calculator
 	{
 	public:
-		using from_vector = EmuMath::NewVector<FromSize_, FromT_>;
-		using to_vector = EmuMath::NewVector<ToSize_, ToT_>;
+		using from_vector = EmuMath::Vector<FromSize_, FromT_>;
+		using to_vector = EmuMath::Vector<ToSize_, ToT_>;
 		using from_value = typename from_vector::value_type;
 		using to_value = typename to_vector::value_type;
 		using from_value_uq = EmuCore::TMP::remove_ref_cv_t<from_value>;
@@ -250,8 +250,8 @@ namespace EmuMath::Helpers::_vector_underlying
 	template<std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_, typename Out_>
 	struct _types_vector_dot
 	{
-		using a_value_uq = typename EmuMath::NewVector<SizeA_, TA_>::value_type_uq;
-		using b_value_uq = typename EmuMath::NewVector<SizeB_, TB_>::value_type_uq;
+		using a_value_uq = typename EmuMath::Vector<SizeA_, TA_>::value_type_uq;
+		using b_value_uq = typename EmuMath::Vector<SizeB_, TB_>::value_type_uq;
 		using a_b_fp = EmuCore::TMP::largest_floating_point_t<a_value_uq, b_value_uq, float>;
 
 		using out_uq = EmuCore::TMP::remove_ref_cv_t<Out_>;
@@ -266,15 +266,15 @@ namespace EmuMath::Helpers::_vector_underlying
 
 	// DOT
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline Out_ _vector_dot(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	[[nodiscard]] constexpr inline Out_ _vector_dot(const EmuMath::Vector<SizeA_, TA_>& a_, const EmuMath::Vector<SizeB_, TB_>& b_)
 	{
 		if constexpr(BeginIndex_ <= EndIndex_)
 		{
 			if constexpr (!std::is_reference_v<Out_>)
 			{
 				// Types for calculation
-				using a_value_uq = typename EmuMath::NewVector<SizeA_, TA_>::value_type_uq;
-				using b_value_uq = typename EmuMath::NewVector<SizeB_, TB_>::value_type_uq;
+				using a_value_uq = typename EmuMath::Vector<SizeA_, TA_>::value_type_uq;
+				using b_value_uq = typename EmuMath::Vector<SizeB_, TB_>::value_type_uq;
 				using a_b_fp = EmuCore::TMP::largest_floating_point_t<a_value_uq, b_value_uq, float>;
 
 				using out_uq = EmuCore::TMP::remove_ref_cv_t<Out_>;
@@ -328,26 +328,26 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<typename Out_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline Out_ _vector_dot(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	[[nodiscard]] constexpr inline Out_ _vector_dot(const EmuMath::Vector<SizeA_, TA_>& a_, const EmuMath::Vector<SizeB_, TB_>& b_)
 	{
 		return _vector_dot<0, (SizeA_ <= SizeB_) ? SizeA_ : SizeB_, Out_>(a_, b_);
 	}
 
 	// SQUARE MAG
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ _vector_square_mag(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline Out_ _vector_square_mag(const EmuMath::Vector<Size_, T_>& vector_)
 	{
 		return _vector_dot<BeginIndex_, EndIndex_, Out_>(vector_, vector_);
 	}
 	template<typename Out_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ _vector_square_mag(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline Out_ _vector_square_mag(const EmuMath::Vector<Size_, T_>& vector_)
 	{
 		return _vector_dot<Out_>(vector_, vector_);
 	}
 
 	// MAG
 	template<class Sqrt_, std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ _vector_mag(Sqrt_ sqrt_, const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline Out_ _vector_mag(Sqrt_ sqrt_, const EmuMath::Vector<Size_, T_>& vector_)
 	{
 		using out_processing = typename _types_vector_dot<Size_, T_, Size_, T_, Out_>::out_processing;
 		if constexpr (std::is_invocable_v<Sqrt_&, out_processing>)
@@ -380,7 +380,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 	}
 	template<template<class> class SqrtTemplate_, std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ _vector_mag(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline Out_ _vector_mag(const EmuMath::Vector<Size_, T_>& vector_)
 	{
 		using out_processing = typename _types_vector_dot<Size_, T_, Size_, T_, Out_>::out_processing;
 		using Sqrt_ = SqrtTemplate_<out_processing>;
@@ -388,23 +388,23 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<class Sqrt_, typename Out_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ _vector_mag(Sqrt_ sqrt_, const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline Out_ _vector_mag(Sqrt_ sqrt_, const EmuMath::Vector<Size_, T_>& vector_)
 	{
-		return _vector_mag<Sqrt_&, 0, EmuMath::NewVector<Size_, T_>::size, Out_>(sqrt_, vector_);
+		return _vector_mag<Sqrt_&, 0, EmuMath::Vector<Size_, T_>::size, Out_>(sqrt_, vector_);
 	}
 	template<template<class> class SqrtTemplate_, typename Out_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ _vector_mag(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline Out_ _vector_mag(const EmuMath::Vector<Size_, T_>& vector_)
 	{
-		return _vector_mag<SqrtTemplate_, 0, EmuMath::NewVector<Size_, T_>::size, Out_>(vector_);
+		return _vector_mag<SqrtTemplate_, 0, EmuMath::Vector<Size_, T_>::size, Out_>(vector_);
 	}
 
 	// NORMALISE W/ RETURNED OUT
 	template<class Sqrt_, std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, typename InT_, std::size_t InSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_normalise(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_normalise(const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		using out_processing = typename _types_vector_dot<InSize_, InT_, InSize_, InT_, OutT_>::out_processing;
 		using norm_func = _vector_norm_element<out_processing>;
-		return _vector_partial_mutation_copy_return_result<OutSize_, OutT_, norm_func, const EmuMath::NewVector<InSize_, InT_>&, BeginIndex_, EndIndex_, BeginIndex_>
+		return _vector_partial_mutation_copy_return_result<OutSize_, OutT_, norm_func, const EmuMath::Vector<InSize_, InT_>&, BeginIndex_, EndIndex_, BeginIndex_>
 		(
 			norm_func(_vector_mag<Sqrt_, out_processing>(in_vector_)),
 			in_vector_,
@@ -412,11 +412,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		);
 	}
 	template<template<class...> class SqrtTemplate_, std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, typename InT_, std::size_t InSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_normalise(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_normalise(const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		using out_processing = typename _types_vector_dot<InSize_, InT_, InSize_, InT_, OutT_>::out_processing;
 		using norm_func = _vector_norm_element<out_processing>;
-		return _vector_partial_mutation_copy_return_result<OutSize_, OutT_, norm_func, const EmuMath::NewVector<InSize_, InT_>&, BeginIndex_, EndIndex_, BeginIndex_>
+		return _vector_partial_mutation_copy_return_result<OutSize_, OutT_, norm_func, const EmuMath::Vector<InSize_, InT_>&, BeginIndex_, EndIndex_, BeginIndex_>
 		(
 			norm_func(_vector_mag<SqrtTemplate_, out_processing>(in_vector_)),
 			in_vector_,
@@ -425,11 +425,11 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<class Sqrt_, std::size_t OutSize_, typename OutT_, typename InT_, std::size_t InSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_normalise(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_normalise(const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		using out_processing = typename _types_vector_dot<InSize_, InT_, InSize_, InT_, OutT_>::out_processing;
 		using norm_func = _vector_norm_element<out_processing>;
-		return _vector_partial_mutation_copy_return_result<OutSize_, OutT_, norm_func, const EmuMath::NewVector<InSize_, InT_>&, 0, OutSize_, 0>
+		return _vector_partial_mutation_copy_return_result<OutSize_, OutT_, norm_func, const EmuMath::Vector<InSize_, InT_>&, 0, OutSize_, 0>
 		(
 			norm_func(_vector_mag<Sqrt_, out_processing>(in_vector_)),
 			in_vector_,
@@ -437,11 +437,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		);
 	}
 	template<template<class...> class SqrtTemplate_, std::size_t OutSize_, typename OutT_, typename InT_, std::size_t InSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_normalise(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_normalise(const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		using out_processing = typename _types_vector_dot<InSize_, InT_, InSize_, InT_, OutT_>::out_processing;
 		using norm_func = _vector_norm_element<out_processing>;
-		return _vector_partial_mutation_copy_return_result<OutSize_, OutT_, norm_func, const EmuMath::NewVector<InSize_, InT_>&, 0, OutSize_, 0>
+		return _vector_partial_mutation_copy_return_result<OutSize_, OutT_, norm_func, const EmuMath::Vector<InSize_, InT_>&, 0, OutSize_, 0>
 		(
 			norm_func(_vector_mag<SqrtTemplate_, out_processing>(in_vector_)),
 			in_vector_,
@@ -451,11 +451,11 @@ namespace EmuMath::Helpers::_vector_underlying
 
 	// NORMALISE W/ REF OUT
 	template<class Sqrt_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_, typename InT_, std::size_t InSize_>
-	constexpr inline void _vector_normalise(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	constexpr inline void _vector_normalise(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		using out_processing = typename _types_vector_dot<InSize_, InT_, InSize_, InT_, OutT_>::out_processing;
 		using norm_func = _vector_norm_element<out_processing>;
-		_vector_partial_mutation_copy<norm_func, EmuMath::NewVector<OutSize_, OutT_>, const EmuMath::NewVector<InSize_, InT_>&, 0, OutSize_, 0>
+		_vector_partial_mutation_copy<norm_func, EmuMath::Vector<OutSize_, OutT_>, const EmuMath::Vector<InSize_, InT_>&, 0, OutSize_, 0>
 		(
 			norm_func(_vector_mag<Sqrt_, out_processing>(in_vector_)),
 			out_vector_,
@@ -464,11 +464,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		);
 	}
 	template<template<class...> class SqrtTemplate_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_, typename InT_, std::size_t InSize_>
-	constexpr inline void _vector_normalise(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	constexpr inline void _vector_normalise(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		using out_processing = typename _types_vector_dot<InSize_, InT_, InSize_, InT_, OutT_>::out_processing;
 		using norm_func = _vector_norm_element<out_processing>;
-		_vector_partial_mutation_copy<norm_func, EmuMath::NewVector<OutSize_, OutT_>, const EmuMath::NewVector<InSize_, InT_>&, 0, OutSize_, 0>
+		_vector_partial_mutation_copy<norm_func, EmuMath::Vector<OutSize_, OutT_>, const EmuMath::Vector<InSize_, InT_>&, 0, OutSize_, 0>
 		(
 			norm_func(_vector_mag<SqrtTemplate_, out_processing>(in_vector_)),
 			out_vector_,
@@ -478,11 +478,11 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<class Sqrt_, std::size_t OutSize_, typename OutT_, typename InT_, std::size_t InSize_>
-	constexpr inline void _vector_normalise(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	constexpr inline void _vector_normalise(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		using out_processing = typename _types_vector_dot<InSize_, InT_, InSize_, InT_, OutT_>::out_processing;
 		using norm_func = _vector_norm_element<out_processing>;
-		_vector_partial_mutation_copy<norm_func, EmuMath::NewVector<OutSize_, OutT_>, const EmuMath::NewVector<InSize_, InT_>&, 0, OutSize_, 0>
+		_vector_partial_mutation_copy<norm_func, EmuMath::Vector<OutSize_, OutT_>, const EmuMath::Vector<InSize_, InT_>&, 0, OutSize_, 0>
 		(
 			norm_func(_vector_mag<Sqrt_, out_processing>(in_vector_)),
 			out_vector_,
@@ -491,11 +491,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		);
 	}
 	template<template<class...> class SqrtTemplate_, std::size_t OutSize_, typename OutT_, typename InT_, std::size_t InSize_>
-	constexpr inline void _vector_normalise(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	constexpr inline void _vector_normalise(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		using out_processing = typename _types_vector_dot<InSize_, InT_, InSize_, InT_, OutT_>::out_processing;
 		using norm_func = _vector_norm_element<out_processing>;
-		_vector_partial_mutation_copy<norm_func, EmuMath::NewVector<OutSize_, OutT_>, const EmuMath::NewVector<InSize_, InT_>&, 0, OutSize_, 0>
+		_vector_partial_mutation_copy<norm_func, EmuMath::Vector<OutSize_, OutT_>, const EmuMath::Vector<InSize_, InT_>&, 0, OutSize_, 0>
 		(
 			norm_func(_vector_mag<SqrtTemplate_, out_processing>(in_vector_)),
 			out_vector_,
@@ -506,7 +506,7 @@ namespace EmuMath::Helpers::_vector_underlying
 
 	// ANGLES
 	template<template<class> class SqrtTemplate_, class Out_, bool Radians_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline Out_ _vector_angle_cos(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	[[nodiscard]] constexpr inline Out_ _vector_angle_cos(const EmuMath::Vector<SizeA_, TA_>& a_, const EmuMath::Vector<SizeB_, TB_>& b_)
 	{
 		using calc_type = typename _types_vector_dot<SizeA_, TA_, SizeB_, TB_, Out_>::out_processing;
 		using mul_ = EmuCore::do_multiply<calc_type, calc_type>;
@@ -591,7 +591,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<template<class> class SqrtTempate_, class Acos_, class Out_, bool Radians_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline Out_ _vector_angle(Acos_ acos_, const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	[[nodiscard]] constexpr inline Out_ _vector_angle(Acos_ acos_, const EmuMath::Vector<SizeA_, TA_>& a_, const EmuMath::Vector<SizeB_, TB_>& b_)
 	{
 		using calc_type = typename _types_vector_dot<SizeA_, TA_, SizeB_, TB_, Out_>::out_processing;
 		using unit_converter = _conditional_rad_converter<Radians_>;
@@ -628,7 +628,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<template<class> class SqrtTemplate_, template<class> class AcosTemplate_, class Out_, bool Radians_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline Out_ _vector_angle(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	[[nodiscard]] constexpr inline Out_ _vector_angle(const EmuMath::Vector<SizeA_, TA_>& a_, const EmuMath::Vector<SizeB_, TB_>& b_)
 	{
 		using out_processing = typename _types_vector_dot<SizeA_, TA_, SizeB_, TB_, Out_>::out_processing;
 		if constexpr (EmuCore::TMP::valid_template_args_v<AcosTemplate_, out_processing>)
@@ -660,7 +660,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		typename TB_,
 		std::size_t SizeB_
 	>
-	[[nodiscard]] constexpr inline Out_ _vector_cross_3d_calculate_value(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	[[nodiscard]] constexpr inline Out_ _vector_cross_3d_calculate_value(const EmuMath::Vector<SizeA_, TA_>& a_, const EmuMath::Vector<SizeB_, TB_>& b_)
 	{
 		using get_a_lhs_t = decltype(_vector_get_theoretical<LhsA_>(a_));
 		using get_b_lhs_t = decltype(_vector_get_theoretical<LhsB_>(b_));
@@ -793,13 +793,13 @@ namespace EmuMath::Helpers::_vector_underlying
 		typename TB_,
 		std::size_t SizeB_
 	>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<OutSize_, OutT_>::stored_type _vector_cross_3d_output_index
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<OutSize_, OutT_>::stored_type _vector_cross_3d_output_index
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& a_,
-		const EmuMath::NewVector<SizeB_, TB_>& b_
+		const EmuMath::Vector<SizeA_, TA_>& a_,
+		const EmuMath::Vector<SizeB_, TB_>& b_
 	)
 	{
-		using out_stored_type = typename EmuMath::NewVector<OutSize_, OutT_>::stored_type;
+		using out_stored_type = typename EmuMath::Vector<OutSize_, OutT_>::stored_type;
 		if constexpr (Index_ == 0)
 		{
 			// (a[1] * b[2]) - (a[2] * b[1])
@@ -823,14 +823,14 @@ namespace EmuMath::Helpers::_vector_underlying
 			}
 			else
 			{
-				using implied_zero_type = decltype(_vector_get_non_contained_value<EmuMath::NewVector<OutSize_, OutT_>>());
+				using implied_zero_type = decltype(_vector_get_non_contained_value<EmuMath::Vector<OutSize_, OutT_>>());
 				if constexpr (std::is_constructible_v<out_stored_type, implied_zero_type>)
 				{
-					return out_stored_type(_vector_get_non_contained_value<EmuMath::NewVector<OutSize_, OutT_>>());
+					return out_stored_type(_vector_get_non_contained_value<EmuMath::Vector<OutSize_, OutT_>>());
 				}
 				else if constexpr(EmuCore::TMP::is_static_castable_v<implied_zero_type, out_stored_type>)
 				{
-					return static_cast<out_stored_type>(_vector_get_non_contained_value<EmuMath::NewVector<OutSize_, OutT_>>());
+					return static_cast<out_stored_type>(_vector_get_non_contained_value<EmuMath::Vector<OutSize_, OutT_>>());
 				}
 				else
 				{
@@ -863,18 +863,18 @@ namespace EmuMath::Helpers::_vector_underlying
 		std::size_t SizeB_,
 		std::size_t...OutIndices_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_cross_3d_build_out
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_cross_3d_build_out
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& a_,
-		const EmuMath::NewVector<SizeB_, TB_>& b_,
+		const EmuMath::Vector<SizeA_, TA_>& a_,
+		const EmuMath::Vector<SizeB_, TB_>& b_,
 		std::index_sequence<OutIndices_...> out_indices_
 	)
 	{
 		if constexpr(OutSize_ != 0)
 		{
-			if constexpr (!EmuMath::NewVector<OutSize_, OutT_>::contains_ref)
+			if constexpr (!EmuMath::Vector<OutSize_, OutT_>::contains_ref)
 			{
-				return EmuMath::NewVector<OutSize_, OutT_>
+				return EmuMath::Vector<OutSize_, OutT_>
 				(
 					_vector_cross_3d_output_index<OutIndices_, MulTemplate_, SubTemplate_, OutSize_, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>
 					(
@@ -894,7 +894,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			return EmuMath::NewVector<OutSize_, OutT_>();
+			return EmuMath::Vector<OutSize_, OutT_>();
 		}
 	}
 
@@ -915,14 +915,14 @@ namespace EmuMath::Helpers::_vector_underlying
 		typename TB_,
 		std::size_t SizeB_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_cross_3d(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_cross_3d(const EmuMath::Vector<SizeA_, TA_>& a_, const EmuMath::Vector<SizeB_, TB_>& b_)
 	{
-		using index_sequence_ = std::make_index_sequence<EmuMath::NewVector<OutSize_, OutT_>::size>;
+		using index_sequence_ = std::make_index_sequence<EmuMath::Vector<OutSize_, OutT_>::size>;
 		return _vector_cross_3d_build_out<MulTemplate_, SubTemplate_, OutSize_, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>(a_, b_, index_sequence_());
 	}
 
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_, std::size_t FromSize_, typename FromT_, std::size_t ToSize_, typename ToT_>
-	[[nodiscard]] constexpr inline Out_ _vector_square_distance(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	[[nodiscard]] constexpr inline Out_ _vector_square_distance(const EmuMath::Vector<FromSize_, FromT_>& from_, const EmuMath::Vector<ToSize_, ToT_>& to_)
 	{
 		if constexpr (BeginIndex_ < EndIndex_)
 		{
@@ -982,10 +982,10 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<bool IncludeNonContained_, typename Out_, std::size_t FromSize_, typename FromT_, std::size_t ToSize_, typename ToT_>
-	[[nodiscard]] constexpr inline Out_ _vector_square_distance(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	[[nodiscard]] constexpr inline Out_ _vector_square_distance(const EmuMath::Vector<FromSize_, FromT_>& from_, const EmuMath::Vector<ToSize_, ToT_>& to_)
 	{
-		constexpr std::size_t from_size_ = EmuMath::NewVector<FromSize_, FromT_>::size;
-		constexpr std::size_t to_size_ = EmuMath::NewVector<ToSize_, ToT_>::size;
+		constexpr std::size_t from_size_ = EmuMath::Vector<FromSize_, FromT_>::size;
+		constexpr std::size_t to_size_ = EmuMath::Vector<ToSize_, ToT_>::size;
 		constexpr std::size_t smallest_size_ = (from_size_ <= to_size_) ? from_size_ : to_size_;
 		constexpr std::size_t greatest_size_ = (from_size_ >= to_size_) ? from_size_ : to_size_;
 
@@ -1003,7 +1003,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		std::size_t ToSize_,
 		typename ToT_
 	>
-	[[nodiscard]] constexpr inline Out_ _vector_distance(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	[[nodiscard]] constexpr inline Out_ _vector_distance(const EmuMath::Vector<FromSize_, FromT_>& from_, const EmuMath::Vector<ToSize_, ToT_>& to_)
 	{
 		if constexpr (BeginIndex_ < EndIndex_)
 		{
@@ -1097,10 +1097,10 @@ namespace EmuMath::Helpers::_vector_underlying
 		std::size_t ToSize_,
 		typename ToT_
 	>
-	[[nodiscard]] constexpr inline Out_ _vector_distance(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	[[nodiscard]] constexpr inline Out_ _vector_distance(const EmuMath::Vector<FromSize_, FromT_>& from_, const EmuMath::Vector<ToSize_, ToT_>& to_)
 	{
-		constexpr std::size_t from_size_ = EmuMath::NewVector<FromSize_, FromT_>::size;
-		constexpr std::size_t to_size_ = EmuMath::NewVector<ToSize_, ToT_>::size;
+		constexpr std::size_t from_size_ = EmuMath::Vector<FromSize_, FromT_>::size;
+		constexpr std::size_t to_size_ = EmuMath::Vector<ToSize_, ToT_>::size;
 		constexpr std::size_t smallest_size_ = (from_size_ <= to_size_) ? from_size_ : to_size_;
 		constexpr std::size_t greatest_size_ = (from_size_ >= to_size_) ? from_size_ : to_size_;
 
@@ -1121,13 +1121,13 @@ namespace EmuMath::Helpers::_vector_underlying
 		std::size_t NormSize_,
 		typename NormT_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_reflect_normal
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_reflect_normal
 	(
-		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
-		const EmuMath::NewVector<NormSize_, NormT_>& normal_
+		const EmuMath::Vector<RaySize_, RayT_>& ray_,
+		const EmuMath::Vector<NormSize_, NormT_>& normal_
 	)
 	{
-		using ray_fp = typename EmuMath::NewVector<RaySize_, RayT_>::preferred_floating_point;
+		using ray_fp = typename EmuMath::Vector<RaySize_, RayT_>::preferred_floating_point;
 		if constexpr (EmuCore::TMP::valid_template_args_v<MulTemplate_, ray_fp, ray_fp>)
 		{
 			// MulDot_: Used for 2 * dot(ray_, normal_)
@@ -1140,13 +1140,13 @@ namespace EmuMath::Helpers::_vector_underlying
 				{
 					// Select the smallest size for calculations since we don't want to be constructing unused indices
 					constexpr std::size_t norm_calc_size_ = OutSize_ <= NormSize_ ? OutSize_ : NormSize_;
-					using norm_fp = typename EmuMath::NewVector<NormSize_, NormT_>::preferred_floating_point;
+					using norm_fp = typename EmuMath::Vector<NormSize_, NormT_>::preferred_floating_point;
 
 					// Calculates normal_ * (2 * dot(ray_, normal_))
-					EmuMath::NewVector<norm_calc_size_, norm_fp> norm_mult_ = _vector_mutate_with_func_template_args_only
+					EmuMath::Vector<norm_calc_size_, norm_fp> norm_mult_ = _vector_mutate_with_func_template_args_only
 					<
 						MulTemplate_,
-						EmuMath::NewVector<norm_calc_size_, norm_fp>,
+						EmuMath::Vector<norm_calc_size_, norm_fp>,
 						BeginIndex_,
 						EndIndex_,
 						BeginIndex_
@@ -1156,7 +1156,7 @@ namespace EmuMath::Helpers::_vector_underlying
 					return _vector_mutate_with_func_template_args_only
 					<
 						SubTemplate_,
-						EmuMath::NewVector<OutSize_, OutT_>,
+						EmuMath::Vector<OutSize_, OutT_>,
 						BeginIndex_,
 						EndIndex_,
 						BeginIndex_
@@ -1201,10 +1201,10 @@ namespace EmuMath::Helpers::_vector_underlying
 		std::size_t NormSize_,
 		typename NormT_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_reflect_normal
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_reflect_normal
 	(
-		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
-		const EmuMath::NewVector<NormSize_, NormT_>& normal_
+		const EmuMath::Vector<RaySize_, RayT_>& ray_,
+		const EmuMath::Vector<NormSize_, NormT_>& normal_
 	)
 	{
 		return _vector_reflect_normal
@@ -1212,7 +1212,7 @@ namespace EmuMath::Helpers::_vector_underlying
 			SubTemplate_,
 			MulTemplate_,
 			0,
-			EmuMath::NewVector<OutSize_, OutT_>::size,
+			EmuMath::Vector<OutSize_, OutT_>::size,
 			OutSize_,
 			OutT_
 		>(ray_, normal_);
@@ -1232,15 +1232,15 @@ namespace EmuMath::Helpers::_vector_underlying
 		std::size_t SizeC_,
 		typename TC_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_normal_to_plane_3d_no_norm
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_normal_to_plane_3d_no_norm
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& a_,
-		const EmuMath::NewVector<SizeB_, TB_>& b_,
-		const EmuMath::NewVector<SizeC_, TC_>& c_
+		const EmuMath::Vector<SizeA_, TA_>& a_,
+		const EmuMath::Vector<SizeB_, TB_>& b_,
+		const EmuMath::Vector<SizeC_, TC_>& c_
 	)
 	{
-		using out_fp = typename EmuMath::NewVector<OutSize_, OutT_>::preferred_floating_point;
-		using calc_vector = EmuMath::NewVector<3, out_fp>;
+		using out_fp = typename EmuMath::Vector<OutSize_, OutT_>::preferred_floating_point;
+		using calc_vector = EmuMath::Vector<3, out_fp>;
 		return _vector_cross_3d<MulTemplate_, SubTemplate_, OutSize_, OutT_, 0, 1, 2, 0, 1, 2>
 		(
 			_vector_mutate_with_func_template_args_only<SubTemplate_, calc_vector, 0, 3, ReadOffset_>(b_, a_),
@@ -1263,15 +1263,15 @@ namespace EmuMath::Helpers::_vector_underlying
 		std::size_t SizeC_,
 		typename TC_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_normal_to_plane_3d
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_normal_to_plane_3d
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& a_,
-		const EmuMath::NewVector<SizeB_, TB_>& b_,
-		const EmuMath::NewVector<SizeC_, TC_>& c_
+		const EmuMath::Vector<SizeA_, TA_>& a_,
+		const EmuMath::Vector<SizeB_, TB_>& b_,
+		const EmuMath::Vector<SizeC_, TC_>& c_
 	)
 	{
-		using out_fp = typename EmuMath::NewVector<OutSize_, OutT_>::preferred_floating_point;
-		using calc_vector = EmuMath::NewVector<3, out_fp>;
+		using out_fp = typename EmuMath::Vector<OutSize_, OutT_>::preferred_floating_point;
+		using calc_vector = EmuMath::Vector<3, out_fp>;
 		return _vector_normalise<SqrtTemplate_, OutSize_, OutT_, 0, 3>
 		(
 			_vector_cross_3d<MulTemplate_, SubTemplate_, 3, out_fp, 0, 1, 2, 0, 1, 2>
@@ -1296,13 +1296,13 @@ namespace EmuMath::Helpers::_vector_underlying
 		std::size_t SizeB_,
 		typename TB_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_project
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_project
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& a_,
-		const EmuMath::NewVector<SizeB_, TB_>& b_
+		const EmuMath::Vector<SizeA_, TA_>& a_,
+		const EmuMath::Vector<SizeB_, TB_>& b_
 	)
 	{
-		using out_fp = typename EmuMath::NewVector<OutSize_, OutT_>::preferred_floating_point;
+		using out_fp = typename EmuMath::Vector<OutSize_, OutT_>::preferred_floating_point;
 		if constexpr (EmuCore::TMP::valid_template_args_v<ReciprocalTemplate_, out_fp>)
 		{
 			using Reciprocal_ = ReciprocalTemplate_<out_fp>;
@@ -1316,7 +1316,7 @@ namespace EmuMath::Helpers::_vector_underlying
 						// Returns the result of b_ * (dot(a_, b_) / square_mag(b_))
 						// --- We use reciprocal multiplication to perform division as we are likely to do >= 2 divisions,
 						// --- so we can optimise this by avoiding slower fp-division by doing a single 1/sqr_mag and multiplying by that result
-						return _vector_mutate_with_func_template_args_only<MulTemplate_, EmuMath::NewVector<OutSize_, OutT_>, BeginIndex_, EndIndex_, BeginIndex_>
+						return _vector_mutate_with_func_template_args_only<MulTemplate_, EmuMath::Vector<OutSize_, OutT_>, BeginIndex_, EndIndex_, BeginIndex_>
 						(
 							b_,
 							Mul_()
@@ -1374,13 +1374,13 @@ namespace EmuMath::Helpers::_vector_underlying
 		std::size_t SizeB_,
 		typename TB_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_project
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_project
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& a_,
-		const EmuMath::NewVector<SizeB_, TB_>& b_
+		const EmuMath::Vector<SizeA_, TA_>& a_,
+		const EmuMath::Vector<SizeB_, TB_>& b_
 	)
 	{
-		return _vector_project<MulTemplate_, ReciprocalTemplate_, OutSize_, OutT_, 0, EmuMath::NewVector<OutSize_, OutT_>::size>(a_, b_);
+		return _vector_project<MulTemplate_, ReciprocalTemplate_, OutSize_, OutT_, 0, EmuMath::Vector<OutSize_, OutT_>::size>(a_, b_);
 	}
 #pragma endregion
 
@@ -1399,21 +1399,21 @@ namespace EmuMath::Helpers::_vector_underlying
 		std::size_t SizeNorm_,
 		typename TNorm_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_project_plane
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_project_plane
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& a_,
-		const EmuMath::NewVector<SizeNorm_, TNorm_>& plane_normal_
+		const EmuMath::Vector<SizeA_, TA_>& a_,
+		const EmuMath::Vector<SizeNorm_, TNorm_>& plane_normal_
 	)
 	{
 		// Figure out the smallest size of our 3 Vectors (out, a_, plane_normal_), minimising construction of intermediate Vectors
 		// --- This can additionally minimise calculations being performed when not needed
-		constexpr std::size_t out_size_ = EmuMath::NewVector<OutSize_, OutT_>::size;
-		constexpr std::size_t a_size_ = EmuMath::NewVector<SizeA_, TA_>::size;
-		constexpr std::size_t norm_size_ = EmuMath::NewVector<SizeNorm_, TNorm_>::size;
+		constexpr std::size_t out_size_ = EmuMath::Vector<OutSize_, OutT_>::size;
+		constexpr std::size_t a_size_ = EmuMath::Vector<SizeA_, TA_>::size;
+		constexpr std::size_t norm_size_ = EmuMath::Vector<SizeNorm_, TNorm_>::size;
 		constexpr std::size_t calc_size_ = EmuCore::TMP::smallest_constant_v<std::size_t, out_size_, a_size_, norm_size_>;
 
-		using out_fp = typename EmuMath::NewVector<OutSize_, OutT_>::preferred_floating_point;
-		return _vector_mutate_with_func_template_args_only<SubTemplate_, EmuMath::NewVector<OutSize_, OutT_>, BeginIndex_, EndIndex_, BeginIndex_>
+		using out_fp = typename EmuMath::Vector<OutSize_, OutT_>::preferred_floating_point;
+		return _vector_mutate_with_func_template_args_only<SubTemplate_, EmuMath::Vector<OutSize_, OutT_>, BeginIndex_, EndIndex_, BeginIndex_>
 		(
 			a_,
 			_vector_project<MulTemplate_, ReciprocalTemplate_, calc_size_, out_fp>(a_, plane_normal_)
@@ -1431,15 +1431,15 @@ namespace EmuMath::Helpers::_vector_underlying
 		std::size_t SizeNorm_,
 		typename TNorm_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_project_plane
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_project_plane
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& a_,
-		const EmuMath::NewVector<SizeNorm_, TNorm_>& plane_normal_
+		const EmuMath::Vector<SizeA_, TA_>& a_,
+		const EmuMath::Vector<SizeNorm_, TNorm_>& plane_normal_
 	)
 	{
-		constexpr std::size_t out_size_ = EmuMath::NewVector<OutSize_, OutT_>::size;
-		constexpr std::size_t a_size_ = EmuMath::NewVector<SizeA_, TA_>::size;
-		constexpr std::size_t norm_size_ = EmuMath::NewVector<SizeNorm_, TNorm_>::size;
+		constexpr std::size_t out_size_ = EmuMath::Vector<OutSize_, OutT_>::size;
+		constexpr std::size_t a_size_ = EmuMath::Vector<SizeA_, TA_>::size;
+		constexpr std::size_t norm_size_ = EmuMath::Vector<SizeNorm_, TNorm_>::size;
 		return _vector_project_plane
 		<
 			SubTemplate_,
@@ -1470,15 +1470,15 @@ namespace EmuMath::Helpers::_vector_underlying
 		std::size_t SizeC_,
 		typename TC_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_project_plane_3d
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_project_plane_3d
 	(
-		const EmuMath::NewVector<ProjSize_, ProjT_>& to_project_,
-		const EmuMath::NewVector<SizeA_, TA_>& plane_point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& plane_point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
+		const EmuMath::Vector<ProjSize_, ProjT_>& to_project_,
+		const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& plane_point_c_
 	)
 	{
-		using out_fp = typename EmuMath::NewVector<OutSize_, OutT_>::preferred_floating_point;
+		using out_fp = typename EmuMath::Vector<OutSize_, OutT_>::preferred_floating_point;
 
 		// This function is defined purely for 3D, so calculations will be performed in 3D as a result.
 		return _vector_project_plane<SubTemplate_, MulTemplate_, ReciprocalTemplate_, OutSize_, OutT_, 0, 3>

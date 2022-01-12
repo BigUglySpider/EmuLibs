@@ -2,10 +2,10 @@
 #define EMU_MATH_NOISE_FUNCTORS_H_INC_ 1
 
 #include "_noise_gen_functors/_common_noise_gen_functor_includes.h"
-#include "_noise_gen_functors/NoiseGen1D.h"
-#include "_noise_gen_functors/NoiseGen2D.h"
-#include "_noise_gen_functors/NoiseGen3D.h"
-#include "_noise_gen_functors/FractalNoiseWrapper.h"
+#include "_noise_gen_functors/_scalar_noise_gen_1d.h"
+#include "_noise_gen_functors/_scalar_noise_gen_2d.h"
+#include "_noise_gen_functors/_scalar_noise_gen_3d.h"
+#include "_noise_gen_functors/_fractal_noise_wrapper.h"
 
 namespace EmuMath::Functors
 {

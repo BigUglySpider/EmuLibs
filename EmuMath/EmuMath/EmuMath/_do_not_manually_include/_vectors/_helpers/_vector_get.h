@@ -21,7 +21,7 @@ namespace EmuMath::Helpers
 	/// </summary>
 	/// <returns>Value for any non-contained index of an EmuMath Vector created with the provided template parameters.</returns>
 	template<std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::value_type_uq vector_get_non_contained()
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<Size_, T_>::value_type_uq vector_get_non_contained()
 	{
 		return _vector_underlying::_vector_get_non_contained_value<Size_, T_>();
 	}
@@ -42,7 +42,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath Vector to access the specified Index_ of.</param>
 	/// <returns>Reference to the provided EmuMath Vector's value_type located at the specified Index_ within the passed Vector.</returns>
 	template<std::size_t Index_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::value_type& vector_get(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<Size_, T_>::value_type& vector_get(EmuMath::Vector<Size_, T_>& vector_)
 	{
 		return _vector_underlying::_vector_get<Index_, Size_, T_>(vector_);
 	}
@@ -58,7 +58,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath Vector to access the specified Index_ of.</param>
 	/// <returns>Constant reference to the provided EmuMath Vector's value_type located at the specified Index_ within the passed Vector.</returns>
 	template<std::size_t Index_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline const typename EmuMath::NewVector<Size_, T_>::value_type& vector_get(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline const typename EmuMath::Vector<Size_, T_>::value_type& vector_get(const EmuMath::Vector<Size_, T_>& vector_)
 	{
 		return _vector_underlying::_vector_get<Index_, Size_, T_>(vector_);
 	}
@@ -78,9 +78,9 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath Vector to access the specified Index_ of.</param>
 	/// <returns>Reference to the provided EmuMath Vector's value_type located at the specified Index_ within the passed Vector.</returns>
 	template<std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::value_type& vector_get
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<Size_, T_>::value_type& vector_get
 	(
-		EmuMath::NewVector<Size_, T_>& vector_,
+		EmuMath::Vector<Size_, T_>& vector_,
 		std::size_t index_
 	)
 	{
@@ -102,9 +102,9 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath Vector to access the specified Index_ of.</param>
 	/// <returns>Constant reference to the provided EmuMath Vector's value_type located at the specified Index_ within the passed Vector.</returns>
 	template<std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline const typename EmuMath::NewVector<Size_, T_>::value_type& vector_get
+	[[nodiscard]] constexpr inline const typename EmuMath::Vector<Size_, T_>::value_type& vector_get
 	(
-		const EmuMath::NewVector<Size_, T_>& vector_,
+		const EmuMath::Vector<Size_, T_>& vector_,
 		std::size_t index_
 	)
 	{
@@ -122,7 +122,7 @@ namespace EmuMath::Helpers
 	template<std::size_t Index_, std::size_t Size_, typename T_>
 	[[nodiscard]] constexpr inline const EmuMath::TMP::emu_vector_from_args_theoretical_return_t<Index_, Size_, T_> vector_get_theoretical
 	(
-		EmuMath::NewVector<Size_, T_>& vector_
+		EmuMath::Vector<Size_, T_>& vector_
 	)
 	{
 		return _vector_underlying::_vector_get_theoretical<Index_, Size_, T_>(vector_);
@@ -130,7 +130,7 @@ namespace EmuMath::Helpers
 	template<std::size_t Index_, std::size_t Size_, typename T_>
 	[[nodiscard]] constexpr inline const EmuMath::TMP::emu_const_vector_from_args_theoretical_return_t<Index_, Size_, T_> vector_get_theoretical
 	(
-		const EmuMath::NewVector<Size_, T_>& vector_
+		const EmuMath::Vector<Size_, T_>& vector_
 	)
 	{
 		return _vector_underlying::_vector_get_theoretical<Index_, Size_, T_>(vector_);
@@ -143,7 +143,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath Vector to retrieve a data pointer for.</param>
 	/// <returns>Pointer to the start of the provided EmuMath Vector's contiguous data.</returns>
 	template<std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::stored_type* vector_data(EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<Size_, T_>::stored_type* vector_data(EmuMath::Vector<Size_, T_>& vector_)
 	{
 		return _vector_underlying::_vector_data<Size_, T_>(vector_);
 	}
@@ -155,7 +155,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath Vector to retrieve a data pointer for.</param>
 	/// <returns>Constant pointer to the start of the provided EmuMath Vector's contiguous data.</returns>
 	template<std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline const typename EmuMath::NewVector<Size_, T_>::stored_type* vector_data(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline const typename EmuMath::Vector<Size_, T_>::stored_type* vector_data(const EmuMath::Vector<Size_, T_>& vector_)
 	{
 		return _vector_underlying::_vector_data<Size_, T_>(vector_);
 	}
@@ -174,8 +174,8 @@ namespace EmuMath::Helpers
 	///		: Reference to output to if the get is successful. Must be assignable, constructible, or convertible-to from a reference to vector_'s value_type.
 	/// </param>
 	/// <returns>True if the provided index is valid, otherwise false.</returns>
-	template<class Out_, std::size_t Size_, typename T_, typename = std::enable_if_t<EmuMath::NewVector<Size_, T_>::template is_valid_try_get_output_ref<Out_, false>()>>
-	[[nodiscard]] constexpr inline bool vector_try_get(EmuMath::NewVector<Size_, T_>& vector_, std::size_t index_, Out_& out_)
+	template<class Out_, std::size_t Size_, typename T_, typename = std::enable_if_t<EmuMath::Vector<Size_, T_>::template is_valid_try_get_output_ref<Out_, false>()>>
+	[[nodiscard]] constexpr inline bool vector_try_get(EmuMath::Vector<Size_, T_>& vector_, std::size_t index_, Out_& out_)
 	{
 		return _vector_underlying::_vector_try_get<Out_>(vector_, index_, out_);
 	}
@@ -194,8 +194,8 @@ namespace EmuMath::Helpers
 	///		: Reference to output to if the get is successful. Must be assignable, constructible, or convertible-to from a const reference to vector_'s value_type.
 	/// </param>
 	/// <returns>True if the provided index is valid, otherwise false.</returns>
-	template<class Out_, std::size_t Size_, typename T_, typename = std::enable_if_t<EmuMath::NewVector<Size_, T_>::template is_valid_try_get_output_ref<Out_, true>()>>
-	[[nodiscard]] constexpr inline bool vector_try_get(const EmuMath::NewVector<Size_, T_>& vector_, std::size_t index_, Out_& out_)
+	template<class Out_, std::size_t Size_, typename T_, typename = std::enable_if_t<EmuMath::Vector<Size_, T_>::template is_valid_try_get_output_ref<Out_, true>()>>
+	[[nodiscard]] constexpr inline bool vector_try_get(const EmuMath::Vector<Size_, T_>& vector_, std::size_t index_, Out_& out_)
 	{
 		return _vector_underlying::_vector_try_get<Out_, Size_, T_>(vector_, index_, out_);
 	}
@@ -215,9 +215,9 @@ namespace EmuMath::Helpers
 	template<bool NullptrIfFailed_ = false, std::size_t Size_, typename T_>
 	[[nodiscard]] constexpr inline bool vector_try_get
 	(
-		EmuMath::NewVector<Size_, T_>& vector_,
+		EmuMath::Vector<Size_, T_>& vector_,
 		std::size_t index_,
-		typename EmuMath::NewVector<Size_, T_>::value_type** pp_out_
+		typename EmuMath::Vector<Size_, T_>::value_type** pp_out_
 	)
 	{
 		return _vector_underlying::_vector_try_get<NullptrIfFailed_, Size_, T_>(vector_, index_, pp_out_);
@@ -241,9 +241,9 @@ namespace EmuMath::Helpers
 	template<bool NullptrIfFailed_ = false, std::size_t Size_, typename T_>
 	[[nodiscard]] constexpr inline bool vector_try_get
 	(
-		const EmuMath::NewVector<Size_, T_>& vector_,
+		const EmuMath::Vector<Size_, T_>& vector_,
 		std::size_t index_,
-		const typename EmuMath::NewVector<Size_, T_>::value_type** pp_const_out_
+		const typename EmuMath::Vector<Size_, T_>::value_type** pp_const_out_
 	)
 	{
 		return _vector_underlying::_vector_try_get<NullptrIfFailed_, Size_, T_>(vector_, index_, pp_const_out_);

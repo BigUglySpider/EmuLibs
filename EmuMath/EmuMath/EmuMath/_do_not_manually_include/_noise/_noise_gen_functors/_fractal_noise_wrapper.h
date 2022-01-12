@@ -2,7 +2,7 @@
 #define EMU_MATH_FRACTAL_NOISE_WRAPPER_H_INC_ 1
 
 #include "_common_noise_gen_functor_includes.h"
-#include "../_noise_info/FractalNoiseInfo.h"
+#include "../_noise_info/_fractal_noise_info.h"
 
 namespace EmuMath::Functors
 {

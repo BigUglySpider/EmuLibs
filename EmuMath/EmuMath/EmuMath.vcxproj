@@ -119,7 +119,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -179,10 +179,18 @@
     <ClInclude Include="EmuCore\TMPHelpers\VariadicHelpers.h" />
     <ClInclude Include="EmuMath\Colour.h" />
     <ClInclude Include="EmuMath\FastNoise.h" />
+    <ClInclude Include="EmuMath\Matrix.h" />
     <ClInclude Include="EmuMath\Noise.h" />
     <ClInclude Include="EmuMath\Random.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FastNoiseGen1D.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FastNoiseGen2D.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_all_matrix_helpers.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_common_matrix_helper_includes.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_stream_append.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_matrix_t.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_matrix.info.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_matrix_underlying_stream_append.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_matrix_tmp.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_simd_noise_gen_1d.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_simd_noise_gen_2d.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_common_fast_noise_gen_functors_includes.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_common_vector_helpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_basic_arithmetic_assign.h" />
@@ -228,26 +236,26 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_colour_validation_layer.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_helpers_underlying\_colour_helpers_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_helpers_underlying\_colour_helpers_underlying_common_includes.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\FastNoiseFunctors.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\FastNoiseSampleProcessors.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\FastNoiseTable.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseSampleProcessorAnalytics.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseFunctors.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FastFractalNoiseWrapper.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FastNoiseGen3D.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FractalNoiseWrapper.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\NoisePermutations.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_info\FractalNoiseInfo.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_info\NoisePermutationInfo.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseSampleProcessors.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseTable.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseTableOptions.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseTMP.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\NoiseGen1D.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\NoiseGen2D.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\NoiseGen3D.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_fast_noise_functors.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_fast_noise_sample_processors.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_fast_noise_table.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_sample_processor_analytics.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_scalar_noise_functors.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_simd_fractal_noise_wrapper.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_simd_noise_gen_3d.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_fractal_noise_wrapper.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_noise_permutations.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_info\_fractal_noise_info.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_info\_noise_permutation_info.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_scalar_noise_sample_processors.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_table.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_table_options.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_tmp.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_scalar_noise_gen_1d.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_scalar_noise_gen_2d.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_scalar_noise_gen_3d.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_common_noise_gen_functor_includes.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_info\NoiseType.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_info\_noise_type.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_random\_rng_wrapper.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_random\_shuffled_int_sequence.h" />
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_common_simd_helpers_includes.h" />

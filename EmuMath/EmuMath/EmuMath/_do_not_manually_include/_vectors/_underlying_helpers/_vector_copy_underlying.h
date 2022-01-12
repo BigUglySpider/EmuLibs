@@ -7,9 +7,9 @@
 namespace EmuMath::Helpers::_vector_underlying
 {
 	template<std::size_t Index_, typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void _vector_copy_index(EmuMath::NewVector<Size_, T_>& to_copy_to_, Arg_&& arg_)
+	constexpr inline void _vector_copy_index(EmuMath::Vector<Size_, T_>& to_copy_to_, Arg_&& arg_)
 	{
-		using value_type = typename EmuMath::NewVector<Size_, T_>::value_type;
+		using value_type = typename EmuMath::Vector<Size_, T_>::value_type;
 		if constexpr (std::is_assignable_v<value_type, Arg_>)
 		{
 			_vector_get<Index_>(to_copy_to_) = std::forward<Arg_>(arg_);
@@ -33,7 +33,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<std::size_t Index_, std::size_t EndIndex_, typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void _vector_copy_scalar(EmuMath::NewVector<Size_, T_>& vector_, Arg_& to_copy_)
+	constexpr inline void _vector_copy_scalar(EmuMath::Vector<Size_, T_>& vector_, Arg_& to_copy_)
 	{
 		if constexpr (Index_ < EndIndex_)
 		{
@@ -43,13 +43,13 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<std::size_t Index_, std::size_t EndIndex_, std::size_t ArgIndex_, class ArgVector_, std::size_t Size_, typename T_>
-	constexpr inline void _vector_copy_vector(EmuMath::NewVector<Size_, T_>& vector_, ArgVector_& to_copy_)
+	constexpr inline void _vector_copy_vector(EmuMath::Vector<Size_, T_>& vector_, ArgVector_& to_copy_)
 	{
 		if constexpr (Index_ < EndIndex_)
 		{
 			if constexpr (EmuMath::TMP::is_emu_vector_v<ArgVector_>)
 			{
-				using lhs_value_type = typename EmuMath::NewVector<Size_, T_>::value_type;
+				using lhs_value_type = typename EmuMath::Vector<Size_, T_>::value_type;
 				using arg_vector_uq = EmuCore::TMP::remove_ref_cv_t<ArgVector_>;
 				using arg_value_type_cq = EmuCore::TMP::conditional_const_t<std::is_const_v<ArgVector_>, typename arg_vector_uq::value_type>;
 				if constexpr (EmuMath::TMP::is_emu_vector_v<lhs_value_type> && !EmuMath::TMP::is_emu_vector_v<arg_value_type_cq>)
@@ -90,11 +90,11 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgIndex_, typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void _vector_copy(EmuMath::NewVector<Size_, T_>& out_, Arg_& in_)
+	constexpr inline void _vector_copy(EmuMath::Vector<Size_, T_>& out_, Arg_& in_)
 	{
 		if constexpr (BeginIndex_ <= EndIndex_)
 		{
-			using lhs_vector_type = EmuMath::NewVector<Size_, T_>;
+			using lhs_vector_type = EmuMath::Vector<Size_, T_>;
 			constexpr std::size_t end_index_ = (EndIndex_ <= lhs_vector_type::size) ? EndIndex_ : lhs_vector_type::size;
 
 			if constexpr (EmuMath::TMP::is_emu_vector_v<Arg_>)
@@ -117,15 +117,15 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void _vector_copy(EmuMath::NewVector<Size_, T_>& out_, Arg_& in_)
+	constexpr inline void _vector_copy(EmuMath::Vector<Size_, T_>& out_, Arg_& in_)
 	{
-		_vector_copy<0, EmuMath::NewVector<Size_, T_>::size, 0, Arg_, Size_, T_>(out_, in_);
+		_vector_copy<0, EmuMath::Vector<Size_, T_>::size, 0, Arg_, Size_, T_>(out_, in_);
 	}
 
 	template<bool CopyNonContained_, typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void _vector_copy(EmuMath::NewVector<Size_, T_>& out_, Arg_& in_)
+	constexpr inline void _vector_copy(EmuMath::Vector<Size_, T_>& out_, Arg_& in_)
 	{
-		using lhs_vector_type = EmuMath::NewVector<Size_, T_>;
+		using lhs_vector_type = EmuMath::Vector<Size_, T_>;
 		if constexpr (CopyNonContained_)
 		{
 			_vector_copy<0, lhs_vector_type::size, 0, Arg_, Size_, T_>(out_, in_);
@@ -138,7 +138,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, bool CopyNonContained_, typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void _vector_copy_from_start(EmuMath::NewVector<Size_, T_>& out_vector_, Arg_& in_arg_)
+	constexpr inline void _vector_copy_from_start(EmuMath::Vector<Size_, T_>& out_vector_, Arg_& in_arg_)
 	{
 		if constexpr (CopyNonContained_)
 		{
@@ -150,7 +150,7 @@ namespace EmuMath::Helpers::_vector_underlying
 			{
 				if constexpr (BeginIndex_ <= EndIndex_)
 				{
-					using lhs_vector = EmuMath::NewVector<Size_, T_>;
+					using lhs_vector = EmuMath::Vector<Size_, T_>;
 					constexpr std::size_t clamped_end_index_ = (EndIndex_ < lhs_vector::size) ? EndIndex_ : lhs_vector::size;
 					constexpr std::size_t arg_size_ = EmuCore::TMP::remove_ref_cv_t<Arg_>::size;
 					constexpr std::size_t index_range_ = clamped_end_index_ - BeginIndex_;

@@ -1,7 +1,7 @@
 #ifndef EMU_MATH_FAST_FRACTAL_NOISE_WRAPPER_H_INC_
 #define EMU_MATH_FAST_FRACTAL_NOISE_WRAPPER_H_INC_ 1
 
-#include "FractalNoiseWrapper.h"
+#include "_fractal_noise_wrapper.h"
 #include "../../../../EmuSIMD/SIMDHelpers.h"
 
 namespace EmuMath::Functors

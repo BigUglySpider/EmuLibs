@@ -29,14 +29,14 @@ namespace EmuMath::TMP
 			using type = std::conditional_t
 			<
 				std::is_lvalue_reference_v<InType_>,
-				EmuMath::NewVector<Size_, EmuMath::vector_internal_ref<std::remove_reference_t<InType_>>>,
+				EmuMath::Vector<Size_, EmuMath::vector_internal_ref<std::remove_reference_t<InType_>>>,
 				std::false_type
 			>;
 		};
 		template<class InReferencedType_>
 		struct _find_alternative_vector_rep<EmuMath::vector_internal_ref<InReferencedType_>>
 		{
-			using type = EmuMath::NewVector<Size_, InReferencedType_&>;
+			using type = EmuMath::Vector<Size_, InReferencedType_&>;
 		};
 		
 		template<std::size_t Size_, typename InT_, bool in_is_const, bool in_is_temp>
@@ -44,7 +44,7 @@ namespace EmuMath::TMP
 		{
 			static constexpr inline bool _may_be_created_from_get_return()
 			{
-				using in_vector_type = EmuMath::NewVector<Size_, InT_>;
+				using in_vector_type = EmuMath::Vector<Size_, InT_>;
 				using in_get_type = typename EmuCore::TMP::conditional_const_t<in_is_const, typename in_vector_type::value_type>&;
 				return
 				(
@@ -56,7 +56,7 @@ namespace EmuMath::TMP
 
 			[[nodiscard]] static constexpr inline bool get()
 			{
-				using in_vector_type = EmuMath::NewVector<Size_, InT_>;
+				using in_vector_type = EmuMath::Vector<Size_, InT_>;
 				using in_get_type = typename EmuCore::TMP::conditional_const_t<in_is_const, typename in_vector_type::value_type>&;
 
 				if constexpr (contains_ref)
@@ -134,7 +134,7 @@ namespace EmuMath::TMP
 		/// </summary>
 		using preferred_floating_point = typename EmuMath::TMP::preferred_vector_fp<T_>::type;
 		
-		using vector_rep = EmuMath::NewVector<Size_, T_>;
+		using vector_rep = EmuMath::Vector<Size_, T_>;
 		using alternative_vector_rep = typename _find_alternative_vector_rep<T_>::type;
 
 #pragma endregion
@@ -303,8 +303,8 @@ namespace EmuMath::TMP
 		template<std::size_t OtherSize_, typename OtherT_>
 		[[nodiscard]] static constexpr inline bool valid_template_vector_copy_construct_arg()
 		{
-			using other_vector = EmuMath::NewVector<OtherSize_, OtherT_>;
-			if constexpr (valid_template_construct_args<EmuMath::NewVector<OtherSize_, other_vector>>())
+			using other_vector = EmuMath::Vector<OtherSize_, OtherT_>;
+			if constexpr (valid_template_construct_args<EmuMath::Vector<OtherSize_, other_vector>>())
 			{
 				// If this is a valid vector arg for template construction, defer to that as the instantiation speed is likely improved.
 				// --- This is because a copy is likely to be a default-then-copy-in-the-body situation.

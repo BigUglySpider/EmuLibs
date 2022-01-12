@@ -20,7 +20,7 @@ namespace EmuMath::Helpers
 	/// <param name="to_set_">EmuMath Vector to set the specified index of.</param>
 	/// <param name="args_">Argument(s) to set the specified index via as described.</param>
 	template<std::size_t Index_, class...Args_, typename T_, std::size_t Size_, typename = std::enable_if_t<sizeof...(Args_) != 0>>
-	constexpr inline void vector_set(EmuMath::NewVector<Size_, T_>& to_set_, Args_&&...args_)
+	constexpr inline void vector_set(EmuMath::Vector<Size_, T_>& to_set_, Args_&&...args_)
 	{
 		_vector_underlying::_vector_set_scalar<Index_, Args_...>(to_set_, std::forward<Args_>(args_)...);
 	}
@@ -41,17 +41,17 @@ namespace EmuMath::Helpers
 	/// <param name="to_set_">EmuMath Vector to set all elements of in the specified inclusive:exclusive range of BeginIndex_:EndIndex_.</param>
 	/// <param name="arg_">Argument to set all elements via.</param>
 	template<std::size_t BeginIndex_ = 0, std::size_t EndIndex_ = std::numeric_limits<std::size_t>::max(), class Arg_, typename T_, std::size_t Size_>
-	constexpr inline void vector_set_all(EmuMath::NewVector<Size_, T_>& to_set_, Arg_&& arg_)
+	constexpr inline void vector_set_all(EmuMath::Vector<Size_, T_>& to_set_, Arg_&& arg_)
 	{
 		_vector_underlying::_vector_set_all<BeginIndex_, EndIndex_, Arg_>(to_set_, std::forward<Arg_>(arg_));
 	}
 	template<std::size_t BeginIndex_ = 0, std::size_t EndIndex_ = std::numeric_limits<std::size_t>::max(), class Arg_, typename T_, std::size_t Size_>
-	constexpr inline void vector_set_all(EmuMath::NewVector<Size_, T_>& to_set_, const Arg_& arg_)
+	constexpr inline void vector_set_all(EmuMath::Vector<Size_, T_>& to_set_, const Arg_& arg_)
 	{
 		_vector_underlying::_vector_set_all<BeginIndex_, EndIndex_, const Arg_&>(to_set_, arg_);
 	}
 	template<std::size_t BeginIndex_ = 0, std::size_t EndIndex_ = std::numeric_limits<std::size_t>::max(), class Arg_, typename T_, std::size_t Size_>
-	constexpr inline void vector_set_all(EmuMath::NewVector<Size_, T_>& to_set_, Arg_& arg_)
+	constexpr inline void vector_set_all(EmuMath::Vector<Size_, T_>& to_set_, Arg_& arg_)
 	{
 		_vector_underlying::_vector_set_all<BeginIndex_, EndIndex_, Arg_&>(to_set_, arg_);
 	}
@@ -67,11 +67,11 @@ namespace EmuMath::Helpers
 	template<typename T_, std::size_t Size_, std::size_t ArgSize_, typename ArgT_>
 	constexpr inline void vector_set
 	(
-		EmuMath::NewVector<Size_, T_>& to_set_,
-		EmuMath::NewVector<ArgSize_, ArgT_>&& move_arg_
+		EmuMath::Vector<Size_, T_>& to_set_,
+		EmuMath::Vector<ArgSize_, ArgT_>&& move_arg_
 	)
 	{
-		using arg_type = EmuMath::NewVector<ArgSize_, ArgT_>;
+		using arg_type = EmuMath::Vector<ArgSize_, ArgT_>;
 		_vector_underlying::_vector_set_vector<true, arg_type, Size_, T_>(to_set_, std::forward<arg_type>(move_arg_));
 	}
 
@@ -86,11 +86,11 @@ namespace EmuMath::Helpers
 	template<typename T_, std::size_t Size_, std::size_t ArgSize_, typename ArgT_>
 	constexpr inline void vector_set
 	(
-		EmuMath::NewVector<Size_, T_>& to_set_,
-		EmuMath::NewVector<ArgSize_, ArgT_>& copy_arg_
+		EmuMath::Vector<Size_, T_>& to_set_,
+		EmuMath::Vector<ArgSize_, ArgT_>& copy_arg_
 	)
 	{
-		using arg_type = EmuMath::NewVector<ArgSize_, ArgT_>;
+		using arg_type = EmuMath::Vector<ArgSize_, ArgT_>;
 		_vector_underlying::_vector_set_vector<true, arg_type, Size_, T_>(to_set_, copy_arg_);
 	}
 
@@ -105,11 +105,11 @@ namespace EmuMath::Helpers
 	template<typename T_, std::size_t Size_, std::size_t ArgSize_, typename ArgT_>
 	constexpr inline void vector_set
 	(
-		EmuMath::NewVector<Size_, T_>& to_set_,
-		const EmuMath::NewVector<ArgSize_, ArgT_>& copy_arg_
+		EmuMath::Vector<Size_, T_>& to_set_,
+		const EmuMath::Vector<ArgSize_, ArgT_>& copy_arg_
 	)
 	{
-		using arg_type = const EmuMath::NewVector<ArgSize_, ArgT_>;
+		using arg_type = const EmuMath::Vector<ArgSize_, ArgT_>;
 		_vector_underlying::_vector_set_vector<true, arg_type, Size_, T_>(to_set_, copy_arg_);
 	}
 
@@ -124,11 +124,11 @@ namespace EmuMath::Helpers
 	template<typename T_, std::size_t Size_, std::size_t ArgSize_, typename ArgT_>
 	constexpr inline void vector_set_contained_only
 	(
-		EmuMath::NewVector<Size_, T_>& to_set_,
-		EmuMath::NewVector<ArgSize_, ArgT_>&& move_arg_
+		EmuMath::Vector<Size_, T_>& to_set_,
+		EmuMath::Vector<ArgSize_, ArgT_>&& move_arg_
 	)
 	{
-		using arg_type = EmuMath::NewVector<ArgSize_, ArgT_>;
+		using arg_type = EmuMath::Vector<ArgSize_, ArgT_>;
 		_vector_underlying::_vector_set_vector<false, arg_type, Size_, T_>(to_set_, std::forward<arg_type>(move_arg_));
 	}
 
@@ -143,11 +143,11 @@ namespace EmuMath::Helpers
 	template<typename T_, std::size_t Size_, std::size_t ArgSize_, typename ArgT_>
 	constexpr inline void vector_set_contained_only
 	(
-		EmuMath::NewVector<Size_, T_>& to_set_,
-		EmuMath::NewVector<ArgSize_, ArgT_>& copy_arg_
+		EmuMath::Vector<Size_, T_>& to_set_,
+		EmuMath::Vector<ArgSize_, ArgT_>& copy_arg_
 	)
 	{
-		using arg_type = EmuMath::NewVector<ArgSize_, ArgT_>;
+		using arg_type = EmuMath::Vector<ArgSize_, ArgT_>;
 		_vector_underlying::_vector_set_vector<false, arg_type, Size_, T_>(to_set_, copy_arg_);
 	}
 
@@ -162,11 +162,11 @@ namespace EmuMath::Helpers
 	template<typename T_, std::size_t Size_, std::size_t ArgSize_, typename ArgT_>
 	constexpr inline void vector_set_contained_only
 	(
-		EmuMath::NewVector<Size_, T_>& to_set_,
-		const EmuMath::NewVector<ArgSize_, ArgT_>& copy_arg_
+		EmuMath::Vector<Size_, T_>& to_set_,
+		const EmuMath::Vector<ArgSize_, ArgT_>& copy_arg_
 	)
 	{
-		using arg_type = const EmuMath::NewVector<ArgSize_, ArgT_>;
+		using arg_type = const EmuMath::Vector<ArgSize_, ArgT_>;
 		_vector_underlying::_vector_set_vector<false, arg_type, Size_, T_>(to_set_, copy_arg_);
 	}
 }
@@ -188,11 +188,11 @@ namespace EmuMath
 	<
 		typename T_,
 		typename...ConstructionArgs_,
-		typename = std::enable_if_t<std::is_constructible_v<EmuMath::NewVector<sizeof...(ConstructionArgs_), T_>, ConstructionArgs_...>>
+		typename = std::enable_if_t<std::is_constructible_v<EmuMath::Vector<sizeof...(ConstructionArgs_), T_>, ConstructionArgs_...>>
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(ConstructionArgs_), T_> make_vector(ConstructionArgs_&&...construction_args_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(ConstructionArgs_), T_> make_vector(ConstructionArgs_&&...construction_args_)
 	{
-		return EmuMath::NewVector<sizeof...(ConstructionArgs_), T_>(std::forward<ConstructionArgs_>(construction_args_)...);
+		return EmuMath::Vector<sizeof...(ConstructionArgs_), T_>(std::forward<ConstructionArgs_>(construction_args_)...);
 	}
 }
 

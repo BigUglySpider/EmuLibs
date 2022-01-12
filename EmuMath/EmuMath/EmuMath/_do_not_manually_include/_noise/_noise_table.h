@@ -1,10 +1,10 @@
 #ifndef EMU_MATH_NOISE_TABLE_H_INC_
 #define EMU_MATH_NOISE_TABLE_H_INC_ 1
 
-#include "NoiseFunctors.h"
-#include "NoiseSampleProcessors.h"
-#include "NoiseTableOptions.h"
-#include "NoiseTMP.h"
+#include "_scalar_noise_functors.h"
+#include "_scalar_noise_sample_processors.h"
+#include "_noise_table_options.h"
+#include "_noise_tmp.h"
 #include "../../../EmuCore/TMPHelpers/TypeComparators.h"
 #include "../../../EmuCore/TMPHelpers/TypeConvertors.h"
 #include "../../../EmuCore/TMPHelpers/Values.h"
@@ -56,7 +56,7 @@ namespace EmuMath
 		{
 			table_data.swap(to_move_.table_data);
 			table_size = to_move_.table_size;
-			to_move_.table_size = EmuMath::NewVector<num_dimensions, std::size_t>();
+			to_move_.table_size = EmuMath::Vector<num_dimensions, std::size_t>();
 		}
 
 #pragma region ASSIGNMENT
@@ -128,7 +128,7 @@ namespace EmuMath
 		/// <param name="indices_">EmuMath vector containing respective indices of the sample of this table to access.</param>
 		/// <returns>Copy of this table's sample at the specified indices.</returns>
 		template<std::size_t Size_>
-		[[nodiscard]] inline value_type at(const EmuMath::NewVector<Size_, std::size_t>& indices_) const
+		[[nodiscard]] inline value_type at(const EmuMath::Vector<Size_, std::size_t>& indices_) const
 		{
 			if constexpr (num_dimensions == 1)
 			{
@@ -205,7 +205,7 @@ namespace EmuMath
 		/// <param name="indices_">EmuMath vector containing respective indices of the sample of this table to access.</param>
 		/// <returns>Copy of this table's sample at the specified indices.</returns>
 		template<std::size_t Size_>
-		[[nodiscard]] inline value_type operator()(const EmuMath::NewVector<Size_, std::size_t>& indices_) const
+		[[nodiscard]] inline value_type operator()(const EmuMath::Vector<Size_, std::size_t>& indices_) const
 		{
 			return at(indices_);
 		}
@@ -232,7 +232,7 @@ namespace EmuMath
 		/// <param name="indices_">EmuMath vector containing respective indices of the sample of this table to access.</param>
 		/// <returns>Copy of this table's sample at the specified indices.</returns>
 		template<std::size_t Size_>
-		[[nodiscard]] inline value_type operator[](const EmuMath::NewVector<Size_, std::size_t>& indices_) const
+		[[nodiscard]] inline value_type operator[](const EmuMath::Vector<Size_, std::size_t>& indices_) const
 		{
 			return at(indices_);
 		}
@@ -416,7 +416,7 @@ namespace EmuMath
 #pragma region STL_MIMICS
 		/// <summary> Returns a vector showing this table's size in each of its stored layers. </summary>
 		/// <returns>Vector with this table's size in each respective dimension.</returns>
-		[[nodiscard]] inline EmuMath::NewVector<Dimensions_, std::size_t> size() const
+		[[nodiscard]] inline EmuMath::Vector<Dimensions_, std::size_t> size() const
 		{
 			return table_size;
 		}
@@ -567,9 +567,9 @@ namespace EmuMath
 		/// </summary>
 		[[nodiscard]] static inline options_type MakeOptions
 		(
-			const EmuMath::NewVector<num_dimensions, std::size_t>& table_resolution_,
-			const EmuMath::NewVector<num_dimensions, value_type>& start_point_,
-			const EmuMath::NewVector<num_dimensions, value_type>& end_point_or_step_,
+			const EmuMath::Vector<num_dimensions, std::size_t>& table_resolution_,
+			const EmuMath::Vector<num_dimensions, value_type>& start_point_,
+			const EmuMath::Vector<num_dimensions, value_type>& end_point_or_step_,
 			value_type freq_,
 			bool step_mode_,
 			bool use_fractal_noise_,
@@ -593,14 +593,14 @@ namespace EmuMath
 
 	private:
 		table_storage table_data;
-		EmuMath::NewVector<num_dimensions, std::size_t> table_size;
+		EmuMath::Vector<num_dimensions, std::size_t> table_size;
 
-		static constexpr inline bool _valid_resolution(const EmuMath::NewVector<num_dimensions, std::size_t>& res_)
+		static constexpr inline bool _valid_resolution(const EmuMath::Vector<num_dimensions, std::size_t>& res_)
 		{
 			return !res_.CmpAnyEqual(std::size_t(0));
 		}
 
-		inline void _do_resize(const EmuMath::NewVector<num_dimensions, std::size_t>& res_)
+		inline void _do_resize(const EmuMath::Vector<num_dimensions, std::size_t>& res_)
 		{
 			// No need to resize if we're the same
 			// --- Not particularly necessary for 1D, but avoids a potentially large construction that won't even be used for greater dimensions
@@ -639,11 +639,11 @@ namespace EmuMath
 		(
 			Generator_ generator_,
 			SampleProcessor_ sample_processor_,
-			EmuMath::NewVector<num_dimensions, value_type> start_,
-			EmuMath::NewVector<num_dimensions, value_type> step_
+			EmuMath::Vector<num_dimensions, value_type> start_,
+			EmuMath::Vector<num_dimensions, value_type> step_
 		)
 		{
-			EmuMath::NewVector<num_dimensions, value_type> point_(start_);
+			EmuMath::Vector<num_dimensions, value_type> point_(start_);
 			if constexpr (num_dimensions == 1)
 			{
 				for (std::size_t x_ = 0, end_x_ = table_data.size(); x_ < end_x_; ++x_)

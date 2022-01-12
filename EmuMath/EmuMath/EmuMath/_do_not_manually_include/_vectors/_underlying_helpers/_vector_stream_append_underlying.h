@@ -60,13 +60,13 @@ namespace EmuMath::Helpers::_vector_underlying
 
 
 	template<std::size_t Index_, std::size_t EndIndex_, bool IsWide_, class StreamType_, std::size_t Size_, typename T_>
-	constexpr inline void _vector_append_to_stream(StreamType_& str_, const EmuMath::NewVector<Size_, T_>& vector_)
+	constexpr inline void _vector_append_to_stream(StreamType_& str_, const EmuMath::Vector<Size_, T_>& vector_)
 	{
 		if constexpr (Index_ < EndIndex_)
 		{
 			// Append using additional _vector_append layer if the Vector contains more Vectors
 			// --- Allows this template to work with itself
-			using get_result = decltype(_vector_get<Index_>(std::declval<EmuMath::NewVector<Size_, T_>>()));
+			using get_result = decltype(_vector_get<Index_>(std::declval<EmuMath::Vector<Size_, T_>>()));
 			if constexpr (EmuMath::TMP::is_emu_vector_v<get_result>)
 			{
 				using get_result_uq = EmuCore::TMP::remove_ref_cv_t<get_result>;
@@ -88,7 +88,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<std::size_t EndIndex_, bool IsWide_,class StreamType_, std::size_t Size_, typename T_>
-	constexpr inline void _vector_append_to_stream(StreamType_& str_, const EmuMath::NewVector<Size_, T_>& vector_)
+	constexpr inline void _vector_append_to_stream(StreamType_& str_, const EmuMath::Vector<Size_, T_>& vector_)
 	{
 		if constexpr (Size_ != 0)
 		{
@@ -103,9 +103,9 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<bool IsWide_, class StreamType_, std::size_t Size_, typename T_>
-	constexpr inline void _vector_append_to_stream(StreamType_& str_, const EmuMath::NewVector<Size_, T_>& vector_)
+	constexpr inline void _vector_append_to_stream(StreamType_& str_, const EmuMath::Vector<Size_, T_>& vector_)
 	{
-		_vector_append_to_stream<EmuMath::NewVector<Size_, T_>::size, IsWide_, StreamType_, Size_, T_>(str_, vector_);
+		_vector_append_to_stream<EmuMath::Vector<Size_, T_>::size, IsWide_, StreamType_, Size_, T_>(str_, vector_);
 	}
 }
 

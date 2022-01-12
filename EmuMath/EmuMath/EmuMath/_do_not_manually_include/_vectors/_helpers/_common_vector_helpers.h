@@ -38,9 +38,9 @@
 EmuMath::Helpers::_vector_underlying::_vector_mutate_args_only\
 <\
 	_func_type,\
-	EmuMath::NewVector<(_out_size), _out_t>,\
+	EmuMath::Vector<(_out_size), _out_t>,\
 	0,\
-	EmuMath::NewVector<(_out_size), _out_t>::size,\
+	EmuMath::Vector<(_out_size), _out_t>::size,\
 	0\
 >
 
@@ -63,9 +63,9 @@ EmuMath::Helpers::_vector_underlying::_vector_mutate_args_only\
 EmuMath::Helpers::_vector_underlying::_vector_mutate_no_func_passed\
 <\
 	_func_type,\
-	EmuMath::NewVector<(_out_size), _out_t>,\
+	EmuMath::Vector<(_out_size), _out_t>,\
 	0,\
-	EmuMath::NewVector<(_out_size), _out_t>::size,\
+	EmuMath::Vector<(_out_size), _out_t>::size,\
 	0\
 >
 
@@ -90,7 +90,7 @@ EmuMath::Helpers::_vector_underlying::_vector_partial_mutation_copy_args_only\
 	(_out_size),\
 	_out_t,\
 	_func_type,\
-	const EmuMath::NewVector<(_in_size), InT_>&,\
+	const EmuMath::Vector<(_in_size), InT_>&,\
 	(_out_begin),\
 	(_out_end),\
 	(_out_begin)\
@@ -115,8 +115,8 @@ EmuMath::Helpers::_vector_underlying::_vector_partial_mutation_copy_args_only\
 EmuMath::Helpers::_vector_underlying::_vector_partial_mutation_copy_no_func_passed\
 <\
 	_func_type,\
-	EmuMath::NewVector<(_out_size), _out_t>,\
-	const EmuMath::NewVector<(_in_size), InT_>&,\
+	EmuMath::Vector<(_out_size), _out_t>,\
+	const EmuMath::Vector<(_in_size), InT_>&,\
 	(_out_begin),\
 	(_out_end),\
 	(_out_begin)\
@@ -141,7 +141,7 @@ EmuMath::Helpers::_vector_underlying::_vector_partial_mutation_copy_no_func_pass
 EmuMath::Helpers::_vector_underlying::_vector_mutate_args_only\
 <\
 	_func_type,\
-	EmuMath::NewVector<(_out_size), _out_t>,\
+	EmuMath::Vector<(_out_size), _out_t>,\
 	(_out_begin),\
 	(_out_end),\
 	(_read_begin)\
@@ -166,7 +166,7 @@ EmuMath::Helpers::_vector_underlying::_vector_mutate_args_only\
 EmuMath::Helpers::_vector_underlying::_vector_mutate_no_func_passed\
 <\
 	_func_type,\
-	EmuMath::NewVector<(_out_size), _out_t>,\
+	EmuMath::Vector<(_out_size), _out_t>,\
 	(_out_begin),\
 	(_out_end),\
 	(_read_begin)\
@@ -179,9 +179,9 @@ EmuMath::Helpers::_vector_underlying::_vector_mutate_no_func_passed\
 EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_args_only\
 <\
 	_func_template,\
-	EmuMath::NewVector<(_out_size), _out_t>,\
+	EmuMath::Vector<(_out_size), _out_t>,\
 	0,\
-	EmuMath::NewVector<(_out_size), _out_t>::size,\
+	EmuMath::Vector<(_out_size), _out_t>::size,\
 	0\
 >
 
@@ -192,9 +192,9 @@ EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_args_onl
 EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_no_func_passed\
 <\
 	_func_template,\
-	EmuMath::NewVector<(_out_size), _out_t>,\
+	EmuMath::Vector<(_out_size), _out_t>,\
 	0,\
-	EmuMath::NewVector<(_out_size), _out_t>::size,\
+	EmuMath::Vector<(_out_size), _out_t>::size,\
 	0\
 >
 
@@ -207,7 +207,7 @@ EmuMath::Helpers::_vector_underlying::_vector_partial_mutation_copy_with_func_te
 	_func_template,\
 	(_out_size),\
 	_out_t,\
-	const EmuMath::NewVector<(_in_size), _in_t>&,\
+	const EmuMath::Vector<(_in_size), _in_t>&,\
 	(_begin_index),\
 	(_end_index),\
 	(_begin_index)\
@@ -220,8 +220,8 @@ EmuMath::Helpers::_vector_underlying::_vector_partial_mutation_copy_with_func_te
 EmuMath::Helpers::_vector_underlying::_vector_partial_mutation_copy_with_func_template_no_func_passed\
 <\
 	_func_template,\
-	EmuMath::NewVector<(_out_size), _out_t>,\
-	const EmuMath::NewVector<(_in_size), _in_t>&,\
+	EmuMath::Vector<(_out_size), _out_t>,\
+	const EmuMath::Vector<(_in_size), _in_t>&,\
 	(_begin_index),\
 	(_end_index),\
 	(_begin_index)\
@@ -234,7 +234,7 @@ EmuMath::Helpers::_vector_underlying::_vector_partial_mutation_copy_with_func_te
 EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_args_only\
 <\
 	_func_template,\
-	EmuMath::NewVector<(_out_size), _out_t>,\
+	EmuMath::Vector<(_out_size), _out_t>,\
 	(_begin_index),\
 	(_end_index),\
 	(_arg_index)\
@@ -247,7 +247,7 @@ EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_args_onl
 EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_no_func_passed\
 <\
 	_func_template,\
-	EmuMath::NewVector<(_out_size), _out_t>,\
+	EmuMath::Vector<(_out_size), _out_t>,\
 	(_begin_index),\
 	(_end_index),\
 	(_arg_index)\
@@ -261,11 +261,11 @@ EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_no_func_
 EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_extra_args_args_only\
 <\
 	_func_template,\
-	EmuMath::NewVector<(_out_size), _out_t>,\
-	std::tuple<EmuMath::NewVector<(_out_size), _out_t>>,\
+	EmuMath::Vector<(_out_size), _out_t>,\
+	std::tuple<EmuMath::Vector<(_out_size), _out_t>>,\
 	(_custom_args_at_start),\
 	0,\
-	EmuMath::NewVector<(_out_size), _out_t>::size,\
+	EmuMath::Vector<(_out_size), _out_t>::size,\
 	0\
 >
 
@@ -276,11 +276,11 @@ EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_extra_ar
 EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_extra_args_no_func_passed\
 <\
 	_func_template,\
-	EmuMath::NewVector<(_out_size), _out_t>,\
-	std::tuple<EmuMath::NewVector<(_out_size), _out_t>>,\
+	EmuMath::Vector<(_out_size), _out_t>,\
+	std::tuple<EmuMath::Vector<(_out_size), _out_t>>,\
 	(_custom_args_at_start),\
 	0,\
-	EmuMath::NewVector<(_out_size), _out_t>::size,\
+	EmuMath::Vector<(_out_size), _out_t>::size,\
 	0\
 >
 
@@ -293,8 +293,8 @@ EmuMath::Helpers::_vector_underlying::_vector_partial_mutation_copy_with_func_te
 	_func_template,\
 	(_out_size),\
 	_out_t,\
-	const EmuMath::NewVector<(_in_size), _in_t>&,\
-	std::tuple<EmuMath::NewVector<(_out_size), _out_t>>,\
+	const EmuMath::Vector<(_in_size), _in_t>&,\
+	std::tuple<EmuMath::Vector<(_out_size), _out_t>>,\
 	(_custom_args_at_start),\
 	(_begin_index),\
 	(_end_index),\
@@ -308,9 +308,9 @@ EmuMath::Helpers::_vector_underlying::_vector_partial_mutation_copy_with_func_te
 EmuMath::Helpers::_vector_underlying::_vector_partial_mutation_copy_with_func_template_extra_args_no_func_passed\
 <\
 	_func_template,\
-	EmuMath::NewVector<(_out_size), _out_t>,\
-	const EmuMath::NewVector<(_in_size), _in_t>&,\
-	std::tuple<EmuMath::NewVector<(_out_size), _out_t>>,\
+	EmuMath::Vector<(_out_size), _out_t>,\
+	const EmuMath::Vector<(_in_size), _in_t>&,\
+	std::tuple<EmuMath::Vector<(_out_size), _out_t>>,\
 	_custom_args_at_start,\
 	(_begin_index),\
 	(_end_index),\
@@ -324,8 +324,8 @@ EmuMath::Helpers::_vector_underlying::_vector_partial_mutation_copy_with_func_te
 EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_extra_args_args_only\
 <\
 	_func_template,\
-	EmuMath::NewVector<(_out_size), _out_t>,\
-	std::tuple<EmuMath::NewVector<(_out_size), _out_t>>,\
+	EmuMath::Vector<(_out_size), _out_t>,\
+	std::tuple<EmuMath::Vector<(_out_size), _out_t>>,\
 	(_custom_args_at_start),\
 	(_begin_index),\
 	(_end_index),\
@@ -339,8 +339,8 @@ EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_extra_ar
 EmuMath::Helpers::_vector_underlying::_vector_mutate_with_func_template_extra_args_no_func_passed\
 <\
 	_func_template,\
-	EmuMath::NewVector<(_out_size), _out_t>,\
-	std::tuple<EmuMath::NewVector<(_out_size), _out_t>>,\
+	EmuMath::Vector<(_out_size), _out_t>,\
+	std::tuple<EmuMath::Vector<(_out_size), _out_t>>,\
 	(_custom_args_at_start),\
 	(_begin_index),\
 	(_end_index),\

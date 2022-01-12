@@ -41,7 +41,7 @@ namespace EmuMath::Functors
 			return permutations_[i_] * (value_type(1) / mask_);
 		}
 		template<std::size_t Size_, typename T_>
-		inline value_type operator()(const EmuMath::NewVector<Size_, T_>& point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
+		inline value_type operator()(const EmuMath::Vector<Size_, T_>& point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
 			return operator()(static_cast<value_type>(point_.at<0>()), freq_, permutations_);
 		}
@@ -75,7 +75,7 @@ namespace EmuMath::Functors
 			return lerp_(perm_0_, perm_1_, t_) * (value_type(1) / mask_);
 		}
 		template<std::size_t Size_, typename T_>
-		inline value_type operator()(const EmuMath::NewVector<Size_, T_>& point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
+		inline value_type operator()(const EmuMath::Vector<Size_, T_>& point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
 			return operator()(static_cast<value_type>(point_.at<0>()), freq_, permutations_);
 		}
@@ -117,7 +117,7 @@ namespace EmuMath::Functors
 			return lerp_(val_0_, val_1_, EmuMath::Functors::_underlying_noise_gen::smooth_t(t_0_));
 		}
 		template<std::size_t Size_, typename T_>
-		inline value_type operator()(const EmuMath::NewVector<Size_, T_>& point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
+		inline value_type operator()(const EmuMath::Vector<Size_, T_>& point_, value_type freq_, const EmuMath::NoisePermutations& permutations_) const
 		{
 			return operator()(static_cast<value_type>(point_.at<0>()), freq_, permutations_);
 		}

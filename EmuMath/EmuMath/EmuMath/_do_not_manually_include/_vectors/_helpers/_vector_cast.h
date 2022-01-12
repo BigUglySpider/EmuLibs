@@ -25,7 +25,7 @@ namespace EmuMath::Helpers
 	template<std::size_t InSize_, typename InT_, std::size_t OutSize_, typename OutT_, bool InIsConst_, bool InIsLvalRef_, std::size_t Offset_ = 0>
 	[[nodiscard]] constexpr inline bool vector_cast_is_valid()
 	{
-		using in_vector_raw = EmuMath::NewVector<InSize_, InT_>;
+		using in_vector_raw = EmuMath::Vector<InSize_, InT_>;
 		using in_ref_qualified = std::conditional_t<InIsLvalRef_, std::add_lvalue_reference_t<in_vector_raw>, in_vector_raw>;
 		using in_fully_qualified = EmuCore::TMP::conditional_const_t<InIsConst_, in_ref_qualified>;
 		return _vector_underlying::_vector_cast_valid<in_fully_qualified, OutSize_, OutT_, Offset_>;
@@ -108,28 +108,28 @@ namespace EmuMath::Helpers
 	/// <param name="in_vector_">Constant reference to an EmuMath Vector to cast.</param>
 	/// <returns>The passed EmuMath Vector cast to the desired output Vector.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_cast(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_cast(const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
-		return _vector_underlying::_vector_cast<OutSize_, OutT_, const EmuMath::NewVector<InSize_, InT_>&, Offset_>(in_vector_);
+		return _vector_underlying::_vector_cast<OutSize_, OutT_, const EmuMath::Vector<InSize_, InT_>&, Offset_>(in_vector_);
 	}
 
 	template<typename OutT_, std::size_t Offset_ = 0, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> vector_cast(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<InSize_, OutT_> vector_cast(const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
-		return _vector_underlying::_vector_cast<InSize_, OutT_, const EmuMath::NewVector<InSize_, InT_>&, Offset_>(in_vector_);
+		return _vector_underlying::_vector_cast<InSize_, OutT_, const EmuMath::Vector<InSize_, InT_>&, Offset_>(in_vector_);
 	}
 
 	template<std::size_t OutSize_, std::size_t Offset_ = 0, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq> vector_cast
+	[[nodiscard]] constexpr inline EmuMath::Vector<InSize_, typename EmuMath::Vector<InSize_, InT_>::value_type_uq> vector_cast
 	(
-		const EmuMath::NewVector<InSize_, InT_>& in_vector_
+		const EmuMath::Vector<InSize_, InT_>& in_vector_
 	)
 	{
 		return _vector_underlying::_vector_cast
 		<
 			OutSize_,
-			typename EmuMath::NewVector<InSize_, InT_>::value_type_uq,
-			const EmuMath::NewVector<InSize_, InT_>&,
+			typename EmuMath::Vector<InSize_, InT_>::value_type_uq,
+			const EmuMath::Vector<InSize_, InT_>&,
 			Offset_
 		>(in_vector_);
 	}
@@ -146,28 +146,28 @@ namespace EmuMath::Helpers
 	/// <param name="in_vector_">Reference to an EmuMath Vector to cast.</param>
 	/// <returns>The passed EmuMath Vector cast to the desired output Vector.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_cast(EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_cast(EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
-		return _vector_underlying::_vector_cast<OutSize_, OutT_, EmuMath::NewVector<InSize_, InT_>&, Offset_>(in_vector_);
+		return _vector_underlying::_vector_cast<OutSize_, OutT_, EmuMath::Vector<InSize_, InT_>&, Offset_>(in_vector_);
 	}
 
 	template<typename OutT_, std::size_t Offset_ = 0, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> vector_cast(EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<InSize_, OutT_> vector_cast(EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
-		return _vector_underlying::_vector_cast<InSize_, OutT_, EmuMath::NewVector<InSize_, InT_>&, Offset_>(in_vector_);
+		return _vector_underlying::_vector_cast<InSize_, OutT_, EmuMath::Vector<InSize_, InT_>&, Offset_>(in_vector_);
 	}
 
 	template<std::size_t OutSize_, std::size_t Offset_ = 0, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq> vector_cast
+	[[nodiscard]] constexpr inline EmuMath::Vector<InSize_, typename EmuMath::Vector<InSize_, InT_>::value_type_uq> vector_cast
 	(
-		EmuMath::NewVector<InSize_, InT_>& in_vector_
+		EmuMath::Vector<InSize_, InT_>& in_vector_
 	)
 	{
 		return _vector_underlying::_vector_cast
 		<
 			OutSize_,
-			typename EmuMath::NewVector<InSize_, InT_>::value_type_uq,
-			EmuMath::NewVector<InSize_, InT_>&,
+			typename EmuMath::Vector<InSize_, InT_>::value_type_uq,
+			EmuMath::Vector<InSize_, InT_>&,
 			Offset_
 		>(in_vector_);
 	}
@@ -184,36 +184,36 @@ namespace EmuMath::Helpers
 	/// <param name="in_vector_">Rvalue-reference to an EmuMath Vector to cast.</param>
 	/// <returns>The passed EmuMath Vector cast to the desired output Vector.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_cast(EmuMath::NewVector<InSize_, InT_>&& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_cast(EmuMath::Vector<InSize_, InT_>&& in_vector_)
 	{
-		return _vector_underlying::_vector_cast<OutSize_, OutT_, EmuMath::NewVector<InSize_, InT_>, Offset_>
+		return _vector_underlying::_vector_cast<OutSize_, OutT_, EmuMath::Vector<InSize_, InT_>, Offset_>
 		(
-			std::forward<EmuMath::NewVector<InSize_, InT_>>(in_vector_)
+			std::forward<EmuMath::Vector<InSize_, InT_>>(in_vector_)
 		);
 	}
 
 	template<typename OutT_, std::size_t Offset_ = 0, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> vector_cast(EmuMath::NewVector<InSize_, InT_>&& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<InSize_, OutT_> vector_cast(EmuMath::Vector<InSize_, InT_>&& in_vector_)
 	{
-		return _vector_underlying::_vector_cast<InSize_, OutT_, EmuMath::NewVector<InSize_, InT_>, Offset_>
+		return _vector_underlying::_vector_cast<InSize_, OutT_, EmuMath::Vector<InSize_, InT_>, Offset_>
 		(
-			std::forward<EmuMath::NewVector<InSize_, InT_>>(in_vector_)
+			std::forward<EmuMath::Vector<InSize_, InT_>>(in_vector_)
 		);
 	}
 
 	template<std::size_t OutSize_, std::size_t Offset_ = 0, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::value_type_uq> vector_cast
+	[[nodiscard]] constexpr inline EmuMath::Vector<InSize_, typename EmuMath::Vector<InSize_, InT_>::value_type_uq> vector_cast
 	(
-		EmuMath::NewVector<InSize_, InT_>&& in_vector_
+		EmuMath::Vector<InSize_, InT_>&& in_vector_
 	)
 	{
 		return _vector_underlying::_vector_cast
 		<
 			OutSize_,
-			typename EmuMath::NewVector<InSize_, InT_>::value_type_uq,
-			EmuMath::NewVector<InSize_, InT_>,
+			typename EmuMath::Vector<InSize_, InT_>::value_type_uq,
+			EmuMath::Vector<InSize_, InT_>,
 			Offset_
-		>(std::forward<EmuMath::NewVector<InSize_, InT_>>(in_vector_));
+		>(std::forward<EmuMath::Vector<InSize_, InT_>>(in_vector_));
 	}
 #pragma endregion
 }
@@ -223,44 +223,44 @@ namespace EmuCore::TMP
 #pragma region IS_STATIC_CASTABLE_SPECIALISATIONS
 	// EmuMath Vector static_cast check specialisations: VALUE
 	template<std::size_t FromSize_, typename FromT_, std::size_t ToSize_, typename ToT_>
-	struct is_static_castable<EmuMath::NewVector<FromSize_, FromT_>, EmuMath::NewVector<ToSize_, ToT_>>
+	struct is_static_castable<EmuMath::Vector<FromSize_, FromT_>, EmuMath::Vector<ToSize_, ToT_>>
 	{
 		static constexpr bool value = EmuMath::Helpers::vector_cast_is_valid
 		<
-			EmuMath::NewVector<FromSize_, FromT_>,
+			EmuMath::Vector<FromSize_, FromT_>,
 			ToSize_,
 			ToT_,
 			0
 		>();
 	};
 	template<std::size_t FromSize_, typename FromT_, std::size_t ToSize_, typename ToT_>
-	struct is_static_castable<const EmuMath::NewVector<FromSize_, FromT_>, EmuMath::NewVector<ToSize_, ToT_>>
+	struct is_static_castable<const EmuMath::Vector<FromSize_, FromT_>, EmuMath::Vector<ToSize_, ToT_>>
 	{
 		static constexpr bool value = EmuMath::Helpers::vector_cast_is_valid
 		<
-			const EmuMath::NewVector<FromSize_, FromT_>,
+			const EmuMath::Vector<FromSize_, FromT_>,
 			ToSize_,
 			ToT_,
 			0
 		>();
 	};
 	template<std::size_t FromSize_, typename FromT_, std::size_t ToSize_, typename ToT_>
-	struct is_static_castable<volatile EmuMath::NewVector<FromSize_, FromT_>, EmuMath::NewVector<ToSize_, ToT_>>
+	struct is_static_castable<volatile EmuMath::Vector<FromSize_, FromT_>, EmuMath::Vector<ToSize_, ToT_>>
 	{
 		static constexpr bool value = EmuMath::Helpers::vector_cast_is_valid
 		<
-			volatile EmuMath::NewVector<FromSize_, FromT_>,
+			volatile EmuMath::Vector<FromSize_, FromT_>,
 			ToSize_,
 			ToT_,
 			0
 		>();
 	};
 	template<std::size_t FromSize_, typename FromT_, std::size_t ToSize_, typename ToT_>
-	struct is_static_castable<const volatile EmuMath::NewVector<FromSize_, FromT_>, EmuMath::NewVector<ToSize_, ToT_>>
+	struct is_static_castable<const volatile EmuMath::Vector<FromSize_, FromT_>, EmuMath::Vector<ToSize_, ToT_>>
 	{
 		static constexpr bool value = EmuMath::Helpers::vector_cast_is_valid
 		<
-			const volatile EmuMath::NewVector<FromSize_, FromT_>,
+			const volatile EmuMath::Vector<FromSize_, FromT_>,
 			ToSize_,
 			ToT_,
 			0
@@ -269,44 +269,44 @@ namespace EmuCore::TMP
 
 	// EmuMath Vector static_cast check specialisations: LVAL REF
 	template<std::size_t FromSize_, typename FromT_, std::size_t ToSize_, typename ToT_>
-	struct is_static_castable<EmuMath::NewVector<FromSize_, FromT_>&, EmuMath::NewVector<ToSize_, ToT_>>
+	struct is_static_castable<EmuMath::Vector<FromSize_, FromT_>&, EmuMath::Vector<ToSize_, ToT_>>
 	{
 		static constexpr bool value = EmuMath::Helpers::vector_cast_is_valid
 		<
-			EmuMath::NewVector<FromSize_, FromT_>&,
+			EmuMath::Vector<FromSize_, FromT_>&,
 			ToSize_,
 			ToT_,
 			0
 		>();
 	};
 	template<std::size_t FromSize_, typename FromT_, std::size_t ToSize_, typename ToT_>
-	struct is_static_castable<const EmuMath::NewVector<FromSize_, FromT_>&, EmuMath::NewVector<ToSize_, ToT_>>
+	struct is_static_castable<const EmuMath::Vector<FromSize_, FromT_>&, EmuMath::Vector<ToSize_, ToT_>>
 	{
 		static constexpr bool value = EmuMath::Helpers::vector_cast_is_valid
 		<
-			const EmuMath::NewVector<FromSize_, FromT_>&,
+			const EmuMath::Vector<FromSize_, FromT_>&,
 			ToSize_,
 			ToT_,
 			0
 		>();
 	};
 	template<std::size_t FromSize_, typename FromT_, std::size_t ToSize_, typename ToT_>
-	struct is_static_castable<volatile EmuMath::NewVector<FromSize_, FromT_>&, EmuMath::NewVector<ToSize_, ToT_>>
+	struct is_static_castable<volatile EmuMath::Vector<FromSize_, FromT_>&, EmuMath::Vector<ToSize_, ToT_>>
 	{
 		static constexpr bool value = EmuMath::Helpers::vector_cast_is_valid
 		<
-			volatile EmuMath::NewVector<FromSize_, FromT_>&,
+			volatile EmuMath::Vector<FromSize_, FromT_>&,
 			ToSize_,
 			ToT_,
 			0
 		>();
 	};
 	template<std::size_t FromSize_, typename FromT_, std::size_t ToSize_, typename ToT_>
-	struct is_static_castable<const volatile EmuMath::NewVector<FromSize_, FromT_>&, EmuMath::NewVector<ToSize_, ToT_>>
+	struct is_static_castable<const volatile EmuMath::Vector<FromSize_, FromT_>&, EmuMath::Vector<ToSize_, ToT_>>
 	{
 		static constexpr bool value = EmuMath::Helpers::vector_cast_is_valid
 		<
-			const volatile EmuMath::NewVector<FromSize_, FromT_>&,
+			const volatile EmuMath::Vector<FromSize_, FromT_>&,
 			ToSize_,
 			ToT_,
 			0
@@ -315,44 +315,44 @@ namespace EmuCore::TMP
 
 	// EmuMath Vector static_cast check specialisations: RVAL REF
 	template<std::size_t FromSize_, typename FromT_, std::size_t ToSize_, typename ToT_>
-	struct is_static_castable<EmuMath::NewVector<FromSize_, FromT_>&&, EmuMath::NewVector<ToSize_, ToT_>>
+	struct is_static_castable<EmuMath::Vector<FromSize_, FromT_>&&, EmuMath::Vector<ToSize_, ToT_>>
 	{
 		static constexpr bool value = EmuMath::Helpers::vector_cast_is_valid
 		<
-			EmuMath::NewVector<FromSize_, FromT_>&&,
+			EmuMath::Vector<FromSize_, FromT_>&&,
 			ToSize_,
 			ToT_,
 			0
 		>();
 	};
 	template<std::size_t FromSize_, typename FromT_, std::size_t ToSize_, typename ToT_>
-	struct is_static_castable<const EmuMath::NewVector<FromSize_, FromT_>&&, EmuMath::NewVector<ToSize_, ToT_>>
+	struct is_static_castable<const EmuMath::Vector<FromSize_, FromT_>&&, EmuMath::Vector<ToSize_, ToT_>>
 	{
 		static constexpr bool value = EmuMath::Helpers::vector_cast_is_valid
 		<
-			const EmuMath::NewVector<FromSize_, FromT_>&&,
+			const EmuMath::Vector<FromSize_, FromT_>&&,
 			ToSize_,
 			ToT_,
 			0
 		>();
 	};
 	template<std::size_t FromSize_, typename FromT_, std::size_t ToSize_, typename ToT_>
-	struct is_static_castable<volatile EmuMath::NewVector<FromSize_, FromT_>&&, EmuMath::NewVector<ToSize_, ToT_>>
+	struct is_static_castable<volatile EmuMath::Vector<FromSize_, FromT_>&&, EmuMath::Vector<ToSize_, ToT_>>
 	{
 		static constexpr bool value = EmuMath::Helpers::vector_cast_is_valid
 		<
-			volatile EmuMath::NewVector<FromSize_, FromT_>&&,
+			volatile EmuMath::Vector<FromSize_, FromT_>&&,
 			ToSize_,
 			ToT_,
 			0
 		>();
 	};
 	template<std::size_t FromSize_, typename FromT_, std::size_t ToSize_, typename ToT_>
-	struct is_static_castable<const volatile EmuMath::NewVector<FromSize_, FromT_>&&, EmuMath::NewVector<ToSize_, ToT_>>
+	struct is_static_castable<const volatile EmuMath::Vector<FromSize_, FromT_>&&, EmuMath::Vector<ToSize_, ToT_>>
 	{
 		static constexpr bool value = EmuMath::Helpers::vector_cast_is_valid
 		<
-			const volatile EmuMath::NewVector<FromSize_, FromT_>&&,
+			const volatile EmuMath::Vector<FromSize_, FromT_>&&,
 			ToSize_,
 			ToT_,
 			0

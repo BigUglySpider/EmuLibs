@@ -7,15 +7,15 @@
 namespace EmuMath::Helpers::_vector_underlying
 {
 	template<std::size_t Index_, typename...Args_, std::size_t Size_, typename T_>
-	constexpr inline void _vector_set_scalar(EmuMath::NewVector<Size_, T_>& out_vector_, Args_&&...args_)
+	constexpr inline void _vector_set_scalar(EmuMath::Vector<Size_, T_>& out_vector_, Args_&&...args_)
 	{
 		out_vector_.template Set<Index_, Args_...>(std::forward<Args_>(args_)...);
 	}
 
 	template<std::size_t Index_, std::size_t End_, class Arg_, std::size_t Size_, typename T_>
-	constexpr inline void _vector_set_all_execution(EmuMath::NewVector<Size_, T_>& out_vector_, Arg_& arg_)
+	constexpr inline void _vector_set_all_execution(EmuMath::Vector<Size_, T_>& out_vector_, Arg_& arg_)
 	{
-		using lhs_vector_type = EmuMath::NewVector<Size_, T_>;
+		using lhs_vector_type = EmuMath::Vector<Size_, T_>;
 		if constexpr (Index_ < End_)
 		{
 			_vector_set_scalar<Index_, Arg_&>(out_vector_, arg_);
@@ -24,9 +24,9 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Arg_, std::size_t Size_, typename T_>
-	constexpr inline void _vector_set_all(EmuMath::NewVector<Size_, T_>& out_vector_, Arg_&& arg_)
+	constexpr inline void _vector_set_all(EmuMath::Vector<Size_, T_>& out_vector_, Arg_&& arg_)
 	{
-		using lhs_vector_type = EmuMath::NewVector<Size_, T_>;
+		using lhs_vector_type = EmuMath::Vector<Size_, T_>;
 
 		if constexpr (BeginIndex_ < lhs_vector_type::size)
 		{
@@ -106,9 +106,9 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<std::size_t Index_, std::size_t EndIndex_, class VectorArg_, std::size_t Size_, typename T_>
-	constexpr inline void _vector_set_vector_move(EmuMath::NewVector<Size_, T_>& out_vector_, VectorArg_&& in_vector_arg_)
+	constexpr inline void _vector_set_vector_move(EmuMath::Vector<Size_, T_>& out_vector_, VectorArg_&& in_vector_arg_)
 	{
-		using lhs_vector_type = EmuMath::NewVector<Size_, T_>;
+		using lhs_vector_type = EmuMath::Vector<Size_, T_>;
 		if constexpr (Index_ < EndIndex_)
 		{
 			using rhs_vector_type = EmuCore::TMP::remove_ref_cv_t<VectorArg_>;
@@ -126,9 +126,9 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<std::size_t Index_, std::size_t EndIndex_, class VectorArg_, std::size_t Size_, typename T_>
-	constexpr inline void _vector_set_vector_copy(EmuMath::NewVector<Size_, T_>& out_vector_, VectorArg_& in_vector_arg_)
+	constexpr inline void _vector_set_vector_copy(EmuMath::Vector<Size_, T_>& out_vector_, VectorArg_& in_vector_arg_)
 	{
-		using lhs_vector_type = EmuMath::NewVector<Size_, T_>;
+		using lhs_vector_type = EmuMath::Vector<Size_, T_>;
 		if constexpr (Index_ < EndIndex_)
 		{
 			using rhs_vector_type = EmuCore::TMP::remove_ref_cv_t<VectorArg_>;
@@ -146,11 +146,11 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<bool SetAll_, class VectorArg_, std::size_t Size_, typename T_>
-	constexpr inline void _vector_set_vector(EmuMath::NewVector<Size_, T_>& out_vector_, VectorArg_& vector_arg_)
+	constexpr inline void _vector_set_vector(EmuMath::Vector<Size_, T_>& out_vector_, VectorArg_& vector_arg_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<VectorArg_>)
 		{
-			using lhs_vector_type = EmuMath::NewVector<Size_, T_>;
+			using lhs_vector_type = EmuMath::Vector<Size_, T_>;
 			using rhs_vector_type = EmuCore::TMP::remove_ref_cv_t<VectorArg_>;
 
 			// Set all indices in out_vector_ if SetAll_ is true, otherwise only go up to the lowest end index.
@@ -202,11 +202,11 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<bool SetAll_, class VectorArg_, std::size_t Size_, typename T_>
-	constexpr inline void _vector_set_vector(EmuMath::NewVector<Size_, T_>& out_vector_, VectorArg_&& vector_arg_)
+	constexpr inline void _vector_set_vector(EmuMath::Vector<Size_, T_>& out_vector_, VectorArg_&& vector_arg_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<VectorArg_>)
 		{
-			using lhs_vector_type = EmuMath::NewVector<Size_, T_>;
+			using lhs_vector_type = EmuMath::Vector<Size_, T_>;
 			using rhs_vector_type = EmuCore::TMP::remove_ref_cv_t<VectorArg_>;
 
 			// Set all indices in out_vector_ if SetAll_ is true, otherwise only go up to the lowest end index.

@@ -1,7 +1,6 @@
 #ifndef EMU_MATH_NOISE_SAMPLE_PROCESSOR_ANALYTICS_H_INC_
 #define EMU_MATH_NOISE_SAMPLE_PROCESSOR_ANALYTICS_H_INC_
 
-#include "NoiseSampleProcessors.h"
 #include "../../../EmuCore/TMPHelpers/Values.h"
 #include <tuple>
 

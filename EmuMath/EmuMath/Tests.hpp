@@ -120,9 +120,9 @@ namespace EmuCore::TestingHelpers
 
 		static constexpr std::size_t vec_size = 3;
 		using vector_type_arg = float;
-		using vector_type = EmuMath::NewVector<vec_size, vector_type_arg>;
+		using vector_type = EmuMath::Vector<vec_size, vector_type_arg>;
 		using float_type = typename vector_type::preferred_floating_point;
-		using vector_type_fp = EmuMath::NewVector<vec_size, float_type>;
+		using vector_type_fp = EmuMath::Vector<vec_size, float_type>;
 
 		reflect_test_emu()
 		{

@@ -2,7 +2,7 @@
 #define EMU_MATH_FRACTAL_NOISE_INFO_H_INC_ 1
 
 #include <cstddef>
-#include "../NoiseTMP.h"
+#include "../_noise_tmp.h"
 
 namespace EmuMath::Info
 {

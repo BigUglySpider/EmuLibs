@@ -39,18 +39,18 @@ namespace EmuMath::Helpers
 	/// <param name="vector_b_">: EmuMath Vector `b` for finding the dot product.</param>
 	/// <returns>Dot product of the passed EmuMath Vectors.</returns>
 	template<typename Out_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline Out_ vector_dot(const EmuMath::NewVector<SizeA_, TA_>& vector_a_, const EmuMath::NewVector<SizeB_, TB_>& vector_b_)
+	[[nodiscard]] constexpr inline Out_ vector_dot(const EmuMath::Vector<SizeA_, TA_>& vector_a_, const EmuMath::Vector<SizeB_, TB_>& vector_b_)
 	{
 		return _vector_underlying::_vector_dot<Out_>(vector_a_, vector_b_);
 	}
 	template<std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point vector_dot
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point vector_dot
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+		const EmuMath::Vector<SizeA_, TA_>& vector_a_,
+		const EmuMath::Vector<SizeB_, TB_>& vector_b_
 	)
 	{
-		return _vector_underlying::_vector_dot<typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point>(vector_a_, vector_b_);
+		return _vector_underlying::_vector_dot<typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point>(vector_a_, vector_b_);
 	}
 
 	/// <summary>
@@ -64,18 +64,18 @@ namespace EmuMath::Helpers
 	/// <param name="vector_b_">: EmuMath Vector `b` for finding the dot product.</param>
 	/// <returns>Dot product of the passed EmuMath Vectors, using elements within the specified range.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline Out_ vector_dot(const EmuMath::NewVector<SizeA_, TA_>& vector_a_, const EmuMath::NewVector<SizeB_, TB_>& vector_b_)
+	[[nodiscard]] constexpr inline Out_ vector_dot(const EmuMath::Vector<SizeA_, TA_>& vector_a_, const EmuMath::Vector<SizeB_, TB_>& vector_b_)
 	{
 		return _vector_underlying::_vector_dot<BeginIndex_, EndIndex_, Out_>(vector_a_, vector_b_);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point vector_dot
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point vector_dot
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+		const EmuMath::Vector<SizeA_, TA_>& vector_a_,
+		const EmuMath::Vector<SizeB_, TB_>& vector_b_
 	)
 	{
-		return _vector_underlying::_vector_dot<BeginIndex_, EndIndex_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point>(vector_a_, vector_b_);
+		return _vector_underlying::_vector_dot<BeginIndex_, EndIndex_, typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point>(vector_a_, vector_b_);
 	}
 #pragma endregion
 
@@ -89,14 +89,14 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">: EmuMath Vector to calculate the square magnitude of.</param>
 	/// <returns>Squared magnitude of the passed EmuMath Vector.</returns>
 	template<typename Out_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ vector_square_magnitude(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline Out_ vector_square_magnitude(const EmuMath::Vector<Size_, T_>& vector_)
 	{
 		return _vector_underlying::_vector_square_mag<Out_>(vector_);
 	}
 	template<std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::preferred_floating_point vector_square_magnitude(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<Size_, T_>::preferred_floating_point vector_square_magnitude(const EmuMath::Vector<Size_, T_>& vector_)
 	{
-		return _vector_underlying::_vector_square_mag<typename EmuMath::NewVector<Size_, T_>::preferred_floating_point>(vector_);
+		return _vector_underlying::_vector_square_mag<typename EmuMath::Vector<Size_, T_>::preferred_floating_point>(vector_);
 	}
 
 	/// <summary>
@@ -110,14 +110,14 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">: EmuMath Vector to calculate the square magnitude of.</param>
 	/// <returns>Squared magnitude of the passed EmuMath Vector, using the provided index range.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ vector_square_magnitude(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline Out_ vector_square_magnitude(const EmuMath::Vector<Size_, T_>& vector_)
 	{
 		return _vector_underlying::_vector_square_mag<BeginIndex_, EndIndex_, Out_>(vector_);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::preferred_floating_point vector_square_magnitude(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<Size_, T_>::preferred_floating_point vector_square_magnitude(const EmuMath::Vector<Size_, T_>& vector_)
 	{
-		return _vector_underlying::_vector_square_mag<BeginIndex_, EndIndex_, typename EmuMath::NewVector<Size_, T_>::preferred_floating_point>(vector_);
+		return _vector_underlying::_vector_square_mag<BeginIndex_, EndIndex_, typename EmuMath::Vector<Size_, T_>::preferred_floating_point>(vector_);
 	}
 #pragma endregion
 
@@ -133,14 +133,14 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">: EmuMath Vector to calculate the magnitude of.</param>
 	/// <returns>Magnitude of the passed EmuMath Vector.</returns>
 	template<typename Out_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ vector_magnitude_constexpr(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline Out_ vector_magnitude_constexpr(const EmuMath::Vector<Size_, T_>& vector_)
 	{
 		return _vector_underlying::_vector_mag<EmuCore::do_sqrt_constexpr, Out_>(vector_);
 	}
 	template<std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::preferred_floating_point vector_magnitude_constexpr(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<Size_, T_>::preferred_floating_point vector_magnitude_constexpr(const EmuMath::Vector<Size_, T_>& vector_)
 	{
-		return _vector_underlying::_vector_mag<EmuCore::do_sqrt_constexpr, typename EmuMath::NewVector<Size_, T_>::preferred_floating_point>(vector_);
+		return _vector_underlying::_vector_mag<EmuCore::do_sqrt_constexpr, typename EmuMath::Vector<Size_, T_>::preferred_floating_point>(vector_);
 	}
 
 	/// <summary>
@@ -156,14 +156,14 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">: EmuMath Vector to calculate the magnitude of.</param>
 	/// <returns>Magnitude of the passed EmuMath Vector, using the provided index range.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ vector_magnitude_constexpr(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline Out_ vector_magnitude_constexpr(const EmuMath::Vector<Size_, T_>& vector_)
 	{
 		return _vector_underlying::_vector_mag<EmuCore::do_sqrt_constexpr, BeginIndex_, EndIndex_, Out_>(vector_);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::preferred_floating_point vector_magnitude_constexpr(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<Size_, T_>::preferred_floating_point vector_magnitude_constexpr(const EmuMath::Vector<Size_, T_>& vector_)
 	{
-		return _vector_underlying::_vector_mag<EmuCore::do_sqrt_constexpr, BeginIndex_, EndIndex_, typename EmuMath::NewVector<Size_, T_>::preferred_floating_point>(vector_);
+		return _vector_underlying::_vector_mag<EmuCore::do_sqrt_constexpr, BeginIndex_, EndIndex_, typename EmuMath::Vector<Size_, T_>::preferred_floating_point>(vector_);
 	}
 #pragma endregion
 
@@ -176,14 +176,14 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">: EmuMath Vector to calculate the magnitude of.</param>
 	/// <returns>Magnitude of the passed EmuMath Vector.</returns>
 	template<typename Out_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ vector_magnitude(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline Out_ vector_magnitude(const EmuMath::Vector<Size_, T_>& vector_)
 	{
 		return _vector_underlying::_vector_mag<EmuCore::do_sqrt, Out_>(vector_);
 	}
 	template<std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::preferred_floating_point vector_magnitude(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<Size_, T_>::preferred_floating_point vector_magnitude(const EmuMath::Vector<Size_, T_>& vector_)
 	{
-		return _vector_underlying::_vector_mag<EmuCore::do_sqrt, typename EmuMath::NewVector<Size_, T_>::preferred_floating_point>(vector_);
+		return _vector_underlying::_vector_mag<EmuCore::do_sqrt, typename EmuMath::Vector<Size_, T_>::preferred_floating_point>(vector_);
 	}
 
 	/// <summary>
@@ -196,14 +196,14 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">: EmuMath Vector to calculate the magnitude of.</param>
 	/// <returns>Magnitude of the passed EmuMath Vector, using the provided index range.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ vector_magnitude(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline Out_ vector_magnitude(const EmuMath::Vector<Size_, T_>& vector_)
 	{
 		return _vector_underlying::_vector_mag<EmuCore::do_sqrt, BeginIndex_, EndIndex_, Out_>(vector_);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<Size_, T_>::preferred_floating_point vector_magnitude(const EmuMath::NewVector<Size_, T_>& vector_)
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<Size_, T_>::preferred_floating_point vector_magnitude(const EmuMath::Vector<Size_, T_>& vector_)
 	{
-		return _vector_underlying::_vector_mag<EmuCore::do_sqrt, BeginIndex_, EndIndex_, typename EmuMath::NewVector<Size_, T_>::preferred_floating_point>(vector_);
+		return _vector_underlying::_vector_mag<EmuCore::do_sqrt, BeginIndex_, EndIndex_, typename EmuMath::Vector<Size_, T_>::preferred_floating_point>(vector_);
 	}
 #pragma endregion
 
@@ -218,31 +218,31 @@ namespace EmuMath::Helpers
 	/// <param name="in_vector_">: EmuMath Vector to calculate the normalised form of.</param>
 	/// <returns>Normalised form of the passed EmuMath Vector.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_normalise_constexpr(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_normalise_constexpr(const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt_constexpr, OutSize_, OutT_>(in_vector_);
 	}
 	template<typename OutT_, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> vector_normalise_constexpr(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<InSize_, OutT_> vector_normalise_constexpr(const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt_constexpr, InSize_, OutT_>(in_vector_);
 	}
 	template<std::size_t OutSize_, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point> vector_normalise_constexpr
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Vector<InSize_, InT_>::preferred_floating_point> vector_normalise_constexpr
 	(
-		const EmuMath::NewVector<InSize_, InT_>& in_vector_
+		const EmuMath::Vector<InSize_, InT_>& in_vector_
 	)
 	{
-		using out_arg = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		using out_arg = typename EmuMath::Vector<InSize_, InT_>::preferred_floating_point;
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt_constexpr, OutSize_, out_arg>(in_vector_);
 	}
 	template<typename InT_, std::size_t InSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point> vector_normalise_constexpr
+	[[nodiscard]] constexpr inline EmuMath::Vector<InSize_, typename EmuMath::Vector<InSize_, InT_>::preferred_floating_point> vector_normalise_constexpr
 	(
-		const EmuMath::NewVector<InSize_, InT_>& in_vector_
+		const EmuMath::Vector<InSize_, InT_>& in_vector_
 	)
 	{
-		using out_arg = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		using out_arg = typename EmuMath::Vector<InSize_, InT_>::preferred_floating_point;
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt_constexpr, InSize_, out_arg>(in_vector_);
 	}
 
@@ -256,7 +256,7 @@ namespace EmuMath::Helpers
 	/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 	/// <param name="in_vector_">: EmuMath Vector to calculate the normalised form of.</param>
 	template<std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_>
-	constexpr inline void vector_normalise_constexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	constexpr inline void vector_normalise_constexpr(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt_constexpr>(out_vector_, in_vector_);
 	}
@@ -274,31 +274,31 @@ namespace EmuMath::Helpers
 	/// <param name="in_vector_">: EmuMath Vector to calculate the normalised form of.</param>
 	/// <returns>Normalised form of the passed EmuMath Vector.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_normalise_range_constexpr(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_normalise_range_constexpr(const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt_constexpr, BeginIndex_, EndIndex_, OutSize_, OutT_>(in_vector_);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> vector_normalise_range_constexpr(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<InSize_, OutT_> vector_normalise_range_constexpr(const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt_constexpr, BeginIndex_, EndIndex_, InSize_, OutT_>(in_vector_);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point> vector_normalise_range_constexpr
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Vector<InSize_, InT_>::preferred_floating_point> vector_normalise_range_constexpr
 	(
-		const EmuMath::NewVector<InSize_, InT_>& in_vector_
+		const EmuMath::Vector<InSize_, InT_>& in_vector_
 	)
 	{
-		using out_arg = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		using out_arg = typename EmuMath::Vector<InSize_, InT_>::preferred_floating_point;
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt_constexpr, BeginIndex_, EndIndex_, OutSize_, out_arg>(in_vector_);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename InT_, std::size_t InSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point> vector_normalise_range_constexpr
+	[[nodiscard]] constexpr inline EmuMath::Vector<InSize_, typename EmuMath::Vector<InSize_, InT_>::preferred_floating_point> vector_normalise_range_constexpr
 	(
-		const EmuMath::NewVector<InSize_, InT_>& in_vector_
+		const EmuMath::Vector<InSize_, InT_>& in_vector_
 	)
 	{
-		using out_arg = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		using out_arg = typename EmuMath::Vector<InSize_, InT_>::preferred_floating_point;
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt_constexpr, BeginIndex_, EndIndex_, InSize_, out_arg>(in_vector_);
 	}
 
@@ -315,7 +315,7 @@ namespace EmuMath::Helpers
 	/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 	/// <param name="in_vector_">: EmuMath Vector to calculate the normalised form of.</param>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_>
-	constexpr inline void vector_normalise_range_constexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	constexpr inline void vector_normalise_range_constexpr(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt_constexpr, BeginIndex_, EndIndex_>(out_vector_, in_vector_);
 	}
@@ -329,31 +329,31 @@ namespace EmuMath::Helpers
 	/// <param name="in_vector_">: EmuMath Vector to calculate the normalised form of.</param>
 	/// <returns>Normalised form of the passed EmuMath Vector.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_normalise(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_normalise(const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt, OutSize_, OutT_>(in_vector_);
 	}
 	template<typename OutT_, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> vector_normalise(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<InSize_, OutT_> vector_normalise(const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt, InSize_, OutT_>(in_vector_);
 	}
 	template<std::size_t OutSize_, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point> vector_normalise
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Vector<InSize_, InT_>::preferred_floating_point> vector_normalise
 	(
-		const EmuMath::NewVector<InSize_, InT_>& in_vector_
+		const EmuMath::Vector<InSize_, InT_>& in_vector_
 	)
 	{
-		using out_arg = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		using out_arg = typename EmuMath::Vector<InSize_, InT_>::preferred_floating_point;
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt, OutSize_, out_arg>(in_vector_);
 	}
 	template<typename InT_, std::size_t InSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point> vector_normalise
+	[[nodiscard]] constexpr inline EmuMath::Vector<InSize_, typename EmuMath::Vector<InSize_, InT_>::preferred_floating_point> vector_normalise
 	(
-		const EmuMath::NewVector<InSize_, InT_>& in_vector_
+		const EmuMath::Vector<InSize_, InT_>& in_vector_
 	)
 	{
-		using out_arg = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		using out_arg = typename EmuMath::Vector<InSize_, InT_>::preferred_floating_point;
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt, InSize_, out_arg>(in_vector_);
 	}
 
@@ -364,7 +364,7 @@ namespace EmuMath::Helpers
 	/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 	/// <param name="in_vector_">: EmuMath Vector to calculate the normalised form of.</param>
 	template<std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_>
-	constexpr inline void vector_normalise(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	constexpr inline void vector_normalise(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt>(out_vector_, in_vector_);
 	}
@@ -379,31 +379,31 @@ namespace EmuMath::Helpers
 	/// <param name="in_vector_">: EmuMath Vector to calculate the normalised form of.</param>
 	/// <returns>Normalised form of the passed EmuMath Vector.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_normalise_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_normalise_range(const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt, BeginIndex_, EndIndex_, OutSize_, OutT_>(in_vector_);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, OutT_> vector_normalise_range(const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<InSize_, OutT_> vector_normalise_range(const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt, BeginIndex_, EndIndex_, InSize_, OutT_>(in_vector_);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, std::size_t InSize_, typename InT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point> vector_normalise_range
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Vector<InSize_, InT_>::preferred_floating_point> vector_normalise_range
 	(
-		const EmuMath::NewVector<InSize_, InT_>& in_vector_
+		const EmuMath::Vector<InSize_, InT_>& in_vector_
 	)
 	{
-		using out_arg = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		using out_arg = typename EmuMath::Vector<InSize_, InT_>::preferred_floating_point;
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt, BeginIndex_, EndIndex_, OutSize_, out_arg>(in_vector_);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename InT_, std::size_t InSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<InSize_, typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point> vector_normalise_range
+	[[nodiscard]] constexpr inline EmuMath::Vector<InSize_, typename EmuMath::Vector<InSize_, InT_>::preferred_floating_point> vector_normalise_range
 	(
-		const EmuMath::NewVector<InSize_, InT_>& in_vector_
+		const EmuMath::Vector<InSize_, InT_>& in_vector_
 	)
 	{
-		using out_arg = typename EmuMath::NewVector<InSize_, InT_>::preferred_floating_point;
+		using out_arg = typename EmuMath::Vector<InSize_, InT_>::preferred_floating_point;
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt, BeginIndex_, EndIndex_, InSize_, out_arg>(in_vector_);
 	}
 
@@ -417,7 +417,7 @@ namespace EmuMath::Helpers
 	/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 	/// <param name="in_vector_">: EmuMath Vector to calculate the normalised form of.</param>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_, std::size_t InSize_, typename InT_>
-	constexpr inline void vector_normalise_range(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, const EmuMath::NewVector<InSize_, InT_>& in_vector_)
+	constexpr inline void vector_normalise_range(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<InSize_, InT_>& in_vector_)
 	{
 		return _vector_underlying::_vector_normalise<EmuCore::do_sqrt, BeginIndex_, EndIndex_>(out_vector_, in_vector_);
 	}
@@ -436,18 +436,18 @@ namespace EmuMath::Helpers
 	/// <param name="vector_b_">Second EmuMath Vector of the two to find the cosine of the angle between.</param>
 	/// <returns>Cosine of the angle between the two provided EmuMath Vectors, in radians or degrees depending on the Radians_ arg.</returns>
 	template<typename Out_, bool Radians_ = true, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline Out_ vector_angle_cos_constexpr(const EmuMath::NewVector<SizeA_, TA_>& vector_a_, const EmuMath::NewVector<SizeB_, TB_>& vector_b_)
+	[[nodiscard]] constexpr inline Out_ vector_angle_cos_constexpr(const EmuMath::Vector<SizeA_, TA_>& vector_a_, const EmuMath::Vector<SizeB_, TB_>& vector_b_)
 	{
 		return _vector_underlying::_vector_angle_cos<EmuCore::do_sqrt_constexpr, Out_, Radians_>(vector_a_, vector_b_);
 	}
 	template<bool Radians_ = true, typename TA_, std::size_t SizeA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point vector_angle_cos_constexpr
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point vector_angle_cos_constexpr
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+		const EmuMath::Vector<SizeA_, TA_>& vector_a_,
+		const EmuMath::Vector<SizeB_, TB_>& vector_b_
 	)
 	{
-		using out_type_arg = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		using out_type_arg = typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_angle_cos<EmuCore::do_sqrt_constexpr, out_type_arg, Radians_>(vector_a_, vector_b_);
 	}
 
@@ -460,18 +460,18 @@ namespace EmuMath::Helpers
 	/// <param name="vector_b_">Second EmuMath Vector of the two to find the cosine of the angle between.</param>
 	/// <returns>Cosine of the angle between the two provided EmuMath Vectors, in radians or degrees depending on the Radians_ arg.</returns>
 	template<typename Out_, bool Radians_ = true, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline Out_ vector_angle_cos(const EmuMath::NewVector<SizeA_, TA_>& vector_a_, const EmuMath::NewVector<SizeB_, TB_>& vector_b_)
+	[[nodiscard]] constexpr inline Out_ vector_angle_cos(const EmuMath::Vector<SizeA_, TA_>& vector_a_, const EmuMath::Vector<SizeB_, TB_>& vector_b_)
 	{
 		return _vector_underlying::_vector_angle_cos<EmuCore::do_sqrt, Out_, Radians_>(vector_a_, vector_b_);
 	}
 	template<bool Radians_ = true, typename TA_, std::size_t SizeA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point vector_angle_cos
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point vector_angle_cos
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+		const EmuMath::Vector<SizeA_, TA_>& vector_a_,
+		const EmuMath::Vector<SizeB_, TB_>& vector_b_
 	)
 	{
-		using out_type_arg = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		using out_type_arg = typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_angle_cos<EmuCore::do_sqrt, out_type_arg, Radians_>(vector_a_, vector_b_);
 	}
 
@@ -483,18 +483,18 @@ namespace EmuMath::Helpers
 	/// <param name="vector_b_">Second EmuMath Vector of the two to find the angle between.</param>
 	/// <returns>Angle between the two provided EmuMath Vectors, in radians or degrees depending on the Radians_ arg.</returns>
 	template<typename Out_, bool Radians_ = true, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline Out_ vector_angle(const EmuMath::NewVector<SizeA_, TA_>& vector_a_, const EmuMath::NewVector<SizeB_, TB_>& vector_b_)
+	[[nodiscard]] constexpr inline Out_ vector_angle(const EmuMath::Vector<SizeA_, TA_>& vector_a_, const EmuMath::Vector<SizeB_, TB_>& vector_b_)
 	{
 		return _vector_underlying::_vector_angle<EmuCore::do_sqrt, EmuCore::do_acos, Out_, Radians_>(vector_a_, vector_b_);
 	}
 	template<bool Radians_ = true, typename TA_, std::size_t SizeA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point vector_angle
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point vector_angle
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+		const EmuMath::Vector<SizeA_, TA_>& vector_a_,
+		const EmuMath::Vector<SizeB_, TB_>& vector_b_
 	)
 	{
-		using out_type_arg = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		using out_type_arg = typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_angle<EmuCore::do_sqrt, EmuCore::do_acos, out_type_arg, Radians_>(vector_a_, vector_b_);
 	}
 #pragma endregion
@@ -513,36 +513,36 @@ namespace EmuMath::Helpers
 	/// <param name="b_">: EmuMath Vector appearing as `b_` in the listed calculations.</param>
 	/// <returns>3D cross product of EmuMath Vectors a_ and b_, using theoretical indices 0, 1, 2.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_cross_3d(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_cross_3d(const EmuMath::Vector<SizeA_, TA_>& a_, const EmuMath::Vector<SizeB_, TB_>& b_)
 	{
 		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, OutSize_, OutT_, 0, 1, 2, 0, 1, 2>(a_, b_);
 	}
 
 	template<typename OutT_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> vector_cross_3d(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> vector_cross_3d(const EmuMath::Vector<SizeA_, TA_>& a_, const EmuMath::Vector<SizeB_, TB_>& b_)
 	{
 		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, 3, OutT_, 0, 1, 2, 0, 1, 2>(a_, b_);
 	}
 
 	template<std::size_t OutSize_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> vector_cross_3d
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point> vector_cross_3d
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& a_,
-		const EmuMath::NewVector<SizeB_, TB_>& b_
+		const EmuMath::Vector<SizeA_, TA_>& a_,
+		const EmuMath::Vector<SizeB_, TB_>& b_
 	)
 	{
-		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		using a_fp = typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, OutSize_, a_fp, 0, 1, 2, 0, 1, 2>(a_, b_);
 	}
 
 	template<typename TA_, std::size_t SizeA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<3, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> vector_cross_3d
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point> vector_cross_3d
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& a_,
-		const EmuMath::NewVector<SizeB_, TB_>& b_
+		const EmuMath::Vector<SizeA_, TA_>& a_,
+		const EmuMath::Vector<SizeB_, TB_>& b_
 	)
 	{
-		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		using a_fp = typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, 3, a_fp, 0, 1, 2, 0, 1, 2>(a_, b_);
 	}
 
@@ -559,36 +559,36 @@ namespace EmuMath::Helpers
 	/// <param name="b_">: EmuMath Vector appearing as `b_` in the listed calculations.</param>
 	/// <returns>3D cross product of EmuMath Vectors a_ and b_, using theoretical indices I0_, I1_, I2_.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_cross_3d(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_cross_3d(const EmuMath::Vector<SizeA_, TA_>& a_, const EmuMath::Vector<SizeB_, TB_>& b_)
 	{
 		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, OutSize_, OutT_, I0_, I1_, I2_, I0_, I1_, I2_>(a_, b_);
 	}
 
 	template<typename OutT_, std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> vector_cross_3d(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> vector_cross_3d(const EmuMath::Vector<SizeA_, TA_>& a_, const EmuMath::Vector<SizeB_, TB_>& b_)
 	{
 		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, 3, OutT_, I0_, I1_, I2_, I0_, I1_, I2_>(a_, b_);
 	}
 
 	template<std::size_t OutSize_, std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> vector_cross_3d
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point> vector_cross_3d
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& a_,
-		const EmuMath::NewVector<SizeB_, TB_>& b_
+		const EmuMath::Vector<SizeA_, TA_>& a_,
+		const EmuMath::Vector<SizeB_, TB_>& b_
 	)
 	{
-		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		using a_fp = typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, OutSize_, a_fp, I0_, I1_, I2_, I0_, I1_, I2_>(a_, b_);
 	}
 
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, typename TA_, std::size_t SizeA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<3, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> vector_cross_3d
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point> vector_cross_3d
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& a_,
-		const EmuMath::NewVector<SizeB_, TB_>& b_
+		const EmuMath::Vector<SizeA_, TA_>& a_,
+		const EmuMath::Vector<SizeB_, TB_>& b_
 	)
 	{
-		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		using a_fp = typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, 3, a_fp, I0_, I1_, I2_, I0_, I1_, I2_>(a_, b_);
 	}
 
@@ -619,7 +619,7 @@ namespace EmuMath::Helpers
 		std::size_t SizeB_,
 		typename TB_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_cross_3d(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_cross_3d(const EmuMath::Vector<SizeA_, TA_>& a_, const EmuMath::Vector<SizeB_, TB_>& b_)
 	{
 		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, OutSize_, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>(a_, b_);
 	}
@@ -638,7 +638,7 @@ namespace EmuMath::Helpers
 		std::size_t SizeB_,
 		typename TB_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> vector_cross_3d(const EmuMath::NewVector<SizeA_, TA_>& a_, const EmuMath::NewVector<SizeB_, TB_>& b_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> vector_cross_3d(const EmuMath::Vector<SizeA_, TA_>& a_, const EmuMath::Vector<SizeB_, TB_>& b_)
 	{
 		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, 3, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>(a_, b_);
 	}
@@ -657,13 +657,13 @@ namespace EmuMath::Helpers
 		std::size_t SizeB_,
 		typename TB_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> vector_cross_3d
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point> vector_cross_3d
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& a_,
-		const EmuMath::NewVector<SizeB_, TB_>& b_
+		const EmuMath::Vector<SizeA_, TA_>& a_,
+		const EmuMath::Vector<SizeB_, TB_>& b_
 	)
 	{
-		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		using a_fp = typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, OutSize_, a_fp, A0_, A1_, A2_, B0_, B1_, B2_>(a_, b_);
 	}
 
@@ -680,13 +680,13 @@ namespace EmuMath::Helpers
 		std::size_t SizeB_,
 		typename TB_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<3, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> vector_cross_3d
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point> vector_cross_3d
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& a_,
-		const EmuMath::NewVector<SizeB_, TB_>& b_
+		const EmuMath::Vector<SizeA_, TA_>& a_,
+		const EmuMath::Vector<SizeB_, TB_>& b_
 	)
 	{
-		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		using a_fp = typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_cross_3d<EmuCore::do_multiply, EmuCore::do_subtract, 3, a_fp, A0_, A1_, A2_, B0_, B1_, B2_>(a_, b_);
 	}
 #pragma endregion
@@ -700,19 +700,19 @@ namespace EmuMath::Helpers
 	/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
 	/// <returns>Distance between the two passed EmuMath Vectors before a square root operation is performed.</returns>
 	template<typename Out_, bool IncludeNonContained_ = true, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
-	[[nodiscard]] constexpr inline Out_ vector_square_distance(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	[[nodiscard]] constexpr inline Out_ vector_square_distance(const EmuMath::Vector<FromSize_, FromT_>& from_, const EmuMath::Vector<ToSize_, ToT_>& to_)
 	{
 		return _vector_underlying::_vector_square_distance<IncludeNonContained_, Out_>(from_, to_);
 	}
 
 	template<bool IncludeNonContained_ = true, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point vector_square_distance
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<FromSize_, FromT_>::preferred_floating_point vector_square_distance
 	(
-		const EmuMath::NewVector<FromSize_, FromT_>& from_,
-		const EmuMath::NewVector<ToSize_, ToT_>& to_
+		const EmuMath::Vector<FromSize_, FromT_>& from_,
+		const EmuMath::Vector<ToSize_, ToT_>& to_
 	)
 	{
-		return _vector_underlying::_vector_square_distance<IncludeNonContained_, typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point>(from_, to_);
+		return _vector_underlying::_vector_square_distance<IncludeNonContained_, typename EmuMath::Vector<FromSize_, FromT_>::preferred_floating_point>(from_, to_);
 	}
 
 	/// <summary>
@@ -724,19 +724,19 @@ namespace EmuMath::Helpers
 	/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
 	/// <returns>Distance between the two passed EmuMath Vectors before a square root operation is performed.</returns>
 	template<typename Out_, std::size_t BeginIndex_, std::size_t EndIndex_, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
-	[[nodiscard]] constexpr inline Out_ vector_square_distance(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	[[nodiscard]] constexpr inline Out_ vector_square_distance(const EmuMath::Vector<FromSize_, FromT_>& from_, const EmuMath::Vector<ToSize_, ToT_>& to_)
 	{
 		return _vector_underlying::_vector_square_distance<BeginIndex_, EndIndex_, Out_>(from_, to_);
 	}
 
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point vector_square_distance
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<FromSize_, FromT_>::preferred_floating_point vector_square_distance
 	(
-		const EmuMath::NewVector<FromSize_, FromT_>& from_,
-		const EmuMath::NewVector<ToSize_, ToT_>& to_
+		const EmuMath::Vector<FromSize_, FromT_>& from_,
+		const EmuMath::Vector<ToSize_, ToT_>& to_
 	)
 	{
-		return _vector_underlying::_vector_square_distance<BeginIndex_, EndIndex_, typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point>(from_, to_);
+		return _vector_underlying::_vector_square_distance<BeginIndex_, EndIndex_, typename EmuMath::Vector<FromSize_, FromT_>::preferred_floating_point>(from_, to_);
 	}
 #pragma endregion
 
@@ -750,19 +750,19 @@ namespace EmuMath::Helpers
 	/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
 	/// <returns>Distance between the two passed EmuMath Vectors.</returns>
 	template<typename Out_, bool IncludeNonContained_ = true, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
-	[[nodiscard]] constexpr inline Out_ vector_distance(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	[[nodiscard]] constexpr inline Out_ vector_distance(const EmuMath::Vector<FromSize_, FromT_>& from_, const EmuMath::Vector<ToSize_, ToT_>& to_)
 	{
 		return _vector_underlying::_vector_distance<EmuCore::do_sqrt, IncludeNonContained_, Out_>(from_, to_);
 	}
 
 	template<bool IncludeNonContained_ = true, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point vector_distance
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<FromSize_, FromT_>::preferred_floating_point vector_distance
 	(
-		const EmuMath::NewVector<FromSize_, FromT_>& from_,
-		const EmuMath::NewVector<ToSize_, ToT_>& to_
+		const EmuMath::Vector<FromSize_, FromT_>& from_,
+		const EmuMath::Vector<ToSize_, ToT_>& to_
 	)
 	{
-		return _vector_underlying::_vector_distance<EmuCore::do_sqrt, IncludeNonContained_, typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point>(from_, to_);
+		return _vector_underlying::_vector_distance<EmuCore::do_sqrt, IncludeNonContained_, typename EmuMath::Vector<FromSize_, FromT_>::preferred_floating_point>(from_, to_);
 	}
 
 	/// <summary>
@@ -775,19 +775,19 @@ namespace EmuMath::Helpers
 	/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
 	/// <returns>Distance between the two passed EmuMath Vectors.</returns>
 	template<typename Out_, std::size_t BeginIndex_, std::size_t EndIndex_, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
-	[[nodiscard]] constexpr inline Out_ vector_distance(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	[[nodiscard]] constexpr inline Out_ vector_distance(const EmuMath::Vector<FromSize_, FromT_>& from_, const EmuMath::Vector<ToSize_, ToT_>& to_)
 	{
 		return _vector_underlying::_vector_distance<EmuCore::do_sqrt, BeginIndex_, EndIndex_, Out_>(from_, to_);
 	}
 
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point vector_distance
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<FromSize_, FromT_>::preferred_floating_point vector_distance
 	(
-		const EmuMath::NewVector<FromSize_, FromT_>& from_,
-		const EmuMath::NewVector<ToSize_, ToT_>& to_
+		const EmuMath::Vector<FromSize_, FromT_>& from_,
+		const EmuMath::Vector<ToSize_, ToT_>& to_
 	)
 	{
-		return _vector_underlying::_vector_distance<EmuCore::do_sqrt, BeginIndex_, EndIndex_, typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point>(from_, to_);
+		return _vector_underlying::_vector_distance<EmuCore::do_sqrt, BeginIndex_, EndIndex_, typename EmuMath::Vector<FromSize_, FromT_>::preferred_floating_point>(from_, to_);
 	}
 #pragma endregion
 
@@ -804,19 +804,19 @@ namespace EmuMath::Helpers
 	/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
 	/// <returns>Distance between the two passed EmuMath Vectors.</returns>
 	template<typename Out_, bool IncludeNonContained_ = true, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
-	[[nodiscard]] constexpr inline Out_ vector_distance_constexpr(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	[[nodiscard]] constexpr inline Out_ vector_distance_constexpr(const EmuMath::Vector<FromSize_, FromT_>& from_, const EmuMath::Vector<ToSize_, ToT_>& to_)
 	{
 		return _vector_underlying::_vector_distance<EmuCore::do_sqrt_constexpr, IncludeNonContained_, Out_>(from_, to_);
 	}
 
 	template<bool IncludeNonContained_ = true, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point vector_distance_constexpr
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<FromSize_, FromT_>::preferred_floating_point vector_distance_constexpr
 	(
-		const EmuMath::NewVector<FromSize_, FromT_>& from_,
-		const EmuMath::NewVector<ToSize_, ToT_>& to_
+		const EmuMath::Vector<FromSize_, FromT_>& from_,
+		const EmuMath::Vector<ToSize_, ToT_>& to_
 	)
 	{
-		using from_fp = typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point;
+		using from_fp = typename EmuMath::Vector<FromSize_, FromT_>::preferred_floating_point;
 		return _vector_underlying::_vector_distance<EmuCore::do_sqrt_constexpr, IncludeNonContained_, from_fp>(from_, to_);
 	}
 
@@ -833,19 +833,19 @@ namespace EmuMath::Helpers
 	/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
 	/// <returns>Distance between the two passed EmuMath Vectors.</returns>
 	template<typename Out_, std::size_t BeginIndex_, std::size_t EndIndex_, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
-	[[nodiscard]] constexpr inline Out_ vector_distance_constexpr(const EmuMath::NewVector<FromSize_, FromT_>& from_, const EmuMath::NewVector<ToSize_, ToT_>& to_)
+	[[nodiscard]] constexpr inline Out_ vector_distance_constexpr(const EmuMath::Vector<FromSize_, FromT_>& from_, const EmuMath::Vector<ToSize_, ToT_>& to_)
 	{
 		return _vector_underlying::_vector_distance<EmuCore::do_sqrt_constexpr, BeginIndex_, EndIndex_, Out_>(from_, to_);
 	}
 
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename FromT_, std::size_t FromSize_, typename ToT_, std::size_t ToSize_>
-	[[nodiscard]] constexpr inline typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point vector_distance_constexpr
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<FromSize_, FromT_>::preferred_floating_point vector_distance_constexpr
 	(
-		const EmuMath::NewVector<FromSize_, FromT_>& from_,
-		const EmuMath::NewVector<ToSize_, ToT_>& to_
+		const EmuMath::Vector<FromSize_, FromT_>& from_,
+		const EmuMath::Vector<ToSize_, ToT_>& to_
 	)
 	{
-		using from_fp = typename EmuMath::NewVector<FromSize_, FromT_>::preferred_floating_point;
+		using from_fp = typename EmuMath::Vector<FromSize_, FromT_>::preferred_floating_point;
 		return _vector_underlying::_vector_distance<EmuCore::do_sqrt_constexpr, BeginIndex_, EndIndex_, from_fp>(from_, to_);
 	}
 #pragma endregion
@@ -858,44 +858,44 @@ namespace EmuMath::Helpers
 	/// <param name="normal_">: Normal describing a reflection surface. This is expected to be normalised, and treated as such.</param>
 	/// <returns>EmuMath Vector representing the reflection of the provided ray_ on the provided surface normal_.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t RaySize_, typename RayT_, std::size_t NormalSize_, typename NormalT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_reflect_normal
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_reflect_normal
 	(
-		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
-		const EmuMath::NewVector<NormalSize_, NormalT_>& normal_
+		const EmuMath::Vector<RaySize_, RayT_>& ray_,
+		const EmuMath::Vector<NormalSize_, NormalT_>& normal_
 	)
 	{
 		return _vector_underlying::_vector_reflect_normal<EmuCore::do_subtract, EmuCore::do_multiply, OutSize_, OutT_>(ray_, normal_);
 	}
 
 	template<typename OutT_, std::size_t RaySize_, typename RayT_, std::size_t NormalSize_, typename NormalT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<RaySize_, OutT_> vector_reflect_normal
+	[[nodiscard]] constexpr inline EmuMath::Vector<RaySize_, OutT_> vector_reflect_normal
 	(
-		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
-		const EmuMath::NewVector<NormalSize_, NormalT_>& normal_
+		const EmuMath::Vector<RaySize_, RayT_>& ray_,
+		const EmuMath::Vector<NormalSize_, NormalT_>& normal_
 	)
 	{
 		return _vector_underlying::_vector_reflect_normal<EmuCore::do_subtract, EmuCore::do_multiply, RaySize_, OutT_>(ray_, normal_);
 	}
 
 	template<std::size_t OutSize_, std::size_t RaySize_, typename RayT_, std::size_t NormalSize_, typename NormalT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<RaySize_, RayT_>::preferred_floating_point> vector_reflect_normal
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Vector<RaySize_, RayT_>::preferred_floating_point> vector_reflect_normal
 	(
-		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
-		const EmuMath::NewVector<NormalSize_, NormalT_>& normal_
+		const EmuMath::Vector<RaySize_, RayT_>& ray_,
+		const EmuMath::Vector<NormalSize_, NormalT_>& normal_
 	)
 	{
-		using ray_fp = typename EmuMath::NewVector<RaySize_, RayT_>::preferred_floating_point;
+		using ray_fp = typename EmuMath::Vector<RaySize_, RayT_>::preferred_floating_point;
 		return _vector_underlying::_vector_reflect_normal<EmuCore::do_subtract, EmuCore::do_multiply, OutSize_, ray_fp>(ray_, normal_);
 	}
 
 	template<typename RayT_, typename NormalT_, std::size_t RaySize_, std::size_t NormalSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<RaySize_, typename EmuMath::NewVector<RaySize_, RayT_>::preferred_floating_point> vector_reflect_normal
+	[[nodiscard]] constexpr inline EmuMath::Vector<RaySize_, typename EmuMath::Vector<RaySize_, RayT_>::preferred_floating_point> vector_reflect_normal
 	(
-		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
-		const EmuMath::NewVector<NormalSize_, NormalT_>& normal_
+		const EmuMath::Vector<RaySize_, RayT_>& ray_,
+		const EmuMath::Vector<NormalSize_, NormalT_>& normal_
 	)
 	{
-		using ray_fp = typename EmuMath::NewVector<RaySize_, RayT_>::preferred_floating_point;
+		using ray_fp = typename EmuMath::Vector<RaySize_, RayT_>::preferred_floating_point;
 		return _vector_underlying::_vector_reflect_normal<EmuCore::do_subtract, EmuCore::do_multiply, RaySize_, ray_fp>(ray_, normal_);
 	}
 
@@ -912,44 +912,44 @@ namespace EmuMath::Helpers
 	/// <param name="normal_">: Normal describing a reflection surface. This is expected to be normalised, and treated as such.</param>
 	/// <returns>EmuMath Vector representing the reflection of the provided ray_ on the provided surface normal_, using indices within the provided range.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t RaySize_, typename RayT_, std::size_t NormalSize_, typename NormalT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_reflect_normal
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_reflect_normal
 	(
-		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
-		const EmuMath::NewVector<NormalSize_, NormalT_>& normal_
+		const EmuMath::Vector<RaySize_, RayT_>& ray_,
+		const EmuMath::Vector<NormalSize_, NormalT_>& normal_
 	)
 	{
 		return _vector_underlying::_vector_reflect_normal<EmuCore::do_subtract, EmuCore::do_multiply, BeginIndex_, EndIndex_, OutSize_, OutT_>(ray_, normal_);
 	}
 
 	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t RaySize_, typename RayT_, std::size_t NormalSize_, typename NormalT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<RaySize_, OutT_> vector_reflect_normal
+	[[nodiscard]] constexpr inline EmuMath::Vector<RaySize_, OutT_> vector_reflect_normal
 	(
-		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
-		const EmuMath::NewVector<NormalSize_, NormalT_>& normal_
+		const EmuMath::Vector<RaySize_, RayT_>& ray_,
+		const EmuMath::Vector<NormalSize_, NormalT_>& normal_
 	)
 	{
 		return _vector_underlying::_vector_reflect_normal<EmuCore::do_subtract, EmuCore::do_multiply, BeginIndex_, EndIndex_, RaySize_, OutT_>(ray_, normal_);
 	}
 
 	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t RaySize_, typename RayT_, std::size_t NormalSize_, typename NormalT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<RaySize_, RayT_>::preferred_floating_point> vector_reflect_normal
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Vector<RaySize_, RayT_>::preferred_floating_point> vector_reflect_normal
 	(
-		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
-		const EmuMath::NewVector<NormalSize_, NormalT_>& normal_
+		const EmuMath::Vector<RaySize_, RayT_>& ray_,
+		const EmuMath::Vector<NormalSize_, NormalT_>& normal_
 	)
 	{
-		using ray_fp = typename EmuMath::NewVector<RaySize_, RayT_>::preferred_floating_point;
+		using ray_fp = typename EmuMath::Vector<RaySize_, RayT_>::preferred_floating_point;
 		return _vector_underlying::_vector_reflect_normal<EmuCore::do_subtract, EmuCore::do_multiply, BeginIndex_, EndIndex_, OutSize_, ray_fp>(ray_, normal_);
 	}
 
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename RayT_, std::size_t RaySize_, typename NormalT_, std::size_t NormalSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<RaySize_, typename EmuMath::NewVector<RaySize_, RayT_>::preferred_floating_point> vector_reflect_normal
+	[[nodiscard]] constexpr inline EmuMath::Vector<RaySize_, typename EmuMath::Vector<RaySize_, RayT_>::preferred_floating_point> vector_reflect_normal
 	(
-		const EmuMath::NewVector<RaySize_, RayT_>& ray_,
-		const EmuMath::NewVector<NormalSize_, NormalT_>& normal_
+		const EmuMath::Vector<RaySize_, RayT_>& ray_,
+		const EmuMath::Vector<NormalSize_, NormalT_>& normal_
 	)
 	{
-		using ray_fp = typename EmuMath::NewVector<RaySize_, RayT_>::preferred_floating_point;
+		using ray_fp = typename EmuMath::Vector<RaySize_, RayT_>::preferred_floating_point;
 		return _vector_underlying::_vector_reflect_normal<EmuCore::do_subtract, EmuCore::do_multiply, BeginIndex_, EndIndex_, RaySize_, ray_fp>(ray_, normal_);
 	}
 #pragma endregion
@@ -966,48 +966,48 @@ namespace EmuMath::Helpers
 	/// <param name="point_c_">EmuMath Vector to interpret as a 3D cartesian coordinate, appearing as `point_c_` in described calculations.</param>
 	/// <returns>EmuMath Vector normal to the plane defined by the passed 3 coordinates, before normalisation.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t ReadOffset_ = 0, typename TA_, std::size_t SizeA_, typename TB_, std::size_t SizeB_, typename TC_, std::size_t SizeC_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_normal_to_plane_3d_no_norm
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_normal_to_plane_3d_no_norm
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& point_c_
+		const EmuMath::Vector<SizeA_, TA_>& point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& point_c_
 	)
 	{
 		return _vector_underlying::_vector_normal_to_plane_3d_no_norm<EmuCore::do_multiply, EmuCore::do_subtract, OutSize_, OutT_, ReadOffset_>(point_a_, point_b_, point_c_);
 	}
 
 	template<typename OutT_, std::size_t ReadOffset_ = 0, typename TA_, std::size_t SizeA_, typename TB_, std::size_t SizeB_, typename TC_, std::size_t SizeC_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> vector_normal_to_plane_3d_no_norm
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> vector_normal_to_plane_3d_no_norm
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& point_c_
+		const EmuMath::Vector<SizeA_, TA_>& point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& point_c_
 	)
 	{
 		return _vector_underlying::_vector_normal_to_plane_3d_no_norm<EmuCore::do_multiply, EmuCore::do_subtract, 3, OutT_, ReadOffset_>(point_a_, point_b_, point_c_);
 	}
 
 	template<std::size_t OutSize_, std::size_t ReadOffset_ = 0, typename TA_, std::size_t SizeA_, typename TB_, std::size_t SizeB_, typename TC_, std::size_t SizeC_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> vector_normal_to_plane_3d_no_norm
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point> vector_normal_to_plane_3d_no_norm
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& point_c_
+		const EmuMath::Vector<SizeA_, TA_>& point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& point_c_
 	)
 	{
-		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		using a_fp = typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_normal_to_plane_3d_no_norm<EmuCore::do_multiply, EmuCore::do_subtract, OutSize_, a_fp, ReadOffset_>(point_a_, point_b_, point_c_);
 	}
 
 	template<typename TA_, typename TB_, typename TC_, std::size_t SizeA_, std::size_t SizeB_, std::size_t SizeC_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<3, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> vector_normal_to_plane_3d_no_norm
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point> vector_normal_to_plane_3d_no_norm
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& point_c_
+		const EmuMath::Vector<SizeA_, TA_>& point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& point_c_
 	)
 	{
-		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		using a_fp = typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_normal_to_plane_3d_no_norm<EmuCore::do_multiply, EmuCore::do_subtract, 3, a_fp, 0>(point_a_, point_b_, point_c_);
 	}
 #pragma endregion
@@ -1028,11 +1028,11 @@ namespace EmuMath::Helpers
 	/// <param name="point_c_">EmuMath Vector to interpret as a 3D cartesian coordinate, appearing as `point_c_` in described calculations.</param>
 	/// <returns>EmuMath Vector normal to the plane defined by the passed 3 coordinates.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t ReadOffset_ = 0, typename TA_, std::size_t SizeA_, typename TB_, std::size_t SizeB_, typename TC_, std::size_t SizeC_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_normal_to_plane_3d_constexpr
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_normal_to_plane_3d_constexpr
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& point_c_
+		const EmuMath::Vector<SizeA_, TA_>& point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& point_c_
 	)
 	{
 		return _vector_underlying::_vector_normal_to_plane_3d<EmuCore::do_multiply, EmuCore::do_subtract, EmuCore::do_sqrt_constexpr, OutSize_, OutT_, ReadOffset_>
@@ -1044,11 +1044,11 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename OutT_, std::size_t ReadOffset_ = 0, typename TA_, std::size_t SizeA_, typename TB_, std::size_t SizeB_, typename TC_, std::size_t SizeC_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> vector_normal_to_plane_3d_constexpr
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> vector_normal_to_plane_3d_constexpr
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& point_c_
+		const EmuMath::Vector<SizeA_, TA_>& point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& point_c_
 	)
 	{
 		return _vector_underlying::_vector_normal_to_plane_3d<EmuCore::do_multiply, EmuCore::do_subtract, EmuCore::do_sqrt_constexpr, 3, OutT_, ReadOffset_>
@@ -1060,14 +1060,14 @@ namespace EmuMath::Helpers
 	}
 
 	template<std::size_t OutSize_, std::size_t ReadOffset_ = 0, typename TA_, std::size_t SizeA_, typename TB_, std::size_t SizeB_, typename TC_, std::size_t SizeC_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> vector_normal_to_plane_3d_constexpr
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point> vector_normal_to_plane_3d_constexpr
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& point_c_
+		const EmuMath::Vector<SizeA_, TA_>& point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& point_c_
 	)
 	{
-		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		using a_fp = typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_normal_to_plane_3d<EmuCore::do_multiply, EmuCore::do_subtract, EmuCore::do_sqrt_constexpr, OutSize_, a_fp, ReadOffset_>
 		(
 			point_a_,
@@ -1077,14 +1077,14 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename TA_, typename TB_, typename TC_, std::size_t SizeA_, std::size_t SizeB_, std::size_t SizeC_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<3, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> vector_normal_to_plane_3d_constexpr
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point> vector_normal_to_plane_3d_constexpr
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& point_c_
+		const EmuMath::Vector<SizeA_, TA_>& point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& point_c_
 	)
 	{
-		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		using a_fp = typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_normal_to_plane_3d<EmuCore::do_multiply, EmuCore::do_subtract, EmuCore::do_sqrt_constexpr, 3, a_fp, 0>
 		(
 			point_a_,
@@ -1107,11 +1107,11 @@ namespace EmuMath::Helpers
 	/// <param name="point_c_">EmuMath Vector to interpret as a 3D cartesian coordinate, appearing as `point_c_` in described calculations.</param>
 	/// <returns>EmuMath Vector normal to the plane defined by the passed 3 coordinates.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t ReadOffset_ = 0, typename TA_, std::size_t SizeA_, typename TB_, std::size_t SizeB_, typename TC_, std::size_t SizeC_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_normal_to_plane_3d
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_normal_to_plane_3d
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& point_c_
+		const EmuMath::Vector<SizeA_, TA_>& point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& point_c_
 	)
 	{
 		return _vector_underlying::_vector_normal_to_plane_3d<EmuCore::do_multiply, EmuCore::do_subtract, EmuCore::do_sqrt, OutSize_, OutT_, ReadOffset_>
@@ -1123,11 +1123,11 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename OutT_, std::size_t ReadOffset_ = 0, typename TA_, std::size_t SizeA_, typename TB_, std::size_t SizeB_, typename TC_, std::size_t SizeC_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> vector_normal_to_plane_3d
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> vector_normal_to_plane_3d
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& point_c_
+		const EmuMath::Vector<SizeA_, TA_>& point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& point_c_
 	)
 	{
 		return _vector_underlying::_vector_normal_to_plane_3d<EmuCore::do_multiply, EmuCore::do_subtract, EmuCore::do_sqrt, 3, OutT_, ReadOffset_>
@@ -1139,14 +1139,14 @@ namespace EmuMath::Helpers
 	}
 
 	template<std::size_t OutSize_, std::size_t ReadOffset_ = 0, typename TA_, std::size_t SizeA_, typename TB_, std::size_t SizeB_, typename TC_, std::size_t SizeC_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> vector_normal_to_plane_3d
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point> vector_normal_to_plane_3d
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& point_c_
+		const EmuMath::Vector<SizeA_, TA_>& point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& point_c_
 	)
 	{
-		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		using a_fp = typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_normal_to_plane_3d<EmuCore::do_multiply, EmuCore::do_subtract, EmuCore::do_sqrt, OutSize_, a_fp, ReadOffset_>
 		(
 			point_a_,
@@ -1156,14 +1156,14 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename TA_, typename TB_, typename TC_, std::size_t SizeA_, std::size_t SizeB_, std::size_t SizeC_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<3, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> vector_normal_to_plane_3d
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point> vector_normal_to_plane_3d
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& point_c_
+		const EmuMath::Vector<SizeA_, TA_>& point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& point_c_
 	)
 	{
-		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		using a_fp = typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_normal_to_plane_3d<EmuCore::do_multiply, EmuCore::do_subtract, EmuCore::do_sqrt, 3, a_fp, 0>
 		(
 			point_a_,
@@ -1181,44 +1181,44 @@ namespace EmuMath::Helpers
 	/// <param name="vector_b_">EmuMath Vector to project onto.</param>
 	/// <returns>EmuMath Vector resulting from a projection of vector_a_ onto vector_b_.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_project
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_project
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+		const EmuMath::Vector<SizeA_, TA_>& vector_a_,
+		const EmuMath::Vector<SizeB_, TB_>& vector_b_
 	)
 	{
 		return _vector_underlying::_vector_project<EmuCore::do_multiply, EmuCore::do_reciprocal, OutSize_, OutT_>(vector_a_, vector_b_);
 	}
 
 	template<typename OutT_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<SizeA_, OutT_> vector_project
+	[[nodiscard]] constexpr inline EmuMath::Vector<SizeA_, OutT_> vector_project
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+		const EmuMath::Vector<SizeA_, TA_>& vector_a_,
+		const EmuMath::Vector<SizeB_, TB_>& vector_b_
 	)
 	{
 		return _vector_underlying::_vector_project<EmuCore::do_multiply, EmuCore::do_reciprocal, SizeA_, OutT_>(vector_a_, vector_b_);
 	}
 
 	template<std::size_t OutSize_, std::size_t SizeA_, typename TA_, typename TB_, std::size_t SizeB_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> vector_project
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point> vector_project
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+		const EmuMath::Vector<SizeA_, TA_>& vector_a_,
+		const EmuMath::Vector<SizeB_, TB_>& vector_b_
 	)
 	{
-		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preffered_floating_point;
+		using a_fp = typename EmuMath::Vector<SizeA_, TA_>::preffered_floating_point;
 		return _vector_underlying::_vector_project<EmuCore::do_multiply, EmuCore::do_reciprocal, OutSize_, a_fp>(vector_a_, vector_b_);
 	}
 
 	template<typename TA_, typename TB_, std::size_t SizeA_, std::size_t SizeB_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<SizeA_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> vector_project
+	[[nodiscard]] constexpr inline EmuMath::Vector<SizeA_, typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point> vector_project
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+		const EmuMath::Vector<SizeA_, TA_>& vector_a_,
+		const EmuMath::Vector<SizeB_, TB_>& vector_b_
 	)
 	{
-		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		using a_fp = typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_project<EmuCore::do_multiply, EmuCore::do_reciprocal, SizeA_, a_fp>(vector_a_, vector_b_);
 	}
 
@@ -1231,44 +1231,44 @@ namespace EmuMath::Helpers
 	/// <param name="vector_b_">EmuMath Vector to project onto.</param>
 	/// <returns>EmuMath Vector resulting from a projection of vector_a_ onto vector_b_, using indices within the specified range.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_project
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_project
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+		const EmuMath::Vector<SizeA_, TA_>& vector_a_,
+		const EmuMath::Vector<SizeB_, TB_>& vector_b_
 	)
 	{
 		return _vector_underlying::_vector_project<EmuCore::do_multiply, EmuCore::do_reciprocal, OutSize_, OutT_, BeginIndex_, EndIndex_>(vector_a_, vector_b_);
 	}
 
 	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<SizeA_, OutT_> vector_project
+	[[nodiscard]] constexpr inline EmuMath::Vector<SizeA_, OutT_> vector_project
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+		const EmuMath::Vector<SizeA_, TA_>& vector_a_,
+		const EmuMath::Vector<SizeB_, TB_>& vector_b_
 	)
 	{
 		return _vector_underlying::_vector_project<EmuCore::do_multiply, EmuCore::do_reciprocal, SizeA_, OutT_, BeginIndex_, EndIndex_>(vector_a_, vector_b_);
 	}
 
 	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_, typename TA_, std::size_t SizeA_, typename TB_, std::size_t SizeB_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> vector_project
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point> vector_project
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+		const EmuMath::Vector<SizeA_, TA_>& vector_a_,
+		const EmuMath::Vector<SizeB_, TB_>& vector_b_
 	)
 	{
-		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preffered_floating_point;
+		using a_fp = typename EmuMath::Vector<SizeA_, TA_>::preffered_floating_point;
 		return _vector_underlying::_vector_project<EmuCore::do_multiply, EmuCore::do_reciprocal, OutSize_, a_fp, BeginIndex_, EndIndex_>(vector_a_, vector_b_);
 	}
 
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename TA_, typename TB_, std::size_t SizeA_, std::size_t SizeB_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<SizeA_, typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point> vector_project
+	[[nodiscard]] constexpr inline EmuMath::Vector<SizeA_, typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point> vector_project
 	(
-		const EmuMath::NewVector<SizeA_, TA_>& vector_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& vector_b_
+		const EmuMath::Vector<SizeA_, TA_>& vector_a_,
+		const EmuMath::Vector<SizeB_, TB_>& vector_b_
 	)
 	{
-		using a_fp = typename EmuMath::NewVector<SizeA_, TA_>::preferred_floating_point;
+		using a_fp = typename EmuMath::Vector<SizeA_, TA_>::preferred_floating_point;
 		return _vector_underlying::_vector_project<EmuCore::do_multiply, EmuCore::do_reciprocal, SizeA_, a_fp, BeginIndex_, EndIndex_>(vector_a_, vector_b_);
 	}
 #pragma endregion
@@ -1281,10 +1281,10 @@ namespace EmuMath::Helpers
 	/// <param name="plane_normal_">: EmuMath Vector describing the plane to reflect onto. This is expected to be normalised, and treated as such.</param>
 	/// <returns>EmuMath Vector resulting from projecting the Vector to_project_ onto the plane defined by the provided plane_normal_.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t ProjSize_, typename ProjT_, std::size_t NormSize_, typename NormT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_project_plane
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_project_plane
 	(
-		const EmuMath::NewVector<ProjSize_, ProjT_>& to_project_,
-		const EmuMath::NewVector<NormSize_, NormT_>& plane_normal_
+		const EmuMath::Vector<ProjSize_, ProjT_>& to_project_,
+		const EmuMath::Vector<NormSize_, NormT_>& plane_normal_
 	)
 	{
 		return _vector_underlying::_vector_project_plane<EmuCore::do_subtract, EmuCore::do_multiply, EmuCore::do_reciprocal, OutSize_, OutT_>
@@ -1295,10 +1295,10 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename OutT_, std::size_t ProjSize_, typename ProjT_, std::size_t NormSize_, typename NormT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<ProjSize_, OutT_> vector_project_plane
+	[[nodiscard]] constexpr inline EmuMath::Vector<ProjSize_, OutT_> vector_project_plane
 	(
-		const EmuMath::NewVector<ProjSize_, ProjT_>& to_project_,
-		const EmuMath::NewVector<NormSize_, NormT_>& plane_normal_
+		const EmuMath::Vector<ProjSize_, ProjT_>& to_project_,
+		const EmuMath::Vector<NormSize_, NormT_>& plane_normal_
 	)
 	{
 		return _vector_underlying::_vector_project_plane<EmuCore::do_subtract, EmuCore::do_multiply, EmuCore::do_reciprocal, ProjSize_, OutT_>
@@ -1309,13 +1309,13 @@ namespace EmuMath::Helpers
 	}
 
 	template<std::size_t OutSize_, std::size_t ProjSize_, typename ProjT_, std::size_t NormSize_, typename NormT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<ProjSize_, ProjT_>::preferred_floating_point> vector_project_plane
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Vector<ProjSize_, ProjT_>::preferred_floating_point> vector_project_plane
 	(
-		const EmuMath::NewVector<ProjSize_, ProjT_>& to_project_,
-		const EmuMath::NewVector<NormSize_, NormT_>& plane_normal_
+		const EmuMath::Vector<ProjSize_, ProjT_>& to_project_,
+		const EmuMath::Vector<NormSize_, NormT_>& plane_normal_
 	)
 	{
-		using proj_fp = typename EmuMath::NewVector<ProjSize_, ProjT_>::preferred_floating_point;
+		using proj_fp = typename EmuMath::Vector<ProjSize_, ProjT_>::preferred_floating_point;
 		return _vector_underlying::_vector_project_plane<EmuCore::do_subtract, EmuCore::do_multiply, EmuCore::do_reciprocal, OutSize_, proj_fp>
 		(
 			to_project_,
@@ -1324,13 +1324,13 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename ProjT_, typename NormT_, std::size_t ProjSize_, std::size_t NormSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<ProjSize_, typename EmuMath::NewVector<ProjSize_, ProjT_>::preferred_floating_point> vector_project_plane
+	[[nodiscard]] constexpr inline EmuMath::Vector<ProjSize_, typename EmuMath::Vector<ProjSize_, ProjT_>::preferred_floating_point> vector_project_plane
 	(
-		const EmuMath::NewVector<ProjSize_, ProjT_>& to_project_,
-		const EmuMath::NewVector<NormSize_, NormT_>& plane_normal_
+		const EmuMath::Vector<ProjSize_, ProjT_>& to_project_,
+		const EmuMath::Vector<NormSize_, NormT_>& plane_normal_
 	)
 	{
-		using proj_fp = typename EmuMath::NewVector<ProjSize_, ProjT_>::preferred_floating_point;
+		using proj_fp = typename EmuMath::Vector<ProjSize_, ProjT_>::preferred_floating_point;
 		return _vector_underlying::_vector_project_plane<EmuCore::do_subtract, EmuCore::do_multiply, EmuCore::do_reciprocal, ProjSize_, proj_fp>
 		(
 			to_project_,
@@ -1345,10 +1345,10 @@ namespace EmuMath::Helpers
 	/// <param name="plane_normal_">: EmuMath Vector describing the plane to reflect onto. This is expected to be normalised, and treated as such.</param>
 	/// <returns>EmuMath Vector resulting from projecting the Vector to_project_ onto the plane defined by the provided plane_normal_, using indices in the provided range..</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ProjSize_, typename ProjT_, std::size_t NormSize_, typename NormT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_project_plane
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_project_plane
 	(
-		const EmuMath::NewVector<ProjSize_, ProjT_>& to_project_,
-		const EmuMath::NewVector<NormSize_, NormT_>& plane_normal_
+		const EmuMath::Vector<ProjSize_, ProjT_>& to_project_,
+		const EmuMath::Vector<NormSize_, NormT_>& plane_normal_
 	)
 	{
 		return _vector_underlying::_vector_project_plane<EmuCore::do_subtract, EmuCore::do_multiply, EmuCore::do_reciprocal, OutSize_, OutT_, BeginIndex_, EndIndex_>
@@ -1359,10 +1359,10 @@ namespace EmuMath::Helpers
 	}
 
 	template<typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ProjSize_, typename ProjT_, std::size_t NormSize_, typename NormT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<ProjSize_, OutT_> vector_project_plane
+	[[nodiscard]] constexpr inline EmuMath::Vector<ProjSize_, OutT_> vector_project_plane
 	(
-		const EmuMath::NewVector<ProjSize_, ProjT_>& to_project_,
-		const EmuMath::NewVector<NormSize_, NormT_>& plane_normal_
+		const EmuMath::Vector<ProjSize_, ProjT_>& to_project_,
+		const EmuMath::Vector<NormSize_, NormT_>& plane_normal_
 	)
 	{
 		return _vector_underlying::_vector_project_plane<EmuCore::do_subtract, EmuCore::do_multiply, EmuCore::do_reciprocal, ProjSize_, OutT_, BeginIndex_, EndIndex_>
@@ -1373,13 +1373,13 @@ namespace EmuMath::Helpers
 	}
 
 	template<std::size_t OutSize_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ProjSize_, typename ProjT_, std::size_t NormSize_, typename NormT_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<ProjSize_, ProjT_>::preferred_floating_point> vector_project_plane
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Vector<ProjSize_, ProjT_>::preferred_floating_point> vector_project_plane
 	(
-		const EmuMath::NewVector<ProjSize_, ProjT_>& to_project_,
-		const EmuMath::NewVector<NormSize_, NormT_>& plane_normal_
+		const EmuMath::Vector<ProjSize_, ProjT_>& to_project_,
+		const EmuMath::Vector<NormSize_, NormT_>& plane_normal_
 	)
 	{
-		using proj_fp = typename EmuMath::NewVector<ProjSize_, ProjT_>::preferred_floating_point;
+		using proj_fp = typename EmuMath::Vector<ProjSize_, ProjT_>::preferred_floating_point;
 		return _vector_underlying::_vector_project_plane<EmuCore::do_subtract, EmuCore::do_multiply, EmuCore::do_reciprocal, OutSize_, proj_fp, BeginIndex_, EndIndex_>
 		(
 			to_project_,
@@ -1388,13 +1388,13 @@ namespace EmuMath::Helpers
 	}
 
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename ProjT_, typename NormT_, std::size_t ProjSize_, std::size_t NormSize_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<ProjSize_, typename EmuMath::NewVector<ProjSize_, ProjT_>::preferred_floating_point> vector_project_plane
+	[[nodiscard]] constexpr inline EmuMath::Vector<ProjSize_, typename EmuMath::Vector<ProjSize_, ProjT_>::preferred_floating_point> vector_project_plane
 	(
-		const EmuMath::NewVector<ProjSize_, ProjT_>& to_project_,
-		const EmuMath::NewVector<NormSize_, NormT_>& plane_normal_
+		const EmuMath::Vector<ProjSize_, ProjT_>& to_project_,
+		const EmuMath::Vector<NormSize_, NormT_>& plane_normal_
 	)
 	{
-		using proj_fp = typename EmuMath::NewVector<ProjSize_, ProjT_>::preferred_floating_point;
+		using proj_fp = typename EmuMath::Vector<ProjSize_, ProjT_>::preferred_floating_point;
 		return _vector_underlying::_vector_project_plane<EmuCore::do_subtract, EmuCore::do_multiply, EmuCore::do_reciprocal, ProjSize_, proj_fp, BeginIndex_, EndIndex_>
 		(
 			to_project_,
@@ -1436,12 +1436,12 @@ namespace EmuMath::Helpers
 		std::size_t SizeC_,
 		typename TC_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_project_plane_3d_constexpr
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_project_plane_3d_constexpr
 	(
-		const EmuMath::NewVector<ProjSize_, ProjT_>& to_project_,
-		const EmuMath::NewVector<SizeA_, TA_>& plane_point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& plane_point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
+		const EmuMath::Vector<ProjSize_, ProjT_>& to_project_,
+		const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& plane_point_c_
 	)
 	{
 		return _vector_underlying::_vector_project_plane_3d
@@ -1469,12 +1469,12 @@ namespace EmuMath::Helpers
 		std::size_t SizeC_,
 		typename TC_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> vector_project_plane_3d_constexpr
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> vector_project_plane_3d_constexpr
 	(
-		const EmuMath::NewVector<ProjSize_, ProjT_>& to_project_,
-		const EmuMath::NewVector<SizeA_, TA_>& plane_point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& plane_point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
+		const EmuMath::Vector<ProjSize_, ProjT_>& to_project_,
+		const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& plane_point_c_
 	)
 	{
 		return _vector_underlying::_vector_project_plane_3d
@@ -1502,15 +1502,15 @@ namespace EmuMath::Helpers
 		std::size_t SizeC_,
 		typename TC_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<ProjSize_, ProjT_>::preferred_floating_point> vector_project_plane_3d_constexpr
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Vector<ProjSize_, ProjT_>::preferred_floating_point> vector_project_plane_3d_constexpr
 	(
-		const EmuMath::NewVector<ProjSize_, ProjT_>& to_project_,
-		const EmuMath::NewVector<SizeA_, TA_>& plane_point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& plane_point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
+		const EmuMath::Vector<ProjSize_, ProjT_>& to_project_,
+		const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& plane_point_c_
 	)
 	{
-		using proj_fp = typename EmuMath::NewVector<ProjSize_, ProjT_>::preferred_floating_point;
+		using proj_fp = typename EmuMath::Vector<ProjSize_, ProjT_>::preferred_floating_point;
 		return _vector_underlying::_vector_project_plane_3d
 		<
 			EmuCore::do_sqrt_constexpr,
@@ -1534,15 +1534,15 @@ namespace EmuMath::Helpers
 		std::size_t SizeC_,
 		typename TC_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<3, typename EmuMath::NewVector<ProjSize_, ProjT_>::preferred_floating_point> vector_project_plane_3d_constexpr
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, typename EmuMath::Vector<ProjSize_, ProjT_>::preferred_floating_point> vector_project_plane_3d_constexpr
 	(
-		const EmuMath::NewVector<ProjSize_, ProjT_>& to_project_,
-		const EmuMath::NewVector<SizeA_, TA_>& plane_point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& plane_point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
+		const EmuMath::Vector<ProjSize_, ProjT_>& to_project_,
+		const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& plane_point_c_
 	)
 	{
-		using proj_fp = typename EmuMath::NewVector<ProjSize_, ProjT_>::preferred_floating_point;
+		using proj_fp = typename EmuMath::Vector<ProjSize_, ProjT_>::preferred_floating_point;
 		return _vector_underlying::_vector_project_plane_3d
 		<
 			EmuCore::do_sqrt_constexpr,
@@ -1586,12 +1586,12 @@ namespace EmuMath::Helpers
 		std::size_t SizeC_,
 		typename TC_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> vector_project_plane_3d
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_project_plane_3d
 	(
-		const EmuMath::NewVector<ProjSize_, ProjT_>& to_project_,
-		const EmuMath::NewVector<SizeA_, TA_>& plane_point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& plane_point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
+		const EmuMath::Vector<ProjSize_, ProjT_>& to_project_,
+		const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& plane_point_c_
 	)
 	{
 		return _vector_underlying::_vector_project_plane_3d
@@ -1619,12 +1619,12 @@ namespace EmuMath::Helpers
 		std::size_t SizeC_,
 		typename TC_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> vector_project_plane_3d
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> vector_project_plane_3d
 	(
-		const EmuMath::NewVector<ProjSize_, ProjT_>& to_project_,
-		const EmuMath::NewVector<SizeA_, TA_>& plane_point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& plane_point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
+		const EmuMath::Vector<ProjSize_, ProjT_>& to_project_,
+		const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& plane_point_c_
 	)
 	{
 		return _vector_underlying::_vector_project_plane_3d
@@ -1652,15 +1652,15 @@ namespace EmuMath::Helpers
 		std::size_t SizeC_,
 		typename TC_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, typename EmuMath::NewVector<ProjSize_, ProjT_>::preferred_floating_point> vector_project_plane_3d
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Vector<ProjSize_, ProjT_>::preferred_floating_point> vector_project_plane_3d
 	(
-		const EmuMath::NewVector<ProjSize_, ProjT_>& to_project_,
-		const EmuMath::NewVector<SizeA_, TA_>& plane_point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& plane_point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
+		const EmuMath::Vector<ProjSize_, ProjT_>& to_project_,
+		const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& plane_point_c_
 	)
 	{
-		using proj_fp = typename EmuMath::NewVector<ProjSize_, ProjT_>::preferred_floating_point;
+		using proj_fp = typename EmuMath::Vector<ProjSize_, ProjT_>::preferred_floating_point;
 		return _vector_underlying::_vector_project_plane_3d
 		<
 			EmuCore::do_sqrt,
@@ -1684,15 +1684,15 @@ namespace EmuMath::Helpers
 		std::size_t SizeC_,
 		typename TC_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<3, typename EmuMath::NewVector<ProjSize_, ProjT_>::preferred_floating_point> vector_project_plane_3d
+	[[nodiscard]] constexpr inline EmuMath::Vector<3, typename EmuMath::Vector<ProjSize_, ProjT_>::preferred_floating_point> vector_project_plane_3d
 	(
-		const EmuMath::NewVector<ProjSize_, ProjT_>& to_project_,
-		const EmuMath::NewVector<SizeA_, TA_>& plane_point_a_,
-		const EmuMath::NewVector<SizeB_, TB_>& plane_point_b_,
-		const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
+		const EmuMath::Vector<ProjSize_, ProjT_>& to_project_,
+		const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
+		const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
+		const EmuMath::Vector<SizeC_, TC_>& plane_point_c_
 	)
 	{
-		using proj_fp = typename EmuMath::NewVector<ProjSize_, ProjT_>::preferred_floating_point;
+		using proj_fp = typename EmuMath::Vector<ProjSize_, ProjT_>::preferred_floating_point;
 		return _vector_underlying::_vector_project_plane_3d
 		<
 			EmuCore::do_sqrt,

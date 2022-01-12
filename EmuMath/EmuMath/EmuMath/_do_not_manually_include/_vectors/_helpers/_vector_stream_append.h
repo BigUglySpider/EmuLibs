@@ -17,7 +17,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath Vector to append to the provided stream.</param>
 	/// <returns>Reference to the passed str_.</returns>
 	template<std::size_t Size_, typename T_>
-	inline std::ostream& vector_stream_append(std::ostream& str_, const EmuMath::NewVector<Size_, T_>& vector_)
+	inline std::ostream& vector_stream_append(std::ostream& str_, const EmuMath::Vector<Size_, T_>& vector_)
 	{
 		_vector_underlying::_vector_append_to_stream<false>(str_, vector_);
 		return str_;
@@ -31,7 +31,7 @@ namespace EmuMath::Helpers
 	/// <param name="vector_">EmuMath Vector to append to the provided wide stream.</param>
 	/// <returns>Reference to the passed w_str_.</returns>
 	template<std::size_t Size_, typename T_>
-	inline std::wostream& vector_stream_append(std::wostream& w_str_, const EmuMath::NewVector<Size_, T_>& vector_)
+	inline std::wostream& vector_stream_append(std::wostream& w_str_, const EmuMath::Vector<Size_, T_>& vector_)
 	{
 		_vector_underlying::_vector_append_to_stream<true>(w_str_, vector_);
 		return w_str_;
@@ -39,13 +39,13 @@ namespace EmuMath::Helpers
 }
 
 template<std::size_t Size_, typename T_>
-inline std::ostream& operator<<(std::ostream& str_, const EmuMath::NewVector<Size_, T_>& vector_)
+inline std::ostream& operator<<(std::ostream& str_, const EmuMath::Vector<Size_, T_>& vector_)
 {
 	return EmuMath::Helpers::vector_stream_append(str_, vector_);
 }
 
 template<std::size_t Size_, typename T_>
-inline std::wostream& operator<<(std::wostream& w_str_, const EmuMath::NewVector<Size_, T_>& vector_)
+inline std::wostream& operator<<(std::wostream& w_str_, const EmuMath::Vector<Size_, T_>& vector_)
 {
 	return EmuMath::Helpers::vector_stream_append(w_str_, vector_);
 }

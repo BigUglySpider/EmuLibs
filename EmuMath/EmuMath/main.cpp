@@ -8,6 +8,7 @@
 // Math components
 #include "EmuMath/Colour.h"
 #include "EmuMath/FastNoise.h"
+#include "EmuMath/Matrix.h"
 #include "EmuMath/Noise.h"
 #include "EmuMath/Random.h"
 #include "EmuMath/Vector.h"
@@ -20,11 +21,11 @@ inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::str
 {
 	using FP_ = typename NoiseTable_::value_type;
 	constexpr std::size_t num_dimensions = NoiseTable_::num_dimensions;
-	EmuMath::NewVector<3, FP_> white_(255.0f, 255.0f, 255.0f);
+	EmuMath::Vector<3, FP_> white_(255.0f, 255.0f, 255.0f);
 
 	if constexpr (num_dimensions == 3)
 	{
-		EmuMath::NewVector<3, std::size_t> resolution_ = noise_table_.size();
+		EmuMath::Vector<3, std::size_t> resolution_ = noise_table_.size();
 		for (std::size_t z = 0; z < resolution_.at<2>(); ++z)
 		{
 			std::cout << "\nOutputting image layer #" << z << "...\n";
@@ -39,7 +40,7 @@ inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::str
 				for (std::size_t x = 0; x < resolution_.at<0>(); ++x)
 				{
 					// Clamp is merely to cancel out fp-rounding errors
-					EmuMath::NewVector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.at(x, y, z)).Clamp(0.0f, 255.0f));
+					EmuMath::Vector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.at(x, y, z)).Clamp(0.0f, 255.0f));
 					out_ppm_ << (char)colour_byte_.at<0>() << (char)colour_byte_.at<1>() << (char)colour_byte_.at<2>();
 				}
 			}
@@ -61,7 +62,7 @@ inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::str
 			for (std::size_t x = 0, end_x = noise_table_.size<0>(); x < end_x; ++x)
 			{
 				// Clamp is merely to cancel out fp-rounding errors
-				EmuMath::NewVector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.at(x, y)).Clamp(0.0f, 255.0f));
+				EmuMath::Vector<3, std::uint8_t> colour_byte_(white_.Multiply(noise_table_.at(x, y)).Clamp(0.0f, 255.0f));
 				out_ppm_ << (char)colour_byte_.at<0>() << (char)colour_byte_.at<1>() << (char)colour_byte_.at<2>();
 			}
 		}
@@ -84,7 +85,7 @@ inline void WriteNoiseTableToPPM
 		if constexpr (num_dimensions == 3)
 		{
 			const auto& noise_table_ = noise_table_vector_[0];
-			EmuMath::NewVector<3, std::size_t> resolution_ = noise_table_.size();
+			EmuMath::Vector<3, std::size_t> resolution_ = noise_table_.size();
 			for (std::size_t z = 0; z < resolution_.at<2>(); ++z)
 			{
 				std::cout << "\nOutputting image layer #" << z << "...\n";
@@ -109,7 +110,7 @@ inline void WriteNoiseTableToPPM
 		else if constexpr (num_dimensions == 2)
 		{
 			const auto& noise_table_ = noise_table_vector_[0];
-			EmuMath::NewVector<2, std::size_t> resolution_ = noise_table_.size();
+			EmuMath::Vector<2, std::size_t> resolution_ = noise_table_.size();
 			std::cout << "\nOutputting 2D noise image layer...\n";
 
 			std::ostringstream name_;
@@ -130,7 +131,7 @@ inline void WriteNoiseTableToPPM
 		}
 		else
 		{
-			EmuMath::NewVector<2, std::size_t> resolution_(noise_table_vector_[0].size<0>(), noise_table_vector_.size());
+			EmuMath::Vector<2, std::size_t> resolution_(noise_table_vector_[0].size<0>(), noise_table_vector_.size());
 			std::cout << "\nOutputting 1D noise image layer from full vector...\n";
 
 			std::ostringstream name_;
@@ -158,65 +159,114 @@ int main()
 	srand(static_cast<unsigned int>(time(0)));
 	EmuCore::Timer<std::milli> timer_;
 
+	EmuMath::Matrix<4, 2, float, false> some_mat_4x2f_cm_;
+	some_mat_4x2f_cm_.at<0, 0>() = 0.0f;
+	some_mat_4x2f_cm_.at<0, 1>() = 0.1f;
+	some_mat_4x2f_cm_.at<1, 0>() = 1.0f;
+	some_mat_4x2f_cm_.at<1, 1>() = 1.1f;
+	some_mat_4x2f_cm_.at<2, 0>() = 2.0f;
+	some_mat_4x2f_cm_.at<2, 1>() = 2.1f;
+	some_mat_4x2f_cm_.at<3, 0>() = 3.0f;
+	some_mat_4x2f_cm_.at<3, 1>() = 3.1f;
+	some_mat_4x2f_cm_.AppendToStream<true>(std::cout) << "\n\n";
+	some_mat_4x2f_cm_.AppendToStream<false>(std::cout) << "\n\n";
+	for (std::size_t x = 0, end = some_mat_4x2f_cm_.num_columns * some_mat_4x2f_cm_.num_rows; x < end; ++x)
+	{
+		std::cout << *(some_mat_4x2f_cm_.data() + x) << ", ";
+	}
+	std::cout << "\n\n";
 
+	try
+	{
+		std::cout << some_mat_4x2f_cm_.at(2, 4);
+	}
+	catch (std::out_of_range& e)
+	{
+		std::cout << e.what();
+		std::cout << "\n";
+	}
+
+	system("pause");
 	
 	// ##### SCALAR vs SIMD NOISE #####
-	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
-	//constexpr std::size_t test_noise_dimensions = 3;
-	//constexpr auto sample_count = EmuMath::make_vector<std::size_t>(1024, 1024, 1);
-	//constexpr bool use_fractal = true;
-	//using scalar_test_noise_processor = EmuMath::Functors::noise_sample_processor_perlin_normalise<test_noise_dimensions>;
-	//using fast_test_noise_processor = EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<test_noise_dimensions>;
-	//
-	//constexpr std::size_t num_iterations = 1;
-	//std::vector<EmuMath::NoiseTable<test_noise_dimensions, float>> noise_;
-	//std::vector<EmuMath::FastNoiseTable<test_noise_dimensions, 0>> fast_noise_;
-	//noise_.resize(num_iterations, decltype(noise_)::value_type());
-	//fast_noise_.resize(num_iterations, decltype(fast_noise_)::value_type());
-	//
-	//system("pause");
-	//for (std::size_t i = 0; i < num_iterations; ++i)
-	//{
-	//	std::cout << "\nNOISE BATCH " << i << "\n";
-	//	timer_.Restart();
-	//	noise_[i].GenerateNoise<test_noise_type_flag, scalar_test_noise_processor>
-	//	(
-	//		decltype(noise_)::value_type::MakeOptions
-	//		(
-	//			sample_count,
-	//			EmuMath::NewVector<test_noise_dimensions, float>(0.0f),
-	//			EmuMath::NewVector<test_noise_dimensions, float>(1.0f / 1024.0f),
-	//			3.0f,
-	//			true,
-	//			use_fractal,
-	//			EmuMath::Info::NoisePermutationInfo(4096, EmuMath::Info::NoisePermutationShuffleMode::SEED_32, true, 1337, 1337),
-	//			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
-	//		)
-	//	);
-	//	timer_.Pause();
-	//	std::cout << "FINISHED SCALAR NOISE IN: " << timer_.GetMilli() << "ms\n";
-	//
-	//
-	//	timer_.Restart();
-	//	fast_noise_[i].GenerateNoise<test_noise_type_flag, fast_test_noise_processor>
-	//	(
-	//		decltype(fast_noise_)::value_type::make_options
-	//		(
-	//			sample_count,
-	//			EmuMath::NewVector<test_noise_dimensions, float>(0.0f),
-	//			EmuMath::NewVector<test_noise_dimensions, float>(1.0f / 1024.0f),
-	//			3.0f,
-	//			true,
-	//			use_fractal,
-	//			EmuMath::Info::NoisePermutationInfo(4096, EmuMath::Info::NoisePermutationShuffleMode::SEED_32, true, 1337, 1337),
-	//			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
-	//		)
-	//	);
-	//	timer_.Pause();
-	//	std::cout << "FINISHED FAST NOISE IN: " << timer_.GetMilli() << "ms\n";
-	//}
-	//WriteNoiseTableToPPM(noise_, noise_gradient_, "test_noise_scalar");
-	//WriteNoiseTableToPPM(fast_noise_, noise_gradient_, "test_noise_simd");
+	constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
+	constexpr std::size_t test_noise_dimensions = 3;
+	constexpr auto sample_count = EmuMath::make_vector<std::size_t>(1024, 1024, 1);
+	constexpr bool use_fractal = true;
+	using scalar_test_noise_processor = EmuMath::Functors::noise_sample_processor_perlin_normalise<test_noise_dimensions>;
+	using fast_test_noise_processor = EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<test_noise_dimensions>;
+	
+	constexpr std::size_t num_iterations = 1;
+	std::vector<EmuMath::NoiseTable<test_noise_dimensions, float>> noise_;
+	std::vector<EmuMath::FastNoiseTable<test_noise_dimensions, 0>> fast_noise_;
+	noise_.resize(num_iterations, decltype(noise_)::value_type());
+	fast_noise_.resize(num_iterations, decltype(fast_noise_)::value_type());
+
+	constexpr std::size_t noise_num_perms = 4096;
+	constexpr EmuMath::Info::NoisePermutationShuffleMode noise_perm_shuffle_mode = EmuMath::Info::NoisePermutationShuffleMode::SEED_32;
+	constexpr bool noise_perm_bool_input = true;
+	constexpr EmuMath::Info::NoisePermutationInfo::seed_32_type noise_perm_seed_32 = 1337;
+	constexpr EmuMath::Info::NoisePermutationInfo::seed_64_type noise_perm_seed_64 = 1337;
+	
+	system("pause");
+	for (std::size_t i = 0; i < num_iterations; ++i)
+	{
+		std::cout << "\nNOISE BATCH " << i << "\n";
+		timer_.Restart();
+		noise_[i].GenerateNoise<test_noise_type_flag, scalar_test_noise_processor>
+		(
+			decltype(noise_)::value_type::MakeOptions
+			(
+				sample_count,
+				EmuMath::Vector<test_noise_dimensions, float>(0.0f),
+				EmuMath::Vector<test_noise_dimensions, float>(1.0f / 1024.0f),
+				3.0f,
+				true,
+				use_fractal,
+				EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
+				EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+			)
+		);
+		timer_.Pause();
+		std::cout << "FINISHED SCALAR NOISE IN: " << timer_.GetMilli() << "ms\n";
+	
+	
+		timer_.Restart();
+		fast_noise_[i].GenerateNoise<test_noise_type_flag, fast_test_noise_processor>
+		(
+			decltype(fast_noise_)::value_type::make_options
+			(
+				sample_count,
+				EmuMath::Vector<test_noise_dimensions, float>(0.0f),
+				EmuMath::Vector<test_noise_dimensions, float>(1.0f / 1024.0f),
+				3.0f,
+				true,
+				use_fractal,
+				EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
+				EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+			)
+		);
+		timer_.Pause();
+		std::cout << "FINISHED FAST NOISE IN: " << timer_.GetMilli() << "ms\n";
+	}
+
+	EmuMath::Gradient<float> gradient_colours_;
+	gradient_colours_.AddClampedColourAnchor(0.0f, EmuMath::Colours::Blue());
+	gradient_colours_.AddClampedColourAnchor(0.35f, EmuMath::Colours::Blue());
+	gradient_colours_.AddClampedColourAnchor(0.45f, EmuMath::Colours::White());
+	gradient_colours_.AddClampedColourAnchor(0.5f, EmuMath::Colours::Black());
+	gradient_colours_.AddClampedColourAnchor(0.65f, EmuMath::Colours::Yellow());
+	gradient_colours_.AddClampedColourAnchor(0.85f, EmuMath::Colours::Green());
+	gradient_colours_.AddClampedColourAnchor(1.0f, EmuMath::Colours::Red());
+
+	EmuMath::Gradient<std::uint8_t> gradient_grayscale_;
+	gradient_colours_.AddClampedColourAnchor(0.0f, EmuMath::Colours::Black<std::uint8_t>());
+	gradient_colours_.AddClampedColourAnchor(1.0f, EmuMath::Colours::White<std::uint8_t>());
+
+	auto& noise_gradient_ = gradient_colours_;
+
+	WriteNoiseTableToPPM(noise_, noise_gradient_, "test_noise_scalar");
+	WriteNoiseTableToPPM(fast_noise_, noise_gradient_, "test_noise_simd");
 
 	// #### THREADED_NOISE_EXAMPLE ####
 	//std::cout << "GENERATING FAST NOISE VIA THREAD POOL...\n";
@@ -232,9 +282,9 @@ int main()
 	//		auto* p_table_ = &(array_[y]);
 	//		auto options_ = EmuMath::FastNoiseTable<3, 1>::make_options
 	//		(
-	//			EmuMath::NewVector<3, std::size_t>(128, 128, 1),
-	//			EmuMath::NewVector<3, float>((1.0f / 1024.0f) * (x * 128), (1.0f / 1024.0f) * (y * 128), 0.0f),
-	//			EmuMath::NewVector<3, float>(1.0f / 1024.0f, 1.0f / 1024.0f, 1.0f / 1024.0f),
+	//			EmuMath::Vector<3, std::size_t>(128, 128, 1),
+	//			EmuMath::Vector<3, float>((1.0f / 1024.0f) * (x * 128), (1.0f / 1024.0f) * (y * 128), 0.0f),
+	//			EmuMath::Vector<3, float>(1.0f / 1024.0f, 1.0f / 1024.0f, 1.0f / 1024.0f),
 	//			3.0f,
 	//			true,
 	//			true,
@@ -258,7 +308,7 @@ int main()
 	//thread_pool_.ViewWorkAllocator().WaitForAllTasksToComplete();
 	//timer_.Pause();
 	//std::cout << "FINISHED FAST NOISE VIA THREAD POOL IN: " << timer_.GetMilli() << "ms\n";
-	//EmuMath::NewVector3<std::size_t> resolution_ = fast_noise_.size();
+	//EmuMath::Vector3<std::size_t> resolution_ = fast_noise_.size();
 	//for (std::size_t z = 0; z < resolution_.at<2>(); ++z)
 	//{
 	//	std::cout << "\nOutputting threaded image layer #" << z << "...\n";
@@ -281,20 +331,6 @@ int main()
 	//	out_ppm_.close();
 	//}
 	//std::cout << "Finished outputting all 3D noise layers from array.\n";
-
-
-
-	//EmuSIMD::append_simd_vector_to_stream(std::cout, EmuSIMD::cast<__m256>(_mm_set_ps(1.0f, 2.0f, 3.0f, 4.0f))) << "\n";
-	//EmuMath::Functors::make_fast_noise_3d<EmuMath::NoiseType::PERLIN, __m128> fast_generator_;
-	//__m128 test_128_ = fast_generator_(_mm_set1_ps(0.4f), _mm_set1_ps(0.0f), _mm_set1_ps(1.0f), _mm_set1_ps(16.0f), _mm_set1_epi32(1023), EmuMath::NoisePermutations(1024, 0U));
-	//std::cout << "\n\n";
-	//std::cout << EmuMath::FastVector4f(test_128_) << "\n";
-	//std::cout << EmuMath::Functors::make_noise_3d<EmuMath::NoiseType::PERLIN, float>()({ 0.4f, 0.0f, 1.0f }, 16.0f, EmuMath::NoisePermutations(1024, 0U)) << "\n";
-	//
-	//__m128 some_float_ = _mm_set_ps(1.0f, 2.0f, 3.0f, 4.0f);
-	//std::cout << EmuMath::FastVector4f(some_float_) << "\n";
-	//__m128i some_ints_ = _mm_cvtps_epi32(some_float_);
-	//std::cout << EmuMath::FastVector4f(_mm_cvtepi32_ps(some_ints_)) << "\n";
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

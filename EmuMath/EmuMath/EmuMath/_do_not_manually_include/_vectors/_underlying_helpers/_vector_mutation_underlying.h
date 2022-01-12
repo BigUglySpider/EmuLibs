@@ -408,11 +408,11 @@ namespace EmuMath::Helpers::_vector_underlying
 
 #pragma region SHUFFLES
 	template<typename OutT_, bool UseTheoreticalIndices_, std::size_t...Indices_, class InVector_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> _vector_shuffle(InVector_& in_vector_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), OutT_> _vector_shuffle(InVector_& in_vector_)
 	{
 		if constexpr (EmuMath::TMP::is_emu_vector_v<InVector_>)
 		{
-			using out_vector = EmuMath::NewVector<sizeof...(Indices_), OutT_>;
+			using out_vector = EmuMath::Vector<sizeof...(Indices_), OutT_>;
 			using out_stored_type = typename out_vector::stored_type;
 			using get_return_type = EmuCore::TMP::conditional_const_t<std::is_const_v<InVector_>, typename InVector_::value_type>&;
 
@@ -915,9 +915,9 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<std::size_t OutSize_, typename OutT_, class Func_, class InVector_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgIndex_, class...Args_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_partial_mutation_copy_return_result(Func_ func_, InVector_&& in_vector_, Args_&&...args_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_partial_mutation_copy_return_result(Func_ func_, InVector_&& in_vector_, Args_&&...args_)
 	{
-		using out_vector = EmuMath::NewVector<OutSize_, OutT_>;
+		using out_vector = EmuMath::Vector<OutSize_, OutT_>;
 		if constexpr ((BeginIndex_ == 0) && (EndIndex_ >= out_vector::size))
 		{
 			// Mutation range covers all indices, so we don't need to worry about copying and instead defer for mutation optimisations
@@ -948,9 +948,9 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<std::size_t OutSize_, typename OutT_, class Func_, class InVector_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgIndex_, class...Args_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_partial_mutation_copy_args_only(InVector_&& in_vector_, Args_&&...args_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_partial_mutation_copy_args_only(InVector_&& in_vector_, Args_&&...args_)
 	{
-		using out_vector = EmuMath::NewVector<OutSize_, OutT_>;
+		using out_vector = EmuMath::Vector<OutSize_, OutT_>;
 		if constexpr ((BeginIndex_ == 0) && (EndIndex_ >= out_vector::size))
 		{
 			// Mutation range covers all indices, so we don't need to worry about copying and instead defer for mutation optimisations
@@ -992,7 +992,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<template<class...> class FuncT_, std::size_t Size_, typename T_, class InVector_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgIndex_, class...Args_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<Size_, T_> _vector_partial_mutation_copy_with_func_template_args_only(InVector_&& in_vector_, Args_&&...args_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<Size_, T_> _vector_partial_mutation_copy_with_func_template_args_only(InVector_&& in_vector_, Args_&&...args_)
 	{
 		if constexpr (EmuCore::TMP::valid_template_args_v<FuncT_, EmuMath::TMP::emu_vector_value_type_uq<Args_>...>)
 		{
@@ -1026,7 +1026,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		std::size_t ArgIndex_,
 		class...Args_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_partial_mutation_copy_with_func_template_extra_args_args_only(InVector_&& in_vector_, Args_&&...args_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_partial_mutation_copy_with_func_template_extra_args_args_only(InVector_&& in_vector_, Args_&&...args_)
 	{
 		using instance_info = _vector_mutate_custom_func_instance<FuncT_, ArgTuple_, Args_...>;
 		if constexpr (CustomArgsFirst_ ? instance_info::is_valid_with_tuple_first : instance_info::is_valid_with_tuple_last)
@@ -1158,20 +1158,20 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<bool CopyBeforeMut_, class Func_, std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_, class...Args_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_copy_mutate_invoke_only(Func_ func_, EmuMath::NewVector<Size_, T_>& vector_, Args_&&...args_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_copy_mutate_invoke_only(Func_ func_, EmuMath::Vector<Size_, T_>& vector_, Args_&&...args_)
 	{
-		if constexpr (std::is_constructible_v<EmuMath::NewVector<OutSize_, OutT_>, EmuMath::NewVector<Size_, T_>&>)
+		if constexpr (std::is_constructible_v<EmuMath::Vector<OutSize_, OutT_>, EmuMath::Vector<Size_, T_>&>)
 		{
 			if constexpr (CopyBeforeMut_)
 			{
-				EmuMath::NewVector<OutSize_, OutT_> out_vector_(vector_);
+				EmuMath::Vector<OutSize_, OutT_> out_vector_(vector_);
 				_vector_mutate_invoke_only<Func_&, BeginIndex_, EndIndex_>(func_, std::forward<Args_>(args_)...);
 				return out_vector_;
 			}
 			else
 			{
 				_vector_mutate_invoke_only<Func_&, BeginIndex_, EndIndex_>(func_, std::forward<Args_>(args_)...);
-				return EmuMath::NewVector<OutSize_, OutT_>(vector_);
+				return EmuMath::Vector<OutSize_, OutT_>(vector_);
 			}
 		}
 		else
@@ -1184,20 +1184,20 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 	}
 	template<bool CopyBeforeMut_, class Func_, std::size_t OutSize_, typename OutT_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_, class...Args_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_copy_mutate_invoke_only_no_func_passed(EmuMath::NewVector<Size_, T_>& vector_, Args_&&...args_)
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_copy_mutate_invoke_only_no_func_passed(EmuMath::Vector<Size_, T_>& vector_, Args_&&...args_)
 	{
-		if constexpr (std::is_constructible_v<EmuMath::NewVector<OutSize_, OutT_>, EmuMath::NewVector<Size_, T_>&>)
+		if constexpr (std::is_constructible_v<EmuMath::Vector<OutSize_, OutT_>, EmuMath::Vector<Size_, T_>&>)
 		{
 			if constexpr (CopyBeforeMut_)
 			{
-				EmuMath::NewVector<OutSize_, OutT_> out_vector_(vector_);
+				EmuMath::Vector<OutSize_, OutT_> out_vector_(vector_);
 				_vector_mutate_invoke_only_no_func_passed<Func_, BeginIndex_, EndIndex_>(std::forward<Args_>(args_)...);
 				return out_vector_;
 			}
 			else
 			{
 				_vector_mutate_invoke_only_no_func_passed<Func_, BeginIndex_, EndIndex_>(std::forward<Args_>(args_)...);
-				return EmuMath::NewVector<OutSize_, OutT_>(vector_);
+				return EmuMath::Vector<OutSize_, OutT_>(vector_);
 			}
 		}
 		else
@@ -1222,9 +1222,9 @@ namespace EmuMath::Helpers::_vector_underlying
 		typename T_,
 		class...Args_
 	>
-	constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_copy_mutate_with_func_template_invoke_only_no_func_passed
+	constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_copy_mutate_with_func_template_invoke_only_no_func_passed
 	(
-		EmuMath::NewVector<Size_, T_>& vector_,
+		EmuMath::Vector<Size_, T_>& vector_,
 		Args_&&...args_
 	)
 	{
@@ -1262,9 +1262,9 @@ namespace EmuMath::Helpers::_vector_underlying
 		typename InT_,
 		class...Args_
 	>
-	[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> _vector_copy_mutate_with_func_template_extra_args_invoke_only_no_func_passed
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _vector_copy_mutate_with_func_template_extra_args_invoke_only_no_func_passed
 	(
-		EmuMath::NewVector<InSize_, InT_>& in_vector_,
+		EmuMath::Vector<InSize_, InT_>& in_vector_,
 		Args_&&...args_
 	)
 	{
@@ -1423,14 +1423,14 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<typename OutT_, class LhsVector_, class RhsVector_>
-	[[nodiscard]] constexpr inline EmuMath::NewVector
+	[[nodiscard]] constexpr inline EmuMath::Vector
 	<
 		EmuCore::TMP::remove_ref_cv_t<LhsVector_>::size + EmuCore::TMP::remove_ref_cv_t<RhsVector_>::size,
 		OutT_
 	> _vector_concat(LhsVector_&& lhs_vector_, RhsVector_&& rhs_vector_)
 	{
 		constexpr std::size_t out_size_ = EmuCore::TMP::remove_ref_cv_t<LhsVector_>::size + EmuCore::TMP::remove_ref_cv_t<RhsVector_>::size;
-		return _vector_concat_execution<EmuMath::NewVector<out_size_, OutT_>>
+		return _vector_concat_execution<EmuMath::Vector<out_size_, OutT_>>
 		(
 			std::make_index_sequence<out_size_>(),
 			std::forward<LhsVector_>(lhs_vector_),

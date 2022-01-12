@@ -1,10 +1,10 @@
 #ifndef EMU_MATH_FAST_NOISE_FUNCTORS_H_INC_
 #define EMU_MATH_FAST_NOISE_FUNCTORS_H_INC_ 1
 
-#include "_noise_gen_functors/FastNoiseGen1D.h"
-#include "_noise_gen_functors/FastNoiseGen2D.h"
-#include "_noise_gen_functors/FastNoiseGen3D.h"
-#include "_noise_gen_functors/FastFractalNoiseWrapper.h"
+#include "_noise_gen_functors/_simd_noise_gen_1d.h"
+#include "_noise_gen_functors/_simd_noise_gen_2d.h"
+#include "_noise_gen_functors/_simd_noise_gen_3d.h"
+#include "_noise_gen_functors/_simd_fractal_noise_wrapper.h"
 
 namespace EmuMath::Functors
 {

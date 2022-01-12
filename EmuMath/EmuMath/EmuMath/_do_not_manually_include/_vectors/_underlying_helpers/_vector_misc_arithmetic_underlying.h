@@ -203,47 +203,47 @@ namespace EmuMath::Helpers::_vector_underlying
 	}
 
 	template<class Out_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ _vector_min(const EmuMath::NewVector<Size_, T_>& in_vector_)
+	[[nodiscard]] constexpr inline Out_ _vector_min(const EmuMath::Vector<Size_, T_>& in_vector_)
 	{
-		return _vector_min_or_max<EmuCore::do_cmp_less, Out_, BeginIndex_, EndIndex_, const EmuMath::NewVector<Size_, T_>>(in_vector_);
+		return _vector_min_or_max<EmuCore::do_cmp_less, Out_, BeginIndex_, EndIndex_, const EmuMath::Vector<Size_, T_>>(in_vector_);
 	}
 	template<class Out_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ _vector_min(const EmuMath::NewVector<Size_, T_>& in_vector_)
+	[[nodiscard]] constexpr inline Out_ _vector_min(const EmuMath::Vector<Size_, T_>& in_vector_)
 	{
-		return _vector_min_or_max<EmuCore::do_cmp_less, Out_, 0, EmuMath::NewVector<Size_, T_>::size, const EmuMath::NewVector<Size_, T_>>(in_vector_);
+		return _vector_min_or_max<EmuCore::do_cmp_less, Out_, 0, EmuMath::Vector<Size_, T_>::size, const EmuMath::Vector<Size_, T_>>(in_vector_);
 	}
 
 	template<class Out_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ _vector_min(EmuMath::NewVector<Size_, T_>& in_vector_)
+	[[nodiscard]] constexpr inline Out_ _vector_min(EmuMath::Vector<Size_, T_>& in_vector_)
 	{
-		return _vector_min_or_max<EmuCore::do_cmp_less, Out_, BeginIndex_, EndIndex_, EmuMath::NewVector<Size_, T_>>(in_vector_);
+		return _vector_min_or_max<EmuCore::do_cmp_less, Out_, BeginIndex_, EndIndex_, EmuMath::Vector<Size_, T_>>(in_vector_);
 	}
 	template<class Out_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ _vector_min(EmuMath::NewVector<Size_, T_>& in_vector_)
+	[[nodiscard]] constexpr inline Out_ _vector_min(EmuMath::Vector<Size_, T_>& in_vector_)
 	{
-		return _vector_min_or_max<EmuCore::do_cmp_less, Out_, 0, EmuMath::NewVector<Size_, T_>::size, EmuMath::NewVector<Size_, T_>>(in_vector_);
+		return _vector_min_or_max<EmuCore::do_cmp_less, Out_, 0, EmuMath::Vector<Size_, T_>::size, EmuMath::Vector<Size_, T_>>(in_vector_);
 	}
 
 	template<class Out_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ _vector_max(const EmuMath::NewVector<Size_, T_>& in_vector_)
+	[[nodiscard]] constexpr inline Out_ _vector_max(const EmuMath::Vector<Size_, T_>& in_vector_)
 	{
-		return _vector_min_or_max<EmuCore::do_cmp_greater, Out_, BeginIndex_, EndIndex_, const EmuMath::NewVector<Size_, T_>>(in_vector_);
+		return _vector_min_or_max<EmuCore::do_cmp_greater, Out_, BeginIndex_, EndIndex_, const EmuMath::Vector<Size_, T_>>(in_vector_);
 	}
 	template<class Out_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ _vector_max(const EmuMath::NewVector<Size_, T_>& in_vector_)
+	[[nodiscard]] constexpr inline Out_ _vector_max(const EmuMath::Vector<Size_, T_>& in_vector_)
 	{
-		return _vector_min_or_max<EmuCore::do_cmp_greater, Out_, 0, EmuMath::NewVector<Size_, T_>::size, const EmuMath::NewVector<Size_, T_>>(in_vector_);
+		return _vector_min_or_max<EmuCore::do_cmp_greater, Out_, 0, EmuMath::Vector<Size_, T_>::size, const EmuMath::Vector<Size_, T_>>(in_vector_);
 	}
 
 	template<class Out_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ _vector_max(EmuMath::NewVector<Size_, T_>& in_vector_)
+	[[nodiscard]] constexpr inline Out_ _vector_max(EmuMath::Vector<Size_, T_>& in_vector_)
 	{
-		return _vector_min_or_max<EmuCore::do_cmp_greater, Out_, BeginIndex_, EndIndex_, EmuMath::NewVector<Size_, T_>>(in_vector_);
+		return _vector_min_or_max<EmuCore::do_cmp_greater, Out_, BeginIndex_, EndIndex_, EmuMath::Vector<Size_, T_>>(in_vector_);
 	}
 	template<class Out_, std::size_t Size_, typename T_>
-	[[nodiscard]] constexpr inline Out_ _vector_max(EmuMath::NewVector<Size_, T_>& in_vector_)
+	[[nodiscard]] constexpr inline Out_ _vector_max(EmuMath::Vector<Size_, T_>& in_vector_)
 	{
-		return _vector_min_or_max<EmuCore::do_cmp_greater, Out_, 0, EmuMath::NewVector<Size_, T_>::size, EmuMath::NewVector<Size_, T_>>(in_vector_);
+		return _vector_min_or_max<EmuCore::do_cmp_greater, Out_, 0, EmuMath::Vector<Size_, T_>::size, EmuMath::Vector<Size_, T_>>(in_vector_);
 	}
 }
 

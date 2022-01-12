@@ -11,37 +11,37 @@
 namespace EmuMath::Helpers
 {
 	template<typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void vector_copy(EmuMath::NewVector<Size_, T_>& out_vector_, Arg_& in_arg_)
+	constexpr inline void vector_copy(EmuMath::Vector<Size_, T_>& out_vector_, Arg_& in_arg_)
 	{
 		_vector_underlying::_vector_copy<Arg_, Size_, T_>(out_vector_, in_arg_);
 	}
 
 	template<typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void vector_copy(EmuMath::NewVector<Size_, T_>& out_vector_, const Arg_& in_arg_)
+	constexpr inline void vector_copy(EmuMath::Vector<Size_, T_>& out_vector_, const Arg_& in_arg_)
 	{
 		_vector_underlying::_vector_copy<const Arg_, Size_, T_>(out_vector_, in_arg_);
 	}
 
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void vector_copy(EmuMath::NewVector<Size_, T_>& out_vector_, Arg_& in_arg_)
+	constexpr inline void vector_copy(EmuMath::Vector<Size_, T_>& out_vector_, Arg_& in_arg_)
 	{
 		_vector_underlying::_vector_copy<BeginIndex_, EndIndex_, BeginIndex_, Arg_, Size_, T_>(out_vector_, in_arg_);
 	}
 
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void vector_copy(EmuMath::NewVector<Size_, T_>& out_vector_, const Arg_& in_arg_)
+	constexpr inline void vector_copy(EmuMath::Vector<Size_, T_>& out_vector_, const Arg_& in_arg_)
 	{
 		_vector_underlying::_vector_copy<BeginIndex_, EndIndex_, BeginIndex_, const Arg_, Size_, T_>(out_vector_, in_arg_);
 	}
 
 	template<bool CopyNonContained_, typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void vector_copy(EmuMath::NewVector<Size_, T_>& out_vector_, Arg_& in_arg_)
+	constexpr inline void vector_copy(EmuMath::Vector<Size_, T_>& out_vector_, Arg_& in_arg_)
 	{
 		_vector_underlying::_vector_copy<CopyNonContained_, Arg_, Size_, T_>(out_vector_, in_arg_);
 	}
 
 	template<bool CopyNonContained_, typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void vector_copy(EmuMath::NewVector<Size_, T_>& out_vector_, const Arg_& in_arg_)
+	constexpr inline void vector_copy(EmuMath::Vector<Size_, T_>& out_vector_, const Arg_& in_arg_)
 	{
 		_vector_underlying::_vector_copy<CopyNonContained_, const Arg_, Size_, T_>(out_vector_, in_arg_);
 	}
@@ -63,24 +63,24 @@ namespace EmuMath::Helpers
 	/// <param name="out_vector_">EmuMath Vector to copy to.</param>
 	/// <param name="in_arg_">EmuMath Vector or usable scalar to copy to value(s) from.</param>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void vector_copy_from_start(EmuMath::NewVector<Size_, T_>& out_vector_, Arg_& in_arg_)
+	constexpr inline void vector_copy_from_start(EmuMath::Vector<Size_, T_>& out_vector_, Arg_& in_arg_)
 	{
 		_vector_underlying::_vector_copy_from_start<BeginIndex_, EndIndex_, true, Arg_, Size_, T_>(out_vector_, in_arg_);
 	}
 	template<std::size_t BeginIndex_, typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void vector_copy_from_start(EmuMath::NewVector<Size_, T_>& out_vector_, Arg_& in_arg_)
+	constexpr inline void vector_copy_from_start(EmuMath::Vector<Size_, T_>& out_vector_, Arg_& in_arg_)
 	{
-		_vector_underlying::_vector_copy_from_start<BeginIndex_, EmuMath::NewVector<Size_, T_>::size, true, Arg_, Size_, T_>(out_vector_, in_arg_);
+		_vector_underlying::_vector_copy_from_start<BeginIndex_, EmuMath::Vector<Size_, T_>::size, true, Arg_, Size_, T_>(out_vector_, in_arg_);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void vector_copy_from_start(EmuMath::NewVector<Size_, T_>& out_vector_, const Arg_& in_arg_)
+	constexpr inline void vector_copy_from_start(EmuMath::Vector<Size_, T_>& out_vector_, const Arg_& in_arg_)
 	{
 		_vector_underlying::_vector_copy_from_start<BeginIndex_, EndIndex_, true, const Arg_, Size_, T_>(out_vector_, in_arg_);
 	}
 	template<std::size_t BeginIndex_, typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void vector_copy_from_start(EmuMath::NewVector<Size_, T_>& out_vector_, const Arg_& in_arg_)
+	constexpr inline void vector_copy_from_start(EmuMath::Vector<Size_, T_>& out_vector_, const Arg_& in_arg_)
 	{
-		_vector_underlying::_vector_copy_from_start<BeginIndex_, EmuMath::NewVector<Size_, T_>::size, true, const Arg_, Size_, T_>(out_vector_, in_arg_);
+		_vector_underlying::_vector_copy_from_start<BeginIndex_, EmuMath::Vector<Size_, T_>::size, true, const Arg_, Size_, T_>(out_vector_, in_arg_);
 	}
 
 	/// <summary>
@@ -100,24 +100,24 @@ namespace EmuMath::Helpers
 	/// <param name="out_vector_">EmuMath Vector to copy to.</param>
 	/// <param name="in_arg_">EmuMath Vector or usable scalar to copy to value(s) from.</param>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void vector_copy_from_start_contained_only(EmuMath::NewVector<Size_, T_>& out_vector_, Arg_& in_arg_)
+	constexpr inline void vector_copy_from_start_contained_only(EmuMath::Vector<Size_, T_>& out_vector_, Arg_& in_arg_)
 	{
 		_vector_underlying::_vector_copy_from_start<BeginIndex_, EndIndex_, false, Arg_, Size_, T_>(out_vector_, in_arg_);
 	}
 	template<std::size_t BeginIndex_, typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void vector_copy_from_start_contained_only(EmuMath::NewVector<Size_, T_>& out_vector_, Arg_& in_arg_)
+	constexpr inline void vector_copy_from_start_contained_only(EmuMath::Vector<Size_, T_>& out_vector_, Arg_& in_arg_)
 	{
-		_vector_underlying::_vector_copy_from_start<BeginIndex_, EmuMath::NewVector<Size_, T_>::size, false, Arg_, Size_, T_>(out_vector_, in_arg_);
+		_vector_underlying::_vector_copy_from_start<BeginIndex_, EmuMath::Vector<Size_, T_>::size, false, Arg_, Size_, T_>(out_vector_, in_arg_);
 	}
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void vector_copy_from_start_contained_only(EmuMath::NewVector<Size_, T_>& out_vector_, const Arg_& in_arg_)
+	constexpr inline void vector_copy_from_start_contained_only(EmuMath::Vector<Size_, T_>& out_vector_, const Arg_& in_arg_)
 	{
 		_vector_underlying::_vector_copy_from_start<BeginIndex_, EndIndex_, false, const Arg_, Size_, T_>(out_vector_, in_arg_);
 	}
 	template<std::size_t BeginIndex_, typename Arg_, std::size_t Size_, typename T_>
-	constexpr inline void vector_copy_from_start_contained_only(EmuMath::NewVector<Size_, T_>& out_vector_, const Arg_& in_arg_)
+	constexpr inline void vector_copy_from_start_contained_only(EmuMath::Vector<Size_, T_>& out_vector_, const Arg_& in_arg_)
 	{
-		_vector_underlying::_vector_copy_from_start<BeginIndex_, EmuMath::NewVector<Size_, T_>::size, false, const Arg_, Size_, T_>(out_vector_, in_arg_);
+		_vector_underlying::_vector_copy_from_start<BeginIndex_, EmuMath::Vector<Size_, T_>::size, false, const Arg_, Size_, T_>(out_vector_, in_arg_);
 	}
 }
 

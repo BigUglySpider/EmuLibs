@@ -51,7 +51,7 @@ namespace EmuMath::Helpers
 	/// <param name="cmp_">: Invocable item to perform comparisons. Must return a type that may be interpreted as a bool when invoked with lhs_vector_ and rhs_ as described.</param>
 	/// <returns>True if all comparisons with the provided Cmp_ are true, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Cmp_, typename Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_, Cmp_ cmp_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_, Cmp_ cmp_)
 	{
 		using cmp_ref_ = std::add_lvalue_reference_t<Cmp_>;
 		using Joiner_ = std::logical_and<void>;
@@ -59,7 +59,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<class Cmp_, bool IncludeNonContained_ = true, typename Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, IncludeNonContained_, Cmp_, Joiner_>(Cmp_(), Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -81,7 +81,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if all comparisons using the provided CmpTemplate_ are true, otherwise false.</returns>
 	template<template<class...> class CmpTemplate_, bool IncludeNonContained_ = true, typename Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, IncludeNonContained_, CmpTemplate_, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -99,7 +99,7 @@ namespace EmuMath::Helpers
 	/// <param name="cmp_">: Invocable item to perform comparisons. Must return a type that may be interpreted as a bool when invoked with lhs_vector_ and rhs_ as described.</param>
 	/// <returns>True if all comparisons with the provided Cmp_ within the provided index range are true, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Cmp_, typename Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_, Cmp_ cmp_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_, Cmp_ cmp_)
 	{
 		using cmp_ref_ = std::add_lvalue_reference_t<Cmp_>;
 		using Joiner_ = std::logical_and<void>;
@@ -107,7 +107,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<class Cmp_, std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, BeginIndex_, EndIndex_, Cmp_, Joiner_>(Cmp_(), Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -125,7 +125,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if all comparisons using the provided CmpTemplate_ within the provided index range are true, otherwise false.</returns>
 	template<template<class...> class CmpTemplate_, std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, BeginIndex_, EndIndex_, CmpTemplate_, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -149,7 +149,7 @@ namespace EmuMath::Helpers
 	/// <param name="cmp_">: Invocable item to perform comparisons. Must return a type that may be interpreted as a bool when invoked with lhs_vector_ and rhs_ as described.</param>
 	/// <returns>True if at least 1 comparison with the provided Cmp_ is true, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Cmp_, typename Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_, Cmp_ cmp_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_, Cmp_ cmp_)
 	{
 		using cmp_ref_ = std::add_lvalue_reference_t<Cmp_>;
 		using Joiner_ = std::logical_or<void>;
@@ -157,7 +157,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<class Cmp_, bool IncludeNonContained_ = true, typename Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, IncludeNonContained_, Cmp_, Joiner_>(Cmp_(), Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -179,7 +179,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if at least 1 comparison using the provided CmpTemplate_ is true, otherwise false.</returns>
 	template<template<class...> class CmpTemplate_, bool IncludeNonContained_ = true, typename Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, IncludeNonContained_, CmpTemplate_, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -197,7 +197,7 @@ namespace EmuMath::Helpers
 	/// <param name="cmp_">: Invocable item to perform comparisons. Must return a type that may be interpreted as a bool when invoked with lhs_vector_ and rhs_ as described.</param>
 	/// <returns>True if at least 1 comparison with the provided Cmp_ within the provided index range is true, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Cmp_, typename Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_, Cmp_ cmp_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_, Cmp_ cmp_)
 	{
 		using cmp_ref_ = std::add_lvalue_reference_t<Cmp_>;
 		using Joiner_ = std::logical_or<void>;
@@ -205,7 +205,7 @@ namespace EmuMath::Helpers
 	}
 
 	template<class Cmp_, std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, BeginIndex_, EndIndex_, Cmp_, Joiner_>(Cmp_(), Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -223,7 +223,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if at least 1 comparison using the provided CmpTemplate_ within the provided index range is true, otherwise false.</returns>
 	template<template<class...> class CmpTemplate_, std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, BeginIndex_, EndIndex_, CmpTemplate_, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -241,7 +241,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath Vector appearing on the right of per-element comparison, or scalar appearing on the right of magnitude comparison.</param>
 	/// <returns>If Rhs_: is an EmuMath Vector: true if all comparisons are true, otherwise false. Otherwise, true if rhs_ is near-equal to lhs_vector_'s magnitude.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_near(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_near(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp_mag_if_rhs_scalar<true, IncludeNonContained_, EmuCore::do_cmp_near_equal, Joiner_>(lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -261,7 +261,7 @@ namespace EmuMath::Helpers
 	///		Otherwise, true if rhs_ is near-equal to lhs_vector_'s magnitude when calculated using only indices within the provided range.
 	/// </returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_near(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_near(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp_mag_if_rhs_scalar<true, BeginIndex_, EndIndex_, EmuCore::do_cmp_near_equal, Joiner_>(lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -281,7 +281,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if all comparisons are true, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all_near(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_near(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, IncludeNonContained_, EmuCore::do_cmp_near_equal, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -297,7 +297,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if all comparisons within the provided range are true, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all_near(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_near(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, BeginIndex_, EndIndex_, EmuCore::do_cmp_near_equal, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -317,7 +317,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if at least 1 comparison is true, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any_near(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_near(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, IncludeNonContained_, EmuCore::do_cmp_near_equal, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -333,7 +333,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if at least 1 comparison within the provided range is true, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any_near(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_near(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, BeginIndex_, EndIndex_, EmuCore::do_cmp_near_equal, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -351,7 +351,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath Vector appearing on the right of per-element comparison, or scalar appearing on the right of magnitude comparison.</param>
 	/// <returns>If Rhs_: is an EmuMath Vector: true if all comparisons are true, otherwise false. Otherwise, true if rhs_ is near-equal to lhs_vector_'s magnitude.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_not_near(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_not_near(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp_mag_if_rhs_scalar<false, IncludeNonContained_, EmuCore::do_cmp_not_near_equal, Joiner_>(lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -371,7 +371,7 @@ namespace EmuMath::Helpers
 	///		Otherwise, true if rhs_ is near-equal to lhs_vector_'s magnitude when calculated using only indices within the provided range.
 	/// </returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_not_near(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_not_near(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp_mag_if_rhs_scalar<false, BeginIndex_, EndIndex_, EmuCore::do_cmp_not_near_equal, Joiner_>(lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -391,7 +391,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if all comparisons are true, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all_not_near(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_not_near(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, IncludeNonContained_, EmuCore::do_cmp_not_near_equal, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -407,7 +407,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if all comparisons within the provided range are true, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all_not_near(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_not_near(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, BeginIndex_, EndIndex_, EmuCore::do_cmp_not_near_equal, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -427,7 +427,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if at least 1 comparison is true, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any_not_near(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_not_near(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, IncludeNonContained_, EmuCore::do_cmp_not_near_equal, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -443,7 +443,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if at least 1 comparison within the provided range is true, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any_not_near(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_not_near(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, BeginIndex_, EndIndex_, EmuCore::do_cmp_not_near_equal, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -461,7 +461,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath Vector appearing on the right of per-element comparison, or scalar appearing on the right of magnitude comparison.</param>
 	/// <returns>If Rhs_: is an EmuMath Vector: true if all comparisons are true, otherwise false. Otherwise, true if rhs_ is equal to lhs_vector_'s magnitude.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp_mag_if_rhs_scalar<true, IncludeNonContained_, EmuCore::do_cmp_equal_to, Joiner_>(lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -481,7 +481,7 @@ namespace EmuMath::Helpers
 	///		Otherwise, true if rhs_ is equal to lhs_vector_'s magnitude when calculated using only indices within the provided range.
 	/// </returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp_mag_if_rhs_scalar<true, BeginIndex_, EndIndex_, EmuCore::do_cmp_equal_to, Joiner_>(lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -501,7 +501,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if all comparisons are true, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, IncludeNonContained_, EmuCore::do_cmp_equal_to, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -517,7 +517,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if all comparisons within the provided range are true, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, BeginIndex_, EndIndex_, EmuCore::do_cmp_equal_to, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -537,7 +537,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if at least 1 comparison is true, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, IncludeNonContained_, EmuCore::do_cmp_equal_to, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -553,7 +553,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if at least 1 comparison within the provided range is true, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, BeginIndex_, EndIndex_, EmuCore::do_cmp_equal_to, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -571,7 +571,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath Vector appearing on the right of per-element comparison, or scalar appearing on the right of magnitude comparison.</param>
 	/// <returns>If Rhs_: is an EmuMath Vector: true if all comparisons are true, otherwise false. Otherwise, true if rhs_ is not equal to lhs_vector_'s magnitude.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_not_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_not_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp_mag_if_rhs_scalar<false, IncludeNonContained_, EmuCore::do_cmp_not_equal_to, Joiner_>(lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -591,7 +591,7 @@ namespace EmuMath::Helpers
 	///		Otherwise, true if rhs_ is not equal to lhs_vector_'s magnitude when calculated using only indices within the provided range.
 	/// </returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_not_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_not_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp_mag_if_rhs_scalar<false, BeginIndex_, EndIndex_, EmuCore::do_cmp_not_equal_to, Joiner_>(lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -611,7 +611,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if all comparisons are true, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all_not_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_not_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, IncludeNonContained_, EmuCore::do_cmp_not_equal_to, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -627,7 +627,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if all comparisons within the provided range are true, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all_not_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_not_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, BeginIndex_, EndIndex_, EmuCore::do_cmp_not_equal_to, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -647,7 +647,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if at least 1 comparison is true, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any_not_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_not_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, IncludeNonContained_, EmuCore::do_cmp_not_equal_to, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -663,7 +663,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if at least 1 comparison within the provided range is true, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any_not_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_not_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, BeginIndex_, EndIndex_, EmuCore::do_cmp_not_equal_to, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -685,7 +685,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath Vector whose magnitude appears on the right of comparison, or scalar appearing on the right of comparison.</param>
 	/// <returns>True if lhs_vector_'s magnitude is greater than that of rhs_, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_greater(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_greater(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		return _vector_underlying::_vector_cmp_mag<IncludeNonContained_, EmuCore::do_cmp_greater>(lhs_vector_, std::forward<Rhs_>(rhs_));
 	}
@@ -700,7 +700,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath Vector whose magnitude appears on the right of comparison, or scalar appearing on the right of comparison.</param>
 	/// <returns>True if lhs_vector_'s magnitude is greater than that of rhs_, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_greater(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_greater(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		return _vector_underlying::_vector_cmp_mag<BeginIndex_, EndIndex_, EmuCore::do_cmp_greater>(lhs_vector_, std::forward<Rhs_>(rhs_));
 	}
@@ -719,7 +719,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if all comparisons are true, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all_greater(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_greater(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, IncludeNonContained_, EmuCore::do_cmp_greater, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -735,7 +735,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if all comparisons within the provided range are true, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all_greater(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_greater(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, BeginIndex_, EndIndex_, EmuCore::do_cmp_greater, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -755,7 +755,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if at least 1 comparison is true, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any_greater(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_greater(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, IncludeNonContained_, EmuCore::do_cmp_greater, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -771,7 +771,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if at least 1 comparison within the provided range is true, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any_greater(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_greater(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, BeginIndex_, EndIndex_, EmuCore::do_cmp_greater, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -793,7 +793,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath Vector whose magnitude appears on the right of comparison, or scalar appearing on the right of comparison.</param>
 	/// <returns>True if lhs_vector_'s magnitude is less than that of rhs_, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_less(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_less(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		return _vector_underlying::_vector_cmp_mag<IncludeNonContained_, EmuCore::do_cmp_less>(lhs_vector_, std::forward<Rhs_>(rhs_));
 	}
@@ -808,7 +808,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath Vector whose magnitude appears on the right of comparison, or scalar appearing on the right of comparison.</param>
 	/// <returns>True if lhs_vector_'s magnitude is less than that of rhs_, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_less(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_less(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		return _vector_underlying::_vector_cmp_mag<BeginIndex_, EndIndex_, EmuCore::do_cmp_less>(lhs_vector_, std::forward<Rhs_>(rhs_));
 	}
@@ -827,7 +827,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if all comparisons are true, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all_less(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_less(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, IncludeNonContained_, EmuCore::do_cmp_less, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -843,7 +843,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if all comparisons within the provided range are true, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all_less(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_less(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, BeginIndex_, EndIndex_, EmuCore::do_cmp_less, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -863,7 +863,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if at least 1 comparison is true, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any_less(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_less(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, IncludeNonContained_, EmuCore::do_cmp_less, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -879,7 +879,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if at least 1 comparison within the provided range is true, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any_less(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_less(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, BeginIndex_, EndIndex_, EmuCore::do_cmp_less, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -901,7 +901,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath Vector whose magnitude appears on the right of comparison, or scalar appearing on the right of comparison.</param>
 	/// <returns>True if lhs_vector_'s magnitude is greater than or equal to that of rhs_, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_greater_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_greater_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		return _vector_underlying::_vector_cmp_mag<IncludeNonContained_, EmuCore::do_cmp_greater_equal>(lhs_vector_, std::forward<Rhs_>(rhs_));
 	}
@@ -916,7 +916,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath Vector whose magnitude appears on the right of comparison, or scalar appearing on the right of comparison.</param>
 	/// <returns>True if lhs_vector_'s magnitude is greater than or equal to that of rhs_, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_greater_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_greater_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		return _vector_underlying::_vector_cmp_mag<BeginIndex_, EndIndex_, EmuCore::do_cmp_greater_equal>(lhs_vector_, std::forward<Rhs_>(rhs_));
 	}
@@ -935,7 +935,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if all comparisons are true, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all_greater_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_greater_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, IncludeNonContained_, EmuCore::do_cmp_greater_equal, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -951,7 +951,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if all comparisons within the provided range are true, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all_greater_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_greater_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, BeginIndex_, EndIndex_, EmuCore::do_cmp_greater_equal, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -971,7 +971,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if at least 1 comparison is true, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any_greater_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_greater_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, IncludeNonContained_, EmuCore::do_cmp_greater_equal, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -987,7 +987,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if at least 1 comparison within the provided range is true, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any_greater_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_greater_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, BeginIndex_, EndIndex_, EmuCore::do_cmp_greater_equal, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -1009,7 +1009,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath Vector whose magnitude appears on the right of comparison, or scalar appearing on the right of comparison.</param>
 	/// <returns>True if lhs_vector_'s magnitude is less than or equal to that of rhs_, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_less_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_less_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		return _vector_underlying::_vector_cmp_mag<IncludeNonContained_, EmuCore::do_cmp_less_equal>(lhs_vector_, std::forward<Rhs_>(rhs_));
 	}
@@ -1024,7 +1024,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">EmuMath Vector whose magnitude appears on the right of comparison, or scalar appearing on the right of comparison.</param>
 	/// <returns>True if lhs_vector_'s magnitude is less than or equal to that of rhs_, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_less_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_less_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		return _vector_underlying::_vector_cmp_mag<BeginIndex_, EndIndex_, EmuCore::do_cmp_less_equal>(lhs_vector_, std::forward<Rhs_>(rhs_));
 	}
@@ -1043,7 +1043,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if all comparisons are true, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all_less_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_less_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, IncludeNonContained_, EmuCore::do_cmp_less_equal, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -1059,7 +1059,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if all comparisons within the provided range are true, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_all_less_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_all_less_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_and<void>;
 		return _vector_underlying::_vector_cmp<true, BeginIndex_, EndIndex_, EmuCore::do_cmp_less_equal, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -1079,7 +1079,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if at least 1 comparison is true, otherwise false.</returns>
 	template<bool IncludeNonContained_ = true, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any_less_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_less_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, IncludeNonContained_, EmuCore::do_cmp_less_equal, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));
@@ -1095,7 +1095,7 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of comparisons.</param>
 	/// <returns>True if at least 1 comparison within the provided range is true, otherwise false.</returns>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_, std::size_t LhsSize_, typename LhsT_>
-	[[nodiscard]] constexpr inline bool vector_cmp_any_less_equal(const EmuMath::NewVector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline bool vector_cmp_any_less_equal(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Rhs_&& rhs_)
 	{
 		using Joiner_ = std::logical_or<void>;
 		return _vector_underlying::_vector_cmp<false, BeginIndex_, EndIndex_, EmuCore::do_cmp_less_equal, Joiner_>(Joiner_(), lhs_vector_, std::forward<Rhs_>(rhs_));

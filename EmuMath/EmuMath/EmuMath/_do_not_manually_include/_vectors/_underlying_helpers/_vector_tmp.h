@@ -10,7 +10,7 @@
 namespace EmuMath
 {
 	template<std::size_t Size_, typename T_>
-	struct NewVector;
+	struct Vector;
 
 	template<typename TypeToReference_>
 	using vector_internal_ref = EmuCore::DeferrableReferenceWrapper<TypeToReference_>;
@@ -31,7 +31,7 @@ namespace EmuMath::TMP
 		>::value;
 	};
 	template<std::size_t Size_, typename T_>
-	struct is_emu_vector<EmuMath::NewVector<Size_, T_>>
+	struct is_emu_vector<EmuMath::Vector<Size_, T_>>
 	{
 		static constexpr bool value = true;
 	};
@@ -53,10 +53,10 @@ namespace EmuMath::TMP
 		>::type;
 	};
 	template<std::size_t Index_, std::size_t Size_, typename T_>
-	struct emu_vector_theoretical_return<Index_, EmuMath::NewVector<Size_, T_>>
+	struct emu_vector_theoretical_return<Index_, EmuMath::Vector<Size_, T_>>
 	{
 	private:
-		using vector_type = EmuMath::NewVector<Size_, T_>;
+		using vector_type = EmuMath::Vector<Size_, T_>;
 
 	public:
 		using type = std::conditional_t
@@ -67,10 +67,10 @@ namespace EmuMath::TMP
 		>;
 	};
 	template<std::size_t Index_, std::size_t Size_, typename T_>
-	struct emu_vector_theoretical_return<Index_, const EmuMath::NewVector<Size_, T_>>
+	struct emu_vector_theoretical_return<Index_, const EmuMath::Vector<Size_, T_>>
 	{
 	private:
-		using vector_type = EmuMath::NewVector<Size_, T_>;
+		using vector_type = EmuMath::Vector<Size_, T_>;
 
 	public:
 		using type = std::conditional_t
@@ -84,13 +84,13 @@ namespace EmuMath::TMP
 	using emu_vector_theoretical_return_t = typename emu_vector_theoretical_return<Index_, T_>::type;
 
 	template<std::size_t Index_, std::size_t Size_, typename T_>
-	using emu_vector_from_args_theoretical_return = emu_vector_theoretical_return<Index_, EmuMath::NewVector<Size_, T_>>;
+	using emu_vector_from_args_theoretical_return = emu_vector_theoretical_return<Index_, EmuMath::Vector<Size_, T_>>;
 	template<std::size_t Index_, std::size_t Size_, typename T_>
 	using emu_vector_from_args_theoretical_return_t = typename emu_vector_from_args_theoretical_return<Index_, Size_, T_>::type;
 
 
 	template<std::size_t Index_, std::size_t Size_, typename T_>
-	using emu_const_vector_from_args_theoretical_return = emu_vector_theoretical_return<Index_, const EmuMath::NewVector<Size_, T_>>;
+	using emu_const_vector_from_args_theoretical_return = emu_vector_theoretical_return<Index_, const EmuMath::Vector<Size_, T_>>;
 	template<std::size_t Index_, std::size_t Size_, typename T_>
 	using emu_const_vector_from_args_theoretical_return_t = typename emu_const_vector_from_args_theoretical_return<Index_, Size_, T_>::type;
 
@@ -256,7 +256,7 @@ namespace EmuMath::TMP
 			using t_ = void;
 		};
 		template<std::size_t Size_, typename T_>
-		struct _generator<EmuMath::NewVector<Size_, T_>>
+		struct _generator<EmuMath::Vector<Size_, T_>>
 		{
 			static constexpr std::size_t size_ = Size_;
 			using t_ = T_;
@@ -275,9 +275,9 @@ namespace EmuMath::TMP
 namespace EmuCore::TMP
 {
 	template<std::size_t Size_, typename T_>
-	struct floating_point_equivalent<EmuMath::NewVector<Size_, T_>>
+	struct floating_point_equivalent<EmuMath::Vector<Size_, T_>>
 	{
-		using type = EmuMath::NewVector<Size_, typename EmuMath::NewVector<Size_, T_>::preferred_floating_point>;
+		using type = EmuMath::Vector<Size_, typename EmuMath::Vector<Size_, T_>::preferred_floating_point>;
 	};
 }
 #pragma endregion

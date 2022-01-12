@@ -23,11 +23,11 @@ namespace EmuMath
 	///		If T_ is an l-value reference type, it will be reinterpreted as `vector_internal_ref&lt;std::remove_ref_t&lt;T_&gt;&gt;`.
 	/// </typeparam>
 	template<std::size_t Size_, typename T_>
-	struct NewVector
+	struct Vector
 	{
 #pragma region COMMON_STATIC_INFO
 	public:
-		using this_type = NewVector<Size_, T_>;
+		using this_type = Vector<Size_, T_>;
 		using vector_info = EmuMath::TMP::common_vector_info<Size_, T_, true>;
 
 		using stored_type = typename vector_info::stored_type;
@@ -62,7 +62,7 @@ namespace EmuMath
 			return 
 			(
 				vector_info::template valid_template_vector_copy_construct_arg<OtherSize_, OtherT_>() &&
-				!vector_info::template is_valid_lone_type_for_set_all_construction<EmuMath::NewVector<OtherSize_, OtherT_>&>()
+				!vector_info::template is_valid_lone_type_for_set_all_construction<EmuMath::Vector<OtherSize_, OtherT_>&>()
 			);
 		}
 
@@ -72,7 +72,7 @@ namespace EmuMath
 			return 
 			(
 				vector_info::template valid_template_vector_const_copy_construct_arg<OtherSize_, OtherT_>() &&
-				!vector_info::template is_valid_lone_type_for_set_all_construction<const EmuMath::NewVector<OtherSize_, OtherT_>&>()
+				!vector_info::template is_valid_lone_type_for_set_all_construction<const EmuMath::Vector<OtherSize_, OtherT_>&>()
 			);
 		}
 
@@ -82,7 +82,7 @@ namespace EmuMath
 			return
 			(
 				vector_info::template valid_template_vector_move_construct_arg<OtherSize_, OtherT_>() &&
-				!vector_info::template is_valid_lone_type_for_set_all_construction<EmuMath::NewVector<OtherSize_, OtherT_>&&>()
+				!vector_info::template is_valid_lone_type_for_set_all_construction<EmuMath::Vector<OtherSize_, OtherT_>&&>()
 			);
 		}
 
@@ -156,7 +156,7 @@ namespace EmuMath
 		template<std::size_t Size__, typename T__, typename = void>
 		struct _vector_or_void
 		{
-			using type = EmuMath::NewVector<Size__, T__>;
+			using type = EmuMath::Vector<Size__, T__>;
 		};
 		template<std::size_t Size__, typename T__>
 		struct _vector_or_void<Size__, T__, std::enable_if_t<std::is_void_v<T__>>>
@@ -193,7 +193,7 @@ namespace EmuMath
 		/// <para> This is only available for Vectors which contain default-constructible, non-reference types. </para>
 		/// </summary>
 		template<typename OnlyIfNonRefAndContainsDefaultConstructibles_ = std::enable_if_t<is_default_constructible>>
-		constexpr inline NewVector() : _data()
+		constexpr inline Vector() : _data()
 		{
 		}
 
@@ -203,7 +203,7 @@ namespace EmuMath
 		/// <param name="to_copy_">
 		///		: Non-const reference to an EmuMath Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.
 		/// </param>
-		constexpr inline NewVector(this_type& to_copy_) : _data(to_copy_._data)
+		constexpr inline Vector(this_type& to_copy_) : _data(to_copy_._data)
 		{
 		}
 
@@ -215,7 +215,7 @@ namespace EmuMath
 		///		: Const reference to an EmuMath Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.
 		/// </param>
 		template<typename = std::enable_if_t<!contains_non_const_ref>>
-		constexpr inline NewVector(const this_type& to_copy_) : _data(to_copy_._data)
+		constexpr inline Vector(const this_type& to_copy_) : _data(to_copy_._data)
 		{
 		}
 
@@ -223,7 +223,7 @@ namespace EmuMath
 		/// <para> Moves the data of the passed Vector reference into a newly constructed Vector. </para>
 		/// </summary>
 		/// <param name="to_move_">: Vector to move into the newly constructed vector.</param>
-		constexpr inline NewVector(this_type&& to_move_) noexcept : _data(std::move(to_move_._data))
+		constexpr inline Vector(this_type&& to_move_) noexcept : _data(std::move(to_move_._data))
 		{
 		}
 
@@ -239,7 +239,7 @@ namespace EmuMath
 		///		: Non-const reference to an EmuMath Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.
 		/// </param>
 		template<typename OnlyIfAlternativeRepExists_ = std::enable_if_t<has_alternative_representation>>
-		constexpr inline NewVector(alternative_rep& to_copy_) : _data(to_copy_._data)
+		constexpr inline Vector(alternative_rep& to_copy_) : _data(to_copy_._data)
 		{
 		}
 
@@ -255,7 +255,7 @@ namespace EmuMath
 		///		: Const reference to an EmuMath Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.
 		/// </param>
 		template<typename OnlyIfAlternativeRepExists_ = std::enable_if_t<has_alternative_representation && !contains_non_const_ref>>
-		constexpr inline NewVector(const alternative_rep& to_copy_) : _data(to_copy_._data)
+		constexpr inline Vector(const alternative_rep& to_copy_) : _data(to_copy_._data)
 		{
 		}
 
@@ -269,7 +269,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="to_move_">: EmuMath Vector to move into the newly constructed vector.</param>
 		template<typename OnlyIfAlternativeRepExists_ = std::enable_if_t<has_alternative_representation>>
-		constexpr inline NewVector(alternative_rep&& to_move_) noexcept : _data(std::move(to_move_._data))
+		constexpr inline Vector(alternative_rep&& to_move_) noexcept : _data(std::move(to_move_._data))
 		{
 		}
 
@@ -288,7 +288,7 @@ namespace EmuMath
 			class...ConstructionArgs_,
 			typename = std::enable_if_t<valid_template_construction_args<ConstructionArgs_...>()>
 		>
-		explicit constexpr inline NewVector(ConstructionArgs_&&...construction_args_) : 
+		explicit constexpr inline Vector(ConstructionArgs_&&...construction_args_) :
 			_data({ stored_type(std::forward<ConstructionArgs_>(construction_args_))... })
 		{
 		}
@@ -305,7 +305,7 @@ namespace EmuMath
 			typename OtherT_,
 			typename = std::enable_if_t<valid_template_vector_copy_construct_arg<OtherSize_, OtherT_>()>
 		>
-		explicit constexpr inline NewVector(EmuMath::NewVector<OtherSize_, OtherT_>& to_copy_) : NewVector(_dummy_arg_for_private_default())
+		explicit constexpr inline Vector(EmuMath::Vector<OtherSize_, OtherT_>& to_copy_) : Vector(_dummy_arg_for_private_default())
 		{
 			EmuMath::Helpers::vector_set(*this, to_copy_);
 		}
@@ -323,7 +323,7 @@ namespace EmuMath
 			typename OtherT_,
 			typename = std::enable_if_t<valid_template_vector_const_copy_construct_arg<OtherSize_, OtherT_>() && !contains_non_const_ref>
 		>
-		explicit constexpr inline NewVector(const EmuMath::NewVector<OtherSize_, OtherT_>& to_copy_) : NewVector(_dummy_arg_for_private_default())
+		explicit constexpr inline Vector(const EmuMath::Vector<OtherSize_, OtherT_>& to_copy_) : Vector(_dummy_arg_for_private_default())
 		{
 			EmuMath::Helpers::vector_set(*this, to_copy_);
 		}
@@ -341,14 +341,14 @@ namespace EmuMath
 			typename OtherT_,
 			typename = std::enable_if_t<valid_template_vector_move_construct_arg<OtherSize_, OtherT_>()>
 		>
-		explicit constexpr inline NewVector(EmuMath::NewVector<OtherSize_, OtherT_>&& to_move_) : NewVector(_dummy_arg_for_private_default())
+		explicit constexpr inline Vector(EmuMath::Vector<OtherSize_, OtherT_>&& to_move_) : Vector(_dummy_arg_for_private_default())
 		{
 			// Checks are here so that temporaries aren't resolved to the const copy constructor
 			// --- This comes with the unfortunate effect that this constructor may appear usable in TMP in situations where it is not
 			// ------ This is, however, considered better than allowing silent dangling references to form
 			if constexpr (contains_ref)
 			{
-				if constexpr (!EmuMath::NewVector<OtherSize_, OtherT_>::contains_ref)
+				if constexpr (!EmuMath::Vector<OtherSize_, OtherT_>::contains_ref)
 				{
 					static_assert
 					(
@@ -372,7 +372,7 @@ namespace EmuMath
 			typename InT_,
 			typename = std::enable_if_t<is_valid_lone_type_for_set_all_construction<InT_&&>()>
 		>
-		explicit constexpr inline NewVector(InT_&& to_set_all_to_) : NewVector(_dummy_arg_for_private_default())
+		explicit constexpr inline Vector(InT_&& to_set_all_to_) : Vector(_dummy_arg_for_private_default())
 		{
 			SetAll(std::forward<InT_>(to_set_all_to_));
 		}
@@ -382,7 +382,7 @@ namespace EmuMath
 			typename InT_,
 			typename = std::enable_if_t<is_valid_lone_type_for_set_all_construction<InT_&>()>
 		>
-		explicit constexpr inline NewVector(InT_& to_set_all_to_) : NewVector(_dummy_arg_for_private_default())
+		explicit constexpr inline Vector(InT_& to_set_all_to_) : Vector(_dummy_arg_for_private_default())
 		{
 			SetAll(to_set_all_to_);
 		}
@@ -392,7 +392,7 @@ namespace EmuMath
 			typename InT_,
 			typename = std::enable_if_t<is_valid_lone_type_for_set_all_construction<const InT_&>()>
 		>
-		explicit constexpr inline NewVector(const InT_& to_set_all_to_) : NewVector(_dummy_arg_for_private_default())
+		explicit constexpr inline Vector(const InT_& to_set_all_to_) : Vector(_dummy_arg_for_private_default())
 		{
 			SetAll(to_set_all_to_);
 		}
@@ -402,12 +402,12 @@ namespace EmuMath
 		// --- Only available when we cannot default construct
 		// --- Disable warning about uninitialised data since that's the point of this constructor
 #pragma warning(disable : 26495)
-		explicit constexpr inline NewVector(_dummy_arg_for_private_lazy_default dummy_arg_)
+		explicit constexpr inline Vector(_dummy_arg_for_private_lazy_default dummy_arg_)
 		{
 		}
 		// Empty constructor used to perform a default-construction when full construction is executed within the constructor body; inaccessible out of this struct
 		// --- Only available when we can default construct
-		explicit constexpr inline NewVector(_dummy_arg_for_private_constexpr_default dummy_arg_) : NewVector()
+		explicit constexpr inline Vector(_dummy_arg_for_private_constexpr_default dummy_arg_) : Vector()
 		{
 		}
 #pragma endregion
@@ -837,18 +837,18 @@ namespace EmuMath
 			return EmuMath::Helpers::vector_pre_increment(*this);
 		}
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator++()
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator++()
 		{
 			return EmuMath::Helpers::vector_pre_increment<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator++()
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator++()
 		{
 			return EmuMath::Helpers::vector_pre_increment<size, OutT_>(*this);
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator++(int)
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator++(int)
 		{
 			return EmuMath::Helpers::vector_post_increment<OutSize_, OutT_>(*this);
 		}
@@ -871,18 +871,18 @@ namespace EmuMath
 			return EmuMath::Helpers::vector_pre_decrement(*this);
 		}
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator--()
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator--()
 		{
 			return EmuMath::Helpers::vector_pre_decrement<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator--()
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator--()
 		{
 			return EmuMath::Helpers::vector_pre_decrement<size, OutT_>(*this);
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator--(int)
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator--(int)
 		{
 			return EmuMath::Helpers::vector_post_decrement<OutSize_, OutT_>(*this);
 		}
@@ -901,13 +901,13 @@ namespace EmuMath
 		
 		// NEGATION OPERATORS
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator-() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator-() const
 		{
 			return EmuMath::Helpers::vector_negate<OutSize_, OutT_>(*this);
 		}
 
 		template<typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator-() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator-() const
 		{
 			return EmuMath::Helpers::vector_negate<size, OutT_>(*this);
 		}
@@ -916,56 +916,56 @@ namespace EmuMath
 #pragma region CONST_ARITHMETIC_OPERATORS
 	public:
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator+(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator+(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_add<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator+(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator+(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_add<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator-(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator-(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_subtract<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator-(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator-(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_subtract<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator*(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator*(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_multiply<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator*(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator*(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_multiply<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator/(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator/(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_divide<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator/(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator/(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_divide<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator%(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator%(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_mod<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator%(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator%(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_mod<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -973,67 +973,67 @@ namespace EmuMath
 
 #pragma region CONST_BITWISE_OPERATORS
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator~() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator~() const
 		{
 			return EmuMath::Helpers::vector_bitwise_not<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator~() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator~() const
 		{
 			return EmuMath::Helpers::vector_bitwise_not<size, OutT_>(*this);
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator&(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator&(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_and<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator&(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator&(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_and<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator|(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator|(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_or<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator|(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator|(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_or<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator^(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator^(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_xor<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator^(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator^(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_xor<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator<<(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator<<(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_shift_left<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator<<(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator<<(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_shift_left<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> operator>>(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator>>(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_shift_right<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> operator>>(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator>>(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_shift_right<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -1213,12 +1213,12 @@ namespace EmuMath
 			return EmuMath::Helpers::vector_pre_increment(*this);
 		}
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> PreIncrement()
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> PreIncrement()
 		{
 			return EmuMath::Helpers::vector_pre_increment<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> PreIncrement()
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> PreIncrement()
 		{
 			return EmuMath::Helpers::vector_pre_increment<size, OutT_>(*this);
 		}
@@ -1229,7 +1229,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>Copy of this Vector before the increment if not provided with only `void` as a template argument; otherwise, no return.</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> PostIncrement()
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> PostIncrement()
 		{
 			return EmuMath::Helpers::vector_post_increment<OutSize_, OutT_>(*this);
 		}
@@ -1255,12 +1255,12 @@ namespace EmuMath
 			return EmuMath::Helpers::vector_pre_decrement(*this);
 		}
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> PreDecrement()
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> PreDecrement()
 		{
 			return EmuMath::Helpers::vector_pre_decrement<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> PreDecrement()
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> PreDecrement()
 		{
 			return EmuMath::Helpers::vector_pre_decrement<size, OutT_>();
 		}
@@ -1271,7 +1271,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>Copy of this Vector before the decrement if not provided with only `void` as a template argument; otherwise, no return.</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> PostDecrement()
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> PostDecrement()
 		{
 			return EmuMath::Helpers::vector_post_decrement<OutSize_, OutT_>(*this);
 		}
@@ -1291,12 +1291,12 @@ namespace EmuMath
 		/// <summary> Returns a negated form of this Vector, equivalent to `-this_vector`. </summary>
 		/// <returns>Copy of this Vector with its elements negated, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Negate() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Negate() const
 		{
 			return EmuMath::Helpers::vector_negate<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Negate() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Negate() const
 		{
 			return EmuMath::Helpers::vector_negate<size, OutT_>(*this);
 		}
@@ -1304,7 +1304,7 @@ namespace EmuMath
 		/// <summary> Ouputs a negated form of this Vector to the provided out_vector_, equivalent to `out_vector_ = -this_vector`. </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output the negated form of this Vector to.</param>
 		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void Negate(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void Negate(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_negate(out_vector_, *this);
 		}
@@ -1319,12 +1319,12 @@ namespace EmuMath
 		///		containing a copy of this Vector with the provided index range negated.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NegateRange() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> NegateRange() const
 		{
 			return EmuMath::Helpers::vector_negate_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> NegateRange() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> NegateRange() const
 		{
 			return EmuMath::Helpers::vector_negate_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
@@ -1336,7 +1336,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void NegateRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void NegateRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_negate_range<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
@@ -1355,12 +1355,12 @@ namespace EmuMath
 		///		containing a partial negated copy of this Vector in the specified range, and default values outside of said range.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NegateBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NegateRangeNoCopy() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> NegateRangeNoCopy() const
 		{
 			return EmuMath::Helpers::vector_negate_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, NegateBegin_>(*this);
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t NegateBegin_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> NegateRangeNoCopy() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> NegateRangeNoCopy() const
 		{
 			return EmuMath::Helpers::vector_negate_range_no_copy<size, OutT_, OutBegin, OutEnd_, NegateBegin_>(*this);
 		}
@@ -1375,7 +1375,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NegateBegin_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void NegateRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void NegateRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_negate_range_no_copy<OutBegin_, OutEnd_, NegateBegin_>(out_vector_, *this);
 		}
@@ -1390,12 +1390,12 @@ namespace EmuMath
 		/// <param name="rhs_">: Scalar or EmuMath Vector to add to this Vector.</param>
 		/// <returns>Copy of this Vector with rhs_ added, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Add(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Add(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_add<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Add(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Add(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_add<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -1407,7 +1407,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to add to this Vector.</param>
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void Add(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void Add(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_add(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -1421,12 +1421,12 @@ namespace EmuMath
 		/// <param name="rhs_">: Scalar or EmuMath Vector to add to elements in the specified range.</param>
 		/// <returns>Copy of this Vector using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq), with rhs_ added to indices in the provided range.</returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> AddRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> AddRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_add_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> AddRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> AddRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_add_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -1443,7 +1443,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to add to elements in the specified range.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void AddRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void AddRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_add_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -1462,12 +1462,12 @@ namespace EmuMath
 		///		with rhs_ added to indices within this Vector in the provided range, and default-constructed elements elsewhere.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AddBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> AddRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> AddRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_add_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, AddBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AddBegin_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> AddRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> AddRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_add_range_no_copy<size, OutT_, OutBegin_, OutEnd_, AddBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -1483,7 +1483,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to add to elements in the specified range.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AddBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void AddRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void AddRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_add_range_no_copy<OutBegin_, OutEnd_, AddBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -1495,12 +1495,12 @@ namespace EmuMath
 		/// <param name="rhs_">: Scalar or EmuMath Vector to subtract from this Vector.</param>
 		/// <returns>Copy of this Vector with rhs_ subtracted, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Subtract(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Subtract(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_subtract<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Subtract(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Subtract(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_subtract<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -1512,7 +1512,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to subtract from this Vector.</param>
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void Subtract(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void Subtract(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_subtract(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -1529,12 +1529,12 @@ namespace EmuMath
 		///		with rhs_ subtracted from indices in the provided range.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> SubtractRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> SubtractRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_subtract_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> SubtractRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> SubtractRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_subtract_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -1551,7 +1551,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to subtract from elements in the specified range.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void SubtractRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void SubtractRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_subtract_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -1570,12 +1570,12 @@ namespace EmuMath
 		///		with rhs_ subtracted from indices within this Vector in the provided range, and default-constructed elements elsewhere.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t SubBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> SubtractRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> SubtractRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_subtract_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, SubBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t SubBegin_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> SubtractRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> SubtractRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_subtract_range_no_copy<size, OutT_, OutBegin_, OutEnd_, SubBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -1591,7 +1591,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to subtract from elements in the specified range.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t SubBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void SubtractRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void SubtractRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_subtract_range_no_copy<OutBegin_, OutEnd_, SubBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -1603,12 +1603,12 @@ namespace EmuMath
 		/// <param name="rhs_">: Scalar or EmuMath Vector to multiply this Vector by.</param>
 		/// <returns>Copy of this Vector multiplied by rhs_, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Multiply(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Multiply(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_multiply<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Multiply(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Multiply(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_multiply<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -1620,7 +1620,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to multiply this Vector by.</param>
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void Multiply(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void Multiply(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_multiply(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -1637,12 +1637,12 @@ namespace EmuMath
 		///		with indices in the provided range multiplied by rhs_.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> MultiplyRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> MultiplyRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_multiply_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> MultiplyRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> MultiplyRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_multiply_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -1659,7 +1659,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to multiply elements by in the specified range.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MultiplyRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void MultiplyRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_multiply_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -1678,12 +1678,12 @@ namespace EmuMath
 		///		with indices within this Vector multiplied by rhs_ in the provided range, and default-constructed elements elsewhere.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MulBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> MultiplyRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> MultiplyRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_multiply_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, MulBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MulBegin_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> MultiplyRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> MultiplyRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_multiply_range_no_copy<size, OutT_, OutBegin_, OutEnd_, MulBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -1699,7 +1699,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to multiply elements by in the specified range.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MulBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MultiplyRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void MultiplyRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_multiply_range_no_copy<OutBegin_, OutEnd_, MulBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -1711,12 +1711,12 @@ namespace EmuMath
 		/// <param name="rhs_">: Scalar or EmuMath Vector to divide this Vector by.</param>
 		/// <returns>Copy of this Vector divided by rhs_, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Divide(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Divide(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_divide<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Divide(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Divide(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_divide<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -1728,7 +1728,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to divide this Vector by.</param>
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void Divide(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void Divide(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_divide(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -1745,12 +1745,12 @@ namespace EmuMath
 		///		with indices in the provided range divided by rhs_.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> DivideRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> DivideRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_divide_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> DivideRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> DivideRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_divide_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -1767,7 +1767,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to divide elements by in the specified range.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void DivideRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void DivideRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_divide_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -1786,12 +1786,12 @@ namespace EmuMath
 		///		with indices within this Vector divided by rhs_ in the provided range, and default-constructed elements elsewhere.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t DivBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> DivideRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> DivideRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_divide_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, DivBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t DivBegin_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> DivideRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> DivideRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_divide_range_no_copy<size, OutT_, OutBegin_, OutEnd_, DivBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -1807,7 +1807,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to divide elements by in the specified range.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t DivBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void DivideRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void DivideRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_divide_range_no_copy<OutBegin_, OutEnd_, DivBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -1819,12 +1819,12 @@ namespace EmuMath
 		/// <param name="rhs_">: Scalar or EmuMath Vector to modulo-divide this Vector by.</param>
 		/// <returns>Copy of this Vector modulo-divided by rhs_, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Mod(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Mod(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_mod<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Mod(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Mod(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_mod<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -1836,7 +1836,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to modulo-divide this Vector by.</param>
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void Mod(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void Mod(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_mod(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -1853,12 +1853,12 @@ namespace EmuMath
 		///		with indices in the provided range modulo-divided by rhs_.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ModRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ModRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_mod_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ModRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ModRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_mod_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -1875,7 +1875,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to modulo-divide elements by in the specified range.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void ModRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void ModRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_mod_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -1894,12 +1894,12 @@ namespace EmuMath
 		///		with indices within this Vector modulo-divided by rhs_ in the provided range, and default-constructed elements elsewhere.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ModBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ModRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ModRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_mod_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ModBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ModBegin_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ModRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ModRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_mod_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ModBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -1915,7 +1915,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to modulo-divide elements by in the specified range.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ModBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void ModRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void ModRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_mod_range_no_copy<OutBegin_, OutEnd_, ModBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -1929,12 +1929,12 @@ namespace EmuMath
 		/// <param name="rhs_">: Scalar or EmuMath Vector to AND with this Vector.</param>
 		/// <returns>Copy of this Vector ANDed with rhs_, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> And(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> And(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_and<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> And(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> And(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_and<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -1946,7 +1946,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to AND with this Vector.</param>
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void And(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void And(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_bitwise_and(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -1963,12 +1963,12 @@ namespace EmuMath
 		///		with rhs_ ANDed with indices in the provided range.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> AndRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> AndRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_and_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> AndRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> AndRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_and_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -1985,7 +1985,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to AND with this Vector within the specified index range.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void AndRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void AndRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_bitwise_and_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -2004,12 +2004,12 @@ namespace EmuMath
 		///		with indices within the provided range containing AND results starting AndBegin_, and default-constructed elements elsewhere.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AndBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> AndRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> AndRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_and_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, AndBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AndBegin_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> AndRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> AndRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_and_range_no_copy<size, OutT_, OutBegin_, OutEnd_, AndBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -2025,7 +2025,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to AND with this Vector's elements in the specified range.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AndBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void AndRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void AndRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_bitwise_and_range_no_copy<OutBegin_, OutEnd_, AndBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -2037,12 +2037,12 @@ namespace EmuMath
 		/// <param name="rhs_">: Scalar or EmuMath Vector to OR with this Vector.</param>
 		/// <returns>Copy of this Vector ORed with rhs_, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Or(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Or(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_or<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Or(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Or(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_or<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -2054,7 +2054,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to OR with this Vector.</param>
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void Or(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void Or(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_bitwise_or(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -2071,12 +2071,12 @@ namespace EmuMath
 		///		with rhs_ ORed with indices in the provided range.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> OrRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> OrRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_or_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> OrRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> OrRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_or_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -2093,7 +2093,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to OR with this Vector within the specified index range.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void OrRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void OrRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_bitwise_or_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -2112,12 +2112,12 @@ namespace EmuMath
 		///		with indices within the provided range containing OR results starting OrBegin_, and default-constructed elements elsewhere.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t OrBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> OrRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> OrRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_or_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, OrBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t OrBegin_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> OrRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> OrRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_or_range_no_copy<size, OutT_, OutBegin_, OutEnd_, OrBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -2133,7 +2133,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to OR with this Vector's elements in the specified range.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t OrBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void OrRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void OrRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_bitwise_or_range_no_copy<OutBegin_, OutEnd_, OrBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -2145,12 +2145,12 @@ namespace EmuMath
 		/// <param name="rhs_">: Scalar or EmuMath Vector to XOR with this Vector.</param>
 		/// <returns>Copy of this Vector XORed with rhs_, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Xor(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Xor(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_xor<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Xor(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Xor(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_xor<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -2162,7 +2162,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to XOR with this Vector.</param>
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void Xor(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void Xor(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_bitwise_xor(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -2179,12 +2179,12 @@ namespace EmuMath
 		///		with rhs_ XORed with indices in the provided range.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> XorRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> XorRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_xor_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> XorRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> XorRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_xor_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -2201,7 +2201,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to XOR with this Vector within the specified index range.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void XorRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void XorRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_bitwise_xor_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -2220,12 +2220,12 @@ namespace EmuMath
 		///		with indices within the provided range containing XOR results starting XorBegin_, and default-constructed elements elsewhere.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t XorBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> XorRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> XorRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_or_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, XorBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t XorBegin_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> XorRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> XorRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_bitwise_or_range_no_copy<size, OutT_, OutBegin_, OutEnd_, XorBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -2241,7 +2241,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to XOR with this Vector's elements in the specified range.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t XorBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void XorRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void XorRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_bitwise_or_range_no_copy<OutBegin_, OutEnd_, XorBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -2253,12 +2253,12 @@ namespace EmuMath
 		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
 		/// <returns>Copy of this Vector left-shifted with rhs_, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ShiftLeft(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ShiftLeft(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_shift_left<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ShiftLeft(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ShiftLeft(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_shift_left<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -2270,7 +2270,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void ShiftLeft(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void ShiftLeft(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_shift_left(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -2287,12 +2287,12 @@ namespace EmuMath
 		///		with indices in the provided range left-shifted using rhs_.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ShiftLeftRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ShiftLeftRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_shift_left_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ShiftLeftRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ShiftLeftRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_shift_left_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -2309,7 +2309,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void ShiftLeftRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void ShiftLeftRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_shift_left_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -2328,12 +2328,12 @@ namespace EmuMath
 		///		with indices within the provided range containing left-shift results starting at ShiftBegin_, and default-constructed elements elsewhere.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ShiftBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ShiftLeftRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ShiftLeftRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_shift_left_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ShiftBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ShiftBegin_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ShiftLeftRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ShiftLeftRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_shift_left_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ShiftBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -2349,7 +2349,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ShiftBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void ShiftLeftRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void ShiftLeftRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_shift_left_range_no_copy<OutBegin_, OutEnd_, ShiftBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -2361,12 +2361,12 @@ namespace EmuMath
 		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
 		/// <returns>Copy of this Vector right-shifted with rhs_, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ShiftRight(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ShiftRight(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_shift_right<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ShiftRight(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ShiftRight(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_shift_right<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -2378,7 +2378,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void ShiftRight(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void ShiftRight(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_shift_right(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -2395,12 +2395,12 @@ namespace EmuMath
 		///		with indices in the provided range right-shifted using rhs_.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ShiftRightRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ShiftRightRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_shift_right_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ShiftRightRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ShiftRightRange(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_shift_right_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -2417,7 +2417,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void ShiftRightRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void ShiftRightRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_shift_right_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -2436,12 +2436,12 @@ namespace EmuMath
 		///		with indices within the provided range containing right-shift results starting at ShiftBegin_, and default-constructed elements elsewhere.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ShiftBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ShiftRightRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ShiftRightRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_shift_right_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ShiftBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ShiftBegin_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ShiftRightRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ShiftRightRangeNoCopy(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::vector_shift_right_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ShiftBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -2457,7 +2457,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to shift this Vector's elements via.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ShiftBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void ShiftRightRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline void ShiftRightRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
 		{
 			EmuMath::Helpers::vector_shift_right_range_no_copy<OutBegin_, OutEnd_, ShiftBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -2465,12 +2465,12 @@ namespace EmuMath
 		/// <summary> Returns a bitwise NOT form of this Vector, equivalent to `-this_vector`. </summary>
 		/// <returns>Copy of this Vector with its elements bitwise NOT-ed, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Not() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Not() const
 		{
 			return EmuMath::Helpers::vector_bitwise_not<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Not() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Not() const
 		{
 			return EmuMath::Helpers::vector_bitwise_not<size, OutT_>(*this);
 		}
@@ -2478,7 +2478,7 @@ namespace EmuMath
 		/// <summary> Ouputs a bitwise NOT form of this Vector to the provided out_vector_, equivalent to `out_vector_ = ~this_vector`. </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void Not(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void Not(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_bitwise_not(out_vector_, *this);
 		}
@@ -2493,12 +2493,12 @@ namespace EmuMath
 		///		containing a copy of this Vector with the provided index range bitwise NOT-ed.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NotRange() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> NotRange() const
 		{
 			return EmuMath::Helpers::vector_bitwise_not_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> NotRange() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> NotRange() const
 		{
 			return EmuMath::Helpers::vector_bitwise_not_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
@@ -2510,7 +2510,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void NotRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void NotRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_bitwise_not_range<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
@@ -2530,12 +2530,12 @@ namespace EmuMath
 		///		containing a partial bitwise NOT copy of this Vector in the specified range, and default values outside of said range.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NotBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NotRangeNoCopy() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> NotRangeNoCopy() const
 		{
 			return EmuMath::Helpers::vector_bitwise_not_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, NotBegin_>(*this);
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t NotBegin_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> NotRangeNoCopy() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> NotRangeNoCopy() const
 		{
 			return EmuMath::Helpers::vector_bitwise_not_range_no_copy<size, OutT_, OutBegin, OutEnd_, NotBegin_>(*this);
 		}
@@ -2550,7 +2550,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t NotBegin_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void NotRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void NotRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_bitwise_not_range_no_copy<OutBegin_, OutEnd_, NotBegin_>(out_vector_, *this);
 		}
@@ -2710,12 +2710,12 @@ namespace EmuMath
 		/// <summary> Returns the absolute form of this Vector. </summary>
 		/// <returns>Copy of this Vector with its elements made absolute, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Abs() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Abs() const
 		{
 			return EmuMath::Helpers::vector_abs<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Abs() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Abs() const
 		{
 			return EmuMath::Helpers::vector_abs<size, OutT_>(*this);
 		}
@@ -2723,7 +2723,7 @@ namespace EmuMath
 		/// <summary> Outputs the absolute form of this Vector to the provided out_vector_. </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output absolute elements to.</param>
 		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void Abs(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void Abs(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_abs(out_vector_, *this);
 		}
@@ -2738,12 +2738,12 @@ namespace EmuMath
 		///		containing a copy of this Vector with the provided index range converted to absolute form.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> AbsRange() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> AbsRange() const
 		{
 			return EmuMath::Helpers::vector_abs_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> AbsRange() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> AbsRange() const
 		{
 			return EmuMath::Helpers::vector_abs_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
@@ -2755,7 +2755,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void AbsRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void AbsRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_abs_range<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
@@ -2774,12 +2774,12 @@ namespace EmuMath
 		///		containing a partial absolute copy of this Vector in the specified range, and default values outside of said range.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AbsBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> AbsRangeNoCopy() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> AbsRangeNoCopy() const
 		{
 			return EmuMath::Helpers::vector_abs_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, AbsBegin_>(*this);
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t AbsBegin_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> AbsRangeNoCopy() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> AbsRangeNoCopy() const
 		{
 			return EmuMath::Helpers::vector_abs_range_no_copy<size, OutT_, OutBegin, OutEnd_, AbsBegin_>(*this);
 		}
@@ -2793,7 +2793,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t AbsBegin_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void AbsRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void AbsRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_abs_range_no_copy<OutBegin_, OutEnd_, AbsBegin_>(out_vector_, *this);
 		}
@@ -2806,12 +2806,12 @@ namespace EmuMath
 		/// <param name="t_">Scalar or EmuMath Vector to use as weighting(s) for interpolation.</param>
 		/// <returns>EmuMath Vector of the provided OutSize (defaults to size) and OutT_ (defaults to value_type_uq) containing interpolation results.</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename ArgB_, typename ArgT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Lerp(ArgB_&& b_, ArgT_&& t_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Lerp(ArgB_&& b_, ArgT_&& t_) const
 		{
 			return EmuMath::Helpers::vector_lerp<OutSize_, OutT_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
 		template<typename OutT_ = value_type_uq, typename ArgB_, typename ArgT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Lerp(ArgB_&& b_, ArgT_&& t_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Lerp(ArgB_&& b_, ArgT_&& t_) const
 		{
 			return EmuMath::Helpers::vector_lerp<size, OutT_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
@@ -2824,7 +2824,7 @@ namespace EmuMath
 		/// <param name="b_">Scalar or EmuMath Vector to use as target point(s) for interpolation.</param>
 		/// <param name="t_">Scalar or EmuMath Vector to use as weighting(s) for interpolation.</param>
 		template<typename ArgB_, typename ArgT_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void Lerp(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, ArgB_&& b_, ArgT_&& t_) const
+		constexpr inline void Lerp(EmuMath::Vector<OutSize_, OutT_>& out_vector_, ArgB_&& b_, ArgT_&& t_) const
 		{
 			EmuMath::Helpers::vector_lerp(out_vector_, *this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
@@ -2840,12 +2840,12 @@ namespace EmuMath
 		/// <param name="t_">Scalar or EmuMath Vector to use as weighting(s) for interpolation.</param>
 		/// <returns>EmuMath Vector copy of this Vector, with the provided index range linearly interpolated.</returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename ArgB_, typename ArgT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> LerpRange(ArgB_&& b_, ArgT_&& t_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> LerpRange(ArgB_&& b_, ArgT_&& t_) const
 		{
 			return EmuMath::Helpers::vector_lerp_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename ArgB_, typename ArgT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> LerpRange(ArgB_&& b_, ArgT_&& t_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> LerpRange(ArgB_&& b_, ArgT_&& t_) const
 		{
 			return EmuMath::Helpers::vector_lerp_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
@@ -2861,7 +2861,7 @@ namespace EmuMath
 		/// <param name="b_">Scalar or EmuMath Vector to use as target point(s) for interpolation.</param>
 		/// <param name="t_">Scalar or EmuMath Vector to use as weighting(s) for interpolation.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_, typename ArgB_, typename ArgT_>
-		constexpr inline void LerpRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, ArgB_&& b_, ArgT_&& t_) const
+		constexpr inline void LerpRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, ArgB_&& b_, ArgT_&& t_) const
 		{
 			EmuMath::Helpers::vector_lerp_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
@@ -2882,12 +2882,12 @@ namespace EmuMath
 		/// <param name="t_">Scalar or EmuMath Vector to use as weighting(s) for interpolation.</param>
 		/// <returns>EmuMath Vector with results of linearly interpolating this vector with the provided arguments in the specified index range, and defaults elsewhere.</returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t LerpBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename ArgB_, typename ArgT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> LerpRangeNoCopy(ArgB_&& b_, ArgT_&& t_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> LerpRangeNoCopy(ArgB_&& b_, ArgT_&& t_) const
 		{
 			return EmuMath::Helpers::vector_lerp_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, LerpBegin_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t LerpBegin_, typename OutT_ = value_type_uq, typename ArgB_, typename ArgT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> LerpRangeNoCopy(ArgB_&& b_, ArgT_&& t_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> LerpRangeNoCopy(ArgB_&& b_, ArgT_&& t_) const
 		{
 			return EmuMath::Helpers::vector_lerp_range_no_copy<size, OutT_, OutBegin, OutEnd_, LerpBegin_>(*this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
@@ -2907,7 +2907,7 @@ namespace EmuMath
 		/// <param name="b_">Scalar or EmuMath Vector to use as target point(s) for interpolation.</param>
 		/// <param name="t_">Scalar or EmuMath Vector to use as weighting(s) for interpolation.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t LerpBegin_, std::size_t OutSize_, typename OutT_, typename ArgB_, typename ArgT_>
-		constexpr inline void LerpRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, ArgB_&& b_, ArgT_&& t_) const
+		constexpr inline void LerpRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, ArgB_&& b_, ArgT_&& t_) const
 		{
 			EmuMath::Helpers::vector_lerp_range_no_copy<OutBegin_, OutEnd_, LerpBegin_>(out_vector_, *this, std::forward<ArgB_>(b_), std::forward<ArgT_>(t_));
 		}
@@ -2949,12 +2949,12 @@ namespace EmuMath
 		/// <param name="b_">: Scalar or EmuMath Vector appearing as the second argument in comparisons.</param>
 		/// <returns>EmuMath Vector formed of the lowest values of this Vector and b_ in respective indices.</returns>
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename B_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Min(B_&& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Min(B_&& b_) const
 		{
 			return EmuMath::Helpers::vector_min<OutSize_, OutT_>(*this, std::forward<B_>(b_));
 		}
 		template<typename OutT_ = preferred_floating_point, typename B_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Min(B_&& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Min(B_&& b_) const
 		{
 			return EmuMath::Helpers::vector_min<size, OutT_>(*this, std::forward<B_>(b_));
 		}
@@ -2966,7 +2966,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="b_">: Scalar or EmuMath Vector appearing as the second argument in comparisons.</param>
 		template<typename B_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void Min(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, B_&& b_) const
+		constexpr inline void Min(EmuMath::Vector<OutSize_, OutT_>& out_vector_, B_&& b_) const
 		{
 			EmuMath::Helpers::vector_min(out_vector_, *this, std::forward<B_>(b_));
 		}
@@ -2983,12 +2983,12 @@ namespace EmuMath
 		///		and copied values from this Vector outside of said range.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename B_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> MinRange(B_&& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> MinRange(B_&& b_) const
 		{
 			return EmuMath::Helpers::vector_min_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<B_>(b_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point, typename B_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> MinRange(B_&& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> MinRange(B_&& b_) const
 		{
 			return EmuMath::Helpers::vector_min_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<B_>(b_));
 		}
@@ -3002,7 +3002,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="b_">: Scalar or EmuMath Vector appearing as the second argument in comparisons.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename B_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MinRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, B_&& b_) const
+		constexpr inline void MinRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, B_&& b_) const
 		{
 			EmuMath::Helpers::vector_min_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<B_>(b_));
 		}
@@ -3018,12 +3018,12 @@ namespace EmuMath
 		/// <param name="b_">: Scalar or EmuMath Vector appearing as the second argument in comparisons.</param>
 		/// <returns>EmuMath Vector containing min results from the provided range within the provided output range, and default elements outside of said range.</returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MinBegin_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename B_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> MinRangeNoCopy(B_&& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> MinRangeNoCopy(B_&& b_) const
 		{
 			return EmuMath::Helpers::vector_min_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, MinBegin_>(*this, std::forward<B_>(b_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MinBegin_, typename OutT_ = preferred_floating_point, typename B_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> MinRangeNoCopy(B_&& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> MinRangeNoCopy(B_&& b_) const
 		{
 			return EmuMath::Helpers::vector_min_range_no_copy<size, OutT_, OutBegin_, OutEnd_, MinBegin_>(*this, std::forward<B_>(b_));
 		}
@@ -3039,7 +3039,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="b_">: Scalar or EmuMath Vector appearing as the second argument in comparisons.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MinBegin_, typename B_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MinRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, B_&& b_) const
+		constexpr inline void MinRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, B_&& b_) const
 		{
 			EmuMath::Helpers::vector_min_range_no_copy<OutBegin_, OutEnd_, MinBegin_>(out_vector_, *this, std::forward<B_>(b_));
 		}
@@ -3081,12 +3081,12 @@ namespace EmuMath
 		/// <param name="b_">: Scalar or EmuMath Vector appearing as the second argument in comparisons.</param>
 		/// <returns>EmuMath Vector formed of the greatest values of this Vector and b_ in respective indices.</returns>
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename B_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Max(B_&& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Max(B_&& b_) const
 		{
 			return EmuMath::Helpers::vector_max<OutSize_, OutT_>(*this, std::forward<B_>(b_));
 		}
 		template<typename OutT_ = preferred_floating_point, typename B_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Max(B_&& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Max(B_&& b_) const
 		{
 			return EmuMath::Helpers::vector_max<size, OutT_>(*this, std::forward<B_>(b_));
 		}
@@ -3098,7 +3098,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="b_">: Scalar or EmuMath Vector appearing as the second argument in comparisons.</param>
 		template<typename B_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void Max(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, B_&& b_) const
+		constexpr inline void Max(EmuMath::Vector<OutSize_, OutT_>& out_vector_, B_&& b_) const
 		{
 			EmuMath::Helpers::vector_max(out_vector_, *this, std::forward<B_>(b_));
 		}
@@ -3115,12 +3115,12 @@ namespace EmuMath
 		///		and copied values from this Vector outside of said range.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename B_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> MaxRange(B_&& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> MaxRange(B_&& b_) const
 		{
 			return EmuMath::Helpers::vector_max_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<B_>(b_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point, typename B_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> MaxRange(B_&& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> MaxRange(B_&& b_) const
 		{
 			return EmuMath::Helpers::vector_max_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<B_>(b_));
 		}
@@ -3134,7 +3134,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="b_">: Scalar or EmuMath Vector appearing as the second argument in comparisons.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename B_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MaxRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, B_&& b_) const
+		constexpr inline void MaxRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, B_&& b_) const
 		{
 			EmuMath::Helpers::vector_max_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<B_>(b_));
 		}
@@ -3150,12 +3150,12 @@ namespace EmuMath
 		/// <param name="b_">: Scalar or EmuMath Vector appearing as the second argument in comparisons.</param>
 		/// <returns>EmuMath Vector containing max results from the provided range within the provided output range, and default elements outside of said range.</returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MaxBegin_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename B_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> MaxRangeNoCopy(B_&& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> MaxRangeNoCopy(B_&& b_) const
 		{
 			return EmuMath::Helpers::vector_max_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, MaxBegin_>(*this, std::forward<B_>(b_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MaxBegin_, typename OutT_ = preferred_floating_point, typename B_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> MaxRangeNoCopy(B_&& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> MaxRangeNoCopy(B_&& b_) const
 		{
 			return EmuMath::Helpers::vector_max_range_no_copy<size, OutT_, OutBegin_, OutEnd_, MaxBegin_>(*this, std::forward<B_>(b_));
 		}
@@ -3171,7 +3171,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="b_">: Scalar or EmuMath Vector appearing as the second argument in comparisons.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MaxBegin_, typename B_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MaxRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, B_&& b_) const
+		constexpr inline void MaxRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, B_&& b_) const
 		{
 			EmuMath::Helpers::vector_max_range_no_copy<OutBegin_, OutEnd_, MaxBegin_>(out_vector_, *this, std::forward<B_>(b_));
 		}
@@ -3183,12 +3183,12 @@ namespace EmuMath
 		/// <param name="min_">: Scalar or EmuMath Vector to clamp this Vector's elements to a minimum of.</param>
 		/// <returns>EmuMath Vector copy of this Vector with elements clamped to a minimum of min_.</returns>
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename Min_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ClampMin(Min_&& min_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ClampMin(Min_&& min_) const
 		{
 			return EmuMath::Helpers::vector_clamp_min<OutSize_, OutT_>(*this, std::forward<Min_>(min_));
 		}
 		template<typename OutT_ = preferred_floating_point, typename Min_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ClampMin(Min_&& min_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ClampMin(Min_&& min_) const
 		{
 			return EmuMath::Helpers::vector_clamp_min<size, OutT_>(*this, std::forward<Min_>(min_));
 		}
@@ -3200,7 +3200,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="min_">: Scalar or EmuMath Vector to clamp this Vector's elements to a minimum of.</param>
 		template<typename Min_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void ClampMin(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Min_&& min_) const
+		constexpr inline void ClampMin(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Min_&& min_) const
 		{
 			EmuMath::Helpers::vector_clamp_min(out_vector_, *this, std::forward<Min_>(min_));
 		}
@@ -3214,12 +3214,12 @@ namespace EmuMath
 		/// <param name="min_">: Scalar or EmuMath Vector to clamp this Vector's elements to a minimum of.</param>
 		/// <returns>EmuMath Vector copy of this Vector with elements in the provided range clamped to a minimum of min_.</returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename Min_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ClampMinRange(Min_&& min_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ClampMinRange(Min_&& min_) const
 		{
 			return EmuMath::Helpers::vector_clamp_min_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Min_>(min_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point, typename Min_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ClampMinRange(Min_&& min_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ClampMinRange(Min_&& min_) const
 		{
 			return EmuMath::Helpers::vector_clamp_min_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Min_>(min_));
 		}
@@ -3233,7 +3233,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="min_">: Scalar or EmuMath Vector to clamp this Vector's elements to a minimum of.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Min_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void ClampMinRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Min_&& min_) const
+		constexpr inline void ClampMinRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Min_&& min_) const
 		{
 			EmuMath::Helpers::vector_clamp_min_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Min_>(min_));
 		}
@@ -3252,12 +3252,12 @@ namespace EmuMath
 		/// <param name="min_">: Scalar or EmuMath Vector to clamp this Vector's elements to a minimum of.</param>
 		/// <returns>EmuMath Vector containing clamp results in the specified output range, and default elements outside of said range.</returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename Min_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ClampMinRangeNoCopy(Min_&& min_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ClampMinRangeNoCopy(Min_&& min_) const
 		{
 			return EmuMath::Helpers::vector_clamp_min_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_>(*this, std::forward<Min_>(min_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, typename OutT_ = preferred_floating_point, typename Min_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ClampMinRangeNoCopy(Min_&& min_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ClampMinRangeNoCopy(Min_&& min_) const
 		{
 			return EmuMath::Helpers::vector_clamp_min_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ClampBegin_>(*this, std::forward<Min_>(min_));
 		}
@@ -3273,7 +3273,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="min_">: Scalar or EmuMath Vector to clamp this Vector's elements to a minimum of.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, typename Min_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void ClampMinRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Min_&& min_) const
+		constexpr inline void ClampMinRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Min_&& min_) const
 		{
 			EmuMath::Helpers::vector_clamp_min_range_no_copy<OutBegin_, OutEnd_, ClampBegin_>(out_vector_, *this, std::forward<Min_>(min_));
 		}
@@ -3285,12 +3285,12 @@ namespace EmuMath
 		/// <param name="max_">: Scalar or EmuMath Vector to clamp this Vector's elements to a maximum of.</param>
 		/// <returns>EmuMath Vector copy of this Vector with elements clamped to a maximum of max_.</returns>
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename Max_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ClampMax(Max_&& max_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ClampMax(Max_&& max_) const
 		{
 			return EmuMath::Helpers::vector_clamp_max<OutSize_, OutT_>(*this, std::forward<Max_>(max_));
 		}
 		template<typename OutT_ = preferred_floating_point, typename Max_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ClampMax(Max_&& max_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ClampMax(Max_&& max_) const
 		{
 			return EmuMath::Helpers::vector_clamp_max<size, OutT_>(*this, std::forward<Max_>(max_));
 		}
@@ -3302,7 +3302,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="max_">: Scalar or EmuMath Vector to clamp this Vector's elements to a maximum of.</param>
 		template<typename Max_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void ClampMax(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Max_&& max_) const
+		constexpr inline void ClampMax(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Max_&& max_) const
 		{
 			EmuMath::Helpers::vector_clamp_max(out_vector_, *this, std::forward<Max_>(max_));
 		}
@@ -3316,12 +3316,12 @@ namespace EmuMath
 		/// <param name="max_">: Scalar or EmuMath Vector to clamp this Vector's elements to a maximum of.</param>
 		/// <returns>EmuMath Vector copy of this Vector with elements in the provided range clamped to a maximum of max_.</returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename Max_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ClampMaxRange(Max_&& max_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ClampMaxRange(Max_&& max_) const
 		{
 			return EmuMath::Helpers::vector_clamp_max_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Max_>(max_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point, typename Max_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ClampMaxRange(Max_&& max_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ClampMaxRange(Max_&& max_) const
 		{
 			return EmuMath::Helpers::vector_clamp_max_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Max_>(max_));
 		}
@@ -3335,7 +3335,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="max_">: Scalar or EmuMath Vector to clamp this Vector's elements to a maximum of.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Max_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void ClampMaxRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Max_&& max_) const
+		constexpr inline void ClampMaxRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Max_&& max_) const
 		{
 			EmuMath::Helpers::vector_clamp_max_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Max_>(max_));
 		}
@@ -3354,12 +3354,12 @@ namespace EmuMath
 		/// <param name="max_">: Scalar or EmuMath Vector to clamp this Vector's elements to a maximum of.</param>
 		/// <returns>EmuMath Vector containing clamp results in the specified output range, and default elements outside of said range.</returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename Max_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ClampMaxRangeNoCopy(Max_&& max_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ClampMaxRangeNoCopy(Max_&& max_) const
 		{
 			return EmuMath::Helpers::vector_clamp_max_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_>(*this, std::forward<Max_>(max_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, typename OutT_ = preferred_floating_point, typename Max_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ClampMaxRangeNoCopy(Max_&& max_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ClampMaxRangeNoCopy(Max_&& max_) const
 		{
 			return EmuMath::Helpers::vector_clamp_max_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ClampBegin_>(*this, std::forward<Max_>(max_));
 		}
@@ -3375,7 +3375,7 @@ namespace EmuMath
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="max_">: Scalar or EmuMath Vector to clamp this Vector's elements to a maximum of.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, typename Max_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void ClampMaxRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Max_&& max_) const
+		constexpr inline void ClampMaxRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Max_&& max_) const
 		{
 			EmuMath::Helpers::vector_clamp_max_range_no_copy<OutBegin_, OutEnd_, ClampBegin_>(out_vector_, *this, std::forward<Max_>(max_));
 		}
@@ -3389,12 +3389,12 @@ namespace EmuMath
 		/// <param name="max_">: Scalar or EmuMath Vector to clamp this Vector's elements to a maximum of.</param>
 		/// <returns>EmuMath Vector copy of this Vector with elements clamped to the inclusive range min_:max_.</returns>
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename Min_, typename Max_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Clamp(Min_&& min_, Max_&& max_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Clamp(Min_&& min_, Max_&& max_) const
 		{
 			return EmuMath::Helpers::vector_clamp<OutSize_, OutT_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
 		template<typename OutT_ = preferred_floating_point, typename Min_, typename Max_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Clamp(Min_&& min_, Max_&& max_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Clamp(Min_&& min_, Max_&& max_) const
 		{
 			return EmuMath::Helpers::vector_clamp<size, OutT_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
@@ -3408,7 +3408,7 @@ namespace EmuMath
 		/// <param name="min_">: Scalar or EmuMath Vector to clamp this Vector's elements to a minimum of.</param>
 		/// <param name="max_">: Scalar or EmuMath Vector to clamp this Vector's elements to a maximum of.</param>
 		template<typename Min_, typename Max_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void Clamp(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Min_&& min_, Max_&& max_) const
+		constexpr inline void Clamp(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Min_&& min_, Max_&& max_) const
 		{
 			EmuMath::Helpers::vector_clamp(out_vector_, *this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
@@ -3424,12 +3424,12 @@ namespace EmuMath
 		/// <param name="max_">: Scalar or EmuMath Vector to clamp this Vector's elements to a maximum of.</param>
 		/// <returns>EmuMath Vector copy of this Vector with elements in the provided range clamped to the inclusive range min_:max_.</returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename Min_, typename Max_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ClampRange(Min_&& min_, Max_&& max_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ClampRange(Min_&& min_, Max_&& max_) const
 		{
 			return EmuMath::Helpers::vector_clamp_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point, typename Min_, typename Max_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ClampRange(Min_&& min_, Max_&& max_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ClampRange(Min_&& min_, Max_&& max_) const
 		{
 			return EmuMath::Helpers::vector_clamp_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
@@ -3445,7 +3445,7 @@ namespace EmuMath
 		/// <param name="min_">: Scalar or EmuMath Vector to clamp this Vector's elements to a minimum of.</param>
 		/// <param name="max_">: Scalar or EmuMath Vector to clamp this Vector's elements to a maximum of.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Min_, typename Max_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void ClampRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Min_&& min_, Max_&& max_) const
+		constexpr inline void ClampRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Min_&& min_, Max_&& max_) const
 		{
 			EmuMath::Helpers::vector_clamp_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
@@ -3466,12 +3466,12 @@ namespace EmuMath
 		/// <param name="max_">: Scalar or EmuMath Vector to clamp this Vector's elements to a maximum of.</param>
 		/// <returns>EmuMath Vector containing clamp results in the specified output range, and default elements outside of said range.</returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, typename Min_, typename Max_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ClampRangeNoCopy(Min_&& min_, Max_&& max_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ClampRangeNoCopy(Min_&& min_, Max_&& max_) const
 		{
 			return EmuMath::Helpers::vector_clamp_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, ClampBegin_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, typename OutT_ = preferred_floating_point, typename Min_, typename Max_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ClampRangeNoCopy(Min_&& min_, Max_&& max_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ClampRangeNoCopy(Min_&& min_, Max_&& max_) const
 		{
 			return EmuMath::Helpers::vector_clamp_range_no_copy<size, OutT_, OutBegin_, OutEnd_, ClampBegin_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
@@ -3488,7 +3488,7 @@ namespace EmuMath
 		/// <param name="min_">: Scalar or EmuMath Vector to clamp this Vector's elements to a minimum of.</param>
 		/// <param name="max_">: Scalar or EmuMath Vector to clamp this Vector's elements to a maximum of.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t ClampBegin_, typename Min_, typename Max_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void ClampRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Min_&& min_, Max_&& max_) const
+		constexpr inline void ClampRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Min_&& min_, Max_&& max_) const
 		{
 			EmuMath::Helpers::vector_clamp_range_no_copy<OutBegin_, OutEnd_, ClampBegin_>(out_vector_, *this, std::forward<Min_>(min_), std::forward<Max_>(max_));
 		}
@@ -3502,12 +3502,12 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq>, containing a floored copy of this Vector.</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Floor() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Floor() const
 		{
 			return EmuMath::Helpers::vector_floor<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Floor() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Floor() const
 		{
 			return EmuMath::Helpers::vector_floor<size, OutT_>(*this);
 		}
@@ -3517,7 +3517,7 @@ namespace EmuMath
 		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `FloorConstexpr` instead. </para>
 		/// </summary>
 		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void Floor(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void Floor(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_ceil(out_vector_, *this);
 		}
@@ -3533,12 +3533,12 @@ namespace EmuMath
 		///		containing a copy of this Vector with the provided index range floored.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> FloorRange() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> FloorRange() const
 		{
 			return EmuMath::Helpers::vector_floor_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> FloorRange() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> FloorRange() const
 		{
 			return EmuMath::Helpers::vector_floor_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
@@ -3551,7 +3551,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void FloorRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void FloorRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_floor_range<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
@@ -3571,12 +3571,12 @@ namespace EmuMath
 		///		containing a partial floored copy of this Vector in the specified range, and default values outside of said range.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> FloorRangeNoCopy() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> FloorRangeNoCopy() const
 		{
 			return EmuMath::Helpers::vector_floor_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t RoundBegin_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> FloorRangeNoCopy() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> FloorRangeNoCopy() const
 		{
 			return EmuMath::Helpers::vector_floor_range_no_copy<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
 		}
@@ -3591,7 +3591,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void FloorRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void FloorRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_floor_range_no_copy<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
 		}
@@ -3602,12 +3602,12 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq>, containing a ceiled copy of this Vector.</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Ceil() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Ceil() const
 		{
 			return EmuMath::Helpers::vector_ceil<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Ceil() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Ceil() const
 		{
 			return EmuMath::Helpers::vector_ceil<size, OutT_>(*this);
 		}
@@ -3617,7 +3617,7 @@ namespace EmuMath
 		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `CeilConstexpr` instead. </para>
 		/// </summary>
 		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void Ceil(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void Ceil(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_ceil(out_vector_, *this);
 		}
@@ -3633,12 +3633,12 @@ namespace EmuMath
 		///		containing a copy of this Vector with the provided index range ceiled.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> CeilRange() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> CeilRange() const
 		{
 			return EmuMath::Helpers::vector_ceil_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> CeilRange() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> CeilRange() const
 		{
 			return EmuMath::Helpers::vector_ceil_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
@@ -3651,7 +3651,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void CeilRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void CeilRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_ceil_range<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
@@ -3671,12 +3671,12 @@ namespace EmuMath
 		///		containing a partial ceiled copy of this Vector in the specified range, and default values outside of said range.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> CeilRangeNoCopy() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> CeilRangeNoCopy() const
 		{
 			return EmuMath::Helpers::vector_ceil_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t RoundBegin_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> CeilRangeNoCopy() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> CeilRangeNoCopy() const
 		{
 			return EmuMath::Helpers::vector_ceil_range_no_copy<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
 		}
@@ -3691,7 +3691,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void CeilRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void CeilRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_ceil_range_no_copy<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
 		}
@@ -3702,12 +3702,12 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq>, containing a truncated copy of this Vector.</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Trunc() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Trunc() const
 		{
 			return EmuMath::Helpers::vector_trunc<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Trunc() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Trunc() const
 		{
 			return EmuMath::Helpers::vector_trunc<size, OutT_>(*this);
 		}
@@ -3717,7 +3717,7 @@ namespace EmuMath
 		/// <para> Does not provide a guarantee to be constexpr-evaluable if possible; for such behaviour, use `TruncConstexpr` instead. </para>
 		/// </summary>
 		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void Trunc(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void Trunc(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_trunc(out_vector_, *this);
 		}
@@ -3733,12 +3733,12 @@ namespace EmuMath
 		///		containing a copy of this Vector with the provided index range truncated.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> TruncRange() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> TruncRange() const
 		{
 			return EmuMath::Helpers::vector_trunc_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> TruncRange() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> TruncRange() const
 		{
 			return EmuMath::Helpers::vector_trunc_range<size, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
@@ -3751,7 +3751,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void TruncRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void TruncRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_trunc_range<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
@@ -3771,12 +3771,12 @@ namespace EmuMath
 		///		containing a partial truncated copy of this Vector in the specified range, and default values outside of said range.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> TruncRangeNoCopy() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> TruncRangeNoCopy() const
 		{
 			return EmuMath::Helpers::vector_trunc_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t RoundBegin_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> TruncRangeNoCopy() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> TruncRangeNoCopy() const
 		{
 			return EmuMath::Helpers::vector_trunc_range_no_copy<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
 		}
@@ -3791,7 +3791,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void TruncRangeNoCopy(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void TruncRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_trunc_range_no_copy<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
 		}
@@ -3805,12 +3805,12 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq>, containing a floored copy of this Vector.</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> FloorConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> FloorConstexpr() const
 		{
 			return EmuMath::Helpers::vector_floor_constexpr<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> FloorConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> FloorConstexpr() const
 		{
 			return EmuMath::Helpers::vector_floor_constexpr<size, OutT_>(*this);
 		}
@@ -3820,7 +3820,7 @@ namespace EmuMath
 		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `Floor` if calling at runtime. </para>
 		/// </summary>
 		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void FloorConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void FloorConstexpr(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			return EmuMath::Helpers::vector_floor_constexpr(out_vector_, *this);
 		}
@@ -3836,12 +3836,12 @@ namespace EmuMath
 		///		containing a copy of this Vector with the provided index range floored.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> FloorRangeConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> FloorRangeConstexpr() const
 		{
 			return EmuMath::Helpers::vector_floor_range_constexpr<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> FloorRangeConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> FloorRangeConstexpr() const
 		{
 			return EmuMath::Helpers::vector_floor_range_constexpr<size, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
@@ -3854,7 +3854,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void FloorRangeConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void FloorRangeConstexpr(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_floor_range_constexpr<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
@@ -3874,12 +3874,12 @@ namespace EmuMath
 		///		containing a partial floored copy of this Vector in the specified range, and default values outside of said range.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> FloorRangeNoCopyConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> FloorRangeNoCopyConstexpr() const
 		{
 			return EmuMath::Helpers::vector_floor_range_no_copy_constexpr<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t RoundBegin_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> FloorRangeNoCopyConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> FloorRangeNoCopyConstexpr() const
 		{
 			return EmuMath::Helpers::vector_floor_range_no_copy_constexpr<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
 		}
@@ -3894,7 +3894,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void FloorRangeNoCopyConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void FloorRangeNoCopyConstexpr(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_floor_range_no_copy_constexpr<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
 		}
@@ -3905,12 +3905,12 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq>, containing a ceiled copy of this Vector.</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> CeilConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> CeilConstexpr() const
 		{
 			return EmuMath::Helpers::vector_ceil_constexpr<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> CeilConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> CeilConstexpr() const
 		{
 			return EmuMath::Helpers::vector_ceil_constexpr<size, OutT_>(*this);
 		}
@@ -3920,7 +3920,7 @@ namespace EmuMath
 		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `Ceil` if calling at runtime. </para>
 		/// </summary>
 		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void CeilConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void CeilConstexpr(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			return EmuMath::Helpers::vector_ceil_constexpr(out_vector_, *this);
 		}
@@ -3936,12 +3936,12 @@ namespace EmuMath
 		///		containing a copy of this Vector with the provided index range ceiled.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> CeilRangeConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> CeilRangeConstexpr() const
 		{
 			return EmuMath::Helpers::vector_ceil_range_constexpr<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> CeilRangeConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> CeilRangeConstexpr() const
 		{
 			return EmuMath::Helpers::vector_ceil_range_constexpr<size, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
@@ -3954,7 +3954,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void CeilRangeConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void CeilRangeConstexpr(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_ceil_range_constexpr<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
@@ -3974,12 +3974,12 @@ namespace EmuMath
 		///		containing a partial ceiled copy of this Vector in the specified range, and default values outside of said range.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> CeilRangeNoCopyConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> CeilRangeNoCopyConstexpr() const
 		{
 			return EmuMath::Helpers::vector_ceil_range_no_copy_constexpr<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t RoundBegin_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> CeilRangeNoCopyConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> CeilRangeNoCopyConstexpr() const
 		{
 			return EmuMath::Helpers::vector_ceil_range_no_copy_constexpr<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
 		}
@@ -3994,7 +3994,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void CeilRangeNoCopyConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void CeilRangeNoCopyConstexpr(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_ceil_range_no_copy_constexpr<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
 		}
@@ -4005,12 +4005,12 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>Vector of the provided OutSize_ (defaults to size) and OutT_ (defaults to value_type_uq>, containing a truncated copy of this Vector.</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> TruncConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> TruncConstexpr() const
 		{
 			return EmuMath::Helpers::vector_trunc_constexpr<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> TruncConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> TruncConstexpr() const
 		{
 			return EmuMath::Helpers::vector_trunc_constexpr<size, OutT_>(*this);
 		}
@@ -4020,7 +4020,7 @@ namespace EmuMath
 		/// <para> Provides a guarantee to be constexpr-evaluable if possible, but may make sacrifices. One may prefer to use `Trunc` if calling at runtime. </para>
 		/// </summary>
 		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void TruncConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void TruncConstexpr(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			return EmuMath::Helpers::vector_trunc_constexpr(out_vector_, *this);
 		}
@@ -4036,12 +4036,12 @@ namespace EmuMath
 		///		containing a copy of this Vector with the provided index range truncated.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> TruncRangeConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> TruncRangeConstexpr() const
 		{
 			return EmuMath::Helpers::vector_trunc_range_constexpr<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> TruncRangeConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> TruncRangeConstexpr() const
 		{
 			return EmuMath::Helpers::vector_trunc_range_constexpr<size, OutT_, BeginIndex_, EndIndex_>(*this);
 		}
@@ -4054,7 +4054,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void TruncRangeConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void TruncRangeConstexpr(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_trunc_range_constexpr<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
@@ -4074,12 +4074,12 @@ namespace EmuMath
 		///		containing a partial truncated copy of this Vector in the specified range, and default values outside of said range.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> TruncRangeNoCopyConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> TruncRangeNoCopyConstexpr() const
 		{
 			return EmuMath::Helpers::vector_trunc_range_no_copy_constexpr<OutSize_, OutT_, OutBegin_, OutEnd_, RoundBegin_>(*this);
 		}
 		template<std::size_t OutBegin, std::size_t OutEnd_, std::size_t RoundBegin_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> TruncRangeNoCopyConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> TruncRangeNoCopyConstexpr() const
 		{
 			return EmuMath::Helpers::vector_trunc_range_no_copy_constexpr<size, OutT_, OutBegin, OutEnd_, RoundBegin_>(*this);
 		}
@@ -4094,7 +4094,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t RoundBegin_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void TruncRangeNoCopyConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void TruncRangeNoCopyConstexpr(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_trunc_range_no_copy_constexpr<OutBegin_, OutEnd_, RoundBegin_>(out_vector_, *this);
 		}
@@ -4119,23 +4119,23 @@ namespace EmuMath
 		///		with respective elements constructed from the provided Indices_ within this Vector.
 		/// </returns>
 		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> Shuffle()
+		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), OutT_> Shuffle()
 		{
 			return EmuMath::Helpers::vector_shuffle<OutT_, Indices_...>(*this);
 		}
 		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> Shuffle() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), OutT_> Shuffle() const
 		{
 			return EmuMath::Helpers::vector_shuffle<OutT_, Indices_...>(*this);
 		}
 
 		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), value_type_uq> Shuffle()
+		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), value_type_uq> Shuffle()
 		{
 			return EmuMath::Helpers::vector_shuffle<value_type_uq, Indices_...>(*this);
 		}
 		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), value_type_uq> Shuffle() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), value_type_uq> Shuffle() const
 		{
 			return EmuMath::Helpers::vector_shuffle<value_type_uq, Indices_...>(*this);
 		}
@@ -4157,23 +4157,23 @@ namespace EmuMath
 		///		with respective elements constructed from the provided theoretical Indices_ within this Vector.
 		/// </returns>
 		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> ShuffleTheoretical()
+		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), OutT_> ShuffleTheoretical()
 		{
 			return EmuMath::Helpers::vector_shuffle_theoretical<OutT_, Indices_...>(*this);
 		}
 		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), OutT_> ShuffleTheoretical() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), OutT_> ShuffleTheoretical() const
 		{
 			return EmuMath::Helpers::vector_shuffle_theoretical<OutT_, Indices_...>(*this);
 		}
 
 		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), value_type_uq> ShuffleTheoretical()
+		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), value_type_uq> ShuffleTheoretical()
 		{
 			return EmuMath::Helpers::vector_shuffle_theoretical<value_type_uq, Indices_...>(*this);
 		}
 		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), value_type_uq> ShuffleTheoretical() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), value_type_uq> ShuffleTheoretical() const
 		{
 			return EmuMath::Helpers::vector_shuffle_theoretical<value_type_uq, Indices_...>(*this);
 		}
@@ -4190,12 +4190,12 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>EmuMath Vector containing references to this Vector's data, or this Vector's references if it is also a reference-containing Vector.</returns>
 		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), value_type&> RefShuffle()
+		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), value_type&> RefShuffle()
 		{
 			return EmuMath::Helpers::vector_shuffle<value_type&, Indices_...>(*this);
 		}
 		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), const value_type&> RefShuffle() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), const value_type&> RefShuffle() const
 		{
 			return EmuMath::Helpers::vector_shuffle<const value_type&, Indices_...>(*this);
 		}
@@ -4212,7 +4212,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>EmuMath Vector containing const references to this Vector's data, or this Vector's references if it is also a reference-containing Vector.</returns>
 		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<sizeof...(Indices_), const value_type&> ConstRefShuffle() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), const value_type&> ConstRefShuffle() const
 		{
 			return EmuMath::Helpers::vector_shuffle<const value_type&, Indices_...>(*this);
 		}
@@ -4234,7 +4234,7 @@ namespace EmuMath
 		/// <param name="args_">All (or additional, if this Vector is being passed based on IncludeSelf_) arguments to pass to the mutation function.</param>
 		/// <returns>EmuMath Vector created from mutating the provided arguments via an instance of the provided Func_ at every index within the output Vector.</returns>
 		template<std::size_t IncludeSelf_, class Func_, class...Args_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, value_type_uq> Mutate(Func_ func_, Args_&&...args_)
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, value_type_uq> Mutate(Func_ func_, Args_&&...args_)
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
@@ -4250,7 +4250,7 @@ namespace EmuMath
 			}
 		}
 		template<std::size_t IncludeSelf_, class Func_, class...Args_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, value_type_uq> Mutate(Func_ func_, Args_&&...args_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, value_type_uq> Mutate(Func_ func_, Args_&&...args_) const
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
@@ -4280,7 +4280,7 @@ namespace EmuMath
 		/// <param name="args_">All (or additional, if this Vector is being passed based on IncludeSelf_) arguments to pass to the mutation function.</param>
 		/// <returns>EmuMath Vector created from mutating the provided arguments via an instance of the provided Func_ at every index within the output Vector.</returns>
 		template<class Func_, std::size_t IncludeSelf_, class...Args_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, value_type_uq> Mutate(Args_&&...args_)
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, value_type_uq> Mutate(Args_&&...args_)
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
@@ -4296,7 +4296,7 @@ namespace EmuMath
 			}
 		}
 		template<class Func_, std::size_t IncludeSelf_, class...Args_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, value_type_uq> Mutate(Args_&&...args_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, value_type_uq> Mutate(Args_&&...args_) const
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
@@ -4327,7 +4327,7 @@ namespace EmuMath
 		/// <param name="out_vector_">Non-const EmuMath Vector reference to output mutation results to.</param>
 		/// <param name="args_">All (or additional, if this Vector is being passed based on IncludeSelf_) arguments to pass to the mutation function.</param>
 		template<std::size_t IncludeSelf_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateTo(Func_ func_, EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
+		constexpr inline void MutateTo(Func_ func_, EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
@@ -4343,7 +4343,7 @@ namespace EmuMath
 			}
 		}
 		template<std::size_t IncludeSelf_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateTo(Func_ func_, EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
+		constexpr inline void MutateTo(Func_ func_, EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
@@ -4373,7 +4373,7 @@ namespace EmuMath
 		/// <param name="out_vector_">Non-const EmuMath Vector reference to output mutation results to.</param>
 		/// <param name="args_">All (or additional, if this Vector is being passed based on IncludeSelf_) arguments to pass to the mutation function.</param>
 		template<class Func_, std::size_t IncludeSelf_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateTo(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
+		constexpr inline void MutateTo(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
@@ -4389,7 +4389,7 @@ namespace EmuMath
 			}
 		}
 		template<class Func_, std::size_t IncludeSelf_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateTo(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
+		constexpr inline void MutateTo(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
@@ -4427,7 +4427,7 @@ namespace EmuMath
 		/// </param>
 		/// <param name="args_">: All (or additional, if this Vector is being passed based on IncludeSelf_) arguments to pass to the mutation function.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_, std::size_t IncludeSelf_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateRange(Func_ func_, EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
+		constexpr inline void MutateRange(Func_ func_, EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
@@ -4443,7 +4443,7 @@ namespace EmuMath
 			}
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_, std::size_t IncludeSelf_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateRange(Func_ func_, EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
+		constexpr inline void MutateRange(Func_ func_, EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
 		{
 			if constexpr (IncludeSelf_ < 0)
 			{
@@ -4459,17 +4459,17 @@ namespace EmuMath
 			}
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t IncludeSelf_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateRange(Func_ func_, EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
+		constexpr inline void MutateRange(Func_ func_, EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
 		{
 			MutateRange<BeginIndex_, EndIndex_, 0, IncludeSelf_, Func_&>(func_, out_vector_, std::forward<Args_>(args_)...);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t IncludeSelf_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateRange(Func_ func_, EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
+		constexpr inline void MutateRange(Func_ func_, EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
 		{
 			MutateRange<BeginIndex_, EndIndex_, 0, IncludeSelf_, Func_&>(func_, out_vector_, std::forward<Args_>(args_)...);
 		}
 		template<class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_, std::size_t IncludeSelf_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
+		constexpr inline void MutateRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
 		{
 			if constexpr (std::is_default_constructible_v<Func_>)
 			{
@@ -4486,7 +4486,7 @@ namespace EmuMath
 			}
 		}
 		template<class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_, std::size_t IncludeSelf_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
+		constexpr inline void MutateRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
 		{
 			if constexpr (std::is_default_constructible_v<Func_>)
 			{
@@ -4503,12 +4503,12 @@ namespace EmuMath
 			}
 		}
 		template<class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t IncludeSelf_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
+		constexpr inline void MutateRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
 		{
 			MutateRange<Func_, BeginIndex_, EndIndex_, 0, IncludeSelf_>(out_vector_, std::forward<Args_>(args_)...);
 		}
 		template<class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t IncludeSelf_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateRange(EmuMath::NewVector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
+		constexpr inline void MutateRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
 		{
 			MutateRange<Func_, BeginIndex_, EndIndex_, 0, IncludeSelf_>(out_vector_, std::forward<Args_>(args_)...);
 		}
@@ -4523,7 +4523,7 @@ namespace EmuMath
 		/// <param name="other_vector_">EmuMath Vector to concatenate this Vector with.</param>
 		/// <returns>This Vector concatenated with the passed EmuMath Vector.</returns>
 		template<typename OutT_ = value_type_uq, bool Left_ = true, std::size_t OtherSize_, typename OtherT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size + OtherSize_, OutT_> Concat(const EmuMath::NewVector<OtherSize_, OtherT_>& other_vector_)
+		[[nodiscard]] constexpr inline EmuMath::Vector<size + OtherSize_, OutT_> Concat(const EmuMath::Vector<OtherSize_, OtherT_>& other_vector_)
 		{
 			if constexpr (Left_)
 			{
@@ -4535,32 +4535,7 @@ namespace EmuMath
 			}
 		}
 		template<typename OutT_ = value_type_uq, bool Left_ = true, std::size_t OtherSize_, typename OtherT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size + OtherSize_, OutT_> Concat(const EmuMath::NewVector<OtherSize_, OtherT_>& other_vector_) const
-		{
-			if constexpr (Left_)
-			{
-				return EmuMath::Helpers::vector_concat<OutT_>(*this, other_vector_);
-			}
-			else
-			{
-				return EmuMath::Helpers::vector_concat<OutT_>(other_vector_, *this);
-			}
-		}
-
-		template<typename OutT_ = value_type_uq, bool Left_ = true, std::size_t OtherSize_, typename OtherT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size + OtherSize_, OutT_> Concat(EmuMath::NewVector<OtherSize_, OtherT_>& other_vector_)
-		{
-			if constexpr (Left_)
-			{
-				return EmuMath::Helpers::vector_concat<OutT_>(*this, other_vector_);
-			}
-			else
-			{
-				return EmuMath::Helpers::vector_concat<OutT_>(other_vector_, *this);
-			}
-		}
-		template<typename OutT_ = value_type_uq, bool Left_ = true, std::size_t OtherSize_, typename OtherT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size + OtherSize_, OutT_> Concat(EmuMath::NewVector<OtherSize_, OtherT_>& other_vector_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size + OtherSize_, OutT_> Concat(const EmuMath::Vector<OtherSize_, OtherT_>& other_vector_) const
 		{
 			if constexpr (Left_)
 			{
@@ -4573,27 +4548,52 @@ namespace EmuMath
 		}
 
 		template<typename OutT_ = value_type_uq, bool Left_ = true, std::size_t OtherSize_, typename OtherT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size + OtherSize_, OutT_> Concat(EmuMath::NewVector<OtherSize_, OtherT_>&& other_vector_)
+		[[nodiscard]] constexpr inline EmuMath::Vector<size + OtherSize_, OutT_> Concat(EmuMath::Vector<OtherSize_, OtherT_>& other_vector_)
 		{
 			if constexpr (Left_)
 			{
-				return EmuMath::Helpers::vector_concat<OutT_>(*this, std::forward<EmuMath::NewVector<OtherSize_, OtherT_>>(other_vector_));
+				return EmuMath::Helpers::vector_concat<OutT_>(*this, other_vector_);
 			}
 			else
 			{
-				return EmuMath::Helpers::vector_concat<OutT_>(std::forward<EmuMath::NewVector<OtherSize_, OtherT_>>(other_vector_), *this);
+				return EmuMath::Helpers::vector_concat<OutT_>(other_vector_, *this);
 			}
 		}
 		template<typename OutT_ = value_type_uq, bool Left_ = true, std::size_t OtherSize_, typename OtherT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size + OtherSize_, OutT_> Concat(EmuMath::NewVector<OtherSize_, OtherT_>&& other_vector_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size + OtherSize_, OutT_> Concat(EmuMath::Vector<OtherSize_, OtherT_>& other_vector_) const
 		{
 			if constexpr (Left_)
 			{
-				return EmuMath::Helpers::vector_concat<OutT_>(*this, std::forward<EmuMath::NewVector<OtherSize_, OtherT_>>(other_vector_));
+				return EmuMath::Helpers::vector_concat<OutT_>(*this, other_vector_);
 			}
 			else
 			{
-				return EmuMath::Helpers::vector_concat<OutT_>(std::forward<EmuMath::NewVector<OtherSize_, OtherT_>>(other_vector_), *this);
+				return EmuMath::Helpers::vector_concat<OutT_>(other_vector_, *this);
+			}
+		}
+
+		template<typename OutT_ = value_type_uq, bool Left_ = true, std::size_t OtherSize_, typename OtherT_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<size + OtherSize_, OutT_> Concat(EmuMath::Vector<OtherSize_, OtherT_>&& other_vector_)
+		{
+			if constexpr (Left_)
+			{
+				return EmuMath::Helpers::vector_concat<OutT_>(*this, std::forward<EmuMath::Vector<OtherSize_, OtherT_>>(other_vector_));
+			}
+			else
+			{
+				return EmuMath::Helpers::vector_concat<OutT_>(std::forward<EmuMath::Vector<OtherSize_, OtherT_>>(other_vector_), *this);
+			}
+		}
+		template<typename OutT_ = value_type_uq, bool Left_ = true, std::size_t OtherSize_, typename OtherT_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<size + OtherSize_, OutT_> Concat(EmuMath::Vector<OtherSize_, OtherT_>&& other_vector_) const
+		{
+			if constexpr (Left_)
+			{
+				return EmuMath::Helpers::vector_concat<OutT_>(*this, std::forward<EmuMath::Vector<OtherSize_, OtherT_>>(other_vector_));
+			}
+			else
+			{
+				return EmuMath::Helpers::vector_concat<OutT_>(std::forward<EmuMath::Vector<OtherSize_, OtherT_>>(other_vector_), *this);
 			}
 		}
 #pragma endregion
@@ -4609,7 +4609,7 @@ namespace EmuMath
 		/// <param name="vector_b_">: EmuMath Vector to calculate the dot product of this Vector with.</param>
 		/// <returns>Dot product of this Vector and the passed vector_b_.</returns>
 		template<typename Out_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
-		[[nodiscard]] constexpr inline Out_ Dot(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		[[nodiscard]] constexpr inline Out_ Dot(const EmuMath::Vector<SizeB_, TB_>& vector_b_) const
 		{
 			return EmuMath::Helpers::vector_dot<Out_>(*this, vector_b_);
 		}
@@ -4625,7 +4625,7 @@ namespace EmuMath
 		/// <param name="vector_b_">: EmuMath Vector to calculate the dot product of this Vector with.</param>
 		/// <returns>Dot product of this Vector and the passed vector_b_.</returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Out_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
-		[[nodiscard]] constexpr inline Out_ Dot(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		[[nodiscard]] constexpr inline Out_ Dot(const EmuMath::Vector<SizeB_, TB_>& vector_b_) const
 		{
 			return EmuMath::Helpers::vector_dot<BeginIndex_, EndIndex_, Out_>(*this, vector_b_);
 		}
@@ -4723,12 +4723,12 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>EmuMath Vector copy of this Vector normalised.</returns>
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NormaliseConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> NormaliseConstexpr() const
 		{
 			return EmuMath::Helpers::vector_normalise_constexpr<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> NormaliseConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> NormaliseConstexpr() const
 		{
 			return EmuMath::Helpers::vector_normalise_constexpr<size, OutT_>(*this);
 		}
@@ -4742,7 +4742,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void NormaliseConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void NormaliseConstexpr(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_normalise_constexpr(out_vector_, *this);
 		}
@@ -4759,12 +4759,12 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>EmuMath Vector copy of this Vector normalised.</returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NormaliseConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> NormaliseConstexpr() const
 		{
 			return EmuMath::Helpers::vector_normalise_range_constexpr<BeginIndex_, EndIndex_, OutSize_, OutT_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> NormaliseConstexpr() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> NormaliseConstexpr() const
 		{
 			return EmuMath::Helpers::vector_normalise_range_constexpr<BeginIndex_, EndIndex_, size, OutT_>(*this);
 		}
@@ -4781,7 +4781,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void NormaliseConstexpr(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void NormaliseConstexpr(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_normalise_range_constexpr<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
@@ -4792,12 +4792,12 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>EmuMath Vector copy of this Vector normalised.</returns>
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Normalise() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Normalise() const
 		{
 			return EmuMath::Helpers::vector_normalise<OutSize_, OutT_>(*this);
 		}
 		template<typename OutT_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Normalise() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Normalise() const
 		{
 			return EmuMath::Helpers::vector_normalise<size, OutT_>(*this);
 		}
@@ -4808,7 +4808,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t OutSize_, typename OutT_>
-		constexpr inline void Normalise(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void Normalise(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_normalise(out_vector_, *this);
 		}
@@ -4822,12 +4822,12 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>EmuMath Vector copy of this Vector normalised.</returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Normalise() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Normalise() const
 		{
 			return EmuMath::Helpers::vector_normalise_range<BeginIndex_, EndIndex_, OutSize_, OutT_>(*this);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Normalise() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Normalise() const
 		{
 			return EmuMath::Helpers::vector_normalise_range<BeginIndex_, EndIndex_, size, OutT_>(*this);
 		}
@@ -4841,7 +4841,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void Normalise(EmuMath::NewVector<OutSize_, OutT_>& out_vector_) const
+		constexpr inline void Normalise(EmuMath::Vector<OutSize_, OutT_>& out_vector_) const
 		{
 			EmuMath::Helpers::vector_normalise_range<BeginIndex_, EndIndex_>(out_vector_, *this);
 		}
@@ -4857,12 +4857,12 @@ namespace EmuMath
 		/// <param name="vector_b_">EmuMath Vector to find the cosine of the angle between itself and this Vector.</param>
 		/// <returns>Cosine of the angle between this Vector and vector_b_, in radians or degrees depending on the Radians_ arg.</returns>
 		template<typename Out_, bool Radians_ = true, std::size_t SizeB_, typename TB_>
-		[[nodiscard]] constexpr inline Out_ AngleCosConstexpr(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		[[nodiscard]] constexpr inline Out_ AngleCosConstexpr(const EmuMath::Vector<SizeB_, TB_>& vector_b_) const
 		{
 			return EmuMath::Helpers::vector_angle_cos_constexpr<Out_, Radians_>(*this, vector_b_);
 		}
 		template<bool Radians_ = true, std::size_t SizeB_, typename TB_>
-		[[nodiscard]] constexpr inline preferred_floating_point AngleCosConstexpr(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		[[nodiscard]] constexpr inline preferred_floating_point AngleCosConstexpr(const EmuMath::Vector<SizeB_, TB_>& vector_b_) const
 		{
 			return EmuMath::Helpers::vector_angle_cos_constexpr<preferred_floating_point, Radians_>(*this, vector_b_);
 		}
@@ -4875,12 +4875,12 @@ namespace EmuMath
 		/// <param name="vector_b_">EmuMath Vector to find the cosine of the angle between itself and this Vector.</param>
 		/// <returns>Cosine of the angle between this Vector and vector_b_, in radians or degrees depending on the Radians_ arg.</returns>
 		template<typename Out_, bool Radians_ = true, std::size_t SizeB_, typename TB_>
-		[[nodiscard]] constexpr inline Out_ AngleCos(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		[[nodiscard]] constexpr inline Out_ AngleCos(const EmuMath::Vector<SizeB_, TB_>& vector_b_) const
 		{
 			return EmuMath::Helpers::vector_angle_cos<Out_, Radians_>(*this, vector_b_);
 		}
 		template<bool Radians_ = true, std::size_t SizeB_, typename TB_>
-		[[nodiscard]] constexpr inline preferred_floating_point AngleCos(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		[[nodiscard]] constexpr inline preferred_floating_point AngleCos(const EmuMath::Vector<SizeB_, TB_>& vector_b_) const
 		{
 			return EmuMath::Helpers::vector_angle_cos<preferred_floating_point, Radians_>(*this, vector_b_);
 		}
@@ -4892,12 +4892,12 @@ namespace EmuMath
 		/// <param name="vector_b_">EmuMath Vector to find the angle between itself and this Vector.</param>
 		/// <returns>Angle between this Vector and vector_b_, in radians or degrees depending on the Radians_ arg.</returns>
 		template<typename Out_, bool Radians_ = true, std::size_t SizeB_, typename TB_>
-		[[nodiscard]] constexpr inline Out_ Angle(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		[[nodiscard]] constexpr inline Out_ Angle(const EmuMath::Vector<SizeB_, TB_>& vector_b_) const
 		{
 			return EmuMath::Helpers::vector_angle<Out_, Radians_>(*this, vector_b_);
 		}
 		template<bool Radians_ = true, std::size_t SizeB_, typename TB_>
-		[[nodiscard]] constexpr inline preferred_floating_point Angle(const EmuMath::NewVector<SizeB_, TB_>& vector_b_) const
+		[[nodiscard]] constexpr inline preferred_floating_point Angle(const EmuMath::Vector<SizeB_, TB_>& vector_b_) const
 		{
 			return EmuMath::Helpers::vector_angle<preferred_floating_point, Radians_>(*this, vector_b_);
 		}
@@ -4914,12 +4914,12 @@ namespace EmuMath
 		/// <param name="b_">: EmuMath Vector appearing as `b_` in the listed calculations.</param>
 		/// <returns>3D cross product of this Vector and b_, using theoretical indices 0, 1, 2.</returns>
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Cross3(const EmuMath::Vector<SizeB_, TB_>& b_) const
 		{
 			return EmuMath::Helpers::vector_cross_3d<OutSize_, OutT_>(*this, b_);
 		}
 		template<typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> Cross3(const EmuMath::Vector<SizeB_, TB_>& b_) const
 		{
 			return EmuMath::Helpers::vector_cross_3d<3, OutT_>(*this, b_);
 		}
@@ -4936,12 +4936,12 @@ namespace EmuMath
 		/// <param name="b_">: EmuMath Vector appearing as `b_` in the listed calculations.</param>
 		/// <returns>3D cross product of this Vector and b_, using theoretical indices I0_, I1_, I2_.</returns>
 		template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Cross3(const EmuMath::Vector<SizeB_, TB_>& b_) const
 		{
 			return EmuMath::Helpers::vector_cross_3d<OutSize_, OutT_, I0_, I1_, I2_>(*this, b_);
 		}
 		template<std::size_t I0_, std::size_t I1_, std::size_t I2_, typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> Cross3(const EmuMath::Vector<SizeB_, TB_>& b_) const
 		{
 			return EmuMath::Helpers::vector_cross_3d<3, OutT_, I0_, I1_, I2_>(*this, b_);
 		}
@@ -4970,7 +4970,7 @@ namespace EmuMath
 			std::size_t SizeB_,
 			typename TB_
 		>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Cross3(const EmuMath::Vector<SizeB_, TB_>& b_) const
 		{
 			return EmuMath::Helpers::vector_cross_3d<OutSize_, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>(*this, b_);
 		}
@@ -4986,7 +4986,7 @@ namespace EmuMath
 			std::size_t SizeB_,
 			typename TB_
 		>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> Cross3(const EmuMath::NewVector<SizeB_, TB_>& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> Cross3(const EmuMath::Vector<SizeB_, TB_>& b_) const
 		{
 			return EmuMath::Helpers::vector_cross_3d<3, OutT_, A0_, A1_, A2_, B0_, B1_, B2_>(*this, b_);
 		}
@@ -4998,12 +4998,12 @@ namespace EmuMath
 		/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
 		/// <returns>Distance between this Vector and to_ before a square root operation is performed.</returns>
 		template<typename Out_ = preferred_floating_point, bool IncludeNonContained_ = true, std::size_t ToSize_, typename ToT_>
-		[[nodiscard]] constexpr inline Out_ SquareDistance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		[[nodiscard]] constexpr inline Out_ SquareDistance(const EmuMath::Vector<ToSize_, ToT_>& to_) const
 		{
 			return EmuMath::Helpers::vector_square_distance<Out_, IncludeNonContained_>(*this, to_);
 		}
 		template<bool IncludeNonContained_, std::size_t ToSize_, typename ToT_>
-		[[nodiscard]] constexpr inline preferred_floating_point SquareDistance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		[[nodiscard]] constexpr inline preferred_floating_point SquareDistance(const EmuMath::Vector<ToSize_, ToT_>& to_) const
 		{
 			return EmuMath::Helpers::vector_square_distance<preferred_floating_point, IncludeNonContained_>(*this, to_);
 		}
@@ -5015,12 +5015,12 @@ namespace EmuMath
 		/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
 		/// <returns>Distance between this Vector and to_ before a square root operation is performed.</returns>
 		template<typename Out_ = preferred_floating_point, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ToSize_, typename ToT_>
-		[[nodiscard]] constexpr inline Out_ SquareDistance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		[[nodiscard]] constexpr inline Out_ SquareDistance(const EmuMath::Vector<ToSize_, ToT_>& to_) const
 		{
 			return EmuMath::Helpers::vector_square_distance<Out_, BeginIndex_, EndIndex_>(*this, to_);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ToSize_, typename ToT_>
-		[[nodiscard]] constexpr inline preferred_floating_point SquareDistance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		[[nodiscard]] constexpr inline preferred_floating_point SquareDistance(const EmuMath::Vector<ToSize_, ToT_>& to_) const
 		{
 			return EmuMath::Helpers::vector_square_distance<preferred_floating_point, BeginIndex_, EndIndex_>(*this, to_);
 		}
@@ -5033,12 +5033,12 @@ namespace EmuMath
 		/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
 		/// <returns>Distance between this Vector and to_ before a square root operation is performed.</returns>
 		template<typename Out_ = preferred_floating_point, bool IncludeNonContained_ = true, std::size_t ToSize_, typename ToT_>
-		[[nodiscard]] constexpr inline Out_ Distance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		[[nodiscard]] constexpr inline Out_ Distance(const EmuMath::Vector<ToSize_, ToT_>& to_) const
 		{
 			return EmuMath::Helpers::vector_distance<Out_, IncludeNonContained_>(*this, to_);
 		}
 		template<bool IncludeNonContained_, std::size_t ToSize_, typename ToT_>
-		[[nodiscard]] constexpr inline preferred_floating_point Distance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		[[nodiscard]] constexpr inline preferred_floating_point Distance(const EmuMath::Vector<ToSize_, ToT_>& to_) const
 		{
 			return EmuMath::Helpers::vector_distance<preferred_floating_point, IncludeNonContained_>(*this, to_);
 		}
@@ -5051,12 +5051,12 @@ namespace EmuMath
 		/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
 		/// <returns>Distance between this Vector and to_.</returns>
 		template<typename Out_ = preferred_floating_point, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ToSize_, typename ToT_>
-		[[nodiscard]] constexpr inline Out_ Distance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		[[nodiscard]] constexpr inline Out_ Distance(const EmuMath::Vector<ToSize_, ToT_>& to_) const
 		{
 			return EmuMath::Helpers::vector_distance<Out_, BeginIndex_, EndIndex_>(*this, to_);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ToSize_, typename ToT_>
-		[[nodiscard]] constexpr inline preferred_floating_point Distance(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		[[nodiscard]] constexpr inline preferred_floating_point Distance(const EmuMath::Vector<ToSize_, ToT_>& to_) const
 		{
 			return EmuMath::Helpers::vector_distance<preferred_floating_point, BeginIndex_, EndIndex_>(*this, to_);
 		}
@@ -5072,12 +5072,12 @@ namespace EmuMath
 		/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
 		/// <returns>Distance between this Vector and to_ before a square root operation is performed.</returns>
 		template<typename Out_ = preferred_floating_point, bool IncludeNonContained_ = true, std::size_t ToSize_, typename ToT_>
-		[[nodiscard]] constexpr inline Out_ DistanceConstexpr(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		[[nodiscard]] constexpr inline Out_ DistanceConstexpr(const EmuMath::Vector<ToSize_, ToT_>& to_) const
 		{
 			return EmuMath::Helpers::vector_distance_constexpr<Out_, IncludeNonContained_>(*this, to_);
 		}
 		template<bool IncludeNonContained_, std::size_t ToSize_, typename ToT_>
-		[[nodiscard]] constexpr inline preferred_floating_point DistanceConstexpr(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		[[nodiscard]] constexpr inline preferred_floating_point DistanceConstexpr(const EmuMath::Vector<ToSize_, ToT_>& to_) const
 		{
 			return EmuMath::Helpers::vector_distance_constexpr<preferred_floating_point, IncludeNonContained_>(*this, to_);
 		}
@@ -5093,12 +5093,12 @@ namespace EmuMath
 		/// <param name="to_">: EmuMath Vector to calculate the distance to.</param>
 		/// <returns>Distance between this Vector and to_.</returns>
 		template<typename Out_ = preferred_floating_point, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ToSize_, typename ToT_>
-		[[nodiscard]] constexpr inline Out_ DistanceConstexpr(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		[[nodiscard]] constexpr inline Out_ DistanceConstexpr(const EmuMath::Vector<ToSize_, ToT_>& to_) const
 		{
 			return EmuMath::Helpers::vector_distance_constexpr<Out_, BeginIndex_, EndIndex_>(*this, to_);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ToSize_, typename ToT_>
-		[[nodiscard]] constexpr inline preferred_floating_point DistanceConstexpr(const EmuMath::NewVector<ToSize_, ToT_>& to_) const
+		[[nodiscard]] constexpr inline preferred_floating_point DistanceConstexpr(const EmuMath::Vector<ToSize_, ToT_>& to_) const
 		{
 			return EmuMath::Helpers::vector_distance_constexpr<preferred_floating_point, BeginIndex_, EndIndex_>(*this, to_);
 		}
@@ -5109,12 +5109,12 @@ namespace EmuMath
 		/// <param name="surface_normal_">: Normal describing a reflection surface. This is expected to be normalised, and treated as such.</param>
 		/// <returns>EmuMath Vector representing the reflection of this Vector on the provided surface_normal_.</returns>
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t NormalSize_, typename NormalT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Reflect(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Reflect(const EmuMath::Vector<NormalSize_, NormalT_>& surface_normal_) const
 		{
 			return EmuMath::Helpers::vector_reflect_normal<OutSize_, OutT_>(*this, surface_normal_);
 		}
 		template<typename OutT_ = preferred_floating_point, std::size_t NormalSize_, typename NormalT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Reflect(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Reflect(const EmuMath::Vector<NormalSize_, NormalT_>& surface_normal_) const
 		{
 			return EmuMath::Helpers::vector_reflect_normal<size, OutT_>(*this, surface_normal_);
 		}
@@ -5131,12 +5131,12 @@ namespace EmuMath
 		/// <param name="surface_normal_">: Normal describing a reflection surface. This is expected to be normalised, and treated as such.</param>
 		/// <returns>EmuMath Vector representing the reflection of this Vector on the provided surface_normal_, using indices within the provided range.</returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t NormalSize_, typename NormalT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Reflect(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Reflect(const EmuMath::Vector<NormalSize_, NormalT_>& surface_normal_) const
 		{
 			return EmuMath::Helpers::vector_reflect_normal<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, surface_normal_);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point, std::size_t NormalSize_, typename NormalT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Reflect(const EmuMath::NewVector<NormalSize_, NormalT_>& surface_normal_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Reflect(const EmuMath::Vector<NormalSize_, NormalT_>& surface_normal_) const
 		{
 			return EmuMath::Helpers::vector_reflect_normal<size, OutT_, BeginIndex_, EndIndex_>(*this, surface_normal_);
 		}
@@ -5151,19 +5151,19 @@ namespace EmuMath
 		/// <param name="point_c_">EmuMath Vector to interpret as a 3D cartesian coordinate, appearing as `point_c_` in described calculations.</param>
 		/// <returns>EmuMath Vector normal to the plane defined by this Vector and the passed 2 other coordinates, before normalisation.</returns>
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t ReadOffset_ = 0, std::size_t SizeB_, typename TB_, std::size_t SizeC_, typename TC_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NormalToPlane3NoNorm
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> NormalToPlane3NoNorm
 		(
-			const EmuMath::NewVector<SizeB_, TB_>& point_b_,
-			const EmuMath::NewVector<SizeC_, TC_>& point_c_
+			const EmuMath::Vector<SizeB_, TB_>& point_b_,
+			const EmuMath::Vector<SizeC_, TC_>& point_c_
 		) const
 		{
 			return EmuMath::Helpers::vector_normal_to_plane_3d_no_norm<OutSize_, OutT_, ReadOffset_>(*this, point_b_, point_c_);
 		}
 		template<typename OutT_ = preferred_floating_point, std::size_t ReadOffset_ = 0, std::size_t SizeB_, typename TB_, std::size_t SizeC_, typename TC_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> NormalToPlane3NoNorm
+		[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> NormalToPlane3NoNorm
 		(
-			const EmuMath::NewVector<SizeB_, TB_>& point_b_,
-			const EmuMath::NewVector<SizeC_, TC_>& point_c_
+			const EmuMath::Vector<SizeB_, TB_>& point_b_,
+			const EmuMath::Vector<SizeC_, TC_>& point_c_
 		) const
 		{
 			return EmuMath::Helpers::vector_normal_to_plane_3d_no_norm<3, OutT_, ReadOffset_>(*this, point_b_, point_c_);
@@ -5183,19 +5183,19 @@ namespace EmuMath
 		/// <param name="point_c_">EmuMath Vector to interpret as a 3D cartesian coordinate, appearing as `point_c_` in described calculations.</param>
 		/// <returns>EmuMath Vector normal to the plane defined by this Vector and the passed 2 other coordinates.</returns>
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t ReadOffset_ = 0, std::size_t SizeB_, typename TB_, std::size_t SizeC_, typename TC_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NormalToPlane3Constexpr
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> NormalToPlane3Constexpr
 		(
-			const EmuMath::NewVector<SizeB_, TB_>& point_b_,
-			const EmuMath::NewVector<SizeC_, TC_>& point_c_
+			const EmuMath::Vector<SizeB_, TB_>& point_b_,
+			const EmuMath::Vector<SizeC_, TC_>& point_c_
 		) const
 		{
 			return EmuMath::Helpers::vector_normal_to_plane_3d_constexpr<OutSize_, OutT_, ReadOffset_>(*this, point_b_, point_c_);
 		}
 		template<typename OutT_ = preferred_floating_point, std::size_t ReadOffset_ = 0, std::size_t SizeB_, typename TB_, std::size_t SizeC_, typename TC_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> NormalToPlane3Constexpr
+		[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> NormalToPlane3Constexpr
 		(
-			const EmuMath::NewVector<SizeB_, TB_>& point_b_,
-			const EmuMath::NewVector<SizeC_, TC_>& point_c_
+			const EmuMath::Vector<SizeB_, TB_>& point_b_,
+			const EmuMath::Vector<SizeC_, TC_>& point_c_
 		) const
 		{
 			return EmuMath::Helpers::vector_normal_to_plane_3d_constexpr<3, OutT_, ReadOffset_>(*this, point_b_, point_c_);
@@ -5214,19 +5214,19 @@ namespace EmuMath
 		/// <param name="point_c_">EmuMath Vector to interpret as a 3D cartesian coordinate, appearing as `point_c_` in described calculations.</param>
 		/// <returns>EmuMath Vector normal to the plane defined by this Vector and the passed 2 other coordinates.</returns>
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t ReadOffset_ = 0, std::size_t SizeB_, typename TB_, std::size_t SizeC_, typename TC_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> NormalToPlane3
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> NormalToPlane3
 		(
-			const EmuMath::NewVector<SizeB_, TB_>& point_b_,
-			const EmuMath::NewVector<SizeC_, TC_>& point_c_
+			const EmuMath::Vector<SizeB_, TB_>& point_b_,
+			const EmuMath::Vector<SizeC_, TC_>& point_c_
 		) const
 		{
 			return EmuMath::Helpers::vector_normal_to_plane_3d<OutSize_, OutT_, ReadOffset_>(*this, point_b_, point_c_);
 		}
 		template<typename OutT_ = preferred_floating_point, std::size_t ReadOffset_ = 0, std::size_t SizeB_, typename TB_, std::size_t SizeC_, typename TC_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> NormalToPlane3
+		[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> NormalToPlane3
 		(
-			const EmuMath::NewVector<SizeB_, TB_>& point_b_,
-			const EmuMath::NewVector<SizeC_, TC_>& point_c_
+			const EmuMath::Vector<SizeB_, TB_>& point_b_,
+			const EmuMath::Vector<SizeC_, TC_>& point_c_
 		) const
 		{
 			return EmuMath::Helpers::vector_normal_to_plane_3d<3, OutT_, ReadOffset_>(*this, point_b_, point_c_);
@@ -5238,12 +5238,12 @@ namespace EmuMath
 		/// <param name="onto_">: EmuMath Vector to project this Vector onto.</param>
 		/// <returns>EmuMath Vector resulting from a projection of this Vector onto the Vector onto_.</returns>
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Project(const EmuMath::NewVector<SizeB_, TB_>& onto_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Project(const EmuMath::Vector<SizeB_, TB_>& onto_) const
 		{
 			return EmuMath::Helpers::vector_project<OutSize_, OutT_>(*this, onto_);
 		}
 		template<typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Project(const EmuMath::NewVector<SizeB_, TB_>& onto_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Project(const EmuMath::Vector<SizeB_, TB_>& onto_) const
 		{
 			return EmuMath::Helpers::vector_project<size, OutT_>(*this, onto_);
 		}
@@ -5254,12 +5254,12 @@ namespace EmuMath
 		/// <param name="onto_">: EmuMath Vector to project this Vector onto.</param>
 		/// <returns>EmuMath Vector resulting from a projection of this Vector onto the Vector onto_, using indices within the specified range.</returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Project(const EmuMath::NewVector<SizeB_, TB_>& onto_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Project(const EmuMath::Vector<SizeB_, TB_>& onto_) const
 		{
 			return EmuMath::Helpers::vector_project<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, onto_);
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = preferred_floating_point, std::size_t SizeB_, typename TB_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Project(const EmuMath::NewVector<SizeB_, TB_>& onto_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Project(const EmuMath::Vector<SizeB_, TB_>& onto_) const
 		{
 			return EmuMath::Helpers::vector_project<size, OutT_, BeginIndex_, EndIndex_>(*this, onto_);
 		}
@@ -5270,12 +5270,12 @@ namespace EmuMath
 		/// <param name="plane_normal_">: EmuMath Vector describing the plane to reflect onto. This is expected to be normalised, and treated as such.</param>
 		/// <returns>EmuMath Vector resulting from projecting this Vector onto the plane defined by the provided plane_normal_.</returns>
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t NormSize_, typename NormT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ProjectPlane(const EmuMath::NewVector<NormSize_, NormT_>& plane_normal_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ProjectPlane(const EmuMath::Vector<NormSize_, NormT_>& plane_normal_) const
 		{
 			return EmuMath::Helpers::vector_project_plane<OutSize_, OutT_>(*this, plane_normal_);
 		}
 		template<typename OutT_ = preferred_floating_point, std::size_t NormSize_, typename NormT_>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> ProjectPlane(const EmuMath::NewVector<NormSize_, NormT_>& plane_normal_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ProjectPlane(const EmuMath::Vector<NormSize_, NormT_>& plane_normal_) const
 		{
 			return EmuMath::Helpers::vector_project_plane<size, OutT_>(*this, plane_normal_);
 		}
@@ -5312,11 +5312,11 @@ namespace EmuMath
 			std::size_t SizeC_,
 			typename TC_
 		>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ProjectPlane3Constexpr
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ProjectPlane3Constexpr
 		(
-			const EmuMath::NewVector<SizeA_, TA_>& plane_point_a_,
-			const EmuMath::NewVector<SizeB_, TB_>& plane_point_b_,
-			const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
+			const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
+			const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
+			const EmuMath::Vector<SizeC_, TC_>& plane_point_c_
 		) const
 		{
 			return EmuMath::Helpers::vector_project_plane_3d_constexpr<OutSize_, OutT_, PlaneReadOffset_>(*this, plane_point_a_, plane_point_b_, plane_point_c_);
@@ -5332,11 +5332,11 @@ namespace EmuMath
 			std::size_t SizeC_,
 			typename TC_
 		>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> ProjectPlane3Constexpr
+		[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> ProjectPlane3Constexpr
 		(
-			const EmuMath::NewVector<SizeA_, TA_>& plane_point_a_,
-			const EmuMath::NewVector<SizeB_, TB_>& plane_point_b_,
-			const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
+			const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
+			const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
+			const EmuMath::Vector<SizeC_, TC_>& plane_point_c_
 		) const
 		{
 			return EmuMath::Helpers::vector_project_plane_3d_constexpr<3, OutT_, PlaneReadOffset_>(*this, plane_point_a_, plane_point_b_, plane_point_c_);
@@ -5371,11 +5371,11 @@ namespace EmuMath
 			std::size_t SizeC_,
 			typename TC_
 		>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> ProjectPlane3
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ProjectPlane3
 		(
-			const EmuMath::NewVector<SizeA_, TA_>& plane_point_a_,
-			const EmuMath::NewVector<SizeB_, TB_>& plane_point_b_,
-			const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
+			const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
+			const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
+			const EmuMath::Vector<SizeC_, TC_>& plane_point_c_
 		) const
 		{
 			return EmuMath::Helpers::vector_project_plane_3d<OutSize_, OutT_, PlaneReadOffset_>(*this, plane_point_a_, plane_point_b_, plane_point_c_);
@@ -5391,11 +5391,11 @@ namespace EmuMath
 			std::size_t SizeC_,
 			typename TC_
 		>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<3, OutT_> ProjectPlane3
+		[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> ProjectPlane3
 		(
-			const EmuMath::NewVector<SizeA_, TA_>& plane_point_a_,
-			const EmuMath::NewVector<SizeB_, TB_>& plane_point_b_,
-			const EmuMath::NewVector<SizeC_, TC_>& plane_point_c_
+			const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
+			const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
+			const EmuMath::Vector<SizeC_, TC_>& plane_point_c_
 		) const
 		{
 			return EmuMath::Helpers::vector_project_plane_3d<3, OutT_, PlaneReadOffset_>(*this, plane_point_a_, plane_point_b_, plane_point_c_);
@@ -6383,7 +6383,7 @@ namespace EmuMath
 			std::size_t Offset_ = 0,
 			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<const this_type&, OutSize_, OutT_, Offset_>()>
 		>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Cast() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Cast() const
 		{
 			return EmuMath::Helpers::vector_cast<OutSize_, OutT_, Offset_>(*this);
 		}
@@ -6393,7 +6393,7 @@ namespace EmuMath
 			std::size_t Offset_ = 0,
 			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<const this_type&, OutSize_, value_type_uq, Offset_>()>
 		>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, value_type_uq> Cast() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, value_type_uq> Cast() const
 		{
 			return EmuMath::Helpers::vector_cast<OutSize_, value_type_uq, Offset_>(*this);
 		}
@@ -6403,7 +6403,7 @@ namespace EmuMath
 			std::size_t Offset_ = 0,
 			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<const this_type&, size, OutT_, Offset_>()>
 		>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Cast() const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Cast() const
 		{
 			return EmuMath::Helpers::vector_cast<size, OutT_, Offset_>(*this);
 		}
@@ -6415,7 +6415,7 @@ namespace EmuMath
 			std::size_t Offset_ = 0,
 			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<this_type&, OutSize_, OutT_, Offset_>()>
 		>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, OutT_> Cast()
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Cast()
 		{
 			return EmuMath::Helpers::vector_cast<OutSize_, OutT_, Offset_>(*this);
 		}
@@ -6425,7 +6425,7 @@ namespace EmuMath
 			std::size_t Offset_ = 0,
 			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<this_type&, OutSize_, value_type_uq, Offset_>()>
 		>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<OutSize_, value_type_uq> Cast()
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, value_type_uq> Cast()
 		{
 			return EmuMath::Helpers::vector_cast<OutSize_, value_type_uq, Offset_>(*this);
 		}
@@ -6435,20 +6435,20 @@ namespace EmuMath
 			std::size_t Offset_ = 0,
 			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<this_type&, size, OutT_, Offset_>()>
 		>
-		[[nodiscard]] constexpr inline EmuMath::NewVector<size, OutT_> Cast()
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Cast()
 		{
 			return EmuMath::Helpers::vector_cast<size, OutT_, Offset_>(*this);
 		}
 
 		/// <summary> Explicit cast operator for converting this Vector to an alternative EmuMath Vector instance. </summary>
 		template<std::size_t OutSize_, typename OutT_, typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<const this_type&, OutSize_, OutT_, 0>()>>
-		explicit constexpr inline operator EmuMath::NewVector<OutSize_, OutT_>() const
+		explicit constexpr inline operator EmuMath::Vector<OutSize_, OutT_>() const
 		{
 			return EmuMath::Helpers::vector_cast<OutSize_, OutT_, 0>(*this);
 		}
 
 		template<std::size_t OutSize_, typename OutT_, typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<this_type&, OutSize_, OutT_, 0>()>>
-		explicit constexpr inline operator EmuMath::NewVector<OutSize_, OutT_>()
+		explicit constexpr inline operator EmuMath::Vector<OutSize_, OutT_>()
 		{
 			return EmuMath::Helpers::vector_cast<OutSize_, OutT_, 0>(*this);
 		}
@@ -6611,7 +6611,7 @@ namespace EmuMath
 			typename InT_,
 			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, false, true>()>
 		>
-		constexpr inline void Set(EmuMath::NewVector<InSize_, InT_>&& to_move_set_)
+		constexpr inline void Set(EmuMath::Vector<InSize_, InT_>&& to_move_set_)
 		{
 			EmuMath::Helpers::vector_set<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
 		}
@@ -6628,7 +6628,7 @@ namespace EmuMath
 			typename InT_,
 			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, true, true>()>
 		>
-		constexpr inline void Set(const EmuMath::NewVector<InSize_, InT_>&& to_move_set_)
+		constexpr inline void Set(const EmuMath::Vector<InSize_, InT_>&& to_move_set_)
 		{
 			EmuMath::Helpers::vector_set<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
 		}
@@ -6645,7 +6645,7 @@ namespace EmuMath
 			typename InT_,
 			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, false, false>()>
 		>
-		constexpr inline void Set(EmuMath::NewVector<InSize_, InT_>& to_copy_set_)
+		constexpr inline void Set(EmuMath::Vector<InSize_, InT_>& to_copy_set_)
 		{
 			EmuMath::Helpers::vector_set<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
 		}
@@ -6662,7 +6662,7 @@ namespace EmuMath
 			typename InT_,
 			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, true, false>()>
 		>
-		constexpr inline void Set(const EmuMath::NewVector<InSize_, InT_>& to_copy_set_)
+		constexpr inline void Set(const EmuMath::Vector<InSize_, InT_>& to_copy_set_)
 		{
 			EmuMath::Helpers::vector_set<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
 		}
@@ -6679,7 +6679,7 @@ namespace EmuMath
 			typename InT_,
 			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, false, true>()>
 		>
-		constexpr inline void SetContainedOnly(EmuMath::NewVector<InSize_, InT_>&& to_move_set_)
+		constexpr inline void SetContainedOnly(EmuMath::Vector<InSize_, InT_>&& to_move_set_)
 		{
 			EmuMath::Helpers::vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
 		}
@@ -6696,7 +6696,7 @@ namespace EmuMath
 			typename InT_,
 			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, true, true>()>
 		>
-		constexpr inline void SetContainedOnly(const EmuMath::NewVector<InSize_, InT_>&& to_move_set_)
+		constexpr inline void SetContainedOnly(const EmuMath::Vector<InSize_, InT_>&& to_move_set_)
 		{
 			EmuMath::Helpers::vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
 		}
@@ -6713,7 +6713,7 @@ namespace EmuMath
 			typename InT_,
 			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, false, false>()>
 		>
-		constexpr inline void SetContainedOnly(EmuMath::NewVector<InSize_, InT_>& to_copy_set_)
+		constexpr inline void SetContainedOnly(EmuMath::Vector<InSize_, InT_>& to_copy_set_)
 		{
 			EmuMath::Helpers::vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
 		}
@@ -6730,7 +6730,7 @@ namespace EmuMath
 			typename InT_,
 			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, true, false>()>
 		>
-		constexpr inline void SetContainedOnly(const EmuMath::NewVector<InSize_, InT_>& to_copy_set_)
+		constexpr inline void SetContainedOnly(const EmuMath::Vector<InSize_, InT_>& to_copy_set_)
 		{
 			EmuMath::Helpers::vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
 		}
@@ -6886,22 +6886,22 @@ namespace std
 	/// <para> Basic additive hash partial-specialisation that performs a hash for an EmuMath Vector's value_type_uq, combining all elements into a single hash. </para>
 	/// </summary>
 	template<std::size_t Size_, typename T_>
-	struct hash<EmuMath::NewVector<Size_, T_>>
+	struct hash<EmuMath::Vector<Size_, T_>>
 	{
 	private:
-		using _element_hash = std::hash<typename EmuMath::NewVector<Size_, T_>::value_type_uq>;
+		using _element_hash = std::hash<typename EmuMath::Vector<Size_, T_>::value_type_uq>;
 
 		// Recursive call to allow constexpr-evaluation
 		// --- Constexpr is not guaranteed with standard, but there's no reason to not allow it in case of change/user specialisations
 		template<std::size_t Index_, std::size_t MultiplierPrimeConstant_>
-		static constexpr inline void _do_all_elements(const EmuMath::NewVector<Size_, T_>& vector_, std::size_t& out_)
+		static constexpr inline void _do_all_elements(const EmuMath::Vector<Size_, T_>& vector_, std::size_t& out_)
 		{
-			if constexpr (Index_ < EmuMath::NewVector<Size_, T_>::size)
+			if constexpr (Index_ < EmuMath::Vector<Size_, T_>::size)
 			{
 				out_ *= MultiplierPrimeConstant_;
 				out_ += _element_hash()(vector_.at<Index_>());
 
-				if constexpr ((Index_ + 1) < EmuMath::NewVector<Size_, T_>::size)
+				if constexpr ((Index_ + 1) < EmuMath::Vector<Size_, T_>::size)
 				{
 					_do_all_elements<Index_ + 1, MultiplierPrimeConstant_>(vector_, out_);
 				}
@@ -6913,7 +6913,7 @@ namespace std
 		{
 		}
 
-		constexpr inline std::size_t operator()(const EmuMath::NewVector<Size_, T_>& vector_) const
+		constexpr inline std::size_t operator()(const EmuMath::Vector<Size_, T_>& vector_) const
 		{
 			constexpr std::size_t starting_prime_ = 37;
 			std::size_t out_ = starting_prime_;
