@@ -3,6 +3,7 @@
 
 // REQUIRED INCLUDES
 #include "EmuCore/TestingHelpers/LoopingTestHarness.h"
+#include "EmuMath/Random.h"
 #include <array>
 #include <chrono>
 #include <iostream>

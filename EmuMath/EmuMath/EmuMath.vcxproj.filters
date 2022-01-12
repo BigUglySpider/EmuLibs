@@ -110,10 +110,10 @@
     <ClInclude Include="EmuMath\Random.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_random\RngWrapper.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_random\_rng_wrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_random\ShuffledIntSequence.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_random\_shuffled_int_sequence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_common_noise_gen_functor_includes.h">

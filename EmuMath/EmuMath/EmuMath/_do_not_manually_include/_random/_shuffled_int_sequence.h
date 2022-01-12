@@ -2,7 +2,7 @@
 #define EMU_MATH_SEQUENTIAL_PERMUTATIONS_H_INC_ 1
 
 #include "../../../EmuCore/ArithmeticHelpers/BitHelpers.h"
-#include "RngWrapper.h"
+#include "_rng_wrapper.h"
 #include <ostream>
 #include <vector>
 
