@@ -1,7 +1,9 @@
 #ifndef EMU_CORE_COMMON_MATH_H_INC_
 #define EMU_CORE_COMMON_MATH_H_INC_ 1
 
+#include "../TMPHelpers/OperatorChecks.h"
 #include "../TMPHelpers/TypeComparators.h"
+#include "../TMPHelpers/Values.h"
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -29,7 +31,7 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Attempted to use EmuCore SqrtConstexpr with an output type that is not a floating point.");
+				static_assert(EmuCore::TMP::get_false<Out_>(), "Attempted to use EmuCore SqrtConstexpr with an output type that is not a floating point.");
 			}
 		}
 	}
@@ -78,12 +80,12 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Attempted to use EmuCore::SqrtConstexpr with an input type that is neither floating point nor integral. Did you mean to use the do_sqrt_constexpr functor?");
+				static_assert(EmuCore::TMP::get_false<In_>(), "Attempted to use EmuCore::SqrtConstexpr with an input type that is neither floating point nor integral. Did you mean to use the do_sqrt_constexpr functor?");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to use EmuCore::SqrtConstexpr with an output type that is not a floating point.");
+			static_assert(EmuCore::TMP::get_false<In_>(), "Attempted to use EmuCore::SqrtConstexpr with an output type that is not a floating point.");
 		}
 	}
 
@@ -195,11 +197,11 @@ namespace EmuCore
 			{
 				return static_cast<FloatingPointOut_>(cosl(static_cast<long double>(val_)));
 			}
-			else if constexpr(std::is_convertible_v<FloatingPointIn_, float>)
+			else if constexpr(EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
 			{
 				return DoMatchingCos<FloatingPointOut_, float>(static_cast<float>(val_));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, double>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, double>)
 			{
 				return DoMatchingCos<FloatingPointOut_, double>(static_cast<double>(val_));
 			}
@@ -209,12 +211,12 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingCos.");
+				static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingCos.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Passed a non-floating-point output type to EmuCore::DoMatchingCos. Did you mean to use the do_cos functor?");
+			static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point output type to EmuCore::DoMatchingCos. Did you mean to use the do_cos functor?");
 		}
 	}
 	template<typename FloatingPointOut_ = float, typename FloatingPointIn_>
@@ -234,11 +236,11 @@ namespace EmuCore
 			{
 				return static_cast<FloatingPointOut_>(acosl(static_cast<long double>(val_)));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, float>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
 			{
 				return DoMatchingAcos<FloatingPointOut_, float>(static_cast<float>(val_));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, double>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, double>)
 			{
 				return DoMatchingAcos<FloatingPointOut_, double>(static_cast<double>(val_));
 			}
@@ -248,12 +250,12 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingAcos.");
+				static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingAcos.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Passed a non-floating-point output type to EmuCore::DoMatchingAcos. Did you mean to use the do_acos functor?");
+			static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point output type to EmuCore::DoMatchingAcos. Did you mean to use the do_acos functor?");
 		}
 	}
 
@@ -274,11 +276,11 @@ namespace EmuCore
 			{
 				return static_cast<FloatingPointOut_>(sinl(static_cast<long double>(val_)));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, float>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
 			{
 				return DoMatchingSin<FloatingPointOut_, float>(static_cast<float>(val_));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, double>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, double>)
 			{
 				return DoMatchingSin<FloatingPointOut_, double>(static_cast<double>(val_));
 			}
@@ -288,12 +290,12 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingSin.");
+				static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingSin.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Passed a non-floating-point output type to EmuCore::DoMatchingSin. Did you mean to use the do_sin functor?");
+			static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point output type to EmuCore::DoMatchingSin. Did you mean to use the do_sin functor?");
 		}
 	}
 	template<typename FloatingPointOut_ = float, typename FloatingPointIn_>
@@ -313,11 +315,11 @@ namespace EmuCore
 			{
 				return static_cast<FloatingPointOut_>(asinl(static_cast<long double>(val_)));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, float>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
 			{
 				return DoMatchingAsin<FloatingPointOut_, float>(static_cast<float>(val_));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, double>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, double>)
 			{
 				return DoMatchingAsin<FloatingPointOut_, double>(static_cast<double>(val_));
 			}
@@ -327,12 +329,12 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingAsin.");
+				static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingAsin.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Passed a non-floating-point output type to EmuCore::DoMatchingAsin. Did you mean to use the do_asin functor?");
+			static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point output type to EmuCore::DoMatchingAsin. Did you mean to use the do_asin functor?");
 		}
 	}
 
@@ -353,11 +355,11 @@ namespace EmuCore
 			{
 				return static_cast<FloatingPointOut_>(tanl(static_cast<long double>(val_)));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, float>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
 			{
 				return DoMatchingTan<FloatingPointOut_, float>(static_cast<float>(val_));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, double>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, double>)
 			{
 				return DoMatchingTan<FloatingPointOut_, double>(static_cast<double>(val_));
 			}
@@ -367,12 +369,12 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingTan.");
+				static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingTan.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Passed a non-floating-point output type to EmuCore::DoMatchingTan. Did you mean to use the do_tan functor?");
+			static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point output type to EmuCore::DoMatchingTan. Did you mean to use the do_tan functor?");
 		}
 	}
 	template<typename FloatingPointOut_ = float, typename FloatingPointIn_>
@@ -392,11 +394,11 @@ namespace EmuCore
 			{
 				return static_cast<FloatingPointOut_>(atanl(static_cast<long double>(val_)));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, float>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
 			{
 				return DoMatchingAtan<FloatingPointOut_, float>(static_cast<float>(val_));
 			}
-			else if constexpr (std::is_convertible_v<FloatingPointIn_, double>)
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, double>)
 			{
 				return DoMatchingAtan<FloatingPointOut_, double>(static_cast<double>(val_));
 			}
@@ -406,12 +408,12 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingAtan.");
+				static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingAtan.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Passed a non-floating-point output type to EmuCore::DoMatchingAtan. Did you mean to use the do_atan functor?");
+			static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point output type to EmuCore::DoMatchingAtan. Did you mean to use the do_atan functor?");
 		}
 	}
 
@@ -461,7 +463,7 @@ namespace EmuCore
 		}
 		else
 		{
-			static_assert(false, "Passed a non-floating-point output type to EmuCore::DoMatchingStandardSqrt. Did you mean to use the do_sqrt functor?");
+			static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point output type to EmuCore::DoMatchingStandardSqrt. Did you mean to use the do_sqrt functor?");
 		}
 	}
 
@@ -492,7 +494,7 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuCore::DoCorrectFloor with a non-arithmetic type. Did you mean to use the do_floor functor?");
+				static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to perform EmuCore::DoCorrectFloor with a non-arithmetic type. Did you mean to use the do_floor functor?");
 			}
 		}
 	}
@@ -523,7 +525,7 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuCore::DoCorrectCeil with a non-arithmetic type. Did you mean to use the do_ceil functor?");
+				static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to perform EmuCore::DoCorrectCeil with a non-arithmetic type. Did you mean to use the do_ceil functor?");
 			}
 		}
 	}
@@ -554,7 +556,7 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuCore::DoCorrectTrunc with a non-arithmetic type. Did you mean to use the do_trunc functor?");
+				static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to perform EmuCore::DoCorrectTrunc with a non-arithmetic type. Did you mean to use the do_trunc functor?");
 			}
 		}
 	}
@@ -566,9 +568,10 @@ namespace EmuCore
 	/// <param name="rhs_">Value to divide by, acting as rhs_ in the expression lhs_ % rhs_.</param>
 	/// <returns>Floating-point mod of the provided arguments, expressed as the type Lhs_.</returns>
 	template<typename Lhs_, typename Rhs_>
-	constexpr inline Lhs_ FmodConstexpr(const Lhs_& lhs_, const Rhs_& rhs_)
+	[[nodiscard]] constexpr inline EmuCore::TMP::remove_ref_cv_t<Lhs_> FmodConstexpr(const Lhs_& lhs_, const Rhs_& rhs_)
 	{
-		return static_cast<Lhs_>(lhs_ - (static_cast<std::int64_t>(lhs_ / rhs_) * rhs_));
+		using lhs_uq = EmuCore::TMP::remove_ref_cv_t<Lhs_>;
+		return static_cast<lhs_uq>(lhs_ - (static_cast<std::int64_t>(lhs_ / rhs_) * rhs_));
 	}
 
 	/// <summary>
@@ -600,7 +603,7 @@ namespace EmuCore
 	/// <summary>
 	/// <para> Calculates the reciprocal to the square root of the passed in_ value, represented as the provided OutFloatingPoint_ type. </para>
 	/// <para> By default, performs 1 Newton's Method iteration to improve accuracy. More iterations may be requested to increase accuracy. </para>
-	/// <para> A magic constant is used for some bit manipulation. It is recommended to only change this from the default (0x5F3759DF) if you know what you are doing. </para>
+	/// <para> A magic constant is used for some bit manipulation. It is recommended to only change this from the default (0x5F375A86) if you know what you are doing. </para>
 	/// <para> More information regarding the algorithm may be found here: https://en.wikipedia.org/wiki/Fast_inverse_square_root#Overview_of_the_code </para>
 	/// </summary>
 	/// <typeparam name="InT_">Type being input to find the reciprocal to the square root of.</typeparam>
@@ -610,7 +613,7 @@ namespace EmuCore
 	///		Close approximation of the reciprocal to the provided in_ value's square root, represented as the provided OutFloatingPoint_. 
 	///		The accuracy of this value increases with more newton iterations.
 	/// </returns>
-	template<typename OutFloatingPoint_ = float, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F3759DF, typename InT_>
+	template<typename OutFloatingPoint_ = float, std::size_t NumNewtonIterations_ = 1, std::int32_t MagicConstant_ = 0x5F375A86, typename InT_>
 	inline OutFloatingPoint_ Q_rsqrt(const InT_ in_)
 	{
 		if constexpr (std::is_floating_point_v<OutFloatingPoint_>)
@@ -626,7 +629,7 @@ namespace EmuCore
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform Q_rsqrt with a non-floating-point output type.");
+			static_assert(EmuCore::TMP::get_false<OutFloatingPoint_>(), "Attempted to perform Q_rsqrt with a non-floating-point output type.");
 		}
 	}
 
@@ -656,12 +659,135 @@ namespace EmuCore
 		return (val_ + (val_ >> 63)) ^ (val_ >> 63);
 	}
 
-	template<typename FP_>
-	constexpr inline bool FpNearEqual(FP_ lhs_, FP_ rhs_, FP_ epsilon_ = std::numeric_limits<FP_>::epsilon())
+	template<typename T_>
+	struct epsilon
 	{
-		FP_ delta_ = lhs_ - rhs_;
-		return AbsConstexpr<FP_>(delta_) <= epsilon_;
-	}
+		constexpr epsilon()
+		{
+		}
+
+		[[nodiscard]] static constexpr inline T_ get()
+		{
+			return std::numeric_limits<T_>::epsilon();
+		}
+
+		[[nodiscard]] constexpr inline T_ operator()() const
+		{
+			return get();
+		}
+	};
+
+	template
+	<
+		typename Lhs_,
+		typename Rhs_ = Lhs_,
+		typename Epsilon_ = std::conditional_t<EmuCore::TMP::is_any_floating_point_v<Lhs_, Rhs_>, EmuCore::TMP::first_floating_point_t<Lhs_, Rhs_>, Lhs_>
+	>
+	struct do_cmp_near_equal
+	{
+		constexpr do_cmp_near_equal()
+		{
+		}
+
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_, const Epsilon_& epsilon_) const
+		{
+			return AbsConstexpr(lhs_ - rhs_) <= epsilon_;
+		}
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			return operator()(lhs_, rhs_, epsilon<Epsilon_>::get());
+		}
+	};
+	template<>
+	struct do_cmp_near_equal<void, void, void>
+	{
+		constexpr do_cmp_near_equal()
+		{
+		}
+
+		template<class Lhs_, class Rhs_>
+		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			using lhs_uq = EmuCore::TMP::remove_ref_cv_t<Lhs_>;
+			using rhs_uq = EmuCore::TMP::remove_ref_cv_t<Rhs_>;
+			if constexpr (std::is_floating_point_v<lhs_uq> || !std::is_floating_point_v<rhs_uq>)
+			{
+				// If neither are floating points, Epsilon is lhs; if Lhs_ is floating point, always default to Lhs_ for epsilon
+				return do_cmp_near_equal<lhs_uq, rhs_uq, lhs_uq>()(lhs_, rhs_);
+			}
+			else
+			{
+				// Lhs_ not fp, but Rhs_ is fp
+				return do_cmp_near_equal<lhs_uq, rhs_uq, rhs_uq>()(lhs_, rhs_);
+			}
+		}
+		template<class Lhs_, class Rhs_, class Epsilon_>
+		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_, const Epsilon_& epsilon_) const
+		{
+			using lhs_uq = EmuCore::TMP::remove_ref_cv_t<Lhs_>;
+			using rhs_uq = EmuCore::TMP::remove_ref_cv_t<Rhs_>;
+			using epsilon_uq = EmuCore::TMP::remove_ref_cv_t<Epsilon_>;
+			return do_cmp_near_equal<lhs_uq, rhs_uq, epsilon_uq>()(lhs_, rhs_, epsilon_);
+		}
+	};
+
+	template
+	<
+		typename Lhs_,
+		typename Rhs_ = Lhs_,
+		typename Epsilon_ = std::conditional_t<EmuCore::TMP::is_any_floating_point_v<Lhs_, Rhs_>, EmuCore::TMP::first_floating_point_t<Lhs_, Rhs_>, Lhs_>
+	>
+	struct do_cmp_not_near_equal
+	{
+	private:
+		using _do_cmp_near_equal = do_cmp_near_equal<Lhs_, Rhs_, Epsilon_>;
+
+	public:
+		constexpr do_cmp_not_near_equal()
+		{
+		}
+
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_, const Epsilon_& epsilon_) const
+		{
+			return !_do_cmp_near_equal()(lhs_, rhs_, epsilon_);
+		}
+		[[nodiscard]] constexpr inline bool operator()(const Lhs_& lhs_, const Rhs_& rhs_)
+		{
+			return !_do_cmp_near_equal()(lhs_, rhs_);
+		}
+	};
+	template<>
+	struct do_cmp_not_near_equal<void, void, void>
+	{
+		constexpr do_cmp_not_near_equal()
+		{
+		}
+
+		template<class Lhs_, class Rhs_>
+		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			using lhs_uq = EmuCore::TMP::remove_ref_cv_t<Lhs_>;
+			using rhs_uq = EmuCore::TMP::remove_ref_cv_t<Rhs_>;
+			if constexpr (std::is_floating_point_v<lhs_uq> || !std::is_floating_point_v<rhs_uq>)
+			{
+				// If neither are floating points, Epsilon is lhs; if Lhs_ is floating point, always default to Lhs_ for epsilon
+				return do_cmp_not_near_equal<lhs_uq, rhs_uq, lhs_uq>()(lhs_, rhs_);
+			}
+			else
+			{
+				// Lhs_ not fp, but Rhs_ is fp
+				return do_cmp_not_near_equal<lhs_uq, rhs_uq, rhs_uq>()(lhs_, rhs_);
+			}
+		}
+		template<class Lhs_, class Rhs_, class Epsilon_>
+		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_, const Epsilon_& epsilon_) const
+		{
+			using lhs_uq = EmuCore::TMP::remove_ref_cv_t<Lhs_>;
+			using rhs_uq = EmuCore::TMP::remove_ref_cv_t<Rhs_>;
+			using epsilon_uq = EmuCore::TMP::remove_ref_cv_t<Epsilon_>;
+			return do_cmp_not_near_equal<lhs_uq, rhs_uq, epsilon_uq>()(lhs_, rhs_, epsilon_);
+		}
+	};
 }
 
 #endif

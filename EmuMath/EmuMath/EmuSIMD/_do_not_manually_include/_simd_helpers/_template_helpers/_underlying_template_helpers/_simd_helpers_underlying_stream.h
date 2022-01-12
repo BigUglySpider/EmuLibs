@@ -3,6 +3,7 @@
 
 #include "_common_underlying_simd_template_helper_includes.h"
 #include "_simd_helpers_underlying_get.h"
+#include "../../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD::_underlying_simd_helpers
 {
@@ -54,17 +55,17 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to append an integral SIMD register to a stream via EmuSIMD helpers, but the provided register was not a supported integral register.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to append an integral SIMD register to a stream via EmuSIMD helpers, but the provided register was not a supported integral register.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to append an integral SIMD register to a stream via EmuSIMD helpers, but the provided width to interpret elements of the register as was invalid.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to append an integral SIMD register to a stream via EmuSIMD helpers, but the provided width to interpret elements of the register as was invalid.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to append an integral SIMD register to a stream via EmuSIMD helpers, but the provided register_ was not a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to append an integral SIMD register to a stream via EmuSIMD helpers, but the provided register_ was not a supported SIMD register.");
 		}
 	}
 
@@ -113,12 +114,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to append a floating-point SIMD register to a stream via EmuSIMD helpers, but the provided register was not a supported floating-point register.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to append a floating-point SIMD register to a stream via EmuSIMD helpers, but the provided register was not a supported floating-point register.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to append a floating-point SIMD register to a stream via EmuSIMD helpers, but the provided register_ was not a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to append a floating-point SIMD register to a stream via EmuSIMD helpers, but the provided register_ was not a supported SIMD register.");
 		}
 	}
 
@@ -138,12 +139,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to append a SIMD register to a stream via EmuSIMD helpers, but it could not be determined whether the register contained floating-point or integral elements.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to append a SIMD register to a stream via EmuSIMD helpers, but it could not be determined whether the register contained floating-point or integral elements.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to append a SIMD register to a stream via EmuSIMD helpers, but the provided register_ was not a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to append a SIMD register to a stream via EmuSIMD helpers, but the provided register_ was not a supported SIMD register.");
 		}
 	}
 }

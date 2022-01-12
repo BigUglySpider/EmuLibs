@@ -1,6 +1,7 @@
 #ifndef EMU_THREADS_FUNCTORS_DEFAULT_WORK_ALLOCATOR_H_INC_
 #define EMU_THREADS_FUNCTORS_DEFAULT_WORK_ALLOCATOR_H_INC_ 1
 
+#include "../../EmuCore/TMPHelpers/Values.h"
 #include <atomic>
 #include <chrono>
 #include <functional>
@@ -233,7 +234,7 @@ namespace EmuThreads::Functors
 			}
 			else
 			{
-				static_assert(false, "Attempted to allocate a task via EmuThreading::Functors::default_work_allocator, but the provided Func_ type cannot be invoked with the provided Args_.");
+				static_assert(EmuCore::TMP::get_false<Func_>(), "Attempted to allocate a task via EmuThreading::Functors::default_work_allocator, but the provided Func_ type cannot be invoked with the provided Args_.");
 			}
 		}
 

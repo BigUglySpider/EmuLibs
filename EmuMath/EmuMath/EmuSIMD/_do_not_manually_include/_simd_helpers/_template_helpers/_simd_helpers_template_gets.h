@@ -3,6 +3,7 @@
 
 #include "_underlying_template_helpers/_common_underlying_simd_template_helper_includes.h"
 #include "_underlying_template_helpers/_simd_helpers_underlying_get.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD
 {
@@ -24,7 +25,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to extract a SIMD register index via EmuSIMD::get_index, but the provided register_ is not recognised as a SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Out_>(), "Attempted to extract a SIMD register index via EmuSIMD::get_index, but the provided register_ is not recognised as a SIMD register.");
 		}
 	}
 
@@ -48,7 +49,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to extract a SIMD register index via EmuSIMD::get_index, but the provided register_ is not recognised as a SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Out_>(), "Attempted to extract a SIMD register index via EmuSIMD::get_index, but the provided register_ is not recognised as a SIMD register.");
 		}
 	}
 }

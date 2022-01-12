@@ -5,6 +5,7 @@
 #include <limits>
 #include <type_traits>
 #include "../TMPHelpers/TimeTMP.h"
+#include "../TMPHelpers/Values.h"
 
 namespace EmuCore
 {
@@ -309,7 +310,7 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Attempted to retrieve an EmuCore::Timer duration with a type that is not an instance of std::chrono::duration.");
+				static_assert(EmuCore::TMP::get_false<Duration_>(), "Attempted to retrieve an EmuCore::Timer duration with a type that is not an instance of std::chrono::duration.");
 			}
 		}
 
@@ -322,7 +323,7 @@ namespace EmuCore
 			}
 			else
 			{
-				static_assert(false, "Attempted to peek at an EmuCore::Timer duration with a type that is not an instance of std::chrono::duration.");
+				static_assert(EmuCore::TMP::get_false<Duration_>(), "Attempted to peek at an EmuCore::Timer duration with a type that is not an instance of std::chrono::duration.");
 			}
 		}
 

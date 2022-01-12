@@ -1,6 +1,8 @@
 #ifndef EMU_THREADS_DEFAULT_PARALLEL_LOOP_ITERATION_ALLOCATOR_H_INC_
 #define EMU_THREADS_DEFAULT_PARALLEL_LOOP_ITERATION_ALLOCATOR_H_INC_ 1
 
+#include "../../../EmuCore/TMPHelpers/Values.h"
+
 namespace EmuThreads::Functors
 {
 	template<class Executor_>
@@ -23,17 +25,17 @@ namespace EmuThreads::Functors
 					}
 					else
 					{
-						static_assert(false, "Attempted to allocate a parallel loop iteration via default_parallel_loop_iteration_allocator, but the provided Func_ cannot be invoked with a tuple of the provided iterators, and the single iterator in the tuple cannot be used as a lone argument in the fallback operation.");
+						static_assert(EmuCore::TMP::get_false<Executor_>(), "Attempted to allocate a parallel loop iteration via default_parallel_loop_iteration_allocator, but the provided Func_ cannot be invoked with a tuple of the provided iterators, and the single iterator in the tuple cannot be used as a lone argument in the fallback operation.");
 					}
 				}
 				else
 				{
-					static_assert(false, "Attempted to allocate a parallel loop iteration via default_parallel_loop_iteration_allocator, but the provided Func_ cannot be invoked with a tuple of the provided iterators.");
+					static_assert(EmuCore::TMP::get_false<Executor_>(), "Attempted to allocate a parallel loop iteration via default_parallel_loop_iteration_allocator, but the provided Func_ cannot be invoked with a tuple of the provided iterators.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to allocate a parallel loop iteration via default_parallel_loop_iteration_allocator, but the provided Func_ cannot be copy constructed. As this can cause undesirable behaviours with task allocation, this behaviour has been blocked.");
+				static_assert(EmuCore::TMP::get_false<Executor_>(), "Attempted to allocate a parallel loop iteration via default_parallel_loop_iteration_allocator, but the provided Func_ cannot be copy constructed. As this can cause undesirable behaviours with task allocation, this behaviour has been blocked.");
 			}
 		}
 
@@ -48,12 +50,12 @@ namespace EmuThreads::Functors
 				}
 				else
 				{
-					static_assert(false, "Attempted to allocate a parallel loop iteration via default_parallel_loop_iteration_allocator, but the provided Func_ cannot be invoked with the provided single non-tuple Iterator_ argument type.");
+					static_assert(EmuCore::TMP::get_false<Func_>(), "Attempted to allocate a parallel loop iteration via default_parallel_loop_iteration_allocator, but the provided Func_ cannot be invoked with the provided single non-tuple Iterator_ argument type.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to allocate a parallel loop iteration via default_parallel_loop_iteration_allocator, but the provided Func_ cannot be copy constructed. As this can cause undesirable behaviours with task allocation, this behaviour has been blocked.");
+				static_assert(EmuCore::TMP::get_false<Func_>(), "Attempted to allocate a parallel loop iteration via default_parallel_loop_iteration_allocator, but the provided Func_ cannot be copy constructed. As this can cause undesirable behaviours with task allocation, this behaviour has been blocked.");
 			}
 		}
 	};

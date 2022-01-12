@@ -1,12 +1,13 @@
 #ifndef EMU_MATH_COMMON_NOISE_GEN_FUNCTOR_INCLUDES_H_INC_
 #define EMU_MATH_COMMON_NOISE_GEN_FUNCTOR_INCLUDES_H_INC_ 1
 
-#include "NoisePermutations.h"
-#include "../_noise_info/NoiseType.h"
+#include "_noise_permutations.h"
+#include "../_noise_info/_noise_type.h"
 #include "../../../Random.h"
 #include "../../../Vector.h"
 #include "../../../../EmuCore/Functors/Arithmetic.h"
 #include "../../../../EmuCore/TMPHelpers/TypeComparators.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuMath::Functors::_underlying_noise_gen
 {
@@ -15,7 +16,7 @@ namespace EmuMath::Functors::_underlying_noise_gen
 	{
 		constexpr perlin_gradients()
 		{
-			static_assert(false, "Attempted to construct an unspecialised perlin_gradients instance.");
+			static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to construct an unspecialised perlin_gradients instance.");
 		}
 	};
 	template<typename T_>
@@ -35,7 +36,7 @@ namespace EmuMath::Functors::_underlying_noise_gen
 			}
 			else
 			{
-				static_assert(false, "Attempted to retrieve a 1D perlin noise gradient via compile-time index, but the provided Index_ was not in the valid range. The valid range is 0:1 (inclusive).");
+				static_assert(EmuCore::TMP::get_false<std::size_t, Index_>(), "Attempted to retrieve a 1D perlin noise gradient via compile-time index, but the provided Index_ was not in the valid range. The valid range is 0:1 (inclusive).");
 			}
 		}
 
@@ -70,7 +71,7 @@ namespace EmuMath::Functors::_underlying_noise_gen
 			}
 			else
 			{
-				static_assert(false, "Attempted to retrieve a 2D perlin noise gradient via compile-time index, but the provided Index_ was not in the valid range. The valid range is 0:7 (inclusive).");
+				static_assert(EmuCore::TMP::get_false<std::size_t, Index_>(), "Attempted to retrieve a 2D perlin noise gradient via compile-time index, but the provided Index_ was not in the valid range. The valid range is 0:7 (inclusive).");
 			}
 		}
 
@@ -114,7 +115,7 @@ namespace EmuMath::Functors::_underlying_noise_gen
 			}
 			else
 			{
-				static_assert(false, "Attempted to retrieve a 3D perlin noise gradient via compile-time index, but the provided Index_ was not in the valid range. The valid range is 0:15 (inclusive).");
+				static_assert(EmuCore::TMP::get_false<std::size_t, Index_>(), "Attempted to retrieve a 3D perlin noise gradient via compile-time index, but the provided Index_ was not in the valid range. The valid range is 0:15 (inclusive).");
 			}
 		}
 

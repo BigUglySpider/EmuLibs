@@ -2,6 +2,7 @@
 #define EMU_CORE_COMPARATOR_FUNCTORS_H_INC_ 1
 
 #include <functional>
+#include "../TMPHelpers/OperatorChecks.h"
 
 namespace EmuCore
 {
@@ -173,53 +174,161 @@ namespace EmuCore
 		}
 	};
 
-	template<typename A_, typename B_ = A_>
+	template<typename A_, typename B_ = A_, typename Out_ = EmuCore::TMP::remove_ref_cv_t<A_>>
 	struct do_min
 	{
-		const do_cmp_less<A_, B_> cmp_;
-		constexpr do_min() : cmp_()
+	private:
+		using _cmp_less_equal = EmuCore::do_cmp_less_equal<A_, B_>;
+
+	public:
+		constexpr do_min()
 		{
 		}
-		[[nodiscard]] constexpr inline A_ operator()(const A_& a_, const B_& b_) const
+		[[nodiscard]] constexpr inline Out_ operator()(const A_& a_, const B_& b_) const
 		{
-			return cmp_(a_, b_) ? a_ : static_cast<A_>(b_);
+			if (_cmp_less_equal()(a_, b_))
+			{
+				// min: a_
+				if constexpr (std::is_constructible_v<Out_, const A_&>)
+				{
+					return Out_(a_);
+				}
+				else if constexpr (EmuCore::TMP::is_static_castable_v<const A_&, Out_>)
+				{
+					return static_cast<Out_>(a_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Out_>(),
+						"Attempted to get the minimum of two values via EmuCore::do_min, but the provided type A_ cannot be used to create the desired Out_ type."
+					);
+				}
+			}
+			else
+			{
+				// min: b_
+				if constexpr (std::is_constructible_v<Out_, const B_&>)
+				{
+					return Out_(b_);
+				}
+				else if constexpr (EmuCore::TMP::is_static_castable_v<const B_&, Out_>)
+				{
+					return static_cast<Out_>(b_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Out_>(),
+						"Attempted to get the minimum of two values via EmuCore::do_min, but the provided type B_ cannot be used to create the desired Out_ type."
+					);
+				}
+			}
 		}
 	};
 	template<>
-	struct do_min<void, void>
+	struct do_min<void, void, void>
+	{
+		constexpr do_min()
+		{
+		}
+		template<typename A_, typename B_, typename Out_ = EmuCore::TMP::remove_ref_cv_t<A_>>
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_min<A_, B_, Out_>, const A_&, const B_&> operator()(const A_& a_, const B_& b_)
+		{
+			return do_min<A_, B_, Out_>()(a_, b_);
+		}
+	};
+	template<typename Out_>
+	struct do_min<void, void, Out_>
 	{
 		constexpr do_min()
 		{
 		}
 		template<typename A_, typename B_>
-		[[nodiscard]] constexpr inline auto operator()(A_&& a_, B_&& b_)
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_min<A_, B_, Out_>, const A_&, const B_&> operator()(const A_& a_, const B_& b_)
 		{
-			return do_min<A_, B_>()(std::forward<A_>(a_), std::forward<B_>(b_));
+			return do_min<A_, B_, Out_>()(a_, b_);
 		}
 	};
 
-	template<typename A_, typename B_ = A_>
+	template<typename A_, typename B_ = A_, typename Out_ = EmuCore::TMP::remove_ref_cv_t<A_>>
 	struct do_max
 	{
-		const do_cmp_greater<A_, B_> cmp_;
-		constexpr do_max() : cmp_()
+	private:
+		using _cmp_greater_equal = EmuCore::do_cmp_greater_equal<A_, B_>;
+
+	public:
+		constexpr do_max()
 		{
 		}
-		[[nodiscard]] constexpr inline A_ operator()(const A_& a_, const B_& b_) const
+		[[nodiscard]] constexpr inline Out_ operator()(const A_& a_, const B_& b_) const
 		{
-			return cmp_(a_, b_) ? a_ : static_cast<A_>(b_);
+			if (_cmp_greater_equal()(a_, b_))
+			{
+				// max: a_
+				if constexpr (std::is_constructible_v<Out_, const A_&>)
+				{
+					return Out_(a_);
+				}
+				else if constexpr (EmuCore::TMP::is_static_castable_v<const A_&, Out_>)
+				{
+					return static_cast<Out_>(a_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Out_>(),
+						"Attempted to get the maximum of two values via EmuCore::do_min, but the provided type A_ cannot be used to create the desired Out_ type."
+					);
+				}
+			}
+			else
+			{
+				// max: b_
+				if constexpr (std::is_constructible_v<Out_, const B_&>)
+				{
+					return Out_(b_);
+				}
+				else if constexpr (EmuCore::TMP::is_static_castable_v<const B_&, Out_>)
+				{
+					return static_cast<Out_>(b_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Out_>(),
+						"Attempted to get the maximum of two values via EmuCore::do_min, but the provided type B_ cannot be used to create the desired Out_ type."
+					);
+				}
+			}
 		}
 	};
 	template<>
-	struct do_max<void, void>
+	struct do_max<void, void, void>
+	{
+		constexpr do_max()
+		{
+		}
+		template<typename A_, typename B_, typename Out_ = EmuCore::TMP::remove_ref_cv_t<A_>>
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_max<A_, B_, Out_>, const A_&, const B_&> operator()(const A_& a_, const B_& b_)
+		{
+			return do_max<A_, B_, Out_>()(a_, b_);
+		}
+	};
+	template<typename Out_>
+	struct do_max<void, void, Out_>
 	{
 		constexpr do_max()
 		{
 		}
 		template<typename A_, typename B_>
-		[[nodiscard]] constexpr inline auto operator()(A_&& a_, B_&& b_) const
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_max<A_, B_, Out_>, const A_&, const B_&> operator()(const A_& a_, const B_& b_)
 		{
-			return do_max<A_, B_>()(std::forward<A_>(a_), std::forward<B_>(b_));
+			return do_max<A_, B_, Out_>()(a_, b_);
 		}
 	};
 }

@@ -5,6 +5,7 @@
 #include "_simd_helpers_template_cast.h"
 #include "_simd_helpers_template_gets.h"
 #include "_simd_helpers_template_shuffles.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD
 {
@@ -38,12 +39,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::lerp, but the provided SIMD register type is unsupported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::lerp, but the provided SIMD register type is unsupported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::lerp with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::lerp with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -86,12 +87,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::lerp, but the provided SIMD register type is unsupported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::lerp, but the provided SIMD register type is unsupported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::lerp with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::lerp with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -188,7 +189,7 @@ namespace EmuSIMD
 				}
 				else
 				{
-					static_assert(false, "Attempted to perform EmuSIMD::horizontal_sum, but the the provided floating-point SIMD register type is unsupported for this operation.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::horizontal_sum, but the the provided floating-point SIMD register type is unsupported for this operation.");
 				}
 			}
 			else if constexpr (EmuSIMD::TMP::is_integral_simd_register_v<register_type_uq>)
@@ -252,22 +253,22 @@ namespace EmuSIMD
 					}
 					else
 					{
-						static_assert(false, "Attempted to perform EmuSIMD::horizontal_sum, but the provided integral SIMD register type is not supported for this operation.");
+						static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::horizontal_sum, but the provided integral SIMD register type is not supported for this operation.");
 					}
 				}
 				else
 				{
-					static_assert(false, "Attempted to perform EmuSIMD::horizontal_sum, but the provided bit width for each element within the passed integral SIMD register is invalid.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::horizontal_sum, but the provided bit width for each element within the passed integral SIMD register is invalid.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::horizontal_sum, but the provided SIMD register type is unsupported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::horizontal_sum, but the provided SIMD register type is unsupported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::horizontal_sum with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::horizontal_sum with an unsupported type as the passed Register_.");
 		}
 	}
 	template<std::size_t PerElementWidthIfInt_ = 32, class Register_>
@@ -321,17 +322,17 @@ namespace EmuSIMD
 				}
 				else
 				{
-					static_assert(false, "Attempted to perform EmuSIMD::horizontal_sum_fill with an integral SIMD register, but the provided bit-width per element is invalid.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::horizontal_sum_fill with an integral SIMD register, but the provided bit-width per element is invalid.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::horizontal_sum_fill with a SIMD register type that is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::horizontal_sum_fill with a SIMD register type that is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::horizontal_sum_fill with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::horizontal_sum_fill with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -357,12 +358,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::horizontal_sum_scalar, but the provided SIMD register type is unsupported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::horizontal_sum_scalar, but the provided SIMD register type is unsupported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::horizontal_sum_scalar with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::horizontal_sum_scalar with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -382,12 +383,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::dot, but the provided SIMD register type is unsupported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::dot, but the provided SIMD register type is unsupported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::dot with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::dot with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -413,12 +414,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::dot_scalar, but the provided SIMD register type is unsupported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::dot_scalar, but the provided SIMD register type is unsupported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::dot_scalar with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::dot_scalar with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -438,12 +439,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::dot_fill, but the provided SIMD register type is unsupported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::dot_fill, but the provided SIMD register type is unsupported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::dot_fill with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::dot_fill with an unsupported type as the passed Register_.");
 		}
 	}
 }

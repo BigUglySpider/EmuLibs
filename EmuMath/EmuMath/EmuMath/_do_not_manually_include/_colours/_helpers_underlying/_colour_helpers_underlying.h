@@ -2,6 +2,7 @@
 #define EMU_MATH_COLOUR_HELPERS_UNDERLYING_H_INC_ 1
 
 #include "_colour_helpers_underlying_common_includes.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuMath::Helpers::_underlying_colour_funcs
 {
@@ -67,8 +68,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			{
 				constexpr calc_type min_ratio_ = std::is_unsigned_v<OutChannel_> ? calc_type(0) : calc_type(-1);
 				constexpr calc_type max_ratio_ = calc_type(1);
-				constexpr EmuCore::do_clamp<calc_type, calc_type, calc_type> clamp_(min_ratio_, max_ratio_);
-				calc_type ratio_ = clamp_(static_cast<calc_type>(to_convert_));
+				calc_type ratio_ = EmuCore::do_clamp<calc_type, calc_type, calc_type>()(static_cast<calc_type>(to_convert_), min_ratio_, max_ratio_);
 				return static_cast<OutChannel_>(max_out_calc * ratio_);
 			}
 		}
@@ -84,8 +84,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			{
 				constexpr calc_type min_ratio_ = std::is_unsigned_v<OutChannel_> ? calc_type(0) : calc_type(-1);
 				constexpr calc_type max_ratio_ = calc_type(1);
-				constexpr EmuCore::do_clamp<calc_type, calc_type, calc_type> clamp_(min_ratio_, max_ratio_);
-				ratio_ = clamp_(ratio_);
+				ratio_ = EmuCore::do_clamp<calc_type, calc_type, calc_type>()(ratio_, min_ratio_, max_ratio_);
 				return static_cast<OutChannel_>(max_out_calc * ratio_);
 			}
 		}
@@ -343,12 +342,12 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform arithmetic with an EmuMath Colour, but the provided lhs_ was not an EmuMath Colour type.");
+				static_assert(EmuCore::TMP::get_false<Rhs_>(), "Attempted to perform arithmetic with an EmuMath Colour, but the provided lhs_ was not an EmuMath Colour type.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform arithmetic with an EmuMath Colour, but provided a non-EmuMath-Colour output OutColour_ type.");
+			static_assert(EmuCore::TMP::get_false<Rhs_>(), "Attempted to perform arithmetic with an EmuMath Colour, but provided a non-EmuMath-Colour output OutColour_ type.");
 		}
 	}
 
@@ -416,12 +415,12 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			}
 			else
 			{
-				static_assert(false, "Attempted to compare two EmuMath Colours, but the provided rhs_ was not an EmuMath colour.");
+				static_assert(EmuCore::TMP::get_false<AndOr_>(), "Attempted to compare two EmuMath Colours, but the provided rhs_ was not an EmuMath colour.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to compare two EmuMath Colours, but the provided lhs_ was not an EmuMath colour.");
+			static_assert(EmuCore::TMP::get_false<AndOr_>(), "Attempted to compare two EmuMath Colours, but the provided lhs_ was not an EmuMath colour.");
 		}
 	}
 
@@ -484,7 +483,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			static_assert(false, "Provided a_ and b_ colours with incompatible channels to _colour_lerp_t_colour. Channel compatibility should be resolved via colour_lerp.");
+			static_assert(EmuCore::TMP::get_false<OutColour_>(), "Provided a_ and b_ colours with incompatible channels to _colour_lerp_t_colour. Channel compatibility should be resolved via colour_lerp.");
 		}
 	}
 
@@ -510,19 +509,19 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 				(
 					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
-						static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::vector_get<0>(t_)))
+						static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), t_.template at<0>()))
 					),
 					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
-						static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), EmuMath::Helpers::vector_get<1>(t_)))
+						static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), t_.template at<1>()))
 					),
 					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
-						static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), EmuMath::Helpers::vector_get<2>(t_)))
+						static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), t_.template at<2>()))
 					),
 					_colour_convert_channel<out_channel_type, a_channel_type>
 					(
-						static_cast<a_channel_type>(lerp_(a_.A(), b_.A(), EmuMath::Helpers::vector_get<3>(t_)))
+						static_cast<a_channel_type>(lerp_(a_.A(), b_.A(), t_.template at<3>()))
 					)
 				);
 			}
@@ -540,7 +539,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 					(
 						_colour_convert_channel<out_channel_type, a_channel_type>
 						(
-							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::vector_get<0>(t_)))
+							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), t_.template at<0>()))
 						),
 						_colour_convert_channel<out_channel_type, a_channel_type>(a_.G()),
 						_colour_convert_channel<out_channel_type, a_channel_type>(a_.B())
@@ -552,11 +551,11 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 					(
 						_colour_convert_channel<out_channel_type, a_channel_type>
 						(
-							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::vector_get<0>(t_)))
+							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), t_.template at<0>()))
 						),
 						_colour_convert_channel<out_channel_type, a_channel_type>
 						(
-							static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), EmuMath::Helpers::vector_get<1>(t_)))
+							static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), t_.template at<1>()))
 						),
 						_colour_convert_channel<out_channel_type, a_channel_type>(a_.B())
 					);
@@ -567,15 +566,15 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 					(
 						_colour_convert_channel<out_channel_type, a_channel_type>
 						(
-							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), EmuMath::Helpers::vector_get<0>(t_)))
+							static_cast<a_channel_type>(lerp_(a_.R(), b_.R(), t_.template at<0>()))
 						),
 						_colour_convert_channel<out_channel_type, a_channel_type>
 						(
-							static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), EmuMath::Helpers::vector_get<1>(t_)))
+							static_cast<a_channel_type>(lerp_(a_.G(), b_.G(), t_.template at<1>()))
 						),
 						_colour_convert_channel<out_channel_type, a_channel_type>
 						(
-							static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), EmuMath::Helpers::vector_get<2>(t_)))
+							static_cast<a_channel_type>(lerp_(a_.B(), b_.B(), t_.template at<2>()))
 						)
 					);
 				}
@@ -583,7 +582,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			static_assert(false, "Provided a_ and b_ colours with incompatible channels to _colour_lerp_t_vector. Channel compatibility should be resolved via colour_lerp.");
+			static_assert(EmuCore::TMP::get_false<OutColour_>(), "Provided a_ and b_ colours with incompatible channels to _colour_lerp_t_vector. Channel compatibility should be resolved via colour_lerp.");
 		}
 	}
 
@@ -623,7 +622,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			static_assert(false, "Provided a_ and b_ colours with incompatible channels to _colour_lerp_t_scalar. Channel compatibility should be resolved via colour_lerp.");
+			static_assert(EmuCore::TMP::get_false<OutColour_>(), "Provided a_ and b_ colours with incompatible channels to _colour_lerp_t_scalar. Channel compatibility should be resolved via colour_lerp.");
 		}
 	}
 
@@ -669,17 +668,17 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 				}
 				else
 				{
-					static_assert(false, "Attempted to linearly interpolate two EmuMath Colours, but the provided input a_ was not an EmuMath Colour.");
+					static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to linearly interpolate two EmuMath Colours, but the provided input a_ was not an EmuMath Colour.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to linearly interpolate two EmuMath Colours, but the provided input a_ was not an EmuMath Colour.");
+				static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to linearly interpolate two EmuMath Colours, but the provided input a_ was not an EmuMath Colour.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to linearly interpolate two EmuMath Colours, but the provided output OutColour_ was not an EmuMath Colour type.");
+			static_assert(EmuCore::TMP::get_false<T_>(), "Attempted to linearly interpolate two EmuMath Colours, but the provided output OutColour_ was not an EmuMath Colour type.");
 		}
 	}
 
@@ -705,7 +704,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			static_assert(false, "Attempted to find an EmuMath Colour's min or max element, but the provided input Colour_ was not an EmuMath Colour.");
+			static_assert(EmuCore::TMP::get_false<Out_>(), "Attempted to find an EmuMath Colour's min or max element, but the provided input Colour_ was not an EmuMath Colour.");
 		}
 	}
 
@@ -720,12 +719,12 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 			}
 			else
 			{
-				static_assert(false, "Attempted to greyscale an EmuMath Colour, but the provided in_ colour was not an EmuMath Colour.");
+				static_assert(EmuCore::TMP::get_false<InColour_>(), "Attempted to greyscale an EmuMath Colour, but the provided in_ colour was not an EmuMath Colour.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to greyscale an EmuMath Colour, but the provided output OutColour_ type was not an EmuMath Colour type.");
+			static_assert(EmuCore::TMP::get_false<InColour_>(), "Attempted to greyscale an EmuMath Colour, but the provided output OutColour_ type was not an EmuMath Colour type.");
 		}
 	}
 
@@ -757,7 +756,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			static_assert(false, "Invalid arguments provided to colour_greyscale_basic_average.");
+			static_assert(EmuCore::TMP::get_false<OutColour_>(), "Invalid arguments provided to colour_greyscale_basic_average.");
 		}
 	}
 
@@ -790,7 +789,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			static_assert(false, "Invalid arguments provided to colour_greyscale_luminance_average.");
+			static_assert(EmuCore::TMP::get_false<OutColour_>(), "Invalid arguments provided to colour_greyscale_luminance_average.");
 		}
 	}
 
@@ -826,7 +825,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			static_assert(false, "Invalid arguments provided to colour_greyscale_desaturate.");
+			static_assert(EmuCore::TMP::get_false<OutColour_>(), "Invalid arguments provided to colour_greyscale_desaturate.");
 		}
 	}
 
@@ -854,7 +853,7 @@ namespace EmuMath::Helpers::_underlying_colour_funcs
 		}
 		else
 		{
-			static_assert(false, "Invalid arguments provided to colour_greyscale_decompose.");
+			static_assert(EmuCore::TMP::get_false<OutColour_>(), "Invalid arguments provided to colour_greyscale_decompose.");
 		}
 	}
 }

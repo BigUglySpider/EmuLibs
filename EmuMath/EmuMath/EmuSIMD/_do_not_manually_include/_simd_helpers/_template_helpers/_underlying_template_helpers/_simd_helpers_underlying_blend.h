@@ -4,6 +4,7 @@
 #include "_common_underlying_simd_template_helper_includes.h"
 #include "_simd_helpers_underlying_blend_mask.h"
 #include "_simd_helpers_underlying_shuffle.h"
+#include "../../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD::_underlying_simd_helpers
 {
@@ -134,17 +135,17 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to execute a SIMD vectorwise blend (blendv) on an integral register, but the bit-width per element is invalid.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to execute a SIMD vectorwise blend (blendv) on an integral register, but the bit-width per element is invalid.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to execute a SIMD vectorwise blend (blendv), but the provided SIMD register is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to execute a SIMD vectorwise blend (blendv), but the provided SIMD register is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to execute a SIMD vectorwise blend (blendv), but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to execute a SIMD vectorwise blend (blendv), but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -176,12 +177,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 						}
 						else
 						{
-							static_assert(false, "Attempted to execute SIMD blend with index arguments which result in a vectorwise blend mask for a blendv operation, however the index argument count cannot be successfully used to determine a per-element width (in bits) for the register.");
+							static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to execute SIMD blend with index arguments which result in a vectorwise blend mask for a blendv operation, however the index argument count cannot be successfully used to determine a per-element width (in bits) for the register.");
 						}
 					}
 					else
 					{
-						static_assert(false, "Attempted to execute SIMD blend with index arguments which result in a vectorwise blend mask for a blendv operation, however the passed SIMD register is not supported for EmuMath's blendv functionality.");
+						static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to execute SIMD blend with index arguments which result in a vectorwise blend mask for a blendv operation, however the passed SIMD register is not supported for EmuMath's blendv functionality.");
 					}
 				}
 				else
@@ -258,28 +259,28 @@ namespace EmuSIMD::_underlying_simd_helpers
 						{
 							if constexpr (per_element_width_ == 8)
 							{
-								static_assert(false, "Attempted to execute a SIMD blend, but the provided arguments and register resulted in an attempt at blending an integral register in 8-bit fields without deferring to blendv. This behaviour is prohibited.");
+								static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to execute a SIMD blend, but the provided arguments and register resulted in an attempt at blending an integral register in 8-bit fields without deferring to blendv. This behaviour is prohibited.");
 							}
 							else
 							{
-								static_assert(false, "Attempted to execute SIMD blend with integral registers, however the index argument count cannot be successfully used to determine a per-element width (in bits) for the register.");
+								static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to execute SIMD blend with integral registers, however the index argument count cannot be successfully used to determine a per-element width (in bits) for the register.");
 							}
 						}
 					}
 					else
 					{
-						static_assert(false, "Attempted to execute a SIMD blend via EmuSIMD helpers using a SIMD register that is not supported for this operation.");
+						static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to execute a SIMD blend via EmuSIMD helpers using a SIMD register that is not supported for this operation.");
 					}
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to execute a SIMD blend, but the provided IndexUsesB_ arguments were not valid for creating a mask for the provided SIMD register type.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to execute a SIMD blend, but the provided IndexUsesB_ arguments were not valid for creating a mask for the provided SIMD register type.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to execute a SIMD blend, but the provided Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to execute a SIMD blend, but the provided Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 }

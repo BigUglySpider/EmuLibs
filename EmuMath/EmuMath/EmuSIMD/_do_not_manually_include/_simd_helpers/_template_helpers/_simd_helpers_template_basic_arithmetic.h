@@ -3,6 +3,7 @@
 
 #include "_underlying_template_helpers/_common_underlying_simd_template_helper_includes.h"
 #include "_underlying_template_helpers/_simd_helpers_underlying_basic_arithmetic.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD
 {
@@ -34,7 +35,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::add with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::add with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -66,7 +67,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::sub with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::sub with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -102,7 +103,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::mul with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::mul with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -142,7 +143,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::mul_all with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::mul_all with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -172,12 +173,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::mullo with a non-integral SIMD register. Integral registers are required for this operation.");
+				static_assert(EmuCore::TMP::get_false<IntegralRegister_>(), "Attempted to perform EmuSIMD::mullo with a non-integral SIMD register. Integral registers are required for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::mullo with an unsupported type as the passed IntegralRegister_.");
+			static_assert(EmuCore::TMP::get_false<IntegralRegister_>(), "Attempted to perform EmuSIMD::mullo with an unsupported type as the passed IntegralRegister_.");
 		}
 	}
 
@@ -212,7 +213,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::sub with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::sub with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -247,7 +248,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::mod with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::mod with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -273,7 +274,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::negate with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::negate with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -307,12 +308,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::fmadd with SIMD register that is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::fmadd with SIMD register that is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::fmadd with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::fmadd with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -346,12 +347,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::fmsub with SIMD register that is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::fmsub with SIMD register that is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::fmsub with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::fmsub with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -388,12 +389,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::fmaddsub with SIMD register that is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::fmaddsub with SIMD register that is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::fmaddsub with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::fmaddsub with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -430,12 +431,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::fmsubadd with SIMD register that is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::fmsubadd with SIMD register that is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::fmsubadd with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::fmsubadd with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -469,12 +470,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::addsub with SIMD register that is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::addsub with SIMD register that is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::addsub with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::addsub with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -507,12 +508,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::subadd with SIMD register that is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::subadd with SIMD register that is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::subadd with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::subadd with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -526,7 +527,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::round with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::round with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -540,7 +541,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::floor with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::floor with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -554,7 +555,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::ceil with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::ceil with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -568,7 +569,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::trunc with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::trunc with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -582,7 +583,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::vector_min with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::vector_min with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -596,7 +597,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::vector_max with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::vector_max with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -610,7 +611,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::clamp_min with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::clamp_min with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -624,7 +625,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::clamp_max with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::clamp_max with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -638,7 +639,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::clamp with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::clamp with an unsupported type as the passed Register_.");
 		}
 	}
 }

@@ -3,6 +3,7 @@
 
 #include "_underlying_template_helpers/_common_underlying_simd_template_helper_includes.h"
 #include "_underlying_template_helpers/_simd_helpers_underlying_bitwise.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD
 {
@@ -16,7 +17,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to use EmuSIMD::bitwise_and with a non-SIMD register type, or a SIMD register that is not supported.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to use EmuSIMD::bitwise_and with a non-SIMD register type, or a SIMD register that is not supported.");
 		}
 	}
 
@@ -30,7 +31,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to use EmuSIMD::bitwise_or with a non-SIMD register type, or a SIMD register that is not supported.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to use EmuSIMD::bitwise_or with a non-SIMD register type, or a SIMD register that is not supported.");
 		}
 	}
 
@@ -44,7 +45,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to use EmuSIMD::bitwise_xor with a non-SIMD register type, or a SIMD register that is not supported.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to use EmuSIMD::bitwise_xor with a non-SIMD register type, or a SIMD register that is not supported.");
 		}
 	}
 
@@ -58,7 +59,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to use EmuSIMD::bitwise_andnot with a non-SIMD register type, or a SIMD register that is not supported.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to use EmuSIMD::bitwise_andnot with a non-SIMD register type, or a SIMD register that is not supported.");
 		}
 	}
 
@@ -72,7 +73,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to use EmuSIMD::bitwise_andnot with a non-SIMD register type, or a SIMD register that is not supported.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to use EmuSIMD::bitwise_andnot with a non-SIMD register type, or a SIMD register that is not supported.");
 		}
 	}
 }

@@ -2,62 +2,26 @@
 #define EMU_CORE_ARITHMETIC_FUNCTORS_H_INC_ 1
 
 #include "../ArithmeticHelpers/CommonMath.h"
+#include "../TMPHelpers/OperatorChecks.h"
 #include "../TMPHelpers/TypeComparators.h"
+#include "../TMPHelpers/TypeConvertors.h"
+#include "../TMPHelpers/Values.h"
+#include "../TMPHelpers/VariadicHelpers.h"
 #include <cstddef>
 #include <functional>
 
 namespace EmuCore
 {
+#pragma region SPECIAL_ARITHMETIC_FUNCTORS
 	/// <summary>
-	/// <para> Functor which may be used to perform linear interpolations. </para>
-	/// <para> Takes 3 type arguments, however only one or two may be passed. B_ will be the same type as A_ if omitted. T_ will be float if omitted. </para>
-	/// <para> Types should be considered for the equation A_ + ((B_ - A_) * T_). </para>
-	/// <para> do_lerp&lt;void&gt;, do_lerp&lt;void, void&gt;, and do_lerp&lt;void, void, void&gt; are reserved for a generic specialisation of do_lerp. </para>
+	/// <para> Template square root functor, used to calculate the square root of a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this functor provides a guarantee to perform a constexpr sqrt. Specialisations must follow this behaviour. 
+	///		It should be noted that constexpr sqrts could potentially make performance sacrifices, and as such this should not be used for items that are guaranteed 
+	///		to be executed at runtime.
+	/// </para>
 	/// </summary>
-	/// <typeparam name="A_">Type used to represent a in the equation a + ((b - a) * t).</typeparam>
-	/// <typeparam name="B_">Type used to represent b in the equation a + ((b - a) * t).</typeparam>
-	/// <typeparam name="T_">Type used to represent t in the equation a + ((b - a) * t).</typeparam>
-	template<class A_, class B_ = A_, class T_ = float>
-	struct do_lerp
-	{
-		constexpr do_lerp()
-		{
-		}
-		[[nodiscard]] constexpr inline auto operator()(const A_& a_, const B_& b_, const T_& t_) const
-		{
-			if constexpr
-			(
-				EmuCore::TMP::is_any_floating_point_v<A_, B_, T_> &&
-				!EmuCore::TMP::are_all_comparisons_true<std::is_same, A_, B_, T_>::value
-			)
-			{
-				using floating_point = typename EmuCore::TMP::largest_floating_point<A_, B_, T_>::type;
-				floating_point a_cast_ = static_cast<floating_point>(a_);
-				return a_cast_ + ((static_cast<floating_point>(b_) - a_cast_) * static_cast<floating_point>(t_));
-			}
-			else
-			{
-				return (a_ + ((b_ - a_) * t_));
-			}
-		}
-	};
-	/// <summary>
-	/// <para> Reserved generic specialisation of do_lerp. </para>
-	/// <para> Determines the specialisation to make use of when the function operator() is called, based on the 3 arguments when called. </para>
-	/// </summary>
-	template<>
-	struct do_lerp<void, void, void>
-	{
-		constexpr do_lerp()
-		{
-		}
-		template<class A_, class B_, class T_>
-		[[nodiscard]] constexpr inline auto operator()(const A_& a_, const B_& b_, const T_& t_) const
-		{
-			return do_lerp<A_, B_, T_>()(a_, b_, t_);
-		}
-	};
-
 	template<typename T_>
 	struct do_sqrt_constexpr
 	{
@@ -78,12 +42,17 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline auto operator()(const T_& val_) const
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_sqrt_constexpr<T_>, const T_&> operator()(const T_& val_) const
 		{
 			return do_sqrt_constexpr<T_>()(val_);
 		}
 	};
 
+	/// <summary>
+	/// <para> Template square root functor, used to calculate the square root of a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_sqrt_constexpr` template. </para>
+	/// </summary>
 	template<typename T_>
 	struct do_sqrt
 	{
@@ -113,15 +82,22 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] inline auto operator()(const T_& val_) const
+		[[nodiscard]] inline std::invoke_result_t<do_sqrt<T_>, const T_&> operator()(const T_& val_) const
 		{
 			return do_sqrt<T_>()(val_);
 		}
 	};
+#pragma endregion
 
-	/// <summary> 
-	/// <para> Constexpr flooring functor. </para>
-	/// <para> Unless specialised, the valid range for values this can take is min(int64_t):max(uint64_t). </para>
+#pragma region ROUNDING_FUNCTORS
+	/// <summary>
+	/// <para> Template floor-rounding functor, used to round a value of type T_ toward negative infinity. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this functor provides a guarantee to perform a constexpr round. Specialisations must follow this behaviour. 
+	///		It should be noted that constexpr rounds could potentially make performance sacrifices, and as such this should not be used for items that are guaranteed 
+	///		to be executed at runtime.
+	/// </para>
 	/// </summary>
 	template<typename T_>
 	struct do_floor_constexpr
@@ -166,9 +142,14 @@ namespace EmuCore
 		}
 	};
 
-	/// <summary> 
-	/// <para> Constexpr ceiling functor. </para>
-	/// <para> Unless specialised, the valid range for values this can take is min(int64_t):max(uint64_t). </para>
+	/// <summary>
+	/// <para> Template ceil-rounding functor, used to round a value of type T_ toward positive infinity. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this functor provides a guarantee to perform a constexpr round. Specialisations must follow this behaviour. 
+	///		It should be noted that constexpr rounds could potentially make performance sacrifices, and as such this should not be used for items that are guaranteed 
+	///		to be executed at runtime.
+	/// </para>
 	/// </summary>
 	template<typename T_>
 	struct do_ceil_constexpr
@@ -212,9 +193,14 @@ namespace EmuCore
 		}
 	};
 
-	/// <summary> 
-	/// <para> Constexpr flooring functor. </para>
-	/// <para> Unless specialised, the valid range for values this can take is min(int64_t):max(int64_t). </para>
+	/// <summary>
+	/// <para> Template truncation functor, used to round a value of type T_ toward 0. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this functor provides a guarantee to perform a constexpr round. Specialisations must follow this behaviour. 
+	///		It should be noted that constexpr rounds could potentially make performance sacrifices, and as such this should not be used for items that are guaranteed 
+	///		to be executed at runtime.
+	/// </para>
 	/// </summary>
 	template<typename T_>
 	struct do_trunc_constexpr
@@ -247,6 +233,11 @@ namespace EmuCore
 		}
 	};
 
+	/// <summary>
+	/// <para> Template floor-rounding functor, used to round a value of type T_ toward negative infinity. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_floor_constexpr` template. </para>
+	/// </summary>
 	template<typename T_>
 	struct do_floor
 	{
@@ -265,12 +256,17 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline auto operator()(const T_& val_) const
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_floor<T_>, const T_&> operator()(const T_& val_) const
 		{
 			return do_floor<T_>()(val_);
 		}
 	};
 
+	/// <summary>
+	/// <para> Template ceil-rounding functor, used to round a value of type T_ toward positive infinity. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_ceil_constexpr` template. </para>
+	/// </summary>
 	template<typename T_>
 	struct do_ceil
 	{
@@ -289,12 +285,17 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline auto operator()(const T_& val_) const
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_ceil<T_>, const T_&> operator()(const T_& val_) const
 		{
 			return do_ceil<T_>()(val_);
 		}
 	};
 
+	/// <summary>
+	/// <para> Template truncation functor, used to round a value of type T_ toward 0. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_trunc_constexpr` template. </para>
+	/// </summary>
 	template<typename T_>
 	struct do_trunc
 	{
@@ -313,25 +314,35 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline auto operator()(const T_& val_) const
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_trunc<T_>, const T_&> operator()(const T_& val_) const
 		{
 			return do_trunc<T_>()(val_);
 		}
 	};
+#pragma endregion
 
-	template<typename Lhs_, typename Rhs_ = Lhs_>
+#pragma region CONST_OPERATOR_ARITHMETIC_FUNCTORS
+	/// <summary>
+	/// <para> Template addition functor which allows specialisation for separate left-hand and right-hand argument types. </para>
+	/// <para> Rhs_ will default to Lhs_ unless an explicit argument for Rhs_ is provided. </para>
+	/// <para> If Lhs_ and Rhs_ are void, the correct specialisation of this functor will be invoked based on arguments passed on invocation. </para>
+	/// </summary>
+	template<typename Lhs_ = void, typename Rhs_ = Lhs_>
 	struct do_add
 	{
-	private:
-		const std::plus<void> adder_;
-
-	public:
-		constexpr do_add() : adder_()
+		constexpr do_add()
 		{
 		}
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline EmuCore::TMP::plus_operator_result_t<const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return adder_(lhs_, rhs_);
+			if constexpr (EmuCore::TMP::has_plus_operator_v<const Lhs_&, const Rhs_&>)
+			{
+				return lhs_ + rhs_;
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<Lhs_>(), "Attempted to perform a add operation via EmuCore::do_add, but the provided Lhs_ type does not have a const + operator which takes a const Rhs_ ref argument.");
+			}
 		}
 	};
 	template<>
@@ -342,25 +353,33 @@ namespace EmuCore
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_add<Lhs_, Rhs_>, const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			return do_add<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
 	};
 
-	template<typename Lhs_, typename Rhs_ = Lhs_>
+	/// <summary>
+	/// <para> Template subtraction functor which allows specialisation for separate left-hand and right-hand argument types. </para>
+	/// <para> Rhs_ will default to Lhs_ unless an explicit argument for Rhs_ is provided. </para>
+	/// <para> If Lhs_ and Rhs_ are void, the correct specialisation of this functor will be invoked based on arguments passed on invocation. </para>
+	/// </summary>
+	template<typename Lhs_ = void, typename Rhs_ = Lhs_>
 	struct do_subtract
 	{
-	private:
-		const std::minus<void> subtractor_;
-
-	public:
-		constexpr do_subtract() : subtractor_()
+		constexpr do_subtract()
 		{
 		}
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline EmuCore::TMP::subtract_operator_result_t<const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return subtractor_(lhs_, rhs_);
+			if constexpr (EmuCore::TMP::has_subtract_operator_v<const Lhs_&, const Rhs_&>)
+			{
+				return lhs_ - rhs_;
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<Lhs_>(), "Attempted to perform a subtract operation via EmuCore::do_subtract, but the provided Lhs_ type does not have a const - operator which takes a const Rhs_ ref argument.");
+			}
 		}
 	};
 	template<>
@@ -371,25 +390,33 @@ namespace EmuCore
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline std::invoke_result_t<do_subtract<Lhs_, Rhs_>, const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			return do_subtract<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
 	};
 
-	template<typename Lhs_, typename Rhs_ = Lhs_>
+	/// <summary>
+	/// <para> Template multiplication functor which allows specialisation for separate left-hand and right-hand argument types. </para>
+	/// <para> Rhs_ will default to Lhs_ unless an explicit argument for Rhs_ is provided. </para>
+	/// <para> If Lhs_ and Rhs_ are void, the correct specialisation of this functor will be invoked based on arguments passed on invocation. </para>
+	/// </summary>
+	template<typename Lhs_ = void, typename Rhs_ = Lhs_>
 	struct do_multiply
 	{
-	private:
-		const std::multiplies<void> multiplier_;
-
-	public:
-		constexpr do_multiply() : multiplier_()
+		constexpr do_multiply()
 		{
 		}
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline EmuCore::TMP::multiply_operator_result_t<const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return multiplier_(lhs_, rhs_);
+			if constexpr (EmuCore::TMP::has_multiply_operator_v<const Lhs_&, const Rhs_&>)
+			{
+				return lhs_ * rhs_;
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<Lhs_>(), "Attempted to perform a multiply operation via EmuCore::do_multiply, but the provided Lhs_ type does not have a const * operator which takes a const Rhs_ ref argument.");
+			}
 		}
 	};
 	template<>
@@ -400,25 +427,33 @@ namespace EmuCore
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline std::invoke_result_t<do_multiply<Lhs_, Rhs_>, const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			return do_multiply<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
 	};
 
-	template<typename Lhs_, typename Rhs_ = Lhs_>
+	/// <summary>
+	/// <para> Template division functor which allows specialisation for separate left-hand and right-hand argument types. </para>
+	/// <para> Rhs_ will default to Lhs_ unless an explicit argument for Rhs_ is provided. </para>
+	/// <para> If Lhs_ and Rhs_ are void, the correct specialisation of this functor will be invoked based on arguments passed on invocation. </para>
+	/// </summary>
+	template<typename Lhs_ = void, typename Rhs_ = Lhs_>
 	struct do_divide
 	{
-	private:
-		const std::divides<void> divider_;
-
-	public:
-		constexpr do_divide() : divider_()
+		constexpr do_divide()
 		{
 		}
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline EmuCore::TMP::divide_operator_result_t<const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return divider_(lhs_, rhs_);
+			if constexpr (EmuCore::TMP::has_divide_operator_v<const Lhs_&, const Rhs_&>)
+			{
+				return lhs_ / rhs_;
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<Lhs_>(), "Attempted to perform a divide operation via EmuCore::do_divide, but the provided Lhs_ type does not have a const / operator which takes a const Rhs_ ref argument.");
+			}
 		}
 	};
 	template<>
@@ -429,25 +464,120 @@ namespace EmuCore
 		{
 		}
 		template<typename Lhs_, typename Rhs_>
-		[[nodiscard]] constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		constexpr inline std::invoke_result_t<do_divide<Lhs_, Rhs_>, const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
 		{
 			return do_divide<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
 	};
 
-	template<typename T_>
+	/// <summary>
+	/// <para> Template modulo-division functor which allows specialisation for separate left-hand and right-hand argument types. </para>
+	/// <para> Rhs_ will default to Lhs_ unless an explicit argument for Rhs_ is provided. </para>
+	/// <para> If Lhs_ and Rhs_ are void, the correct specialisation of this functor will be invoked based on arguments passed on invocation. </para>
+	/// <para> If either Lhs_ or Rhs_ is a floating-point type, this will output the results of an fmod operation by default. </para>
+	/// </summary>
+	template<typename Lhs_, typename Rhs_>
+	struct do_mod
+	{
+	private:
+		static constexpr bool is_floating_point_mod = std::is_floating_point_v<Lhs_> || std::is_floating_point_v<Rhs_>;
+		template<typename InT_, bool IsFmod_ = is_floating_point_mod>
+		struct _out_finder
+		{
+			using out_type = EmuCore::TMP::mod_operator_result_t<const InT_&, const Rhs_&>;
+		};
+		template<typename InT_>
+		struct _out_finder<InT_, false>
+		{
+			using out_type = EmuCore::TMP::mod_operator_result_t<const InT_&, const Rhs_&>;
+		};
+		template<typename InT_>
+		struct _out_finder<InT_, true>
+		{
+			using out_type = decltype(EmuCore::FmodConstexpr<InT_, Rhs_>(std::declval<InT_>(), std::declval<Rhs_>()));
+		};
+
+	public:
+		using out_type = typename _out_finder<Lhs_>::out_type;
+
+		constexpr do_mod()
+		{
+		}
+		constexpr inline out_type operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			if constexpr (is_floating_point_mod)
+			{
+				return EmuCore::FmodConstexpr<Lhs_, Rhs_>(lhs_, rhs_);
+			}
+			else if constexpr (EmuCore::TMP::has_mod_operator_v<const Lhs_&, const Rhs_&>)
+			{
+				return lhs_ % rhs_;
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<Lhs_>(), "Attempted to perform a mod operation via EmuCore::do_mod, but the provided Lhs_ type does not have a valid % operator which takes the provided const Rhs_ operand, and is not a fall back to an fmod call.");
+			}
+		}
+	};
+	template<>
+	struct do_mod<void, void>
+	{
+		constexpr do_mod()
+		{
+		}
+		template<typename Lhs_, typename Rhs_>
+		constexpr inline std::invoke_result_t<do_mod<Lhs_, Rhs_>, const Lhs_&, const Rhs_&> operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		{
+			return do_mod<Lhs_, Rhs_>()(lhs_, rhs_);
+		}
+	};
+
+	/// <summary>
+	/// <para> Template negation functor, which provides additional wrapping to provide better-expected results if T_ is unsigned. </para>
+	/// <para> Note that the additional wrapping is performed at compile time, and is only within the default functor. </para>
+	/// <para> 
+	///		If T_ is unsigned, it will be cast to the next signed integral width before negation, if possible; otherwise it will be cast to a double before negation. 
+	///		(e.g. T_ = uint32_t will be cast to int64_t, T_ = uint64_t will be cast to double). 
+	///		It is most likely that the cast will result in a different output type to the passed type.
+	/// </para>
+	/// <para> Defaults to T_ = void, which may be invoked with any type argument and will invoke the do_negate for the type passed on invocation. </para>
+	/// </summary>
+	template<typename T_ = void>
 	struct do_negate
 	{
 	private:
-		const std::negate<void> negator_;
+		template<typename InT_, bool IsUnsigned_ = std::is_unsigned_v<InT_>>
+		struct _unsigned_helper
+		{
+			using out_type = EmuCore::TMP::unary_minus_operator_result_t<const InT_&>;
+		};
+		template<typename InT_>
+		struct _unsigned_helper<InT_, true>
+		{
+			using signed_type = std::make_signed_t<InT_>;
+			using next_size_type = EmuCore::TMP::next_size_up_t<signed_type>;
+			using cast_type = std::conditional_t<(sizeof(next_size_type) > sizeof(InT_)), next_size_type, double>;
+			using out_type = EmuCore::TMP::unary_minus_operator_result_t<cast_type>;
+		};
+
+		using _type_helper = _unsigned_helper<T_>;
 
 	public:
-		constexpr do_negate() : negator_()
+		using out_type = typename _type_helper::out_type;
+
+		constexpr do_negate()
 		{
 		}
-		[[nodiscard]] constexpr inline auto operator()(const T_& val_) const
+		[[nodiscard]] constexpr inline out_type operator()(const T_& val_) const
 		{
-			return negator_(val_);
+			if constexpr (std::is_unsigned_v<T_>)
+			{
+				return -static_cast<typename _type_helper::cast_type>(val_);
+			}
+			else
+			{
+				return -val_;
+			}
 		}
 	};
 	template<>
@@ -458,186 +588,519 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline auto operator()(const T_& val_) const
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_negate<T_>, const T_&> operator()(const T_& val_) const
 		{
 			return do_negate<T_>()(val_);
 		}
 	};
+#pragma endregion
 
-	template<typename T_>
-	struct do_cos
+#pragma region ARITHMETIC_OPERATOR_ASSIGN_FUNCTORS
+	template<typename Lhs_, typename Rhs_ = Lhs_>
+	struct do_add_assign
 	{
-		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
-		constexpr do_cos()
+		using result_type = std::conditional_t
+		<
+			EmuCore::TMP::has_plus_assign_operator_v<Lhs_&, const Rhs_&>,
+			EmuCore::TMP::plus_assign_operator_result_t<Lhs_&, const Rhs_&>,
+			Lhs_&
+		>;
+		constexpr do_add_assign()
 		{
 		}
-		[[nodiscard]] constexpr inline out_t operator()(const T_& t_) const
+		constexpr inline result_type operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return EmuCore::DoMatchingCos<out_t, T_>(t_);
+			if constexpr (EmuCore::TMP::has_plus_assign_operator_v<Lhs_&, const Rhs_&>)
+			{
+				return lhs_ += rhs_;
+			}
+			else
+			{
+				using const_op = do_add<Lhs_, Rhs_>;
+				using const_op_result = std::invoke_result_t<const_op, Lhs_&, const Rhs_&>;
+				if constexpr (std::is_assignable_v<Lhs_&, const_op_result>)
+				{
+					lhs_ = const_op()(lhs_, rhs_);
+					return lhs_;
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<const_op_result>(), "Unable to perform add-assign operation via EmuCore::do_add_assign, as the provided Lhs_ type does not have a valid += operator, and cannot be assigned via the result of do_add in order to emulate such behaviour, when used with the provided Rhs_ argument.");
+				}
+			}
 		}
 	};
 	template<>
-	struct do_cos<void>
+	struct do_add_assign<void, void>
 	{
-		constexpr do_cos()
+		constexpr do_add_assign()
 		{
 		}
-		template<typename T_>
-		[[nodiscard]] constexpr inline auto operator()(const T_& t_) const
+		template<typename Lhs_, typename Rhs_>
+		constexpr inline std::invoke_result_t<do_add_assign<Lhs_, Rhs_>, Lhs_&, const Rhs_&> operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return do_cos<T_>()(t_);
+			return do_add_assign<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
 	};
 
-	template<typename T_>
-	struct do_acos
+	template<typename Lhs_, typename Rhs_ = Lhs_>
+	struct do_subtract_assign
 	{
-		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
-		constexpr do_acos()
+		using result_type = std::conditional_t
+		<
+			EmuCore::TMP::has_subtract_assign_operator_v<Lhs_&, const Rhs_&>,
+			EmuCore::TMP::subtract_assign_operator_result_t<Lhs_&, const Rhs_&>,
+			Lhs_&
+		>;
+		constexpr do_subtract_assign()
 		{
 		}
-		[[nodiscard]] constexpr inline out_t operator()(const T_& t_) const
+		constexpr inline result_type operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return EmuCore::DoMatchingAcos<out_t, T_>(t_);
+			if constexpr (EmuCore::TMP::has_subtract_assign_operator_v<Lhs_&, const Rhs_&>)
+			{
+				return lhs_ -= rhs_;
+			}
+			else
+			{
+				using const_op = do_subtract<Lhs_, Rhs_>;
+				using const_op_result = std::invoke_result_t<const_op, Lhs_&, const Rhs_&>;
+				if constexpr (std::is_assignable_v<Lhs_&, const_op_result>)
+				{
+					lhs_ = const_op()(lhs_, rhs_);
+					return lhs_;
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<const_op_result>(), "Unable to perform subtract-assign operation via EmuCore::do_subtract_assign, as the provided Lhs_ type does not have a valid -= operator, and cannot be assigned via the result of do_subtract in order to emulate such behaviour, when used with the provided Rhs_ argument.");
+				}
+			}
 		}
 	};
 	template<>
-	struct do_acos<void>
+	struct do_subtract_assign<void, void>
 	{
-		constexpr do_acos()
+		constexpr do_subtract_assign()
 		{
 		}
-		template<typename T_>
-		[[nodiscard]] constexpr inline auto operator()(const T_& t_) const
+		template<typename Lhs_, typename Rhs_>
+		constexpr inline std::invoke_result_t<do_subtract_assign<Lhs_, Rhs_>, Lhs_&, const Rhs_&> operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return do_acos<T_>()(t_);
+			return do_subtract_assign<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
 	};
 
-	template<typename T_>
-	struct do_sin
+	template<typename Lhs_, typename Rhs_ = Lhs_>
+	struct do_multiply_assign
 	{
-		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
-		constexpr do_sin()
+		using result_type = std::conditional_t
+		<
+			EmuCore::TMP::has_multiply_assign_operator_v<Lhs_&, const Rhs_&>,
+			EmuCore::TMP::multiply_assign_operator_result_t<Lhs_&, const Rhs_&>,
+			Lhs_&
+		>;
+		constexpr do_multiply_assign()
 		{
 		}
-		[[nodiscard]] constexpr inline out_t operator()(const T_& t_) const
+		constexpr inline result_type operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return EmuCore::DoMatchingSin<out_t, T_>(t_);
+			if constexpr (EmuCore::TMP::has_multiply_assign_operator_v<Lhs_&, const Rhs_&>)
+			{
+				return lhs_ *= rhs_;
+			}
+			else
+			{
+				using const_op = do_multiply<Lhs_, Rhs_>;
+				using const_op_result = std::invoke_result_t<const_op, Lhs_&, const Rhs_&>;
+				if constexpr (std::is_assignable_v<Lhs_&, const_op_result>)
+				{
+					lhs_ = const_op()(lhs_, rhs_);
+					return lhs_;
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<const_op_result>(), "Unable to perform multiply-assign operation via EmuCore::do_multiply_assign, as the provided Lhs_ type does not have a valid *= operator, and cannot be assigned via the result of do_multiply in order to emulate such behaviour, when used with the provided Rhs_ argument.");
+				}
+			}
 		}
 	};
 	template<>
-	struct do_sin<void>
+	struct do_multiply_assign<void, void>
 	{
-		constexpr do_sin()
+		constexpr do_multiply_assign()
 		{
 		}
-		template<typename T_>
-		[[nodiscard]] constexpr inline auto operator()(const T_& t_) const
+		template<typename Lhs_, typename Rhs_>
+		constexpr inline std::invoke_result_t<do_multiply_assign<Lhs_, Rhs_>, Lhs_&, const Rhs_&> operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return do_sin<T_>()(t_);
+			return do_multiply_assign<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
 	};
 
-	template<typename T_>
-	struct do_asin
+	template<typename Lhs_, typename Rhs_ = Lhs_>
+	struct do_divide_assign
 	{
-		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
-		constexpr do_asin()
+		using result_type = std::conditional_t
+		<
+			EmuCore::TMP::has_divide_assign_operator_v<Lhs_&, const Rhs_&>,
+			EmuCore::TMP::divide_assign_operator_result_t<Lhs_&, const Rhs_&>,
+			Lhs_&
+		>;
+		constexpr do_divide_assign()
 		{
 		}
-		[[nodiscard]] constexpr inline out_t operator()(const T_& t_) const
+		constexpr inline result_type operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return EmuCore::DoMatchingAsin<out_t, T_>(t_);
+			if constexpr (EmuCore::TMP::has_divide_assign_operator_v<Lhs_&, const Rhs_&>)
+			{
+				return lhs_ /= rhs_;
+			}
+			else
+			{
+				using const_op = do_divide<Lhs_, Rhs_>;
+				using const_op_result = std::invoke_result_t<const_op, Lhs_&, const Rhs_&>;
+				if constexpr (std::is_assignable_v<Lhs_&, const_op_result>)
+				{
+					lhs_ = const_op()(lhs_, rhs_);
+					return lhs_;
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<const_op_result>(), "Unable to perform divide-assign operation via EmuCore::do_divide_assign, as the provided Lhs_ type does not have a valid /= operator, and cannot be assigned via the result of do_divide in order to emulate such behaviour, when used with the provided Rhs_ argument.");
+				}
+			}
 		}
 	};
 	template<>
-	struct do_asin<void>
+	struct do_divide_assign<void, void>
 	{
-		constexpr do_asin()
+		constexpr do_divide_assign()
 		{
 		}
-		template<typename T_>
-		[[nodiscard]] constexpr inline auto operator()(const T_& t_) const
+		template<typename Lhs_, typename Rhs_>
+		constexpr inline std::invoke_result_t<do_divide_assign<Lhs_, Rhs_>, Lhs_&, const Rhs_&> operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return do_asin<T_>()(t_);
+			return do_divide_assign<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
 	};
 
-	template<typename T_>
-	struct do_tan
+	template<typename Lhs_, typename Rhs_ = Lhs_>
+	struct do_mod_assign
 	{
-		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
-		constexpr do_tan()
+		using result_type = std::conditional_t
+		<
+			EmuCore::TMP::has_mod_assign_operator_v<Lhs_&, const Rhs_&>,
+			EmuCore::TMP::mod_assign_operator_result_t<Lhs_&, const Rhs_&>,
+			Lhs_&
+		>;
+		constexpr do_mod_assign()
 		{
 		}
-		[[nodiscard]] constexpr inline out_t operator()(const T_& t_) const
+		constexpr inline result_type operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return EmuCore::DoMatchingTan<out_t, T_>(t_);
+			if constexpr (EmuCore::TMP::has_mod_assign_operator_v<Lhs_&, const Rhs_&>)
+			{
+				return lhs_ %= rhs_;
+			}
+			else
+			{
+				using const_op = do_mod<Lhs_, Rhs_>;
+				using const_op_result = std::invoke_result_t<const_op, Lhs_&, const Rhs_&>;
+				if constexpr (std::is_assignable_v<Lhs_&, const_op_result>)
+				{
+					lhs_ = static_cast<Lhs_>(const_op()(lhs_, rhs_));
+					return lhs_;
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<const_op_result>(), "Unable to perform modulo-divide-assign operation via EmuCore::do_mod_assign, as the provided Lhs_ type does not have a valid %= operator, and cannot be assigned via the result of do_mod in order to emulate such behaviour, when used with the provided Rhs_ argument.");
+				}
+			}
 		}
 	};
 	template<>
-	struct do_tan<void>
+	struct do_mod_assign<void, void>
 	{
-		constexpr do_tan()
+		constexpr do_mod_assign()
 		{
 		}
-		template<typename T_>
-		[[nodiscard]] constexpr inline auto operator()(const T_& t_) const
+		template<typename Lhs_, typename Rhs_>
+		constexpr inline std::invoke_result_t<do_mod_assign<Lhs_, Rhs_>, Lhs_&, const Rhs_&> operator()(Lhs_& lhs_, const Rhs_& rhs_) const
 		{
-			return do_tan<T_>()(t_);
+			return do_mod_assign<Lhs_, Rhs_>()(lhs_, rhs_);
 		}
 	};
+#pragma endregion
 
+#pragma region UNARY_ARITHMETIC_FUNCTORS
+	/// <summary>
+	/// <para> Functor to perform and output the result of a pre-increment on a value of type T_, with the format ++value. </para>
+	/// <para> If a type does not implement the correct operator, this will attempt to emulate it by default with += operators if possible. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// </summary>
 	template<typename T_>
-	struct do_atan
+	struct do_pre_increment
 	{
-		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
-		constexpr do_atan()
+		using result_type = std::conditional_t
+		<
+			EmuCore::TMP::has_pre_increment_operator_v<T_&>,
+			EmuCore::TMP::pre_increment_operator_result_t<T_&>,
+			T_&
+		>;
+
+		constexpr do_pre_increment()
 		{
 		}
-		[[nodiscard]] constexpr inline out_t operator()(const T_& t_) const
+		constexpr inline result_type operator()(T_& val_) const
 		{
-			return EmuCore::DoMatchingAtan<out_t, T_>(t_);
+			if constexpr (EmuCore::TMP::has_pre_increment_operator_v<T_&>)
+			{
+				return ++val_;
+			}
+			else
+			{
+				EmuCore::do_add_assign<T_, decltype(1)>()(val_, 1);
+				return val_;
+			}
 		}
 	};
 	template<>
-	struct do_atan<void>
+	struct do_pre_increment<void>
 	{
-		constexpr do_atan()
+		constexpr do_pre_increment()
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline auto operator()(const T_& t_) const
+		constexpr inline std::invoke_result_t<do_pre_increment<T_>, T_&> operator()(T_& val_) const
 		{
-			return do_atan<T_>()(t_);
+			return do_pre_increment<T_>()(val_);
 		}
 	};
 
+	/// <summary>
+	/// <para> Functor to perform and output the result of a post-increment on a value of type T_, with the format value++. </para>
+	/// <para> If a type does not implement the correct operator, this will attempt to emulate it by default with += operators if possible. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// </summary>
 	template<typename T_>
-	struct do_degs_to_rads
+	struct do_post_increment
 	{
-		constexpr do_degs_to_rads()
+		using result_type = std::conditional_t
+		<
+			EmuCore::TMP::has_post_increment_operator_v<T_&>,
+			EmuCore::TMP::post_increment_operator_result_t<T_&>,
+			EmuCore::TMP::remove_ref_cv_t<T_>
+		>;
+
+		constexpr do_post_increment()
 		{
 		}
-		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		constexpr inline result_type operator()(T_& val_) const
 		{
-			return EmuCore::Pi::DegsToRads<T_>(val_);
+			if constexpr (EmuCore::TMP::has_post_increment_operator_v<T_&>)
+			{
+				return val_++;
+			}
+			else
+			{
+				EmuCore::TMP::remove_ref_cv_t<T_> out_(val_);
+				EmuCore::do_add_assign<T_, decltype(1)>()(val_, 1);
+				return out_;
+			}
 		}
 	};
 	template<>
-	struct do_degs_to_rads<void>
+	struct do_post_increment<void>
 	{
-		constexpr do_degs_to_rads()
+		constexpr do_post_increment()
 		{
 		}
 		template<typename T_>
-		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
+		constexpr inline std::invoke_result_t<do_post_increment<T_>, T_&> operator()(T_& val_) const
 		{
-			return do_degs_to_rads<T_>()(val_);
+			return do_post_increment<T_>()(val_);
 		}
 	};
 
+	/// <summary>
+	/// <para> Functor to perform and output the result of a pre-decrement on a value of type T_, with the format --value. </para>
+	/// <para> If a type does not implement the correct operator, this will attempt to emulate it by default with -= operators if possible. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// </summary>
+	template<typename T_>
+	struct do_pre_decrement
+	{
+		using result_type = std::conditional_t
+		<
+			EmuCore::TMP::has_pre_decrement_operator_v<T_&>,
+			EmuCore::TMP::pre_decrement_operator_result_t<T_&>,
+			T_&
+		>;
+
+		constexpr do_pre_decrement()
+		{
+		}
+		constexpr inline result_type operator()(T_& val_) const
+		{
+			if constexpr (EmuCore::TMP::has_pre_decrement_operator_v<T_&>)
+			{
+				return --val_;
+			}
+			else
+			{
+				EmuCore::do_subtract_assign<T_, decltype(1)>()(val_, 1);
+				return val_;
+			}
+		}
+	};
+	template<>
+	struct do_pre_decrement<void>
+	{
+		constexpr do_pre_decrement()
+		{
+		}
+		template<typename T_>
+		constexpr inline std::invoke_result_t<do_pre_decrement<T_>, T_&> operator()(T_& val_) const
+		{
+			return do_pre_decrement<T_>()(val_);
+		}
+	};
+
+	/// <summary>
+	/// <para> Functor to perform and output the result of a post-decrement on a value of type T_, with the format value--. </para>
+	/// <para> If a type does not implement the correct operator, this will attempt to emulate it by default with -= operators if possible. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// </summary>
+	template<typename T_>
+	struct do_post_decrement
+	{
+		using result_type = std::conditional_t
+		<
+			EmuCore::TMP::has_post_decrement_operator_v<T_&>,
+			EmuCore::TMP::post_decrement_operator_result_t<T_&>,
+			EmuCore::TMP::remove_ref_cv_t<T_>
+		>;
+
+		constexpr do_post_decrement()
+		{
+		}
+		constexpr inline result_type operator()(T_& val_) const
+		{
+			if constexpr (EmuCore::TMP::has_post_decrement_operator_v<T_&>)
+			{
+				return val_--;
+			}
+			else
+			{
+				EmuCore::TMP::remove_ref_cv_t<T_> out_(val_);
+				EmuCore::do_subtract_assign<T_, decltype(1)>()(val_, 1);
+				return out_;
+			}
+		}
+	};
+	template<>
+	struct do_post_decrement<void>
+	{
+		constexpr do_post_decrement()
+		{
+		}
+		template<typename T_>
+		constexpr inline std::invoke_result_t<do_post_decrement<T_>, T_&> operator()(T_& val_) const
+		{
+			return do_post_decrement<T_>()(val_);
+		}
+	};
+#pragma endregion
+
+#pragma region RECIPROCAL_FUNCTORS
+	template<typename In_>
+	struct do_reciprocal
+	{
+	private:
+		using _fp_type = EmuCore::TMP::remove_ref_cv_t<EmuCore::TMP::floating_point_equivalent_t<In_>>;
+		using _in_uq = EmuCore::TMP::remove_ref_cv_t<In_>;
+		using _make_div = EmuCore::TMP::safe_template_instantiate<EmuCore::do_divide, _fp_type, _in_uq>;
+		using _make_one = EmuCore::TMP::try_make_constant<_fp_type, 1>;
+		using _div = typename _make_div::type;
+		using _make_div_result = EmuCore::TMP::safe_invoke_result<_div, _fp_type, const In_&>;
+
+	public:
+		using out_type = typename _make_div_result::type;
+
+		constexpr do_reciprocal()
+		{
+		}
+
+		[[nodiscard]] constexpr inline out_type operator()(const In_& in_) const
+		{
+			if constexpr(!std::is_void_v<_fp_type>)
+			{
+				if constexpr (_make_div::value)
+				{
+					if constexpr (_make_div_result::value)
+					{
+						if constexpr (_make_one::is_valid)
+						{
+							return _div()(_make_one::get(), in_);
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<_make_one>(),
+								"Attempted to calculate a reciprocal via EmuCore::do_reciprocal, but the unqualified floating-point equivalent to In_ could not be used to generate a constant of 1 via EmuCore::TMP::try_make_constant."
+							);
+						}
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<_make_div_result>(),
+							"Attempted to calculate a reciprocal via EmuCore::do_reciprocal, but the generated instance of EmuCore::do_divide could not be invoked with a value of the unqualified floating-point equivalent to In_ and a const reference to In_ as arguments."
+						);
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<_make_div>(),
+						"Attempted to calculate a reciprocal via EmuCore::do_reciprocal, but an instance of EmuCore::do_divide could not be instantiated with the unqualified floating-point equivalent of In_ and the unqualified form of In_ as type arguments."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<_fp_type>(),
+					"Attempted to calculate a reciprocal via EmuCore::do_reciprocal, but the provided In_ type does not have a floating-point equivalent defined by EmuCore::TMP::floating_point_equivalent."
+				);
+			}
+		}
+	};
+
+	template<>
+	struct do_reciprocal<void>
+	{
+		constexpr do_reciprocal()
+		{
+		}
+
+		template<typename In_>
+		constexpr inline std::invoke_result_t<do_reciprocal<In_>, const In_&> operator()(const In_& in_) const
+		{
+			return do_reciprocal<In_>()(in_);
+		}
+	};
+#pragma endregion
+
+#pragma region RADIAN_AND_DEGREE_ARITHMETIC_FUNCTORS
+	/// <summary>
+	/// <para> Template functor for converting a value of type T_ from radians to degrees. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// </summary>
 	template<typename T_>
 	struct do_rads_to_degs
 	{
@@ -662,76 +1125,232 @@ namespace EmuCore
 		}
 	};
 
-	template<typename Lhs_, typename Rhs_>
-	struct do_mod
+	/// <summary>
+	/// <para> Template functor for converting a value of type T_ from degrees to radians. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// </summary>
+	template<typename T_>
+	struct do_degs_to_rads
 	{
-	private:
-		std::modulus<void> modder_;
-
-	public:
-		constexpr do_mod() : modder_()
+		constexpr do_degs_to_rads()
 		{
 		}
-		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
 		{
-			return modder_(lhs_, rhs_);
+			return EmuCore::Pi::DegsToRads<T_>(val_);
 		}
 	};
 	template<>
-	struct do_mod<void, void>
+	struct do_degs_to_rads<void>
 	{
-		constexpr do_mod()
+		constexpr do_degs_to_rads()
 		{
 		}
-		template<typename Lhs_, typename Rhs_>
-		constexpr inline auto operator()(const Lhs_& lhs_, const Rhs_& rhs_) const
+		template<typename T_>
+		[[nodiscard]] constexpr inline T_ operator()(const T_& val_) const
 		{
-			return do_mod<Lhs_, Rhs_>()(lhs_, rhs_);
+			return do_degs_to_rads<T_>()(val_);
 		}
 	};
-	template<typename Rhs_>
-	struct do_mod<float, Rhs_>
+#pragma endregion
+
+#pragma region TRIG_ARITHMETIC_FUNCTORS
+	/// <summary>
+	/// <para> Template cos functor, used to perform the cos(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_cos_constexpr` template. </para>
+	/// </summary>
+	template<typename T_>
+	struct do_cos
 	{
-		constexpr do_mod()
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
+		constexpr do_cos()
 		{
 		}
-		constexpr inline auto operator()(const float& lhs_, const Rhs_& rhs_) const
+		[[nodiscard]] constexpr inline out_t operator()(const T_& t_) const
 		{
-			return FmodConstexpr<float, Rhs_>(lhs_, rhs_);
+			return EmuCore::DoMatchingCos<out_t, T_>(t_);
 		}
 	};
-	template<typename Rhs_>
-	struct do_mod<double, Rhs_>
+	template<>
+	struct do_cos<void>
 	{
-		constexpr do_mod()
+		constexpr do_cos()
 		{
 		}
-		constexpr inline auto operator()(const double& lhs_, const Rhs_& rhs_) const
+		template<typename T_>
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_cos<T_>, const T_&> operator()(const T_& t_) const
 		{
-			return FmodConstexpr<double, Rhs_>(lhs_, rhs_);
-		}
-	};
-	template<typename Rhs_>
-	struct do_mod<long double, Rhs_>
-	{
-		constexpr do_mod()
-		{
-		}
-		constexpr inline auto operator()(const long double& lhs_, const Rhs_& rhs_) const
-		{
-			return FmodConstexpr<long double, Rhs_>(lhs_, rhs_);
+			return do_cos<T_>()(t_);
 		}
 	};
 
 	/// <summary>
-	/// <para> Functor to calculate cosine (radian units) at compile time using Taylor Series, using the specified number of iterations of said series to do so. </para>
+	/// <para> Template acos functor, used to perform the acos(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_acos_constexpr` template. </para>
+	/// </summary>
+	template<typename T_>
+	struct do_acos
+	{
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
+		constexpr do_acos()
+		{
+		}
+		[[nodiscard]] constexpr inline out_t operator()(const T_& t_) const
+		{
+			return EmuCore::DoMatchingAcos<out_t, T_>(t_);
+		}
+	};
+	template<>
+	struct do_acos<void>
+	{
+		constexpr do_acos()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_acos<T_>, const T_&> operator()(const T_& t_) const
+		{
+			return do_acos<T_>()(t_);
+		}
+	};
+
+	/// <summary>
+	/// <para> Template sin functor, used to perform the sin(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_sin_constexpr` template. </para>
+	/// </summary>
+	template<typename T_>
+	struct do_sin
+	{
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
+		constexpr do_sin()
+		{
+		}
+		[[nodiscard]] constexpr inline out_t operator()(const T_& t_) const
+		{
+			return EmuCore::DoMatchingSin<out_t, T_>(t_);
+		}
+	};
+	template<>
+	struct do_sin<void>
+	{
+		constexpr do_sin()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_sin<T_>, const T_&> operator()(const T_& t_) const
+		{
+			return do_sin<T_>()(t_);
+		}
+	};
+
+	/// <summary>
+	/// <para> Template asin functor, used to perform the asin(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_asin_constexpr` template. </para>
+	/// </summary>
+	template<typename T_>
+	struct do_asin
+	{
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
+		constexpr do_asin()
+		{
+		}
+		[[nodiscard]] constexpr inline out_t operator()(const T_& t_) const
+		{
+			return EmuCore::DoMatchingAsin<out_t, T_>(t_);
+		}
+	};
+	template<>
+	struct do_asin<void>
+	{
+		constexpr do_asin()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_asin<T_>, const T_&> operator()(const T_& t_) const
+		{
+			return do_asin<T_>()(t_);
+		}
+	};
+
+	/// <summary>
+	/// <para> Template tan functor, used to perform the tan(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_tan_constexpr` template. </para>
+	/// </summary>
+	template<typename T_>
+	struct do_tan
+	{
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
+		constexpr do_tan()
+		{
+		}
+		[[nodiscard]] constexpr inline out_t operator()(const T_& t_) const
+		{
+			return EmuCore::DoMatchingTan<out_t, T_>(t_);
+		}
+	};
+	template<>
+	struct do_tan<void>
+	{
+		constexpr do_tan()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_tan<T_>, const T_&> operator()(const T_& t_) const
+		{
+			return do_tan<T_>()(t_);
+		}
+	};
+
+	/// <summary>
+	/// <para> Template atan functor, used to perform the atan(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para> May be constexpr, but does not provide constexpr guarantee; for such behaviour, use the `do_atan_constexpr` template. </para>
+	/// </summary>
+	template<typename T_>
+	struct do_atan
+	{
+		using out_t = typename EmuCore::TMP::first_floating_point<T_, float>::type;
+		constexpr do_atan()
+		{
+		}
+		[[nodiscard]] constexpr inline out_t operator()(const T_& t_) const
+		{
+			return EmuCore::DoMatchingAtan<out_t, T_>(t_);
+		}
+	};
+	template<>
+	struct do_atan<void>
+	{
+		constexpr do_atan()
+		{
+		}
+		template<typename T_>
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_atan<T_>, const T_&> operator()(const T_& t_) const
+		{
+			return do_atan<T_>()(t_);
+		}
+	};
+#pragma endregion
+
+#pragma region CONSTEXPR_TRIG_ARITHMETIC_FUNCTORS
+	/// <summary>
+	/// <para> Template cos functor, used to perform the cos(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this provides a guarantee to perform a constexpr implementation of cos if possible. 
+	///		Specialisations are expected to follow this guarantee.
+	/// </para>
+	/// <para> By default, uses Taylor Series implmentation for the specified number of iterations specified by NumIterations_, which defaults to 3. </para>
 	/// <para>
 	///		DoMod_ is true by default, and will only have an effect on values greater than 6.28319. 
 	///		In cases where input ranges are unknown, it is recommended to keep it as true.
 	///		In cases where you know inputs will not exceed the provided range, it will do nothing and thus setting the argument to false will avoid a useless fmod operation.
 	/// </para>
 	/// </summary>
-	/// <typeparam name="T_"></typeparam>
 	template<typename T_, std::size_t NumIterations_ = 3, bool DoMod_ = true>
 	struct do_cos_constexpr
 	{
@@ -816,12 +1435,26 @@ namespace EmuCore
 		{
 		}
 		template<bool DoMod_ = true, typename T_>
-		constexpr inline auto operator()(const T_& val_) const
+		constexpr inline std::invoke_result_t<do_cos_constexpr<T_, NumIterations_, DoMod_>, const T_&> operator()(const T_& val_) const
 		{
 			return do_cos_constexpr<T_, NumIterations_, DoMod_>()(val_);
 		}
 	};
 
+	/// <summary>
+	/// <para> Template sin functor, used to perform the sin(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this provides a guarantee to perform a constexpr implementation of sin if possible. 
+	///		Specialisations are expected to follow this guarantee.
+	/// </para>
+	/// <para> By default, uses Taylor Series implmentation for the specified number of iterations specified by NumIterations_, which defaults to 3. </para>
+	/// <para>
+	///		DoMod_ is true by default, and will only have an effect on values greater than 6.28319. 
+	///		In cases where input ranges are unknown, it is recommended to keep it as true.
+	///		In cases where you know inputs will not exceed the provided range, it will do nothing and thus setting the argument to false will avoid a useless fmod operation.
+	/// </para>
+	/// </summary>
 	template<typename T_, std::size_t NumIterations_ = 3, bool DoMod_ = true>
 	struct do_sin_constexpr
 	{
@@ -833,7 +1466,7 @@ namespace EmuCore
 			EmuCore::TMP::first_floating_point_t<T_, float>,
 			T_
 		>;
-		static constexpr out_t full_circle = EmuCore::Pi::DegsToRads_v<out_t, int, 360>;
+		static constexpr out_t full_circle = EmuCore::Pi::DegsToRads_v<float, int, 360>;
 
 		constexpr do_sin_constexpr() : add_(), sub_(), mul_(), div_(), mod_()
 		{
@@ -906,12 +1539,26 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		constexpr inline auto operator()(const T_& val_) const
+		constexpr inline std::invoke_result_t<do_sin_constexpr<T_, NumIterations_, DoMod_>, const T_&> operator()(const T_& val_) const
 		{
 			return do_sin_constexpr<T_, NumIterations_, DoMod_>()(val_);
 		}
 	};
 
+	/// <summary>
+	/// <para> Template sin functor, used to perform the sin(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this provides a guarantee to perform a constexpr implementation of sin if possible. 
+	///		Specialisations are expected to follow this guarantee.
+	/// </para>
+	/// <para> By default, uses the results of cos and sin to create the result of tan. </para>
+	/// <para>
+	///		DoMod_ is true by default, and will only have an effect on values greater than 6.28319. 
+	///		In cases where input ranges are unknown, it is recommended to keep it as true.
+	///		In cases where you know inputs will not exceed the provided range, it will do nothing and thus setting the argument to false will avoid a useless fmod operation.
+	/// </para>
+	/// </summary>
 	template<typename T_, std::size_t NumIterations_ = 3, bool DoMod_ = true>
 	struct do_tan_constexpr
 	{
@@ -968,12 +1615,68 @@ namespace EmuCore
 		{
 		}
 		template<typename T_>
-		constexpr inline auto operator()(const T_& val_) const
+		constexpr inline std::invoke_result_t<do_tan_constexpr<T_, NumIterations_, DoMod_>, const T_&> operator()(const T_& val_) const
 		{
 			return do_tan_constexpr<T_, NumIterations_, DoMod_>()(val_);
 		}
 	};
+#pragma endregion
 
+#pragma region MISC_ARITHMETIC_FUNCTORS
+	/// <summary>
+	/// <para> Functor which may be used to perform linear interpolations. </para>
+	/// <para> Takes 3 type arguments, however only one or two may be passed. B_ will be the same type as A_ if omitted. T_ will be float if omitted. </para>
+	/// <para> Types should be considered for the equation A_ + ((B_ - A_) * T_). </para>
+	/// <para> do_lerp&lt;void&gt;, do_lerp&lt;void, void&gt;, and do_lerp&lt;void, void, void&gt; are reserved for a generic specialisation of do_lerp. </para>
+	/// </summary>
+	/// <typeparam name="A_">Type used to represent a in the equation a + ((b - a) * t).</typeparam>
+	/// <typeparam name="B_">Type used to represent b in the equation a + ((b - a) * t).</typeparam>
+	/// <typeparam name="T_">Type used to represent t in the equation a + ((b - a) * t).</typeparam>
+	template<class A_, class B_ = A_, class T_ = float>
+	struct do_lerp
+	{
+		constexpr do_lerp()
+		{
+		}
+		[[nodiscard]] constexpr inline auto operator()(const A_& a_, const B_& b_, const T_& t_) const
+		{
+			if constexpr
+			(
+				EmuCore::TMP::is_any_floating_point_v<A_, B_, T_> &&
+				!EmuCore::TMP::are_all_comparisons_true<std::is_same, A_, B_, T_>::value
+			)
+			{
+				using floating_point = typename EmuCore::TMP::largest_floating_point<A_, B_, T_>::type;
+				floating_point a_cast_ = static_cast<floating_point>(a_);
+				return a_cast_ + ((static_cast<floating_point>(b_) - a_cast_) * static_cast<floating_point>(t_));
+			}
+			else
+			{
+				return (a_ + ((b_ - a_) * t_));
+			}
+		}
+	};
+	/// <summary>
+	/// <para> Reserved generic specialisation of do_lerp. </para>
+	/// <para> Determines the specialisation to make use of when the function operator() is called, based on the 3 arguments when called. </para>
+	/// </summary>
+	template<>
+	struct do_lerp<void, void, void>
+	{
+		constexpr do_lerp()
+		{
+		}
+		template<class A_, class B_, class T_>
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_lerp<A_, B_, T_>, const A_&, const B_&, const T_&> operator()(const A_& a_, const B_& b_, const T_& t_) const
+		{
+			return do_lerp<A_, B_, T_>()(a_, b_, t_);
+		}
+	};
+
+	/// <summary>
+	/// <para> Template functor for finding the absolute value of a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// </summary>
 	template<typename T_>
 	struct do_abs
 	{
@@ -986,9 +1689,23 @@ namespace EmuCore
 			return EmuCore::AbsConstexpr<T_>(val_);
 		}
 	};
+	template<>
+	struct do_abs<void>
+	{
+		constexpr do_abs()
+		{
+		}
+
+		template<typename T_>
+		constexpr inline std::invoke_result_t<do_abs<T_>, const T_&> operator()(const T_& val_) const
+		{
+			return do_abs<T_>()(val_);
+		}
+	};
 
 	/// <summary> 
-	/// <para> Functor for wrapping values that are assumed to lie in a normalised range 0:1, where -0.1 is wrapped to 0.9, and 1.1 wrapped to 1.1. </para>
+	/// <para> Functor for wrapping values that are assumed to lie in a normalised range 0:1, where -0.1 is wrapped to 0.9, and 1.1 wrapped to 0.1. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
 	/// <para> Default, non-specialised forms of this functor are presented in a branchless manner. </para>
 	/// <para> If WrapToOne_ is TRUE: non-zero whole numbers will be wrapped to 1. </para>
 	/// <para> If WrapToOne_ is FALSE: non-zero whole numbers will be wrapped to 0. </para>
@@ -1040,6 +1757,20 @@ namespace EmuCore
 			}
 		}
 	};
+	template<bool WrapToOne_>
+	struct do_normalised_wrap<void, WrapToOne_>
+	{
+		constexpr do_normalised_wrap()
+		{
+		}
+
+		template<typename T_>
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_normalised_wrap<T_, WrapToOne_>, T_&&> operator()(T_&& val_) const
+		{
+			return do_normalised_wrap<EmuCore::TMP::remove_ref_cv_t<T_>, WrapToOne_>()(std::forward<T_>(val_));
+		}
+	};
+#pragma endregion
 }
 
 #endif

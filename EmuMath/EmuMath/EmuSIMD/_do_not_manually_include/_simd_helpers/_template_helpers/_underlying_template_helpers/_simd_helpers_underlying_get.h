@@ -3,6 +3,7 @@
 
 #include "_common_underlying_simd_template_helper_includes.h"
 #include "_simd_helpers_underlying_shuffle.h"
+#include "../../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD::_underlying_simd_helpers
 {
@@ -14,7 +15,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		{
 			if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128, __m256, __m512>::value)
 			{
-				if constexpr (std::is_convertible_v<float, OutT_>)
+				if constexpr (EmuCore::TMP::is_static_castable_v<float, OutT_>)
 				{
 					if constexpr (std::is_same_v<register_type_uq, __m128>)
 					{
@@ -28,7 +29,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 						}
 						else
 						{
-							static_assert(false, "Attempted to extract an index from a 128-bit float SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1, 2, 3.");
+							static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 128-bit float SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1, 2, 3.");
 						}
 					}
 					else if constexpr (std::is_same_v<register_type_uq, __m256>)
@@ -41,7 +42,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 						}
 						else
 						{
-							static_assert(false, "Attempted to extract an index from a 256-bit float SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1, 2, 3, 4, 5, 6, 7.");
+							static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 256-bit float SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1, 2, 3, 4, 5, 6, 7.");
 						}
 					}
 					else
@@ -54,18 +55,18 @@ namespace EmuSIMD::_underlying_simd_helpers
 						}
 						else
 						{
-							static_assert(false, "Attempted to extract an index from a 512-bit float SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15.");
+							static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 512-bit float SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15.");
 						}
 					}
 				}
 				else
 				{
-					static_assert(false, "Attempted to extract an index from a float-containing SIMD register using EmuSIMD helpers, but the provided output type cannot be created from a float value.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a float-containing SIMD register using EmuSIMD helpers, but the provided output type cannot be created from a float value.");
 				}
 			}
 			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128d, __m256d, __m512d>::value)
 			{
-				if constexpr (std::is_convertible_v<double, OutT_>)
+				if constexpr (EmuCore::TMP::is_static_castable_v<double, OutT_>)
 				{
 					if constexpr (std::is_same_v<register_type_uq, __m128d>)
 					{
@@ -79,7 +80,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 						}
 						else
 						{
-							static_assert(false, "Attempted to extract an index from a 128-bit double SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1.");
+							static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 128-bit double SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1.");
 						}
 					}
 					else if constexpr (std::is_same_v<register_type_uq, __m256d>)
@@ -92,7 +93,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 						}
 						else
 						{
-							static_assert(false, "Attempted to extract an index from a 256-bit double SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1, 2, 3.");
+							static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 256-bit double SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1, 2, 3.");
 						}
 					}
 					else
@@ -105,13 +106,13 @@ namespace EmuSIMD::_underlying_simd_helpers
 						}
 						else
 						{
-							static_assert(false, "Attempted to extract an index from a 512-bit double SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1, 2, 3, 4, 5, 6, 7.");
+							static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 512-bit double SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1, 2, 3, 4, 5, 6, 7.");
 						}
 					}
 				}
 				else
 				{
-					static_assert(false, "Attempted to extract an index from a double-containing SIMD register using EmuSIMD helpers, but the provided output type cannot be created from a double value.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a double-containing SIMD register using EmuSIMD helpers, but the provided output type cannot be created from a double value.");
 				}
 			}
 			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>::value)
@@ -119,7 +120,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 				if constexpr(EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfInt_>())
 				{
 					using int_type = EmuCore::TMP::int_of_size_t<PerElementWidthIfInt_ / 8>;
-					if constexpr (std::is_convertible_v<int_type, OutT_>)
+					if constexpr (EmuCore::TMP::is_static_castable_v<int_type, OutT_>)
 					{
 						constexpr std::size_t chunk_divisor_ = std::size_t(128) / PerElementWidthIfInt_;
 						if constexpr (std::is_same_v<register_type_uq, __m128i>)
@@ -147,7 +148,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 							}
 							else
 							{
-								static_assert(false, "Attempted to extract an index from a 128-bit integral SIMD register using EmuSIMD helpers, but the provided index is invalid for the provided width. The valid index range is 0:(128 / PerElementWidthIfInt_)-1.");
+								static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 128-bit integral SIMD register using EmuSIMD helpers, but the provided index is invalid for the provided width. The valid index range is 0:(128 / PerElementWidthIfInt_)-1.");
 							}
 						}
 						else if constexpr (std::is_same_v<register_type_uq, __m256i>)
@@ -161,7 +162,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 							}
 							else
 							{
-								static_assert(false, "Attempted to extract an index from a 256-bit integral SIMD register using EmuSIMD helpers, but the provided index is invalid for the provided width. The valid index range is 0:(256 / PerElementWidthIfInt_)-1.");
+								static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 256-bit integral SIMD register using EmuSIMD helpers, but the provided index is invalid for the provided width. The valid index range is 0:(256 / PerElementWidthIfInt_)-1.");
 							}
 						}
 						else
@@ -175,28 +176,28 @@ namespace EmuSIMD::_underlying_simd_helpers
 							}
 							else
 							{
-								static_assert(false, "Attempted to extract an index from a 512-bit integral SIMD register using EmuSIMD helpers, but the provided index is invalid for the provided width. The valid index range is 0:(512 / PerElementWidthIfInt_)-1.");
+								static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 512-bit integral SIMD register using EmuSIMD helpers, but the provided index is invalid for the provided width. The valid index range is 0:(512 / PerElementWidthIfInt_)-1.");
 							}
 						}
 					}
 					else
 					{
-						static_assert(false, "Attempted to extract an index from an integral SIMD register using EmuSIMD helpers, but the provided output type cannot be created from an integer of the provided width.");
+						static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from an integral SIMD register using EmuSIMD helpers, but the provided output type cannot be created from an integer of the provided width.");
 					}
 				}
 				else
 				{
-					static_assert(false, "Attempted to extract an index from an integral SIMD register using EmuSIMD helpers, but the provided bit width per element is invalid.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from an integral SIMD register using EmuSIMD helpers, but the provided bit width per element is invalid.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to extract an index from a SIMD register using EmuSIMD helpers, but the provided SIMD register is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a SIMD register using EmuSIMD helpers, but the provided SIMD register is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to extract an index from a SIMD register using EmuSIMD helpers, but the provided register is not a supported SIMD register type.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a SIMD register using EmuSIMD helpers, but the provided register is not a supported SIMD register type.");
 		}
 	}
 
@@ -244,12 +245,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to store a SIMD register to a pointer via an EmuSIMD helper, but the provided register_ could not be recognised.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to store a SIMD register to a pointer via an EmuSIMD helper, but the provided register_ could not be recognised.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to store a SIMD register to a pointer via an EmuSIMD helper, but the provided register_ was not a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to store a SIMD register to a pointer via an EmuSIMD helper, but the provided register_ was not a supported SIMD register.");
 		}
 	}
 }
