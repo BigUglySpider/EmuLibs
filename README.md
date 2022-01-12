@@ -17,6 +17,8 @@ Implements a templatised type that can be used to describe a colour with its cha
    - Some wrapped types have been implemented to automatically wrap or clamp these colours, but an unmanaged form of the colour is available too.
       - It is your responsibility to ensure that the channels of an unmanaged colour remain valid when needed.
 
+---
+
 ### Noise
 Implements multiple functors to generate noise samples using value, smooth value, or perlin noise (more noise types may be available at a later point).
 Additionally provides a NoiseTable type to produce contiguous noise samples in a desired range, using a desired functor.
@@ -25,8 +27,12 @@ Additionally provides a NoiseTable type to produce contiguous noise samples in a
    - SIMD variants of the NoiseTable are also available, which allow large chunks of SIMD processing to be executed at once.
       - 3D Perlin SIMD variant has a ~3x (rounded down) speed increase on testing hardware. Returns diminish as sample calculation complexity goes down, but SIMD remains faster for all (again, on test hardware).
 
+---
+
 ### Random
 Provides simple wrappers for `std::mt19937` and `std::mt19937_64`, via the template `RngWrapper` type.
+
+---
 
 ### Vector
 Provides a templatised mathematical Vector type which can contain any number of elements (within the constraints of `std::size_t`) of and one specified type.
@@ -42,6 +48,8 @@ Contains a lot of helpers under the `EmuMath::Helpers` namespace, and encapsulat
    - A Vector can contain references (e.g. `Vector<float&>`); these references may be updated to reference something else, but this functionality is not set in stone.
       - Allowing Vectors of references *is* set in stone, however.
 
+---
+
 ## In-progress Features
 ### Matrix
 A mathematical type which aims to encapsulate matrix behaviour the same way that Vector does. The underlying structure may be considered an `EmuMath::Vector` of `EmuMath::Vector`s. Allows customisation of major-memory storage (i.e. data may be contiguously stored in column-major order (default) or row-major order). Note that this does not modify the common interface for these matrices, which will always take the order of `column, row`.
@@ -51,6 +59,8 @@ A mathematical type which aims to encapsulate matrix behaviour the same way that
 A form of the Vector which makes use of SIMD intrinsics. This will be more specialised than the `Vector` template, but it would be nice to be templatised to some degree.
 Would like to follow a similar usage to `DirectXMath` Vectors and their SIMD variants.
 Nothing set in stone.
+
+---
 
 ### FastMatrix
 Same as `FastVector`, but for matrices.
