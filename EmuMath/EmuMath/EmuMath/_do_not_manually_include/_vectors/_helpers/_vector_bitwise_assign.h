@@ -2,7 +2,7 @@
 #define EMU_MATH_vector_BITWISE_ASSIGN_H_INC_ 1
 
 #include "_common_vector_helpers.h"
-#include "../../../../../EmuCore/Functors/Bitwise.h"
+#include "../../../../EmuCore/Functors/Bitwise.h"
 
 // CONTAINS:
 // --- bitwise_and_assign

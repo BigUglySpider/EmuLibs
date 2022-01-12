@@ -4,8 +4,8 @@
 #include "_vector_tmp.h"
 #include "_vector_get_underlying.h"
 #include "_vector_mutation_underlying.h"
-#include "../../../../../EmuCore/Functors/Arithmetic.h"
-#include "../../../../../EmuCore/TMPHelpers/Values.h"
+#include "../../../../EmuCore/Functors/Arithmetic.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuMath::Helpers::_vector_underlying
 {

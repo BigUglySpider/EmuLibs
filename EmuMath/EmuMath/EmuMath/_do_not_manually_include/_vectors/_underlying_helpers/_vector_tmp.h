@@ -2,10 +2,10 @@
 #define EMU_MATH_vector_TMP_H_INC_ 1
 
 #include <cstddef>
-#include "../../../../../EmuCore/TMPHelpers/TypeComparators.h"
-#include "../../../../../EmuCore/TMPHelpers/TypeConvertors.h"
-#include "../../../../../EmuCore/CommonTypes/DeferrableReferenceWrapper.h"
-#include "../../../../../EmuCore/TMPHelpers/Values.h"
+#include "../../../../EmuCore/TMPHelpers/TypeComparators.h"
+#include "../../../../EmuCore/TMPHelpers/TypeConvertors.h"
+#include "../../../../EmuCore/CommonTypes/DeferrableReferenceWrapper.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuMath
 {

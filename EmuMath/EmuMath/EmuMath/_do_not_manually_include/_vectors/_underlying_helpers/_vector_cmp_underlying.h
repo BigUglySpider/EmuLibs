@@ -4,8 +4,8 @@
 #include "_vector_tmp.h"
 #include "_vector_get_underlying.h"
 #include "_vector_special_operations_underlying.h"
-#include "../../../../../EmuCore/TMPHelpers/TypeComparators.h"
-#include "../../../../../EmuCore/TMPHelpers/Values.h"
+#include "../../../../EmuCore/TMPHelpers/TypeComparators.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuMath::Helpers::_vector_underlying
 {

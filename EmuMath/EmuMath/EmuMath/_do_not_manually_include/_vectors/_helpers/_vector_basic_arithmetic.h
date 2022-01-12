@@ -2,7 +2,7 @@
 #define EMU_MATH_vector_BASIC_ARITHMETIC_H_INC_ 1
 
 #include "_common_vector_helpers.h"
-#include "../../../../../EmuCore/Functors/Arithmetic.h"
+#include "../../../../EmuCore/Functors/Arithmetic.h"
 
 // CONTAINS:
 // --- add

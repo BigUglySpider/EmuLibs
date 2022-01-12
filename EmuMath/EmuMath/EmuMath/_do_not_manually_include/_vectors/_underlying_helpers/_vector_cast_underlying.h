@@ -3,7 +3,7 @@
 
 #include "_vector_tmp.h"
 #include "_vector_get_underlying.h"
-#include "../../../../../EmuCore/TMPHelpers/VariadicHelpers.h"
+#include "../../../../EmuCore/TMPHelpers/VariadicHelpers.h"
 
 namespace EmuMath::Helpers::_vector_underlying
 {
