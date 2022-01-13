@@ -186,6 +186,25 @@ int main()
 		std::cout << "\n";
 	}
 
+	std::cout << "\n---\n";
+	constexpr auto unflattened_index_ = some_mat_4x2f_cm_.unflatten_index(5);
+	for (std::size_t x = 0; x < 10; ++x)
+	{
+		try
+		{
+			std::cout << some_mat_4x2f_cm_.at(x) << "\n";
+		}
+		catch (std::out_of_range& e)
+		{
+			std::cout << "\n" << e.what() << "\n\n";
+		}
+	}
+
+	for (std::size_t x = 0; x < 10; ++x)
+	{
+		std::cout << some_mat_4x2f_cm_[x] << "\n";
+	}
+
 	system("pause");
 	
 	// ##### SCALAR vs SIMD NOISE #####
