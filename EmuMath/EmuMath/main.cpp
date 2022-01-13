@@ -210,6 +210,7 @@ int main()
 	some_mat_4x2f_cm_.GetColumn<0>().at<1>() = -1337.0f;
 	std::cout << some_mat_4x2f_cm_ << "\n";
 
+
 	system("pause");
 	
 	// ##### SCALAR vs SIMD NOISE #####
