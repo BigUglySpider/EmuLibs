@@ -25,6 +25,11 @@ namespace EmuMath
 
 		using matrix_vector_type = typename matrix_info::matrix_vector_type;
 		using value_type = typename matrix_info::value_type;
+
+		using column_get_ref_type = typename matrix_info::column_get_ref_type;
+		using column_get_const_ref_type = typename matrix_info::column_get_const_ref_type;
+		using row_get_ref_type = typename matrix_info::row_get_ref_type;
+		using row_get_const_ref_type = typename matrix_info::row_get_const_ref_type;
 #pragma endregion
 
 #pragma region HELPER_STATIC_FUNCS
@@ -394,6 +399,114 @@ namespace EmuMath
 		{
 			return const_cast<this_type*>(this)->template data<Offset_>();
 		}
+
+		/// <summary>
+		/// <para> Accesses the column at the provided ColumnIndex_ within this Matrix. </para>
+		/// <para> If this Matrix is column-major: This will be a direct reference to the specified column. </para>
+		/// <para> If this Matrix is not column-major: This will be an EmuMath Vector of reference to elements at respective points within the specified column. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector referencing the specified column within this Matrix.</returns>
+		template<std::size_t ColumnIndex_>
+		[[nodiscard]] constexpr inline column_get_ref_type GetColumn()
+		{
+			if constexpr (ColumnIndex_ < num_columns)
+			{
+				if constexpr (is_column_major)
+				{
+					return _data.template at<ColumnIndex_>();
+				}
+				else
+				{
+					return _make_non_major_vector<ColumnIndex_, column_get_ref_type>(std::make_index_sequence<num_rows>());
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, ColumnIndex_>(),
+					"Attempted to access a column within an EmuMath Matrix, but the provided ColumnIndex_ is invalid. The inclusive valid column index range is 0:(num_columns - 1)."
+				);
+			}
+		}
+
+		template<std::size_t ColumnIndex_>
+		[[nodiscard]] constexpr inline column_get_const_ref_type GetColumn() const
+		{
+			if constexpr (ColumnIndex_ < num_columns)
+			{
+				if constexpr (is_column_major)
+				{
+					return _data.template at<ColumnIndex_>();
+				}
+				else
+				{
+					return _make_non_major_vector<ColumnIndex_, column_get_const_ref_type>(std::make_index_sequence<num_rows>());
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, ColumnIndex_>(),
+					"Attempted to const-access a column within an EmuMath Matrix, but the provided ColumnIndex_ is invalid. The inclusive valid column index range is 0:(num_columns - 1)."
+				);
+			}
+		}
+
+		/// <summary>
+		/// <para> Accesses the row at the provided RowIndex_ within this Matrix. </para>
+		/// <para> If this Matrix is column-major: This will be an EmuMath Vector of reference to elements at respective points within the specified row. </para>
+		/// <para> If this Matrix is not column-major: This will be a direct reference to the specified row. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector referencing the specified row within this Matrix.</returns>
+		template<std::size_t RowIndex_>
+		[[nodiscard]] constexpr inline row_get_ref_type GetRow()
+		{
+			if constexpr (RowIndex_ < num_rows)
+			{
+				if constexpr (is_column_major)
+				{
+					return _make_non_major_vector<RowIndex_, row_get_ref_type>(std::make_index_sequence<num_columns>());
+				}
+				else
+				{
+					return _data.template at<RowIndex_>();
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, RowIndex_>(),
+					"Attempted to access a row within an EmuMath Matrix, but the provided RowIndex_ is invalid. The inclusive valid row index range is 0:(num_rows - 1)."
+				);
+			}
+		}
+
+		template<std::size_t RowIndex_>
+		[[nodiscard]] constexpr inline row_get_const_ref_type GetRow() const
+		{
+			if constexpr (RowIndex_ < num_rows)
+			{
+				if constexpr (is_column_major)
+				{
+					return _make_non_major_vector<RowIndex_, row_get_const_ref_type>(std::make_index_sequence<num_columns>());
+				}
+				else
+				{
+					return _data.template at<RowIndex_>();
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, RowIndex_>(),
+					"Attempted to access a row within an EmuMath Matrix, but the provided RowIndex_ is invalid. The inclusive valid row index range is 0:(num_rows - 1)."
+				);
+			}
+		}
 #pragma endregion
 
 #pragma region STREAM_FUNCS
@@ -420,6 +533,19 @@ namespace EmuMath
 
 	private:
 		matrix_vector_type _data;
+
+		template<std::size_t NonMajorIndex_, class Out_, std::size_t...MajorIndices_>
+		[[nodiscard]] constexpr inline Out_ _make_non_major_vector(std::index_sequence<MajorIndices_...> major_indices_)
+		{
+			if constexpr (is_column_major)
+			{
+				return Out_(this->template at<MajorIndices_, NonMajorIndex_>()...);
+			}
+			else
+			{
+				return Out_(this->template at<NonMajorIndex_, MajorIndices_>()...);
+			}
+		}
 	};
 }
 

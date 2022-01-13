@@ -200,10 +200,15 @@ int main()
 		}
 	}
 
-	for (std::size_t x = 0; x < 10; ++x)
-	{
-		std::cout << some_mat_4x2f_cm_[x] << "\n";
-	}
+	std::cout << "\n---\n";
+	std::cout << "Column 0: " << some_mat_4x2f_cm_.GetColumn<0>() << "\n";
+	std::cout << "Column 3: " << some_mat_4x2f_cm_.GetColumn<3>() << "\n";
+	std::cout << "Row 0: " << some_mat_4x2f_cm_.GetRow<0>() << "\n";
+	std::cout << "Row 3: " << some_mat_4x2f_cm_.GetRow<1>() << "\n";
+
+	some_mat_4x2f_cm_.GetRow<0>().at<2>() = 1337.0f;
+	some_mat_4x2f_cm_.GetColumn<0>().at<1>() = -1337.0f;
+	std::cout << some_mat_4x2f_cm_ << "\n";
 
 	system("pause");
 	
