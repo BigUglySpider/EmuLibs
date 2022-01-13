@@ -245,6 +245,8 @@ int main()
 	std::cout << some_mat_3x4f_cm_ << "\n\n";
 	std::cout << some_mat_3x4f_rm_ << "\n\n";
 
+	constexpr auto some_mat_3x4f_cm_copy_ = EmuMath::Matrix<3, 4, float, true>(some_mat_3x4f_cm_);
+
 	system("pause");
 	
 	// ##### SCALAR vs SIMD NOISE #####

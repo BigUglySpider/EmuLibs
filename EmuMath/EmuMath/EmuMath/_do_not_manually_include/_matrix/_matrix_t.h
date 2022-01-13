@@ -115,6 +115,21 @@ namespace EmuMath
 				EmuCore::TMP::variadic_and_v<std::is_constructible_v<stored_type, decltype(std::forward<Args_>(std::declval<Args_>()))>...>
 			);
 		}
+
+		[[nodiscard]] static constexpr inline bool is_const_copy_constructible()
+		{
+			return std::is_constructible_v<matrix_vector_type, const matrix_vector_type&>;
+		}
+
+		[[nodiscard]] static constexpr inline bool is_non_const_copy_constructible()
+		{
+			return std::is_constructible_v<matrix_vector_type, matrix_vector_type&>;
+		}
+
+		[[nodiscard]] static constexpr inline bool is_move_constructible()
+		{
+			return std::is_constructible_v<matrix_vector_type, matrix_vector_type&&>;
+		}
 #pragma endregion
 
 #pragma region CONSTRUCTORS
@@ -124,8 +139,23 @@ namespace EmuMath
 		{
 		}
 
+		template<typename = std::enable_if_t<is_const_copy_constructible()>>
+		constexpr inline Matrix(const this_type& to_copy_) : _data(to_copy_._data)
+		{
+		}
+
+		template<typename = std::enable_if_t<is_non_const_copy_constructible()>>
+		constexpr inline Matrix(this_type& to_copy_) : _data(to_copy_._data)
+		{
+		}
+
+		template<typename = std::enable_if_t<is_move_constructible()>>
+		constexpr inline Matrix(this_type&& to_move_) : _data(std::move(to_move_._data))
+		{
+		}
+
 		template<typename...Args_, typename = std::enable_if_t<is_constructible<Args_...>()>>
-		constexpr inline Matrix(Args_&&...contiguous_args_) : _data(_make_data(std::make_index_sequence<num_major_elements>(), std::forward<Args_>(contiguous_args_)...))
+		explicit constexpr inline Matrix(Args_&&...contiguous_args_) : _data(_make_data(std::make_index_sequence<num_major_elements>(), std::forward<Args_>(contiguous_args_)...))
 		{
 		}
 #pragma endregion
