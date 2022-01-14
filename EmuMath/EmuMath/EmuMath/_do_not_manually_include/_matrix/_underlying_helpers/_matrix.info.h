@@ -40,6 +40,10 @@ namespace EmuMath::TMP
 		using row_get_ref_type = std::conditional_t<is_row_major, major_vector_type&, EmuMath::Vector<num_columns, value_type&>>;
 		using column_get_const_ref_type = std::conditional_t<is_column_major, const major_vector_type&, const EmuMath::Vector<num_rows, const value_type&>>;
 		using row_get_const_ref_type = std::conditional_t<is_row_major, const major_vector_type&, const EmuMath::Vector<num_columns, const value_type&>>;
+		using major_get_ref_type = major_vector_type&;
+		using major_get_const_ref_type = const major_vector_type&;
+		using non_major_get_ref_type = std::conditional_t<is_column_major, row_get_ref_type, column_get_ref_type>;
+		using non_major_get_const_ref_type = std::conditional_t<is_column_major, row_get_const_ref_type, column_get_const_ref_type>;
 	};
 }
 

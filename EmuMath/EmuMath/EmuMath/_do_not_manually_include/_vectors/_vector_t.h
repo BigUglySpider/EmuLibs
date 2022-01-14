@@ -51,6 +51,12 @@ namespace EmuMath
 		using data_storage_type = std::array<stored_type, size>;
 		using index_sequence = std::make_index_sequence<size>;
 
+		/// <summary> Functional approach to retrieve this Vector's size. Returns this type's `size` value. </summary>
+		[[nodiscard]] static constexpr inline std::size_t get_size()
+		{
+			return size;
+		}
+
 		template<class...Args_>
 		[[nodiscard]] static constexpr inline bool valid_template_construction_args()
 		{
@@ -6410,7 +6416,7 @@ namespace EmuMath
 		<
 			typename OutT_,
 			std::size_t Offset_ = 0,
-			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<const this_type&, size, OutT_, Offset_>()>
+			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<const this_type&, get_size(), OutT_, Offset_>()>
 		>
 		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Cast() const
 		{
@@ -6442,7 +6448,7 @@ namespace EmuMath
 		<
 			typename OutT_,
 			std::size_t Offset_ = 0,
-			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<this_type&, size, OutT_, Offset_>()>
+			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<this_type&, get_size(), OutT_, Offset_>()>
 		>
 		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Cast()
 		{

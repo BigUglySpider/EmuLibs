@@ -246,6 +246,10 @@ int main()
 	std::cout << some_mat_3x4f_rm_ << "\n\n";
 
 	constexpr auto some_mat_3x4f_cm_copy_ = EmuMath::Matrix<3, 4, float, true>(some_mat_3x4f_cm_);
+	constexpr auto column_1_ = some_mat_3x4f_cm_copy_.GetColumn<1>();
+	constexpr auto row_2_ = some_mat_3x4f_cm_copy_.GetRow<2>().Cast<float>();
+
+	using row_get = decltype(some_mat_3x4f_cm_.GetRow<2>());
 
 	system("pause");
 	

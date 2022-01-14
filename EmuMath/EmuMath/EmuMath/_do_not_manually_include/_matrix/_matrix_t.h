@@ -36,6 +36,10 @@ namespace EmuMath
 		using column_get_const_ref_type = typename matrix_info::column_get_const_ref_type;
 		using row_get_ref_type = typename matrix_info::row_get_ref_type;
 		using row_get_const_ref_type = typename matrix_info::row_get_const_ref_type;
+		using major_get_ref_type = typename matrix_info::major_get_ref_type;
+		using major_get_const_ref_type = typename matrix_info::major_get_const_ref_type;
+		using non_major_get_ref_type = typename matrix_info::non_major_get_ref_type;
+		using non_major_get_const_ref_type = typename matrix_info::non_major_get_const_ref_type;
 #pragma endregion
 
 #pragma region HELPER_STATIC_FUNCS
@@ -564,6 +568,87 @@ namespace EmuMath
 				);
 			}
 		}
+
+		/// <summary>
+		/// <para> Accesses the major eement at the provided MajorIndex_ within this Matrix. </para>
+		/// <para> If this Matrix is column-major: This will be a reference to the column at the specified MajorIndex_. </para>
+		/// <para> If this Matrix is not column-major: This will be a reference to the row at the specified MajorIndex_. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector referencing the specified major element within this Matrix.</returns>
+		template<std::size_t MajorIndex_>
+		[[nodiscard]] constexpr inline major_get_ref_type GetMajor()
+		{
+			if constexpr (MajorIndex_ < num_major_elements)
+			{
+				return _data.template at<MajorIndex_>();
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, MajorIndex_>(),
+					"Attempted to access a major element within an EmuMath Matrix, but the provided MajorIndex_ is invalid. The inclusive valid major index range is 0:(num_major_elements - 1)."
+				);
+			}
+		}
+
+		template<std::size_t MajorIndex_>
+		[[nodiscard]] constexpr inline major_get_const_ref_type GetMajor() const
+		{
+			// Although currently implementation is identical, this ignores DRY standards in case major_get_const_ref_type is not just const-qualified major_get_ref_type.
+			if constexpr (MajorIndex_ < num_major_elements)
+			{
+				return _data.template at<MajorIndex_>();
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, MajorIndex_>(),
+					"Attempted to access a major element within an EmuMath Matrix, but the provided MajorIndex_ is invalid. The inclusive valid major index range is 0:(num_major_elements - 1)."
+				);
+			}
+		}
+
+		/// <summary>
+		/// <para> Accesses the major eement at the provided MajorIndex_ within this Matrix. </para>
+		/// <para> If this Matrix is column-major: This will be an EmuMath Vector of references to respective elements in the row at the specified MajorIndex_. </para>
+		/// <para> If this Matrix is not column-major: This will be an EmuMath Vector of references to respective elements in the column at the specified MajorIndex_. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector of references to elements within the specified non-major element within this Matrix.</returns>
+		template<std::size_t NonMajorIndex_>
+		[[nodiscard]] constexpr inline non_major_get_ref_type GetNonMajor()
+		{
+			if constexpr (NonMajorIndex_ < num_non_major_elements)
+			{
+				return _make_non_major_vector<NonMajorIndex_, non_major_get_ref_type>(std::make_index_sequence<num_major_elements>());
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, NonMajorIndex_>(),
+					"Attempted to access a non-major element within an EmuMath Matrix, but the provided NonMajorIndex_ is invalid. The inclusive valid non-major index range is 0:(num_non_major_elements - 1)."
+				);
+			}
+		}
+
+		template<std::size_t NonMajorIndex_>
+		[[nodiscard]] constexpr inline non_major_get_const_ref_type GetNonMajor()
+		{
+			if constexpr (NonMajorIndex_ < num_non_major_elements)
+			{
+				return _make_non_major_vector<NonMajorIndex_, non_major_get_const_ref_type>(std::make_index_sequence<num_major_elements>());
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, NonMajorIndex_>(),
+					"Attempted to access a non-major element within an EmuMath Matrix, but the provided NonMajorIndex_ is invalid. The inclusive valid non-major index range is 0:(num_non_major_elements - 1)."
+				);
+			}
+		}
 #pragma endregion
 
 #pragma region STREAM_FUNCS
@@ -593,6 +678,19 @@ namespace EmuMath
 
 		template<std::size_t NonMajorIndex_, class Out_, std::size_t...MajorIndices_>
 		[[nodiscard]] constexpr inline Out_ _make_non_major_vector(std::index_sequence<MajorIndices_...> major_indices_)
+		{
+			if constexpr (is_column_major)
+			{
+				return Out_(this->template at<MajorIndices_, NonMajorIndex_>()...);
+			}
+			else
+			{
+				return Out_(this->template at<NonMajorIndex_, MajorIndices_>()...);
+			}
+		}
+
+		template<std::size_t NonMajorIndex_, class Out_, std::size_t...MajorIndices_>
+		[[nodiscard]] constexpr inline Out_ _make_non_major_vector(std::index_sequence<MajorIndices_...> major_indices_) const
 		{
 			if constexpr (is_column_major)
 			{
