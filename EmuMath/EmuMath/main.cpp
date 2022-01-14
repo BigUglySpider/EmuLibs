@@ -210,6 +210,42 @@ int main()
 	some_mat_4x2f_cm_.GetColumn<0>().at<1>() = -1337.0f;
 	std::cout << some_mat_4x2f_cm_ << "\n";
 
+	std::cout << "\n---\n";
+	constexpr auto some_mat_4x4f_cm_ = EmuMath::Matrix<4, 4, float, true>
+	(
+		0, 1, 2, 3,
+		4, 5, 6, 7,
+		8, 9, 10, 11,
+		12, 13, 14, 15
+	);
+
+	constexpr auto some_mat_4x3f_cm_ = EmuMath::Matrix<4, 3, float, true>
+	(
+		0, 1, 2,
+		4, 5, 6,
+		8, 9, 10,
+		12, 13, 14
+	);
+
+	constexpr auto some_mat_3x4f_cm_ = EmuMath::Matrix<3, 4, float, true>
+	(
+		0, 1, 2, 4,
+		5, 6, 8, 9,
+		10, 12, 13, 14
+	);
+	
+	constexpr auto some_mat_3x4f_rm_ = EmuMath::Matrix<3, 4, float, false>
+	(
+		0, 1, 2,
+		4, 5, 6,
+		8, 9, 10,
+		12, 13, 14
+	);
+
+	std::cout << some_mat_3x4f_cm_ << "\n\n";
+	std::cout << some_mat_3x4f_rm_ << "\n\n";
+
+	constexpr auto some_mat_3x4f_cm_copy_ = EmuMath::Matrix<3, 4, float, true>(some_mat_3x4f_cm_);
 
 	system("pause");
 	

@@ -49,6 +49,7 @@ namespace EmuMath
 		static constexpr bool has_alternative_representation = vector_info::has_alternative_representation;
 
 		using data_storage_type = std::array<stored_type, size>;
+		using index_sequence = std::make_index_sequence<size>;
 
 		template<class...Args_>
 		[[nodiscard]] static constexpr inline bool valid_template_construction_args()
@@ -186,6 +187,24 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region STATIC_HELPERS
+	private:
+		template<class Other_, std::size_t...Indices_>
+		[[nodiscard]] static constexpr inline data_storage_type _copy_or_move_other_data(std::index_sequence<Indices_...> indices_, Other_&& to_copy_or_move_)
+		{
+			if constexpr (std::is_lvalue_reference_v<Other_>)
+			{
+				// COPY
+				return data_storage_type({ to_copy_or_move_[Indices_]... });
+			}
+			else
+			{
+				// MOVE
+				return data_storage_type({ std::move(to_copy_or_move_[Indices_])... });
+			}
+		}
+#pragma endregion
+
 #pragma region CONSTRUCTORS
 	public:
 		/// <summary>
@@ -203,7 +222,8 @@ namespace EmuMath
 		/// <param name="to_copy_">
 		///		: Non-const reference to an EmuMath Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.
 		/// </param>
-		constexpr inline Vector(this_type& to_copy_) : _data(to_copy_._data)
+		constexpr inline Vector(this_type& to_copy_) : 
+			_data(_copy_or_move_other_data<data_storage_type&>(index_sequence(), to_copy_._data))
 		{
 		}
 
@@ -215,7 +235,8 @@ namespace EmuMath
 		///		: Const reference to an EmuMath Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.
 		/// </param>
 		template<typename = std::enable_if_t<!contains_non_const_ref>>
-		constexpr inline Vector(const this_type& to_copy_) : _data(to_copy_._data)
+		constexpr inline Vector(const this_type& to_copy_) : 
+			_data(_copy_or_move_other_data<const data_storage_type&>(index_sequence(), to_copy_._data))
 		{
 		}
 
@@ -223,7 +244,8 @@ namespace EmuMath
 		/// <para> Moves the data of the passed Vector reference into a newly constructed Vector. </para>
 		/// </summary>
 		/// <param name="to_move_">: Vector to move into the newly constructed vector.</param>
-		constexpr inline Vector(this_type&& to_move_) noexcept : _data(std::move(to_move_._data))
+		constexpr inline Vector(this_type&& to_move_) noexcept : 
+			_data(_copy_or_move_other_data<data_storage_type>(index_sequence(), std::move(to_move_._data)))
 		{
 		}
 
@@ -239,7 +261,8 @@ namespace EmuMath
 		///		: Non-const reference to an EmuMath Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.
 		/// </param>
 		template<typename OnlyIfAlternativeRepExists_ = std::enable_if_t<has_alternative_representation>>
-		constexpr inline Vector(alternative_rep& to_copy_) : _data(to_copy_._data)
+		constexpr inline Vector(alternative_rep& to_copy_) :
+			_data(_copy_or_move_other_data<data_storage_type&>(index_sequence(), to_copy_._data))
 		{
 		}
 
@@ -255,7 +278,8 @@ namespace EmuMath
 		///		: Const reference to an EmuMath Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.
 		/// </param>
 		template<typename OnlyIfAlternativeRepExists_ = std::enable_if_t<has_alternative_representation && !contains_non_const_ref>>
-		constexpr inline Vector(const alternative_rep& to_copy_) : _data(to_copy_._data)
+		constexpr inline Vector(const alternative_rep& to_copy_) :
+			_data(_copy_or_move_other_data<const data_storage_type&>(index_sequence(), to_copy_._data))
 		{
 		}
 
@@ -269,7 +293,8 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="to_move_">: EmuMath Vector to move into the newly constructed vector.</param>
 		template<typename OnlyIfAlternativeRepExists_ = std::enable_if_t<has_alternative_representation>>
-		constexpr inline Vector(alternative_rep&& to_move_) noexcept : _data(std::move(to_move_._data))
+		constexpr inline Vector(alternative_rep&& to_move_) noexcept :
+			_data(_copy_or_move_other_data<data_storage_type>(index_sequence(), std::move(to_move_._data)))
 		{
 		}
 
@@ -752,66 +777,38 @@ namespace EmuMath
 	public:
 		constexpr inline this_type& operator=(this_type&& to_move_) noexcept
 		{
-			_data = std::move(to_move_._data);
+			_data = _copy_or_move_other_data<data_storage_type>(index_sequence(), std::move(to_move_._data));
 			return *this;
 		}
 
 		template<typename = std::enable_if_t<has_alternative_representation>>
 		constexpr inline this_type& operator=(alternative_rep&& to_move_) noexcept
 		{
-			_data = std::move(to_move_._data);
+			_data = _copy_or_move_other_data<data_storage_type>(index_sequence(), std::move(to_move_._data));
 			return *this;
 		}
 
 		constexpr inline this_type& operator=(this_type& to_copy_)
 		{
-			if constexpr (contains_ref)
-			{
-				Copy(to_copy_);
-			}
-			else
-			{
-				_data = to_copy_._data;
-			}
+			Copy(to_copy_);
 			return *this;
 		}
 		template<typename = std::enable_if_t<has_alternative_representation>>
 		constexpr inline this_type& operator=(alternative_rep& to_copy_)
 		{
-			if constexpr (contains_ref)
-			{
-				Copy(to_copy_);
-			}
-			else
-			{
-				_data = to_copy_._data;
-			}
+			Copy(to_copy_);
 			return *this;
 		}
 
 		constexpr inline this_type& operator=(const this_type& to_copy_)
 		{
-			if constexpr (contains_ref)
-			{
-				Copy(to_copy_);
-			}
-			else
-			{
-				_data = to_copy_._data;
-			}
+			Copy(to_copy_);
 			return *this;
 		}
 		template<typename = std::enable_if_t<has_alternative_representation>>
 		constexpr inline this_type& operator=(const alternative_rep& to_copy_)
 		{
-			if constexpr (contains_ref)
-			{
-				Copy(to_copy_);
-			}
-			else
-			{
-				_data = to_copy_._data;
-			}
+			Copy(to_copy_);
 			return *this;
 		}
 
@@ -972,6 +969,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONST_BITWISE_OPERATORS
+	public:
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator~() const
 		{
@@ -1922,6 +1920,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONST_BITWISE_FUNCS
+	public:
 		/// <summary>
 		/// <para> Returns the result of bitwise ANDing this Vector with rhs_. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be ANDed. Otherwise, all elements be ANDed with rhs_ directly. </para>
@@ -2650,6 +2649,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region BITWISE_ASSIGN_FUNCS
+	public:
 		/// <summary>
 		/// <para> Performs a bitwise AND-assign operation on this Vector, equivalent to `this_vector &= rhs_`. </para>
 		/// <para> If rhs_ is an EmuMath Vector: Respective indices will be used for each bitwise operation; otherwise, all operations will use rhs_ directly. </para>
@@ -4515,6 +4515,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONCAT_FUNCS
+	public:
 		/// <summary>
 		/// <para> Concatenates this Vector with the passed EmuMath Vector to form a new single Vector. </para>
 		/// <para> If Left_ is true, this Vector will appear on the left of concatenation; otherwise, it will appear on the right. </para>
@@ -4599,6 +4600,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region VECTOR_OPERATIONS
+	public:
 		/// <summary>
 		/// <para>
 		///		Calculates the dot product of this Vector and the passed vector_b_,
@@ -5582,6 +5584,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CMP_NEAR_FUNCS
+	public:
 		/// <summary>
 		/// <para> Adaptive near-equality comparison which changes behaviour based on the provided Rhs_ type, intended for safer floating-point equality checks. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Equivalent to CmpAllNear. </para>
@@ -5680,6 +5683,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CMP_NOT_NEAR_FUNCS
+	public:
 		/// <summary>
 		/// <para> Adaptive not near-equality comparison which changes behaviour based on the provided Rhs_ type, intended for safer floating-point inequality checks. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Equivalent to CmpAllNear. </para>
@@ -5778,6 +5782,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CMP_EQUAL_FUNCS
+	public:
 		/// <summary>
 		/// <para> Adaptive equality comparison which changes behaviour based on the provided Rhs_ type. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Equivalent to CmpAllNear. </para>
@@ -5975,6 +5980,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CMP_GREATER_FUNCS
+	public:
 		/// <summary>
 		/// <para> Returns true if the magnitude of this Vector is greater than that of rhs_. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Both Vector's magnitudes will be compared. Otherwise, this Vector's magnitude will be compared with rhs_ directly. </para>
@@ -6073,6 +6079,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CMP_LESS_FUNCS
+	public:
 		/// <summary>
 		/// <para> Returns true if the magnitude of this Vector is less than that of rhs_. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Both Vector's magnitudes will be compared. Otherwise, this Vector's magnitude will be compared with rhs_ directly. </para>
@@ -6171,6 +6178,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CMP_GREATER_EQUAL_FUNCS
+	public:
 		/// <summary>
 		/// <para> Returns true if the magnitude of this Vector is greater than or equal to that of rhs_. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Both Vector's magnitudes will be compared. Otherwise, this Vector's magnitude will be compared with rhs_ directly. </para>
@@ -6269,6 +6277,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CMP_LESS_EQUAL_FUNCS
+	public:
 		/// <summary>
 		/// <para> Returns true if the magnitude of this Vector is less than or equal to that of rhs_. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Both Vector's magnitudes will be compared. Otherwise, this Vector's magnitude will be compared with rhs_ directly. </para>

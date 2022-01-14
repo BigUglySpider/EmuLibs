@@ -3,6 +3,7 @@
 
 #include "_helpers/_all_matrix_helpers.h"
 #include <exception>
+#include <tuple>
 #include <utility>
 
 namespace EmuMath
@@ -17,6 +18,8 @@ namespace EmuMath
 		static constexpr std::size_t num_columns = matrix_info::num_columns;
 		static constexpr std::size_t num_rows = matrix_info::num_rows;
 		static constexpr std::size_t size = matrix_info::size;
+		static constexpr std::size_t num_major_elements = matrix_info::num_major_elements;
+		static constexpr std::size_t num_non_major_elements = matrix_info::num_non_major_elements;
 		static constexpr bool is_column_major = matrix_info::is_column_major;
 		static constexpr bool is_row_major = matrix_info::is_row_major;
 		static constexpr bool contains_ref = matrix_info::contains_ref;
@@ -24,7 +27,10 @@ namespace EmuMath
 		static constexpr bool contains_non_const_ref = matrix_info::contains_non_const_ref;
 
 		using matrix_vector_type = typename matrix_info::matrix_vector_type;
+		using stored_type = typename matrix_info::stored_type;
 		using value_type = typename matrix_info::value_type;
+		using value_type_uq = typename matrix_info::value_type_uq;
+		using preferred_floating_point = typename matrix_info::preferred_floating_point;
 
 		using column_get_ref_type = typename matrix_info::column_get_ref_type;
 		using column_get_const_ref_type = typename matrix_info::column_get_const_ref_type;
@@ -93,12 +99,63 @@ namespace EmuMath
 				);
 			}
 		}
+
+		[[nodiscard]] static constexpr inline bool is_default_constructible()
+		{
+			return std::is_default_constructible_v<matrix_vector_type>;
+		}
+
+		template<typename...Args_>
+		[[nodiscard]] static constexpr inline bool is_constructible()
+		{
+			return
+			(
+				sizeof...(Args_) == size &&
+				size > 1 &&
+				EmuCore::TMP::variadic_and_v<std::is_constructible_v<stored_type, decltype(std::forward<Args_>(std::declval<Args_>()))>...>
+			);
+		}
+
+		[[nodiscard]] static constexpr inline bool is_const_copy_constructible()
+		{
+			return std::is_constructible_v<matrix_vector_type, const matrix_vector_type&>;
+		}
+
+		[[nodiscard]] static constexpr inline bool is_non_const_copy_constructible()
+		{
+			return std::is_constructible_v<matrix_vector_type, matrix_vector_type&>;
+		}
+
+		[[nodiscard]] static constexpr inline bool is_move_constructible()
+		{
+			return std::is_constructible_v<matrix_vector_type, matrix_vector_type&&>;
+		}
 #pragma endregion
 
 #pragma region CONSTRUCTORS
 	public:
-		template<typename = std::enable_if_t<std::is_default_constructible_v<matrix_vector_type>>>
+		template<typename = std::enable_if_t<is_default_constructible()>>
 		constexpr inline Matrix() : _data()
+		{
+		}
+
+		template<typename = std::enable_if_t<is_const_copy_constructible()>>
+		constexpr inline Matrix(const this_type& to_copy_) : _data(to_copy_._data)
+		{
+		}
+
+		template<typename = std::enable_if_t<is_non_const_copy_constructible()>>
+		constexpr inline Matrix(this_type& to_copy_) : _data(to_copy_._data)
+		{
+		}
+
+		template<typename = std::enable_if_t<is_move_constructible()>>
+		constexpr inline Matrix(this_type&& to_move_) : _data(std::move(to_move_._data))
+		{
+		}
+
+		template<typename...Args_, typename = std::enable_if_t<is_constructible<Args_...>()>>
+		explicit constexpr inline Matrix(Args_&&...contiguous_args_) : _data(_make_data(std::make_index_sequence<num_major_elements>(), std::forward<Args_>(contiguous_args_)...))
 		{
 		}
 #pragma endregion
@@ -545,6 +602,34 @@ namespace EmuMath
 			{
 				return Out_(this->template at<NonMajorIndex_, MajorIndices_>()...);
 			}
+		}
+
+		template<std::size_t MajorIndex_, typename...Args_, std::size_t...NonMajorIndices_>
+		[[nodiscard]] static constexpr inline typename matrix_vector_type::stored_type _make_major_index
+		(
+			std::index_sequence<NonMajorIndices_...> non_major_indices_,
+			std::tuple<Args_...>& tuple_of_args_
+		)
+		{
+			constexpr std::size_t major_offset_ = MajorIndex_ * num_non_major_elements;
+			return typename matrix_vector_type::stored_type
+			(
+				std::get<major_offset_ + NonMajorIndices_>(tuple_of_args_)...
+			);
+		}
+
+		template<typename...Args_, std::size_t...MajorIndices_>
+		[[nodiscard]] static constexpr inline matrix_vector_type _make_data(std::index_sequence<MajorIndices_...> major_indices_, Args_&&...args_)
+		{
+			auto tuple_of_args_ = std::forward_as_tuple(std::forward<Args_>(args_)...);
+			return matrix_vector_type
+			(
+				_make_major_index<MajorIndices_>
+				(
+					std::make_index_sequence<num_non_major_elements>(),
+					tuple_of_args_
+				)...
+			);
 		}
 	};
 }
