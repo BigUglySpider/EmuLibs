@@ -249,6 +249,15 @@ int main()
 	constexpr auto column_1_ = some_mat_3x4f_cm_copy_.GetColumn<1>();
 	constexpr auto row_2_ = some_mat_3x4f_cm_copy_.GetRow<2>().Cast<float>();
 
+	constexpr auto theoretical_test_0_ = some_mat_3x4f_cm_.AtTheoretical<25>();
+	constexpr auto theoretical_test_1_ = some_mat_3x4f_cm_.AtTheoretical<3>();
+	constexpr auto theoretical_test_2_ = some_mat_3x4f_cm_.AtTheoretical<1, 2>();
+	constexpr auto theoretical_test_3_ = some_mat_3x4f_cm_.AtTheoretical<0, 25>();
+	constexpr auto theoretical_test_4_ = some_mat_3x4f_cm_.AtTheoretical<25, 0>();
+	constexpr auto theoretical_test_5_ = some_mat_3x4f_cm_.AtTheoretical<25, 25>();
+
+	using matrix = EmuMath::Matrix<3, 4, float, true>;
+
 	using row_get = decltype(some_mat_3x4f_cm_.GetRow<2>());
 
 	system("pause");

@@ -168,7 +168,7 @@ namespace EmuMath
 	public:
 		/// <summary>
 		/// <para> Accesses the element at the provided indices within this Matrix, with compile-time validity checks. </para>
-		/// <para> If either ColumnIndex_ or RowIndex_, a static_assert will be triggered. </para>
+		/// <para> If either ColumnIndex_ or RowIndex_ is not contained, a static_assert will be triggered. </para>
 		/// </summary>
 		/// <returns>Reference to the element at the provided index within this Matrix.</returns>
 		template<std::size_t ColumnIndex_, std::size_t RowIndex_>
@@ -205,6 +205,24 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline const value_type& at() const
 		{
 			return const_cast<this_type*>(this)->template at<ColumnIndex_, RowIndex_>();
+		}
+
+		/// <summary>
+		/// <para> Accesses the element at the provided indices within this Matrix, with compile-time validity checks. </para>
+		/// <para> If the provided idnex is contained, this will return a reference to the specified element. </para>
+		/// <para> If either ColumnIndex_ or RowIndex_ is not contained, this will return a newly constructed value_type_uq. </para>
+		/// </summary>
+		/// <returns>Reference to the element at the provided index within this Matrix if the index is contained, otherwise a newly constructed value_type_uq.</returns>
+		template<std::size_t ColumnIndex_, std::size_t RowIndex_>
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_theoretical_get_result<ColumnIndex_, RowIndex_, this_type&>::type AtTheoretical()
+		{
+			return EmuMath::Helpers::matrix_get_theoretical<ColumnIndex_, RowIndex_>(*this);
+		}
+
+		template<std::size_t ColumnIndex_, std::size_t RowIndex_>
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_theoretical_get_result<ColumnIndex_, RowIndex_, const this_type&>::type AtTheoretical() const
+		{
+			return EmuMath::Helpers::matrix_get_theoretical<ColumnIndex_, RowIndex_>(*this);
 		}
 
 		/// <summary>
@@ -262,6 +280,24 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline const value_type& at() const
 		{
 			return const_cast<this_type*>(this)->template at<FlattenedIndex_>();
+		}
+
+		/// <summary>
+		/// <para> Accesses the element at the provided indices within this Matrix, with compile-time validity checks. </para>
+		/// <para> If the provided idnex is contained, this will return a reference to the specified element. </para>
+		/// <para> If either ColumnIndex_ or RowIndex_ is not contained, this will return a newly constructed value_type_uq. </para>
+		/// </summary>
+		/// <returns>Reference to the element at the provided index within this Matrix if the index is contained, otherwise a newly constructed value_type_uq.</returns>
+		template<std::size_t FlattenedIndex_>
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_flattened_theoretical_get_result<FlattenedIndex_, this_type&>::type AtTheoretical()
+		{
+			return EmuMath::Helpers::matrix_get_theoretical<FlattenedIndex_>(*this);
+		}
+
+		template<std::size_t FlattenedIndex_>
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_flattened_theoretical_get_result<FlattenedIndex_, const this_type&>::type AtTheoretical() const
+		{
+			return EmuMath::Helpers::matrix_get_theoretical<FlattenedIndex_>(*this);
 		}
 
 		/// <summary>
