@@ -41,25 +41,10 @@
     <ClInclude Include="EmuCore\TMPHelpers\TypeConvertors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuCore\TMPHelpers\Functors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EmuSIMD\SIMDHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuCore\ArithmeticHelpers\BitHelpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\VectorT.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\VectorHelpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\VectorHelpersUnderlying.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\VectorTMP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\Vector.h">
@@ -80,79 +65,7 @@
     <ClInclude Include="EmuCore\CommonTypes\DeferrableReferenceWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\Vector2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\VectorInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\Vector3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\Vector4.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\FastVector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\FastVector4f.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\MatrixT.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\Matrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\MatrixHelpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\MatrixTMP.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EmuCore\TMPHelpers\Tuples.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_common_underlying_matrix_helper_includes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_gets_underlying.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_validity_checks_underlying.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_sets_underlying.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_reinterpretations_underlying.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_arithmetic_underlying.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_operations_underlying.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_transformations_underlying.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_common_matrix_helper_includes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_gets.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_reinterpretations.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_arithmetic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_operations.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_transformations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuCore\Events\Event.h">
@@ -167,40 +80,7 @@
     <ClInclude Include="EmuCore\Events\ThreadSafeEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_projections.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_projections_underlying.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_sets.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_bitwise.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_matrix_comparisons.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers_underlying\_matrix_comparisons_underlying.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EmuCore\Functors\MiscMath.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\_helpers\_functors_matrix_arithmetic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\MatrixInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\Matrix4x4.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_matrices\FastMatrix4x4f.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\FastMatrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_common_simd_helpers_includes.h">
@@ -218,73 +98,73 @@
     <ClInclude Include="EmuMath\Noise.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseTable.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_table.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\NoiseGen1D.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_scalar_noise_gen_1d.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_info\NoiseType.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_info\_noise_type.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\Random.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_random\RngWrapper.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_random\_rng_wrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_random\ShuffledIntSequence.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_random\_shuffled_int_sequence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_common_noise_gen_functor_includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseFunctors.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_scalar_noise_functors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\NoiseGen2D.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_scalar_noise_gen_2d.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseSampleProcessors.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_scalar_noise_sample_processors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\NoiseGen3D.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_scalar_noise_gen_3d.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseTMP.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_tmp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseTableOptions.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_table_options.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_info\NoisePermutationInfo.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_info\_noise_permutation_info.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_info\FractalNoiseInfo.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_info\_fractal_noise_info.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FractalNoiseWrapper.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_fractal_noise_wrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\NoiseSampleProcessorAnalytics.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_sample_processor_analytics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuCore\Functors\Analytics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\NoisePermutations.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_noise_permutations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\Colour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourT.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_colour_t.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourTMP.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_helpers_underlying\_colour_tmp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourHelpers.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_colour_helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_helpers_underlying\_colour_helpers_underlying.h">
@@ -293,43 +173,43 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_helpers_underlying\_colour_helpers_underlying_common_includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\WrappedColour.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_wrapped_colour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourValidationLayer.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_colour_validation_layer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ClampedColour.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_clamped_colour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\Gradient.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_gradient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourArithmeticFunctors.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_colour_arithmetic_functors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourConstants.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_colour_constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\ColourComparisonFunctors.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_colour_cmp_functors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\FastNoiseTable.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_fast_noise_table.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\FastNoiseSampleProcessors.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_fast_noise_sample_processors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\FastNoise.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FastFractalNoiseWrapper.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_simd_fractal_noise_wrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\FastNoiseFunctors.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_fast_noise_functors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FastNoiseGen3D.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_simd_noise_gen_3d.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_aliases.h">
@@ -464,10 +344,136 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_common_fast_noise_gen_functors_includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FastNoiseGen2D.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_simd_noise_gen_2d.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\FastNoiseGen1D.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_simd_noise_gen_1d.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_vector_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_tmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_common_vector_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_info.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_get_underlying.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_get.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_set_underlying.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_set.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_stream_append_underlying.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_stream_append.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_copy_underlying.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_copy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_mutation_underlying.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_mutation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_basic_arithmetic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_rounds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuCore\TMPHelpers\OperatorChecks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuCore\TMPHelpers\TypeObfuscation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuCore\TMPHelpers\VariadicHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_rounds_constexpr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_misc_arithmetic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_unary_arithmetic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_bitwise.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_basic_arithmetic_assign.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_bitwise_assign.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_special_operations_underlying.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_special_operations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_misc_arithmetic_underlying.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_cast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_cast_underlying.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_cmp_underlying.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_cmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuCore\TMPHelpers\StdAliases.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_matrix_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_matrix_tmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_matrix.info.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\Matrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_matrix_underlying_stream_append.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_stream_append.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_common_matrix_helper_includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_all_matrix_helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

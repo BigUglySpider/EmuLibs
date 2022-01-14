@@ -3,6 +3,7 @@
 
 #include "_common_underlying_simd_template_helper_includes.h"
 #include "_simd_helpers_underlying_index_masks.h"
+#include "../../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD::_underlying_simd_helpers
 {
@@ -50,12 +51,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform bitwise AND of a SIMD register using EmuSIMD helpers, but the provided SIMD register is not supported for this operation");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform bitwise AND of a SIMD register using EmuSIMD helpers, but the provided SIMD register is not supported for this operation");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform bitwise AND of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform bitwise AND of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register.");
 		}
 	}
 
@@ -103,12 +104,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform bitwise OR of a SIMD register using EmuSIMD helpers, but the provided SIMD register is not supported for this operation");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform bitwise OR of a SIMD register using EmuSIMD helpers, but the provided SIMD register is not supported for this operation");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform bitwise OR of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform bitwise OR of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register.");
 		}
 	}
 
@@ -156,12 +157,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform bitwise XOR of a SIMD register using EmuSIMD helpers, but the provided SIMD register is not supported for this operation");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform bitwise XOR of a SIMD register using EmuSIMD helpers, but the provided SIMD register is not supported for this operation");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform bitwise XOR of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform bitwise XOR of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register.");
 		}
 	}
 
@@ -209,12 +210,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform bitwise ANDNOT of a SIMD register using EmuSIMD helpers, but the provided SIMD register is not supported for this operation");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform bitwise ANDNOT of a SIMD register using EmuSIMD helpers, but the provided SIMD register is not supported for this operation");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform bitwise ANDNOT of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform bitwise ANDNOT of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register.");
 		}
 	}
 
@@ -242,17 +243,17 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to perform bitwise NOT of a SIMD register using EmuSIMD helpers, but a mask to perform the operation could not be successfully generated.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform bitwise NOT of a SIMD register using EmuSIMD helpers, but a mask to perform the operation could not be successfully generated.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform bitwise NOT of a SIMD register using EmuSIMD helpers, but provided a SIMD register that is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform bitwise NOT of a SIMD register using EmuSIMD helpers, but provided a SIMD register that is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform bitwise NOT of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform bitwise NOT of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register.");
 		}
 	}
 }

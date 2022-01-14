@@ -5,6 +5,7 @@
 #include <type_traits>
 #include "../EmuCore/TMPHelpers/TypeComparators.h"
 #include "../EmuCore/TMPHelpers/TypeConvertors.h"
+#include "../EmuCore/TMPHelpers/Values.h"
 #include "ThreadPool.h"
 #include "Functors/ParallelLoopFunctors/default_parallel_loop_custom_incrementer.h"
 #include "Functors/ParallelLoopFunctors/default_parallel_loop_incrementer.h"
@@ -196,7 +197,7 @@ namespace EmuThreads
 								}
 								else
 								{
-									static_assert(false, "Provided a tuple for all arguments (excluding Func_) for EmuThreads::ParallelFor::Execute, but the Incrementer_ tuple does not contain a number of types equal to 1 or the number of iterators. There must be 1 incrementer for all iterators, or 1 incrementer per iterator.");
+									static_assert(EmuCore::TMP::get_false<Iterator_>(), "Provided a tuple for all arguments (excluding Func_) for EmuThreads::ParallelFor::Execute, but the Incrementer_ tuple does not contain a number of types equal to 1 or the number of iterators. There must be 1 incrementer for all iterators, or 1 incrementer per iterator.");
 								}
 							}
 							else
@@ -208,7 +209,7 @@ namespace EmuThreads
 						}
 						else
 						{
-							static_assert(false, "Provided a tuple as the Iterator_ and Comparator_ for EmuThreads::ParallelFor::Execute, but the Comparator_ tuple does not contain a number of types equal to 1 or the number of iterators. There must be 1 comparator for all iterators, or 1 comparator per iterator.");
+							static_assert(EmuCore::TMP::get_false<Iterator_>(), "Provided a tuple as the Iterator_ and Comparator_ for EmuThreads::ParallelFor::Execute, but the Comparator_ tuple does not contain a number of types equal to 1 or the number of iterators. There must be 1 comparator for all iterators, or 1 comparator per iterator.");
 						}
 					}
 					else
@@ -224,7 +225,7 @@ namespace EmuThreads
 							}
 							else
 							{
-								static_assert(false, "Provided a tuple as the Iterator_ and Incrementer_ for EmuThreads::ParallelFor::Execute, but the Incrementer_ tuple does not contain a number of types equal to 1 or the number of iterators. There must be 1 incrementer for all iterators, or 1 incrementer per iterator.");
+								static_assert(EmuCore::TMP::get_false<Iterator_>(), "Provided a tuple as the Iterator_ and Incrementer_ for EmuThreads::ParallelFor::Execute, but the Incrementer_ tuple does not contain a number of types equal to 1 or the number of iterators. There must be 1 incrementer for all iterators, or 1 incrementer per iterator.");
 							}
 						}
 						else
@@ -237,7 +238,7 @@ namespace EmuThreads
 				}
 				else
 				{
-					static_assert(false, "Provided a tuple as the Iterator_ for EmuThreads::ParallelFor::Execute with a size of 0. There must be at least one Iterator_. within a tuple of iterators");
+					static_assert(EmuCore::TMP::get_false<Iterator_>(), "Provided a tuple as the Iterator_ for EmuThreads::ParallelFor::Execute with a size of 0. There must be at least one Iterator_. within a tuple of iterators");
 				}
 			}
 			else
@@ -258,7 +259,7 @@ namespace EmuThreads
 							}
 							else
 							{
-								static_assert(false, "Provided a tuple for Comparator_ and Incrementer_ with a non-tuple Iterator_ for EmuThreads::ParallelFor::Execute, but the size of the Incrementer_ tuple is not equal to 1. Non-tuple iterator arguments are interpreted as 1-dimensional loops, and thus require a single incrementer (which may or may not be contained within a tuple).");
+								static_assert(EmuCore::TMP::get_false<Iterator_>(), "Provided a tuple for Comparator_ and Incrementer_ with a non-tuple Iterator_ for EmuThreads::ParallelFor::Execute, but the size of the Incrementer_ tuple is not equal to 1. Non-tuple iterator arguments are interpreted as 1-dimensional loops, and thus require a single incrementer (which may or may not be contained within a tuple).");
 							}
 						}
 						else
@@ -270,7 +271,7 @@ namespace EmuThreads
 					}
 					else
 					{
-						static_assert(false, "Provided a tuple for Comparator_ with a non-tuple Iterator_ for EmuThreads::ParallelFor::Execute, but the size of the Comparator_ tuple is not equal to 1. Non-tuple iterator arguments are interpreted as 1-dimensional loops, and thus require a single comparator (which may or nay not be contained within a tuple).");
+						static_assert(EmuCore::TMP::get_false<Iterator_>(), "Provided a tuple for Comparator_ with a non-tuple Iterator_ for EmuThreads::ParallelFor::Execute, but the size of the Comparator_ tuple is not equal to 1. Non-tuple iterator arguments are interpreted as 1-dimensional loops, and thus require a single comparator (which may or nay not be contained within a tuple).");
 					}
 				}
 				else
@@ -284,7 +285,7 @@ namespace EmuThreads
 						}
 						else
 						{
-							static_assert(false, "Provided a tuple for Incrementer_ with a non-tuple Iterator_ for EmuThreads::ParallelFor::Execute, but the size of the Incrementer_ tuple is not equal to 1.  Non-tuple iterator arguments are interpreted as 1-dimensional loops, and thus require a single incrementer (which may or may not be contained within a tuple).");
+							static_assert(EmuCore::TMP::get_false<Iterator_>(), "Provided a tuple for Incrementer_ with a non-tuple Iterator_ for EmuThreads::ParallelFor::Execute, but the size of the Incrementer_ tuple is not equal to 1.  Non-tuple iterator arguments are interpreted as 1-dimensional loops, and thus require a single incrementer (which may or may not be contained within a tuple).");
 						}
 					}
 					else

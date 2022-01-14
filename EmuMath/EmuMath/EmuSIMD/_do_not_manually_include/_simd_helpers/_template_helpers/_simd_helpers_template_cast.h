@@ -2,6 +2,7 @@
 #define EMU_SIMD_HELPERS_TEMPLATE_CAST_H_INC_ 1
 
 #include "_underlying_template_helpers/_simd_helpers_underlying_cast.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD
 {
@@ -26,12 +27,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::cast, but the provided ToRegister_ (the output type) is not recognised as a supported SIMD register.");
+				static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to perform EmuSIMD::cast, but the provided ToRegister_ (the output type) is not recognised as a supported SIMD register.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cast, but the provided FromRegister_ (the input type) is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to perform EmuSIMD::cast, but the provided FromRegister_ (the input type) is not recognised as a supported SIMD register.");
 		}
 	}
 }

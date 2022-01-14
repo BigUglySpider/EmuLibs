@@ -2,6 +2,7 @@
 #define EMU_SIMD_COMMON_UNDERLYING_SIMD_CAST_INCLUDES_H_INC_ 1
 
 #include "_common_underlying_simd_template_helper_includes.h"
+#include "../../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD::_underlying_simd_helpers
 {
@@ -49,12 +50,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to cast a __m128 register via EmuSIMD helpers, but the provided SIMD register to cast to is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a __m128 register via EmuSIMD helpers, but the provided SIMD register to cast to is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to cast a __m128 register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a __m128 register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
 		}
 	}
 
@@ -102,12 +103,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to cast a __m256 register via EmuSIMD helpers, but the provided SIMD register to cast to is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a __m256 register via EmuSIMD helpers, but the provided SIMD register to cast to is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to cast a __m256 register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a __m256 register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
 		}
 	}
 
@@ -155,12 +156,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to cast a __m512 register via EmuSIMD helpers, but the provided SIMD register to cast to is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a __m512 register via EmuSIMD helpers, but the provided SIMD register to cast to is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to cast a __m512 register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a __m512 register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
 		}
 	}
 
@@ -208,12 +209,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to cast a __m128d register via EmuSIMD helpers, but the provided SIMD register to cast to is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a __m128d register via EmuSIMD helpers, but the provided SIMD register to cast to is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to cast a __m128d register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a __m128d register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
 		}
 	}
 
@@ -261,12 +262,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to cast a __m256d register via EmuSIMD helpers, but the provided SIMD register to cast to is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a __m256d register via EmuSIMD helpers, but the provided SIMD register to cast to is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to cast a __m256d register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a __m256d register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
 		}
 	}
 
@@ -314,12 +315,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to cast a __m512d register via EmuSIMD helpers, but the provided SIMD register to cast to is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a __m512d register via EmuSIMD helpers, but the provided SIMD register to cast to is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to cast a __m512d register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a __m512d register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
 		}
 	}
 
@@ -367,12 +368,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to cast a __m128i register via EmuSIMD helpers, but the provided SIMD register to cast to is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a __m128i register via EmuSIMD helpers, but the provided SIMD register to cast to is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to cast a __m128i register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a __m128i register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
 		}
 	}
 
@@ -420,12 +421,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to cast a __m256i register via EmuSIMD helpers, but the provided SIMD register to cast to is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a __m256i register via EmuSIMD helpers, but the provided SIMD register to cast to is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to cast a __m256i register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a __m256i register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
 		}
 	}
 
@@ -473,12 +474,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 			}
 			else
 			{
-				static_assert(false, "Attempted to cast a __m512i register via EmuSIMD helpers, but the provided SIMD register to cast to is not supported for this operation.");
+				static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a __m512i register via EmuSIMD helpers, but the provided SIMD register to cast to is not supported for this operation.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to cast a __m512i register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a __m512i register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
 		}
 	}
 
@@ -529,17 +530,17 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else
 				{
-					static_assert(false, "Attempted to cast a SIMD register via EmuSIMD helpers, but the provided SIMD register to cast from is not supported for this operation.");
+					static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a SIMD register via EmuSIMD helpers, but the provided SIMD register to cast from is not supported for this operation.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to cast a SIMD register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
+				static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a SIMD register via EmuSIMD helpers, but the provided register to cast to is not recognisd as a supported SIMD register.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to cast a SIMD register via EmuSIMD helpers, but the provided register to cast from is not recognisd as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<ToRegister_>(), "Attempted to cast a SIMD register via EmuSIMD helpers, but the provided register to cast from is not recognisd as a supported SIMD register.");
 		}
 	}
 }

@@ -24,7 +24,7 @@ namespace EmuSIMD::TMP
 		}
 		else
 		{
-			static_assert(false, "Invalid element width for a SIMD register provided. Valid per-element widths for integral SIMD registers are: 8, 16, 32, 64.");
+			static_assert(EmuCore::TMP::get_false<std::size_t, Width_>(), "Invalid element width for a SIMD register provided. Valid per-element widths for integral SIMD registers are: 8, 16, 32, 64.");
 			return false;
 		}
 	}

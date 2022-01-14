@@ -9,6 +9,7 @@
 #include "Functors/prioritised_work_allocator.h"
 #include "TMP/CommonThreadingAliases.h"
 #include "TMP/ThreadPoolTMP.h"
+#include "../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuThreads
 {
@@ -351,7 +352,7 @@ namespace EmuThreads
 			}
 			else
 			{
-				static_assert(false, "Attempted to allocate a task to an EmuThreads::ThreadPool with a designated priority, but the underlying work allocator does not take priority arguments.");
+				static_assert(EmuCore::TMP::get_false<Func_>(), "Attempted to allocate a task to an EmuThreads::ThreadPool with a designated priority, but the underlying work allocator does not take priority arguments.");
 			}
 		}
 

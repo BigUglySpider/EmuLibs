@@ -3,6 +3,7 @@
 
 #include "_common_underlying_simd_template_helper_includes.h"
 #include "_simd_helpers_underlying_shuffle_masks.h"
+#include "../../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD::_underlying_simd_helpers
 {
@@ -41,21 +42,21 @@ namespace EmuSIMD::_underlying_simd_helpers
 				}
 				else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>::value)
 				{
-					static_assert(false, "Attempted to shuffle 2 integral SIMD registers using EmuSIMD helpers, but only one integral register may be shuffled.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to shuffle 2 integral SIMD registers using EmuSIMD helpers, but only one integral register may be shuffled.");
 				}
 				else
 				{
-					static_assert(false, "Attempted to shuffle SIMD registers using EmuSIMD helpers, but the provided Register_ types are unsupported.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to shuffle SIMD registers using EmuSIMD helpers, but the provided Register_ types are unsupported.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Attempted to shuffle SIMD registers using EmuSIMD helpers, but the provided indices did not form a valid shuffle mask template for the provided register type.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to shuffle SIMD registers using EmuSIMD helpers, but the provided indices did not form a valid shuffle mask template for the provided register type.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to shuffle SIMD registers using EmuSIMD helpers, but the provided Register_ type was not a supported SIMD register type.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to shuffle SIMD registers using EmuSIMD helpers, but the provided Register_ type was not a supported SIMD register type.");
 		}
 	}
 	template<std::size_t...Indices_, class Register_>
@@ -110,18 +111,18 @@ namespace EmuSIMD::_underlying_simd_helpers
 					}
 					else
 					{
-						static_assert(false, "Attempted to shuffle a SIMD register using EmuSIMD helpers, but the provided Register_ type is unsupported.");
+						static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to shuffle a SIMD register using EmuSIMD helpers, but the provided Register_ type is unsupported.");
 					}
 				}
 				else
 				{
-					static_assert(false, "Attempted to shuffle a SIMD register using EmuSIMD helpers, but the provided indices did not form a valid shuffle mask template for the provided register type.");
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to shuffle a SIMD register using EmuSIMD helpers, but the provided indices did not form a valid shuffle mask template for the provided register type.");
 				}
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to shuffle a SIMD register using EmuSIMD helpers, but the provided Register_ type was not a supported SIMD register type.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to shuffle a SIMD register using EmuSIMD helpers, but the provided Register_ type was not a supported SIMD register type.");
 		}
 	}
 

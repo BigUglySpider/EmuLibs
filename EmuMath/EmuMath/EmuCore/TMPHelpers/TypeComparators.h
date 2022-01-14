@@ -3,9 +3,23 @@
 
 #include <tuple>
 #include <type_traits>
+#include "OperatorChecks.h"
 
 namespace EmuCore::TMP
 {
+	template<typename Out_, typename In_>
+	struct is_compatible
+	{
+		static constexpr bool is_constructible = std::is_constructible_v<Out_, In_>;
+		static constexpr bool is_convertible = std::is_convertible_v<In_, Out_>;
+		static constexpr bool is_assignable = std::is_assignable_v<Out_, In_>;
+		static constexpr bool is_static_castable = EmuCore::TMP::is_static_castable_v<In_, Out_>;
+
+		static constexpr bool value = is_constructible || is_convertible || is_assignable || is_static_castable;
+	};
+	template<typename Out_, typename In_>
+	static constexpr bool is_compatible_v = is_compatible<Out_, In_>::value;
+
 	/// <summary> Finds the largest byte-sized type of the passed options. For matching type sizes, the leftmost type receives priority. </summary>
 	/// <typeparam name="X_">First type to compare. Required.</typeparam>
 	/// <typeparam name="Y_">Second type to compare. Required.</typeparam>
@@ -329,12 +343,12 @@ namespace EmuCore::TMP
 	};
 
 	template<class A_, class B_>
-	struct is_two_way_convertible
+	struct is_two_way_static_castable
 	{
-		static constexpr bool value = std::is_convertible_v<A_, B_> && std::is_convertible_v<B_, A_>;
+		static constexpr bool value = EmuCore::TMP::is_static_castable_v<A_, B_> && EmuCore::TMP::is_static_castable_v<B_, A_>;
 	};
 	template<class A_, class B_>
-	constexpr bool is_two_way_convertible_v = is_two_way_convertible<A_, B_>::value;
+	constexpr bool is_two_way_static_castable_v = is_two_way_static_castable<A_, B_>::value;
 
 	/// <summary> Type used to encapsualate a void type. Not to be confused with std::void_t. </summary>
 	struct void_type
@@ -363,17 +377,17 @@ namespace EmuCore::TMP
 	using conditional_const_t = typename conditional_const<Condition_, T_>::type;
 
 	template<typename ToConvertTo_, typename FirstToConvertFrom_, typename...OthersToConvertFrom_>
-	struct are_all_convertible
+	struct are_all_static_castable
 	{
-		static constexpr bool value = std::is_convertible_v<FirstToConvertFrom_, ToConvertTo_> ? are_all_convertible<ToConvertTo_, OthersToConvertFrom_...>::value : false;
+		static constexpr bool value = EmuCore::TMP::is_static_castable_v<FirstToConvertFrom_, ToConvertTo_> ? are_all_static_castable<ToConvertTo_, OthersToConvertFrom_...>::value : false;
 	};
 	template<typename ToConvertTo_, typename FirstToConvertFrom_>
-	struct are_all_convertible<ToConvertTo_, FirstToConvertFrom_>
+	struct are_all_static_castable<ToConvertTo_, FirstToConvertFrom_>
 	{
-		static constexpr bool value = std::is_convertible_v<FirstToConvertFrom_, ToConvertTo_>;
+		static constexpr bool value = EmuCore::TMP::is_static_castable_v<FirstToConvertFrom_, ToConvertTo_>;
 	};
 	template<typename ToConvertTo_, typename...ToConvertFrom_>
-	static constexpr bool are_all_convertible_v = are_all_convertible<ToConvertTo_, ToConvertFrom_...>::value;
+	static constexpr bool are_all_static_castable_v = are_all_static_castable<ToConvertTo_, ToConvertFrom_...>::value;
 
 	template<class T_, typename = void>
 	struct has_static_get : std::false_type
@@ -392,6 +406,27 @@ namespace EmuCore::TMP
 	struct has_static_value<T_, std::void_t<decltype(T_::value)>> : std::true_type
 	{
 	};
+
+	template<template<class...> class Template_, class...TypeArgs_>
+	struct valid_template_args
+	{
+	private:
+		template<template<class...> class T_>
+		static constexpr bool _get(T_<TypeArgs_...>* p_dummy_)
+		{
+			return true;
+		};
+		template<template<class...> class T_>
+		static constexpr bool _get(...)
+		{
+			return false;
+		}
+
+	public:
+		static constexpr bool value = _get<Template_>(nullptr);
+	};
+	template<template<class...> class Template_, class...TypeArgs_>
+	static constexpr bool valid_template_args_v = valid_template_args<Template_, TypeArgs_...>::value;
 }
 
 #endif

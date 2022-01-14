@@ -3,6 +3,7 @@
 
 #include "_common_noise_gen_functor_includes.h"
 #include "../../../../EmuSIMD/SIMDHelpers.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 #include <array>
 
 namespace EmuMath::Functors::_underlying_noise_gen
@@ -52,7 +53,7 @@ namespace EmuMath::Functors::_underlying_noise_gen
 			}
 			else
 			{
-				static_assert(false, "Provided an invalid Index_ arg to perlin_gradients<3, __m128>::init_registers. Valid indices are: 0, 1, 2.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, SpareIndex_>(), "Provided an invalid Index_ arg to perlin_gradients<3, __m128>::init_registers. Valid indices are: 0, 1, 2.");
 				return register_array();
 			}
 		}
@@ -104,12 +105,12 @@ namespace EmuMath::Functors::_underlying_noise_gen
 				}
 				else
 				{
-					static_assert(false, "Provided an invalid SpareW_ arg to perlin_gradients<2, __m128>::init_registers. Valid indices are: 0, 1.");
+					static_assert(EmuCore::TMP::get_false<std::size_t, SpareZ_>(), "Provided an invalid SpareW_ arg to perlin_gradients<2, __m128>::init_registers. Valid indices are: 0, 1.");
 				}
 			}
 			else
 			{
-				static_assert(false, "Provided an invalid SpareZ_ arg to perlin_gradients<2, __m128>::init_registers. Valid indices are: 0, 1.");
+				static_assert(EmuCore::TMP::get_false<std::size_t, SpareZ_>(), "Provided an invalid SpareZ_ arg to perlin_gradients<2, __m128>::init_registers. Valid indices are: 0, 1.");
 				return register_array();
 			}
 		}

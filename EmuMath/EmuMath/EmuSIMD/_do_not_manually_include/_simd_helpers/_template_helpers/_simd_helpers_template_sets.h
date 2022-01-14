@@ -3,6 +3,7 @@
 
 #include "_underlying_template_helpers/_common_underlying_simd_template_helper_includes.h"
 #include "_underlying_template_helpers/_simd_helpers_underlying_set.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD
 {
@@ -35,7 +36,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::set with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::set with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -68,7 +69,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::set with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::set with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -89,7 +90,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::set1 with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::set1 with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -107,7 +108,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::setzero with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::setzero with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -128,12 +129,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::setallone, but a successful mask generation could not be performed.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::setallone, but a successful mask generation could not be performed.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::setallone with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::setallone with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -152,7 +153,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::set_decrementing with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::set_decrementing with an unsupported type as the passed Register_.");
 		}
 	}
 	/// <summary> 
@@ -170,7 +171,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::setr_decrementing with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::setr_decrementing with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -189,7 +190,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::set_incrementing with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::set_incrementing with an unsupported type as the passed Register_.");
 		}
 	}
 	/// <summary> 
@@ -207,7 +208,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::setr_incrementing with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::setr_incrementing with an unsupported type as the passed Register_.");
 		}
 	}
 
@@ -233,7 +234,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::load with an unsupported type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::load with an unsupported type as the passed Register_.");
 		}
 	}
 }

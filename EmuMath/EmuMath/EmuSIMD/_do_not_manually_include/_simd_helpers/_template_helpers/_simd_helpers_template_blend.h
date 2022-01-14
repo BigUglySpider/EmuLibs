@@ -2,6 +2,7 @@
 #define EMU_SIMD_HELPERS_TEMPLATE_BLEND_H_INC_ 1
 
 #include "_underlying_template_helpers/_simd_helpers_underlying_blend.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD
 {
@@ -15,7 +16,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::blendv with an unsupported or unrecognised type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::blendv with an unsupported or unrecognised type as the passed Register_.");
 		}
 	}
 
@@ -29,7 +30,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::blend with an unsupported or unrecognised type as the passed Register_.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::blend with an unsupported or unrecognised type as the passed Register_.");
 		}
 	}
 }

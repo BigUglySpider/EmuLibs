@@ -4,6 +4,7 @@
 #include "_underlying_template_helpers/_common_underlying_simd_template_helper_includes.h"
 #include "_underlying_template_helpers/_simd_helpers_underlying_cmp.h"
 #include "_underlying_template_helpers/_simd_helpers_underlying_movemasks.h"
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD
 {
@@ -17,7 +18,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::movemask, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::movemask, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -31,7 +32,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmpeq, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmpeq, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -45,7 +46,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmpneq, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmpneq, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -59,7 +60,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmplt, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmplt, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -73,7 +74,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmpgt, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmpgt, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -87,7 +88,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmple, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmple, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -101,7 +102,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmpge, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmpge, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -115,7 +116,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmp, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -132,7 +133,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmp_any_eq, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_any_eq, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -149,7 +150,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmp_any_neq, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_any_neq, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -166,7 +167,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmp_any_lt, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_any_lt, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -183,7 +184,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmp_any_gt, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_any_gt, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -200,7 +201,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmp_any_le, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_any_le, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -217,7 +218,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmp_any_ge, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_any_ge, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -234,7 +235,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmp_any, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_any, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 
@@ -260,12 +261,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::cmp_all_eq, but the passed IndexMustBeTrue_ arguments could not be used with the provided SIMD register to form a valid movemask. The number of boolean arguments must be equal to 1 or the number of elements contained within the register. If the register is integral, the number of arguments can be 1, register_width/64, register_width/32, register_width/16, or register_width/8, where the bit-width per element is determined as the denominator in these fractions.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_all_eq, but the passed IndexMustBeTrue_ arguments could not be used with the provided SIMD register to form a valid movemask. The number of boolean arguments must be equal to 1 or the number of elements contained within the register. If the register is integral, the number of arguments can be 1, register_width/64, register_width/32, register_width/16, or register_width/8, where the bit-width per element is determined as the denominator in these fractions.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmp_all_eq, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_all_eq, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 	template<bool SignedIfInt_ = true, class Register_>
@@ -293,12 +294,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::cmp_all_neq, but the passed IndexMustBeTrue_ arguments could not be used with the provided SIMD register to form a valid movemask. The number of boolean arguments must be equal to 1 or the number of elements contained within the register. If the register is integral, the number of arguments can be 1, register_width/64, register_width/32, register_width/16, or register_width/8, where the bit-width per element is determined as the denominator in these fractions.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_all_neq, but the passed IndexMustBeTrue_ arguments could not be used with the provided SIMD register to form a valid movemask. The number of boolean arguments must be equal to 1 or the number of elements contained within the register. If the register is integral, the number of arguments can be 1, register_width/64, register_width/32, register_width/16, or register_width/8, where the bit-width per element is determined as the denominator in these fractions.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmp_all_neq, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_all_neq, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 	template<bool SignedIfInt_ = true, class Register_>
@@ -326,12 +327,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::cmp_all_lt, but the passed IndexMustBeTrue_ arguments could not be used with the provided SIMD register to form a valid movemask. The number of boolean arguments must be equal to 1 or the number of elements contained within the register. If the register is integral, the number of arguments can be 1, register_width/64, register_width/32, register_width/16, or register_width/8, where the bit-width per element is determined as the denominator in these fractions.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_all_lt, but the passed IndexMustBeTrue_ arguments could not be used with the provided SIMD register to form a valid movemask. The number of boolean arguments must be equal to 1 or the number of elements contained within the register. If the register is integral, the number of arguments can be 1, register_width/64, register_width/32, register_width/16, or register_width/8, where the bit-width per element is determined as the denominator in these fractions.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmp_all_lt, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_all_lt, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 	template<bool SignedIfInt_ = true, class Register_>
@@ -359,12 +360,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::cmp_all_gt, but the passed IndexMustBeTrue_ arguments could not be used with the provided SIMD register to form a valid movemask. The number of boolean arguments must be equal to 1 or the number of elements contained within the register. If the register is integral, the number of arguments can be 1, register_width/64, register_width/32, register_width/16, or register_width/8, where the bit-width per element is determined as the denominator in these fractions.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_all_gt, but the passed IndexMustBeTrue_ arguments could not be used with the provided SIMD register to form a valid movemask. The number of boolean arguments must be equal to 1 or the number of elements contained within the register. If the register is integral, the number of arguments can be 1, register_width/64, register_width/32, register_width/16, or register_width/8, where the bit-width per element is determined as the denominator in these fractions.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmp_all_gt, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_all_gt, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 	template<bool SignedIfInt_ = true, class Register_>
@@ -392,12 +393,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::cmp_all_le, but the passed IndexMustBeTrue_ arguments could not be used with the provided SIMD register to form a valid movemask. The number of boolean arguments must be equal to 1 or the number of elements contained within the register. If the register is integral, the number of arguments can be 1, register_width/64, register_width/32, register_width/16, or register_width/8, where the bit-width per element is determined as the denominator in these fractions.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_all_le, but the passed IndexMustBeTrue_ arguments could not be used with the provided SIMD register to form a valid movemask. The number of boolean arguments must be equal to 1 or the number of elements contained within the register. If the register is integral, the number of arguments can be 1, register_width/64, register_width/32, register_width/16, or register_width/8, where the bit-width per element is determined as the denominator in these fractions.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmp_all_le, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_all_le, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 	template<bool SignedIfInt_ = true, class Register_>
@@ -425,12 +426,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::cmp_all_ge, but the passed IndexMustBeTrue_ arguments could not be used with the provided SIMD register to form a valid movemask. The number of boolean arguments must be equal to 1 or the number of elements contained within the register. If the register is integral, the number of arguments can be 1, register_width/64, register_width/32, register_width/16, or register_width/8, where the bit-width per element is determined as the denominator in these fractions.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_all_ge, but the passed IndexMustBeTrue_ arguments could not be used with the provided SIMD register to form a valid movemask. The number of boolean arguments must be equal to 1 or the number of elements contained within the register. If the register is integral, the number of arguments can be 1, register_width/64, register_width/32, register_width/16, or register_width/8, where the bit-width per element is determined as the denominator in these fractions.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmp_all_ge, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_all_ge, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 	template<bool SignedIfInt_ = true, class Register_>
@@ -458,12 +459,12 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(false, "Attempted to perform EmuSIMD::cmp_all, but the passed IndexMustBeTrue_ arguments could not be used with the provided SIMD register to form a valid movemask. The number of boolean arguments must be equal to 1 or the number of elements contained within the register. If the register is integral, the number of arguments can be 1, register_width/64, register_width/32, register_width/16, or register_width/8, where the bit-width per element is determined as the denominator in these fractions.");
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_all, but the passed IndexMustBeTrue_ arguments could not be used with the provided SIMD register to form a valid movemask. The number of boolean arguments must be equal to 1 or the number of elements contained within the register. If the register is integral, the number of arguments can be 1, register_width/64, register_width/32, register_width/16, or register_width/8, where the bit-width per element is determined as the denominator in these fractions.");
 			}
 		}
 		else
 		{
-			static_assert(false, "Attempted to perform EmuSIMD::cmp_all, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_all, but the passed Register_ type is not recognised as a supported SIMD register.");
 		}
 	}
 	template<int CmpFlags_, bool SignedIfInt_ = true, class Register_>

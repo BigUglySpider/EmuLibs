@@ -2,7 +2,7 @@
 #define EMU_SIMD_HELPERS_TEMPLATE_INDEX_MASKS_H_INC_ 1
 
 #include "_underlying_template_helpers/_simd_helpers_underlying_index_masks.h"
-
+#include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD
 {
@@ -221,7 +221,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Provided an invalid PerElementWidth_ when calling EmuSIMD::single_index_mask_m128i.");
+			static_assert(EmuCore::TMP::get_false<std::size_t, Index_>(), "Provided an invalid PerElementWidth_ when calling EmuSIMD::single_index_mask_m128i.");
 		}
 	}
 
@@ -270,7 +270,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Provided an invalid PerElementWidth_ when calling EmuSIMD::alternating_index_mask_m128i.");
+			static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Provided an invalid PerElementWidth_ when calling EmuSIMD::alternating_index_mask_m128i.");
 		}
 	}
 
@@ -443,7 +443,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Provided an invalid PerElementWidth_ when calling EmuSIMD::single_index_mask_m256i.");
+			static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Provided an invalid PerElementWidth_ when calling EmuSIMD::single_index_mask_m256i.");
 		}
 	}
 
@@ -492,7 +492,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Provided an invalid PerElementWidth_ when calling EmuSIMD::alternating_index_mask_m256i.");
+			static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Provided an invalid PerElementWidth_ when calling EmuSIMD::alternating_index_mask_m256i.");
 		}
 	}
 
@@ -703,7 +703,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Provided an invalid PerElementWidth_ when calling EmuSIMD::single_index_mask_m512i.");
+			static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Provided an invalid PerElementWidth_ when calling EmuSIMD::single_index_mask_m512i.");
 		}
 	}
 
@@ -754,7 +754,7 @@ namespace EmuSIMD
 		}
 		else
 		{
-			static_assert(false, "Provided an invalid PerElementWidth_ when calling EmuSIMD::alternating_index_mask_m512i.");
+			static_assert(EmuCore::TMP::get_false<std::size_t, PerElementWidth_>(), "Provided an invalid PerElementWidth_ when calling EmuSIMD::alternating_index_mask_m512i.");
 		}
 	}
 
