@@ -136,6 +136,33 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region GENERAL_STATIC_FUNCS
+		[[nodiscard]] static constexpr inline value_type_uq get_implied_zero()
+		{
+			return EmuMath::Helpers::matrix_get_non_contained<this_type>();
+		}
+
+		[[nodiscard]] static constexpr inline typename EmuMath::TMP::matrix_non_contained_column<this_type>::type get_implied_zero_column()
+		{
+			return EmuMath::Helpers::matrix_get_column_non_contained<this_type>();
+		}
+
+		[[nodiscard]] static constexpr inline typename EmuMath::TMP::matrix_non_contained_row<this_type>::type get_implied_zero_row()
+		{
+			return EmuMath::Helpers::matrix_get_row_non_contained<this_type>();
+		}
+
+		[[nodiscard]] static constexpr inline decltype(EmuMath::Helpers::matrix_get_major_non_contained<this_type>()) get_implied_zero_major()
+		{
+			return EmuMath::Helpers::matrix_get_major_non_contained<this_type>();
+		}
+
+		[[nodiscard]] static constexpr inline decltype(EmuMath::Helpers::matrix_get_non_major_non_contained<this_type>()) get_implied_zero_non_major()
+		{
+			return EmuMath::Helpers::matrix_get_non_major_non_contained<this_type>();
+		}
+#pragma endregion
+
 #pragma region CONSTRUCTORS
 	public:
 		template<typename = std::enable_if_t<is_default_constructible()>>
@@ -500,7 +527,7 @@ namespace EmuMath
 		/// <summary>
 		/// <para> Accesses the column at the provided ColumnIndex_ within this Matrix. </para>
 		/// <para> If this Matrix is column-major: This will be a direct reference to the specified column. </para>
-		/// <para> If this Matrix is not column-major: This will be an EmuMath Vector of reference to elements at respective points within the specified column. </para>
+		/// <para> If this Matrix is not column-major: This will be an EmuMath Vector of references to elements at respective points within the specified column. </para>
 		/// </summary>
 		/// <returns>EmuMath Vector referencing the specified column within this Matrix.</returns>
 		template<std::size_t ColumnIndex_>
@@ -552,8 +579,30 @@ namespace EmuMath
 		}
 
 		/// <summary>
+		/// <para> Accesses the theoretical column at the provided ColumnIndex_ within this Matrix. </para>
+		/// <para> If this Matrix is column-major and the index is contained: This will be a direct reference to the specified column. </para>
+		/// <para> 
+		///		If this Matrix is not column-major and the index is contained: 
+		///		This will be an EmuMath Vector of references to elements at respective points within the specified column. 
+		/// </para>
+		/// <para> If the index is not contained: This will be an implied-zero column for this Matrix type. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector referencing the specified column within this Matrix, or an implied-zero column if the index is not contained.</returns>
+		template<std::size_t ColumnIndex_>
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_column_theoretical_get_result<ColumnIndex_, this_type&>::type GetColumnTheoretical()
+		{
+			return EmuMath::Helpers::matrix_get_column_theoretical<ColumnIndex_>(*this);
+		}
+
+		template<std::size_t ColumnIndex_>
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_column_theoretical_get_result<ColumnIndex_, const this_type&>::type GetColumnTheoretical() const
+		{
+			return EmuMath::Helpers::matrix_get_column_theoretical<ColumnIndex_>(*this);
+		}
+
+		/// <summary>
 		/// <para> Accesses the row at the provided RowIndex_ within this Matrix. </para>
-		/// <para> If this Matrix is column-major: This will be an EmuMath Vector of reference to elements at respective points within the specified row. </para>
+		/// <para> If this Matrix is column-major: This will be an EmuMath Vector of references to elements at respective points within the specified row. </para>
 		/// <para> If this Matrix is not column-major: This will be a direct reference to the specified row. </para>
 		/// </summary>
 		/// <returns>EmuMath Vector referencing the specified row within this Matrix.</returns>
@@ -606,7 +655,29 @@ namespace EmuMath
 		}
 
 		/// <summary>
-		/// <para> Accesses the major eement at the provided MajorIndex_ within this Matrix. </para>
+		/// <para> Accesses the theoretical row at the provided RowIndex_ within this Matrix. </para>
+		/// <para> 
+		///		If this Matrix is column-major and the index is contained: 
+		///		This will be an EmuMath Vector of references to elements at respective points within the specified row. 
+		/// </para>
+		/// <para> If this Matrix is not column-major and the index is contained: This will be a direct reference to the specified row. </para>
+		/// <para> If the index is not contained: This will be an implied-zero row for this Matrix type. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector referencing the specified row within this Matrix, or an implied-zero row if the index is not contained.</returns>
+		template<std::size_t RowIndex_>
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_row_theoretical_get_result<RowIndex_, this_type&>::type GetRowTheoretical()
+		{
+			return EmuMath::Helpers::matrix_get_row_theoretical<RowIndex_>(*this);
+		}
+
+		template<std::size_t RowIndex_>
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_row_theoretical_get_result<RowIndex_, const this_type&>::type GetRowTheoretical() const
+		{
+			return EmuMath::Helpers::matrix_get_row_theoretical<RowIndex_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Accesses the major element at the provided MajorIndex_ within this Matrix. </para>
 		/// <para> If this Matrix is column-major: This will be a reference to the column at the specified MajorIndex_. </para>
 		/// <para> If this Matrix is not column-major: This will be a reference to the row at the specified MajorIndex_. </para>
 		/// </summary>
@@ -647,6 +718,26 @@ namespace EmuMath
 		}
 
 		/// <summary>
+		/// <para> Accesses the theoretical major element at the provided MajorIndex_ within this Matrix. </para>
+		/// <para> If this Matrix is column-major and the index is contained: This will be a reference to the column at the specified MajorIndex_. </para>
+		/// <para> If this Matrix is not column-major and the index is contained: This will be a reference to the row at the specified MajorIndex_. </para>
+		/// <para> If this Matrix is column-major and the index is not contained: This will be an implied-zero column for this Matrix type. </para>
+		/// <para> If this Matrix is not column-major and the index is not contained: This will be an implied-zero row for this Matrix type. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector referencing the specified major element within the passed matrix_, or an implied-zero non-major element if it is not contained.</returns>
+		template<std::size_t MajorIndex_>
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_major_theoretical_get_result<MajorIndex_, this_type&>::type GetMajorTheoretical()
+		{
+			return EmuMath::Helpers::matrix_get_major_theoretical<MajorIndex_>(*this);
+		}
+
+		template<std::size_t MajorIndex_>
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_major_theoretical_get_result<MajorIndex_, const this_type&>::type GetMajorTheoretical() const
+		{
+			return EmuMath::Helpers::matrix_get_major_theoretical<MajorIndex_>(*this);
+		}
+
+		/// <summary>
 		/// <para> Accesses the major eement at the provided MajorIndex_ within this Matrix. </para>
 		/// <para> If this Matrix is column-major: This will be an EmuMath Vector of references to respective elements in the row at the specified MajorIndex_. </para>
 		/// <para> If this Matrix is not column-major: This will be an EmuMath Vector of references to respective elements in the column at the specified MajorIndex_. </para>
@@ -684,6 +775,29 @@ namespace EmuMath
 					"Attempted to access a non-major element within an EmuMath Matrix, but the provided NonMajorIndex_ is invalid. The inclusive valid non-major index range is 0:(num_non_major_elements - 1)."
 				);
 			}
+		}
+
+		/// <summary>
+		/// <para> Accesses the theoretical non-major element at the provided NonMajorIndex_ within this Matrix. </para>
+		/// <para> If this Matrix is column-major and the index is contained: This will be a reference to the row at the specified MajorIndex_. </para>
+		/// <para> If this Matrix is not column-major and the index is contained: This will be a reference to the column at the specified MajorIndex_. </para>
+		/// <para> If this Matrix is column-major and the index is not contained: This will be an implied-zero row for this Matrix type. </para>
+		/// <para> If this Matrix is not column-major and the index is not contained: This will be an implied-zero column for this Matrix type. </para>
+		/// </summary>
+		/// <returns>
+		///		EmuMath Vector of references to elements within the specified non-major element within this Matrix, 
+		///		or an implied-zero non-major element if it is not contained.
+		/// </returns>
+		template<std::size_t NonMajorIndex_>
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_non_major_theoretical_get_result<NonMajorIndex_, this_type&>::type GetNonMajorTheoretical()
+		{
+			return EmuMath::Helpers::matrix_get_non_major_theoretical<NonMajorIndex_>(*this);
+		}
+
+		template<std::size_t NonMajorIndex_>
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_non_major_theoretical_get_result<NonMajorIndex_, const this_type&>::type GetNonMajorTheoretical() const
+		{
+			return EmuMath::Helpers::matrix_get_non_major_theoretical<NonMajorIndex_>(*this);
 		}
 #pragma endregion
 

@@ -260,6 +260,23 @@ int main()
 
 	using row_get = decltype(some_mat_3x4f_cm_.GetRow<2>());
 
+	EmuMath::Matrix<3, 4, float, false> tester_;
+	constexpr auto zero_ = tester_.get_implied_zero();
+	constexpr auto zero_column_ = tester_.get_implied_zero_column();
+	constexpr auto zero_row_ = tester_.get_implied_zero_row();
+	constexpr auto zero_major_ = tester_.get_implied_zero_major();
+	constexpr auto zero_non_major_ = tester_.get_implied_zero_non_major();
+
+	auto column_theoretical_0_ = tester_.GetColumnTheoretical<0>();
+	auto column_theoretical_1_ = tester_.GetColumnTheoretical<25>();
+	auto& row_theoretical_0_ = tester_.GetRowTheoretical<0>();
+	auto row_theoretical_1_ = tester_.GetRowTheoretical<25>();
+	auto& major_theoretical_0_ = tester_.GetMajorTheoretical<0>();
+	auto major_theoretical_1_ = tester_.GetMajorTheoretical<25>();
+	auto non_major_theoretical_0_ = tester_.GetNonMajorTheoretical<0>();
+	auto non_major_theoretical_1_ = tester_.GetNonMajorTheoretical<25>();
+
+
 	system("pause");
 	
 	// ##### SCALAR vs SIMD NOISE #####
