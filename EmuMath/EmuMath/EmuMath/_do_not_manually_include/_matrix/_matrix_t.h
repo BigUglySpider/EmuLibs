@@ -912,6 +912,60 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::matrix_get_non_major_theoretical<NonMajorIndex_>(*this);
 		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs an EmuMath Vector representing the main-diagonal of the this Matrix, 
+		///		starting from the provided Offset_ for as many indices as the output Vector holds.
+		/// </para>
+		/// <para> If no OutSize_ is provided, the output size will default to that of this Matrix's smallest axis. </para>
+		/// <para> Offset_: Inclusive index from which to start reading main diagonal elements. This is used as both a column index and a row index. Defaults to 0. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector representing the main diagonal within this Matrix for as many elements as it contains, and starting from the provided Offset_.</returns>
+		template<std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> MainDiagonal()
+		{
+			return EmuMath::Helpers::matrix_get_main_diagonal<OutSize_, OutT_, Offset_>(*this);
+		}
+
+		template<std::size_t OutSize_, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, value_type_uq> MainDiagonal()
+		{
+			return EmuMath::Helpers::matrix_get_main_diagonal<OutSize_, value_type_uq, Offset_>(*this);
+		}
+
+		template<typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<EmuMath::TMP::matrix_smallest_axis_v<this_type>, OutT_> MainDiagonal()
+		{
+			return EmuMath::Helpers::matrix_get_main_diagonal<EmuMath::TMP::matrix_smallest_axis_v<this_type>, OutT_, Offset_>(*this);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs an EmuMath Vector representing the main-diagonal of the this Matrix, 
+		///		starting from the provided Offset_ for as many indices as the output Vector holds.
+		/// </para>
+		/// <para> If no OutSize_ is provided, the output size will default to that of this Matrix's smallest axis. </para>
+		/// <para> Offset_: Inclusive index from which to start reading main diagonal elements. This is used as both a column index and a row index. Defaults to 0. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector representing the main diagonal within this Matrix for as many elements as it contains, and starting from the provided Offset_.</returns>
+		template<std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> MainDiagonal() const
+		{
+			return EmuMath::Helpers::matrix_get_main_diagonal<OutSize_, OutT_, Offset_>(*this);
+		}
+
+		template<std::size_t OutSize_, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, value_type_uq> MainDiagonal() const
+		{
+			return EmuMath::Helpers::matrix_get_main_diagonal<OutSize_, value_type_uq, Offset_>(*this);
+		}
+
+		template<typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<EmuMath::TMP::matrix_smallest_axis_v<this_type>, OutT_> MainDiagonal() const
+		{
+			return EmuMath::Helpers::matrix_get_main_diagonal<EmuMath::TMP::matrix_smallest_axis_v<this_type>, OutT_, Offset_>(*this);
+		}
 #pragma endregion
 
 #pragma region STREAM_FUNCS

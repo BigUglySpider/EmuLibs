@@ -405,6 +405,108 @@ namespace EmuMath::Helpers
 	{
 		return _matrix_underlying::_matrix_get_non_major_theoretical<NonMajorIndex_>(matrix_);
 	}
+
+	/// <summary>
+	/// <para>
+	///		Outputs an EmuMath Vector representing the main-diagonal of the provided matrix_, 
+	///		starting from the provided Offset_ for as many indices as the output Vector holds.
+	/// </para>
+	/// <para> If no OutSize_ is provided, the output size will default to that of matrix_'s smallest axis. </para>
+	/// <para> Offset_: Inclusive index from which to start reading main diagonal elements. This is used as both a column index and a row index. Defaults to 0. </para>
+	/// </summary>
+	/// <param name="matrix_">: Reference to an EmuMath Matrix to retrieve the main-diagonal of.</param>
+	/// <returns>EmuMath Vector representing the main diagonal in the passed matrix for as many elements as it contains, and starting from the provided Offset_.</returns>
+	template<std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> matrix_get_main_diagonal(EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+	{
+		return _matrix_underlying::_matrix_get_main_diagonal<Offset_, OutSize_, OutT_>(matrix_);
+	}
+
+	template<std::size_t OutSize_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq> matrix_get_main_diagonal
+	(
+		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		return _matrix_underlying::_matrix_get_main_diagonal<Offset_, OutSize_, matrix_value_uq>(matrix_);
+	}
+
+	template<typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<EmuMath::TMP::matrix_smallest_axis_v<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>, OutT_> matrix_get_main_diagonal
+	(
+		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		constexpr std::size_t out_size_ = EmuMath::TMP::matrix_smallest_axis_v<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>;
+		return _matrix_underlying::_matrix_get_main_diagonal<Offset_, out_size_, OutT_>(matrix_);
+	}
+
+	template<typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector
+	<
+		EmuMath::TMP::matrix_smallest_axis_v<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>,
+		typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq
+	> matrix_get_main_diagonal
+	(
+		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		constexpr std::size_t out_size_ = EmuMath::TMP::matrix_smallest_axis_v<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>;
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		return _matrix_underlying::_matrix_get_main_diagonal<0, out_size_, matrix_value_uq>(matrix_);
+	}
+
+	/// <summary>
+	/// <para>
+	///		Outputs an EmuMath Vector representing the main-diagonal of the provided matrix_, 
+	///		starting from the provided Offset_ for as many indices as the output Vector holds.
+	/// </para>
+	/// <para> If no OutSize_ is provided, the output size will default to that of matrix_'s smallest axis. </para>
+	/// <para> Offset_: Inclusive index from which to start reading main diagonal elements. This is used as both a column index and a row index. Defaults to 0. </para>
+	/// </summary>
+	/// <param name="matrix_">: Const reference to an EmuMath Matrix to retrieve the main-diagonal of.</param>
+	/// <returns>EmuMath Vector representing the main diagonal in the passed matrix for as many elements as it contains, and starting from the provided Offset_.</returns>
+	template<std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> matrix_get_main_diagonal(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+	{
+		return _matrix_underlying::_matrix_get_main_diagonal<Offset_, OutSize_, OutT_>(matrix_);
+	}
+
+	template<std::size_t OutSize_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq> matrix_get_main_diagonal
+	(
+		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		return _matrix_underlying::_matrix_get_main_diagonal<Offset_, OutSize_, matrix_value_uq>(matrix_);
+	}
+
+	template<typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<EmuMath::TMP::matrix_smallest_axis_v<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>, OutT_> matrix_get_main_diagonal
+	(
+		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		constexpr std::size_t out_size_ = EmuMath::TMP::matrix_smallest_axis_v<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>;
+		return _matrix_underlying::_matrix_get_main_diagonal<Offset_, out_size_, OutT_>(matrix_);
+	}
+
+	template<typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector
+	<
+		EmuMath::TMP::matrix_smallest_axis_v<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>,
+		typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq
+	> matrix_get_main_diagonal
+	(
+		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		constexpr std::size_t out_size_ = EmuMath::TMP::matrix_smallest_axis_v<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>;
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		return _matrix_underlying::_matrix_get_main_diagonal<0, out_size_, matrix_value_uq>(matrix_);
+	}
 }
 
 #endif

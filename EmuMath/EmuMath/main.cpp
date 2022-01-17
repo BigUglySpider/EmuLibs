@@ -313,6 +313,27 @@ int main()
 		)
 	);
 
+	std::cout << "\n---\n";
+	constexpr auto main_diagonal_cm_normal_ = mat_from_vec_move_cm_.MainDiagonal();
+	constexpr auto main_diagonal_rm_normal_ = mat_from_vec_move_rm_.MainDiagonal();
+	constexpr auto main_diagonal_cm_smaller_no_offset_ = mat_from_vec_move_cm_.MainDiagonal<2>();
+	constexpr auto main_diagonal_rm_smaller_no_offset_ = mat_from_vec_move_rm_.MainDiagonal<2>();
+	constexpr auto main_diagonal_cm_smaller_offset_ = mat_from_vec_move_cm_.MainDiagonal<2, 1>();
+	constexpr auto main_diagonal_rm_smaller_offset_ = mat_from_vec_move_rm_.MainDiagonal<2, 1>();
+	constexpr auto main_diagonal_cm_larger_no_offset_ = mat_from_vec_move_cm_.MainDiagonal<5>();
+	constexpr auto main_diagonal_rm_larger_no_offset_ = mat_from_vec_move_rm_.MainDiagonal<5>();
+	constexpr auto main_diagonal_cm_larger_offset_ = mat_from_vec_move_cm_.MainDiagonal<5, 25>();
+	constexpr auto main_diagonal_rm_larger_offset_ = mat_from_vec_move_rm_.MainDiagonal<5, 25>();
+
+	EmuMath::Matrix<4, 4, float, true> runtime_mat_4x4f_cm_(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << runtime_mat_4x4f_cm_ << "\n\n";
+	runtime_mat_4x4f_cm_.MainDiagonal<float&>() *= 10.0f;
+	std::cout << runtime_mat_4x4f_cm_ << "\n\n";
+
+
+
+
+
 	system("pause");
 	
 	// ##### SCALAR vs SIMD NOISE #####

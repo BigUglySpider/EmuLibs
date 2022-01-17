@@ -2,6 +2,7 @@
 #define EMU_MATH_MATRIX_TMP_H_INC_ 1
 
 #include "../../../../EmuCore/TMPHelpers/TypeConvertors.h"
+#include "../../../Vector.h"
 #include <type_traits>
 
 namespace EmuMath
@@ -489,6 +490,52 @@ namespace EmuMath::TMP
 		static constexpr bool is_theoretical = _type_finder::is_theoretical;
 		using type = typename _type_finder::type;
 	};
+
+	template<class Matrix_>
+	struct matrix_largest_axis
+	{
+	private:
+		template<class In_, bool = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _value_finder
+		{
+			static constexpr std::size_t value = 0;
+		};
+
+		template<class In_>
+		struct _value_finder<In_, true>
+		{
+			using _in_uq = EmuCore::TMP::remove_ref_cv_t<In_>;
+			static constexpr std::size_t value = EmuCore::TMP::greatest_constant_v<std::size_t, _in_uq::num_columns, _in_uq::num_rows>;
+		};
+
+	public:
+		static constexpr std::size_t value = _value_finder<Matrix_>::value;
+	};
+	template<class Matrix_>
+	static constexpr std::size_t matrix_largest_axis_v = matrix_largest_axis<Matrix_>::value;
+
+	template<class Matrix_>
+	struct matrix_smallest_axis
+	{
+	private:
+		template<class In_, bool = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _value_finder
+		{
+			static constexpr std::size_t value = 0;
+		};
+
+		template<class In_>
+		struct _value_finder<In_, true>
+		{
+			using _in_uq = EmuCore::TMP::remove_ref_cv_t<In_>;
+			static constexpr std::size_t value = EmuCore::TMP::smallest_constant_v<std::size_t, _in_uq::num_columns, _in_uq::num_rows>;
+		};
+
+	public:
+		static constexpr std::size_t value = _value_finder<Matrix_>::value;
+	};
+	template<class Matrix_>
+	static constexpr std::size_t matrix_smallest_axis_v = matrix_smallest_axis<Matrix_>::value;
 }
 
 #endif

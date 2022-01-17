@@ -83,6 +83,17 @@ namespace EmuCore::TMP
 	using type_and_discard_t = typename type_and_discard<T_, Discarded_>::type;
 
 	/// <summary>
+	/// <para> Variant of type_and_discard which instead takes a non-type Discarded_ argument. </para>
+	/// </summary>
+	template<class T_, auto Discarded_>
+	struct type_and_discard_val
+	{
+		using type = T_;
+	};
+	template<class T_, auto Discarded_>
+	using type_and_discard_val_t = typename type_and_discard_val<T_, Discarded_>::type;
+
+	/// <summary>
 	/// <para> Extracts the first argument type of a selection of variadic Args_, aliasing it as the internal type. </para>
 	/// <para> If 1 or more arguments are provided: type will be the first provided type. </para>
 	/// <para> If 0 arguments are provided: type will be void. </para>
