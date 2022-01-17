@@ -256,10 +256,6 @@ int main()
 	constexpr auto theoretical_test_4_ = some_mat_3x4f_cm_.AtTheoretical<25, 0>();
 	constexpr auto theoretical_test_5_ = some_mat_3x4f_cm_.AtTheoretical<25, 25>();
 
-	using matrix = EmuMath::Matrix<3, 4, float, true>;
-
-	using row_get = decltype(some_mat_3x4f_cm_.GetRow<2>());
-
 	EmuMath::Matrix<3, 4, float, false> tester_;
 	constexpr auto zero_ = tester_.get_implied_zero();
 	constexpr auto zero_column_ = tester_.get_implied_zero_column();
@@ -276,6 +272,46 @@ int main()
 	auto non_major_theoretical_0_ = tester_.GetNonMajorTheoretical<0>();
 	auto non_major_theoretical_1_ = tester_.GetNonMajorTheoretical<25>();
 
+	std::cout << "\n---\n";
+	constexpr auto read_mat_cm_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	constexpr auto read_mat_rm_ = EmuMath::Matrix<4, 4, float, false>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << "Column Major:\n" << read_mat_cm_ << "\n\nRow Major:\n" << read_mat_rm_ << "\n\n";
+
+	std::cout << "\n---\n";
+	constexpr auto mat_from_vecs_cm_ = EmuMath::Matrix<4, 3, float, true>
+	(
+		EmuMath::Vector<3, float>(1, 2, 3),
+		EmuMath::Vector<3, float>(4, 5, 6),
+		EmuMath::Vector<3, float>(7, 8, 9),
+		EmuMath::Vector<3, float>(10, 11, 12)
+	);
+	constexpr auto mat_from_vecs_rm_ = EmuMath::Matrix<4, 3, float, false>
+	(
+		EmuMath::Vector<4, float>(1, 2, 3, 4),
+		EmuMath::Vector<4, float>(5, 6, 7, 8),
+		EmuMath::Vector<4, float>(9, 10, 11, 12)
+	);
+
+	std::cout << "\n---\n";
+	constexpr auto mat_from_vec_move_cm_ = EmuMath::Matrix<4, 3, float, true>
+	(
+		EmuMath::Matrix<4, 3, float, true>::matrix_vector_type
+		(
+			EmuMath::Vector<3, float>(1, 2, 3),
+			EmuMath::Vector<3, float>(4, 5, 6),
+			EmuMath::Vector<3, float>(7, 8, 9),
+			EmuMath::Vector<3, float>(10, 11, 12)
+		)
+	);
+	constexpr auto mat_from_vec_move_rm_ = EmuMath::Matrix<4, 3, float, false>
+	(
+		EmuMath::Matrix<4, 3, float, false>::matrix_vector_type
+		(
+			EmuMath::Vector<4, float>(1, 2, 3, 4),
+			EmuMath::Vector<4, float>(5, 6, 7, 8),
+			EmuMath::Vector<4, float>(9, 10, 11, 12)
+		)
+	);
 
 	system("pause");
 	

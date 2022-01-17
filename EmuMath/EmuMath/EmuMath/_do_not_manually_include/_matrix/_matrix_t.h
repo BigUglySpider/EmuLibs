@@ -26,6 +26,7 @@ namespace EmuMath
 		static constexpr bool contains_const_ref = matrix_info::contains_const_ref;
 		static constexpr bool contains_non_const_ref = matrix_info::contains_non_const_ref;
 
+		/// <summary> Representation of this Matrix type as an EmuMath Vector. </summary>
 		using matrix_vector_type = typename matrix_info::matrix_vector_type;
 		using stored_type = typename matrix_info::stored_type;
 		using value_type = typename matrix_info::value_type;
@@ -103,36 +104,84 @@ namespace EmuMath
 				);
 			}
 		}
+#pragma endregion
 
+#pragma region CONSTRUCTION_CHECKS
+		/// <summary> Returns true if this Matrix can be default-constructed, otherwise false. </summary>
 		[[nodiscard]] static constexpr inline bool is_default_constructible()
 		{
 			return std::is_default_constructible_v<matrix_vector_type>;
 		}
 
+		/// <summary>
+		/// <para> Returns true if this Matrix can be constructed with the provided Args_, interpreted as per-element scalars. </para>
+		/// <para> The provided number of Args_ must be equal to the total number of elements within this Matrix type (i.e. its static `size` member). </para>
+		/// <para> The provided Args_ will be interpreted as though they are references to be forwarded (e.g. an Arg_ of `int` will be treated as `int&amp;&amp;`). </para>
+		/// </summary>
+		/// <typeparam name="Args_">All argument types that will be forwarded for construction.</typeparam>
+		/// <returns>True if scalar-argument construction is possible for this Matrix type with the provided arguments, otherwise false.</returns>
 		template<typename...Args_>
-		[[nodiscard]] static constexpr inline bool is_constructible()
+		[[nodiscard]] static constexpr inline bool is_constructible_with_scalar_args()
 		{
 			return
 			(
 				sizeof...(Args_) == size &&
-				size > 1 &&
-				EmuCore::TMP::variadic_and_v<std::is_constructible_v<stored_type, decltype(std::forward<Args_>(std::declval<Args_>()))>...>
+				(size != num_major_elements || !EmuCore::TMP::variadic_and_v<EmuMath::TMP::is_emu_vector_v<Args_>...>) &&
+				EmuCore::TMP::variadic_and_v<std::is_constructible_v<stored_type, EmuCore::TMP::forward_result_t<Args_>>...>
 			);
 		}
 
+		/// <summary> Returns true if this Matrix can constructed by copying a const reference to another of its type, otherwise false. </summary>
 		[[nodiscard]] static constexpr inline bool is_const_copy_constructible()
 		{
 			return std::is_constructible_v<matrix_vector_type, const matrix_vector_type&>;
 		}
 
+		/// <summary> Returns true if this Matrix can constructed by copying a non-const reference to another of its type, otherwise false. </summary>
 		[[nodiscard]] static constexpr inline bool is_non_const_copy_constructible()
 		{
 			return std::is_constructible_v<matrix_vector_type, matrix_vector_type&>;
 		}
 
+		/// <summary> Returns true if this Matrix can be move-constructed with an rvalue reference to another of its type, otherwise false. </summary>
 		[[nodiscard]] static constexpr inline bool is_move_constructible()
 		{
 			return std::is_constructible_v<matrix_vector_type, matrix_vector_type&&>;
+		}
+
+		/// <summary>
+		/// <para> Returns true if this Matrix can be constructed from the provided selection of Vectors_. </para>
+		/// <para> All arguments provided to Vectors_ must be EmuMath Vectors, and will be provided as major-elements for the constructed Matrix.. </para>
+		/// <para> The provided Args_ will be interpreted as though they are references to be forwarded. </para>
+		/// </summary>
+		/// <typeparam name="Vectors_">All EmuMath Vectors to check for input validity.</typeparam>
+		/// <returns>True if all provided EmuMath Vectors_ may be used to construct a Matrix of this type in terms of major-elements, otherwise false.</returns>
+		template<class...Vectors_>
+		[[nodiscard]] static constexpr inline bool is_constructible_from_major_vectors()
+		{
+			return
+			(
+				EmuCore::TMP::variadic_and_v<EmuMath::TMP::is_emu_vector_v<Vectors_>...> &&
+				sizeof...(Vectors_) == num_major_elements &&
+				(
+					// This braced section is to prevent (unlikely, but not impossible) conflicts when constructing from a matrix_vector_type argument
+					num_major_elements != 1 ||
+					!std::is_same_v<matrix_vector_type, EmuCore::TMP::remove_ref_cv_t<EmuCore::TMP::first_variadic_arg_t<Vectors_...>>>
+				) &&
+				std::is_constructible_v<matrix_vector_type, EmuCore::TMP::forward_result_t<Vectors_>...>
+			);
+		}
+
+		/// <summary>
+		/// <para> Returns true if this Matrix can be constructed via its variadic argument constructor. </para>
+		/// <para> Effectively translates to `is_constructible_with_scalar_args || is_constructible_from_major_vectors`. </para>
+		/// <para> Note that, when true, this does not determine which construction method is used, but major-vector construction will take priority when both are true. </para>
+		/// </summary>
+		/// <returns>True if this Matrix's variadic constructor may be used with the provided arguments, otherwise false.</returns>
+		template<class...Args_>
+		[[nodiscard]] static constexpr inline bool is_constructible_via_variadic_constructor()
+		{
+			return is_constructible_with_scalar_args<Args_...>() || is_constructible_from_major_vectors<Args_...>();
 		}
 #pragma endregion
 
@@ -165,28 +214,92 @@ namespace EmuMath
 
 #pragma region CONSTRUCTORS
 	public:
+		/// <summary> Default constructor for this Matrix. Only available if its underlying elements may be default-constructed. </summary>
 		template<typename = std::enable_if_t<is_default_constructible()>>
 		constexpr inline Matrix() : _data()
 		{
 		}
 
+		/// <summary> Constructs a copy of the const-referenced EmuMath Matrix of this type. Only available if a const-copy is valid for the Matrix's underlying elements. </summary>
+		/// <param name="to_copy_">Const reference to an EmuMath Matrix of this type to copy.</param>
 		template<typename = std::enable_if_t<is_const_copy_constructible()>>
 		constexpr inline Matrix(const this_type& to_copy_) : _data(to_copy_._data)
 		{
 		}
 
+		/// <summary> Constructs a copy of the referenced EmuMath Matrix of this type. Only available if a non-const-copy is valid for the Matrix's underlying elements. </summary>
+		/// <param name="to_copy_">Non-const reference to an EmuMath Matrix of this type to copy.</param>
 		template<typename = std::enable_if_t<is_non_const_copy_constructible()>>
 		constexpr inline Matrix(this_type& to_copy_) : _data(to_copy_._data)
 		{
 		}
 
+		/// <summary>
+		///		Moves the passed EmuMath Matrix of this type into a newly constructed Matrix of the same type. 
+		///		Only available if this Matrix's underlying elements may be moved.
+		/// </summary>
+		/// <param name="to_move_">EmuMath Matrix to move into the newly constructed Matrix of the same type.</param>
 		template<typename = std::enable_if_t<is_move_constructible()>>
 		constexpr inline Matrix(this_type&& to_move_) : _data(std::move(to_move_._data))
 		{
 		}
 
-		template<typename...Args_, typename = std::enable_if_t<is_constructible<Args_...>()>>
-		explicit constexpr inline Matrix(Args_&&...contiguous_args_) : _data(_make_data(std::make_index_sequence<num_major_elements>(), std::forward<Args_>(contiguous_args_)...))
+		/// <summary>
+		/// <para> 
+		///		Copies the data of the const-referenced matrix_vector_type into a newly constructed Matrix's data. 
+		///		Only available if this Matrix's underlying data may be const-copy constructed.
+		/// </para>
+		/// </summary>
+		/// <param name="matrix_vector_to_copy_">Constant reference to an EmuMath Vector of this Matrix's matrix_vector_type to copy.</param>
+		template<typename = std::enable_if_t<is_const_copy_constructible()>>
+		[[nodiscard]] constexpr inline Matrix(const matrix_vector_type& matrix_vector_to_copy_) : _data(matrix_vector_to_copy_)
+		{
+		}
+
+		/// <summary>
+		/// <para> 
+		///		Copies the data of the referenced matrix_vector_type into a newly constructed Matrix's data. 
+		///		Only available if this Matrix's underlying data may be non-const-copy constructed.
+		/// </para>
+		/// </summary>
+		/// <param name="matrix_vector_to_copy_">Non-constant reference to an EmuMath Vector of this Matrix's matrix_vector_type to copy.</param>
+		template<typename = std::enable_if_t<is_non_const_copy_constructible()>>
+		[[nodiscard]] constexpr inline Matrix(matrix_vector_type& matrix_vector_to_copy_) : _data(matrix_vector_to_copy_)
+		{
+		}
+
+		/// <summary>
+		/// <para>
+		///		Moves the data of the passed matrix_vector_type into a newly constructed Matrix's data. 
+		///		Only available if this Matrix's underlying data may be move constructed.
+		/// </para>
+		/// </summary>
+		/// <param name="matrix_vector_to_move_">Rvalue reference to an EmuMath Vector of this Matrix's matrix_vector_type to move.</param>
+		template<typename = std::enable_if_t<is_move_constructible()>>
+		[[nodiscard]] constexpr inline Matrix(matrix_vector_type&& matrix_vector_to_move_) : _data(std::forward<matrix_vector_type>(matrix_vector_to_move_))
+		{
+		}
+
+		/// <summary>
+		/// <para> Constructs an EmuMath Matrix from either a selection of major EmuMath Vectors or a selection of per-element scalars. </para>
+		/// <para>
+		///		To construct via scalars: The number of provided Args_ must be equal to the total number of elements within this Matrix type (i.e. its `size`). 
+		///		Additionally, this Matrix's stored_type must be constructible via all Args_ as single arguments. 
+		///		It should be noted that the placement of these indices is contiguous in memory, and thus is modified by this Matrix's major-order.
+		/// </para>
+		/// <para>
+		///		To construct via major EmuMath Vectors: The number of provided Args_ must be equal to the number of major elements within this Matrix type. 
+		///		Additionally, all Args_ must be EmuMath Vectors, and when forwarded must be valid construction arguments for constructing this Matrix's matrix_vector_type.
+		/// </para>
+		/// <para> Where both are valid, construction via major EmuMath Vectors takes priority. </para>
+		/// </summary>
+		/// <param name="contiguous_args_">Contiguous scalar arguments, or contiguous major-vector EmuMath Vector arguments.</param>
+		template<typename...Args_, typename = std::enable_if_t<is_constructible_via_variadic_constructor<Args_...>()>>
+		explicit constexpr inline Matrix(Args_&&...contiguous_args_) : 
+			_data
+			(
+				_make_data(std::make_index_sequence<num_major_elements>(), std::forward<Args_>(contiguous_args_)...)
+			)
 		{
 		}
 #pragma endregion
@@ -761,7 +874,7 @@ namespace EmuMath
 		}
 
 		template<std::size_t NonMajorIndex_>
-		[[nodiscard]] constexpr inline non_major_get_const_ref_type GetNonMajor()
+		[[nodiscard]] constexpr inline non_major_get_const_ref_type GetNonMajor() const
 		{
 			if constexpr (NonMajorIndex_ < num_non_major_elements)
 			{
@@ -869,15 +982,30 @@ namespace EmuMath
 		template<typename...Args_, std::size_t...MajorIndices_>
 		[[nodiscard]] static constexpr inline matrix_vector_type _make_data(std::index_sequence<MajorIndices_...> major_indices_, Args_&&...args_)
 		{
-			auto tuple_of_args_ = std::forward_as_tuple(std::forward<Args_>(args_)...);
-			return matrix_vector_type
-			(
-				_make_major_index<MajorIndices_>
+			if constexpr (is_constructible_from_major_vectors<Args_...>())
+			{
+				return matrix_vector_type(std::forward<Args_>(args_)...);
+			}
+			else if constexpr (is_constructible_with_scalar_args<Args_...>())
+			{
+				auto tuple_of_args_ = std::forward_as_tuple(std::forward<Args_>(args_)...);
+				return matrix_vector_type
 				(
-					std::make_index_sequence<num_non_major_elements>(),
-					tuple_of_args_
-				)...
-			);
+					_make_major_index<MajorIndices_>
+					(
+						std::make_index_sequence<num_non_major_elements>(),
+						tuple_of_args_
+					)...
+				);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Args_...>(),
+					"Attempted to construct the data Vector of an EmuMath Matrix, but the provided Args_ are incompatible for construct the matrix_vector_type."
+				);
+			}
 		}
 	};
 }

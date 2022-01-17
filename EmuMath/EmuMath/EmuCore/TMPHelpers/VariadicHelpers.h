@@ -81,6 +81,34 @@ namespace EmuCore::TMP
 	};
 	template<class T_, class Discarded_>
 	using type_and_discard_t = typename type_and_discard<T_, Discarded_>::type;
+
+	/// <summary>
+	/// <para> Extracts the first argument type of a selection of variadic Args_, aliasing it as the internal type. </para>
+	/// <para> If 1 or more arguments are provided: type will be the first provided type. </para>
+	/// <para> If 0 arguments are provided: type will be void. </para>
+	/// </summary>
+	template<class...Args_>
+	struct first_variadic_arg
+	{
+		using type = void;
+	};
+	template<class First_, class...Others_>
+	struct first_variadic_arg<First_, Others_...>
+	{
+		using type = First_;
+	};
+	template<class First_>
+	struct first_variadic_arg<First_>
+	{
+		using type = First_;
+	};
+	template<>
+	struct first_variadic_arg<>
+	{
+		using type = void;
+	};
+	template<class...Args_>
+	using first_variadic_arg_t = typename first_variadic_arg<Args_...>::type;
 #pragma endregion
 
 #pragma region VARIADIC_BOOLS

@@ -491,6 +491,15 @@ namespace EmuCore::TMP
 
 	template<typename T_>
 	using floating_point_equivalent_t = typename floating_point_equivalent<T_>::type;
+
+	/// <summary> Determines the type that results from a call to std::forward on a declval of type T_. </summary>
+	template<typename T_>
+	struct forward_result
+	{
+		using type = decltype(std::forward<T_>(std::declval<T_>()));
+	};
+	template<typename T_>
+	using forward_result_t = typename forward_result<T_>::type;
 }
 
 #endif
