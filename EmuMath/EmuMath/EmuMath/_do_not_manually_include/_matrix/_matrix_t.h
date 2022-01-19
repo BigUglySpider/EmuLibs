@@ -25,6 +25,7 @@ namespace EmuMath
 		static constexpr bool contains_ref = matrix_info::contains_ref;
 		static constexpr bool contains_const_ref = matrix_info::contains_const_ref;
 		static constexpr bool contains_non_const_ref = matrix_info::contains_non_const_ref;
+		static constexpr bool is_contiguous = matrix_info::is_contiguous;
 
 		/// <summary> Representation of this Matrix type as an EmuMath Vector. </summary>
 		using matrix_vector_type = typename matrix_info::matrix_vector_type;
@@ -183,6 +184,29 @@ namespace EmuMath
 		{
 			return is_constructible_with_scalar_args<Args_...>() || is_constructible_from_major_vectors<Args_...>();
 		}
+
+		/// <summary>
+		/// <para> Returns true if this Matrix can be constructed via the provided other Matrix_ type. </para>
+		/// <para> Matrix_ is expected to be another Matrix type, and thus this will return false if the unqualified Matrix_ is the same as this_type. </para>
+		/// </summary>
+		/// <returns>True if this Matrix may be conversion-constructed via the provided Matrix_ type.</returns>
+		template<class Matrix_>
+		[[nodiscard]] static constexpr inline bool is_constructible_via_other_matrix_type()
+		{
+			constexpr bool is_other_matrix_type_ = EmuCore::TMP::variadic_and_v
+			<
+				EmuMath::TMP::is_emu_matrix_v<Matrix_>,
+				!std::is_same_v<this_type, EmuCore::TMP::remove_ref_cv_t<Matrix_>>
+			>;
+			if constexpr (is_other_matrix_type_)
+			{
+				return EmuMath::Helpers::matrix_copy_is_valid<NumColumns_, NumRows_, T_, ColumnMajor_, Matrix_>();
+			}
+			else
+			{
+				return false;
+			}
+		}
 #pragma endregion
 
 #pragma region GENERAL_STATIC_FUNCS
@@ -301,6 +325,106 @@ namespace EmuMath
 				_make_data(std::make_index_sequence<num_major_elements>(), std::forward<Args_>(contiguous_args_)...)
 			)
 		{
+		}
+
+		/// <summary>
+		/// <para> Explicit conversion constructor to create this Matrix type as a converted copy of the provided Matrix. </para>
+		/// <para> Indices not contained in this Matrix will be ignored. </para>
+		/// <para> Indices not contained in the passed Matrix, but contained within this Matrix, will be interpreted as implied zero. </para>
+		/// </summary>
+		/// <param name="matrix_to_convert_">Non-const reference to an EmuMath Matrix of a different type to convert into this Matrix type.</param>
+		template
+		<
+			std::size_t InNumColumns_, std::size_t InNumRows_, typename InT_, bool InColumnMajor_,
+			typename = std::enable_if_t<is_constructible_via_other_matrix_type<EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>&>()>
+		>
+		explicit constexpr inline Matrix(EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>& matrix_to_convert_) :
+			Matrix
+			(
+				EmuMath::Helpers::matrix_copy<NumColumns_, NumRows_, T_, ColumnMajor_, InT_, InNumColumns_, InNumRows_, InColumnMajor_>(matrix_to_convert_)
+			)
+		{
+		}
+
+		/// <summary>
+		/// <para> Explicit conversion constructor to create this Matrix type as a converted copy of the provided Matrix. </para>
+		/// <para> Indices not contained in this Matrix will be ignored. </para>
+		/// <para> Indices not contained in the passed Matrix, but contained within this Matrix, will be interpreted as implied zero. </para>
+		/// </summary>
+		/// <param name="matrix_to_convert_">Const reference to an EmuMath Matrix of a different type to convert into this Matrix type.</param>
+		template
+		<
+			std::size_t InNumColumns_, std::size_t InNumRows_, typename InT_, bool InColumnMajor_,
+			typename = std::enable_if_t<is_constructible_via_other_matrix_type<const EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>&>()>
+		>
+		explicit constexpr inline Matrix(const EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>& matrix_to_convert_) :
+			Matrix
+			(
+				EmuMath::Helpers::matrix_copy<NumColumns_, NumRows_, T_, ColumnMajor_, InT_, InNumColumns_, InNumRows_, InColumnMajor_>(matrix_to_convert_)
+			)
+		{
+		}
+
+		/// <summary>
+		/// <para> Explicit conversion constructor to create this Matrix type as a converted move-or-copy of the provided Matrix. </para>
+		/// <para> Indices not contained in this Matrix will be ignored. </para>
+		/// <para> Indices not contained in the passed Matrix, but contained within this Matrix, will be interpreted as implied zero. </para>
+		/// <para>
+		///		NOTE: This constructor allows false positive results in checks for if this type is constructible with the provided argument. 
+		///		This is to prevent invalid implicit casting to an lvalue-reference to provide safety from constructing with dangling references.
+		/// </para>
+		/// </summary>
+		/// <param name="matrix_to_convert_">Non-const rvalue reference to an EmuMath Matrix of a different type to convert into this Matrix type via move-or-copy.</param>
+		template
+		<
+			std::size_t InNumColumns_, std::size_t InNumRows_, typename InT_, bool InColumnMajor_,
+			typename = std::enable_if_t<!std::is_same_v<this_type, EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>>>
+		>
+		explicit constexpr inline Matrix(EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>&& matrix_to_convert_) :
+			Matrix
+			(
+				EmuMath::Helpers::matrix_copy<NumColumns_, NumRows_, T_, ColumnMajor_, InT_, InNumColumns_, InNumRows_, InColumnMajor_>
+				(
+					std::forward<EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>>(matrix_to_convert_)
+				)
+			)
+		{
+			static_assert
+			(
+				is_constructible_via_other_matrix_type<EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>&&>(),
+				"Attempted to perform invalid move-construction of an EmuMath Matrix. This may have been performed due to a removed std::enable_if_t trigger. This is a side-effect of an intentional change to prevent construction of reference-containing Matrices via temporary non-reference-containing Matrices (which would result in dangling references), and is likely what is occurring in this situation. Note that move-construction falls back to copy construction if not possible, so the alternative of copy-construction if this is not a reference-containing Matrix type is likely also not possible."
+			);
+		}
+
+		/// <summary>
+		/// <para> Explicit conversion constructor to create this Matrix type as a converted move-or-copy of the provided Matrix. </para>
+		/// <para> Indices not contained in this Matrix will be ignored. </para>
+		/// <para> Indices not contained in the passed Matrix, but contained within this Matrix, will be interpreted as implied zero. </para>
+		/// <para>
+		///		NOTE: This constructor allows false positive results in checks for if this type is constructible with the provided argument. 
+		///		This is to prevent invalid implicit casting to an lvalue-reference to provide safety from constructing with dangling references.
+		/// </para>
+		/// </summary>
+		/// <param name="matrix_to_convert_">Const rvalue reference to an EmuMath Matrix of a different type to convert into this Matrix type via move-or-copy.</param>
+		template
+		<
+			std::size_t InNumColumns_, std::size_t InNumRows_, typename InT_, bool InColumnMajor_,
+			typename = std::enable_if_t<!std::is_same_v<this_type, EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>>>
+		>
+		explicit constexpr inline Matrix(const EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>&& matrix_to_convert_) :
+			Matrix
+			(
+				EmuMath::Helpers::matrix_copy<NumColumns_, NumRows_, T_, ColumnMajor_, InT_, InNumColumns_, InNumRows_, InColumnMajor_>
+				(
+					std::forward<const EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>>(matrix_to_convert_)
+				)
+			)
+		{
+			static_assert
+			(
+				is_constructible_via_other_matrix_type<const EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>&&>(),
+				"Attempted to perform invalid const-move-construction of an EmuMath Matrix. This may have been performed due to a removed std::enable_if_t trigger. This is a side-effect of an intentional change to prevent construction of reference-containing Matrices via temporary non-reference-containing Matrices (which would result in dangling references), which is likely what is occurring in this situation. Note that move-construction falls back to copy construction if not possible, so the alternative of copy-construction if this is not a reference-containing Matrix type is likely also not possible."
+			);
 		}
 #pragma endregion
 
@@ -582,10 +706,10 @@ namespace EmuMath
 		/// <summary>
 		/// <para> Accesses a contiguous data pointer to the elements of this Matrix, starting from an element at the provided Offset_. </para>
 		/// <para> Offset_: Index to retrieve a pointer to. Defaults to 0. </para>
-		/// <para> This function is not available for reference-containing matrices. </para>
+		/// <para> This function is not available for reference-containing matrices, or matrices whose elements are not fully contiguous. </para>
 		/// </summary>
 		/// <returns>Pointer to the value at the provided index.</returns>
-		template<std::size_t Offset_ = 0>
+		template<std::size_t Offset_ = 0, typename = std::enable_if_t<is_contiguous>>
 		[[nodiscard]] constexpr inline value_type* data()
 		{
 			if constexpr(!contains_ref)
@@ -631,7 +755,7 @@ namespace EmuMath
 			}
 		}
 
-		template<std::size_t Offset_ = 0>
+		template<std::size_t Offset_ = 0, typename = std::enable_if_t<is_contiguous>>
 		[[nodiscard]] constexpr inline const value_type* data() const
 		{
 			return const_cast<this_type*>(this)->template data<Offset_>();
@@ -1042,15 +1166,25 @@ namespace EmuMath
 			}
 			else if constexpr (is_constructible_with_scalar_args<Args_...>())
 			{
-				auto tuple_of_args_ = std::forward_as_tuple(std::forward<Args_>(args_)...);
-				return matrix_vector_type
-				(
-					_make_major_index<MajorIndices_>
+				if constexpr(num_major_elements > 1)
+				{
+					auto tuple_of_args_ = std::forward_as_tuple(std::forward<Args_>(args_)...);
+					return matrix_vector_type
 					(
-						std::make_index_sequence<num_non_major_elements>(),
-						tuple_of_args_
-					)...
-				);
+						_make_major_index<MajorIndices_>
+						(
+							std::make_index_sequence<num_non_major_elements>(),
+							tuple_of_args_
+						)...
+					);
+				}
+				else
+				{
+					return matrix_vector_type
+					(
+						typename matrix_vector_type::stored_type(1, 2, 3, 4)
+					);
+				}
 			}
 			else
 			{

@@ -536,6 +536,110 @@ namespace EmuMath::TMP
 	};
 	template<class Matrix_>
 	static constexpr std::size_t matrix_smallest_axis_v = matrix_smallest_axis<Matrix_>::value;
+
+	/// <summary>
+	/// <para> Helper type to determine Column and Row index sequences to fully access the provided Matrix_ type contiguously within the provided indices range. </para>
+	/// <para> Will trigger a static_assert if ColumnIndices_ or RowIndices_ is not a std::index_sequence. </para>
+	/// <para> column_index_sequence will display all determined column indices. </para>
+	/// <para> row_index_sequence will display all determined row indices. </para>
+	/// <para>
+	///		If Matrix_ is column-major, row_index_sequence will be iterated and reset to its starting point in a loop for every column. 
+	///		For all indices in a single loop, columns will be the same value before iterating.
+	/// </para>
+	/// <para>
+	///		If Matrix_ is not column-major, column_index_sequence will be iterated and reset to its starting point in a loop for every row. 
+	///		For all indices in a single loop, rows will be the same value before iterating.
+	/// </para>
+	/// </summary>
+	template<class Matrix_, class ColumnIndices_, class RowIndices_, typename = void>
+	struct make_matrix_index_sequences
+	{
+		static_assert
+		(
+			EmuCore::TMP::is_index_sequence_v<ColumnIndices_> && EmuCore::TMP::is_index_sequence_v<RowIndices_>,
+			"Passed a non-index sequence to an indices argument for make_full_matrix_index_sequences for an EmuMath Matrix."
+		);
+		using column_index_sequence = std::index_sequence<>;
+		using row_index_sequence = std::index_sequence<>;
+	};
+
+	template<class Matrix_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+	struct make_matrix_index_sequences
+	<
+		Matrix_,
+		std::index_sequence<ColumnIndices_...>,
+		std::index_sequence<RowIndices_...>,
+		std::enable_if_t<Matrix_::is_column_major>
+	>
+	{
+		// Output matrix will have to read the input Matrix in its contiguous order to correctly construct
+		// --- In this case, we are column-major, so we iterate rows before iterating columns
+		static constexpr std::size_t num_columns = sizeof...(ColumnIndices_);
+		static constexpr std::size_t num_rows = sizeof...(RowIndices_);
+
+		using column_index_sequence = typename EmuCore::TMP::variadic_splice_integer_sequences
+		<
+			EmuCore::TMP::make_duplicated_index_sequence<ColumnIndices_, num_rows>...
+		>::type;
+
+		using row_index_sequence = typename EmuCore::TMP::looped_integer_sequence<std::index_sequence<RowIndices_...>, num_columns - 1>::type;
+	};
+
+	template<class Matrix_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+	struct make_matrix_index_sequences
+		<
+		Matrix_,
+		std::index_sequence<ColumnIndices_...>,
+		std::index_sequence<RowIndices_...>,
+		std::enable_if_t<!Matrix_::is_column_major>
+	>
+	{
+		// Output matrix will have to read the input Matrix in its contiguous order to correctly construct
+		// --- In this case, we are row-major, so we iterate columns before iterating rows
+		static constexpr std::size_t num_columns = sizeof...(ColumnIndices_);
+		static constexpr std::size_t num_rows = sizeof...(RowIndices_);
+
+		using column_index_sequence = typename EmuCore::TMP::looped_integer_sequence<std::index_sequence<ColumnIndices_...>, num_rows - 1>::type;
+		using row_index_sequence = typename EmuCore::TMP::variadic_splice_integer_sequences
+		<
+			EmuCore::TMP::make_duplicated_index_sequence<RowIndices_, num_columns>...
+		>::type;
+	};
+
+	template<class Matrix_>
+	struct make_full_matrix_index_sequences
+	{
+	private:
+		template<class In_, bool IsMatrix_ = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _maker_template
+		{
+			using column_index_sequence = std::index_sequence<>;
+			using row_index_sequence = std::index_sequence<>;
+		};
+
+		template<class In_>
+		struct _maker_template<In_, true>
+		{
+		private:
+			using _in_uq = EmuCore::TMP::remove_ref_cv_t<In_>;
+			using _underlying_maker = EmuMath::TMP::make_matrix_index_sequences
+			<
+				_in_uq,
+				std::make_index_sequence<_in_uq::num_columns>,
+				std::make_index_sequence<_in_uq::num_rows>
+			>;
+
+		public:
+			using column_index_sequence = typename _underlying_maker::column_index_sequence;
+			using row_index_sequence = typename _underlying_maker::row_index_sequence;
+		};
+
+		using _maker = _maker_template<Matrix_>;
+
+	public:
+		using column_index_sequence = typename _maker::column_index_sequence;
+		using row_index_sequence = typename _maker::row_index_sequence;
+	};
 }
 
 #endif

@@ -44,6 +44,9 @@ namespace EmuMath::TMP
 		using major_get_const_ref_type = const major_vector_type&;
 		using non_major_get_ref_type = std::conditional_t<is_column_major, row_get_ref_type, column_get_ref_type>;
 		using non_major_get_const_ref_type = std::conditional_t<is_column_major, row_get_const_ref_type, column_get_const_ref_type>;
+
+		// Misc info
+		static constexpr bool is_contiguous = sizeof(matrix_vector_type) == (sizeof(stored_type) * size);
 	};
 }
 

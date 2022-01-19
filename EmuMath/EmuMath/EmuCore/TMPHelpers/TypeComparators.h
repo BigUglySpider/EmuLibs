@@ -427,6 +427,32 @@ namespace EmuCore::TMP
 	};
 	template<template<class...> class Template_, class...TypeArgs_>
 	static constexpr bool valid_template_args_v = valid_template_args<Template_, TypeArgs_...>::value;
+
+	template<class T_>
+	struct is_integer_sequence
+	{
+		static constexpr bool value = false;
+	};
+	template<class T_, T_...Vals_>
+	struct is_integer_sequence<std::integer_sequence<T_, Vals_...>>
+	{
+		static constexpr bool value = true;
+	};
+	template<class T_>
+	static constexpr bool is_integer_sequence_v = is_integer_sequence<T_>::value;
+
+	template<class T_>
+	struct is_index_sequence
+	{
+		static constexpr bool value = false;
+	};
+	template<std::size_t...Vals_>
+	struct is_index_sequence<std::index_sequence<Vals_...>>
+	{
+		static constexpr bool value = true;
+	};
+	template<class T_>
+	static constexpr bool is_index_sequence_v = is_index_sequence<T_>::value;
 }
 
 #endif

@@ -5,6 +5,84 @@
 
 namespace EmuMath::Helpers::_matrix_underlying
 {
+	// CONTAINED FLATTENED INDEX CHECK
+	template<std::size_t FlattenedIndex_, class Matrix_, typename = std::enable_if_t<EmuMath::TMP::is_emu_matrix_v<Matrix_>>>
+	[[nodiscard]] constexpr inline bool _matrix_index_is_contained()
+	{
+		return FlattenedIndex_ < EmuCore::TMP::remove_ref_cv_t<Matrix_>::size;
+	}
+
+	template<std::size_t FlattenedIndex_, std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline bool _matrix_index_is_contained()
+	{
+		return _matrix_index_is_contained<FlattenedIndex_, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>();
+	}
+
+	// CONTAINED COLUMN-ROW INDEX CHECK
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Matrix_, typename = std::enable_if_t<EmuMath::TMP::is_emu_matrix_v<Matrix_>>>
+	[[nodiscard]] constexpr inline bool _matrix_index_is_contained()
+	{
+		return (ColumnIndex_ < EmuCore::TMP::remove_ref_cv_t<Matrix_>::num_columns) && (RowIndex_ < EmuCore::TMP::remove_ref_cv_t<Matrix_>::num_rows);
+	}
+
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline bool _matrix_index_is_contained()
+	{
+		return _matrix_index_is_contained<ColumnIndex_, RowIndex_, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>();
+	}
+
+	// CONTAINED COLUMN INDEX CHECK
+	template<std::size_t ColumnIndex_, class Matrix_, typename = std::enable_if_t<EmuMath::TMP::is_emu_matrix_v<Matrix_>>>
+	[[nodiscard]] constexpr inline bool _matrix_column_is_contained()
+	{
+		return ColumnIndex_ < EmuCore::TMP::remove_ref_cv_t<Matrix_>::num_columns;
+	}
+
+	template<std::size_t ColumnIndex_, std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline bool _matrix_column_is_contained()
+	{
+		return _matrix_column_is_contained<ColumnIndex_, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>();
+	}
+
+	// CONTAINED ROW INDEX CHECK
+	template<std::size_t RowIndex_, class Matrix_, typename = std::enable_if_t<EmuMath::TMP::is_emu_matrix_v<Matrix_>>>
+	[[nodiscard]] constexpr inline bool _matrix_row_is_contained()
+	{
+		return RowIndex_ < EmuCore::TMP::remove_ref_cv_t<Matrix_>::num_rows;
+	}
+
+	template<std::size_t RowIndex_, std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline bool _matrix_row_is_contained()
+	{
+		return _matrix_row_is_contained<RowIndex_, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>();
+	}
+
+	// CONTAINED MAJOR INDEX CHECK
+	template<std::size_t MajorIndex_, class Matrix_, typename = std::enable_if_t<EmuMath::TMP::is_emu_matrix_v<Matrix_>>>
+	[[nodiscard]] constexpr inline bool _matrix_major_is_contained()
+	{
+		return MajorIndex_ < EmuCore::TMP::remove_ref_cv_t<Matrix_>::num_major_elements;
+	}
+
+	template<std::size_t MajorIndex_, std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline bool _matrix_major_is_contained()
+	{
+		return _matrix_major_is_contained<MajorIndex_, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>();
+	}
+
+	// CONTAINED NON-MAJOR INDEX CHECK
+	template<std::size_t NonMajorIndex_, class Matrix_, typename = std::enable_if_t<EmuMath::TMP::is_emu_matrix_v<Matrix_>>>
+	[[nodiscard]] constexpr inline bool _matrix_non_major_is_contained()
+	{
+		return NonMajorIndex_ < EmuCore::TMP::remove_ref_cv_t<Matrix_>::num_non_major_elements;
+	}
+
+	template<std::size_t NonMajorIndex_, std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline bool _matrix_non_major_is_contained()
+	{
+		return _matrix_non_major_is_contained<NonMajorIndex_, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>();
+	}
+
 	// NON-CONTAINED GET
 	template<class Matrix_, typename = std::enable_if_t<EmuMath::TMP::is_emu_matrix_v<Matrix_>>>
 	[[nodiscard]] constexpr inline typename EmuCore::TMP::remove_ref_cv_t<Matrix_>::value_type_uq _matrix_get_non_contained()
@@ -447,60 +525,71 @@ namespace EmuMath::Helpers::_matrix_underlying
 	template<class OutVector_, class Matrix_, std::size_t...Indices_>
 	[[nodiscard]] constexpr inline OutVector_ _matrix_make_main_diagonal_vector(Matrix_& matrix_ref_, std::index_sequence<Indices_...> indices_)
 	{
-		if constexpr (std::is_constructible_v<OutVector_, decltype(_matrix_get_theoretical<Indices_, Indices_>(matrix_ref_))...>)
+		if constexpr(!OutVector_::contains_ref || EmuCore::TMP::variadic_and_v<_matrix_index_is_contained<Indices_, Indices_, Matrix_>()...>)
 		{
-			return OutVector_(_matrix_get_theoretical<Indices_, Indices_>(matrix_ref_)...);
-		}
-		else
-		{
-			using out_stored_type = typename EmuCore::TMP::remove_ref_cv_t<OutVector_>::stored_type;
-			constexpr bool constructible_from_stored_type = std::is_constructible_v<OutVector_, EmuCore::TMP::type_and_discard_val_t<out_stored_type, Indices_>...>;
-			if constexpr (constructible_from_stored_type)
+			if constexpr (std::is_constructible_v<OutVector_, decltype(_matrix_get_theoretical<Indices_, Indices_>(matrix_ref_))...>)
 			{
-				constexpr bool valid_for_stored_type_construction_ = EmuCore::TMP::variadic_and_v
-				<
-					std::is_constructible_v<out_stored_type, decltype(_matrix_get_theoretical<Indices_, Indices_>(matrix_ref_))>...
-				>;
-
-				if constexpr (valid_for_stored_type_construction_)
+				return OutVector_(_matrix_get_theoretical<Indices_, Indices_>(matrix_ref_)...);
+			}
+			else
+			{
+				using out_stored_type = typename EmuCore::TMP::remove_ref_cv_t<OutVector_>::stored_type;
+				constexpr bool constructible_from_stored_type = std::is_constructible_v<OutVector_, EmuCore::TMP::type_and_discard_val_t<out_stored_type, Indices_>...>;
+				if constexpr (constructible_from_stored_type)
 				{
-					return OutVector_
-					(
-						out_stored_type(_matrix_get_theoretical<Indices_, Indices_>(matrix_ref_))...
-					);
-				}
-				else
-				{
-					constexpr bool valid_for_stored_type_static_cast_ = EmuCore::TMP::variadic_and_v
+					constexpr bool valid_for_stored_type_construction_ = EmuCore::TMP::variadic_and_v
 					<
-						EmuCore::TMP::is_static_castable_v<decltype(_matrix_get_theoretical<Indices_, Indices_>(matrix_ref_)), out_stored_type>...
+						std::is_constructible_v<out_stored_type, decltype(_matrix_get_theoretical<Indices_, Indices_>(matrix_ref_))>...
 					>;
 
-					if constexpr (valid_for_stored_type_static_cast_)
+					if constexpr (valid_for_stored_type_construction_)
 					{
 						return OutVector_
 						(
-							static_cast<out_stored_type>(_matrix_get_theoretical<Indices_, Indices_>(matrix_ref_))...
+							out_stored_type(_matrix_get_theoretical<Indices_, Indices_>(matrix_ref_))...
 						);
 					}
 					else
 					{
-						static_assert
-						(
-							EmuCore::TMP::get_false<OutVector_>(),
-							"Attempted to retrieve an EmuMath Vector of the main diagonal within an EmuMath Matrix, but neither the provided output Vector nor its stored_type could not be formed from accessing respective main-diagonal indices within the Matrix."
-						);
+						constexpr bool valid_for_stored_type_static_cast_ = EmuCore::TMP::variadic_and_v
+						<
+							EmuCore::TMP::is_static_castable_v<decltype(_matrix_get_theoretical<Indices_, Indices_>(matrix_ref_)), out_stored_type>...
+						>;
+
+						if constexpr (valid_for_stored_type_static_cast_)
+						{
+							return OutVector_
+							(
+								static_cast<out_stored_type>(_matrix_get_theoretical<Indices_, Indices_>(matrix_ref_))...
+							);
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<OutVector_>(),
+								"Attempted to retrieve an EmuMath Vector of the main diagonal within an EmuMath Matrix, but neither the provided output Vector nor its stored_type could not be formed from accessing respective main-diagonal indices within the Matrix."
+							);
+						}
 					}
 				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<OutVector_>(),
+						"Attempted to retrieve an EmuMath Vector of the main diagonal within an EmuMath Matrix, but the provided output Vector could not be formed from accessing respective main-diagonal indices within the Matrix, and cannot be constructed from its stored_type."
+					);
+				}
 			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<OutVector_>(),
-					"Attempted to retrieve an EmuMath Vector of the main diagonal within an EmuMath Matrix, but the provided output Vector could not be formed from accessing respective main-diagonal indices within the Matrix, and cannot be constructed from its stored_type."
-				);
-			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<OutVector_>(),
+				"Attempted to retrieve an EmuMath Vector referencing the main diagonal within an EmuMath Matrix, but the indices the Vector would have to access include non-contained indices which cannot be referenced."
+			);
 		}
 	}
 
