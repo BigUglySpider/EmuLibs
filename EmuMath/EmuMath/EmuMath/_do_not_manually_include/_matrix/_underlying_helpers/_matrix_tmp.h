@@ -2,6 +2,7 @@
 #define EMU_MATH_MATRIX_TMP_H_INC_ 1
 
 #include "../../../../EmuCore/TMPHelpers/TypeConvertors.h"
+#include "../../../Vector.h"
 #include <type_traits>
 
 namespace EmuMath
@@ -69,6 +70,576 @@ namespace EmuMath::TMP
 	};
 	template<class Matrix_, typename OutT_, bool OutColumnMajor_>
 	using emu_matrix_transpose_t = typename emu_matrix_transpose<Matrix_, OutT_, OutColumnMajor_>::type;
+
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Matrix_>
+	struct is_theoretical_matrix_index
+	{
+	private:
+		template<class In_, bool IsMatrix_ = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _value_finder_template
+		{
+			static constexpr bool valid_column_index = false;
+			static constexpr bool valid_row_index = false;
+			static constexpr bool is_theoretical_index = false;
+		};
+
+		template<class In_>
+		struct _value_finder_template<In_, true>
+		{
+		private:
+			using _in_uq = EmuCore::TMP::remove_ref_cv_t<In_>;
+
+		public:
+			static constexpr bool valid_column_index = ColumnIndex_ < _in_uq::num_columns;
+			static constexpr bool valid_row_index = RowIndex_ < _in_uq::num_rows;
+			static constexpr bool is_theoretical_index = !(valid_column_index && valid_row_index);
+		};
+
+		using _value_finder = _value_finder_template<Matrix_>;
+
+	public:
+		static constexpr bool valid_column_index = _value_finder::valid_column_index;
+		static constexpr bool valid_row_index = _value_finder::valid_row_index;
+		static constexpr bool value = _value_finder::is_theoretical_index;
+	};
+
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Matrix_>
+	struct matrix_theoretical_get_result
+	{
+	private:
+		template<class In_, bool IsMatrix_ = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _type_finder_template
+		{
+			static constexpr bool valid_column_index = false;
+			static constexpr bool valid_row_index = false;
+			static constexpr bool is_theoretical_index = false;
+			using type = void;
+		};
+
+		template<class In_>
+		struct _type_finder_template<In_, true>
+		{
+		private:
+			using _in_uq = EmuCore::TMP::remove_ref_cv_t<In_>;
+			using _is_theoretical = EmuMath::TMP::is_theoretical_matrix_index<ColumnIndex_, RowIndex_, _in_uq>;
+
+		public:
+			static constexpr bool valid_column_index = _is_theoretical::valid_column_index;
+			static constexpr bool valid_row_index = _is_theoretical::valid_row_index;
+			static constexpr bool is_theoretical_index = _is_theoretical::value;
+			using type = typename std::conditional
+			<
+				is_theoretical_index,
+				typename _in_uq::value_type_uq,
+				typename EmuCore::TMP::conditional_const<std::is_const_v<std::remove_reference_t<In_>>, typename _in_uq::value_type&>::type
+			>::type;
+		};
+
+		using _type_finder = _type_finder_template<Matrix_>;
+
+	public:
+		static constexpr bool valid_column_index = _type_finder::valid_column_index;
+		static constexpr bool valid_row_index = _type_finder::valid_row_index;
+		static constexpr bool is_theoretical_index = _type_finder::is_theoretical_index;
+
+		using type = typename _type_finder::type;
+	};
+
+	template<std::size_t FlattenedIndex_, class Matrix_>
+	struct is_theoretical_flattened_matrix_index
+	{
+	private:
+		template<class In_, bool IsMatrix_ = EmuMath::TMP::is_emu_matrix_v<Matrix_>>
+		struct _value_finder
+		{
+			static constexpr bool value = false;
+		};
+
+		template<class In_>
+		struct _value_finder<In_, true>
+		{
+			static constexpr bool value = FlattenedIndex_ > EmuCore::TMP::remove_ref_cv_t<In_>::size;
+		};
+
+	public:
+		static constexpr bool value = _value_finder<Matrix_>::value;
+	};
+
+	template<std::size_t FlattenedIndex_, class Matrix_>
+	struct matrix_flattened_theoretical_get_result
+	{
+	private:
+		template<class In_, bool = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _type_finder_template
+		{
+			static constexpr bool is_theoretical_index = false;
+			using type = void;
+		};
+
+		template<class In_>
+		struct _type_finder_template<In_, true>
+		{
+		private:
+			using _in_uq = EmuCore::TMP::remove_ref_cv_t<In_>;
+
+		public:
+			static constexpr bool is_theoretical_index = is_theoretical_flattened_matrix_index<FlattenedIndex_, In_>::value;
+			using type = typename std::conditional
+			<
+				is_theoretical_index,
+				typename _in_uq::value_type_uq,
+				typename EmuCore::TMP::conditional_const<std::is_const_v<std::remove_reference_t<In_>>, typename _in_uq::value_type&>::type
+			>::type;
+		};
+
+		using _type_finder = _type_finder_template<Matrix_>;
+
+	public:
+		static constexpr bool is_theoretical_index = _type_finder::is_theoretical_index;
+		using type = typename _type_finder::type;
+	};
+
+	template<class Matrix_>
+	struct matrix_non_contained_column
+	{
+	private:
+		template<class In_, bool IsMatrix_ = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _type_finder
+		{
+			using type = void;
+		};
+
+		template<class In_>
+		struct _type_finder<In_, true>
+		{
+			using type = EmuMath::Vector
+			<
+				EmuCore::TMP::remove_ref_cv_t<In_>::num_rows,
+				typename EmuCore::TMP::remove_ref_cv_t<In_>::value_type_uq
+			>;
+		};
+
+	public:
+		using type = typename _type_finder<Matrix_>::type;
+	};
+
+	template<class Matrix_>
+	struct matrix_non_contained_row
+	{
+	private:
+		template<class In_, bool IsMatrix_ = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _type_finder
+		{
+			using type = void;
+		};
+
+		template<class In_>
+		struct _type_finder<In_, true>
+		{
+			using type = EmuMath::Vector
+			<
+				EmuCore::TMP::remove_ref_cv_t<In_>::num_columns,
+				typename EmuCore::TMP::remove_ref_cv_t<In_>::value_type_uq
+			>;
+		};
+
+	public:
+		using type = typename _type_finder<Matrix_>::type;
+	};
+
+	template<std::size_t ColumnIndex_, class Matrix_>
+	struct is_theoretical_matrix_column_index
+	{
+	private:
+		template<class In_, bool IsMatrix_ = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _value_finder
+		{
+			static constexpr bool value = true;
+		};
+
+		template<class In_>
+		struct _value_finder<In_, true>
+		{
+			static constexpr bool value = ColumnIndex_ >= EmuCore::TMP::remove_ref_cv_t<In_>::num_columns;
+		};
+
+	public:
+		static constexpr bool value = _value_finder<Matrix_>::value;
+	};
+
+	template<std::size_t RowIndex_, class Matrix_>
+	struct is_theoretical_matrix_row_index
+	{
+	private:
+		template<class In_, bool IsMatrix_ = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _value_finder
+		{
+			static constexpr bool value = true;
+		};
+
+		template<class In_>
+		struct _value_finder<In_, true>
+		{
+			static constexpr bool value = RowIndex_ >= EmuCore::TMP::remove_ref_cv_t<In_>::num_rows;
+		};
+
+	public:
+		static constexpr bool value = _value_finder<Matrix_>::value;
+	};
+
+	template<std::size_t ColumnIndex_, class Matrix_>
+	struct matrix_column_theoretical_get_result
+	{
+	private:
+		template<class In_, bool IsMatrix_ = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _type_finder_template
+		{
+			static constexpr bool is_theoretical = false;
+			using type = void;
+		};
+
+		template<class In_>
+		struct _type_finder_template<In_, true>
+		{
+		private:
+			using _in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
+
+		public:
+			static constexpr bool is_theoretical = EmuMath::TMP::is_theoretical_matrix_column_index<ColumnIndex_, In_>::value;
+			using type = std::conditional_t
+			<
+				is_theoretical,
+				typename matrix_non_contained_column<_in_uq>::type,
+				std::conditional_t
+				<
+					std::is_const_v<std::remove_reference_t<In_>>,
+					typename _in_uq::column_get_const_ref_type,
+					typename _in_uq::column_get_ref_type
+				>
+			>;
+		};
+
+		using _type_finder = _type_finder_template<Matrix_>;
+
+	public:
+		static constexpr bool is_theoretical = _type_finder::is_theoretical;
+		using type = typename _type_finder::type;
+	};
+
+	template<std::size_t RowIndex_, class Matrix_>
+	struct matrix_row_theoretical_get_result
+	{
+	private:
+		template<class In_, bool IsMatrix_ = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _type_finder_template
+		{
+			static constexpr bool is_theoretical = false;
+			using type = void;
+		};
+
+		template<class In_>
+		struct _type_finder_template<In_, true>
+		{
+		private:
+			using _in_uq = typename EmuCore::TMP::remove_ref_cv<In_>::type;
+
+		public:
+			static constexpr bool is_theoretical = EmuMath::TMP::is_theoretical_matrix_row_index<RowIndex_, _in_uq>::value;
+			using type = std::conditional_t
+			<
+				is_theoretical,
+				typename matrix_non_contained_row<_in_uq>::type,
+				std::conditional_t
+				<
+					std::is_const_v<std::remove_reference_t<In_>>,
+					typename _in_uq::row_get_const_ref_type,
+					typename _in_uq::row_get_ref_type
+				>
+			>;
+		};
+
+		using _type_finder = _type_finder_template<Matrix_>;
+
+	public:
+		static constexpr bool is_theoretical = _type_finder::is_theoretical;
+		using type = typename _type_finder::type;
+	};
+
+	template<std::size_t MajorIndex_, class Matrix_>
+	struct is_theoretical_matrix_major_index
+	{
+	private:
+		template<class In_, bool IsMatrix_ = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _value_finder
+		{
+			static constexpr bool value = false;
+		};
+
+		template<class In_>
+		struct _value_finder<In_, true>
+		{
+		private:
+			using _underlying_check = typename std::conditional
+			<
+				EmuCore::TMP::remove_ref_cv_t<In_>::is_column_major,
+				EmuMath::TMP::is_theoretical_matrix_column_index<MajorIndex_, In_>,
+				EmuMath::TMP::is_theoretical_matrix_row_index<MajorIndex_, In_>
+			>::type;
+
+		public:
+			static constexpr bool value = _underlying_check::value;
+		};
+
+	public:
+		static constexpr bool value = _value_finder<Matrix_>::value;
+	};
+
+	template<std::size_t NonMajorIndex_, class Matrix_>
+	struct is_theoretical_matrix_non_major_index
+	{
+	private:
+		template<class In_, bool IsMatrix_ = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _value_finder
+		{
+			static constexpr bool value = false;
+		};
+
+		template<class In_>
+		struct _value_finder<In_, true>
+		{
+		private:
+			using _underlying_check = typename std::conditional
+			<
+				EmuCore::TMP::remove_ref_cv_t<In_>::is_column_major,
+				EmuMath::TMP::is_theoretical_matrix_row_index<NonMajorIndex_, In_>,
+				EmuMath::TMP::is_theoretical_matrix_column_index<NonMajorIndex_, In_>
+			>::type;
+
+		public:
+			static constexpr bool value = _underlying_check::value;
+		};
+
+	public:
+		static constexpr bool value = _value_finder<Matrix_>::value;
+	};
+
+	template<std::size_t MajorIndex_, class Matrix_>
+	struct matrix_major_theoretical_get_result
+	{
+	private:
+		template<class In_, bool IsMatrix_ = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _type_finder_template
+		{
+			static constexpr bool is_theoretical = false;
+			using type = void;
+		};
+
+		template<class In_>
+		struct _type_finder_template<In_, true>
+		{
+		private:
+			using _underlying_check = typename std::conditional
+			<
+				EmuCore::TMP::remove_ref_cv_t<In_>::is_column_major,
+				EmuMath::TMP::matrix_column_theoretical_get_result<MajorIndex_, Matrix_>,
+				EmuMath::TMP::matrix_row_theoretical_get_result<MajorIndex_, Matrix_>
+			>::type;
+
+		public:
+			static constexpr bool is_theoretical = _underlying_check::is_theoretical;
+			using type = typename _underlying_check::type;
+		};
+
+		using _type_finder = _type_finder_template<Matrix_>;
+
+	public:
+		static constexpr bool is_theoretical = _type_finder::is_theoretical;
+		using type = typename _type_finder::type;
+	};
+
+	template<std::size_t NonMajorIndex_, class Matrix_>
+	struct matrix_non_major_theoretical_get_result
+	{
+	private:
+		template<class In_, bool IsMatrix_ = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _type_finder_template
+		{
+			static constexpr bool is_theoretical = false;
+			using type = void;
+		};
+
+		template<class In_>
+		struct _type_finder_template<In_, true>
+		{
+		private:
+			using _underlying_check = typename std::conditional
+			<
+				EmuCore::TMP::remove_ref_cv_t<In_>::is_column_major,
+				EmuMath::TMP::matrix_row_theoretical_get_result<NonMajorIndex_, Matrix_>,
+				EmuMath::TMP::matrix_column_theoretical_get_result<NonMajorIndex_, Matrix_>
+			>::type;
+
+		public:
+			static constexpr bool is_theoretical = _underlying_check::is_theoretical;
+			using type = typename _underlying_check::type;
+		};
+
+		using _type_finder = _type_finder_template<Matrix_>;
+
+	public:
+		static constexpr bool is_theoretical = _type_finder::is_theoretical;
+		using type = typename _type_finder::type;
+	};
+
+	template<class Matrix_>
+	struct matrix_largest_axis
+	{
+	private:
+		template<class In_, bool = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _value_finder
+		{
+			static constexpr std::size_t value = 0;
+		};
+
+		template<class In_>
+		struct _value_finder<In_, true>
+		{
+			using _in_uq = EmuCore::TMP::remove_ref_cv_t<In_>;
+			static constexpr std::size_t value = EmuCore::TMP::greatest_constant_v<std::size_t, _in_uq::num_columns, _in_uq::num_rows>;
+		};
+
+	public:
+		static constexpr std::size_t value = _value_finder<Matrix_>::value;
+	};
+	template<class Matrix_>
+	static constexpr std::size_t matrix_largest_axis_v = matrix_largest_axis<Matrix_>::value;
+
+	template<class Matrix_>
+	struct matrix_smallest_axis
+	{
+	private:
+		template<class In_, bool = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _value_finder
+		{
+			static constexpr std::size_t value = 0;
+		};
+
+		template<class In_>
+		struct _value_finder<In_, true>
+		{
+			using _in_uq = EmuCore::TMP::remove_ref_cv_t<In_>;
+			static constexpr std::size_t value = EmuCore::TMP::smallest_constant_v<std::size_t, _in_uq::num_columns, _in_uq::num_rows>;
+		};
+
+	public:
+		static constexpr std::size_t value = _value_finder<Matrix_>::value;
+	};
+	template<class Matrix_>
+	static constexpr std::size_t matrix_smallest_axis_v = matrix_smallest_axis<Matrix_>::value;
+
+	/// <summary>
+	/// <para> Helper type to determine Column and Row index sequences to fully access the provided Matrix_ type contiguously within the provided indices range. </para>
+	/// <para> Will trigger a static_assert if ColumnIndices_ or RowIndices_ is not a std::index_sequence. </para>
+	/// <para> column_index_sequence will display all determined column indices. </para>
+	/// <para> row_index_sequence will display all determined row indices. </para>
+	/// <para>
+	///		If Matrix_ is column-major, row_index_sequence will be iterated and reset to its starting point in a loop for every column. 
+	///		For all indices in a single loop, columns will be the same value before iterating.
+	/// </para>
+	/// <para>
+	///		If Matrix_ is not column-major, column_index_sequence will be iterated and reset to its starting point in a loop for every row. 
+	///		For all indices in a single loop, rows will be the same value before iterating.
+	/// </para>
+	/// </summary>
+	template<class Matrix_, class ColumnIndices_, class RowIndices_, typename = void>
+	struct make_matrix_index_sequences
+	{
+		static_assert
+		(
+			EmuCore::TMP::is_index_sequence_v<ColumnIndices_> && EmuCore::TMP::is_index_sequence_v<RowIndices_>,
+			"Passed a non-index sequence to an indices argument for make_full_matrix_index_sequences for an EmuMath Matrix."
+		);
+		using column_index_sequence = std::index_sequence<>;
+		using row_index_sequence = std::index_sequence<>;
+	};
+
+	template<class Matrix_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+	struct make_matrix_index_sequences
+	<
+		Matrix_,
+		std::index_sequence<ColumnIndices_...>,
+		std::index_sequence<RowIndices_...>,
+		std::enable_if_t<Matrix_::is_column_major>
+	>
+	{
+		// Output matrix will have to read the input Matrix in its contiguous order to correctly construct
+		// --- In this case, we are column-major, so we iterate rows before iterating columns
+		static constexpr std::size_t num_columns = sizeof...(ColumnIndices_);
+		static constexpr std::size_t num_rows = sizeof...(RowIndices_);
+
+		using column_index_sequence = typename EmuCore::TMP::variadic_splice_integer_sequences
+		<
+			EmuCore::TMP::make_duplicated_index_sequence<ColumnIndices_, num_rows>...
+		>::type;
+
+		using row_index_sequence = typename EmuCore::TMP::looped_integer_sequence<std::index_sequence<RowIndices_...>, num_columns - 1>::type;
+	};
+
+	template<class Matrix_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+	struct make_matrix_index_sequences
+		<
+		Matrix_,
+		std::index_sequence<ColumnIndices_...>,
+		std::index_sequence<RowIndices_...>,
+		std::enable_if_t<!Matrix_::is_column_major>
+	>
+	{
+		// Output matrix will have to read the input Matrix in its contiguous order to correctly construct
+		// --- In this case, we are row-major, so we iterate columns before iterating rows
+		static constexpr std::size_t num_columns = sizeof...(ColumnIndices_);
+		static constexpr std::size_t num_rows = sizeof...(RowIndices_);
+
+		using column_index_sequence = typename EmuCore::TMP::looped_integer_sequence<std::index_sequence<ColumnIndices_...>, num_rows - 1>::type;
+		using row_index_sequence = typename EmuCore::TMP::variadic_splice_integer_sequences
+		<
+			EmuCore::TMP::make_duplicated_index_sequence<RowIndices_, num_columns>...
+		>::type;
+	};
+
+	template<class Matrix_>
+	struct make_full_matrix_index_sequences
+	{
+	private:
+		template<class In_, bool IsMatrix_ = EmuMath::TMP::is_emu_matrix_v<In_>>
+		struct _maker_template
+		{
+			using column_index_sequence = std::index_sequence<>;
+			using row_index_sequence = std::index_sequence<>;
+		};
+
+		template<class In_>
+		struct _maker_template<In_, true>
+		{
+		private:
+			using _in_uq = EmuCore::TMP::remove_ref_cv_t<In_>;
+			using _underlying_maker = EmuMath::TMP::make_matrix_index_sequences
+			<
+				_in_uq,
+				std::make_index_sequence<_in_uq::num_columns>,
+				std::make_index_sequence<_in_uq::num_rows>
+			>;
+
+		public:
+			using column_index_sequence = typename _underlying_maker::column_index_sequence;
+			using row_index_sequence = typename _underlying_maker::row_index_sequence;
+		};
+
+		using _maker = _maker_template<Matrix_>;
+
+	public:
+		using column_index_sequence = typename _maker::column_index_sequence;
+		using row_index_sequence = typename _maker::row_index_sequence;
+	};
 }
 
 #endif

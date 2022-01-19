@@ -114,8 +114,22 @@ namespace EmuMath::Helpers::_vector_underlying
 			using rhs_vector_type = EmuCore::TMP::remove_ref_cv_t<VectorArg_>;
 			if constexpr (Index_ < rhs_vector_type::size)
 			{
-				_vector_set_scalar<Index_>(out_vector_, std::move(_vector_get<Index_>(in_vector_arg_)));
-				_vector_set_vector_move<Index_ + 1, EndIndex_>(out_vector_, std::move(in_vector_arg_));
+				using lhs_value_type = typename lhs_vector_type::value_type;
+				using rhs_value_type = typename rhs_vector_type::value_type;
+				if constexpr (EmuMath::TMP::is_emu_vector_v<lhs_value_type> && !EmuMath::TMP::is_emu_vector_v<rhs_value_type>)
+				{
+					_vector_set_vector_move<0, EmuCore::TMP::remove_ref_cv_t<lhs_value_type>::size>
+					(
+						_vector_get<Index_>(out_vector_),
+						std::forward<VectorArg_>(in_vector_arg_)
+					);
+					_vector_set_vector_move<Index_ + 1, EndIndex_>(out_vector_, std::forward<VectorArg_>(in_vector_arg_));
+				}
+				else
+				{
+					_vector_set_scalar<Index_>(out_vector_, std::move(_vector_get<Index_>(in_vector_arg_)));
+					_vector_set_vector_move<Index_ + 1, EndIndex_>(out_vector_, std::forward<VectorArg_>(in_vector_arg_));
+				}
 			}
 			else
 			{
@@ -134,8 +148,23 @@ namespace EmuMath::Helpers::_vector_underlying
 			using rhs_vector_type = EmuCore::TMP::remove_ref_cv_t<VectorArg_>;
 			if constexpr (Index_ < rhs_vector_type::size)
 			{
-				_vector_set_scalar<Index_>(out_vector_, _vector_get<Index_>(in_vector_arg_));
-				_vector_set_vector_copy<Index_ + 1, EndIndex_>(out_vector_, in_vector_arg_);
+				using lhs_value_type = typename lhs_vector_type::value_type;
+				using rhs_value_type = typename rhs_vector_type::value_type;
+
+				if constexpr (EmuMath::TMP::is_emu_vector_v<lhs_value_type> && !EmuMath::TMP::is_emu_vector_v<rhs_value_type>)
+				{
+					_vector_set_vector_copy<0, EmuCore::TMP::remove_ref_cv_t<lhs_value_type>::size, VectorArg_>
+					(
+						_vector_get<Index_>(out_vector_),
+						in_vector_arg_
+					);
+					_vector_set_vector_copy<Index_ + 1, EndIndex_, VectorArg_>(out_vector_, in_vector_arg_);
+				}
+				else
+				{
+					_vector_set_scalar<Index_>(out_vector_, _vector_get<Index_>(in_vector_arg_));
+					_vector_set_vector_copy<Index_ + 1, EndIndex_, VectorArg_>(out_vector_, in_vector_arg_);
+				}
 			}
 			else
 			{

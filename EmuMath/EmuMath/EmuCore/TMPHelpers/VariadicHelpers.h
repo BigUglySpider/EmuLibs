@@ -81,6 +81,45 @@ namespace EmuCore::TMP
 	};
 	template<class T_, class Discarded_>
 	using type_and_discard_t = typename type_and_discard<T_, Discarded_>::type;
+
+	/// <summary>
+	/// <para> Variant of type_and_discard which instead takes a non-type Discarded_ argument. </para>
+	/// </summary>
+	template<class T_, auto Discarded_>
+	struct type_and_discard_val
+	{
+		using type = T_;
+	};
+	template<class T_, auto Discarded_>
+	using type_and_discard_val_t = typename type_and_discard_val<T_, Discarded_>::type;
+
+	/// <summary>
+	/// <para> Extracts the first argument type of a selection of variadic Args_, aliasing it as the internal type. </para>
+	/// <para> If 1 or more arguments are provided: type will be the first provided type. </para>
+	/// <para> If 0 arguments are provided: type will be void. </para>
+	/// </summary>
+	template<class...Args_>
+	struct first_variadic_arg
+	{
+		using type = void;
+	};
+	template<class First_, class...Others_>
+	struct first_variadic_arg<First_, Others_...>
+	{
+		using type = First_;
+	};
+	template<class First_>
+	struct first_variadic_arg<First_>
+	{
+		using type = First_;
+	};
+	template<>
+	struct first_variadic_arg<>
+	{
+		using type = void;
+	};
+	template<class...Args_>
+	using first_variadic_arg_t = typename first_variadic_arg<Args_...>::type;
 #pragma endregion
 
 #pragma region VARIADIC_BOOLS
@@ -93,7 +132,21 @@ namespace EmuCore::TMP
 	template<bool First_, bool...Remaining_>
 	struct variadic_and<First_, Remaining_...>
 	{
-		static constexpr bool value = First_ ? variadic_and<Remaining_...>::value : false;
+	private:
+		[[nodiscard]] static constexpr inline bool _get()
+		{
+			if constexpr (First_)
+			{
+				return variadic_and<Remaining_...>::value;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+	public:
+		static constexpr bool value = _get();
 	};
 	template<bool First_>
 	struct variadic_and<First_>
@@ -206,54 +259,130 @@ namespace EmuCore::TMP
 	using make_offset_index_sequence = typename offset_integer_sequence_maker<std::size_t, Offset_, Size_>::type;
 
 	/// <summary>
-	///	<para> Type used to splice to index sequences into a single one. Indices in the left-hand sequence will all appear first, then those in the right-hand sequence. </para>
-	/// <para> If an argument is not a std::index_sequence, it will be interpreted as an empty std::index_sequence. </para>
+	///	<para> Type used to splice two integer sequences into a single one. Indices in the left-hand sequence will all appear first, then those in the right-hand sequence. </para>
+	/// <para> If an argument is not a std::intger_sequence, it will be interpreted as an empty std::integer_sequence of the correct type. </para>
+	/// <para> If both arguments are not a std::intger_sequence, type will be an empty std::integer_sequence of chars. </para>
+	/// <para> If both arguments are std::integer_sequences (as they should be), the value_type of the left-hand integer sequence will be used. </para>
 	/// </summary>
-	template<class LhsIndexSequence_, class RhsIndexSequence_>
-	struct splice_index_sequences
+	template<class LhsIntegerSequence_, class RhsIntegerSequence_>
+	struct splice_integer_sequences
 	{
-		using type = std::index_sequence<>;
+	private:
+		template<class Lhs_, class Rhs_>
+		struct _builder
+		{
+			using type = std::integer_sequence<char>;
+		};
+
+		template<class LhsT_, std::size_t...LhsIndices_, class Rhs_>
+		struct _builder<std::integer_sequence<LhsT_, LhsIndices_...>, Rhs_>
+		{
+			using type = std::integer_sequence<LhsT_, LhsIndices_...>;
+		};
+
+		template<class Lhs_, class RhsT_, std::size_t...RhsIndices_>
+		struct _builder<Lhs_, std::integer_sequence<RhsT_, RhsIndices_...>>
+		{
+			using type = std::integer_sequence<RhsT_, RhsIndices_...>;
+		};
+
+	public:
+		using type = typename _builder<LhsIntegerSequence_, RhsIntegerSequence_>::type;
 	};
-	template<std::size_t...LhsIndices_, class Rhs_>
-	struct splice_index_sequences<std::index_sequence<LhsIndices_...>, Rhs_>
+	template<typename LhsT_, std::size_t...LhsIndices_, typename RhsT_, std::size_t...RhsIndices_>
+	struct splice_integer_sequences<std::integer_sequence<LhsT_, LhsIndices_...>, std::integer_sequence<RhsT_, RhsIndices_...>>
 	{
-		using type = std::index_sequence<LhsIndices_...>;
-	};
-	template<class Lhs_, std::size_t...RhsIndices_>
-	struct splice_index_sequences<Lhs_, std::index_sequence<RhsIndices_...>>
-	{
-		using type = std::index_sequence<RhsIndices_...>;
-	};
-	template<std::size_t...LhsIndices_, std::size_t...RhsIndices_>
-	struct splice_index_sequences<std::index_sequence<LhsIndices_...>, std::index_sequence<RhsIndices_...>>
-	{
-		using type = std::index_sequence<LhsIndices_..., RhsIndices_...>;
+		using type = std::integer_sequence<LhsT_, LhsIndices_..., static_cast<LhsT_>(RhsIndices_)...>;
 	};
 	template<class Lhs_, class Rhs_>
-	using splice_index_sequences_t = typename splice_index_sequences<Lhs_, Rhs_>::type;
+	using splice_index_sequences_t = typename splice_integer_sequences<Lhs_, Rhs_>::type;
 
-	/// <summary> Type used to form an index sequence containing only the specified Index_ the specified Count_ of times. </summary>
-	template<std::size_t Index_, std::size_t Count_>
-	struct duplicated_index_sequence
+	/// <summary>
+	/// <para> Type extension of splice_index_sequences which may be used to splice a variadic number of integer sequences. </para>
+	/// <para> If an argument is not a std::integer_sequence, it will be interpreted as an empty std::integer_sequence of chars. </para>
+	/// </summary>
+	template<class...IntegerSequences_>
+	struct variadic_splice_integer_sequences
 	{
-		using type = typename splice_index_sequences
+		using type = std::integer_sequence<char>;
+	};
+	template<typename T_, T_...Indices_>
+	struct variadic_splice_integer_sequences<std::integer_sequence<T_, Indices_...>>
+	{
+		using type = std::index_sequence<Indices_...>;
+	};
+	template<class LhsIndexSequence_, class RhsIndexSequence_>
+	struct variadic_splice_integer_sequences<LhsIndexSequence_, RhsIndexSequence_>
+	{
+		using type = typename splice_integer_sequences<LhsIndexSequence_, RhsIndexSequence_>::type;
+	};
+	template<class FirstIndexSequence_, class SecondIndexSequence_, class...RemainingIndexSequences_>
+	struct variadic_splice_integer_sequences<FirstIndexSequence_, SecondIndexSequence_, RemainingIndexSequences_...>
+	{
+		using type = typename variadic_splice_integer_sequences
 		<
-			std::index_sequence<Index_>,
-			typename duplicated_index_sequence<Index_, Count_ - 1>::type
+			typename splice_integer_sequences<FirstIndexSequence_, SecondIndexSequence_>::type,
+			RemainingIndexSequences_...
 		>::type;
 	};
-	template<std::size_t Index_>
-	struct duplicated_index_sequence<Index_, 0>
+	template<class...IntegerSequences_>
+	using variadic_splice_integer_sequences_t = typename variadic_splice_integer_sequences<IntegerSequences_...>::type;
+
+	/// <summary> Type used to form an index sequence containing only the specified Index_ the specified Count_ of times. </summary>
+	template<typename T_, T_ Index_, std::size_t Count_>
+	struct duplicated_integer_sequence
+	{
+		using type = typename splice_integer_sequences
+		<
+			std::index_sequence<Index_>,
+			typename duplicated_integer_sequence<T_, Index_, Count_ - 1>::type
+		>::type;
+	};
+	template<typename T_, T_ Index_>
+	struct duplicated_integer_sequence<T_, Index_, 0>
 	{
 		using type = std::index_sequence<>;
 	};
-	template<std::size_t Index_>
-	struct duplicated_index_sequence<Index_, 1>
+	template<typename T_, T_ Index_>
+	struct duplicated_integer_sequence<T_, Index_, 1>
 	{
-		using type = std::index_sequence<Index_>;
+		using type = std::integer_sequence<T_, Index_>;
 	};
 	template<std::size_t Index_, std::size_t Count_>
-	using make_duplicated_index_sequence = typename duplicated_index_sequence<Index_, Count_>::type;
+	using make_duplicated_index_sequence = typename duplicated_integer_sequence<std::size_t, Index_, Count_>::type;
+
+	/// <summary> Type used to form an integer sequence which consists of the provided sequence looped the specified number of times. </summary>
+	template<class IntegerSequence_, std::size_t LoopCount_>
+	struct looped_integer_sequence
+	{
+		using type = std::integer_sequence<char>;
+	};
+	template<typename T_, T_...Indices_, std::size_t LoopCount_>
+	struct looped_integer_sequence<std::integer_sequence<T_, Indices_...>, LoopCount_>
+	{
+	private:
+		using _base_sequence = std::integer_sequence<T_, Indices_...>;
+
+		template<class CurrentSequence_, std::size_t RemainingLoops_>
+		struct _sequence_builder
+		{
+			using type = typename _sequence_builder
+			<
+				typename splice_integer_sequences<CurrentSequence_, _base_sequence>::type,
+				RemainingLoops_ - 1
+			>::type;
+		};
+		template<class CurrentSequence_>
+		struct _sequence_builder<CurrentSequence_, 0>
+		{
+			using type = CurrentSequence_;
+		};
+
+	public:
+		using type = typename _sequence_builder<_base_sequence, LoopCount_>::type;
+	};
+	template<class IntegerSequence_, std::size_t LoopCount_>
+	using make_looped_integer_sequence = typename looped_integer_sequence<IntegerSequence_, LoopCount_>::type;
 
 	/// <summary>
 	/// <para> Helper type to perform a comparison of all constants to determine the last to compare true. </para>

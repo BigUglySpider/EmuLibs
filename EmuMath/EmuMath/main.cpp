@@ -154,6 +154,31 @@ inline void WriteNoiseTableToPPM
 	}
 }
 
+template<class OutMatrix_, class InMatrix_, class ColumnIndices_, class RowIndices_>
+struct _matrix_index_sequences_test
+{
+};
+
+template<class OutMatrix_, class InMatrix_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+struct _matrix_index_sequences_test<OutMatrix_, InMatrix_, std::index_sequence<ColumnIndices_...>, std::index_sequence<RowIndices_...>>
+{
+	static constexpr std::size_t num_columns_ = sizeof...(ColumnIndices_);
+	static constexpr std::size_t num_rows_ = sizeof...(RowIndices_);
+	using column_index_sequence = typename EmuCore::TMP::variadic_splice_integer_sequences
+	<
+		EmuCore::TMP::make_duplicated_index_sequence<ColumnIndices_, num_rows_>...
+	>::type;
+	using row_index_sequence = typename EmuCore::TMP::looped_integer_sequence<std::index_sequence<RowIndices_...>, num_columns_ - 1>::type;
+};
+
+template<typename T_, T_...Indices_>
+void PrintIntSequence(std::integer_sequence<T_, Indices_...>)
+{
+	std::cout << "{ ";
+	((std::cout << Indices_ << ", "), ...);
+	std::cout << " }";
+}
+
 int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
@@ -246,6 +271,121 @@ int main()
 	std::cout << some_mat_3x4f_rm_ << "\n\n";
 
 	constexpr auto some_mat_3x4f_cm_copy_ = EmuMath::Matrix<3, 4, float, true>(some_mat_3x4f_cm_);
+	constexpr auto column_1_ = some_mat_3x4f_cm_copy_.GetColumn<1>();
+	constexpr auto row_2_ = some_mat_3x4f_cm_copy_.GetRow<2>().Cast<float>();
+
+	constexpr auto theoretical_test_0_ = some_mat_3x4f_cm_.AtTheoretical<25>();
+	constexpr auto theoretical_test_1_ = some_mat_3x4f_cm_.AtTheoretical<3>();
+	constexpr auto theoretical_test_2_ = some_mat_3x4f_cm_.AtTheoretical<1, 2>();
+	constexpr auto theoretical_test_3_ = some_mat_3x4f_cm_.AtTheoretical<0, 25>();
+	constexpr auto theoretical_test_4_ = some_mat_3x4f_cm_.AtTheoretical<25, 0>();
+	constexpr auto theoretical_test_5_ = some_mat_3x4f_cm_.AtTheoretical<25, 25>();
+
+	EmuMath::Matrix<3, 4, float, false> tester_;
+	constexpr auto zero_ = tester_.get_implied_zero();
+	constexpr auto zero_column_ = tester_.get_implied_zero_column();
+	constexpr auto zero_row_ = tester_.get_implied_zero_row();
+	constexpr auto zero_major_ = tester_.get_implied_zero_major();
+	constexpr auto zero_non_major_ = tester_.get_implied_zero_non_major();
+
+	auto column_theoretical_0_ = tester_.GetColumnTheoretical<0>();
+	auto column_theoretical_1_ = tester_.GetColumnTheoretical<25>();
+	auto& row_theoretical_0_ = tester_.GetRowTheoretical<0>();
+	auto row_theoretical_1_ = tester_.GetRowTheoretical<25>();
+	auto& major_theoretical_0_ = tester_.GetMajorTheoretical<0>();
+	auto major_theoretical_1_ = tester_.GetMajorTheoretical<25>();
+	auto non_major_theoretical_0_ = tester_.GetNonMajorTheoretical<0>();
+	auto non_major_theoretical_1_ = tester_.GetNonMajorTheoretical<25>();
+
+	std::cout << "\n---\n";
+	constexpr auto read_mat_cm_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	constexpr auto read_mat_rm_ = EmuMath::Matrix<4, 4, float, false>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << "Column Major:\n" << read_mat_cm_ << "\n\nRow Major:\n" << read_mat_rm_ << "\n\n";
+
+	std::cout << "\n---\n";
+	constexpr auto mat_from_vecs_cm_ = EmuMath::Matrix<4, 3, float, true>
+	(
+		EmuMath::Vector<3, float>(1, 2, 3),
+		EmuMath::Vector<3, float>(4, 5, 6),
+		EmuMath::Vector<3, float>(7, 8, 9),
+		EmuMath::Vector<3, float>(10, 11, 12)
+	);
+	constexpr auto mat_from_vecs_rm_ = EmuMath::Matrix<4, 3, float, false>
+	(
+		EmuMath::Vector<4, float>(1, 2, 3, 4),
+		EmuMath::Vector<4, float>(5, 6, 7, 8),
+		EmuMath::Vector<4, float>(9, 10, 11, 12)
+	);
+
+	std::cout << "\n---\n";
+	constexpr auto mat_from_vec_move_cm_ = EmuMath::Matrix<4, 3, float, true>
+	(
+		EmuMath::Matrix<4, 3, float, true>::matrix_vector_type
+		(
+			EmuMath::Vector<3, float>(1, 2, 3),
+			EmuMath::Vector<3, float>(4, 5, 6),
+			EmuMath::Vector<3, float>(7, 8, 9),
+			EmuMath::Vector<3, float>(10, 11, 12)
+		)
+	);
+	constexpr auto mat_from_vec_move_rm_ = EmuMath::Matrix<4, 3, float, false>
+	(
+		EmuMath::Matrix<4, 3, float, false>::matrix_vector_type
+		(
+			EmuMath::Vector<4, float>(1, 2, 3, 4),
+			EmuMath::Vector<4, float>(5, 6, 7, 8),
+			EmuMath::Vector<4, float>(9, 10, 11, 12)
+		)
+	);
+
+	std::cout << "\n---\n";
+	constexpr auto main_diagonal_cm_normal_ = mat_from_vec_move_cm_.MainDiagonal();
+	constexpr auto main_diagonal_rm_normal_ = mat_from_vec_move_rm_.MainDiagonal();
+	constexpr auto main_diagonal_cm_smaller_no_offset_ = mat_from_vec_move_cm_.MainDiagonal<2>();
+	constexpr auto main_diagonal_rm_smaller_no_offset_ = mat_from_vec_move_rm_.MainDiagonal<2>();
+	constexpr auto main_diagonal_cm_smaller_offset_ = mat_from_vec_move_cm_.MainDiagonal<2, 1>();
+	constexpr auto main_diagonal_rm_smaller_offset_ = mat_from_vec_move_rm_.MainDiagonal<2, 1>();
+	constexpr auto main_diagonal_cm_larger_no_offset_ = mat_from_vec_move_cm_.MainDiagonal<5>();
+	constexpr auto main_diagonal_rm_larger_no_offset_ = mat_from_vec_move_rm_.MainDiagonal<5>();
+	constexpr auto main_diagonal_cm_larger_offset_ = mat_from_vec_move_cm_.MainDiagonal<5, 25>();
+	constexpr auto main_diagonal_rm_larger_offset_ = mat_from_vec_move_rm_.MainDiagonal<5, 25>();
+
+	EmuMath::Matrix<4, 4, float, true> runtime_mat_4x4f_cm_(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << runtime_mat_4x4f_cm_ << "\n\n";
+	runtime_mat_4x4f_cm_.MainDiagonal<float&>() *= 10.0f;
+	std::cout << runtime_mat_4x4f_cm_ << "\n\n";
+
+	std::cout << "\n---\n";
+	constexpr auto mat_to_copy_cm_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	constexpr auto mat_to_copy_rm_ = EmuMath::Matrix<4, 4, float, false>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+
+	std::cout << "Full CM:\n" << mat_to_copy_cm_ << "\n\nFull RM:\n" << mat_to_copy_rm_ << "\n\n";
+
+	constexpr auto copy_mat_2x4i32_cm_from_cm_ = EmuMath::Helpers::matrix_copy<2, 4, std::int32_t, true>(mat_to_copy_cm_);
+	constexpr auto copy_mat_2x4i32_cm_from_rm_ = EmuMath::Helpers::matrix_copy<2, 4, std::int32_t, true>(mat_to_copy_rm_);
+	std::cout << "CM FROM CM:\n" << copy_mat_2x4i32_cm_from_cm_ << "\n\nCM FROM RM:\n" << copy_mat_2x4i32_cm_from_rm_ << "\n\n";
+
+	constexpr auto copy_mat_2x4i32_rm_from_cm_ = EmuMath::Helpers::matrix_copy<2, 4, std::int32_t, false>(mat_to_copy_cm_);
+	constexpr auto copy_mat_2x4i32_rm_from_rm_ = EmuMath::Helpers::matrix_copy<2, 4, std::int32_t, false>(mat_to_copy_rm_);
+	std::cout << "RM FROM CM:\n" << copy_mat_2x4i32_rm_from_cm_ << "\n\nRM FROM RM:\n" << copy_mat_2x4i32_rm_from_rm_ << "\n\n";
+
+	std::cout << "\n---\n";
+	constexpr auto constructed_copy_ = EmuMath::Matrix<12, 7, long double, true>(copy_mat_2x4i32_cm_from_rm_);
+	std::cout << constructed_copy_ << "\n\n";
+
+	constexpr auto moved_copy_ = EmuMath::Matrix<4, 4, float, true>
+	(
+		EmuMath::Matrix<5, 3, float, false>
+		(
+			0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+		)
+	);
+
+	constexpr bool halp_ = EmuMath::Helpers::matrix_assert_copy_is_valid<4, 4, const float&, true, decltype(moved_copy_)&>();
+	auto mat_to_ref_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	auto ref_copy_ = EmuMath::Matrix<4, 4, float&, true>(mat_to_ref_);
+
+
 
 	system("pause");
 	
