@@ -226,7 +226,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 			if constexpr (move_allowed_)
 			{
 				// Move allowed, fallback to copy
-				using move_result = decltype(std::move(_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(in_matrix_))));
+				using move_result = decltype(std::move(_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::declval<InMatrix_>()))));
 				if constexpr (std::is_constructible_v<out_stored_type, move_result>)
 				{
 					get_return_type intermediate_ = _matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(in_matrix_));
