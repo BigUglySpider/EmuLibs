@@ -330,7 +330,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
 	)
 	{
-		return matrix_.template GetColumn<ColumnIndex_>();
+		return matrix_.template ColumnAt<ColumnIndex_>();
 	}
 
 	template<std::size_t ColumnIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
@@ -339,7 +339,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
 	)
 	{
-		return matrix_.template GetColumn<ColumnIndex_>();
+		return matrix_.template ColumnAt<ColumnIndex_>();
 	}
 
 	// COLUMN THEORETICAL GETS
@@ -354,7 +354,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		}
 		else
 		{
-			return matrix_.template GetColumn<ColumnIndex_>();
+			return matrix_.template ColumnAt<ColumnIndex_>();
 		}
 	}
 
@@ -369,7 +369,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		}
 		else
 		{
-			return matrix_.template GetColumn<ColumnIndex_>();
+			return matrix_.template ColumnAt<ColumnIndex_>();
 		}
 	}
 
@@ -380,7 +380,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
 	)
 	{
-		return matrix_.template GetRow<RowIndex_>();
+		return matrix_.template RowAt<RowIndex_>();
 	}
 
 	template<std::size_t RowIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
@@ -389,7 +389,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
 	)
 	{
-		return matrix_.template GetRow<RowIndex_>();
+		return matrix_.template RowAt<RowIndex_>();
 	}
 
 	// ROW THEORETICAL GETS
@@ -404,7 +404,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		}
 		else
 		{
-			return matrix_.template GetRow<RowIndex_>();
+			return matrix_.template RowAt<RowIndex_>();
 		}
 	}
 
@@ -419,7 +419,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		}
 		else
 		{
-			return matrix_.template GetRow<RowIndex_>();
+			return matrix_.template RowAt<RowIndex_>();
 		}
 	}
 
@@ -430,7 +430,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
 	)
 	{
-		return matrix_.template GetMajor<MajorIndex_>();
+		return matrix_.template MajorAt<MajorIndex_>();
 	}
 
 	template<std::size_t MajorIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
@@ -439,7 +439,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
 	)
 	{
-		return matrix_.template GetMajor<MajorIndex_>();
+		return matrix_.template MajorAt<MajorIndex_>();
 	}
 
 	template<std::size_t MajorIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
@@ -453,7 +453,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		}
 		else
 		{
-			return matrix_.template GetMajor<MajorIndex_>();
+			return matrix_.template MajorAt<MajorIndex_>();
 		}
 	}
 
@@ -468,7 +468,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		}
 		else
 		{
-			return matrix_.template GetMajor<MajorIndex_>();
+			return matrix_.template MajorAt<MajorIndex_>();
 		}
 	}
 
@@ -479,7 +479,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
 	)
 	{
-		return matrix_.template GetNonMajor<NonMajorIndex_>();
+		return matrix_.template NonMajorAt<NonMajorIndex_>();
 	}
 
 	template<std::size_t NonMajorIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
@@ -488,7 +488,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
 	)
 	{
-		return matrix_.template GetNonMajor<NonMajorIndex_>();
+		return matrix_.template NonMajorAt<NonMajorIndex_>();
 	}
 
 	// NON-MAJOR THEORETICAL GETS
@@ -503,7 +503,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		}
 		else
 		{
-			return matrix_.template GetNonMajor<NonMajorIndex_>();
+			return matrix_.template NonMajorAt<NonMajorIndex_>();
 		}
 	}
 
@@ -518,7 +518,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		}
 		else
 		{
-			return matrix_.template GetNonMajor<NonMajorIndex_>();
+			return matrix_.template NonMajorAt<NonMajorIndex_>();
 		}
 	}
 

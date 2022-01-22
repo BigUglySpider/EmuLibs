@@ -318,6 +318,317 @@ namespace EmuMath::Helpers::_matrix_underlying
 #pragma warning(pop)
 	}
 
+	template<class OutMatrix_, class InMatrix_, bool DoAssertions_, std::size_t ColumnIndex_, std::size_t RowIndex_>
+	[[nodiscard]] constexpr inline bool _matrix_copy_assign_index_is_valid()
+	{
+		if constexpr (_matrix_index_is_contained<ColumnIndex_, RowIndex_, OutMatrix_>())
+		{
+			using out_get_result = decltype(_matrix_get<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<OutMatrix_>(std::declval<OutMatrix_>())));
+			if constexpr (std::is_lvalue_reference_v<InMatrix_> || !_matrix_index_is_contained<ColumnIndex_, RowIndex_, InMatrix_>())
+			{
+				// No explicit std::move allowed
+				using in_get_result = decltype(_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::declval<InMatrix_>())));
+				if constexpr (std::is_assignable_v<out_get_result, in_get_result>)
+				{
+					return true;
+				}
+				else
+				{
+					using out_value_type_uq = typename EmuCore::TMP::remove_ref_cv_t<OutMatrix_>::value_type_uq;
+					if constexpr (std::is_assignable_v<out_get_result, out_value_type_uq>)
+					{
+						if constexpr (std::is_constructible_v<out_value_type_uq, in_get_result> || EmuCore::TMP::is_static_castable_v<in_get_result, out_value_type_uq>)
+						{
+							return true;
+						}
+						else
+						{
+							static_assert(!DoAssertions_, "Invalid EmuMath Matrix Copy Assignment Arguments: At least one of the accessed indices could not be assigned to from the respective element in the Matrix to assign via, and the Matrix's value_type_uq could not be constructed or static_cast to from said value.");
+							return false;
+						}
+					}
+					else
+					{
+						static_assert(!DoAssertions_, "Invalid EmuMath Matrix Copy Assignment Arguments: At least one of the accessed indices could not be assigned to from the respective element in the Matrix to assign via, nor could it be assigned via its own value_type_uq.");
+						return false;
+					}
+				}
+			}
+			else
+			{
+				// Explicit std::move allowed, fallback to copy
+				using in_move_result = decltype
+				(
+					std::move(_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::declval<InMatrix_>())))
+				);
+
+				if constexpr (std::is_assignable_v<out_get_result, in_move_result>)
+				{
+					return true;
+				}
+				else
+				{
+					// Direct assignment prioritised over std::move to a value_type_uq
+					using in_get_result = decltype(_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::declval<InMatrix_>())));
+					if constexpr (std::is_assignable_v<out_get_result, in_get_result>)
+					{
+						return true;
+					}
+					else
+					{
+						using out_value_type_uq = typename EmuCore::TMP::remove_ref_cv_t<OutMatrix_>::value_type_uq;
+						if constexpr (std::is_assignable_v<out_get_result, out_value_type_uq>)
+						{
+							// Move conversion prioritised over copy conversion
+							constexpr bool can_move_ = 
+							(
+								std::is_constructible_v<out_value_type_uq, in_move_result> ||
+								EmuCore::TMP::is_static_castable_v<in_move_result, out_value_type_uq>
+							);
+							constexpr bool can_copy_ = 
+							(
+								std::is_constructible_v<out_value_type_uq, in_get_result> ||
+								EmuCore::TMP::is_static_castable_v<in_get_result, out_value_type_uq>
+							);
+
+							if constexpr (can_move_ || can_copy_)
+							{
+								return true;
+							}
+							else
+							{
+								static_assert(!DoAssertions_, "Invalid EmuMath Matrix Copy-or-Move Assignment Arguments: At least one of the accessed indices could not be moved or copied from the Matrix to assign via, nor could it be moved or copied to form the output Matrix's value_type_uq.");
+								return false;
+							}
+						}
+						else
+						{
+							static_assert(!DoAssertions_, "Invalid EmuMath Matrix Copy-or-Move Assignment Arguments: At least one of the accessed indices could not be moved or copied from the Matrix to assign via, and the output Matrix may not be assigned via its value_type_uq.");
+							return false;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			static_assert(!DoAssertions_, "Invalid EmuMath Matrix Copy-or-Move Assignment Arguments: At least one accessed index is not contained within the output Matrix.");
+			return false;
+		}
+	}
+
+	template<class OutMatrix_, class InMatrix_, bool DoAssertions_, std::size_t...FullColumnIndices_, std::size_t...FullRowIndices_>
+	[[nodiscard]] constexpr inline bool _matrix_copy_assign_is_valid
+	(
+		std::index_sequence<FullColumnIndices_...> full_column_indices_,
+		std::index_sequence<FullRowIndices_...> full_row_indices_
+	)
+	{
+		using out_matrix = std::remove_reference_t<OutMatrix_>;
+		if constexpr (EmuMath::TMP::is_emu_matrix_v<out_matrix> && EmuMath::TMP::is_emu_matrix_v<InMatrix_>)
+		{
+			if constexpr (EmuCore::TMP::variadic_and_v<_matrix_copy_assign_index_is_valid<out_matrix, InMatrix_, DoAssertions_, FullColumnIndices_, FullRowIndices_>()...>)
+			{
+				return true;
+			}
+			else
+			{
+				static_assert(!DoAssertions_, "Invalid EmuMath Matrix Copy-or-Move Assignment test assertion performed.");
+				return false;
+			}
+		}
+		else
+		{
+			static_assert(!DoAssertions_, "Invalid EmuMath Matrix Copy-or-Move Assignment assertion failed as one of the provided types (OutMatrix_ with reference removed, or InMatrix_) is not an EmuMath Matrix.");
+			return false;
+		}
+	}
+
+	template<class OutMatrix_, class InMatrix_, bool DoAssertions_>
+	[[nodiscard]] constexpr inline bool _matrix_copy_assign_is_valid()
+	{
+		using out_indices = EmuMath::TMP::make_full_matrix_index_sequences<OutMatrix_>;
+		return _matrix_copy_assign_is_valid<OutMatrix_, InMatrix_, DoAssertions_>
+		(
+			typename out_indices::column_index_sequence(),
+			typename out_indices::row_index_sequence()
+		);
+	}
+
+	template<class OutMatrix_, class InMatrix_, std::size_t ColumnIndex_, std::size_t RowIndex_>
+	constexpr inline void _matrix_copy_index(OutMatrix_& out_matrix_, InMatrix_&& in_matrix_)
+	{
+		if constexpr (_matrix_index_is_contained<ColumnIndex_, RowIndex_, OutMatrix_>())
+		{
+			using out_get_result = decltype(_matrix_get<ColumnIndex_, RowIndex_>(out_matrix_));
+			if constexpr (std::is_lvalue_reference_v<InMatrix_> || !_matrix_index_is_contained<ColumnIndex_, RowIndex_, InMatrix_>())
+			{
+				// No explicit std::move allowed
+				using in_get_result = decltype(_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::declval<InMatrix_>())));
+				if constexpr (std::is_assignable_v<out_get_result, in_get_result>)
+				{
+					_matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = _matrix_get_theoretical<ColumnIndex_, RowIndex_>
+					(
+						EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_))
+					);
+				}
+				else
+				{
+					using out_value_type_uq = typename EmuCore::TMP::remove_ref_cv_t<OutMatrix_>::value_type_uq;
+					if constexpr (std::is_assignable_v<out_get_result, out_value_type_uq>)
+					{
+						if constexpr (std::is_constructible_v<out_value_type_uq, in_get_result>)
+						{
+							_matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = out_value_type_uq
+							(
+								_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_)))
+							);
+						}
+						else if constexpr (EmuCore::TMP::is_static_castable_v<in_get_result, out_value_type_uq>)
+						{
+							_matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = static_cast<out_value_type_uq>
+							(
+								_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_)))
+							);
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<in_get_result>(),
+								"Attempted to assign values of an existing EmuMath Matrix, but at least one of the accessed indices could not be assigned to from the respective element in the Matrix to assign via, and the Matrix's value_type_uq could not be constructed or static_cast to from said value."
+							);
+						}
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<in_get_result>(),
+							"Attempted to assign values of an existing EmuMath Matrix, but at least one of the accessed indices could not be assigned to from the respective element in the Matrix to assign via, nor could it be assigned via its own value_type_uq."
+						);
+					}
+				}
+			}
+			else
+			{
+				// Explicit std::move allowed, fallback to copy
+				using in_move_result = decltype
+				(
+					std::move(_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::declval<InMatrix_>())))
+				);
+
+				if constexpr (std::is_assignable_v<out_get_result, in_move_result>)
+				{
+					_matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = std::move
+					(
+						_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_)))
+					);
+				}
+				else
+				{
+					// Direct assignment prioritised over std::move to a value_type_uq
+					using in_get_result = decltype(_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::declval<InMatrix_>())));
+					if constexpr (std::is_assignable_v<out_get_result, in_get_result>)
+					{
+						_matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = _matrix_get_theoretical<ColumnIndex_, RowIndex_>
+						(
+							EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_))
+						);
+					}
+					else
+					{
+						using out_value_type_uq = typename EmuCore::TMP::remove_ref_cv_t<OutMatrix_>::value_type_uq;
+						if constexpr (std::is_assignable_v<out_get_result, out_value_type_uq>)
+						{
+							// Move conversion prioritised over copy conversion
+							if constexpr (std::is_constructible_v<out_value_type_uq, in_move_result>)
+							{
+								return _matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = out_value_type_uq
+								(
+									std::move(_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_))))
+								);
+							}
+							else if constexpr (EmuCore::TMP::is_static_castable_v<in_move_result, out_value_type_uq>)
+							{
+								return _matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = static_cast<out_value_type_uq>
+								(
+									std::move(_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_))))
+								);
+							}
+							else if constexpr (std::is_constructible_v<out_value_type_uq, in_get_result>)
+							{
+								return _matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = out_value_type_uq
+								(
+									_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_)))
+								);
+							}
+							else if constexpr (EmuCore::TMP::is_static_castable_v<in_get_result, out_value_type_uq>)
+							{
+								return _matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = static_cast<out_value_type_uq>
+								(
+									_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_)))
+								);
+							}
+							else
+							{
+								static_assert
+								(
+									EmuCore::TMP::get_false<InMatrix_>(),
+									"Attempted to move-or-copy assign values to an existing EmuMath Matrix, but at least one of the accessed indices could not be moved or copied from the Matrix to assign via, nor could it be moved or copied to form the output Matrix's value_type_uq."
+								);
+							}
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<InMatrix_>(),
+								"Attempted to move-or-copy assign values to an existing EmuMath Matrix, but at least one of the accessed indices could not be moved or copied from the Matrix to assign via, and the output Matrix may not be assigned via its value_type_uq."
+							);
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<OutMatrix_>(),
+				"Attempted to assign values of an existing EmuMath Matrix, but at least one of the accessed indices is not a contained index within the output Matrix."
+			);
+		}
+	}
+
+	template<class OutMatrix_, class InMatrix_, std::size_t...FullColumnIndices_, std::size_t...FullRowIndices_>
+	constexpr inline void _matrix_copy_assign
+	(
+		OutMatrix_& out_matrix_,
+		InMatrix_&& in_matrix_,
+		std::index_sequence<FullColumnIndices_...> full_column_indices_,
+		std::index_sequence<FullRowIndices_...> full_row_indices_
+	)
+	{
+		if constexpr (_matrix_copy_assign_is_valid<OutMatrix_, InMatrix_, true>(full_column_indices_, full_row_indices_))
+		{
+			// Warning disabled as we are never moving the same element, but VS sees us passing a matrix containing at least 1 moved element
+			// --- This is with correct use, where this is always supplied a contiguous selection of indices. This is not designed for public use.
+#pragma warning(push)
+#pragma warning(disable: 26800)
+			(_matrix_copy_index<OutMatrix_, InMatrix_, FullColumnIndices_, FullRowIndices_>(out_matrix_, std::forward<InMatrix_>(in_matrix_)), ...);
+#pragma warning(pop)
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<OutMatrix_, InMatrix_>(),
+				"Attempted to assign the values of an existing EmuMath Matrix, but the provided arguments were incompatible."
+			);
+		}
+	}
+
 	template
 	<
 		std::size_t OutNumColumns_,
@@ -355,6 +666,31 @@ namespace EmuMath::Helpers::_matrix_underlying
 					"Attempted to copy an EmuMath Matrix to an empty EmuMath Matrix. This behaviour is allowed, and will simply result in default-construction of the empty Matrix, however the provided output Matrix type cannot be default-constructed."
 				);
 			}
+		}
+	}
+
+	template
+	<
+		class InMatrix_,
+		std::size_t OutNumColumns_,
+		std::size_t OutNumRows_,
+		typename OutT_,
+		bool OutColumnMajor_,
+		typename = std::enable_if_t<EmuMath::TMP::is_emu_matrix_v<InMatrix_>>
+	>
+	constexpr inline void _matrix_copy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, InMatrix_&& in_matrix_)
+	{
+		using out_matrix = EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>;
+		if constexpr (out_matrix::size != 0)
+		{
+			using index_sequences = EmuMath::TMP::make_full_matrix_index_sequences<out_matrix>;
+			_matrix_copy_assign<out_matrix>
+			(
+				out_matrix_,
+				std::forward<InMatrix_>(in_matrix_),
+				typename index_sequences::column_index_sequence(),
+				typename index_sequences::row_index_sequence()
+			);
 		}
 	}
 }
