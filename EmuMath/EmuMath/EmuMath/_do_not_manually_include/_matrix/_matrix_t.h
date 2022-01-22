@@ -45,6 +45,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region HELPER_STATIC_FUNCS
+	public:
 		/// <summary>
 		/// <para> Outputs a copy of the major index of the two provided indices for this Matrix type. </para>
 		/// </summary>
@@ -108,6 +109,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONSTRUCTION_CHECKS
+	public:
 		/// <summary> Returns true if this Matrix can be default-constructed, otherwise false. </summary>
 		[[nodiscard]] static constexpr inline bool is_default_constructible()
 		{
@@ -210,6 +212,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region GENERAL_STATIC_FUNCS
+	public:
 		[[nodiscard]] static constexpr inline value_type_uq get_implied_zero()
 		{
 			return EmuMath::Helpers::matrix_get_non_contained<this_type>();
@@ -768,7 +771,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>EmuMath Vector referencing the specified column within this Matrix.</returns>
 		template<std::size_t ColumnIndex_>
-		[[nodiscard]] constexpr inline column_get_ref_type GetColumn()
+		[[nodiscard]] constexpr inline column_get_ref_type ColumnAt()
 		{
 			if constexpr (ColumnIndex_ < num_columns)
 			{
@@ -792,7 +795,7 @@ namespace EmuMath
 		}
 
 		template<std::size_t ColumnIndex_>
-		[[nodiscard]] constexpr inline column_get_const_ref_type GetColumn() const
+		[[nodiscard]] constexpr inline column_get_const_ref_type ColumnAt() const
 		{
 			if constexpr (ColumnIndex_ < num_columns)
 			{
@@ -826,13 +829,13 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>EmuMath Vector referencing the specified column within this Matrix, or an implied-zero column if the index is not contained.</returns>
 		template<std::size_t ColumnIndex_>
-		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_column_theoretical_get_result<ColumnIndex_, this_type&>::type GetColumnTheoretical()
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_column_theoretical_get_result<ColumnIndex_, this_type&>::type ColumnAtTheoretical()
 		{
 			return EmuMath::Helpers::matrix_get_column_theoretical<ColumnIndex_>(*this);
 		}
 
 		template<std::size_t ColumnIndex_>
-		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_column_theoretical_get_result<ColumnIndex_, const this_type&>::type GetColumnTheoretical() const
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_column_theoretical_get_result<ColumnIndex_, const this_type&>::type ColumnAtTheoretical() const
 		{
 			return EmuMath::Helpers::matrix_get_column_theoretical<ColumnIndex_>(*this);
 		}
@@ -844,7 +847,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>EmuMath Vector referencing the specified row within this Matrix.</returns>
 		template<std::size_t RowIndex_>
-		[[nodiscard]] constexpr inline row_get_ref_type GetRow()
+		[[nodiscard]] constexpr inline row_get_ref_type RowAt()
 		{
 			if constexpr (RowIndex_ < num_rows)
 			{
@@ -868,7 +871,7 @@ namespace EmuMath
 		}
 
 		template<std::size_t RowIndex_>
-		[[nodiscard]] constexpr inline row_get_const_ref_type GetRow() const
+		[[nodiscard]] constexpr inline row_get_const_ref_type RowAt() const
 		{
 			if constexpr (RowIndex_ < num_rows)
 			{
@@ -902,13 +905,13 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>EmuMath Vector referencing the specified row within this Matrix, or an implied-zero row if the index is not contained.</returns>
 		template<std::size_t RowIndex_>
-		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_row_theoretical_get_result<RowIndex_, this_type&>::type GetRowTheoretical()
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_row_theoretical_get_result<RowIndex_, this_type&>::type RowAtTheoretical()
 		{
 			return EmuMath::Helpers::matrix_get_row_theoretical<RowIndex_>(*this);
 		}
 
 		template<std::size_t RowIndex_>
-		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_row_theoretical_get_result<RowIndex_, const this_type&>::type GetRowTheoretical() const
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_row_theoretical_get_result<RowIndex_, const this_type&>::type RowAtTheoretical() const
 		{
 			return EmuMath::Helpers::matrix_get_row_theoretical<RowIndex_>(*this);
 		}
@@ -920,7 +923,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>EmuMath Vector referencing the specified major element within this Matrix.</returns>
 		template<std::size_t MajorIndex_>
-		[[nodiscard]] constexpr inline major_get_ref_type GetMajor()
+		[[nodiscard]] constexpr inline major_get_ref_type MajorAt()
 		{
 			if constexpr (MajorIndex_ < num_major_elements)
 			{
@@ -937,7 +940,7 @@ namespace EmuMath
 		}
 
 		template<std::size_t MajorIndex_>
-		[[nodiscard]] constexpr inline major_get_const_ref_type GetMajor() const
+		[[nodiscard]] constexpr inline major_get_const_ref_type MajorAt() const
 		{
 			// Although currently implementation is identical, this ignores DRY standards in case major_get_const_ref_type is not just const-qualified major_get_ref_type.
 			if constexpr (MajorIndex_ < num_major_elements)
@@ -963,13 +966,13 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>EmuMath Vector referencing the specified major element within the passed matrix_, or an implied-zero non-major element if it is not contained.</returns>
 		template<std::size_t MajorIndex_>
-		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_major_theoretical_get_result<MajorIndex_, this_type&>::type GetMajorTheoretical()
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_major_theoretical_get_result<MajorIndex_, this_type&>::type MajorAtTheoretical()
 		{
 			return EmuMath::Helpers::matrix_get_major_theoretical<MajorIndex_>(*this);
 		}
 
 		template<std::size_t MajorIndex_>
-		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_major_theoretical_get_result<MajorIndex_, const this_type&>::type GetMajorTheoretical() const
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_major_theoretical_get_result<MajorIndex_, const this_type&>::type MajorAtTheoretical() const
 		{
 			return EmuMath::Helpers::matrix_get_major_theoretical<MajorIndex_>(*this);
 		}
@@ -981,7 +984,7 @@ namespace EmuMath
 		/// </summary>
 		/// <returns>EmuMath Vector of references to elements within the specified non-major element within this Matrix.</returns>
 		template<std::size_t NonMajorIndex_>
-		[[nodiscard]] constexpr inline non_major_get_ref_type GetNonMajor()
+		[[nodiscard]] constexpr inline non_major_get_ref_type NonMajorAt()
 		{
 			if constexpr (NonMajorIndex_ < num_non_major_elements)
 			{
@@ -998,7 +1001,7 @@ namespace EmuMath
 		}
 
 		template<std::size_t NonMajorIndex_>
-		[[nodiscard]] constexpr inline non_major_get_const_ref_type GetNonMajor() const
+		[[nodiscard]] constexpr inline non_major_get_const_ref_type NonMajorAt() const
 		{
 			if constexpr (NonMajorIndex_ < num_non_major_elements)
 			{
@@ -1026,13 +1029,13 @@ namespace EmuMath
 		///		or an implied-zero non-major element if it is not contained.
 		/// </returns>
 		template<std::size_t NonMajorIndex_>
-		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_non_major_theoretical_get_result<NonMajorIndex_, this_type&>::type GetNonMajorTheoretical()
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_non_major_theoretical_get_result<NonMajorIndex_, this_type&>::type NonMajorAtTheoretical()
 		{
 			return EmuMath::Helpers::matrix_get_non_major_theoretical<NonMajorIndex_>(*this);
 		}
 
 		template<std::size_t NonMajorIndex_>
-		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_non_major_theoretical_get_result<NonMajorIndex_, const this_type&>::type GetNonMajorTheoretical() const
+		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_non_major_theoretical_get_result<NonMajorIndex_, const this_type&>::type NonMajorAtTheoretical() const
 		{
 			return EmuMath::Helpers::matrix_get_non_major_theoretical<NonMajorIndex_>(*this);
 		}
@@ -1090,9 +1093,328 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::matrix_get_main_diagonal<EmuMath::TMP::matrix_smallest_axis_v<this_type>, OutT_, Offset_>(*this);
 		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Vector copy of the column at the provided theoretical index within this Matrix. </para>
+		/// <para> ReadOffset_: Inclusive index at which to start copying from the specified column. Defaults to 0. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector constructed from this Matrix's column at the provided index, copying said column from the provided ReadOffset_.</returns>
+		template<std::size_t ColumnIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ColumnCopy()
+		{
+			if constexpr (EmuMath::Helpers::vector_cast_is_valid<column_get_ref_type, OutSize_, OutT_, ReadOffset_>())
+			{
+				return EmuMath::Helpers::vector_cast<OutSize_, OutT_, ReadOffset_>(ColumnAtTheoretical<ColumnIndex_>());
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<OutT_>(),
+					"Attempted to retrieve a copy of a column within an EmuMath Matrix, but the provided output Vector type could not be cast to from the provided offset within one of the Matrix's non-const columns."
+				);
+			}
+		}
+
+		template<std::size_t ColumnIndex_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_rows, OutT_> ColumnCopy()
+		{
+			return ColumnCopy<ColumnIndex_, num_rows, OutT_, ReadOffset_>();
+		}
+
+		template<std::size_t ColumnIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ColumnCopy() const
+		{
+			if constexpr (EmuMath::Helpers::vector_cast_is_valid<column_get_const_ref_type, OutSize_, OutT_, ReadOffset_>())
+			{
+				return EmuMath::Helpers::vector_cast<OutSize_, OutT_, ReadOffset_>(ColumnAtTheoretical<ColumnIndex_>());
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<OutT_>(),
+					"Attempted to retrieve a copy of a column within an EmuMath Matrix, but the provided output Vector type could not be cast to from the provided offset within one of the Matrix's const columns."
+				);
+			}
+		}
+
+		template<std::size_t ColumnIndex_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_rows, OutT_> ColumnCopy() const
+		{
+			return ColumnCopy<ColumnIndex_, num_rows, OutT_, ReadOffset_>();
+		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Vector copy of the row at the provided theoretical index within this Matrix. </para>
+		/// <para> ReadOffset_: Inclusive index at which to start copying from the specified row. Defaults to 0. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector constructed from this Matrix's row at the provided index, copying said row from the provided ReadOffset_.</returns>
+		template<std::size_t RowIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> RowCopy()
+		{
+			if constexpr (EmuMath::Helpers::vector_cast_is_valid<row_get_ref_type, OutSize_, OutT_, ReadOffset_>())
+			{
+				return EmuMath::Helpers::vector_cast<OutSize_, OutT_, ReadOffset_>(RowAtTheoretical<RowIndex_>());
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<OutT_>(),
+					"Attempted to retrieve a copy of a row within an EmuMath Matrix, but the provided output Vector type could not be cast to from the provided offset within one of the Matrix's non-const rows."
+				);
+			}
+		}
+
+		template<std::size_t RowIndex_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_columns, OutT_> RowCopy()
+		{
+			return RowCopy<RowIndex_, num_columns, OutT_, ReadOffset_>();
+		}
+
+		template<std::size_t RowIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> RowCopy() const
+		{
+			if constexpr (EmuMath::Helpers::vector_cast_is_valid<row_get_const_ref_type, OutSize_, OutT_, ReadOffset_>())
+			{
+				return EmuMath::Helpers::vector_cast<OutSize_, OutT_, ReadOffset_>(RowAtTheoretical<RowIndex_>());
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<OutT_>(),
+					"Attempted to retrieve a copy of a row within an EmuMath Matrix, but the provided output Vector type could not be cast to from the provided offset within one of the Matrix's const rows."
+				);
+			}
+		}
+
+		template<std::size_t RowIndex_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_columns, OutT_> RowCopy() const
+		{
+			return RowCopy<RowIndex_, num_columns, OutT_, ReadOffset_>();
+		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Vector copy of the major element at the provided theoretical index within this Matrix. </para>
+		/// <para> ReadOffset_: Inclusive index at which to start copying from the specified major element. Defaults to 0. </para>
+		/// <para> If this Matrix is column major: Results should be expected to be identical to ColumnCopy. </para>
+		/// <para> If this Matrix is not column major: Results should be expected to be identical to RowCopy. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector constructed from this Matrix's major element at the provided index, copying said element from the provided ReadOffset_.</returns>
+		template<std::size_t MajorIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> MajorCopy()
+		{
+			if constexpr (EmuMath::Helpers::vector_cast_is_valid<major_get_ref_type, OutSize_, OutT_, ReadOffset_>())
+			{
+				return EmuMath::Helpers::vector_cast<OutSize_, OutT_, ReadOffset_>(MajorAtTheoretical<MajorIndex_>());
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<OutT_>(),
+					"Attempted to retrieve a copy of a major element within an EmuMath Matrix, but the provided output Vector type could not be cast to from the provided offset within one of the Matrix's non-const major elements."
+				);
+			}
+		}
+
+		template<std::size_t MajorIndex_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_non_major_elements, OutT_> MajorCopy()
+		{
+			return MajorCopy<MajorIndex_, num_non_major_elements, OutT_, ReadOffset_>();
+		}
+
+		template<std::size_t MajorIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> MajorCopy() const
+		{
+			if constexpr (EmuMath::Helpers::vector_cast_is_valid<major_get_const_ref_type, OutSize_, OutT_, ReadOffset_>())
+			{
+				return EmuMath::Helpers::vector_cast<OutSize_, OutT_, ReadOffset_>(MajorAtTheoretical<MajorIndex_>());
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<OutT_>(),
+					"Attempted to retrieve a copy of a major element within an EmuMath Matrix, but the provided output Vector type could not be cast to from the provided offset within one of the Matrix's const major elements."
+				);
+			}
+		}
+
+		template<std::size_t MajorIndex_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_non_major_elements, OutT_> MajorCopy() const
+		{
+			return MajorCopy<MajorIndex_, num_non_major_elements, OutT_, ReadOffset_>();
+		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Vector copy of the non-major element at the provided theoretical index within this Matrix. </para>
+		/// <para> ReadOffset_: Inclusive index at which to start copying from the specified non-major element. Defaults to 0. </para>
+		/// <para> If this Matrix is column major: Results should be expected to be identical to RowCopy. </para>
+		/// <para> If this Matrix is not column major: Results should be expected to be identical to ColumnCopy. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector constructed from this Matrix's non-major element at the provided index, copying said element from the provided ReadOffset_.</returns>
+		template<std::size_t NonMajorIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> NonMajorCopy()
+		{
+			if constexpr (EmuMath::Helpers::vector_cast_is_valid<non_major_get_ref_type, OutSize_, OutT_, ReadOffset_>())
+			{
+				return EmuMath::Helpers::vector_cast<OutSize_, OutT_, ReadOffset_>(NonMajorAtTheoretical<NonMajorIndex_>());
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<OutT_>(),
+					"Attempted to retrieve a copy of a non-major element within an EmuMath Matrix, but the provided output Vector type could not be cast to from the provided offset within one of the Matrix's non-const non-major elements."
+				);
+			}
+		}
+
+		template<std::size_t NonMajorIndex_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_major_elements, OutT_> NonMajorCopy()
+		{
+			return NonMajorCopy<NonMajorIndex_, num_major_elements, OutT_, ReadOffset_>();
+		}
+
+		template<std::size_t NonMajorIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> NonMajorCopy() const
+		{
+			if constexpr (EmuMath::Helpers::vector_cast_is_valid<non_major_get_const_ref_type, OutSize_, OutT_, ReadOffset_>())
+			{
+				return EmuMath::Helpers::vector_cast<OutSize_, OutT_, ReadOffset_>(NonMajorAtTheoretical<NonMajorIndex_>());
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<OutT_>(),
+					"Attempted to retrieve a copy of a non-major element within an EmuMath Matrix, but the provided output Vector type could not be cast to from the provided offset within one of the Matrix's const non-major elements."
+				);
+			}
+		}
+
+		template<std::size_t NonMajorIndex_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_major_elements, OutT_> NonMajorCopy() const
+		{
+			return NonMajorCopy<NonMajorIndex_, num_major_elements, OutT_, ReadOffset_>();
+		}
+#pragma endregion
+
+#pragma region ASSIGNMENT_OPERATORS
+	public:
+		template
+		<
+			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
+			typename = std::enable_if_t<EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&>()>
+		>
+		constexpr inline this_type& operator=(EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& to_copy_)
+		{
+			EmuMath::Helpers::matrix_copy(*this, to_copy_);
+			return *this;
+		}
+
+		template
+		<
+			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
+			typename = std::enable_if_t<EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&>()>
+		>
+		constexpr inline this_type& operator=(const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& to_copy_)
+		{
+			EmuMath::Helpers::matrix_copy(*this, to_copy_);
+			return *this;
+		}
+
+		template
+		<
+			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
+			typename = std::enable_if_t<EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>()>
+		>
+		constexpr inline this_type& operator=(EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&& to_move_copy_)
+		{
+			EmuMath::Helpers::matrix_copy
+			(
+				*this,
+				std::forward<EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>(to_move_copy_)
+			);
+			return *this;
+		}
+
+		template
+		<
+			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
+			typename = std::enable_if_t<EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>()>
+		>
+		constexpr inline this_type& operator=(const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&& to_move_copy_)
+		{
+			EmuMath::Helpers::matrix_copy
+			(
+				*this,
+				std::forward<EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>(to_move_copy_)
+			);
+			return *this;
+		}
+#pragma endregion
+
+#pragma region COPY_FUNCS
+	public:
+		/// <summary>
+		/// <para> Copies the theoretical indices of the provided input Matrix to respective indices within this Matrix. </para>
+		/// </summary>
+		/// <param name="to_copy_">: EmuMath Matrix to copy to this Matrix.</param>
+		template
+		<
+			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
+			typename = std::enable_if_t<EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&>()>
+		>
+		constexpr inline void Copy(EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& to_copy_)
+		{
+			EmuMath::Helpers::matrix_copy(*this, to_copy_);
+		}
+
+		template
+		<
+			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
+			typename = std::enable_if_t<EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&>()>
+		>
+		constexpr inline void Copy(const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& to_copy_)
+		{
+			EmuMath::Helpers::matrix_copy(*this, to_copy_);
+		}
+
+		template
+		<
+			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
+			typename = std::enable_if_t<EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>()>
+		>
+		constexpr inline void Copy(EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&& to_move_copy_)
+		{
+			EmuMath::Helpers::matrix_copy
+			(
+				*this,
+				std::forward<EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>(to_move_copy_)
+			);
+		}
+
+		template
+		<
+			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
+			typename = std::enable_if_t<EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>()>
+		>
+		constexpr inline void Copy(const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&& to_move_copy_)
+		{
+			EmuMath::Helpers::matrix_copy
+			(
+				*this,
+				std::forward<EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>(to_move_copy_)
+			);
+		}
 #pragma endregion
 
 #pragma region STREAM_FUNCS
+	public:
 		/// <summary>
 		/// <para> Appends this Matrix to the provided stream. </para>
 		/// <para> Elements will be appended as a series of lines containing columns or lines, depending on AppendAsRows_. </para>

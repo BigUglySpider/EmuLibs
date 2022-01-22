@@ -5,6 +5,7 @@
 #include "../_underlying_helpers/_matrix_tmp.h"
 #include "../_underlying_helpers/_matrix_underlying_copy.h"
 #include "../_underlying_helpers/_matrix_underlying_get.h"
+#include "../_underlying_helpers/_matrix_underlying_mutate.h"
 #include "../_underlying_helpers/_matrix_underlying_stream_append.h"
 
 #endif

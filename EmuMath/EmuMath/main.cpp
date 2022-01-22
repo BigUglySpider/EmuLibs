@@ -226,13 +226,13 @@ int main()
 	}
 
 	std::cout << "\n---\n";
-	std::cout << "Column 0: " << some_mat_4x2f_cm_.GetColumn<0>() << "\n";
-	std::cout << "Column 3: " << some_mat_4x2f_cm_.GetColumn<3>() << "\n";
-	std::cout << "Row 0: " << some_mat_4x2f_cm_.GetRow<0>() << "\n";
-	std::cout << "Row 3: " << some_mat_4x2f_cm_.GetRow<1>() << "\n";
+	std::cout << "Column 0: " << some_mat_4x2f_cm_.ColumnAt<0>() << "\n";
+	std::cout << "Column 3: " << some_mat_4x2f_cm_.ColumnAt<3>() << "\n";
+	std::cout << "Row 0: " << some_mat_4x2f_cm_.RowAt<0>() << "\n";
+	std::cout << "Row 3: " << some_mat_4x2f_cm_.RowAt<1>() << "\n";
 
-	some_mat_4x2f_cm_.GetRow<0>().at<2>() = 1337.0f;
-	some_mat_4x2f_cm_.GetColumn<0>().at<1>() = -1337.0f;
+	some_mat_4x2f_cm_.RowAt<0>().at<2>() = 1337.0f;
+	some_mat_4x2f_cm_.ColumnAt<0>().at<1>() = -1337.0f;
 	std::cout << some_mat_4x2f_cm_ << "\n";
 
 	std::cout << "\n---\n";
@@ -271,8 +271,8 @@ int main()
 	std::cout << some_mat_3x4f_rm_ << "\n\n";
 
 	constexpr auto some_mat_3x4f_cm_copy_ = EmuMath::Matrix<3, 4, float, true>(some_mat_3x4f_cm_);
-	constexpr auto column_1_ = some_mat_3x4f_cm_copy_.GetColumn<1>();
-	constexpr auto row_2_ = some_mat_3x4f_cm_copy_.GetRow<2>().Cast<float>();
+	constexpr auto column_1_ = some_mat_3x4f_cm_copy_.ColumnAt<1>();
+	constexpr auto row_2_ = some_mat_3x4f_cm_copy_.RowAt<2>().Cast<float>();
 
 	constexpr auto theoretical_test_0_ = some_mat_3x4f_cm_.AtTheoretical<25>();
 	constexpr auto theoretical_test_1_ = some_mat_3x4f_cm_.AtTheoretical<3>();
@@ -288,14 +288,14 @@ int main()
 	constexpr auto zero_major_ = tester_.get_implied_zero_major();
 	constexpr auto zero_non_major_ = tester_.get_implied_zero_non_major();
 
-	auto column_theoretical_0_ = tester_.GetColumnTheoretical<0>();
-	auto column_theoretical_1_ = tester_.GetColumnTheoretical<25>();
-	auto& row_theoretical_0_ = tester_.GetRowTheoretical<0>();
-	auto row_theoretical_1_ = tester_.GetRowTheoretical<25>();
-	auto& major_theoretical_0_ = tester_.GetMajorTheoretical<0>();
-	auto major_theoretical_1_ = tester_.GetMajorTheoretical<25>();
-	auto non_major_theoretical_0_ = tester_.GetNonMajorTheoretical<0>();
-	auto non_major_theoretical_1_ = tester_.GetNonMajorTheoretical<25>();
+	auto column_theoretical_0_ = tester_.ColumnAtTheoretical<0>();
+	auto column_theoretical_1_ = tester_.ColumnAtTheoretical<25>();
+	auto& row_theoretical_0_ = tester_.RowAtTheoretical<0>();
+	auto row_theoretical_1_ = tester_.RowAtTheoretical<25>();
+	auto& major_theoretical_0_ = tester_.MajorAtTheoretical<0>();
+	auto major_theoretical_1_ = tester_.MajorAtTheoretical<25>();
+	auto non_major_theoretical_0_ = tester_.NonMajorAtTheoretical<0>();
+	auto non_major_theoretical_1_ = tester_.NonMajorAtTheoretical<25>();
 
 	std::cout << "\n---\n";
 	constexpr auto read_mat_cm_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
@@ -381,11 +381,27 @@ int main()
 		)
 	);
 
-	constexpr bool halp_ = EmuMath::Helpers::matrix_assert_copy_is_valid<4, 4, const float&, true, decltype(moved_copy_)&>();
+	std::cout << "\n---\n";
 	auto mat_to_ref_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-	auto ref_copy_ = EmuMath::Matrix<4, 4, float&, true>(mat_to_ref_);
+	auto ref_copy_ = EmuMath::Matrix<3, 3, float&, true>(mat_to_ref_);
+	std::cout << "Mat:\n" << mat_to_ref_ << "\n\nRef Mat:\n" << ref_copy_ << "\n\n";
+	ref_copy_ = EmuMath::Matrix<2, 6, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+	std::cout << "Mat:\n" << mat_to_ref_ << "\n\nRef Mat:\n" << ref_copy_ << "\n\n";
 
+	std::cout << "\n---\n";
 
+	constexpr auto mut_result_scalars_ = EmuMath::Helpers::matrix_mutate<EmuCore::do_add<void>, 4, 3, float, true>(1, 2);
+	constexpr auto mut_result_matrices_ = EmuMath::Helpers::matrix_mutate<EmuCore::do_add<void>, 3, 4, float, true>
+	(
+		EmuMath::Matrix<3, 3, float, true>(10, 20, 30, 40, 50, 60, 70, 80, 90),
+		27
+	);
+	constexpr auto mut_result_passed_ = EmuMath::Helpers::matrix_mutate<4, 4, float, false>
+	(
+		EmuCore::do_bitwise_or<std::uint16_t, std::uint16_t>(),
+		std::uint16_t(1),
+		EmuMath::Matrix<3, 3, std::uint16_t, false>(1, 2, 4, 5, 8, 0, 2, 4, 12)
+	);
 
 	system("pause");
 	
