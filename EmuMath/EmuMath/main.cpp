@@ -390,12 +390,7 @@ int main()
 
 	std::cout << "\n---\n";
 
-	constexpr auto copy_get_test_ = EmuMath::Matrix<4, 7, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28);
 
-	constexpr auto njgkidf = copy_get_test_.ColumnCopy<1>();
-	constexpr auto njgkidfa = copy_get_test_.RowCopy<1>();
-	constexpr auto ngiurngi = copy_get_test_.MajorCopy<1>();
-	constexpr auto ngiurngia = copy_get_test_.NonMajorCopy<1>();
 
 	system("pause");
 	
