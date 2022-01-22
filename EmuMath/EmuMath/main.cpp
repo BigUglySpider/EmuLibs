@@ -403,6 +403,26 @@ int main()
 		EmuMath::Matrix<3, 3, std::uint16_t, false>(1, 2, 4, 5, 8, 0, 2, 4, 12)
 	);
 
+	auto runtime_to_mutate_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << runtime_to_mutate_ << "\n\n";
+	EmuMath::Helpers::matrix_mutate_to<1, 2, 0, 3, 0, 0>(runtime_to_mutate_, EmuCore::do_multiply<void>(), 2, 25);
+	std::cout << runtime_to_mutate_ << "\n\n";
+	EmuMath::Helpers::matrix_mutate_to<2, 3, 1, 4, 1, 1>
+	(
+		runtime_to_mutate_,
+		EmuCore::do_add<void>(),
+		EmuMath::Matrix<4, 4, float, true>(10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160),
+		1
+	);
+	std::cout << runtime_to_mutate_ << "\n\n";
+	EmuMath::Helpers::matrix_mutate_to<EmuCore::do_multiply<void>>
+	(
+		runtime_to_mutate_,
+		0.5f,
+		EmuMath::Matrix<3, 3, double, false>(1, 2, 3, 4, 5, 6, 7, 8, 9)
+	);
+	std::cout << runtime_to_mutate_ << "\n\n";
+
 	system("pause");
 	
 	// ##### SCALAR vs SIMD NOISE #####
