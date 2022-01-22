@@ -390,7 +390,18 @@ int main()
 
 	std::cout << "\n---\n";
 
-
+	constexpr auto mut_result_scalars_ = EmuMath::Helpers::matrix_mutate<EmuCore::do_add<void>, 4, 3, float, true>(1, 2);
+	constexpr auto mut_result_matrices_ = EmuMath::Helpers::matrix_mutate<EmuCore::do_add<void>, 3, 4, float, true>
+	(
+		EmuMath::Matrix<3, 3, float, true>(10, 20, 30, 40, 50, 60, 70, 80, 90),
+		27
+	);
+	constexpr auto mut_result_passed_ = EmuMath::Helpers::matrix_mutate<4, 4, float, false>
+	(
+		EmuCore::do_bitwise_or<std::uint16_t, std::uint16_t>(),
+		std::uint16_t(1),
+		EmuMath::Matrix<3, 3, std::uint16_t, false>(1, 2, 4, 5, 8, 0, 2, 4, 12)
+	);
 
 	system("pause");
 	
