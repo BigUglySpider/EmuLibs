@@ -423,6 +423,11 @@ int main()
 	);
 	std::cout << runtime_to_mutate_ << "\n\n";
 
+	std::cout << "\n---\n";
+	constexpr auto one_mat_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	constexpr auto inner_multiplied_mat_ = EmuMath::Helpers::matrix_mutate_copy<EmuCore::do_multiply, 4, 4, float, true, 1, 3, 1, 3>(one_mat_, one_mat_, 5.0f);
+	std::cout << inner_multiplied_mat_ << "\n\n";
+
 	system("pause");
 	
 	// ##### SCALAR vs SIMD NOISE #####

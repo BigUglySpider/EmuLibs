@@ -151,6 +151,144 @@ namespace EmuMath::Helpers
 			std::forward<Args_>(args_)...
 		);
 	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <typeparam name="OutT_"></typeparam>
+	/// <typeparam name="InT_"></typeparam>
+	/// <typeparam name="...Args_"></typeparam>
+	/// <param name="matrix_to_copy_"></param>
+	/// <param name="...args_"></param>
+	/// <returns></returns>
+	template
+	<
+		template<class...> class FuncTemplate_,
+		std::size_t OutNumColumns_,
+		std::size_t OutNumRows_,
+		typename OutT_,
+		bool OutColumnMajor_,
+		std::size_t MutBeginColumn_,
+		std::size_t MutEndColumn_,
+		std::size_t MutBeginRow_,
+		std::size_t MutEndRow_,
+		std::size_t ArgColumnOffset_ = 0,
+		std::size_t ArgRowOffset_ = 0,
+		typename InT_,
+		std::size_t InNumColumns_,
+		std::size_t InNumRows_,
+		bool InColumnMajor_,
+		class...Args_
+	>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> matrix_mutate_copy
+	(
+		EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>& matrix_to_copy_,
+		Args_&&...args_
+	)
+	{
+		using in_matrix = EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>&;
+		return _matrix_underlying::_matrix_mutate_copy_func_template
+		<
+			FuncTemplate_,
+			in_matrix,
+			MutBeginColumn_,
+			MutEndColumn_,
+			MutBeginRow_,
+			MutEndRow_,
+			ArgColumnOffset_,
+			ArgRowOffset_,
+			OutT_,
+			OutNumColumns_,
+			OutNumRows_,
+			OutColumnMajor_
+		>(matrix_to_copy_, std::forward<Args_>(args_)...);
+	}
+
+	template
+	<
+		template<class...> class FuncTemplate_,
+		std::size_t OutNumColumns_,
+		std::size_t OutNumRows_,
+		typename OutT_,
+		bool OutColumnMajor_,
+		std::size_t MutBeginColumn_,
+		std::size_t MutEndColumn_,
+		std::size_t MutBeginRow_,
+		std::size_t MutEndRow_,
+		std::size_t ArgColumnOffset_ = 0,
+		std::size_t ArgRowOffset_ = 0,
+		typename InT_,
+		std::size_t InNumColumns_,
+		std::size_t InNumRows_,
+		bool InColumnMajor_,
+		class...Args_
+	>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> matrix_mutate_copy
+	(
+		const EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>& matrix_to_copy_,
+		Args_&&...args_
+	)
+	{
+		using in_matrix = const EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>&;
+		return _matrix_underlying::_matrix_mutate_copy_func_template
+		<
+			FuncTemplate_,
+			in_matrix,
+			MutBeginColumn_,
+			MutEndColumn_,
+			MutBeginRow_,
+			MutEndRow_,
+			ArgColumnOffset_,
+			ArgRowOffset_,
+			OutT_,
+			OutNumColumns_,
+			OutNumRows_,
+			OutColumnMajor_
+		>(matrix_to_copy_, std::forward<Args_>(args_)...);
+	}
+
+	template
+	<
+		template<class...> class FuncTemplate_,
+		std::size_t OutNumColumns_,
+		std::size_t OutNumRows_,
+		typename OutT_,
+		bool OutColumnMajor_,
+		std::size_t MutBeginColumn_,
+		std::size_t MutEndColumn_,
+		std::size_t MutBeginRow_,
+		std::size_t MutEndRow_,
+		std::size_t ArgColumnOffset_ = 0,
+		std::size_t ArgRowOffset_ = 0,
+		typename InT_,
+		std::size_t InNumColumns_,
+		std::size_t InNumRows_,
+		bool InColumnMajor_,
+		class...Args_
+	>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> matrix_mutate_copy
+	(
+		EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>&& matrix_to_copy_,
+		Args_&&...args_
+	)
+	{
+		using in_matrix = EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>;
+		return _matrix_underlying::_matrix_mutate_copy_func_template
+		<
+			FuncTemplate_,
+			in_matrix,
+			MutBeginColumn_,
+			MutEndColumn_,
+			MutBeginRow_,
+			MutEndRow_,
+			ArgColumnOffset_,
+			ArgRowOffset_,
+			OutT_,
+			OutNumColumns_,
+			OutNumRows_,
+			OutColumnMajor_
+		>(std::forward<in_matrix>(matrix_to_copy_), std::forward<Args_>(args_)...);
+	}
 }
 
 #endif

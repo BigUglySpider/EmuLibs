@@ -2,7 +2,9 @@
 #define EMU_MATH_MATRIX_MUTATE_UNDERLYING_H_INC_ 1
 
 #include "_matrix_tmp.h"
+#include "_matrix_underlying_copy.h"
 #include "_matrix_underlying_get.h"
+#include "../../../../EmuCore/TMPHelpers/Tuples.h"
 #include "../../../../EmuCore/TMPHelpers/VariadicHelpers.h"
 
 namespace EmuMath::Helpers::_matrix_underlying
@@ -93,6 +95,44 @@ namespace EmuMath::Helpers::_matrix_underlying
 	public:
 		static constexpr bool success = _type_finder::success;
 		using type = typename _type_finder::type;
+	};
+
+	
+
+	template<template<class...> class FuncTemplate_, std::size_t ColumnIndex_, std::size_t RowIndex_, class LeftTuple_, class RightTuple_, class...Args_>
+	struct _matrix_make_mutation_func_from_args
+	{
+	private:
+		static constexpr bool _valid_args = EmuCore::TMP::is_tuple_v<LeftTuple_> && EmuCore::TMP::is_tuple_v<RightTuple_>;
+		static_assert
+		(
+			_valid_args,
+			"Underlying EmuMath Failure: Provided a non-tuple type argument to _matrix_make_mutation_func_from_args for either its LeftTuple_ or RightTuple_ arguments."
+		);
+
+		template<class FullTuple_>
+		struct _builder
+		{
+			using type = void;
+		};
+
+		template<class...FullArgs_>
+		struct _builder<std::tuple<FullArgs_...>>
+		{
+			using type = EmuCore::TMP::safe_template_instantiate
+			<
+				FuncTemplate_,
+				EmuCore::TMP::remove_ref_cv_t<typename _matrix_get_mutation_argument_return<FullArgs_, ColumnIndex_, RowIndex_>::type>...
+			>;
+		};
+
+		using _left_and_centre = EmuCore::TMP::join_tuples_t<LeftTuple_, std::tuple<Args_...>>;
+		using _full_tuple = EmuCore::TMP::join_tuples_t<_left_and_centre, RightTuple_>;
+		using _safe_instantiation = typename _builder<_full_tuple>::type;
+
+	public:
+		using type = typename _safe_instantiation::type;;
+		static constexpr bool is_valid = std::conditional_t<_valid_args, _safe_instantiation, std::false_type>::value;
 	};
 #pragma endregion
 
@@ -556,6 +596,265 @@ namespace EmuMath::Helpers::_matrix_underlying
 				"Attempted to perform an EmuMath Matrix mutation, with mutation results assigned to an existing Matrix, without providing an instance of the provided Func_ type. This is allowed, but the provided Func_ type is not default-constructible. Being default-constructible is a requirement if not passing an instance of Func_."
 			);
 		}
+	}
+#pragma endregion
+
+#pragma region AUTO_FUNC_TEMPLATE_MUTATIONS
+	template
+	<
+		template<class...> class FuncTemplate_,
+		std::size_t ColumnIndex_,
+		std::size_t RowIndex_,
+		class OutMatrix_,
+		class LeftArgsTuple_,
+		class RightArgsTuple_,
+		class...Args_
+	>
+	[[nodiscard]] constexpr inline typename OutMatrix_::stored_type _matrix_mutate_for_index_func_template_stored_type_out(std::add_lvalue_reference_t<Args_>...args_)
+	{
+		using instantiator = _matrix_make_mutation_func_from_args<FuncTemplate_, ColumnIndex_, RowIndex_, LeftArgsTuple_, RightArgsTuple_, Args_...>;
+		if constexpr (instantiator::is_valid)
+		{
+			using Func_ = typename instantiator::type;
+			if constexpr (std::is_default_constructible_v<Func_>)
+			{
+				Func_ func_ = Func_();
+				return _matrix_mutate_execution_for_index_stored_type_out
+				<
+					ColumnIndex_,
+					RowIndex_,
+					OutMatrix_,
+					Func_,
+					ColumnIndex_,
+					ColumnIndex_ + 1,
+					RowIndex_,
+					RowIndex_ + 1,
+					Args_...
+				>(func_, args_...);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Func_>(),
+					"Attempted to perform an EmuMath Matrix mutation with a function template whose arguments are automatically decided based on unqualified arguments, but the determined template instance cannot be default-constructed."
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<instantiator>(),
+				"Attempted to perform an EmuMath Matrix mutation with a function template whose arguments are automatically decided based on unqualified arguments, but the provided template could not successfully be instantiated with the all of the provided arguments."
+			);
+		}
+	}
+#pragma endregion
+
+#pragma region MUTATE_COPY_HYBRID_FUNCS
+	template
+	<
+		template<class...> class FuncTemplate_,
+		std::size_t ColumnIndex_,
+		std::size_t RowIndex_,
+		class OutMatrix_,
+		class InMatrix_,
+		std::size_t MutBeginColumn_,
+		std::size_t MutEndColumn_,
+		std::size_t MutBeginRow_,
+		std::size_t MutEndRow_,
+		std::size_t ArgColumnOffset_,
+		std::size_t ArgRowOffset_,
+		class LeftArgsTuple_,
+		class RightArgsTuple_,
+		class...Args_
+	>
+	[[nodiscard]] constexpr inline typename OutMatrix_::stored_type _matrix_mutate_copy_for_index_func_template_stored_type_out
+	(
+		InMatrix_&& in_matrix_,
+		std::add_lvalue_reference_t<Args_>...args_
+	)
+	{
+		constexpr bool is_mut_column_ = (ColumnIndex_ >= MutBeginColumn_) && (ColumnIndex_ < MutEndColumn_);
+		if constexpr (is_mut_column_ && (RowIndex_ >= MutBeginRow_) && (RowIndex_ < MutEndRow_))
+		{
+			constexpr std::size_t mut_column_ = ColumnIndex_ + ArgColumnOffset_;
+			constexpr std::size_t mut_row_ = RowIndex_ + ArgRowOffset_;
+			return _matrix_mutate_for_index_func_template_stored_type_out<FuncTemplate_, mut_column_, mut_row_, OutMatrix_, LeftArgsTuple_, RightArgsTuple_, Args_...>
+			(
+				std::forward<Args_>(args_)...
+			);
+		}
+		else
+		{	// Disable Visual Studio warning about using moved-from object, as we aren't accessing anything after it is moved (if a move occurs)
+#pragma warning(push)
+#pragma warning(disable: 26800)
+			return _matrix_create_out_from_index<OutMatrix_, InMatrix_, ColumnIndex_, RowIndex_>(std::forward<InMatrix_>(in_matrix_));
+#pragma warning(pop)
+		}
+	}
+
+	template
+	<
+		template<class...> class FuncTemplate_,
+		class OutMatrix_,
+		class InMatrix_,
+		std::size_t MutBeginColumn_,
+		std::size_t MutEndColumn_,
+		std::size_t MutBeginRow_,
+		std::size_t MutEndRow_,
+		std::size_t ArgColumnOffset_,
+		std::size_t ArgRowOffset_,
+		class LeftArgsTuple_,
+		class RightArgsTuple_,
+		class...Args_,
+		std::size_t...OutColumnIndices_,
+		std::size_t...OutRowIndices_
+	>
+	[[nodiscard]] constexpr inline OutMatrix_ _matrix_mutate_copy_func_template_execution
+	(
+		std::index_sequence<OutColumnIndices_...> out_column_indices_,
+		std::index_sequence<OutRowIndices_...> out_row_indices_,
+		InMatrix_&& in_matrix_,
+		std::add_lvalue_reference_t<Args_>...args_
+	)
+	{
+		constexpr bool is_constructible_ = std::is_constructible_v
+		<
+			OutMatrix_,
+			decltype
+			(
+				_matrix_mutate_copy_for_index_func_template_stored_type_out
+				<
+					FuncTemplate_,
+					OutColumnIndices_,
+					OutRowIndices_,
+					OutMatrix_,
+					InMatrix_,
+					MutBeginColumn_,
+					MutEndColumn_,
+					MutBeginRow_,
+					MutEndRow_,
+					ArgColumnOffset_,
+					ArgRowOffset_,
+					LeftArgsTuple_,
+					RightArgsTuple_,
+					Args_...
+				>(std::forward<InMatrix_>(in_matrix_), args_...)
+			)...
+		>;
+
+		if constexpr (is_constructible_)
+		{
+			return OutMatrix_
+			(
+				_matrix_mutate_copy_for_index_func_template_stored_type_out
+				<
+					FuncTemplate_,
+					OutColumnIndices_,
+					OutRowIndices_,
+					OutMatrix_,
+					InMatrix_,
+					MutBeginColumn_,
+					MutEndColumn_,
+					MutBeginRow_,
+					MutEndRow_,
+					ArgColumnOffset_,
+					ArgRowOffset_,
+					LeftArgsTuple_,
+					RightArgsTuple_,
+					Args_...
+				>(std::forward<InMatrix_>(in_matrix_), args_...)...
+			);
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<OutMatrix_>(),
+				"Attempted to perform a partial EmuMath Matrix copy-mutate operation, but the provided output Matrix type cannot be constructed from a stored_type for each element (i.e. one stored_type argument per element)."
+			);
+		}
+	}
+
+	template
+	<
+		template<class...> class FuncTemplate_,
+		class InMatrix_,
+		class LeftExtraArgsTuple_,
+		class RightExtraArgsTuple_,
+		std::size_t MutBeginColumn_,
+		std::size_t MutEndColumn_,
+		std::size_t MutBeginRow_,
+		std::size_t MutEndRow_,
+		std::size_t ArgColumnOffset_,
+		std::size_t ArgRowOffset_,
+		typename OutT_,
+		std::size_t OutNumColumns_,
+		std::size_t OutNumRows_,
+		bool OutColumnMajor_,
+		class...Args_
+	>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> _matrix_mutate_copy_func_template(InMatrix_&& in_matrix_, Args_&&...args_)
+	{
+		using out_matrix = EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>;
+		using output_indices = EmuMath::TMP::make_full_matrix_index_sequences<out_matrix>;
+		using column_index_sequence = typename output_indices::column_index_sequence;
+		using row_index_sequence = typename output_indices::row_index_sequence;
+		return _matrix_mutate_copy_func_template_execution
+		<
+			FuncTemplate_,
+			out_matrix,
+			InMatrix_,
+			MutBeginColumn_,
+			MutEndColumn_,
+			MutBeginRow_,
+			MutEndRow_,
+			ArgColumnOffset_,
+			ArgRowOffset_,
+			LeftExtraArgsTuple_,
+			RightExtraArgsTuple_,
+			decltype(EmuCore::TMP::lval_ref_cast<Args_>(std::forward<Args_>(args_)))...
+		>(column_index_sequence(), row_index_sequence(), std::forward<InMatrix_>(in_matrix_), EmuCore::TMP::lval_ref_cast<Args_>(std::forward<Args_>(args_))...);
+	}
+
+	template
+	<
+		template<class...> class FuncTemplate_,
+		class InMatrix_,
+		std::size_t MutBeginColumn_,
+		std::size_t MutEndColumn_,
+		std::size_t MutBeginRow_,
+		std::size_t MutEndRow_,
+		std::size_t ArgColumnOffset_,
+		std::size_t ArgRowOffset_,
+		typename OutT_,
+		std::size_t OutNumColumns_,
+		std::size_t OutNumRows_,
+		bool OutColumnMajor_,
+		class...Args_
+	>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> _matrix_mutate_copy_func_template(InMatrix_&& in_matrix_, Args_&&...args_)
+	{
+		// Well this looks horrifying
+		return _matrix_mutate_copy_func_template
+		<
+			FuncTemplate_,
+			InMatrix_,
+			std::tuple<>,
+			std::tuple<>,
+			MutBeginColumn_,
+			MutEndColumn_,
+			MutBeginRow_,
+			MutEndRow_,
+			ArgColumnOffset_,
+			ArgRowOffset_,
+			OutT_,
+			OutNumColumns_,
+			OutNumRows_,
+			OutColumnMajor_
+		>(std::forward<InMatrix_>(in_matrix_), std::forward<Args_>(args_)...);
 	}
 #pragma endregion
 }
