@@ -455,19 +455,25 @@ namespace EmuMath::Helpers::_matrix_underlying
 		);
 	}
 
-	template<class OutMatrix_, class InMatrix_, std::size_t ColumnIndex_, std::size_t RowIndex_>
+	template<class OutMatrix_, class InMatrix_, std::size_t ColumnIndex_, std::size_t RowIndex_, std::size_t InColumnIndex_, std::size_t InRowIndex_>
 	constexpr inline void _matrix_copy_index(OutMatrix_& out_matrix_, InMatrix_&& in_matrix_)
 	{
 		if constexpr (_matrix_index_is_contained<ColumnIndex_, RowIndex_, OutMatrix_>())
 		{
 			using out_get_result = decltype(_matrix_get<ColumnIndex_, RowIndex_>(out_matrix_));
-			if constexpr (std::is_lvalue_reference_v<InMatrix_> || !_matrix_index_is_contained<ColumnIndex_, RowIndex_, InMatrix_>())
+			using out_uq = EmuCore::TMP::remove_ref_cv_t<out_get_result>;
+			constexpr bool out_is_arithmetic_ = std::is_arithmetic_v<out_uq>;
+			if constexpr (std::is_lvalue_reference_v<InMatrix_> || !_matrix_index_is_contained<InColumnIndex_, InRowIndex_, InMatrix_>())
 			{
 				// No explicit std::move allowed
-				using in_get_result = decltype(_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::declval<InMatrix_>())));
-				if constexpr (std::is_assignable_v<out_get_result, in_get_result>)
+				using in_get_result = decltype(_matrix_get_theoretical<InColumnIndex_, InRowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::declval<InMatrix_>())));
+				using in_uq = EmuCore::TMP::remove_ref_cv_t<in_get_result>;
+				constexpr bool both_arithmetic_ = std::is_arithmetic_v<in_uq> && out_is_arithmetic_;
+
+				// Only assign directly if non-airthmetic arg at least once, or both are the same arithmetic types not requiring conversions
+				if constexpr (std::is_assignable_v<out_get_result, in_get_result> && (!both_arithmetic_ || std::is_same_v<in_uq, out_uq>))
 				{
-					_matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = _matrix_get_theoretical<ColumnIndex_, RowIndex_>
+					_matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = _matrix_get_theoretical<InColumnIndex_, InRowIndex_>
 					(
 						EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_))
 					);
@@ -481,14 +487,14 @@ namespace EmuMath::Helpers::_matrix_underlying
 						{
 							_matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = out_value_type_uq
 							(
-								_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_)))
+								_matrix_get_theoretical<InColumnIndex_, InRowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_)))
 							);
 						}
 						else if constexpr (EmuCore::TMP::is_static_castable_v<in_get_result, out_value_type_uq>)
 						{
 							_matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = static_cast<out_value_type_uq>
 							(
-								_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_)))
+								_matrix_get_theoretical<InColumnIndex_, InRowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_)))
 							);
 						}
 						else
@@ -515,23 +521,28 @@ namespace EmuMath::Helpers::_matrix_underlying
 				// Explicit std::move allowed, fallback to copy
 				using in_move_result = decltype
 				(
-					std::move(_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::declval<InMatrix_>())))
+					std::move(_matrix_get_theoretical<InColumnIndex_, InRowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::declval<InMatrix_>())))
 				);
+				using in_move_uq = EmuCore::TMP::remove_ref_cv_t<in_move_result>;
+				constexpr bool out_and_move_arithmetic_ = std::is_arithmetic_v<in_move_uq> && out_is_arithmetic_;
 
-				if constexpr (std::is_assignable_v<out_get_result, in_move_result>)
+				if constexpr (std::is_assignable_v<out_get_result, in_move_result> && (!out_and_move_arithmetic_ || std::is_same_v<in_move_uq, out_uq>))
 				{
 					_matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = std::move
 					(
-						_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_)))
+						_matrix_get_theoretical<InColumnIndex_, InRowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_)))
 					);
 				}
 				else
 				{
 					// Direct assignment prioritised over std::move to a value_type_uq
 					using in_get_result = decltype(_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::declval<InMatrix_>())));
-					if constexpr (std::is_assignable_v<out_get_result, in_get_result>)
+					using in_get_uq = EmuCore::TMP::remove_ref_cv_t<in_get_result>;
+					constexpr bool out_and_get_arithmetic_ = std::is_arithmetic_v<in_get_result> && out_is_arithmetic_;
+
+					if constexpr (std::is_assignable_v<out_get_result, in_get_result> && (!out_and_get_arithmetic_ || std::is_same_v<in_get_uq, out_uq>))
 					{
-						_matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = _matrix_get_theoretical<ColumnIndex_, RowIndex_>
+						_matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = _matrix_get_theoretical<InColumnIndex_, InRowIndex_>
 						(
 							EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_))
 						);
@@ -546,28 +557,28 @@ namespace EmuMath::Helpers::_matrix_underlying
 							{
 								return _matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = out_value_type_uq
 								(
-									std::move(_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_))))
+									std::move(_matrix_get_theoretical<InColumnIndex_, InRowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_))))
 								);
 							}
 							else if constexpr (EmuCore::TMP::is_static_castable_v<in_move_result, out_value_type_uq>)
 							{
 								return _matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = static_cast<out_value_type_uq>
 								(
-									std::move(_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_))))
+									std::move(_matrix_get_theoretical<InColumnIndex_, InRowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_))))
 								);
 							}
 							else if constexpr (std::is_constructible_v<out_value_type_uq, in_get_result>)
 							{
 								return _matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = out_value_type_uq
 								(
-									_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_)))
+									_matrix_get_theoretical<InColumnIndex_, InRowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_)))
 								);
 							}
 							else if constexpr (EmuCore::TMP::is_static_castable_v<in_get_result, out_value_type_uq>)
 							{
 								return _matrix_get<ColumnIndex_, RowIndex_>(out_matrix_) = static_cast<out_value_type_uq>
 								(
-									_matrix_get_theoretical<ColumnIndex_, RowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_)))
+									_matrix_get_theoretical<InColumnIndex_, InRowIndex_>(EmuCore::TMP::lval_ref_cast<InMatrix_>(std::forward<InMatrix_>(in_matrix_)))
 								);
 							}
 							else
@@ -616,7 +627,13 @@ namespace EmuMath::Helpers::_matrix_underlying
 			// --- This is with correct use, where this is always supplied a contiguous selection of indices. This is not designed for public use.
 #pragma warning(push)
 #pragma warning(disable: 26800)
-			(_matrix_copy_index<OutMatrix_, InMatrix_, FullColumnIndices_, FullRowIndices_>(out_matrix_, std::forward<InMatrix_>(in_matrix_)), ...);
+			(
+				_matrix_copy_index<OutMatrix_, InMatrix_, FullColumnIndices_, FullRowIndices_, FullColumnIndices_, FullRowIndices_>
+				(
+					out_matrix_,
+					std::forward<InMatrix_>(in_matrix_)
+				), ...
+			);
 #pragma warning(pop)
 		}
 		else

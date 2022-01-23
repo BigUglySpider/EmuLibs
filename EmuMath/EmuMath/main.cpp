@@ -427,6 +427,18 @@ int main()
 	constexpr auto one_mat_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 	constexpr auto inner_multiplied_mat_ = EmuMath::Helpers::matrix_mutate_copy<EmuCore::do_multiply, 4, 4, float, true, 1, 3, 1, 3>(one_mat_, one_mat_, 5.0f);
 	std::cout << inner_multiplied_mat_ << "\n\n";
+	constexpr auto inner_subtracted_mat_ = EmuMath::Helpers::matrix_mutate_copy<4, 4, float, true, 1, 3, 1, 3>(one_mat_, EmuCore::do_subtract<void>(), one_mat_, one_mat_);
+	std::cout << inner_subtracted_mat_ << "\n\n";
+
+	std::cout << "\n---\n";
+	auto another_runtime_mat_ = EmuMath::Matrix<5, 5, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25);
+	auto mat_to_copy = EmuMath::Matrix<6, 6, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36);
+	auto another_mat_to_copy_ = EmuMath::Matrix<5, 5, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25);
+	std::cout << another_runtime_mat_ << "\n\n";
+	EmuMath::Helpers::matrix_mutate_copy_to<1, 4, 1, 4>(another_runtime_mat_, mat_to_copy, EmuCore::do_multiply<void>(), another_runtime_mat_, 0);
+	std::cout << another_runtime_mat_ << "\n\n";
+	EmuMath::Helpers::matrix_mutate_copy_to<EmuCore::do_add, 1, 4, 1, 4>(another_runtime_mat_, another_mat_to_copy_, another_runtime_mat_, 50);
+	std::cout << another_runtime_mat_ << "\n\n";
 
 	system("pause");
 	
