@@ -440,6 +440,10 @@ int main()
 	EmuMath::Helpers::matrix_mutate_copy_to<EmuCore::do_add, 1, 4, 1, 4>(another_runtime_mat_, another_mat_to_copy_, another_runtime_mat_, 50);
 	std::cout << another_runtime_mat_ << "\n\n";
 
+	std::cout << "\n---\n";
+	constexpr auto mat_from_single_vec_arg_ = EmuMath::Matrix<4, 4, float, true>(EmuMath::Vector<3, float>(1, 2, 3));
+	constexpr auto mat_from_single_scalar_arg_ = EmuMath::Matrix<4, 4, float, true>(5);
+
 	system("pause");
 	
 	// ##### SCALAR vs SIMD NOISE #####

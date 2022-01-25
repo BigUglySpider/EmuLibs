@@ -9,26 +9,45 @@ namespace EmuMath::Helpers::_vector_underlying
 	template<std::size_t Index_, typename Arg_, std::size_t Size_, typename T_>
 	constexpr inline void _vector_copy_index(EmuMath::Vector<Size_, T_>& to_copy_to_, Arg_&& arg_)
 	{
-		using value_type = typename EmuMath::Vector<Size_, T_>::value_type;
-		if constexpr (std::is_assignable_v<value_type, Arg_>)
+		using get_result = decltype(_vector_get<Index_>(to_copy_to_));
+		using get_result_uq = EmuCore::TMP::remove_ref_cv_t<get_result>;
+		using arg_uq = EmuCore::TMP::remove_ref_cv_t<Arg_>;
+		constexpr bool both_arithmetic_ = std::is_arithmetic_v<get_result_uq> && std::is_arithmetic_v<arg_uq>;
+
+		if constexpr (std::is_assignable_v<get_result, Arg_> && (!both_arithmetic_ || std::is_same_v<get_result_uq, arg_uq>))
 		{
 			_vector_get<Index_>(to_copy_to_) = std::forward<Arg_>(arg_);
 		}
-		else if constexpr (EmuCore::TMP::is_static_castable_v<Arg_, value_type>)
-		{
-			_vector_get<Index_>(to_copy_to_) = static_cast<value_type>(std::forward<Arg_>(arg_));
-		}
-		else if constexpr (std::is_constructible_v<value_type, Arg_>)
-		{
-			_vector_get<Index_>(to_copy_to_) = value_type(std::forward<Arg_>(arg_));
-		}
 		else
 		{
-			static_assert
-			(
-				EmuCore::TMP::get_false<T_>(),
-				"Attempted to copy a value into an EmuMath Vector at a specified index, but the provided Arg_ cannot be used to assign, convert-to, or construct the Vector's value_type."
-			);
+			using value_type_uq = typename EmuMath::Vector<Size_, T_>::value_type_uq;
+			if constexpr(std::is_assignable_v<get_result, value_type_uq>)
+			{
+				if constexpr (EmuCore::TMP::is_static_castable_v<Arg_, value_type_uq>)
+				{
+					_vector_get<Index_>(to_copy_to_) = static_cast<value_type_uq>(std::forward<Arg_>(arg_));
+				}
+				else if constexpr (std::is_constructible_v<value_type_uq, Arg_>)
+				{
+					_vector_get<Index_>(to_copy_to_) = value_type_uq(std::forward<Arg_>(arg_));
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<T_>(),
+						"Attempted to copy a value into an EmuMath Vector at a specified index, but the provided Arg_ cannot be used to assign the result of getting an element in the Vector directly, nor can it be used to form the Vector's value_type_uq."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+					(
+						EmuCore::TMP::get_false<T_>(),
+						"Attempted to copy a value into an EmuMath Vector at a specified index, but the provided Arg_ cannot be used to assign to a get result of the Vector, and an element of the Vector cannot be assigned from its value_type_uq."
+					);
+			}
 		}
 	}
 
