@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_vector_MUTATION_H_INC_
-#define EMU_MATH_vector_MUTATION_H_INC_ 1
+#ifndef EMU_MATH_VECTOR_MUTATION_H_INC_
+#define EMU_MATH_VECTOR_MUTATION_H_INC_ 1
 
 #include "_common_vector_helpers.h"
 

@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_vector_SET_UNDERLYING_H_INC_
-#define EMU_MATH_vector_SET_UNDERLYING_H_INC_ 1
+#ifndef EMU_MATH_VECTOR_SET_UNDERLYING_H_INC_
+#define EMU_MATH_VECTOR_SET_UNDERLYING_H_INC_ 1
 
 #include "_vector_tmp.h"
 #include "_vector_get_underlying.h"

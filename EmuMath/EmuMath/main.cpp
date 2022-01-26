@@ -270,6 +270,9 @@ int main()
 	std::cout << some_mat_3x4f_cm_ << "\n\n";
 	std::cout << some_mat_3x4f_rm_ << "\n\n";
 
+	//constexpr bool gjdoig = EmuMath::Vector<3, float>::_is_constructible_from_only_stored_types(EmuMath::Vector<3, float>::index_sequence());
+
+
 	constexpr auto some_mat_3x4f_cm_copy_ = EmuMath::Matrix<3, 4, float, true>(some_mat_3x4f_cm_);
 	constexpr auto column_1_ = some_mat_3x4f_cm_copy_.ColumnAt<1>();
 	constexpr auto row_2_ = some_mat_3x4f_cm_copy_.RowAt<2>().Cast<float>();
@@ -443,6 +446,17 @@ int main()
 	std::cout << "\n---\n";
 	constexpr auto mat_from_single_vec_arg_ = EmuMath::Matrix<4, 4, float, true>(EmuMath::Vector<3, float>(1, 2, 3));
 	constexpr auto mat_from_single_scalar_arg_ = EmuMath::Matrix<4, 4, float, true>(5);
+	constexpr auto mat_from_single_major_arg_ = EmuMath::Matrix<4, 4, float, true>(EmuMath::Vector<4, float>(1, 2, 3, 4));
+	auto some_mat_to_fiddle_with_ = mat_from_single_major_arg_;
+	std::cout << some_mat_to_fiddle_with_ << "\n\n";
+	some_mat_to_fiddle_with_.ColumnAt<2>() = 3;
+	std::cout << some_mat_to_fiddle_with_ << "\n\n";
+	some_mat_to_fiddle_with_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << some_mat_to_fiddle_with_ << "\n\n";
+	some_mat_to_fiddle_with_ = EmuMath::Matrix<4, 4, float, false>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << some_mat_to_fiddle_with_ << "\n\n";
+	some_mat_to_fiddle_with_.MainDiagonal<float&>() = EmuMath::Vector<25, float>(7);
+	std::cout << some_mat_to_fiddle_with_ << "\n\n";
 
 	system("pause");
 	

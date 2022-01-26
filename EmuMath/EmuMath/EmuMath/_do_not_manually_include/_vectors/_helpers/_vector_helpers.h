@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_vector_HELPERS_H_INC_
-#define EMU_MATH_vector_HELPERS_H_INC_ 1
+#ifndef EMU_MATH_VECTOR_HELPERS_H_INC_
+#define EMU_MATH_VECTOR_HELPERS_H_INC_ 1
 
 // CONTAINS:
 // --- Includes for all EmuMath Vector Helpers

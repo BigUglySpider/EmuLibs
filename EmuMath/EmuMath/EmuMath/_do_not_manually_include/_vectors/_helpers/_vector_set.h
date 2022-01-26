@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_vector_SET_H_INC_
-#define EMU_MATH_vector_SET_H_INC_
+#ifndef EMU_MATH_VECTOR_SET_H_INC_
+#define EMU_MATH_VECTOR_SET_H_INC_
 
 #include "_common_vector_helpers.h"
 
