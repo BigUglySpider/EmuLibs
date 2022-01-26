@@ -27,7 +27,7 @@ namespace EmuMath
 	{
 #pragma region COMMON_STATIC_INFO
 	public:
-		using this_type = Vector<Size_, T_>;
+		using this_type = EmuMath::Vector<Size_, T_>;
 		using vector_info = EmuMath::TMP::common_vector_info<Size_, T_, true>;
 
 		using stored_type = typename vector_info::stored_type;
@@ -46,6 +46,7 @@ namespace EmuMath
 		static constexpr bool is_class = vector_info::is_class;
 		static constexpr std::size_t element_byte_size = vector_info::element_byte_size;
 		static constexpr bool has_alternative_representation = vector_info::has_alternative_representation;
+		static constexpr std::size_t depth = vector_info::depth;
 
 		using data_storage_type = std::array<stored_type, size>;
 		using index_sequence = std::make_index_sequence<size>;
@@ -756,10 +757,25 @@ namespace EmuMath
 			return _func_make_stored_type_from_arg<Arg_>::template get<Index_, ReadOffset_, AllowScalarMoves_>(std::forward<Arg_>(arg_));
 		}
 
-		template<std::size_t ReadOffset_, bool AllowScalarMoves_, class Arg_, std::size_t...Indices_>
+		template<std::size_t ReadOffset_, class Arg_, std::size_t...Indices_>
 		[[nodiscard]] static constexpr inline data_storage_type _construct_all_from_single_arg(std::index_sequence<Indices_...> indices_, Arg_&& arg_)
 		{
-			return data_storage_type({ _make_stored_type_from_arg<Indices_, ReadOffset_, AllowScalarMoves_>(std::forward<Arg_>(arg_))... });
+			if constexpr (EmuMath::TMP::is_emu_vector_v<Arg_>)
+			{
+				constexpr bool allow_move_between_depths_ = depth <= EmuCore::TMP::remove_ref_cv_t<Arg_>::depth;
+				return data_storage_type({ _make_stored_type_from_arg<Indices_, ReadOffset_, allow_move_between_depths_>(std::forward<Arg_>(arg_))... });
+			}
+			else
+			{
+				if constexpr (size == 1)
+				{
+					return data_storage_type({ _make_stored_type_from_arg<Indices_, ReadOffset_, true>(std::forward<Arg_>(arg_))... });
+				}
+				else
+				{
+					return data_storage_type({ _make_stored_type_from_arg<Indices_, ReadOffset_, false>(std::forward<Arg_>(arg_))... });
+				}
+			}
 		}
 
 		template<std::size_t ReadOffset_, class Arg_>
@@ -809,11 +825,11 @@ namespace EmuMath
 				);
 				if constexpr (is_vector_conversion_)
 				{
-					return _construct_all_from_single_arg<ReadOffset_, true>(index_sequence(), std::forward<Args_>(args_)...);
+					return _construct_all_from_single_arg<ReadOffset_>(index_sequence(), std::forward<Args_>(args_)...);
 				}
 				else if constexpr (valid_arg_for_all_same_construction<ReadOffset_, EmuCore::TMP::first_variadic_arg_t<Args_...>>())
 				{
-					return _construct_all_from_single_arg<ReadOffset_, false>(index_sequence(), std::forward<Args_>(args_)...);
+					return _construct_all_from_single_arg<ReadOffset_>(index_sequence(), std::forward<Args_>(args_)...);
 				}
 				else
 				{
@@ -1368,7 +1384,7 @@ namespace EmuMath
 			return *this;
 		}
 
-		template<typename = std::enable_if_t<!contains_non_const_ref>>
+		template<typename = std::enable_if_t<(!contains_non_const_ref)>>
 		constexpr inline this_type& operator=(const this_type& rhs_)
 		{
 			EmuMath::Helpers::vector_copy(*this, rhs_);

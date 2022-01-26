@@ -391,6 +391,8 @@ int main()
 	ref_copy_ = EmuMath::Matrix<2, 6, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
 	std::cout << "Mat:\n" << mat_to_ref_ << "\n\nRef Mat:\n" << ref_copy_ << "\n\n";
 
+	constexpr bool help_me_please_ = EmuMath::Helpers::vector_copy_assign_is_valid<3, float, const EmuMath::Vector<3, float>&>();
+
 	std::cout << "\n---\n";
 
 	constexpr auto mut_result_scalars_ = EmuMath::Helpers::matrix_mutate<EmuCore::do_add<void>, 4, 3, float, true>(1, 2);

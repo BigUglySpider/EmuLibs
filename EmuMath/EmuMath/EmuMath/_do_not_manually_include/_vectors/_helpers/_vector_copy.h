@@ -4,10 +4,37 @@
 #include "_common_vector_helpers.h"
 
 // CONTAINS:
+// --- copy_assign_is_valid
 // --- copy
 
 namespace EmuMath::Helpers
 {
+#pragma region VALIDITY_CHECKS
+	template<std::size_t OutSize_, typename OutT_, class In_, std::size_t ReadOffset_ = 0>
+	[[nodiscard]] constexpr inline bool vector_copy_assign_is_valid()
+	{
+		return _vector_underlying::_vector_copy_assign_is_valid<0, OutSize_, ReadOffset_, In_, OutSize_, OutT_, false>();
+	}
+
+	template<std::size_t OutSize_, typename OutT_, class In_, std::size_t CopyBegin_, std::size_t CopyEnd_, std::size_t ReadOffset_ = 0>
+	[[nodiscard]] constexpr inline bool vector_copy_assign_is_valid()
+	{
+		return _vector_underlying::_vector_copy_assign_is_valid<CopyBegin_, CopyEnd_, ReadOffset_, In_, OutSize_, OutT_, false>();
+	}
+
+	template<std::size_t OutSize_, typename OutT_, class In_, std::size_t ReadOffset_ = 0>
+	[[nodiscard]] constexpr inline bool vector_assert_copy_assign_is_valid()
+	{
+		return _vector_underlying::_vector_copy_assign_is_valid<0, OutSize_, ReadOffset_, In_, OutSize_, OutT_, true>();
+	}
+
+	template<std::size_t OutSize_, typename OutT_, class In_, std::size_t CopyBegin_, std::size_t CopyEnd_, std::size_t ReadOffset_ = 0>
+	[[nodiscard]] constexpr inline bool vector_assert_copy_assign_is_valid()
+	{
+		return _vector_underlying::_vector_copy_assign_is_valid<CopyBegin_, CopyEnd_, ReadOffset_, In_, OutSize_, OutT_, true>();
+	}
+#pragma endregion
+
 	/// <summary>
 	/// <para> Assigns to the provided EmuMath Vector within the specified range using the provided in_ argument. </para>
 	/// <para> If In_ is an EmuMath Vector: Written-to indices in out_vector_ will be assigned via the element at the respective index + ReadOffset_ within in_. </para>

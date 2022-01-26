@@ -38,6 +38,25 @@ namespace EmuMath::TMP
 		{
 			using type = EmuMath::Vector<Size_, InReferencedType_&>;
 		};
+
+		template<class StoredType_>
+		struct _calculate_vector_depth
+		{
+		private:
+			template<std::size_t Count_, class CheckT_, bool IsVector_ = EmuMath::TMP::is_emu_vector_v<CheckT_>>
+			struct _calculator
+			{
+				static constexpr std::size_t value = Count_;
+			};
+			template<std::size_t Count_, class CheckT_>
+			struct _calculator<Count_, CheckT_, true>
+			{
+				static constexpr std::size_t value = _calculator<Count_ + 1, typename EmuCore::TMP::remove_ref_cv_t<CheckT_>::stored_type>::value;
+			};
+
+		public:
+			static constexpr std::size_t value = _calculator<0, StoredType_>::value;
+		};
 #pragma endregion
 
 #pragma region TYPE_ALIASES
@@ -113,6 +132,8 @@ namespace EmuMath::TMP
 		static constexpr bool is_default_constructible = !contains_ref && std::is_default_constructible_v<stored_type>;
 
 		static constexpr bool has_alternative_representation = !std::is_same_v<std::false_type, alternative_vector_rep>;
+
+		static constexpr std::size_t depth = _calculate_vector_depth<stored_type>::value;
 #pragma endregion
 
 	private:
