@@ -371,12 +371,6 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_get.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_set_underlying.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_set.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_stream_append_underlying.h">
       <Filter>Header Files</Filter>
     </ClInclude>
