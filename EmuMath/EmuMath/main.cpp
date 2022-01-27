@@ -460,6 +460,15 @@ int main()
 	some_mat_to_fiddle_with_.MainDiagonal<float&>() = EmuMath::Vector<25, float>(7);
 	std::cout << some_mat_to_fiddle_with_ << "\n\n";
 
+	auto vec_to_equal_ = EmuMath::make_vector<float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << vec_to_equal_ << "\n";
+	vec_to_equal_ = decltype(vec_to_equal_)(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16);
+	std::cout << vec_to_equal_ << "\n";
+	vec_to_equal_ = vec_to_equal_ * -2.5L;
+	std::cout << vec_to_equal_ << "\n";
+
+
+
 	system("pause");
 	
 	// ##### SCALAR vs SIMD NOISE #####

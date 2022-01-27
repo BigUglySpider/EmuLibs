@@ -172,7 +172,6 @@ namespace EmuMath
 				}
 				else
 				{
-
 					using arg_move_result = decltype(std::move(EmuCore::TMP::lval_ref_cast<Arg_>(std::declval<Arg_>()).template at<arg_index_>()));
 					if constexpr(!contains_ref)
 					{
@@ -666,7 +665,7 @@ namespace EmuMath
 						if constexpr (!contains_ref)
 						{
 							// Explicit move allowed
-							using moved_arg_result = decltype(std::move(arg_));
+							using moved_arg_result = decltype(std::move(std::declval<Arg_>()));
 							if constexpr (std::is_constructible_v<stored_type, moved_arg_result>)
 							{
 								return stored_type(std::move(arg_));
@@ -1391,7 +1390,7 @@ namespace EmuMath
 			return *this;
 		}
 
-		constexpr inline this_type& operator=(this_type&& rhs_)
+		constexpr inline this_type& operator=(this_type&& rhs_) noexcept
 		{
 			EmuMath::Helpers::vector_copy(*this, std::forward<this_type>(rhs_));
 			return *this;

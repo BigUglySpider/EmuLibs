@@ -338,9 +338,9 @@ namespace EmuMath
 			typename = std::enable_if_t<is_constructible_via_other_matrix_type<EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>&>()>
 		>
 		explicit constexpr inline Matrix(EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>& matrix_to_convert_) :
-			Matrix
+			_data
 			(
-				EmuMath::Helpers::matrix_copy<NumColumns_, NumRows_, T_, ColumnMajor_, InT_, InNumColumns_, InNumRows_, InColumnMajor_>(matrix_to_convert_)
+				EmuMath::Helpers::matrix_copy<NumColumns_, NumRows_, T_, ColumnMajor_, InT_, InNumColumns_, InNumRows_, InColumnMajor_>(matrix_to_convert_)._data
 			)
 		{
 		}
