@@ -772,7 +772,11 @@ namespace EmuMath
 				}
 				else
 				{
+					// Disable Visual Studio warning about using moved-from object, as we aren't even moving here, but repeated forwarding draws a false positive
+#pragma warning(push)
+#pragma warning(disable: 26800)
 					return data_storage_type({ _make_stored_type_from_arg<Indices_, ReadOffset_, false>(std::forward<Arg_>(arg_))... });
+#pragma warning(pop)
 				}
 			}
 		}
