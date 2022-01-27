@@ -6,9 +6,13 @@
 // CONTAINS:
 // --- mutate
 // --- mutate_to
+// --- mutate_copy
+// --- mutate_copy_to
+// --- mutate_invoke_only
 
 namespace EmuMath::Helpers
 {
+#pragma region MUTATE_FUNCS
 	/// <summary>
 	/// <para> Outputs an EmuMath Matrix resulting from invoking invocations of the provided Func_ with the provided Args_ for every index. </para>
 	/// <para> If a provided Arg_ is an EmuMath Matrix: The respective theoretical column/row index will be used as an argument instead of the Matrix itself. </para>
@@ -16,7 +20,7 @@ namespace EmuMath::Helpers
 	/// </summary>
 	/// <param name="func_">Function to invoke for each mutation. This is considered not explicitly provided if the first template parameter is the Func_ type.</param>
 	/// <param name="args_"></param>
-	/// <returns></returns>
+	/// <returns>EmuMath Matrix containing the results of mutation invocation at respective indices using the provided arguments.</returns>
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_ = true, class Func_, class...Args_>
 	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> matrix_mutate(Func_ func_, Args_&&...args_)
 	{
@@ -36,7 +40,9 @@ namespace EmuMath::Helpers
 			std::forward<Args_>(args_)...
 		);
 	}
+#pragma endregion
 
+#pragma region MUTATE_TO_FUNCS
 	/// <summary>
 	/// <para> Outputs to the provided EmuMath Matrix via the results of invoking the provided mutation Func_ with the provided Args_. </para>
 	/// <para> If a provided Arg_ is an EmuMath Matrix: The correct theoretical column/row index will be used as an argument instead of the Matrix itself. </para>
@@ -151,7 +157,9 @@ namespace EmuMath::Helpers
 			std::forward<Args_>(args_)...
 		);
 	}
+#pragma endregion
 
+#pragma region MATRIX_MUTATE_COPY_FUNCS
 	/// <summary>
 	/// <para> Performs a partial copy-mutation of the provided EmuMath Matrix, using the provided args_ for the mutation function only. </para>
 	/// <para> Note that in_matrix_ is not used as an argument for the mutation function; it must be provided a second time if this behaviour is wanted. </para>
@@ -445,7 +453,9 @@ namespace EmuMath::Helpers
 			OutColumnMajor_
 		>(func_, std::forward<in_matrix_type>(in_matrix_), std::forward<Args_>(args_)...);
 	}
+#pragma endregion
 
+#pragma region MATRIX_MUTATE_COPY_TO_FUNCS
 	/// <summary>
 	/// <para> Performs a partial copy-mutation of the provided EmuMath Matrix, using the provided args_ for the mutation function only. </para>
 	/// <para> Note that in_matrix_ is not used as an argument for the mutation function; it must be provided a second time if this behaviour is wanted. </para>
@@ -720,6 +730,49 @@ namespace EmuMath::Helpers
 			ArgRowOffset_
 		>(out_matrix_, std::forward<in_matrix_type>(in_matrix_), std::forward<Args_>(args_)...);
 	}
+#pragma endregion
+
+#pragma region MATRIX_MUTATE_INVOKE_ONLY_FUNCS
+	/// <summary>
+	/// <para> Performs an EmuMath Matrix mutation without producing any output. Ideal for operations with similar semantics to operator++. </para>
+	/// <para> As there is no output, a custom range and execution order must be provided. </para>
+	/// <para> BeginColumn_: Inclusive column index at which to start reading EmuMath Matrix arguments. </para>
+	/// <para> EndColumn_: Exclusive column index at which to stop reading EmuMath Matrix arguments. </para>
+	/// <para> BeginRow_: Inclusive row index at which to start reading EmuMath Matrix arguments. </para>
+	/// <para> EndRow_: Exclusive row index at which to stop reading EmuMath Matrix arguments. </para>
+	/// <para> ColumnMajor_: True to execute in column-major order, false to execute in row-major order. </para>
+	/// </summary>
+	/// <param name="func_">: Function to invoke with the provided arguments.</param>
+	/// <param name="args_">: Arguments to provide to function invocation.</param>
+	template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool ColumnMajor_, class Func_, class...Args_>
+	constexpr inline void matrix_mutate_invoke_only(Func_ func_, Args_&&...args_)
+	{
+		using func_lval_ref_type = decltype(EmuCore::TMP::lval_ref_cast<Func_>(std::forward<Func_>(func_)));
+		func_lval_ref_type func_lval_ref_ = EmuCore::TMP::lval_ref_cast<Func_>(std::forward<Func_>(func_));
+		_matrix_underlying::_matrix_mutate_invoke_only<BeginColumn_, EndColumn_, BeginRow_, EndRow_, ColumnMajor_, func_lval_ref_type>
+		(
+			func_lval_ref_,
+			std::forward<Args_>(args_)...
+		);
+	}
+
+	/// <summary>
+	/// <para> Performs an EmuMath Matrix mutation without producing any output. Ideal for operations with similar semantics to operator++. </para>
+	/// <para> As there is no output, a custom range and execution order must be provided. </para>
+	/// <para> BeginColumn_: Inclusive column index at which to start reading EmuMath Matrix arguments. </para>
+	/// <para> EndColumn_: Exclusive column index at which to stop reading EmuMath Matrix arguments. </para>
+	/// <para> BeginRow_: Inclusive row index at which to start reading EmuMath Matrix arguments. </para>
+	/// <para> EndRow_: Exclusive row index at which to stop reading EmuMath Matrix arguments. </para>
+	/// <para> ColumnMajor_: True to execute in column-major order, false to execute in row-major order. </para>
+	/// <para> The typeargs for FuncTemplate_ will be decided based on the provided arguments on a per-iteration basis. </para>
+	/// </summary>
+	/// <param name="args_">: Arguments to provide to function invocation.</param>
+	template<template<class...> class FuncTemplate_, std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool ColumnMajor_, class...Args_>
+	constexpr inline void matrix_mutate_invoke_only(Args_&&...args_)
+	{
+		_matrix_underlying::_matrix_mutate_invoke_only_func_template<FuncTemplate_, BeginColumn_, EndColumn_, BeginRow_, EndRow_, ColumnMajor_>(std::forward<Args_>(args_)...);
+	}
+#pragma endregion
 }
 
 #endif

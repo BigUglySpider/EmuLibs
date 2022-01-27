@@ -691,7 +691,7 @@ namespace EmuMath::TMP
 			struct _underlying_maker_template<std::index_sequence<ColumnIndices_...>, std::index_sequence<RowIndices_...>, false>
 			{
 				using column_index_sequence = typename EmuCore::TMP::looped_integer_sequence<std::index_sequence<ColumnIndices_...>, sizeof...(RowIndices_) - 1>::type;
-				using row_index_sequence = typename EmuCore::TMP::variadic_splice_integer_sequences_t
+				using row_index_sequence = typename EmuCore::TMP::variadic_splice_integer_sequences
 				<
 					EmuCore::TMP::make_duplicated_index_sequence<RowIndices_, sizeof...(ColumnIndices_)>...
 				>::type;
