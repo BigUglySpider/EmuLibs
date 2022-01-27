@@ -179,6 +179,12 @@ void PrintIntSequence(std::integer_sequence<T_, Indices_...>)
 	std::cout << " }";
 }
 
+template<typename...Args_>
+constexpr inline bool variadic_and_test(Args_&&...args_)
+{
+	return (... && args_);
+}
+
 int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
@@ -467,7 +473,13 @@ int main()
 	vec_to_equal_ = vec_to_equal_ * -2.5L;
 	std::cout << vec_to_equal_ << "\n";
 
+	std::cout << "\n---\n";
+	EmuMath::Vector<4, float>::depth;
+	constexpr auto why_ = EmuMath::Vector<4, EmuMath::Vector<10, EmuMath::Vector<2, float>>>(1, 2, 3, 4);
+	constexpr auto why2_ = why_[3].at<2>()[1];
 
+	auto add_2 = [](auto val_) { return val_ + 2; };
+	std::cout << add_2(2.5) << "\n";
 
 	system("pause");
 	
