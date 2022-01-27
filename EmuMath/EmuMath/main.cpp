@@ -401,8 +401,8 @@ int main()
 
 	std::cout << "\n---\n";
 
-	constexpr auto mut_result_scalars_ = EmuMath::Helpers::matrix_mutate<EmuCore::do_add<void>, 4, 3, float, true>(1, 2);
-	constexpr auto mut_result_matrices_ = EmuMath::Helpers::matrix_mutate<EmuCore::do_add<void>, 3, 4, float, true>
+	constexpr auto mut_result_scalars_ = EmuMath::Helpers::matrix_mutate<EmuCore::do_add, 4, 3, float, true>(1, 2);
+	constexpr auto mut_result_matrices_ = EmuMath::Helpers::matrix_mutate<EmuCore::do_add, 3, 4, float, true>
 	(
 		EmuMath::Matrix<3, 3, float, true>(10, 20, 30, 40, 50, 60, 70, 80, 90),
 		27
@@ -426,12 +426,12 @@ int main()
 		1
 	);
 	std::cout << runtime_to_mutate_ << "\n\n";
-	EmuMath::Helpers::matrix_mutate_to<EmuCore::do_multiply<void>>
-	(
-		runtime_to_mutate_,
-		0.5f,
-		EmuMath::Matrix<3, 3, double, false>(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	);
+	//EmuMath::Helpers::matrix_mutate_to<EmuCore::do_multiply<void>>
+	//(
+	//	runtime_to_mutate_,
+	//	0.5f,
+	//	EmuMath::Matrix<3, 3, double, false>(1, 2, 3, 4, 5, 6, 7, 8, 9)
+	//);
 	std::cout << runtime_to_mutate_ << "\n\n";
 
 	std::cout << "\n---\n";
@@ -467,6 +467,18 @@ int main()
 
 	system("pause");
 	
+	auto dxm_test_ = EmuCore::TestingHelpers::matrix_test_dxm();
+	dxm_test_.Prepare();
+	dxm_test_(25);
+	auto emu_test_ = EmuCore::TestingHelpers::matrix_test_void_template();
+	emu_test_.Prepare();
+	emu_test_(25);
+	system("pause");
+	dxm_test_.print_dxm_mat(dxm_test_.out[25]);
+	std::cout << "\n\n" << emu_test_.out[25] << "\n\n";
+
+	system("pause");
+
 	// ##### SCALAR vs SIMD NOISE #####
 	constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
 	constexpr std::size_t test_noise_dimensions = 3;

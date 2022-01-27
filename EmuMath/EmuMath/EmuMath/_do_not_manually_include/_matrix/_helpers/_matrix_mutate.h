@@ -19,26 +19,102 @@ namespace EmuMath::Helpers
 	/// <para> If a provided Arg_ is none of the above: All function invocations will use the provided Arg_ as is. </para>
 	/// </summary>
 	/// <param name="func_">Function to invoke for each mutation. This is considered not explicitly provided if the first template parameter is the Func_ type.</param>
-	/// <param name="args_"></param>
+	/// <param name="args_">: Arguments to invoke the mutation function via.</param>
 	/// <returns>EmuMath Matrix containing the results of mutation invocation at respective indices using the provided arguments.</returns>
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_ = true, class Func_, class...Args_>
 	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> matrix_mutate(Func_ func_, Args_&&...args_)
 	{
-		using func_ref = std::add_lvalue_reference_t<Func_>;
-		return _matrix_underlying::_matrix_mutate_return_out<func_ref, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_, 0, OutNumColumns_, 0, OutNumRows_>
+		using func_lval_ref_type = decltype(EmuCore::TMP::lval_ref_cast<Func_>(std::forward<Func_>(func_)));
+		func_lval_ref_type func_lval_ref_ = EmuCore::TMP::lval_ref_cast<Func_>(std::forward<Func_>(func_));
+		return _matrix_underlying::_matrix_mutate_return_out<func_lval_ref_type, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_, 0, OutNumColumns_, 0, OutNumRows_>
 		(
-			func_,
+			func_lval_ref_,
 			std::forward<Args_>(args_)...
 		);
 	}
 
-	template<class Func_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_ = true, class...Args_>
+	/// <summary>
+	/// <para> Outputs an EmuMath Matrix resulting from invoking invocations of the provided Func_ with the provided Args_ for every index. </para>
+	/// <para> If a provided Arg_ is an EmuMath Matrix: The respective theoretical column/row index will be used as an argument instead of the Matrix itself. </para>
+	/// <para> If a provided Arg_ is none of the above: All function invocations will use the provided Arg_ as is. </para>
+	/// <para> The type arguments of the provided FuncTemplate_ will be decided based on the provided arguments on a per-iteration basis. </para>
+	/// </summary>
+	/// <param name="args_">: Arguments to invoke the mutation function via.</param>
+	/// <returns>EmuMath Matrix containing the results of mutation invocation at respective indices using the provided arguments.</returns>
+	template<template<class...> class FuncTemplate_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_ = true, class...Args_>
 	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> matrix_mutate(Args_&&...args_)
 	{
-		return _matrix_underlying::_matrix_mutate_return_out_no_func_passed<Func_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_, 0, OutNumColumns_, 0, OutNumRows_>
+		return _matrix_underlying::_matrix_mutate_return_out_func_template<FuncTemplate_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_, 0, OutNumColumns_, 0, OutNumRows_>
 		(
 			std::forward<Args_>(args_)...
 		);
+	}
+#pragma endregion
+
+#pragma region MUTATE_RANGE_FUNCS
+	/// <summary>
+	/// <para> Outputs an EmuMath Matrix resulting from invoking invocations of the provided Func_ with the provided Args_ for every index in the provided range. </para>
+	/// <para> Indices outside of the specified range will be default constructed. </para>
+	/// <para> If a provided Arg_ is an EmuMath Matrix: The respective theoretical column/row index will be used as an argument instead of the Matrix itself. </para>
+	/// <para> If a provided Arg_ is none of the above: All function invocations will use the provided Arg_ as is. </para>
+	/// </summary>
+	/// <param name="func_">Function to invoke for each mutation. This is considered not explicitly provided if the first template parameter is the Func_ type.</param>
+	/// <param name="args_">: Arguments to invoke the mutation function via.</param>
+	/// <returns>
+	///		EmuMath Matrix containing the results of mutation invocation at respective indices using the provided arguments, 
+	///		and default elements outside of the provided range.
+	/// </returns>
+	template
+	<
+		std::size_t BeginColumn_,
+		std::size_t EndColumn_,
+		std::size_t BeginRow_,
+		std::size_t EndRow_,
+		std::size_t OutNumColumns_,
+		std::size_t OutNumRows_,
+		typename OutT_,
+		bool OutColumnMajor_ = true,
+		class Func_,
+		class...Args_
+	>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> matrix_mutate_range(Func_ func_, Args_&&...args_)
+	{
+		using func_lval_ref_type = decltype(EmuCore::TMP::lval_ref_cast<Func_>(std::forward<Func_>(func_)));
+		func_lval_ref_type func_lval_ref_ = EmuCore::TMP::lval_ref_cast<Func_>(std::forward<Func_>(func_));
+		return _matrix_underlying::_matrix_mutate_return_out<func_lval_ref_type, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_, BeginColumn_, EndColumn_, BeginRow_, EndRow_>
+		(
+			func_lval_ref_,
+			std::forward<Args_>(args_)...
+		);
+	}
+
+	template
+	<
+		template<class...> class FuncTemplate_,
+		std::size_t BeginColumn_,
+		std::size_t EndColumn_,
+		std::size_t BeginRow_,
+		std::size_t EndRow_,
+		std::size_t OutNumColumns_,
+		std::size_t OutNumRows_,
+		typename OutT_,
+		bool OutColumnMajor_ = true,
+		class...Args_
+	>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> matrix_mutate_range(Args_&&...args_)
+	{
+		return _matrix_underlying::_matrix_mutate_return_out_func_template
+		<
+			FuncTemplate_,
+			OutNumColumns_,
+			OutNumRows_,
+			OutT_,
+			OutColumnMajor_,
+			BeginColumn_,
+			EndColumn_,
+			BeginRow_,
+			EndRow_
+		>(std::forward<Args_>(args_)...);
 	}
 #pragma endregion
 
@@ -75,9 +151,19 @@ namespace EmuMath::Helpers
 		);
 	}
 
+	/// <summary>
+	/// <para> Outputs to the provided EmuMath Matrix via the results of invoking the provided mutation Func_ with the provided Args_. </para>
+	/// <para> If a provided Arg_ is an EmuMath Matrix: The correct theoretical column/row index will be used as an argument instead of the Matrix itself. </para>
+	/// <para> If a provided Arg_ is none of the above: All function invocations will use the provided Arg_ as is. </para>
+	/// <para> ArgColumnOffset_: Offset from the output column index to use for reading Matrix arguments. Defaults to 0. </para>
+	/// <para> ArgRowOffset_: Offset from the output row index to use for reading Matrix arguments. Defaults to 0. </para>
+	/// <para> The type arguments of the provided FuncTemplate_ will be decided based on the provided arguments on a per-iteration basis. </para>
+	/// </summary>
+	/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+	/// <param name="args_">: All arguments to provide to the mutation function.</param>
 	template
 	<
-		class Func_,
+		template<class...> class FuncTemplate_,
 		std::size_t ArgColumnOffset_ = 0,
 		std::size_t ArgRowOffset_ = 0,
 		std::size_t OutNumColumns_,
@@ -88,12 +174,12 @@ namespace EmuMath::Helpers
 	>
 	constexpr inline void matrix_mutate_to(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Args_&&...args_)
 	{
-		_matrix_underlying::_matrix_mutate_assign_no_func_passed<Func_, 0, OutNumColumns_, 0, OutNumRows_, ArgColumnOffset_, ArgRowOffset_>
+		_matrix_underlying::_matrix_mutate_assign_func_template<FuncTemplate_, 0, OutNumColumns_, 0, OutNumRows_, ArgColumnOffset_, ArgRowOffset_>
 		(
 			out_matrix_,
 			std::forward<Args_>(args_)...
 		);
-	}
+	} 
 
 	/// <summary>
 	/// <para> Outputs to the provided EmuMath Matrix within the provided range via the results of invoking the provided mutation Func_ with the provided Args_. </para>
@@ -107,6 +193,7 @@ namespace EmuMath::Helpers
 	/// <para> ArgRowOffset_: Offset from the output row index to use for reading Matrix arguments. Defaults to 0. </para>
 	/// </summary>
 	/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+	/// <param name="func_">: Function to invoke for each mutation.</param>
 	/// <param name="args_">: All arguments to provide to the mutation function.</param>
 	template
 	<
@@ -134,9 +221,23 @@ namespace EmuMath::Helpers
 		);
 	}
 
+	/// <summary>
+	/// <para> Outputs to the provided EmuMath Matrix within the provided range via the results of invoking the provided mutation Func_ with the provided Args_. </para>
+	/// <para> If a provided Arg_ is an EmuMath Matrix: The correct theoretical column/row index will be used as an argument instead of the Matrix itself. </para>
+	/// <para> If a provided Arg_ is none of the above: All function invocations will use the provided Arg_ as is. </para>
+	/// <para> OutBeginColumn_: Inclusive column index at which to start outputting to the provided Matrix. </para>
+	/// <para> OutEndColumn_: Exclusive column index at which to stop outputting to the provided Matrix. </para>
+	/// <para> OutBeginRow_: Inclusive row index at which to start outputting to the provided Matrix. </para>
+	/// <para> OutEndRow_: Exclusive row index at which to stop outputting to the provided Matrix. </para>
+	/// <para> ArgColumnOffset_: Offset from the output column index to use for reading Matrix arguments. Defaults to 0. </para>
+	/// <para> ArgRowOffset_: Offset from the output row index to use for reading Matrix arguments. Defaults to 0. </para>
+	/// <para> The type arguments of the provided FuncTemplate_ will be decided based on the provided arguments on a per-iteration basis. </para>
+	/// </summary>
+	/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+	/// <param name="args_">: All arguments to provide to the mutation function.</param>
 	template
 	<
-		class Func_,
+		template<class...> class FuncTemplate_,
 		std::size_t OutBeginColumn_,
 		std::size_t OutEndColumn_,
 		std::size_t OutBeginRow_,
@@ -151,7 +252,7 @@ namespace EmuMath::Helpers
 	>
 	constexpr inline void matrix_mutate_to(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Args_&&...args_)
 	{
-		_matrix_underlying::_matrix_mutate_assign_no_func_passed<Func_, OutBeginColumn_, OutEndColumn_, OutBeginRow_, OutEndRow_, ArgColumnOffset_, ArgRowOffset_>
+		_matrix_underlying::_matrix_mutate_assign_func_template<FuncTemplate_, OutBeginColumn_, OutEndColumn_, OutBeginRow_, OutEndRow_, ArgColumnOffset_, ArgRowOffset_>
 		(
 			out_matrix_,
 			std::forward<Args_>(args_)...

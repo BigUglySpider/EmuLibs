@@ -123,31 +123,13 @@ namespace EmuCore::TMP
 #pragma endregion
 
 #pragma region VARIADIC_BOOLS
-	/// <summary> Type to easily produce the result of a logical AND with variadic template argument results. </summary>
+	/// <summary> Type to easily produce the result of a logical AND with variadic template argument results, with a consistent `false` value with no arguments. </summary>
 	template<bool...Bools_>
 	struct variadic_and
 	{
-		static constexpr bool value = false;
+		static constexpr bool value = (... && Bools_);
 	};
-	template<bool First_, bool...Remaining_>
-	struct variadic_and<First_, Remaining_...>
-	{
-	private:
-		[[nodiscard]] static constexpr inline bool _get()
-		{
-			if constexpr (First_)
-			{
-				return variadic_and<Remaining_...>::value;
-			}
-			else
-			{
-				return false;
-			}
-		}
 
-	public:
-		static constexpr bool value = _get();
-	};
 	template<bool First_>
 	struct variadic_and<First_>
 	{
@@ -161,16 +143,11 @@ namespace EmuCore::TMP
 	template<bool...Bools_>
 	static constexpr bool variadic_and_v = variadic_and<Bools_...>::value;
 
-	/// <summary> Type to easily produce the result of a logical OR with variadic template argument results. </summary>
+	/// <summary> Type to easily produce the result of a logical OR with variadic template argument results, with a consistent `false` value with no arguments. </summary>
 	template<bool...Bools_>
 	struct variadic_or
 	{
-		static constexpr bool value = false;
-	};
-	template<bool First_, bool...Remaining_>
-	struct variadic_or<First_, Remaining_...>
-	{
-		static constexpr bool value = First_ ? true : variadic_or<Remaining_...>::value;
+		static constexpr bool value = (... || Bools_);
 	};
 	template<bool First_>
 	struct variadic_or<First_>
@@ -185,46 +162,21 @@ namespace EmuCore::TMP
 	template<bool...Bools_>
 	static constexpr bool variadic_or_v = variadic_or<Bools_...>::value;
 
-	/// <summary> Type to easily produce the result of a logical XOR with variadic template argument results. </summary>
+	/// <summary> Type to easily produce the result of a logical XOR with variadic template argument results, with a consistent 'false' value with no arguments. </summary>
 	template<bool...Bools_>
 	struct variadic_xor
 	{
-	private:
-		template<bool Current, bool...Bools_>
-		struct _variadic_xor_executor
-		{
-			static constexpr bool value = Current;
-		};
-		template<bool Current_, bool First_, bool...Remaining_>
-		struct _variadic_xor_executor<Current_, First_, Remaining_...>
-		{
-			[[nodiscard]] static constexpr inline bool _get()
-			{
-				if constexpr (Current_)
-				{
-					return First_ ? false : _variadic_xor_executor<Current_, Remaining_...>::value;
-				}
-				else
-				{
-					return _variadic_xor_executor<First_, Remaining_...>::value;
-				}
-			}
-
-			static constexpr bool value = _get();
-		};
-		template<bool Current_, bool First_>
-		struct _variadic_xor_executor<Current_, First_>
-		{
-			static constexpr bool value = Current_ ^ First_;
-		};
-		template<bool Current_>
-		struct _variadic_xor_executor<Current_>
-		{
-			static constexpr bool value = Current_;
-		};
-
-	public:
-		static constexpr bool value = _variadic_xor_executor<false, Bools_...>::value;
+		static constexpr bool value = (... ^ Bools_);
+	};
+	template<bool First_>
+	struct variadic_xor<First_>
+	{
+		static constexpr bool value = First_;
+	};
+	template<>
+	struct variadic_xor<>
+	{
+		static constexpr bool value = false;
 	};
 	template<bool...Bools_>
 	static constexpr bool variadic_xor_v = variadic_xor<Bools_...>::value;
