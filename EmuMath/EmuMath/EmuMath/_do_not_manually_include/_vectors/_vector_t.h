@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_vector_T_H_INC_
-#define EMU_MATH_vector_T_H_INC_ 1
+#ifndef EMU_MATH_VECTOR_T_H_INC_
+#define EMU_MATH_VECTOR_T_H_INC_ 1
 
 #include "_helpers/_vector_helpers.h"
 #include <array>
@@ -10,24 +10,12 @@
 
 namespace EmuMath
 {
-	/// <summary>
-	/// <para> Mathematical Vector of any number of dimensions. </para>
-	/// <para> 
-	///		Provides support for Vectors of lvalue references.
-	///		References to a type T are intended to be stored as vector_internal_ref&lt;T&gt;.
-	///		As such, instantiations of `Vector&lt;size, T&amp;&gt;` are identical to instantiations of `Vector&lt;size, vector_internal_ref&lt;T&gt;&gt;`.
-	/// </para>
-	/// </summary>
-	/// <typeparam name="T_">
-	///		Type for this Vector to store.
-	///		If T_ is an l-value reference type, it will be reinterpreted as `vector_internal_ref&lt;std::remove_ref_t&lt;T_&gt;&gt;`.
-	/// </typeparam>
 	template<std::size_t Size_, typename T_>
 	struct Vector
 	{
 #pragma region COMMON_STATIC_INFO
 	public:
-		using this_type = Vector<Size_, T_>;
+		using this_type = EmuMath::Vector<Size_, T_>;
 		using vector_info = EmuMath::TMP::common_vector_info<Size_, T_, true>;
 
 		using stored_type = typename vector_info::stored_type;
@@ -37,16 +25,34 @@ namespace EmuMath
 		using alternative_rep = typename vector_info::alternative_vector_rep;
 		friend typename alternative_rep;
 
+		/// <summary> The number of elements contained within this Vector type. </summary>
 		static constexpr std::size_t size = vector_info::size;
+		/// <summary> True if this Vector contains any kind of reference(s). </summary>
 		static constexpr bool contains_ref = vector_info::contains_ref;
+		/// <summary> True if this Vector contains const-qualified reference(s). </summary>
 		static constexpr bool contains_const_ref = vector_info::contains_const_ref;
+		/// <summary> True if this Vector contains non-const-qualified reference(s). </summary>
 		static constexpr bool contains_non_const_ref = vector_info::contains_non_const_ref;
+		/// <summary> True if the data stored within this Vector type is integral. </summary>
 		static constexpr bool is_integral = vector_info::is_integral;
+		/// <summary> True if the data stored within this Vector type is floating-point. </summary>
 		static constexpr bool is_floating_point = vector_info::is_floating_point;
+		/// <summary> True if the data stored within this Vector type is of a class type. </summary>
 		static constexpr bool is_class = vector_info::is_class;
+		/// <summary> The size of each element of this Vector in bytes. </summary>
 		static constexpr std::size_t element_byte_size = vector_info::element_byte_size;
-		static constexpr bool is_default_constructible = vector_info::is_default_constructible;
+		/// <summary> True if this Vector type can be represented with different template arguments. This is limited to primarily reference-containing Vector types. </summary>
 		static constexpr bool has_alternative_representation = vector_info::has_alternative_representation;
+		/// <summary>
+		/// <para> The number of Vector depths within this Vector type. </para>
+		/// <para> If this Vector contains non-Vectors: This is 0. </para>
+		/// <para> 
+		///		If this Vector contains EmuMath Vectors: This starts at 1, incrementing for every layer of EmuMath Vectors 
+		///		(i.e. it is incremented when stored_type::stored_type... is an EmuMath Vector, and continues until ...::stored_type is not an EmuMath Vector.
+		/// </para>
+		/// <para> For example, Vector&lt;3, Vector&lt;10, Vector&lt;2, float&gt;&gt;&gt; has a depth of 2, as there are 2 layers of internal EmuMath Vectors. </para>
+		/// </summary>
+		static constexpr std::size_t depth = vector_info::depth;
 
 		using data_storage_type = std::array<stored_type, size>;
 		using index_sequence = std::make_index_sequence<size>;
@@ -57,106 +63,16 @@ namespace EmuMath
 			return size;
 		}
 
-		template<class...Args_>
-		[[nodiscard]] static constexpr inline bool valid_template_construction_args()
-		{
-			return vector_info::template valid_template_construct_args<Args_...>();
-		}
-
-		template<std::size_t OtherSize_, typename OtherT_>
-		[[nodiscard]] static constexpr inline bool valid_template_vector_copy_construct_arg()
-		{
-			return 
-			(
-				vector_info::template valid_template_vector_copy_construct_arg<OtherSize_, OtherT_>() &&
-				!vector_info::template is_valid_lone_type_for_set_all_construction<EmuMath::Vector<OtherSize_, OtherT_>&>()
-			);
-		}
-
-		template<std::size_t OtherSize_, typename OtherT_>
-		[[nodiscard]] static constexpr inline bool valid_template_vector_const_copy_construct_arg()
-		{
-			return 
-			(
-				vector_info::template valid_template_vector_const_copy_construct_arg<OtherSize_, OtherT_>() &&
-				!vector_info::template is_valid_lone_type_for_set_all_construction<const EmuMath::Vector<OtherSize_, OtherT_>&>()
-			);
-		}
-
-		template<std::size_t OtherSize_, typename OtherT_>
-		[[nodiscard]] static constexpr inline bool valid_template_vector_move_construct_arg()
-		{
-			return
-			(
-				vector_info::template valid_template_vector_move_construct_arg<OtherSize_, OtherT_>() &&
-				!vector_info::template is_valid_lone_type_for_set_all_construction<EmuMath::Vector<OtherSize_, OtherT_>&&>()
-			);
-		}
-
-		template<std::size_t InSize_, typename InT_, bool in_is_const, bool in_is_temp>
-		[[nodiscard]] static constexpr inline bool is_valid_vector_for_set()
-		{
-			return vector_info::template is_valid_vector_for_set<InSize_, InT_, in_is_const, in_is_temp>();
-		}
-
-		template<typename T_>
-		[[nodiscard]] static constexpr inline bool is_valid_type_for_single_set()
-		{
-			return vector_info::template is_valid_type_for_single_set<T_>();
-		}
-
-		template<typename T_>
-		[[nodiscard]] static constexpr inline bool is_valid_type_for_set_all()
-		{
-			return vector_info::template is_valid_type_for_set_all<T_>();
-		}
-
 		template<typename T_, bool WhileConst_>
 		[[nodiscard]] static constexpr inline bool is_valid_try_get_output_ref()
 		{
 			return vector_info::template is_valid_try_get_output_ref<T_, WhileConst_>();
 		}
 
-		template<typename T_>
-		[[nodiscard]] static constexpr inline bool is_valid_lone_type_for_set_all_construction()
-		{
-			return vector_info::template is_valid_lone_type_for_set_all_construction<T_>();
-		}
-
 		[[nodiscard]] static constexpr inline value_type_uq get_implied_zero()
 		{
 			return EmuMath::Helpers::vector_get_non_contained<this_type>();
 		}
-
-		template<typename Arg_>
-		[[nodiscard]] static constexpr inline bool is_valid_template_copy_arg()
-		{
-			return vector_info::template is_valid_template_copy_arg<Arg_, false>();
-		}
-
-		template<typename Arg_>
-		[[nodiscard]] static constexpr inline bool is_valid_template_assign_arg()
-		{
-			return vector_info::template is_valid_template_copy_arg<Arg_, true>();
-		}
-
-	private:
-		struct _dummy_arg_for_private_constexpr_default
-		{
-			constexpr inline _dummy_arg_for_private_constexpr_default() {}
-		};
-
-		struct _dummy_arg_for_private_lazy_default
-		{
-			constexpr inline _dummy_arg_for_private_lazy_default() {}
-		};
-
-		using _dummy_arg_for_private_default = std::conditional_t
-		<
-			is_default_constructible,
-			_dummy_arg_for_private_constexpr_default,
-			_dummy_arg_for_private_lazy_default
-		>;
 
 		// Helper to decide if a type should be an EmuMath Vector of size Size__ and type T__, or void.
 		// --- If std::is_void_v<T__> is true, the underlying type will be void; otherwise, it will be Vector<Size__, T__>.
@@ -193,8 +109,638 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region STATIC_HELPERS
+#pragma region CONSTRUCTOR_VALIDITY_CHECKS
 	private:
+		template<class Arg_, bool IsVector_ = EmuMath::TMP::is_emu_vector_v<Arg_>>
+		struct _func_is_valid_arg_for_stored_type
+		{
+			template<std::size_t Index_, std::size_t ReadOffset_, bool AllowScalarMoves_, bool DoAssertions_>
+			[[nodiscard]] static constexpr inline bool get()
+			{
+				return false;
+			}
+		};
+
+		template<class Arg_>
+		struct _func_is_valid_arg_for_stored_type<Arg_, true>
+		{
+			// CHECK FOR EMU VECTOR ARG_
+			template<std::size_t Index_, std::size_t ReadOffset_, bool AllowScalarMoves_, bool DoAssertions_>
+			[[nodiscard]] static constexpr inline bool get()
+			{
+				using arg_uq = EmuCore::TMP::remove_ref_cv_t<Arg_>;
+				constexpr std::size_t arg_index_ = Index_ + ReadOffset_;
+				constexpr bool is_theoretical_index_ = arg_index_ >= arg_uq::size;			
+
+				using arg_get_result = decltype(EmuMath::Helpers::vector_get_theoretical<arg_index_>(EmuCore::TMP::lval_ref_cast<Arg_>(std::declval<Arg_>())));
+				if constexpr (EmuMath::TMP::is_emu_vector_v<stored_type> && !EmuMath::TMP::is_emu_vector_v<arg_get_result>)
+				{
+					// We pass the lval cast instead of forwarding the arg to prevent repeated moves where applicable
+					// --- This scenario is for cases such as Vec<4, Vec<4, float>> a = Vec<4, float>(...), where each internal vector will copy the passed Vector
+					using passed_defer_type = std::conditional_t
+					<
+						AllowScalarMoves_,
+						decltype(std::forward<Arg_>(std::declval<Arg_>())),
+						decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(std::declval<Arg_>())))
+					>;
+
+					if constexpr (std::is_constructible_v<stored_type, passed_defer_type>)
+					{
+						return true;
+					}
+					else
+					{
+						static_assert(!DoAssertions_, "Attempted to create the stored_type of an EmuMath Vector which contains EmuMath Vectors, using an EmuMath Vector which contains non-Vector elements, but the internal Vectors of the output Vector cannot be constructed from the provided input Vector.");
+						return false;
+					}
+				}
+				else if constexpr (std::is_lvalue_reference_v<Arg_> || is_theoretical_index_)
+				{
+					// No explicit std::move allowed
+					constexpr bool assigning_theoretical_to_ref_ = is_theoretical_index_ && contains_ref;
+					if constexpr (!assigning_theoretical_to_ref_)
+					{
+						if constexpr (std::is_constructible_v<stored_type, arg_get_result> || EmuCore::TMP::is_static_castable_v<arg_get_result, stored_type>)
+						{
+							return true;
+						}
+						else
+						{
+							static_assert(!DoAssertions_, "Attempted to create an EmuMath Vector's stored_type from an EmuMath Vector argument, but the result of getting one of the indices within the input Vector could not be used to construct or static_cast to the Vector's stored_type.");
+							return false;
+						}
+					}
+					else
+					{
+						static_assert(!DoAssertions_, "Attempted to create an EmuMath Vector's stored_type from an EmuMath Vector argument, but one of the attempted indices to access from the input Vector is a theoretical index, and the output Vector contains references. This would result in a dangling reference, and has been prohibited as a result.");
+						return false;
+					}
+				}
+				else
+				{
+					using arg_move_result = decltype(std::move(EmuCore::TMP::lval_ref_cast<Arg_>(std::declval<Arg_>()).template at<arg_index_>()));
+					if constexpr(!contains_ref)
+					{
+						// Explicit std::move allowed
+						if constexpr (std::is_constructible_v<stored_type, arg_move_result> || EmuCore::TMP::is_static_castable_v<arg_move_result, stored_type>)
+						{
+							return true;
+						}
+						else
+						{
+							static_assert(!DoAssertions_, "Attempted to create an EmuMath Vector's stored_type from a moveable EmuMath Vector argument, but the output Vector's stored_type could not be formed from moving or copying the get result of the input Vector.");
+							return false;
+						}
+					}
+					else if constexpr(arg_uq::contains_ref)
+					{
+						// Outputting reference; don't explicitly move references since we aren't actually moving them
+						// --- Perform some additional const checks - only doable safely if out is const ref, or input is non-const and contains non-const refs
+						constexpr bool compatible_ref_ = contains_const_ref || (arg_uq::contains_non_const_ref && !std::is_const_v<Arg_>);
+						if constexpr (compatible_ref_)
+						{
+							if constexpr (std::is_constructible_v<stored_type, arg_get_result> || EmuCore::TMP::is_static_castable_v<arg_get_result, stored_type>)
+							{
+								return true;
+							}
+							else
+							{
+								static_assert(!DoAssertions_, "Attempted to create an EmuMath Vector of references' stored_type from a moveable EmuMath Vector of references, but the output Vector's stored_type could not be constructed or static_cast to from getting a valid index from the input Vector.");
+								return false;
+							}
+						}
+						else
+						{
+							static_assert(!DoAssertions_, "Attempted to create an EmuMath Vector of references' stored_type from a moveable EmuMath Vector of references, but the constness of references of the input Vector is not compatible with that of the output Vector. If the output Vector contains non-const references, the input Vector must not be const qualified, regardless of the constness of its stored references.");
+							return false;
+						}
+					}
+					else
+					{
+						static_assert(!DoAssertions_, "Attempted to create an EmuMath Vector of references' stored_type from a moveable EmuMath Vector argument which does not contain references. As a moveable argument is considered a likely temporary, this is liable to result in a dangling reference and is thus prohibited.");
+						return false;
+					}
+				}
+			}
+		};
+
+		template<class Arg_>
+		struct _func_is_valid_arg_for_stored_type<Arg_, false>
+		{
+			// CHECK FOR NON-EMU-VECTOR ARG_
+			template<std::size_t Index_, std::size_t ReadOffset_, bool AllowScalarMoves_, bool DoAssertions_>
+			[[nodiscard]] static constexpr inline bool get()
+			{
+				if constexpr(AllowScalarMoves_)
+				{
+					// We only allow reference creation if Arg_ is of lvalue reference type to prevent dangling ref creation
+					using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(std::declval<Arg_>())));			
+					if constexpr (std::is_lvalue_reference_v<Arg_> || !contains_ref)
+					{
+						if constexpr(std::is_constructible_v<stored_type, lval_ref_arg_type> && EmuCore::TMP::is_static_castable_v<lval_ref_arg_type, stored_type>)
+						{
+							return true;
+						}
+						else
+						{
+							static_assert(!DoAssertions_, "Attempted to create an EmuMath Vector's stored_type from a non-Vector argument, but it cannot be constructed or static_cast to from an lvalue reference to the provided argument. Note: non-lvalue references will have been cast to an lvalue reference to prevent repeated moves. To avoid this behaviour and perform moves (which may be valid), an argument is required for each index.");
+							return false;
+						}
+					}
+					else
+					{
+						static_assert(!DoAssertions_, "Attempted to create an EmuMath Vector's stored_type from a non-Vector argument, but the output Vector contains references and the provided Arg_ is not an lvalue reference. As this is likely to result in dangling references, such behaviour is prohibited.");
+						return false;
+					}
+				}
+				else
+				{
+					if constexpr (std::is_lvalue_reference_v<Arg_>)
+					{
+						// No explicit move
+						using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(std::declval<Arg_>())));
+			
+						if constexpr(std::is_constructible_v<stored_type, lval_ref_arg_type> || EmuCore::TMP::is_static_castable_v<lval_ref_arg_type, stored_type>)
+						{
+							return true;
+						}
+						else
+						{
+							static_assert(!DoAssertions_, "Attempted to create an EmuMath Vector's stored_type from a lvalue-reference to a non-Vector argument.");
+							return false;
+						}
+					}
+					else
+					{
+						using arg_uq = EmuCore::TMP::remove_ref_cv_t<Arg_>;
+						constexpr bool in_is_ref_wrapper = EmuCore::TMP::variadic_or_v
+						<
+							EmuCore::TMP::is_instance_of_typeparams_only_v<arg_uq, std::reference_wrapper>,
+							EmuCore::TMP::is_instance_of_typeparams_only_v<arg_uq, EmuMath::vector_internal_ref>,
+							EmuCore::TMP::is_instance_of_typeparams_only_v<arg_uq, EmuMath::vector_internal_const_ref>
+						>;
+						if constexpr (!contains_ref)
+						{
+							// Explicit move allowed
+							using moved_arg_result = decltype(std::move(std::declval<Arg_>()));
+							if constexpr (std::is_constructible_v<stored_type, moved_arg_result> || EmuCore::TMP::is_static_castable_v<moved_arg_result, stored_type>)
+							{
+								return true;
+							}
+							else
+							{
+								static_assert(!DoAssertions_, "Attempted to create an EmuMath Vector's stored_type from a moveable non-Vector argument, but the Vector's stored_type could not be constructed from said argument after a std::move.");
+								return false;
+							}
+						}
+						else if constexpr (in_is_ref_wrapper)
+						{
+							using wrapped_ref_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::declval<Arg_>()).get());
+							if constexpr (std::is_constructible_v<stored_type, wrapped_ref_type> || EmuCore::TMP::is_static_castable_v<wrapped_ref_type, stored_type>)
+							{
+								return true;
+							}
+							else
+							{
+								static_assert(!DoAssertions_, "Attempted to create an EmuMath Vector of references' stored_type from a moveable reference wrapper (std::reference_wrapper, EmuMath::vector_internal_ref, or EmuMath::vector_internal_const_ref), but the stored_type could not be used to reference the wrapper's underlying reference.");
+								return false;
+							}
+						}
+						else
+						{
+							static_assert(!DoAssertions_, "Attempted to create an EmuMath Vector of references' stored_type from a moveable scalar that is not a std::reference_wrapper, EmuMath::vector_internal_ref, or EmuMath::vector_internal_const_ref. As this is likely a temporary non-reference-wrapper, such behaviour is prohibited.");
+							return false;
+						}
+					}
+				}
+			}
+		};
+
+		template<std::size_t Index_, std::size_t ReadOffset_, class Arg_, bool AllowScalarMoves_, bool DoAssertions_>
+		[[nodiscard]] static constexpr inline bool _is_valid_arg_for_stored_type()
+		{
+			return _func_is_valid_arg_for_stored_type<Arg_>::template get<Index_, ReadOffset_, AllowScalarMoves_, DoAssertions_>();
+		}
+
+		template<std::size_t ReadOffset_, class Arg_, std::size_t...Indices_>
+		[[nodiscard]] static constexpr inline bool _underlying_valid_arg_for_all_same_construction(std::index_sequence<Indices_...> indices_)
+		{
+			using arg_uq = EmuCore::TMP::remove_ref_cv_t<Arg_>;
+			if constexpr (!std::is_same_v<this_type, arg_uq>)
+			{
+				return EmuCore::TMP::variadic_and_v
+				<
+					_is_valid_arg_for_stored_type<Indices_, ReadOffset_, Arg_, false, false>()...
+				>;
+			}
+			else
+			{
+				// Reserved for explicit copy/move constructors
+				return false;
+			}
+		}
+
+	public:
+		[[nodiscard]] static constexpr inline bool is_default_constructible()
+		{
+			return 
+			(
+				!contains_ref &&
+				(
+					std::is_default_constructible_v<data_storage_type> || std::is_default_constructible_v<stored_type>
+				)
+			);
+		}
+
+		template<std::size_t ReadOffset_, class Arg_>
+		[[nodiscard]] static constexpr inline bool valid_arg_for_all_same_construction()
+		{
+			return _underlying_valid_arg_for_all_same_construction<ReadOffset_, Arg_>(index_sequence());
+		}
+
+		template<class Vector_, std::size_t ReadOffset_ = 0>
+		[[nodiscard]] static constexpr inline bool is_valid_vector_conversion_arg()
+		{
+			return EmuCore::TMP::variadic_and_v
+			<
+				EmuMath::TMP::is_emu_vector_v<Vector_>,
+				!std::is_same_v<EmuCore::TMP::remove_ref_cv_t<Vector_>, this_type>,
+				valid_arg_for_all_same_construction<ReadOffset_, Vector_>()
+			>;
+		}
+
+		template<class Vector_, std::size_t ReadOffset_ = 0>
+		[[nodiscard]] static constexpr inline bool is_valid_const_vector_conversion_arg()
+		{
+			return !contains_non_const_ref && is_valid_vector_conversion_arg<Vector_, ReadOffset_>();
+		}
+
+		template<std::size_t ReadOffset_, class...Args_>
+		[[nodiscard]] static constexpr inline bool valid_args_for_per_element_construction()
+		{
+			if constexpr (size != 0 && sizeof...(Args_) == size) // 0-args reserved for default
+			{
+				// For validity:
+				// 1: Must be more than 1 argument *or* the only argument is not an EmuMath Vector (as a single argument will use Vector conversion construction instead)
+				// 2: Must be at least one of A and B, with A taking priority over B:
+				// --- A: All Args_ are immediately valid for constructing data_storage_type when forwarded to an initialiser list for data_storage_type construction
+				// --- B: All Args_ are valid lone types for making a stored_type
+				return
+				(
+					(size != 1 || !EmuMath::TMP::is_emu_vector_v<EmuCore::TMP::first_variadic_arg_t<Args_...>>) &&
+					(
+						std::is_constructible_v<data_storage_type, decltype(std::forward<Args_>(std::declval<Args_>()))...> ||
+						EmuCore::TMP::variadic_and_v<_is_valid_arg_for_stored_type<0, ReadOffset_, Args_, true, false>()...>						
+					)
+				);
+			}
+			else
+			{
+				return false;
+			}
+		}
+		template<class...Args_>
+		[[nodiscard]] static constexpr inline bool valid_args_for_per_element_construction()
+		{
+			return valid_args_for_per_element_construction<0, Args_...>();
+		}		
+
+		template<std::size_t ReadOffset_, class...Args_>
+		[[nodiscard]] static constexpr inline bool valid_args_for_variadic_constructor()
+		{
+			constexpr bool valid_ = 
+			(
+				valid_args_for_per_element_construction<ReadOffset_, Args_...>()
+			);
+			
+			if constexpr (!valid_)
+			{
+				if constexpr (sizeof...(Args_) == 1)
+				{
+					using arg_type = EmuCore::TMP::first_variadic_arg_t<Args_...>;
+					return
+					(
+						is_valid_vector_conversion_arg<arg_type, ReadOffset_>() ||
+						is_valid_const_vector_conversion_arg<arg_type, ReadOffset_>() ||
+						valid_arg_for_all_same_construction<ReadOffset_, arg_type>()
+					);
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return true;
+			}
+		}
+		template<class...Args_>
+		[[nodiscard]] static constexpr inline bool valid_args_for_variadic_constructor()
+		{
+			return valid_args_for_variadic_constructor<0, Args_...>();
+		}
+#pragma endregion
+
+#pragma region UNDERLYING_CONSTRUCTION_HELPERS
+	private:
+		template<class Arg_, bool IsVector_ = EmuMath::TMP::is_emu_vector_v<Arg_>>
+		struct _func_make_stored_type_from_arg
+		{
+			// Dummy - partial specialisations will always replace this
+			template<std::size_t Index_, std::size_t ReadOffset_, bool AllowScalarMoves_>
+			[[nodiscard]] static constexpr inline Arg_&& get(Arg_&& arg_)
+			{
+				return arg_;
+			}
+		};
+
+		template<class Arg_>
+		struct _func_make_stored_type_from_arg<Arg_, true>
+		{
+			// CREATE FROM ANOTHER EMUMATH VECTOR
+			template<std::size_t Index_, std::size_t ReadOffset_, bool AllowScalarMoves_>
+			[[nodiscard]] static constexpr inline stored_type get(Arg_&& arg_)
+			{
+				using arg_uq = EmuCore::TMP::remove_ref_cv_t<Arg_>;
+				constexpr std::size_t arg_index_ = Index_ + ReadOffset_;
+				constexpr bool is_theoretical_index_ = arg_index_ >= arg_uq::size;		
+			
+				using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_)));
+				lval_ref_arg_type lval_ref_arg_ = EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_));
+
+				using arg_get_result = decltype(EmuMath::Helpers::vector_get_theoretical<arg_index_>(lval_ref_arg_));
+				if constexpr (EmuMath::TMP::is_emu_vector_v<stored_type> && !EmuMath::TMP::is_emu_vector_v<arg_get_result>)
+				{
+					// This scenario is for cases such as Vec<4, Vec<4, float>> a = Vec<4, float>(...), where each internal vector will copy the passed Vector
+					if constexpr (std::is_constructible_v<stored_type, lval_ref_arg_type>)
+					{
+						if constexpr (AllowScalarMoves_)
+						{
+							return stored_type(std::forward<Arg_>(arg_));
+						}
+						else
+						{
+							return stored_type(lval_ref_arg_);
+						}
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<Arg_>(),
+							"Attempted to create the stored_type of an EmuMath Vector which contains EmuMath Vectors, using an EmuMath Vector which contains non-Vector elements, but the internal Vectors of the output Vector cannot be constructed from the provided input Vector."
+						);
+					}
+				}
+				else if constexpr (std::is_lvalue_reference_v<Arg_> || is_theoretical_index_)
+				{
+					// No explicit std::move allowed
+					constexpr bool assigning_theoretical_to_ref_ = is_theoretical_index_ && contains_ref;
+					if constexpr (!assigning_theoretical_to_ref_)
+					{
+						if constexpr (std::is_constructible_v<stored_type, arg_get_result>)
+						{
+							return stored_type(EmuMath::Helpers::vector_get_theoretical<arg_index_>(lval_ref_arg_));
+						}
+						else if constexpr(EmuCore::TMP::is_static_castable_v<arg_get_result, stored_type>)
+						{
+							return static_cast<stored_type>(EmuMath::Helpers::vector_get_theoretical<arg_index_>(lval_ref_arg_));
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<std::size_t, arg_index_>(),
+								"Attempted to create an EmuMath Vector's stored_type from an EmuMath Vector argument, but the result of getting one of the indices within the input Vector could not be used to construct or static_cast to the Vector's stored_type."
+							);
+						}
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<std::size_t, arg_index_>(),
+							"Attempted to create an EmuMath Vector's stored_type from an EmuMath Vector argument, but one of the attempted indices to access from the input Vector is a theoretical index, and the output Vector contains references. This would result in a dangling reference, and has been prohibited as a result."
+						);
+					}
+				}
+				else
+				{
+					using arg_move_result = decltype(std::move(lval_ref_arg_.template at<arg_index_>()));
+					if constexpr(!contains_ref)
+					{
+						// Explicit std::move allowed
+						if constexpr (std::is_constructible_v<stored_type, arg_move_result>)
+						{
+							return stored_type(std::move(lval_ref_arg_.template at<arg_index_>())    );
+						}
+						else if constexpr (EmuCore::TMP::is_static_castable_v<arg_move_result, stored_type>)
+						{
+							return static_cast<stored_type>(std::move(lval_ref_arg_.template at<arg_index_>()));
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<std::size_t, arg_index_>(),
+								"Attempted to create an EmuMath Vector's stored_type from a moveable EmuMath Vector argument, but the output Vector's stored_type could not be formed from moving or copying the get result of the input Vector."
+							);
+						}
+					}
+					else if constexpr(arg_uq::contains_ref)
+					{
+						// Outputting reference; don't explicitly move references since we aren't actually moving them
+						// --- Perform some additional const checks - only doable safely if out is const ref, or input is non-const and contains non-const refs
+						constexpr bool compatible_ref_ = contains_const_ref || (arg_uq::contains_non_const_ref && !std::is_const_v<Arg_>);
+						if constexpr (compatible_ref_)
+						{
+							if constexpr (std::is_constructible_v<stored_type, arg_get_result>)
+							{
+								return stored_type(lval_ref_arg_.template at<arg_index_>());
+							}
+							else if constexpr (EmuCore::TMP::is_static_castable_v<arg_get_result, stored_type>)
+							{
+								return static_cast<stored_type>(lval_ref_arg_.template at<arg_index_>());
+							}
+							else
+							{
+								static_assert
+								(
+									EmuCore::TMP::get_false<Arg_>(),
+									"Attempted to create an EmuMath Vector of references' stored_type from a moveable EmuMath Vector of references, but the output Vector's stored_type could not be constructed or static_cast to from getting a valid index from the input Vector."
+								);
+							}
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<Arg_>(),
+								"Attempted to create an EmuMath Vector of references' stored_type from a moveable EmuMath Vector of references, but the constness of references of the input Vector is not compatible with that of the output Vector. If the output Vector contains non-const references, the input Vector must not be const qualified, regardless of the constness of its stored references."
+							);
+						}
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<Arg_>(),
+							"Attempted to create an EmuMath Vector of references' stored_type from a moveable EmuMath Vector argument which does not contain references. As a moveable argument is considered a likely temporary, this is liable to result in a dangling reference and is thus prohibited."
+						);
+					}
+				}
+			}
+		};
+
+		template<class Arg_>
+		struct _func_make_stored_type_from_arg<Arg_, false>
+		{
+			// CREATE FROM A NON-EMU-VECTOR TYPE
+			template<std::size_t Index_, std::size_t ReadOffset_, bool AllowScalarMoves_>
+			[[nodiscard]] static constexpr inline stored_type get(Arg_&& arg_)
+			{
+				if constexpr(AllowScalarMoves_)
+				{
+					// We do not allow this arg to be moved as it is used for all output arguments.
+					// --- We only allow reference creation if Arg_ is of lvalue reference type to prevent dangling ref creation
+					using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_)));
+					lval_ref_arg_type lval_ref_arg_ = EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_));
+			
+					if constexpr (std::is_lvalue_reference_v<Arg_> || !contains_ref)
+					{
+						if constexpr(std::is_constructible_v<stored_type, lval_ref_arg_type>)
+						{
+							return stored_type(lval_ref_arg_);
+						}
+						else if constexpr (EmuCore::TMP::is_static_castable_v<lval_ref_arg_type, stored_type>)
+						{
+							return static_cast<stored_type>(lval_ref_arg_);
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<Arg_>(),
+								"Attempted to create an EmuMath Vector's stored_type from a non-Vector argument, but it cannot be constructed or static_cast to from an lvalue reference to the provided argument. Note: non-lvalue references will have been cast to an lvalue reference to prevent repeated moves. To avoid this behaviour and perform moves (which may be valid), an argument is required for each index."
+							);
+						}
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<Arg_>(),
+							"Attempted to create an EmuMath Vector's stored_type from a non-Vector argument, but the output Vector contains references and the provided Arg_ is not an lvalue reference. As this is likely to result in dangling references, such behaviour is prohibited."
+						);
+					}
+				}
+				else
+				{
+					using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_)));
+					lval_ref_arg_type lval_ref_arg_ = EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_));
+					if constexpr (std::is_lvalue_reference_v<Arg_>)
+					{
+						// No explicit move		
+						if constexpr(std::is_constructible_v<stored_type, lval_ref_arg_type>)
+						{
+							return stored_type(lval_ref_arg_);
+						}
+						else if constexpr (EmuCore::TMP::is_static_castable_v<lval_ref_arg_type, stored_type>)
+						{
+							return static_cast<stored_type>(lval_ref_arg_);
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<Arg_>(),
+								"Attempted to create an EmuMath Vector's stored_type from a lvalue-reference to a non-Vector argument."
+							);
+						}
+					}
+					else
+					{
+						using arg_uq = EmuCore::TMP::remove_ref_cv_t<Arg_>;
+						constexpr bool in_is_ref_wrapper = EmuCore::TMP::variadic_or_v
+						<
+							EmuCore::TMP::is_instance_of_typeparams_only_v<arg_uq, std::reference_wrapper>,
+							EmuCore::TMP::is_instance_of_typeparams_only_v<arg_uq, EmuMath::vector_internal_ref>,
+							EmuCore::TMP::is_instance_of_typeparams_only_v<arg_uq, EmuMath::vector_internal_const_ref>
+						>;
+						if constexpr (!contains_ref)
+						{
+							// Explicit move allowed
+							using moved_arg_result = decltype(std::move(std::declval<Arg_>()));
+							if constexpr (std::is_constructible_v<stored_type, moved_arg_result>)
+							{
+								return stored_type(std::move(arg_));
+							}
+							else if constexpr (EmuCore::TMP::is_static_castable_v<moved_arg_result, stored_type>)
+							{
+								return static_cast<stored_type>(std::move(arg_));
+							}
+							else
+							{
+								static_assert
+								(
+									EmuCore::TMP::get_false<Arg_>(),
+									"Attempted to create an EmuMath Vector's stored_type from a moveable non-Vector argument, but the Vector's stored_type could not be constructed from said argument after a std::move."
+								);
+							}
+						}
+						else if constexpr (in_is_ref_wrapper)
+						{
+							using wrapped_ref_type = decltype(lval_ref_arg_.get());
+							wrapped_ref_type wrapped_ref_ = lval_ref_arg_.get();
+							if constexpr (std::is_constructible_v<stored_type, wrapped_ref_type>)
+							{
+								return stored_type(wrapped_ref_);
+							}
+							else if constexpr (EmuCore::TMP::is_static_castable_v<wrapped_ref_type, stored_type>)
+							{
+								return static_cast<stored_type>(wrapped_ref_);
+							}
+							else
+							{
+								static_assert
+								(
+									EmuCore::TMP::get_false<Arg_>(),
+									"Attempted to create an EmuMath Vector of references' stored_type from a moveable reference wrapper (std::reference_wrapper, EmuMath::vector_internal_ref, or EmuMath::vector_internal_const_ref), but the stored_type could not be used to reference the wrapper's underlying reference."
+								);
+							}
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<Arg_>(),
+								"Attempted to create an EmuMath Vector of references' stored_type from a moveable scalar that is not a std::reference_wrapper, EmuMath::vector_internal_ref, or EmuMath::vector_internal_const_ref. As this is likely a temporary non-reference-wrapper, such behaviour is prohibited."
+							);
+						}
+					}
+				}
+			}
+		};
+
+		template<std::size_t...Indices_>
+		[[nodiscard]] static constexpr inline data_storage_type _construct_from_default_stored_types_only(std::index_sequence<Indices_...> indices_)
+		{
+			return data_storage_type(EmuCore::TMP::type_and_discard_val_t<stored_type, Indices_>()...);
+		}
+
+		[[nodiscard]] static constexpr inline data_storage_type _default_construct()
+		{
+			if constexpr (std::is_default_constructible_v<data_storage_type>)
+			{
+				return data_storage_type();
+			}
+			else
+			{
+				return _construct_from_default_stored_types_only(index_sequence());
+			}
+		}
+
 		template<class Other_, std::size_t...Indices_>
 		[[nodiscard]] static constexpr inline data_storage_type _copy_or_move_other_data(std::index_sequence<Indices_...> indices_, Other_&& to_copy_or_move_)
 		{
@@ -209,6 +755,115 @@ namespace EmuMath
 				return data_storage_type({ std::move(to_copy_or_move_[Indices_])... });
 			}
 		}
+
+		template<std::size_t Index_, std::size_t ReadOffset_, bool AllowScalarMoves_, class Arg_>
+		[[nodiscard]] static constexpr inline stored_type _make_stored_type_from_arg(Arg_&& arg_)
+		{
+			return _func_make_stored_type_from_arg<Arg_>::template get<Index_, ReadOffset_, AllowScalarMoves_>(std::forward<Arg_>(arg_));
+		}
+
+		template<std::size_t ReadOffset_, class Arg_, std::size_t...Indices_>
+		[[nodiscard]] static constexpr inline data_storage_type _construct_all_from_single_arg(std::index_sequence<Indices_...> indices_, Arg_&& arg_)
+		{
+			if constexpr (EmuMath::TMP::is_emu_vector_v<Arg_>)
+			{
+				constexpr bool allow_move_between_depths_ = depth <= EmuCore::TMP::remove_ref_cv_t<Arg_>::depth;
+				// Disable Visual Studio warning about using moved-from object, as repeated moves are not allowed here due to the Vector depth requirement
+#pragma warning(push)
+#pragma warning(disable: 26800)
+				return data_storage_type({ _make_stored_type_from_arg<Indices_, ReadOffset_, allow_move_between_depths_>(std::forward<Arg_>(arg_))... });
+#pragma endregion
+			}
+			else
+			{
+				if constexpr (size == 1)
+				{
+					return data_storage_type({ _make_stored_type_from_arg<Indices_, ReadOffset_, true>(std::forward<Arg_>(arg_))... });
+				}
+				else
+				{
+					// Disable Visual Studio warning about using moved-from object, as we aren't even moving here, but repeated forwarding draws a false positive
+#pragma warning(push)
+#pragma warning(disable: 26800)
+					return data_storage_type({ _make_stored_type_from_arg<Indices_, ReadOffset_, false>(std::forward<Arg_>(arg_))... });
+#pragma warning(pop)
+				}
+			}
+		}
+
+		template<std::size_t ReadOffset_, class Arg_>
+		[[nodiscard]] static constexpr inline std::conditional_t
+		<
+			(ReadOffset_ == 0 || !EmuMath::TMP::is_emu_vector_v<stored_type>) && EmuCore::TMP::is_any_same_v<stored_type, Arg_, std::remove_reference_t<Arg_>>,
+			decltype(std::forward<Arg_>(std::declval<Arg_>())),
+			stored_type
+		> _forward_or_make_stored_type(Arg_&& arg_)
+		{
+			if constexpr ((ReadOffset_ == 0 || !EmuMath::TMP::is_emu_vector_v<stored_type>) && EmuCore::TMP::is_any_same_v<stored_type, Arg_, std::remove_reference_t<Arg_>>)
+			{
+				return std::forward<Arg_>(arg_);
+			}
+			else
+			{
+				return _make_stored_type_from_arg<0, ReadOffset_, true>(std::forward<Arg_>(arg_));
+			}
+		}
+
+		template<std::size_t ReadOffset_, class...Args_>
+		[[nodiscard]] static constexpr inline data_storage_type _construct_all_from_one_arg_per_element(Args_&&...args_)
+		{
+			if constexpr (std::is_constructible_v<data_storage_type, decltype(std::forward<Args_>(args_))...>)
+			{
+				return data_storage_type({ std::forward<Args_>(args_)... });
+			}
+			else
+			{
+				return data_storage_type({ _forward_or_make_stored_type<ReadOffset_>(std::forward<Args_>(args_))... });
+			}
+		}
+
+		template<std::size_t ReadOffset_, class...Args_>
+		[[nodiscard]] static constexpr inline data_storage_type _variadic_construct(Args_&&...args_)
+		{
+			if constexpr (valid_args_for_per_element_construction<ReadOffset_, Args_...>())
+			{
+				return _construct_all_from_one_arg_per_element<ReadOffset_>(std::forward<Args_>(args_)...);
+			}
+			else if constexpr(sizeof...(Args_) == 1)
+			{
+				constexpr bool is_vector_conversion_ = 
+				(
+					is_valid_vector_conversion_arg<EmuCore::TMP::first_variadic_arg_t<Args_...>, ReadOffset_>() ||
+					is_valid_const_vector_conversion_arg<EmuCore::TMP::first_variadic_arg_t<Args_...>, ReadOffset_>()
+				);
+				if constexpr (is_vector_conversion_)
+				{
+					return _construct_all_from_single_arg<ReadOffset_>(index_sequence(), std::forward<Args_>(args_)...);
+				}
+				else if constexpr (valid_arg_for_all_same_construction<ReadOffset_, EmuCore::TMP::first_variadic_arg_t<Args_...>>())
+				{
+					return _construct_all_from_single_arg<ReadOffset_>(index_sequence(), std::forward<Args_>(args_)...);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false(),
+						"Internal SFINAE Failure: Invalid variadic construction arguments for an EmuMath Vector have been provided as no possible branch for variadic construction with 1 argument was true."
+					);
+					return data_storage_type();
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false(),
+					"Internal SFINAE Failure: Invalid variadic construction arguments for an EmuMath Vector have been provided as no possible branch for variadic construction with a number of arguments not equal to 1 was true."
+				);
+				return data_storage_type();
+			}
+		}
 #pragma endregion
 
 #pragma region CONSTRUCTORS
@@ -217,8 +872,8 @@ namespace EmuMath
 		/// <para> Default constructs all elements within this Vector. </para>
 		/// <para> This is only available for Vectors which contain default-constructible, non-reference types. </para>
 		/// </summary>
-		template<typename OnlyIfNonRefAndContainsDefaultConstructibles_ = std::enable_if_t<is_default_constructible>>
-		constexpr inline Vector() : _data()
+		template<typename OnlyIfNonRefAndContainsDefaultConstructibles_ = std::enable_if_t<is_default_constructible()>>
+		constexpr inline Vector() : _data(_default_construct())
 		{
 		}
 
@@ -304,145 +959,16 @@ namespace EmuMath
 		{
 		}
 
-		/// <summary>
-		/// <para> Constructs a Vector with custom template arguments, where each argument is used to construct the respective element within the new Vector. </para>
-		/// <para> Only 1 argument may be provided per element, and the provided number of arguments must be equal to this vector's size. </para>
-		/// <para> Additionally, provided arguments must be valid for constructing this Vector's stored_type. </para>
-		/// <para> Provided arguments represent elements in order from index 0 to the final index (e.g. 0, 1, 2...n-1 in a vector of size n). </para>
-		/// </summary>
-		/// <typeparam name="ConstructionArgs_">Types of all provided arguments provided for construction.</typeparam>
-		/// <param name="construction_args_"> 
-		///		: Ordered arguments representing respective elements within the constructed Vector, used to construct their respective element.
-		/// </param>
+
 		template
 		<
 			class...ConstructionArgs_,
-			typename = std::enable_if_t<valid_template_construction_args<ConstructionArgs_...>()>
+			typename = std::enable_if_t<valid_args_for_variadic_constructor<0, ConstructionArgs_...>()>
 		>
 		explicit constexpr inline Vector(ConstructionArgs_&&...construction_args_) :
-			_data({ stored_type(std::forward<ConstructionArgs_>(construction_args_))... })
+			_data(_variadic_construct<0>(std::forward<ConstructionArgs_>(construction_args_)...))
 		{
 		}
-
-		/// <summary>
-		/// <para> Constructs this Vector as a copy of the provided EmuMath Vector. </para>
-		/// <para> If this Vector contains more elements than the passed Vector to_copy_, non-contained elements will be interpreted as implied zeroes. </para>
-		/// <para> If this Vector contains references, the passed Vector to_copy_ must contain at least as many elements as this Vector. </para>
-		/// </summary>
-		/// <param name="to_copy_">: Non-constant reference to an EmuMath Vector to copy into the newly constructed Vector.</param>
-		template
-		<
-			std::size_t OtherSize_,
-			typename OtherT_,
-			typename = std::enable_if_t<valid_template_vector_copy_construct_arg<OtherSize_, OtherT_>()>
-		>
-		explicit constexpr inline Vector(EmuMath::Vector<OtherSize_, OtherT_>& to_copy_) : Vector(_dummy_arg_for_private_default())
-		{
-			EmuMath::Helpers::vector_set(*this, to_copy_);
-		}
-
-		/// <summary>
-		/// <para> Constructs this Vector as a copy of the provided EmuMath Vector. </para>
-		/// <para> If this Vector contains more elements than the passed Vector to_copy_, non-contained elements will be interpreted as implied zeroes. </para>
-		/// <para> If this Vector contains references, the passed Vector to_copy_ must contain at least as many elements as this Vector. </para>
-		/// <para> This constructor is not available for Vectors which contain non-const references.</para>
-		/// </summary>
-		/// <param name="to_copy_">: Constant reference to an EmuMath Vector to copy into the newly constructed Vector.</param>
-		template
-		<
-			std::size_t OtherSize_,
-			typename OtherT_,
-			typename = std::enable_if_t<valid_template_vector_const_copy_construct_arg<OtherSize_, OtherT_>() && !contains_non_const_ref>
-		>
-		explicit constexpr inline Vector(const EmuMath::Vector<OtherSize_, OtherT_>& to_copy_) : Vector(_dummy_arg_for_private_default())
-		{
-			EmuMath::Helpers::vector_set(*this, to_copy_);
-		}
-
-		/// <summary>
-		/// <para> Constructs this Vector as a copy of the provided EmuMath Vector, which attempts to move its contained elements. </para>
-		/// <para> If this Vector contains more elements than the passed Vector to_move_, non-contained elements will be interpreted as implied zeroes. </para>
-		/// <para> If this Vector contains references, the passed Vector to_move_ must contain at least as many elements as this Vector. </para>
-		/// <para> This constructor is not available for Vectors which contain non-const references. </para>
-		/// </summary>
-		/// <param name="to_move_">: rvalue reference to an EmuMath Vector to copy into the newly constructed Vector, with attempts to move used elements.</param>
-		template
-		<
-			std::size_t OtherSize_,
-			typename OtherT_,
-			typename = std::enable_if_t<valid_template_vector_move_construct_arg<OtherSize_, OtherT_>()>
-		>
-		explicit constexpr inline Vector(EmuMath::Vector<OtherSize_, OtherT_>&& to_move_) : Vector(_dummy_arg_for_private_default())
-		{
-			// Checks are here so that temporaries aren't resolved to the const copy constructor
-			// --- This comes with the unfortunate effect that this constructor may appear usable in TMP in situations where it is not
-			// ------ This is, however, considered better than allowing silent dangling references to form
-			if constexpr (contains_ref)
-			{
-				if constexpr (!EmuMath::Vector<OtherSize_, OtherT_>::contains_ref)
-				{
-					static_assert
-					(
-						EmuCore::TMP::get_false<OtherT_>(),
-						"Attempted to construct a reference-containing EmuMath Vector via a temporary EmuMath Vector that does not contain references. This behaviour will result in dangling references, and has been prohibited as a result."
-					);
-				}
-				else
-				{
-					EmuMath::Helpers::vector_set(*this, std::move(to_move_));
-				}
-			}
-			else
-			{
-				EmuMath::Helpers::vector_set(*this, std::move(to_move_));
-			}
-		}
-
-		template
-		<
-			typename InT_,
-			typename = std::enable_if_t<is_valid_lone_type_for_set_all_construction<InT_&&>()>
-		>
-		explicit constexpr inline Vector(InT_&& to_set_all_to_) : Vector(_dummy_arg_for_private_default())
-		{
-			SetAll(std::forward<InT_>(to_set_all_to_));
-		}
-
-		template
-		<
-			typename InT_,
-			typename = std::enable_if_t<is_valid_lone_type_for_set_all_construction<InT_&>()>
-		>
-		explicit constexpr inline Vector(InT_& to_set_all_to_) : Vector(_dummy_arg_for_private_default())
-		{
-			SetAll(to_set_all_to_);
-		}
-
-		template
-		<
-			typename InT_,
-			typename = std::enable_if_t<is_valid_lone_type_for_set_all_construction<const InT_&>()>
-		>
-		explicit constexpr inline Vector(const InT_& to_set_all_to_) : Vector(_dummy_arg_for_private_default())
-		{
-			SetAll(to_set_all_to_);
-		}
-
-	private:
-		// Empty constructor used to perform a lazy-default when construction is executed within the constructor body; inaccessible out of this struct
-		// --- Only available when we cannot default construct
-		// --- Disable warning about uninitialised data since that's the point of this constructor
-#pragma warning(disable : 26495)
-		explicit constexpr inline Vector(_dummy_arg_for_private_lazy_default dummy_arg_)
-		{
-		}
-		// Empty constructor used to perform a default-construction when full construction is executed within the constructor body; inaccessible out of this struct
-		// --- Only available when we can default construct
-		explicit constexpr inline Vector(_dummy_arg_for_private_constexpr_default dummy_arg_) : Vector()
-		{
-		}
-#pragma endregion
-
 #pragma region ACCESS
 	public:
 		/// <summary>
@@ -779,58 +1305,6 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region ASSIGNMENT_OPERATORS
-	public:
-		constexpr inline this_type& operator=(this_type&& to_move_) noexcept
-		{
-			_data = _copy_or_move_other_data<data_storage_type>(index_sequence(), std::move(to_move_._data));
-			return *this;
-		}
-
-		template<typename = std::enable_if_t<has_alternative_representation>>
-		constexpr inline this_type& operator=(alternative_rep&& to_move_) noexcept
-		{
-			_data = _copy_or_move_other_data<data_storage_type>(index_sequence(), std::move(to_move_._data));
-			return *this;
-		}
-
-		constexpr inline this_type& operator=(this_type& to_copy_)
-		{
-			Copy(to_copy_);
-			return *this;
-		}
-		template<typename = std::enable_if_t<has_alternative_representation>>
-		constexpr inline this_type& operator=(alternative_rep& to_copy_)
-		{
-			Copy(to_copy_);
-			return *this;
-		}
-
-		constexpr inline this_type& operator=(const this_type& to_copy_)
-		{
-			Copy(to_copy_);
-			return *this;
-		}
-		template<typename = std::enable_if_t<has_alternative_representation>>
-		constexpr inline this_type& operator=(const alternative_rep& to_copy_)
-		{
-			Copy(to_copy_);
-			return *this;
-		}
-
-		template<class Arg_, typename = std::enable_if_t<is_valid_template_assign_arg<Arg_>()>>
-		constexpr inline this_type& operator=(Arg_& to_copy_)
-		{
-			Copy(to_copy_);
-			return *this;
-		}
-		template<class Arg_, typename = std::enable_if_t<is_valid_template_assign_arg<const Arg_>()>>
-		constexpr inline this_type& operator=(const Arg_& to_copy_)
-		{
-			Copy(to_copy_);
-			return *this;
-		}
-#pragma endregion
 
 #pragma region UNARY_ARITHMETIC_OPERATORS
 	public:
@@ -913,6 +1387,86 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator-() const
 		{
 			return EmuMath::Helpers::vector_negate<size, OutT_>(*this);
+		}
+#pragma endregion
+
+#pragma region ASSIGNMENT_OPERATORS
+		constexpr inline this_type& operator=(this_type& rhs_)
+		{
+			EmuMath::Helpers::vector_copy(*this, rhs_);
+			return *this;
+		}
+
+		template<typename = std::enable_if_t<(!contains_non_const_ref)>>
+		constexpr inline this_type& operator=(const this_type& rhs_)
+		{
+			EmuMath::Helpers::vector_copy(*this, rhs_);
+			return *this;
+		}
+
+		constexpr inline this_type& operator=(this_type&& rhs_) noexcept
+		{
+			EmuMath::Helpers::vector_copy(*this, std::forward<this_type>(rhs_));
+			return *this;
+		}
+
+		template<typename = std::enable_if_t<has_alternative_representation>>
+		constexpr inline this_type& operator=(alternative_rep& rhs_)
+		{
+			EmuMath::Helpers::vector_copy(*this, rhs_);
+			return *this;
+		}
+
+		template<typename = std::enable_if_t<has_alternative_representation && !contains_non_const_ref>>
+		constexpr inline this_type& operator=(const alternative_rep& rhs_)
+		{
+			EmuMath::Helpers::vector_copy(*this, rhs_);
+			return *this;
+		}
+
+		template<typename = std::enable_if_t<has_alternative_representation>>
+		constexpr inline this_type& operator=(alternative_rep&& rhs_)
+		{
+			EmuMath::Helpers::vector_copy(*this, std::forward<alternative_rep>(rhs_));
+			return *this;
+		}
+
+		template<typename = std::enable_if_t<has_alternative_representation && !contains_non_const_ref>>
+		constexpr inline this_type& operator=(const alternative_rep&& rhs_)
+		{
+			EmuMath::Helpers::vector_copy(*this, std::forward<alternative_rep>(rhs_));
+			return *this;
+		}
+
+		template
+		<
+			class Rhs_,
+			typename = std::enable_if_t
+			<
+				(
+					!std::is_same_v<this_type, EmuCore::TMP::remove_ref_cv_t<Rhs_>> ||
+					has_alternative_representation && !std::is_same_v<this_type, EmuCore::TMP::remove_ref_cv_t<Rhs_>>
+				)
+			>
+		>
+		constexpr inline this_type& operator=(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::vector_copy<0, size, 0>(*this, std::forward<Rhs_>(rhs_));
+			return *this;
+		}
+
+		template<std::size_t ReadOffset_, class Rhs_>
+		constexpr inline this_type& operator=(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::vector_copy<0, size, ReadOffset_>(*this, std::forward<Rhs_>(rhs_));
+			return *this;
+		}
+
+		template<std::size_t CopyBegin_, std::size_t CopyEnd_, std::size_t ReadOffset_ = 0, class Rhs_>
+		constexpr inline this_type& operator=(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::vector_copy<CopyBegin_, CopyEnd_, ReadOffset_>(*this, std::forward<Rhs_>(rhs_));
+			return *this;
 		}
 #pragma endregion
 
@@ -4224,302 +4778,6 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region MUTATIONS
-	public:
-		/// <summary>
-		/// <para> Crates a Vector of this Vector's size and value_type_uq using the provided mutation func_. </para>
-		/// <para> The provided arguments will be provided to func_ for every index within the output Vector. </para>
-		/// <para> For any Arg_ that is an EmuMath Vector: The argument at the matching index will be passed to the Func_ instance, instead of the full Vector. </para>
-		/// <para> IncludeSelf_ indicates if (and how) this Vector should be included as an argument for mutation. </para>
-		/// <para> If IncludeSelf_ == 0: This Vector will not be passed as an argument for mutation. </para>
-		/// <para> If IncludeSelf &lt; 0: This Vector will be passed as the first argument for mutation. </para>
-		/// <para> If IncludeSelf &gt; 0: This Vector will be passed as the final argument for mutation. </para>
-		/// </summary>
-		/// <typeparam name="Func_">Mutation function to invoke for every index within the output Vector.</typeparam>
-		/// <typeparam name="Args_">All (or additional, if this Vector is also being passed based on IncludeSelf_) argument types being passed to the mutation function.</typeparam>
-		/// <param name="args_">All (or additional, if this Vector is being passed based on IncludeSelf_) arguments to pass to the mutation function.</param>
-		/// <returns>EmuMath Vector created from mutating the provided arguments via an instance of the provided Func_ at every index within the output Vector.</returns>
-		template<std::size_t IncludeSelf_, class Func_, class...Args_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, value_type_uq> Mutate(Func_ func_, Args_&&...args_)
-		{
-			if constexpr (IncludeSelf_ < 0)
-			{
-				return EmuMath::Helpers::vector_mutate<size, value_type_uq, Func_&>(func_, *this, std::forward<Args_>(args_)...);
-			}
-			else if constexpr (IncludeSelf_ > 0)
-			{
-				return EmuMath::Helpers::vector_mutate<size, value_type_uq, Func_&>(func_, std::forward<Args_>(args_)..., *this);
-			}
-			else
-			{
-				return EmuMath::Helpers::vector_mutate<size, value_type_uq, Func_&>(func_, std::forward<Args_>(args_)...);
-			}
-		}
-		template<std::size_t IncludeSelf_, class Func_, class...Args_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, value_type_uq> Mutate(Func_ func_, Args_&&...args_) const
-		{
-			if constexpr (IncludeSelf_ < 0)
-			{
-				return EmuMath::Helpers::vector_mutate<size, value_type_uq, Func_&>(func_, *this, std::forward<Args_>(args_)...);
-			}
-			else if constexpr (IncludeSelf_ > 0)
-			{
-				return EmuMath::Helpers::vector_mutate<size, value_type_uq, Func_&>(func_, std::forward<Args_>(args_)..., *this);
-			}
-			else
-			{
-				return EmuMath::Helpers::vector_mutate<size, value_type_uq, Func_&>(func_, std::forward<Args_>(args_)...);
-			}
-		}
-
-		/// <summary>
-		/// <para> Crates a Vector of this Vector's size and value_type_uq using the provided mutation Func_ type. </para>
-		/// <para> The provided arguments will be provided to an instance of Func_ for every index within the output Vector. </para>
-		/// <para> For any Arg_ that is an EmuMath Vector: The argument at the matching index will be passed to the Func_ instance, instead of the full Vector. </para>
-		/// <para> IncludeSelf_ indicates if (and how) this Vector should be included as an argument for mutation. </para>
-		/// <para> If IncludeSelf_ == 0: This Vector will not be passed as an argument for mutation. </para>
-		/// <para> If IncludeSelf &lt; 0: This Vector will be passed as the first argument for mutation. </para>
-		/// <para> If IncludeSelf &gt; 0: This Vector will be passed as the final argument for mutation. </para>
-		/// </summary>
-		/// <typeparam name="Func_">Mutation function to invoke for every index within the output Vector.</typeparam>
-		/// <typeparam name="Args_">All (or additional, if this Vector is also being passed based on IncludeSelf_) argument types being passed to the mutation function.</typeparam>
-		/// <param name="args_">All (or additional, if this Vector is being passed based on IncludeSelf_) arguments to pass to the mutation function.</param>
-		/// <returns>EmuMath Vector created from mutating the provided arguments via an instance of the provided Func_ at every index within the output Vector.</returns>
-		template<class Func_, std::size_t IncludeSelf_, class...Args_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, value_type_uq> Mutate(Args_&&...args_)
-		{
-			if constexpr (IncludeSelf_ < 0)
-			{
-				return EmuMath::Helpers::vector_mutate<Func_, size, value_type_uq>(*this, std::forward<Args_>(args_)...);
-			}
-			else if constexpr (IncludeSelf_ > 0)
-			{
-				return EmuMath::Helpers::vector_mutate<Func_, size, value_type_uq>(std::forward<Args_>(args_)..., *this);
-			}
-			else
-			{
-				return EmuMath::Helpers::vector_mutate<Func_, size, value_type_uq>(std::forward<Args_>(args_)...);
-			}
-		}
-		template<class Func_, std::size_t IncludeSelf_, class...Args_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, value_type_uq> Mutate(Args_&&...args_) const
-		{
-			if constexpr (IncludeSelf_ < 0)
-			{
-				return EmuMath::Helpers::vector_mutate<Func_, size, value_type_uq>(*this, std::forward<Args_>(args_)...);
-			}
-			else if constexpr (IncludeSelf_ > 0)
-			{
-				return EmuMath::Helpers::vector_mutate<Func_, size, value_type_uq>(std::forward<Args_>(args_)..., *this);
-			}
-			else
-			{
-				return EmuMath::Helpers::vector_mutate<Func_, size, value_type_uq>(std::forward<Args_>(args_)...);
-			}
-		}
-
-		/// <summary>
-		/// <para> Outputs to the provided EmuMath Vector using the provided mutation func_. </para>
-		/// <para> The provided arguments will be provided to func_ for every index within the output Vector. </para>
-		/// <para> For any Arg_ that is an EmuMath Vector: The argument at the matching index will be passed to the Func_ instance, instead of the full Vector. </para>
-		/// <para> IncludeSelf_ indicates if (and how) this Vector should be included as an argument for mutation. </para>
-		/// <para> If IncludeSelf_ == 0: This Vector will not be passed as an argument for mutation. </para>
-		/// <para> If IncludeSelf &lt; 0: This Vector will be passed as the first argument for mutation. </para>
-		/// <para> If IncludeSelf &gt; 0: This Vector will be passed as the final argument for mutation. </para>
-		/// </summary>
-		/// <typeparam name="Func_">Mutation function to invoke for every index within the output Vector.</typeparam>
-		/// <typeparam name="Args_">All (or additional, if this Vector is also being passed based on IncludeSelf_) argument types being passed to the mutation function.</typeparam>
-		/// <param name="func_">Mutation function to call for every index in the out_vector_.</param>
-		/// <param name="out_vector_">Non-const EmuMath Vector reference to output mutation results to.</param>
-		/// <param name="args_">All (or additional, if this Vector is being passed based on IncludeSelf_) arguments to pass to the mutation function.</param>
-		template<std::size_t IncludeSelf_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateTo(Func_ func_, EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
-		{
-			if constexpr (IncludeSelf_ < 0)
-			{
-				EmuMath::Helpers::vector_mutate_to<Func_&>(func_, out_vector_, *this, std::forward<Args_>(args_)...);
-			}
-			else if constexpr (IncludeSelf_ > 0)
-			{
-				EmuMath::Helpers::vector_mutate_to<Func_&>(func_, out_vector_, std::forward<Args_>(args_)..., *this);
-			}
-			else
-			{
-				EmuMath::Helpers::vector_mutate_to<Func_&>(func_, out_vector_, std::forward<Args_>(args_)...);
-			}
-		}
-		template<std::size_t IncludeSelf_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateTo(Func_ func_, EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
-		{
-			if constexpr (IncludeSelf_ < 0)
-			{
-				EmuMath::Helpers::vector_mutate_to<Func_&>(func_, out_vector_, *this, std::forward<Args_>(args_)...);
-			}
-			else if constexpr (IncludeSelf_ > 0)
-			{
-				EmuMath::Helpers::vector_mutate_to<Func_&>(func_, out_vector_, std::forward<Args_>(args_)..., *this);
-			}
-			else
-			{
-				EmuMath::Helpers::vector_mutate_to<Func_&>(func_, out_vector_, std::forward<Args_>(args_)...);
-			}
-		}
-
-		/// <summary>
-		/// <para> Outputs to the provided EmuMath Vector using the provided mutation func_. </para>
-		/// <para> The provided arguments will be provided to func_ for every index within the output Vector. </para>
-		/// <para> For any Arg_ that is an EmuMath Vector: The argument at the matching index will be passed to the Func_ instance, instead of the full Vector. </para>
-		/// <para> IncludeSelf_ indicates if (and how) this Vector should be included as an argument for mutation. </para>
-		/// <para> If IncludeSelf_ == 0: This Vector will not be passed as an argument for mutation. </para>
-		/// <para> If IncludeSelf &lt; 0: This Vector will be passed as the first argument for mutation. </para>
-		/// <para> If IncludeSelf &gt; 0: This Vector will be passed as the final argument for mutation. </para>
-		/// </summary>
-		/// <typeparam name="Func_">Mutation function to invoke for every index within the output Vector.</typeparam>
-		/// <typeparam name="Args_">All (or additional, if this Vector is also being passed based on IncludeSelf_) argument types being passed to the mutation function.</typeparam>
-		/// <param name="out_vector_">Non-const EmuMath Vector reference to output mutation results to.</param>
-		/// <param name="args_">All (or additional, if this Vector is being passed based on IncludeSelf_) arguments to pass to the mutation function.</param>
-		template<class Func_, std::size_t IncludeSelf_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateTo(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
-		{
-			if constexpr (IncludeSelf_ < 0)
-			{
-				EmuMath::Helpers::vector_mutate_to<Func_>(out_vector_, *this, std::forward<Args_>(args_)...);
-			}
-			else if constexpr (IncludeSelf_ > 0)
-			{
-				EmuMath::Helpers::vector_mutate_to<Func_>(out_vector_, std::forward<Args_>(args_)..., *this);
-			}
-			else
-			{
-				EmuMath::Helpers::vector_mutate_to<Func_>(out_vector_, std::forward<Args_>(args_)...);
-			}
-		}
-		template<class Func_, std::size_t IncludeSelf_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateTo(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
-		{
-			if constexpr (IncludeSelf_ < 0)
-			{
-				EmuMath::Helpers::vector_mutate_to<Func_>(out_vector_, *this, std::forward<Args_>(args_)...);
-			}
-			else if constexpr (IncludeSelf_ > 0)
-			{
-				EmuMath::Helpers::vector_mutate_to<Func_>(out_vector_, std::forward<Args_>(args_)..., *this);
-			}
-			else
-			{
-				EmuMath::Helpers::vector_mutate_to<Func_>(out_vector_, std::forward<Args_>(args_)...);
-			}
-		}
-
-		/// <summary>
-		/// <para> Outputs to the specified index range within out_vector_ using the provided mutation func_. </para>
-		/// <para> The provided arguments will be provided to func_ for every index within the output range. </para>
-		/// <para>
-		///		For any Arg_ that is an EmuMath Vector: The argument at the current ArgIndex_ will be used. 
-		///		This is increased by 1 for every iteration, and starts at ArgBeginIndex_, which defaults to 0 if not provided.
-		/// </para>
-		/// <para> BeginIndex_ is the inclusive index at which to begin writing to out_vector_. </para>
-		/// <para> EndIndex_ is the exclusive index at which to end writing to out_vector_. </para>
-		/// <para> IncludeSelf_ indicates if (and how) this Vector should be included as an argument for mutation. </para>
-		/// <para> If IncludeSelf_ == 0: This Vector will not be passed as an argument for mutation. </para>
-		/// <para> If IncludeSelf &lt; 0: This Vector will be passed as the first argument for mutation. </para>
-		/// <para> If IncludeSelf &gt; 0: This Vector will be passed as the final argument for mutation. </para>
-		/// </summary>
-		/// <typeparam name="Func_">Mutation function to invoke for every index within the provided range.</typeparam>
-		/// <typeparam name="Args_">All (or additional, if this Vector is also being passed based on IncludeSelf_) argument types being passed to the mutation function.</typeparam>
-		/// <param name="func_">
-		///		: Function invocable with each of the provided arguments (or theoretical index equivalents for EmuMath Vector args_), 
-		///		which additionally returns a type that may be copied to a value within out_vector_.
-		/// </param>
-		/// <param name="args_">: All (or additional, if this Vector is being passed based on IncludeSelf_) arguments to pass to the mutation function.</param>
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_, std::size_t IncludeSelf_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateRange(Func_ func_, EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
-		{
-			if constexpr (IncludeSelf_ < 0)
-			{
-				EmuMath::Helpers::vector_mutate_range<BeginIndex_, EndIndex_, ArgBeginIndex_, Func_&>(func_, out_vector_, *this, std::forward<Args_>(args_)...);
-			}
-			else if constexpr (IncludeSelf_ > 0)
-			{
-				EmuMath::Helpers::vector_mutate_range<BeginIndex_, EndIndex_, ArgBeginIndex_, Func_&>(func_, out_vector_, std::forward<Args_>(args_)..., *this);
-			}
-			else
-			{
-				EmuMath::Helpers::vector_mutate_range<BeginIndex_, EndIndex_, ArgBeginIndex_, Func_&>(func_, out_vector_, std::forward<Args_>(args_)...);
-			}
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_, std::size_t IncludeSelf_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateRange(Func_ func_, EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
-		{
-			if constexpr (IncludeSelf_ < 0)
-			{
-				EmuMath::Helpers::vector_mutate_range<BeginIndex_, EndIndex_, ArgBeginIndex_, Func_&>(func_, out_vector_, *this, std::forward<Args_>(args_)...);
-			}
-			else if constexpr (IncludeSelf_ > 0)
-			{
-				EmuMath::Helpers::vector_mutate_range<BeginIndex_, EndIndex_, ArgBeginIndex_, Func_&>(func_, out_vector_, std::forward<Args_>(args_)..., *this);
-			}
-			else
-			{
-				EmuMath::Helpers::vector_mutate_range<BeginIndex_, EndIndex_, ArgBeginIndex_, Func_&>(func_, out_vector_, std::forward<Args_>(args_)...);
-			}
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t IncludeSelf_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateRange(Func_ func_, EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
-		{
-			MutateRange<BeginIndex_, EndIndex_, 0, IncludeSelf_, Func_&>(func_, out_vector_, std::forward<Args_>(args_)...);
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t IncludeSelf_, class Func_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateRange(Func_ func_, EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
-		{
-			MutateRange<BeginIndex_, EndIndex_, 0, IncludeSelf_, Func_&>(func_, out_vector_, std::forward<Args_>(args_)...);
-		}
-		template<class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_, std::size_t IncludeSelf_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
-		{
-			if constexpr (std::is_default_constructible_v<Func_>)
-			{
-				Func_ func_ = Func_();
-				MutateRange<BeginIndex_, EndIndex_, ArgBeginIndex_, IncludeSelf_, Func_&>(func_, out_vector_, std::forward<Args_>(args_)...);
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<Func_>(),
-					"Attempted to use an EmuMath Vector's MutateRange member without passing a func_, but the provided Func_ type is not default-constructible. Only default-constructible Func_ types may be omitted."
-				);
-			}
-		}
-		template<class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ArgBeginIndex_, std::size_t IncludeSelf_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
-		{
-			if constexpr (std::is_default_constructible_v<Func_>)
-			{
-				Func_ func_ = Func_();
-				MutateRange<BeginIndex_, EndIndex_, ArgBeginIndex_, IncludeSelf_, Func_&>(func_, out_vector_, std::forward<Args_>(args_)...);
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<Func_>(),
-					"Attempted to use an EmuMath Vector's MutateRange member without passing a func_, but the provided Func_ type is not default-constructible. Only default-constructible Func_ types may be omitted."
-				);
-			}
-		}
-		template<class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t IncludeSelf_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_)
-		{
-			MutateRange<Func_, BeginIndex_, EndIndex_, 0, IncludeSelf_>(out_vector_, std::forward<Args_>(args_)...);
-		}
-		template<class Func_, std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t IncludeSelf_, class...Args_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MutateRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Args_&&...args_) const
-		{
-			MutateRange<Func_, BeginIndex_, EndIndex_, 0, IncludeSelf_>(out_vector_, std::forward<Args_>(args_)...);
-		}
-#pragma endregion
-
 #pragma region CONCAT_FUNCS
 	public:
 		/// <summary>
@@ -6499,393 +6757,6 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline alternative_rep AsAlternativeRep() const
 		{
 			return alternative_rep(*this);
-		}
-#pragma endregion
-
-#pragma region COPIES
-	public:
-		/// <summary>
-		/// <para> Copies the provided argument to this Vector's elements. </para>
-		/// <para> If this Vector contains references, this will copy the provided Arg_ to the referenced value_types. </para>
-		/// <para>
-		///		If to_copy_ is an EmuMath Vector: Respective indices will be copied (e.g. this[1] = to_copy_[1]).
-		///		Non-contained elements will be interpreted as implied-zeroes.
-		/// </para>
-		/// <para> If to_copy_ is none of the above: All indices will be set as a copy of to_copy_. </para>
-		/// </summary>
-		/// <param name="to_copy_">Argument to copy to indices as described.</param>
-		template<typename Arg_, typename = std::enable_if_t<is_valid_template_copy_arg<Arg_&>()>>
-		constexpr inline void Copy(Arg_& to_copy_)
-		{
-			EmuMath::Helpers::vector_copy<Arg_>(*this, to_copy_);
-		}
-		template<typename Arg_, typename = std::enable_if_t<is_valid_template_copy_arg<Arg_&>()>>
-		constexpr inline void Copy(const Arg_& to_copy_)
-		{
-			EmuMath::Helpers::vector_copy<Arg_>(*this, to_copy_);
-		}
-
-		/// <summary>
-		/// <para> Copies the provided argument to this Vector's elements within the provided index range. </para>
-		/// <para> If this Vector contains references, this will copy the provided Arg_ to the referenced value_types. </para>
-		/// <para>
-		///		If to_copy_ is an EmuMath Vector: Respective indices will be copied (e.g. this[1] = to_copy_[1]).
-		///		Non-contained elements will be interpreted as implied-zeroes.
-		/// </para>
-		/// <para> If to_copy_ is none of the above: All indices will be set as a copy of to_copy_. </para>
-		/// </summary>
-		/// <param name="to_copy_">Argument to copy to the provided index range as described.</param>
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Arg_>
-		constexpr inline void Copy(Arg_& to_copy_)
-		{
-			EmuMath::Helpers::vector_copy<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Arg_>
-		constexpr inline void Copy(const Arg_& to_copy_)
-		{
-			EmuMath::Helpers::vector_copy<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
-		}
-
-		/// <summary>
-		/// <para> Copies the provided argument to this Vector's elements within the provided index range. </para>
-		/// <para> If this Vector contains references, this will copy the provided Arg_ to the referenced value_types. </para>
-		/// <para>
-		///		If to_copy_ is an EmuMath Vector: Respective indices will be copied (e.g. this[1] = to_copy_[1]).
-		///		Non-contained elements will be interpreted as implied-zeroes if CopyNonContained_ is true; otherwise, non-shared indices will not be modified.
-		/// </para>
-		/// <para> If to_copy_ is none of the above: All indices will be set as a copy of to_copy_. </para>
-		/// </summary>
-		/// <param name="to_copy_">Argument to copy to the provided index range as described.</param>
-		template<bool CopyNonContained_, typename Arg_>
-		constexpr inline void Copy(Arg_& to_copy_)
-		{
-			EmuMath::Helpers::vector_copy<CopyNonContained_, Arg_>(*this, to_copy_);
-		}
-		template<bool CopyNonContained_, typename Arg_>
-		constexpr inline void Copy(const Arg_& to_copy_)
-		{
-			EmuMath::Helpers::vector_copy<CopyNonContained_, Arg_>(*this, to_copy_);
-		}
-
-		/// <summary>
-		/// <para> Copies the provided argument to this Vector's elements within the provided index range. </para>
-		/// <para> If this Vector contains references, this will copy the provided Arg_ to the referenced value_types. </para>
-		/// <para>
-		///		If to_copy_ is an EmuMath Vector: Progressively iterating indices from 0 will be copied (e.g. this[BeginIndex_ + 1] = to_copy_[1]).
-		///		Non-contained elements will be interpreted as implied-zeroes. 
-		///		Reading of to_copy_ will start at index 0; to begin reading from BeginIndex_, use `Copy`.
-		/// </para>
-		/// <para> If to_copy_ is none of the above: All indices will be set as a copy of to_copy_. </para>
-		/// </summary>
-		/// <param name="to_copy_">Argument to copy to the provided index range as described.</param>
-		template<std::size_t BeginIndex_, std::size_t EndIndex_ = size, typename Arg_>
-		constexpr inline void CopyFromStart(Arg_& to_copy_)
-		{
-			EmuMath::Helpers::vector_copy_from_start<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_ = size, typename Arg_>
-		constexpr inline void CopyFromStart(const Arg_& to_copy_)
-		{
-			EmuMath::Helpers::vector_copy_from_start<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
-		}
-
-		/// <summary>
-		/// <para> Copies the provided argument to this Vector's elements within the provided index range. </para>
-		/// <para> If this Vector contains references, this will copy the provided Arg_ to the referenced value_types. </para>
-		/// <para>
-		///		If to_copy_ is an EmuMath Vector: Progressively iterating indices from 0 will be copied (e.g. this[BeginIndex_ + 1] = to_copy_[1]).
-		///		Non-shared indices will not be modified. 
-		///		Reading of to_copy_ will start at index 0; to begin reading from BeginIndex_, use `Copy`.
-		/// </para>
-		/// <para> If to_copy_ is none of the above: All indices will be set as a copy of to_copy_. </para>
-		/// </summary>
-		/// <param name="to_copy_">Argument to copy to the provided index range as described.</param>
-		template<std::size_t BeginIndex_, std::size_t EndIndex_ = size, typename Arg_>
-		constexpr inline void CopyFromStartContainedOnly(Arg_& to_copy_)
-		{
-			EmuMath::Helpers::vector_copy_from_start_contained_only<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_ = size, typename Arg_>
-		constexpr inline void CopyFromStartContainedOnly(const Arg_& to_copy_)
-		{
-			EmuMath::Helpers::vector_copy_from_start_contained_only<BeginIndex_, EndIndex_, Arg_>(*this, to_copy_);
-		}
-#pragma endregion
-
-#pragma region SETS
-	public:
-		/// <summary>
-		/// <para> Sets the stored elements of this Vector to via moving respective elements in the passed Vector. </para>
-		/// <para> If to_move_set_ contains less elements than this Vector, non-contained elements will be interpreted as implied zeroes. </para>
-		/// <para> If this Vector contains references, this will update what is referenced by respective references. </para>
-		/// </summary>
-		/// <param name="to_move_set_">EmuMath Vector to move stored elements from when assigning this Vector's stored elements.</param>
-		template
-		<
-			std::size_t InSize_,
-			typename InT_,
-			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, false, true>()>
-		>
-		constexpr inline void Set(EmuMath::Vector<InSize_, InT_>&& to_move_set_)
-		{
-			EmuMath::Helpers::vector_set<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
-		}
-
-		/// <summary>
-		/// <para> Sets the stored elements of this Vector to via moving respective elements in the passed Vector. </para>
-		/// <para> If to_move_set_ contains less elements than this Vector, non-contained elements will be interpreted as implied zeroes. </para>
-		/// <para> If this Vector contains references, this will update what is referenced by respective references. </para>
-		/// </summary>
-		/// <param name="to_move_set_">EmuMath Vector to move stored elements from when assigning this Vector's stored elements.</param>
-		template
-		<
-			std::size_t InSize_,
-			typename InT_,
-			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, true, true>()>
-		>
-		constexpr inline void Set(const EmuMath::Vector<InSize_, InT_>&& to_move_set_)
-		{
-			EmuMath::Helpers::vector_set<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
-		}
-
-		/// <summary>
-		/// <para> Sets the stored elements of this Vector to via copying respective elements in the passed Vector. </para>
-		/// <para> If to_copy_set_ contains less elements than this Vector, non-contained elements will be interpreted as implied zeroes. </para>
-		/// <para> If this Vector contains references, this will update what is referenced by respective references. </para>
-		/// </summary>
-		/// <param name="to_copy_set_">EmuMath Vector to copy stored elements from when assigning this Vector's stored elements.</param>
-		template
-		<
-			std::size_t InSize_,
-			typename InT_,
-			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, false, false>()>
-		>
-		constexpr inline void Set(EmuMath::Vector<InSize_, InT_>& to_copy_set_)
-		{
-			EmuMath::Helpers::vector_set<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
-		}
-
-		/// <summary>
-		/// <para> Sets the stored elements of this Vector to via copying respective elements in the passed Vector. </para>
-		/// <para> If to_copy_set_ contains less elements than this Vector, non-contained elements will be interpreted as implied zeroes. </para>
-		/// <para> If this Vector contains references, this will update what is referenced by respective references. </para>
-		/// </summary>
-		/// <param name="to_copy_set_">EmuMath Vector to copy stored elements from when assigning this Vector's stored elements.</param>
-		template
-		<
-			std::size_t InSize_,
-			typename InT_,
-			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, true, false>()>
-		>
-		constexpr inline void Set(const EmuMath::Vector<InSize_, InT_>& to_copy_set_)
-		{
-			EmuMath::Helpers::vector_set<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
-		}
-
-		/// <summary>
-		/// <para> Sets the stored elements of this Vector to via moving respective elements in the passed Vector. </para>
-		/// <para> If to_move_set_ contains less elements than this Vector, elements in non-shared indices will not be modified. </para>
-		/// <para> If this Vector contains references, this will update what is referenced by respective references. </para>
-		/// </summary>
-		/// <param name="to_move_set_">EmuMath Vector to move stored elements from when assigning this Vector's stored elements.</param>
-		template
-		<
-			std::size_t InSize_,
-			typename InT_,
-			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, false, true>()>
-		>
-		constexpr inline void SetContainedOnly(EmuMath::Vector<InSize_, InT_>&& to_move_set_)
-		{
-			EmuMath::Helpers::vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
-		}
-
-		/// <summary>
-		/// <para> Sets the stored elements of this Vector to via moving respective elements in the passed Vector. </para>
-		/// <para> If to_move_set_ contains less elements than this Vector, elements in non-shared indices will not be modified. </para>
-		/// <para> If this Vector contains references, this will update what is referenced by respective references. </para>
-		/// </summary>
-		/// <param name="to_move_set_">EmuMath Vector to move stored elements from when assigning this Vector's stored elements.</param>
-		template
-		<
-			std::size_t InSize_,
-			typename InT_,
-			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, true, true>()>
-		>
-		constexpr inline void SetContainedOnly(const EmuMath::Vector<InSize_, InT_>&& to_move_set_)
-		{
-			EmuMath::Helpers::vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, std::move(to_move_set_));
-		}
-
-		/// <summary>
-		/// <para> Sets the stored elements of this Vector to via copying respective elements in the passed Vector. </para>
-		/// <para> If to_move_set_ contains less elements than this Vector, elements in non-shared indices will not be modified. </para>
-		/// <para> If this Vector contains references, this will update what is referenced by respective references. </para>
-		/// </summary>
-		/// <param name="to_copy_set_">EmuMath Vector to copy stored elements from when assigning this Vector's stored elements.</param>
-		template
-		<
-			std::size_t InSize_,
-			typename InT_,
-			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, false, false>()>
-		>
-		constexpr inline void SetContainedOnly(EmuMath::Vector<InSize_, InT_>& to_copy_set_)
-		{
-			EmuMath::Helpers::vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
-		}
-
-		/// <summary>
-		/// <para> Sets the stored elements of this Vector to via copying respective elements in the passed Vector. </para>
-		/// <para> If to_move_set_ contains less elements than this Vector, elements in non-shared indices will not be modified. </para>
-		/// <para> If this Vector contains references, this will update what is referenced by respective references. </para>
-		/// </summary>
-		/// <param name="to_copy_set_">EmuMath Vector to copy stored elements from when assigning this Vector's stored elements.</param>
-		template
-		<
-			std::size_t InSize_,
-			typename InT_,
-			typename = std::enable_if_t<is_valid_vector_for_set<InSize_, InT_, true, false>()>
-		>
-		constexpr inline void SetContainedOnly(const EmuMath::Vector<InSize_, InT_>& to_copy_set_)
-		{
-			EmuMath::Helpers::vector_set_contained_only<T_, Size_, InSize_, InT_>(*this, to_copy_set_);
-		}
-
-		/// <summary>
-		/// <para> Sets the stored_type at the provided Index_ within this Vector via the provided arg_. </para>
-		/// <para> If this Vector contains references, this will update what is referenced by said reference. </para>
-		/// <para> If multiple arguments are provided, this will attempt to construct the stored_type via the provided args_. </para>
-		/// </summary>
-		/// <param name="arg_">Argument to set the stored_type at the provided Index_ via.</param>
-		template
-		<
-			std::size_t Index_,
-			typename Arg_,
-			typename = std::enable_if_t<is_valid_type_for_single_set<Arg_>()>
-		>
-		constexpr inline void Set(Arg_&& arg_)
-		{
-			if constexpr (Index_ < size)
-			{
-				if constexpr (std::is_assignable_v<stored_type, Arg_>)
-				{
-					std::get<Index_>(_data) = std::forward<Arg_>(arg_);
-				}
-				else if constexpr (EmuCore::TMP::is_static_castable_v<Arg_, stored_type>)
-				{
-					std::get<Index_>(_data) = static_cast<stored_type>(arg_);
-				}
-				else if constexpr (std::is_constructible_v<stored_type, Arg_>)
-				{
-					std::get<Index_>(_data) = stored_type(std::forward<Arg_>(arg_));
-				}
-				else
-				{
-					static_assert
-					(
-						EmuCore::TMP::get_false<Arg_>(),
-						"Attempted to `Set` an Index_ within an EmuMath Vector, but the provided Arg_ cannot be used to assign, construct, or convert-to the Vector's stored_type."
-					);
-				}
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<Arg_>(),
-					"Attempted to `Set` an invalid Index_ within an EmuMath Vector."
-				);
-			}
-		}
-
-		/// <summary>
-		/// <para> Constructs a stored_type via the provided construction_args_ and sets the stored_type at the provided index via it. </para>
-		/// <para> If this Vector contains references, this will update what is referenced by said reference. </para>
-		/// </summary>
-		/// <param name="construction_args_">Arguments to construct an instance of this Vector's stored_type.</param>
-		template
-		<
-			std::size_t Index_,
-			typename...Args_,
-			typename = std::enable_if_t<(sizeof...(Args_) > 1) && std::is_constructible_v<stored_type, Args_...>>
-		>
-		constexpr inline void Set(Args_&&...construction_args_)
-		{
-			if constexpr (Index_ < size)
-			{
-				if constexpr (std::is_constructible_v<stored_type, Args_...>)
-				{
-					std::get<Index_>(_data) = stored_type(std::forward<Args_>(construction_args_)...);
-				}
-				else
-				{
-					static_assert
-					(
-						EmuCore::TMP::get_false<Args_...>(),
-						"Attempted to `Set` an Index_ within an EmuMath Vector with multiple arguments, but the stored_type cannot be constructed from the provided arguments."
-					);
-				}
-			}
-			else
-			{
-				static_assert(EmuCore::TMP::get_false<Args_...>(), "Attempted to `Set` an invalid Index_ within an EmuMath Vector.");
-			}
-		}
-
-		/// <summary>
-		/// <para> Sets all stored_types at indices in the specified range within this Vector via the provided arg_. </para>
-		/// <para> If this Vector contains references, this will update what is referenced by all references. </para>
-		/// <para> BeginIndex_ indicates the inclusive index to start setting stored elements from. This defaults to 0.</para>
-		/// <para> EndIndex_ indicates the exclusive index to stop setting stored elements at. This defaults to the size of this Vector. </para>
-		/// </summary>
-		/// <param name="arg_">Argument to set all stored_types in the specified index range within this Vector via.</param>
-		template
-		<
-			std::size_t BeginIndex_ = 0,
-			std::size_t EndIndex_ = size,
-			typename Arg_,
-			typename = std::enable_if_t<is_valid_type_for_set_all<Arg_&&>()>
-		>
-		constexpr inline void SetAll(Arg_&& arg_)
-		{
-			EmuMath::Helpers::vector_set_all<BeginIndex_, EndIndex_>(*this, std::move(arg_));
-		}
-
-		/// <summary>
-		/// <para> Sets all stored_types at indices in the specified range within this Vector via the provided arg_. </para>
-		/// <para> If this Vector contains references, this will update what is referenced by all references. </para>
-		/// <para> BeginIndex_ indicates the inclusive index to start setting stored elements from. This defaults to 0.</para>
-		/// <para> EndIndex_ indicates the exclusive index to stop setting stored elements at. This defaults to the size of this Vector. </para>
-		/// </summary>
-		/// <param name="arg_">Argument to set all stored_types in the specified index range within this Vector via.</param>
-		template
-		<
-			std::size_t BeginIndex_ = 0,
-			std::size_t EndIndex_ = size,
-			typename Arg_,
-			typename = std::enable_if_t<is_valid_type_for_set_all<Arg_&>()>
-		>
-		constexpr inline void SetAll(Arg_& arg_)
-		{
-			EmuMath::Helpers::vector_set_all<BeginIndex_, EndIndex_>(*this, arg_);
-		}
-
-		/// <summary>
-		/// <para> Sets all stored_types at indices in the specified range within this Vector via the provided arg_. </para>
-		/// <para> If this Vector contains references, this will update what is referenced by all references. </para>
-		/// <para> BeginIndex_ indicates the inclusive index to start setting stored elements from. This defaults to 0.</para>
-		/// <para> EndIndex_ indicates the exclusive index to stop setting stored elements at. This defaults to the size of this Vector. </para>
-		/// </summary>
-		/// <param name="arg_">Argument to set all stored_types in the specified index range within this Vector via.</param>
-		template
-		<
-			std::size_t BeginIndex_ = 0,
-			std::size_t EndIndex_ = size,
-			typename Arg_,
-			typename = std::enable_if_t<is_valid_type_for_set_all<const Arg_&>()>
-		>
-		constexpr inline void SetAll(const Arg_& arg_)
-		{
-			EmuMath::Helpers::vector_set_all<BeginIndex_, EndIndex_>(*this, arg_);
 		}
 #pragma endregion
 

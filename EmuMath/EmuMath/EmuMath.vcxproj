@@ -212,7 +212,6 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_mutation.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_rounds.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_rounds_constexpr.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_set.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_special_operations.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_stream_append.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_unary_arithmetic.h" />
@@ -223,7 +222,6 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_info.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_misc_arithmetic_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_mutation_underlying.h" />
-    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_set_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_special_operations_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_stream_append_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_tmp.h" />

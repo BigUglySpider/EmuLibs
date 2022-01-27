@@ -179,6 +179,12 @@ void PrintIntSequence(std::integer_sequence<T_, Indices_...>)
 	std::cout << " }";
 }
 
+template<typename...Args_>
+constexpr inline bool variadic_and_test(Args_&&...args_)
+{
+	return (... && args_);
+}
+
 int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
@@ -269,6 +275,9 @@ int main()
 
 	std::cout << some_mat_3x4f_cm_ << "\n\n";
 	std::cout << some_mat_3x4f_rm_ << "\n\n";
+
+	//constexpr bool gjdoig = EmuMath::Vector<3, float>::_is_constructible_from_only_stored_types(EmuMath::Vector<3, float>::index_sequence());
+
 
 	constexpr auto some_mat_3x4f_cm_copy_ = EmuMath::Matrix<3, 4, float, true>(some_mat_3x4f_cm_);
 	constexpr auto column_1_ = some_mat_3x4f_cm_copy_.ColumnAt<1>();
@@ -388,6 +397,8 @@ int main()
 	ref_copy_ = EmuMath::Matrix<2, 6, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
 	std::cout << "Mat:\n" << mat_to_ref_ << "\n\nRef Mat:\n" << ref_copy_ << "\n\n";
 
+	constexpr bool help_me_please_ = EmuMath::Helpers::vector_copy_assign_is_valid<3, float, const EmuMath::Vector<3, float>&>();
+
 	std::cout << "\n---\n";
 
 	constexpr auto mut_result_scalars_ = EmuMath::Helpers::matrix_mutate<EmuCore::do_add<void>, 4, 3, float, true>(1, 2);
@@ -443,6 +454,32 @@ int main()
 	std::cout << "\n---\n";
 	constexpr auto mat_from_single_vec_arg_ = EmuMath::Matrix<4, 4, float, true>(EmuMath::Vector<3, float>(1, 2, 3));
 	constexpr auto mat_from_single_scalar_arg_ = EmuMath::Matrix<4, 4, float, true>(5);
+	constexpr auto mat_from_single_major_arg_ = EmuMath::Matrix<4, 4, float, true>(EmuMath::Vector<4, float>(1, 2, 3, 4));
+	auto some_mat_to_fiddle_with_ = mat_from_single_major_arg_;
+	std::cout << some_mat_to_fiddle_with_ << "\n\n";
+	some_mat_to_fiddle_with_.ColumnAt<2>() = 3;
+	std::cout << some_mat_to_fiddle_with_ << "\n\n";
+	some_mat_to_fiddle_with_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << some_mat_to_fiddle_with_ << "\n\n";
+	some_mat_to_fiddle_with_ = EmuMath::Matrix<4, 4, float, false>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << some_mat_to_fiddle_with_ << "\n\n";
+	some_mat_to_fiddle_with_.MainDiagonal<float&>() = EmuMath::Vector<25, float>(7);
+	std::cout << some_mat_to_fiddle_with_ << "\n\n";
+
+	auto vec_to_equal_ = EmuMath::make_vector<float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << vec_to_equal_ << "\n";
+	vec_to_equal_ = decltype(vec_to_equal_)(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16);
+	std::cout << vec_to_equal_ << "\n";
+	vec_to_equal_ = vec_to_equal_ * -2.5L;
+	std::cout << vec_to_equal_ << "\n";
+
+	std::cout << "\n---\n";
+	EmuMath::Vector<4, float>::depth;
+	constexpr auto why_ = EmuMath::Vector<4, EmuMath::Vector<10, EmuMath::Vector<2, float>>>(1, 2, 3, 4);
+	constexpr auto why2_ = why_[3].at<2>()[1];
+
+	auto add_2 = [](auto val_) { return val_ + 2; };
+	std::cout << add_2(2.5) << "\n";
 
 	system("pause");
 	

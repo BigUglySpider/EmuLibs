@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_vector_TMP_H_INC_
-#define EMU_MATH_vector_TMP_H_INC_ 1
+#ifndef EMU_MATH_VECTOR_TMP_H_INC_
+#define EMU_MATH_VECTOR_TMP_H_INC_ 1
 
 #include <cstddef>
 #include "../../../../EmuCore/TMPHelpers/TypeComparators.h"
@@ -16,6 +16,18 @@ namespace EmuMath
 	using vector_internal_ref = EmuCore::DeferrableReferenceWrapper<TypeToReference_>;
 	template<typename TypeToConstReference_>
 	using vector_internal_const_ref = vector_internal_ref<const TypeToConstReference_>;
+
+	template<typename TypeToReference_>
+	[[nodiscard]] constexpr inline vector_internal_ref<TypeToReference_> make_vector_internal_ref(TypeToReference_& to_ref_)
+	{
+		return vector_internal_ref<TypeToReference_>(to_ref_);
+	}
+
+	template<typename TypeToReference_>
+	[[nodiscard]] constexpr inline vector_internal_const_ref<TypeToReference_> make_vector_internal_const_ref(const TypeToReference_& to_ref_)
+	{
+		return vector_internal_const_ref<TypeToReference_>(to_ref_);
+	}
 }
 
 namespace EmuMath::TMP
