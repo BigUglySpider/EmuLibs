@@ -371,7 +371,11 @@ namespace EmuMath::Helpers::_vector_underlying
 	template<std::size_t CopyBegin_, std::size_t CopyEnd_, std::size_t ReadOffset_, bool AllowScalarMove_, class OutVector_, class In_, std::size_t...Indices_>
 	constexpr inline void _vector_copy_assign_execution(std::index_sequence<Indices_...> indices_, OutVector_& out_, In_&& in_)
 	{
+		// We don't allow moves where a problem would occur, so silence false-positive VS warning here
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		(_vector_copy_index_in_range<Indices_, CopyBegin_, CopyEnd_, ReadOffset_, AllowScalarMove_>(out_, std::forward<In_>(in_)), ...);
+#pragma warning(pop)
 	}
 	
 	template<std::size_t CopyBegin_, std::size_t CopyEnd_, std::size_t ReadOffset_, class In_, std::size_t OutSize_, typename OutT_>

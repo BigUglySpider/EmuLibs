@@ -14,6 +14,7 @@
 #include "_vector_cmp.h"
 #include "_vector_copy.h"
 #include "_vector_get.h"
+#include "_vector_iterator.h"
 #include "_vector_misc_arithmetic.h"
 #include "_vector_mutation.h"
 #include "_vector_rounds.h"

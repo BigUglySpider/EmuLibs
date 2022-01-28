@@ -25,6 +25,15 @@ namespace EmuMath
 		using alternative_rep = typename vector_info::alternative_vector_rep;
 		friend typename alternative_rep;
 
+		/// <summary> STL-compliant random-access iterator for this Vector type. </summary>
+		using iterator = EmuMath::vector_iterator<this_type>;
+		/// <summary> STL-compliant constant random-access iterator for this Vector type. </summary>
+		using const_iterator = EmuMath::vector_const_iterator<this_type>;
+		/// <summary> STL-compliant reverse random-access iterator for this Vector type. </summary>
+		using reverse_iterator = EmuMath::vector_reverse_iterator<this_type>;
+		/// <summary> STL-compliant constant reverse random-access iterator for this Vector type. </summary>
+		using const_reverse_iterator = EmuMath::vector_const_reverse_iterator<this_type>;
+
 		/// <summary> The number of elements contained within this Vector type. </summary>
 		static constexpr std::size_t size = vector_info::size;
 		/// <summary> True if this Vector contains any kind of reference(s). </summary>
@@ -772,7 +781,7 @@ namespace EmuMath
 #pragma warning(push)
 #pragma warning(disable: 26800)
 				return data_storage_type({ _make_stored_type_from_arg<Indices_, ReadOffset_, allow_move_between_depths_>(std::forward<Arg_>(arg_))... });
-#pragma endregion
+#pragma warning(pop)
 			}
 			else
 			{
@@ -1305,6 +1314,80 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region STL_ACCESS
+	public:
+		[[nodiscard]] constexpr inline const_iterator cbegin() const
+		{
+			return const_iterator(_data.data(), 0);
+		}
+
+		[[nodiscard]] constexpr inline const_iterator cend() const
+		{
+			using diff_type = typename const_reverse_iterator::difference_type;
+			constexpr diff_type size_as_diff_ = static_cast<diff_type>(size);
+			return const_iterator(_data.data() + size, size_as_diff_);
+		}
+
+		[[nodiscard]] constexpr inline const_reverse_iterator crbegin() const
+		{
+			using diff_type = typename const_reverse_iterator::difference_type;
+			constexpr diff_type final_index_ = static_cast<diff_type>(size) - 1;
+			return const_reverse_iterator(_data.data() + final_index_, final_index_);
+		}
+
+		[[nodiscard]] constexpr inline const_reverse_iterator crend() const
+		{
+			using diff_type = typename const_reverse_iterator::difference_type;
+			constexpr diff_type minus_one_ = diff_type(-1);
+			return const_reverse_iterator(_data.data() - 1, minus_one_);
+		}
+
+		[[nodiscard]] constexpr inline iterator begin()
+		{
+			return iterator(_data.data(), 0);
+		}
+
+		[[nodiscard]] constexpr inline const_iterator begin() const
+		{
+			return cbegin();
+		}
+
+		[[nodiscard]] constexpr inline iterator end()
+		{
+			using diff_type = typename const_reverse_iterator::difference_type;
+			constexpr diff_type size_as_diff_ = static_cast<diff_type>(size);
+			return iterator(_data.data() + size, size_as_diff_);
+		}
+
+		[[nodiscard]] constexpr inline const_iterator end() const
+		{
+			return cend();
+		}
+
+		[[nodiscard]] constexpr inline reverse_iterator rbegin()
+		{
+			using diff_type = typename const_reverse_iterator::difference_type;
+			constexpr diff_type final_index_ = static_cast<diff_type>(size) - 1;
+			return reverse_iterator(_data.data() + final_index_, final_index_);
+		}
+
+		[[nodiscard]] constexpr inline const_reverse_iterator rbegin() const
+		{
+			return crbegin();
+		}
+
+		[[nodiscard]] constexpr inline reverse_iterator rend()
+		{
+			using diff_type = typename const_reverse_iterator::difference_type;
+			constexpr diff_type minus_one_ = diff_type(-1);
+			return reverse_iterator(_data.data() - 1, minus_one_);
+		}
+
+		[[nodiscard]] constexpr inline const_reverse_iterator rend() const
+		{
+			return crend();
+		}
+#pragma endregion
 
 #pragma region UNARY_ARITHMETIC_OPERATORS
 	public:

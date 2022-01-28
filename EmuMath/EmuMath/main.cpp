@@ -16,6 +16,9 @@
 // Test harness execution
 #include "Tests.hpp"
 
+// STL Testers
+#include <algorithm>
+
 template<class NoiseTable_>
 inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::string& out_name_ = "test_noise")
 {
@@ -465,99 +468,106 @@ int main()
 	EmuMath::Helpers::matrix_mutate_invoke_only<0, 4, 0, 4, false>([&count](auto& val_) { val_ = static_cast<std::remove_reference_t<decltype(val_)>>(++count); }, mat_to_increment_);
 	std::cout << mat_to_increment_ << "\n\n";
 
-	system("pause");
-	
-	auto dxm_test_ = EmuCore::TestingHelpers::matrix_test_dxm();
-	dxm_test_.Prepare();
-	dxm_test_(25);
-	auto emu_test_ = EmuCore::TestingHelpers::matrix_test_void_template();
-	emu_test_.Prepare();
-	emu_test_(25);
-	system("pause");
-	dxm_test_.print_dxm_mat(dxm_test_.out[25]);
-	std::cout << "\n\n" << emu_test_.out[25] << "\n\n";
+	std::cout << "\n---\n";
+	auto vec_a_ = EmuMath::make_vector<float>(1, 2, 3, 4);
+	auto vec_b_ = EmuMath::make_vector<float>(10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150);
+	std::cout << vec_b_ << "\n";
+	std::copy(vec_a_.begin(), vec_a_.end(), vec_b_.begin());
+	std::cout << vec_b_ << "\n";
+	std::copy(vec_a_.begin(), vec_a_.end(), vec_b_.rbegin());
+	std::cout << vec_b_ << "\n";
+	std::copy(vec_a_.crbegin(), vec_a_.crend(), vec_b_.begin());
+	std::cout << vec_b_ << "\n";
+	std::copy(vec_a_.cbegin(), vec_a_.cend(), 2 + vec_b_.rbegin());
+	std::cout << vec_b_ << "\n\n";
+
+	EmuMath::Vector<4, float&> b_ref_(vec_b_.at<1>(), vec_b_.at<3>(), vec_b_.at<4>(), vec_b_.at<12>());
+	std::cout << vec_b_ << " | " << b_ref_ << "\n\n";
+	std::copy(vec_a_.begin(), vec_a_.end(), b_ref_.begin());
+	std::cout << vec_b_ << " | " << b_ref_ << "\n\n";
+
 
 	system("pause");
 
 	// ##### SCALAR vs SIMD NOISE #####
-	constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
-	constexpr std::size_t test_noise_dimensions = 3;
-	constexpr auto sample_count = EmuMath::make_vector<std::size_t>(1024, 1024, 1);
-	constexpr bool use_fractal = true;
-	using scalar_test_noise_processor = EmuMath::Functors::noise_sample_processor_perlin_normalise<test_noise_dimensions>;
-	using fast_test_noise_processor = EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<test_noise_dimensions>;
-	
-	constexpr std::size_t num_iterations = 1;
-	std::vector<EmuMath::NoiseTable<test_noise_dimensions, float>> noise_;
-	std::vector<EmuMath::FastNoiseTable<test_noise_dimensions, 0>> fast_noise_;
-	noise_.resize(num_iterations, decltype(noise_)::value_type());
-	fast_noise_.resize(num_iterations, decltype(fast_noise_)::value_type());
-
-	constexpr std::size_t noise_num_perms = 4096;
-	constexpr EmuMath::Info::NoisePermutationShuffleMode noise_perm_shuffle_mode = EmuMath::Info::NoisePermutationShuffleMode::SEED_32;
-	constexpr bool noise_perm_bool_input = true;
-	constexpr EmuMath::Info::NoisePermutationInfo::seed_32_type noise_perm_seed_32 = 1337;
-	constexpr EmuMath::Info::NoisePermutationInfo::seed_64_type noise_perm_seed_64 = 1337;
-	
-	system("pause");
-	for (std::size_t i = 0; i < num_iterations; ++i)
-	{
-		std::cout << "\nNOISE BATCH " << i << "\n";
-		timer_.Restart();
-		noise_[i].GenerateNoise<test_noise_type_flag, scalar_test_noise_processor>
-		(
-			decltype(noise_)::value_type::MakeOptions
-			(
-				sample_count,
-				EmuMath::Vector<test_noise_dimensions, float>(0.0f),
-				EmuMath::Vector<test_noise_dimensions, float>(1.0f / 1024.0f),
-				3.0f,
-				true,
-				use_fractal,
-				EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
-				EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
-			)
-		);
-		timer_.Pause();
-		std::cout << "FINISHED SCALAR NOISE IN: " << timer_.GetMilli() << "ms\n";
-	
-	
-		timer_.Restart();
-		fast_noise_[i].GenerateNoise<test_noise_type_flag, fast_test_noise_processor>
-		(
-			decltype(fast_noise_)::value_type::make_options
-			(
-				sample_count,
-				EmuMath::Vector<test_noise_dimensions, float>(0.0f),
-				EmuMath::Vector<test_noise_dimensions, float>(1.0f / 1024.0f),
-				3.0f,
-				true,
-				use_fractal,
-				EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
-				EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
-			)
-		);
-		timer_.Pause();
-		std::cout << "FINISHED FAST NOISE IN: " << timer_.GetMilli() << "ms\n";
-	}
-
-	EmuMath::Gradient<float> gradient_colours_;
-	gradient_colours_.AddClampedColourAnchor(0.0f, EmuMath::Colours::Blue());
-	gradient_colours_.AddClampedColourAnchor(0.35f, EmuMath::Colours::Blue());
-	gradient_colours_.AddClampedColourAnchor(0.45f, EmuMath::Colours::White());
-	gradient_colours_.AddClampedColourAnchor(0.5f, EmuMath::Colours::Black());
-	gradient_colours_.AddClampedColourAnchor(0.65f, EmuMath::Colours::Yellow());
-	gradient_colours_.AddClampedColourAnchor(0.85f, EmuMath::Colours::Green());
-	gradient_colours_.AddClampedColourAnchor(1.0f, EmuMath::Colours::Red());
-
-	EmuMath::Gradient<std::uint8_t> gradient_grayscale_;
-	gradient_colours_.AddClampedColourAnchor(0.0f, EmuMath::Colours::Black<std::uint8_t>());
-	gradient_colours_.AddClampedColourAnchor(1.0f, EmuMath::Colours::White<std::uint8_t>());
-
-	auto& noise_gradient_ = gradient_colours_;
-
-	WriteNoiseTableToPPM(noise_, noise_gradient_, "test_noise_scalar");
-	WriteNoiseTableToPPM(fast_noise_, noise_gradient_, "test_noise_simd");
+	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
+	//constexpr std::size_t test_noise_dimensions = 3;
+	//constexpr auto sample_count = EmuMath::make_vector<std::size_t>(1024, 1024, 1);
+	//constexpr bool use_fractal = true;
+	//using scalar_test_noise_processor = EmuMath::Functors::noise_sample_processor_perlin_normalise<test_noise_dimensions>;
+	//using fast_test_noise_processor = EmuMath::Functors::fast_noise_sample_processor_perlin_normalise<test_noise_dimensions>;
+	//
+	//constexpr std::size_t num_iterations = 1;
+	//std::vector<EmuMath::NoiseTable<test_noise_dimensions, float>> noise_;
+	//std::vector<EmuMath::FastNoiseTable<test_noise_dimensions, 0>> fast_noise_;
+	//noise_.resize(num_iterations, decltype(noise_)::value_type());
+	//fast_noise_.resize(num_iterations, decltype(fast_noise_)::value_type());
+	//
+	//constexpr std::size_t noise_num_perms = 4096;
+	//constexpr EmuMath::Info::NoisePermutationShuffleMode noise_perm_shuffle_mode = EmuMath::Info::NoisePermutationShuffleMode::SEED_32;
+	//constexpr bool noise_perm_bool_input = true;
+	//constexpr EmuMath::Info::NoisePermutationInfo::seed_32_type noise_perm_seed_32 = 1337;
+	//constexpr EmuMath::Info::NoisePermutationInfo::seed_64_type noise_perm_seed_64 = 1337;
+	//
+	//system("pause");
+	//for (std::size_t i = 0; i < num_iterations; ++i)
+	//{
+	//	std::cout << "\nNOISE BATCH " << i << "\n";
+	//	timer_.Restart();
+	//	noise_[i].GenerateNoise<test_noise_type_flag, scalar_test_noise_processor>
+	//	(
+	//		decltype(noise_)::value_type::MakeOptions
+	//		(
+	//			sample_count,
+	//			EmuMath::Vector<test_noise_dimensions, float>(0.0f),
+	//			EmuMath::Vector<test_noise_dimensions, float>(1.0f / 1024.0f),
+	//			3.0f,
+	//			true,
+	//			use_fractal,
+	//			EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
+	//			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+	//		)
+	//	);
+	//	timer_.Pause();
+	//	std::cout << "FINISHED SCALAR NOISE IN: " << timer_.GetMilli() << "ms\n";
+	//
+	//
+	//	timer_.Restart();
+	//	fast_noise_[i].GenerateNoise<test_noise_type_flag, fast_test_noise_processor>
+	//	(
+	//		decltype(fast_noise_)::value_type::make_options
+	//		(
+	//			sample_count,
+	//			EmuMath::Vector<test_noise_dimensions, float>(0.0f),
+	//			EmuMath::Vector<test_noise_dimensions, float>(1.0f / 1024.0f),
+	//			3.0f,
+	//			true,
+	//			use_fractal,
+	//			EmuMath::Info::NoisePermutationInfo(noise_num_perms, noise_perm_shuffle_mode, noise_perm_bool_input, noise_perm_seed_32, noise_perm_seed_64),
+	//			EmuMath::Info::FractalNoiseInfo<float>(6, 2.0f, 0.5f)
+	//		)
+	//	);
+	//	timer_.Pause();
+	//	std::cout << "FINISHED FAST NOISE IN: " << timer_.GetMilli() << "ms\n";
+	//}
+	//
+	//EmuMath::Gradient<float> gradient_colours_;
+	//gradient_colours_.AddClampedColourAnchor(0.0f, EmuMath::Colours::Blue());
+	//gradient_colours_.AddClampedColourAnchor(0.35f, EmuMath::Colours::Blue());
+	//gradient_colours_.AddClampedColourAnchor(0.45f, EmuMath::Colours::White());
+	//gradient_colours_.AddClampedColourAnchor(0.5f, EmuMath::Colours::Black());
+	//gradient_colours_.AddClampedColourAnchor(0.65f, EmuMath::Colours::Yellow());
+	//gradient_colours_.AddClampedColourAnchor(0.85f, EmuMath::Colours::Green());
+	//gradient_colours_.AddClampedColourAnchor(1.0f, EmuMath::Colours::Red());
+	//
+	//EmuMath::Gradient<std::uint8_t> gradient_grayscale_;
+	//gradient_colours_.AddClampedColourAnchor(0.0f, EmuMath::Colours::Black<std::uint8_t>());
+	//gradient_colours_.AddClampedColourAnchor(1.0f, EmuMath::Colours::White<std::uint8_t>());
+	//
+	//auto& noise_gradient_ = gradient_colours_;
+	//
+	//WriteNoiseTableToPPM(noise_, noise_gradient_, "test_noise_scalar");
+	//WriteNoiseTableToPPM(fast_noise_, noise_gradient_, "test_noise_simd");
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");

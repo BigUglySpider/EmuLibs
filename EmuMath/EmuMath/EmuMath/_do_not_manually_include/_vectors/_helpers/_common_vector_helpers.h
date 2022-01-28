@@ -6,6 +6,7 @@
 #include "../_underlying_helpers/_vector_copy_underlying.h"
 #include "../_underlying_helpers/_vector_get_underlying.h"
 #include "../_underlying_helpers/_vector_info.h"
+#include "../_underlying_helpers/_vector_iterator_underlying.h"
 #include "../_underlying_helpers/_vector_misc_arithmetic_underlying.h"
 #include "../_underlying_helpers/_vector_mutation_underlying.h"
 #include "../_underlying_helpers/_vector_special_operations_underlying.h"
