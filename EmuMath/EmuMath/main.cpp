@@ -1,4 +1,4 @@
-// Helpeful Functors
+// Helpful Functors
 #include "EmuCore/Functors/Analytics.h"
 
 // Timing
@@ -15,9 +15,6 @@
 
 // Test harness execution
 #include "Tests.hpp"
-
-// STL Testers
-#include <algorithm>
 
 template<class NoiseTable_>
 inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::string& out_name_ = "test_noise")
@@ -400,8 +397,6 @@ int main()
 	ref_copy_ = EmuMath::Matrix<2, 6, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
 	std::cout << "Mat:\n" << mat_to_ref_ << "\n\nRef Mat:\n" << ref_copy_ << "\n\n";
 
-	constexpr bool help_me_please_ = EmuMath::Helpers::vector_copy_assign_is_valid<3, float, const EmuMath::Vector<3, float>&>();
-
 	std::cout << "\n---\n";
 
 	constexpr auto mut_result_scalars_ = EmuMath::Helpers::matrix_mutate<EmuCore::do_add, 4, 3, float, true>(1, 2);
@@ -429,12 +424,6 @@ int main()
 		1
 	);
 	std::cout << runtime_to_mutate_ << "\n\n";
-	//EmuMath::Helpers::matrix_mutate_to<EmuCore::do_multiply<void>>
-	//(
-	//	runtime_to_mutate_,
-	//	0.5f,
-	//	EmuMath::Matrix<3, 3, double, false>(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	//);
 	std::cout << runtime_to_mutate_ << "\n\n";
 
 	std::cout << "\n---\n";
@@ -469,22 +458,6 @@ int main()
 	std::cout << mat_to_increment_ << "\n\n";
 
 	std::cout << "\n---\n";
-	auto vec_a_ = EmuMath::make_vector<float>(1, 2, 3, 4);
-	auto vec_b_ = EmuMath::make_vector<float>(10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150);
-	std::cout << vec_b_ << "\n";
-	std::copy(vec_a_.begin(), vec_a_.end(), vec_b_.begin());
-	std::cout << vec_b_ << "\n";
-	std::copy(vec_a_.begin(), vec_a_.end(), vec_b_.rbegin());
-	std::cout << vec_b_ << "\n";
-	std::copy(vec_a_.crbegin(), vec_a_.crend(), vec_b_.begin());
-	std::cout << vec_b_ << "\n";
-	std::copy(vec_a_.cbegin(), vec_a_.cend(), 2 + vec_b_.rbegin());
-	std::cout << vec_b_ << "\n\n";
-
-	EmuMath::Vector<4, float&> b_ref_(vec_b_.at<1>(), vec_b_.at<3>(), vec_b_.at<4>(), vec_b_.at<12>());
-	std::cout << vec_b_ << " | " << b_ref_ << "\n\n";
-	std::copy(vec_a_.begin(), vec_a_.end(), b_ref_.begin());
-	std::cout << vec_b_ << " | " << b_ref_ << "\n\n";
 
 
 	system("pause");
