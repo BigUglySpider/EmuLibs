@@ -465,6 +465,21 @@ int main()
 	constexpr auto add_res_2_ = to_add_range_.AddRange<3, 5, 0, 5, 5, 5, float, true>(EmuMath::Matrix<5, 5, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25));
 	constexpr auto add_res_3_ = to_add_range_.AddRange<3, 5, 0, 5, 5, 5, float, true>(EmuMath::Matrix<5, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20));
 
+	std::cout << "\n---\n";
+	auto another_mat_for_adds_ = EmuMath::Matrix<3, 3, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9);
+	auto mat_to_assign_to_cm_ = EmuMath::Matrix<5, 5, float, true>();
+	auto mat_to_assign_to_rm_ = EmuMath::Matrix<5, 5, float, false>();
+	std::cout << another_mat_for_adds_ << "\n\n";
+	std::cout << "(TEMP ADD RESULT - NO ASSIGN):\n" << another_mat_for_adds_.AddRangeNoCopy<1, 2, 0, 3, 5, 7, std::uint32_t, false>(20) << "\n\n";
+	another_mat_for_adds_.Add(mat_to_assign_to_cm_, 250);
+	std::cout << mat_to_assign_to_cm_ << "\n\n";
+	another_mat_for_adds_.AddRange<1, 2, 1, 2>(mat_to_assign_to_cm_, another_mat_for_adds_);
+	std::cout << mat_to_assign_to_cm_ << "\n\n";
+
+	mat_to_assign_to_cm_ = decltype(mat_to_assign_to_cm_)(-1);
+	another_mat_for_adds_.AddRangeNoCopy<1, 2, 1, 2>(mat_to_assign_to_cm_, another_mat_for_adds_);
+	std::cout << mat_to_assign_to_cm_ << "\n\n";
+
 	// ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
 	//constexpr std::size_t test_noise_dimensions = 3;
