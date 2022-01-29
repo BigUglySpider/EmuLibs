@@ -45,8 +45,9 @@ Contains a lot of helpers under the `EmuMath::Helpers` namespace, and encapsulat
    - Provides a selection of common Vector functionalities, but by no means all of them.
       - The list includes (but is not limited to) cross product, dot product, normalisation, magnitude calculation, and reflection via a normal describing a surface.
    - Any Vector type can be cast to another Vector type if the contained type is compatible.
-   - A Vector can contain references (e.g. `Vector<float&>`); these references may be updated to reference something else, but this functionality is not set in stone.
-      - Allowing Vectors of references *is* set in stone, however.
+   - A Vector can contain references (e.g. `Vector<float&>`); ~~these references may be updated to reference something else, but this functionality is not set in stone.~~
+      - ~~Allowing Vectors of references *is* set in stone, however.~~
+      - Without using C++ in ways that are almost certainly undefined (or at the very least, extremely inadvisable), there is no way to change what a Vector references. This is in line with how normal references behave in C++, enforces an extra layer of safety, and is built in a way to prevent nullable references (although there are some nefarious things user may do to initialise a Vector of at least 1 null reference; this will be handled at some point).
 
 ---
 
