@@ -804,7 +804,7 @@ namespace EmuMath::Helpers::_vector_underlying
 			// Copy 0:mutation_begin
 			if constexpr (BeginIndex_ > 0)
 			{
-				_vector_copy<0, BeginIndex_, 0, InVector_>(out_vector_, in_vector_);
+				_vector_copy<0, BeginIndex_, 0>(out_vector_, std::forward<InVector_>(in_vector_));
 			}
 
 			// Copy in mutated values
@@ -817,7 +817,7 @@ namespace EmuMath::Helpers::_vector_underlying
 			// Copy EndIndex_:size values if there's anything left
 			if constexpr (EndIndex_ < out_vector_uq::size)
 			{
-				_vector_copy<EndIndex_, out_vector_uq::size, EndIndex_, InVector_>(out_vector_, in_vector_);
+				_vector_copy<EndIndex_, out_vector_uq::size, EndIndex_, InVector_>(out_vector_, std::forward<InVector_>(in_vector_));
 			}
 		}
 		else

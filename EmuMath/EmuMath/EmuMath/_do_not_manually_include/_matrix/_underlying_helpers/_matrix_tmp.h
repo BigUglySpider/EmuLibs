@@ -587,7 +587,7 @@ namespace EmuMath::TMP
 
 	template<class Matrix_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
 	struct make_matrix_index_sequences
-		<
+	<
 		Matrix_,
 		std::index_sequence<ColumnIndices_...>,
 		std::index_sequence<RowIndices_...>,
@@ -635,6 +635,80 @@ namespace EmuMath::TMP
 		};
 
 		using _maker = _maker_template<Matrix_>;
+
+	public:
+		using column_index_sequence = typename _maker::column_index_sequence;
+		using row_index_sequence = typename _maker::row_index_sequence;
+	};
+
+	template<std::size_t ColumnBeginIndex_, std::size_t ColumnEndIndex_, std::size_t RowBeginIndex_, std::size_t RowEndIndex_, bool ColumnMajor_>
+	struct make_ranged_matrix_index_sequences
+	{
+	private:
+		template<std::size_t ColumnBegin_, std::size_t ColumnEnd_, std::size_t RowBegin_, std::size_t RowEnd_>
+		[[nodiscard]] static constexpr inline bool _valid_index_range()
+		{
+			return (ColumnBegin_ < ColumnEnd_) && (RowBegin_ < RowEnd_);
+		}
+
+		template
+		<
+			std::size_t ColumnBegin_,
+			std::size_t ColumnEnd_,
+			std::size_t RowBegin_,
+			std::size_t RowEnd_,
+			bool Valid_ = _valid_index_range<ColumnBegin_, ColumnEnd_, RowBegin_, RowEnd_>()
+		>
+		struct _maker_template
+		{
+			static constexpr bool is_valid = false;
+			using column_index_sequence = std::index_sequence<>;
+			using row_index_sequence = std::index_sequence<>;
+		};
+
+		template<std::size_t ColumnBegin_, std::size_t ColumnEnd_, std::size_t RowBegin_, std::size_t RowEnd_>
+		struct _maker_template<ColumnBegin_, ColumnEnd_, RowBegin_, RowEnd_, true>
+		{
+		private:
+			template<class ColumnIndices_, class RowIndices_, bool IsColumnMajor_>
+			struct _underlying_maker_template
+			{
+				using column_index_sequence = std::index_sequence<>;
+				using row_index_sequence = std::index_sequence<>;
+			};
+
+			template<std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+			struct _underlying_maker_template<std::index_sequence<ColumnIndices_...>, std::index_sequence<RowIndices_...>, true>
+			{
+				using column_index_sequence = typename EmuCore::TMP::variadic_splice_integer_sequences
+				<
+					EmuCore::TMP::make_duplicated_index_sequence<ColumnIndices_, sizeof...(RowIndices_)>...
+				>::type;
+				using row_index_sequence = typename EmuCore::TMP::looped_integer_sequence<std::index_sequence<RowIndices_...>, sizeof...(ColumnIndices_) - 1>::type;
+			};
+
+			template<std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+			struct _underlying_maker_template<std::index_sequence<ColumnIndices_...>, std::index_sequence<RowIndices_...>, false>
+			{
+				using column_index_sequence = typename EmuCore::TMP::looped_integer_sequence<std::index_sequence<ColumnIndices_...>, sizeof...(RowIndices_) - 1>::type;
+				using row_index_sequence = typename EmuCore::TMP::variadic_splice_integer_sequences
+				<
+					EmuCore::TMP::make_duplicated_index_sequence<RowIndices_, sizeof...(ColumnIndices_)>...
+				>::type;
+			};
+
+			using _base_column_indices = EmuCore::TMP::make_offset_index_sequence<ColumnBegin_, ColumnEnd_ - ColumnBegin_>;
+			using _base_row_indices = EmuCore::TMP::make_offset_index_sequence<RowBegin_, RowEnd_ - RowBegin_>;
+
+			using _underlying_maker = _underlying_maker_template<_base_column_indices, _base_row_indices, ColumnMajor_>;
+
+		public:
+			static constexpr bool is_valid = true;
+			using column_index_sequence = typename _underlying_maker::column_index_sequence;
+			using row_index_sequence = typename _underlying_maker::row_index_sequence;
+		};
+
+		using _maker = _maker_template<ColumnBeginIndex_, ColumnEndIndex_, RowBeginIndex_, RowEndIndex_>;
 
 	public:
 		using column_index_sequence = typename _maker::column_index_sequence;
