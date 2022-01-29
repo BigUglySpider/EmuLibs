@@ -296,17 +296,17 @@ namespace EmuCore::TestingHelpers
 			out[i]._12 = in_a[i]._12 + in_b[i]._12;
 			out[i]._13 = in_a[i]._13 + in_b[i]._13;
 			out[i]._14 = in_a[i]._14 + in_b[i]._14;
-
+			
 			out[i]._21 = in_a[i]._21 + in_b[i]._21;
 			out[i]._22 = in_a[i]._22 + in_b[i]._22;
 			out[i]._23 = in_a[i]._23 + in_b[i]._23;
 			out[i]._24 = in_a[i]._24 + in_b[i]._24;
-
+			
 			out[i]._31 = in_a[i]._31 + in_b[i]._31;
 			out[i]._32 = in_a[i]._32 + in_b[i]._32;
 			out[i]._33 = in_a[i]._33 + in_b[i]._33;
 			out[i]._34 = in_a[i]._34 + in_b[i]._34;
-
+			
 			out[i]._41 = in_a[i]._41 + in_b[i]._41;
 			out[i]._42 = in_a[i]._42 + in_b[i]._42;
 			out[i]._43 = in_a[i]._43 + in_b[i]._43;
@@ -439,7 +439,7 @@ namespace EmuCore::TestingHelpers
 
 		static constexpr std::size_t num_columns = 4;
 		static constexpr std::size_t num_rows = 4;
-		static constexpr bool column_major = true;
+		static constexpr bool column_major = false; // Just to appear identically to dxm in terms of where our random args are
 		using t_arg = float;
 		using out_type = EmuMath::Matrix<num_columns, num_rows, t_arg, column_major>;
 		using in_a_type = out_type;
@@ -465,12 +465,13 @@ namespace EmuCore::TestingHelpers
 			{
 				//in_a.push_back(in_a_type(in_a_type_column_major(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)));
 				in_a.push_back(make_random_matrix<in_a_type>(rng_));
-				in_b.push_back(rng_._rng.NextReal<in_b_type>());
+				in_b.push_back(in_b_type(rng_._rng.NextReal<float>()));
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			EmuMath::Helpers::matrix_mutate_to(out[i], EmuCore::do_add<void>(), in_a[i], in_b[i]);
+			//EmuMath::Helpers::matrix_mutate_to(out[i], EmuCore::do_add<void>(), in_a[i], in_b[i]);
+			out[i] = in_a[i] + in_b[i];
 		}
 		void OnTestsOver()
 		{

@@ -18,13 +18,6 @@ namespace EmuMath::Helpers::_vector_underlying
 		static constexpr bool _is_const = std::is_const_v<Vector_>;
 		using _stored_type = typename EmuCore::TMP::conditional_const<_is_const, typename _vector_type::stored_type>::type;
 
-		/// <summary> Constructor that may only be invoked by the Vector that this iterator is for. </summary>
-		/// <param name="val_pointer_">: Pointer to the item that this iterator points to.</param>
-		/// <param name="index_">: Index of the pointed-to element. If this is for end, it should be size. If it is for reverse end, it should be -1.</param>
-		constexpr inline _vector_iterator_underlying(_stored_type* val_pointer_, std::size_t index_) noexcept : _p_item(val_pointer_), _index(index_)
-		{
-		}
-
 	public:
 		using this_type = EmuMath::Helpers::_vector_underlying::_vector_iterator_underlying<Vector_, Reverse_>;
 
@@ -35,6 +28,15 @@ namespace EmuMath::Helpers::_vector_underlying
 		using difference_type = std::ptrdiff_t;
 
 #pragma region CONSTRUCTORS
+	private:
+		/// <summary> Constructor that may only be invoked by the Vector that this iterator is for. </summary>
+		/// <param name="val_pointer_">: Pointer to the item that this iterator points to.</param>
+		/// <param name="index_">: Index of the pointed-to element. If this is for end, it should be size. If it is for reverse end, it should be -1.</param>
+		constexpr inline _vector_iterator_underlying(_stored_type* val_pointer_, difference_type index_) noexcept : _p_item(val_pointer_), _index(index_)
+		{
+		}
+
+	public:
 		/// <summary> Default constructor which creates an invalid iterator. </summary>
 		_vector_iterator_underlying() : _p_item(nullptr), _index(std::numeric_limits<difference_type>::lowest())
 		{
@@ -52,53 +54,32 @@ namespace EmuMath::Helpers::_vector_underlying
 #pragma region ACCESS
 		[[nodiscard]] constexpr inline reference operator*()
 		{
-			if constexpr (_vector_type::contains_ref)
-			{
-				return (*_p_item).get();
-			}
-			else
-			{
-				return *_p_item;
-			}
+			return _dereference_pointer();
 		}
 
 		[[nodiscard]] constexpr inline const reference operator*() const
 		{
-			return const_cast<this_type*>(this)->operator*();
+			return _dereference_pointer();
 		}
 
 		[[nodiscard]] constexpr inline pointer operator->()
 		{
-			if constexpr (_vector_type::contains_ref)
-			{
-				return &(_p_item->get());
-			}
-			else
-			{
-				return _p_item;
-			}
+			return _value_address();
 		}
 
 		[[nodiscard]] constexpr inline const pointer operator->() const
 		{
-			return const_cast<this_type*>(this)->operator->();
+			return _value_address();
 		}
 
 		[[nodiscard]] constexpr inline reference operator[](difference_type offset_)
 		{
-			if constexpr (Reverse_)
-			{
-				return *(_p_item - offset_);
-			}
-			else
-			{
-				return *(_p_item + offset_);
-			}
+			return _dereference_pointer(offset_);
 		}
 
 		[[nodiscard]] constexpr inline const reference operator[](difference_type offset_) const
 		{
-			return const_cast<this_type*>(this)->operator[](offset_);
+			return _dereference_pointer(offset_);
 		}
 #pragma endregion
 
@@ -117,11 +98,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		{
 			if constexpr (Reverse_)
 			{
-				return rhs_._p_item > _p_item;
+				return rhs_._index > _index;
 			}
 			else
 			{
-				return _p_item > rhs_._p_item;
+				return _index > rhs_._index;
 			}
 		}
 
@@ -129,11 +110,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		{
 			if constexpr (Reverse_)
 			{
-				return rhs_._p_item < _p_item;
+				return rhs_._index < _index;
 			}
 			else
 			{
-				return _p_item < rhs_._p_item;
+				return _index < rhs_._index;
 			}
 		}
 
@@ -141,11 +122,11 @@ namespace EmuMath::Helpers::_vector_underlying
 		{
 			if constexpr (Reverse_)
 			{
-				return rhs_._p_item >= _p_item;
+				return rhs_._index >= _index;
 			}
 			else
 			{
-				return _p_item >= rhs_._p_item;
+				return _index >= rhs_._index;
 			}
 		}
 
@@ -153,7 +134,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		{
 			if constexpr (Reverse_)
 			{
-				return rhs_._p_item <= _p_item;
+				return rhs_._index <= _index;
 			}
 			else
 			{
@@ -197,7 +178,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		constexpr inline this_type operator++(int) noexcept
 		{
 			this_type out_(_p_item);
-			this->operator++();
+			operator++();
 			return out_;
 		}
 
@@ -219,7 +200,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		constexpr inline this_type operator--(int) noexcept
 		{
 			this_type out_(_p_item);
-			this->operator--();
+			operator--();
 			return out_;
 		}
 
@@ -291,6 +272,102 @@ namespace EmuMath::Helpers::_vector_underlying
 #pragma endregion
 
 	private:
+		[[nodiscard]] constexpr inline reference _dereference_pointer()
+		{
+			if constexpr (_vector_type::contains_ref)
+			{
+				return (*_p_item).get();
+			}
+			else
+			{
+				return *_p_item;
+			}
+		}
+
+		[[nodiscard]] constexpr inline const reference _dereference_pointer() const
+		{
+			if constexpr (_vector_type::contains_ref)
+			{
+				return (*_p_item).get();
+			}
+			else
+			{
+				return *_p_item;
+			}
+		}
+
+		[[nodiscard]] constexpr inline _stored_type* _offset_stored_pointer(difference_type offset_)
+		{
+			if constexpr (Reverse_)
+			{
+				return _p_item - offset_;
+			}
+			else
+			{
+				return _p_item + offset_;
+			}
+		}
+
+		[[nodiscard]] constexpr inline const _stored_type* _offset_stored_pointer(difference_type offset_) const
+		{
+			if constexpr (Reverse_)
+			{
+				return _p_item - offset_;
+			}
+			else
+			{
+				return _p_item + offset_;
+			}
+		}
+
+		[[nodiscard]] constexpr inline reference _dereference_pointer(difference_type offset_)
+		{
+			if constexpr (_vector_type::contains_ref)
+			{
+				return (*_offset_stored_pointer(offset_)).get();
+			}
+			else
+			{
+				return *_offset_stored_pointer(offset_);
+			}
+		}
+
+		[[nodiscard]] constexpr inline reference _dereference_pointer(difference_type offset_) const
+		{
+			if constexpr (_vector_type::contains_ref)
+			{
+				return (*_offset_stored_pointer(offset_)).get();
+			}
+			else
+			{
+				return *_offset_stored_pointer(offset_);
+			}
+		}
+
+		[[nodiscard]] constexpr inline pointer _value_address()
+		{
+			if constexpr (_vector_type::contains_ref)
+			{
+				return &(*_p_item).get();
+			}
+			else
+			{
+				return _p_item;
+			}
+		}
+
+		[[nodiscard]] constexpr inline const pointer _value_address() const
+		{
+			if constexpr (_vector_type::contains_ref)
+			{
+				return &(*_p_item).get();
+			}
+			else
+			{
+				return _p_item;
+			}
+		}
+
 		_stored_type* _p_item;
 		difference_type _index;
 	};

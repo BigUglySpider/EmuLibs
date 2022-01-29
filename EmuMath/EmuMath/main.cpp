@@ -444,23 +444,26 @@ int main()
 	std::cout << another_runtime_mat_ << "\n\n";
 
 	std::cout << "\n---\n";
-	auto mat_to_increment_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-	std::cout << mat_to_increment_ << "\n\n";
-	EmuMath::Helpers::matrix_mutate_invoke_only<EmuCore::do_pre_increment, 0, 4, 0, 4, true>(mat_to_increment_);
-	std::cout << mat_to_increment_ << "\n\n";
-	EmuMath::Helpers::matrix_mutate_invoke_only<EmuCore::do_post_increment, 1, 3, 1, 3, false>(mat_to_increment_);
-	std::cout << mat_to_increment_ << "\n\n";
-	std::size_t count = 0;
-	EmuMath::Helpers::matrix_mutate_invoke_only<0, 4, 0, 4, true>([&count](auto& val_) { val_ = static_cast<std::remove_reference_t<decltype(val_)>>(++count); }, mat_to_increment_);
-	std::cout << mat_to_increment_ << "\n\n";
-	count = 0;
-	EmuMath::Helpers::matrix_mutate_invoke_only<0, 4, 0, 4, false>([&count](auto& val_) { val_ = static_cast<std::remove_reference_t<decltype(val_)>>(++count); }, mat_to_increment_);
-	std::cout << mat_to_increment_ << "\n\n";
+	EmuMath::Matrix<4, 4, float, true> to_add_assign_(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << to_add_assign_ << "\n\n";
+	to_add_assign_.AddAssign(5);
+	std::cout << to_add_assign_ << "\n\n";
+	to_add_assign_.AddAssign<false>(-5);
+	std::cout << to_add_assign_ << "\n\n";
+	to_add_assign_.AddAssignRange<1, 3, 1, 3>(to_add_assign_);
+	std::cout << to_add_assign_ << "\n\n";
 
 	std::cout << "\n---\n";
+	constexpr EmuMath::Matrix<4, 4, float, true> to_add_range_(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << to_add_range_.AddRange<0, 4, 2, 4>(5) << "\n\n";
+	std::cout << to_add_range_.AddRange<1, 3, 1, 3, long double, false>(0.5f) << "\n\n";
+	std::cout << to_add_range_.AddRange<3, 5, 0, 5, 5, 5, float, true>(EmuMath::Matrix<5, 5, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25)) << "\n\n";
+	std::cout << to_add_range_.AddRange<3, 5, 0, 5, 5, 5, float, true>(EmuMath::Matrix<5, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)) << "\n\n";
 
-
-	system("pause");
+	constexpr auto add_res_0_ = to_add_range_.AddRange<0, 4, 2, 4>(5);
+	constexpr auto add_res_1_ = to_add_range_.AddRange<1, 3, 1, 3, long double, false>(0.5f);
+	constexpr auto add_res_2_ = to_add_range_.AddRange<3, 5, 0, 5, 5, 5, float, true>(EmuMath::Matrix<5, 5, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25));
+	constexpr auto add_res_3_ = to_add_range_.AddRange<3, 5, 0, 5, 5, 5, float, true>(EmuMath::Matrix<5, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20));
 
 	// ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
