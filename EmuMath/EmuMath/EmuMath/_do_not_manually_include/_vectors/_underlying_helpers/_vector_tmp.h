@@ -12,22 +12,140 @@ namespace EmuMath
 	template<std::size_t Size_, typename T_>
 	struct Vector;
 
+#pragma region INTERNAL_REFERENCES
+	/// <summary> Type used to store references inside of EmuMath Vectors and, by extension, anything whose underlying storage is an EmuMath Vector. </summary>
+	/// <typeparam name="TypeToReference_">: Exact type to be referenced, including const state.</typeparam>
 	template<typename TypeToReference_>
 	using vector_internal_ref = EmuCore::DeferrableReferenceWrapper<TypeToReference_>;
+	/// <summary> Type used to store const references inside of EmuMath Vectors. Same as vector_internal_ref, but const will always be added to the type to reference. </summary>
+	/// <typeparam name="TypeToConstReference_">: Type to be referenced. Const will always be applied to this type.</typeparam>
 	template<typename TypeToConstReference_>
 	using vector_internal_const_ref = vector_internal_ref<const TypeToConstReference_>;
 
-	template<typename TypeToReference_>
+	/// <summary> Wraps the passed reference in a vector_internal_ref. </summary>
+	/// <param name="to_ref_">: Reference to wrap as a vector_internal_ref.</param>
+	/// <returns>Passed reference to_ref_ wrapped as a vector_internal_ref of the related type.</returns>
+	template
+		<
+		typename TypeToReference_,
+		typename = std::enable_if_t
+		<
+			!EmuCore::TMP::is_instance_of_typeparams_only_v<TypeToReference_, std::reference_wrapper> &&
+			!EmuCore::TMP::is_instance_of_typeparams_only_v<TypeToReference_, vector_internal_ref>
+		>
+	>
 	[[nodiscard]] constexpr inline vector_internal_ref<TypeToReference_> make_vector_internal_ref(TypeToReference_& to_ref_)
 	{
 		return vector_internal_ref<TypeToReference_>(to_ref_);
 	}
 
+	/// <summary> Wraps the passed std-wrapped reference in a vector_internal_ref. </summary>
+	/// <param name="to_ref_">: Reference to wrap as a vector_internal_ref.</param>
+	/// <returns>Passed reference to_ref_ wrapped as a vector_internal_ref of the related type.</returns>
 	template<typename TypeToReference_>
+	[[nodiscard]] constexpr inline vector_internal_ref<TypeToReference_> make_vector_internal_ref(std::reference_wrapper<TypeToReference_>&& std_ref_)
+	{
+		return vector_internal_ref<TypeToReference_>(std_ref_.get());
+	}
+
+	template<typename TypeToReference_>
+	[[nodiscard]] constexpr inline vector_internal_ref<TypeToReference_> make_vector_internal_ref(std::reference_wrapper<TypeToReference_>& std_ref_)
+	{
+		return vector_internal_ref<TypeToReference_>(std_ref_.get());
+	}
+
+	template<typename TypeToReference_, typename = std::enable_if_t<std::is_const_v<TypeToReference_>>>
+	[[nodiscard]] constexpr inline vector_internal_const_ref<TypeToReference_> make_vector_internal_ref(const std::reference_wrapper<TypeToReference_>& std_ref_)
+	{
+		return vector_internal_const_ref<TypeToReference_>(std_ref_.get());
+	}
+
+	/// <summary> Wraps the passed wrapped vector_internal_ref in a vector_internal_ref. </summary>
+	/// <param name="to_ref_">: Reference to wrap as a vector_internal_ref.</param>
+	/// <returns>Passed reference to_ref_ wrapped as a vector_internal_ref of the related type.</returns>
+	template<typename TypeToReference_>
+	[[nodiscard]] constexpr inline vector_internal_ref<TypeToReference_> make_vector_internal_ref(vector_internal_ref<TypeToReference_>&& vector_ref_)
+	{
+		return vector_internal_ref<TypeToReference_>(vector_ref_.get());
+	}
+
+	template<typename TypeToReference_>
+	[[nodiscard]] constexpr inline vector_internal_ref<TypeToReference_> make_vector_internal_ref(vector_internal_ref<TypeToReference_>& vector_ref_)
+	{
+		return vector_internal_ref<TypeToReference_>(vector_ref_.get());
+	}
+
+	template<typename TypeToReference_>
+	[[nodiscard]] constexpr inline vector_internal_const_ref<TypeToReference_> make_vector_internal_ref(const vector_internal_ref<TypeToReference_>& vector_ref_)
+	{
+		return vector_internal_const_ref<TypeToReference_>(vector_ref_.get());
+	}
+
+	template<typename TypeToReference_>
+	constexpr inline void make_vector_internal_ref(TypeToReference_&&) = delete;
+
+	/// <summary> Wraps the passed reference in a vector_internal_const_ref. </summary>
+	/// <param name="to_ref_">: Reference to wrap as a vector_internal_const_ref.</param>
+	/// <returns>Passed reference to_ref_ wrapped as a vector_internal_const_ref of the related type.</returns>
+	template
+	<
+		typename TypeToReference_,
+		typename = std::enable_if_t
+		<
+			!EmuCore::TMP::is_instance_of_typeparams_only_v<TypeToReference_, std::reference_wrapper> &&
+			!EmuCore::TMP::is_instance_of_typeparams_only_v<TypeToReference_, vector_internal_ref>
+		>
+	>
 	[[nodiscard]] constexpr inline vector_internal_const_ref<TypeToReference_> make_vector_internal_const_ref(const TypeToReference_& to_ref_)
 	{
 		return vector_internal_const_ref<TypeToReference_>(to_ref_);
 	}
+
+	/// <summary> Wraps the passed std-wrapped reference in a vector_internal_const_ref. </summary>
+	/// <param name="to_ref_">: Reference to wrap as a vector_internal_const_ref.</param>
+	/// <returns>Passed reference to_ref_ wrapped as a vector_internal_const_ref of the related type.</returns>
+	template<typename TypeToReference_>
+	[[nodiscard]] constexpr inline vector_internal_const_ref<TypeToReference_> make_vector_internal_const_ref(std::reference_wrapper<TypeToReference_>&& std_ref_)
+	{
+		return vector_internal_const_ref<TypeToReference_>(std_ref_.get());
+	}
+
+	template<typename TypeToReference_>
+	[[nodiscard]] constexpr inline vector_internal_const_ref<TypeToReference_> make_vector_internal_const_ref(std::reference_wrapper<TypeToReference_>& std_ref_)
+	{
+		return vector_internal_const_ref<TypeToReference_>(std_ref_.get());
+	}
+
+	template<typename TypeToReference_>
+	[[nodiscard]] constexpr inline vector_internal_const_ref<TypeToReference_> make_vector_internal_const_ref(const std::reference_wrapper<TypeToReference_>& std_ref_)
+	{
+		return vector_internal_const_ref<TypeToReference_>(std_ref_.get());
+	}
+
+	/// <summary> Wraps the passed wrapped vector_internal_ref in a vector_internal_const_ref. </summary>
+	/// <param name="to_ref_">: Reference to wrap as a vector_internal_const_ref.</param>
+	/// <returns>Passed reference to_ref_ wrapped as a vector_internal_const_ref of the related type.</returns>
+	template<typename TypeToReference_>
+	[[nodiscard]] constexpr inline vector_internal_const_ref<TypeToReference_> make_vector_internal_const_ref(vector_internal_ref<TypeToReference_>&& vector_ref_)
+	{
+		return vector_internal_const_ref<TypeToReference_>(vector_ref_.get());
+	}
+
+	template<typename TypeToReference_>
+	[[nodiscard]] constexpr inline vector_internal_const_ref<TypeToReference_> make_vector_internal_const_ref(vector_internal_ref<TypeToReference_>& vector_ref_)
+	{
+		return vector_internal_const_ref<TypeToReference_>(vector_ref_.get());
+	}
+
+	template<typename TypeToReference_>
+	[[nodiscard]] constexpr inline vector_internal_const_ref<TypeToReference_> make_vector_internal_const_ref(const vector_internal_ref<TypeToReference_>& vector_ref_)
+	{
+		return vector_internal_const_ref<TypeToReference_>(vector_ref_.get());
+	}
+
+	template<typename TypeToReference_>
+	constexpr inline void make_vector_internal_const_ref(TypeToReference_&&) = delete;
+#pragma endregion
 }
 
 namespace EmuMath::TMP
