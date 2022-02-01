@@ -1779,6 +1779,84 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region TRANSPOSE_FUNCS
+		/// <summary>
+		/// <para> Outputs a transposed form of this Matrix. </para>
+		/// <para> Supports output of a Matrix of references as long as only contained indices are required, and the reference type is compatible with this Matrix. </para>
+		/// </summary>
+		/// <returns>Transposed form of this Matrix.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Transpose() &
+		{
+			return EmuMath::Helpers::matrix_transpose<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_rows, num_columns, OutT_, OutColumnMajor_> Transpose() &
+		{
+			return EmuMath::Helpers::matrix_transpose<num_rows, num_columns, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_rows, num_columns, value_type_uq, OutColumnMajor_> Transpose() &
+		{
+			return EmuMath::Helpers::matrix_transpose<num_rows, num_columns, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a transposed form of this Matrix. </para>
+		/// <para>
+		///		Supports output of a Matrix of references as long as only contained indices are required, 
+		///		and the reference type is compatible with this Matrix when it is in a const state.
+		/// </para>
+		/// </summary>
+		/// <returns>Transposed form of this Matrix.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Transpose() const &
+		{
+			return EmuMath::Helpers::matrix_transpose<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_rows, num_columns, OutT_, OutColumnMajor_> Transpose() const &
+		{
+			return EmuMath::Helpers::matrix_transpose<num_rows, num_columns, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_rows, num_columns, value_type_uq, OutColumnMajor_> Transpose() const &
+		{
+			return EmuMath::Helpers::matrix_transpose<num_rows, num_columns, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a transposed form of this Matrix. </para>
+		/// <para>
+		///		Supports output of a Matrix of references as long as only contained indices are required, 
+		///		and the reference type is compatible with this Matrix when it is in a const state. 
+		///		It should be noted that this rvalue-specialisation is likely incompatible for references in most cases to prevent dangling references.
+		/// </para>
+		/// </summary>
+		/// <returns>Transposed form of this Matrix.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Transpose() &&
+		{
+			return EmuMath::Helpers::matrix_transpose<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(std::move(*this));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_rows, num_columns, OutT_, OutColumnMajor_> Transpose() &&
+		{
+			return EmuMath::Helpers::matrix_transpose<num_rows, num_columns, OutT_, OutColumnMajor_>(std::move(*this));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_rows, num_columns, value_type_uq, OutColumnMajor_> Transpose() &&
+		{
+			return EmuMath::Helpers::matrix_transpose<num_rows, num_columns, value_type_uq, OutColumnMajor_>(std::move(*this));
+		}
+#pragma endregion
+
 #pragma region STREAM_FUNCS
 	public:
 		/// <summary>
