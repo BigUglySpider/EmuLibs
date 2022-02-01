@@ -1406,6 +1406,7 @@ namespace EmuMath
 
 #pragma region CONST_ARITHMETIC_OPERATORS
 	public:
+		// BASIC ARITHMETIC OPERATOR+
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_>
 		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> operator+(Rhs_&& rhs_) const
 		{
@@ -1422,6 +1423,25 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> operator+(Rhs_&& rhs_) const
 		{
 			return EmuMath::Helpers::matrix_add<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		// BASIC ARITHMETIC OPERATOR-
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> operator-(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> operator-(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> operator-(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
 		}
 #pragma endregion
 
@@ -1637,6 +1657,98 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::matrix_add_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
 		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of subtracting the provided rhs_ argument from this Matrix as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be subtracted. </para>
+		/// <para> If Rhs_ is none of the above: All index subtractions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of subtraction.</param>
+		/// <returns>EmuMath Matrix containing the results of subtraction in respective indices.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Subtract(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Subtract(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Subtract(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<class Rhs_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Subtract(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::matrix_subtract(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of subtracting the provided rhs_ argument from this Matrix as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective subtraction operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices in lhs_matrix_. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be subtracted. </para>
+		/// <para> If Rhs_ is none of the above: All index subtractions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of subtraction.</param>
+		/// <returns>EmuMath Matrix containing the results of subtraction in respective indices within the provided range, and copied respective elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> SubtractRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> SubtractRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> SubtractRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void SubtractRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		// TODO: SubtractRangeNoCopy
 #pragma endregion
 
 #pragma region ARITHMETIC_ASSIGN_FUNCS

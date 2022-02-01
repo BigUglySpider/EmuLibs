@@ -183,6 +183,8 @@
     <ClInclude Include="EmuMath\Noise.h" />
     <ClInclude Include="EmuMath\Random.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_all_matrix_helpers.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_basic_arithmetic\_matrix_add.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_basic_arithmetic\_matrix_subtract.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_common_matrix_helper_includes.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_basic_arithmetic.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_basic_arithmetic_assign.h" />
