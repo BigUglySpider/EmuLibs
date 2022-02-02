@@ -714,6 +714,16 @@ namespace EmuMath::TMP
 		using column_index_sequence = typename _maker::column_index_sequence;
 		using row_index_sequence = typename _maker::row_index_sequence;
 	};
+
+	template<class Arg_>
+	[[nodiscard]] constexpr inline bool is_specialised_matrix_multiply_arg()
+	{
+		return
+		(
+			EmuMath::TMP::is_emu_matrix_v<Arg_> ||
+			EmuMath::TMP::is_emu_vector_v<Arg_>
+		);
+	}
 }
 
 #endif

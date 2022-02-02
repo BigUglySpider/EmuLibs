@@ -512,5 +512,20 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_special_operations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_basic_arithmetic\_matrix_multiply_basic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_basic_arithmetic\_matrix_divide.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_basic_arithmetic\_matrix_mod.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_matrix_special_arithmetic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_std_multiply.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -203,6 +203,25 @@ int main()
 	runtime_ref_transpose_.ColumnAt<3>() = EmuMath::make_vector<int>(-1, -2, -3, -4, -5);
 	std::cout << runtime_mat_to_transpose << "\n\n" << runtime_ref_transpose_ << "\n\n";
 
+	constexpr auto egrjoi = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) / 2.0f;
+	constexpr auto egrjof = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) / 2;
+	constexpr auto modi = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) % 3;
+	constexpr auto modf = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) % 2.5;
+
+	constexpr auto scalar_result_ = EmuMath::Matrix<4, 4, float, true>(1, 0, 0, 0, 0, 10, 0, 0, 0, 0, 1, 0, 1.5, 2, 3, 1) * 2;
+
+	constexpr auto vec_result_ = EmuMath::Matrix<4, 4, float, true>(1, 0, 0, 0, 0, 10, 0, 0, 0, 0, 1, 0, 1.5, 2, 3, 1) * EmuMath::Vector<3, float>(1, 2, 3);
+
+	constexpr auto mat_result_ =
+	(
+		EmuMath::Matrix<4, 4, float, true>(1, 0, 0, 0, 0, 10, 0, 0, 0, 0, 1, 0, 1.5, 2, 3, 1) *
+		EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+	);
+
+	constexpr auto unequal_mat_result = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) * EmuMath::Matrix<1, 4, float, true>(1, 2, 3, 4);
+
+	std::cout << mat_result_ << "\n\n";
+
 	// ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
 	//constexpr std::size_t test_noise_dimensions = 3;
@@ -282,7 +301,7 @@ int main()
 	//
 	//WriteNoiseTableToPPM(noise_, noise_gradient_, "test_noise_scalar");
 	//WriteNoiseTableToPPM(fast_noise_, noise_gradient_, "test_noise_simd");
-
+	 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();

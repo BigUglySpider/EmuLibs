@@ -8,6 +8,7 @@
 #include "_matrix_get.h"
 #include "_matrix_mutate.h"
 #include "_matrix_special_operations.h"
+#include "_matrix_std_multiply.h"
 #include "_matrix_stream_append.h"
 
 #endif
