@@ -180,12 +180,6 @@ namespace EmuMath::Helpers::_matrix_underlying
 		}
 	}
 
-	template<typename...Args_>
-	[[nodiscard]] constexpr inline bool _halp_me(Args_...args_)
-	{
-		return (... && args_);
-	}
-
 	template<class OutMatrix_, class InMatrix_, bool DoAssertions_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
 	[[nodiscard]] constexpr inline bool _matrix_create_from_matrix_is_valid
 	(

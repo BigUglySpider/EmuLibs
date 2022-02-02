@@ -258,6 +258,20 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region VALID_FUNCTION_ARG_CHECKS
+		template<std::size_t RhsSize_>
+		[[nodiscard]] static constexpr inline bool valid_vector_multiply_arg_size()
+		{
+			return RhsSize_ == num_rows || (RhsSize_ == num_rows - 1);
+		}
+
+		template<std::size_t RhsNumColumns_, std::size_t RhsNumRows_>
+		[[nodiscard]] static constexpr inline bool valid_matrix_multiply_arg_size()
+		{
+			return num_columns == RhsNumRows_;
+		}
+#pragma endregion
+
 #pragma region CONSTRUCTORS
 	public:
 		/// <summary> Default constructor for this Matrix. Only available if its underlying elements may be default-constructed. </summary>
@@ -287,6 +301,16 @@ namespace EmuMath
 		/// <param name="to_move_">EmuMath Matrix to move into the newly constructed Matrix of the same type.</param>
 		template<typename = std::enable_if_t<is_move_constructible()>>
 		constexpr inline Matrix(this_type&& to_move_) : _data(std::move(to_move_._data))
+		{
+		}
+
+		/// <summary>
+		///		Moves the passed EmuMath Matrix of this type into a newly constructed Matrix of the same type. 
+		///		Only available if this Matrix's underlying elements may be moved.
+		/// </summary>
+		/// <param name="to_move_">EmuMath Matrix to move into the newly constructed Matrix of the same type.</param>
+		template<typename = std::enable_if_t<is_move_constructible()>>
+		constexpr inline Matrix(const this_type&& to_move_) : _data(std::move(to_move_._data))
 		{
 		}
 
@@ -1332,7 +1356,10 @@ namespace EmuMath
 		template
 		<
 			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
-			typename = std::enable_if_t<EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&>()>
+			typename = std::enable_if_t
+			<
+				EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&>()
+			>
 		>
 		constexpr inline this_type& operator=(EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& to_copy_)
 		{
@@ -1343,7 +1370,10 @@ namespace EmuMath
 		template
 		<
 			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
-			typename = std::enable_if_t<EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&>()>
+			typename = std::enable_if_t
+			<
+				EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&>()
+			>
 		>
 		constexpr inline this_type& operator=(const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& to_copy_)
 		{
@@ -1354,7 +1384,10 @@ namespace EmuMath
 		template
 		<
 			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
-			typename = std::enable_if_t<EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>()>
+			typename = std::enable_if_t
+			<
+				EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>()
+			>
 		>
 		constexpr inline this_type& operator=(EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&& to_move_copy_)
 		{
@@ -1369,7 +1402,10 @@ namespace EmuMath
 		template
 		<
 			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
-			typename = std::enable_if_t<EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>()>
+			typename = std::enable_if_t
+			<
+				EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>()
+			>
 		>
 		constexpr inline this_type& operator=(const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&& to_move_copy_)
 		{
@@ -1378,6 +1414,173 @@ namespace EmuMath
 				*this,
 				std::forward<EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>(to_move_copy_)
 			);
+			return *this;
+		}
+#pragma endregion
+
+#pragma region CONST_ARITHMETIC_OPERATORS
+	public:
+		// BASIC ARITHMETIC OPERATOR+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> operator+(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_add<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> operator+(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_add<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> operator+(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_add<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		// BASIC ARITHMETIC OPERATOR-
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> operator-(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> operator-(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> operator-(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		// BASIC ARITHMETIC OPERATOR/
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> operator/(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_divide<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> operator/(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_divide<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> operator/(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_divide<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		// BASIC ARITHMETIC OPERATOR%
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> operator%(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_mod<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> operator%(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_mod<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> operator%(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_mod<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		// ADAPTIVE ARITHMETIC OPERATOR* : UNSPECIALISED FALLBACK TO BASIC_MULTIPLY
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_, typename = std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>()>>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> operator*(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_multiply<OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_, typename = std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>()>>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> operator*(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_multiply<value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		// ADAPTIVE ARITHMETIC OPERATOR*: SPECIALISED VECTOR MULTIPLY
+		template
+		<
+			typename OutT_,
+			bool OutColumnMajor_ = is_column_major,
+			typename RhsT_,
+			std::size_t RhsSize_,
+			typename = std::enable_if_t<valid_vector_multiply_arg_size<RhsSize_>()>
+		>
+		[[nodiscard]] constexpr inline EmuMath::Vector<RhsSize_, OutT_> operator*(const EmuMath::Vector<RhsSize_, RhsT_>& rhs_vector_) const
+		{
+			return EmuMath::Helpers::matrix_multiply<OutT_, OutColumnMajor_>(*this, rhs_vector_);
+		}
+
+		template
+		<
+			bool OutColumnMajor_ = is_column_major,
+			typename RhsT_,
+			std::size_t RhsSize_,
+			typename = std::enable_if_t<valid_vector_multiply_arg_size<RhsSize_>()>
+		>
+		[[nodiscard]] constexpr inline EmuMath::Vector<RhsSize_, typename EmuMath::Vector<RhsSize_, RhsT_>::preferred_floating_point> operator*
+		(
+			const EmuMath::Vector<RhsSize_, RhsT_>& rhs_vector_
+		) const
+		{
+			using rhs_fp = typename EmuMath::Vector<RhsSize_, RhsT_>::preferred_floating_point;
+			return EmuMath::Helpers::matrix_multiply<rhs_fp, OutColumnMajor_>(*this, rhs_vector_);
+		}
+
+		// ADAPTIVE ARITHMETIC OPERATOR*: SPECIALISED MATRIX MULTIPLY
+		template
+		<
+			typename OutT_,
+			bool OutColumnMajor_ = is_column_major,
+			typename RhsT_,
+			std::size_t RhsNumColumns_,
+			std::size_t RhsNumRows_,
+			bool RhsColumnMajor_,
+			typename = std::enable_if_t<valid_matrix_multiply_arg_size<RhsNumColumns_, RhsNumRows_>()>
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<RhsNumColumns_, num_rows, OutT_, OutColumnMajor_> operator*
+		(
+			const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& rhs_matrix_
+		)
+		{
+			return EmuMath::Helpers::matrix_multiply<OutT_, OutColumnMajor_>(*this, rhs_matrix_);
+		}
+
+		template
+		<
+			bool OutColumnMajor_ = is_column_major,
+			typename RhsT_,
+			std::size_t RhsNumColumns_,
+			std::size_t RhsNumRows_,
+			bool RhsColumnMajor_,
+			typename = std::enable_if_t<valid_matrix_multiply_arg_size<RhsNumColumns_, RhsNumRows_>()>
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<RhsNumColumns_, num_rows, preferred_floating_point, OutColumnMajor_> operator*
+		(
+			const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& rhs_matrix_
+		)
+		{
+			return EmuMath::Helpers::matrix_multiply<preferred_floating_point, OutColumnMajor_>(*this, rhs_matrix_);
+		}
+#pragma endregion
+
+#pragma region ARITHMETIC_ASSIGN_OPERATORS
+		template<bool ColumnMajorOrder_ = is_column_major, class Rhs_>
+		constexpr inline this_type& operator+=(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::matrix_add_assign<ColumnMajorOrder_>(*this, std::forward<Rhs_>(rhs_));
 			return *this;
 		}
 #pragma endregion
@@ -1434,6 +1637,1001 @@ namespace EmuMath
 				*this,
 				std::forward<EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>(to_move_copy_)
 			);
+		}
+#pragma endregion
+
+#pragma region CONST_ARITHMETIC_FUNCS
+	public:
+		/// <summary>
+		/// <para>
+		///		Outputs the result of adding the provided rhs_ argument to this Matrix, as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be added. </para>
+		/// <para> If Rhs_ is none of the above: All index additions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of addition.</param>
+		/// <returns>EmuMath Matrix containing the results of addition in respective indices.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Add(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_add<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Add(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_add<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Add(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_add<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<class Rhs_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Add(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::matrix_add(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of adding the provided rhs_ argument to this Matrix, as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective addition operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices in this Matrix. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be added. </para>
+		/// <para> If Rhs_ is none of the above: All index additions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of addition.</param>
+		/// <returns>EmuMath Matrix containing the results of addition in respective indices within the provided range, and copied respective elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> AddRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_add_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> AddRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_add_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> AddRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_add_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void AddRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::matrix_add_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of adding the provided lhs_matrix_ and rhs_ arguments as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of lhs_matrix_ if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective addition operations. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be added. </para>
+		/// <para> If Rhs_ is none of the above: All index additions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="lhs_matrix_">: EmuMath Matrix appearing on the left-hand side of addition.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of addition.</param>
+		/// <returns>EmuMath Matrix containing the results of addition in respective indices within the provided range, and default-constructed elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> AddRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_add_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> AddRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_add_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> AddRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_add_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void AddRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_add_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of subtracting the provided rhs_ argument from this Matrix as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be subtracted. </para>
+		/// <para> If Rhs_ is none of the above: All index subtractions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of subtraction.</param>
+		/// <returns>EmuMath Matrix containing the results of subtraction in respective indices.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Subtract(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Subtract(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Subtract(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<class Rhs_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Subtract(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::matrix_subtract(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of subtracting the provided rhs_ argument from this Matrix as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective subtraction operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices in lhs_matrix_. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be subtracted. </para>
+		/// <para> If Rhs_ is none of the above: All index subtractions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of subtraction.</param>
+		/// <returns>EmuMath Matrix containing the results of subtraction in respective indices within the provided range, and copied respective elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> SubtractRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> SubtractRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> SubtractRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void SubtractRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of subtracting the provided rhs_ from this Matrix as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective subtraction operations. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be subtracted. </para>
+		/// <para> If Rhs_ is none of the above: All index subtractions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of subtraction.</param>
+		/// <returns>EmuMath Matrix containing the results of subtraction in respective indices within the provided range, and default-constructed elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> SubtractRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> SubtractRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> SubtractRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of subtracting the provided rhs_ argument from this Matrix via the provided out_matrix_. </para>
+		/// <para> Indices within the provided range will contain results of respective subtraction operations. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be subtracted. </para>
+		/// <para> If Rhs_ is none of the above: All index subtractions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of subtraction.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void SubtractRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_subtract_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of multiplying this Matrix by the provided rhs_ argument as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para>
+		///		This is a basic, non-standard Matrix multiplication. 
+		///		If Rhs_ is a Matrix it will not perform a standard Matrix multiplication using dot products of columns and rows. 
+		///		For a standard Matrix multiplication, use `Multiply` instead.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be multiplied. </para>
+		/// <para> If Rhs_ is none of the above: All index multiplications will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of basic multiplication.</param>
+		/// <returns>EmuMath Matrix containing the results of basic multiplication in respective indices.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> MultiplyBasic(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_multiply_basic<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> MultiplyBasic(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_multiply_basic<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> MultiplyBasic(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_multiply_basic<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<class Rhs_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void MultiplyBasic(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::matrix_multiply_basic(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of multiplying this Matrix by the provided rhs_ argument as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para>
+		///		This is a basic, non-standard Matrix multiplication. 
+		///		If Rhs_ is a Matrix it will not perform a standard Matrix multiplication using dot products of columns and rows. 
+		///		For a standard Matrix multiplication, use `Multiply` instead. 
+		///		Range-based standard variants as this function is used are not available.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective multiplication operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices in lhs_matrix_. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be multiplied. </para>
+		/// <para> If Rhs_ is none of the above: All index multiplications will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of basic multiplication.</param>
+		/// <returns>EmuMath Matrix containing the results of basic multiplication in respective indices within the provided range, and copied respective elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> MultiplyBasicRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_multiply_basic_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> MultiplyBasicRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_multiply_basic_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> MultiplyBasicRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_multiply_basic_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void MultiplyBasicRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_multiply_basic_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of multiplying this Matrix by the provided rhs_ argument as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrx if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para>
+		///		This is a basic, non-standard Matrix multiplication. 
+		///		If Rhs_ is a Matrix it will not perform a standard Matrix multiplication using dot products of columns and rows. 
+		///		For a standard Matrix multiplication, use `Multiply` instead. 
+		///		Range-based standard variants as this function is used are not available.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective multiplication operations. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be multiplied. </para>
+		/// <para> If Rhs_ is none of the above: All index multiplications will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of basic multiplication.</param>
+		/// <returns>EmuMath Matrix containing the results of basic multiplication in respective indices within the provided range, and default-constructed elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> MultiplyBasicRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_multiply_basic_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> MultiplyBasicRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_multiply_basic_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> MultiplyBasicRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_multiply_basic_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of multiplying this Matrix by the provided rhs_ argument via the provided out_matrix_. </para>
+		/// <para>
+		///		This is a basic, non-standard Matrix multiplication. 
+		///		If Rhs_ is a Matrix it will not perform a standard Matrix multiplication using dot products of columns and rows. 
+		///		For a standard Matrix multiplication, use `matrix_multiply` instead. 
+		///		Range-based standard variants as this function is used are not available.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective multiplication operations. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be multiplied. </para>
+		/// <para> If Rhs_ is none of the above: All index multiplications will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of basic multiplication.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void MultiplyBasicRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_multiply_basic_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of dividing this Matrix by the provided rhs_ argument as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para>
+		///		This is a basic, non-standard Matrix division. As a standard division is mathemtically undefined, there is no alternative. 
+		///		To create an effect similar to what could be considered standard division when rhs_ is a Matrix, consider multiplying this Matrix by the inverse of rhs_.
+		/// </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be divided. </para>
+		/// <para> If Rhs_ is none of the above: All index divisions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of basic division.</param>
+		/// <returns>EmuMath Matrix containing the results of basic division in respective indices.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Divide(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_divide<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Divide(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_divide<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Divide(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_divide<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<class Rhs_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Divide(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::matrix_divide(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of dividing this Matrix by the provided rhs_ argument as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para>
+		///		This is a basic, non-standard Matrix division. As a standard division is mathemtically undefined, there is no alternative. 
+		///		To create an effect similar to what could be considered standard division when rhs_ is a Matrix, consider multiplying lhs_matrix_ by the inverse of rhs_.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective division operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices in lhs_matrix_. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be divided. </para>
+		/// <para> If Rhs_ is none of the above: All index divisions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of basic division.</param>
+		/// <returns>EmuMath Matrix containing the results of basic division in respective indices within the provided range, and copied respective elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> DivideRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_divide_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> DivideRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_divide_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> DivideRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_divide_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void DivideRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_divide_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of dividing the provided this Matrix by the provided rhs_ argument as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para>
+		///		This is a basic, non-standard Matrix division. As a standard division is mathemtically undefined, there is no alternative. 
+		///		To create an effect similar to what could be considered standard division when rhs_ is a Matrix, consider multiplying this Matrix by the inverse of rhs_.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective division operations. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be divided. </para>
+		/// <para> If Rhs_ is none of the above: All index divisions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of basic division.</param>
+		/// <returns>EmuMath Matrix containing the results of basic division in respective indices within the provided range, and default-constructed elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> DivideRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_divide_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> DivideRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_divide_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> DivideRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_divide_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of dividing this Matrix by the provided rhs_ argument via the provided out_matrix_. </para>
+		/// <para>
+		///		This is a basic, non-standard Matrix division. As a standard division is mathemtically undefined, there is no alternative. 
+		///		To create an effect similar to what could be considered standard division when rhs_ is a Matrix, consider multiplying lhs_matrix_ by the inverse of rhs_.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective division operations. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be divided. </para>
+		/// <para> If Rhs_ is none of the above: All index divisions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of basic division.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void DivideRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_divide_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of modulo-dividing this Matrix by the provided rhs_ argument as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> This is a basic, non-standard Matrix modulo-division. As a standard modulo-division is mathemtically undefined, there is no alternative. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be modulo-divided. </para>
+		/// <para> If Rhs_ is none of the above: All index modulo-divisions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of basic modulo-division.</param>
+		/// <returns>EmuMath Matrix containing the results of basic modulo-division in respective indices.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Mod(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_mod<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Mod(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_mod<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Mod(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_mod<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<class Rhs_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Mod(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::matrix_mod(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of modulo-dividing this Matrix by the provided rhs_ argument as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> This is a basic, non-standard Matrix modulo-division. As a standard modulo-division is mathemtically undefined, there is no alternative. </para>
+		/// <para> Indices within the provided range will contain results of respective modulo-division operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices in lhs_matrix_. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be modulo-divided. </para>
+		/// <para> If Rhs_ is none of the above: All index modulo-divisions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of basic modulo-division.</param>
+		/// <returns>EmuMath Matrix containing the results of basic modulo-division in respective indices within the provided range, and copied respective elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ModRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_mod_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ModRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_mod_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ModRange(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_mod_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void ModRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			EmuMath::Helpers::matrix_mod_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of modulo-dividing this Matrix by the provided rhs_ argument as an EmuMath Matrix with the specified template arguments, 
+		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> This is a basic, non-standard Matrix modulo-division. As a standard modulo-division is mathemtically undefined, there is no alternative. </para>
+		/// <para> Indices within the provided range will contain results of respective modulo-division operations. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be modulo-divided. </para>
+		/// <para> If Rhs_ is none of the above: All index modulo-divisions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of basic modulo-division.</param>
+		/// <returns>EmuMath Matrix containing the results of basic modulo-division in respective indices within the provided range, and default-constructed elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Rhs_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ModRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_mod_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ModRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_mod_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ModRangeNoCopy(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_mod_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Rhs_>(rhs_)
+			);
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of modulo-dividing this Matrix by the provided rhs_ argument via the provided out_matrix_. </para>
+		/// <para> This is a basic, non-standard Matrix modulo-division. As a standard modulo-division is mathemtically undefined, there is no alternative. </para>
+		/// <para> Indices within the provided range will contain results of respective modulo-division operations. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be modulo-divided. </para>
+		/// <para> If Rhs_ is none of the above: All index modulo-divisions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right-hand side of modulo-basic division.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Rhs_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void ModRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_mod_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Matrix resulting from basic multiplication of this Matrix with the provided Rhs_ argument. </para>
+		/// <para> 
+		///		This function will only be available for rhs-arguments which are NOT specialised for standard multiplication 
+		///		(unlike Matrices and Vectors, which are specialised). 
+		/// </para>
+		/// <para> To always perform basic multiplication regardless of argument type, use `MultiplyBasic` instead. </para>
+		/// </summary>
+		/// <param name="rhs_">: Unspecialised argument appearing on the right of multiplication.</param>
+		/// <returns>EmuMath Matrix containing the results of basic multiplication in respective indices.</returns>
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_, typename = std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>()>>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Multiply(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_multiply<OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_, typename = std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>()>>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Multiply(Rhs_&& rhs_) const
+		{
+			return EmuMath::Helpers::matrix_multiply<value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Vector resulting from a multiplication with this Matrix. The Vector will be treated as a single-column Matrix. </para>
+		/// <para> The Vector must meet constraint A or B: </para>
+		/// <para> A: The Vector's size is equal to num_rows. </para>
+		/// <para> B: The Vector's size is equal to (num_rows - 1). In this case, the non-contained index will be treated as 1. </para>
+		/// <para> NOTE: OutColumnMajor_ is unused in this function. It is only present to allow a consistent interface for templates. </para>
+		/// </summary>
+		/// <param name="rhs_vector_">: EmuMath Vector to multiply via this Matrix.</param>
+		/// <returns>EmuMath Vector resulting from a multiplication of this Matrix and the provided Vector.</returns>
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, typename RhsT_, std::size_t RhsSize_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<RhsSize_, OutT_> Multiply(const EmuMath::Vector<RhsSize_, RhsT_>& rhs_vector_) const
+		{
+			return EmuMath::Helpers::matrix_multiply<OutT_, OutColumnMajor_>(*this, rhs_vector_);
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, typename RhsT_, std::size_t RhsSize_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<RhsSize_, typename EmuMath::Vector<RhsSize_, RhsT_>::preferred_floating_point> Multiply
+		(
+			const EmuMath::Vector<RhsSize_, RhsT_>& rhs_vector_
+		)
+		{
+			using rhs_fp = typename EmuMath::Vector<RhsSize_, RhsT_>::preferred_floating_point;
+			return EmuMath::Helpers::matrix_multiply<rhs_fp, OutColumnMajor_>(*this, rhs_vector_);
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of a standard Matrix multiplication with the passed Matrix, where this Matrix appears on the left-hand side. </para>
+		/// <para> The output Matrix will have a number of columns equal to that of rhs_matrix_, and a number of rows equal to that of this Matrix. </para>
+		/// <para> The number of columns in this Matrix must be equal to the number of rows in rhs_matrix_. </para>
+		/// <para>
+		///		Output indices will be the dot product of the row in this Matrix and the column in rhs_matrix_. 
+		///		For example, out(1, 3) would be (in pseudocode) dot(this_matrix.Rows[3], rhs_matrix_.Columns[1]).
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_matrix_">: EmuMath Matrix appearing on the right of Matrix multiplication.</param>
+		/// <returns>EmuMath Matrix resulting from a standard Matrix multiplication of this Matrix and the provided rhs_matrix_, where this Matrix appears on the left.</returns>
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<RhsNumColumns_, num_rows, OutT_, OutColumnMajor_> Multiply
+		(
+			const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& rhs_matrix_
+		)
+		{
+			return EmuMath::Helpers::matrix_multiply<OutT_, OutColumnMajor_>(*this, rhs_matrix_);
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<RhsNumColumns_, num_rows, preferred_floating_point, OutColumnMajor_> Multiply
+		(
+			const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& rhs_matrix_
+		)
+		{
+			return EmuMath::Helpers::matrix_multiply<preferred_floating_point, OutColumnMajor_>(*this, rhs_matrix_);
+		}
+#pragma endregion
+
+#pragma region ARITHMETIC_ASSIGN_FUNCS
+	public:
+		/// <summary>
+		/// <para> Performs an arithmetic add-assign (e.g. operator+=) on this Matrix with the provided rhs_ argument. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be added. </para>
+		/// <para> If Rhs_ is none of the above: All index additions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right of addition.</param>
+		template<bool ColumnMajorOrder_ = is_column_major, class Rhs_>
+		constexpr inline void AddAssign(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::matrix_add_assign<ColumnMajorOrder_>(*this, std::forward<Rhs_>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Performs an arithmetic add-assign (e.g. operator+=) on this Matrix with the provided rhs_ argument. </para>
+		/// <para> Operations will only be performed for indices within the provided range. </para>
+		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be added. </para>
+		/// <para> If Rhs_ is none of the above: All index additions will use the rhs_ directly. </para>
+		/// </summary>
+		/// <param name="rhs_">: Scalar or EmuMath Matrix appearing on the right of addition.</param>
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool ColumnMajorOrder_ = is_column_major, class Rhs_>
+		constexpr inline void AddAssignRange(Rhs_&& rhs_)
+		{
+			EmuMath::Helpers::matrix_add_assign_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, ColumnMajorOrder_>(*this, std::forward<Rhs_>(rhs_));
+		}
+#pragma endregion
+
+#pragma region TRANSPOSE_FUNCS
+		/// <summary>
+		/// <para> Outputs a transposed form of this Matrix. </para>
+		/// <para> Supports output of a Matrix of references as long as only contained indices are required, and the reference type is compatible with this Matrix. </para>
+		/// </summary>
+		/// <returns>Transposed form of this Matrix.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Transpose() &
+		{
+			return EmuMath::Helpers::matrix_transpose<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_rows, num_columns, OutT_, OutColumnMajor_> Transpose() &
+		{
+			return EmuMath::Helpers::matrix_transpose<num_rows, num_columns, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_rows, num_columns, value_type_uq, OutColumnMajor_> Transpose() &
+		{
+			return EmuMath::Helpers::matrix_transpose<num_rows, num_columns, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a transposed form of this Matrix. </para>
+		/// <para>
+		///		Supports output of a Matrix of references as long as only contained indices are required, 
+		///		and the reference type is compatible with this Matrix when it is in a const state.
+		/// </para>
+		/// </summary>
+		/// <returns>Transposed form of this Matrix.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Transpose() const &
+		{
+			return EmuMath::Helpers::matrix_transpose<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_rows, num_columns, OutT_, OutColumnMajor_> Transpose() const &
+		{
+			return EmuMath::Helpers::matrix_transpose<num_rows, num_columns, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_rows, num_columns, value_type_uq, OutColumnMajor_> Transpose() const &
+		{
+			return EmuMath::Helpers::matrix_transpose<num_rows, num_columns, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a transposed form of this Matrix. </para>
+		/// <para>
+		///		Supports output of a Matrix of references as long as only contained indices are required, 
+		///		and the reference type is compatible with this Matrix when it is in a const state. 
+		///		It should be noted that this rvalue-specialisation is likely incompatible for references in most cases to prevent dangling references.
+		/// </para>
+		/// </summary>
+		/// <returns>Transposed form of this Matrix.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Transpose() &&
+		{
+			return EmuMath::Helpers::matrix_transpose<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(std::move(*this));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_rows, num_columns, OutT_, OutColumnMajor_> Transpose() &&
+		{
+			return EmuMath::Helpers::matrix_transpose<num_rows, num_columns, OutT_, OutColumnMajor_>(std::move(*this));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_rows, num_columns, value_type_uq, OutColumnMajor_> Transpose() &&
+		{
+			return EmuMath::Helpers::matrix_transpose<num_rows, num_columns, value_type_uq, OutColumnMajor_>(std::move(*this));
 		}
 #pragma endregion
 

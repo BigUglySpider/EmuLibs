@@ -3,6 +3,7 @@
 
 #include <tuple>
 #include <type_traits>
+#include "TypeConvertors.h"
 #include "OperatorChecks.h"
 
 namespace EmuCore::TMP
@@ -219,10 +220,15 @@ namespace EmuCore::TMP
 	static constexpr bool is_any_same_v = is_any_comparison_true<std::is_same, ToFind_, First_, Others...>::value;
 
 	/// <summary> Determines if the passed type T is an instance of the template class ToFind_. Only works for templates which only take typeparams. </summary>
-	template<class T, template<class...> class ToFind_>
+	template<class T_, template<class...> class ToFind_>
 	struct is_instance_of_typeparams_only
 	{
-		static constexpr bool value = false;
+		static constexpr bool value = std::conditional_t
+		<
+			std::is_same_v<T_, EmuCore::TMP::remove_ref_cv_t<T_>>,
+			std::false_type,
+			is_instance_of_typeparams_only<EmuCore::TMP::remove_ref_cv_t<T_>, ToFind_>
+		>::value;
 	};
 	/// <summary> Determines if the passed type T is an instance of the template class ToFind_. Only works for templates which only take typeparams. </summary>
 	template<class...T, template<class...> class ToFind_>
