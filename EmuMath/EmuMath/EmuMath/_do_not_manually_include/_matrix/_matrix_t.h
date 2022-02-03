@@ -299,8 +299,7 @@ namespace EmuMath
 		///		Only available if this Matrix's underlying elements may be moved.
 		/// </summary>
 		/// <param name="to_move_">EmuMath Matrix to move into the newly constructed Matrix of the same type.</param>
-		template<typename = std::enable_if_t<is_move_constructible()>>
-		constexpr inline Matrix(this_type&& to_move_) : _data(std::move(to_move_._data))
+		constexpr inline Matrix(this_type&& to_move_) noexcept : _data(std::move(to_move_._data))
 		{
 		}
 
@@ -1353,6 +1352,12 @@ namespace EmuMath
 
 #pragma region ASSIGNMENT_OPERATORS
 	public:
+		constexpr inline this_type& operator=(this_type&& to_move_) noexcept
+		{
+			EmuMath::Helpers::matrix_copy(*this, std::forward<this_type>(to_move_));
+			return *this;
+		}
+
 		template
 		<
 			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
@@ -1386,7 +1391,8 @@ namespace EmuMath
 			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
 			typename = std::enable_if_t
 			<
-				EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>()
+				EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>() &&
+				!std::is_same_v<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>
 			>
 		>
 		constexpr inline this_type& operator=(EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&& to_move_copy_)
