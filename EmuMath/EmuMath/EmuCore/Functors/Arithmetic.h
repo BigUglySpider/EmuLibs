@@ -3,6 +3,7 @@
 
 #include "../ArithmeticHelpers/CommonMath.h"
 #include "../TMPHelpers/OperatorChecks.h"
+#include "../TMPHelpers/StdFunctionChecks.h"
 #include "../TMPHelpers/TypeComparators.h"
 #include "../TMPHelpers/TypeConvertors.h"
 #include "../TMPHelpers/Values.h"
@@ -591,6 +592,170 @@ namespace EmuCore
 		[[nodiscard]] constexpr inline std::invoke_result_t<do_negate<T_>, const T_&> operator()(const T_& val_) const
 		{
 			return do_negate<T_>()(val_);
+		}
+	};
+
+	template<class X_, class Y_ = X_, class Z_ = X_>
+	struct do_fmadd
+	{
+	private:
+		using _x_uq = typename EmuCore::TMP::remove_ref_cv<X_>::type;
+		using _y_uq = typename EmuCore::TMP::remove_ref_cv<Y_>::type;
+		using _z_uq = typename EmuCore::TMP::remove_ref_cv<Z_>::type;
+
+		static constexpr bool _any_fp = EmuCore::TMP::is_any_floating_point_v<_x_uq, _y_uq, _z_uq>;
+
+		template<bool AnyFp_>
+		struct _out_type_finder_template
+		{
+			// This will never be used due to specialisations
+			using type = void;
+			static constexpr bool is_valid = false;
+		};
+
+		template<>
+		struct _out_type_finder_template<false>
+		{
+		private:
+			using _x_mul_y_safe_result = EmuCore::TMP::safe_invoke_result<EmuCore::do_multiply<_x_uq, _y_uq>, const X_&, const Y_&>;
+			using _x_mul_y_result = typename _x_mul_y_safe_result::type;
+			using _x_mul_y_result_uq = typename EmuCore::TMP::remove_ref_cv<_x_mul_y_result>::type;
+			using _safe_result = EmuCore::TMP::safe_invoke_result<EmuCore::do_add<_x_mul_y_result_uq, _z_uq>, _x_mul_y_result, const Z_&>;
+
+		public:
+			using type = typename _safe_result::type;
+			static constexpr bool is_valid = _x_mul_y_safe_result::value && _safe_result::value;
+		};
+
+		template<>
+		struct _out_type_finder_template<true>
+		{
+		public:
+			using type = typename EmuCore::TMP::fma_result<const X_&, const Y_&, const Z_&>::type;
+			static constexpr bool is_valid = EmuCore::TMP::valid_fma_args_v<const X_&, const Y_&, const Z_&>;
+		};
+
+		using _out_type_finder = _out_type_finder_template<_any_fp>;
+
+	public:
+		constexpr do_fmadd()
+		{
+		}
+
+		template<typename = std::enable_if_t<_out_type_finder::is_valid>>
+		[[nodiscard]] constexpr inline typename _out_type_finder::type operator()(const X_& x_, const Y_& y_, const Z_& z_) const
+		{
+			if constexpr (!_any_fp)
+			{
+				// No need for fused arithmetic since this is only to prevent floating-point rounds before an add, and we have no FP vals
+				using mul_xy = EmuCore::do_multiply<_x_uq, _y_uq>;
+				using mul_xy_result = std::invoke_result_t<mul_xy, const X_&, const Y_&>;
+				using add_xy_z = EmuCore::do_add<mul_xy_result, _z_uq>;
+				return add_xy_z()(mul_xy()(x_, y_), z_);
+			}
+			else
+			{
+				return std::fma(x_, y_, z_);
+			}
+		}
+	};
+
+	template<>
+	struct do_fmadd<void, void, void>
+	{
+	private:
+		template<typename X_, typename Y_, typename Z_>
+		struct _result_with_args
+		{
+		private:
+			using _x_uq = EmuCore::TMP::remove_ref_cv_t<X_>;
+			using _y_uq = EmuCore::TMP::remove_ref_cv_t<Y_>;
+			using _z_uq = EmuCore::TMP::remove_ref_cv_t<Z_>;
+			using _to_invoke = EmuCore::do_fmadd<_x_uq, _y_uq, _z_uq>;
+			using _safe_invoke_result = EmuCore::TMP::safe_invoke_result<_to_invoke, const X_&, const Y_&, const Z_&>;
+
+		public:
+			using func_type = _to_invoke;
+			using type = typename _safe_invoke_result::type;
+			static constexpr bool is_valid = _safe_invoke_result::value;
+		};
+
+	public:
+		constexpr do_fmadd()
+		{
+		}
+
+		template
+		<
+			typename X_,
+			typename Y_,
+			typename Z_,
+			typename = std::enable_if_t<_result_with_args<X_, Y_, Z_>::is_valid>
+		>
+		constexpr inline typename _result_with_args<X_, Y_, Z_>::type operator()(const X_& x_, const Y_& y_, const Z_& z_) const
+		{
+			return typename _result_with_args<X_, Y_, Z_>::func_type()(x_, y_, z_);
+		}
+	};
+
+	template<class X_, class Y_ = X_, class Z_ = X_>
+	struct do_fmsub
+	{
+	private:
+		static constexpr bool _z_may_be_negated = EmuCore::TMP::has_unary_minus_operator_v<const Z_&>;
+		using _z_negate_result = typename EmuCore::TMP::unary_minus_operator_result<const Z_&>::type;
+		static_assert(_z_may_be_negated, "Attempted to use an EmuCore::do_fmsub functor instance, but the provided Z_ argument cannot be negated. As fmsub is emulated through fmadd, const Z_& must be possible to negate via the unary operator-.");
+
+		using _x_uq = typename EmuCore::TMP::remove_ref_cv<X_>::type;
+		using _y_uq = typename EmuCore::TMP::remove_ref_cv<Y_>::type;
+		using _neg_z_uq = typename EmuCore::TMP::remove_ref_cv<_z_negate_result>::type;
+
+		using _fmadd = do_fmadd<_x_uq, _y_uq, _neg_z_uq>;
+		using _safe_fmadd_invoke_result = EmuCore::TMP::safe_invoke_result<_fmadd, const X_&, const Y_&, _z_negate_result>;
+
+	public:
+		template<typename = std::enable_if_t<_z_may_be_negated && _safe_fmadd_invoke_result::value>>
+		[[nodiscard]] constexpr inline typename _safe_fmadd_invoke_result::type operator()(const X_& x_, const Y_& y_, const Z_& z_) const
+		{
+			return _fmadd()(x_, y_, -z_);
+		}
+	};
+
+	template<>
+	struct do_fmsub<void, void, void>
+	{
+		private:
+		template<typename X_, typename Y_, typename Z_>
+		struct _result_with_args
+		{
+		private:
+			using _x_uq = EmuCore::TMP::remove_ref_cv_t<X_>;
+			using _y_uq = EmuCore::TMP::remove_ref_cv_t<Y_>;
+			using _z_uq = EmuCore::TMP::remove_ref_cv_t<Z_>;
+			using _to_invoke = EmuCore::do_fmsub<_x_uq, _y_uq, _z_uq>;
+			using _safe_invoke_result = EmuCore::TMP::safe_invoke_result<_to_invoke, const X_&, const Y_&, const Z_&>;
+
+		public:
+			using func_type = _to_invoke;
+			using type = typename _safe_invoke_result::type;
+			static constexpr bool is_valid = _safe_invoke_result::value;
+		};
+
+	public:
+		constexpr do_fmsub()
+		{
+		}
+
+		template
+		<
+			typename X_,
+			typename Y_,
+			typename Z_,
+			typename = std::enable_if_t<_result_with_args<X_, Y_, Z_>::is_valid>
+		>
+		constexpr inline typename _result_with_args<X_, Y_, Z_>::type operator()(const X_& x_, const Y_& y_, const Z_& z_) const
+		{
+			return typename _result_with_args<X_, Y_, Z_>::func_type()(x_, y_, z_);
 		}
 	};
 #pragma endregion
