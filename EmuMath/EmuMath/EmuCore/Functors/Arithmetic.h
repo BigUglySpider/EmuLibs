@@ -720,6 +720,44 @@ namespace EmuCore
 			return _fmadd()(x_, y_, -z_);
 		}
 	};
+
+	template<>
+	struct do_fmsub<void, void, void>
+	{
+		private:
+		template<typename X_, typename Y_, typename Z_>
+		struct _result_with_args
+		{
+		private:
+			using _x_uq = EmuCore::TMP::remove_ref_cv_t<X_>;
+			using _y_uq = EmuCore::TMP::remove_ref_cv_t<Y_>;
+			using _z_uq = EmuCore::TMP::remove_ref_cv_t<Z_>;
+			using _to_invoke = EmuCore::do_fmsub<_x_uq, _y_uq, _z_uq>;
+			using _safe_invoke_result = EmuCore::TMP::safe_invoke_result<_to_invoke, const X_&, const Y_&, const Z_&>;
+
+		public:
+			using func_type = _to_invoke;
+			using type = typename _safe_invoke_result::type;
+			static constexpr bool is_valid = _safe_invoke_result::value;
+		};
+
+	public:
+		constexpr do_fmsub()
+		{
+		}
+
+		template
+		<
+			typename X_,
+			typename Y_,
+			typename Z_,
+			typename = std::enable_if_t<_result_with_args<X_, Y_, Z_>::is_valid>
+		>
+		constexpr inline typename _result_with_args<X_, Y_, Z_>::type operator()(const X_& x_, const Y_& y_, const Z_& z_) const
+		{
+			return typename _result_with_args<X_, Y_, Z_>::func_type()(x_, y_, z_);
+		}
+	};
 #pragma endregion
 
 #pragma region ARITHMETIC_OPERATOR_ASSIGN_FUNCTORS
