@@ -10,7 +10,8 @@
 // --- multiply
 // --- divide
 // --- mod
-// --- fma
+// --- fmadd
+// --- fmsub
 
 namespace EmuMath::Helpers
 {

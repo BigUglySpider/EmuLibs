@@ -499,13 +499,16 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Vector FMA (Manual Multiply -> Add)";
+		static constexpr std::string_view NAME = "Matrix FMS (Manual Multiply -> Sub)";
 
-		static constexpr std::size_t vec_size = 30;
-		using vector_type_arg = float;
-		using vector_type = EmuMath::Vector<vec_size, vector_type_arg>;
-		using float_type = typename vector_type::preferred_floating_point;
-		using vector_type_fp = EmuMath::Vector<vec_size, float_type>;
+		static constexpr std::size_t num_columns = 4;
+		static constexpr std::size_t num_rows = 4;
+		static constexpr bool column_major = false; // Just to appear identically to dxm in terms of where our random args are
+		using t_arg = int;
+		using out_type = EmuMath::Matrix<num_columns, num_rows, t_arg, column_major>;
+		using in_a_type = out_type;
+		using in_a_type_column_major = EmuMath::Matrix<in_a_type::num_columns, in_a_type::num_rows, in_a_type::stored_type, true>;
+		using in_b_type = t_arg;
 
 		fma_test_manual()
 		{
@@ -513,38 +516,37 @@ namespace EmuCore::TestingHelpers
 		void Prepare()
 		{
 			// RESIZES
-			out_fma.resize(NUM_LOOPS);
+			out.resize(NUM_LOOPS);
 
 			// RESERVES
 			in_x.reserve(NUM_LOOPS);
 			in_y.reserve(NUM_LOOPS);
-			in_z.reserve(NUM_LOOPS);
 
-			// FILL RESERVES
-			RngFunctor rng_ = RngFunctor(shared_fill_seed_);
-			rng_._rng.SetMinMax(-1000, 1000);
-
+			// RESERVED FILLS
+			RngFunctor rng_(shared_fill_seed_);
+			rng_._rng.SetMinMax(0, 25);
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				emplace_back_vector<vec_size, vector_type_arg>(in_x, rng_);
-				emplace_back_vector<vec_size, float_type>(in_y, rng_);
-				emplace_back_vector<vec_size, float_type>(in_z, rng_);
+				//in_a.push_back(in_a_type(in_a_type_column_major(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)));
+				in_x.push_back(make_random_matrix<in_a_type>(rng_));
+				in_y.push_back(in_b_type(rng_._rng.NextReal<float>()));
+				in_z.push_back(in_b_type(rng_._rng.NextReal<float>()));
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			(in_x[i] * in_y[i]).Add(out_fma[i], in_z[i]);
+			in_x[i].MultiplyBasic(in_y[i]).Subtract(out[i], in_z[i]);
 		}
 		void OnTestsOver()
 		{
 			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
-			std::cout << "FMA(\n\t" << in_x[i_] << ",\n\t" << in_y[i_] << ",\n\t" << in_z[i_] << "\n): " << out_fma[i_] << "\n\n";
+			std::cout << out[i_] << "\n\n";
 		}
 
-		std::vector<vector_type> in_x;
-		std::vector<vector_type_fp> in_y;
-		std::vector<vector_type_fp> in_z;
-		std::vector<vector_type_fp> out_fma;
+		std::vector<in_a_type> in_x;
+		std::vector<in_b_type> in_y;
+		std::vector<in_b_type> in_z;
+		std::vector<out_type> out;
 	};
 
 	struct fma_test_fused
@@ -553,13 +555,16 @@ namespace EmuCore::TestingHelpers
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Vector FMA (Fused)";
+		static constexpr std::string_view NAME = "Matrix FMS (Fused)";
 
-		static constexpr std::size_t vec_size = 30;
-		using vector_type_arg = float;
-		using vector_type = EmuMath::Vector<vec_size, vector_type_arg>;
-		using float_type = typename vector_type::preferred_floating_point;
-		using vector_type_fp = EmuMath::Vector<vec_size, float_type>;
+		static constexpr std::size_t num_columns = fma_test_manual::num_columns;
+		static constexpr std::size_t num_rows = fma_test_manual::num_rows;
+		static constexpr bool column_major = false; // Just to appear identically to dxm in terms of where our random args are
+		using t_arg = int;
+		using out_type = EmuMath::Matrix<num_columns, num_rows, t_arg, column_major>;
+		using in_a_type = out_type;
+		using in_a_type_column_major = EmuMath::Matrix<in_a_type::num_columns, in_a_type::num_rows, in_a_type::stored_type, true>;
+		using in_b_type = t_arg;
 
 		fma_test_fused()
 		{
@@ -567,38 +572,37 @@ namespace EmuCore::TestingHelpers
 		void Prepare()
 		{
 			// RESIZES
-			out_fma.resize(NUM_LOOPS);
+			out.resize(NUM_LOOPS);
 
 			// RESERVES
 			in_x.reserve(NUM_LOOPS);
 			in_y.reserve(NUM_LOOPS);
-			in_z.reserve(NUM_LOOPS);
 
-			// FILL RESERVES
-			RngFunctor rng_ = RngFunctor(shared_fill_seed_);
-			rng_._rng.SetMinMax(-1000, 1000);
-
+			// RESERVED FILLS
+			RngFunctor rng_(shared_fill_seed_);
+			rng_._rng.SetMinMax(0, 25);
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				emplace_back_vector<vec_size, vector_type_arg>(in_x, rng_);
-				emplace_back_vector<vec_size, float_type>(in_y, rng_);
-				emplace_back_vector<vec_size, float_type>(in_z, rng_);
+				//in_a.push_back(in_a_type(in_a_type_column_major(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)));
+				in_x.push_back(make_random_matrix<in_a_type>(rng_));
+				in_y.push_back(in_b_type(rng_._rng.NextReal<float>()));
+				in_z.push_back(in_b_type(rng_._rng.NextReal<float>()));
 			}
 		}
 		void operator()(std::size_t i)
 		{
-			in_x[i].Fmadd(out_fma[i], in_y[i], in_z[i]);
+			in_x[i].Fmsub(out[i], in_y[i], in_z[i]);
 		}
 		void OnTestsOver()
 		{
 			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
-			std::cout << "FMA(\n\t" << in_x[i_] << ",\n\t" << in_y[i_] << ",\n\t" << in_z[i_] << "\n): " << out_fma[i_] << "\n\n";
+			std::cout << out[i_] << "\n\n";
 		}
 
-		std::vector<vector_type> in_x;
-		std::vector<vector_type_fp> in_y;
-		std::vector<vector_type_fp> in_z;
-		std::vector<vector_type_fp> out_fma;
+		std::vector<in_a_type> in_x;
+		std::vector<in_b_type> in_y;
+		std::vector<in_b_type> in_z;
+		std::vector<out_type> out;
 	};
 
 	// ----------- TESTS SELECTION -----------

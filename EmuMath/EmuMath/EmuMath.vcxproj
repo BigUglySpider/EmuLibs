@@ -186,6 +186,8 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_all_matrix_helpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_basic_arithmetic\_matrix_add.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_basic_arithmetic\_matrix_divide.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_basic_arithmetic\_matrix_fmadd.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_basic_arithmetic\_matrix_fmsub.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_basic_arithmetic\_matrix_mod.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_basic_arithmetic\_matrix_multiply_basic.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_basic_arithmetic\_matrix_subtract.h" />

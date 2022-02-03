@@ -3,6 +3,8 @@
 
 #include "_basic_arithmetic/_matrix_add.h"
 #include "_basic_arithmetic/_matrix_divide.h"
+#include "_basic_arithmetic/_matrix_fmadd.h"
+#include "_basic_arithmetic/_matrix_fmsub.h"
 #include "_basic_arithmetic/_matrix_mod.h"
 #include "_basic_arithmetic/_matrix_multiply_basic.h"
 #include "_basic_arithmetic/_matrix_subtract.h"

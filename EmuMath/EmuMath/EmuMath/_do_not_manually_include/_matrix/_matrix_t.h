@@ -2527,6 +2527,388 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::matrix_multiply<preferred_floating_point, OutColumnMajor_>(*this, rhs_matrix_);
 		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of a fused multiply-add operation on this Matrix, using arguments y_ and z_,
+		///		with output size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> If Y_ is an EmuMath Matrix: Respective elements in this Matrix and y_ will be multiplied. Otherwise, all elements in this Matrix will be multiplied by y_. </para>
+		/// <para>
+		///		If Z_ is an EmuMath Matrix: Intermediate results from each multiplication in specific indices will have the respective indices of z_ added. 
+		///		Otherwise, all intermediate multiplication results will have z_ added directly.
+		/// </para>
+		/// </summary>
+		/// <param name="y_">: Scalar or EmuMath Matrix to multiply this Matrix by.</param>
+		/// <param name="z_">: Scalar or EmuMath Matrix to add to intermediate multiplication results.</param>
+		/// <returns>EmuMath Matrix containing the results of fmadd operations on this Matrix with the provided arguments in respective indices.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Fmadd(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmadd<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Fmadd(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmadd<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Fmadd(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmadd<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		template<class Y_, class Z_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Fmadd(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Y_&& y_, Z_&& z_) const
+		{
+			EmuMath::Helpers::matrix_fmadd(out_matrix_, *this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of a fused multiply-add operation on this Matrix, using arguments y_ and z_,
+		///		with output size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> If Y_ is an EmuMath Matrix: Respective elements in this Matrix and y_ will be multiplied. Otherwise, all elements in this Matrix will be multiplied by y_. </para>
+		/// <para>
+		///		If Z_ is an EmuMath Matrix: Intermediate results from each multiplication in specific indices will have the respective indices of z_ added. 
+		///		Otherwise, all intermediate multiplication results will have z_ added directly.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective fused multiply-addition operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices in matrix_x_. </para>
+		/// </summary>
+		/// <param name="y_">: Scalar or EmuMath Matrix to multiply this Matrix by.</param>
+		/// <param name="z_">: Scalar or EmuMath Matrix to add to intermediate multiplication results.</param>
+		/// <returns>EmuMath Matrix containing the results of fmadd in respective indices within the provided range, and copied respective elements of this Matrix elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Y_, class Z_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> FmaddRange(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmadd_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Y_>(y_),
+				std::forward<Z_>(z_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major,
+			class Y_, class Z_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> FmaddRange(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmadd_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Y_>(y_),
+				std::forward<Z_>(z_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> FmaddRange(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmadd_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Y_>(y_),
+				std::forward<Z_>(z_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Y_, class Z_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void FmaddRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Y_&& y_, Z_&& z_) const
+		{
+			EmuMath::Helpers::matrix_fmadd_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of a fused multiply-add operation on this Matrix, using arguments y_ and z_,
+		///		with output size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> If Y_ is an EmuMath Matrix: Respective elements in this Matrix and y_ will be multiplied. Otherwise, all elements in this Matrix will be multiplied by y_. </para>
+		/// <para>
+		///		If Z_ is an EmuMath Matrix: Intermediate results from each multiplication in specific indices will have the respective indices of z_ added. 
+		///		Otherwise, all intermediate multiplication results will have z_ added directly.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective fused multiply-addition operations. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// </summary>
+		/// <param name="y_">: Scalar or EmuMath Matrix to multiply this Matrix by.</param>
+		/// <param name="z_">: Scalar or EmuMath Matrix to add to intermediate multiplication results.</param>
+		/// <returns>EmuMath Matrix containing the results of fmadd in respective indices within the provided range, and default-constructed elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Y_, class Z_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> FmaddRangeNoCopy(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmadd_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Y_>(y_),
+				std::forward<Z_>(z_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major,
+			class Y_, class Z_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> FmaddRangeNoCopy(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmadd_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Y_>(y_),
+				std::forward<Z_>(z_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> FmaddRangeNoCopy(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmadd_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Y_>(y_),
+				std::forward<Z_>(z_)
+			);
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of a fused multiply-add operation on this Matrix using arguments y_ and z_, via the provided out_matrix_. </para>
+		/// <para> If Y_ is an EmuMath Matrix: Respective elements in this Matrix and y_ will be multiplied. Otherwise, all elements in this Matrix will be multiplied by y_. </para>
+		/// <para>
+		///		If Z_ is an EmuMath Matrix: Intermediate results from each multiplication in specific indices will have the respective indices of z_ added. 
+		///		Otherwise, all intermediate multiplication results will have z_ added directly.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective fused multiply-addition operations. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		/// <param name="y_">: Scalar or EmuMath Matrix to multiply this Matrix by.</param>
+		/// <param name="z_">: Scalar or EmuMath Matrix to add to intermediate multiplication results.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Y_, class Z_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void FmaddRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmadd_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of a fused multiply-subtract operation on this Matrix, using arguments y_ and z_,
+		///		with output size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> If Y_ is an EmuMath Matrix: Respective elements in this Matrix and y_ will be multiplied. Otherwise, all elements in this Matrix will be multiplied by y_. </para>
+		/// <para>
+		///		If Z_ is an EmuMath Matrix: Intermediate results from each multiplication in specific indices will have the respective indices of z_ subtracted. 
+		///		Otherwise, all intermediate multiplication results will have z_ subtracted directly.
+		/// </para>
+		/// </summary>
+		/// <param name="y_">: Scalar or EmuMath Matrix to multiply this Matrix by.</param>
+		/// <param name="z_">: Scalar or EmuMath Matrix to subtract from intermediate multiplication results.</param>
+		/// <returns>EmuMath Matrix containing the results of fmsub operations on this Matrix with the provided arguments in respective indices.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Fmsub(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmsub<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Fmsub(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmsub<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Fmsub(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmsub<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		template<class Y_, class Z_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Fmsub(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Y_&& y_, Z_&& z_) const
+		{
+			EmuMath::Helpers::matrix_fmsub(out_matrix_, *this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of a fused multiply-subtract operation on this Matrix, using arguments y_ and z_,
+		///		with output size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> If Y_ is an EmuMath Matrix: Respective elements in this Matrix and y_ will be multiplied. Otherwise, all elements in this Matrix will be multiplied by y_. </para>
+		/// <para>
+		///		If Z_ is an EmuMath Matrix: Intermediate results from each multiplication in specific indices will have the respective indices of z_ subtracted. 
+		///		Otherwise, all intermediate multiplication results will have z_ subtracted directly.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective fused multiply-subtraction operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices in matrix_x_. </para>
+		/// </summary>
+		/// <param name="y_">: Scalar or EmuMath Matrix to multiply this Matrix by.</param>
+		/// <param name="z_">: Scalar or EmuMath Matrix to subtract from intermediate multiplication results.</param>
+		/// <returns>EmuMath Matrix containing the results of fmsub in respective indices within the provided range, and copied respective elements of this Matrix elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Y_, class Z_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> FmsubRange(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmsub_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Y_>(y_),
+				std::forward<Z_>(z_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major,
+			class Y_, class Z_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> FmsubRange(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmsub_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Y_>(y_),
+				std::forward<Z_>(z_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> FmsubRange(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmsub_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Y_>(y_),
+				std::forward<Z_>(z_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Y_, class Z_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void FmsubRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Y_&& y_, Z_&& z_) const
+		{
+			EmuMath::Helpers::matrix_fmsub_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Outputs the result of a fused multiply-subtract operation on this Matrix, using arguments y_ and z_,
+		///		with output size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
+		/// </para>
+		/// <para> If Y_ is an EmuMath Matrix: Respective elements in this Matrix and y_ will be multiplied. Otherwise, all elements in this Matrix will be multiplied by y_. </para>
+		/// <para>
+		///		If Z_ is an EmuMath Matrix: Intermediate results from each multiplication in specific indices will have the respective indices of z_ subtracted. 
+		///		Otherwise, all intermediate multiplication results will have z_ subtracted directly.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective fused multiply-subtraction operations. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// </summary>
+		/// <param name="y_">: Scalar or EmuMath Matrix to multiply this Matrix by.</param>
+		/// <param name="z_">: Scalar or EmuMath Matrix to subtract from intermediate multiplication results.</param>
+		/// <returns>EmuMath Matrix containing the results of fmsub in respective indices within the provided range, and default-constructed elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Y_, class Z_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> FmsubRangeNoCopy(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmsub_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Y_>(y_),
+				std::forward<Z_>(z_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major,
+			class Y_, class Z_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> FmsubRangeNoCopy(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmsub_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Y_>(y_),
+				std::forward<Z_>(z_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> FmsubRangeNoCopy(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmsub_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Y_>(y_),
+				std::forward<Z_>(z_)
+			);
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of a fused multiply-add operation on this Matrix using arguments y_ and z_, via the provided out_matrix_. </para>
+		/// <para> If Y_ is an EmuMath Matrix: Respective elements in this Matrix and y_ will be multiplied. Otherwise, all elements in this Matrix will be multiplied by y_. </para>
+		/// <para>
+		///		If Z_ is an EmuMath Matrix: Intermediate results from each multiplication in specific indices will have the respective indices of z_ added. 
+		///		Otherwise, all intermediate multiplication results will have z_ added directly.
+		/// </para>
+		/// <para> Indices within the provided range will contain results of respective fused multiply-addition operations. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		/// <param name="y_">: Scalar or EmuMath Matrix to multiply this Matrix by.</param>
+		/// <param name="z_">: Scalar or EmuMath Matrix to add to intermediate multiplication results.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Y_, class Z_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void FmsubRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::matrix_fmsub_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
 #pragma endregion
 
 #pragma region ARITHMETIC_ASSIGN_FUNCS
