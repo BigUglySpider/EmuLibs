@@ -587,7 +587,7 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i)
 		{
-			in_x[i].Fma(out_fma[i], in_y[i], in_z[i]);
+			in_x[i].Fmadd(out_fma[i], in_y[i], in_z[i]);
 		}
 		void OnTestsOver()
 		{

@@ -220,6 +220,8 @@ int main()
 
 	constexpr auto unequal_mat_result = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) * EmuMath::Matrix<1, 4, float, true>(1, 2, 3, 4);
 
+
+
 	std::cout << mat_result_ << "\n\n";
 
 	// ##### SCALAR vs SIMD NOISE #####

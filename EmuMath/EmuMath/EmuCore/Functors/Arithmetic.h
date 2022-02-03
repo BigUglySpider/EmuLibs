@@ -596,7 +596,7 @@ namespace EmuCore
 	};
 
 	template<class X_, class Y_ = X_, class Z_ = X_>
-	struct do_fma
+	struct do_fmadd
 	{
 	private:
 		using _x_uq = typename EmuCore::TMP::remove_ref_cv<X_>::type;
@@ -638,7 +638,7 @@ namespace EmuCore
 		using _out_type_finder = _out_type_finder_template<_any_fp>;
 
 	public:
-		constexpr do_fma()
+		constexpr do_fmadd()
 		{
 		}
 
@@ -661,7 +661,7 @@ namespace EmuCore
 	};
 
 	template<>
-	struct do_fma<void, void, void>
+	struct do_fmadd<void, void, void>
 	{
 	private:
 		template<typename X_, typename Y_, typename Z_>
@@ -671,7 +671,7 @@ namespace EmuCore
 			using _x_uq = EmuCore::TMP::remove_ref_cv_t<X_>;
 			using _y_uq = EmuCore::TMP::remove_ref_cv_t<Y_>;
 			using _z_uq = EmuCore::TMP::remove_ref_cv_t<Z_>;
-			using _to_invoke = EmuCore::do_fma<_x_uq, _y_uq, _z_uq>;
+			using _to_invoke = EmuCore::do_fmadd<_x_uq, _y_uq, _z_uq>;
 			using _safe_invoke_result = EmuCore::TMP::safe_invoke_result<_to_invoke, const X_&, const Y_&, const Z_&>;
 
 		public:
@@ -681,7 +681,7 @@ namespace EmuCore
 		};
 
 	public:
-		constexpr do_fma()
+		constexpr do_fmadd()
 		{
 		}
 
@@ -695,6 +695,29 @@ namespace EmuCore
 		constexpr inline typename _result_with_args<X_, Y_, Z_>::type operator()(const X_& x_, const Y_& y_, const Z_& z_) const
 		{
 			return typename _result_with_args<X_, Y_, Z_>::func_type()(x_, y_, z_);
+		}
+	};
+
+	template<class X_, class Y_ = X_, class Z_ = X_>
+	struct do_fmsub
+	{
+	private:
+		static constexpr bool _z_may_be_negated = EmuCore::TMP::has_unary_minus_operator_v<const Z_&>;
+		using _z_negate_result = typename EmuCore::TMP::unary_minus_operator_result<const Z_&>::type;
+		static_assert(_z_may_be_negated, "Attempted to use an EmuCore::do_fmsub functor instance, but the provided Z_ argument cannot be negated. As fmsub is emulated through fmadd, const Z_& must be possible to negate via the unary operator-.");
+
+		using _x_uq = typename EmuCore::TMP::remove_ref_cv<X_>::type;
+		using _y_uq = typename EmuCore::TMP::remove_ref_cv<Y_>::type;
+		using _neg_z_uq = typename EmuCore::TMP::remove_ref_cv<_z_negate_result>::type;
+
+		using _fmadd = do_fmadd<_x_uq, _y_uq, _neg_z_uq>;
+		using _safe_fmadd_invoke_result = EmuCore::TMP::safe_invoke_result<_fmadd, const X_&, const Y_&, _z_negate_result>;
+
+	public:
+		template<typename = std::enable_if_t<_z_may_be_negated && _safe_fmadd_invoke_result::value>>
+		[[nodiscard]] constexpr inline typename _safe_fmadd_invoke_result::type operator()(const X_& x_, const Y_& y_, const Z_& z_) const
+		{
+			return _fmadd()(x_, y_, -z_);
 		}
 	};
 #pragma endregion
