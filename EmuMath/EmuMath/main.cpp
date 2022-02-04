@@ -226,6 +226,15 @@ int main()
 	std::cout << another_ << "\n\n";
 
 	std::cout << mat_result_ << "\n\n";
+	std::cout << "\n---\n";
+
+	auto trans_matrix_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	auto trans_vector = EmuMath::Vector<4, float>(1, 2, 3, 4);
+	std::cout << trans_matrix_ << "\nMUL\n" << trans_vector << "\n:\n";
+	std::cout << (trans_matrix_ *= trans_vector) << "\n\n";
+	std::cout << "Matrix Squared:\n" << (trans_matrix_.SquareAssign()) << "\n\n";
+	trans_matrix_.MultiplyAssign(EmuMath::Matrix<1, 4, float, true>(1, 2, 3, 4));
+	std::cout << "Mult 1x4 1234:\n" << trans_matrix_ << "\n\n";
 
 	// ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;

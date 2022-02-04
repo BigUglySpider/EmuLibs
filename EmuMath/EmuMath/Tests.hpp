@@ -605,11 +605,105 @@ namespace EmuCore::TestingHelpers
 		std::vector<out_type> out;
 	};
 
+	struct square_assign_test_manual
+	{
+		static constexpr bool DO_TEST = true;
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr std::string_view NAME = "Matrix Square (Manual Mult -> Assign)";
+
+		static constexpr std::size_t num_columns = 8;
+		static constexpr std::size_t num_rows = 8;
+		static constexpr bool column_major = false; // Just to appear identically to dxm in terms of where our random args are
+		using t_arg = int;
+		using out_type = EmuMath::Matrix<num_columns, num_rows, t_arg, column_major>;
+		using in_a_type = out_type;
+		using in_a_type_column_major = EmuMath::Matrix<in_a_type::num_columns, in_a_type::num_rows, in_a_type::stored_type, true>;
+		using in_b_type = t_arg;
+
+		square_assign_test_manual()
+		{
+		}
+		void Prepare()
+		{
+			// RESERVES
+			out.reserve(NUM_LOOPS);
+
+			// RESERVED FILLS
+			RngFunctor rng_(shared_fill_seed_);
+			rng_._rng.SetMinMax(0, 25);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				//in_a.push_back(in_a_type(in_a_type_column_major(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)));
+				out.push_back(make_random_matrix<in_a_type>(rng_));
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			out[i] = out[i] * out[i];
+		}
+		void OnTestsOver()
+		{
+			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
+			std::cout << out[i_] << "\n\n";
+		}
+
+		std::vector<out_type> out;
+	};
+
+	struct square_assign_test_auto
+	{
+		static constexpr bool DO_TEST = true;
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr std::string_view NAME = "Matrix Square (Auto SquareAssign Func)";
+
+		static constexpr std::size_t num_columns = square_assign_test_manual::num_columns;
+		static constexpr std::size_t num_rows = square_assign_test_manual::num_rows;
+		static constexpr bool column_major = false; // Just to appear identically to dxm in terms of where our random args are
+		using t_arg = int;
+		using out_type = EmuMath::Matrix<num_columns, num_rows, t_arg, column_major>;
+		using in_a_type = out_type;
+		using in_a_type_column_major = EmuMath::Matrix<in_a_type::num_columns, in_a_type::num_rows, in_a_type::stored_type, true>;
+		using in_b_type = t_arg;
+
+		square_assign_test_auto()
+		{
+		}
+		void Prepare()
+		{
+			// RESERVES
+			out.reserve(NUM_LOOPS);
+
+			// RESERVED FILLS
+			RngFunctor rng_(shared_fill_seed_);
+			rng_._rng.SetMinMax(0, 25);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				//in_a.push_back(in_a_type(in_a_type_column_major(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)));
+				out.push_back(make_random_matrix<in_a_type>(rng_));
+			}
+		}
+		void operator()(std::size_t i)
+		{
+			out[i].SquareAssign();
+		}
+		void OnTestsOver()
+		{
+			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
+			std::cout << out[i_] << "\n\n";
+		}
+
+		std::vector<out_type> out;
+	};
+
 	// ----------- TESTS SELECTION -----------
 	using AllTests = std::tuple
 	<
-		fma_test_manual,
-		fma_test_fused
+		square_assign_test_manual,
+		square_assign_test_auto
 	>;
 
 	// ----------- TESTS BEGIN -----------
