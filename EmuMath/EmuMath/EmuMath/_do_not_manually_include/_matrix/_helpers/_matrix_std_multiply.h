@@ -101,6 +101,27 @@ namespace EmuMath::Helpers
 			std::forward<Rhs_>(rhs_)
 		);
 	}
+
+	template
+	<
+		class Rhs_, std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_,
+		std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_,
+		typename = std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>()>
+	>
+	constexpr inline void matrix_multiply
+	(
+		EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_,
+		const EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_,
+		Rhs_&& rhs_
+	)
+	{
+		return EMU_MATH_MATRIX_MUTATE_ASSIGN_TEMPLATE(EmuCore::do_multiply, 0, OutNumColumns_, 0, OutNumRows_, 0, 0)
+		(
+			out_matrix_,
+			lhs_matrix_,
+			std::forward<Rhs_>(rhs_)
+		);
+	}
 #pragma endregion
 
 #pragma region MULTIPLY_WITH_VECTOR_RHS
@@ -154,6 +175,20 @@ namespace EmuMath::Helpers
 	{
 		using rhs_fp = typename EmuMath::Vector<RhsSize_, RhsT_>::preferred_floating_point;
 		return _matrix_underlying::_matrix_std_multiply_mat_vector<rhs_fp>(lhs_matrix_, rhs_vector_);
+	}
+
+	template
+	<
+		std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, std::size_t RhsSize_, typename RhsT_, std::size_t OutSize_, typename OutT_
+	>
+	[[nodiscard]] constexpr inline void matrix_multiply
+	(
+		EmuMath::Vector<OutSize_, OutT_>& out_vector_,
+		const EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_,
+		const EmuMath::Vector<RhsSize_, RhsT_>& rhs_vector_
+	)
+	{
+		_matrix_underlying::_matrix_std_multiply_assign_mat_vector(out_vector_, lhs_matrix_, rhs_vector_);
 	}
 #pragma endregion
 
@@ -243,6 +278,22 @@ namespace EmuMath::Helpers
 	{
 		using lhs_fp = typename EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>::preferred_floating_point;
 		return _matrix_underlying::_matrix_std_multiply_mat_mat<lhs_fp, LhsColumnMajor_>(lhs_matrix_, rhs_matrix_);
+	}
+
+	template
+	<
+		std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_,
+		std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
+		std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+	>
+	constexpr inline void matrix_multiply
+	(
+		EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_,
+		const EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_,
+		const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& rhs_matrix_
+	)
+	{
+		_matrix_underlying::_matrix_std_multiply_assign_mat_mat<OutColumnMajor_>(out_matrix_, lhs_matrix_, rhs_matrix_);
 	}
 #pragma endregion
 }

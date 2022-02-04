@@ -2560,6 +2560,248 @@ namespace EmuMath
 		{
 			EmuMath::Helpers::vector_mod_range_no_copy<OutBegin_, OutEnd_, ModBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
+
+		/// <summary>
+		/// <para> Outputs the result of a fused multiply-add operation on this Vector with the provided y_ and z_ arguments. </para>
+		/// <para> This operation will perform only one floating-point round operation; the intermediate from this_vector * y_ is unrounded. </para>
+		/// <para> If Y_ is an EmuMath Vector: Respective elements in this Vector and y_ will be multiplied. Otherwise, all elements in this Vector will be multiplied by y_. </para>
+		/// <para>
+		///		If Z_ is an EmuMath Vector: Intermediate results from each multiplication in specific indices will have the respective indices of z_ added. 
+		///		Otherwise, all intermediate multiplication results will have z_ added directly.
+		/// </para>
+		/// </summary>
+		/// <param name="y_">: Scalar or EmuMath Vector to multiply this Vector by.</param>
+		/// <param name="z_">: Scalar or EmuMath Vector to add to intermediate multiplication results.</param>
+		/// <returns>EmuMath Vector containing the results of a fused multiply-add operation on this Vector with the provided arguments.</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Fmadd(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::vector_fmadd<OutSize_, OutT_>(*this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		template<typename OutT_ = value_type_uq, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Fmadd(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::vector_fmadd<size, OutT_>(*this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		template<class Y_, class Z_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void Fmadd(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Y_&& y_, Z_&& z_) const
+		{
+			EmuMath::Helpers::vector_fmadd(out_vector_, *this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		/// <summary>
+		/// <para> Outputs a copy of this Vector as the desired EmuMath Vector type, with fused multiply-add operations performed in the provided range. </para>
+		/// <para> When a fmadd operation is performed, it will perform only one floating-point round operation; the intermediate from this_vector * y_ is unrounded. </para>
+		/// <para> If Y_ is an EmuMath Vector: Respective elements in this Vector and y_ will be multiplied. Otherwise, all elements in this Vector will be multiplied by y_. </para>
+		/// <para>
+		///		If Z_ is an EmuMath Vector: Intermediate results from each multiplication in specific indices will have the respective indices of z_ added. 
+		///		Otherwise, all intermediate multiplication results will have z_ added directly.
+		/// </para>
+		/// <para> BeginIndex_: Inclusive index at which to start fused multiply-adding elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop fused multiply-adding elements. </para>
+		/// </summary>
+		/// <param name="y_">: Scalar or EmuMath Vector to multiply this Vector by.</param>
+		/// <param name="z_">: Scalar or EmuMath Vector to add to intermediate multiplication results.</param>
+		/// <returns>Copy of this Vector, with fused multiply-addition performed with the provided y_ and z_ arguments as described within the specified index range.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> FmaddRange(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::vector_fmadd_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> FmaddRange(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::vector_fmadd_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Y_, class Z_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void FmaddRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Y_&& y_, Z_&& z_) const
+		{
+			EmuMath::Helpers::vector_fmadd_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		/// <summary>
+		/// <para> 
+		///		Outputs the results of a fused multiply-add on this Vector with the provided y_ and z_ arguments to the specified index range of an output vector, 
+		///		starting from index AddBegin_ within any provided input Vectors (including this Vector).
+		/// </para>
+		/// <para> When a fmadd operation is performed, it will perform only one floating-point round operation; the intermediate from this_vector * y_ is unrounded. </para>
+		/// <para> If Y_ is an EmuMath Vector: Respective elements in this Vector and y_ will be multiplied. Otherwise, all elements in this Vector will be multiplied by y_. </para>
+		/// <para>
+		///		If Z_ is an EmuMath Vector: Intermediate results from each multiplication in specific indices will have the respective indices of z_ added. 
+		///		Otherwise, all intermediate multiplication results will have z_ added directly.
+		/// </para>
+		/// <para> Indices outside of the specified output range will be default-constructed. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing fused arithmetic results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing fused arithmetic results to the output Vector. </para>
+		/// <para> FmaddBegin_: Inclusive index at which to start reading elements from this Vector (and y_ and z_ if they are EmuMath Vectors) to perform arithmetic. </para>
+		/// </summary>
+		/// <param name="y_">: Scalar or EmuMath Vector to multiply this Vector by.</param>
+		/// <param name="z_">: Scalar or EmuMath Vector to add to intermediate multiplication results.</param>
+		/// <returns>
+		///		EmuMath Vector of the desired OutSize_ (defaults to this Vector's size) and OutT_ (defaults to this Vector's value_type_uq), 
+		///		containing the results of fused multiply-addition in the specified index range as described, and default values outside of said range.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t FmaddBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> FmaddRangeNoCopy(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::vector_fmadd_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, FmaddBegin_>(*this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t FmaddBegin_, typename OutT_ = value_type_uq, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> FmaddRangeNoCopy(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::vector_fmadd_range_no_copy<size, OutT_, OutBegin_, OutEnd_, FmaddBegin_>(*this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		/// <summary>
+		/// <para> 
+		///		Outputs the results of a fused multiply-add on this Vector with the provided y_ and z_ arguments to the specified index range of the provided out_vector_, 
+		///		starting from index AddBegin_ within any provided input Vectors (including this Vector).
+		/// </para>
+		/// <para> When a fmadd operation is performed, it will perform only one floating-point round operation; the intermediate from this_vector * y_ is unrounded. </para>
+		/// <para> If Y_ is an EmuMath Vector: Respective elements in this Vector and y_ will be multiplied. Otherwise, all elements in this Vector will be multiplied by y_. </para>
+		/// <para>
+		///		If Z_ is an EmuMath Vector: Intermediate results from each multiplication in specific indices will have the respective indices of z_ added. 
+		///		Otherwise, all intermediate multiplication results will have z_ added directly.
+		/// </para>
+		/// <para> Indices outside of the specified output range will not be modified. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing fused arithmetic results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing fused arithmetic results to the output Vector. </para>
+		/// <para> FmaddBegin_: Inclusive index at which to start reading elements from this Vector (and y_ and z_ if they are EmuMath Vectors) to perform arithmetic. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="y_">: Scalar or EmuMath Vector to multiply this Vector by.</param>
+		/// <param name="z_">: Scalar or EmuMath Vector to add to intermediate multiplication results.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t FmaddBegin_, class Y_, class Z_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void FmaddRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Y_&& y_, Z_&& z_) const
+		{
+			EmuMath::Helpers::vector_fmadd_range_no_copy<OutBegin_, OutEnd_, FmaddBegin_>(out_vector_, *this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the result of a fused multiply-subtract operation on this Vector with the provided y_ and z_ arguments. </para>
+		/// <para> This operation will perform only one floating-point round operation; the intermediate from this_vector * y_ is unrounded. </para>
+		/// <para> If Y_ is an EmuMath Vector: Respective elements in this Vector and y_ will be multiplied. Otherwise, all elements in this Vector will be multiplied by y_. </para>
+		/// <para>
+		///		If Z_ is an EmuMath Vector: Intermediate results from each multiplication in specific indices will have the respective indices of z_ subtracted. 
+		///		Otherwise, all intermediate multiplication results will have z_ subtracted directly.
+		/// </para>
+		/// </summary>
+		/// <param name="y_">: Scalar or EmuMath Vector to multiply this Vector by.</param>
+		/// <param name="z_">: Scalar or EmuMath Vector to subtract from intermediate multiplication results.</param>
+		/// <returns>EmuMath Vector containing the results of a fused multiply-subtract operation on this Vector with the provided arguments.</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Fmsub(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::vector_fmsub<OutSize_, OutT_>(*this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		template<typename OutT_ = value_type_uq, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Fmsub(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::vector_fmsub<size, OutT_>(*this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		template<class Y_, class Z_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void Fmsub(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Y_&& y_, Z_&& z_) const
+		{
+			EmuMath::Helpers::vector_fmsub(out_vector_, *this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		/// <summary>
+		/// <para> Outputs a copy of this Vector as the desired EmuMath Vector type, with fused multiply-subtract operations performed in the provided range. </para>
+		/// <para> When a fmsub operation is performed, it will perform only one floating-point round operation; the intermediate from this_vector * y_ is unrounded. </para>
+		/// <para> If Y_ is an EmuMath Vector: Respective elements in this Vector and y_ will be multiplied. Otherwise, all elements in this Vector will be multiplied by y_. </para>
+		/// <para>
+		///		If Z_ is an EmuMath Vector: Intermediate results from each multiplication in specific indices will have the respective indices of z_ subtracted. 
+		///		Otherwise, all intermediate multiplication results will have z_ subtracted directly.
+		/// </para>
+		/// <para> BeginIndex_: Inclusive index at which to start fused multiply-subtracting elements. </para>
+		/// <para> EndIndex_: Exclusive index at which to stop fused multiply-subtracting elements. </para>
+		/// </summary>
+		/// <param name="y_">: Scalar or EmuMath Vector to multiply this Vector by.</param>
+		/// <param name="z_">: Scalar or EmuMath Vector to subtract from intermediate multiplication results.</param>
+		/// <returns>Copy of this Vector, with fused multiply-subtraction performed with the provided y_ and z_ arguments as described within the specified index range.</returns>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> FmsubRange(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::vector_fmsub_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> FmsubRange(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::vector_fmsub_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Y_, class Z_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void FmsubRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Y_&& y_, Z_&& z_) const
+		{
+			EmuMath::Helpers::vector_fmsub_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		/// <summary>
+		/// <para> 
+		///		Outputs the results of a fused multiply-subtract on this Vector with the provided y_ and z_ arguments to the specified index range of an output vector, 
+		///		starting from index AddBegin_ within any provided input Vectors (including this Vector).
+		/// </para>
+		/// <para> When a fmsub operation is performed, it will perform only one floating-point round operation; the intermediate from this_vector * y_ is unrounded. </para>
+		/// <para> If Y_ is an EmuMath Vector: Respective elements in this Vector and y_ will be multiplied. Otherwise, all elements in this Vector will be multiplied by y_. </para>
+		/// <para>
+		///		If Z_ is an EmuMath Vector: Intermediate results from each multiplication in specific indices will have the respective indices of z_ subtracted. 
+		///		Otherwise, all intermediate multiplication results will have z_ subtracted directly.
+		/// </para>
+		/// <para> Indices outside of the specified output range will be default-constructed. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing fused arithmetic results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing fused arithmetic results to the output Vector. </para>
+		/// <para> FmaddBegin_: Inclusive index at which to start reading elements from this Vector (and y_ and z_ if they are EmuMath Vectors) to perform fused arithmetic. </para>
+		/// </summary>
+		/// <param name="y_">: Scalar or EmuMath Vector to multiply this Vector by.</param>
+		/// <param name="z_">: Scalar or EmuMath Vector to subtract from intermediate multiplication results.</param>
+		/// <returns>
+		///		EmuMath Vector of the desired OutSize_ (defaults to this Vector's size) and OutT_ (defaults to this Vector's value_type_uq), 
+		///		containing the results of fused multiply-subtraction in the specified index range as described, and default values outside of said range.
+		/// </returns>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t FmaddBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> FmsubRangeNoCopy(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::vector_fmsub_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, FmaddBegin_>(*this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t FmaddBegin_, typename OutT_ = value_type_uq, class Y_, class Z_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> FmsubRangeNoCopy(Y_&& y_, Z_&& z_) const
+		{
+			return EmuMath::Helpers::vector_fmsub_range_no_copy<size, OutT_, OutBegin_, OutEnd_, FmaddBegin_>(*this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
+
+		/// <summary>
+		/// <para> 
+		///		Outputs the results of a fused multiply-subtract on this Vector with the provided y_ and z_ arguments to the specified index range of the provided out_vector_, 
+		///		starting from index AddBegin_ within any provided input Vectors (including this Vector).
+		/// </para>
+		/// <para> When a fmsub operation is performed, it will perform only one floating-point round operation; the intermediate from this_vector * y_ is unrounded. </para>
+		/// <para> If Y_ is an EmuMath Vector: Respective elements in this Vector and y_ will be multiplied. Otherwise, all elements in this Vector will be multiplied by y_. </para>
+		/// <para>
+		///		If Z_ is an EmuMath Vector: Intermediate results from each multiplication in specific indices will have the respective indices of z_ subtracted. 
+		///		Otherwise, all intermediate multiplication results will have z_ subtracted directly.
+		/// </para>
+		/// <para> Indices outside of the specified output range will not be modified. </para>
+		/// <para> OutBegin_: Inclusive index at which to start writing fused arithmetic results to the output Vector. </para>
+		/// <para> OutEnd_: Exclusive index at which to stop writing fused arithmetic results to the output Vector. </para>
+		/// <para> FmaddBegin_: Inclusive index at which to start reading elements from this Vector (and y_ and z_ if they are EmuMath Vectors) to perform fused arithmetic. </para>
+		/// </summary>
+		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
+		/// <param name="y_">: Scalar or EmuMath Vector to multiply this Vector by.</param>
+		/// <param name="z_">: Scalar or EmuMath Vector to subtract from intermediate multiplication results.</param>
+		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t FmaddBegin_, class Y_, class Z_, std::size_t OutSize_, typename OutT_>
+		constexpr inline void FmsubRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Y_&& y_, Z_&& z_) const
+		{
+			EmuMath::Helpers::vector_fmsub_range_no_copy<OutBegin_, OutEnd_, FmaddBegin_>(out_vector_, *this, std::forward<Y_>(y_), std::forward<Z_>(z_));
+		}
 #pragma endregion
 
 #pragma region CONST_BITWISE_FUNCS
