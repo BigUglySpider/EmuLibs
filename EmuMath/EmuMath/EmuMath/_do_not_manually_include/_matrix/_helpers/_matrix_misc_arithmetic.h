@@ -1,6 +1,7 @@
 #ifndef EMU_MATH_MATRIX_MISC_ARITHMETIC_H_INC_
 #define EMU_MATH_MATRIX_MISC_ARITHMETIC_H_INC_ 1
 
+#include "_misc_arithmetic/_matrix_abs.h"
 #include "_misc_arithmetic/_matrix_ceil.h"
 #include "_misc_arithmetic/_matrix_ceil_constexpr.h"
 #include "_misc_arithmetic/_matrix_floor.h"

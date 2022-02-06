@@ -248,6 +248,8 @@ int main()
 	constexpr auto mat_trunced_ = mat_to_round_.TruncConstexpr();
 	std::cout << "Truncated (constexpr):\n" << mat_trunced_ << "\nTruncated (non-constexpr):\n" << mat_to_round_.Trunc() << "\n\n";
 
+	std::cout << "Abs:\n" << mat_to_round_.Abs() << "\n";
+
 	// ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
 	//constexpr std::size_t test_noise_dimensions = 3;
