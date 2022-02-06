@@ -196,10 +196,13 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_arithmetic_assign.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_copy.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_get.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_misc_arithmetic.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_mutate.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_special_operations.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_std_multiply.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_stream_append.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_misc_arithmetic\_matrix_floor.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_misc_arithmetic\_matrix_floor_constexpr.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_matrix_t.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_matrix.info.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_matrix_special_arithmetic.h" />

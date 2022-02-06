@@ -236,6 +236,13 @@ int main()
 	trans_matrix_.MultiplyAssign(EmuMath::Matrix<1, 4, float, true>(1, 2, 3, 4));
 	std::cout << "Mult 1x4 1234:\n" << trans_matrix_ << "\n\n";
 
+	std::cout << "\n---\n";
+	constexpr auto mat_to_round_ = EmuMath::Matrix<4, 4, float, true>(0.2, 0.7, 0.5, -0.8, -0.2, -1.2, 2, 2.5, 133.7, 13.37, 6, 12, 20, 40.5, 1.0L / 2.0f, 6.6666666);
+	constexpr auto mat_floored_ = mat_to_round_.FloorConstexpr();
+	std::cout << mat_to_round_ << "\n\n";
+	std::cout << "Floored (constexpr):\n" << mat_floored_ << "\nFloored (non-constexpr):\n" << mat_to_round_.Floor() << "\n\n";
+
+
 	// ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
 	//constexpr std::size_t test_noise_dimensions = 3;

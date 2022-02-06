@@ -3186,6 +3186,250 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region ROUNDING_FUNCS
+		/// <summary> 
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward negative infinity. </para>
+		/// <para> This does not provide a guarantee to be constexpr where possible. For such behaviour, use `FloorConstexpr`. </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward negative infinity.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Floor() const
+		{
+			return EmuMath::Helpers::matrix_floor<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Floor() const
+		{
+			return EmuMath::Helpers::matrix_floor<num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Floor() const
+		{
+			return EmuMath::Helpers::matrix_floor<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Floor(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_floor(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward negative infinity. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices within this Matrix. </para>
+		/// <para> This does not provide a guarantee to be constexpr where possible. For such behaviour, use `FloorRangeConstexpr`. </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward negative infinity.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> FloorRange() const
+		{
+			return EmuMath::Helpers::matrix_floor_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> FloorRange() const
+		{
+			return EmuMath::Helpers::matrix_floor_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> FloorRange() const
+		{
+			return EmuMath::Helpers::matrix_floor_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void FloorRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_floor_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward negative infinity. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> This does not provide a guarantee to be constexpr where possible. For such behaviour, use `FloorRangeNoCopyConstexpr`. </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward negative infinity.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> FloorRangeNoCopy() const
+		{
+			return EmuMath::Helpers::matrix_floor_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> FloorRangeNoCopy() const
+		{
+			return EmuMath::Helpers::matrix_floor_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> FloorRangeNoCopy() const
+		{
+			return EmuMath::Helpers::matrix_floor_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with all of its elements rounded toward negative infinity via the provided out_matrix_. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para> This does not provide a guarantee to be constexpr where possible. For such behaviour, use `FloorRangeNoCopyConstexpr`. </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void FloorRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_floor_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+#pragma endregion
+
+#pragma region CONSTEXPR_ROUNDING_FUNCS
+		/// <summary> 
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward negative infinity. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward negative infinity.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> FloorConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_floor_constexpr<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> FloorConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_floor_constexpr<num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> FloorConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_floor_constexpr<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void FloorConstexpr(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_floor_constexpr(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward negative infinity. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices within this Matrix. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward negative infinity.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> FloorRangeConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_floor_range_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> FloorRangeConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_floor_range_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> FloorRangeConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_floor_range_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void FloorRangeConstexpr(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_floor_range_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward negative infinity. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward negative infinity.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> FloorRangeNoCopyConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_floor_range_no_copy_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> FloorRangeNoCopyConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_floor_range_no_copy_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> FloorRangeNoCopyConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_floor_range_no_copy_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with all of its elements rounded toward negative infinity via the provided out_matrix_. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void FloorRangeNoCopyConstexpr(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_floor_range_no_copy_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+#pragma endregion
+
 #pragma region TRANSPOSE_FUNCS
 		/// <summary>
 		/// <para> Outputs a transposed form of this Matrix. </para>

@@ -6,6 +6,7 @@
 #include "_matrix_basic_arithmetic.h"
 #include "_matrix_copy.h"
 #include "_matrix_get.h"
+#include "_matrix_misc_arithmetic.h"
 #include "_matrix_mutate.h"
 #include "_matrix_special_operations.h"
 #include "_matrix_std_multiply.h"
