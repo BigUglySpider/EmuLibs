@@ -242,6 +242,11 @@ int main()
 	std::cout << mat_to_round_ << "\n\n";
 	std::cout << "Floored (constexpr):\n" << mat_floored_ << "\nFloored (non-constexpr):\n" << mat_to_round_.Floor() << "\n\n";
 
+	constexpr auto mat_ceiled_ = mat_to_round_.CeilConstexpr();
+	std::cout << "Ceiled (constexpr):\n" << mat_ceiled_ << "\nCeiled (non-constexpr):\n" << mat_to_round_.Ceil() << "\n\n";
+
+	constexpr auto mat_trunced_ = mat_to_round_.TruncConstexpr();
+	std::cout << "Truncated (constexpr):\n" << mat_trunced_ << "\nTruncated (non-constexpr):\n" << mat_to_round_.Trunc() << "\n\n";
 
 	// ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
