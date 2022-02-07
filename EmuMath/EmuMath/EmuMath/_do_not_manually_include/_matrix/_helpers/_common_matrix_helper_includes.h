@@ -5,6 +5,7 @@
 #include "../_underlying_helpers/_matrix_tmp.h"
 #include "../_underlying_helpers/_matrix_underlying_copy.h"
 #include "../_underlying_helpers/_matrix_underlying_get.h"
+#include "../_underlying_helpers/_matrix_underlying_misc_arithmetic.h"
 #include "../_underlying_helpers/_matrix_underlying_mutate.h"
 #include "../_underlying_helpers/_matrix_special_arithmetic.h"
 #include "../_underlying_helpers/_matrix_underlying_special_operations.h"
@@ -209,6 +210,26 @@ EmuMath::Helpers::_matrix_underlying::_matrix_mutate_copy_assign_func_template\
 	(_end_row),\
 	(_arg_column_offset),\
 	(_arg_row_offset)\
+>
+
+#ifdef EMU_MATH_MATRIX_MUTATE_TEMPLATE_OUTVAL_RIGHT_ARG
+#undef EMU_MATH_MATRIX_MUTATE_TEMPLATE_OUTVAL_RIGHT_ARG
+#endif
+
+#define EMU_MATH_MATRIX_MUTATE_TEMPLATE_OUT_STORED_RIGHT_ARG(_func_template, _out_num_columns, _out_num_rows, _out_t, _out_column_major, _begin_column, _end_column, _begin_row, _end_row)\
+EmuMath::Helpers::_matrix_underlying::_matrix_mutate_return_out_func_template\
+<\
+	_func_template,\
+	_out_num_columns,\
+	_out_num_rows,\
+	_out_t,\
+	_out_column_major,\
+	_begin_column,\
+	_end_column,\
+	_begin_row,\
+	_end_row,\
+	std::tuple<>,\
+	std::tuple<typename EmuMath::Matrix<_out_num_columns, _out_num_rows, _out_t, _out_column_major>::stored_type>\
 >
 
 #endif

@@ -4021,6 +4021,41 @@ namespace EmuMath
 		{
 			EmuMath::Helpers::matrix_abs_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
 		}
+
+		/// <summary>
+		/// <para> Outputs the lowest element within this Matrix as the provided Out_ type, defaulting this Matrix's value_type_uq. </para>
+		/// <para> Supports output of references if the reference type is compatible with const-qualification. </para>
+		/// </summary>
+		/// <returns>Lowest element of this Matrix, as the provided Out_ type.</returns>
+		template<typename Out_ = value_type_uq>
+		[[nodiscard]] constexpr inline Out_ Min() const
+		{
+			return EmuMath::Helpers::matrix_min<Out_>(*this);
+		}
+
+		template<typename Out_ = value_type_uq>
+		[[nodiscard]] constexpr inline Out_ Min()
+		{
+			return EmuMath::Helpers::matrix_min<Out_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs the lowest element within this Matrix as the provided Out_ type, defaulting to this Matrix's value_type_uq. </para>
+		/// <para> Only elements within the provided range will be considered. </para>
+		/// <para> Supports output of references if the reference type is compatible with const-qualification, and the provided range contains no theoretical indices. </para>
+		/// </summary>
+		/// <returns>Lowest element of this Matrix within the provided range, as the provided Out_ type.</returns>
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename Out_ = value_type_uq>
+		[[nodiscard]] constexpr inline Out_ MinRange() const
+		{
+			return EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, Out_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename Out_ = value_type_uq>
+		[[nodiscard]] constexpr inline Out_ MinRange()
+		{
+			return EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, Out_>(*this);
+		}
 #pragma endregion
 
 #pragma region TRANSPOSE_FUNCS

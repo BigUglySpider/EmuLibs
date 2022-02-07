@@ -190,65 +190,23 @@ int main()
 	srand(static_cast<unsigned int>(time(0)));
 	EmuCore::Timer<std::milli> timer_;
 
-	constexpr auto mat_to_transpose_ = EmuMath::Matrix<4, 5, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20);
-	constexpr auto transposed_from_rval_ = EmuMath::Matrix<4, 5, float, true>(mat_to_transpose_).Transpose();
-	constexpr auto transposed_from_lval_ = mat_to_transpose_.Transpose();
-	std::cout << mat_to_transpose_ << "\n\nTransposed Lval:\n" << transposed_from_lval_ << "\n\nTransposed Rval:\n" << transposed_from_rval_ << "\n\n";
-
-	std::cout << "\n---\n";
-	auto runtime_mat_to_transpose = EmuMath::Matrix<4, 5, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20);
-	auto runtime_ref_transpose_ = runtime_mat_to_transpose.Transpose<float&>();
-	std::cout << runtime_mat_to_transpose << "\n\n" << runtime_ref_transpose_ << "\n\n";
-	runtime_ref_transpose_.MainDiagonal<float&>() *= 2.5f;
-	runtime_ref_transpose_.ColumnAt<3>() = EmuMath::make_vector<int>(-1, -2, -3, -4, -5);
-	std::cout << runtime_mat_to_transpose << "\n\n" << runtime_ref_transpose_ << "\n\n";
-
-	constexpr auto egrjoi = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) / 2.0f;
-	constexpr auto egrjof = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) / 2;
-	constexpr auto modi = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) % 3;
-	constexpr auto modf = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) % 2.5;
-
-	constexpr auto scalar_result_ = EmuMath::Matrix<4, 4, float, true>(1, 0, 0, 0, 0, 10, 0, 0, 0, 0, 1, 0, 1.5, 2, 3, 1) * 2;
-
-	constexpr auto vec_result_ = EmuMath::Matrix<4, 4, float, true>(1, 0, 0, 0, 0, 10, 0, 0, 0, 0, 1, 0, 1.5, 2, 3, 1) * EmuMath::Vector<3, float>(1, 2, 3);
-
-	constexpr auto mat_result_ =
+	constexpr auto mat_for_min_4x4_rm_ = EmuMath::Matrix<4, 4, float, false>
 	(
-		EmuMath::Matrix<4, 4, float, true>(1, 0, 0, 0, 0, 10, 0, 0, 0, 0, 1, 0, 1.5, 2, 3, 1) *
-		EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+		1, 2, 3, 4,
+		5, 6, 7, 8,
+		9, 10, 11, 12,
+		13, 14, 15, 16
 	);
+	constexpr auto mat_for_min_4x4_cm_ = EmuMath::Matrix<4, 4, float, true>(mat_for_min_4x4_rm_);
 
-	constexpr auto unequal_mat_result = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) * EmuMath::Matrix<1, 4, float, true>(1, 2, 3, 4);
+	constexpr auto min_rm_ = mat_for_min_4x4_rm_.Min();
+	constexpr auto min_cm_ = mat_for_min_4x4_cm_.Min<int>();
 
-	runtime_mat_to_transpose = decltype(runtime_mat_to_transpose)(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20);
-	std::cout << runtime_mat_to_transpose << "\n\n";
-	decltype(runtime_mat_to_transpose) another_(std::move(runtime_mat_to_transpose));
-	std::cout << another_ << "\n\n";
+	constexpr auto min_12_04_rm_ = mat_for_min_4x4_rm_.MinRange<1, 2, 0, 4>();
+	constexpr auto min_12_04_cm_ = mat_for_min_4x4_cm_.MinRange<1, 2, 0, 4, int>();
 
-	std::cout << mat_result_ << "\n\n";
-	std::cout << "\n---\n";
-
-	auto trans_matrix_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-	auto trans_vector = EmuMath::Vector<4, float>(1, 2, 3, 4);
-	std::cout << trans_matrix_ << "\nMUL\n" << trans_vector << "\n:\n";
-	std::cout << (trans_matrix_ *= trans_vector) << "\n\n";
-	std::cout << "Matrix Squared:\n" << (trans_matrix_.SquareAssign()) << "\n\n";
-	trans_matrix_.MultiplyAssign(EmuMath::Matrix<1, 4, float, true>(1, 2, 3, 4));
-	std::cout << "Mult 1x4 1234:\n" << trans_matrix_ << "\n\n";
-
-	std::cout << "\n---\n";
-	constexpr auto mat_to_round_ = EmuMath::Matrix<4, 4, float, true>(0.2, 0.7, 0.5, -0.8, -0.2, -1.2, 2, 2.5, 133.7, 13.37, 6, 12, 20, 40.5, 1.0L / 2.0f, 6.6666666);
-	constexpr auto mat_floored_ = mat_to_round_.FloorConstexpr();
-	std::cout << mat_to_round_ << "\n\n";
-	std::cout << "Floored (constexpr):\n" << mat_floored_ << "\nFloored (non-constexpr):\n" << mat_to_round_.Floor() << "\n\n";
-
-	constexpr auto mat_ceiled_ = mat_to_round_.CeilConstexpr();
-	std::cout << "Ceiled (constexpr):\n" << mat_ceiled_ << "\nCeiled (non-constexpr):\n" << mat_to_round_.Ceil() << "\n\n";
-
-	constexpr auto mat_trunced_ = mat_to_round_.TruncConstexpr();
-	std::cout << "Truncated (constexpr):\n" << mat_trunced_ << "\nTruncated (non-constexpr):\n" << mat_to_round_.Trunc() << "\n\n";
-
-	std::cout << "Abs:\n" << mat_to_round_.Abs() << "\n";
+	constexpr auto min_13_12_rm_ = mat_for_min_4x4_rm_.MinRange<1, 3, 1, 2>();
+	constexpr auto min_13_12_cm_ = mat_for_min_4x4_cm_.MinRange<1, 3, 1, 2, int>();
 
 	// ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;

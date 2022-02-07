@@ -8,8 +8,10 @@
 // CONTAINS:
 // --- abs
 // --- lerp
-// --- min
-// --- max
+// --- min (self)
+// --- min (a, b)
+// --- max (self)
+// --- max (a, b)
 // --- clamp_min
 // --- clamp_max
 // --- clamp

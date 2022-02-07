@@ -5,6 +5,53 @@
 
 namespace EmuMath::Helpers::_matrix_underlying
 {
+	// VALID COLUMN-ROW RANGE CHECK
+	template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_>
+	[[nodiscard]] constexpr inline bool _matrix_index_range_is_valid()
+	{
+		return (BeginColumn_ < EndColumn_) && (BeginRow_ < EndRow_);
+	}
+
+	// VALID+CONTAINED COLUMN RANGE CHECK
+	template<std::size_t BeginColumn_, std::size_t EndColumn_, class Matrix_, typename = std::enable_if_t<EmuMath::TMP::is_emu_matrix_v<Matrix_>>>
+	[[nodiscard]] constexpr inline bool _matrix_column_range_is_valid_and_contained()
+	{
+		using mat_uq = typename EmuCore::TMP::remove_ref_cv<Matrix_>::type;
+		return
+		(
+			(BeginColumn_ >= 0 && BeginColumn_ < mat_uq::num_columns) &&
+			(EndColumn_ > BeginColumn_ && EndColumn_ <= mat_uq::num_columns)
+		);
+	}
+
+	// VALID+CONTAINED ROW RANGE CHECK
+	template<std::size_t BeginRow_, std::size_t EndRow_, class Matrix_, typename = std::enable_if_t<EmuMath::TMP::is_emu_matrix_v<Matrix_>>>
+	[[nodiscard]] constexpr inline bool _matrix_row_range_is_valid_and_contained()
+	{
+		using mat_uq = typename EmuCore::TMP::remove_ref_cv<Matrix_>::type;
+		return
+		(
+			(BeginRow_ >= 0 && BeginRow_ < mat_uq::num_rows) &&
+			(EndRow_ > BeginRow_ && EndRow_ <= mat_uq::num_rows)
+		);
+	}
+
+	// VALID+CONTAINED COLUMN-ROW RANGE CHECK
+	template
+	<
+		std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Matrix_,
+		typename = std::enable_if_t<EmuMath::TMP::is_emu_matrix_v<Matrix_>>
+	>
+	[[nodiscard]] constexpr inline bool _matrix_index_range_is_valid_and_contained()
+	{
+		using mat_uq = typename EmuCore::TMP::remove_ref_cv<Matrix_>::type;
+		return 
+		(
+			_matrix_column_range_is_valid_and_contained<BeginColumn_, EndColumn_, mat_uq>() &&
+			_matrix_row_range_is_valid_and_contained<BeginRow_, EndRow_, mat_uq>()
+		);
+	}
+
 	// CONTAINED FLATTENED INDEX CHECK
 	template<std::size_t FlattenedIndex_, class Matrix_, typename = std::enable_if_t<EmuMath::TMP::is_emu_matrix_v<Matrix_>>>
 	[[nodiscard]] constexpr inline bool _matrix_index_is_contained()
