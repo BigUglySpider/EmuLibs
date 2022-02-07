@@ -220,10 +220,9 @@ int main()
 
 	auto runtime_copy_a_(mat_for_min_4x4_cm_);
 	auto runtime_copy_b_(other_mat_for_min_ab_4x4_rm_);
-	auto ref_min_ = runtime_copy_a_.Min<const float&>(runtime_copy_b_);
-	std::cout << runtime_copy_a_ << "\n\n" << runtime_copy_b_ << "\n\n" << ref_min_ << "\n\n";
-	runtime_copy_a_ *= 5;
-	std::cout << runtime_copy_a_ << "\n\n" << runtime_copy_b_ << "\n\n" << ref_min_ << "\n\n";
+	std::cout << runtime_copy_a_ << "\n\n";
+	std::cout << "Min Range No Copy:\n";
+	std::cout << runtime_copy_a_.MinRangeNoCopy<1, 3, 1, 3>(runtime_copy_b_) << "\n\n";
 
 
 	// ##### SCALAR vs SIMD NOISE #####

@@ -79,6 +79,24 @@ EmuMath::Helpers::_matrix_underlying::_matrix_mutate_assign_func_template\
 	(_arg_row_offset)\
 >
 
+#define EMU_MATH_MATRIX_MUTATE_ASSIGN_TEMPLATE_OUT_VALUQ_RIGHT_ARG(_func_template, _out_columns, _out_rows, _out_t, _out_column_major, _begin_column, _end_column, _begin_row, _end_row, _arg_column_offset, _arg_row_offset)\
+EmuMath::Helpers::_matrix_underlying::_matrix_mutate_assign_func_template\
+<\
+	_func_template,\
+	_begin_column,\
+	_end_column,\
+	_begin_row,\
+	_end_row,\
+	_arg_column_offset,\
+	_arg_row_offset,\
+	_out_columns,\
+	_out_rows,\
+	_out_t,\
+	_out_column_major,\
+	std::tuple<>,\
+	std::tuple<typename EmuMath::Matrix<_out_columns, _out_rows, _out_t, _out_column_major>::value_type_uq>\
+>
+
 #ifdef EMU_MATH_MATRIX_MUTATE_COPY_TEMPLATE
 #undef EMU_MATH_MATRIX_MUTATE_COPY_TEMPLATE
 #endif
