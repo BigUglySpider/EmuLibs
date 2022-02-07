@@ -759,30 +759,41 @@ namespace EmuMath
 		/// <para> This function is not available for reference-containing matrices, or matrices whose elements are not fully contiguous. </para>
 		/// </summary>
 		/// <returns>Pointer to the value at the provided index.</returns>
-		template<std::size_t Offset_ = 0, typename = std::enable_if_t<is_contiguous>>
+		template<std::size_t Offset_ = 0>
 		[[nodiscard]] constexpr inline value_type* data()
 		{
-			if constexpr(!contains_ref)
+			if constexpr(is_contiguous)
 			{
-				if constexpr (size != 0)
+				if constexpr(!contains_ref)
 				{
-					if constexpr (Offset_ < size)
+					if constexpr (size != 0)
 					{
-						if constexpr (Offset_ == 0)
+						if constexpr (Offset_ < size)
 						{
-							return _data.template at<0>().data();
+							if constexpr (Offset_ == 0)
+							{
+								return _data.template at<0>().data();
+							}
+							else
+							{
+								return (_data.template at<0>().data()) + Offset_;
+							}
 						}
 						else
 						{
-							return (_data.template at<0>().data()) + Offset_;
+							static_assert
+							(
+								EmuCore::TMP::get_false<std::size_t, Offset_>(),
+								"Attempted to access a pointer to the contiguous data of an EmuMath Matrix starting from a provided index Offset_, but the provided Offset_ was greater than the total number of elements within the Matrix."
+							);
 						}
 					}
 					else
 					{
 						static_assert
 						(
-							EmuCore::TMP::get_false<std::size_t, Offset_>(),
-							"Attempted to access a pointer to the contiguous data of an EmuMath Matrix starting from a provided index Offset_, but the provided Offset_ was greater than the total number of elements within the Matrix."
+							EmuCore::TMP::get_false<T_>(),
+							"Attempted to access a pointer to the contiguous data of an EmuMath Matrix, but the Matrix type contains no non-theoretical elements."
 						);
 					}
 				}
@@ -791,7 +802,7 @@ namespace EmuMath
 					static_assert
 					(
 						EmuCore::TMP::get_false<T_>(),
-						"Attempted to access a pointer to the contiguous data of an EmuMath Matrix, but the Matrix type contains no non-theoretical elements."
+						"Attempted to access a pointer to the contiguous data of an EmuMath Matrix which contains references. This behaviour is not allowed as references are not guaranteed to be contiguous."
 					);
 				}
 			}
@@ -800,12 +811,12 @@ namespace EmuMath
 				static_assert
 				(
 					EmuCore::TMP::get_false<T_>(),
-					"Attempted to access a pointer to the contiguous data of an EmuMath Matrix which contains references. This behaviour is not allowed as references are not guaranteed to be contiguous."
+					"Attempted to access a pointer to the contiguous data of an EmuMath Matrix whose data is not contiguous. This may be tested via Matrix::is_contiguous."
 				);
 			}
 		}
 
-		template<std::size_t Offset_ = 0, typename = std::enable_if_t<is_contiguous>>
+		template<std::size_t Offset_ = 0>
 		[[nodiscard]] constexpr inline const value_type* data() const
 		{
 			return const_cast<this_type*>(this)->template data<Offset_>();
