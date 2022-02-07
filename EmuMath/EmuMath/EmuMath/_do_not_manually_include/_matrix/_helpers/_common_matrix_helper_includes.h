@@ -117,6 +117,28 @@ EmuMath::Helpers::_matrix_underlying::_matrix_mutate_copy_func_template\
 	(_out_column_major)\
 >
 
+#ifdef EMU_MATH_MATRIX_MUTATE_COPY_TEMPLATE_OUT_STORED_RIGHT_ARG
+#undef EMU_MATH_MATRIX_MUTATE_COPY_TEMPLATE_OUT_STORED_RIGHT_ARG
+#endif
+#define EMU_MATH_MATRIX_MUTATE_COPY_TEMPLATE_OUT_STORED_RIGHT_ARG(_func_template, _out_columns, _out_rows, _out_t, _out_column_major, _copy_ref_t, _arg_column_offset, _arg_row_offset)\
+EmuMath::Helpers::_matrix_underlying::_matrix_mutate_copy_func_template\
+<\
+	_func_template,\
+	_copy_ref_t,\
+	std::tuple<>,\
+	std::tuple<typename EmuMath::Matrix<_out_columns, _out_rows, _out_t, _out_column_major>::stored_type>,\
+	0,\
+	_out_columns,\
+	0,\
+	_out_rows,\
+	_arg_column_offset,\
+	_arg_row_offset,\
+	_out_t,\
+	_out_columns,\
+	_out_rows,\
+	_out_column_major\
+>
+
 #ifdef EMU_MATH_MATRIX_MUTATE_COPY_ASSIGN_TEMPLATE
 #undef EMU_MATH_MATRIX_MUTATE_COPY_ASSIGN_TEMPLATE
 #endif
@@ -151,6 +173,29 @@ EmuMath::Helpers::_matrix_underlying::_matrix_mutate_copy_assign_func_template\
 	_arg_row_offset\
 >
 
+#ifdef EMU_MATH_MATRIX_MUTATE_COPY_ASSIGN_TEMPLATE_OUT_VALUQ_RIGHT_ARG
+#undef EMU_MATH_MATRIX_MUTATE_COPY_ASSIGN_TEMPLATE_OUT_VALUQ_RIGHT_ARG
+#endif
+
+#define EMU_MATH_MATRIX_MUTATE_COPY_ASSIGN_TEMPLATE_OUT_VALUQ_RIGHT_ARG(_func_template, _out_num_columns, _out_num_rows, _out_t, _out_column_major, _copy_ref_t, _begin_column, _end_column, _begin_row, _end_row, _arg_column_offset, _arg_row_offset)\
+EmuMath::Helpers::_matrix_underlying::_matrix_mutate_copy_assign_func_template\
+<\
+	_func_template,\
+	_copy_ref_t,\
+	_begin_column,\
+	_end_column,\
+	_begin_row,\
+	_end_row,\
+	_arg_column_offset,\
+	_arg_row_offset,\
+	_out_t,\
+	_out_num_columns,\
+	_out_num_rows,\
+	_out_column_major,\
+	std::tuple<>,\
+	std::tuple<typename EmuMath::Matrix<_out_num_columns, _out_num_rows, _out_t, _out_column_major>::value_type_uq>\
+>
+
 #ifdef EMU_MATH_MATRIX_MUTATE_INVOKE_ONLY_TEMPLATE
 #undef EMU_MATH_MATRIX_MUTATE_INVOKE_ONLY_TEMPLATE
 #endif
@@ -175,10 +220,7 @@ EmuMath::Helpers::_matrix_underlying::_matrix_mutate_invoke_only_func_template\
 #undef EMU_MATH_MATRIX_MUTATE_COPY_RANGE_TEMPLATE
 #endif
 
-#define EMU_MATH_MATRIX_MUTATE_COPY_RANGE_TEMPLATE\
-(\
-	_func_template, _out_num_columns, _out_num_rows, _out_t, _out_column_major, _copy_ref_t, _begin_column, _end_column, _begin_row, _end_row, _arg_column_offset, _arg_row_offset\
-)\
+#define EMU_MATH_MATRIX_MUTATE_COPY_RANGE_TEMPLATE(_func_template, _out_num_columns, _out_num_rows, _out_t, _out_column_major, _copy_ref_t, _begin_column, _end_column, _begin_row, _end_row, _arg_column_offset, _arg_row_offset)\
 EmuMath::Helpers::_matrix_underlying::_matrix_mutate_copy_func_template\
 <\
 	_func_template,\

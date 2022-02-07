@@ -4040,6 +4040,63 @@ namespace EmuMath
 		}
 
 		/// <summary>
+		/// <para> Outputs an EmuMath Matrix composed of the lowest elements out of this Matrix and b_. </para>
+		/// <para>
+		///		If B_ is an EmuMath Matrix: Comparisons will be performed with respective indices in this Matrix and b_. 
+		///		Otherwise, all indices will be compared with b_ directly.
+		/// </para>
+		/// </summary>
+		/// <param name="b_">: Scalar or EmuMath Matrix appearing as b in a min(a, b) operation.</param>
+		/// <returns>EmuMath Matrix composed of min results in respective indices.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Min(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_min<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<B_>(b_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Min(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_min<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<B_>(b_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Min(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_min<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<B_>(b_));
+		}
+
+		template<class B_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Min(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_) const
+		{
+			EmuMath::Helpers::matrix_min(out_matrix_, *this, std::forward<B_>(b_));
+		}
+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Min(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_min<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<B_>(b_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Min(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_min<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<B_>(b_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Min(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_min<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<B_>(b_));
+		}
+
+		template<class B_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Min(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_)
+		{
+			EmuMath::Helpers::matrix_min(out_matrix_, *this, std::forward<B_>(b_));
+		}
+
+		/// <summary>
 		/// <para> Outputs the lowest element within this Matrix as the provided Out_ type, defaulting to this Matrix's value_type_uq. </para>
 		/// <para> Only elements within the provided range will be considered. </para>
 		/// <para> Supports output of references if the reference type is compatible with const-qualification, and the provided range contains no theoretical indices. </para>
@@ -4055,6 +4112,113 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline Out_ MinRange()
 		{
 			return EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, Out_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Matrix composed of the lowest elements out of this Matrix and b_. </para>
+		/// <para>
+		///		If B_ is an EmuMath Matrix: Comparisons will be performed with respective indices in this MAtrix and b_. 
+		///		Otherwise, all indices will be compared with b_ directly.
+		/// </para>
+		/// <para> Indices within the provided range will be the respective minimum element out of this Matrix and b_. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective element within this Matrix. </para>
+		/// </summary>
+		/// <param name="b_">: Scalar or EmuMath Matrix appearing as b in a min(a, b) operation.</param>
+		/// <returns>EmuMath Matrix composed of min results in respective indices within the provided range, and copies of respective indices within this Matrix elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class B_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> MinRange(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			typename OutT_, bool OutColumnMajor_ = is_column_major, class B_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> MinRange(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> MinRange(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class B_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void MinRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_) const
+		{
+			EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_));
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class B_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> MinRange(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			typename OutT_, bool OutColumnMajor_ = is_column_major, class B_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> MinRange(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> MinRange(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class B_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void MinRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_)
+		{
+			EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_));
 		}
 #pragma endregion
 

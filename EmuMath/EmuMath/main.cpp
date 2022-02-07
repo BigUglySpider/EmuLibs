@@ -208,6 +208,24 @@ int main()
 	constexpr auto min_13_12_rm_ = mat_for_min_4x4_rm_.MinRange<1, 3, 1, 2>();
 	constexpr auto min_13_12_cm_ = mat_for_min_4x4_cm_.MinRange<1, 3, 1, 2, int>();
 
+	constexpr auto other_mat_for_min_ab_4x4_rm_ = EmuMath::Matrix<4, 4, float, false>
+	(
+		100, 2, -3, 4,
+		5, -6, 7, 8,
+		9, 10, 11, 12,
+		-13, -14, -15, 16
+	);
+
+	constexpr auto min_ab_ = mat_for_min_4x4_cm_.Min(other_mat_for_min_ab_4x4_rm_);
+
+	auto runtime_copy_a_(mat_for_min_4x4_cm_);
+	auto runtime_copy_b_(other_mat_for_min_ab_4x4_rm_);
+	auto ref_min_ = runtime_copy_a_.Min<const float&>(runtime_copy_b_);
+	std::cout << runtime_copy_a_ << "\n\n" << runtime_copy_b_ << "\n\n" << ref_min_ << "\n\n";
+	runtime_copy_a_ *= 5;
+	std::cout << runtime_copy_a_ << "\n\n" << runtime_copy_b_ << "\n\n" << ref_min_ << "\n\n";
+
+
 	// ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
 	//constexpr std::size_t test_noise_dimensions = 3;
