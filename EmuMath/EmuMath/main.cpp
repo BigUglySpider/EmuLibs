@@ -205,6 +205,7 @@ int main()
 	constexpr auto cm_diagonal12_ = some_mat_cm_.Diagonal<float, 1, 2>();
 	constexpr auto rm_diagonal12_ = some_mat_rm_.Diagonal<float, 1, 2>();
 
+
 	std::cout << some_mat_cm_ << "\n\n" << some_mat_rm_ << "\n\n";
 
 	auto some_runtime_mat_cm_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
