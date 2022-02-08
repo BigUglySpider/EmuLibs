@@ -19,6 +19,8 @@ namespace EmuMath::TMP
 		static constexpr std::size_t num_major_elements = is_column_major ? num_columns : num_rows;
 		static constexpr std::size_t num_non_major_elements = is_column_major ? num_rows : num_columns;
 		static constexpr std::size_t size = num_columns * num_rows;
+		static constexpr std::size_t smallest_direction_size = (num_columns <= num_rows) ? num_columns : num_rows;
+		static constexpr std::size_t greatest_direction_size = (num_columns >= num_rows) ? num_columns : num_rows;
 
 		// Matrix storage types and info regarding their elements
 		// --- Effectively a vector of major vectors.

@@ -192,48 +192,25 @@ int main()
 
 	constexpr auto some_mat_cm_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 	constexpr auto some_mat_rm_ = EmuMath::Matrix<4, 4, float, false>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-	std::cout << "Column Major:\n" << some_mat_cm_ << "\n\n";
-	std::cout << "Row Major:\n" << some_mat_rm_ << "\n\n";
+	constexpr auto cm_column_1_ = some_mat_cm_.Column<1>();
+	constexpr auto rm_column_1_ = some_mat_rm_.Column<1>();
+	constexpr auto cm_row_1_ = some_mat_cm_.Row<1>();
+	constexpr auto rm_row_1_ = some_mat_rm_.Row<1>();
+	constexpr auto cm_major_1_ = some_mat_cm_.Major<1>();
+	constexpr auto rm_major_1_ = some_mat_rm_.Major<1>();
+	constexpr auto cm_non_major_1_ = some_mat_cm_.NonMajor<1>();
+	constexpr auto rm_non_major_1_ = some_mat_rm_.NonMajor<1>();
+	constexpr auto cm_main_diagonal_ = some_mat_cm_.Diagonal();
+	constexpr auto rm_main_diagonal_ = some_mat_rm_.Diagonal();
+	constexpr auto cm_diagonal12_ = some_mat_cm_.Diagonal<float, 1, 2>();
+	constexpr auto rm_diagonal12_ = some_mat_rm_.Diagonal<float, 1, 2>();
 
-	constexpr auto scalar_mat_cm_ = EmuMath::Matrix<4, 4, float, true>(25);
-	constexpr auto scalar_mat_rm_ = EmuMath::Matrix<4, 4, float, true>(25);
+	std::cout << some_mat_cm_ << "\n\n" << some_mat_rm_ << "\n\n";
 
-	constexpr auto vector_mat_cm_ = EmuMath::Matrix<4, 4, float, true>
-	(
-		EmuMath::make_vector<float>(1, 2, 3, 4),
-		EmuMath::make_vector<float>(5, 6, 7, 8),
-		EmuMath::make_vector<float>(9, 10, 11, 12),
-		EmuMath::make_vector<float>(13, 14, 15, 16)
-	);
-
-	constexpr auto vector_mat_rm_ = EmuMath::Matrix<4, 4, float, false>
-	(
-		EmuMath::make_vector<float>(1, 2, 3, 4),
-		EmuMath::make_vector<float>(5, 6, 7, 8),
-		EmuMath::make_vector<float>(9, 10, 11, 12),
-		EmuMath::make_vector<float>(13, 14, 15, 16)
-	);
-	std::cout << "Column Major From Vectors:\n" << vector_mat_cm_ << "\n\nRow Major From Vectors:\n" << vector_mat_rm_ << "\n\n";
-
-	auto runtime_mat_ref_cm_ = EmuMath::Matrix<4, 4, const float&, true>
-	(
-		vector_mat_cm_.at<0, 0>(), vector_mat_cm_.at<0, 1>(), vector_mat_cm_.at<0, 2>(), vector_mat_cm_.at<0, 3>(),
-		vector_mat_cm_.at<1, 0>(), vector_mat_cm_.at<1, 1>(), vector_mat_cm_.at<1, 2>(), vector_mat_cm_.at<1, 3>(),
-		vector_mat_cm_.at<2, 0>(), vector_mat_cm_.at<2, 1>(), vector_mat_cm_.at<2, 2>(), vector_mat_cm_.at<2, 3>(),
-		vector_mat_cm_.at<3, 0>(), vector_mat_cm_.at<3, 1>(), vector_mat_cm_.at<3, 2>(), vector_mat_cm_.at<3, 3>()
-	);
-	auto runtime_mat_ref_cm_transpose_rm_ = runtime_mat_ref_cm_.Transpose<const float&>();
-	std::cout << runtime_mat_ref_cm_ << "\n\n" << runtime_mat_ref_cm_transpose_rm_ << "\n\n";
-
-	constexpr auto copy_mat_cm_from_cm_ = EmuMath::Matrix<4, 4, float, true>(some_mat_cm_);
-	constexpr auto copy_mat_rm_from_cm_ = EmuMath::Matrix<4, 4, float, false>(some_mat_cm_);
-	std::cout << "Base:\n" << some_mat_cm_ << "\nCopy (CM):\n" << copy_mat_cm_from_cm_ << "\nCopy (RM):\n" << copy_mat_rm_from_cm_ << "\n\n";
-
-	auto runtime_to_ref_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-	auto runtime_ref_ = EmuMath::Matrix<3, 3, float&, false>(runtime_to_ref_);
-	std::cout << "Base:\n" << runtime_to_ref_ << "\nRef:\n" << runtime_ref_ << "\n";
-	runtime_ref_ *= 5;
-	std::cout << "Base:\n" << runtime_to_ref_ << "\nRef:\n" << runtime_ref_ << "\n";
+	auto some_runtime_mat_cm_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << some_runtime_mat_cm_ << "\n\n";
+	some_runtime_mat_cm_.Diagonal<2, float&, 1>() *= 10;
+	std::cout << some_runtime_mat_cm_ << "\n\n";
 
 	// ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;

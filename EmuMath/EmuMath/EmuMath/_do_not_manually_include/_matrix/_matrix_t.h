@@ -22,6 +22,8 @@ namespace EmuMath
 		static constexpr std::size_t size = matrix_info::size;
 		static constexpr std::size_t num_major_elements = matrix_info::num_major_elements;
 		static constexpr std::size_t num_non_major_elements = matrix_info::num_non_major_elements;
+		static constexpr std::size_t smallest_direction_size = matrix_info::smallest_direction_size;
+		static constexpr std::size_t greatest_direction_size = matrix_info::greatest_direction_size;
 		static constexpr bool is_column_major = matrix_info::is_column_major;
 		static constexpr bool is_row_major = matrix_info::is_row_major;
 		static constexpr bool contains_ref = matrix_info::contains_ref;
@@ -119,8 +121,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONSTRUCTION_CHECKS
-	private:
-		
+	private:		
 		template<class VectorTuple_, std::size_t ColumnIndex_, std::size_t RowIndex_>
 		struct _variadic_construction_from_major_vector_arg_at_index
 		{
@@ -163,6 +164,66 @@ namespace EmuMath
 				>::type
 			>::type;
 		};
+
+		
+
+		template<class ToConvert_, std::size_t ColumnIndex_, std::size_t RowIndex_>
+		struct _matrix_convert_construct_index_arg
+		{
+		private:
+			using _to_convert_uq = typename EmuCore::TMP::remove_ref_cv<ToConvert_>::type;
+			using _to_convert_lval = decltype(EmuCore::TMP::lval_ref_cast<ToConvert_>(std::declval<ToConvert_>()));
+			static constexpr bool _index_is_contained = EmuMath::Helpers::_matrix_underlying::_matrix_index_is_contained<ColumnIndex_, RowIndex_, _to_convert_uq>();
+
+			static constexpr bool _is_valid_arg =
+			(
+				std::is_lvalue_reference_v<ToConvert_> ||
+				!contains_ref ||
+				(
+					_to_convert_uq::contains_ref &&
+					(contains_const_ref || _to_convert_uq::contains_non_const_ref) &&
+					_index_is_contained
+				)
+			);
+
+			static constexpr bool _should_move =
+			(
+				!std::is_lvalue_reference_v<ToConvert_> &&
+				!contains_ref &&
+				_index_is_contained
+			);
+
+			using _get_result = decltype(std::declval<_to_convert_lval>().template AtTheoretical<ColumnIndex_, RowIndex_>());
+			using _out_result = typename std::conditional
+			<
+				_index_is_contained,
+				_get_result,
+				decltype(EmuMath::Helpers::matrix_get_non_contained<this_type>())
+			>::type;
+
+		public:
+			using type = typename std::conditional
+			<
+				!_is_valid_arg,
+				void,
+				typename std::conditional
+				<
+					_should_move,
+					decltype(std::move(std::declval<_get_result>())),
+					_out_result
+				>::type
+			>::type;
+		};
+
+		template<class ToConvert_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+		[[nodiscard]] static constexpr inline bool _is_valid_matrix_to_convert_construct
+		(
+			std::index_sequence<ColumnIndices_...> column_indices_,
+			std::index_sequence<RowIndices_...> row_indices_
+		)
+		{
+			return std::is_constructible_v<matrix_vector_type, typename _matrix_convert_construct_index_arg<ToConvert_, ColumnIndices_, RowIndices_>::type...>;
+		}
 
 		template<class ForwardedVectorTuple_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
 		[[nodiscard]] static constexpr inline bool _valid_variadic_construction_args_from_major_vectors
@@ -253,147 +314,6 @@ namespace EmuMath
 			return std::is_constructible_v<matrix_vector_type, matrix_vector_type&&>;
 		}
 
-		template<class ToConvert_, std::size_t ColumnIndex_, std::size_t RowIndex_>
-		struct _matrix_convert_construct_index_arg
-		{
-		private:
-			using _to_convert_uq = typename EmuCore::TMP::remove_ref_cv<ToConvert_>::type;
-			using _to_convert_lval = decltype(EmuCore::TMP::lval_ref_cast<ToConvert_>(std::declval<ToConvert_>()));
-			static constexpr bool _index_is_contained = EmuMath::Helpers::_matrix_underlying::_matrix_index_is_contained<ColumnIndex_, RowIndex_, _to_convert_uq>();
-
-			static constexpr bool _is_valid_arg =
-			(
-				std::is_lvalue_reference_v<ToConvert_> ||
-				!contains_ref ||
-				(
-					_to_convert_uq::contains_ref &&
-					(contains_const_ref || _to_convert_uq::contains_non_const_ref) &&
-					_index_is_contained
-				)
-			);
-
-			static constexpr bool _should_move =
-			(
-				!std::is_lvalue_reference_v<ToConvert_> &&
-				!contains_ref &&
-				_index_is_contained
-			);
-
-			using _get_result = decltype(std::declval<_to_convert_lval>().template AtTheoretical<ColumnIndex_, RowIndex_>());
-			using _out_result = typename std::conditional
-			<
-				_index_is_contained,
-				_get_result,
-				decltype(EmuMath::Helpers::matrix_get_non_contained<this_type>())
-			>::type;
-
-		public:
-			using type = typename std::conditional
-			<
-				!_is_valid_arg,
-				void,
-				typename std::conditional
-				<
-					_should_move,
-					decltype(std::move(std::declval<_get_result>())),
-					_out_result
-				>::type
-			>::type;
-		};
-
-		template<class ToConvert_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
-		[[nodiscard]] static constexpr inline bool _is_valid_matrix_to_convert_construct
-		(
-			std::index_sequence<ColumnIndices_...> column_indices_,
-			std::index_sequence<RowIndices_...> row_indices_
-		)
-		{
-			return std::is_constructible_v<matrix_vector_type, typename _matrix_convert_construct_index_arg<ToConvert_, ColumnIndices_, RowIndices_>::type...>;
-		}
-
-		template<std::size_t ColumnIndex_, std::size_t RowIndex_, class ToConvert_>
-		[[nodiscard]] static constexpr inline typename _matrix_convert_construct_index_arg<ToConvert_, ColumnIndex_, RowIndex_>::type _get_conversion_construct_index_arg
-		(
-			ToConvert_&& to_convert_
-		)
-		{
-			if constexpr (!std::is_void_v<typename _matrix_convert_construct_index_arg<ToConvert_, ColumnIndex_, RowIndex_>::type>)
-			{
-				if constexpr (EmuMath::Helpers::_matrix_underlying::_matrix_index_is_contained<ColumnIndex_, RowIndex_, ToConvert_>())
-				{
-					constexpr bool should_move_ =
-					(
-						!std::is_lvalue_reference_v<ToConvert_> &&
-						!contains_ref
-					);
-					auto& to_convert_lval_ = EmuCore::TMP::lval_ref_cast<ToConvert_>(std::forward<ToConvert_>(to_convert_));
-
-					if constexpr (should_move_)
-					{
-						return std::move(to_convert_lval_.template AtTheoretical<ColumnIndex_, RowIndex_>());
-					}
-					else
-					{
-						return to_convert_lval_.template AtTheoretical<ColumnIndex_, RowIndex_>();
-					}
-				}
-				else
-				{
-					return EmuMath::Helpers::matrix_get_non_contained<this_type>();
-				}
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<ToConvert_>(),
-					"False-positive to conversion construction for an EmuMath Matrix. The output Matrix type cannot use elements from the input Matrix to construct its underlying data at all respective indices, or with its own implied-zero in indices that the input Matrix does not contain."
-				);
-			}
-		}
-
-		template<class ToConvert_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
-		[[nodiscard]] static constexpr inline matrix_vector_type _do_conversion_construction
-		(
-			ToConvert_&& to_convert_,
-			std::index_sequence<ColumnIndices_...> column_indices_,
-			std::index_sequence<RowIndices_...> row_indices_
-		)
-		{
-			using column_index_sequence = std::index_sequence<ColumnIndices_...>;
-			using row_index_sequence = std::index_sequence<RowIndices_...>;
-			if constexpr (_is_valid_matrix_to_convert_construct<ToConvert_>(column_index_sequence(), row_index_sequence()))
-			{
-				// We'll never access the same index twice, so silence false-positives
-				// --- This is a slight disadvantage since there are scenarios where different references to the same object may be moved,
-				// --- but silencing this has been chosen since VS is not showing any compromise
-#pragma warning(push)
-#pragma warning(disable: 26800)
-				return matrix_vector_type
-				(
-					_get_conversion_construct_index_arg<ColumnIndices_, RowIndices_>(std::forward<ToConvert_>(to_convert_))...
-				);
-#pragma warning(pop)
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<ToConvert_>(),
-					"False-positive to conversion construction for an EmuMath Matrix. The output Matrix's underlying data cannot be constructed from the results extracted from the Matrix to convert."
-				);
-			}
-		}
-
-		template<class ToConvert_>
-		[[nodiscard]] static constexpr inline matrix_vector_type _do_conversion_construction(ToConvert_&& to_convert_)
-		{
-			using indices = EmuMath::TMP::make_full_matrix_index_sequences<this_type>;
-			using column_indices = typename indices::column_index_sequence;
-			using row_indices = typename indices::row_index_sequence;
-			return _do_conversion_construction(std::forward<ToConvert_>(to_convert_), column_indices(), row_indices());
-		}
-
 		template<class ToConvert_>
 		[[nodiscard]] static constexpr inline bool is_conversion_constructible()
 		{
@@ -482,8 +402,91 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region CONSTRUCTORS
+#pragma region UNDERLYING_CONSTRUCTORS
 	private:
+		template<std::size_t ColumnIndex_, std::size_t RowIndex_, class ToConvert_>
+		[[nodiscard]] static constexpr inline typename _matrix_convert_construct_index_arg<ToConvert_, ColumnIndex_, RowIndex_>::type _get_conversion_construct_index_arg
+		(
+			ToConvert_&& to_convert_
+		)
+		{
+			if constexpr (!std::is_void_v<typename _matrix_convert_construct_index_arg<ToConvert_, ColumnIndex_, RowIndex_>::type>)
+			{
+				if constexpr (EmuMath::Helpers::_matrix_underlying::_matrix_index_is_contained<ColumnIndex_, RowIndex_, ToConvert_>())
+				{
+					constexpr bool should_move_ =
+					(
+						!std::is_lvalue_reference_v<ToConvert_> &&
+						!contains_ref
+					);
+					auto& to_convert_lval_ = EmuCore::TMP::lval_ref_cast<ToConvert_>(std::forward<ToConvert_>(to_convert_));
+
+					if constexpr (should_move_)
+					{
+						return std::move(to_convert_lval_.template AtTheoretical<ColumnIndex_, RowIndex_>());
+					}
+					else
+					{
+						return to_convert_lval_.template AtTheoretical<ColumnIndex_, RowIndex_>();
+					}
+				}
+				else
+				{
+					return EmuMath::Helpers::matrix_get_non_contained<this_type>();
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<ToConvert_>(),
+					"False-positive to conversion construction for an EmuMath Matrix. The output Matrix type cannot use elements from the input Matrix to construct its underlying data at all respective indices, or with its own implied-zero in indices that the input Matrix does not contain."
+				);
+			}
+		}
+
+		template<class ToConvert_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+		[[nodiscard]] static constexpr inline matrix_vector_type _do_conversion_construction
+		(
+			ToConvert_&& to_convert_,
+			std::index_sequence<ColumnIndices_...> column_indices_,
+			std::index_sequence<RowIndices_...> row_indices_
+		)
+		{
+			using column_index_sequence = std::index_sequence<ColumnIndices_...>;
+			using row_index_sequence = std::index_sequence<RowIndices_...>;
+			if constexpr (_is_valid_matrix_to_convert_construct<ToConvert_>(column_index_sequence(), row_index_sequence()))
+			{
+				// We'll never access the same index twice, so silence false-positives
+				// --- This is a slight disadvantage since there are scenarios where different references to the same object may be moved,
+				// --- but silencing this has been chosen since VS is not showing any compromise
+#pragma warning(push)
+#pragma warning(disable: 26800)
+				return matrix_vector_type
+				(
+					_get_conversion_construct_index_arg<ColumnIndices_, RowIndices_>(std::forward<ToConvert_>(to_convert_))...
+				);
+#pragma warning(pop)
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<ToConvert_>(),
+					"False-positive to conversion construction for an EmuMath Matrix. The output Matrix's underlying data cannot be constructed from the results extracted from the Matrix to convert."
+				);
+			}
+		}
+
+		template<class ToConvert_>
+		[[nodiscard]] static constexpr inline matrix_vector_type _do_conversion_construction(ToConvert_&& to_convert_)
+		{
+			using indices = EmuMath::TMP::make_full_matrix_index_sequences<this_type>;
+			using column_indices = typename indices::column_index_sequence;
+			using row_indices = typename indices::row_index_sequence;
+			return _do_conversion_construction(std::forward<ToConvert_>(to_convert_), column_indices(), row_indices());
+		}
+
 		template<std::size_t ColumnIndex_, std::size_t RowIndex_, class VectorTuple_>
 		[[nodiscard]] static constexpr inline typename _variadic_construction_from_major_vector_arg_at_index<VectorTuple_&, ColumnIndex_, RowIndex_>::type
 		_do_variadic_major_vector_construction_get_arg_for_index(VectorTuple_& vectors_tuple_)
@@ -576,7 +579,9 @@ namespace EmuMath
 				);
 			}
 		}
+#pragma endregion
 
+#pragma region CONSTRUCTORS
 	public:
 		template<typename = std::enable_if_t<is_default_constructible()>>
 		constexpr Matrix() :
@@ -853,6 +858,159 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline const stored_type* data() const
 		{
 			return const_cast<this_type*>(this)->template data<Offset_>();
+		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Vector of elements in the specified Column within this Matrix. </para>
+		/// <para> May output a Vector of references to the elements of the Column, as long as all required indices are contained within this Matrix. </para>
+		/// <para> Offset_: Index of the Row at which to start reading the Column at the provided ColumnIndex_. Defaults to 0. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector of the specified Column within this Matrix.</returns>
+		template<std::size_t ColumnIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Column() const
+		{
+			return _make_column_vector<ColumnIndex_, OutSize_, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, OutSize_>());
+		}
+
+		template<std::size_t ColumnIndex_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_rows, OutT_> Column() const
+		{
+			return _make_column_vector<ColumnIndex_, num_rows, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, num_rows>());
+		}
+
+		template<std::size_t ColumnIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Column()
+		{
+			return _make_column_vector<ColumnIndex_, OutSize_, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, OutSize_>());
+		}
+
+		template<std::size_t ColumnIndex_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_rows, OutT_> Column()
+		{
+			return _make_column_vector<ColumnIndex_, num_rows, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, num_rows>());
+		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Vector of elements in the specified Row within this Matrix. </para>
+		/// <para> May output a Vector of references to the elements of the Row, as long as all required indices are contained within this Matrix. </para>
+		/// <para> Offset_: Index of the Column at which to start reading the Row at the provided RowIndex_. Defaults to 0. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector of the specified Row within this Matrix.</returns>
+		template<std::size_t RowIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Row() const
+		{
+			return _make_row_vector<RowIndex_, OutSize_, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, OutSize_>());
+		}
+
+		template<std::size_t RowIndex_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_columns, OutT_> Row() const
+		{
+			return _make_row_vector<RowIndex_, num_columns, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, num_columns>());
+		}
+
+		template<std::size_t RowIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Row()
+		{
+			return _make_row_vector<RowIndex_, OutSize_, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, OutSize_>());
+		}
+
+		template<std::size_t RowIndex_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_columns, OutT_> Row()
+		{
+			return _make_row_vector<RowIndex_, num_columns, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, num_columns>());
+		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Vector of elements in the specified Major Segment within this Matrix. </para>
+		/// <para> May output a Vector of references to the elements of the Major Segment, as long as all required indices are contained within this Matrix. </para>
+		/// <para> If this Matrix is Column Major, this is equivalent to `Column`. Otherwise, it is equivalent to `Row`. </para>
+		/// <para> Offset_: Non-Major index at which to start reading the Major Segment at the provided MajorIndex_. Defaults to 0. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector of the specified Major Segment within this Matrix.</returns>
+		template<std::size_t MajorIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Major() const
+		{
+			return _make_major_vector<MajorIndex_, OutSize_, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, OutSize_>());
+		}
+
+		template<std::size_t MajorIndex_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_non_major_elements, OutT_> Major() const
+		{
+			return _make_major_vector<MajorIndex_, num_non_major_elements, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, num_non_major_elements>());
+		}
+
+		template<std::size_t MajorIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Major()
+		{
+			return _make_major_vector<MajorIndex_, OutSize_, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, OutSize_>());
+		}
+
+		template<std::size_t MajorIndex_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_non_major_elements, OutT_> Major()
+		{
+			return _make_major_vector<MajorIndex_, num_non_major_elements, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, num_non_major_elements>());
+		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Vector of elements in the specified Non-Major Segment within this Matrix. </para>
+		/// <para> May output a Vector of references to the elements of the Non-Major Segment, as long as all required indices are contained within this Matrix. </para>
+		/// <para> If this Matrix is Column Major, this is equivalent to `Row`. Otherwise, it is equivalent to `Column`. </para>
+		/// <para> Offset_: Major index at which to start reading the Non-Major Segment at the provided NonMajorIndex_. Defaults to 0. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector of the specified Non-Major Segment within this Matrix.</returns>
+		template<std::size_t NonMajorIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> NonMajor() const
+		{
+			return _make_non_major_vector<NonMajorIndex_, OutSize_, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, OutSize_>());
+		}
+
+		template<std::size_t NonMajorIndex_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_major_elements, OutT_> NonMajor() const
+		{
+			return _make_non_major_vector<NonMajorIndex_, num_major_elements, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, num_major_elements>());
+		}
+
+		template<std::size_t NonMajorIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> NonMajor()
+		{
+			return _make_non_major_vector<NonMajorIndex_, OutSize_, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, OutSize_>());
+		}
+
+		template<std::size_t NonMajorIndex_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_major_elements, OutT_> NonMajor()
+		{
+			return _make_non_major_vector<NonMajorIndex_, num_major_elements, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, num_major_elements>());
+		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Vector of elements within the specified Diagonal Segment within this Matrix, defaulting to its main diagonal. </para>
+		/// <para> ColumnOffset_: Index of the first Column to access. This will increment by 1 for each progressive element in the output Vector. Defaults to 0. </para>
+		/// <para> RowOffset_: Index of the first Row to access. This will increment by 1 for each progressive element in the output Vector. Defaults to ColumnOffset_. </para>
+		/// <para> May output a Vector of references to the elements of the Diagonal Segment, as long as all required indices are contained within this Matrix. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector of the specified Diagonal Segment within this Matrix.</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ColumnOffset_ = 0, std::size_t RowOffset_ = ColumnOffset_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Diagonal() const
+		{
+			return _make_diagonal_vector<OutSize_, OutT_, ColumnOffset_, RowOffset_>(std::make_index_sequence<OutSize_>());
+		}
+
+		template<typename OutT_ = value_type_uq, std::size_t ColumnOffset_ = 0, std::size_t RowOffset_ = ColumnOffset_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<smallest_direction_size, OutT_> Diagonal() const
+		{
+			return _make_diagonal_vector<smallest_direction_size, OutT_, ColumnOffset_, RowOffset_>(std::make_index_sequence<smallest_direction_size>());
+		}
+
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ColumnOffset_ = 0, std::size_t RowOffset_ = ColumnOffset_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Diagonal()
+		{
+			return _make_diagonal_vector<OutSize_, OutT_, ColumnOffset_, RowOffset_>(std::make_index_sequence<OutSize_>());
+		}
+
+		template<typename OutT_ = value_type_uq, std::size_t ColumnOffset_ = 0, std::size_t RowOffset_ = ColumnOffset_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<smallest_direction_size, OutT_> Diagonal()
+		{
+			return _make_diagonal_vector<smallest_direction_size, OutT_, ColumnOffset_, RowOffset_>(std::make_index_sequence<smallest_direction_size>());
 		}
 #pragma endregion
 
@@ -3931,7 +4089,171 @@ namespace EmuMath
 	private:
 		matrix_vector_type _data;
 
+#pragma region UNDERLYING_VECTOR_CREATION
+	private:
+		template<std::size_t ColumnIndex_, std::size_t OutSize_, typename OutT_, std::size_t...RowIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_column_vector(std::index_sequence<RowIndices_...> row_indices_)
+		{
+			using out_vector = EmuMath::Vector<OutSize_, OutT_>;
+			if constexpr (std::is_constructible_v<out_vector, decltype(AtTheoretical<ColumnIndex_, RowIndices_>())...>)
+			{
+				return out_vector(AtTheoretical<ColumnIndex_, RowIndices_>()...);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<out_vector>(),
+					"Attempted to retrieve a Column Vector within an EmuMath Matrix, but the desired output Vector cannot be constructed from the provided column within the Matrix."
+				);
+			}
+		}
 
+		template<std::size_t ColumnIndex_, std::size_t OutSize_, typename OutT_, std::size_t...RowIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_column_vector(std::index_sequence<RowIndices_...> row_indices_) const
+		{
+			// Unfortunate code duplication due to different behaviour when outputting reference Vectors
+			using out_vector = EmuMath::Vector<OutSize_, OutT_>;
+			if constexpr (std::is_constructible_v<out_vector, decltype(AtTheoretical<ColumnIndex_, RowIndices_>())...>)
+			{
+				return out_vector(AtTheoretical<ColumnIndex_, RowIndices_>()...);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<out_vector>(),
+					"Attempted to retrieve a Column Vector within a const-qualified EmuMath Matrix, but the desired output Vector cannot be constructed from the provided column within the Matrix."
+				);
+			}
+		}
+
+		template<std::size_t RowIndex_, std::size_t OutSize_, typename OutT_, std::size_t...ColumnIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_row_vector(std::index_sequence<ColumnIndices_...> column_indices_)
+		{
+			using out_vector = EmuMath::Vector<OutSize_, OutT_>;
+			if constexpr (std::is_constructible_v<out_vector, decltype(AtTheoretical<ColumnIndices_, RowIndex_>())...>)
+			{
+				return out_vector(AtTheoretical<ColumnIndices_, RowIndex_>()...);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<out_vector>(),
+					"Attempted to retrieve a Row Vector within an EmuMath Matrix, but the desired output Vector cannot be constructed from the provided row within the Matrix."
+				);
+			}
+		}
+
+		template<std::size_t RowIndex_, std::size_t OutSize_, typename OutT_, std::size_t...ColumnIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_row_vector(std::index_sequence<ColumnIndices_...> column_indices_) const
+		{
+			// Unfortunate code duplication due to different behaviour when outputting reference Vectors
+			using out_vector = EmuMath::Vector<OutSize_, OutT_>;
+			if constexpr (std::is_constructible_v<out_vector, decltype(AtTheoretical<ColumnIndices_, RowIndex_>())...>)
+			{
+				return out_vector(AtTheoretical<ColumnIndices_, RowIndex_>()...);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<out_vector>(),
+					"Attempted to retrieve a Row Vector within a const-qualified EmuMath Matrix, but the desired output Vector cannot be constructed from the provided row within the Matrix."
+				);
+			}
+		}
+
+		template<std::size_t MajorIndex_, std::size_t OutSize_, typename OutT_, std::size_t...NonMajorIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_major_vector(std::index_sequence<NonMajorIndices_...> non_major_indices_)
+		{
+			if constexpr (is_column_major)
+			{
+				return _make_column_vector<MajorIndex_, OutSize_, OutT_>(std::index_sequence<NonMajorIndices_...>());
+			}
+			else
+			{
+				return _make_row_vector<MajorIndex_, OutSize_, OutT_>(std::index_sequence<NonMajorIndices_...>());
+			}
+		}
+
+		template<std::size_t MajorIndex_, std::size_t OutSize_, typename OutT_, std::size_t...NonMajorIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_major_vector(std::index_sequence<NonMajorIndices_...> non_major_indices_) const
+		{
+			if constexpr (is_column_major)
+			{
+				return _make_column_vector<MajorIndex_, OutSize_, OutT_>(std::index_sequence<NonMajorIndices_...>());
+			}
+			else
+			{
+				return _make_row_vector<MajorIndex_, OutSize_, OutT_>(std::index_sequence<NonMajorIndices_...>());
+			}
+		}
+
+		template<std::size_t NonMajorIndex_, std::size_t OutSize_, typename OutT_, std::size_t...MajorIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_non_major_vector(std::index_sequence<MajorIndices_...> major_indices_)
+		{
+			if constexpr (is_column_major)
+			{
+				return _make_row_vector<NonMajorIndex_, OutSize_, OutT_>(std::index_sequence<MajorIndices_...>());
+			}
+			else
+			{
+				return _make_column_vector<NonMajorIndex_, OutSize_, OutT_>(std::index_sequence<MajorIndices_...>());
+			}
+		}
+
+		template<std::size_t NonMajorIndex_, std::size_t OutSize_, typename OutT_, std::size_t...MajorIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_non_major_vector(std::index_sequence<MajorIndices_...> major_indices_) const
+		{
+			if constexpr (is_column_major)
+			{
+				return _make_row_vector<NonMajorIndex_, OutSize_, OutT_>(std::index_sequence<MajorIndices_...>());
+			}
+			else
+			{
+				return _make_column_vector<NonMajorIndex_, OutSize_, OutT_>(std::index_sequence<MajorIndices_...>());
+			}
+		}
+
+		template<std::size_t OutSize_, typename OutT_, std::size_t ColumnOffset_, std::size_t RowOffset_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_diagonal_vector(std::index_sequence<Indices_...> indices_)
+		{
+			using out_vector = EmuMath::Vector<OutSize_, OutT_>;
+			if constexpr (std::is_constructible_v<out_vector, decltype(AtTheoretical<Indices_ + ColumnOffset_, Indices_ + RowOffset_>())...>)
+			{
+				return out_vector(AtTheoretical<Indices_ + ColumnOffset_, Indices_ + RowOffset_>()...);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<out_vector>(),
+					"Attempted to retreieve a Diagonal Vector within an EmuMath Matrix, but the desired output Vector cannot be constructed from all accessed diagonal indices within the Matrix."
+				);
+			}
+		}
+
+		template<std::size_t OutSize_, typename OutT_, std::size_t ColumnOffset_, std::size_t RowOffset_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_diagonal_vector(std::index_sequence<Indices_...> indices_) const
+		{
+			// Even more unfortunate code duplication for the sake of safe and successfuly ref-vector output
+			using out_vector = EmuMath::Vector<OutSize_, OutT_>;
+			if constexpr (std::is_constructible_v<out_vector, decltype(AtTheoretical<Indices_ + ColumnOffset_, Indices_ + RowOffset_>())...>)
+			{
+				return out_vector(AtTheoretical<Indices_ + ColumnOffset_, Indices_ + RowOffset_>()...);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<out_vector>(),
+					"Attempted to retreieve a Diagonal Vector within a const-qualified EmuMath Matrix, but the desired output Vector cannot be constructed from all accessed diagonal indices within the Matrix."
+				);
+			}
+		}
+#pragma endregion
 	};
 }
 
