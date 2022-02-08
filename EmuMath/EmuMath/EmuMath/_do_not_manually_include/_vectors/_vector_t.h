@@ -1025,9 +1025,7 @@ namespace EmuMath
 			{
 				if constexpr (size != 0)
 				{
-					// NOTE: Under MSVC, constexpr_str_ will always be false without the /Zc:__cplusplus switch enabled, as of 2022/01/05
-					constexpr bool constexpr_str_ = __cplusplus >= 201907L;
-					if constexpr (constexpr_str_)
+					if constexpr (EmuCore::TMP::feature_constexpr_dynamic_memory())
 					{
 						// We can provide some extra information if we have access to constexpr strings
 						// --- This is to allow `at(index_)` to still satisfy constexpr constraints in standards before C++20

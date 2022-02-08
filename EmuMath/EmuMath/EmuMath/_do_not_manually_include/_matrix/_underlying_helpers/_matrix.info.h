@@ -22,31 +22,16 @@ namespace EmuMath::TMP
 
 		// Matrix storage types and info regarding their elements
 		// --- Effectively a vector of major vectors.
-		using major_vector_type = EmuMath::Vector<num_non_major_elements, T_>;
-		using matrix_vector_type = EmuMath::Vector<num_major_elements, major_vector_type>;
-		static constexpr bool contains_ref = major_vector_type::contains_ref;
-		static constexpr bool contains_const_ref = major_vector_type::contains_const_ref;
-		static constexpr bool contains_non_const_ref = major_vector_type::contains_non_const_ref;
+		using matrix_vector_type = EmuMath::Vector<size, T_>;
+		static constexpr bool contains_ref = matrix_vector_type::contains_ref;
+		static constexpr bool contains_const_ref = matrix_vector_type::contains_const_ref;
+		static constexpr bool contains_non_const_ref = matrix_vector_type::contains_non_const_ref;
 
 		// Type info for elements
-		using stored_type = typename major_vector_type::stored_type;
-		using value_type = typename major_vector_type::value_type;
-		using value_type_uq = typename major_vector_type::value_type_uq;
-		using preferred_floating_point = typename major_vector_type::preferred_floating_point;
-
-		// Vectorwise access types
-		// --- Const ref gets for non-majors still return a const EmuMath Vector, to provide a consistent interface for both major-orders
-		using column_get_ref_type = std::conditional_t<is_column_major, major_vector_type&, EmuMath::Vector<num_rows, value_type&>>;
-		using row_get_ref_type = std::conditional_t<is_row_major, major_vector_type&, EmuMath::Vector<num_columns, value_type&>>;
-		using column_get_const_ref_type = std::conditional_t<is_column_major, const major_vector_type&, const EmuMath::Vector<num_rows, const value_type&>>;
-		using row_get_const_ref_type = std::conditional_t<is_row_major, const major_vector_type&, const EmuMath::Vector<num_columns, const value_type&>>;
-		using major_get_ref_type = major_vector_type&;
-		using major_get_const_ref_type = const major_vector_type&;
-		using non_major_get_ref_type = std::conditional_t<is_column_major, row_get_ref_type, column_get_ref_type>;
-		using non_major_get_const_ref_type = std::conditional_t<is_column_major, row_get_const_ref_type, column_get_const_ref_type>;
-
-		// Misc info
-		static constexpr bool is_contiguous = sizeof(matrix_vector_type) == (sizeof(stored_type) * size);
+		using stored_type = typename matrix_vector_type::stored_type;
+		using value_type = typename matrix_vector_type::value_type;
+		using value_type_uq = typename matrix_vector_type::value_type_uq;
+		using preferred_floating_point = typename matrix_vector_type::preferred_floating_point;
 	};
 }
 
