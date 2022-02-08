@@ -120,6 +120,84 @@ namespace EmuMath
 
 #pragma region CONSTRUCTION_CHECKS
 	private:
+		
+		template<class VectorTuple_, std::size_t ColumnIndex_, std::size_t RowIndex_>
+		struct _variadic_construction_from_major_vector_arg_at_index
+		{
+		private:
+			static constexpr std::size_t _non_major_index = get_non_major_index(ColumnIndex_, RowIndex_);
+			using _vector_tuple_no_ref = std::remove_reference_t<VectorTuple_>;
+			using _vector_type_raw = std::tuple_element_t<get_major_index(ColumnIndex_, RowIndex_), _vector_tuple_no_ref>;
+			using _vector_type_lval = decltype(EmuCore::TMP::lval_ref_cast<_vector_type_raw>(std::declval<_vector_type_raw>()));
+			using _vector_uq = typename EmuCore::TMP::remove_ref_cv<_vector_type_raw>::type;
+
+			static constexpr bool _is_valid_arg =
+			(
+				std::is_lvalue_reference_v<_vector_type_raw> ||
+				!contains_ref ||
+				(_vector_uq::contains_ref && (contains_const_ref || _vector_uq::contains_non_const_ref))
+			);
+
+			static constexpr bool _should_move = 
+			(
+				!contains_ref &&
+				!std::is_lvalue_reference_v<_vector_type_raw> &&
+				_non_major_index < _vector_uq::size
+			);
+			using get_result = decltype(std::declval<_vector_type_lval>().template AtTheoretical<_non_major_index>());
+
+		public:
+			using type = typename std::conditional
+			<
+				!_is_valid_arg,
+				void,
+				typename std::conditional
+				<
+					_should_move,
+					decltype(std::move(std::declval<get_result>())),
+					get_result
+				>::type
+			>::type;
+		};
+
+		template<class ForwardedVectorTuple_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+		[[nodiscard]] static constexpr inline bool _valid_variadic_construction_args_from_major_vectors
+		(
+			std::index_sequence<ColumnIndices_...> column_indices_,
+			std::index_sequence<RowIndices_...> row_indices_
+		)
+		{
+			return std::is_constructible_v
+			<
+				matrix_vector_type,
+				typename _variadic_construction_from_major_vector_arg_at_index<ForwardedVectorTuple_&, ColumnIndices_, RowIndices_>::type...
+			>;
+		}
+
+		template<std::size_t ArgCount_, class...Args_>
+		[[nodiscard]] static constexpr inline bool _valid_variadic_construction_args_from_major_vectors()
+		{
+			if constexpr (ArgCount_ == num_major_elements)
+			{
+				if constexpr ((... && EmuMath::TMP::is_emu_vector_v<Args_>))
+				{
+					using forward_tuple = decltype(std::forward_as_tuple(std::forward<Args_>(std::declval<Args_>())...));
+					using indices = EmuMath::TMP::make_full_matrix_index_sequences<this_type>;
+					using column_indices = typename indices::column_index_sequence;
+					using row_indices = typename indices::row_index_sequence;
+					return _valid_variadic_construction_args_from_major_vectors<forward_tuple>(column_indices(), row_indices());
+				}
+				else
+				{
+					return false; // Must only be EmuMath Vectors
+				}
+			}
+			else
+			{
+				return false; // Must be 1 argument per major segment
+			}
+		}
+
 		// Component of is_variadic_constructible; Assumes no reservations for provided args
 		template<std::size_t ArgCount_, class...Args_>
 		static constexpr inline bool _valid_variadic_scalar_construction_args()
@@ -129,6 +207,25 @@ namespace EmuMath
 				ArgCount_ == size &&
 				std::is_constructible_v<matrix_vector_type, decltype(std::forward<Args_>(std::declval<Args_>()))...>
 			);
+		}
+
+		template<std::size_t ArgCount_, class...Args_>
+		static constexpr inline bool _valid_variadic_single_scalar_construction_arg()
+		{
+			if constexpr (ArgCount_ == 1)
+			{
+				using arg_type = EmuCore::TMP::first_variadic_arg_t<Args_...>;
+				return
+				(
+					!EmuMath::TMP::is_emu_matrix_v<arg_type> && // Reserved for conversion/copy/move
+					!EmuMath::TMP::is_emu_vector_v<arg_type> && // Don't allow instantiation via a flattened Vector; leave this to Matrix construction
+					std::is_constructible_v<matrix_vector_type, decltype(std::forward<arg_type>(std::declval<arg_type>()))>
+				);
+			}
+			else
+			{
+				return false; // More than 1 arg, immediately invalid since this is a "construct all via X" situation
+			}
 		}
 
 	public:
@@ -163,7 +260,8 @@ namespace EmuMath
 					(num_args_ != 1 || !EmuMath::TMP::is_emu_matrix_v<EmuCore::TMP::first_variadic_arg_t<Args_...>>) && // Reserved for Matrix copies/moves/conversions
 					(
 						_valid_variadic_scalar_construction_args<num_args_, Args_...>() ||
-						false // insert other potential results here
+						_valid_variadic_single_scalar_construction_arg<num_args_, Args_...>() ||
+						_valid_variadic_construction_args_from_major_vectors<num_args_, Args_...>()
 					)
 				);
 			}
@@ -218,6 +316,71 @@ namespace EmuMath
 
 #pragma region CONSTRUCTORS
 	private:
+
+		template<std::size_t ColumnIndex_, std::size_t RowIndex_, class VectorTuple_>
+		[[nodiscard]] static constexpr inline typename _variadic_construction_from_major_vector_arg_at_index<VectorTuple_&, ColumnIndex_, RowIndex_>::type
+		_do_variadic_major_vector_construction_get_arg_for_index(VectorTuple_& vectors_tuple_)
+		{
+			if constexpr (!std::is_void_v<typename _variadic_construction_from_major_vector_arg_at_index<VectorTuple_&, ColumnIndex_, RowIndex_>::type>)
+			{
+				constexpr std::size_t major_index_ = get_major_index(ColumnIndex_, RowIndex_);
+				constexpr std::size_t non_major_index_ = get_non_major_index(ColumnIndex_, RowIndex_);
+				using vector_type_raw = std::tuple_element_t<major_index_, VectorTuple_>;
+				using vector_uq = typename EmuCore::TMP::remove_ref_cv<vector_type_raw>::type;
+				auto& vector_lval_cast_ = EmuCore::TMP::lval_ref_cast<vector_type_raw>(std::forward<vector_type_raw>(std::get<major_index_>(vectors_tuple_)));
+				constexpr bool should_move_ = 
+				(
+					!contains_ref &&
+					!std::is_lvalue_reference_v<vector_type_raw> &&
+					get_non_major_index(ColumnIndex_, RowIndex_) < vector_uq::size
+				);
+
+				if constexpr (should_move_)
+				{
+					return std::move(vector_lval_cast_.template at<non_major_index_>());
+				}
+				else
+				{
+					return vector_lval_cast_.template AtTheoretical<non_major_index_>();
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<VectorTuple_>(),
+					"False-positive access to variadic construction of an EmuMath Matrix via a selection of EmuMath Vectors (1 per major segment). One index could not form a successful argument for creating the output Matrix's underlying data."
+				);
+			}
+		}
+
+		template<class ForwardedVectorTuple_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+		[[nodiscard]] static constexpr inline matrix_vector_type _do_variadic_major_vector_construction
+		(
+			ForwardedVectorTuple_ vector_tuple_,
+			std::index_sequence<ColumnIndices_...> column_indices_,
+			std::index_sequence<RowIndices_...> row_indices_
+		)
+		{
+			using column_index_sequence = std::index_sequence<ColumnIndices_...>;
+			using row_index_sequence = std::index_sequence<RowIndices_...>;
+			if constexpr (_valid_variadic_construction_args_from_major_vectors<ForwardedVectorTuple_>(column_index_sequence(), row_index_sequence()))
+			{
+				return matrix_vector_type
+				(
+					_do_variadic_major_vector_construction_get_arg_for_index<ColumnIndices_, RowIndices_>(vector_tuple_)...
+				);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<ForwardedVectorTuple_>(),
+					"False-positive access to variadic construction of an EmuMath Matrix via a selection of EmuMath Vectors (1 per major segment). The output Matrix's underlying data could not be constructed from respective accesses to Vector elements at the determined indices."
+				);
+			}
+		}
+
 		template<class...Args_>
 		static constexpr inline matrix_vector_type _do_variadic_construction(Args_&&...args_)
 		{
@@ -225,6 +388,17 @@ namespace EmuMath
 			if constexpr (_valid_variadic_scalar_construction_args<sizeof...(Args_), Args_...>())
 			{
 				return matrix_vector_type(std::forward<Args_>(args_)...);
+			}
+			else if constexpr (_valid_variadic_single_scalar_construction_arg<sizeof...(Args_), Args_...>())
+			{
+				return matrix_vector_type(std::forward<Args_>(args_)...);
+			}
+			else if constexpr (_valid_variadic_construction_args_from_major_vectors<sizeof...(Args_), Args_...>())
+			{
+				using indices = EmuMath::TMP::make_full_matrix_index_sequences<this_type>;
+				using column_indices = typename indices::column_index_sequence;
+				using row_indices = typename indices::row_index_sequence;
+				return _do_variadic_major_vector_construction(std::forward_as_tuple(std::forward<Args_>(args_)...), column_indices(), row_indices());
 			}
 			else
 			{

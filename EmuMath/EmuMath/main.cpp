@@ -195,6 +195,26 @@ int main()
 	std::cout << "Column Major:\n" << some_mat_cm_ << "\n\n";
 	std::cout << "Row Major:\n" << some_mat_rm_ << "\n\n";
 
+	constexpr auto scalar_mat_cm_ = EmuMath::Matrix<4, 4, float, true>(25);
+	constexpr auto scalar_mat_rm_ = EmuMath::Matrix<4, 4, float, true>(25);
+
+	constexpr auto vector_mat_cm_ = EmuMath::Matrix<4, 4, float, true>
+	(
+		EmuMath::make_vector<float>(1, 2, 3, 4),
+		EmuMath::make_vector<float>(5, 6, 7, 8),
+		EmuMath::make_vector<float>(9, 10, 11, 12),
+		EmuMath::make_vector<float>(13, 14, 15, 16)
+	);
+
+	constexpr auto vector_mat_rm_ = EmuMath::Matrix<4, 4, float, false>
+	(
+		EmuMath::make_vector<float>(1, 2, 3, 4),
+		EmuMath::make_vector<float>(5, 6, 7, 8),
+		EmuMath::make_vector<float>(9, 10, 11, 12),
+		EmuMath::make_vector<float>(13, 14, 15, 16)
+	);
+	std::cout << "Column Major From Vectors:\n" << vector_mat_cm_ << "\n\nRow Major From Vectors:\n" << vector_mat_rm_ << "\n\n";
+
 
 
 
