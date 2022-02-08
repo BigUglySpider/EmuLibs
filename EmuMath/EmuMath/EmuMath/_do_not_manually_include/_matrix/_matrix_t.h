@@ -135,7 +135,11 @@ namespace EmuMath
 			(
 				std::is_lvalue_reference_v<_vector_type_raw> ||
 				!contains_ref ||
-				(_vector_uq::contains_ref && (contains_const_ref || _vector_uq::contains_non_const_ref))
+				(
+					_vector_uq::contains_ref &&
+					(contains_const_ref || _vector_uq::contains_non_const_ref) &&
+					_non_major_index < _vector_uq::size
+				)
 			);
 
 			static constexpr bool _should_move = 
@@ -249,6 +253,170 @@ namespace EmuMath
 			return std::is_constructible_v<matrix_vector_type, matrix_vector_type&&>;
 		}
 
+		template<class ToConvert_, std::size_t ColumnIndex_, std::size_t RowIndex_>
+		struct _matrix_convert_construct_index_arg
+		{
+		private:
+			using _to_convert_uq = typename EmuCore::TMP::remove_ref_cv<ToConvert_>::type;
+			using _to_convert_lval = decltype(EmuCore::TMP::lval_ref_cast<ToConvert_>(std::declval<ToConvert_>()));
+			static constexpr bool _index_is_contained = EmuMath::Helpers::_matrix_underlying::_matrix_index_is_contained<ColumnIndex_, RowIndex_, _to_convert_uq>();
+
+			static constexpr bool _is_valid_arg =
+			(
+				std::is_lvalue_reference_v<ToConvert_> ||
+				!contains_ref ||
+				(
+					_to_convert_uq::contains_ref &&
+					(contains_const_ref || _to_convert_uq::contains_non_const_ref) &&
+					_index_is_contained
+				)
+			);
+
+			static constexpr bool _should_move =
+			(
+				!std::is_lvalue_reference_v<ToConvert_> &&
+				!contains_ref &&
+				_index_is_contained
+			);
+
+			using _get_result = decltype(std::declval<_to_convert_lval>().template AtTheoretical<ColumnIndex_, RowIndex_>());
+			using _out_result = typename std::conditional
+			<
+				_index_is_contained,
+				_get_result,
+				decltype(EmuMath::Helpers::matrix_get_non_contained<this_type>())
+			>::type;
+
+		public:
+			using type = typename std::conditional
+			<
+				!_is_valid_arg,
+				void,
+				typename std::conditional
+				<
+					_should_move,
+					decltype(std::move(std::declval<_get_result>())),
+					_out_result
+				>::type
+			>::type;
+		};
+
+		template<class ToConvert_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+		[[nodiscard]] static constexpr inline bool _is_valid_matrix_to_convert_construct
+		(
+			std::index_sequence<ColumnIndices_...> column_indices_,
+			std::index_sequence<RowIndices_...> row_indices_
+		)
+		{
+			return std::is_constructible_v<matrix_vector_type, typename _matrix_convert_construct_index_arg<ToConvert_, ColumnIndices_, RowIndices_>::type...>;
+		}
+
+		template<std::size_t ColumnIndex_, std::size_t RowIndex_, class ToConvert_>
+		[[nodiscard]] static constexpr inline typename _matrix_convert_construct_index_arg<ToConvert_, ColumnIndex_, RowIndex_>::type _get_conversion_construct_index_arg
+		(
+			ToConvert_&& to_convert_
+		)
+		{
+			if constexpr (!std::is_void_v<typename _matrix_convert_construct_index_arg<ToConvert_, ColumnIndex_, RowIndex_>::type>)
+			{
+				if constexpr (EmuMath::Helpers::_matrix_underlying::_matrix_index_is_contained<ColumnIndex_, RowIndex_, ToConvert_>())
+				{
+					constexpr bool should_move_ =
+					(
+						!std::is_lvalue_reference_v<ToConvert_> &&
+						!contains_ref
+					);
+					auto& to_convert_lval_ = EmuCore::TMP::lval_ref_cast<ToConvert_>(std::forward<ToConvert_>(to_convert_));
+
+					if constexpr (should_move_)
+					{
+						return std::move(to_convert_lval_.template AtTheoretical<ColumnIndex_, RowIndex_>());
+					}
+					else
+					{
+						return to_convert_lval_.template AtTheoretical<ColumnIndex_, RowIndex_>();
+					}
+				}
+				else
+				{
+					return EmuMath::Helpers::matrix_get_non_contained<this_type>();
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<ToConvert_>(),
+					"False-positive to conversion construction for an EmuMath Matrix. The output Matrix type cannot use elements from the input Matrix to construct its underlying data at all respective indices, or with its own implied-zero in indices that the input Matrix does not contain."
+				);
+			}
+		}
+
+		template<class ToConvert_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+		[[nodiscard]] static constexpr inline matrix_vector_type _do_conversion_construction
+		(
+			ToConvert_&& to_convert_,
+			std::index_sequence<ColumnIndices_...> column_indices_,
+			std::index_sequence<RowIndices_...> row_indices_
+		)
+		{
+			using column_index_sequence = std::index_sequence<ColumnIndices_...>;
+			using row_index_sequence = std::index_sequence<RowIndices_...>;
+			if constexpr (_is_valid_matrix_to_convert_construct<ToConvert_>(column_index_sequence(), row_index_sequence()))
+			{
+				// We'll never access the same index twice, so silence false-positives
+				// --- This is a slight disadvantage since there are scenarios where different references to the same object may be moved,
+				// --- but silencing this has been chosen since VS is not showing any compromise
+#pragma warning(push)
+#pragma warning(disable: 26800)
+				return matrix_vector_type
+				(
+					_get_conversion_construct_index_arg<ColumnIndices_, RowIndices_>(std::forward<ToConvert_>(to_convert_))...
+				);
+#pragma warning(pop)
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<ToConvert_>(),
+					"False-positive to conversion construction for an EmuMath Matrix. The output Matrix's underlying data cannot be constructed from the results extracted from the Matrix to convert."
+				);
+			}
+		}
+
+		template<class ToConvert_>
+		[[nodiscard]] static constexpr inline matrix_vector_type _do_conversion_construction(ToConvert_&& to_convert_)
+		{
+			using indices = EmuMath::TMP::make_full_matrix_index_sequences<this_type>;
+			using column_indices = typename indices::column_index_sequence;
+			using row_indices = typename indices::row_index_sequence;
+			return _do_conversion_construction(std::forward<ToConvert_>(to_convert_), column_indices(), row_indices());
+		}
+
+		template<class ToConvert_>
+		[[nodiscard]] static constexpr inline bool is_conversion_constructible()
+		{
+			if constexpr (EmuMath::TMP::is_emu_matrix_v<ToConvert_>)
+			{
+				if constexpr (!std::is_same_v<this_type, EmuCore::TMP::remove_ref_cv_t<ToConvert_>>)
+				{
+					using indices = EmuMath::TMP::make_full_matrix_index_sequences<this_type>;
+					using column_indices = typename indices::column_index_sequence;
+					using row_indices = typename indices::row_index_sequence;
+					return _is_valid_matrix_to_convert_construct<ToConvert_>(column_indices(), row_indices());
+				}
+				else
+				{
+					return false; // this_type reserved for own move/copy constructors
+				}
+			}
+			else
+			{
+				return false; // Can only convert another Matrix
+			}
+		}
+
 		template<class...Args_>
 		static constexpr inline bool is_variadic_constructible()
 		{
@@ -316,7 +484,6 @@ namespace EmuMath
 
 #pragma region CONSTRUCTORS
 	private:
-
 		template<std::size_t ColumnIndex_, std::size_t RowIndex_, class VectorTuple_>
 		[[nodiscard]] static constexpr inline typename _variadic_construction_from_major_vector_arg_at_index<VectorTuple_&, ColumnIndex_, RowIndex_>::type
 		_do_variadic_major_vector_construction_get_arg_for_index(VectorTuple_& vectors_tuple_)
@@ -438,6 +605,36 @@ namespace EmuMath
 		template<class...Args_, typename = std::enable_if_t<is_variadic_constructible<Args_...>()>>
 		constexpr Matrix(Args_&&...contiguous_element_args_) :
 			_data(_do_variadic_construction(std::forward<Args_>(contiguous_element_args_)...))
+		{
+		}
+
+		template
+		<
+			std::size_t OtherNumColumns_, std::size_t OtherNumRows_, typename OtherT_, bool OtherColumnMajor_,
+			typename = std::enable_if_t<is_conversion_constructible<EmuMath::Matrix<OtherNumColumns_, OtherNumRows_, OtherT_, OtherColumnMajor_>&>()>
+		>
+		constexpr Matrix(EmuMath::Matrix<OtherNumColumns_, OtherNumRows_, OtherT_, OtherColumnMajor_>& to_convert_) :
+			_data(_do_conversion_construction(to_convert_))
+		{
+		}
+
+		template
+		<
+			std::size_t OtherNumColumns_, std::size_t OtherNumRows_, typename OtherT_, bool OtherColumnMajor_,
+			typename = std::enable_if_t<is_conversion_constructible<const EmuMath::Matrix<OtherNumColumns_, OtherNumRows_, OtherT_, OtherColumnMajor_>&>()>
+		>
+		constexpr Matrix(const EmuMath::Matrix<OtherNumColumns_, OtherNumRows_, OtherT_, OtherColumnMajor_>& to_convert_) :
+			_data(_do_conversion_construction(to_convert_))
+		{
+		}
+
+		template
+		<
+			std::size_t OtherNumColumns_, std::size_t OtherNumRows_, typename OtherT_, bool OtherColumnMajor_,
+			typename = std::enable_if_t<is_conversion_constructible<EmuMath::Matrix<OtherNumColumns_, OtherNumRows_, OtherT_, OtherColumnMajor_>&&>()>
+		>
+		constexpr Matrix(EmuMath::Matrix<OtherNumColumns_, OtherNumRows_, OtherT_, OtherColumnMajor_>&& to_convert_) :
+			_data(_do_conversion_construction(std::forward<EmuMath::Matrix<OtherNumColumns_, OtherNumRows_, OtherT_, OtherColumnMajor_>>(to_convert_)))
 		{
 		}
 #pragma endregion

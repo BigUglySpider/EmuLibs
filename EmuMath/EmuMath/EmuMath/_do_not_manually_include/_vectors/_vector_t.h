@@ -399,18 +399,26 @@ namespace EmuMath
 			if constexpr (size != 0 && sizeof...(Args_) == size) // 0-args reserved for default
 			{
 				// For validity:
-				// 1: Must be more than 1 argument *or* the only argument is not an EmuMath Vector (as a single argument will use Vector conversion construction instead)
-				// 2: Must be at least one of A and B, with A taking priority over B:
+				// 1: No voids
+				// 2: Must be more than 1 argument *or* the only argument is not an EmuMath Vector (as a single argument will use Vector conversion construction instead)
+				// 3: Must be at least one of A and B, with A taking priority over B:
 				// --- A: All Args_ are immediately valid for constructing data_storage_type when forwarded to an initialiser list for data_storage_type construction
 				// --- B: All Args_ are valid lone types for making a stored_type
-				return
-				(
-					(size != 1 || !EmuMath::TMP::is_emu_vector_v<EmuCore::TMP::first_variadic_arg_t<Args_...>>) &&
+				if constexpr(!(... || std::is_void_v<Args_>))
+				{
+					return
 					(
-						std::is_constructible_v<data_storage_type, decltype(std::forward<Args_>(std::declval<Args_>()))...> ||
-						EmuCore::TMP::variadic_and_v<_is_valid_arg_for_stored_type<0, ReadOffset_, Args_, true, false>()...>						
-					)
-				);
+						(size != 1 || !EmuMath::TMP::is_emu_vector_v<EmuCore::TMP::first_variadic_arg_t<Args_...>>) &&
+						(
+							std::is_constructible_v<data_storage_type, decltype(std::forward<Args_>(std::declval<Args_>()))...> ||
+							EmuCore::TMP::variadic_and_v<_is_valid_arg_for_stored_type<0, ReadOffset_, Args_, true, false>()...>						
+						)
+					);
+				}
+				else
+				{
+					return false;
+				}
 			}
 			else
 			{
