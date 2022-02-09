@@ -170,6 +170,7 @@
     <ClInclude Include="EmuCore\TMPHelpers\OperatorChecks.h" />
     <ClInclude Include="EmuCore\TMPHelpers\SafeEnumFuncs.h" />
     <ClInclude Include="EmuCore\TMPHelpers\StdAliases.h" />
+    <ClInclude Include="EmuCore\TMPHelpers\StdFeatureChecks.h" />
     <ClInclude Include="EmuCore\TMPHelpers\StdFunctionChecks.h" />
     <ClInclude Include="EmuCore\TMPHelpers\TimeTMP.h" />
     <ClInclude Include="EmuCore\TMPHelpers\Tuples.h" />

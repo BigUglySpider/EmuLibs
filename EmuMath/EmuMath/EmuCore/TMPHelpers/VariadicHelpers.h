@@ -500,6 +500,46 @@ namespace EmuCore::TMP
 	template<typename T_, T_...Vals_>
 	static constexpr T_ greatest_constant_v = EmuCore::TMP::greatest_constant<T_, Vals_...>::value;
 #pragma endregion
+
+	template<bool Condition_, template<class...> class TemplateIfTrue, template<class...> class TemplateIfFalse_, class...TypeArgs_>
+	struct conditional_template_instance
+	{
+	private:
+		template<bool Val_, template<class...> class IfTrue_, template<class...> class IfFalse_>
+		struct _instantiation_template
+		{
+			using type = void;
+			static constexpr bool success = false;
+		};
+
+		template<template<class...> class IfTrue_, template<class...> class IfFalse_>
+		struct _instantiation_template<false, IfTrue_, IfFalse_>
+		{
+		private:
+			using _safe_instantiate = EmuCore::TMP::safe_template_instantiate<IfFalse_, TypeArgs_...>;
+
+		public:
+			using type = typename _safe_instantiate::type;
+			static constexpr bool success = _safe_instantiate::value;
+		};
+
+		template<template<class...> class IfTrue_, template<class...> class IfFalse_>
+		struct _instantiation_template<true, IfTrue_, IfFalse_>
+		{
+		private:
+			using _safe_instantiate = EmuCore::TMP::safe_template_instantiate<IfTrue_, TypeArgs_...>;
+
+		public:
+			using type = typename _safe_instantiate::type;
+			static constexpr bool success = _safe_instantiate::value;
+		};
+
+		using _instantiation = _instantiation_template<Condition_, TemplateIfTrue, TemplateIfFalse_>;
+
+	public:
+		using type = typename _instantiation::type;
+		static constexpr bool success = _instantiation::success;
+	};
 }
 
 #endif

@@ -25,80 +25,6 @@ namespace EmuMath::Helpers
 	}
 
 	/// <summary>
-	/// <para> Outputs an implied-zero Vector representing a non-contained column of the provided Matrix_ type. </para>
-	/// </summary>
-	/// <returns>
-	///		By default, a Vector the same size as the passed Matrix_'s columns, containing value_type_uq elements that are default constructed, 
-	///		constructed with an argument of 0, or constructed with an argument of 0.0f, whichever is possible and earliest in the listed order.
-	/// </returns>
-	template<class Matrix_, typename = std::enable_if_t<EmuMath::TMP::is_emu_matrix_v<Matrix_>>>
-	[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_non_contained_column<Matrix_>::type matrix_get_column_non_contained()
-	{
-		return _matrix_underlying::_matrix_get_column_non_contained<Matrix_>();
-	}
-
-	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_non_contained_column<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>::type
-	matrix_get_column_non_contained()
-	{
-		return _matrix_underlying::_matrix_get_column_non_contained<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>();
-	}
-
-	/// <summary>
-	/// <para> Outputs an implied-zero Vector representing a non-contained row of the provided Matrix_ type. </para>
-	/// </summary>
-	/// <returns>
-	///		By default, a Vector the same size as the passed Matrix_'s rows, containing value_type_uq elements that are default constructed, 
-	///		constructed with an argument of 0, or constructed with an argument of 0.0f, whichever is possible and earliest in the listed order.
-	/// </returns>
-	template<class Matrix_, typename = std::enable_if_t<EmuMath::TMP::is_emu_matrix_v<Matrix_>>>
-	[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_non_contained_row<Matrix_>::type matrix_get_row_non_contained()
-	{
-		return _matrix_underlying::_matrix_get_row_non_contained<Matrix_>();
-	}
-
-	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_non_contained_row<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>::type
-	matrix_get_row_non_contained()
-	{
-		return _matrix_underlying::_matrix_get_row_non_contained<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>();
-	}
-
-	/// <summary>
-	/// <para> Outputs an implied-zero Vector representing a non-contained major element of the provided Matrix_ type. </para>
-	/// </summary>
-	/// <returns> If Matrix_ is column-major, the same as matrix_get_column_non_contained. Otherwise, the same as matrix_get_row_non_contained. </returns>
-	template<class Matrix_, typename = std::enable_if_t<EmuMath::TMP::is_emu_matrix_v<Matrix_>>>
-	[[nodiscard]] constexpr inline decltype(_matrix_underlying::_matrix_get_major_non_contained<Matrix_>()) matrix_get_major_non_contained()
-	{
-		return _matrix_underlying::_matrix_get_major_non_contained<Matrix_>();
-	}
-
-	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline decltype(_matrix_underlying::_matrix_get_major_non_contained<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>())
-	matrix_get_major_non_contained()
-	{
-		return _matrix_underlying::_matrix_get_major_non_contained<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>();
-	}
-
-	/// <summary>
-	/// <para> Outputs an implied-zero Vector representing a non-contained non-major element of the provided Matrix_ type. </para>
-	/// </summary>
-	/// <returns> If Matrix_ is column-major, the same as matrix_get_row_non_contained. Otherwise, the same as matrix_get_column_non_contained. </returns>
-	template<class Matrix_, typename = std::enable_if_t<EmuMath::TMP::is_emu_matrix_v<Matrix_>>>
-	[[nodiscard]] constexpr inline decltype(_matrix_underlying::_matrix_get_non_major_non_contained<Matrix_>()) matrix_get_non_major_non_contained()
-	{
-		return _matrix_underlying::_matrix_get_non_major_non_contained<Matrix_>();
-	}
-
-	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline decltype(_matrix_underlying::_matrix_get_non_major_non_contained<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>())
-	matrix_get_non_major_non_contained()
-	{
-		return _matrix_underlying::_matrix_get_non_major_non_contained<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>();
-	}
-
-	/// <summary>
 	/// <para> Accesses a reference to the element at the provided column+row index of the passed matrix_. </para>
 	/// <para> If a non-contained index may attempt to be accessed (and this is intended behaviour), one should use `matrix_get_theoretical` instead. </para>
 	/// </summary>
@@ -142,15 +68,11 @@ namespace EmuMath::Helpers
 	}
 
 	/// <summary>
-	/// <para> Accesses a reference to the element at the provided flattened index of the passed matrix_. </para>
-	/// <para>
-	///		The flattened index is always interpreted as column-major, where index (x + 1) is the next item in a column after x,
-	///		or the start of the next column if x is the final index of a column.
-	/// </para>
+	/// <para> Accesses a reference to the element at the provided contiguous flattened index of the passed matrix_. </para>
 	/// <para> If a non-contained index may attempt to be accessed (and this is intended behaviour), one should use `matrix_get_theoretical` instead. </para>
 	/// </summary>
 	/// <param name="matrix_">: EmuMath Matrix to access the specified element of.</param>
-	/// <returns>Reference to the element at the provided flattened index within the passed Matrix.</returns>
+	/// <returns>Reference to the element at the provided contiguous flattened index within the passed Matrix.</returns>
 	template<std::size_t FlattenedIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
 	[[nodiscard]] constexpr inline typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type& matrix_get
 	(
@@ -170,14 +92,13 @@ namespace EmuMath::Helpers
 	}
 
 	/// <summary>
-	/// <para> Accesses either a reference to the element at the provided flattened index of the passed matrix_, or an implied-zero value_type_uq of the Matrix type. </para>
 	/// <para>
-	///		The flattened index is always interpreted as column-major, where index (x + 1) is the next item in a column after x,
-	///		or the start of the next column if x is the final index of a column.
+	///		Accesses either a reference to the element at the provided contiguous flattened index of the passed matrix_, 
+	///		or an implied-zero value_type_uq of the Matrix type.
 	/// </para>
 	/// </summary>
 	/// <param name="matrix_">: EmuMath Matrix to access the specified theoretical element of.</param>
-	/// <returns>Reference to the element at the provided flattened index within the passed Matrix_ if the index is contained, otherwise an implied-zero value_type_uq.</returns>
+	/// <returns>Reference to the element at the provided contiguous flattened index within the passed Matrix_ if the index is contained, otherwise an implied-zero value.</returns>
 	template<std::size_t FlattenedIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
 	[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_flattened_theoretical_get_result<FlattenedIndex_, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>&>::type
 	matrix_get_theoretical(EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
@@ -193,319 +114,409 @@ namespace EmuMath::Helpers
 	}
 
 	/// <summary>
-	/// <para> Accesses the column at the provided ColumnIndex_ within the passed matrix_. </para>
-	/// <para> If matrix_ is column-major: This will be a direct reference to the specified column. </para>
-	/// <para> If matrix_ is not column-major: This will be an EmuMath Vector of references to elements at respective points within the specified column. </para>
+	/// <para> Outputs an EmuMath Vector of elements in the specified Column within the passed EmuMath Matrix. </para>
+	/// <para> May output a Vector of references to the elements of the Column, as long as all required indices are contained within the Matrix. </para>
+	/// <para> Offset_: Index of the Row at which to start reading the Column at the provided ColumnIndex_. Defaults to 0. </para>
 	/// </summary>
-	/// <param name="matrix_">: EmuMath Matrix to access the specified column of.</param>
-	/// <returns>EmuMath Vector referencing the specified column within the passed matrix_.</returns>
-	template<std::size_t ColumnIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::column_get_ref_type matrix_get_column
-	(
-		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
-	)
+	/// <param name="matrix_">: EmuMath Matrix to retrieve a Column from.</param>
+	/// <returns>EmuMath Vector of the specified Column within the passed matrix_.</returns>
+	template<std::size_t ColumnIndex_, std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> matrix_get_column(EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
 	{
-		return _matrix_underlying::_matrix_get_column<ColumnIndex_>(matrix_);
+		return _matrix_underlying::_matrix_get_column<ColumnIndex_, OutSize_, OutT_, Offset_>(matrix_);
 	}
 
-	template<std::size_t ColumnIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::column_get_const_ref_type matrix_get_column
-	(
-		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
-	)
+	template<std::size_t ColumnIndex_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<NumRows_, OutT_> matrix_get_column(EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
 	{
-		return _matrix_underlying::_matrix_get_column<ColumnIndex_>(matrix_);
+		return _matrix_underlying::_matrix_get_column<ColumnIndex_, NumRows_, OutT_, Offset_>(matrix_);
 	}
 
-	/// <summary>
-	/// <para> Accesses the theoretical column at the provided ColumnIndex_ within the passed matrix_. </para>
-	/// <para> If matrix_ is column-major and the index is contained: This will be a direct reference to the specified column. </para>
-	/// <para> 
-	///		If matrix_ is not column-major and the index is contained: This will be an EmuMath Vector of references to elements at respective points within the specified column. 
-	/// </para>
-	/// <para> If the index is not contained: This will be an implied-zero column for the type of matrix_. </para>
-	/// </summary>
-	/// <param name="matrix_">: EmuMath Matrix to access the specified column of.</param>
-	/// <returns>EmuMath Vector referencing the specified column within the passed matrix_, or an implied-zero column if the index is not contained.</returns>
-	template<std::size_t ColumnIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_column_theoretical_get_result<ColumnIndex_, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>&>::type
-	matrix_get_column_theoretical
-	(
-		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
-	)
-	{
-		return _matrix_underlying::_matrix_get_column_theoretical<ColumnIndex_>(matrix_);
-	}
-
-	template<std::size_t ColumnIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_column_theoretical_get_result<ColumnIndex_, const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>&>::type
-	matrix_get_column_theoretical
-	(
-		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
-	)
-	{
-		return _matrix_underlying::_matrix_get_column_theoretical<ColumnIndex_>(matrix_);
-	}
-
-	/// <summary>
-	/// <para> Accesses the column at the provided RowIndex_ within the passed matrix_. </para>
-	/// <para> If matrix_ is column-major: This will be a direct reference to the specified column. </para>
-	/// <para> If matrix_ is not column-major: This will be an EmuMath Vector of references to elements at respective points within the specified column. </para>
-	/// </summary>
-	/// <param name="matrix_">: EmuMath Matrix to access the specified row of.</param>
-	/// <returns>EmuMath Vector referencing the specified row within the passed matrix_.</returns>
-	template<std::size_t RowIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::row_get_ref_type matrix_get_row
-	(
-		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
-	)
-	{
-		return _matrix_underlying::_matrix_get_row<RowIndex_>(matrix_);
-	}
-
-	template<std::size_t RowIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::row_get_const_ref_type matrix_get_row
-	(
-		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
-	)
-	{
-		return _matrix_underlying::_matrix_get_row<RowIndex_>(matrix_);
-	}
-
-	/// <summary>
-	/// <para> Accesses the theoretical row at the provided RowIndex_ within the passed matrix_. </para>
-	/// <para> If matrix_ is column-major and the index is contained: This will be an EmuMath Vector of references to elements at respective points within the specified row. </para>
-	/// <para> If matrix_ is not column-major and the index is contained: This will be a direct reference to the specified row. </para>
-	/// <para> If the index is not contained: This will be an implied-zero row for the type of matrix_. </para>
-	/// </summary>
-	/// <param name="matrix_">: EmuMath Matrix to access the specified row of.</param>
-	/// <returns>EmuMath Vector referencing the specified row within the passed matrix_, or an implied-zero row if the index is not contained.</returns>
-	template<std::size_t RowIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_row_theoretical_get_result<RowIndex_, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>&>::type
-	matrix_get_row_theoretical
-	(
-		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
-	)
-	{
-		return _matrix_underlying::_matrix_get_row_theoretical<RowIndex_>(matrix_);
-	}
-
-	template<std::size_t RowIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_row_theoretical_get_result<RowIndex_, const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>&>::type
-	matrix_get_row_theoretical
-	(
-		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
-	)
-	{
-		return _matrix_underlying::_matrix_get_row_theoretical<RowIndex_>(matrix_);
-	}
-
-	/// <summary>
-	/// <para> Accesses the major element at the provided MajorIndex_ within the passed matrix_. </para>
-	/// <para> If the passed matrix_ is column-major: This will be a reference to the column at the specified MajorIndex_. </para>
-	/// <para> If the passed matrix_ is not column-major: This will be a reference to the row at the specified MajorIndex_. </para>
-	/// </summary>
-	/// <returns>EmuMath Vector referencing the specified major element within the passed matrix_.</returns>
-	template<std::size_t MajorIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::major_get_ref_type matrix_get_major
-	(
-		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
-	)
-	{
-		return _matrix_underlying::_matrix_get_major<MajorIndex_>(matrix_);
-	}
-
-	template<std::size_t MajorIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::major_get_const_ref_type matrix_get_major
-	(
-		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
-	)
-	{
-		return _matrix_underlying::_matrix_get_major<MajorIndex_>(matrix_);
-	}
-
-	/// <summary>
-	/// <para> Accesses the theoretical major element at the provided MajorIndex_ within the passed matrix_. </para>
-	/// <para> If the passed matrix_ is column-major and the index is contained: This will be a reference to the column at the specified MajorIndex_. </para>
-	/// <para> If the passed matrix_ is not column-major and the index is contained: This will be a reference to the row at the specified MajorIndex_. </para>
-	/// <para> If the passed matrix_ is column-major and the index is not contained: This will be an implied-zero column for the provided matrix_. </para>
-	/// <para> If the passed matrix_ is not column-major and the index is not contained: This will be an implied-zero row for the provided matrix_. </para>
-	/// </summary>
-	/// <param name="matrix_">: EmuMath Matrix to access the specified major element of.</param>
-	/// <returns>EmuMath Vector referencing the specified major element within the passed matrix_, or an implied-zero non-major element if it is not contained.</returns>
-	template<std::size_t MajorIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_major_theoretical_get_result<MajorIndex_, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>&>::type
-	matrix_get_major_theoretical
-	(
-		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
-	)
-	{
-		return _matrix_underlying::_matrix_get_major_theoretical<MajorIndex_>(matrix_);
-	}
-
-	template<std::size_t MajorIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_major_theoretical_get_result<MajorIndex_, const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>&>::type
-	matrix_get_major_theoretical
-	(
-		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
-	)
-	{
-		return _matrix_underlying::_matrix_get_major_theoretical<MajorIndex_>(matrix_);
-	}
-
-	/// <summary>
-	/// <para> Accesses the non-major element at the provided NonMajorIndex_ within the passed matrix_. </para>
-	/// <para> If the passed matrix_ is column-major: This will be a reference to the row at the specified MajorIndex_. </para>
-	/// <para> If the passed matrix_ is not column-major: This will be a reference to the column at the specified MajorIndex_. </para>
-	/// </summary>
-	/// <returns>EmuMath Vector referencing the specified non-major element within the passed matrix_.</returns>
-	template<std::size_t NonMajorIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::non_major_get_ref_type matrix_get_non_major
-	(
-		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
-	)
-	{
-		return _matrix_underlying::_matrix_get_non_major<NonMajorIndex_>(matrix_);
-	}
-
-	template<std::size_t NonMajorIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::non_major_get_const_ref_type matrix_get_non_major
-	(
-		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
-	)
-	{
-		return _matrix_underlying::_matrix_get_non_major<NonMajorIndex_>(matrix_);
-	}
-
-	/// <summary>
-	/// <para> Accesses the theoretical non-major element at the provided NonMajorIndex_ within the passed matrix_. </para>
-	/// <para> If the passed matrix_ is column-major and the index is contained: This will be a reference to the row at the specified MajorIndex_. </para>
-	/// <para> If the passed matrix_ is not column-major and the index is contained: This will be a reference to the column at the specified MajorIndex_. </para>
-	/// <para> If the passed matrix_ is column-major and the index is not contained: This will be an implied-zero row for the provided matrix_. </para>
-	/// <para> If the passed matrix_ is not column-major and the index is not contained: This will be an implied-zero column for the provided matrix_. </para>
-	/// </summary>
-	/// <param name="matrix_">: EmuMath Matrix to access the specified non-major element of.</param>
-	/// <returns>EmuMath Vector referencing the specified non-major element within the passed matrix_, or an implied-zero non-major element if it is not contained.</returns>
-	template<std::size_t NonMajorIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_non_major_theoretical_get_result<NonMajorIndex_, EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>&>::type
-	matrix_get_non_major_theoretical
-	(
-		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
-	)
-	{
-		return _matrix_underlying::_matrix_get_non_major_theoretical<NonMajorIndex_>(matrix_);
-	}
-
-	template<std::size_t NonMajorIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_non_major_theoretical_get_result<NonMajorIndex_, const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>&>::type
-	matrix_get_non_major_theoretical
-	(
-		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
-	)
-	{
-		return _matrix_underlying::_matrix_get_non_major_theoretical<NonMajorIndex_>(matrix_);
-	}
-
-	/// <summary>
-	/// <para>
-	///		Outputs an EmuMath Vector representing the main-diagonal of the provided matrix_, 
-	///		starting from the provided Offset_ for as many indices as the output Vector holds.
-	/// </para>
-	/// <para> If no OutSize_ is provided, the output size will default to that of matrix_'s smallest axis. </para>
-	/// <para> Offset_: Inclusive index from which to start reading main diagonal elements. This is used as both a column index and a row index. Defaults to 0. </para>
-	/// </summary>
-	/// <param name="matrix_">: Reference to an EmuMath Matrix to retrieve the main-diagonal of.</param>
-	/// <returns>EmuMath Vector representing the main diagonal in the passed matrix for as many elements as it contains, and starting from the provided Offset_.</returns>
-	template<std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> matrix_get_main_diagonal(EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
-	{
-		return _matrix_underlying::_matrix_get_main_diagonal<Offset_, OutSize_, OutT_>(matrix_);
-	}
-
-	template<std::size_t OutSize_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq> matrix_get_main_diagonal
+	template<std::size_t ColumnIndex_, std::size_t OutSize_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq> matrix_get_column
 	(
 		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
 	)
 	{
 		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
-		return _matrix_underlying::_matrix_get_main_diagonal<Offset_, OutSize_, matrix_value_uq>(matrix_);
+		return _matrix_underlying::_matrix_get_column<ColumnIndex_, OutSize_, matrix_value_uq, Offset_>(matrix_);
 	}
 
-	template<typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<EmuMath::TMP::matrix_smallest_axis_v<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>, OutT_> matrix_get_main_diagonal
+	template<std::size_t ColumnIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<NumRows_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq> matrix_get_column
 	(
 		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
 	)
 	{
-		constexpr std::size_t out_size_ = EmuMath::TMP::matrix_smallest_axis_v<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>;
-		return _matrix_underlying::_matrix_get_main_diagonal<Offset_, out_size_, OutT_>(matrix_);
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		return _matrix_underlying::_matrix_get_column<ColumnIndex_, NumRows_, matrix_value_uq, 0>(matrix_);
 	}
 
-	template<typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline EmuMath::Vector
+	template<std::size_t ColumnIndex_, std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> matrix_get_column(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+	{
+		return _matrix_underlying::_matrix_get_column<ColumnIndex_, OutSize_, OutT_, Offset_>(matrix_);
+	}
+
+	template<std::size_t ColumnIndex_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<NumRows_, OutT_> matrix_get_column(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+	{
+		return _matrix_underlying::_matrix_get_column<ColumnIndex_, NumRows_, OutT_, Offset_>(matrix_);
+	}
+
+	template<std::size_t ColumnIndex_, std::size_t OutSize_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq> matrix_get_column
+	(
+		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		return _matrix_underlying::_matrix_get_column<ColumnIndex_, OutSize_, matrix_value_uq, Offset_>(matrix_);
+	}
+
+	template<std::size_t ColumnIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<NumRows_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq> matrix_get_column
+	(
+		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		return _matrix_underlying::_matrix_get_column<ColumnIndex_, NumRows_, matrix_value_uq, 0>(matrix_);
+	}
+
+	/// <summary>
+	/// <para> Outputs an EmuMath Vector of elements in the specified Row within the passed EmuMath Matrix. </para>
+	/// <para> May output a Vector of references to the elements of the Row, as long as all required indices are contained within the Matrix. </para>
+	/// <para> Offset_: Index of the Column at which to start reading the Row at the provided RowIndex_. Defaults to 0. </para>
+	/// </summary>
+	/// <param name="matrix_">: EmuMath Matrix to retrieve a Row from.</param>
+	/// <returns>EmuMath Vector of the specified Row within the passed matrix_.</returns>
+	template<std::size_t RowIndex_, std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> matrix_get_row(EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+	{
+		return _matrix_underlying::_matrix_get_row<RowIndex_, OutSize_, OutT_, Offset_>(matrix_);
+	}
+
+	template<std::size_t RowIndex_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<NumColumns_, OutT_> matrix_get_row(EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+	{
+		return _matrix_underlying::_matrix_get_row<RowIndex_, NumColumns_, OutT_, Offset_>(matrix_);
+	}
+
+	template<std::size_t RowIndex_, std::size_t OutSize_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq> matrix_get_row
+	(
+		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		return _matrix_underlying::_matrix_get_row<RowIndex_, OutSize_, matrix_value_uq, Offset_>(matrix_);
+	}
+
+	template<std::size_t RowIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<NumColumns_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq> matrix_get_row
+	(
+		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		return _matrix_underlying::_matrix_get_row<RowIndex_, NumColumns_, matrix_value_uq, 0>(matrix_);
+	}
+
+	template<std::size_t RowIndex_, std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> matrix_get_row(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+	{
+		return _matrix_underlying::_matrix_get_row<RowIndex_, OutSize_, OutT_, Offset_>(matrix_);
+	}
+
+	template<std::size_t RowIndex_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<NumColumns_, OutT_> matrix_get_row(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+	{
+		return _matrix_underlying::_matrix_get_row<RowIndex_, NumColumns_, OutT_, Offset_>(matrix_);
+	}
+
+	template<std::size_t RowIndex_, std::size_t OutSize_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq> matrix_get_row
+	(
+		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		return _matrix_underlying::_matrix_get_row<RowIndex_, OutSize_, matrix_value_uq, Offset_>(matrix_);
+	}
+
+	template<std::size_t RowIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<NumColumns_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq> matrix_get_row
+	(
+		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		return _matrix_underlying::_matrix_get_row<RowIndex_, NumColumns_, matrix_value_uq, 0>(matrix_);
+	}
+
+	/// <summary>
+	/// <para> Outputs an EmuMath Vector of elements in the specified Major Segment within the passed Matrix. </para>
+	/// <para> May output a Vector of references to the elements of the Major Segment, as long as all required indices are contained within the Matrix. </para>
+	/// <para> If matrix_ is Column Major, this is equivalent to `matrix_get_column`. Otherwise, it is equivalent to `matrix_get_row`. </para>
+	/// <para> Offset_: Non-Major index at which to start reading the Major Segment at the provided MajorIndex_. Defaults to 0. </para>
+	/// </summary>
+	/// <param name="matrix_">: EmuMath Matrix to retrieve a Major Segment from.</param>
+	/// <returns>EmuMath Vector of the specified Major Segment within the passed matrix_.</returns>
+	template<std::size_t MajorIndex_, std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> matrix_get_major(EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+	{
+		return _matrix_underlying::_matrix_get_major<MajorIndex_, OutSize_, OutT_, Offset_>(matrix_);
+	}
+
+	template<std::size_t MajorIndex_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<(ColumnMajor_ ? NumRows_ : NumColumns_), OutT_> matrix_get_major
+	(
+		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		constexpr std::size_t out_size_ = (ColumnMajor_ ? NumRows_ : NumColumns_);
+		return _matrix_underlying::_matrix_get_major<MajorIndex_, out_size_, OutT_, Offset_>(matrix_);
+	}
+
+	template<std::size_t MajorIndex_, std::size_t OutSize_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq> matrix_get_major
+	(
+		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		return _matrix_underlying::_matrix_get_major<MajorIndex_, OutSize_, matrix_value_uq, Offset_>(matrix_);
+	}
+
+	template<std::size_t MajorIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<(ColumnMajor_ ? NumRows_ : NumColumns_), typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq>
+	matrix_get_major
+	(
+		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		constexpr std::size_t out_size_ = (ColumnMajor_ ? NumRows_ : NumColumns_);
+		return _matrix_underlying::_matrix_get_major<MajorIndex_, out_size_, matrix_value_uq, 0>(matrix_);
+	}
+
+	template<std::size_t MajorIndex_, std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> matrix_get_major(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+	{
+		return _matrix_underlying::_matrix_get_major<MajorIndex_, OutSize_, OutT_, Offset_>(matrix_);
+	}
+
+	template<std::size_t MajorIndex_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<(ColumnMajor_ ? NumRows_ : NumColumns_), OutT_> matrix_get_major
+	(
+		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		constexpr std::size_t out_size_ = (ColumnMajor_ ? NumRows_ : NumColumns_);
+		return _matrix_underlying::_matrix_get_major<MajorIndex_, out_size_, OutT_, Offset_>(matrix_);
+	}
+
+	template<std::size_t MajorIndex_, std::size_t OutSize_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq> matrix_get_major
+	(
+		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		return _matrix_underlying::_matrix_get_major<MajorIndex_, OutSize_, matrix_value_uq, Offset_>(matrix_);
+	}
+
+	template<std::size_t MajorIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<(ColumnMajor_ ? NumRows_ : NumColumns_), typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq>
+	matrix_get_major
+	(
+		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		constexpr std::size_t out_size_ = (ColumnMajor_ ? NumRows_ : NumColumns_);
+		return _matrix_underlying::_matrix_get_major<MajorIndex_, out_size_, matrix_value_uq, 0>(matrix_);
+	}
+
+	/// <summary>
+	/// <para> Outputs an EmuMath Vector of elements in the specified Non-Major Segment within the passed Matrix. </para>
+	/// <para> May output a Vector of references to the elements of the Non-Major Segment, as long as all required indices are contained within the Matrix. </para>
+	/// <para> If Matrix is Column Major, this is equivalent to `matrix_get_row`. Otherwise, it is equivalent to `matrix_get_column`. </para>
+	/// <para> Offset_: Major index at which to start reading the Non-Major Segment at the provided NonMajorIndex_. Defaults to 0. </para>
+	/// </summary>
+	/// <param name="matrix_">: EmuMath Matrix to retrieve a Non-Major Segment from.</param>
+	/// <returns>EmuMath Vector of the specified Non-Major Segment within the passed matrix_.</returns>
+	template<std::size_t MajorIndex_, std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> matrix_get_non_major(EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+	{
+		return _matrix_underlying::_matrix_get_non_major<MajorIndex_, OutSize_, OutT_, Offset_>(matrix_);
+	}
+
+	template<std::size_t MajorIndex_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<(ColumnMajor_ ? NumColumns_ : NumRows_), OutT_> matrix_get_non_major
+	(
+		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		constexpr std::size_t out_size_ = (ColumnMajor_ ? NumColumns_ : NumRows_);
+		return _matrix_underlying::_matrix_get_non_major<MajorIndex_, out_size_, OutT_, Offset_>(matrix_);
+	}
+
+	template<std::size_t MajorIndex_, std::size_t OutSize_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq> matrix_get_non_major
+	(
+		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		return _matrix_underlying::_matrix_get_non_major<MajorIndex_, OutSize_, matrix_value_uq, Offset_>(matrix_);
+	}
+
+	template<std::size_t MajorIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<(ColumnMajor_ ? NumColumns_ : NumRows_), typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq>
+	matrix_get_non_major
+	(
+		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		constexpr std::size_t out_size_ = (ColumnMajor_ ? NumColumns_ : NumRows_);
+		return _matrix_underlying::_matrix_get_non_major<MajorIndex_, out_size_, matrix_value_uq, 0>(matrix_);
+	}
+
+	template<std::size_t MajorIndex_, std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> matrix_get_non_major(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+	{
+		return _matrix_underlying::_matrix_get_non_major<MajorIndex_, OutSize_, OutT_, Offset_>(matrix_);
+	}
+
+	template<std::size_t MajorIndex_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<(ColumnMajor_ ? NumColumns_ : NumRows_), OutT_> matrix_get_non_major
+	(
+		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		constexpr std::size_t out_size_ = (ColumnMajor_ ? NumColumns_ : NumRows_);
+		return _matrix_underlying::_matrix_get_non_major<MajorIndex_, out_size_, OutT_, Offset_>(matrix_);
+	}
+
+	template<std::size_t MajorIndex_, std::size_t OutSize_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq> matrix_get_non_major
+	(
+		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		return _matrix_underlying::_matrix_get_non_major<MajorIndex_, OutSize_, matrix_value_uq, Offset_>(matrix_);
+	}
+
+	template<std::size_t MajorIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<(ColumnMajor_ ? NumColumns_ : NumRows_), typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq>
+	matrix_get_non_major
+	(
+		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		constexpr std::size_t out_size_ = (ColumnMajor_ ? NumColumns_ : NumRows_);
+		return _matrix_underlying::_matrix_get_non_major<MajorIndex_, out_size_, matrix_value_uq, 0>(matrix_);
+	}
+
+	/// <summary>
+	/// <para> Outputs an EmuMath Vector of elements within the specified Diagonal Segment within the passed Matrix, defaulting to its main diagonal. </para>
+	/// <para> ColumnOffset_: Index of the first Column to access. This will increment by 1 for each progressive element in the output Vector. Defaults to 0. </para>
+	/// <para> RowOffset_: Index of the first Row to access. This will increment by 1 for each progressive element in the output Vector. Defaults to ColumnOffset_. </para>
+	/// <para> May output a Vector of references to the elements of the Diagonal Segment, as long as all required indices are contained within the Matrix. </para>
+	/// </summary>
+	/// <param name="matrix_">: EmuMath Matrix to retrieve a Diagonal Segment from.</param>
+	/// <returns>EmuMath Vector of the specified Diagonal Segment within the passed matrix_.</returns>
+	template
 	<
-		EmuMath::TMP::matrix_smallest_axis_v<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>,
-		typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq
-	> matrix_get_main_diagonal
+		std::size_t OutSize_, typename OutT_, std::size_t ColumnOffset_ = 0, std::size_t RowOffset_ = ColumnOffset_,
+		typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_
+	>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> matrix_get_diagonal(EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+	{
+		return _matrix_underlying::_matrix_get_diagonal<OutSize_, OutT_, ColumnOffset_, RowOffset_>(matrix_);
+	}
+
+	template<typename OutT_, std::size_t ColumnOffset_ = 0, std::size_t RowOffset_ = ColumnOffset_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::smallest_direction_size, OutT_>
+	matrix_get_diagonal(EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+	{
+		constexpr std::size_t out_size_ = EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::smallest_direction_size;
+		return _matrix_underlying::_matrix_get_diagonal<out_size_, OutT_, ColumnOffset_, RowOffset_>(matrix_);
+	}
+
+	template<std::size_t OutSize_, std::size_t ColumnOffset_ = 0, std::size_t RowOffset_ = ColumnOffset_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq> matrix_get_diagonal
 	(
 		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
 	)
 	{
-		constexpr std::size_t out_size_ = EmuMath::TMP::matrix_smallest_axis_v<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>;
 		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
-		return _matrix_underlying::_matrix_get_main_diagonal<0, out_size_, matrix_value_uq>(matrix_);
+		return _matrix_underlying::_matrix_get_diagonal<OutSize_, matrix_value_uq, ColumnOffset_, RowOffset_>(matrix_);
 	}
 
-	/// <summary>
-	/// <para>
-	///		Outputs an EmuMath Vector representing the main-diagonal of the provided matrix_, 
-	///		starting from the provided Offset_ for as many indices as the output Vector holds.
-	/// </para>
-	/// <para> If no OutSize_ is provided, the output size will default to that of matrix_'s smallest axis. </para>
-	/// <para> Offset_: Inclusive index from which to start reading main diagonal elements. This is used as both a column index and a row index. Defaults to 0. </para>
-	/// </summary>
-	/// <param name="matrix_">: Const reference to an EmuMath Matrix to retrieve the main-diagonal of.</param>
-	/// <returns>EmuMath Vector representing the main diagonal in the passed matrix for as many elements as it contains, and starting from the provided Offset_.</returns>
-	template<std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> matrix_get_main_diagonal(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
-	{
-		return _matrix_underlying::_matrix_get_main_diagonal<Offset_, OutSize_, OutT_>(matrix_);
-	}
-
-	template<std::size_t OutSize_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq> matrix_get_main_diagonal
-	(
-		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
-	)
-	{
-		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
-		return _matrix_underlying::_matrix_get_main_diagonal<Offset_, OutSize_, matrix_value_uq>(matrix_);
-	}
-
-	template<typename OutT_, std::size_t Offset_ = 0, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<EmuMath::TMP::matrix_smallest_axis_v<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>, OutT_> matrix_get_main_diagonal
-	(
-		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
-	)
-	{
-		constexpr std::size_t out_size_ = EmuMath::TMP::matrix_smallest_axis_v<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>;
-		return _matrix_underlying::_matrix_get_main_diagonal<Offset_, out_size_, OutT_>(matrix_);
-	}
-
-	template<typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
-	[[nodiscard]] constexpr inline EmuMath::Vector
+	template<std::size_t OutSize_, std::size_t ColumnOffset_ = 0, std::size_t RowOffset_ = ColumnOffset_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	constexpr inline EmuMath::Vector
 	<
-		EmuMath::TMP::matrix_smallest_axis_v<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>,
+		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::smallest_direction_size,
 		typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq
-	> matrix_get_main_diagonal
+	>
+	matrix_get_diagonal
+	(
+		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		constexpr std::size_t out_size_ = EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::smallest_direction_size;
+		return _matrix_underlying::_matrix_get_diagonal<out_size_, matrix_value_uq, ColumnOffset_, RowOffset_>(matrix_);
+	}
+
+	template
+	<
+		std::size_t OutSize_, typename OutT_, std::size_t ColumnOffset_ = 0, std::size_t RowOffset_ = ColumnOffset_,
+		typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_
+	>
+	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> matrix_get_diagonal(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+	{
+		return _matrix_underlying::_matrix_get_diagonal<OutSize_, OutT_, ColumnOffset_, RowOffset_>(matrix_);
+	}
+
+	template<typename OutT_, std::size_t ColumnOffset_ = 0, std::size_t RowOffset_ = ColumnOffset_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Vector<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::smallest_direction_size, OutT_>
+	matrix_get_diagonal(const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+	{
+		constexpr std::size_t out_size_ = EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::smallest_direction_size;
+		return _matrix_underlying::_matrix_get_diagonal<out_size_, OutT_, ColumnOffset_, RowOffset_>(matrix_);
+	}
+
+	template<std::size_t OutSize_, std::size_t ColumnOffset_ = 0, std::size_t RowOffset_ = ColumnOffset_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	constexpr inline EmuMath::Vector<OutSize_, typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq> matrix_get_diagonal
 	(
 		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
 	)
 	{
-		constexpr std::size_t out_size_ = EmuMath::TMP::matrix_smallest_axis_v<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>;
 		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
-		return _matrix_underlying::_matrix_get_main_diagonal<0, out_size_, matrix_value_uq>(matrix_);
+		return _matrix_underlying::_matrix_get_diagonal<OutSize_, matrix_value_uq, ColumnOffset_, RowOffset_>(matrix_);
+	}
+
+	template<std::size_t OutSize_, std::size_t ColumnOffset_ = 0, std::size_t RowOffset_ = ColumnOffset_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	constexpr inline EmuMath::Vector
+	<
+		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::smallest_direction_size,
+		typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq
+	>
+	matrix_get_diagonal
+	(
+		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		using matrix_value_uq = typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type_uq;
+		constexpr std::size_t out_size_ = EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::smallest_direction_size;
+		return _matrix_underlying::_matrix_get_diagonal<out_size_, matrix_value_uq, ColumnOffset_, RowOffset_>(matrix_);
 	}
 }
 

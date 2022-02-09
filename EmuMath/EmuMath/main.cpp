@@ -190,40 +190,56 @@ int main()
 	srand(static_cast<unsigned int>(time(0)));
 	EmuCore::Timer<std::milli> timer_;
 
-	constexpr auto mat_for_min_4x4_rm_ = EmuMath::Matrix<4, 4, float, false>
-	(
-		1, 2, 3, 4,
-		5, 6, 7, 8,
-		9, 10, 11, 12,
-		13, 14, 15, 16
-	);
-	constexpr auto mat_for_min_4x4_cm_ = EmuMath::Matrix<4, 4, float, true>(mat_for_min_4x4_rm_);
+	constexpr auto some_mat_cm_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	constexpr auto some_mat_rm_ = EmuMath::Matrix<4, 4, float, false>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	constexpr auto cm_column_1_ = some_mat_cm_.Column<1>();
+	constexpr auto rm_column_1_ = some_mat_rm_.Column<1>();
+	constexpr auto cm_row_1_ = some_mat_cm_.Row<1>();
+	constexpr auto rm_row_1_ = some_mat_rm_.Row<1>();
+	constexpr auto cm_major_1_ = some_mat_cm_.Major<1>();
+	constexpr auto rm_major_1_ = some_mat_rm_.Major<1>();
+	constexpr auto cm_non_major_1_ = some_mat_cm_.NonMajor<1>();
+	constexpr auto rm_non_major_1_ = some_mat_rm_.NonMajor<1>();
+	constexpr auto cm_main_diagonal_ = some_mat_cm_.Diagonal();
+	constexpr auto rm_main_diagonal_ = some_mat_rm_.Diagonal();
+	constexpr auto cm_diagonal12_ = some_mat_cm_.Diagonal<float, 1, 2>();
+	constexpr auto rm_diagonal12_ = some_mat_rm_.Diagonal<float, 1, 2>();
 
-	constexpr auto min_rm_ = mat_for_min_4x4_rm_.Min();
-	constexpr auto min_cm_ = mat_for_min_4x4_cm_.Min<int>();
+	constexpr auto subscript_flat_ = some_mat_cm_[7];
+	constexpr auto subscript_pair_ = some_mat_cm_[{1, 3}];
+	constexpr auto func_flat_ = some_mat_cm_(7);
+	constexpr auto func_column_row_ = some_mat_cm_(1, 3);
+	constexpr auto func_pair_ = some_mat_cm_({ 1, 3 });
 
-	constexpr auto min_12_04_rm_ = mat_for_min_4x4_rm_.MinRange<1, 2, 0, 4>();
-	constexpr auto min_12_04_cm_ = mat_for_min_4x4_cm_.MinRange<1, 2, 0, 4, int>();
+	constexpr auto subscript_flat_rm_ = some_mat_rm_[7];
+	constexpr auto subscript_pair_rm_ = some_mat_rm_[{1, 3}];
+	constexpr auto func_flat_rm_ = some_mat_rm_(7);
+	constexpr auto func_column_row_rm_ = some_mat_rm_(1, 3);
+	constexpr auto func_pair_rm_ = some_mat_rm_({ 1, 3 });
 
-	constexpr auto min_13_12_rm_ = mat_for_min_4x4_rm_.MinRange<1, 3, 1, 2>();
-	constexpr auto min_13_12_cm_ = mat_for_min_4x4_cm_.MinRange<1, 3, 1, 2, int>();
+	constexpr auto test_ = some_mat_cm_.at(3, 3);
 
-	constexpr auto other_mat_for_min_ab_4x4_rm_ = EmuMath::Matrix<4, 4, float, false>
-	(
-		100, 2, -3, 4,
-		5, -6, 7, 8,
-		9, 10, 11, 12,
-		-13, -14, -15, 16
-	);
+	std::cout << some_mat_cm_ << "\n\n" << some_mat_rm_ << "\n\n";
 
-	constexpr auto min_ab_ = mat_for_min_4x4_cm_.Min(other_mat_for_min_ab_4x4_rm_);
+	auto some_runtime_mat_cm_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << some_runtime_mat_cm_ << "\n\n";
+	some_runtime_mat_cm_.Diagonal<2, float&, 1>() *= 10;
+	std::cout << some_runtime_mat_cm_ << "\n\n";
 
-	auto runtime_copy_a_(mat_for_min_4x4_cm_);
-	auto runtime_copy_b_(other_mat_for_min_ab_4x4_rm_);
-	std::cout << runtime_copy_a_ << "\n\n";
-	std::cout << "Min Range No Copy:\n";
-	std::cout << runtime_copy_a_.MinRangeNoCopy<1, 3, 1, 3>(runtime_copy_b_) << "\n\n";
+	for (auto& val_ : some_runtime_mat_cm_)
+	{
+		val_ *= 25;
+	}
+	std::cout << some_runtime_mat_cm_ << "\n\n";
 
+	try
+	{
+		auto yo = some_mat_cm_.at(2525, -1);
+	}
+	catch (std::out_of_range& e_)
+	{
+		std::cout << e_.what() << "\n\n";
+	}
 
 	// ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;

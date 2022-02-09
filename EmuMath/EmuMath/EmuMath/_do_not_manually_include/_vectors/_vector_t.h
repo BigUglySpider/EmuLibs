@@ -240,7 +240,7 @@ namespace EmuMath
 			template<std::size_t Index_, std::size_t ReadOffset_, bool AllowScalarMoves_, bool DoAssertions_>
 			[[nodiscard]] static constexpr inline bool get()
 			{
-				if constexpr(AllowScalarMoves_)
+				if constexpr(!AllowScalarMoves_)
 				{
 					// We only allow reference creation if Arg_ is of lvalue reference type to prevent dangling ref creation
 					using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(std::declval<Arg_>())));			
@@ -258,8 +258,24 @@ namespace EmuMath
 					}
 					else
 					{
-						static_assert(!DoAssertions_, "Attempted to create an EmuMath Vector's stored_type from a non-Vector argument, but the output Vector contains references and the provided Arg_ is not an lvalue reference. As this is likely to result in dangling references, such behaviour is prohibited.");
-						return false;
+						if constexpr (EmuMath::TMP::is_recognised_vector_ref_wrapper_v<Arg_>)
+						{
+							using wrapped_ref_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::declval<Arg_>()).get());
+							if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, Arg_>())
+							{
+								return true;
+							}
+							else
+							{
+								static_assert(!DoAssertions_, "Attempted to create an EmuMath Vector's stored type using a recongised reference-wrapper argument, but the contained reference within the wrapper is not compatible with the output Vector.");
+								return false;
+							}
+						}
+						else
+						{
+							static_assert(!DoAssertions_, "Attempted to create an EmuMath Vector's stored_type from a non-Vector argument, but the output Vector contains references and the provided Arg_ is not an lvalue reference or a recognised reference wrapper. As this is likely to result in dangling references, such behaviour is prohibited.");
+							return false;
+						}
 					}
 				}
 				else
@@ -281,13 +297,6 @@ namespace EmuMath
 					}
 					else
 					{
-						using arg_uq = EmuCore::TMP::remove_ref_cv_t<Arg_>;
-						constexpr bool in_is_ref_wrapper = EmuCore::TMP::variadic_or_v
-						<
-							EmuCore::TMP::is_instance_of_typeparams_only_v<arg_uq, std::reference_wrapper>,
-							EmuCore::TMP::is_instance_of_typeparams_only_v<arg_uq, EmuMath::vector_internal_ref>,
-							EmuCore::TMP::is_instance_of_typeparams_only_v<arg_uq, EmuMath::vector_internal_const_ref>
-						>;
 						if constexpr (!contains_ref)
 						{
 							// Explicit move allowed
@@ -302,10 +311,10 @@ namespace EmuMath
 								return false;
 							}
 						}
-						else if constexpr (in_is_ref_wrapper)
+						else if constexpr (EmuMath::TMP::is_recognised_vector_ref_wrapper_v<Arg_>)
 						{
 							using wrapped_ref_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::declval<Arg_>()).get());
-							if constexpr (std::is_constructible_v<stored_type, wrapped_ref_type> || EmuCore::TMP::is_static_castable_v<wrapped_ref_type, stored_type>)
+							if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, wrapped_ref_type>())
 							{
 								return true;
 							}
@@ -390,18 +399,26 @@ namespace EmuMath
 			if constexpr (size != 0 && sizeof...(Args_) == size) // 0-args reserved for default
 			{
 				// For validity:
-				// 1: Must be more than 1 argument *or* the only argument is not an EmuMath Vector (as a single argument will use Vector conversion construction instead)
-				// 2: Must be at least one of A and B, with A taking priority over B:
+				// 1: No voids
+				// 2: Must be more than 1 argument *or* the only argument is not an EmuMath Vector (as a single argument will use Vector conversion construction instead)
+				// 3: Must be at least one of A and B, with A taking priority over B:
 				// --- A: All Args_ are immediately valid for constructing data_storage_type when forwarded to an initialiser list for data_storage_type construction
 				// --- B: All Args_ are valid lone types for making a stored_type
-				return
-				(
-					(size != 1 || !EmuMath::TMP::is_emu_vector_v<EmuCore::TMP::first_variadic_arg_t<Args_...>>) &&
+				if constexpr(!(... || std::is_void_v<Args_>))
+				{
+					return
 					(
-						std::is_constructible_v<data_storage_type, decltype(std::forward<Args_>(std::declval<Args_>()))...> ||
-						EmuCore::TMP::variadic_and_v<_is_valid_arg_for_stored_type<0, ReadOffset_, Args_, true, false>()...>						
-					)
-				);
+						(size != 1 || !EmuMath::TMP::is_emu_vector_v<EmuCore::TMP::first_variadic_arg_t<Args_...>>) &&
+						(
+							std::is_constructible_v<data_storage_type, decltype(std::forward<Args_>(std::declval<Args_>()))...> ||
+							EmuCore::TMP::variadic_and_v<_is_valid_arg_for_stored_type<0, ReadOffset_, Args_, true, false>()...>						
+						)
+					);
+				}
+				else
+				{
+					return false;
+				}
 			}
 			else
 			{
@@ -508,13 +525,9 @@ namespace EmuMath
 					constexpr bool assigning_theoretical_to_ref_ = is_theoretical_index_ && contains_ref;
 					if constexpr (!assigning_theoretical_to_ref_)
 					{
-						if constexpr (std::is_constructible_v<stored_type, arg_get_result>)
+						if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, arg_get_result>())
 						{
-							return stored_type(EmuMath::Helpers::vector_get_theoretical<arg_index_>(lval_ref_arg_));
-						}
-						else if constexpr(EmuCore::TMP::is_static_castable_v<arg_get_result, stored_type>)
-						{
-							return static_cast<stored_type>(EmuMath::Helpers::vector_get_theoretical<arg_index_>(lval_ref_arg_));
+							return EmuCore::TMP::construct_or_cast<stored_type>(EmuMath::Helpers::vector_get_theoretical<arg_index_>(lval_ref_arg_));
 						}
 						else
 						{
@@ -540,13 +553,9 @@ namespace EmuMath
 					if constexpr(!contains_ref)
 					{
 						// Explicit std::move allowed
-						if constexpr (std::is_constructible_v<stored_type, arg_move_result>)
+						if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, arg_move_result>())
 						{
-							return stored_type(std::move(lval_ref_arg_.template at<arg_index_>())    );
-						}
-						else if constexpr (EmuCore::TMP::is_static_castable_v<arg_move_result, stored_type>)
-						{
-							return static_cast<stored_type>(std::move(lval_ref_arg_.template at<arg_index_>()));
+							return EmuCore::TMP::construct_or_cast<stored_type>(std::move(lval_ref_arg_.template at<arg_index_>()));
 						}
 						else
 						{
@@ -564,13 +573,9 @@ namespace EmuMath
 						constexpr bool compatible_ref_ = contains_const_ref || (arg_uq::contains_non_const_ref && !std::is_const_v<Arg_>);
 						if constexpr (compatible_ref_)
 						{
-							if constexpr (std::is_constructible_v<stored_type, arg_get_result>)
+							if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, arg_get_result>())
 							{
-								return stored_type(lval_ref_arg_.template at<arg_index_>());
-							}
-							else if constexpr (EmuCore::TMP::is_static_castable_v<arg_get_result, stored_type>)
-							{
-								return static_cast<stored_type>(lval_ref_arg_.template at<arg_index_>());
+								return EmuCore::TMP::construct_or_cast<stored_type>(lval_ref_arg_.template at<arg_index_>());
 							}
 							else
 							{
@@ -609,22 +614,18 @@ namespace EmuMath
 			template<std::size_t Index_, std::size_t ReadOffset_, bool AllowScalarMoves_>
 			[[nodiscard]] static constexpr inline stored_type get(Arg_&& arg_)
 			{
-				if constexpr(AllowScalarMoves_)
+				if constexpr(!AllowScalarMoves_)
 				{
 					// We do not allow this arg to be moved as it is used for all output arguments.
 					// --- We only allow reference creation if Arg_ is of lvalue reference type to prevent dangling ref creation
-					using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_)));
-					lval_ref_arg_type lval_ref_arg_ = EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_));
 			
 					if constexpr (std::is_lvalue_reference_v<Arg_> || !contains_ref)
 					{
-						if constexpr(std::is_constructible_v<stored_type, lval_ref_arg_type>)
+						using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_)));
+						lval_ref_arg_type lval_ref_arg_ = EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_));
+						if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, lval_ref_arg_type>())
 						{
-							return stored_type(lval_ref_arg_);
-						}
-						else if constexpr (EmuCore::TMP::is_static_castable_v<lval_ref_arg_type, stored_type>)
-						{
-							return static_cast<stored_type>(lval_ref_arg_);
+							return EmuCore::TMP::construct_or_cast<stored_type>(lval_ref_arg_);
 						}
 						else
 						{
@@ -637,27 +638,44 @@ namespace EmuMath
 					}
 					else
 					{
-						static_assert
-						(
-							EmuCore::TMP::get_false<Arg_>(),
-							"Attempted to create an EmuMath Vector's stored_type from a non-Vector argument, but the output Vector contains references and the provided Arg_ is not an lvalue reference. As this is likely to result in dangling references, such behaviour is prohibited."
-						);
+						if constexpr (EmuMath::TMP::is_recognised_vector_ref_wrapper_v<Arg_>)
+						{
+							using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_)));
+							lval_ref_arg_type lval_ref_arg_ = EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_));
+							using wrapped_arg_type = decltype(lval_ref_arg_.get());
+							if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, wrapped_arg_type>())
+							{
+								return EmuCore::TMP::construct_or_cast<stored_type>(lval_ref_arg_.get());
+							}
+							else
+							{
+								static_assert
+								(
+									EmuCore::TMP::get_false<Arg_>(),
+									"Attempted to create an EmuMath Vector's stored_type from a recognised reference-wrapper argument, but the output Vector does not supported the reference wrapped by it."
+								);
+							}
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<Arg_>(),
+								"Attempted to create an EmuMath Vector's stored_type from a non-Vector argument, but the output Vector contains references and the provided Arg_ is not an lvalue reference. As this is likely to result in dangling references, such behaviour is prohibited."
+							);
+						}
 					}
 				}
 				else
 				{
-					using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_)));
-					lval_ref_arg_type lval_ref_arg_ = EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_));
 					if constexpr (std::is_lvalue_reference_v<Arg_>)
 					{
 						// No explicit move		
-						if constexpr(std::is_constructible_v<stored_type, lval_ref_arg_type>)
+						using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_)));
+						lval_ref_arg_type lval_ref_arg_ = EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_));
+						if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, lval_ref_arg_type>())
 						{
-							return stored_type(lval_ref_arg_);
-						}
-						else if constexpr (EmuCore::TMP::is_static_castable_v<lval_ref_arg_type, stored_type>)
-						{
-							return static_cast<stored_type>(lval_ref_arg_);
+							return EmuCore::TMP::construct_or_cast<stored_type>(lval_ref_arg_);
 						}
 						else
 						{
@@ -668,65 +686,48 @@ namespace EmuMath
 							);
 						}
 					}
-					else
+					else if constexpr (!contains_ref)
 					{
-						using arg_uq = EmuCore::TMP::remove_ref_cv_t<Arg_>;
-						constexpr bool in_is_ref_wrapper = EmuCore::TMP::variadic_or_v
-						<
-							EmuCore::TMP::is_instance_of_typeparams_only_v<arg_uq, std::reference_wrapper>,
-							EmuCore::TMP::is_instance_of_typeparams_only_v<arg_uq, EmuMath::vector_internal_ref>,
-							EmuCore::TMP::is_instance_of_typeparams_only_v<arg_uq, EmuMath::vector_internal_const_ref>
-						>;
-						if constexpr (!contains_ref)
+						// Explicit move allowed
+						using moved_arg_result = decltype(std::move(std::declval<Arg_>()));
+						if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, moved_arg_result>())
 						{
-							// Explicit move allowed
-							using moved_arg_result = decltype(std::move(std::declval<Arg_>()));
-							if constexpr (std::is_constructible_v<stored_type, moved_arg_result>)
-							{
-								return stored_type(std::move(arg_));
-							}
-							else if constexpr (EmuCore::TMP::is_static_castable_v<moved_arg_result, stored_type>)
-							{
-								return static_cast<stored_type>(std::move(arg_));
-							}
-							else
-							{
-								static_assert
-								(
-									EmuCore::TMP::get_false<Arg_>(),
-									"Attempted to create an EmuMath Vector's stored_type from a moveable non-Vector argument, but the Vector's stored_type could not be constructed from said argument after a std::move."
-								);
-							}
-						}
-						else if constexpr (in_is_ref_wrapper)
-						{
-							using wrapped_ref_type = decltype(lval_ref_arg_.get());
-							wrapped_ref_type wrapped_ref_ = lval_ref_arg_.get();
-							if constexpr (std::is_constructible_v<stored_type, wrapped_ref_type>)
-							{
-								return stored_type(wrapped_ref_);
-							}
-							else if constexpr (EmuCore::TMP::is_static_castable_v<wrapped_ref_type, stored_type>)
-							{
-								return static_cast<stored_type>(wrapped_ref_);
-							}
-							else
-							{
-								static_assert
-								(
-									EmuCore::TMP::get_false<Arg_>(),
-									"Attempted to create an EmuMath Vector of references' stored_type from a moveable reference wrapper (std::reference_wrapper, EmuMath::vector_internal_ref, or EmuMath::vector_internal_const_ref), but the stored_type could not be used to reference the wrapper's underlying reference."
-								);
-							}
+							return EmuCore::TMP::construct_or_cast<stored_type>(std::move(arg_));
 						}
 						else
 						{
 							static_assert
 							(
 								EmuCore::TMP::get_false<Arg_>(),
-								"Attempted to create an EmuMath Vector of references' stored_type from a moveable scalar that is not a std::reference_wrapper, EmuMath::vector_internal_ref, or EmuMath::vector_internal_const_ref. As this is likely a temporary non-reference-wrapper, such behaviour is prohibited."
+								"Attempted to create an EmuMath Vector's stored_type from a moveable non-Vector argument, but the Vector's stored_type could not be constructed from said argument after a std::move."
 							);
 						}
+					}
+					else if constexpr (EmuMath::TMP::is_recognised_vector_ref_wrapper_v<Arg_>)
+					{
+						using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_)));
+						lval_ref_arg_type lval_ref_arg_ = EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_));
+						using wrapped_ref_type = decltype(lval_ref_arg_.get());
+						if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, wrapped_ref_type>())
+						{
+							return EmuCore::TMP::construct_or_cast<stored_type>(lval_ref_arg_.get());
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<Arg_>(),
+								"Attempted to create an EmuMath Vector of references' stored_type from a moveable reference wrapper (std::reference_wrapper, EmuMath::vector_internal_ref, or EmuMath::vector_internal_const_ref), but the stored_type could not be used to reference the wrapper's underlying reference."
+							);
+						}
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<Arg_>(),
+							"Attempted to create an EmuMath Vector of references' stored_type from a moveable scalar that is not a std::reference_wrapper, EmuMath::vector_internal_ref, or EmuMath::vector_internal_const_ref. As this is likely a temporary non-reference-wrapper, such behaviour is prohibited."
+						);
 					}
 				}
 			}
@@ -1025,9 +1026,7 @@ namespace EmuMath
 			{
 				if constexpr (size != 0)
 				{
-					// NOTE: Under MSVC, constexpr_str_ will always be false without the /Zc:__cplusplus switch enabled, as of 2022/01/05
-					constexpr bool constexpr_str_ = __cplusplus >= 201907L;
-					if constexpr (constexpr_str_)
+					if constexpr (EmuCore::TMP::feature_constexpr_dynamic_memory())
 					{
 						// We can provide some extra information if we have access to constexpr strings
 						// --- This is to allow `at(index_)` to still satisfy constexpr constraints in standards before C++20
