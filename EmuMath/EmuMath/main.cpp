@@ -224,6 +224,12 @@ int main()
 	some_runtime_mat_cm_.Diagonal<2, float&, 1>() *= 10;
 	std::cout << some_runtime_mat_cm_ << "\n\n";
 
+	for (auto& val_ : some_runtime_mat_cm_)
+	{
+		val_ *= 25;
+	}
+	std::cout << some_runtime_mat_cm_ << "\n\n";
+
 	// ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
 	//constexpr std::size_t test_noise_dimensions = 3;

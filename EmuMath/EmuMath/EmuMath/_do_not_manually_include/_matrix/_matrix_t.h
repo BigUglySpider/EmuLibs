@@ -37,6 +37,11 @@ namespace EmuMath
 		using value_type = typename matrix_info::value_type;
 		using value_type_uq = typename matrix_info::value_type_uq;
 		using preferred_floating_point = typename matrix_info::preferred_floating_point;
+
+		using iterator = typename matrix_vector_type::iterator;
+		using const_iterator = typename matrix_vector_type::const_iterator;
+		using reverse_iterator = typename matrix_vector_type::reverse_iterator;
+		using const_reverse_iterator = typename matrix_vector_type::const_reverse_iterator;
 #pragma endregion
 
 #pragma region HELPER_STATIC_FUNCS
@@ -1075,6 +1080,68 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline value_type& operator()(const std::pair<std::size_t, std::size_t>& column_row_index_pair_)
 		{
 			return _data[get_flattened_index(column_row_index_pair_)];
+		}
+#pragma endregion
+
+#pragma region STL_ACCESS
+		[[nodiscard]] constexpr inline const_iterator cbegin() const
+		{
+			return _data.cbegin();
+		}
+
+		[[nodiscard]] constexpr inline const_iterator cend() const
+		{
+			return _data.cend();
+		}
+
+		[[nodiscard]] constexpr inline const_reverse_iterator crbegin() const
+		{
+			return _data.crbegin();
+		}
+
+		[[nodiscard]] constexpr inline const_reverse_iterator crend() const
+		{
+			return _data.crend();
+		}
+
+		[[nodiscard]] constexpr inline iterator begin()
+		{
+			return _data.begin();
+		}
+
+		[[nodiscard]] constexpr inline const_iterator begin() const
+		{
+			return _data.cbegin();
+		}
+
+		[[nodiscard]] constexpr inline iterator end()
+		{
+			return _data.end();
+		}
+
+		[[nodiscard]] constexpr inline const_iterator end() const
+		{
+			return _data.cend();
+		}
+
+		[[nodiscard]] constexpr inline reverse_iterator rbegin()
+		{
+			return _data.rbegin();
+		}
+
+		[[nodiscard]] constexpr inline const_reverse_iterator rbegin() const
+		{
+			return _data.crbegin();
+		}
+
+		[[nodiscard]] constexpr inline reverse_iterator rend()
+		{
+			return _data.rend();
+		}
+
+		[[nodiscard]] constexpr inline const_reverse_iterator rend() const
+		{
+			return _data.crend();
 		}
 #pragma endregion
 
