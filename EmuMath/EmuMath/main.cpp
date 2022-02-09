@@ -217,6 +217,8 @@ int main()
 	constexpr auto func_column_row_rm_ = some_mat_rm_(1, 3);
 	constexpr auto func_pair_rm_ = some_mat_rm_({ 1, 3 });
 
+	constexpr auto test_ = some_mat_cm_.at(3, 3);
+
 	std::cout << some_mat_cm_ << "\n\n" << some_mat_rm_ << "\n\n";
 
 	auto some_runtime_mat_cm_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
@@ -229,6 +231,15 @@ int main()
 		val_ *= 25;
 	}
 	std::cout << some_runtime_mat_cm_ << "\n\n";
+
+	try
+	{
+		auto yo = some_mat_cm_.at(2525, -1);
+	}
+	catch (std::out_of_range& e_)
+	{
+		std::cout << e_.what() << "\n\n";
+	}
 
 	// ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;

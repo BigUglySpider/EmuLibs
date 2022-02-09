@@ -710,11 +710,17 @@ namespace EmuMath
 			{
 				if constexpr (EmuCore::TMP::feature_constexpr_dynamic_memory())
 				{
-					std::ostringstream str_;
-					str_ << "Attempted to access an invalid Column + Row Index within an EmuMath Matrix.";
-					str_ << "\nColumn: " << column_index_ << ", Valid Column Range (Inclusive): 0:" << (num_columns - 1);
-					str_ << "\nRow: " << row_index_ << ", Valid Row Range (Inclusive): 0:" << (num_rows - 1);
-					throw std::out_of_range(str_.str());
+					std::string str_;
+					str_.reserve(180); // Reserves enough space for literals, + padding for index -> string conversions
+					str_ += "Attempted to access an invalid Column + Row Index within an EmuMath Matrix.\nColumn: ";
+					str_ += std::to_string(column_index_);
+					str_ += ", Valid Column Range (Inclusive): 0:";
+					str_ += std::to_string(num_columns - 1);
+					str_ += "\nRow: ";
+					str_ += std::to_string(row_index_);
+					str_ += ", Valid Row Range (Inclusive): 0:";
+					str_ += std::to_string(num_rows - 1);
+					throw std::out_of_range(str_);
 				}
 				else
 				{
@@ -741,10 +747,13 @@ namespace EmuMath
 			{
 				if constexpr (EmuCore::TMP::feature_constexpr_dynamic_memory())
 				{
-					std::ostringstream str_;
-					str_ << "Attempted to access an invalid Flattened Index within an EmuMath Matrix.";
-					str_ << "\nIndex: " << flattened_index_ << ", Valid Flattened Index Range (Inclusive): 0:" << (size - 1);
-					throw std::out_of_range(str_.str());
+					std::string str_;
+					str_.reserve(140); // Enough space for literals + some extra padding for converted index -> string appends
+					str_ += "Attempted to access an invalid Flattened Index within an EmuMath Matrix.\nIndex:";
+					str_ += std::to_string(flattened_index_);
+					str_ += ", Valid Flattened Index Range (Inclusive): 0:";
+					str_ += std::to_string(size - 1);
+					throw std::out_of_range(str_);
 				}
 				else
 				{
@@ -752,6 +761,11 @@ namespace EmuMath
 				}
 			}
 			return _data[flattened_index_];
+		}
+
+		[[nodiscard]] constexpr inline const value_type& at(std::size_t flattened_index_) const
+		{
+			return const_cast<this_type*>(this)->at(flattened_index_);
 		}
 
 		/// <summary>
