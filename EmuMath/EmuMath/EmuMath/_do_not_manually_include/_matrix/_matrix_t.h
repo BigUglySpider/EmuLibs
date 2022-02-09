@@ -85,9 +85,9 @@ namespace EmuMath
 			}
 		}
 
-		[[nodiscard]] static constexpr inline std::size_t get_flattened_index(std::pair<std::size_t, std::size_t> column_row_index_pair_)
+		[[nodiscard]] static constexpr inline std::size_t get_flattened_index(const std::pair<std::size_t, std::size_t>& column_row_index_pair_)
 		{
-			return get_flattened_index(column_row_index_pair_.first, column_row_index_pair_.second);
+			return get_flattened_index(std::get<0>(column_row_index_pair_), std::get<1>(column_row_index_pair_));
 		}
 
 		[[nodiscard]] static constexpr inline std::size_t get_unflattened_column_index(std::size_t flattened_index_)
@@ -366,26 +366,6 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::matrix_get_non_contained<this_type>();
 		}
-
-		[[nodiscard]] static constexpr inline typename EmuMath::TMP::matrix_non_contained_column<this_type>::type get_implied_zero_column()
-		{
-			return EmuMath::Helpers::matrix_get_column_non_contained<this_type>();
-		}
-
-		[[nodiscard]] static constexpr inline typename EmuMath::TMP::matrix_non_contained_row<this_type>::type get_implied_zero_row()
-		{
-			return EmuMath::Helpers::matrix_get_row_non_contained<this_type>();
-		}
-
-		[[nodiscard]] static constexpr inline decltype(EmuMath::Helpers::matrix_get_major_non_contained<this_type>()) get_implied_zero_major()
-		{
-			return EmuMath::Helpers::matrix_get_major_non_contained<this_type>();
-		}
-
-		[[nodiscard]] static constexpr inline decltype(EmuMath::Helpers::matrix_get_non_major_non_contained<this_type>()) get_implied_zero_non_major()
-		{
-			return EmuMath::Helpers::matrix_get_non_major_non_contained<this_type>();
-		}
 #pragma endregion
 
 #pragma region VALID_FUNCTION_ARG_CHECKS
@@ -644,7 +624,7 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region ACCESS
+#pragma region ACCESS_FUNCS
 	public:
 		/// <summary>
 		/// <para> Accesses the element at the provided Column and Row within this Matrix, performing a compile-time validity check. </para>
@@ -1011,6 +991,90 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline EmuMath::Vector<smallest_direction_size, OutT_> Diagonal()
 		{
 			return _make_diagonal_vector<smallest_direction_size, OutT_, ColumnOffset_, RowOffset_>(std::make_index_sequence<smallest_direction_size>());
+		}
+#pragma endregion
+
+#pragma region ACCESS_OPERATORS
+	public:
+		/// <summary>
+		/// <para> Accesses the element at the provided contiguous flattened index within this Matrix. </para>
+		/// <para> Performs no validity checks, and behaviour when flattened_index_ is not in the valid range (0:size-1) is undefined. </para>
+		/// </summary>
+		/// <param name="flattened_index_">: Contiguous flattened index of the element to access.</param>
+		/// <returns>Reference to the element at the provided contiguous flattened index within this Matrix.</returns>
+		[[nodiscard]] constexpr inline const value_type& operator[](std::size_t flattened_index_) const
+		{
+			return _data[flattened_index_];
+		}
+
+		[[nodiscard]] constexpr inline value_type& operator[](std::size_t flattened_index_)
+		{
+			return _data[flattened_index_];
+		}
+
+		/// <summary>
+		/// <para> Accesses the element at the provided Column + Row Index within this Matrix. </para>
+		/// <para> Performs no validity checks, and behaviour when either index is in invalid is undefined. </para>
+		/// </summary>
+		/// <param name="column_row_index_pair_">: Pair of indices to use as Column + Row Index arguments; first is the column index, second is the row index. </param>
+		/// <returns>Reference to the element at the provided Column + Row Index within this Matrix.</returns>
+		[[nodiscard]] constexpr inline const value_type& operator[](const std::pair<std::size_t, std::size_t>& column_row_index_pair_) const
+		{
+			return _data[get_flattened_index(column_row_index_pair_)];
+		}
+
+		[[nodiscard]] constexpr inline value_type& operator[](const std::pair<std::size_t, std::size_t>& column_row_index_pair_)
+		{
+			return _data[get_flattened_index(column_row_index_pair_)];
+		}
+
+		/// <summary>
+		/// <para> Accesses the element at the provided contiguous flattened index within this Matrix. </para>
+		/// <para> Performs no validity checks, and behaviour when flattened_index_ is not in the valid range (0:size-1) is undefined. </para>
+		/// </summary>
+		/// <param name="flattened_index_">: Contiguous flattened index of the element to access.</param>
+		/// <returns>Reference to the element at the provided contiguous flattened index within this Matrix.</returns>
+		[[nodiscard]] constexpr inline const value_type& operator()(std::size_t flattened_index_) const
+		{
+			return _data[flattened_index_];
+		}
+
+		[[nodiscard]] constexpr inline value_type& operator()(std::size_t flattened_index_)
+		{
+			return _data[flattened_index_];
+		}
+
+		/// <summary>
+		/// <para> Accesses the element at the provided Column + Row Index within this Matrix. </para>
+		/// <para> Performs no validity checks, and behaviour when either index is in invalid is undefined. </para>
+		/// </summary>
+		/// <param name="column_index_">: Index of the Column to access.</param>
+		/// <param name="row_index_">: Index of the Row to access.</param>
+		/// <returns>Reference to the element at the provided Column + Row Index within this Matrix.</returns>
+		[[nodiscard]] constexpr inline const value_type& operator()(std::size_t column_index_, std::size_t row_index_) const
+		{
+			return _data[get_flattened_index(column_index_, row_index_)];
+		}
+
+		[[nodiscard]] constexpr inline value_type& operator()(std::size_t column_index_, std::size_t row_index_)
+		{
+			return _data[get_flattened_index(column_index_, row_index_)];
+		}
+
+		/// <summary>
+		/// <para> Accesses the element at the provided Column + Row Index within this Matrix. </para>
+		/// <para> Performs no validity checks, and behaviour when either index is in invalid is undefined. </para>
+		/// </summary>
+		/// <param name="column_row_index_pair_">: Pair of indices to use as Column + Row Index arguments; first is the column index, second is the row index. </param>
+		/// <returns>Reference to the element at the provided Column + Row Index within this Matrix.</returns>
+		[[nodiscard]] constexpr inline const value_type& operator()(const std::pair<std::size_t, std::size_t>& column_row_index_pair_) const
+		{
+			return _data[get_flattened_index(column_row_index_pair_)];
+		}
+
+		[[nodiscard]] constexpr inline value_type& operator()(const std::pair<std::size_t, std::size_t>& column_row_index_pair_)
+		{
+			return _data[get_flattened_index(column_row_index_pair_)];
 		}
 #pragma endregion
 

@@ -205,6 +205,17 @@ int main()
 	constexpr auto cm_diagonal12_ = some_mat_cm_.Diagonal<float, 1, 2>();
 	constexpr auto rm_diagonal12_ = some_mat_rm_.Diagonal<float, 1, 2>();
 
+	constexpr auto subscript_flat_ = some_mat_cm_[7];
+	constexpr auto subscript_pair_ = some_mat_cm_[{1, 3}];
+	constexpr auto func_flat_ = some_mat_cm_(7);
+	constexpr auto func_column_row_ = some_mat_cm_(1, 3);
+	constexpr auto func_pair_ = some_mat_cm_({ 1, 3 });
+
+	constexpr auto subscript_flat_rm_ = some_mat_rm_[7];
+	constexpr auto subscript_pair_rm_ = some_mat_rm_[{1, 3}];
+	constexpr auto func_flat_rm_ = some_mat_rm_(7);
+	constexpr auto func_column_row_rm_ = some_mat_rm_(1, 3);
+	constexpr auto func_pair_rm_ = some_mat_rm_({ 1, 3 });
 
 	std::cout << some_mat_cm_ << "\n\n" << some_mat_rm_ << "\n\n";
 
