@@ -568,36 +568,52 @@ namespace EmuMath
 
 #pragma region CONSTRUCTORS
 	public:
+		/// <summary>
+		/// <para> Default constructs this Matrix. Only available if this Matrix type's contained data is also default-constructible. </para>
+		/// </summary>
 		template<typename = std::enable_if_t<is_default_constructible()>>
 		constexpr Matrix() :
 			_data()
 		{
 		}
 
+		/// <summary>
+		/// <para> Performs a const-copy of the passed Matrix. Only available if this Matrix type's contained data can be const-copy-constructed. </para>
+		/// </summary>
+		/// <param name="to_copy_">: EmuMath Matrix of the same type to const-copy.</param>
 		template<typename = std::enable_if_t<is_const_copy_constructible()>>
 		constexpr Matrix(const Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& to_const_copy) :
 			_data(to_const_copy._data)
 		{
 		}
 
+		/// <summary>
+		/// <para> Performs a non-const-copy of the passed Matrix. Only available if this Matrix type's contained data can be non-const-copy-constructed. </para>
+		/// </summary>
+		/// <param name="to_copy_">: EmuMath Matrix of the same type to copy.</param>
 		template<typename = std::enable_if_t<is_non_const_copy_constructible()>>
 		constexpr Matrix(Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& to_copy_) :
 			_data(to_copy_._data)
 		{
 		}
 
+		/// <summary> Moves the passed Matrix data into a newly constructed Matrix. Only available if this Matrix type's contained data may be move-constructed. </summary>
+		/// <param name="to_move_">: EmuMath Matrix of the same type to move.</param>
 		template<typename = std::enable_if_t<is_move_constructible()>>
 		constexpr Matrix(Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>&& to_move_) noexcept :
 			_data(std::move(to_move_._data))
 		{
 		}
+		
 
-		template<class...Args_, typename = std::enable_if_t<is_variadic_constructible<Args_...>()>>
-		constexpr Matrix(Args_&&...contiguous_element_args_) :
-			_data(_do_variadic_construction(std::forward<Args_>(contiguous_element_args_)...))
-		{
-		}
-
+		/// <summary>
+		/// <para> Constructs a Matrix of this type by converting respective Column+Row indices within the passed Matrix. </para>
+		/// <para> Non-contained indices are interpreted as implied-zeroes. </para>
+		/// <para>
+		///		Only available if this Matrix type's contained data may be constructed from non-const lvalue references to respective indices in to_convert_, or an implied-zero.
+		/// </para>
+		/// </summary>
+		/// <param name="to_convert_">: EmuMath Matrix of a different type to convert.</param>
 		template
 		<
 			std::size_t OtherNumColumns_, std::size_t OtherNumRows_, typename OtherT_, bool OtherColumnMajor_,
@@ -608,6 +624,14 @@ namespace EmuMath
 		{
 		}
 
+		/// <summary>
+		/// <para> Constructs a Matrix of this type by converting respective Column+Row indices within the passed Matrix. </para>
+		/// <para> Non-contained indices are interpreted as implied-zeroes. </para>
+		/// <para>
+		///		Only available if this Matrix type's contained data may be constructed from const lvalue references to respective indices in to_convert_, or an implied-zero.
+		/// </para>
+		/// </summary>
+		/// <param name="to_convert_">: EmuMath Matrix of a different type to convert.</param>
 		template
 		<
 			std::size_t OtherNumColumns_, std::size_t OtherNumRows_, typename OtherT_, bool OtherColumnMajor_,
@@ -618,6 +642,15 @@ namespace EmuMath
 		{
 		}
 
+		/// <summary>
+		/// <para> Constructs a Matrix of this type by converting respective Column+Row indices within the passed Matrix. </para>
+		/// <para> Non-contained indices are interpreted as implied-zeroes. </para>
+		/// <para> 
+		///		Only available if this Matrix type's contained data may be constructed from rvalue references to respective indices in to_convert_, or an implied-zero. 
+		///		The rvalue references are viewed as lvalue references when both this Matrix and to_convert_ contain recognised references.
+		/// </para>
+		/// </summary>
+		/// <param name="to_convert_">: EmuMath Matrix of a different type to convert.</param>
 		template
 		<
 			std::size_t OtherNumColumns_, std::size_t OtherNumRows_, typename OtherT_, bool OtherColumnMajor_,
@@ -625,6 +658,26 @@ namespace EmuMath
 		>
 		constexpr Matrix(EmuMath::Matrix<OtherNumColumns_, OtherNumRows_, OtherT_, OtherColumnMajor_>&& to_convert_) :
 			_data(_do_conversion_construction(std::forward<EmuMath::Matrix<OtherNumColumns_, OtherNumRows_, OtherT_, OtherColumnMajor_>>(to_convert_)))
+		{
+		}
+
+		/// <summary>
+		/// <para> Variadic construction which adapts based on the provided arguments, and will perform one of the following: </para>
+		/// <para> 1: Where sizeof...(Args_) == size, arguments will be seen as contiguous element arguments and used directly in constructing the element they represent. </para>
+		/// <para> 2: Where sizeof...(Args_) == 1, the one argument will be seen as a value to copy to all elements within the newly created Matrix. </para>
+		/// <para>
+		///		3: Where sizeof...(Args_) == num_major_elements and all arguments are EmuMath Vectors,
+		///		the arguments will be seen as arguments for each major segment of this Matrix (i.e. columns if this Matrix is column-major, otherwise rows).
+		/// </para>
+		/// <para>
+		///		All listed outcomes are not used if a non-variadic constructor would make use of that argument, 
+		///		and are additionally subject to compatibility with this Matrix type's contained data. </para>
+		/// <para> Where multiple potential outcomes are possible, the earliest listed will be prioritised. </para>
+		/// </summary>
+		/// <param name="args_">: Arguments for variadic construction, meeting at least 1 of the above constraints.</param>
+		template<class...Args_, typename = std::enable_if_t<is_variadic_constructible<Args_...>()>>
+		constexpr Matrix(Args_&&...args_) :
+			_data(_do_variadic_construction(std::forward<Args_>(args_)...))
 		{
 		}
 #pragma endregion
@@ -1010,6 +1063,40 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline EmuMath::Vector<smallest_direction_size, OutT_> Diagonal()
 		{
 			return _make_diagonal_vector<smallest_direction_size, OutT_, ColumnOffset_, RowOffset_>(std::make_index_sequence<smallest_direction_size>());
+		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Vector representing a flattened form of this Matrix. </para>
+		/// <para> The output Vector may be either column-major or row-major, and will follow the major-order of this Matrix if not explicitly specified. </para>
+		/// <para> May be used to output a flattened Vector of references. </para>
+		/// </summary>
+		/// <returns>EmuMath Vector representation of a flattened form of this Matrix.</returns>
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Flatten() const
+		{
+			using indices = EmuMath::TMP::make_ranged_matrix_index_sequences<0, num_columns, 0, num_rows, OutColumnMajor_>;
+			return _make_flattened_vector<size, OutT_>(typename indices::column_index_sequence(), typename indices::row_index_sequence());
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, value_type_uq> Flatten() const
+		{
+			using indices = EmuMath::TMP::make_ranged_matrix_index_sequences<0, num_columns, 0, num_rows, OutColumnMajor_>;
+			return _make_flattened_vector<size, value_type_uq>(typename indices::column_index_sequence(), typename indices::row_index_sequence());
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Flatten()
+		{
+			using indices = EmuMath::TMP::make_ranged_matrix_index_sequences<0, num_columns, 0, num_rows, OutColumnMajor_>;
+			return _make_flattened_vector<size, OutT_>(typename indices::column_index_sequence(), typename indices::row_index_sequence());
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, value_type_uq> Flatten()
+		{
+			using indices = EmuMath::TMP::make_ranged_matrix_index_sequences<0, num_columns, 0, num_rows, OutColumnMajor_>;
+			return _make_flattened_vector<size, value_type_uq>(typename indices::column_index_sequence(), typename indices::row_index_sequence());
 		}
 #pragma endregion
 
@@ -4375,7 +4462,7 @@ namespace EmuMath
 				static_assert
 				(
 					EmuCore::TMP::get_false<out_vector>(),
-					"Attempted to retreieve a Diagonal Vector within an EmuMath Matrix, but the desired output Vector cannot be constructed from all accessed diagonal indices within the Matrix."
+					"Attempted to retrieve a Diagonal Vector within an EmuMath Matrix, but the desired output Vector cannot be constructed from all accessed diagonal indices within the Matrix."
 				);
 			}
 		}
@@ -4394,7 +4481,43 @@ namespace EmuMath
 				static_assert
 				(
 					EmuCore::TMP::get_false<out_vector>(),
-					"Attempted to retreieve a Diagonal Vector within a const-qualified EmuMath Matrix, but the desired output Vector cannot be constructed from all accessed diagonal indices within the Matrix."
+					"Attempted to retrieve a Diagonal Vector within a const-qualified EmuMath Matrix, but the desired output Vector cannot be constructed from all accessed diagonal indices within the Matrix."
+				);
+			}
+		}
+
+		template<std::size_t OutSize_, typename OutT_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_flattened_vector(std::index_sequence<ColumnIndices_...>, std::index_sequence<RowIndices_...>)
+		{
+			using out_vector = EmuMath::Vector<OutSize_, OutT_>;
+			if constexpr (std::is_constructible_v<out_vector, decltype(AtTheoretical<ColumnIndices_, RowIndices_>())...>)
+			{
+				return out_vector(at<ColumnIndices_, RowIndices_>()...);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<out_vector>(),
+					"Attempted to retrieve a Flattened Vector version of an EmuMath Matrix, but the desired output Vector could not be constructed from all indices within the Matrix."
+				);
+			}
+		}
+
+		template<std::size_t OutSize_, typename OutT_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_flattened_vector(std::index_sequence<ColumnIndices_...>, std::index_sequence<RowIndices_...>) const
+		{
+			using out_vector = EmuMath::Vector<OutSize_, OutT_>;
+			if constexpr (std::is_constructible_v<out_vector, decltype(AtTheoretical<ColumnIndices_, RowIndices_>())...>)
+			{
+				return out_vector(at<ColumnIndices_, RowIndices_>()...);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<out_vector>(),
+					"Attempted to retrieve a Flattened Vector version of a const-qualified EmuMath Matrix, but the desired output Vector could not be constructed from all indices within the Matrix."
 				);
 			}
 		}

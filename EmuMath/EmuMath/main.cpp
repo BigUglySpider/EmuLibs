@@ -204,6 +204,12 @@ int main()
 	constexpr auto rm_main_diagonal_ = some_mat_rm_.Diagonal();
 	constexpr auto cm_diagonal12_ = some_mat_cm_.Diagonal<float, 1, 2>();
 	constexpr auto rm_diagonal12_ = some_mat_rm_.Diagonal<float, 1, 2>();
+	constexpr auto cm_flatten_cm_ = some_mat_cm_.Flatten<true>();
+	constexpr auto cm_flatten_rm_ = some_mat_cm_.Flatten<false>();
+	constexpr auto cm_flatten_def_ = some_mat_cm_.Flatten();
+	constexpr auto rm_flatten_cm_ = some_mat_rm_.Flatten<true>();
+	constexpr auto rm_flatten_rm_ = some_mat_rm_.Flatten<false>();
+	constexpr auto rm_flatten_def_ = some_mat_rm_.Flatten();
 
 	constexpr auto subscript_flat_ = some_mat_cm_[7];
 	constexpr auto subscript_pair_ = some_mat_cm_[{1, 3}];
@@ -225,6 +231,13 @@ int main()
 	std::cout << some_runtime_mat_cm_ << "\n\n";
 	some_runtime_mat_cm_.Diagonal<2, float&, 1>() *= 10;
 	std::cout << some_runtime_mat_cm_ << "\n\n";
+	auto some_flattened_cm_cm_ = some_runtime_mat_cm_.Flatten<float&, true>();
+	auto some_flattened_cm_rm_ = some_runtime_mat_cm_.Flatten<float&, false>();
+	std::cout << some_runtime_mat_cm_ << "\n\n" << some_flattened_cm_cm_ << "\n\n" << some_flattened_cm_rm_ << "\n\n";
+	some_flattened_cm_cm_ += EmuMath::make_vector<float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << some_runtime_mat_cm_ << "\n\n" << some_flattened_cm_cm_ << "\n\n" << some_flattened_cm_rm_ << "\n\n";
+	some_flattened_cm_rm_ += EmuMath::make_vector<int>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	std::cout << some_runtime_mat_cm_ << "\n\n" << some_flattened_cm_cm_ << "\n\n" << some_flattened_cm_rm_ << "\n\n";
 
 	for (auto& val_ : some_runtime_mat_cm_)
 	{
