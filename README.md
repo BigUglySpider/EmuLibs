@@ -53,7 +53,7 @@ Contains a lot of helpers under the `EmuMath::Helpers` namespace, and encapsulat
 
 ## In-progress Features
 ### Matrix
-A mathematical type which aims to encapsulate matrix behaviour the same way that Vector does. The underlying structure may be considered an `EmuMath::Vector` of `EmuMath::Vector`s. Allows customisation of major-memory storage (i.e. data may be contiguously stored in column-major order (default) or row-major order). Note that this does not modify the common interface for these matrices, which will always take the order of `column, row`.
+A mathematical type which aims to encapsulate matrix behaviour the same way that Vector does. The underlying structure may be considered ~~an `EmuMath::Vector` of `EmuMath::Vector`s~~ an `EmuMath::Vector` with a size equal to `NumColumns * NumRows`, and may be reinterpreted as such via flattening. Allows customisation of major-memory storage (i.e. data may be contiguously stored in column-major order (default) or row-major order). Note that this does not modify the common interface for these matrices, which will always take the order of `column, row`.
 
 ## Planned Features
 ### FastVector
