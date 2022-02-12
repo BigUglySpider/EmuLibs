@@ -4215,6 +4215,170 @@ namespace EmuMath
 		{
 			EmuMath::Helpers::matrix_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_));
 		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements linearly interpolated with b_ using a weighting of t_. </para>
+		/// <para> If B_ is an EmuMath Vector: Elements will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
+		/// <para> If ArgT_ is an EmuMath Vector: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
+		/// </summary>
+		/// <param name="b_">: Scalar or EmuMath Matrix to use as the target point for linear interpolation.</param>
+		/// <param name="t_">: Scalar or EmuMath Matrix to use as weighting for linear interpolations, where lerp(a, b, 0) = a, lerp(a, b, 1) = b.</param>
+		/// <returns>Copy of this Matrix with its elements linearly interpolated, summarised as `out = a + ((b - a) * t)`.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = preferred_floating_point, bool OutColumnMajor_ = is_column_major, class B_, class ArgT_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Lerp(B_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::matrix_lerp<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<B_>(b_), std::forward<ArgT_>(t_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class B_, class ArgT_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Lerp(B_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::matrix_lerp<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<B_>(b_), std::forward<ArgT_>(t_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class B_, class ArgT_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, preferred_floating_point, OutColumnMajor_> Lerp(B_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::matrix_lerp<num_columns, num_rows, preferred_floating_point, OutColumnMajor_>(*this, std::forward<B_>(b_), std::forward<ArgT_>(t_));
+		}
+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, class B_, class ArgT_>
+		constexpr inline void Lerp(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_, ArgT_&& t_) const
+		{
+			EmuMath::Helpers::matrix_lerp(out_matrix_, *this, std::forward<B_>(b_), std::forward<ArgT_>(t_));
+		}
+				
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements linearly interpolated with b_ using a weighting of t_. </para>
+		/// <para> If B_ is an EmuMath Vector: Elements will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
+		/// <para> If ArgT_ is an EmuMath Vector: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
+		/// <para> Indices within the provided range will contain respective linear interpolation results. </para>
+		/// <para> Indices outside of the provided range will be copies of respective indices in this Matrix. </para>
+		/// </summary>
+		/// <param name="b_">: Scalar or EmuMath Matrix to use as the target point for linear interpolation.</param>
+		/// <param name="t_">: Scalar or EmuMath Matrix to use as weighting for linear interpolations, where lerp(a, b, 0) = a, lerp(a, b, 1) = b.</param>
+		/// <returns>Copy of this Matrix with elements in the provided range linearly interpolated, summarised as `out = a + ((b - a) * t)`, and copied elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = preferred_floating_point, bool OutColumnMajor_ = is_column_major, class B_, class ArgT_
+		>
+			[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> LerpRange(B_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::matrix_lerp_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+				(
+					*this,
+					std::forward<B_>(b_),
+					std::forward<ArgT_>(t_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			typename OutT_, bool OutColumnMajor_ = is_column_major, class B_, class ArgT_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> LerpRange(B_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::matrix_lerp_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_),
+				std::forward<ArgT_>(t_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class B_, class ArgT_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, preferred_floating_point, OutColumnMajor_> LerpRange(B_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::matrix_lerp_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, preferred_floating_point, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_),
+				std::forward<ArgT_>(t_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, class B_, class ArgT_
+		>
+		constexpr inline void LerpRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_, ArgT_&& t_) const
+		{
+			EmuMath::Helpers::matrix_lerp_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_), std::forward<ArgT_>(t_));
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements linearly interpolated with b_ using a weighting of t_. </para>
+		/// <para> If B_ is an EmuMath Vector: Elements will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
+		/// <para> If ArgT_ is an EmuMath Vector: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
+		/// <para> Indices within the provided range will contain respective linear interpolation results. </para>
+		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// </summary>
+		/// <param name="b_">: Scalar or EmuMath Matrix to use as the target point for linear interpolation.</param>
+		/// <param name="t_">: Scalar or EmuMath Matrix to use as weighting for linear interpolations, where lerp(a, b, 0) = a, lerp(a, b, 1) = b.</param>
+		/// <returns>Copy of this Matrix with elements in the provided range linearly interpolated, summarised as `out = a + ((b - a) * t)`, and default elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = preferred_floating_point, bool OutColumnMajor_ = is_column_major, class B_, class ArgT_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> LerpRangeNoCopy(B_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::matrix_lerp_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_),
+				std::forward<ArgT_>(t_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			typename OutT_, bool OutColumnMajor_ = is_column_major, class B_, class ArgT_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> LerpRangeNoCopy(B_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::matrix_lerp_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_),
+				std::forward<ArgT_>(t_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class B_, class ArgT_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, preferred_floating_point, OutColumnMajor_> LerpRangeNoCopy(B_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::matrix_lerp_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, preferred_floating_point, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_),
+				std::forward<ArgT_>(t_)
+			);
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements linearly interpolated with b_ using a weighting of t_, via the provided out_matrix_. </para>
+		/// <para> If B_ is an EmuMath Vector: Elements will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
+		/// <para> If ArgT_ is an EmuMath Vector: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
+		/// <para> Indices within the provided range will contain respective linear interpolation results. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		/// <param name="b_">: Scalar or EmuMath Matrix to use as the target point for linear interpolation.</param>
+		/// <param name="t_">: Scalar or EmuMath Matrix to use as weighting for linear interpolations, where lerp(a, b, 0) = a, lerp(a, b, 1) = b.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, class B_, class ArgT_
+		>
+		constexpr inline void LerpRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_, ArgT_&& t_) const
+		{
+			EmuMath::Helpers::matrix_lerp_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_), std::forward<ArgT_>(t_));
+		}
 #pragma endregion
 
 #pragma region TRANSPOSE_FUNCS

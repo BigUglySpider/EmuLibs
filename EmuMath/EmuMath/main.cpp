@@ -190,69 +190,14 @@ int main()
 	srand(static_cast<unsigned int>(time(0)));
 	EmuCore::Timer<std::milli> timer_;
 
-	constexpr auto some_mat_cm_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-	constexpr auto some_mat_rm_ = EmuMath::Matrix<4, 4, float, false>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-	constexpr auto cm_column_1_ = some_mat_cm_.Column<1>();
-	constexpr auto rm_column_1_ = some_mat_rm_.Column<1>();
-	constexpr auto cm_row_1_ = some_mat_cm_.Row<1>();
-	constexpr auto rm_row_1_ = some_mat_rm_.Row<1>();
-	constexpr auto cm_major_1_ = some_mat_cm_.Major<1>();
-	constexpr auto rm_major_1_ = some_mat_rm_.Major<1>();
-	constexpr auto cm_non_major_1_ = some_mat_cm_.NonMajor<1>();
-	constexpr auto rm_non_major_1_ = some_mat_rm_.NonMajor<1>();
-	constexpr auto cm_main_diagonal_ = some_mat_cm_.Diagonal();
-	constexpr auto rm_main_diagonal_ = some_mat_rm_.Diagonal();
-	constexpr auto cm_diagonal12_ = some_mat_cm_.Diagonal<float, 1, 2>();
-	constexpr auto rm_diagonal12_ = some_mat_rm_.Diagonal<float, 1, 2>();
-	constexpr auto cm_flatten_cm_ = some_mat_cm_.Flatten<true>();
-	constexpr auto cm_flatten_rm_ = some_mat_cm_.Flatten<false>();
-	constexpr auto cm_flatten_def_ = some_mat_cm_.Flatten();
-	constexpr auto rm_flatten_cm_ = some_mat_rm_.Flatten<true>();
-	constexpr auto rm_flatten_rm_ = some_mat_rm_.Flatten<false>();
-	constexpr auto rm_flatten_def_ = some_mat_rm_.Flatten();
-
-	constexpr auto subscript_flat_ = some_mat_cm_[7];
-	constexpr auto subscript_pair_ = some_mat_cm_[{1, 3}];
-	constexpr auto func_flat_ = some_mat_cm_(7);
-	constexpr auto func_column_row_ = some_mat_cm_(1, 3);
-	constexpr auto func_pair_ = some_mat_cm_({ 1, 3 });
-
-	constexpr auto subscript_flat_rm_ = some_mat_rm_[7];
-	constexpr auto subscript_pair_rm_ = some_mat_rm_[{1, 3}];
-	constexpr auto func_flat_rm_ = some_mat_rm_(7);
-	constexpr auto func_column_row_rm_ = some_mat_rm_(1, 3);
-	constexpr auto func_pair_rm_ = some_mat_rm_({ 1, 3 });
-
-	constexpr auto test_ = some_mat_cm_.at(3, 3);
-
-	std::cout << some_mat_cm_ << "\n\n" << some_mat_rm_ << "\n\n";
-
-	auto some_runtime_mat_cm_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-	std::cout << some_runtime_mat_cm_ << "\n\n";
-	some_runtime_mat_cm_.Diagonal<2, float&, 1>() *= 10;
-	std::cout << some_runtime_mat_cm_ << "\n\n";
-	auto some_flattened_cm_cm_ = some_runtime_mat_cm_.Flatten<float&, true>();
-	auto some_flattened_cm_rm_ = some_runtime_mat_cm_.Flatten<float&, false>();
-	std::cout << some_runtime_mat_cm_ << "\n\n" << some_flattened_cm_cm_ << "\n\n" << some_flattened_cm_rm_ << "\n\n";
-	some_flattened_cm_cm_ += EmuMath::make_vector<float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-	std::cout << some_runtime_mat_cm_ << "\n\n" << some_flattened_cm_cm_ << "\n\n" << some_flattened_cm_rm_ << "\n\n";
-	some_flattened_cm_rm_ += EmuMath::make_vector<int>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-	std::cout << some_runtime_mat_cm_ << "\n\n" << some_flattened_cm_cm_ << "\n\n" << some_flattened_cm_rm_ << "\n\n";
-
-	for (auto& val_ : some_runtime_mat_cm_)
-	{
-		val_ *= 25;
-	}
-	std::cout << some_runtime_mat_cm_ << "\n\n";
-
-	try
-	{
-		auto yo = some_mat_cm_.at(2525, -1);
-	}
-	catch (std::out_of_range& e_)
-	{
-		std::cout << e_.what() << "\n\n";
-	}
+	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	constexpr auto mat_b_ = EmuMath::Matrix<4, 4, int, true>(1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
+	constexpr auto mat_c_ = EmuMath::Matrix<4, 4, float, true>(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25);
+	constexpr auto mat_lerped_mmm_ = mat_a_.Lerp<float>(mat_b_, mat_c_);
+	constexpr auto mat_lerped_msm_ = mat_a_.Lerp<float>(100, mat_c_);
+	constexpr auto mat_lerped_mms_ = mat_a_.Lerp<float>(mat_b_, 0.5L);
+	constexpr auto mat_lerped_mss_ = mat_a_.Lerp(100, 2);
+	constexpr auto mat_lerped_mmm_1313_ = mat_a_.LerpRange<1, 3, 1, 3, float>(mat_b_, mat_c_);
 
 	// ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
