@@ -50,7 +50,8 @@ namespace EmuMath::Functors
 		{
 			if constexpr (Index_ < num_analytics)
 			{
-				return std::get<Index_>(analytics);
+				using std::get;
+				return get<Index_>(analytics);
 			}
 			else
 			{
@@ -64,7 +65,8 @@ namespace EmuMath::Functors
 		{
 			if constexpr (Index_ < num_analytics)
 			{
-				return std::get<Index_>(analytics);
+				using std::get;
+				return get<Index_>(analytics);
 			}
 			else
 			{
@@ -89,7 +91,8 @@ namespace EmuMath::Functors
 		{
 			if constexpr (Index_ < num_analytics)
 			{
-				std::get<Index_>(analytics)(processed_sample_);
+				using std::get;
+				get<Index_>(analytics)(processed_sample_);
 				_do_analysis<Index_ + 1, Sample_>(processed_sample_);
 			}
 		}

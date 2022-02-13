@@ -166,6 +166,7 @@
     <ClInclude Include="EmuCore\Functors\Bitwise.h" />
     <ClInclude Include="EmuCore\Functors\Comparators.h" />
     <ClInclude Include="EmuCore\Functors\MiscMath.h" />
+    <ClInclude Include="EmuCore\Functors\StdOps.h" />
     <ClInclude Include="EmuCore\TestingHelpers\LoopingTestHarness.h" />
     <ClInclude Include="EmuCore\TMPHelpers\OperatorChecks.h" />
     <ClInclude Include="EmuCore\TMPHelpers\SafeEnumFuncs.h" />
@@ -224,6 +225,8 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_simd_noise_gen_1d.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_simd_noise_gen_2d.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_common_fast_noise_gen_functors_includes.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_core_functor_specialisations\_all_core_functor_specialisations.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_core_functor_specialisations\_std_ops\_vector_do_swap_specialisation.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_common_vector_helpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_basic_arithmetic_assign.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_vector_bitwise.h" />

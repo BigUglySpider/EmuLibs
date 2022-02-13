@@ -148,7 +148,8 @@ namespace EmuCore::TestingHelpers
 	{
 		if constexpr (Index_ < std::tuple_size_v<AllTests>)
 		{
-			auto& test_ = std::get<Index_>(tests);
+			using std::get;
+			auto& test_ = get<Index_>(tests);
 			if (test_.DO_TEST)
 			{
 				test_.Prepare();
@@ -170,8 +171,9 @@ namespace EmuCore::TestingHelpers
 			using Test_ = std::tuple_element_t<Index_, AllTests>;
 			if constexpr (Test_::DO_TEST)
 			{
+				using std::get;
 				std::cout << "Test " << Index_ << " (" << Test_::NAME << ")\n";
-				std::get<Index_>(tests).OnTestsOver();
+				get<Index_>(tests).OnTestsOver();
 				std::cout << std::endl;
 			}
 			OnAllTestsOver<Index_ + 1>(tests);
@@ -188,8 +190,9 @@ namespace EmuCore::TestingHelpers
 
 		if constexpr (!Finished)
 		{
+			using std::get;
 			using Test = std::tuple_element_t<TestIndex, Tuple>;
-			Test& test = std::get<TestIndex>(tests);
+			Test& test = get<TestIndex>(tests);
 			LoopingTestHarness<Test> harness;
 			std::cout << "!!!Test " << TestIndex << " (" << Test::NAME << ") Results!!!\n";
 			if (test.DO_TEST)

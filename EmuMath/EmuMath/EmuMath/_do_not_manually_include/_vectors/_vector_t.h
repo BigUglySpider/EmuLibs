@@ -990,7 +990,8 @@ namespace EmuMath
 		{
 			if constexpr (Index_ < size)
 			{
-				return std::get<Index_>(_data);
+				using std::get;
+				return get<Index_>(_data);
 			}
 			else
 			{
@@ -4984,6 +4985,37 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region SWAPS
+	public:
+		/// <summary>
+		/// <para> Swaps the elements of this Vector with respective elements of the passed Vector b_. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, values in a larger Vector will be set to its implied-zero in the range not contained within the smaller Vector. 
+		///		Otherwise, only values in the mutual contained range will be swapped.
+		/// </para>
+		/// </summary>
+		/// <param name="vector_b_">: EmuMath Vector to swap the elements of with those of this Vector.</param>
+		template<bool IncludeNonContained_ = true, typename OtherT_, std::size_t OtherSize_>
+		constexpr inline void swap(EmuMath::Vector<OtherSize_, OtherT_>& b_)
+		{
+			EmuMath::Helpers::vector_swap<IncludeNonContained_>(*this, b_);
+		}
+
+		/// <summary>
+		/// <para> Swaps the elements of this Vector with respective elements of the passed Vector b_ within the provided range. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, values in a larger Vector will be set to zero in the range not contained within the smaller Vector. 
+		///		Otherwise, only values in the mutual contained range will be swapped.
+		/// </para>
+		/// </summary>
+		/// <param name="vector_b_">: EmuMath Vector to swap the elements of with those of this Vector.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, bool IncludeNonContained_ = true, typename OtherT_, std::size_t OtherSize_>
+		constexpr inline void swap(EmuMath::Vector<OtherSize_, OtherT_>& b_)
+		{
+			EmuMath::Helpers::vector_swap_range<BeginIndex_, EndIndex_, IncludeNonContained_>(*this, b_);
+		}
+#pragma endregion
+
 #pragma region SHUFFLES
 	public:
 		/// <summary>
@@ -7088,6 +7120,23 @@ namespace EmuMath
 		/// <summary> Contiguous element data stored within this Vector. </summary>
 		data_storage_type _data;
 	};
+
+	/// <summary>
+	/// <para> Get function for use with EmuMath Vectors using ADL. Equivalent to vector_.at with the provided Index_. Does not allow theoretical output. </para>
+	/// </summary>
+	/// <param name="vector_">: EmuMath Vector to retrieve the specified contained index of.</param>
+	/// <returns>Reference to the element contained at the specified index of the passed EmuMath Vector.</returns>
+	template<std::size_t Index_, typename T_, std::size_t Size_>
+	[[nodiscard]] constexpr inline const typename EmuMath::Vector<Size_, T_>::value_type& get(const EmuMath::Vector<Size_, T_>& vector_)
+	{
+		return vector_.template at<Index_>();
+	}
+
+	template<std::size_t Index_, typename T_, std::size_t Size_>
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<Size_, T_>::value_type& get(EmuMath::Vector<Size_, T_>& vector_)
+	{
+		return vector_.template at<Index_>();
+	}
 }
 
 namespace std

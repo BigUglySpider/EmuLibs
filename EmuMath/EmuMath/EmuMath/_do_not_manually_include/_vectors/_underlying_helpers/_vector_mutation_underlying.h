@@ -4,6 +4,7 @@
 #include "_vector_copy_underlying.h"
 #include "_vector_get_underlying.h"
 #include "_vector_tmp.h"
+#include "../../../../EmuCore/Functors/StdOps.h"
 #include "../../../../EmuCore/TMPHelpers/VariadicHelpers.h"
 
 namespace EmuMath::Helpers::_vector_underlying
@@ -149,6 +150,7 @@ namespace EmuMath::Helpers::_vector_underlying
 	template<std::size_t ArgIndex_, class Func_, class...Args_>
 	[[nodiscard]] constexpr inline void _vector_mutate_invoke_func_no_ret(Func_ func_, Args_&&...args_)
 	{
+		auto tup = std::forward_as_tuple(std::forward<Args_>(args_)...);
 		func_
 		(
 			_vector_mutate_get_theoretical_if_vector<ArgIndex_>
@@ -1436,6 +1438,60 @@ namespace EmuMath::Helpers::_vector_underlying
 			std::forward<LhsVector_>(lhs_vector_),
 			std::forward<RhsVector_>(rhs_vector_)
 		);
+	}
+
+	template<std::size_t Begin_, std::size_t End_, bool IncludeNonContained_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
+	constexpr inline void _vector_swap(EmuMath::Vector<SizeA_, TA_>& a_, EmuMath::Vector<SizeB_, TB_>& b_)
+	{
+		constexpr std::size_t smallest_ = (SizeA_ <= SizeB_) ? SizeA_ : SizeB_;
+		if constexpr (Begin_ < smallest_)
+		{
+			using a_value = typename EmuMath::Vector<SizeA_, TA_>::value_type;
+			using b_value = typename EmuMath::Vector<SizeB_, TB_>::value_type;
+			using swap_func = EmuCore::do_swap<a_value, b_value>;
+			if constexpr (std::is_default_constructible_v<swap_func>)
+			{
+				_vector_mutate_invoke_only<swap_func, Begin_, (End_ < smallest_) ? End_ : smallest_>(swap_func(), a_, b_);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<swap_func>(),
+					"Attempted to swap two EmuMath Vectors, but the determined instance of EmuCore::do_swap (using value_type of each Vector as arguments) could not be default-constructed."
+				);
+			}
+		}
+
+		if constexpr (IncludeNonContained_ && End_ > smallest_)
+		{
+			// Zero remaining range for whichever has further elements
+			// --- We do two checks so that equal-sized Vectors will never attempt the non-contained "swap"
+			if constexpr (smallest_ != SizeA_)
+			{
+				_vector_copy<smallest_, (End_ < SizeA_) ? End_ : SizeA_, 0>(a_, _vector_get_non_contained_value<SizeA_, TA_>());
+			}
+			else if constexpr(smallest_ != SizeB_)
+			{
+				_vector_copy<smallest_, (End_ < SizeB_) ? End_ : SizeB_, 0>(b_, _vector_get_non_contained_value<SizeB_, TB_>());
+			}
+		}
+	}
+
+	
+	template<bool IncludeNonContained_, std::size_t SizeA_, typename TA_, std::size_t SizeB_, typename TB_>
+	constexpr inline void _vector_swap(EmuMath::Vector<SizeA_, TA_>& a_, EmuMath::Vector<SizeB_, TB_>& b_)
+	{
+		if constexpr (IncludeNonContained_)
+		{
+			constexpr std::size_t largest_ = (SizeA_ >= SizeB_) ? SizeA_ : SizeB_;
+			return _vector_swap<0, largest_, true>(a_, b_);
+		}
+		else
+		{
+			constexpr std::size_t smallest_ = (SizeA_ <= SizeB_) ? SizeA_ : SizeB_;
+			return _vector_swap<0, smallest_, false>(a_, b_);
+		}
 	}
 #pragma endregion
 }

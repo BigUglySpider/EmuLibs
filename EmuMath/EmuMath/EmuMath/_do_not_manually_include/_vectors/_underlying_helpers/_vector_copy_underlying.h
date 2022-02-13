@@ -388,7 +388,12 @@ namespace EmuMath::Helpers::_vector_underlying
 		}
 		else
 		{
-			_vector_copy_assign_execution<CopyBegin_, CopyEnd_, ReadOffset_, false>(std::make_index_sequence<OutSize_>(), out_, std::forward<In_>(in_));
+			_vector_copy_assign_execution<CopyBegin_, CopyEnd_, ReadOffset_, false>
+			(
+				std::make_index_sequence<OutSize_>(),
+				out_,
+				EmuCore::TMP::lval_ref_cast<In_>(std::forward<In_>(in_))
+			);
 		}
 	}
 

@@ -16,6 +16,11 @@
 // Test harness execution
 #include "Tests.hpp"
 
+
+
+
+#include "EmuCore/Functors/StdOps.h"
+
 template<class NoiseTable_>
 inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::string& out_name_ = "test_noise")
 {
@@ -198,6 +203,22 @@ int main()
 	constexpr auto mat_lerped_mms_ = mat_a_.Lerp<float>(mat_b_, 0.5L);
 	constexpr auto mat_lerped_mss_ = mat_a_.Lerp(100, 2);
 	constexpr auto mat_lerped_mmm_1313_ = mat_a_.LerpRange<1, 3, 1, 3, float>(mat_b_, mat_c_);
+	constexpr auto mat_lerped_mmm_1313_no_copy_ = mat_a_.LerpRangeNoCopy<1, 3, 1, 3>(mat_b_, mat_c_);
+	
+	EmuCore::do_swap<void> swapper_;
+	int int_a_ = 1;
+	float int_b_ = 2.5f;
+	std::cout << int_a_ << " | " << int_b_ << "\n";
+	//swapper_(int_a_, int_b_);
+	std::cout << int_a_ << " | " << int_b_ << "\n";
+
+	auto vec_a_ = EmuMath::make_vector<float>(1, 2, 3, 4);
+	auto vec_b_ = EmuMath::make_vector<float>(9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+	std::cout << vec_a_ << " |\n" << vec_b_ << "\n\n";
+	swapper_(vec_a_, vec_b_);
+	//vec_a_.swap<false>(vec_b_);
+	std::cout << vec_a_ << " |\n" << vec_b_ << "\n\n";
+
 
 	// ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;

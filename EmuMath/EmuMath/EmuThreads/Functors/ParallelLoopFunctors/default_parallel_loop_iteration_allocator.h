@@ -21,7 +21,8 @@ namespace EmuThreads::Functors
 				{
 					if constexpr (std::is_invocable_v<Func_, std::tuple_element_t<0, std::tuple<Iterators_...>>>)
 					{
-						executor_.AllocateTask(func_, std::get<0>(iterators_));
+						using std::get;
+						executor_.AllocateTask(func_, get<0>(iterators_));
 					}
 					else
 					{

@@ -92,7 +92,8 @@ namespace EmuMath
 
 		[[nodiscard]] static constexpr inline std::size_t get_flattened_index(const std::pair<std::size_t, std::size_t>& column_row_index_pair_)
 		{
-			return get_flattened_index(std::get<0>(column_row_index_pair_), std::get<1>(column_row_index_pair_));
+			using std::get;
+			return get_flattened_index(get<0>(column_row_index_pair_), get<1>(column_row_index_pair_));
 		}
 
 		[[nodiscard]] static constexpr inline std::size_t get_unflattened_column_index(std::size_t flattened_index_)
@@ -478,11 +479,12 @@ namespace EmuMath
 		{
 			if constexpr (!std::is_void_v<typename _variadic_construction_from_major_vector_arg_at_index<VectorTuple_&, ColumnIndex_, RowIndex_>::type>)
 			{
+				using std::get;
 				constexpr std::size_t major_index_ = get_major_index(ColumnIndex_, RowIndex_);
 				constexpr std::size_t non_major_index_ = get_non_major_index(ColumnIndex_, RowIndex_);
 				using vector_type_raw = std::tuple_element_t<major_index_, VectorTuple_>;
 				using vector_uq = typename EmuCore::TMP::remove_ref_cv<vector_type_raw>::type;
-				auto& vector_lval_cast_ = EmuCore::TMP::lval_ref_cast<vector_type_raw>(std::forward<vector_type_raw>(std::get<major_index_>(vectors_tuple_)));
+				auto& vector_lval_cast_ = EmuCore::TMP::lval_ref_cast<vector_type_raw>(std::forward<vector_type_raw>(get<major_index_>(vectors_tuple_)));
 				constexpr bool should_move_ = 
 				(
 					!contains_ref &&
@@ -4687,6 +4689,30 @@ namespace EmuMath
 		}
 #pragma endregion
 	};
+
+	/// <summary>
+	/// <para> Get function for use with EmuMath Matrices using ADL. Equivalent to matrix_.at with the provided FlattenedIndex_. Does not allow theoretical output. </para>
+	/// <para> One may note that there is no alternative that uses Column+Row indices. This is due to this functions provision for ADL, with no intent for other uses. </para>
+	/// </summary>
+	/// <param name="matrix_">: EmuMath Matrix to retrieve the specified contained contiguous flattened index of.</param>
+	/// <returns>Reference to the element contained at the specified contiguous flattened index of the passed EmuMath Matrix.</returns>
+	template<std::size_t FlattenedIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline const typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type& get
+	(
+		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		return matrix_.template at<FlattenedIndex_>();
+	}
+
+	template<std::size_t FlattenedIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type& get
+	(
+		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		return matrix_.template at<FlattenedIndex_>();
+	}
 }
 
 #endif

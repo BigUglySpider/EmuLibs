@@ -411,6 +411,38 @@ namespace EmuMath::Helpers
 		);
 	}
 #pragma endregion
+
+#pragma region VECTOR_SWAPS
+	/// <summary>
+	/// <para> Swaps the two passed EmuMath Vectors. </para>
+	/// <para>
+	///		IncludeNonContained_: If true, values in a larger Vector will be set to its implied-zero in the range not contained within the smaller Vector. 
+	///		Otherwise, only values in the mutual contained range will be swapped.
+	/// </para>
+	/// </summary>
+	/// <param name="vector_a_">: EmuMath Vector to swap the elements of with those of b_.</param>
+	/// <param name="vector_b_">: EmuMath Vector to swap the elements of with those of a_.</param>
+	template<bool IncludeNonContained_ = true, typename TA_, typename TB_, std::size_t SizeA_, std::size_t SizeB_>
+	constexpr inline void vector_swap(EmuMath::Vector<SizeA_, TA_>& vector_a_, EmuMath::Vector<SizeB_, TB_>& vector_b_)
+	{
+		_vector_underlying::_vector_swap<IncludeNonContained_>(vector_a_, vector_b_);
+	}
+
+	/// <summary>
+	/// <para> Swaps the two passed EmuMath Vectors within the provided index range. </para>
+	/// <para>
+	///		IncludeNonContained_: If true, values in a larger Vector will be set to zero in the range not contained within the smaller Vector. 
+	///		Otherwise, only values in the mutual contained range will be swapped.
+	/// </para>
+	/// </summary>
+	/// <param name="vector_a_">: EmuMath Vector to swap the elements of with those of b_.</param>
+	/// <param name="vector_b_">: EmuMath Vector to swap the elements of with those of a_.</param>
+	template<std::size_t BeginIndex_, std::size_t EndIndex_, bool IncludeNonContained_ = true, typename TA_, typename TB_, std::size_t SizeA_, std::size_t SizeB_>
+	constexpr inline void vector_swap_range(EmuMath::Vector<SizeA_, TA_>& vector_a_, EmuMath::Vector<SizeB_, TB_>& vector_b_)
+	{
+		_vector_underlying::_vector_swap<BeginIndex_, EndIndex_, IncludeNonContained_>(vector_a_, vector_b_);
+	}
+#pragma endregion
 }
 
 #endif
