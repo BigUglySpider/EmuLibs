@@ -4484,6 +4484,43 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region STATIC_MATRIX_MAKERS
+		/// <summary>
+		/// <para> Outputs the Identity Matrix as the desired output Matrix, defaulting to the same as this Matrix (except for T_, which will be this Matrix's value_type_uq). </para>
+		/// <para> The Identity Matrix is composed of all 1 along the main diagonal, and all 0 elsewhere. </para>
+		/// <para> Although this may be used to create an Identity of any size, it mainly has useful meaning within a square Matrix (where num_columns == num_rows). </para>
+		/// </summary>
+		/// <returns>EmuMath Matrix of the specified type, constructed as its Identity Matrix (all 1 along the main diagonal, all 0 elsewhere).</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] static constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> identity()
+		{
+			return EmuMath::Helpers::matrix_identity<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>();
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] static constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> identity()
+		{
+			return EmuMath::Helpers::matrix_identity<num_columns, num_rows, OutT_, OutColumnMajor_>();
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] static constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> identity()
+		{
+			return EmuMath::Helpers::matrix_identity<num_columns, num_rows, value_type_uq, OutColumnMajor_>();
+		}
+
+		/// <summary>
+		/// <para> Assigns the Identity Matrix of the passed EmuMath Matrix's type to said matrix_. </para>
+		/// <para> Although this may be used to assign an Identity of any size, it mainly has useful meaning within a square Matrix (where num_columns == num_rows). </para>
+		/// </summary>
+		/// <param name="matrix_">: EmuMath Matrix to assign the Identity to (all 1 along the main diagonal, all 0 elsewhere).</param>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		static constexpr inline void identity(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& matrix_)
+		{
+			EmuMath::Helpers::matrix_identity(matrix_);
+		}
+#pragma endregion
+
 	private:
 		matrix_vector_type _data;
 

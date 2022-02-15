@@ -5,6 +5,7 @@
 
 // CONTAINS:
 // --- transpose
+// --- identity
 
 namespace EmuMath::Helpers
 {
@@ -368,6 +369,38 @@ namespace EmuMath::Helpers
 		using in_matrix_type = EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>;
 		using in_value_uq = typename in_matrix_type::value_type_uq;
 		return _matrix_underlying::_matrix_transpose<InNumRows_, InNumColumns_, in_value_uq, InColumnMajor_>(std::forward<in_matrix_type>(in_matrix_));
+	}
+#pragma endregion
+
+#pragma region IDENTITY
+	/// <summary> 
+	/// <para> Constructs an Identity Matrix of the provided size, type, and major order. May alternatively pass an EmuMath Matrix type. </para>
+		/// <para> Although this may be used to create an Identity of any size, it mainly has useful meaning within a square Matrix (where NumColumns_ == NumRows_). </para>
+	/// </summary>
+	/// <returns>EmuMath Matrix of the specified type, constructed as its Identity Matrix (all 1 along the main diagonal, all 0 elsewhere).</returns>
+	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_> matrix_identity()
+	{
+		return _matrix_underlying::_matrix_identity<NumColumns_, NumRows_, T_, ColumnMajor_>();
+	}
+
+	template<class Matrix_, typename = std::enable_if_t<EmuMath::TMP::is_emu_matrix_v<Matrix_>>>
+	[[nodiscard]] constexpr inline typename EmuCore::TMP::remove_ref_cv<Matrix_>::type matrix_identity()
+	{
+		using mat_uq = typename EmuCore::TMP::remove_ref_cv<Matrix_>::type;
+		using indices = EmuMath::TMP::make_full_matrix_index_sequences<Matrix_>;
+		return _matrix_underlying::_matrix_make_identity<mat_uq>(typename indices::column_index_sequence(), typename indices::row_index_sequence());
+	}
+
+	/// <summary>
+	/// <para> Assigns the Identity Matrix of the passed EmuMath Matrix's type to said matrix_. </para>
+	/// <para> Although this may be used to assign an Identity of any size, it mainly has useful meaning within a square Matrix (where num_columns == num_rows). </para>
+	/// </summary>
+	/// <param name="matrix_">: EmuMath Matrix to assign the Identity to (all 1 along the main diagonal, all 0 elsewhere).</param>
+	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
+	constexpr inline void matrix_identity(EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_)
+	{
+		_matrix_underlying::_matrix_identity(matrix_);
 	}
 #pragma endregion
 }
