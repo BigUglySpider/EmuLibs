@@ -88,7 +88,7 @@ The casing standards of Emu libraries may seem somewhat disparate, but there is 
 1. Non-static public member variables/constants. Items such as `std::pair::first` fall into this category.
 
 ### PascalCaseWithTrailingUnderscore_
-1. Template arguments. Items fall into this category are those within a template's angular braces, such as `template<std::size_t Size_, typename T_>`
+1. Template arguments. Items that fall into this category are those within a template's angular braces, such as `template<std::size_t Size_, typename T_>`
 
 ### snake_case_with_trailing_underscore_
 1. Temporary items that will be destroyed at the end of their provided scope. Items such as function arguments fall into this category.
@@ -104,7 +104,7 @@ The casing standards of Emu libraries may seem somewhat disparate, but there is 
    - Note: Macros are not intended for anything other than Emu library implementations. Always use functions when interacting with Emu libraries.
    - Any fully upper-snake-case naming when using an Emu library is ill formed if:
       1. It is unknown if a program will use any further Emu libraries, and the name starts with `EMU_`, or
-      2. All known Emu libraries for the program are known, and no changes to this will ever occur, and the name starts with `EMU_CORE_`, `EMU_MATH_` or any other upper-snake-case variation of an Emu library's name.
+      2. All known Emu libraries for the program are known, and no changes to this will ever occur, and the name starts with `EMU_CORE_`, `EMU_MATH_` or any other upper-snake-case variation of a used Emu library's name with a trailing underscore.
 
 ### Inconsistencies
 If any inconsistencies are found with the above standard and Emu implementations, raise an issue regarding where the inconsitency/inconsistencies are, and label it with "Casing"
