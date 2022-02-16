@@ -7,6 +7,7 @@
 #include "_misc_arithmetic/_matrix_floor.h"
 #include "_misc_arithmetic/_matrix_floor_constexpr.h"
 #include "_misc_arithmetic/_matrix_lerp.h"
+#include "_misc_arithmetic/_matrix_max.h"
 #include "_misc_arithmetic/_matrix_min.h"
 #include "_misc_arithmetic/_matrix_trunc.h"
 #include "_misc_arithmetic/_matrix_trunc_constexpr.h"

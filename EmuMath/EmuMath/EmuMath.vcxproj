@@ -209,6 +209,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_misc_arithmetic\_matrix_floor.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_misc_arithmetic\_matrix_floor_constexpr.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_misc_arithmetic\_matrix_lerp.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_misc_arithmetic\_matrix_max.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_misc_arithmetic\_matrix_min.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_misc_arithmetic\_matrix_trunc.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_misc_arithmetic\_matrix_trunc_constexpr.h" />
