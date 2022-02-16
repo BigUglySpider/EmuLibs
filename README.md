@@ -65,3 +65,46 @@ Nothing set in stone.
 
 ### FastMatrix
 Same as `FastVector`, but for matrices.
+
+---
+
+## A Note on Casing
+The casing standards of Emu libraries may seem somewhat disparate, but there is a pattern used to provide extra information in an item's name alone.
+
+### PascalCase
+1. `struct`s that are not intended for templatised metaprogramming. Items such as `Vector` fall into this category.
+2. `class`es that are not intended for templatised metaprogramming. Items such as `NoiseTable` fall into this category.
+3. Non-static public member functions of `struct`s/`class`es. Items such as `Vector::Add` fall into this category.
+   - There is a small exception to this for STL-compliant functions. These will be in snake_case, and are talked about more under said heading.
+
+### snake_case
+1. `struct`s/`class`es that are intended for templatised metaprogramming. Items such as `do_add` fall into this category.
+2. Static public member functions of `struct`s/`class`es. Items such as `Matrix::identity` fall into this category.
+3. Non-static public member functions that are designed to be STL-compliant. Items such as `Vector::begin` fall into this category.
+   - This is the one blanket exception to PascalCase non-static public member functions.
+4. Static public member variables/constants. Items such as `Matrix::num_columns` fall into this category.
+
+### camelCase
+1. Non-static public member variables/constants. Items such as `std::pair::first` fall into this category.
+
+### PascalCaseWithTrailingUnderscore_
+1. Template arguments. Items fall into this category are those within a template's angular braces, such as `template<std::size_t Size_, typename T_>`
+
+### snake_case_with_trailing_underscore_
+1. Temporary items that will be destroyed at the end of their provided scope. Items such as function arguments fall into this category.
+
+### \_snake_case_with_leading_underscore
+1. Files/folders that should not be manually accessed outside of Emu library implementations
+2. Namespaces that should not be manually accessed outside of Emu library implementations
+3. All private members of a `struct`/`class`
+4. All protected members of a `struct`/`class`
+
+### UPPER_SNAKE_CASE
+1. Global defines - primarily include guards, but may or may not include macros.
+   - Note: Macros are not intended for anything other than Emu library implementations. Always use functions when interacting with Emu libraries.
+   - Any fully upper-snake-case naming when using an Emu library is ill formed if:
+      1. It is unknown if a program will use any further Emu libraries, and the name starts with `EMU_`, or
+      2. All known Emu libraries for the program are known, and no changes to this will ever occur, and the name starts with `EMU_CORE_`, `EMU_MATH_` or any other upper-snake-case variation of an Emu library's name.
+
+### Inconsistencies
+If any inconsistencies are found with the above standard and Emu implementations, raise an issue regarding where the inconsitency/inconsistencies are, and label it with "Casing"
