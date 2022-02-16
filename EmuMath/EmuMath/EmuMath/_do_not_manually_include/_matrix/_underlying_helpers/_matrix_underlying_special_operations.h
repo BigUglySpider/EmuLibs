@@ -114,7 +114,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 	}
 
 	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Matrix_>
-	[[nodiscard]] constexpr inline typename EmuCore::TMP::remove_ref_cv_t<Matrix_>::stored_type _matrix_assign_identity_element(Matrix_& matrix_)
+	constexpr inline void _matrix_assign_identity_element(Matrix_& matrix_)
 	{
 		using get_result = decltype(_matrix_get<ColumnIndex_, RowIndex_>(matrix_));
 		if constexpr (ColumnIndex_ == RowIndex_)
@@ -190,7 +190,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 	{
 		using matrix_type = EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>;
 		using indices = EmuMath::TMP::make_full_matrix_index_sequences<matrix_type>;
-		return _matrix_assign_identity(typename indices::column_index_sequence(), typename indices::row_index_sequence(), matrix_);
+		return _matrix_assign_identity(matrix_, typename indices::column_index_sequence(), typename indices::row_index_sequence());
 	}
 }
 

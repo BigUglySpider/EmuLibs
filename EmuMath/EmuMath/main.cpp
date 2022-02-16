@@ -215,6 +215,8 @@ int main()
 	std::cout << rt_ << "\n\n" << mat_a_.Min(rt_) << "\n\n" << mat_a_.MinRange<1, 3, 1, 3>(rt_) << "\n\n" << mat_a_.MinRangeNoCopy<1, 3, 1, 3>(rt_) << "\n\n";
 	mat_a_.MinRange<1, 3, 1, 3>(rt_, mat_a_);
 	std::cout << rt_ << "\n\n";
+	rt_.identity(rt_);
+	std::cout << rt_ << "\n\n";
 
 
 	// ##### SCALAR vs SIMD NOISE #####
