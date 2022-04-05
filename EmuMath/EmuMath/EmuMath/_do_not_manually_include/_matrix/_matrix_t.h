@@ -4218,15 +4218,6 @@ namespace EmuMath
 			EmuMath::Helpers::matrix_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_));
 		}
 
-
-
-
-
-
-
-
-
-
 		/// <summary>
 		/// <para> Outputs the greatest element within this Matrix as the provided Out_ type, defaulting to this Matrix's value_type_uq. </para>
 		/// <para> Supports output of references if the reference type is compatible with const-qualification. </para>
@@ -4524,25 +4515,6 @@ namespace EmuMath
 		{
 			EmuMath::Helpers::matrix_max_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_));
 		}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 		/// <summary>
 		/// <para> Outputs a version of this Matrix with its elements linearly interpolated with b_ using a weighting of t_. </para>
