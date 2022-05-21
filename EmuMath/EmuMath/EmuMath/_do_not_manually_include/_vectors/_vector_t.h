@@ -72,10 +72,12 @@ namespace EmuMath
 			return size;
 		}
 
-		template<typename T_, bool WhileConst_>
+		template<typename Out_, bool WhileConst_>
 		[[nodiscard]] static constexpr inline bool is_valid_try_get_output_ref()
 		{
-			return vector_info::template is_valid_try_get_output_ref<T_, WhileConst_>();
+			using qualified_reference_type = typename EmuCore::TMP::conditional_const<WhileConst_, value_type&>::type;
+			using out_lval_ref = typename std::add_lvalue_reference<Out_>::type;
+			return EmuCore::TMP::valid_assign_direct_or_cast<Out_, qualified_reference_type, out_lval_ref>();
 		}
 
 		[[nodiscard]] static constexpr inline value_type_uq get_implied_zero()
