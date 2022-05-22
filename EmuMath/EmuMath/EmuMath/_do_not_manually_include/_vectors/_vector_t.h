@@ -385,7 +385,7 @@ namespace EmuMath
 			<
 				EmuMath::TMP::is_emu_vector_v<Vector_>,
 				!std::is_same_v<EmuCore::TMP::remove_ref_cv_t<Vector_>, this_type>,
-				(!has_alternative_representation || !std::is_same_v<EmuCore::TMP::remove_ref_cv_t<Vector_>, alternative_rep),
+				(!has_alternative_representation || !std::is_same_v<EmuCore::TMP::remove_ref_cv_t<Vector_>, alternative_rep>),
 				valid_arg_for_all_same_construction<ReadOffset_, Vector_>()
 			>;
 		}
