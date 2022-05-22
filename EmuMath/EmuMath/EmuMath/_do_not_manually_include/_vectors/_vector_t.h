@@ -383,9 +383,10 @@ namespace EmuMath
 		{
 			return EmuCore::TMP::variadic_and_v
 			<
+				!contains_non_const_ref || !std::is_const_v<Vector_>,
 				EmuMath::TMP::is_emu_vector_v<Vector_>,
 				!std::is_same_v<EmuCore::TMP::remove_ref_cv_t<Vector_>, this_type>,
-				(!has_alternative_representation || !std::is_same_v<EmuCore::TMP::remove_ref_cv_t<Vector_>, alternative_rep>),
+				!has_alternative_representation || !std::is_same_v<EmuCore::TMP::remove_ref_cv_t<Vector_>, alternative_rep>,
 				valid_arg_for_all_same_construction<ReadOffset_, Vector_>()
 			>;
 		}
@@ -393,7 +394,7 @@ namespace EmuMath
 		template<class Vector_, std::size_t ReadOffset_ = 0>
 		[[nodiscard]] static constexpr inline bool is_valid_const_vector_conversion_arg()
 		{
-			return !contains_non_const_ref && is_valid_vector_conversion_arg<const Vector_, ReadOffset_>();
+			return is_valid_vector_conversion_arg<const Vector_, ReadOffset_>();
 		}
 
 		template<std::size_t ReadOffset_, class...Args_>
