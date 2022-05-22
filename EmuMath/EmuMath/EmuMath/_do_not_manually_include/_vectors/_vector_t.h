@@ -346,7 +346,7 @@ namespace EmuMath
 		[[nodiscard]] static constexpr inline bool _underlying_valid_arg_for_all_same_construction(std::index_sequence<Indices_...> indices_)
 		{
 			using arg_uq = EmuCore::TMP::remove_ref_cv_t<Arg_>;
-			if constexpr (!std::is_same_v<this_type, arg_uq>)
+			if constexpr (!std::is_same_v<this_type, arg_uq> && (!has_alternative_representation || !std::is_same_v<alternative_rep, arg_uq>))
 			{
 				return EmuCore::TMP::variadic_and_v
 				<
