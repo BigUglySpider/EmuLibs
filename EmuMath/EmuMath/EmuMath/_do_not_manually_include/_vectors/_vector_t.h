@@ -392,7 +392,7 @@ namespace EmuMath
 		template<class Vector_, std::size_t ReadOffset_ = 0>
 		[[nodiscard]] static constexpr inline bool is_valid_const_vector_conversion_arg()
 		{
-			return !contains_non_const_ref && is_valid_vector_conversion_arg<Vector_, ReadOffset_>();
+			return !contains_non_const_ref && is_valid_vector_conversion_arg<const Vector_, ReadOffset_>();
 		}
 
 		template<std::size_t ReadOffset_, class...Args_>
