@@ -182,8 +182,14 @@ namespace EmuMath
 		///		To include indices that are technically not contained by the Vector, pass true as a template argument for FullWidth_.
 		/// </para>
 		/// </summary>
-		/// <typeparam name="Out_"></typeparam>
-		/// <param name="p_out_"></param>
+		/// <param name="p_out_">
+		///		<para> Pointer to contiguous memory to output to. </para>
+		///		<para> If FullWidth_ is true or this Vector does not require a partial register, this must point to at least (num_registers * elements_per_register) items. </para>
+		///		<para> 
+		///			If FullWidth_ is false and this Vector and this Vector requires a partial register,
+		///			this must point to at least ((num_registers - 1) * elements_per_register) + partial_register_length) items.
+		///		</para>
+		/// </param>
 		template<bool FullWidth_ = false, typename Out_>
 		constexpr inline void Store(Out_* p_out_) const
 		{
