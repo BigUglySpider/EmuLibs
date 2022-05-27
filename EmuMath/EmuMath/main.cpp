@@ -16,10 +16,10 @@
 // Test harness execution
 #include "Tests.hpp"
 
-
-
-
 #include "EmuCore/Functors/StdOps.h"
+
+// Fast Vector
+#include "EmuMath/FastVector.h"
 
 template<class NoiseTable_>
 inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::string& out_name_ = "test_noise")
@@ -195,7 +195,32 @@ int main()
 	srand(static_cast<unsigned int>(time(0)));
 	EmuCore::Timer<std::milli> timer_;
 
+	EmuMath::FastVector<4, float> fast_v4f_a;
+	EmuMath::FastVector<4, float> fast_v4f_b(12);
+	std::cout << fast_v4f_a << std::endl;
+	std::cout << fast_v4f_b << std::endl;
+	std::cout << fast_v4f_b.Store<5>() << std::endl;
+	std::cout << fast_v4f_a.Store<3>() << std::endl;
 
+	EmuMath::FastVector<8, float> fast_v8f_a(7);
+	std::cout << fast_v8f_a << std::endl;
+	std::cout << EmuMath::FastVector<7, float>(6);
+	std::cout << std::endl << EmuMath::FastVector<9, float>(8) << std::endl;
+	std::cout << EmuMath::FastVector<8, float, 256>() << std::endl;
+	std::cout << EmuMath::FastVector<8, float, 256>(3) << std::endl;
+	std::cout << EmuMath::FastVector<9, float, 256>(3) << std::endl;
+	std::cout << EmuMath::FastVector<7, float, 256>(3) << std::endl;
+	std::cout << EmuMath::FastVector<3, float, 256>(3).Store<4>() << std::endl;
+	std::cout << EmuMath::FastVector<12, float, 128>(6).Store<4>() << std::endl;
+
+
+	std::cout << "\n\n";
+	EmuMath::Vector<6, long long> normal_v(42);
+	std::cout << normal_v << std::endl;
+	fast_v4f_a.Store<1>(normal_v);
+	std::cout << normal_v << std::endl;
+
+	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 	constexpr auto mat_b_ = EmuMath::Matrix<4, 4, int, true>(1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
 	constexpr auto mat_c_ = EmuMath::Matrix<4, 4, float, true>(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25);

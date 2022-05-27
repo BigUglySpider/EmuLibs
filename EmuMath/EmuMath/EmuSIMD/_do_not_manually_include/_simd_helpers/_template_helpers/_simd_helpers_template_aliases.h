@@ -57,7 +57,7 @@ namespace EmuSIMD::TMP
 		<
 			std::is_integral_v<T_>,
 			integer_register_type<Width_>,
-			std::void_t<void>
+			void
 		>::type;
 	};
 
