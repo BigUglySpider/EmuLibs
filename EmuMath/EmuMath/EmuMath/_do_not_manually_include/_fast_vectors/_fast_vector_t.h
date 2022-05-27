@@ -189,11 +189,12 @@ namespace EmuMath
 		///			If FullWidth_ is false and this Vector and this Vector requires a partial register,
 		///			this must point to at least ((num_registers - 1) * elements_per_register) + partial_register_length) items.
 		///		</para>
+		///		<para> If size requirements are not met, the behaviour of this function is undefined as it will write to unknown memory. </para>
 		/// </param>
 		template<bool FullWidth_ = false, typename Out_>
 		constexpr inline void Store(Out_* p_out_) const
 		{
-			_store_to_non_uniform<num_registers, FullWidth_ ? 0 : partial_register_length>(out_);
+			_store_to_non_uniform<num_registers, FullWidth_ ? 0 : partial_register_length>(p_out_);
 		}
 #pragma endregion
 

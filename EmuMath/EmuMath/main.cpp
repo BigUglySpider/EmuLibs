@@ -21,6 +21,22 @@
 // Fast Vector
 #include "EmuMath/FastVector.h"
 
+template<typename T_, std::size_t Size_>
+inline std::ostream& operator<<(std::ostream& str_, const std::array<T_, Size_>& arr_)
+{
+	str_ << "{";
+	if constexpr (Size_ > 0)
+	{
+		str_ << " " << arr_[0];
+		for (std::size_t i = 1; i < Size_; ++i)
+		{
+			str_ << ", " << arr_[i];
+		}
+	}
+	str_ << " }";
+	return str_;
+}
+
 template<class NoiseTable_>
 inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::string& out_name_ = "test_noise")
 {
@@ -219,6 +235,12 @@ int main()
 	std::cout << normal_v << std::endl;
 	fast_v4f_a.Store<1>(normal_v);
 	std::cout << normal_v << std::endl;
+	std::array<float, 9> some_floats{};
+	std::cout << some_floats << std::endl;
+	fast_v8f_a.Store(some_floats.data());
+	std::cout << some_floats << std::endl;
+	fast_v4f_b.Store(some_floats.data() + 4);
+	std::cout << some_floats << std::endl;
 
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
