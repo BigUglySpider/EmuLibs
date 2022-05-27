@@ -90,6 +90,16 @@ namespace EmuMath
 					// Reserved for copy/move construction
 					return false;
 				}
+				else if constexpr(std::is_same_v<value_type, single_arg_uq>)
+				{
+					// Reserved for all-as-one construction
+					return false;
+				}
+				else if constexpr (std::is_same_v<value_type*, single_arg_uq>)
+				{
+					// Reserved for load construction
+					return false;
+				}
 				else
 				{
 					// TODO: VALIDATE SINGLE ARG
@@ -119,6 +129,10 @@ namespace EmuMath
 		}
 
 		constexpr inline FastVector(value_type to_set_all_to_) : data(_do_set_all_same(to_set_all_to_))
+		{
+		}
+
+		constexpr inline FastVector(const value_type* p_to_load_) : data(_do_load(p_to_load_))
 		{
 		}
 
@@ -422,6 +436,31 @@ namespace EmuMath
 		static constexpr inline register_type _set_all_same_discard_index(const value_type& to_set_all_to_)
 		{
 			return EmuSIMD::set1<register_type, per_element_width>(to_set_all_to_);
+		}
+
+		static constexpr inline data_type _do_load(const value_type* p_to_load_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return _do_array_load(p_to_load_, register_index_sequence());
+			}
+			else
+			{
+				return EmuSIMD::load<register_type>(p_to_load_);
+			}
+		}
+
+		template<std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_load(const value_type* p_to_load_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type({ _do_load_for_register_index<RegisterIndices_>(p_to_load_)... });
+		}
+
+		template<std::size_t RegisterIndex_>
+		static constexpr inline register_type _do_load_for_register_index(const value_type* p_to_load_)
+		{
+			constexpr std::size_t offset = RegisterIndex_ * elements_per_register;
+			return EmuSIMD::load<register_type>(p_to_load_ + offset);
 		}
 
 	public:

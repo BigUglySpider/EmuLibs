@@ -241,6 +241,14 @@ int main()
 	std::cout << some_floats << std::endl;
 	fast_v4f_b.Store(some_floats.data() + 4);
 	std::cout << some_floats << std::endl;
+	EmuMath::FastVector<6, float, 128>(42).Store<true>(some_floats.data());
+	std::cout << some_floats << std::endl;
+	
+	std::cout << "\n\n";
+	const float a_float_array[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+	std::cout << EmuMath::FastVector<4, float>(a_float_array) << "\n";
+	std::cout << EmuMath::FastVector<12, float>(a_float_array + 4) << "\n";
+
 
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
