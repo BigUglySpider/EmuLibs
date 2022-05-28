@@ -1,6 +1,7 @@
 #ifndef EMU_MATH_FAST_VECTOR_T_H_INC_
 #define EMU_MATH_FAST_VECTOR_T_H_INC_ 1
 
+#include "_underlying_helpers/_fast_vector_tmp.h"
 #include "../../Vector.h"
 #include "../../../EmuCore/TMPHelpers/TypeConvertors.h"
 #include "../../../EmuCore/TMPHelpers/Values.h"
@@ -17,18 +18,23 @@ namespace EmuMath
 	/// <para> Only accepts value type arguments, and ignore const/volatile qualification. </para>
 	/// <para> May select a specific bit-width of the encapsulated registers; defaults to 128-bit, but accepts 256-bit and 512-bit too. </para>
 	/// </summary>
-	template<std::size_t Size_, typename T_, std::size_t RegisterWidth_ = 128>
+	template<std::size_t Size_, typename T_, std::size_t RegisterWidth_>
 	struct FastVector
 	{
 	public:
+		/// <summary> The number of elements that this Vector behaves to encapsulate. </summary>
 		static constexpr std::size_t size = Size_;
+		/// <summary> The width provided for this Vector's registers to use, in bits. </summary>
 		static constexpr std::size_t register_width = RegisterWidth_ > 0 ? RegisterWidth_ : 1;
 
+		/// <summary> Alias to this Vector type. </summary>
 		using this_type = FastVector<Size_, T_, RegisterWidth_>;
-		using vector_type = EmuMath::Vector<Size_, T_>;
+		/// <summary> Alias to the type of values within this Vector. </summary>
 		using value_type = typename std::remove_cv<T_>::type;
+		/// <summary> Alias to the EmuMath::Vector type composed of this Vector's size and value_type. </summary>
+		using vector_type = EmuMath::Vector<size, value_type>;
+		/// <summary> Alias to the type of SIMD register used for this Vector's data. </summary>
 		using register_type = typename EmuSIMD::TMP::register_type<value_type, register_width>::type;
-		using index_sequence = std::make_index_sequence<size>;
 
 		/// <summary> Boolean indicating if this Vector's encapsulated type is integral. </summary>
 		static constexpr bool is_integral = std::is_integral<value_type>::value;
@@ -67,78 +73,279 @@ namespace EmuMath
 		/// </para>
 		/// </summary>
 		using data_type = std::conditional_t<contains_multiple_registers, std::array<register_type, num_registers>, register_type>;
-		/// <summary> Index sequence that may be used to statically iterate over this Vector's registers if it contains multiple. </summary>
+
+		/// <summary> Standard index sequence that may be used to statically iterate over this Vector's encapsulated elements. </summary>
+		using index_sequence = std::make_index_sequence<size>;
+		/// <summary> Standard index sequence that may be used to statically iterate over this Vector's registers if it contains multiple. </summary>
 		using register_index_sequence = std::make_index_sequence<num_registers>;
 
 #pragma region CONSTRUCTOR_VALIDATORS
-	public:
+	private:
+		template<typename Arg_>
+		static constexpr inline bool _is_reserved_for_single_explicitly_typed_constructor()
+		{
+			using arg_uq = typename EmuCore::TMP::remove_ref_cv<Arg_>::type;
+			return
+			(
+				std::is_same_v<this_type, arg_uq> ||	// Reserved for copy/move construction
+				std::is_same_v<value_type, arg_uq> ||	// Reserved for all-as-one construction
+				std::is_same_v<value_type*, arg_uq>		// Reserved for load construction
+			);
+		}
+
 		template<typename...Args_>
-		[[nodiscard]] static constexpr inline bool valid_variadic_construction_args()
+		static constexpr inline bool _is_reserved_for_explicitly_typed_constructor()
 		{
 			constexpr std::size_t num_args = sizeof...(Args_);
-			if constexpr (num_args == 0)
+			if (num_args == 0)
 			{
-				// Reserved for default
+				return true; // Reserved for default
+			}
+			else if (num_args == 1)
+			{
+				return _is_reserved_for_single_explicitly_typed_constructor<typename EmuCore::TMP::first_variadic_arg<Args_...>::type>();
+			}
+			else
+			{
 				return false;
 			}
-			if constexpr (num_args == 1)
+		}
+
+		template<std::size_t Index_, typename Vector_>
+		struct _vector_get_index_for_load_result
+		{
+			using _vector_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
+			using _get_result = decltype(std::declval<_vector_uq>().AtTheoretical<Index_>());
+
+			using type = typename std::conditional
+			<
+				(Index_ > _vector_uq::size) || std::is_lvalue_reference_v<Vector_>,
+				_get_result,
+				decltype(std::move(std::declval<_get_result>()))
+			>::type;
+		};
+
+		template<std::size_t Index_, typename Vector_>
+		[[nodiscard]] static constexpr inline typename _vector_get_index_for_load_result<Index_, Vector_>::type _get_index_from_normal_vector(Vector_&& arg_)
+		{
+			using vector_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
+			if constexpr (Index_ > vector_uq::size || std::is_lvalue_reference_v<Vector_>)
 			{
-				using single_arg = typename EmuCore::TMP::first_variadic_arg<Args_...>::type;
-				using single_arg_uq = typename EmuCore::TMP::remove_ref_cv<single_arg>::type;
-				if constexpr (std::is_same_v<this_type, single_arg_uq>)
+				return arg_.AtTheoretical<Index_>();
+			}
+			else
+			{
+				return std::move(arg_.AtTheoretical<Index_>());
+			}
+		}
+
+		template<class Vector_, std::size_t...Indices_>
+		[[nodiscard]] static constexpr inline bool _may_create_from_all_normal_vector_indices(std::index_sequence<Indices_...> indices_)
+		{
+			return (... && EmuCore::TMP::is_static_castable_v<decltype(_get_index_from_normal_vector<Indices_>(std::declval<Vector_>())), value_type>);
+		}
+
+	public:
+		/// <summary>
+		/// <para> Returns a boolean indicating if the provided Arg_ is a valid argument for converting a normal EmuMath vector to a FastVector of this type. </para>
+		/// </summary>
+		/// <returns>True if Arg_ is valid for a normal->fast Vector conversion; otherwise false.</returns>
+		template<typename Arg_>
+		[[nodiscard]] static constexpr inline bool valid_arg_for_normal_vector_conversion_construction()
+		{
+			using in_uq = typename EmuCore::TMP::remove_ref_cv<Arg_>::type;
+			if constexpr (!EmuMath::TMP::is_emu_vector_v<in_uq>)
+			{
+				return false;
+			}
+			else
+			{
+				return _may_create_from_all_normal_vector_indices<Arg_>(index_sequence());
+			}
+		}
+
+		/// <summary>
+		/// <para> Returns a boolean indicating if the provided Args_ are valid for creating a FastVector with one argument per element. </para>
+		/// </summary>
+		/// <returns>True if this FastVector type's indices can all be constructed using the provided set of Args_; otherwise false.</returns>
+		template<typename...Args_>
+		[[nodiscard]] static constexpr inline bool valid_args_for_per_element_construction()
+		{
+			if constexpr (_is_reserved_for_explicitly_typed_constructor<Args_...>())
+			{
+				return false;
+			}
+			else
+			{
+				constexpr std::size_t num_args = sizeof...(Args_);
+				if constexpr (num_args != size)
 				{
-					// Reserved for copy/move construction
-					return false;
-				}
-				else if constexpr(std::is_same_v<value_type, single_arg_uq>)
-				{
-					// Reserved for all-as-one construction
-					return false;
-				}
-				else if constexpr (std::is_same_v<value_type*, single_arg_uq>)
-				{
-					// Reserved for load construction
 					return false;
 				}
 				else
 				{
-					// TODO: VALIDATE SINGLE ARG
-					return false;
+					if constexpr (num_args == 1)
+					{
+						using single_arg = typename EmuCore::TMP::first_variadic_arg<Args_...>::type;
+						return
+						(
+								!valid_arg_for_normal_vector_conversion_construction<single_arg>() &&
+								EmuCore::TMP::is_static_castable<decltype(std::forward<single_arg>(std::declval<single_arg>())), value_type>::value
+						);
+					}
+					else
+					{
+						return 
+						(
+							(... && EmuCore::TMP::is_static_castable_v<decltype(std::forward<Args_>(std::declval<Args_>())), value_type>)
+						);
+					}
 				}
+			}
+		}
+
+		/// <summary>
+		/// <para> Blanket check to determine if this FastVector's variadic constructor can be invoked with the provided Args_. </para>
+		/// </summary>
+		/// <returns>True if the variadic constructor of this FastVector can be invoked with the provided Args_; otherwise false.</returns>
+		template<typename...Args_>
+		[[nodiscard]] static constexpr inline bool valid_variadic_construction_args()
+		{
+			if constexpr (_is_reserved_for_explicitly_typed_constructor<Args_...>())
+			{
+				return false;
 			}
 			else
 			{
-				// TODO: VALIDATE MULTI ARG
-				return false;
+				return
+				(
+					valid_args_for_per_element_construction<Args_...>()
+				);
 			}
 		}
 #pragma endregion
 
 #pragma region CONSTRUCTORS
 	public:
+		/// <summary>
+		/// <para> Default constructor for a Vector, which uses the default construction method of its underlying SIMD registers.. </para>
+		/// </summary>
 		constexpr inline FastVector() : data()
 		{
 		}
 
+		/// <summary>
+		/// <para> Copy constructor for a FastVector which copies all respective elements of the passed FastVector of the same type. </para>
+		/// </summary>
+		/// <param name="to_copy_">Emu FastVector of the same type to copy.</param>
 		constexpr inline FastVector(const EmuMath::FastVector<Size_, T_, RegisterWidth_>& to_copy_) : data(_make_copy(to_copy_))
 		{
 		}
 
+		/// <summary>
+		/// <para> Move constructor for a FastVector which moves all respective elements of the passed FastVector of the same type. </para>
+		/// <para> Likely to be barely - if at all - different to copy construction. </para>
+		/// </summary>
+		/// <param name="to_move_">Emu FastVector of the same type to move.</param>
 		constexpr inline FastVector(EmuMath::FastVector<Size_, T_, RegisterWidth_>&& to_move_) : data(_do_move(std::move(to_move_)))
 		{
 		}
 
-		constexpr inline FastVector(value_type to_set_all_to_) : data(_do_set_all_same(to_set_all_to_))
+		/// <summary>
+		/// <para> All-as-one constructor for a FastVector which has all elements initialised to the same starting value. </para>
+		/// </summary>
+		/// <param name="to_set_all_to_">Value to set every element within the Vector to.</param>
+		explicit constexpr inline FastVector(value_type to_set_all_to_) : data(_do_set_all_same(to_set_all_to_))
 		{
 		}
 
-		constexpr inline FastVector(const value_type* p_to_load_) : data(_do_load(p_to_load_))
+		/// <summary>
+		/// <para> Loading constructor for a FastVector which loads data directly from bytes in memory. </para>
+		/// <para> This is a full-width load which considers only the width of the underlying registers; the passed pointer must account for this. </para>
+		/// </summary>
+		/// <param name="p_to_load_">Pointer to data that is contiguous for at least (`elements_per_register * num_registers`) elements.</param>
+		explicit constexpr inline FastVector(const value_type* p_to_load_) : data(_do_load(p_to_load_))
 		{
 		}
 
+		/// <summary>
+		/// <para> Variadic constructor which is used for per-element construction and conversion construction. If available, the first possible in the list will be chosen: </para>
+		/// <para>
+		///		EmuMath::Vector conversion: Constructs the Vector using respective indices in a passed EmuMath::Vector argument, performing necessary conversions. 
+		///		This will attempt optimised loads instead of sets if possible.
+		///		Available where `sizeof...(Args_) == 1`, the argument is an EmuMath Vector, and all of its required theoretical indices may be used as a `value_type`.
+		/// </para>
+		/// <para>
+		///		Per-element construction: Constructs the Vector using respective arguments to construct indices as in the matching variadic constructor of EmuMath::Vector. 
+		///		Available where `sizeof...(Args_) == size)` and all arguments may be used as a `value_type`.
+		/// </para>
+		/// </summary>
+		/// <param name="args_">Variadic arguments to construct the Vector via, as per the listed potential paths.</param>
 		template<typename...ConstructionArgs_, typename = std::enable_if_t<valid_variadic_construction_args<ConstructionArgs_...>()>>
-		constexpr inline FastVector(ConstructionArgs_&&...args_) : data(_do_variadic_construction(std::forward<ConstructionArgs_>(args_...)))
+		explicit constexpr inline FastVector(ConstructionArgs_&&...args_) : data(_do_variadic_construction(std::forward<ConstructionArgs_>(args_)...))
 		{
+			// TODO: normal->fast vector conversion
+		}
+#pragma endregion
+
+#pragma region SETTERS
+	public:
+		/// <summary>
+		/// <para> Sets all register bits in this Vector to 0. </para>
+		/// </summary>
+		inline void SetAllZero()
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_set_zero_array(register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::setzero<register_type>();
+			}
+		}
+
+		/// <summary>
+		/// <para> Sets all register bits in this Vector to 1. </para>
+		/// </summary>
+		inline void SetAllOne()
+		{
+			if constexpr (contains_multiple_registers)
+			{
+
+			}
+			else
+			{
+				data = EmuSIMD::setallone<register_type>();
+			}
+		}
+
+		/// <summary>
+		/// <para> Sets all elements in this Vector to match the passed val_. </para>
+		/// </summary>
+		/// <param name="val_">Value to set all elements to.</param>
+		inline void Set1(value_type val_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_set_all_same_array(val_, register_index_sequence());
+			}
+			{
+				data = EmuSIMD::set1<register_type, per_element_width>(val_);
+			}
+		}
+
+	private:
+		template<std::size_t...RegisterIndices_>
+		constexpr inline void _set_zero_array(std::index_sequence<RegisterIndices_...> indices_)
+		{
+			((data[RegisterIndices_] = EmuSIMD::setzero<register_type>()), ...);
+		}
+
+		template<std::size_t...RegisterIndices_>
+		constexpr inline void _set1_array(const value_type& val_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			((data[RegisterIndices_] = EmuSIMD::set1<register_type, per_element_width>(val_)), ...);
 		}
 #pragma endregion
 
@@ -259,7 +466,69 @@ namespace EmuMath
 		template<typename...Args_>
 		static constexpr inline data_type _do_variadic_construction(Args_&&...args_)
 		{
-			return {};
+			if constexpr (valid_args_for_per_element_construction<Args_...>())
+			{
+				return _make_with_arg_per_element(std::forward<Args_>(args_)...);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Args_...>(),
+					"False-positive allowed for variadic construction of an EmuMath::FastVector; no variadic construction method is available."
+				);
+			}
+		}
+
+		template<typename...Args_>
+		static constexpr inline data_type _make_with_arg_per_element(Args_&&...args_)
+		{
+			if constexpr (contains_multiple_registers || requires_partial_register)
+			{
+				auto args_tuple = std::forward_as_tuple<Args_...>(std::forward<Args_>(args_)...);
+				return _make_all_registers_from_tuple(args_tuple, register_index_sequence());
+			}
+			else
+			{
+				return EmuSIMD::setr<register_type, per_element_width>(std::forward<Args_>(args_)...);
+			}
+		}
+
+		template<std::size_t Index_, typename...Args_>
+		static constexpr inline value_type _make_value_type_from_tuple_index(std::tuple<Args_...>& args_)
+		{
+			if constexpr (Index_ < sizeof...(Args_))
+			{
+				using tuple_type = std::tuple<Args_...>;
+				using arg_type = typename std::tuple_element<Index_, tuple_type>;
+				return static_cast<value_type>(std::get<Index_>(args_));
+			}
+			else
+			{
+				return value_type();
+			}
+		}
+
+		template<std::size_t...Indices, typename...Args_>
+		static constexpr inline register_type _make_register_from_tuple(std::tuple<Args_...>& args_, std::index_sequence<Indices...> indices_)
+		{
+			return EmuSIMD::setr<register_type, per_element_width>(_make_value_type_from_tuple_index<Indices>(args_)...);
+		}
+
+		template<std::size_t...RegisterIndices_, typename...Args_>
+		static constexpr inline data_type _make_all_registers_from_tuple(std::tuple<Args_...>& args_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			if constexpr (sizeof...(RegisterIndices_) == 1)
+			{
+				return data_type(_make_register_from_tuple(args_, EmuCore::TMP::make_offset_index_sequence<RegisterIndices_ * elements_per_register, elements_per_register>())...);
+			}
+			else
+			{
+				return data_type
+				(
+					{ _make_register_from_tuple(args_, EmuCore::TMP::make_offset_index_sequence<RegisterIndices_ * elements_per_register, elements_per_register>())... }
+				);
+			}
 		}
 
 		template<std::size_t OutSize_, typename OutT_, std::size_t SrcSize_, std::size_t...OutIndices_>

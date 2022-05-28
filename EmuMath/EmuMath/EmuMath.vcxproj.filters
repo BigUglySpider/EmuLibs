@@ -590,5 +590,8 @@
     <ClInclude Include="EmuMath\FastVector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_vectors\_underlying_helpers\_fast_vector_tmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

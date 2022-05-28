@@ -229,7 +229,6 @@ int main()
 	std::cout << EmuMath::FastVector<3, float, 256>(3).Store<4>() << std::endl;
 	std::cout << EmuMath::FastVector<12, float, 128>(6).Store<4>() << std::endl;
 
-
 	std::cout << "\n\n";
 	EmuMath::Vector<6, long long> normal_v(42);
 	std::cout << normal_v << std::endl;
@@ -248,6 +247,9 @@ int main()
 	const float a_float_array[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
 	std::cout << EmuMath::FastVector<4, float>(a_float_array) << "\n";
 	std::cout << EmuMath::FastVector<12, float>(a_float_array + 4) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(1, 2, 3, 4) << "\n";
+	std::cout << EmuMath::FastVector<3, int>(1, 2.0f, 3) << "\n";
+	std::cout << EmuMath::FastVector<27, float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27) << "\n";
 
 
 	system("pause");

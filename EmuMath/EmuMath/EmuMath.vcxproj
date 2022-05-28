@@ -187,6 +187,7 @@
     <ClInclude Include="EmuMath\Noise.h" />
     <ClInclude Include="EmuMath\Random.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_vectors\_fast_vector_t.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_vectors\_underlying_helpers\_fast_vector_tmp.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_all_matrix_helpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_basic_arithmetic\_matrix_add.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_basic_arithmetic\_matrix_divide.h" />
