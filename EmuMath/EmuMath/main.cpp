@@ -251,6 +251,8 @@ int main()
 	std::cout << EmuMath::FastVector<3, int>(1, 2.0f, 3) << "\n";
 	std::cout << EmuMath::FastVector<27, float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27) << "\n";
 	std::cout << EmuMath::FastVector<35, std::uint16_t>(_mm_setr_epi16(1, 2, 3, 4, 5, 6, 7, 8)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(EmuMath::Vector<8, const float>(1, 2, 3, 4, 42, 69, 420, 42)) << "\n";
+	std::cout << EmuMath::FastVector<12, float>(_mm_set_ps(1, 2, 3, 4), _mm_set_ps(4, 3, 2, 1), _mm_set_ps(42, 42, 42, 42)) << "\n";
 
 
 	system("pause");

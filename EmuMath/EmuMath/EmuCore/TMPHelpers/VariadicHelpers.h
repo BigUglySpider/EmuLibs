@@ -122,6 +122,41 @@ namespace EmuCore::TMP
 	using first_variadic_arg_t = typename first_variadic_arg<Args_...>::type;
 #pragma endregion
 
+#pragma region VALUE_EXTRACTORS
+	/// <summary>
+	/// <para> Extracts the first argument value of a selection of variadic template Values_, storing it as the internal value. </para>
+	/// <para> This uses auto argument type deduction, allowing support for multiple argument types. </para>
+	/// <para> If 1 or more arguments are provided: value will be the first argument. </para>
+	/// <para> If 0 arguments are provided: value will be 0. </para>
+	/// </summary>
+	template<auto...Values_>
+	struct first_variadic_value
+	{
+		static constexpr auto value = 0;
+	};
+
+	template<auto First_, auto...Others_>
+	struct first_variadic_value<First_, Others_...>
+	{
+		static constexpr auto value = First_;
+	};
+
+	template<auto First_>
+	struct first_variadic_value<First_>
+	{
+		static constexpr auto value = First_;
+	};
+
+	template<>
+	struct first_variadic_value<>
+	{
+		static constexpr auto value = 0;
+	};
+
+	template<auto...Values_>
+	static constexpr inline auto first_variadic_value_v = first_variadic_value<Values_...>::value;
+#pragma endregion
+
 #pragma region VARIADIC_BOOLS
 	/// <summary> Type to easily produce the result of a logical AND with variadic template argument results, with a consistent `false` value with no arguments. </summary>
 	template<bool...Bools_>

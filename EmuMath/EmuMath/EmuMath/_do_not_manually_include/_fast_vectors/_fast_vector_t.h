@@ -64,6 +64,8 @@ namespace EmuMath
 		static constexpr std::size_t num_registers = (total_element_width / register_width) + requires_partial_register;
 		/// <summary> Boolean indicating if the underlying implementation of this Vector makes use of multiple SIMD registers. </summary>
 		static constexpr bool contains_multiple_registers = num_registers > 1;
+		/// <summary> The total number of elements contained within this Vector's regiseters, including those exceeding its encapsulated range. </summary>
+		static constexpr std::size_t full_width_size = elements_per_register * num_registers;
 
 		/// <summary>
 		/// <para> 
@@ -76,6 +78,13 @@ namespace EmuMath
 
 		/// <summary> Standard index sequence that may be used to statically iterate over this Vector's encapsulated elements. </summary>
 		using index_sequence = std::make_index_sequence<size>;
+		/// <summary> 
+		/// <para>
+		///		Standard index sequence that may be used to statically iterate over every element of this Vector's registers, 
+		///		including those exceeding its encapsulated range.
+		/// </para>
+		/// </summary>
+		using full_width_index_sequence = std::make_index_sequence<full_width_size>;
 		/// <summary> Standard index sequence that may be used to statically iterate over this Vector's registers if it contains multiple. </summary>
 		using register_index_sequence = std::make_index_sequence<num_registers>;
 
@@ -125,38 +134,38 @@ namespace EmuMath
 			}
 		}
 
-		template<std::size_t Index_, typename Vector_>
+		template<std::size_t FullWidthIndex_, typename Vector_>
 		struct _vector_get_index_for_load_result
 		{
 			using _vector_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
-			using _get_result = decltype(std::declval<_vector_uq>().AtTheoretical<Index_>());
+			using _get_result = decltype(std::declval<_vector_uq>().AtTheoretical<FullWidthIndex_>());
 
 			using type = typename std::conditional
 			<
-				(Index_ > _vector_uq::size) || std::is_lvalue_reference_v<Vector_>,
+				(FullWidthIndex_ > _vector_uq::size) || std::is_lvalue_reference_v<Vector_>,
 				_get_result,
 				decltype(std::move(std::declval<_get_result>()))
 			>::type;
 		};
 
-		template<std::size_t Index_, typename Vector_>
-		[[nodiscard]] static constexpr inline typename _vector_get_index_for_load_result<Index_, Vector_>::type _get_index_from_normal_vector(Vector_&& arg_)
+		template<std::size_t FullWidthIndex_, typename Vector_>
+		[[nodiscard]] static constexpr inline typename _vector_get_index_for_load_result<FullWidthIndex_, Vector_>::type _get_index_from_normal_vector(Vector_&& arg_)
 		{
 			using vector_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
-			if constexpr (Index_ > vector_uq::size || std::is_lvalue_reference_v<Vector_>)
+			if constexpr (FullWidthIndex_ > vector_uq::size || std::is_lvalue_reference_v<Vector_>)
 			{
-				return arg_.AtTheoretical<Index_>();
+				return arg_.AtTheoretical<FullWidthIndex_>();
 			}
 			else
 			{
-				return std::move(arg_.AtTheoretical<Index_>());
+				return std::move(arg_.AtTheoretical<FullWidthIndex_>());
 			}
 		}
 
-		template<class Vector_, std::size_t...Indices_>
-		[[nodiscard]] static constexpr inline bool _may_create_from_all_normal_vector_indices(std::index_sequence<Indices_...> indices_)
+		template<class Vector_, std::size_t...FullWidthIndices_>
+		[[nodiscard]] static constexpr inline bool _may_create_from_all_normal_vector_indices(std::index_sequence<FullWidthIndices_...> indices_)
 		{
-			return (... && EmuCore::TMP::is_static_castable_v<decltype(_get_index_from_normal_vector<Indices_>(std::declval<Vector_>())), value_type>);
+			return (... && EmuCore::TMP::is_static_castable_v<typename _vector_get_index_for_load_result<FullWidthIndices_, Vector_>::type, value_type>);
 		}
 
 	public:
@@ -174,7 +183,40 @@ namespace EmuMath
 			}
 			else
 			{
-				return _may_create_from_all_normal_vector_indices<Arg_>(index_sequence());
+				return _may_create_from_all_normal_vector_indices<Arg_>(full_width_index_sequence());
+			}
+		}
+
+		template<typename...Args_>
+		[[nodiscard]] static constexpr inline bool valid_args_for_per_register_construction()
+		{
+			if constexpr (_is_reserved_for_explicitly_typed_constructor<Args_...>())
+			{
+				return false;
+			}
+			else
+			{
+				constexpr std::size_t num_args = sizeof...(Args_);
+				if constexpr (num_args != num_registers)
+				{
+					return false;
+				}
+				else
+				{
+					if constexpr (num_args == 1)
+					{
+						using single_arg = typename EmuCore::TMP::first_variadic_arg<Args_...>::type;
+						return
+						(
+							!valid_arg_for_normal_vector_conversion_construction<single_arg>() &&
+							std::is_same_v<register_type, typename EmuCore::TMP::remove_ref_cv<single_arg>::type>
+						);
+					}
+					else
+					{
+						return (... && std::is_same_v<register_type, typename EmuCore::TMP::remove_ref_cv<Args_>::type>);
+					}
+				}
 			}
 		}
 
@@ -204,6 +246,7 @@ namespace EmuMath
 						return
 						(
 								!valid_arg_for_normal_vector_conversion_construction<single_arg>() &&
+								!valid_args_for_per_register_construction<Args_...>() &&
 								EmuCore::TMP::is_static_castable<decltype(std::forward<single_arg>(std::declval<single_arg>())), value_type>::value
 						);
 					}
@@ -211,6 +254,7 @@ namespace EmuMath
 					{
 						return 
 						(
+							!valid_args_for_per_register_construction<Args_...>() &&
 							(... && EmuCore::TMP::is_static_castable_v<decltype(std::forward<Args_>(std::declval<Args_>())), value_type>)
 						);
 					}
@@ -231,8 +275,12 @@ namespace EmuMath
 			}
 			else
 			{
+				constexpr std::size_t num_args = sizeof...(Args_);
+				using first_arg = typename EmuCore::TMP::first_variadic_arg<Args_...>::type;
 				return
 				(
+					(num_args == 1 && valid_arg_for_normal_vector_conversion_construction<first_arg>()) ||
+					valid_args_for_per_register_construction<Args_...>() ||
 					valid_args_for_per_element_construction<Args_...>()
 				);
 			}
@@ -294,8 +342,12 @@ namespace EmuMath
 		/// <para> Variadic constructor which is used for per-element construction and conversion construction. If available, the first possible in the list will be chosen: </para>
 		/// <para>
 		///		EmuMath::Vector conversion: Constructs the Vector using respective indices in a passed EmuMath::Vector argument, performing necessary conversions. 
-		///		This will attempt optimised loads instead of sets if possible.
+		///		This will attempt optimised loads instead of sets where possible.
 		///		Available where `sizeof...(Args_) == 1`, the argument is an EmuMath Vector, and all of its required theoretical indices may be used as a `value_type`.
+		/// </para>
+		/// <para>
+		///		Per-register construction: Constructs the Vector using respective arguments to construct each register. 
+		///		Available where `sizeof...(Args_) == num_registers` and all arguments are of this Vector's register_type.
 		/// </para>
 		/// <para>
 		///		Per-element construction: Constructs the Vector using respective arguments to construct indices as in the matching variadic constructor of EmuMath::Vector. 
@@ -306,7 +358,6 @@ namespace EmuMath
 		template<typename...ConstructionArgs_, typename = std::enable_if_t<valid_variadic_construction_args<ConstructionArgs_...>()>>
 		explicit constexpr inline FastVector(ConstructionArgs_&&...args_) : data(_do_variadic_construction(std::forward<ConstructionArgs_>(args_)...))
 		{
-			// TODO: normal->fast vector conversion
 		}
 #pragma endregion
 
@@ -433,7 +484,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="p_out_">
 		///		<para> Pointer to contiguous memory to output to. </para>
-		///		<para> If FullWidth_ is true or this Vector does not require a partial register, this must point to at least (num_registers * elements_per_register) items. </para>
+		///		<para> If FullWidth_ is true or this Vector does not require a partial register, this must point to at least full_width_size items. </para>
 		///		<para> 
 		///			If FullWidth_ is false and this Vector and this Vector requires a partial register,
 		///			this must point to at least ((num_registers - 1) * elements_per_register) + partial_register_length) items.
@@ -491,10 +542,21 @@ namespace EmuMath
 			}
 		}
 
+#pragma region VARIADIC_CONSTRUCTORS
 		template<typename...Args_>
 		static constexpr inline data_type _do_variadic_construction(Args_&&...args_)
 		{
-			if constexpr (valid_args_for_per_element_construction<Args_...>())
+			constexpr std::size_t num_args = sizeof...(Args_);
+			using first_arg = typename std::conditional<num_args != 0, typename EmuCore::TMP::first_variadic_arg<Args_...>::type, void>::type;
+			if constexpr (num_args == 1 && valid_arg_for_normal_vector_conversion_construction<first_arg>())
+			{
+				return _make_as_normal_vector_conversion(std::forward<Args_>(args_)...);
+			}
+			else if constexpr (valid_args_for_per_register_construction<Args_...>())
+			{
+				return _make_with_arg_per_register(std::forward<Args_>(args_)...);
+			}
+			else if constexpr (valid_args_for_per_element_construction<Args_...>())
 			{
 				return _make_with_arg_per_element(std::forward<Args_>(args_)...);
 			}
@@ -505,6 +567,64 @@ namespace EmuMath
 					EmuCore::TMP::get_false<Args_...>(),
 					"False-positive allowed for variadic construction of an EmuMath::FastVector; no variadic construction method is available."
 				);
+			}
+		}
+
+		template<class Vector_, std::size_t...FullWidthIndices_>
+		static constexpr inline register_type _make_register_from_normal_vector(Vector_&& vector_, std::index_sequence<FullWidthIndices_...> indices_)
+		{
+			using vector_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
+			using vector_stored_uq = typename std::remove_cv<typename vector_uq::stored_type>::type;
+			constexpr std::size_t num_indices = sizeof...(FullWidthIndices_);
+			constexpr bool all_indices_in_range = (... && (FullWidthIndices_ < vector_uq::size));
+			if constexpr (all_indices_in_range && std::is_same_v<value_type, vector_stored_uq>)
+			{
+				constexpr std::size_t first_index = EmuCore::TMP::first_variadic_value_v<FullWidthIndices_...>;
+				return EmuSIMD::load<register_type>(vector_.data<first_index>());
+			}
+			else
+			{
+				return EmuSIMD::setr<register_type, per_element_byte_size>(_get_index_from_normal_vector<FullWidthIndices_>(std::forward<Vector_>(vector_))...);
+			}
+		}
+
+		template<class Vector_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _make_array_as_normal_vector_conversion(Vector_&& vector_, std::index_sequence<RegisterIndices_...> register_indices_)
+		{
+			return data_type
+			({ 
+				_make_register_from_normal_vector
+				(
+					std::forward<Vector_>(vector_),
+					EmuCore::TMP::make_offset_index_sequence<RegisterIndices_ * elements_per_register, elements_per_register>()
+				)...
+			});
+		}
+
+		template<class Vector_>
+		static constexpr inline data_type _make_as_normal_vector_conversion(Vector_&& vector_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return _make_array_as_normal_vector_conversion(std::forward<Vector_>(vector_), register_index_sequence());
+			}
+			else
+			{
+				return _make_register_from_normal_vector(std::forward<Vector_>(vector_), full_width_index_sequence());
+			}
+		}
+
+		template<typename...Args_>
+		static constexpr inline data_type _make_with_arg_per_register(Args_&&...args_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return data_type({ register_type(std::forward<Args_>(args_))... });
+			}
+			else
+			{
+				// Realistically this shouldn't be called since the explicitly-typed constructor will cover it, but here as a safe fallback
+				return data_type(std::forward<Args_>(args_)...);
 			}
 		}
 
@@ -558,6 +678,7 @@ namespace EmuMath
 				);
 			}
 		}
+#pragma endregion
 
 		template<std::size_t OutSize_, typename OutT_, std::size_t SrcSize_, std::size_t...OutIndices_>
 		static constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_normal_vector(value_type* p_src_, std::index_sequence<OutIndices_...> out_indices_)
