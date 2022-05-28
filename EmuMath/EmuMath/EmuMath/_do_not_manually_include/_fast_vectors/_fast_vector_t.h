@@ -79,6 +79,19 @@ namespace EmuMath
 		/// <summary> Standard index sequence that may be used to statically iterate over this Vector's registers if it contains multiple. </summary>
 		using register_index_sequence = std::make_index_sequence<num_registers>;
 
+#pragma region STATIC_GETS
+	public:
+		static constexpr inline this_type make_all_zero()
+		{
+			return this_type(EmuSIMD::setzero<register_type>());
+		}
+
+		static constexpr inline this_type make_all_one()
+		{
+			return this_type(EmuSIMD::setallone<register_type>());
+		}
+#pragma endregion
+
 #pragma region CONSTRUCTOR_VALIDATORS
 	private:
 		template<typename Arg_>
@@ -89,7 +102,8 @@ namespace EmuMath
 			(
 				std::is_same_v<this_type, arg_uq> ||	// Reserved for copy/move construction
 				std::is_same_v<value_type, arg_uq> ||	// Reserved for all-as-one construction
-				std::is_same_v<value_type*, arg_uq>		// Reserved for load construction
+				std::is_same_v<value_type*, arg_uq>	 ||	// Reserved for load construction
+				std::is_same_v<register_type, arg_uq>	// Reserved for all-registers-as-one construction
 			);
 		}
 
@@ -260,6 +274,14 @@ namespace EmuMath
 		}
 
 		/// <summary>
+		/// <para> Variant of all-as-one constructor which instead initialises all registers to match the passed register of this Vector's register_type. </para>
+		/// </summary>
+		/// <param name="to_set_all_registers_to_">SIMD register of this Vector's register_type to initialise all of this Vector's registers as.</param>
+		explicit constexpr inline FastVector(register_type to_set_all_registers_to_) : data(_do_set_all_same_register(to_set_all_registers_to_))
+		{
+		}
+
+		/// <summary>
 		/// <para> Loading constructor for a FastVector which loads data directly from bytes in memory. </para>
 		/// <para> This is a full-width load which considers only the width of the underlying registers; the passed pointer must account for this. </para>
 		/// </summary>
@@ -312,7 +334,7 @@ namespace EmuMath
 		{
 			if constexpr (contains_multiple_registers)
 			{
-
+				_set_one_array(register_index_sequence());
 			}
 			else
 			{
@@ -340,6 +362,12 @@ namespace EmuMath
 		constexpr inline void _set_zero_array(std::index_sequence<RegisterIndices_...> indices_)
 		{
 			((data[RegisterIndices_] = EmuSIMD::setzero<register_type>()), ...);
+		}
+
+		template<std::size_t...RegisterIndices_>
+		constexpr inline void _set_one_array(std::index_sequence<RegisterIndices_...> indices_)
+		{
+			((data[RegisterIndices_] = EmuSIMD::setallone<register_type>()), ...);
 		}
 
 		template<std::size_t...RegisterIndices_>
@@ -705,6 +733,30 @@ namespace EmuMath
 		static constexpr inline register_type _set_all_same_discard_index(const value_type& to_set_all_to_)
 		{
 			return EmuSIMD::set1<register_type, per_element_width>(to_set_all_to_);
+		}
+
+		static constexpr inline data_type _do_set_all_same_register(register_type to_set_all_registers_to_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return _do_array_set_all_same_register(to_set_all_registers_to_, register_index_sequence());
+			}
+			else
+			{
+				return to_set_all_registers_to_;
+			}
+		}
+
+		template<std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_set_all_same_register(register_type to_set_all_registers_to_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type({ _construct_register_discard_index<RegisterIndices_>(to_set_all_registers_to_)... });
+		}
+
+		template<std::size_t Index_, typename Arg_>
+		static constexpr inline register_type _construct_register_discard_index(Arg_&& arg_)
+		{
+			return register_type(std::forward<Arg_>(arg_));
 		}
 
 		static constexpr inline data_type _do_load(const value_type* p_to_load_)
