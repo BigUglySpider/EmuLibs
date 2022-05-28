@@ -254,6 +254,14 @@ int main()
 	std::cout << EmuMath::FastVector<3, float>(EmuMath::Vector<8, const float>(1, 2, 3, 4, 42, 69, 420, 42)) << "\n";
 	std::cout << EmuMath::FastVector<12, float>(_mm_set_ps(1, 2, 3, 4), _mm_set_ps(4, 3, 2, 1), _mm_set_ps(42, 42, 42, 42)) << "\n";
 
+	std::cout << "\n\n";
+	std::cout << fast_v8f_a << "\n";
+	fast_v8f_a.GetRegisterTheoretical<1>() = _mm_set_ps(42, 4242, 424242, 42424242);
+	std::cout << fast_v8f_a << "\n";
+	std::cout << fast_v4f_b << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, fast_v4f_b.GetRegisterTheoretical<0>()) << "\n";
+	EmuSIMD::append_simd_vector_to_stream(std::cout, fast_v4f_b.GetRegisterTheoretical<1>()) << "\n";
+
 
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);

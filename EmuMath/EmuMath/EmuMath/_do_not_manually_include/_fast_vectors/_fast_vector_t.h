@@ -105,6 +105,23 @@ namespace EmuMath
 				decltype(std::move(std::declval<_get_result>()))
 			>::type;
 		};
+	
+	public:
+		/// <summary>
+		/// <para> Helper type for determining what an output type will be when using `GetRegisterTheoretical()`. </para>
+		/// <para> If `RegisterIndex_` is a contained register index, type will be a (const-qualified if `IsConst_` is true) reference to this Vector's `register_type`. </para>
+		/// <para> If `RegisterIndex_` exceeds this Vector type's register range, `type` will be this Vector's `register_type`. </para>
+		/// </summary>
+		template<std::size_t RegisterIndex_, bool IsConst_>
+		struct theoretical_register_get_result
+		{
+			using type = typename std::conditional
+			<
+				(RegisterIndex_ < num_registers),
+				typename EmuCore::TMP::conditional_const<IsConst_, register_type&>::type,
+				register_type
+			>::type;
+		};
 #pragma endregion
 
 #pragma region STATIC_GETS
@@ -366,18 +383,99 @@ namespace EmuMath
 
 #pragma region GETTERS
 	public:
-		template<std::size_t Index_>
-		constexpr inline register_type& GetRegister()
+		/// <summary>
+		/// <para> Retrieves a copy of the value at the specified index within this Vector. </para>
+		/// <para> Performs a compile-time bounds check to ensure that the index is contained. If the check fails, this triggers a static_assert. </para>
+		/// <para>
+		///		The bounds check may either be for this Vector's encapsulated range or for the full range of its underlying indices. 
+		///		By default only the encapsulated range is used, but the full-width range may be used by setting `IncludeNonEncapsulated_` to true in the template arguments.
+		/// </para>
+		/// <para> This may not be used to retrieve references. </para>
+		/// <para>
+		///		This operation can become expensive after multiple calls, and in general is not very efficient compared to normal Vector access. 
+		///		As such, if multiple accesses are required it is highly recommended to instead store this Vector to a normal EmuMath Vector first and read from that.
+		/// </para>
+		/// </summary>
+		/// <returns>Copy of the value at the specified index within this Vector's registers.</returns>
+		template<std::size_t Index_, bool IncludeNonEncapsulated_ = false>
+		[[nodiscard]] constexpr inline value_type at() const
 		{
-			if constexpr (Index_ < num_registers)
+			constexpr std::size_t max_index = IncludeNonEncapsulated_ ? full_width_size : size;
+			if constexpr (Index_ < max_index)
 			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<Index_>(),
-					"Attempted to retrieve a register from an EmuMath::FastVector, but provided an index exceeding the range of the Vector's registers."
-				);
+				if constexpr (contains_multiple_registers)
+				{
+					constexpr std::size_t register_index = Index_ / elements_per_register;
+					constexpr std::size_t index_in_register = Index_ % elements_per_register;
+					return EmuSIMD::get_index<index_in_register, value_type>(GetRegister<register_index>());
+				}
+				else
+				{
+					return EmuSIMD::get_index<Index_, value_type>(data);
+				}
 			}
 			else
+			{
+				if constexpr (IncludeNonEncapsulated_)
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Index_>(),
+						"Attempted to retrieve a value from an EmuMath::FastVector (including non-encapsulated indices), but provided an Index_ exceeding the range of the Vector's full width size."
+					);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Index_>(),
+						"Attempted to retrieve a value from an EmuMath::FastVector (excluding non-encapsulated indices), but provided an Index_ exceeding the range of the Vector's encapsulated size."
+					);
+				}
+			}
+		}
+
+		/// <summary>
+		/// <para> Retrieves a copy of the value at the specified theoretical index within this Vector. </para>
+		/// <para> Performs a compile-time bounds check to ensure that the index is contained. If the check fails, this returns a newly constructed implied-zero. </para>
+		/// <para>
+		///		The bounds check may either be for this Vector's encapsulated range or for the full range of its underlying indices. 
+		///		By default only the encapsulated range is used, but the full-width range may be used by setting `IncludeNonEncapsulated_` to true in the template arguments.
+		/// </para>
+		/// <para> This may not be used to retrieve references. </para>
+		/// <para>
+		///		This operation can become expensive after multiple calls, and in general is not very efficient compared to normal Vector access. 
+		///		As such, if multiple accesses are required it is highly recommended to instead store this Vector to a normal EmuMath Vector first and read from that.
+		/// </para>
+		/// </summary>
+		/// <returns>
+		///		Copy of the value at the specified theoretical index within this Vector's registers, 
+		///		which will be this Vector's implied-zero if the index is not contained.
+		/// </returns>
+		template<std::size_t Index_, bool IncludeNonEncapsulated_ = false>
+		[[nodiscard]] constexpr inline value_type AtTheoretical() const
+		{
+			constexpr std::size_t max_index = IncludeNonEncapsulated_ ? full_width_size : size;
+			if constexpr (Index_ < max_index)
+			{
+				return at<Index_, IncludeNonEncapsulated_>();
+			}
+			else
+			{
+				return vector_type::get_implied_zero();
+			}
+		}
+
+		/// <summary>
+		/// <para> Retrieves a reference to the SIMD register at the provided index within this Vector's underlying registers. </para>
+		/// <para> Performs a compile-time bounds check to ensure that the register is contained. If the check fails, this triggers a static_assert. </para>
+		/// <para> If this Vector only contains one register, this will return a reference to `data` directly if Index_ is correctly 0. </para>
+		/// </summary>
+		/// <returns>Reference to the register at the provided index of this Vector's underlying registers.</returns>
+		template<std::size_t Index_>
+		[[nodiscard]] constexpr inline register_type& GetRegister()
+		{
+			if constexpr (Index_ < num_registers)
 			{
 				if constexpr (contains_multiple_registers)
 				{
@@ -388,12 +486,60 @@ namespace EmuMath
 					return data;
 				}
 			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Index_>(),
+					"Attempted to retrieve a register from an EmuMath::FastVector, but provided an Index_ exceeding the range of the Vector's registers."
+				);
+			}
 		}
 
+		/// <summary>
+		/// <para> Retrieves a const-qualified to the SIMD register at the provided Index_ within this Vector's underlying registers. </para>
+		/// <para> Performs a compile-time bounds check to ensure that the register is contained. If the check fails, this triggers a static_assert. </para>
+		/// <para> If this Vector only contains one register, this will return a const-qualified reference to `data` directly if Index_ is correctly 0. </para>
+		/// </summary>
+		/// <returns>Const-qualified reference to the register at the provided index of this Vector's underlying registers.</returns>
 		template<std::size_t Index_>
-		constexpr inline const register_type& GetRegister() const
+		[[nodiscard]] constexpr inline const register_type& GetRegister() const
 		{
 			return const_cast<this_type*>(this)->GetRegister();
+		}
+
+		/// <summary>
+		/// <para> 
+		///		Retrieves a reference to the SIMD register at the provided Index_ within this Vector's underlying registers, 
+		///		or a newly-created zeroed register if it is not contained. </para>
+		/// <para> If this Vector only contains one register and the provided Index_ is 0, this will return a reference to data directly. </para>
+		/// </summary>
+		/// <returns>Reference to the register at the provided Index_ if it is contained; otherwise a newly created zeroed register.</returns>
+		template<std::size_t Index_>
+		[[nodiscard]] constexpr inline typename theoretical_register_get_result<Index_, false>::type GetRegisterTheoretical()
+		{
+			if constexpr (Index_ < num_registers)
+			{
+				return GetRegister<Index_>();
+			}
+			else
+			{
+				return EmuSIMD::setzero<register_type>();
+			}
+		}
+
+		/// <summary>
+		/// <para> 
+		///		Retrieves a const-qualified reference to the SIMD register at the provided Index_ within this Vector's underlying registers, 
+		///		or a newly-created zeroed register if it is not contained.
+		/// </para>
+		/// <para> If this Vector only contains one register and the provided Index_ is 0, this will return a reference to data directly. </para>
+		/// </summary>
+		/// <returns>Const-qualified reference to the register at the provided Index_ if it is contained; otherwise a newly created zeroed register.</returns>
+		template<std::size_t Index_>
+		[[nodiscard]] constexpr inline typename theoretical_register_get_result<Index_, true>::type GetRegisterTheoretical() const
+		{
+			return const_cast<this_type*>(this)->GetRegisterTheoretical<Index_>();
 		}
 #pragma endregion
 
