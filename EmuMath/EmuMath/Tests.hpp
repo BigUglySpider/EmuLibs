@@ -10,6 +10,7 @@
 #include <tuple>
 
 // ADDITIONAL INCLUDES
+#include "EmuMath/FastVector.h"
 #include "EmuMath/Matrix.h"
 #include "EmuMath/Vector.h"
 #include "EmuMath/Random.h"
@@ -49,6 +50,31 @@ namespace EmuCore::TestingHelpers
 		return out_;
 	}
 
+	template<class OutVec_, typename T_, std::size_t...Indices_>
+	[[nodiscard]] inline OutVec_ make_vec_from_data(const T_* p_data_, std::index_sequence<Indices_...> indices_)
+	{
+		return OutVec_((*(p_data_ + Indices_))...);
+	}
+
+	template<class OutVec_, typename T_, std::size_t Size_, bool Is64Bit_>
+	[[nodiscard]] inline OutVec_ make_random_vec(EmuMath::RngWrapper<Is64Bit_>& rng_)
+	{
+		T_ out_[Size_];
+		for (std::size_t i = 0; i < Size_; ++i)
+		{
+			if constexpr (std::is_floating_point_v<EmuCore::TMP::remove_ref_cv_t<T_>>)
+			{
+				out_[i] = rng_.NextReal<T_>();
+			}
+			else
+			{
+				out_[i] = rng_.NextInt<T_>();
+			}
+		}
+
+		return make_vec_from_data<OutVec_>(out_, std::make_index_sequence<Size_>());
+	}
+
 	/// <summary> Example which only contains the required items for the test harness. </summary>
 	struct ExampleTest
 	{
@@ -73,73 +99,136 @@ namespace EmuCore::TestingHelpers
 		}
 	};
 
-	template<bool Fused_>
-	struct MultiplyAddMatTest
+	struct EmuFastVectorTest
 	{
 		static constexpr bool DO_TEST = true;
 		static constexpr bool PASS_LOOP_NUM = true;
 		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = Fused_ ? "Multiply-Add (Fused)" : "Multiply-Add (Manual)";
+		static constexpr std::string_view NAME = "Emu FastVector";
 
-		using a_mat_type = EmuMath::Matrix<4, 4, float, true>;
-		using b_type = EmuMath::Matrix<4, 4, float, true>;
-		using c_type = float;
-		static constexpr std::size_t out_num_columns = a_mat_type::num_columns;
-		static constexpr std::size_t out_num_rows = a_mat_type::num_rows;
-		static constexpr bool out_column_major = a_mat_type::is_column_major;
-		using out_t = a_mat_type::value_type_uq;
+		static constexpr std::size_t vec_size = 4;
+		using vec_t_arg = float;
+		using fast_vector_type = EmuMath::FastVector<vec_size, vec_t_arg>;
+		using vector_type = typename fast_vector_type::vector_type;
+		using lhs_type = fast_vector_type;
+		using rhs_type = fast_vector_type;
+		using output_type = fast_vector_type;
 
-		MultiplyAddMatTest()
+		EmuFastVectorTest()
 		{
 		}
 		void Prepare()
 		{
 			// FILLS
-			out_mats.resize(NUM_LOOPS);
+			out_vecs.resize(NUM_LOOPS);
 
 			// RESERVES
-			args_a.reserve(NUM_LOOPS);
-			args_b.reserve(NUM_LOOPS);
-			args_c.reserve(NUM_LOOPS);
+			lhs.reserve(NUM_LOOPS);
+			rhs.reserve(NUM_LOOPS);
 
 			// RESERVED FILLS
 			EmuMath::RngWrapper<true> rng_(-100, 100, shared_fill_seed_);
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				args_a.emplace_back(make_random_mat<a_mat_type>(rng_));
-				args_b.emplace_back(make_random_mat<b_type>(rng_));
-				args_c.emplace_back(rng_.NextReal<c_type>());
+				lhs.emplace_back(make_random_vec<lhs_type, vec_t_arg, vec_size>(rng_));
+				rhs.emplace_back(make_random_vec<lhs_type, vec_t_arg, vec_size>(rng_));
 			}
 		}
 		void operator()(std::size_t i_)
 		{
-			if constexpr (Fused_)
-			{
-				args_a[i_].Fmadd(out_mats[i_], args_b[i_], args_c[i_]);
-			}
-			else
-			{
-				out_mats[i_] = args_a[i_].MultiplyBasic(args_b[i_]).Add(args_c[i_]);
-			}
+			// ADD
+			out_vecs[i_] = lhs[i_].Add(rhs[i_]);
 		}
 		void OnTestsOver()
 		{
 			const std::size_t i_ = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
-			std::cout << args_a[i_] << "\n*\n" << args_b[i_] << "\n+\n" << args_c[i_] << "\n=\n" << out_mats[i_] << "\n\n";
+			std::cout << lhs[i_] << " +\n" << rhs[i_] << " =\n" << out_vecs[i_] << "\n\n";
 		}
 
-		std::vector<a_mat_type> args_a;
-		std::vector<b_type> args_b;
-		std::vector<c_type> args_c;
-		std::vector<EmuMath::Matrix<out_num_columns, out_num_rows, out_t, out_column_major>> out_mats;
+		std::vector<lhs_type> lhs;
+		std::vector<rhs_type> rhs;
+		std::vector<output_type> out_vecs;
+	};
+
+	struct DirectXSimdTest
+	{
+		static constexpr bool DO_TEST = true;
+		static constexpr bool PASS_LOOP_NUM = true;
+		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
+		static constexpr std::string_view NAME = "DirectX SIMD";
+
+		static constexpr std::size_t vec_size = 4;
+		using vec_t_arg = float;
+		using fast_vector_type = DirectX::XMVECTOR;
+		using vector_type = DirectX::XMFLOAT4;
+		using lhs_type = fast_vector_type;
+		using rhs_type = fast_vector_type;
+		using output_type = fast_vector_type;
+
+		DirectXSimdTest()
+		{
+		}
+		void Prepare()
+		{
+			// FILLS
+			out_vecs.resize(NUM_LOOPS);
+
+			// RESERVES
+			lhs.reserve(NUM_LOOPS);
+			rhs.reserve(NUM_LOOPS);
+
+			// RESERVED FILLS
+			EmuMath::RngWrapper<true> rng_(-100, 100, shared_fill_seed_);
+			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
+			{
+				lhs.emplace_back(make_vector(rng_));
+				rhs.emplace_back(make_vector(rng_));
+			}
+		}
+		void operator()(std::size_t i_)
+		{
+			out_vecs[i_] = DirectX::XMVectorAdd(lhs[i_], rhs[i_]);
+		}
+		void OnTestsOver()
+		{
+			const std::size_t i_ = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
+			print_vector(lhs[i_]) << " +\n";
+			print_vector(rhs[i_]) << " =\n";
+			print_vector(out_vecs[i_]) << "\n\n";
+		}
+
+		template<bool Is64Bit_>
+		static fast_vector_type make_vector(EmuMath::RngWrapper<Is64Bit_>& rng_)
+		{
+			vector_type vec = make_random_vec<vector_type, vec_t_arg, vec_size>(rng_);
+			return DirectX::XMLoadFloat4(&vec);
+		}
+
+		static std::ostream& print_vector(DirectX::XMVECTOR vec)
+		{
+			vector_type floatx;
+			DirectX::XMStoreFloat4(&floatx, vec);
+			return print_floatx(floatx);
+		}
+
+		static std::ostream& print_floatx(DirectX::XMFLOAT4 floatx)
+		{
+			std::cout << "{ " << floatx.x << ", " << floatx.y << ", " << floatx.z << ", " << floatx.w << " }";
+			return std::cout;
+		}
+
+		std::vector<lhs_type> lhs;
+		std::vector<rhs_type> rhs;
+		std::vector<output_type> out_vecs;
 	};
 
 	// ----------- TESTS SELECTION -----------
 	using AllTests = std::tuple
 	<
-		MultiplyAddMatTest<false>,
-		MultiplyAddMatTest<true>
+		EmuFastVectorTest,
+		DirectXSimdTest
 	>;
 
 	// ----------- TESTS BEGIN -----------

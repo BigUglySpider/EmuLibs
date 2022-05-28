@@ -211,6 +211,8 @@ int main()
 	srand(static_cast<unsigned int>(time(0)));
 	EmuCore::Timer<std::milli> timer_;
 
+	/*
+#pragma region PRE_TEST_BODY
 	EmuMath::FastVector<4, float> fast_v4f_a;
 	EmuMath::FastVector<4, float> fast_v4f_b(12);
 	std::cout << fast_v4f_a << std::endl;
@@ -261,6 +263,22 @@ int main()
 	std::cout << fast_v4f_b << "\n";
 	EmuSIMD::append_simd_vector_to_stream(std::cout, fast_v4f_b.GetRegisterTheoretical<0>()) << "\n";
 	EmuSIMD::append_simd_vector_to_stream(std::cout, fast_v4f_b.GetRegisterTheoretical<1>()) << "\n";
+
+	std::cout << "\n\n";
+	EmuMath::FastVector<4, float> fast_v4f_d(1, 2, 3, 4);
+	EmuMath::FastVector<4, float> fast_v4f_e(10, 20, 30, 42);
+	std::cout << fast_v4f_d << " + " << fast_v4f_e << " = " << fast_v4f_d.Add(fast_v4f_e) << "\n";
+
+	EmuMath::FastVector<8, std::int32_t> fast_v8i32_a(1, 2, 3, 4, 5, 6, 7, 8);
+	EmuMath::FastVector<8, std::int32_t> fast_v8i32_b(10, 20, 30, 42, 50, 60, 70, 80);
+	std::cout << fast_v8i32_a << " + " << fast_v8i32_b << " = " << fast_v8i32_a.Add(fast_v8i32_b) << "\n";
+
+	std::cout << "\n\n";
+	EmuMath::FastVector<16, std::uint16_t, 128> fast_v16u16_a(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	EmuMath::FastVector<16, std::uint16_t, 128> fast_v16u16_b(10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160);
+	std::cout << fast_v16u16_a << " +\n" << fast_v16u16_b << " =\n" << fast_v16u16_a.Add(fast_v16u16_b) << "\n";
+	std::cout << fast_v16u16_a << " + 16 = " << fast_v16u16_a.Add(16) << "\n";
+	std::cout << EmuMath::FastVector<4, std::int32_t>(1, 2, 3, 4).Add(5) << "\n";
 
 
 	system("pause");
@@ -367,10 +385,20 @@ int main()
 	//
 	//WriteNoiseTableToPPM(noise_, noise_gradient_, "test_noise_scalar");
 	//WriteNoiseTableToPPM(fast_noise_, noise_gradient_, "test_noise_simd");
-	 
+#pragma endregion
+	 */
+
+	/*// Some tests to see disassembly
+	EmuMath::FastVector<4, float> veca((rand() % 100) * 0.33f, (rand() % 100) * 0.33f, (rand() % 100) * 0.33f, (rand() % 100) * 0.33f);
+	EmuMath::FastVector<4, float> vecb((rand() % 100) * 0.33f, (rand() % 100) * 0.33f, (rand() % 100) * 0.33f, (rand() % 100) * 0.33f);
+	auto result = veca.Add(vecb);
+	std::cout << result << "\n";
+	*/
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();
 #pragma endregion
+	//std::cout << result.Add(rand()) << " :)";
 	return 0;
 }

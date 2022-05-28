@@ -379,6 +379,55 @@ namespace EmuMath
 		explicit constexpr inline FastVector(ConstructionArgs_&&...args_) : data(_do_variadic_construction(std::forward<ConstructionArgs_>(args_)...))
 		{
 		}
+
+	private:
+		/// <summary>
+		/// <para> Private constructor for creating a new instance of this FastVector type with a newly created data_type. Disabled if this Vector has 1 register. </para>
+		/// </summary>
+		template<typename = std::enable_if_t<contains_multiple_registers>>
+		explicit constexpr inline FastVector(data_type&& data_) : data(std::move(data_))
+		{
+		}
+#pragma endregion
+
+#pragma region BASIC_ARITHMETIC
+	public:
+		[[nodiscard]] constexpr inline this_type Add(register_type rhs_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_add(data, rhs_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::add<per_element_width>(data, rhs_for_all_));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type Add(value_type rhs_for_all_) const
+		{
+			return Add(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		[[nodiscard]] constexpr inline this_type Add(const this_type& rhs_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_add(data, rhs_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::add<per_element_width>(data, rhs_.data));
+			}
+		}
+
+	private:
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_add(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			return data_type({ EmuSIMD::add<per_element_width>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))... });
+		}
 #pragma endregion
 
 #pragma region GETTERS
@@ -662,6 +711,29 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region ASSIGNMENT_OPERATORS
+	public:
+		constexpr inline this_type& operator=(const this_type& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_assign(rhs_, register_index_sequence());
+			}
+			else
+			{
+				data = rhs_.data;
+			}
+			return *this;
+		}
+
+	private:
+		template<std::size_t...RegisterIndices_>
+		constexpr inline void _do_array_assign(const this_type& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			((data[RegisterIndices_] = rhs_.data[RegisterIndices_]), ...);
+		}
+#pragma endregion
+
 #pragma region VECTOR_DATA
 	public:
 		/// <summary>
@@ -687,6 +759,32 @@ namespace EmuMath
 			else
 			{
 				return std::move(arg_.AtTheoretical<FullWidthIndex_>());
+			}
+		}
+
+		template<std::size_t Index_, typename Arg_>
+		[[nodiscard]] static constexpr inline const register_type& _retrieve_register_from_arg(Arg_&& arg_)
+		{
+			using arg_uq = typename EmuCore::TMP::remove_ref_cv<Arg_>::type;
+			if constexpr (std::is_same_v<this_type, arg_uq>)
+			{
+				return arg_.data[Index_];
+			}
+			else if constexpr (std::is_same_v<data_type, arg_uq>)
+			{
+				return arg_[Index_];
+			}
+			else if constexpr (std::is_same_v<register_type, arg_uq>)
+			{
+				return arg_;
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Arg_>(),
+					"Unable to retrieve a register argument from a provided argument for interacting with an EmuMath::FastVector."
+				);
 			}
 		}
 #pragma endregion
