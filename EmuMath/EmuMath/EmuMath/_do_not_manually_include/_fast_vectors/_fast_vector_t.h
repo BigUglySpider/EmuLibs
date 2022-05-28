@@ -21,6 +21,7 @@ namespace EmuMath
 	template<std::size_t Size_, typename T_, std::size_t RegisterWidth_>
 	struct FastVector
 	{
+#pragma region GENERAL_STATIC_INFO
 	public:
 		/// <summary> The number of elements that this Vector behaves to encapsulate. </summary>
 		static constexpr std::size_t size = Size_;
@@ -87,14 +88,36 @@ namespace EmuMath
 		using full_width_index_sequence = std::make_index_sequence<full_width_size>;
 		/// <summary> Standard index sequence that may be used to statically iterate over this Vector's registers if it contains multiple. </summary>
 		using register_index_sequence = std::make_index_sequence<num_registers>;
+#pragma endregion
+
+#pragma region GENERAL_HELPER_TYPES
+	private:
+		template<std::size_t FullWidthIndex_, typename Vector_>
+		struct _vector_get_index_for_load_result
+		{
+			using _vector_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
+			using _get_result = decltype(std::declval<_vector_uq>().AtTheoretical<FullWidthIndex_>());
+
+			using type = typename std::conditional
+				<
+				(FullWidthIndex_ > _vector_uq::size) || std::is_lvalue_reference_v<Vector_>,
+				_get_result,
+				decltype(std::move(std::declval<_get_result>()))
+			>::type;
+		};
+#pragma endregion
 
 #pragma region STATIC_GETS
 	public:
+		/// <summary> Makes a FastVector of this type with all register bits set to 0. </summary>
+		/// <returns>A newly constructed FastVector of this type with all register bits set to 0.</returns>
 		static constexpr inline this_type make_all_zero()
 		{
 			return this_type(EmuSIMD::setzero<register_type>());
 		}
 
+		/// <summary> Makes a FastVector of this type with all register bits set to 1. </summary>
+		/// <returns>A newly constructed FastVector of this type with all register bits set to 1.</returns>
 		static constexpr inline this_type make_all_one()
 		{
 			return this_type(EmuSIMD::setallone<register_type>());
@@ -134,34 +157,6 @@ namespace EmuMath
 			}
 		}
 
-		template<std::size_t FullWidthIndex_, typename Vector_>
-		struct _vector_get_index_for_load_result
-		{
-			using _vector_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
-			using _get_result = decltype(std::declval<_vector_uq>().AtTheoretical<FullWidthIndex_>());
-
-			using type = typename std::conditional
-			<
-				(FullWidthIndex_ > _vector_uq::size) || std::is_lvalue_reference_v<Vector_>,
-				_get_result,
-				decltype(std::move(std::declval<_get_result>()))
-			>::type;
-		};
-
-		template<std::size_t FullWidthIndex_, typename Vector_>
-		[[nodiscard]] static constexpr inline typename _vector_get_index_for_load_result<FullWidthIndex_, Vector_>::type _get_index_from_normal_vector(Vector_&& arg_)
-		{
-			using vector_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
-			if constexpr (FullWidthIndex_ > vector_uq::size || std::is_lvalue_reference_v<Vector_>)
-			{
-				return arg_.AtTheoretical<FullWidthIndex_>();
-			}
-			else
-			{
-				return std::move(arg_.AtTheoretical<FullWidthIndex_>());
-			}
-		}
-
 		template<class Vector_, std::size_t...FullWidthIndices_>
 		[[nodiscard]] static constexpr inline bool _may_create_from_all_normal_vector_indices(std::index_sequence<FullWidthIndices_...> indices_)
 		{
@@ -171,6 +166,7 @@ namespace EmuMath
 	public:
 		/// <summary>
 		/// <para> Returns a boolean indicating if the provided Arg_ is a valid argument for converting a normal EmuMath vector to a FastVector of this type. </para>
+		/// <para> Note that this refers purely to the variadic constructor; it may be that an explictly-typed constructor is available but this returns false. </para>
 		/// </summary>
 		/// <returns>True if Arg_ is valid for a normal->fast Vector conversion; otherwise false.</returns>
 		template<typename Arg_>
@@ -187,6 +183,11 @@ namespace EmuMath
 			}
 		}
 
+		/// <summary>
+		/// <para> Returns a boolean indicating if the provided Args_ are valid for creating a FastVector with one argument per register. </para>
+		/// <para> Note that this refers purely to the variadic constructor; it may be that an explictly-typed constructor is available but this returns false. </para>
+		/// </summary>
+		/// <returns>True if this FastVector type's registers can all be constructed using respective passed Args_; otherwise false.</returns>
 		template<typename...Args_>
 		[[nodiscard]] static constexpr inline bool valid_args_for_per_register_construction()
 		{
@@ -222,6 +223,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns a boolean indicating if the provided Args_ are valid for creating a FastVector with one argument per element. </para>
+		/// <para> Note that this refers purely to the variadic constructor; it may be that an explictly-typed constructor is available but this returns false. </para>
 		/// </summary>
 		/// <returns>True if this FastVector type's indices can all be constructed using the provided set of Args_; otherwise false.</returns>
 		template<typename...Args_>
@@ -264,6 +266,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Blanket check to determine if this FastVector's variadic constructor can be invoked with the provided Args_. </para>
+		/// <para> Note that this refers purely to the variadic constructor; it may be that an explictly-typed constructor is available but this returns false. </para>
 		/// </summary>
 		/// <returns>True if the variadic constructor of this FastVector can be invoked with the provided Args_; otherwise false.</returns>
 		template<typename...Args_>
@@ -361,6 +364,39 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region GETTERS
+	public:
+		template<std::size_t Index_>
+		constexpr inline register_type& GetRegister()
+		{
+			if constexpr (Index_ < num_registers)
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Index_>(),
+					"Attempted to retrieve a register from an EmuMath::FastVector, but provided an index exceeding the range of the Vector's registers."
+				);
+			}
+			else
+			{
+				if constexpr (contains_multiple_registers)
+				{
+					return data[Index_];
+				}
+				else
+				{
+					return data;
+				}
+			}
+		}
+
+		template<std::size_t Index_>
+		constexpr inline const register_type& GetRegister() const
+		{
+			return const_cast<this_type*>(this)->GetRegister();
+		}
+#pragma endregion
+
 #pragma region SETTERS
 	public:
 		/// <summary>
@@ -403,28 +439,10 @@ namespace EmuMath
 			{
 				_set_all_same_array(val_, register_index_sequence());
 			}
+			else
 			{
 				data = EmuSIMD::set1<register_type, per_element_width>(val_);
 			}
-		}
-
-	private:
-		template<std::size_t...RegisterIndices_>
-		constexpr inline void _set_zero_array(std::index_sequence<RegisterIndices_...> indices_)
-		{
-			((data[RegisterIndices_] = EmuSIMD::setzero<register_type>()), ...);
-		}
-
-		template<std::size_t...RegisterIndices_>
-		constexpr inline void _set_one_array(std::index_sequence<RegisterIndices_...> indices_)
-		{
-			((data[RegisterIndices_] = EmuSIMD::setallone<register_type>()), ...);
-		}
-
-		template<std::size_t...RegisterIndices_>
-		constexpr inline void _set1_array(const value_type& val_, std::index_sequence<RegisterIndices_...> indices_)
-		{
-			((data[RegisterIndices_] = EmuSIMD::set1<register_type, per_element_width>(val_)), ...);
 		}
 #pragma endregion
 
@@ -509,40 +527,266 @@ namespace EmuMath
 		data_type data;
 #pragma endregion
 
+		// MAJORITY OF IMPLEMENTATION STARTS HERE
+#pragma region GENERAL_HELPERS
 	private:
-		static constexpr bool _do_static_assert()
+		template<std::size_t FullWidthIndex_, typename Vector_>
+		[[nodiscard]] static constexpr inline typename _vector_get_index_for_load_result<FullWidthIndex_, Vector_>::type _get_index_from_normal_vector(Vector_&& arg_)
 		{
-			if constexpr (Size_ == 0)
+			using vector_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
+			if constexpr (FullWidthIndex_ > vector_uq::size || std::is_lvalue_reference_v<Vector_>)
 			{
-				static_assert(EmuCore::TMP::get_false<T_>(), "Passed 0 as the Size_ for an EmuMath::FastVector. The Vector must account for at least 1 element.");
-				return false;
-			}
-			else if constexpr (RegisterWidth_ != 128 && RegisterWidth_ != 256 && RegisterWidth_ != 512)
-			{
-				static_assert(EmuCore::TMP::get_false<T_>(), "Invalid RegisterWidth_ provided to an EmuMath::FastVector. Valid values are 128, 256, 512.");
-				return false;
-			}
-			else if constexpr (std::is_reference_v<T_>)
-			{
-				static_assert(EmuCore::TMP::get_false<T_>(), "Passed a reference type T_ to an EmuMath::FastVector. Reference types are not allowed for these templates.");
-				return false;
-			}
-			else if constexpr (std::is_same_v<register_type, void>)
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<T_>(),
-					"Unable to successfully form a register_type for an EmuMath::FastVector. This is likely due to the provided T_ argument."
-				);
-				return false;
+				return arg_.AtTheoretical<FullWidthIndex_>();
 			}
 			else
 			{
-				return true;
+				return std::move(arg_.AtTheoretical<FullWidthIndex_>());
+			}
+		}
+#pragma endregion
+
+#pragma region EXTRACTION_HELPERS
+	private:
+		template<std::size_t OutSize_, typename OutT_, std::size_t SrcSize_, std::size_t...OutIndices_>
+		static constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_normal_vector(value_type* p_src_, std::index_sequence<OutIndices_...> out_indices_)
+		{
+			return EmuMath::Vector<OutSize_, OutT_>(_move_src_or_default<OutIndices_, SrcSize_>(p_src_)...);
+		}
+
+		template<std::size_t Index_, std::size_t SrcSize_>
+		static constexpr inline typename std::conditional<(Index_ < SrcSize_), value_type&&, value_type>::type _move_src_or_default(value_type* p_src_)
+		{
+			if constexpr (Index_ < SrcSize_)
+			{
+				return std::move(*(p_src_ + Index_));
+			}
+			else
+			{
+				return value_type();
 			}
 		}
 
-#pragma region VARIADIC_CONSTRUCTORS
+		template<std::size_t NumRegisters_>
+		constexpr inline void _store_all(value_type* p_out_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_store_all_multiple_registers(p_out_, std::make_index_sequence<NumRegisters_>());
+			}
+			else
+			{
+				EmuSIMD::store(data, p_out_);
+			}
+		}
+
+		template<std::size_t...RegisterIndices_>
+		constexpr inline void _store_all_multiple_registers(value_type* p_out_, std::index_sequence<RegisterIndices_...> indices_) const
+		{
+			(EmuSIMD::store(data[RegisterIndices_], p_out_ + (RegisterIndices_ * elements_per_register)), ...);
+		}
+
+		template<std::size_t NumRegisters_, std::size_t PartialLength_, typename Out_>
+		constexpr inline void _store_to_non_uniform(Out_* p_out_) const
+		{
+			if constexpr (PartialLength_ != 0)
+			{
+				constexpr std::size_t NumFullRegisters_ = NumRegisters_ - 1;
+				if constexpr (NumFullRegisters_ == 0)
+				{
+					_store_partial<0, PartialLength_>(p_out_);
+				}
+				else
+				{
+					constexpr std::size_t TotalFullRegistersLength_ = NumFullRegisters_ * elements_per_register;
+
+					if constexpr (std::is_same_v<typename EmuCore::TMP::remove_ref_cv<Out_>::type, value_type>)
+					{
+						// No intermediate conversion needed, so we can just store straight to the output
+						_store_all<NumFullRegisters_>(p_out_);
+					}
+					else
+					{
+						value_type dumped[TotalFullRegistersLength_];
+						_store_all<NumFullRegisters_>(dumped);
+						_store_range_non_uniform<0>(p_out_, dumped, std::make_index_sequence<TotalFullRegistersLength_>());
+					}
+
+					_store_partial<TotalFullRegistersLength_, TotalFullRegistersLength_ + PartialLength_>(p_out_);
+				}
+			}
+			else
+			{
+				_store_all<NumRegisters_>(p_out_);
+			}
+		}
+
+		template<std::size_t From_, std::size_t To_, typename Out_>
+		constexpr inline void _store_partial(Out_* p_out_) const
+		{
+			constexpr std::size_t out_range = To_ - From_;
+			if constexpr (contains_multiple_registers)
+			{
+				constexpr std::size_t register_index = From_ / elements_per_register;
+				if constexpr (out_range == 1 && register_width == 128)
+				{
+					*p_out_ = static_cast<Out_>(EmuSIMD::get_index<0, value_type, per_element_width>(data[register_index]));
+				}
+				else
+				{
+					value_type dumped[elements_per_register];
+					EmuSIMD::store(data[register_index], dumped);
+					_store_range_non_uniform<From_>(p_out_, dumped, std::make_index_sequence<out_range>());
+				}
+			}
+			else
+			{
+				if constexpr (out_range == 1 && register_width == 128)
+				{
+					// Prefer this approach here as it is typically faster in this scenario
+					*p_out_ = static_cast<Out_>(EmuSIMD::get_index<0, value_type, per_element_width>(data));
+				}
+				else
+				{
+					value_type dumped[elements_per_register];
+					EmuSIMD::store(data, dumped);
+					_store_range_non_uniform<From_>(p_out_, dumped, std::make_index_sequence<out_range>());
+				}
+			}
+		}
+
+		template<std::size_t OutOffset_, typename Out_, std::size_t...Indices_>
+		static constexpr inline void _store_range_non_uniform(Out_* p_out_, value_type* p_src_, std::index_sequence<Indices_...> indices_)
+		{
+			(
+				(*(p_out_ + OutOffset_ + Indices_) = static_cast<Out_>(*(p_src_ + Indices_))), 
+				...
+			);
+		}
+#pragma endregion
+
+#pragma region COPY_CONSTRUCTION_HELPERS
+	private:
+		template<std::size_t...Indices_>
+		static constexpr inline data_type _make_array_copy(const this_type& to_copy_, std::index_sequence<Indices_...> indices_)
+		{
+			return data_type({ register_type(to_copy_.data[Indices_])... });
+		}
+
+		static constexpr inline data_type _make_copy(const this_type& to_copy_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return _make_array_copy(to_copy_, index_sequence());
+			}
+			else
+			{
+				return to_copy_.data;
+			}
+		}
+#pragma endregion
+
+#pragma region MOVE_CONSTRUCTION_HELPERS
+	private:
+		template<std::size_t...Indices_>
+		static constexpr inline data_type _do_array_move(this_type&& to_move_, std::index_sequence<Indices_...> indices_)
+		{
+			return data_type({ register_type(std::move(to_move_.data[Indices_]))... });
+		}
+
+		static constexpr inline data_type _do_move(this_type&& to_move_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return _do_array_move(std::move(to_move_), index_sequence());
+			}
+			else
+			{
+				return data_type(std::move(to_move_.data));
+			}
+		}
+#pragma endregion
+
+#pragma region ALL_SAME_CONSTRUCTION_HELPERS
+	private:
+		template<std::size_t ToDiscard_>
+		static constexpr inline register_type _set_all_same_discard_index(const value_type& to_set_all_to_)
+		{
+			return EmuSIMD::set1<register_type, per_element_width>(to_set_all_to_);
+		}
+
+		template<std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_set_all_same(const value_type& to_set_all_to_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type({ _set_all_same_discard_index<RegisterIndices_>(to_set_all_to_)... });
+		}
+
+		static constexpr inline data_type _do_set_all_same(const value_type& to_set_all_to_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return _do_array_set_all_same(to_set_all_to_, register_index_sequence());
+			}
+			else
+			{
+				return EmuSIMD::set1<data_type, per_element_width>(to_set_all_to_);
+			}
+		}
+
+		template<std::size_t Index_, typename Arg_>
+		static constexpr inline register_type _construct_register_discard_index(Arg_&& arg_)
+		{
+			return register_type(std::forward<Arg_>(arg_));
+		}
+
+		template<std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_set_all_same_register(register_type to_set_all_registers_to_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type({ _construct_register_discard_index<RegisterIndices_>(to_set_all_registers_to_)... });
+		}
+
+		static constexpr inline data_type _do_set_all_same_register(register_type to_set_all_registers_to_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return _do_array_set_all_same_register(to_set_all_registers_to_, register_index_sequence());
+			}
+			else
+			{
+				return to_set_all_registers_to_;
+			}
+		}
+#pragma endregion
+
+#pragma region LOAD_CONSTRUCTION_HELPERS
+	private:
+		template<std::size_t RegisterIndex_>
+		static constexpr inline register_type _do_load_for_register_index(const value_type* p_to_load_)
+		{
+			constexpr std::size_t offset = RegisterIndex_ * elements_per_register;
+			return EmuSIMD::load<register_type>(p_to_load_ + offset);
+		}
+
+		template<std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_load(const value_type* p_to_load_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type({ _do_load_for_register_index<RegisterIndices_>(p_to_load_)... });
+		}
+
+		static constexpr inline data_type _do_load(const value_type* p_to_load_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return _do_array_load(p_to_load_, register_index_sequence());
+			}
+			else
+			{
+				return EmuSIMD::load<register_type>(p_to_load_);
+			}
+		}
+#pragma endregion
+
+#pragma region VARIADIC_CONSTRUCTION_HELPERS
+	private:
 		template<typename...Args_>
 		static constexpr inline data_type _do_variadic_construction(Args_&&...args_)
 		{
@@ -680,234 +924,64 @@ namespace EmuMath
 		}
 #pragma endregion
 
-		template<std::size_t OutSize_, typename OutT_, std::size_t SrcSize_, std::size_t...OutIndices_>
-		static constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_normal_vector(value_type* p_src_, std::index_sequence<OutIndices_...> out_indices_)
+#pragma region SETTER_HELPERS
+	private:
+		template<std::size_t...RegisterIndices_>
+		constexpr inline void _set_zero_array(std::index_sequence<RegisterIndices_...> indices_)
 		{
-			return EmuMath::Vector<OutSize_, OutT_>(_move_src_or_default<OutIndices_, SrcSize_>(p_src_)...);
-		}
-
-		template<std::size_t Index_, std::size_t SrcSize_>
-		static constexpr inline typename std::conditional<(Index_ < SrcSize_), value_type&&, value_type>::type _move_src_or_default(value_type* p_src_)
-		{
-			if constexpr (Index_ < SrcSize_)
-			{
-				return std::move(*(p_src_ + Index_));
-			}
-			else
-			{
-				return value_type();
-			}
-		}
-
-		template<std::size_t NumRegisters_>
-		constexpr inline void _store_all(value_type* p_out_) const
-		{
-			if constexpr (contains_multiple_registers)
-			{
-				_store_all_multiple_registers(p_out_, std::make_index_sequence<NumRegisters_>());
-			}
-			else
-			{
-				EmuSIMD::store(data, p_out_);
-			}
+			((data[RegisterIndices_] = EmuSIMD::setzero<register_type>()), ...);
 		}
 
 		template<std::size_t...RegisterIndices_>
-		constexpr inline void _store_all_multiple_registers(value_type* p_out_, std::index_sequence<RegisterIndices_...> indices_) const
+		constexpr inline void _set_one_array(std::index_sequence<RegisterIndices_...> indices_)
 		{
-			(EmuSIMD::store(data[RegisterIndices_], p_out_ + (RegisterIndices_ * elements_per_register)), ...);
-		}
-
-		template<std::size_t NumRegisters_, std::size_t PartialLength_, typename Out_>
-		constexpr inline void _store_to_non_uniform(Out_* p_out_) const
-		{
-			if constexpr (PartialLength_ != 0)
-			{
-				constexpr std::size_t NumFullRegisters_ = NumRegisters_ - 1;
-				if constexpr (NumFullRegisters_ == 0)
-				{
-					_store_partial<0, PartialLength_>(p_out_);
-				}
-				else
-				{
-					constexpr std::size_t TotalFullRegistersLength_ = NumFullRegisters_ * elements_per_register;
-
-					if constexpr (std::is_same_v<typename EmuCore::TMP::remove_ref_cv<Out_>::type, value_type>)
-					{
-						// No intermediate conversion needed, so we can just store straight to the output
-						_store_all<NumFullRegisters_>(p_out_);
-					}
-					else
-					{
-						value_type dumped[TotalFullRegistersLength_];
-						_store_all<NumFullRegisters_>(dumped);
-						_store_range_non_uniform<0>(p_out_, dumped, std::make_index_sequence<TotalFullRegistersLength_>());
-					}
-
-					_store_partial<TotalFullRegistersLength_, TotalFullRegistersLength_ + PartialLength_>(p_out_);
-				}
-			}
-			else
-			{
-				_store_all<NumRegisters_>(p_out_);
-			}
-		}
-
-		template<std::size_t From_, std::size_t To_, typename Out_>
-		constexpr inline void _store_partial(Out_* p_out_) const
-		{
-			constexpr std::size_t out_range = To_ - From_;
-			if constexpr (contains_multiple_registers)
-			{
-				constexpr std::size_t register_index = From_ / elements_per_register;
-				if constexpr (out_range == 1 && register_width == 128)
-				{
-					*p_out_ = static_cast<Out_>(EmuSIMD::get_index<0, value_type, per_element_width>(data[register_index]));
-				}
-				else
-				{
-					value_type dumped[elements_per_register];
-					EmuSIMD::store(data[register_index], dumped);
-					_store_range_non_uniform<From_>(p_out_, dumped, std::make_index_sequence<out_range>());
-				}
-			}
-			else
-			{
-				if constexpr (out_range == 1 && register_width == 128)
-				{
-					// Prefer this approach here as it is typically faster in this scenario
-					*p_out_ = static_cast<Out_>(EmuSIMD::get_index<0, value_type, per_element_width>(data));
-				}
-				else
-				{
-					value_type dumped[elements_per_register];
-					EmuSIMD::store(data, dumped);
-					_store_range_non_uniform<From_>(p_out_, dumped, std::make_index_sequence<out_range>());
-				}
-			}
-		}
-
-		template<std::size_t OutOffset_, typename Out_, std::size_t...Indices_>
-		static constexpr inline void _store_range_non_uniform(Out_* p_out_, value_type* p_src_, std::index_sequence<Indices_...> indices_)
-		{
-			(
-				(*(p_out_ + OutOffset_ + Indices_) = static_cast<Out_>(*(p_src_ + Indices_))), 
-				...
-			);
-		}
-
-		static constexpr inline data_type _make_copy(const this_type& to_copy_)
-		{
-			if constexpr (contains_multiple_registers)
-			{
-				return _make_array_copy(to_copy_, index_sequence());
-			}
-			else
-			{
-				return to_copy_.data;
-			}
-		}
-
-		static constexpr inline data_type _do_move(this_type&& to_move_)
-		{
-			if constexpr (contains_multiple_registers)
-			{
-				return _do_array_move(std::move(to_move_), index_sequence());
-			}
-			else
-			{
-				return data_type(std::move(to_move_.data));
-			}
-		}
-
-		template<std::size_t...Indices_>
-		static constexpr inline data_type _make_array_copy(const this_type& to_copy_, std::index_sequence<Indices_...> indices_)
-		{
-			return data_type({ register_type(to_copy_.data[Indices_])... });
-		}
-
-		template<std::size_t...Indices_>
-		static constexpr inline data_type _do_array_move(this_type&& to_move_, std::index_sequence<Indices_...> indices_)
-		{
-			return data_type({ register_type(std::move(to_move_.data[Indices_]))... });
-		}
-
-		static constexpr inline data_type _do_set_all_same(const value_type& to_set_all_to_)
-		{
-			if constexpr (contains_multiple_registers)
-			{
-				return _do_array_set_all_same(to_set_all_to_, register_index_sequence());
-			}
-			else
-			{
-				return EmuSIMD::set1<data_type, per_element_width>(to_set_all_to_);
-			}
+			((data[RegisterIndices_] = EmuSIMD::setallone<register_type>()), ...);
 		}
 
 		template<std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_set_all_same(const value_type& to_set_all_to_, std::index_sequence<RegisterIndices_...> indices_)
+		constexpr inline void _set1_array(const value_type& val_, std::index_sequence<RegisterIndices_...> indices_)
 		{
-			return data_type({ _set_all_same_discard_index<RegisterIndices_>(to_set_all_to_)... });
+			((data[RegisterIndices_] = EmuSIMD::set1<register_type, per_element_width>(val_)), ...);
 		}
+#pragma endregion
 
-		template<std::size_t ToDiscard_>
-		static constexpr inline register_type _set_all_same_discard_index(const value_type& to_set_all_to_)
+#pragma region STATIC_ASSERTION_HELPERS
+	private:
+		static constexpr bool _do_static_assert()
 		{
-			return EmuSIMD::set1<register_type, per_element_width>(to_set_all_to_);
-		}
-
-		static constexpr inline data_type _do_set_all_same_register(register_type to_set_all_registers_to_)
-		{
-			if constexpr (contains_multiple_registers)
+			if constexpr (Size_ == 0)
 			{
-				return _do_array_set_all_same_register(to_set_all_registers_to_, register_index_sequence());
+				static_assert(EmuCore::TMP::get_false<T_>(), "Passed 0 as the Size_ for an EmuMath::FastVector. The Vector must account for at least 1 element.");
+				return false;
+			}
+			else if constexpr (RegisterWidth_ != 128 && RegisterWidth_ != 256 && RegisterWidth_ != 512)
+			{
+				static_assert(EmuCore::TMP::get_false<T_>(), "Invalid RegisterWidth_ provided to an EmuMath::FastVector. Valid values are 128, 256, 512.");
+				return false;
+			}
+			else if constexpr (std::is_reference_v<T_>)
+			{
+				static_assert(EmuCore::TMP::get_false<T_>(), "Passed a reference type T_ to an EmuMath::FastVector. Reference types are not allowed for these templates.");
+				return false;
+			}
+			else if constexpr (std::is_same_v<register_type, void>)
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<T_>(),
+					"Unable to successfully form a register_type for an EmuMath::FastVector. This is likely due to the provided T_ argument."
+				);
+				return false;
 			}
 			else
 			{
-				return to_set_all_registers_to_;
+				return true;
 			}
-		}
-
-		template<std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_set_all_same_register(register_type to_set_all_registers_to_, std::index_sequence<RegisterIndices_...> indices_)
-		{
-			return data_type({ _construct_register_discard_index<RegisterIndices_>(to_set_all_registers_to_)... });
-		}
-
-		template<std::size_t Index_, typename Arg_>
-		static constexpr inline register_type _construct_register_discard_index(Arg_&& arg_)
-		{
-			return register_type(std::forward<Arg_>(arg_));
-		}
-
-		static constexpr inline data_type _do_load(const value_type* p_to_load_)
-		{
-			if constexpr (contains_multiple_registers)
-			{
-				return _do_array_load(p_to_load_, register_index_sequence());
-			}
-			else
-			{
-				return EmuSIMD::load<register_type>(p_to_load_);
-			}
-		}
-
-		template<std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_load(const value_type* p_to_load_, std::index_sequence<RegisterIndices_...> indices_)
-		{
-			return data_type({ _do_load_for_register_index<RegisterIndices_>(p_to_load_)... });
-		}
-
-		template<std::size_t RegisterIndex_>
-		static constexpr inline register_type _do_load_for_register_index(const value_type* p_to_load_)
-		{
-			constexpr std::size_t offset = RegisterIndex_ * elements_per_register;
-			return EmuSIMD::load<register_type>(p_to_load_ + offset);
 		}
 
 	public:
 		static_assert(_do_static_assert(), "Unable to successfully form an EmuMath::FastVector instance.");
-				
+#pragma endregion
 	};
 }
 
