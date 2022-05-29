@@ -3045,9 +3045,12 @@ namespace EmuMath
 	public:
 		/// <summary>
 		/// <para> Linearly interpolates this Vector with the provided b_ and t_ arguments. </para>
+		/// <para> If an argument is a FastVector, all registers and elements will be used respectively. </para>
+		/// <para> If an argument is this Vector's register_type, each respective element of it will be used for all registers. </para>
+		/// <para> If an argument is a scalar value, it will be used for all elements. </para>
 		/// </summary>
-		/// <param name="b_">Vector of the same type representing the target point for this Vector to reach with respective elements.</param>
-		/// <param name="t_">Vector representing thresholds for interpolations in each respective element as a percentage, where 0 = this, 1 = t_.</param>
+		/// <param name="b_">Target to interpolate this Vector with.</param>
+		/// <param name="t_">Threshold to use for interpolations, interpreted as percentages where 0 = 0%, 1 = 100%.</param>
 		/// <returns>Vector resulting from the linear interpolation operation.</returns>
 		[[nodiscard]] constexpr inline this_type Lerp(const this_type& b_, const this_type& t_) const
 		{
@@ -3061,34 +3064,62 @@ namespace EmuMath
 			}
 		}
 
-		/// <summary>
-		/// <para> Linearly interpolates this Vector with the provided b_ and t_ arguments. </para>
-		/// </summary>
-		/// <param name="b_">Vector of the same type representing the target point for this Vector to reach with respective elements.</param>
-		/// <param name="t_">Value representing the thresholds for interpolations of all elements as a percentage, where 0 = this, 1 = t_.</param>
-		/// <returns>Vector resulting from the linear interpolation operation.</returns>
+		[[nodiscard]] constexpr inline this_type Lerp(register_type b_for_all_, const this_type& t_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_lerp(data, b_for_all_, t_.data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::lerp<per_element_width>(data, b_for_all_, t_.data));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type Lerp(const this_type& b_, register_type t_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_lerp(data, b_.data, t_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::lerp<per_element_width>(data, b_.data, t_for_all_));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type Lerp(register_type b_for_all_, register_type t_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_lerp(data, b_for_all_, t_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::lerp<per_element_width>(data, b_for_all_, t_for_all_));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type Lerp(register_type b_for_all_, value_type t_) const
+		{
+			return Lerp(b_for_all_, EmuSIMD::set1<register_type, per_element_width>(t_));
+		}
+
+		[[nodiscard]] constexpr inline this_type Lerp(value_type b_, register_type t_for_all_) const
+		{
+			return Lerp(EmuSIMD::set1<register_type, per_element_width>(b_), t_for_all_);
+		}
+
 		[[nodiscard]] constexpr inline this_type Lerp(const this_type& b_, value_type t_) const
 		{
 			return Lerp(b_, EmuSIMD::set1<register_type, per_element_width>(t_));
 		}
 
-		/// <summary>
-		/// <para> Linearly interpolates this Vector with the provided b_ and t_ arguments. </para>
-		/// </summary>
-		/// <param name="b_">Value representing the target point for all of this Vector's elements to reach.</param>
-		/// <param name="t_">Vector representing thresholds for interpolations in each respective element as a percentage, where 0 = this, 1 = t_.</param>
-		/// <returns>Vector resulting from the linear interpolation operation.</returns>
 		[[nodiscard]] constexpr inline this_type Lerp(value_type b_, const this_type& t_) const
 		{
 			return Lerp(EmuSIMD::set1<register_type, per_element_width>(b_), t_);
 		}
 
-		/// <summary>
-		/// <para> Linearly interpolates this Vector with the provided b_ and t_ arguments. </para>
-		/// </summary>
-		/// <param name="b_">Value representing the target point for all of this Vector's elements to reach.</param>
-		/// <param name="t_">Value representing the thresholds for interpolations of all elements as a percentage, where 0 = this, 1 = t_.</param>
-		/// <returns>Vector resulting from the linear interpolation operation.</returns>
 		[[nodiscard]] constexpr inline this_type Lerp(value_type b_, value_type t_) const
 		{
 			return Lerp(EmuSIMD::set1<register_type, per_element_width>(b_), EmuSIMD::set1<register_type, per_element_width>(t_));
@@ -3096,10 +3127,13 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Linearly interpolates this Vector with the provided b_ and t_ arguments. </para>
-		/// <para> A fused interpolation differentiates from a normal loop in that multiplication and addition operations will be fused to reduce floating-point rounds. </para>
+		/// <para> A fused lerp differentiates from a normal lerp in that multiplication and addition operations will be fused to reduce floating-point rounds. </para>
+		/// <para> If an argument is a FastVector, all registers and elements will be used respectively. </para>
+		/// <para> If an argument is this Vector's register_type, each respective element of it will be used for all registers. </para>
+		/// <para> If an argument is a scalar value, it will be used for all elements. </para>
 		/// </summary>
-		/// <param name="b_">Vector of the same type representing the target point for this Vector to reach with respective elements.</param>
-		/// <param name="t_">Vector representing thresholds for interpolations in each respective element as a percentage, where 0 = this, 1 = t_.</param>
+		/// <param name="b_">Target to interpolate this Vector with.</param>
+		/// <param name="t_">Threshold to use for interpolations, interpreted as percentages where 0 = 0%, 1 = 100%.</param>
 		/// <returns>Vector resulting from the linear interpolation operation.</returns>
 		[[nodiscard]] constexpr inline this_type FusedLerp(const this_type& b_, const this_type& t_) const
 		{
@@ -3113,37 +3147,62 @@ namespace EmuMath
 			}
 		}
 
-		/// <summary>
-		/// <para> Linearly interpolates this Vector with the provided b_ and t_ arguments. </para>
-		/// <para> A fused interpolation differentiates from a normal loop in that multiplication and addition operations will be fused to reduce floating-point rounds. </para>
-		/// </summary>
-		/// <param name="b_">Vector of the same type representing the target point for this Vector to reach with respective elements.</param>
-		/// <param name="t_">Value representing the thresholds for interpolations of all elements as a percentage, where 0 = this, 1 = t_.</param>
-		/// <returns>Vector resulting from the linear interpolation operation.</returns>
+		[[nodiscard]] constexpr inline this_type FusedLerp(register_type b_for_all_, const this_type& t_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_fused_lerp(data, b_for_all_, t_.data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::fused_lerp<per_element_width>(data, b_for_all_, t_.data));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type FusedLerp(const this_type& b_, register_type t_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_fused_lerp(data, b_.data, t_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::fused_lerp<per_element_width>(data, b_.data, t_for_all_));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type FusedLerp(register_type b_for_all_, register_type t_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_fused_lerp(data, b_for_all_, t_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::fused_lerp<per_element_width>(data, b_for_all_, t_for_all_));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type FusedLerp(register_type b_for_all_, value_type t_) const
+		{
+			return FusedLerp(b_for_all_, EmuSIMD::set1<register_type, per_element_width>(t_));
+		}
+
+		[[nodiscard]] constexpr inline this_type FusedLerp(value_type b_, register_type t_for_all_) const
+		{
+			return FusedLerp(EmuSIMD::set1<register_type, per_element_width>(b_), t_for_all_);
+		}
+
 		[[nodiscard]] constexpr inline this_type FusedLerp(const this_type& b_, value_type t_) const
 		{
 			return FusedLerp(b_, EmuSIMD::set1<register_type, per_element_width>(t_));
 		}
 
-		/// <summary>
-		/// <para> Linearly interpolates this Vector with the provided b_ and t_ arguments. </para>
-		/// <para> A fused interpolation differentiates from a normal loop in that multiplication and addition operations will be fused to reduce floating-point rounds. </para>
-		/// </summary>
-		/// <param name="b_">Value representing the target point for all of this Vector's elements to reach.</param>
-		/// <param name="t_">Vector representing thresholds for interpolations in each respective element as a percentage, where 0 = this, 1 = t_.</param>
-		/// <returns>Vector resulting from the linear interpolation operation.</returns>
 		[[nodiscard]] constexpr inline this_type FusedLerp(value_type b_, const this_type& t_) const
 		{
 			return FusedLerp(EmuSIMD::set1<register_type, per_element_width>(b_), t_);
 		}
 
-		/// <summary>
-		/// <para> Linearly interpolates this Vector with the provided b_ and t_ arguments. </para>
-		/// <para> A fused interpolation differentiates from a normal loop in that multiplication and addition operations will be fused to reduce floating-point rounds. </para>
-		/// </summary>
-		/// <param name="b_">Value representing the target point for all of this Vector's elements to reach.</param>
-		/// <param name="t_">Value representing the thresholds for interpolations of all elements as a percentage, where 0 = this, 1 = t_.</param>
-		/// <returns>Vector resulting from the linear interpolation operation.</returns>
 		[[nodiscard]] constexpr inline this_type FusedLerp(value_type b_, value_type t_) const
 		{
 			return FusedLerp(EmuSIMD::set1<register_type, per_element_width>(b_), EmuSIMD::set1<register_type, per_element_width>(t_));
