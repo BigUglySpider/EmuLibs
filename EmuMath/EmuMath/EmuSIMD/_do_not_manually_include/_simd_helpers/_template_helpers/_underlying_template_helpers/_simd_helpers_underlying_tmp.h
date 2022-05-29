@@ -9,6 +9,37 @@
 #include <immintrin.h>
 #include <stdexcept>
 
+namespace EmuSIMD
+{
+	using f32x4 = __m128;
+	using f32x8 = __m256;
+	using f32x16 = __m512;
+
+	using f64x2 = __m128d;
+	using f64x4 = __m256d;
+	using f64x8 = __m512d;
+
+	using i8x16 = __m128i;
+	using i8x32 = __m256i;
+	using i8x64 = __m512i;
+
+	using i16x8 = __m128i;
+	using i16x16 = __m256i;
+	using i16x32 = __m512i;
+
+	using i32x4 = __m128i;
+	using i32x8 = __m256i;
+	using i32x16 = __m512i;
+
+	using i64x2 = __m128i;
+	using i64x4 = __m256i;
+	using i64x8 = __m512i;
+
+	using i128_generic = __m128i;
+	using i256_generic = __m256i;
+	using i512_generic = __m512i;
+}
+
 namespace EmuSIMD::TMP
 {
 	[[nodiscard]] constexpr inline bool _valid_simd_int_element_width(std::size_t width_)
@@ -40,49 +71,49 @@ namespace EmuSIMD::TMP
 		>::value;
 	};
 	template<>
-	struct is_simd_register<__m128>
+	struct is_simd_register<EmuSIMD::f32x4>
 	{
 		static constexpr bool value = true;
 	};
 	template<>
-	struct is_simd_register<__m128d>
+	struct is_simd_register<EmuSIMD::f64x2>
 	{
 		static constexpr bool value = true;
 	};
 	template<>
-	struct is_simd_register<__m128i>
-	{
-		static constexpr bool value = true;
-	};
-
-	template<>
-	struct is_simd_register<__m256>
-	{
-		static constexpr bool value = true;
-	};
-	template<>
-	struct is_simd_register<__m256d>
-	{
-		static constexpr bool value = true;
-	};
-	template<>
-	struct is_simd_register<__m256i>
+	struct is_simd_register<EmuSIMD::i128_generic>
 	{
 		static constexpr bool value = true;
 	};
 
 	template<>
-	struct is_simd_register<__m512>
+	struct is_simd_register<EmuSIMD::f32x8>
 	{
 		static constexpr bool value = true;
 	};
 	template<>
-	struct is_simd_register<__m512d>
+	struct is_simd_register<EmuSIMD::f64x4>
 	{
 		static constexpr bool value = true;
 	};
 	template<>
-	struct is_simd_register<__m512i>
+	struct is_simd_register<EmuSIMD::i256_generic>
+	{
+		static constexpr bool value = true;
+	};
+
+	template<>
+	struct is_simd_register<EmuSIMD::f32x16>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_simd_register<EmuSIMD::f64x8>
+	{
+		static constexpr bool value = true;
+	};
+	template<>
+	struct is_simd_register<EmuSIMD::i512_generic>
 	{
 		static constexpr bool value = true;
 	};
@@ -102,47 +133,47 @@ namespace EmuSIMD::TMP
 		>::value;
 	};
 	template<>
-	struct simd_register_width<__m128>
+	struct simd_register_width<EmuSIMD::f32x4>
 	{
 		static constexpr std::size_t value = 128;
 	};
 	template<>
-	struct simd_register_width<__m128d>
+	struct simd_register_width<EmuSIMD::f64x2>
 	{
 		static constexpr std::size_t value = 128;
 	};
 	template<>
-	struct simd_register_width<__m128i>
+	struct simd_register_width<EmuSIMD::i128_generic>
 	{
 		static constexpr std::size_t value = 128;
 	};
 	template<>
-	struct simd_register_width<__m256>
+	struct simd_register_width<EmuSIMD::f32x8>
 	{
 		static constexpr std::size_t value = 256;
 	};
 	template<>
-	struct simd_register_width<__m256d>
+	struct simd_register_width<EmuSIMD::f64x4>
 	{
 		static constexpr std::size_t value = 256;
 	};
 	template<>
-	struct simd_register_width<__m256i>
+	struct simd_register_width<EmuSIMD::i256_generic>
 	{
 		static constexpr std::size_t value = 256;
 	};
 	template<>
-	struct simd_register_width<__m512>
+	struct simd_register_width<EmuSIMD::f32x16>
 	{
 		static constexpr std::size_t value = 512;
 	};
 	template<>
-	struct simd_register_width<__m512d>
+	struct simd_register_width<EmuSIMD::f64x8>
 	{
 		static constexpr std::size_t value = 512;
 	};
 	template<>
-	struct simd_register_width<__m512i>
+	struct simd_register_width<EmuSIMD::i512_generic>
 	{
 		static constexpr std::size_t value = 512;
 	};
@@ -162,47 +193,47 @@ namespace EmuSIMD::TMP
 		>::value;
 	};
 	template<>
-	struct is_integral_simd_register<__m128>
+	struct is_integral_simd_register<EmuSIMD::f32x4>
 	{
 		static constexpr bool value = false;
 	};
 	template<>
-	struct is_integral_simd_register<__m128d>
+	struct is_integral_simd_register<EmuSIMD::f64x2>
 	{
 		static constexpr bool value = false;
 	};
 	template<>
-	struct is_integral_simd_register<__m128i>
+	struct is_integral_simd_register<EmuSIMD::i128_generic>
 	{
 		static constexpr bool value = true;
 	};
 	template<>
-	struct is_integral_simd_register<__m256>
+	struct is_integral_simd_register<EmuSIMD::f32x8>
 	{
 		static constexpr bool value = false;
 	};
 	template<>
-	struct is_integral_simd_register<__m256d>
+	struct is_integral_simd_register<EmuSIMD::f64x4>
 	{
 		static constexpr bool value = false;
 	};
 	template<>
-	struct is_integral_simd_register<__m256i>
+	struct is_integral_simd_register<EmuSIMD::i256_generic>
 	{
 		static constexpr bool value = true;
 	};
 	template<>
-	struct is_integral_simd_register<__m512>
+	struct is_integral_simd_register<EmuSIMD::f32x16>
 	{
 		static constexpr bool value = false;
 	};
 	template<>
-	struct is_integral_simd_register<__m512d>
+	struct is_integral_simd_register<EmuSIMD::f64x8>
 	{
 		static constexpr bool value = false;
 	};
 	template<>
-	struct is_integral_simd_register<__m512i>
+	struct is_integral_simd_register<EmuSIMD::i512_generic>
 	{
 		static constexpr bool value = true;
 	};
@@ -238,32 +269,32 @@ namespace EmuSIMD::TMP
 		>;
 	};
 	template<>
-	struct floating_point_register_element_count<__m128>
+	struct floating_point_register_element_count<EmuSIMD::f32x4>
 	{
 		static constexpr std::size_t value = 4;
 	};
 	template<>
-	struct floating_point_register_element_count<__m128d>
+	struct floating_point_register_element_count<EmuSIMD::f64x2>
 	{
 		static constexpr std::size_t value = 2;
 	};
 	template<>
-	struct floating_point_register_element_count<__m256>
+	struct floating_point_register_element_count<EmuSIMD::f32x8>
 	{
 		static constexpr std::size_t value = 8;
 	};
 	template<>
-	struct floating_point_register_element_count<__m256d>
+	struct floating_point_register_element_count<EmuSIMD::f64x4>
 	{
 		static constexpr std::size_t value = 4;
 	};
 	template<>
-	struct floating_point_register_element_count<__m512>
+	struct floating_point_register_element_count<EmuSIMD::f32x16>
 	{
 		static constexpr std::size_t value = 16;
 	};
 	template<>
-	struct floating_point_register_element_count<__m512d>
+	struct floating_point_register_element_count<EmuSIMD::f64x8>
 	{
 		static constexpr std::size_t value = 8;
 	};
@@ -283,68 +314,68 @@ namespace EmuSIMD::TMP
 		>::value;
 	};
 	template<std::size_t Index_, std::size_t PerElementWidthIfIntegral_>
-	struct valid_register_index<__m128, Index_, PerElementWidthIfIntegral_>
+	struct valid_register_index<EmuSIMD::f32x4, Index_, PerElementWidthIfIntegral_>
 	{
 		static constexpr std::size_t max_index = std::size_t(3);
 		static constexpr bool value = Index_ <= max_index;
 	};
 	template<std::size_t Index_, std::size_t PerElementWidthIfIntegral_>
-	struct valid_register_index<__m256, Index_, PerElementWidthIfIntegral_>
+	struct valid_register_index<EmuSIMD::f32x8, Index_, PerElementWidthIfIntegral_>
 	{
 		static constexpr std::size_t max_index = std::size_t(7);
 		static constexpr bool value = Index_ <= max_index;
 	};
 	template<std::size_t Index_, std::size_t PerElementWidthIfIntegral_>
-	struct valid_register_index<__m512, Index_, PerElementWidthIfIntegral_>
+	struct valid_register_index<EmuSIMD::f32x16, Index_, PerElementWidthIfIntegral_>
 	{
 		static constexpr std::size_t max_index = std::size_t(15);
 		static constexpr bool value = Index_ <= max_index;
 	};
 
 	template<std::size_t Index_, std::size_t PerElementWidthIfIntegral_>
-	struct valid_register_index<__m128d, Index_, PerElementWidthIfIntegral_>
+	struct valid_register_index<EmuSIMD::f64x2, Index_, PerElementWidthIfIntegral_>
 	{
 		static constexpr std::size_t max_index = std::size_t(1);
 		static constexpr bool value = Index_ <= max_index;
 	};
 	template<std::size_t Index_, std::size_t PerElementWidthIfIntegral_>
-	struct valid_register_index<__m256d, Index_, PerElementWidthIfIntegral_>
+	struct valid_register_index<EmuSIMD::f64x4, Index_, PerElementWidthIfIntegral_>
 	{
 		static constexpr std::size_t max_index = std::size_t(3);
 		static constexpr bool value = Index_ <= max_index;
 	};
 	template<std::size_t Index_, std::size_t PerElementWidthIfIntegral_>
-	struct valid_register_index<__m512d, Index_, PerElementWidthIfIntegral_>
+	struct valid_register_index<EmuSIMD::f64x8, Index_, PerElementWidthIfIntegral_>
 	{
 		static constexpr std::size_t max_index = std::size_t(7);
 		static constexpr bool value = Index_ <= max_index;
 	};
 
 	template<std::size_t Index_, std::size_t PerElementWidth_>
-	struct valid_register_index<__m128i, Index_, PerElementWidth_>
+	struct valid_register_index<EmuSIMD::i128_generic, Index_, PerElementWidth_>
 	{
 		static constexpr bool valid_element_width = _assert_valid_simd_int_element_width<PerElementWidth_>();
 		static_assert(valid_element_width, "Invalid per-element width provided when checking for a valid integral SIMD register index via valid_register_index.");
 
-		static constexpr std::size_t max_index = (simd_register_width_v<__m128i> / PerElementWidth_) - std::size_t(1);
+		static constexpr std::size_t max_index = (simd_register_width_v<EmuSIMD::i128_generic> / PerElementWidth_) - std::size_t(1);
 		static constexpr bool value = Index_ <= max_index;
 	};
 	template<std::size_t Index_, std::size_t PerElementWidth_>
-	struct valid_register_index<__m256i, Index_, PerElementWidth_>
+	struct valid_register_index<EmuSIMD::i256_generic, Index_, PerElementWidth_>
 	{
 		static constexpr bool valid_element_width = _assert_valid_simd_int_element_width<PerElementWidth_>();
 		static_assert(valid_element_width, "Invalid per-element width provided when checking for a valid integral SIMD register index via valid_register_index.");
 
-		static constexpr std::size_t max_index = (simd_register_width_v<__m256i> / PerElementWidth_) - std::size_t(1);
+		static constexpr std::size_t max_index = (simd_register_width_v<EmuSIMD::i256_generic> / PerElementWidth_) - std::size_t(1);
 		static constexpr bool value = Index_ <= max_index;
 	};
 	template<std::size_t Index_, std::size_t PerElementWidth_>
-	struct valid_register_index<__m512i, Index_, PerElementWidth_>
+	struct valid_register_index<EmuSIMD::i512_generic, Index_, PerElementWidth_>
 	{
 		static constexpr bool valid_element_width = _assert_valid_simd_int_element_width<PerElementWidth_>();
 		static_assert(valid_element_width, "Invalid per-element width provided when checking for a valid integral SIMD register index via valid_register_index.");
 
-		static constexpr std::size_t max_index = (simd_register_width_v<__m512i> / PerElementWidth_) - std::size_t(1);
+		static constexpr std::size_t max_index = (simd_register_width_v<EmuSIMD::i512_generic> / PerElementWidth_) - std::size_t(1);
 		static constexpr bool value = Index_ <= max_index;
 	};
 	template<class Register_, std::size_t Index_, std::size_t PerElementWidthIfIntegral_ = 32>

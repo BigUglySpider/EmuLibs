@@ -85,7 +85,7 @@ namespace EmuSIMD
 	}
 
 	template<int PerElementWidthIfInt_= 32, class Register_>
-	[[nodiscard]] inline Register_ shift_left(Register_ lhs_, __m128i num_shifts_)
+	[[nodiscard]] inline Register_ shift_left(Register_ lhs_, EmuSIMD::i128_generic num_shifts_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
@@ -121,7 +121,7 @@ namespace EmuSIMD
 	}
 
 	template<int PerElementWidthIfInt_ = 32, class Register_>
-	[[nodiscard]] inline Register_ shift_right_arithmetic(Register_ lhs_, __m128i num_shifts_)
+	[[nodiscard]] inline Register_ shift_right_arithmetic(Register_ lhs_, EmuSIMD::i128_generic num_shifts_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
@@ -157,7 +157,7 @@ namespace EmuSIMD
 	}
 
 	template<int PerElementWidthIfInt_ = 32, class Register_>
-	[[nodiscard]] inline Register_ shift_right_logical(Register_ lhs_, __m128i num_shifts_)
+	[[nodiscard]] inline Register_ shift_right_logical(Register_ lhs_, EmuSIMD::i128_generic num_shifts_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)

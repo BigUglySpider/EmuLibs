@@ -11,7 +11,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	};
 
 	template<bool I0_, bool I1_, bool I2_, bool I3_>
-	struct _make_movemask<__m128, I0_, I1_, I2_, I3_>
+	struct _make_movemask<EmuSIMD::f32x4, I0_, I1_, I2_, I3_>
 	{
 	private:
 		template<std::size_t Index_>
@@ -21,12 +21,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 		static constexpr int value = _bit<3>(I3_) | _bit<2>(I2_) | _bit<1>(I1_) | _bit<0>(I0_);
 	};
 	template<bool I_>
-	struct _make_movemask<__m128, I_> : public _make_movemask<__m128, I_, I_, I_, I_>
+	struct _make_movemask<EmuSIMD::f32x4, I_> : public _make_movemask<EmuSIMD::f32x4, I_, I_, I_, I_>
 	{
 	};
 
 	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_>
-	struct _make_movemask<__m256, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>
+	struct _make_movemask<EmuSIMD::f32x8, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>
 	{
 	private:
 		template<std::size_t Index_>
@@ -36,7 +36,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		static constexpr int value = _bit<7>(I7_) | _bit<6>(I6_) | _bit<5>(I5_) | _bit<4>(I4_) | _bit<3>(I3_) | _bit<2>(I2_) | _bit<1>(I1_) | _bit<0>(I0_);
 	};
 	template<bool I_>
-	struct _make_movemask<__m256, I_> : public _make_movemask<__m256, I_, I_, I_, I_, I_, I_, I_, I_>
+	struct _make_movemask<EmuSIMD::f32x8, I_> : public _make_movemask<EmuSIMD::f32x8, I_, I_, I_, I_, I_, I_, I_, I_>
 	{
 	};
 
@@ -45,7 +45,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		bool I0_, bool I1_, bool I2_,  bool I3_,  bool I4_,  bool I5_,  bool I6_,  bool I7_,
 		bool I8_, bool I9_, bool I10_, bool I11_, bool I12_, bool I13_, bool I14_, bool I15_
 	>
-	struct _make_movemask<__m512, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>
+	struct _make_movemask<EmuSIMD::f32x16, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>
 	{
 	private:
 		template<std::size_t Index_>
@@ -59,12 +59,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 		);
 	};
 	template<bool I_>
-	struct _make_movemask<__m512, I_> : public _make_movemask<__m512, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_>
+	struct _make_movemask<EmuSIMD::f32x16, I_> : public _make_movemask<EmuSIMD::f32x16, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_>
 	{
 	};
 
 	template<bool I0_, bool I1_>
-	struct _make_movemask<__m128d, I0_, I1_>
+	struct _make_movemask<EmuSIMD::f64x2, I0_, I1_>
 	{
 	private:
 		template<std::size_t Index_>
@@ -74,12 +74,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 		static constexpr int value = _bit<1>(I1_) | _bit<0>(I0_);
 	};
 	template<bool I_>
-	struct _make_movemask<__m128d, I_> : public _make_movemask<__m128d, I_, I_>
+	struct _make_movemask<EmuSIMD::f64x2, I_> : public _make_movemask<EmuSIMD::f64x2, I_, I_>
 	{
 	};
 
 	template<bool I0_, bool I1_, bool I2_, bool I3_>
-	struct _make_movemask<__m256d, I0_, I1_, I2_, I3_>
+	struct _make_movemask<EmuSIMD::f64x4, I0_, I1_, I2_, I3_>
 	{
 	private:
 		template<std::size_t Index_>
@@ -89,12 +89,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 		static constexpr int value = _bit<3>(I3_) | _bit<2>(I2_) | _bit<1>(I1_) | _bit<0>(I0_);
 	};
 	template<bool I_>
-	struct _make_movemask<__m256d, I_> : public _make_movemask<__m256d, I_, I_, I_, I_>
+	struct _make_movemask<EmuSIMD::f64x4, I_> : public _make_movemask<EmuSIMD::f64x4, I_, I_, I_, I_>
 	{
 	};
 
 	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_>
-	struct _make_movemask<__m512d, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>
+	struct _make_movemask<EmuSIMD::f64x8, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>
 	{
 	private:
 		template<std::size_t Index_>
@@ -104,7 +104,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		static constexpr int value = _bit<7>(I7_) | _bit<6>(I6_) | _bit<5>(I5_) | _bit<4>(I4_) | _bit<3>(I3_) | _bit<2>(I2_) | _bit<1>(I1_) | _bit<0>(I0_);
 	};
 	template<bool I_>
-	struct _make_movemask<__m512d, I_> : public _make_movemask<__m512d, I_, I_, I_, I_, I_, I_, I_, I_>
+	struct _make_movemask<EmuSIMD::f64x8, I_> : public _make_movemask<EmuSIMD::f64x8, I_, I_, I_, I_, I_, I_, I_, I_>
 	{
 	};
 
@@ -113,7 +113,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		bool I0_, bool I1_, bool I2_,  bool I3_,  bool I4_,  bool I5_,  bool I6_,  bool I7_,
 		bool I8_, bool I9_, bool I10_, bool I11_, bool I12_, bool I13_, bool I14_, bool I15_
 	>
-	struct _make_movemask<__m128i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>
+	struct _make_movemask<EmuSIMD::i128_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>
 	{
 	private:
 		template<std::size_t Index_>
@@ -127,20 +127,20 @@ namespace EmuSIMD::_underlying_simd_helpers
 		);
 	};
 	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_>
-	struct _make_movemask<__m128i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_> : 
-		public _make_movemask<__m128i, I0_, I0_, I1_, I1_, I2_, I2_, I3_, I3_, I4_, I4_, I5_, I5_, I6_, I6_, I7_, I7_>
+	struct _make_movemask<EmuSIMD::i128_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_> : 
+		public _make_movemask<EmuSIMD::i128_generic, I0_, I0_, I1_, I1_, I2_, I2_, I3_, I3_, I4_, I4_, I5_, I5_, I6_, I6_, I7_, I7_>
 	{
 	};
 	template<bool I0_, bool I1_, bool I2_, bool I3_>
-	struct _make_movemask<__m128i, I0_, I1_, I2_, I3_> : public _make_movemask<__m128i, I0_, I0_, I0_, I0_, I1_, I1_, I1_, I1_, I2_, I2_, I2_, I2_, I3_, I3_, I3_, I3_>
+	struct _make_movemask<EmuSIMD::i128_generic, I0_, I1_, I2_, I3_> : public _make_movemask<EmuSIMD::i128_generic, I0_, I0_, I0_, I0_, I1_, I1_, I1_, I1_, I2_, I2_, I2_, I2_, I3_, I3_, I3_, I3_>
 	{
 	};
 	template<bool I0_, bool I1_>
-	struct _make_movemask<__m128i, I0_, I1_> : public _make_movemask<__m128i, I0_, I0_, I0_, I0_, I0_, I0_, I0_, I0_, I1_, I1_, I1_, I1_, I1_, I1_, I1_, I1_>
+	struct _make_movemask<EmuSIMD::i128_generic, I0_, I1_> : public _make_movemask<EmuSIMD::i128_generic, I0_, I0_, I0_, I0_, I0_, I0_, I0_, I0_, I1_, I1_, I1_, I1_, I1_, I1_, I1_, I1_>
 	{
 	};
 	template<bool I_>
-	struct _make_movemask<__m128i, I_> : public _make_movemask<__m128i, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_>
+	struct _make_movemask<EmuSIMD::i128_generic, I_> : public _make_movemask<EmuSIMD::i128_generic, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_>
 	{
 	};
 
@@ -153,7 +153,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	>
 	struct _make_movemask
 	<
-		__m256i,
+		EmuSIMD::i256_generic,
 		I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_,  I8_,  I9_,  I10_, I11_, I12_, I13_, I14_, I15_,
 		I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_
 	>
@@ -176,40 +176,40 @@ namespace EmuSIMD::_underlying_simd_helpers
 		bool I0_, bool I1_, bool I2_,  bool I3_,  bool I4_,  bool I5_,  bool I6_,  bool I7_,
 		bool I8_, bool I9_, bool I10_, bool I11_, bool I12_, bool I13_, bool I14_, bool I15_
 	>
-	struct _make_movemask<__m256i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_> : 
+	struct _make_movemask<EmuSIMD::i256_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_> : 
 		public _make_movemask
 		<
-			__m256i,
+			EmuSIMD::i256_generic,
 			I0_,  I0_,  I1_,  I1_,  I2_,  I2_,  I3_,  I3_,  I4_,  I4_,  I5_,  I5_,  I6_,  I6_,  I7_,  I7_,
 			I8_,  I8_,  I9_,  I9_,  I10_, I10_, I11_, I11_, I12_, I12_, I13_, I13_, I14_, I14_, I15_, I15_
 		>
 	{
 	};
 	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_>
-	struct _make_movemask<__m256i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_> : 
+	struct _make_movemask<EmuSIMD::i256_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_> : 
 		public _make_movemask
 		<
-			__m256i,
+			EmuSIMD::i256_generic,
 			I0_, I0_, I0_, I0_, I1_, I1_, I1_, I1_, I2_, I2_, I2_, I2_, I3_, I3_, I3_, I3_,
 			I4_, I4_, I4_, I4_, I5_, I5_, I5_, I5_, I6_, I6_, I6_, I6_, I7_, I7_, I7_, I7_
 		>
 	{
 	};
 	template<bool I0_, bool I1_, bool I2_, bool I3_>
-	struct _make_movemask<__m256i, I0_, I1_, I2_, I3_> : 
+	struct _make_movemask<EmuSIMD::i256_generic, I0_, I1_, I2_, I3_> : 
 		public _make_movemask
 		<
-			__m256i,
+			EmuSIMD::i256_generic,
 			I0_, I0_, I0_, I0_, I0_, I0_, I0_, I0_, I1_, I1_, I1_, I1_, I1_, I1_, I1_, I1_,
 			I2_, I2_, I2_, I2_, I2_, I2_, I2_, I2_, I3_, I3_, I3_, I3_, I3_, I3_, I3_, I3_
 		>
 	{
 	};
 	template<bool I_>
-	struct _make_movemask<__m256i, I_> : 
+	struct _make_movemask<EmuSIMD::i256_generic, I_> : 
 		public _make_movemask
 		<
-			__m256i,
+			EmuSIMD::i256_generic,
 			I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_,
 			I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_
 		>
@@ -229,7 +229,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	>
 	struct _make_movemask
 	<
-		__m512i,
+		EmuSIMD::i512_generic,
 		I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_,  I8_,  I9_,  I10_, I11_, I12_, I13_, I14_, I15_,
 		I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_,
 		I32_, I33_, I34_, I35_, I36_, I37_, I38_, I39_, I40_, I41_, I42_, I43_, I44_, I45_, I46_, I47_,
@@ -262,7 +262,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	>
 	struct _make_movemask
 	<
-		__m512i,
+		EmuSIMD::i512_generic,
 		I0_,  I0_,  I1_,  I1_,  I2_,  I2_,  I3_,  I3_,  I4_,  I4_,  I5_,  I5_,  I6_,  I6_,  I7_,  I7_,
 		I8_,  I8_,  I9_,  I9_,  I10_, I10_, I11_, I11_, I12_, I12_, I13_, I13_, I14_, I14_, I15_, I15_,
 		I16_, I16_, I17_, I17_, I18_, I18_, I19_, I19_, I20_, I20_, I21_, I21_, I22_, I22_, I23_, I23_,
@@ -275,10 +275,10 @@ namespace EmuSIMD::_underlying_simd_helpers
 		bool I0_, bool I1_, bool I2_,  bool I3_,  bool I4_,  bool I5_,  bool I6_,  bool I7_,
 		bool I8_, bool I9_, bool I10_, bool I11_, bool I12_, bool I13_, bool I14_, bool I15_
 	>
-	struct _make_movemask<__m512i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_> :
+	struct _make_movemask<EmuSIMD::i512_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_> :
 		public _make_movemask
 		<
-			__m512i,
+			EmuSIMD::i512_generic,
 			I0_,  I0_,  I0_,  I0_,  I1_,  I1_,  I1_,  I1_,  I2_,  I2_,  I2_,  I2_,  I3_,  I3_,  I3_,  I3_,
 			I4_,  I4_,  I4_,  I4_,  I5_,  I5_,  I5_,  I5_,  I6_,  I6_,  I6_,  I6_,  I7_,  I7_,  I7_,  I7_,
 			I8_,  I8_,  I8_,  I8_,  I9_,  I9_,  I9_,  I9_,  I10_, I10_, I10_, I10_, I11_, I11_, I11_, I11_,
@@ -287,10 +287,10 @@ namespace EmuSIMD::_underlying_simd_helpers
 	{
 	};
 	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_>
-	struct _make_movemask<__m512i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_> :
+	struct _make_movemask<EmuSIMD::i512_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_> :
 		public _make_movemask
 		<
-			__m512i,
+			EmuSIMD::i512_generic,
 			I0_, I0_, I0_, I0_, I0_, I0_, I0_, I0_, I1_, I1_, I1_, I1_, I1_, I1_, I1_, I1_,
 			I2_, I2_, I2_, I2_, I2_, I2_, I2_, I2_, I3_, I3_, I3_, I3_, I3_, I3_, I3_, I3_,
 			I4_, I4_, I4_, I4_, I4_, I4_, I4_, I4_, I5_, I5_, I5_, I5_, I5_, I5_, I5_, I5_,

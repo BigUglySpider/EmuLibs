@@ -13,11 +13,11 @@ namespace EmuSIMD::_underlying_simd_helpers
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
-			if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128, __m256, __m512>::value)
+			if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::f32x4, EmuSIMD::f32x8, EmuSIMD::f32x16>::value)
 			{
 				if constexpr (EmuCore::TMP::is_static_castable_v<float, OutT_>)
 				{
-					if constexpr (std::is_same_v<register_type_uq, __m128>)
+					if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 					{
 						if constexpr (Index_ <= 3)
 						{
@@ -32,7 +32,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 							static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 128-bit float SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1, 2, 3.");
 						}
 					}
-					else if constexpr (std::is_same_v<register_type_uq, __m256>)
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 					{
 						if constexpr (Index_ <= 7)
 						{
@@ -64,11 +64,11 @@ namespace EmuSIMD::_underlying_simd_helpers
 					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a float-containing SIMD register using EmuSIMD helpers, but the provided output type cannot be created from a float value.");
 				}
 			}
-			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128d, __m256d, __m512d>::value)
+			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::f64x2, EmuSIMD::f64x4, EmuSIMD::f64x8>::value)
 			{
 				if constexpr (EmuCore::TMP::is_static_castable_v<double, OutT_>)
 				{
-					if constexpr (std::is_same_v<register_type_uq, __m128d>)
+					if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 					{
 						if constexpr (Index_ <= 1)
 						{
@@ -83,7 +83,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 							static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 128-bit double SIMD register using EmuSIMD helpers, but the provided Index_ was invalid. Valid indices: 0, 1.");
 						}
 					}
-					else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 					{
 						if constexpr (Index_ <= 3)
 						{
@@ -115,7 +115,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a double-containing SIMD register using EmuSIMD helpers, but the provided output type cannot be created from a double value.");
 				}
 			}
-			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>::value)
+			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::i128_generic, EmuSIMD::i256_generic, EmuSIMD::i512_generic>::value)
 			{
 				if constexpr(EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfInt_>())
 				{
@@ -123,7 +123,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 					if constexpr (EmuCore::TMP::is_static_castable_v<int_type, OutT_>)
 					{
 						constexpr std::size_t chunk_divisor_ = std::size_t(128) / PerElementWidthIfInt_;
-						if constexpr (std::is_same_v<register_type_uq, __m128i>)
+						if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 						{
 							constexpr std::size_t first_invalid_index_ = chunk_divisor_;
 							if constexpr (Index_ < first_invalid_index_)
@@ -151,7 +151,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 								static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to extract an index from a 128-bit integral SIMD register using EmuSIMD helpers, but the provided index is invalid for the provided width. The valid index range is 0:(128 / PerElementWidthIfInt_)-1.");
 							}
 						}
-						else if constexpr (std::is_same_v<register_type_uq, __m256i>)
+						else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 						{
 							constexpr std::size_t first_invalid_index_ = std::size_t(256) / PerElementWidthIfInt_;
 							if constexpr (Index_ < first_invalid_index_)
@@ -207,39 +207,39 @@ namespace EmuSIMD::_underlying_simd_helpers
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<Register_>)
 		{
 			using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
-			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
 				_mm_store_ps(reinterpret_cast<float*>(p_out_), register_);
 			}
-			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
 				_mm_store_pd(reinterpret_cast<double*>(p_out_), register_);
 			}
-			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
 				_mm256_store_ps(reinterpret_cast<float*>(p_out_), register_);
 			}
-			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
 				_mm256_store_pd(reinterpret_cast<double*>(p_out_), register_);
 			}
-			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 			{
 				_mm512_store_ps(reinterpret_cast<void*>(p_out_), register_);
 			}
-			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 			{
 				_mm512_store_pd(reinterpret_cast<void*>(p_out_), register_);
 			}
-			else if constexpr (std::is_same_v<register_type_uq, __m128i>)
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 			{
-				_mm_store_si128(reinterpret_cast<__m128i*>(p_out_), register_);
+				_mm_store_si128(reinterpret_cast<EmuSIMD::i128_generic*>(p_out_), register_);
 			}
-			else if constexpr (std::is_same_v<register_type_uq, __m256i>)
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 			{
-				_mm256_store_si256(reinterpret_cast<__m256i*>(p_out_), register_);
+				_mm256_store_si256(reinterpret_cast<EmuSIMD::i256_generic*>(p_out_), register_);
 			}
-			else if constexpr (std::is_same_v<register_type_uq, __m512i>)
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
 			{
 				_mm512_store_si512(reinterpret_cast<void*>(p_out_), register_);
 			}

@@ -17,35 +17,35 @@ namespace EmuSIMD
 
 #pragma region SHUFFLE_MASK_ALIASES
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m128 = shuffle_mask<__m128, I0_, I1_, I2_, I3_>;
+	using shuffle_mask_m128 = shuffle_mask<EmuSIMD::f32x4, I0_, I1_, I2_, I3_>;
 
 	template<std::size_t I0_, std::size_t I1_>
-	using shuffle_mask_m128d = shuffle_mask<__m128d, I0_, I1_>;
+	using shuffle_mask_m128d = shuffle_mask<EmuSIMD::f64x2, I0_, I1_>;
 
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m128i16 = shuffle_mask<__m128i, I0_, I1_, I2_, I3_>;
+	using shuffle_mask_m128i16 = shuffle_mask<EmuSIMD::i128_generic, I0_, I1_, I2_, I3_>;
 
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m128i32 = shuffle_mask<__m128i, I0_, I1_, I2_, I3_>;
+	using shuffle_mask_m128i32 = shuffle_mask<EmuSIMD::i128_generic, I0_, I1_, I2_, I3_>;
 
 	template
 	<
 		std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, std::size_t I4_, std::size_t I5_, std::size_t I6_, std::size_t I7_,
 		std::size_t I8_, std::size_t I9_, std::size_t I10_, std::size_t I11_, std::size_t I12_, std::size_t I13_, std::size_t I14_, std::size_t I15_
 	>
-	using shuffle_mask_m128i8 = shuffle_mask<__m128i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>;
+	using shuffle_mask_m128i8 = shuffle_mask<EmuSIMD::i128_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>;
 
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m256 = shuffle_mask<__m256, I0_, I1_, I2_, I3_>;
+	using shuffle_mask_m256 = shuffle_mask<EmuSIMD::f32x8, I0_, I1_, I2_, I3_>;
 
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m256d = shuffle_mask<__m256d, I0_, I1_, I2_, I3_>;
+	using shuffle_mask_m256d = shuffle_mask<EmuSIMD::f64x4, I0_, I1_, I2_, I3_>;
 
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m256i16 = shuffle_mask<__m256i, I0_, I1_, I2_, I3_>;
+	using shuffle_mask_m256i16 = shuffle_mask<EmuSIMD::i256_generic, I0_, I1_, I2_, I3_>;
 
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m256i32 = shuffle_mask<__m256i, I0_, I1_, I2_, I3_>;
+	using shuffle_mask_m256i32 = shuffle_mask<EmuSIMD::i256_generic, I0_, I1_, I2_, I3_>;
 
 	template
 	<
@@ -56,22 +56,22 @@ namespace EmuSIMD
 	>
 	using shuffle_mask_m256i8 = shuffle_mask
 	<
-		__m256i,
+		EmuSIMD::i256_generic,
 		I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_,
 		I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_
 	>;
 
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m512 = shuffle_mask<__m512, I0_, I1_, I2_, I3_>;
+	using shuffle_mask_m512 = shuffle_mask<EmuSIMD::f32x16, I0_, I1_, I2_, I3_>;
 
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, std::size_t I4_, std::size_t I5_, std::size_t I6_, std::size_t I7_>
-	using shuffle_mask_m512d = shuffle_mask<__m512d, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>;
+	using shuffle_mask_m512d = shuffle_mask<EmuSIMD::f64x8, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>;
 
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m512i16 = shuffle_mask<__m512i, I0_, I1_, I2_, I3_>;
+	using shuffle_mask_m512i16 = shuffle_mask<EmuSIMD::i512_generic, I0_, I1_, I2_, I3_>;
 
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	using shuffle_mask_m512i32 = shuffle_mask<__m512i, I0_, I1_, I2_, I3_>;
+	using shuffle_mask_m512i32 = shuffle_mask<EmuSIMD::i512_generic, I0_, I1_, I2_, I3_>;
 
 	template
 	<
@@ -86,7 +86,7 @@ namespace EmuSIMD
 	>
 	using shuffle_mask_m512i8 = shuffle_mask
 	<
-		__m512i,
+		EmuSIMD::i512_generic,
 		I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_,  I8_,  I9_,  I10_, I11_, I12_, I13_, I14_, I15_,
 		I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_,
 		I32_, I33_, I34_, I35_, I36_, I37_, I38_, I39_, I40_, I41_, I42_, I43_, I44_, I45_, I46_, I47_,

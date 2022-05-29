@@ -13,7 +13,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 
 #pragma region BLEND_MASK_128
 	template<bool I0_, bool I1_, bool I2_, bool I3_>
-	struct _blend_mask<__m128, I0_, I1_, I2_, I3_>
+	struct _blend_mask<EmuSIMD::f32x4, I0_, I1_, I2_, I3_>
 	{
 	private:
 		template<std::size_t Index_>
@@ -31,7 +31,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	};
 
 	template<bool I0_, bool I1_>
-	struct _blend_mask<__m128d, I0_, I1_>
+	struct _blend_mask<EmuSIMD::f64x2, I0_, I1_>
 	{
 	private:
 		template<std::size_t Index_>
@@ -53,24 +53,24 @@ namespace EmuSIMD::_underlying_simd_helpers
 		bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_,
 		bool I8_, bool I9_, bool I10_, bool I11_, bool I12_, bool I13_, bool I14_, bool I15_
 	>
-	struct _blend_mask<__m128i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>
+	struct _blend_mask<EmuSIMD::i128_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>
 	{
 	private:
 		using _mask_generator = _underlying_simd_helpers::_per_index_mask
 		<
-			__m128i,
+			EmuSIMD::i128_generic,
 			I15_, I14_, I13_, I12_, I11_, I10_, I9_,  I8_,  I7_,  I6_,  I5_,  I4_,  I3_,  I2_,  I1_,  I0_
 		>;
 
 	public:
-		[[nodiscard]] static inline __m128i get()
+		[[nodiscard]] static inline EmuSIMD::i128_generic get()
 		{
 			return _mask_generator::get();
 		}
 	};
 
 	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_>
-	struct _blend_mask<__m128i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>
+	struct _blend_mask<EmuSIMD::i128_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>
 	{
 	private:
 		template<std::size_t Index_>
@@ -88,7 +88,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	};
 
 	template<bool I0_, bool I1_, bool I2_, bool I3_>
-	struct _blend_mask<__m128i, I0_, I1_, I2_, I3_>
+	struct _blend_mask<EmuSIMD::i128_generic, I0_, I1_, I2_, I3_>
 	{
 	private:
 		template<std::size_t Index_>
@@ -106,10 +106,10 @@ namespace EmuSIMD::_underlying_simd_helpers
 	};
 
 	template<bool I0_, bool I1_>
-	struct _blend_mask<__m128i, I0_, I1_>
+	struct _blend_mask<EmuSIMD::i128_generic, I0_, I1_>
 	{
 	private:
-		using _mask_generator = _blend_mask<__m128i, I0_, I0_, I1_, I1_>;
+		using _mask_generator = _blend_mask<EmuSIMD::i128_generic, I0_, I0_, I1_, I1_>;
 
 	public:
 		static constexpr int value = _mask_generator::value;
@@ -122,7 +122,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 
 #pragma region BLEND_MASK_256
 	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_>
-	struct _blend_mask<__m256, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>
+	struct _blend_mask<EmuSIMD::f32x8, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>
 	{
 	private:
 		template<std::size_t Index_>
@@ -140,7 +140,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	};
 
 	template<bool I0_, bool I1_, bool I2_, bool I3_>
-	struct _blend_mask<__m256d, I0_, I1_, I2_, I3_>
+	struct _blend_mask<EmuSIMD::f64x4, I0_, I1_, I2_, I3_>
 	{
 	private:
 		template<std::size_t Index_>
@@ -166,7 +166,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	>
 	struct _blend_mask
 	<
-		__m256i,
+		EmuSIMD::i256_generic,
 		I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_,  I8_,  I9_,  I10_, I11_, I12_, I13_, I14_, I15_,
 		I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_
 	>
@@ -174,13 +174,13 @@ namespace EmuSIMD::_underlying_simd_helpers
 	private:
 		using _mask_generator = _underlying_simd_helpers::_per_index_mask
 		<
-			__m256i,
+			EmuSIMD::i256_generic,
 			I31_, I30_, I29_, I28_, I27_, I26_, I25_, I24_, I23_, I22_, I21_, I20_, I19_, I18_, I17_, I16_,
 			I15_, I14_, I13_, I12_, I11_, I10_, I9_,  I8_,  I7_,  I6_,  I5_,  I4_,  I3_,  I2_,  I1_,  I0_
 		>;
 
 	public:
-		[[nodiscard]] static inline __m256i get()
+		[[nodiscard]] static inline EmuSIMD::i256_generic get()
 		{
 			return _mask_generator::get();
 		}
@@ -191,25 +191,25 @@ namespace EmuSIMD::_underlying_simd_helpers
 		bool I0_,  bool I1_,  bool I2_,  bool I3_,  bool I4_,  bool I5_,  bool I6_,  bool I7_,
 		bool I8_,  bool I9_,  bool I10_, bool I11_, bool I12_, bool I13_, bool I14_, bool I15_
 	>
-	struct _blend_mask<__m256i, I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_,  I8_,  I9_,  I10_, I11_, I12_, I13_, I14_, I15_>
+	struct _blend_mask<EmuSIMD::i256_generic, I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_,  I8_,  I9_,  I10_, I11_, I12_, I13_, I14_, I15_>
 	{
 	private:
 		using _mask_generator = _blend_mask
 		<
-			__m256i,
+			EmuSIMD::i256_generic,
 			I0_, I0_, I1_, I1_, I2_,  I2_,  I3_,  I3_,  I4_,  I4_,  I5_,  I5_,  I6_,  I6_,  I7_,  I7_,
 			I8_, I8_, I9_, I9_, I10_, I10_, I11_, I11_, I12_, I12_, I13_, I13_, I14_, I14_, I15_, I15_
 		>;
 
 	public:
-		[[nodiscard]] static inline __m256i get()
+		[[nodiscard]] static inline EmuSIMD::i256_generic get()
 		{
 			return _mask_generator::get();
 		}
 	};
 
 	template<bool I0_,  bool I1_,  bool I2_,  bool I3_,  bool I4_,  bool I5_,  bool I6_,  bool I7_>
-	struct _blend_mask<__m256i, I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_>
+	struct _blend_mask<EmuSIMD::i256_generic, I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_>
 	{
 	private:
 		template<std::size_t Index_>
@@ -227,10 +227,10 @@ namespace EmuSIMD::_underlying_simd_helpers
 	};
 
 	template<bool I0_, bool I1_, bool I2_, bool I3_>
-	struct _blend_mask<__m256i, I0_, I1_, I2_, I3_>
+	struct _blend_mask<EmuSIMD::i256_generic, I0_, I1_, I2_, I3_>
 	{
 	private:
-		using _mask_generator = _blend_mask<__m256i, I0_, I0_, I1_, I1_, I2_, I2_, I3_, I3_>;
+		using _mask_generator = _blend_mask<EmuSIMD::i256_generic, I0_, I0_, I1_, I1_, I2_, I2_, I3_, I3_>;
 
 	public:
 		static constexpr int value = _mask_generator::value;
@@ -247,7 +247,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		bool I0_,  bool I1_,  bool I2_,  bool I3_,  bool I4_,  bool I5_,  bool I6_,  bool I7_,
 		bool I8_,  bool I9_,  bool I10_, bool I11_, bool I12_, bool I13_, bool I14_, bool I15_
 	>
-	struct _blend_mask<__m512, I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_,  I8_,  I9_,  I10_, I11_, I12_, I13_, I14_, I15_>
+	struct _blend_mask<EmuSIMD::f32x16, I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_,  I8_,  I9_,  I10_, I11_, I12_, I13_, I14_, I15_>
 	{
 	private:
 		template<std::size_t Index_>
@@ -269,7 +269,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	};
 
 	template<bool I0_,  bool I1_,  bool I2_,  bool I3_,  bool I4_,  bool I5_,  bool I6_,  bool I7_>
-	struct _blend_mask<__m512d, I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_>
+	struct _blend_mask<EmuSIMD::f64x8, I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_>
 	{
 	private:
 		template<std::size_t Index_>
@@ -299,7 +299,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	>
 	struct _blend_mask
 	<
-		__m512i,
+		EmuSIMD::i512_generic,
 		I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_,  I8_,  I9_,  I10_, I11_, I12_, I13_, I14_, I15_,
 		I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_,
 		I32_, I33_, I34_, I35_, I36_, I37_, I38_, I39_, I40_, I41_, I42_, I43_, I44_, I45_, I46_, I47_,
@@ -340,7 +340,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	>
 	struct _blend_mask
 	<
-		__m512i,
+		EmuSIMD::i512_generic,
 		I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_,  I8_,  I9_,  I10_, I11_, I12_, I13_, I14_, I15_,
 		I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_
 	>
@@ -371,7 +371,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		bool I0_,  bool I1_,  bool I2_,  bool I3_,  bool I4_,  bool I5_,  bool I6_,  bool I7_,
 		bool I8_,  bool I9_,  bool I10_, bool I11_, bool I12_, bool I13_, bool I14_, bool I15_
 	>
-	struct _blend_mask<__m512i,I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_,  I8_,  I9_,  I10_, I11_, I12_, I13_, I14_, I15_>
+	struct _blend_mask<EmuSIMD::i512_generic,I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_,  I8_,  I9_,  I10_, I11_, I12_, I13_, I14_, I15_>
 	{
 	private:
 		template<std::size_t Index_>
@@ -393,7 +393,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	};
 
 	template<bool I0_,  bool I1_,  bool I2_,  bool I3_,  bool I4_,  bool I5_,  bool I6_,  bool I7_>
-	struct _blend_mask<__m512i,I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_>
+	struct _blend_mask<EmuSIMD::i512_generic,I0_,  I1_,  I2_,  I3_,  I4_,  I5_,  I6_,  I7_>
 	{
 	private:
 		template<std::size_t Index_>

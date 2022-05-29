@@ -140,7 +140,7 @@ namespace EmuSIMD
 
 	/// <summary> 
 	/// <para> Sets a SIMD register via decrementing values within its relevant _set_ function, starting at StartingVal_. </para>
-	/// <para> E.g. when setting __m128 where StartingVal_ == 4, this will generate the equivalent of _mm_set_ps(4.0f, 3.0f, 2.0f, 1.0f). </para>
+	/// <para> E.g. when setting EmuSIMD::f32x4 where StartingVal_ == 4, this will generate the equivalent of _mm_set_ps(4.0f, 3.0f, 2.0f, 1.0f). </para>
 	/// </summary>
 	/// <returns>SIMD register of the specified type with elements set via _set_ with a consistently decrementing value from StartingVal_.</returns>
 	template<class Register_, std::int64_t StartingVal_, std::size_t ElementWidthIfInt_ = 32>
@@ -158,7 +158,7 @@ namespace EmuSIMD
 	}
 	/// <summary> 
 	/// <para> Sets a SIMD register via decrementing values within its relevant _setr_ function, starting at StartingVal_. </para>
-	/// <para> E.g. when setting __m128 where StartingVal_ == 4, this will generate the equivalent of _mm_setr_ps(4.0f, 3.0f, 2.0f, 1.0f). </para>
+	/// <para> E.g. when setting EmuSIMD::f32x4 where StartingVal_ == 4, this will generate the equivalent of _mm_setr_ps(4.0f, 3.0f, 2.0f, 1.0f). </para>
 	/// </summary>
 	/// <returns>SIMD register of the specified type with elements set via _setr_ with a consistently decrementing value from StartingVal_.</returns>
 	template<class Register_, std::int64_t StartingVal_, std::size_t ElementWidthIfInt_ = 32>
@@ -177,7 +177,7 @@ namespace EmuSIMD
 
 	/// <summary> 
 	/// <para> Sets a SIMD register via incrementing values within its relevant _set_ function, starting at StartingVal_. </para>
-	/// <para> E.g. when setting __m128 where StartingVal_ == 4, this will generate the equivalent of _mm_set_ps(4.0f, 5.0f, 6.0f, 7.0f). </para>
+	/// <para> E.g. when setting EmuSIMD::f32x4 where StartingVal_ == 4, this will generate the equivalent of _mm_set_ps(4.0f, 5.0f, 6.0f, 7.0f). </para>
 	/// </summary>
 	/// <returns>SIMD register of the specified type with elements set via _set_ with a consistently incrementing value from StartingVal_.</returns>
 	template<class Register_, std::int64_t StartingVal_, std::size_t ElementWidthIfInt_ = 32>
@@ -195,7 +195,7 @@ namespace EmuSIMD
 	}
 	/// <summary> 
 	/// <para> Sets a SIMD register via incrementing values within its relevant _setr_ function, starting at StartingVal_. </para>
-	/// <para> E.g. when setting __m128 where StartingVal_ == 4, this will generate the equivalent of _mm_setr_ps(4.0f, 5.0f, 6.0f, 7.0f). </para>
+	/// <para> E.g. when setting EmuSIMD::f32x4 where StartingVal_ == 4, this will generate the equivalent of _mm_setr_ps(4.0f, 5.0f, 6.0f, 7.0f). </para>
 	/// </summary>
 	/// <returns>SIMD register of the specified type with elements set via _setr_ with a consistently incrementing value from StartingVal_.</returns>
 	template<class Register_, std::int64_t StartingVal_, std::size_t ElementWidthIfInt_ = 32>
@@ -217,7 +217,7 @@ namespace EmuSIMD
 	/// <para> Bits of pointed-to data are loaded directly; conversions between different representations (such as IEEE-754 -> 2's complement) are NOT performed. </para>
 	/// <para> 
 	///		It is the caller's responsibility to ensure that the pointed-to location contains enough contiguously safe memory 
-	///		(e.g. 256 bits for __m256 registers) for the register to read from. 
+	///		(e.g. 256 bits for EmuSIMD::f32x8 registers) for the register to read from. 
 	/// </para>
 	/// </summary>
 	/// <typeparam name="Register_">Type of SIMD register to create from loaded data.</typeparam>

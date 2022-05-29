@@ -316,6 +316,18 @@ int main()
 	std::cout << fastv8i32_a << " >> " << 2 << " = " << (fastv8i32_a.ShiftRightAssign(2)) << "\n";
 	std::cout << "~" << fastv8i32_a << " = " << (fastv8i32_a.NotAssign()) << "\n";
 
+
+	std::cout << "\n\n";
+	EmuMath::FastVector<4, float> fastv4f32_a(1, 2, 3, 4);
+	EmuMath::FastVector<4, float> fastv4f32_b(20, -10, 5, 4);
+	EmuMath::FastVector<4, float> fastv4f32_t(0.5f, 2.0f, 0.0f, 19999.0f);
+	std::cout << "LERP(\n\t" << fastv4f32_a << ",\n\t" << fastv4f32_b << ",\n\t" << fastv4f32_t << "\n) = " << fastv4f32_a.FusedLerp(fastv4f32_b, fastv4f32_t) << "\n\n";
+
+	EmuMath::FastVector<8, double> fastv8f64_a(1, 2, 3, 4, 5, 6, 7, 8);
+	EmuMath::FastVector<8, double> fastv8f64_b(20, -10, 5, 4, 2, 6, 1337, 2);
+	EmuMath::FastVector<8, double> fastv8f64_t(0.5, 2.0, 0.0, 19999.0, 0.25, 0.75, -0.5, 1.0);
+	std::cout << "LERP(\n\t" << fastv8f64_a << ",\n\t" << fastv8f64_b << ",\n\t" << fastv8f64_t << "\n) = " << fastv8f64_a.FusedLerp(fastv8f64_b, fastv8f64_t) << "\n\n";
+
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 	constexpr auto mat_b_ = EmuMath::Matrix<4, 4, int, true>(1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);

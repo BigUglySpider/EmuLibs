@@ -17,7 +17,7 @@ namespace EmuSIMD
 	/// <typeparam name="Register_">Register type to perform an addition operation via.</typeparam>
 	/// <param name="lhs_">Register of values appearing on the left-hand side of addition.</param>
 	/// <param name="rhs_">Register of values appearing on the right-hand side of addition.</param>
-	/// <returns>Result of adding the two passed SIMD registers with their relevant _add_ operation (e.g. _mm_add_ps with __m128 registers).</returns>
+	/// <returns>Result of adding the two passed SIMD registers with their relevant _add_ operation (e.g. _mm_add_ps with EmuSIMD::f32x4 registers).</returns>
 	template<std::size_t PerElementWidthIfIntegral_ = 32, class Register_>
 	[[nodiscard]] inline Register_ add(Register_ lhs_, Register_ rhs_)
 	{
@@ -49,7 +49,7 @@ namespace EmuSIMD
 	/// <typeparam name="Register_">Register type to perform a subtraction operation via.</typeparam>
 	/// <param name="lhs_">Register of values appearing on the left-hand side of subtraction.</param>
 	/// <param name="rhs_">Register of values appearing on the right-hand side of subtraction.</param>
-	/// <returns>Result of subtracting the two passed SIMD registers with their relevant _sub_ operation (e.g. _mm_sub_ps with __m128 registers).</returns>
+	/// <returns>Result of subtracting the two passed SIMD registers with their relevant _sub_ operation (e.g. _mm_sub_ps with EmuSIMD::f32x4 registers).</returns>
 	template<std::size_t PerElementWidthIfIntegral_ = 32, class Register_>
 	[[nodiscard]] inline Register_ sub(Register_ lhs_, Register_ rhs_)
 	{
@@ -85,7 +85,7 @@ namespace EmuSIMD
 	/// <typeparam name="Register_">Register type to perform a multiplication operation via.</typeparam>
 	/// <param name="lhs_">Register of values appearing on the left-hand side of multiplication.</param>
 	/// <param name="rhs_">Register of values appearing on the right-hand side of multiplication.</param>
-	/// <returns>Result of multiplying the two passed SIMD registers with their relevant _mul_ operation (e.g. _mm_mul_ps with __m128 registers).</returns>
+	/// <returns>Result of multiplying the two passed SIMD registers with their relevant _mul_ operation (e.g. _mm_mul_ps with EmuSIMD::f32x4 registers).</returns>
 	template<bool SignedIfIntegral_ = true, class Register_>
 	[[nodiscard]] inline Register_ mul(Register_ lhs_, Register_ rhs_)
 	{
@@ -123,7 +123,7 @@ namespace EmuSIMD
 	/// <param name="lhs_">Register of values appearing on the left-hand side of multiplication.</param>
 	/// <param name="rhs_">Register of values appearing on the right-hand side of multiplication.</param>
 	/// <returns>
-	///		Result of multiplying the two passed SIMD registers with their relevant _mul_ operation (e.g. _mm_mul_ps with __m128 registers), where
+	///		Result of multiplying the two passed SIMD registers with their relevant _mul_ operation (e.g. _mm_mul_ps with EmuSIMD::f32x4 registers), where
 	///		all operations and resulting elements are of the same width of the input elements.
 	/// </returns>
 	template<std::size_t PerElementWidthIfIntegral_ = 32, class Register_>
@@ -195,7 +195,7 @@ namespace EmuSIMD
 	/// <typeparam name="Register_">Register type to perform a division operation via.</typeparam>
 	/// <param name="lhs_">Register of values appearing on the left-hand side of division.</param>
 	/// <param name="rhs_">Register of values appearing on the right-hand side of division.</param>
-	/// <returns>Result of division with the two passed SIMD registers with their relevant _div_ operation (e.g. _mm_div_ps with __m128 registers).</returns>
+	/// <returns>Result of division with the two passed SIMD registers with their relevant _div_ operation (e.g. _mm_div_ps with EmuSIMD::f32x4 registers).</returns>
 	template<std::size_t PerElementWidthIfIntegral_ = 32, bool SignedIfIntegral_ = true, class Register_>
 	[[nodiscard]] inline Register_ div(Register_ lhs_, Register_ rhs_)
 	{
@@ -230,7 +230,7 @@ namespace EmuSIMD
 	/// <typeparam name="Register_">Register type to perform a modulo division operation via.</typeparam>
 	/// <param name="lhs_">Register of values appearing on the left-hand side of modulo division.</param>
 	/// <param name="rhs_">Register of values appearing on the right-hand side of modulo division.</param>
-	/// <returns>Result of modulo division with the two passed SIMD registers with their relevant mod operation (e.g. _mm_fmod_ps with __m128 registers).</returns>
+	/// <returns>Result of modulo division with the two passed SIMD registers with their relevant mod operation (e.g. _mm_fmod_ps with EmuSIMD::f32x4 registers).</returns>
 	template<std::size_t PerElementWidthIfIntegral_ = 32, bool SignedIfIntegral_ = true, class Register_>
 	[[nodiscard]] inline Register_ mod(Register_ lhs_, Register_ rhs_)
 	{

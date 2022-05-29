@@ -33,7 +33,7 @@ namespace EmuSIMD
 	/// <para> Outputs the entirety of the passed SIMD register to the contiguous memory location pointed to by p_out_. </para>
 	/// <para> 
 	///		It is the caller's responsibility to ensure that the output location contains enough contiguously safe memory 
-	///		(e.g. 256 bits for __m256 registers) to store the passed register. 
+	///		(e.g. 256 bits for EmuSIMD::f32x8 registers) to store the passed register. 
 	/// </para>
 	/// <para> EmuSIMD::TMP::simd_register_width_v may be useful for forming a generic output location for this function. </para>
 	/// </summary>

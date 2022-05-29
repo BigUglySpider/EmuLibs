@@ -32,15 +32,15 @@ namespace EmuSIMD::TMP
 		using type = std::conditional_t
 		<
 			Width_ == 128,
-			__m128i,
+			EmuSIMD::i128_generic,
 			std::conditional_t
 			<
 				Width_ == 256,
-				__m256i,
+				EmuSIMD::i256_generic,
 				std::conditional_t
 				<
 					Width_ == 512,
-					__m512i,
+					EmuSIMD::i512_generic,
 					void
 				>
 			>
@@ -65,13 +65,13 @@ namespace EmuSIMD::TMP
 	template<>
 	struct register_type<float, 128>
 	{
-		using type = __m128;
+		using type = EmuSIMD::f32x4;
 	};
 
 	template<>
 	struct register_type<double, 128>
 	{
-		using type = __m128d;
+		using type = EmuSIMD::f64x2;
 	};
 #pragma endregion
 
@@ -79,13 +79,13 @@ namespace EmuSIMD::TMP
 	template<>
 	struct register_type<float, 256>
 	{
-		using type = __m256;
+		using type = EmuSIMD::f32x8;
 	};
 
 	template<>
 	struct register_type<double, 256>
 	{
-		using type = __m256d;
+		using type = EmuSIMD::f64x4;
 	};
 #pragma endregion
 
@@ -93,13 +93,13 @@ namespace EmuSIMD::TMP
 	template<>
 	struct register_type<float, 512>
 	{
-		using type = __m512;
+		using type = EmuSIMD::f32x16;
 	};
 
 	template<>
 	struct register_type<double, 512>
 	{
-		using type = __m512d;
+		using type = EmuSIMD::f64x8;
 	};
 #pragma endregion
 
