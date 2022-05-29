@@ -283,8 +283,13 @@ int main()
 	std::cout << fast_v4f_a << "\n";
 	std::cout << fast_v4f_a.AddAssign(5) << "\n";
 	std::cout << fast_v4f_a.AddAssign(_mm_set_ps1(20)) << "\n";
-	fast_v4f_b = EmuMath::FastVector<4, float>(1, 2, 3, 4);
+	fast_v4f_b = EmuMath::FastVector<4, float>(1000, 2000, 3000, 4000);
 	std::cout << fast_v4f_a << " + " << fast_v4f_b << " = " << fast_v4f_a.AddAssign(fast_v4f_b) << "\n";
+	std::cout << fast_v4f_a << " - " << fast_v4f_b << " = " << fast_v4f_a.SubtractAssign(fast_v4f_b) << "\n";
+	std::cout << fast_v4f_a << " * " << fast_v4f_b << " = " << fast_v4f_a.MultiplyAssign(fast_v4f_b) << "\n";
+	std::cout << fast_v4f_a << " / " << fast_v4f_b << " = " << fast_v4f_a.DivideAssign(fast_v4f_b) << "\n";
+	std::cout << fast_v4f_a << " % " << fast_v4f_b << " = " << fast_v4f_a.ModAssign(fast_v4f_b) << "\n";
+	std::cout << "-" << fast_v4f_a << " = " << fast_v4f_a.NegateAssign() << "\n";
 
 
 	system("pause");

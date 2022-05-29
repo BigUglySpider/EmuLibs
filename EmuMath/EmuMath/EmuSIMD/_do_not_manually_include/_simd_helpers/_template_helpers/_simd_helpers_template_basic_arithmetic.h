@@ -270,7 +270,7 @@ namespace EmuSIMD
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
-			return _underlying_simd_helpers::_negate(register_);
+			return _underlying_simd_helpers::_negate<PerElementWidthIfIntegral_>(register_);
 		}
 		else
 		{
