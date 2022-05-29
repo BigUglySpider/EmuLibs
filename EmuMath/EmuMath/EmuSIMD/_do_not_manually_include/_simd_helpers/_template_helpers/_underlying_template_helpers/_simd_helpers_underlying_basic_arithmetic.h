@@ -689,27 +689,39 @@ namespace EmuSIMD::_underlying_simd_helpers
 		{
 			if constexpr (std::is_same_v<register_type_uq, __m128>)
 			{
-				return _mm_fmod_ps(lhs_, rhs_);
+				__m128 res = _mm_div_ps(lhs_, rhs_);
+				res = _mm_trunc_ps(res);
+				return _mm_fnmadd_ps(res, rhs_, lhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, __m256>)
 			{
-				return _mm256_fmod_ps(lhs_, rhs_);
+				__m256 res = _mm256_div_ps(lhs_, rhs_);
+				res = _mm256_trunc_ps(res);
+				return _mm256_fnmadd_ps(res, rhs_, lhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, __m512>)
 			{
-				return _mm512_fmod_ps(lhs_, rhs_);
+				__m512 res = _mm512_div_ps(lhs_, rhs_);
+				res = _mm512_trunc_ps(res);
+				return _mm512_fnmadd_ps(res, rhs_, lhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
 			{
-				return _mm_fmod_pd(lhs_, rhs_);
+				__m128d res = _mm_div_pd(lhs_, rhs_);
+				res = _mm_trunc_pd(res);
+				return _mm_fnmadd_pd(res, rhs_, lhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
 			{
-				return _mm256_fmod_pd(lhs_, rhs_);
+				__m256d res = _mm256_div_pd(lhs_, rhs_);
+				res = _mm256_trunc_pd(res);
+				return _mm256_fnmadd_pd(res, rhs_, lhs_);
 			}
 			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
 			{
-				return _mm512_fmod_pd(lhs_, rhs_);
+				__m512d res = _mm512_div_pd(lhs_, rhs_);
+				res = _mm512_trunc_pd(res);
+				return _mm512_fnmadd_pd(res, rhs_, lhs_);
 			}
 			else
 			{

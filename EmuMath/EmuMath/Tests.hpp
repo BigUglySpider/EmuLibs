@@ -138,7 +138,7 @@ namespace EmuCore::TestingHelpers
 		void operator()(std::size_t i_)
 		{
 			// ADD
-			out_vecs[i_] = lhs[i_].Add(rhs[i_]);
+			out_vecs[i_] = lhs[i_].Mod(rhs[i_]);
 		}
 		void OnTestsOver()
 		{
@@ -189,7 +189,7 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i_)
 		{
-			out_vecs[i_] = DirectX::XMVectorAdd(lhs[i_], rhs[i_]);
+			out_vecs[i_] = DirectX::XMVectorMod(lhs[i_], rhs[i_]);
 		}
 		void OnTestsOver()
 		{

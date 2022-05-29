@@ -211,7 +211,6 @@ int main()
 	srand(static_cast<unsigned int>(time(0)));
 	EmuCore::Timer<std::milli> timer_;
 
-	/*
 #pragma region PRE_TEST_BODY
 	EmuMath::FastVector<4, float> fast_v4f_a;
 	EmuMath::FastVector<4, float> fast_v4f_b(12);
@@ -279,6 +278,13 @@ int main()
 	std::cout << fast_v16u16_a << " +\n" << fast_v16u16_b << " =\n" << fast_v16u16_a.Add(fast_v16u16_b) << "\n";
 	std::cout << fast_v16u16_a << " + 16 = " << fast_v16u16_a.Add(16) << "\n";
 	std::cout << EmuMath::FastVector<4, std::int32_t>(1, 2, 3, 4).Add(5) << "\n";
+
+	std::cout << "\n\n";
+	std::cout << fast_v4f_a << "\n";
+	std::cout << fast_v4f_a.AddAssign(5) << "\n";
+	std::cout << fast_v4f_a.AddAssign(_mm_set_ps1(20)) << "\n";
+	fast_v4f_b = EmuMath::FastVector<4, float>(1, 2, 3, 4);
+	std::cout << fast_v4f_a << " + " << fast_v4f_b << " = " << fast_v4f_a.AddAssign(fast_v4f_b) << "\n";
 
 
 	system("pause");
@@ -386,7 +392,6 @@ int main()
 	//WriteNoiseTableToPPM(noise_, noise_gradient_, "test_noise_scalar");
 	//WriteNoiseTableToPPM(fast_noise_, noise_gradient_, "test_noise_simd");
 #pragma endregion
-	 */
 
 	/*// Some tests to see disassembly
 	EmuMath::FastVector<4, float> veca((rand() % 100) * 0.33f, (rand() % 100) * 0.33f, (rand() % 100) * 0.33f, (rand() % 100) * 0.33f);

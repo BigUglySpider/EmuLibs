@@ -139,6 +139,28 @@ namespace EmuMath
 		{
 			return this_type(EmuSIMD::setallone<register_type>());
 		}
+
+		/// <summary> Creates a new register of this Vector's register_type with all bits set to 0. </summary>
+		/// <returns>A newly created register_type with all register bits set to 0.</returns>
+		static constexpr inline register_type make_all_zero_register()
+		{
+			return EmuSIMD::setzero<register_type>();
+		}
+
+		/// <summary> Creates a new register of this Vector's register_type with all bits set to 1. </summary>
+		/// <returns>A newly created register_type with all register bits set to 1.</returns>
+		static constexpr inline register_type make_all_one_register()
+		{
+			return EmuSIMD::setallone<register_type>();
+		}
+
+		/// <summary> Helper to create one instance of this Vector's register_type with all elements set to the provided val_. </summary>
+		/// <param name="val_">Value to set all elements within the output register to.</param>
+		/// <returns>A newly created register_type with all elements set to match val_.</returns>
+		static constexpr inline register_type make_all_same_register(value_type val_)
+		{
+			return EmuSIMD::set1<register_type, per_element_width>(val_);
+		}
 #pragma endregion
 
 #pragma region CONSTRUCTOR_VALIDATORS
@@ -390,8 +412,13 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region BASIC_ARITHMETIC
+#pragma region CONST_BASIC_ARITHMETIC
 	public:
+		/// <summary>
+		/// <para> Adds the passed register to all registers encapsulated by this Vector. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in add operations with all registers encapsulated by this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the addition operation.</returns>
 		[[nodiscard]] constexpr inline this_type Add(register_type rhs_for_all_) const
 		{
 			if constexpr (contains_multiple_registers)
@@ -404,11 +431,26 @@ namespace EmuMath
 			}
 		}
 
+		/// <summary>
+		/// <para> Adds the passed scalar value to all elements within this Vector. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to add to all elements within this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the addition operation.</returns>
 		[[nodiscard]] constexpr inline this_type Add(value_type rhs_for_all_) const
 		{
 			return Add(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
 		}
 
+		/// <summary>
+		/// <para>Adds this Vector and the passed rhs_ Vector of the same type.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to add to this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the addition operation.</returns>
 		[[nodiscard]] constexpr inline this_type Add(const this_type& rhs_) const
 		{
 			if constexpr (contains_multiple_registers)
@@ -421,12 +463,341 @@ namespace EmuMath
 			}
 		}
 
+		/// <summary>
+		/// <para> Subtracts the passed register from all registers encapsulated by this Vector. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in subtract operations with all registers encapsulated by this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the subtraction operation.</returns>
+		[[nodiscard]] constexpr inline this_type Subtract(register_type rhs_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_subtract(data, rhs_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::sub<per_element_width>(data, rhs_for_all_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Subtracts the passed scalar value to all elements within this Vector. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to subtract from all elements within this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the subtraction operation.</returns>
+		[[nodiscard]] constexpr inline this_type Subtract(value_type rhs_for_all_) const
+		{
+			return Subtract(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Subtracts this Vector and the passed rhs_ Vector of the same type.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to subtract from this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the subtraction operation.</returns>
+		[[nodiscard]] constexpr inline this_type Subtract(const this_type& rhs_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_subtract(data, rhs_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::sub<per_element_width>(data, rhs_.data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Multiplies all registers encapsulated by this Vector by the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in multiplication operations with all registers encapsulated by this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the multiplication operation.</returns>
+		[[nodiscard]] constexpr inline this_type Multiply(register_type rhs_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_multiply(data, rhs_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::mul_all<per_element_width>(data, rhs_for_all_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Multiplies all elements within this Vector by the passed scalar value. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to multiply all elements within this Vector by.</param>
+		/// <returns>New FastVector of this type resulting from the multiplication operation.</returns>
+		[[nodiscard]] constexpr inline this_type Multiply(value_type rhs_for_all_) const
+		{
+			return Multiply(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Multiplies this Vector and the passed rhs_ Vector of the same type.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to multiply this Vector by.</param>
+		/// <returns>New FastVector of this type resulting from the multiplication operation.</returns>
+		[[nodiscard]] constexpr inline this_type Multiply(const this_type& rhs_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_multiply(data, rhs_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::mul_all<per_element_width>(data, rhs_.data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Divides all registers encapsulated by this Vector by the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in division operations with all registers encapsulated by this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the division operation.</returns>
+		[[nodiscard]] constexpr inline this_type Divide(register_type rhs_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_divide(data, rhs_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::div<per_element_width, is_signed>(data, rhs_for_all_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Divides all elements within this Vector by the passed scalar value. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to divide all elements within this Vector by.</param>
+		/// <returns>New FastVector of this type resulting from the division operation.</returns>
+		[[nodiscard]] constexpr inline this_type Divide(value_type rhs_for_all_) const
+		{
+			return Divide(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Divides this Vector and the passed rhs_ Vector of the same type.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to divide this Vector by.</param>
+		/// <returns>New FastVector of this type resulting from the division operation.</returns>
+		[[nodiscard]] constexpr inline this_type Divide(const this_type& rhs_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_divide(data, rhs_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::div<per_element_width, is_signed>(data, rhs_.data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Modulo-divides all registers encapsulated by this Vector by the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in modulo-division operations with all registers encapsulated by this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the modulo-division operation.</returns>
+		[[nodiscard]] constexpr inline this_type Mod(register_type rhs_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_mod(data, rhs_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::mod<per_element_width, is_signed>(data, rhs_for_all_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Modulo-divides all elements within this Vector by the passed scalar value. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to modulo-divide all elements within this Vector by.</param>
+		/// <returns>New FastVector of this type resulting from the modulo-division operation.</returns>
+		[[nodiscard]] constexpr inline this_type Mod(value_type rhs_for_all_) const
+		{
+			return Mod(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Modulo-divides this Vector and the passed rhs_ Vector of the same type.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to modulo-divide this Vector by.</param>
+		/// <returns>New FastVector of this type resulting from the modulo-division operation.</returns>
+		[[nodiscard]] constexpr inline this_type Mod(const this_type& rhs_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_divide(data, rhs_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::mod<per_element_width, is_signed>(data, rhs_.data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Creates a negated form of this Vector, where each element will be set to -element.</para>
+		/// </summary>
+		/// <returns>New FastVector of this type resulting from the negation.</returns>
+		[[nodiscard]] constexpr inline this_type Negate(const this_type& rhs_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_negate(*this, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::negate<per_element_width>());
+			}
+		}
+
 	private:
 		template<typename Rhs_, std::size_t...RegisterIndices_>
 		static constexpr inline data_type _do_array_add(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
-			return data_type({ EmuSIMD::add<per_element_width>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))... });
+			return data_type
+			({
+				EmuSIMD::add<per_element_width>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
+			});
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_subtract(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			return data_type
+			({
+				EmuSIMD::sub<per_element_width>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
+			});
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_multiply(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			return data_type
+			({
+				EmuSIMD::mul_all<per_element_width>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
+			});
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_divide(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			return data_type
+			({
+				EmuSIMD::div<per_element_width, is_signed>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
+			});
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_mod(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			return data_type
+			({
+				EmuSIMD::mod<per_element_width, is_signed>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
+			});
+		}
+
+		template<std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_negate(const data_type& lhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type({ EmuSIMD::negate<per_element_width>(lhs_[RegisterIndices_])... });
+		}
+#pragma endregion
+
+#pragma region NON_CONST_BASIC_ARITHMETIC
+	public:
+		/// <summary>
+		/// <para> Adds the passed register to all registers encapsulated by this Vector, assigning the results to this Vector. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in add operations with all registers encapsulated by this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the addition operation.</returns>
+		[[nodiscard]] constexpr inline this_type& AddAssign(register_type rhs_for_all_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_add_assign(data, rhs_for_all_);
+			}
+			else
+			{
+				data = EmuSIMD::add<per_element_width>(data, rhs_for_all_);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Adds the passed scalar value to all elements within this Vector. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to add to all elements within this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the addition operation.</returns>
+		[[nodiscard]] constexpr inline this_type AddAssign(value_type rhs_for_all_)
+		{
+			return AddAssign(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Adds this Vector and the passed rhs_ Vector of the same type.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to add to this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the addition operation.</returns>
+		[[nodiscard]] constexpr inline this_type AddAssign(const this_type& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_add_assign(data, rhs_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::add<per_element_width>(data, rhs_.data);
+			}
+			return *this;
+		}
+
+	private:
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline void _do_array_add_assign(data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			((
+				lhs_[RegisterIndices_] = EmuSIMD::add<per_element_width>
+				(
+					lhs_[RegisterIndices_],
+					_retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_))
+					)
+				), ...);
 		}
 #pragma endregion
 
@@ -723,6 +1094,12 @@ namespace EmuMath
 			{
 				data = rhs_.data;
 			}
+			return *this;
+		}
+
+		constexpr inline this_type& operator=(this_type&& rhs_)
+		{
+			data = std::move(rhs_.data);
 			return *this;
 		}
 
