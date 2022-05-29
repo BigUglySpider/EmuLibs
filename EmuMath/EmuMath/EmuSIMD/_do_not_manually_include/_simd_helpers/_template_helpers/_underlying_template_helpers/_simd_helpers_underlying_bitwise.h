@@ -256,6 +256,843 @@ namespace EmuSIMD::_underlying_simd_helpers
 			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform bitwise NOT of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register.");
 		}
 	}
+
+#pragma region LEFT_SHIFTS
+	template<class Register_, int NumShifts_, std::size_t PerElementWidthIfInt_>
+	[[nodiscard]] inline Register_ _shift_left(Register_ lhs_)
+	{
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_castsi128_ps(_mm_slli_epi32(_mm_castps_si128(lhs_), NumShifts_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_castsi256_ps(_mm256_slli_epi32(_mm256_castps_si256(lhs_), NumShifts_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			{
+				return _mm512_castsi512_ps(_mm512_slli_epi32(_mm512_castps_si512(lhs_), NumShifts_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_castsi128_pd(_mm_slli_epi64(_mm_castpd_si128(lhs_), NumShifts_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_castsi256_pd(_mm256_slli_epi64(_mm256_castpd_si256(lhs_), NumShifts_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			{
+				return _mm512_castsi512_pd(_mm512_slli_epi64(_mm512_castpd_si512(lhs_), NumShifts_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128i>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					constexpr char keep_mask = 0xFF << NumShifts_;
+					return _mm_and_si128(_mm_set1_epi8(keep_mask), _mm_slli_epi32(lhs_, NumShifts_));
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					return _mm_slli_epi16(lhs_, NumShifts_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					return _mm_slli_epi32(lhs_, NumShifts_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					return _mm_slli_epi64(lhs_, NumShifts_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise left shift of an integral SIMD register using EmuSIMD helpers, but the provided width per element is invalid; only 8, 16, 32, and 64 are valid widths."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256i>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					constexpr char keep_mask = 0xFF << NumShifts_;
+					return _mm256_and_si256(_mm256_set1_epi8(keep_mask), _mm256_slli_epi32(lhs_, NumShifts_));
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					return _mm256_slli_epi16(lhs_, NumShifts_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					return _mm256_slli_epi32(lhs_, NumShifts_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					return _mm256_slli_epi64(lhs_, NumShifts_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise left shift of an integral SIMD register using EmuSIMD helpers, but the provided width per element is invalid; only 8, 16, 32, and 64 are valid widths."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512i>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					constexpr char keep_mask = 0xFF << NumShifts_;
+					return _mm512_and_si512(_mm512_set1_epi8(keep_mask), _mm512_slli_epi32(lhs_, NumShifts_));
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					return _mm512_slli_epi16(lhs_, NumShifts_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					return _mm512_slli_epi32(lhs_, NumShifts_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					return _mm512_slli_epi64(lhs_, NumShifts_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise left shift of an integral SIMD register using EmuSIMD helpers, but the provided width per element is invalid; only 8, 16, 32, and 64 are valid widths."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Register_>(),
+					"Attempted to perform bitwise left shift of a SIMD register using EmuSIMD helpers, but the provided SIMD register is not supported for this operation"
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<Register_>(),
+				"Attempted to perform bitwise left shift of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register."
+			);
+		}
+	}
+
+	template<class Register_, std::size_t PerElementWidthIfInt_>
+	[[nodiscard]] inline Register_ _shift_left(Register_ lhs_, __m128i rhs_)
+	{
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_castsi128_ps(_mm_sll_epi32(_mm_castps_si128(lhs_), rhs_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_castsi256_ps(_mm256_sll_epi32(_mm256_castps_si256(lhs_), rhs_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			{
+				return _mm512_castsi512_ps(_mm512_sll_epi32(_mm512_castps_si512(lhs_), rhs_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_castsi128_pd(_mm_sll_epi64(_mm_castpd_si128(lhs_), rhs_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_castsi256_pd(_mm256_sll_epi64(_mm256_castpd_si256(lhs_), rhs_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			{
+				return _mm512_castsi512_pd(_mm512_sll_epi64(_mm512_castpd_si512(lhs_), rhs_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128i>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise left-shift of an 8-bit integral SIMD register using EmuSIMD registers, with a SIMD register shift argument. This function is not available with register arguments; if a constant argument for each shift is possible, use the function which takes a template NumShifts_ argument instead."
+					);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					return _mm_sll_epi16(lhs_, rhs_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					return _mm_sll_epi32(lhs_, rhs_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					return _mm_sll_epi64(lhs_, rhs_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise left shift of an integral SIMD register using EmuSIMD helpers, but the provided width per element is invalid; only 8, 16, 32, and 64 are valid widths."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256i>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise left-shift of an 8-bit integral SIMD register using EmuSIMD registers, with a SIMD register shift argument. This function is not available with register arguments; if a constant argument for each shift is possible, use the function which takes a template NumShifts_ argument instead."
+					);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					return _mm256_sll_epi16(lhs_, rhs_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					return _mm256_sll_epi32(lhs_, rhs_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					return _mm256_sll_epi64(lhs_, rhs_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise left shift of an integral SIMD register using EmuSIMD helpers, but the provided width per element is invalid; only 8, 16, 32, and 64 are valid widths."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512i>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise left-shift of an 8-bit integral SIMD register using EmuSIMD registers, with a SIMD register shift argument. This function is not available with register arguments; if a constant argument for each shift is possible, use the function which takes a template NumShifts_ argument instead."
+					);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					return _mm512_sll_epi16(lhs_, rhs_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					return _mm512_sll_epi32(lhs_, rhs_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					return _mm512_sll_epi64(lhs_, rhs_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise left shift of an integral SIMD register using EmuSIMD helpers, but the provided width per element is invalid; only 8, 16, 32, and 64 are valid widths."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Register_>(),
+					"Attempted to perform bitwise left shift of a SIMD register using EmuSIMD helpers, but the provided SIMD register is not supported for this operation"
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<Register_>(),
+				"Attempted to perform bitwise left shift of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register."
+			);
+		}
+	}
+#pragma endregion
+
+#pragma region ARITHMETIC_RIGHT_SHIFTS
+	template<class Register_, int NumShifts_, std::size_t PerElementWidthIfInt_>
+	[[nodiscard]] inline Register_ _shift_right_arithmetic(Register_ lhs_)
+	{
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_castsi128_ps(_mm_srai_epi32(_mm_castps_si128(lhs_), NumShifts_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_castsi256_ps(_mm256_srai_epi32(_mm256_castps_si256(lhs_), NumShifts_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			{
+				return _mm512_castsi512_ps(_mm512_srai_epi32(_mm512_castps_si512(lhs_), NumShifts_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_castsi128_pd(_mm_srai_epi64(_mm_castpd_si128(lhs_), NumShifts_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_castsi256_pd(_mm256_srai_epi64(_mm256_castpd_si256(lhs_), NumShifts_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			{
+				return _mm512_castsi512_pd(_mm512_srai_epi64(_mm512_castpd_si512(lhs_), NumShifts_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128i>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					constexpr char keep_mask = 0xFF >> NumShifts_;
+					return _mm_and_si128(_mm_set1_epi8(keep_mask), _mm_srai_epi32(lhs_, NumShifts_));
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					return _mm_srai_epi16(lhs_, NumShifts_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					return _mm_srai_epi32(lhs_, NumShifts_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					return _mm_srai_epi64(lhs_, NumShifts_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise arithmetic right shift of an integral SIMD register using EmuSIMD helpers, but the provided width per element is invalid; only 8, 16, 32, and 64 are valid widths."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256i>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					constexpr char keep_mask = 0xFF >> NumShifts_;
+					return _mm256_and_si256(_mm256_set1_epi8(keep_mask), _mm256_srai_epi32(lhs_, NumShifts_));
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					return _mm256_srai_epi16(lhs_, NumShifts_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					return _mm256_srai_epi32(lhs_, NumShifts_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					return _mm256_srai_epi64(lhs_, NumShifts_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise arithmetic right shift of an integral SIMD register using EmuSIMD helpers, but the provided width per element is invalid; only 8, 16, 32, and 64 are valid widths."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512i>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					constexpr char keep_mask = 0xFF << NumShifts_;
+					return _mm512_and_si512(_mm512_set1_epi8(keep_mask), _mm512_srai_epi32(lhs_, NumShifts_));
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					return _mm512_srai_epi16(lhs_, NumShifts_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					return _mm512_srai_epi32(lhs_, NumShifts_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					return _mm512_srai_epi64(lhs_, NumShifts_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise arithmetic right shift of an integral SIMD register using EmuSIMD helpers, but the provided width per element is invalid; only 8, 16, 32, and 64 are valid widths."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Register_>(),
+					"Attempted to perform bitwise arithmetic right shift of a SIMD register using EmuSIMD helpers, but the provided SIMD register is not supported for this operation"
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<Register_>(),
+				"Attempted to perform bitwise arithmetic right shift of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register."
+			);
+		}
+	}
+
+	template<class Register_, std::size_t PerElementWidthIfInt_>
+	[[nodiscard]] inline Register_ _shift_right_arithmetic(Register_ lhs_, __m128i rhs_)
+	{
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_castsi128_ps(_mm_sra_epi32(_mm_castps_si128(lhs_), rhs_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_castsi256_ps(_mm256_sra_epi32(_mm256_castps_si256(lhs_), rhs_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			{
+				return _mm512_castsi512_ps(_mm512_sra_epi32(_mm512_castps_si512(lhs_), rhs_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_castsi128_pd(_mm_sra_epi64(_mm_castpd_si128(lhs_), rhs_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_castsi256_pd(_mm256_sra_epi64(_mm256_castpd_si256(lhs_), rhs_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			{
+				return _mm512_castsi512_pd(_mm512_sra_epi64(_mm512_castpd_si512(lhs_), rhs_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128i>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise arithmetic right shift of an 8-bit integral SIMD register using EmuSIMD registers, with a SIMD register shift argument. This function is not available with register arguments; if a constant argument for each shift is possible, use the function which takes a template NumShifts_ argument instead."
+					);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					return _mm_sra_epi16(lhs_, rhs_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					return _mm_sra_epi32(lhs_, rhs_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					return _mm_sra_epi64(lhs_, rhs_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise arithmetic right shift of an integral SIMD register using EmuSIMD helpers, but the provided width per element is invalid; only 8, 16, 32, and 64 are valid widths."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256i>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise arithmetic right shift of an 8-bit integral SIMD register using EmuSIMD registers, with a SIMD register shift argument. This function is not available with register arguments; if a constant argument for each shift is possible, use the function which takes a template NumShifts_ argument instead."
+					);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					return _mm256_sra_epi16(lhs_, rhs_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					return _mm256_sra_epi32(lhs_, rhs_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					return _mm256_sra_epi64(lhs_, rhs_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise arithmetic right shift of an integral SIMD register using EmuSIMD helpers, but the provided width per element is invalid; only 8, 16, 32, and 64 are valid widths."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512i>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise arithmetic right shift of an 8-bit integral SIMD register using EmuSIMD registers, with a SIMD register shift argument. This function is not available with register arguments; if a constant argument for each shift is possible, use the function which takes a template NumShifts_ argument instead."
+					);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					return _mm512_sra_epi16(lhs_, rhs_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					return _mm512_sra_epi32(lhs_, rhs_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					return _mm512_sra_epi64(lhs_, rhs_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise arithmetic right shift of an integral SIMD register using EmuSIMD helpers, but the provided width per element is invalid; only 8, 16, 32, and 64 are valid widths."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Register_>(),
+					"Attempted to perform bitwise arithmetic right shift of a SIMD register using EmuSIMD helpers, but the provided SIMD register is not supported for this operation"
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<Register_>(),
+				"Attempted to perform bitwise arithmetic right shift of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register."
+			);
+		}
+	}
+#pragma endregion
+
+#pragma region LOGCAL_RIGHT_SHIFTS
+	template<class Register_, int NumShifts_, std::size_t PerElementWidthIfInt_>
+	[[nodiscard]] inline Register_ _shift_right_logical(Register_ lhs_)
+	{
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_castsi128_ps(_mm_srli_epi32(_mm_castps_si128(lhs_), NumShifts_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_castsi256_ps(_mm256_srli_epi32(_mm256_castps_si256(lhs_), NumShifts_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			{
+				return _mm512_castsi512_ps(_mm512_srli_epi32(_mm512_castps_si512(lhs_), NumShifts_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_castsi128_pd(_mm_srli_epi64(_mm_castpd_si128(lhs_), NumShifts_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_castsi256_pd(_mm256_srli_epi64(_mm256_castpd_si256(lhs_), NumShifts_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			{
+				return _mm512_castsi512_pd(_mm512_srli_epi64(_mm512_castpd_si512(lhs_), NumShifts_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128i>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					constexpr char keep_mask = 0xFF >> NumShifts_;
+					return _mm_and_si128(_mm_set1_epi8(keep_mask), _mm_srli_epi32(lhs_, NumShifts_));
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					return _mm_srli_epi16(lhs_, NumShifts_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					return _mm_srli_epi32(lhs_, NumShifts_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					return _mm_srli_epi64(lhs_, NumShifts_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise logical right shift of an integral SIMD register using EmuSIMD helpers, but the provided width per element is invalid; only 8, 16, 32, and 64 are valid widths."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256i>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					constexpr char keep_mask = 0xFF >> NumShifts_;
+					return _mm256_and_si256(_mm256_set1_epi8(keep_mask), _mm256_srli_epi32(lhs_, NumShifts_));
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					return _mm256_srli_epi16(lhs_, NumShifts_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					return _mm256_srli_epi32(lhs_, NumShifts_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					return _mm256_srli_epi64(lhs_, NumShifts_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise logical right shift of an integral SIMD register using EmuSIMD helpers, but the provided width per element is invalid; only 8, 16, 32, and 64 are valid widths."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512i>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					constexpr char keep_mask = 0xFF << NumShifts_;
+					return _mm512_and_si512(_mm512_set1_epi8(keep_mask), _mm512_srli_epi32(lhs_, NumShifts_));
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					return _mm512_srli_epi16(lhs_, NumShifts_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					return _mm512_srli_epi32(lhs_, NumShifts_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					return _mm512_srli_epi64(lhs_, NumShifts_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise logical right shift of an integral SIMD register using EmuSIMD helpers, but the provided width per element is invalid; only 8, 16, 32, and 64 are valid widths."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Register_>(),
+					"Attempted to perform bitwise logical right shift of a SIMD register using EmuSIMD helpers, but the provided SIMD register is not supported for this operation"
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<Register_>(),
+				"Attempted to perform bitwise logical right shift of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register."
+			);
+		}
+	}
+
+	template<class Register_, std::size_t PerElementWidthIfInt_>
+	[[nodiscard]] inline Register_ _shift_right_logical(Register_ lhs_, __m128i rhs_)
+	{
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			{
+				return _mm_castsi128_ps(_mm_srl_epi32(_mm_castps_si128(lhs_), rhs_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			{
+				return _mm256_castsi256_ps(_mm256_srl_epi32(_mm256_castps_si256(lhs_), rhs_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512>)
+			{
+				return _mm512_castsi512_ps(_mm512_srl_epi32(_mm512_castps_si512(lhs_), rhs_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			{
+				return _mm_castsi128_pd(_mm_srl_epi64(_mm_castpd_si128(lhs_), rhs_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			{
+				return _mm256_castsi256_pd(_mm256_srl_epi64(_mm256_castpd_si256(lhs_), rhs_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+			{
+				return _mm512_castsi512_pd(_mm512_srl_epi64(_mm512_castpd_si512(lhs_), rhs_));
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m128i>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise logical right shift of an 8-bit integral SIMD register using EmuSIMD registers, with a SIMD register shift argument. This function is not available with register arguments; if a constant argument for each shift is possible, use the function which takes a template NumShifts_ argument instead."
+					);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					return _mm_srl_epi16(lhs_, rhs_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					return _mm_srl_epi32(lhs_, rhs_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					return _mm_srl_epi64(lhs_, rhs_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise logical right shift of an integral SIMD register using EmuSIMD helpers, but the provided width per element is invalid; only 8, 16, 32, and 64 are valid widths."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m256i>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise logical right shift of an 8-bit integral SIMD register using EmuSIMD registers, with a SIMD register shift argument. This function is not available with register arguments; if a constant argument for each shift is possible, use the function which takes a template NumShifts_ argument instead."
+					);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					return _mm256_srl_epi16(lhs_, rhs_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					return _mm256_srl_epi32(lhs_, rhs_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					return _mm256_srl_epi64(lhs_, rhs_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise logical right shift of an integral SIMD register using EmuSIMD helpers, but the provided width per element is invalid; only 8, 16, 32, and 64 are valid widths."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, __m512i>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise logical right shift of an 8-bit integral SIMD register using EmuSIMD registers, with a SIMD register shift argument. This function is not available with register arguments; if a constant argument for each shift is possible, use the function which takes a template NumShifts_ argument instead."
+					);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					return _mm512_srl_epi16(lhs_, rhs_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					return _mm512_srl_epi32(lhs_, rhs_);
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					return _mm512_srl_epi64(lhs_, rhs_);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to perform bitwise logical right shift of an integral SIMD register using EmuSIMD helpers, but the provided width per element is invalid; only 8, 16, 32, and 64 are valid widths."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Register_>(),
+					"Attempted to perform bitwise logical right shift of a SIMD register using EmuSIMD helpers, but the provided SIMD register is not supported for this operation"
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<Register_>(),
+				"Attempted to perform bitwise logical right shift of a SIMD register using EmuSIMD helpers, but provided a type that is not a supported SIMD register."
+			);
+		}
+	}
+#pragma endregion
 }
 
 #endif

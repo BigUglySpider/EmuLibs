@@ -36,6 +36,10 @@ namespace EmuMath
 		using vector_type = EmuMath::Vector<size, value_type>;
 		/// <summary> Alias to the type of SIMD register used for this Vector's data. </summary>
 		using register_type = typename EmuSIMD::TMP::register_type<value_type, register_width>::type;
+		/// <summary> Alias to the register type used as an argument for the number of shifts performed when a register argument is used instead of a constant. </summary>
+		using shift_register_type = __m128i;
+		/// <summary> The number of bits each element is interpreted to consume within this Vector's shift_register_type, with 8-bit bytes regardless of CHAR_BIT. </summary>
+		static constexpr std::size_t shift_register_per_element_width = 64;
 
 		/// <summary> Boolean indicating if this Vector's encapsulated type is integral. </summary>
 		static constexpr bool is_integral = std::is_integral<value_type>::value;
@@ -334,7 +338,7 @@ namespace EmuMath
 		/// <summary>
 		/// <para> Default constructor for a Vector, which uses the default construction method of its underlying SIMD registers.. </para>
 		/// </summary>
-		constexpr inline FastVector() : data()
+		constexpr inline FastVector() noexcept : data()
 		{
 		}
 
@@ -342,7 +346,7 @@ namespace EmuMath
 		/// <para> Copy constructor for a FastVector which copies all respective elements of the passed FastVector of the same type. </para>
 		/// </summary>
 		/// <param name="to_copy_">Emu FastVector of the same type to copy.</param>
-		constexpr inline FastVector(const EmuMath::FastVector<Size_, T_, RegisterWidth_>& to_copy_) : data(_make_copy(to_copy_))
+		constexpr inline FastVector(const EmuMath::FastVector<Size_, T_, RegisterWidth_>& to_copy_) noexcept : data(_make_copy(to_copy_))
 		{
 		}
 
@@ -351,7 +355,7 @@ namespace EmuMath
 		/// <para> Likely to be barely - if at all - different to copy construction. </para>
 		/// </summary>
 		/// <param name="to_move_">Emu FastVector of the same type to move.</param>
-		constexpr inline FastVector(EmuMath::FastVector<Size_, T_, RegisterWidth_>&& to_move_) : data(_do_move(std::move(to_move_)))
+		constexpr inline FastVector(EmuMath::FastVector<Size_, T_, RegisterWidth_>&& to_move_) noexcept : data(_do_move(std::move(to_move_)))
 		{
 		}
 
@@ -359,7 +363,7 @@ namespace EmuMath
 		/// <para> All-as-one constructor for a FastVector which has all elements initialised to the same starting value. </para>
 		/// </summary>
 		/// <param name="to_set_all_to_">Value to set every element within the Vector to.</param>
-		explicit constexpr inline FastVector(value_type to_set_all_to_) : data(_do_set_all_same(to_set_all_to_))
+		explicit constexpr inline FastVector(value_type to_set_all_to_) noexcept : data(_do_set_all_same(to_set_all_to_))
 		{
 		}
 
@@ -367,7 +371,7 @@ namespace EmuMath
 		/// <para> Variant of all-as-one constructor which instead initialises all registers to match the passed register of this Vector's register_type. </para>
 		/// </summary>
 		/// <param name="to_set_all_registers_to_">SIMD register of this Vector's register_type to initialise all of this Vector's registers as.</param>
-		explicit constexpr inline FastVector(register_type to_set_all_registers_to_) : data(_do_set_all_same_register(to_set_all_registers_to_))
+		explicit constexpr inline FastVector(register_type to_set_all_registers_to_) noexcept : data(_do_set_all_same_register(to_set_all_registers_to_))
 		{
 		}
 
@@ -663,73 +667,16 @@ namespace EmuMath
 		/// <para> Creates a negated form of this Vector, where each element will be set to -element.</para>
 		/// </summary>
 		/// <returns>New FastVector of this type resulting from the negation.</returns>
-		[[nodiscard]] constexpr inline this_type Negate(const this_type& rhs_) const
+		[[nodiscard]] constexpr inline this_type Negate() const
 		{
 			if constexpr (contains_multiple_registers)
 			{
-				return this_type(_do_array_negate(*this, register_index_sequence()));
+				return this_type(_do_array_negate(data, register_index_sequence()));
 			}
 			else
 			{
-				return this_type(EmuSIMD::negate<per_element_width>());
+				return this_type(EmuSIMD::negate<per_element_width>(data));
 			}
-		}
-
-	private:
-		template<typename Rhs_, std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_add(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
-		{
-			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
-			return data_type
-			({
-				EmuSIMD::add<per_element_width>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
-			});
-		}
-
-		template<typename Rhs_, std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_subtract(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
-		{
-			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
-			return data_type
-			({
-				EmuSIMD::sub<per_element_width>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
-			});
-		}
-
-		template<typename Rhs_, std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_multiply(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
-		{
-			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
-			return data_type
-			({
-				EmuSIMD::mul_all<per_element_width>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
-			});
-		}
-
-		template<typename Rhs_, std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_divide(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
-		{
-			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
-			return data_type
-			({
-				EmuSIMD::div<per_element_width, is_signed>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
-			});
-		}
-
-		template<typename Rhs_, std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_mod(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
-		{
-			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
-			return data_type
-			({
-				EmuSIMD::mod<per_element_width, is_signed>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
-			});
-		}
-
-		template<std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_negate(const data_type& lhs_, std::index_sequence<RegisterIndices_...> indices_)
-		{
-			return data_type({ EmuSIMD::negate<per_element_width>(lhs_[RegisterIndices_])... });
 		}
 #pragma endregion
 
@@ -1006,82 +953,1779 @@ namespace EmuMath
 			}
 			return *this;
 		}
+#pragma endregion
 
-	private:
-		template<typename Rhs_, std::size_t...RegisterIndices_>
-		static constexpr inline void _do_array_add_assign(data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+#pragma region CONST_BITWISE_ARITHMETIC
+	public:
+		/// <summary>
+		/// <para> Bitwise ANDs all registers encapsulated by this Vector with the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in AND operations with all registers encapsulated by this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type And(register_type rhs_for_all_) const
 		{
-			(
-				(
-					lhs_[RegisterIndices_] = EmuSIMD::add<per_element_width>
-					(
-						lhs_[RegisterIndices_],
-						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_))
-					)
-				), ...
-			);
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_and(data, rhs_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::bitwise_and(data, rhs_for_all_));
+			}
 		}
 
-		template<typename Rhs_, std::size_t...RegisterIndices_>
-		static constexpr inline void _do_array_subtract_assign(data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		/// <summary>
+		/// <para> Bitwise ANDs all elements within this Vector with the passed scalar value. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to use in AND operations with all elements within this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type And(value_type rhs_for_all_) const
 		{
-			(
-				(
-					lhs_[RegisterIndices_] = EmuSIMD::sub<per_element_width>
-					(
-						lhs_[RegisterIndices_],
-						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_))
-					)
-				), ...
-			);
+			return And(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
 		}
 
-		template<typename Rhs_, std::size_t...RegisterIndices_>
-		static constexpr inline void _do_array_multiply_assign(data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		/// <summary>
+		/// <para>Bitwise ANDs this Vector with the passed rhs_ Vector of the same type.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to AND this Vector with.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type And(const this_type& rhs_) const
 		{
-			(
-				(
-					lhs_[RegisterIndices_] = EmuSIMD::mul_all<per_element_width>
-					(
-						lhs_[RegisterIndices_],
-						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_))
-					)
-				), ...
-			);
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_and(data, rhs_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::bitwise_and(data, rhs_.data));
+			}
 		}
 
-		template<typename Rhs_, std::size_t...RegisterIndices_>
-		static constexpr inline void _do_array_divide_assign(data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		/// <summary>
+		/// <para> Bitwise ORs all registers encapsulated by this Vector with the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in OR operations with all registers encapsulated by this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type Or(register_type rhs_for_all_) const
 		{
-			(
-				(
-					lhs_[RegisterIndices_] = EmuSIMD::div<per_element_width, is_signed>
-					(
-						lhs_[RegisterIndices_],
-						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_))
-					)
-				), ...
-			);
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_or(data, rhs_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::bitwise_or(data, rhs_for_all_));
+			}
 		}
 
-		template<typename Rhs_, std::size_t...RegisterIndices_>
-		static constexpr inline void _do_array_mod_assign(data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		/// <summary>
+		/// <para> Bitwise ORs all elements within this Vector with the passed scalar value. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to use in OR operations with all elements within this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type Or(value_type rhs_for_all_) const
 		{
-			(
-				(
-					lhs_[RegisterIndices_] = EmuSIMD::mod<per_element_width, is_signed>
-					(
-						lhs_[RegisterIndices_],
-						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_))
-					)
-				), ...
-			);
+			return Or(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
 		}
 
-		template<std::size_t...RegisterIndices_>
-		static constexpr inline void _do_array_negate_assign(data_type& lhs_, std::index_sequence<RegisterIndices_...> indices_)
+		/// <summary>
+		/// <para>Bitwise ORs this Vector with the passed rhs_ Vector of the same type.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to OR this Vector with.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type Or(const this_type& rhs_) const
 		{
-			((lhs_[RegisterIndices_] = EmuSIMD::negate<per_element_width>(lhs_[RegisterIndices_])), ...);
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_or(data, rhs_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::bitwise_or(data, rhs_.data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Bitwise XORs all registers encapsulated by this Vector with the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in XOR operations with all registers encapsulated by this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type Xor(register_type rhs_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_xor(data, rhs_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::bitwise_xor(data, rhs_for_all_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Bitwise XORs all elements within this Vector with the passed scalar value. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to use in XOR operations with all elements within this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type Xor(value_type rhs_for_all_) const
+		{
+			return Xor(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Bitwise XORs this Vector with the passed rhs_ Vector of the same type.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to XOR this Vector with.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type Xor(const this_type& rhs_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_xor(data, rhs_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::bitwise_xor(data, rhs_.data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Bitwise ANDS the NOT of all registers encapsulated by this Vector with the passed register. </para>
+		/// <para> The passed argument will be used as-is; only the NOT of this Vector is used. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in AND operations with the NOT of all registers encapsulated by this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type AndNot(register_type rhs_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_andnot(data, rhs_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::bitwise_andnot(data, rhs_for_all_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Bitwise ANDS the NOT of all elements within this Vector with the passed scalar value. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// <para> The passed argument will be used as-is; only the NOT of this Vector is used. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to use in AND operations with the NOT of all elements within this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type AndNot(value_type rhs_for_all_) const
+		{
+			return AndNot(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Bitwise ANDS the NOT of this Vector with the passed rhs_ Vector of the same type.</para>
+		/// <para> The passed argument will be used as-is; only the NOT of this Vector is used. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to AND the NOT this Vector with.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type AndNot(const this_type& rhs_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_andnot(data, rhs_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::bitwise_andnot(data, rhs_.data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Logically left-shifts all registers encapsulated by this Vector using the passed argument as the shifts for each register. </para>
+		/// </summary>
+		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
+		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
+		[[nodiscard]] constexpr inline this_type ShiftLeft(shift_register_type num_shifts_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_shift_left(data, num_shifts_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::shift_left<per_element_width>(data, num_shifts_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Logically left-shifts all elements within this Vector using the passed scalar value as the number of shifts for each element. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// <para> If num_shifts_ is a compile-time constant, it is recommended to use the form of this function which takes a NumShifts_ template argument instead. </para>
+		/// </summary>
+		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
+		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
+		[[nodiscard]] constexpr inline this_type ShiftLeft(std::size_t num_shifts_) const
+		{
+			return ShiftLeft(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
+		}
+
+		/// <summary>
+		/// <para> Logically left-shifts all elements within this Vector using the passed template scalar value as the number of shifts for each element. </para>
+		/// </summary>
+		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
+		template<std::size_t NumShifts_>
+		constexpr inline this_type ShiftLeft() const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_shift_left<NumShifts_>(data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::shift_left<NumShifts_, per_element_width>(data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Logically right-shifts all registers encapsulated by this Vector using the passed argument as the shifts for each register. </para>
+		/// </summary>
+		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
+		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
+		[[nodiscard]] constexpr inline this_type ShiftRight(shift_register_type num_shifts_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_shift_right_logical(data, num_shifts_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::shift_right_logical<per_element_width>(data, num_shifts_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Logically right-shifts all elements within this Vector using the passed scalar value as the number of shifts for each element. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// <para> If num_shifts_ is a compile-time constant, it is recommended to use the form of this function which takes a NumShifts_ template argument instead. </para>
+		/// </summary>
+		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
+		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
+		[[nodiscard]] constexpr inline this_type ShiftRight(std::size_t num_shifts_) const
+		{
+			return ShiftRight(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
+		}
+
+		/// <summary>
+		/// <para> Logically right-shifts all elements within this Vector using the passed template scalar value as the number of shifts for each element. </para>
+		/// </summary>
+		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
+		template<std::size_t NumShifts_>
+		constexpr inline this_type ShiftRight() const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_shift_right_logical<NumShifts_>(data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::shift_right_logical<NumShifts_, per_element_width>(data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Arithmetically right-shifts all registers encapsulated by this Vector using the passed argument as the shifts for each register. </para>
+		/// <para> Arithmetic shifts differentiate from logical shifts in that they preserve the sign bit. </para>
+		/// </summary>
+		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
+		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
+		[[nodiscard]] constexpr inline this_type ShiftRightArithmetic(shift_register_type num_shifts_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_shift_right_arithmetic(data, num_shifts_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::shift_right_arithmetic<per_element_width>(data, num_shifts_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Arithmetically right-shifts all elements within this Vector using the passed scalar value as the number of shifts for each element. </para>
+		/// <para> Arithmetic shifts differentiate from logical shifts in that they preserve the sign bit. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// <para> If num_shifts_ is a compile-time constant, it is recommended to use the form of this function which takes a NumShifts_ template argument instead. </para>
+		/// </summary>
+		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
+		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
+		[[nodiscard]] constexpr inline this_type ShiftRightArithmetic(std::size_t num_shifts_) const
+		{
+			return ShiftRightArithmetic(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
+		}
+
+		/// <summary>
+		/// <para> Arithmetically right-shifts all elements within this Vector using the passed template scalar value as the number of shifts for each element. </para>
+		/// <para> Arithmetic shifts differentiate from logical shifts in that they preserve the sign bit. </para>
+		/// </summary>
+		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
+		template<std::size_t NumShifts_>
+		constexpr inline this_type ShiftRightArithmetic() const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_shift_right_arithmetic<NumShifts_>(data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::shift_right_arithmetic<NumShifts_, per_element_width>(data));
+			}
+		}
+
+		/// <summary>
+		/// <para>Creates the NOT form of this Vector, with 0-bits flipped to 1 and 1-bits flipped to 0.</para>
+		/// </summary>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type Not() const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_not(data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::bitwise_not(data));
+			}
+		}
+#pragma endregion
+
+#pragma region NON_CONST_BITWISE_ARITHMETIC
+	public:
+		/// <summary>
+		/// <para> Bitwise ANDs all registers encapsulated by this Vector with the passed register, and assigns results to this Vector. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in AND operations with all registers encapsulated by this Vector.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& AndAssign(register_type rhs_for_all_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_and_assign(data, rhs_for_all_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::bitwise_and(data, rhs_for_all_);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Bitwise ANDs all elements within this Vector with the passed scalar value, and assigns results to this Vector. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to use in AND operations with all elements within this Vector, assigning the results to this Vector.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& AndAssign(value_type rhs_for_all_)
+		{
+			return AndAssign(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Bitwise ANDs this Vector with the passed rhs_ Vector of the same type, and assigns results to this Vector.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to AND this Vector with.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& AndAssign(const this_type& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_and_assign(data, rhs_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::bitwise_and(data, rhs_.data);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Bitwise ORs all registers encapsulated by this Vector with the passed register, and assigns results to this Vector. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in OR operations with all registers encapsulated by this Vector.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& OrAssign(register_type rhs_for_all_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_or_assign(data, rhs_for_all_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::bitwise_or(data, rhs_for_all_);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Bitwise ORs all elements within this Vector with the passed scalar value, and assigns results to this Vector. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to use in OR operations with all elements within this Vector, assigning the results to this Vector.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& OrAssign(value_type rhs_for_all_)
+		{
+			return OrAssign(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Bitwise ORs this Vector with the passed rhs_ Vector of the same type, and assigns results to this Vector.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to OR this Vector with.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& OrAssign(const this_type& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_or_assign(data, rhs_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::bitwise_or(data, rhs_.data);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Bitwise XORs all registers encapsulated by this Vector with the passed register, and assigns results to this Vector. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in XOR operations with all registers encapsulated by this Vector.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& XorAssign(register_type rhs_for_all_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_xor_assign(data, rhs_for_all_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::bitwise_xor(data, rhs_for_all_);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Bitwise XORs all elements within this Vector with the passed scalar value, and assigns results to this Vector. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to use in XOR operations with all elements within this Vector, assigning the results to this Vector.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& XorAssign(value_type rhs_for_all_)
+		{
+			return XorAssign(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Bitwise XORs this Vector with the passed rhs_ Vector of the same type, and assigns results to this Vector.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to XOR this Vector with.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& XorAssign(const this_type& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_xor_assign(data, rhs_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::bitwise_xor(data, rhs_.data);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Bitwise ANDS the NOT of all registers encapsulated by this Vector with the passed register, and assigns results to this Vector. </para>
+		/// <para> The passed argument will be used as-is; only the NOT of this Vector is used. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in AND operations with the NOT of all registers encapsulated by this Vector.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& AndNotAssign(register_type rhs_for_all_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_andnot_assign(data, rhs_for_all_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::bitwise_andnot(data, rhs_for_all_);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Bitwise ANDS the NOT of all elements within this Vector with the passed scalar value, and assigns results to this Vector. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// <para> The passed argument will be used as-is; only the NOT of this Vector is used. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to use in AND operations with the NOT of all elements within this Vector.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& AndNotAssign(value_type rhs_for_all_)
+		{
+			return AndNotAssign(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para> Bitwise ANDS the NOT of this Vector with the passed rhs_ Vector of the same type, and assigns results to this Vector. </para>
+		/// <para> The passed argument will be used as-is; only the NOT of this Vector is used. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to AND the NOT this Vector with.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& AndNotAssign(const this_type& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_andnot_assign(data, rhs_.data, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::bitwise_andnot(data, rhs_.data);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para>
+		///		Logically left-shifts all registers encapsulated by this Vector using the passed argument as the shifts for each register, 
+		///		and assigns results to this Vector.
+		/// </para>
+		/// </summary>
+		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& ShiftLeftAssign(shift_register_type num_shifts_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_shift_left_assign(data, num_shifts_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::shift_left<per_element_width>(data, num_shifts_);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para>
+		///		Logically left-shifts all elements within this Vector using the passed scalar value as the number of shifts for each element, 
+		///		and assigns results to this Vector.
+		/// </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// <para> If num_shifts_ is a compile-time constant, it is recommended to use the form of this function which takes a NumShifts_ template argument instead. </para>
+		/// </summary>
+		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& ShiftLeftAssign(std::size_t num_shifts_)
+		{
+			return ShiftLeftAssign(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Logically left-shifts all elements within this Vector using the passed template scalar value as the number of shifts for each element, 
+		///		and assigns results to this Vector.
+		/// </para>
+		/// </summary>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		template<std::size_t NumShifts_>
+		constexpr inline this_type& ShiftLeftAssign()
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_shift_left_assign<NumShifts_>(data, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::shift_left<NumShifts_, per_element_width>(data);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para>
+		///		Logically left-shifts all registers encapsulated by this Vector using the passed argument as the shifts for each register, 
+		///		and assigns results to this Vector.
+		/// </para>
+		/// </summary>
+		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& ShiftRightAssign(shift_register_type num_shifts_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_shift_right_logical_assign(data, num_shifts_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::shift_right_logical<per_element_width>(data, num_shifts_);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para>
+		///		Logically left-shifts all elements within this Vector using the passed scalar value as the number of shifts for each element, 
+		///		and assigns results to this Vector.
+		/// </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// <para> If num_shifts_ is a compile-time constant, it is recommended to use the form of this function which takes a NumShifts_ template argument instead. </para>
+		/// </summary>
+		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& ShiftRightAssign(std::size_t num_shifts_)
+		{
+			return ShiftRightAssign(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Logically left-shifts all elements within this Vector using the passed template scalar value as the number of shifts for each element, 
+		///		and assigns results to this Vector.
+		/// </para>
+		/// </summary>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		template<std::size_t NumShifts_>
+		constexpr inline this_type& ShiftRightAssign()
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_shift_right_logical_assign<NumShifts_>(data, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::shift_right_logical<NumShifts_, per_element_width>(data);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para>
+		///		Arithmetically left-shifts all registers encapsulated by this Vector using the passed argument as the shifts for each register, 
+		///		and assigns results to this Vector.
+		/// </para>
+		/// <para> Arithmetic shifts differentiate from logical shifts in that they preserve the sign bit. </para>
+		/// </summary>
+		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& ShiftRightArithmeticAssign(shift_register_type num_shifts_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_shift_right_arithmetic_assign(data, num_shifts_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::shift_right_arithmetic<per_element_width>(data, num_shifts_);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para>
+		///		Arithmetically left-shifts all elements within this Vector using the passed scalar value as the number of shifts for each element, 
+		///		and assigns results to this Vector.
+		/// </para>
+		/// <para> Arithmetic shifts differentiate from logical shifts in that they preserve the sign bit. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// <para> If num_shifts_ is a compile-time constant, it is recommended to use the form of this function which takes a NumShifts_ template argument instead. </para>
+		/// </summary>
+		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& ShiftRightArithmeticAssign(std::size_t num_shifts_)
+		{
+			return ShiftRightArithmeticAssign(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Arithmetically left-shifts all elements within this Vector using the passed template scalar value as the number of shifts for each element, 
+		///		and assigns results to this Vector.
+		/// </para>
+		/// <para> Arithmetic shifts differentiate from logical shifts in that they preserve the sign bit. </para>
+		/// </summary>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		template<std::size_t NumShifts_>
+		constexpr inline this_type& ShiftRightArithmeticAssign()
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_shift_right_arithmetic_assign<NumShifts_>(data, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::shift_right_arithmetic<NumShifts_, per_element_width>(data);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para>Creates the NOT form of this Vector, with 0-bits flipped to 1 and 1-bits flipped to 0., and assigns the results to this Vector.</para>
+		/// </summary>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& NotAssign()
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_not_assign(data, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::bitwise_not(data);
+			}
+			return *this;
+		}
+#pragma endregion
+
+#pragma region CONST_BASIC_ARITHMETIC_OPERATORS
+	public:
+		/// <summary>
+		/// <para> Adds the passed register to all registers encapsulated by this Vector. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in add operations with all registers encapsulated by this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the addition operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator+(register_type rhs_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_add(data, rhs_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::add<per_element_width>(data, rhs_for_all_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Adds the passed scalar value to all elements within this Vector. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to add to all elements within this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the addition operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator+(value_type rhs_for_all_) const
+		{
+			return operator+(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Adds this Vector and the passed rhs_ Vector of the same type.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to add to this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the addition operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator+(const this_type& rhs_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_add(data, rhs_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::add<per_element_width>(data, rhs_.data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Subtracts the passed register from all registers encapsulated by this Vector. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in subtract operations with all registers encapsulated by this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the subtraction operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator-(register_type rhs_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_subtract(data, rhs_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::sub<per_element_width>(data, rhs_for_all_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Subtracts the passed scalar value to all elements within this Vector. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to subtract from all elements within this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the subtraction operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator-(value_type rhs_for_all_) const
+		{
+			return operator-(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Subtracts this Vector and the passed rhs_ Vector of the same type.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to subtract from this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the subtraction operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator-(const this_type& rhs_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_subtract(data, rhs_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::sub<per_element_width>(data, rhs_.data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Multiplies all registers encapsulated by this Vector by the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in multiplication operations with all registers encapsulated by this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the multiplication operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator*(register_type rhs_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_multiply(data, rhs_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::mul_all<per_element_width>(data, rhs_for_all_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Multiplies all elements within this Vector by the passed scalar value. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to multiply all elements within this Vector by.</param>
+		/// <returns>New FastVector of this type resulting from the multiplication operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator*(value_type rhs_for_all_) const
+		{
+			return operator*(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Multiplies this Vector and the passed rhs_ Vector of the same type.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to multiply this Vector by.</param>
+		/// <returns>New FastVector of this type resulting from the multiplication operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator*(const this_type& rhs_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_multiply(data, rhs_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::mul_all<per_element_width>(data, rhs_.data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Divides all registers encapsulated by this Vector by the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in division operations with all registers encapsulated by this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the division operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator/(register_type rhs_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_divide(data, rhs_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::div<per_element_width, is_signed>(data, rhs_for_all_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Divides all elements within this Vector by the passed scalar value. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to divide all elements within this Vector by.</param>
+		/// <returns>New FastVector of this type resulting from the division operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator/(value_type rhs_for_all_) const
+		{
+			return operator/(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Divides this Vector and the passed rhs_ Vector of the same type.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to divide this Vector by.</param>
+		/// <returns>New FastVector of this type resulting from the division operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator/(const this_type& rhs_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_divide(data, rhs_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::div<per_element_width, is_signed>(data, rhs_.data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Modulo-divides all registers encapsulated by this Vector by the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in modulo-division operations with all registers encapsulated by this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the modulo-division operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator%(register_type rhs_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_mod(data, rhs_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::mod<per_element_width, is_signed>(data, rhs_for_all_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Modulo-divides all elements within this Vector by the passed scalar value. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to modulo-divide all elements within this Vector by.</param>
+		/// <returns>New FastVector of this type resulting from the modulo-division operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator%(value_type rhs_for_all_) const
+		{
+			return operator%(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Modulo-divides this Vector and the passed rhs_ Vector of the same type.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to modulo-divide this Vector by.</param>
+		/// <returns>New FastVector of this type resulting from the modulo-division operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator%(const this_type& rhs_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_divide(data, rhs_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::mod<per_element_width, is_signed>(data, rhs_.data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Creates a negated form of this Vector, where each element will be set to -element.</para>
+		/// </summary>
+		/// <returns>New FastVector of this type resulting from the negation.</returns>
+		[[nodiscard]] constexpr inline this_type operator-() const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_negate(data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::negate<per_element_width>(data));
+			}
+		}
+#pragma endregion
+
+#pragma region NON_CONST_BASIC_ARITHMETIC_OPERATORS
+	public:
+		/// <summary>
+		/// <para> Adds the passed register to all registers encapsulated by this Vector, assigning the results to this Vector. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in add operations with all registers encapsulated by this Vector.</param>
+		/// <returns>Reference to this Vector after the results are assigned.</returns>
+		constexpr inline this_type& operator+=(register_type rhs_for_all_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_add_assign(data, rhs_for_all_);
+			}
+			else
+			{
+				data = EmuSIMD::add<per_element_width>(data, rhs_for_all_);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Adds the passed scalar value to all elements within this Vector, assigning the results to this Vector. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to add to all elements within this Vector.</param>
+		/// <returns>Reference to this Vector after the results are assigned.</returns>
+		constexpr inline this_type& operator+=(value_type rhs_for_all_)
+		{
+			return operator+=(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Adds this Vector and the passed rhs_ Vector of the same type, assigning the results to this Vector.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to add to this Vector.</param>
+		/// <returns>Reference to this Vector after the results are assigned.</returns>
+		constexpr inline this_type& operator+=(const this_type& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_add_assign(data, rhs_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::add<per_element_width>(data, rhs_.data);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Subtracts the passed register to all registers encapsulated by this Vector, assigning the results to this Vector. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in subtraction operations with all registers encapsulated by this Vector.</param>
+		/// <returns>Reference to this Vector after the results are assigned.</returns>
+		constexpr inline this_type& operator-=(register_type rhs_for_all_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_subtract_assign(data, rhs_for_all_);
+			}
+			else
+			{
+				data = EmuSIMD::sub<per_element_width>(data, rhs_for_all_);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Subtracts the passed scalar value to all elements within this Vector, assigning the results to this Vector. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to subtract from all elements within this Vector.</param>
+		/// <returns>Reference to this Vector after the results are assigned.</returns>
+		constexpr inline this_type& operator-=(value_type rhs_for_all_)
+		{
+			return operator-=(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Subtracts this Vector and the passed rhs_ Vector of the same type, assigning the results to this Vector.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to subtract from this Vector.</param>
+		/// <returns>Reference to this Vector after the results are assigned.</returns>
+		constexpr inline this_type& operator-=(const this_type& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_subtract_assign(data, rhs_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::sub<per_element_width>(data, rhs_.data);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Multiplies all registers encapsulated by this Vector by the passed register, assigning the results to this Vector. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in multiplication operations with all registers encapsulated by this Vector.</param>
+		/// <returns>Reference to this Vector after the results are assigned.</returns>
+		constexpr inline this_type& operator*=(register_type rhs_for_all_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_multiply_assign(data, rhs_for_all_);
+			}
+			else
+			{
+				data = EmuSIMD::mul_all<per_element_width>(data, rhs_for_all_);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Multiplies all elements within this Vector by the passed scalar value, assigning the results to this Vector. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to multiply all elements within this Vector by.</param>
+		/// <returns>Reference to this Vector after the results are assigned.</returns>
+		constexpr inline this_type& operator*=(value_type rhs_for_all_)
+		{
+			return operator*=(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Multiplies this Vector by the passed rhs_ Vector of the same type, assigning the results to this Vector.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to multiply this Vector by.</param>
+		/// <returns>Reference to this Vector after the results are assigned.</returns>
+		constexpr inline this_type& operator*=(const this_type& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_multiply_assign(data, rhs_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::mul_all<per_element_width>(data, rhs_.data);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Divides all registers encapsulated by this Vector by the passed register, assigning the results to this Vector. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in division operations with all registers encapsulated by this Vector.</param>
+		/// <returns>Reference to this Vector after the results are assigned.</returns>
+		constexpr inline this_type& operator/=(register_type rhs_for_all_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_divide_assign(data, rhs_for_all_);
+			}
+			else
+			{
+				data = EmuSIMD::div<per_element_width, is_signed>(data, rhs_for_all_);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Divides all elements within this Vector by the passed scalar value, assigning the results to this Vector. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to divide all elements within this Vector by.</param>
+		/// <returns>Reference to this Vector after the results are assigned.</returns>
+		constexpr inline this_type& operator/=(value_type rhs_for_all_)
+		{
+			return operator/=(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Divides this Vector by the passed rhs_ Vector of the same type, assigning the results to this Vector.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to divide this Vector by.</param>
+		/// <returns>Reference to this Vector after the results are assigned.</returns>
+		constexpr inline this_type& operator/=(const this_type& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_divide_assign(data, rhs_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::div<per_element_width, is_signed>(data, rhs_.data);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Divides all registers encapsulated by this Vector by the passed register, assigning the results to this Vector. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in division operations with all registers encapsulated by this Vector.</param>
+		/// <returns>Reference to this Vector after the results are assigned.</returns>
+		constexpr inline this_type& operator%=(register_type rhs_for_all_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_mod_assign(data, rhs_for_all_);
+			}
+			else
+			{
+				data = EmuSIMD::mod<per_element_width, is_signed>(data, rhs_for_all_);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Divides all elements within this Vector by the passed scalar value, assigning the results to this Vector. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to divide all elements within this Vector by.</param>
+		/// <returns>Reference to this Vector after the results are assigned.</returns>
+		constexpr inline this_type& operator%=(value_type rhs_for_all_)
+		{
+			return operator%=(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Divides this Vector by the passed rhs_ Vector of the same type, assigning the results to this Vector.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to divide this Vector by.</param>
+		/// <returns>Reference to this Vector after the results are assigned.</returns>
+		constexpr inline this_type& operator%=(const this_type& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_mod_assign(data, rhs_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::mod<per_element_width, is_signed>(data, rhs_.data);
+			}
+			return *this;
+		}
+#pragma endregion
+
+#pragma region CONST_BITWISE_ARITHMETIC_OPERATORS
+	public:
+		/// <summary>
+		/// <para> Bitwise ANDs all registers encapsulated by this Vector with the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in AND operations with all registers encapsulated by this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator&(register_type rhs_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_and(data, rhs_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::bitwise_and(data, rhs_for_all_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Bitwise ANDs all elements within this Vector with the passed scalar value. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to use in AND operations with all elements within this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator&(value_type rhs_for_all_) const
+		{
+			return operator&(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Bitwise ANDs this Vector with the passed rhs_ Vector of the same type.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to AND this Vector with.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator&(const this_type& rhs_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_and(data, rhs_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::bitwise_and(data, rhs_.data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Bitwise ORs all registers encapsulated by this Vector with the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in OR operations with all registers encapsulated by this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator|(register_type rhs_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_or(data, rhs_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::bitwise_or(data, rhs_for_all_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Bitwise ORs all elements within this Vector with the passed scalar value. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to use in OR operations with all elements within this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator|(value_type rhs_for_all_) const
+		{
+			return operator|(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Bitwise ORs this Vector with the passed rhs_ Vector of the same type.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to OR this Vector with.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator|(const this_type& rhs_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_or(data, rhs_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::bitwise_or(data, rhs_.data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Bitwise XORs all registers encapsulated by this Vector with the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in XOR operations with all registers encapsulated by this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator^(register_type rhs_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_xor(data, rhs_for_all_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::bitwise_xor(data, rhs_for_all_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Bitwise XORs all elements within this Vector with the passed scalar value. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to use in XOR operations with all elements within this Vector.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator^(value_type rhs_for_all_) const
+		{
+			return operator^(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Bitwise XORs this Vector with the passed rhs_ Vector of the same type.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to XOR this Vector with.</param>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator^(const this_type& rhs_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_xor(data, rhs_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::bitwise_xor(data, rhs_.data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Logically left-shifts all registers encapsulated by this Vector using the passed argument as the shifts for each register. </para>
+		/// </summary>
+		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
+		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator<<(shift_register_type num_shifts_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_shift_left(data, num_shifts_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::shift_left<per_element_width>(data, num_shifts_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Logically left-shifts all elements within this Vector using the passed scalar value as the number of shifts for each element. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// <para> If num_shifts_ is a compile-time constant, it is recommended to use the ShiftLeft function which takes a NumShifts_ template argument instead. </para>
+		/// </summary>
+		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
+		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator<<(std::size_t num_shifts_) const
+		{
+			return operator<<(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
+		}
+
+		/// <summary>
+		/// <para> Logically right-shifts all registers encapsulated by this Vector using the passed argument as the shifts for each register. </para>
+		/// </summary>
+		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
+		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator>>(shift_register_type num_shifts_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_shift_right_logical(data, num_shifts_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::shift_right_logical<per_element_width>(data, num_shifts_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Logically right-shifts all elements within this Vector using the passed scalar value as the number of shifts for each element. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// <para> If num_shifts_ is a compile-time constant, it is recommended to use ShiftRight function which takes a NumShifts_ template argument instead. </para>
+		/// </summary>
+		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
+		/// <returns>New FastVector of this type resulting from the shift operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator>>(std::size_t num_shifts_) const
+		{
+			return operator>>(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
+		}
+
+		/// <summary>
+		/// <para>Creates the NOT form of this Vector, with 0-bits flipped to 1 and 1-bits flipped to 0.</para>
+		/// </summary>
+		/// <returns>New FastVector of this type resulting from the bitwise operation.</returns>
+		[[nodiscard]] constexpr inline this_type operator~() const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_not(data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::bitwise_not(data));
+			}
+		}
+#pragma endregion
+
+#pragma region NON_CONST_BITWISE_ARITHMETIC_OPERATORS
+	public:
+		/// <summary>
+		/// <para> Bitwise ANDs all registers encapsulated by this Vector with the passed register, and assigns results to this Vector. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in AND operations with all registers encapsulated by this Vector.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& operator&=(register_type rhs_for_all_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_and_assign(data, rhs_for_all_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::bitwise_and(data, rhs_for_all_);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Bitwise ANDs all elements within this Vector with the passed scalar value, and assigns results to this Vector. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to use in AND operations with all elements within this Vector, assigning the results to this Vector.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& operator&=(value_type rhs_for_all_)
+		{
+			return operator&=(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Bitwise ANDs this Vector with the passed rhs_ Vector of the same type, and assigns results to this Vector.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to AND this Vector with.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& operator&=(const this_type& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_and_assign(data, rhs_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::bitwise_and(data, rhs_.data);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Bitwise ORs all registers encapsulated by this Vector with the passed register, and assigns results to this Vector. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in OR operations with all registers encapsulated by this Vector.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& operator|=(register_type rhs_for_all_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_or_assign(data, rhs_for_all_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::bitwise_or(data, rhs_for_all_);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Bitwise ORs all elements within this Vector with the passed scalar value, and assigns results to this Vector. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to use in OR operations with all elements within this Vector, assigning the results to this Vector.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& operator|=(value_type rhs_for_all_)
+		{
+			return operator|=(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Bitwise ORs this Vector with the passed rhs_ Vector of the same type, and assigns results to this Vector.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to OR this Vector with.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& operator|=(const this_type& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_or_assign(data, rhs_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::bitwise_or(data, rhs_.data);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Bitwise XORs all registers encapsulated by this Vector with the passed register, and assigns results to this Vector. </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">SIMD register to use in XOR operations with all registers encapsulated by this Vector.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& operator^=(register_type rhs_for_all_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_xor_assign(data, rhs_for_all_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::bitwise_xor(data, rhs_for_all_);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para> Bitwise XORs all elements within this Vector with the passed scalar value, and assigns results to this Vector. </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// </summary>
+		/// <param name="rhs_for_all_">Scalar to use in XOR operations with all elements within this Vector, assigning the results to this Vector.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& operator^=(value_type rhs_for_all_)
+		{
+			return operator^=(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+
+		/// <summary>
+		/// <para>Bitwise XORs this Vector with the passed rhs_ Vector of the same type, and assigns results to this Vector.</para>
+		/// </summary>
+		/// <param name="rhs_">Vector of the same type to XOR this Vector with.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& operator^=(const this_type& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_xor_assign(data, rhs_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::bitwise_xor(data, rhs_.data);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para>
+		///		Logically left-shifts all registers encapsulated by this Vector using the passed argument as the shifts for each register, 
+		///		and assigns results to this Vector.
+		/// </para>
+		/// </summary>
+		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& operator<<=(shift_register_type num_shifts_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_shift_left_assign(data, num_shifts_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::shift_left<per_element_width>(data, num_shifts_);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para>
+		///		Logically left-shifts all elements within this Vector using the passed scalar value as the number of shifts for each element, 
+		///		and assigns results to this Vector.
+		/// </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// <para> If num_shifts_ is a compile-time constant, it is recommended to use the ShiftLeftAssign function which takes a NumShifts_ template argument instead. </para>
+		/// </summary>
+		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& operator<<=(std::size_t num_shifts_)
+		{
+			return operator<<=(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Logically left-shifts all registers encapsulated by this Vector using the passed argument as the shifts for each register, 
+		///		and assigns results to this Vector.
+		/// </para>
+		/// </summary>
+		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& operator>>=(shift_register_type num_shifts_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				_do_array_shift_right_logical_assign(data, num_shifts_, register_index_sequence());
+			}
+			else
+			{
+				data = EmuSIMD::shift_right_logical<per_element_width>(data, num_shifts_);
+			}
+			return *this;
+		}
+
+		/// <summary>
+		/// <para>
+		///		Logically left-shifts all elements within this Vector using the passed scalar value as the number of shifts for each element, 
+		///		and assigns results to this Vector.
+		/// </para>
+		/// <para> 
+		///		This will create an intermediate for SIMD register interactions; 
+		///		it is recommended if the scalar is known to be reused in this context to instead create the intermediate register yourself via this Vector's 
+		///		make_all_same_register function.
+		/// </para>
+		/// <para> If num_shifts_ is a compile-time constant, it is recommended to use the ShiftRightAssign function which takes a NumShifts_ template argument instead. </para>
+		/// </summary>
+		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
+		/// <returns>Reference to this Vector after results have been assigned.</returns>
+		[[nodiscard]] constexpr inline this_type& operator>>=(std::size_t num_shifts_)
+		{
+			return operator>>=(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
 		}
 #pragma endregion
 
@@ -1368,7 +3012,7 @@ namespace EmuMath
 
 #pragma region ASSIGNMENT_OPERATORS
 	public:
-		constexpr inline this_type& operator=(const this_type& rhs_)
+		constexpr inline this_type& operator=(const this_type& rhs_) noexcept
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -1381,7 +3025,7 @@ namespace EmuMath
 			return *this;
 		}
 
-		constexpr inline this_type& operator=(this_type&& rhs_)
+		constexpr inline this_type& operator=(this_type&& rhs_) noexcept
 		{
 			data = std::move(rhs_.data);
 			return *this;
@@ -1406,7 +3050,7 @@ namespace EmuMath
 		data_type data;
 #pragma endregion
 
-		// MAJORITY OF IMPLEMENTATION STARTS HERE
+		// SIGNIFICANT PORTION OF UNDERLYING IMPLEMENTATION STARTS HERE
 #pragma region GENERAL_HELPERS
 	private:
 		template<std::size_t FullWidthIndex_, typename Vector_>
@@ -1572,12 +3216,12 @@ namespace EmuMath
 #pragma region COPY_CONSTRUCTION_HELPERS
 	private:
 		template<std::size_t...Indices_>
-		static constexpr inline data_type _make_array_copy(const this_type& to_copy_, std::index_sequence<Indices_...> indices_)
+		static constexpr inline data_type _make_array_copy(const this_type& to_copy_, std::index_sequence<Indices_...> indices_) noexcept
 		{
 			return data_type({ register_type(to_copy_.data[Indices_])... });
 		}
 
-		static constexpr inline data_type _make_copy(const this_type& to_copy_)
+		static constexpr inline data_type _make_copy(const this_type& to_copy_) noexcept
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -1593,12 +3237,12 @@ namespace EmuMath
 #pragma region MOVE_CONSTRUCTION_HELPERS
 	private:
 		template<std::size_t...Indices_>
-		static constexpr inline data_type _do_array_move(this_type&& to_move_, std::index_sequence<Indices_...> indices_)
+		static constexpr inline data_type _do_array_move(this_type&& to_move_, std::index_sequence<Indices_...> indices_) noexcept
 		{
 			return data_type({ register_type(std::move(to_move_.data[Indices_]))... });
 		}
 
-		static constexpr inline data_type _do_move(this_type&& to_move_)
+		static constexpr inline data_type _do_move(this_type&& to_move_) noexcept
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -1614,18 +3258,18 @@ namespace EmuMath
 #pragma region ALL_SAME_CONSTRUCTION_HELPERS
 	private:
 		template<std::size_t ToDiscard_>
-		static constexpr inline register_type _set_all_same_discard_index(const value_type& to_set_all_to_)
+		static constexpr inline register_type _set_all_same_discard_index(const value_type& to_set_all_to_) noexcept
 		{
 			return EmuSIMD::set1<register_type, per_element_width>(to_set_all_to_);
 		}
 
 		template<std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_set_all_same(const value_type& to_set_all_to_, std::index_sequence<RegisterIndices_...> indices_)
+		static constexpr inline data_type _do_array_set_all_same(const value_type& to_set_all_to_, std::index_sequence<RegisterIndices_...> indices_) noexcept
 		{
 			return data_type({ _set_all_same_discard_index<RegisterIndices_>(to_set_all_to_)... });
 		}
 
-		static constexpr inline data_type _do_set_all_same(const value_type& to_set_all_to_)
+		static constexpr inline data_type _do_set_all_same(const value_type& to_set_all_to_) noexcept
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -1638,18 +3282,18 @@ namespace EmuMath
 		}
 
 		template<std::size_t Index_, typename Arg_>
-		static constexpr inline register_type _construct_register_discard_index(Arg_&& arg_)
+		static constexpr inline register_type _construct_register_discard_index(Arg_&& arg_) noexcept
 		{
 			return register_type(std::forward<Arg_>(arg_));
 		}
 
 		template<std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_set_all_same_register(register_type to_set_all_registers_to_, std::index_sequence<RegisterIndices_...> indices_)
+		static constexpr inline data_type _do_array_set_all_same_register(register_type to_set_all_registers_to_, std::index_sequence<RegisterIndices_...> indices_) noexcept
 		{
 			return data_type({ _construct_register_discard_index<RegisterIndices_>(to_set_all_registers_to_)... });
 		}
 
-		static constexpr inline data_type _do_set_all_same_register(register_type to_set_all_registers_to_)
+		static constexpr inline data_type _do_set_all_same_register(register_type to_set_all_registers_to_) noexcept
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -1764,7 +3408,7 @@ namespace EmuMath
 		}
 
 		template<typename...Args_>
-		static constexpr inline data_type _make_with_arg_per_register(Args_&&...args_)
+		static constexpr inline data_type _make_with_arg_per_register(Args_&&...args_) noexcept
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -1778,7 +3422,7 @@ namespace EmuMath
 		}
 
 		template<typename...Args_>
-		static constexpr inline data_type _make_with_arg_per_element(Args_&&...args_)
+		static constexpr inline data_type _make_with_arg_per_element(Args_&&...args_) noexcept
 		{
 			if constexpr (contains_multiple_registers || requires_partial_register)
 			{
@@ -1792,7 +3436,7 @@ namespace EmuMath
 		}
 
 		template<std::size_t Index_, typename...Args_>
-		static constexpr inline value_type _make_value_type_from_tuple_index(std::tuple<Args_...>& args_)
+		static constexpr inline value_type _make_value_type_from_tuple_index(std::tuple<Args_...>& args_) noexcept
 		{
 			if constexpr (Index_ < sizeof...(Args_))
 			{
@@ -1807,13 +3451,13 @@ namespace EmuMath
 		}
 
 		template<std::size_t...Indices, typename...Args_>
-		static constexpr inline register_type _make_register_from_tuple(std::tuple<Args_...>& args_, std::index_sequence<Indices...> indices_)
+		static constexpr inline register_type _make_register_from_tuple(std::tuple<Args_...>& args_, std::index_sequence<Indices...> indices_) noexcept
 		{
 			return EmuSIMD::setr<register_type, per_element_width>(_make_value_type_from_tuple_index<Indices>(args_)...);
 		}
 
 		template<std::size_t...RegisterIndices_, typename...Args_>
-		static constexpr inline data_type _make_all_registers_from_tuple(std::tuple<Args_...>& args_, std::index_sequence<RegisterIndices_...> indices_)
+		static constexpr inline data_type _make_all_registers_from_tuple(std::tuple<Args_...>& args_, std::index_sequence<RegisterIndices_...> indices_) noexcept
 		{
 			if constexpr (sizeof...(RegisterIndices_) == 1)
 			{
@@ -1829,22 +3473,382 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region CONST_BASIC_ARITHMETIC_HELPERS
+	private:
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_add(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			return data_type
+			({
+				EmuSIMD::add<per_element_width>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
+			});
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_subtract(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			return data_type
+			({
+				EmuSIMD::sub<per_element_width>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
+			});
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_multiply(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			return data_type
+			({
+				EmuSIMD::mul_all<per_element_width>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
+			});
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_divide(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			return data_type
+			({
+				EmuSIMD::div<per_element_width, is_signed>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
+			});
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_mod(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			return data_type
+			({
+				EmuSIMD::mod<per_element_width, is_signed>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
+			});
+		}
+
+		template<std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_negate(const data_type& lhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type({ EmuSIMD::negate<per_element_width>(lhs_[RegisterIndices_])... });
+		}
+#pragma endregion
+
+#pragma region NON_CONST_BASIC_ARITHMETIC_HELPERS
+	private:
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline void _do_array_add_assign(data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			(
+				(
+					lhs_[RegisterIndices_] = EmuSIMD::add<per_element_width>
+					(
+						lhs_[RegisterIndices_],
+						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_))
+					)
+				), ...
+			);
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline void _do_array_subtract_assign(data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			(
+				(
+					lhs_[RegisterIndices_] = EmuSIMD::sub<per_element_width>
+					(
+						lhs_[RegisterIndices_],
+						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_))
+					)
+				), ...
+			);
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline void _do_array_multiply_assign(data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			(
+				(
+					lhs_[RegisterIndices_] = EmuSIMD::mul_all<per_element_width>
+					(
+						lhs_[RegisterIndices_],
+						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_))
+					)
+				), ...
+			);
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline void _do_array_divide_assign(data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			(
+				(
+					lhs_[RegisterIndices_] = EmuSIMD::div<per_element_width, is_signed>
+					(
+						lhs_[RegisterIndices_],
+						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_))
+					)
+				), ...
+			);
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline void _do_array_mod_assign(data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			(
+				(
+					lhs_[RegisterIndices_] = EmuSIMD::mod<per_element_width, is_signed>
+					(
+						lhs_[RegisterIndices_],
+						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_))
+					)
+				), ...
+			);
+		}
+
+		template<std::size_t...RegisterIndices_>
+		static constexpr inline void _do_array_negate_assign(data_type& lhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			((lhs_[RegisterIndices_] = EmuSIMD::negate<per_element_width>(lhs_[RegisterIndices_])), ...);
+		}
+#pragma endregion
+
+#pragma region CONST_BITWISE_ARITHMETIC_HELPERS
+	private:
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_and(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			return data_type
+			({
+				EmuSIMD::bitwise_and(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
+			});
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_or(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			return data_type
+			({
+				EmuSIMD::bitwise_or(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
+			});
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_xor(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			return data_type
+			({
+				EmuSIMD::bitwise_xor(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
+			});
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_andnot(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			return data_type
+			({
+				EmuSIMD::bitwise_andnot(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
+			});
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_shift_left(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			return data_type
+			({
+				EmuSIMD::shift_left<per_element_width>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
+			});
+		}
+
+		template<std::size_t NumShifts_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_shift_left(const data_type& lhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type({ EmuSIMD::shift_left<NumShifts_, per_element_width>(lhs_[RegisterIndices_])... });
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_shift_right_arithmetic(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			return data_type
+			({
+				EmuSIMD::shift_right_arithmetic<per_element_width>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
+			});
+		}
+
+		template<std::size_t NumShifts_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_shift_right_arithmetic(const data_type& lhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type({ EmuSIMD::shift_right_arithmetic<NumShifts_, per_element_width>(lhs_[RegisterIndices_])... });
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_shift_right_logical(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			return data_type
+			({
+				EmuSIMD::shift_right_logical<per_element_width>(lhs_[RegisterIndices_], _retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_)))...
+			});
+		}
+
+		template<std::size_t NumShifts_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_shift_right_logical(const data_type& lhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type({ EmuSIMD::shift_right_logical<NumShifts_, per_element_width>(lhs_[RegisterIndices_])... });
+		}
+
+		template<std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_not(const data_type& lhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type({ EmuSIMD::bitwise_not(lhs_[RegisterIndices_])... });
+		}
+#pragma endregion
+
+#pragma region NON_CONST_BITWISE_ARITHMETIC_HELPERS
+	private:
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline void _do_array_and_assign(data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			(
+				(
+					lhs_[RegisterIndices_] = EmuSIMD::bitwise_and
+					(
+						lhs_[RegisterIndices_],
+						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_))
+					)
+				), ...
+			);
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline void _do_array_or_assign(data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			(
+				(
+					lhs_[RegisterIndices_] = EmuSIMD::bitwise_or
+					(
+						lhs_[RegisterIndices_],
+						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_))
+					)
+				), ...
+			);
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline void _do_array_xor_assign(data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			(
+				(
+					lhs_[RegisterIndices_] = EmuSIMD::bitwise_xor
+					(
+						lhs_[RegisterIndices_],
+						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_))
+					)
+				), ...
+			);
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline void _do_array_andnot_assign(data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			(
+				(
+					lhs_[RegisterIndices_] = EmuSIMD::bitwise_andnot
+					(
+						lhs_[RegisterIndices_],
+						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_))
+					)
+				), ...
+			);
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline void _do_array_shift_left_assign(data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			(
+				(
+					lhs_[RegisterIndices_] = EmuSIMD::shift_left<per_element_width>
+					(
+						lhs_[RegisterIndices_],
+						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_))
+					)
+				), ...
+			);
+		}
+
+		template<std::size_t NumShifts_, std::size_t...RegisterIndices_>
+		static constexpr inline void _do_array_shift_left_assign(data_type& lhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			((lhs_[RegisterIndices_] = EmuSIMD::shift_left<NumShifts_, per_element_width>(lhs_[RegisterIndices_])), ...);
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline void _do_array_shift_right_arithmetic_assign(data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			(
+				(
+					lhs_[RegisterIndices_] = EmuSIMD::shift_right_arithmetic<per_element_width>
+					(
+						lhs_[RegisterIndices_],
+						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_))
+					)
+				), ...
+			);
+		}
+
+		template<std::size_t NumShifts_, std::size_t...RegisterIndices_>
+		static constexpr inline void _do_array_shift_right_arithmetic_assign(data_type& lhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			((lhs_[RegisterIndices_] = EmuSIMD::shift_right_arithmetic<NumShifts_, per_element_width>(lhs_[RegisterIndices_])), ...);
+		}
+
+		template<typename Rhs_, std::size_t...RegisterIndices_>
+		static constexpr inline void _do_array_shift_right_logical_assign(data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			(
+				(
+					lhs_[RegisterIndices_] = EmuSIMD::shift_right_logical<per_element_width>
+					(
+						lhs_[RegisterIndices_],
+						_retrieve_register_from_arg<RegisterIndices_>(std::forward<Rhs_>(rhs_))
+					)
+				), ...
+			);
+		}
+
+		template<std::size_t NumShifts_, std::size_t...RegisterIndices_>
+		static constexpr inline void _do_array_shift_right_logical_assign(data_type& lhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			((lhs_[RegisterIndices_] = EmuSIMD::shift_right_logical<NumShifts_, per_element_width>(lhs_[RegisterIndices_])), ...);
+		}
+
+		template<std::size_t...RegisterIndices_>
+		static constexpr inline void _do_array_not_assign(data_type& lhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			((lhs_[RegisterIndices_] = EmuSIMD::bitwise_not(lhs_[RegisterIndices_])), ...);
+		}
+#pragma endregion
+
 #pragma region SETTER_HELPERS
 	private:
 		template<std::size_t...RegisterIndices_>
-		constexpr inline void _set_zero_array(std::index_sequence<RegisterIndices_...> indices_)
+		constexpr inline void _set_zero_array(std::index_sequence<RegisterIndices_...> indices_) noexcept
 		{
 			((data[RegisterIndices_] = EmuSIMD::setzero<register_type>()), ...);
 		}
 
 		template<std::size_t...RegisterIndices_>
-		constexpr inline void _set_one_array(std::index_sequence<RegisterIndices_...> indices_)
+		constexpr inline void _set_one_array(std::index_sequence<RegisterIndices_...> indices_) noexcept
 		{
 			((data[RegisterIndices_] = EmuSIMD::setallone<register_type>()), ...);
 		}
 
 		template<std::size_t...RegisterIndices_>
-		constexpr inline void _set1_array(const value_type& val_, std::index_sequence<RegisterIndices_...> indices_)
+		constexpr inline void _set1_array(const value_type& val_, std::index_sequence<RegisterIndices_...> indices_) noexcept
 		{
 			((data[RegisterIndices_] = EmuSIMD::set1<register_type, per_element_width>(val_)), ...);
 		}
@@ -1852,7 +3856,7 @@ namespace EmuMath
 
 #pragma region STATIC_ASSERTION_HELPERS
 	private:
-		static constexpr bool _do_static_assert()
+		static constexpr inline bool _do_static_assert() noexcept
 		{
 			if constexpr (Size_ == 0)
 			{

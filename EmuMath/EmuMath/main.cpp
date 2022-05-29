@@ -211,6 +211,7 @@ int main()
 	srand(static_cast<unsigned int>(time(0)));
 	EmuCore::Timer<std::milli> timer_;
 
+	//*
 #pragma region PRE_TEST_BODY
 	EmuMath::FastVector<4, float> fast_v4f_a;
 	EmuMath::FastVector<4, float> fast_v4f_b(12);
@@ -257,7 +258,7 @@ int main()
 
 	std::cout << "\n\n";
 	std::cout << fast_v8f_a << "\n";
-	fast_v8f_a.GetRegisterTheoretical<1>() = _mm_set_ps(42, 4242, 424242, 42424242);
+	fast_v8f_a.GetRegisterTheoretical<1>() = _mm_set_ps(42.0f, 4242.0f, 424242.0f, 42424242.0f);
 	std::cout << fast_v8f_a << "\n";
 	std::cout << fast_v4f_b << "\n";
 	EmuSIMD::append_simd_vector_to_stream(std::cout, fast_v4f_b.GetRegisterTheoretical<0>()) << "\n";
@@ -284,13 +285,36 @@ int main()
 	std::cout << fast_v4f_a.AddAssign(5) << "\n";
 	std::cout << fast_v4f_a.AddAssign(_mm_set_ps1(20)) << "\n";
 	fast_v4f_b = EmuMath::FastVector<4, float>(1000, 2000, 3000, 4000);
-	std::cout << fast_v4f_a << " + " << fast_v4f_b << " = " << fast_v4f_a.AddAssign(fast_v4f_b) << "\n";
-	std::cout << fast_v4f_a << " - " << fast_v4f_b << " = " << fast_v4f_a.SubtractAssign(fast_v4f_b) << "\n";
-	std::cout << fast_v4f_a << " * " << fast_v4f_b << " = " << fast_v4f_a.MultiplyAssign(fast_v4f_b) << "\n";
-	std::cout << fast_v4f_a << " / " << fast_v4f_b << " = " << fast_v4f_a.DivideAssign(fast_v4f_b) << "\n";
-	std::cout << fast_v4f_a << " % " << fast_v4f_b << " = " << fast_v4f_a.ModAssign(fast_v4f_b) << "\n";
+	std::cout << fast_v4f_a << " + " << fast_v4f_b << " = " << (fast_v4f_a += fast_v4f_b) << "\n";
+	std::cout << fast_v4f_a << " - " << fast_v4f_b << " = " << (fast_v4f_a -= fast_v4f_b) << "\n";
+	std::cout << fast_v4f_a << " * " << fast_v4f_b << " = " << (fast_v4f_a *= fast_v4f_b) << "\n";
+	std::cout << fast_v4f_a << " / " << fast_v4f_b << " = " << (fast_v4f_a /= fast_v4f_b) << "\n";
+	fast_v4f_b = decltype(fast_v4f_b)(3);
+	std::cout << fast_v4f_a << " % " << fast_v4f_b << " = " << (fast_v4f_a %= fast_v4f_b) << "\n";
 	std::cout << "-" << fast_v4f_a << " = " << fast_v4f_a.NegateAssign() << "\n";
+	std::cout << "-" << fast_v4f_a << " = " << -fast_v4f_a << "\n";
 
+	std::cout << "\n\n";
+	EmuMath::FastVector<4, std::int32_t> fastv4i32_a(1, 2, 4, 8);
+	EmuMath::FastVector<8, std::int32_t> fastv8i32_a(16, 32, 64, 128, 256, 512, 1024, 2048);
+	EmuMath::FastVector<4, std::int32_t> fastv4i32_b(12, 6, 4, 0);
+	EmuMath::FastVector<8, std::int32_t> fastv8i32_b(12, 6, 4, 8, 10, 38, 277, 2048);
+	std::cout << fastv4i32_a << " & " << fastv4i32_b << " = " << (fastv4i32_a.AndAssign(fastv4i32_b)) << "\n";
+	std::cout << fastv4i32_a << " | " << fastv4i32_b << " = " << (fastv4i32_a.OrAssign(fastv4i32_b)) << "\n";
+	std::cout << fastv4i32_a << " ^ " << fastv4i32_b << " = " << (fastv4i32_a.XorAssign(fastv4i32_b)) << "\n";
+	std::cout << fastv4i32_a << " &~ " << fastv4i32_b << " = " << (fastv4i32_a.AndNotAssign(fastv4i32_b)) << "\n";
+	std::cout << fastv4i32_a << " << " << 2 << " = " << (fastv4i32_a.ShiftLeftAssign(2)) << "\n";
+	std::cout << fastv4i32_a << " >> " << 2 << " = " << (fastv4i32_a.ShiftRightAssign(2)) << "\n";
+	std::cout << "~" << fastv4i32_a << " = " << (fastv4i32_a.NotAssign()) << "\n";
+
+	std::cout << "\n\n";
+	std::cout << fastv8i32_a << " & " << fastv8i32_b << " = " << (fastv8i32_a.AndAssign(fastv8i32_b)) << "\n";
+	std::cout << fastv8i32_a << " | " << fastv8i32_b << " = " << (fastv8i32_a.OrAssign(fastv8i32_b)) << "\n";
+	std::cout << fastv8i32_a << " ^ " << fastv8i32_b << " = " << (fastv8i32_a.XorAssign(fastv8i32_b)) << "\n";
+	std::cout << fastv8i32_a << " &~ " << fastv8i32_b << " = " << (fastv8i32_a.AndNotAssign(fastv8i32_b)) << "\n";
+	std::cout << fastv8i32_a << " << " << 2 << " = " << (fastv8i32_a.ShiftLeftAssign(2)) << "\n";
+	std::cout << fastv8i32_a << " >> " << 2 << " = " << (fastv8i32_a.ShiftRightAssign(2)) << "\n";
+	std::cout << "~" << fastv8i32_a << " = " << (fastv8i32_a.NotAssign()) << "\n";
 
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
@@ -397,13 +421,15 @@ int main()
 	//WriteNoiseTableToPPM(noise_, noise_gradient_, "test_noise_scalar");
 	//WriteNoiseTableToPPM(fast_noise_, noise_gradient_, "test_noise_simd");
 #pragma endregion
+	//*/
 
-	/*// Some tests to see disassembly
+	/*
+	// Some tests to see disassembly
 	EmuMath::FastVector<4, float> veca((rand() % 100) * 0.33f, (rand() % 100) * 0.33f, (rand() % 100) * 0.33f, (rand() % 100) * 0.33f);
 	EmuMath::FastVector<4, float> vecb((rand() % 100) * 0.33f, (rand() % 100) * 0.33f, (rand() % 100) * 0.33f, (rand() % 100) * 0.33f);
-	auto result = veca.Add(vecb);
-	std::cout << result << "\n";
-	*/
+	auto result = veca + vecb;
+	std::cout << veca << " + " << vecb << " = " << result << "\n";
+	// */
 
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
