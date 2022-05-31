@@ -42,7 +42,7 @@ namespace EmuSIMD::Funcs
 #pragma endregion
 
 #pragma region STORES
-	inline EmuSIMD::f32x16 store_f32x16(float* p_out_, f32x16_arg a_)
+	inline void store_f32x16(float* p_out_, f32x16_arg a_)
 	{
 		_mm512_store_ps(p_out_, a_);
 	}

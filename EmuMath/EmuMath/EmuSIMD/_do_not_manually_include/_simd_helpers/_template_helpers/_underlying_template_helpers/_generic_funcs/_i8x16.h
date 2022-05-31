@@ -42,7 +42,7 @@ namespace EmuSIMD::Funcs
 #pragma endregion
 
 #pragma region STORES
-	inline EmuSIMD::i8x16 store_i8x16(std::int8_t* p_out_, i8x16_arg a_)
+	inline void store_i8x16(std::int8_t* p_out_, i8x16_arg a_)
 	{
 		_mm_store_si128(reinterpret_cast<__m128i*>(p_out_), a_);
 	}
@@ -58,7 +58,7 @@ namespace EmuSIMD::Funcs
 #pragma region CASTS
 	inline EmuSIMD::i8x16 cast_f32x4_i8x16(f32x4_arg a_)
 	{
-		_mm_castps_si128(a_);
+		return _mm_castps_si128(a_);
 	}
 
 	inline EmuSIMD::i8x16 cast_f32x8_i8x16(f32x8_arg a_)
@@ -278,22 +278,22 @@ namespace EmuSIMD::Funcs
 		return _mm256_cvtepi64_epi8(a_);
 	}
 
-	inline EmuSIMD::i8x16 cvt_i8x32_i8x16(i8x64_arg a_)
+	inline EmuSIMD::i8x16 cvt_i8x64_i8x16(i8x64_arg a_)
 	{
 		return _mm512_castsi512_si128(a_);
 	}
 
-	inline EmuSIMD::i8x16 cvt_i16x16_i8x16(i16x32_arg a_)
+	inline EmuSIMD::i8x16 cvt_i16x32_i8x16(i16x32_arg a_)
 	{
 		return _mm256_cvtepi16_epi8(_mm512_castsi512_si256(a_));
 	}
 
-	inline EmuSIMD::i8x16 cvt_i32x8_i8x16(i32x16_arg a_)
+	inline EmuSIMD::i8x16 cvt_i32x16_i8x16(i32x16_arg a_)
 	{
 		return _mm512_cvtepi32_epi8(a_);
 	}
 
-	inline EmuSIMD::i8x16 cvt_i64x4_i8x16(i64x8_arg a_)
+	inline EmuSIMD::i8x16 cvt_i64x8_i8x16(i64x8_arg a_)
 	{
 		return _mm512_cvtepi64_epi8(a_);
 	}
@@ -338,22 +338,22 @@ namespace EmuSIMD::Funcs
 		return _mm256_cvtepi64_epi8(a_);
 	}
 
-	inline EmuSIMD::i8x16 cvt_u8x32_i8x16(u8x64_arg a_)
+	inline EmuSIMD::i8x16 cvt_u8x64_i8x16(u8x64_arg a_)
 	{
 		return _mm512_castsi512_si128(a_);
 	}
 
-	inline EmuSIMD::i8x16 cvt_u16x16_i8x16(u16x32_arg a_)
+	inline EmuSIMD::i8x16 cvt_u16x32_i8x16(u16x32_arg a_)
 	{
 		return _mm256_cvtepi16_epi8(_mm512_castsi512_si256(a_));
 	}
 
-	inline EmuSIMD::i8x16 cvt_u32x8_i8x16(u32x16_arg a_)
+	inline EmuSIMD::i8x16 cvt_u32x16_i8x16(u32x16_arg a_)
 	{
 		return _mm512_cvtepi32_epi8(a_);
 	}
 
-	inline EmuSIMD::i8x16 cvt_u64x4_i8x16(u64x8_arg a_)
+	inline EmuSIMD::i8x16 cvt_u64x8_i8x16(u64x8_arg a_)
 	{
 		return _mm512_cvtepi64_epi8(a_);
 	}
@@ -461,8 +461,7 @@ namespace EmuSIMD::Funcs
 
 	inline EmuSIMD::i8x16 mod_i8x16(EmuSIMD::i8x16_arg lhs_, EmuSIMD::i8x16_arg rhs_)
 	{
-		EmuSIMD::i8x16 result = _mm_div_epi8(lhs_, rhs_);
-
+		return _mm_rem_epi8(lhs_, rhs_);
 	}
 #pragma endregion
 }

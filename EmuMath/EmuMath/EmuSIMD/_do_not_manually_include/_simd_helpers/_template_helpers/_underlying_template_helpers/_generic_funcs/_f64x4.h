@@ -34,7 +34,7 @@ namespace EmuSIMD::Funcs
 #pragma endregion
 
 #pragma region STORES
-	inline EmuSIMD::f64x4 store_f64x4(double* p_out_, f64x4_arg a_)
+	inline void store_f64x4(double* p_out_, f64x4_arg a_)
 	{
 		_mm256_store_pd(p_out_, a_);
 	}
