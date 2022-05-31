@@ -359,6 +359,16 @@ namespace EmuSIMD::Funcs
 #pragma endregion
 
 #pragma region BASIC_ARITHMETIC
+	inline EmuSIMD::f32x4 mul_all_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
+	{
+		return _mm_mul_ps(lhs_, rhs_);
+	}
+
+	inline EmuSIMD::f32x4 negate_f32x4(EmuSIMD::f32x4_arg to_negate_)
+	{
+		return _mm_sub_ps(_mm_setzero_ps(), to_negate_);
+	}
+
 	inline EmuSIMD::f32x4 add_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
 		return _mm_add_ps(lhs_, rhs_);

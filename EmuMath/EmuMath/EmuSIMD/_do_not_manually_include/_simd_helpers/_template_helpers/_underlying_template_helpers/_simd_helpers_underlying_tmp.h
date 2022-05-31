@@ -8,6 +8,7 @@
 #include "_generic_funcs/_f64x2.h"
 #include "_generic_funcs/_f64x4.h"
 #include "_generic_funcs/_f64x8.h"
+#include "_generic_funcs/_i8x16.h"
 #include "../../../../../EmuCore/ArithmeticHelpers/BitHelpers.h"
 #include "../../../../../EmuCore/TMPHelpers/TypeComparators.h"
 #include "../../../../../EmuCore/TMPHelpers/TypeConvertors.h"
