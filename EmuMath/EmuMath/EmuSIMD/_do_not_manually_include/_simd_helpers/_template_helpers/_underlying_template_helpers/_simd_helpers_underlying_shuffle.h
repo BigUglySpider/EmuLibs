@@ -180,12 +180,6 @@ namespace EmuSIMD::_underlying_simd_helpers
 	{
 		return ab_;
 	}
-
-	template<>
-	[[nodiscard]] inline EmuSIMD::f64x2 _execute_shuffle<1, 0>(EmuSIMD::f64x2 a_, EmuSIMD::f64x2 b_)
-	{
-		return _mm_move_sd(a_, b_);
-	}
 #pragma endregion
 
 #pragma region M128I_SPECIALISATIONS

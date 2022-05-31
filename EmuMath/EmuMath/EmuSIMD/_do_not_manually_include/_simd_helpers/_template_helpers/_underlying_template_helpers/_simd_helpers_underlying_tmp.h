@@ -1,44 +1,19 @@
 #ifndef EMU_SIMD_UNDERLYING_SIMD_HELPERS_TMP_H_INC_
 #define EMU_SIMD_UNDERLYING_SIMD_HELPERS_TMP_H_INC_ 1
 
+#include "_simd_helpers_underlying_aliases.h"
+#include "_generic_funcs/_f32x4.h"
+#include "_generic_funcs/_f32x8.h"
+#include "_generic_funcs/_f32x16.h"
+#include "_generic_funcs/_f64x2.h"
+#include "_generic_funcs/_f64x4.h"
+#include "_generic_funcs/_f64x8.h"
 #include "../../../../../EmuCore/ArithmeticHelpers/BitHelpers.h"
 #include "../../../../../EmuCore/TMPHelpers/TypeComparators.h"
 #include "../../../../../EmuCore/TMPHelpers/TypeConvertors.h"
 #include "../../../../../EmuCore/TMPHelpers/Values.h"
 #include <cstdlib>
-#include <immintrin.h>
 #include <stdexcept>
-
-namespace EmuSIMD
-{
-	using f32x4 = __m128;
-	using f32x8 = __m256;
-	using f32x16 = __m512;
-
-	using f64x2 = __m128d;
-	using f64x4 = __m256d;
-	using f64x8 = __m512d;
-
-	using i8x16 = __m128i;
-	using i8x32 = __m256i;
-	using i8x64 = __m512i;
-
-	using i16x8 = __m128i;
-	using i16x16 = __m256i;
-	using i16x32 = __m512i;
-
-	using i32x4 = __m128i;
-	using i32x8 = __m256i;
-	using i32x16 = __m512i;
-
-	using i64x2 = __m128i;
-	using i64x4 = __m256i;
-	using i64x8 = __m512i;
-
-	using i128_generic = __m128i;
-	using i256_generic = __m256i;
-	using i512_generic = __m512i;
-}
 
 namespace EmuSIMD::TMP
 {

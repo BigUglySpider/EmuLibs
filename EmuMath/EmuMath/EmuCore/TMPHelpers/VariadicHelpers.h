@@ -371,6 +371,27 @@ namespace EmuCore::TMP
 	template<class IntegerSequence_, std::size_t LoopCount_>
 	using make_looped_integer_sequence = typename looped_integer_sequence<IntegerSequence_, LoopCount_>::type;
 
+	template<std::size_t Size_, std::size_t Offset_ = 0>
+	struct reverse_index_sequence
+	{
+	private:
+		template<std::size_t...Indices_>
+		static constexpr auto _make_reverse(std::index_sequence<Indices_...> indices_)
+		{
+			constexpr std::size_t num_indices = sizeof...(Indices_);
+			return std::index_sequence<(num_indices + Offset_) - 1U - (Indices_ - Offset_)...>{};
+		}
+
+	public:
+		using type = decltype(_make_reverse(make_offset_index_sequence<Offset_, Size_>()));
+	};
+
+	template<std::size_t Size_>
+	using make_reverse_index_sequence = typename reverse_index_sequence<Size_, 0>::type;
+
+	template<std::size_t Offset_, std::size_t Size_>
+	using make_offset_reverse_index_sequence = typename reverse_index_sequence<Size_, Offset_>::type;
+
 	/// <summary>
 	/// <para> Helper type to perform a comparison of all constants to determine the last to compare true. </para>
 	/// <para> The provided CmpTemplate_ will be instantiated with a single T_ argument, and used to perform each comparison. </para>

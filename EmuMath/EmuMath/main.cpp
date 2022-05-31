@@ -328,6 +328,26 @@ int main()
 	EmuMath::FastVector<8, double> fastv8f64_t(0.5, 2.0, 0.0, 19999.0, 0.25, 0.75, -0.5, 1.0);
 	std::cout << "LERP(\n\t" << fastv8f64_a << ",\n\t" << fastv8f64_b << ",\n\t" << fastv8f64_t << "\n) = " << fastv8f64_a.FusedLerp(fastv8f64_b, fastv8f64_t) << "\n\n";
 
+	DirectX::XMVECTOR a, b;
+	DirectX::XMFLOAT4 xm(1, 2, 3, 4);
+	a = DirectX::XMLoadFloat4(&xm);
+	b = DirectX::XMLoadFloat4(&xm);
+	DirectX::XMVector3Dot(a, b);
+
+	std::cout << "\n\n";
+	std::cout << EmuMath::FastVector<8, std::uint16_t>(EmuMath::FastVector<5, std::uint16_t>::make_partial_end_exclude_mask_register()) << "\n\n";
+	std::cout << EmuMath::FastVector<8, std::uint16_t>(EmuMath::FastVector<5, std::uint16_t>::make_partial_end_only_mask_register()) << "\n\n";
+	std::cout << EmuMath::FastVector<8, std::uint16_t>(EmuSIMD::index_mask<__m128i, 0, 0, 0, 0, 0, 0, 0, 1>::get()) << "\n";
+
+	std::cout << (EmuMath::FastVector<8, std::uint16_t>(1, 2, 3, 4, 5, 6, 7, 8) & EmuMath::FastVector<5, std::uint16_t>::make_partial_end_exclude_mask_register()) << "\n";
+
+	std::cout << "\n\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).Dot(EmuMath::FastVector<3, float>(13)) << "\n";
+	std::cout << EmuMath::FastVector<7, double>(1, 2, 3, 4, 5, 6, 7).Dot(EmuMath::FastVector<7, double>(13)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).Dot(EmuMath::FastVector<7, float>(13)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(EmuMath::FastVector<3, float>::make_partial_end_exclude_mask_register());
+	std::cout << EmuMath::FastVector<4, float>(EmuMath::FastVector<7, float>::make_partial_end_exclude_mask_register());
+
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 	constexpr auto mat_b_ = EmuMath::Matrix<4, 4, int, true>(1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);

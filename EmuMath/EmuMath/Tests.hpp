@@ -113,7 +113,8 @@ namespace EmuCore::TestingHelpers
 		using vector_type = typename fast_vector_type::vector_type;
 		using lhs_type = fast_vector_type;
 		using rhs_type = fast_vector_type;
-		using output_type = fast_vector_type;
+		using t_type = fast_vector_type;
+		using output_type = EmuMath::FastVector<3, float>;
 
 		EmuFastVectorTest()
 		{
@@ -133,21 +134,24 @@ namespace EmuCore::TestingHelpers
 			{
 				lhs.emplace_back(make_random_vec<lhs_type, vec_t_arg, vec_size>(rng_));
 				rhs.emplace_back(make_random_vec<lhs_type, vec_t_arg, vec_size>(rng_));
+				t.emplace_back(make_random_vec<lhs_type, vec_t_arg, vec_size>(rng_));
 			}
 		}
 		void operator()(std::size_t i_)
 		{
 			// ADD
-			out_vecs[i_] = lhs[i_].Mod(rhs[i_]);
+			//out_vecs[i_] = lhs[i_].Mod(rhs[i_]);
+			out_vecs[i_] = lhs[i_].Convert<3>().Dot(rhs[i_].Convert<3>());
 		}
 		void OnTestsOver()
 		{
 			const std::size_t i_ = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
-			std::cout << lhs[i_] << " +\n" << rhs[i_] << " =\n" << out_vecs[i_] << "\n\n";
+			std::cout << "DOT(" << lhs[i_] << ", " << rhs[i_] << ") =\n" << out_vecs[i_] << "\n\n";
 		}
 
 		std::vector<lhs_type> lhs;
 		std::vector<rhs_type> rhs;
+		std::vector<t_type> t;
 		std::vector<output_type> out_vecs;
 	};
 
@@ -189,13 +193,14 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i_)
 		{
-			out_vecs[i_] = DirectX::XMVectorMod(lhs[i_], rhs[i_]);
+			out_vecs[i_] = DirectX::XMVector3Dot(lhs[i_], rhs[i_]);
 		}
 		void OnTestsOver()
 		{
 			const std::size_t i_ = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
-			print_vector(lhs[i_]) << " +\n";
-			print_vector(rhs[i_]) << " =\n";
+			std::cout << "DOT(";
+			print_vector(lhs[i_]) << ", ";
+			print_vector(rhs[i_]) << ")=\n";
 			print_vector(out_vecs[i_]) << "\n\n";
 		}
 

@@ -155,7 +155,7 @@ namespace EmuSIMD
 				}
 				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 				{
-					return _mm_add_ps(register_, _underlying_simd_helpers::_execute_shuffle<0, 1>(register_));
+					return _mm_add_pd(register_, _underlying_simd_helpers::_execute_shuffle<1, 0>(register_));
 				}
 				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 				{

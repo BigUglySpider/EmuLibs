@@ -96,6 +96,36 @@ namespace EmuMath
 		using register_index_sequence = std::make_index_sequence<num_registers>;
 #pragma endregion
 
+#pragma region HELPER_MASKS
+	public:
+		struct _make_partial_mask
+		{
+		public:
+			template<bool Included_, typename IndexSequence_>
+			struct _underlying_mask_generation_maker
+			{
+				using type = void;
+			};
+			template<std::size_t...Indices_>
+			struct _underlying_mask_generation_maker<false, std::index_sequence<Indices_...>>
+			{
+				using type = typename EmuSIMD::index_mask<register_type, (Indices_ < size)...>;
+			};
+			template<std::size_t...Indices_>
+			struct _underlying_mask_generation_maker<true, std::index_sequence<Indices_...>>
+			{
+				using type = typename EmuSIMD::index_mask<register_type, (Indices_ >= size)...>;
+			};
+
+			static constexpr std::size_t _offset = (num_registers - 1) * elements_per_register;
+			using _partial_index_sequence = EmuCore::TMP::make_offset_reverse_index_sequence<_offset, elements_per_register>;
+			
+		public:
+			using excluded_generator = typename _underlying_mask_generation_maker<false, _partial_index_sequence>::type;
+			using included_generator = typename _underlying_mask_generation_maker<true, _partial_index_sequence>::type;
+		};
+#pragma endregion
+
 #pragma region GENERAL_HELPER_TYPES
 	private:
 		template<std::size_t FullWidthIndex_, typename Vector_>
@@ -132,6 +162,16 @@ namespace EmuMath
 
 #pragma region STATIC_GETS
 	public:
+		static constexpr inline register_type make_partial_end_exclude_mask_register()
+		{
+			return _make_partial_mask::excluded_generator::get();
+		}
+
+		static constexpr inline register_type make_partial_end_only_mask_register()
+		{
+			return _make_partial_mask::included_generator::get();
+		}
+
 		/// <summary> Makes a FastVector of this type with all register bits set to 0. </summary>
 		/// <returns>A newly constructed FastVector of this type with all register bits set to 0.</returns>
 		static constexpr inline this_type make_all_zero()
@@ -3043,6 +3083,44 @@ namespace EmuMath
 
 #pragma region CONST_VECTOR_ARITHMETIC
 	public:
+		[[nodiscard]] constexpr inline this_type Dot(const this_type& b_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_dot<false>(data, b_.data, register_index_sequence()));
+			}
+			else if constexpr (requires_partial_register)
+			{
+				// Need extra work to make sure we dot correctly
+				register_type mask = make_partial_end_exclude_mask_register();
+				return this_type(EmuSIMD::dot<per_element_width>(EmuSIMD::bitwise_and(data, mask), b_.data));
+			}
+			else
+			{
+				// Safe to do a simple dot
+				return this_type(EmuSIMD::dot<per_element_width>(data, b_.data));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type Dot(register_type b_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_dot<false>(data, b_for_all_, register_index_sequence()));
+			}
+			else if constexpr (requires_partial_register)
+			{
+				// Need extra work to make sure we dot correctly
+				register_type mask = make_partial_end_exclude_mask_register();
+				return this_type(EmuSIMD::dot<per_element_width>(EmuSIMD::bitwise_and(data, mask), b_for_all_));
+			}
+			else
+			{
+				// Safe to do a simple dot
+				return this_type(EmuSIMD::dot<per_element_width>(data, b_for_all_));
+			}
+		}
+
 		/// <summary>
 		/// <para> Linearly interpolates this Vector with the provided b_ and t_ arguments. </para>
 		/// <para> If an argument is a FastVector, all registers and elements will be used respectively. </para>
@@ -3206,6 +3284,64 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline this_type FusedLerp(value_type b_, value_type t_) const
 		{
 			return FusedLerp(EmuSIMD::set1<register_type, per_element_width>(b_), EmuSIMD::set1<register_type, per_element_width>(t_));
+		}
+#pragma endregion
+
+#pragma region CASTS
+	public:
+		template<std::size_t OutSize_, typename OutT_ = value_type, std::size_t OutRegisterWidth_ = register_width>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<OutSize_, OutT_, OutRegisterWidth_> Convert() const
+		{
+			using out_vector = EmuMath::FastVector<OutSize_, T_, OutRegisterWidth_>;
+			constexpr bool matching_element_width = out_vector::per_element_width == per_element_width;
+			constexpr bool matching_register = std::is_same_v<typename out_vector::register_type, register_type>;
+
+			if constexpr (matching_element_width && matching_register)
+			{
+				if constexpr (out_vector::contains_multiple_registers)
+				{
+					// TODO
+					static_assert("Multi-register casts not implemented for FastVector.");
+				}
+				else
+				{
+					if constexpr (contains_multiple_registers)
+					{
+						return out_vector(data[0]);
+					}
+					else
+					{
+						return out_vector(data);
+					}
+				}
+			}
+			else
+			{
+				if constexpr (contains_multiple_registers)
+				{
+					// TODO
+					static_assert
+					(
+						EmuCore::TMP::get_false<OutSize_>(),
+						"Differing width/register array casts not implemented for FastVector."
+					);
+				}
+				else
+				{
+					// TODO
+					static_assert
+					(
+						EmuCore::TMP::get_false<OutSize_>(),
+						"Differing width/register casts not implemented for FastVector."
+					);
+				}
+			}
+		}
+
+		template<typename OutT_, std::size_t OutRegisterWidth_ = register_width>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<size, OutT_, OutRegisterWidth_> Cast() const
+		{
+			return Cast<size, OutT_, OutRegisterWidth_>();
 		}
 #pragma endregion
 
@@ -4005,6 +4141,48 @@ namespace EmuMath
 
 #pragma region CONST_VECTOR_ARITHMETIC_HELPERS
 	private:
+		template<bool Fill_, typename B_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_dot(const data_type& a_, B_&& b_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			register_type result = make_all_zero_register();
+			(
+				(
+					result = EmuSIMD::add<per_element_width>
+					(
+						result,
+						_do_array_dot_mult<RegisterIndices_>
+						(
+							a_[RegisterIndices_],
+							_retrieve_register_from_arg<RegisterIndices_>(std::forward<B_>(b_))
+						)
+					)
+				), ...
+			);
+
+			if constexpr (Fill_)
+			{
+				return _do_set_all_same_register(EmuSIMD::horizontal_sum_fill<per_element_width>(result));
+			}
+			else
+			{
+				return _do_set_all_same_register(EmuSIMD::horizontal_sum<per_element_width>(result));
+			}
+		}
+
+		template<std::size_t RegisterIndex_>
+		static constexpr inline register_type _do_array_dot_mult(register_type a_, register_type b_)
+		{
+			constexpr std::size_t final_index = num_registers - 1;
+			if constexpr (!requires_partial_register || RegisterIndex_ != final_index)
+			{
+				return EmuSIMD::mul_all<per_element_width>(a_, b_);
+			}
+			else
+			{
+				return EmuSIMD::mul_all<per_element_width>(EmuSIMD::bitwise_and(a_, make_partial_end_exclude_mask_register()), b_);
+			}
+		}
+
 		template<typename B_, typename T_, std::size_t...RegisterIndices_>
 		static constexpr inline data_type _do_array_lerp(const data_type& lhs_, B_&& b_, T_&& t_, std::index_sequence<RegisterIndices_...> indices_)
 		{
