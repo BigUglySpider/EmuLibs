@@ -41,19 +41,9 @@ namespace EmuSIMD::Funcs
 #pragma endregion
 
 #pragma region STORES
-	EMU_SIMD_COMMON_FUNC_SPEC void store_i16x16(std::int16_t* p_out_, i8x32_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC void store_i16x16(std::int16_t* p_out_, i16x16_arg a_)
 	{
 		_mm256_store_si256(reinterpret_cast<__m256i*>(p_out_), a_);
-	}
-#pragma endregion
-
-#pragma region SHUFFLES
-	template<int ShuffleMask_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 shuffle_i16x16(i16x16_arg a_)
-	{
-		EmuSIMD::i16x16 result = _mm256_shuffle_epi32(a_, ShuffleMask_);
-		result = _mm256_shufflelo_epi16(result, ShuffleMask_);
-		return _mm256_shufflehi_epi16(result, ShuffleMask_);
 	}
 #pragma endregion
 

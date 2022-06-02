@@ -39,16 +39,6 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
-#pragma region SHUFFLES
-	template<int ShuffleMask_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 shuffle_i16x8(i16x8_arg a_)
-	{
-		EmuSIMD::i16x8 result = _mm_shuffle_epi32(a_, ShuffleMask_);
-		result = _mm_shufflelo_epi16(result, ShuffleMask_);
-		return _mm_shufflehi_epi16(result, ShuffleMask_);
-	}
-#pragma endregion
-
 #pragma region CASTS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 cast_f32x4_i16x8(f32x4_arg a_)
 	{
@@ -386,7 +376,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 addsub_i16x8(EmuSIMD::i16x8_arg lhs_, EmuSIMD::i16x8_arg rhs_)
 	{
-		constexpr std::int8_t bytes_mask = static_cast<std::int16_t>(0xFFFF);
+		constexpr std::int16_t bytes_mask = static_cast<std::int16_t>(0xFFFF);
 		const EmuSIMD::i16x8 mask = _mm_set_epi16(bytes_mask, 0, bytes_mask, 0, bytes_mask, 0, bytes_mask, 0);
 		EmuSIMD::i16x8 out = _mm_add_epi16(lhs_, _mm_and_si128(mask, rhs_));
 		return _mm_sub_epi16(lhs_, _mm_andnot_si128(mask, rhs_));
@@ -394,7 +384,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 subadd_i16x8(EmuSIMD::i16x8_arg lhs_, EmuSIMD::i16x8_arg rhs_)
 	{
-		constexpr std::int8_t bytes_mask = static_cast<std::int16_t>(0xFFFF);
+		constexpr std::int16_t bytes_mask = static_cast<std::int16_t>(0xFFFF);
 		const EmuSIMD::i16x8 mask = _mm_set_epi16(bytes_mask, 0, bytes_mask, 0, bytes_mask, 0, bytes_mask, 0);
 		EmuSIMD::i16x8 out = _mm_sub_epi16(lhs_, _mm_and_si128(mask, rhs_));
 		return _mm_add_epi16(lhs_, _mm_andnot_si128(mask, rhs_));

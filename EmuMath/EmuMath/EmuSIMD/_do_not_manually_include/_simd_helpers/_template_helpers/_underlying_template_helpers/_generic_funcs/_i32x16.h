@@ -6,7 +6,7 @@
 namespace EmuSIMD::Funcs
 {
 #pragma region SETTERS
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x16 set_i16x32
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x16 set_i32x16
 	(
 		std::int32_t e0, std::int32_t e1, std::int32_t e2, std::int32_t e3, std::int32_t e4, std::int32_t e5, std::int32_t e6, std::int32_t e7,
 		std::int32_t e8, std::int32_t e9, std::int32_t e10, std::int32_t e11, std::int32_t e12, std::int32_t e13, std::int32_t e14, std::int32_t e15
@@ -15,7 +15,7 @@ namespace EmuSIMD::Funcs
 		return _mm512_set_epi32(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15);
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x16 setr_i16x32
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x16 setr_i32x16
 	(
 		std::int32_t e0, std::int32_t e1, std::int32_t e2, std::int32_t e3, std::int32_t e4, std::int32_t e5, std::int32_t e6, std::int32_t e7,
 		std::int32_t e8, std::int32_t e9, std::int32_t e10, std::int32_t e11, std::int32_t e12, std::int32_t e13, std::int32_t e14, std::int32_t e15
@@ -41,17 +41,9 @@ namespace EmuSIMD::Funcs
 #pragma endregion
 
 #pragma region STORES
-	EMU_SIMD_COMMON_FUNC_SPEC void store_i32x16(std::int32_t* p_out_, i8x64_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC void store_i32x16(std::int32_t* p_out_, i32x16_arg a_)
 	{
 		_mm512_store_si512(reinterpret_cast<__m256i*>(p_out_), a_);
-	}
-#pragma endregion
-
-#pragma region SHUFFLES
-	template<int ShuffleMask_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x16 shuffle_i32x16(i32x16_arg a_)
-	{
-		return _mm512_shuffle_epi32(a_, ShuffleMask_);
 	}
 #pragma endregion
 

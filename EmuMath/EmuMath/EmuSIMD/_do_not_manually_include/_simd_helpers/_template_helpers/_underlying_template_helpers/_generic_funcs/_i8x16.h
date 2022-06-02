@@ -47,13 +47,6 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
-#pragma region SHUFFLES
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 shuffle_i8x16(i8x16_arg a_, i8x16_arg mask_)
-	{
-		return _mm_shuffle_epi8(a_, mask_);
-	}
-#pragma endregion
-
 #pragma region CASTS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x16 cast_f32x4_i8x16(f32x4_arg a_)
 	{

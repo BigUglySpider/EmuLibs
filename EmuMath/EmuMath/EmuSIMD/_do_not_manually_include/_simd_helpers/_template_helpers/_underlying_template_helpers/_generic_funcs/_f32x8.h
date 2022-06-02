@@ -39,20 +39,6 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
-#pragma region SHUFFLES
-	template<int ShuffleMask_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 shuffle_f32x8(f32x8_arg a_, f32x8_arg b_)
-	{
-		return _mm256_shuffle_ps(a_, b_, ShuffleMask_);
-	}
-
-	template<int ShuffleMask_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 permute_f32x8(f32x8_arg a_)
-	{
-		return _mm256_permute_ps(a_, ShuffleMask_);
-	}
-#pragma endregion
-
 #pragma region CASTS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 cast_f32x4_f32x8(f32x4_arg a_)
 	{
