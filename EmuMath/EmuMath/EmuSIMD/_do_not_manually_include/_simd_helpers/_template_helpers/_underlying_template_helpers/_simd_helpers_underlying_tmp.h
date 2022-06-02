@@ -11,6 +11,8 @@
 #include "_generic_funcs/_i8x16.h"
 #include "_generic_funcs/_i8x32.h"
 #include "_generic_funcs/_i8x64.h"
+#include "_generic_funcs/_i16x8.h"
+#include "_generic_funcs/_i16x16.h"
 #include "../../../../../EmuCore/ArithmeticHelpers/BitHelpers.h"
 #include "../../../../../EmuCore/TMPHelpers/TypeComparators.h"
 #include "../../../../../EmuCore/TMPHelpers/TypeConvertors.h"
