@@ -49,7 +49,7 @@ namespace EmuSIMD::Funcs
 
 #pragma region SHUFFLES
 	template<int ShuffleMask_>
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 shuffle_i16x16(i8x32_arg a_, i8x32_arg mask_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 shuffle_i16x16(i16x16_arg a_)
 	{
 		EmuSIMD::i16x16 result = _mm256_shuffle_epi32(a_, ShuffleMask_);
 		result = _mm256_shufflelo_epi16(result, ShuffleMask_);
