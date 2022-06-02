@@ -275,7 +275,7 @@ namespace EmuSIMD::Funcs
 
 	inline EmuSIMD::i16x8 cvt_i8x64_i16x8(i8x64_arg a_)
 	{
-		return _mm512_castsi512_si128(a_);
+		return _mm512_castsi512_si128(_mm512_cvtepi8_epi16(_mm512_castsi512_si256(a_)));
 	}
 
 	inline EmuSIMD::i16x8 cvt_i16x32_i16x8(i16x32_arg a_)
@@ -295,7 +295,7 @@ namespace EmuSIMD::Funcs
 
 	inline EmuSIMD::i16x8 cvt_u8x16_i16x8(u8x16_arg a_)
 	{
-		return _mm_cvtepi8_epi16(a_);
+		return _mm_cvtepu8_epi16(a_);
 	}
 
 	inline EmuSIMD::i16x8 cvt_u16x8_i16x8(u16x8_arg a_)
@@ -315,7 +315,7 @@ namespace EmuSIMD::Funcs
 
 	inline EmuSIMD::i16x8 cvt_u8x32_i16x8(u8x32_arg a_)
 	{
-		return _mm256_castsi256_si128(_mm256_cvtepi8_epi16(_mm256_castsi256_si128(a_)));
+		return _mm256_castsi256_si128(_mm256_cvtepu8_epi16(_mm256_castsi256_si128(a_)));
 	}
 
 	inline EmuSIMD::i16x8 cvt_u16x16_i16x8(u16x16_arg a_)
@@ -335,7 +335,7 @@ namespace EmuSIMD::Funcs
 
 	inline EmuSIMD::i16x8 cvt_u8x64_i16x8(u8x64_arg a_)
 	{
-		return _mm512_castsi512_si128(a_);
+		return _mm512_castsi512_si128(_mm512_cvtepu8_epi16(_mm512_castsi512_si256(a_)));
 	}
 
 	inline EmuSIMD::i16x8 cvt_u16x32_i16x8(u16x32_arg a_)
@@ -423,12 +423,12 @@ namespace EmuSIMD::Funcs
 
 	inline EmuSIMD::i16x8 fmaddsub_i16x8(EmuSIMD::i16x8_arg a_, EmuSIMD::i16x8_arg b_, EmuSIMD::i16x8_arg c_)
 	{
-		return addsub_i16x8(mul_all_i16x8(negate_i16x8(a_), b_), c_);
+		return addsub_i16x8(mul_all_i16x8(a_, b_), c_);
 	}
 
 	inline EmuSIMD::i16x8 fmsubadd_i16x8(EmuSIMD::i16x8_arg a_, EmuSIMD::i16x8_arg b_, EmuSIMD::i16x8_arg c_)
 	{
-		return subadd_i16x8(mul_all_i16x8(negate_i16x8(a_), b_), c_);
+		return subadd_i16x8(mul_all_i16x8(a_, b_), c_);
 	}
 
 	inline EmuSIMD::i16x8 floor_i16x8(EmuSIMD::i16x8_arg to_floor_)

@@ -33,6 +33,7 @@ inline std::ostream& operator<<(std::ostream& str_, const std::array<T_, Size_>&
 			str_ << ", " << arr_[i];
 		}
 	}
+
 	str_ << " }";
 	return str_;
 }
