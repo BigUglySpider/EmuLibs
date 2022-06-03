@@ -1,5 +1,5 @@
-#ifndef EMU_SIMD_GENERIC_FUNCS_U64X4_H_INC_
-#define EMU_SIMD_GENERIC_FUNCS_U64X4_H_INC_ 1
+#ifndef EMU_SIMD_GENERIC_FUNCS_I64X4_H_INC_
+#define EMU_SIMD_GENERIC_FUNCS_I64X4_H_INC_ 1
 
 #include "_common_generic_func_helpers.h"
 

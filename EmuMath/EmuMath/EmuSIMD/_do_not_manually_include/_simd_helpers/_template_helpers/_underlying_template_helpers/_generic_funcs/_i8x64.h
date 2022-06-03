@@ -350,22 +350,22 @@ namespace EmuSIMD::Funcs
 		return _mm512_castsi128_si512(_mm256_cvtepi64_epi8(a_));
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 cvt_u8x32_i8x64(u8x64_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 cvt_u8x64_i8x64(u8x64_arg a_)
 	{
 		return a_;
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 cvt_u16x16_i8x64(u16x32_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 cvt_u16x32_i8x64(u16x32_arg a_)
 	{
 		return _mm512_castsi256_si512(_mm512_cvtepi16_epi8(a_));
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 cvt_u32x8_i8x64(u32x16_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 cvt_u32x16_i8x64(u32x16_arg a_)
 	{
 		return _mm512_castsi128_si512(_mm512_cvtepi32_epi8(a_));
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 cvt_u64x4_i8x64(u64x8_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 cvt_u64x8_i8x64(u64x8_arg a_)
 	{
 		return _mm512_castsi128_si512(_mm512_cvtepi64_epi8(a_));
 	}

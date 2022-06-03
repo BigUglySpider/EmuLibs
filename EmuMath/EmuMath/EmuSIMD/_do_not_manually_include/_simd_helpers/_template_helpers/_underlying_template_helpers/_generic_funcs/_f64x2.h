@@ -262,22 +262,22 @@ namespace EmuSIMD::Funcs
 		return _mm_cvtepi64_pd(_mm256_castsi256_si128(a_));
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 cvt_i8x32_f64x2(i8x64_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 cvt_i8x64_f64x2(i8x64_arg a_)
 	{
 		return _mm_cvtepi64_pd(_mm_cvtepi8_epi64(_mm512_castsi512_si128(a_)));
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 cvt_i16x16_f64x2(i16x32_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 cvt_i16x32_f64x2(i16x32_arg a_)
 	{
 		return _mm_cvtepi64_pd(_mm_cvtepi16_epi64(_mm512_castsi512_si128(a_)));
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 cvt_i32x8_f64x2(i32x16_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 cvt_i32x16_f64x2(i32x16_arg a_)
 	{
 		return _mm_cvtepi32_pd(_mm512_castsi512_si128(a_));
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 cvt_i64x4_f64x2(i64x8_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 cvt_i64x8_f64x2(i64x8_arg a_)
 	{
 		return _mm_cvtepi64_pd(_mm512_castsi512_si128(a_));
 	}
@@ -322,22 +322,22 @@ namespace EmuSIMD::Funcs
 		return _mm_cvtepu64_pd(_mm256_castsi256_si128(a_));
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 cvt_u8x32_f64x2(u8x64_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 cvt_u8x64_f64x2(u8x64_arg a_)
 	{
 		return _mm_cvtepi64_pd(_mm_cvtepu8_epi64(_mm512_castsi512_si128(a_)));
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 cvt_u16x16_f64x2(u16x32_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 cvt_u16x32_f64x2(u16x32_arg a_)
 	{
 		return _mm_cvtepi64_pd(_mm_cvtepu16_epi64(_mm512_castsi512_si128(a_)));
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 cvt_u32x8_f64x2(u32x16_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 cvt_u32x16_f64x2(u32x16_arg a_)
 	{
 		return _mm_cvtepu32_pd(_mm512_castsi512_si128(a_));
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 cvt_u64x4_f64x2(u64x8_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x2 cvt_u64x8_f64x2(u64x8_arg a_)
 	{
 		return _mm_cvtepu64_pd(_mm512_castsi512_si128(a_));
 	}
