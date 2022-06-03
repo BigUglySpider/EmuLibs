@@ -3289,6 +3289,14 @@ namespace EmuMath
 
 #pragma region CASTS
 	public:
+		/// <summary>
+		/// <para> Converts this Vector to a different kind of FastVector. </para>
+		/// <para> The output Vector will be of the provided OutSize_, OutT_, and OutRegisterWidth_. </para>
+		/// <para> OutSize_ may be omitted if OutT_ is provided, and defaults to this Vector's size. </para>
+		/// <para> OutT_ may be omitted if OutSize_ is provided, and defaults to this Vector's size. </para>
+		/// <para> OutRegisterWidth_ may always be omitted, but must be provided after OutT_ if not omitted. It defaults to this Vector's register_width. </para>
+		/// </summary>
+		/// <returns>New FastVector of the provided output type resulting from a conversion of this FastVector.</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type, std::size_t OutRegisterWidth_ = register_width>
 		[[nodiscard]] constexpr inline EmuMath::FastVector<OutSize_, OutT_, OutRegisterWidth_> Convert() const
 		{
