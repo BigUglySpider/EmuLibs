@@ -349,6 +349,10 @@ int main()
 	std::cout << EmuMath::FastVector<4, float>(EmuMath::FastVector<3, float>::make_partial_end_exclude_mask_register());
 	std::cout << EmuMath::FastVector<4, float>(EmuMath::FastVector<7, float>::make_partial_end_exclude_mask_register());
 
+	std::cout << "\n\n";
+	std::cout << EmuMath::FastVector<4, float>(1.2f, 2.4f, 3.6f, 4.8f) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(1.2f, 2.4f, 3.6f, 4.8f).Convert<19, std::int32_t>() << "\n\n";
+
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 	constexpr auto mat_b_ = EmuMath::Matrix<4, 4, int, true>(1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);

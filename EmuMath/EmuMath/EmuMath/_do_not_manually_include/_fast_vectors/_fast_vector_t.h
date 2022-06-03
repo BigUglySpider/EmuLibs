@@ -3292,7 +3292,7 @@ namespace EmuMath
 		template<std::size_t OutSize_, typename OutT_ = value_type, std::size_t OutRegisterWidth_ = register_width>
 		[[nodiscard]] constexpr inline EmuMath::FastVector<OutSize_, OutT_, OutRegisterWidth_> Convert() const
 		{
-			using out_vector = EmuMath::FastVector<OutSize_, T_, OutRegisterWidth_>;
+			using out_vector = EmuMath::FastVector<OutSize_, OutT_, OutRegisterWidth_>;
 			constexpr bool matching_element_width = out_vector::per_element_width == per_element_width;
 			constexpr bool matching_register = std::is_same_v<typename out_vector::register_type, register_type>;
 
@@ -3328,20 +3328,58 @@ namespace EmuMath
 				}
 				else
 				{
-					// TODO
-					static_assert
-					(
-						EmuCore::TMP::get_false<OutSize_>(),
-						"Differing width/register casts not implemented for FastVector."
-					);
+					if constexpr (elements_per_register == out_vector::elements_per_register && matching_element_width)
+					{
+						// Differing register, same number of elements+width per register
+						return _do_non_array_conversion_all_widths_equal<out_vector>(data, std::make_index_sequence<out_vector::num_registers>());
+					}
+					else
+					{
+						// TODO
+						static_assert
+						(
+							EmuCore::TMP::get_false<OutSize_>(),
+							"Differing width + differing register casts not implemented for FastVector."
+						);
+					}
 				}
 			}
 		}
 
 		template<typename OutT_, std::size_t OutRegisterWidth_ = register_width>
-		[[nodiscard]] constexpr inline EmuMath::FastVector<size, OutT_, OutRegisterWidth_> Cast() const
+		[[nodiscard]] constexpr inline EmuMath::FastVector<size, OutT_, OutRegisterWidth_> Convert() const
 		{
-			return Cast<size, OutT_, OutRegisterWidth_>();
+			return Convert<size, OutT_, OutRegisterWidth_>();
+		}
+
+		template<class Out_, std::size_t...OutRegisterIndices_>
+		[[nodiscard]] static constexpr inline Out_ _do_non_array_conversion_all_widths_equal(const data_type& in_data_, std::index_sequence<OutRegisterIndices_...> out_indices_)
+		{
+			using out_vector = typename EmuCore::TMP::remove_ref_cv<Out_>::type;
+			using out_register_type = typename out_vector::register_type;
+			constexpr std::size_t out_per_element_width = out_vector::per_element_width;
+			constexpr bool out_signed = out_vector::is_signed;
+			return Out_(_convert_index_all_widths_equal<out_register_type, out_per_element_width, out_signed, OutRegisterIndices_>(in_data_)...);
+		}
+
+		template<class OutRegister_, std::size_t OutPerElementWidth_, bool OutSigned_, std::size_t RegisterIndex_>
+		[[nodiscard]] static constexpr inline OutRegister_ _convert_index_all_widths_equal(const data_type& in_data_)
+		{
+			if constexpr (RegisterIndex_ < num_registers)
+			{
+				if constexpr (contains_multiple_registers)
+				{
+					return EmuSIMD::convert<OutRegister_, per_element_width, is_signed, OutPerElementWidth_, OutSigned_>(in_data_[RegisterIndex_]);
+				}
+				else
+				{
+					return EmuSIMD::convert<OutRegister_, per_element_width, is_signed, OutPerElementWidth_, OutSigned_>(in_data_);
+				}
+			}
+			else
+			{
+				return EmuSIMD::setzero<OutRegister_>();
+			}
 		}
 #pragma endregion
 
