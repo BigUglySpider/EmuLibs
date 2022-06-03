@@ -14,7 +14,7 @@ namespace EmuSIMD::Funcs
 		return _mm256_set_epi32(e0, e1, e2, e3, e4, e5, e6, e7);
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 setr_i16x16
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x8 setr_i32x8
 	(
 		std::int32_t e0, std::int32_t e1, std::int32_t e2, std::int32_t e3, std::int32_t e4, std::int32_t e5, std::int32_t e6, std::int32_t e7
 	)
@@ -39,7 +39,7 @@ namespace EmuSIMD::Funcs
 #pragma endregion
 
 #pragma region STORES
-	EMU_SIMD_COMMON_FUNC_SPEC void store_i32x8(std::int32_t* p_out_, i8x32_arg a_)
+	EMU_SIMD_COMMON_FUNC_SPEC void store_i32x8(std::int32_t* p_out_, i32x8_arg a_)
 	{
 		_mm256_store_si256(reinterpret_cast<__m256i*>(p_out_), a_);
 	}

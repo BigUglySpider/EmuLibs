@@ -1,17 +1,17 @@
-#ifndef EMU_SIMD_GENERIC_FUNCS_I64X4_H_INC_
-#define EMU_SIMD_GENERIC_FUNCS_I64X4_H_INC_ 1
+#ifndef EMU_SIMD_GENERIC_FUNCS_U64X4_H_INC_
+#define EMU_SIMD_GENERIC_FUNCS_U64X4_H_INC_ 1
 
 #include "_common_generic_func_helpers.h"
 
 namespace EmuSIMD::Funcs
 {
 #pragma region SETTERS
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 set_i32x8(std::int64_t e0, std::int64_t e1, std::int64_t e2, std::int64_t e3)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 set_i64x4(std::int64_t e0, std::int64_t e1, std::int64_t e2, std::int64_t e3)
 	{
 		return _mm256_set_epi64x(e3, e2, e1, e0);
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 setr_i16x16(std::int64_t e0, std::int64_t e1, std::int64_t e2, std::int64_t e3)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i64x4 setr_i64x4(std::int64_t e0, std::int64_t e1, std::int64_t e2, std::int64_t e3)
 	{
 		return _mm256_set_epi64x(e3, e2, e1, e0);
 	}
