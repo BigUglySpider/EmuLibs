@@ -6,7 +6,7 @@
 namespace EmuSIMD::Funcs
 {
 #pragma region SETTERS
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x8 set_i64x8
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x8 set_u64x8
 	(
 		std::uint64_t e0, std::uint64_t e1, std::uint64_t e2, std::uint64_t e3, std::uint64_t e4, std::uint64_t e5, std::uint64_t e6, std::uint64_t e7
 	)
@@ -14,7 +14,7 @@ namespace EmuSIMD::Funcs
 		return _mm512_set_epi64(e0, e1, e2, e3, e4, e5, e6, e7);
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x8 setr_i64x8
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x8 setr_u64x8
 	(
 		std::uint64_t e0, std::uint64_t e1, std::uint64_t e2, std::uint64_t e3, std::uint64_t e4, std::uint64_t e5, std::uint64_t e6, std::uint64_t e7
 	)

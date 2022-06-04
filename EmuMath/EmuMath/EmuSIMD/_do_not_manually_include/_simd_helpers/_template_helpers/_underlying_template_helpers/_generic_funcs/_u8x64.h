@@ -6,7 +6,7 @@
 namespace EmuSIMD::Funcs
 {
 #pragma region SETTERS
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 set_i8x64
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 set_u8x64
 	(
 		std::uint8_t e0, std::uint8_t e1, std::uint8_t e2, std::uint8_t e3, std::uint8_t e4, std::uint8_t e5, std::uint8_t e6, std::uint8_t e7,
 		std::uint8_t e8, std::uint8_t e9, std::uint8_t e10, std::uint8_t e11, std::uint8_t e12, std::uint8_t e13, std::uint8_t e14, std::uint8_t e15,
@@ -25,7 +25,7 @@ namespace EmuSIMD::Funcs
 		);
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 setr_i8x64
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 setr_u8x64
 	(
 		std::uint8_t e0, std::uint8_t e1, std::uint8_t e2, std::uint8_t e3, std::uint8_t e4, std::uint8_t e5, std::uint8_t e6, std::uint8_t e7,
 		std::uint8_t e8, std::uint8_t e9, std::uint8_t e10, std::uint8_t e11, std::uint8_t e12, std::uint8_t e13, std::uint8_t e14, std::uint8_t e15,

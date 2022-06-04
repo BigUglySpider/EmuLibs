@@ -3083,6 +3083,13 @@ namespace EmuMath
 
 #pragma region CONST_VECTOR_ARITHMETIC
 	public:
+		/// <summary>
+		/// <para> Calculates the dot product of this Vector with another Vector of the same type. </para>
+		/// <para> The result will remain as a Vector, and is guaranteed to at least be stored within the first element in the output Vector. </para>
+		/// <para> If a Vector full of the result is required, use `DotFill` instead. </para>
+		/// <para> If only a scalar result is required, use `DotScalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the result of the dot product in at least its very first element.</returns>
 		[[nodiscard]] constexpr inline this_type Dot(const this_type& b_) const
 		{
 			if constexpr (contains_multiple_registers)
@@ -3118,6 +3125,96 @@ namespace EmuMath
 			{
 				// Safe to do a simple dot
 				return this_type(EmuSIMD::dot<per_element_width>(data, b_for_all_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Calculates the dot product of this Vector with another Vector of the same type. </para>
+		/// <para> The result will remain as a Vector, and is guaranteed to be stored in all elements of the output Vector. </para>
+		/// <para> If only a scalar result is required, use `DotScalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the result of the dot product in every element.</returns>
+		[[nodiscard]] constexpr inline this_type DotFill(const this_type& b_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_dot<true>(data, b_.data, register_index_sequence()));
+			}
+			else if constexpr (requires_partial_register)
+			{
+				// Need extra work to make sure we dot correctly
+				register_type mask = make_partial_end_exclude_mask_register();
+				return this_type(EmuSIMD::dot_fill<per_element_width>(EmuSIMD::bitwise_and(data, mask), b_.data));
+			}
+			else
+			{
+				// Safe to do a simple dot
+				return this_type(EmuSIMD::dot_fill<per_element_width>(data, b_.data));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type DotFill(register_type b_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_dot<true>(data, b_for_all_, register_index_sequence()));
+			}
+			else if constexpr (requires_partial_register)
+			{
+				// Need extra work to make sure we dot correctly
+				register_type mask = make_partial_end_exclude_mask_register();
+				return this_type(EmuSIMD::dot_fill<per_element_width>(EmuSIMD::bitwise_and(data, mask), b_for_all_));
+			}
+			else
+			{
+				// Safe to do a simple dot
+				return this_type(EmuSIMD::dot_fill<per_element_width>(data, b_for_all_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Calculates the dot product of this Vector with another Vector of the same type. </para>
+		/// <para> The result will be a scalar extracted from a resulting intermediate Vector. </para>
+		/// <para> If a Vector full of the result is required, use `DotFill` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the result of the dot product in every element.</returns>
+		template<typename Out_ = value_type>
+		[[nodiscard]] constexpr inline Out_ DotScalar(const this_type& b_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return _do_array_dot_scalar<Out_>(data, b_.data, register_index_sequence());
+			}
+			else if constexpr (requires_partial_register)
+			{
+				// Need extra work to make sure we dot correctly
+				register_type mask = make_partial_end_exclude_mask_register();
+				return EmuSIMD::dot_scalar<Out_, per_element_width>(EmuSIMD::bitwise_and(data, mask), b_.data);
+			}
+			else
+			{
+				// Safe to do a simple dot
+				return EmuSIMD::dot_scalar<Out_, per_element_width>(data, b_.data);
+			}
+		}
+
+		template<typename Out_ = value_type>
+		[[nodiscard]] constexpr inline Out_ DotScalar(register_type b_for_all_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return _do_array_dot_scalar<Out_>(data, b_for_all_, register_index_sequence());
+			}
+			else if constexpr (requires_partial_register)
+			{
+				// Need extra work to make sure we dot correctly
+				register_type mask = make_partial_end_exclude_mask_register();
+				return EmuSIMD::dot_scalar<Out_, per_element_width>(EmuSIMD::bitwise_and(data, mask), b_for_all_);
+			}
+			else
+			{
+				// Safe to do a simple dot
+				return EmuSIMD::dot_scalar<Out_, per_element_width>(data, b_for_all_);
 			}
 		}
 
@@ -3295,6 +3392,7 @@ namespace EmuMath
 		/// <para> OutSize_ may be omitted if OutT_ is provided, and defaults to this Vector's size. </para>
 		/// <para> OutT_ may be omitted if OutSize_ is provided, and defaults to this Vector's size. </para>
 		/// <para> OutRegisterWidth_ may always be omitted, but must be provided after OutT_ if not omitted. It defaults to this Vector's register_width. </para>
+		/// <para> Non-encapsulated values may also be converted if a vectorwise conversion is possible, as a result of using only SIMD operations for such conversions. </para>
 		/// </summary>
 		/// <returns>New FastVector of the provided output type resulting from a conversion of this FastVector.</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type, std::size_t OutRegisterWidth_ = register_width>
@@ -3303,53 +3401,25 @@ namespace EmuMath
 			using out_vector = EmuMath::FastVector<OutSize_, OutT_, OutRegisterWidth_>;
 			constexpr bool matching_element_width = out_vector::per_element_width == per_element_width;
 			constexpr bool matching_register = std::is_same_v<typename out_vector::register_type, register_type>;
+			constexpr bool same_element_type = std::is_same_v<value_type, typename out_vector::value_type>;
 
-			if constexpr (matching_element_width && matching_register)
+			if constexpr (matching_element_width && matching_register&& same_element_type)
 			{
-				if constexpr (out_vector::contains_multiple_registers)
-				{
-					// TODO
-					static_assert("Multi-register casts not implemented for FastVector.");
-				}
-				else
-				{
-					if constexpr (contains_multiple_registers)
-					{
-						return out_vector(data[0]);
-					}
-					else
-					{
-						return out_vector(data);
-					}
-				}
+				return _do_conversion_matching_element_type_and_register<out_vector>(data);
 			}
 			else
 			{
-				if constexpr (contains_multiple_registers)
+				constexpr bool matching_count_per_register = elements_per_register == out_vector::elements_per_register;
+				if constexpr (matching_count_per_register)
 				{
-					// TODO
-					static_assert
-					(
-						EmuCore::TMP::get_false<OutSize_>(),
-						"Differing width/register array casts not implemented for FastVector."
-					);
+					// We can safely trivialise this as conversions as each register is 1:1.
+					return _do_conversion_all_widths_equal<out_vector>(data, std::make_index_sequence<out_vector::num_registers>());
 				}
 				else
 				{
-					if constexpr (elements_per_register == out_vector::elements_per_register && matching_element_width)
-					{
-						// Differing register, same number of elements+width per register
-						return _do_non_array_conversion_all_widths_equal<out_vector>(data, std::make_index_sequence<out_vector::num_registers>());
-					}
-					else
-					{
-						// TODO
-						static_assert
-						(
-							EmuCore::TMP::get_false<OutSize_>(),
-							"Differing width + differing register casts not implemented for FastVector."
-						);
-					}
+					// NOTE: This *can* be optimised a bit more to do vectorwise conversions in some cases other than above, 
+					//       but isn't much of a priority right now due to complexity
+					return _do_basic_store_and_load_conversion<out_vector>(std::make_index_sequence<OutSize_>());
 				}
 			}
 		}
@@ -3358,36 +3428,6 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline EmuMath::FastVector<size, OutT_, OutRegisterWidth_> Convert() const
 		{
 			return Convert<size, OutT_, OutRegisterWidth_>();
-		}
-
-		template<class Out_, std::size_t...OutRegisterIndices_>
-		[[nodiscard]] static constexpr inline Out_ _do_non_array_conversion_all_widths_equal(const data_type& in_data_, std::index_sequence<OutRegisterIndices_...> out_indices_)
-		{
-			using out_vector = typename EmuCore::TMP::remove_ref_cv<Out_>::type;
-			using out_register_type = typename out_vector::register_type;
-			constexpr std::size_t out_per_element_width = out_vector::per_element_width;
-			constexpr bool out_signed = out_vector::is_signed;
-			return Out_(_convert_index_all_widths_equal<out_register_type, out_per_element_width, out_signed, OutRegisterIndices_>(in_data_)...);
-		}
-
-		template<class OutRegister_, std::size_t OutPerElementWidth_, bool OutSigned_, std::size_t RegisterIndex_>
-		[[nodiscard]] static constexpr inline OutRegister_ _convert_index_all_widths_equal(const data_type& in_data_)
-		{
-			if constexpr (RegisterIndex_ < num_registers)
-			{
-				if constexpr (contains_multiple_registers)
-				{
-					return EmuSIMD::convert<OutRegister_, per_element_width, is_signed, OutPerElementWidth_, OutSigned_>(in_data_[RegisterIndex_]);
-				}
-				else
-				{
-					return EmuSIMD::convert<OutRegister_, per_element_width, is_signed, OutPerElementWidth_, OutSigned_>(in_data_);
-				}
-			}
-			else
-			{
-				return EmuSIMD::setzero<OutRegister_>();
-			}
 		}
 #pragma endregion
 
@@ -4190,7 +4230,29 @@ namespace EmuMath
 		template<bool Fill_, typename B_, std::size_t...RegisterIndices_>
 		static constexpr inline data_type _do_array_dot(const data_type& a_, B_&& b_, std::index_sequence<RegisterIndices_...> indices_)
 		{
+			register_type result = _calculate_array_dot_pre_hadd(a_, std::forward<B_>(b_), indices_);
+
+			if constexpr (Fill_)
+			{
+				return _do_set_all_same_register(EmuSIMD::horizontal_sum_fill<per_element_width>(result));
+			}
+			else
+			{
+				return _do_set_all_same_register(EmuSIMD::horizontal_sum<per_element_width>(result));
+			}
+		}
+
+		template<typename Out_, typename B_, std::size_t...RegisterIndices_>
+		static constexpr inline Out_ _do_array_dot_scalar(const data_type& a_, B_&& b_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return EmuSIMD::horizontal_sum_scalar<Out_, per_element_width>(_calculate_array_dot_pre_hadd(a_, std::forward<B_>(b_), indices_));
+		}
+
+		template<class B_, std::size_t...RegisterIndices_>
+		static constexpr inline register_type _calculate_array_dot_pre_hadd(const data_type& a_, B_&& b_, std::index_sequence<RegisterIndices_...> indices_)
+		{
 			register_type result = make_all_zero_register();
+
 			(
 				(
 					result = EmuSIMD::add<per_element_width>
@@ -4205,14 +4267,7 @@ namespace EmuMath
 				), ...
 			);
 
-			if constexpr (Fill_)
-			{
-				return _do_set_all_same_register(EmuSIMD::horizontal_sum_fill<per_element_width>(result));
-			}
-			else
-			{
-				return _do_set_all_same_register(EmuSIMD::horizontal_sum<per_element_width>(result));
-			}
+			return result;
 		}
 
 		template<std::size_t RegisterIndex_>
@@ -4309,6 +4364,134 @@ namespace EmuMath
 		constexpr inline void _set1_array(const value_type& val_, std::index_sequence<RegisterIndices_...> indices_) noexcept
 		{
 			((data[RegisterIndices_] = EmuSIMD::set1<register_type, per_element_width>(val_)), ...);
+		}
+#pragma endregion
+
+#pragma region CONVERSION_HELPERS
+	private:
+		template<class Out_, std::size_t...OutIndices_>
+		[[nodiscard]] constexpr inline Out_ _do_basic_store_and_load_conversion(std::index_sequence<OutIndices_...> out_indices_) const
+		{
+			using out_uq = typename EmuCore::TMP::remove_ref_cv<Out_>::type;
+			using out_value_type = typename out_uq::value_type;
+			constexpr std::size_t required_index_count = sizeof...(OutIndices_);
+			constexpr bool requires_partial_register = (required_index_count % elements_per_register) != 0;
+			constexpr std::size_t required_register_count = (required_index_count / elements_per_register) + requires_partial_register;
+			constexpr std::size_t total_stored_register_count = required_register_count > num_registers ? num_registers : required_register_count;
+			constexpr std::size_t stored_data_size = total_stored_register_count * elements_per_register;
+			constexpr std::size_t end_read_index = stored_data_size > size ? size : stored_data_size;
+
+			value_type stored_data[stored_data_size];
+			_store_all<total_stored_register_count>(stored_data);
+			return Out_(_make_basic_store_and_load_output_value<out_value_type, OutIndices_, end_read_index>(stored_data)...);
+		}
+
+		template<class OutValue_, std::size_t OutIndex_, std::size_t DataEnd_>
+		[[nodiscard]] static constexpr inline OutValue_ _make_basic_store_and_load_output_value(value_type* p_data_)
+		{
+			if constexpr (OutIndex_ < DataEnd_)
+			{
+				using move_result = decltype(std::move(std::declval<value_type&>()));
+				if constexpr (EmuCore::TMP::is_static_castable_v<move_result, OutValue_>)
+				{
+					return static_cast<OutValue_>(std::move(*(p_data_ + OutIndex_)));
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<OutValue_>(),
+						"Attempted to perform a basic store-and-load conversion between two EmuMath::FastVector types, but the value_type of the destination Vector cannot be static_cast to from a moved reference of the Vector's value_type."
+					);
+				}
+			}
+			else
+			{
+				return OutValue_();
+			}
+		}
+
+		template<class Out_>
+		[[nodiscard]] static constexpr inline Out_ _do_conversion_matching_element_type_and_register(const data_type& in_data_)
+		{
+			using out_uq = typename EmuCore::TMP::remove_ref_cv<Out_>::type;
+			if constexpr (out_uq::contains_multiple_registers)
+			{
+				return _do_array_conversion_matching_element_type_and_register<Out_>(in_data_, std::make_index_sequence<out_uq::num_registers>());
+			}
+			else
+			{
+				if constexpr (contains_multiple_registers)
+				{
+					return Out_(in_data_[0]);
+				}
+				else
+				{
+					return Out_(in_data_);
+				}
+			}
+		}
+
+		template<class Out_, std::size_t...OutRegisterIndices_>
+		[[nodiscard]] static constexpr inline Out_ _do_array_conversion_matching_element_type_and_register
+		(
+			const data_type& in_data_,
+			std::index_sequence<OutRegisterIndices_...> out_indices_
+		)
+		{
+			using out_uq = typename EmuCore::TMP::remove_ref_cv<Out_>::type;
+			using out_register = typename out_uq::register_type;
+			return Out_(_convert_index_matching_width_and_register<out_register, OutRegisterIndices_>(in_data_)...);
+		}
+
+		template<class OutRegister_, std::size_t RegisterIndex_>
+		[[nodiscard]] static constexpr inline OutRegister_ _convert_index_matching_width_and_register(const data_type& in_data_)
+		{
+			if constexpr (RegisterIndex_ < num_registers)
+			{
+				if constexpr (contains_multiple_registers)
+				{
+					return in_data_[RegisterIndex_];
+				}
+				else
+				{
+					return in_data_;
+				}
+			}
+			else
+			{
+				return EmuSIMD::setzero<OutRegister_>();
+			}
+		}
+
+		template<class Out_, std::size_t...OutRegisterIndices_>
+		[[nodiscard]] static constexpr inline Out_ _do_conversion_all_widths_equal(const data_type& in_data_, std::index_sequence<OutRegisterIndices_...> out_indices_)
+		{
+			using out_vector = typename EmuCore::TMP::remove_ref_cv<Out_>::type;
+			using out_register_type = typename out_vector::register_type;
+			constexpr std::size_t out_per_element_width = out_vector::per_element_width;
+			constexpr bool out_signed = out_vector::is_signed;
+			return Out_(_convert_index_all_widths_equal<out_register_type, out_per_element_width, out_signed, OutRegisterIndices_>(in_data_)...);
+		}
+
+		template<class OutRegister_, std::size_t OutPerElementWidth_, bool OutSigned_, std::size_t RegisterIndex_>
+		[[nodiscard]] static constexpr inline OutRegister_ _convert_index_all_widths_equal(const data_type& in_data_)
+		{
+			if constexpr (RegisterIndex_ < num_registers)
+			{
+				if constexpr (contains_multiple_registers)
+				{
+					return EmuSIMD::convert<OutRegister_, per_element_width, is_signed, OutPerElementWidth_, OutSigned_>(in_data_[RegisterIndex_]);
+				}
+				else
+				{
+					return EmuSIMD::convert<OutRegister_, per_element_width, is_signed, OutPerElementWidth_, OutSigned_>(in_data_);
+				}
+			}
+			else
+			{
+				return EmuSIMD::setzero<OutRegister_>();
+			}
 		}
 #pragma endregion
 

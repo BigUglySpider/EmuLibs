@@ -352,6 +352,39 @@ int main()
 	std::cout << "\n\n";
 	std::cout << EmuMath::FastVector<4, float>(1.2f, 2.4f, 3.6f, 4.8f) << "\n";
 	std::cout << EmuMath::FastVector<4, float>(1.2f, -2.4f, 3.6f, 4.8f).Convert<19, std::int32_t>() << "\n\n";
+	std::cout << EmuMath::FastVector<4, float>(1.2f, -2.4f, 3.6f, 4.8f).Convert<17>() << "\n\n";
+	std::cout << EmuMath::FastVector<4, int>(-1, -2, -3, -4).Convert<3, long long>() << "\n";
+	std::cout << EmuMath::FastVector<4, int>(-1, -2, -3, -4).Convert<5, long long>() << "\n";
+	std::cout << EmuMath::FastVector<4, int>(-1, -2, -3, -4).Convert<4, long long>() << "\n";
+	std::cout << EmuMath::FastVector<4, int>(-1, -2, -3, -4).Convert<8, long long>() << "\n";
+	std::cout << EmuMath::FastVector<4, int>(-1, -2, -3, -4).Convert<long long>() << "\n";
+	std::cout << EmuMath::FastVector<4, unsigned int>(std::numeric_limits<unsigned int>::max()).Convert<long long>() << "\n\n";
+	std::cout << EmuMath::FastVector<7, int>(-1, -2, -3, -4, -5, -6, -7).Convert<3, long long>() << "\n";
+	std::cout << EmuMath::FastVector<7, int>(-1, -2, -3, -4, -5, -6, -7).Convert<5, long long>() << "\n";
+	std::cout << EmuMath::FastVector<7, int>(-1, -2, -3, -4, -5, -6, -7).Convert<4, long long>() << "\n";
+	std::cout << EmuMath::FastVector<7, int>(-1, -2, -3, -4, -5, -6, -7).Convert<8, long long>() << "\n";
+	std::cout << EmuMath::FastVector<7, int>(-1, -2, -3, -4, -5, -6, -7).Convert<long long>() << "\n";
+	std::cout << EmuMath::FastVector<7, unsigned int>(std::numeric_limits<unsigned int>::max()).Convert<long long>() << "\n\n";
+	std::cout << EmuMath::FastVector<7, unsigned int>(std::numeric_limits<unsigned int>::max()).Convert<27, long long, 256>() << "\n\n";
+
+
+	std::cout << "\n\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).Dot(EmuMath::FastVector<3, float>(13)) << "\n";
+	std::cout << EmuMath::FastVector<7, double>(1, 2, 3, 4, 5, 6, 7).Dot(EmuMath::FastVector<7, double>(13)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).Dot(EmuMath::FastVector<7, float>(13)) << "\n\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).DotFill(EmuMath::FastVector<3, float>(13)) << "\n";
+	std::cout << EmuMath::FastVector<7, double>(1, 2, 3, 4, 5, 6, 7).DotFill(EmuMath::FastVector<7, double>(13)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).DotFill(EmuMath::FastVector<7, float>(13)) << "\n\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).DotScalar(EmuMath::FastVector<3, float>(13)) << "\n";
+	std::cout << EmuMath::FastVector<7, double>(1, 2, 3, 4, 5, 6, 7).DotScalar(EmuMath::FastVector<7, double>(13)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).DotScalar(EmuMath::FastVector<7, float>(13)) << "\n\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).DotScalar<unsigned long long>(EmuMath::FastVector<3, float>(13)) << "\n";
+	std::cout << EmuMath::FastVector<7, double>(1, 2, 3, 4, 5, 6, 7).DotScalar<unsigned long long>(EmuMath::FastVector<7, double>(13)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).DotScalar<unsigned long long>(EmuMath::FastVector<7, float>(13)) << "\n\n";
+	std::cout << EmuMath::FastVector<3, std::uint32_t>(1, 2, 3).DotScalar<unsigned long long>(EmuMath::FastVector<3, std::uint32_t>(13)) << "\n";
+	std::cout << EmuMath::FastVector<7, std::uint32_t>(1, 2, 3, 4, 5, 6, 7).DotScalar<unsigned long long>(EmuMath::FastVector<7, std::uint32_t>(13)) << "\n";
+	std::cout << EmuMath::FastVector<7, std::uint32_t>(1, 2, 3, 4, 5, 6, 7).DotScalar<unsigned long long>(EmuMath::FastVector<7, std::uint32_t>(13)) << "\n\n";
+
 
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
@@ -378,7 +411,7 @@ int main()
 	std::cout << rt_ << "\n\n";
 
 
-	// ##### SCALAR vs SIMD NOISE #####
+	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
 	//constexpr std::size_t test_noise_dimensions = 3;
 	//constexpr auto sample_count = EmuMath::make_vector<std::size_t>(1024, 1024, 1);

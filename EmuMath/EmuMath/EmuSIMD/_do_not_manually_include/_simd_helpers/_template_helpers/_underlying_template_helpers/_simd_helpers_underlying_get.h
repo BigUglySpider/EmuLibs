@@ -23,9 +23,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 						{
 							if constexpr (Index_ != 0)
 							{
-								register_ = _execute_shuffle<Index_>(register_);
+								return static_cast<OutT_>(_mm_cvtss_f32(_execute_shuffle<Index_>(register_)));
 							}
-							return _mm_cvtss_f32(register_);
+							else
+							{
+								return static_cast<OutT_>(_mm_cvtss_f32(register_));
+							}
 						}
 						else
 						{
@@ -74,9 +77,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 						{
 							if constexpr (Index_ != 0)
 							{
-								register_ = _execute_shuffle<Index_>(register_);
+								return static_cast<OutT_>(_mm_cvtsd_f64(_execute_shuffle<Index_>(register_)));
 							}
-							return static_cast<OutT_>(_mm_cvtsd_f64(register_));
+							else
+							{
+								return static_cast<OutT_>(_mm_cvtsd_f64(register_));
+							}
 						}
 						else
 						{
