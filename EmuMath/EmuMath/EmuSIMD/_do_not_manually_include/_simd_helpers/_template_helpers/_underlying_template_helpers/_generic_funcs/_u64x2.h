@@ -30,6 +30,16 @@ namespace EmuSIMD::Funcs
 	{
 		return _mm_setzero_si128();
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 setmasked_u64x2(std::uint8_t bit_mask_)
+	{
+		constexpr std::uint64_t element_mask = static_cast<std::uint64_t>(0xFFFFFFFFFFFFFFFF);
+		return _mm_set_epi64x
+		(
+			(bit_mask_ & 0x01) * element_mask,
+			((bit_mask_ & 0x02) >> 1) * element_mask
+		);
+	}
 #pragma endregion
 
 #pragma region STORES
@@ -343,6 +353,41 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region COMPARISONS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 cmpeq_u64x2(EmuSIMD::u64x2_arg lhs_, EmuSIMD::u64x2_arg rhs_)
+	{
+		return _mm_cmpeq_epi64(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 cmpneq_u64x2(EmuSIMD::u64x2_arg lhs_, EmuSIMD::u64x2_arg rhs_)
+	{
+		constexpr std::int64_t mask = static_cast<std::int64_t>(0xFFFFFFFFFFFFFFFF);
+		return _mm_xor_si128(set1_i64x2(mask), _mm_cmpeq_epi64(lhs_, rhs_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 cmpgt_u64x2(EmuSIMD::u64x2_arg lhs_, EmuSIMD::u64x2_arg rhs_)
+	{
+		constexpr std::int64_t mask = static_cast<std::int64_t>(0xFFFFFFFFFFFFFFFF);
+		return _mm_andnot_si128(_mm_cmpeq_epi64(_mm_min_epu64(lhs_, rhs_), lhs_), set1_u64x2(mask));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 cmplt_u64x2(EmuSIMD::u64x2_arg lhs_, EmuSIMD::u64x2_arg rhs_)
+	{
+		constexpr std::int64_t mask = static_cast<std::int64_t>(0xFFFFFFFFFFFFFFFF);
+		return _mm_andnot_si128(_mm_cmpeq_epi64(_mm_max_epu64(lhs_, rhs_), lhs_), set1_u64x2(mask));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 cmpge_u64x2(EmuSIMD::u64x2_arg lhs_, EmuSIMD::u64x2_arg rhs_)
+	{
+		return _mm_cmpeq_epi64(_mm_max_epu64(lhs_, rhs_), lhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 cmple_u64x2(EmuSIMD::u64x2_arg lhs_, EmuSIMD::u64x2_arg rhs_)
+	{
+		return _mm_cmpeq_epi64(_mm_min_epu64(lhs_, rhs_), lhs_);
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 mul_all_u64x2(EmuSIMD::u64x2_arg lhs_, EmuSIMD::u64x2_arg rhs_)
 	{
@@ -444,6 +489,16 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 mod_u64x2(EmuSIMD::u64x2_arg lhs_, EmuSIMD::u64x2_arg rhs_)
 	{
 		return _mm_rem_epu64(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 abs_u64x2(EmuSIMD::u64x2_arg in_)
+	{
+		return in_;
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 sqrt_u64x2(EmuSIMD::u64x2_arg in_)
+	{
+		return _mm_cvtpd_epu64(_mm_sqrt_pd(_mm_cvtepu64_pd(in_)));
 	}
 #pragma endregion
 }

@@ -38,6 +38,30 @@ namespace EmuSIMD::Funcs
 	{
 		return _mm_setzero_si128();
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 setmasked_u8x16(std::uint16_t bit_mask_)
+	{
+		constexpr std::uint8_t element_mask = static_cast<std::uint8_t>(0xFF);
+		return _mm_set_epi8
+		(
+			(bit_mask_ & 0x0001) * element_mask,
+			((bit_mask_ & 0x0002) >> 1) * element_mask,
+			((bit_mask_ & 0x0004) >> 2) * element_mask,
+			((bit_mask_ & 0x0008) >> 3) * element_mask,
+			((bit_mask_ & 0x0010) >> 4) * element_mask,
+			((bit_mask_ & 0x0020) >> 5) * element_mask,
+			((bit_mask_ & 0x0040) >> 6) * element_mask,
+			((bit_mask_ & 0x0080) >> 7) * element_mask,
+			((bit_mask_ & 0x0100) >> 8) * element_mask,
+			((bit_mask_ & 0x0200) >> 9) * element_mask,
+			((bit_mask_ & 0x0400) >> 10) * element_mask,
+			((bit_mask_ & 0x0800) >> 11) * element_mask,
+			((bit_mask_ & 0x1000) >> 12) * element_mask,
+			((bit_mask_ & 0x2000) >> 13) * element_mask,
+			((bit_mask_ & 0x4000) >> 14) * element_mask,
+			((bit_mask_ & 0x8000) >> 15) * element_mask
+		);
+	}
 #pragma endregion
 
 #pragma region STORES
@@ -351,6 +375,41 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region COMPARISONS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 cmpeq_u8x16(EmuSIMD::u8x16_arg lhs_, EmuSIMD::u8x16_arg rhs_)
+	{
+		return _mm_cmpeq_epi8(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 cmpneq_u8x16(EmuSIMD::u8x16_arg lhs_, EmuSIMD::u8x16_arg rhs_)
+	{
+		constexpr std::uint8_t mask = static_cast<std::uint8_t>(0xFF);
+		return _mm_xor_si128(set1_i8x16(mask), _mm_cmpeq_epi8(lhs_, rhs_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 cmpgt_u8x16(EmuSIMD::u8x16_arg lhs_, EmuSIMD::u8x16_arg rhs_)
+	{
+		constexpr std::uint8_t mask = static_cast<std::uint8_t>(0xFF);
+		return _mm_andnot_si128(_mm_cmpeq_epi8(_mm_min_epu8(lhs_, rhs_), lhs_), set1_u8x16(mask));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 cmplt_u8x16(EmuSIMD::u8x16_arg lhs_, EmuSIMD::u8x16_arg rhs_)
+	{
+		constexpr std::uint8_t mask = static_cast<std::uint8_t>(0xFF);
+		return _mm_andnot_si128(_mm_cmpeq_epi8(_mm_max_epu8(lhs_, rhs_), lhs_), set1_u8x16(mask));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 cmpge_u8x16(EmuSIMD::u8x16_arg lhs_, EmuSIMD::u8x16_arg rhs_)
+	{
+		return _mm_cmpeq_epi8(_mm_max_epu8(lhs_, rhs_), lhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 cmple_u8x16(EmuSIMD::u8x16_arg lhs_, EmuSIMD::u8x16_arg rhs_)
+	{
+		return _mm_cmpeq_epi8(_mm_min_epu8(lhs_, rhs_), lhs_);
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 mul_all_u8x16(EmuSIMD::u8x16_arg lhs_, EmuSIMD::u8x16_arg rhs_)
 	{
@@ -454,6 +513,45 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 mod_u8x16(EmuSIMD::u8x16_arg lhs_, EmuSIMD::u8x16_arg rhs_)
 	{
 		return _mm_rem_epu8(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 abs_u8x16(EmuSIMD::u8x16_arg in_)
+	{
+		return in_;
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x16 sqrt_u8x16(EmuSIMD::u8x16_arg in_)
+	{
+		constexpr std::size_t num_elements = 16;
+		constexpr std::size_t elements_per_register = 4;
+		std::uint8_t data[num_elements];
+		float results[num_elements];
+
+		store_u8x16(data, in_);
+		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
+		{
+			store_f32x4(results + i, _mm_sqrt_ps(set_f32x4(data[i + 3], data[i + 2], data[i + 1], data[i])));
+		}
+
+		return set_u8x16
+		(
+			static_cast<std::uint8_t>(results[15]),
+			static_cast<std::uint8_t>(results[14]),
+			static_cast<std::uint8_t>(results[13]),
+			static_cast<std::uint8_t>(results[12]),
+			static_cast<std::uint8_t>(results[11]),
+			static_cast<std::uint8_t>(results[10]),
+			static_cast<std::uint8_t>(results[9]),
+			static_cast<std::uint8_t>(results[8]),
+			static_cast<std::uint8_t>(results[7]),
+			static_cast<std::uint8_t>(results[6]),
+			static_cast<std::uint8_t>(results[5]),
+			static_cast<std::uint8_t>(results[4]),
+			static_cast<std::uint8_t>(results[3]),
+			static_cast<std::uint8_t>(results[2]),
+			static_cast<std::uint8_t>(results[1]),
+			static_cast<std::uint8_t>(results[0])
+		);
 	}
 #pragma endregion
 }

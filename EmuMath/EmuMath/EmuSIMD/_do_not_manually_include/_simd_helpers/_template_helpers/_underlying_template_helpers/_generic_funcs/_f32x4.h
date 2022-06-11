@@ -30,6 +30,21 @@ namespace EmuSIMD::Funcs
 	{
 		return _mm_setzero_ps();
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 setmasked_f32x4(std::uint8_t bit_mask_)
+	{
+		constexpr std::int32_t element_mask = static_cast<std::int32_t>(0xFFFFFFFF);
+		return _mm_castsi128_ps
+		(
+			_mm_set_epi32
+			(
+				(bit_mask_ & 0x01) * element_mask,
+				((bit_mask_ & 0x02) >> 1) * element_mask,
+				((bit_mask_ & 0x04) >> 2) * element_mask,
+				((bit_mask_ & 0x08) >> 3) * element_mask
+			)
+		);
+	}
 #pragma endregion
 
 #pragma region STORES
@@ -343,6 +358,38 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region COMPARISONS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cmpeq_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
+	{
+		return _mm_cmpeq_ps(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cmpneq_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
+	{
+		return _mm_cmpneq_ps(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cmpgt_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
+	{
+		return _mm_cmpgt_ps(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cmplt_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
+	{
+		return _mm_cmplt_ps(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cmpge_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
+	{
+		return _mm_cmpge_ps(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cmple_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
+	{
+		return _mm_cmple_ps(lhs_, rhs_);
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 mul_all_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_)
 	{
@@ -435,6 +482,18 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::f32x4 res = _mm_div_ps(lhs_, rhs_);
 		res = _mm_trunc_ps(res);
 		return _mm_fnmadd_ps(res, rhs_, lhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 abs_f32x4(EmuSIMD::f32x4_arg in_)
+	{
+		EmuSIMD::f32x4 negative_mask = cmplt_f32x4(in_, setzero_f32x4());
+		EmuSIMD::f32x4 out = _mm_and_ps(negative_mask, mul_all_f32x4(in_, set1_f32x4(-1)));
+		return _mm_or_ps(out, _mm_andnot_ps(negative_mask, in_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 sqrt_f32x4(EmuSIMD::f32x4_arg in_)
+	{
+		return _mm_sqrt_ps(in_);
 	}
 #pragma endregion
 }

@@ -38,6 +38,33 @@ namespace EmuSIMD::Funcs
 	{
 		return _mm512_setzero_ps();
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 setmasked_f32x16(std::uint16_t bit_mask_)
+	{
+		constexpr std::int32_t element_mask = static_cast<std::int32_t>(0xFFFFFFFF);
+		return _mm512_castsi512_ps
+		(
+			_mm512_set_epi32
+			(
+				(bit_mask_ & 0x0001) * element_mask,
+				((bit_mask_ & 0x0002) >> 1) * element_mask,
+				((bit_mask_ & 0x0004) >> 2) * element_mask,
+				((bit_mask_ & 0x0008) >> 3) * element_mask,
+				((bit_mask_ & 0x0010) >> 4) * element_mask,
+				((bit_mask_ & 0x0020) >> 5) * element_mask,
+				((bit_mask_ & 0x0040) >> 6) * element_mask,
+				((bit_mask_ & 0x0080) >> 7) * element_mask,
+				((bit_mask_ & 0x0100) >> 8) * element_mask,
+				((bit_mask_ & 0x0200) >> 9) * element_mask,
+				((bit_mask_ & 0x0400) >> 10) * element_mask,
+				((bit_mask_ & 0x0800) >> 11) * element_mask,
+				((bit_mask_ & 0x1000) >> 12) * element_mask,
+				((bit_mask_ & 0x2000) >> 13) * element_mask,
+				((bit_mask_ & 0x4000) >> 14) * element_mask,
+				((bit_mask_ & 0x8000) >> 15) * element_mask
+			)
+		);
+	}
 #pragma endregion
 
 #pragma region STORES
@@ -351,6 +378,38 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region COMPARISONS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 cmpeq_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
+	{
+		return setmasked_f32x16(_mm512_cmpeq_ps_mask(lhs_, rhs_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 cmpneq_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
+	{
+		return setmasked_f32x16(_mm512_cmpneq_ps_mask(lhs_, rhs_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 cmpgt_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
+	{
+		return setmasked_f32x16(_mm512_cmplt_ps_mask(rhs_, lhs_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 cmplt_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
+	{
+		return setmasked_f32x16(_mm512_cmplt_ps_mask(lhs_, rhs_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 cmpge_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
+	{
+		return setmasked_f32x16(_mm512_cmple_ps_mask(rhs_, lhs_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 cmple_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
+	{
+		return setmasked_f32x16(_mm512_cmple_ps_mask(lhs_, rhs_));
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 mul_all_f32x16(EmuSIMD::f32x16_arg lhs_, EmuSIMD::f32x16_arg rhs_)
 	{
@@ -443,6 +502,18 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::f32x16 res = _mm512_div_ps(lhs_, rhs_);
 		res = _mm512_trunc_ps(res);
 		return _mm512_fnmadd_ps(res, rhs_, lhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 abs_f32x16(EmuSIMD::f32x16_arg in_)
+	{
+		EmuSIMD::f32x16 negative_mask = cmplt_f32x16(in_, setzero_f32x16());
+		EmuSIMD::f32x16 out = _mm512_and_ps(negative_mask, mul_all_f32x16(in_, set1_f32x16(-1)));
+		return _mm512_or_ps(out, _mm512_andnot_ps(negative_mask, in_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x16 sqrt_f32x16(EmuSIMD::f32x16_arg in_)
+	{
+		return _mm512_sqrt_ps(in_);
 	}
 #pragma endregion
 }

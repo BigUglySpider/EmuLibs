@@ -30,6 +30,21 @@ namespace EmuSIMD::Funcs
 	{
 		return _mm256_setzero_pd();
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 setmasked_f64x4(std::uint8_t bit_mask_)
+	{
+		constexpr std::int64_t element_mask = static_cast<std::int64_t>(0xFFFFFFFFFFFFFFFF);
+		return _mm256_castsi256_pd
+		(
+			_mm256_set_epi64x
+			(
+				(bit_mask_ & 0x01) * element_mask,
+				((bit_mask_ & 0x02) >> 1) * element_mask,
+				((bit_mask_ & 0x04) >> 2) * element_mask,
+				((bit_mask_ & 0x08) >> 3) * element_mask
+			)
+		);
+	}
 #pragma endregion
 
 #pragma region STORES
@@ -343,6 +358,38 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region COMPARISONS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cmpeq_f64x4(EmuSIMD::f64x4_arg lhs_, EmuSIMD::f64x4_arg rhs_)
+	{
+		return _mm256_cmp_pd(lhs_, rhs_, EMU_SIMD_CMP_EQ_FLAG);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cmpneq_f64x4(EmuSIMD::f64x4_arg lhs_, EmuSIMD::f64x4_arg rhs_)
+	{
+		return _mm256_cmp_pd(lhs_, rhs_, EMU_SIMD_CMP_NEQ_FLAG);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cmpgt_f64x4(EmuSIMD::f64x4_arg lhs_, EmuSIMD::f64x4_arg rhs_)
+	{
+		return _mm256_cmp_pd(lhs_, rhs_, EMU_SIMD_CMP_GT_FLAG);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cmplt_f64x4(EmuSIMD::f64x4_arg lhs_, EmuSIMD::f64x4_arg rhs_)
+	{
+		return _mm256_cmp_pd(lhs_, rhs_, EMU_SIMD_CMP_LT_FLAG);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cmpge_f64x4(EmuSIMD::f64x4_arg lhs_, EmuSIMD::f64x4_arg rhs_)
+	{
+		return _mm256_cmp_pd(lhs_, rhs_, EMU_SIMD_CMP_GE_FLAG);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 cmple_f64x4(EmuSIMD::f64x4_arg lhs_, EmuSIMD::f64x4_arg rhs_)
+	{
+		return _mm256_cmp_pd(lhs_, rhs_, EMU_SIMD_CMP_LE_FLAG);
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 mul_all_f64x4(EmuSIMD::f64x4_arg lhs_, EmuSIMD::f64x4_arg rhs_)
 	{
@@ -435,6 +482,18 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::f64x4 res = _mm256_div_pd(lhs_, rhs_);
 		res = _mm256_trunc_pd(res);
 		return _mm256_fnmadd_pd(res, rhs_, lhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 abs_f64x4(EmuSIMD::f64x4_arg in_)
+	{
+		EmuSIMD::f64x4 negative_mask = cmplt_f64x4(in_, setzero_f64x4());
+		EmuSIMD::f64x4 out = _mm256_and_pd(negative_mask, mul_all_f64x4(in_, set1_f64x4(-1)));
+		return _mm256_or_pd(out, _mm256_andnot_pd(negative_mask, in_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 sqrt_f64x4(EmuSIMD::f64x4_arg in_)
+	{
+		return _mm256_sqrt_pd(in_);
 	}
 #pragma endregion
 }

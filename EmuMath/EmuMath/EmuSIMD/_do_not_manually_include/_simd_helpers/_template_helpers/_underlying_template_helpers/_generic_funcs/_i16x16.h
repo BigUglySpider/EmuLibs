@@ -38,6 +38,30 @@ namespace EmuSIMD::Funcs
 	{
 		return _mm256_setzero_si256();
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 setmasked_i16x16(std::uint16_t bit_mask_)
+	{
+		constexpr std::int16_t element_mask = static_cast<std::int16_t>(0xFFFF);
+		return _mm256_set_epi16
+		(
+			(bit_mask_  & 0x0001) * element_mask,
+			((bit_mask_ & 0x0002) >> 1) * element_mask,
+			((bit_mask_ & 0x0004) >> 2) * element_mask,
+			((bit_mask_ & 0x0008) >> 3) * element_mask,
+			((bit_mask_ & 0x0010) >> 4) * element_mask,
+			((bit_mask_ & 0x0020) >> 5) * element_mask,
+			((bit_mask_ & 0x0040) >> 6) * element_mask,
+			((bit_mask_ & 0x0080) >> 7) * element_mask,
+			((bit_mask_ & 0x0100) >> 8) * element_mask,
+			((bit_mask_ & 0x0200) >> 9) * element_mask,
+			((bit_mask_ & 0x0400) >> 10) * element_mask,
+			((bit_mask_ & 0x0800) >> 11) * element_mask,
+			((bit_mask_ & 0x1000) >> 12) * element_mask,
+			((bit_mask_ & 0x2000) >> 13) * element_mask,
+			((bit_mask_ & 0x4000) >> 14) * element_mask,
+			((bit_mask_ & 0x8000) >> 15) * element_mask
+		);
+	}
 #pragma endregion
 
 #pragma region STORES
@@ -356,6 +380,39 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region COMPARISONS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 cmpeq_i16x16(EmuSIMD::i16x16_arg lhs_, EmuSIMD::i16x16_arg rhs_)
+	{
+		return _mm256_cmpeq_epi16(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 cmpneq_i16x16(EmuSIMD::i16x16_arg lhs_, EmuSIMD::i16x16_arg rhs_)
+	{
+		constexpr std::int16_t mask = static_cast<std::int16_t>(0xFFFF);
+		return _mm256_xor_si256(set1_i16x16(mask), _mm256_cmpeq_epi16(lhs_, rhs_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 cmpgt_i16x16(EmuSIMD::i16x16_arg lhs_, EmuSIMD::i16x16_arg rhs_)
+	{
+		return _mm256_cmpgt_epi16(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 cmplt_i16x16(EmuSIMD::i16x16_arg lhs_, EmuSIMD::i16x16_arg rhs_)
+	{
+		return _mm256_cmpgt_epi16(rhs_, lhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 cmpge_i16x16(EmuSIMD::i16x16_arg lhs_, EmuSIMD::i16x16_arg rhs_)
+	{
+		return _mm256_or_si256(_mm256_cmpgt_epi16(lhs_, rhs_), _mm256_cmpeq_epi16(lhs_, rhs_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 cmple_i16x16(EmuSIMD::i16x16_arg lhs_, EmuSIMD::i16x16_arg rhs_)
+	{
+		return _mm256_or_si256(_mm256_cmpgt_epi16(rhs_, lhs_), _mm256_cmpeq_epi16(lhs_, rhs_));
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 mul_all_i16x16(EmuSIMD::i16x16_arg lhs_, EmuSIMD::i16x16_arg rhs_)
 	{
@@ -457,6 +514,45 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 mod_i16x16(EmuSIMD::i16x16_arg lhs_, EmuSIMD::i16x16_arg rhs_)
 	{
 		return _mm256_rem_epi16(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 abs_i16x16(EmuSIMD::i16x16_arg in_)
+	{
+		return _mm256_abs_epi16(in_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x16 sqrt_i16x16(EmuSIMD::i16x16_arg in_)
+	{
+		constexpr std::size_t num_elements = 16;
+		constexpr std::size_t elements_per_register = 8;
+		std::int16_t data[num_elements];
+		float results[num_elements];
+
+		store_i16x16(data, in_);
+		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
+		{
+			store_f32x8(results + i, _mm256_sqrt_ps(set_f32x8(data[i + 7], data[i + 6], data[i + 5], data[i + 4], data[i + 3], data[i + 2], data[i + 1], data[i])));
+		}
+
+		return set_i16x16
+		(
+			static_cast<std::int16_t>(results[15]),
+			static_cast<std::int16_t>(results[14]),
+			static_cast<std::int16_t>(results[13]),
+			static_cast<std::int16_t>(results[12]),
+			static_cast<std::int16_t>(results[11]),
+			static_cast<std::int16_t>(results[10]),
+			static_cast<std::int16_t>(results[9]),
+			static_cast<std::int16_t>(results[8]),
+			static_cast<std::int16_t>(results[7]),
+			static_cast<std::int16_t>(results[6]),
+			static_cast<std::int16_t>(results[5]),
+			static_cast<std::int16_t>(results[4]),
+			static_cast<std::int16_t>(results[3]),
+			static_cast<std::int16_t>(results[2]),
+			static_cast<std::int16_t>(results[1]),
+			static_cast<std::int16_t>(results[0])
+		);
 	}
 #pragma endregion
 }

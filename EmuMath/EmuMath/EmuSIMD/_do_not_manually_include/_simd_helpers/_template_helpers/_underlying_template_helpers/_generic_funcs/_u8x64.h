@@ -58,6 +58,78 @@ namespace EmuSIMD::Funcs
 	{
 		return _mm512_setzero_si512();
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 setmasked_u8x64(std::uint64_t bit_mask_)
+	{
+		constexpr std::uint8_t element_mask = static_cast<std::uint8_t>(0xFF);
+		return _mm512_set_epi8
+		(
+			static_cast<std::int8_t>(bit_mask_  & 0x0000000000000001) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000002) >> 1) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000004) >> 2) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000008) >> 3) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000010) >> 4) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000020) >> 5) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000040) >> 6) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000080) >> 7) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000100) >> 8) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000200) >> 9) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000400) >> 10) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000000800) >> 11) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000001000) >> 12) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000002000) >> 13) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000004000) >> 14) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000008000) >> 15) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000010000) >> 16) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000020000) >> 17) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000040000) >> 18) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000080000) >> 19) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000100000) >> 20) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000200000) >> 21) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000400000) >> 22) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000000800000) >> 23) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000001000000) >> 24) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000002000000) >> 25) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000004000000) >> 26) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000008000000) >> 27) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000010000000) >> 28) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000020000000) >> 29) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000040000000) >> 30) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000080000000) >> 31) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000100000000) >> 32) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000200000000) >> 33) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000400000000) >> 34) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000000800000000) >> 35) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000001000000000) >> 36) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000002000000000) >> 37) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000004000000000) >> 38) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000008000000000) >> 39) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000010000000000) >> 40) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000020000000000) >> 41) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000040000000000) >> 42) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000080000000000) >> 43) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000100000000000) >> 44) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000200000000000) >> 45) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000400000000000) >> 46) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0000800000000000) >> 47) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0001000000000000) >> 48) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0002000000000000) >> 49) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0004000000000000) >> 50) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0008000000000000) >> 51) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0010000000000000) >> 52) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0020000000000000) >> 53) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0040000000000000) >> 54) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0080000000000000) >> 55) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0100000000000000) >> 56) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0200000000000000) >> 57) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0400000000000000) >> 58) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x0800000000000000) >> 59) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x1000000000000000) >> 60) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x2000000000000000) >> 61) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x4000000000000000) >> 62) * element_mask,
+			static_cast<std::int8_t>((bit_mask_ & 0x8000000000000000) >> 63)* element_mask
+		);
+	}
 #pragma endregion
 
 #pragma region STORES
@@ -371,6 +443,38 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region COMPARISONS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 cmpeq_u8x64(EmuSIMD::u8x64_arg lhs_, EmuSIMD::u8x64_arg rhs_)
+	{
+		return setmasked_i8x64(_mm512_cmpeq_epu8_mask(lhs_, rhs_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 cmpneq_u8x64(EmuSIMD::u8x64_arg lhs_, EmuSIMD::u8x64_arg rhs_)
+	{
+		return setmasked_i8x64(_mm512_cmpneq_epu8_mask(lhs_, rhs_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 cmpgt_u8x64(EmuSIMD::u8x64_arg lhs_, EmuSIMD::u8x64_arg rhs_)
+	{
+		return setmasked_i8x64(_mm512_cmplt_epu8_mask(rhs_, lhs_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 cmplt_u8x64(EmuSIMD::u8x64_arg lhs_, EmuSIMD::u8x64_arg rhs_)
+	{
+		return setmasked_i8x64(_mm512_cmplt_epu8_mask(lhs_, rhs_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 cmpge_u8x64(EmuSIMD::u8x64_arg lhs_, EmuSIMD::u8x64_arg rhs_)
+	{
+		return setmasked_i8x64(_mm512_cmple_epu8_mask(rhs_, lhs_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 cmple_u8x64(EmuSIMD::u8x64_arg lhs_, EmuSIMD::u8x64_arg rhs_)
+	{
+		return setmasked_i8x64(_mm512_cmple_epu8_mask(lhs_, rhs_));
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 mul_all_u8x64(EmuSIMD::u8x64_arg lhs_, EmuSIMD::u8x64_arg rhs_)
 	{
@@ -486,6 +590,103 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 mod_u8x64(EmuSIMD::u8x64_arg lhs_, EmuSIMD::u8x64_arg rhs_)
 	{
 		return _mm512_rem_epu8(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 abs_u8x64(EmuSIMD::u8x64_arg in_)
+	{
+		return in_;
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u8x64 sqrt_u8x64(EmuSIMD::u8x64_arg in_)
+	{
+		constexpr std::size_t num_elements = 64;
+		constexpr std::size_t elements_per_register = 16;
+		std::uint8_t data[num_elements];
+		float results[num_elements];
+
+		store_u8x64(data, in_);
+		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
+		{
+			store_f32x16
+			(
+				results + i, _mm512_sqrt_ps
+				(
+					set_f32x16
+					( 
+						data[i + 15], data[i + 14], data[i + 13], data[i + 12], data[i + 11], data[i + 10], data[i + 9], data[i + 8],
+						data[i + 7], data[i + 6], data[i + 5], data[i + 4], data[i + 3], data[i + 2], data[i + 1], data[i]
+					)
+				)
+			);
+		}
+
+		return set_u8x64
+		(
+			static_cast<std::uint8_t>(results[63]),
+			static_cast<std::uint8_t>(results[62]),
+			static_cast<std::uint8_t>(results[61]),
+			static_cast<std::uint8_t>(results[60]),
+			static_cast<std::uint8_t>(results[59]),
+			static_cast<std::uint8_t>(results[58]),
+			static_cast<std::uint8_t>(results[57]),
+			static_cast<std::uint8_t>(results[56]),
+			static_cast<std::uint8_t>(results[55]),
+			static_cast<std::uint8_t>(results[54]),
+			static_cast<std::uint8_t>(results[53]),
+			static_cast<std::uint8_t>(results[52]),
+			static_cast<std::uint8_t>(results[51]),
+			static_cast<std::uint8_t>(results[50]),
+			static_cast<std::uint8_t>(results[49]),
+			static_cast<std::uint8_t>(results[48]),
+			static_cast<std::uint8_t>(results[47]),
+			static_cast<std::uint8_t>(results[46]),
+			static_cast<std::uint8_t>(results[45]),
+			static_cast<std::uint8_t>(results[44]),
+			static_cast<std::uint8_t>(results[43]),
+			static_cast<std::uint8_t>(results[42]),
+			static_cast<std::uint8_t>(results[41]),
+			static_cast<std::uint8_t>(results[40]),
+			static_cast<std::uint8_t>(results[39]),
+			static_cast<std::uint8_t>(results[38]),
+			static_cast<std::uint8_t>(results[37]),
+			static_cast<std::uint8_t>(results[36]),
+			static_cast<std::uint8_t>(results[35]),
+			static_cast<std::uint8_t>(results[34]),
+			static_cast<std::uint8_t>(results[33]),
+			static_cast<std::uint8_t>(results[32]),
+			static_cast<std::uint8_t>(results[31]),
+			static_cast<std::uint8_t>(results[30]),
+			static_cast<std::uint8_t>(results[29]),
+			static_cast<std::uint8_t>(results[28]),
+			static_cast<std::uint8_t>(results[27]),
+			static_cast<std::uint8_t>(results[26]),
+			static_cast<std::uint8_t>(results[25]),
+			static_cast<std::uint8_t>(results[24]),
+			static_cast<std::uint8_t>(results[23]),
+			static_cast<std::uint8_t>(results[22]),
+			static_cast<std::uint8_t>(results[21]),
+			static_cast<std::uint8_t>(results[20]),
+			static_cast<std::uint8_t>(results[19]),
+			static_cast<std::uint8_t>(results[18]),
+			static_cast<std::uint8_t>(results[17]),
+			static_cast<std::uint8_t>(results[16]),
+			static_cast<std::uint8_t>(results[15]),
+			static_cast<std::uint8_t>(results[14]),
+			static_cast<std::uint8_t>(results[13]),
+			static_cast<std::uint8_t>(results[12]),
+			static_cast<std::uint8_t>(results[11]),
+			static_cast<std::uint8_t>(results[10]),
+			static_cast<std::uint8_t>(results[9]),
+			static_cast<std::uint8_t>(results[8]),
+			static_cast<std::uint8_t>(results[7]),
+			static_cast<std::uint8_t>(results[6]),
+			static_cast<std::uint8_t>(results[5]),
+			static_cast<std::uint8_t>(results[4]),
+			static_cast<std::uint8_t>(results[3]),
+			static_cast<std::uint8_t>(results[2]),
+			static_cast<std::uint8_t>(results[1]),
+			static_cast<std::uint8_t>(results[0])
+		);
 	}
 #pragma endregion
 }

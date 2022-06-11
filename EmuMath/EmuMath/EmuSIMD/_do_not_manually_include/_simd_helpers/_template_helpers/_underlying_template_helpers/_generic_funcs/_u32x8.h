@@ -347,6 +347,57 @@ namespace EmuSIMD::Funcs
 	{
 		return _mm512_cvtepi64_epi32(a_);
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 setmasked_u32x8(std::uint8_t bit_mask_)
+	{
+		constexpr std::uint32_t element_mask = static_cast<std::uint32_t>(0xFFFFFFFF);
+		return _mm256_set_epi32
+		(
+			(bit_mask_ & 0x01) * element_mask,
+			((bit_mask_ & 0x02) >> 1) * element_mask,
+			((bit_mask_ & 0x04) >> 2) * element_mask,
+			((bit_mask_ & 0x08) >> 3) * element_mask,
+			((bit_mask_ & 0x10) >> 4) * element_mask,
+			((bit_mask_ & 0x20) >> 5) * element_mask,
+			((bit_mask_ & 0x40) >> 6) * element_mask,
+			((bit_mask_ & 0x80) >> 7) * element_mask
+		);
+	}
+#pragma endregion
+
+#pragma region COMPARISONS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 cmpeq_u32x8(EmuSIMD::u32x8_arg lhs_, EmuSIMD::u32x8_arg rhs_)
+	{
+		return _mm256_cmpeq_epi32(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 cmpneq_u32x8(EmuSIMD::u32x8_arg lhs_, EmuSIMD::u32x8_arg rhs_)
+	{
+		constexpr std::uint32_t mask = static_cast<std::uint32_t>(0xFFFFFFFF);
+		return _mm256_xor_si256(set1_u32x8(mask), _mm256_cmpeq_epi32(lhs_, rhs_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 cmpgt_u32x8(EmuSIMD::u32x8_arg lhs_, EmuSIMD::u32x8_arg rhs_)
+	{
+		constexpr std::uint32_t mask = static_cast<std::uint32_t>(0xFFFFFFFF);
+		return _mm256_andnot_si256(_mm256_cmpeq_epi32(_mm256_min_epu32(lhs_, rhs_), lhs_), set1_u32x8(mask));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 cmplt_u32x8(EmuSIMD::u32x8_arg lhs_, EmuSIMD::u32x8_arg rhs_)
+	{
+		constexpr std::uint32_t mask = static_cast<std::uint32_t>(0xFFFFFFFF);
+		return _mm256_andnot_si256(_mm256_cmpeq_epi32(_mm256_max_epu32(lhs_, rhs_), lhs_), set1_u32x8(mask));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 cmpge_u32x8(EmuSIMD::u32x8_arg lhs_, EmuSIMD::u32x8_arg rhs_)
+	{
+		return _mm256_cmpeq_epi32(_mm256_max_epu32(lhs_, rhs_), lhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 cmple_u32x8(EmuSIMD::u32x8_arg lhs_, EmuSIMD::u32x8_arg rhs_)
+	{
+		return _mm256_cmpeq_epi32(_mm256_min_epu32(lhs_, rhs_), lhs_);
+	}
 #pragma endregion
 
 #pragma region BASIC_ARITHMETIC
@@ -450,6 +501,16 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 mod_u32x8(EmuSIMD::u32x8_arg lhs_, EmuSIMD::u32x8_arg rhs_)
 	{
 		return _mm256_rem_epu32(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 abs_u32x8(EmuSIMD::u32x8_arg in_)
+	{
+		return in_;
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 sqrt_u32x8(EmuSIMD::u32x8_arg in_)
+	{
+		return _mm256_cvtps_epu32(_mm256_sqrt_ps(_mm256_cvtepu32_ps(in_)));
 	}
 #pragma endregion
 }

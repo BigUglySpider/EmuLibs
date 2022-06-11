@@ -42,6 +42,46 @@ namespace EmuSIMD::Funcs
 	{
 		return _mm256_setzero_si256();
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 setmasked_i8x32(std::uint32_t bit_mask_)
+	{
+		constexpr std::int8_t element_mask = static_cast<std::int8_t>(0xFF);
+		return _mm256_set_epi8
+		(
+			(bit_mask_ & 0x00000001) * element_mask,
+			((bit_mask_ & 0x00000002) >> 1) * element_mask,
+			((bit_mask_ & 0x00000004) >> 2) * element_mask,
+			((bit_mask_ & 0x00000008) >> 3) * element_mask,
+			((bit_mask_ & 0x00000010) >> 4) * element_mask,
+			((bit_mask_ & 0x00000020) >> 5) * element_mask,
+			((bit_mask_ & 0x00000040) >> 6) * element_mask,
+			((bit_mask_ & 0x00000080) >> 7) * element_mask,
+			((bit_mask_ & 0x00000100) >> 8) * element_mask,
+			((bit_mask_ & 0x00000200) >> 9) * element_mask,
+			((bit_mask_ & 0x00000400) >> 10) * element_mask,
+			((bit_mask_ & 0x00000800) >> 11) * element_mask,
+			((bit_mask_ & 0x00001000) >> 12) * element_mask,
+			((bit_mask_ & 0x00002000) >> 13) * element_mask,
+			((bit_mask_ & 0x00004000) >> 14) * element_mask,
+			((bit_mask_ & 0x00008000) >> 15) * element_mask,
+			((bit_mask_ & 0x00010000) >> 16) * element_mask,
+			((bit_mask_ & 0x00020000) >> 17) * element_mask,
+			((bit_mask_ & 0x00040000) >> 18) * element_mask,
+			((bit_mask_ & 0x00080000) >> 19) * element_mask,
+			((bit_mask_ & 0x00100000) >> 20) * element_mask,
+			((bit_mask_ & 0x00200000) >> 21) * element_mask,
+			((bit_mask_ & 0x00400000) >> 22) * element_mask,
+			((bit_mask_ & 0x00800000) >> 23) * element_mask,
+			((bit_mask_ & 0x01000000) >> 24) * element_mask,
+			((bit_mask_ & 0x02000000) >> 25) * element_mask,
+			((bit_mask_ & 0x04000000) >> 26) * element_mask,
+			((bit_mask_ & 0x08000000) >> 27) * element_mask,
+			((bit_mask_ & 0x10000000) >> 28) * element_mask,
+			((bit_mask_ & 0x20000000) >> 29) * element_mask,
+			((bit_mask_ & 0x40000000) >> 30) * element_mask,
+			((bit_mask_ & 0x80000000) >> 31) * element_mask
+		);
+	}
 #pragma endregion
 
 #pragma region STORES
@@ -355,6 +395,39 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region COMPARISONS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 cmpeq_i8x32(EmuSIMD::i8x32_arg lhs_, EmuSIMD::i8x32_arg rhs_)
+	{
+		return _mm256_cmpeq_epi8(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 cmpneq_i8x32(EmuSIMD::i8x32_arg lhs_, EmuSIMD::i8x32_arg rhs_)
+	{
+		constexpr std::int8_t mask = static_cast<std::int8_t>(0xFF);
+		return _mm256_xor_si256(set1_i8x32(mask), _mm256_cmpeq_epi8(lhs_, rhs_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 cmpgt_i8x32(EmuSIMD::i8x32_arg lhs_, EmuSIMD::i8x32_arg rhs_)
+	{
+		return _mm256_cmpgt_epi8(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 cmplt_i8x32(EmuSIMD::i8x32_arg lhs_, EmuSIMD::i8x32_arg rhs_)
+	{
+		return _mm256_cmpgt_epi8(rhs_, lhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 cmpge_i8x32(EmuSIMD::i8x32_arg lhs_, EmuSIMD::i8x32_arg rhs_)
+	{
+		return _mm256_or_si256(_mm256_cmpgt_epi8(lhs_, rhs_), _mm256_cmpeq_epi8(lhs_, rhs_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 cmple_i8x32(EmuSIMD::i8x32_arg lhs_, EmuSIMD::i8x32_arg rhs_)
+	{
+		return _mm256_or_si256(_mm256_cmpgt_epi8(rhs_, lhs_), _mm256_cmpeq_epi8(lhs_, rhs_));
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 mul_all_i8x32(EmuSIMD::i8x32_arg lhs_, EmuSIMD::i8x32_arg rhs_)
 	{
@@ -466,6 +539,62 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 mod_i8x32(EmuSIMD::i8x32_arg lhs_, EmuSIMD::i8x32_arg rhs_)
 	{
 		return _mm256_rem_epi8(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 abs_i8x32(EmuSIMD::i8x32_arg in_)
+	{
+		return _mm256_abs_epi8(in_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x32 sqrt_i8x32(EmuSIMD::i8x32_arg in_)
+	{
+		constexpr std::size_t num_elements = 32;
+		constexpr std::size_t elements_per_register = 8;
+		std::int8_t data[num_elements];
+		float results[num_elements];
+
+		store_i8x32(data, in_);
+		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
+		{
+			store_f32x8(results + i, _mm256_sqrt_ps(set_f32x8(data[i + 7], data[i + 6], data[i + 5], data[i + 4], data[i + 3], data[i + 2], data[i + 1], data[i])));
+		}
+
+		return set_i8x32
+		(
+
+			static_cast<std::int8_t>(results[31]),
+			static_cast<std::int8_t>(results[30]),
+			static_cast<std::int8_t>(results[29]),
+			static_cast<std::int8_t>(results[28]),
+			static_cast<std::int8_t>(results[27]),
+			static_cast<std::int8_t>(results[26]),
+			static_cast<std::int8_t>(results[25]),
+			static_cast<std::int8_t>(results[24]),
+			static_cast<std::int8_t>(results[23]),
+			static_cast<std::int8_t>(results[22]),
+			static_cast<std::int8_t>(results[21]),
+			static_cast<std::int8_t>(results[20]),
+			static_cast<std::int8_t>(results[19]),
+			static_cast<std::int8_t>(results[18]),
+			static_cast<std::int8_t>(results[17]),
+			static_cast<std::int8_t>(results[16]),
+			static_cast<std::int8_t>(results[15]),
+			static_cast<std::int8_t>(results[14]),
+			static_cast<std::int8_t>(results[13]),
+			static_cast<std::int8_t>(results[12]),
+			static_cast<std::int8_t>(results[11]),
+			static_cast<std::int8_t>(results[10]),
+			static_cast<std::int8_t>(results[9]),
+			static_cast<std::int8_t>(results[8]),
+			static_cast<std::int8_t>(results[7]),
+			static_cast<std::int8_t>(results[6]),
+			static_cast<std::int8_t>(results[5]),
+			static_cast<std::int8_t>(results[4]),
+			static_cast<std::int8_t>(results[3]),
+			static_cast<std::int8_t>(results[2]),
+			static_cast<std::int8_t>(results[1]),
+			static_cast<std::int8_t>(results[0])
+		);
 	}
 #pragma endregion
 }

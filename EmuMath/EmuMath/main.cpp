@@ -388,6 +388,16 @@ int main()
 	std::cout << "\n\n";
 	std::cout << EmuMath::FastVector<7, double, 256>(1, -6, 25, 18, 21, 4, 3).Cross3(EmuMath::FastVector<7, double, 256>(2, 24, 1, 6, 9, 69, 42)) << "\n\n";
 
+	std::cout << "Sqrt Test: ";
+	EmuSIMD::append_simd_vector_to_stream<8>(std::cout, EmuSIMD::Funcs::sqrt_i8x16(_mm_setr_epi8(3, 9, 81, 0, 3, 9, 81, 0, 3, 9, 81, 0, 3, 9, 81, 4))) << "\n\n";
+	EmuSIMD::append_simd_vector_to_stream<32>(std::cout, _mm_sqrt_ps(_mm_setr_ps(3, 9, 81, 0))) << "\n\n";
+
+	std::cout << EmuMath::FastVector<3, float>(1, 20, -3).MagnitudeScalar() << "\n";
+	std::cout << EmuMath::FastVector<4, float>(100, 20, -3, -9).MagnitudeScalar() << "\n";
+	std::cout << EmuMath::FastVector<5, float>(1, 20, -3, 16, 0).MagnitudeScalar() << "\n";
+	std::cout << EmuMath::FastVector<1, float>(500.5f).MagnitudeScalar() << "\n";
+	std::cout << EmuMath::FastVector<3, double>(1, 20, -3).MagnitudeScalar() << "\n";
+	std::cout << EmuMath::FastVector<4, int>(1, 20, -3, -9).MagnitudeScalar<float>() << "\n";
 
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);

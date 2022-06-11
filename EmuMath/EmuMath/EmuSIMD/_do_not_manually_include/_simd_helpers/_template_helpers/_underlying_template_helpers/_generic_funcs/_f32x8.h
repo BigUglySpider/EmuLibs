@@ -30,6 +30,25 @@ namespace EmuSIMD::Funcs
 	{
 		return _mm256_setzero_ps();
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 setmasked_f32x8(std::uint8_t bit_mask_)
+	{
+		constexpr std::int32_t element_mask = static_cast<std::int32_t>(0xFFFFFFFF);
+		return _mm256_castsi256_ps
+		(
+			_mm256_set_epi32
+			(
+				(bit_mask_ & 0x01) * element_mask,
+				((bit_mask_ & 0x02) >> 1) * element_mask,
+				((bit_mask_ & 0x04) >> 2) * element_mask,
+				((bit_mask_ & 0x08) >> 3) * element_mask,
+				((bit_mask_ & 0x10) >> 4) * element_mask,
+				((bit_mask_ & 0x20) >> 5) * element_mask,
+				((bit_mask_ & 0x40) >> 6) * element_mask,
+				((bit_mask_ & 0x80) >> 7) * element_mask
+			)
+		);
+	}
 #pragma endregion
 
 #pragma region STORES
@@ -343,6 +362,38 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region COMPARISONS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 cmpeq_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_)
+	{
+		return _mm256_cmp_ps(lhs_, rhs_, EMU_SIMD_CMP_EQ_FLAG);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 cmpneq_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_)
+	{
+		return _mm256_cmp_ps(lhs_, rhs_, EMU_SIMD_CMP_NEQ_FLAG);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 cmpgt_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_)
+	{
+		return _mm256_cmp_ps(lhs_, rhs_, EMU_SIMD_CMP_GT_FLAG);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 cmplt_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_)
+	{
+		return _mm256_cmp_ps(lhs_, rhs_, EMU_SIMD_CMP_LT_FLAG);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 cmpge_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_)
+	{
+		return _mm256_cmp_ps(lhs_, rhs_, EMU_SIMD_CMP_GE_FLAG);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 cmple_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_)
+	{
+		return _mm256_cmp_ps(lhs_, rhs_, EMU_SIMD_CMP_LE_FLAG);
+	}
+#pragma endregion
+
 #pragma region BASIC_ARITHMETIC
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 mul_all_f32x8(EmuSIMD::f32x8_arg lhs_, EmuSIMD::f32x8_arg rhs_)
 	{
@@ -435,6 +486,18 @@ namespace EmuSIMD::Funcs
 		EmuSIMD::f32x8 res = _mm256_div_ps(lhs_, rhs_);
 		res = _mm256_trunc_ps(res);
 		return _mm256_fnmadd_ps(res, rhs_, lhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 abs_f32x8(EmuSIMD::f32x8_arg in_)
+	{
+		EmuSIMD::f32x8 negative_mask = cmplt_f32x8(in_, setzero_f32x8());
+		EmuSIMD::f32x8 out = _mm256_and_ps(negative_mask, mul_all_f32x8(in_, set1_f32x8(-1)));
+		return _mm256_or_ps(out, _mm256_andnot_ps(negative_mask, in_));
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 sqrt_f32x8(EmuSIMD::f32x8_arg in_)
+	{
+		return _mm256_sqrt_ps(in_);
 	}
 #pragma endregion
 }

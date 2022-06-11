@@ -12,4 +12,11 @@
 /// </summary>
 #define EMU_SIMD_COMMON_FUNC_SPEC inline
 
+#define EMU_SIMD_CMP_EQ_FLAG _CMP_EQ_OS
+#define EMU_SIMD_CMP_NEQ_FLAG _CMP_NEQ_OS
+#define EMU_SIMD_CMP_GT_FLAG _CMP_GT_OS
+#define EMU_SIMD_CMP_LT_FLAG _CMP_LT_OS
+#define EMU_SIMD_CMP_GE_FLAG _CMP_GE_OS
+#define EMU_SIMD_CMP_LE_FLAG _CMP_LE_OS
+
 #endif

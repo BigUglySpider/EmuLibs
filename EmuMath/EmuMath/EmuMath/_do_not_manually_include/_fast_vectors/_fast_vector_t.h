@@ -3183,7 +3183,7 @@ namespace EmuMath
 		{
 			if constexpr (contains_multiple_registers)
 			{
-				return this_type(_do_array_dot<true>(data, b_.data, register_index_sequence()));
+				return this_type(_do_array_dot<false>(data, b_.data, register_index_sequence()));
 			}
 			else if constexpr (requires_partial_register)
 			{
@@ -3223,7 +3223,7 @@ namespace EmuMath
 		/// <para> The output type may be customised, but may be omitted in which case it will default to value_type. </para>
 		/// <para> If a Vector full of the result is required, use `DotFill` instead. </para>
 		/// </summary>
-		/// <returns>FastVector containing the result of the dot product in every element.</returns>
+		/// <returns>Scalar of the provided output type, containing the result of the dot product calculation.</returns>
 		template<typename Out_ = value_type>
 		[[nodiscard]] constexpr inline Out_ DotScalar(const this_type& b_) const
 		{
@@ -3261,6 +3261,135 @@ namespace EmuMath
 			{
 				// Safe to do a simple dot
 				return EmuSIMD::dot_scalar<Out_, per_element_width>(data, b_for_all_);
+			}
+		}
+
+		/// <summary>
+		/// <para> Calculates the squared magnitude of this Vector, which is equivalent to its dot product with itself. </para>
+		/// <para> The result will remain as a Vector, and is guaranteed to at least be stored within the first element in the output Vector. </para>
+		/// <para> If a Vector full of the result is required, use `SquareMagnitudeFill` instead. </para>
+		/// <para> If only a scalar result is required, use `SquareMagnitudeScalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the square magnitude of this Vector in at least its very first element.</returns>
+		[[nodiscard]] constexpr inline this_type SquareMagnitude() const
+		{
+			return Dot(*this);
+		}
+		
+		/// <summary>
+		/// <para> Calculates the squared magnitude of this Vector, which is equivalent to its dot product with itself. </para>
+		/// <para> The result will remain as a Vector, and is guaranteed to be stored in all elements of the output Vector. </para>
+		/// <para> If only a scalar result is required, use `SquareMagnitudeScalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the square magnitude of this Vector in every element.</returns>
+		[[nodiscard]] constexpr inline this_type SquareMagnitudeFill() const
+		{
+			return DotFill(*this);
+		}
+
+		/// <summary>
+		/// <para> Calculates the squared magnitude of this Vector, which is equivalent to its dot product with itself. </para>
+		/// <para> The result will be a scalar extracted from a resulting intermediate Vector. </para>
+		/// <para> The output type may be customised, but may be omitted in which case it will default to value_type. </para>
+		/// <para> If a Vector full of the result is required, use `SquareMagnitudeFill` instead. </para>
+		/// </summary>
+		/// <returns>Scalar of the provided output type, containing the squared magnitude of this Vector.</returns>
+		template<typename Out_>
+		[[nodiscard]] constexpr inline Out_ SquareMagnitudeScalar() const
+		{
+			return DotScalar<Out_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Calculates the magnitude of this Vector. </para>
+		/// <para> The result will remain as a Vector, and is guaranteed to at least be stored within the first element in the output Vector. </para>
+		/// <para> If a Vector full of the result is required, use `MagnitudeFill` instead. </para>
+		/// <para> If only a scalar result is required, use `MagnitudeScalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the magnitude of this Vector in at least its very first element.</returns>
+		[[nodiscard]] constexpr inline this_type Magnitude() const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_mag<false>(data, register_index_sequence()));
+			}
+			else if constexpr (requires_partial_register)
+			{
+				register_type mag = make_partial_end_exclude_mask_register();
+				mag = EmuSIMD::dot<per_element_width>(EmuSIMD::bitwise_and(data, mag), data);
+				return this_type(EmuSIMD::sqrt<per_element_width, is_signed>(mag));
+			}
+			else
+			{
+				register_type mag = EmuSIMD::dot<per_element_width>(data, data);
+				return this_type(EmuSIMD::sqrt<per_element_width, is_signed>(mag));
+			}
+		}
+
+		/// <summary>
+		/// <para> Calculates the magnitude of this Vector. </para>
+		/// <para> The result will remain as a Vector, and is guaranteed to be stored in all elements of the output Vector. </para>
+		/// <para> If only a scalar result is required, use `MagnitudeScalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the magnitude of this Vector in every element.</returns>
+		[[nodiscard]] constexpr inline this_type MagnitudeFill() const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_mag<true>(data, register_index_sequence()));
+			}
+			else if constexpr (requires_partial_register)
+			{
+				register_type mag = make_partial_end_exclude_mask_register();
+				mag = EmuSIMD::dot_fill<per_element_width>(EmuSIMD::bitwise_and(data, mag), data);
+				return this_type(EmuSIMD::sqrt<per_element_width, is_signed>(mag));
+			}
+			else
+			{
+				register_type mag = EmuSIMD::dot_fill<per_element_width>(data, data);
+				return this_type(EmuSIMD::sqrt<per_element_width, is_signed>(mag));
+			}
+		}
+
+		/// <summary>
+		/// <para> Calculates the magnitude of this Vector. </para>
+		/// <para> The result will be a scalar extracted from a resulting intermediate Vector. </para>
+		/// <para> The output type may be customised, but may be omitted in which case it will default to value_type. </para>
+		/// <para> If a Vector full of the result is required, use `MagnitudeFill` instead. </para>
+		/// </summary>
+		/// <returns>Scalar of the provided output type, containing the magnitude of this Vector.</returns>
+		template<typename Out_ = value_type>
+		[[nodiscard]] constexpr inline Out_ MagnitudeScalar() const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return _do_array_mag_scalar<Out_>(data, register_index_sequence());
+			}
+			else if constexpr (requires_partial_register)
+			{
+				// Need extra work to make sure we dot correctly
+				register_type mask = make_partial_end_exclude_mask_register();
+
+				if constexpr (per_element_byte_size <= 4)
+				{
+					return static_cast<Out_>(sqrtf(EmuSIMD::dot_scalar<float, per_element_width>(EmuSIMD::bitwise_and(data, mask), data)));
+				}
+				else
+				{
+					return static_cast<Out_>(sqrt(EmuSIMD::dot_scalar<double, per_element_width>(EmuSIMD::bitwise_and(data, mask), data)));
+				}
+			}
+			else
+			{
+				// Safe to do a simple dot
+				if constexpr (per_element_byte_size <= 4)
+				{
+					return static_cast<Out_>(sqrtf(EmuSIMD::dot_scalar<float, per_element_width>(data, data)));
+				}
+				else
+				{
+					return static_cast<Out_>(sqrt(EmuSIMD::dot_scalar<double, per_element_width>(data, data)));
+				}
 			}
 		}
 
@@ -4292,6 +4421,37 @@ namespace EmuMath
 		static constexpr inline Out_ _do_array_dot_scalar(const data_type& a_, B_&& b_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			return EmuSIMD::horizontal_sum_scalar<Out_, per_element_width>(_calculate_array_dot_pre_hadd(a_, std::forward<B_>(b_), indices_));
+		}
+
+		template<bool Fill_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_mag(const data_type& vec_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			register_type result = _calculate_array_dot_pre_hadd(vec_, vec_);
+
+			if constexpr (Fill_)
+			{
+				result = EmuSIMD::horizontal_sum_fill<per_element_width>(result);
+			}
+			else
+			{
+				result = EmuSIMD::horizontal_sum<per_element_width>(result);
+			}
+
+			return _do_set_all_same_register(EmuSIMD::sqrt<per_element_width, is_signed>(result));
+		}
+
+		template<typename Out_, std::size_t...RegisterIndices_>
+		static constexpr inline Out_ _do_array_mag_scalar(const data_type& vec_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			Out_ squared_magnitude = EmuSIMD::horizontal_sum_scalar<Out_, per_element_width>(_calculate_array_dot_pre_hadd(vec_, vec_, indices_));
+			if constexpr (per_element_byte_size <= 4)
+			{
+				return static_cast<Out_>(sqrtf(EmuSIMD::horizontal_sum_scalar<float, per_element_width>(_calculate_array_dot_pre_hadd(vec_, vec_, indices_))));
+			}
+			else
+			{
+				return static_cast<Out_>(sqrt(EmuSIMD::horizontal_sum_scalar<double, per_element_width>(_calculate_array_dot_pre_hadd(vec_, vec_, indices_))));
+			}
 		}
 
 		template<class B_, std::size_t...RegisterIndices_>
