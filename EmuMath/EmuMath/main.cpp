@@ -385,6 +385,9 @@ int main()
 	std::cout << EmuMath::FastVector<7, std::uint32_t>(1, 2, 3, 4, 5, 6, 7).DotScalar<unsigned long long>(EmuMath::FastVector<7, std::uint32_t>(13)) << "\n";
 	std::cout << EmuMath::FastVector<7, std::uint32_t>(1, 2, 3, 4, 5, 6, 7).DotScalar<unsigned long long>(EmuMath::FastVector<7, std::uint32_t>(13)) << "\n\n";
 
+	std::cout << "\n\n";
+	std::cout << EmuMath::FastVector<7, double, 256>(1, -6, 25, 18, 21, 4, 3).Cross3(EmuMath::FastVector<7, double, 256>(2, 24, 1, 6, 9, 69, 42)) << "\n\n";
+
 
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);

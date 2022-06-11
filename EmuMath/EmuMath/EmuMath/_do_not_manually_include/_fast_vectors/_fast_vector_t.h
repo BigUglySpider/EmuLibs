@@ -2924,7 +2924,7 @@ namespace EmuMath
 		template<std::size_t Index_>
 		[[nodiscard]] constexpr inline const register_type& GetRegister() const
 		{
-			return const_cast<this_type*>(this)->GetRegister();
+			return const_cast<this_type*>(this)->GetRegister<Index_>();
 		}
 
 		/// <summary>
@@ -3084,6 +3084,51 @@ namespace EmuMath
 #pragma region CONST_VECTOR_ARITHMETIC
 	public:
 		/// <summary>
+		/// <para> Calculates the 3D cross product of this Vector and b_. </para>
+		/// <para> This is primarily designed for 128-bit registers of 32-bit components, and will perform automatic conversions if this Vector type does not match that. </para>
+		/// <para> If this calculation is likely to be common with this Vector, it is recommended to convert it to match the design of this function. </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline this_type Cross3(const this_type& b_) const
+		{
+			if constexpr (register_width == 128 && per_element_width == 32)
+			{
+				register_type a0 = GetRegister<0>();
+				register_type b0 = b_.GetRegister<0>();
+
+				// Mask out non-contained elements as they are implied zero for mathematical purposes
+				// --- Unfortunately, we can't get away with only masking one register since they multiply with non-respective elements
+				if constexpr (size < 3)
+				{
+					register_type mask = make_partial_end_exclude_mask_register();
+					a0 = EmuSIMD::bitwise_and(a0, mask);
+					b0 = EmuSIMD::bitwise_and(b0, mask);
+				}
+
+				register_type a0_1203 = EmuSIMD::shuffle<1, 2, 0, 3>(a0);
+				register_type a1203_mul_b0123 = EmuSIMD::mul_all<per_element_width>(a0_1203, b0);
+				return this_type
+				(
+					EmuSIMD::fmsub<per_element_width>
+					(
+						a0_1203,
+						EmuSIMD::shuffle<2, 0, 1, 3>(b0),
+						EmuSIMD::shuffle<1, 2, 0, 3>(a1203_mul_b0123)
+					)
+				);
+			}
+			else
+			{
+				constexpr std::size_t cast_size = 4;
+				constexpr std::size_t cast_register_width = 128;
+				using cast_type = typename std::conditional<is_integral, std::int32_t, float>::type;
+				using cast_vector_type = EmuMath::FastVector<cast_size, cast_type, cast_register_width>;
+				cast_vector_type cast_a = Convert<cast_size, cast_type, cast_register_width>();
+				cast_vector_type cast_b = b_.Convert<cast_size, cast_type, cast_register_width>();
+				return cast_a.Cross3(cast_b).Convert<Size_, T_, RegisterWidth_>();
+			}
+		}
+
+		/// <summary>
 		/// <para> Calculates the dot product of this Vector with another Vector of the same type. </para>
 		/// <para> The result will remain as a Vector, and is guaranteed to at least be stored within the first element in the output Vector. </para>
 		/// <para> If a Vector full of the result is required, use `DotFill` instead. </para>
@@ -3175,6 +3220,7 @@ namespace EmuMath
 		/// <summary>
 		/// <para> Calculates the dot product of this Vector with another Vector of the same type. </para>
 		/// <para> The result will be a scalar extracted from a resulting intermediate Vector. </para>
+		/// <para> The output type may be customised, but may be omitted in which case it will default to value_type. </para>
 		/// <para> If a Vector full of the result is required, use `DotFill` instead. </para>
 		/// </summary>
 		/// <returns>FastVector containing the result of the dot product in every element.</returns>
