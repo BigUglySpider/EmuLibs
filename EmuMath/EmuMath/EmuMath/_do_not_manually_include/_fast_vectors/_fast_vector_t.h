@@ -752,6 +752,70 @@ namespace EmuMath
 				return this_type(EmuSIMD::rsqrt<per_element_width, is_signed>(data));
 			}
 		}
+
+		/// <summary>
+		/// <para> Rounds all elements within this Vector toward negative infinity, outputting the results as a new Vector. </para>
+		/// </summary>
+		/// <returns>New FastVector of this type containing the results of rounding.</returns>
+		[[nodiscard]] constexpr inline this_type Floor() const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_floor(data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::floor(data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Rounds all elements within this Vector toward positive infinity, outputting the results as a new Vector. </para>
+		/// </summary>
+		/// <returns>New FastVector of this type containing the results of rounding.</returns>
+		[[nodiscard]] constexpr inline this_type Ceil() const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_ceil(data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::ceil(data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Rounds all elements within this Vector toward 0, outputting the results as a new Vector. </para>
+		/// </summary>
+		/// <returns>New FastVector of this type containing the results of rounding.</returns>
+		[[nodiscard]] constexpr inline this_type Trunc() const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_trunc(data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::trunc(data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Outputs the absolute form of this Vector, where (x => x, -x => x). </para>
+		/// </summary>
+		/// <returns>New FastVector of this type containing the absolute form of this Vector.</returns>
+		[[nodiscard]] constexpr inline this_type Abs() const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_abs(data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::abs<per_element_width, is_signed>(data));
+			}
+		}
 #pragma endregion
 
 #pragma region NON_CONST_BASIC_ARITHMETIC
@@ -4176,6 +4240,30 @@ namespace EmuMath
 				return data_type({ EmuSIMD::sqrt<per_element_width, is_signed>(in_[RegisterIndices_])... });
 			}
 		}
+
+		template<std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_floor(const data_type& in_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type({ EmuSIMD::floor(in_[RegisterIndices_])... });
+		}
+
+		template<std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_ceil(const data_type& in_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type({ EmuSIMD::ceil(in_[RegisterIndices_])... });
+		}
+
+		template<std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_trunc(const data_type& in_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type({ EmuSIMD::trunc(in_[RegisterIndices_])... });
+		}
+
+		template<std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_abs(const data_type& in_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type({ EmuSIMD::abs<per_element_width, is_signed>(in_[RegisterIndices_])... });
+		}
 #pragma endregion
 
 #pragma region NON_CONST_BASIC_ARITHMETIC_HELPERS
@@ -4564,10 +4652,10 @@ namespace EmuMath
 						(
 							in_.data[RegisterIndices_],
 							in_.data[RegisterIndices_]
-							)
 						)
-					), ...
-				);
+					)
+				), ...
+			);
 			mag = EmuSIMD::horizontal_sum_fill<Vector_::per_element_width>(mag);
 
 			return in_ * EmuSIMD::rsqrt<Vector_::per_element_width, Vector_::is_signed>(mag);

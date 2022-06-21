@@ -421,6 +421,13 @@ int main()
 	std::cout << EmuMath::FastVector<8, float>(3, 2, 26, 5, 16, 27, 139, 81).Normalise<double>() << "\n";
 	std::cout << EmuMath::FastVector<8, double>(3, 2, 26, 5, 16, 27, 139, 81).Normalise<double>() << "\n";
 
+	std::cout << "\nRounds and Abs\n";
+	EmuMath::FastVector<7, float> rounds_and_abs(1.0f, -3.3f, 2.3f, -12.6f, 0.0f, 16.2f, -13.2f);
+	std::cout << "Base: " << rounds_and_abs << "\n";
+	std::cout << "Floor: " << rounds_and_abs.Floor() << "\n";
+	std::cout << "Ceil: " << rounds_and_abs.Ceil() << "\n";
+	std::cout << "Trunc: " << rounds_and_abs.Trunc() << "\n";
+	std::cout << "Abs: " << rounds_and_abs.Abs() << "\n";
 
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
