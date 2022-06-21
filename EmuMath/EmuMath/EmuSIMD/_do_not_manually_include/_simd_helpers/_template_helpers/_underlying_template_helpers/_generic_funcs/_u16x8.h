@@ -512,7 +512,33 @@ namespace EmuSIMD::Funcs
 		store_u16x8(data, in_);
 		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
 		{
-			store_f32x4(results + i, _mm_sqrt_ps(set_f32x4(data[i + 3], data[i + 2], data[i + 1], data[i])));
+			_mm_store_ps(results + i, _mm_sqrt_ps(_mm_set_ps(data[i + 3], data[i + 2], data[i + 1], data[i])));
+		}
+
+		return set_u16x8
+		(
+			static_cast<std::uint16_t>(results[7]),
+			static_cast<std::uint16_t>(results[6]),
+			static_cast<std::uint16_t>(results[5]),
+			static_cast<std::uint16_t>(results[4]),
+			static_cast<std::uint16_t>(results[3]),
+			static_cast<std::uint16_t>(results[2]),
+			static_cast<std::uint16_t>(results[1]),
+			static_cast<std::uint16_t>(results[0])
+		);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x8 rsqrt_u16x8(EmuSIMD::u16x8_arg in_)
+	{
+		constexpr std::size_t num_elements = 8;
+		constexpr std::size_t elements_per_register = 4;
+		std::uint16_t data[num_elements];
+		float results[num_elements];
+
+		store_u16x8(data, in_);
+		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
+		{
+			_mm_store_ps(results + i, _mm_rsqrt_ps(_mm_set_ps(data[i + 3], data[i + 2], data[i + 1], data[i])));
 		}
 
 		return set_u16x8

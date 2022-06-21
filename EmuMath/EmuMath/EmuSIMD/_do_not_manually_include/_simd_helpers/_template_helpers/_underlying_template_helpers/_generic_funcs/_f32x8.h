@@ -499,6 +499,11 @@ namespace EmuSIMD::Funcs
 	{
 		return _mm256_sqrt_ps(in_);
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x8 rsqrt_f32x8(EmuSIMD::f32x8_arg in_)
+	{
+		return _mm256_rsqrt_ps(in_);
+	}
 #pragma endregion
 }
 

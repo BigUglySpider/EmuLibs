@@ -562,11 +562,71 @@ namespace EmuSIMD::Funcs
 		store_i16x32(data, in_);
 		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
 		{
-			store_f32x16
+			_mm512_store_ps
 			(
 				results + i, _mm512_sqrt_ps
 				(
-					set_f32x16
+					_mm512_set_ps
+					(
+						data[i + 15], data[i + 14], data[i + 13], data[i + 12], data[i + 11], data[i + 10], data[i + 9], data[i + 8],
+						data[i + 7], data[i + 6], data[i + 5], data[i + 4], data[i + 3], data[i + 2], data[i + 1], data[i]
+					)
+				)
+			);
+		}
+
+		return set_i16x32
+		(
+			static_cast<std::int16_t>(results[31]),
+			static_cast<std::int16_t>(results[30]),
+			static_cast<std::int16_t>(results[29]),
+			static_cast<std::int16_t>(results[28]),
+			static_cast<std::int16_t>(results[27]),
+			static_cast<std::int16_t>(results[26]),
+			static_cast<std::int16_t>(results[25]),
+			static_cast<std::int16_t>(results[24]),
+			static_cast<std::int16_t>(results[23]),
+			static_cast<std::int16_t>(results[22]),
+			static_cast<std::int16_t>(results[21]),
+			static_cast<std::int16_t>(results[20]),
+			static_cast<std::int16_t>(results[19]),
+			static_cast<std::int16_t>(results[18]),
+			static_cast<std::int16_t>(results[17]),
+			static_cast<std::int16_t>(results[16]),
+			static_cast<std::int16_t>(results[15]),
+			static_cast<std::int16_t>(results[14]),
+			static_cast<std::int16_t>(results[13]),
+			static_cast<std::int16_t>(results[12]),
+			static_cast<std::int16_t>(results[11]),
+			static_cast<std::int16_t>(results[10]),
+			static_cast<std::int16_t>(results[9]),
+			static_cast<std::int16_t>(results[8]),
+			static_cast<std::int16_t>(results[7]),
+			static_cast<std::int16_t>(results[6]),
+			static_cast<std::int16_t>(results[5]),
+			static_cast<std::int16_t>(results[4]),
+			static_cast<std::int16_t>(results[3]),
+			static_cast<std::int16_t>(results[2]),
+			static_cast<std::int16_t>(results[1]),
+			static_cast<std::int16_t>(results[0])
+		);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x32 rsqrt_i16x32(EmuSIMD::i16x32_arg in_)
+	{
+		constexpr std::size_t num_elements = 32;
+		constexpr std::size_t elements_per_register = 16;
+		std::int16_t data[num_elements];
+		float results[num_elements];
+
+		store_i16x32(data, in_);
+		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
+		{
+			_mm512_store_ps
+			(
+				results + i, _mm512_rsqrt28_ps
+				(
+					_mm512_set_ps
 					(
 						data[i + 15], data[i + 14], data[i + 13], data[i + 12], data[i + 11], data[i + 10], data[i + 9], data[i + 8],
 						data[i + 7], data[i + 6], data[i + 5], data[i + 4], data[i + 3], data[i + 2], data[i + 1], data[i]

@@ -519,6 +519,11 @@ namespace EmuSIMD::Funcs
 	{
 		return _mm512_cvtps_epi32(_mm512_sqrt_ps(_mm512_cvtepi32_ps(in_)));
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i32x16 rsqrt_i32x16(EmuSIMD::i32x16_arg in_)
+	{
+		return _mm512_cvtps_epi32(_mm512_rsqrt28_ps(_mm512_cvtepi32_ps(in_)));
+	}
 #pragma endregion
 }
 

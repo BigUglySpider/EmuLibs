@@ -495,6 +495,11 @@ namespace EmuSIMD::Funcs
 	{
 		return _mm256_sqrt_pd(in_);
 	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x4 rsqrt_f64x4(EmuSIMD::f64x4_arg in_)
+	{
+		return div_f64x4(set1_f64x4(1.0), sqrt_f64x4(in_));
+	}
 #pragma endregion
 }
 

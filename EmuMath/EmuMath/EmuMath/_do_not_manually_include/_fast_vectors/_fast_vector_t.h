@@ -41,7 +41,7 @@ namespace EmuMath
 		/// <summary> The number of bits each element is interpreted to consume within this Vector's shift_register_type, with 8-bit bytes regardless of CHAR_BIT. </summary>
 		static constexpr std::size_t shift_register_per_element_width = 64;
 		/// <summary> The preferred floating-point type for this Vector, used for floating-point-based calculations using this Vector. </summary>
-		using preferred_floating_point = typename vector_type::preferred_floating_point;
+		using preferred_floating_point = typename std::conditional<(sizeof(value_type) >= 64), double, float>::type;
 
 		/// <summary> Boolean indicating if this Vector's encapsulated type is integral. </summary>
 		static constexpr bool is_integral = std::is_integral<value_type>::value;
@@ -718,6 +718,38 @@ namespace EmuMath
 			else
 			{
 				return this_type(EmuSIMD::negate<per_element_width>(data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Calculates the square root of elements within this Vector.</para>
+		/// </summary>
+		/// <returns>New FastVector of this type containing the square roots of respective elements.</returns>
+		[[nodiscard]] constexpr inline this_type Sqrt() const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_sqrt<false>(data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::sqrt<per_element_width, is_signed>(data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Calculates the reciprocal of the square root of elements within this Vector.</para>
+		/// </summary>
+		/// <returns>New FastVector of this type containing the reciprocal of square roots of respective elements (1.0 / sqrt).</returns>
+		[[nodiscard]] constexpr inline this_type Rsqrt() const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_sqrt<true>(data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::rsqrt<per_element_width, is_signed>(data));
 			}
 		}
 #pragma endregion
@@ -3557,6 +3589,40 @@ namespace EmuMath
 		{
 			return FusedLerp(EmuSIMD::set1<register_type, per_element_width>(b_), EmuSIMD::set1<register_type, per_element_width>(t_));
 		}
+
+		/// <summary>
+		/// <para> Calculates and outputs the normalised form of this Vector. </para>
+		/// <para> 
+		///		The output element type may be modified with the `OutFP_` argument for this function. It is not enforced, but recommended to use a floating-point type. 
+		///		This defaults to the Vector's preferred_floating_point type.
+		/// </para>
+		/// <para> Conversions for floating-point calculations will be performed automatically; these conversions will be minimised where possible. </para>
+		/// </summary>
+		/// <returns>Normalised form of this Vector.</returns>
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Normalise() const
+		{
+			using out_vector = EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>;
+			constexpr bool out_is_fp = out_vector::is_floating_point;
+			constexpr bool output_same = std::is_same_v<this_type, out_vector>;
+
+			if constexpr (output_same && is_floating_point)
+			{
+				return _do_normalise(*this);
+			}
+			else if constexpr (is_floating_point)
+			{
+				return _do_normalise(*this).Convert<OutFP_>();
+			}
+			else if constexpr (out_is_fp)
+			{
+				return _do_normalise(this->Convert<OutFP_>());
+			}
+			else
+			{
+				return _do_normalise(this->Convert<preferred_floating_point>()).Convert<OutFP_>();
+			}
+		}
 #pragma endregion
 
 #pragma region CASTS
@@ -4097,6 +4163,19 @@ namespace EmuMath
 		{
 			return data_type({ EmuSIMD::negate<per_element_width>(lhs_[RegisterIndices_])... });
 		}
+
+		template<bool Inverse_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_sqrt(const data_type& in_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			if constexpr (Inverse_)
+			{
+				return data_type({ EmuSIMD::rsqrt<per_element_width, is_signed>(in_[RegisterIndices_])... });
+			}
+			else
+			{
+				return data_type({ EmuSIMD::sqrt<per_element_width, is_signed>(in_[RegisterIndices_])... });
+			}
+		}
 #pragma endregion
 
 #pragma region NON_CONST_BASIC_ARITHMETIC_HELPERS
@@ -4451,6 +4530,60 @@ namespace EmuMath
 			else
 			{
 				return static_cast<Out_>(sqrt(EmuSIMD::horizontal_sum_scalar<double, per_element_width>(_calculate_array_dot_pre_hadd(vec_, vec_, indices_))));
+			}
+		}
+
+		template<class Vector_>
+		static constexpr inline Vector_ _do_normalise(const Vector_& in_)
+		{
+			if constexpr (Vector_::contains_multiple_registers)
+			{
+				return _do_array_normalise<Vector_>(in_, typename Vector_::register_index_sequence());
+			}
+			else
+			{
+				using out_register = typename Vector_::register_type;
+				out_register mag_reciprocal = EmuSIMD::dot_fill(in_.data, in_.data);
+				mag_reciprocal = EmuSIMD::rsqrt<Vector_::per_element_width, Vector_::is_signed>(mag_reciprocal);
+				return Vector_(EmuSIMD::mul_all<Vector_::per_element_width>(in_.data, mag_reciprocal));
+			}
+		}
+
+		template<class Vector_, std::size_t...RegisterIndices_>
+		static constexpr inline Vector_ _do_array_normalise(const Vector_& in_, std::index_sequence<RegisterIndices_...> register_indices_)
+		{
+			using out_register = typename Vector_::register_type;
+			out_register mag = Vector_::make_all_zero_register();
+
+			(
+				(
+					mag = EmuSIMD::add<Vector_::per_element_width>
+					(
+						mag,
+						_do_generic_dot_mult<RegisterIndices_, Vector_>
+						(
+							in_.data[RegisterIndices_],
+							in_.data[RegisterIndices_]
+							)
+						)
+					), ...
+				);
+			mag = EmuSIMD::horizontal_sum_fill<Vector_::per_element_width>(mag);
+
+			return in_ * EmuSIMD::rsqrt<Vector_::per_element_width, Vector_::is_signed>(mag);
+		}
+
+		template<std::size_t RegisterIndex_, class Vector_>
+		static constexpr inline typename Vector_::register_type _do_generic_dot_mult(typename Vector_::register_type a_, typename Vector_::register_type b_)
+		{
+			constexpr std::size_t final_index = Vector_::num_registers - 1;
+			if constexpr (!Vector_::requires_partial_register || RegisterIndex_ != final_index)
+			{
+				return EmuSIMD::mul_all<Vector_::per_element_width>(a_, b_);
+			}
+			else
+			{
+				return EmuSIMD::mul_all<Vector_::per_element_width>(EmuSIMD::bitwise_and(a_, Vector_::make_partial_end_exclude_mask_register()), b_);
 			}
 		}
 

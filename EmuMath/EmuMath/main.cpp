@@ -400,6 +400,29 @@ int main()
 	std::cout << EmuMath::FastVector<4, int>(1, 20, -3, -9).MagnitudeScalar<float>() << "\n";
 
 	system("pause");
+	std::cout << "Square roots\n";
+	std::cout << EmuMath::FastVector<3, float>(3, 2, 26).Sqrt() << "\n";
+	std::cout << EmuMath::FastVector<4, float>(3, 2, 26, 5).Sqrt() << "\n";
+	std::cout << EmuMath::FastVector<8, float>(3, 2, 26, 5, 16, 27, 139, 81).Sqrt() << "\n";
+	std::cout << EmuMath::FastVector<7, float>(3, 2, 26, 5, 16, 27, 139).Sqrt() << "\n";
+	std::cout << EmuMath::FastVector<7, double>(3, 2, 26, 5, 16, 27, 139).Sqrt() << "\n";
+
+	std::cout << "\nInverse square roots\n";
+	std::cout << EmuMath::FastVector<3, float>(3, 2, 26).Rsqrt() << "\n";
+	std::cout << EmuMath::FastVector<4, float>(3, 2, 26, 5).Rsqrt() << "\n";
+	std::cout << EmuMath::FastVector<8, float>(3, 2, 26, 5, 16, 27, 139, 81).Rsqrt() << "\n";
+	std::cout << EmuMath::FastVector<7, float>(3, 2, 26, 5, 16, 27, 139).Rsqrt() << "\n";
+	std::cout << EmuMath::FastVector<7, double>(3, 2, 26, 5, 16, 27, 139).Rsqrt() << "\n";
+
+	std::cout << "\nNormalisations\n";
+	std::cout << EmuMath::FastVector<3, float>(3, 2, 26).Normalise() << "\n";
+	std::cout << EmuMath::FastVector<4, float>(3, 2, 26, 5).Normalise() << "\n";
+	std::cout << EmuMath::FastVector<8, float>(3, 2, 26, 5, 16, 27, 139, 81).Normalise() << "\n";
+	std::cout << EmuMath::FastVector<8, float>(3, 2, 26, 5, 16, 27, 139, 81).Normalise<double>() << "\n";
+	std::cout << EmuMath::FastVector<8, double>(3, 2, 26, 5, 16, 27, 139, 81).Normalise<double>() << "\n";
+
+
+	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 	constexpr auto mat_b_ = EmuMath::Matrix<4, 4, int, true>(1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
 	constexpr auto mat_c_ = EmuMath::Matrix<4, 4, float, true>(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25);
@@ -422,7 +445,6 @@ int main()
 	std::cout << rt_ << "\n\n";
 	rt_.identity(rt_);
 	std::cout << rt_ << "\n\n";
-
 
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
