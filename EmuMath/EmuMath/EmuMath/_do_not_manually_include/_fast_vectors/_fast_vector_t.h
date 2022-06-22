@@ -4121,6 +4121,20 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region COMPARISONS
+	public:
+		[[nodiscard]] constexpr inline bool CmpAnyEqual(const this_type& rhs_) const
+		{
+			return _do_cmp_equal_bool_out<false>(data, rhs_.data);
+		}
+
+
+		[[nodiscard]] constexpr inline bool CmpAllEqual(const this_type& rhs_) const
+		{
+			return _do_cmp_equal_bool_out<true>(data, rhs_.data);
+		}
+#pragma endregion
+
 #pragma region CASTS
 	public:
 		/// <summary>
@@ -4204,13 +4218,13 @@ namespace EmuMath
 			{
 				return arg_.data[Index_];
 			}
-			else if constexpr (std::is_same_v<data_type, arg_uq>)
-			{
-				return arg_[Index_];
-			}
 			else if constexpr (std::is_same_v<register_type, arg_uq>)
 			{
 				return arg_;
+			}
+			else if constexpr (std::is_same_v<data_type, arg_uq>)
+			{
+				return arg_[Index_];
 			}
 			else
 			{
@@ -5240,6 +5254,258 @@ namespace EmuMath
 					_retrieve_register_from_arg<RegisterIndices_>(std::forward<T_>(t_))
 				)...
 			});
+		}
+#pragma endregion
+
+#pragma region COMPARISON_HELPERS
+	private:
+		enum class _cmp_type : std::uint8_t
+		{
+			EQ = 0,
+			NEQ = 1,
+			GT = 2,
+			LT = 3,
+			GE = 4,
+			LE = 5
+		};
+
+		template<bool TakeLhs_, _cmp_type CmpType_>
+		static constexpr inline register_type _mask_register_for_cmp_all(register_type lhs_, register_type rhs_)
+		{
+			if constexpr (CmpType_ == _cmp_type::EQ || CmpType_ == _cmp_type::NEQ || CmpType_ == _cmp_type::GE || CmpType_ == _cmp_type::LE)
+			{
+				if constexpr (TakeLhs_)
+				{
+					return lhs_;
+				}
+				else
+				{
+					register_type mask = make_partial_end_exclude_mask_register();
+					return EmuSIMD::bitwise_or
+					(
+						EmuSIMD::bitwise_and(mask, rhs_),
+						EmuSIMD::bitwise_andnot(mask, lhs_)
+					);
+				}
+			}
+			else if constexpr(CmpType_ == _cmp_type::GT)
+			{
+				if constexpr (TakeLhs_)
+				{
+					register_type mask = make_partial_end_exclude_mask_register();
+					return EmuSIMD::bitwise_or
+					(
+						EmuSIMD::bitwise_and(mask, lhs_),
+						EmuSIMD::bitwise_andnot(mask, EmuSIMD::set1<register_type, per_element_width>(1))
+					);
+				}
+				else
+				{
+					register_type mask = make_partial_end_exclude_mask_register();
+					return EmuSIMD::bitwise_or
+					(
+						EmuSIMD::bitwise_and(mask, rhs_),
+						EmuSIMD::bitwise_andnot(mask, EmuSIMD::setzero<register_type>())
+					);
+				}
+			}
+			else if constexpr(CmpType_ == _cmp_type::LT)
+			{
+				if constexpr (TakeLhs_)
+				{
+					register_type mask = make_partial_end_exclude_mask_register();
+					return EmuSIMD::bitwise_or
+					(
+						EmuSIMD::bitwise_and(mask, lhs_),
+						EmuSIMD::bitwise_andnot(mask, EmuSIMD::setzero<register_type>())
+					);
+				}
+				else
+				{
+					register_type mask = make_partial_end_exclude_mask_register();
+					return EmuSIMD::bitwise_or
+					(
+						EmuSIMD::bitwise_and(mask, rhs_),
+						EmuSIMD::bitwise_andnot(mask, EmuSIMD::set1<register_type, per_element_width>(1))
+					);
+				}
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<CmpType_>(), "Internal EmuMath Error: Called _mask_register_for_cmp_all with an invalid CmpType_.");
+			}
+		}
+
+		template<bool TakeLhs_, _cmp_type CmpType_>
+		static constexpr inline register_type _mask_register_for_cmp_any(register_type lhs_, register_type rhs_)
+		{
+			if constexpr (CmpType_ == _cmp_type::NEQ)
+			{
+				if constexpr (TakeLhs_)
+				{
+					return lhs_;
+				}
+				else
+				{
+					register_type mask = make_partial_end_exclude_mask_register();
+					return EmuSIMD::bitwise_or
+					(
+						EmuSIMD::bitwise_and(mask, rhs_),
+						EmuSIMD::bitwise_andnot(mask, lhs_)
+					);
+				}
+			}
+			else if constexpr (CmpType_ == _cmp_type::EQ || CmpType_ == _cmp_type::GT || CmpType_ == _cmp_type::GE)
+			{
+				if constexpr (TakeLhs_)
+				{
+					register_type mask = make_partial_end_exclude_mask_register();
+					return EmuSIMD::bitwise_or
+					(
+						EmuSIMD::bitwise_and(mask, lhs_),
+						EmuSIMD::bitwise_andnot(mask, EmuSIMD::setzero<register_type>())
+					);
+				}
+				else
+				{
+					register_type mask = make_partial_end_exclude_mask_register();
+					return EmuSIMD::bitwise_or
+					(
+						EmuSIMD::bitwise_and(mask, rhs_),
+						EmuSIMD::bitwise_andnot(mask, EmuSIMD::set1<register_type, per_element_width>(1))
+					);
+				}
+			}
+			else if constexpr (CmpType_ == _cmp_type::LT || CmpType_ == _cmp_type::LE)
+			{
+				if constexpr (TakeLhs_)
+				{
+					register_type mask = make_partial_end_exclude_mask_register();
+					return EmuSIMD::bitwise_or
+					(
+						EmuSIMD::bitwise_and(mask, lhs_),
+						EmuSIMD::bitwise_andnot(mask, EmuSIMD::set1<register_type, per_element_width>(1))
+					);
+				}
+				else
+				{
+					register_type mask = make_partial_end_exclude_mask_register();
+					return EmuSIMD::bitwise_or
+					(
+						EmuSIMD::bitwise_and(mask, rhs_),
+						EmuSIMD::bitwise_andnot(mask, EmuSIMD::setzero<register_type>())
+					);
+				}
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<CmpType_>(), "Internal EmuMath Error: Called _mask_register_for_cmp_any with an invalid CmpType_.");
+			}
+		}
+
+		template<std::size_t RegisterIndex_, _cmp_type CmpType_, bool TakeLhs_, bool All_, class Lhs_, class Rhs_>
+		static constexpr inline register_type _retrieve_register_for_bool_out_cmp(Lhs_&& lhs_, Rhs_&& rhs_)
+		{
+			using in_type = std::conditional_t<TakeLhs_, Lhs_, Rhs_>;
+			using in_uq = typename EmuCore::TMP::remove_ref_cv<in_type>::type;
+			constexpr bool is_final_index = (num_registers - 1) == RegisterIndex_;
+
+			if constexpr (is_final_index && requires_partial_register)
+			{
+				if constexpr (All_)
+				{
+					return _mask_register_for_cmp_all<TakeLhs_, CmpType_>
+					(
+						_retrieve_register_from_arg<RegisterIndex_>(std::forward<Lhs_>(lhs_)),
+						_retrieve_register_from_arg<RegisterIndex_>(std::forward<Rhs_>(rhs_))
+					);
+				}
+				else
+				{
+					return _mask_register_for_cmp_any<TakeLhs_, CmpType_>
+					(
+						_retrieve_register_from_arg<RegisterIndex_>(std::forward<Lhs_>(lhs_)),
+						_retrieve_register_from_arg<RegisterIndex_>(std::forward<Rhs_>(rhs_))
+					);
+				}
+			}
+			else
+			{
+				if constexpr (TakeLhs_)
+				{
+					return _retrieve_register_from_arg<RegisterIndex_>(std::forward<Lhs_>(lhs_));
+				}
+				else
+				{
+					return _retrieve_register_from_arg<RegisterIndex_>(std::forward<Rhs_>(rhs_));
+				}
+			}
+		}
+
+		template<bool All_, class Rhs_, std::size_t...RegisterIndices_ >
+		[[nodiscard]] static constexpr inline bool _do_array_cmp_equal_bool_out(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			if constexpr (All_)
+			{
+				return (... && EmuSIMD::cmp_all_eq<per_element_width, is_signed>
+				(
+					_retrieve_register_for_bool_out_cmp<RegisterIndices_>(lhs_),
+					_retrieve_register_for_bool_out_cmp<RegisterIndices_>(std::forward<Rhs_>(rhs_)))
+				);
+			}
+			else
+			{
+				return 
+				(
+					... || EmuSIMD::cmp_any_eq<per_element_width, is_signed>
+					(
+						_retrieve_register_for_bool_out_cmp<RegisterIndices_>(lhs_),
+						_retrieve_register_for_bool_out_cmp<RegisterIndices_>(std::forward<Rhs_>(rhs_))
+					)
+				);
+			}
+		}
+
+		template<bool All_, class Rhs_>
+		[[nodiscard]] static constexpr inline bool _do_cmp_equal_bool_out(const data_type& lhs_, Rhs_&& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return _do_array_cmp_equal_bool_out<All_>(lhs_, std::forward<Rhs_>(rhs_));
+			}
+			else
+			{
+				if constexpr (requires_partial_register)
+				{
+					if constexpr (All_)
+					{
+						return EmuSIMD::cmp_all_eq
+						(
+							_retrieve_register_for_bool_out_cmp<0, _cmp_type::EQ, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
+							_retrieve_register_for_bool_out_cmp<0, _cmp_type::EQ, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
+						);
+					}
+					else
+					{
+						return EmuSIMD::cmp_any_eq
+						(
+							_retrieve_register_for_bool_out_cmp<0, _cmp_type::EQ, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
+							_retrieve_register_for_bool_out_cmp<0, _cmp_type::EQ, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
+						);
+					}
+				}
+				else
+				{
+					if constexpr (All_)
+					{
+						return EmuSIMD::cmp_all_eq(lhs_, _retrieve_register_from_arg<0>(std::forward<Rhs_>(rhs_)));
+					}
+					else
+					{
+						return EmuSIMD::cmp_any_eq(lhs_, _retrieve_register_from_arg<0>(std::forward<Rhs_>(rhs_)));
+					}
+				}
+			}
 		}
 #pragma endregion
 

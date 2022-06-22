@@ -8,6 +8,53 @@
 namespace EmuCore::TMP
 {
 #pragma region TEMPLATE_HELPERS
+	template<bool...Bools_>
+	using bool_sequence = std::integer_sequence<bool, Bools_...>;
+
+	template<std::size_t Count_>
+	struct true_bool_sequence_maker
+	{
+	private:
+		template<class IndexSequence_>
+		struct _instantiator
+		{
+			using type = std::integer_sequence<bool>;
+		};
+
+		template<std::size_t...Indices_>
+		struct _instantiator<std::index_sequence<Indices_...>>
+		{
+			using type = bool_sequence<(true || Indices_)...>;
+		};
+
+	public:
+		using type = typename _instantiator<std::make_index_sequence<Count_>>::type;
+	};
+	template<std::size_t Count_>
+	using make_true_bool_sequence = typename true_bool_sequence_maker<Count_>::type;
+
+	template<std::size_t Count_>
+	struct false_bool_sequence_maker
+	{
+	private:
+		template<class IndexSequence_>
+		struct _instantiator
+		{
+			using type = std::integer_sequence<bool>;
+		};
+
+		template<std::size_t...Indices_>
+		struct _instantiator<std::index_sequence<Indices_...>>
+		{
+			using type = bool_sequence<(false && Indices_)...>;
+		};
+
+	public:
+		using type = typename _instantiator<std::make_index_sequence<Count_>>::type;
+	};
+	template<std::size_t Count_>
+	using make_false_bool_sequence = typename false_bool_sequence_maker<Count_>::type;
+
 	/// <summary>
 	/// <para> Helper to safely instantiate a Template_ from variadic Args_, cancelling instantiation if it is a failure. </para>
 	/// <para> If instantiation fails, type will be void. Otherwise, it will be an instance of Template_ instantiated with the provided Args_. </para>

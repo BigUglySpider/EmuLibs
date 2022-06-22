@@ -240,7 +240,7 @@ namespace EmuSIMD
 	}
 
 	template<bool SignedIfInt_, bool...IndexMustBeTrue_, class Register_>
-	[[nodiscard]] inline bool cmp_all_eq(Register_ lhs_, Register_ rhs_)
+	[[nodiscard]] inline bool cmp_selected_eq(Register_ lhs_, Register_ rhs_)
 	{
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
@@ -261,18 +261,34 @@ namespace EmuSIMD
 			}
 			else
 			{
-				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_all_eq, but the passed IndexMustBeTrue_ arguments could not be used with the provided SIMD register to form a valid movemask. The number of boolean arguments must be equal to 1 or the number of elements contained within the register. If the register is integral, the number of arguments can be 1, register_width/64, register_width/32, register_width/16, or register_width/8, where the bit-width per element is determined as the denominator in these fractions.");
+				static_assert
+				(
+					EmuCore::TMP::get_false<Register_>(),
+					"Attempted to perform EmuSIMD::cmp_all_eq, but the passed IndexMustBeTrue_ arguments could not be used with the provided SIMD register to form a valid movemask. The number of boolean arguments must be equal to 1 or the number of elements contained within the register. If the register is integral, the number of arguments can be 1, register_width/64, register_width/32, register_width/16, or register_width/8, where the bit-width per element is determined as the denominator in these fractions."
+				);
 			}
 		}
 		else
 		{
-			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::cmp_all_eq, but the passed Register_ type is not recognised as a supported SIMD register.");
+			static_assert
+			(
+				EmuCore::TMP::get_false<Register_>(),
+				"Attempted to perform EmuSIMD::cmp_all_eq, but the passed Register_ type is not recognised as a supported SIMD register."
+			);
 		}
 	}
-	template<bool SignedIfInt_ = true, class Register_>
+
+	template<bool SignedIfInt_, bool...IndexMustBeTrue_, class Register_>
+	[[nodiscard]] inline bool cmp_selected_eq(Register_ lhs_, Register_ rhs_, EmuCore::TMP::bool_sequence<IndexMustBeTrue_...> indices_must_be_true_)
+	{
+		return cmp_selected_eq<SignedIfInt_, IndexMustBeTrue_...>(lhs_, rhs_);
+	}
+
+	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
 	[[nodiscard]] inline bool cmp_all_eq(Register_ lhs_, Register_ rhs_)
 	{
-		return cmp_all_eq<SignedIfInt_, true>(lhs_, rhs_);
+		constexpr std::size_t count = EmuSIMD::TMP::register_element_count_v<Register_, PerElementWidthIfInt_>;
+		return cmp_selected_eq<SignedIfInt_>(lhs_, rhs_, EmuCore::TMP::make_true_bool_sequence<count>());
 	}
 
 	template<bool SignedIfInt_, bool...ResultAtIndex_, class Register_>
