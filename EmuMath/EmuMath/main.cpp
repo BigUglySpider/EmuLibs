@@ -436,6 +436,28 @@ int main()
 	std::cout << EmuMath::FastVector<7, float>(1, -3, 26.2f, 33, -9, 2.5, 1337).ClampMin(EmuMath::FastVector<7, float>(3, 2, 1, 6, -9, -2.5, 1337.1f)) << "\n";
 	std::cout << EmuMath::FastVector<7, float>(1, -3, 26.2f, 33, -9, 2.5, 1337).ClampMax(EmuMath::FastVector<7, float>(3, 2, 1, 6, -9, -2.5, 1337.1f)) << "\n";
 	std::cout << EmuMath::FastVector<7, float>(1, -3, 26.2f, 33, -9, 2.5, 1337).Clamp(EmuMath::FastVector<7, float>(3, 2, 1, 6, -9, -2.5, 1337.1f), 15) << "\n";
+	
+	std::cout << "\nFMADD\n";
+	std::cout << EmuMath::FastVector<4, float>(1, 2, 3, 4).Fmadd(EmuMath::FastVector<4, float>(0, 10, 20, 1), EmuMath::FastVector<4, float>(69, 12, 18, -1341)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(1, 2, 3, 4).Fmadd(EmuMath::FastVector<4, float>(0, 10, 20, 1), 12) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(1, 2, 3, 4).Fmadd(5, EmuMath::FastVector<4, float>(69, 12, 18, -1341)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(1, 2, 3, 4).Fmadd(6, 12) << "\n";
+
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).Fmadd(EmuMath::FastVector<7, float>(0, 10, 20, 1, -1, -2, 0.5f), EmuMath::FastVector<7, float>(69, 12, 18, -1341, 19, 0, 2)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).Fmadd(EmuMath::FastVector<7, float>(0, 10, 20, 1, -1, -2, 0.5f), 12) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).Fmadd(5, EmuMath::FastVector<7, float>(69, 12, 18, -1341, 19, 0, 2)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).Fmadd(6, 12) << "\n";
+
+	std::cout << "\nFMSUB\n";
+	std::cout << EmuMath::FastVector<4, float>(1, 2, 3, 4).Fmsub(EmuMath::FastVector<4, float>(0, 10, 20, 1), EmuMath::FastVector<4, float>(69, 12, 18, -1341)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(1, 2, 3, 4).Fmsub(EmuMath::FastVector<4, float>(0, 10, 20, 1), 12) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(1, 2, 3, 4).Fmsub(5, EmuMath::FastVector<4, float>(69, 12, 18, -1341)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(1, 2, 3, 4).Fmsub(6, 12) << "\n";
+
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).Fmsub(EmuMath::FastVector<7, float>(0, 10, 20, 1, -1, -2, 0.5f), EmuMath::FastVector<7, float>(69, 12, 18, -1341, 19, 0, 2)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).Fmsub(EmuMath::FastVector<7, float>(0, 10, 20, 1, -1, -2, 0.5f), 12) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).Fmsub(5, EmuMath::FastVector<7, float>(69, 12, 18, -1341, 19, 0, 2)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).Fmsub(6, 12) << "\n";
 
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);

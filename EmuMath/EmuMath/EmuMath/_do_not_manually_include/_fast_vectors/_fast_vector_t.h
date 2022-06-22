@@ -720,6 +720,178 @@ namespace EmuMath
 				return this_type(EmuSIMD::negate<per_element_width>(data));
 			}
 		}
+
+		/// <summary>
+		/// <para>
+		///		Performs a fused multiply-add operation on this Vector with the passed operands, 
+		///		multiplying it by `multiplier_` and adding `to_add_` to the intermediate multiplication result.
+		/// </para>
+		/// <para> A fused operation will not perform a floating-point round until the addition has been performed; as such, this may help with performance and/or accuracy. </para>
+		/// <para> If an argument is of this Vector type, respective elements will be used. </para>
+		/// <para> If an argument is of this Vector's register_type, respective register elements will be used for all registers. </para>
+		/// <para> If an argument is of this Vector's value_type, it will be used to create an intermediate register to use with all elements. </para>
+		/// </summary>
+		/// <param name="multiplier_">Multiplier to use with this Vector to create the intermediate result before addition.</param>
+		/// <param name="to_add_">Value(s) to add to the intermediate multiplication result before a floating-point round.</param>
+		/// <returns>Vector resulting from the fused arithmetic operation.</returns>
+		[[nodiscard]] constexpr inline this_type Fmadd(const this_type& multiplier_, const this_type& to_add_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_fmadd(data, multiplier_.data, to_add_.data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::fmadd<per_element_width>(data, multiplier_.data, to_add_.data));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type Fmadd(const this_type& multiplier_, register_type to_add_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_fmadd(data, multiplier_.data, to_add_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::fmadd<per_element_width>(data, multiplier_.data, to_add_));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type Fmadd(register_type multiplier_, const this_type& to_add_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_fmadd(data, multiplier_, to_add_.data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::fmadd<per_element_width>(data, multiplier_, to_add_.data));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type Fmadd(register_type multiplier_, register_type to_add_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_fmadd(data, multiplier_, to_add_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::fmadd<per_element_width>(data, multiplier_, to_add_));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type Fmadd(const this_type& multiplier_, value_type to_add_to_all_) const
+		{
+			return Fmadd(multiplier_, EmuSIMD::set1<register_type, per_element_width>(to_add_to_all_));
+		}
+
+		[[nodiscard]] constexpr inline this_type Fmadd(value_type multiplier_for_all_, const this_type& to_add_) const
+		{
+			return Fmadd(EmuSIMD::set1<register_type, per_element_width>(multiplier_for_all_), to_add_);
+		}
+
+		[[nodiscard]] constexpr inline this_type Fmadd(register_type multiplier_, value_type to_add_to_all_) const
+		{
+			return Fmadd(multiplier_, EmuSIMD::set1<register_type, per_element_width>(to_add_to_all_));
+		}
+
+		[[nodiscard]] constexpr inline this_type Fmadd(value_type multiplier_for_all_, register_type to_add_) const
+		{
+			return Fmadd(EmuSIMD::set1<register_type, per_element_width>(multiplier_for_all_), to_add_);
+		}
+
+		[[nodiscard]] constexpr inline this_type Fmadd(value_type multiplier_for_all_, value_type to_add_to_all_) const
+		{
+			return Fmadd(EmuSIMD::set1<register_type, per_element_width>(multiplier_for_all_), EmuSIMD::set1<register_type, per_element_width>(to_add_to_all_));
+		}
+
+		/// <summary>
+		/// <para>
+		///		Performs a fused multiply-subtract operation on this Vector with the passed operands, 
+		///		multiplying it by `multiplier_` and subtracting `to_subtract_` from the intermediate multiplication result.
+		/// </para>
+		/// <para> A fused operation will not perform a floating-point round until the subtraction has been performed; as such, this may help with performance and/or accuracy. </para>
+		/// <para> If an argument is of this Vector type, respective elements will be used. </para>
+		/// <para> If an argument is of this Vector's register_type, respective register elements will be used for all registers. </para>
+		/// <para> If an argument is of this Vector's value_type, it will be used to create an intermediate register to use with all elements. </para>
+		/// </summary>
+		/// <param name="multiplier_">Multiplier to use with this Vector to create the intermediate result before subtraction.</param>
+		/// <param name="to_subtract_">Value(s) to subtract from the intermediate multiplication result before a floating-point round.</param>
+		/// <returns>Vector resulting from the fused arithmetic operation.</returns>
+		[[nodiscard]] constexpr inline this_type Fmsub(const this_type& multiplier_, const this_type& to_subtract_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_fmsub(data, multiplier_.data, to_subtract_.data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::fmsub<per_element_width>(data, multiplier_.data, to_subtract_.data));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type Fmsub(const this_type& multiplier_, register_type to_subtract_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_fmsub(data, multiplier_.data, to_subtract_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::fmsub<per_element_width>(data, multiplier_.data, to_subtract_));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type Fmsub(register_type multiplier_, const this_type& to_subtract_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_fmsub(data, multiplier_, to_subtract_.data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::fmsub<per_element_width>(data, multiplier_, to_subtract_.data));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type Fmsub(register_type multiplier_, register_type to_subtract_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_fmsub(data, multiplier_, to_subtract_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::fmsub<per_element_width>(data, multiplier_, to_subtract_));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type Fmsub(const this_type& multiplier_, value_type to_subtract_from_all_) const
+		{
+			return Fmsub(multiplier_, EmuSIMD::set1<register_type, per_element_width>(to_subtract_from_all_));
+		}
+
+		[[nodiscard]] constexpr inline this_type Fmsub(value_type multiplier_for_all_, const this_type& to_subtract_) const
+		{
+			return Fmsub(EmuSIMD::set1<register_type, per_element_width>(multiplier_for_all_), to_subtract_);
+		}
+
+		[[nodiscard]] constexpr inline this_type Fmsub(register_type multiplier_, value_type to_subtract_from_all_) const
+		{
+			return Fmsub(multiplier_, EmuSIMD::set1<register_type, per_element_width>(to_subtract_from_all_));
+		}
+
+		[[nodiscard]] constexpr inline this_type Fmsub(value_type multiplier_for_all_, register_type to_subtract_) const
+		{
+			return Fmsub(EmuSIMD::set1<register_type, per_element_width>(multiplier_for_all_), to_subtract_);
+		}
+
+		[[nodiscard]] constexpr inline this_type Fmsub(value_type multiplier_for_all_, value_type to_subtract_from_all_) const
+		{
+			return Fmsub(EmuSIMD::set1<register_type, per_element_width>(multiplier_for_all_), EmuSIMD::set1<register_type, per_element_width>(to_subtract_from_all_));
+		}
 #pragma endregion
 
 #pragma region CONST_MISC_ARITHMETIC
@@ -4407,6 +4579,34 @@ namespace EmuMath
 		static constexpr inline data_type _do_array_negate(const data_type& lhs_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			return data_type({ EmuSIMD::negate<per_element_width>(lhs_[RegisterIndices_])... });
+		}
+
+		template<class Mul_, class Add_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_fmadd(const data_type& a_, Mul_&& mul_, Add_&& add_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type
+			({
+				EmuSIMD::fmadd<per_element_width>
+				(
+					a_[RegisterIndices_],
+					_retrieve_register_from_arg<RegisterIndices_>(std::forward<Mul_>(mul_)),
+					_retrieve_register_from_arg<RegisterIndices_>(std::forward<Add_>(add_))
+				)...
+			});
+		}
+
+		template<class Mul_, class Sub_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_fmsub(const data_type& a_, Mul_&& mul_, Sub_&& sub_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type
+			({
+				EmuSIMD::fmsub<per_element_width>
+				(
+					a_[RegisterIndices_],
+					_retrieve_register_from_arg<RegisterIndices_>(std::forward<Mul_>(mul_)),
+					_retrieve_register_from_arg<RegisterIndices_>(std::forward<Sub_>(sub_))
+				)...
+			});
 		}
 #pragma endregion
 
