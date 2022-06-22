@@ -720,7 +720,10 @@ namespace EmuMath
 				return this_type(EmuSIMD::negate<per_element_width>(data));
 			}
 		}
+#pragma endregion
 
+#pragma region CONST_MISC_ARITHMETIC
+	public:
 		/// <summary>
 		/// <para> Calculates the square root of elements within this Vector.</para>
 		/// </summary>
@@ -815,6 +818,184 @@ namespace EmuMath
 			{
 				return this_type(EmuSIMD::abs<per_element_width, is_signed>(data));
 			}
+		}
+
+		/// <summary>
+		/// <para> Clamps the elements of this Vector to a minimum of the values of respective elements in the passed Vector. </para>
+		/// </summary>
+		/// <param name="min_">Vector to clamp this Vector to a minimum of.</param>
+		/// <returns>Copy of this Vector with elements clamped to a minimum of respective elements of min_.</returns>
+		[[nodiscard]] constexpr inline this_type ClampMin(const this_type& min_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_clamp_min(data, min_.data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::clamp_min<per_element_width, is_signed>(data, min_.data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Clamps the registers of this Vector to a minimum of respective elements within the passed register. </para>
+		/// </summary>
+		/// <param name="min_">Register to clamp this Vector's registers via.</param>
+		/// <returns>Copy of this Vector with its registers clamped to a minimum of the passed min_ register.</returns>
+		[[nodiscard]] constexpr inline this_type ClampMin(register_type min_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_clamp_min(data, min_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::clamp_min<per_element_width, is_signed>(data, min_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Clamps all elements of this Vector to a minimum of the passed value </para>
+		/// <para>
+		///		This will create an intermediate SIMD register to perform the clamp. 
+		///		If multiple uses of this clamp are required, it is recommended to create the intermediate register and pass that instead.
+		/// </para>
+		/// </summary>
+		/// <param name="min_">Value to clamp all of this Vector's elements to a minimum of.</param>
+		/// <returns>Copy of this Vector with elements clamped to a minimum of min_for_all_.</returns>
+		[[nodiscard]] constexpr inline this_type ClampMin(value_type min_for_all_) const
+		{
+			return ClampMin(EmuSIMD::set1<register_type, per_element_width>(min_for_all_));
+		}
+
+		/// <summary>
+		/// <para> Clamps the elements of this Vector to a maximum of the values of respective elements in the passed Vector. </para>
+		/// </summary>
+		/// <param name="max_">Vector to clamp this Vector to a maximum of.</param>
+		/// <returns>Copy of this Vector with elements clamped to a maximum of respective elements of max_.</returns>
+		[[nodiscard]] constexpr inline this_type ClampMax(const this_type& max_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_clamp_max(data, max_.data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::clamp_max<per_element_width, is_signed>(data, max_.data));
+			}
+		}
+
+		/// <summary>
+		/// <para> Clamps the registers of this Vector to a minimum of respective elements within the passed register. </para>
+		/// </summary>
+		/// <param name="min_">Register to clamp this Vector's registers via.</param>
+		/// <returns>Copy of this Vector with its registers clamped to a maximum of the passed max_ register.</returns>
+		[[nodiscard]] constexpr inline this_type ClampMax(register_type max_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_clamp_max(data, max_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::clamp_max<per_element_width, is_signed>(data, max_));
+			}
+		}
+
+		/// <summary>
+		/// <para> Clamps all elements of this Vector to a minimum of the passed value </para>
+		/// <para>
+		///		This will create an intermediate SIMD register to perform the clamp. 
+		///		If multiple uses of this clamp are required, it is recommended to create the intermediate register and pass that instead.
+		/// </para>
+		/// </summary>
+		/// <param name="max_for_all_">Value to clamp all of this Vector's elements to a maximum of.</param>
+		/// <returns>Copy of this Vector with elements clamped to a maximum of max_for_all_.</returns>
+		[[nodiscard]] constexpr inline this_type ClampMax(value_type max_for_all_) const
+		{
+			return ClampMax(EmuSIMD::set1<register_type, per_element_width>(max_for_all_));
+		}
+
+		/// <summary>
+		/// <para> Clamps the elements of this Vector to the range of the values of respective elements in the passed arguments. </para>
+		/// <para> If an argument is a Vector of this type, respective elements will be clamped to it. </para>
+		/// <para> If an argument is of this Vector's register_type, it will be used to clamp respective elements of all registers. </para>
+		/// <para> If an argument is of this Vector's value_type, it will be used to clamp all elements. </para>
+		/// </summary>
+		/// <param name="min_">Argument of this Vector type, its register_type, or its value_type to clamp to a minimum of.</param>
+		/// <param name="max_">Argument of this Vector type, its register_type, or its value_type to clamp to a maximum of.</param>
+		/// <returns>Copy of this Vector with elements clamped between min_ and max_ as described.</returns>
+		[[nodiscard]] constexpr inline this_type Clamp(const this_type& min_, const this_type& max_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_clamp(data, min_.data, max_.data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::clamp<per_element_width, is_signed>(data, max_.data));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type Clamp(const this_type& min_, register_type max_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_clamp(data, min_.data, max_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::clamp<per_element_width, is_signed>(data, min_.data, max_));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type Clamp(register_type min_, const this_type& max_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_clamp(data, min_, max_.data, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::clamp<per_element_width, is_signed>(data, min_, max_.data));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type Clamp(register_type min_, register_type max_) const
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return this_type(_do_array_clamp(data, min_, max_, register_index_sequence()));
+			}
+			else
+			{
+				return this_type(EmuSIMD::clamp<per_element_width, is_signed>(data, min_, max_));
+			}
+		}
+
+		[[nodiscard]] constexpr inline this_type Clamp(const this_type& min_, value_type max_for_all_) const
+		{
+			return Clamp(min_, EmuSIMD::set1<register_type, per_element_width>(max_for_all_));
+		}
+
+		[[nodiscard]] constexpr inline this_type Clamp(value_type min_for_all_, const this_type& max_) const
+		{
+			return Clamp(EmuSIMD::set1<register_type, per_element_width>(min_for_all_), max_);
+		}
+
+		[[nodiscard]] constexpr inline this_type Clamp(register_type min_, value_type max_for_all_) const
+		{
+			return Clamp(min_, EmuSIMD::set1<register_type, per_element_width>(max_for_all_));
+		}
+
+		[[nodiscard]] constexpr inline this_type Clamp(value_type min_for_all_, register_type max_) const
+		{
+			return Clamp(EmuSIMD::set1<register_type, per_element_width>(min_for_all_), max_);
+		}
+
+		[[nodiscard]] constexpr inline this_type Clamp(value_type min_for_all_, value_type max_for_all_) const
+		{
+			return Clamp(EmuSIMD::set1<register_type, per_element_width>(min_for_all_), EmuSIMD::set1<register_type, per_element_width>(max_for_all_));
 		}
 #pragma endregion
 
@@ -4227,7 +4408,10 @@ namespace EmuMath
 		{
 			return data_type({ EmuSIMD::negate<per_element_width>(lhs_[RegisterIndices_])... });
 		}
+#pragma endregion
 
+#pragma region CONST_MISC_ARITHMETIC_HELPERS
+	private:
 		template<bool Inverse_, std::size_t...RegisterIndices_>
 		static constexpr inline data_type _do_array_sqrt(const data_type& in_, std::index_sequence<RegisterIndices_...> indices_)
 		{
@@ -4263,6 +4447,46 @@ namespace EmuMath
 		static constexpr inline data_type _do_array_abs(const data_type& in_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			return data_type({ EmuSIMD::abs<per_element_width, is_signed>(in_[RegisterIndices_])... });
+		}
+
+		template<class Min_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_clamp_min(const data_type& a_, Min_&& min_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type
+			({
+				EmuSIMD::clamp_min<per_element_width, is_signed>
+				(
+					a_[RegisterIndices_],
+					_retrieve_register_from_arg<RegisterIndices_>(std::forward<Min_>(min_))
+				)...
+			});
+		}
+
+		template<class Max_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_clamp_max(const data_type& a_, Max_&& max_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type
+			({
+				EmuSIMD::clamp_max<per_element_width, is_signed>
+				(
+					a_[RegisterIndices_],
+					_retrieve_register_from_arg<RegisterIndices_>(std::forward<Max_>(max_))
+				)...
+			});
+		}
+
+		template<class Min_, class Max_, std::size_t...RegisterIndices_>
+		static constexpr inline data_type _do_array_clamp(const data_type& a_, Min_&& min_, Max_&& max_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			return data_type
+			({
+				EmuSIMD::clamp<per_element_width, is_signed>
+				(
+					a_[RegisterIndices_],
+					_retrieve_register_from_arg<RegisterIndices_>(std::forward<Min_>(min_)),
+					_retrieve_register_from_arg<RegisterIndices_>(std::forward<Max_>(max_))
+				)...
+			});
 		}
 #pragma endregion
 

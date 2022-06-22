@@ -429,6 +429,14 @@ int main()
 	std::cout << "Trunc: " << rounds_and_abs.Trunc() << "\n";
 	std::cout << "Abs: " << rounds_and_abs.Abs() << "\n";
 
+	std::cout << "\nClamps\n";
+	std::cout << EmuMath::FastVector<4, float>(1, -3, 26.2f, 33).ClampMin(EmuMath::FastVector<4, float>(3, 2, 1, 6)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(1, -3, 26.2f, 33).ClampMax(EmuMath::FastVector<4, float>(3, 2, 1, 6)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(1, -3, 26.2f, 33).Clamp(EmuMath::FastVector<4, float>(3, 2, 1, 6), 15) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, -3, 26.2f, 33, -9, 2.5, 1337).ClampMin(EmuMath::FastVector<7, float>(3, 2, 1, 6, -9, -2.5, 1337.1f)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, -3, 26.2f, 33, -9, 2.5, 1337).ClampMax(EmuMath::FastVector<7, float>(3, 2, 1, 6, -9, -2.5, 1337.1f)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, -3, 26.2f, 33, -9, 2.5, 1337).Clamp(EmuMath::FastVector<7, float>(3, 2, 1, 6, -9, -2.5, 1337.1f), 15) << "\n";
+
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 	constexpr auto mat_b_ = EmuMath::Matrix<4, 4, int, true>(1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
