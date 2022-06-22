@@ -3843,6 +3843,85 @@ namespace EmuMath
 		}
 
 		/// <summary>
+		/// <para> Calculates the distance between this Vector and target_, which is equivalent to the magnitude of the Vector resulting from `target_ - this_vector`. </para>
+		/// <para> The result will remain as a Vector, and is guaranteed to at least be stored within the first element in the output Vector. </para>
+		/// <para> If a Vector full of the result is required, use `DistanceFill` instead. </para>
+		/// <para> If only a scalar result is required, use `DistanceScalar` instead. </para>
+		/// </summary>
+		/// <returns>Scalar of the provided output type containing the distance between this Vector and the target_ Vector in at least its very first element.</returns>
+		[[nodiscard]] constexpr inline this_type Distance(const this_type& target_) const
+		{
+			return target_.Subtract(*this).Magnitude();
+		}
+
+		/// <summary>
+		/// <para> Calculates the distance between this Vector and target_, which is equivalent to the magnitude of the Vector resulting from `target_ - this_vector`. </para>
+		/// <para> The result will remain as a Vector, and is guaranteed to be stored in all elements of the output Vector. </para>
+		/// <para> If only a scalar result is required, use `DistanceScalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the distance between this Vector and the target_ Vector in every element.</returns>
+		[[nodiscard]] constexpr inline this_type DistanceFill(const this_type& target_) const
+		{
+			return target_.Subtract(*this).MagnitudeFill();
+		}
+
+		/// <summary>
+		/// <para> Calculates the distance between this Vector and target_, which is equivalent to the magnitude of the Vector resulting from `target_ - this_vector`. </para>
+		/// <para> The result will be a scalar extracted from a resulting intermediate Vector. </para>
+		/// <para> If a Vector full of the result is required, use `DistanceFill` instead. </para>
+		/// </summary>
+		/// <returns>Scalar of the provided output type, containing the distance between this Vector and the target_ Vector in every element.</returns>
+		template<typename Out_ = value_type>
+		[[nodiscard]] constexpr inline Out_ DistanceScalar(const this_type& target_) const
+		{
+			return target_.Subtract(*this).MagnitudeScalar<Out_>();
+		}
+
+		/// <summary>
+		/// <para> 
+		///		Calculates the squared distance between this Vector and target_, 
+		///		which is equivalent to the squared magnitude of the Vector resulting from `target_ - this_vector`.
+		/// </para>
+		/// <para> The result will remain as a Vector, and is guaranteed to at least be stored within the first element in the output Vector. </para>
+		/// <para> If a Vector full of the result is required, use `SquareDistanceFill` instead. </para>
+		/// <para> If only a scalar result is required, use `SquareDistanceScalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the squared distance between this Vector and the target_ Vector in at least its very first element.</returns>
+		[[nodiscard]] constexpr inline this_type SquareDistance(const this_type& target_) const
+		{
+			return target_.Subtract(*this).SquareMagnitude();
+		}
+
+		/// <summary>
+		/// <para> 
+		///		Calculates the squared distance between this Vector and target_, 
+		///		which is equivalent to the squared magnitude of the Vector resulting from `target_ - this_vector`.
+		/// </para>
+		/// <para> The result will remain as a Vector, and is guaranteed to be stored in all elements of the output Vector. </para>
+		/// <para> If only a scalar result is required, use `SquareDistanceScalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the squared distance between this Vector and the target_ Vector in every element.</returns>
+		[[nodiscard]] constexpr inline this_type SquareDistanceFill(const this_type& target_) const
+		{
+			return target_.Subtract(*this).SquareMagnitudeFill();
+		}
+
+		/// <summary>
+		/// <para> 
+		///		Calculates the squared distance between this Vector and target_, 
+		///		which is equivalent to the squared magnitude of the Vector resulting from `target_ - this_vector`.
+		/// </para>
+		/// <para> The result will be a scalar extracted from a resulting intermediate Vector. </para>
+		/// <para> If a Vector full of the result is required, use `SquareDistanceFill` instead. </para>
+		/// </summary>
+		/// <returns>Scalar of the provided output type, containing the squared distance between this Vector and the target_ Vector in every element.</returns>
+		template<typename Out_ = value_type>
+		[[nodiscard]] constexpr inline Out_ SquareDistanceScalar(const this_type& target_) const
+		{
+			return target_.Subtract(*this).SquareMagnitudeScalar<Out_>();
+		}
+
+		/// <summary>
 		/// <para> Linearly interpolates this Vector with the provided b_ and t_ arguments. </para>
 		/// <para> If an argument is a FastVector, all registers and elements will be used respectively. </para>
 		/// <para> If an argument is this Vector's register_type, each respective element of it will be used for all registers. </para>

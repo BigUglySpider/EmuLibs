@@ -459,6 +459,14 @@ int main()
 	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).Fmsub(5, EmuMath::FastVector<7, float>(69, 12, 18, -1341, 19, 0, 2)) << "\n";
 	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).Fmsub(6, 12) << "\n";
 
+	std::cout << "\nDISTANCE\n";
+	std::cout << EmuMath::FastVector<4, float>(1, 2, 3, 4).Distance(EmuMath::FastVector<4, float>(1, 0, -3, 16)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(1, 2, 3, 4).DistanceFill(EmuMath::FastVector<4, float>(1, 0, -3, 16)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(1, 2, 3, 4).DistanceScalar(EmuMath::FastVector<4, float>(1, 0, -3, 16)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(1, 2, 3, 4).SquareDistance(EmuMath::FastVector<4, float>(1, 0, -3, 16)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(1, 2, 3, 4).SquareDistanceFill(EmuMath::FastVector<4, float>(1, 0, -3, 16)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(1, 2, 3, 4).SquareDistanceScalar(EmuMath::FastVector<4, float>(1, 0, -3, 16)) << "\n";
+
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 	constexpr auto mat_b_ = EmuMath::Matrix<4, 4, int, true>(1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
