@@ -474,6 +474,28 @@ int main()
 	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAllEqual(EmuMath::FastVector<3, float>(1, 2, 3)) << "\n";
 	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAllEqual(EmuMath::FastVector<3, float>(4, 4, 4)) << "\n";
 	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAllEqual(EmuMath::FastVector<3, float>(4, 2, 4)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAnyEqual(EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAnyEqual(EmuMath::FastVector<7, float>(4, 4, 4, 5, 4, 4, 4)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAnyEqual(EmuMath::FastVector<7, float>(4, 4, 4, 6, 9, 2, 7)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAllEqual(EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAllEqual(EmuMath::FastVector<7, float>(4, 4, 4, 5, 4, 4, 4)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAllEqual(EmuMath::FastVector<7, float>(4, 4, 4, 6, 9, 2, 7)) << "\n";
+
+	std::cout << "\nCMPNEQ\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAnyNotEqual(EmuMath::FastVector<3, float>(1, 2, 3)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAnyNotEqual(EmuMath::FastVector<3, float>(4, 4, 4)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAnyNotEqual(EmuMath::FastVector<3, float>(4, 2, 4)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAllNotEqual(EmuMath::FastVector<3, float>(1, 2, 3)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAllNotEqual(EmuMath::FastVector<3, float>(4, 4, 4)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAllNotEqual(EmuMath::FastVector<3, float>(4, 2, 4)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAnyNotEqual(EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAnyNotEqual(EmuMath::FastVector<7, float>(4, 4, 4, 5, 4, 4, 4)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAnyNotEqual(EmuMath::FastVector<7, float>(4, 4, 4, 6, 9, 2, 7)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAllNotEqual(EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAllNotEqual(EmuMath::FastVector<7, float>(4, 4, 4, 5, 4, 4, 4)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAllNotEqual(EmuMath::FastVector<7, float>(4, 4, 4, 6, 9, 2, 7)) << "\n";
 
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);

@@ -486,9 +486,7 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 abs_f32x4(EmuSIMD::f32x4_arg in_)
 	{
-		EmuSIMD::f32x4 negative_mask = cmplt_f32x4(in_, setzero_f32x4());
-		EmuSIMD::f32x4 out = _mm_and_ps(negative_mask, mul_all_f32x4(in_, set1_f32x4(-1)));
-		return _mm_or_ps(out, _mm_andnot_ps(negative_mask, in_));
+		return _mm_andnot_ps(set1_f32x4(-0.0f), in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 sqrt_f32x4(EmuSIMD::f32x4_arg in_)
@@ -499,6 +497,13 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 rsqrt_f32x4(EmuSIMD::f32x4_arg in_)
 	{
 		return _mm_rsqrt_ps(in_);
+	}
+#pragma endregion
+
+#pragma region NEAR_COMPARISONS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f32x4 cmpnear_f32x4(EmuSIMD::f32x4_arg lhs_, EmuSIMD::f32x4_arg rhs_, EmuSIMD::f32x4_arg epsilon = set1_f32x4(EmuCore::epsilon<float>::get()))
+	{
+		return cmple_f32x4(abs_f32x4(sub_f32x4(lhs_, rhs_)), epsilon);
 	}
 #pragma endregion
 }

@@ -154,6 +154,7 @@
     <ClInclude Include="EmuCore\ArithmeticHelpers\BitHelpers.h" />
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonMath.h" />
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonValues.h" />
+    <ClInclude Include="EmuCore\CommonTypes\ComparisonEnum.h" />
     <ClInclude Include="EmuCore\CommonTypes\Stopwatch.h" />
     <ClInclude Include="EmuCore\CommonTypes\Timer.h" />
     <ClInclude Include="EmuCore\Events\Event.h" />

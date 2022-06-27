@@ -4,7 +4,6 @@
 #include "../_simd_helpers_underlying_aliases.h"
 
 #include <cstdint>
-
 #include <immintrin.h>
 
 /// <summary>

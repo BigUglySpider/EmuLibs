@@ -518,6 +518,18 @@ namespace EmuSIMD::Funcs
 		return _mm256_cvtps_epu32(_mm256_rsqrt_ps(_mm256_cvtepu32_ps(in_)));
 	}
 #pragma endregion
+
+#pragma region NEAR_COMPARISONS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 cmpnear_u32x8(EmuSIMD::u32x8_arg lhs_, EmuSIMD::u32x8_arg rhs_)
+	{
+		return cmpeq_u32x8(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u32x8 cmpnear_u32x8(EmuSIMD::u32x8_arg lhs_, EmuSIMD::u32x8_arg rhs_, EmuSIMD::u32x8_arg epsilon)
+	{
+		return cmple_u32x8(sub_u32x8(lhs_, rhs_), epsilon);
+	}
+#pragma endregion
 }
 
 #endif

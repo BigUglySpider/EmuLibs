@@ -1438,6 +1438,584 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	}
 #pragma endregion
+
+#pragma region CMP_NEAR_HELPERS
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
+	[[nodiscard]] inline Register_ _cmp_near_equal(Register_ a_, Register_ b_)
+	{
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
+			{
+				return EmuSIMD::Funcs::cmpnear_f32x4(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
+			{
+				return EmuSIMD::Funcs::cmpnear_f32x8(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
+			{
+				return EmuSIMD::Funcs::cmpnear_f32x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
+			{
+				return EmuSIMD::Funcs::cmpnear_f64x2(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
+			{
+				return EmuSIMD::Funcs::cmpnear_f64x4(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
+			{
+				return EmuSIMD::Funcs::cmpnear_f64x8(a_, b_);
+			}
+			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::i128_generic, EmuSIMD::i256_generic, EmuSIMD::i512_generic>::value)
+			{
+				if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfInt_>())
+				{
+					if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
+					{
+						if constexpr (PerElementWidthIfInt_ == 8)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i8x16(a_, b_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u8x16(a_, b_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 16)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i16x8(a_, b_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u16x8(a_, b_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 32)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i32x4(a_, b_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u32x4(a_, b_);
+							}
+						}
+						else
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i64x2(a_, b_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u64x2(a_, b_);
+							}
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
+					{
+						if constexpr (PerElementWidthIfInt_ == 8)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i8x32(a_, b_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u8x32(a_, b_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 16)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i16x16(a_, b_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u16x16(a_, b_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 32)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i32x8(a_, b_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u32x8(a_, b_);
+							}
+						}
+						else
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i64x4(a_, b_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u64x4(a_, b_);
+							}
+						}
+					}
+					else
+					{
+						if constexpr (PerElementWidthIfInt_ == 8)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i8x64(a_, b_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u8x64(a_, b_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 16)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i16x32(a_, b_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u16x32(a_, b_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 32)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i32x16(a_, b_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u32x16(a_, b_);
+							}
+						}
+						else
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i64x8(a_, b_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u64x8(a_, b_);
+							}
+						}
+					}
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to determine if the elements of two SIMD registers are near-equal via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i8x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i8x32(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i8x64(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u8x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u8x32(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u8x64(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i16x8(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i16x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i16x32(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u16x8(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u16x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u16x32(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i32x4(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i32x8(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i32x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u32x4(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u32x8(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u32x16(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i64x2(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i64x4(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i64x8(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u64x2(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u64x4(a_, b_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u64x8(a_, b_);
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to determine if the elements of two SIMD registers are near-equal via EmuSIMD registers, but the passed Register_ type is not supported for this operation.");
+			}
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to determine if the elements of two SIMD registers are near-equal via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+		}
+	}
+
+	template<std::size_t PerElementWidthIfInt_, bool SignedIfInt_, class Register_>
+	[[nodiscard]] inline Register_ _cmp_near_equal(Register_ a_, Register_ b_, Register_ epsilon_)
+	{
+		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
+		{
+			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
+			{
+				return EmuSIMD::Funcs::cmpnear_f32x4(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
+			{
+				return EmuSIMD::Funcs::cmpnear_f32x8(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
+			{
+				return EmuSIMD::Funcs::cmpnear_f32x16(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
+			{
+				return EmuSIMD::Funcs::cmpnear_f64x2(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
+			{
+				return EmuSIMD::Funcs::cmpnear_f64x4(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
+			{
+				return EmuSIMD::Funcs::cmpnear_f64x8(a_, b_, epsilon_);
+			}
+			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::i128_generic, EmuSIMD::i256_generic, EmuSIMD::i512_generic>::value)
+			{
+				if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfInt_>())
+				{
+					if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
+					{
+						if constexpr (PerElementWidthIfInt_ == 8)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i8x16(a_, b_, epsilon_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u8x16(a_, b_, epsilon_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 16)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i16x8(a_, b_, epsilon_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u16x8(a_, b_, epsilon_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 32)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i32x4(a_, b_, epsilon_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u32x4(a_, b_, epsilon_);
+							}
+						}
+						else
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i64x2(a_, b_, epsilon_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u64x2(a_, b_, epsilon_);
+							}
+						}
+					}
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
+					{
+						if constexpr (PerElementWidthIfInt_ == 8)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i8x32(a_, b_, epsilon_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u8x32(a_, b_, epsilon_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 16)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i16x16(a_, b_, epsilon_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u16x16(a_, b_, epsilon_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 32)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i32x8(a_, b_, epsilon_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u32x8(a_, b_, epsilon_);
+							}
+						}
+						else
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i64x4(a_, b_, epsilon_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u64x4(a_, b_, epsilon_);
+							}
+						}
+					}
+					else
+					{
+						if constexpr (PerElementWidthIfInt_ == 8)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i8x64(a_, b_, epsilon_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u8x64(a_, b_, epsilon_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 16)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i16x32(a_, b_, epsilon_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u16x32(a_, b_, epsilon_);
+							}
+						}
+						else if constexpr (PerElementWidthIfInt_ == 32)
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i32x16(a_, b_, epsilon_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u32x16(a_, b_, epsilon_);
+							}
+						}
+						else
+						{
+							if constexpr (SignedIfInt_)
+							{
+								return EmuSIMD::Funcs::cmpnear_i64x8(a_, b_, epsilon_);
+							}
+							else
+							{
+								return EmuSIMD::Funcs::cmpnear_u64x8(a_, b_, epsilon_);
+							}
+						}
+					}
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to determine if the elements of two SIMD registers are near-equal via EmuSIMD helpers, but the provided PerElementWidth_ is invalid.");
+				}
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x16>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i8x16(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x32>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i8x32(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i8x64>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i8x64(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x16>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u8x16(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x32>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u8x32(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u8x64>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u8x64(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x8>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i16x8(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x16>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i16x16(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i16x32>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i16x32(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x8>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u16x8(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x16>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u16x16(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u16x32>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u16x32(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x4>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i32x4(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x8>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i32x8(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i32x16>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i32x16(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x4>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u32x4(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x8>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u32x8(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u32x16>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u32x16(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x2>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i64x2(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x4>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i64x4(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i64x8>)
+			{
+				return EmuSIMD::Funcs::cmpnear_i64x8(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x2>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u64x2(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x4>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u64x4(a_, b_, epsilon_);
+			}
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::u64x8>)
+			{
+				return EmuSIMD::Funcs::cmpnear_u64x8(a_, b_, epsilon_);
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to determine if the elements of two SIMD registers are near-equal via EmuSIMD helpers, but the passed Register_ type is not supported for this operation.");
+			}
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to determine if the elements of two SIMD registers are near-equal via EmuSIMD helpers, but the provided Register_ type is not recognised as a supported SIMD register.");
+		}
+	}
+#pragma endregion
 }
 
 #endif

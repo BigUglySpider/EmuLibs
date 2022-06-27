@@ -506,6 +506,18 @@ namespace EmuSIMD::Funcs
 		return _mm_cvtpd_epu64(_mm_div_pd(_mm_set1_pd(1.0), _mm_sqrt_pd(_mm_cvtepu64_pd(in_))));
 	}
 #pragma endregion
+
+#pragma region NEAR_COMPARISONS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 cmpnear_u64x2(EmuSIMD::u64x2_arg lhs_, EmuSIMD::u64x2_arg rhs_)
+	{
+		return cmpeq_u64x2(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u64x2 cmpnear_u64x2(EmuSIMD::u64x2_arg lhs_, EmuSIMD::u64x2_arg rhs_, EmuSIMD::u64x2_arg epsilon)
+	{
+		return cmple_u64x2(sub_u64x2(lhs_, rhs_), epsilon);
+	}
+#pragma endregion
 }
 
 #endif

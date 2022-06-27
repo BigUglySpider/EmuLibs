@@ -381,35 +381,35 @@ namespace EmuSIMD::Funcs
 #pragma endregion
 
 #pragma region COMPARISONS
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 cmpeq_u16x8(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 cmpeq_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_)
 	{
 		return _mm256_cmpeq_epi16(lhs_, rhs_);
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 cmpneq_u16x8(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 cmpneq_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_)
 	{
 		constexpr std::uint16_t mask = static_cast<std::uint16_t>(0xFFFF);
 		return _mm256_xor_si256(set1_i16x16(mask), _mm256_cmpeq_epi16(lhs_, rhs_));
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 cmpgt_u16x8(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 cmpgt_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_)
 	{
 		constexpr std::uint16_t mask = static_cast<std::uint16_t>(0xFFFF);
 		return _mm256_andnot_si256(_mm256_cmpeq_epi16(_mm256_min_epu16(lhs_, rhs_), lhs_), set1_u16x16(mask));
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 cmplt_u16x8(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 cmplt_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_)
 	{
 		constexpr std::uint16_t mask = static_cast<std::uint16_t>(0xFFFF);
 		return _mm256_andnot_si256(_mm256_cmpeq_epi16(_mm256_max_epu16(lhs_, rhs_), lhs_), set1_u16x16(mask));
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 cmpge_u16x8(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 cmpge_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_)
 	{
 		return _mm256_cmpeq_epi16(_mm256_max_epu16(lhs_, rhs_), lhs_);
 	}
 
-	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 cmple_u16x8(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_)
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 cmple_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_)
 	{
 		return _mm256_cmpeq_epi16(_mm256_min_epu16(lhs_, rhs_), lhs_);
 	}
@@ -589,6 +589,18 @@ namespace EmuSIMD::Funcs
 			static_cast<std::uint16_t>(results[1]),
 			static_cast<std::uint16_t>(results[0])
 		);
+	}
+#pragma endregion
+
+#pragma region NEAR_COMPARISONS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 cmpnear_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_)
+	{
+		return cmpeq_u16x16(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x16 cmpnear_u16x16(EmuSIMD::u16x16_arg lhs_, EmuSIMD::u16x16_arg rhs_, EmuSIMD::u16x16_arg epsilon)
+	{
+		return cmple_u16x16(sub_u16x16(lhs_, rhs_), epsilon);
 	}
 #pragma endregion
 }

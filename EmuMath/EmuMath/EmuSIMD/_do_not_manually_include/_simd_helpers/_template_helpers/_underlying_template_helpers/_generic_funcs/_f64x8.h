@@ -505,6 +505,13 @@ namespace EmuSIMD::Funcs
 		return div_f64x8(set1_f64x8(1.0), sqrt_f64x8(in_));
 	}
 #pragma endregion
+
+#pragma region NEAR_COMPARISONS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 cmpnear_f64x8(EmuSIMD::f64x8_arg lhs_, EmuSIMD::f64x8_arg rhs_, EmuSIMD::f64x8_arg epsilon = set1_f64x8(EmuCore::epsilon<double>::get()))
+	{
+		return cmple_f64x8(abs_f64x8(sub_f64x8(lhs_, rhs_)), epsilon);
+	}
+#pragma endregion
 }
 
 #endif

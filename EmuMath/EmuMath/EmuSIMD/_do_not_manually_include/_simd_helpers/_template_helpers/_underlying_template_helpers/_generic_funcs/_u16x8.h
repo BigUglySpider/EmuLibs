@@ -554,6 +554,18 @@ namespace EmuSIMD::Funcs
 		);
 	}
 #pragma endregion
+
+#pragma region NEAR_COMPARISONS
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x8 cmpnear_u16x8(EmuSIMD::u16x8_arg lhs_, EmuSIMD::u16x8_arg rhs_)
+	{
+		return cmpeq_u16x8(lhs_, rhs_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::u16x8 cmpnear_u16x8(EmuSIMD::u16x8_arg lhs_, EmuSIMD::u16x8_arg rhs_, EmuSIMD::u16x8_arg epsilon)
+	{
+		return cmple_u16x8(sub_u16x8(lhs_, rhs_), epsilon);
+	}
+#pragma endregion
 }
 
 #endif
