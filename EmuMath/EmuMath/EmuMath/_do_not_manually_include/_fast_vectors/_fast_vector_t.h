@@ -3716,117 +3716,6 @@ namespace EmuMath
 			}
 		}
 
-		template<std::size_t Index_>
-		[[nodiscard]] static constexpr inline register_type _generic_fill_from_register_index(register_arg_type register_)
-		{
-			if constexpr (elements_per_register == 2)
-			{
-				return EmuSIMD::shuffle<Index_, Index_>(register_);
-			}
-			else if constexpr (elements_per_register == 4)
-			{
-				return EmuSIMD::shuffle<Index_, Index_, Index_, Index_>(register_);
-			}
-			else if constexpr (elements_per_register == 8)
-			{
-				return EmuSIMD::shuffle<Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_>(register_);
-			}
-			else if constexpr (elements_per_register == 16)
-			{
-				return EmuSIMD::shuffle<Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_>(register_);
-			}
-			else if constexpr (elements_per_register == 32)
-			{
-				return EmuSIMD::shuffle
-				<
-					Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_,
-					Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_
-				>(register_);
-			}
-			else if constexpr (elements_per_register == 64)
-			{
-				return EmuSIMD::shuffle
-				<
-					Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_,
-					Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_,
-					Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_,
-					Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_
-				>(register_);
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<this_type>(),
-					"Unable to perform a generic register-fill operation from an existing register on an EmuMath::FastVector instance as it cannot be reliably shuffled due to its elements_per_register size."
-				);
-			}
-		}
-
-		template<class A_, class B_>
-		[[nodiscard]] static constexpr inline register_type _calculate_dot_2_fill(A_&& a_, B_&& b_)
-		{
-			return _generic_fill_from_register_index<0>(_calculate_dot_2(std::forward<A_>(a_), std::forward<B_>(b_)));
-		}
-
-		template<class A_, class B_>
-		[[nodiscard]] static constexpr inline register_type _calculate_dot_2(A_&& a_, B_&& b_)
-		{
-			if constexpr (size >= 2)
-			{
-				register_type dot2 = EmuSIMD::mul_all<per_element_width>(_retrieve_register_from_arg<0>(a_), _retrieve_register_from_arg<0>(b_));
-
-				if constexpr (elements_per_register == 2)
-				{
-					return EmuSIMD::add<per_element_width>(dot2, EmuSIMD::shuffle<1, 0>(dot2));
-				}
-				else if constexpr (elements_per_register == 4)
-				{
-					return EmuSIMD::add<per_element_width>(dot2, EmuSIMD::shuffle<1, 0, 1, 0>(dot2));
-				}
-				else if constexpr (elements_per_register == 8)
-				{
-					return EmuSIMD::add<per_element_width>(dot2, EmuSIMD::shuffle<1, 0, 1, 0, 1, 0, 1, 0>(dot2));
-				}
-				else if constexpr (elements_per_register == 16)
-				{
-					return EmuSIMD::add<per_element_width>(dot2, EmuSIMD::shuffle<1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0>(dot2));
-				}
-				else if constexpr (elements_per_register == 32)
-				{
-					return EmuSIMD::add<per_element_width>
-					(
-						dot2,
-						EmuSIMD::shuffle<1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0>(dot2)
-					);
-				}
-				else if constexpr (elements_per_register == 64)
-				{
-					return EmuSIMD::add<per_element_width>
-					(
-						dot2,
-						EmuSIMD::shuffle
-						<
-							1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
-							1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0
-						>(dot2)
-					);
-				}
-				else
-				{
-					static_assert
-					(
-						EmuCore::TMP::get_false<this_type>(),
-						"Unable to perform a Dot2 operation on an EmuMath::FastVector instance as it cannot be reliably shuffled due to its elements_per_register size."
-					);
-				}
-			}
-			else
-			{
-				return EmuSIMD::mul_all<per_element_width>(_retrieve_register_from_arg<0>(a_), _retrieve_register_from_arg<0>(b_));
-			}
-		}
-
 		/// <summary>
 		/// <para> Calculates the dot product of this Vector with another Vector of the same type, treating them as 2-element Vectors. </para>
 		/// <para> The result will remain as a Vector, and is guaranteed to at least be stored within the first element in the output Vector. </para>
@@ -4429,6 +4318,130 @@ namespace EmuMath
 		{
 			return CmpAnyNear(EmuSIMD::set1<register_type, per_element_width>(rhs_), EmuSIMD::set1<register_type, per_element_width>(epsilon_));
 		}
+
+		/// <summary>
+		/// <para> Returns true if any respective elements are greater than those of the passed Vector. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector to compare respective values of this Vector with.</param>
+		/// <returns>True if at least one element of this Vector is greater than the respective element of `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAnyGreater(const this_type& rhs_) const
+		{
+			return _do_cmp_greater_bool_out<false>(data, rhs_.data);
+		}
+
+		/// <summary>
+		/// <para> Returns true if any respective elements in this Vector's register(s) are greater than those of the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_">Register to compare the registers of this Vector with.</param>
+		/// <returns>True if at least one element of any of this Vector's registers is greater than the respective element of `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAnyGreater(register_arg_type rhs_) const
+		{
+			return _do_cmp_greater_bool_out<false>(data, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns true if any elements in this Vector are greater than the passed value. </para>
+		/// <para> This will create an intermediate register for SIMD comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare the elements of this Vector with.</param>
+		/// <returns>True if at least one element of this Vector is greater than `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAnyGreater(value_type rhs_) const
+		{
+			return _do_cmp_greater_bool_out<false>(data, EmuSIMD::set1<register_type, per_element_width>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any respective elements are less than those of the passed Vector. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector to compare respective values of this Vector with.</param>
+		/// <returns>True if at least one element of this Vector is less than the respective element of `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAnyLess(const this_type& rhs_) const
+		{
+			return _do_cmp_less_bool_out<false>(data, rhs_.data);
+		}
+
+		/// <summary>
+		/// <para> Returns true if any respective elements in this Vector's register(s) are less than those of the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_">Register to compare the registers of this Vector with.</param>
+		/// <returns>True if at least one element of any of this Vector's registers is less than the respective element of `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAnyLess(register_arg_type rhs_) const
+		{
+			return _do_cmp_less_bool_out<false>(data, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns true if any elements in this Vector are less than the passed value. </para>
+		/// <para> This will create an intermediate register for SIMD comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare the elements of this Vector with.</param>
+		/// <returns>True if at least one element of this Vector is less than `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAnyLess(value_type rhs_) const
+		{
+			return _do_cmp_less_bool_out<false>(data, EmuSIMD::set1<register_type, per_element_width>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any respective elements are greater than or equal to those of the passed Vector. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector to compare respective values of this Vector with.</param>
+		/// <returns>True if at least one element of this Vector is greater than or equal to the respective element of `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAnyGreaterEqual(const this_type& rhs_) const
+		{
+			return _do_cmp_greater_equal_bool_out<false>(data, rhs_.data);
+		}
+
+		/// <summary>
+		/// <para> Returns true if any respective elements in this Vector's register(s) are greater than or equal to those of the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_">Register to compare the registers of this Vector with.</param>
+		/// <returns>True if at least one element of any of this Vector's registers is greater than or equal to the respective element of `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAnyGreaterEqual(register_arg_type rhs_) const
+		{
+			return _do_cmp_greater_equal_bool_out<false>(data, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns true if any elements in this Vector are greater than or equal to the passed value. </para>
+		/// <para> This will create an intermediate register for SIMD comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare the elements of this Vector with.</param>
+		/// <returns>True if at least one element of this Vector is greater than or equal to `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAnyGreaterEqual(value_type rhs_) const
+		{
+			return _do_cmp_greater_equal_bool_out<false>(data, EmuSIMD::set1<register_type, per_element_width>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if any respective elements are less than or equal to those of the passed Vector. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector to compare respective values of this Vector with.</param>
+		/// <returns>True if at least one element of this Vector is less than or equal to the respective element of `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAnyLessEqual(const this_type& rhs_) const
+		{
+			return _do_cmp_less_equal_bool_out<false>(data, rhs_.data);
+		}
+
+		/// <summary>
+		/// <para> Returns true if any respective elements in this Vector's register(s) are less than or equal to those of the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_">Register to compare the registers of this Vector with.</param>
+		/// <returns>True if at least one element of any of this Vector's registers is less than or equal to the respective element of `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAnyLessEqual(register_arg_type rhs_) const
+		{
+			return _do_cmp_less_equal_bool_out<false>(data, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns true if any elements in this Vector are less than or equal to the passed value. </para>
+		/// <para> This will create an intermediate register for SIMD comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare the elements of this Vector with.</param>
+		/// <returns>True if at least one element of this Vector is less than or equal to `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAnyLessEqual(value_type rhs_) const
+		{
+			return _do_cmp_less_equal_bool_out<false>(data, EmuSIMD::set1<register_type, per_element_width>(rhs_));
+		}
 #pragma endregion
 
 #pragma region COMPARISONS_ALL
@@ -4579,6 +4592,130 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline bool CmpAllNear(value_type rhs_, value_type epsilon_) const
 		{
 			return CmpAllNear(EmuSIMD::set1<register_type, per_element_width>(rhs_), EmuSIMD::set1<register_type, per_element_width>(epsilon_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all respective elements are greater than those of the passed Vector. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector to compare respective values of this Vector with.</param>
+		/// <returns>True if every element of this Vector is greater than the respective element of `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAllGreater(const this_type& rhs_) const
+		{
+			return _do_cmp_greater_bool_out<true>(data, rhs_.data);
+		}
+
+		/// <summary>
+		/// <para> Returns true if all respective elements in this Vector's register(s) are greater than those of the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_">Register to compare the registers of this Vector with.</param>
+		/// <returns>True if every element of all of this Vector's registers is greater than the respective element of `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAllGreater(register_arg_type rhs_) const
+		{
+			return _do_cmp_greater_bool_out<true>(data, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns true if all elements in this Vector are greater than the passed value. </para>
+		/// <para> This will create an intermediate register for SIMD comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare the elements of this Vector with.</param>
+		/// <returns>True if every element of this Vector is greater than `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAllGreater(value_type rhs_) const
+		{
+			return _do_cmp_greater_bool_out<true>(data, EmuSIMD::set1<register_type, per_element_width>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all respective elements are less than those of the passed Vector. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector to compare respective values of this Vector with.</param>
+		/// <returns>True if every element of this Vector is less than the respective element of `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAllLess(const this_type& rhs_) const
+		{
+			return _do_cmp_less_bool_out<true>(data, rhs_.data);
+		}
+
+		/// <summary>
+		/// <para> Returns true if all respective elements in this Vector's register(s) are less than those of the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_">Register to compare the registers of this Vector with.</param>
+		/// <returns>True if every element of all of this Vector's registers is less than the respective element of `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAllLess(register_arg_type rhs_) const
+		{
+			return _do_cmp_less_bool_out<true>(data, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns true if all elements in this Vector are less than the passed value. </para>
+		/// <para> This will create an intermediate register for SIMD comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare the elements of this Vector with.</param>
+		/// <returns>True if every element of this Vector is less than `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAllLess(value_type rhs_) const
+		{
+			return _do_cmp_less_bool_out<true>(data, EmuSIMD::set1<register_type, per_element_width>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all respective elements are greater than or equal to those of the passed Vector. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector to compare respective values of this Vector with.</param>
+		/// <returns>True if every element of this Vector is greater than or equal to the respective element of `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAllGreaterEqual(const this_type& rhs_) const
+		{
+			return _do_cmp_greater_equal_bool_out<true>(data, rhs_.data);
+		}
+
+		/// <summary>
+		/// <para> Returns true if all respective elements in this Vector's register(s) are greater than or equal to those of the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_">Register to compare the registers of this Vector with.</param>
+		/// <returns>True if every element of all of this Vector's registers is greater than or equal to the respective element of `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAllGreaterEqual(register_arg_type rhs_) const
+		{
+			return _do_cmp_greater_equal_bool_out<true>(data, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns true if all elements in this Vector are greater than or equal to the passed value. </para>
+		/// <para> This will create an intermediate register for SIMD comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare the elements of this Vector with.</param>
+		/// <returns>True if every element of this Vector is greater than or equal to `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAllGreaterEqual(value_type rhs_) const
+		{
+			return _do_cmp_greater_equal_bool_out<true>(data, EmuSIMD::set1<register_type, per_element_width>(rhs_));
+		}
+
+		/// <summary>
+		/// <para> Returns true if all respective elements are less than or equal to those of the passed Vector. </para>
+		/// </summary>
+		/// <param name="rhs_">Vector to compare respective values of this Vector with.</param>
+		/// <returns>True if every element of this Vector is less than or equal to the respective element of `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAllLessEqual(const this_type& rhs_) const
+		{
+			return _do_cmp_less_equal_bool_out<true>(data, rhs_.data);
+		}
+
+		/// <summary>
+		/// <para> Returns true if all respective elements in this Vector's register(s) are less than or equal to those of the passed register. </para>
+		/// </summary>
+		/// <param name="rhs_">Register to compare the registers of this Vector with.</param>
+		/// <returns>True if every element of all of this Vector's registers is less than or equal to the respective element of `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAllLessEqual(register_arg_type rhs_) const
+		{
+			return _do_cmp_less_equal_bool_out<true>(data, rhs_);
+		}
+
+		/// <summary>
+		/// <para> Returns true if all elements in this Vector are less than or equal to the passed value. </para>
+		/// <para> This will create an intermediate register for SIMD comparisons. </para>
+		/// </summary>
+		/// <param name="rhs_">Value to compare the elements of this Vector with.</param>
+		/// <returns>True if every element of this Vector is less than or equal to `rhs_`; otherwise false.</returns>
+		[[nodiscard]] constexpr inline bool CmpAllLessEqual(value_type rhs_) const
+		{
+			return _do_cmp_less_equal_bool_out<true>(data, EmuSIMD::set1<register_type, per_element_width>(rhs_));
 		}
 #pragma endregion
 
@@ -5098,6 +5235,53 @@ namespace EmuMath
 				(
 					EmuCore::TMP::get_false<Arg_>(),
 					"Unable to retrieve a register argument from a provided argument for interacting with an EmuMath::FastVector."
+				);
+			}
+		}
+
+		template<std::size_t Index_>
+		[[nodiscard]] static constexpr inline register_type _generic_fill_from_register_index(register_arg_type register_)
+		{
+			if constexpr (elements_per_register == 2)
+			{
+				return EmuSIMD::shuffle<Index_, Index_>(register_);
+			}
+			else if constexpr (elements_per_register == 4)
+			{
+				return EmuSIMD::shuffle<Index_, Index_, Index_, Index_>(register_);
+			}
+			else if constexpr (elements_per_register == 8)
+			{
+				return EmuSIMD::shuffle<Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_>(register_);
+			}
+			else if constexpr (elements_per_register == 16)
+			{
+				return EmuSIMD::shuffle<Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_>(register_);
+			}
+			else if constexpr (elements_per_register == 32)
+			{
+				return EmuSIMD::shuffle
+				<
+					Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_,
+					Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_
+				>(register_);
+			}
+			else if constexpr (elements_per_register == 64)
+			{
+				return EmuSIMD::shuffle
+				<
+					Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_,
+					Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_,
+					Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_,
+					Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_
+				>(register_);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<this_type>(),
+					"Unable to perform a generic register-fill operation from an existing register on an EmuMath::FastVector instance as it cannot be reliably shuffled due to its elements_per_register size."
 				);
 			}
 		}
@@ -5822,6 +6006,70 @@ namespace EmuMath
 		static constexpr inline data_type _do_array_not(const data_type& lhs_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			return data_type({ EmuSIMD::bitwise_not(lhs_[RegisterIndices_])... });
+		}
+
+		template<class A_, class B_>
+		[[nodiscard]] static constexpr inline register_type _calculate_dot_2_fill(A_&& a_, B_&& b_)
+		{
+			return _generic_fill_from_register_index<0>(_calculate_dot_2(std::forward<A_>(a_), std::forward<B_>(b_)));
+		}
+
+		template<class A_, class B_>
+		[[nodiscard]] static constexpr inline register_type _calculate_dot_2(A_&& a_, B_&& b_)
+		{
+			if constexpr (size >= 2)
+			{
+				register_type dot2 = EmuSIMD::mul_all<per_element_width>(_retrieve_register_from_arg<0>(a_), _retrieve_register_from_arg<0>(b_));
+
+				if constexpr (elements_per_register == 2)
+				{
+					return EmuSIMD::add<per_element_width>(dot2, EmuSIMD::shuffle<1, 0>(dot2));
+				}
+				else if constexpr (elements_per_register == 4)
+				{
+					return EmuSIMD::add<per_element_width>(dot2, EmuSIMD::shuffle<1, 0, 1, 0>(dot2));
+				}
+				else if constexpr (elements_per_register == 8)
+				{
+					return EmuSIMD::add<per_element_width>(dot2, EmuSIMD::shuffle<1, 0, 1, 0, 1, 0, 1, 0>(dot2));
+				}
+				else if constexpr (elements_per_register == 16)
+				{
+					return EmuSIMD::add<per_element_width>(dot2, EmuSIMD::shuffle<1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0>(dot2));
+				}
+				else if constexpr (elements_per_register == 32)
+				{
+					return EmuSIMD::add<per_element_width>
+					(
+						dot2,
+						EmuSIMD::shuffle<1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0>(dot2)
+					);
+				}
+				else if constexpr (elements_per_register == 64)
+				{
+					return EmuSIMD::add<per_element_width>
+					(
+						dot2,
+						EmuSIMD::shuffle
+						<
+							1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
+							1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0
+						>(dot2)
+					);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<this_type>(),
+						"Unable to perform a Dot2 operation on an EmuMath::FastVector instance as it cannot be reliably shuffled due to its elements_per_register size."
+					);
+				}
+			}
+			else
+			{
+				return EmuSIMD::mul_all<per_element_width>(_retrieve_register_from_arg<0>(a_), _retrieve_register_from_arg<0>(b_));
+			}
 		}
 #pragma endregion
 
@@ -6567,77 +6815,6 @@ namespace EmuMath
 		}
 
 		template<bool All_, class Rhs_, std::size_t...RegisterIndices_ >
-		[[nodiscard]] static constexpr inline bool _do_array_cmp_greater_bool_out(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
-		{
-			if constexpr (All_)
-			{
-				return 
-				(
-					... && EmuSIMD::cmp_all_gt<per_element_width, is_signed>
-					(
-						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::GREATER, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
-						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::GREATER, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
-					)					
-				);
-			}
-			else
-			{
-				return 
-				(
-					... || EmuSIMD::cmp_any_gt<per_element_width, is_signed>
-					(
-						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::GREATER, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
-						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::GREATER, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
-					)
-				);
-			}
-		}
-
-		template<bool All_, class Rhs_>
-		[[nodiscard]] static constexpr inline bool _do_cmp_greater_bool_out(const data_type& lhs_, Rhs_&& rhs_)
-		{
-			if constexpr (contains_multiple_registers)
-			{
-				return _do_array_cmp_greater_bool_out<All_>(lhs_, std::forward<Rhs_>(rhs_), register_index_sequence());
-			}
-			else if constexpr (requires_partial_register)
-			{
-				if constexpr (All_)
-				{
-					return EmuSIMD::cmp_all_gt<per_element_width, is_signed>
-					(
-						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::GREATER, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
-						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::GREATER, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
-					);
-				}
-				else
-				{
-					return EmuSIMD::cmp_any_gt<per_element_width, is_signed>
-					(
-						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::GREATER, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
-						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::GREATER, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
-					);
-				}
-			}
-			else
-			{
-				if constexpr (All_)
-				{
-					return EmuSIMD::cmp_all_gt<per_element_width, is_signed>(lhs_, _retrieve_register_from_arg<0>(std::forward<Rhs_>(rhs_)));
-				}
-				else
-				{
-					return EmuSIMD::cmp_any_gt<per_element_width, is_signed>(lhs_, _retrieve_register_from_arg<0>(std::forward<Rhs_>(rhs_)));
-				}
-			}
-		}
-
-
-
-
-
-
-		template<bool All_, class Rhs_, std::size_t...RegisterIndices_ >
 		[[nodiscard]] static constexpr inline bool _do_array_cmp_near_equal_bool_out(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			if constexpr (All_)
@@ -6785,6 +6962,270 @@ namespace EmuMath
 						_retrieve_register_from_arg<0>(std::forward<Rhs_>(rhs_)),
 						_retrieve_register_from_arg<0>(std::forward<Epsilon_>(epsilon_))
 					);
+				}
+			}
+		}		
+
+		template<bool All_, class Rhs_, std::size_t...RegisterIndices_ >
+		[[nodiscard]] static constexpr inline bool _do_array_cmp_greater_bool_out(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			if constexpr (All_)
+			{
+				return 
+				(
+					... && EmuSIMD::cmp_all_gt<per_element_width, is_signed>
+					(
+						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::GREATER, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
+						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::GREATER, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
+					)					
+				);
+			}
+			else
+			{
+				return 
+				(
+					... || EmuSIMD::cmp_any_gt<per_element_width, is_signed>
+					(
+						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::GREATER, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
+						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::GREATER, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
+					)
+				);
+			}
+		}
+
+		template<bool All_, class Rhs_>
+		[[nodiscard]] static constexpr inline bool _do_cmp_greater_bool_out(const data_type& lhs_, Rhs_&& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return _do_array_cmp_greater_bool_out<All_>(lhs_, std::forward<Rhs_>(rhs_), register_index_sequence());
+			}
+			else if constexpr (requires_partial_register)
+			{
+				if constexpr (All_)
+				{
+					return EmuSIMD::cmp_all_gt<per_element_width, is_signed>
+					(
+						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::GREATER, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
+						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::GREATER, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
+					);
+				}
+				else
+				{
+					return EmuSIMD::cmp_any_gt<per_element_width, is_signed>
+					(
+						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::GREATER, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
+						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::GREATER, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
+					);
+				}
+			}
+			else
+			{
+				if constexpr (All_)
+				{
+					return EmuSIMD::cmp_all_gt<per_element_width, is_signed>(lhs_, _retrieve_register_from_arg<0>(std::forward<Rhs_>(rhs_)));
+				}
+				else
+				{
+					return EmuSIMD::cmp_any_gt<per_element_width, is_signed>(lhs_, _retrieve_register_from_arg<0>(std::forward<Rhs_>(rhs_)));
+				}
+			}
+		}
+
+		template<bool All_, class Rhs_, std::size_t...RegisterIndices_ >
+		[[nodiscard]] static constexpr inline bool _do_array_cmp_less_bool_out(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			if constexpr (All_)
+			{
+				return 
+				(
+					... && EmuSIMD::cmp_all_lt<per_element_width, is_signed>
+					(
+						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::LESS, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
+						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::LESS, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
+					)					
+				);
+			}
+			else
+			{
+				return 
+				(
+					... || EmuSIMD::cmp_any_lt<per_element_width, is_signed>
+					(
+						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::LESS, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
+						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::LESS, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
+					)
+				);
+			}
+		}
+
+		template<bool All_, class Rhs_>
+		[[nodiscard]] static constexpr inline bool _do_cmp_less_bool_out(const data_type& lhs_, Rhs_&& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return _do_array_cmp_less_bool_out<All_>(lhs_, std::forward<Rhs_>(rhs_), register_index_sequence());
+			}
+			else if constexpr (requires_partial_register)
+			{
+				if constexpr (All_)
+				{
+					return EmuSIMD::cmp_all_lt<per_element_width, is_signed>
+					(
+						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::LESS, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
+						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::LESS, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
+					);
+				}
+				else
+				{
+					return EmuSIMD::cmp_any_lt<per_element_width, is_signed>
+					(
+						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::LESS, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
+						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::LESS, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
+					);
+				}
+			}
+			else
+			{
+				if constexpr (All_)
+				{
+					return EmuSIMD::cmp_all_lt<per_element_width, is_signed>(lhs_, _retrieve_register_from_arg<0>(std::forward<Rhs_>(rhs_)));
+				}
+				else
+				{
+					return EmuSIMD::cmp_any_lt<per_element_width, is_signed>(lhs_, _retrieve_register_from_arg<0>(std::forward<Rhs_>(rhs_)));
+				}
+			}
+		}
+
+		template<bool All_, class Rhs_, std::size_t...RegisterIndices_ >
+		[[nodiscard]] static constexpr inline bool _do_array_cmp_greater_equal_bool_out(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			if constexpr (All_)
+			{
+				return 
+				(
+					... && EmuSIMD::cmp_all_ge<per_element_width, is_signed>
+					(
+						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::GREATER_EQUAL, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
+						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::GREATER_EQUAL, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
+					)					
+				);
+			}
+			else
+			{
+				return 
+				(
+					... || EmuSIMD::cmp_any_ge<per_element_width, is_signed>
+					(
+						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::GREATER_EQUAL, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
+						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::GREATER_EQUAL, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
+					)
+				);
+			}
+		}
+
+		template<bool All_, class Rhs_>
+		[[nodiscard]] static constexpr inline bool _do_cmp_greater_equal_bool_out(const data_type& lhs_, Rhs_&& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return _do_array_cmp_greater_equal_bool_out<All_>(lhs_, std::forward<Rhs_>(rhs_), register_index_sequence());
+			}
+			else if constexpr (requires_partial_register)
+			{
+				if constexpr (All_)
+				{
+					return EmuSIMD::cmp_all_ge<per_element_width, is_signed>
+					(
+						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::GREATER_EQUAL, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
+						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::GREATER_EQUAL, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
+					);
+				}
+				else
+				{
+					return EmuSIMD::cmp_any_ge<per_element_width, is_signed>
+					(
+						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::GREATER_EQUAL, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
+						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::GREATER_EQUAL, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
+					);
+				}
+			}
+			else
+			{
+				if constexpr (All_)
+				{
+					return EmuSIMD::cmp_all_ge<per_element_width, is_signed>(lhs_, _retrieve_register_from_arg<0>(std::forward<Rhs_>(rhs_)));
+				}
+				else
+				{
+					return EmuSIMD::cmp_any_ge<per_element_width, is_signed>(lhs_, _retrieve_register_from_arg<0>(std::forward<Rhs_>(rhs_)));
+				}
+			}
+		}
+
+		template<bool All_, class Rhs_, std::size_t...RegisterIndices_ >
+		[[nodiscard]] static constexpr inline bool _do_array_cmp_less_equal_bool_out(const data_type& lhs_, Rhs_&& rhs_, std::index_sequence<RegisterIndices_...> indices_)
+		{
+			if constexpr (All_)
+			{
+				return 
+				(
+					... && EmuSIMD::cmp_all_le<per_element_width, is_signed>
+					(
+						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::LESS_EQUAL, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
+						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::LESS_EQUAL, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
+					)					
+				);
+			}
+			else
+			{
+				return 
+				(
+					... || EmuSIMD::cmp_any_le<per_element_width, is_signed>
+					(
+						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::LESS_EQUAL, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
+						_retrieve_register_for_bool_out_cmp<RegisterIndices_, EmuCore::BasicCmp::LESS_EQUAL, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
+					)
+				);
+			}
+		}
+
+		template<bool All_, class Rhs_>
+		[[nodiscard]] static constexpr inline bool _do_cmp_less_equal_bool_out(const data_type& lhs_, Rhs_&& rhs_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return _do_array_cmp_greater_equal_bool_out<All_>(lhs_, std::forward<Rhs_>(rhs_), register_index_sequence());
+			}
+			else if constexpr (requires_partial_register)
+			{
+				if constexpr (All_)
+				{
+					return EmuSIMD::cmp_all_le<per_element_width, is_signed>
+					(
+						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::LESS_EQUAL, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
+						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::LESS_EQUAL, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
+					);
+				}
+				else
+				{
+					return EmuSIMD::cmp_any_le<per_element_width, is_signed>
+					(
+						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::LESS_EQUAL, true, All_>(lhs_, std::forward<Rhs_>(rhs_)),
+						_retrieve_register_for_bool_out_cmp<0, EmuCore::BasicCmp::LESS_EQUAL, false, All_>(lhs_, std::forward<Rhs_>(rhs_))
+					);
+				}
+			}
+			else
+			{
+				if constexpr (All_)
+				{
+					return EmuSIMD::cmp_all_le<per_element_width, is_signed>(lhs_, _retrieve_register_from_arg<0>(std::forward<Rhs_>(rhs_)));
+				}
+				else
+				{
+					return EmuSIMD::cmp_any_le<per_element_width, is_signed>(lhs_, _retrieve_register_from_arg<0>(std::forward<Rhs_>(rhs_)));
 				}
 			}
 		}
