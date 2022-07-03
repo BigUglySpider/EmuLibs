@@ -3225,8 +3225,6 @@ namespace EmuMath
 
 #pragma region COMPARISON_OPERATORS
 	public:
-		#pragma region COMPARISONS_ADAPTIVE
-	public:
 		/// <summary>
 		/// <para> Adaptive equality check. </para>
 		/// <para> If the passed argument is of this FastVector type or its register_arg_type: Identical to CmpAllEqual. </para>
@@ -3326,7 +3324,6 @@ namespace EmuMath
 		{
 			return MagnitudeScalar<value_type>() <= rhs_magnitude_;
 		}
-#pragma endregion
 #pragma endregion
 
 #pragma region ASSIGNMENT_OPERATORS
