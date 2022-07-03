@@ -18,6 +18,12 @@ namespace EmuMath
 	/// <para> Generic Vector that makes explicit use of SIMD registers to gain a speed boost. </para>
 	/// <para> Only accepts value type arguments, and ignores const/volatile qualification. </para>
 	/// <para> May select a specific bit-width of the encapsulated registers; defaults to 128-bit, but accepts 256-bit and 512-bit too. </para>
+	/// <para>
+	///		Automatic masking will be performed for operations where the result may otherwise be affected by non-contained indices. 
+	///		As such, if it is certain that a Vector may not have values that interfere with output for such desired operations, 
+	///		it is recommended to choose a size that does not leave any empty register space to avoid these masking operations. (e.g. `4, float` instead of `3, float`).
+	/// </para>
+	/// <para> Where possible, this type will provide named size alternative functions to mimic a size without requiring a conversion or mask. </para>
 	/// </summary>
 	template<std::size_t Size_, typename T_, std::size_t RegisterWidth_>
 	struct FastVector
@@ -5459,6 +5465,7 @@ namespace EmuMath
 		/// <para> If this Vector requires only 1 register, this will be that register. </para>
 		/// <para> If this Vector requires multiple registers, this will be an array of registers. </para>
 		/// <para> It is recommended to avoid using this unless you know what you are doing. </para>
+		/// <para> For a generic approach to accessing this, consider GetRegister() or GetRegisterTheoretical(). </para>
 		/// </summary>
 		data_type data;
 #pragma endregion
