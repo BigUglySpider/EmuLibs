@@ -364,67 +364,57 @@ namespace EmuSIMD::_underlying_simd_helpers
 				{
 					if constexpr (PerElementWidth_ == 8)
 					{
-						EmuSIMD::i128_generic out_even_ = _mm_mullo_epi16(lhs_, rhs_);
-						EmuSIMD::f32x4 out_odd_ = _mm_mullo_epi16(_mm_srli_epi16(lhs_, 8), _mm_srli_epi16(rhs_, 8));
-
-						// Mask the least-significant 8 bits for even elements
-						// --- Bits of odd elements are shifted so we only have the least significant bits available, which also places them in their output slot
-						// --- This applies for other 8-bit _mullo_ implementations
-						EmuSIMD::f32x4 mask_ = _mm_set1_epi16(0xFF);
-						return _mm_or_si128(_mm_slli_epi16(out_odd_, 8), _mm_and_si128(out_even_, mask_));
+						return EmuSIMD::Funcs::mul_all_i8x16(lhs_, rhs_);
 					}
 					else if constexpr (PerElementWidth_ == 16)
 					{
-						return _mm_mullo_epi16(lhs_, rhs_);
+						return EmuSIMD::Funcs::mul_all_i16x8(lhs_, rhs_);
 					}
 					else if constexpr (PerElementWidth_ == 32)
 					{
-						return _mm_mullo_epi32(lhs_, rhs_);
+						return EmuSIMD::Funcs::mul_all_i32x4(lhs_, rhs_);
 					}
 					else
 					{
-						return _mm_mullo_epi64(lhs_, rhs_);
+						return EmuSIMD::Funcs::mul_all_i64x2(lhs_, rhs_);
 					}
 				}
 				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 				{
 					if constexpr (PerElementWidth_ == 8)
 					{
-						EmuSIMD::i256_generic out_even_ = _mm256_mullo_epi16(lhs_, rhs_);
-						EmuSIMD::i256_generic out_odd_ = _mm256_mullo_epi16(_mm256_srli_epi16(lhs_, 8), _mm256_srli_epi16(rhs_, 8));
-						EmuSIMD::i256_generic mask_ = _mm256_set1_epi16(0xFF);
-						return _mm256_or_si256(_mm256_slli_epi16(out_odd_, 8), _mm256_and_si256(out_even_, mask_));
+						return EmuSIMD::Funcs::mul_all_i8x32(lhs_, rhs_);
 					}
 					else if constexpr (PerElementWidth_ == 16)
 					{
-						return _mm256_mullo_epi32(lhs_, rhs_);
+						return EmuSIMD::Funcs::mul_all_i16x16(lhs_, rhs_);
 					}
 					else if constexpr (PerElementWidth_ == 32)
 					{
-						return _mm256_mullo_epi32(lhs_, rhs_);
+						return EmuSIMD::Funcs::mul_all_i32x8(lhs_, rhs_);
 					}
 					else
 					{
-						return _mm256_mullo_epi64(lhs_, rhs_);
+						return EmuSIMD::Funcs::mul_all_i64x4(lhs_, rhs_);
 					}
 				}
 				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
 				{
 					if constexpr (PerElementWidth_ == 8)
 					{
-
+						return EmuSIMD::Funcs::mul_all_i8x64(lhs_, rhs_);
 					}
 					else if constexpr (PerElementWidth_ == 16)
 					{
-						return _mm512_mullo_epi16(lhs_, rhs_);
+						return EmuSIMD::Funcs::mul_all_i16x32(lhs_, rhs_);
 					}
 					else if constexpr (PerElementWidth_ == 32)
 					{
-						return _mm512_mullo_epi32(lhs_, rhs_);
+						return EmuSIMD::Funcs::mul_all_i32x16(lhs_, rhs_);
 					}
 					else
 					{
-						return _mm512_mullo_epi64(lhs_, rhs_);
+						return EmuSIMD::Funcs::mul_all_i64x8(lhs_, rhs_);
 					}
 				}
 				else

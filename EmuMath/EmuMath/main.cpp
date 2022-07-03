@@ -528,6 +528,18 @@ int main()
 	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAllNear(EmuMath::FastVector<7, float>(4, 4, 4, 5, 4, 4, 4), 5) << "\n";
 	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAllNear(EmuMath::FastVector<7, float>(4, 4, 4, 6, 9, 2, 7), FLT_EPSILON) << "\n";
 
+	
+	std::cout << "DOT2\n";
+	std::cout << EmuMath::FastVector<2, float>(5, 17).Dot2(EmuMath::FastVector<2, float>(13, 1)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(5, 17, 26, 7).Dot2(EmuMath::FastVector<4, float>(13, 1, 2, 19)) << "\n";
+	std::cout << EmuMath::FastVector<16, std::uint8_t>(5, 17, 26, 7, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12).Dot2(EmuMath::FastVector<16, std::uint8_t>(13, 1, 2, 19, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)) << "\n";
+	std::cout << EmuMath::FastVector<2, float>(5, 17).Dot2Fill(EmuMath::FastVector<2, float>(13, 1)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(5, 17, 26, 7).Dot2Fill(EmuMath::FastVector<4, float>(13, 1, 2, 19)) << "\n";
+	std::cout << EmuMath::FastVector<16, std::uint8_t>(5, 17, 26, 7, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12).Dot2Fill(EmuMath::FastVector<16, std::uint8_t>(13, 1, 2, 19, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)) << "\n";
+	std::cout << EmuMath::FastVector<2, float>(5, 17).Dot2Scalar<float>(EmuMath::FastVector<2, float>(13, 1)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(5, 17, 26, 7).Dot2Scalar<float>(EmuMath::FastVector<4, float>(13, 1, 2, 19)) << "\n";
+	std::cout << EmuMath::FastVector<16, std::uint8_t>(5, 17, 26, 7, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12).Dot2Scalar<float>(EmuMath::FastVector<16, std::uint8_t>(13, 1, 2, 19, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)) << "\n";
+
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 	constexpr auto mat_b_ = EmuMath::Matrix<4, 4, int, true>(1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
