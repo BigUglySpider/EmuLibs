@@ -497,6 +497,37 @@ int main()
 	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAllNotEqual(EmuMath::FastVector<7, float>(4, 4, 4, 5, 4, 4, 4)) << "\n";
 	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAllNotEqual(EmuMath::FastVector<7, float>(4, 4, 4, 6, 9, 2, 7)) << "\n";
 
+	std::cout << "\nCMPNEAR (NO EPSILON)\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAnyNear(EmuMath::FastVector<3, float>(1, 2, 3)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAnyNear(EmuMath::FastVector<3, float>(4, 4, 4)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAnyNear(EmuMath::FastVector<3, float>(4, 2, 4)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAllNear(EmuMath::FastVector<3, float>(1, 2, 3)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAllNear(EmuMath::FastVector<3, float>(4, 4, 4)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAllNear(EmuMath::FastVector<3, float>(4, 2, 4)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAnyNear(EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAnyNear(EmuMath::FastVector<7, float>(4, 4, 4, 5, 4, 4, 4)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAnyNear(EmuMath::FastVector<7, float>(4, 4, 4, 6, 9, 2, 7)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAllNear(EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAllNear(EmuMath::FastVector<7, float>(4, 4, 4, 5, 4, 4, 4)) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAllNear(EmuMath::FastVector<7, float>(4, 4, 4, 6, 9, 2, 7)) << "\n";
+
+
+	std::cout << "\nCMPNEAR (EPSILON)\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAnyNear(EmuMath::FastVector<3, float>(1, 2, 3), FLT_EPSILON) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAnyNear(EmuMath::FastVector<3, float>(4, 4, 4), 5) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAnyNear(EmuMath::FastVector<3, float>(4, 2, 4), FLT_EPSILON) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAllNear(EmuMath::FastVector<3, float>(1, 2, 3), FLT_EPSILON) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAllNear(EmuMath::FastVector<3, float>(4, 4, 4), 5) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(1, 2, 3).CmpAllNear(EmuMath::FastVector<3, float>(4, 2, 4), FLT_EPSILON) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAnyNear(EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7), FLT_EPSILON) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAnyNear(EmuMath::FastVector<7, float>(4, 4, 4, 5, 4, 4, 4), 5) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAnyNear(EmuMath::FastVector<7, float>(4, 4, 4, 6, 9, 2, 7), FLT_EPSILON) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAllNear(EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7), FLT_EPSILON) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAllNear(EmuMath::FastVector<7, float>(4, 4, 4, 5, 4, 4, 4), 5) << "\n";
+	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAllNear(EmuMath::FastVector<7, float>(4, 4, 4, 6, 9, 2, 7), FLT_EPSILON) << "\n";
+
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 	constexpr auto mat_b_ = EmuMath::Matrix<4, 4, int, true>(1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
