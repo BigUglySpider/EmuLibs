@@ -3223,6 +3223,112 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region COMPARISON_OPERATORS
+	public:
+		#pragma region COMPARISONS_ADAPTIVE
+	public:
+		/// <summary>
+		/// <para> Adaptive equality check. </para>
+		/// <para> If the passed argument is of this FastVector type or its register_arg_type: Identical to CmpAllEqual. </para>
+		/// <para> If the passed argument is of this FastVector's value_type: Identical to MagnitudeScalar() == arg. </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline bool operator==(const this_type& rhs_) const
+		{
+			return _do_cmp_equal_bool_out<true>(data, rhs_.data);
+		}
+
+		[[nodiscard]] constexpr inline bool operator==(register_arg_type rhs_) const
+		{
+			return _do_cmp_equal_bool_out<true>(data, rhs_);
+		}
+
+		[[nodiscard]] constexpr inline bool operator==(value_type rhs_magnitude_) const
+		{
+			return MagnitudeScalar<value_type>() == rhs_magnitude_;
+		}
+
+		/// <summary>
+		/// <para> Adaptive inequality check. </para>
+		/// <para> If the passed argument is of this FastVector type or its register_arg_type: Identical to CmpAnyNotEqual. </para>
+		/// <para> If the passed argument is of this FastVector's value_type: Identical to MagnitudeScalar() != arg. </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline bool operator!=(const this_type& rhs_) const
+		{
+			return _do_cmp_not_equal_bool_out<false>(data, rhs_.data);
+		}
+
+		[[nodiscard]] constexpr inline bool operator!=(register_arg_type rhs_) const
+		{
+			return _do_cmp_not_equal_bool_out<false>(data, rhs_);
+		}
+
+		[[nodiscard]] constexpr inline bool operator!=(value_type rhs_magnitude_) const
+		{
+			return MagnitudeScalar<value_type>() != rhs_magnitude_;
+		}
+
+		/// <summary>
+		/// <para> Adaptive greater-than magnitude comparison. </para>
+		/// <para> If the passed argument is of this FastVector type: Identical to MagnitudeScalar() &gt; arg.MagnitudeScalar(). </para>
+		/// <para> If the passed argument is of this FastVector type: Identical to MagnitudeScalar() &gt; arg. </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline bool operator>(const this_type& rhs_) const
+		{
+			return MagnitudeScalar<value_type>() > rhs_.MagnitudeScalar<value_type>();
+		}
+
+		[[nodiscard]] constexpr inline bool operator>(value_type rhs_magnitude_) const
+		{
+			return MagnitudeScalar<value_type>() > rhs_magnitude_;
+		}
+
+		/// <summary>
+		/// <para> Adaptive less-than magnitude comparison. </para>
+		/// <para> If the passed argument is of this FastVector type: Identical to MagnitudeScalar() &lt; arg.MagnitudeScalar(). </para>
+		/// <para> If the passed argument is of this FastVector type: Identical to MagnitudeScalar() &lt; arg. </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline bool operator<(const this_type& rhs_) const
+		{
+			return MagnitudeScalar<value_type>() < rhs_.MagnitudeScalar<value_type>();
+		}
+
+		[[nodiscard]] constexpr inline bool operator<(value_type rhs_magnitude_) const
+		{
+			return MagnitudeScalar<value_type>() < rhs_magnitude_;
+		}
+
+		/// <summary>
+		/// <para> Adaptive greater-equal magnitude comparison. </para>
+		/// <para> If the passed argument is of this FastVector type: Identical to MagnitudeScalar() &gt;= arg.MagnitudeScalar(). </para>
+		/// <para> If the passed argument is of this FastVector type: Identical to MagnitudeScalar() &gt;= arg. </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline bool operator>=(const this_type& rhs_) const
+		{
+			return MagnitudeScalar<value_type>() >= rhs_.MagnitudeScalar<value_type>();
+		}
+
+		[[nodiscard]] constexpr inline bool operator>=(value_type rhs_magnitude_) const
+		{
+			return MagnitudeScalar<value_type>() >= rhs_magnitude_;
+		}
+
+		/// <summary>
+		/// <para> Adaptive less-equal magnitude comparison. </para>
+		/// <para> If the passed argument is of this FastVector type: Identical to MagnitudeScalar() &lt;= arg.MagnitudeScalar(). </para>
+		/// <para> If the passed argument is of this FastVector type: Identical to MagnitudeScalar() &lt;= arg. </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline bool operator<=(const this_type& rhs_) const
+		{
+			return MagnitudeScalar<value_type>() <= rhs_.MagnitudeScalar<value_type>();
+		}
+
+		[[nodiscard]] constexpr inline bool operator<=(value_type rhs_magnitude_) const
+		{
+			return MagnitudeScalar<value_type>() <= rhs_magnitude_;
+		}
+#pragma endregion
+#pragma endregion
+
 #pragma region ASSIGNMENT_OPERATORS
 	public:
 		constexpr inline this_type& operator=(const this_type& rhs_) noexcept
@@ -5135,6 +5241,170 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline this_type CmpPerElementLessEqual(value_type rhs_for_all_) const
 		{
 			return CmpPerElementLessEqual(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+		}
+#pragma endregion
+
+#pragma region COMPARISONS_ADAPTIVE
+	public:
+		/// <summary>
+		/// <para> Adaptive equality check. </para>
+		/// <para> If the passed argument is of this FastVector type or its register_arg_type: Identical to CmpAllEqual. </para>
+		/// <para> If the passed argument is of this FastVector's value_type: Identical to MagnitudeScalar() == arg. </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline bool CmpEqual(const this_type& rhs_) const
+		{
+			return _do_cmp_equal_bool_out<true>(data, rhs_.data);
+		}
+
+		[[nodiscard]] constexpr inline bool CmpEqual(register_arg_type rhs_) const
+		{
+			return _do_cmp_equal_bool_out<true>(data, rhs_);
+		}
+
+		[[nodiscard]] constexpr inline bool CmpEqual(value_type rhs_magnitude_) const
+		{
+			return MagnitudeScalar<value_type>() == rhs_magnitude_;
+		}
+
+		/// <summary>
+		/// <para> Adaptive inequality check. </para>
+		/// <para> If the passed argument is of this FastVector type or its register_arg_type: Identical to CmpAnyNotEqual. </para>
+		/// <para> If the passed argument is of this FastVector's value_type: Identical to MagnitudeScalar() != arg. </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline bool CmpNotEqual(const this_type& rhs_) const
+		{
+			return _do_cmp_not_equal_bool_out<false>(data, rhs_.data);
+		}
+
+		[[nodiscard]] constexpr inline bool CmpNotEqual(register_arg_type rhs_) const
+		{
+			return _do_cmp_not_equal_bool_out<false>(data, rhs_);
+		}
+
+		[[nodiscard]] constexpr inline bool CmpNotEqual(value_type rhs_magnitude_) const
+		{
+			return MagnitudeScalar<value_type>() != rhs_magnitude_;
+		}
+
+		/// <summary>
+		/// <para> Adaptive near-equality check. </para>
+		/// <para> If the passed argument is of this FastVector type or its register_arg_type: Identical to CmpAllNear. </para>
+		/// <para> 
+		///		If the passed argument is of this FastVector's value_type: 
+		///		Identical to EmuCore::do_near&lt;value_type, value_type, value_type&gt;()(MagnitudeScalar(), first_arg, [epsilon]). </para>
+		/// <para>
+		///		May optionally provide a custom epsilon for determining if values are near-equal. 
+		///		If the first argument is this FastVector's value_type, the type of the passed epsilon may only be a value_type.
+		/// </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline bool CmpNear(const this_type& rhs_) const
+		{
+			return _do_cmp_near_equal_bool_out<true>(data, rhs_.data);
+		}
+
+		[[nodiscard]] constexpr inline bool CmpNear(register_arg_type rhs_) const
+		{
+			return _do_cmp_near_equal_bool_out<true>(data, rhs_);
+		}
+
+		[[nodiscard]] constexpr inline bool CmpNear(const this_type& rhs_, const this_type& epsilon_) const
+		{
+			return _do_cmp_near_equal_bool_out<true>(data, rhs_.data, epsilon_.data);
+		}
+
+		[[nodiscard]] constexpr inline bool CmpNear(const this_type& rhs_, register_arg_type epsilon_) const
+		{
+			return _do_cmp_near_equal_bool_out<true>(data, rhs_.data, epsilon_.data);
+		}
+
+		[[nodiscard]] constexpr inline bool CmpNear(const this_type& rhs_, value_type epsilon_) const
+		{
+			return _do_cmp_near_equal_bool_out<true>(data, rhs_.data, EmuSIMD::set1<per_element_width>(epsilon_));
+		}
+
+		[[nodiscard]] constexpr inline bool CmpNear(register_arg_type rhs_, const this_type& epsilon_) const
+		{
+			return _do_cmp_near_equal_bool_out<true>(data, rhs_, epsilon_.data);
+		}
+
+		[[nodiscard]] constexpr inline bool CmpNear(register_arg_type rhs_, register_arg_type epsilon_) const
+		{
+			return _do_cmp_near_equal_bool_out<true>(data, rhs_, epsilon_.data);
+		}
+
+		[[nodiscard]] constexpr inline bool CmpNear(register_arg_type rhs_, value_type epsilon_) const
+		{
+			return _do_cmp_near_equal_bool_out<true>(data, rhs_, EmuSIMD::set1<per_element_width>(epsilon_));
+		}
+
+		[[nodiscard]] constexpr inline bool CmpNear(value_type rhs_magnitude_) const
+		{
+			return EmuCore::do_cmp_near_equal<value_type, value_type, value_type>()(MagnitudeScalar<value_type>(), rhs_magnitude_);
+		}
+
+		[[nodiscard]] constexpr inline bool CmpNear(value_type rhs_magnitude_, value_type epsilon_) const
+		{
+			return EmuCore::do_cmp_near_equal<value_type, value_type, value_type>()(MagnitudeScalar<value_type>(), rhs_magnitude_, epsilon_);
+		}
+
+		/// <summary>
+		/// <para> Adaptive greater-than magnitude comparison. </para>
+		/// <para> If the passed argument is of this FastVector type: Identical to MagnitudeScalar() &gt; arg.MagnitudeScalar(). </para>
+		/// <para> If the passed argument is of this FastVector type: Identical to MagnitudeScalar() &gt; arg. </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline bool CmpGreater(const this_type& rhs_) const
+		{
+			return MagnitudeScalar<value_type>() > rhs_.MagnitudeScalar<value_type>();
+		}
+
+		[[nodiscard]] constexpr inline bool CmpGreater(value_type rhs_magnitude_) const
+		{
+			return MagnitudeScalar<value_type>() > rhs_magnitude_;
+		}
+
+		/// <summary>
+		/// <para> Adaptive less-than magnitude comparison. </para>
+		/// <para> If the passed argument is of this FastVector type: Identical to MagnitudeScalar() &lt; arg.MagnitudeScalar(). </para>
+		/// <para> If the passed argument is of this FastVector type: Identical to MagnitudeScalar() &lt; arg. </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline bool CmpLess(const this_type& rhs_) const
+		{
+			return MagnitudeScalar<value_type>() < rhs_.MagnitudeScalar<value_type>();
+		}
+
+		[[nodiscard]] constexpr inline bool CmpLess(value_type rhs_magnitude_) const
+		{
+			return MagnitudeScalar<value_type>() < rhs_magnitude_;
+		}
+
+		/// <summary>
+		/// <para> Adaptive greater-equal magnitude comparison. </para>
+		/// <para> If the passed argument is of this FastVector type: Identical to MagnitudeScalar() &gt;= arg.MagnitudeScalar(). </para>
+		/// <para> If the passed argument is of this FastVector type: Identical to MagnitudeScalar() &gt;= arg. </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline bool CmpGreaterEqual(const this_type& rhs_) const
+		{
+			return MagnitudeScalar<value_type>() >= rhs_.MagnitudeScalar<value_type>();
+		}
+
+		[[nodiscard]] constexpr inline bool CmpGreaterEqual(value_type rhs_magnitude_) const
+		{
+			return MagnitudeScalar<value_type>() >= rhs_magnitude_;
+		}
+
+		/// <summary>
+		/// <para> Adaptive less-equal magnitude comparison. </para>
+		/// <para> If the passed argument is of this FastVector type: Identical to MagnitudeScalar() &lt;= arg.MagnitudeScalar(). </para>
+		/// <para> If the passed argument is of this FastVector type: Identical to MagnitudeScalar() &lt;= arg. </para>
+		/// </summary>
+		[[nodiscard]] constexpr inline bool CmpLessEqual(const this_type& rhs_) const
+		{
+			return MagnitudeScalar<value_type>() <= rhs_.MagnitudeScalar<value_type>();
+		}
+
+		[[nodiscard]] constexpr inline bool CmpLessEqual(value_type rhs_magnitude_) const
+		{
+			return MagnitudeScalar<value_type>() <= rhs_magnitude_;
 		}
 #pragma endregion
 
