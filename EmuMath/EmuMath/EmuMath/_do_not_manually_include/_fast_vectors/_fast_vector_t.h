@@ -4822,7 +4822,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Vector to compare this Vector with, appearing on the right-hand side of comparison.</param>
 		/// <returns>Vector of the same type representing a mask of comparison results.</returns>
-		[[nodiscard]] constexpr inline this_type CmpPerElementNearEqual(const this_type& rhs_) const
+		[[nodiscard]] constexpr inline this_type CmpPerElementNear(const this_type& rhs_) const
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -4841,7 +4841,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Register to compare all of this Vector's registers with, appearing on the right-hand side of comparison(s).</param>
 		/// <returns>Vector of the same type representing a mask of comparison results.</returns>
-		[[nodiscard]] constexpr inline this_type CmpPerElementNearEqual(register_arg_type rhs_) const
+		[[nodiscard]] constexpr inline this_type CmpPerElementNear(register_arg_type rhs_) const
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -4860,9 +4860,9 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_for_all_">Value to compare all of this Vector's elements with, appearing on the right-hand side of comparison.</param>
 		/// <returns>Vector of the same type representing a mask of comparison results.</returns>
-		[[nodiscard]] constexpr inline this_type CmpPerElementNearEqual(value_type rhs_for_all_) const
+		[[nodiscard]] constexpr inline this_type CmpPerElementNear(value_type rhs_for_all_) const
 		{
-			return CmpPerElementNearEqual(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
+			return CmpPerElementNear(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
 		}
 
 		/// <summary>
@@ -4876,7 +4876,7 @@ namespace EmuMath
 		///		Vector of the same type representing a mask of comparison results, 
 		///		where true results are where this Vector's respective values are within the inclusive range of epsilon_ to reach rhs_.
 		/// </returns>
-		[[nodiscard]] constexpr inline this_type CmpPerElementNearEqual(const this_type& rhs_, const this_type& epsilon_) const
+		[[nodiscard]] constexpr inline this_type CmpPerElementNear(const this_type& rhs_, const this_type& epsilon_) const
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -4888,7 +4888,7 @@ namespace EmuMath
 			}
 		}
 
-		[[nodiscard]] constexpr inline this_type CmpPerElementNearEqual(const this_type& rhs_, register_arg_type epsilon_) const
+		[[nodiscard]] constexpr inline this_type CmpPerElementNear(const this_type& rhs_, register_arg_type epsilon_) const
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -4900,7 +4900,7 @@ namespace EmuMath
 			}
 		}
 
-		[[nodiscard]] constexpr inline this_type CmpPerElementNearEqual(register_arg_type rhs_, const this_type& epsilon_) const
+		[[nodiscard]] constexpr inline this_type CmpPerElementNear(register_arg_type rhs_, const this_type& epsilon_) const
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -4912,7 +4912,7 @@ namespace EmuMath
 			}
 		}
 
-		[[nodiscard]] constexpr inline this_type CmpPerElementNearEqual(register_arg_type rhs_, register_arg_type epsilon_) const
+		[[nodiscard]] constexpr inline this_type CmpPerElementNear(register_arg_type rhs_, register_arg_type epsilon_) const
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -4924,29 +4924,29 @@ namespace EmuMath
 			}
 		}
 
-		[[nodiscard]] constexpr inline this_type CmpPerElementNearEqual(const this_type& rhs_, value_type epsilon_) const
+		[[nodiscard]] constexpr inline this_type CmpPerElementNear(const this_type& rhs_, value_type epsilon_) const
 		{
-			return CmpPerElementNearEqual(rhs_, EmuSIMD::set1<register_type, per_element_width>(epsilon_));
+			return CmpPerElementNear(rhs_, EmuSIMD::set1<register_type, per_element_width>(epsilon_));
 		}
 
-		[[nodiscard]] constexpr inline this_type CmpPerElementNearEqual(register_arg_type rhs_, value_type epsilon_) const
+		[[nodiscard]] constexpr inline this_type CmpPerElementNear(register_arg_type rhs_, value_type epsilon_) const
 		{
-			return CmpPerElementNearEqual(rhs_, EmuSIMD::set1<register_type, per_element_width>(epsilon_));
+			return CmpPerElementNear(rhs_, EmuSIMD::set1<register_type, per_element_width>(epsilon_));
 		}
 
-		[[nodiscard]] constexpr inline this_type CmpPerElementNearEqual(value_type rhs_, const this_type& epsilon_) const
+		[[nodiscard]] constexpr inline this_type CmpPerElementNear(value_type rhs_, const this_type& epsilon_) const
 		{
-			return CmpPerElementNearEqual(EmuSIMD::set1<register_type, per_element_width>(rhs_), epsilon_);
+			return CmpPerElementNear(EmuSIMD::set1<register_type, per_element_width>(rhs_), epsilon_);
 		}
 
-		[[nodiscard]] constexpr inline this_type CmpPerElementNearEqual(value_type rhs_, register_arg_type epsilon_) const
+		[[nodiscard]] constexpr inline this_type CmpPerElementNear(value_type rhs_, register_arg_type epsilon_) const
 		{
-			return CmpPerElementNearEqual(EmuSIMD::set1<register_type, per_element_width>(rhs_), epsilon_);
+			return CmpPerElementNear(EmuSIMD::set1<register_type, per_element_width>(rhs_), epsilon_);
 		}
 
-		[[nodiscard]] constexpr inline this_type CmpPerElementNearEqual(value_type rhs_, value_type epsilon_) const
+		[[nodiscard]] constexpr inline this_type CmpPerElementNear(value_type rhs_, value_type epsilon_) const
 		{
-			return CmpPerElementNearEqual(EmuSIMD::set1<register_type, per_element_width>(rhs_), EmuSIMD::set1<register_type, per_element_width>(epsilon_));
+			return CmpPerElementNear(EmuSIMD::set1<register_type, per_element_width>(rhs_), EmuSIMD::set1<register_type, per_element_width>(epsilon_));
 		}
 
 		/// <summary>
