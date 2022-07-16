@@ -3,6 +3,7 @@
 
 #include "_underlying_template_helpers/_common_underlying_simd_template_helper_includes.h"
 #include "_underlying_template_helpers/_simd_helpers_underlying_set.h"
+#include "_simd_helpers_template_shuffles.h"
 #include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD
@@ -235,6 +236,221 @@ namespace EmuSIMD
 		else
 		{
 			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::load with an unsupported type as the passed Register_.");
+		}
+	}
+
+	template<std::size_t Index_, std::size_t PerElementWidthIfInt_ = 32, class Register_>
+	[[nodiscard]] constexpr inline Register_ set_all_to_index(Register_ in_)
+	{
+		using register_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_uq>)
+		{
+			constexpr std::size_t num_elements = EmuSIMD::TMP::register_element_count_v<Register_, PerElementWidthIfInt_>;
+			if constexpr (Index_ < num_elements)
+			{
+				if constexpr (std::is_same_v<register_uq, EmuSIMD::f32x4>)
+				{
+					return EmuSIMD::shuffle<Index_, Index_, Index_, Index_>(in_);
+				}
+				else if constexpr (std::is_same_v<register_uq, EmuSIMD::f32x8>)
+				{
+					constexpr std::size_t lane_index = Index_ >= 4 ? 1 : 0;
+					constexpr std::size_t mask = (lane_index << 4) | lane_index;
+					register_uq matching_lanes = _mm256_permute2f128_ps(in_, in_, mask);
+					matching_lanes = _mm256_permute2f128_ps(matching_lanes, matching_lanes, mask);
+					return EmuSIMD::shuffle<Index_, Index_, Index_, Index_>(matching_lanes);
+				}
+				else if constexpr (std::is_same_v<register_uq, EmuSIMD::f32x16>)
+				{
+					return EmuSIMD::set1<Register_, PerElementWidthIfInt_>(EmuSIMD::get_index<Index_, float, PerElementWidthIfInt_>(in_));
+				}
+				else if constexpr (std::is_same_v<register_uq, EmuSIMD::f64x2>)
+				{
+					return EmuSIMD::shuffle<Index_, Index_>(in_);
+				}
+				else if constexpr (std::is_same_v<register_uq, EmuSIMD::f64x4>)
+				{
+					constexpr std::size_t lane_index = Index_ >= 2 ? 1 : 0;
+					constexpr std::size_t mask = (lane_index << 4) | lane_index;
+					register_uq matching_lanes = _mm256_permute2f128_pd(in_, in_, mask);
+					return EmuSIMD::shuffle<Index_, Index_>(matching_lanes);
+				}
+				else if constexpr (std::is_same_v<register_uq, EmuSIMD::f64x8>)
+				{
+					return EmuSIMD::set1<Register_, PerElementWidthIfInt_>(EmuSIMD::get_index<Index_, double, PerElementWidthIfInt_>(in_));
+				}
+				else if constexpr (std::is_same_v<register_uq, EmuSIMD::i128_generic>)
+				{
+					if constexpr (PerElementWidthIfInt_ == 8)
+					{
+						return EmuSIMD::shuffle<Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_>(in_);
+					}
+					else if constexpr (PerElementWidthIfInt_ == 16)
+					{
+						return EmuSIMD::shuffle<Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_>(in_);
+					}
+					else if constexpr (PerElementWidthIfInt_ == 32)
+					{
+						return EmuSIMD::shuffle<Index_, Index_, Index_, Index_>(in_);
+					}
+					else if constexpr (PerElementWidthIfInt_ == 64)
+					{
+						return EmuSIMD::shuffle<Index_, Index_>(in_);
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+							"Attempted to set all elements in a generic 128-bit integral SIMD register to match a specific index via EmuSIMD::set_all_to_index, but the provided PerElementWidthIfInt_ is invalid. Valid values are: 8, 16, 32, 64."
+						);
+					}
+				}
+				else if constexpr (std::is_same_v<register_uq, EmuSIMD::i256_generic>)
+				{
+					constexpr std::size_t half_elements = num_elements / 2;
+					constexpr std::size_t lane_index = Index_ >= half_elements ? 1 : 0;
+					constexpr std::size_t mask = (lane_index << 4) | lane_index;
+					register_uq matching_lanes = _mm256_permute2f128_si256(in_, in_, mask);
+
+					if constexpr (PerElementWidthIfInt_ == 8)
+					{
+						return EmuSIMD::shuffle<Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_>
+						(
+							matching_lanes
+						);
+					}
+					else if constexpr (PerElementWidthIfInt_ == 16)
+					{
+						return EmuSIMD::shuffle<Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_>(matching_lanes);
+					}
+					else if constexpr (PerElementWidthIfInt_ == 32)
+					{
+						return EmuSIMD::shuffle<Index_, Index_, Index_, Index_>(matching_lanes);
+					}
+					else if constexpr (PerElementWidthIfInt_ == 64)
+					{
+						return EmuSIMD::shuffle<Index_, Index_>(matching_lanes);
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+							"Attempted to set all elements in a generic 256-bit integral SIMD register to match a specific index via EmuSIMD::set_all_to_index, but the provided PerElementWidthIfInt_ is invalid. Valid values are: 8, 16, 32, 64."
+						);
+					}
+				}
+				else if constexpr (std::is_same_v<register_uq, EmuSIMD::i512_generic>)
+				{
+					if constexpr (PerElementWidthIfInt_ == 8 || PerElementWidthIfInt_ == 16 || PerElementWidthIfInt_ == 32 || PerElementWidthIfInt_ == 64)
+					{
+						using sized_int = EmuCore::TMP::int_of_size_t<PerElementWidthIfInt_ / 8>;
+						return EmuSIMD::set1<Register_, PerElementWidthIfInt_>(EmuSIMD::get_index<Index_, sized_int, PerElementWidthIfInt_>(in_));
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+							"Attempted to set all elements in a generic 512-bit integral SIMD register to match a specific index via EmuSIMD::set_all_to_index, but the provided PerElementWidthIfInt_ is invalid. Valid values are: 8, 16, 32, 64."
+						);
+					}
+				}
+				else if constexpr (std::is_same_v<register_uq, EmuSIMD::i8x16> || std::is_same_v<register_uq, EmuSIMD::u8x16>)
+				{
+					return EmuSIMD::shuffle<Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_>(in_);
+				}
+				else if constexpr (std::is_same_v<register_uq, EmuSIMD::i16x8> || std::is_same_v<register_uq, EmuSIMD::u16x8>)
+				{
+					return EmuSIMD::shuffle<Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_>(in_);
+				}
+				else if constexpr (std::is_same_v<register_uq, EmuSIMD::i32x4> || std::is_same_v<register_uq, EmuSIMD::u32x4>)
+				{
+					return EmuSIMD::shuffle<Index_, Index_, Index_, Index_>(in_);
+				}
+				else if constexpr (std::is_same_v<register_uq, EmuSIMD::i64x2> || std::is_same_v<register_uq, EmuSIMD::u64x2>)
+				{
+					return EmuSIMD::shuffle<Index_, Index_>(in_);
+				}
+				else if constexpr (EmuCore::TMP::is_any_same_v<register_uq, EmuSIMD::i8x32, EmuSIMD::i16x16, EmuSIMD::i32x8, EmuSIMD::i64x4, EmuSIMD::u8x32, EmuSIMD::u16x16, EmuSIMD::u32x8, EmuSIMD::u64x4>)
+				{
+					constexpr std::size_t half_elements = num_elements / 2;
+					constexpr std::size_t lane_index = Index_ >= half_elements ? 1 : 0;
+					constexpr std::size_t mask = (lane_index << 4) | lane_index;
+					register_uq matching_lanes = _mm256_permute2f128_si256(in_, in_, mask);;
+
+					if constexpr (std::is_same_v<register_uq, EmuSIMD::i8x32> || std::is_same_v<register_uq, EmuSIMD::u8x32>)
+					{
+						return EmuSIMD::shuffle<Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_>
+						(
+							matching_lanes
+						);
+
+					}
+					else if constexpr (std::is_same_v<register_uq, EmuSIMD::i16x16> || std::is_same_v<register_uq, EmuSIMD::u16x16>)
+					{
+						return EmuSIMD::shuffle<Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_>(matching_lanes);
+					}
+					else if constexpr (std::is_same_v<register_uq, EmuSIMD::i32x8> || std::is_same_v<register_uq, EmuSIMD::u32x8>)
+					{
+						return EmuSIMD::shuffle<Index_, Index_, Index_, Index_>(matching_lanes);
+					}
+					else if constexpr(std::is_same_v<register_uq, EmuSIMD::i64x4> || std::is_same_v<register_uq, EmuSIMD::u64x4>)
+					{
+						return EmuSIMD::shuffle<Index_, Index_>(matching_lanes);
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<Register_>(),
+							"Internal EmuSIMD error @EmuSIMD::set_all_to_index, with register_uq recognised as one of: i8x32, i16x16, i32x8, i64x4, u8x32, u16x16, u32x8, or u64x4 in initial check, but not in further checks."
+						);
+					}
+				}
+				else if constexpr (std::is_same_v<register_uq, EmuSIMD::i8x64> || std::is_same_v<register_uq, EmuSIMD::u8x64>)
+				{
+					return EmuSIMD::set1<Register_, 8>(EmuSIMD::get_index<Index_, std::int8_t, 8>(in_));
+				}
+				else if constexpr (std::is_same_v<register_uq, EmuSIMD::i16x32> || std::is_same_v<register_uq, EmuSIMD::u16x32>)
+				{
+					return EmuSIMD::set1<Register_, 16>(EmuSIMD::get_index<Index_, std::int16_t, 16>(in_));
+				}
+				else if constexpr (std::is_same_v<register_uq, EmuSIMD::i32x16> || std::is_same_v<register_uq, EmuSIMD::u32x16>)
+				{
+					return EmuSIMD::set1<Register_, 32>(EmuSIMD::get_index<Index_, std::int32_t, 32>(in_));
+				}
+				else if constexpr (std::is_same_v<register_uq, EmuSIMD::i8x64> || std::is_same_v<register_uq, EmuSIMD::u8x64>)
+				{
+					return EmuSIMD::set1<Register_, 64>(EmuSIMD::get_index<Index_, std::int64_t, 64>(in_));
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Register_>(),
+						"Attempted to perform EmuSIMD::set_all_to_index, but the provided Register_ type is not supported for this operation."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Index_>(),
+					"Attempted to perform EmuSIMD::set_all_to_index with an index outside of the range of the passed SIMD register."
+				);
+			}
+
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<Register_>(),
+				"Attempted to perform EmuSIMD::set_all_to_index with a passed Register_ type which is not recognised as a SIMD register."
+			);
 		}
 	}
 }

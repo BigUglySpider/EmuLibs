@@ -600,6 +600,68 @@ int main()
 	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAllLessEqual(EmuMath::FastVector<7, float>(4, 4, 4, 5, 4, 4, 4)) << "\n";
 	std::cout << EmuMath::FastVector<7, float>(1, 2, 3, 4, 5, 6, 7).CmpAllLessEqual(EmuMath::FastVector<7, float>(4, 4, 4, 6, 9, 2, 7)) << "\n";
 
+	std::cout << "\nDOT2\n";
+	std::cout << EmuMath::FastVector<2, float>(5, 7).Dot2(EmuMath::FastVector<2, float>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(5, 7, -16).Dot2(EmuMath::FastVector<3, float>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(5, 7, -16, 12).Dot2(EmuMath::FastVector<4, float>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, double>(5, 7).Dot2(EmuMath::FastVector<2, double>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, double>(5, 7, -16).Dot2(EmuMath::FastVector<3, double>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, double>(5, 7, -16, 12).Dot2(EmuMath::FastVector<4, double>(2, 9, 8, 19)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::FastVector<2, float, 256>(5, 7).Dot2(EmuMath::FastVector<2, float, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, float, 256>(5, 7, -16).Dot2(EmuMath::FastVector<3, float, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, float, 256>(5, 7, -16, 12).Dot2(EmuMath::FastVector<4, float, 256>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, double, 256>(5, 7).Dot2(EmuMath::FastVector<2, double, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, double, 256>(5, 7, -16).Dot2(EmuMath::FastVector<3, double, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, double, 256>(5, 7, -16, 12).Dot2(EmuMath::FastVector<4, double, 256>(2, 9, 8, 19)) << "\n";
+
+	std::cout << "\nDOT3\n";
+	std::cout << EmuMath::FastVector<2, float>(5, 7).Dot3(EmuMath::FastVector<2, float>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(5, 7, -16).Dot3(EmuMath::FastVector<3, float>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(5, 7, -16, 12).Dot3(EmuMath::FastVector<4, float>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, double>(5, 7).Dot3(EmuMath::FastVector<2, double>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, double>(5, 7, -16).Dot3(EmuMath::FastVector<3, double>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, double>(5, 7, -16, 12).Dot3(EmuMath::FastVector<4, double>(2, 9, 8, 19)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::FastVector<2, float, 256>(5, 7).Dot3(EmuMath::FastVector<2, float, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, float, 256>(5, 7, -16).Dot3(EmuMath::FastVector<3, float, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, float, 256>(5, 7, -16, 12).Dot3(EmuMath::FastVector<4, float, 256>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, double, 256>(5, 7).Dot3(EmuMath::FastVector<2, double, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, double, 256>(5, 7, -16).Dot3(EmuMath::FastVector<3, double, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, double, 256>(5, 7, -16, 12).Dot3(EmuMath::FastVector<4, double, 256>(2, 9, 8, 19)) << "\n";
+
+	std::cout << "\nDOT3FILL\n";
+	std::cout << EmuMath::FastVector<2, float>(5, 7).Dot3Fill(EmuMath::FastVector<2, float>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(5, 7, -16).Dot3Fill(EmuMath::FastVector<3, float>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(5, 7, -16, 12).Dot3Fill(EmuMath::FastVector<4, float>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, double>(5, 7).Dot3Fill(EmuMath::FastVector<2, double>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, double>(5, 7, -16).Dot3Fill(EmuMath::FastVector<3, double>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, double>(5, 7, -16, 12).Dot3Fill(EmuMath::FastVector<4, double>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<8, double>(5, 7, -16, 12, 1, 2, 3, 4).Dot3Fill(EmuMath::FastVector<8, double>(2, 9, 8, 19, 4, 3, 2, 1)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::FastVector<2, float, 256>(5, 7).Dot3Fill(EmuMath::FastVector<2, float, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, float, 256>(5, 7, -16).Dot3Fill(EmuMath::FastVector<3, float, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, float, 256>(5, 7, -16, 12).Dot3Fill(EmuMath::FastVector<4, float, 256>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, double, 256>(5, 7).Dot3Fill(EmuMath::FastVector<2, double, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, double, 256>(5, 7, -16).Dot3Fill(EmuMath::FastVector<3, double, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, double, 256>(5, 7, -16, 12).Dot3Fill(EmuMath::FastVector<4, double, 256>(2, 9, 8, 19)) << "\n";
+
+	std::cout << "\nDOT3SCALAR\n";
+	std::cout << EmuMath::FastVector<2, float>(5, 7).Dot3Scalar(EmuMath::FastVector<2, float>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(5, 7, -16).Dot3Scalar(EmuMath::FastVector<3, float>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(5, 7, -16, 12).Dot3Scalar(EmuMath::FastVector<4, float>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, double>(5, 7).Dot3Scalar(EmuMath::FastVector<2, double>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, double>(5, 7, -16).Dot3Scalar(EmuMath::FastVector<3, double>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, double>(5, 7, -16, 12).Dot3Scalar(EmuMath::FastVector<4, double>(2, 9, 8, 19)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::FastVector<2, float, 256>(5, 7).Dot3Scalar(EmuMath::FastVector<2, float, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, float, 256>(5, 7, -16).Dot3Scalar(EmuMath::FastVector<3, float, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, float, 256>(5, 7, -16, 12).Dot3Scalar(EmuMath::FastVector<4, float, 256>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, double, 256>(5, 7).Dot3Scalar(EmuMath::FastVector<2, double, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, double, 256>(5, 7, -16).Dot3Scalar(EmuMath::FastVector<3, double, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, double, 256>(5, 7, -16, 12).Dot3Scalar(EmuMath::FastVector<4, double, 256>(2, 9, 8, 19)) << "\n";
+
+
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 	constexpr auto mat_b_ = EmuMath::Matrix<4, 4, int, true>(1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);

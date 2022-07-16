@@ -3842,12 +3842,17 @@ namespace EmuMath
 			return this_type(_calculate_dot_2(data, b_));
 		}
 
+		[[nodiscard]] constexpr inline this_type Dot2(value_type b_) const
+		{
+			return this_type(_calculate_dot_2(data, EmuSIMD::set1<register_type, per_element_width>(b_)));
+		}
+
 		/// <summary>
 		/// <para> Calculates the dot product of this Vector with another Vector of the same type, treating them as 2-element Vectors. </para>
 		/// <para> The result will remain as a Vector, and is guaranteed to be stored within every element in the output Vector. </para>
 		/// <para> If only a scalar result is required, use `Dot2Scalar` instead. </para>
 		/// </summary>
-		/// <returns>FastVector containing the result of the 2-element dot product in at least its very first element.</returns>
+		/// <returns>FastVector containing the result of the 2-element dot product within every element.</returns>
 		[[nodiscard]] constexpr inline this_type Dot2Fill(const this_type& b_) const
 		{
 			return this_type(_calculate_dot_2_fill(data, b_.data));
@@ -3858,6 +3863,18 @@ namespace EmuMath
 			return this_type(_calculate_dot_2_fill(data, b_));
 		}
 
+		[[nodiscard]] constexpr inline this_type Dot2Fill(value_type b_) const
+		{
+			return this_type(_calculate_dot_2_fill(data, EmuSIMD::set1<register_type, per_element_width>(b_)));
+		}
+
+		/// <summary>
+		/// <para> Calculates the dot product of this Vector with another Vector of the same type, treating them as 2-element Vectors. </para>
+		/// <para> The result will be a scalar extracted from a resulting intermediate Vector. </para>
+		/// <para> The output type may be customised, but may be omitted in which case it will default to value_type. </para>
+		/// <para> If a Vector full of the result is required, use `Dot2Fill` instead. </para>
+		/// </summary>
+		/// <returns>Scalar containing the result of the 2-element dot product.</returns>
 		template<typename Out_ = value_type>
 		[[nodiscard]] constexpr inline Out_ Dot2Scalar(const this_type& b_) const
 		{
@@ -3868,6 +3885,80 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline Out_ Dot2Scalar(register_arg_type b_) const
 		{
 			return EmuSIMD::get_index<0, Out_, per_element_width>(_calculate_dot_2(data, b_));
+		}
+
+		template<typename Out_ = value_type>
+		[[nodiscard]] constexpr inline Out_ Dot2Scalar(value_type b_) const
+		{
+			return EmuSIMD::get_index<0, Out_, per_element_width>(_calculate_dot_2(data, EmuSIMD::set1<register_type, per_element_width>(b_)));
+		}
+
+		/// <summary>
+		/// <para> Calculates the dot product of this Vector with another Vector of the same type, treating them as 3-element Vectors. </para>
+		/// <para> The result will remain as a Vector, and is guaranteed to at least be stored within the first element in the output Vector. </para>
+		/// <para> If a Vector full of the result is required, use `Dot3Fill` instead. </para>
+		/// <para> If only a scalar result is required, use `Dot3Scalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the result of the 3-element dot product in at least its very first element.</returns>
+		[[nodiscard]] constexpr inline this_type Dot3(const this_type& b_) const
+		{
+			return this_type(_calculate_dot_3(data, b_.data));
+		}
+
+		[[nodiscard]] constexpr inline this_type Dot3(register_arg_type b_) const
+		{
+			return this_type(_calculate_dot_3(data, b_));
+		}
+
+		[[nodiscard]] constexpr inline this_type Dot3(value_type b_) const
+		{
+			return this_type(_calculate_dot_3(data, EmuSIMD::set1<register_type, per_element_width>(b_)));
+		}
+
+		/// <summary>
+		/// <para> Calculates the dot product of this Vector with another Vector of the same type, treating them as 3-element Vectors. </para>
+		/// <para> The result will remain as a Vector, and is guaranteed to be stored within every element in the output Vector. </para>
+		/// <para> If only a scalar result is required, use `Dot3Scalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the result of the 3-element dot product within every element.</returns>
+		[[nodiscard]] constexpr inline this_type Dot3Fill(const this_type& b_) const
+		{
+			return this_type(_calculate_dot_3_fill(data, b_.data));
+		}
+
+		[[nodiscard]] constexpr inline this_type Dot3Fill(register_arg_type b_) const
+		{
+			return this_type(_calculate_dot_3_fill(data, b_));
+		}
+
+		[[nodiscard]] constexpr inline this_type Dot3Fill(value_type b_) const
+		{
+			return this_type(_calculate_dot_3_fill(data, EmuSIMD::set1<register_type, per_element_width>(b_)));
+		}
+
+		/// <summary>
+		/// <para> Calculates the dot product of this Vector with another Vector of the same type, treating them as 3-element Vectors. </para>
+		/// <para> The result will be a scalar extracted from a resulting intermediate Vector. </para>
+		/// <para> The output type may be customised, but may be omitted in which case it will default to value_type. </para>
+		/// <para> If a Vector full of the result is required, use `Dot3Fill` instead. </para>
+		/// </summary>
+		/// <returns>Scalar containing the result of the 2-element dot product.</returns>
+		template<typename Out_ = value_type>
+		[[nodiscard]] constexpr inline Out_ Dot3Scalar(const this_type& b_) const
+		{
+			return EmuSIMD::get_index<0, Out_, per_element_width>(_calculate_dot_3(data, b_.data));
+		}
+
+		template<typename Out_ = value_type>
+		[[nodiscard]] constexpr inline Out_ Dot3Scalar(register_arg_type b_) const
+		{
+			return EmuSIMD::get_index<0, Out_, per_element_width>(_calculate_dot_3(data, b_));
+		}
+
+		template<typename Out_ = value_type>
+		[[nodiscard]] constexpr inline Out_ Dot3Scalar(value_type b_) const
+		{
+			return EmuSIMD::get_index<0, Out_, per_element_width>(_calculate_dot_3(data, EmuSIMD::set1<register_type, per_element_width>(b_)));
 		}
 
 		/// <summary>
@@ -5516,48 +5607,7 @@ namespace EmuMath
 		template<std::size_t Index_>
 		[[nodiscard]] static constexpr inline register_type _generic_fill_from_register_index(register_arg_type register_)
 		{
-			if constexpr (elements_per_register == 2)
-			{
-				return EmuSIMD::shuffle<Index_, Index_>(register_);
-			}
-			else if constexpr (elements_per_register == 4)
-			{
-				return EmuSIMD::shuffle<Index_, Index_, Index_, Index_>(register_);
-			}
-			else if constexpr (elements_per_register == 8)
-			{
-				return EmuSIMD::shuffle<Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_>(register_);
-			}
-			else if constexpr (elements_per_register == 16)
-			{
-				return EmuSIMD::shuffle<Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_>(register_);
-			}
-			else if constexpr (elements_per_register == 32)
-			{
-				return EmuSIMD::shuffle
-				<
-					Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_,
-					Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_
-				>(register_);
-			}
-			else if constexpr (elements_per_register == 64)
-			{
-				return EmuSIMD::shuffle
-				<
-					Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_,
-					Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_,
-					Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_,
-					Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_, Index_
-				>(register_);
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<this_type>(),
-					"Unable to perform a generic register-fill operation from an existing register on an EmuMath::FastVector instance as it cannot be reliably shuffled due to its elements_per_register size."
-				);
-			}
+			return EmuSIMD::set_all_to_index<Index_, per_element_width>(register_);
 		}
 #pragma endregion
 
@@ -5713,7 +5763,7 @@ namespace EmuMath
 		{
 			if constexpr (contains_multiple_registers)
 			{
-				return _do_array_move(std::move(to_move_), index_sequence());
+				return _do_array_move(std::move(to_move_), register_index_sequence());
 			}
 			else
 			{
@@ -6289,60 +6339,214 @@ namespace EmuMath
 		}
 
 		template<class A_, class B_>
+		[[nodiscard]] static constexpr inline register_type _calculate_dot_3_fill(A_&& a_, B_&& b_)
+		{
+			return _generic_fill_from_register_index<0>(_calculate_dot_3(std::forward<A_>(a_), std::forward<B_>(b_)));
+		}
+
+		template<class A_, class B_>
+		[[nodiscard]] static constexpr inline register_type _calculate_dot_3(A_&& a_, B_&& b_)
+		{
+			if constexpr (size <= 2)
+			{
+				return _calculate_dot_2(std::forward<A_>(a_), std::forward<B_>(b_));
+			}
+			else
+			{
+				if constexpr (elements_per_register == 2)
+				{
+					register_type multiplied = _retrieve_register_from_arg<0>(std::forward<A_>(a_));
+					multiplied = EmuSIMD::mul_all<per_element_width>(multiplied, _retrieve_register_from_arg<0>(std::forward<B_>(b_)));
+
+					register_type dot01 = EmuSIMD::horizontal_sum<per_element_width>(multiplied);
+					multiplied = _retrieve_register_from_arg<1>(std::forward<A_>(a_));
+					multiplied = EmuSIMD::mul_all<per_element_width>(multiplied, _retrieve_register_from_arg<1>(std::forward<B_>(b_)));
+
+					return EmuSIMD::add<per_element_width>(dot01, multiplied);
+				}
+				else
+				{
+					if constexpr (register_width == 128)
+					{
+						return _calculate_dot_3_for_sizege3_width128
+						(
+							_retrieve_register_from_arg<0>(std::forward<A_>(a_)),
+							_retrieve_register_from_arg<0>(std::forward<B_>(b_)),
+							_make_shuffle_0_for_dot3_sizege3_width128(),
+							_make_shuffle_1_for_dot3_sizege3_width128()
+						);
+					}
+					else
+					{
+						using register_128 = typename EmuSIMD::TMP::register_type<value_type, 128>::type;
+						if constexpr ((128 / per_element_width) >= 3)
+						{
+							// Special case: We can slice the registers with a reinterpretation for only 128-bits as this will include all required elements
+							return _calculate_dot_3_for_sizege3_width128
+							(
+								EmuSIMD::cast<register_128>(_retrieve_register_from_arg<0>(std::forward<A_>(a_))),
+								EmuSIMD::cast<register_128>(_retrieve_register_from_arg<0>(std::forward<B_>(b_))),
+								_make_shuffle_0_for_dot3_sizege3_width128(),
+								_make_shuffle_1_for_dot3_sizege3_width128()
+							);
+						}
+						else
+						{
+							// Extract 2 128-bit lanes from each starter register; this will provided us indices [0, 1, 2, 3] for each
+							register_type register_a = _retrieve_register_from_arg<0>(std::forward<A_>(a_));
+							register_type register_b = _retrieve_register_from_arg<0>(std::forward<B_>(b_));
+
+							register_128 multiplied_128 = EmuSIMD::extract_lane<0, register_128>(register_a);
+							multiplied_128 = EmuSIMD::mul_all<per_element_width>(multiplied_128, EmuSIMD::extract_lane<0, register_128>(register_b));
+
+							register_128 dot01_128 = EmuSIMD::horizontal_sum<per_element_width>(multiplied_128);
+							multiplied_128 = EmuSIMD::extract_lane<1, register_128>(register_a);
+							multiplied_128 = EmuSIMD::mul_all<per_element_width>(multiplied_128, EmuSIMD::extract_lane<1, register_128>(register_b));
+							dot01_128 = EmuSIMD::add<per_element_width>(dot01_128, multiplied_128);
+
+							return EmuSIMD::cast<register_type>(dot01_128);
+						}
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// <para> Calculates the 3D dot product of `a_` and `b_` for a Vector with a size greater than or equal to 3, with registers of 128-bit width. </para>
+		/// <para> The provided index sequences should provide shuffle orders that move multiplied (but not added) indices 1 and 2 to index 0. The order is irrelevant. </para>
+		/// </summary>
+		template<class RegisterAB_, std::size_t...Shuffle0Indices_, std::size_t...Shuffle1Indices_>
+		[[nodiscard]] static constexpr inline register_type _calculate_dot_3_for_sizege3_width128
+		(
+			RegisterAB_&& a_,
+			RegisterAB_&& b_,
+			std::index_sequence<Shuffle0Indices_...> shuffle_0_indices_,
+			std::index_sequence<Shuffle1Indices_...> shuffle_1_indices_
+		)
+		{
+			using register_ab_uq = typename EmuCore::TMP::remove_ref_cv<RegisterAB_>::type;
+			register_ab_uq multiplied = EmuSIMD::mul_all<per_element_width>(std::forward<RegisterAB_>(a_), std::forward<RegisterAB_>(b_));
+			register_ab_uq dot = EmuSIMD::add<per_element_width>(multiplied, EmuSIMD::shuffle<Shuffle0Indices_...>(multiplied));
+			dot = EmuSIMD::add<per_element_width>(dot, EmuSIMD::shuffle<Shuffle1Indices_...>(multiplied));
+
+			if constexpr (std::is_same_v<register_ab_uq, register_type>)
+			{
+				return dot;
+			}
+			else
+			{
+				return EmuSIMD::cast<register_type>(dot);
+			}
+		}
+
+	public:
+		static constexpr inline auto _make_shuffle_0_for_dot3_sizege3_width128()
+		{
+			// with a 4-element register, this is 2, 1, 2, 1
+			constexpr std::size_t elements_per_128 = 128 / per_element_width;
+			using base_seq = std::index_sequence<2, 1>;
+			using full_seq = EmuCore::TMP::make_looped_integer_sequence<base_seq, (elements_per_128 / 2) - 1>;
+			return full_seq();
+		}
+
+		static constexpr inline auto _make_shuffle_1_for_dot3_sizege3_width128()
+		{
+			// 1 1 1 ... 1 for all registers
+			constexpr std::size_t elements_per_128 = 128 / per_element_width;
+			using base_seq = std::index_sequence<1>;
+			using full_seq = EmuCore::TMP::make_looped_integer_sequence<base_seq, elements_per_128 - 1>;
+			return full_seq();
+		}
+
+		template<class A_, class B_>
 		[[nodiscard]] static constexpr inline register_type _calculate_dot_2(A_&& a_, B_&& b_)
 		{
 			if constexpr (size >= 2)
 			{
-				register_type dot2 = EmuSIMD::mul_all<per_element_width>(_retrieve_register_from_arg<0>(a_), _retrieve_register_from_arg<0>(b_));
-
-				if constexpr (elements_per_register == 2)
+				if constexpr(register_width == 128)
 				{
-					return EmuSIMD::add<per_element_width>(dot2, EmuSIMD::shuffle<1, 0>(dot2));
-				}
-				else if constexpr (elements_per_register == 4)
-				{
-					return EmuSIMD::add<per_element_width>(dot2, EmuSIMD::shuffle<1, 0, 1, 0>(dot2));
-				}
-				else if constexpr (elements_per_register == 8)
-				{
-					return EmuSIMD::add<per_element_width>(dot2, EmuSIMD::shuffle<1, 0, 1, 0, 1, 0, 1, 0>(dot2));
-				}
-				else if constexpr (elements_per_register == 16)
-				{
-					return EmuSIMD::add<per_element_width>(dot2, EmuSIMD::shuffle<1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0>(dot2));
-				}
-				else if constexpr (elements_per_register == 32)
-				{
-					return EmuSIMD::add<per_element_width>
+					return _calculate_dot2_width128
 					(
-						dot2,
-						EmuSIMD::shuffle<1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0>(dot2)
-					);
-				}
-				else if constexpr (elements_per_register == 64)
-				{
-					return EmuSIMD::add<per_element_width>
-					(
-						dot2,
-						EmuSIMD::shuffle
-						<
-							1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
-							1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0
-						>(dot2)
+						_retrieve_register_from_arg<0>(std::forward<A_>(a_)),
+						_retrieve_register_from_arg<0>(std::forward<B_>(b_))
 					);
 				}
 				else
 				{
-					static_assert
+					// SIMD registers will have at least 2 elements, so we just cast to 128-bit width and operate on that
+					using register_128 = typename EmuSIMD::TMP::register_type<value_type, 128>::type;
+					return _calculate_dot2_width128
 					(
-						EmuCore::TMP::get_false<this_type>(),
-						"Unable to perform a Dot2 operation on an EmuMath::FastVector instance as it cannot be reliably shuffled due to its elements_per_register size."
+						EmuSIMD::cast<register_128>(_retrieve_register_from_arg<0>(std::forward<A_>(a_))),
+						EmuSIMD::cast<register_128>(_retrieve_register_from_arg<0>(std::forward<B_>(b_)))
 					);
 				}
 			}
 			else
 			{
 				return EmuSIMD::mul_all<per_element_width>(_retrieve_register_from_arg<0>(a_), _retrieve_register_from_arg<0>(b_));
+			}
+		}
+
+		template<class RegisterAB_>
+		[[nodiscard]] static constexpr inline register_type _calculate_dot2_width128(RegisterAB_&& a_, RegisterAB_&& b_)
+		{
+			using register_ab_uq = typename EmuCore::TMP::remove_ref_cv<RegisterAB_>::type;
+			constexpr std::size_t elements_per_128 = 128 / per_element_width;
+			register_ab_uq dot2 = EmuSIMD::mul_all<per_element_width>(std::forward<RegisterAB_>(a_), std::forward<RegisterAB_>(b_));
+
+			if constexpr (elements_per_128 == 2)
+			{
+				dot2 = EmuSIMD::add<per_element_width>(dot2, EmuSIMD::shuffle<1, 0>(dot2));
+			}
+			else if constexpr (elements_per_128 == 4)
+			{
+				dot2 = EmuSIMD::add<per_element_width>(dot2, EmuSIMD::shuffle<1, 0, 1, 0>(dot2));
+			}
+			else if constexpr (elements_per_128 == 8)
+			{
+				dot2 = EmuSIMD::add<per_element_width>(dot2, EmuSIMD::shuffle<1, 0, 1, 0, 1, 0, 1, 0>(dot2));
+			}
+			else if constexpr (elements_per_128 == 16)
+			{
+				dot2 = EmuSIMD::add<per_element_width>(dot2, EmuSIMD::shuffle<1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0>(dot2));
+			}
+			else if constexpr (elements_per_128 == 32)
+			{
+				dot2 = EmuSIMD::add<per_element_width>
+				(
+					dot2,
+					EmuSIMD::shuffle<1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0>(dot2)
+				);
+			}
+			else if constexpr (elements_per_128 == 64)
+			{
+				dot2 = EmuSIMD::add<per_element_width>
+				(
+					dot2,
+					EmuSIMD::shuffle
+					<
+						1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
+						1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0
+					>(dot2)
+				);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<this_type>(),
+					"Unable to perform a Dot2 operation on an EmuMath::FastVector instance as it cannot be reliably shuffled due to its elements_per_register size."
+				);
+			}
+
+			if constexpr (std::is_same_v<register_ab_uq, register_type>)
+			{
+				return dot2;
+			}
+			else
+			{
+				return EmuSIMD::cast<register_type>(dot2);
 			}
 		}
 #pragma endregion

@@ -14,7 +14,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		{
 			using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 			using shuffle_mask_inst = EmuSIMD::_underlying_simd_helpers::_shuffle_mask<register_type_uq, Indices_...>;
-			if constexpr (EmuSIMD::_underlying_simd_helpers::is_valid_shuffle_mask_instance<shuffle_mask_inst>::value)
+			if constexpr (true)
 			{
 				if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 				{
