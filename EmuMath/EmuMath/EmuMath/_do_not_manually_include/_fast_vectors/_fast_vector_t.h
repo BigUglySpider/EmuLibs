@@ -110,10 +110,10 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region HELPER_MASKS
-	public:
+	private:
 		struct _make_partial_mask
 		{
-		public:
+		private:
 			template<bool Included_, typename IndexSequence_>
 			struct _underlying_mask_generation_maker
 			{
@@ -6675,7 +6675,6 @@ namespace EmuMath
 			}
 		}
 
-	public:
 		static constexpr inline auto _make_shuffle_0_for_dot3_sizege3_width128()
 		{
 			// with a 4-element register, this is 2, 1, 2, 1
