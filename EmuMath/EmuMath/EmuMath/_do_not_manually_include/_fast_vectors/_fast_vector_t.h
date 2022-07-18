@@ -25,6 +25,10 @@ namespace EmuMath
 	///		in cases where you are certain that such masking is not required.
 	/// </para>
 	/// <para> Where possible, this type will provide named size alternative functions to mimic a size without requiring a conversion or mask. </para>
+	/// <para>
+	///		It should be noted that while this Vector is designed to run fast, its templatised nature will cause a significant speed decrease in debug builds compared to release. 
+	///		If this is an issue, you may need to activate different optimisation flags for debug builds with your compiler.
+	/// </para>
 	/// </summary>
 	template<std::size_t Size_, typename T_, std::size_t RegisterWidth_>
 	struct FastVector
@@ -4298,6 +4302,16 @@ namespace EmuMath
 			}
 		}
 
+		/// <summary>
+		/// <para> Calculates and outputs the normalised form of this Vector when interpreted as a 2D Vector. </para>
+		/// <para> 
+		///		The output element type may be modified with the `OutFP_` argument for this function. It is not enforced, but recommended to use a floating-point type. 
+		///		This defaults to the Vector's preferred_floating_point type.
+		/// </para>
+		/// <para> By default, this will only normalise the first register. To normalise all registers, pass `true` for the `NormaliseAll_` template argument. </para>
+		/// <para> Conversions for floating-point calculations will be performed automatically; these conversions will be minimised where possible. </para>
+		/// </summary>
+		/// <returns>Normalised form of this Vector when interpreted as a 2D Vector.</returns>
 		template<bool NormaliseAll_, typename OutFP_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Normalise2() const
 		{
@@ -4329,6 +4343,19 @@ namespace EmuMath
 			return Normalise2<false, OutFP_>();
 		}
 
+		/// <summary>
+		/// <para> Calculates and outputs the normalised form of this Vector when interpreted as a 3D Vector. </para>
+		/// <para> 
+		///		The output element type may be modified with the `OutFP_` argument for this function. It is not enforced, but recommended to use a floating-point type. 
+		///		This defaults to the Vector's preferred_floating_point type.
+		/// </para>
+		/// <para>
+		///		By default, this will only normalise the registers containing the first 3 elements in this Vector. 
+		///		To normalise all registers, pass `true` for the `NormaliseAll_` template argument.
+		/// </para>
+		/// <para> Conversions for floating-point calculations will be performed automatically; these conversions will be minimised where possible. </para>
+		/// </summary>
+		/// <returns>Normalised form of this Vector when interpreted as a 3D Vector.</returns>
 		template<bool NormaliseAll_, typename OutFP_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Normalise3() const
 		{
