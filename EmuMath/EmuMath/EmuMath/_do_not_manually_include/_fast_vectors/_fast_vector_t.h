@@ -21,7 +21,8 @@ namespace EmuMath
 	/// <para>
 	///		Automatic masking will be performed for operations where the result may otherwise be affected by non-contained indices. 
 	///		As such, if it is certain that a Vector may not have values that interfere with output for such desired operations, 
-	///		it is recommended to choose a size that does not leave any empty register space to avoid these masking operations. (e.g. `4, float` instead of `3, float`).
+	///		it is recommended to choose a size that does not leave any empty register space to avoid these masking operations (e.g. `4, float` instead of `3, float`) 
+	///		in cases where you are certain that such masking is not required.
 	/// </para>
 	/// <para> Where possible, this type will provide named size alternative functions to mimic a size without requiring a conversion or mask. </para>
 	/// </summary>
@@ -30,6 +31,9 @@ namespace EmuMath
 	{
 #pragma region GENERAL_STATIC_INFO
 	public:
+		// Protected/Private interfaces exposed to all FastVectors to allow use of underlying implementations when working with differing types
+		template<std::size_t, typename, std::size_t> friend struct FastVector;
+
 		/// <summary> The number of elements that this Vector behaves to encapsulate. </summary>
 		static constexpr std::size_t size = Size_;
 		/// <summary> The width provided for this Vector's registers to use, in bits. </summary>
@@ -3991,10 +3995,89 @@ namespace EmuMath
 		/// <para> If a Vector full of the result is required, use `SquareMagnitudeFill` instead. </para>
 		/// </summary>
 		/// <returns>Scalar of the provided output type, containing the squared magnitude of this Vector.</returns>
-		template<typename Out_>
+		template<typename Out_ = value_type>
 		[[nodiscard]] constexpr inline Out_ SquareMagnitudeScalar() const
 		{
 			return DotScalar<Out_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Calculates the squared magnitude of this Vector interpreted as a 2D Vector, which is equivalent to its dot product with itself (using only elements 0 and 1). </para>
+		/// <para> The result will remain as a Vector, and is guaranteed to at least be stored within the first element in the output Vector. </para>
+		/// <para> If a Vector full of the result is required, use `SquareMagnitude2Fill` instead. </para>
+		/// <para> If only a scalar result is required, use `SquareMagnitude2Scalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the square magnitude of this Vector when interpreted as a 2D Vector in at least its very first element.</returns>
+		[[nodiscard]] constexpr inline this_type SquareMagnitude2() const
+		{
+			return Dot2(*this);
+		}
+
+		/// <summary>
+		/// <para> Calculates the squared magnitude of this Vector interpreted as a 2D Vector, which is equivalent to its dot product with itself (using only elements 0 and 1). </para>
+		/// <para> The result will remain as a Vector, and is guaranteed be stored within every element in the output Vector. </para>
+		/// <para> If only a scalar result is required, use `SquareMagnitude2Scalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the square magnitude of this Vector when interpreted as a 2D Vector in at least its very first element.</returns>
+		[[nodiscard]] constexpr inline this_type SquareMagnitude2Fill() const
+		{
+			return Dot2Fill(*this);
+		}
+
+		/// <summary>
+		/// <para> Calculates the squared magnitude of this Vector interpreted as a 2D Vector, which is equivalent to its dot product with itself (using only elements 0 and 1). </para>
+		/// <para> The result will remain as a Vector, and is guaranteed be stored within every element in the output Vector. </para>
+		/// <para> If a Vector full of the result is required, use `SquareMagnitude2Fill` instead. </para>
+		/// </summary>
+		/// <returns>Scalar of the provided output type, containing the squared magnitude of this Vector when interpreted as a 2D Vector.</returns>
+		template<typename Out_ = value_type>
+		[[nodiscard]] constexpr inline Out_ SquareMagnitude2Scalar() const
+		{
+			return Dot2Scalar<Out_>(*this);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Calculates the squared magnitude of this Vector interpreted as a 3D Vector, 
+		///		which is equivalent to its dot product with itself (using only elements 0, 1 and 2).
+		/// </para>
+		/// <para> The result will remain as a Vector, and is guaranteed to at least be stored within the first element in the output Vector. </para>
+		/// <para> If a Vector full of the result is required, use `SquareMagnitude3Fill` instead. </para>
+		/// <para> If only a scalar result is required, use `SquareMagnitude3Scalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the square magnitude of this Vector when interpreted as a 3D Vector in at least its very first element.</returns>
+		[[nodiscard]] constexpr inline this_type SquareMagnitude3() const
+		{
+			return Dot3(*this);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Calculates the squared magnitude of this Vector interpreted as a 3D Vector, 
+		///		which is equivalent to its dot product with itself (using only elements 0, 1 and 2).
+		/// </para>
+		/// <para> The result will remain as a Vector, and is guaranteed be stored within every element in the output Vector. </para>
+		/// <para> If only a scalar result is required, use `SquareMagnitude3Scalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the square magnitude of this Vector when interpreted as a 3D Vector in at least its very first element.</returns>
+		[[nodiscard]] constexpr inline this_type SquareMagnitude3Fill() const
+		{
+			return Dot3Fill(*this);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Calculates the squared magnitude of this Vector interpreted as a 3D Vector, 
+		///		which is equivalent to its dot product with itself (using only elements 0, 1 and 2).
+		/// </para>
+		/// <para> The result will remain as a Vector, and is guaranteed be stored within every element in the output Vector. </para>
+		/// <para> If a Vector full of the result is required, use `SquareMagnitude3Fill` instead. </para>
+		/// </summary>
+		/// <returns>Scalar of the provided output type, containing the squared magnitude of this Vector when interpreted as a 3D Vector.</returns>
+		template<typename Out_ = value_type>
+		[[nodiscard]] constexpr inline Out_ SquareMagnitude3Scalar() const
+		{
+			return Dot3Scalar<Out_>(*this);
 		}
 
 		/// <summary>
@@ -4088,6 +4171,193 @@ namespace EmuMath
 					return static_cast<Out_>(sqrt(EmuSIMD::dot_scalar<double, per_element_width>(data, data)));
 				}
 			}
+		}
+
+		/// <summary>
+		/// <para> Calculates the magnitude of this Vector when interpreted as a 2D Vector. </para>
+		/// <para> The result will remain as a Vector, and is guaranteed to at least be stored within the first element in the output Vector. </para>
+		/// <para> If a Vector full of the result is required, use `Magnitude2Fill` instead. </para>
+		/// <para> If only a scalar result is required, use `Magnitude2Scalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the magnitude of this Vector (when interpreted as a 2D Vector) in at least its very first element.</returns>
+		[[nodiscard]] constexpr inline this_type Magnitude2() const
+		{
+			return this_type(EmuSIMD::sqrt<per_element_width, is_signed>(Dot2(*this)));
+		}
+
+		/// <summary>
+		/// <para> Calculates the magnitude of this Vector when interpreted as a 2D Vector. </para>
+		/// <para> The result will remain as a Vector, and is guaranteed to be stored in all elements of the output Vector. </para>
+		/// <para> If only a scalar result is required, use `Magnitude2Scalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the magnitude of this Vector (when interpreted as a 2D Vector) in at least its very first element.</returns>
+		[[nodiscard]] constexpr inline this_type Magnitude2Fill() const
+		{
+			return this_type(EmuSIMD::sqrt<per_element_width, is_signed>(Dot2Fill(*this)));
+		}
+
+		/// <summary>
+		/// <para> Calculates the magnitude of this Vector when interpreted as a 2D Vector. </para>
+		/// <para> The output type may be customised, but may be omitted in which case it will default to value_type. </para>
+		/// <para> If a Vector full of the result is required, use `Magnitude2Fill` instead. </para>
+		/// </summary>
+		/// <returns>Scalar of the provided output type, containing the magnitude of this Vector when interpreted as a 2D Vector.</returns>
+		template<typename Out_ = value_type>
+		[[nodiscard]] constexpr inline Out_ Magnitude2Scalar() const
+		{
+			if constexpr (per_element_byte_size <= 4)
+			{
+				return static_cast<Out_>(std::sqrtf(Dot2Scalar<float>(*this)));
+			}
+			else
+			{
+				return static_cast<Out_>(std::sqrt(Dot2Scalar<double>(*this)));
+			}
+		}
+
+
+
+
+
+
+
+
+		/// <summary>
+		/// <para> Calculates the magnitude of this Vector when interpreted as a 3D Vector. </para>
+		/// <para> The result will remain as a Vector, and is guaranteed to at least be stored within the first element in the output Vector. </para>
+		/// <para> If a Vector full of the result is required, use `Magnitude3Fill` instead. </para>
+		/// <para> If only a scalar result is required, use `Magnitude3Scalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the magnitude of this Vector (when interpreted as a 3D Vector) in at least its very first element.</returns>
+		[[nodiscard]] constexpr inline this_type Magnitude3() const
+		{
+			return this_type(EmuSIMD::sqrt<per_element_width, is_signed>(Dot3(*this)));
+		}
+
+		/// <summary>
+		/// <para> Calculates the magnitude of this Vector when interpreted as a 3D Vector. </para>
+		/// <para> The result will remain as a Vector, and is guaranteed to be stored in all elements of the output Vector. </para>
+		/// <para> If only a scalar result is required, use `Magnitude3Scalar` instead. </para>
+		/// </summary>
+		/// <returns>FastVector containing the magnitude of this Vector (when interpreted as a 3D Vector) in at least its very first element.</returns>
+		[[nodiscard]] constexpr inline this_type Magnitude3Fill() const
+		{
+			return this_type(EmuSIMD::sqrt<per_element_width, is_signed>(Dot3Fill(*this)));
+		}
+
+		/// <summary>
+		/// <para> Calculates the magnitude of this Vector when interpreted as a 3D Vector. </para>
+		/// <para> The output type may be customised, but may be omitted in which case it will default to value_type. </para>
+		/// <para> If a Vector full of the result is required, use `Magnitude3Fill` instead. </para>
+		/// </summary>
+		/// <returns>Scalar of the provided output type, containing the magnitude of this Vector when interpreted as a 3D Vector.</returns>
+		template<typename Out_ = value_type>
+		[[nodiscard]] constexpr inline Out_ Magnitude3Scalar() const
+		{
+			if constexpr (per_element_byte_size <= 4)
+			{
+				return static_cast<Out_>(std::sqrtf(Dot3Scalar<float>(*this)));
+			}
+			else
+			{
+				return static_cast<Out_>(std::sqrt(Dot3Scalar<double>(*this)));
+			}
+		}
+
+		/// <summary>
+		/// <para> Calculates and outputs the normalised form of this Vector. </para>
+		/// <para> 
+		///		The output element type may be modified with the `OutFP_` argument for this function. It is not enforced, but recommended to use a floating-point type. 
+		///		This defaults to the Vector's preferred_floating_point type.
+		/// </para>
+		/// <para> Conversions for floating-point calculations will be performed automatically; these conversions will be minimised where possible. </para>
+		/// </summary>
+		/// <returns>Normalised form of this Vector.</returns>
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Normalise() const
+		{
+			using out_vector = EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>;
+			constexpr bool out_is_fp = out_vector::is_floating_point;
+			constexpr bool output_same = std::is_same_v<this_type, out_vector>;
+
+			if constexpr (output_same && is_floating_point)
+			{
+				return _do_normalise(*this);
+			}
+			else if constexpr (is_floating_point)
+			{
+				return _do_normalise(*this).template Convert<OutFP_>();
+			}
+			else if constexpr (out_is_fp)
+			{
+				return _do_normalise(this->Convert<OutFP_>());
+			}
+			else
+			{
+				return _do_normalise(this->Convert<preferred_floating_point>()).template Convert<OutFP_>();
+			}
+		}
+
+		template<bool NormaliseAll_, typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Normalise2() const
+		{
+			using out_vector = EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>;
+			constexpr bool out_is_fp = out_vector::is_floating_point;
+			constexpr bool output_same = std::is_same_v<this_type, out_vector>;
+
+			if constexpr (output_same && is_floating_point)
+			{
+				return _calculate_norm_2<NormaliseAll_>(*this);
+			}
+			else if constexpr (is_floating_point)
+			{
+				return _calculate_norm_2<NormaliseAll_>(*this).template Convert<OutFP_>();
+			}
+			else if constexpr (out_is_fp)
+			{
+				return _calculate_norm_2<NormaliseAll_>(this->Convert<OutFP_>());
+			}
+			else
+			{
+				return _calculate_norm_2<NormaliseAll_>(this->Convert<preferred_floating_point>()).template Convert<OutFP_>();
+			}
+		}
+
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Normalise2() const
+		{
+			return Normalise2<false, OutFP_>();
+		}
+
+		template<bool NormaliseAll_, typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Normalise3() const
+		{
+			using out_vector = EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>;
+			constexpr bool out_is_fp = out_vector::is_floating_point;
+			constexpr bool output_same = std::is_same_v<this_type, out_vector>;
+
+			if constexpr (output_same && is_floating_point)
+			{
+				return _calculate_norm_3<NormaliseAll_>(*this);
+			}
+			else if constexpr (is_floating_point)
+			{
+				return _calculate_norm_3<NormaliseAll_>(*this).template Convert<OutFP_>();
+			}
+			else if constexpr (out_is_fp)
+			{
+				return _calculate_norm_3<NormaliseAll_>(this->Convert<OutFP_>());
+			}
+			else
+			{
+				return _calculate_norm_3<NormaliseAll_>(this->Convert<preferred_floating_point>()).template Convert<OutFP_>();
+			}
+		}
+
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Normalise3() const
+		{
+			return Normalise3<false, OutFP_>();
 		}
 
 		/// <summary>
@@ -4332,40 +4602,6 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline this_type FusedLerp(value_type b_, value_type t_) const
 		{
 			return FusedLerp(EmuSIMD::set1<register_type, per_element_width>(b_), EmuSIMD::set1<register_type, per_element_width>(t_));
-		}
-
-		/// <summary>
-		/// <para> Calculates and outputs the normalised form of this Vector. </para>
-		/// <para> 
-		///		The output element type may be modified with the `OutFP_` argument for this function. It is not enforced, but recommended to use a floating-point type. 
-		///		This defaults to the Vector's preferred_floating_point type.
-		/// </para>
-		/// <para> Conversions for floating-point calculations will be performed automatically; these conversions will be minimised where possible. </para>
-		/// </summary>
-		/// <returns>Normalised form of this Vector.</returns>
-		template<typename OutFP_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Normalise() const
-		{
-			using out_vector = EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>;
-			constexpr bool out_is_fp = out_vector::is_floating_point;
-			constexpr bool output_same = std::is_same_v<this_type, out_vector>;
-
-			if constexpr (output_same && is_floating_point)
-			{
-				return _do_normalise(*this);
-			}
-			else if constexpr (is_floating_point)
-			{
-				return _do_normalise(*this).Convert<OutFP_>();
-			}
-			else if constexpr (out_is_fp)
-			{
-				return _do_normalise(this->Convert<OutFP_>());
-			}
-			else
-			{
-				return _do_normalise(this->Convert<preferred_floating_point>()).Convert<OutFP_>();
-			}
 		}
 #pragma endregion
 
@@ -6547,6 +6783,113 @@ namespace EmuMath
 			else
 			{
 				return EmuSIMD::cast<register_type>(dot2);
+			}
+		}
+
+		[[nodiscard]] static constexpr inline register_type _calculate_mag_2(const this_type& vec_)
+		{
+			register_type square_mag = _calculate_dot_2(vec_, vec_);
+			return EmuSIMD::sqrt<per_element_width, is_signed>(square_mag);
+		}
+
+		[[nodiscard]] static constexpr inline register_type _calculate_mag_2_fill(const this_type& vec_)
+		{
+			register_type square_mag = _calculate_dot_2_fill(vec_, vec_);
+			return EmuSIMD::sqrt<per_element_width, is_signed>(square_mag);
+		}
+
+		[[nodiscard]] static constexpr inline register_type _calculate_mag_3(const this_type& vec_)
+		{
+			register_type square_mag = _calculate_dot_3(vec_, vec_);
+			return EmuSIMD::sqrt<per_element_width, is_signed>(square_mag);
+		}
+
+		[[nodiscard]] static constexpr inline register_type _calculate_mag_3_fill(const this_type& vec_)
+		{
+			register_type square_mag = _calculate_dot_3_fill(vec_, vec_);
+			return EmuSIMD::sqrt<per_element_width, is_signed>(square_mag);
+		}
+
+		template<bool NormaliseAll_, class Vector_>
+		[[nodiscard]] static constexpr inline typename Vector_ _calculate_norm_2(const Vector_& vec_)
+		{
+			using vec_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
+			using vec_register_type = typename vec_uq::register_type;
+			constexpr std::size_t out_element_width = vec_uq::per_element_width;
+			
+			vec_register_type mag_reciprocal = vec_._calculate_dot_2_fill(vec_.data, vec_.data);
+			mag_reciprocal = EmuSIMD::rsqrt<per_element_width, is_signed>(mag_reciprocal);
+			if constexpr (NormaliseAll_)
+			{
+				return vec_.Multiply(mag_reciprocal);
+			}
+			else
+			{
+				return Vector_(EmuSIMD::mul_all<out_element_width>(vec_.template GetRegister<0>(), mag_reciprocal));
+			}
+		}
+
+		template<bool NormaliseAll_, class Vector_>
+		[[nodiscard]] static constexpr inline typename Vector_ _calculate_norm_3(const Vector_& vec_)
+		{
+			using vec_uq = typename EmuCore::TMP::remove_ref_cv<Vector_>::type;
+			using vec_register_type = typename vec_uq::register_type;
+			constexpr std::size_t out_element_width = vec_uq::per_element_width;
+			constexpr bool out_is_signed = vec_uq::is_signed;
+
+			vec_register_type mag_reciprocal = vec_._calculate_dot_3_fill(vec_.data, vec_.data);
+			mag_reciprocal = EmuSIMD::rsqrt<out_element_width, out_is_signed>(mag_reciprocal);
+
+			if constexpr (NormaliseAll_)
+			{
+				return vec_.Multiply(mag_reciprocal);
+			}
+			else
+			{
+				constexpr std::size_t out_elements_per_register = vec_uq::elements_per_register;
+				constexpr std::size_t out_size = vec_uq::size;
+
+				if constexpr (out_elements_per_register >= 3 || out_size < 2)
+				{
+					return Vector_(EmuSIMD::mul_all<out_element_width>(vec_.template GetRegister<0>(), mag_reciprocal));
+				}
+				else
+				{
+					using vec_register_index_sequence = typename vec_uq::register_index_sequence;
+					return _make_partial_norm_3(vec_, mag_reciprocal, vec_register_index_sequence());
+				}
+			}
+		}
+
+		template<class OutVector_, std::size_t...RegisterIndices_>
+		[[nodiscard]] static constexpr inline OutVector_ _make_partial_norm_3
+		(
+			const OutVector_& vec_,
+			typename OutVector_::register_arg_type mag_reciprocal_,
+			std::index_sequence<RegisterIndices_...> register_indices_
+		)
+		{
+			return OutVector_(vec_.template _make_register_for_partial_norm_3<RegisterIndices_>(vec_, mag_reciprocal_)...);
+		}
+
+		template<std::size_t Index_, class OutVector_>
+		[[nodiscard]] static constexpr inline typename OutVector_::register_type _make_register_for_partial_norm_3
+		(
+			const OutVector_& vec_,
+			const typename OutVector_::register_arg_type& mag_reciprocal_
+		)
+		{
+			using out_uq = typename EmuCore::TMP::remove_ref_cv<OutVector_>::type;
+			constexpr std::size_t out_elements_per_register = out_uq::elements_per_register;
+			constexpr std::size_t current_register_first_element_index = Index_ * out_elements_per_register;
+			if constexpr (current_register_first_element_index < 3)
+			{
+				constexpr std::size_t out_per_element_width = out_uq::per_element_width;
+				return EmuSIMD::mul_all<out_per_element_width>(vec_.template GetRegister<Index_>(), mag_reciprocal_);
+			}
+			else
+			{
+				return vec_.template GetRegister<Index_>();
 			}
 		}
 #pragma endregion

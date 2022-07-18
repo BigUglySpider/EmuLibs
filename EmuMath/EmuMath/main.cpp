@@ -662,6 +662,28 @@ int main()
 	std::cout << EmuMath::FastVector<4, double, 256>(5, 7, -16, 12).Dot3Scalar(EmuMath::FastVector<4, double, 256>(2, 9, 8, 19)) << "\n";
 
 
+	std::cout << "\nNormalisations\n";
+	std::cout << EmuMath::FastVector<3, float>(3, 2, 26).Normalise() << "\n";
+	std::cout << EmuMath::FastVector<4, float>(3, 2, 26, 5).Normalise() << "\n";
+	std::cout << EmuMath::FastVector<8, float>(3, 2, 26, 5, 16, 27, 139, 81).Normalise() << "\n";
+	std::cout << EmuMath::FastVector<8, float>(3, 2, 26, 5, 16, 27, 139, 81).Normalise<double>() << "\n";
+	std::cout << EmuMath::FastVector<8, double>(3, 2, 26, 5, 16, 27, 139, 81).Normalise<double>() << "\n";
+
+	std::cout << "\nNormalisations 2D\n";
+	std::cout << EmuMath::FastVector<3, float>(3, 2, 26).Normalise2() << "\n";
+	std::cout << EmuMath::FastVector<4, float>(3, 2, 26, 5).Normalise2() << "\n";
+	std::cout << EmuMath::FastVector<8, float>(3, 2, 26, 5, 16, 27, 139, 81).Normalise2() << "\n";
+	std::cout << EmuMath::FastVector<8, float>(3, 2, 26, 5, 16, 27, 139, 81).Normalise2<double>() << "\n";
+	std::cout << EmuMath::FastVector<8, double>(3, 2, 26, 5, 16, 27, 139, 81).Normalise2<double>() << "\n";
+
+	std::cout << "\nNormalisations 3D\n";
+	std::cout << EmuMath::FastVector<3, float>(3, 2, 26).Normalise3() << "\n";
+	std::cout << EmuMath::FastVector<4, float>(3, 2, 26, 5).Normalise3() << "\n";
+	std::cout << EmuMath::FastVector<8, float>(3, 2, 26, 5, 16, 27, 139, 81).Normalise3() << "\n";
+	std::cout << EmuMath::FastVector<8, float>(3, 2, 26, 5, 16, 27, 139, 81).Normalise3<double>() << "\n";
+	std::cout << EmuMath::FastVector<8, double>(3, 2, 26, 5, 16, 27, 139, 81).Normalise3<double>() << "\n";
+
+
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 	constexpr auto mat_b_ = EmuMath::Matrix<4, 4, int, true>(1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
