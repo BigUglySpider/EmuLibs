@@ -4219,13 +4219,6 @@ namespace EmuMath
 			}
 		}
 
-
-
-
-
-
-
-
 		/// <summary>
 		/// <para> Calculates the magnitude of this Vector when interpreted as a 3D Vector. </para>
 		/// <para> The result will remain as a Vector, and is guaranteed to at least be stored within the first element in the output Vector. </para>
@@ -4629,6 +4622,588 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline this_type FusedLerp(value_type b_, value_type t_) const
 		{
 			return FusedLerp(EmuSIMD::set1<register_type, per_element_width>(b_), EmuSIMD::set1<register_type, per_element_width>(t_));
+		}
+
+		enum class _GeneralOutputType : std::uint8_t
+		{
+			VectorBegin =	0x01,
+			VectorFill =	0x02,
+			Scalar =		0x04,
+
+			AnyVector = VectorBegin | VectorFill
+		};
+
+		static constexpr bool _is_vector_general_out_type(_GeneralOutputType out_type_)
+		{
+			return EmuCore::TMP::safe_enum_and<_GeneralOutputType>(out_type_, _GeneralOutputType::AnyVector) != EmuCore::TMP::safe_enum_zero<_GeneralOutputType>();
+		}
+
+		static constexpr bool _out_type_should_fill_vector(_GeneralOutputType out_type_)
+		{
+			return EmuCore::TMP::safe_enum_and<_GeneralOutputType>(out_type_, _GeneralOutputType::VectorFill) != EmuCore::TMP::safe_enum_zero<_GeneralOutputType>();
+		}
+
+		template<bool OutRads_, typename OutFP_, _GeneralOutputType OutMethod_, bool AllowLossy_>
+		[[nodiscard]] static constexpr inline auto _do_angle_cos(const this_type& a_, const this_type& b_)
+			-> typename std::conditional<_is_vector_general_out_type(OutMethod_), EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>, OutFP_>::type
+		{
+			constexpr bool output_is_vector = _is_vector_general_out_type(OutMethod_);
+			if constexpr (output_is_vector)
+			{
+				using out_vector = EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>;
+				constexpr bool out_is_fp = out_vector::is_floating_point;
+				constexpr bool output_same = std::is_same_v<this_type, out_vector>;
+				constexpr bool fill_vector = _out_type_should_fill_vector(OutMethod_);
+
+				if constexpr (output_same && is_floating_point)
+				{
+					return this_type(_calculate_angle_cosine<OutRads_, fill_vector, AllowLossy_>(a_.data, b_.data));
+				}
+				else if constexpr (is_floating_point)
+				{
+					return this_type(_calculate_angle_cosine<OutRads_, fill_vector, AllowLossy_>(a_.data, b_.data)).Convert<OutFP_>();
+				}
+				else if constexpr (out_is_fp)
+				{
+					return out_vector
+					(
+						out_vector::template _calculate_angle_cosine<OutRads_, fill_vector, AllowLossy_>
+						(
+							a_.Convert<OutFP_>().data,
+							b_.Convert<OutFP_>().data
+						)
+					);
+				}
+				else
+				{
+					using fp_vector = EmuMath::FastVector<Size_, preferred_floating_point, RegisterWidth_>;
+					return fp_vector
+					(
+						fp_vector::template _calculate_angle_cosine<OutRads_, fill_vector, AllowLossy_>
+						(
+							a_.Convert<preferred_floating_point>().data,
+							b_.Convert<preferred_floating_point>().data
+						)
+					).template Convert<OutFP_>();
+				}
+			}
+			else
+			{
+				using out_uq = typename EmuCore::TMP::remove_ref_cv<OutFP_>::type;
+				constexpr bool fill_vector = false;
+				if constexpr (is_floating_point)
+				{
+					return EmuSIMD::get_index<0, OutFP_, per_element_width>(_calculate_angle_cosine<OutRads_, fill_vector, AllowLossy_>(a_.data, b_.data));
+				}
+				else
+				{
+					constexpr bool out_is_fp = std::is_floating_point_v<out_uq>;
+					using calc_fp = typename std::conditional<out_is_fp, out_uq, preferred_floating_point>::type;
+					using fp_vector = EmuMath::FastVector<Size_, calc_fp, RegisterWidth_>;
+					return EmuSIMD::get_index<0, OutFP_, fp_vector::per_element_width>
+					(
+						fp_vector::template _calculate_angle_cosine<OutRads_, fill_vector, AllowLossy_>
+						(
+							a_.Convert<calc_fp>().data,
+							b_.Convert<calc_fp>().data
+						)
+					);
+				}
+			}
+		}
+
+		template<bool OutRads_, typename OutFP_, _GeneralOutputType OutMethod_, bool AllowLossy_>
+		[[nodiscard]] static constexpr inline auto _do_angle(const this_type& a_, const this_type& b_)
+			-> typename std::conditional<_is_vector_general_out_type(OutMethod_), EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>, OutFP_>::type
+		{
+			constexpr bool output_is_vector = _is_vector_general_out_type(OutMethod_);
+			if constexpr (output_is_vector)
+			{
+				using out_vector = EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>;
+				constexpr bool out_is_fp = out_vector::is_floating_point;
+				constexpr bool output_same = std::is_same_v<this_type, out_vector>;
+				constexpr bool fill_vector = _out_type_should_fill_vector(OutMethod_);
+
+				if constexpr (output_same && is_floating_point)
+				{
+					return this_type(_calculate_angle<OutRads_, fill_vector, AllowLossy_>(a_.data, b_.data));
+				}
+				else if constexpr (is_floating_point)
+				{
+					return this_type(_calculate_angle<OutRads_, fill_vector, AllowLossy_>(a_.data, b_.data)).Convert<OutFP_>();
+				}
+				else if constexpr (out_is_fp)
+				{
+					return out_vector
+					(
+						out_vector::template _calculate_angle<OutRads_, fill_vector, AllowLossy_>
+						(
+							a_.Convert<OutFP_>().data,
+							b_.Convert<OutFP_>().data
+						)
+					);
+				}
+				else
+				{
+					using fp_vector = EmuMath::FastVector<Size_, preferred_floating_point, RegisterWidth_>;
+					return fp_vector
+					(
+						fp_vector::template _calculate_angle<OutRads_, fill_vector, AllowLossy_>
+						(
+							a_.Convert<preferred_floating_point>().data,
+							b_.Convert<preferred_floating_point>().data
+						)
+					).template Convert<OutFP_>();
+				}
+			}
+			else
+			{
+				using out_uq = typename EmuCore::TMP::remove_ref_cv<OutFP_>::type;
+				constexpr bool fill_vector = false;
+				if constexpr (is_floating_point)
+				{
+					return EmuSIMD::get_index<0, OutFP_, per_element_width>(_calculate_angle<OutRads_, fill_vector, AllowLossy_>(a_.data, b_.data));
+				}
+				else
+				{
+					constexpr bool out_is_fp = std::is_floating_point_v<out_uq>;
+					using calc_fp = typename std::conditional<out_is_fp, out_uq, preferred_floating_point>::type;
+					using fp_vector = EmuMath::FastVector<Size_, calc_fp, RegisterWidth_>;
+					return EmuSIMD::get_index<0, OutFP_, fp_vector::per_element_width>
+					(
+						fp_vector::template _calculate_angle<OutRads_, fill_vector, AllowLossy_>
+						(
+							a_.Convert<calc_fp>().data,
+							b_.Convert<calc_fp>().data
+						)
+					);
+				}
+			}
+		}
+
+		/// <summary>
+		/// <para> Calculates the cosine of the angle between this Vector and Vector b_. </para>
+		/// <para> For accuracy purposes, intermediate floating-point conversions will be performed for integral Vectors. </para>
+		/// <para> Some optimisations will be omitted for accuracy in the result. For speedier calculations at the cost of accuracy, use `AngleCosLossy`. </para>
+		/// <para> 
+		///		To output as radians, provide `true` as the `OutRads_` template argument; provide `false` to output as Degrees. 
+		///		If OutRads_ is omitted, this will output in Radians.
+		/// </para>
+		/// <para> The output Vector may have a different, modifiable value type, which defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="b_">Vector to calculate the cosine of the angle of with this Vector.</param>
+		/// <returns>
+		///		FastVector of the same size and register width with the provided OutFP_ value type,
+		///		containing the cosine of the angle between this Vector and b_ in at least its very first item.
+		/// </returns>
+		template<bool OutRads_, typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> AngleCos(const this_type& b_) const
+		{
+			return _do_angle_cos<OutRads_, OutFP_, _GeneralOutputType::VectorBegin, false>(*this, b_);
+		}
+
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> AngleCos(const this_type& b_)
+		{
+			return _do_angle_cos<true, OutFP_, _GeneralOutputType::VectorBegin, false>(*this, b_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the cosine of the angle between this Vector and Vector b_. </para>
+		/// <para> For accuracy purposes, intermediate floating-point conversions will be performed for integral Vectors. </para>
+		/// <para> Some optimisations will reduce accuracy in the result. For better accuracy at the cost of slower calculations, use `AngleCos`. </para>
+		/// <para> 
+		///		To output as radians, provide `true` as the `OutRads_` template argument; provide `false` to output as Degrees. 
+		///		If OutRads_ is omitted, this will output in Radians.
+		/// </para>
+		/// <para> The output Vector may have a different, modifiable value type, which defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="b_">Vector to calculate the cosine of the angle of with this Vector.</param>
+		/// <returns>
+		///		FastVector of the same size and register width with the provided OutFP_ value type,
+		///		containing the cosine of the angle between this Vector and b_ in at least its very first item.
+		/// </returns>
+		template<bool OutRads_, typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> AngleCosLossy(const this_type& b_) const
+		{
+			return _do_angle_cos<OutRads_, OutFP_, _GeneralOutputType::VectorBegin, true>(*this, b_);
+		}
+
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> AngleCosLossy(const this_type& b_)
+		{
+			return _do_angle_cos<true, OutFP_, _GeneralOutputType::VectorBegin, true>(*this, b_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the cosine of the angle between this Vector and Vector b_. </para>
+		/// <para> For accuracy purposes, intermediate floating-point conversions will be performed for integral Vectors. </para>
+		/// <para> Some optimisations will be omitted for accuracy in the result. For speedier calculations at the cost of accuracy, use `AngleCosLossyFill`. </para>
+		/// <para> 
+		///		To output as radians, provide `true` as the `OutRads_` template argument; provide `false` to output as Degrees. 
+		///		If OutRads_ is omitted, this will output in Radians.
+		/// </para>
+		/// <para> The output Vector may have a different, modifiable value type, which defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="b_">Vector to calculate the cosine of the angle of with this Vector.</param>
+		/// <returns>
+		///		FastVector of the same size and register width with the provided OutFP_ value type,
+		///		containing the cosine of the angle between this Vector and b_ in every element.
+		/// </returns>
+		template<bool OutRads_, typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> AngleCosFill(const this_type& b_) const
+		{
+			return _do_angle_cos<OutRads_, OutFP_, _GeneralOutputType::VectorFill, false>(*this, b_);
+		}
+
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> AngleCosFill(const this_type& b_)
+		{
+			return _do_angle_cos<true, OutFP_, _GeneralOutputType::VectorFill, false>(*this, b_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the cosine of the angle between this Vector and Vector b_. </para>
+		/// <para> For accuracy purposes, intermediate floating-point conversions will be performed for integral Vectors. </para>
+		/// <para> Some optimisations will reduce accuracy in the result. For better accuracy at the cost of slower calculations, use `AngleCosFill`. </para>
+		/// <para> 
+		///		To output as radians, provide `true` as the `OutRads_` template argument; provide `false` to output as Degrees. 
+		///		If OutRads_ is omitted, this will output in Radians.
+		/// </para>
+		/// <para> The output Vector may have a different, modifiable value type, which defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="b_">Vector to calculate the cosine of the angle of with this Vector.</param>
+		/// <returns>
+		///		FastVector of the same size and register width with the provided OutFP_ value type,
+		///		containing the cosine of the angle between this Vector and b_ in every element.
+		/// </returns>
+		template<bool OutRads_, typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> AngleCosLossyFill(const this_type& b_) const
+		{
+			return _do_angle_cos<OutRads_, OutFP_, _GeneralOutputType::VectorFill, true>(*this, b_);
+		}
+
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> AngleCosLossyFill(const this_type& b_)
+		{
+			return _do_angle_cos<true, OutFP_, _GeneralOutputType::VectorFill, true>(*this, b_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the cosine of the angle between this Vector and Vector b_. </para>
+		/// <para> For accuracy purposes, intermediate floating-point conversions will be performed for integral Vectors. </para>
+		/// <para> Some optimisations will be omitted for accuracy in the result. For speedier calculations at the cost of accuracy, use `AngleCosLossyScalar`. </para>
+		/// <para> 
+		///		To output as radians, provide `true` as the `OutRads_` template argument; provide `false` to output as Degrees. 
+		///		If OutRads_ is omitted, this will output in Radians.
+		/// </para>
+		/// <para> The output scalar type may be modified, and defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="b_">Vector to calculate the cosine of the angle of with this Vector.</param>
+		/// <returns>
+		///		Scalar of the provided Out_ type (defaulting to this Vector's preferred_floating_point if omitted),
+		///		containing the cosine of the angle between this Vector and b_.
+		/// </returns>
+		template<bool OutRads_, typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline Out_ AngleCosScalar(const this_type& b_) const
+		{
+			return _do_angle_cos<OutRads_, Out_, _GeneralOutputType::Scalar, false>(*this, b_);
+		}
+
+		template<typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline Out_ AngleCosScalar(const this_type& b_)
+		{
+			return _do_angle_cos<true, Out_, _GeneralOutputType::Scalar, false>(*this, b_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the cosine of the angle between this Vector and Vector b_. </para>
+		/// <para> For accuracy purposes, intermediate floating-point conversions will be performed for integral Vectors. </para>
+		/// <para> Some optimisations will reduce accuracy in the result. For better accuracy at the cost of slower calculations, use `AngleCosScalar`. </para>
+		/// <para> 
+		///		To output as radians, provide `true` as the `OutRads_` template argument; provide `false` to output as Degrees. 
+		///		If OutRads_ is omitted, this will output in Radians.
+		/// </para>
+		/// <para> The output scalar type may be modified, and defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="b_">Vector to calculate the cosine of the angle of with this Vector.</param>
+		/// <returns>
+		///		Scalar of the provided Out_ type (defaulting to this Vector's preferred_floating_point if omitted),
+		///		containing the cosine of the angle between this Vector and b_.
+		/// </returns>
+		template<bool OutRads_, typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline Out_ AngleCosLossyScalar(const this_type& b_) const
+		{
+			return _do_angle_cos<OutRads_, Out_, _GeneralOutputType::Scalar, true>(*this, b_);
+		}
+
+		template<typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline Out_ AngleCosLossyScalar(const this_type& b_)
+		{
+			return _do_angle_cos<true, Out_, _GeneralOutputType::Scalar, true>(*this, b_);
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+		/// <summary>
+		/// <para> Calculates the angle between this Vector and Vector b_. </para>
+		/// <para> For accuracy purposes, intermediate floating-point conversions will be performed for integral Vectors. </para>
+		/// <para> Some optimisations will be omitted for accuracy in the result. For speedier calculations at the cost of accuracy, use `AngleLossy`. </para>
+		/// <para> 
+		///		To output as radians, provide `true` as the `OutRads_` template argument; provide `false` to output as Degrees. 
+		///		If OutRads_ is omitted, this will output in Radians.
+		/// </para>
+		/// <para> The output Vector may have a different, modifiable value type, which defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="b_">Vector to calculate the angle of with this Vector.</param>
+		/// <returns>
+		///		FastVector of the same size and register width with the provided OutFP_ value type,
+		///		containing the angle between this Vector and b_ in at least its very first item.
+		/// </returns>
+		template<bool OutRads_, typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Angle(const this_type& b_) const
+		{
+			return _do_angle<OutRads_, OutFP_, _GeneralOutputType::VectorBegin, false>(*this, b_);
+		}
+
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Angle(const this_type& b_)
+		{
+			return _do_angle<true, OutFP_, _GeneralOutputType::VectorBegin, false>(*this, b_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the angle between this Vector and Vector b_. </para>
+		/// <para> For accuracy purposes, intermediate floating-point conversions will be performed for integral Vectors. </para>
+		/// <para> Some optimisations will reduce accuracy in the result. For better accuracy at the cost of slower calculations, use `Angle`. </para>
+		/// <para> 
+		///		To output as radians, provide `true` as the `OutRads_` template argument; provide `false` to output as Degrees. 
+		///		If OutRads_ is omitted, this will output in Radians.
+		/// </para>
+		/// <para> The output Vector may have a different, modifiable value type, which defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="b_">Vector to calculate the angle of with this Vector.</param>
+		/// <returns>
+		///		FastVector of the same size and register width with the provided OutFP_ value type,
+		///		containing the angle between this Vector and b_ in at least its very first item.
+		/// </returns>
+		template<bool OutRads_, typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> AngleLossy(const this_type& b_) const
+		{
+			return _do_angle<OutRads_, OutFP_, _GeneralOutputType::VectorBegin, true>(*this, b_);
+		}
+
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> AngleLossy(const this_type& b_)
+		{
+			return _do_angle<true, OutFP_, _GeneralOutputType::VectorBegin, true>(*this, b_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the angle between this Vector and Vector b_. </para>
+		/// <para> For accuracy purposes, intermediate floating-point conversions will be performed for integral Vectors. </para>
+		/// <para> Some optimisations will be omitted for accuracy in the result. For speedier calculations at the cost of accuracy, use `AngleLossyFill`. </para>
+		/// <para> 
+		///		To output as radians, provide `true` as the `OutRads_` template argument; provide `false` to output as Degrees. 
+		///		If OutRads_ is omitted, this will output in Radians.
+		/// </para>
+		/// <para> The output Vector may have a different, modifiable value type, which defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="b_">Vector to calculate the angle of with this Vector.</param>
+		/// <returns>
+		///		FastVector of the same size and register width with the provided OutFP_ value type,
+		///		containing the angle between this Vector and b_ in every element.
+		/// </returns>
+		template<bool OutRads_, typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> AngleFill(const this_type& b_) const
+		{
+			return _do_angle<OutRads_, OutFP_, _GeneralOutputType::VectorFill, false>(*this, b_);
+		}
+
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> AngleFill(const this_type& b_)
+		{
+			return _do_angle<true, OutFP_, _GeneralOutputType::VectorFill, false>(*this, b_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the angle between this Vector and Vector b_. </para>
+		/// <para> For accuracy purposes, intermediate floating-point conversions will be performed for integral Vectors. </para>
+		/// <para> Some optimisations will reduce accuracy in the result. For better accuracy at the cost of slower calculations, use `AngleFill`. </para>
+		/// <para> 
+		///		To output as radians, provide `true` as the `OutRads_` template argument; provide `false` to output as Degrees. 
+		///		If OutRads_ is omitted, this will output in Radians.
+		/// </para>
+		/// <para> The output Vector may have a different, modifiable value type, which defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="b_">Vector to calculate the angle of with this Vector.</param>
+		/// <returns>
+		///		FastVector of the same size and register width with the provided OutFP_ value type,
+		///		containing the angle between this Vector and b_ in every element.
+		/// </returns>
+		template<bool OutRads_, typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> AngleLossyFill(const this_type& b_) const
+		{
+			return _do_angle<OutRads_, OutFP_, _GeneralOutputType::VectorFill, true>(*this, b_);
+		}
+
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> AngleLossyFill(const this_type& b_)
+		{
+			return _do_angle<true, OutFP_, _GeneralOutputType::VectorFill, true>(*this, b_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the angle between this Vector and Vector b_. </para>
+		/// <para> For accuracy purposes, intermediate floating-point conversions will be performed for integral Vectors. </para>
+		/// <para> Some optimisations will be omitted for accuracy in the result. For speedier calculations at the cost of accuracy, use `AngleLossyScalar`. </para>
+		/// <para> 
+		///		To output as radians, provide `true` as the `OutRads_` template argument; provide `false` to output as Degrees. 
+		///		If OutRads_ is omitted, this will output in Radians.
+		/// </para>
+		/// <para> The output scalar type may be modified, and defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="b_">Vector to calculate the angle of with this Vector.</param>
+		/// <returns>Scalar of the provided Out_ type (defaulting to this Vector's preferred_floating_point if omitted), containing the angle between this Vector and b_.</returns>
+		template<bool OutRads_, typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline Out_ AngleScalar(const this_type& b_) const
+		{
+			return _do_angle<OutRads_, Out_, _GeneralOutputType::Scalar, false>(*this, b_);
+		}
+
+		template<typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline Out_ AngleScalar(const this_type& b_)
+		{
+			return _do_angle<true, Out_, _GeneralOutputType::Scalar, false>(*this, b_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the angle between this Vector and Vector b_. </para>
+		/// <para> For accuracy purposes, intermediate floating-point conversions will be performed for integral Vectors. </para>
+		/// <para> Some optimisations will reduce accuracy in the result. For better accuracy at the cost of slower calculations, use `AngleScalar`. </para>
+		/// <para> 
+		///		To output as radians, provide `true` as the `OutRads_` template argument; provide `false` to output as Degrees. 
+		///		If OutRads_ is omitted, this will output in Radians.
+		/// </para>
+		/// <para> The output scalar type may be modified, and defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="b_">Vector to calculate the angle of with this Vector.</param>
+		/// <returns>Scalar of the provided Out_ type (defaulting to this Vector's preferred_floating_point if omitted), containing the angle between this Vector and b_.</returns>
+		template<bool OutRads_, typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline Out_ AngleLossyScalar(const this_type& b_) const
+		{
+			return _do_angle<OutRads_, Out_, _GeneralOutputType::Scalar, true>(*this, b_);
+		}
+
+		template<typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline Out_ AngleLossyScalar(const this_type& b_)
+		{
+			return _do_angle<true, Out_, _GeneralOutputType::Scalar, true>(*this, b_);
+		}
+
+		/// <summary>
+		/// <para> Underlying angle cosine calculation method. This is very lossy with integers; higher level calls should preferably convert to floating-point first. </para>
+		/// </summary>
+		/// <returns>Register of the angle cosine between a_ and b_ in Radians or Degrees, without any type conversions.</returns>
+		template<bool OutputRadians_, bool Fill_, bool AllowLossy_, class B_>
+		[[nodiscard]] static constexpr inline register_type _calculate_angle_cosine(const data_type& a_, B_&& b_)
+		{
+			const B_ forwarded_b = std::forward<B_>(b_);
+			register_type combined_square_mag = _calculate_dot<Fill_>(a_, a_);
+			combined_square_mag = EmuSIMD::mul_all<per_element_width>(combined_square_mag, _calculate_dot<Fill_>(forwarded_b, forwarded_b));
+
+			register_type result = _calculate_dot<Fill_>(a_, forwarded_b);
+
+			if constexpr (is_floating_point && AllowLossy_)
+			{
+				result = EmuSIMD::mul_all<per_element_width>(result, EmuSIMD::rsqrt<per_element_width, is_signed>(combined_square_mag));
+			}
+			else
+			{
+				result = EmuSIMD::div<per_element_width, is_signed>(result, EmuSIMD::sqrt<per_element_width, is_signed>(combined_square_mag));
+			}
+
+			if constexpr (OutputRadians_)
+			{
+				return result;
+			}
+			else
+			{
+				return EmuSIMD::mul_all<per_element_width>(result, EmuSIMD::set1<register_type, per_element_width>(EmuCore::Pi::HUNDRED80_DIV_PI<value_type>));
+			}
+		}
+
+		template<bool OutputRadians_, bool Fill_, bool AllowLossy_, class B_>
+		[[nodiscard]] static constexpr inline register_type _calculate_angle(const data_type& a_, B_&& b_)
+		{
+			// Start with radians before calculating arc cosine as SIMD assumes radian I/O
+			register_type angle = _calculate_angle_cosine<true, Fill_, AllowLossy_>(a_, std::forward<B_>(b_));
+			angle = EmuSIMD::acos<per_element_width, is_signed>(angle);
+
+			if constexpr (OutputRadians_)
+			{
+				return angle;
+			}
+			else
+			{
+				return EmuSIMD::mul_all<per_element_width>(angle, EmuSIMD::set1<register_type, per_element_width>(EmuCore::Pi::HUNDRED80_DIV_PI<value_type>));
+			}
+		}
+
+		template<bool Fill_, class A_, class B_>
+		static constexpr inline register_type _calculate_dot(A_&& a_, B_&& b_)
+		{
+			if constexpr (contains_multiple_registers)
+			{
+				return _do_array_dot<Fill_>(std::forward<A_>(a_), std::forward<B_>(b_), register_index_sequence());
+			}
+			else if constexpr (requires_partial_register)
+			{
+				// Need extra work to make sure we dot correctly
+				register_type a_masked = EmuSIMD::bitwise_and
+				(
+					_retrieve_register_from_arg<0>(std::forward<A_>(a_)),
+					make_partial_end_exclude_mask_register()
+				);
+
+				if constexpr (Fill_)
+				{
+					return EmuSIMD::dot_fill<per_element_width>(a_masked, _retrieve_register_from_arg<0>(std::forward<B_>(b_)));
+				}
+				else
+				{
+					return EmuSIMD::dot<per_element_width>(a_masked, _retrieve_register_from_arg<0>(std::forward<B_>(b_)));
+				}
+			}
+			else
+			{
+				// Safe to do a simple dot
+				if constexpr (Fill_)
+				{
+					return EmuSIMD::dot_fill<per_element_width>
+					(
+						_retrieve_register_from_arg<0>(std::forward<A_>(a_)),
+						_retrieve_register_from_arg<0>(std::forward<B_>(b_))
+					);
+				}
+				else
+				{
+					return EmuSIMD::dot<per_element_width>
+					(
+							_retrieve_register_from_arg<0>(std::forward<A_>(a_)),
+							_retrieve_register_from_arg<0>(std::forward<B_>(b_))
+					);
+				}
+			}
 		}
 #pragma endregion
 
@@ -7047,18 +7622,18 @@ namespace EmuMath
 
 #pragma region CONST_VECTOR_ARITHMETIC_HELPERS
 	private:
-		template<bool Fill_, typename B_, std::size_t...RegisterIndices_>
-		static constexpr inline data_type _do_array_dot(const data_type& a_, B_&& b_, std::index_sequence<RegisterIndices_...> indices_)
+		template<bool Fill_, class A_, class B_, std::size_t...RegisterIndices_>
+		static constexpr inline register_type _do_array_dot(A_&& a_, B_&& b_, std::index_sequence<RegisterIndices_...> indices_)
 		{
-			register_type result = _calculate_array_dot_pre_hadd(a_, std::forward<B_>(b_), indices_);
+			register_type result = _calculate_array_dot_pre_hadd(std::forward<A_>(a_), std::forward<B_>(b_), indices_);
 
 			if constexpr (Fill_)
 			{
-				return _do_set_all_same_register(EmuSIMD::horizontal_sum_fill<per_element_width>(result));
+				return EmuSIMD::horizontal_sum_fill<per_element_width>(result);
 			}
 			else
 			{
-				return _do_set_all_same_register(EmuSIMD::horizontal_sum<per_element_width>(result));
+				return EmuSIMD::horizontal_sum<per_element_width>(result);
 			}
 		}
 
@@ -7153,10 +7728,12 @@ namespace EmuMath
 			}
 		}
 
-		template<class B_, std::size_t...RegisterIndices_>
-		static constexpr inline register_type _calculate_array_dot_pre_hadd(const data_type& a_, B_&& b_, std::index_sequence<RegisterIndices_...> indices_)
+		template<class A_, class B_, std::size_t...RegisterIndices_>
+		static constexpr inline register_type _calculate_array_dot_pre_hadd(A_&& a_, B_&& b_, std::index_sequence<RegisterIndices_...> indices_)
 		{
 			register_type result = make_all_zero_register();
+			const A_ a_forwarded = std::forward<A_>(a_);
+			const B_ b_forwarded = std::forward<B_>(b_);
 
 			(
 				(
@@ -7165,8 +7742,8 @@ namespace EmuMath
 						result,
 						_do_array_dot_mult<RegisterIndices_>
 						(
-							a_[RegisterIndices_],
-							_retrieve_register_from_arg<RegisterIndices_>(std::forward<B_>(b_))
+							_retrieve_register_from_arg<RegisterIndices_>(a_forwarded),
+							_retrieve_register_from_arg<RegisterIndices_>(b_forwarded)
 						)
 					)
 				), ...

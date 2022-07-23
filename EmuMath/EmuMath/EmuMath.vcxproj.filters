@@ -698,5 +698,11 @@
     <ClInclude Include="EmuCore\CommonTypes\ComparisonEnum.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_simd_helpers_template_trig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_all_underlying_templates.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

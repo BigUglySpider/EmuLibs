@@ -443,6 +443,113 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region TEMPLATES
+	/// <summary>
+	/// <para> Template helper for performing a floating-point operation on an integral register. The floating-point operation is provided by Func_. </para>
+	/// <para>
+	///		The used floating-point register is the first with element width greater than or equal to the width of elements in the integer register. 
+	///		The full width of the registers will match fully. 
+	/// </para>
+	/// </summary>
+	/// <param name="func_">Floating-point function to execute.</param>
+	/// <param name="in_">Integral register to emulate the fp operation with.</param>
+	/// <returns>The results of the floating-point operation with the provided register elements.</returns>
+	template<class Func_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto emulate_fp_i8x64(Func_ func_, EmuSIMD::i8x64_arg in_)
+		-> std::enable_if_t<std::is_invocable_r_v<EmuSIMD::f32x16, decltype(func_), EmuSIMD::f32x16>, EmuSIMD::i8x64>
+	{
+		constexpr std::size_t num_elements = 64;
+		constexpr std::size_t elements_per_register = 16;
+		std::int8_t data[num_elements];
+		float results[num_elements];
+
+		store_i8x64(data, in_);
+		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
+		{
+			_mm512_store_ps
+			(
+				results + i,
+				func_
+				(
+					_mm512_set_ps
+					( 
+						data[i + 15], data[i + 14], data[i + 13], data[i + 12], data[i + 11], data[i + 10], data[i + 9], data[i + 8],
+						data[i + 7], data[i + 6], data[i + 5], data[i + 4], data[i + 3], data[i + 2], data[i + 1], data[i]
+					)
+				)
+			);
+		}
+
+		return set_i8x64
+		(
+			static_cast<std::int8_t>(results[63]),
+			static_cast<std::int8_t>(results[62]),
+			static_cast<std::int8_t>(results[61]),
+			static_cast<std::int8_t>(results[60]),
+			static_cast<std::int8_t>(results[59]),
+			static_cast<std::int8_t>(results[58]),
+			static_cast<std::int8_t>(results[57]),
+			static_cast<std::int8_t>(results[56]),
+			static_cast<std::int8_t>(results[55]),
+			static_cast<std::int8_t>(results[54]),
+			static_cast<std::int8_t>(results[53]),
+			static_cast<std::int8_t>(results[52]),
+			static_cast<std::int8_t>(results[51]),
+			static_cast<std::int8_t>(results[50]),
+			static_cast<std::int8_t>(results[49]),
+			static_cast<std::int8_t>(results[48]),
+			static_cast<std::int8_t>(results[47]),
+			static_cast<std::int8_t>(results[46]),
+			static_cast<std::int8_t>(results[45]),
+			static_cast<std::int8_t>(results[44]),
+			static_cast<std::int8_t>(results[43]),
+			static_cast<std::int8_t>(results[42]),
+			static_cast<std::int8_t>(results[41]),
+			static_cast<std::int8_t>(results[40]),
+			static_cast<std::int8_t>(results[39]),
+			static_cast<std::int8_t>(results[38]),
+			static_cast<std::int8_t>(results[37]),
+			static_cast<std::int8_t>(results[36]),
+			static_cast<std::int8_t>(results[35]),
+			static_cast<std::int8_t>(results[34]),
+			static_cast<std::int8_t>(results[33]),
+			static_cast<std::int8_t>(results[32]),
+			static_cast<std::int8_t>(results[31]),
+			static_cast<std::int8_t>(results[30]),
+			static_cast<std::int8_t>(results[29]),
+			static_cast<std::int8_t>(results[28]),
+			static_cast<std::int8_t>(results[27]),
+			static_cast<std::int8_t>(results[26]),
+			static_cast<std::int8_t>(results[25]),
+			static_cast<std::int8_t>(results[24]),
+			static_cast<std::int8_t>(results[23]),
+			static_cast<std::int8_t>(results[22]),
+			static_cast<std::int8_t>(results[21]),
+			static_cast<std::int8_t>(results[20]),
+			static_cast<std::int8_t>(results[19]),
+			static_cast<std::int8_t>(results[18]),
+			static_cast<std::int8_t>(results[17]),
+			static_cast<std::int8_t>(results[16]),
+			static_cast<std::int8_t>(results[15]),
+			static_cast<std::int8_t>(results[14]),
+			static_cast<std::int8_t>(results[13]),
+			static_cast<std::int8_t>(results[12]),
+			static_cast<std::int8_t>(results[11]),
+			static_cast<std::int8_t>(results[10]),
+			static_cast<std::int8_t>(results[9]),
+			static_cast<std::int8_t>(results[8]),
+			static_cast<std::int8_t>(results[7]),
+			static_cast<std::int8_t>(results[6]),
+			static_cast<std::int8_t>(results[5]),
+			static_cast<std::int8_t>(results[4]),
+			static_cast<std::int8_t>(results[3]),
+			static_cast<std::int8_t>(results[2]),
+			static_cast<std::int8_t>(results[1]),
+			static_cast<std::int8_t>(results[0])
+		);
+	}
+#pragma endregion
+
 #pragma region COMPARISONS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 cmpeq_i8x64(EmuSIMD::i8x64_arg lhs_, EmuSIMD::i8x64_arg rhs_)
 	{
@@ -599,186 +706,12 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 sqrt_i8x64(EmuSIMD::i8x64_arg in_)
 	{
-		constexpr std::size_t num_elements = 64;
-		constexpr std::size_t elements_per_register = 16;
-		std::int8_t data[num_elements];
-		float results[num_elements];
-
-		store_i8x64(data, in_);
-		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
-		{
-			_mm512_store_ps
-			(
-				results + i, _mm512_sqrt_ps
-				(
-					_mm512_set_ps
-					( 
-						data[i + 15], data[i + 14], data[i + 13], data[i + 12], data[i + 11], data[i + 10], data[i + 9], data[i + 8],
-						data[i + 7], data[i + 6], data[i + 5], data[i + 4], data[i + 3], data[i + 2], data[i + 1], data[i]
-					)
-				)
-			);
-		}
-
-		return set_i8x64
-		(
-			static_cast<std::int8_t>(results[63]),
-			static_cast<std::int8_t>(results[62]),
-			static_cast<std::int8_t>(results[61]),
-			static_cast<std::int8_t>(results[60]),
-			static_cast<std::int8_t>(results[59]),
-			static_cast<std::int8_t>(results[58]),
-			static_cast<std::int8_t>(results[57]),
-			static_cast<std::int8_t>(results[56]),
-			static_cast<std::int8_t>(results[55]),
-			static_cast<std::int8_t>(results[54]),
-			static_cast<std::int8_t>(results[53]),
-			static_cast<std::int8_t>(results[52]),
-			static_cast<std::int8_t>(results[51]),
-			static_cast<std::int8_t>(results[50]),
-			static_cast<std::int8_t>(results[49]),
-			static_cast<std::int8_t>(results[48]),
-			static_cast<std::int8_t>(results[47]),
-			static_cast<std::int8_t>(results[46]),
-			static_cast<std::int8_t>(results[45]),
-			static_cast<std::int8_t>(results[44]),
-			static_cast<std::int8_t>(results[43]),
-			static_cast<std::int8_t>(results[42]),
-			static_cast<std::int8_t>(results[41]),
-			static_cast<std::int8_t>(results[40]),
-			static_cast<std::int8_t>(results[39]),
-			static_cast<std::int8_t>(results[38]),
-			static_cast<std::int8_t>(results[37]),
-			static_cast<std::int8_t>(results[36]),
-			static_cast<std::int8_t>(results[35]),
-			static_cast<std::int8_t>(results[34]),
-			static_cast<std::int8_t>(results[33]),
-			static_cast<std::int8_t>(results[32]),
-			static_cast<std::int8_t>(results[31]),
-			static_cast<std::int8_t>(results[30]),
-			static_cast<std::int8_t>(results[29]),
-			static_cast<std::int8_t>(results[28]),
-			static_cast<std::int8_t>(results[27]),
-			static_cast<std::int8_t>(results[26]),
-			static_cast<std::int8_t>(results[25]),
-			static_cast<std::int8_t>(results[24]),
-			static_cast<std::int8_t>(results[23]),
-			static_cast<std::int8_t>(results[22]),
-			static_cast<std::int8_t>(results[21]),
-			static_cast<std::int8_t>(results[20]),
-			static_cast<std::int8_t>(results[19]),
-			static_cast<std::int8_t>(results[18]),
-			static_cast<std::int8_t>(results[17]),
-			static_cast<std::int8_t>(results[16]),
-			static_cast<std::int8_t>(results[15]),
-			static_cast<std::int8_t>(results[14]),
-			static_cast<std::int8_t>(results[13]),
-			static_cast<std::int8_t>(results[12]),
-			static_cast<std::int8_t>(results[11]),
-			static_cast<std::int8_t>(results[10]),
-			static_cast<std::int8_t>(results[9]),
-			static_cast<std::int8_t>(results[8]),
-			static_cast<std::int8_t>(results[7]),
-			static_cast<std::int8_t>(results[6]),
-			static_cast<std::int8_t>(results[5]),
-			static_cast<std::int8_t>(results[4]),
-			static_cast<std::int8_t>(results[3]),
-			static_cast<std::int8_t>(results[2]),
-			static_cast<std::int8_t>(results[1]),
-			static_cast<std::int8_t>(results[0])
-		);
+		return emulate_fp_i8x64([](EmuSIMD::f32x16_arg in_fp_) { return _mm512_sqrt_ps(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 rsqrt_i8x64(EmuSIMD::i8x64_arg in_)
 	{
-		constexpr std::size_t num_elements = 64;
-		constexpr std::size_t elements_per_register = 16;
-		std::int8_t data[num_elements];
-		float results[num_elements];
-
-		store_i8x64(data, in_);
-		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
-		{
-			_mm512_store_ps
-			(
-				results + i, _mm512_rsqrt28_ps
-				(
-					_mm512_set_ps
-					( 
-						data[i + 15], data[i + 14], data[i + 13], data[i + 12], data[i + 11], data[i + 10], data[i + 9], data[i + 8],
-						data[i + 7], data[i + 6], data[i + 5], data[i + 4], data[i + 3], data[i + 2], data[i + 1], data[i]
-					)
-				)
-			);
-		}
-
-		return set_i8x64
-		(
-			static_cast<std::int8_t>(results[63]),
-			static_cast<std::int8_t>(results[62]),
-			static_cast<std::int8_t>(results[61]),
-			static_cast<std::int8_t>(results[60]),
-			static_cast<std::int8_t>(results[59]),
-			static_cast<std::int8_t>(results[58]),
-			static_cast<std::int8_t>(results[57]),
-			static_cast<std::int8_t>(results[56]),
-			static_cast<std::int8_t>(results[55]),
-			static_cast<std::int8_t>(results[54]),
-			static_cast<std::int8_t>(results[53]),
-			static_cast<std::int8_t>(results[52]),
-			static_cast<std::int8_t>(results[51]),
-			static_cast<std::int8_t>(results[50]),
-			static_cast<std::int8_t>(results[49]),
-			static_cast<std::int8_t>(results[48]),
-			static_cast<std::int8_t>(results[47]),
-			static_cast<std::int8_t>(results[46]),
-			static_cast<std::int8_t>(results[45]),
-			static_cast<std::int8_t>(results[44]),
-			static_cast<std::int8_t>(results[43]),
-			static_cast<std::int8_t>(results[42]),
-			static_cast<std::int8_t>(results[41]),
-			static_cast<std::int8_t>(results[40]),
-			static_cast<std::int8_t>(results[39]),
-			static_cast<std::int8_t>(results[38]),
-			static_cast<std::int8_t>(results[37]),
-			static_cast<std::int8_t>(results[36]),
-			static_cast<std::int8_t>(results[35]),
-			static_cast<std::int8_t>(results[34]),
-			static_cast<std::int8_t>(results[33]),
-			static_cast<std::int8_t>(results[32]),
-			static_cast<std::int8_t>(results[31]),
-			static_cast<std::int8_t>(results[30]),
-			static_cast<std::int8_t>(results[29]),
-			static_cast<std::int8_t>(results[28]),
-			static_cast<std::int8_t>(results[27]),
-			static_cast<std::int8_t>(results[26]),
-			static_cast<std::int8_t>(results[25]),
-			static_cast<std::int8_t>(results[24]),
-			static_cast<std::int8_t>(results[23]),
-			static_cast<std::int8_t>(results[22]),
-			static_cast<std::int8_t>(results[21]),
-			static_cast<std::int8_t>(results[20]),
-			static_cast<std::int8_t>(results[19]),
-			static_cast<std::int8_t>(results[18]),
-			static_cast<std::int8_t>(results[17]),
-			static_cast<std::int8_t>(results[16]),
-			static_cast<std::int8_t>(results[15]),
-			static_cast<std::int8_t>(results[14]),
-			static_cast<std::int8_t>(results[13]),
-			static_cast<std::int8_t>(results[12]),
-			static_cast<std::int8_t>(results[11]),
-			static_cast<std::int8_t>(results[10]),
-			static_cast<std::int8_t>(results[9]),
-			static_cast<std::int8_t>(results[8]),
-			static_cast<std::int8_t>(results[7]),
-			static_cast<std::int8_t>(results[6]),
-			static_cast<std::int8_t>(results[5]),
-			static_cast<std::int8_t>(results[4]),
-			static_cast<std::int8_t>(results[3]),
-			static_cast<std::int8_t>(results[2]),
-			static_cast<std::int8_t>(results[1]),
-			static_cast<std::int8_t>(results[0])
-		);
+		return emulate_fp_i8x64([](EmuSIMD::f32x16_arg in_fp_) { return _mm512_rsqrt28_ps(in_fp_); }, in_);
 	}
 #pragma endregion
 
@@ -791,6 +724,38 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 cmpnear_i8x64(EmuSIMD::i8x64_arg lhs_, EmuSIMD::i8x64_arg rhs_, EmuSIMD::i8x64_arg epsilon)
 	{
 		return cmple_i8x64(abs_i8x64(sub_i8x64(lhs_, rhs_)), epsilon);
+	}
+#pragma endregion
+
+#pragma region TRIG
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 cos_i8x64(EmuSIMD::i8x64_arg in_)
+	{
+		return emulate_fp_i8x64([](EmuSIMD::f32x16_arg in_fp_) { return _mm512_cos_ps(in_fp_); }, in_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 sin_i8x64(EmuSIMD::i8x64_arg in_)
+	{
+		return emulate_fp_i8x64([](EmuSIMD::f32x16_arg in_fp_) { return _mm512_sin_ps(in_fp_); }, in_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 tan_i8x64(EmuSIMD::i8x64_arg in_)
+	{
+		return emulate_fp_i8x64([](EmuSIMD::f32x16_arg in_fp_) { return _mm512_tan_ps(in_fp_); }, in_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 acos_i8x64(EmuSIMD::i8x64_arg in_)
+	{
+		return emulate_fp_i8x64([](EmuSIMD::f32x16_arg in_fp_) { return _mm512_acos_ps(in_fp_); }, in_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 asin_i8x64(EmuSIMD::i8x64_arg in_)
+	{
+		return emulate_fp_i8x64([](EmuSIMD::f32x16_arg in_fp_) { return _mm512_asin_ps(in_fp_); }, in_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i8x64 atan_i8x64(EmuSIMD::i8x64_arg in_)
+	{
+		return emulate_fp_i8x64([](EmuSIMD::f32x16_arg in_fp_) { return _mm512_atan_ps(in_fp_); }, in_);
 	}
 #pragma endregion
 }

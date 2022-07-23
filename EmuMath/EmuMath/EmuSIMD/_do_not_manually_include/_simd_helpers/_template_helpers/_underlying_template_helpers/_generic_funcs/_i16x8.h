@@ -359,6 +359,46 @@ namespace EmuSIMD::Funcs
 	}
 #pragma endregion
 
+#pragma region TEMPLATES
+	/// <summary>
+	/// <para> Template helper for performing a floating-point operation on an integral register. The floating-point operation is provided by Func_. </para>
+	/// <para>
+	///		The used floating-point register is the first with element width greater than or equal to the width of elements in the integer register. 
+	///		The full width of the registers will match fully. 
+	/// </para>
+	/// </summary>
+	/// <param name="func_">Floating-point function to execute.</param>
+	/// <param name="in_">Integral register to emulate the fp operation with.</param>
+	/// <returns>The results of the floating-point operation with the provided register elements.</returns>
+	template<class Func_>
+	EMU_SIMD_COMMON_FUNC_SPEC auto emulate_fp_i16x8(Func_ func_, EmuSIMD::i16x8_arg in_)
+		-> std::enable_if_t<std::is_invocable_r_v<EmuSIMD::f32x4, decltype(func_), EmuSIMD::f32x4>, EmuSIMD::i16x8>
+	{
+		constexpr std::size_t num_elements = 8;
+		constexpr std::size_t elements_per_register = 4;
+		std::int16_t data[num_elements];
+		float results[num_elements];
+
+		store_i16x8(data, in_);
+		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
+		{
+			_mm_store_ps(results + i, func_(_mm_set_ps(data[i + 3], data[i + 2], data[i + 1], data[i])));
+		}
+
+		return set_i16x8
+		(
+			static_cast<std::int16_t>(results[7]),
+			static_cast<std::int16_t>(results[6]),
+			static_cast<std::int16_t>(results[5]),
+			static_cast<std::int16_t>(results[4]),
+			static_cast<std::int16_t>(results[3]),
+			static_cast<std::int16_t>(results[2]),
+			static_cast<std::int16_t>(results[1]),
+			static_cast<std::int16_t>(results[0])
+		);
+	}
+#pragma endregion
+
 #pragma region COMPARISONS
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 cmpeq_i16x8(EmuSIMD::i16x8_arg lhs_, EmuSIMD::i16x8_arg rhs_)
 	{
@@ -502,54 +542,12 @@ namespace EmuSIMD::Funcs
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 sqrt_i16x8(EmuSIMD::i16x8_arg in_)
 	{
-		constexpr std::size_t num_elements = 8;
-		constexpr std::size_t elements_per_register = 4;
-		std::int16_t data[num_elements];
-		float results[num_elements];
-
-		store_i16x8(data, in_);
-		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
-		{
-			_mm_store_ps(results + i, _mm_sqrt_ps(_mm_set_ps(data[i + 3], data[i + 2], data[i + 1], data[i])));
-		}
-
-		return set_i16x8
-		(
-			static_cast<std::int16_t>(results[7]),
-			static_cast<std::int16_t>(results[6]),
-			static_cast<std::int16_t>(results[5]),
-			static_cast<std::int16_t>(results[4]),
-			static_cast<std::int16_t>(results[3]),
-			static_cast<std::int16_t>(results[2]),
-			static_cast<std::int16_t>(results[1]),
-			static_cast<std::int16_t>(results[0])
-		);
+		return emulate_fp_i16x8([](EmuSIMD::f32x4_arg in_fp_) { return _mm_sqrt_ps(in_fp_); }, in_);
 	}
 
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 rsqrt_i16x8(EmuSIMD::i16x8_arg in_)
 	{
-		constexpr std::size_t num_elements = 8;
-		constexpr std::size_t elements_per_register = 4;
-		std::int16_t data[num_elements];
-		float results[num_elements];
-
-		store_i16x8(data, in_);
-		for (std::size_t i = 0; i < num_elements; i += elements_per_register)
-		{
-			_mm_store_ps(results + i, _mm_rsqrt_ps(_mm_set_ps(data[i + 3], data[i + 2], data[i + 1], data[i])));
-		}
-
-		return set_i16x8
-		(
-			static_cast<std::int16_t>(results[7]),
-			static_cast<std::int16_t>(results[6]),
-			static_cast<std::int16_t>(results[5]),
-			static_cast<std::int16_t>(results[4]),
-			static_cast<std::int16_t>(results[3]),
-			static_cast<std::int16_t>(results[2]),
-			static_cast<std::int16_t>(results[1]),
-			static_cast<std::int16_t>(results[0])
-		);
+		return emulate_fp_i16x8([](EmuSIMD::f32x4_arg in_fp_) { return _mm_rsqrt_ps(in_fp_); }, in_);
 	}
 #pragma endregion
 
@@ -562,6 +560,38 @@ namespace EmuSIMD::Funcs
 	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 cmpnear_i16x8(EmuSIMD::i16x8_arg lhs_, EmuSIMD::i16x8_arg rhs_, EmuSIMD::i16x8_arg epsilon)
 	{
 		return cmple_i16x8(abs_i16x8(sub_i16x8(lhs_, rhs_)), epsilon);
+	}
+#pragma endregion
+
+#pragma region TRIG
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 cos_i16x8(EmuSIMD::i16x8_arg in_)
+	{
+		return emulate_fp_i16x8([](EmuSIMD::f32x4_arg in_fp_) { return _mm_cos_ps(in_fp_); }, in_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 sin_i16x8(EmuSIMD::i16x8_arg in_)
+	{
+		return emulate_fp_i16x8([](EmuSIMD::f32x4_arg in_fp_) { return _mm_sin_ps(in_fp_); }, in_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 tan_i16x8(EmuSIMD::i16x8_arg in_)
+	{
+		return emulate_fp_i16x8([](EmuSIMD::f32x4_arg in_fp_) { return _mm_tan_ps(in_fp_); }, in_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 acos_i16x8(EmuSIMD::i16x8_arg in_)
+	{
+		return emulate_fp_i16x8([](EmuSIMD::f32x4_arg in_fp_) { return _mm_acos_ps(in_fp_); }, in_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 asin_i16x8(EmuSIMD::i16x8_arg in_)
+	{
+		return emulate_fp_i16x8([](EmuSIMD::f32x4_arg in_fp_) { return _mm_asin_ps(in_fp_); }, in_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::i16x8 atan_i16x8(EmuSIMD::i16x8_arg in_)
+	{
+		return emulate_fp_i16x8([](EmuSIMD::f32x4_arg in_fp_) { return _mm_atan_ps(in_fp_); }, in_);
 	}
 #pragma endregion
 }

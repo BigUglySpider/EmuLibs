@@ -15,5 +15,6 @@
 #include "_template_helpers/_simd_helpers_template_sets.h"
 #include "_template_helpers/_simd_helpers_template_shuffles.h"
 #include "_template_helpers/_simd_helpers_template_streams.h"
+#include "_template_helpers/_simd_helpers_template_trig.h"
 
 #endif

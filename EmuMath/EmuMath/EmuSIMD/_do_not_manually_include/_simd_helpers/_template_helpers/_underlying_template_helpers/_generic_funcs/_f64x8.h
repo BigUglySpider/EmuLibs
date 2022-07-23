@@ -512,6 +512,38 @@ namespace EmuSIMD::Funcs
 		return cmple_f64x8(abs_f64x8(sub_f64x8(lhs_, rhs_)), epsilon);
 	}
 #pragma endregion
+
+#pragma region TRIG
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 cos_f64x8(EmuSIMD::f64x8_arg in_)
+	{
+		return _mm512_cos_pd(in_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 sin_f64x8(EmuSIMD::f64x8_arg in_)
+	{
+		return _mm512_sin_pd(in_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 tan_f64x8(EmuSIMD::f64x8_arg in_)
+	{
+		return _mm512_tan_pd(in_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 acos_f64x8(EmuSIMD::f64x8_arg in_)
+	{
+		return _mm512_acos_pd(in_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 asin_f64x8(EmuSIMD::f64x8_arg in_)
+	{
+		return _mm512_asin_pd(in_);
+	}
+
+	EMU_SIMD_COMMON_FUNC_SPEC EmuSIMD::f64x8 atan_f64x8(EmuSIMD::f64x8_arg in_)
+	{
+		return _mm512_atan_pd(in_);
+	}
+#pragma endregion
 }
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef EMU_SIMD_HELPERS_TEMPLATE_COMMON_ARITHMETIC
 #define EMU_SIMD_HELPERS_TEMPLATE_COMMON_ARITHMETIC 1
 
-#include "_underlying_template_helpers/_simd_helpers_underlying_basic_arithmetic.h"
+#include "_underlying_template_helpers/_all_underlying_templates.h"
 #include "_simd_helpers_template_cast.h"
 #include "_simd_helpers_template_gets.h"
 #include "_simd_helpers_template_shuffles.h"

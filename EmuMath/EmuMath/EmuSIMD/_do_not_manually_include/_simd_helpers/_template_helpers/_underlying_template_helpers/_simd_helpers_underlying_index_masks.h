@@ -462,11 +462,11 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	};
 
-	template<bool I0_, bool I1_, bool I2_, bool I3_, bool I4_, bool I5_, bool I6_, bool I7_>
-	struct _per_index_mask<EmuSIMD::f64x4, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>
+	template<bool I0_, bool I1_, bool I2_, bool I3_>
+	struct _per_index_mask<EmuSIMD::f64x4, I0_, I1_, I2_, I3_>
 	{
 	private:
-		using _integral_mask_generator = _per_index_mask<EmuSIMD::i256_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>;
+		using _integral_mask_generator = _per_index_mask<EmuSIMD::i256_generic, I0_, I1_, I2_, I3_>;
 
 	public:
 		[[nodiscard]] static inline EmuSIMD::f64x4 get()
