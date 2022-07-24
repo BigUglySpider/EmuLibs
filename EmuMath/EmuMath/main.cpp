@@ -329,6 +329,7 @@ int main()
 	EmuMath::FastVector<8, double> fastv8f64_t(0.5, 2.0, 0.0, 19999.0, 0.25, 0.75, -0.5, 1.0);
 	std::cout << "LERP(\n\t" << fastv8f64_a << ",\n\t" << fastv8f64_b << ",\n\t" << fastv8f64_t << "\n) = " << fastv8f64_a.FusedLerp(fastv8f64_b, fastv8f64_t) << "\n\n";
 
+
 	DirectX::XMVECTOR a, b;
 	DirectX::XMFLOAT4 xm(1, 2, 3, 4);
 	a = DirectX::XMLoadFloat4(&xm);
@@ -750,6 +751,49 @@ int main()
 	std::cout << EmuMath::FastVector<3, std::int32_t, 256>(5, 7, -16).Angle3<fast_vec_rads, double>(EmuMath::FastVector<3, std::int32_t, 256>(2, 9, 8)) << "\n";
 	std::cout << EmuMath::FastVector<4, std::int32_t, 256>(5, 7, -16, 12).Angle3<fast_vec_rads, double>(EmuMath::FastVector<4, std::int32_t, 256>(2, 9, 8, 19)) << "\n";
 
+	std::cout << "\nPROJECT_TO_VECTOR\n";
+	std::cout << EmuMath::FastVector<2, float>(5, 7).Project3(EmuMath::FastVector<2, float>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(5, 7, -16).Project3(EmuMath::FastVector<3, float>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(5, 7, -16, 12).Project3(EmuMath::FastVector<4, float>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, double>(5, 7).Project3(EmuMath::FastVector<2, double>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, double>(5, 7, -16).Project3(EmuMath::FastVector<3, double>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, double>(5, 7, -16, 12).Project3(EmuMath::FastVector<4, double>(2, 9, 8, 19)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::FastVector<2, float, 256>(5, 7).Project3(EmuMath::FastVector<2, float, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, float, 256>(5, 7, -16).Project3(EmuMath::FastVector<3, float, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, float, 256>(5, 7, -16, 12).Project3(EmuMath::FastVector<4, float, 256>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, double, 256>(5, 7).Project3(EmuMath::FastVector<2, double, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, double, 256>(5, 7, -16).Project3(EmuMath::FastVector<3, double, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, double, 256>(5, 7, -16, 12).Project3(EmuMath::FastVector<4, double, 256>(2, 9, 8, 19)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::FastVector<2, std::int32_t, 256>(5, 7).Project3(EmuMath::FastVector<2, std::int32_t, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, std::int16_t, 256>(5, 7, -16).Project3(EmuMath::FastVector<3, std::int16_t, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, std::int32_t, 256>(5, 7, -16, 12).Project3<float>(EmuMath::FastVector<4, std::int32_t, 256>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, std::int32_t, 256>(5, 7).Project3<std::int32_t>(EmuMath::FastVector<2, std::int32_t, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, std::int32_t, 256>(5, 7, -16).Project3<double>(EmuMath::FastVector<3, std::int32_t, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, std::int32_t, 256>(5, 7, -16, 12).Project3<double>(EmuMath::FastVector<4, std::int32_t, 256>(2, 9, 8, 19)) << "\n";
+
+	std::cout << "\nPROJECT_TO_VECTOR (NORMAL)\n";
+	std::cout << EmuMath::Vector<2, float>(5, 7).Project(EmuMath::Vector<2, float>(2, 9)) << "\n";
+	std::cout << EmuMath::Vector<3, float>(5, 7, -16).Project(EmuMath::Vector<3, float>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::Vector<4, float>(5, 7, -16, 12).Project(EmuMath::Vector<4, float>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::Vector<2, double>(5, 7).Project(EmuMath::Vector<2, double>(2, 9)) << "\n";
+	std::cout << EmuMath::Vector<3, double>(5, 7, -16).Project(EmuMath::Vector<3, double>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::Vector<4, double>(5, 7, -16, 12).Project(EmuMath::Vector<4, double>(2, 9, 8, 19)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::Vector<2, float>(5, 7).Project(EmuMath::Vector<2, float>(2, 9)) << "\n";
+	std::cout << EmuMath::Vector<3, float>(5, 7, -16).Project(EmuMath::Vector<3, float>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::Vector<4, float>(5, 7, -16, 12).Project(EmuMath::Vector<4, float>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::Vector<2, double>(5, 7).Project(EmuMath::Vector<2, double>(2, 9)) << "\n";
+	std::cout << EmuMath::Vector<3, double>(5, 7, -16).Project(EmuMath::Vector<3, double>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::Vector<4, double>(5, 7, -16, 12).Project(EmuMath::Vector<4, double>(2, 9, 8, 19)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::Vector<2, std::int32_t>(5, 7).Project(EmuMath::Vector<2, std::int32_t>(2, 9)) << "\n";
+	std::cout << EmuMath::Vector<3, std::int16_t>(5, 7, -16).Project(EmuMath::Vector<3, std::int16_t>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::Vector<4, std::int32_t>(5, 7, -16, 12).Project<float>(EmuMath::Vector<4, std::int32_t>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::Vector<2, std::int32_t>(5, 7).Project<std::int32_t>(EmuMath::Vector<2, std::int32_t>(2, 9)) << "\n";
+	std::cout << EmuMath::Vector<3, std::int32_t>(5, 7, -16).Project<double>(EmuMath::Vector<3, std::int32_t>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::Vector<4, std::int32_t>(5, 7, -16, 12).Project<double>(EmuMath::Vector<4, std::int32_t>(2, 9, 8, 19)) << "\n";
 
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);

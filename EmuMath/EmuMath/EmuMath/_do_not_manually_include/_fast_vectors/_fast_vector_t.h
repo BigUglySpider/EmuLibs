@@ -5615,6 +5615,126 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region PROJECTION_FUNCS
+	public:
+		/// <summary>
+		/// <para> Calculates the projection of this Vector onto the passed Vector. </para>
+		/// <para> For accuracy purposes, intermediate conversions to floating-point registers will be performed for Vectors containing integers. </para>
+		/// <para> The output Vector may be of a different, customisable value type, and defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="project_onto_">Vector to project this Vector onto.</param>
+		/// <returns>Vector with the specified OutFP_ value type containing the Vector resulting from projecting this Vector onto the passed Vector.</returns>
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Project(const this_type& project_onto_)
+		{
+			return _calculate_projection_to_vector<Size_, OutFP_>(*this, project_onto_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the projection of this Vector onto the passed Vector, treating them as 2D Vectors. </para>
+		/// <para> For accuracy purposes, intermediate conversions to floating-point registers will be performed for Vectors containing integers. </para>
+		/// <para> The output Vector may be of a different, customisable value type, and defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="project_onto_">Vector to project this Vector onto.</param>
+		/// <returns>
+		///		Vector with the specified OutFP_ value type containing the Vector resulting from projecting this Vector onto the passed Vector (when treated as 2D Vectors). 
+		///		This will contain a 2D Vector in its first 2 elements, but the values of elements after tge furst 2 are undefined.
+		/// </returns>
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Project2(const this_type& project_onto_)
+		{
+			return _calculate_projection_to_vector<2, OutFP_>(*this, project_onto_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the projection of this Vector onto the passed Vector, treating them as 3D Vectors. </para>
+		/// <para> For accuracy purposes, intermediate conversions to floating-point registers will be performed for Vectors containing integers. </para>
+		/// <para> The output Vector may be of a different, customisable value type, and defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="project_onto_">Vector to project this Vector onto.</param>
+		/// <returns>
+		///		Vector with the specified OutFP_ value type containing the Vector resulting from projecting this Vector onto the passed Vector (when treated as 3D Vectors). 
+		///		This will contain a 3D Vector in its first 3 elements, but the values of elements after the first 3 are undefined.
+		/// </returns>
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Project3(const this_type& project_onto_)
+		{
+			return _calculate_projection_to_vector<3, OutFP_>(*this, project_onto_);
+		}
+
+	private:
+		template<std::size_t CalcSize_, typename OutFP_>
+		[[nodiscard]] static constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> _calculate_projection_to_vector(const this_type& a_, const this_type& b_)
+		{
+			using out_vector = EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>;
+			if constexpr (std::is_same_v<out_vector, this_type> && is_floating_point)
+			{
+				// Vector projection formula = b * (dot(a, b) / square_mag(b))
+				if constexpr (CalcSize_ == 2)
+				{
+					register_type multiplier = _calculate_dot_2_fill(a_.data, b_.data);
+					multiplier = EmuSIMD::div<per_element_width, is_signed>(multiplier, _calculate_dot_2_fill(b_.data, b_.data));
+					return out_vector
+					(
+						EmuSIMD::mul_all<per_element_width>
+						(
+							b_.GetRegister<0>(),
+							multiplier
+						)
+					);
+				}
+				else if constexpr (CalcSize_ == 3)
+				{
+					register_type multiplier = _calculate_dot_3_fill(a_.data, b_.data);
+					multiplier = EmuSIMD::div<per_element_width, is_signed>(multiplier, _calculate_dot_3_fill(b_.data, b_.data));
+					if constexpr (elements_per_register >= 3)
+					{
+						return out_vector
+						(
+							EmuSIMD::mul_all<per_element_width>
+							(
+								b_.GetRegister<0>(),
+								multiplier
+							)
+						);
+					}
+					else
+					{
+						return _make_partial_multiplied_3<out_vector>(b_, multiplier, register_index_sequence());
+					}
+				}
+				else
+				{
+					register_type multiplier = _calculate_dot<true>(a_.data, b_.data);
+					multiplier = EmuSIMD::div<per_element_width, is_signed>(multiplier, _calculate_dot<true>(b_.data, b_.data));
+					return b_.Multiply(multiplier);
+				}
+			}
+			else if constexpr (is_floating_point)
+			{
+				return _calculate_projection_to_vector<CalcSize_, T_>(a_, b_).template Convert<OutFP_>();
+			}
+			else if constexpr (out_vector::is_floating_point)
+			{
+				return out_vector::template _calculate_projection_to_vector<CalcSize_, OutFP_>
+				(
+					a_.Convert<OutFP_>(),
+					b_.Convert<OutFP_>()
+				);
+			}
+			else
+			{
+				using calc_vector = EmuMath::FastVector<Size_, preferred_floating_point, RegisterWidth_>;
+				return calc_vector::template _calculate_projection_to_vector<CalcSize_, OutFP_>
+				(
+					a_.Convert<preferred_floating_point>(),
+					b_.Convert<preferred_floating_point>()
+				).template Convert<OutFP_>();
+			}
+		}
+
+#pragma endregion
+
 #pragma region COMPARISONS_ANY
 	public:
 		/// <summary>
@@ -7865,27 +7985,27 @@ namespace EmuMath
 				else
 				{
 					using vec_register_index_sequence = typename vec_uq::register_index_sequence;
-					return _make_partial_norm_3(vec_, mag_reciprocal, vec_register_index_sequence());
+					return _make_partial_multiplied_3(vec_, mag_reciprocal, vec_register_index_sequence());
 				}
 			}
 		}
 
 		template<class OutVector_, std::size_t...RegisterIndices_>
-		[[nodiscard]] static constexpr inline OutVector_ _make_partial_norm_3
+		[[nodiscard]] static constexpr inline OutVector_ _make_partial_multiplied_3
 		(
 			const OutVector_& vec_,
-			typename OutVector_::register_arg_type mag_reciprocal_,
+			typename OutVector_::register_arg_type multiplier_,
 			std::index_sequence<RegisterIndices_...> register_indices_
 		)
 		{
-			return OutVector_(vec_.template _make_register_for_partial_norm_3<RegisterIndices_>(vec_, mag_reciprocal_)...);
+			return OutVector_(vec_.template _make_register_for_partial_multiplied_3<RegisterIndices_>(vec_, multiplier_)...);
 		}
 
 		template<std::size_t Index_, class OutVector_>
-		[[nodiscard]] static constexpr inline typename OutVector_::register_type _make_register_for_partial_norm_3
+		[[nodiscard]] static constexpr inline typename OutVector_::register_type _make_register_for_partial_multiplied_3
 		(
 			const OutVector_& vec_,
-			const typename OutVector_::register_arg_type& mag_reciprocal_
+			const typename OutVector_::register_arg_type& multiplier_
 		)
 		{
 			using out_uq = typename EmuCore::TMP::remove_ref_cv<OutVector_>::type;
@@ -7894,7 +8014,7 @@ namespace EmuMath
 			if constexpr (current_register_first_element_index < 3)
 			{
 				constexpr std::size_t out_per_element_width = out_uq::per_element_width;
-				return EmuSIMD::mul_all<out_per_element_width>(vec_.template GetRegister<Index_>(), mag_reciprocal_);
+				return EmuSIMD::mul_all<out_per_element_width>(vec_.template GetRegister<Index_>(), multiplier_);
 			}
 			else
 			{
@@ -8466,7 +8586,7 @@ namespace EmuMath
 				else
 				{
 					constexpr bool out_is_fp = std::is_floating_point_v<out_uq>;
-					using calc_fp = typename std::conditional<out_is_fp, out_uq, preferred_floating_point>::type;
+					using calc_fp = typename std::conditional<out_is_fp && std::is_fundamental_v<out_uq>, out_uq, preferred_floating_point>::type;
 					using fp_vector = EmuMath::FastVector<Size_, calc_fp, RegisterWidth_>;
 					return EmuSIMD::get_index<0, OutFP_, fp_vector::per_element_width>
 					(
@@ -8535,7 +8655,7 @@ namespace EmuMath
 				else
 				{
 					constexpr bool out_is_fp = std::is_floating_point_v<out_uq>;
-					using calc_fp = typename std::conditional<out_is_fp, out_uq, preferred_floating_point>::type;
+					using calc_fp = typename std::conditional<out_is_fp && std::is_fundamental_v<out_uq>, out_uq, preferred_floating_point>::type;
 					using fp_vector = EmuMath::FastVector<Size_, calc_fp, RegisterWidth_>;
 					return EmuSIMD::get_index<0, OutFP_, fp_vector::per_element_width>
 					(
@@ -8604,7 +8724,7 @@ namespace EmuMath
 				else
 				{
 					constexpr bool out_is_fp = std::is_floating_point_v<out_uq>;
-					using calc_fp = typename std::conditional<out_is_fp, out_uq, preferred_floating_point>::type;
+					using calc_fp = typename std::conditional<out_is_fp && std::is_fundamental_v<out_uq>, out_uq, preferred_floating_point>::type;
 					using fp_vector = EmuMath::FastVector<Size_, calc_fp, RegisterWidth_>;
 					return EmuSIMD::get_index<0, OutFP_, fp_vector::per_element_width>
 					(
@@ -8673,7 +8793,7 @@ namespace EmuMath
 				else
 				{
 					constexpr bool out_is_fp = std::is_floating_point_v<out_uq>;
-					using calc_fp = typename std::conditional<out_is_fp, out_uq, preferred_floating_point>::type;
+					using calc_fp = typename std::conditional<out_is_fp && std::is_fundamental_v<out_uq>, out_uq, preferred_floating_point>::type;
 					using fp_vector = EmuMath::FastVector<Size_, calc_fp, RegisterWidth_>;
 					return EmuSIMD::get_index<0, OutFP_, fp_vector::per_element_width>
 					(
@@ -8742,7 +8862,7 @@ namespace EmuMath
 				else
 				{
 					constexpr bool out_is_fp = std::is_floating_point_v<out_uq>;
-					using calc_fp = typename std::conditional<out_is_fp, out_uq, preferred_floating_point>::type;
+					using calc_fp = typename std::conditional<out_is_fp && std::is_fundamental_v<out_uq>, out_uq, preferred_floating_point>::type;
 					using fp_vector = EmuMath::FastVector<Size_, calc_fp, RegisterWidth_>;
 					return EmuSIMD::get_index<0, OutFP_, fp_vector::per_element_width>
 					(
@@ -8811,7 +8931,7 @@ namespace EmuMath
 				else
 				{
 					constexpr bool out_is_fp = std::is_floating_point_v<out_uq>;
-					using calc_fp = typename std::conditional<out_is_fp, out_uq, preferred_floating_point>::type;
+					using calc_fp = typename std::conditional<out_is_fp && std::is_fundamental_v<out_uq>, out_uq, preferred_floating_point>::type;
 					using fp_vector = EmuMath::FastVector<Size_, calc_fp, RegisterWidth_>;
 					return EmuSIMD::get_index<0, OutFP_, fp_vector::per_element_width>
 					(
