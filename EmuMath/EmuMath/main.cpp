@@ -813,6 +813,51 @@ int main()
 	std::cout << EmuMath::Vector<3, double>(5, 7, -16).NormalToPlane3(fast_normal_b.Convert<3, double>().Store(), fast_normal_c.Convert<3, double>().Store()) << "\n";
 	std::cout << EmuMath::Vector<4, double>(5, 7, -16, 12).NormalToPlane3(fast_normal_b.Convert<4, double>().Store(), fast_normal_c.Convert<4, double>().Store()) << "\n";
 
+	std::cout << "\nPROJECT_TO_PLANE\n";
+	std::cout << EmuMath::FastVector<2, float>(5, 7).ProjectToPlane(EmuMath::FastVector<2, float>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(5, 7, -16).ProjectToPlane(EmuMath::FastVector<3, float>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(5, 7, -16, 12).ProjectToPlane(EmuMath::FastVector<4, float>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, double>(5, 7).ProjectToPlane(EmuMath::FastVector<2, double>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, double>(5, 7, -16).ProjectToPlane(EmuMath::FastVector<3, double>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, double>(5, 7, -16, 12).ProjectToPlane(EmuMath::FastVector<4, double>(2, 9, 8, 19)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::FastVector<2, float, 256>(5, 7).ProjectToPlane(EmuMath::FastVector<2, float, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, float, 256>(5, 7, -16).ProjectToPlane(EmuMath::FastVector<3, float, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, float, 256>(5, 7, -16, 12).ProjectToPlane(EmuMath::FastVector<4, float, 256>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, double, 256>(5, 7).ProjectToPlane(EmuMath::FastVector<2, double, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, double, 256>(5, 7, -16).ProjectToPlane(EmuMath::FastVector<3, double, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, double, 256>(5, 7, -16, 12).ProjectToPlane(EmuMath::FastVector<4, double, 256>(2, 9, 8, 19)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::FastVector<2, std::int32_t, 256>(5, 7).ProjectToPlane(EmuMath::FastVector<2, std::int32_t, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, std::int16_t, 256>(5, 7, -16).ProjectToPlane(EmuMath::FastVector<3, std::int16_t, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, std::int32_t, 256>(5, 7, -16, 12).ProjectToPlane<float>(EmuMath::FastVector<4, std::int32_t, 256>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, std::int32_t, 256>(5, 7).ProjectToPlane<std::int32_t>(EmuMath::FastVector<2, std::int32_t, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, std::int32_t, 256>(5, 7, -16).ProjectToPlane<double>(EmuMath::FastVector<3, std::int32_t, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, std::int32_t, 256>(5, 7, -16, 12).ProjectToPlane<double>(EmuMath::FastVector<4, std::int32_t, 256>(2, 9, 8, 19)) << "\n";
+
+	std::cout << "\nPROJECT_TO_PLANE (NORMAL)\n";
+	std::cout << EmuMath::Vector<2, float>(5, 7).ProjectToPlane(EmuMath::Vector<2, float>(2, 9)) << "\n";
+	std::cout << EmuMath::Vector<3, float>(5, 7, -16).ProjectToPlane(EmuMath::Vector<3, float>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::Vector<4, float>(5, 7, -16, 12).ProjectToPlane(EmuMath::Vector<4, float>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::Vector<2, double>(5, 7).ProjectToPlane(EmuMath::Vector<2, double>(2, 9)) << "\n";
+	std::cout << EmuMath::Vector<3, double>(5, 7, -16).ProjectToPlane(EmuMath::Vector<3, double>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::Vector<4, double>(5, 7, -16, 12).ProjectToPlane(EmuMath::Vector<4, double>(2, 9, 8, 19)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::Vector<2, float>(5, 7).ProjectToPlane(EmuMath::Vector<2, float>(2, 9)) << "\n";
+	std::cout << EmuMath::Vector<3, float>(5, 7, -16).ProjectToPlane(EmuMath::Vector<3, float>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::Vector<4, float>(5, 7, -16, 12).ProjectToPlane(EmuMath::Vector<4, float>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::Vector<2, double>(5, 7).ProjectToPlane(EmuMath::Vector<2, double>(2, 9)) << "\n";
+	std::cout << EmuMath::Vector<3, double>(5, 7, -16).ProjectToPlane(EmuMath::Vector<3, double>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::Vector<4, double>(5, 7, -16, 12).ProjectToPlane(EmuMath::Vector<4, double>(2, 9, 8, 19)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::Vector<2, std::int32_t>(5, 7).ProjectToPlane(EmuMath::Vector<2, std::int32_t>(2, 9)) << "\n";
+	std::cout << EmuMath::Vector<3, std::int16_t>(5, 7, -16).ProjectToPlane(EmuMath::Vector<3, std::int16_t>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::Vector<4, std::int32_t>(5, 7, -16, 12).ProjectToPlane<float>(EmuMath::Vector<4, std::int32_t>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::Vector<2, std::int32_t>(5, 7).ProjectToPlane<std::int32_t>(EmuMath::Vector<2, std::int32_t>(2, 9)) << "\n";
+	std::cout << EmuMath::Vector<3, std::int32_t>(5, 7, -16).ProjectToPlane<double>(EmuMath::Vector<3, std::int32_t>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::Vector<4, std::int32_t>(5, 7, -16, 12).ProjectToPlane<double>(EmuMath::Vector<4, std::int32_t>(2, 9, 8, 19)) << "\n";
+
+
 
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);

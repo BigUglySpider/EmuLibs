@@ -5625,7 +5625,7 @@ namespace EmuMath
 		/// <param name="project_onto_">Vector to project this Vector onto.</param>
 		/// <returns>Vector with the specified OutFP_ value type containing the Vector resulting from projecting this Vector onto the passed Vector.</returns>
 		template<typename OutFP_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Project(const this_type& project_onto_)
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Project(const this_type& project_onto_) const
 		{
 			return _calculate_projection_to_vector<Size_, OutFP_>(*this, project_onto_);
 		}
@@ -5641,7 +5641,7 @@ namespace EmuMath
 		///		This will contain a 2D Vector in its first 2 elements, but the values of elements after tge furst 2 are undefined.
 		/// </returns>
 		template<typename OutFP_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Project2(const this_type& project_onto_)
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Project2(const this_type& project_onto_) const
 		{
 			return _calculate_projection_to_vector<2, OutFP_>(*this, project_onto_);
 		}
@@ -5657,14 +5657,138 @@ namespace EmuMath
 		///		This will contain a 3D Vector in its first 3 elements, but the values of elements after the first 3 are undefined.
 		/// </returns>
 		template<typename OutFP_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Project3(const this_type& project_onto_)
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> Project3(const this_type& project_onto_) const
 		{
 			return _calculate_projection_to_vector<3, OutFP_>(*this, project_onto_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the projection of this Vector onto the plane defined by the passed normal Vector. </para>
+		/// <para> For accuracy purposes, intermediate conversions to floating-point registers will be performed for Vectors containing integers. </para>
+		/// <para> The output Vector may be of a different, customisable value type, and defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="plane_normal_">Normalised Vector defining the plane onto which this Vector will be projected.</param>
+		/// <returns>The Vector resulting from projecting this Vector onto a plane defined by the passed normal.</returns>
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> ProjectToPlane(const this_type& plane_normal_) const
+		{
+			return _calculate_projection_to_plane<Size_, OutFP_>(*this, plane_normal_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the projection of this Vector onto the plane defined by the passed normal Vector, treating them as 2D. </para>
+		/// <para> For accuracy purposes, intermediate conversions to floating-point registers will be performed for Vectors containing integers. </para>
+		/// <para> The output Vector may be of a different, customisable value type, and defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="plane_normal_">Normalised Vector defining the plane onto which this Vector will be projected.</param>
+		/// <returns>
+		///		The Vector resulting from projecting this Vector onto a plane defined by the passed normal (when both are treated as 2D). 
+		///		This will contain a 2D Vector in its first 3 elements, but the values of elements after the first 2 are undefined.
+		/// </returns>
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> ProjectToPlane2(const this_type& plane_normal_) const
+		{
+			return _calculate_projection_to_plane<2, OutFP_>(*this, plane_normal_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the projection of this Vector onto the plane defined by the passed normal Vector, treating them as 3D. </para>
+		/// <para> For accuracy purposes, intermediate conversions to floating-point registers will be performed for Vectors containing integers. </para>
+		/// <para> The output Vector may be of a different, customisable value type, and defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="plane_normal_">Normalised Vector defining the plane onto which this Vector will be projected.</param>
+		/// <returns>
+		///		The Vector resulting from projecting this Vector onto a plane defined by the passed normal (when both are treated as 3D). 
+		///		This will contain a 3D Vector in its first 3 elements, but the values of elements after the first 3 are undefined.
+		/// </returns>
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> ProjectToPlane3(const this_type& plane_normal_) const
+		{
+			return _calculate_projection_to_plane<3, OutFP_>(*this, plane_normal_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the projection of this Vector onto the plane defined by the passed 3 points, treating this Vector, the points, and the plane as 3D. </para>
+		/// <para> For accuracy purposes, intermediate conversions to floating-point registers will be performed for Vectors containing integers. </para>
+		/// <para> The output Vector may be of a different, customisable value type, and defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="plane_point_a_">Vector to treat as a 3D cartesian coordinate, used as the first point in defining the plane to project onto.</param>
+		/// <param name="plane_point_a_">Vector to treat as a 3D cartesian coordinate, used as the second point in defining the plane to project onto.</param>
+		/// <param name="plane_point_a_">Vector to treat as a 3D cartesian coordinate, used as the third point in defining the plane to project onto.</param>
+		/// <returns>
+		///		The Vector resulting from projecting this Vector onto a plane defined by the passed 3 sets of cartesian coordinatees (with everything treated as 3D). 
+		///		This will contain a 3D Vector in its first 3 elements, but the values of elements after the first 3 are undefined.
+		/// </returns>
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline auto ProjectToPlane3(const this_type& plane_point_a_, const this_type& plane_point_b_, const this_type& plane_point_c_) const
+			-> EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>
+		{
+			this_type plane_normal = _calculate_normal_to_plane_3<T_>(plane_point_a_, plane_point_b_, plane_point_c_);
+			return _calculate_projection_to_plane<3, OutFP_>(*this, plane_normal);
+		}
+
+		/// <summary>
+		/// <para> Calculates the projection of this Vector onto the plane defined by the passed 3 points, treating this Vector, the points, and the plane as 3D. </para>
+		/// <para> Additionally outputs the calculated plane normal to the passed `out_plane_normal_` reference, performing conversions where necessary. </para>
+		/// <para> For accuracy purposes, intermediate conversions to floating-point registers will be performed for Vectors containing integers. </para>
+		/// <para> The output Vector may be of a different, customisable value type, and defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="plane_point_a_">Vector to treat as a 3D cartesian coordinate, used as the first point in defining the plane to project onto.</param>
+		/// <param name="plane_point_a_">Vector to treat as a 3D cartesian coordinate, used as the second point in defining the plane to project onto.</param>
+		/// <param name="plane_point_a_">Vector to treat as a 3D cartesian coordinate, used as the third point in defining the plane to project onto.</param>
+		/// <param name="out_plane_normal_">
+		///		<para>
+		///			Reference to any FastVector type, to which the 3D plane normal will be outputted. 
+		///			Be aware that its data will be overwritten as if assigned from the results to `NormalToPlane3`.
+		///		</para>
+		///		<para> If it is the same as this FastVector type, it will be assigned to and used directly in projection calculations. </para>
+		///		<para> If it is of a different FastVector type, it will be assigned to via a conversion after projection calculations are complete. </para>
+		/// </param>
+		/// <returns>
+		///		The Vector resulting from projecting this Vector onto a plane defined by the passed 3 sets of cartesian coordinatees (with everything treated as 3D). 
+		///		This will contain a 3D Vector in its first 3 elements, but the values of elements after the first 3 are undefined.
+		/// </returns>
+		template<typename OutFP_ = preferred_floating_point, std::size_t OutPlaneSize_, typename OutPlaneT_, std::size_t OutPlaneRegisterWidth_>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> ProjectToPlane3
+		(
+			const this_type& plane_point_a_,
+			const this_type& plane_point_b_,
+			const this_type& plane_point_c_,
+			EmuMath::FastVector<OutPlaneSize_, OutPlaneT_, OutPlaneRegisterWidth_>& out_plane_normal_
+		) const
+		{
+			using out_plane_vector = EmuMath::FastVector<OutPlaneSize_, OutPlaneT_, OutPlaneRegisterWidth_>;
+			if constexpr (std::is_same_v<this_type, out_plane_vector>)
+			{
+				out_plane_normal_ = _calculate_normal_to_plane_3<T_>(plane_point_a_, plane_point_b_, plane_point_c_);
+				return _calculate_projection_to_plane<3, OutFP_>(*this, out_plane_normal_);
+			}
+			else
+			{
+				// Need to convert - save conversion until after calculation so wee can avoid a potential prematur switch of SIMD execution modes on relevant CPUs
+				this_type calc_plane_normal = _calculate_normal_to_plane_3<T_>(plane_point_a_, plane_point_b_, plane_point_c_);
+				this_type projection = _calculate_projection_to_plane<3, OutFP_>(*this, calc_plane_normal);
+				out_plane_normal_ = calc_plane_normal.Convert<OutPlaneSize_, OutPlaneT_, OutPlaneRegisterWidth_>();
+				return projection;
+			}
 		}
 #pragma endregion
 
 #pragma region PLANE_FUNCS
 	public:
+		/// <summary>
+		/// <para> 
+		///		Calculates the normal to a 3D plane defined by 3 sets of 3D cartesian coordinates `a`, `b`, and `c`, where this Vector is `a`. 
+		///		All items will be treated as 3D.
+		/// </para>
+		/// <para> The output Vector may be of a different, customisable value type, and defaults to this Vector's preferred_floating_point. </para>
+		/// </summary>
+		/// <param name="b_">Vector to treat as a 3D cartesian coordinate, used as the second point in defining the plane to project onto.</param>
+		/// <param name="c_">Vector to treat as a 3D cartesian coordinate, used as the third point in defining the plane to project onto.</param>
+		/// <returns>
+		///		FastVector of the provided output value type, containing a 3D normal to the 3D plane defined by points a_, b_, c_, where the called-on Vector is a_. 
+		///		This will contain a 3D Vector in its first 3 elements, but the values of elements after the first 3 are undefined.
+		/// </returns>
 		template<typename OutFP_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> NormalToPlane3(const this_type& b_, const this_type& c_) const
 		{
@@ -8952,6 +9076,47 @@ namespace EmuMath
 					a_.Convert<preferred_floating_point>(),
 					b_.Convert<preferred_floating_point>()
 				).template Convert<OutFP_>();
+			}
+		}
+
+		template<std::size_t CalcSize_, typename OutFP_>
+		[[nodiscard]] static constexpr inline auto _calculate_projection_to_plane(const this_type& vector_, const this_type& plane_normal_)
+			-> EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>
+		{
+			using out_vector = EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>;
+
+			if constexpr (std::is_same_v<out_vector, this_type> && is_floating_point)
+			{
+				return vector_.Subtract(_calculate_projection_to_vector<CalcSize_, OutFP_>(vector_, plane_normal_));
+			}
+			else if constexpr (is_floating_point)
+			{
+				return vector_.Subtract(_calculate_projection_to_vector<CalcSize_, T_>(vector_, plane_normal_)).template Convert<OutFP_>();
+			}
+			else if constexpr (out_vector::is_floating_point)
+			{
+				using calc_vector_type = EmuMath::FastVector<CalcSize_, OutFP_, RegisterWidth_>;
+				calc_vector_type alt_vector = vector_.Convert<CalcSize_, OutFP_>();
+				calc_vector_type alt_plane_normal = plane_normal_.Convert<CalcSize_, OutFP_>();
+				calc_vector_type projection = alt_vector.Subtract(calc_vector_type::template _calculate_projection_to_vector<CalcSize_, OutFP_>(alt_vector, alt_plane_normal));
+				if constexpr (std::is_same_v<calc_vector_type, out_vector>)
+				{
+					return projection;
+				}
+				else
+				{
+					return projection.template Convert<Size_, OutFP_>();
+				}
+			}
+			else
+			{
+				using calc_vector_type = EmuMath::FastVector<CalcSize_, preferred_floating_point, RegisterWidth_>;
+				calc_vector_type alt_vector = vector_.Convert<CalcSize_, preferred_floating_point>();
+				calc_vector_type alt_plane_normal = plane_normal_.Convert<CalcSize_, preferred_floating_point>();
+				return alt_vector.Subtract
+				(
+					calc_vector_type::template _calculate_projection_to_vector<CalcSize_, preferred_floating_point>(alt_vector, alt_plane_normal)
+				).Convert<Size_, OutFP_, RegisterWidth_>();
 			}
 		}
 #pragma endregion
