@@ -862,26 +862,27 @@ int main()
 
 
 	std::cout << "\nPROJECT_TO_PLANE_FROM_POINTS_3D\n";
-	std::cout << EmuMath::FastVector<2, float>(5, 7).ProjectToPlane3(EmuMath::FastVector<2, float>(2, 9), fast_normal_b.Convert<2, float>(), fast_normal_c.Convert<2, float>()) << "\n";
-	std::cout << EmuMath::FastVector<3, float>(5, 7, -16).ProjectToPlane3(EmuMath::FastVector<3, float>(2, 9, 8), fast_normal_b.Convert<3, float>(), fast_normal_c.Convert<3, float>()) << "\n";
-	std::cout << EmuMath::FastVector<4, float>(5, 7, -16, 12).ProjectToPlane3(EmuMath::FastVector<4, float>(2, 9, 8, 19), fast_normal_b.Convert<4, float>(), fast_normal_c.Convert<4, float>()) << "\n";
-	std::cout << EmuMath::FastVector<2, double>(5, 7).ProjectToPlane3(EmuMath::FastVector<2, double>(2, 9), fast_normal_b.Convert<2, double>(), fast_normal_c.Convert<2, double>()) << "\n";
-	std::cout << EmuMath::FastVector<3, double>(5, 7, -16).ProjectToPlane3(EmuMath::FastVector<3, double>(2, 9, 8), fast_normal_b.Convert<3, double>(), fast_normal_c.Convert<3, double>()) << "\n";
-	std::cout << EmuMath::FastVector<4, double>(5, 7, -16, 12).ProjectToPlane3(EmuMath::FastVector<4, double>(2, 9, 8, 19), fast_normal_b.Convert<4, double>(), fast_normal_c.Convert<4, double>()) << "\n";
+	EmuMath::FastVector<4, float> dummy_out_vec;
+	std::cout << EmuMath::FastVector<2, float>(5, 7).ProjectToPlane3(EmuMath::FastVector<2, float>(2, 9), fast_normal_b.Convert<2, float>(), fast_normal_c.Convert<2, float>(), dummy_out_vec) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(5, 7, -16).ProjectToPlane3(EmuMath::FastVector<3, float>(2, 9, 8), fast_normal_b.Convert<3, float>(), fast_normal_c.Convert<3, float>(), dummy_out_vec) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(5, 7, -16, 12).ProjectToPlane3(EmuMath::FastVector<4, float>(2, 9, 8, 19), fast_normal_b.Convert<4, float>(), fast_normal_c.Convert<4, float>(), dummy_out_vec) << "\n";
+	std::cout << EmuMath::FastVector<2, double>(5, 7).ProjectToPlane3(EmuMath::FastVector<2, double>(2, 9), fast_normal_b.Convert<2, double>(), fast_normal_c.Convert<2, double>(), dummy_out_vec) << "\n";
+	std::cout << EmuMath::FastVector<3, double>(5, 7, -16).ProjectToPlane3(EmuMath::FastVector<3, double>(2, 9, 8), fast_normal_b.Convert<3, double>(), fast_normal_c.Convert<3, double>(), dummy_out_vec) << "\n";
+	std::cout << EmuMath::FastVector<4, double>(5, 7, -16, 12).ProjectToPlane3(EmuMath::FastVector<4, double>(2, 9, 8, 19), fast_normal_b.Convert<4, double>(), fast_normal_c.Convert<4, double>(), dummy_out_vec) << "\n";
 	std::cout << "---\n";
-	std::cout << EmuMath::FastVector<2, float, 256>(5, 7).ProjectToPlane3(EmuMath::FastVector<2, float, 256>(2, 9), fast_normal_b.Convert<2, float, 256>(), fast_normal_c.Convert<2, float, 256>()) << "\n";
-	std::cout << EmuMath::FastVector<3, float, 256>(5, 7, -16).ProjectToPlane3(EmuMath::FastVector<3, float, 256>(2, 9, 8), fast_normal_b.Convert<3, float, 256>(), fast_normal_c.Convert<3, float, 256>()) << "\n";
-	std::cout << EmuMath::FastVector<4, float, 256>(5, 7, -16, 12).ProjectToPlane3(EmuMath::FastVector<4, float, 256>(2, 9, 8, 19), fast_normal_b.Convert<4, float, 256>(), fast_normal_c.Convert<4, float, 256>()) << "\n";
-	std::cout << EmuMath::FastVector<2, double, 256>(5, 7).ProjectToPlane3(EmuMath::FastVector<2, double, 256>(2, 9), fast_normal_b.Convert<2, double, 256>(), fast_normal_c.Convert<2, double, 256>()) << "\n";
-	std::cout << EmuMath::FastVector<3, double, 256>(5, 7, -16).ProjectToPlane3(EmuMath::FastVector<3, double, 256>(2, 9, 8), fast_normal_b.Convert<3, double, 256>(), fast_normal_c.Convert<3, double, 256>()) << "\n";
-	std::cout << EmuMath::FastVector<4, double, 256>(5, 7, -16, 12).ProjectToPlane3(EmuMath::FastVector<4, double, 256>(2, 9, 8, 19), fast_normal_b.Convert<4, double, 256>(), fast_normal_c.Convert<4, double, 256>()) << "\n";
+	std::cout << EmuMath::FastVector<2, float, 256>(5, 7).ProjectToPlane3(EmuMath::FastVector<2, float, 256>(2, 9), fast_normal_b.Convert<2, float, 256>(), fast_normal_c.Convert<2, float, 256>(), dummy_out_vec) << "\n";
+	std::cout << EmuMath::FastVector<3, float, 256>(5, 7, -16).ProjectToPlane3(EmuMath::FastVector<3, float, 256>(2, 9, 8), fast_normal_b.Convert<3, float, 256>(), fast_normal_c.Convert<3, float, 256>(), dummy_out_vec) << "\n";
+	std::cout << EmuMath::FastVector<4, float, 256>(5, 7, -16, 12).ProjectToPlane3(EmuMath::FastVector<4, float, 256>(2, 9, 8, 19), fast_normal_b.Convert<4, float, 256>(), fast_normal_c.Convert<4, float, 256>(), dummy_out_vec) << "\n";
+	std::cout << EmuMath::FastVector<2, double, 256>(5, 7).ProjectToPlane3(EmuMath::FastVector<2, double, 256>(2, 9), fast_normal_b.Convert<2, double, 256>(), fast_normal_c.Convert<2, double, 256>(), dummy_out_vec) << "\n";
+	std::cout << EmuMath::FastVector<3, double, 256>(5, 7, -16).ProjectToPlane3(EmuMath::FastVector<3, double, 256>(2, 9, 8), fast_normal_b.Convert<3, double, 256>(), fast_normal_c.Convert<3, double, 256>(), dummy_out_vec) << "\n";
+	std::cout << EmuMath::FastVector<4, double, 256>(5, 7, -16, 12).ProjectToPlane3(EmuMath::FastVector<4, double, 256>(2, 9, 8, 19), fast_normal_b.Convert<4, double, 256>(), fast_normal_c.Convert<4, double, 256>(), dummy_out_vec) << "\n";
 	std::cout << "---\n";
-	std::cout << EmuMath::FastVector<2, std::int32_t, 256>(5, 7).ProjectToPlane3(EmuMath::FastVector<2, std::int32_t, 256>(2, 9), fast_normal_b.Convert<2, std::int32_t, 256>(), fast_normal_c.Convert<2, std::int32_t, 256>()) << "\n";
-	std::cout << EmuMath::FastVector<3, std::int16_t, 256>(5, 7, -16).ProjectToPlane3(EmuMath::FastVector<3, std::int16_t, 256>(2, 9, 8), fast_normal_b.Convert<3, std::int16_t, 256>(), fast_normal_c.Convert<3, std::int16_t, 256>()) << "\n";
-	std::cout << EmuMath::FastVector<4, std::int32_t, 256>(5, 7, -16, 12).ProjectToPlane3<float>(EmuMath::FastVector<4, std::int32_t, 256>(2, 9, 8, 19), fast_normal_b.Convert<4, std::int32_t, 256>(), fast_normal_c.Convert<4, std::int32_t, 256>()) << "\n";
-	std::cout << EmuMath::FastVector<2, std::int32_t, 256>(5, 7).ProjectToPlane3<std::int32_t>(EmuMath::FastVector<2, std::int32_t, 256>(2, 9), fast_normal_b.Convert<2, std::int32_t, 256>(), fast_normal_c.Convert<2, std::int32_t, 256>()) << "\n";
-	std::cout << EmuMath::FastVector<3, std::int32_t, 256>(5, 7, -16).ProjectToPlane3<double>(EmuMath::FastVector<3, std::int32_t, 256>(2, 9, 8), fast_normal_b.Convert<3, std::int32_t, 256>(), fast_normal_c.Convert<3, std::int32_t, 256>()) << "\n";
-	std::cout << EmuMath::FastVector<4, std::int32_t, 256>(5, 7, -16, 12).ProjectToPlane3<double>(EmuMath::FastVector<4, std::int32_t, 256>(2, 9, 8, 19), fast_normal_b.Convert<4, std::int32_t, 256>(), fast_normal_c.Convert<4, std::int32_t, 256>()) << "\n";
+	std::cout << EmuMath::FastVector<2, std::int32_t, 256>(5, 7).ProjectToPlane3(EmuMath::FastVector<2, std::int32_t, 256>(2, 9), fast_normal_b.Convert<2, std::int32_t, 256>(), fast_normal_c.Convert<2, std::int32_t, 256>(), dummy_out_vec) << "\n";
+	std::cout << EmuMath::FastVector<3, std::int16_t, 256>(5, 7, -16).ProjectToPlane3(EmuMath::FastVector<3, std::int16_t, 256>(2, 9, 8), fast_normal_b.Convert<3, std::int16_t, 256>(), fast_normal_c.Convert<3, std::int16_t, 256>(), dummy_out_vec) << "\n";
+	std::cout << EmuMath::FastVector<4, std::int32_t, 256>(5, 7, -16, 12).ProjectToPlane3<float>(EmuMath::FastVector<4, std::int32_t, 256>(2, 9, 8, 19), fast_normal_b.Convert<4, std::int32_t, 256>(), fast_normal_c.Convert<4, std::int32_t, 256>(), dummy_out_vec) << "\n";
+	std::cout << EmuMath::FastVector<2, std::int32_t, 256>(5, 7).ProjectToPlane3<std::int32_t>(EmuMath::FastVector<2, std::int32_t, 256>(2, 9), fast_normal_b.Convert<2, std::int32_t, 256>(), fast_normal_c.Convert<2, std::int32_t, 256>(), dummy_out_vec) << "\n";
+	std::cout << EmuMath::FastVector<3, std::int32_t, 256>(5, 7, -16).ProjectToPlane3<double>(EmuMath::FastVector<3, std::int32_t, 256>(2, 9, 8), fast_normal_b.Convert<3, std::int32_t, 256>(), fast_normal_c.Convert<3, std::int32_t, 256>(), dummy_out_vec) << "\n";
+	std::cout << EmuMath::FastVector<4, std::int32_t, 256>(5, 7, -16, 12).ProjectToPlane3<double>(EmuMath::FastVector<4, std::int32_t, 256>(2, 9, 8, 19), fast_normal_b.Convert<4, std::int32_t, 256>(), fast_normal_c.Convert<4, std::int32_t, 256>(), dummy_out_vec) << "\n";
 
 	std::cout << fast_normal_b.Convert<2, std::int32_t, 256>() << "<-- fast_normal_b\n";
 	std::cout << "\nPROJECT_TO_PLANE_FROM_POINTS_3D (NORMAL)\n";
