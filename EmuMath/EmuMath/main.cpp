@@ -684,7 +684,7 @@ int main()
 	std::cout << EmuMath::FastVector<8, double>(3, 2, 26, 5, 16, 27, 139, 81).Normalise3<double>() << "\n";
 
 	std::cout << "\nANGLE_COS\n";
-	constexpr bool fast_vec_rads = false;
+	constexpr bool fast_vec_rads = true;
 	std::cout << EmuMath::FastVector<2, float>(5, 7).AngleCos<fast_vec_rads>(EmuMath::FastVector<2, float>(2, 9)) << "\n";
 	std::cout << EmuMath::FastVector<3, float>(5, 7, -16).AngleCos<fast_vec_rads>(EmuMath::FastVector<3, float>(2, 9, 8)) << "\n";
 	std::cout << EmuMath::FastVector<4, float>(5, 7, -16, 12).AngleCos<fast_vec_rads>(EmuMath::FastVector<4, float>(2, 9, 8, 19)) << "\n";
@@ -729,26 +729,26 @@ int main()
 	std::cout << EmuMath::FastVector<4, std::int32_t, 256>(5, 7, -16, 12).Angle<fast_vec_rads, double>(EmuMath::FastVector<4, std::int32_t, 256>(2, 9, 8, 19)) << "\n";
 
 	std::cout << "\nANGLE_LOSSY\n";
-	std::cout << EmuMath::FastVector<2, float>(5, 7).AngleLossy<fast_vec_rads>(EmuMath::FastVector<2, float>(2, 9)) << "\n";
-	std::cout << EmuMath::FastVector<3, float>(5, 7, -16).AngleLossy<fast_vec_rads>(EmuMath::FastVector<3, float>(2, 9, 8)) << "\n";
-	std::cout << EmuMath::FastVector<4, float>(5, 7, -16, 12).AngleLossy<fast_vec_rads>(EmuMath::FastVector<4, float>(2, 9, 8, 19)) << "\n";
-	std::cout << EmuMath::FastVector<2, double>(5, 7).AngleLossy<fast_vec_rads>(EmuMath::FastVector<2, double>(2, 9)) << "\n";
-	std::cout << EmuMath::FastVector<3, double>(5, 7, -16).AngleLossy<fast_vec_rads>(EmuMath::FastVector<3, double>(2, 9, 8)) << "\n";
-	std::cout << EmuMath::FastVector<4, double>(5, 7, -16, 12).AngleLossy<fast_vec_rads>(EmuMath::FastVector<4, double>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, float>(5, 7).Angle3<fast_vec_rads>(EmuMath::FastVector<2, float>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(5, 7, -16).Angle3<fast_vec_rads>(EmuMath::FastVector<3, float>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(5, 7, -16, 12).Angle3<fast_vec_rads>(EmuMath::FastVector<4, float>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, double>(5, 7).Angle3<fast_vec_rads>(EmuMath::FastVector<2, double>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, double>(5, 7, -16).Angle3<fast_vec_rads>(EmuMath::FastVector<3, double>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, double>(5, 7, -16, 12).Angle3<fast_vec_rads>(EmuMath::FastVector<4, double>(2, 9, 8, 19)) << "\n";
 	std::cout << "---\n";
-	std::cout << EmuMath::FastVector<2, float, 256>(5, 7).AngleLossy<fast_vec_rads>(EmuMath::FastVector<2, float, 256>(2, 9)) << "\n";
-	std::cout << EmuMath::FastVector<3, float, 256>(5, 7, -16).AngleLossy<fast_vec_rads>(EmuMath::FastVector<3, float, 256>(2, 9, 8)) << "\n";
-	std::cout << EmuMath::FastVector<4, float, 256>(5, 7, -16, 12).AngleLossy<fast_vec_rads>(EmuMath::FastVector<4, float, 256>(2, 9, 8, 19)) << "\n";
-	std::cout << EmuMath::FastVector<2, double, 256>(5, 7).AngleLossy<fast_vec_rads>(EmuMath::FastVector<2, double, 256>(2, 9)) << "\n";
-	std::cout << EmuMath::FastVector<3, double, 256>(5, 7, -16).AngleLossy<fast_vec_rads>(EmuMath::FastVector<3, double, 256>(2, 9, 8)) << "\n";
-	std::cout << EmuMath::FastVector<4, double, 256>(5, 7, -16, 12).AngleLossy<fast_vec_rads>(EmuMath::FastVector<4, double, 256>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, float, 256>(5, 7).Angle3<fast_vec_rads>(EmuMath::FastVector<2, float, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, float, 256>(5, 7, -16).Angle3<fast_vec_rads>(EmuMath::FastVector<3, float, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, float, 256>(5, 7, -16, 12).Angle3<fast_vec_rads>(EmuMath::FastVector<4, float, 256>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, double, 256>(5, 7).Angle3<fast_vec_rads>(EmuMath::FastVector<2, double, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, double, 256>(5, 7, -16).Angle3<fast_vec_rads>(EmuMath::FastVector<3, double, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, double, 256>(5, 7, -16, 12).Angle3<fast_vec_rads>(EmuMath::FastVector<4, double, 256>(2, 9, 8, 19)) << "\n";
 	std::cout << "---\n";
-	std::cout << EmuMath::FastVector<2, std::int32_t, 256>(5, 7).AngleLossy<fast_vec_rads>(EmuMath::FastVector<2, std::int32_t, 256>(2, 9)) << "\n";
-	std::cout << EmuMath::FastVector<3, std::int16_t, 256>(5, 7, -16).AngleLossy<fast_vec_rads>(EmuMath::FastVector<3, std::int16_t, 256>(2, 9, 8)) << "\n";
-	std::cout << EmuMath::FastVector<4, std::int32_t, 256>(5, 7, -16, 12).AngleLossy<fast_vec_rads, float>(EmuMath::FastVector<4, std::int32_t, 256>(2, 9, 8, 19)) << "\n";
-	std::cout << EmuMath::FastVector<2, std::int32_t, 256>(5, 7).AngleLossy<fast_vec_rads, std::int32_t>(EmuMath::FastVector<2, std::int32_t, 256>(2, 9)) << "\n";
-	std::cout << EmuMath::FastVector<3, std::int32_t, 256>(5, 7, -16).AngleLossy<fast_vec_rads, double>(EmuMath::FastVector<3, std::int32_t, 256>(2, 9, 8)) << "\n";
-	std::cout << EmuMath::FastVector<4, std::int32_t, 256>(5, 7, -16, 12).AngleLossy<fast_vec_rads, double>(EmuMath::FastVector<4, std::int32_t, 256>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, std::int32_t, 256>(5, 7).Angle3<fast_vec_rads>(EmuMath::FastVector<2, std::int32_t, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, std::int16_t, 256>(5, 7, -16).Angle3<fast_vec_rads>(EmuMath::FastVector<3, std::int16_t, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, std::int32_t, 256>(5, 7, -16, 12).Angle3<fast_vec_rads, float>(EmuMath::FastVector<4, std::int32_t, 256>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, std::int32_t, 256>(5, 7).Angle3<fast_vec_rads, std::int32_t>(EmuMath::FastVector<2, std::int32_t, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, std::int32_t, 256>(5, 7, -16).Angle3<fast_vec_rads, double>(EmuMath::FastVector<3, std::int32_t, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, std::int32_t, 256>(5, 7, -16, 12).Angle3<fast_vec_rads, double>(EmuMath::FastVector<4, std::int32_t, 256>(2, 9, 8, 19)) << "\n";
 
 
 	system("pause");
