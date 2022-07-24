@@ -8560,7 +8560,7 @@ namespace EmuMath
 			if constexpr (CalcSize_ == 2)
 			{
 				register_type normal_multiplier = _calculate_dot_2_fill(ray_.data, surface_normal_.data);
-				normal_multiplier = EmuSIMD::mul_all<per_element_width>(normal_multiplier, EmuSIMD::set1<register_type, per_element_width>(2));
+				normal_multiplier = EmuSIMD::add<per_element_width>(normal_multiplier, normal_multiplier);
 				return this_type
 				(
 					EmuSIMD::sub<per_element_width>
@@ -8573,7 +8573,7 @@ namespace EmuMath
 			else if constexpr (CalcSize_ == 3)
 			{
 				register_type normal_multiplier = _calculate_dot_3_fill(ray_.data, surface_normal_.data);
-				normal_multiplier = EmuSIMD::mul_all<per_element_width>(normal_multiplier, EmuSIMD::set1<register_type, per_element_width>(2));
+				normal_multiplier = EmuSIMD::add<per_element_width>(normal_multiplier, normal_multiplier);
 				if constexpr (elements_per_register >= 3)
 				{
 					return this_type
@@ -8594,7 +8594,7 @@ namespace EmuMath
 			else
 			{
 				register_type normal_multiplier = _calculate_dot<true>(ray_.data, surface_normal_.data);
-				normal_multiplier = EmuSIMD::mul_all<per_element_width>(normal_multiplier, EmuSIMD::set1<register_type, per_element_width>(2));
+				normal_multiplier = EmuSIMD::add<per_element_width>(normal_multiplier, normal_multiplier);
 				return ray_.Subtract(surface_normal_.Multiply(normal_multiplier));
 			}
 		}
