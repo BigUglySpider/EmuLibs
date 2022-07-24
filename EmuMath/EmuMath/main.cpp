@@ -795,6 +795,25 @@ int main()
 	std::cout << EmuMath::Vector<3, std::int32_t>(5, 7, -16).Project<double>(EmuMath::Vector<3, std::int32_t>(2, 9, 8)) << "\n";
 	std::cout << EmuMath::Vector<4, std::int32_t>(5, 7, -16, 12).Project<double>(EmuMath::Vector<4, std::int32_t>(2, 9, 8, 19)) << "\n";
 
+	std::cout << "\nNORMAL_TO_PLANE\n";
+	auto fast_normal_b = EmuMath::FastVector<4, float>(1, 4, 7, 9);
+	auto fast_normal_c = EmuMath::FastVector<4, float>(6, 5, -2, 7);
+	std::cout << EmuMath::FastVector<2, float>(5, 7).NormalToPlane3(fast_normal_b.Convert<2>(), fast_normal_c.Convert<2>()) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(5, 7, -16).NormalToPlane3(fast_normal_b.Convert<3>(), fast_normal_c.Convert<3>()) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(5, 7, -16, 12).NormalToPlane3(fast_normal_b.Convert<4>(), fast_normal_c.Convert<4>()) << "\n";
+	std::cout << EmuMath::FastVector<2, double>(5, 7).NormalToPlane3(fast_normal_b.Convert<2, double>(), fast_normal_c.Convert<2, double>()) << "\n";
+	std::cout << EmuMath::FastVector<3, double>(5, 7, -16).NormalToPlane3(fast_normal_b.Convert<3, double>(), fast_normal_c.Convert<3, double>()) << "\n";
+	std::cout << EmuMath::FastVector<4, double>(5, 7, -16, 12).NormalToPlane3(fast_normal_b.Convert<4, double>(), fast_normal_c.Convert<4, double>()) << "\n";
+
+	std::cout << "\nNORMAL_TO_PLANE (NORMAL VECTOR)\n";
+	std::cout << EmuMath::Vector<2, float>(5, 7).NormalToPlane3(fast_normal_b.Convert<2>().Store(), fast_normal_c.Convert<2>().Store()) << "\n";
+	std::cout << EmuMath::Vector<3, float>(5, 7, -16).NormalToPlane3(fast_normal_b.Convert<3>().Store(), fast_normal_c.Convert<3>().Store()) << "\n";
+	std::cout << EmuMath::Vector<4, float>(5, 7, -16, 12).NormalToPlane3(fast_normal_b.Convert<4>().Store(), fast_normal_c.Convert<4>().Store()) << "\n";
+	std::cout << EmuMath::Vector<2, double>(5, 7).NormalToPlane3(fast_normal_b.Convert<2, double>().Store(), fast_normal_c.Convert<2, double>().Store()) << "\n";
+	std::cout << EmuMath::Vector<3, double>(5, 7, -16).NormalToPlane3(fast_normal_b.Convert<3, double>().Store(), fast_normal_c.Convert<3, double>().Store()) << "\n";
+	std::cout << EmuMath::Vector<4, double>(5, 7, -16, 12).NormalToPlane3(fast_normal_b.Convert<4, double>().Store(), fast_normal_c.Convert<4, double>().Store()) << "\n";
+
+
 	system("pause");
 	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 	constexpr auto mat_b_ = EmuMath::Matrix<4, 4, int, true>(1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);

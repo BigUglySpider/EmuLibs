@@ -1861,7 +1861,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_for_all_">SIMD register to use in AND operations with all registers encapsulated by this Vector.</param>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& AndAssign(register_arg_type rhs_for_all_)
+		constexpr inline this_type& AndAssign(register_arg_type rhs_for_all_)
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -1884,7 +1884,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_for_all_">Scalar to use in AND operations with all elements within this Vector, assigning the results to this Vector.</param>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& AndAssign(value_type rhs_for_all_)
+		constexpr inline this_type& AndAssign(value_type rhs_for_all_)
 		{
 			return AndAssign(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
 		}
@@ -1894,7 +1894,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Vector of the same type to AND this Vector with.</param>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& AndAssign(const this_type& rhs_)
+		constexpr inline this_type& AndAssign(const this_type& rhs_)
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -1912,7 +1912,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_for_all_">SIMD register to use in OR operations with all registers encapsulated by this Vector.</param>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& OrAssign(register_arg_type rhs_for_all_)
+		constexpr inline this_type& OrAssign(register_arg_type rhs_for_all_)
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -1935,7 +1935,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_for_all_">Scalar to use in OR operations with all elements within this Vector, assigning the results to this Vector.</param>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& OrAssign(value_type rhs_for_all_)
+		constexpr inline this_type& OrAssign(value_type rhs_for_all_)
 		{
 			return OrAssign(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
 		}
@@ -1945,7 +1945,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Vector of the same type to OR this Vector with.</param>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& OrAssign(const this_type& rhs_)
+		constexpr inline this_type& OrAssign(const this_type& rhs_)
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -1963,7 +1963,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_for_all_">SIMD register to use in XOR operations with all registers encapsulated by this Vector.</param>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& XorAssign(register_arg_type rhs_for_all_)
+		constexpr inline this_type& XorAssign(register_arg_type rhs_for_all_)
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -1986,7 +1986,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_for_all_">Scalar to use in XOR operations with all elements within this Vector, assigning the results to this Vector.</param>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& XorAssign(value_type rhs_for_all_)
+		constexpr inline this_type& XorAssign(value_type rhs_for_all_)
 		{
 			return XorAssign(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
 		}
@@ -1996,7 +1996,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Vector of the same type to XOR this Vector with.</param>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& XorAssign(const this_type& rhs_)
+		constexpr inline this_type& XorAssign(const this_type& rhs_)
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -2015,7 +2015,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_for_all_">SIMD register to use in AND operations with the NOT of all registers encapsulated by this Vector.</param>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& AndNotAssign(register_arg_type rhs_for_all_)
+		constexpr inline this_type& AndNotAssign(register_arg_type rhs_for_all_)
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -2039,7 +2039,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_for_all_">Scalar to use in AND operations with the NOT of all elements within this Vector.</param>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& AndNotAssign(value_type rhs_for_all_)
+		constexpr inline this_type& AndNotAssign(value_type rhs_for_all_)
 		{
 			return AndNotAssign(EmuSIMD::set1<register_type, per_element_width>(rhs_for_all_));
 		}
@@ -2050,7 +2050,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">Vector of the same type to AND the NOT this Vector with.</param>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& AndNotAssign(const this_type& rhs_)
+		constexpr inline this_type& AndNotAssign(const this_type& rhs_)
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -2071,7 +2071,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& ShiftLeftAssign(shift_register_type num_shifts_)
+		constexpr inline this_type& ShiftLeftAssign(shift_register_type num_shifts_)
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -2098,7 +2098,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& ShiftLeftAssign(std::size_t num_shifts_)
+		constexpr inline this_type& ShiftLeftAssign(std::size_t num_shifts_)
 		{
 			return ShiftLeftAssign(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
 		}
@@ -2132,7 +2132,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& ShiftRightAssign(shift_register_type num_shifts_)
+		constexpr inline this_type& ShiftRightAssign(shift_register_type num_shifts_)
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -2159,7 +2159,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& ShiftRightAssign(std::size_t num_shifts_)
+		constexpr inline this_type& ShiftRightAssign(std::size_t num_shifts_)
 		{
 			return ShiftRightAssign(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
 		}
@@ -2194,7 +2194,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="num_shifts_">SIMD register of this Vector's `shift_register_type` which indicates the number of shifts to execute.</param>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& ShiftRightArithmeticAssign(shift_register_type num_shifts_)
+		constexpr inline this_type& ShiftRightArithmeticAssign(shift_register_type num_shifts_)
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -2222,7 +2222,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="num_shifts_">Scalar to shift all elements within this Vector by.</param>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& ShiftRightArithmeticAssign(std::size_t num_shifts_)
+		constexpr inline this_type& ShiftRightArithmeticAssign(std::size_t num_shifts_)
 		{
 			return ShiftRightArithmeticAssign(EmuSIMD::set1<shift_register_type, shift_register_per_element_width>(num_shifts_));
 		}
@@ -2253,7 +2253,7 @@ namespace EmuMath
 		/// <para>Creates the NOT form of this Vector, with 0-bits flipped to 1 and 1-bits flipped to 0., and assigns the results to this Vector.</para>
 		/// </summary>
 		/// <returns>Reference to this Vector after results have been assigned.</returns>
-		[[nodiscard]] constexpr inline this_type& NotAssign()
+		constexpr inline this_type& NotAssign()
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -5661,78 +5661,15 @@ namespace EmuMath
 		{
 			return _calculate_projection_to_vector<3, OutFP_>(*this, project_onto_);
 		}
+#pragma endregion
 
-	private:
-		template<std::size_t CalcSize_, typename OutFP_>
-		[[nodiscard]] static constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> _calculate_projection_to_vector(const this_type& a_, const this_type& b_)
+#pragma region PLANE_FUNCS
+	public:
+		template<typename OutFP_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> NormalToPlane3(const this_type& b_, const this_type& c_) const
 		{
-			using out_vector = EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>;
-			if constexpr (std::is_same_v<out_vector, this_type> && is_floating_point)
-			{
-				// Vector projection formula = b * (dot(a, b) / square_mag(b))
-				if constexpr (CalcSize_ == 2)
-				{
-					register_type multiplier = _calculate_dot_2_fill(a_.data, b_.data);
-					multiplier = EmuSIMD::div<per_element_width, is_signed>(multiplier, _calculate_dot_2_fill(b_.data, b_.data));
-					return out_vector
-					(
-						EmuSIMD::mul_all<per_element_width>
-						(
-							b_.GetRegister<0>(),
-							multiplier
-						)
-					);
-				}
-				else if constexpr (CalcSize_ == 3)
-				{
-					register_type multiplier = _calculate_dot_3_fill(a_.data, b_.data);
-					multiplier = EmuSIMD::div<per_element_width, is_signed>(multiplier, _calculate_dot_3_fill(b_.data, b_.data));
-					if constexpr (elements_per_register >= 3)
-					{
-						return out_vector
-						(
-							EmuSIMD::mul_all<per_element_width>
-							(
-								b_.GetRegister<0>(),
-								multiplier
-							)
-						);
-					}
-					else
-					{
-						return _make_partial_multiplied_3<out_vector>(b_, multiplier, register_index_sequence());
-					}
-				}
-				else
-				{
-					register_type multiplier = _calculate_dot<true>(a_.data, b_.data);
-					multiplier = EmuSIMD::div<per_element_width, is_signed>(multiplier, _calculate_dot<true>(b_.data, b_.data));
-					return b_.Multiply(multiplier);
-				}
-			}
-			else if constexpr (is_floating_point)
-			{
-				return _calculate_projection_to_vector<CalcSize_, T_>(a_, b_).template Convert<OutFP_>();
-			}
-			else if constexpr (out_vector::is_floating_point)
-			{
-				return out_vector::template _calculate_projection_to_vector<CalcSize_, OutFP_>
-				(
-					a_.Convert<OutFP_>(),
-					b_.Convert<OutFP_>()
-				);
-			}
-			else
-			{
-				using calc_vector = EmuMath::FastVector<Size_, preferred_floating_point, RegisterWidth_>;
-				return calc_vector::template _calculate_projection_to_vector<CalcSize_, OutFP_>
-				(
-					a_.Convert<preferred_floating_point>(),
-					b_.Convert<preferred_floating_point>()
-				).template Convert<OutFP_>();
-			}
+			return _calculate_normal_to_plane_3<OutFP_>(*this, b_, c_);
 		}
-
 #pragma endregion
 
 #pragma region COMPARISONS_ANY
@@ -8941,6 +8878,175 @@ namespace EmuMath
 							b_.Convert<calc_fp>().data
 						)
 					);
+				}
+			}
+		}
+#pragma endregion
+
+#pragma region PROJECTION_HELPERS
+	private:
+		template<std::size_t CalcSize_, typename OutFP_>
+		[[nodiscard]] static constexpr inline EmuMath::FastVector<Size_, OutFP_, RegisterWidth_> _calculate_projection_to_vector(const this_type& a_, const this_type& b_)
+		{
+			using out_vector = EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>;
+			if constexpr (std::is_same_v<out_vector, this_type> && is_floating_point)
+			{
+				// Vector projection formula = b * (dot(a, b) / square_mag(b))
+				if constexpr (CalcSize_ == 2)
+				{
+					register_type multiplier = _calculate_dot_2_fill(a_.data, b_.data);
+					multiplier = EmuSIMD::div<per_element_width, is_signed>(multiplier, _calculate_dot_2_fill(b_.data, b_.data));
+					return out_vector
+					(
+						EmuSIMD::mul_all<per_element_width>
+						(
+							b_.GetRegister<0>(),
+							multiplier
+						)
+					);
+				}
+				else if constexpr (CalcSize_ == 3)
+				{
+					register_type multiplier = _calculate_dot_3_fill(a_.data, b_.data);
+					multiplier = EmuSIMD::div<per_element_width, is_signed>(multiplier, _calculate_dot_3_fill(b_.data, b_.data));
+					if constexpr (elements_per_register >= 3)
+					{
+						return out_vector
+						(
+							EmuSIMD::mul_all<per_element_width>
+							(
+								b_.GetRegister<0>(),
+								multiplier
+							)
+						);
+					}
+					else
+					{
+						return _make_partial_multiplied_3<out_vector>(b_, multiplier, register_index_sequence());
+					}
+				}
+				else
+				{
+					register_type multiplier = _calculate_dot<true>(a_.data, b_.data);
+					multiplier = EmuSIMD::div<per_element_width, is_signed>(multiplier, _calculate_dot<true>(b_.data, b_.data));
+					return b_.Multiply(multiplier);
+				}
+			}
+			else if constexpr (is_floating_point)
+			{
+				return _calculate_projection_to_vector<CalcSize_, T_>(a_, b_).template Convert<OutFP_>();
+			}
+			else if constexpr (out_vector::is_floating_point)
+			{
+				return out_vector::template _calculate_projection_to_vector<CalcSize_, OutFP_>
+				(
+					a_.Convert<OutFP_>(),
+					b_.Convert<OutFP_>()
+				);
+			}
+			else
+			{
+				using calc_vector = EmuMath::FastVector<Size_, preferred_floating_point, RegisterWidth_>;
+				return calc_vector::template _calculate_projection_to_vector<CalcSize_, OutFP_>
+				(
+					a_.Convert<preferred_floating_point>(),
+					b_.Convert<preferred_floating_point>()
+				).template Convert<OutFP_>();
+			}
+		}
+#pragma endregion
+
+#pragma region PLANE_HELPERS
+	private:
+		template<typename OutFP_>
+		[[nodiscard]] static constexpr inline auto _calculate_normal_to_plane_3(const this_type& a_, const this_type& b_, const this_type& c_)
+			-> EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>
+		{
+			using out_vector = EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>;
+
+			// Normal to 3D plane = Normalise(Cross((b - a), (c - a)));
+			if constexpr (Size_ < 3)
+			{
+				// To avoid NaNs, we want at least 3 items to work with.
+				// --- Additionally, cover the 32-bit value + 128-bit register conversion for the cross to avoid extra conversions
+				using out_fp_uq = typename EmuCore::TMP::remove_ref_cv<OutFP_>::type;
+				using calc_value_type = typename std::conditional
+				<
+					per_element_width == 32,
+					value_type,
+					typename std::conditional
+					<
+						sizeof(preferred_floating_point) == 4,
+						preferred_floating_point,
+						typename std::conditional<sizeof(out_fp_uq) == 4, out_fp_uq, float>::type
+					>::type
+				>::type;
+				using calc_vector_type = EmuMath::FastVector<3, calc_value_type, 128>;
+
+				calc_vector_type alt_a = a_.Convert<3, calc_value_type, 128>();
+				calc_vector_type alt_b = b_.Convert<3, calc_value_type, 128>();
+				calc_vector_type alt_c = c_.Convert<3, calc_value_type, 128>();
+
+				if constexpr (elements_per_register >= 3)
+				{
+					// Indices >= Size_ may contain garbage, so mask them out to prevent inaccurate results
+					// --- We know the register will contain 4 elements as we force a 128-bit register with 32-bit elements.
+					using calc_register_type = typename calc_vector_type::register_type;
+					calc_register_type mask;
+					if constexpr (Size_ == 2)
+					{
+						mask = EmuSIMD::index_mask<calc_register_type, false, false, true, true>::get();
+					}
+					else
+					{
+						mask = EmuSIMD::index_mask<calc_register_type, false, false, false, true>::get();
+					}
+					alt_a.AndAssign(mask);
+					alt_b.AndAssign(mask);
+					alt_c.AndAssign(mask);
+				}
+
+				// We know the types won't be the same due to the size conversion, so always call .Convert
+				return calc_vector_type::template _calculate_normal_to_plane_3<OutFP_>(alt_a, alt_b, alt_c).template Convert<Size_, OutFP_, RegisterWidth_>();
+			}
+			else if constexpr (Size_ == 3 || num_registers == 1)
+			{
+				// No need for optimising the number of calculations since we're covering everything we need with minimal calculations already
+				this_type cross = b_.Subtract(a_).Cross3(c_.Subtract(a_));
+				return cross.Normalise3<false, OutFP_>();
+			}
+			else
+			{
+				// May end up calculating more than is needed, so do some conversions first to minimise calcs
+				// --- Additionally, cover the 32-bit value + 128-bit register conversion for the cross to avoid extra conversions
+				using out_fp_uq = typename EmuCore::TMP::remove_ref_cv<OutFP_>::type;
+				using calc_value_type = typename std::conditional
+				<
+					per_element_width == 32,
+					value_type,
+					typename std::conditional
+					<
+						sizeof(preferred_floating_point) == 4,
+						preferred_floating_point,
+						typename std::conditional<sizeof(out_fp_uq) == 4, out_fp_uq, float>::type
+					>::type
+				>::type;
+				using calc_vector_type = EmuMath::FastVector<3, calc_value_type, 128>;
+
+				calc_vector_type a_alt = a_.Convert<3, calc_value_type, 128>();
+				calc_vector_type b_alt = b_.Convert<3, calc_value_type, 128>();
+				calc_vector_type c_alt = c_.Convert<3, calc_value_type, 128>();
+				calc_vector_type result = b_alt.Subtract(a_alt).Cross3(c_alt.Subtract(a_alt));
+
+				result = result.template Normalise3<false, calc_value_type>();
+
+				if constexpr (std::is_same_v<calc_vector_type, out_vector>)
+				{
+					return result;
+				}
+				else
+				{
+					return result.template Convert<Size_, OutFP_, RegisterWidth_>();
 				}
 			}
 		}
