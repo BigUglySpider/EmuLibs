@@ -5723,8 +5723,19 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline auto ProjectToPlane3(const this_type& plane_point_a_, const this_type& plane_point_b_, const this_type& plane_point_c_) const
 			-> EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>
 		{
-			this_type plane_normal = _calculate_normal_to_plane_3<T_>(plane_point_a_, plane_point_b_, plane_point_c_);
-			return _calculate_projection_to_plane<3, OutFP_>(*this, plane_normal);
+			if constexpr (is_floating_point)
+			{
+				this_type plane_normal = _calculate_normal_to_plane_3<T_>(plane_point_a_, plane_point_b_, plane_point_c_);
+				return _calculate_projection_to_plane<3, OutFP_>(*this, plane_normal);
+			}
+			else
+			{
+				using out_vector = EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>;
+				using calc_value_type = typename std::conditional<out_vector::is_floating_point, OutFP_, preferred_floating_point>::type;
+				using calc_vector_type = EmuMath::FastVector<Size_, calc_value_type, RegisterWidth_>;
+				calc_vector_type plane_normal = _calculate_normal_to_plane_3<calc_value_type>(plane_point_a_, plane_point_b_, plane_point_c_);
+				return calc_vector_type::_calculate_projection_to_plane<3, OutFP_>(this->Convert<calc_value_type>(), plane_normal);
+			}
 		}
 
 		/// <summary>
@@ -5741,8 +5752,8 @@ namespace EmuMath
 		///			Reference to any FastVector type, to which the 3D plane normal will be outputted. 
 		///			Be aware that its data will be overwritten as if assigned from the results to `NormalToPlane3`.
 		///		</para>
-		///		<para> If it is the same as this FastVector type, it will be assigned to and used directly in projection calculations. </para>
-		///		<para> If it is of a different FastVector type, it will be assigned to via a conversion after projection calculations are complete. </para>
+		///		<para> If it is the same as the FastVector type used for calculations, it will be assigned to and used directly in projection calculations. </para>
+		///		<para> If it is of a different FastVector type to that used in calculations, it will be assigned to via a conversion after projection calculations are complete. </para>
 		/// </param>
 		/// <returns>
 		///		The Vector resulting from projecting this Vector onto a plane defined by the passed 3 sets of cartesian coordinatees (with everything treated as 3D). 
@@ -5757,19 +5768,42 @@ namespace EmuMath
 			EmuMath::FastVector<OutPlaneSize_, OutPlaneT_, OutPlaneRegisterWidth_>& out_plane_normal_
 		) const
 		{
-			using out_plane_vector = EmuMath::FastVector<OutPlaneSize_, OutPlaneT_, OutPlaneRegisterWidth_>;
-			if constexpr (std::is_same_v<this_type, out_plane_vector>)
+			using out_plane_vector_type = EmuMath::FastVector < OutPlaneSize_, OutPlaneT_, OutPlaneRegisterWidth_>;
+
+			if constexpr (is_floating_point)
 			{
-				out_plane_normal_ = _calculate_normal_to_plane_3<T_>(plane_point_a_, plane_point_b_, plane_point_c_);
-				return _calculate_projection_to_plane<3, OutFP_>(*this, out_plane_normal_);
+				if constexpr (std::is_same_v<this_type, out_plane_vector_type>)
+				{
+					out_plane_normal_ = _calculate_normal_to_plane_3<T_>(plane_point_a_, plane_point_b_, plane_point_c_);
+					return _calculate_projection_to_plane<3, OutFP_>(*this, out_plane_normal_);
+				}
+				else
+				{
+					using out_vector = EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>;
+					this_type plane_normal = _calculate_normal_to_plane_3<T_>(plane_point_a_, plane_point_b_, plane_point_c_);
+					out_vector projection = _calculate_projection_to_plane<3, OutFP_>(*this, plane_normal);
+					out_plane_normal_ = plane_normal.template Convert<OutPlaneSize_, OutPlaneT_, OutPlaneRegisterWidth_>();
+					return projection;
+				}
 			}
 			else
 			{
-				// Need to convert - save conversion until after calculation so wee can avoid a potential prematur switch of SIMD execution modes on relevant CPUs
-				this_type calc_plane_normal = _calculate_normal_to_plane_3<T_>(plane_point_a_, plane_point_b_, plane_point_c_);
-				this_type projection = _calculate_projection_to_plane<3, OutFP_>(*this, calc_plane_normal);
-				out_plane_normal_ = calc_plane_normal.Convert<OutPlaneSize_, OutPlaneT_, OutPlaneRegisterWidth_>();
-				return projection;
+				using out_vector = EmuMath::FastVector<Size_, OutFP_, RegisterWidth_>;
+				using calc_value_type = typename std::conditional<out_vector::is_floating_point, OutFP_, preferred_floating_point>::type;
+				using calc_vector_type = EmuMath::FastVector<Size_, calc_value_type, RegisterWidth_>;
+
+				if constexpr (std::is_same_v<out_plane_vector_type, calc_vector_type>)
+				{
+					out_plane_normal_ = _calculate_normal_to_plane_3<calc_value_type>(plane_point_a_, plane_point_b_, plane_point_c_);
+					return calc_vector_type::template _calculate_projection_to_plane<3, OutFP_>(this->Convert<calc_value_type>(), out_plane_normal_);
+				}
+				else
+				{
+					calc_vector_type plane_normal = _calculate_normal_to_plane_3<calc_value_type>(plane_point_a_, plane_point_b_, plane_point_c_);
+					out_vector projection = calc_vector_type::template _calculate_projection_to_plane<3, OutFP_>(this->Convert<calc_value_type>(), plane_normal);
+					out_plane_normal_ = plane_normal.template Convert<OutPlaneSize_, OutPlaneT_, OutPlaneRegisterWidth_>();
+					return projection;
+				}
 			}
 		}
 #pragma endregion
