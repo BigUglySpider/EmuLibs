@@ -1,8 +1,7 @@
 #ifndef EMU_SIMD_HELPERS_TEMPLATE_BASIC_ARITHMETIC_H_INC_
 #define EMU_SIMD_HELPERS_TEMPLATE_BASIC_ARITHMETIC_H_INC_ 1
 
-#include "_underlying_template_helpers/_common_underlying_simd_template_helper_includes.h"
-#include "_underlying_template_helpers/_simd_helpers_underlying_basic_arithmetic.h"
+#include "_underlying_template_helpers/_all_underlying_templates.h"
 #include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD
@@ -17,7 +16,7 @@ namespace EmuSIMD
 	/// <typeparam name="Register_">Register type to perform an addition operation via.</typeparam>
 	/// <param name="lhs_">Register of values appearing on the left-hand side of addition.</param>
 	/// <param name="rhs_">Register of values appearing on the right-hand side of addition.</param>
-	/// <returns>Result of adding the two passed SIMD registers with their relevant _add_ operation (e.g. _mm_add_ps with __m128 registers).</returns>
+	/// <returns>Result of adding the two passed SIMD registers with their relevant _add_ operation (e.g. _mm_add_ps with EmuSIMD::f32x4 registers).</returns>
 	template<std::size_t PerElementWidthIfIntegral_ = 32, class Register_>
 	[[nodiscard]] inline Register_ add(Register_ lhs_, Register_ rhs_)
 	{
@@ -49,7 +48,7 @@ namespace EmuSIMD
 	/// <typeparam name="Register_">Register type to perform a subtraction operation via.</typeparam>
 	/// <param name="lhs_">Register of values appearing on the left-hand side of subtraction.</param>
 	/// <param name="rhs_">Register of values appearing on the right-hand side of subtraction.</param>
-	/// <returns>Result of subtracting the two passed SIMD registers with their relevant _sub_ operation (e.g. _mm_sub_ps with __m128 registers).</returns>
+	/// <returns>Result of subtracting the two passed SIMD registers with their relevant _sub_ operation (e.g. _mm_sub_ps with EmuSIMD::f32x4 registers).</returns>
 	template<std::size_t PerElementWidthIfIntegral_ = 32, class Register_>
 	[[nodiscard]] inline Register_ sub(Register_ lhs_, Register_ rhs_)
 	{
@@ -85,7 +84,7 @@ namespace EmuSIMD
 	/// <typeparam name="Register_">Register type to perform a multiplication operation via.</typeparam>
 	/// <param name="lhs_">Register of values appearing on the left-hand side of multiplication.</param>
 	/// <param name="rhs_">Register of values appearing on the right-hand side of multiplication.</param>
-	/// <returns>Result of multiplying the two passed SIMD registers with their relevant _mul_ operation (e.g. _mm_mul_ps with __m128 registers).</returns>
+	/// <returns>Result of multiplying the two passed SIMD registers with their relevant _mul_ operation (e.g. _mm_mul_ps with EmuSIMD::f32x4 registers).</returns>
 	template<bool SignedIfIntegral_ = true, class Register_>
 	[[nodiscard]] inline Register_ mul(Register_ lhs_, Register_ rhs_)
 	{
@@ -123,7 +122,7 @@ namespace EmuSIMD
 	/// <param name="lhs_">Register of values appearing on the left-hand side of multiplication.</param>
 	/// <param name="rhs_">Register of values appearing on the right-hand side of multiplication.</param>
 	/// <returns>
-	///		Result of multiplying the two passed SIMD registers with their relevant _mul_ operation (e.g. _mm_mul_ps with __m128 registers), where
+	///		Result of multiplying the two passed SIMD registers with their relevant _mul_ operation (e.g. _mm_mul_ps with EmuSIMD::f32x4 registers), where
 	///		all operations and resulting elements are of the same width of the input elements.
 	/// </returns>
 	template<std::size_t PerElementWidthIfIntegral_ = 32, class Register_>
@@ -195,7 +194,7 @@ namespace EmuSIMD
 	/// <typeparam name="Register_">Register type to perform a division operation via.</typeparam>
 	/// <param name="lhs_">Register of values appearing on the left-hand side of division.</param>
 	/// <param name="rhs_">Register of values appearing on the right-hand side of division.</param>
-	/// <returns>Result of division with the two passed SIMD registers with their relevant _div_ operation (e.g. _mm_div_ps with __m128 registers).</returns>
+	/// <returns>Result of division with the two passed SIMD registers with their relevant _div_ operation (e.g. _mm_div_ps with EmuSIMD::f32x4 registers).</returns>
 	template<std::size_t PerElementWidthIfIntegral_ = 32, bool SignedIfIntegral_ = true, class Register_>
 	[[nodiscard]] inline Register_ div(Register_ lhs_, Register_ rhs_)
 	{
@@ -230,7 +229,7 @@ namespace EmuSIMD
 	/// <typeparam name="Register_">Register type to perform a modulo division operation via.</typeparam>
 	/// <param name="lhs_">Register of values appearing on the left-hand side of modulo division.</param>
 	/// <param name="rhs_">Register of values appearing on the right-hand side of modulo division.</param>
-	/// <returns>Result of modulo division with the two passed SIMD registers with their relevant mod operation (e.g. _mm_fmod_ps with __m128 registers).</returns>
+	/// <returns>Result of modulo division with the two passed SIMD registers with their relevant mod operation (e.g. _mm_fmod_ps with EmuSIMD::f32x4 registers).</returns>
 	template<std::size_t PerElementWidthIfIntegral_ = 32, bool SignedIfIntegral_ = true, class Register_>
 	[[nodiscard]] inline Register_ mod(Register_ lhs_, Register_ rhs_)
 	{
@@ -270,7 +269,7 @@ namespace EmuSIMD
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
-			return _underlying_simd_helpers::_negate(register_);
+			return _underlying_simd_helpers::_negate<PerElementWidthIfIntegral_>(register_);
 		}
 		else
 		{
@@ -640,6 +639,936 @@ namespace EmuSIMD
 		else
 		{
 			static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to perform EmuSIMD::clamp with an unsupported type as the passed Register_.");
+		}
+	}
+
+	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
+	[[nodiscard]] constexpr inline Register_ sqrt(Register_ in_)
+	{
+		using in_uq = EmuCore::TMP::remove_ref_cv_t<Register_>;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<in_uq>)
+		{
+			if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x4>)
+			{
+				return EmuSIMD::Funcs::sqrt_f32x4(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x8>)
+			{
+				return EmuSIMD::Funcs::sqrt_f32x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
+			{
+				return EmuSIMD::Funcs::sqrt_f32x16(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x2>)
+			{
+				return EmuSIMD::Funcs::sqrt_f64x2(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x4>)
+			{
+				return EmuSIMD::Funcs::sqrt_f64x4(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
+			{
+				return EmuSIMD::Funcs::sqrt_f64x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i128_generic>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::sqrt_i8x16(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::sqrt_u8x16(in_);
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::sqrt_i16x8(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::sqrt_u16x8(in_);
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::sqrt_i32x4(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::sqrt_u32x4(in_);
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::sqrt_i64x2(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::sqrt_u64x2(in_);
+					}
+				}
+				else
+				{
+					static_assert
+						(
+							EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+							"Attempted to calculate the square root of elements in a generic 128-bit integral SIMD register, but the provided width per element is invalid. Valid values are 8, 16, 32, and 64."
+							);
+				}
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i256_generic>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::sqrt_i8x32(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::sqrt_u8x32(in_);
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::sqrt_i16x16(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::sqrt_u16x16(in_);
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::sqrt_i32x8(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::sqrt_u32x8(in_);
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::sqrt_i64x4(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::sqrt_u64x4(in_);
+					}
+				}
+				else
+				{
+					static_assert
+						(
+							EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+							"Attempted to calculate the square root of elements in a generic 256-bit integral SIMD register, but the provided width per element is invalid. Valid values are 8, 16, 32, and 64."
+							);
+				}
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::sqrt_i8x64(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::sqrt_u8x64(in_);
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::sqrt_i16x32(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::sqrt_u16x32(in_);
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::sqrt_i32x16(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::sqrt_u32x16(in_);
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::sqrt_i64x8(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::sqrt_u64x8(in_);
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to calculate the square root of elements in a generic 512-bit integral SIMD register, but the provided width per element is invalid. Valid values are 8, 16, 32, and 64."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x16>)
+			{
+				return EmuSIMD::Funcs::sqrt_i8x16(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x32>)
+			{
+				return EmuSIMD::Funcs::sqrt_i8x32(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+			{
+				return EmuSIMD::Funcs::sqrt_i8x64(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x16>)
+			{
+				return EmuSIMD::Funcs::sqrt_u8x16(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x32>)
+			{
+				return EmuSIMD::Funcs::sqrt_u8x32(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+			{
+				return EmuSIMD::Funcs::sqrt_u8x64(in_);
+			}			
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x8>)
+			{
+				return EmuSIMD::Funcs::sqrt_i16x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x16>)
+			{
+				return EmuSIMD::Funcs::sqrt_i16x16(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+			{
+				return EmuSIMD::Funcs::sqrt_i16x32(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x8>)
+			{
+				return EmuSIMD::Funcs::sqrt_u16x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x16>)
+			{
+				return EmuSIMD::Funcs::sqrt_u16x16(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+			{
+				return EmuSIMD::Funcs::sqrt_u16x32(in_);
+			}			
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x4>)
+			{
+				return EmuSIMD::Funcs::sqrt_i32x4(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x8>)
+			{
+				return EmuSIMD::Funcs::sqrt_i32x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+			{
+				return EmuSIMD::Funcs::sqrt_i32x16(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x4>)
+			{
+				return EmuSIMD::Funcs::sqrt_u32x4(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x8>)
+			{
+				return EmuSIMD::Funcs::sqrt_u32x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+			{
+				return EmuSIMD::Funcs::sqrt_u32x16(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x2>)
+			{
+				return EmuSIMD::Funcs::sqrt_i64x2(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x4>)
+			{
+				return EmuSIMD::Funcs::sqrt_i64x4(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+			{
+				return EmuSIMD::Funcs::sqrt_i64x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x2>)
+			{
+				return EmuSIMD::Funcs::sqrt_u64x2(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x4>)
+			{
+				return EmuSIMD::Funcs::sqrt_u64x4(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+			{
+				return EmuSIMD::Funcs::sqrt_u64x8(in_);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<in_uq>(),
+					"Attempted to calculate the square root of a SIMD register via EmuSIMD helpers, but the provided in_ register is not a support register type for this operation."
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<Register_>(),
+				"Attempted to calculate the square root of a SIMD register via EmuSIMD helpers, but the provided in_ register is not a recognised SIMD register type."
+			);
+		}
+	}
+
+	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
+	[[nodiscard]] constexpr inline Register_ rsqrt(Register_ in_)
+	{
+		using in_uq = EmuCore::TMP::remove_ref_cv_t<Register_>;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<in_uq>)
+		{
+			if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x4>)
+			{
+				return EmuSIMD::Funcs::rsqrt_f32x4(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x8>)
+			{
+				return EmuSIMD::Funcs::rsqrt_f32x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
+			{
+				return EmuSIMD::Funcs::rsqrt_f32x16(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x2>)
+			{
+				return EmuSIMD::Funcs::rsqrt_f64x2(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x4>)
+			{
+				return EmuSIMD::Funcs::rsqrt_f64x4(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
+			{
+				return EmuSIMD::Funcs::rsqrt_f64x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i128_generic>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::rsqrt_i8x16(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::rsqrt_u8x16(in_);
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::rsqrt_i16x8(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::rsqrt_u16x8(in_);
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::rsqrt_i32x4(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::rsqrt_u32x4(in_);
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::rsqrt_i64x2(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::rsqrt_u64x2(in_);
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to calculate the reciprocal of the square root of elements in a generic 128-bit integral SIMD register, but the provided width per element is invalid. Valid values are 8, 16, 32, and 64."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i256_generic>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::rsqrt_i8x32(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::rsqrt_u8x32(in_);
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::rsqrt_i16x16(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::rsqrt_u16x16(in_);
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::rsqrt_i32x8(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::rsqrt_u32x8(in_);
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::rsqrt_i64x4(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::rsqrt_u64x4(in_);
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to calculate the reciprocal of the square root of elements in a generic 256-bit integral SIMD register, but the provided width per element is invalid. Valid values are 8, 16, 32, and 64."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::rsqrt_i8x64(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::rsqrt_u8x64(in_);
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::rsqrt_i16x32(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::rsqrt_u16x32(in_);
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::rsqrt_i32x16(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::rsqrt_u32x16(in_);
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::rsqrt_i64x8(in_);
+					}
+					else
+					{
+						return EmuSIMD::Funcs::rsqrt_u64x8(in_);
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to calculate the reciprocal of the square root of elements in a generic 512-bit integral SIMD register, but the provided width per element is invalid. Valid values are 8, 16, 32, and 64."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x16>)
+			{
+				return EmuSIMD::Funcs::rsqrt_i8x16(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x32>)
+			{
+				return EmuSIMD::Funcs::rsqrt_i8x32(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+			{
+				return EmuSIMD::Funcs::rsqrt_i8x64(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x16>)
+			{
+				return EmuSIMD::Funcs::rsqrt_u8x16(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x32>)
+			{
+				return EmuSIMD::Funcs::rsqrt_u8x32(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+			{
+				return EmuSIMD::Funcs::rsqrt_u8x64(in_);
+			}			
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x8>)
+			{
+				return EmuSIMD::Funcs::rsqrt_i16x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x16>)
+			{
+				return EmuSIMD::Funcs::rsqrt_i16x16(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+			{
+				return EmuSIMD::Funcs::rsqrt_i16x32(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x8>)
+			{
+				return EmuSIMD::Funcs::rsqrt_u16x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x16>)
+			{
+				return EmuSIMD::Funcs::rsqrt_u16x16(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+			{
+				return EmuSIMD::Funcs::rsqrt_u16x32(in_);
+			}			
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x4>)
+			{
+				return EmuSIMD::Funcs::rsqrt_i32x4(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x8>)
+			{
+				return EmuSIMD::Funcs::rsqrt_i32x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+			{
+				return EmuSIMD::Funcs::rsqrt_i32x16(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x4>)
+			{
+				return EmuSIMD::Funcs::rsqrt_u32x4(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x8>)
+			{
+				return EmuSIMD::Funcs::rsqrt_u32x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+			{
+				return EmuSIMD::Funcs::rsqrt_u32x16(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x2>)
+			{
+				return EmuSIMD::Funcs::rsqrt_i64x2(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x4>)
+			{
+				return EmuSIMD::Funcs::rsqrt_i64x4(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+			{
+				return EmuSIMD::Funcs::rsqrt_i64x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x2>)
+			{
+				return EmuSIMD::Funcs::rsqrt_u64x2(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x4>)
+			{
+				return EmuSIMD::Funcs::rsqrt_u64x4(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+			{
+				return EmuSIMD::Funcs::rsqrt_u64x8(in_);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<in_uq>(),
+					"Attempted to calculate the reciprocal of the square root of a SIMD register via EmuSIMD helpers, but the provided in_ register is not a support register type for this operation."
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<Register_>(),
+				"Attempted to calculate the reciporcal of the square root of a SIMD register via EmuSIMD helpers, but the provided in_ register is not a recognised SIMD register type."
+			);
+		}
+	}
+
+	template<std::size_t PerElementWidthIfInt_ = 32, bool SignedIfInt_ = true, class Register_>
+	[[nodiscard]] constexpr inline Register_ abs(Register_ in_)
+	{
+		using in_uq = EmuCore::TMP::remove_ref_cv_t<Register_>;
+		if constexpr (EmuSIMD::TMP::is_simd_register_v<in_uq>)
+		{
+			if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x4>)
+			{
+				return EmuSIMD::Funcs::abs_f32x4(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x8>)
+			{
+				return EmuSIMD::Funcs::abs_f32x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::f32x16>)
+			{
+				return EmuSIMD::Funcs::abs_f32x16(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x2>)
+			{
+				return EmuSIMD::Funcs::abs_f64x2(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x4>)
+			{
+				return EmuSIMD::Funcs::abs_f64x4(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::f64x8>)
+			{
+				return EmuSIMD::Funcs::abs_f64x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i128_generic>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::abs_i8x16(in_);
+					}
+					else
+					{
+						return in_;
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::abs_i16x8(in_);
+					}
+					else
+					{
+						return in_;
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::abs_i32x4(in_);
+					}
+					else
+					{
+						return in_;
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::abs_i64x2(in_);
+					}
+					else
+					{
+						return in_;
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to calculate the absolute form of elements in a generic 128-bit integral SIMD register, but the provided width per element is invalid. Valid values are 8, 16, 32, and 64."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i256_generic>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::abs_i8x32(in_);
+					}
+					else
+					{
+						return in_;
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::abs_i16x16(in_);
+					}
+					else
+					{
+						return in_;
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::abs_i32x8(in_);
+					}
+					else
+					{
+						return in_;
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::abs_i64x4(in_);
+					}
+					else
+					{
+						return in_;
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to calculate the absolute form of elements in a generic 256-bit integral SIMD register, but the provided width per element is invalid. Valid values are 8, 16, 32, and 64."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i512_generic>)
+			{
+				if constexpr (PerElementWidthIfInt_ == 8)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::abs_i8x64(in_);
+					}
+					else
+					{
+						return in_;
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 16)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::abs_i16x32(in_);
+					}
+					else
+					{
+						return in_;
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 32)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::abs_i32x16(in_);
+					}
+					else
+					{
+						return in_;
+					}
+				}
+				else if constexpr (PerElementWidthIfInt_ == 64)
+				{
+					if constexpr (SignedIfInt_)
+					{
+						return EmuSIMD::Funcs::abs_i64x8(in_);
+					}
+					else
+					{
+						return in_;
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<PerElementWidthIfInt_>(),
+						"Attempted to calculate the absolute form of elements in a generic 512-bit integral SIMD register, but the provided width per element is invalid. Valid values are 8, 16, 32, and 64."
+					);
+				}
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x16>)
+			{
+				return EmuSIMD::Funcs::abs_i8x16(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x32>)
+			{
+				return EmuSIMD::Funcs::abs_i8x32(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i8x64>)
+			{
+				return EmuSIMD::Funcs::abs_i8x64(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x16>)
+			{
+				return in_;
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x32>)
+			{
+				return in_;
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u8x64>)
+			{
+				return in_;
+			}			
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x8>)
+			{
+				return EmuSIMD::Funcs::abs_i16x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x16>)
+			{
+				return EmuSIMD::Funcs::abs_i16x16(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i16x32>)
+			{
+				return EmuSIMD::Funcs::abs_i16x32(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x8>)
+			{
+				return in_;
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x16>)
+			{
+				return in_;
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u16x32>)
+			{
+				return in_;
+			}			
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x4>)
+			{
+				return EmuSIMD::Funcs::abs_i32x4(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x8>)
+			{
+				return EmuSIMD::Funcs::abs_i32x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i32x16>)
+			{
+				return EmuSIMD::Funcs::abs_i32x16(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x4>)
+			{
+				return in_;
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x8>)
+			{
+				return in_;
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u32x16>)
+			{
+				return in_;
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x2>)
+			{
+				return EmuSIMD::Funcs::abs_i64x2(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x4>)
+			{
+				return EmuSIMD::Funcs::abs_i64x4(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::i64x8>)
+			{
+				return EmuSIMD::Funcs::abs_i64x8(in_);
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x2>)
+			{
+				return in_;
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x4>)
+			{
+				return in_;
+			}
+			else if constexpr (std::is_same_v<in_uq, EmuSIMD::u64x8>)
+			{
+				return in_;
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<in_uq>(),
+					"Attempted to calculate the absolute form of a SIMD register via EmuSIMD helpers, but the provided in_ register is not a support register type for this operation."
+				);
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<Register_>(),
+				"Attempted to calculate the absolute form of a SIMD register via EmuSIMD helpers, but the provided in_ register is not a recognised SIMD register type."
+			);
 		}
 	}
 }

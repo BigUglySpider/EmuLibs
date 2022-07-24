@@ -8,6 +8,53 @@
 namespace EmuCore::TMP
 {
 #pragma region TEMPLATE_HELPERS
+	template<bool...Bools_>
+	using bool_sequence = std::integer_sequence<bool, Bools_...>;
+
+	template<std::size_t Count_>
+	struct true_bool_sequence_maker
+	{
+	private:
+		template<class IndexSequence_>
+		struct _instantiator
+		{
+			using type = std::integer_sequence<bool>;
+		};
+
+		template<std::size_t...Indices_>
+		struct _instantiator<std::index_sequence<Indices_...>>
+		{
+			using type = bool_sequence<(true || Indices_)...>;
+		};
+
+	public:
+		using type = typename _instantiator<std::make_index_sequence<Count_>>::type;
+	};
+	template<std::size_t Count_>
+	using make_true_bool_sequence = typename true_bool_sequence_maker<Count_>::type;
+
+	template<std::size_t Count_>
+	struct false_bool_sequence_maker
+	{
+	private:
+		template<class IndexSequence_>
+		struct _instantiator
+		{
+			using type = std::integer_sequence<bool>;
+		};
+
+		template<std::size_t...Indices_>
+		struct _instantiator<std::index_sequence<Indices_...>>
+		{
+			using type = bool_sequence<(false && Indices_)...>;
+		};
+
+	public:
+		using type = typename _instantiator<std::make_index_sequence<Count_>>::type;
+	};
+	template<std::size_t Count_>
+	using make_false_bool_sequence = typename false_bool_sequence_maker<Count_>::type;
+
 	/// <summary>
 	/// <para> Helper to safely instantiate a Template_ from variadic Args_, cancelling instantiation if it is a failure. </para>
 	/// <para> If instantiation fails, type will be void. Otherwise, it will be an instance of Template_ instantiated with the provided Args_. </para>
@@ -120,6 +167,41 @@ namespace EmuCore::TMP
 	};
 	template<class...Args_>
 	using first_variadic_arg_t = typename first_variadic_arg<Args_...>::type;
+#pragma endregion
+
+#pragma region VALUE_EXTRACTORS
+	/// <summary>
+	/// <para> Extracts the first argument value of a selection of variadic template Values_, storing it as the internal value. </para>
+	/// <para> This uses auto argument type deduction, allowing support for multiple argument types. </para>
+	/// <para> If 1 or more arguments are provided: value will be the first argument. </para>
+	/// <para> If 0 arguments are provided: value will be 0. </para>
+	/// </summary>
+	template<auto...Values_>
+	struct first_variadic_value
+	{
+		static constexpr auto value = 0;
+	};
+
+	template<auto First_, auto...Others_>
+	struct first_variadic_value<First_, Others_...>
+	{
+		static constexpr auto value = First_;
+	};
+
+	template<auto First_>
+	struct first_variadic_value<First_>
+	{
+		static constexpr auto value = First_;
+	};
+
+	template<>
+	struct first_variadic_value<>
+	{
+		static constexpr auto value = 0;
+	};
+
+	template<auto...Values_>
+	static constexpr inline auto first_variadic_value_v = first_variadic_value<Values_...>::value;
 #pragma endregion
 
 #pragma region VARIADIC_BOOLS
@@ -335,6 +417,27 @@ namespace EmuCore::TMP
 	};
 	template<class IntegerSequence_, std::size_t LoopCount_>
 	using make_looped_integer_sequence = typename looped_integer_sequence<IntegerSequence_, LoopCount_>::type;
+
+	template<std::size_t Size_, std::size_t Offset_ = 0>
+	struct reverse_index_sequence
+	{
+	private:
+		template<std::size_t...Indices_>
+		static constexpr auto _make_reverse(std::index_sequence<Indices_...> indices_)
+		{
+			constexpr std::size_t num_indices = sizeof...(Indices_);
+			return std::index_sequence<(num_indices + Offset_) - 1U - (Indices_ - Offset_)...>{};
+		}
+
+	public:
+		using type = decltype(_make_reverse(make_offset_index_sequence<Offset_, Size_>()));
+	};
+
+	template<std::size_t Size_>
+	using make_reverse_index_sequence = typename reverse_index_sequence<Size_, 0>::type;
+
+	template<std::size_t Offset_, std::size_t Size_>
+	using make_offset_reverse_index_sequence = typename reverse_index_sequence<Size_, Offset_>::type;
 
 	/// <summary>
 	/// <para> Helper type to perform a comparison of all constants to determine the last to compare true. </para>

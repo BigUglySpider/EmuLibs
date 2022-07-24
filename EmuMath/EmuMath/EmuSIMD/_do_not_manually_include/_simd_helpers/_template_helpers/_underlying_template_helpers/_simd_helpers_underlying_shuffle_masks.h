@@ -13,7 +13,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 
 #pragma region SHUFFLE_MASKS_128
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	struct _shuffle_mask<__m128, I0_, I1_, I2_, I3_>
+	struct _shuffle_mask<EmuSIMD::f32x4, I0_, I1_, I2_, I3_>
 	{
 		static constexpr unsigned int value = static_cast<unsigned int>(((I3_ & 0b11) << 6) | ((I2_ & 0b11) << 4) | ((I1_ & 0b11) << 2) | (I0_ & 0b11));
 		[[nodiscard]] static constexpr inline unsigned int get()
@@ -22,12 +22,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	};
 	template<std::size_t I_>
-	struct _shuffle_mask<__m128, I_> : public _shuffle_mask<__m128, I_, I_, I_, I_>
+	struct _shuffle_mask<EmuSIMD::f32x4, I_> : public _shuffle_mask<EmuSIMD::f32x4, I_, I_, I_, I_>
 	{
 	};
 
 	template<std::size_t I0_, std::size_t I1_>
-	struct _shuffle_mask<__m128d, I0_, I1_>
+	struct _shuffle_mask<EmuSIMD::f64x2, I0_, I1_>
 	{
 		static constexpr int value = static_cast<int>(((I1_ & 0b1) << 1) | (I0_ & 0b1));
 		[[nodiscard]] static constexpr inline int get()
@@ -36,12 +36,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	};
 	template<std::size_t I_>
-	struct _shuffle_mask<__m128d, I_> : public _shuffle_mask<__m128d, I_, I_>
+	struct _shuffle_mask<EmuSIMD::f64x2, I_> : public _shuffle_mask<EmuSIMD::f64x2, I_, I_>
 	{
 	};
 
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	struct _shuffle_mask<__m128i, I0_, I1_, I2_, I3_>
+	struct _shuffle_mask<EmuSIMD::i128_generic, I0_, I1_, I2_, I3_>
 	{
 		static constexpr int value = static_cast<int>(((I3_ & 0b11) << 6) | ((I2_ & 0b11) << 4) | ((I1_ & 0b11) << 2) | (I0_ & 0b11));
 		[[nodiscard]] static constexpr inline int get()
@@ -50,12 +50,36 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	};
 
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, std::size_t I4_, std::size_t I5_, std::size_t I6_, std::size_t I7_>
+	struct _shuffle_mask<EmuSIMD::i128_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>
+	{
+	private:
+		using _underlying_shuffle = _shuffle_mask
+		<
+			EmuSIMD::i128_generic,
+			I0_ * 2, (I0_ * 2) + 1,
+			I1_ * 2, (I1_ * 2) + 1,
+			I2_ * 2, (I2_ * 2) + 1,
+			I3_ * 2, (I3_ * 2) + 1,
+			I4_ * 2, (I4_ * 2) + 1,
+			I5_ * 2, (I5_ * 2) + 1,
+			I6_ * 2, (I6_ * 2) + 1,
+			I7_ * 2, (I7_ * 2) + 1
+		>;
+
+	public:
+		[[nodiscard]] static inline auto get()
+		{
+			return _underlying_shuffle::get();
+		}
+	};
+
 	template
 	<
 		std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, std::size_t I4_, std::size_t I5_, std::size_t I6_, std::size_t I7_,
 		std::size_t I8_, std::size_t I9_, std::size_t I10_, std::size_t I11_, std::size_t I12_, std::size_t I13_, std::size_t I14_, std::size_t I15_
 	>
-	struct _shuffle_mask<__m128i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>
+	struct _shuffle_mask<EmuSIMD::i128_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_>
 	{
 	private:
 		static constexpr char _mask = 0b1111;
@@ -96,7 +120,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		static constexpr char _val<15> = I15_ & _mask;
 
 	public:
-		[[nodiscard]] static inline __m128i get()
+		[[nodiscard]] static inline EmuSIMD::i128_generic get()
 		{
 			return _mm_set_epi8
 			(
@@ -109,7 +133,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 
 #pragma region SHUFFLE_MASKS_256
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	struct _shuffle_mask<__m256, I0_, I1_, I2_, I3_>
+	struct _shuffle_mask<EmuSIMD::f32x8, I0_, I1_, I2_, I3_>
 	{
 		static constexpr int value = static_cast<int>(((I3_ & 0b11) << 6) | ((I2_ & 0b11) << 4) | ((I1_ & 0b11) << 2) | (I0_ & 0b11));
 		[[nodiscard]] static constexpr inline int get()
@@ -118,12 +142,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	};
 	template<std::size_t I_>
-	struct _shuffle_mask<__m256, I_> : public _shuffle_mask<__m256, I_, I_, I_, I_>
+	struct _shuffle_mask<EmuSIMD::f32x8, I_> : public _shuffle_mask<EmuSIMD::f32x8, I_, I_, I_, I_>
 	{
 	};
 
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	struct _shuffle_mask<__m256d, I0_, I1_, I2_, I3_>
+	struct _shuffle_mask<EmuSIMD::f64x4, I0_, I1_, I2_, I3_>
 	{
 		static constexpr int value = static_cast<int>(((I3_ & 0b1) << 3) | ((I2_ & 0b1) << 2) | ((I1_ & 0b1) << 1) | (I0_ & 0b1));
 		[[nodiscard]] static constexpr inline int get()
@@ -132,21 +156,53 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	};
 	template<std::size_t I0_, std::size_t I1_>
-	struct _shuffle_mask<__m256d, I0_, I1_> : public _shuffle_mask<__m256d, I0_, I1_, I0_, I1_>
+	struct _shuffle_mask<EmuSIMD::f64x4, I0_, I1_> : public _shuffle_mask<EmuSIMD::f64x4, I0_, I1_, I0_, I1_>
 	{
 	};
 	template<std::size_t I_>
-	struct _shuffle_mask<__m256d, I_> : public _shuffle_mask<__m256d, I_, I_, I_, I_>
+	struct _shuffle_mask<EmuSIMD::f64x4, I_> : public _shuffle_mask<EmuSIMD::f64x4, I_, I_, I_, I_>
 	{
 	};
 
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	struct _shuffle_mask<__m256i, I0_, I1_, I2_, I3_>
+	struct _shuffle_mask<EmuSIMD::i256_generic, I0_, I1_, I2_, I3_>
 	{
 		static constexpr int value = static_cast<int>(((I3_ & 0b11) << 6) | ((I2_ & 0b11) << 4) | ((I1_ & 0b11) << 2) | (I0_ & 0b11));
 		[[nodiscard]] static constexpr inline int get()
 		{
 			return value;
+		}
+	};
+
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, std::size_t I4_, std::size_t I5_, std::size_t I6_, std::size_t I7_>
+	struct _shuffle_mask<EmuSIMD::i256_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>
+	{
+	private:
+		using _underlying_shuffle = _shuffle_mask
+		<
+			EmuSIMD::i256_generic,
+			I0_ * 2, (I0_ * 2) + 1,
+			I1_ * 2, (I1_ * 2) + 1,
+			I2_ * 2, (I2_ * 2) + 1,
+			I3_ * 2, (I3_ * 2) + 1,
+			I4_ * 2, (I4_ * 2) + 1,
+			I5_ * 2, (I5_ * 2) + 1,
+			I6_ * 2, (I6_ * 2) + 1,
+			I7_ * 2, (I7_ * 2) + 1,
+			I0_ * 2, (I0_ * 2) + 1,
+			I1_ * 2, (I1_ * 2) + 1,
+			I2_ * 2, (I2_ * 2) + 1,
+			I3_ * 2, (I3_ * 2) + 1,
+			I4_ * 2, (I4_ * 2) + 1,
+			I5_ * 2, (I5_ * 2) + 1,
+			I6_ * 2, (I6_ * 2) + 1,
+			I7_ * 2, (I7_ * 2) + 1
+		>;
+
+	public:
+		static inline auto get()
+		{
+			return _underlying_shuffle::get();
 		}
 	};
 
@@ -159,7 +215,8 @@ namespace EmuSIMD::_underlying_simd_helpers
 	>
 	struct _shuffle_mask
 	<
-		__m256i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_,
+		EmuSIMD::i256_generic,
+		I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_,
 		I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_
 	>
 	{
@@ -234,7 +291,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		static constexpr char _val<31> = I31_ & _mask;
 
 	public:
-		[[nodiscard]] static inline __m256i get()
+		[[nodiscard]] static inline EmuSIMD::i256_generic get()
 		{
 			return _mm256_set_epi8
 			(
@@ -250,10 +307,10 @@ namespace EmuSIMD::_underlying_simd_helpers
 		std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, std::size_t I4_, std::size_t I5_, std::size_t I6_, std::size_t I7_,
 		std::size_t I8_, std::size_t I9_, std::size_t I10_, std::size_t I11_, std::size_t I12_, std::size_t I13_, std::size_t I14_, std::size_t I15_
 	>
-	struct _shuffle_mask<__m256i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_> :
+	struct _shuffle_mask<EmuSIMD::i256_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_> :
 		public _shuffle_mask
 		<
-			__m256i,
+			EmuSIMD::i256_generic,
 			I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_,
 			I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_
 		>
@@ -263,7 +320,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 
 #pragma region SHUFFLE_MASKS_512
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	struct _shuffle_mask<__m512, I0_, I1_, I2_, I3_>
+	struct _shuffle_mask<EmuSIMD::f32x16, I0_, I1_, I2_, I3_>
 	{
 		static constexpr int value = static_cast<int>(((I3_ & 0b11) << 6) | ((I2_ & 0b11) << 4) | ((I1_ & 0b11) << 2) | (I0_ & 0b11));
 		[[nodiscard]] static constexpr inline int get()
@@ -272,12 +329,12 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	};
 	template<std::size_t I_>
-	struct _shuffle_mask<__m512, I_> : public _shuffle_mask<__m512, I_, I_, I_, I_>
+	struct _shuffle_mask<EmuSIMD::f32x16, I_> : public _shuffle_mask<EmuSIMD::f32x16, I_, I_, I_, I_>
 	{
 	};
 
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, std::size_t I4_, std::size_t I5_, std::size_t I6_, std::size_t I7_>
-	struct _shuffle_mask<__m512d, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>
+	struct _shuffle_mask<EmuSIMD::f64x8, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>
 	{
 		static constexpr int value = static_cast<int>
 		(
@@ -289,20 +346,20 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	};
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	struct _shuffle_mask<__m512d, I0_, I1_, I2_, I3_> : public _shuffle_mask<__m512d, I0_, I1_, I2_, I3_, I0_, I1_, I2_, I3_>
+	struct _shuffle_mask<EmuSIMD::f64x8, I0_, I1_, I2_, I3_> : public _shuffle_mask<EmuSIMD::f64x8, I0_, I1_, I2_, I3_, I0_, I1_, I2_, I3_>
 	{
 	};
 	template<std::size_t I0_, std::size_t I1_>
-	struct _shuffle_mask<__m512d, I0_, I1_> : public _shuffle_mask<__m512d, I0_, I1_, I0_, I1_, I0_, I1_, I0_, I1_>
+	struct _shuffle_mask<EmuSIMD::f64x8, I0_, I1_> : public _shuffle_mask<EmuSIMD::f64x8, I0_, I1_, I0_, I1_, I0_, I1_, I0_, I1_>
 	{
 	};
 	template<std::size_t I_>
-	struct _shuffle_mask<__m512d, I_> : public _shuffle_mask<__m512d, I_, I_, I_, I_, I_, I_, I_, I_>
+	struct _shuffle_mask<EmuSIMD::f64x8, I_> : public _shuffle_mask<EmuSIMD::f64x8, I_, I_, I_, I_, I_, I_, I_, I_>
 	{
 	};
 
 	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_>
-	struct _shuffle_mask<__m512i, I0_, I1_, I2_, I3_>
+	struct _shuffle_mask<EmuSIMD::i512_generic, I0_, I1_, I2_, I3_>
 	{
 		static constexpr _MM_PERM_ENUM value = static_cast<_MM_PERM_ENUM>(((I3_ & 0b11) << 6) | ((I2_ & 0b11) << 4) | ((I1_ & 0b11) << 2) | (I0_ & 0b11));
 		static constexpr inline _MM_PERM_ENUM get()
@@ -324,7 +381,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	>
 	struct _shuffle_mask
 	<
-		__m512i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_,
+		EmuSIMD::i512_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_,
 		I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_,
 		I32_, I33_, I34_, I35_, I36_, I37_, I38_, I39_, I40_, I41_, I42_, I43_, I44_, I45_, I46_, I47_,
 		I48_, I49_, I50_, I51_, I52_, I53_, I54_, I55_, I56_, I57_, I58_, I59_, I60_, I61_, I62_, I63_
@@ -465,7 +522,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 		static constexpr char _val<63> = I63_ & _mask;
 
 	public:
-		[[nodiscard]] static inline __m512i get()
+		[[nodiscard]] static inline EmuSIMD::i512_generic get()
 		{
 			return _mm512_set_epi8
 			(
@@ -489,11 +546,11 @@ namespace EmuSIMD::_underlying_simd_helpers
 	>
 	struct _shuffle_mask
 	<
-		__m512i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_,
+		EmuSIMD::i512_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_,
 		I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_
 	> : public _shuffle_mask
 		<
-			__m512i, 
+			EmuSIMD::i512_generic, 
 			I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_,
 			I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_,
 			I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_,
@@ -506,10 +563,10 @@ namespace EmuSIMD::_underlying_simd_helpers
 		std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, std::size_t I4_, std::size_t I5_, std::size_t I6_, std::size_t I7_,
 		std::size_t I8_, std::size_t I9_, std::size_t I10_, std::size_t I11_, std::size_t I12_, std::size_t I13_, std::size_t I14_, std::size_t I15_
 	>
-	struct _shuffle_mask<__m512i, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_> :
+	struct _shuffle_mask<EmuSIMD::i512_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_> :
 		public _shuffle_mask
 		<
-			__m512i, 
+			EmuSIMD::i512_generic, 
 			I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_,
 			I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_,
 			I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_,

@@ -5896,12 +5896,12 @@ namespace EmuMath
 		/// <param name="plane_normal_">: EmuMath Vector describing the plane to reflect onto. This is expected to be normalised, and treated as such.</param>
 		/// <returns>EmuMath Vector resulting from projecting this Vector onto the plane defined by the provided plane_normal_.</returns>
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t NormSize_, typename NormT_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ProjectPlane(const EmuMath::Vector<NormSize_, NormT_>& plane_normal_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ProjectToPlane(const EmuMath::Vector<NormSize_, NormT_>& plane_normal_) const
 		{
 			return EmuMath::Helpers::vector_project_plane<OutSize_, OutT_>(*this, plane_normal_);
 		}
 		template<typename OutT_ = preferred_floating_point, std::size_t NormSize_, typename NormT_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ProjectPlane(const EmuMath::Vector<NormSize_, NormT_>& plane_normal_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ProjectToPlane(const EmuMath::Vector<NormSize_, NormT_>& plane_normal_) const
 		{
 			return EmuMath::Helpers::vector_project_plane<size, OutT_>(*this, plane_normal_);
 		}
@@ -5938,7 +5938,7 @@ namespace EmuMath
 			std::size_t SizeC_,
 			typename TC_
 		>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ProjectPlane3Constexpr
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ProjectToPlane3Constexpr
 		(
 			const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
 			const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
@@ -5958,7 +5958,7 @@ namespace EmuMath
 			std::size_t SizeC_,
 			typename TC_
 		>
-		[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> ProjectPlane3Constexpr
+		[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> ProjectToPlane3Constexpr
 		(
 			const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
 			const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
@@ -5976,7 +5976,7 @@ namespace EmuMath
 		/// </para>
 		/// <para> If a normal for the defined plane is already available, it is recommended to use vector_project_plane with that normal to minimise normalisation costs. </para>
 		/// <para> Unlike most member functions, if no OutSize_ is provided this will always default to 3 instead of this Vector's size, due to its 3D focus. </para>
-		/// <para> For a guarantee to be constexpr-evaluable if possible, use ProjectPlane3Constexpr instead. </para>
+		/// <para> For a guarantee to be constexpr-evaluable if possible, use ProjectToPlane3Constexpr instead. </para>
 		/// </summary>
 		/// <param name="plane_point_a_">
 		///		: Cartesian point a defining the plane to project onto. For more information on how this is used, see NormalToPlane3 
@@ -5997,7 +5997,7 @@ namespace EmuMath
 			std::size_t SizeC_,
 			typename TC_
 		>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ProjectPlane3
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ProjectToPlane3
 		(
 			const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
 			const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
@@ -6017,7 +6017,7 @@ namespace EmuMath
 			std::size_t SizeC_,
 			typename TC_
 		>
-		[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> ProjectPlane3
+		[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> ProjectToPlane3
 		(
 			const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
 			const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,

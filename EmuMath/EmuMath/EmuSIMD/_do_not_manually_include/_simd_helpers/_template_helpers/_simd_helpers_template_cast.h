@@ -1,7 +1,7 @@
 #ifndef EMU_SIMD_HELPERS_TEMPLATE_CAST_H_INC_
 #define EMU_SIMD_HELPERS_TEMPLATE_CAST_H_INC_ 1
 
-#include "_underlying_template_helpers/_simd_helpers_underlying_cast.h"
+#include "_underlying_template_helpers/_all_underlying_templates.h"
 #include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD
