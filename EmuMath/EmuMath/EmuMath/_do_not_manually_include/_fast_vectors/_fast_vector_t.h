@@ -4643,6 +4643,51 @@ namespace EmuMath
 		{
 			return FusedLerp(EmuSIMD::set1<register_type, per_element_width>(b_), EmuSIMD::set1<register_type, per_element_width>(t_));
 		}
+
+		/// <summary>
+		/// <para> Calculates the Vector resulting from this Vector being reflected as a ray bouncing from the passed surface normal. </para>
+		/// </summary>
+		/// <param name="surface_normal_">Normal describing a surface on which the ray will be reflected.</param>
+		/// <returns>
+		///		FastVector of the same type containing the Vector resulting from a reflection of this Vector (treated as a ray) 
+		///		on a surface described by the passed surface normal.
+		/// </returns>
+		[[nodiscard]] constexpr inline this_type Reflect(const this_type& surface_normal_) const
+		{
+			return _calculate_reflect<Size_>(*this, surface_normal_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the Vector resulting from this Vector being reflected as a ray bouncing from the passed surface normal, treating them as 2D Vectors. </para>
+		/// </summary>
+		/// <param name="surface_normal_">Normal describing a 2D surface on which the ray will be reflected.</param>
+		/// <returns>
+		///		<para>
+		///			FastVector of the same type containing the Vector resulting from a reflection of this Vector (treated as a ray) 
+		///			on a surface described by the passed surface normal, where both are treated as 2D Vectors. 
+		///		</para>
+		///		<para> The first 2 items in the output Vector will be the 2D result Vector, but the values for elements after the first 2 are undefined. </para>
+		/// </returns>
+		[[nodiscard]] constexpr inline this_type Reflect2(const this_type& surface_normal_) const
+		{
+			return _calculate_reflect<2>(*this, surface_normal_);
+		}
+
+		/// <summary>
+		/// <para> Calculates the Vector resulting from this Vector being reflected as a ray bouncing from the passed surface normal, treating them as 3D Vectors. </para>
+		/// </summary>
+		/// <param name="surface_normal_">Normal describing a 3D surface on which the ray will be reflected.</param>
+		/// <returns>
+		///		<para>	
+		///			FastVector of the same type containing the Vector resulting from a reflection of this Vector (treated as a ray) 
+		///			on a surface described by the passed surface normal, where both are treated as 3D Vectors. 
+		///		</para>
+		///		<para> The first 3 items in the output Vector will be the 3D result Vector, but the values for elements after the first 3 are undefined. </para>
+		/// </returns>
+		[[nodiscard]] constexpr inline this_type Reflect3(const this_type& surface_normal_) const
+		{
+			return _calculate_reflect<3>(*this, surface_normal_);
+		}
 #pragma endregion
 
 #pragma region ANGLE_COSINE_FUNCS
@@ -7045,7 +7090,14 @@ namespace EmuMath
 			using arg_uq = typename EmuCore::TMP::remove_ref_cv<Arg_>::type;
 			if constexpr (std::is_same_v<this_type, arg_uq>)
 			{
-				return arg_.data[Index_];
+				if constexpr (contains_multiple_registers)
+				{
+					return arg_.data[Index_];
+				}
+				else
+				{
+					return arg_.data;
+				}
 			}
 			else if constexpr (std::is_same_v<register_type, arg_uq>)
 			{
@@ -7900,6 +7952,7 @@ namespace EmuMath
 			}
 		}
 
+		public:
 		static constexpr inline auto _make_shuffle_0_for_dot3_sizege3_width128()
 		{
 			// with a 4-element register, this is 2, 1, 2, 1
@@ -8110,6 +8163,42 @@ namespace EmuMath
 			{
 				constexpr std::size_t out_per_element_width = out_uq::per_element_width;
 				return EmuSIMD::mul_all<out_per_element_width>(vec_.template GetRegister<Index_>(), multiplier_);
+			}
+			else
+			{
+				return vec_.template GetRegister<Index_>();
+			}
+		}
+
+		template<class OutVector_, class Rhs_, std::size_t...RegisterIndices_>
+		[[nodiscard]] static constexpr inline OutVector_ _make_partial_subtracted_3
+		(
+			const OutVector_& vec_,
+			const Rhs_& to_subtract_,
+			std::index_sequence<RegisterIndices_...> register_indices_
+		)
+		{
+			return OutVector_(vec_.template _make_register_for_partial_subtracted_3<RegisterIndices_>(vec_, to_subtract_)...);
+		}
+
+		template<std::size_t Index_, class OutVector_, class Rhs_>
+		[[nodiscard]] static constexpr inline typename OutVector_::register_type _make_register_for_partial_subtracted_3
+		(
+			const OutVector_& vec_,
+			const Rhs_& to_subtract_
+		)
+		{
+			using out_uq = typename EmuCore::TMP::remove_ref_cv<OutVector_>::type;
+			constexpr std::size_t out_elements_per_register = out_uq::elements_per_register;
+			constexpr std::size_t current_register_first_element_index = Index_ * out_elements_per_register;
+			if constexpr (current_register_first_element_index < 3)
+			{
+				constexpr std::size_t out_per_element_width = out_uq::per_element_width;
+				return EmuSIMD::sub<out_per_element_width>
+				(
+					vec_.template GetRegister<Index_>(),
+					_retrieve_register_from_arg<Index_>(to_subtract_)
+				);
 			}
 			else
 			{
@@ -8462,6 +8551,52 @@ namespace EmuMath
 					_retrieve_register_from_arg<RegisterIndices_>(std::forward<T_>(t_))
 				)...
 			});
+		}
+
+		template<std::size_t CalcSize_>
+		[[nodiscard]] static constexpr inline this_type _calculate_reflect(const this_type& ray_, const this_type& surface_normal_)
+		{
+			// Reflect(ray, norm) = ray - (norm * (2 * dot(ray, norm)))
+			if constexpr (CalcSize_ == 2)
+			{
+				register_type normal_multiplier = _calculate_dot_2_fill(ray_.data, surface_normal_.data);
+				normal_multiplier = EmuSIMD::mul_all<per_element_width>(normal_multiplier, EmuSIMD::set1<register_type, per_element_width>(2));
+				return this_type
+				(
+					EmuSIMD::sub<per_element_width>
+					(
+						_retrieve_register_from_arg<0>(ray_.data),
+						EmuSIMD::mul_all<per_element_width>(_retrieve_register_from_arg<0>(surface_normal_), normal_multiplier)
+					)
+				);
+			}
+			else if constexpr (CalcSize_ == 3)
+			{
+				register_type normal_multiplier = _calculate_dot_3_fill(ray_.data, surface_normal_.data);
+				normal_multiplier = EmuSIMD::mul_all<per_element_width>(normal_multiplier, EmuSIMD::set1<register_type, per_element_width>(2));
+				if constexpr (elements_per_register >= 3)
+				{
+					return this_type
+					(
+						EmuSIMD::sub<per_element_width>
+						(
+							_retrieve_register_from_arg<0>(ray_.data),
+							EmuSIMD::mul_all<per_element_width>(_retrieve_register_from_arg<0>(surface_normal_), normal_multiplier)
+						)
+					);
+				}
+				else
+				{
+					this_type scaled_normal = _make_partial_multiplied_3<this_type>(surface_normal_, normal_multiplier, register_index_sequence());
+					return _make_partial_subtracted_3<this_type>(ray_, scaled_normal, register_index_sequence());
+				}
+			}
+			else
+			{
+				register_type normal_multiplier = _calculate_dot<true>(ray_.data, surface_normal_.data);
+				normal_multiplier = EmuSIMD::mul_all<per_element_width>(normal_multiplier, EmuSIMD::set1<register_type, per_element_width>(2));
+				return ray_.Subtract(surface_normal_.Multiply(normal_multiplier));
+			}
 		}
 #pragma endregion
 

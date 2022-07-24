@@ -706,7 +706,6 @@ int main()
 	std::cout << EmuMath::FastVector<2, std::int32_t, 256>(5, 7).AngleCos<fast_vec_rads, std::int32_t>(EmuMath::FastVector<2, std::int32_t, 256>(2, 9)) << "\n";
 	std::cout << EmuMath::FastVector<3, std::int32_t, 256>(5, 7, -16).AngleCos<fast_vec_rads, double>(EmuMath::FastVector<3, std::int32_t, 256>(2, 9, 8)) << "\n";
 	std::cout << EmuMath::FastVector<4, std::int32_t, 256>(5, 7, -16, 12).AngleCos<fast_vec_rads, double>(EmuMath::FastVector<4, std::int32_t, 256>(2, 9, 8, 19)) << "\n";
-
 	std::cout << "\nANGLE\n";
 	std::cout << EmuMath::FastVector<2, float>(5, 7).Angle<fast_vec_rads>(EmuMath::FastVector<2, float>(2, 9)) << "\n";
 	std::cout << EmuMath::FastVector<3, float>(5, 7, -16).Angle<fast_vec_rads>(EmuMath::FastVector<3, float>(2, 9, 8)) << "\n";
@@ -857,10 +856,6 @@ int main()
 	std::cout << EmuMath::Vector<3, std::int32_t>(5, 7, -16).ProjectToPlane<double>(EmuMath::Vector<3, std::int32_t>(2, 9, 8)) << "\n";
 	std::cout << EmuMath::Vector<4, std::int32_t>(5, 7, -16, 12).ProjectToPlane<double>(EmuMath::Vector<4, std::int32_t>(2, 9, 8, 19)) << "\n";
 
-
-
-
-
 	std::cout << "\nPROJECT_TO_PLANE_FROM_POINTS_3D\n";
 	EmuMath::FastVector<4, float> dummy_out_vec;
 	std::cout << EmuMath::FastVector<2, float>(5, 7).ProjectToPlane3(EmuMath::FastVector<2, float>(2, 9), fast_normal_b.Convert<2, float>(), fast_normal_c.Convert<2, float>(), dummy_out_vec) << "\n";
@@ -907,6 +902,49 @@ int main()
 	std::cout << EmuMath::Vector<3, std::int32_t>(5, 7, -16).ProjectToPlane3<double>(EmuMath::Vector<3, std::int32_t>(2, 9, 8), fast_normal_b.Convert<3, std::int32_t, 256>().Store(), fast_normal_c.Convert<3, std::int32_t, 256>().Store()) << "\n";
 	std::cout << EmuMath::Vector<4, std::int32_t>(5, 7, -16, 12).ProjectToPlane3<double>(EmuMath::Vector<4, std::int32_t>(2, 9, 8, 19), fast_normal_b.Convert<4, std::int32_t, 256>().Store(), fast_normal_c.Convert<4, std::int32_t, 256>().Store()) << "\n";
 
+	std::cout << "\nREFLECT\n";
+	std::cout << EmuMath::FastVector<2, float>(5, 7).Reflect3(EmuMath::FastVector<2, float>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, float>(5, 7, -16).Reflect3(EmuMath::FastVector<3, float>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, float>(5, 7, -16, 12).Reflect3(EmuMath::FastVector<4, float>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, double>(5, 7).Reflect3(EmuMath::FastVector<2, double>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, double>(5, 7, -16).Reflect3(EmuMath::FastVector<3, double>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, double>(5, 7, -16, 12).Reflect3(EmuMath::FastVector<4, double>(2, 9, 8, 19)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::FastVector<2, float, 256>(5, 7).Reflect3(EmuMath::FastVector<2, float, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, float, 256>(5, 7, -16).Reflect3(EmuMath::FastVector<3, float, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, float, 256>(5, 7, -16, 12).Reflect3(EmuMath::FastVector<4, float, 256>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, double, 256>(5, 7).Reflect3(EmuMath::FastVector<2, double, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, double, 256>(5, 7, -16).Reflect3(EmuMath::FastVector<3, double, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, double, 256>(5, 7, -16, 12).Reflect3(EmuMath::FastVector<4, double, 256>(2, 9, 8, 19)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::FastVector<2, std::int32_t, 256>(5, 7).Reflect3(EmuMath::FastVector<2, std::int32_t, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, std::int16_t, 256>(5, 7, -16).Reflect3(EmuMath::FastVector<3, std::int16_t, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, std::int32_t, 256>(5, 7, -16, 12).Reflect3(EmuMath::FastVector<4, std::int32_t, 256>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::FastVector<2, std::int32_t, 256>(5, 7).Reflect3(EmuMath::FastVector<2, std::int32_t, 256>(2, 9)) << "\n";
+	std::cout << EmuMath::FastVector<3, std::int32_t, 256>(5, 7, -16).Reflect3(EmuMath::FastVector<3, std::int32_t, 256>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::FastVector<4, std::int32_t, 256>(5, 7, -16, 12).Reflect3(EmuMath::FastVector<4, std::int32_t, 256>(2, 9, 8, 19)) << "\n";
+
+	std::cout << "\nREFLECT (NORMAL)\n";
+	std::cout << EmuMath::Vector<2, float>(5, 7).Reflect(EmuMath::Vector<2, float>(2, 9)) << "\n";
+	std::cout << EmuMath::Vector<3, float>(5, 7, -16).Reflect(EmuMath::Vector<3, float>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::Vector<4, float>(5, 7, -16, 12).Reflect(EmuMath::Vector<4, float>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::Vector<2, double>(5, 7).Reflect(EmuMath::Vector<2, double>(2, 9)) << "\n";
+	std::cout << EmuMath::Vector<3, double>(5, 7, -16).Reflect(EmuMath::Vector<3, double>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::Vector<4, double>(5, 7, -16, 12).Reflect(EmuMath::Vector<4, double>(2, 9, 8, 19)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::Vector<2, float>(5, 7).Reflect(EmuMath::Vector<2, float>(2, 9)) << "\n";
+	std::cout << EmuMath::Vector<3, float>(5, 7, -16).Reflect(EmuMath::Vector<3, float>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::Vector<4, float>(5, 7, -16, 12).Reflect(EmuMath::Vector<4, float>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::Vector<2, double>(5, 7).Reflect(EmuMath::Vector<2, double>(2, 9)) << "\n";
+	std::cout << EmuMath::Vector<3, double>(5, 7, -16).Reflect(EmuMath::Vector<3, double>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::Vector<4, double>(5, 7, -16, 12).Reflect(EmuMath::Vector<4, double>(2, 9, 8, 19)) << "\n";
+	std::cout << "---\n";
+	std::cout << EmuMath::Vector<2, std::int32_t>(5, 7).Reflect(EmuMath::Vector<2, std::int32_t>(2, 9)) << "\n";
+	std::cout << EmuMath::Vector<3, std::int16_t>(5, 7, -16).Reflect(EmuMath::Vector<3, std::int16_t>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::Vector<4, std::int32_t>(5, 7, -16, 12).Reflect(EmuMath::Vector<4, std::int32_t>(2, 9, 8, 19)) << "\n";
+	std::cout << EmuMath::Vector<2, std::int32_t>(5, 7).Reflect(EmuMath::Vector<2, std::int32_t>(2, 9)) << "\n";
+	std::cout << EmuMath::Vector<3, std::int32_t>(5, 7, -16).Reflect(EmuMath::Vector<3, std::int32_t>(2, 9, 8)) << "\n";
+	std::cout << EmuMath::Vector<4, std::int32_t>(5, 7, -16, 12).Reflect(EmuMath::Vector<4, std::int32_t>(2, 9, 8, 19)) << "\n";
 
 
 	system("pause");

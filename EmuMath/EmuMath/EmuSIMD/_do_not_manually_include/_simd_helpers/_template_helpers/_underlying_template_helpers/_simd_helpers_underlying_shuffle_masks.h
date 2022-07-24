@@ -50,6 +50,30 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	};
 
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, std::size_t I4_, std::size_t I5_, std::size_t I6_, std::size_t I7_>
+	struct _shuffle_mask<EmuSIMD::i128_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>
+	{
+	private:
+		using _underlying_shuffle = _shuffle_mask
+		<
+			EmuSIMD::i128_generic,
+			I0_ * 2, (I0_ * 2) + 1,
+			I1_ * 2, (I1_ * 2) + 1,
+			I2_ * 2, (I2_ * 2) + 1,
+			I3_ * 2, (I3_ * 2) + 1,
+			I4_ * 2, (I4_ * 2) + 1,
+			I5_ * 2, (I5_ * 2) + 1,
+			I6_ * 2, (I6_ * 2) + 1,
+			I7_ * 2, (I7_ * 2) + 1
+		>;
+
+	public:
+		[[nodiscard]] static inline auto get()
+		{
+			return _underlying_shuffle::get();
+		}
+	};
+
 	template
 	<
 		std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, std::size_t I4_, std::size_t I5_, std::size_t I6_, std::size_t I7_,
@@ -150,6 +174,38 @@ namespace EmuSIMD::_underlying_simd_helpers
 		}
 	};
 
+	template<std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, std::size_t I4_, std::size_t I5_, std::size_t I6_, std::size_t I7_>
+	struct _shuffle_mask<EmuSIMD::i256_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_>
+	{
+	private:
+		using _underlying_shuffle = _shuffle_mask
+		<
+			EmuSIMD::i256_generic,
+			I0_ * 2, (I0_ * 2) + 1,
+			I1_ * 2, (I1_ * 2) + 1,
+			I2_ * 2, (I2_ * 2) + 1,
+			I3_ * 2, (I3_ * 2) + 1,
+			I4_ * 2, (I4_ * 2) + 1,
+			I5_ * 2, (I5_ * 2) + 1,
+			I6_ * 2, (I6_ * 2) + 1,
+			I7_ * 2, (I7_ * 2) + 1,
+			I0_ * 2, (I0_ * 2) + 1,
+			I1_ * 2, (I1_ * 2) + 1,
+			I2_ * 2, (I2_ * 2) + 1,
+			I3_ * 2, (I3_ * 2) + 1,
+			I4_ * 2, (I4_ * 2) + 1,
+			I5_ * 2, (I5_ * 2) + 1,
+			I6_ * 2, (I6_ * 2) + 1,
+			I7_ * 2, (I7_ * 2) + 1
+		>;
+
+	public:
+		static inline auto get()
+		{
+			return _underlying_shuffle::get();
+		}
+	};
+
 	template
 	<
 		std::size_t I0_, std::size_t I1_, std::size_t I2_, std::size_t I3_, std::size_t I4_, std::size_t I5_, std::size_t I6_, std::size_t I7_,
@@ -159,7 +215,8 @@ namespace EmuSIMD::_underlying_simd_helpers
 	>
 	struct _shuffle_mask
 	<
-		EmuSIMD::i256_generic, I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_,
+		EmuSIMD::i256_generic,
+		I0_, I1_, I2_, I3_, I4_, I5_, I6_, I7_, I8_, I9_, I10_, I11_, I12_, I13_, I14_, I15_,
 		I16_, I17_, I18_, I19_, I20_, I21_, I22_, I23_, I24_, I25_, I26_, I27_, I28_, I29_, I30_, I31_
 	>
 	{

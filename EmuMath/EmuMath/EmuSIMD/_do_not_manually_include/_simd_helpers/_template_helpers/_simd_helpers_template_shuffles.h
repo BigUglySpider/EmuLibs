@@ -10,7 +10,7 @@ namespace EmuSIMD
 	{
 		static constexpr bool is_valid = _underlying_simd_helpers::is_valid_shuffle_mask_instance
 		<
-			shuffle_mask<Register_, Indices_...>
+			_underlying_simd_helpers::_shuffle_mask<Register_, Indices_...>
 		>::value;
 	};
 
