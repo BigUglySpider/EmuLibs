@@ -4,6 +4,7 @@
 #include "_misc_arithmetic/_matrix_abs.h"
 #include "_misc_arithmetic/_matrix_ceil.h"
 #include "_misc_arithmetic/_matrix_ceil_constexpr.h"
+#include "_misc_arithmetic/_matrix_clamp_min.h"
 #include "_misc_arithmetic/_matrix_floor.h"
 #include "_misc_arithmetic/_matrix_floor_constexpr.h"
 #include "_misc_arithmetic/_matrix_lerp.h"

@@ -704,5 +704,8 @@
     <ClInclude Include="EmuSIMD\_do_not_manually_include\_simd_helpers\_template_helpers\_underlying_template_helpers\_all_underlying_templates.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_misc_arithmetic\_matrix_clamp_min.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

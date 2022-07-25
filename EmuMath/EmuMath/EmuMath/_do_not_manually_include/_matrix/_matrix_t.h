@@ -6,6 +6,10 @@
 #include <tuple>
 #include <utility>
 
+// MISC MATH TO DO:
+// --- CLAMPS
+// --- That's literally it, I missed just one bloody thing
+
 namespace EmuMath
 {
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
@@ -15,32 +19,55 @@ namespace EmuMath
 	public:
 		template<std::size_t, std::size_t, typename, bool> friend struct Matrix;
 
+		/// <summary> The type of Matrix that this is an instance of. Primarily for clearer typing in the implementation, and of little use. </summary>
 		using this_type = Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>;
+		/// <summary> Type providing info regarding this Matrix, which may have been specialised to some degree to encourage new behaviours in the default implementation. </summary>
 		using matrix_info = EmuMath::TMP::common_matrix_info<NumColumns_, NumRows_, T_, ColumnMajor_>;
+		/// <summary> The number of columns containined within this Matrix type. </summary>
 		static constexpr std::size_t num_columns = matrix_info::num_columns;
+		/// <summary> The number of rows containined within this Matrix type. </summary>
 		static constexpr std::size_t num_rows = matrix_info::num_rows;
+		/// <summary> The total number of elements contained within this Matrix type. </summary>
 		static constexpr std::size_t size = matrix_info::size;
+		/// <summary> The total number of major elements contained within this Matrix type. Equal to num_columns if column-major, otherwise equal to num_rows. </summary>
 		static constexpr std::size_t num_major_elements = matrix_info::num_major_elements;
+		/// <summary> The total number of non-major elements contained within this Matrix type. Equal to num_rows if column-major, otherwise equal to num_columns. </summary>
 		static constexpr std::size_t num_non_major_elements = matrix_info::num_non_major_elements;
+		/// <summary> The number of columns or rows that this Matrix contains, whichever of the two is lower. </summary>
 		static constexpr std::size_t smallest_direction_size = matrix_info::smallest_direction_size;
+		/// <summary> The number of columns or rows that this Matrix contains, whichever of the two is higher. </summary>
 		static constexpr std::size_t greatest_direction_size = matrix_info::greatest_direction_size;
+		/// <summary> If true, this Matrix type is contiguously stored in column order - that is, a full column appears in memory before moving to the immediate next column. </summary>
 		static constexpr bool is_column_major = matrix_info::is_column_major;
+		/// <summary> If true, this Matrix type is contiguously stored in row order - that is, a full row appears in memory before moving to the immediate next row. </summary>
 		static constexpr bool is_row_major = matrix_info::is_row_major;
+		/// <summary> True if this Matrix type contains any form of reference, regardless of qualification. </summary>
 		static constexpr bool contains_ref = matrix_info::contains_ref;
+		/// <summary> True if this Matrix type contains const-qualified (aka readonly) references. </summary>
 		static constexpr bool contains_const_ref = matrix_info::contains_const_ref;
+		/// <summary> True if this Matrix type contains non-const-qualified (aka writable) references. </summary>
 		static constexpr bool contains_non_const_ref = matrix_info::contains_non_const_ref;
+		/// <summary> True if this is a square Matrix type, meaning that it contains an equal number of columns and rows. </summary>
 		static constexpr bool is_square = num_columns == num_rows;
 
 		/// <summary> Representation of this Matrix type flattened as an EmuMath Vector. </summary>
 		using matrix_vector_type = typename matrix_info::matrix_vector_type;
+		/// <summary> The underlying type stored within this Matrix type. </summary>
 		using stored_type = typename matrix_info::stored_type;
+		/// <summary> The qualified type used when interacting with this Matrix type's common interface. </summary>
 		using value_type = typename matrix_info::value_type;
+		/// <summary> The unqualified form of the type used when interacting with this Matrix type's common interface. </summary>
 		using value_type_uq = typename matrix_info::value_type_uq;
+		/// <summary> The floating-point type preferred for use with this Matrix type in operations which benefit/require floating-points. </summary>
 		using preferred_floating_point = typename matrix_info::preferred_floating_point;
 
+		/// <summary> STL-compliant random-access iterator for accessing this Matrix type in a flattened, contiguous approach. </summary>
 		using iterator = typename matrix_vector_type::iterator;
+		/// <summary> STL-compliant random-access constant iterator for accessing this Matrix type in a flattened, contiguous approach. </summary>
 		using const_iterator = typename matrix_vector_type::const_iterator;
+		/// <summary> STL-compliant random-access reverse iterator for accessing this Matrix type in a flattened, contiguous approach. </summary>
 		using reverse_iterator = typename matrix_vector_type::reverse_iterator;
+		/// <summary> STL-compliant random-access constant reverse iterator for accessing this Matrix type in a flattened, contiguous approach. </summary>
 		using const_reverse_iterator = typename matrix_vector_type::const_reverse_iterator;
 #pragma endregion
 
@@ -78,6 +105,10 @@ namespace EmuMath
 			}
 		}
 
+		/// <summary>
+		/// <para> Calculates the index for the provided index in this Matrix type to be used when accessing it as a flattened, contiguous array. </para>
+		/// </summary>
+		/// <returns> Flattened index of the provided column/row index within this Matrix type. </returns>
 		[[nodiscard]] static constexpr inline std::size_t get_flattened_index(std::size_t column_index_, std::size_t row_index_)
 		{
 			if constexpr (is_column_major)
@@ -90,12 +121,22 @@ namespace EmuMath
 			}
 		}
 
+		/// <summary>
+		/// <para> Calculates the index for the provided index in this Matrix type to be used when accessing it as a flattened, contiguous array. </para>
+		/// </summary>
+		/// <param name="column_row_index_pair_">Pair containing the column index in its first element (0), and the row index in its second element (1).</param>
+		/// <returns> Flattened index of the provided column/row index within this Matrix type. </returns>
 		[[nodiscard]] static constexpr inline std::size_t get_flattened_index(const std::pair<std::size_t, std::size_t>& column_row_index_pair_)
 		{
 			using std::get;
 			return get_flattened_index(get<0>(column_row_index_pair_), get<1>(column_row_index_pair_));
 		}
 
+		/// <summary>
+		/// <para> Unflattens the provided flattened index and calculates the index of the column it matches to. </para>
+		/// </summary>
+		/// <param name="flattened_index_">Index when accessing this Matrix type as a flattened, contiguous array.</param>
+		/// <returns> The index of the column that the provided `flattened_index_` would equate to. </returns>
 		[[nodiscard]] static constexpr inline std::size_t get_unflattened_column_index(std::size_t flattened_index_)
 		{
 			if constexpr (is_column_major)
@@ -108,6 +149,11 @@ namespace EmuMath
 			}
 		}
 
+		/// <summary>
+		/// <para> Unflattens the provided flattened index and calculates the index of the row it matches to. </para>
+		/// </summary>
+		/// <param name="flattened_index_">Index when accessing this Matrix type as a flattened, contiguous array.</param>
+		/// <returns> The index of the row that the provided `flattened_index_` would equate to. </returns>
 		[[nodiscard]] static constexpr inline std::size_t get_unflattened_row_index(std::size_t flattened_index_)
 		{
 			if constexpr (is_column_major)
@@ -120,6 +166,14 @@ namespace EmuMath
 			}
 		}
 
+		/// <summary>
+		/// <para> Unflattens the provided flattened index and calculates the index of the column and row indices it matches to. </para>
+		/// </summary>
+		/// <param name="flattened_index_">Index when accessing this Matrix type as a flattened, contiguous array.</param>
+		/// <returns>
+		///		A pair containing unflattened indices of the provided `flattened_index_`, 
+		///		with the column index in the first element (0), and the row index in the second element (1).
+		/// </returns>
 		[[nodiscard]] static constexpr inline std::pair<std::size_t, std::size_t> get_unflattened_index(std::size_t flattened_index_)
 		{
 			return std::pair<std::size_t, std::size_t>(get_unflattened_column_index(flattened_index_), get_unflattened_row_index(flattened_index_));
@@ -4678,6 +4732,172 @@ namespace EmuMath
 		constexpr inline void LerpRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_, ArgT_&& t_) const
 		{
 			EmuMath::Helpers::matrix_lerp_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_), std::forward<ArgT_>(t_));
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a minimum value indicated by min_. </para>
+		/// <para> If Min_ is an EmuMath Vector: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
+		/// </summary>
+		/// <param name="min_">: Scalar or EmuMath Matrix to use as the minimum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with its elements clamped to the provided minimum.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Min_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ClampMin(Min_&& min_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_min<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Min_>(min_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Min_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ClampMin(Min_&& min_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_min<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Min_>(min_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Min_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ClampMin(Min_&& min_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_min<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Min_>(min_));
+		}
+
+		template<class Min_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void ClampMin(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Min_&& min_) const
+		{
+			EmuMath::Helpers::matrix_clamp_min(out_matrix_, *this, std::forward<Min_>(min_));
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a minimum value indicated by min_. </para>
+		/// <para> If Min_ is an EmuMath Vector: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
+		/// <para> Indices within the provided range will contain respective clamping results. </para>
+		/// <para> Indices outside of the provided range will be copies of respective indices in matrix_a_. </para>
+		/// </summary>
+		/// <param name="min_">: Scalar or EmuMath Matrix to use as the minimum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with elements in the provided range clamped to the provided minimum, and copied elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Min_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ClampMinRange(Min_&& min_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Min_>(min_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			typename OutT_, bool OutColumnMajor_ = is_column_major, class Min_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ClampMinRange(Min_&& min_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Min_>(min_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Min_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ClampMinRange(Min_&& min_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Min_>(min_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Min_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void ClampMinRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Min_&& min_) const
+		{
+			EmuMath::Helpers::matrix_clamp_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Min_>(min_));
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a minimum value indicated by min_. </para>
+		/// <para> If Min_ is an EmuMath Vector: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
+		/// <para> Indices within the provided range will contain respective clamping results. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// </summary>
+		/// <param name="min_">: Scalar or EmuMath Matrix to use as the minimum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with elements in the provided range clamped to the provided minimum, and default elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Min_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ClampMinRangeNoCopy(Min_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Min_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Min_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ClampMinRangeNoCopy(Min_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Min_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Min_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ClampMinRangeNoCopy(Min_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Min_>(b_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Min_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void ClampMinRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Min_&& b_) const
+		{
+			EmuMath::Helpers::matrix_clamp_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Min_>(b_));
 		}
 #pragma endregion
 
