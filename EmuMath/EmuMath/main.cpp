@@ -238,26 +238,26 @@ int main()
 	std::cout << rt_ << "\n\n";
 
 	std::cout << "CLAMPS\n";
-	std::cout << mat_a_.ClampMax(-4) << "\n\n";
-	std::cout << mat_a_.ClampMax(4) << "\n\n";
-	std::cout << mat_a_.ClampMax(EmuMath::Matrix<4, 4, int, true>(7, 0, 2, 1, 4, 7, 5, 3, 2, 1, 12, 6, 144, 155, -275, 2)) << "\n\n";
-	std::cout << mat_a_.ClampMax(EmuMath::Matrix<4, 4, int, false>(7, 0, 2, 1, 4, 7, 5, 3, 2, 1, 12, 6, 144, 155, -275, 2)) << "\n\n";
-	std::cout << mat_a_.ClampMax(EmuMath::Matrix<2, 3, int, true>(7, 0, 2, 1, 4, 7)) << "\n\n";
-	std::cout << mat_a_.ClampMax(EmuMath::Matrix<2, 3, int, false>(7, 0, 2, 1, 4, 7)) << "\n\n";
+	std::cout << mat_a_.Clamp(-4, 4) << "\n\n";
+	std::cout << mat_a_.Clamp(4, 40) << "\n\n";
+	std::cout << mat_a_.Clamp(EmuMath::Matrix<4, 4, int, true>(7, 0, 2, 1, 4, 7, 5, 3, 2, 1, 12, 6, 144, 155, -275, 2), 6) << "\n\n";
+	std::cout << mat_a_.Clamp(6, EmuMath::Matrix<4, 4, int, false>(7, 0, 2, 1, 4, 7, 5, 3, 2, 1, 12, 6, 144, 155, -275, 2)) << "\n\n";
+	std::cout << mat_a_.Clamp(EmuMath::Matrix<2, 3, int, true>(7, 0, 2, 1, 4, 7), EmuMath::Matrix<4, 4, int, true>(12, 10, 6, 3, 15, 21, 13, -5, 19, 20, 21, -7, 1, 2, 3, 4)) << "\n\n";
+	std::cout << mat_a_.Clamp(EmuMath::Matrix<4, 4, int, false>(-3, 4, -4, 5, 3, 4, 5, 6, 10, 11, 12, 13, -255, -511, 31, 1337), EmuMath::Matrix<2, 3, int, false>(3, 12, 6, 8, 9, 10)) << "\n\n";
 	std::cout << "---\n";
-	std::cout << mat_a_.ClampMaxRange<0, 2, 0, 2>(-4) << "\n\n";
-	std::cout << mat_a_.ClampMaxRange<0, 2, 0, 2>(4) << "\n\n";
-	std::cout << mat_a_.ClampMaxRange<0, 2, 0, 2>(EmuMath::Matrix<4, 4, int, true>(7, 0, 2, 1, 4, 7, 5, 3, 2, 1, 12, 6, 144, 155, -275, 2)) << "\n\n";
-	std::cout << mat_a_.ClampMaxRange<0, 2, 0, 2>(EmuMath::Matrix<4, 4, int, false>(7, 0, 2, 1, 4, 7, 5, 3, 2, 1, 12, 6, 144, 155, -275, 2)) << "\n\n";
-	std::cout << mat_a_.ClampMaxRange<0, 2, 0, 2>(EmuMath::Matrix<2, 3, int, true>(7, 0, 2, 1, 4, 7)) << "\n\n";
-	std::cout << mat_a_.ClampMaxRange<0, 2, 0, 2>(EmuMath::Matrix<2, 3, int, false>(7, 0, 2, 1, 4, 7)) << "\n\n";
+	std::cout << mat_a_.ClampRange<1, 3, 1, 3>(-4, 4) << "\n\n";
+	std::cout << mat_a_.ClampRange<1, 3, 1, 3>(4, 40) << "\n\n";
+	std::cout << mat_a_.ClampRange<1, 3, 1, 3>(EmuMath::Matrix<4, 4, int, true>(7, 0, 2, 1, 4, 7, 5, 3, 2, 1, 12, 6, 144, 155, -275, 2), 6) << "\n\n";
+	std::cout << mat_a_.ClampRange<1, 3, 1, 3>(6, EmuMath::Matrix<4, 4, int, false>(7, 0, 2, 1, 4, 7, 5, 3, 2, 1, 12, 6, 144, 155, -275, 2)) << "\n\n";
+	std::cout << mat_a_.ClampRange<1, 3, 1, 3>(EmuMath::Matrix<2, 3, int, true>(7, 0, 2, 1, 4, 7), EmuMath::Matrix<4, 4, int, true>(12, 10, 6, 3, 15, 21, 13, -5, 19, 20, 21, -7, 1, 2, 3, 4)) << "\n\n";
+	std::cout << mat_a_.ClampRange<1, 3, 1, 3>(EmuMath::Matrix<4, 4, int, false>(-3, 4, -4, 5, 3, 4, 5, 6, 10, 11, 12, 13, -255, -511, 31, 1337), EmuMath::Matrix<2, 3, int, false>(3, 12, 6, 8, 9, 10)) << "\n\n";
 	std::cout << "---\n";
-	std::cout << mat_a_.ClampMaxRangeNoCopy<0, 2, 0, 2>(-4) << "\n\n";
-	std::cout << mat_a_.ClampMaxRangeNoCopy<0, 2, 0, 2>(4) << "\n\n";
-	std::cout << mat_a_.ClampMaxRangeNoCopy<0, 2, 0, 2>(EmuMath::Matrix<4, 4, int, true>(7, 0, 2, 1, 4, 7, 5, 3, 2, 1, 12, 6, 144, 155, -275, 2)) << "\n\n";
-	std::cout << mat_a_.ClampMaxRangeNoCopy<0, 2, 0, 2>(EmuMath::Matrix<4, 4, int, false>(7, 0, 2, 1, 4, 7, 5, 3, 2, 1, 12, 6, 144, 155, -275, 2)) << "\n\n";
-	std::cout << mat_a_.ClampMaxRangeNoCopy<0, 2, 0, 2>(EmuMath::Matrix<2, 3, int, true>(7, 0, 2, 1, 4, 7)) << "\n\n";
-	std::cout << mat_a_.ClampMaxRangeNoCopy<0, 2, 0, 2>(EmuMath::Matrix<2, 3, int, false>(7, 0, 2, 1, 4, 7)) << "\n\n";
+	std::cout << mat_a_.ClampRangeNoCopy<1, 3, 1, 3>(-4, 4) << "\n\n";
+	std::cout << mat_a_.ClampRangeNoCopy<1, 3, 1, 3>(4, 40) << "\n\n";
+	std::cout << mat_a_.ClampRangeNoCopy<1, 3, 1, 3>(EmuMath::Matrix<4, 4, int, true>(7, 0, 2, 1, 4, 7, 5, 3, 2, 1, 12, 6, 144, 155, -275, 2), 6) << "\n\n";
+	std::cout << mat_a_.ClampRangeNoCopy<1, 3, 1, 3>(6, EmuMath::Matrix<4, 4, int, false>(7, 0, 2, 1, 4, 7, 5, 3, 2, 1, 12, 6, 144, 155, -275, 2)) << "\n\n";
+	std::cout << mat_a_.ClampRangeNoCopy<1, 3, 1, 3>(EmuMath::Matrix<2, 3, int, true>(7, 0, 2, 1, 4, 7), EmuMath::Matrix<4, 4, int, true>(12, 10, 6, 3, 15, 21, 13, -5, 19, 20, 21, -7, 1, 2, 3, 4)) << "\n\n";
+	std::cout << mat_a_.ClampRangeNoCopy<1, 3, 1, 3>(EmuMath::Matrix<4, 4, int, false>(-3, 4, -4, 5, 3, 4, 5, 6, 10, 11, 12, 13, -255, -511, 31, 1337), EmuMath::Matrix<2, 3, int, false>(3, 12, 6, 8, 9, 10)) << "\n\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

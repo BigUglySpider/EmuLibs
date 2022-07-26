@@ -383,7 +383,7 @@ namespace EmuMath::Helpers
 	///		To create an effect similar to what could be considered standard division when rhs_ is a Matrix, consider multiplying lhs_matrix_ by the inverse of rhs_.
 	/// </para>
 	/// <para> Indices within the provided range will contain results of respective division operations. </para>
-	/// <para> Indices outside of the provided range will be default-constructed. </para>
+	/// <para> Indices outside of the provided range will be defaulted. </para>
 	/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be divided. </para>
 	/// <para> If Rhs_ is none of the above: All index divisions will use the rhs_ directly. </para>
 	/// </summary>

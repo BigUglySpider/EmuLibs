@@ -334,7 +334,7 @@ namespace EmuMath::Helpers
 	/// <summary>
 	/// <para> Returns a version of the input EmuMath Matrix with all of its elements rounded toward negative infinity. </para>
 	/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
-	/// <para> Indices outside of the provided range will be default-constructed. </para>
+	/// <para> Indices outside of the provided range will be defaulted. </para>
 	/// <para> This does not provide a guarantee to be constexpr where possible. For such behaviour, use `matrix_floor_range_no_copy_constexpr`. </para>
 	/// </summary>
 	/// <param name="in_matrix_">: EmuMath Matrix to floor.</param>

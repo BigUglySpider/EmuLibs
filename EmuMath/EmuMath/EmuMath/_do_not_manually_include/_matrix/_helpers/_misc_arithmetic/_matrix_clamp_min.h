@@ -341,7 +341,7 @@ namespace EmuMath::Helpers
 	/// <para> Outputs a version of the input EmuMath Matrix with its elements clamped to a minimum value indicated by Min_. </para>
 	/// <para> If Min_ is an EmuMath Matrix: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
 	/// <para> Indices within the provided range will contain respective clamping results. </para>
-	/// <para> Indices outside of the provided range will be default-constructed. </para>
+	/// <para> Indices outside of the provided range will be defaulted. </para>
 	/// </summary>
 	/// <param name="matrix_a_">: EmuMath Matrix to clamp.</param>
 	/// <param name="min_">: Scalar or EmuMath Matrix to use as the minimum to clamp the `matrix_a_`'s values to.</param>

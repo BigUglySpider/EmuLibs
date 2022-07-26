@@ -2095,7 +2095,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of adding rhs_ to this Vector within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be added. Otherwise, all elements have rhs_ added. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
@@ -2203,7 +2203,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of subtracting rhs_ from this Vector within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be subtracted. Otherwise, all elements have rhs_ subtracted. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
@@ -2311,7 +2311,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of multiplying this Vector by rhs_ within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be multiplied. Otherwise, all elements are multiplied by rhs_. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
@@ -2419,7 +2419,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of dividing this Vector by rhs_ within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be divided. Otherwise, all elements are divided by rhs_. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
@@ -2527,7 +2527,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of modulo-dividing this Vector by rhs_ within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be modulo-divided. Otherwise, all elements are modulo-divided by rhs_. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
@@ -2880,7 +2880,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of bitwise ANDing this Vector with rhs_ within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be ANDed. Otherwise, all elements be ANDed with rhs_ directly. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing bitwise operation results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing bitwise operation results to the output Vector. </para>
@@ -2988,7 +2988,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of bitwise ORing this Vector with rhs_ within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be ORed. Otherwise, all elements be ORed with rhs_ directly. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing bitwise operation results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing bitwise operation results to the output Vector. </para>
@@ -3096,7 +3096,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of bitwise XORing this Vector with rhs_ within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be XORed. Otherwise, all elements be ORed with rhs_ directly. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing bitwise operation results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing bitwise operation results to the output Vector. </para>
@@ -3204,7 +3204,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of left-shifting this Vector with rhs_ within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be used for shifts. Otherwise, all elements will be shifted with rhs_ directly. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing shift operation results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing shift operation results to the output Vector. </para>
@@ -3312,7 +3312,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of right-shifting this Vector with rhs_ within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be used for shifts. Otherwise, all elements will be shifted with rhs_ directly. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing shift operation results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing shift operation results to the output Vector. </para>

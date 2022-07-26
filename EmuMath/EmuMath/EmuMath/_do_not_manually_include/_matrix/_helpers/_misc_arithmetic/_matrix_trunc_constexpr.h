@@ -340,7 +340,7 @@ namespace EmuMath::Helpers
 	/// <summary>
 	/// <para> Returns a version of the input EmuMath Matrix with all of its elements rounded toward 0. </para>
 	/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
-	/// <para> Indices outside of the provided range will be default-constructed. </para>
+	/// <para> Indices outside of the provided range will be defaulted. </para>
 	/// <para>
 	///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
 	///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.

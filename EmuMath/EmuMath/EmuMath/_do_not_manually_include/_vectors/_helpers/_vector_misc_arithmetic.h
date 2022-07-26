@@ -660,7 +660,7 @@ namespace EmuMath::Helpers
 
 	/// <summary>
 	/// <para> Outputs a Vector with indices in the provided index range containing the lowest values of indices of vector_a_ and b_, starting from index MinBegin_. </para>
-	/// <para> Indices outside of the provided range will be default-constructed. </para>
+	/// <para> Indices outside of the provided range will be defaulted. </para>
 	/// <para> If B_ is an EmuMath Vector: Respective indices will be compared. Otherwise, all indices in vector_a_ will be compared with b_ directly. </para>
 	/// <para> OutBegin_: Inclusive index at which to start writing min values to the output Vector. </para>
 	/// <para> OutEnd_: Exclusive index at which to stop writing min values to the output Vector. </para>
@@ -926,7 +926,7 @@ namespace EmuMath::Helpers
 
 	/// <summary>
 	/// <para> Outputs a Vector with indices in the provided index range containing the greatest values of indices of vector_a_ and b_, starting from index MinBegin_. </para>
-	/// <para> Indices outside of the provided range will be default-constructed. </para>
+	/// <para> Indices outside of the provided range will be defaulted. </para>
 	/// <para> If B_ is an EmuMath Vector: Respective indices will be compared. Otherwise, all indices in vector_a_ will be compared with b_ directly. </para>
 	/// <para> OutBegin_: Inclusive index at which to start writing min values to the output Vector. </para>
 	/// <para> OutEnd_: Exclusive index at which to stop writing min values to the output Vector. </para>

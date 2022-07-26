@@ -371,7 +371,7 @@ namespace EmuMath::Helpers
 	///		with size/column-major arguments matching those of lhs_matrix_ if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
 	/// </para>
 	/// <para> Indices within the provided range will contain results of respective subtraction operations. </para>
-	/// <para> Indices outside of the provided range will be default-constructed. </para>
+	/// <para> Indices outside of the provided range will be defaulted. </para>
 	/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be subtracted. </para>
 	/// <para> If Rhs_ is none of the above: All index subtractions will use the rhs_ directly. </para>
 	/// </summary>

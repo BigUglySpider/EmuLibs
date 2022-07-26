@@ -396,7 +396,7 @@ namespace EmuMath::Helpers
 	///		Otherwise, all intermediate multiplication results will have z_ added directly.
 	/// </para>
 	/// <para> Indices within the provided range will contain results of respective fused multiply-addition operations. </para>
-	/// <para> Indices outside of the provided range will be default-constructed. </para>
+	/// <para> Indices outside of the provided range will be defaulted. </para>
 	/// </summary>
 	/// <param name="matrix_x_">: EmuMath Matrix to perform a fused multiply-add on.</param>
 	/// <param name="y_">: Scalar or EmuMath Matrix to multiply matrix_x_ by.</param>

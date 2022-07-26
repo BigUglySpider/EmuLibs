@@ -178,7 +178,7 @@ namespace EmuMath::Helpers
 	/// </summary>
 	/// <param name="matrix_a_">: EmuMath Matrix to clamp.</param>
 	/// <param name="max_">: Scalar or EmuMath Matrix to use as the maximum to clamp the `matrix_a_`'s values to.</param>
-	/// <returns>Copy of the matrix_a_ with elements in the provided range clamped to the provided maximum, and copied elements elsewhere.</returns>
+	/// <returns>Copy of matrix_a_ with elements in the provided range clamped to the provided maximum, and copied elements elsewhere.</returns>
 	template
 	<
 		std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
@@ -341,7 +341,7 @@ namespace EmuMath::Helpers
 	/// <para> Outputs a version of the input EmuMath Matrix with its elements clamped to a maximum value indicated by Max_. </para>
 	/// <para> If Max_ is an EmuMath Matrix: Elements will be clamped to a maximum of the respective element of max_. Otherwise, all will be clamped to max_ directly. </para>
 	/// <para> Indices within the provided range will contain respective clamping results. </para>
-	/// <para> Indices outside of the provided range will be default-constructed. </para>
+	/// <para> Indices outside of the provided range will be defaulted. </para>
 	/// </summary>
 	/// <param name="matrix_a_">: EmuMath Matrix to clamp.</param>
 	/// <param name="max_">: Scalar or EmuMath Matrix to use as the maximum to clamp the `matrix_a_`'s values to.</param>

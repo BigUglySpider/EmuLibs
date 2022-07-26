@@ -388,7 +388,7 @@ namespace EmuMath::Helpers
 	///		Range-based standard variants as this function is used are not available.
 	/// </para>
 	/// <para> Indices within the provided range will contain results of respective multiplication operations. </para>
-	/// <para> Indices outside of the provided range will be default-constructed. </para>
+	/// <para> Indices outside of the provided range will be defaulted. </para>
 	/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be multiplied. </para>
 	/// <para> If Rhs_ is none of the above: All index multiplications will use the rhs_ directly. </para>
 	/// </summary>

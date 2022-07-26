@@ -332,7 +332,7 @@ namespace EmuMath::Helpers
 	/// <summary>
 	/// <para> Returns a version of the input EmuMath Matrix with its elements made absolute (e.g. x = x, -x = x). </para>
 	/// <para> Indices within the provided range will contain results of respective absolute operations. </para>
-	/// <para> Indices outside of the provided range will be default-constructed. </para>
+	/// <para> Indices outside of the provided range will be defaulted. </para>
 	/// </summary>
 	/// <param name="in_matrix_">: EmuMath Matrix to convert to its absolute form.</param>
 	/// <returns>EmuMath Matrix with elements with the passed Matrix's elements made absolute in the provided range, and default-constructed elements elsewhere.</returns>

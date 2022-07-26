@@ -945,7 +945,7 @@ namespace EmuMath::Helpers
 	///		Otherwise, all matrix_a_ indices will be compared with b_ directly.
 	/// </para>
 	/// <para> Indices within the provided range will be the respective minimum element out of matrix_a_ and b_. </para>
-	/// <para> Indices outside of the provided range will be default-constructed. </para>
+	/// <para> Indices outside of the provided range will be defaulted. </para>
 	/// </summary>
 	/// <param name="matrix_a_">: EmuMath Matrix appearing as a in a min(a, b) operation.</param>
 	/// <param name="b_">: Scalar or EmuMath Matrix appearing as b in a min(a, b) operation.</param>

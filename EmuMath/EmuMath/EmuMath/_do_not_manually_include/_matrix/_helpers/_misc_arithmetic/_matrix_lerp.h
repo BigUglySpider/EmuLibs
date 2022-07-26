@@ -402,7 +402,7 @@ namespace EmuMath::Helpers
 	/// <para> If B_ is an EmuMath Matrix: Elements in matrix_a_ will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
 	/// <para> If T_ is an EmuMath Matrix: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
 	/// <para> Indices within the provided range will contain respective linear interpolation results. </para>
-	/// <para> Indices outside of the provided range will be default-constructed. </para>
+	/// <para> Indices outside of the provided range will be defaulted. </para>
 	/// </summary>
 	/// <param name="matrix_a_">: EmuMath Matrix to use as the starting point for linear interpolation.</param>
 	/// <param name="b_">: Scalar or EmuMath Matrix to use as the target point for linear interpolation.</param>
