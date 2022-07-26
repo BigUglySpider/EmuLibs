@@ -16,6 +16,28 @@
 // Test harness execution
 #include "Tests.hpp"
 
+#include "EmuCore/Functors/StdOps.h"
+
+// Fast Vector
+#include "EmuMath/FastVector.h"
+
+template<typename T_, std::size_t Size_>
+inline std::ostream& operator<<(std::ostream& str_, const std::array<T_, Size_>& arr_)
+{
+	str_ << "{";
+	if constexpr (Size_ > 0)
+	{
+		str_ << " " << arr_[0];
+		for (std::size_t i = 1; i < Size_; ++i)
+		{
+			str_ << ", " << arr_[i];
+		}
+	}
+
+	str_ << " }";
+	return str_;
+}
+
 template<class NoiseTable_>
 inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::string& out_name_ = "test_noise")
 {
@@ -190,53 +212,55 @@ int main()
 	srand(static_cast<unsigned int>(time(0)));
 	EmuCore::Timer<std::milli> timer_;
 
-	constexpr auto mat_to_transpose_ = EmuMath::Matrix<4, 5, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20);
-	constexpr auto transposed_from_rval_ = EmuMath::Matrix<4, 5, float, true>(mat_to_transpose_).Transpose();
-	constexpr auto transposed_from_lval_ = mat_to_transpose_.Transpose();
-	std::cout << mat_to_transpose_ << "\n\nTransposed Lval:\n" << transposed_from_lval_ << "\n\nTransposed Rval:\n" << transposed_from_rval_ << "\n\n";
+	//*
+#pragma region PRE_TEST_BODY
+	constexpr auto mat_a_ = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	constexpr auto mat_b_ = EmuMath::Matrix<4, 4, int, true>(1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
+	constexpr auto mat_c_ = EmuMath::Matrix<4, 4, float, true>(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25);
+	constexpr auto mat_lerped_mmm_ = mat_a_.Lerp<float>(mat_b_, mat_c_);
+	constexpr auto mat_lerped_msm_ = mat_a_.Lerp<float>(100, mat_c_);
+	constexpr auto mat_lerped_mms_ = mat_a_.Lerp<float>(mat_b_, 0.5L);
+	constexpr auto mat_lerped_mss_ = mat_a_.Lerp(100, 2);
+	constexpr auto mat_lerped_mmm_1313_ = mat_a_.LerpRange<1, 3, 1, 3, float>(mat_b_, mat_c_);
+	constexpr auto mat_lerped_mmm_1313_no_copy_ = mat_a_.LerpRangeNoCopy<1, 3, 1, 3>(mat_b_, mat_c_);
 
-	std::cout << "\n---\n";
-	auto runtime_mat_to_transpose = EmuMath::Matrix<4, 5, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20);
-	auto runtime_ref_transpose_ = runtime_mat_to_transpose.Transpose<float&>();
-	std::cout << runtime_mat_to_transpose << "\n\n" << runtime_ref_transpose_ << "\n\n";
-	runtime_ref_transpose_.MainDiagonal<float&>() *= 2.5f;
-	runtime_ref_transpose_.ColumnAt<3>() = EmuMath::make_vector<int>(-1, -2, -3, -4, -5);
-	std::cout << runtime_mat_to_transpose << "\n\n" << runtime_ref_transpose_ << "\n\n";
+	constexpr auto max_ = mat_a_.Max();
+	constexpr auto max_1324 = mat_a_.MaxRange<1, 3, 2, 4>();
+	constexpr auto max_vecs_ = mat_a_.Max(mat_c_);
+	constexpr auto max_vecs_1324_ = mat_c_.MaxRange<1, 3, 2, 4>(mat_a_);
+	constexpr auto max_vecs_1324_no_copy_ = mat_a_.MaxRangeNoCopy<1, 3, 2, 4>(mat_c_);
 
-	constexpr auto egrjoi = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) / 2.0f;
-	constexpr auto egrjof = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) / 2;
-	constexpr auto modi = EmuMath::Matrix<4, 4, int, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) % 3;
-	constexpr auto modf = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) % 2.5;
+	auto rt_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, -5, -6, -7, -8, 9, 10, 11, 12, -13, -14, -15, -16);
+	std::cout << rt_ << "\n\n" << mat_a_.Min(rt_) << "\n\n" << mat_a_.MinRange<1, 3, 1, 3>(rt_) << "\n\n" << mat_a_.MinRangeNoCopy<1, 3, 1, 3>(rt_) << "\n\n";
+	mat_a_.MinRange<1, 3, 1, 3>(rt_, mat_a_);
+	std::cout << rt_ << "\n\n";
+	rt_.identity(rt_);
+	std::cout << rt_ << "\n\n";
 
-	constexpr auto scalar_result_ = EmuMath::Matrix<4, 4, float, true>(1, 0, 0, 0, 0, 10, 0, 0, 0, 0, 1, 0, 1.5, 2, 3, 1) * 2;
+	std::cout << "CLAMPS\n";
+	std::cout << mat_a_.Clamp(-4, 4) << "\n\n";
+	std::cout << mat_a_.Clamp(4, 40) << "\n\n";
+	std::cout << mat_a_.Clamp(EmuMath::Matrix<4, 4, int, true>(7, 0, 2, 1, 4, 7, 5, 3, 2, 1, 12, 6, 144, 155, -275, 2), 6) << "\n\n";
+	std::cout << mat_a_.Clamp(6, EmuMath::Matrix<4, 4, int, false>(7, 0, 2, 1, 4, 7, 5, 3, 2, 1, 12, 6, 144, 155, -275, 2)) << "\n\n";
+	std::cout << mat_a_.Clamp(EmuMath::Matrix<2, 3, int, true>(7, 0, 2, 1, 4, 7), EmuMath::Matrix<4, 4, int, true>(12, 10, 6, 3, 15, 21, 13, -5, 19, 20, 21, -7, 1, 2, 3, 4)) << "\n\n";
+	std::cout << mat_a_.Clamp(EmuMath::Matrix<4, 4, int, false>(-3, 4, -4, 5, 3, 4, 5, 6, 10, 11, 12, 13, -255, -511, 31, 1337), EmuMath::Matrix<2, 3, int, false>(3, 12, 6, 8, 9, 10)) << "\n\n";
+	std::cout << "---\n";
+	std::cout << mat_a_.ClampRange<1, 3, 1, 3>(-4, 4) << "\n\n";
+	std::cout << mat_a_.ClampRange<1, 3, 1, 3>(4, 40) << "\n\n";
+	std::cout << mat_a_.ClampRange<1, 3, 1, 3>(EmuMath::Matrix<4, 4, int, true>(7, 0, 2, 1, 4, 7, 5, 3, 2, 1, 12, 6, 144, 155, -275, 2), 6) << "\n\n";
+	std::cout << mat_a_.ClampRange<1, 3, 1, 3>(6, EmuMath::Matrix<4, 4, int, false>(7, 0, 2, 1, 4, 7, 5, 3, 2, 1, 12, 6, 144, 155, -275, 2)) << "\n\n";
+	std::cout << mat_a_.ClampRange<1, 3, 1, 3>(EmuMath::Matrix<2, 3, int, true>(7, 0, 2, 1, 4, 7), EmuMath::Matrix<4, 4, int, true>(12, 10, 6, 3, 15, 21, 13, -5, 19, 20, 21, -7, 1, 2, 3, 4)) << "\n\n";
+	std::cout << mat_a_.ClampRange<1, 3, 1, 3>(EmuMath::Matrix<4, 4, int, false>(-3, 4, -4, 5, 3, 4, 5, 6, 10, 11, 12, 13, -255, -511, 31, 1337), EmuMath::Matrix<2, 3, int, false>(3, 12, 6, 8, 9, 10)) << "\n\n";
+	std::cout << "---\n";
+	std::cout << mat_a_.ClampRangeNoCopy<1, 3, 1, 3>(-4, 4) << "\n\n";
+	std::cout << mat_a_.ClampRangeNoCopy<1, 3, 1, 3>(4, 40) << "\n\n";
+	std::cout << mat_a_.ClampRangeNoCopy<1, 3, 1, 3>(EmuMath::Matrix<4, 4, int, true>(7, 0, 2, 1, 4, 7, 5, 3, 2, 1, 12, 6, 144, 155, -275, 2), 6) << "\n\n";
+	std::cout << mat_a_.ClampRangeNoCopy<1, 3, 1, 3>(6, EmuMath::Matrix<4, 4, int, false>(7, 0, 2, 1, 4, 7, 5, 3, 2, 1, 12, 6, 144, 155, -275, 2)) << "\n\n";
+	std::cout << mat_a_.ClampRangeNoCopy<1, 3, 1, 3>(EmuMath::Matrix<2, 3, int, true>(7, 0, 2, 1, 4, 7), EmuMath::Matrix<4, 4, int, true>(12, 10, 6, 3, 15, 21, 13, -5, 19, 20, 21, -7, 1, 2, 3, 4)) << "\n\n";
+	std::cout << mat_a_.ClampRangeNoCopy<1, 3, 1, 3>(EmuMath::Matrix<4, 4, int, false>(-3, 4, -4, 5, 3, 4, 5, 6, 10, 11, 12, 13, -255, -511, 31, 1337), EmuMath::Matrix<2, 3, int, false>(3, 12, 6, 8, 9, 10)) << "\n\n";
 
-	constexpr auto vec_result_ = EmuMath::Matrix<4, 4, float, true>(1, 0, 0, 0, 0, 10, 0, 0, 0, 0, 1, 0, 1.5, 2, 3, 1) * EmuMath::Vector<3, float>(1, 2, 3);
-
-	constexpr auto mat_result_ =
-	(
-		EmuMath::Matrix<4, 4, float, true>(1, 0, 0, 0, 0, 10, 0, 0, 0, 0, 1, 0, 1.5, 2, 3, 1) *
-		EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	);
-
-	constexpr auto unequal_mat_result = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) * EmuMath::Matrix<1, 4, float, true>(1, 2, 3, 4);
-
-	runtime_mat_to_transpose = decltype(runtime_mat_to_transpose)(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20);
-	std::cout << runtime_mat_to_transpose << "\n\n";
-	decltype(runtime_mat_to_transpose) another_(std::move(runtime_mat_to_transpose));
-	std::cout << another_ << "\n\n";
-
-	std::cout << mat_result_ << "\n\n";
-	std::cout << "\n---\n";
-
-	auto trans_matrix_ = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-	auto trans_vector = EmuMath::Vector<4, float>(1, 2, 3, 4);
-	std::cout << trans_matrix_ << "\nMUL\n" << trans_vector << "\n:\n";
-	std::cout << (trans_matrix_ *= trans_vector) << "\n\n";
-	std::cout << "Matrix Squared:\n" << (trans_matrix_.SquareAssign()) << "\n\n";
-	trans_matrix_.MultiplyAssign(EmuMath::Matrix<1, 4, float, true>(1, 2, 3, 4));
-	std::cout << "Mult 1x4 1234:\n" << trans_matrix_ << "\n\n";
-
-	// ##### SCALAR vs SIMD NOISE #####
+	system("pause");
+	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
 	//constexpr std::size_t test_noise_dimensions = 3;
 	//constexpr auto sample_count = EmuMath::make_vector<std::size_t>(1024, 1024, 1);
@@ -315,10 +339,21 @@ int main()
 	//
 	//WriteNoiseTableToPPM(noise_, noise_gradient_, "test_noise_scalar");
 	//WriteNoiseTableToPPM(fast_noise_, noise_gradient_, "test_noise_simd");
-	 
+#pragma endregion
+	//*/
+
+	/*
+	// Some tests to see disassembly
+	EmuMath::FastVector<4, float> veca((rand() % 100) * 0.33f, (rand() % 100) * 0.33f, (rand() % 100) * 0.33f, (rand() % 100) * 0.33f);
+	EmuMath::FastVector<4, float> vecb((rand() % 100) * 0.33f, (rand() % 100) * 0.33f, (rand() % 100) * 0.33f, (rand() % 100) * 0.33f);
+	auto result = veca + vecb;
+	std::cout << veca << " + " << vecb << " = " << result << "\n";
+	// */
+
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();
 #pragma endregion
+	//std::cout << result.Add(rand()) << " :)";
 	return 0;
 }

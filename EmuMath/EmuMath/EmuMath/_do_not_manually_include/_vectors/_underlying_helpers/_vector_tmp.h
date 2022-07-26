@@ -2,9 +2,10 @@
 #define EMU_MATH_VECTOR_TMP_H_INC_ 1
 
 #include <cstddef>
+#include "../../../../EmuCore/CommonTypes/DeferrableReferenceWrapper.h"
+#include "../../../../EmuCore/TMPHelpers/StdFeatureChecks.h"
 #include "../../../../EmuCore/TMPHelpers/TypeComparators.h"
 #include "../../../../EmuCore/TMPHelpers/TypeConvertors.h"
-#include "../../../../EmuCore/CommonTypes/DeferrableReferenceWrapper.h"
 #include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuMath
@@ -399,6 +400,24 @@ namespace EmuMath::TMP
 		static constexpr std::size_t Size_ = _results::size_;
 		using T_ = typename _results::t_;
 	};
+
+	template<class T_>
+	struct is_recognised_vector_ref_wrapper
+	{
+	private:
+		using _t_uq = typename EmuCore::TMP::remove_ref_cv<T_>::type;
+
+	public:
+		static constexpr bool value =
+		(
+			EmuCore::TMP::is_instance_of_typeparams_only_v<_t_uq, std::reference_wrapper> ||
+			EmuCore::TMP::is_instance_of_typeparams_only_v<_t_uq, EmuCore::DeferrableReferenceWrapper> ||
+			EmuCore::TMP::is_instance_of_typeparams_only_v<_t_uq, EmuMath::vector_internal_ref> ||
+			EmuCore::TMP::is_instance_of_typeparams_only_v<_t_uq, EmuMath::vector_internal_const_ref>
+		);
+	};
+	template<class T_>
+	static constexpr bool is_recognised_vector_ref_wrapper_v = is_recognised_vector_ref_wrapper<T_>::value;
 }
 
 #pragma region EMU_CORE_TMP_SPECIALISATIONS

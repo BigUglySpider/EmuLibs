@@ -380,6 +380,10 @@ namespace EmuMath::Helpers::_matrix_underlying
 		template<class...> class FuncTemplate_,
 		std::size_t ColumnIndex_,
 		std::size_t RowIndex_,
+		std::size_t MutBeginColumn_,
+		std::size_t MutEndColumn_,
+		std::size_t MutBeginRow_,
+		std::size_t MutEndRow_,
 		class OutMatrix_,
 		class LeftArgsTuple_,
 		class RightArgsTuple_,
@@ -400,10 +404,10 @@ namespace EmuMath::Helpers::_matrix_underlying
 					RowIndex_,
 					OutMatrix_,
 					Func_,
-					ColumnIndex_,
-					ColumnIndex_ + 1,
-					RowIndex_,
-					RowIndex_ + 1,
+					MutBeginColumn_,
+					MutEndColumn_,
+					MutBeginRow_,
+					MutEndRow_,
 					Args_...
 				>(func_, args_...);
 			}
@@ -452,20 +456,40 @@ namespace EmuMath::Helpers::_matrix_underlying
 			OutMatrix_,
 			decltype
 			(
-				_matrix_mutate_for_index_func_template_stored_type_out<FuncTemplate_, OutColumnIndices_, OutRowIndices_, OutMatrix_, LeftArgsTuple_, RightArgsTuple_, Args_...>
-				(
-					args_...
-				)
+				_matrix_mutate_for_index_func_template_stored_type_out
+				<
+					FuncTemplate_,
+					OutColumnIndices_,
+					OutRowIndices_,
+					MutBeginColumn_,
+					MutEndColumn_,
+					MutBeginRow_,
+					MutEndRow_,
+					OutMatrix_,
+					LeftArgsTuple_,
+					RightArgsTuple_,
+					Args_...
+				>(args_...)
 			)...
 		>;
 		if constexpr (is_constructible)
 		{
 			return OutMatrix_
 			(
-				_matrix_mutate_for_index_func_template_stored_type_out<FuncTemplate_, OutColumnIndices_, OutRowIndices_, OutMatrix_, LeftArgsTuple_, RightArgsTuple_, Args_...>
-				(
-					args_...
-				)...
+				_matrix_mutate_for_index_func_template_stored_type_out
+				<
+					FuncTemplate_,
+					OutColumnIndices_,
+					OutRowIndices_,
+					MutBeginColumn_,
+					MutEndColumn_,
+					MutBeginRow_,
+					MutEndRow_,
+					OutMatrix_,
+					LeftArgsTuple_,
+					RightArgsTuple_,
+					Args_...
+				>(args_...)...
 			);
 		}
 		else
@@ -1002,10 +1026,10 @@ namespace EmuMath::Helpers::_matrix_underlying
 		constexpr std::size_t arg_row_ = RowIndex_ + ArgRowOffset_;
 		if constexpr (is_mut_column_ && (RowIndex_ >= MutBeginRow_) && (RowIndex_ < MutEndRow_))
 		{
-			return _matrix_mutate_for_index_func_template_stored_type_out<FuncTemplate_, arg_column_, arg_row_, OutMatrix_, LeftArgsTuple_, RightArgsTuple_, Args_...>
-			(
-				args_...
-			);
+			return _matrix_mutate_for_index_func_template_stored_type_out
+			<
+				FuncTemplate_, arg_column_, arg_row_, MutBeginColumn_, MutEndColumn_, MutBeginRow_, MutEndRow_, OutMatrix_, LeftArgsTuple_, RightArgsTuple_, Args_...
+			>(args_...);
 		}
 		else
 		{	// Disable Visual Studio warning about using moved-from object, as we aren't accessing anything after it is moved (if a move occurs)

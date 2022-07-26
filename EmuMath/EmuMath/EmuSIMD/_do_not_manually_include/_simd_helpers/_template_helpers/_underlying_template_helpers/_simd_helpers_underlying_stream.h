@@ -88,7 +88,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 
 				using fp_type = std::conditional_t
 				<
-					EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128, __m256, __m512>::value,
+					EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::f32x4, EmuSIMD::f32x8, EmuSIMD::f32x16>::value,
 					float,
 					double
 				>;

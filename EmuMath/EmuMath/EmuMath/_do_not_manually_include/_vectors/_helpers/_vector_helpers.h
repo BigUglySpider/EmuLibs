@@ -4,6 +4,7 @@
 // CONTAINS:
 // --- Includes for all EmuMath Vector Helpers
 // --- make_vector
+// --- swap_vector
 
 #include "_common_vector_helpers.h"
 #include "_vector_basic_arithmetic.h"

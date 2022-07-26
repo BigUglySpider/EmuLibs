@@ -1,0 +1,6 @@
+#ifndef EMU_MATH_ALL_VECTOR_CORE_FUNCTOR_SPECIALISATIONS_H_INC_
+#define EMU_MATH_ALL_VECTOR_CORE_FUNCTOR_SPECIALISATIONS_H_INC_ 1
+
+#include "_std_ops/_vector_do_swap_specialisation.h"
+
+#endif

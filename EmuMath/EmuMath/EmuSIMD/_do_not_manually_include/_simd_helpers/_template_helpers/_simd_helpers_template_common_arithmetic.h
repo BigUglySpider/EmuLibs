@@ -1,7 +1,7 @@
 #ifndef EMU_SIMD_HELPERS_TEMPLATE_COMMON_ARITHMETIC
 #define EMU_SIMD_HELPERS_TEMPLATE_COMMON_ARITHMETIC 1
 
-#include "_underlying_template_helpers/_simd_helpers_underlying_basic_arithmetic.h"
+#include "_underlying_template_helpers/_all_underlying_templates.h"
 #include "_simd_helpers_template_cast.h"
 #include "_simd_helpers_template_gets.h"
 #include "_simd_helpers_template_shuffles.h"
@@ -116,14 +116,14 @@ namespace EmuSIMD
 		{
 			if constexpr (EmuSIMD::TMP::is_floating_point_simd_register_v<register_type_uq>)
 			{
-				if constexpr (std::is_same_v<register_type_uq, __m128>)
+				if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 				{
-					__m128 shuffled_ = _underlying_simd_helpers::_execute_shuffle<1, 0, 3, 2>(register_);
-					__m128 out_ = _underlying_simd_helpers::_add_fp(register_, shuffled_);
+					EmuSIMD::f32x4 shuffled_ = _underlying_simd_helpers::_execute_shuffle<1, 0, 3, 2>(register_);
+					EmuSIMD::f32x4 out_ = _underlying_simd_helpers::_add_fp(register_, shuffled_);
 					shuffled_ = _mm_movehl_ps(shuffled_, out_);
 					return _mm_add_ss(out_, shuffled_);
 				}
-				else if constexpr (std::is_same_v<register_type_uq, __m256>)
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 				{
 					return _mm256_castps128_ps256
 					(
@@ -137,9 +137,9 @@ namespace EmuSIMD
 						)
 					);
 				}
-				else if constexpr (std::is_same_v<register_type_uq, __m512>)
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 				{
-					__m128 chunks_[4] =
+					EmuSIMD::f32x4 chunks_[4] =
 					{
 						_mm512_extractf32x4_ps(register_, 0),
 						_mm512_extractf32x4_ps(register_, 1),
@@ -153,11 +153,11 @@ namespace EmuSIMD
 						horizontal_sum(_mm_add_ps(chunks_[0], chunks_[3]))
 					);
 				}
-				else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 				{
-					return _mm_add_ps(register_, _underlying_simd_helpers::_execute_shuffle<0, 1>(register_));
+					return _mm_add_pd(register_, _underlying_simd_helpers::_execute_shuffle<1, 0>(register_));
 				}
-				else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 				{
 					return _mm256_castpd128_pd256
 					(
@@ -171,9 +171,9 @@ namespace EmuSIMD
 						)
 					);
 				}
-				else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 				{
-					__m128d chunks_[4] =
+					EmuSIMD::f64x2 chunks_[4] =
 					{
 						_mm512_extractf64x2_pd(register_, 0),
 						_mm512_extractf64x2_pd(register_, 1),
@@ -196,28 +196,28 @@ namespace EmuSIMD
 			{
 				if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfInt_>())
 				{
-					if constexpr (std::is_same_v<register_type_uq, __m128i>)
+					if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 					{
 						if constexpr (PerElementWidthIfInt_ == 8)
 						{
-							__m128i out_ = _mm_add_epi8(register_, _underlying_simd_helpers::_execute_shuffle<2, 3, 0, 1>(register_));
+							EmuSIMD::i128_generic out_ = _mm_add_epi8(register_, _underlying_simd_helpers::_execute_shuffle<2, 3, 0, 1>(register_));
 							out_ = _mm_add_epi8(out_, _underlying_simd_helpers::_execute_shuffle<3, 2, 3, 2>(out_));
-							out_ = _mm_add_epi8(out_, _mm_shufflelo_epi16(out_, _underlying_simd_helpers::_shuffle_mask<__m128i, 1, 0, 3, 2>::get()));
+							out_ = _mm_add_epi8(out_, _mm_shufflelo_epi16(out_, _underlying_simd_helpers::_shuffle_mask<EmuSIMD::i128_generic, 1, 0, 3, 2>::get()));
 							return _mm_add_epi8
 							(
 								out_,
-								_mm_shuffle_epi8(out_, _underlying_simd_helpers::_shuffle_mask<__m128i, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 14, 15>::get())
+								_mm_shuffle_epi8(out_, _underlying_simd_helpers::_shuffle_mask<EmuSIMD::i128_generic, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 14, 15>::get())
 							);
 						}
 						else if constexpr (PerElementWidthIfInt_ == 16)
 						{
-							__m128i out_ = _mm_add_epi16(register_, _underlying_simd_helpers::_execute_shuffle<2, 3, 0, 1>(register_));
+							EmuSIMD::i128_generic out_ = _mm_add_epi16(register_, _underlying_simd_helpers::_execute_shuffle<2, 3, 0, 1>(register_));
 							out_ = _mm_add_epi16(out_, _underlying_simd_helpers::_execute_shuffle<3, 2, 3, 2>(out_));
-							return _mm_add_epi16(out_, _mm_shufflelo_epi16(out_, _underlying_simd_helpers::_shuffle_mask<__m128i, 1, 0, 3, 2>::get()));
+							return _mm_add_epi16(out_, _mm_shufflelo_epi16(out_, _underlying_simd_helpers::_shuffle_mask<EmuSIMD::i128_generic, 1, 0, 3, 2>::get()));
 						}
 						else if constexpr (PerElementWidthIfInt_ == 32)
 						{
-							__m128i out_ = _mm_add_epi32(register_, _underlying_simd_helpers::_execute_shuffle<2, 3, 0, 1>(register_));
+							EmuSIMD::i128_generic out_ = _mm_add_epi32(register_, _underlying_simd_helpers::_execute_shuffle<2, 3, 0, 1>(register_));
 							return _mm_add_epi32(out_, _underlying_simd_helpers::_execute_shuffle<3, 0, 3, 2>(out_));
 						}
 						else
@@ -225,10 +225,10 @@ namespace EmuSIMD
 							return _mm_add_epi64(register_, _underlying_simd_helpers::_execute_shuffle<2, 3, 0, 1>(register_));
 						}
 					}
-					else if constexpr (std::is_same_v<register_type_uq, __m256i>)
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 					{
-						__m128i lo_ = _mm256_extracti128_si256(register_, 0);
-						__m128i hi_ = _mm256_extracti128_si256(register_, 1);
+						EmuSIMD::i128_generic lo_ = _mm256_extracti128_si256(register_, 0);
+						EmuSIMD::i128_generic hi_ = _mm256_extracti128_si256(register_, 1);
 						return _mm256_castsi128_si256
 						(
 							horizontal_sum<PerElementWidthIfInt_>
@@ -237,9 +237,9 @@ namespace EmuSIMD
 							)
 						);
 					}
-					else if constexpr (std::is_same_v<register_type_uq, __m512i>)
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
 					{
-						__m128i chunks_[4] =
+						EmuSIMD::i128_generic chunks_[4] =
 						{
 							_mm256_extracti128_si256(register_, 0),
 							_mm256_extracti128_si256(register_, 1),
@@ -277,38 +277,38 @@ namespace EmuSIMD
 		using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<register_type_uq>)
 		{
-			if constexpr (std::is_same_v<register_type_uq, __m128>)
+			if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 			{
-				__m128 out_ = _mm_hadd_ps(register_, register_);
+				EmuSIMD::f32x4 out_ = _mm_hadd_ps(register_, register_);
 				return _mm_hadd_ps(out_, out_);
 			}
-			else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 			{
 				return _underlying_simd_helpers::_execute_shuffle<0>(horizontal_sum(register_));
 			}
-			else if constexpr (std::is_same_v<register_type_uq, __m256>)
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 			{
-				__m256 result_ = _underlying_simd_helpers::_cast<__m256>
+				EmuSIMD::f32x8 result_ = _underlying_simd_helpers::_cast<EmuSIMD::f32x8>
 				(
 					_underlying_simd_helpers::_execute_shuffle<0>
 					(
-						_underlying_simd_helpers::_cast<__m128>(horizontal_sum(register_))
+						_underlying_simd_helpers::_cast<EmuSIMD::f32x4>(horizontal_sum(register_))
 					)
 				);
 				return _mm256_permute2f128_ps(result_, result_, 0);
 			}
-			else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+			else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 			{
-				__m256d result_ = _underlying_simd_helpers::_cast<__m256d>
+				EmuSIMD::f64x4 result_ = _underlying_simd_helpers::_cast<EmuSIMD::f64x4>
 				(
 					_underlying_simd_helpers::_execute_shuffle<0>
 					(
-						_underlying_simd_helpers::_cast<__m128d>(horizontal_sum(register_))
+						_underlying_simd_helpers::_cast<EmuSIMD::f64x2>(horizontal_sum(register_))
 					)
 				);
 				return _mm256_permute2f128_pd(result_, result_, 0);
 			}
-			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i>::value)
+			else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::i128_generic, EmuSIMD::i256_generic>::value)
 			{
 				if constexpr (EmuSIMD::TMP::_assert_valid_simd_int_element_width<PerElementWidthIfInt_>())
 				{

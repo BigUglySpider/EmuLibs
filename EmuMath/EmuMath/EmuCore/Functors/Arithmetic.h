@@ -655,7 +655,8 @@ namespace EmuCore
 			}
 			else
 			{
-				return std::fma(x_, y_, z_);
+				using std::fma;
+				return fma(x_, y_, z_);
 			}
 		}
 	};

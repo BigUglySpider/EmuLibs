@@ -147,6 +147,11 @@ namespace EmuCore
 		template<typename T>
 		static constexpr T PI_CUBE = PI_POW<T, 3>;
 
+		template<typename T_>
+		static constexpr T_ RECIPROCAL_180_DIV_PI = T_(1.0) / HUNDRED80_DIV_PI<T_>;
+		template<typename T_>
+		static constexpr T_ RECIPROCAL_PI_DIV_180 = T_(1.0) / PI_DIV_180<T_>;
+
 		template<typename T>
 		static constexpr T RadsToDegs(const T rads_)
 		{

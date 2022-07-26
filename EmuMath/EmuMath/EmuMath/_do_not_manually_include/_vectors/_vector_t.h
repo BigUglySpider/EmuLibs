@@ -72,10 +72,12 @@ namespace EmuMath
 			return size;
 		}
 
-		template<typename T_, bool WhileConst_>
+		template<typename Out_, bool WhileConst_>
 		[[nodiscard]] static constexpr inline bool is_valid_try_get_output_ref()
 		{
-			return vector_info::template is_valid_try_get_output_ref<T_, WhileConst_>();
+			using qualified_reference_type = typename EmuCore::TMP::conditional_const<WhileConst_, value_type&>::type;
+			using out_lval_ref = typename std::add_lvalue_reference<Out_>::type;
+			return EmuCore::TMP::valid_assign_direct_or_cast<Out_, qualified_reference_type, out_lval_ref>();
 		}
 
 		[[nodiscard]] static constexpr inline value_type_uq get_implied_zero()
@@ -240,7 +242,7 @@ namespace EmuMath
 			template<std::size_t Index_, std::size_t ReadOffset_, bool AllowScalarMoves_, bool DoAssertions_>
 			[[nodiscard]] static constexpr inline bool get()
 			{
-				if constexpr(AllowScalarMoves_)
+				if constexpr(!AllowScalarMoves_)
 				{
 					// We only allow reference creation if Arg_ is of lvalue reference type to prevent dangling ref creation
 					using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(std::declval<Arg_>())));			
@@ -258,8 +260,24 @@ namespace EmuMath
 					}
 					else
 					{
-						static_assert(!DoAssertions_, "Attempted to create an EmuMath Vector's stored_type from a non-Vector argument, but the output Vector contains references and the provided Arg_ is not an lvalue reference. As this is likely to result in dangling references, such behaviour is prohibited.");
-						return false;
+						if constexpr (EmuMath::TMP::is_recognised_vector_ref_wrapper_v<Arg_>)
+						{
+							using wrapped_ref_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::declval<Arg_>()).get());
+							if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, Arg_>())
+							{
+								return true;
+							}
+							else
+							{
+								static_assert(!DoAssertions_, "Attempted to create an EmuMath Vector's stored type using a recongised reference-wrapper argument, but the contained reference within the wrapper is not compatible with the output Vector.");
+								return false;
+							}
+						}
+						else
+						{
+							static_assert(!DoAssertions_, "Attempted to create an EmuMath Vector's stored_type from a non-Vector argument, but the output Vector contains references and the provided Arg_ is not an lvalue reference or a recognised reference wrapper. As this is likely to result in dangling references, such behaviour is prohibited.");
+							return false;
+						}
 					}
 				}
 				else
@@ -281,13 +299,6 @@ namespace EmuMath
 					}
 					else
 					{
-						using arg_uq = EmuCore::TMP::remove_ref_cv_t<Arg_>;
-						constexpr bool in_is_ref_wrapper = EmuCore::TMP::variadic_or_v
-						<
-							EmuCore::TMP::is_instance_of_typeparams_only_v<arg_uq, std::reference_wrapper>,
-							EmuCore::TMP::is_instance_of_typeparams_only_v<arg_uq, EmuMath::vector_internal_ref>,
-							EmuCore::TMP::is_instance_of_typeparams_only_v<arg_uq, EmuMath::vector_internal_const_ref>
-						>;
 						if constexpr (!contains_ref)
 						{
 							// Explicit move allowed
@@ -302,10 +313,10 @@ namespace EmuMath
 								return false;
 							}
 						}
-						else if constexpr (in_is_ref_wrapper)
+						else if constexpr (EmuMath::TMP::is_recognised_vector_ref_wrapper_v<Arg_>)
 						{
 							using wrapped_ref_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::declval<Arg_>()).get());
-							if constexpr (std::is_constructible_v<stored_type, wrapped_ref_type> || EmuCore::TMP::is_static_castable_v<wrapped_ref_type, stored_type>)
+							if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, wrapped_ref_type>())
 							{
 								return true;
 							}
@@ -335,7 +346,7 @@ namespace EmuMath
 		[[nodiscard]] static constexpr inline bool _underlying_valid_arg_for_all_same_construction(std::index_sequence<Indices_...> indices_)
 		{
 			using arg_uq = EmuCore::TMP::remove_ref_cv_t<Arg_>;
-			if constexpr (!std::is_same_v<this_type, arg_uq>)
+			if constexpr (!std::is_same_v<this_type, arg_uq> && (!has_alternative_representation || !std::is_same_v<alternative_rep, arg_uq>))
 			{
 				return EmuCore::TMP::variadic_and_v
 				<
@@ -372,8 +383,10 @@ namespace EmuMath
 		{
 			return EmuCore::TMP::variadic_and_v
 			<
+				!contains_non_const_ref || !std::is_const_v<Vector_>,
 				EmuMath::TMP::is_emu_vector_v<Vector_>,
 				!std::is_same_v<EmuCore::TMP::remove_ref_cv_t<Vector_>, this_type>,
+				!has_alternative_representation || !std::is_same_v<EmuCore::TMP::remove_ref_cv_t<Vector_>, alternative_rep>,
 				valid_arg_for_all_same_construction<ReadOffset_, Vector_>()
 			>;
 		}
@@ -381,7 +394,7 @@ namespace EmuMath
 		template<class Vector_, std::size_t ReadOffset_ = 0>
 		[[nodiscard]] static constexpr inline bool is_valid_const_vector_conversion_arg()
 		{
-			return !contains_non_const_ref && is_valid_vector_conversion_arg<Vector_, ReadOffset_>();
+			return is_valid_vector_conversion_arg<const Vector_, ReadOffset_>();
 		}
 
 		template<std::size_t ReadOffset_, class...Args_>
@@ -390,18 +403,26 @@ namespace EmuMath
 			if constexpr (size != 0 && sizeof...(Args_) == size) // 0-args reserved for default
 			{
 				// For validity:
-				// 1: Must be more than 1 argument *or* the only argument is not an EmuMath Vector (as a single argument will use Vector conversion construction instead)
-				// 2: Must be at least one of A and B, with A taking priority over B:
+				// 1: No voids
+				// 2: Must be more than 1 argument *or* the only argument is not an EmuMath Vector (as a single argument will use Vector conversion construction instead)
+				// 3: Must be at least one of A and B, with A taking priority over B:
 				// --- A: All Args_ are immediately valid for constructing data_storage_type when forwarded to an initialiser list for data_storage_type construction
 				// --- B: All Args_ are valid lone types for making a stored_type
-				return
-				(
-					(size != 1 || !EmuMath::TMP::is_emu_vector_v<EmuCore::TMP::first_variadic_arg_t<Args_...>>) &&
+				if constexpr(!(... || std::is_void_v<Args_>))
+				{
+					return
 					(
-						std::is_constructible_v<data_storage_type, decltype(std::forward<Args_>(std::declval<Args_>()))...> ||
-						EmuCore::TMP::variadic_and_v<_is_valid_arg_for_stored_type<0, ReadOffset_, Args_, true, false>()...>						
-					)
-				);
+						(size != 1 || !EmuMath::TMP::is_emu_vector_v<EmuCore::TMP::first_variadic_arg_t<Args_...>>) &&
+						(
+							std::is_constructible_v<data_storage_type, decltype(std::forward<Args_>(std::declval<Args_>()))...> ||
+							EmuCore::TMP::variadic_and_v<_is_valid_arg_for_stored_type<0, ReadOffset_, Args_, true, false>()...>						
+						)
+					);
+				}
+				else
+				{
+					return false;
+				}
 			}
 			else
 			{
@@ -508,13 +529,9 @@ namespace EmuMath
 					constexpr bool assigning_theoretical_to_ref_ = is_theoretical_index_ && contains_ref;
 					if constexpr (!assigning_theoretical_to_ref_)
 					{
-						if constexpr (std::is_constructible_v<stored_type, arg_get_result>)
+						if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, arg_get_result>())
 						{
-							return stored_type(EmuMath::Helpers::vector_get_theoretical<arg_index_>(lval_ref_arg_));
-						}
-						else if constexpr(EmuCore::TMP::is_static_castable_v<arg_get_result, stored_type>)
-						{
-							return static_cast<stored_type>(EmuMath::Helpers::vector_get_theoretical<arg_index_>(lval_ref_arg_));
+							return EmuCore::TMP::construct_or_cast<stored_type>(EmuMath::Helpers::vector_get_theoretical<arg_index_>(lval_ref_arg_));
 						}
 						else
 						{
@@ -540,13 +557,9 @@ namespace EmuMath
 					if constexpr(!contains_ref)
 					{
 						// Explicit std::move allowed
-						if constexpr (std::is_constructible_v<stored_type, arg_move_result>)
+						if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, arg_move_result>())
 						{
-							return stored_type(std::move(lval_ref_arg_.template at<arg_index_>())    );
-						}
-						else if constexpr (EmuCore::TMP::is_static_castable_v<arg_move_result, stored_type>)
-						{
-							return static_cast<stored_type>(std::move(lval_ref_arg_.template at<arg_index_>()));
+							return EmuCore::TMP::construct_or_cast<stored_type>(std::move(lval_ref_arg_.template at<arg_index_>()));
 						}
 						else
 						{
@@ -564,13 +577,9 @@ namespace EmuMath
 						constexpr bool compatible_ref_ = contains_const_ref || (arg_uq::contains_non_const_ref && !std::is_const_v<Arg_>);
 						if constexpr (compatible_ref_)
 						{
-							if constexpr (std::is_constructible_v<stored_type, arg_get_result>)
+							if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, arg_get_result>())
 							{
-								return stored_type(lval_ref_arg_.template at<arg_index_>());
-							}
-							else if constexpr (EmuCore::TMP::is_static_castable_v<arg_get_result, stored_type>)
-							{
-								return static_cast<stored_type>(lval_ref_arg_.template at<arg_index_>());
+								return EmuCore::TMP::construct_or_cast<stored_type>(lval_ref_arg_.template at<arg_index_>());
 							}
 							else
 							{
@@ -609,22 +618,18 @@ namespace EmuMath
 			template<std::size_t Index_, std::size_t ReadOffset_, bool AllowScalarMoves_>
 			[[nodiscard]] static constexpr inline stored_type get(Arg_&& arg_)
 			{
-				if constexpr(AllowScalarMoves_)
+				if constexpr(!AllowScalarMoves_)
 				{
 					// We do not allow this arg to be moved as it is used for all output arguments.
 					// --- We only allow reference creation if Arg_ is of lvalue reference type to prevent dangling ref creation
-					using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_)));
-					lval_ref_arg_type lval_ref_arg_ = EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_));
 			
 					if constexpr (std::is_lvalue_reference_v<Arg_> || !contains_ref)
 					{
-						if constexpr(std::is_constructible_v<stored_type, lval_ref_arg_type>)
+						using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_)));
+						lval_ref_arg_type lval_ref_arg_ = EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_));
+						if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, lval_ref_arg_type>())
 						{
-							return stored_type(lval_ref_arg_);
-						}
-						else if constexpr (EmuCore::TMP::is_static_castable_v<lval_ref_arg_type, stored_type>)
-						{
-							return static_cast<stored_type>(lval_ref_arg_);
+							return EmuCore::TMP::construct_or_cast<stored_type>(lval_ref_arg_);
 						}
 						else
 						{
@@ -637,27 +642,44 @@ namespace EmuMath
 					}
 					else
 					{
-						static_assert
-						(
-							EmuCore::TMP::get_false<Arg_>(),
-							"Attempted to create an EmuMath Vector's stored_type from a non-Vector argument, but the output Vector contains references and the provided Arg_ is not an lvalue reference. As this is likely to result in dangling references, such behaviour is prohibited."
-						);
+						if constexpr (EmuMath::TMP::is_recognised_vector_ref_wrapper_v<Arg_>)
+						{
+							using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_)));
+							lval_ref_arg_type lval_ref_arg_ = EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_));
+							using wrapped_arg_type = decltype(lval_ref_arg_.get());
+							if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, wrapped_arg_type>())
+							{
+								return EmuCore::TMP::construct_or_cast<stored_type>(lval_ref_arg_.get());
+							}
+							else
+							{
+								static_assert
+								(
+									EmuCore::TMP::get_false<Arg_>(),
+									"Attempted to create an EmuMath Vector's stored_type from a recognised reference-wrapper argument, but the output Vector does not supported the reference wrapped by it."
+								);
+							}
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<Arg_>(),
+								"Attempted to create an EmuMath Vector's stored_type from a non-Vector argument, but the output Vector contains references and the provided Arg_ is not an lvalue reference. As this is likely to result in dangling references, such behaviour is prohibited."
+							);
+						}
 					}
 				}
 				else
 				{
-					using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_)));
-					lval_ref_arg_type lval_ref_arg_ = EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_));
 					if constexpr (std::is_lvalue_reference_v<Arg_>)
 					{
 						// No explicit move		
-						if constexpr(std::is_constructible_v<stored_type, lval_ref_arg_type>)
+						using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_)));
+						lval_ref_arg_type lval_ref_arg_ = EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_));
+						if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, lval_ref_arg_type>())
 						{
-							return stored_type(lval_ref_arg_);
-						}
-						else if constexpr (EmuCore::TMP::is_static_castable_v<lval_ref_arg_type, stored_type>)
-						{
-							return static_cast<stored_type>(lval_ref_arg_);
+							return EmuCore::TMP::construct_or_cast<stored_type>(lval_ref_arg_);
 						}
 						else
 						{
@@ -668,65 +690,48 @@ namespace EmuMath
 							);
 						}
 					}
-					else
+					else if constexpr (!contains_ref)
 					{
-						using arg_uq = EmuCore::TMP::remove_ref_cv_t<Arg_>;
-						constexpr bool in_is_ref_wrapper = EmuCore::TMP::variadic_or_v
-						<
-							EmuCore::TMP::is_instance_of_typeparams_only_v<arg_uq, std::reference_wrapper>,
-							EmuCore::TMP::is_instance_of_typeparams_only_v<arg_uq, EmuMath::vector_internal_ref>,
-							EmuCore::TMP::is_instance_of_typeparams_only_v<arg_uq, EmuMath::vector_internal_const_ref>
-						>;
-						if constexpr (!contains_ref)
+						// Explicit move allowed
+						using moved_arg_result = decltype(std::move(std::declval<Arg_>()));
+						if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, moved_arg_result>())
 						{
-							// Explicit move allowed
-							using moved_arg_result = decltype(std::move(std::declval<Arg_>()));
-							if constexpr (std::is_constructible_v<stored_type, moved_arg_result>)
-							{
-								return stored_type(std::move(arg_));
-							}
-							else if constexpr (EmuCore::TMP::is_static_castable_v<moved_arg_result, stored_type>)
-							{
-								return static_cast<stored_type>(std::move(arg_));
-							}
-							else
-							{
-								static_assert
-								(
-									EmuCore::TMP::get_false<Arg_>(),
-									"Attempted to create an EmuMath Vector's stored_type from a moveable non-Vector argument, but the Vector's stored_type could not be constructed from said argument after a std::move."
-								);
-							}
-						}
-						else if constexpr (in_is_ref_wrapper)
-						{
-							using wrapped_ref_type = decltype(lval_ref_arg_.get());
-							wrapped_ref_type wrapped_ref_ = lval_ref_arg_.get();
-							if constexpr (std::is_constructible_v<stored_type, wrapped_ref_type>)
-							{
-								return stored_type(wrapped_ref_);
-							}
-							else if constexpr (EmuCore::TMP::is_static_castable_v<wrapped_ref_type, stored_type>)
-							{
-								return static_cast<stored_type>(wrapped_ref_);
-							}
-							else
-							{
-								static_assert
-								(
-									EmuCore::TMP::get_false<Arg_>(),
-									"Attempted to create an EmuMath Vector of references' stored_type from a moveable reference wrapper (std::reference_wrapper, EmuMath::vector_internal_ref, or EmuMath::vector_internal_const_ref), but the stored_type could not be used to reference the wrapper's underlying reference."
-								);
-							}
+							return EmuCore::TMP::construct_or_cast<stored_type>(std::move(arg_));
 						}
 						else
 						{
 							static_assert
 							(
 								EmuCore::TMP::get_false<Arg_>(),
-								"Attempted to create an EmuMath Vector of references' stored_type from a moveable scalar that is not a std::reference_wrapper, EmuMath::vector_internal_ref, or EmuMath::vector_internal_const_ref. As this is likely a temporary non-reference-wrapper, such behaviour is prohibited."
+								"Attempted to create an EmuMath Vector's stored_type from a moveable non-Vector argument, but the Vector's stored_type could not be constructed from said argument after a std::move."
 							);
 						}
+					}
+					else if constexpr (EmuMath::TMP::is_recognised_vector_ref_wrapper_v<Arg_>)
+					{
+						using lval_ref_arg_type = decltype(EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_)));
+						lval_ref_arg_type lval_ref_arg_ = EmuCore::TMP::lval_ref_cast<Arg_>(std::forward<Arg_>(arg_));
+						using wrapped_ref_type = decltype(lval_ref_arg_.get());
+						if constexpr (EmuCore::TMP::valid_construct_or_cast<stored_type, wrapped_ref_type>())
+						{
+							return EmuCore::TMP::construct_or_cast<stored_type>(lval_ref_arg_.get());
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<Arg_>(),
+								"Attempted to create an EmuMath Vector of references' stored_type from a moveable reference wrapper (std::reference_wrapper, EmuMath::vector_internal_ref, or EmuMath::vector_internal_const_ref), but the stored_type could not be used to reference the wrapper's underlying reference."
+							);
+						}
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<Arg_>(),
+							"Attempted to create an EmuMath Vector of references' stored_type from a moveable scalar that is not a std::reference_wrapper, EmuMath::vector_internal_ref, or EmuMath::vector_internal_const_ref. As this is likely a temporary non-reference-wrapper, such behaviour is prohibited."
+						);
 					}
 				}
 			}
@@ -989,7 +994,8 @@ namespace EmuMath
 		{
 			if constexpr (Index_ < size)
 			{
-				return std::get<Index_>(_data);
+				using std::get;
+				return get<Index_>(_data);
 			}
 			else
 			{
@@ -1025,9 +1031,7 @@ namespace EmuMath
 			{
 				if constexpr (size != 0)
 				{
-					// NOTE: Under MSVC, constexpr_str_ will always be false without the /Zc:__cplusplus switch enabled, as of 2022/01/05
-					constexpr bool constexpr_str_ = __cplusplus >= 201907L;
-					if constexpr (constexpr_str_)
+					if constexpr (EmuCore::TMP::feature_constexpr_dynamic_memory())
 					{
 						// We can provide some extra information if we have access to constexpr strings
 						// --- This is to allow `at(index_)` to still satisfy constexpr constraints in standards before C++20
@@ -2091,7 +2095,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of adding rhs_ to this Vector within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be added. Otherwise, all elements have rhs_ added. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
@@ -2199,7 +2203,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of subtracting rhs_ from this Vector within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be subtracted. Otherwise, all elements have rhs_ subtracted. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
@@ -2307,7 +2311,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of multiplying this Vector by rhs_ within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be multiplied. Otherwise, all elements are multiplied by rhs_. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
@@ -2415,7 +2419,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of dividing this Vector by rhs_ within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be divided. Otherwise, all elements are divided by rhs_. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
@@ -2523,7 +2527,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of modulo-dividing this Vector by rhs_ within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be modulo-divided. Otherwise, all elements are modulo-divided by rhs_. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
@@ -2876,7 +2880,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of bitwise ANDing this Vector with rhs_ within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be ANDed. Otherwise, all elements be ANDed with rhs_ directly. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing bitwise operation results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing bitwise operation results to the output Vector. </para>
@@ -2984,7 +2988,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of bitwise ORing this Vector with rhs_ within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be ORed. Otherwise, all elements be ORed with rhs_ directly. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing bitwise operation results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing bitwise operation results to the output Vector. </para>
@@ -3092,7 +3096,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of bitwise XORing this Vector with rhs_ within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be XORed. Otherwise, all elements be ORed with rhs_ directly. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing bitwise operation results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing bitwise operation results to the output Vector. </para>
@@ -3200,7 +3204,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of left-shifting this Vector with rhs_ within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be used for shifts. Otherwise, all elements will be shifted with rhs_ directly. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing shift operation results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing shift operation results to the output Vector. </para>
@@ -3308,7 +3312,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Returns the result of right-shifting this Vector with rhs_ within the provided index range. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be used for shifts. Otherwise, all elements will be shifted with rhs_ directly. </para>
 		/// <para> OutBegin_: Inclusive index at which to start writing shift operation results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing shift operation results to the output Vector. </para>
@@ -4985,6 +4989,37 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region SWAPS
+	public:
+		/// <summary>
+		/// <para> Swaps the elements of this Vector with respective elements of the passed Vector b_. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, values in a larger Vector will be set to its implied-zero in the range not contained within the smaller Vector. 
+		///		Otherwise, only values in the mutual contained range will be swapped.
+		/// </para>
+		/// </summary>
+		/// <param name="vector_b_">: EmuMath Vector to swap the elements of with those of this Vector.</param>
+		template<bool IncludeNonContained_ = true, typename OtherT_, std::size_t OtherSize_>
+		constexpr inline void swap(EmuMath::Vector<OtherSize_, OtherT_>& b_)
+		{
+			EmuMath::Helpers::vector_swap<IncludeNonContained_>(*this, b_);
+		}
+
+		/// <summary>
+		/// <para> Swaps the elements of this Vector with respective elements of the passed Vector b_ within the provided range. </para>
+		/// <para>
+		///		IncludeNonContained_: If true, values in a larger Vector will be set to zero in the range not contained within the smaller Vector. 
+		///		Otherwise, only values in the mutual contained range will be swapped.
+		/// </para>
+		/// </summary>
+		/// <param name="vector_b_">: EmuMath Vector to swap the elements of with those of this Vector.</param>
+		template<std::size_t BeginIndex_, std::size_t EndIndex_, bool IncludeNonContained_ = true, typename OtherT_, std::size_t OtherSize_>
+		constexpr inline void swap(EmuMath::Vector<OtherSize_, OtherT_>& b_)
+		{
+			EmuMath::Helpers::vector_swap_range<BeginIndex_, EndIndex_, IncludeNonContained_>(*this, b_);
+		}
+#pragma endregion
+
 #pragma region SHUFFLES
 	public:
 		/// <summary>
@@ -5861,12 +5896,12 @@ namespace EmuMath
 		/// <param name="plane_normal_">: EmuMath Vector describing the plane to reflect onto. This is expected to be normalised, and treated as such.</param>
 		/// <returns>EmuMath Vector resulting from projecting this Vector onto the plane defined by the provided plane_normal_.</returns>
 		template<std::size_t OutSize_, typename OutT_ = preferred_floating_point, std::size_t NormSize_, typename NormT_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ProjectPlane(const EmuMath::Vector<NormSize_, NormT_>& plane_normal_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ProjectToPlane(const EmuMath::Vector<NormSize_, NormT_>& plane_normal_) const
 		{
 			return EmuMath::Helpers::vector_project_plane<OutSize_, OutT_>(*this, plane_normal_);
 		}
 		template<typename OutT_ = preferred_floating_point, std::size_t NormSize_, typename NormT_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ProjectPlane(const EmuMath::Vector<NormSize_, NormT_>& plane_normal_) const
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> ProjectToPlane(const EmuMath::Vector<NormSize_, NormT_>& plane_normal_) const
 		{
 			return EmuMath::Helpers::vector_project_plane<size, OutT_>(*this, plane_normal_);
 		}
@@ -5903,7 +5938,7 @@ namespace EmuMath
 			std::size_t SizeC_,
 			typename TC_
 		>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ProjectPlane3Constexpr
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ProjectToPlane3Constexpr
 		(
 			const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
 			const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
@@ -5923,7 +5958,7 @@ namespace EmuMath
 			std::size_t SizeC_,
 			typename TC_
 		>
-		[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> ProjectPlane3Constexpr
+		[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> ProjectToPlane3Constexpr
 		(
 			const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
 			const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
@@ -5941,7 +5976,7 @@ namespace EmuMath
 		/// </para>
 		/// <para> If a normal for the defined plane is already available, it is recommended to use vector_project_plane with that normal to minimise normalisation costs. </para>
 		/// <para> Unlike most member functions, if no OutSize_ is provided this will always default to 3 instead of this Vector's size, due to its 3D focus. </para>
-		/// <para> For a guarantee to be constexpr-evaluable if possible, use ProjectPlane3Constexpr instead. </para>
+		/// <para> For a guarantee to be constexpr-evaluable if possible, use ProjectToPlane3Constexpr instead. </para>
 		/// </summary>
 		/// <param name="plane_point_a_">
 		///		: Cartesian point a defining the plane to project onto. For more information on how this is used, see NormalToPlane3 
@@ -5962,7 +5997,7 @@ namespace EmuMath
 			std::size_t SizeC_,
 			typename TC_
 		>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ProjectPlane3
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ProjectToPlane3
 		(
 			const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
 			const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
@@ -5982,7 +6017,7 @@ namespace EmuMath
 			std::size_t SizeC_,
 			typename TC_
 		>
-		[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> ProjectPlane3
+		[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> ProjectToPlane3
 		(
 			const EmuMath::Vector<SizeA_, TA_>& plane_point_a_,
 			const EmuMath::Vector<SizeB_, TB_>& plane_point_b_,
@@ -7089,6 +7124,23 @@ namespace EmuMath
 		/// <summary> Contiguous element data stored within this Vector. </summary>
 		data_storage_type _data;
 	};
+
+	/// <summary>
+	/// <para> Get function for use with EmuMath Vectors using ADL. Equivalent to vector_.at with the provided Index_. Does not allow theoretical output. </para>
+	/// </summary>
+	/// <param name="vector_">: EmuMath Vector to retrieve the specified contained index of.</param>
+	/// <returns>Reference to the element contained at the specified index of the passed EmuMath Vector.</returns>
+	template<std::size_t Index_, typename T_, std::size_t Size_>
+	[[nodiscard]] constexpr inline const typename EmuMath::Vector<Size_, T_>::value_type& get(const EmuMath::Vector<Size_, T_>& vector_)
+	{
+		return vector_.template at<Index_>();
+	}
+
+	template<std::size_t Index_, typename T_, std::size_t Size_>
+	[[nodiscard]] constexpr inline typename EmuMath::Vector<Size_, T_>::value_type& get(EmuMath::Vector<Size_, T_>& vector_)
+	{
+		return vector_.template at<Index_>();
+	}
 }
 
 namespace std

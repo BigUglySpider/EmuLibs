@@ -402,8 +402,9 @@ namespace EmuThreads
 		template<std::size_t Index_, class...TupleArgs_>
 		struct _item_get_result<Index_, std::tuple<TupleArgs_...>>
 		{
+			using std::get;
 			static_assert(Index_ < sizeof...(TupleArgs_), "Attempted to get an invalid index within an EmuThreads::ParallelFor's underlying execution. This is an internal EmuThreads error.");
-			using type = decltype(std::get<Index_>(std::declval<std::tuple<TupleArgs_...>>()))&;
+			using type = decltype(get<Index_>(std::declval<std::tuple<TupleArgs_...>>()))&;
 		};
 
 		template<std::size_t Index_, class Item_>
@@ -411,7 +412,8 @@ namespace EmuThreads
 		{
 			if constexpr (_is_tuple<Item_>())
 			{
-				return std::get<Index_>(item_);
+				using std::get;
+				return get<Index_>(item_);
 			}
 			else
 			{

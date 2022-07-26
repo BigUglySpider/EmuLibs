@@ -10,6 +10,7 @@
 #include <tuple>
 
 // ADDITIONAL INCLUDES
+#include "EmuMath/FastVector.h"
 #include "EmuMath/Matrix.h"
 #include "EmuMath/Vector.h"
 #include "EmuMath/Random.h"
@@ -22,88 +23,56 @@ namespace EmuCore::TestingHelpers
 	static constexpr unsigned long long shared_fill_seed_ = 1337;
 	static constexpr unsigned long long shared_select_seed_ = -25;
 
-	template<std::size_t Size_, typename OutT_, class OutColl_, class RngFunc_>
-	inline void emplace_back_vector(OutColl_& out_coll_, RngFunc_& func_)
+	template<typename T_, auto...ToDiscard_, bool Is64Bit_>
+	[[nodiscard]] inline T_ get_random_val(EmuMath::RngWrapper<Is64Bit_>& rng_)
 	{
-		out_coll_.emplace_back
-		(
-			EmuMath::Helpers::vector_mutate<Size_, OutT_, RngFunc_&>(func_, OutT_())
-		);
+		if constexpr (std::is_integral_v<T_>)
+		{
+			return rng_.NextInt<T_>();
+		}
+		else
+		{
+			return rng_.NextReal<T_>();
+		}
 	}
 
-	template<class Vector_, class OutColl_, class RngFunc_>
-	inline void emplace_back_old_vector(OutColl_& out_coll_, RngFunc_& func_)
+	template<class OutMat_, bool Is64Bit_>
+	[[nodiscard]] inline OutMat_ make_random_mat(EmuMath::RngWrapper<Is64Bit_>& rng_)
 	{
-		Vector_ vec_ = Vector_();
-		out_coll_.emplace_back(EmuMath::Helpers::vector_mutate(vec_, std::ref(func_)));
-	}
-
-	struct RngFunctor
-	{
-	private:
-		template
-		<
-			typename T_,
-			bool IsValidOut_ = 
-			(
-				std::is_integral_v<EmuCore::TMP::remove_ref_cv_t<T_>> ||
-				std::is_floating_point_v<EmuCore::TMP::remove_ref_cv_t<T_>>
-			)
-	>
-		struct _out_type
+		OutMat_ out_ = OutMat_();
+		for (std::size_t column = 0; column < OutMat_::num_columns; ++column)
 		{
-			using type = float;
-		};
-		template<typename T_>
-		struct _out_type<T_, true>
-		{
-			using type = EmuCore::TMP::remove_ref_cv_t<T_>;
-		};
-
-	public:
-		using rng_type = EmuMath::RngWrapper<true>;
-		using seed_type = rng_type::unsigned_int_type;
-
-		RngFunctor() : _rng()
-		{
-		}
-		template<class...ConstructionArgs_, typename = std::enable_if_t<std::is_constructible_v<rng_type, ConstructionArgs_&&...>>>
-		RngFunctor(ConstructionArgs_&&...construction_args_) : _rng(std::forward<ConstructionArgs_>(construction_args_)...)
-		{
-		}
-
-		template<typename T_>
-		constexpr inline typename _out_type<T_>::type operator()(const T_& dummy_)
-		{
-			if constexpr (std::is_integral_v<typename _out_type<T_>::type>)
+			for (std::size_t row = 0; row < OutMat_::num_rows; ++row)
 			{
-				return _rng.NextInt<typename _out_type<T_>::type>();
+				out_(column, row) = get_random_val<typename OutMat_::value_type_uq>(rng_);
+			}
+		}
+		return out_;
+	}
+
+	template<class OutVec_, typename T_, std::size_t...Indices_>
+	[[nodiscard]] inline OutVec_ make_vec_from_data(const T_* p_data_, std::index_sequence<Indices_...> indices_)
+	{
+		return OutVec_((*(p_data_ + Indices_))...);
+	}
+
+	template<class OutVec_, typename T_, std::size_t Size_, bool Is64Bit_>
+	[[nodiscard]] inline OutVec_ make_random_vec(EmuMath::RngWrapper<Is64Bit_>& rng_)
+	{
+		T_ out_[Size_];
+		for (std::size_t i = 0; i < Size_; ++i)
+		{
+			if constexpr (std::is_floating_point_v<EmuCore::TMP::remove_ref_cv_t<T_>>)
+			{
+				out_[i] = rng_.NextReal<T_>();
 			}
 			else
 			{
-				return _rng.NextReal<typename _out_type<T_>::type>();
+				out_[i] = rng_.NextInt<T_>();
 			}
 		}
 
-		rng_type _rng;
-	};
-
-	template<class Matrix_, class Arr_, std::size_t...FlattenedIndices_>
-	[[nodiscard]] inline Matrix_ make_mat_from_arr(Arr_& arr_, std::index_sequence<FlattenedIndices_...>)
-	{
-		return Matrix_(arr_[FlattenedIndices_]...);
-	}
-
-	template<class Matrix_, class Rng_>
-	[[nodiscard]] inline Matrix_ make_random_matrix(Rng_& rng_)
-	{
-		using indices = EmuMath::TMP::make_full_matrix_index_sequences<Matrix_>;
-		std::array<typename Matrix_::stored_type, Matrix_::size> out_array_;
-		for (std::size_t i = 0; i < Matrix_::size; ++i)
-		{
-			out_array_[i] = rng_(typename Matrix_::stored_type());
-		}
-		return make_mat_from_arr<Matrix_>(out_array_, std::make_index_sequence<Matrix_::size>());
+		return make_vec_from_data<OutVec_>(out_, std::make_index_sequence<Size_>());
 	}
 
 	/// <summary> Example which only contains the required items for the test harness. </summary>
@@ -121,589 +90,150 @@ namespace EmuCore::TestingHelpers
 		void Prepare()
 		{
 		}
-		void operator()(std::size_t i)
+		void operator()(std::size_t i_)
 		{
+
 		}
 		void OnTestsOver()
 		{
 		}
 	};
 
-	struct reflect_test_emu
+	struct EmuFastVectorTest
 	{
 		static constexpr bool DO_TEST = true;
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr std::size_t NUM_LOOPS = 5000000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Vector Reflect (Emu)";
+		static constexpr std::string_view NAME = "Emu FastVector (Dot)";
 
-		static constexpr std::size_t vec_size = 3;
-		using vector_type_arg = float;
-		using vector_type = EmuMath::Vector<vec_size, vector_type_arg>;
-		using float_type = typename vector_type::preferred_floating_point;
-		using vector_type_fp = EmuMath::Vector<vec_size, float_type>;
+		static constexpr std::size_t vec_size = 4;
+		using vec_t_arg = float;
+		using fast_vector_type = EmuMath::FastVector<vec_size, vec_t_arg>;
+		using vector_type = typename fast_vector_type::vector_type;
+		using lhs_type = fast_vector_type;
+		using rhs_type = fast_vector_type;
+		using output_type = lhs_type;
 
-		reflect_test_emu()
+		EmuFastVectorTest()
 		{
 		}
 		void Prepare()
 		{
-			// RESIZES
-			out_reflection.resize(NUM_LOOPS);
+			// FILLS
+			out_vecs.resize(NUM_LOOPS);
 
 			// RESERVES
-			in_ray.reserve(NUM_LOOPS);
-			in_norm.reserve(NUM_LOOPS);
-
-			// FILL RESERVES
-			RngFunctor rng_ = RngFunctor(shared_fill_seed_);
-			rng_._rng.SetMinMax(-1000, 1000);
-
-			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
-			{
-				emplace_back_vector<vec_size, vector_type_arg>(in_ray, rng_);
-				emplace_back_vector<vec_size, float_type>(in_norm, rng_);
-				in_norm[i] = in_norm[i].Normalise();
-			}
-		}
-		void operator()(std::size_t i)
-		{
-			out_reflection[i] = in_ray[i].Reflect(in_norm[i]);
-		}
-		void OnTestsOver()
-		{
-			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
-			std::cout << "REFLECT\n(\n\t" << in_ray[i_] << "\n\t" << in_norm[i_] << "\n" << "): " << out_reflection[i_] << "\n\n";
-		}
-
-		std::vector<vector_type> in_ray;
-		std::vector<vector_type_fp> in_norm;
-		std::vector<vector_type_fp> out_reflection;
-	};
-
-	struct reflect_test_dxm
-	{
-		static constexpr bool DO_TEST = true;
-		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 500000;
-		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Vector Reflect (DXM)";
-
-		reflect_test_dxm()
-		{
-		}
-		void Prepare()
-		{
-			// RESIZES
-			out_reflection.resize(NUM_LOOPS);
-
-			// RESERVES
-			in_ray.reserve(NUM_LOOPS);
-			in_norm.reserve(NUM_LOOPS);
-
-			// FILL RESERVES
-			RngFunctor rng_ = RngFunctor(shared_fill_seed_);
-			rng_._rng.SetMinMax(-1000, 1000);
-
-			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
-			{
-				in_ray.emplace_back
-				(
-					rng_(0.0f), rng_(0.0f), rng_(0.0f)
-				);
-				in_norm.emplace_back
-				(
-					rng_(0.0f), rng_(0.0f), rng_(0.0f)
-				);
-				DirectX::XMStoreFloat3
-				(
-					&(in_norm[i]), 
-					DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&(in_norm[i])))
-				);
-			}
-		}
-		void operator()(std::size_t i)
-		{
-			DirectX::XMStoreFloat3
-			(
-				&(out_reflection[i]),
-				DirectX::XMVector3Reflect
-				(
-					DirectX::XMLoadFloat3(&(in_ray[i])),
-					DirectX::XMLoadFloat3(&(in_norm[i]))
-				)
-			);
-		}
-		void OnTestsOver()
-		{
-			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
-			std::cout << "REFLECT\n(\n\t";
-			Print(in_ray[i_]);
-			std::cout << "\n\t";
-			Print(in_norm[i_]);
-			std::cout << "\n" << "): ";
-			Print(out_reflection[i_]);
-			std::cout << "\n\n";
-		}
-		void Print(const DirectX::XMFLOAT3& vector_)
-		{
-			std::cout << "{ " << vector_.x << ", " << vector_.y << ", " << vector_.z << " }";
-		}
-
-		std::vector<DirectX::XMFLOAT3> in_ray;
-		std::vector<DirectX::XMFLOAT3> in_norm;
-		std::vector<DirectX::XMFLOAT3> out_reflection;
-	};
-
-	struct matrix_test_dxm
-	{
-		static constexpr bool DO_TEST = true;
-		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 500000;
-		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Matrix Mutate (DXM)";
-
-		static constexpr std::size_t num_columns = 4;
-		static constexpr std::size_t num_rows = 4;
-		static constexpr bool column_major = true;
-		using t_arg = float;
-		using out_type = DirectX::XMFLOAT4X4;
-		using in_a_type = out_type;
-		using in_b_type = float;
-
-		matrix_test_dxm()
-		{
-		}
-		void Prepare()
-		{
-			// RESIZES
-			out.resize(NUM_LOOPS);
-			in_a.resize(NUM_LOOPS);
-			in_b.resize(NUM_LOOPS);
+			lhs.reserve(NUM_LOOPS);
+			rhs.reserve(NUM_LOOPS);
 
 			// RESERVED FILLS
-			RngFunctor rng_(shared_fill_seed_);
-			rng_._rng.SetMinMax(0, 25);
+			EmuMath::RngWrapper<true> rng_(-100, 100, shared_fill_seed_);
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				make_dxm_mat(in_a[i], rng_);
-				make_dxm_mat_all_same(in_b[i], rng_);
+				lhs.emplace_back(make_random_vec<lhs_type, vec_t_arg, vec_size>(rng_));
+				rhs.emplace_back(make_random_vec<lhs_type, vec_t_arg, vec_size>(rng_).Normalise());
 			}
 		}
-		void operator()(std::size_t i)
+		void operator()(std::size_t i_)
 		{
-			out[i]._11 = in_a[i]._11 + in_b[i]._11;
-			out[i]._12 = in_a[i]._12 + in_b[i]._12;
-			out[i]._13 = in_a[i]._13 + in_b[i]._13;
-			out[i]._14 = in_a[i]._14 + in_b[i]._14;
-			
-			out[i]._21 = in_a[i]._21 + in_b[i]._21;
-			out[i]._22 = in_a[i]._22 + in_b[i]._22;
-			out[i]._23 = in_a[i]._23 + in_b[i]._23;
-			out[i]._24 = in_a[i]._24 + in_b[i]._24;
-			
-			out[i]._31 = in_a[i]._31 + in_b[i]._31;
-			out[i]._32 = in_a[i]._32 + in_b[i]._32;
-			out[i]._33 = in_a[i]._33 + in_b[i]._33;
-			out[i]._34 = in_a[i]._34 + in_b[i]._34;
-			
-			out[i]._41 = in_a[i]._41 + in_b[i]._41;
-			out[i]._42 = in_a[i]._42 + in_b[i]._42;
-			out[i]._43 = in_a[i]._43 + in_b[i]._43;
-			out[i]._44 = in_a[i]._44 + in_b[i]._44;
-
-			//DirectX::XMStoreFloat4
-			//(
-			//	reinterpret_cast<DirectX::XMFLOAT4*>(out[i].m[0]),
-			//	DirectX::XMVectorAdd
-			//	(
-			//		DirectX::XMLoadFloat4(reinterpret_cast<const DirectX::XMFLOAT4*>(in_a[i].m[0])),
-			//		DirectX::XMLoadFloat4(reinterpret_cast<const DirectX::XMFLOAT4*>(in_b[i].m[0]))
-			//	)
-			//);
-			//
-			//DirectX::XMStoreFloat4
-			//(
-			//	reinterpret_cast<DirectX::XMFLOAT4*>(out[i].m[1]),
-			//	DirectX::XMVectorAdd
-			//	(
-			//		DirectX::XMLoadFloat4(reinterpret_cast<const DirectX::XMFLOAT4*>(in_a[i].m[1])),
-			//		DirectX::XMLoadFloat4(reinterpret_cast<const DirectX::XMFLOAT4*>(in_b[i].m[1]))
-			//	)
-			//);
-			//
-			//DirectX::XMStoreFloat4
-			//(
-			//	reinterpret_cast<DirectX::XMFLOAT4*>(out[i].m[2]),
-			//	DirectX::XMVectorAdd
-			//	(
-			//		DirectX::XMLoadFloat4(reinterpret_cast<const DirectX::XMFLOAT4*>(in_a[i].m[2])),
-			//		DirectX::XMLoadFloat4(reinterpret_cast<const DirectX::XMFLOAT4*>(in_b[i].m[2]))
-			//	)
-			//);
-			//
-			//DirectX::XMStoreFloat4
-			//(
-			//	reinterpret_cast<DirectX::XMFLOAT4*>(out[i].m[3]),
-			//	DirectX::XMVectorAdd
-			//	(
-			//		DirectX::XMLoadFloat4(reinterpret_cast<const DirectX::XMFLOAT4*>(in_a[i].m[3])),
-			//		DirectX::XMLoadFloat4(reinterpret_cast<const DirectX::XMFLOAT4*>(in_b[i].m[3]))
-			//	)
-			//);
+			//out_vecs[i_] = lhs[i_].Mod(rhs[i_]);
+			//out_vecs[i_] = lhs[i_].Convert<3>().Dot(rhs[i_].Convert<3>());
+			//out_vecs[i_] = lhs[i_].Convert<3>().Dot(rhs[i_].Convert<3>()).Convert<4>();
+			out_vecs[i_] = lhs[i_].Reflect(rhs[i_]);
 		}
 		void OnTestsOver()
 		{
-			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
-			print_dxm_mat(in_a[i_]);
-			std::cout << "\n\n";
+			const std::size_t i_ = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
+			std::cout << "REFLECT(" << lhs[i_] << ", " << rhs[i_] << ") =\n" << out_vecs[i_] << "\n\n";
 		}
 
-		static inline void make_dxm_mat(DirectX::XMFLOAT4X4& out_, RngFunctor& rng_)
-		{
-			float _00 = rng_._rng.NextReal<float>();
-			float _01 = rng_._rng.NextReal<float>();
-			float _02 = rng_._rng.NextReal<float>();
-			float _03 = rng_._rng.NextReal<float>();
-			float _10 = rng_._rng.NextReal<float>();
-			float _11 = rng_._rng.NextReal<float>();
-			float _12 = rng_._rng.NextReal<float>();
-			float _13 = rng_._rng.NextReal<float>();
-			float _20 = rng_._rng.NextReal<float>();
-			float _21 = rng_._rng.NextReal<float>();
-			float _22 = rng_._rng.NextReal<float>();
-			float _23 = rng_._rng.NextReal<float>();
-			float _30 = rng_._rng.NextReal<float>();
-			float _31 = rng_._rng.NextReal<float>();
-			float _32 = rng_._rng.NextReal<float>();
-			float _33 = rng_._rng.NextReal<float>();
-			//float _00 = 1;
-			//float _01 = 2;
-			//float _02 = 3;
-			//float _03 = 4;
-			//float _10 = 5;
-			//float _11 = 6;
-			//float _12 = 7;
-			//float _13 = 8;
-			//float _20 = 9;
-			//float _21 = 10;
-			//float _22 = 11;
-			//float _23 = 12;
-			//float _30 = 13;
-			//float _31 = 14;
-			//float _32 = 15;
-			//float _33 = 16;
-			out_ = DirectX::XMFLOAT4X4(_00, _01, _02, _03, _10, _11, _12, _13, _20, _21, _22, _23, _30, _31, _32, _33);
-		}
-
-		static inline void make_dxm_mat_all_same(DirectX::XMFLOAT4X4& out_, RngFunctor& rng_)
-		{
-			const float val_ = rng_._rng.NextReal<float>();
-			out_ = DirectX::XMFLOAT4X4(val_, val_, val_, val_, val_, val_, val_, val_, val_, val_, val_, val_, val_, val_, val_, val_);
-		}
-
-		static inline void print_dxm_mat(const DirectX::XMFLOAT4X4& mat_)
-		{
-			for (std::size_t x = 0; x < 4; ++x)
-			{
-				std::cout << "{ " << mat_(x, 0);
-				for (std::size_t y = 1; y < 4; ++y)
-				{
-					std::cout << ", " << mat_(x, y);
-				}
-				std::cout << " }\n";
-			}
-
-			const float* data_ = reinterpret_cast<const float*>(&mat_);
-			std::cout << "{ ";
-			std::cout << *data_;
-			for (std::size_t i = 1; i < 16; ++i)
-			{
-				std::cout << ", " << *(data_ + i);
-			}
-			std::cout << " }\n\n";
-		}
-
-		std::vector<DirectX::XMFLOAT4X4> in_a;
-		std::vector<DirectX::XMFLOAT4X4> in_b;
-		std::vector<DirectX::XMFLOAT4X4> out;
+		std::vector<lhs_type> lhs;
+		std::vector<rhs_type> rhs;
+		std::vector<output_type> out_vecs;
 	};
 
-	struct matrix_test_void_template
+	struct DirectXSimdTest
 	{
 		static constexpr bool DO_TEST = true;
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr std::size_t NUM_LOOPS = 5000000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Matrix Mutate (Void Template Args)";
+		static constexpr std::string_view NAME = "DirectX SIMD";
 
-		static constexpr std::size_t num_columns = 4;
-		static constexpr std::size_t num_rows = 4;
-		static constexpr bool column_major = false; // Just to appear identically to dxm in terms of where our random args are
-		using t_arg = float;
-		using out_type = EmuMath::Matrix<num_columns, num_rows, t_arg, column_major>;
-		using in_a_type = out_type;
-		using in_a_type_column_major = EmuMath::Matrix<in_a_type::num_columns, in_a_type::num_rows, in_a_type::stored_type, true>;
-		using in_b_type = float;
+		static constexpr std::size_t vec_size = 4;
+		using vec_t_arg = float;
+		using fast_vector_type = DirectX::XMVECTOR;
+		using vector_type = DirectX::XMFLOAT4;
+		using lhs_type = fast_vector_type;
+		using rhs_type = fast_vector_type;
+		using output_type = fast_vector_type;
 
-		matrix_test_void_template()
+		DirectXSimdTest()
 		{
 		}
 		void Prepare()
 		{
-			// RESIZES
-			out.resize(NUM_LOOPS);
+			// FILLS
+			out_vecs.resize(NUM_LOOPS);
 
 			// RESERVES
-			in_a.reserve(NUM_LOOPS);
-			in_b.reserve(NUM_LOOPS);
+			lhs.reserve(NUM_LOOPS);
+			rhs.reserve(NUM_LOOPS);
 
 			// RESERVED FILLS
-			RngFunctor rng_(shared_fill_seed_);
-			rng_._rng.SetMinMax(0, 25);
+			EmuMath::RngWrapper<true> rng_(-100, 100, shared_fill_seed_);
 			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
 			{
-				//in_a.push_back(in_a_type(in_a_type_column_major(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)));
-				in_a.push_back(make_random_matrix<in_a_type>(rng_));
-				in_b.push_back(in_b_type(rng_._rng.NextReal<float>()));
+				lhs.emplace_back(make_vector(rng_));
+				rhs.emplace_back(DirectX::XMVector4Normalize(make_vector(rng_)));
 			}
 		}
-		void operator()(std::size_t i)
+		void operator()(std::size_t i_)
 		{
-			//EmuMath::Helpers::matrix_mutate_to(out[i], EmuCore::do_add<void>(), in_a[i], in_b[i]);
-			out[i] = in_a[i] + in_b[i];
+			//out_vecs[i_] = DirectX::XMVector3Dot(lhs[i_], rhs[i_]);
+			//out_vecs[i_] = DirectX::XMVector3Dot(lhs[i_], rhs[i_]);
+			out_vecs[i_] = DirectX::XMVector4Reflect(lhs[i_], rhs[i_]);
 		}
 		void OnTestsOver()
 		{
-			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
-			std::cout << in_a[i_] << "\n";
-			
-			const float* data_ = reinterpret_cast<const float*>(&in_a[i_]);
-			std::cout << "{ ";
-			std::cout << *data_;
-			for (std::size_t i = 1; i < 16; ++i)
-			{
-				std::cout << ", " << *(data_ + i);
-			}
-			std::cout << " }\n\n";
+			const std::size_t i_ = EmuMath::RngWrapper<true>(shared_select_seed_).NextInt<std::size_t>(0, NUM_LOOPS - 1);
+			std::cout << "REFLECT(";
+			print_vector(lhs[i_]) << ", ";
+			print_vector(rhs[i_]) << ")=\n";
+			print_vector(out_vecs[i_]) << "\n\n";
 		}
 
-		std::vector<in_a_type> in_a;
-		std::vector<in_b_type> in_b;
-		std::vector<out_type> out;
-	};
-
-	struct fma_test_manual
-	{
-		static constexpr bool DO_TEST = true;
-		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 500000;
-		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Matrix FMS (Manual Multiply -> Sub)";
-
-		static constexpr std::size_t num_columns = 4;
-		static constexpr std::size_t num_rows = 4;
-		static constexpr bool column_major = false; // Just to appear identically to dxm in terms of where our random args are
-		using t_arg = int;
-		using out_type = EmuMath::Matrix<num_columns, num_rows, t_arg, column_major>;
-		using in_a_type = out_type;
-		using in_a_type_column_major = EmuMath::Matrix<in_a_type::num_columns, in_a_type::num_rows, in_a_type::stored_type, true>;
-		using in_b_type = t_arg;
-
-		fma_test_manual()
+		template<bool Is64Bit_>
+		static fast_vector_type make_vector(EmuMath::RngWrapper<Is64Bit_>& rng_)
 		{
+			vector_type vec = make_random_vec<vector_type, vec_t_arg, vec_size>(rng_);
+			return DirectX::XMLoadFloat4(&vec);
 		}
-		void Prepare()
+
+		static std::ostream& print_vector(DirectX::XMVECTOR vec)
 		{
-			// RESIZES
-			out.resize(NUM_LOOPS);
-
-			// RESERVES
-			in_x.reserve(NUM_LOOPS);
-			in_y.reserve(NUM_LOOPS);
-
-			// RESERVED FILLS
-			RngFunctor rng_(shared_fill_seed_);
-			rng_._rng.SetMinMax(0, 25);
-			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
-			{
-				//in_a.push_back(in_a_type(in_a_type_column_major(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)));
-				in_x.push_back(make_random_matrix<in_a_type>(rng_));
-				in_y.push_back(in_b_type(rng_._rng.NextReal<float>()));
-				in_z.push_back(in_b_type(rng_._rng.NextReal<float>()));
-			}
+			vector_type floatx;
+			DirectX::XMStoreFloat4(&floatx, vec);
+			return print_floatx(floatx);
 		}
-		void operator()(std::size_t i)
+
+		static std::ostream& print_floatx(DirectX::XMFLOAT4 floatx)
 		{
-			in_x[i].MultiplyBasic(in_y[i]).Subtract(out[i], in_z[i]);
-		}
-		void OnTestsOver()
-		{
-			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
-			std::cout << out[i_] << "\n\n";
+			std::cout << "{ " << floatx.x << ", " << floatx.y << ", " << floatx.z << ", " << floatx.w << " }";
+			return std::cout;
 		}
 
-		std::vector<in_a_type> in_x;
-		std::vector<in_b_type> in_y;
-		std::vector<in_b_type> in_z;
-		std::vector<out_type> out;
-	};
-
-	struct fma_test_fused
-	{
-		static constexpr bool DO_TEST = true;
-		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 500000;
-		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Matrix FMS (Fused)";
-
-		static constexpr std::size_t num_columns = fma_test_manual::num_columns;
-		static constexpr std::size_t num_rows = fma_test_manual::num_rows;
-		static constexpr bool column_major = false; // Just to appear identically to dxm in terms of where our random args are
-		using t_arg = int;
-		using out_type = EmuMath::Matrix<num_columns, num_rows, t_arg, column_major>;
-		using in_a_type = out_type;
-		using in_a_type_column_major = EmuMath::Matrix<in_a_type::num_columns, in_a_type::num_rows, in_a_type::stored_type, true>;
-		using in_b_type = t_arg;
-
-		fma_test_fused()
-		{
-		}
-		void Prepare()
-		{
-			// RESIZES
-			out.resize(NUM_LOOPS);
-
-			// RESERVES
-			in_x.reserve(NUM_LOOPS);
-			in_y.reserve(NUM_LOOPS);
-
-			// RESERVED FILLS
-			RngFunctor rng_(shared_fill_seed_);
-			rng_._rng.SetMinMax(0, 25);
-			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
-			{
-				//in_a.push_back(in_a_type(in_a_type_column_major(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)));
-				in_x.push_back(make_random_matrix<in_a_type>(rng_));
-				in_y.push_back(in_b_type(rng_._rng.NextReal<float>()));
-				in_z.push_back(in_b_type(rng_._rng.NextReal<float>()));
-			}
-		}
-		void operator()(std::size_t i)
-		{
-			in_x[i].Fmsub(out[i], in_y[i], in_z[i]);
-		}
-		void OnTestsOver()
-		{
-			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
-			std::cout << out[i_] << "\n\n";
-		}
-
-		std::vector<in_a_type> in_x;
-		std::vector<in_b_type> in_y;
-		std::vector<in_b_type> in_z;
-		std::vector<out_type> out;
-	};
-
-	struct square_assign_test_manual
-	{
-		static constexpr bool DO_TEST = true;
-		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 500000;
-		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Matrix Square (Manual Mult -> Assign)";
-
-		static constexpr std::size_t num_columns = 8;
-		static constexpr std::size_t num_rows = 8;
-		static constexpr bool column_major = false; // Just to appear identically to dxm in terms of where our random args are
-		using t_arg = int;
-		using out_type = EmuMath::Matrix<num_columns, num_rows, t_arg, column_major>;
-		using in_a_type = out_type;
-		using in_a_type_column_major = EmuMath::Matrix<in_a_type::num_columns, in_a_type::num_rows, in_a_type::stored_type, true>;
-		using in_b_type = t_arg;
-
-		square_assign_test_manual()
-		{
-		}
-		void Prepare()
-		{
-			// RESERVES
-			out.reserve(NUM_LOOPS);
-
-			// RESERVED FILLS
-			RngFunctor rng_(shared_fill_seed_);
-			rng_._rng.SetMinMax(0, 25);
-			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
-			{
-				//in_a.push_back(in_a_type(in_a_type_column_major(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)));
-				out.push_back(make_random_matrix<in_a_type>(rng_));
-			}
-		}
-		void operator()(std::size_t i)
-		{
-			out[i] = out[i] * out[i];
-		}
-		void OnTestsOver()
-		{
-			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
-			std::cout << out[i_] << "\n\n";
-		}
-
-		std::vector<out_type> out;
-	};
-
-	struct square_assign_test_auto
-	{
-		static constexpr bool DO_TEST = true;
-		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 500000;
-		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
-		static constexpr std::string_view NAME = "Matrix Square (Auto SquareAssign Func)";
-
-		static constexpr std::size_t num_columns = square_assign_test_manual::num_columns;
-		static constexpr std::size_t num_rows = square_assign_test_manual::num_rows;
-		static constexpr bool column_major = false; // Just to appear identically to dxm in terms of where our random args are
-		using t_arg = int;
-		using out_type = EmuMath::Matrix<num_columns, num_rows, t_arg, column_major>;
-		using in_a_type = out_type;
-		using in_a_type_column_major = EmuMath::Matrix<in_a_type::num_columns, in_a_type::num_rows, in_a_type::stored_type, true>;
-		using in_b_type = t_arg;
-
-		square_assign_test_auto()
-		{
-		}
-		void Prepare()
-		{
-			// RESERVES
-			out.reserve(NUM_LOOPS);
-
-			// RESERVED FILLS
-			RngFunctor rng_(shared_fill_seed_);
-			rng_._rng.SetMinMax(0, 25);
-			for (std::size_t i = 0; i < NUM_LOOPS; ++i)
-			{
-				//in_a.push_back(in_a_type(in_a_type_column_major(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)));
-				out.push_back(make_random_matrix<in_a_type>(rng_));
-			}
-		}
-		void operator()(std::size_t i)
-		{
-			out[i].SquareAssign();
-		}
-		void OnTestsOver()
-		{
-			const std::size_t i_ = RngFunctor(shared_select_seed_)._rng.NextInt<std::size_t>() % NUM_LOOPS;
-			std::cout << out[i_] << "\n\n";
-		}
-
-		std::vector<out_type> out;
+		std::vector<lhs_type> lhs;
+		std::vector<rhs_type> rhs;
+		std::vector<output_type> out_vecs;
 	};
 
 	// ----------- TESTS SELECTION -----------
 	using AllTests = std::tuple
 	<
-		square_assign_test_manual,
-		square_assign_test_auto
+		EmuFastVectorTest,
+		DirectXSimdTest
 	>;
 
 	// ----------- TESTS BEGIN -----------
@@ -712,7 +242,8 @@ namespace EmuCore::TestingHelpers
 	{
 		if constexpr (Index_ < std::tuple_size_v<AllTests>)
 		{
-			auto& test_ = std::get<Index_>(tests);
+			using std::get;
+			auto& test_ = get<Index_>(tests);
 			if (test_.DO_TEST)
 			{
 				test_.Prepare();
@@ -734,8 +265,9 @@ namespace EmuCore::TestingHelpers
 			using Test_ = std::tuple_element_t<Index_, AllTests>;
 			if constexpr (Test_::DO_TEST)
 			{
+				using std::get;
 				std::cout << "Test " << Index_ << " (" << Test_::NAME << ")\n";
-				std::get<Index_>(tests).OnTestsOver();
+				get<Index_>(tests).OnTestsOver();
 				std::cout << std::endl;
 			}
 			OnAllTestsOver<Index_ + 1>(tests);
@@ -752,8 +284,9 @@ namespace EmuCore::TestingHelpers
 
 		if constexpr (!Finished)
 		{
+			using std::get;
 			using Test = std::tuple_element_t<TestIndex, Tuple>;
-			Test& test = std::get<TestIndex>(tests);
+			Test& test = get<TestIndex>(tests);
 			LoopingTestHarness<Test> harness;
 			std::cout << "!!!Test " << TestIndex << " (" << Test::NAME << ") Results!!!\n";
 			if (test.DO_TEST)

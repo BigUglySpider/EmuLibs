@@ -122,33 +122,25 @@ namespace EmuMath::Helpers::_vector_underlying
 		using vector_type = EmuMath::Vector<Size_, T_>;
 		using value_type = typename vector_type::value_type;
 
-		if (index_ < vector_type::size)
+		if constexpr (EmuCore::TMP::valid_assign_direct_or_cast<Out_, value_type&, Out_&>())
 		{
-			if constexpr (std::is_assignable_v<Out_, value_type&>)
+			if (index_ < vector_type::size)
 			{
-				out_ = vector_[index_];
-			}
-			else if constexpr (std::is_constructible_v<Out_, value_type&>)
-			{
-				out_ = Out_(vector_[index_]);
-			}
-			else if constexpr (EmuCore::TMP::is_static_castable_v<Out_, value_type&>)
-			{
-				out_ = static_cast<Out_>(vector_[index_]);
+				EmuCore::TMP::assign_direct_or_cast<Out_>(out_, vector_[index_]);
+				return true;
 			}
 			else
 			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<T_>(),
-					"Attempted to retrieve an element within an EmuMath Vector via try_get (non-const), but the provided out_ type cannot be assigned, constructed, or converted-to from a non-const reference to the Vector's value_type."
-				);
+				return false;
 			}
-			return true;
 		}
 		else
 		{
-			return false;
+			static_assert
+			(
+				EmuCore::TMP::get_false<T_>(),
+				"Attempted to retrieve an element within an EmuMath Vector via try_get (non-const), but the provided out_ type cannot be assigned to from a value in the Vector either directly or as a cast."
+			);
 		}
 	}
 
@@ -159,33 +151,25 @@ namespace EmuMath::Helpers::_vector_underlying
 		using vector_type = EmuMath::Vector<Size_, T_>;
 		using value_type = typename vector_type::value_type;
 
-		if (index_ < vector_type::size)
+		if constexpr (EmuCore::TMP::valid_assign_direct_or_cast<Out_, const value_type&, Out_&>())
 		{
-			if constexpr (std::is_assignable_v<Out_, const value_type&>)
+			if (index_ < vector_type::size)
 			{
-				out_ = vector_[index_];
-			}
-			else if constexpr (std::is_constructible_v<Out_, const value_type&>)
-			{
-				out_ = Out_(vector_[index_]);
-			}
-			else if constexpr (EmuCore::TMP::is_static_castable_v<Out_, const value_type&>)
-			{
-				out_ = static_cast<Out_>(vector_[index_]);
+				EmuCore::TMP::assign_direct_or_cast<Out_>(out_, vector_[index_]);
+				return true;
 			}
 			else
 			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<T_>(),
-					"Attempted to retrieve an element within an EmuMath Vector via try_get (const), but the provided out_ type cannot be assigned, constructed, or converted-to from a constant reference to the Vector's value_type."
-				);
+				return false;
 			}
-			return true;
 		}
 		else
 		{
-			return false;
+			static_assert
+			(
+				EmuCore::TMP::get_false<T_>(),
+				"Attempted to retrieve an element within a const-qualified EmuMath Vector via try_get (non-const), but the provided out_ type cannot be assigned to from a value in the Vector either directly or as a cast."
+			);
 		}
 	}
 
@@ -197,6 +181,31 @@ namespace EmuMath::Helpers::_vector_underlying
 		typename EmuMath::Vector<Size_, T_>::value_type** pp_out_
 	)
 	{
+
+		if (index_ < EmuMath::Vector<Size_, T_>::size)
+		{
+			(*pp_out_) = &(vector_[index_]);
+			return true;
+		}
+		else
+		{
+			if constexpr (NullptrIfFailed_)
+			{
+				(*pp_out_) = nullptr;
+			}
+			return false;
+		}
+	}
+
+	template<bool NullptrIfFailed_, std::size_t Size_, typename T_>
+	[[nodiscard]] constexpr inline bool _vector_try_get
+	(
+		EmuMath::Vector<Size_, T_>& vector_,
+		std::size_t index_,
+		const typename EmuMath::Vector<Size_, T_>::value_type** pp_out_
+	)
+	{
+
 		if (index_ < EmuMath::Vector<Size_, T_>::size)
 		{
 			(*pp_out_) = &(vector_[index_]);

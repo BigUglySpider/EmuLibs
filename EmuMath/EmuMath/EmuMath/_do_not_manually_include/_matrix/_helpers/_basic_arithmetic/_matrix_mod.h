@@ -374,7 +374,7 @@ namespace EmuMath::Helpers
 	/// </para>
 	/// <para> This is a basic, non-standard Matrix modulo-division. As a standard modulo-division is mathemtically undefined, there is no alternative. </para>
 	/// <para> Indices within the provided range will contain results of respective modulo-division operations. </para>
-	/// <para> Indices outside of the provided range will be default-constructed. </para>
+	/// <para> Indices outside of the provided range will be defaulted. </para>
 	/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be modulo-divided. </para>
 	/// <para> If Rhs_ is none of the above: All index modulo-divisions will use the rhs_ directly. </para>
 	/// </summary>

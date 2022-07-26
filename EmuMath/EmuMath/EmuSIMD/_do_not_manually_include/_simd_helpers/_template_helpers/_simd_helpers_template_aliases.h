@@ -1,8 +1,7 @@
 #ifndef EMU_SIMD_HELPERS_ALIASES_H_INC_
 #define EMU_SIMD_HELPERS_ALIASES_H_INC_ 1
 
-#include "_underlying_template_helpers/_common_underlying_simd_template_helper_includes.h"
-#include "_underlying_template_helpers/_simd_helpers_underlying_tmp.h"
+#include "_underlying_template_helpers/_all_underlying_templates.h"
 #include "../../../../EmuCore/TMPHelpers/Values.h"
 
 namespace EmuSIMD::TMP
@@ -32,15 +31,15 @@ namespace EmuSIMD::TMP
 		using type = std::conditional_t
 		<
 			Width_ == 128,
-			__m128i,
+			EmuSIMD::i128_generic,
 			std::conditional_t
 			<
 				Width_ == 256,
-				__m256i,
+				EmuSIMD::i256_generic,
 				std::conditional_t
 				<
 					Width_ == 512,
-					__m512i,
+					EmuSIMD::i512_generic,
 					void
 				>
 			>
@@ -48,6 +47,30 @@ namespace EmuSIMD::TMP
 	};
 	template<std::size_t Width_ = 128>
 	using integer_register_type_t = typename integer_register_type<Width_>::type;
+
+	template<std::size_t Width_ = 128>
+	struct integer_register_arg_type
+	{
+		static_assert(_assert_valid_simd_register_width<Width_>(), "Provided invalid width for integer_register_arg_type finder.");
+		using type = std::conditional_t
+		<
+			Width_ == 128,
+			EmuSIMD::i128_generic_arg,
+			std::conditional_t
+			<
+				Width_ == 256,
+				EmuSIMD::i256_generic_arg,
+				std::conditional_t
+				<
+					Width_ == 512,
+					EmuSIMD::i512_generic_arg,
+					void
+				>
+			>
+		>;
+	};
+	template<std::size_t Width_ = 128>
+	using integer_register_arg_type_t = typename integer_register_arg_type<Width_>::type;
 
 	template<typename T_, std::size_t Width_ = 128>
 	struct register_type
@@ -57,7 +80,19 @@ namespace EmuSIMD::TMP
 		<
 			std::is_integral_v<T_>,
 			integer_register_type<Width_>,
-			std::void_t<void>
+			EmuCore::TMP::dummy_type_wrapper<void>
+		>::type;
+	};
+
+	template<typename T_, std::size_t Width_ = 128>
+	struct register_arg_type
+	{
+		static_assert(_assert_valid_simd_register_width<Width_>(), "Provided invalid width for register_arg_type finder.");
+		using type = typename std::conditional_t
+		<
+			std::is_integral_v<T_>,
+			integer_register_arg_type<Width_>,
+			EmuCore::TMP::dummy_type_wrapper<void>
 		>::type;
 	};
 
@@ -65,13 +100,25 @@ namespace EmuSIMD::TMP
 	template<>
 	struct register_type<float, 128>
 	{
-		using type = __m128;
+		using type = EmuSIMD::f32x4;
 	};
 
 	template<>
 	struct register_type<double, 128>
 	{
-		using type = __m128d;
+		using type = EmuSIMD::f64x2;
+	};
+
+	template<>
+	struct register_arg_type<float, 128>
+	{
+		using type = EmuSIMD::f32x4_arg;
+	};
+
+	template<>
+	struct register_arg_type<double, 128>
+	{
+		using type = EmuSIMD::f64x2_arg;
 	};
 #pragma endregion
 
@@ -79,13 +126,25 @@ namespace EmuSIMD::TMP
 	template<>
 	struct register_type<float, 256>
 	{
-		using type = __m256;
+		using type = EmuSIMD::f32x8;
 	};
 
 	template<>
 	struct register_type<double, 256>
 	{
-		using type = __m256d;
+		using type = EmuSIMD::f64x4;
+	};
+
+	template<>
+	struct register_arg_type<float, 256>
+	{
+		using type = EmuSIMD::f32x8_arg;
+	};
+
+	template<>
+	struct register_arg_type<double, 256>
+	{
+		using type = EmuSIMD::f64x4_arg;
 	};
 #pragma endregion
 
@@ -93,18 +152,33 @@ namespace EmuSIMD::TMP
 	template<>
 	struct register_type<float, 512>
 	{
-		using type = __m512;
+		using type = EmuSIMD::f32x16;
 	};
 
 	template<>
 	struct register_type<double, 512>
 	{
-		using type = __m512d;
+		using type = EmuSIMD::f64x8;
+	};
+
+	template<>
+	struct register_arg_type<float, 512>
+	{
+		using type = EmuSIMD::f32x16_arg;
+	};
+
+	template<>
+	struct register_arg_type<double, 512>
+	{
+		using type = EmuSIMD::f64x8_arg;
 	};
 #pragma endregion
 
 	template<class T_, std::size_t Width_ = 128>
 	using register_type_t = typename register_type<T_, Width_>::type;
+
+	template<class T_, std::size_t Width_ = 128>
+	using register_arg_type_t = typename register_arg_type<T_, Width_>::type;
 }
 
 #endif

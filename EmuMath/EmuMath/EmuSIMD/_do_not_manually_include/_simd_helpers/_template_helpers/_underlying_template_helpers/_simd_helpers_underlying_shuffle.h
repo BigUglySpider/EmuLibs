@@ -14,33 +14,33 @@ namespace EmuSIMD::_underlying_simd_helpers
 		{
 			using register_type_uq = typename EmuCore::TMP::remove_ref_cv<Register_>::type;
 			using shuffle_mask_inst = EmuSIMD::_underlying_simd_helpers::_shuffle_mask<register_type_uq, Indices_...>;
-			if constexpr (EmuSIMD::_underlying_simd_helpers::is_valid_shuffle_mask_instance<shuffle_mask_inst>::value)
+			if constexpr (true)
 			{
-				if constexpr (std::is_same_v<register_type_uq, __m128>)
+				if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x4>)
 				{
 					return _mm_shuffle_ps(a_, b_, shuffle_mask_inst::get());
 				}
-				else if constexpr (std::is_same_v<register_type_uq, __m256>)
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x8>)
 				{
 					return _mm256_shuffle_ps(a_, b_, shuffle_mask_inst::get());
 				}
-				else if constexpr (std::is_same_v<register_type_uq, __m512>)
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f32x16>)
 				{
 					return _mm512_shuffle_ps(a_, b_, shuffle_mask_inst::get());
 				}
-				else if constexpr (std::is_same_v<register_type_uq, __m128d>)
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x2>)
 				{
 					return _mm_shuffle_pd(a_, b_, shuffle_mask_inst::get());
 				}
-				else if constexpr (std::is_same_v<register_type_uq, __m256d>)
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x4>)
 				{
 					return _mm256_shuffle_pd(a_, b_, shuffle_mask_inst::get());
 				}
-				else if constexpr (std::is_same_v<register_type_uq, __m512d>)
+				else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::f64x8>)
 				{
 					return _mm512_shuffle_pd(a_, b_, shuffle_mask_inst::get());
 				}
-				else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, __m128i, __m256i, __m512i>::value)
+				else if constexpr (EmuCore::TMP::is_any_comparison_true<std::is_same, register_type_uq, EmuSIMD::i128_generic, EmuSIMD::i256_generic, EmuSIMD::i512_generic>::value)
 				{
 					static_assert(EmuCore::TMP::get_false<Register_>(), "Attempted to shuffle 2 integral SIMD registers using EmuSIMD helpers, but only one integral register may be shuffled.");
 				}
@@ -76,7 +76,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 				{
 					constexpr std::size_t num_indices_ = sizeof...(Indices_);
 					constexpr bool is_8bit_shuffle_ = num_indices_ > 4;
-					if constexpr (std::is_same_v<register_type_uq, __m128i>)
+					if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i128_generic>)
 					{
 						if constexpr (is_8bit_shuffle_)
 						{
@@ -87,7 +87,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 							return _mm_shuffle_epi32(ab_, shuffle_mask_inst::get());
 						}
 					}
-					else if constexpr (std::is_same_v<register_type_uq, __m256i>)
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i256_generic>)
 					{
 						if constexpr (is_8bit_shuffle_)
 						{
@@ -98,7 +98,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 							return _mm256_shuffle_epi32(ab_, shuffle_mask_inst::get());
 						}
 					}
-					else if constexpr (std::is_same_v<register_type_uq, __m512i>)
+					else if constexpr (std::is_same_v<register_type_uq, EmuSIMD::i512_generic>)
 					{
 						if constexpr (is_8bit_shuffle_)
 						{
@@ -128,41 +128,41 @@ namespace EmuSIMD::_underlying_simd_helpers
 
 #pragma region M128_SPECIALISATIONS
 	template<>
-	[[nodiscard]] inline __m128 _execute_shuffle<0, 0, 2, 2>(__m128 ab_)
+	[[nodiscard]] inline EmuSIMD::f32x4 _execute_shuffle<0, 0, 2, 2>(EmuSIMD::f32x4 ab_)
 	{
 		return _mm_moveldup_ps(ab_);
 	}
 
 	template<>
-	[[nodiscard]] inline __m128 _execute_shuffle<1, 1, 3, 3>(__m128 ab_)
+	[[nodiscard]] inline EmuSIMD::f32x4 _execute_shuffle<1, 1, 3, 3>(EmuSIMD::f32x4 ab_)
 	{
 		return _mm_movehdup_ps(ab_);
 	}
 
 	template<>
-	[[nodiscard]] inline __m128 _execute_shuffle<0, 1, 0, 1>(__m128 ab_)
+	[[nodiscard]] inline EmuSIMD::f32x4 _execute_shuffle<0, 1, 0, 1>(EmuSIMD::f32x4 ab_)
 	{
 		return _mm_movelh_ps(ab_, ab_);
 	}
 	template<>
-	[[nodiscard]] inline __m128 _execute_shuffle<0, 1, 0, 1>(__m128 a_, __m128 b_)
+	[[nodiscard]] inline EmuSIMD::f32x4 _execute_shuffle<0, 1, 0, 1>(EmuSIMD::f32x4 a_, EmuSIMD::f32x4 b_)
 	{
 		return _mm_movelh_ps(a_, b_);
 	}
 
 	template<>
-	[[nodiscard]] inline __m128 _execute_shuffle<2, 3, 2, 3>(__m128 ab_)
+	[[nodiscard]] inline EmuSIMD::f32x4 _execute_shuffle<2, 3, 2, 3>(EmuSIMD::f32x4 ab_)
 	{
 		return _mm_movehl_ps(ab_, ab_);
 	}
 	template<>
-	[[nodiscard]] inline __m128 _execute_shuffle<2, 3, 2, 3>(__m128 a_, __m128 b_)
+	[[nodiscard]] inline EmuSIMD::f32x4 _execute_shuffle<2, 3, 2, 3>(EmuSIMD::f32x4 a_, EmuSIMD::f32x4 b_)
 	{
 		return _mm_movehl_ps(b_, a_);
 	}
 
 	template<>
-	[[nodiscard]] inline __m128 _execute_shuffle<0, 1, 2, 3>(__m128 ab_)
+	[[nodiscard]] inline EmuSIMD::f32x4 _execute_shuffle<0, 1, 2, 3>(EmuSIMD::f32x4 ab_)
 	{
 		return ab_;
 	}
@@ -170,33 +170,27 @@ namespace EmuSIMD::_underlying_simd_helpers
 
 #pragma region M128D_SPECIALISATIONS
 	template<>
-	[[nodiscard]] inline __m128d _execute_shuffle<0, 0>(__m128d ab_)
+	[[nodiscard]] inline EmuSIMD::f64x2 _execute_shuffle<0, 0>(EmuSIMD::f64x2 ab_)
 	{
 		return _mm_movedup_pd(ab_);
 	}
 
 	template<>
-	[[nodiscard]] inline __m128d _execute_shuffle<0, 1>(__m128d ab_)
+	[[nodiscard]] inline EmuSIMD::f64x2 _execute_shuffle<0, 1>(EmuSIMD::f64x2 ab_)
 	{
 		return ab_;
-	}
-
-	template<>
-	[[nodiscard]] inline __m128d _execute_shuffle<1, 0>(__m128d a_, __m128d b_)
-	{
-		return _mm_move_sd(a_, b_);
 	}
 #pragma endregion
 
 #pragma region M128I_SPECIALISATIONS
 	template<>
-	[[nodiscard]] inline __m128i _execute_shuffle<0, 1, 2, 3>(__m128i ab_)
+	[[nodiscard]] inline EmuSIMD::i128_generic _execute_shuffle<0, 1, 2, 3>(EmuSIMD::i128_generic ab_)
 	{
 		return ab_;
 	}
 
 	template<>
-	[[nodiscard]] inline __m128i _execute_shuffle<0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15>(__m128i ab_)
+	[[nodiscard]] inline EmuSIMD::i128_generic _execute_shuffle<0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15>(EmuSIMD::i128_generic ab_)
 	{
 		return ab_;
 	}

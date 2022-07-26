@@ -400,7 +400,7 @@ namespace EmuCore::TMP
 	{
 	};
 	template<class T_>
-	struct has_static_get<T_, std::void_t<decltype(T_::get)>> : std::true_type
+	struct has_static_get<T_, std::void_t<decltype(EmuCore::TMP::remove_ref_cv_t<T_>::get())>> : std::true_type
 	{
 	};
 

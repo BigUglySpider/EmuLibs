@@ -6,6 +6,10 @@
 #include <tuple>
 #include <utility>
 
+// MISC MATH TO DO:
+// --- CLAMPS
+// --- That's literally it, I missed just one bloody thing
+
 namespace EmuMath
 {
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
@@ -13,36 +17,58 @@ namespace EmuMath
 	{
 #pragma region TMP_INFO
 	public:
+		template<std::size_t, std::size_t, typename, bool> friend struct Matrix;
+
+		/// <summary> The type of Matrix that this is an instance of. Primarily for clearer typing in the implementation, and of little use. </summary>
 		using this_type = Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>;
+		/// <summary> Type providing info regarding this Matrix, which may have been specialised to some degree to encourage new behaviours in the default implementation. </summary>
 		using matrix_info = EmuMath::TMP::common_matrix_info<NumColumns_, NumRows_, T_, ColumnMajor_>;
+		/// <summary> The number of columns containined within this Matrix type. </summary>
 		static constexpr std::size_t num_columns = matrix_info::num_columns;
+		/// <summary> The number of rows containined within this Matrix type. </summary>
 		static constexpr std::size_t num_rows = matrix_info::num_rows;
+		/// <summary> The total number of elements contained within this Matrix type. </summary>
 		static constexpr std::size_t size = matrix_info::size;
+		/// <summary> The total number of major elements contained within this Matrix type. Equal to num_columns if column-major, otherwise equal to num_rows. </summary>
 		static constexpr std::size_t num_major_elements = matrix_info::num_major_elements;
+		/// <summary> The total number of non-major elements contained within this Matrix type. Equal to num_rows if column-major, otherwise equal to num_columns. </summary>
 		static constexpr std::size_t num_non_major_elements = matrix_info::num_non_major_elements;
+		/// <summary> The number of columns or rows that this Matrix contains, whichever of the two is lower. </summary>
+		static constexpr std::size_t smallest_direction_size = matrix_info::smallest_direction_size;
+		/// <summary> The number of columns or rows that this Matrix contains, whichever of the two is higher. </summary>
+		static constexpr std::size_t greatest_direction_size = matrix_info::greatest_direction_size;
+		/// <summary> If true, this Matrix type is contiguously stored in column order - that is, a full column appears in memory before moving to the immediate next column. </summary>
 		static constexpr bool is_column_major = matrix_info::is_column_major;
+		/// <summary> If true, this Matrix type is contiguously stored in row order - that is, a full row appears in memory before moving to the immediate next row. </summary>
 		static constexpr bool is_row_major = matrix_info::is_row_major;
+		/// <summary> True if this Matrix type contains any form of reference, regardless of qualification. </summary>
 		static constexpr bool contains_ref = matrix_info::contains_ref;
+		/// <summary> True if this Matrix type contains const-qualified (aka readonly) references. </summary>
 		static constexpr bool contains_const_ref = matrix_info::contains_const_ref;
+		/// <summary> True if this Matrix type contains non-const-qualified (aka writable) references. </summary>
 		static constexpr bool contains_non_const_ref = matrix_info::contains_non_const_ref;
-		static constexpr bool is_contiguous = matrix_info::is_contiguous;
+		/// <summary> True if this is a square Matrix type, meaning that it contains an equal number of columns and rows. </summary>
 		static constexpr bool is_square = num_columns == num_rows;
 
-		/// <summary> Representation of this Matrix type as an EmuMath Vector. </summary>
+		/// <summary> Representation of this Matrix type flattened as an EmuMath Vector. </summary>
 		using matrix_vector_type = typename matrix_info::matrix_vector_type;
+		/// <summary> The underlying type stored within this Matrix type. </summary>
 		using stored_type = typename matrix_info::stored_type;
+		/// <summary> The qualified type used when interacting with this Matrix type's common interface. </summary>
 		using value_type = typename matrix_info::value_type;
+		/// <summary> The unqualified form of the type used when interacting with this Matrix type's common interface. </summary>
 		using value_type_uq = typename matrix_info::value_type_uq;
+		/// <summary> The floating-point type preferred for use with this Matrix type in operations which benefit/require floating-points. </summary>
 		using preferred_floating_point = typename matrix_info::preferred_floating_point;
 
-		using column_get_ref_type = typename matrix_info::column_get_ref_type;
-		using column_get_const_ref_type = typename matrix_info::column_get_const_ref_type;
-		using row_get_ref_type = typename matrix_info::row_get_ref_type;
-		using row_get_const_ref_type = typename matrix_info::row_get_const_ref_type;
-		using major_get_ref_type = typename matrix_info::major_get_ref_type;
-		using major_get_const_ref_type = typename matrix_info::major_get_const_ref_type;
-		using non_major_get_ref_type = typename matrix_info::non_major_get_ref_type;
-		using non_major_get_const_ref_type = typename matrix_info::non_major_get_const_ref_type;
+		/// <summary> STL-compliant random-access iterator for accessing this Matrix type in a flattened, contiguous approach. </summary>
+		using iterator = typename matrix_vector_type::iterator;
+		/// <summary> STL-compliant random-access constant iterator for accessing this Matrix type in a flattened, contiguous approach. </summary>
+		using const_iterator = typename matrix_vector_type::const_iterator;
+		/// <summary> STL-compliant random-access reverse iterator for accessing this Matrix type in a flattened, contiguous approach. </summary>
+		using reverse_iterator = typename matrix_vector_type::reverse_iterator;
+		/// <summary> STL-compliant random-access constant reverse iterator for accessing this Matrix type in a flattened, contiguous approach. </summary>
+		using const_reverse_iterator = typename matrix_vector_type::const_reverse_iterator;
 #pragma endregion
 
 #pragma region HELPER_STATIC_FUNCS
@@ -80,153 +106,316 @@ namespace EmuMath
 		}
 
 		/// <summary>
-		/// <para> Unflattens the provided index into a column index and a row index for this Matrix type. </para>
-		/// <para> Output contained type may be modified, but is recommended to stick to std::size_t. </para>
+		/// <para> Calculates the index for the provided index in this Matrix type to be used when accessing it as a flattened, contiguous array. </para>
 		/// </summary>
-		/// <param name="flattened_index_">
-		///		Flattened index to unflatten. This will always be read in column-major order
-		///		(i.e. index x+1 is the next item in a column immediately after x, or the next column if x is the end of a column).
-		/// </param>
-		/// <returns>Pair of std::size_t, containing the unflattened column index in first, and the unflattened row index in second.</returns>
-		[[nodiscard]] static constexpr inline std::pair<std::size_t, std::size_t> unflatten_index(std::size_t flattened_index_)
+		/// <returns> Flattened index of the provided column/row index within this Matrix type. </returns>
+		[[nodiscard]] static constexpr inline std::size_t get_flattened_index(std::size_t column_index_, std::size_t row_index_)
 		{
-			if constexpr(size != 0)
+			if constexpr (is_column_major)
 			{
-				return std::pair<std::size_t, std::size_t>
-				(
-					flattened_index_ / num_rows,
-					flattened_index_ % num_rows
-				);
+				return (column_index_ * num_rows) + row_index_;
 			}
 			else
 			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<T_>(),
-					"Attempted to unflatten an index for an EmuMath Matrix, but the size of the Matrix is 0, meaning a conversion cannot be made due to integral divide-by-0."
-				);
+				return (row_index_ * num_columns) + column_index_;
 			}
+		}
+
+		/// <summary>
+		/// <para> Calculates the index for the provided index in this Matrix type to be used when accessing it as a flattened, contiguous array. </para>
+		/// </summary>
+		/// <param name="column_row_index_pair_">Pair containing the column index in its first element (0), and the row index in its second element (1).</param>
+		/// <returns> Flattened index of the provided column/row index within this Matrix type. </returns>
+		[[nodiscard]] static constexpr inline std::size_t get_flattened_index(const std::pair<std::size_t, std::size_t>& column_row_index_pair_)
+		{
+			using std::get;
+			return get_flattened_index(get<0>(column_row_index_pair_), get<1>(column_row_index_pair_));
+		}
+
+		/// <summary>
+		/// <para> Unflattens the provided flattened index and calculates the index of the column it matches to. </para>
+		/// </summary>
+		/// <param name="flattened_index_">Index when accessing this Matrix type as a flattened, contiguous array.</param>
+		/// <returns> The index of the column that the provided `flattened_index_` would equate to. </returns>
+		[[nodiscard]] static constexpr inline std::size_t get_unflattened_column_index(std::size_t flattened_index_)
+		{
+			if constexpr (is_column_major)
+			{
+				return flattened_index_ / num_rows;
+			}
+			else
+			{
+				return flattened_index_ % num_rows;
+			}
+		}
+
+		/// <summary>
+		/// <para> Unflattens the provided flattened index and calculates the index of the row it matches to. </para>
+		/// </summary>
+		/// <param name="flattened_index_">Index when accessing this Matrix type as a flattened, contiguous array.</param>
+		/// <returns> The index of the row that the provided `flattened_index_` would equate to. </returns>
+		[[nodiscard]] static constexpr inline std::size_t get_unflattened_row_index(std::size_t flattened_index_)
+		{
+			if constexpr (is_column_major)
+			{
+				return flattened_index_ % num_columns;
+			}
+			else
+			{
+				return flattened_index_ / num_columns;
+			}
+		}
+
+		/// <summary>
+		/// <para> Unflattens the provided flattened index and calculates the index of the column and row indices it matches to. </para>
+		/// </summary>
+		/// <param name="flattened_index_">Index when accessing this Matrix type as a flattened, contiguous array.</param>
+		/// <returns>
+		///		A pair containing unflattened indices of the provided `flattened_index_`, 
+		///		with the column index in the first element (0), and the row index in the second element (1).
+		/// </returns>
+		[[nodiscard]] static constexpr inline std::pair<std::size_t, std::size_t> get_unflattened_index(std::size_t flattened_index_)
+		{
+			return std::pair<std::size_t, std::size_t>(get_unflattened_column_index(flattened_index_), get_unflattened_row_index(flattened_index_));
 		}
 #pragma endregion
 
 #pragma region CONSTRUCTION_CHECKS
+	private:		
+		template<class VectorTuple_, std::size_t ColumnIndex_, std::size_t RowIndex_>
+		struct _variadic_construction_from_major_vector_arg_at_index
+		{
+		private:
+			static constexpr std::size_t _non_major_index = get_non_major_index(ColumnIndex_, RowIndex_);
+			using _vector_tuple_no_ref = std::remove_reference_t<VectorTuple_>;
+			using _vector_type_raw = std::tuple_element_t<get_major_index(ColumnIndex_, RowIndex_), _vector_tuple_no_ref>;
+			using _vector_type_lval = decltype(EmuCore::TMP::lval_ref_cast<_vector_type_raw>(std::declval<_vector_type_raw>()));
+			using _vector_uq = typename EmuCore::TMP::remove_ref_cv<_vector_type_raw>::type;
+
+			static constexpr bool _is_valid_arg =
+			(
+				std::is_lvalue_reference_v<_vector_type_raw> ||
+				!contains_ref ||
+				(
+					_vector_uq::contains_ref &&
+					(contains_const_ref || _vector_uq::contains_non_const_ref) &&
+					_non_major_index < _vector_uq::size
+				)
+			);
+
+			static constexpr bool _should_move = 
+			(
+				!contains_ref &&
+				!std::is_lvalue_reference_v<_vector_type_raw> &&
+				_non_major_index < _vector_uq::size
+			);
+			using get_result = decltype(std::declval<_vector_type_lval>().template AtTheoretical<_non_major_index>());
+
+		public:
+			using type = typename std::conditional
+			<
+				!_is_valid_arg,
+				void,
+				typename std::conditional
+				<
+					_should_move,
+					decltype(std::move(std::declval<get_result>())),
+					get_result
+				>::type
+			>::type;
+		};
+
+		
+
+		template<class ToConvert_, std::size_t ColumnIndex_, std::size_t RowIndex_>
+		struct _matrix_convert_construct_index_arg
+		{
+		private:
+			using _to_convert_uq = typename EmuCore::TMP::remove_ref_cv<ToConvert_>::type;
+			using _to_convert_lval = decltype(EmuCore::TMP::lval_ref_cast<ToConvert_>(std::declval<ToConvert_>()));
+			static constexpr bool _index_is_contained = EmuMath::Helpers::_matrix_underlying::_matrix_index_is_contained<ColumnIndex_, RowIndex_, _to_convert_uq>();
+
+			static constexpr bool _is_valid_arg =
+			(
+				std::is_lvalue_reference_v<ToConvert_> ||
+				!contains_ref ||
+				(
+					_to_convert_uq::contains_ref &&
+					(contains_const_ref || _to_convert_uq::contains_non_const_ref) &&
+					_index_is_contained
+				)
+			);
+
+			static constexpr bool _should_move =
+			(
+				!std::is_lvalue_reference_v<ToConvert_> &&
+				!contains_ref &&
+				_index_is_contained
+			);
+
+			using _get_result = decltype(std::declval<_to_convert_lval>().template AtTheoretical<ColumnIndex_, RowIndex_>());
+			using _out_result = typename std::conditional
+			<
+				_index_is_contained,
+				_get_result,
+				decltype(EmuMath::Helpers::matrix_get_non_contained<this_type>())
+			>::type;
+
+		public:
+			using type = typename std::conditional
+			<
+				!_is_valid_arg,
+				void,
+				typename std::conditional
+				<
+					_should_move,
+					decltype(std::move(std::declval<_get_result>())),
+					_out_result
+				>::type
+			>::type;
+		};
+
+		template<class ToConvert_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+		[[nodiscard]] static constexpr inline bool _is_valid_matrix_to_convert_construct
+		(
+			std::index_sequence<ColumnIndices_...> column_indices_,
+			std::index_sequence<RowIndices_...> row_indices_
+		)
+		{
+			return std::is_constructible_v<matrix_vector_type, typename _matrix_convert_construct_index_arg<ToConvert_, ColumnIndices_, RowIndices_>::type...>;
+		}
+
+		template<class ForwardedVectorTuple_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+		[[nodiscard]] static constexpr inline bool _valid_variadic_construction_args_from_major_vectors
+		(
+			std::index_sequence<ColumnIndices_...> column_indices_,
+			std::index_sequence<RowIndices_...> row_indices_
+		)
+		{
+			return std::is_constructible_v
+			<
+				matrix_vector_type,
+				typename _variadic_construction_from_major_vector_arg_at_index<ForwardedVectorTuple_&, ColumnIndices_, RowIndices_>::type...
+			>;
+		}
+
+		template<std::size_t ArgCount_, class...Args_>
+		[[nodiscard]] static constexpr inline bool _valid_variadic_construction_args_from_major_vectors()
+		{
+			if constexpr (ArgCount_ == num_major_elements)
+			{
+				if constexpr ((... && EmuMath::TMP::is_emu_vector_v<Args_>))
+				{
+					using forward_tuple = decltype(std::forward_as_tuple(std::forward<Args_>(std::declval<Args_>())...));
+					using indices = EmuMath::TMP::make_full_matrix_index_sequences<this_type>;
+					using column_indices = typename indices::column_index_sequence;
+					using row_indices = typename indices::row_index_sequence;
+					return _valid_variadic_construction_args_from_major_vectors<forward_tuple>(column_indices(), row_indices());
+				}
+				else
+				{
+					return false; // Must only be EmuMath Vectors
+				}
+			}
+			else
+			{
+				return false; // Must be 1 argument per major segment
+			}
+		}
+
+		// Component of is_variadic_constructible; Assumes no reservations for provided args
+		template<std::size_t ArgCount_, class...Args_>
+		static constexpr inline bool _valid_variadic_scalar_construction_args()
+		{
+			return 
+			(
+				ArgCount_ == size &&
+				std::is_constructible_v<matrix_vector_type, decltype(std::forward<Args_>(std::declval<Args_>()))...>
+			);
+		}
+
+		template<std::size_t ArgCount_, class...Args_>
+		static constexpr inline bool _valid_variadic_single_scalar_construction_arg()
+		{
+			if constexpr (ArgCount_ == 1)
+			{
+				using arg_type = EmuCore::TMP::first_variadic_arg_t<Args_...>;
+				return
+				(
+					!EmuMath::TMP::is_emu_matrix_v<arg_type> && // Reserved for conversion/copy/move
+					!EmuMath::TMP::is_emu_vector_v<arg_type> && // Don't allow instantiation via a flattened Vector; leave this to Matrix construction
+					std::is_constructible_v<matrix_vector_type, decltype(std::forward<arg_type>(std::declval<arg_type>()))>
+				);
+			}
+			else
+			{
+				return false; // More than 1 arg, immediately invalid since this is a "construct all via X" situation
+			}
+		}
+
 	public:
-		/// <summary> Returns true if this Matrix can be default-constructed, otherwise false. </summary>
-		[[nodiscard]] static constexpr inline bool is_default_constructible()
+		static constexpr inline bool is_default_constructible()
 		{
 			return std::is_default_constructible_v<matrix_vector_type>;
 		}
 
-		/// <summary> Returns true if this Matrix can constructed by copying a const reference to another of its type, otherwise false. </summary>
-		[[nodiscard]] static constexpr inline bool is_const_copy_constructible()
+		static constexpr inline bool is_const_copy_constructible()
 		{
 			return std::is_constructible_v<matrix_vector_type, const matrix_vector_type&>;
 		}
 
-		/// <summary> Returns true if this Matrix can constructed by copying a non-const reference to another of its type, otherwise false. </summary>
-		[[nodiscard]] static constexpr inline bool is_non_const_copy_constructible()
+		static constexpr inline bool is_non_const_copy_constructible()
 		{
 			return std::is_constructible_v<matrix_vector_type, matrix_vector_type&>;
 		}
 
-		/// <summary> Returns true if this Matrix can be move-constructed with an rvalue reference to another of its type, otherwise false. </summary>
-		[[nodiscard]] static constexpr inline bool is_move_constructible()
+		static constexpr inline bool is_move_constructible()
 		{
 			return std::is_constructible_v<matrix_vector_type, matrix_vector_type&&>;
 		}
 
-		/// <summary>
-		/// <para> Returns true if this Matrix can be constructed from the provided selection of Vectors_. </para>
-		/// <para> All arguments provided to Vectors_ must be EmuMath Vectors, and will be provided as major-elements for the constructed Matrix.. </para>
-		/// <para> The provided Args_ will be interpreted as though they are references to be forwarded. </para>
-		/// </summary>
-		/// <typeparam name="Vectors_">All EmuMath Vectors to check for input validity.</typeparam>
-		/// <returns>True if all provided EmuMath Vectors_ may be used to construct a Matrix of this type in terms of major-elements, otherwise false.</returns>
-		template<class...Vectors_>
-		[[nodiscard]] static constexpr inline bool is_constructible_from_major_vectors()
+		template<class ToConvert_>
+		[[nodiscard]] static constexpr inline bool is_conversion_constructible()
 		{
-			return
-			(
-				EmuCore::TMP::variadic_and_v<EmuMath::TMP::is_emu_vector_v<Vectors_>...> &&
-				sizeof...(Vectors_) == num_major_elements &&
-				(
-					// This braced section is to prevent (unlikely, but not impossible) conflicts when constructing from a matrix_vector_type argument
-					num_major_elements != 1 ||
-					!std::is_same_v<matrix_vector_type, EmuCore::TMP::remove_ref_cv_t<EmuCore::TMP::first_variadic_arg_t<Vectors_...>>>
-				) &&
-				std::is_constructible_v<matrix_vector_type, EmuCore::TMP::forward_result_t<Vectors_>...>
-			);
-		}		
-
-		/// <summary>
-		/// <para> Returns true if this Matrix can be constructed with the provided Args_, interpreted as per-element scalars. </para>
-		/// <para> The provided number of Args_ must be equal to the total number of elements within this Matrix type (i.e. its static `size` member). </para>
-		/// <para> The provided Args_ will be interpreted as though they are references to be forwarded (e.g. an Arg_ of `int` will be treated as `int&amp;&amp;`). </para>
-		/// </summary>
-		/// <typeparam name="Args_">All argument types that will be forwarded for construction.</typeparam>
-		/// <returns>True if scalar-argument construction is possible for this Matrix type with the provided arguments, otherwise false.</returns>
-		template<typename...Args_>
-		[[nodiscard]] static constexpr inline bool is_constructible_with_scalar_args()
-		{
-			return
-			(
-				sizeof...(Args_) == size &&
-				(size != num_major_elements || !EmuCore::TMP::variadic_and_v<EmuMath::TMP::is_emu_vector_v<Args_>...>) &&
-				EmuCore::TMP::variadic_and_v<std::is_constructible_v<stored_type, EmuCore::TMP::forward_result_t<Args_>>...>
-			);
-		}
-
-		template<typename...Args_>
-		[[nodiscard]] static constexpr inline bool is_constructible_with_single_scalar_arg()
-		{
-			// Requires 1 arg, which is not a Matrix, not valid for construction via major Vectors, is not the matrix_vector_type, and matrix_vector_type is constructible via it
-			return
-			(
-				sizeof...(Args_) == 1 &&
-				!EmuCore::TMP::variadic_or_v<EmuMath::TMP::is_emu_matrix_v<Args_>...> &&
-				!is_constructible_from_major_vectors<Args_...>() &&
-				!EmuCore::TMP::variadic_or_v<std::is_same_v<matrix_vector_type, EmuCore::TMP::remove_ref_cv_t<Args_>>...> &&
-				EmuCore::TMP::variadic_and_v<std::is_constructible_v<matrix_vector_type, EmuCore::TMP::forward_result_t<Args_>>...>
-			);
-		}
-
-		/// <summary>
-		/// <para> Returns true if this Matrix can be constructed via its variadic argument constructor. </para>
-		/// <para> Effectively translates to `is_constructible_with_scalar_args || is_constructible_from_major_vectors`. </para>
-		/// <para> Note that, when true, this does not determine which construction method is used, but major-vector construction will take priority when both are true. </para>
-		/// </summary>
-		/// <returns>True if this Matrix's variadic constructor may be used with the provided arguments, otherwise false.</returns>
-		template<class...Args_>
-		[[nodiscard]] static constexpr inline bool is_constructible_via_variadic_constructor()
-		{
-			return 
-			(
-				is_constructible_with_scalar_args<Args_...>() || 
-				is_constructible_from_major_vectors<Args_...>() ||
-				is_constructible_with_single_scalar_arg<Args_...>()
-			);
-		}
-
-		/// <summary>
-		/// <para> Returns true if this Matrix can be constructed via the provided other Matrix_ type. </para>
-		/// <para> Matrix_ is expected to be another Matrix type, and thus this will return false if the unqualified Matrix_ is the same as this_type. </para>
-		/// </summary>
-		/// <returns>True if this Matrix may be conversion-constructed via the provided Matrix_ type.</returns>
-		template<class Matrix_>
-		[[nodiscard]] static constexpr inline bool is_constructible_via_other_matrix_type()
-		{
-			constexpr bool is_other_matrix_type_ = EmuCore::TMP::variadic_and_v
-			<
-				EmuMath::TMP::is_emu_matrix_v<Matrix_>,
-				!std::is_same_v<this_type, EmuCore::TMP::remove_ref_cv_t<Matrix_>>
-			>;
-			if constexpr (is_other_matrix_type_)
+			if constexpr (EmuMath::TMP::is_emu_matrix_v<ToConvert_>)
 			{
-				return EmuMath::Helpers::matrix_copy_is_valid<NumColumns_, NumRows_, T_, ColumnMajor_, Matrix_>();
+				if constexpr (!std::is_same_v<this_type, EmuCore::TMP::remove_ref_cv_t<ToConvert_>>)
+				{
+					using indices = EmuMath::TMP::make_full_matrix_index_sequences<this_type>;
+					using column_indices = typename indices::column_index_sequence;
+					using row_indices = typename indices::row_index_sequence;
+					return _is_valid_matrix_to_convert_construct<ToConvert_>(column_indices(), row_indices());
+				}
+				else
+				{
+					return false; // this_type reserved for own move/copy constructors
+				}
 			}
 			else
 			{
-				return false;
+				return false; // Can only convert another Matrix
+			}
+		}
+
+		template<class...Args_>
+		static constexpr inline bool is_variadic_constructible()
+		{
+			constexpr std::size_t num_args_ = sizeof...(Args_);
+			if constexpr (num_args_ != 0)
+			{
+				return
+				(
+					(num_args_ != 1 || !EmuMath::TMP::is_emu_matrix_v<EmuCore::TMP::first_variadic_arg_t<Args_...>>) && // Reserved for Matrix copies/moves/conversions
+					(
+						_valid_variadic_scalar_construction_args<num_args_, Args_...>() ||
+						_valid_variadic_single_scalar_construction_arg<num_args_, Args_...>() ||
+						_valid_variadic_construction_args_from_major_vectors<num_args_, Args_...>()
+					)
+				);
+			}
+			else
+			{
+				return false; // Reserved for default constructor test
 			}
 		}
 #pragma endregion
@@ -236,26 +425,6 @@ namespace EmuMath
 		[[nodiscard]] static constexpr inline value_type_uq get_implied_zero()
 		{
 			return EmuMath::Helpers::matrix_get_non_contained<this_type>();
-		}
-
-		[[nodiscard]] static constexpr inline typename EmuMath::TMP::matrix_non_contained_column<this_type>::type get_implied_zero_column()
-		{
-			return EmuMath::Helpers::matrix_get_column_non_contained<this_type>();
-		}
-
-		[[nodiscard]] static constexpr inline typename EmuMath::TMP::matrix_non_contained_row<this_type>::type get_implied_zero_row()
-		{
-			return EmuMath::Helpers::matrix_get_row_non_contained<this_type>();
-		}
-
-		[[nodiscard]] static constexpr inline decltype(EmuMath::Helpers::matrix_get_major_non_contained<this_type>()) get_implied_zero_major()
-		{
-			return EmuMath::Helpers::matrix_get_major_non_contained<this_type>();
-		}
-
-		[[nodiscard]] static constexpr inline decltype(EmuMath::Helpers::matrix_get_non_major_non_contained<this_type>()) get_implied_zero_non_major()
-		{
-			return EmuMath::Helpers::matrix_get_non_major_non_contained<this_type>();
 		}
 #pragma endregion
 
@@ -273,218 +442,308 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region UNDERLYING_CONSTRUCTORS
+	private:
+		template<std::size_t ColumnIndex_, std::size_t RowIndex_, class ToConvert_>
+		[[nodiscard]] static constexpr inline typename _matrix_convert_construct_index_arg<ToConvert_, ColumnIndex_, RowIndex_>::type _get_conversion_construct_index_arg
+		(
+			ToConvert_&& to_convert_
+		)
+		{
+			if constexpr (!std::is_void_v<typename _matrix_convert_construct_index_arg<ToConvert_, ColumnIndex_, RowIndex_>::type>)
+			{
+				if constexpr (EmuMath::Helpers::_matrix_underlying::_matrix_index_is_contained<ColumnIndex_, RowIndex_, ToConvert_>())
+				{
+					constexpr bool should_move_ =
+					(
+						!std::is_lvalue_reference_v<ToConvert_> &&
+						!contains_ref
+					);
+					auto& to_convert_lval_ = EmuCore::TMP::lval_ref_cast<ToConvert_>(std::forward<ToConvert_>(to_convert_));
+
+					if constexpr (should_move_)
+					{
+						return std::move(to_convert_lval_.template AtTheoretical<ColumnIndex_, RowIndex_>());
+					}
+					else
+					{
+						return to_convert_lval_.template AtTheoretical<ColumnIndex_, RowIndex_>();
+					}
+				}
+				else
+				{
+					return EmuMath::Helpers::matrix_get_non_contained<this_type>();
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<ToConvert_>(),
+					"False-positive to conversion construction for an EmuMath Matrix. The output Matrix type cannot use elements from the input Matrix to construct its underlying data at all respective indices, or with its own implied-zero in indices that the input Matrix does not contain."
+				);
+			}
+		}
+
+		template<class ToConvert_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+		[[nodiscard]] static constexpr inline matrix_vector_type _do_conversion_construction
+		(
+			ToConvert_&& to_convert_,
+			std::index_sequence<ColumnIndices_...> column_indices_,
+			std::index_sequence<RowIndices_...> row_indices_
+		)
+		{
+			using column_index_sequence = std::index_sequence<ColumnIndices_...>;
+			using row_index_sequence = std::index_sequence<RowIndices_...>;
+			if constexpr (_is_valid_matrix_to_convert_construct<ToConvert_>(column_index_sequence(), row_index_sequence()))
+			{
+				// We'll never access the same index twice, so silence false-positives
+				// --- This is a slight disadvantage since there are scenarios where different references to the same object may be moved,
+				// --- but silencing this has been chosen since VS is not showing any compromise
+#pragma warning(push)
+#pragma warning(disable: 26800)
+				return matrix_vector_type
+				(
+					_get_conversion_construct_index_arg<ColumnIndices_, RowIndices_>(std::forward<ToConvert_>(to_convert_))...
+				);
+#pragma warning(pop)
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<ToConvert_>(),
+					"False-positive to conversion construction for an EmuMath Matrix. The output Matrix's underlying data cannot be constructed from the results extracted from the Matrix to convert."
+				);
+			}
+		}
+
+		template<class ToConvert_>
+		[[nodiscard]] static constexpr inline matrix_vector_type _do_conversion_construction(ToConvert_&& to_convert_)
+		{
+			using indices = EmuMath::TMP::make_full_matrix_index_sequences<this_type>;
+			using column_indices = typename indices::column_index_sequence;
+			using row_indices = typename indices::row_index_sequence;
+			return _do_conversion_construction(std::forward<ToConvert_>(to_convert_), column_indices(), row_indices());
+		}
+
+		template<std::size_t ColumnIndex_, std::size_t RowIndex_, class VectorTuple_>
+		[[nodiscard]] static constexpr inline typename _variadic_construction_from_major_vector_arg_at_index<VectorTuple_&, ColumnIndex_, RowIndex_>::type
+		_do_variadic_major_vector_construction_get_arg_for_index(VectorTuple_& vectors_tuple_)
+		{
+			if constexpr (!std::is_void_v<typename _variadic_construction_from_major_vector_arg_at_index<VectorTuple_&, ColumnIndex_, RowIndex_>::type>)
+			{
+				using std::get;
+				constexpr std::size_t major_index_ = get_major_index(ColumnIndex_, RowIndex_);
+				constexpr std::size_t non_major_index_ = get_non_major_index(ColumnIndex_, RowIndex_);
+				using vector_type_raw = std::tuple_element_t<major_index_, VectorTuple_>;
+				using vector_uq = typename EmuCore::TMP::remove_ref_cv<vector_type_raw>::type;
+				auto& vector_lval_cast_ = EmuCore::TMP::lval_ref_cast<vector_type_raw>(std::forward<vector_type_raw>(get<major_index_>(vectors_tuple_)));
+				constexpr bool should_move_ = 
+				(
+					!contains_ref &&
+					!std::is_lvalue_reference_v<vector_type_raw> &&
+					get_non_major_index(ColumnIndex_, RowIndex_) < vector_uq::size
+				);
+
+				if constexpr (should_move_)
+				{
+					return std::move(vector_lval_cast_.template at<non_major_index_>());
+				}
+				else
+				{
+					return vector_lval_cast_.template AtTheoretical<non_major_index_>();
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<VectorTuple_>(),
+					"False-positive access to variadic construction of an EmuMath Matrix via a selection of EmuMath Vectors (1 per major segment). One index could not form a successful argument for creating the output Matrix's underlying data."
+				);
+			}
+		}
+
+		template<class ForwardedVectorTuple_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+		[[nodiscard]] static constexpr inline matrix_vector_type _do_variadic_major_vector_construction
+		(
+			ForwardedVectorTuple_ vector_tuple_,
+			std::index_sequence<ColumnIndices_...> column_indices_,
+			std::index_sequence<RowIndices_...> row_indices_
+		)
+		{
+			using column_index_sequence = std::index_sequence<ColumnIndices_...>;
+			using row_index_sequence = std::index_sequence<RowIndices_...>;
+			if constexpr (_valid_variadic_construction_args_from_major_vectors<ForwardedVectorTuple_>(column_index_sequence(), row_index_sequence()))
+			{
+				return matrix_vector_type
+				(
+					_do_variadic_major_vector_construction_get_arg_for_index<ColumnIndices_, RowIndices_>(vector_tuple_)...
+				);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<ForwardedVectorTuple_>(),
+					"False-positive access to variadic construction of an EmuMath Matrix via a selection of EmuMath Vectors (1 per major segment). The output Matrix's underlying data could not be constructed from respective accesses to Vector elements at the determined indices."
+				);
+			}
+		}
+
+		template<class...Args_>
+		static constexpr inline matrix_vector_type _do_variadic_construction(Args_&&...args_)
+		{
+			// Visual studio does not play nice with constexpr std::size_t val = sizeof...(Args_); thanks for that :)
+			if constexpr (_valid_variadic_scalar_construction_args<sizeof...(Args_), Args_...>())
+			{
+				return matrix_vector_type(std::forward<Args_>(args_)...);
+			}
+			else if constexpr (_valid_variadic_single_scalar_construction_arg<sizeof...(Args_), Args_...>())
+			{
+				return matrix_vector_type(std::forward<Args_>(args_)...);
+			}
+			else if constexpr (_valid_variadic_construction_args_from_major_vectors<sizeof...(Args_), Args_...>())
+			{
+				using indices = EmuMath::TMP::make_full_matrix_index_sequences<this_type>;
+				using column_indices = typename indices::column_index_sequence;
+				using row_indices = typename indices::row_index_sequence;
+				return _do_variadic_major_vector_construction(std::forward_as_tuple(std::forward<Args_>(args_)...), column_indices(), row_indices());
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Args_...>(),
+					"False-positive variadic construction triggered for an EmuMath Matrix. This is an internal EmuMath error, as variadic construction should not have been possible with the provided arguments."
+				);
+			}
+		}
+#pragma endregion
+
 #pragma region CONSTRUCTORS
 	public:
-		/// <summary> Default constructor for this Matrix. Only available if its underlying elements may be default-constructed. </summary>
+		/// <summary>
+		/// <para> Default constructs this Matrix. Only available if this Matrix type's contained data is also default-constructible. </para>
+		/// </summary>
 		template<typename = std::enable_if_t<is_default_constructible()>>
-		constexpr inline Matrix() : _data()
+		constexpr Matrix() :
+			_data()
 		{
 		}
 
-		/// <summary> Constructs a copy of the const-referenced EmuMath Matrix of this type. Only available if a const-copy is valid for the Matrix's underlying elements. </summary>
-		/// <param name="to_copy_">Const reference to an EmuMath Matrix of this type to copy.</param>
+		/// <summary>
+		/// <para> Performs a const-copy of the passed Matrix. Only available if this Matrix type's contained data can be const-copy-constructed. </para>
+		/// </summary>
+		/// <param name="to_copy_">: EmuMath Matrix of the same type to const-copy.</param>
 		template<typename = std::enable_if_t<is_const_copy_constructible()>>
-		constexpr inline Matrix(const this_type& to_copy_) : _data(to_copy_._data)
-		{
-		}
-
-		/// <summary> Constructs a copy of the referenced EmuMath Matrix of this type. Only available if a non-const-copy is valid for the Matrix's underlying elements. </summary>
-		/// <param name="to_copy_">Non-const reference to an EmuMath Matrix of this type to copy.</param>
-		constexpr inline Matrix(this_type& to_copy_) : _data(to_copy_._data)
+		constexpr Matrix(const Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& to_const_copy) :
+			_data(to_const_copy._data)
 		{
 		}
 
 		/// <summary>
-		///		Moves the passed EmuMath Matrix of this type into a newly constructed Matrix of the same type. 
-		///		Only available if this Matrix's underlying elements may be moved.
+		/// <para> Performs a non-const-copy of the passed Matrix. Only available if this Matrix type's contained data can be non-const-copy-constructed. </para>
 		/// </summary>
-		/// <param name="to_move_">EmuMath Matrix to move into the newly constructed Matrix of the same type.</param>
-		constexpr inline Matrix(this_type&& to_move_) noexcept : _data(std::move(to_move_._data))
-		{
-		}
-
-		/// <summary>
-		///		Moves the passed EmuMath Matrix of this type into a newly constructed Matrix of the same type. 
-		///		Only available if this Matrix's underlying elements may be moved.
-		/// </summary>
-		/// <param name="to_move_">EmuMath Matrix to move into the newly constructed Matrix of the same type.</param>
-		template<typename = std::enable_if_t<is_move_constructible()>>
-		constexpr inline Matrix(const this_type&& to_move_) : _data(std::move(to_move_._data))
-		{
-		}
-
-		/// <summary>
-		/// <para> 
-		///		Copies the data of the const-referenced matrix_vector_type into a newly constructed Matrix's data. 
-		///		Only available if this Matrix's underlying data may be const-copy constructed.
-		/// </para>
-		/// </summary>
-		/// <param name="matrix_vector_to_copy_">Constant reference to an EmuMath Vector of this Matrix's matrix_vector_type to copy.</param>
-		template<typename = std::enable_if_t<is_const_copy_constructible()>>
-		[[nodiscard]] constexpr inline Matrix(const matrix_vector_type& matrix_vector_to_copy_) : _data(matrix_vector_to_copy_)
-		{
-		}
-
-		/// <summary>
-		/// <para> 
-		///		Copies the data of the referenced matrix_vector_type into a newly constructed Matrix's data. 
-		///		Only available if this Matrix's underlying data may be non-const-copy constructed.
-		/// </para>
-		/// </summary>
-		/// <param name="matrix_vector_to_copy_">Non-constant reference to an EmuMath Vector of this Matrix's matrix_vector_type to copy.</param>
+		/// <param name="to_copy_">: EmuMath Matrix of the same type to copy.</param>
 		template<typename = std::enable_if_t<is_non_const_copy_constructible()>>
-		[[nodiscard]] constexpr inline Matrix(matrix_vector_type& matrix_vector_to_copy_) : _data(matrix_vector_to_copy_)
+		constexpr Matrix(Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& to_copy_) :
+			_data(to_copy_._data)
 		{
 		}
 
-		/// <summary>
-		/// <para>
-		///		Moves the data of the passed matrix_vector_type into a newly constructed Matrix's data. 
-		///		Only available if this Matrix's underlying data may be move constructed.
-		/// </para>
-		/// </summary>
-		/// <param name="matrix_vector_to_move_">Rvalue reference to an EmuMath Vector of this Matrix's matrix_vector_type to move.</param>
+		/// <summary> Moves the passed Matrix data into a newly constructed Matrix. Only available if this Matrix type's contained data may be move-constructed. </summary>
+		/// <param name="to_move_">: EmuMath Matrix of the same type to move.</param>
 		template<typename = std::enable_if_t<is_move_constructible()>>
-		[[nodiscard]] constexpr inline Matrix(matrix_vector_type&& matrix_vector_to_move_) : _data(std::forward<matrix_vector_type>(matrix_vector_to_move_))
+		constexpr Matrix(Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>&& to_move_) noexcept :
+			_data(std::move(to_move_._data))
 		{
 		}
+		
 
 		/// <summary>
-		/// <para> Explicit conversion constructor to create this Matrix type as a converted copy of the provided Matrix. </para>
-		/// <para> Indices not contained in this Matrix will be ignored. </para>
-		/// <para> Indices not contained in the passed Matrix, but contained within this Matrix, will be interpreted as implied zero. </para>
+		/// <para> Constructs a Matrix of this type by converting respective Column+Row indices within the passed Matrix. </para>
+		/// <para> Non-contained indices are interpreted as implied-zeroes. </para>
+		/// <para>
+		///		Only available if this Matrix type's contained data may be constructed from non-const lvalue references to respective indices in to_convert_, or an implied-zero.
+		/// </para>
 		/// </summary>
-		/// <param name="matrix_to_convert_">Non-const reference to an EmuMath Matrix of a different type to convert into this Matrix type.</param>
+		/// <param name="to_convert_">: EmuMath Matrix of a different type to convert.</param>
 		template
 		<
-			std::size_t InNumColumns_, std::size_t InNumRows_, typename InT_, bool InColumnMajor_,
-			typename = std::enable_if_t<is_constructible_via_other_matrix_type<EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>&>()>
+			std::size_t OtherNumColumns_, std::size_t OtherNumRows_, typename OtherT_, bool OtherColumnMajor_,
+			typename = std::enable_if_t<is_conversion_constructible<EmuMath::Matrix<OtherNumColumns_, OtherNumRows_, OtherT_, OtherColumnMajor_>&>()>
 		>
-		explicit constexpr inline Matrix(EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>& matrix_to_convert_) :
-			_data
-			(
-				EmuMath::Helpers::matrix_copy<NumColumns_, NumRows_, T_, ColumnMajor_, InT_, InNumColumns_, InNumRows_, InColumnMajor_>(matrix_to_convert_)._data
-			)
+		constexpr Matrix(EmuMath::Matrix<OtherNumColumns_, OtherNumRows_, OtherT_, OtherColumnMajor_>& to_convert_) :
+			_data(_do_conversion_construction(to_convert_))
 		{
 		}
 
 		/// <summary>
-		/// <para> Explicit conversion constructor to create this Matrix type as a converted copy of the provided Matrix. </para>
-		/// <para> Indices not contained in this Matrix will be ignored. </para>
-		/// <para> Indices not contained in the passed Matrix, but contained within this Matrix, will be interpreted as implied zero. </para>
+		/// <para> Constructs a Matrix of this type by converting respective Column+Row indices within the passed Matrix. </para>
+		/// <para> Non-contained indices are interpreted as implied-zeroes. </para>
+		/// <para>
+		///		Only available if this Matrix type's contained data may be constructed from const lvalue references to respective indices in to_convert_, or an implied-zero.
+		/// </para>
 		/// </summary>
-		/// <param name="matrix_to_convert_">Const reference to an EmuMath Matrix of a different type to convert into this Matrix type.</param>
+		/// <param name="to_convert_">: EmuMath Matrix of a different type to convert.</param>
 		template
 		<
-			std::size_t InNumColumns_, std::size_t InNumRows_, typename InT_, bool InColumnMajor_,
-			typename = std::enable_if_t<is_constructible_via_other_matrix_type<const EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>&>()>
+			std::size_t OtherNumColumns_, std::size_t OtherNumRows_, typename OtherT_, bool OtherColumnMajor_,
+			typename = std::enable_if_t<is_conversion_constructible<const EmuMath::Matrix<OtherNumColumns_, OtherNumRows_, OtherT_, OtherColumnMajor_>&>()>
 		>
-		explicit constexpr inline Matrix(const EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>& matrix_to_convert_) :
-			_data
-			(
-				EmuMath::Helpers::matrix_copy<NumColumns_, NumRows_, T_, ColumnMajor_, InT_, InNumColumns_, InNumRows_, InColumnMajor_>(matrix_to_convert_)._data
-			)
+		constexpr Matrix(const EmuMath::Matrix<OtherNumColumns_, OtherNumRows_, OtherT_, OtherColumnMajor_>& to_convert_) :
+			_data(_do_conversion_construction(to_convert_))
 		{
 		}
 
 		/// <summary>
-		/// <para> Explicit conversion constructor to create this Matrix type as a converted move-or-copy of the provided Matrix. </para>
-		/// <para> Indices not contained in this Matrix will be ignored. </para>
-		/// <para> Indices not contained in the passed Matrix, but contained within this Matrix, will be interpreted as implied zero. </para>
-		/// <para>
-		///		NOTE: This constructor allows false positive results in checks for if this type is constructible with the provided argument. 
-		///		This is to prevent invalid implicit casting to an lvalue-reference to provide safety from constructing with dangling references.
+		/// <para> Constructs a Matrix of this type by converting respective Column+Row indices within the passed Matrix. </para>
+		/// <para> Non-contained indices are interpreted as implied-zeroes. </para>
+		/// <para> 
+		///		Only available if this Matrix type's contained data may be constructed from rvalue references to respective indices in to_convert_, or an implied-zero. 
+		///		The rvalue references are viewed as lvalue references when both this Matrix and to_convert_ contain recognised references.
 		/// </para>
 		/// </summary>
-		/// <param name="matrix_to_convert_">Non-const rvalue reference to an EmuMath Matrix of a different type to convert into this Matrix type via move-or-copy.</param>
+		/// <param name="to_convert_">: EmuMath Matrix of a different type to convert.</param>
 		template
 		<
-			std::size_t InNumColumns_, std::size_t InNumRows_, typename InT_, bool InColumnMajor_,
-			typename = std::enable_if_t<!std::is_same_v<this_type, EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>>>
+			std::size_t OtherNumColumns_, std::size_t OtherNumRows_, typename OtherT_, bool OtherColumnMajor_,
+			typename = std::enable_if_t<is_conversion_constructible<EmuMath::Matrix<OtherNumColumns_, OtherNumRows_, OtherT_, OtherColumnMajor_>&&>()>
 		>
-		explicit constexpr inline Matrix(EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>&& matrix_to_convert_) :
-			_data
-			(
-				EmuMath::Helpers::matrix_copy<NumColumns_, NumRows_, T_, ColumnMajor_, InT_, InNumColumns_, InNumRows_, InColumnMajor_>
-				(
-					std::forward<EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>>(matrix_to_convert_)
-				)._data
-			)
+		constexpr Matrix(EmuMath::Matrix<OtherNumColumns_, OtherNumRows_, OtherT_, OtherColumnMajor_>&& to_convert_) :
+			_data(_do_conversion_construction(std::forward<EmuMath::Matrix<OtherNumColumns_, OtherNumRows_, OtherT_, OtherColumnMajor_>>(to_convert_)))
 		{
-			static_assert
-			(
-				is_constructible_via_other_matrix_type<EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>&&>(),
-				"Attempted to perform invalid move-construction of an EmuMath Matrix. This may have been performed due to a removed std::enable_if_t trigger. This is a side-effect of an intentional change to prevent construction of reference-containing Matrices via temporary non-reference-containing Matrices (which would result in dangling references), and is likely what is occurring in this situation. Note that move-construction falls back to copy construction if not possible, so the alternative of copy-construction if this is not a reference-containing Matrix type is likely also not possible."
-			);
 		}
 
 		/// <summary>
-		/// <para> Explicit conversion constructor to create this Matrix type as a converted move-or-copy of the provided Matrix. </para>
-		/// <para> Indices not contained in this Matrix will be ignored. </para>
-		/// <para> Indices not contained in the passed Matrix, but contained within this Matrix, will be interpreted as implied zero. </para>
+		/// <para> Variadic construction which adapts based on the provided arguments, and will perform one of the following: </para>
+		/// <para> 1: Where sizeof...(Args_) == size, arguments will be seen as contiguous element arguments and used directly in constructing the element they represent. </para>
+		/// <para> 2: Where sizeof...(Args_) == 1, the one argument will be seen as a value to copy to all elements within the newly created Matrix. </para>
 		/// <para>
-		///		NOTE: This constructor allows false positive results in checks for if this type is constructible with the provided argument. 
-		///		This is to prevent invalid implicit casting to an lvalue-reference to provide safety from constructing with dangling references.
+		///		3: Where sizeof...(Args_) == num_major_elements and all arguments are EmuMath Vectors,
+		///		the arguments will be seen as arguments for each major segment of this Matrix (i.e. columns if this Matrix is column-major, otherwise rows).
 		/// </para>
+		/// <para>
+		///		All listed outcomes are not used if a non-variadic constructor would make use of that argument, 
+		///		and are additionally subject to compatibility with this Matrix type's contained data. </para>
+		/// <para> Where multiple potential outcomes are possible, the earliest listed will be prioritised. </para>
 		/// </summary>
-		/// <param name="matrix_to_convert_">Const rvalue reference to an EmuMath Matrix of a different type to convert into this Matrix type via move-or-copy.</param>
-		template
-		<
-			std::size_t InNumColumns_, std::size_t InNumRows_, typename InT_, bool InColumnMajor_,
-			typename = std::enable_if_t<!std::is_same_v<this_type, EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>>>
-		>
-		explicit constexpr inline Matrix(const EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>&& matrix_to_convert_) :
-			_data
-			(
-				EmuMath::Helpers::matrix_copy<NumColumns_, NumRows_, T_, ColumnMajor_, InT_, InNumColumns_, InNumRows_, InColumnMajor_>
-				(
-					std::forward<const EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>>(matrix_to_convert_)
-				)._data
-			)
-		{
-			static_assert
-			(
-				is_constructible_via_other_matrix_type<const EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>&&>(),
-				"Attempted to perform invalid const-move-construction of an EmuMath Matrix. This may have been performed due to a removed std::enable_if_t trigger. This is a side-effect of an intentional change to prevent construction of reference-containing Matrices via temporary non-reference-containing Matrices (which would result in dangling references), which is likely what is occurring in this situation. Note that move-construction falls back to copy construction if not possible, so the alternative of copy-construction if this is not a reference-containing Matrix type is likely also not possible."
-			);
-		}
-
-		/// <summary>
-		/// <para> Constructs an EmuMath Matrix from either a selection of major EmuMath Vectors or a selection of per-element scalars. </para>
-		/// <para>
-		///		To construct via scalars: The number of provided Args_ must be equal to the total number of elements within this Matrix type (i.e. its `size`). 
-		///		Additionally, this Matrix's stored_type must be constructible via all Args_ as single arguments. 
-		///		It should be noted that the placement of these indices is contiguous in memory, and thus is modified by this Matrix's major-order.
-		/// </para>
-		/// <para>
-		///		To construct via major EmuMath Vectors: The number of provided Args_ must be equal to the number of major elements within this Matrix type. 
-		///		Additionally, all Args_ must be EmuMath Vectors, and when forwarded must be valid construction arguments for constructing this Matrix's matrix_vector_type.
-		/// </para>
-		/// <para>
-		///		To construct via a single non-Matrix Arg: The number of provided Args_ must be equal to 1. 
-		///		Additionally, the Arg_ must be valid to construct matrix_vector_type, is not matrix_vector_type, is not valid for construction via major Vectors, 
-		///		and is not an EmuMath Matrix.
-		/// </para>
-		/// <para> Where both are valid, construction via major EmuMath Vectors takes priority. </para>
-		/// </summary>
-		/// <param name="contiguous_args_">Contiguous scalar arguments, or contiguous major-vector EmuMath Vector arguments.</param>
-		template<typename...Args_, typename = std::enable_if_t<is_constructible_via_variadic_constructor<Args_...>()>>
-		explicit constexpr inline Matrix(Args_&&...contiguous_args_) :
-			_data
-			(
-				_make_data(std::make_index_sequence<num_major_elements>(), std::forward<Args_>(contiguous_args_)...)
-			)
+		/// <param name="args_">: Arguments for variadic construction, meeting at least 1 of the above constraints.</param>
+		template<class...Args_, typename = std::enable_if_t<is_variadic_constructible<Args_...>()>>
+		constexpr Matrix(Args_&&...args_) :
+			_data(_do_variadic_construction(std::forward<Args_>(args_)...))
 		{
 		}
 #pragma endregion
 
-#pragma region ACCESS
+#pragma region ACCESS_FUNCS
 	public:
 		/// <summary>
-		/// <para> Accesses the element at the provided indices within this Matrix, with compile-time validity checks. </para>
-		/// <para> If either ColumnIndex_ or RowIndex_ is not contained, a static_assert will be triggered. </para>
+		/// <para> Accesses the element at the provided Column and Row within this Matrix, performing a compile-time validity check. </para>
 		/// </summary>
-		/// <returns>Reference to the element at the provided index within this Matrix.</returns>
+		/// <returns>Reference to this Matrix's element at the provided index.</returns>
 		template<std::size_t ColumnIndex_, std::size_t RowIndex_>
 		[[nodiscard]] constexpr inline value_type& at()
 		{
@@ -492,16 +751,14 @@ namespace EmuMath
 			{
 				if constexpr (RowIndex_ < num_rows)
 				{
-					constexpr std::size_t major_index_ = get_major_index(ColumnIndex_, RowIndex_);
-					constexpr std::size_t non_major_index_ = get_non_major_index(ColumnIndex_, RowIndex_);
-					return _data.template at<major_index_>().template at<non_major_index_>();
+					return _data.template at<get_flattened_index(ColumnIndex_, RowIndex_)>();
 				}
 				else
 				{
 					static_assert
 					(
 						EmuCore::TMP::get_false<std::size_t, RowIndex_>(),
-						"Attempted to access an index of an EmuMath Matrix, but the provided RowIndex_ is invalid. The inclusive valid row index range is 0:(num_rows - 1)."
+						"Attempted to retrieve an index from an EmuMath Matrix within an invalid row. The valid inclusive index range for rows is 0:(num_rows - 1)"
 					);
 				}
 			}
@@ -509,8 +766,8 @@ namespace EmuMath
 			{
 				static_assert
 				(
-					EmuCore::TMP::get_false<std::size_t, RowIndex_>(),
-					"Attempted to access an index of an EmuMath Matrix, but the provided ColumnIndex_ is invalid. The inclusive valid column index range is 0:(num_columns - 1)."
+					EmuCore::TMP::get_false<std::size_t, ColumnIndex_>(),
+					"Attempted to retrieve an index from an EmuMath Matrix within an invalid column. The valid inclusive index range for columns is 0:(num_columns - 1)"
 				);
 			}
 		}
@@ -522,11 +779,109 @@ namespace EmuMath
 		}
 
 		/// <summary>
-		/// <para> Accesses the element at the provided indices within this Matrix, with compile-time validity checks. </para>
-		/// <para> If the provided idnex is contained, this will return a reference to the specified element. </para>
-		/// <para> If either ColumnIndex_ or RowIndex_ is not contained, this will return a newly constructed value_type_uq. </para>
+		/// <para> Accesses the element at the provided flattened, contiguous index within this Matrix, performing a compile-time validity check. </para>
 		/// </summary>
-		/// <returns>Reference to the element at the provided index within this Matrix if the index is contained, otherwise a newly constructed value_type_uq.</returns>
+		/// <returns>Reference to this Matrix's element at the provided contiguous flattened index.</returns>
+		template<std::size_t FlattenedIndex_>
+		[[nodiscard]] constexpr inline value_type& at()
+		{
+			if constexpr (FlattenedIndex_ < size)
+			{
+				return _data.template at<FlattenedIndex_>();
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<std::size_t, FlattenedIndex_>(),
+					"Attempted to retrieve an index from an EmuMath Matrix using an invalid flattened index. The valid inclusive flattened index range is 0:(size - 1)."
+				);
+			}
+		}
+
+		template<std::size_t FlattenedIndex_>
+		[[nodiscard]] constexpr inline const value_type& at() const
+		{
+			return const_cast<this_type*>(this)->template at<FlattenedIndex_>();
+		}
+
+		/// <summary>
+		/// <para> Accesses the element at the provided Column and Row within this Matrix, performing a runtime validity check. </para>
+		/// <para> Throws a std::out_of_range exception if an invalid index is provided. </para>
+		/// </summary>
+		/// <param name="column_index_">: Index of the column to access. Valid inclusive range is 0:(num_columns - 1).</param>
+		/// <param name="row_index_">: Index of the row to access. Valid inclusive range is 0:(num_rows - 1).</param>
+		/// <returns>Reference to this Matrix's element at the provided contiguous flattened index.</returns>
+		[[nodiscard]] constexpr inline value_type& at(std::size_t column_index_, std::size_t row_index_)
+		{
+			const std::size_t flattened_index_ = get_flattened_index(column_index_, row_index_);
+			if (flattened_index_ >= size)
+			{
+				if constexpr (EmuCore::TMP::feature_constexpr_dynamic_memory())
+				{
+					std::string str_;
+					str_.reserve(180); // Reserves enough space for literals, + padding for index -> string conversions
+					str_ += "Attempted to access an invalid Column + Row Index within an EmuMath Matrix.\nColumn: ";
+					str_ += std::to_string(column_index_);
+					str_ += ", Valid Column Range (Inclusive): 0:";
+					str_ += std::to_string(num_columns - 1);
+					str_ += "\nRow: ";
+					str_ += std::to_string(row_index_);
+					str_ += ", Valid Row Range (Inclusive): 0:";
+					str_ += std::to_string(num_rows - 1);
+					throw std::out_of_range(str_);
+				}
+				else
+				{
+					throw std::out_of_range("Attempted to access an invalid Column + Row Index within an EmuMath Matrix.");
+				}
+			}
+			return _data[flattened_index_];
+		}
+
+		[[nodiscard]] constexpr inline const value_type& at(std::size_t column_index_, std::size_t row_index_) const
+		{
+			return const_cast<this_type*>(this)->at(column_index_, row_index_);
+		}
+
+		/// <summary>
+		/// <para> Accesses the element at the provided flattened, contiguous index within this Matrix, performing a runtime validity check. </para>
+		/// <para> Throws a std::out_of_range exception if an invalid index is provided. </para>
+		/// </summary>
+		/// <param name="flattened_index_">: Flattened, contiguous index to access. Valid inclusive range is 0:(size - 1).</param>
+		/// <returns>Reference to this Matrix's element at the provided contiguous flattened index.</returns>
+		[[nodiscard]] constexpr inline value_type& at(std::size_t flattened_index_)
+		{
+			if (flattened_index_ >= size)
+			{
+				if constexpr (EmuCore::TMP::feature_constexpr_dynamic_memory())
+				{
+					std::string str_;
+					str_.reserve(140); // Enough space for literals + some extra padding for converted index -> string appends
+					str_ += "Attempted to access an invalid Flattened Index within an EmuMath Matrix.\nIndex:";
+					str_ += std::to_string(flattened_index_);
+					str_ += ", Valid Flattened Index Range (Inclusive): 0:";
+					str_ += std::to_string(size - 1);
+					throw std::out_of_range(str_);
+				}
+				else
+				{
+					throw std::out_of_range("Attempted to access an invalid Flattened Index within an EmuMath Matrix.");
+				}
+			}
+			return _data[flattened_index_];
+		}
+
+		[[nodiscard]] constexpr inline const value_type& at(std::size_t flattened_index_) const
+		{
+			return const_cast<this_type*>(this)->at(flattened_index_);
+		}
+
+		/// <summary>
+		/// <para> Accesses the theoretical element at the provided Column and Row within this Matrix. </para>
+		/// <para> Returns this Matrix type's implied-zero if the provided index is not contained. </para>
+		/// </summary>
+		/// <returns>Reference to this Matrix's element at the provided index if it is contained, otherwise a newly-constructed implied-zero for this Matrix type.</returns>
 		template<std::size_t ColumnIndex_, std::size_t RowIndex_>
 		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_theoretical_get_result<ColumnIndex_, RowIndex_, this_type&>::type AtTheoretical()
 		{
@@ -540,68 +895,10 @@ namespace EmuMath
 		}
 
 		/// <summary>
-		/// <para> Accesses the element at the provided FlattenedIndex_ within this Matrix, with compile-time validity checks. </para>
-		/// <para> If the flattened index exceeds this Matrix's size, or the unflattened indices are deemed invalid, a static_assert will be triggered. </para>
+		/// <para> Accesses the theoretical element at the provided contiguous flattened index within this Matrix. </para>
+		/// <para> Returns this Matrix type's implied-zero if the provided index is not contained. </para>
 		/// </summary>
-		/// <returns>Reference to the element at the provided column-major index within this Matrix.</returns>
-		template<std::size_t FlattenedIndex_>
-		[[nodiscard]] constexpr inline value_type& at()
-		{
-			if constexpr (FlattenedIndex_ < size)
-			{
-				// Assuming we reach this point, all indices should be valid, but we want to maintain suitable static_assert messages in case of inaccurate calculations
-				constexpr auto unflattened_indices_ = unflatten_index(FlattenedIndex_);
-				constexpr std::size_t column_index_ = unflattened_indices_.first;
-
-				if constexpr (column_index_ < num_columns)
-				{
-					constexpr std::size_t row_index_ = unflattened_indices_.second;
-					if constexpr (row_index_ < num_rows)
-					{
-						constexpr std::size_t major_index_ = get_major_index(column_index_, row_index_);
-						constexpr std::size_t non_major_index_ = get_non_major_index(column_index_, row_index_);
-						return _data.template at<major_index_>().template at<non_major_index_>();
-					}
-					else
-					{
-						static_assert
-						(
-							EmuCore::TMP::get_false<std::size_t, row_index_>(),
-							"Attempted to access a flattened index within an EmuMath Matrix, but the determined row index is invalid."
-						);
-					}
-				}
-				else
-				{
-					static_assert
-					(
-						EmuCore::TMP::get_false<std::size_t, column_index_>(),
-						"Attempted to access a flattened index within an EmuMath Matrix, but the determined column index is invalid."
-					);
-				}
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<std::size_t, FlattenedIndex_>(),
-					"Attempted to access a flattened index within an EmuMath Matrix, but the provided FlattenedIndex_ exceeds the valid range. The inclusive valid flattened index range is 0:(size-1)."
-				);
-			}
-		}
-
-		template<std::size_t FlattenedIndex_>
-		[[nodiscard]] constexpr inline const value_type& at() const
-		{
-			return const_cast<this_type*>(this)->template at<FlattenedIndex_>();
-		}
-
-		/// <summary>
-		/// <para> Accesses the element at the provided indices within this Matrix, with compile-time validity checks. </para>
-		/// <para> If the provided idnex is contained, this will return a reference to the specified element. </para>
-		/// <para> If either ColumnIndex_ or RowIndex_ is not contained, this will return a newly constructed value_type_uq. </para>
-		/// </summary>
-		/// <returns>Reference to the element at the provided index within this Matrix if the index is contained, otherwise a newly constructed value_type_uq.</returns>
+		/// <returns>Reference to this Matrix's element at the provided index if it is contained, otherwise a newly-constructed implied-zero for this Matrix type.</returns>
 		template<std::size_t FlattenedIndex_>
 		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_flattened_theoretical_get_result<FlattenedIndex_, this_type&>::type AtTheoretical()
 		{
@@ -615,183 +912,43 @@ namespace EmuMath
 		}
 
 		/// <summary>
-		/// <para> Accesses the element at the provided indices within this Matrix, with runtime-time validity checks. </para>
-		/// <para> If either column_index_ or row_index_, a std::out_of_range exception will be thrown. </para>
+		/// <para> Outputs a contiguous pointer to this Matrix's stored data, with an optional offset which performs compile-time validity checks. </para>
+		/// <para> A static assertion will be triggered if this Matrix contains references or 0 elements, or if the provided offset is too large. </para>
 		/// </summary>
-		/// <param name="column_index_">: Index of the column to access.</param>
-		/// <param name="row_index_">: Index of the row to access.</param>
-		/// <returns>Reference to the element at the provided index within this Matrix.</returns>
-		[[nodiscard]] constexpr inline value_type& at(std::size_t column_index_, std::size_t row_index_)
+		/// <returns>Pointer to the contiguous data stored within this Matrix.</returns>
+		template<std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline stored_type* data()
 		{
-			if constexpr (size > 0)
-			{
-				constexpr bool constexpr_str_ = __cplusplus >= 201907L;
-				if ((column_index_ < num_columns) && (row_index_ < num_rows))
-				{
-					return _data[get_major_index(column_index_, row_index_)][get_non_major_index(column_index_, row_index_)];
-				}
-				else
-				{
-					// AT LEAST 1 BAD INDEX
-					if constexpr (constexpr_str_)
-					{
-						// We can provide some extra information if we have access to constexpr strings
-						// --- This is to allow `at(index_)` to still satisfy constexpr constraints in standards before C++20
-						std::string out_str_;
-						out_str_.reserve(170); // Reserves enough space for all literal chars, alongside some extra for range and index after conversion.
-						out_str_ += "Attempted to access an invalid contained index of an EmuMath Matrix.\nProvided indices (Column, Row): (";
-						out_str_ += std::to_string(column_index_);
-						out_str_ += ", ";
-						out_str_ += std::to_string(row_index_);
-						out_str_ += ")\nInclusive valid Column Range: 0:";
-						out_str_ += std::to_string(num_columns - 1);
-						out_str_ += "\nInclusive valid Row Range: 0:";
-						out_str_ += std::to_string(num_rows - 1);
-						throw std::out_of_range(out_str_);
-					}
-					else
-					{
-						throw std::out_of_range("Attempted to access an invalid contained index of an EmuMath Matrix.");
-					}
-				}
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<T_>(),
-					"Attempted to access a non-theoretical index of a 0-sized EmuMath Matrix."
-				);
-			}
-		}
-
-		[[nodiscard]] constexpr inline const value_type& at(std::size_t column_index_, std::size_t row_index_) const
-		{
-			return const_cast<this_type*>(this)->at(column_index_, row_index_);
-		}
-
-		/// <summary>
-		/// <para> Accesses the element at the provided flattened_index_ within this Matrix, with runtime-time validity checks. </para>
-		/// <para> If the flattened index exceeds this Matrix's size, or the unflattened indices are deemed invalid, a runtime exception will be thrown. </para>
-		/// </summary>
-		/// <param name="flattened_index_">: Column-major flattened index of the element to retrieve.</param>
-		/// <returns>Reference to the element at the provided column-major index within this Matrix.</returns>
-		[[nodiscard]] constexpr inline value_type& at(std::size_t flattened_index_)
-		{
-			if constexpr (size > 0)
-			{
-				auto unflattened_indices_ = unflatten_index(flattened_index_);
-				if ((unflattened_indices_.first < num_columns) && (unflattened_indices_.second < num_rows))
-				{
-					return operator()(unflattened_indices_.first, unflattened_indices_.second);
-				}
-				else
-				{
-					constexpr bool constexpr_str_ = __cplusplus >= 201907L;
-					if constexpr (constexpr_str_)
-					{
-						// We can provide some extra information if we have access to constexpr strings
-						// --- This is to allow `at(index_)` to still satisfy constexpr constraints in standards before C++20
-						std::string out_str_;
-						out_str_.reserve(160); // Reserves enough space for all literal chars, alongside some extra for range and index after conversion.
-						out_str_ += "Attempted to access an invalid flattened index of an EmuMath Matrix.\nProvided index: ";
-						out_str_ += std::to_string(flattened_index_);
-						out_str_ += "\nInclusive valid flattened index range: 0:";
-						out_str_ += std::to_string(size - 1);
-						throw std::out_of_range(out_str_);
-					}
-					else
-					{
-						throw std::out_of_range("Attempted to access an invalid flattened index of an EmuMath Matrix.");
-					}
-				}
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<T_>(),
-					"Attempted to access a non-theoretical index of a 0-sized EmuMath Matrix."
-				);
-			}
-		}
-
-		[[nodiscard]] constexpr inline const value_type& at(std::size_t flattened_index_) const
-		{
-			return const_cast<this_type*>(this)->at(flattened_index_);
-		}
-
-		/// <summary>
-		/// <para> Accesses the element at the provided indices within this Matrix, with no validity checks. </para>
-		/// <para> If either ColumnIndex_ or RowIndex_, behaviour is undefined. </para>
-		/// </summary>
-		/// <returns>Reference to the element at the provided index within this Matrix.</returns>
-		[[nodiscard]] constexpr inline value_type& operator()(std::size_t column_index_, std::size_t row_index_)
-		{
-			return _data[get_major_index(column_index_, row_index_)][get_non_major_index(column_index_, row_index_)];
-		}
-
-		[[nodiscard]] constexpr inline const value_type& operator()(std::size_t column_index_, std::size_t row_index_) const
-		{
-			return const_cast<this_type*>(this)->operator()(column_index_, row_index_);
-		}
-
-		/// <summary>
-		/// <para> Accesses the element at the provided flattened_index_ within this Matrix. </para>
-		/// <para> If the flattened index exceeds this Matrix's size, or the unflattened indices are deemed invalid, behaviour is undefined. </para>
-		/// </summary>
-		/// <param name="flattened_index_">: Column-major flattened index of the element to retrieve.</param>
-		/// <returns>Reference to the element at the provided column-major index within this Matrix.</returns>
-		[[nodiscard]] constexpr inline value_type& operator[](std::size_t flattened_index_)
-		{
-			auto unflattened_indices_ = unflatten_index(flattened_index_);
-			return this->operator()(unflattened_indices_.first, unflattened_indices_.second);
-		}
-
-		[[nodiscard]] constexpr inline const value_type& operator[](std::size_t flattened_index_) const
-		{
-			return const_cast<this_type*>(this)->operator[](flattened_index_);
-		}
-
-		/// <summary>
-		/// <para> Accesses a contiguous data pointer to the elements of this Matrix, starting from an element at the provided Offset_. </para>
-		/// <para> Offset_: Index to retrieve a pointer to. Defaults to 0. </para>
-		/// <para> This function is not available for reference-containing matrices, or matrices whose elements are not fully contiguous. </para>
-		/// </summary>
-		/// <returns>Pointer to the value at the provided index.</returns>
-		template<std::size_t Offset_ = 0, typename = std::enable_if_t<is_contiguous>>
-		[[nodiscard]] constexpr inline value_type* data()
-		{
-			if constexpr(!contains_ref)
+			if constexpr (!contains_ref)
 			{
 				if constexpr (size != 0)
 				{
-					if constexpr (Offset_ < size)
+					if constexpr (Offset_ == 0)
 					{
-						if constexpr (Offset_ == 0)
-						{
-							return _data.template at<0>().data();
-						}
-						else
-						{
-							return (_data.template at<0>().data()) + Offset_;
-						}
+						return _data.data();
 					}
 					else
 					{
-						static_assert
-						(
-							EmuCore::TMP::get_false<std::size_t, Offset_>(),
-							"Attempted to access a pointer to the contiguous data of an EmuMath Matrix starting from a provided index Offset_, but the provided Offset_ was greater than the total number of elements within the Matrix."
-						);
+						if constexpr (Offset_ < size)
+						{
+							return (_data.data()) + Offset_;
+						}
+						else
+						{
+							static_assert
+							(
+								EmuCore::TMP::get_false<std::size_t, Offset_>(),
+								"Attempted to access a contiguous data pointer for an EmuMath Matrix using an offset which would take the pointer to memory outside of the Matrix's data."
+							);
+						}
 					}
 				}
 				else
 				{
 					static_assert
 					(
-						EmuCore::TMP::get_false<T_>(),
-						"Attempted to access a pointer to the contiguous data of an EmuMath Matrix, but the Matrix type contains no non-theoretical elements."
+						EmuCore::TMP::get_false<std::size_t, size>(),
+						"Attempted to access a contiguous data pointer for an EmuMath Matrix which contains no data."
 					);
 				}
 			}
@@ -799,554 +956,349 @@ namespace EmuMath
 			{
 				static_assert
 				(
-					EmuCore::TMP::get_false<T_>(),
-					"Attempted to access a pointer to the contiguous data of an EmuMath Matrix which contains references. This behaviour is not allowed as references are not guaranteed to be contiguous."
+					EmuCore::TMP::get_false<stored_type>(),
+					"Attempted to access a contiguous data pointer for an EmuMath Matrix which contains references. As referenced data is not guaranteed to be contiguous, this behaviour is prohibited."
 				);
 			}
 		}
 
-		template<std::size_t Offset_ = 0, typename = std::enable_if_t<is_contiguous>>
-		[[nodiscard]] constexpr inline const value_type* data() const
+		template<std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline const stored_type* data() const
 		{
 			return const_cast<this_type*>(this)->template data<Offset_>();
 		}
 
 		/// <summary>
-		/// <para> Accesses the column at the provided ColumnIndex_ within this Matrix. </para>
-		/// <para> If this Matrix is column-major: This will be a direct reference to the specified column. </para>
-		/// <para> If this Matrix is not column-major: This will be an EmuMath Vector of references to elements at respective points within the specified column. </para>
+		/// <para> Outputs an EmuMath Vector of elements in the specified Column within this Matrix. </para>
+		/// <para> May output a Vector of references to the elements of the Column, as long as all required indices are contained within this Matrix. </para>
+		/// <para> Offset_: Index of the Row at which to start reading the Column at the provided ColumnIndex_. Defaults to 0. </para>
 		/// </summary>
-		/// <returns>EmuMath Vector referencing the specified column within this Matrix.</returns>
-		template<std::size_t ColumnIndex_>
-		[[nodiscard]] constexpr inline column_get_ref_type ColumnAt()
+		/// <returns>EmuMath Vector of the specified Column within this Matrix.</returns>
+		template<std::size_t ColumnIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Column() const
 		{
-			if constexpr (ColumnIndex_ < num_columns)
-			{
-				if constexpr (is_column_major)
-				{
-					return _data.template at<ColumnIndex_>();
-				}
-				else
-				{
-					return _make_non_major_vector<ColumnIndex_, column_get_ref_type>(std::make_index_sequence<num_rows>());
-				}
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<std::size_t, ColumnIndex_>(),
-					"Attempted to access a column within an EmuMath Matrix, but the provided ColumnIndex_ is invalid. The inclusive valid column index range is 0:(num_columns - 1)."
-				);
-			}
+			return _make_column_vector<ColumnIndex_, OutSize_, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, OutSize_>());
 		}
 
-		template<std::size_t ColumnIndex_>
-		[[nodiscard]] constexpr inline column_get_const_ref_type ColumnAt() const
+		template<std::size_t ColumnIndex_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_rows, OutT_> Column() const
 		{
-			if constexpr (ColumnIndex_ < num_columns)
-			{
-				if constexpr (is_column_major)
-				{
-					return _data.template at<ColumnIndex_>();
-				}
-				else
-				{
-					return _make_non_major_vector<ColumnIndex_, column_get_const_ref_type>(std::make_index_sequence<num_rows>());
-				}
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<std::size_t, ColumnIndex_>(),
-					"Attempted to const-access a column within an EmuMath Matrix, but the provided ColumnIndex_ is invalid. The inclusive valid column index range is 0:(num_columns - 1)."
-				);
-			}
+			return _make_column_vector<ColumnIndex_, num_rows, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, num_rows>());
+		}
+
+		template<std::size_t ColumnIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Column()
+		{
+			return _make_column_vector<ColumnIndex_, OutSize_, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, OutSize_>());
+		}
+
+		template<std::size_t ColumnIndex_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_rows, OutT_> Column()
+		{
+			return _make_column_vector<ColumnIndex_, num_rows, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, num_rows>());
 		}
 
 		/// <summary>
-		/// <para> Accesses the theoretical column at the provided ColumnIndex_ within this Matrix. </para>
-		/// <para> If this Matrix is column-major and the index is contained: This will be a direct reference to the specified column. </para>
-		/// <para> 
-		///		If this Matrix is not column-major and the index is contained: 
-		///		This will be an EmuMath Vector of references to elements at respective points within the specified column. 
-		/// </para>
-		/// <para> If the index is not contained: This will be an implied-zero column for this Matrix type. </para>
+		/// <para> Outputs an EmuMath Vector of elements in the specified Row within this Matrix. </para>
+		/// <para> May output a Vector of references to the elements of the Row, as long as all required indices are contained within this Matrix. </para>
+		/// <para> Offset_: Index of the Column at which to start reading the Row at the provided RowIndex_. Defaults to 0. </para>
 		/// </summary>
-		/// <returns>EmuMath Vector referencing the specified column within this Matrix, or an implied-zero column if the index is not contained.</returns>
-		template<std::size_t ColumnIndex_>
-		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_column_theoretical_get_result<ColumnIndex_, this_type&>::type ColumnAtTheoretical()
+		/// <returns>EmuMath Vector of the specified Row within this Matrix.</returns>
+		template<std::size_t RowIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Row() const
 		{
-			return EmuMath::Helpers::matrix_get_column_theoretical<ColumnIndex_>(*this);
+			return _make_row_vector<RowIndex_, OutSize_, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, OutSize_>());
 		}
 
-		template<std::size_t ColumnIndex_>
-		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_column_theoretical_get_result<ColumnIndex_, const this_type&>::type ColumnAtTheoretical() const
+		template<std::size_t RowIndex_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_columns, OutT_> Row() const
 		{
-			return EmuMath::Helpers::matrix_get_column_theoretical<ColumnIndex_>(*this);
+			return _make_row_vector<RowIndex_, num_columns, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, num_columns>());
+		}
+
+		template<std::size_t RowIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Row()
+		{
+			return _make_row_vector<RowIndex_, OutSize_, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, OutSize_>());
+		}
+
+		template<std::size_t RowIndex_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_columns, OutT_> Row()
+		{
+			return _make_row_vector<RowIndex_, num_columns, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, num_columns>());
 		}
 
 		/// <summary>
-		/// <para> Accesses the row at the provided RowIndex_ within this Matrix. </para>
-		/// <para> If this Matrix is column-major: This will be an EmuMath Vector of references to elements at respective points within the specified row. </para>
-		/// <para> If this Matrix is not column-major: This will be a direct reference to the specified row. </para>
+		/// <para> Outputs an EmuMath Vector of elements in the specified Major Segment within this Matrix. </para>
+		/// <para> May output a Vector of references to the elements of the Major Segment, as long as all required indices are contained within this Matrix. </para>
+		/// <para> If this Matrix is Column Major, this is equivalent to `Column`. Otherwise, it is equivalent to `Row`. </para>
+		/// <para> Offset_: Non-Major index at which to start reading the Major Segment at the provided MajorIndex_. Defaults to 0. </para>
 		/// </summary>
-		/// <returns>EmuMath Vector referencing the specified row within this Matrix.</returns>
-		template<std::size_t RowIndex_>
-		[[nodiscard]] constexpr inline row_get_ref_type RowAt()
+		/// <returns>EmuMath Vector of the specified Major Segment within this Matrix.</returns>
+		template<std::size_t MajorIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Major() const
 		{
-			if constexpr (RowIndex_ < num_rows)
-			{
-				if constexpr (is_column_major)
-				{
-					return _make_non_major_vector<RowIndex_, row_get_ref_type>(std::make_index_sequence<num_columns>());
-				}
-				else
-				{
-					return _data.template at<RowIndex_>();
-				}
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<std::size_t, RowIndex_>(),
-					"Attempted to access a row within an EmuMath Matrix, but the provided RowIndex_ is invalid. The inclusive valid row index range is 0:(num_rows - 1)."
-				);
-			}
+			return _make_major_vector<MajorIndex_, OutSize_, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, OutSize_>());
 		}
 
-		template<std::size_t RowIndex_>
-		[[nodiscard]] constexpr inline row_get_const_ref_type RowAt() const
+		template<std::size_t MajorIndex_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_non_major_elements, OutT_> Major() const
 		{
-			if constexpr (RowIndex_ < num_rows)
-			{
-				if constexpr (is_column_major)
-				{
-					return _make_non_major_vector<RowIndex_, row_get_const_ref_type>(std::make_index_sequence<num_columns>());
-				}
-				else
-				{
-					return _data.template at<RowIndex_>();
-				}
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<std::size_t, RowIndex_>(),
-					"Attempted to access a row within an EmuMath Matrix, but the provided RowIndex_ is invalid. The inclusive valid row index range is 0:(num_rows - 1)."
-				);
-			}
+			return _make_major_vector<MajorIndex_, num_non_major_elements, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, num_non_major_elements>());
+		}
+
+		template<std::size_t MajorIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Major()
+		{
+			return _make_major_vector<MajorIndex_, OutSize_, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, OutSize_>());
+		}
+
+		template<std::size_t MajorIndex_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_non_major_elements, OutT_> Major()
+		{
+			return _make_major_vector<MajorIndex_, num_non_major_elements, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, num_non_major_elements>());
 		}
 
 		/// <summary>
-		/// <para> Accesses the theoretical row at the provided RowIndex_ within this Matrix. </para>
-		/// <para> 
-		///		If this Matrix is column-major and the index is contained: 
-		///		This will be an EmuMath Vector of references to elements at respective points within the specified row. 
-		/// </para>
-		/// <para> If this Matrix is not column-major and the index is contained: This will be a direct reference to the specified row. </para>
-		/// <para> If the index is not contained: This will be an implied-zero row for this Matrix type. </para>
+		/// <para> Outputs an EmuMath Vector of elements in the specified Non-Major Segment within this Matrix. </para>
+		/// <para> May output a Vector of references to the elements of the Non-Major Segment, as long as all required indices are contained within this Matrix. </para>
+		/// <para> If this Matrix is Column Major, this is equivalent to `Row`. Otherwise, it is equivalent to `Column`. </para>
+		/// <para> Offset_: Major index at which to start reading the Non-Major Segment at the provided NonMajorIndex_. Defaults to 0. </para>
 		/// </summary>
-		/// <returns>EmuMath Vector referencing the specified row within this Matrix, or an implied-zero row if the index is not contained.</returns>
-		template<std::size_t RowIndex_>
-		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_row_theoretical_get_result<RowIndex_, this_type&>::type RowAtTheoretical()
+		/// <returns>EmuMath Vector of the specified Non-Major Segment within this Matrix.</returns>
+		template<std::size_t NonMajorIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> NonMajor() const
 		{
-			return EmuMath::Helpers::matrix_get_row_theoretical<RowIndex_>(*this);
+			return _make_non_major_vector<NonMajorIndex_, OutSize_, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, OutSize_>());
 		}
 
-		template<std::size_t RowIndex_>
-		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_row_theoretical_get_result<RowIndex_, const this_type&>::type RowAtTheoretical() const
+		template<std::size_t NonMajorIndex_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_major_elements, OutT_> NonMajor() const
 		{
-			return EmuMath::Helpers::matrix_get_row_theoretical<RowIndex_>(*this);
+			return _make_non_major_vector<NonMajorIndex_, num_major_elements, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, num_major_elements>());
+		}
+
+		template<std::size_t NonMajorIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> NonMajor()
+		{
+			return _make_non_major_vector<NonMajorIndex_, OutSize_, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, OutSize_>());
+		}
+
+		template<std::size_t NonMajorIndex_, typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline EmuMath::Vector<num_major_elements, OutT_> NonMajor()
+		{
+			return _make_non_major_vector<NonMajorIndex_, num_major_elements, OutT_>(EmuCore::TMP::make_offset_index_sequence<Offset_, num_major_elements>());
 		}
 
 		/// <summary>
-		/// <para> Accesses the major element at the provided MajorIndex_ within this Matrix. </para>
-		/// <para> If this Matrix is column-major: This will be a reference to the column at the specified MajorIndex_. </para>
-		/// <para> If this Matrix is not column-major: This will be a reference to the row at the specified MajorIndex_. </para>
+		/// <para> Outputs an EmuMath Vector of elements within the specified Diagonal Segment within this Matrix, defaulting to its main diagonal. </para>
+		/// <para> ColumnOffset_: Index of the first Column to access. This will increment by 1 for each progressive element in the output Vector. Defaults to 0. </para>
+		/// <para> RowOffset_: Index of the first Row to access. This will increment by 1 for each progressive element in the output Vector. Defaults to ColumnOffset_. </para>
+		/// <para> May output a Vector of references to the elements of the Diagonal Segment, as long as all required indices are contained within this Matrix. </para>
 		/// </summary>
-		/// <returns>EmuMath Vector referencing the specified major element within this Matrix.</returns>
-		template<std::size_t MajorIndex_>
-		[[nodiscard]] constexpr inline major_get_ref_type MajorAt()
+		/// <returns>EmuMath Vector of the specified Diagonal Segment within this Matrix.</returns>
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ColumnOffset_ = 0, std::size_t RowOffset_ = ColumnOffset_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Diagonal() const
 		{
-			if constexpr (MajorIndex_ < num_major_elements)
-			{
-				return _data.template at<MajorIndex_>();
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<std::size_t, MajorIndex_>(),
-					"Attempted to access a major element within an EmuMath Matrix, but the provided MajorIndex_ is invalid. The inclusive valid major index range is 0:(num_major_elements - 1)."
-				);
-			}
+			return _make_diagonal_vector<OutSize_, OutT_, ColumnOffset_, RowOffset_>(std::make_index_sequence<OutSize_>());
 		}
 
-		template<std::size_t MajorIndex_>
-		[[nodiscard]] constexpr inline major_get_const_ref_type MajorAt() const
+		template<typename OutT_ = value_type_uq, std::size_t ColumnOffset_ = 0, std::size_t RowOffset_ = ColumnOffset_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<smallest_direction_size, OutT_> Diagonal() const
 		{
-			// Although currently implementation is identical, this ignores DRY standards in case major_get_const_ref_type is not just const-qualified major_get_ref_type.
-			if constexpr (MajorIndex_ < num_major_elements)
-			{
-				return _data.template at<MajorIndex_>();
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<std::size_t, MajorIndex_>(),
-					"Attempted to access a major element within an EmuMath Matrix, but the provided MajorIndex_ is invalid. The inclusive valid major index range is 0:(num_major_elements - 1)."
-				);
-			}
+			return _make_diagonal_vector<smallest_direction_size, OutT_, ColumnOffset_, RowOffset_>(std::make_index_sequence<smallest_direction_size>());
+		}
+
+		template<std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ColumnOffset_ = 0, std::size_t RowOffset_ = ColumnOffset_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Diagonal()
+		{
+			return _make_diagonal_vector<OutSize_, OutT_, ColumnOffset_, RowOffset_>(std::make_index_sequence<OutSize_>());
+		}
+
+		template<typename OutT_ = value_type_uq, std::size_t ColumnOffset_ = 0, std::size_t RowOffset_ = ColumnOffset_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<smallest_direction_size, OutT_> Diagonal()
+		{
+			return _make_diagonal_vector<smallest_direction_size, OutT_, ColumnOffset_, RowOffset_>(std::make_index_sequence<smallest_direction_size>());
 		}
 
 		/// <summary>
-		/// <para> Accesses the theoretical major element at the provided MajorIndex_ within this Matrix. </para>
-		/// <para> If this Matrix is column-major and the index is contained: This will be a reference to the column at the specified MajorIndex_. </para>
-		/// <para> If this Matrix is not column-major and the index is contained: This will be a reference to the row at the specified MajorIndex_. </para>
-		/// <para> If this Matrix is column-major and the index is not contained: This will be an implied-zero column for this Matrix type. </para>
-		/// <para> If this Matrix is not column-major and the index is not contained: This will be an implied-zero row for this Matrix type. </para>
+		/// <para> Outputs an EmuMath Vector representing a flattened form of this Matrix. </para>
+		/// <para> The output Vector may be either column-major or row-major, and will follow the major-order of this Matrix if not explicitly specified. </para>
+		/// <para> May be used to output a flattened Vector of references. </para>
 		/// </summary>
-		/// <returns>EmuMath Vector referencing the specified major element within the passed matrix_, or an implied-zero non-major element if it is not contained.</returns>
-		template<std::size_t MajorIndex_>
-		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_major_theoretical_get_result<MajorIndex_, this_type&>::type MajorAtTheoretical()
+		/// <returns>EmuMath Vector representation of a flattened form of this Matrix.</returns>
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Flatten() const
 		{
-			return EmuMath::Helpers::matrix_get_major_theoretical<MajorIndex_>(*this);
+			using indices = EmuMath::TMP::make_ranged_matrix_index_sequences<0, num_columns, 0, num_rows, OutColumnMajor_>;
+			return _make_flattened_vector<size, OutT_>(typename indices::column_index_sequence(), typename indices::row_index_sequence());
 		}
 
-		template<std::size_t MajorIndex_>
-		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_major_theoretical_get_result<MajorIndex_, const this_type&>::type MajorAtTheoretical() const
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, value_type_uq> Flatten() const
 		{
-			return EmuMath::Helpers::matrix_get_major_theoretical<MajorIndex_>(*this);
+			using indices = EmuMath::TMP::make_ranged_matrix_index_sequences<0, num_columns, 0, num_rows, OutColumnMajor_>;
+			return _make_flattened_vector<size, value_type_uq>(typename indices::column_index_sequence(), typename indices::row_index_sequence());
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Flatten()
+		{
+			using indices = EmuMath::TMP::make_ranged_matrix_index_sequences<0, num_columns, 0, num_rows, OutColumnMajor_>;
+			return _make_flattened_vector<size, OutT_>(typename indices::column_index_sequence(), typename indices::row_index_sequence());
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Vector<size, value_type_uq> Flatten()
+		{
+			using indices = EmuMath::TMP::make_ranged_matrix_index_sequences<0, num_columns, 0, num_rows, OutColumnMajor_>;
+			return _make_flattened_vector<size, value_type_uq>(typename indices::column_index_sequence(), typename indices::row_index_sequence());
+		}
+#pragma endregion
+
+#pragma region ACCESS_OPERATORS
+	public:
+		/// <summary>
+		/// <para> Accesses the element at the provided contiguous flattened index within this Matrix. </para>
+		/// <para> Performs no validity checks, and behaviour when flattened_index_ is not in the valid range (0:size-1) is undefined. </para>
+		/// </summary>
+		/// <param name="flattened_index_">: Contiguous flattened index of the element to access.</param>
+		/// <returns>Reference to the element at the provided contiguous flattened index within this Matrix.</returns>
+		[[nodiscard]] constexpr inline const value_type& operator[](std::size_t flattened_index_) const
+		{
+			return _data[flattened_index_];
+		}
+
+		[[nodiscard]] constexpr inline value_type& operator[](std::size_t flattened_index_)
+		{
+			return _data[flattened_index_];
 		}
 
 		/// <summary>
-		/// <para> Accesses the major eement at the provided MajorIndex_ within this Matrix. </para>
-		/// <para> If this Matrix is column-major: This will be an EmuMath Vector of references to respective elements in the row at the specified MajorIndex_. </para>
-		/// <para> If this Matrix is not column-major: This will be an EmuMath Vector of references to respective elements in the column at the specified MajorIndex_. </para>
+		/// <para> Accesses the element at the provided Column + Row Index within this Matrix. </para>
+		/// <para> Performs no validity checks, and behaviour when either index is in invalid is undefined. </para>
 		/// </summary>
-		/// <returns>EmuMath Vector of references to elements within the specified non-major element within this Matrix.</returns>
-		template<std::size_t NonMajorIndex_>
-		[[nodiscard]] constexpr inline non_major_get_ref_type NonMajorAt()
+		/// <param name="column_row_index_pair_">: Pair of indices to use as Column + Row Index arguments; first is the column index, second is the row index. </param>
+		/// <returns>Reference to the element at the provided Column + Row Index within this Matrix.</returns>
+		[[nodiscard]] constexpr inline const value_type& operator[](const std::pair<std::size_t, std::size_t>& column_row_index_pair_) const
 		{
-			if constexpr (NonMajorIndex_ < num_non_major_elements)
-			{
-				return _make_non_major_vector<NonMajorIndex_, non_major_get_ref_type>(std::make_index_sequence<num_major_elements>());
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<std::size_t, NonMajorIndex_>(),
-					"Attempted to access a non-major element within an EmuMath Matrix, but the provided NonMajorIndex_ is invalid. The inclusive valid non-major index range is 0:(num_non_major_elements - 1)."
-				);
-			}
+			return _data[get_flattened_index(column_row_index_pair_)];
 		}
 
-		template<std::size_t NonMajorIndex_>
-		[[nodiscard]] constexpr inline non_major_get_const_ref_type NonMajorAt() const
+		[[nodiscard]] constexpr inline value_type& operator[](const std::pair<std::size_t, std::size_t>& column_row_index_pair_)
 		{
-			if constexpr (NonMajorIndex_ < num_non_major_elements)
-			{
-				return _make_non_major_vector<NonMajorIndex_, non_major_get_const_ref_type>(std::make_index_sequence<num_major_elements>());
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<std::size_t, NonMajorIndex_>(),
-					"Attempted to access a non-major element within an EmuMath Matrix, but the provided NonMajorIndex_ is invalid. The inclusive valid non-major index range is 0:(num_non_major_elements - 1)."
-				);
-			}
+			return _data[get_flattened_index(column_row_index_pair_)];
 		}
 
 		/// <summary>
-		/// <para> Accesses the theoretical non-major element at the provided NonMajorIndex_ within this Matrix. </para>
-		/// <para> If this Matrix is column-major and the index is contained: This will be a reference to the row at the specified MajorIndex_. </para>
-		/// <para> If this Matrix is not column-major and the index is contained: This will be a reference to the column at the specified MajorIndex_. </para>
-		/// <para> If this Matrix is column-major and the index is not contained: This will be an implied-zero row for this Matrix type. </para>
-		/// <para> If this Matrix is not column-major and the index is not contained: This will be an implied-zero column for this Matrix type. </para>
+		/// <para> Accesses the element at the provided contiguous flattened index within this Matrix. </para>
+		/// <para> Performs no validity checks, and behaviour when flattened_index_ is not in the valid range (0:size-1) is undefined. </para>
 		/// </summary>
-		/// <returns>
-		///		EmuMath Vector of references to elements within the specified non-major element within this Matrix, 
-		///		or an implied-zero non-major element if it is not contained.
-		/// </returns>
-		template<std::size_t NonMajorIndex_>
-		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_non_major_theoretical_get_result<NonMajorIndex_, this_type&>::type NonMajorAtTheoretical()
+		/// <param name="flattened_index_">: Contiguous flattened index of the element to access.</param>
+		/// <returns>Reference to the element at the provided contiguous flattened index within this Matrix.</returns>
+		[[nodiscard]] constexpr inline const value_type& operator()(std::size_t flattened_index_) const
 		{
-			return EmuMath::Helpers::matrix_get_non_major_theoretical<NonMajorIndex_>(*this);
+			return _data[flattened_index_];
 		}
 
-		template<std::size_t NonMajorIndex_>
-		[[nodiscard]] constexpr inline typename EmuMath::TMP::matrix_non_major_theoretical_get_result<NonMajorIndex_, const this_type&>::type NonMajorAtTheoretical() const
+		[[nodiscard]] constexpr inline value_type& operator()(std::size_t flattened_index_)
 		{
-			return EmuMath::Helpers::matrix_get_non_major_theoretical<NonMajorIndex_>(*this);
+			return _data[flattened_index_];
 		}
 
 		/// <summary>
-		/// <para>
-		///		Outputs an EmuMath Vector representing the main-diagonal of the this Matrix, 
-		///		starting from the provided Offset_ for as many indices as the output Vector holds.
-		/// </para>
-		/// <para> If no OutSize_ is provided, the output size will default to that of this Matrix's smallest axis. </para>
-		/// <para> Offset_: Inclusive index from which to start reading main diagonal elements. This is used as both a column index and a row index. Defaults to 0. </para>
+		/// <para> Accesses the element at the provided Column + Row Index within this Matrix. </para>
+		/// <para> Performs no validity checks, and behaviour when either index is in invalid is undefined. </para>
 		/// </summary>
-		/// <returns>EmuMath Vector representing the main diagonal within this Matrix for as many elements as it contains, and starting from the provided Offset_.</returns>
-		template<std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> MainDiagonal()
+		/// <param name="column_index_">: Index of the Column to access.</param>
+		/// <param name="row_index_">: Index of the Row to access.</param>
+		/// <returns>Reference to the element at the provided Column + Row Index within this Matrix.</returns>
+		[[nodiscard]] constexpr inline const value_type& operator()(std::size_t column_index_, std::size_t row_index_) const
 		{
-			return EmuMath::Helpers::matrix_get_main_diagonal<OutSize_, OutT_, Offset_>(*this);
+			return _data[get_flattened_index(column_index_, row_index_)];
 		}
 
-		template<std::size_t OutSize_, std::size_t Offset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, value_type_uq> MainDiagonal()
+		[[nodiscard]] constexpr inline value_type& operator()(std::size_t column_index_, std::size_t row_index_)
 		{
-			return EmuMath::Helpers::matrix_get_main_diagonal<OutSize_, value_type_uq, Offset_>(*this);
-		}
-
-		template<typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<EmuMath::TMP::matrix_smallest_axis_v<this_type>, OutT_> MainDiagonal()
-		{
-			return EmuMath::Helpers::matrix_get_main_diagonal<EmuMath::TMP::matrix_smallest_axis_v<this_type>, OutT_, Offset_>(*this);
+			return _data[get_flattened_index(column_index_, row_index_)];
 		}
 
 		/// <summary>
-		/// <para>
-		///		Outputs an EmuMath Vector representing the main-diagonal of the this Matrix, 
-		///		starting from the provided Offset_ for as many indices as the output Vector holds.
-		/// </para>
-		/// <para> If no OutSize_ is provided, the output size will default to that of this Matrix's smallest axis. </para>
-		/// <para> Offset_: Inclusive index from which to start reading main diagonal elements. This is used as both a column index and a row index. Defaults to 0. </para>
+		/// <para> Accesses the element at the provided Column + Row Index within this Matrix. </para>
+		/// <para> Performs no validity checks, and behaviour when either index is in invalid is undefined. </para>
 		/// </summary>
-		/// <returns>EmuMath Vector representing the main diagonal within this Matrix for as many elements as it contains, and starting from the provided Offset_.</returns>
-		template<std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> MainDiagonal() const
+		/// <param name="column_row_index_pair_">: Pair of indices to use as Column + Row Index arguments; first is the column index, second is the row index. </param>
+		/// <returns>Reference to the element at the provided Column + Row Index within this Matrix.</returns>
+		[[nodiscard]] constexpr inline const value_type& operator()(const std::pair<std::size_t, std::size_t>& column_row_index_pair_) const
 		{
-			return EmuMath::Helpers::matrix_get_main_diagonal<OutSize_, OutT_, Offset_>(*this);
+			return _data[get_flattened_index(column_row_index_pair_)];
 		}
 
-		template<std::size_t OutSize_, std::size_t Offset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, value_type_uq> MainDiagonal() const
+		[[nodiscard]] constexpr inline value_type& operator()(const std::pair<std::size_t, std::size_t>& column_row_index_pair_)
 		{
-			return EmuMath::Helpers::matrix_get_main_diagonal<OutSize_, value_type_uq, Offset_>(*this);
+			return _data[get_flattened_index(column_row_index_pair_)];
+		}
+#pragma endregion
+
+#pragma region STL_ACCESS
+		[[nodiscard]] constexpr inline const_iterator cbegin() const
+		{
+			return _data.cbegin();
 		}
 
-		template<typename OutT_ = value_type_uq, std::size_t Offset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<EmuMath::TMP::matrix_smallest_axis_v<this_type>, OutT_> MainDiagonal() const
+		[[nodiscard]] constexpr inline const_iterator cend() const
 		{
-			return EmuMath::Helpers::matrix_get_main_diagonal<EmuMath::TMP::matrix_smallest_axis_v<this_type>, OutT_, Offset_>(*this);
+			return _data.cend();
 		}
 
-		/// <summary>
-		/// <para> Outputs an EmuMath Vector copy of the column at the provided theoretical index within this Matrix. </para>
-		/// <para> ReadOffset_: Inclusive index at which to start copying from the specified column. Defaults to 0. </para>
-		/// </summary>
-		/// <returns>EmuMath Vector constructed from this Matrix's column at the provided index, copying said column from the provided ReadOffset_.</returns>
-		template<std::size_t ColumnIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ColumnCopy()
+		[[nodiscard]] constexpr inline const_reverse_iterator crbegin() const
 		{
-			if constexpr (EmuMath::Helpers::vector_cast_is_valid<column_get_ref_type, OutSize_, OutT_, ReadOffset_>())
-			{
-				return EmuMath::Helpers::vector_cast<OutSize_, OutT_, ReadOffset_>(ColumnAtTheoretical<ColumnIndex_>());
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<OutT_>(),
-					"Attempted to retrieve a copy of a column within an EmuMath Matrix, but the provided output Vector type could not be cast to from the provided offset within one of the Matrix's non-const columns."
-				);
-			}
+			return _data.crbegin();
 		}
 
-		template<std::size_t ColumnIndex_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<num_rows, OutT_> ColumnCopy()
+		[[nodiscard]] constexpr inline const_reverse_iterator crend() const
 		{
-			return ColumnCopy<ColumnIndex_, num_rows, OutT_, ReadOffset_>();
+			return _data.crend();
 		}
 
-		template<std::size_t ColumnIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> ColumnCopy() const
+		[[nodiscard]] constexpr inline iterator begin()
 		{
-			if constexpr (EmuMath::Helpers::vector_cast_is_valid<column_get_const_ref_type, OutSize_, OutT_, ReadOffset_>())
-			{
-				return EmuMath::Helpers::vector_cast<OutSize_, OutT_, ReadOffset_>(ColumnAtTheoretical<ColumnIndex_>());
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<OutT_>(),
-					"Attempted to retrieve a copy of a column within an EmuMath Matrix, but the provided output Vector type could not be cast to from the provided offset within one of the Matrix's const columns."
-				);
-			}
+			return _data.begin();
 		}
 
-		template<std::size_t ColumnIndex_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<num_rows, OutT_> ColumnCopy() const
+		[[nodiscard]] constexpr inline const_iterator begin() const
 		{
-			return ColumnCopy<ColumnIndex_, num_rows, OutT_, ReadOffset_>();
+			return _data.cbegin();
 		}
 
-		/// <summary>
-		/// <para> Outputs an EmuMath Vector copy of the row at the provided theoretical index within this Matrix. </para>
-		/// <para> ReadOffset_: Inclusive index at which to start copying from the specified row. Defaults to 0. </para>
-		/// </summary>
-		/// <returns>EmuMath Vector constructed from this Matrix's row at the provided index, copying said row from the provided ReadOffset_.</returns>
-		template<std::size_t RowIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> RowCopy()
+		[[nodiscard]] constexpr inline iterator end()
 		{
-			if constexpr (EmuMath::Helpers::vector_cast_is_valid<row_get_ref_type, OutSize_, OutT_, ReadOffset_>())
-			{
-				return EmuMath::Helpers::vector_cast<OutSize_, OutT_, ReadOffset_>(RowAtTheoretical<RowIndex_>());
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<OutT_>(),
-					"Attempted to retrieve a copy of a row within an EmuMath Matrix, but the provided output Vector type could not be cast to from the provided offset within one of the Matrix's non-const rows."
-				);
-			}
+			return _data.end();
 		}
 
-		template<std::size_t RowIndex_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<num_columns, OutT_> RowCopy()
+		[[nodiscard]] constexpr inline const_iterator end() const
 		{
-			return RowCopy<RowIndex_, num_columns, OutT_, ReadOffset_>();
+			return _data.cend();
 		}
 
-		template<std::size_t RowIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> RowCopy() const
+		[[nodiscard]] constexpr inline reverse_iterator rbegin()
 		{
-			if constexpr (EmuMath::Helpers::vector_cast_is_valid<row_get_const_ref_type, OutSize_, OutT_, ReadOffset_>())
-			{
-				return EmuMath::Helpers::vector_cast<OutSize_, OutT_, ReadOffset_>(RowAtTheoretical<RowIndex_>());
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<OutT_>(),
-					"Attempted to retrieve a copy of a row within an EmuMath Matrix, but the provided output Vector type could not be cast to from the provided offset within one of the Matrix's const rows."
-				);
-			}
+			return _data.rbegin();
 		}
 
-		template<std::size_t RowIndex_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<num_columns, OutT_> RowCopy() const
+		[[nodiscard]] constexpr inline const_reverse_iterator rbegin() const
 		{
-			return RowCopy<RowIndex_, num_columns, OutT_, ReadOffset_>();
+			return _data.crbegin();
 		}
 
-		/// <summary>
-		/// <para> Outputs an EmuMath Vector copy of the major element at the provided theoretical index within this Matrix. </para>
-		/// <para> ReadOffset_: Inclusive index at which to start copying from the specified major element. Defaults to 0. </para>
-		/// <para> If this Matrix is column major: Results should be expected to be identical to ColumnCopy. </para>
-		/// <para> If this Matrix is not column major: Results should be expected to be identical to RowCopy. </para>
-		/// </summary>
-		/// <returns>EmuMath Vector constructed from this Matrix's major element at the provided index, copying said element from the provided ReadOffset_.</returns>
-		template<std::size_t MajorIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> MajorCopy()
+		[[nodiscard]] constexpr inline reverse_iterator rend()
 		{
-			if constexpr (EmuMath::Helpers::vector_cast_is_valid<major_get_ref_type, OutSize_, OutT_, ReadOffset_>())
-			{
-				return EmuMath::Helpers::vector_cast<OutSize_, OutT_, ReadOffset_>(MajorAtTheoretical<MajorIndex_>());
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<OutT_>(),
-					"Attempted to retrieve a copy of a major element within an EmuMath Matrix, but the provided output Vector type could not be cast to from the provided offset within one of the Matrix's non-const major elements."
-				);
-			}
+			return _data.rend();
 		}
 
-		template<std::size_t MajorIndex_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<num_non_major_elements, OutT_> MajorCopy()
+		[[nodiscard]] constexpr inline const_reverse_iterator rend() const
 		{
-			return MajorCopy<MajorIndex_, num_non_major_elements, OutT_, ReadOffset_>();
-		}
-
-		template<std::size_t MajorIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> MajorCopy() const
-		{
-			if constexpr (EmuMath::Helpers::vector_cast_is_valid<major_get_const_ref_type, OutSize_, OutT_, ReadOffset_>())
-			{
-				return EmuMath::Helpers::vector_cast<OutSize_, OutT_, ReadOffset_>(MajorAtTheoretical<MajorIndex_>());
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<OutT_>(),
-					"Attempted to retrieve a copy of a major element within an EmuMath Matrix, but the provided output Vector type could not be cast to from the provided offset within one of the Matrix's const major elements."
-				);
-			}
-		}
-
-		template<std::size_t MajorIndex_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<num_non_major_elements, OutT_> MajorCopy() const
-		{
-			return MajorCopy<MajorIndex_, num_non_major_elements, OutT_, ReadOffset_>();
-		}
-
-		/// <summary>
-		/// <para> Outputs an EmuMath Vector copy of the non-major element at the provided theoretical index within this Matrix. </para>
-		/// <para> ReadOffset_: Inclusive index at which to start copying from the specified non-major element. Defaults to 0. </para>
-		/// <para> If this Matrix is column major: Results should be expected to be identical to RowCopy. </para>
-		/// <para> If this Matrix is not column major: Results should be expected to be identical to ColumnCopy. </para>
-		/// </summary>
-		/// <returns>EmuMath Vector constructed from this Matrix's non-major element at the provided index, copying said element from the provided ReadOffset_.</returns>
-		template<std::size_t NonMajorIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> NonMajorCopy()
-		{
-			if constexpr (EmuMath::Helpers::vector_cast_is_valid<non_major_get_ref_type, OutSize_, OutT_, ReadOffset_>())
-			{
-				return EmuMath::Helpers::vector_cast<OutSize_, OutT_, ReadOffset_>(NonMajorAtTheoretical<NonMajorIndex_>());
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<OutT_>(),
-					"Attempted to retrieve a copy of a non-major element within an EmuMath Matrix, but the provided output Vector type could not be cast to from the provided offset within one of the Matrix's non-const non-major elements."
-				);
-			}
-		}
-
-		template<std::size_t NonMajorIndex_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<num_major_elements, OutT_> NonMajorCopy()
-		{
-			return NonMajorCopy<NonMajorIndex_, num_major_elements, OutT_, ReadOffset_>();
-		}
-
-		template<std::size_t NonMajorIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> NonMajorCopy() const
-		{
-			if constexpr (EmuMath::Helpers::vector_cast_is_valid<non_major_get_const_ref_type, OutSize_, OutT_, ReadOffset_>())
-			{
-				return EmuMath::Helpers::vector_cast<OutSize_, OutT_, ReadOffset_>(NonMajorAtTheoretical<NonMajorIndex_>());
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<OutT_>(),
-					"Attempted to retrieve a copy of a non-major element within an EmuMath Matrix, but the provided output Vector type could not be cast to from the provided offset within one of the Matrix's const non-major elements."
-				);
-			}
-		}
-
-		template<std::size_t NonMajorIndex_, typename OutT_ = value_type_uq, std::size_t ReadOffset_ = 0>
-		[[nodiscard]] constexpr inline EmuMath::Vector<num_major_elements, OutT_> NonMajorCopy() const
-		{
-			return NonMajorCopy<NonMajorIndex_, num_major_elements, OutT_, ReadOffset_>();
+			return _data.crend();
 		}
 #pragma endregion
 
@@ -1794,7 +1746,7 @@ namespace EmuMath
 		///		with size/column-major arguments matching those of lhs_matrix_ if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
 		/// </para>
 		/// <para> Indices within the provided range will contain results of respective addition operations. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be added. </para>
 		/// <para> If Rhs_ is none of the above: All index additions will use the rhs_ directly. </para>
 		/// </summary>
@@ -1941,7 +1893,7 @@ namespace EmuMath
 		///		with size/column-major arguments matching those of this Matrix if not provided, and value_type_uq for its T_ argument if OutT_ is not provided.
 		/// </para>
 		/// <para> Indices within the provided range will contain results of respective subtraction operations. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be subtracted. </para>
 		/// <para> If Rhs_ is none of the above: All index subtractions will use the rhs_ directly. </para>
 		/// </summary>
@@ -2113,7 +2065,7 @@ namespace EmuMath
 		///		Range-based standard variants as this function is used are not available.
 		/// </para>
 		/// <para> Indices within the provided range will contain results of respective multiplication operations. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be multiplied. </para>
 		/// <para> If Rhs_ is none of the above: All index multiplications will use the rhs_ directly. </para>
 		/// </summary>
@@ -2286,7 +2238,7 @@ namespace EmuMath
 		///		To create an effect similar to what could be considered standard division when rhs_ is a Matrix, consider multiplying this Matrix by the inverse of rhs_.
 		/// </para>
 		/// <para> Indices within the provided range will contain results of respective division operations. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be divided. </para>
 		/// <para> If Rhs_ is none of the above: All index divisions will use the rhs_ directly. </para>
 		/// </summary>
@@ -2448,7 +2400,7 @@ namespace EmuMath
 		/// </para>
 		/// <para> This is a basic, non-standard Matrix modulo-division. As a standard modulo-division is mathemtically undefined, there is no alternative. </para>
 		/// <para> Indices within the provided range will contain results of respective modulo-division operations. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// <para> If Rhs_ is an EmuMath Matrix: Respective indices in each Matrix will be modulo-divided. </para>
 		/// <para> If Rhs_ is none of the above: All index modulo-divisions will use the rhs_ directly. </para>
 		/// </summary>
@@ -2624,7 +2576,7 @@ namespace EmuMath
 		///		Otherwise, all intermediate multiplication results will have z_ added directly.
 		/// </para>
 		/// <para> Indices within the provided range will contain results of respective fused multiply-addition operations. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// </summary>
 		/// <param name="y_">: Scalar or EmuMath Matrix to multiply this Matrix by.</param>
 		/// <param name="z_">: Scalar or EmuMath Matrix to add to intermediate multiplication results.</param>
@@ -2821,7 +2773,7 @@ namespace EmuMath
 		///		Otherwise, all intermediate multiplication results will have z_ subtracted directly.
 		/// </para>
 		/// <para> Indices within the provided range will contain results of respective fused multiply-subtraction operations. </para>
-		/// <para> Indices outside of the provided range will be default-constructed. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// </summary>
 		/// <param name="y_">: Scalar or EmuMath Matrix to multiply this Matrix by.</param>
 		/// <param name="z_">: Scalar or EmuMath Matrix to subtract from intermediate multiplication results.</param>
@@ -3186,6 +3138,2059 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region ROUNDING_FUNCS
+		/// <summary> 
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward negative infinity. </para>
+		/// <para> This does not provide a guarantee to be constexpr where possible. For such behaviour, use `FloorConstexpr`. </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward negative infinity.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Floor() const
+		{
+			return EmuMath::Helpers::matrix_floor<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Floor() const
+		{
+			return EmuMath::Helpers::matrix_floor<num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Floor() const
+		{
+			return EmuMath::Helpers::matrix_floor<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Floor(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_floor(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward negative infinity. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices within this Matrix. </para>
+		/// <para> This does not provide a guarantee to be constexpr where possible. For such behaviour, use `FloorRangeConstexpr`. </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward negative infinity.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> FloorRange() const
+		{
+			return EmuMath::Helpers::matrix_floor_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> FloorRange() const
+		{
+			return EmuMath::Helpers::matrix_floor_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> FloorRange() const
+		{
+			return EmuMath::Helpers::matrix_floor_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void FloorRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_floor_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward negative infinity. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// <para> This does not provide a guarantee to be constexpr where possible. For such behaviour, use `FloorRangeNoCopyConstexpr`. </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward negative infinity.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> FloorRangeNoCopy() const
+		{
+			return EmuMath::Helpers::matrix_floor_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> FloorRangeNoCopy() const
+		{
+			return EmuMath::Helpers::matrix_floor_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> FloorRangeNoCopy() const
+		{
+			return EmuMath::Helpers::matrix_floor_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with all of its elements rounded toward negative infinity via the provided out_matrix_. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para> This does not provide a guarantee to be constexpr where possible. For such behaviour, use `FloorRangeNoCopyConstexpr`. </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void FloorRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_floor_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+
+		/// <summary> 
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward positive infinity. </para>
+		/// <para> This does not provide a guarantee to be constexpr where possible. For such behaviour, use `CeilConstexpr`. </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward positive infinity.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Ceil() const
+		{
+			return EmuMath::Helpers::matrix_ceil<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Ceil() const
+		{
+			return EmuMath::Helpers::matrix_ceil<num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Ceil() const
+		{
+			return EmuMath::Helpers::matrix_ceil<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Ceil(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_ceil(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward positive infinity. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices within this Matrix. </para>
+		/// <para> This does not provide a guarantee to be constexpr where possible. For such behaviour, use `CeilRangeConstexpr`. </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward positive infinity.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> CeilRange() const
+		{
+			return EmuMath::Helpers::matrix_ceil_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> CeilRange() const
+		{
+			return EmuMath::Helpers::matrix_ceil_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> CeilRange() const
+		{
+			return EmuMath::Helpers::matrix_ceil_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void CeilRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_ceil_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward positive infinity. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// <para> This does not provide a guarantee to be constexpr where possible. For such behaviour, use `CeilRangeNoCopyConstexpr`. </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward positive infinity.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> CeilRangeNoCopy() const
+		{
+			return EmuMath::Helpers::matrix_ceil_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> CeilRangeNoCopy() const
+		{
+			return EmuMath::Helpers::matrix_ceil_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> CeilRangeNoCopy() const
+		{
+			return EmuMath::Helpers::matrix_ceil_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with all of its elements rounded toward positive infinity via the provided out_matrix_. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para> This does not provide a guarantee to be constexpr where possible. For such behaviour, use `CeilRangeNoCopyConstexpr`. </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void CeilRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_ceil_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+
+		/// <summary> 
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward 0. </para>
+		/// <para> This does not provide a guarantee to be constexpr where possible. For such behaviour, use `TruncConstexpr`. </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward 0.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Trunc() const
+		{
+			return EmuMath::Helpers::matrix_trunc<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Trunc() const
+		{
+			return EmuMath::Helpers::matrix_trunc<num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Trunc() const
+		{
+			return EmuMath::Helpers::matrix_trunc<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Trunc(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_trunc(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward 0. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices within this Matrix. </para>
+		/// <para> This does not provide a guarantee to be constexpr where possible. For such behaviour, use `TruncRangeConstexpr`. </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward 0.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> TruncRange() const
+		{
+			return EmuMath::Helpers::matrix_trunc_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> TruncRange() const
+		{
+			return EmuMath::Helpers::matrix_trunc_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> TruncRange() const
+		{
+			return EmuMath::Helpers::matrix_trunc_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void TruncRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_trunc_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward 0. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// <para> This does not provide a guarantee to be constexpr where possible. For such behaviour, use `TruncRangeNoCopyConstexpr`. </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward 0.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> TruncRangeNoCopy() const
+		{
+			return EmuMath::Helpers::matrix_trunc_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> TruncRangeNoCopy() const
+		{
+			return EmuMath::Helpers::matrix_trunc_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> TruncRangeNoCopy() const
+		{
+			return EmuMath::Helpers::matrix_trunc_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with all of its elements rounded toward 0 via the provided out_matrix_. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para> This does not provide a guarantee to be constexpr where possible. For such behaviour, use `TruncRangeNoCopyConstexpr`. </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void TruncRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_trunc_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+#pragma endregion
+
+#pragma region CONSTEXPR_ROUNDING_FUNCS
+		/// <summary> 
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward negative infinity. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward negative infinity.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> FloorConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_floor_constexpr<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> FloorConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_floor_constexpr<num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> FloorConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_floor_constexpr<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void FloorConstexpr(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_floor_constexpr(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward negative infinity. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices within this Matrix. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward negative infinity.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> FloorRangeConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_floor_range_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> FloorRangeConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_floor_range_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> FloorRangeConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_floor_range_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void FloorRangeConstexpr(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_floor_range_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward negative infinity. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward negative infinity.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> FloorRangeNoCopyConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_floor_range_no_copy_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> FloorRangeNoCopyConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_floor_range_no_copy_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> FloorRangeNoCopyConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_floor_range_no_copy_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with all of its elements rounded toward negative infinity via the provided out_matrix_. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void FloorRangeNoCopyConstexpr(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_floor_range_no_copy_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+
+		/// <summary> 
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward positive infinity. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward positive infinity.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> CeilConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_ceil_constexpr<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> CeilConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_ceil_constexpr<num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> CeilConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_ceil_constexpr<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void CeilConstexpr(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_ceil_constexpr(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward positive infinity. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices within this Matrix. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward positive infinity.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> CeilRangeConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_ceil_range_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> CeilRangeConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_ceil_range_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> CeilRangeConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_ceil_range_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void CeilRangeConstexpr(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_ceil_range_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward positive infinity. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward positive infinity.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> CeilRangeNoCopyConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_ceil_range_no_copy_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> CeilRangeNoCopyConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_ceil_range_no_copy_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> CeilRangeNoCopyConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_ceil_range_no_copy_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with all of its elements rounded toward positive infinity via the provided out_matrix_. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void CeilRangeNoCopyConstexpr(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_ceil_range_no_copy_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+
+		/// <summary> 
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward 0. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward 0.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> TruncConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_trunc_constexpr<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> TruncConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_trunc_constexpr<num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> TruncConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_trunc_constexpr<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void TruncConstexpr(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_trunc_constexpr(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward 0. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices within this Matrix. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward 0.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> TruncRangeConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_trunc_range_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> TruncRangeConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_trunc_range_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> TruncRangeConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_trunc_range_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void TruncRangeConstexpr(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_trunc_range_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with all of its elements rounded toward 0. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <returns>Copy of this Matrix with its elements rounded toward 0.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> TruncRangeNoCopyConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_trunc_range_no_copy_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> TruncRangeNoCopyConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_trunc_range_no_copy_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> TruncRangeNoCopyConstexpr() const
+		{
+			return EmuMath::Helpers::matrix_trunc_range_no_copy_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with all of its elements rounded toward 0 via the provided out_matrix_. </para>
+		/// <para> Indices within the provided range will contain results of respective rounding operations. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// <para>
+		///		Provides a guarantee to be constexpr-evaluable if possible. Note that this may make sacrifices to accuracy and/or performance, 
+		///		and as a result one may prefer to use the non-constexpr variant of this function if it is guaranteed to be executed at runtime.
+		/// </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void TruncRangeNoCopyConstexpr(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_trunc_range_no_copy_constexpr<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+#pragma endregion
+
+#pragma region MISC_ARITHMETIC_FUNCS
+	public:
+		/// <summary>
+		/// <para> Returns a version of this Matrix with its elements made absolute (e.g. x = x, -x = x). </para>
+		/// </summary>
+		/// <returns>Copy of the this Matrix with its elements made absolute.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Abs() const
+		{
+			return EmuMath::Helpers::matrix_abs<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Abs() const
+		{
+			return EmuMath::Helpers::matrix_abs<num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Abs() const
+		{
+			return EmuMath::Helpers::matrix_abs<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Abs(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_abs(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with its elements made absolute (e.g. x = x, -x = x). </para>
+		/// <para> Indices within the provided range will contain results of respective absolute operations. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective indices within in_matrix_. </para>
+		/// </summary>
+		/// <returns>Copy of the this Matrix with elements within the provided range made absolute.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> AbsRange() const
+		{
+			return EmuMath::Helpers::matrix_abs_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> AbsRange() const
+		{
+			return EmuMath::Helpers::matrix_abs_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> AbsRange() const
+		{
+			return EmuMath::Helpers::matrix_abs_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void AbsRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_abs_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Returns a version of this Matrix with its elements made absolute (e.g. x = x, -x = x). </para>
+		/// <para> Indices within the provided range will contain results of respective absolute operations. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// </summary>
+		/// <returns>EmuMath Matrix with elements with this Matrix's elements made absolute in the provided range, and default-constructed elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> AbsRangeNoCopy() const
+		{
+			return EmuMath::Helpers::matrix_abs_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> AbsRangeNoCopy() const
+		{
+			return EmuMath::Helpers::matrix_abs_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> AbsRangeNoCopy() const
+		{
+			return EmuMath::Helpers::matrix_abs_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements made absolute (e.g. x = x, -x = x) via the provided out_matrix_. </para>
+		/// <para> Indices within the provided range will contain results of respective absolute operations. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void AbsRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			EmuMath::Helpers::matrix_abs_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this);
+		}
+
+		/// <summary>
+		/// <para> Outputs the lowest element within this Matrix as the provided Out_ type, defaulting this Matrix's value_type_uq. </para>
+		/// <para> Supports output of references if the reference type is compatible with const-qualification. </para>
+		/// </summary>
+		/// <returns>Lowest element of this Matrix, as the provided Out_ type.</returns>
+		template<typename Out_ = value_type_uq>
+		[[nodiscard]] constexpr inline Out_ Min() const
+		{
+			return EmuMath::Helpers::matrix_min<Out_>(*this);
+		}
+
+		template<typename Out_ = value_type_uq>
+		[[nodiscard]] constexpr inline Out_ Min()
+		{
+			return EmuMath::Helpers::matrix_min<Out_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Matrix composed of the lowest elements out of this Matrix and b_. </para>
+		/// <para>
+		///		If B_ is an EmuMath Matrix: Comparisons will be performed with respective indices in this Matrix and b_. 
+		///		Otherwise, all indices will be compared with b_ directly.
+		/// </para>
+		/// </summary>
+		/// <param name="b_">: Scalar or EmuMath Matrix appearing as b in a min(a, b) operation.</param>
+		/// <returns>EmuMath Matrix composed of min results in respective indices.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Min(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_min<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<B_>(b_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Min(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_min<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<B_>(b_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Min(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_min<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<B_>(b_));
+		}
+
+		template<class B_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Min(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_) const
+		{
+			EmuMath::Helpers::matrix_min(out_matrix_, *this, std::forward<B_>(b_));
+		}
+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Min(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_min<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<B_>(b_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Min(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_min<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<B_>(b_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Min(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_min<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<B_>(b_));
+		}
+
+		template<class B_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Min(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_)
+		{
+			EmuMath::Helpers::matrix_min(out_matrix_, *this, std::forward<B_>(b_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the lowest element within this Matrix as the provided Out_ type, defaulting to this Matrix's value_type_uq. </para>
+		/// <para> Only elements within the provided range will be considered. </para>
+		/// <para> Supports output of references if the reference type is compatible with const-qualification, and the provided range contains no theoretical indices. </para>
+		/// </summary>
+		/// <returns>Lowest element of this Matrix within the provided range, as the provided Out_ type.</returns>
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename Out_ = value_type_uq>
+		[[nodiscard]] constexpr inline Out_ MinRange() const
+		{
+			return EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, Out_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename Out_ = value_type_uq>
+		[[nodiscard]] constexpr inline Out_ MinRange()
+		{
+			return EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, Out_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Matrix composed of the lowest elements out of this Matrix and b_. </para>
+		/// <para>
+		///		If B_ is an EmuMath Matrix: Comparisons will be performed with respective indices in this Matrix and b_. 
+		///		Otherwise, all indices will be compared with b_ directly.
+		/// </para>
+		/// <para> Indices within the provided range will be the respective minimum element out of this Matrix and b_. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective element within this Matrix. </para>
+		/// </summary>
+		/// <param name="b_">: Scalar or EmuMath Matrix appearing as b in a min(a, b) operation.</param>
+		/// <returns>EmuMath Matrix composed of min results in respective indices within the provided range, and copies of respective indices within this Matrix elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class B_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> MinRange(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			typename OutT_, bool OutColumnMajor_ = is_column_major, class B_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> MinRange(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> MinRange(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class B_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void MinRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_) const
+		{
+			EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_));
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class B_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> MinRange(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			typename OutT_, bool OutColumnMajor_ = is_column_major, class B_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> MinRange(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> MinRange(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class B_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void MinRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_)
+		{
+			EmuMath::Helpers::matrix_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_));
+		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Matrix composed of the lowest elements out of this Matrix and b_. </para>
+		/// <para>
+		///		If B_ is an EmuMath Matrix: Comparisons will be performed with respective indices in this Matrix and b_. 
+		///		Otherwise, all of this Matrix's indices will be compared with b_ directly.
+		/// </para>
+		/// <para> Indices within the provided range will be the respective minimum element out of this Matrix and b_. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// </summary>
+		/// <param name="b_">: Scalar or EmuMath Matrix appearing as b in a min(a, b) operation.</param>
+		/// <returns>EmuMath Matrix composed of min results in respective indices within the provided range, and default-constructed elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class B_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> MinRangeNoCopy(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> MinRangeNoCopy(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> MinRangeNoCopy(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class B_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void MinRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_) const
+		{
+			EmuMath::Helpers::matrix_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_));
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class B_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> MinRangeNoCopy(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> MinRangeNoCopy(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> MinRangeNoCopy(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class B_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void MinRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_)
+		{
+			EmuMath::Helpers::matrix_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the greatest element within this Matrix as the provided Out_ type, defaulting to this Matrix's value_type_uq. </para>
+		/// <para> Supports output of references if the reference type is compatible with const-qualification. </para>
+		/// </summary>
+		/// <returns>Greaetst element of this Matrix, as the provided Out_ type.</returns>
+		template<typename Out_ = value_type_uq>
+		[[nodiscard]] constexpr inline Out_ Max() const
+		{
+			return EmuMath::Helpers::matrix_max<Out_>(*this);
+		}
+
+		template<typename Out_ = value_type_uq>
+		[[nodiscard]] constexpr inline Out_ Max()
+		{
+			return EmuMath::Helpers::matrix_max<Out_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Matrix composed of the greatest elements out of this Matrix and b_. </para>
+		/// <para>
+		///		If B_ is an EmuMath Matrix: Comparisons will be performed with respective indices in this Matrix and b_. 
+		///		Otherwise, all indices will be compared with b_ directly.
+		/// </para>
+		/// </summary>
+		/// <param name="b_">: Scalar or EmuMath Matrix appearing as b in a max(a, b) operation.</param>
+		/// <returns>EmuMath Matrix composed of max results in respective indices.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Max(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_min<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<B_>(b_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Max(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_max<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<B_>(b_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Max(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_max<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<B_>(b_));
+		}
+
+		template<class B_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Max(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_) const
+		{
+			EmuMath::Helpers::matrix_max(out_matrix_, *this, std::forward<B_>(b_));
+		}
+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Max(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_max<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<B_>(b_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Max(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_max<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<B_>(b_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Max(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_max<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<B_>(b_));
+		}
+
+		template<class B_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void Max(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_)
+		{
+			EmuMath::Helpers::matrix_max(out_matrix_, *this, std::forward<B_>(b_));
+		}
+
+		/// <summary>
+		/// <para> Outputs the greatest element within this Matrix as the provided Out_ type, defaulting to this Matrix's value_type_uq. </para>
+		/// <para> Only elements within the provided range will be considered. </para>
+		/// <para> Supports output of references if the reference type is compatible with const-qualification, and the provided range contains no theoretical indices. </para>
+		/// </summary>
+		/// <returns>Greatest element of this Matrix within the provided range, as the provided Out_ type.</returns>
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename Out_ = value_type_uq>
+		[[nodiscard]] constexpr inline Out_ MaxRange() const
+		{
+			return EmuMath::Helpers::matrix_max_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, Out_>(*this);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename Out_ = value_type_uq>
+		[[nodiscard]] constexpr inline Out_ MaxRange()
+		{
+			return EmuMath::Helpers::matrix_max_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, Out_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Matrix composed of the greatest elements out of this Matrix and b_. </para>
+		/// <para>
+		///		If B_ is an EmuMath Matrix: Comparisons will be performed with respective indices in this Matrix and b_. 
+		///		Otherwise, all indices will be compared with b_ directly.
+		/// </para>
+		/// <para> Indices within the provided range will be the respective maximum element out of this Matrix and b_. </para>
+		/// <para> Indices outside of the provided range will be copies of the respective element within this Matrix. </para>
+		/// </summary>
+		/// <param name="b_">: Scalar or EmuMath Matrix appearing as b in a max(a, b) operation.</param>
+		/// <returns>EmuMath Matrix composed of max results in respective indices within the provided range, and copies of respective indices within this Matrix elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class B_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> MaxRange(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_max_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			typename OutT_, bool OutColumnMajor_ = is_column_major, class B_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> MaxRange(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_max_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> MaxRange(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_max_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class B_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void MaxRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_) const
+		{
+			EmuMath::Helpers::matrix_max_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_));
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class B_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> MaxRange(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_max_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			typename OutT_, bool OutColumnMajor_ = is_column_major, class B_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> MaxRange(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_max_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> MaxRange(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_max_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class B_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void MaxRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_)
+		{
+			EmuMath::Helpers::matrix_max_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_));
+		}
+
+		/// <summary>
+		/// <para> Outputs an EmuMath Matrix composed of the greatest elements out of this Matrix and b_. </para>
+		/// <para>
+		///		If B_ is an EmuMath Matrix: Comparisons will be performed with respective indices in this Matrix and b_. 
+		///		Otherwise, all of this Matrix's indices will be compared with b_ directly.
+		/// </para>
+		/// <para> Indices within the provided range will be the respective maximum element out of this Matrix and b_. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// </summary>
+		/// <param name="b_">: Scalar or EmuMath Matrix appearing as b in a max(a, b) operation.</param>
+		/// <returns>EmuMath Matrix composed of max results in respective indices within the provided range, and default-constructed elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class B_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> MaxRangeNoCopy(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_max_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> MaxRangeNoCopy(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_max_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> MaxRangeNoCopy(B_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_max_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class B_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void MaxRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_) const
+		{
+			EmuMath::Helpers::matrix_max_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_));
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class B_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> MaxRangeNoCopy(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_max_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> MaxRangeNoCopy(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_max_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class B_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> MaxRangeNoCopy(B_&& b_)
+		{
+			return EmuMath::Helpers::matrix_max_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class B_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void MaxRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_)
+		{
+			EmuMath::Helpers::matrix_max_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_));
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements linearly interpolated with b_ using a weighting of t_. </para>
+		/// <para> If B_ is an EmuMath Matrix: Elements will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
+		/// <para> If ArgT_ is an EmuMath Matrix: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
+		/// </summary>
+		/// <param name="b_">: Scalar or EmuMath Matrix to use as the target point for linear interpolation.</param>
+		/// <param name="t_">: Scalar or EmuMath Matrix to use as weighting for linear interpolations, where lerp(a, b, 0) = a, lerp(a, b, 1) = b.</param>
+		/// <returns>Copy of this Matrix with its elements linearly interpolated, summarised as `out = a + ((b - a) * t)`.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = preferred_floating_point, bool OutColumnMajor_ = is_column_major, class B_, class ArgT_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Lerp(B_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::matrix_lerp<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<B_>(b_), std::forward<ArgT_>(t_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class B_, class ArgT_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Lerp(B_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::matrix_lerp<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<B_>(b_), std::forward<ArgT_>(t_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class B_, class ArgT_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, preferred_floating_point, OutColumnMajor_> Lerp(B_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::matrix_lerp<num_columns, num_rows, preferred_floating_point, OutColumnMajor_>(*this, std::forward<B_>(b_), std::forward<ArgT_>(t_));
+		}
+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, class B_, class ArgT_>
+		constexpr inline void Lerp(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_, ArgT_&& t_) const
+		{
+			EmuMath::Helpers::matrix_lerp(out_matrix_, *this, std::forward<B_>(b_), std::forward<ArgT_>(t_));
+		}
+				
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements linearly interpolated with b_ using a weighting of t_. </para>
+		/// <para> If B_ is an EmuMath Matrix: Elements will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
+		/// <para> If ArgT_ is an EmuMath Matrix: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
+		/// <para> Indices within the provided range will contain respective linear interpolation results. </para>
+		/// <para> Indices outside of the provided range will be copies of respective indices in this Matrix. </para>
+		/// </summary>
+		/// <param name="b_">: Scalar or EmuMath Matrix to use as the target point for linear interpolation.</param>
+		/// <param name="t_">: Scalar or EmuMath Matrix to use as weighting for linear interpolations, where lerp(a, b, 0) = a, lerp(a, b, 1) = b.</param>
+		/// <returns>Copy of this Matrix with elements in the provided range linearly interpolated, summarised as `out = a + ((b - a) * t)`, and copied elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = preferred_floating_point, bool OutColumnMajor_ = is_column_major, class B_, class ArgT_
+		>
+			[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> LerpRange(B_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::matrix_lerp_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+				(
+					*this,
+					std::forward<B_>(b_),
+					std::forward<ArgT_>(t_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			typename OutT_, bool OutColumnMajor_ = is_column_major, class B_, class ArgT_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> LerpRange(B_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::matrix_lerp_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_),
+				std::forward<ArgT_>(t_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class B_, class ArgT_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, preferred_floating_point, OutColumnMajor_> LerpRange(B_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::matrix_lerp_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, preferred_floating_point, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_),
+				std::forward<ArgT_>(t_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, class B_, class ArgT_
+		>
+		constexpr inline void LerpRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_, ArgT_&& t_) const
+		{
+			EmuMath::Helpers::matrix_lerp_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_), std::forward<ArgT_>(t_));
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements linearly interpolated with b_ using a weighting of t_. </para>
+		/// <para> If B_ is an EmuMath Matrix: Elements will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
+		/// <para> If ArgT_ is an EmuMath Matrix: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
+		/// <para> Indices within the provided range will contain respective linear interpolation results. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// </summary>
+		/// <param name="b_">: Scalar or EmuMath Matrix to use as the target point for linear interpolation.</param>
+		/// <param name="t_">: Scalar or EmuMath Matrix to use as weighting for linear interpolations, where lerp(a, b, 0) = a, lerp(a, b, 1) = b.</param>
+		/// <returns>Copy of this Matrix with elements in the provided range linearly interpolated, summarised as `out = a + ((b - a) * t)`, and default elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = preferred_floating_point, bool OutColumnMajor_ = is_column_major, class B_, class ArgT_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> LerpRangeNoCopy(B_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::matrix_lerp_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_),
+				std::forward<ArgT_>(t_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			typename OutT_, bool OutColumnMajor_ = is_column_major, class B_, class ArgT_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> LerpRangeNoCopy(B_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::matrix_lerp_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_),
+				std::forward<ArgT_>(t_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class B_, class ArgT_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, preferred_floating_point, OutColumnMajor_> LerpRangeNoCopy(B_&& b_, ArgT_&& t_) const
+		{
+			return EmuMath::Helpers::matrix_lerp_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, preferred_floating_point, OutColumnMajor_>
+			(
+				*this,
+				std::forward<B_>(b_),
+				std::forward<ArgT_>(t_)
+			);
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements linearly interpolated with b_ using a weighting of t_, via the provided out_matrix_. </para>
+		/// <para> If B_ is an EmuMath Matrix: Elements will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
+		/// <para> If ArgT_ is an EmuMath Matrix: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
+		/// <para> Indices within the provided range will contain respective linear interpolation results. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		/// <param name="b_">: Scalar or EmuMath Matrix to use as the target point for linear interpolation.</param>
+		/// <param name="t_">: Scalar or EmuMath Matrix to use as weighting for linear interpolations, where lerp(a, b, 0) = a, lerp(a, b, 1) = b.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, class B_, class ArgT_
+		>
+		constexpr inline void LerpRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, B_&& b_, ArgT_&& t_) const
+		{
+			EmuMath::Helpers::matrix_lerp_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_), std::forward<ArgT_>(t_));
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a minimum value indicated by min_. </para>
+		/// <para> If Min_ is an EmuMath Matrix: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
+		/// </summary>
+		/// <param name="min_">: Scalar or EmuMath Matrix to use as the minimum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with its elements clamped to the provided minimum.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Min_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ClampMin(Min_&& min_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_min<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Min_>(min_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Min_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ClampMin(Min_&& min_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_min<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Min_>(min_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Min_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ClampMin(Min_&& min_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_min<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Min_>(min_));
+		}
+
+		template<class Min_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void ClampMin(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Min_&& min_) const
+		{
+			EmuMath::Helpers::matrix_clamp_min(out_matrix_, *this, std::forward<Min_>(min_));
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a minimum value indicated by min_. </para>
+		/// <para> If Min_ is an EmuMath Matrix: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
+		/// <para> Indices within the provided range will contain respective clamping results. </para>
+		/// <para> Indices outside of the provided range will be copies of respective indices in this Matrix. </para>
+		/// </summary>
+		/// <param name="min_">: Scalar or EmuMath Matrix to use as the minimum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with elements in the provided range clamped to the provided minimum, and copied elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Min_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ClampMinRange(Min_&& min_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Min_>(min_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			typename OutT_, bool OutColumnMajor_ = is_column_major, class Min_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ClampMinRange(Min_&& min_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Min_>(min_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Min_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ClampMinRange(Min_&& min_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Min_>(min_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Min_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void ClampMinRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Min_&& min_) const
+		{
+			EmuMath::Helpers::matrix_clamp_min_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Min_>(min_));
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a minimum value indicated by min_. </para>
+		/// <para> If Min_ is an EmuMath Matrix: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
+		/// <para> Indices within the provided range will contain respective clamping results. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// </summary>
+		/// <param name="min_">: Scalar or EmuMath Matrix to use as the minimum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with elements in the provided range clamped to the provided minimum, and default elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Min_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ClampMinRangeNoCopy(Min_&& min_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Min_>(min_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Min_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ClampMinRangeNoCopy(Min_&& min_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Min_>(min_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Min_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ClampMinRangeNoCopy(Min_&& min_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Min_>(min_)
+			);
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a minimum value indicated by min_, via the provided `out_matrix_`. </para>
+		/// <para> If Min_ is an EmuMath Matrix: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
+		/// <para> Indices within the provided range will contain respective clamping results. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// </summary>
+		/// <param name="min_">: Scalar or EmuMath Matrix to use as the maximum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with elements in the provided range clamped to the provided minimum, and default elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Min_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void ClampMinRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Min_&& min_) const
+		{
+			EmuMath::Helpers::matrix_clamp_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Min_>(min_));
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a maximum value indicated by max_. </para>
+		/// <para> If Max_ is an EmuMath Matrix: Elements will be clamped to a maximum of the respective element of max_. Otherwise, all will be clamped to max_ directly. </para>
+		/// </summary>
+		/// <param name="max_">: Scalar or EmuMath Matrix to use as the maximum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with its elements clamped to the provided maximum.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Max_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ClampMax(Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_max<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Max_>(max_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Max_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ClampMax(Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_max<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Max_>(max_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Max_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ClampMax(Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_max<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Max_>(max_));
+		}
+
+		template<class Max_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void ClampMax(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Max_&& max_) const
+		{
+			EmuMath::Helpers::matrix_clamp_max(out_matrix_, *this, std::forward<Max_>(max_));
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a maximum value indicated by max_. </para>
+		/// <para> If Max_ is an EmuMath Matrix: Elements will be clamped to a maximum of the respective element of max_. Otherwise, all will be clamped to max_ directly. </para>
+		/// <para> Indices within the provided range will contain respective clamping results. </para>
+		/// <para> Indices outside of the provided range will be copies of respective indices in this Matrix. </para>
+		/// </summary>
+		/// <param name="max_">: Scalar or EmuMath Matrix to use as the maximum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with elements in the provided range clamped to the provided maximum, and copied elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Max_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ClampMaxRange(Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_max_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Max_>(max_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			typename OutT_, bool OutColumnMajor_ = is_column_major, class Max_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ClampMaxRange(Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_max_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Max_>(max_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Max_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ClampMaxRange(Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_max_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Max_>(max_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Max_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void ClampMaxRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Max_&& max_) const
+		{
+			EmuMath::Helpers::matrix_clamp_max_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Max_>(max_));
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a maximum value indicated by max_. </para>
+		/// <para> If Max_ is an EmuMath Matrix: Elements will be clamped to a maximum of the respective element of max_. Otherwise, all will be clamped to max_ directly. </para>
+		/// <para> Indices within the provided range will contain respective clamping results. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// </summary>
+		/// <param name="max_">: Scalar or EmuMath Matrix to use as the maximum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with elements in the provided range clamped to the provided maximum, and default elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Max_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ClampMaxRangeNoCopy(Max_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_max_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Max_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Max_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ClampMaxRangeNoCopy(Max_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_max_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Max_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Max_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ClampMaxRangeNoCopy(Max_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_max_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Max_>(b_)
+			);
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a maximum value indicated by max_, via the provided `out_matrix_`. </para>
+		/// <para> If Max_ is an EmuMath Matrix: Elements will be clamped to a maximum of the respective element of max_. Otherwise, all will be clamped to max_ directly. </para>
+		/// <para> Indices within the provided range will contain respective clamping results. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// </summary>
+		/// <param name="max_">: Scalar or EmuMath Matrix to use as the maximum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with elements in the provided range clamped to the provided maximum, and default elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Max_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void ClampMaxRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Max_&& b_) const
+		{
+			EmuMath::Helpers::matrix_clamp_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Max_>(b_));
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a minimum value indicated by min_ and a maximum value indicated by max_. </para>
+		/// <para> If Min_ is an EmuMath Matrix: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
+		/// <para> If Max_ is an EmuMath Matrix: Elements will be clamped to a maximum of the respective element of max_. Otherwise, all will be clamped to max_ directly. </para>
+		/// </summary>
+		/// <param name="min_">: Scalar or EmuMath Matrix to use as the mimimum to clamp this Matrix's values to.</param>
+		/// <param name="max_">: Scalar or EmuMath Matrix to use as the maximum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with all of its elements to the provided minimum and maximum.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = preferred_floating_point, bool OutColumnMajor_ = is_column_major, class Min_, class Max_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Clamp(Min_&& min_, Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Min_, class Max_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Clamp(Min_&& min_, Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Min_, class Max_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, preferred_floating_point, OutColumnMajor_> Clamp(Min_&& min_, Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp<num_columns, num_rows, preferred_floating_point, OutColumnMajor_>(*this, std::forward<Min_>(min_), std::forward<Max_>(max_));
+		}
+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, class Min_, class Max_>
+		constexpr inline void Clamp(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Min_&& min_, Max_&& max_) const
+		{
+			EmuMath::Helpers::matrix_clamp(out_matrix_, *this, std::forward<Min_>(min_), std::forward<Max_>(max_));
+		}
+				
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a minimum value indicated by min_ and a maximum value indicated by max_. </para>
+		/// <para> If Min_ is an EmuMath Matrix: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
+		/// <para> If Max_ is an EmuMath Matrix: Elements will be clamped to a maximum of the respective element of max_. Otherwise, all will be clamped to max_ directly. </para>
+		/// <para> Indices within the provided range will contain respective clamping results. </para>
+		/// <para> Indices outside of the provided range will be copies of respective indices in this Matrix. </para>
+		/// </summary>
+		/// <param name="min_">: Scalar or EmuMath Matrix to use as the mimimum to clamp this Matrix's values to.</param>
+		/// <param name="max_">: Scalar or EmuMath Matrix to use as the maximum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with elements in the provided range clamped to the provided minimum and maximum, and copied elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = preferred_floating_point, bool OutColumnMajor_ = is_column_major, class Min_, class Max_
+		>
+			[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ClampRange(Min_&& min_, Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+				(
+					*this,
+					std::forward<Min_>(min_),
+					std::forward<Max_>(max_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			typename OutT_, bool OutColumnMajor_ = is_column_major, class Min_, class Max_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ClampRange(Min_&& min_, Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Min_>(min_),
+				std::forward<Max_>(max_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Min_, class Max_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, preferred_floating_point, OutColumnMajor_> ClampRange(Min_&& min_, Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, preferred_floating_point, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Min_>(min_),
+				std::forward<Max_>(max_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, class Min_, class Max_
+		>
+		constexpr inline void ClampRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Min_&& min_, Max_&& max_) const
+		{
+			EmuMath::Helpers::matrix_clamp_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Min_>(min_), std::forward<Max_>(max_));
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a minimum value indicated by min_ and a maximum value indicated by max_. </para>
+		/// <para> If Min_ is an EmuMath Matrix: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
+		/// <para> If Max_ is an EmuMath Matrix: Elements will be clamped to a maximum of the respective element of max_. Otherwise, all will be clamped to max_ directly. </para>
+		/// <para> Indices within the provided range will contain respective clamping results. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// </summary>
+		/// <param name="min_">: Scalar or EmuMath Matrix to use as the mimimum to clamp this Matrix's values to.</param>
+		/// <param name="max_">: Scalar or EmuMath Matrix to use as the maximum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with elements in the provided range clamped to the provided minimum and maximum, and defaulted elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = preferred_floating_point, bool OutColumnMajor_ = is_column_major, class Min_, class Max_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ClampRangeNoCopy(Min_&& min_, Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Min_>(min_),
+				std::forward<Max_>(max_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			typename OutT_, bool OutColumnMajor_ = is_column_major, class Min_, class Max_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ClampRangeNoCopy(Min_&& min_, Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Min_>(min_),
+				std::forward<Max_>(max_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Min_, class Max_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, preferred_floating_point, OutColumnMajor_> ClampRangeNoCopy(Min_&& min_, Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, preferred_floating_point, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Min_>(min_),
+				std::forward<Max_>(max_)
+			);
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a minimum value indicated by min_ and a maximum value indicated by max_, via `out_matrix_`. </para>
+		/// <para> If Min_ is an EmuMath Matrix: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
+		/// <para> If Max_ is an EmuMath Matrix: Elements will be clamped to a maximum of the respective element of max_. Otherwise, all will be clamped to max_ directly. </para>
+		/// <para> Indices within the provided range will contain respective clamping results. </para>
+		/// <para> Indices outside of the provided range will be not be modified. </para>
+		/// </summary>
+		/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
+		/// <param name="min_">: Scalar or EmuMath Matrix to use as the mimimum to clamp this Matrix's values to.</param>
+		/// <param name="max_">: Scalar or EmuMath Matrix to use as the maximum to clamp this Matrix's values to.</param>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, class Min_, class Max_
+		>
+		constexpr inline void ClampRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Min_&& min_, Max_&& max_) const
+		{
+			EmuMath::Helpers::matrix_clamp_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Min_>(min_), std::forward<Max_>(max_));
+		}
+#pragma endregion
+
 #pragma region TRANSPOSE_FUNCS
 		/// <summary>
 		/// <para> Outputs a transposed form of this Matrix. </para>
@@ -3287,100 +5292,272 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region STATIC_MATRIX_MAKERS
+		/// <summary>
+		/// <para> Outputs the Identity Matrix as the desired output Matrix, defaulting to the same as this Matrix (except for T_, which will be this Matrix's value_type_uq). </para>
+		/// <para> The Identity Matrix is composed of all 1 along the main diagonal, and all 0 elsewhere. </para>
+		/// <para> Although this may be used to create an Identity of any size, it mainly has useful meaning within a square Matrix (where num_columns == num_rows). </para>
+		/// </summary>
+		/// <returns>EmuMath Matrix of the specified type, constructed as its Identity Matrix (all 1 along the main diagonal, all 0 elsewhere).</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] static constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> identity()
+		{
+			return EmuMath::Helpers::matrix_identity<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>();
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] static constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> identity()
+		{
+			return EmuMath::Helpers::matrix_identity<num_columns, num_rows, OutT_, OutColumnMajor_>();
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] static constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> identity()
+		{
+			return EmuMath::Helpers::matrix_identity<num_columns, num_rows, value_type_uq, OutColumnMajor_>();
+		}
+
+		/// <summary>
+		/// <para> Assigns the Identity Matrix of the passed EmuMath Matrix's type to said matrix_. </para>
+		/// <para> Although this may be used to assign an Identity of any size, it mainly has useful meaning within a square Matrix (where num_columns == num_rows). </para>
+		/// </summary>
+		/// <param name="matrix_">: EmuMath Matrix to assign the Identity to (all 1 along the main diagonal, all 0 elsewhere).</param>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		static constexpr inline void identity(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& matrix_)
+		{
+			EmuMath::Helpers::matrix_identity(matrix_);
+		}
+#pragma endregion
+
 	private:
 		matrix_vector_type _data;
 
-		template<std::size_t NonMajorIndex_, class Out_, std::size_t...MajorIndices_>
-		[[nodiscard]] constexpr inline Out_ _make_non_major_vector(std::index_sequence<MajorIndices_...> major_indices_)
+#pragma region UNDERLYING_VECTOR_CREATION
+	private:
+		template<std::size_t ColumnIndex_, std::size_t OutSize_, typename OutT_, std::size_t...RowIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_column_vector(std::index_sequence<RowIndices_...> row_indices_)
 		{
-			if constexpr (is_column_major)
+			using out_vector = EmuMath::Vector<OutSize_, OutT_>;
+			if constexpr (std::is_constructible_v<out_vector, decltype(AtTheoretical<ColumnIndex_, RowIndices_>())...>)
 			{
-				return Out_(this->template at<MajorIndices_, NonMajorIndex_>()...);
-			}
-			else
-			{
-				return Out_(this->template at<NonMajorIndex_, MajorIndices_>()...);
-			}
-		}
-
-		template<std::size_t NonMajorIndex_, class Out_, std::size_t...MajorIndices_>
-		[[nodiscard]] constexpr inline Out_ _make_non_major_vector(std::index_sequence<MajorIndices_...> major_indices_) const
-		{
-			if constexpr (is_column_major)
-			{
-				return Out_(this->template at<MajorIndices_, NonMajorIndex_>()...);
-			}
-			else
-			{
-				return Out_(this->template at<NonMajorIndex_, MajorIndices_>()...);
-			}
-		}
-
-		template<std::size_t MajorIndex_, typename...Args_, std::size_t...NonMajorIndices_>
-		[[nodiscard]] static constexpr inline typename matrix_vector_type::stored_type _make_major_index
-		(
-			std::index_sequence<NonMajorIndices_...> non_major_indices_,
-			std::tuple<Args_...>& tuple_of_args_
-		)
-		{
-			constexpr std::size_t major_offset_ = MajorIndex_ * num_non_major_elements;
-			return typename matrix_vector_type::stored_type
-			(
-				std::get<major_offset_ + NonMajorIndices_>(tuple_of_args_)...
-			);
-		}
-
-		template<typename...Args_, std::size_t...MajorIndices_>
-		[[nodiscard]] static constexpr inline matrix_vector_type _make_data_from_major_vectors(std::index_sequence<MajorIndices_...> major_indices_, Args_&&...args_)
-		{
-			return matrix_vector_type(std::forward<Args_>(args_)...);
-		}
-
-		template<typename...Args_, std::size_t...MajorIndices_>
-		[[nodiscard]] static constexpr inline matrix_vector_type _make_data_from_multiple_scalar_args(std::index_sequence<MajorIndices_...> major_indices_, Args_&&...args_)
-		{
-			auto tuple_of_args_ = std::forward_as_tuple(std::forward<Args_>(args_)...);
-			return matrix_vector_type
-			(
-				_make_major_index<MajorIndices_>
-				(
-					std::make_index_sequence<num_non_major_elements>(),
-					tuple_of_args_
-				)...
-			);
-		}
-
-		template<typename Arg_>
-		[[nodiscard]] static constexpr inline matrix_vector_type _make_data_from_single_scalar_arg(Arg_&& arg_)
-		{
-			return matrix_vector_type(std::forward<Arg_>(arg_));
-		}
-
-		template<typename...Args_, std::size_t...MajorIndices_>
-		[[nodiscard]] static constexpr inline matrix_vector_type _make_data(std::index_sequence<MajorIndices_...> major_indices_, Args_&&...args_)
-		{
-			if constexpr (is_constructible_from_major_vectors<Args_...>())
-			{
-				return _make_data_from_major_vectors(major_indices_, std::forward<Args_>(args_)...);
-			}
-			else if constexpr (is_constructible_with_scalar_args<Args_...>())
-			{
-				return _make_data_from_multiple_scalar_args(major_indices_, std::forward<Args_>(args_)...);
-			}
-			else if constexpr (is_constructible_with_single_scalar_arg<Args_...>())
-			{
-				return _make_data_from_single_scalar_arg(std::forward<Args_>(args_)...);
+				return out_vector(AtTheoretical<ColumnIndex_, RowIndices_>()...);
 			}
 			else
 			{
 				static_assert
 				(
-					EmuCore::TMP::get_false<Args_...>(),
-					"Attempted to construct the data Vector of an EmuMath Matrix, but the provided Args_ are incompatible for construct the matrix_vector_type."
+					EmuCore::TMP::get_false<out_vector>(),
+					"Attempted to retrieve a Column Vector within an EmuMath Matrix, but the desired output Vector cannot be constructed from the provided column within the Matrix."
 				);
 			}
 		}
+
+		template<std::size_t ColumnIndex_, std::size_t OutSize_, typename OutT_, std::size_t...RowIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_column_vector(std::index_sequence<RowIndices_...> row_indices_) const
+		{
+			// Unfortunate code duplication due to different behaviour when outputting reference Vectors
+			using out_vector = EmuMath::Vector<OutSize_, OutT_>;
+			if constexpr (std::is_constructible_v<out_vector, decltype(AtTheoretical<ColumnIndex_, RowIndices_>())...>)
+			{
+				return out_vector(AtTheoretical<ColumnIndex_, RowIndices_>()...);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<out_vector>(),
+					"Attempted to retrieve a Column Vector within a const-qualified EmuMath Matrix, but the desired output Vector cannot be constructed from the provided column within the Matrix."
+				);
+			}
+		}
+
+		template<std::size_t RowIndex_, std::size_t OutSize_, typename OutT_, std::size_t...ColumnIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_row_vector(std::index_sequence<ColumnIndices_...> column_indices_)
+		{
+			using out_vector = EmuMath::Vector<OutSize_, OutT_>;
+			if constexpr (std::is_constructible_v<out_vector, decltype(AtTheoretical<ColumnIndices_, RowIndex_>())...>)
+			{
+				return out_vector(AtTheoretical<ColumnIndices_, RowIndex_>()...);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<out_vector>(),
+					"Attempted to retrieve a Row Vector within an EmuMath Matrix, but the desired output Vector cannot be constructed from the provided row within the Matrix."
+				);
+			}
+		}
+
+		template<std::size_t RowIndex_, std::size_t OutSize_, typename OutT_, std::size_t...ColumnIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_row_vector(std::index_sequence<ColumnIndices_...> column_indices_) const
+		{
+			// Unfortunate code duplication due to different behaviour when outputting reference Vectors
+			using out_vector = EmuMath::Vector<OutSize_, OutT_>;
+			if constexpr (std::is_constructible_v<out_vector, decltype(AtTheoretical<ColumnIndices_, RowIndex_>())...>)
+			{
+				return out_vector(AtTheoretical<ColumnIndices_, RowIndex_>()...);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<out_vector>(),
+					"Attempted to retrieve a Row Vector within a const-qualified EmuMath Matrix, but the desired output Vector cannot be constructed from the provided row within the Matrix."
+				);
+			}
+		}
+
+		template<std::size_t MajorIndex_, std::size_t OutSize_, typename OutT_, std::size_t...NonMajorIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_major_vector(std::index_sequence<NonMajorIndices_...> non_major_indices_)
+		{
+			if constexpr (is_column_major)
+			{
+				return _make_column_vector<MajorIndex_, OutSize_, OutT_>(std::index_sequence<NonMajorIndices_...>());
+			}
+			else
+			{
+				return _make_row_vector<MajorIndex_, OutSize_, OutT_>(std::index_sequence<NonMajorIndices_...>());
+			}
+		}
+
+		template<std::size_t MajorIndex_, std::size_t OutSize_, typename OutT_, std::size_t...NonMajorIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_major_vector(std::index_sequence<NonMajorIndices_...> non_major_indices_) const
+		{
+			if constexpr (is_column_major)
+			{
+				return _make_column_vector<MajorIndex_, OutSize_, OutT_>(std::index_sequence<NonMajorIndices_...>());
+			}
+			else
+			{
+				return _make_row_vector<MajorIndex_, OutSize_, OutT_>(std::index_sequence<NonMajorIndices_...>());
+			}
+		}
+
+		template<std::size_t NonMajorIndex_, std::size_t OutSize_, typename OutT_, std::size_t...MajorIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_non_major_vector(std::index_sequence<MajorIndices_...> major_indices_)
+		{
+			if constexpr (is_column_major)
+			{
+				return _make_row_vector<NonMajorIndex_, OutSize_, OutT_>(std::index_sequence<MajorIndices_...>());
+			}
+			else
+			{
+				return _make_column_vector<NonMajorIndex_, OutSize_, OutT_>(std::index_sequence<MajorIndices_...>());
+			}
+		}
+
+		template<std::size_t NonMajorIndex_, std::size_t OutSize_, typename OutT_, std::size_t...MajorIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_non_major_vector(std::index_sequence<MajorIndices_...> major_indices_) const
+		{
+			if constexpr (is_column_major)
+			{
+				return _make_row_vector<NonMajorIndex_, OutSize_, OutT_>(std::index_sequence<MajorIndices_...>());
+			}
+			else
+			{
+				return _make_column_vector<NonMajorIndex_, OutSize_, OutT_>(std::index_sequence<MajorIndices_...>());
+			}
+		}
+
+		template<std::size_t OutSize_, typename OutT_, std::size_t ColumnOffset_, std::size_t RowOffset_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_diagonal_vector(std::index_sequence<Indices_...> indices_)
+		{
+			using out_vector = EmuMath::Vector<OutSize_, OutT_>;
+			if constexpr (std::is_constructible_v<out_vector, decltype(AtTheoretical<Indices_ + ColumnOffset_, Indices_ + RowOffset_>())...>)
+			{
+				return out_vector(AtTheoretical<Indices_ + ColumnOffset_, Indices_ + RowOffset_>()...);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<out_vector>(),
+					"Attempted to retrieve a Diagonal Vector within an EmuMath Matrix, but the desired output Vector cannot be constructed from all accessed diagonal indices within the Matrix."
+				);
+			}
+		}
+
+		template<std::size_t OutSize_, typename OutT_, std::size_t ColumnOffset_, std::size_t RowOffset_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_diagonal_vector(std::index_sequence<Indices_...> indices_) const
+		{
+			// Even more unfortunate code duplication for the sake of safe and successfuly ref-vector output
+			using out_vector = EmuMath::Vector<OutSize_, OutT_>;
+			if constexpr (std::is_constructible_v<out_vector, decltype(AtTheoretical<Indices_ + ColumnOffset_, Indices_ + RowOffset_>())...>)
+			{
+				return out_vector(AtTheoretical<Indices_ + ColumnOffset_, Indices_ + RowOffset_>()...);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<out_vector>(),
+					"Attempted to retrieve a Diagonal Vector within a const-qualified EmuMath Matrix, but the desired output Vector cannot be constructed from all accessed diagonal indices within the Matrix."
+				);
+			}
+		}
+
+		template<std::size_t OutSize_, typename OutT_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_flattened_vector(std::index_sequence<ColumnIndices_...>, std::index_sequence<RowIndices_...>)
+		{
+			using out_vector = EmuMath::Vector<OutSize_, OutT_>;
+			if constexpr (std::is_constructible_v<out_vector, decltype(AtTheoretical<ColumnIndices_, RowIndices_>())...>)
+			{
+				return out_vector(at<ColumnIndices_, RowIndices_>()...);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<out_vector>(),
+					"Attempted to retrieve a Flattened Vector version of an EmuMath Matrix, but the desired output Vector could not be constructed from all indices within the Matrix."
+				);
+			}
+		}
+
+		template<std::size_t OutSize_, typename OutT_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> _make_flattened_vector(std::index_sequence<ColumnIndices_...>, std::index_sequence<RowIndices_...>) const
+		{
+			using out_vector = EmuMath::Vector<OutSize_, OutT_>;
+			if constexpr (std::is_constructible_v<out_vector, decltype(AtTheoretical<ColumnIndices_, RowIndices_>())...>)
+			{
+				return out_vector(at<ColumnIndices_, RowIndices_>()...);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<out_vector>(),
+					"Attempted to retrieve a Flattened Vector version of a const-qualified EmuMath Matrix, but the desired output Vector could not be constructed from all indices within the Matrix."
+				);
+			}
+		}
+#pragma endregion
 	};
+
+	/// <summary>
+	/// <para> Get function for use with EmuMath Matrices using ADL. Equivalent to matrix_.at with the provided FlattenedIndex_. Does not allow theoretical output. </para>
+	/// <para> One may note that there is no alternative that uses Column+Row indices. This is due to this functions provision for ADL, with no intent for other uses. </para>
+	/// </summary>
+	/// <param name="matrix_">: EmuMath Matrix to retrieve the specified contained contiguous flattened index of.</param>
+	/// <returns>Reference to the element contained at the specified contiguous flattened index of the passed EmuMath Matrix.</returns>
+	template<std::size_t FlattenedIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline const typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type& get
+	(
+		const EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		return matrix_.template at<FlattenedIndex_>();
+	}
+
+	template<std::size_t FlattenedIndex_, typename T_, std::size_t NumColumns_, std::size_t NumRows_, bool ColumnMajor_>
+	[[nodiscard]] constexpr inline typename EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>::value_type& get
+	(
+		EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& matrix_
+	)
+	{
+		return matrix_.template at<FlattenedIndex_>();
+	}
 }
 
 #endif
