@@ -4862,6 +4862,14 @@ namespace EmuMath
 			);
 		}
 
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a minimum value indicated by min_, via the provided `out_matrix_`. </para>
+		/// <para> If Min_ is an EmuMath Matrix: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
+		/// <para> Indices within the provided range will contain respective clamping results. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// </summary>
+		/// <param name="min_">: Scalar or EmuMath Matrix to use as the maximum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with elements in the provided range clamped to the provided minimum, and default elements elsewhere.</returns>
 		template
 		<
 			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Min_,
@@ -5000,6 +5008,14 @@ namespace EmuMath
 			);
 		}
 
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a maximum value indicated by max_, via the provided `out_matrix_`. </para>
+		/// <para> If Max_ is an EmuMath Matrix: Elements will be clamped to a maximum of the respective element of max_. Otherwise, all will be clamped to max_ directly. </para>
+		/// <para> Indices within the provided range will contain respective clamping results. </para>
+		/// <para> Indices outside of the provided range will not be modified. </para>
+		/// </summary>
+		/// <param name="max_">: Scalar or EmuMath Matrix to use as the maximum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with elements in the provided range clamped to the provided maximum, and default elements elsewhere.</returns>
 		template
 		<
 			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Max_,
@@ -5009,17 +5025,6 @@ namespace EmuMath
 		{
 			EmuMath::Helpers::matrix_clamp_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Max_>(b_));
 		}
-
-
-
-
-
-
-
-
-
-
-
 
 		/// <summary>
 		/// <para> Outputs a version of this Matrix with its elements clamped to a minimum value indicated by min_ and a maximum value indicated by max_. </para>
