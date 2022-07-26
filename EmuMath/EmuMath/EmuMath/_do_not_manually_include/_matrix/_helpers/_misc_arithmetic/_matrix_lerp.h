@@ -13,8 +13,8 @@ namespace EmuMath::Helpers
 #pragma region LERP_CUSTOM_MAJOR_OUT
 	/// <summary>
 	/// <para> Outputs a version of the input EmuMath Matrix with its elements linearly interpolated with b_ using a weighting of t_. </para>
-	/// <para> If B_ is an EmuMath Vector: Elements in matrix_a_ will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
-	/// <para> If T_ is an EmuMath Vector: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
+	/// <para> If B_ is an EmuMath Matrix: Elements in matrix_a_ will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
+	/// <para> If T_ is an EmuMath Matrix: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
 	/// </summary>
 	/// <param name="matrix_a_">: EmuMath Matrix to use as the starting point for linear interpolation.</param>
 	/// <param name="b_">: Scalar or EmuMath Matrix to use as the target point for linear interpolation.</param>
@@ -198,8 +198,8 @@ namespace EmuMath::Helpers
 #pragma region LERP_RANGE_CUSTOM_MAJOR_OUT
 	/// <summary>
 	/// <para> Outputs a version of the input EmuMath Matrix with its elements linearly interpolated with b_ using a weighting of t_. </para>
-	/// <para> If B_ is an EmuMath Vector: Elements in matrix_a_ will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
-	/// <para> If T_ is an EmuMath Vector: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
+	/// <para> If B_ is an EmuMath Matrix: Elements in matrix_a_ will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
+	/// <para> If T_ is an EmuMath Matrix: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
 	/// <para> Indices within the provided range will contain respective linear interpolation results. </para>
 	/// <para> Indices outside of the provided range will be copies of respective indices in matrix_a_. </para>
 	/// </summary>
@@ -399,8 +399,8 @@ namespace EmuMath::Helpers
 #pragma region LERP_RANGE_NO_COPY_CUSTOM_MAJOR_OUT
 	/// <summary>
 	/// <para> Outputs a version of the input EmuMath Matrix with its elements linearly interpolated with b_ using a weighting of t_. </para>
-	/// <para> If B_ is an EmuMath Vector: Elements in matrix_a_ will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
-	/// <para> If T_ is an EmuMath Vector: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
+	/// <para> If B_ is an EmuMath Matrix: Elements in matrix_a_ will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
+	/// <para> If T_ is an EmuMath Matrix: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
 	/// <para> Indices within the provided range will contain respective linear interpolation results. </para>
 	/// <para> Indices outside of the provided range will be default-constructed. </para>
 	/// </summary>
@@ -614,8 +614,8 @@ namespace EmuMath::Helpers
 #pragma region LERP_OUTPUT_ASSIGNED_VARIANTS
 	/// <summary>
 	/// <para> Outputs a version of the input EmuMath Matrix with its elements linearly interpolated with b_ using a weighting of t_, via the provided out_matrix_. </para>
-	/// <para> If B_ is an EmuMath Vector: Elements in matrix_a_ will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
-	/// <para> If T_ is an EmuMath Vector: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
+	/// <para> If B_ is an EmuMath Matrix: Elements in matrix_a_ will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
+	/// <para> If T_ is an EmuMath Matrix: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
 	/// </summary>
 	/// <param name="out_matrix_">: EmuMath Matrix to output to.</param>
 	/// <param name="matrix_a_">: EmuMath Matrix to use as the starting point for linear interpolation.</param>
@@ -647,8 +647,8 @@ namespace EmuMath::Helpers
 
 	/// <summary>
 	/// <para> Outputs a version of the input EmuMath Matrix with its elements linearly interpolated with b_ using a weighting of t_, via the provided out_matrix_. </para>
-	/// <para> If B_ is an EmuMath Vector: Elements in matrix_a_ will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
-	/// <para> If T_ is an EmuMath Vector: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
+	/// <para> If B_ is an EmuMath Matrix: Elements in matrix_a_ will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
+	/// <para> If T_ is an EmuMath Matrix: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
 	/// <para> Indices within the provided range will contain respective linear interpolation results. </para>
 	/// <para> Indices outside of the provided range will be copies of respective indices in matrix_a_. </para>
 	/// </summary>
@@ -683,8 +683,8 @@ namespace EmuMath::Helpers
 
 	/// <summary>
 	/// <para> Outputs a version of the input EmuMath Matrix with its elements linearly interpolated with b_ using a weighting of t_, via the provided out_matrix_. </para>
-	/// <para> If B_ is an EmuMath Vector: Elements in matrix_a_ will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
-	/// <para> If T_ is an EmuMath Vector: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
+	/// <para> If B_ is an EmuMath Matrix: Elements in matrix_a_ will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
+	/// <para> If T_ is an EmuMath Matrix: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
 	/// <para> Indices within the provided range will contain respective linear interpolation results. </para>
 	/// <para> Indices outside of the provided range will not be modified. </para>
 	/// </summary>

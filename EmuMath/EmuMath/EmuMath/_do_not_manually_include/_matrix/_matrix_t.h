@@ -4572,8 +4572,8 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Outputs a version of this Matrix with its elements linearly interpolated with b_ using a weighting of t_. </para>
-		/// <para> If B_ is an EmuMath Vector: Elements will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
-		/// <para> If ArgT_ is an EmuMath Vector: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
+		/// <para> If B_ is an EmuMath Matrix: Elements will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
+		/// <para> If ArgT_ is an EmuMath Matrix: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
 		/// </summary>
 		/// <param name="b_">: Scalar or EmuMath Matrix to use as the target point for linear interpolation.</param>
 		/// <param name="t_">: Scalar or EmuMath Matrix to use as weighting for linear interpolations, where lerp(a, b, 0) = a, lerp(a, b, 1) = b.</param>
@@ -4604,8 +4604,8 @@ namespace EmuMath
 				
 		/// <summary>
 		/// <para> Outputs a version of this Matrix with its elements linearly interpolated with b_ using a weighting of t_. </para>
-		/// <para> If B_ is an EmuMath Vector: Elements will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
-		/// <para> If ArgT_ is an EmuMath Vector: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
+		/// <para> If B_ is an EmuMath Matrix: Elements will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
+		/// <para> If ArgT_ is an EmuMath Matrix: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
 		/// <para> Indices within the provided range will contain respective linear interpolation results. </para>
 		/// <para> Indices outside of the provided range will be copies of respective indices in this Matrix. </para>
 		/// </summary>
@@ -4665,8 +4665,8 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Outputs a version of this Matrix with its elements linearly interpolated with b_ using a weighting of t_. </para>
-		/// <para> If B_ is an EmuMath Vector: Elements will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
-		/// <para> If ArgT_ is an EmuMath Vector: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
+		/// <para> If B_ is an EmuMath Matrix: Elements will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
+		/// <para> If ArgT_ is an EmuMath Matrix: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
 		/// <para> Indices within the provided range will contain respective linear interpolation results. </para>
 		/// <para> Indices outside of the provided range will be default-constructed. </para>
 		/// </summary>
@@ -4716,8 +4716,8 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Outputs a version of this Matrix with its elements linearly interpolated with b_ using a weighting of t_, via the provided out_matrix_. </para>
-		/// <para> If B_ is an EmuMath Vector: Elements will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
-		/// <para> If ArgT_ is an EmuMath Vector: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
+		/// <para> If B_ is an EmuMath Matrix: Elements will be interpolated with respective elements of b_. Otherwise, all will be interpolated with b_ directly. </para>
+		/// <para> If ArgT_ is an EmuMath Matrix: Linear interpolations will use respective elements in t_ as weightings. Otherwise, all interpolations will use t_ directly. </para>
 		/// <para> Indices within the provided range will contain respective linear interpolation results. </para>
 		/// <para> Indices outside of the provided range will not be modified. </para>
 		/// </summary>
@@ -4734,37 +4734,9 @@ namespace EmuMath
 			EmuMath::Helpers::matrix_lerp_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<B_>(b_), std::forward<ArgT_>(t_));
 		}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 		/// <summary>
 		/// <para> Outputs a version of this Matrix with its elements clamped to a minimum value indicated by min_. </para>
-		/// <para> If Min_ is an EmuMath Vector: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
+		/// <para> If Min_ is an EmuMath Matrix: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
 		/// </summary>
 		/// <param name="min_">: Scalar or EmuMath Matrix to use as the minimum to clamp this Matrix's values to.</param>
 		/// <returns>Copy of this Matrix with its elements clamped to the provided minimum.</returns>
@@ -4794,7 +4766,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Outputs a version of this Matrix with its elements clamped to a minimum value indicated by min_. </para>
-		/// <para> If Min_ is an EmuMath Vector: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
+		/// <para> If Min_ is an EmuMath Matrix: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
 		/// <para> Indices within the provided range will contain respective clamping results. </para>
 		/// <para> Indices outside of the provided range will be copies of respective indices in matrix_a_. </para>
 		/// </summary>
@@ -4850,7 +4822,7 @@ namespace EmuMath
 
 		/// <summary>
 		/// <para> Outputs a version of this Matrix with its elements clamped to a minimum value indicated by min_. </para>
-		/// <para> If Min_ is an EmuMath Vector: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
+		/// <para> If Min_ is an EmuMath Matrix: Elements will be clamped to a minimum of the respective element of min_. Otherwise, all will be clamped to min_ directly. </para>
 		/// <para> Indices within the provided range will contain respective clamping results. </para>
 		/// <para> Indices outside of the provided range will be defaulted. </para>
 		/// </summary>
@@ -4861,32 +4833,32 @@ namespace EmuMath
 			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
 			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Min_
 		>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ClampMinRangeNoCopy(Min_&& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ClampMinRangeNoCopy(Min_&& min_) const
 		{
 			return EmuMath::Helpers::matrix_clamp_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
 			(
 				*this,
-				std::forward<Min_>(b_)
+				std::forward<Min_>(min_)
 			);
 		}
 
 		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Min_>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ClampMinRangeNoCopy(Min_&& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ClampMinRangeNoCopy(Min_&& min_) const
 		{
 			return EmuMath::Helpers::matrix_clamp_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
 			(
 				*this,
-				std::forward<Min_>(b_)
+				std::forward<Min_>(min_)
 			);
 		}
 
 		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Min_>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ClampMinRangeNoCopy(Min_&& b_) const
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ClampMinRangeNoCopy(Min_&& min_) const
 		{
 			return EmuMath::Helpers::matrix_clamp_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
 			(
 				*this,
-				std::forward<Min_>(b_)
+				std::forward<Min_>(min_)
 			);
 		}
 
@@ -4895,9 +4867,162 @@ namespace EmuMath
 			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Min_,
 			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
 		>
-		constexpr inline void ClampMinRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Min_&& b_) const
+		constexpr inline void ClampMinRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Min_&& min_) const
 		{
-			EmuMath::Helpers::matrix_clamp_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Min_>(b_));
+			EmuMath::Helpers::matrix_clamp_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Min_>(min_));
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a maximum value indicated by max_. </para>
+		/// <para> If Max_ is an EmuMath Matrix: Elements will be clamped to a maximum of the respective element of max_. Otherwise, all will be clamped to max_ directly. </para>
+		/// </summary>
+		/// <param name="max_">: Scalar or EmuMath Matrix to use as the maximum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with its elements clamped to the provided maximum.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Max_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ClampMax(Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_max<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this, std::forward<Max_>(max_));
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Max_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ClampMax(Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_max<num_columns, num_rows, OutT_, OutColumnMajor_>(*this, std::forward<Max_>(max_));
+		}
+
+		template<bool OutColumnMajor_ = is_column_major, class Max_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ClampMax(Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_max<num_columns, num_rows, value_type_uq, OutColumnMajor_>(*this, std::forward<Max_>(max_));
+		}
+
+		template<class Max_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline void ClampMax(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Max_&& max_) const
+		{
+			EmuMath::Helpers::matrix_clamp_max(out_matrix_, *this, std::forward<Max_>(max_));
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a maximum value indicated by max_. </para>
+		/// <para> If Max_ is an EmuMath Matrix: Elements will be clamped to a maximum of the respective element of max_. Otherwise, all will be clamped to max_ directly. </para>
+		/// <para> Indices within the provided range will contain respective clamping results. </para>
+		/// <para> Indices outside of the provided range will be copies of respective indices in matrix_a_. </para>
+		/// </summary>
+		/// <param name="max_">: Scalar or EmuMath Matrix to use as the maximum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with elements in the provided range clamped to the provided maximum, and copied elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Max_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ClampMaxRange(Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_max_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Max_>(max_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			typename OutT_, bool OutColumnMajor_ = is_column_major, class Max_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ClampMaxRange(Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_max_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Max_>(max_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Max_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ClampMaxRange(Max_&& max_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_max_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Max_>(max_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Max_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major
+		>
+		constexpr inline void ClampMaxRange(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Max_&& max_) const
+		{
+			EmuMath::Helpers::matrix_clamp_max_range<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Max_>(max_));
+		}
+
+		/// <summary>
+		/// <para> Outputs a version of this Matrix with its elements clamped to a minimum value indicated by max_. </para>
+		/// <para> If Max_ is an EmuMath Matrix: Elements will be clamped to a minimum of the respective element of max_. Otherwise, all will be clamped to max_ directly. </para>
+		/// <para> Indices within the provided range will contain respective clamping results. </para>
+		/// <para> Indices outside of the provided range will be defaulted. </para>
+		/// </summary>
+		/// <param name="max_">: Scalar or EmuMath Matrix to use as the maximum to clamp this Matrix's values to.</param>
+		/// <returns>Copy of this Matrix with elements in the provided range clamped to the provided maximum, and default elements elsewhere.</returns>
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type_uq, bool OutColumnMajor_ = is_column_major, class Max_
+		>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> ClampMaxRangeNoCopy(Max_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_max_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Max_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, typename OutT_, bool OutColumnMajor_ = is_column_major, class Max_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> ClampMaxRangeNoCopy(Max_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_max_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, OutT_, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Max_>(b_)
+			);
+		}
+
+		template<std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, bool OutColumnMajor_ = is_column_major, class Max_>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> ClampMaxRangeNoCopy(Max_&& b_) const
+		{
+			return EmuMath::Helpers::matrix_clamp_max_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_, num_columns, num_rows, value_type_uq, OutColumnMajor_>
+			(
+				*this,
+				std::forward<Max_>(b_)
+			);
+		}
+
+		template
+		<
+			std::size_t BeginColumn_, std::size_t EndColumn_, std::size_t BeginRow_, std::size_t EndRow_, class Max_,
+			std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_
+		>
+		constexpr inline void ClampMaxRangeNoCopy(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Max_&& b_) const
+		{
+			EmuMath::Helpers::matrix_clamp_min_range_no_copy<BeginColumn_, EndColumn_, BeginRow_, EndRow_>(out_matrix_, *this, std::forward<Max_>(b_));
 		}
 #pragma endregion
 
