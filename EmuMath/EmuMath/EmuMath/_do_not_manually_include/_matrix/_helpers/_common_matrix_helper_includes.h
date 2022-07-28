@@ -10,6 +10,7 @@
 #include "../_underlying_helpers/_matrix_special_arithmetic.h"
 #include "../_underlying_helpers/_matrix_underlying_special_operations.h"
 #include "../_underlying_helpers/_matrix_underlying_stream_append.h"
+#include "../_underlying_helpers/_matrix_underlying_transformations.h"
 
 // CONTAINS:
 // --- Includes for all underlying helpers

@@ -259,6 +259,16 @@ int main()
 	std::cout << mat_a_.ClampRangeNoCopy<1, 3, 1, 3>(EmuMath::Matrix<2, 3, int, true>(7, 0, 2, 1, 4, 7), EmuMath::Matrix<4, 4, int, true>(12, 10, 6, 3, 15, 21, 13, -5, 19, 20, 21, -7, 1, 2, 3, 4)) << "\n\n";
 	std::cout << mat_a_.ClampRangeNoCopy<1, 3, 1, 3>(EmuMath::Matrix<4, 4, int, false>(-3, 4, -4, 5, 3, 4, 5, 6, 10, 11, 12, 13, -255, -511, 31, 1337), EmuMath::Matrix<2, 3, int, false>(3, 12, 6, 8, 9, 10)) << "\n\n";
 
+
+	constexpr auto scale = EmuMath::Helpers::matrix_make_scale<float>(2, 5, 10);
+	constexpr auto scale_from_tuple = EmuMath::Helpers::matrix_make_scale<double>(std::make_tuple(8, -2.0L, 0.5f));
+	constexpr auto scale_from_vector = EmuMath::Helpers::matrix_make_scale<int>(EmuMath::Vector<3, float>(1.0f, 2.0f, 6.0f));
+	constexpr auto scale_from_vector_no_t_arg = EmuMath::Helpers::matrix_make_scale(EmuMath::Vector<3, float>(1.0f, 0.5f, 6.0f));
+
+	constexpr auto another_scale_0 = EmuMath::Helpers::matrix_make_scale<4, 4, float>(EmuMath::Vector<12, float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12));
+	constexpr auto another_scale_1 = EmuMath::Helpers::matrix_make_scale<4, 4>(EmuMath::Vector<12, float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12));
+	constexpr auto another_scale_2 = EmuMath::Helpers::matrix_make_scale<4, 4, float>(12, 5);
+
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;

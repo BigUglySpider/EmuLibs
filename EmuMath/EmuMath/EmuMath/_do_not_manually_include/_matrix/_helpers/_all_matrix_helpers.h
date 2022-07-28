@@ -11,5 +11,6 @@
 #include "_matrix_special_operations.h"
 #include "_matrix_std_multiply.h"
 #include "_matrix_stream_append.h"
+#include "_matrix_transformations.h"
 
 #endif
