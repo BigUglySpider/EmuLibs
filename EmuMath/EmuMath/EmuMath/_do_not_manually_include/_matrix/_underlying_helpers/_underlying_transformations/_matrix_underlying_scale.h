@@ -51,10 +51,27 @@ namespace EmuMath::Helpers::_matrix_underlying
 		std::tuple<Args_...> args_tuple_
 	)
 	{
-		return OutMatrix_
-		(
-			_matrix_scale_multi_args_get_for_index<ColumnIndices_, RowIndices_, OutMatrix_>(args_tuple_)...
-		);
+		constexpr bool is_constructible = std::is_constructible_v
+		<
+			OutMatrix_,
+			decltype(_matrix_scale_multi_args_get_for_index<ColumnIndices_, RowIndices_, OutMatrix_>(args_tuple_))...
+		>;
+
+		if constexpr (is_constructible)
+		{
+			return OutMatrix_
+			(
+				_matrix_scale_multi_args_get_for_index<ColumnIndices_, RowIndices_, OutMatrix_>(args_tuple_)...
+			);
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<OutMatrix_>(),
+				"Attempted to create a scaling EmuMath Matrix, but at least one element of the provided output Matrix type cannot construct be constructed with the resoectuve argument, a default 1 value, or a default 0 value."
+			);
+		}
 	}
 
 	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class OutMatrix_, class Arg_>
@@ -133,16 +150,33 @@ namespace EmuMath::Helpers::_matrix_underlying
 		}
 		else
 		{
-			return OutMatrix_
-			(
+			constexpr bool is_constructible = std::is_constructible_v
+			<
+				OutMatrix_,
+				decltype(_matrix_scale_single_arg_get_for_index<ColumnIndices_, RowIndices_, OutMatrix_>(std::forward<ScaleArg_>(scale_arg_)))...
+			>;
+
+			if constexpr(is_constructible)
+			{
 #pragma warning(push)
 #pragma warning(disable: 26800)
-				_matrix_scale_single_arg_get_for_index<ColumnIndices_, RowIndices_, OutMatrix_>
+				return OutMatrix_
 				(
-					std::forward<ScaleArg_>(scale_arg_)
-				)...
+					_matrix_scale_single_arg_get_for_index<ColumnIndices_, RowIndices_, OutMatrix_>
+					(
+						std::forward<ScaleArg_>(scale_arg_)
+					)...
+				);
 #pragma warning(pop)
-			);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<OutMatrix_>(),
+					"Attempted to create a scaling EmuMath Matrix, but at least one element of the provided output Matrix type cannot construct be constructed with the provided argument, a default 1 value, or a default 0 value."
+				);
+			}
 		}
 	}
 
@@ -161,6 +195,136 @@ namespace EmuMath::Helpers::_matrix_underlying
 		else
 		{
 			return _matrix_scale_multi_args<out_matrix>(column_indices(), row_indices(), std::forward_as_tuple<ScaleArgs_...>(std::forward<ScaleArgs_>(scale_args_)...));
+		}
+	}
+	
+	template<class OutMatrix_, class...Args_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+	constexpr inline void _matrix_scale_assign_multi_args
+	(
+		OutMatrix_& out_matrix_,
+		std::index_sequence<ColumnIndices_...> column_indices_,
+		std::index_sequence<RowIndices_...> row_indices_,
+		std::tuple<Args_...> args_tuple_
+	)
+	{
+		using out_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
+		using out_value_uq = typename out_mat_uq::value_type_uq;
+		constexpr bool valid_assign_or_casts = 
+		(
+			... &&
+			EmuCore::TMP::valid_assign_direct_or_cast
+			<
+				out_value_uq,
+				decltype(_matrix_scale_multi_args_get_for_index<ColumnIndices_, RowIndices_, out_mat_uq>(args_tuple_)),
+				decltype(out_matrix_.template at<ColumnIndices_, RowIndices_>())
+			>()
+		);
+
+		if constexpr (valid_assign_or_casts)
+		{
+			(
+				(
+					EmuCore::TMP::assign_direct_or_cast<out_value_uq>
+					(
+						out_matrix_.template at<ColumnIndices_, RowIndices_>(),
+						_matrix_scale_multi_args_get_for_index<ColumnIndices_, RowIndices_, out_mat_uq>(args_tuple_)
+					)
+				), ...
+			);
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<OutMatrix_>(),
+				"Attempted to assign a scaling Matrix to an existing EmuMath Matrix, but the provided output Matrix type cannot be assigned to at least one index with the provided arguments, a default 1 value, or a default 0 value."
+			);
+		}
+	}
+
+	template<class OutMatrix_, class ScaleArg_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+	[[nodiscard]] constexpr inline void _matrix_scale_assign_single_arg
+	(
+		OutMatrix_& out_matrix_,
+		std::index_sequence<ColumnIndices_...> column_indices_,
+		std::index_sequence<RowIndices_...> row_indices_,
+		ScaleArg_&& scale_arg_
+	)
+	{
+		using arg_uq = typename EmuCore::TMP::remove_ref_cv<ScaleArg_>::type;
+		if constexpr (EmuCore::TMP::is_tuple_v<arg_uq>)
+		{
+			// Defer to multi-arg with tuples
+			_matrix_scale_assign_multi_args<OutMatrix_>
+			(
+				out_matrix_,
+				std::index_sequence<ColumnIndices_...>(),
+				std::index_sequence<RowIndices_...>(),
+				EmuCore::TMP::lval_ref_cast<ScaleArg_>(std::forward<ScaleArg_>(scale_arg_))
+			);
+		}
+		else
+		{
+			using out_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
+			using out_value_uq = typename out_mat_uq::value_type_uq;
+			constexpr bool valid_assign_or_casts = 
+			(
+				... &&
+				EmuCore::TMP::valid_assign_direct_or_cast
+				<
+					out_value_uq,
+					decltype(_matrix_scale_single_arg_get_for_index<ColumnIndices_, RowIndices_, out_mat_uq>(std::forward<ScaleArg_>(scale_arg_))),
+					decltype(out_matrix_.template at<ColumnIndices_, RowIndices_>())
+				>()
+			);
+
+			if constexpr (valid_assign_or_casts)
+			{
+#pragma warning(push)
+#pragma warning(disable: 26800)
+				(
+					(
+						EmuCore::TMP::assign_direct_or_cast<out_value_uq>
+						(
+							out_matrix_.template at<ColumnIndices_, RowIndices_>(),
+							_matrix_scale_single_arg_get_for_index<ColumnIndices_, RowIndices_, out_mat_uq>(std::forward<ScaleArg_>(scale_arg_))
+						)
+					), ...
+				);
+#pragma warning(pop)
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<OutMatrix_>(),
+					"Attempted to assign a scaling Matrix to an existing EmuMath Matrix, but the provided output Matrix type cannot be assigned to at least one index with the provided arguments, a default 1 value, or a default 0 value."
+				);
+			}
+		}
+	}
+
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, class...ScaleArgs_>
+	constexpr inline void _matrix_scale_assign(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, ScaleArgs_&&...scale_args_)
+	{
+		using out_matrix = EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>;
+		using out_indices = EmuMath::TMP::make_full_matrix_index_sequences<out_matrix>;
+		using column_indices = typename out_indices::column_index_sequence;
+		using row_indices = typename out_indices::row_index_sequence;
+
+		if constexpr (sizeof...(ScaleArgs_) == 1)
+		{
+			_matrix_scale_assign_single_arg<out_matrix>(out_matrix_, column_indices(), row_indices(), std::forward<ScaleArgs_>(scale_args_)...);
+		}
+		else
+		{
+			_matrix_scale_assign_multi_args<out_matrix>
+			(
+				out_matrix_,
+				column_indices(),
+				row_indices(),
+				std::forward_as_tuple<ScaleArgs_...>(std::forward<ScaleArgs_>(scale_args_)...)
+			);
 		}
 	}
 }

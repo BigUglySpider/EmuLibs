@@ -309,6 +309,35 @@ namespace EmuMath::Helpers
 		>(scale_args_vector_);
 	}
 #pragma endregion
+
+#pragma region ASSIGNING_SCALE_FUNCS
+	/// <summary>
+	/// <para> Assigns a scaling transformation Matrix to the passed `out_matrix_`. </para>
+	/// <para> 
+	///		The scale will be for as many dimensions as the Matrix can cover, which will be the size of its smallest direction minus 1.
+	///		For example, in a 4x4 matrix, a 3D scale will be assigned, but in a 4x3 or 3x4 a 2D scale will be assigned.
+	/// </para>
+	/// <para> This may be given a maximum number of arguments equal to the number of dimensions that the scale is for. </para>
+	/// <para> Omitted dimension arguments will be considered as "no scaling", and will be treated as 1. </para>
+	/// <para> If given a single argument, which is also a std::tuple, respective items in the tuple will be used for each dimension. </para>
+	/// <para> If given a single argument, which is also an EmuMath Vector, respective items in the tuple will be used for each dimension. </para>
+	/// </summary>
+	/// <param name="out_matrix_">EmuMath Matrix to output the scaling transformation Matrix to.</param>
+	/// <param name="scale_args_">Sequential arguments for each axis's scaling, starting from X; or a std::tuple/EmuMath Vector containing sequential arguments.</param>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, typename...ScaleArgs_>
+	constexpr inline auto matrix_assign_scale(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, ScaleArgs_&&...scale_args_) ->
+		std::enable_if_t
+		<
+			(
+				sizeof...(ScaleArgs_) > 0 &&
+				sizeof...(ScaleArgs_) < EmuCore::TMP::smallest_constant_v<std::size_t, OutNumColumns_, OutNumRows_>
+			),
+			void
+		>
+	{
+		EmuMath::Helpers::_matrix_underlying::_matrix_scale_assign(out_matrix_, std::forward<ScaleArgs_>(scale_args_)...);
+	}
+#pragma endregion
 }
 
 #endif
