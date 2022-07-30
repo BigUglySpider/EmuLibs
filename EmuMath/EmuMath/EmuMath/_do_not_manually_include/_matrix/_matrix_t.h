@@ -5302,6 +5302,10 @@ namespace EmuMath
 
 #pragma region SCALE_TRANSFORMATIONS
 	public:
+		/// <summary>
+		/// <para> Static check if `AssignScale` can be called on this Matrix type with the provided argument types, including qualifications. </para>
+		/// </summary>
+		/// <returns>True if a call to `AssignScale` is valid on this Matrix type given the provided argument types, otherwise false.</returns>
 		template<class...ScaleArgs_>
 		[[nodiscard]] static constexpr inline bool valid_assign_scale_args()
 		{
@@ -5311,6 +5315,10 @@ namespace EmuMath
 			);
 		}
 
+		/// <summary>
+		/// <para> Static check if `make_scale` can be called on this Matrix type with the provided argument types, including qualifications. </para>
+		/// </summary>
+		/// <returns>True if a call to `make_scale` is valid on this Matrix type given the provided argument types, otherwise false.</returns>
 		template<class...ScaleArgs_>
 		[[nodiscard]] static constexpr inline bool valid_make_scale_args()
 		{
@@ -5320,13 +5328,42 @@ namespace EmuMath
 			);
 		}
 
+		/// <summary>
+		/// <para> Creates a new Matrix of this Matrix's size, major-storage order, and value_type_uq, representing a scaling transformation based on the passed arguments. </para>
+		/// <para>
+		///		The maximum number of scale arguments is the number of items in the smallest direction of this Matrix type, minus 1. 
+		///		For example, in a 4x4 matrix, a maximum of 3 arguments may be provided, but in a 4x3 or 3x4 matrix a maximum of 2 may be provided.
+		/// </para>
+		/// <para> Omitted dimension arguments will be considered as "no scaling", and will be treated as 1. </para>
+		/// <para> If only one argument is provided, one of 3 possible outcomes will result: </para>
+		/// <para> A: If the argument is an EmuMath Vector: Scales for each axis will use the respective index of the Vector. </para>
+		/// <para> B: If the argument is a std::tuple: Scales for each axis will use the respective element of the tuple. </para>
+		/// <para> C: If the argument is anything else: Scales for every axis will use the same scale, regardless of Matrix size. </para>
+		/// </summary>
+		/// <param name="scale_args_">Sequential scaling values for each axis, starting from X, or a std::tuple/EmuMath Vector of sequential scaling values for each axis.</param>
+		/// <returns>
+		///		EmuMath Matrix representing an X-dimensional scaling transformation, or as much as is possible in the output Matrix type,
+		///		where X is the smallest size of this Matrix type minus 1.
+		/// </returns>
 		template<class...ScaleArgs_>
 		[[nodiscard]] static constexpr inline auto make_scale(ScaleArgs_&&...scale_args_)
-			-> std::enable_if_t<valid_make_scale_args<ScaleArgs_...>(), this_type>
+			-> std::enable_if_t<valid_make_scale_args<ScaleArgs_...>(), EmuMath::Matrix<num_columns, num_rows, value_type_uq, is_column_major>>
 		{
 			return EmuMath::Helpers::matrix_make_scale<num_columns, num_rows, value_type_uq, is_column_major>(std::forward<ScaleArgs_>(scale_args_)...);
 		}
 
+		/// <summary>
+		/// <para> Assigns a scaling transformation Matrix to this Matrix. </para>
+		/// <para> 
+		///		The scale will be for as many dimensions as this Matrix can cover, which will be the size of its smallest direction minus 1.
+		///		For example, in a 4x4 matrix, a 3D scale will be assigned, but in a 4x3 or 3x4 a 2D scale will be assigned.
+		/// </para>
+		/// <para> This may be given a maximum number of arguments equal to the number of dimensions that the scale is for. </para>
+		/// <para> Omitted dimension arguments will be considered as "no scaling", and will be treated as 1. </para>
+		/// <para> If given a single argument, which is also a std::tuple, respective items in the tuple will be used for each dimension. </para>
+		/// <para> If given a single argument, which is also an EmuMath Vector, respective elements in the Vector will be used for each dimension. </para>
+		/// </summary>
+		/// <param name="scale_args_">Sequential arguments for each axis's scaling, starting from X; or a std::tuple/EmuMath Vector containing sequential arguments.</param>
 		template<class...ScaleArgs_>
 		constexpr inline auto AssignScale(ScaleArgs_&&...scale_args_) &
 			-> std::enable_if_t<valid_assign_scale_args<ScaleArgs_...>(), void>
@@ -5337,6 +5374,10 @@ namespace EmuMath
 
 #pragma region TRANSLATE_TRANSFORMATIONS
 	public:
+		/// <summary>
+		/// <para> Static check if `AssignTranslation` can be called on this Matrix type with the provided argument types, including qualifications. </para>
+		/// </summary>
+		/// <returns>True if a call to `AssignTranslation` is valid on this Matrix type given the provided argument types, otherwise false.</returns>
 		template<class...ScaleArgs_>
 		[[nodiscard]] static constexpr inline bool valid_assign_translation_args()
 		{
@@ -5346,6 +5387,10 @@ namespace EmuMath
 			);
 		}
 
+		/// <summary>
+		/// <para> Static check if `make_translation` can be called on this Matrix type with the provided argument types, including qualifications. </para>
+		/// </summary>
+		/// <returns>True if a call to `make_translation` is valid on this Matrix type given the provided argument types, otherwise false.</returns>
 		template<class...ScaleArgs_>
 		[[nodiscard]] static constexpr inline bool valid_make_translation_args()
 		{
@@ -5355,18 +5400,50 @@ namespace EmuMath
 			);
 		}
 
-		template<class...ScaleArgs_>
-		[[nodiscard]] static constexpr inline auto make_translation(ScaleArgs_&&...scale_args_)
-			-> std::enable_if_t<valid_make_scale_args<ScaleArgs_...>(), this_type>
+		/// <summary>
+		/// <para> Creates a new Matrix of this Matrix's size, major-storage order, and value_type_uq, representing a trasnlation transformation based on the passed arguments. </para>
+		/// <para>
+		///		The maximum number of translation arguments is the number of rows in this Matrix type, minus 1. 
+		///		For example, in a 4x4 or 3x4 matrix, a maximum of 3 arguments may be provided, but in a 4x3 Matrix a maximum of 2 may be provided.
+		/// </para>
+		/// <para> Omitted dimension arguments will be considered as "no translation", and will be treated as 0. </para>
+		/// <para> If only one argument is provided, one of 3 possible outcomes will result: </para>
+		/// <para> A: If the argument is an EmuMath Vector: Translations for each axis will use the respective index of the Vector. </para>
+		/// <para> B: If the argument is a std::tuple: Translations for each axis will use the respective element of the tuple. </para>
+		/// <para> C: If the argument is anything else: Translations for every axis will use the same value, regardless of Matrix size. </para>
+		/// </summary>
+		/// <param name="translation_args_">
+		///		Sequential translation values for each axis, starting from X, 
+		///		or a std::tuple/EmuMath Vector of sequential translation values for each axis.
+		/// </param>
+		/// <returns>
+		///		EmuMath Matrix representing an X-dimensional translation transformation, or as much as is possible in the output Matrix type,
+		///		where X is the number of rows in this Matrix type minus 1.
+		/// </returns>
+		template<class...TranslationArgs_>
+		[[nodiscard]] static constexpr inline auto make_translation(TranslationArgs_&&...translation_args_)
+			-> std::enable_if_t<valid_make_scale_args<TranslationArgs_...>(), EmuMath::Matrix<num_columns, num_rows, value_type_uq, is_column_major>>
 		{
-			return EmuMath::Helpers::matrix_make_translation<num_columns, num_rows, value_type_uq, is_column_major>(std::forward<ScaleArgs_>(scale_args_)...);
+			return EmuMath::Helpers::matrix_make_translation<num_columns, num_rows, value_type_uq, is_column_major>(std::forward<TranslationArgs_>(translation_args_)...);
 		}
 
-		template<class...ScaleArgs_>
-		constexpr inline auto AssignTranslation(ScaleArgs_&&...scale_args_) &
-			-> std::enable_if_t<valid_assign_scale_args<ScaleArgs_...>(), void>
+		/// <summary>
+		/// <para> Assigns a translation transformation Matrix to this Matrix. </para>
+		/// <para> 
+		///		The translation will be for as many dimensions as the Matrix can cover, which will be the number of rows it contains minus 1
+		///		For example, in a 4x4 or 3x4 matrix, a 3D translation will be assigned, but in a 4x3 Matrix a 2D translation will be assigned.
+		/// </para>
+		/// <para> This may be given a maximum number of arguments equal to the number of dimensions that the translation is for. </para>
+		/// <para> Omitted dimension arguments will be considered as "no translation", and will be treated as 0. </para>
+		/// <para> If given a single argument, which is also a std::tuple, respective items in the tuple will be used for each dimension. </para>
+		/// <para> If given a single argument, which is also an EmuMath Vector, respective elements in the Vector will be used for each dimension. </para>
+		/// </summary>
+		/// <param name="translation_args_">Sequential arguments for each axis's translation, starting from X; or a std::tuple/EmuMath Vector containing sequential arguments.</param>
+		template<class...TranslationArgs_>
+		constexpr inline auto AssignTranslation(TranslationArgs_&&...translation_args_) &
+			-> std::enable_if_t<valid_assign_scale_args<TranslationArgs_...>(), void>
 		{
-			EmuMath::Helpers::matrix_assign_translation(*this, std::forward<ScaleArgs_>(scale_args_)...);
+			EmuMath::Helpers::matrix_assign_translation(*this, std::forward<TranslationArgs_>(translation_args_)...);
 		}
 #pragma endregion
 
