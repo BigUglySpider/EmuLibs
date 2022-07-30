@@ -338,6 +338,60 @@ namespace EmuMath::Helpers
 		EmuMath::Helpers::_matrix_underlying::_matrix_scale_assign(out_matrix_, std::forward<ScaleArgs_>(scale_args_)...);
 	}
 #pragma endregion
+
+#pragma region VALIDITY_CHECKS
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_ = true, typename...ScaleArgs_>
+	[[nodiscard]] constexpr inline bool matrix_make_scale_is_valid()
+	{
+		constexpr std::size_t num_args = sizeof...(ScaleArgs_);
+		if constexpr (num_args == 0)
+		{
+			return false;
+		}
+		else if constexpr (num_args >= EmuCore::TMP::smallest_constant_v<std::size_t, OutNumColumns_, OutNumRows_>)
+		{
+			return false;
+		}
+		else
+		{
+			return _matrix_underlying::_matrix_make_scale_is_valid<EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>, false, ScaleArgs_...>();
+		}
+	}
+
+	template<std::size_t VecSize_, typename VecT_, typename OutT_, bool VecIsRef_, bool VecIsConst_, bool OutColumnMajor_ = true>
+	[[nodiscard]] constexpr inline bool matrix_make_scale_is_valid()
+	{
+		using out_matrix = EmuMath::Matrix<VecSize_ + 1, VecSize_ + 1, OutT_, OutColumnMajor_>;
+		using vec_type = EmuMath::Vector<VecSize_, VecT_>;
+		using vec_type_cq = typename std::conditional<VecIsConst_, const vec_type, vec_type>::type;
+		using vec_fully_qualified = typename std::conditional<VecIsRef_, vec_type_cq&, vec_type_cq&&>::type;
+		return _matrix_underlying::_matrix_make_scale_is_valid<out_matrix, true, vec_fully_qualified>();
+	}
+
+	template<std::size_t VecSize_, typename VecT_, bool VecIsRef_, bool VecIsConst_, bool OutColumnMajor_ = true >
+	[[nodiscard]] constexpr inline bool matrix_make_scale_is_valid()
+	{
+		return matrix_make_scale_is_valid<VecSize_, VecT_, typename EmuMath::Vector<VecSize_, VecT_>::value_type_uq, OutColumnMajor_>();
+	}
+
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, typename...ScaleArgs_>
+	[[nodiscard]] constexpr inline bool matrix_assign_scale_is_valid()
+	{
+		constexpr std::size_t num_args = sizeof...(ScaleArgs_);
+		if constexpr (num_args == 0)
+		{
+			return false;
+		}
+		else if constexpr (num_args >= EmuCore::TMP::smallest_constant_v<std::size_t, OutNumColumns_, OutNumRows_>)
+		{
+			return false;
+		}
+		else
+		{
+			return _matrix_underlying::_matrix_make_scale_is_valid<EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>&, true, ScaleArgs_...>();
+		}
+	}
+#pragma region
 }
 
 #endif
