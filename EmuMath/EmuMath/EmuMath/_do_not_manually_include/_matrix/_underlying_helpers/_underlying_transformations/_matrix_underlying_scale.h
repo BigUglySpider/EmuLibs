@@ -34,7 +34,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 				}
 				else
 				{
-					return EmuCore::TMP::construct_or_cast<typename OutMatrix_::value_type>(1);
+					return EmuCore::TMP::construct_or_cast<typename OutMatrix_::value_type_uq>(1);
 				}
 			}
 		}
@@ -53,7 +53,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 			constexpr bool is_scale_end = matched_index == (OutMatrix_::smallest_direction_size - 1);
 			if constexpr (is_scale_end)
 			{
-				return EmuCore::TMP::construct_or_cast<typename OutMatrix_::value_type>(1);
+				return EmuCore::TMP::construct_or_cast<typename OutMatrix_::value_type_uq>(1);
 			}
 			else
 			{
@@ -75,7 +75,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 					else
 					{
 						// Non-contained indices are interpreted as 1 to allow partial inputs for larger matrices (e.g. only scale in 2D for a 3D transformation matrix)
-						return EmuCore::TMP::construct_or_cast<typename OutMatrix_::value_type>(1);
+						return EmuCore::TMP::construct_or_cast<typename OutMatrix_::value_type_uq>(1);
 					}
 				}
 				else
@@ -166,7 +166,6 @@ namespace EmuMath::Helpers::_matrix_underlying
 		}
 	}
 
-
 	template<class OutMatrix_, bool Assigning_, class...ScaleArgs_>
 	[[nodiscard]] constexpr inline bool _matrix_make_scale_is_valid()
 	{
@@ -223,7 +222,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 			static_assert
 			(
 				EmuCore::TMP::get_false<OutMatrix_>(),
-				"Attempted to create a scaling EmuMath Matrix, but at least one element of the provided output Matrix type cannot construct be constructed with the resoectuve argument, a default 1 value, or a default 0 value."
+				"Attempted to create a scaling EmuMath Matrix, but at least one element of the provided output Matrix type cannot be constructed with the respective argument, a default 1 value, or a default 0 value."
 			);
 		}
 	}
@@ -269,7 +268,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 				static_assert
 				(
 					EmuCore::TMP::get_false<OutMatrix_>(),
-					"Attempted to create a scaling EmuMath Matrix, but at least one element of the provided output Matrix type cannot construct be constructed with the provided argument, a default 1 value, or a default 0 value."
+					"Attempted to create a scaling EmuMath Matrix, but at least one element of the provided output Matrix type cannot be constructed with the provided argument, a default 1 value, or a default 0 value."
 				);
 			}
 		}
@@ -289,7 +288,12 @@ namespace EmuMath::Helpers::_matrix_underlying
 		}
 		else
 		{
-			return _matrix_scale_multi_args<out_matrix>(column_indices(), row_indices(), std::forward_as_tuple<ScaleArgs_...>(std::forward<ScaleArgs_>(scale_args_)...));
+			return _matrix_scale_multi_args<out_matrix>
+			(
+				column_indices(),
+				row_indices(),
+				std::forward_as_tuple<ScaleArgs_...>(std::forward<ScaleArgs_>(scale_args_)...)
+			);
 		}
 	}
 #pragma endregion

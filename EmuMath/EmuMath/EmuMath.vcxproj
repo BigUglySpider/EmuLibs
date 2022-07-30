@@ -222,6 +222,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_misc_arithmetic\_matrix_trunc.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_misc_arithmetic\_matrix_trunc_constexpr.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_transformations\_matrix_scale.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_transformations\_matrix_translate.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_matrix_t.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_matrix.info.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_matrix_special_arithmetic.h" />
@@ -235,6 +236,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_matrix_underlying_transformations.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_underlying_transformations\_common_matrix_transformation_helpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_underlying_transformations\_matrix_underlying_scale.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_underlying_transformations\_matrix_underlying_translate.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_simd_noise_gen_1d.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_simd_noise_gen_2d.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_noise\_noise_gen_functors\_common_fast_noise_gen_functors_includes.h" />

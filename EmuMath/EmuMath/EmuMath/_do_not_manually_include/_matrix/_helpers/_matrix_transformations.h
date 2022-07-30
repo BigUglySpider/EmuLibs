@@ -3,5 +3,6 @@
 
 #include "_common_matrix_helper_includes.h"
 #include "_transformations/_matrix_scale.h"
+#include "_transformations/_matrix_translate.h"
 
 #endif

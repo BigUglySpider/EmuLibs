@@ -269,11 +269,11 @@ int main()
 	constexpr auto another_scale_1 = EmuMath::Helpers::matrix_make_scale<4, 4>(EmuMath::Vector<12, float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12));
 	constexpr auto another_scale_2 = EmuMath::Helpers::matrix_make_scale<4, 4, float>(12, 5);
 
-	constexpr auto ree = EmuMath::Matrix<4, 4, float, true>::valid_make_scale_args<int, int, int>();
-	constexpr auto from_member = EmuMath::Matrix<4, 4, float, true>::make_scale(2, 1, 3);
-	constexpr auto ree_tuple = EmuMath::Matrix<4, 4, float, true>::valid_make_scale_args<decltype(std::make_tuple(2, 10, 6, 1))>();
-	constexpr auto tuple_from_member = EmuMath::Matrix<4, 4, float, true>::make_scale(std::make_tuple(2, 10));
-	constexpr auto tuple_from_vector = EmuMath::Matrix<4, 4, float, true>::make_scale(EmuMath::Vector<4, float>(7));
+	constexpr auto scale_ree = EmuMath::Matrix<4, 4, float, true>::valid_make_scale_args<int, int, int>();
+	constexpr auto scale_from_member = EmuMath::Matrix<4, 4, float, true>::make_scale(2, 1, 3);
+	constexpr auto scale_ree_tuple = EmuMath::Matrix<4, 4, float, true>::valid_make_scale_args<decltype(std::make_tuple(2, 10, 6, 1))>();
+	constexpr auto scale_tuple_from_member = EmuMath::Matrix<4, 4, float, true>::make_scale(std::make_tuple(2, 10));
+	constexpr auto scale_vector_from_member = EmuMath::Matrix<4, 4, float, true>::make_scale(EmuMath::Vector<4, float>(7));
 
 	std::cout << "\nASSIGN_SCALE TESTS\n";
 	EmuMath::Matrix<4, 4, float, true> scale_assign_matrix(10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160);
@@ -286,6 +286,50 @@ int main()
 	std::cout << scale_assign_matrix << "\n\n";
 	scale_assign_matrix.AssignScale(EmuMath::Vector<4, unsigned long long int>(1, 2, 3, 4));
 	std::cout << scale_assign_matrix << "\n\n";
+
+
+	std::cout << "MAKE_TRANSLATION TESTS\n";
+	constexpr auto translate = EmuMath::Helpers::matrix_make_translation<float>(2, 5, 10);
+	constexpr auto translate_from_tuple = EmuMath::Helpers::matrix_make_translation<double>(std::make_tuple(8, -2.0L, 0.5f));
+	constexpr auto translate_from_vector = EmuMath::Helpers::matrix_make_translation<int>(EmuMath::Vector<3, float>(1.0f, 2.0f, 6.0f));
+	constexpr auto translate_from_vector_no_t_arg = EmuMath::Helpers::matrix_make_translation(EmuMath::Vector<3, float>(1.0f, 0.5f, 6.0f));
+	constexpr auto translate_auto_2d = EmuMath::Helpers::matrix_make_translation<double>(-5, 5);
+	std::cout << translate << "\n\n";
+	std::cout << translate_from_tuple << "\n\n";
+	std::cout << translate_from_vector << "\n\n";
+	std::cout << translate_from_vector_no_t_arg << "\n\n";
+	std::cout << translate_auto_2d << "\n\n";
+
+	constexpr auto another_translate_0 = EmuMath::Helpers::matrix_make_translation<4, 4, float>(EmuMath::Vector<12, float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12));
+	constexpr auto another_translate_1 = EmuMath::Helpers::matrix_make_translation<4, 4>(EmuMath::Vector<12, float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12));
+	constexpr auto another_translate_2 = EmuMath::Helpers::matrix_make_translation<4, 4, float>(12, 5);
+	std::cout << "---\n";
+	std::cout << another_translate_0 << "\n\n";
+	std::cout << another_translate_1 << "\n\n";
+	std::cout << another_translate_2 << "\n\n";
+
+	constexpr auto translate_ree = EmuMath::Matrix<4, 4, float, true>::valid_make_translation_args<int, int, int>();
+	constexpr auto translate_from_member = EmuMath::Matrix<4, 4, float, true>::make_translation(2, 1, 3);
+	constexpr auto translate_ree_tuple = EmuMath::Matrix<4, 4, float, true>::valid_make_translation_args<decltype(std::make_tuple(2, 10, 6, 1))>();
+	constexpr auto translate_tuple_from_member = EmuMath::Matrix<4, 4, float, true>::make_translation(std::make_tuple(2, 10));
+	constexpr auto translate_vector_from_member = EmuMath::Matrix<4, 4, float, true>::make_translation(EmuMath::Vector<4, float>(7));
+	std::cout << "---\n";
+	std::cout << translate_from_member << "\n\n";
+	std::cout << translate_tuple_from_member << "\n\n";
+	std::cout << translate_vector_from_member << "\n\n";
+
+
+	std::cout << "ASSIGN_TRANSLATION TESTS\n";
+	EmuMath::Matrix<4, 4, float, true> translate_assign_matrix(10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160);
+	std::cout << translate_assign_matrix << "\n\n";
+	translate_assign_matrix.AssignTranslation(5);
+	std::cout << translate_assign_matrix << "\n\n";
+	translate_assign_matrix.AssignTranslation(2, 4, 6);
+	std::cout << translate_assign_matrix << "\n\n";
+	translate_assign_matrix.AssignTranslation(std::make_tuple(0, 6));
+	std::cout << translate_assign_matrix << "\n\n";
+	translate_assign_matrix.AssignTranslation(EmuMath::Vector<4, unsigned long long int>(1, 2, 3, 4));
+	std::cout << translate_assign_matrix << "\n\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

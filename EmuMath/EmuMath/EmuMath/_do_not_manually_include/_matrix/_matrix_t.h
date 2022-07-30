@@ -439,7 +439,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="post_check_func_">Additional funtion to be invoked for checks. This should preferably be a lambda or functor.</param>
 		/// <returns>True if the passed arguments are valid for a linear transformation, otherwise false.</returns>
-		template<class...SequentialArgs_, class Func_>
+		template<std::size_t MaxArgCount_, class...SequentialArgs_, class Func_>
 		[[nodiscard]] static constexpr inline auto _valid_linear_transform_args(Func_ post_check_func_)
 			-> std::enable_if_t<std::is_invocable_r_v<bool, Func_>, bool>
 		{
@@ -448,7 +448,7 @@ namespace EmuMath
 			{
 				return false;
 			}
-			else if constexpr(num_args >= smallest_direction_size)
+			else if constexpr(num_args > MaxArgCount_)
 			{
 				return false;
 			}
@@ -5305,7 +5305,7 @@ namespace EmuMath
 		template<class...ScaleArgs_>
 		[[nodiscard]] static constexpr inline bool valid_assign_scale_args()
 		{
-			return _valid_linear_transform_args<ScaleArgs_...>
+			return _valid_linear_transform_args<smallest_direction_size - 1, ScaleArgs_...>
 			(
 				[]() { return EmuMath::Helpers::matrix_assign_scale_is_valid<num_columns, num_rows, value_type_uq, is_column_major, ScaleArgs_...>(); }
 			);
@@ -5314,7 +5314,7 @@ namespace EmuMath
 		template<class...ScaleArgs_>
 		[[nodiscard]] static constexpr inline bool valid_make_scale_args()
 		{
-			return _valid_linear_transform_args<ScaleArgs_...>
+			return _valid_linear_transform_args<smallest_direction_size - 1, ScaleArgs_...>
 			(
 				[]() { return EmuMath::Helpers::matrix_make_scale_is_valid<num_columns, num_rows, value_type_uq, is_column_major, ScaleArgs_...>(); }
 			);
@@ -5332,6 +5332,41 @@ namespace EmuMath
 			-> std::enable_if_t<valid_assign_scale_args<ScaleArgs_...>(), void>
 		{
 			EmuMath::Helpers::matrix_assign_scale(*this, std::forward<ScaleArgs_>(scale_args_)...);
+		}
+#pragma endregion
+
+#pragma region TRANSLATE_TRANSFORMATIONS
+	public:
+		template<class...ScaleArgs_>
+		[[nodiscard]] static constexpr inline bool valid_assign_translation_args()
+		{
+			return _valid_linear_transform_args<num_rows - 1, ScaleArgs_...>
+			(
+				[]() { return EmuMath::Helpers::matrix_assign_translation_is_valid<num_columns, num_rows, value_type_uq, is_column_major, ScaleArgs_...>(); }
+			);
+		}
+
+		template<class...ScaleArgs_>
+		[[nodiscard]] static constexpr inline bool valid_make_translation_args()
+		{
+			return _valid_linear_transform_args<num_rows - 1, ScaleArgs_...>
+			(
+				[]() { return EmuMath::Helpers::matrix_make_translation_is_valid<num_columns, num_rows, value_type_uq, is_column_major, ScaleArgs_...>(); }
+			);
+		}
+
+		template<class...ScaleArgs_>
+		[[nodiscard]] static constexpr inline auto make_translation(ScaleArgs_&&...scale_args_)
+			-> std::enable_if_t<valid_make_scale_args<ScaleArgs_...>(), this_type>
+		{
+			return EmuMath::Helpers::matrix_make_translation<num_columns, num_rows, value_type_uq, is_column_major>(std::forward<ScaleArgs_>(scale_args_)...);
+		}
+
+		template<class...ScaleArgs_>
+		constexpr inline auto AssignTranslation(ScaleArgs_&&...scale_args_) &
+			-> std::enable_if_t<valid_assign_scale_args<ScaleArgs_...>(), void>
+		{
+			EmuMath::Helpers::matrix_assign_translation(*this, std::forward<ScaleArgs_>(scale_args_)...);
 		}
 #pragma endregion
 

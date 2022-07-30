@@ -320,7 +320,7 @@ namespace EmuMath::Helpers
 	/// <para> This may be given a maximum number of arguments equal to the number of dimensions that the scale is for. </para>
 	/// <para> Omitted dimension arguments will be considered as "no scaling", and will be treated as 1. </para>
 	/// <para> If given a single argument, which is also a std::tuple, respective items in the tuple will be used for each dimension. </para>
-	/// <para> If given a single argument, which is also an EmuMath Vector, respective items in the tuple will be used for each dimension. </para>
+	/// <para> If given a single argument, which is also an EmuMath Vector, respective elements in the Vector will be used for each dimension. </para>
 	/// </summary>
 	/// <param name="out_matrix_">EmuMath Matrix to output the scaling transformation Matrix to.</param>
 	/// <param name="scale_args_">Sequential arguments for each axis's scaling, starting from X; or a std::tuple/EmuMath Vector containing sequential arguments.</param>
