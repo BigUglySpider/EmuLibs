@@ -5447,6 +5447,383 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region ROTATION_3D_TRANSFORMATION_VALIDITY
+	private:
+		template<class Angle_, bool AngleIsRads_, std::size_t AxisIndex_, bool Assigning_>
+		[[nodiscard]] static constexpr inline bool valid_rotation_3d_arg()
+		{
+			using out_mat = typename std::conditional
+			<
+				Assigning_,
+				EmuMath::Matrix<num_columns, num_rows, value_type_uq, is_column_major>&,
+				EmuMath::Matrix<num_columns, num_rows, value_type_uq, is_column_major>
+			>::type;
+			return EmuMath::Helpers::_matrix_underlying::_matrix_rotate_3_is_valid<out_mat, Angle_, Assigning_, AngleIsRads_, AxisIndex_, 0, false, false>();
+		}
+
+		template<class Angle_, bool AngleIsRads_, std::size_t AxisIndex_, bool Assigning_, std::size_t NumTrigIterations_, bool TrigMod_>
+		[[nodiscard]] static constexpr inline bool valid_rotation_3d_constexpr_arg()
+		{
+			if constexpr (NumTrigIterations_ == 0)
+			{
+				return false;
+			}
+			else
+			{
+				using out_mat = typename std::conditional
+				<
+					Assigning_,
+					EmuMath::Matrix<num_columns, num_rows, value_type_uq, is_column_major>&,
+					EmuMath::Matrix<num_columns, num_rows, value_type_uq, is_column_major>
+				>::type;
+				return EmuMath::Helpers::_matrix_underlying::_matrix_rotate_3_is_valid<out_mat, Angle_, Assigning_, AngleIsRads_, AxisIndex_, NumTrigIterations_, TrigMod_, false>();
+			}
+		}
+
+	public:
+		template<class Angle_, bool AngleIsRads_>
+		[[nodiscard]] static constexpr inline bool valid_make_rotation_3d_x_arg()
+		{
+			return valid_rotation_3d_arg<Angle_, AngleIsRads_, 0, false>();
+		}
+
+		template<class Angle_, bool AngleIsRads_>
+		[[nodiscard]] static constexpr inline bool valid_make_rotation_3d_y_arg()
+		{
+			return valid_rotation_3d_arg<Angle_, AngleIsRads_, 1, false>();
+		}
+
+		template<class Angle_, bool AngleIsRads_>
+		[[nodiscard]] static constexpr inline bool valid_make_rotation_3d_z_arg()
+		{
+			return valid_rotation_3d_arg<Angle_, AngleIsRads_, 2, false>();
+		}
+
+		template<class Angle_, bool AngleIsRads_, std::size_t NumTrigIterations_, bool TrigMod_>
+		[[nodiscard]] static constexpr inline bool valid_make_rotation_3d_x_constexpr_arg()
+		{
+			return valid_rotation_3d_constexpr_arg<Angle_, AngleIsRads_, 0, false, NumTrigIterations_, TrigMod_>();
+		}
+
+		template<class Angle_, bool AngleIsRads_, std::size_t NumTrigIterations_, bool TrigMod_>
+		[[nodiscard]] static constexpr inline bool valid_make_rotation_3d_y_constexpr_arg()
+		{
+			return valid_rotation_3d_constexpr_arg<Angle_, AngleIsRads_, 1, false, NumTrigIterations_, TrigMod_>();
+		}
+
+		template<class Angle_, bool AngleIsRads_, std::size_t NumTrigIterations_, bool TrigMod_>
+		[[nodiscard]] static constexpr inline bool valid_make_rotation_3d_z_constexpr_arg()
+		{
+			return valid_rotation_3d_constexpr_arg<Angle_, AngleIsRads_, 2, false, NumTrigIterations_, TrigMod_>();
+		}
+		
+		template<class Angle_, bool AngleIsRads_>
+		[[nodiscard]] static constexpr inline bool valid_assign_rotation_3d_x_arg()
+		{
+			return valid_rotation_3d_arg<Angle_, AngleIsRads_, 0, true>();
+		}
+
+		template<class Angle_, bool AngleIsRads_>
+		[[nodiscard]] static constexpr inline bool valid_assign_rotation_3d_y_arg()
+		{
+			return valid_rotation_3d_arg<Angle_, AngleIsRads_, 1, true>();
+		}
+
+		template<class Angle_, bool AngleIsRads_>
+		[[nodiscard]] static constexpr inline bool valid_assign_rotation_3d_z_arg()
+		{
+			return valid_rotation_3d_arg<Angle_, AngleIsRads_, 2, true>();
+		}
+
+		template<class Angle_, bool AngleIsRads_, std::size_t NumTrigIterations_, bool TrigMod_>
+		[[nodiscard]] static constexpr inline bool valid_assign_rotation_3d_x_constexpr_arg()
+		{
+			return valid_rotation_3d_constexpr_arg<Angle_, AngleIsRads_, 0, true, NumTrigIterations_, TrigMod_>();
+		}
+
+		template<class Angle_, bool AngleIsRads_, std::size_t NumTrigIterations_, bool TrigMod_>
+		[[nodiscard]] static constexpr inline bool valid_assign_rotation_3d_y_constexpr_arg()
+		{
+			return valid_rotation_3d_constexpr_arg<Angle_, AngleIsRads_, 1, true, NumTrigIterations_, TrigMod_>();
+		}
+
+		template<class Angle_, bool AngleIsRads_, std::size_t NumTrigIterations_, bool TrigMod_>
+		[[nodiscard]] static constexpr inline bool valid_assign_rotation_3d_z_constexpr_arg()
+		{
+			return valid_rotation_3d_constexpr_arg<Angle_, AngleIsRads_, 2, true, NumTrigIterations_, TrigMod_>();
+		}
+#pragma endregion
+
+#pragma region ROTATION_3D_TRANSFORMATION
+	public:
+		/// <summary>
+		/// <para> 
+		///		Creates a 3D rotation transformation of `angle_` radians or degrees about the X-axis, 
+		///		output as a Matrix of this Matrix's size, memory major order, and value_type_uq.
+		/// </para>
+		/// <para> If `AngleIsRads_` is true, `angle_` will be interpreted as radians. If it is false, `angle_` will be interpreted as degrees. </para>
+		/// <para> If the output Matrix cannot fit the full rotation Matrix, as much as can be filled in will be provided. </para>
+		/// <para> `AngleIsRads_` may be omitted in some cases. If it is omitted, `angle_` will be interpreted as radians. </para>
+		/// </summary>
+		/// <param name="angle_">Angle of rotation in either radians or degrees.</param>
+		/// <returns>EmuMath Matrix representing a 3D rotation transformation about the X-axis based on the provided `angle_` argument.</returns>
+		template<bool AngleIsRads_ = true, class Angle_>
+		[[nodiscard]] static constexpr inline auto make_rotation_3d_x(Angle_&& angle_)
+			-> std::enable_if_t<valid_make_rotation_3d_x_arg<Angle_, AngleIsRads_>(), EmuMath::Matrix<num_columns, num_rows, value_type_uq, is_column_major>>
+		{
+			return EmuMath::Helpers::matrix_make_rotation_3d_x<AngleIsRads_, num_columns, num_rows, value_type_uq, is_column_major>(std::forward<Angle_>(angle_));
+		}
+
+		/// <summary>
+		/// <para> 
+		///		Creates a 3D rotation transformation of `angle_` radians or degrees about the X-axis, 
+		///		output as a Matrix of this Matrix's size, memory major order, and value_type_uq.
+		/// </para>
+		/// <para> Calculation will aim to be constexpr-evaluable if possible. </para>
+		/// <para> `NumTrigIterations_` is the number of iterations to perform for executing trigonometric functions such as cos and sin. It must be greater than 0. </para>
+		/// <para> 
+		///		`TrigMod_` is a boolean indicating if a safety modulo calculation should be performed. 
+		///		If it is known that `angle_` is not greater than 6.28319 radians (or the degree equivalent after conversion), this modulo has no effect and can be safely skipped.
+		/// </para>
+		/// <para> If `AngleIsRads_` is true, `angle_` will be interpreted as radians. If it is false, `angle_` will be interpreted as degrees. </para>
+		/// <para> If the output Matrix cannot fit the full rotation Matrix, as much as can be filled in will be provided. </para>
+		/// <para> `AngleIsRads_` may be omitted in some cases. If it is omitted, `angle_` will be interpreted as radians. </para>
+		/// </summary>
+		/// <param name="angle_">Angle of rotation in either radians or degrees.</param>
+		/// <returns>EmuMath Matrix representing a 3D rotation transformation about the Z-axis based on the provided `angle_` argument.</returns>
+		template<std::size_t NumTrigIterations_, bool TrigMod_, bool AngleIsRads_ = true, class Angle_>
+		[[nodiscard]] static constexpr inline auto make_rotation_3d_x_constexpr(Angle_&& angle_)
+			-> std::enable_if_t
+			<
+				valid_make_rotation_3d_x_constexpr_arg<Angle_, AngleIsRads_, NumTrigIterations_, TrigMod_>(),
+				EmuMath::Matrix<num_columns, num_rows, value_type_uq, is_column_major>
+			>
+		{
+			return EmuMath::Helpers::matrix_make_rotation_3d_x_constexpr
+			<
+				NumTrigIterations_,
+				TrigMod_,
+				AngleIsRads_,
+				num_columns,
+				num_rows,
+				value_type_uq,
+				is_column_major
+			>(std::forward<Angle_>(angle_));
+		}
+
+		/// <summary>
+		/// <para> 
+		///		Creates a 3D rotation transformation of `angle_` radians or degrees about the Y-axis, 
+		///		output as a Matrix of this Matrix's size, memory major order, and value_type_uq.
+		/// </para>
+		/// <para> If `AngleIsRads_` is true, `angle_` will be interpreted as radians. If it is false, `angle_` will be interpreted as degrees. </para>
+		/// <para> If the output Matrix cannot fit the full rotation Matrix, as much as can be filled in will be provided. </para>
+		/// <para> `AngleIsRads_` may be omitted in some cases. If it is omitted, `angle_` will be interpreted as radians. </para>
+		/// </summary>
+		/// <param name="angle_">Angle of rotation in either radians or degrees.</param>
+		/// <returns>EmuMath Matrix representing a 3D rotation transformation about the Y-axis based on the provided `angle_` argument.</returns>
+		template<bool AngleIsRads_ = true, class Angle_>
+		[[nodiscard]] static constexpr inline auto make_rotation_3d_y(Angle_&& angle_)
+			-> std::enable_if_t<valid_make_rotation_3d_y_arg<Angle_, AngleIsRads_>(), EmuMath::Matrix<num_columns, num_rows, value_type_uq, is_column_major>>
+		{
+			return EmuMath::Helpers::matrix_make_rotation_3d_y<AngleIsRads_, num_columns, num_rows, value_type_uq, is_column_major>(std::forward<Angle_>(angle_));
+		}
+
+		/// <summary>
+		/// <para> 
+		///		Creates a 3D rotation transformation of `angle_` radians or degrees about the Y-axis, 
+		///		output as a Matrix of this Matrix's size, memory major order, and value_type_uq.
+		/// </para>
+		/// <para> Calculation will aim to be constexpr-evaluable if possible. </para>
+		/// <para> `NumTrigIterations_` is the number of iterations to perform for executing trigonometric functions such as cos and sin. It must be greater than 0. </para>
+		/// <para> 
+		///		`TrigMod_` is a boolean indicating if a safety modulo calculation should be performed. 
+		///		If it is known that `angle_` is not greater than 6.28319 radians (or the degree equivalent after conversion), this modulo has no effect and can be safely skipped.
+		/// </para>
+		/// <para> If `AngleIsRads_` is true, `angle_` will be interpreted as radians. If it is false, `angle_` will be interpreted as degrees. </para>
+		/// <para> If the output Matrix cannot fit the full rotation Matrix, as much as can be filled in will be provided. </para>
+		/// <para> `AngleIsRads_` may be omitted in some cases. If it is omitted, `angle_` will be interpreted as radians. </para>
+		/// </summary>
+		/// <param name="angle_">Angle of rotation in either radians or degrees.</param>
+		/// <returns>EmuMath Matrix representing a 3D rotation transformation about the Y-axis based on the provided `angle_` argument.</returns>
+		template<std::size_t NumTrigIterations_, bool TrigMod_, bool AngleIsRads_ = true, class Angle_>
+		[[nodiscard]] static constexpr inline auto make_rotation_3d_y_constexpr(Angle_&& angle_)
+			-> std::enable_if_t
+			<
+				valid_make_rotation_3d_y_constexpr_arg<Angle_, AngleIsRads_, NumTrigIterations_, TrigMod_>(),
+				EmuMath::Matrix<num_columns, num_rows, value_type_uq, is_column_major>
+			>
+		{
+			return EmuMath::Helpers::matrix_make_rotation_3d_y_constexpr
+			<
+				NumTrigIterations_,
+				TrigMod_,
+				AngleIsRads_,
+				num_columns,
+				num_rows,
+				value_type_uq,
+				is_column_major
+			>(std::forward<Angle_>(angle_));
+		}
+
+		/// <summary>
+		/// <para> 
+		///		Creates a 3D rotation transformation of `angle_` radians or degrees about the Y-axis, 
+		///		output as a Matrix of this Matrix's size, memory major order, and value_type_uq.
+		/// </para>
+		/// <para> If `AngleIsRads_` is true, `angle_` will be interpreted as radians. If it is false, `angle_` will be interpreted as degrees. </para>
+		/// <para> If the output Matrix cannot fit the full rotation Matrix, as much as can be filled in will be provided. </para>
+		/// <para> `AngleIsRads_` may be omitted in some cases. If it is omitted, `angle_` will be interpreted as radians. </para>
+		/// </summary>
+		/// <param name="angle_">Angle of rotation in either radians or degrees.</param>
+		/// <returns>EmuMath Matrix representing a 3D rotation transformation about the Y-axis based on the provided `angle_` argument.</returns>
+		template<bool AngleIsRads_ = true, class Angle_>
+		[[nodiscard]] static constexpr inline auto make_rotation_3d_z(Angle_&& angle_)
+			-> std::enable_if_t<valid_make_rotation_3d_z_arg<Angle_, AngleIsRads_>(), EmuMath::Matrix<num_columns, num_rows, value_type_uq, is_column_major>>
+		{
+			return EmuMath::Helpers::matrix_make_rotation_3d_z<AngleIsRads_, num_columns, num_rows, value_type_uq, is_column_major>(std::forward<Angle_>(angle_));
+		}
+
+		/// <summary>
+		/// <para> 
+		///		Creates a 3D rotation transformation of `angle_` radians or degrees about the Y-axis, 
+		///		output as a Matrix of this Matrix's size, memory major order, and value_type_uq.
+		/// </para>
+		/// <para> Calculation will aim to be constexpr-evaluable if possible. </para>
+		/// <para> `NumTrigIterations_` is the number of iterations to perform for executing trigonometric functions such as cos and sin. It must be greater than 0. </para>
+		/// <para> 
+		///		`TrigMod_` is a boolean indicating if a safety modulo calculation should be performed. 
+		///		If it is known that `angle_` is not greater than 6.28319 radians (or the degree equivalent after conversion), this modulo has no effect and can be safely skipped.
+		/// </para>
+		/// <para> If `AngleIsRads_` is true, `angle_` will be interpreted as radians. If it is false, `angle_` will be interpreted as degrees. </para>
+		/// <para> If the output Matrix cannot fit the full rotation Matrix, as much as can be filled in will be provided. </para>
+		/// <para> `AngleIsRads_` may be omitted in some cases. If it is omitted, `angle_` will be interpreted as radians. </para>
+		/// </summary>
+		/// <param name="angle_">Angle of rotation in either radians or degrees.</param>
+		/// <returns>EmuMath Matrix representing a 3D rotation transformation about the Y-axis based on the provided `angle_` argument.</returns>
+		template<std::size_t NumTrigIterations_, bool TrigMod_, bool AngleIsRads_ = true, class Angle_>
+		[[nodiscard]] static constexpr inline auto make_rotation_3d_z_constexpr(Angle_&& angle_)
+			-> std::enable_if_t
+			<
+				valid_make_rotation_3d_z_constexpr_arg<Angle_, AngleIsRads_, NumTrigIterations_, TrigMod_>(),
+				EmuMath::Matrix<num_columns, num_rows, value_type_uq, is_column_major>
+			>
+		{
+			return EmuMath::Helpers::matrix_make_rotation_3d_z_constexpr
+			<
+				NumTrigIterations_,
+				TrigMod_,
+				AngleIsRads_,
+				num_columns,
+				num_rows,
+				value_type_uq,
+				is_column_major
+			>(std::forward<Angle_>(angle_));
+		}
+
+		/// <summary>
+		/// <para> Assigns this Matrix to represent a 3D rotation transformation of `angle_` radians or degrees about the X-axis. </para>
+		/// <para> If `AngleIsRads_` is true, `angle_` will be interpreted as radians. If it is false, `angle_` will be interpreted as degrees. </para>
+		/// <para> If this Matrix cannot fit the full rotation Matrix, as much as can be filled in will be provided. </para>
+		/// <para> `AngleIsRads_` may be omitted in some cases. If it is omitted, `angle_` will be interpreted as radians. </para>
+		/// </summary>
+		/// <param name="angle_">Angle of rotation in either radians or degrees.</param>
+		template<bool AngleIsRads_ = true, class Angle_>
+		constexpr inline auto AssignRotation3DX(Angle_&& angle_) &
+			-> std::enable_if_t<valid_assign_rotation_3d_x_arg<Angle_, AngleIsRads_>(), void>
+		{
+			EmuMath::Helpers::matrix_assign_rotation_3d_x<AngleIsRads_>(*this, std::forward<Angle_>(angle_));
+		}
+
+		/// <summary>
+		/// <para> Assigns this Matrix to represent a 3D rotation transformation of `angle_` radians or degrees about the X-axis. </para>
+		/// <para> Calculation will aim to be constexpr-evaluable if possible. </para>
+		/// <para> `NumIterations_` is the number of iterations to perform for executing trigonometric functions such as cos and sin. It must be greater than 0. </para>
+		/// <para> 
+		///		`TrigMod_` is a boolean indicating if a safety modulo calculation should be performed. 
+		///		If it is known that `angle_` is not greater than 6.28319 radians (or the degree equivalent after conversion), this modulo has no effect and can be safely skipped.
+		/// </para>
+		/// <para> If `AngleIsRads_` is true, `angle_` will be interpreted as radians. If it is false, `angle_` will be interpreted as degrees. </para>
+		/// <para> If this Matrix cannot fit the full rotation Matrix, as much as can be filled in will be provided. </para>
+		/// <para> `AngleIsRads_` may be omitted in some cases. If it is omitted, `angle_` will be interpreted as radians. </para>
+		/// </summary>
+		/// <param name="angle_">Angle of rotation in either radians or degrees.</param>
+		template<std::size_t NumTrigIterations_, bool TrigMod_, bool AngleIsRads_ = true, class Angle_>
+		constexpr inline auto AssignRotation3DXConstexpr(Angle_&& angle_) &
+			-> std::enable_if_t<valid_assign_rotation_3d_x_constexpr_arg<Angle_, AngleIsRads_, NumTrigIterations_, TrigMod_>(), void>
+		{
+			EmuMath::Helpers::matrix_assign_rotation_3d_x_constexpr<NumTrigIterations_, TrigMod_, AngleIsRads_>(*this, std::forward<Angle_>(angle_));
+		}		
+
+		/// <summary>
+		/// <para> Assigns this Matrix to represent a 3D rotation transformation of `angle_` radians or degrees about the Y-axis. </para>
+		/// <para> If `AngleIsRads_` is true, `angle_` will be interpreted as radians. If it is false, `angle_` will be interpreted as degrees. </para>
+		/// <para> If this Matrix cannot fit the full rotation Matrix, as much as can be filled in will be provided. </para>
+		/// <para> `AngleIsRads_` may be omitted in some cases. If it is omitted, `angle_` will be interpreted as radians. </para>
+		/// </summary>
+		/// <param name="angle_">Angle of rotation in either radians or degrees.</param>
+		template<bool AngleIsRads_ = true, class Angle_>
+		constexpr inline auto AssignRotation3DY(Angle_&& angle_) &
+			-> std::enable_if_t<valid_assign_rotation_3d_y_arg<Angle_, AngleIsRads_>(), void>
+		{
+			EmuMath::Helpers::matrix_assign_rotation_3d_y<AngleIsRads_>(*this, std::forward<Angle_>(angle_));
+		}
+
+		/// <summary>
+		/// <para> Assigns this Matrix to represent a 3D rotation transformation of `angle_` radians or degrees about the Y-axis. </para>
+		/// <para> Calculation will aim to be constexpr-evaluable if possible. </para>
+		/// <para> `NumIterations_` is the number of iterations to perform for executing trigonometric functions such as cos and sin. It must be greater than 0. </para>
+		/// <para> 
+		///		`TrigMod_` is a boolean indicating if a safety modulo calculation should be performed. 
+		///		If it is known that `angle_` is not greater than 6.28319 radians (or the degree equivalent after conversion), this modulo has no effect and can be safely skipped.
+		/// </para>
+		/// <para> If `AngleIsRads_` is true, `angle_` will be interpreted as radians. If it is false, `angle_` will be interpreted as degrees. </para>
+		/// <para> If this Matrix cannot fit the full rotation Matrix, as much as can be filled in will be provided. </para>
+		/// <para> `AngleIsRads_` may be omitted in some cases. If it is omitted, `angle_` will be interpreted as radians. </para>
+		/// </summary>
+		/// <param name="angle_">Angle of rotation in either radians or degrees.</param>
+		template<std::size_t NumTrigIterations_, bool TrigMod_, bool AngleIsRads_ = true, class Angle_>
+		constexpr inline auto AssignRotation3DYConstexpr(Angle_&& angle_) &
+			-> std::enable_if_t<valid_assign_rotation_3d_y_constexpr_arg<Angle_, AngleIsRads_, NumTrigIterations_, TrigMod_>(), void>
+		{
+			EmuMath::Helpers::matrix_assign_rotation_3d_y_constexpr<NumTrigIterations_, TrigMod_, AngleIsRads_>(*this, std::forward<Angle_>(angle_));
+		}		
+
+		/// <summary>
+		/// <para> Assigns this Matrix to represent a 3D rotation transformation of `angle_` radians or degrees about the Z-axis. </para>
+		/// <para> If `AngleIsRads_` is true, `angle_` will be interpreted as radians. If it is false, `angle_` will be interpreted as degrees. </para>
+		/// <para> If this Matrix cannot fit the full rotation Matrix, as much as can be filled in will be provided. </para>
+		/// <para> `AngleIsRads_` may be omitted in some cases. If it is omitted, `angle_` will be interpreted as radians. </para>
+		/// </summary>
+		/// <param name="angle_">Angle of rotation in either radians or degrees.</param>
+		template<bool AngleIsRads_ = true, class Angle_>
+		constexpr inline auto AssignRotation3DZ(Angle_&& angle_) &
+			-> std::enable_if_t<valid_assign_rotation_3d_z_arg<Angle_, AngleIsRads_>(), void>
+		{
+			EmuMath::Helpers::matrix_assign_rotation_3d_z<AngleIsRads_>(*this, std::forward<Angle_>(angle_));
+		}
+
+		/// <summary>
+		/// <para> Assigns this Matrix to represent a 3D rotation transformation of `angle_` radians or degrees about the Z-axis. </para>
+		/// <para> Calculation will aim to be constexpr-evaluable if possible. </para>
+		/// <para> `NumIterations_` is the number of iterations to perform for executing trigonometric functions such as cos and sin. It must be greater than 0. </para>
+		/// <para> 
+		///		`TrigMod_` is a boolean indicating if a safety modulo calculation should be performed. 
+		///		If it is known that `angle_` is not greater than 6.28319 radians (or the degree equivalent after conversion), this modulo has no effect and can be safely skipped.
+		/// </para>
+		/// <para> If `AngleIsRads_` is true, `angle_` will be interpreted as radians. If it is false, `angle_` will be interpreted as degrees. </para>
+		/// <para> If this Matrix cannot fit the full rotation Matrix, as much as can be filled in will be provided. </para>
+		/// <para> `AngleIsRads_` may be omitted in some cases. If it is omitted, `angle_` will be interpreted as radians. </para>
+		/// </summary>
+		/// <param name="angle_">Angle of rotation in either radians or degrees.</param>
+		template<std::size_t NumTrigIterations_, bool TrigMod_, bool AngleIsRads_ = true, class Angle_>
+		constexpr inline auto AssignRotation3DZConstexpr(Angle_&& angle_) &
+			-> std::enable_if_t<valid_assign_rotation_3d_z_constexpr_arg<Angle_, AngleIsRads_, NumTrigIterations_, TrigMod_>(), void>
+		{
+			EmuMath::Helpers::matrix_assign_rotation_3d_z_constexpr<NumTrigIterations_, TrigMod_, AngleIsRads_>(*this, std::forward<Angle_>(angle_));
+		}
+#pragma endregion
+
 #pragma region STREAM_FUNCS
 	public:
 		/// <summary>

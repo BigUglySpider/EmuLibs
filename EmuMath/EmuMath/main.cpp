@@ -320,6 +320,7 @@ int main()
 
 
 	std::cout << "ASSIGN_TRANSLATION TESTS\n";
+	using Mat4x4f32CM = EmuMath::Matrix<4, 4, float, true>;
 	EmuMath::Matrix<4, 4, float, true> translate_assign_matrix(10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160);
 	std::cout << translate_assign_matrix << "\n\n";
 	translate_assign_matrix.AssignTranslation(5);
@@ -337,12 +338,46 @@ int main()
 	std::cout << "ROTATION TESTS\n";
 	std::cout << "Constexpr:\n" << rot_0 << "\n\n:Runtime:\n" << EmuMath::Helpers::matrix_make_rotation_3d_z<true, float, false>(-33) << "\n\n";
 
+	std::cout << "ROTATION MEMBER TESTS\n";
+	auto member_rot_runtime = Mat4x4f32CM::make_rotation_3d_z<false>(33);
+	constexpr auto member_rot = Mat4x4f32CM::make_rotation_3d_z_constexpr<4, true, false>(33);
+	std::cout << "runtime: " << (member_rot_runtime * point_to_rotate) << "\n";
+	std::cout << "constexpr: " << (member_rot * point_to_rotate) << "\n";
+
+	std::cout << "ROTATION MEMBER ASSIGN TESTS\n";
 	auto rot_mat_runtime = EmuMath::Matrix<4, 4, float, true>::identity();
 	std::cout << rot_mat_runtime << "\nVec: " << (rot_mat_runtime * point_to_rotate) << "\n\n";
-	EmuMath::Helpers::matrix_assign_rotation_3d_z<false>(rot_mat_runtime, 33);
+	rot_mat_runtime.AssignRotation3DZ<false>(33);
 	std::cout << rot_mat_runtime << "\nVec: " << (rot_mat_runtime * point_to_rotate) << "\n\n";
-	EmuMath::Helpers::matrix_assign_rotation_3d_z_constexpr<12, true, false>(rot_mat_runtime, -33);
+	rot_mat_runtime.AssignRotation3DZConstexpr<12, true, false>(-33);
 	std::cout << rot_mat_runtime << "\nVec: " << (rot_mat_runtime * point_to_rotate) << "\n\n";
+
+	std::cout << "IRREGULAR MATRIX MAKE ROTATION TESTS\n";
+	EmuMath::Matrix<2, 4, float, true> irregular_matrix(1, 2, 3, 4, 5, 6, 7, 8);
+	std::cout << irregular_matrix.make_rotation_3d_x<false>(33) << "\n\n";
+	std::cout << irregular_matrix.make_rotation_3d_y<false>(33) << "\n\n";
+	std::cout << irregular_matrix.make_rotation_3d_z<false>(33) << "\n\n";
+
+	std::cout << "IRREGULAR MATRIX MAKE ROTATION CONSTEXPR TESTS\n";
+	std::cout << irregular_matrix.make_rotation_3d_x_constexpr<12, true, false>(-33) << "\n\n";
+	std::cout << irregular_matrix.make_rotation_3d_y_constexpr<12, true, false>(-33) << "\n\n";
+	std::cout << irregular_matrix.make_rotation_3d_z_constexpr<12, true, false>(-33) << "\n\n";
+
+	std::cout << "IRREGULAR MATRIX ASSIGN ROTATION TESTS\n";
+	irregular_matrix.AssignRotation3DX<false>(33);
+	std::cout << irregular_matrix << "\n\n";
+	irregular_matrix.AssignRotation3DY<false>(33);
+	std::cout << irregular_matrix << "\n\n";
+	irregular_matrix.AssignRotation3DZ<false>(33);
+	std::cout << irregular_matrix << "\n\n";
+
+	std::cout << "IRREGULAR MATRIX ASSIGN ROTATION CONSTEXPR TESTS\n";
+	irregular_matrix.AssignRotation3DXConstexpr<12, true, false>(33);
+	std::cout << irregular_matrix << "\n\n";
+	irregular_matrix.AssignRotation3DYConstexpr<12, true, false>(33);
+	std::cout << irregular_matrix << "\n\n";
+	irregular_matrix.AssignRotation3DZConstexpr<12, true, false>(33);
+	std::cout << irregular_matrix << "\n\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

@@ -474,7 +474,7 @@ namespace EmuMath::Helpers
 	}
 #pragma endregion
 
-#pragma region ROTATE_|_CONSTEXPR
+#pragma region ROTATE_Z_CONSTEXPR
 	/// <summary>
 	/// <para> Creates an EmuMath Matrix of the specified type which represents a 3D rotation transformation of `angle_` radians or degrees about the Z-axis. </para>
 	/// <para> Calculation will aim to be constexpr-evaluable if possible. </para>
