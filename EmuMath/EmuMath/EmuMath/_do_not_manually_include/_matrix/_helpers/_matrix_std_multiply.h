@@ -181,7 +181,7 @@ namespace EmuMath::Helpers
 	<
 		std::size_t LhsNumColumns_, std::size_t LhsNumRows_, typename LhsT_, bool LhsColumnMajor_, std::size_t RhsSize_, typename RhsT_, std::size_t OutSize_, typename OutT_
 	>
-	[[nodiscard]] constexpr inline void matrix_multiply
+	constexpr inline void matrix_multiply
 	(
 		EmuMath::Vector<OutSize_, OutT_>& out_vector_,
 		const EmuMath::Matrix<LhsNumColumns_, LhsNumRows_, LhsT_, LhsColumnMajor_>& lhs_matrix_,

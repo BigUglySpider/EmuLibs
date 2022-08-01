@@ -331,6 +331,19 @@ int main()
 	translate_assign_matrix.AssignTranslation(EmuMath::Vector<4, unsigned long long int>(1, 2, 3, 4));
 	std::cout << translate_assign_matrix << "\n\n";
 
+	constexpr auto point_to_rotate = EmuMath::Vector<3, double>(1, 0, 1);
+	constexpr auto rot_0 = EmuMath::Helpers::matrix_make_rotation_3d_x_constexpr<12, true, true, 4, 4, double, true>(-33);
+	constexpr auto point_rot_0 = rot_0 * point_to_rotate;
+	std::cout << "ROTATION TESTS\n";
+	std::cout << "Constexpr:\n" << rot_0 << "\n\n:Runtime:\n" << EmuMath::Helpers::matrix_make_rotation_3d_x<true, float, false>(-33) << "\n\n";
+
+	auto rot_mat_runtime = EmuMath::Matrix<4, 4, float, true>::identity();
+	std::cout << rot_mat_runtime << "\nVec: " << (rot_mat_runtime * point_to_rotate) << "\n\n";
+	EmuMath::Helpers::matrix_assign_rotation_3d_x<false>(rot_mat_runtime, 33);
+	std::cout << rot_mat_runtime << "\nVec: " << (rot_mat_runtime * point_to_rotate) << "\n\n";
+	EmuMath::Helpers::matrix_assign_rotation_3d_x_constexpr<12, true, false>(rot_mat_runtime, -33);
+	std::cout << rot_mat_runtime << "\nVec: " << (rot_mat_runtime * point_to_rotate) << "\n\n";
+
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;

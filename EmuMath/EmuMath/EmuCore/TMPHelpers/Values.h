@@ -547,7 +547,7 @@ namespace EmuCore::TMP
 	/// <param name="out_">: Reference to assign to.</param>
 	/// <param name="in_">: Value to assign out_ via if Direct Assignment may occur, or used to create a CastType_ if Cast Assignment is performed.</param>
 	template<class CastType_, class In_, class Out_>
-	[[nodiscard]] constexpr inline void assign_direct_or_cast(Out_& out_, In_&& in_)
+	constexpr inline void assign_direct_or_cast(Out_& out_, In_&& in_)
 	{
 		using in_uq = EmuCore::TMP::remove_ref_cv_t<In_>;
 		using out_uq = EmuCore::TMP::remove_ref_cv_t<Out_>;

@@ -289,22 +289,22 @@ namespace EmuMath::Helpers::_matrix_underlying
 #pragma endregion
 
 #pragma region MATRIX_MUL_VECTOR
-	template<std::size_t DpIndex_, class LhsRow_, class RhsVector_>
-	[[nodiscard]] constexpr inline auto _matrix_std_multiply_vector_calculate_dp_mult(const LhsRow_& lhs_row_, const RhsVector_& rhs_vector_)
+	template<std::size_t DpIndex_, std::size_t RowIndex_, class LhsMatrix_, class RhsVector_>
+	[[nodiscard]] constexpr inline auto _matrix_std_multiply_vector_calculate_dp_mult(const LhsMatrix_& lhs_mat_, const RhsVector_& rhs_vector_)
 	{
 		if constexpr (DpIndex_ < EmuCore::TMP::remove_ref_cv_t<RhsVector_>::size)
 		{
-			using lhs_get_uq = EmuCore::TMP::remove_ref_cv_t<decltype(lhs_row_.template at<DpIndex_>())>;
+			using lhs_get_uq = EmuCore::TMP::remove_ref_cv_t<decltype(lhs_mat_.template at<DpIndex_, RowIndex_>())>;
 			using rhs_get_uq = EmuCore::TMP::remove_ref_cv_t<decltype(rhs_vector_.template at<DpIndex_>())>;
 			return EmuCore::do_multiply<lhs_get_uq, rhs_get_uq>()
 			(
-				lhs_row_.template at<DpIndex_>(),
+				lhs_mat_.template at<DpIndex_, RowIndex_>(),
 				rhs_vector_.template at<DpIndex_>()
 			);
 		}
 		else
 		{
-			return lhs_row_.template at<DpIndex_>();
+			return lhs_mat_.template at<DpIndex_, RowIndex_>();
 		}
 	}
 
@@ -315,11 +315,9 @@ namespace EmuMath::Helpers::_matrix_underlying
 		const RhsVector_& rhs_vector_
 	)
 	{
-		using lhs_row_ref_type = typename LhsMatrix_::row_get_const_ref_type;
-		lhs_row_ref_type lhs_row_ref_ = lhs_matrix_.template RowAt<Index_>();
 		return EmuCore::TMP::construct_or_cast<typename OutVector_::stored_type>
 		(
-			(_matrix_std_multiply_vector_calculate_dp_mult<DpIndices_, lhs_row_ref_type, RhsVector_>(lhs_row_ref_, rhs_vector_) + ...)
+			(_matrix_std_multiply_vector_calculate_dp_mult<DpIndices_, Index_>(lhs_matrix_, rhs_vector_) + ...)
 		);
 	}
 
@@ -330,11 +328,9 @@ namespace EmuMath::Helpers::_matrix_underlying
 		const RhsVector_& rhs_vector_
 	)
 	{
-		using lhs_row_ref_type = typename LhsMatrix_::row_get_const_ref_type;
-		lhs_row_ref_type lhs_row_ref_ = lhs_matrix_.template RowAt<Index_>();
 		return
 		(
-			(_matrix_std_multiply_vector_calculate_dp_mult<DpIndices_, lhs_row_ref_type, RhsVector_>(lhs_row_ref_, rhs_vector_) + ...)
+			(_matrix_std_multiply_vector_calculate_dp_mult<DpIndices_, Index_>(lhs_matrix_, rhs_vector_) + ...)
 		);
 	}
 

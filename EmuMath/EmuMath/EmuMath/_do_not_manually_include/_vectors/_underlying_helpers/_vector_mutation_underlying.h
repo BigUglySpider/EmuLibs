@@ -148,7 +148,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		);
 	}
 	template<std::size_t ArgIndex_, class Func_, class...Args_>
-	[[nodiscard]] constexpr inline void _vector_mutate_invoke_func_no_ret(Func_ func_, Args_&&...args_)
+	constexpr inline void _vector_mutate_invoke_func_no_ret(Func_ func_, Args_&&...args_)
 	{
 		auto tup = std::forward_as_tuple(std::forward<Args_>(args_)...);
 		func_
@@ -888,7 +888,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		std::size_t ArgIndex_,
 		class...Args_
 	>
-	[[nodiscard]] constexpr inline void _vector_partial_mutation_copy_with_func_template_extra_args_no_func_passed(OutVector_& out_vector_, InVector_&& in_vector_, Args_&&...args_)
+	constexpr inline void _vector_partial_mutation_copy_with_func_template_extra_args_no_func_passed(OutVector_& out_vector_, InVector_&& in_vector_, Args_&&...args_)
 	{
 		using instance_info = _vector_mutate_custom_func_instance<FuncT_, ArgTuple_, Args_...>;
 		if constexpr (CustomArgsFirst_ ? instance_info::is_valid_with_tuple_first : instance_info::is_valid_with_tuple_last)
@@ -1136,7 +1136,7 @@ namespace EmuMath::Helpers::_vector_underlying
 		std::size_t ArgIndex_,
 		class...Args_
 	>
-	[[nodiscard]] constexpr inline void _vector_mutate_with_func_template_extra_args_invoke_only_no_func_passed(Args_&&...args_)
+	constexpr inline void _vector_mutate_with_func_template_extra_args_invoke_only_no_func_passed(Args_&&...args_)
 	{
 		using instance_info = _vector_mutate_custom_func_instance<FuncT_, ArgTuple_, Args_...>;
 		if constexpr (CustomArgsFirst_ ? instance_info::is_valid_with_tuple_first : instance_info::is_valid_with_tuple_last)

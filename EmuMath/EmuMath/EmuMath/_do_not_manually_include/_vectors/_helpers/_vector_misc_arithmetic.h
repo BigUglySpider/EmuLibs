@@ -243,7 +243,7 @@ namespace EmuMath::Helpers
 	/// <param name="b_">Scalar or EmuMath Vector used as the target point of interpolations. b in the equation `a + ((b - a) * t)`.</param>
 	/// <param name="t_">Scalar or EmuMath Vector used as the weighting of interpolations. t in the equation `a + ((b - a) * t)`.</param>
 	template<std::size_t OutSize_, typename OutT_, std::size_t ASize_, typename AT_, class B_, class T_>
-	[[nodiscard]] constexpr inline void vector_lerp(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<ASize_, AT_>& vector_a_, B_&& b_, T_&& t_)
+	constexpr inline void vector_lerp(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<ASize_, AT_>& vector_a_, B_&& b_, T_&& t_)
 	{
 		return EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE(EmuCore::do_lerp, OutSize_, OutT_)(out_vector_, vector_a_, std::forward<B_>(b_), std::forward<T_>(t_));
 	}
@@ -337,7 +337,7 @@ namespace EmuMath::Helpers
 	/// <param name="b_">Scalar or EmuMath Vector used as the target point of interpolations. b in the equation `a + ((b - a) * t)`.</param>
 	/// <param name="t_">Scalar or EmuMath Vector used as the weighting of interpolations. t in the equation `a + ((b - a) * t)`.</param>
 	template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t ASize_, typename AT_, typename B_, typename T_, std::size_t OutSize_, typename OutT_>
-	[[nodiscard]] constexpr inline void vector_lerp_range
+	constexpr inline void vector_lerp_range
 	(
 		EmuMath::Vector<OutSize_, OutT_>& out_vector_,
 		const EmuMath::Vector<ASize_, AT_>& vector_a_,
@@ -451,7 +451,7 @@ namespace EmuMath::Helpers
 	/// <param name="b_">Scalar or EmuMath Vector used as the target point of interpolations. b in the equation `a + ((b - a) * t)`.</param>
 	/// <param name="t_">Scalar or EmuMath Vector used as the weighting of interpolations. t in the equation `a + ((b - a) * t)`.</param>
 	template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t LerpBegin_, typename AT_, std::size_t ASize_, typename B_, typename T_, std::size_t OutSize_, typename OutT_>
-	[[nodiscard]] constexpr inline void vector_lerp_range_no_copy
+	constexpr inline void vector_lerp_range_no_copy
 	(
 		EmuMath::Vector<OutSize_, OutT_>& out_vector_,
 		const EmuMath::Vector<ASize_, AT_>& vector_a_,
