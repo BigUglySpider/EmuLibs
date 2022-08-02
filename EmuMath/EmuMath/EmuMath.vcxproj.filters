@@ -740,5 +740,14 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_transformations\_matrix_rotate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_quaternion_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_underlying_helpers\_quaternion_tmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\Quaternion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

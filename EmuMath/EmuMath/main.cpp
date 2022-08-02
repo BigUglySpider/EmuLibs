@@ -10,6 +10,7 @@
 #include "EmuMath/FastNoise.h"
 #include "EmuMath/Matrix.h"
 #include "EmuMath/Noise.h"
+#include "EmuMath/Quaternion.h"
 #include "EmuMath/Random.h"
 #include "EmuMath/Vector.h"
 
@@ -378,6 +379,20 @@ int main()
 	std::cout << irregular_matrix << "\n\n";
 	irregular_matrix.AssignRotation3DZConstexpr<12, true, false>(33);
 	std::cout << irregular_matrix << "\n\n";
+
+	system("pause");
+	std::cout << "\n\n\n\nQUATERNIONS\n";
+	constexpr auto rot_euler = EmuMath::Vector<3, float>
+	(
+		EmuCore::Pi::DegsToRads_v<float, int, 45>,
+		EmuCore::Pi::DegsToRads_v<float, int, 33>,
+		EmuCore::Pi::DegsToRads_v<float, int, 0>
+	);
+
+	constexpr auto quat_default = EmuMath::Quaternion<float>();
+	auto quat_from_euler = EmuMath::Quaternion<float>(rot_euler.at<0>(), rot_euler.at<1>(), rot_euler.at<2>());
+	std::cout << quat_from_euler << "\n";
+	std::cout << quat_from_euler.data.Normalise() << "\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

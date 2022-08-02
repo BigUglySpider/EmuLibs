@@ -7,6 +7,21 @@
 namespace EmuCore::TMP
 {
 #pragma region EXISTENCE_CHECKS
+	template<class Stream_, typename Arg_, typename = void>
+	struct is_stream_appendable
+	{
+		static constexpr bool value = false;
+	};
+
+	template<class Stream_, typename Arg_>
+	struct is_stream_appendable<Stream_, Arg_, std::void_t<decltype(std::declval<std::remove_reference_t<Stream_>&>() << std::declval<Arg_>())>>
+	{
+		static constexpr bool value = true;
+	};
+
+	template<class Stream_, typename Arg_>
+	static constexpr bool is_stream_appendable_v = is_stream_appendable<Stream_, Arg_>::value;
+
 	/// <summary> Struct that may be used to check if a type T_ has a subscript operator (operator[]) callable with the provided Arg_ type. </summary>
 	template<class T_, typename Arg_, typename = void>
 	struct has_subscript_operator
