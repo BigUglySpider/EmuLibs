@@ -393,6 +393,12 @@ int main()
 	auto quat_from_euler = EmuMath::Quaternion<float>(rot_euler.at<0>(), rot_euler.at<1>(), rot_euler.at<2>());
 	std::cout << quat_from_euler << "\n";
 	std::cout << quat_from_euler.data.Normalise() << "\n";
+	constexpr auto quat_from_euler_constexpr = EmuMath::Quaternion<float>::from_euler_constexpr<false>(45, 33, 0);
+	constexpr auto quat_from_euler_vector_constexpr = EmuMath::Quaternion<float>::from_euler_constexpr(rot_euler);
+
+	//constexpr auto quat_from_euler_vector_constexpr = EmuMath::Quaternion<float>::from_euler_constexpr(rot_euler);
+
+	std::cout << "Angle: " << acos(EmuMath::Quaternion<float>(EmuCore::Pi::DegsToRads(45.0), 0, 0).data.Dot(EmuMath::Quaternion<float>(EmuCore::Pi::DegsToRads(90.0), 0, 0).data)) << "\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

@@ -11,6 +11,7 @@ namespace EmuMath
 	{
 #pragma region COMMON_ALIASES
 	public:
+		using this_type = Quaternion<T_>;
 		/// <summary> The type used to represent this Quaternion exactly as a Vector. </summary>
 		using vector_type = EmuMath::Vector<4, T_>;
 		/// <summary> The type used to represent this Quaternion as a Euler Angles Vector. </summary>
@@ -28,11 +29,11 @@ namespace EmuMath
 
 #pragma region COMMON_INFO
 	public:
-		static constexpr std::size_t euler_cvt_constructor_read_offset = 0;
-		static constexpr std::size_t euler_cvt_constructor_constexpr_iterations = 0;
-		static constexpr bool euler_cvt_constructor_constexpr_mod = false;
-		static constexpr bool euler_cvt_constructor_prefer_multiplies = false;
-		static constexpr bool euler_cvt_constructor_is_rads = true;
+		static constexpr std::size_t euler_cvt_default_read_offset = 0;
+		static constexpr std::size_t euler_cvt_default_constexpr_iterations = 0;
+		static constexpr bool euler_cvt_default_constexpr_mod = false;
+		static constexpr bool euler_cvt_default_prefer_multiplies = false;
+		static constexpr bool euler_cvt_default_is_rads = true;
 #pragma endregion
 
 #pragma region GET_HELPERS
@@ -52,7 +53,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONVERSION_VALIDITY_CHECKS		
-	private:
+	public:
 		template
 		<
 			typename X_, typename Y_, typename Z_,
@@ -241,9 +242,9 @@ namespace EmuMath
 		[[nodiscard]] static constexpr inline bool _valid_euler_vector_lvalue_conversion_arg()
 		{
 			using in_vector = typename std::conditional<IsConst_, const EmuMath::Vector<VecSize_, VecT_>&, EmuMath::Vector<VecSize_, VecT_>&>::type;
-			using in_x = decltype(std::declval<in_vector>().template AtTheoretial<ReadOffset_>());
-			using in_y = decltype(std::declval<in_vector>().template AtTheoretial<ReadOffset_ + 1>());
-			using in_z = decltype(std::declval<in_vector>().template AtTheoretial<ReadOffset_ + 2>());
+			using in_x = decltype(std::declval<in_vector>().template AtTheoretical<ReadOffset_>());
+			using in_y = decltype(std::declval<in_vector>().template AtTheoretical<ReadOffset_ + 1>());
+			using in_z = decltype(std::declval<in_vector>().template AtTheoretical<ReadOffset_ + 2>());
 			return _valid_euler_conversion_args<in_x, in_y, in_z, ConstexprIterations_, ConstexprMod_, PreferMultiplies_, IsRads_, StaticAssert_>();
 		}
 
@@ -273,12 +274,12 @@ namespace EmuMath
 				<
 					VecSize_,
 					VecT_,
-					euler_cvt_constructor_read_offset,
+					euler_cvt_default_read_offset,
 					IsConst_,
-					euler_cvt_constructor_constexpr_iterations,
-					euler_cvt_constructor_constexpr_mod,
-					euler_cvt_constructor_prefer_multiplies,
-					euler_cvt_constructor_is_rads,
+					euler_cvt_default_constexpr_iterations,
+					euler_cvt_default_constexpr_mod,
+					euler_cvt_default_prefer_multiplies,
+					euler_cvt_default_is_rads,
 					false
 				>();
 			}
@@ -297,11 +298,11 @@ namespace EmuMath
 				<
 					VecSize_,
 					VecT_,
-					euler_cvt_constructor_read_offset,
-					euler_cvt_constructor_constexpr_iterations,
-					euler_cvt_constructor_constexpr_mod,
-					euler_cvt_constructor_prefer_multiplies,
-					euler_cvt_constructor_is_rads,
+					euler_cvt_default_read_offset,
+					euler_cvt_default_constexpr_iterations,
+					euler_cvt_default_constexpr_mod,
+					euler_cvt_default_prefer_multiplies,
+					euler_cvt_default_is_rads,
 					false
 				>();
 			}
@@ -315,7 +316,8 @@ namespace EmuMath
 		template<std::size_t Unused_ = 0>
 		[[nodiscard]] static constexpr inline bool is_default_constructible()
 		{
-			return vector_type::is_default_constructible();
+			using implied_zero = decltype(vector_type::get_implied_zero());
+			return std::is_constructible_v<vector_type, implied_zero, implied_zero, implied_zero, value_type_uq&&>;
 		}
 
 		template<std::size_t Unused_ = 0>
@@ -354,18 +356,18 @@ namespace EmuMath
 			return _valid_euler_vector_rvalue_conversion_constructor_arg<VecSize_, VecT_>();
 		}
 
-		template<typename Pitch_, typename Yaw_, typename Roll_>
+		template<typename X_, typename Y_, typename Z_>
 		[[nodiscard]] static constexpr inline bool valid_euler_conversion_construction_args()
 		{
 			return _valid_euler_conversion_args
 			<
-				Pitch_,
-				Yaw_,
-				Roll_,
-				euler_cvt_constructor_constexpr_iterations,
-				euler_cvt_constructor_constexpr_mod,
-				euler_cvt_constructor_prefer_multiplies,
-				euler_cvt_constructor_is_rads,
+				X_,
+				Y_,
+				Z_,
+				euler_cvt_default_constexpr_iterations,
+				euler_cvt_default_constexpr_mod,
+				euler_cvt_default_prefer_multiplies,
+				euler_cvt_default_is_rads,
 				false
 			>();
 		}
@@ -374,15 +376,17 @@ namespace EmuMath
 #pragma region CONSTRUCTOR_HELPERS
 	private:
 		template<bool IsRads_, bool PreferMultiplies_, std::size_t ConstexprIterations_, bool ConstexprMod_, typename X_, typename Y_, typename Z_>
-		[[nodiscard]] static constexpr inline vector_type _make_vector_from_euler(X_&& euler_pitch_, Y_&& euler_yaw_, Z_&& euler_roll_)
+		[[nodiscard]] static constexpr inline vector_type _make_vector_from_euler(X_&& euler_x_, Y_&& euler_y_, Z_&& euler_z_)
 		{
 			if constexpr (_valid_euler_conversion_args<X_, Y_, Z_, ConstexprIterations_, ConstexprMod_, PreferMultiplies_, IsRads_, true>())
 			{
 				// Common info
+				// --- We use the largest floating-point type for calculation (including preferred fp type),
+				// --- as passing greater-accuracy fp suggests a desire for greater-accuracy calculation results
 				using x_uq = typename EmuCore::TMP::remove_ref_cv<X_>::type;
 				using y_uq = typename EmuCore::TMP::remove_ref_cv<Y_>::type;
 				using z_uq = typename EmuCore::TMP::remove_ref_cv<Z_>::type;
-				using largest_fp = typename EmuCore::TMP::largest_floating_point<x_uq, y_uq, z_uq, preferred_floating_point>::type;
+				using calc_fp = typename EmuCore::TMP::largest_floating_point<x_uq, y_uq, z_uq, preferred_floating_point>::type;
 				constexpr bool is_constexpr = ConstexprIterations_ > 0;
 				
 				// --- START of common function types determination
@@ -390,87 +394,73 @@ namespace EmuMath
 				using div_func = typename std::conditional
 				<
 					PreferMultiplies_,
-					EmuCore::do_multiply<largest_fp, largest_fp>,
-					EmuCore::do_divide<largest_fp, largest_fp>
+					EmuCore::do_multiply<calc_fp, calc_fp>,
+					EmuCore::do_divide<calc_fp, calc_fp>
 				>::type;
 
 				// Prepare trivial functions
-				using add_func = EmuCore::do_add<largest_fp, largest_fp>;
-				using sub_func = EmuCore::do_subtract<largest_fp, largest_fp>;
-				using mul_func = EmuCore::do_multiply<largest_fp, largest_fp>;
+				using add_func = EmuCore::do_add<calc_fp, calc_fp>;
+				using sub_func = EmuCore::do_subtract<calc_fp, calc_fp>;
+				using mul_func = EmuCore::do_multiply<calc_fp, calc_fp>;
 
 				// Prepare trig functions
 				using cos_func = typename std::conditional
 				<
 					is_constexpr,
-					EmuCore::do_cos_constexpr<largest_fp, ConstexprIterations_, ConstexprMod_>,
-					EmuCore::do_cos<largest_fp>
+					EmuCore::do_cos_constexpr<calc_fp, ConstexprIterations_, ConstexprMod_>,
+					EmuCore::do_cos<calc_fp>
 				>::type;
 				using sin_func = typename std::conditional
 				<
 					is_constexpr,
-					EmuCore::do_sin_constexpr<largest_fp, ConstexprIterations_, ConstexprMod_>,
-					EmuCore::do_sin<largest_fp>
+					EmuCore::do_sin_constexpr<calc_fp, ConstexprIterations_, ConstexprMod_>,
+					EmuCore::do_sin<calc_fp>
 				>::type;
 
 				// --- END of common function types determination
 				// --- START of common calculations
 				// Convert values to calculation type
-				largest_fp pitch_div_2_sin = static_cast<largest_fp>(std::forward<X_>(euler_pitch_));
-				largest_fp yaw_div_2_sin = static_cast<largest_fp>(std::forward<Y_>(euler_yaw_));
-				largest_fp roll_div_2_sin = static_cast<largest_fp>(std::forward<Z_>(euler_roll_));
+				calc_fp pitch_sin = static_cast<calc_fp>(std::forward<X_>(euler_x_));
+				calc_fp yaw_sin = static_cast<calc_fp>(std::forward<Y_>(euler_y_));
+				calc_fp roll_sin = static_cast<calc_fp>(std::forward<Z_>(euler_z_));
 
 				// Deg->Rad if needed
 				if constexpr (!IsRads_)
 				{
-					pitch_div_2_sin = EmuCore::Pi::DegsToRads(pitch_div_2_sin);
-					yaw_div_2_sin = EmuCore::Pi::DegsToRads(yaw_div_2_sin);
-					roll_div_2_sin = EmuCore::Pi::DegsToRads(roll_div_2_sin);
+					pitch_sin = EmuCore::Pi::DegsToRads(pitch_sin);
+					yaw_sin = EmuCore::Pi::DegsToRads(yaw_sin);
+					roll_sin = EmuCore::Pi::DegsToRads(roll_sin);
 				}
 
 				// Set these values to angle / 2
-				constexpr largest_fp div_by_2_rhs = PreferMultiplies_ ? largest_fp(0.5) : largest_fp(2);
-				pitch_div_2_sin = div_func()(pitch_div_2_sin, div_by_2_rhs);
-				yaw_div_2_sin = div_func()(yaw_div_2_sin, div_by_2_rhs);
-				roll_div_2_sin = div_func()(roll_div_2_sin, div_by_2_rhs);
+				constexpr calc_fp div_by_2_rhs = PreferMultiplies_ ? calc_fp(0.5) : calc_fp(2);
+				pitch_sin = div_func()(pitch_sin, div_by_2_rhs);
+				yaw_sin = div_func()(yaw_sin, div_by_2_rhs);
+				roll_sin = div_func()(roll_sin, div_by_2_rhs);
 
 				// Find cosines
-				largest_fp pitch_div_2_cos = cos_func()(pitch_div_2_sin);
-				largest_fp yaw_div_2_cos = cos_func()(yaw_div_2_sin);
-				largest_fp roll_div_2_cos = cos_func()(roll_div_2_sin);
+				calc_fp pitch_cos = cos_func()(pitch_sin);
+				calc_fp yaw_cos = cos_func()(yaw_sin);
+				calc_fp roll_cos = cos_func()(roll_sin);
 
 				// Finally set these vars to their names by finding sines
-				pitch_div_2_sin = sin_func()(pitch_div_2_sin);
-				yaw_div_2_sin = sin_func()(yaw_div_2_sin);
-				roll_div_2_sin = sin_func()(roll_div_2_sin);
+				pitch_sin = sin_func()(pitch_sin);
+				yaw_sin = sin_func()(yaw_sin);
+				roll_sin = sin_func()(roll_sin);
 
 				// Common values used in component calculations - avoids extra multiplies
-				largest_fp sin_roll_mul_sin_pitch = mul_func()(roll_div_2_sin, pitch_div_2_sin);
-				largest_fp cos_roll_mul_cos_pitch = mul_func()(roll_div_2_cos, pitch_div_2_cos);
-				largest_fp sin_roll_mul_cos_pitch = mul_func()(roll_div_2_sin, pitch_div_2_cos);
-				largest_fp cos_roll_mul_sin_pitch = mul_func()(roll_div_2_cos, pitch_div_2_sin);
-				
+				// --- We cache roll * pitch calculations only for consistency in formatting to make code more readable
+				calc_fp roll_sin_MUL_pitch_sin = mul_func()(roll_sin, pitch_sin);
+				calc_fp roll_cos_MUL_pitch_cos = mul_func()(roll_cos, pitch_cos);
+				calc_fp roll_sin_MUL_pitch_cos = mul_func()(roll_sin, pitch_cos);
+				calc_fp roll_cos_MUL_pitch_sin = mul_func()(roll_cos, pitch_sin);
+
 				// --- END of common calculations
-				// --- START of component calculations
-				// X = (SIN_ROLL * COS_PITCH * COS_YAW) - (COS_ROLL * SIN_PITCH * SIN_YAW);
-				largest_fp temp_rhs = mul_func()(cos_roll_mul_sin_pitch, yaw_div_2_sin); // COS_ROLL * SIN_PITCH * SIN_YAW
-				largest_fp x = mul_func()(sin_roll_mul_cos_pitch, yaw_div_2_cos); // SIN_ROLL * COS_PITCH * COS_YAW
-				x = sub_func()(x, temp_rhs);
-
-				// Y = (COS_ROLL * SIN_PITCH * COS_YAW) + (SIN_ROLL * COS_PITCH * SIN_YAW);
-				largest_fp y = mul_func()(cos_roll_mul_sin_pitch, yaw_div_2_cos); // COS_ROLL * SIN_PITCH * COS_YAW
-				temp_rhs = mul_func()(sin_roll_mul_cos_pitch, yaw_div_2_sin); // SIN_ROLL * COS_PITCH * SIN_YAW
-				y = add_func()(y, temp_rhs);
-
-				// Z = (COS_ROLL * COS_PITCH * SIN_YAW) - (SIN_ROLL * SIN_PITCH * COS_YAW);
-				largest_fp z = mul_func()(cos_roll_mul_cos_pitch, yaw_div_2_sin); // COS_ROLL * COS_PITCH * SIN_YAW
-				temp_rhs = mul_func()(sin_roll_mul_sin_pitch, yaw_div_2_cos); // SIN_ROLL * SIN_PITCH * COS_YAW
-				z = sub_func()(z, temp_rhs);
-
-				// W = (COS_ROLL * COS_PITCH * COS_YAW) + (SIN_ROLL * SIN_PITCH * SIN_YAW);
-				largest_fp w = mul_func()(cos_roll_mul_cos_pitch, yaw_div_2_cos);
-				temp_rhs = mul_func()(sin_roll_mul_sin_pitch, yaw_div_2_sin);
-				w = add_func()(w, temp_rhs);
+				// --- START of quaternion components
+				calc_fp x = roll_cos_MUL_pitch_sin * yaw_cos - roll_sin_MUL_pitch_cos * yaw_sin;
+				calc_fp y = roll_cos_MUL_pitch_cos * yaw_sin + roll_sin_MUL_pitch_sin * yaw_cos;
+				calc_fp z = roll_sin_MUL_pitch_cos * yaw_cos - roll_cos_MUL_pitch_sin * yaw_sin;
+				calc_fp w = roll_cos_MUL_pitch_cos * yaw_cos + roll_sin_MUL_pitch_sin * yaw_sin;
 
 				return vector_type(std::move(x), std::move(y), std::move(z), std::move(w));
 			}
@@ -491,7 +481,7 @@ namespace EmuMath
 		>
 		[[nodiscard]] static constexpr inline vector_type _make_vector_from_euler(const EmuMath::Vector<VecSize_, VecT_>& euler_vector_)
 		{
-			return _make_vector_from_euler
+			return _make_vector_from_euler<IsRads_, PreferMultiplies_, ConstexprIterations_, ConstexprMod_>
 			(
 				euler_vector_.template AtTheoretical<ReadOffset_>(),
 				euler_vector_.template AtTheoretical<ReadOffset_ + 1>(),
@@ -506,7 +496,7 @@ namespace EmuMath
 		>
 		[[nodiscard]] static constexpr inline vector_type _make_vector_from_euler(EmuMath::Vector<VecSize_, VecT_>& euler_vector_)
 		{
-			return _make_vector_from_euler
+			return _make_vector_from_euler<IsRads_, PreferMultiplies_, ConstexprIterations_, ConstexprMod_>
 			(
 				euler_vector_.template AtTheoretical<ReadOffset_>(),
 				euler_vector_.template AtTheoretical<ReadOffset_ + 1>(),
@@ -522,7 +512,7 @@ namespace EmuMath
 		[[nodiscard]] static constexpr inline vector_type _make_vector_from_euler(EmuMath::Vector<VecSize_, VecT_>&& euler_vector_)
 		{
 			using in_vector = EmuMath::Vector<VecSize_, VecT_>;
-			return _make_vector_from_euler
+			return _make_vector_from_euler<IsRads_, PreferMultiplies_, ConstexprIterations_, ConstexprMod_>
 			(
 				_conditional_vector_move_get<ReadOffset_>(std::forward<in_vector>(euler_vector_)),
 				_conditional_vector_move_get<ReadOffset_ + 1>(std::forward<in_vector>(euler_vector_)),
@@ -534,7 +524,7 @@ namespace EmuMath
 #pragma region CONSTRUCTORS
 	public:
 		template<std::size_t Unused_ = 0, typename = std::enable_if_t<is_default_constructible<Unused_>()>>
-		constexpr inline Quaternion() : data()
+		constexpr inline Quaternion() : data(vector_type::get_implied_zero(), vector_type::get_implied_zero(), vector_type::get_implied_zero(), value_type_uq(1))
 		{
 		}
 
@@ -559,11 +549,11 @@ namespace EmuMath
 			(
 				_make_vector_from_euler
 				<
-					euler_cvt_constructor_is_rads,
-					euler_cvt_constructor_prefer_multiplies,
-					euler_cvt_constructor_constexpr_iterations,
-					euler_cvt_constructor_constexpr_mod,
-					euler_cvt_constructor_read_offset
+					euler_cvt_default_is_rads,
+					euler_cvt_default_prefer_multiplies,
+					euler_cvt_default_constexpr_iterations,
+					euler_cvt_default_constexpr_mod,
+					euler_cvt_default_read_offset
 				>(euler_vector_)
 			)
 		{
@@ -575,11 +565,11 @@ namespace EmuMath
 			(
 				_make_vector_from_euler
 				<
-					euler_cvt_constructor_is_rads,
-					euler_cvt_constructor_prefer_multiplies,
-					euler_cvt_constructor_constexpr_iterations,
-					euler_cvt_constructor_constexpr_mod,
-					euler_cvt_constructor_read_offset
+					euler_cvt_default_is_rads,
+					euler_cvt_default_prefer_multiplies,
+					euler_cvt_default_constexpr_iterations,
+					euler_cvt_default_constexpr_mod,
+					euler_cvt_default_read_offset
 				>(euler_vector_)
 			)
 		{
@@ -591,29 +581,243 @@ namespace EmuMath
 			(
 				_make_vector_from_euler
 				<
-					euler_cvt_constructor_is_rads,
-					euler_cvt_constructor_prefer_multiplies,
-					euler_cvt_constructor_constexpr_iterations,
-					euler_cvt_constructor_constexpr_mod,
-					euler_cvt_constructor_read_offset
+					euler_cvt_default_is_rads,
+					euler_cvt_default_prefer_multiplies,
+					euler_cvt_default_constexpr_iterations,
+					euler_cvt_default_constexpr_mod,
+					euler_cvt_default_read_offset
 				>(std::move(euler_vector_))
 			)
 		{
 		}
 
-		template<typename Pitch_, typename Yaw_, typename Roll_, typename = std::enable_if_t<valid_euler_conversion_construction_args<Pitch_, Yaw_, Roll_>()>>
-		constexpr inline Quaternion(Pitch_&& euler_pitch_, Yaw_&& euler_yaw_, Roll_&& euler_roll_) :
+		template<typename X_, typename Y_, typename Z_, typename = std::enable_if_t<valid_euler_conversion_construction_args<X_, Y_, Z_>()>>
+		constexpr inline Quaternion(X_&& euler_x_, Y_&& euler_y_, Z_&& euler_z_) :
 			data
 			(
 				_make_vector_from_euler
 				<
-					euler_cvt_constructor_is_rads,
-					euler_cvt_constructor_prefer_multiplies,
-					euler_cvt_constructor_constexpr_iterations,
-					euler_cvt_constructor_constexpr_mod
-				>(std::forward<Pitch_>(euler_pitch_), std::forward<Yaw_>(euler_yaw_), std::forward<Roll_>(euler_roll_))
+					euler_cvt_default_is_rads,
+					euler_cvt_default_prefer_multiplies,
+					euler_cvt_default_constexpr_iterations,
+					euler_cvt_default_constexpr_mod
+				>(std::forward<X_>(euler_x_), std::forward<Y_>(euler_y_), std::forward<Z_>(euler_z_))
 			)
 		{
+		}
+#pragma endregion
+
+#pragma region STATIC_GENERATORS
+	public:
+		/// <summary>
+		/// <para> Creates a new Quaternion of this type, which converts the rotation depicted by the passed euler representation. </para>
+		/// <para> Input may be radians or degrees, and defaults to being considered radians. If passing degrees, pass `false` for the `IsRads_` template argument. </para>
+		/// <para>
+		///		Provides an optional preference for multiplications via `PreferMultiplies_`, which defaults to this type's `euler_cvt_default_prefer_multiplies` value. 
+		///		When multiplies are preferred, execution may be more performant when emulating divides but there is a chance of reduced accuracy. 
+		///		It should be noted that regardless of preference, the compiler may also optimise divisions into multiplications regardless.
+		/// </para>
+		/// </summary>
+		/// <param name="euler_x_">X-component of the euler rotation to convert into a Quaternion.</param>
+		/// <param name="euler_y_">Y-component of the euler rotation to convert into a Quaternion.</param>
+		/// <param name="euler_z_">Z-component of the euler rotation to convert into a Quaternion.</param>
+		/// <returns>Quaternion representation of the passed Euler rotation.</returns>
+		template<bool IsRads_ = euler_cvt_default_is_rads, bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies, typename X_, typename Y_, typename Z_>
+		[[nodiscard]] static constexpr inline auto from_euler(X_&& euler_x_, Y_&& euler_y_, Z_&& euler_z_)
+			-> std::enable_if_t<_valid_euler_conversion_args<X_, Y_, Z_, 0, false, PreferMultiplies_, IsRads_, false>(), EmuMath::Quaternion<T_>>
+		{
+			return EmuMath::Quaternion<T_>
+			(
+				_make_vector_from_euler<IsRads_, PreferMultiplies_, 0, false>
+				(
+					std::forward<X_>(euler_x_),
+					std::forward<Y_>(euler_y_),
+					std::forward<Z_>(euler_z_)
+				)
+			);
+		}
+
+		/// <summary>
+		/// <para> Creates a new Quaternion of this type, which converts the rotation depicted by the passed euler representation. </para>
+		/// <para> Input may be radians or degrees, and defaults to being considered radians. If passing degrees, pass `false` for the `IsRads_` template argument. </para>
+		/// <para>
+		///		Provides an optional preference for multiplications via `PreferMultiplies_`, which defaults to this type's `euler_cvt_default_prefer_multiplies` value. 
+		///		When multiplies are preferred, execution may be more performant when emulating divides but there is a chance of reduced accuracy. 
+		///		It should be noted that regardless of preference, the compiler may also optimise divisions into multiplications regardless.
+		/// </para>
+		/// <para> May provide an optional `ReadOffset_` from which to start reading the input Vector. This defaults to 0 (i.e. no offset). </para>
+		/// </summary>
+		/// <param name="euler_xyz_">EmuMath Vector containing the euler rotation components xyz at indices ReadOffset_, ReadOffset_ + 1, and ReadOffset_ + 2 respectively.</param>
+		/// <returns>Quaternion representation of the passed Euler rotation.</returns>
+		template
+		<
+			bool IsRads_ = euler_cvt_default_is_rads, bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies, std::size_t ReadOffset_ = 0,
+			typename VecT_, std::size_t VecSize_
+		>
+		[[nodiscard]] static constexpr inline auto from_euler(const EmuMath::Vector<VecSize_, VecT_>& euler_xyz_)
+			-> std::enable_if_t
+			<
+				_valid_euler_vector_lvalue_conversion_arg<VecSize_, VecT_, ReadOffset_, true, 0, false, PreferMultiplies_, IsRads_, false>(),
+				EmuMath::Quaternion<T_>
+			>
+		{
+			return EmuMath::Quaternion<T_>
+			(
+				_make_vector_from_euler<IsRads_, PreferMultiplies_, 0, false, ReadOffset_>(euler_xyz_)
+			);
+		}
+		
+		template
+		<
+			bool IsRads_ = euler_cvt_default_is_rads, bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies, std::size_t ReadOffset_ = 0,
+			typename VecT_, std::size_t VecSize_
+		>
+		[[nodiscard]] static constexpr inline auto from_euler(EmuMath::Vector<VecSize_, VecT_>& euler_xyz_)
+			-> std::enable_if_t
+			<
+				_valid_euler_vector_lvalue_conversion_arg<VecSize_, VecT_, ReadOffset_, false, 0, false, PreferMultiplies_, IsRads_, false>(),
+				EmuMath::Quaternion<T_>
+			>
+		{
+			return EmuMath::Quaternion<T_>
+			(
+				_make_vector_from_euler<IsRads_, PreferMultiplies_, 0, false, ReadOffset_>(euler_xyz_)
+			);
+		}
+
+		template
+		<
+			bool IsRads_ = euler_cvt_default_is_rads, bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies, std::size_t ReadOffset_ = 0,
+			typename VecT_, std::size_t VecSize_
+		>
+		[[nodiscard]] static constexpr inline auto from_euler(EmuMath::Vector<VecSize_, VecT_>&& euler_xyz_)
+			-> std::enable_if_t
+			<
+				_valid_euler_vector_rvalue_conversion_arg<VecSize_, VecT_, ReadOffset_, 0, false, PreferMultiplies_, IsRads_, false>(),
+				EmuMath::Quaternion<T_>
+			>
+		{
+			return EmuMath::Quaternion<T_>
+			(
+				_make_vector_from_euler<IsRads_, PreferMultiplies_, 0, false, ReadOffset_>(std::forward<decltype(euler_xyz_)>(euler_xyz_))
+			);
+		}
+
+		/// <summary>
+		/// <para> Creates a new Quaternion of this type, which converts the rotation depicted by the passed euler representation. </para>
+		/// <para> Makes use of alternative approaches to trigonometric functions to allow the conversion to be calculated in a constexpr context. </para>
+		/// <para> `TrigIterations_` is the number of iterations to perform for trigonometric functions. This cannot be 0, and defaults to 3. </para>
+		/// <para> 
+		///		`TrigMod_` is a boolean flag indicating if a floating-point modulo operation should be performed to ensure angles are within 360 degree constraints,
+		///		for the purpose of calculating trignometric functions. This defaults to true, but can safely be set to false if you know a mod is not required for a value.
+		/// </para>
+		/// <para> Input may be radians or degrees, and defaults to being considered radians. If passing degrees, pass `false` for the `IsRads_` template argument. </para>
+		/// <para>
+		///		Provides an optional preference for multiplications via `PreferMultiplies_`, which defaults to this type's `euler_cvt_default_prefer_multiplies` value. 
+		///		When multiplies are preferred, execution may be more performant when emulating divides but there is a chance of reduced accuracy. 
+		///		It should be noted that regardless of preference, the compiler may also optimise divisions into multiplications regardless.
+		/// </para>
+		/// </summary>
+		/// <param name="euler_x_">X-component of the euler rotation to convert into a Quaternion.</param>
+		/// <param name="euler_y_">Y-component of the euler rotation to convert into a Quaternion.</param>
+		/// <param name="euler_z_">Z-component of the euler rotation to convert into a Quaternion.</param>
+		/// <returns>Quaternion representation of the passed Euler rotation.</returns>
+		template
+		<
+			bool IsRads_ = euler_cvt_default_is_rads, std::size_t TrigIterations_ = 3, bool TrigMod_ = true,
+			bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies, typename X_, typename Y_, typename Z_
+		>
+		[[nodiscard]] static constexpr inline auto from_euler_constexpr(X_&& euler_x_, Y_&& euler_y_, Z_&& euler_z_)
+			-> std::enable_if_t
+			<
+				TrigIterations_ != 0 && _valid_euler_conversion_args<X_, Y_, Z_, TrigIterations_, TrigMod_, PreferMultiplies_, IsRads_, false>(),
+				EmuMath::Quaternion<T_>
+			>
+		{
+			return EmuMath::Quaternion<T_>
+			(
+				_make_vector_from_euler<IsRads_, PreferMultiplies_, TrigIterations_, TrigMod_>
+				(
+					std::forward<X_>(euler_x_),
+					std::forward<Y_>(euler_y_),
+					std::forward<Z_>(euler_z_)
+				)
+			);
+		}
+
+
+
+
+		/// <summary>
+		/// <para> Creates a new Quaternion of this type, which converts the rotation depicted by the passed euler representation. </para>
+		/// <para> Makes use of alternative approaches to trigonometric functions to allow the conversion to be calculated in a constexpr context. </para>
+		/// <para> `TrigIterations_` is the number of iterations to perform for trigonometric functions. This cannot be 0, and defaults to 3. </para>
+		/// <para> 
+		///		`TrigMod_` is a boolean flag indicating if a floating-point modulo operation should be performed to ensure angles are within 360 degree constraints,
+		///		for the purpose of calculating trignometric functions. This defaults to true, but can safely be set to false if you know a mod is not required for a value.
+		/// </para>
+		/// <para> Input may be radians or degrees, and defaults to being considered radians. If passing degrees, pass `false` for the `IsRads_` template argument. </para>
+		/// <para>
+		///		Provides an optional preference for multiplications via `PreferMultiplies_`, which defaults to this type's `euler_cvt_default_prefer_multiplies` value. 
+		///		When multiplies are preferred, execution may be more performant when emulating divides but there is a chance of reduced accuracy. 
+		///		It should be noted that regardless of preference, the compiler may also optimise divisions into multiplications regardless.
+		/// </para>
+		/// <para> May provide an optional `ReadOffset_` from which to start reading the input Vector. This defaults to 0 (i.e. no offset). </para>
+		/// </summary>
+		/// <param name="euler_xyz_">EmuMath Vector containing the euler rotation components xyz at indices ReadOffset_, ReadOffset_ + 1, and ReadOffset_ + 2 respectively.</param>
+		/// <returns>Quaternion representation of the passed Euler rotation.</returns>
+		template
+		<
+			bool IsRads_ = euler_cvt_default_is_rads, std::size_t TrigIterations_ = 3, bool TrigMod_ = true,
+			bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies, std::size_t ReadOffset_ = 0, typename VecT_, std::size_t VecSize_
+		>
+		[[nodiscard]] static constexpr inline auto from_euler_constexpr(const EmuMath::Vector<VecSize_, VecT_>& euler_xyz_)
+			-> std::enable_if_t
+			<
+				TrigIterations_ != 0 && _valid_euler_vector_lvalue_conversion_arg<VecSize_, VecT_, ReadOffset_, true, TrigIterations_, TrigMod_, PreferMultiplies_, IsRads_, false>(),
+				EmuMath::Quaternion<T_>
+			>
+		{
+			return EmuMath::Quaternion<T_>
+			(
+				_make_vector_from_euler<IsRads_, PreferMultiplies_, TrigIterations_, TrigMod_, ReadOffset_>(euler_xyz_)
+			);
+		}
+
+		template
+		<
+			bool IsRads_ = euler_cvt_default_is_rads, std::size_t TrigIterations_ = 3, bool TrigMod_ = true,
+			bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies, std::size_t ReadOffset_ = 0, typename VecT_, std::size_t VecSize_
+		>
+		[[nodiscard]] static constexpr inline auto from_euler_constexpr(EmuMath::Vector<VecSize_, VecT_>& euler_xyz_)
+			-> std::enable_if_t
+			<
+				TrigIterations_ != 0 && _valid_euler_vector_lvalue_conversion_arg<VecSize_, VecT_, ReadOffset_, false, TrigIterations_, TrigMod_, PreferMultiplies_, IsRads_, false>(),
+				EmuMath::Quaternion<T_>
+			>
+		{
+			return EmuMath::Quaternion<T_>
+			(
+				_make_vector_from_euler<IsRads_, PreferMultiplies_, TrigIterations_, TrigMod_, ReadOffset_>(euler_xyz_)
+			);
+		}
+
+		template
+		<
+			bool IsRads_ = euler_cvt_default_is_rads, std::size_t TrigIterations_ = 3, bool TrigMod_ = true,
+			bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies, std::size_t ReadOffset_ = 0, typename VecT_, std::size_t VecSize_
+		>
+		[[nodiscard]] static constexpr inline auto from_euler_constexpr(EmuMath::Vector<VecSize_, VecT_>&& euler_xyz_)
+			-> std::enable_if_t
+			<
+				TrigIterations_ != 0 && _valid_euler_vector_rvalue_conversion_arg<VecSize_, VecT_, ReadOffset_, TrigIterations_, TrigMod_, PreferMultiplies_, IsRads_, false>(),
+				EmuMath::Quaternion<T_>
+			>
+		{
+			return EmuMath::Quaternion<T_>
+			(
+				_make_vector_from_euler<IsRads_, PreferMultiplies_, TrigIterations_, TrigMod_, ReadOffset_>(std::forward<decltype(euler_xyz_)>(euler_xyz_))
+			);
 		}
 #pragma endregion
 
