@@ -11,3 +11,6 @@ A collection of different mathematical types and functionalities with a focus on
 - EmuSIMD: Library used for templatised usage of `__m128`, `__m256` and `__m512` intrinsics, used for Emu-prefixed repositories which make explicit use of SIMD.
 - EmuThreads: Library used for simplifying thread usage, such as through the creation of thread pools.
    - Not currently in use, but is here for experimenting with certain optimisations when creating fast types (such as with noise tables).
+
+### Note
+This is the unstable development master branch. To see more up-to-date (and unstable) progress, view one of the branches for a current development feature. The more specific the branch name, the more up-to-date (and again, unstable) it is likely to be.
