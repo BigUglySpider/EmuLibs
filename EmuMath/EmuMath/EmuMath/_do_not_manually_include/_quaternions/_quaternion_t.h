@@ -321,6 +321,37 @@ namespace EmuMath
 		}
 
 		template<std::size_t Unused_ = 0>
+		[[nodiscard]] static constexpr inline bool is_const_copy_constructible()
+		{
+			return std::is_constructible_v<vector_type, const vector_type&>;
+		}
+
+		template<std::size_t Unused_ = 0>
+		[[nodiscard]] static constexpr inline bool is_non_const_copy_constructible()
+		{
+			return std::is_constructible_v<vector_type, vector_type&>;
+		}
+
+		template<std::size_t Unused_ = 0>
+		[[nodiscard]] static constexpr inline bool is_move_constructible()
+		{
+			return std::is_constructible_v<vector_type, vector_type&&>;
+		}
+
+		template<typename X_, typename Y_, typename Z_, typename W_>
+		[[nodiscard]] static constexpr inline bool is_custom_constructible()
+		{
+			return std::is_constructible_v
+			<
+				vector_type,
+				typename EmuCore::TMP::forward_result<X_>::type,
+				typename EmuCore::TMP::forward_result<Y_>::type,
+				typename EmuCore::TMP::forward_result<Z_>::type,
+				typename EmuCore::TMP::forward_result<W_>::type
+			>;
+		}
+
+		template<std::size_t Unused_ = 0>
 		[[nodiscard]] static constexpr inline bool is_vector_const_copy_constructible()
 		{
 			return std::is_constructible_v<vector_type, const vector_type&>;
@@ -523,26 +554,88 @@ namespace EmuMath
 
 #pragma region CONSTRUCTORS
 	public:
+		/// <summary>
+		/// <para> Creates a default rotation quaternion, where x = y = z = 0, and w = 1. </para>
+		/// </summary>
 		template<std::size_t Unused_ = 0, typename = std::enable_if_t<is_default_constructible<Unused_>()>>
 		constexpr inline Quaternion() : data(vector_type::get_implied_zero(), vector_type::get_implied_zero(), vector_type::get_implied_zero(), value_type_uq(1))
 		{
 		}
 
+		/// <summary>
+		/// <para> Creates a const-copy of the passed Quaternion. </para>
+		/// </summary>
+		/// <param name="to_copy_">Quaternion of the same type to copy.</param>
+		template<std::size_t Unused_ = 0, typename = std::enable_if_t<is_const_copy_constructible<Unused_>()>>
+		constexpr inline Quaternion(const Quaternion<T_>& to_copy_) : data(to_copy_.data)
+		{
+		}
+
+		/// <summary>
+		/// <para> Creates a copy of the passed Quaternion. </para>
+		/// </summary>
+		/// <param name="to_copy_">Quaternion of the same type to copy.</param>
+		template<std::size_t Unused_ = 0, typename = std::enable_if_t<is_copy_constructible<Unused_>()>>
+		constexpr inline Quaternion(Quaternion<T_>& to_copy_) : data(to_copy_.data)
+		{
+		}
+
+		/// <summary>
+		/// <para> Moves the data of the passed Quaternion of the same type into a new Quaternion. </para>
+		/// </summary>
+		/// <param name="to_mmove_">Quaternion of the same type to move.</param>
+		template<std::size_t Unused_ = 0, typename = std::enable_if_t<is_move_constructible<Unused_>()>>
+		constexpr inline Quaternion(Quaternion<T_>&& to_move_) noexcept : data(std::move(to_move_.data))
+		{
+		}
+
+		/// <summary>
+		/// <para> Creates a new Quaternion with custom X, Y, Z, and W components. Note that W is the real component of the Quaternion. </para>
+		/// <para> This does not guarantee that the constructed Quaternion will be valid; this is the responsibility of the caller. </para>
+		/// <para> If you do not well understand Quaternions, it is recommended to create one through a different approach. </para>
+		/// </summary>
+		/// <param name="x_">First imaginary component of the Quaternion.</param>
+		/// <param name="y_">Second imaginary component of the Quaternion.</param>
+		/// <param name="z_">Third imaginary component of the Quaternion.</param>
+		/// <param name="w_">Real component of the Quaternion.</param>
+		template<typename X_, typename Y_, typename Z_, typename W_, typename = std::enable_if_t<is_custom_constructible<X_, Y_, Z_, W_>()>>
+		constexpr inline Quaternion(X_&& x_, Y_&& y_, Z_&& z_, W_&& w_) :
+			data(std::forward<X_>(x_), std::forward<Y_>(y_), std::forward<Z_>(z_), std::forward<W_>(w_))
+		{
+		}
+
+		/// <summary>
+		/// <para> Performs a const-copy of the passed Vector, treating it as a Quaternion. </para>
+		/// </summary>
+		/// <param name="quaternion_as_vector_">Vector representing a Quaternion to copy.</param>
 		template<std::size_t Unused_ = 0, typename = std::enable_if_t<is_vector_const_copy_constructible<Unused_>()>>
 		constexpr inline Quaternion(const vector_type& quaternion_as_vector_) : data(quaternion_as_vector_)
 		{
 		}
 
+		/// <summary>
+		/// <para> Performs a copy of the passed Vector, treating it as a Quaternion. </para>
+		/// </summary>
+		/// <param name="quaternion_as_vector_">Vector representing a Quaternion to copy.</param>
 		template<std::size_t Unused_ = 0, typename = std::enable_if_t<is_vector_non_const_copy_constructible<Unused_>()>>
 		constexpr inline Quaternion(vector_type& quaternion_as_vector_) : data(quaternion_as_vector_)
 		{
 		}
 
+		/// <summary>
+		/// <para> Performs a move of the passed Vector into a new Quaternion's underlying data, treating it as a Quaternion. </para>
+		/// </summary>
+		/// <param name="quaternion_as_vector_">Vector representing a Quaternion to move.</param>
 		template<std::size_t Unused_ = 0, typename = std::enable_if_t<is_vector_move_constructible<Unused_>()>>
-		constexpr inline Quaternion(vector_type&& quaternion_as_vector_) : data(std::move(quaternion_as_vector_))
+		constexpr inline Quaternion(vector_type&& quaternion_as_vector_) noexcept : data(std::move(quaternion_as_vector_))
 		{
 		}
 
+		/// <summary>
+		/// <para> Creates a Quaternion representing the passed Euler Vector. </para>
+		/// <para> Note that the passed Vector will be treated as a Quaternion if it is the same type as this Quaternion's `vector_type`. </para>
+		/// </summary>
+		/// <param name="euler_vector_">Const reference to a Vector to treat as a Euler representation of a rotation.</param>
 		template<std::size_t VecSize_, typename VecT_, typename = std::enable_if_t<valid_euler_vector_const_ref_conversion_constructor_arg<VecSize_, VecT_>()>>
 		constexpr inline Quaternion(const EmuMath::Vector<VecSize_, VecT_>& euler_vector_) : 
 			data
@@ -559,6 +652,11 @@ namespace EmuMath
 		{
 		}
 
+		/// <summary>
+		/// <para> Creates a Quaternion representing the passed Euler Vector. </para>
+		/// <para> Note that the passed Vector will be treated as a Quaternion if it is the same type as this Quaternion's `vector_type`. </para>
+		/// </summary>
+		/// <param name="euler_vector_">Reference to a Vector to treat as a Euler representation of a rotation.</param>
 		template<std::size_t VecSize_, typename VecT_, typename = std::enable_if_t<valid_euler_vector_ref_conversion_constructor_arg<VecSize_, VecT_>()>>
 		constexpr inline Quaternion(EmuMath::Vector<VecSize_, VecT_>& euler_vector_) : 
 			data
@@ -575,6 +673,11 @@ namespace EmuMath
 		{
 		}
 
+		/// <summary>
+		/// <para> Creates a Quaternion representing the passed Euler Vector. </para>
+		/// <para> Note that the passed Vector will be treated as a Quaternion if it is the same type as this Quaternion's `vector_type`. </para>
+		/// </summary>
+		/// <param name="euler_vector_">Vector to treat as a Euler representation of a rotation.</param>
 		template<std::size_t VecSize_, typename VecT_, typename = std::enable_if_t<valid_euler_vector_ref_conversion_constructor_arg<VecSize_, VecT_>()>>
 		constexpr inline Quaternion(EmuMath::Vector<VecSize_, VecT_>&& euler_vector_) : 
 			data
@@ -591,6 +694,12 @@ namespace EmuMath
 		{
 		}
 
+		/// <summary>
+		/// <para> Creates a Quaternion representing a Euler rotation formed of the passed components. </para>
+		/// </summary>
+		/// <param name="euler_x_">First value within the Euler Vector.</param>
+		/// <param name="euler_y_">Second value within the Euler Vector.</param>
+		/// <param name="euler_z_">Third value within the Euler Vector.</param>
 		template<typename X_, typename Y_, typename Z_, typename = std::enable_if_t<valid_euler_conversion_construction_args<X_, Y_, Z_>()>>
 		constexpr inline Quaternion(X_&& euler_x_, Y_&& euler_y_, Z_&& euler_z_) :
 			data
@@ -1005,11 +1114,72 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region VECTOR_BASED_OPERATIONS
+	public:
+		/// <summary>
+		/// <para> Outputs the squared Norm (aka: Length) of this Quaternion as the specified type (defaulting to this Quaternion's `preferred_floating_point`). </para>
+		/// </summary>
+		/// <returns>The squared Norm of this Quaternion.</returns>
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline OutT_ SquareNorm() const
+		{
+			return data.SquareMagnitude<OutT_>();
+		}
+
+		/// <summary>
+		/// <para> Outputs the Norm (aka: Length) of this Quaternion as the specified type (defaulting to this Quaternion's `preferred_floating_point`). </para>
+		/// </summary>
+		/// <returns>The Norm of this Quaternion.</returns>
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline OutT_ Norm() const
+		{
+			return data.Magnitude<OutT_>();
+		}
+
+		/// <summary>
+		/// <para> Outputs the Unit form of this Quaternion (aka: its normalised form). </para>
+		/// </summary>
+		/// <returns>A normalised copy of this Quaternion.</returns>
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::Quaternion<OutT_> Unit() const
+		{
+			return data.Normalise<OutT_>();
+		}
+
+		/// <summary>
+		/// <para> Outputs the Unit form of this Quaternion (aka: its normalised form). </para>
+		/// <para> Relevant operations will be executed under a constexpr-evaluable context where possible. This may affect accuracy and/or performance. </para>
+		/// </summary>
+		/// <returns>A normalised copy of this Quaternion.</returns>
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::Quaternion<OutT_> UnitConstexpr() const
+		{
+			return data.NormaliseConstexpr<OutT_>();
+		}
+
+		/// <summary>
+		/// <para> Normalises this Quaternion into its Unit form. </para>
+		/// </summary>
+		constexpr inline void NormaliseSelf()
+		{
+			data = data.Normalise<T_>();
+		}
+
+		/// <summary>
+		/// <para> Normalises this Quaternion into its Unit form. </para>
+		/// <para> Relevant operations will be executed under a constexpr-evaluable context where possible. This may affect accuracy and/or performance. </para>
+		/// </summary>
+		constexpr inline void NormaliseSelfConstexpr()
+		{
+			data = data.NormaliseConstexpr<T_>();
+		}
+#pragma endregion
+
 #pragma region UNDERLYING_DATA
 	public:
 		/// <summary>
 		/// <para> The underlying data of this Quaternion, represented as a Vector. </para>
-		/// <para> This should not be modified directly unless you are sure what you are doing. </para>
+		/// <para> This should not be modified directly unless you are sure that you know what you're doing. </para>
 		/// </summary>
 		vector_type data;
 #pragma endregion
