@@ -428,6 +428,9 @@ int main()
 		<< "\n";
 
 	constexpr auto constexpr_test_a = EmuMath::Quaternion<float>::from_euler_constexpr<false>(full_cvt_euler_test).ToEulerConstexpr<false>();
+	constexpr auto frm_lr_cnstxpr = EmuMath::Quaternion<float>::from_euler_constexpr<false>(full_cvt_euler_test);
+	constexpr auto frm_lr_cnstxpr_nrmlsd = frm_lr_cnstxpr.UnitConstexpr();
+	constexpr auto nrm = frm_lr_cnstxpr.NormConstexpr();
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

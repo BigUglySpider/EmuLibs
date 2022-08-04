@@ -1136,6 +1136,12 @@ namespace EmuMath
 			return data.Magnitude<OutT_>();
 		}
 
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline OutT_ NormConstexpr() const
+		{
+			return data.MagnitudeConstexpr<OutT_>();
+		}
+
 		/// <summary>
 		/// <para> Outputs the Unit form of this Quaternion (aka: its normalised form). </para>
 		/// </summary>
