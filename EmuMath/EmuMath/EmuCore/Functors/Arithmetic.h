@@ -1821,112 +1821,234 @@ namespace EmuCore
 
 #pragma region CONSTEXPR_INVERSE_TRIG_FUNCTORS
 	/// <summary>
-	/// <para> Template arcsin functor, used to perform the asin(value) function on a value of type T_. </para>
+	/// <para> Template arctangent functor, used to perform the atan(y / x) function on a value of type T_. </para>
 	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
 	/// <para>
-	///		If T_ is constexpr-evaluable, this provides a guarantee to perform a constexpr implementation of asin if possible. 
+	///		If T_ is constexpr-evaluable, this provides a guarantee to perform a constexpr implementation of atan2 if possible. 
 	///		Specialisations are expected to follow this guarantee.
 	/// </para>
-	/// <para> By default, uses Taylor Series implmentation for the specified number of iterations specified by NumIterations_, which defaults to 3. </para>
 	/// </summary>
-	template<typename T_, std::size_t NumIterations_ = 3>
-	struct do_asin_constexpr
+	template<typename T_>
+	struct do_atan2_constexpr
 	{
-		static_assert(NumIterations_ != 0, "Attempted to create an EmuCore::do_asin_constexpr instance with 0 iterations. At least 1 iteration is required.");
-
+	public:
 		using out_t = std::conditional_t
 		<
 			std::is_arithmetic_v<T_>,
 			EmuCore::TMP::first_floating_point_t<T_, float>,
 			T_
 		>;
-		static constexpr out_t full_circle = EmuCore::Pi::DegsToRads_v<float, int, 360>;
 
-		constexpr do_asin_constexpr() : add_(), mul_(), div_()
+	private:
+		using add_func = EmuCore::do_add<out_t, out_t>;
+		using sub_func = EmuCore::do_subtract<out_t, out_t>;
+		using mul_func = EmuCore::do_multiply<out_t, out_t>;
+		using div_func = EmuCore::do_divide<out_t, out_t>;
+
+	public:
+		constexpr do_atan2_constexpr()
+		{
+		}
+		constexpr inline out_t operator()(T_ y_, T_ x_) const
+		{
+			// Approxiation adapted from NVIDIA reference @ https://developer.download.nvidia.com/cg/atan2.html
+			out_t abs_x = static_cast<out_t>(x_);
+			out_t abs_y = static_cast<out_t>(y_);
+			bool x_neg = EmuCore::do_cmp_less<out_t, out_t>()(abs_x, out_t(0));
+			bool y_neg = EmuCore::do_cmp_less<out_t, out_t>()(abs_y, out_t(0));
+			abs_x = _abs(abs_x, x_neg);
+			abs_y = _abs(abs_y, y_neg);
+			bool abs_y_greater = abs_y > abs_x;
+
+			out_t t3 = abs_x;
+			out_t t1 = abs_y;
+			out_t t0 = _min_or_max<true>(abs_x, abs_y);	// t0 = max(abs_x, abs_y)
+			t1 = _min_or_max<false>(abs_x, abs_y);	// t1 = min(abs_x, abs_y)
+			t3 = div_func()(out_t(1), t0);
+			t3 = mul_func()(t1, t3);
+
+			out_t t4 = mul_func()(t3, t3);
+			t0 = out_t(-0.013480470);
+			t0 = add_func()(mul_func()(t0, t4), out_t(0.057477314));
+			t0 = sub_func()(mul_func()(t0, t4), out_t(0.121239071));
+			t0 = add_func()(mul_func()(t0, t4), out_t(0.195635925));
+			t0 = sub_func()(mul_func()(t0, t4), out_t(0.332994597));
+			t0 = add_func()(mul_func()(t0, t4), out_t(0.999995630));
+			t3 = mul_func()(t0, t3);
+
+			t3 = add_func() // t3 = abs_y_greater ? ((pi / 2) - t3) : t3
+			(
+				mul_func()(static_cast<out_t>(abs_y_greater), sub_func()(EmuCore::Pi::HALF_PI<out_t>, t3)),
+				mul_func()(static_cast<out_t>(!abs_y_greater), t3)
+			);
+			t3 = add_func() // t3 = x_neg ? (pi - t3) : t3
+			(
+				mul_func()(static_cast<out_t>(x_neg), sub_func()(EmuCore::Pi::PI<out_t>, t3)),
+				mul_func()(static_cast<out_t>(!x_neg), t3)
+			);
+			return _abs(t3, y_neg);
+		}
+
+	private:
+		[[nodiscard]] static constexpr inline auto _abs(const out_t& in_, bool is_negative_)
+		{
+			// Branchless absolute operation
+			return mul_func()
+			(
+				in_,
+				add_func()
+				(
+					out_t(!is_negative_),
+					mul_func()(out_t(-1), out_t(is_negative_))
+				)
+			);
+		}
+
+		template<bool IsMax_>
+		[[nodiscard]] static constexpr inline decltype(auto) _min_or_max(const out_t& a_, const out_t& b_)
+		{
+			// Branchless min/max operation, typically faster (if not matching speed) on test hardware
+			using comparator = typename std::conditional<IsMax_, EmuCore::do_cmp_greater<out_t, out_t>, EmuCore::do_cmp_less<out_t, out_t>>::type;
+			bool cmp_result = comparator()(a_, b_);
+			return add_func()
+			(
+				mul_func()(static_cast<out_t>(cmp_result), a_),
+				mul_func()(static_cast<out_t>(!cmp_result), b_)
+			);
+		}
+	};
+
+	template<>
+	struct do_atan2_constexpr<void>
+	{
+		constexpr do_atan2_constexpr()
+		{
+		}
+		template<typename T_>
+		constexpr inline std::invoke_result_t<do_atan2_constexpr<T_>, const T_&, const T_&> operator()(const T_& y_, const T_& x_) const
+		{
+			return do_atan2_constexpr<T_>()(y_, x_);
+		}
+	};
+
+
+	/// <summary>
+	/// <para> Template arctangent functor, used to perform the atan(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this provides a guarantee to perform a constexpr implementation of atan if possible. 
+	///		Specialisations are expected to follow this guarantee.
+	/// </para>
+	/// </summary>
+	template<typename T_>
+	struct do_atan_constexpr
+	{
+		using out_t = std::conditional_t
+		<
+			std::is_arithmetic_v<T_>,
+			EmuCore::TMP::first_floating_point_t<T_, float>,
+			T_
+		>;
+		using atan2_func = EmuCore::do_atan2_constexpr<out_t>;
+
+		constexpr do_atan_constexpr()
 		{
 		}
 		constexpr inline out_t operator()(T_ val_) const
 		{
 			if constexpr (std::is_same_v<T_, out_t>)
 			{
-				return _calculate_taylor_series<NumIterations_>(val_);
+				return atan2_func()(val_, out_t(1));
+			}
+			else
+			{
+				return atan2_func()(static_cast<out_t>(val_), out_t(1));
+			}
+		}
+	};
+
+	template<>
+	struct do_atan_constexpr<void>
+	{
+		constexpr do_atan_constexpr()
+		{
+		}
+		template<typename T_>
+		constexpr inline std::invoke_result_t<do_atan_constexpr<T_>, const T_&> operator()(const T_& val_) const
+		{
+			return do_atan_constexpr<T_>()(val_);
+		}
+	};
+
+	/// <summary>
+	/// <para> Template arcsin functor, used to perform the asin(value) function on a value of type T_. </para>
+	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
+	/// <para>
+	///		If T_ is constexpr-evaluable, this provides a guarantee to perform a constexpr implementation of asin if possible. 
+	///		Specialisations are expected to follow this guarantee.
+	/// </para>
+	/// </summary>
+	template<typename T_>
+	struct do_asin_constexpr
+	{
+		using out_t = std::conditional_t
+		<
+			std::is_arithmetic_v<T_>,
+			EmuCore::TMP::first_floating_point_t<T_, float>,
+			T_
+		>;
+
+		constexpr do_asin_constexpr() : add_(), mul_(), sub_()
+		{
+		}
+		constexpr inline out_t operator()(T_ val_) const
+		{
+			if constexpr (std::is_same_v<T_, out_t>)
+			{
+				return _calculate_asin(val_);
 			}
 			else
 			{
 				out_t val_as_out_t_ = static_cast<out_t>(val_);
-				return _calculate_taylor_series<NumIterations_>(val_as_out_t_);
+				return _calculate_asin(val_as_out_t_);
 			}
 		}
 
 	private:
 		using Add_ = EmuCore::do_add<out_t, out_t>;
 		using Mul_ = EmuCore::do_multiply<out_t, out_t>;
-		using Div_ = EmuCore::do_divide<out_t, out_t>;
+		using Sub_ = EmuCore::do_subtract<out_t, out_t>;
 		Add_ add_;
 		Mul_ mul_;
-		Div_ div_;
+		Sub_ sub_;
 
-		template<std::size_t NumIterations_>
-		constexpr inline out_t _calculate_taylor_series(const out_t& in_) const
+		constexpr inline out_t _calculate_asin(const out_t& in_) const
 		{
-			out_t out_ = in_;
-			out_t pow_ = in_;
-			out_t in_sqr_ = mul_(in_, in_);
-			_calculate_taylor_series<0, NumIterations_, 3>(in_sqr_, out_, pow_);
-			return out_;
-		}
-		template<std::size_t Iteration_, std::size_t End_, std::size_t PowExponent_>
-		constexpr inline void _calculate_taylor_series(const out_t& in_sqr_, out_t& out_, out_t& pow_) const
-		{
-			if constexpr (Iteration_ < End_)
-			{
-				pow_ = mul_(in_sqr_, pow_); // pow_ = pow_ * in_ * in_
-
-				const out_t derivative_ = mul_(_make_left_fraction<Iteration_>(), div_(pow_, PowExponent_));
-				out_ = add_(out_, derivative_);
-
-				_calculate_taylor_series<Iteration_ + 1, End_, PowExponent_ + 2>(in_sqr_, out_, pow_);
-			}
-		}
-
-		template<std::size_t Iteration_>
-		[[nodiscard]] static constexpr inline out_t _make_left_fraction()
-		{
-			if constexpr (Iteration_ == 0)
-			{
-				return out_t(0.5);
-			}
-			else
-			{
-				return _make_left_fraction(std::make_index_sequence<Iteration_>());
-			}
-		}
-
-		template<std::size_t...AllIndices_>
-		[[nodiscard]] static constexpr inline out_t _make_left_fraction(std::index_sequence<AllIndices_...> index_sequence_)
-		{
-			return _make_left_fraction_impl<(AllIndices_ + 1)...>();
-		}
-
-		template<std::size_t...IndicesAfterFirst_>
-		[[nodiscard]] static constexpr inline out_t _make_left_fraction_impl()
-		{
-			constexpr out_t top = static_cast<out_t>((1 * ... * ((IndicesAfterFirst_ * 2) + 1)));
-			constexpr out_t bottom = static_cast<out_t>((2 * ... * ((IndicesAfterFirst_ * 2) + 2)));
-			constexpr out_t fraction = top / bottom;
-			return fraction;
+			// Approxiation adapted from NVIDIA reference @ https://developer.download.nvidia.com/cg/asin.html
+			out_t one = out_t(1);
+			bool is_neg = in_ < 0;
+			out_t abs_in = in_ * ((1 * !is_neg) + (-1 * is_neg)); // abs_in = is_neg ? -1 * in_ : 1 * in_;
+			out_t result = out_t(-0.0187293);
+			result = mul_(result, abs_in);
+			result = add_(result, out_t(0.0742610));
+			result = mul_(result, abs_in);
+			result = sub_(result, out_t(0.2121144));
+			result = mul_(result, abs_in);
+			result = add_(result, out_t(1.5707288));
+			result = sub_(EmuCore::Pi::HALF_PI<out_t>, mul_(EmuCore::do_sqrt_constexpr<out_t>()(sub_(one, abs_in)), result));
+			return sub_(result, mul_(out_t(2), mul_(is_neg, result)));
 		}
 	};
-	template<std::size_t NumIterations_>
-	struct do_asin_constexpr<void, NumIterations_>
+	template<>
+	struct do_asin_constexpr<void>
 	{
 		constexpr do_asin_constexpr()
 		{
 		}
 		template<typename T_>
-		constexpr inline std::invoke_result_t<do_asin_constexpr<T_, NumIterations_>, const T_&> operator()(const T_& val_) const
+		constexpr inline std::invoke_result_t<do_asin_constexpr<T_>, const T_&> operator()(const T_& val_) const
 		{
-			return do_asin_constexpr<T_, NumIterations_>()(val_);
+			return do_asin_constexpr<T_>()(val_);
 		}
 	};
 
@@ -1937,13 +2059,10 @@ namespace EmuCore
 	///		If T_ is constexpr-evaluable, this provides a guarantee to perform a constexpr implementation of acos if possible. 
 	///		Specialisations are expected to follow this guarantee.
 	/// </para>
-	/// <para> By default, uses Taylor Series implmentation for the specified number of iterations specified by NumIterations_, which defaults to 3. </para>
 	/// </summary>
-	template<typename T_, std::size_t NumIterations_ = 3>
+	template<typename T_>
 	struct do_acos_constexpr
 	{
-		static_assert(NumIterations_ != 0, "Attempted to create an EmuCore::do_acos_constexpr instance with 0 iterations. At least 1 iteration is required.");
-
 		using out_t = std::conditional_t
 		<
 			std::is_arithmetic_v<T_>,
@@ -1960,12 +2079,12 @@ namespace EmuCore
 
 			if constexpr (std::is_same_v<T_, out_t>)
 			{
-				return sub_(pi_div_2, _calculate_taylor_series<NumIterations_>(val_));
+				return _calculate_acos(val_);
 			}
 			else
 			{
 				out_t val_as_out_t_ = static_cast<out_t>(val_);
-				return sub_(pi_div_2, _calculate_taylor_series<NumIterations_>(val_as_out_t_));
+				return _calculate_acos(val_as_out_t_);
 			}
 		}
 
@@ -1979,237 +2098,33 @@ namespace EmuCore
 		Mul_ mul_;
 		Div_ div_;
 
-		template<std::size_t NumIterations_>
-		constexpr inline out_t _calculate_taylor_series(const out_t& in_) const
+		constexpr inline out_t _calculate_acos(const out_t& in_) const
 		{
-			out_t out_ = in_;
-			out_t pow_ = in_;
-			out_t in_sqr_ = mul_(in_, in_);
-			_calculate_taylor_series<0, NumIterations_, 3>(in_sqr_, out_, pow_);
-			return out_;
-		}
-		template<std::size_t Iteration_, std::size_t End_, std::size_t PowExponent_>
-		constexpr inline void _calculate_taylor_series(const out_t& in_sqr_, out_t& out_, out_t& pow_) const
-		{
-			if constexpr (Iteration_ < End_)
-			{
-				pow_ = mul_(in_sqr_, pow_); // pow_ = pow_ * in_ * in_
-
-				const out_t derivative_ = mul_(_make_left_fraction<Iteration_>(), div_(pow_, PowExponent_));
-				out_ = add_(out_, derivative_);
-
-				_calculate_taylor_series<Iteration_ + 1, End_, PowExponent_ + 2>(in_sqr_, out_, pow_);
-			}
-		}
-
-		template<std::size_t Iteration_>
-		[[nodiscard]] static constexpr inline out_t _make_left_fraction()
-		{
-			if constexpr (Iteration_ == 0)
-			{
-				return out_t(0.5);
-			}
-			else
-			{
-				return _make_left_fraction(std::make_index_sequence<Iteration_>());
-			}
-		}
-
-		template<std::size_t...AllIndices_>
-		[[nodiscard]] static constexpr inline out_t _make_left_fraction(std::index_sequence<AllIndices_...> index_sequence_)
-		{
-			return _make_left_fraction_impl<(AllIndices_ + 1)...>();
-		}
-
-		template<std::size_t...IndicesAfterFirst_>
-		[[nodiscard]] static constexpr inline out_t _make_left_fraction_impl()
-		{
-			constexpr out_t top = static_cast<out_t>((1 * ... * ((IndicesAfterFirst_ * 2) + 1)));
-			constexpr out_t bottom = static_cast<out_t>((2 * ... * ((IndicesAfterFirst_ * 2) + 2)));
-			constexpr out_t fraction = top / bottom;
-			return fraction;
+			// Approximation adapted from NVIDIA reference @ https://developer.download.nvidia.com/cg/acos.html
+			bool is_neg = EmuCore::do_cmp_less<out_t, out_t>()(in_, out_t(0));
+			out_t abs_in = in_ * ((1 * !is_neg) + (-1 * is_neg)); // abs_in = is_neg ? -1 * in_ : 1 * in_;
+			out_t result = out_t(-0.0187293);
+			result = mul_(result, abs_in);
+			result = add_(result, out_t(0.0742610));
+			result = mul_(result, abs_in);
+			result = sub_(result, out_t(0.2121144));
+			result = mul_(result, abs_in);
+			result = add_(result, out_t(1.5707288));
+			result = mul_(result, EmuCore::do_sqrt_constexpr<out_t>()(sub_(out_t(1), abs_in)));
+			result = result - 2 * is_neg * result;
+			return add_(result, mul_(is_neg, EmuCore::Pi::PI<out_t>));
 		}
 	};
-	template<std::size_t NumIterations_>
-	struct do_acos_constexpr<void, NumIterations_>
+	template<>
+	struct do_acos_constexpr<void>
 	{
 		constexpr do_acos_constexpr()
 		{
 		}
 		template<typename T_>
-		constexpr inline std::invoke_result_t<do_acos_constexpr<T_, NumIterations_>, const T_&> operator()(const T_& val_) const
+		constexpr inline std::invoke_result_t<do_acos_constexpr<T_>, const T_&> operator()(const T_& val_) const
 		{
-			return do_acos_constexpr<T_, NumIterations_>()(val_);
-		}
-	};
-
-	/// <summary>
-	/// <para> Template arctangent functor, used to perform the atan(value) function on a value of type T_. </para>
-	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
-	/// <para>
-	///		If T_ is constexpr-evaluable, this provides a guarantee to perform a constexpr implementation of atan if possible. 
-	///		Specialisations are expected to follow this guarantee.
-	/// </para>
-	/// <para> By default, uses Taylor Series implmentation for the specified number of iterations specified by NumIterations_, which defaults to 3. </para>
-	/// </summary>
-	template<typename T_, std::size_t NumIterations_ = 3>
-	struct do_atan_constexpr
-	{
-		static_assert(NumIterations_ != 0, "Attempted to create an EmuCore::do_atan_constexpr instance with 0 iterations. At least 1 iteration is required.");
-
-		using out_t = std::conditional_t
-		<
-			std::is_arithmetic_v<T_>,
-			EmuCore::TMP::first_floating_point_t<T_, float>,
-			T_
-		>;
-		static constexpr out_t full_circle = EmuCore::Pi::DegsToRads_v<float, int, 360>;
-
-		constexpr do_atan_constexpr() : add_(), sub_(), mul_(), div_()
-		{
-		}
-		constexpr inline out_t operator()(T_ val_) const
-		{
-			constexpr out_t pi_div_2 = EmuCore::Pi::PI<out_t> / 2;
-
-			if constexpr (std::is_same_v<T_, out_t>)
-			{
-				return _calculate_taylor_series<NumIterations_>(val_);
-			}
-			else
-			{
-				out_t val_as_out_t_ = static_cast<out_t>(val_);
-				return _calculate_taylor_series<NumIterations_>(val_as_out_t_);
-			}
-		}
-
-	private:
-		using Add_ = EmuCore::do_add<out_t, out_t>;
-		using Sub_ = EmuCore::do_subtract<out_t, out_t>;
-		using Mul_ = EmuCore::do_multiply<out_t, out_t>;
-		using Div_ = EmuCore::do_divide<out_t, out_t>;
-		Add_ add_;
-		Sub_ sub_;
-		Mul_ mul_;
-		Div_ div_;
-
-		template<std::size_t NumIterations_>
-		constexpr inline out_t _calculate_taylor_series(const out_t& in_) const
-		{
-			constexpr out_t one = out_t(1);
-			constexpr out_t neg_one = out_t(-1);
-
-			out_t pow_ = in_;
-			out_t in_sqr_ = mul_(in_, in_);
-			bool less_than_neg_1 = in_ < neg_one;
-			bool more_than_pos_1 = in_ > one;
-			if (less_than_neg_1 || more_than_pos_1)
-			{
-				constexpr out_t pi_div_2 = EmuCore::Pi::PI<out_t> / out_t(2);
-				out_t out_ = pi_div_2 * ((1 * more_than_pos_1) + (-1 * less_than_neg_1)); // PI/2 if > 1, -(PI/2) if < 1
-				_calculate_taylor_series<0, NumIterations_, 1, false>(in_sqr_, out_, pow_);
-				return out_;
-			}
-			else
-			{
-				out_t out_ = in_;
-				_calculate_taylor_series<0, NumIterations_, 3, true>(in_sqr_, out_, pow_);
-				return out_;
-			}
-		}
-
-		template<std::size_t Iteration_, std::size_t End_, std::size_t PowExponent_, bool InNeg1ToPos1Range_>
-		constexpr inline void _calculate_taylor_series(const out_t& in_sqr_, out_t& out_, out_t& pow_) const
-		{
-			if constexpr (Iteration_ < End_)
-			{
-				if constexpr (InNeg1ToPos1Range_)
-				{
-					pow_ = mul_(in_sqr_, pow_); // pow_ = pow_ * in_ * in_, increasing exponent by 2 (e.g. in^3 -> in^5)
-					const out_t derivative_ = div_(pow_, out_t(PowExponent_));
-
-					if constexpr (Iteration_ & 1)
-					{
-						out_ = add_(out_, derivative_);
-					}
-					else
-					{
-						out_ = sub_(out_, derivative_);
-					}
-				}
-				else
-				{
-					const out_t derivative_ = div_(out_t(1), mul_(out_t(PowExponent_), pow_));
-
-					if constexpr (Iteration_ & 1)
-					{
-						out_ = add_(out_, derivative_);
-					}
-					else
-					{
-						out_ = sub_(out_, derivative_);
-					}
-
-					if constexpr ((Iteration_ + 1) < End_)
-					{
-						pow_ = mul_(in_sqr_, pow_); // pow_ = pow_ * in_ * in_, increasing exponent by 2 (e.g. in^3 -> in^5)
-					}
-				}
-
-				_calculate_taylor_series<Iteration_ + 1, End_, PowExponent_ + 2, InNeg1ToPos1Range_>(in_sqr_, out_, pow_);
-			}
-		}
-	};
-	template<std::size_t NumIterations_>
-	struct do_atan_constexpr<void, NumIterations_>
-	{
-		constexpr do_atan_constexpr()
-		{
-		}
-		template<typename T_>
-		constexpr inline std::invoke_result_t<do_atan_constexpr<T_, NumIterations_>, const T_&> operator()(const T_& val_) const
-		{
-			return do_atan_constexpr<T_, NumIterations_>()(val_);
-		}
-	};
-
-	/// <summary>
-	/// <para> Template arctangent functor, used to perform the atan(y / x) function on a value of type T_. </para>
-	/// <para> If T_ is void, the correct specialisation of this functor will be invoked based on the argument passed on invocation. </para>
-	/// <para>
-	///		If T_ is constexpr-evaluable, this provides a guarantee to perform a constexpr implementation of atan2 if possible. 
-	///		Specialisations are expected to follow this guarantee.
-	/// </para>
-	/// <para> By default, uses Taylor Series implmentation for the specified number of iterations specified by NumIterations_, which defaults to 3. </para>
-	/// </summary>
-	template<typename T_, std::size_t NumIterations_ = 3>
-	struct do_atan2_constexpr
-	{
-	private:
-		static_assert(NumIterations_ != 0, "Attempted to create an EmuCore::do_atan2_constexpr instance with 0 iterations. At least 1 iteration is required.");
-		using _t_uq = typename EmuCore::TMP::remove_ref_cv<T_>::type;
-		using div_func = EmuCore::do_divide<_t_uq, _t_uq>;
-		using atan_func = do_atan_constexpr<T_, NumIterations_>;
-
-	public:
-		constexpr do_atan2_constexpr()
-		{
-		}
-		constexpr inline auto operator()(T_ y_, T_ x_) const
-		{
-			return atan_func()(y_ / x_);
-		}
-	};
-	template<std::size_t NumIterations_>
-	struct do_atan2_constexpr<void, NumIterations_>
-	{
-		constexpr do_atan2_constexpr()
-		{
-		}
-		template<typename T_>
-		constexpr inline std::invoke_result_t<do_atan2_constexpr<T_, NumIterations_>, const T_&, const T_&> operator()(const T_& y_, const T_& x_) const
-		{
-			return do_atan2_constexpr<T_, NumIterations_>()(y_, x_);
+			return do_acos_constexpr<T_>()(val_);
 		}
 	};
 #pragma endregion
