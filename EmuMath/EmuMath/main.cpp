@@ -418,6 +418,17 @@ int main()
 	constexpr auto atan2_constexpr = EmuCore::do_atan2_constexpr<std::remove_const_t<decltype(a)>>()(-10, a);
 	std::cout << "atan2: " << atan2_runtime << " | atan2_constexpr: " << atan2_constexpr << "\n";
 
+	std::cout << "\n---\n";
+	constexpr auto full_cvt_euler_test = EmuMath::Vector<3, float>(45.0f, -127.5f, 0.0f);
+	std::cout << "Euler: " << full_cvt_euler_test << "\n";
+	std::cout << "Quaternion: " << EmuMath::Quaternion<float>::from_euler<false>(full_cvt_euler_test) << "\n";
+	std::cout << "Euler from Quaternion: " << EmuMath::Quaternion<float>::from_euler<false>(full_cvt_euler_test).ToEuler<false>() << "\n";
+	std::cout << "Quaternion from Euler from Quaternion: " 
+		<< EmuMath::Quaternion<float>::from_euler<false>(EmuMath::Quaternion<float>::from_euler<false>(full_cvt_euler_test).ToEuler<false>()) 
+		<< "\n";
+
+	constexpr auto constexpr_test_a = EmuMath::Quaternion<float>::from_euler_constexpr<false>(full_cvt_euler_test).ToEulerConstexpr<false>();
+
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;

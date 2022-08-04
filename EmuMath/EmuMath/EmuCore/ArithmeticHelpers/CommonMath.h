@@ -705,6 +705,24 @@ namespace EmuCore
 	{
 		return (val_ + (val_ >> 63)) ^ (val_ >> 63);
 	}
+	template<>
+	constexpr inline float AbsConstexpr(const float val_)
+	{
+		bool neg = val_ < 0.0f;
+		return val_ * ((neg * -1) + !neg);
+	}
+	template<>
+	constexpr inline double AbsConstexpr(const double val_)
+	{
+		bool neg = val_ < 0.0;
+		return val_ * ((neg * -1.0) + !neg);
+	}
+	template<>
+	constexpr inline long double AbsConstexpr(const long double val_)
+	{
+		bool neg = val_ < 0.0L;
+		return val_ * ((neg * -1.0L) + !neg);
+	}
 
 	template<typename T_>
 	struct epsilon
