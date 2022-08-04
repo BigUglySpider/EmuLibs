@@ -398,7 +398,25 @@ int main()
 
 	//constexpr auto quat_from_euler_vector_constexpr = EmuMath::Quaternion<float>::from_euler_constexpr(rot_euler);
 
-	std::cout << "Angle: " << acos(EmuMath::Quaternion<float>(EmuCore::Pi::DegsToRads(45.0), 0, 0).data.Dot(EmuMath::Quaternion<float>(EmuCore::Pi::DegsToRads(90.0), 0, 0).data)) << "\n";
+	constexpr auto a = 10;
+	auto asin_runtime = asin(a);
+
+	constexpr std::size_t test_trig_its = 4;
+	constexpr auto asin_constexpr = EmuCore::do_asin_constexpr<std::remove_const_t<decltype(a)>, test_trig_its>()(a);
+	std::cout << "asin: " << asin_runtime << " | asin_constexpr: " << asin_constexpr << "\n";
+
+	auto acos_runtime = acos(a);
+	constexpr auto acos_constexpr = EmuCore::do_acos_constexpr<std::remove_const_t<decltype(a)>, test_trig_its>()(a);
+	std::cout << "acos: " << acos_runtime << " | acos_constexpr: " << acos_constexpr << "\n";
+
+	auto atan_runtime = atan(a);
+	constexpr auto atan_constexpr = EmuCore::do_atan_constexpr<std::remove_const_t<decltype(a)>, test_trig_its>()(a);
+	std::cout << "atan: " << atan_runtime << " | atan_constexpr: " << atan_constexpr << "\n";
+
+	constexpr auto atan2_y = 17.3f;
+	auto atan2_runtime = atan2(-10, a);
+	constexpr auto atan2_constexpr = EmuCore::do_atan2_constexpr<std::remove_const_t<decltype(a)>, test_trig_its>()(-10, a);
+	std::cout << "atan2: " << atan2_runtime << " | atan2_constexpr: " << atan2_constexpr << "\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

@@ -821,6 +821,35 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region MEMBER_CONVERSIONS
+	private:
+		template<typename OutT_, std::size_t ConstexprInterations_, bool ConstexprMod_, class X_, class Y_, class Z_, class W_>
+		[[nodiscard]] static constexpr inline EmuMath::Vector<3, OutT_> _convert_to_euler_vector(X_&& x_, Y_&& y_, Z_&& z_, W_&& w_)
+		{
+			using calc_fp = typename EmuCore::TMP::largest_floating_point<OutT_, preferred_floating_point>::type;
+			calc_fp x = static_cast<calc_fp>(std::forward<X_>(x_));
+			calc_fp y = static_cast<calc_fp>(std::forward<Y_>(y_));
+			calc_fp z = static_cast<calc_fp>(std::forward<Z_>(z_));
+			calc_fp w = static_cast<calc_fp>(std::forward<W_>(w_));
+
+			using mul_func = EmuCore::do_multiply<calc_fp, calc_fp>;
+			calc_fp x2 = mul_func()(x, x);
+			calc_fp y2 = mul_func()(y, y);
+			calc_fp z2 = mul_func()(z, z);
+			calc_fp w2 = mul_func()(w, w);
+
+			constexpr bool is_constexpr = ConstexprInterations_ > 0;
+
+		}
+
+	public:
+		template<typename OutT_>
+		[[nodiscard]] constexpr inline EmuMath::Vector<3, OutT_> ToEuler() const
+		{
+			return _convert_to_euler_vector<OutT_, 0, false>(data.at<0>(), data.at<1>(), data.at<2>());
+		}
+#pragma endregion
+
 #pragma region UNDERLYING_DATA
 	public:
 		/// <summary>

@@ -422,6 +422,46 @@ namespace EmuCore
 		}
 	}
 
+	template<typename FloatingPointOut_ = float, typename FloatingPointIn_>
+	[[nodiscard]] FloatingPointOut_ DoMatchingAtan2(const FloatingPointIn_ y_, const FloatingPointIn_ x_)
+	{
+		if constexpr (std::is_floating_point_v<FloatingPointOut_>)
+		{
+			if constexpr (std::is_same_v<FloatingPointIn_, float>)
+			{
+				return static_cast<FloatingPointOut_>(atan2f(y_, x_));
+			}
+			else if constexpr (std::is_same_v<FloatingPointIn_, double>)
+			{
+				return static_cast<FloatingPointOut_>(atan2(y_, x_));
+			}
+			else if constexpr (std::is_same_v<FloatingPointIn_, long double>)
+			{
+				return static_cast<FloatingPointOut_>(atan2l(y_, x_));
+			}
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
+			{
+				return DoMatchingAtan<FloatingPointOut_, float>(static_cast<float>(y_), static_cast<float>(x_));
+			}
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, double>)
+			{
+				return DoMatchingAtan<FloatingPointOut_, double>(static_cast<double>(y_), static_cast<double>(x_));
+			}
+			else if constexpr (std::is_constructible_v<FloatingPointIn_, long double>)
+			{
+				return DoMatchingAtan<FloatingPointOut_, long double>(static_cast<long double>(y_), static_cast<long double>(x_));
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingAtan2.");
+			}
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point output type to EmuCore::DoMatchingAtan2. Did you mean to use the do_atan2 functor?");
+		}
+	}
+
 	template<std::size_t Val_, typename T_>
 	struct factorial
 	{
