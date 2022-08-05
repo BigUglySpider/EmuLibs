@@ -11,6 +11,8 @@ namespace EmuMath
 	{
 #pragma region COMMON_ALIASES
 	public:
+		template<typename OtherT_> friend struct Quaternion;
+
 		using this_type = Quaternion<T_>;
 		/// <summary> The type used to represent this Quaternion exactly as a Vector. </summary>
 		using vector_type = EmuMath::Vector<4, T_>;
@@ -34,6 +36,7 @@ namespace EmuMath
 		static constexpr bool euler_cvt_default_constexpr_mod = false;
 		static constexpr bool euler_cvt_default_prefer_multiplies = false;
 		static constexpr bool euler_cvt_default_is_rads = true;
+		static constexpr bool euler_cvt_default_normalise = true;
 #pragma endregion
 
 #pragma region GET_HELPERS
@@ -57,7 +60,7 @@ namespace EmuMath
 		template
 		<
 			typename X_, typename Y_, typename Z_,
-			std::size_t ConstexprIterations_, bool ConstexprMod_, bool PreferMultiplies_, bool IsRads_, bool StaticAssert_
+			std::size_t ConstexprIterations_, bool ConstexprMod_, bool PreferMultiplies_, bool Normalise_, bool IsRads_, bool StaticAssert_
 		>
 		[[nodiscard]] static constexpr inline bool _valid_euler_conversion_args()
 		{
@@ -65,9 +68,9 @@ namespace EmuMath
 			using x_uq = typename EmuCore::TMP::remove_ref_cv<X_>::type;
 			using y_uq = typename EmuCore::TMP::remove_ref_cv<Y_>::type;
 			using z_uq = typename EmuCore::TMP::remove_ref_cv<Z_>::type;
-			using largest_fp = typename EmuCore::TMP::largest_floating_point<x_uq, y_uq, z_uq, preferred_floating_point>::type;
+			using calc_fp = typename EmuCore::TMP::largest_floating_point<x_uq, y_uq, z_uq, preferred_floating_point>::type;
 
-			constexpr bool x_is_valid = EmuCore::TMP::is_static_castable_v<X_, largest_fp>;
+			constexpr bool x_is_valid = EmuCore::TMP::is_static_castable_v<X_, calc_fp>;
 			if constexpr (!x_is_valid)
 			{
 				static_assert
@@ -79,7 +82,7 @@ namespace EmuMath
 			}
 			else
 			{
-				constexpr bool y_is_valid = EmuCore::TMP::is_static_castable_v<Y_, largest_fp>;
+				constexpr bool y_is_valid = EmuCore::TMP::is_static_castable_v<Y_, calc_fp>;
 				if constexpr (!y_is_valid)
 				{
 					static_assert
@@ -91,7 +94,7 @@ namespace EmuMath
 				}
 				else
 				{
-					constexpr bool z_is_valid = EmuCore::TMP::is_static_castable_v<Z_, largest_fp>;
+					constexpr bool z_is_valid = EmuCore::TMP::is_static_castable_v<Z_, calc_fp>;
 					if constexpr (!z_is_valid)
 					{
 						static_assert
@@ -106,10 +109,10 @@ namespace EmuMath
 						using division_func_type = typename std::conditional
 						<
 							PreferMultiplies_,
-							EmuCore::do_multiply<largest_fp, largest_fp>,
-							EmuCore::do_divide<largest_fp, largest_fp>
+							EmuCore::do_multiply<calc_fp, calc_fp>,
+							EmuCore::do_divide<calc_fp, calc_fp>
 						>::type;
-						if constexpr (!std::is_invocable_r_v<largest_fp, division_func_type&, largest_fp, largest_fp>)
+						if constexpr (!std::is_invocable_r_v<calc_fp, division_func_type&, calc_fp, calc_fp>)
 						{
 							static_assert
 							(
@@ -124,11 +127,11 @@ namespace EmuMath
 							using cos_func_type = typename std::conditional
 							<
 								is_constexpr,
-								EmuCore::do_cos_constexpr<largest_fp, ConstexprIterations_, ConstexprMod_>,
-								EmuCore::do_cos<largest_fp>
+								EmuCore::do_cos_constexpr<calc_fp, ConstexprIterations_, ConstexprMod_>,
+								EmuCore::do_cos<calc_fp>
 							>::type;
 
-							if constexpr (!std::is_invocable_r_v<largest_fp, cos_func_type&, largest_fp>)
+							if constexpr (!std::is_invocable_r_v<calc_fp, cos_func_type&, calc_fp>)
 							{
 								static_assert
 								(
@@ -142,10 +145,10 @@ namespace EmuMath
 								using sin_func_type = typename std::conditional
 								<
 									is_constexpr,
-									EmuCore::do_sin_constexpr<largest_fp, ConstexprIterations_, ConstexprMod_>,
-									EmuCore::do_sin<largest_fp>
+									EmuCore::do_sin_constexpr<calc_fp, ConstexprIterations_, ConstexprMod_>,
+									EmuCore::do_sin<calc_fp>
 								>::type;
-								if constexpr (!std::is_invocable_r_v<largest_fp, sin_func_type&, largest_fp>)
+								if constexpr (!std::is_invocable_r_v<calc_fp, sin_func_type&, calc_fp>)
 								{
 									static_assert
 									(
@@ -156,8 +159,8 @@ namespace EmuMath
 								}
 								else
 								{
-									using mul_func_type = EmuCore::do_multiply<largest_fp, largest_fp>;
-									if constexpr (!std::is_invocable_r_v<largest_fp, mul_func_type&, largest_fp, largest_fp>)
+									using mul_func_type = EmuCore::do_multiply<calc_fp, calc_fp>;
+									if constexpr (!std::is_invocable_r_v<calc_fp, mul_func_type&, calc_fp, calc_fp>)
 									{
 										static_assert
 										(
@@ -168,8 +171,8 @@ namespace EmuMath
 									}
 									else
 									{
-										using add_func_type = EmuCore::do_add<largest_fp, largest_fp>;
-										if constexpr (!std::is_invocable_r_v<largest_fp, add_func_type, largest_fp, largest_fp>)
+										using add_func_type = EmuCore::do_add<calc_fp, calc_fp>;
+										if constexpr (!std::is_invocable_r_v<calc_fp, add_func_type, calc_fp, calc_fp>)
 										{
 											static_assert
 											(
@@ -183,7 +186,7 @@ namespace EmuMath
 											constexpr bool can_get_rads_if_needed = 
 											(
 												IsRads_ ||
-												std::is_invocable_r_v<largest_fp, decltype(EmuCore::Pi::DegsToRads<largest_fp>), largest_fp>
+												std::is_invocable_r_v<calc_fp, decltype(EmuCore::Pi::DegsToRads<calc_fp>), calc_fp>
 											);
 											if constexpr (!can_get_rads_if_needed)
 											{
@@ -196,8 +199,8 @@ namespace EmuMath
 											}
 											else
 											{
-												using sub_func_type = EmuCore::do_subtract<largest_fp, largest_fp>;
-												if constexpr (!std::is_invocable_r_v<largest_fp, sub_func_type&, largest_fp, largest_fp>)
+												using sub_func_type = EmuCore::do_subtract<calc_fp, calc_fp>;
+												if constexpr (!std::is_invocable_r_v<calc_fp, sub_func_type&, calc_fp, calc_fp>)
 												{
 													static_assert
 													(
@@ -208,19 +211,69 @@ namespace EmuMath
 												}
 												else
 												{
-													using move_fp_result = decltype(std::move(std::declval<largest_fp>()));
-													if constexpr (!std::is_constructible_v<vector_type, move_fp_result, move_fp_result, move_fp_result, move_fp_result>)
+													if constexpr (Normalise_)
 													{
-														static_assert
-														(
-															!StaticAssert_,
-															"Unable to perform a Euler -> Quaternion conversion as the underlying data cannot be constructed from 4 rvalues of the determined calculation type."
-														);
-														return false;
+														using sqrt_func = typename std::conditional<is_constexpr, EmuCore::do_sqrt_constexpr<calc_fp>, EmuCore::do_sqrt<calc_fp>>::type;
+														if constexpr (!std::is_invocable_r_v<calc_fp, sqrt_func, calc_fp>)
+														{
+															static_assert
+															(
+																!StaticAssert_,
+																"Unable to perform a Euler -> Quaternion conversion (WITH normalisation) as the determined sqrt function cannot successfully be invoked."
+															);
+															return false;
+														}
+														else
+														{
+															if constexpr (PreferMultiplies_)
+															{
+																using reciprocal_func = EmuCore::do_reciprocal<calc_fp>;
+																if constexpr (!std::is_invocable_r_v<calc_fp, reciprocal_func, calc_fp>)
+																{
+																	static_assert
+																	(
+																		!StaticAssert_,
+																		"Unable to perform a Euler -> Quaternion conversion (WITH normalisation AND a preference for multiplication) as the determined reciprocal function cannot successfully be invoked."
+																	);
+																	return false;
+																}															
+															}
+															else
+															{
+																using div_result = typename std::invoke_result<division_func_type, calc_fp, calc_fp>::type;
+																if constexpr (!std::is_constructible_v<vector_type, div_result, div_result, div_result, div_result>)
+																{
+																	static_assert
+																	(
+																		!StaticAssert_,
+																		"Unable to perform a Euler -> Quaternion conversion (WITHOUT normalisation) as the underlying data cannot be constructed from 4 results of the determined division function type."
+																	);
+																	return false;;
+																}
+																else
+																{
+																	return true;
+																}
+															}
+														}
+														
 													}
 													else
 													{
-														return true;
+														using move_fp_result = decltype(std::move(std::declval<calc_fp>()));
+														if constexpr (!std::is_constructible_v<vector_type, move_fp_result, move_fp_result, move_fp_result, move_fp_result>)
+														{
+															static_assert
+															(
+																!StaticAssert_,
+																"Unable to perform a Euler -> Quaternion conversion (WITHOUT normalisation) as the underlying data cannot be constructed from 4 rvalues of the determined calculation type."
+															);
+															return false;
+														}
+														else
+														{
+															return true;
+														}
 													}
 												}
 											}
@@ -237,7 +290,7 @@ namespace EmuMath
 		template
 		<
 			std::size_t VecSize_, typename VecT_, std::size_t ReadOffset_, bool IsConst_,
-			std::size_t ConstexprIterations_, bool ConstexprMod_, bool PreferMultiplies_, bool IsRads_, bool StaticAssert_
+			std::size_t ConstexprIterations_, bool ConstexprMod_, bool PreferMultiplies_, bool Normalise_, bool IsRads_, bool StaticAssert_
 		>
 		[[nodiscard]] static constexpr inline bool _valid_euler_vector_lvalue_conversion_arg()
 		{
@@ -245,13 +298,13 @@ namespace EmuMath
 			using in_x = decltype(std::declval<in_vector>().template AtTheoretical<ReadOffset_>());
 			using in_y = decltype(std::declval<in_vector>().template AtTheoretical<ReadOffset_ + 1>());
 			using in_z = decltype(std::declval<in_vector>().template AtTheoretical<ReadOffset_ + 2>());
-			return _valid_euler_conversion_args<in_x, in_y, in_z, ConstexprIterations_, ConstexprMod_, PreferMultiplies_, IsRads_, StaticAssert_>();
+			return _valid_euler_conversion_args<in_x, in_y, in_z, ConstexprIterations_, ConstexprMod_, PreferMultiplies_, Normalise_, IsRads_, StaticAssert_>();
 		}
 
 		template
 		<
 			std::size_t VecSize_, typename VecT_, std::size_t ReadOffset_, std::size_t ConstexprIterations_, bool ConstexprMod_,
-			bool PreferMultiplies_, bool IsRads_, bool StaticAssert_
+			bool PreferMultiplies_, bool Normalise_, bool IsRads_, bool StaticAssert_
 		>
 		[[nodiscard]] static constexpr inline bool _valid_euler_vector_rvalue_conversion_arg()
 		{
@@ -259,7 +312,7 @@ namespace EmuMath
 			using in_x = decltype(_conditional_vector_move_get<ReadOffset_>(std::forward<in_vector>(std::declval<in_vector>())));
 			using in_y = decltype(_conditional_vector_move_get<ReadOffset_ + 1>(std::forward<in_vector>(std::declval<in_vector>())));
 			using in_z = decltype(_conditional_vector_move_get<ReadOffset_ + 2>(std::forward<in_vector>(std::declval<in_vector>())));
-			return _valid_euler_conversion_args<in_x, in_y, in_z, ConstexprIterations_, ConstexprMod_, PreferMultiplies_, IsRads_, StaticAssert_>();
+			return _valid_euler_conversion_args<in_x, in_y, in_z, ConstexprIterations_, ConstexprMod_, PreferMultiplies_, Normalise_, IsRads_, StaticAssert_>();
 		}
 #pragma endregion
 
@@ -279,6 +332,7 @@ namespace EmuMath
 					euler_cvt_default_constexpr_iterations,
 					euler_cvt_default_constexpr_mod,
 					euler_cvt_default_prefer_multiplies,
+					euler_cvt_default_normalise,
 					euler_cvt_default_is_rads,
 					false
 				>();
@@ -302,6 +356,7 @@ namespace EmuMath
 					euler_cvt_default_constexpr_iterations,
 					euler_cvt_default_constexpr_mod,
 					euler_cvt_default_prefer_multiplies,
+					euler_cvt_default_normalise,
 					euler_cvt_default_is_rads,
 					false
 				>();
@@ -398,6 +453,7 @@ namespace EmuMath
 				euler_cvt_default_constexpr_iterations,
 				euler_cvt_default_constexpr_mod,
 				euler_cvt_default_prefer_multiplies,
+				euler_cvt_default_normalise,
 				euler_cvt_default_is_rads,
 				false
 			>();
@@ -406,10 +462,10 @@ namespace EmuMath
 
 #pragma region CONSTRUCTOR_HELPERS
 	private:
-		template<bool IsRads_, bool PreferMultiplies_, std::size_t ConstexprIterations_, bool ConstexprMod_, typename X_, typename Y_, typename Z_>
+		template<bool IsRads_, bool PreferMultiplies_, bool Normalise_, std::size_t ConstexprIterations_, bool ConstexprMod_, typename X_, typename Y_, typename Z_>
 		[[nodiscard]] static constexpr inline vector_type _make_vector_from_euler(X_&& euler_x_, Y_&& euler_y_, Z_&& euler_z_)
 		{
-			if constexpr (_valid_euler_conversion_args<X_, Y_, Z_, ConstexprIterations_, ConstexprMod_, PreferMultiplies_, IsRads_, true>())
+			if constexpr (_valid_euler_conversion_args<X_, Y_, Z_, ConstexprIterations_, ConstexprMod_, PreferMultiplies_, Normalise_, IsRads_, true>())
 			{
 				// Common info
 				// --- We use the largest floating-point type for calculation (including preferred fp type),
@@ -493,7 +549,34 @@ namespace EmuMath
 				calc_fp z = roll_sin_MUL_pitch_cos * yaw_cos - roll_cos_MUL_pitch_sin * yaw_sin;
 				calc_fp w = roll_cos_MUL_pitch_cos * yaw_cos + roll_sin_MUL_pitch_sin * yaw_sin;
 
-				return vector_type(std::move(x), std::move(y), std::move(z), std::move(w));
+				if constexpr (Normalise_)
+				{
+					calc_fp norm = mul_func()(x, x);
+					norm = add_func()(norm, mul_func()(y, y));
+					norm = add_func()(norm, mul_func()(z, z));
+					norm = add_func()(norm, mul_func()(w, w));
+
+					using sqrt_func = typename std::conditional<is_constexpr, EmuCore::do_sqrt_constexpr<calc_fp>, EmuCore::do_sqrt<calc_fp>>::type;
+					norm = sqrt_func()(norm);
+
+					if constexpr (PreferMultiplies_)
+					{
+						using reciprocal_func = EmuCore::do_reciprocal<calc_fp>;
+						norm = reciprocal_func()(norm);
+					}
+
+					return vector_type
+					(
+						div_func()(x, norm),
+						div_func()(y, norm),
+						div_func()(z, norm),
+						div_func()(w, norm)
+					);
+				}
+				else
+				{
+					return vector_type(std::move(x), std::move(y), std::move(z), std::move(w));
+				}
 			}
 			else
 			{
@@ -507,12 +590,12 @@ namespace EmuMath
 
 		template
 		<
-			bool IsRads_, bool PreferMultiplies_, std::size_t ConstexprIterations_, bool ConstexprMod_,
+			bool IsRads_, bool PreferMultiplies_, bool Normalise_, std::size_t ConstexprIterations_, bool ConstexprMod_,
 			std::size_t ReadOffset_, std::size_t VecSize_, typename VecT_
 		>
 		[[nodiscard]] static constexpr inline vector_type _make_vector_from_euler(const EmuMath::Vector<VecSize_, VecT_>& euler_vector_)
 		{
-			return _make_vector_from_euler<IsRads_, PreferMultiplies_, ConstexprIterations_, ConstexprMod_>
+			return _make_vector_from_euler<IsRads_, PreferMultiplies_, Normalise_, ConstexprIterations_, ConstexprMod_>
 			(
 				euler_vector_.template AtTheoretical<ReadOffset_>(),
 				euler_vector_.template AtTheoretical<ReadOffset_ + 1>(),
@@ -522,12 +605,12 @@ namespace EmuMath
 
 		template
 		<
-			bool IsRads_, bool PreferMultiplies_, std::size_t ConstexprIterations_, bool ConstexprMod_,
+			bool IsRads_, bool PreferMultiplies_, bool Normalise_, std::size_t ConstexprIterations_, bool ConstexprMod_,
 			std::size_t ReadOffset_, std::size_t VecSize_, typename VecT_
 		>
 		[[nodiscard]] static constexpr inline vector_type _make_vector_from_euler(EmuMath::Vector<VecSize_, VecT_>& euler_vector_)
 		{
-			return _make_vector_from_euler<IsRads_, PreferMultiplies_, ConstexprIterations_, ConstexprMod_>
+			return _make_vector_from_euler<IsRads_, PreferMultiplies_, Normalise_, ConstexprIterations_, ConstexprMod_>
 			(
 				euler_vector_.template AtTheoretical<ReadOffset_>(),
 				euler_vector_.template AtTheoretical<ReadOffset_ + 1>(),
@@ -537,18 +620,23 @@ namespace EmuMath
 
 		template
 		<
-			bool IsRads_, bool PreferMultiplies_, std::size_t ConstexprIterations_, bool ConstexprMod_,
+			bool IsRads_, bool PreferMultiplies_, bool Normalise_, std::size_t ConstexprIterations_, bool ConstexprMod_,
 			std::size_t ReadOffset_, std::size_t VecSize_, typename VecT_
 		>
 		[[nodiscard]] static constexpr inline vector_type _make_vector_from_euler(EmuMath::Vector<VecSize_, VecT_>&& euler_vector_)
 		{
 			using in_vector = EmuMath::Vector<VecSize_, VecT_>;
-			return _make_vector_from_euler<IsRads_, PreferMultiplies_, ConstexprIterations_, ConstexprMod_>
+
+			// Warning disabled as we are only ever moving separate indices
+#pragma warning(push)
+#pragma warning(disable: 26800)
+			return _make_vector_from_euler<IsRads_, PreferMultiplies_, Normalise_, ConstexprIterations_, ConstexprMod_>
 			(
 				_conditional_vector_move_get<ReadOffset_>(std::forward<in_vector>(euler_vector_)),
 				_conditional_vector_move_get<ReadOffset_ + 1>(std::forward<in_vector>(euler_vector_)),
 				_conditional_vector_move_get<ReadOffset_ + 2>(std::forward<in_vector>(euler_vector_))
 			);
+#pragma warning(pop)
 		}
 #pragma endregion
 
@@ -644,6 +732,7 @@ namespace EmuMath
 				<
 					euler_cvt_default_is_rads,
 					euler_cvt_default_prefer_multiplies,
+					euler_cvt_default_normalise,
 					euler_cvt_default_constexpr_iterations,
 					euler_cvt_default_constexpr_mod,
 					euler_cvt_default_read_offset
@@ -665,6 +754,7 @@ namespace EmuMath
 				<
 					euler_cvt_default_is_rads,
 					euler_cvt_default_prefer_multiplies,
+					euler_cvt_default_normalise,
 					euler_cvt_default_constexpr_iterations,
 					euler_cvt_default_constexpr_mod,
 					euler_cvt_default_read_offset
@@ -686,6 +776,7 @@ namespace EmuMath
 				<
 					euler_cvt_default_is_rads,
 					euler_cvt_default_prefer_multiplies,
+					euler_cvt_default_normalise,
 					euler_cvt_default_constexpr_iterations,
 					euler_cvt_default_constexpr_mod,
 					euler_cvt_default_read_offset
@@ -708,11 +799,248 @@ namespace EmuMath
 				<
 					euler_cvt_default_is_rads,
 					euler_cvt_default_prefer_multiplies,
+					euler_cvt_default_normalise,
 					euler_cvt_default_constexpr_iterations,
 					euler_cvt_default_constexpr_mod
 				>(std::forward<X_>(euler_x_), std::forward<Y_>(euler_y_), std::forward<Z_>(euler_z_))
 			)
 		{
+		}
+#pragma endregion
+
+#pragma region ACCESS_OPERATORS
+	public:
+		/// <summary>
+		/// <para> Retrieves a reference to the element at the provided index within this Quaternion. </para>
+		/// <para> No bounds checks are performed with this operator. </para>
+		/// <para> Valid indices are 0, 1, 2, and 3, which correlate to this Quaternion's X, Y, Z, and W components respectively. </para>
+		/// </summary>
+		/// <returns>Reference to the item at the specified index within this Quaternion.</returns>
+		[[nodiscard]] constexpr inline value_type& operator[](const std::size_t index_)
+		{
+			return data[index_];
+		}
+
+		[[nodiscard]] constexpr inline const value_type& operator[](const std::size_t index_) const
+		{
+			return data[index_];
+		}
+#pragma endregion
+
+#pragma region COMPARISON_OPERATORS
+	public:
+		/// <summary>
+		/// <para> Compares this Quaternion to the right-hand-side Quaternion and returns true if they are equal. </para>
+		/// <para> For comparisons where a margin of error may exist between otherwise identical Quaternions, it is recommended to use `CmpNear` instead. </para>
+		/// </summary>
+		/// <param name="rhs_">Quaternion to compare this one to.</param>
+		/// <returns>True if this Quaternion is exactly equal to `rhs_`; otherwise false.</returns>
+		template<typename RhsT_>
+		[[nodiscard]] constexpr inline bool operator==(const Quaternion<RhsT_>& rhs_) const
+		{
+			return data.CmpAllEqual(rhs_.data);
+		}
+
+		/// <summary>
+		/// <para> Compares this Quaternion to the right-hand-side Quaternion and returns true if any component is not equal. </para>
+		/// <para> For comparisons where a margin of error may exist between otherwise identical Quaternions, it is recommended to use `CmpNotNear` instead. </para>
+		/// </summary>
+		/// <param name="rhs_">Quaternion to compare this one to.</param>
+		/// <returns>True if this Quaternion is not exactly equal to `rhs_`; otherwise false.</returns>
+		template<typename RhsT_>
+		[[nodiscard]] constexpr inline bool operator!=(const Quaternion<RhsT_>& rhs_) const
+		{
+			return data.CmpAnyNotEqual(rhs_.data);
+		}
+#pragma endregion
+
+#pragma region GET_VALIDITY_CHECKS
+	public:
+		/// <summary>
+		/// <para> Compile-time function to evaluate if a provided `OutT_` is valid when calling `ImaginaryVector` on an instance of this Quaternion type. </para>
+		/// <para> `QuaternionIsConst_` identifies if the Quaternion is const-qualified at the time of calling `ImaginaryVector`. </para>
+		/// </summary>
+		/// <returns>True if a call to `ImaginaryVector` is valid with the given output type on a Quaternion in the given const state; otherwise false.</returns>
+		template<typename OutT_, bool QuaternionIsConst_>
+		[[nodiscard]] static constexpr inline bool valid_out_imaginary_vector_typearg()
+		{
+			using vector_ref_type = typename std::conditional<QuaternionIsConst_, const vector_type&, vector_type&>::type;
+			return std::is_constructible_v
+			<
+				EmuMath::Vector<3, OutT_>,
+				decltype(std::declval<vector_ref_type>().template at<0>()),
+				decltype(std::declval<vector_ref_type>().template at<1>()),
+				decltype(std::declval<vector_ref_type>().template at<2>())
+			>;
+		}
+
+		/// <summary>
+		/// <para> Compile-time function to evaluate if a provided `OutT_` is valid when calling `RealScalar` on an instance of this Quaternion type. </para>
+		/// <para> `QuaternionIsConst_` identifies if the Quaternion is const-qualified at the time of calling `RealScalar`. </para>
+		/// </summary>
+		/// <returns>True if a call to `RealScalar` is valid with the given output type on a Quaternion in the given const state; otherwise false.</returns>
+		template<typename Out_, bool QuaternionIsConst_>
+		[[nodiscard]] static constexpr inline bool valid_out_real_scalar_typearg()
+		{
+			using vector_ref_type = typename std::conditional<QuaternionIsConst_, const vector_type&, vector_type&>::type;
+			return std::is_constructible_v<Out_, decltype(std::declval<vector_ref_type>().template at<3>())>;
+		}
+#pragma endregion
+
+#pragma region GETTERS
+	public:
+		/// <summary>
+		/// <para> Retrieves a reference to the element at the provided index within this Quaternion. </para>
+		/// <para> A compile-time bounds check is performed for this call, and a static assertion will be triggered if Index_ is invalid. </para>
+		/// <para> Valid indices are 0, 1, 2, and 3, which correlate to this Quaternion's X, Y, Z, and W components respectively. </para>
+		/// </summary>
+		/// <returns>Reference to the item at the specified index within this Quaternion.</returns>
+		template<std::size_t Index_>
+		[[nodiscard]] constexpr inline value_type& at()
+		{
+			if constexpr (Index_ <= 3)
+			{
+				return data.template at<Index_>();
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Index_>(),
+					"Attempted to access an index greater than 3 within a Quaternion. Only 0, 1, 2, and 3 are valid indices in a Quaternion, where 0, 1, 2 are the imaginary component X, Y, Z, and 3 is the real component W."
+				);
+			}
+		}
+		template<std::size_t Index_>
+		[[nodiscard]] constexpr inline const value_type& at() const
+		{
+			return const_cast<this_type*>(this)->template at<Index_>();
+		}
+
+		/// <summary>
+		/// <para> Retrieves a reference to the element at the provided index within this Quaternion. </para>
+		/// <para> A runtime bounds check is performed for this call, and a std::out_of_range exception will be thrown if index_ is invalid. </para>
+		/// <para> Valid indices are 0, 1, 2, and 3, which correlate to this Quaternion's X, Y, Z, and W components respectively. </para>
+		/// </summary>
+		/// <returns>Reference to the item at the specified index within this Quaternion.</returns>
+		[[nodiscard]] constexpr inline value_type& at(const std::size_t index_)
+		{
+			if (index_ <= 3)
+			{
+				return data[index_];
+			}
+			else
+			{
+				if constexpr (EmuCore::TMP::feature_constexpr_dynamic_memory())
+				{
+					// We can provide some extra information if we have access to constexpr strings
+					// --- This is to allow `at(index_)` to still satisfy constexpr constraints in standards before C++20
+					std::string out_str_;
+					out_str_.reserve(150); // Reserves enough space for all literal chars, alongside some extra for index_ after conversion.
+					out_str_ += "Attempted to access an invalid contained index of an EmuMath Quaternion.\nProvided index: ";
+					out_str_ += std::to_string(index_);
+					out_str_ += "\nInclusive valid index range: 0:3";
+					throw std::out_of_range(out_str_);
+				}
+				else
+				{
+					throw std::out_of_range("Attempted to access an invalid contained index of an EmuMath Quaternion.\nInclusive valid index range: 0:3");
+				}
+			}
+		}
+
+		[[nodiscard]] constexpr inline const value_type& at(const std::size_t index_) const
+		{
+			return const_cast<this_type*>(this)->at(index_);
+		}
+
+		/// <summary>
+		/// <para> Outputs a Vector representing the imaginary component (i.e. XYZ) of this Quaternion. </para>
+		/// <para> The output Vector may contain any valid conversion type, including references, and defaults to this Quaternion's `value_type_uq`. </para>
+		/// </summary>
+		/// <returns>3D EmuMath Vector containing the imaginary component of this Quaternion, with X, Y, and Z at indices 0, 1, and 2 respectively.</returns>
+		template<typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline auto ImaginaryVector()
+			-> std::enable_if_t<valid_out_imaginary_vector_typearg<OutT_, false>(), EmuMath::Vector<3, OutT_>>
+		{
+			return EmuMath::Vector<3, OutT_>(data.at<0>(), data.at<1>(), data.at<2>());
+		}
+
+		template<typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline auto ImaginaryVector() const
+			-> std::enable_if_t<valid_out_imaginary_vector_typearg<OutT_, true>(), EmuMath::Vector<3, OutT_>>
+		{
+			return EmuMath::Vector<3, OutT_>(data.at<0>(), data.at<1>(), data.at<2>());
+		}
+
+		/// <summary>
+		/// <para> Outputs a the real component (i.e. W) of this Quaternion. </para>
+		/// <para> The output type may be any valid conversion type, including references, and defaults to this Quaternion's `value_type_uq`. </para>
+		/// </summary>
+		/// <returns>Item of the specified output type constructed with this Quaternion's real, scalar component (W).</returns>
+		template<typename Out_ = value_type_uq>
+		[[nodiscard]] constexpr inline auto RealScalar()
+			-> std::enable_if_t<valid_out_real_scalar_typearg<Out_, false>(), Out_>
+		{
+			return Out_(data.at<3>());
+		}
+
+		template<typename Out_ = value_type_uq>
+		[[nodiscard]] constexpr inline auto RealScalar() const
+			-> std::enable_if_t<valid_out_real_scalar_typearg<Out_, true>(), Out_>
+		{
+			return Out_(data.at<3>());
+		}
+#pragma endregion
+
+#pragma region COMPARISON_FUNCS
+	public:
+		/// <summary>
+		/// <para> Compares this Quaternion to the right-hand-side Quaternion and returns true if they are equal. </para>
+		/// <para> For comparisons where a margin of error may exist between otherwise identical Quaternions, it is recommended to use `CmpNear` instead. </para>
+		/// </summary>
+		/// <param name="rhs_">Quaternion to compare this one to.</param>
+		/// <returns>True if this Quaternion is exactly equal to `rhs_`; otherwise false.</returns>
+		template<typename RhsT_>
+		[[nodiscard]] constexpr inline bool CmpEqual(const Quaternion<RhsT_>& rhs_) const
+		{
+			return data.CmpAllEqual(rhs_.data);
+		}
+
+		/// <summary>
+		/// <para> Compares this Quaternion to the right-hand-side Quaternion and returns true if any component is not equal. </para>
+		/// <para> For comparisons where a margin of error may exist between otherwise identical Quaternions, it is recommended to use `CmpNotNear` instead. </para>
+		/// </summary>
+		/// <param name="rhs_">Quaternion to compare this one to.</param>
+		/// <returns>True if this Quaternion is not exactly equal to `rhs_`; otherwise false.</returns>
+		template<typename RhsT_>
+		[[nodiscard]] constexpr inline bool CmpNotEqual(const Quaternion<RhsT_>& rhs_) const
+		{
+			return data.CmpAnyNotEqual(rhs_.data);
+		}
+
+		/// <summary>
+		/// <para> Compares this Quaternion to the right-hand-side Quaternion and returns true if they are near-equal. </para>
+		/// <para> This comparison considers a potential margin of error due to floating-point precision errors. </para>
+		/// </summary>
+		/// <param name="rhs_">Quaternion to compare this one to.</param>
+		/// <returns>True if this Quaternion is near-equal to `rhs_`; otherwise false.</returns>
+		template<typename RhsT_>
+		[[nodiscard]] constexpr inline bool CmpNear(const Quaternion<RhsT_>& rhs_) const
+		{
+			return data.CmpAllNear(rhs_.data);
+		}
+
+		/// <summary>
+		/// <para> Compares this Quaternion to the right-hand-side Quaternion and returns true if they are near-equal. </para>
+		/// <para> This comparison considers a potential margin of error due to floating-point precision errors. </para>
+		/// </summary>
+		/// <param name="rhs_">Quaternion to compare this one to.</param>
+		/// <returns>True if this Quaternion is not near-equal to `rhs_`; otherwise false.</returns>
+		template<typename RhsT_>
+		[[nodiscard]] constexpr inline bool CmpNotNear(const Quaternion<RhsT_>& rhs_) const
+		{
+			return data.CmpAnyNotNear(rhs_.data);
 		}
 #pragma endregion
 
@@ -731,13 +1059,17 @@ namespace EmuMath
 		/// <param name="euler_y_">Y-component of the euler rotation to convert into a Quaternion.</param>
 		/// <param name="euler_z_">Z-component of the euler rotation to convert into a Quaternion.</param>
 		/// <returns>Quaternion representation of the passed Euler rotation.</returns>
-		template<bool IsRads_ = euler_cvt_default_is_rads, bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies, typename X_, typename Y_, typename Z_>
+		template
+		<
+			bool IsRads_ = euler_cvt_default_is_rads, bool Normalise_ = euler_cvt_default_normalise, bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies,
+			typename X_, typename Y_, typename Z_
+		>
 		[[nodiscard]] static constexpr inline auto from_euler(X_&& euler_x_, Y_&& euler_y_, Z_&& euler_z_)
-			-> std::enable_if_t<_valid_euler_conversion_args<X_, Y_, Z_, 0, false, PreferMultiplies_, IsRads_, false>(), EmuMath::Quaternion<T_>>
+			-> std::enable_if_t<_valid_euler_conversion_args<X_, Y_, Z_, 0, false, PreferMultiplies_, Normalise_, IsRads_, false>(), EmuMath::Quaternion<T_>>
 		{
 			return EmuMath::Quaternion<T_>
 			(
-				_make_vector_from_euler<IsRads_, PreferMultiplies_, 0, false>
+				_make_vector_from_euler<IsRads_, PreferMultiplies_, Normalise_, 0, false>
 				(
 					std::forward<X_>(euler_x_),
 					std::forward<Y_>(euler_y_),
@@ -760,66 +1092,61 @@ namespace EmuMath
 		/// <returns>Quaternion representation of the passed Euler rotation.</returns>
 		template
 		<
-			bool IsRads_ = euler_cvt_default_is_rads, bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies, std::size_t ReadOffset_ = 0,
-			typename VecT_, std::size_t VecSize_
+			bool IsRads_ = euler_cvt_default_is_rads, bool Normalise_ = euler_cvt_default_normalise, bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies,
+			std::size_t ReadOffset_ = 0, typename VecT_, std::size_t VecSize_
 		>
 		[[nodiscard]] static constexpr inline auto from_euler(const EmuMath::Vector<VecSize_, VecT_>& euler_xyz_)
 			-> std::enable_if_t
 			<
-				_valid_euler_vector_lvalue_conversion_arg<VecSize_, VecT_, ReadOffset_, true, 0, false, PreferMultiplies_, IsRads_, false>(),
+				_valid_euler_vector_lvalue_conversion_arg<VecSize_, VecT_, ReadOffset_, true, 0, false, PreferMultiplies_, Normalise_, IsRads_, false>(),
 				EmuMath::Quaternion<T_>
 			>
 		{
 			return EmuMath::Quaternion<T_>
 			(
-				_make_vector_from_euler<IsRads_, PreferMultiplies_, 0, false, ReadOffset_>(euler_xyz_)
+				_make_vector_from_euler<IsRads_, PreferMultiplies_, Normalise_, 0, false, ReadOffset_>(euler_xyz_)
 			);
 		}
 		
 		template
 		<
-			bool IsRads_ = euler_cvt_default_is_rads, bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies, std::size_t ReadOffset_ = 0,
-			typename VecT_, std::size_t VecSize_
+			bool IsRads_ = euler_cvt_default_is_rads, bool Normalise_ = euler_cvt_default_normalise, bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies,
+			std::size_t ReadOffset_ = 0, typename VecT_, std::size_t VecSize_
 		>
 		[[nodiscard]] static constexpr inline auto from_euler(EmuMath::Vector<VecSize_, VecT_>& euler_xyz_)
 			-> std::enable_if_t
 			<
-				_valid_euler_vector_lvalue_conversion_arg<VecSize_, VecT_, ReadOffset_, false, 0, false, PreferMultiplies_, IsRads_, false>(),
+				_valid_euler_vector_lvalue_conversion_arg<VecSize_, VecT_, ReadOffset_, false, 0, false, PreferMultiplies_, Normalise_, IsRads_, false>(),
 				EmuMath::Quaternion<T_>
 			>
 		{
 			return EmuMath::Quaternion<T_>
 			(
-				_make_vector_from_euler<IsRads_, PreferMultiplies_, 0, false, ReadOffset_>(euler_xyz_)
+				_make_vector_from_euler<IsRads_, PreferMultiplies_, Normalise_, 0, false, ReadOffset_>(euler_xyz_)
 			);
 		}
 
 		template
 		<
-			bool IsRads_ = euler_cvt_default_is_rads, bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies, std::size_t ReadOffset_ = 0,
-			typename VecT_, std::size_t VecSize_
+			bool IsRads_ = euler_cvt_default_is_rads, bool Normalise_ = euler_cvt_default_normalise, bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies,
+			std::size_t ReadOffset_ = 0, typename VecT_, std::size_t VecSize_
 		>
 		[[nodiscard]] static constexpr inline auto from_euler(EmuMath::Vector<VecSize_, VecT_>&& euler_xyz_)
 			-> std::enable_if_t
 			<
-				_valid_euler_vector_rvalue_conversion_arg<VecSize_, VecT_, ReadOffset_, 0, false, PreferMultiplies_, IsRads_, false>(),
+				_valid_euler_vector_rvalue_conversion_arg<VecSize_, VecT_, ReadOffset_, 0, false, PreferMultiplies_, Normalise_, IsRads_, false>(),
 				EmuMath::Quaternion<T_>
 			>
 		{
 			return EmuMath::Quaternion<T_>
 			(
-				_make_vector_from_euler<IsRads_, PreferMultiplies_, 0, false, ReadOffset_>(std::forward<decltype(euler_xyz_)>(euler_xyz_))
+				_make_vector_from_euler<IsRads_, PreferMultiplies_, Normalise_, 0, false, ReadOffset_>(std::forward<decltype(euler_xyz_)>(euler_xyz_))
 			);
 		}
 
 		/// <summary>
 		/// <para> Creates a new Quaternion of this type, which converts the rotation depicted by the passed euler representation. </para>
 		/// <para> Makes use of alternative approaches to trigonometric functions to allow the conversion to be calculated in a constexpr context. </para>
-		/// <para> `TrigIterations_` is the number of iterations to perform for trigonometric functions. This cannot be 0, and defaults to 3. </para>
-		/// <para> 
-		///		`TrigMod_` is a boolean flag indicating if a floating-point modulo operation should be performed to ensure angles are within 360 degree constraints,
-		///		for the purpose of calculating trignometric functions. This defaults to true, but can safely be set to false if you know a mod is not required for a value.
-		/// </para>
 		/// <para> Input may be radians or degrees, and defaults to being considered radians. If passing degrees, pass `false` for the `IsRads_` template argument. </para>
 		/// <para>
 		///		Provides an optional preference for multiplications via `PreferMultiplies_`, which defaults to this type's `euler_cvt_default_prefer_multiplies` value. 
@@ -833,19 +1160,19 @@ namespace EmuMath
 		/// <returns>Quaternion representation of the passed Euler rotation.</returns>
 		template
 		<
-			bool IsRads_ = euler_cvt_default_is_rads, std::size_t TrigIterations_ = 3, bool TrigMod_ = true,
-			bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies, typename X_, typename Y_, typename Z_
+			bool IsRads_ = euler_cvt_default_is_rads, bool Normalise_ = euler_cvt_default_normalise, bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies,
+			typename X_, typename Y_, typename Z_
 		>
 		[[nodiscard]] static constexpr inline auto from_euler_constexpr(X_&& euler_x_, Y_&& euler_y_, Z_&& euler_z_)
 			-> std::enable_if_t
 			<
-				TrigIterations_ != 0 && _valid_euler_conversion_args<X_, Y_, Z_, TrigIterations_, TrigMod_, PreferMultiplies_, IsRads_, false>(),
+				_valid_euler_conversion_args<X_, Y_, Z_, 3, true, PreferMultiplies_, Normalise_, IsRads_, false>(),
 				EmuMath::Quaternion<T_>
 			>
 		{
 			return EmuMath::Quaternion<T_>
 			(
-				_make_vector_from_euler<IsRads_, PreferMultiplies_, TrigIterations_, TrigMod_>
+				_make_vector_from_euler<IsRads_, PreferMultiplies_, Normalise_, 3, true>
 				(
 					std::forward<X_>(euler_x_),
 					std::forward<Y_>(euler_y_),
@@ -854,17 +1181,9 @@ namespace EmuMath
 			);
 		}
 
-
-
-
 		/// <summary>
 		/// <para> Creates a new Quaternion of this type, which converts the rotation depicted by the passed euler representation. </para>
 		/// <para> Makes use of alternative approaches to trigonometric functions to allow the conversion to be calculated in a constexpr context. </para>
-		/// <para> `TrigIterations_` is the number of iterations to perform for trigonometric functions. This cannot be 0, and defaults to 3. </para>
-		/// <para> 
-		///		`TrigMod_` is a boolean flag indicating if a floating-point modulo operation should be performed to ensure angles are within 360 degree constraints,
-		///		for the purpose of calculating trignometric functions. This defaults to true, but can safely be set to false if you know a mod is not required for a value.
-		/// </para>
 		/// <para> Input may be radians or degrees, and defaults to being considered radians. If passing degrees, pass `false` for the `IsRads_` template argument. </para>
 		/// <para>
 		///		Provides an optional preference for multiplications via `PreferMultiplies_`, which defaults to this type's `euler_cvt_default_prefer_multiplies` value. 
@@ -877,55 +1196,55 @@ namespace EmuMath
 		/// <returns>Quaternion representation of the passed Euler rotation.</returns>
 		template
 		<
-			bool IsRads_ = euler_cvt_default_is_rads, std::size_t TrigIterations_ = 3, bool TrigMod_ = true,
-			bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies, std::size_t ReadOffset_ = 0, typename VecT_, std::size_t VecSize_
+			bool IsRads_ = euler_cvt_default_is_rads, bool Normalise_ = euler_cvt_default_normalise, bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies,
+			std::size_t ReadOffset_ = 0, typename VecT_, std::size_t VecSize_
 		>
 		[[nodiscard]] static constexpr inline auto from_euler_constexpr(const EmuMath::Vector<VecSize_, VecT_>& euler_xyz_)
 			-> std::enable_if_t
 			<
-				TrigIterations_ != 0 && _valid_euler_vector_lvalue_conversion_arg<VecSize_, VecT_, ReadOffset_, true, TrigIterations_, TrigMod_, PreferMultiplies_, IsRads_, false>(),
+				_valid_euler_vector_lvalue_conversion_arg<VecSize_, VecT_, ReadOffset_, true, 3, true, PreferMultiplies_, Normalise_, IsRads_, false>(),
 				EmuMath::Quaternion<T_>
 			>
 		{
 			return EmuMath::Quaternion<T_>
 			(
-				_make_vector_from_euler<IsRads_, PreferMultiplies_, TrigIterations_, TrigMod_, ReadOffset_>(euler_xyz_)
+				_make_vector_from_euler<IsRads_, PreferMultiplies_, Normalise_, 3, true, ReadOffset_>(euler_xyz_)
 			);
 		}
 
 		template
 		<
-			bool IsRads_ = euler_cvt_default_is_rads, std::size_t TrigIterations_ = 3, bool TrigMod_ = true,
-			bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies, std::size_t ReadOffset_ = 0, typename VecT_, std::size_t VecSize_
+			bool IsRads_ = euler_cvt_default_is_rads, bool Normalise_ = euler_cvt_default_normalise, bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies,
+			std::size_t ReadOffset_ = 0, typename VecT_, std::size_t VecSize_
 		>
 		[[nodiscard]] static constexpr inline auto from_euler_constexpr(EmuMath::Vector<VecSize_, VecT_>& euler_xyz_)
 			-> std::enable_if_t
 			<
-				TrigIterations_ != 0 && _valid_euler_vector_lvalue_conversion_arg<VecSize_, VecT_, ReadOffset_, false, TrigIterations_, TrigMod_, PreferMultiplies_, IsRads_, false>(),
+				_valid_euler_vector_lvalue_conversion_arg<VecSize_, VecT_, ReadOffset_, false, 3, true, PreferMultiplies_, Normalise_, IsRads_, false>(),
 				EmuMath::Quaternion<T_>
 			>
 		{
 			return EmuMath::Quaternion<T_>
 			(
-				_make_vector_from_euler<IsRads_, PreferMultiplies_, TrigIterations_, TrigMod_, ReadOffset_>(euler_xyz_)
+				_make_vector_from_euler<IsRads_, PreferMultiplies_, Normalise_, 3, true, ReadOffset_>(euler_xyz_)
 			);
 		}
 
 		template
 		<
-			bool IsRads_ = euler_cvt_default_is_rads, std::size_t TrigIterations_ = 3, bool TrigMod_ = true,
-			bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies, std::size_t ReadOffset_ = 0, typename VecT_, std::size_t VecSize_
+			bool IsRads_ = euler_cvt_default_is_rads, bool Normalise_ = euler_cvt_default_normalise, bool PreferMultiplies_ = euler_cvt_default_prefer_multiplies,
+			std::size_t ReadOffset_ = 0, typename VecT_, std::size_t VecSize_
 		>
 		[[nodiscard]] static constexpr inline auto from_euler_constexpr(EmuMath::Vector<VecSize_, VecT_>&& euler_xyz_)
 			-> std::enable_if_t
 			<
-				TrigIterations_ != 0 && _valid_euler_vector_rvalue_conversion_arg<VecSize_, VecT_, ReadOffset_, TrigIterations_, TrigMod_, PreferMultiplies_, IsRads_, false>(),
+				_valid_euler_vector_rvalue_conversion_arg<VecSize_, VecT_, ReadOffset_, 3, true, PreferMultiplies_, Normalise_, IsRads_, false>(),
 				EmuMath::Quaternion<T_>
 			>
 		{
 			return EmuMath::Quaternion<T_>
 			(
-				_make_vector_from_euler<IsRads_, PreferMultiplies_, TrigIterations_, TrigMod_, ReadOffset_>(std::forward<decltype(euler_xyz_)>(euler_xyz_))
+				_make_vector_from_euler<IsRads_, PreferMultiplies_, Normalise_, 3, true, ReadOffset_>(std::forward<decltype(euler_xyz_)>(euler_xyz_))
 			);
 		}
 #pragma endregion
@@ -1178,6 +1497,486 @@ namespace EmuMath
 		constexpr inline void NormaliseSelfConstexpr()
 		{
 			data = data.NormaliseConstexpr<T_>();
+		}
+#pragma endregion
+
+#pragma region QUATERNION_OPERATIONS_VALIDITY_CHECKS
+	private:
+		template<typename OutT_, typename X_, typename Y_, typename Z_, typename W_, bool StaticAssert_>
+		[[nodiscard]] static constexpr inline bool _valid_conjugate_vector_args()
+		{
+			using out_quaternion = EmuMath::Quaternion<OutT_>;
+			using x_uq = typename EmuCore::TMP::remove_ref_cv<X_>::type;
+			using y_uq = typename EmuCore::TMP::remove_ref_cv<Y_>::type;
+			using z_uq = typename EmuCore::TMP::remove_ref_cv<Z_>::type;
+			using w_uq = typename EmuCore::TMP::remove_ref_cv<W_>::type;
+			using out_t_uq = typename EmuCore::TMP::remove_ref_cv<OutT_>::type;
+			using calc_fp = typename EmuCore::TMP::largest_floating_point
+			<
+				out_t_uq, x_uq, y_uq, z_uq, w_uq, typename out_quaternion::preferred_floating_point, preferred_floating_point
+			>::type;
+
+			constexpr bool all_castable =
+			(
+				EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<X_>::type, calc_fp> &&
+				EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<Y_>::type, calc_fp> &&
+				EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<Z_>::type, calc_fp> &&
+				EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<W_>::type, calc_fp>
+			);
+
+			if constexpr (!all_castable)
+			{
+				static_assert
+				(
+					!StaticAssert_,
+					"Invalid Quaternion Conjugate arguments: At least one item out of the X, Y, Z, and W components cannot be converted to the determined calculation type."
+				);
+				return false;
+			}
+			else
+			{
+				using negate_func = EmuCore::do_negate<calc_fp>;
+				if constexpr (!std::is_invocable_v<negate_func, calc_fp>)
+				{
+					static_assert
+					(
+						!StaticAssert_,
+						"Invalid Quaternion Conjugate operation: The determined negation function cannot be invoked with an argument of the determined calculation type."
+					);
+					return false;
+				}
+				else
+				{
+					using negate_result = typename std::invoke_result<negate_func, calc_fp>::type;
+					if constexpr (std::is_void_v<negate_result>)
+					{
+						static_assert
+						(
+							!StaticAssert_,
+							"Invalid Quaternion Conjugate operation: The determined negation function returns `void` when invoked with an argument of the determined calculation type."
+						);
+						return false;
+					}
+					else
+					{
+						using out_vector = typename EmuMath::Quaternion<OutT_>::vector_type;
+						if constexpr (!std::is_constructible_v<out_vector, negate_result, negate_result, negate_result, typename EmuCore::TMP::forward_result<W_>::type>)
+						{
+							static_assert
+							(
+								!StaticAssert_,
+								"Invalid Quaternion Conjugate output type: The underlying Vector cannot be constructed with negated X, Y, Z, and the passed W component, in the order XYZW."
+							);
+							return false;
+						}
+						else
+						{
+							return true;
+						}
+					}
+				}
+			}
+		}
+
+		template<bool PreferMultiplies_, typename OutT_, typename X_, typename Y_, typename Z_, typename W_, typename Norm_, bool StaticAssert_ >
+		[[nodiscard]] static constexpr inline bool _valid_inverse_vector_args()
+		{
+			using out_quaternion = EmuMath::Quaternion<OutT_>;
+			using x_uq = typename EmuCore::TMP::remove_ref_cv<X_>::type;
+			using y_uq = typename EmuCore::TMP::remove_ref_cv<Y_>::type;
+			using z_uq = typename EmuCore::TMP::remove_ref_cv<Z_>::type;
+			using w_uq = typename EmuCore::TMP::remove_ref_cv<W_>::type;
+			using norm_uq = typename EmuCore::TMP::remove_ref_cv<Norm_>::type;
+			using out_t_uq = typename EmuCore::TMP::remove_ref_cv<OutT_>::type;
+			using calc_fp = typename EmuCore::TMP::largest_floating_point
+			<
+				out_t_uq, x_uq, y_uq, z_uq, w_uq, norm_uq, typename out_quaternion::preferred_floating_point, preferred_floating_point
+			>::type;
+
+			constexpr bool all_castable =
+			(
+				EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<X_>::type, calc_fp> &&
+				EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<Y_>::type, calc_fp> &&
+				EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<Z_>::type, calc_fp> &&
+				EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<W_>::type, calc_fp> &&
+				EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<Norm_>::type, calc_fp>
+			);
+
+			if constexpr (!all_castable)
+			{
+				static_assert
+				(
+					!StaticAssert_,
+					"Invalid Quaternion Inverse arguments: At least one item out of the X, Y, Z, and W components and/or the Norm cannot be converted to the determined calculation type."
+				);
+				return false;
+			}
+			else
+			{
+				using negate_func = EmuCore::do_negate<calc_fp>;
+				if constexpr (!std::is_invocable_v<negate_func, calc_fp>)
+				{
+					static_assert
+					(
+						!StaticAssert_,
+						"Invalid Quaternion Inverse operation: The determined negation function cannot be invoked with an argument of the determined calculation type."
+					);
+					return false;
+				}
+				else
+				{
+					using negate_result = typename std::invoke_result<negate_func, calc_fp>::type;
+					if constexpr (std::is_void_v<negate_result>)
+					{
+						static_assert
+						(
+							!StaticAssert_,
+							"Invalid Quaternion Inverse operation: The determined negation function returns `void` when invoked with an argument of the determined calculation type."
+						);
+						return false;
+					}
+					else
+					{
+						if constexpr (PreferMultiplies_)
+						{
+							using reciprocal_func = EmuCore::do_reciprocal<calc_fp>;
+							if constexpr (!std::is_invocable_v<reciprocal_func, calc_fp>)
+							{
+								static_assert
+								(
+									!StaticAssert_,
+									"Invalid Quaternion Inverse operation (With PreferMultiplies_ = true): The determined reciprocal function cannot be invoked with an argument of the determined calculation type."
+								);
+								return false;
+							}
+							else
+							{
+								using reciprocal_result = typename std::invoke_result<reciprocal_func, calc_fp>::type;
+								if constexpr (std::is_void_v<reciprocal_result>)
+								{
+									static_assert
+									(
+										!StaticAssert_,
+										"Invalid Quaternion Inverse operation (With PreferMultiplies_ = true): The determined reciprocal function returns `void` when invoked with an argument of the determined calculation type."
+									);
+									return false;
+								}
+								else
+								{
+									using mul_func = EmuCore::do_multiply<calc_fp, calc_fp>;
+									if constexpr (!std::is_invocable_v<mul_func, calc_fp, calc_fp>)
+									{
+										static_assert
+										(
+											!StaticAssert_,
+											"Invalid Quaternion Inverse operation (With PreferMultiplies_ = true): The determined multiplication function cannot be invoked with two arguments of the determined calculation type."
+										);
+										return false;
+									}
+									else
+									{
+										using mul_result = typename std::invoke_result<mul_func, calc_fp, calc_fp>::type;
+										if constexpr (std::is_void_v<mul_result>)
+										{
+											static_assert
+											(
+												!StaticAssert_,
+												"Invalid Quaternion Inverse operation (With PreferMultiplies_ = true): The determined multiplication function returns `void` when invoked with an argument of the determined calculation type."
+											);
+											return false;
+										}
+										else
+										{
+											return std::is_constructible_v<typename out_quaternion::vector_type, mul_result, mul_result, mul_result, mul_result>;
+										}
+									}
+								}
+							}
+						}
+						else
+						{
+							using div_func = EmuCore::do_divide<calc_fp, calc_fp>;
+							if constexpr (!std::is_invocable_v<div_func, calc_fp, calc_fp>)
+							{
+								static_assert
+								(
+									!StaticAssert_,
+									"Invalid Quaternion Inverse operation (With PreferMultiplies_ = false): The determined division function cannot be invoked with two arguments of the determined calculation type."
+								);
+								return false;
+							}
+							else
+							{
+								using div_result = typename std::invoke_result<div_func, calc_fp, calc_fp>::type;
+								if constexpr (std::is_void_v<div_result>)
+								{
+									static_assert
+									(
+										!StaticAssert_,
+										"Invalid Quaternion Inverse operation (With PreferMultiplies_ = false): The determined division function returns `void` when invoked with an argument of the determined calculation type."
+									);
+									return false;
+								}
+								else
+								{
+									return std::is_constructible_v<typename out_quaternion::vector_type, div_result, div_result, div_result, div_result>;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+	public:
+		template<typename OutT_>
+		[[nodiscard]] static constexpr inline bool valid_conjugate_out_typearg()
+		{
+			using out_quaternion = EmuMath::Quaternion<OutT_>;
+			if constexpr (std::is_constructible_v<out_quaternion, typename out_quaternion::vector_type&&>)
+			{
+				using vector_ref = const vector_type&;
+				return _valid_conjugate_vector_args
+				<
+					OutT_,
+					decltype(std::declval<vector_ref>().template at<0>()),
+					decltype(std::declval<vector_ref>().template at<1>()),
+					decltype(std::declval<vector_ref>().template at<2>()),
+					decltype(std::declval<vector_ref>().template at<3>()),
+					false
+				>();
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		template<bool PreferMultiplies_, typename OutT_>
+		[[nodiscard]] static constexpr inline bool valid_inverse_args()
+		{
+			using out_quaternion = EmuMath::Quaternion<OutT_>;
+			if constexpr (std::is_constructible_v<out_quaternion, typename out_quaternion::vector_type&&>)
+			{
+				using vector_ref = const vector_type&;
+				return _valid_inverse_vector_args
+				<
+					PreferMultiplies_,
+					OutT_,
+					decltype(std::declval<vector_ref>().template at<0>()),
+					decltype(std::declval<vector_ref>().template at<1>()),
+					decltype(std::declval<vector_ref>().template at<2>()),
+					decltype(std::declval<vector_ref>().template at<3>()),
+					decltype(std::declval<const Quaternion<T_>&>().template Norm<preferred_floating_point>()),
+					false
+				>();
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		template<typename OutT_>
+		[[nodiscard]] static constexpr inline bool valid_inverse_args()
+		{
+			return valid_inverse_args<false, OutT_>();
+		}
+#pragma endregion
+
+#pragma region QUATERNION_OPERATIONS
+	private:
+		template<typename OutT_, typename X_, typename Y_, typename Z_, typename W_>
+		[[nodiscard]] static constexpr inline typename EmuMath::Quaternion<OutT_>::vector_type _make_conjugate_vector(X_&& x_, Y_&& y_, Z_&& z_, W_&& w_)
+		{
+			if constexpr (_valid_conjugate_vector_args<OutT_, X_, Y_, Z_, W_, true>())
+			{
+				using out_quaternion = EmuMath::Quaternion<OutT_>;
+				using x_uq = typename EmuCore::TMP::remove_ref_cv<X_>::type;
+				using y_uq = typename EmuCore::TMP::remove_ref_cv<Y_>::type;
+				using z_uq = typename EmuCore::TMP::remove_ref_cv<Z_>::type;
+				using w_uq = typename EmuCore::TMP::remove_ref_cv<W_>::type;
+				using out_t_uq = typename EmuCore::TMP::remove_ref_cv<OutT_>::type;
+				using calc_fp = typename EmuCore::TMP::largest_floating_point
+				<
+					out_t_uq, x_uq, y_uq, z_uq, w_uq, typename out_quaternion::preferred_floating_point, preferred_floating_point
+				>::type;
+
+				calc_fp x = static_cast<calc_fp>(std::forward<X_>(x_));
+				calc_fp y = static_cast<calc_fp>(std::forward<Y_>(y_));
+				calc_fp z = static_cast<calc_fp>(std::forward<Z_>(z_));
+
+				using negate_func = EmuCore::do_negate<calc_fp>;
+				return typename out_quaternion::vector_type
+				(
+					negate_func()(x),
+					negate_func()(y),
+					negate_func()(z),
+					std::forward<W_>(w_)
+				);
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<OutT_, X_, Y_, Z_, W_>(),
+					"Invalid Quaternion Conjugate operation. See other static assertion messages for more information."
+				);
+			}
+		}
+
+		template<bool PreferMultiplies_, typename OutT_, typename X_, typename Y_, typename Z_, typename W_, typename Norm_ >
+		[[nodiscard]] static constexpr inline typename EmuMath::Quaternion<OutT_>::vector_type _make_inverse_vector(X_&& x_, Y_&& y_, Z_&& z_, W_&& w_, Norm_&& norm_)
+		{
+			if constexpr(_valid_inverse_vector_args<PreferMultiplies_, OutT_, X_, Y_, Z_, W_, Norm_, true>())
+			{
+				using out_quaternion = EmuMath::Quaternion<OutT_>;
+				using x_uq = typename EmuCore::TMP::remove_ref_cv<X_>::type;
+				using y_uq = typename EmuCore::TMP::remove_ref_cv<Y_>::type;
+				using z_uq = typename EmuCore::TMP::remove_ref_cv<Z_>::type;
+				using w_uq = typename EmuCore::TMP::remove_ref_cv<W_>::type;
+				using norm_uq = typename EmuCore::TMP::remove_ref_cv<Norm_>::type;
+				using out_t_uq = typename EmuCore::TMP::remove_ref_cv<OutT_>::type;
+				using calc_fp = typename EmuCore::TMP::largest_floating_point
+				<
+					out_t_uq, x_uq, y_uq, z_uq, w_uq, norm_uq, typename out_quaternion::preferred_floating_point, preferred_floating_point
+				>::type;
+
+				using negate_func = EmuCore::do_negate<calc_fp>;
+				if constexpr (PreferMultiplies_)
+				{
+					using mul_func = EmuCore::do_multiply<calc_fp, calc_fp>;
+					using reciprocal_func = EmuCore::do_reciprocal<calc_fp>;
+					calc_fp norm_reciprocal = reciprocal_func()(static_cast<calc_fp>(std::forward<Norm_>(norm_)));
+					return typename out_quaternion::vector_type
+					(
+						mul_func()(norm_reciprocal, negate_func()(static_cast<calc_fp>(std::forward<X_>(x_)))),
+						mul_func()(norm_reciprocal, negate_func()(static_cast<calc_fp>(std::forward<Y_>(y_)))),
+						mul_func()(norm_reciprocal, negate_func()(static_cast<calc_fp>(std::forward<Z_>(z_)))),
+						mul_func()(norm_reciprocal, static_cast<calc_fp>(std::forward<W_>(w_)))
+					);
+				}
+				else
+				{
+					using div_func = EmuCore::do_divide<calc_fp, calc_fp>;
+					calc_fp norm = static_cast<calc_fp>(std::forward<Norm_>(norm_));
+					return typename out_quaternion::vector_type
+					(
+						div_func()(negate_func()(static_cast<calc_fp>(std::forward<X_>(x_))), norm),
+						div_func()(negate_func()(static_cast<calc_fp>(std::forward<Y_>(y_))), norm),
+						div_func()(negate_func()(static_cast<calc_fp>(std::forward<Z_>(z_))), norm),
+						div_func()(static_cast<calc_fp>(std::forward<W_>(w_)), norm)
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<OutT_, X_, Y_, Z_, W_>(),
+					"Invalid Quaternion Inverse operation. See other static assertion messages for more information."
+				);
+			}
+		}
+
+	public:
+		/// <summary>
+		/// <para> Returns the form of this Quaternion with its imaginary component (i.e. X, Y, Z) negated. </para>
+		/// <para> The type of the output Quaternion may be customised, and defaults to this Quaternion's `preferred_floating_point`. </para>
+		/// </summary>
+		/// <returns>Quaternion representing this Quaternion's conjugate.</returns>
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline auto Conjugate() const
+			-> std::enable_if_t<valid_conjugate_out_typearg<OutT_>(), Quaternion<OutT_>>
+		{
+			return Quaternion<OutT_>(_make_conjugate_vector<OutT_>(data.at<0>(), data.at<1>(), data.at<2>(), data.at<3>()));
+		}
+
+		/// <summary>
+		/// <para> Returns the inverse form of this Quaternion, which is equivalent to its Conjugate normalised. </para>
+		/// <para>
+		///		If this Quaternion is known to have a length of 1, this is mathematically identical to `Conjugate`, 
+		///		although floating-point errors may produce different results.
+		/// </para>
+		/// <para> May optionally choose reciprocal multiplication instead of division for normalisation. If `PreferMultiplies_` is omitted, it will be considered `false`. </para>
+		/// </summary>
+		/// <returns>Quaternion representing the inverse of this Quaternion.</returns>
+		template<bool PreferMultiplies_, typename OutT_ = preferred_floating_point >
+		[[nodiscard]] constexpr inline auto Inverse() const
+			-> std::enable_if_t<valid_inverse_args<PreferMultiplies_, OutT_>(), Quaternion<OutT_>>
+		{
+			return Quaternion<OutT_>
+			(
+				_make_inverse_vector<PreferMultiplies_, OutT_>
+				(
+					data.at<0>(),
+					data.at<1>(),
+					data.at<2>(),
+					data.at<3>(),
+					this->template Norm<preferred_floating_point>()
+				)
+			);
+		}
+
+		template<typename OutT_ = preferred_floating_point >
+		[[nodiscard]] constexpr inline auto Inverse() const
+			-> std::enable_if_t<valid_inverse_args<false, OutT_>(), Quaternion<OutT_>>
+		{
+			return Quaternion<OutT_>
+			(
+				_make_inverse_vector<false, OutT_>
+				(
+					data.at<0>(),
+					data.at<1>(),
+					data.at<2>(),
+					data.at<3>(),
+					this->template Norm<preferred_floating_point>()
+				)
+			);
+		}
+
+		/// <summary>
+		/// <para> Returns the inverse form of this Quaternion, which is equivalent to its Conjugate normalised. </para>
+		/// <para>
+		///		If this Quaternion is known to have a length of 1, this is mathematically identical to `Conjugate`, 
+		///		although floating-point errors may produce different results.
+		/// </para>
+		/// <para> May optionally choose reciprocal multiplication instead of division for normalisation. If `PreferMultiplies_` is omitted, it will be considered `false`. </para>
+		/// <para> If possible, this expression will aim to be constexpr-evaluable. This may affect accuracy and/or performance. </para>
+		/// </summary>
+		/// <returns>Quaternion representing the inverse of this Quaternion.</returns>
+		template<bool PreferMultiplies_, typename OutT_ = preferred_floating_point >
+		[[nodiscard]] constexpr inline auto InverseConstexpr() const
+			-> std::enable_if_t<valid_inverse_args<PreferMultiplies_, OutT_>(), Quaternion<OutT_>>
+		{
+			return Quaternion<OutT_>
+			(
+				_make_inverse_vector<PreferMultiplies_, OutT_>
+				(
+					data.at<0>(),
+					data.at<1>(),
+					data.at<2>(),
+					data.at<3>(),
+					this->template NormConstexpr<preferred_floating_point>()
+				)
+			);
+		}
+
+		template<typename OutT_ = preferred_floating_point >
+		[[nodiscard]] constexpr inline auto InverseConstexpr() const
+			-> std::enable_if_t<valid_inverse_args<false, OutT_>(), Quaternion<OutT_>>
+		{
+			return Quaternion<OutT_>
+			(
+				_make_inverse_vector<false, OutT_>
+				(
+					data.at<0>(),
+					data.at<1>(),
+					data.at<2>(),
+					data.at<3>(),
+					this->template NormConstexpr<preferred_floating_point>()
+				)
+			);
 		}
 #pragma endregion
 

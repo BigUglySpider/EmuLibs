@@ -431,6 +431,17 @@ int main()
 	constexpr auto frm_lr_cnstxpr = EmuMath::Quaternion<float>::from_euler_constexpr<false>(full_cvt_euler_test);
 	constexpr auto frm_lr_cnstxpr_nrmlsd = frm_lr_cnstxpr.UnitConstexpr();
 	constexpr auto nrm = frm_lr_cnstxpr.NormConstexpr();
+	auto some_quat = EmuMath::Quaternion<double>::from_euler<false>(45.0, 0, 0);
+	auto&& some_quat_scalar = some_quat.RealScalar<double&>();
+	auto some_quat_vector = some_quat.ImaginaryVector<double&>();
+	std::cout << some_quat << " | " << some_quat_scalar << " | " << some_quat_vector << "\n";
+	some_quat = EmuMath::Quaternion<double>::from_euler<false>(45.0, -127.5f, 0.0L);
+	std::cout << some_quat << " | " << some_quat_scalar << " | " << some_quat_vector << "\n";
+	constexpr auto frm_lr_cnstxpr_cnjgt = frm_lr_cnstxpr.Conjugate();
+	constexpr auto frm_lr_cnstxpr_nvrs = frm_lr_cnstxpr.InverseConstexpr();
+	constexpr bool equal_boi = frm_lr_cnstxpr_cnjgt == frm_lr_cnstxpr_nvrs;
+
+	constexpr auto not_normed = EmuMath::Quaternion<double>::from_euler_constexpr<false, true>(45.0, 0, 0);
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
