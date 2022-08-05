@@ -441,7 +441,9 @@ int main()
 	constexpr auto frm_lr_cnstxpr_nvrs = frm_lr_cnstxpr.InverseConstexpr();
 	constexpr bool equal_boi = frm_lr_cnstxpr_cnjgt == frm_lr_cnstxpr_nvrs;
 
-	constexpr auto not_normed = EmuMath::Quaternion<double>::from_euler_constexpr<false, true>(45.0, 0, 0);
+	constexpr auto not_normed = EmuMath::Quaternion<float>::from_euler_constexpr<false, false>(full_cvt_euler_test);
+	constexpr bool lksdfnsd = not_normed.Conjugate() == frm_lr_cnstxpr_cnjgt;
+	constexpr bool lksdfnsde = not_normed.InverseConstexpr() == frm_lr_cnstxpr_cnjgt;
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
