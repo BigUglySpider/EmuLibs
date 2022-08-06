@@ -2178,6 +2178,46 @@ namespace EmuCore
 		{
 			return do_lerp<A_, B_, T_>()(a_, b_, t_);
 		}
+	};	
+
+	/// <summary>
+	/// <para> Functor which may be used to perform linear interpolations, while also taking advantage of fused instructions where possible. </para>
+	/// <para> Takes 3 type arguments, however only one or two may be passed. B_ will be the same type as A_ if omitted. T_ will be float if omitted. </para>
+	/// <para> Types should be considered for the equation FMADD(t, b - a, a). </para>
+	/// <para> do_lerp&lt;void&gt;, do_lerp&lt;void, void&gt;, and do_lerp&lt;void, void, void&gt; are reserved for a generic specialisation of do_lerp. </para>
+	/// </summary>
+	/// <typeparam name="A_">Type used to represent a in the equation FMADD(t, b - a, a).</typeparam>
+	/// <typeparam name="B_">Type used to represent b in the equation FMADD(t, b - a, a).</typeparam>
+	/// <typeparam name="T_">Type used to represent t in the equation FMADD(t, b - a, a).</typeparam>
+	template<class A_, class B_ = A_, class T_ = float>
+	struct do_fused_lerp
+	{
+		constexpr do_fused_lerp()
+		{
+		}
+		[[nodiscard]] constexpr inline auto operator()(const A_& a_, const B_& b_, const T_& t_) const
+		{
+			using sub_func = EmuCore::do_subtract<B_, A_>;
+			using sub_result = typename std::invoke_result<sub_func, const B_&, const A_&>::type;
+			using fmadd_func = EmuCore::do_fmadd<T_, sub_result, A_>;
+			return fmadd_func()(t_, sub_func()(b_, a_), a_);
+		}
+	};
+	/// <summary>
+	/// <para> Reserved generic specialisation of do_fused_lerp. </para>
+	/// <para> Determines the specialisation to make use of when the function operator() is called, based on the 3 arguments when called. </para>
+	/// </summary>
+	template<>
+	struct do_fused_lerp<void, void, void>
+	{
+		constexpr do_fused_lerp()
+		{
+		}
+		template<class A_, class B_, class T_>
+		[[nodiscard]] constexpr inline std::invoke_result_t<do_fused_lerp<A_, B_, T_>, const A_&, const B_&, const T_&> operator()(const A_& a_, const B_& b_, const T_& t_) const
+		{
+			return do_fused_lerp<A_, B_, T_>()(a_, b_, t_);
+		}
 	};
 
 	/// <summary>

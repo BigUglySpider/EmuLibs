@@ -445,6 +445,24 @@ int main()
 	constexpr bool lksdfnsd = not_normed.Conjugate() == frm_lr_cnstxpr_cnjgt;
 	constexpr bool lksdfnsde = not_normed.InverseConstexpr() == frm_lr_cnstxpr_cnjgt;
 
+	constexpr auto lerped = EmuMath::Quaternion<float>(1.0f, -1.0f, 12.0f, 0.0f).Lerp(EmuMath::Quaternion<float>(10.0f, 20.0f, 12.0f, 1337), 0.5f);
+	constexpr auto lerped_with_vec = EmuMath::Quaternion<float>(1.0f, -1.0f, 12.0f, -6.0f).Lerp(EmuMath::Quaternion<float>(10.0f, 20.0f, 12.0f, 1337), EmuMath::Vector<3, float>(1, 2, 0.5));
+	std::cout << "Lerped: " << lerped << " | FusedLerped: " << EmuMath::Quaternion<float>(1, -1, 12, 0).FusedLerp(EmuMath::Quaternion<double>(10, 20, 12, 1337), 0.5L) << "\n\n\n";
+
+	constexpr auto slerp = EmuMath::Quaternion<float>::from_euler_constexpr<false>(45.0f, 0.0f, 0.0f).SlerpConstexpr(EmuMath::Quaternion<float>::from_euler_constexpr<false>(90.0f, 0.0f, 0.0f), 0.5f);
+	constexpr auto slerp_euler = slerp.ToEulerConstexpr<false>();
+
+
+	constexpr auto slerp2 = EmuMath::Quaternion<float>::from_euler_constexpr<false>(30.0f, 120.0f, 0).SlerpConstexpr(EmuMath::Quaternion<float>::from_euler_constexpr<false>(90.0f, 120.0f, 0.0f), 0.5f);
+	constexpr auto slerp2_euler = slerp.ToEulerConstexpr<false>();
+
+	auto slerp2_runtime = EmuMath::Quaternion<float>::from_euler<false>(45.0f, 120.0f, 0.0f).Slerp(EmuMath::Quaternion<float>::from_euler<false>(90.0f, 120.0f, 0.0f), 0.5f);
+	auto slerp2_fused_runtime = EmuMath::Quaternion<float>::from_euler<false>(45.0f, 120.0f, 0.0f).FusedSlerp(EmuMath::Quaternion<float>::from_euler<false>(90.0f, 120.0f, 0.0f), 0.5f);
+	auto slerp2_runtime_euler = slerp2_runtime.ToEuler<false>();
+	auto slerp2_fused_runtime_euler = slerp2_fused_runtime.ToEuler<false>();
+	std::cout << "Slerped: " << slerp2_runtime << " | Euler: " << slerp2_runtime_euler << "\n";
+	std::cout << "Fused Slerped: " << slerp2_fused_runtime << " | Euler: " << slerp2_fused_runtime_euler << "\n";
+
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;

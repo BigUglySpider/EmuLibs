@@ -31,6 +31,9 @@ namespace EmuMath::TMP
 	{
 		static constexpr bool value = true;
 	};
+
+	template<typename T_>
+	static constexpr bool is_emu_quaternion_v = is_emu_quaternion<T_>::value;
 }
 
 #endif
