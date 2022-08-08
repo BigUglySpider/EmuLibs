@@ -1603,75 +1603,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region QUATERNION_OPERATIONS_VALIDITY_CHECKS
-	private:
-		template
-		<
-			bool Fused_, typename OutT_, typename AX_, typename AY_, typename AZ_, typename AW_,
-			typename BX_, typename BY_, typename BZ_, typename BW_, class ArgT_, bool StaticAssert_
-		>
-		[[nodiscard]] static constexpr inline bool _valid_lerp_vector_args()
-		{
-			using out_quaternion = EmuMath::Quaternion<OutT_>;
-			using ax_uq = typename EmuCore::TMP::remove_ref_cv<AX_>::type;
-			using ay_uq = typename EmuCore::TMP::remove_ref_cv<AY_>::type;
-			using az_uq = typename EmuCore::TMP::remove_ref_cv<AZ_>::type;
-			using aw_uq = typename EmuCore::TMP::remove_ref_cv<AW_>::type;
-			using bx_uq = typename EmuCore::TMP::remove_ref_cv<BX_>::type;
-			using by_uq = typename EmuCore::TMP::remove_ref_cv<BY_>::type;
-			using bz_uq = typename EmuCore::TMP::remove_ref_cv<BZ_>::type;
-			using bw_uq = typename EmuCore::TMP::remove_ref_cv<BW_>::type;
-			using t_uq = typename EmuCore::TMP::remove_ref_cv<ArgT_>::type;
-			using t_fp_arg = typename std::conditional<EmuMath::TMP::is_emu_vector_v<t_uq>, preferred_floating_point, t_uq>::type; // Don't use ArgT_ if non-scalar
-			using out_t_uq = typename EmuCore::TMP::remove_ref_cv<OutT_>::type;
-			using out_fp = typename out_quaternion::preferred_floating_point;
-			using calc_fp = typename EmuCore::TMP::largest_floating_point
-			<
-				ax_uq, ay_uq, az_uq, aw_uq, bx_uq, by_uq, bz_uq, bw_uq, t_fp_arg, out_t_uq, out_fp, preferred_floating_point
-			>::type;
-
-			if constexpr (!EmuCore::TMP::are_all_static_castable_v<calc_fp, AX_&&, AY_&&, AZ_&&, AW_&&>)
-			{
-				static_assert(!StaticAssert_, "Unable to Lerp two EmuMath Quaternions as at least one index of Quaternion A could not be converted to the determined calculation type.");
-				return false;
-			}
-			else
-			{
-				if constexpr (!EmuCore::TMP::are_all_static_castable_v<calc_fp, BX_&&, BY_&&, BZ_&&, BW_&&>)
-				{
-					static_assert(!StaticAssert_, "Unable to Lerp two EmuMath Quaternions as at least one index of Quaternion B could not be converted to the determined calculation type.");
-					return false;
-				}
-				else
-				{
-					constexpr bool t_valid = 
-					(
-						_valid_get_generic_arg<calc_fp, 0, ArgT_, StaticAssert_>() &&
-						_valid_get_generic_arg<calc_fp, 1, ArgT_, StaticAssert_>() &&
-						_valid_get_generic_arg<calc_fp, 2, ArgT_, StaticAssert_>() &&
-						_valid_get_generic_arg<calc_fp, 3, ArgT_, StaticAssert_>()
-					);
-					if constexpr (!t_valid)
-					{
-						return false; // static_assert handled by _valid_get_generic_arg
-					}
-					else
-					{
-						using lerp_func = typename std::conditional<Fused_, EmuCore::do_fused_lerp<calc_fp, calc_fp, calc_fp>, EmuCore::do_lerp<calc_fp, calc_fp, calc_fp>>::type;
-						using lerp_result = typename std::invoke_result<lerp_func, calc_fp, calc_fp, calc_fp>::type;
-						if constexpr (!std::is_constructible_v<typename out_quaternion::vector_type, lerp_result, lerp_result, lerp_result, lerp_result>)
-						{
-							static_assert(!StaticAssert_, "Unable to Lerp two EmuMath Quaternions as the output Quaternion could not be constructed from the linear interpolation results for all 4 components.");
-							return false;
-						}
-						else
-						{
-							return true;
-						}
-					}
-				}
-			}
-		}
-		
+	private:		
 		template<typename OutT_, typename X_, typename Y_, typename Z_, typename W_, bool StaticAssert_>
 		[[nodiscard]] static constexpr inline bool _valid_conjugate_vector_args()
 		{
@@ -1899,94 +1831,6 @@ namespace EmuMath
 		}
 
 	public:
-		template<typename OutT_, typename BT_>
-		[[nodiscard]] static constexpr inline bool valid_lerp_args()
-		{
-			using quat_b = const EmuMath::Quaternion<BT_>&;
-			using vec_ref = const vector_type&;
-			return _valid_lerp_vector_args
-			<
-				false,
-				OutT_,
-				decltype(std::declval<vec_ref>().template at<0>()),
-				decltype(std::declval<vec_ref>().template at<1>()),
-				decltype(std::declval<vec_ref>().template at<2>()),
-				decltype(std::declval<vec_ref>().template at<3>()),
-				decltype(std::declval<quat_b>().template at<0>()),
-				decltype(std::declval<quat_b>().template at<1>()),
-				decltype(std::declval<quat_b>().template at<2>()),
-				decltype(std::declval<quat_b>().template at<3>()),
-				preferred_floating_point,
-				true
-			>();
-		}
-
-		template<typename OutT_, typename BT_, std::size_t TVecSize_, typename TVecT_>
-		[[nodiscard]] static constexpr inline bool valid_lerp_args()
-		{
-			using quat_b = EmuMath::Quaternion<BT_>;
-			using vec_ref = const vector_type&;
-			return _valid_lerp_vector_args
-			<
-				false,
-				OutT_,
-				decltype(std::declval<vec_ref>().template at<0>()),
-				decltype(std::declval<vec_ref>().template at<1>()),
-				decltype(std::declval<vec_ref>().template at<2>()),
-				decltype(std::declval<vec_ref>().template at<3>()),
-				decltype(std::declval<quat_b>().template at<0>()),
-				decltype(std::declval<quat_b>().template at<1>()),
-				decltype(std::declval<quat_b>().template at<2>()),
-				decltype(std::declval<quat_b>().template at<3>()),
-				const EmuMath::Vector<TVecSize_, TVecT_>&,
-				true
-			>();
-		}
-
-		template<typename OutT_, typename BT_>
-		[[nodiscard]] static constexpr inline bool valid_fused_lerp_args()
-		{
-			using quat_b = const EmuMath::Quaternion<BT_>&;
-			using vec_ref = const vector_type&;
-			return _valid_lerp_vector_args
-			<
-				false,
-				OutT_,
-				decltype(std::declval<vec_ref>().template at<0>()),
-				decltype(std::declval<vec_ref>().template at<1>()),
-				decltype(std::declval<vec_ref>().template at<2>()),
-				decltype(std::declval<vec_ref>().template at<3>()),
-				decltype(std::declval<quat_b>().template at<0>()),
-				decltype(std::declval<quat_b>().template at<1>()),
-				decltype(std::declval<quat_b>().template at<2>()),
-				decltype(std::declval<quat_b>().template at<3>()),
-				preferred_floating_point,
-				true
-			>();
-		}
-
-		template<typename OutT_, typename BT_, std::size_t TVecSize_, typename TVecT_>
-		[[nodiscard]] static constexpr inline bool valid_fused_lerp_args()
-		{
-			using quat_b = EmuMath::Quaternion<BT_>;
-			using vec_ref = const vector_type&;
-			return _valid_lerp_vector_args
-			<
-				false,
-				OutT_,
-				decltype(std::declval<vec_ref>().template at<0>()),
-				decltype(std::declval<vec_ref>().template at<1>()),
-				decltype(std::declval<vec_ref>().template at<2>()),
-				decltype(std::declval<vec_ref>().template at<3>()),
-				decltype(std::declval<quat_b>().template at<0>()),
-				decltype(std::declval<quat_b>().template at<1>()),
-				decltype(std::declval<quat_b>().template at<2>()),
-				decltype(std::declval<quat_b>().template at<3>()),
-				const EmuMath::Vector<TVecSize_, TVecT_>&,
-				true
-			>();
-		}
-
 		template<typename OutT_>
 		[[nodiscard]] static constexpr inline bool valid_conjugate_out_typearg()
 		{
@@ -2044,135 +1888,6 @@ namespace EmuMath
 
 #pragma region QUATERNION_OPERATIONS
 	private:
-		template<bool Fused_, typename OutT_, typename AX_, typename AY_, typename AZ_, typename AW_, typename BX_, typename BY_, typename BZ_, typename BW_, class ArgT_>
-		[[nodiscard]] static constexpr inline auto _make_lerp_vector(AX_&& ax_, AY_&& ay_, AZ_&& az_, AW_&& aw_, BX_&& bx_, BY_&& by_, BZ_&& bz_, BW_&& bw_, ArgT_&& t_)
-			-> typename EmuMath::Quaternion<OutT_>::vector_type
-		{
-			using out_quaternion = EmuMath::Quaternion<OutT_>;
-			using ax_uq = typename EmuCore::TMP::remove_ref_cv<AX_>::type;
-			using ay_uq = typename EmuCore::TMP::remove_ref_cv<AY_>::type;
-			using az_uq = typename EmuCore::TMP::remove_ref_cv<AZ_>::type;
-			using aw_uq = typename EmuCore::TMP::remove_ref_cv<AW_>::type;
-			using bx_uq = typename EmuCore::TMP::remove_ref_cv<BX_>::type;
-			using by_uq = typename EmuCore::TMP::remove_ref_cv<BY_>::type;
-			using bz_uq = typename EmuCore::TMP::remove_ref_cv<BZ_>::type;
-			using bw_uq = typename EmuCore::TMP::remove_ref_cv<BW_>::type;
-			using t_uq = typename EmuCore::TMP::remove_ref_cv<ArgT_>::type;
-			using t_fp_arg = typename std::conditional<EmuMath::TMP::is_emu_vector_v<t_uq>, preferred_floating_point, t_uq>::type; // Don't use ArgT_ if non-scalar
-			using out_t_uq = typename EmuCore::TMP::remove_ref_cv<OutT_>::type;
-			using out_fp = typename out_quaternion::preferred_floating_point;
-			using calc_fp = typename EmuCore::TMP::largest_floating_point
-			<
-				ax_uq, ay_uq, az_uq, aw_uq, bx_uq, by_uq, bz_uq, bw_uq, t_fp_arg, out_t_uq, out_fp, preferred_floating_point
-			>::type;
-
-			// Warning disabled as we are only ever moving separate indices, if any
-#pragma warning(push)
-#pragma warning(disable: 26800)
-			using sub_func = EmuCore::do_subtract<calc_fp, calc_fp>;
-			using lerp_func = typename std::conditional<Fused_, EmuCore::do_fused_lerp<calc_fp, calc_fp, calc_fp>, EmuCore::do_lerp<calc_fp, calc_fp, calc_fp>>::type;
-			return typename out_quaternion::vector_type
-			(
-				lerp_func()(static_cast<calc_fp>(std::forward<AX_>(ax_)), static_cast<calc_fp>(std::forward<BX_>(bx_)), _get_generic_arg<calc_fp, 0>(std::forward<ArgT_>(t_))),
-				lerp_func()(static_cast<calc_fp>(std::forward<AY_>(ay_)), static_cast<calc_fp>(std::forward<BY_>(by_)), _get_generic_arg<calc_fp, 1>(std::forward<ArgT_>(t_))),
-				lerp_func()(static_cast<calc_fp>(std::forward<AZ_>(az_)), static_cast<calc_fp>(std::forward<BZ_>(bz_)), _get_generic_arg<calc_fp, 2>(std::forward<ArgT_>(t_))),
-				lerp_func()(static_cast<calc_fp>(std::forward<AW_>(aw_)), static_cast<calc_fp>(std::forward<BW_>(bw_)), _get_generic_arg<calc_fp, 3>(std::forward<ArgT_>(t_)))
-			);
-#pragma warning(pop)
-		}
-
-		template
-		<
-			bool Fused_, bool IsConstexpr_, typename OutT_, typename AX_, typename AY_, typename AZ_,
-			typename AW_, typename BX_, typename BY_, typename BZ_, typename BW_, class ArgT_
-		>
-		[[nodiscard]] static constexpr inline auto _make_slerp_vector(AX_&& ax_, AY_&& ay_, AZ_&& az_, AW_&& aw_, BX_&& bx_, BY_&& by_, BZ_&& bz_, BW_&& bw_, ArgT_&& t_)
-			-> typename EmuMath::Quaternion<OutT_>::vector_type
-		{
-			using out_quaternion = EmuMath::Quaternion<OutT_>;
-			using ax_uq = typename EmuCore::TMP::remove_ref_cv<AX_>::type;
-			using ay_uq = typename EmuCore::TMP::remove_ref_cv<AY_>::type;
-			using az_uq = typename EmuCore::TMP::remove_ref_cv<AZ_>::type;
-			using aw_uq = typename EmuCore::TMP::remove_ref_cv<AW_>::type;
-			using bx_uq = typename EmuCore::TMP::remove_ref_cv<BX_>::type;
-			using by_uq = typename EmuCore::TMP::remove_ref_cv<BY_>::type;
-			using bz_uq = typename EmuCore::TMP::remove_ref_cv<BZ_>::type;
-			using bw_uq = typename EmuCore::TMP::remove_ref_cv<BW_>::type;
-			using t_uq = typename EmuCore::TMP::remove_ref_cv<ArgT_>::type;
-			using t_fp_arg = typename std::conditional<EmuMath::TMP::is_emu_vector_v<t_uq>, preferred_floating_point, t_uq>::type; // Don't use ArgT_ if non-scalar
-			using out_t_uq = typename EmuCore::TMP::remove_ref_cv<OutT_>::type;
-			using out_fp = typename out_quaternion::preferred_floating_point;
-			using calc_fp = typename EmuCore::TMP::largest_floating_point
-			<
-				ax_uq, ay_uq, az_uq, aw_uq, bx_uq, by_uq, bz_uq, bw_uq, t_fp_arg, out_t_uq, out_fp, preferred_floating_point
-			>::type;
-
-
-			calc_fp ax = static_cast<calc_fp>(std::forward<AX_>(ax_));
-			calc_fp ay = static_cast<calc_fp>(std::forward<AY_>(ay_));
-			calc_fp az = static_cast<calc_fp>(std::forward<AZ_>(az_));
-			calc_fp aw = static_cast<calc_fp>(std::forward<AW_>(aw_));
-			calc_fp bx = static_cast<calc_fp>(std::forward<BX_>(bx_));
-			calc_fp by = static_cast<calc_fp>(std::forward<BY_>(by_));
-			calc_fp bz = static_cast<calc_fp>(std::forward<BZ_>(bz_));
-			calc_fp bw = static_cast<calc_fp>(std::forward<BW_>(bw_));
-
-			// Calculate Dot
-			using mul_func = EmuCore::do_multiply<calc_fp, calc_fp>;
-			calc_fp omega = mul_func()(ax, bx);
-			if constexpr (Fused_)
-			{
-				using fmadd_func = EmuCore::do_fmadd<calc_fp, calc_fp, calc_fp>;
-				omega = fmadd_func()(ay, by, omega);
-				omega = fmadd_func()(az, bz, omega);
-				omega = fmadd_func()(aw, bw, omega);
-			}
-			else
-			{
-				using add_func = EmuCore::do_add<calc_fp, calc_fp>;
-				omega = add_func()(omega, mul_func()(ay, by));
-				omega = add_func()(omega, mul_func()(az, bz));
-				omega = add_func()(omega, mul_func()(aw, bw));
-			}
-
-			// Saturate to -1:1 range, and retrieve acos of saturated dot
-			using clamp_func = EmuCore::do_clamp<calc_fp, calc_fp, calc_fp, calc_fp>;
-			using acos_func = typename std::conditional<IsConstexpr_, EmuCore::do_acos_constexpr<calc_fp>, EmuCore::do_acos<calc_fp>>::type;
-			omega = acos_func()(clamp_func()(omega, calc_fp(-1), calc_fp(1)));
-
-			// Calculate weightings
-			using sin_func = typename std::conditional<IsConstexpr_, EmuCore::do_sin_constexpr<calc_fp>, EmuCore::do_sin<calc_fp>>::type;
-			using div_func = EmuCore::do_divide<calc_fp, calc_fp>;
-			using sub_func = EmuCore::do_subtract<calc_fp, calc_fp>;
-			calc_fp weighting_divisor = sin_func()(omega);
-			calc_fp t = static_cast<calc_fp>(std::forward<ArgT_>(t_));
-			calc_fp ta = div_func()(sin_func()(mul_func()(sub_func()(calc_fp(1), t), omega)), weighting_divisor);
-			calc_fp tb = div_func()(sin_func()(mul_func()(t, omega)), weighting_divisor);
-
-			if constexpr (Fused_)
-			{
-				using fmadd_func = EmuCore::do_fmadd<calc_fp, calc_fp, calc_fp>;
-				return typename out_quaternion::vector_type
-				(
-					fmadd_func()(ax, ta, mul_func()(bx, tb)),
-					fmadd_func()(ay, ta, mul_func()(by, tb)),
-					fmadd_func()(az, ta, mul_func()(bz, tb)),
-					fmadd_func()(aw, ta, mul_func()(bw, tb))
-				);
-			}
-			else
-			{
-				using add_func = EmuCore::do_add<calc_fp, calc_fp>;
-				return typename out_quaternion::vector_type
-				(
-					add_func()(mul_func()(ax, ta), mul_func()(bx, tb)),
-					add_func()(mul_func()(ay, ta), mul_func()(by, tb)),
-					add_func()(mul_func()(az, ta), mul_func()(bz, tb)),
-					add_func()(mul_func()(aw, ta), mul_func()(bw, tb))
-				);
-			}
-		}
-
 		template<typename OutT_, typename X_, typename Y_, typename Z_, typename W_>
 		[[nodiscard]] static constexpr inline typename EmuMath::Quaternion<OutT_>::vector_type _make_conjugate_vector(X_&& x_, Y_&& y_, Z_&& z_, W_&& w_)
 		{
@@ -2277,22 +1992,20 @@ namespace EmuMath
 		/// <returns>Quaternion resulting from the linear interpolation.</returns>
 		template<typename OutT_ = preferred_floating_point, typename BT_>
 		[[nodiscard]] constexpr inline auto Lerp(const EmuMath::Quaternion<BT_>& b_, const preferred_floating_point& t_) const
-			-> std::enable_if_t<valid_lerp_args<OutT_, BT_>(), EmuMath::Quaternion<OutT_>>
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_lerp_valid_args<T_, BT_, const preferred_floating_point&, OutT_, false>(), EmuMath::Quaternion<OutT_>>
 		{
-			return Quaternion<OutT_>
-			(
-				_make_lerp_vector<false, OutT_>(data.at<0>(), data.at<1>(), data.at<2>(), data.at<3>(), b_.at<0>(), b_.at<1>(), b_.at<2>(), b_.at<3>(), t_)
-			);
+			return EmuMath::Helpers::quaternion_lerp<OutT_>(*this, b_, t_);
 		}
 
 		template<typename OutT_ = preferred_floating_point, typename BT_, std::size_t TArgSize_, typename TArgT_>
 		[[nodiscard]] constexpr inline auto Lerp(const EmuMath::Quaternion<BT_>& b_, const EmuMath::Vector<TArgSize_, TArgT_>& t_) const
-			-> std::enable_if_t<valid_lerp_args<OutT_, BT_, TArgSize_, TArgT_>(), EmuMath::Quaternion<OutT_>>
+			-> std::enable_if_t
+			<
+				EmuMath::Helpers::quaternion_lerp_valid_args<T_, BT_, const EmuMath::Vector<TArgSize_, TArgT_>&, OutT_, false>(),
+				EmuMath::Quaternion<OutT_>
+			>
 		{
-			return Quaternion<OutT_>
-			(
-				_make_lerp_vector<false, OutT_>(data.at<0>(), data.at<1>(), data.at<2>(), data.at<3>(), b_.at<0>(), b_.at<1>(), b_.at<2>(), b_.at<3>(), t_)
-			);
+			return EmuMath::Helpers::quaternion_lerp<OutT_>(*this, b_, t_);
 		}
 		
 		/// <summary>
@@ -2309,22 +2022,20 @@ namespace EmuMath
 		/// <returns>Quaternion resulting from the linear interpolation.</returns>
 		template<typename OutT_ = preferred_floating_point, typename BT_>
 		[[nodiscard]] constexpr inline auto FusedLerp(const EmuMath::Quaternion<BT_>& b_, const preferred_floating_point& t_) const
-			-> std::enable_if_t<valid_fused_lerp_args<OutT_, BT_>(), EmuMath::Quaternion<OutT_>>
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_fused_lerp_valid_args<T_, BT_, const preferred_floating_point&, OutT_, false>(), EmuMath::Quaternion<OutT_>>
 		{
-			return Quaternion<OutT_>
-			(
-				_make_lerp_vector<true, OutT_>(data.at<0>(), data.at<1>(), data.at<2>(), data.at<3>(), b_.at<0>(), b_.at<1>(), b_.at<2>(), b_.at<3>(), t_)
-			);
+			return EmuMath::Helpers::quaternion_fused_lerp<OutT_>(*this, b_, t_);
 		}
 
 		template<typename OutT_ = preferred_floating_point, typename BT_, std::size_t TArgSize_, typename TArgT_>
 		[[nodiscard]] constexpr inline auto FusedLerp(const EmuMath::Quaternion<BT_>& b_, const EmuMath::Vector<TArgSize_, TArgT_>& t_) const
-			-> std::enable_if_t<valid_fused_lerp_args<OutT_, BT_, TArgSize_, TArgT_>(), EmuMath::Quaternion<OutT_>>
+			-> std::enable_if_t
+			<
+				EmuMath::Helpers::quaternion_fused_lerp_valid_args<T_, BT_, const EmuMath::Vector<TArgSize_, TArgT_>&, OutT_, false>(),
+				EmuMath::Quaternion<OutT_>
+			>
 		{
-			return Quaternion<OutT_>
-			(
-				_make_lerp_vector<true, OutT_>(data.at<0>(), data.at<1>(), data.at<2>(), data.at<3>(), b_.at<0>(), b_.at<1>(), b_.at<2>(), b_.at<3>(), t_)
-			);
+			return EmuMath::Helpers::quaternion_fused_lerp<OutT_>(*this, b_, t_);
 		}
 
 		/// <summary>
@@ -2337,11 +2048,9 @@ namespace EmuMath
 		/// <returns>Quaternion resulting from the spherical linear interpolation.</returns>
 		template<typename OutT_ = preferred_floating_point, typename BT_>
 		[[nodiscard]] constexpr inline auto Slerp(const EmuMath::Quaternion<BT_>& b_, const preferred_floating_point& t_) const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_slerp_valid_args<T_, BT_, const preferred_floating_point&, OutT_, false>(), EmuMath::Quaternion<OutT_>>
 		{
-			return Quaternion<OutT_>
-			(
-				_make_slerp_vector<false, false, OutT_>(data.at<0>(), data.at<1>(), data.at<2>(), data.at<3>(), b_.at<0>(), b_.at<1>(), b_.at<2>(), b_.at<3>(), t_)
-			);
+			return EmuMath::Helpers::quaternion_slerp<OutT_>(*this, b_, t_);
 		}
 
 		/// <summary>
@@ -2355,11 +2064,9 @@ namespace EmuMath
 		/// <returns>Quaternion resulting from the spherical linear interpolation.</returns>
 		template<typename OutT_ = preferred_floating_point, typename BT_>
 		[[nodiscard]] constexpr inline auto SlerpConstexpr(const EmuMath::Quaternion<BT_>& b_, const preferred_floating_point& t_) const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_slerp_constexpr_valid_args<T_, BT_, preferred_floating_point, OutT_, false>(), EmuMath::Quaternion<OutT_>>
 		{
-			return Quaternion<OutT_>
-			(
-				_make_slerp_vector<false, true, OutT_>(data.at<0>(), data.at<1>(), data.at<2>(), data.at<3>(), b_.at<0>(), b_.at<1>(), b_.at<2>(), b_.at<3>(), t_)
-			);
+			return EmuMath::Helpers::quaternion_slerp_constexpr<OutT_>(*this, b_, t_);
 		}
 
 		/// <summary>
@@ -2376,11 +2083,9 @@ namespace EmuMath
 		/// <returns>Quaternion resulting from the spherical linear interpolation.</returns>
 		template<typename OutT_ = preferred_floating_point, typename BT_>
 		[[nodiscard]] constexpr inline auto FusedSlerp(const EmuMath::Quaternion<BT_>& b_, const preferred_floating_point& t_) const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_fused_slerp_valid_args<T_, BT_, preferred_floating_point, OutT_, false>(), EmuMath::Quaternion<OutT_>>
 		{
-			return Quaternion<OutT_>
-			(
-				_make_slerp_vector<false, false, OutT_>(data.at<0>(), data.at<1>(), data.at<2>(), data.at<3>(), b_.at<0>(), b_.at<1>(), b_.at<2>(), b_.at<3>(), t_)
-			);
+			return EmuMath::Helpers::quaternion_fused_slerp<OutT_>(*this, b_, t_);
 		}
 
 		/// <summary>

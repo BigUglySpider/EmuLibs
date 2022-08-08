@@ -3,5 +3,7 @@
 
 #include "_common_quaternion_helper_includes.h"
 #include "_quaternion_arithmetic.h"
+#include "_quaternion_get.h"
+#include "_quaternion_interpolation.h"
 
 #endif

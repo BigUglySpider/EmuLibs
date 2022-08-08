@@ -3,5 +3,7 @@
 
 #include "../_underlying_helpers/_quaternion_tmp.h"
 #include "../_underlying_helpers/_quaternion_underlying_arithmetic.h"
+#include "../_underlying_helpers/_quaternion_underlying_get.h"
+#include "../_underlying_helpers/_quaternion_underlying_interpolation.h"
 
 #endif

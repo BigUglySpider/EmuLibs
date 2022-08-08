@@ -177,18 +177,28 @@ namespace EmuCore
 		{
 		}
 
-		constexpr inline Value_ operator()(const Value_& value_, const Min_& min_, const Max_& max_) const
+		constexpr inline Out_ operator()(const Value_& value_, const Min_& min_, const Max_& max_) const
 		{
-			if (_cmp_less_min()(value_, min_))
+			// Forced branchless calculation
+			// --- disabled as compilers are likely to optimise branched clamps into conditional moves
+#if false
+			using val_uq = typename EmuCore::TMP::remove_ref_cv<Value_>::type;
+			using min_uq = typename EmuCore::TMP::remove_ref_cv<Min_>::type;
+			using max_uq = typename EmuCore::TMP::remove_ref_cv<Max_>::type;
+			if constexpr (EmuCore::TMP::are_all_check<std::is_arithmetic, val_uq, min_uq, max_uq>::value && !std::is_lvalue_reference_v<Out_>)
 			{
-				// value_ < min_
+				// All arithmetic, so we can do a branchless operation
+				bool below_min = _cmp_less_min()(value_, min_);
+				bool above_max = !below_min && _cmp_greater_max()(value_, max_); // Don't allow both to be true
+				bool in_range = !(below_min || above_max);
+
 				if constexpr (std::is_constructible_v<Out_, const Min_&>)
 				{
-					return Out_(min_);
+					return Out_((value_ * in_range) + (min_ * below_min) + (max_ * above_max));
 				}
 				else if constexpr(EmuCore::TMP::is_static_castable_v<const Min_&, Out_>)
 				{
-					return static_cast<Out_>(min_);
+					return static_cast<Out_>((value_ * in_range) + (min_ * below_min) + (max_ * above_max));
 				}
 				else
 				{
@@ -199,44 +209,69 @@ namespace EmuCore
 					);
 				}
 			}
-			else if (_cmp_greater_max()(value_, max_))
-			{
-				// value_ > max_
-				if constexpr (std::is_constructible_v<Out_, const Max_&>)
-				{
-					return Out_(max_);
-				}
-				else if constexpr(EmuCore::TMP::is_static_castable_v<const Max_&, Out_>)
-				{
-					return static_cast<Out_>(max_);
-				}
-				else
-				{
-					static_assert
-					(
-						EmuCore::TMP::get_false<Out_>(),
-						"Attempted to perform a min-max-value clamp via EmuCore::do_clamp, but the provided Max_ type cannot be output as the desired Out_ type."
-					);
-				}
-			}
 			else
+#endif
 			{
-				// value_ >= min_ && value_ <= max_
-				if constexpr (std::is_constructible_v<Out_, const Value_&>)
+				// Fallback to conditional branching
+				if (_cmp_less_min()(value_, min_))
 				{
-					return Out_(value_);
+					// value_ < min_
+					if constexpr (std::is_constructible_v<Out_, const Min_&>)
+					{
+						return Out_(min_);
+					}
+					else if constexpr(EmuCore::TMP::is_static_castable_v<const Min_&, Out_>)
+					{
+						return static_cast<Out_>(min_);
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<Out_>(),
+							"Attempted to perform a min-max-value clamp via EmuCore::do_clamp, but the provided Min_ type cannot be output as the desired Out_ type."
+						);
+					}
 				}
-				else if constexpr(EmuCore::TMP::is_static_castable_v<const Value_&, Out_>)
+				else if (_cmp_greater_max()(value_, max_))
 				{
-					return static_cast<Out_>(value_);
+					// value_ > max_
+					if constexpr (std::is_constructible_v<Out_, const Max_&>)
+					{
+						return Out_(max_);
+					}
+					else if constexpr(EmuCore::TMP::is_static_castable_v<const Max_&, Out_>)
+					{
+						return static_cast<Out_>(max_);
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<Out_>(),
+							"Attempted to perform a min-max-value clamp via EmuCore::do_clamp, but the provided Max_ type cannot be output as the desired Out_ type."
+						);
+					}
 				}
 				else
 				{
-					static_assert
-					(
-						EmuCore::TMP::get_false<Out_>(),
-						"Attempted to perform a min-max-value clamp via EmuCore::do_clamp, but the provided Value_ type cannot be output as the desired Out_ type."
-					);
+					// value_ >= min_ && value_ <= max_
+					if constexpr (std::is_constructible_v<Out_, const Value_&>)
+					{
+						return Out_(value_);
+					}
+					else if constexpr(EmuCore::TMP::is_static_castable_v<const Value_&, Out_>)
+					{
+						return static_cast<Out_>(value_);
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<Out_>(),
+							"Attempted to perform a min-max-value clamp via EmuCore::do_clamp, but the provided Value_ type cannot be output as the desired Out_ type."
+						);
+					}
 				}
 			}
 		}

@@ -453,7 +453,7 @@ int main()
 	constexpr auto slerp_euler = slerp.ToEulerConstexpr<false>();
 
 
-	constexpr auto slerp2 = EmuMath::Quaternion<float>::from_euler_constexpr<false>(30.0f, 120.0f, 0).SlerpConstexpr(EmuMath::Quaternion<float>::from_euler_constexpr<false>(90.0f, 120.0f, 0.0f), 0.5f);
+	constexpr auto slerp2 = EmuMath::Quaternion<float>::from_euler_constexpr<false>(45.0f, 120.0f, 0).SlerpConstexpr(EmuMath::Quaternion<float>::from_euler_constexpr<false>(90.0f, 120.0f, 0.0f), 0.5f);
 	constexpr auto slerp2_euler = slerp.ToEulerConstexpr<false>();
 
 	auto slerp2_runtime = EmuMath::Quaternion<float>::from_euler<false>(45.0f, 120.0f, 0.0f).Slerp(EmuMath::Quaternion<float>::from_euler<false>(90.0f, 120.0f, 0.0f), 0.5f);
