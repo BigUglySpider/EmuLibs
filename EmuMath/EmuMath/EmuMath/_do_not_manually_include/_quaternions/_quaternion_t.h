@@ -1,7 +1,7 @@
 #ifndef EMU_MATH_QUATERNION_T_H_INC_
 #define EMU_MATH_QUATERNION_T_H_INC_ 1
 
-#include "_underlying_helpers/_quaternion_tmp.h"
+#include "_helpers/_all_helpers.h"
 #include <ostream>
 
 namespace EmuMath
@@ -126,181 +126,17 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region ARITHMETIC_VALIDITY_CHECKS
-	private:
-		template<typename OutT_, bool OutputVector_, bool StaticAssert_>
-		[[nodiscard]] static constexpr inline bool _can_scalar_multiply()
-		{
-			using mul_func = EmuCore::do_multiply<value_type_uq, preferred_floating_point>;
-			if constexpr (!std::is_invocable_v<mul_func, const value_type&, preferred_floating_point>)
-			{
-				static_assert(!StaticAssert_, "Unable to scalar multiply an EmuMath Quaternion as the determined multiplication function cannot be invoked with 2 arguments, being 1: A constant reference to the Quaternion's value_type, 2: The Quaternion's preferred_floating_point type.");
-				return false;
-			}
-			else
-			{
-				using mul_result = typename std::invoke_result<mul_func, const value_type&, preferred_floating_point>::type;
-				using out_quaternion = EmuMath::Quaternion<OutT_>;
-
-				// Split this into a constexpr branch just to avoid the reliance on `vector_type` where it isn't needed
-				if constexpr (OutputVector_)
-				{
-					if constexpr (!std::is_constructible_v<typename out_quaternion::vector_type, mul_result, mul_result, mul_result, mul_result>)
-					{
-						static_assert(!StaticAssert_, "Unable to scalar multiply an EmuMath Quaternion as the underlying vector_type cannot be constructed from 4 instances of the result of the determined multiplication function.");
-						return false;
-					}
-					else
-					{
-						return true;
-					}
-				}
-				else
-				{
-					if constexpr (!std::is_constructible_v<out_quaternion, mul_result, mul_result, mul_result, mul_result>)
-					{
-						// Fallback to vector_type deferred construction
-						using out_vector = typename out_quaternion::vector_type;
-						if constexpr (!(std::is_constructible_v<out_quaternion, out_vector&&> && std::is_constructible_v<out_vector, mul_result, mul_result, mul_result, mul_result>))
-						{
-							static_assert(!StaticAssert_, "Unable to scalar multiply an EmuMath Quaternion as the output Quaternion cannot be constructed from 4 instances of the result of the determined multiplication function, and neither can its vector_type (or the Quaternion cannot be constructed from an rvalue of its vector_type).");
-							return false;
-						}
-						else
-						{
-							return true;
-						}
-					}
-					else
-					{
-						return true;
-					}
-				}
-			}
-		}
-
-		template<typename OutT_, class Lhs_, class Rhs_, bool OutputVector_, bool StaticAssert_>
-		[[nodiscard]] static constexpr inline bool _can_quaternion_multiply()
-		{
-			using rhs_quat_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
-			if constexpr (!EmuMath::TMP::is_emu_quaternion_v<rhs_quat_uq>)
-			{
-				static_assert(!StaticAssert_, "Unable to multiply two EmuMath Quaternions as the passed Rhs_ type is not recognised as an EmuMath Quaternion.");
-				return false;
-			}
-			else
-			{
-				using lhs_quat_uq = typename EmuCore::TMP::remove_ref_cv<Lhs_>::type;
-				using out_quat = EmuMath::Quaternion<OutT_>;
-				using calc_fp = typename EmuCore::TMP::largest_floating_point
-				<
-					typename lhs_quat_uq::preferred_floating_point, typename out_quat::preferred_floating_point, typename rhs_quat_uq::preferred_floating_point
-				>::type;
-
-				constexpr bool lhs_castable =
-				(
-					EmuCore::TMP::is_static_castable_v<decltype(std::declval<Lhs_>().template at<0>()), calc_fp> &&
-					EmuCore::TMP::is_static_castable_v<decltype(std::declval<Lhs_>().template at<1>()), calc_fp> &&
-					EmuCore::TMP::is_static_castable_v<decltype(std::declval<Lhs_>().template at<2>()), calc_fp> &&
-					EmuCore::TMP::is_static_castable_v<decltype(std::declval<Lhs_>().template at<3>()), calc_fp>
-				);
-				if constexpr (!lhs_castable)
-				{
-					static_assert(!StaticAssert_, "Unable to multiply two EmuMath Quaternions as the left-hand Quaternion's values cannot be cast to the determined calculation type.");
-					return false;
-				}
-				else
-				{
-					constexpr bool rhs_castable =
-					(
-						EmuCore::TMP::is_static_castable_v<decltype(std::declval<Rhs_>().template at<0>()), calc_fp> &&
-						EmuCore::TMP::is_static_castable_v<decltype(std::declval<Rhs_>().template at<1>()), calc_fp> &&
-						EmuCore::TMP::is_static_castable_v<decltype(std::declval<Rhs_>().template at<2>()), calc_fp> &&
-						EmuCore::TMP::is_static_castable_v<decltype(std::declval<Rhs_>().template at<3>()), calc_fp>
-					);
-					if constexpr (!rhs_castable)
-					{
-						static_assert(!StaticAssert_, "Unable to multiply two EmuMath Quaternions as the right-hand Quaternion's values cannot be cast to the determined calculation type.");
-						return false;
-					}
-					else
-					{
-						using add_func = EmuCore::do_add<calc_fp, calc_fp>;
-						using sub_func = EmuCore::do_subtract<calc_fp, calc_fp>;
-						using mul_func = EmuCore::do_multiply<calc_fp, calc_fp>;
-
-						if constexpr (!std::is_invocable_r_v<calc_fp, add_func, calc_fp, calc_fp>)
-						{
-							static_assert(!StaticAssert_, "Unable to multiply two EmuMath Quaternions as the determined addition function cannot be invoked with two arguments of the determined calculation type while also outputting the either the determined calculation type or a type implicitly castable to it.");
-							return false;
-						}
-						else if constexpr(!std::is_invocable_r_v<calc_fp, sub_func, calc_fp, calc_fp>)
-						{
-							static_assert(!StaticAssert_, "Unable to multiply two EmuMath Quaternions as the determined subtraction function cannot be invoked with two arguments of the determined calculation type while also outputting the either the determined calculation type or a type implicitly castable to it.");
-							return false;
-						}
-						else if constexpr (!std::is_invocable_r_v<calc_fp, mul_func, calc_fp, calc_fp>)
-						{
-							static_assert(!StaticAssert_, "Unable to multiply two EmuMath Quaternions as the determined multiplication function cannot be invoked with two arguments of the determined calculation type while also outputting the either the determined calculation type or a type implicitly castable to it.");
-							return false;
-						}
-						else
-						{
-							using out_quaternion = EmuMath::Quaternion<OutT_>;
-
-							// Split this into a constexpr branch just to avoid the reliance on `vector_type` where it isn't needed
-							if constexpr (OutputVector_)
-							{
-								if constexpr (!std::is_constructible_v<typename out_quaternion::vector_type, calc_fp&&, calc_fp&&, calc_fp&&, calc_fp&&>)
-								{
-									static_assert(!StaticAssert_, "Unable to multiply two EmuMath Quaternions as the underlying vector_type cannot be constructed from 4 rvalues of the determined calculation type.");
-									return false;
-								}
-								else
-								{
-									return true;
-								}
-							}
-							else
-							{
-								if constexpr (!std::is_constructible_v<out_quaternion, calc_fp&&, calc_fp&&, calc_fp&&, calc_fp&&>)
-								{
-									// Fallback to vector_type deferred construction
-									using out_vector = typename out_quaternion::vector_type;
-									constexpr bool vector_constructible = std::is_constructible_v<out_vector, calc_fp&&, calc_fp&&, calc_fp&&, calc_fp&&>;
-									if constexpr (!(std::is_constructible_v<out_quaternion, out_vector&&> && vector_constructible))
-									{
-										static_assert(!StaticAssert_, "Unable to multiply two EmuMath Quaternions as the output Quaternion cannot be constructed from 4 rvalues of the determined calculation type, and neither can its vector_type (or the Quaternion cannot be constructed from an rvalue of its vector_type).");
-										return false;
-									}
-									else
-									{
-										return true;
-									}
-								}
-								else
-								{
-									return true;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
 	public:
 		template<typename OutT_ = preferred_floating_point>
 		[[nodiscard]] static constexpr inline bool can_scalar_multiply()
 		{
-			return _can_scalar_multiply<OutT_, false, false>();
+			return EmuMath::Helpers::quaternion_can_scalar_multiply<T_, preferred_floating_point, OutT_, false>();
 		}
 
 		template<typename RhsT_, typename OutT_ = preferred_floating_point>
 		[[nodiscard]] static constexpr inline bool can_quaternion_multiply()
 		{
-			using this_ref = const EmuMath::Quaternion<T_>&;
-			using rhs_ref = const EmuMath::Quaternion<RhsT_>&;
-			return _can_quaternion_multiply<OutT_, this_ref, rhs_ref, false, false>();
+			return EmuMath::Helpers::quaternion_can_quaternion_multiply<T_, RhsT_, OutT_, false>();
 		}
 #pragma endregion
 
@@ -1109,14 +945,14 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline auto operator*(const preferred_floating_point& rhs_scalar_) const
 			-> std::enable_if_t<can_scalar_multiply<OutT_>(), EmuMath::Quaternion<OutT_>>
 		{
-			return _multiply_quaternion_by_scalar<false, OutT_>(*this, rhs_scalar_);
+			return EmuMath::Helpers::quaternion_multiply_by_scalar<OutT_>(*this, rhs_scalar_);
 		}
 
 		template<typename OutT_ = preferred_floating_point, typename RhsT_>
 		[[nodiscard]] constexpr inline auto operator*(const EmuMath::Quaternion<RhsT_>& rhs_quaternion_) const
 			-> std::enable_if_t<can_quaternion_multiply<RhsT_, OutT_>(), EmuMath::Quaternion<OutT_>>
 		{
-			return _multiply_quaternion_by_quaternion<false, OutT_>(*this, rhs_quaternion_);
+			return EmuMath::Helpers::quaternion_multiply_by_quaternion<OutT_>(*this, rhs_quaternion_);
 		}
 #pragma endregion
 
@@ -2430,137 +2266,6 @@ namespace EmuMath
 			}
 		}
 
-		template<bool OutputVector_, typename OutT_, typename X_, typename Y_, typename Z_, typename W_>
-		[[nodiscard]] static constexpr inline auto _output_multiply_results(X_&& x_, Y_&& y_, Z_&& z_, W_&& w_)
-			-> typename std::conditional<OutputVector_, typename EmuMath::Quaternion<OutT_>::vector_type, EmuMath::Quaternion<OutT_>>::type
-		{
-			using out_quaternion = EmuMath::Quaternion<OutT_>;
-			if constexpr (OutputVector_)
-			{
-				return typename out_quaternion::vector_type
-				(
-					std::forward<X_>(x_),
-					std::forward<Y_>(y_),
-					std::forward<Z_>(z_),
-					std::forward<W_>(w_)
-				);
-			}
-			else
-			{
-				if constexpr (std::is_constructible_v<out_quaternion, X_&&, Y_&&, Z_&&, W_&&>)
-				{
-					return out_quaternion
-					(
-						std::forward<X_>(x_),
-						std::forward<Y_>(y_),
-						std::forward<Z_>(z_),
-						std::forward<W_>(w_)
-					);
-				}
-				else
-				{
-					// Fallback to construction by vector_type
-					return out_quaternion
-					(
-						std::forward<X_>(x_),
-						std::forward<Y_>(y_),
-						std::forward<Z_>(w_),
-						std::forward<W_>(z_)
-					);
-				}
-			}
-		}
-
-		template<bool OutputVector_, typename OutT_, typename LhsT_, class Rhs_>
-		[[nodiscard]] static constexpr inline auto _multiply_quaternion_by_quaternion(const EmuMath::Quaternion<LhsT_>& lhs_, Rhs_&& rhs_quaternion_)
-			-> typename std::conditional<OutputVector_, typename EmuMath::Quaternion<OutT_>::vector_type, EmuMath::Quaternion<OutT_>>::type
-		{
-			using lhs_quat = const EmuMath::Quaternion<LhsT_>&;
-			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
-			if constexpr(_can_quaternion_multiply<OutT_, lhs_quat, Rhs_, OutputVector_, true>())
-			{
-				using out_quaternion = EmuMath::Quaternion<OutT_>;
-				using calc_fp = typename EmuCore::TMP::largest_floating_point
-				<
-					typename EmuMath::Quaternion<LhsT_>::preferred_floating_point, typename out_quaternion::preferred_floating_point, typename rhs_uq::preferred_floating_point
-				>::type;
-
-				calc_fp lhs_x = static_cast<calc_fp>(lhs_.template at<0>());
-				calc_fp lhs_y = static_cast<calc_fp>(lhs_.template at<1>());
-				calc_fp lhs_z = static_cast<calc_fp>(lhs_.template at<2>());
-				calc_fp lhs_w = static_cast<calc_fp>(lhs_.template at<3>());
-				calc_fp rhs_x = _get_generic_arg<calc_fp, 0>(std::forward<Rhs_>(rhs_quaternion_));
-				calc_fp rhs_y = _get_generic_arg<calc_fp, 1>(std::forward<Rhs_>(rhs_quaternion_));
-				calc_fp rhs_z = _get_generic_arg<calc_fp, 2>(std::forward<Rhs_>(rhs_quaternion_));
-				calc_fp rhs_w = _get_generic_arg<calc_fp, 3>(std::forward<Rhs_>(rhs_quaternion_));
-
-				using add_func = EmuCore::do_add<calc_fp, calc_fp>;
-				using sub_func = EmuCore::do_subtract<calc_fp, calc_fp>;
-				using mul_func = EmuCore::do_multiply<calc_fp, calc_fp>;
-				calc_fp x = sub_func()(mul_func()(lhs_y, rhs_z), mul_func()(lhs_z, rhs_y));
-				x = add_func()(x, mul_func()(lhs_x, rhs_w));
-				x = add_func()(x, mul_func()(lhs_w, rhs_x));
-
-				calc_fp y = sub_func()(mul_func()(lhs_z, rhs_x), mul_func()(lhs_x, rhs_z));
-				y = add_func()(y, mul_func()(lhs_y, rhs_w));
-				y = add_func()(y, mul_func()(lhs_w, rhs_y));
-
-				calc_fp z = sub_func()(mul_func()(lhs_x, rhs_y), mul_func()(lhs_y, rhs_x));
-				z = add_func()(z, mul_func()(lhs_z, rhs_w));
-				z = add_func()(z, mul_func()(lhs_w, rhs_z));
-
-				calc_fp w = sub_func()(mul_func()(lhs_w, rhs_w), mul_func()(lhs_x, rhs_x));
-				w = sub_func()(w, mul_func()(lhs_y, rhs_y));
-				w = sub_func()(w, mul_func()(lhs_z, rhs_z));
-
-				return _output_multiply_results<OutputVector_, OutT_>(std::move(x), std::move(y), std::move(z), std::move(w));
-			}
-			else
-			{
-				static_assert(EmuCore::TMP::get_false<OutT_>(), "Failed to multiply two EmuMath Quaternions. See other static assert messages for more info.");
-			}
-		}
-
-		template<bool OutputVector_, typename OutT_, typename LhsT_, class Rhs_>
-		[[nodiscard]] static constexpr inline auto _multiply_quaternion_by_scalar(const EmuMath::Quaternion<LhsT_>& lhs_, Rhs_&& rhs_scalar_)
-			-> typename std::conditional<OutputVector_, typename EmuMath::Quaternion<OutT_>::vector_type, EmuMath::Quaternion<OutT_>>::type
-		{
-			if constexpr(_can_scalar_multiply<OutT_, OutputVector_, true>())
-			{
-				using out_quaternion = EmuMath::Quaternion<OutT_>;
-				using calc_fp = typename EmuMath::Quaternion<LhsT_>::preferred_floating_point;
-				using mul_func = EmuCore::do_multiply<value_type_uq, calc_fp>;
-
-				const calc_fp rhs = static_cast<calc_fp>(std::forward<Rhs_>(rhs_scalar_));
-				return _output_multiply_results<OutputVector_, OutT_>
-				(
-					mul_func()(lhs_.template at<0>(), rhs),
-					mul_func()(lhs_.template at<1>(), rhs),
-					mul_func()(lhs_.template at<2>(), rhs),
-					mul_func()(lhs_.template at<3>(), rhs)
-				);
-			}
-			else
-			{
-				static_assert(EmuCore::TMP::get_false<OutT_>(), "Failed to multiply an EmuMath Quaternion by a scalar Rhs_ argument. See other static assert messages for more info.");
-			}
-		}
-
-		template<bool OutputVector_, typename OutT_, typename LhsT_, class Rhs_>
-		[[nodiscard]] static constexpr inline auto _multiply_quaternion_by_generic(const EmuMath::Quaternion<LhsT_>& lhs_, Rhs_&& rhs_)
-			-> typename std::conditional<OutputVector_, typename EmuMath::Quaternion<OutT_>::vector_type, EmuMath::Quaternion<OutT_>>::type
-		{
-			using rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
-			if constexpr (EmuMath::TMP::is_emu_quaternion_v<rhs_uq>)
-			{
-				return _multiply_quaternion_by_quaternion<OutputVector_, OutT_>(lhs_, std::forward<Rhs_>(rhs_));
-			}
-			else
-			{
-				return _multiply_quaternion_by_scalar<OutputVector_, OutT_>(lhs_, std::forward<Rhs_>(rhs_));
-			}
-		}
-
 	public:
 		/// <summary>
 		/// <para> Outputs a new Quaternion that is the result of linearly interpolating this Quaternion with Quaternion b_ and a weighting of t_. </para>
@@ -2781,14 +2486,14 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline auto Multiply(const preferred_floating_point& rhs_scalar_) const
 			-> std::enable_if_t<can_scalar_multiply<OutT_>(), EmuMath::Quaternion<OutT_>>
 		{
-			return _multiply_quaternion_by_scalar<false, OutT_>(*this, rhs_scalar_);
+			return EmuMath::Helpers::quaternion_multiply_by_scalar<OutT_>(*this, rhs_scalar_);
 		}
 
 		template<typename OutT_ = preferred_floating_point, typename RhsT_>
 		[[nodiscard]] constexpr inline auto Multiply(const EmuMath::Quaternion<RhsT_>& rhs_quaternion_) const
 			-> std::enable_if_t<can_quaternion_multiply<RhsT_, OutT_>(), EmuMath::Quaternion<OutT_>>
 		{
-			return _multiply_quaternion_by_quaternion<false, OutT_>(*this, rhs_quaternion_);
+			return EmuMath::Helpers::quaternion_multiply_by_quaternion<OutT_>(*this, rhs_quaternion_);
 		}
 #pragma endregion
 
