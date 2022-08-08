@@ -463,6 +463,11 @@ int main()
 	std::cout << "Slerped: " << slerp2_runtime << " | Euler: " << slerp2_runtime_euler << "\n";
 	std::cout << "Fused Slerped: " << slerp2_fused_runtime << " | Euler: " << slerp2_fused_runtime_euler << "\n";
 
+	constexpr auto quat_a = EmuMath::Quaternion<float>::from_euler_constexpr<false>(20, 0, 0);
+	constexpr auto quat_b = EmuMath::Quaternion<float>::from_euler_constexpr<false>(25, 30, 0);
+	constexpr auto quat_ab = quat_a * quat_b;
+	constexpr auto euler_ab = quat_ab.ToEulerConstexpr<false>();
+
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
