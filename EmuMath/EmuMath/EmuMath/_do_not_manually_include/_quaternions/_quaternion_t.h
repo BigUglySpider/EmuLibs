@@ -1538,32 +1538,6 @@ namespace EmuMath
 #pragma region VECTOR_BASED_OPERATIONS
 	public:
 		/// <summary>
-		/// <para> Outputs the squared Norm (aka: Length) of this Quaternion as the specified type (defaulting to this Quaternion's `preferred_floating_point`). </para>
-		/// </summary>
-		/// <returns>The squared Norm of this Quaternion.</returns>
-		template<typename OutT_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline OutT_ SquareNorm() const
-		{
-			return data.SquareMagnitude<OutT_>();
-		}
-
-		/// <summary>
-		/// <para> Outputs the Norm (aka: Length) of this Quaternion as the specified type (defaulting to this Quaternion's `preferred_floating_point`). </para>
-		/// </summary>
-		/// <returns>The Norm of this Quaternion.</returns>
-		template<typename OutT_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline OutT_ Norm() const
-		{
-			return data.Magnitude<OutT_>();
-		}
-
-		template<typename OutT_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline OutT_ NormConstexpr() const
-		{
-			return data.MagnitudeConstexpr<OutT_>();
-		}
-
-		/// <summary>
 		/// <para> Outputs the Unit form of this Quaternion (aka: its normalised form). </para>
 		/// </summary>
 		/// <returns>A normalised copy of this Quaternion.</returns>
@@ -1602,386 +1576,72 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region QUATERNION_OPERATIONS_VALIDITY_CHECKS
-	private:		
-		template<typename OutT_, typename X_, typename Y_, typename Z_, typename W_, bool StaticAssert_>
-		[[nodiscard]] static constexpr inline bool _valid_conjugate_vector_args()
-		{
-			using out_quaternion = EmuMath::Quaternion<OutT_>;
-			using x_uq = typename EmuCore::TMP::remove_ref_cv<X_>::type;
-			using y_uq = typename EmuCore::TMP::remove_ref_cv<Y_>::type;
-			using z_uq = typename EmuCore::TMP::remove_ref_cv<Z_>::type;
-			using w_uq = typename EmuCore::TMP::remove_ref_cv<W_>::type;
-			using out_t_uq = typename EmuCore::TMP::remove_ref_cv<OutT_>::type;
-			using calc_fp = typename EmuCore::TMP::largest_floating_point
-			<
-				out_t_uq, x_uq, y_uq, z_uq, w_uq, typename out_quaternion::preferred_floating_point, preferred_floating_point
-			>::type;
-
-			constexpr bool all_castable =
-			(
-				EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<X_>::type, calc_fp> &&
-				EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<Y_>::type, calc_fp> &&
-				EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<Z_>::type, calc_fp> &&
-				EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<W_>::type, calc_fp>
-			);
-
-			if constexpr (!all_castable)
-			{
-				static_assert
-				(
-					!StaticAssert_,
-					"Invalid Quaternion Conjugate arguments: At least one item out of the X, Y, Z, and W components cannot be converted to the determined calculation type."
-				);
-				return false;
-			}
-			else
-			{
-				using negate_func = EmuCore::do_negate<calc_fp>;
-				if constexpr (!std::is_invocable_v<negate_func, calc_fp>)
-				{
-					static_assert
-					(
-						!StaticAssert_,
-						"Invalid Quaternion Conjugate operation: The determined negation function cannot be invoked with an argument of the determined calculation type."
-					);
-					return false;
-				}
-				else
-				{
-					using negate_result = typename std::invoke_result<negate_func, calc_fp>::type;
-					if constexpr (std::is_void_v<negate_result>)
-					{
-						static_assert
-						(
-							!StaticAssert_,
-							"Invalid Quaternion Conjugate operation: The determined negation function returns `void` when invoked with an argument of the determined calculation type."
-						);
-						return false;
-					}
-					else
-					{
-						using out_vector = typename EmuMath::Quaternion<OutT_>::vector_type;
-						if constexpr (!std::is_constructible_v<out_vector, negate_result, negate_result, negate_result, typename EmuCore::TMP::forward_result<W_>::type>)
-						{
-							static_assert
-							(
-								!StaticAssert_,
-								"Invalid Quaternion Conjugate output type: The underlying Vector cannot be constructed with negated X, Y, Z, and the passed W component, in the order XYZW."
-							);
-							return false;
-						}
-						else
-						{
-							return true;
-						}
-					}
-				}
-			}
-		}
-
-		template<bool PreferMultiplies_, typename OutT_, typename X_, typename Y_, typename Z_, typename W_, typename Norm_, bool StaticAssert_ >
-		[[nodiscard]] static constexpr inline bool _valid_inverse_vector_args()
-		{
-			using out_quaternion = EmuMath::Quaternion<OutT_>;
-			using x_uq = typename EmuCore::TMP::remove_ref_cv<X_>::type;
-			using y_uq = typename EmuCore::TMP::remove_ref_cv<Y_>::type;
-			using z_uq = typename EmuCore::TMP::remove_ref_cv<Z_>::type;
-			using w_uq = typename EmuCore::TMP::remove_ref_cv<W_>::type;
-			using norm_uq = typename EmuCore::TMP::remove_ref_cv<Norm_>::type;
-			using out_t_uq = typename EmuCore::TMP::remove_ref_cv<OutT_>::type;
-			using calc_fp = typename EmuCore::TMP::largest_floating_point
-			<
-				out_t_uq, x_uq, y_uq, z_uq, w_uq, norm_uq, typename out_quaternion::preferred_floating_point, preferred_floating_point
-			>::type;
-
-			constexpr bool all_castable =
-			(
-				EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<X_>::type, calc_fp> &&
-				EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<Y_>::type, calc_fp> &&
-				EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<Z_>::type, calc_fp> &&
-				EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<W_>::type, calc_fp> &&
-				EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<Norm_>::type, calc_fp>
-			);
-
-			if constexpr (!all_castable)
-			{
-				static_assert
-				(
-					!StaticAssert_,
-					"Invalid Quaternion Inverse arguments: At least one item out of the X, Y, Z, and W components and/or the Norm cannot be converted to the determined calculation type."
-				);
-				return false;
-			}
-			else
-			{
-				using negate_func = EmuCore::do_negate<calc_fp>;
-				if constexpr (!std::is_invocable_v<negate_func, calc_fp>)
-				{
-					static_assert
-					(
-						!StaticAssert_,
-						"Invalid Quaternion Inverse operation: The determined negation function cannot be invoked with an argument of the determined calculation type."
-					);
-					return false;
-				}
-				else
-				{
-					using negate_result = typename std::invoke_result<negate_func, calc_fp>::type;
-					if constexpr (std::is_void_v<negate_result>)
-					{
-						static_assert
-						(
-							!StaticAssert_,
-							"Invalid Quaternion Inverse operation: The determined negation function returns `void` when invoked with an argument of the determined calculation type."
-						);
-						return false;
-					}
-					else
-					{
-						if constexpr (PreferMultiplies_)
-						{
-							using reciprocal_func = EmuCore::do_reciprocal<calc_fp>;
-							if constexpr (!std::is_invocable_v<reciprocal_func, calc_fp>)
-							{
-								static_assert
-								(
-									!StaticAssert_,
-									"Invalid Quaternion Inverse operation (With PreferMultiplies_ = true): The determined reciprocal function cannot be invoked with an argument of the determined calculation type."
-								);
-								return false;
-							}
-							else
-							{
-								using reciprocal_result = typename std::invoke_result<reciprocal_func, calc_fp>::type;
-								if constexpr (std::is_void_v<reciprocal_result>)
-								{
-									static_assert
-									(
-										!StaticAssert_,
-										"Invalid Quaternion Inverse operation (With PreferMultiplies_ = true): The determined reciprocal function returns `void` when invoked with an argument of the determined calculation type."
-									);
-									return false;
-								}
-								else
-								{
-									using mul_func = EmuCore::do_multiply<calc_fp, calc_fp>;
-									if constexpr (!std::is_invocable_v<mul_func, calc_fp, calc_fp>)
-									{
-										static_assert
-										(
-											!StaticAssert_,
-											"Invalid Quaternion Inverse operation (With PreferMultiplies_ = true): The determined multiplication function cannot be invoked with two arguments of the determined calculation type."
-										);
-										return false;
-									}
-									else
-									{
-										using mul_result = typename std::invoke_result<mul_func, calc_fp, calc_fp>::type;
-										if constexpr (std::is_void_v<mul_result>)
-										{
-											static_assert
-											(
-												!StaticAssert_,
-												"Invalid Quaternion Inverse operation (With PreferMultiplies_ = true): The determined multiplication function returns `void` when invoked with an argument of the determined calculation type."
-											);
-											return false;
-										}
-										else
-										{
-											return std::is_constructible_v<typename out_quaternion::vector_type, mul_result, mul_result, mul_result, mul_result>;
-										}
-									}
-								}
-							}
-						}
-						else
-						{
-							using div_func = EmuCore::do_divide<calc_fp, calc_fp>;
-							if constexpr (!std::is_invocable_v<div_func, calc_fp, calc_fp>)
-							{
-								static_assert
-								(
-									!StaticAssert_,
-									"Invalid Quaternion Inverse operation (With PreferMultiplies_ = false): The determined division function cannot be invoked with two arguments of the determined calculation type."
-								);
-								return false;
-							}
-							else
-							{
-								using div_result = typename std::invoke_result<div_func, calc_fp, calc_fp>::type;
-								if constexpr (std::is_void_v<div_result>)
-								{
-									static_assert
-									(
-										!StaticAssert_,
-										"Invalid Quaternion Inverse operation (With PreferMultiplies_ = false): The determined division function returns `void` when invoked with an argument of the determined calculation type."
-									);
-									return false;
-								}
-								else
-								{
-									return std::is_constructible_v<typename out_quaternion::vector_type, div_result, div_result, div_result, div_result>;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-	public:
-		template<typename OutT_>
-		[[nodiscard]] static constexpr inline bool valid_conjugate_out_typearg()
-		{
-			using out_quaternion = EmuMath::Quaternion<OutT_>;
-			if constexpr (std::is_constructible_v<out_quaternion, typename out_quaternion::vector_type&&>)
-			{
-				using vector_ref = const vector_type&;
-				return _valid_conjugate_vector_args
-				<
-					OutT_,
-					decltype(std::declval<vector_ref>().template at<0>()),
-					decltype(std::declval<vector_ref>().template at<1>()),
-					decltype(std::declval<vector_ref>().template at<2>()),
-					decltype(std::declval<vector_ref>().template at<3>()),
-					false
-				>();
-			}
-			else
-			{
-				return false;
-			}
-		}
-
-		template<bool PreferMultiplies_, typename OutT_>
-		[[nodiscard]] static constexpr inline bool valid_inverse_args()
-		{
-			using out_quaternion = EmuMath::Quaternion<OutT_>;
-			if constexpr (std::is_constructible_v<out_quaternion, typename out_quaternion::vector_type&&>)
-			{
-				using vector_ref = const vector_type&;
-				return _valid_inverse_vector_args
-				<
-					PreferMultiplies_,
-					OutT_,
-					decltype(std::declval<vector_ref>().template at<0>()),
-					decltype(std::declval<vector_ref>().template at<1>()),
-					decltype(std::declval<vector_ref>().template at<2>()),
-					decltype(std::declval<vector_ref>().template at<3>()),
-					decltype(std::declval<const Quaternion<T_>&>().template Norm<preferred_floating_point>()),
-					false
-				>();
-			}
-			else
-			{
-				return false;
-			}
-		}
-
-		template<typename OutT_>
-		[[nodiscard]] static constexpr inline bool valid_inverse_args()
-		{
-			return valid_inverse_args<false, OutT_>();
-		}
-#pragma endregion
-
 #pragma region QUATERNION_OPERATIONS
-	private:
-		template<typename OutT_, typename X_, typename Y_, typename Z_, typename W_>
-		[[nodiscard]] static constexpr inline typename EmuMath::Quaternion<OutT_>::vector_type _make_conjugate_vector(X_&& x_, Y_&& y_, Z_&& z_, W_&& w_)
+	public:		
+		/// <summary>
+		/// <para> Outputs the squared Norm (aka: Length) of this Quaternion as the specified type (defaulting to this Quaternion's `preferred_floating_point`). </para>
+		/// </summary>
+		/// <returns>The squared Norm of this Quaternion.</returns>
+		template<typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline auto SquareNorm() const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_square_norm<T_, Out_, false>(), Out_>
 		{
-			if constexpr (_valid_conjugate_vector_args<OutT_, X_, Y_, Z_, W_, true>())
-			{
-				using out_quaternion = EmuMath::Quaternion<OutT_>;
-				using x_uq = typename EmuCore::TMP::remove_ref_cv<X_>::type;
-				using y_uq = typename EmuCore::TMP::remove_ref_cv<Y_>::type;
-				using z_uq = typename EmuCore::TMP::remove_ref_cv<Z_>::type;
-				using w_uq = typename EmuCore::TMP::remove_ref_cv<W_>::type;
-				using out_t_uq = typename EmuCore::TMP::remove_ref_cv<OutT_>::type;
-				using calc_fp = typename EmuCore::TMP::largest_floating_point
-				<
-					out_t_uq, x_uq, y_uq, z_uq, w_uq, typename out_quaternion::preferred_floating_point, preferred_floating_point
-				>::type;
-
-				calc_fp x = static_cast<calc_fp>(std::forward<X_>(x_));
-				calc_fp y = static_cast<calc_fp>(std::forward<Y_>(y_));
-				calc_fp z = static_cast<calc_fp>(std::forward<Z_>(z_));
-
-				using negate_func = EmuCore::do_negate<calc_fp>;
-				return typename out_quaternion::vector_type
-				(
-					negate_func()(x),
-					negate_func()(y),
-					negate_func()(z),
-					std::forward<W_>(w_)
-				);
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<OutT_, X_, Y_, Z_, W_>(),
-					"Invalid Quaternion Conjugate operation. See other static assertion messages for more information."
-				);
-			}
+			return EmuMath::Helpers::quaternion_square_norm<Out_>(*this);
 		}
 
-		template<bool PreferMultiplies_, typename OutT_, typename X_, typename Y_, typename Z_, typename W_, typename Norm_ >
-		[[nodiscard]] static constexpr inline typename EmuMath::Quaternion<OutT_>::vector_type _make_inverse_vector(X_&& x_, Y_&& y_, Z_&& z_, W_&& w_, Norm_&& norm_)
+		/// <summary>
+		/// <para> Outputs the squared Norm (aka: Length) of this Quaternion as the specified type (defaulting to this Quaternion's `preferred_floating_point`). </para>
+		/// <para>
+		///		This function will attempt to take advantage of fused instructions (such as FMADD) if possible, or emulate them otherwise. 
+		///		Use of such instructions may improve accuracy and/or performance.
+		/// </para>
+		/// </summary>
+		/// <returns>The squared Norm of this Quaternion.</returns>
+		template<typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline auto FusedSquareNorm() const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_fused_square_norm<T_, Out_, false>(), Out_>
 		{
-			if constexpr(_valid_inverse_vector_args<PreferMultiplies_, OutT_, X_, Y_, Z_, W_, Norm_, true>())
-			{
-				using out_quaternion = EmuMath::Quaternion<OutT_>;
-				using x_uq = typename EmuCore::TMP::remove_ref_cv<X_>::type;
-				using y_uq = typename EmuCore::TMP::remove_ref_cv<Y_>::type;
-				using z_uq = typename EmuCore::TMP::remove_ref_cv<Z_>::type;
-				using w_uq = typename EmuCore::TMP::remove_ref_cv<W_>::type;
-				using norm_uq = typename EmuCore::TMP::remove_ref_cv<Norm_>::type;
-				using out_t_uq = typename EmuCore::TMP::remove_ref_cv<OutT_>::type;
-				using calc_fp = typename EmuCore::TMP::largest_floating_point
-				<
-					out_t_uq, x_uq, y_uq, z_uq, w_uq, norm_uq, typename out_quaternion::preferred_floating_point, preferred_floating_point
-				>::type;
-
-				using negate_func = EmuCore::do_negate<calc_fp>;
-				if constexpr (PreferMultiplies_)
-				{
-					using mul_func = EmuCore::do_multiply<calc_fp, calc_fp>;
-					using reciprocal_func = EmuCore::do_reciprocal<calc_fp>;
-					calc_fp norm_reciprocal = reciprocal_func()(static_cast<calc_fp>(std::forward<Norm_>(norm_)));
-					return typename out_quaternion::vector_type
-					(
-						mul_func()(norm_reciprocal, negate_func()(static_cast<calc_fp>(std::forward<X_>(x_)))),
-						mul_func()(norm_reciprocal, negate_func()(static_cast<calc_fp>(std::forward<Y_>(y_)))),
-						mul_func()(norm_reciprocal, negate_func()(static_cast<calc_fp>(std::forward<Z_>(z_)))),
-						mul_func()(norm_reciprocal, static_cast<calc_fp>(std::forward<W_>(w_)))
-					);
-				}
-				else
-				{
-					using div_func = EmuCore::do_divide<calc_fp, calc_fp>;
-					calc_fp norm = static_cast<calc_fp>(std::forward<Norm_>(norm_));
-					return typename out_quaternion::vector_type
-					(
-						div_func()(negate_func()(static_cast<calc_fp>(std::forward<X_>(x_))), norm),
-						div_func()(negate_func()(static_cast<calc_fp>(std::forward<Y_>(y_))), norm),
-						div_func()(negate_func()(static_cast<calc_fp>(std::forward<Z_>(z_))), norm),
-						div_func()(static_cast<calc_fp>(std::forward<W_>(w_)), norm)
-					);
-				}
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<OutT_, X_, Y_, Z_, W_>(),
-					"Invalid Quaternion Inverse operation. See other static assertion messages for more information."
-				);
-			}
+			return EmuMath::Helpers::quaternion_fused_square_norm<Out_>(*this);
 		}
 
-	public:
+		/// <summary>
+		/// <para> Outputs the Norm (aka: Length) of this Quaternion as the specified type (defaulting to this Quaternion's `preferred_floating_point`). </para>
+		/// </summary>
+		/// <returns>The Norm of this Quaternion.</returns>
+		template<typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline auto Norm() const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_norm<T_, Out_, false>(), Out_>
+		{
+			return EmuMath::Helpers::quaternion_norm<Out_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs the Norm (aka: Length) of this Quaternion as the specified type (defaulting to this Quaternion's `preferred_floating_point`). </para>
+		/// <para>
+		///		This function will attempt to take advantage of fused instructions (such as FMADD) if possible, or emulate them otherwise. 
+		///		Use of such instructions may improve accuracy and/or performance.
+		/// </para>
+		/// </summary>
+		/// <returns>The Norm of this Quaternion.</returns>
+		template<typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline auto FusedNorm() const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_fused_norm<T_, Out_, false>(), Out_>
+		{
+			return EmuMath::Helpers::quaternion_fused_norm<Out_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs the Norm (aka: Length) of this Quaternion as the specified type (defaulting to this Quaternion's `preferred_floating_point`). </para>
+		/// <para> This function will attempt to be constexpr-evaluable, which may have an effect on accuracy and/or performance. </para>
+		/// </summary>
+		/// <returns>The Norm of this Quaternion.</returns>
+		template<typename Out_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline auto NormConstexpr() const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_norm_constexpr<T_, Out_, true>(), Out_>
+		{
+			return EmuMath::Helpers::quaternion_norm_constexpr<Out_>(*this);
+		}
+
 		/// <summary>
 		/// <para> Outputs a new Quaternion that is the result of linearly interpolating this Quaternion with Quaternion b_ and a weighting of t_. </para>
 		/// <para> Typically, Slerp (Spherical linear interpolation) is likely to be preferred for smoother interpolations. </para>
@@ -2095,9 +1755,9 @@ namespace EmuMath
 		/// <returns>Quaternion representing this Quaternion's conjugate.</returns>
 		template<typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline auto Conjugate() const
-			-> std::enable_if_t<valid_conjugate_out_typearg<OutT_>(), Quaternion<OutT_>>
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_conjugate<T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
 		{
-			return Quaternion<OutT_>(_make_conjugate_vector<OutT_>(data.at<0>(), data.at<1>(), data.at<2>(), data.at<3>()));
+			return EmuMath::Helpers::quaternion_conjugate<OutT_>(*this);
 		}
 
 		/// <summary>
@@ -2111,36 +1771,43 @@ namespace EmuMath
 		/// <returns>Quaternion representing the inverse of this Quaternion.</returns>
 		template<bool PreferMultiplies_, typename OutT_ = preferred_floating_point >
 		[[nodiscard]] constexpr inline auto Inverse() const
-			-> std::enable_if_t<valid_inverse_args<PreferMultiplies_, OutT_>(), Quaternion<OutT_>>
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_inverse<PreferMultiplies_, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
 		{
-			return Quaternion<OutT_>
-			(
-				_make_inverse_vector<PreferMultiplies_, OutT_>
-				(
-					data.at<0>(),
-					data.at<1>(),
-					data.at<2>(),
-					data.at<3>(),
-					this->template Norm<preferred_floating_point>()
-				)
-			);
+			return EmuMath::Helpers::quaternion_inverse<PreferMultiplies_, OutT_>(*this);
 		}
 
 		template<typename OutT_ = preferred_floating_point >
 		[[nodiscard]] constexpr inline auto Inverse() const
-			-> std::enable_if_t<valid_inverse_args<false, OutT_>(), Quaternion<OutT_>>
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_inverse<false, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
 		{
-			return Quaternion<OutT_>
-			(
-				_make_inverse_vector<false, OutT_>
-				(
-					data.at<0>(),
-					data.at<1>(),
-					data.at<2>(),
-					data.at<3>(),
-					this->template Norm<preferred_floating_point>()
-				)
-			);
+			return EmuMath::Helpers::quaternion_inverse<false, OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Returns the inverse form of this Quaternion, which is equivalent to its Conjugate normalised. </para>
+		/// <para>
+		///		If this Quaternion is known to have a length of 1, this is mathematically identical to `Conjugate`, 
+		///		although floating-point errors may produce different results.
+		/// </para>
+		/// <para> May optionally choose reciprocal multiplication instead of division for normalisation. If `PreferMultiplies_` is omitted, it will be considered `false`. </para>
+		/// <para>
+		///		This function will attempt to take advantage of fused instructions (such as FMADD) if possible, or emulate them otherwise. 
+		///		Use of such instructions may improve accuracy and/or performance.
+		/// </para>
+		/// </summary>
+		/// <returns>Quaternion representing the inverse of this Quaternion.</returns>
+		template<bool PreferMultiplies_, typename OutT_ = preferred_floating_point >
+		[[nodiscard]] constexpr inline auto FusedInverse() const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_fused_inverse<PreferMultiplies_, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+		{
+			return EmuMath::Helpers::quaternion_fused_inverse<PreferMultiplies_, OutT_>(*this);
+		}
+
+		template<typename OutT_ = preferred_floating_point >
+		[[nodiscard]] constexpr inline auto FusedInverse() const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_fused_inverse<false, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+		{
+			return EmuMath::Helpers::quaternion_fused_inverse<false, OutT_>(*this);
 		}
 
 		/// <summary>
@@ -2155,38 +1822,21 @@ namespace EmuMath
 		/// <returns>Quaternion representing the inverse of this Quaternion.</returns>
 		template<bool PreferMultiplies_, typename OutT_ = preferred_floating_point >
 		[[nodiscard]] constexpr inline auto InverseConstexpr() const
-			-> std::enable_if_t<valid_inverse_args<PreferMultiplies_, OutT_>(), Quaternion<OutT_>>
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_inverse_constexpr<PreferMultiplies_, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
 		{
-			return Quaternion<OutT_>
-			(
-				_make_inverse_vector<PreferMultiplies_, OutT_>
-				(
-					data.at<0>(),
-					data.at<1>(),
-					data.at<2>(),
-					data.at<3>(),
-					this->template NormConstexpr<preferred_floating_point>()
-				)
-			);
+			return EmuMath::Helpers::quaternion_inverse_constexpr<PreferMultiplies_, OutT_>(*this);
 		}
 
 		template<typename OutT_ = preferred_floating_point >
 		[[nodiscard]] constexpr inline auto InverseConstexpr() const
-			-> std::enable_if_t<valid_inverse_args<false, OutT_>(), Quaternion<OutT_>>
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_inverse_constexpr<false, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
 		{
-			return Quaternion<OutT_>
-			(
-				_make_inverse_vector<false, OutT_>
-				(
-					data.at<0>(),
-					data.at<1>(),
-					data.at<2>(),
-					data.at<3>(),
-					this->template NormConstexpr<preferred_floating_point>()
-				)
-			);
+			return EmuMath::Helpers::quaternion_inverse_constexpr<false, OutT_>(*this);
 		}
+#pragma endregion
 
+#pragma region CONST_ARITHMETIC
+	public:
 		template<typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline auto Multiply(const preferred_floating_point& rhs_scalar_) const
 			-> std::enable_if_t<can_scalar_multiply<OutT_>(), EmuMath::Quaternion<OutT_>>

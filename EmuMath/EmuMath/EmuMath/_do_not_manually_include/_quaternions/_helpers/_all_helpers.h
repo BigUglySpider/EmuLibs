@@ -5,5 +5,6 @@
 #include "_quaternion_arithmetic.h"
 #include "_quaternion_get.h"
 #include "_quaternion_interpolation.h"
+#include "_quaternion_quaternion_operations.h"
 
 #endif

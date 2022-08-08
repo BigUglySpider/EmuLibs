@@ -5,5 +5,6 @@
 #include "../_underlying_helpers/_quaternion_underlying_arithmetic.h"
 #include "../_underlying_helpers/_quaternion_underlying_get.h"
 #include "../_underlying_helpers/_quaternion_underlying_interpolation.h"
+#include "../_underlying_helpers/_quaternion_underlying_quaternion_operations.h"
 
 #endif
