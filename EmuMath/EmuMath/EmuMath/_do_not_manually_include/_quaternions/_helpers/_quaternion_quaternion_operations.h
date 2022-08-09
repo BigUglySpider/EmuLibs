@@ -134,6 +134,117 @@ namespace EmuMath::Helpers
 	{
 		return _quaternion_underlying::_valid_inverse_args<false, false, false, true, T_, OutT_, StaticAssert_>();
 	}
+
+	/// <summary>
+	/// <para> Check to see if an EmuMath Quaternion with the typearg T_ can have its Unit form calculated and output as an EmuMath Quaternion with the typearg OutT_. </para>
+	/// <para> If StaticAssert_ is true, this will trigger a static assertion in cases where it returns false. </para>
+	/// </summary>
+	/// <returns>True if the Unity form of a Quaternion with typearg T_  can be calculated and output as a Quaternion with typearg OutT_.</returns>
+	template<bool PreferMultiplies_, typename T_, typename OutT_, bool StaticAssert_ = false>
+	[[nodiscard]] constexpr inline bool quaternion_can_make_unit()
+	{
+		return _quaternion_underlying::_valid_unit_args<false, false, false, false, PreferMultiplies_, OutT_, T_, StaticAssert_>();
+	}
+
+	template<typename T_, typename OutT_, bool StaticAssert_ = false>
+	[[nodiscard]] constexpr inline bool quaternion_can_make_unit()
+	{
+		return _quaternion_underlying::_valid_unit_args<false, false, false, false, false, OutT_, T_, StaticAssert_>();
+	}
+
+	/// <summary>
+	/// <para> 
+	///		Check to see if an EmuMath Quaternion with the typearg T_ can have its Unit form calculated and output as an EmuMath Quaternion with the typearg OutT_,
+	///		using fused operations where possible.
+	/// </para>
+	/// <para> If StaticAssert_ is true, this will trigger a static assertion in cases where it returns false. </para>
+	/// </summary>
+	/// <returns>True if the Unity form of a Quaternion with typearg T_  can be calculated and output as a Quaternion with typearg OutT_.</returns>
+	template<bool PreferMultiplies_, typename T_, typename OutT_, bool StaticAssert_ = false>
+	[[nodiscard]] constexpr inline bool quaternion_can_make_fused_unit()
+	{
+		return _quaternion_underlying::_valid_unit_args<false, false, true, false, PreferMultiplies_, OutT_, T_, StaticAssert_>();
+	}
+
+	template<typename T_, typename OutT_, bool StaticAssert_ = false>
+	[[nodiscard]] constexpr inline bool quaternion_can_make_fused_unit()
+	{
+		return _quaternion_underlying::_valid_unit_args<false, false, true, false, false, OutT_, T_, StaticAssert_>();
+	}
+
+	/// <summary>
+	/// <para>
+	///		Check to see if an EmuMath Quaternion with the typearg T_ can have its Unit form calculated and output as an EmuMath Quaternion with the typearg OutT_ 
+	///		(in a context aiming to be constexpr-evaluable).
+	/// </para>
+	/// <para> If StaticAssert_ is true, this will trigger a static assertion in cases where it returns false. </para>
+	/// </summary>
+	/// <returns>True if the Unity form of a Quaternion with typearg T_  can be calculated and output as a Quaternion with typearg OutT_.</returns>
+	template<bool PreferMultiplies_, typename T_, typename OutT_, bool StaticAssert_ = false>
+	[[nodiscard]] constexpr inline bool quaternion_can_make_unit_constexpr()
+	{
+		return _quaternion_underlying::_valid_unit_args<false, false, false, true, PreferMultiplies_, OutT_, T_, StaticAssert_>();
+	}
+
+	template<typename T_, typename OutT_, bool StaticAssert_ = false>
+	[[nodiscard]] constexpr inline bool quaternion_can_make_unit_constexpr()
+	{
+		return _quaternion_underlying::_valid_unit_args<false, false, false, true, false, OutT_, T_, StaticAssert_>();
+	}
+
+	/// <summary>
+	/// <para> Check to see if an EmuMath Quaternion with the typearg T_ can have its Unit form calculated and assigned to itself. </para>
+	/// <para> If StaticAssert_ is true, this will trigger a static assertion in cases where it returns false. </para>
+	/// </summary>
+	/// <returns>True if the Unity form of a Quaternion with typearg T_  can be calculated and output as a Quaternion with typearg OutT_.</returns>
+	template<bool PreferMultiplies_, typename T_, bool StaticAssert_ = false>
+	[[nodiscard]] constexpr inline bool quaternion_can_assign_unit()
+	{
+		return _quaternion_underlying::_valid_unit_args<true, false, false, false, PreferMultiplies_, T_, T_, StaticAssert_>();
+	}
+
+	template<typename T_, bool StaticAssert_ = false>
+	[[nodiscard]] constexpr inline bool quaternion_can_assign_unit()
+	{
+		return _quaternion_underlying::_valid_unit_args<true, false, false, false, false, T_, T_, StaticAssert_>();
+	}
+
+	/// <summary>
+	/// <para> Check to see if an EmuMath Quaternion with the typearg T_ can have its Unit form calculated and assigned to itself, using fused operations where possible. </para>
+	/// <para> If StaticAssert_ is true, this will trigger a static assertion in cases where it returns false. </para>
+	/// </summary>
+	/// <returns>True if the Unity form of a Quaternion with typearg T_  can be calculated and output as a Quaternion with typearg OutT_.</returns>
+	template<bool PreferMultiplies_, typename T_, bool StaticAssert_ = false>
+	[[nodiscard]] constexpr inline bool quaternion_can_assign_fused_unit()
+	{
+		return _quaternion_underlying::_valid_unit_args<true, false, true, false, PreferMultiplies_, T_, T_, StaticAssert_>();
+	}
+
+	template<typename T_, bool StaticAssert_ = false>
+	[[nodiscard]] constexpr inline bool quaternion_can_assign_fused_unit()
+	{
+		return _quaternion_underlying::_valid_unit_args<true, false, true, false, false, T_, T_, StaticAssert_>();
+	}
+
+	/// <summary>
+	/// <para>
+	///		Check to see if an EmuMath Quaternion with the typearg T_ can have its Unit form calculated and assigned to itself 
+	///		(in a context aiming to be constexpr-evaluable).
+	/// </para>
+	/// <para> If StaticAssert_ is true, this will trigger a static assertion in cases where it returns false. </para>
+	/// </summary>
+	/// <returns>True if the Unity form of a Quaternion with typearg T_  can be calculated and output as a Quaternion with typearg OutT_.</returns>
+	template<bool PreferMultiplies_, typename T_, bool StaticAssert_ = false>
+	[[nodiscard]] constexpr inline bool quaternion_can_assign_unit_constexpr()
+	{
+		return _quaternion_underlying::_valid_unit_args<true, false, false, true, PreferMultiplies_, T_, T_, StaticAssert_>();
+	}
+
+	template<typename T_, bool StaticAssert_ = false>
+	[[nodiscard]] constexpr inline bool quaternion_can_assign_unit_constexpr()
+	{
+		return _quaternion_underlying::_valid_unit_args<true, false, false, true, false, T_, T_, StaticAssert_>();
+	}
 #pragma endregion
 
 #pragma region CONJUGATE_FUNCS
@@ -291,6 +402,136 @@ namespace EmuMath::Helpers
 		return _quaternion_underlying::_make_inverse<false, false, false, true, OutT_>(quaternion_);
 	}
 #pragma endregion
+
+#pragma region UNIT_FUNCS
+	/// <summary>
+	/// <para> Calculates the Unit form (aka the Normalised form) of the input Quaternion. </para>
+	/// <para> May optionally choose to prefer reciprocal multiplication over division. If `PreferMultiplies_` is omitted, it will be treated as `false`. </para>
+	/// </summary>
+	/// <param name="quaternion_">Quaternion to calculate the Unit form of.</param>
+	/// <returns>Unit form of the passed Quaternion.</returns>
+	template<bool PreferMultiplies_, typename OutT_, typename T_>
+	[[nodiscard]] constexpr inline auto quaternion_unit(const EmuMath::Quaternion<T_>& quaternion_)
+		-> std::enable_if_t<quaternion_can_make_unit<PreferMultiplies_, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+	{
+		return _quaternion_underlying::_make_unit<false, false, false, PreferMultiplies_, OutT_>(quaternion_);
+	}
+
+	template<typename OutT_, typename T_>
+	[[nodiscard]] constexpr inline auto quaternion_unit(const EmuMath::Quaternion<T_>& quaternion_)
+		-> std::enable_if_t<quaternion_can_make_unit<false, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+	{
+		return _quaternion_underlying::_make_unit<false, false, false, false, OutT_>(quaternion_);
+	}
+
+	/// <summary>
+	/// <para> Calculates the Unit form (aka the Normalised form) of the input Quaternion. </para>
+	/// <para> May optionally choose to prefer reciprocal multiplication over division. If `PreferMultiplies_` is omitted, it will be treated as `false`. </para>
+	/// <para>
+	///		This function will attempt to take advantage of fused instructions (such as FMADD) if possible, or emulate them otherwise. 
+	///		Use of such instructions may improve accuracy and/or performance.
+	/// </para>
+	/// </summary>
+	/// <param name="quaternion_">Quaternion to calculate the Unit form of.</param>
+	/// <returns>Unit form of the passed Quaternion.</returns>
+	template<bool PreferMultiplies_, typename OutT_, typename T_>
+	[[nodiscard]] constexpr inline auto quaternion_fused_unit(const EmuMath::Quaternion<T_>& quaternion_)
+		-> std::enable_if_t<quaternion_can_make_unit<PreferMultiplies_, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+	{
+		return _quaternion_underlying::_make_unit<false, true, false, PreferMultiplies_, OutT_>(quaternion_);
+	}
+
+	template<typename OutT_, typename T_>
+	[[nodiscard]] constexpr inline auto quaternion_fused_unit(const EmuMath::Quaternion<T_>& quaternion_)
+		-> std::enable_if_t<quaternion_can_make_unit<false, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+	{
+		return _quaternion_underlying::_make_unit<false, true, false, false, OutT_>(quaternion_);
+	}
+
+	/// <summary>
+	/// <para> Calculates the Unit form (aka the Normalised form) of the input Quaternion. </para>
+	/// <para> May optionally choose to prefer reciprocal multiplication over division. If `PreferMultiplies_` is omitted, it will be treated as `false`. </para>
+	/// <para> This function will attempt to be constexpr-evaluable, which may have an effect on accuracy and/or performance. </para>
+	/// </summary>
+	/// <param name="quaternion_">Quaternion to calculate the Unit form of.</param>
+	/// <returns>Unit form of the passed Quaternion.</returns>
+	template<bool PreferMultiplies_, typename OutT_, typename T_>
+	[[nodiscard]] constexpr inline auto quaternion_unit_constexpr(const EmuMath::Quaternion<T_>& quaternion_)
+		-> std::enable_if_t<quaternion_can_make_unit<PreferMultiplies_, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+	{
+		return _quaternion_underlying::_make_unit<false, false, true, PreferMultiplies_, OutT_>(quaternion_);
+	}
+
+	template<typename OutT_, typename T_>
+	[[nodiscard]] constexpr inline auto quaternion_unit_constexpr(const EmuMath::Quaternion<T_>& quaternion_)
+		-> std::enable_if_t<quaternion_can_make_unit<false, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+	{
+		return _quaternion_underlying::_make_unit<false, false, true, false, OutT_>(quaternion_);
+	}
+
+	/// <summary>
+	/// <para> Calculates the Unit form (aka the Normalised form) of the input Quaternion and assigns the result to itself. </para>
+	/// <para> May optionally choose to prefer reciprocal multiplication over division. If `PreferMultiplies_` is omitted, it will be treated as `false`. </para>
+	/// </summary>
+	/// <param name="in_out_quaternion_">Quaternion to calculate the Unit form of and assign the results to.</param>
+	template<bool PreferMultiplies_, typename T_>
+	constexpr inline auto quaternion_assign_unit(EmuMath::Quaternion<T_>& in_out_quaternion_)
+		-> std::enable_if_t<quaternion_can_assign_unit<PreferMultiplies_, T_, false>(), void>
+	{
+		_quaternion_underlying::_assign_unit<false, false, PreferMultiplies_>(in_out_quaternion_);
+	}
+
+	template<typename T_>
+	constexpr inline auto quaternion_assign_unit(EmuMath::Quaternion<T_>& in_out_quaternion_)
+		-> std::enable_if_t<quaternion_can_assign_unit<false, T_, false>(), void>
+	{
+		_quaternion_underlying::_assign_unit<false, false, false>(in_out_quaternion_);
+	}
+
+	/// <summary>
+	/// <para> Calculates the Unit form (aka the Normalised form) of the input Quaternion and assigns the result to itself. </para>
+	/// <para> May optionally choose to prefer reciprocal multiplication over division. If `PreferMultiplies_` is omitted, it will be treated as `false`. </para>
+	/// <para>
+	///		This function will attempt to take advantage of fused instructions (such as FMADD) if possible, or emulate them otherwise. 
+	///		Use of such instructions may improve accuracy and/or performance.
+	/// </para>
+	/// </summary>
+	/// <param name="in_out_quaternion_">Quaternion to calculate the Unit form of and assign the results to.</param>
+	template<bool PreferMultiplies_, typename T_>
+	constexpr inline auto quaternion_assign_fused_unit(EmuMath::Quaternion<T_>& in_out_quaternion_)
+		-> std::enable_if_t<quaternion_can_assign_fused_unit<PreferMultiplies_, T_, false>(), void>
+	{
+		_quaternion_underlying::_assign_unit<true, false, PreferMultiplies_>(in_out_quaternion_);
+	}
+
+	template<typename T_>
+	constexpr inline auto quaternion_assign_fused_unit(EmuMath::Quaternion<T_>& in_out_quaternion_)
+		-> std::enable_if_t<quaternion_can_assign_fused_unit<false, T_, false>(), void>
+	{
+		_quaternion_underlying::_assign_unit<true, false, false>(in_out_quaternion_);
+	}
+
+	/// <summary>
+	/// <para> Calculates the Unit form (aka the Normalised form) of the input Quaternion and assigns the result to itself. </para>
+	/// <para> May optionally choose to prefer reciprocal multiplication over division. If `PreferMultiplies_` is omitted, it will be treated as `false`. </para>
+	/// <para> This function will attempt to be constexpr-evaluable, which may have an effect on accuracy and/or performance. </para>
+	/// </summary>
+	/// <param name="in_out_quaternion_">Quaternion to calculate the Unit form of and assign the results to.</param>
+	template<bool PreferMultiplies_, typename T_>
+	constexpr inline auto quaternion_assign_unit_constexpr(EmuMath::Quaternion<T_>& in_out_quaternion_)
+		-> std::enable_if_t<quaternion_can_assign_unit_constexpr<PreferMultiplies_, T_, false>(), void>
+	{
+		_quaternion_underlying::_assign_unit<false, true, PreferMultiplies_>(in_out_quaternion_);
+	}
+
+	template<typename T_>
+	constexpr inline auto quaternion_assign_unit_constexpr(EmuMath::Quaternion<T_>& in_out_quaternion_)
+		-> std::enable_if_t<quaternion_can_assign_unit_constexpr<false, T_, false>(), void>
+	{
+		_quaternion_underlying::_assign_unit<false, true, false>(in_out_quaternion_);
+	}
+#pragma endregion
 }
 
 #endif
+

@@ -38,73 +38,101 @@ namespace EmuMath::Helpers::_quaternion_underlying
 	template<typename T_>
 	[[nodiscard]] constexpr inline typename EmuMath::Quaternion<T_>::value_type& _get_x(EmuMath::Quaternion<T_>& quaternion)
 	{
-		return _get_index<0>(quaternion);
+		return quaternion.X();
 	}
 
 	template<typename T_>
 	[[nodiscard]] constexpr inline const typename EmuMath::Quaternion<T_>::value_type& _get_x(const EmuMath::Quaternion<T_>& quaternion)
 	{
-		return _get_index<0>(quaternion);
+		return quaternion.X();
 	}
 
 	template<typename T_>
 	[[nodiscard]] constexpr inline typename EmuMath::Quaternion<T_>::value_type& _get_x(EmuMath::Quaternion<T_>&& quaternion)
 	{
-		return _get_index<0>(std::forward<EmuMath::Quaternion<T_>>(quaternion));
+		if constexpr (EmuMath::Quaternion<T_>::contains_ref)
+		{
+			return quaternion.X();
+		}
+		else
+		{
+			return std::move(quaternion.X());
+		}
 	}
 
 	template<typename T_>
 	[[nodiscard]] constexpr inline typename EmuMath::Quaternion<T_>::value_type& _get_y(EmuMath::Quaternion<T_>& quaternion)
 	{
-		return _get_index<1>(quaternion);
+		return quaternion.Y();
 	}
 
 	template<typename T_>
 	[[nodiscard]] constexpr inline const typename EmuMath::Quaternion<T_>::value_type& _get_y(const EmuMath::Quaternion<T_>& quaternion)
 	{
-		return _get_index<1>(quaternion);
+		return quaternion.Y();
 	}
 
 	template<typename T_>
 	[[nodiscard]] constexpr inline typename EmuMath::Quaternion<T_>::value_type& _get_y(EmuMath::Quaternion<T_>&& quaternion)
 	{
-		return _get_index<1>(std::forward<EmuMath::Quaternion<T_>>(quaternion));
+		if constexpr (EmuMath::Quaternion<T_>::contains_ref)
+		{
+			return quaternion.Y();
+		}
+		else
+		{
+			return std::move(quaternion.Y());
+		}
 	}
 
 	template<typename T_>
 	[[nodiscard]] constexpr inline typename EmuMath::Quaternion<T_>::value_type& _get_z(EmuMath::Quaternion<T_>& quaternion)
 	{
-		return _get_index<2>(quaternion);
+		return quaternion.Z();
 	}
 
 	template<typename T_>
 	[[nodiscard]] constexpr inline const typename EmuMath::Quaternion<T_>::value_type& _get_z(const EmuMath::Quaternion<T_>& quaternion)
 	{
-		return _get_index<2>(quaternion);
+		return quaternion.Z();
 	}
 
 	template<typename T_>
 	[[nodiscard]] constexpr inline typename EmuMath::Quaternion<T_>::value_type& _get_z(EmuMath::Quaternion<T_>&& quaternion)
 	{
-		return _get_index<2>(std::forward<EmuMath::Quaternion<T_>>(quaternion));
+		if constexpr (EmuMath::Quaternion<T_>::contains_ref)
+		{
+			return quaternion.Z();
+		}
+		else
+		{
+			return std::move(quaternion.Z());
+		}
 	}
 
 	template<typename T_>
 	[[nodiscard]] constexpr inline typename EmuMath::Quaternion<T_>::value_type& _get_w(EmuMath::Quaternion<T_>& quaternion)
 	{
-		return _get_index<3>(quaternion);
+		return quaternion.W();
 	}
 
 	template<typename T_>
 	[[nodiscard]] constexpr inline const typename EmuMath::Quaternion<T_>::value_type& _get_w(const EmuMath::Quaternion<T_>& quaternion)
 	{
-		return _get_index<3>(quaternion);
+		return quaternion.W();
 	}
 
 	template<typename T_>
 	[[nodiscard]] constexpr inline typename EmuMath::Quaternion<T_>::value_type& _get_w(EmuMath::Quaternion<T_>&& quaternion)
 	{
-		return _get_index<3>(std::forward<EmuMath::Quaternion<T_>>(quaternion));
+		if constexpr (EmuMath::Quaternion<T_>::contains_ref)
+		{
+			return quaternion.W();
+		}
+		else
+		{
+			return std::move(quaternion.W());
+		}
 	}
 #pragma endregion
 
@@ -175,28 +203,232 @@ namespace EmuMath::Helpers::_quaternion_underlying
 		}
 	}
 
+	template<typename Out_, class Arg_, bool StaticAssert_>
+	[[nodiscard]] constexpr inline bool _valid_get_generic_quaternion_x()
+	{
+		if constexpr (std::is_same_v<Arg_, Out_>)
+		{
+			return true;
+		}
+		else
+		{
+			using arg_uq = typename EmuCore::TMP::remove_ref_cv<Arg_>::type;
+			if constexpr (EmuMath::TMP::is_emu_quaternion_v<arg_uq>)
+			{
+				if constexpr (!EmuCore::TMP::is_static_castable_v<decltype(_get_x(std::declval<Arg_>())), Out_>)
+				{
+					static_assert(!StaticAssert_, "Unable to retrieve a generic X argument for an EmuMath Quaternion as a successful conversion to the required type cannot be performed.");
+					return false;
+				}
+				else
+				{
+					return true;
+				}
+			}
+			else
+			{
+				return _valid_get_generic_quaternion_arg<Out_, 0, Arg_, StaticAssert_>();
+			}
+		}
+	}
+
 	template<typename Out_, class Arg_>
 	[[nodiscard]] constexpr inline decltype(auto) _get_generic_quaternion_x(Arg_&& arg_)
 	{
-		return _get_generic_quaternion_arg<Out_, 0>(std::forward<Arg_>(arg_));
+		if constexpr (std::is_same_v<Arg_, Out_>)
+		{
+			return std::forward<Arg_>(arg_);
+		}
+		else
+		{
+			using arg_uq = typename EmuCore::TMP::remove_ref_cv<Arg_>::type;
+			if constexpr (EmuMath::TMP::is_emu_quaternion_v<arg_uq>)
+			{
+				if constexpr (_valid_get_generic_quaternion_x<Out_, Arg_, true>())
+				{
+					return static_cast<Out_>(_get_x(std::forward<Arg_>(arg_)));
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<Out_>(), "Failed to get a generic X argument for an Emuath Quaternion. See other static assert messages for more info.");
+				}
+			}
+			else
+			{
+				return _get_generic_quaternion_arg<Out_, 0>(std::forward<Arg_>(arg_));
+			}
+		}
+	}
+
+	template<typename Out_, class Arg_, bool StaticAssert_>
+	[[nodiscard]] constexpr inline bool _valid_get_generic_quaternion_y()
+	{
+		if constexpr (std::is_same_v<Arg_, Out_>)
+		{
+			return true;
+		}
+		else
+		{
+			using arg_uq = typename EmuCore::TMP::remove_ref_cv<Arg_>::type;
+			if constexpr (EmuMath::TMP::is_emu_quaternion_v<arg_uq>)
+			{
+				if constexpr (!EmuCore::TMP::is_static_castable_v<decltype(_get_y(std::declval<Arg_>())), Out_>)
+				{
+					static_assert(!StaticAssert_, "Unable to retrieve a generic Y argument for an EmuMath Quaternion as a successful conversion to the required type cannot be performed.");
+					return false;
+				}
+				else
+				{
+					return true;
+				}
+			}
+			else
+			{
+				return _valid_get_generic_quaternion_arg<Out_, 1, Arg_, StaticAssert_>();
+			}
+		}
 	}
 
 	template<typename Out_, class Arg_>
 	[[nodiscard]] constexpr inline decltype(auto) _get_generic_quaternion_y(Arg_&& arg_)
 	{
-		return _get_generic_quaternion_arg<Out_, 1>(std::forward<Arg_>(arg_));
+		if constexpr (std::is_same_v<Arg_, Out_>)
+		{
+			return std::forward<Arg_>(arg_);
+		}
+		else
+		{
+			using arg_uq = typename EmuCore::TMP::remove_ref_cv<Arg_>::type;
+			if constexpr (EmuMath::TMP::is_emu_quaternion_v<arg_uq>)
+			{
+				if constexpr (_valid_get_generic_quaternion_y<Out_, Arg_, true>())
+				{
+					return static_cast<Out_>(_get_y(std::forward<Arg_>(arg_)));
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<Out_>(), "Failed to get a generic Y argument for an Emuath Quaternion. See other static assert messages for more info.");
+				}
+			}
+			else
+			{
+				return _get_generic_quaternion_arg<Out_, 1>(std::forward<Arg_>(arg_));
+			}
+		}
+	}
+
+	template<typename Out_, class Arg_, bool StaticAssert_>
+	[[nodiscard]] constexpr inline bool _valid_get_generic_quaternion_z()
+	{
+		if constexpr (std::is_same_v<Arg_, Out_>)
+		{
+			return true;
+		}
+		else
+		{
+			using arg_uq = typename EmuCore::TMP::remove_ref_cv<Arg_>::type;
+			if constexpr (EmuMath::TMP::is_emu_quaternion_v<arg_uq>)
+			{
+				if constexpr (!EmuCore::TMP::is_static_castable_v<decltype(_get_z(std::declval<Arg_>())), Out_>)
+				{
+					static_assert(!StaticAssert_, "Unable to retrieve a generic Z argument for an EmuMath Quaternion as a successful conversion to the required type cannot be performed.");
+					return false;
+				}
+				else
+				{
+					return true;
+				}
+			}
+			else
+			{
+				return _valid_get_generic_quaternion_arg<Out_, 2, Arg_, StaticAssert_>();
+			}
+		}
 	}
 
 	template<typename Out_, class Arg_>
 	[[nodiscard]] constexpr inline decltype(auto) _get_generic_quaternion_z(Arg_&& arg_)
 	{
-		return _get_generic_quaternion_arg<Out_, 2>(std::forward<Arg_>(arg_));
+		if constexpr (std::is_same_v<Arg_, Out_>)
+		{
+			return std::forward<Arg_>(arg_);
+		}
+		else
+		{
+			using arg_uq = typename EmuCore::TMP::remove_ref_cv<Arg_>::type;
+			if constexpr (EmuMath::TMP::is_emu_quaternion_v<arg_uq>)
+			{
+				if constexpr (_valid_get_generic_quaternion_z<Out_, Arg_, true>())
+				{
+					return static_cast<Out_>(_get_z(std::forward<Arg_>(arg_)));
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<Out_>(), "Failed to get a generic Z argument for an Emuath Quaternion. See other static assert messages for more info.");
+				}
+			}
+			else
+			{
+				return _get_generic_quaternion_arg<Out_, 2>(std::forward<Arg_>(arg_));
+			}
+		}
+	}
+
+	template<typename Out_, class Arg_, bool StaticAssert_>
+	[[nodiscard]] constexpr inline bool _valid_get_generic_quaternion_w()
+	{
+		if constexpr (std::is_same_v<Arg_, Out_>)
+		{
+			return true;
+		}
+		else
+		{
+			using arg_uq = typename EmuCore::TMP::remove_ref_cv<Arg_>::type;
+			if constexpr (EmuMath::TMP::is_emu_quaternion_v<arg_uq>)
+			{
+				if constexpr (!EmuCore::TMP::is_static_castable_v<decltype(_get_w(std::declval<Arg_>())), Out_>)
+				{
+					static_assert(!StaticAssert_, "Unable to retrieve a generic W argument for an EmuMath Quaternion as a successful conversion to the required type cannot be performed.");
+					return false;
+				}
+				else
+				{
+					return true;
+				}
+			}
+			else
+			{
+				return _valid_get_generic_quaternion_arg<Out_, 3, Arg_, StaticAssert_>();
+			}
+		}
 	}
 
 	template<typename Out_, class Arg_>
 	[[nodiscard]] constexpr inline decltype(auto) _get_generic_quaternion_w(Arg_&& arg_)
 	{
-		return _get_generic_quaternion_arg<Out_, 3>(std::forward<Arg_>(arg_));
+		if constexpr (std::is_same_v<Arg_, Out_>)
+		{
+			return std::forward<Arg_>(arg_);
+		}
+		else
+		{
+			using arg_uq = typename EmuCore::TMP::remove_ref_cv<Arg_>::type;
+			if constexpr (EmuMath::TMP::is_emu_quaternion_v<arg_uq>)
+			{
+				if constexpr (_valid_get_generic_quaternion_y<Out_, Arg_, true>())
+				{
+					return static_cast<Out_>(_get_w(std::forward<Arg_>(arg_)));
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<Out_>(), "Failed to get a generic W argument for an Emuath Quaternion. See other static assert messages for more info.");
+				}
+			}
+			else
+			{
+				return _get_generic_quaternion_arg<Out_, 3>(std::forward<Arg_>(arg_));
+			}
+		}
 	}
 #pragma endregion
 }

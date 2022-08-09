@@ -417,9 +417,91 @@ namespace EmuMath::Helpers::_quaternion_underlying
 		{
 			static_assert
 			(
-				EmuCore::TMP::get_false<T_>(),
+				!StaticAssert_,
 				"Unable to calculate the normalised inverse of an EmuMath Quaternion as the Norm cannot successfully be calculated. See other static assert messages for more info."
 			);
+		}
+	}
+
+	template<bool Assigning_, bool VectorOut_, bool Fused_, bool IsConstexpr_, bool PreferMultiplies_, typename OutT_, typename T_, bool StaticAssert_>
+	[[nodiscard]] constexpr inline bool _valid_unit_args()
+	{
+		using in_ref = typename std::conditional<Assigning_, EmuMath::Quaternion<T_>&, const EmuMath::Quaternion<T_>&>::type;
+		using out_quaternion = EmuMath::Quaternion<OutT_>;
+		using x_uq = typename EmuCore::TMP::remove_ref_cv<decltype(_get_x(std::declval<in_ref>()))>::type;
+		using y_uq = typename EmuCore::TMP::remove_ref_cv<decltype(_get_y(std::declval<in_ref>()))>::type;
+		using z_uq = typename EmuCore::TMP::remove_ref_cv<decltype(_get_z(std::declval<in_ref>()))>::type;
+		using w_uq = typename EmuCore::TMP::remove_ref_cv<decltype(_get_w(std::declval<in_ref>()))>::type;
+		using out_t_uq = typename EmuCore::TMP::remove_ref_cv<OutT_>::type;
+		using calc_fp = typename EmuCore::TMP::largest_floating_point
+		<
+			out_t_uq, x_uq, y_uq, z_uq, w_uq, typename out_quaternion::preferred_floating_point
+		>::type;
+
+		if constexpr (_valid_norm_args<Fused_, IsConstexpr_, T_, calc_fp, StaticAssert_>())
+		{
+			using div_func = typename std::conditional<PreferMultiplies_, EmuCore::do_multiply<calc_fp, calc_fp>, EmuCore::do_divide<calc_fp, calc_fp>>::type;
+			if constexpr (PreferMultiplies_)
+			{
+				using reciprocal_func = EmuCore::do_reciprocal<calc_fp>;
+				if constexpr (!std::is_invocable_r_v<calc_fp, reciprocal_func, calc_fp>)
+				{
+					static_assert(!StaticAssert_, "Unable to calculate a Unit Quaternion (with PreferMultiplies_ = true) as the determined reciprocal function cannot be invoked with an argument of the determined calculation type while also returning said type.");
+					return false;
+				}
+			}
+
+			if constexpr (!std::is_invocable_v<div_func, calc_fp, calc_fp>)
+			{
+				static_assert(!StaticAssert_, "Unable to calculate a Unit Quaternion as the determined division function cannot be invoked with two arguments of the determined calculation type.");
+				return false;
+			}
+			else
+			{
+				using div_result = typename std::invoke_result<div_func, calc_fp, calc_fp>::type;
+				using out_type = typename std::conditional<VectorOut_, typename out_quaternion::vector_type, out_quaternion>::type;
+				if constexpr (Assigning_)
+				{
+					using out_value_uq = typename out_type::value_type_uq;
+					constexpr bool all_assignable = 
+					(
+						EmuCore::TMP::valid_assign_direct_or_cast<out_value_uq, div_result, decltype(_get_x(std::declval<in_ref>()))>() &&
+						EmuCore::TMP::valid_assign_direct_or_cast<out_value_uq, div_result, decltype(_get_y(std::declval<in_ref>()))>() &&
+						EmuCore::TMP::valid_assign_direct_or_cast<out_value_uq, div_result, decltype(_get_z(std::declval<in_ref>()))>() &&
+						EmuCore::TMP::valid_assign_direct_or_cast<out_value_uq, div_result, decltype(_get_w(std::declval<in_ref>()))>()
+					);
+					if constexpr (!all_assignable)
+					{
+						static_assert(!StaticAssert_, "Unable to calculate a Unit Quaternion as the output Quaternion cannot have its X, Y, Z, and W components individually assigned from the result of respective invocations of the determined division function.");
+						return false;
+					}
+					else
+					{
+						return true;
+					}
+				}
+				else
+				{
+					if constexpr (!std::is_constructible_v<out_type, div_result, div_result, div_result, div_result>)
+					{
+						static_assert(!StaticAssert_, "Unable to calculate a Unit Quaternion as the output data cannot be constructed from 4 results of invoking the determined division function, with arguments representing the X, Y, Z, and W components respectively.");
+						return false;
+					}
+					else
+					{
+						return true;
+					}
+				}
+			}
+		}
+		else
+		{
+			static_assert
+			(
+				!StaticAssert_,
+				"Unable to calculate a Unit Quaternion as the input Quaternion's norm cannot be calculated. See other static assert messages for more info."
+			);
+			return false;
 		}
 	}
 #pragma endregion
@@ -622,6 +704,83 @@ namespace EmuMath::Helpers::_quaternion_underlying
 			_get_w(quaternion_),
 			_make_norm<Fused_, IsConstexpr_, calc_fp>(quaternion_)
 		);
+	}
+#pragma endregion
+
+#pragma region UNIT_FUNCS
+	template<bool Assigning_, bool VectorOut_, bool Fused_, bool IsConstexpr_, bool PreferMultiplies_, typename OutT_, typename InQuaternion_>
+	[[nodiscard]] constexpr inline auto _make_unit_impl(InQuaternion_& quaternion_) // Accepts any lval, but explicit const+typearg may be needed in calls
+		-> typename std::conditional
+		<
+			Assigning_,
+			void,
+			typename std::conditional<VectorOut_, typename EmuMath::Quaternion<OutT_>::vector_type, EmuMath::Quaternion<OutT_>>::type
+		>::type
+	{
+		using in_uq = typename EmuCore::TMP::remove_ref_cv<InQuaternion_>::type;
+		using in_t = typename EmuCore::TMP::type_argument<in_uq>::type;
+		if constexpr(!Assigning_ || !std::is_const_v<InQuaternion_>)
+		{
+			if constexpr (_valid_unit_args<Assigning_, VectorOut_, Fused_, IsConstexpr_, Assigning_, OutT_, in_t, true>())
+			{
+				using out_quaternion = EmuMath::Quaternion<OutT_>;
+				using x_uq = typename EmuCore::TMP::remove_ref_cv<decltype(_get_x(std::forward<InQuaternion_>(quaternion_)))>::type;
+				using y_uq = typename EmuCore::TMP::remove_ref_cv<decltype(_get_y(std::forward<InQuaternion_>(quaternion_)))>::type;
+				using z_uq = typename EmuCore::TMP::remove_ref_cv<decltype(_get_z(std::forward<InQuaternion_>(quaternion_)))>::type;
+				using w_uq = typename EmuCore::TMP::remove_ref_cv<decltype(_get_w(std::forward<InQuaternion_>(quaternion_)))>::type;
+				using out_t_uq = typename EmuCore::TMP::remove_ref_cv<OutT_>::type;
+				using calc_fp = typename EmuCore::TMP::largest_floating_point
+				<
+					out_t_uq, x_uq, y_uq, z_uq, w_uq, typename out_quaternion::preferred_floating_point
+				>::type;
+				calc_fp norm = _make_norm<Fused_, IsConstexpr_, calc_fp>(std::forward<InQuaternion_>(quaternion_));
+				if constexpr (PreferMultiplies_)
+				{
+					norm = EmuCore::do_reciprocal<calc_fp>()(norm);
+				}
+
+				using div_func = typename std::conditional<PreferMultiplies_, EmuCore::do_multiply<calc_fp, calc_fp>, EmuCore::do_divide<calc_fp, calc_fp>>::type;
+				if constexpr (Assigning_)
+				{
+					using in_value_uq = typename in_uq::value_type_uq;
+					EmuCore::TMP::assign_direct_or_cast<in_value_uq>(_get_x(quaternion_), div_func()(_get_x(quaternion_), norm));
+					EmuCore::TMP::assign_direct_or_cast<in_value_uq>(_get_y(quaternion_), div_func()(_get_y(quaternion_), norm));
+					EmuCore::TMP::assign_direct_or_cast<in_value_uq>(_get_z(quaternion_), div_func()(_get_z(quaternion_), norm));
+					EmuCore::TMP::assign_direct_or_cast<in_value_uq>(_get_w(quaternion_), div_func()(_get_w(quaternion_), norm));
+				}
+				else
+				{
+					using out_type = typename std::conditional<VectorOut_, typename out_quaternion::vector_type, out_quaternion>::type;
+					return out_type
+					(
+						div_func()(_get_x(quaternion_), norm),
+						div_func()(_get_y(quaternion_), norm),
+						div_func()(_get_z(quaternion_), norm),
+						div_func()(_get_w(quaternion_), norm)
+					);
+				}
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<OutT_>(), "Failed to calculate a Unit Quaternion. See other static assert messages for more info.");
+			}
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<InQuaternion_>(), "Failed to calculate a Unit Quaternion as it was indicated to output to the input Quaternion, but the Quaternion does not match the requirements (it must be a lvalue, non-const reference).");
+		}
+	}
+
+	template<bool VectorOut_, bool Fused_, bool IsConstexpr_, bool PreferMultiplies_, typename OutT_, typename T_>
+	[[nodiscard]] constexpr inline decltype(auto) _make_unit(const EmuMath::Quaternion<T_>& quaternion_)
+	{
+		return _make_unit_impl<false, VectorOut_, Fused_, IsConstexpr_, PreferMultiplies_, OutT_, const EmuMath::Quaternion<T_>>(quaternion_);
+	}
+
+	template<bool Fused_, bool IsConstexpr_, bool PreferMultiplies_, typename T_>
+	[[nodiscard]] constexpr inline void _assign_unit(EmuMath::Quaternion<T_>& quaternion_)
+	{
+		return _make_unit_impl<true, false, Fused_, IsConstexpr_, PreferMultiplies_, T_, EmuMath::Quaternion<T_>>(quaternion_);
 	}
 #pragma endregion
 }

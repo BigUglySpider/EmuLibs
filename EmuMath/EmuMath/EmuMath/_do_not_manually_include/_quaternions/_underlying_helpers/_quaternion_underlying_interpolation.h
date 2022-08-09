@@ -48,10 +48,10 @@ namespace EmuMath::Helpers::_quaternion_underlying
 			{
 				constexpr bool t_valid = 
 				(
-					_valid_get_generic_quaternion_arg<calc_fp, 0, ArgT_, StaticAssert_>() &&
-					_valid_get_generic_quaternion_arg<calc_fp, 1, ArgT_, StaticAssert_>() &&
-					_valid_get_generic_quaternion_arg<calc_fp, 2, ArgT_, StaticAssert_>() &&
-					_valid_get_generic_quaternion_arg<calc_fp, 3, ArgT_, StaticAssert_>()
+					_valid_get_generic_quaternion_x<calc_fp, ArgT_, StaticAssert_>() &&
+					_valid_get_generic_quaternion_y<calc_fp, ArgT_, StaticAssert_>() &&
+					_valid_get_generic_quaternion_z<calc_fp, ArgT_, StaticAssert_>() &&
+					_valid_get_generic_quaternion_w<calc_fp, ArgT_, StaticAssert_>()
 				);
 				if constexpr (!t_valid)
 				{

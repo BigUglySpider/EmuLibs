@@ -468,6 +468,13 @@ int main()
 	constexpr auto quat_ab = quat_a * quat_b;
 	constexpr auto euler_ab = quat_ab.ToEulerConstexpr<false>();
 
+	auto another_quat = EmuMath::Quaternion<float>(1, 2, 3, 4);
+	std::cout << "\n\n\n---\n" << another_quat << " | " << another_quat.NormConstexpr() << " | ";
+	another_quat.AssignFusedUnit();
+	std::cout << another_quat << " | " << another_quat.FusedNorm() << "\n";
+
+	constexpr auto another_unit = EmuMath::Quaternion<float>(1, 2, 3, 4).UnitConstexpr();
+
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;

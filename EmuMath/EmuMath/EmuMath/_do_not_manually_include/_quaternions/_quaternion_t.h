@@ -1093,6 +1093,62 @@ namespace EmuMath
 		{
 			return Out_(data.at<3>());
 		}
+
+		/// <summary>
+		/// <para> Retrieves a reference to the X component of this Quaternion (i.e. its first imaginary component). </para>
+		/// </summary>
+		/// <returns> Reference to this Quaternion's X component. </returns>
+		[[nodiscard]] constexpr inline value_type& X()
+		{
+			return data.at<0>();
+		}
+
+		[[nodiscard]] constexpr inline const value_type& X() const
+		{
+			return data.at<0>();
+		}
+
+		/// <summary>
+		/// <para> Retrieves a reference to the Y component of this Quaternion (i.e. its second imaginary component). </para>
+		/// </summary>
+		/// <returns> Reference to this Quaternion's Y component. </returns>
+		[[nodiscard]] constexpr inline value_type& Y()
+		{
+			return data.at<1>();
+		}
+
+		[[nodiscard]] constexpr inline const value_type& Y() const
+		{
+			return data.at<1>();
+		}
+
+		/// <summary>
+		/// <para> Retrieves a reference to the Z component of this Quaternion (i.e. its third imaginary component). </para>
+		/// </summary>
+		/// <returns> Reference to this Quaternion's Z component. </returns>
+		[[nodiscard]] constexpr inline value_type& Z()
+		{
+			return data.at<2>();
+		}
+
+		[[nodiscard]] constexpr inline const value_type& Z() const
+		{
+			return data.at<2>();
+		}
+
+		/// <summary>
+		/// <para> Retrieves a reference to the W component of this Quaternion (i.e. its real component). </para>
+		/// </summary>
+		/// <returns> Reference to this Quaternion's W component. </returns>
+		[[nodiscard]] constexpr inline value_type& W()
+		{
+			return data.at<3>();
+		}
+
+		[[nodiscard]] constexpr inline const value_type& W() const
+		{
+			return data.at<3>();
+		}
 #pragma endregion
 
 #pragma region COMPARISON_FUNCS
@@ -1535,47 +1591,6 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region VECTOR_BASED_OPERATIONS
-	public:
-		/// <summary>
-		/// <para> Outputs the Unit form of this Quaternion (aka: its normalised form). </para>
-		/// </summary>
-		/// <returns>A normalised copy of this Quaternion.</returns>
-		template<typename OutT_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline EmuMath::Quaternion<OutT_> Unit() const
-		{
-			return data.Normalise<OutT_>();
-		}
-
-		/// <summary>
-		/// <para> Outputs the Unit form of this Quaternion (aka: its normalised form). </para>
-		/// <para> Relevant operations will be executed under a constexpr-evaluable context where possible. This may affect accuracy and/or performance. </para>
-		/// </summary>
-		/// <returns>A normalised copy of this Quaternion.</returns>
-		template<typename OutT_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline EmuMath::Quaternion<OutT_> UnitConstexpr() const
-		{
-			return data.NormaliseConstexpr<OutT_>();
-		}
-
-		/// <summary>
-		/// <para> Normalises this Quaternion into its Unit form. </para>
-		/// </summary>
-		constexpr inline void NormaliseSelf()
-		{
-			data = data.Normalise<T_>();
-		}
-
-		/// <summary>
-		/// <para> Normalises this Quaternion into its Unit form. </para>
-		/// <para> Relevant operations will be executed under a constexpr-evaluable context where possible. This may affect accuracy and/or performance. </para>
-		/// </summary>
-		constexpr inline void NormaliseSelfConstexpr()
-		{
-			data = data.NormaliseConstexpr<T_>();
-		}
-#pragma endregion
-
 #pragma region QUATERNION_OPERATIONS
 	public:		
 		/// <summary>
@@ -1832,6 +1847,106 @@ namespace EmuMath
 			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_inverse_constexpr<false, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
 		{
 			return EmuMath::Helpers::quaternion_inverse_constexpr<false, OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs the Unit form of this Quaternion (aka: its normalised form). </para>
+		/// <para> May optionally choose to prefer reciprocal multiplication over division. If `PreferMultiplies_` is omitted, it will be treated as `false`. </para>
+		/// </summary>
+		/// <returns>A normalised copy of this Quaternion.</returns>
+		template<bool PreferMultiplies_, typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline auto Unit() const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_unit<PreferMultiplies_, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+		{
+			return EmuMath::Helpers::quaternion_unit<PreferMultiplies_, OutT_>(*this);
+		}
+
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline auto Unit() const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_unit<false, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+		{
+			return EmuMath::Helpers::quaternion_unit<false, OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs the Unit form of this Quaternion (aka: its normalised form). </para>
+		/// <para> May optionally choose to prefer reciprocal multiplication over division. If `PreferMultiplies_` is omitted, it will be treated as `false`. </para>
+		/// <para>
+		///		This function will attempt to take advantage of fused instructions (such as FMADD) if possible, or emulate them otherwise. 
+		///		Use of such instructions may improve accuracy and/or performance.
+		/// </para>
+		/// </summary>
+		/// <returns>A normalised copy of this Quaternion.</returns>
+		template<bool PreferMultiplies_, typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline auto FusedUnit() const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_fused_unit<PreferMultiplies_, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+		{
+			return EmuMath::Helpers::quaternion_fused_unit<PreferMultiplies_, OutT_>(*this);
+		}
+
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline auto FusedUnit() const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_fused_unit<false, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+		{
+			return EmuMath::Helpers::quaternion_fused_unit<false, OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Outputs the Unit form of this Quaternion (aka: its normalised form). </para>
+		/// <para> May optionally choose to prefer reciprocal multiplication over division. If `PreferMultiplies_` is omitted, it will be treated as `false`. </para>
+		/// <para> This function will attempt to be constexpr-evaluable, which may have an effect on accuracy and/or performance. </para>
+		/// </summary>
+		/// <returns>A normalised copy of this Quaternion.</returns>
+		template<bool PreferMultiplies_, typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline auto UnitConstexpr() const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_unit_constexpr<PreferMultiplies_, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+		{
+			return EmuMath::Helpers::quaternion_unit_constexpr<PreferMultiplies_, OutT_>(*this);
+		}
+
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline auto UnitConstexpr() const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_make_unit_constexpr<false, T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+		{
+			return EmuMath::Helpers::quaternion_unit_constexpr<false, OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Normalises and assigns this Quaternion into its Unit form. </para>
+		/// <para> May optionally choose to prefer reciprocal multiplication over division. If `PreferMultiplies_` is omitted, it will be default to `false`. </para>
+		/// </summary>
+		template<bool PreferMultiplies_ = false>
+		constexpr inline auto AssignUnit()
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_assign_unit<PreferMultiplies_, T_, false>(), void>
+		{
+			EmuMath::Helpers::quaternion_assign_unit<PreferMultiplies_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Normalises and assigns this Quaternion into its Unit form. </para>
+		/// <para> May optionally choose to prefer reciprocal multiplication over division. If `PreferMultiplies_` is omitted, it will be default to `false`. </para>
+		/// <para>
+		///		This function will attempt to take advantage of fused instructions (such as FMADD) if possible, or emulate them otherwise. 
+		///		Use of such instructions may improve accuracy and/or performance.
+		/// </para>
+		/// </summary>
+		template<bool PreferMultiplies_ = false>
+		constexpr inline auto AssignFusedUnit()
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_assign_fused_unit<PreferMultiplies_, T_, false>(), void>
+		{
+			EmuMath::Helpers::quaternion_assign_fused_unit<PreferMultiplies_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Normalises and assigns this Quaternion into its Unit form. </para>
+		/// <para> May optionally choose to prefer reciprocal multiplication over division. If `PreferMultiplies_` is omitted, it will be default to `false`. </para>
+		/// <para> This function will attempt to be constexpr-evaluable, which may have an effect on accuracy and/or performance. </para>
+		/// </summary>
+		template<bool PreferMultiplies_ = false>
+		constexpr inline auto AssignUnitConstexpr()
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_assign_unit_constexpr<PreferMultiplies_, T_, false>(), void>
+		{
+			EmuMath::Helpers::quaternion_assign_unit_constexpr<PreferMultiplies_>(*this);
 		}
 #pragma endregion
 
