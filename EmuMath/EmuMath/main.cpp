@@ -476,11 +476,11 @@ int main()
 	constexpr auto another_unit = EmuMath::Quaternion<float>(1, 2, 3, 4).UnitConstexpr();
 
 	auto old_euler = EmuMath::Quaternion<float>(EmuCore::Pi::DegsToRads(45.0), EmuCore::Pi::DegsToRads(45.0), EmuCore::Pi::DegsToRads(45.0));
-	auto new_euler = EmuMath::Quaternion<float>::from_euler(EmuCore::Pi::DegsToRads(45.0), EmuCore::Pi::DegsToRads(45.0), EmuCore::Pi::DegsToRads(45.0));
+	auto new_euler = EmuMath::Quaternion<float>::from_euler(EmuCore::Pi::DegsToRads(163.0), EmuCore::Pi::DegsToRads(233.151), EmuCore::Pi::DegsToRads(-23.157));
 	auto fused_euler = EmuMath::Quaternion<float>::from_euler_fused<false>(45.0, 45.0, 45.0);
 	std::cout << "Old Euler: " << old_euler << "\nNew Euler: " << new_euler << "\nFused Euler: " << fused_euler << "\n\n";
 
-
+	std::cout << "\n\n\n---\nNew Euler: " << new_euler.ToEuler() << "\nFused Euler: " << new_euler.ToEulerFused() << "\nConstexpr Euler: " << new_euler.ToEulerConstexpr() << "\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

@@ -463,13 +463,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 				if constexpr (Assigning_)
 				{
 					using out_value_uq = typename out_type::value_type_uq;
-					constexpr bool all_assignable = 
-					(
-						EmuCore::TMP::valid_assign_direct_or_cast<out_value_uq, div_result, decltype(_get_x(std::declval<in_ref>()))>() &&
-						EmuCore::TMP::valid_assign_direct_or_cast<out_value_uq, div_result, decltype(_get_y(std::declval<in_ref>()))>() &&
-						EmuCore::TMP::valid_assign_direct_or_cast<out_value_uq, div_result, decltype(_get_z(std::declval<in_ref>()))>() &&
-						EmuCore::TMP::valid_assign_direct_or_cast<out_value_uq, div_result, decltype(_get_w(std::declval<in_ref>()))>()
-					);
+					constexpr bool all_assignable =  EmuCore::TMP::valid_assign_direct_or_cast<out_value_uq, div_result, decltype(_get_x(std::declval<in_ref>()))>();
 					if constexpr (!all_assignable)
 					{
 						static_assert(!StaticAssert_, "Unable to calculate a Unit Quaternion as the output Quaternion cannot have its X, Y, Z, and W components individually assigned from the result of respective invocations of the determined division function.");

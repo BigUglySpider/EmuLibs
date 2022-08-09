@@ -785,5 +785,17 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_helpers\_quaternion_conversions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_underlying_helpers\_conversions\_quaternion_underlying_conversion_from_euler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_underlying_helpers\_conversions\_quaternion_underlying_conversion_to_euler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_helpers\_conversions\_quaternion_conversion_from_euler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_helpers\_conversions\_quaternion_conversion_to_euler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
