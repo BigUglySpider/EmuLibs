@@ -482,6 +482,17 @@ int main()
 
 	std::cout << "\n\n\n---\nNew Euler: " << new_euler.ToEuler() << "\nFused Euler: " << new_euler.ToEulerFused() << "\nConstexpr Euler: " << new_euler.ToEulerConstexpr() << "\n";
 
+	std::cout << "Mul:\t\t" << (old_euler * new_euler) << " | Fused Mul: " << old_euler.FusedMultiply(new_euler) << "\n";
+	old_euler.FusedMultiplyAssign(new_euler);
+	std::cout << "FusedMulAssign:\t" << old_euler << "\n\n\n";
+
+	constexpr auto add_a = EmuMath::Helpers::quaternion_from_euler_constexpr<false, float>(30.0f, 25.0f, 10.0f);
+	constexpr auto add_b = EmuMath::Quaternion<double>(1, 2, 3, 4);
+	constexpr auto add_ab = add_a + add_b;
+	constexpr auto unit_ab = add_ab.UnitConstexpr();
+	constexpr auto ab_euler = unit_ab.ToEulerConstexpr<false>();
+
+
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;

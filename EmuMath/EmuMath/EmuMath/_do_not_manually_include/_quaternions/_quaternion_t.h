@@ -45,18 +45,12 @@ namespace EmuMath
 		static constexpr bool contains_non_const_ref = vector_type::contains_non_const_ref;
 #pragma endregion
 
-#pragma region ARITHMETIC_VALIDITY_CHECKS
-	public:
-		template<typename OutT_ = preferred_floating_point>
-		[[nodiscard]] static constexpr inline bool can_scalar_multiply()
+#pragma region DUMMY_TEMPLATE_FUNCS
+	private:
+		template<std::size_t Unused_>
+		[[nodiscard]] static constexpr inline bool _can_scalar_multiply_assign()
 		{
-			return EmuMath::Helpers::quaternion_can_scalar_multiply<T_, preferred_floating_point, OutT_, false>();
-		}
-
-		template<typename RhsT_, typename OutT_ = preferred_floating_point>
-		[[nodiscard]] static constexpr inline bool can_quaternion_multiply()
-		{
-			return EmuMath::Helpers::quaternion_can_quaternion_multiply<T_, RhsT_, OutT_, false>();
+			return Unused_ >= 0 && EmuMath::Helpers::quaternion_can_scalar_multiply_assign<T_, const preferred_floating_point&, false>();
 		}
 #pragma endregion
 
@@ -519,18 +513,51 @@ namespace EmuMath
 
 #pragma region CONST_ARITHMETIC_OPERATORS
 	public:
+		template<typename OutT_ = preferred_floating_point, typename RhsT_>
+		[[nodiscard]] constexpr inline auto operator+(const EmuMath::Quaternion<RhsT_>& rhs_) const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_add<T_, RhsT_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+		{
+			return EmuMath::Helpers::quaternion_add<OutT_>(*this, rhs_);
+		}
+
 		template<typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline auto operator*(const preferred_floating_point& rhs_scalar_) const
-			-> std::enable_if_t<can_scalar_multiply<OutT_>(), EmuMath::Quaternion<OutT_>>
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_scalar_multiply<T_, preferred_floating_point, OutT_, false>(), EmuMath::Quaternion<OutT_>>
 		{
 			return EmuMath::Helpers::quaternion_multiply_by_scalar<OutT_>(*this, rhs_scalar_);
 		}
 
 		template<typename OutT_ = preferred_floating_point, typename RhsT_>
 		[[nodiscard]] constexpr inline auto operator*(const EmuMath::Quaternion<RhsT_>& rhs_quaternion_) const
-			-> std::enable_if_t<can_quaternion_multiply<RhsT_, OutT_>(), EmuMath::Quaternion<OutT_>>
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_quaternion_multiply<T_, RhsT_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
 		{
 			return EmuMath::Helpers::quaternion_multiply_by_quaternion<OutT_>(*this, rhs_quaternion_);
+		}
+#pragma endregion
+
+#pragma region ASSIGNING_ARITHMETIC_OPERATORS
+		template<typename RhsT_>
+		constexpr inline auto operator+=(const EmuMath::Quaternion<RhsT_>& rhs_)
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_add_assign<T_, RhsT_, false>(), this_type&>
+		{
+			EmuMath::Helpers::quaternion_add_assign(*this, rhs_);
+			return *this;
+		}
+
+		template<std::size_t Unused_ = 0>
+		constexpr inline auto operator*=(const preferred_floating_point& rhs_scalar_)
+			-> std::enable_if_t<_can_scalar_multiply_assign<Unused_>(), this_type&>
+		{
+			EmuMath::Helpers::quaternion_multiply_assign_by_scalar(*this, rhs_scalar_);
+			return *this;
+		}
+
+		template<typename RhsT_>
+		constexpr inline auto operator*=(const EmuMath::Quaternion<RhsT_>& rhs_quaternion_)
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_quaternion_multiply_assign<T_, RhsT_, false>(), this_type&>
+		{
+			EmuMath::Helpers::quaternion_multiply_assign_by_quaternion(*this, rhs_quaternion_);
+			return *this;
 		}
 #pragma endregion
 
@@ -761,7 +788,7 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region STATIC_GENERATORS
+#pragma region CONVERSIONS_FROM_EULER
 	public:
 		/// <summary>
 		/// <para> Creates a Quaternion form of the passed Euler angles. </para>
@@ -1570,18 +1597,67 @@ namespace EmuMath
 
 #pragma region CONST_ARITHMETIC
 	public:
+		template<typename OutT_ = preferred_floating_point, typename RhsT_>
+		[[nodiscard]] constexpr inline auto Add(const EmuMath::Quaternion<RhsT_>& rhs_) const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_add<T_, RhsT_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+		{
+			return EmuMath::Helpers::quaternion_add<OutT_>(*this, rhs_);
+		}
+
 		template<typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline auto Multiply(const preferred_floating_point& rhs_scalar_) const
-			-> std::enable_if_t<can_scalar_multiply<OutT_>(), EmuMath::Quaternion<OutT_>>
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_scalar_multiply<T_, const preferred_floating_point&, OutT_, false>, EmuMath::Quaternion<OutT_>>
 		{
 			return EmuMath::Helpers::quaternion_multiply_by_scalar<OutT_>(*this, rhs_scalar_);
 		}
 
 		template<typename OutT_ = preferred_floating_point, typename RhsT_>
 		[[nodiscard]] constexpr inline auto Multiply(const EmuMath::Quaternion<RhsT_>& rhs_quaternion_) const
-			-> std::enable_if_t<can_quaternion_multiply<RhsT_, OutT_>(), EmuMath::Quaternion<OutT_>>
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_quaternion_multiply<T_, RhsT_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
 		{
 			return EmuMath::Helpers::quaternion_multiply_by_quaternion<OutT_>(*this, rhs_quaternion_);
+		}
+
+		template<typename OutT_ = preferred_floating_point, typename RhsT_>
+		[[nodiscard]] constexpr inline auto FusedMultiply(const EmuMath::Quaternion<RhsT_>& rhs_quaternion_) const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_fused_quaternion_multiply<T_, RhsT_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+		{
+			return EmuMath::Helpers::quaternion_multiply_by_quaternion<OutT_>(*this, rhs_quaternion_);
+		}
+#pragma endregion
+
+#pragma region ASSIGNING_ARITHMETIC
+	public:
+		template<typename RhsT_>
+		constexpr inline auto AddAssign(const EmuMath::Quaternion<RhsT_>& rhs_)
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_add_assign<T_, RhsT_, false>(), this_type&>
+		{
+			EmuMath::Helpers::quaternion_add_assign(*this, rhs_);
+			return *this;
+		}
+
+		template<std::size_t Unused_ = 0>
+		constexpr inline auto MultiplyAssign(const preferred_floating_point& rhs_scalar_)
+			-> std::enable_if_t<_can_scalar_multiply_assign<Unused_>(), this_type&>
+		{
+			EmuMath::Helpers::quaternion_multiply_assign_by_scalar(*this, rhs_scalar_);
+			return *this;
+		}
+
+		template<typename RhsT_>
+		constexpr inline auto MultiplyAssign(const EmuMath::Quaternion<RhsT_>& rhs_quaternion_)
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_quaternion_multiply_assign<T_, RhsT_, false>(), this_type&>
+		{
+			EmuMath::Helpers::quaternion_multiply_assign_by_quaternion(*this, rhs_quaternion_);
+			return *this;
+		}
+
+		template<typename RhsT_>
+		constexpr inline auto FusedMultiplyAssign(const EmuMath::Quaternion<RhsT_>& rhs_quaternion_)
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_fused_quaternion_multiply_assign<T_, RhsT_, false>(), this_type&>
+		{
+			EmuMath::Helpers::quaternion_fused_multiply_assign_by_quaternion(*this, rhs_quaternion_);
+			return *this;
 		}
 #pragma endregion
 
