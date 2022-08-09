@@ -137,6 +137,23 @@ namespace EmuMath::Helpers::_quaternion_underlying
 #pragma endregion
 
 #pragma region ARGUMENT_GETS
+	/// <summary>
+	/// <para> Rvalue Vector value extractor for quaternions. Will move the target index if `vector_` 1: contains the index, and 2: does not contain references. </para>
+	/// <para> Outputs a basic `AtTheoretical` call where an index is not moved. </para>
+	/// </summary>
+	template<std::size_t Index_, std::size_t VecSize_, typename VecT_>
+	[[nodiscard]] static constexpr inline decltype(auto) _conditional_quaternion_vector_move_get(EmuMath::Vector<VecSize_, VecT_>&& vector_)
+	{
+		if constexpr (EmuMath::Vector<VecSize_, VecT_>::contains_ref || (Index_ >= VecSize_))
+		{
+			return vector_.template AtTheoretical<Index_>();
+		}
+		else
+		{
+			return std::move(vector_.template at<Index_>());
+		}
+	}
+
 	template<std::size_t Index_, class Arg_>
 	[[nodiscard]] constexpr inline decltype(auto) _get_generic_quaternion_arg(Arg_&& arg_)
 	{

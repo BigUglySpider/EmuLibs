@@ -432,7 +432,7 @@ int main()
 	constexpr auto frm_lr_cnstxpr_nrmlsd = frm_lr_cnstxpr.UnitConstexpr();
 	constexpr auto nrm = frm_lr_cnstxpr.NormConstexpr();
 	auto some_quat = EmuMath::Quaternion<double>::from_euler<false>(45.0, 0, 0);
-	auto&& some_quat_scalar = some_quat.RealScalar<double&>();
+	auto&& some_quat_scalar = some_quat.W();
 	auto some_quat_vector = some_quat.ImaginaryVector<double&>();
 	std::cout << some_quat << " | " << some_quat_scalar << " | " << some_quat_vector << "\n";
 	some_quat = EmuMath::Quaternion<double>::from_euler<false>(45.0, -127.5f, 0.0L);
@@ -474,6 +474,13 @@ int main()
 	std::cout << another_quat << " | " << another_quat.FusedNorm() << "\n";
 
 	constexpr auto another_unit = EmuMath::Quaternion<float>(1, 2, 3, 4).UnitConstexpr();
+
+	auto old_euler = EmuMath::Quaternion<float>(EmuCore::Pi::DegsToRads(45.0), EmuCore::Pi::DegsToRads(45.0), EmuCore::Pi::DegsToRads(45.0));
+	auto new_euler = EmuMath::Quaternion<float>::from_euler(EmuCore::Pi::DegsToRads(45.0), EmuCore::Pi::DegsToRads(45.0), EmuCore::Pi::DegsToRads(45.0));
+	auto fused_euler = EmuMath::Quaternion<float>::from_euler_fused<false>(45.0, 45.0, 45.0);
+	std::cout << "Old Euler: " << old_euler << "\nNew Euler: " << new_euler << "\nFused Euler: " << fused_euler << "\n\n";
+
+
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
