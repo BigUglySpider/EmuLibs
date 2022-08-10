@@ -146,6 +146,8 @@ namespace EmuCore
 		static constexpr T PI_SQR = PI_POW<T, 2>;
 		template<typename T>
 		static constexpr T PI_CUBE = PI_POW<T, 3>;
+		template<typename T_>
+		static constexpr T_ HALF_PI = PI<T_> / T_(2);
 
 		template<typename T_>
 		static constexpr T_ RECIPROCAL_180_DIV_PI = T_(1.0) / HUNDRED80_DIV_PI<T_>;
@@ -422,6 +424,46 @@ namespace EmuCore
 		}
 	}
 
+	template<typename FloatingPointOut_ = float, typename FloatingPointIn_>
+	[[nodiscard]] FloatingPointOut_ DoMatchingAtan2(const FloatingPointIn_ y_, const FloatingPointIn_ x_)
+	{
+		if constexpr (std::is_floating_point_v<FloatingPointOut_>)
+		{
+			if constexpr (std::is_same_v<FloatingPointIn_, float>)
+			{
+				return static_cast<FloatingPointOut_>(atan2f(y_, x_));
+			}
+			else if constexpr (std::is_same_v<FloatingPointIn_, double>)
+			{
+				return static_cast<FloatingPointOut_>(atan2(y_, x_));
+			}
+			else if constexpr (std::is_same_v<FloatingPointIn_, long double>)
+			{
+				return static_cast<FloatingPointOut_>(atan2l(y_, x_));
+			}
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, float>)
+			{
+				return DoMatchingAtan<FloatingPointOut_, float>(static_cast<float>(y_), static_cast<float>(x_));
+			}
+			else if constexpr (EmuCore::TMP::is_static_castable_v<FloatingPointIn_, double>)
+			{
+				return DoMatchingAtan<FloatingPointOut_, double>(static_cast<double>(y_), static_cast<double>(x_));
+			}
+			else if constexpr (std::is_constructible_v<FloatingPointIn_, long double>)
+			{
+				return DoMatchingAtan<FloatingPointOut_, long double>(static_cast<long double>(y_), static_cast<long double>(x_));
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point input type (that cannot be cast to a floating point) to EmuCore::DoMatchingAtan2.");
+			}
+		}
+		else
+		{
+			static_assert(EmuCore::TMP::get_false<FloatingPointIn_>(), "Passed a non-floating-point output type to EmuCore::DoMatchingAtan2. Did you mean to use the do_atan2 functor?");
+		}
+	}
+
 	template<std::size_t Val_, typename T_>
 	struct factorial
 	{
@@ -662,6 +704,24 @@ namespace EmuCore
 	constexpr inline std::int64_t AbsConstexpr(const std::int64_t val_)
 	{
 		return (val_ + (val_ >> 63)) ^ (val_ >> 63);
+	}
+	template<>
+	constexpr inline float AbsConstexpr(const float val_)
+	{
+		bool neg = val_ < 0.0f;
+		return val_ * ((neg * -1) + !neg);
+	}
+	template<>
+	constexpr inline double AbsConstexpr(const double val_)
+	{
+		bool neg = val_ < 0.0;
+		return val_ * ((neg * -1.0) + !neg);
+	}
+	template<>
+	constexpr inline long double AbsConstexpr(const long double val_)
+	{
+		bool neg = val_ < 0.0L;
+		return val_ * ((neg * -1.0L) + !neg);
 	}
 
 	template<typename T_>

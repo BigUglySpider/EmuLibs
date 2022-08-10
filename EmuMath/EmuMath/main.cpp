@@ -10,6 +10,7 @@
 #include "EmuMath/FastNoise.h"
 #include "EmuMath/Matrix.h"
 #include "EmuMath/Noise.h"
+#include "EmuMath/Quaternion.h"
 #include "EmuMath/Random.h"
 #include "EmuMath/Vector.h"
 
@@ -378,6 +379,158 @@ int main()
 	std::cout << irregular_matrix << "\n\n";
 	irregular_matrix.AssignRotation3DZConstexpr<12, true, false>(33);
 	std::cout << irregular_matrix << "\n\n";
+
+	system("pause");
+	std::cout << "\n\n\n\nQUATERNIONS\n";
+	constexpr auto rot_euler = EmuMath::Vector<3, float>
+	(
+		EmuCore::Pi::DegsToRads_v<float, int, 45>,
+		EmuCore::Pi::DegsToRads_v<float, int, 33>,
+		EmuCore::Pi::DegsToRads_v<float, int, 0>
+	);
+
+	constexpr auto quat_default = EmuMath::Quaternion<float>();
+	auto quat_from_euler = EmuMath::Quaternion<float>(rot_euler.at<0>(), rot_euler.at<1>(), rot_euler.at<2>());
+	std::cout << quat_from_euler << "\n";
+	std::cout << quat_from_euler.data.Normalise() << "\n";
+	constexpr auto quat_from_euler_constexpr = EmuMath::Quaternion<float>::from_euler_constexpr<false>(45, 33, 0);
+	constexpr auto quat_from_euler_vector_constexpr = EmuMath::Quaternion<float>::from_euler_constexpr(rot_euler);
+
+	//constexpr auto quat_from_euler_vector_constexpr = EmuMath::Quaternion<float>::from_euler_constexpr(rot_euler);
+
+	constexpr auto a = -0.72301;
+	auto asin_runtime = asin(a);
+
+	constexpr std::size_t test_trig_its = 4;
+	constexpr auto asin_constexpr = EmuCore::do_asin_constexpr<std::remove_const_t<decltype(a)>>()(a);
+	std::cout << "asin: " << asin_runtime << " | asin_constexpr: " << asin_constexpr << "\n";
+
+	auto acos_runtime = acos(a);
+	constexpr auto acos_constexpr = EmuCore::do_acos_constexpr<std::remove_const_t<decltype(a)>>()(a);
+	std::cout << "acos: " << acos_runtime << " | acos_constexpr: " << acos_constexpr << "\n";
+
+	auto atan_runtime = atan(a);
+	constexpr auto atan_constexpr = EmuCore::do_atan_constexpr<std::remove_const_t<decltype(a)>>()(a);
+	std::cout << "atan: " << atan_runtime << " | atan_constexpr: " << atan_constexpr << "\n";
+
+	constexpr auto atan2_y = 17.3f;
+	auto atan2_runtime = atan2(-10, a);
+	constexpr auto atan2_constexpr = EmuCore::do_atan2_constexpr<std::remove_const_t<decltype(a)>>()(-10, a);
+	std::cout << "atan2: " << atan2_runtime << " | atan2_constexpr: " << atan2_constexpr << "\n";
+
+	std::cout << "\n---\n";
+	constexpr auto full_cvt_euler_test = EmuMath::Vector<3, float>(45.0f, -127.5f, 0.0f);
+	std::cout << "Euler: " << full_cvt_euler_test << "\n";
+	std::cout << "Quaternion: " << EmuMath::Quaternion<float>::from_euler<false>(full_cvt_euler_test) << "\n";
+	std::cout << "Euler from Quaternion: " << EmuMath::Quaternion<float>::from_euler<false>(full_cvt_euler_test).ToEuler<false>() << "\n";
+	std::cout << "Quaternion from Euler from Quaternion: " 
+		<< EmuMath::Quaternion<float>::from_euler<false>(EmuMath::Quaternion<float>::from_euler<false>(full_cvt_euler_test).ToEuler<false>()) 
+		<< "\n";
+
+	constexpr auto constexpr_test_a = EmuMath::Quaternion<float>::from_euler_constexpr<false>(full_cvt_euler_test).ToEulerConstexpr<false>();
+	constexpr auto frm_lr_cnstxpr = EmuMath::Quaternion<float>::from_euler_constexpr<false>(full_cvt_euler_test);
+	constexpr auto frm_lr_cnstxpr_nrmlsd = frm_lr_cnstxpr.UnitConstexpr();
+	constexpr auto nrm = frm_lr_cnstxpr.NormConstexpr();
+	auto some_quat = EmuMath::Quaternion<double>::from_euler<false>(45.0, 0, 0);
+	auto&& some_quat_scalar = some_quat.W();
+	auto some_quat_vector = some_quat.ImaginaryVector<double&>();
+	std::cout << some_quat << " | " << some_quat_scalar << " | " << some_quat_vector << "\n";
+	some_quat = EmuMath::Quaternion<double>::from_euler<false>(45.0, -127.5f, 0.0L);
+	std::cout << some_quat << " | " << some_quat_scalar << " | " << some_quat_vector << "\n";
+	constexpr auto frm_lr_cnstxpr_cnjgt = frm_lr_cnstxpr.Conjugate();
+	constexpr auto frm_lr_cnstxpr_nvrs = frm_lr_cnstxpr.InverseConstexpr();
+	constexpr bool equal_boi = frm_lr_cnstxpr_cnjgt == frm_lr_cnstxpr_nvrs;
+
+	constexpr auto not_normed = EmuMath::Quaternion<float>::from_euler_constexpr<false, false>(full_cvt_euler_test);
+	constexpr bool lksdfnsd = not_normed.Conjugate() == frm_lr_cnstxpr_cnjgt;
+	constexpr bool lksdfnsde = not_normed.InverseConstexpr() == frm_lr_cnstxpr_cnjgt;
+
+	constexpr auto lerped = EmuMath::Quaternion<float>(1.0f, -1.0f, 12.0f, 0.0f).Lerp(EmuMath::Quaternion<float>(10.0f, 20.0f, 12.0f, 1337), 0.5f);
+	constexpr auto lerped_with_vec = EmuMath::Quaternion<float>(1.0f, -1.0f, 12.0f, -6.0f).Lerp(EmuMath::Quaternion<float>(10.0f, 20.0f, 12.0f, 1337), EmuMath::Vector<3, float>(1, 2, 0.5));
+	std::cout << "Lerped: " << lerped << " | FusedLerped: " << EmuMath::Quaternion<float>(1, -1, 12, 0).FusedLerp(EmuMath::Quaternion<double>(10, 20, 12, 1337), 0.5L) << "\n\n\n";
+
+	constexpr auto slerp = EmuMath::Quaternion<float>::from_euler_constexpr<false>(45.0f, 0.0f, 0.0f).SlerpConstexpr(EmuMath::Quaternion<float>::from_euler_constexpr<false>(90.0f, 0.0f, 0.0f), 0.5f);
+	constexpr auto slerp_euler = slerp.ToEulerConstexpr<false>();
+
+
+	constexpr auto slerp2 = EmuMath::Quaternion<float>::from_euler_constexpr<false>(45.0f, 120.0f, 0).SlerpConstexpr(EmuMath::Quaternion<float>::from_euler_constexpr<false>(90.0f, 120.0f, 0.0f), 0.5f);
+	constexpr auto slerp2_euler = slerp.ToEulerConstexpr<false>();
+
+	auto slerp2_runtime = EmuMath::Quaternion<float>::from_euler<false>(45.0f, 120.0f, 0.0f).Slerp(EmuMath::Quaternion<float>::from_euler<false>(90.0f, 120.0f, 0.0f), 0.5f);
+	auto slerp2_fused_runtime = EmuMath::Quaternion<float>::from_euler<false>(45.0f, 120.0f, 0.0f).FusedSlerp(EmuMath::Quaternion<float>::from_euler<false>(90.0f, 120.0f, 0.0f), 0.5f);
+	auto slerp2_runtime_euler = slerp2_runtime.ToEuler<false>();
+	auto slerp2_fused_runtime_euler = slerp2_fused_runtime.ToEuler<false>();
+	std::cout << "Slerped: " << slerp2_runtime << " | Euler: " << slerp2_runtime_euler << "\n";
+	std::cout << "Fused Slerped: " << slerp2_fused_runtime << " | Euler: " << slerp2_fused_runtime_euler << "\n";
+
+	constexpr auto quat_a = EmuMath::Quaternion<float>::from_euler_constexpr<false>(20, 0, 0);
+	constexpr auto quat_b = EmuMath::Quaternion<float>::from_euler_constexpr<false>(25, 30, 0);
+	constexpr auto quat_ab = quat_a * quat_b;
+	constexpr auto euler_ab = quat_ab.ToEulerConstexpr<false>();
+
+	auto another_quat = EmuMath::Quaternion<float>(1, 2, 3, 4);
+	std::cout << "\n\n\n---\n" << another_quat << " | " << another_quat.NormConstexpr() << " | ";
+	another_quat.AssignFusedUnit();
+	std::cout << another_quat << " | " << another_quat.FusedNorm() << "\n";
+
+	constexpr auto another_unit = EmuMath::Quaternion<float>(1, 2, 3, 4).UnitConstexpr();
+
+	auto old_euler = EmuMath::Quaternion<float>(EmuCore::Pi::DegsToRads(45.0), EmuCore::Pi::DegsToRads(45.0), EmuCore::Pi::DegsToRads(45.0));
+	auto new_euler = EmuMath::Quaternion<float>::from_euler(EmuCore::Pi::DegsToRads(163.0), EmuCore::Pi::DegsToRads(233.151), EmuCore::Pi::DegsToRads(-23.157));
+	auto fused_euler = EmuMath::Quaternion<float>::from_euler_fused<false>(45.0, 45.0, 45.0);
+	std::cout << "Old Euler: " << old_euler << "\nNew Euler: " << new_euler << "\nFused Euler: " << fused_euler << "\n\n";
+
+	std::cout << "\n\n\n---\nNew Euler: " << new_euler.ToEuler() << "\nFused Euler: " << new_euler.ToEulerFused() << "\nConstexpr Euler: " << new_euler.ToEulerConstexpr() << "\n";
+
+	std::cout << "Mul:\t\t" << (old_euler * new_euler) << " | Fused Mul: " << old_euler.FusedMultiply(new_euler) << "\n";
+	old_euler.FusedMultiplyAssign(new_euler);
+	std::cout << "FusedMulAssign:\t" << old_euler << "\n\n\n";
+
+	constexpr auto add_a = EmuMath::Helpers::quaternion_from_euler_constexpr<false, float>(30.0f, 25.0f, 10.0f);
+	constexpr auto add_b = EmuMath::Quaternion<double>(1, 2, 3, 4);
+	constexpr auto add_ab = add_a + add_b;
+	constexpr auto unit_add_ab = add_ab.UnitConstexpr();
+	constexpr auto add_ab_euler = unit_add_ab.ToEulerConstexpr<false>();
+	auto runtime_add_ab = add_a;
+	std::cout << runtime_add_ab << "\n";
+	runtime_add_ab += add_b;
+	std::cout << runtime_add_ab << "\n";
+
+	constexpr auto sub_a = EmuMath::Helpers::quaternion_from_euler_constexpr<false, float>(30.0f, 25.0f, 10.0f);
+	constexpr auto sub_b = EmuMath::Quaternion<double>(1, 2, 3, 4);
+	constexpr auto sub_ab = sub_a - sub_b;
+	constexpr auto unit_sub_ab = add_ab.UnitConstexpr();
+	constexpr auto sub_ab_euler = unit_sub_ab.ToEulerConstexpr<false>();
+	auto runtime_sub_ab = sub_a;
+	std::cout << runtime_sub_ab << "\n";
+	runtime_sub_ab -= sub_b;
+	std::cout << runtime_sub_ab << "\n";
+
+	constexpr auto neg_a = EmuMath::Helpers::quaternion_from_euler_constexpr<false, float>(30.0f, 25.0f, 10.0f);
+	constexpr auto true_neg_a = -neg_a;
+	auto runtime_neg_a = neg_a;
+	std::cout << runtime_neg_a << "\n";
+	runtime_neg_a.NegateAssign();
+	std::cout << runtime_neg_a << "\n";
+
+	constexpr auto div_a = EmuMath::Helpers::quaternion_from_euler_constexpr<false, float>(30.0f, 25.0f, 10.0f);
+	constexpr auto div_ab = div_a / 10.0f;
+	constexpr auto unit_div_ab = div_ab.UnitConstexpr();
+	constexpr auto div_ab_euler = unit_div_ab.ToEulerConstexpr<false>();
+	auto runtime_div_ab = div_a;
+	std::cout << runtime_div_ab << "\n";
+	runtime_div_ab /= 10.0f;
+	std::cout << runtime_div_ab << "\n";
+
+	constexpr auto mul_a = EmuMath::Helpers::quaternion_from_euler_constexpr<false, float>(30.0f, 25.0f, 10.0f);
+	constexpr auto mul_ab = mul_a * 10.0;
+	constexpr auto unit_mul_ab = mul_ab.UnitConstexpr();
+	constexpr auto mul_ab_euler = unit_mul_ab.ToEulerConstexpr<false>();
+	auto runtime_mul_ab = mul_a;
+	std::cout << runtime_mul_ab << "\n";
+	runtime_mul_ab *= 10.0L;
+	std::cout << runtime_mul_ab << "\n";
+
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

@@ -819,7 +819,7 @@ namespace EmuMath::Helpers::_vector_underlying
 			// Copy EndIndex_:size values if there's anything left
 			if constexpr (EndIndex_ < out_vector_uq::size)
 			{
-				_vector_copy<EndIndex_, out_vector_uq::size, EndIndex_, InVector_>(out_vector_, std::forward<InVector_>(in_vector_));
+				_vector_copy<EndIndex_, out_vector_uq::size, 0, InVector_>(out_vector_, std::forward<InVector_>(in_vector_));
 			}
 		}
 		else
