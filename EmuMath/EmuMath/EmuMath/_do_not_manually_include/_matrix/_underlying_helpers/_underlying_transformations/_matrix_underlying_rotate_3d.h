@@ -684,6 +684,14 @@ namespace EmuMath::Helpers::_matrix_underlying
 		}
 	}
 #pragma endregion
+
+#pragma region QUATERNION_VALIDITY_CHECKS
+	// TODO
+#pragma endregion
+
+#pragma region QUATERNION_MAKERS
+	// TODO
+#pragma endregion
 }
 
 #endif
