@@ -336,3 +336,5 @@ ASALocalRun/
 # Noise Ignores
 *.ppm
 
+# README Ignores
+**/README.md
