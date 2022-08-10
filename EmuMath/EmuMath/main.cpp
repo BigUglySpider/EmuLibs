@@ -489,8 +489,47 @@ int main()
 	constexpr auto add_a = EmuMath::Helpers::quaternion_from_euler_constexpr<false, float>(30.0f, 25.0f, 10.0f);
 	constexpr auto add_b = EmuMath::Quaternion<double>(1, 2, 3, 4);
 	constexpr auto add_ab = add_a + add_b;
-	constexpr auto unit_ab = add_ab.UnitConstexpr();
-	constexpr auto ab_euler = unit_ab.ToEulerConstexpr<false>();
+	constexpr auto unit_add_ab = add_ab.UnitConstexpr();
+	constexpr auto add_ab_euler = unit_add_ab.ToEulerConstexpr<false>();
+	auto runtime_add_ab = add_a;
+	std::cout << runtime_add_ab << "\n";
+	runtime_add_ab += add_b;
+	std::cout << runtime_add_ab << "\n";
+
+	constexpr auto sub_a = EmuMath::Helpers::quaternion_from_euler_constexpr<false, float>(30.0f, 25.0f, 10.0f);
+	constexpr auto sub_b = EmuMath::Quaternion<double>(1, 2, 3, 4);
+	constexpr auto sub_ab = sub_a - sub_b;
+	constexpr auto unit_sub_ab = add_ab.UnitConstexpr();
+	constexpr auto sub_ab_euler = unit_sub_ab.ToEulerConstexpr<false>();
+	auto runtime_sub_ab = sub_a;
+	std::cout << runtime_sub_ab << "\n";
+	runtime_sub_ab -= sub_b;
+	std::cout << runtime_sub_ab << "\n";
+
+	constexpr auto neg_a = EmuMath::Helpers::quaternion_from_euler_constexpr<false, float>(30.0f, 25.0f, 10.0f);
+	constexpr auto true_neg_a = -neg_a;
+	auto runtime_neg_a = neg_a;
+	std::cout << runtime_neg_a << "\n";
+	runtime_neg_a.NegateAssign();
+	std::cout << runtime_neg_a << "\n";
+
+	constexpr auto div_a = EmuMath::Helpers::quaternion_from_euler_constexpr<false, float>(30.0f, 25.0f, 10.0f);
+	constexpr auto div_ab = div_a / 10.0f;
+	constexpr auto unit_div_ab = div_ab.UnitConstexpr();
+	constexpr auto div_ab_euler = unit_div_ab.ToEulerConstexpr<false>();
+	auto runtime_div_ab = div_a;
+	std::cout << runtime_div_ab << "\n";
+	runtime_div_ab /= 10.0f;
+	std::cout << runtime_div_ab << "\n";
+
+	constexpr auto mul_a = EmuMath::Helpers::quaternion_from_euler_constexpr<false, float>(30.0f, 25.0f, 10.0f);
+	constexpr auto mul_ab = mul_a * 10.0;
+	constexpr auto unit_mul_ab = mul_ab.UnitConstexpr();
+	constexpr auto mul_ab_euler = unit_mul_ab.ToEulerConstexpr<false>();
+	auto runtime_mul_ab = mul_a;
+	std::cout << runtime_mul_ab << "\n";
+	runtime_mul_ab *= 10.0L;
+	std::cout << runtime_mul_ab << "\n";
 
 
 	system("pause");

@@ -52,6 +52,18 @@ namespace EmuMath
 		{
 			return Unused_ >= 0 && EmuMath::Helpers::quaternion_can_scalar_multiply_assign<T_, const preferred_floating_point&, false>();
 		}
+
+		template<std::size_t Unused_>
+		[[nodiscard]] static constexpr inline bool _can_negate_assign()
+		{
+			return Unused_ >= 0 && EmuMath::Helpers::quaternion_can_negate_assign<T_, false>();
+		}
+
+		template<std::size_t Unused_>
+		[[nodiscard]] static constexpr inline bool _can_divide_assign()
+		{
+			return Unused_ >= 0 && EmuMath::Helpers::quaternion_can_divide_assign<T_, const preferred_floating_point&, true>();
+		}
 #pragma endregion
 
 #pragma region CONSTRUCTOR_VALIDITY_CHECKS
@@ -520,9 +532,23 @@ namespace EmuMath
 			return EmuMath::Helpers::quaternion_add<OutT_>(*this, rhs_);
 		}
 
+		template<typename OutT_ = preferred_floating_point, typename RhsT_>
+		[[nodiscard]] constexpr inline auto operator-(const EmuMath::Quaternion<RhsT_>& rhs_) const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_subtract<T_, RhsT_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+		{
+			return EmuMath::Helpers::quaternion_subtract<OutT_>(*this, rhs_);
+		}
+
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline auto operator-() const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_negate<T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+		{
+			return EmuMath::Helpers::quaternion_negate<OutT_>(*this);
+		}
+
 		template<typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline auto operator*(const preferred_floating_point& rhs_scalar_) const
-			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_scalar_multiply<T_, preferred_floating_point, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_scalar_multiply<T_, const preferred_floating_point&, OutT_, false>(), EmuMath::Quaternion<OutT_>>
 		{
 			return EmuMath::Helpers::quaternion_multiply_by_scalar<OutT_>(*this, rhs_scalar_);
 		}
@@ -533,6 +559,13 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::quaternion_multiply_by_quaternion<OutT_>(*this, rhs_quaternion_);
 		}
+
+		template<typename OutT_ = preferred_floating_point>
+		constexpr inline auto operator/(const preferred_floating_point& rhs_scalar_) const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_divide<T_, const preferred_floating_point&, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+		{
+			return EmuMath::Helpers::quaternion_divide<OutT_>(*this, rhs_scalar_);
+		}
 #pragma endregion
 
 #pragma region ASSIGNING_ARITHMETIC_OPERATORS
@@ -541,6 +574,14 @@ namespace EmuMath
 			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_add_assign<T_, RhsT_, false>(), this_type&>
 		{
 			EmuMath::Helpers::quaternion_add_assign(*this, rhs_);
+			return *this;
+		}
+
+		template<typename RhsT_>
+		constexpr inline auto operator-=(const EmuMath::Quaternion<RhsT_>& rhs_)
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_subtract_assign<T_, RhsT_, false>(), this_type&>
+		{
+			EmuMath::Helpers::quaternion_subtract_assign(*this, rhs_);
 			return *this;
 		}
 
@@ -557,6 +598,13 @@ namespace EmuMath
 			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_quaternion_multiply_assign<T_, RhsT_, false>(), this_type&>
 		{
 			EmuMath::Helpers::quaternion_multiply_assign_by_quaternion(*this, rhs_quaternion_);
+			return *this;
+		}
+
+		template<std::size_t Unused_ = 0>
+		constexpr inline auto operator/=(const preferred_floating_point& rhs_scalar_)
+		{
+			EmuMath::Helpers::quaternion_divide_assign(*this, rhs_scalar_);
 			return *this;
 		}
 #pragma endregion
@@ -1604,6 +1652,20 @@ namespace EmuMath
 			return EmuMath::Helpers::quaternion_add<OutT_>(*this, rhs_);
 		}
 
+		template<typename OutT_ = preferred_floating_point, typename RhsT_>
+		[[nodiscard]] constexpr inline auto Subtract(const EmuMath::Quaternion<RhsT_>& rhs_) const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_subtract<T_, RhsT_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+		{
+			return EmuMath::Helpers::quaternion_subtract<OutT_>(*this, rhs_);
+		}
+
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline auto Negate() const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_negate<T_, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+		{
+			return EmuMath::Helpers::quaternion_negate<OutT_>(*this);
+		}
+
 		template<typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline auto Multiply(const preferred_floating_point& rhs_scalar_) const
 			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_scalar_multiply<T_, const preferred_floating_point&, OutT_, false>, EmuMath::Quaternion<OutT_>>
@@ -1624,6 +1686,13 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::quaternion_multiply_by_quaternion<OutT_>(*this, rhs_quaternion_);
 		}
+
+		template<typename OutT_ = preferred_floating_point>
+		constexpr inline auto Divide(const preferred_floating_point& rhs_scalar_) const
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_divide<T_, const preferred_floating_point&, OutT_, false>(), EmuMath::Quaternion<OutT_>>
+		{
+			return EmuMath::Helpers::quaternion_divide<OutT_>(*this, rhs_scalar_);
+		}
 #pragma endregion
 
 #pragma region ASSIGNING_ARITHMETIC
@@ -1633,6 +1702,22 @@ namespace EmuMath
 			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_add_assign<T_, RhsT_, false>(), this_type&>
 		{
 			EmuMath::Helpers::quaternion_add_assign(*this, rhs_);
+			return *this;
+		}
+
+		template<typename RhsT_>
+		constexpr inline auto SubtractAssign(const EmuMath::Quaternion<RhsT_>& rhs_)
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_subtract_assign<T_, RhsT_, false>(), this_type&>
+		{
+			EmuMath::Helpers::quaternion_subtract_assign(*this, rhs_);
+			return *this;
+		}
+
+		template<std::size_t Unused_ = 0>
+		constexpr inline auto NegateAssign()
+			-> std::enable_if_t<_can_negate_assign<Unused_>(), this_type&>
+		{
+			EmuMath::Helpers::quaternion_negate_assign(*this);
 			return *this;
 		}
 
@@ -1657,6 +1742,14 @@ namespace EmuMath
 			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_fused_quaternion_multiply_assign<T_, RhsT_, false>(), this_type&>
 		{
 			EmuMath::Helpers::quaternion_fused_multiply_assign_by_quaternion(*this, rhs_quaternion_);
+			return *this;
+		}
+
+		template<std::size_t Unused_>
+		constexpr inline auto DivideAssign(const preferred_floating_point& rhs_scalar_)
+			-> std::enable_if_t<_can_divide_assign<Unused_>(), this_type&>
+		{
+			EmuMath::Helpers::quaternion_divide_assign(*this, rhs_scalar_);
 			return *this;
 		}
 #pragma endregion
