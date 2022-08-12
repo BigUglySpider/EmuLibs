@@ -354,24 +354,28 @@ namespace EmuMath
 		}
 
 	public:
+		template<std::size_t Unused_ = 0>
 		static constexpr inline bool is_default_constructible()
 		{
-			return std::is_default_constructible_v<matrix_vector_type>;
+			return Unused_ >= 0 && std::is_default_constructible_v<matrix_vector_type>;
 		}
 
+		template<std::size_t Unused_ = 0>
 		static constexpr inline bool is_const_copy_constructible()
 		{
-			return std::is_constructible_v<matrix_vector_type, const matrix_vector_type&>;
+			return Unused_ >= 0 && std::is_constructible_v<matrix_vector_type, const matrix_vector_type&>;
 		}
 
+		template<std::size_t Unused_ = 0>
 		static constexpr inline bool is_non_const_copy_constructible()
 		{
-			return std::is_constructible_v<matrix_vector_type, matrix_vector_type&>;
+			return Unused_ >= 0 && std::is_constructible_v<matrix_vector_type, matrix_vector_type&>;
 		}
 
+		template<std::size_t Unused_ = 0>
 		static constexpr inline bool is_move_constructible()
 		{
-			return std::is_constructible_v<matrix_vector_type, matrix_vector_type&&>;
+			return Unused_ >= 0 && std::is_constructible_v<matrix_vector_type, matrix_vector_type&&>;
 		}
 
 		template<class ToConvert_>
@@ -466,10 +470,10 @@ namespace EmuMath
 			return RhsSize_ == num_rows || (RhsSize_ == num_rows - 1);
 		}
 
-		template<std::size_t RhsNumColumns_, std::size_t RhsNumRows_>
+		template<std::size_t RhsNumColumns_, std::size_t RhsNumRows_, std::size_t Unused_ = 0>
 		[[nodiscard]] static constexpr inline bool valid_matrix_multiply_arg_size()
 		{
-			return num_columns == RhsNumRows_;
+			return Unused_ >= 0 && num_columns == RhsNumRows_;
 		}
 #pragma endregion
 
@@ -668,28 +672,29 @@ namespace EmuMath
 		/// <para> Performs a const-copy of the passed Matrix. Only available if this Matrix type's contained data can be const-copy-constructed. </para>
 		/// </summary>
 		/// <param name="to_copy_">: EmuMath Matrix of the same type to const-copy.</param>
-		template<typename = std::enable_if_t<is_const_copy_constructible()>>
 		constexpr Matrix(const Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& to_const_copy) :
 			_data(to_const_copy._data)
 		{
+			static_assert(is_const_copy_constructible(), "Attempted to const-copy-construct an EmuMath Matrix that cannot be const-copy-constructed.");
 		}
 
 		/// <summary>
 		/// <para> Performs a non-const-copy of the passed Matrix. Only available if this Matrix type's contained data can be non-const-copy-constructed. </para>
 		/// </summary>
 		/// <param name="to_copy_">: EmuMath Matrix of the same type to copy.</param>
-		template<typename = std::enable_if_t<is_non_const_copy_constructible()>>
+		template<std::size_t Unused_ = 0, typename = std::enable_if_t<is_non_const_copy_constructible<Unused_>()>>
 		constexpr Matrix(Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>& to_copy_) :
 			_data(to_copy_._data)
 		{
+			static_assert(is_non_const_copy_constructible(), "Attempted to non-const-copy-construct an EmuMath Matrix that cannot be non-const-copy-constructed.");
 		}
 
 		/// <summary> Moves the passed Matrix data into a newly constructed Matrix. Only available if this Matrix type's contained data may be move-constructed. </summary>
 		/// <param name="to_move_">: EmuMath Matrix of the same type to move.</param>
-		template<typename = std::enable_if_t<is_move_constructible()>>
 		constexpr Matrix(Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>&& to_move_) noexcept :
 			_data(std::move(to_move_._data))
 		{
+			static_assert(is_move_constructible(), "Attempted to non-const-copy-construct an EmuMath Vector that cannot be non-const-copy-constructed.");
 		}
 		
 
@@ -1335,50 +1340,51 @@ namespace EmuMath
 
 #pragma region ASSIGNMENT_OPERATORS
 	public:
+		constexpr inline this_type& operator=(const this_type& to_move_)
+		{
+			EmuMath::Helpers::matrix_copy(*this, std::forward<this_type>(to_move_));
+			return *this;
+		}
+
 		constexpr inline this_type& operator=(this_type&& to_move_) noexcept
 		{
 			EmuMath::Helpers::matrix_copy(*this, std::forward<this_type>(to_move_));
 			return *this;
 		}
 
-		template
-		<
-			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
-			typename = std::enable_if_t
+		template<std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_>
+		constexpr inline auto operator=(EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& to_copy_)
+			-> std::enable_if_t
 			<
-				EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&>()
+				EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&>(),
+				this_type&
 			>
-		>
-		constexpr inline this_type& operator=(EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& to_copy_)
 		{
 			EmuMath::Helpers::matrix_copy(*this, to_copy_);
 			return *this;
 		}
 
-		template
-		<
-			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
-			typename = std::enable_if_t
+		template<std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_>
+		constexpr inline auto operator=(const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& to_copy_)
+			-> std::enable_if_t
 			<
-				EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&>()
+				EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&>() &&
+				!std::is_same_v<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>,
+				this_type&
 			>
-		>
-		constexpr inline this_type& operator=(const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& to_copy_)
 		{
 			EmuMath::Helpers::matrix_copy(*this, to_copy_);
 			return *this;
 		}
 
-		template
-		<
-			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
-			typename = std::enable_if_t
+		template<std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_>
+		constexpr inline auto operator=(EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&& to_move_copy_)
+			-> std::enable_if_t
 			<
 				EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>() &&
-				!std::is_same_v<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>
+				!std::is_same_v<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>,
+				this_type&
 			>
-		>
-		constexpr inline this_type& operator=(EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&& to_move_copy_)
 		{
 			EmuMath::Helpers::matrix_copy
 			(
@@ -1388,15 +1394,13 @@ namespace EmuMath
 			return *this;
 		}
 
-		template
-		<
-			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
-			typename = std::enable_if_t
+		template<std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_>
+		constexpr inline auto operator=(const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&& to_move_copy_)
+			-> std::enable_if_t
 			<
-				EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>()
+				EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>(),
+				this_type&
 			>
-		>
-		constexpr inline this_type& operator=(const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&& to_move_copy_)
 		{
 			EmuMath::Helpers::matrix_copy
 			(
@@ -1486,80 +1490,55 @@ namespace EmuMath
 		}
 
 		// ADAPTIVE ARITHMETIC OPERATOR* : UNSPECIALISED FALLBACK TO BASIC_MULTIPLY
-		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_, typename = std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>()>>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> operator*(Rhs_&& rhs_) const
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline auto operator*(Rhs_&& rhs_) const
+			-> std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>(), EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_>>
 		{
 			return EmuMath::Helpers::matrix_multiply<OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
-		template<bool OutColumnMajor_ = is_column_major, class Rhs_, typename = std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>()>>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> operator*(Rhs_&& rhs_) const
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline auto operator*(Rhs_&& rhs_) const
+			-> std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>(), EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_>>
 		{
 			return EmuMath::Helpers::matrix_multiply<value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
 		// ADAPTIVE ARITHMETIC OPERATOR*: SPECIALISED VECTOR MULTIPLY
-		template
-		<
-			typename OutT_,
-			bool OutColumnMajor_ = is_column_major,
-			typename RhsT_,
-			std::size_t RhsSize_,
-			typename = std::enable_if_t<valid_vector_multiply_arg_size<RhsSize_>()>
-		>
-		[[nodiscard]] constexpr inline EmuMath::Vector<RhsSize_, OutT_> operator*(const EmuMath::Vector<RhsSize_, RhsT_>& rhs_vector_) const
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, typename RhsT_, std::size_t RhsSize_>
+		[[nodiscard]] constexpr inline auto operator*(const EmuMath::Vector<RhsSize_, RhsT_>& rhs_vector_) const
+			-> std::enable_if_t<valid_vector_multiply_arg_size<RhsSize_>(), EmuMath::Vector<RhsSize_, OutT_>>
 		{
 			return EmuMath::Helpers::matrix_multiply<OutT_, OutColumnMajor_>(*this, rhs_vector_);
 		}
 
-		template
-		<
-			bool OutColumnMajor_ = is_column_major,
-			typename RhsT_,
-			std::size_t RhsSize_,
-			typename = std::enable_if_t<valid_vector_multiply_arg_size<RhsSize_>()>
-		>
-		[[nodiscard]] constexpr inline EmuMath::Vector<RhsSize_, typename EmuMath::Vector<RhsSize_, RhsT_>::preferred_floating_point> operator*
-		(
-			const EmuMath::Vector<RhsSize_, RhsT_>& rhs_vector_
-		) const
+		template<bool OutColumnMajor_ = is_column_major, typename RhsT_, std::size_t RhsSize_>
+		[[nodiscard]] constexpr inline auto operator*(const EmuMath::Vector<RhsSize_, RhsT_>& rhs_vector_) const
+			-> std::enable_if_t
+			<
+				valid_vector_multiply_arg_size<RhsSize_>(),
+				EmuMath::Vector<RhsSize_, typename EmuMath::Vector<RhsSize_, RhsT_>::preferred_floating_point>
+			>
 		{
 			using rhs_fp = typename EmuMath::Vector<RhsSize_, RhsT_>::preferred_floating_point;
 			return EmuMath::Helpers::matrix_multiply<rhs_fp, OutColumnMajor_>(*this, rhs_vector_);
 		}
 
 		// ADAPTIVE ARITHMETIC OPERATOR*: SPECIALISED MATRIX MULTIPLY
-		template
-		<
-			typename OutT_,
-			bool OutColumnMajor_ = is_column_major,
-			typename RhsT_,
-			std::size_t RhsNumColumns_,
-			std::size_t RhsNumRows_,
-			bool RhsColumnMajor_,
-			typename = std::enable_if_t<valid_matrix_multiply_arg_size<RhsNumColumns_, RhsNumRows_>()>
-		>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<RhsNumColumns_, num_rows, OutT_, OutColumnMajor_> operator*
-		(
-			const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& rhs_matrix_
-		)
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, typename RhsT_, std::size_t RhsNumColumns_, std::size_t RhsNumRows_, bool RhsColumnMajor_>
+		[[nodiscard]] constexpr inline auto operator*(const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& rhs_matrix_) const
+			-> std::enable_if_t<valid_matrix_multiply_arg_size<RhsNumColumns_, RhsNumRows_>(), EmuMath::Matrix<RhsNumColumns_, num_rows, OutT_, OutColumnMajor_>>
 		{
 			return EmuMath::Helpers::matrix_multiply<OutT_, OutColumnMajor_>(*this, rhs_matrix_);
 		}
 
-		template
-		<
-			bool OutColumnMajor_ = is_column_major,
-			typename RhsT_,
-			std::size_t RhsNumColumns_,
-			std::size_t RhsNumRows_,
-			bool RhsColumnMajor_,
-			typename = std::enable_if_t<valid_matrix_multiply_arg_size<RhsNumColumns_, RhsNumRows_>()>
-		>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<RhsNumColumns_, num_rows, preferred_floating_point, OutColumnMajor_> operator*
-		(
-			const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& rhs_matrix_
-		)
+		template<bool OutColumnMajor_ = is_column_major, typename RhsT_, std::size_t RhsNumColumns_, std::size_t RhsNumRows_, bool RhsColumnMajor_>
+		[[nodiscard]] constexpr inline auto operator*(const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& rhs_matrix_) const
+			-> std::enable_if_t
+			<
+				valid_matrix_multiply_arg_size<RhsNumColumns_, RhsNumRows_>(),
+				EmuMath::Matrix<RhsNumColumns_, num_rows, preferred_floating_point, OutColumnMajor_>
+			>
 		{
 			return EmuMath::Helpers::matrix_multiply<preferred_floating_point, OutColumnMajor_>(*this, rhs_matrix_);
 		}
@@ -1594,30 +1573,33 @@ namespace EmuMath
 			return *this;
 		}
 
-		template<bool ColumnMajorOrder_ = is_column_major, class Rhs_, typename = std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>()>>
-		constexpr inline this_type& operator*=(Rhs_&& rhs_)
+		template<bool ColumnMajorOrder_ = is_column_major, class Rhs_>
+		constexpr inline auto operator*=(Rhs_&& rhs_)
+			-> std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>(), this_type&>
 		{
 			EmuMath::Helpers::matrix_multiply_assign<ColumnMajorOrder_>(*this, std::forward<Rhs_>(rhs_));
 			return *this;
 		}
 
-		template
-		<
-			bool ColumnMajorOrder_ = is_column_major, std::size_t RhsSize_, typename RhsT_,
-			typename = std::enable_if_t<EmuMath::Helpers::is_valid_matrix_multiply_assign_rhs_vector<NumColumns_, NumRows_, T_, ColumnMajor_, RhsSize_, RhsT_>()>
-		>
-		constexpr inline EmuMath::Vector<RhsSize_, RhsT_>& operator*=(EmuMath::Vector<RhsSize_, RhsT_>& rhs_vector_) const
+		template<bool ColumnMajorOrder_ = is_column_major, std::size_t RhsSize_, typename RhsT_>
+		constexpr inline auto operator*=(EmuMath::Vector<RhsSize_, RhsT_>& rhs_vector_) const
+			-> std::enable_if_t
+			<
+				EmuMath::Helpers::is_valid_matrix_multiply_assign_rhs_vector<NumColumns_, NumRows_, T_, ColumnMajor_, RhsSize_, RhsT_>(),
+				EmuMath::Vector<RhsSize_, RhsT_>&
+			>
 		{
 			EmuMath::Helpers::matrix_multiply_assign<ColumnMajorOrder_>(*this, rhs_vector_);
 			return rhs_vector_;
 		}
 
-		template
-		<
-			bool ColumnMajorOrder_ = is_column_major, std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
-			typename = std::enable_if_t<valid_matrix_multiply_arg_size<RhsNumColumns_, RhsNumRows_>() && is_square && RhsNumColumns_ == num_columns && RhsNumRows_ == num_rows>
-		>
-		constexpr inline this_type& operator*=(const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& rhs_matrix_)
+		template<bool ColumnMajorOrder_ = is_column_major, std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_>
+		constexpr inline auto operator*=(const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& rhs_matrix_)
+			-> std::enable_if_t
+			<
+				valid_matrix_multiply_arg_size<RhsNumColumns_, RhsNumRows_>() && is_square&& RhsNumColumns_ == num_columns && RhsNumRows_ == num_rows,
+				this_type&
+			>
 		{
 			EmuMath::Helpers::matrix_multiply_assign<ColumnMajorOrder_>(*this, rhs_matrix_);
 			return *this;
@@ -1630,32 +1612,35 @@ namespace EmuMath
 		/// <para> Copies the theoretical indices of the provided input Matrix to respective indices within this Matrix. </para>
 		/// </summary>
 		/// <param name="to_copy_">: EmuMath Matrix to copy to this Matrix.</param>
-		template
-		<
-			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
-			typename = std::enable_if_t<EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&>()>
-		>
-		constexpr inline void Copy(EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& to_copy_)
+		template<std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_>
+		constexpr inline auto Copy(EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& to_copy_)
+			-> std::enable_if_t
+			<
+				EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&>(),
+				void
+			>
 		{
 			EmuMath::Helpers::matrix_copy(*this, to_copy_);
 		}
 
-		template
-		<
-			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
-			typename = std::enable_if_t<EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&>()>
-		>
-		constexpr inline void Copy(const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& to_copy_)
+		template<std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_>
+		constexpr inline auto Copy(const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& to_copy_)
+			-> std::enable_if_t
+			<
+				EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&>(),
+				void
+			>
 		{
 			EmuMath::Helpers::matrix_copy(*this, to_copy_);
 		}
 
-		template
-		<
-			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
-			typename = std::enable_if_t<EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>()>
-		>
-		constexpr inline void Copy(EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&& to_move_copy_)
+		template<std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_>
+		constexpr inline auto Copy(EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&& to_move_copy_)
+			-> std::enable_if_t
+			<
+				EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>(),
+				void
+			>
 		{
 			EmuMath::Helpers::matrix_copy
 			(
@@ -1664,12 +1649,13 @@ namespace EmuMath
 			);
 		}
 
-		template
-		<
-			std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_,
-			typename = std::enable_if_t<EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>()>
-		>
-		constexpr inline void Copy(const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&& to_move_copy_)
+		template<std::size_t RhsNumColumns_, std::size_t RhsNumRows_, typename RhsT_, bool RhsColumnMajor_>
+		constexpr inline auto Copy(const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>&& to_move_copy_)
+			-> std::enable_if_t
+			<
+				EmuMath::Helpers::matrix_assign_copy_is_valid<this_type, const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>>(),
+				void
+			>
 		{
 			EmuMath::Helpers::matrix_copy
 			(
@@ -2885,24 +2871,23 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rhs_">: Unspecialised argument appearing on the right of multiplication.</param>
 		/// <returns>EmuMath Matrix containing the results of basic multiplication in respective indices.</returns>
-		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_, typename = std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>()>>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Multiply(Rhs_&& rhs_) const
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline auto Multiply(Rhs_&& rhs_) const
+			-> std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>(), EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_>>
 		{
 			return EmuMath::Helpers::matrix_multiply<OutT_, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
-		template<bool OutColumnMajor_ = is_column_major, class Rhs_, typename = std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>()>>
-		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_> Multiply(Rhs_&& rhs_) const
+		template<bool OutColumnMajor_ = is_column_major, class Rhs_>
+		[[nodiscard]] constexpr inline auto Multiply(Rhs_&& rhs_) const
+			-> std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>(), EmuMath::Matrix<num_columns, num_rows, value_type_uq, OutColumnMajor_>>
 		{
 			return EmuMath::Helpers::matrix_multiply<value_type_uq, OutColumnMajor_>(*this, std::forward<Rhs_>(rhs_));
 		}
 
-		template
-		<
-			class Rhs_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_,
-			typename = std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>()>
-		>
-		constexpr inline void Multiply(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+		template<class Rhs_, std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		constexpr inline auto Multiply(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_, Rhs_&& rhs_) const
+			-> std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>(), void>
 		{
 			return EmuMath::Helpers::matrix_multiply(out_matrix_, *this, rhs_);
 		}
@@ -3119,8 +3104,9 @@ namespace EmuMath
 		/// </para>
 		/// </summary>
 		/// <param name="rhs_">: Unspecialised item appearing on the right of Matrix multiplication.</param>
-		template<bool ColumnMajorOrder_ = is_column_major, class Rhs_, typename = std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>()>>
-		constexpr inline void MultiplyAssign(Rhs_&& rhs_)
+		template<bool ColumnMajorOrder_ = is_column_major, class Rhs_>
+		constexpr inline auto MultiplyAssign(Rhs_&& rhs_)
+			-> std::enable_if_t<!EmuMath::TMP::is_specialised_matrix_multiply_arg<Rhs_>(), void>
 		{
 			EmuMath::Helpers::matrix_multiply_assign<ColumnMajorOrder_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -3161,8 +3147,9 @@ namespace EmuMath
 		/// <para> This function is only available where this Matrix type can be standard multiplied by another Matrix of the same size. </para>
 		/// </summary>
 		/// <returns>Reference to this Matrix after squaring.</returns>
-		template<bool ColumnMajorOrder_ = is_column_major, typename = std::enable_if_t<valid_matrix_multiply_arg_size<NumColumns_, NumRows_>()>>
-		constexpr inline this_type& SquareAssign()
+		template<bool ColumnMajorOrder_ = is_column_major, std::size_t Unused_ = 0>
+		constexpr inline auto SquareAssign()
+			-> std::enable_if_t<valid_matrix_multiply_arg_size<NumColumns_, NumRows_, Unused_>(), this_type&>
 		{
 			EmuMath::Helpers::matrix_square_assign<ColumnMajorOrder_>(*this);
 			return *this;

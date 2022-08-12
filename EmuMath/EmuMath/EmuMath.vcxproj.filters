@@ -803,5 +803,8 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_helpers\_quaternion_assignment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuCore\TMPHelpers\DefaultItemBases.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
