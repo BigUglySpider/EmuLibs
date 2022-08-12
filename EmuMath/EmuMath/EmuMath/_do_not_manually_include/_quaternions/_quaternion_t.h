@@ -609,6 +609,74 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region ASSIGNMENT_OPERATORS
+		template<std::size_t Unused_ = 0>
+		[[nodiscard]] static constexpr inline bool is_move_assignable()
+		{
+			return Unused_ >= 0 && std::is_assignable_v<vector_type&, vector_type&&>;
+		}
+
+		template<std::size_t Unused_ = 0>
+		[[nodiscard]] static constexpr inline bool is_const_copy_assignable()
+		{
+			return Unused_ >= 0 && std::is_assignable_v<vector_type&, const vector_type&>;
+		}
+
+		template<std::size_t Unused_ = 0>
+		[[nodiscard]] static constexpr inline bool is_non_const_copy_assignable()
+		{
+			return Unused_ >= 0 && std::is_assignable_v<vector_type&, vector_type&>;
+		}
+
+		template<std::size_t Unused_ = 0>
+		constexpr inline auto operator=(EmuMath::Quaternion<T_>&& to_move_)
+			-> std::enable_if_t<is_move_assignable<Unused_>(), this_type&>
+		{
+			data = std::move(to_move_.data);
+			return *this;
+		}
+
+		template<std::size_t Unused_ = 0>
+		constexpr inline auto operator=(EmuMath::Quaternion<T_>& to_copy_)
+			-> std::enable_if_t<is_non_const_copy_assignable<Unused_>(), this_type&>
+		{
+			data = to_copy_.data;
+			return *this;
+		}
+
+		template<std::size_t Unused_ = 0>
+		constexpr inline auto operator=(const EmuMath::Quaternion<T_>& to_copy_)
+			-> std::enable_if_t<is_const_copy_assignable<Unused_>(), this_type&>
+		{
+			data = to_copy_.data;
+			return *this;
+		}
+
+		template<typename RhsT_>
+		constexpr inline auto operator=(EmuMath::Quaternion<RhsT_>& to_convert_)
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_non_const_convert_assign<T_, RhsT_>() && !std::is_same_v<T_, RhsT_>, this_type&>
+		{
+			EmuMath::Helpers::quaternion_convert_assign(*this, to_convert_);
+			return *this;
+		}
+
+		template<typename RhsT_>
+		constexpr inline auto operator=(const EmuMath::Quaternion<RhsT_>& to_convert_)
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_const_convert_assign<T_, RhsT_>() && !std::is_same_v<T_, RhsT_>, this_type&>
+		{
+			EmuMath::Helpers::quaternion_convert_assign(*this, to_convert_);
+			return *this;
+		}
+
+		template<typename RhsT_>
+		constexpr inline auto operator=(EmuMath::Quaternion<RhsT_>&& to_convert_)
+			-> std::enable_if_t<EmuMath::Helpers::quaternion_can_move_convert_assign<T_, RhsT_>() && !std::is_same_v<T_, RhsT_>, this_type&>
+		{
+			EmuMath::Helpers::quaternion_convert_assign(*this, std::forward<EmuMath::Quaternion<RhsT_>>(to_convert_));
+			return *this;
+		}
+#pragma endregion
+
 #pragma region GET_VALIDITY_CHECKS
 	public:
 		/// <summary>
