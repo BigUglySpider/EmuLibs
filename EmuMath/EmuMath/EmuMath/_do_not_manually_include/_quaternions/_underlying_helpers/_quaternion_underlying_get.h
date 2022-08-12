@@ -48,7 +48,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 	}
 
 	template<typename T_>
-	[[nodiscard]] constexpr inline typename EmuMath::Quaternion<T_>::value_type& _get_x(EmuMath::Quaternion<T_>&& quaternion)
+	[[nodiscard]] constexpr inline decltype(auto) _get_x(EmuMath::Quaternion<T_>&& quaternion)
 	{
 		if constexpr (EmuMath::Quaternion<T_>::contains_ref)
 		{
@@ -73,7 +73,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 	}
 
 	template<typename T_>
-	[[nodiscard]] constexpr inline typename EmuMath::Quaternion<T_>::value_type& _get_y(EmuMath::Quaternion<T_>&& quaternion)
+	[[nodiscard]] constexpr inline decltype(auto) _get_y(EmuMath::Quaternion<T_>&& quaternion)
 	{
 		if constexpr (EmuMath::Quaternion<T_>::contains_ref)
 		{
@@ -98,7 +98,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 	}
 
 	template<typename T_>
-	[[nodiscard]] constexpr inline typename EmuMath::Quaternion<T_>::value_type& _get_z(EmuMath::Quaternion<T_>&& quaternion)
+	[[nodiscard]] constexpr inline decltype(auto) _get_z(EmuMath::Quaternion<T_>&& quaternion)
 	{
 		if constexpr (EmuMath::Quaternion<T_>::contains_ref)
 		{
@@ -123,7 +123,7 @@ namespace EmuMath::Helpers::_quaternion_underlying
 	}
 
 	template<typename T_>
-	[[nodiscard]] constexpr inline typename EmuMath::Quaternion<T_>::value_type& _get_w(EmuMath::Quaternion<T_>&& quaternion)
+	[[nodiscard]] constexpr inline decltype(auto) _get_w(EmuMath::Quaternion<T_>&& quaternion)
 	{
 		if constexpr (EmuMath::Quaternion<T_>::contains_ref)
 		{

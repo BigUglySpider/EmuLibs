@@ -2102,7 +2102,7 @@ namespace EmuCore
 		{
 			// Approximation adapted from NVIDIA reference @ https://developer.download.nvidia.com/cg/acos.html
 			bool is_neg = EmuCore::do_cmp_less<out_t, out_t>()(in_, out_t(0));
-			out_t abs_in = mul_ (in_, static_cast<out_t>((!is_neg) + (-1 * is_neg))); // abs_in = is_neg ? -in_ : in_
+			out_t abs_in = mul_(in_, add_(static_cast<out_t>(!is_neg), static_cast<out_t>(-1 * is_neg))); // abs_in = is_neg ? -in_ : in_
 			out_t result = out_t(-0.0187293);
 			result = mul_(result, abs_in);
 			result = add_(result, out_t(0.0742610));

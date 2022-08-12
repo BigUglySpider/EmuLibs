@@ -529,7 +529,19 @@ int main()
 	auto runtime_mul_ab = mul_a;
 	std::cout << runtime_mul_ab << "\n";
 	runtime_mul_ab *= 10.0L;
-	std::cout << runtime_mul_ab << "\n";
+	std::cout << runtime_mul_ab << "\n\n\n";
+
+	auto ass_quat_a = EmuMath::Quaternion<float>(1, 2, 3, 4);
+	auto ass_quat_b = EmuMath::Quaternion<double>(-7, -16, 22, 42);
+	const auto ass_quat_c = EmuMath::Quaternion<std::int64_t>(7, -21, 22, 33);
+	auto ass_quat_d = EmuMath::Quaternion<long double>(-1337, -22, 1337, 47).FusedUnit();
+	std::cout << ass_quat_a << "\n";
+	ass_quat_a = ass_quat_b;
+	std::cout << ass_quat_a << "\n";
+	ass_quat_a = ass_quat_c;
+	std::cout << ass_quat_a << "\n";
+	ass_quat_a = std::move(ass_quat_d);
+	std::cout << ass_quat_a << "\n";
 
 
 	system("pause");
