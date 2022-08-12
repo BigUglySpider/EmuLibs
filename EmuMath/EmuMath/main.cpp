@@ -543,6 +543,10 @@ int main()
 	ass_quat_a = std::move(ass_quat_d);
 	std::cout << ass_quat_a << "\n";
 
+	constexpr auto blo = EmuMath::Vector<3, float>(1, 2, 3);
+	constexpr auto blo2 = blo;
+	constexpr auto blo3 = EmuMath::Vector<3, float>::is_const_copy_constructible();
+
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

@@ -398,8 +398,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 	{
 		using out_indices = std::make_index_sequence<RhsSize_>;
 		using dp_indices = std::make_index_sequence<LhsNumRows_>;
-		using out_vector = EmuMath::Vector<RhsSize_, OutT_>;
-		return _matrix_std_multiply_mat_vector<out_vector>(out_indices(), dp_indices(), lhs_matrix_, rhs_vector_);
+		return _matrix_std_multiply_mat_vector<EmuMath::Vector<RhsSize_, OutT_>>(out_indices(), dp_indices(), lhs_matrix_, rhs_vector_);
 	}
 #pragma endregion
 

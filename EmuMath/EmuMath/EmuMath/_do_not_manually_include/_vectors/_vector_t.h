@@ -120,6 +120,45 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region DUMMY_TEMPLATE_VALIDITY_CHECKS
+	private:
+		template<std::size_t Unused_>
+		[[nodiscard]] static constexpr inline bool _can_cast_as_alt_rep()
+		{
+			return Unused_ >= 0 && has_alternative_representation;
+		}
+
+		template<std::size_t Unused_>
+		[[nodiscard]] static constexpr inline bool _can_const_cast_as_alt_rep()
+		{
+			return Unused_ >= 0 && !contains_non_const_ref && has_alternative_representation;
+		}
+
+		template<std::size_t Unused_>
+		[[nodiscard]] static constexpr inline bool _can_alt_const_copy_assign()
+		{
+			return Unused_ >= 0 && has_alternative_representation;
+		}
+
+		template<std::size_t Unused_>
+		[[nodiscard]] static constexpr inline bool _can_alt_non_const_copy_assign()
+		{
+			return Unused_ >= 0 && has_alternative_representation;
+		}
+
+		template<std::size_t Unused_>
+		[[nodiscard]] static constexpr inline bool _can_alt_move_assign()
+		{
+			return Unused_ >= 0 && has_alternative_representation;
+		}
+
+		template<std::size_t Unused_>
+		[[nodiscard]] static constexpr inline bool _can_alt_const_move_assign()
+		{
+			return Unused_ >= 0 && has_alternative_representation;
+		}
+#pragma endregion
+
 #pragma region CONSTRUCTOR_VALIDITY_CHECKS
 	private:
 		template<class Arg_, bool IsVector_ = EmuMath::TMP::is_emu_vector_v<Arg_>>
@@ -361,15 +400,72 @@ namespace EmuMath
 		}
 
 	public:
+		template<std::size_t Unused_ = 0>
 		[[nodiscard]] static constexpr inline bool is_default_constructible()
 		{
 			return 
 			(
+				Unused_ >= 0 &&
 				!contains_ref &&
 				(
 					std::is_default_constructible_v<data_storage_type> || std::is_default_constructible_v<stored_type>
 				)
 			);
+		}
+		
+		template<std::size_t Unused_ = 0>
+		[[nodiscard]] static constexpr inline bool is_const_copy_constructible()
+		{
+			return 
+			(
+				Unused_ >= 0 &&
+				!contains_non_const_ref &&
+				(
+					std::is_constructible_v<data_storage_type, const data_storage_type&> || std::is_constructible_v<stored_type, const stored_type&>
+				)
+			);
+		}
+		
+		template<std::size_t Unused_ = 0>
+		[[nodiscard]] static constexpr inline bool is_non_const_copy_constructible()
+		{
+			return 
+			(
+				Unused_ >= 0 &&
+				(
+					std::is_constructible_v<data_storage_type, data_storage_type&> || std::is_constructible_v<stored_type, stored_type&>
+				)
+			);
+		}
+
+		template<std::size_t Unused_ = 0>
+		[[nodiscard]] static constexpr inline bool is_move_constructible()
+		{
+			return 
+			(
+				Unused_ >= 0 &&
+				(
+					std::is_constructible_v<data_storage_type, data_storage_type&&> || std::is_constructible_v<stored_type, stored_type&&>
+				)
+			);
+		}
+
+		template<std::size_t Unused_ = 0>
+		[[nodiscard]] static constexpr inline bool is_alternative_rep_const_copy_constructible()
+		{
+			return has_alternative_representation && is_const_copy_constructible<Unused_>();
+		}
+		
+		template<std::size_t Unused_ = 0>
+		[[nodiscard]] static constexpr inline bool is_alternative_rep_non_const_copy_constructible()
+		{
+			return has_alternative_representation && is_non_const_copy_constructible<Unused_>();
+		}
+		
+		template<std::size_t Unused_ = 0>
+		[[nodiscard]] static constexpr inline bool is_alternative_rep_move_construct_invocable()
+		{
+			return Unused_ >= 0 && has_alternative_representation;
 		}
 
 		template<std::size_t ReadOffset_, class Arg_>
@@ -886,9 +982,10 @@ namespace EmuMath
 		/// <para> Default constructs all elements within this Vector. </para>
 		/// <para> This is only available for Vectors which contain default-constructible, non-reference types. </para>
 		/// </summary>
-		template<typename OnlyIfNonRefAndContainsDefaultConstructibles_ = std::enable_if_t<is_default_constructible()>>
+		template<typename std::size_t Unused_ = 0, typename = std::enable_if_t<is_default_constructible<Unused_>()>>
 		constexpr inline Vector() : _data(_default_construct())
 		{
+			static_assert(is_default_constructible(), "Attempted to default-construct an EmuMath Vector that cannot be default-constructed.");
 		}
 
 		/// <summary>
@@ -900,6 +997,7 @@ namespace EmuMath
 		constexpr inline Vector(this_type& to_copy_) : 
 			_data(_copy_or_move_other_data<data_storage_type&>(index_sequence(), to_copy_._data))
 		{
+			static_assert(is_non_const_copy_constructible(), "Attempted to non-const-copy-construct an EmuMath Vector that cannot be non-const-copy-constructed.");
 		}
 
 		/// <summary>
@@ -909,10 +1007,10 @@ namespace EmuMath
 		/// <param name="to_copy_">
 		///		: Const reference to an EmuMath Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.
 		/// </param>
-		template<typename = std::enable_if_t<!contains_non_const_ref>>
 		constexpr inline Vector(const this_type& to_copy_) : 
 			_data(_copy_or_move_other_data<const data_storage_type&>(index_sequence(), to_copy_._data))
 		{
+			static_assert(is_const_copy_constructible(), "Attepted to const-copy-construct an EmuMath Vector that cannot be const-copy-constructed.");
 		}
 
 		/// <summary>
@@ -922,6 +1020,7 @@ namespace EmuMath
 		constexpr inline Vector(this_type&& to_move_) noexcept : 
 			_data(_copy_or_move_other_data<data_storage_type>(index_sequence(), std::move(to_move_._data)))
 		{
+			static_assert(is_non_const_copy_constructible(), "Attempted to non-const-copy-construct an EmuMath Vector that cannot be non-const-copy-constructed.");
 		}
 
 		/// <summary>
@@ -935,7 +1034,7 @@ namespace EmuMath
 		/// <param name="to_copy_">
 		///		: Non-const reference to an EmuMath Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.
 		/// </param>
-		template<typename OnlyIfAlternativeRepExists_ = std::enable_if_t<has_alternative_representation>>
+		template<std::size_t Unused_ = 0, typename = std::enable_if_t<is_alternative_rep_non_const_copy_constructible<Unused_>()>>
 		constexpr inline Vector(alternative_rep& to_copy_) :
 			_data(_copy_or_move_other_data<data_storage_type&>(index_sequence(), to_copy_._data))
 		{
@@ -952,7 +1051,7 @@ namespace EmuMath
 		/// <param name="to_copy_">
 		///		: Const reference to an EmuMath Vector to copy. If this vector contains references, it will reference the same data as the passed Vector.
 		/// </param>
-		template<typename OnlyIfAlternativeRepExists_ = std::enable_if_t<has_alternative_representation && !contains_non_const_ref>>
+		template<std::size_t Unused_ = 0, typename = std::enable_if_t<is_alternative_rep_const_copy_constructible<Unused_>()>>
 		constexpr inline Vector(const alternative_rep& to_copy_) :
 			_data(_copy_or_move_other_data<const data_storage_type&>(index_sequence(), to_copy_._data))
 		{
@@ -967,7 +1066,7 @@ namespace EmuMath
 		/// <para> If there is no alternative representation, the input type for this constructor will be std::false_type. </para>
 		/// </summary>
 		/// <param name="to_move_">: EmuMath Vector to move into the newly constructed vector.</param>
-		template<typename OnlyIfAlternativeRepExists_ = std::enable_if_t<has_alternative_representation>>
+		template<std::size_t Unused_ = 0, typename = std::enable_if_t<is_alternative_rep_move_construct_invocable<Unused_>()>>
 		constexpr inline Vector(alternative_rep&& to_move_) noexcept :
 			_data(_copy_or_move_other_data<data_storage_type>(index_sequence(), std::move(to_move_._data)))
 		{
@@ -1484,7 +1583,7 @@ namespace EmuMath
 			return *this;
 		}
 
-		template<typename = std::enable_if_t<(!contains_non_const_ref)>>
+		template<std::size_t Unused_ = 0, typename = std::enable_if_t<(!contains_non_const_ref) && (Unused_ >= 0)>>
 		constexpr inline this_type& operator=(const this_type& rhs_)
 		{
 			EmuMath::Helpers::vector_copy(*this, rhs_);
@@ -1497,28 +1596,28 @@ namespace EmuMath
 			return *this;
 		}
 
-		template<typename = std::enable_if_t<has_alternative_representation>>
+		template<std::size_t Unused_ = 0, typename = std::enable_if_t<_can_alt_non_const_copy_assign<Unused_>()>>
 		constexpr inline this_type& operator=(alternative_rep& rhs_)
 		{
 			EmuMath::Helpers::vector_copy(*this, rhs_);
 			return *this;
 		}
 
-		template<typename = std::enable_if_t<has_alternative_representation && !contains_non_const_ref>>
+		template<std::size_t Unused_ = 0, typename = std::enable_if_t<_can_alt_const_copy_assign<Unused_>()>>
 		constexpr inline this_type& operator=(const alternative_rep& rhs_)
 		{
 			EmuMath::Helpers::vector_copy(*this, rhs_);
 			return *this;
 		}
 
-		template<typename = std::enable_if_t<has_alternative_representation>>
+		template<std::size_t Unused_ = 0, typename = std::enable_if_t<_can_alt_move_assign<Unused_>()>>
 		constexpr inline this_type& operator=(alternative_rep&& rhs_)
 		{
 			EmuMath::Helpers::vector_copy(*this, std::forward<alternative_rep>(rhs_));
 			return *this;
 		}
 
-		template<typename = std::enable_if_t<has_alternative_representation && !contains_non_const_ref>>
+		template<std::size_t Unused_ = 0, typename = std::enable_if_t<_can_alt_const_move_assign<Unused_>()>>
 		constexpr inline this_type& operator=(const alternative_rep&& rhs_)
 		{
 			EmuMath::Helpers::vector_copy(*this, std::forward<alternative_rep>(rhs_));
@@ -7096,7 +7195,7 @@ namespace EmuMath
 		/// <para> This is not available for Vectors that do not have an alternative template representation. </para>
 		/// </summary>
 		/// <returns>Alternative template representation of this Vector to create the same underlying structure, (non-const) copying this Vector's internals.</returns>
-		template<typename = std::enable_if_t<has_alternative_representation>>
+		template<std::size_t Unused_ = 0, typename = std::enable_if_t<_can_cast_as_alt_rep<Unused_>()>>
 		[[nodiscard]] constexpr inline alternative_rep AsAlternativeRep()
 		{
 			return alternative_rep(*this);
@@ -7113,7 +7212,7 @@ namespace EmuMath
 		/// <para> This const variant is further not available for Vectors that contain non-const references. </para>
 		/// </summary>
 		/// <returns>Alternative template representation of this Vector to create the same underlying structure, (const) copying this Vector's internals.</returns>
-		template<typename = std::enable_if_t<has_alternative_representation && !contains_non_const_ref>>
+		template<std::size_t Unused_ = 0, typename = std::enable_if_t<_can_const_cast_as_alt_rep<Unused_>()>>
 		[[nodiscard]] constexpr inline alternative_rep AsAlternativeRep() const
 		{
 			return alternative_rep(*this);
