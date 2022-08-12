@@ -283,6 +283,45 @@ namespace EmuMath
 				return false;
 			}
 		}
+
+		template<typename InT_>
+		[[nodiscard]] static constexpr inline bool valid_quaternion_non_const_conversion_construction_typearg()
+		{
+			return std::is_constructible_v
+			<
+				vector_type,
+				decltype(std::declval<EmuMath::Quaternion<InT_>&>().X()),
+				decltype(std::declval<EmuMath::Quaternion<InT_>&>().Y()),
+				decltype(std::declval<EmuMath::Quaternion<InT_>&>().Z()),
+				decltype(std::declval<EmuMath::Quaternion<InT_>&>().W())
+			> && !std::is_same_v<T_, InT_>;
+		}
+
+		template<typename InT_>
+		[[nodiscard]] static constexpr inline bool valid_quaternion_const_conversion_construction_typearg()
+		{
+			return std::is_constructible_v
+			<
+				vector_type,
+				decltype(std::declval<const EmuMath::Quaternion<InT_>&>().X()),
+				decltype(std::declval<const EmuMath::Quaternion<InT_>&>().Y()),
+				decltype(std::declval<const EmuMath::Quaternion<InT_>&>().Z()),
+				decltype(std::declval<const EmuMath::Quaternion<InT_>&>().W())
+			> && !std::is_same_v<T_, InT_>;
+		}
+
+		template<typename InT_>
+		[[nodiscard]] static constexpr inline bool valid_quaternion_move_conversion_construction_typearg()
+		{
+			return std::is_constructible_v
+			<
+				vector_type,
+				decltype(std::move(std::declval<EmuMath::Quaternion<InT_>&&>().X())),
+				decltype(std::move(std::declval<EmuMath::Quaternion<InT_>&&>().Y())),
+				decltype(std::move(std::declval<EmuMath::Quaternion<InT_>&&>().Z())),
+				decltype(std::move(std::declval<EmuMath::Quaternion<InT_>&&>().W()))
+			> && !std::is_same_v<T_, InT_>;
+		}
 #pragma endregion
 
 #pragma region CONSTRUCTOR_HELPERS
@@ -350,6 +389,24 @@ namespace EmuMath
 				euler_cvt_default_read_offset
 			>(std::forward<in_vector>(euler_vector_));
 		}
+
+		template<typename InT_>
+		[[nodiscard]] static constexpr inline vector_type _construct_vector_from_conversion(EmuMath::Quaternion<InT_>& to_convert_)
+		{
+			return vector_type(to_convert_.X(), to_convert_.Y(), to_convert_.Z(), to_convert_.W());
+		}
+
+		template<typename InT_>
+		[[nodiscard]] static constexpr inline vector_type _construct_vector_from_conversion(const EmuMath::Quaternion<InT_>& to_convert_)
+		{
+			return vector_type(to_convert_.X(), to_convert_.Y(), to_convert_.Z(), to_convert_.W());
+		}
+
+		template<typename InT_>
+		[[nodiscard]] static constexpr inline vector_type _construct_vector_from_conversion(EmuMath::Quaternion<InT_>&& to_convert_)
+		{
+			return vector_type(std::move(to_convert_.X()), std::move(to_convert_.Y()), std::move(to_convert_.Z()), std::move(to_convert_.W()));
+		}
 #pragma endregion
 
 #pragma region CONSTRUCTORS
@@ -399,8 +456,35 @@ namespace EmuMath
 		/// <param name="z_">Third imaginary component of the Quaternion.</param>
 		/// <param name="w_">Real component of the Quaternion.</param>
 		template<typename X_, typename Y_, typename Z_, typename W_, typename = std::enable_if_t<is_custom_constructible<X_, Y_, Z_, W_>()>>
-		explicit constexpr inline Quaternion(X_&& x_, Y_&& y_, Z_&& z_, W_&& w_) :
+		constexpr inline Quaternion(X_&& x_, Y_&& y_, Z_&& z_, W_&& w_) :
 			data(std::forward<X_>(x_), std::forward<Y_>(y_), std::forward<Z_>(z_), std::forward<W_>(w_))
+		{
+		}
+
+		/// <summary>
+		/// <para> Const copies/converts the passed Quaternion to the newly constructed Quaternion type. </para>
+		/// </summary>
+		/// <param name="to_convert_">Quaternion of a different type to const-copy/convert.</param>
+		template<typename InT_, typename = std::enable_if_t<valid_quaternion_const_conversion_construction_typearg<InT_>()>>
+		explicit constexpr inline Quaternion(const EmuMath::Quaternion<InT_>& to_convert_) : data(_construct_vector_from_conversion(to_convert_))
+		{
+		}
+
+		/// <summary>
+		/// <para> Non-const copies/converts the passed Quaternion to the newly constructed Quaternion type. </para>
+		/// </summary>
+		/// <param name="to_convert_">Quaternion of a different type to non-const-copy/convert.</param>
+		template<typename InT_, typename = std::enable_if_t<valid_quaternion_non_const_conversion_construction_typearg<InT_>()>>
+		explicit constexpr inline Quaternion(EmuMath::Quaternion<InT_>& to_convert_) : data(_construct_vector_from_conversion(to_convert_))
+		{
+		}
+
+		/// <summary>
+		/// <para> Moves/converts the passed Quaternion to the newly constructed Quaternion type. </para>
+		/// </summary>
+		/// <param name="to_convert_">Quaternion of a different type to move/convert.</param>
+		template<typename InT_, typename = std::enable_if_t<valid_quaternion_move_conversion_construction_typearg<InT_>()>>
+		explicit constexpr inline Quaternion(EmuMath::Quaternion<InT_>&& to_convert_) : data(_construct_vector_from_conversion(std::move(to_convert_)))
 		{
 		}
 
