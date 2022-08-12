@@ -1217,8 +1217,9 @@ namespace EmuMath
 		///		: Reference to output to if the get is successful. Must be assignable, convertible-to, or constructible from a reference to this Vector's value_type.
 		/// </param>
 		/// <returns>True if the provided index is valid, otherwise false.</returns>
-		template<typename Out_, typename = std::enable_if_t<is_valid_try_get_output_ref<Out_, false>()>>
-		[[nodiscard]] constexpr inline bool TryAt(const std::size_t index_, Out_& out_)
+		template<typename Out_>
+		[[nodiscard]] constexpr inline auto TryAt(const std::size_t index_, Out_& out_)
+			-> std::enable_if_t<is_valid_try_get_output_ref<Out_, false>(), bool>
 		{
 			return EmuMath::Helpers::vector_try_get<Out_, Size_, T_>(*this, index_, out_);
 		}
@@ -1235,8 +1236,9 @@ namespace EmuMath
 		///		: Reference to output to if the get is successful. Must be assignable, convertible-to, or constructible from a const reference to this Vector's value_type.
 		/// </param>
 		/// <returns>True if the provided index is valid, otherwise false.</returns>
-		template<typename Out_, typename = std::enable_if_t<is_valid_try_get_output_ref<Out_, true>()>>
-		[[nodiscard]] constexpr inline bool TryAt(const std::size_t index_, Out_& out_) const
+		template<typename Out_>
+		[[nodiscard]] constexpr inline auto TryAt(const std::size_t index_, Out_& out_) const
+			-> std::enable_if_t<is_valid_try_get_output_ref<Out_, true>(), bool>
 		{
 			return EmuMath::Helpers::vector_try_get<Out_, Size_, T_>(*this, index_, out_);
 		}
@@ -1291,8 +1293,9 @@ namespace EmuMath
 		///		: Reference to output to if the get is successful. Must be assignable, convertible-to, or constructible from a reference to this Vector's value_type.
 		/// </param>
 		/// <returns>True if the provided index is valid, otherwise false.</returns>
-		template<typename Out_, typename = std::enable_if_t<is_valid_try_get_output_ref<Out_, false>()>>
-		[[nodiscard]] constexpr inline bool operator()(const std::size_t index_, Out_& out_)
+		template<typename Out_>
+		[[nodiscard]] constexpr inline auto operator()(const std::size_t index_, Out_& out_)
+			-> std::enable_if_t<is_valid_try_get_output_ref<Out_, false>(), bool>
 		{
 			return TryAt(index_, out_);
 		}
@@ -1310,8 +1313,9 @@ namespace EmuMath
 		///		: Reference to output to if the get is successful. Must be assignable, convertible-to, or constructible from a const reference to this Vector's value_type.
 		/// </param>
 		/// <returns>True if the provided index is valid, otherwise false.</returns>
-		template<typename Out_, typename = std::enable_if_t<is_valid_try_get_output_ref<Out_, true>()>>
-		[[nodiscard]] constexpr inline bool operator()(const std::size_t index_, Out_& out_) const
+		template<typename Out_>
+		[[nodiscard]] constexpr inline auto operator()(const std::size_t index_, Out_& out_) const
+			-> std::enable_if_t<is_valid_try_get_output_ref<Out_, true>(), bool>
 		{
 			return TryAt(index_, out_);
 		}
@@ -1583,8 +1587,8 @@ namespace EmuMath
 			return *this;
 		}
 
-		template<std::size_t Unused_ = 0, typename = std::enable_if_t<(!contains_non_const_ref) && (Unused_ >= 0)>>
-		constexpr inline this_type& operator=(const this_type& rhs_)
+		template<std::size_t Unused_ = 0>
+		constexpr inline auto operator=(const this_type& rhs_)
 		{
 			EmuMath::Helpers::vector_copy(*this, rhs_);
 			return *this;
@@ -1596,46 +1600,41 @@ namespace EmuMath
 			return *this;
 		}
 
-		template<std::size_t Unused_ = 0, typename = std::enable_if_t<_can_alt_non_const_copy_assign<Unused_>()>>
-		constexpr inline this_type& operator=(alternative_rep& rhs_)
+		template<std::size_t Unused_ = 0>
+		constexpr inline auto operator=(alternative_rep& rhs_)
+			-> std::enable_if_t<_can_alt_non_const_copy_assign<Unused_>(), this_type&>
 		{
 			EmuMath::Helpers::vector_copy(*this, rhs_);
 			return *this;
 		}
 
-		template<std::size_t Unused_ = 0, typename = std::enable_if_t<_can_alt_const_copy_assign<Unused_>()>>
-		constexpr inline this_type& operator=(const alternative_rep& rhs_)
+		template<std::size_t Unused_ = 0>
+		constexpr inline auto operator=(const alternative_rep& rhs_)
+			-> std::enable_if_t<_can_alt_const_copy_assign<Unused_>(), this_type&>
 		{
 			EmuMath::Helpers::vector_copy(*this, rhs_);
 			return *this;
 		}
 
-		template<std::size_t Unused_ = 0, typename = std::enable_if_t<_can_alt_move_assign<Unused_>()>>
-		constexpr inline this_type& operator=(alternative_rep&& rhs_)
+		template<std::size_t Unused_ = 0>
+		constexpr inline auto operator=(alternative_rep&& rhs_)
+			-> std::enable_if_t<_can_alt_move_assign<Unused_>(), this_type&>
 		{
 			EmuMath::Helpers::vector_copy(*this, std::forward<alternative_rep>(rhs_));
 			return *this;
 		}
 
-		template<std::size_t Unused_ = 0, typename = std::enable_if_t<_can_alt_const_move_assign<Unused_>()>>
-		constexpr inline this_type& operator=(const alternative_rep&& rhs_)
+		template<std::size_t Unused_ = 0>
+		constexpr inline auto operator=(const alternative_rep&& rhs_)
+			-> std::enable_if_t<_can_alt_const_move_assign<Unused_>(), this_type&>
 		{
 			EmuMath::Helpers::vector_copy(*this, std::forward<alternative_rep>(rhs_));
 			return *this;
 		}
 
-		template
-		<
-			class Rhs_,
-			typename = std::enable_if_t
-			<
-				(
-					!std::is_same_v<this_type, EmuCore::TMP::remove_ref_cv_t<Rhs_>> ||
-					has_alternative_representation && !std::is_same_v<this_type, EmuCore::TMP::remove_ref_cv_t<Rhs_>>
-				)
-			>
-		>
-		constexpr inline this_type& operator=(Rhs_&& rhs_)
+		template<class Rhs_>
+		constexpr inline auto operator=(Rhs_&& rhs_)
+			-> std::enable_if_t<!std::is_same_v<this_type, typename EmuCore::TMP::remove_ref_cv<Rhs_>::type>, this_type&>
 		{
 			EmuMath::Helpers::vector_copy<0, size, 0>(*this, std::forward<Rhs_>(rhs_));
 			return *this;
@@ -5137,24 +5136,28 @@ namespace EmuMath
 		///		EmuMath Vector containing the provided OutT_ (defaults to value_type_uq), containing a number of indices equal to the number of provided Indices_ args, 
 		///		with respective elements constructed from the provided Indices_ within this Vector.
 		/// </returns>
-		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), OutT_> Shuffle()
+		template<typename OutT_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline auto Shuffle()
+			-> std::enable_if_t<sizeof...(Indices_) != 0, EmuMath::Vector<sizeof...(Indices_), OutT_>>
 		{
 			return EmuMath::Helpers::vector_shuffle<OutT_, Indices_...>(*this);
 		}
-		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), OutT_> Shuffle() const
+		template<typename OutT_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline auto Shuffle() const
+			-> std::enable_if_t<sizeof...(Indices_) != 0, EmuMath::Vector<sizeof...(Indices_), OutT_>>
 		{
 			return EmuMath::Helpers::vector_shuffle<OutT_, Indices_...>(*this);
 		}
 
-		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), value_type_uq> Shuffle()
+		template<std::size_t...Indices_>
+		[[nodiscard]] constexpr inline auto Shuffle()
+			-> std::enable_if_t<sizeof...(Indices_) != 0, EmuMath::Vector<sizeof...(Indices_), value_type_uq>>
 		{
 			return EmuMath::Helpers::vector_shuffle<value_type_uq, Indices_...>(*this);
 		}
-		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), value_type_uq> Shuffle() const
+		template<std::size_t...Indices_>
+		[[nodiscard]] constexpr inline auto Shuffle() const
+			-> std::enable_if_t<sizeof...(Indices_) != 0, EmuMath::Vector<sizeof...(Indices_), value_type_uq>>
 		{
 			return EmuMath::Helpers::vector_shuffle<value_type_uq, Indices_...>(*this);
 		}
@@ -5175,24 +5178,28 @@ namespace EmuMath
 		///		EmuMath Vector containing the provided OutT_ (defaults to value_type_uq), containing a number of indices equal to the number of provided Indices_ args, 
 		///		with respective elements constructed from the provided theoretical Indices_ within this Vector.
 		/// </returns>
-		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), OutT_> ShuffleTheoretical()
+		template<typename OutT_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline auto ShuffleTheoretical()
+			-> std::enable_if_t<sizeof...(Indices_) != 0, EmuMath::Vector<sizeof...(Indices_), OutT_>>
 		{
 			return EmuMath::Helpers::vector_shuffle_theoretical<OutT_, Indices_...>(*this);
 		}
-		template<typename OutT_, std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), OutT_> ShuffleTheoretical() const
+		template<typename OutT_, std::size_t...Indices_>
+		[[nodiscard]] constexpr inline auto ShuffleTheoretical() const
+			-> std::enable_if_t<sizeof...(Indices_) != 0, EmuMath::Vector<sizeof...(Indices_), OutT_>>
 		{
 			return EmuMath::Helpers::vector_shuffle_theoretical<OutT_, Indices_...>(*this);
 		}
 
-		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), value_type_uq> ShuffleTheoretical()
+		template<std::size_t...Indices_>
+		[[nodiscard]] constexpr inline auto ShuffleTheoretical()
+			-> std::enable_if_t<sizeof...(Indices_) != 0, EmuMath::Vector<sizeof...(Indices_), value_type_uq>>
 		{
 			return EmuMath::Helpers::vector_shuffle_theoretical<value_type_uq, Indices_...>(*this);
 		}
-		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), value_type_uq> ShuffleTheoretical() const
+		template<std::size_t...Indices_>
+		[[nodiscard]] constexpr inline auto ShuffleTheoretical() const
+			-> std::enable_if_t<sizeof...(Indices_) != 0, EmuMath::Vector<sizeof...(Indices_), value_type_uq>>
 		{
 			return EmuMath::Helpers::vector_shuffle_theoretical<value_type_uq, Indices_...>(*this);
 		}
@@ -5208,13 +5215,15 @@ namespace EmuMath
 		/// <para> Theoretical indices may not be referenced, and using theoretical indices will result in a compile-time error. </para>
 		/// </summary>
 		/// <returns>EmuMath Vector containing references to this Vector's data, or this Vector's references if it is also a reference-containing Vector.</returns>
-		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), value_type&> RefShuffle()
+		template<std::size_t...Indices_>
+		[[nodiscard]] constexpr inline auto RefShuffle()
+			-> std::enable_if_t<sizeof...(Indices_) != 0, EmuMath::Vector<sizeof...(Indices_), value_type&>>
 		{
 			return EmuMath::Helpers::vector_shuffle<value_type&, Indices_...>(*this);
 		}
-		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), const value_type&> RefShuffle() const
+		template<std::size_t...Indices_>
+		[[nodiscard]] constexpr inline auto RefShuffle() const
+			-> std::enable_if_t<sizeof...(Indices_) != 0, EmuMath::Vector<sizeof...(Indices_), const value_type&>>
 		{
 			return EmuMath::Helpers::vector_shuffle<const value_type&, Indices_...>(*this);
 		}
@@ -5230,8 +5239,9 @@ namespace EmuMath
 		/// <para> Theoretical indices may not be referenced, and using theoretical indices will result in a compile-time error. </para>
 		/// </summary>
 		/// <returns>EmuMath Vector containing const references to this Vector's data, or this Vector's references if it is also a reference-containing Vector.</returns>
-		template<std::size_t...Indices_, typename = std::enable_if_t<sizeof...(Indices_) != 0>>
-		[[nodiscard]] constexpr inline EmuMath::Vector<sizeof...(Indices_), const value_type&> ConstRefShuffle() const
+		template<std::size_t...Indices_>
+		[[nodiscard]] constexpr inline auto ConstRefShuffle() const
+			-> std::enable_if_t<sizeof...(Indices_) != 0, EmuMath::Vector<sizeof...(Indices_), const value_type&>>
 		{
 			return EmuMath::Helpers::vector_shuffle<const value_type&, Indices_...>(*this);
 		}
@@ -7108,66 +7118,44 @@ namespace EmuMath
 		/// <para> Offset_: Optional offset at which to start reading this Vector for forming the output cast. Defaults to 0. </para>
 		/// </summary>
 		/// <returns>Cast of this Vector as an EmuMath Vector with the provided OutSize_ and OutT_ args.</returns>
-		template
-		<
-			std::size_t OutSize_,
-			typename OutT_,
-			std::size_t Offset_ = 0,
-			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<const this_type&, OutSize_, OutT_, Offset_>()>
-		>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Cast() const
+		template<std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline auto Cast() const
+			-> std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<const this_type&, OutSize_, OutT_, Offset_>(), EmuMath::Vector<OutSize_, OutT_>>
 		{
 			return EmuMath::Helpers::vector_cast<OutSize_, OutT_, Offset_>(*this);
 		}
-		template
-		<
-			std::size_t OutSize_,
-			std::size_t Offset_ = 0,
-			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<const this_type&, OutSize_, value_type_uq, Offset_>()>
-		>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, value_type_uq> Cast() const
+		template<std::size_t OutSize_,std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline auto Cast() const
+			-> std::enable_if_t
+			<
+				EmuMath::Helpers::vector_cast_is_valid<const this_type&, OutSize_, value_type_uq, Offset_>(),
+				EmuMath::Vector<OutSize_, value_type_uq>
+			>
 		{
 			return EmuMath::Helpers::vector_cast<OutSize_, value_type_uq, Offset_>(*this);
 		}
-		template
-		<
-			typename OutT_,
-			std::size_t Offset_ = 0,
-			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<const this_type&, get_size(), OutT_, Offset_>()>
-		>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Cast() const
+		template<typename OutT_, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline auto Cast() const
+			-> std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<const this_type&, get_size(), OutT_, Offset_>(), EmuMath::Vector<size, OutT_>>
 		{
 			return EmuMath::Helpers::vector_cast<size, OutT_, Offset_>(*this);
 		}
 
-		template
-		<
-			std::size_t OutSize_,
-			typename OutT_,
-			std::size_t Offset_ = 0,
-			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<this_type&, OutSize_, OutT_, Offset_>()>
-		>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Cast()
+		template<std::size_t OutSize_, typename OutT_, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline auto Cast()
+			-> std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<this_type&, OutSize_, OutT_, Offset_>(), EmuMath::Vector<OutSize_, OutT_>>
 		{
 			return EmuMath::Helpers::vector_cast<OutSize_, OutT_, Offset_>(*this);
 		}
-		template
-		<
-			std::size_t OutSize_,
-			std::size_t Offset_ = 0,
-			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<this_type&, OutSize_, value_type_uq, Offset_>()>
-		>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, value_type_uq> Cast()
+		template<std::size_t OutSize_, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline auto Cast()
+			-> std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<this_type&, OutSize_, value_type_uq, Offset_>(), EmuMath::Vector<OutSize_, value_type_uq>>
 		{
 			return EmuMath::Helpers::vector_cast<OutSize_, value_type_uq, Offset_>(*this);
 		}
-		template
-		<
-			typename OutT_,
-			std::size_t Offset_ = 0,
-			typename = std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<this_type&, get_size(), OutT_, Offset_>()>
-		>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Cast()
+		template<typename OutT_, std::size_t Offset_ = 0>
+		[[nodiscard]] constexpr inline auto Cast()
+			-> std::enable_if_t<EmuMath::Helpers::vector_cast_is_valid<this_type&, get_size(), OutT_, Offset_>(), EmuMath::Vector<size, OutT_>>
 		{
 			return EmuMath::Helpers::vector_cast<size, OutT_, Offset_>(*this);
 		}
@@ -7195,8 +7183,9 @@ namespace EmuMath
 		/// <para> This is not available for Vectors that do not have an alternative template representation. </para>
 		/// </summary>
 		/// <returns>Alternative template representation of this Vector to create the same underlying structure, (non-const) copying this Vector's internals.</returns>
-		template<std::size_t Unused_ = 0, typename = std::enable_if_t<_can_cast_as_alt_rep<Unused_>()>>
-		[[nodiscard]] constexpr inline alternative_rep AsAlternativeRep()
+		template<std::size_t Unused_ = 0>
+		[[nodiscard]] constexpr inline auto AsAlternativeRep()
+			-> std::enable_if_t<_can_cast_as_alt_rep<Unused_>(), alternative_rep>
 		{
 			return alternative_rep(*this);
 		}
@@ -7212,8 +7201,9 @@ namespace EmuMath
 		/// <para> This const variant is further not available for Vectors that contain non-const references. </para>
 		/// </summary>
 		/// <returns>Alternative template representation of this Vector to create the same underlying structure, (const) copying this Vector's internals.</returns>
-		template<std::size_t Unused_ = 0, typename = std::enable_if_t<_can_const_cast_as_alt_rep<Unused_>()>>
-		[[nodiscard]] constexpr inline alternative_rep AsAlternativeRep() const
+		template<std::size_t Unused_ = 0>
+		[[nodiscard]] constexpr inline auto AsAlternativeRep() const
+			-> std::enable_if_t<_can_const_cast_as_alt_rep<Unused_>(), alternative_rep>
 		{
 			return alternative_rep(*this);
 		}
