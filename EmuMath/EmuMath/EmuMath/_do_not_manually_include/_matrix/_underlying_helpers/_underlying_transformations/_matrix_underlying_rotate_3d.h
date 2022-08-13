@@ -834,51 +834,29 @@ namespace EmuMath::Helpers::_matrix_underlying
 	)
 		-> std::enable_if_t<sizeof...(RemainingQuaternionTs_) != 0, OutMatrix_>
 	{
-		if constexpr (sizeof...(RemainingQuaternionTs_) == 0)
+		using out_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
+		using calc_fp = typename EmuCore::TMP::largest_floating_point
+		<
+			typename out_mat_uq::preferred_floating_point,
+			typename EmuMath::Quaternion<FirstQuaternionT_>::preferred_floating_point,
+			typename EmuMath::Quaternion<SecondQuaternionT_>::preferred_floating_point,
+			typename EmuMath::Quaternion<RemainingQuaternionTs_>::preferred_floating_point...
+		>::type;
+		if constexpr (Fused_)
 		{
-			using out_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
-			using calc_fp = typename EmuCore::TMP::largest_floating_point
-			<
-				typename out_mat_uq::preferred_floating_point,
-				typename EmuMath::Quaternion<FirstQuaternionT_>::preferred_floating_point,
-				typename EmuMath::Quaternion<SecondQuaternionT_>::preferred_floating_point
-			>::type;
-			if constexpr (Fused_)
-			{
-				return _matrix_rotate_3_from_quaternion<OutMatrix_>(first_quaternion_.FusedMultiply<calc_fp>(second_quaternion_));
-			}
-			else
-			{
-				return _matrix_rotate_3_from_quaternion<OutMatrix_>(first_quaternion_.Multiply<calc_fp>(second_quaternion_));
-			}
+			EmuMath::Quaternion<calc_fp> combined_quaternion = first_quaternion_.FusedMultiply<calc_fp>(second_quaternion_);
+			_complete_quaternion_sequence<Fused_>(combined_quaternion, remaining_quaternions_...);
+			return _matrix_rotate_3_from_quaternion<OutMatrix_>(combined_quaternion);
+
 		}
 		else
 		{
-			using out_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
-			using calc_fp = typename EmuCore::TMP::largest_floating_point
-			<
-				typename out_mat_uq::preferred_floating_point,
-				typename EmuMath::Quaternion<FirstQuaternionT_>::preferred_floating_point,
-				typename EmuMath::Quaternion<SecondQuaternionT_>::preferred_floating_point,
-				typename EmuMath::Quaternion<RemainingQuaternionTs_>::preferred_floating_point...
-			>::type;
-			if constexpr (Fused_)
-			{
-				EmuMath::Quaternion<calc_fp> combined_quaternion = first_quaternion_.FusedMultiply<calc_fp>(second_quaternion_);
-				_complete_quaternion_sequence<Fused_>(combined_quaternion, remaining_quaternions_...);
-				return _matrix_rotate_3_from_quaternion<OutMatrix_>(combined_quaternion);
-
-			}
-			else
-			{
-				EmuMath::Quaternion<calc_fp> combined_quaternion = first_quaternion_.Multiply<calc_fp>(second_quaternion_);
-				_complete_quaternion_sequence<Fused_>(combined_quaternion, remaining_quaternions_...);
-				return _matrix_rotate_3_from_quaternion<OutMatrix_>(combined_quaternion);
-			}
-
+			EmuMath::Quaternion<calc_fp> combined_quaternion = first_quaternion_.Multiply<calc_fp>(second_quaternion_);
+			_complete_quaternion_sequence<Fused_>(combined_quaternion, remaining_quaternions_...);
+			return _matrix_rotate_3_from_quaternion<OutMatrix_>(combined_quaternion);
 		}
-
 	}
+
 	template<class OutMatrix_, bool Fused_, typename FirstQuaternionT_, typename SecondQuaternionT_>
 	[[nodiscard]] constexpr inline OutMatrix_ _matrix_rotate_3_from_quaternion_sequence
 	(
