@@ -550,7 +550,7 @@ int main()
 	constexpr auto mat_quat = EmuMath::Quaternion<float>::from_euler_constexpr<false>(45, 0, 0) * EmuMath::Quaternion<double>::from_euler_constexpr<false>(0, 0, 33);
 	constexpr auto mat_from_euler = EmuMath::Helpers::matrix_make_rotation_3d_x_constexpr<5, false, false, 4, 4, double, true>(45.0f) *
 		EmuMath::Helpers::matrix_make_rotation_3d_z_constexpr<5, false, false, 4, 4, double, true>(33.0f);
-	constexpr auto mat_from_quat = EmuMath::Helpers::_matrix_underlying::_matrix_rotate_3_from_quaternion<decltype(mat_from_euler), false>(mat_quat);
+	constexpr auto mat_from_quat = EmuMath::Helpers::_matrix_underlying::_matrix_rotate_3_from_quaternion<decltype(mat_from_euler)>(mat_quat);
 	constexpr auto mat_from_quats = EmuMath::Helpers::_matrix_underlying::_matrix_rotate_3_from_quaternion_sequence<decltype(mat_from_euler), false>
 	(
 		EmuMath::Quaternion<double>::from_euler_constexpr<false>(15.0f, 0.0f, 0.0f),

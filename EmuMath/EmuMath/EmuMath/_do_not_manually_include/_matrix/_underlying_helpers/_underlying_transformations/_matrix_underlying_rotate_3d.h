@@ -727,7 +727,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		);
 	}
 
-	template<class OutMatrix_, bool Fused_, typename QuaternionT_>
+	template<class OutMatrix_, typename QuaternionT_>
 	[[nodiscard]] constexpr inline OutMatrix_ _matrix_rotate_3_from_quaternion(const EmuMath::Quaternion<QuaternionT_>& quaternion_)
 	{
 		// Note: this function calculates everything regardless of Matrix size, since chances are that the output is at least 3x3 in this context
@@ -825,13 +825,14 @@ namespace EmuMath::Helpers::_matrix_underlying
 		_complete_quaternion_sequence<Fused_>(out_quaternion_, remaining_quaternions_...);
 	}
 
-	template<class OutMatrix_, bool Fused_ = true, typename FirstQuaternionT_, typename SecondQuaternionT_, typename...RemainingQuaternionTs_>
-	[[nodiscard]] constexpr inline OutMatrix_ _matrix_rotate_3_from_quaternion_sequence
+	template<class OutMatrix_, bool Fused_, typename FirstQuaternionT_, typename SecondQuaternionT_, typename...RemainingQuaternionTs_>
+	[[nodiscard]] constexpr inline auto _matrix_rotate_3_from_quaternion_sequence
 	(
 		const EmuMath::Quaternion<FirstQuaternionT_>& first_quaternion_,
 		const EmuMath::Quaternion<SecondQuaternionT_>& second_quaternion_,
 		const EmuMath::Quaternion<RemainingQuaternionTs_>&...remaining_quaternions_
 	)
+		-> std::enable_if_t<sizeof...(RemainingQuaternionTs_) != 0, OutMatrix_>
 	{
 		if constexpr (sizeof...(RemainingQuaternionTs_) == 0)
 		{
@@ -844,11 +845,11 @@ namespace EmuMath::Helpers::_matrix_underlying
 			>::type;
 			if constexpr (Fused_)
 			{
-				return _matrix_rotate_3_from_quaternion<OutMatrix_, Fused_>(first_quaternion_.FusedMultiply<calc_fp>(second_quaternion_));
+				return _matrix_rotate_3_from_quaternion<OutMatrix_>(first_quaternion_.FusedMultiply<calc_fp>(second_quaternion_));
 			}
 			else
 			{
-				return _matrix_rotate_3_from_quaternion<OutMatrix_, Fused_>(first_quaternion_.Multiply<calc_fp>(second_quaternion_));
+				return _matrix_rotate_3_from_quaternion<OutMatrix_>(first_quaternion_.Multiply<calc_fp>(second_quaternion_));
 			}
 		}
 		else
@@ -865,16 +866,40 @@ namespace EmuMath::Helpers::_matrix_underlying
 			{
 				EmuMath::Quaternion<calc_fp> combined_quaternion = first_quaternion_.FusedMultiply<calc_fp>(second_quaternion_);
 				_complete_quaternion_sequence<Fused_>(combined_quaternion, remaining_quaternions_...);
-				return _matrix_rotate_3_from_quaternion<OutMatrix_, Fused_>(combined_quaternion);
+				return _matrix_rotate_3_from_quaternion<OutMatrix_>(combined_quaternion);
 
 			}
 			else
 			{
 				EmuMath::Quaternion<calc_fp> combined_quaternion = first_quaternion_.Multiply<calc_fp>(second_quaternion_);
 				_complete_quaternion_sequence<Fused_>(combined_quaternion, remaining_quaternions_...);
-				return _matrix_rotate_3_from_quaternion<OutMatrix_, Fused_>(combined_quaternion);
+				return _matrix_rotate_3_from_quaternion<OutMatrix_>(combined_quaternion);
 			}
 
+		}
+
+	}
+	template<class OutMatrix_, bool Fused_, typename FirstQuaternionT_, typename SecondQuaternionT_>
+	[[nodiscard]] constexpr inline OutMatrix_ _matrix_rotate_3_from_quaternion_sequence
+	(
+		const EmuMath::Quaternion<FirstQuaternionT_>& first_quaternion_,
+		const EmuMath::Quaternion<SecondQuaternionT_>& second_quaternion_
+	)
+	{
+		using out_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
+		using calc_fp = typename EmuCore::TMP::largest_floating_point
+		<
+			typename out_mat_uq::preferred_floating_point,
+			typename EmuMath::Quaternion<FirstQuaternionT_>::preferred_floating_point,
+			typename EmuMath::Quaternion<SecondQuaternionT_>::preferred_floating_point
+		>::type;
+		if constexpr (Fused_)
+		{
+			return _matrix_rotate_3_from_quaternion<OutMatrix_>(first_quaternion_.FusedMultiply<calc_fp>(second_quaternion_));
+		}
+		else
+		{
+			return _matrix_rotate_3_from_quaternion<OutMatrix_>(first_quaternion_.Multiply<calc_fp>(second_quaternion_));
 		}
 	}
 #pragma endregion
