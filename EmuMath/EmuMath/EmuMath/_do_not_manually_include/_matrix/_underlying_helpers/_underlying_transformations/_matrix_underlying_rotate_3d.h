@@ -690,7 +690,193 @@ namespace EmuMath::Helpers::_matrix_underlying
 #pragma endregion
 
 #pragma region QUATERNION_MAKERS
-	// TODO
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class OutMatrixUQ_, typename CalcFP_>
+	[[nodiscard]] constexpr inline decltype(auto) _matrix_rotate_3_from_quaternion_get_arg(CalcFP_* p_results_3x3_column_major_)
+	{
+		// Indices [0:2, 0:2] are all formed in the created 3x3 "matrix", so always move from there first
+		if constexpr (ColumnIndex_ <= 2 && RowIndex_ <= 2)
+		{
+			constexpr std::size_t index = (ColumnIndex_ * 3) + RowIndex_;
+			return std::move(p_results_3x3_column_major_[index]);
+		}
+		else if constexpr (ColumnIndex_ == RowIndex_)
+		{
+			return EmuCore::TMP::construct_or_cast<typename OutMatrixUQ_::value_type_uq>(1);
+		}
+		else
+		{
+			return OutMatrixUQ_::get_implied_zero();
+		}
+	}
+
+	template<class OutMatrix_, typename CalcFP_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+	[[nodiscard]] constexpr inline OutMatrix_ _matrix_rotate_3_make_from_quaternion_results
+	(
+		CalcFP_* p_results_3x3_column_major_,
+		std::index_sequence<ColumnIndices_...> column_indices_,
+		std::index_sequence<RowIndices_...> row_indices_
+	)
+	{
+		using mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
+		return OutMatrix_
+		(
+			std::forward<decltype(_matrix_rotate_3_from_quaternion_get_arg<ColumnIndices_, RowIndices_, mat_uq, CalcFP_>(p_results_3x3_column_major_))>
+			(
+				_matrix_rotate_3_from_quaternion_get_arg<ColumnIndices_, RowIndices_, mat_uq, CalcFP_>(p_results_3x3_column_major_)
+			)...
+		);
+	}
+
+	template<class OutMatrix_, bool Fused_, typename QuaternionT_>
+	[[nodiscard]] constexpr inline OutMatrix_ _matrix_rotate_3_from_quaternion(const EmuMath::Quaternion<QuaternionT_>& quaternion_)
+	{
+		// Note: this function calculates everything regardless of Matrix size, since chances are that the output is at least 3x3 in this context
+		// --- The extra layer of abstraction would be either difficult to maintain or a potential performance sacrifice with little gain
+		using mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
+		using mat_fp = typename mat_uq::preferred_floating_point;
+		using quat_fp = typename EmuMath::Quaternion<QuaternionT_>::preferred_floating_point;
+		using calc_fp = typename EmuCore::TMP::largest_floating_point<mat_fp, quat_fp>::type;
+
+		calc_fp x = static_cast<calc_fp>(quaternion_.X());
+		calc_fp y = static_cast<calc_fp>(quaternion_.Y());
+		calc_fp z = static_cast<calc_fp>(quaternion_.Z());
+		calc_fp w = static_cast<calc_fp>(quaternion_.W());
+
+		using add_func = EmuCore::do_add<calc_fp, calc_fp>;
+		using sub_func = EmuCore::do_subtract<calc_fp, calc_fp>;
+		using mul_func = EmuCore::do_multiply<calc_fp, calc_fp>;
+
+		// Common calculation values
+		calc_fp x_MUL_2 = mul_func()(x, calc_fp(2));
+		calc_fp y_MUL_2 = mul_func()(y, calc_fp(2));
+		calc_fp z_MUL_2 = mul_func()(z, calc_fp(2));
+
+		calc_fp one_SUB_x_MUL_2_MUL_x = sub_func()(calc_fp(1), mul_func()(x_MUL_2, x));
+		calc_fp x_MUL_2_MUL_y = mul_func()(x_MUL_2, y);
+		calc_fp x_MUL_2_MUL_z = mul_func()(x_MUL_2, z);
+		calc_fp x_MUL_2_MUL_w = mul_func()(x_MUL_2, w);
+
+		calc_fp y_MUL_2_MUL_y = mul_func()(y_MUL_2, y);
+		calc_fp y_MUL_2_MUL_z = mul_func()(y_MUL_2, z);
+		calc_fp y_MUL_2_MUL_w = mul_func()(y_MUL_2, w);
+
+		calc_fp z_MUL_2_MUL_z = mul_func()(z_MUL_2, z);
+		calc_fp z_MUL_2_MUL_w = mul_func()(z_MUL_2, w);
+
+		// Calculate 3x3 rotation matrix in column-major order; remaining indices are 0 (except 1s on main diagonal)
+		// --- This is rather ugly to read, but we skip duplicate calculations this way
+		calc_fp cm_results[9] =
+		{
+			// Column 0
+			sub_func()(sub_func()(calc_fp(1), y_MUL_2_MUL_y), z_MUL_2_MUL_z), // c0r0
+			add_func()(x_MUL_2_MUL_y, z_MUL_2_MUL_w), // c0r1
+			sub_func()(x_MUL_2_MUL_z, y_MUL_2_MUL_w), // c0r2
+
+			// Column 1
+			sub_func()(x_MUL_2_MUL_y, z_MUL_2_MUL_w), // c1r0
+			sub_func()(one_SUB_x_MUL_2_MUL_x, z_MUL_2_MUL_z), // c1r1
+			add_func()(y_MUL_2_MUL_z, x_MUL_2_MUL_w), // c1r2
+
+			// Column 2
+			add_func()(x_MUL_2_MUL_z, y_MUL_2_MUL_w), // c2r0
+			sub_func()(y_MUL_2_MUL_z, x_MUL_2_MUL_w), // c2r1
+			sub_func()(one_SUB_x_MUL_2_MUL_x, y_MUL_2_MUL_y) // c2r2
+		};
+
+		using out_indices = EmuMath::TMP::make_full_matrix_index_sequences<typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type>;
+		using column_indices = typename out_indices::column_index_sequence;
+		using row_indices = typename out_indices::row_index_sequence;
+		return _matrix_rotate_3_make_from_quaternion_results<OutMatrix_, calc_fp>(cm_results, column_indices(), row_indices());
+	}
+
+	template<bool Fused_, typename OutQuaternionT_, typename FinalQuaternionT_>
+	constexpr inline void _complete_quaternion_sequence
+	(
+		EmuMath::Quaternion<OutQuaternionT_>& out_quaternion_,
+		const EmuMath::Quaternion<FinalQuaternionT_>& final_quaternion_
+	)
+	{
+		if constexpr (Fused_)
+		{
+			out_quaternion_.FusedMultiplyAssign(final_quaternion_);
+		}
+		else
+		{
+			out_quaternion_.MultiplyAssign(final_quaternion_);
+		}
+	}
+
+	template<bool Fused_, typename OutQuaternionT_, typename NextQuaternionT_, typename...RemainingQuaternionTs_>
+	constexpr inline auto _complete_quaternion_sequence
+	(
+		EmuMath::Quaternion<OutQuaternionT_>& out_quaternion_,
+		const EmuMath::Quaternion<NextQuaternionT_>& next_quaternion_,
+		const EmuMath::Quaternion<RemainingQuaternionTs_>&...remaining_quaternions_
+	) -> std::enable_if_t<sizeof...(RemainingQuaternionTs_) != 0, void>
+	{
+		if constexpr (Fused_)
+		{
+			out_quaternion_.FusedMultiplyAssign(next_quaternion_);
+		}
+		else
+		{
+			out_quaternion_.MultiplyAssign(next_quaternion_);
+		}
+		_complete_quaternion_sequence<Fused_>(out_quaternion_, remaining_quaternions_...);
+	}
+
+	template<class OutMatrix_, bool Fused_ = true, typename FirstQuaternionT_, typename SecondQuaternionT_, typename...RemainingQuaternionTs_>
+	[[nodiscard]] constexpr inline OutMatrix_ _matrix_rotate_3_from_quaternion_sequence
+	(
+		const EmuMath::Quaternion<FirstQuaternionT_>& first_quaternion_,
+		const EmuMath::Quaternion<SecondQuaternionT_>& second_quaternion_,
+		const EmuMath::Quaternion<RemainingQuaternionTs_>&...remaining_quaternions_
+	)
+	{
+		if constexpr (sizeof...(RemainingQuaternionTs_) == 0)
+		{
+			using out_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
+			using calc_fp = typename EmuCore::TMP::largest_floating_point
+			<
+				typename out_mat_uq::preferred_floating_point,
+				typename EmuMath::Quaternion<FirstQuaternionT_>::preferred_floating_point,
+				typename EmuMath::Quaternion<SecondQuaternionT_>::preferred_floating_point
+			>::type;
+			if constexpr (Fused_)
+			{
+				return _matrix_rotate_3_from_quaternion<OutMatrix_, Fused_>(first_quaternion_.FusedMultiply<calc_fp>(second_quaternion_));
+			}
+			else
+			{
+				return _matrix_rotate_3_from_quaternion<OutMatrix_, Fused_>(first_quaternion_.Multiply<calc_fp>(second_quaternion_));
+			}
+		}
+		else
+		{
+			using out_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
+			using calc_fp = typename EmuCore::TMP::largest_floating_point
+			<
+				typename out_mat_uq::preferred_floating_point,
+				typename EmuMath::Quaternion<FirstQuaternionT_>::preferred_floating_point,
+				typename EmuMath::Quaternion<SecondQuaternionT_>::preferred_floating_point,
+				typename EmuMath::Quaternion<RemainingQuaternionTs_>::preferred_floating_point...
+			>::type;
+			if constexpr (Fused_)
+			{
+				EmuMath::Quaternion<calc_fp> combined_quaternion = first_quaternion_.FusedMultiply<calc_fp>(second_quaternion_);
+				_complete_quaternion_sequence<Fused_>(combined_quaternion, remaining_quaternions_...);
+				return _matrix_rotate_3_from_quaternion<OutMatrix_, Fused_>(combined_quaternion);
+
+			}
+			else
+			{
+				EmuMath::Quaternion<calc_fp> combined_quaternion = first_quaternion_.Multiply<calc_fp>(second_quaternion_);
+				_complete_quaternion_sequence<Fused_>(combined_quaternion, remaining_quaternions_...);
+				return _matrix_rotate_3_from_quaternion<OutMatrix_, Fused_>(combined_quaternion);
+			}
+
+		}
+	}
 #pragma endregion
 }
 

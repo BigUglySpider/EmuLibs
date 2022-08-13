@@ -2,6 +2,7 @@
 #define EMU_MATH_MATRIX_TMP_H_INC_ 1
 
 #include "../../../../EmuCore/TMPHelpers/TypeConvertors.h"
+#include "../../../Quaternion.h"
 #include "../../../Vector.h"
 #include <type_traits>
 
