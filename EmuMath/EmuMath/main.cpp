@@ -547,25 +547,30 @@ int main()
 	constexpr auto blo2 = blo;
 	constexpr auto blo3 = EmuMath::Vector<3, float>::is_const_copy_constructible();
 
+	using quat_to_mat_t = double;
+	using quat_mat_type = EmuMath::Matrix<4, 4, quat_to_mat_t, true>;
 	constexpr auto mat_quat = EmuMath::Quaternion<float>::from_euler_constexpr<false>(45, 0, 0) * EmuMath::Quaternion<double>::from_euler_constexpr<false>(0, 0, 33);
-	constexpr auto mat_from_euler = EmuMath::Helpers::matrix_make_rotation_3d_x_constexpr<5, false, false, 4, 4, double, true>(45.0f) *
-		EmuMath::Helpers::matrix_make_rotation_3d_z_constexpr<5, false, false, 4, 4, double, true>(33.0f);
-	constexpr auto mat_from_quat = EmuMath::Helpers::_matrix_underlying::_matrix_rotate_3_from_quaternion<decltype(mat_from_euler)>(mat_quat);
-	constexpr auto mat_from_quats = EmuMath::Helpers::_matrix_underlying::_matrix_rotate_3_from_quaternion_sequence<decltype(mat_from_euler), false>
-	(
-		EmuMath::Quaternion<double>::from_euler_constexpr<false>(15.0f, 0.0f, 0.0f),
-		EmuMath::Quaternion<double>::from_euler_constexpr<false>(15.0f, 0.0f, 0.0f),
-		EmuMath::Quaternion<double>::from_euler_constexpr<false>(15.0f, 0.0f, 0.0f)
-	);
-	auto mat_from_fused_quats = EmuMath::Helpers::_matrix_underlying::_matrix_rotate_3_from_quaternion_sequence<decltype(mat_from_euler), true>
-	(
-		EmuMath::Quaternion<double>::from_euler_constexpr<false>(15.0f, 0.0f, 0.0f),
-		EmuMath::Quaternion<double>::from_euler_constexpr<false>(15.0f, 0.0f, 0.0f),
-		EmuMath::Quaternion<double>::from_euler_constexpr<false>(15.0f, 0.0f, 0.0f)
-	);
-	std::cout << "\n\n" << mat_from_quats << "\n\n" << mat_from_fused_quats << "\n";
 
-	std::cout << "\n\n\n" << mat_from_euler << "\n---\n" << mat_from_quat << "\n\n";
+	constexpr auto mat_from_euler = quat_mat_type::make_rotation_3d_x_constexpr<5, false, false>(45.0f) *
+		quat_mat_type::make_rotation_3d_z_constexpr<5, false, false>(33.0f);
+
+	constexpr auto mat_from_quat = quat_mat_type::make_rotation_3d(mat_quat);
+
+	constexpr auto mat_from_quats = quat_mat_type::make_rotation_3d
+	(
+		EmuMath::Quaternion<double>::from_euler_constexpr<false>(15.0f, 0.0f, 0.0f),
+		EmuMath::Quaternion<double>::from_euler_constexpr<false>(15.0f, 0.0f, 0.0f),
+		EmuMath::Quaternion<double>::from_euler_constexpr<false>(15.0f, 0.0f, 0.0f)
+	);
+
+	auto mat_from_fused_quats = quat_mat_type::make_rotation_3d_fused
+	(
+		EmuMath::Quaternion<double>::from_euler_constexpr<false>(15.0f, 0.0f, 0.0f),
+		EmuMath::Quaternion<double>::from_euler_constexpr<false>(15.0f, 0.0f, 0.0f),
+		EmuMath::Quaternion<double>::from_euler_constexpr<false>(15.0f, 0.0f, 0.0f)
+	);
+
+	std::cout << "\n\n" << mat_from_quats << "\n\n" << mat_from_fused_quats << "\n";
 
 
 	system("pause");

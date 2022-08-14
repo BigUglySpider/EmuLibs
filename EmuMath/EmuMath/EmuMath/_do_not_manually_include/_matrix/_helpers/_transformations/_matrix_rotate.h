@@ -610,6 +610,468 @@ namespace EmuMath::Helpers
 		>(out_matrix_, std::forward<Angle_>(angle_));
 	}
 #pragma endregion
+
+#pragma region QUAT_TO_MAT_VALIDITY_CHECKS
+	/// <summary>
+	/// <para> Check to see if a Matrix of the provided type can be calculated from Quaternions with the provided typeargs. </para>
+	/// <para>
+	///		If no arguments are provided for `OptionalQuaternionTs_`: 
+	///		This is a check to see if a direct Quaternion-to-Matrix conversion can be performed. 
+	/// </para>
+	/// <para>
+	///		If at least 1 additional argument is provided for `OptionalQuaternionTs_`:
+	///		This is a check to see if Quaternions can be sequentially multiplied with results assigned to an intermediate calculation-type Quaternion, 
+	///		and said Quaternion can be converted to the output Matrix.
+	/// </para>
+	/// </summary>
+	/// <returns>
+	///		<para> 
+	///			1: If no arguments are provided for `OptionalQuaternionTs_`: 
+	///			True if a Quaternion with `FirstQuaternionT_` as its type argument can be converted to the specified output Matrix; otherwise false.
+	///		</para>
+	///		<para>
+	///			2: If at least 1 additional argument is provided for `OptionalQuaternionTs_`: True if all of the following are met, otherwise false:
+	///			<para>
+	///				--- A: The first 2 Quaternions can be multiplied and the result output as an intermediate calculation-type Quaternion.
+	///			</para>
+	///			<para>
+	///				--- B: If the number of `OptionalQuaternionTs_` is greater than 1, 
+	///				this intermediate must also be multiply-assignable with all remaining Quaternions. 
+	///				(Note: If the number of `OptionalQuaternionTs_` is greater than 1, this check is not performed).
+	///			</para>
+	///			<para>
+	///				--- C: A Quaternion of the determined calculation type can be converted to the specified output Matrix.
+	///			</para>
+	///		</para>
+	/// </returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, typename FirstQuaternionT_, typename...OptionalQuaternionTs_>
+	[[nodiscard]] constexpr inline bool matrix_can_make_from_quaternion()
+	{
+		return _matrix_underlying::_matrix_can_make_from_quaternions
+		<
+			false,
+			false,
+			EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>,
+			FirstQuaternionT_,
+			OptionalQuaternionTs_...
+		>();
+	}
+
+	/// <summary>
+	/// <para> Check to see if a Matrix of the provided type can be calculated from Quaternions with the provided typeargs. </para>
+	/// <para>
+	///		If no arguments are provided for `OptionalQuaternionTs_`: 
+	///		This is a check to see if a direct Quaternion-to-Matrix conversion can be performed. 
+	/// </para>
+	/// <para>
+	///		If at least 1 additional argument is provided for `OptionalQuaternionTs_`:
+	///		This is a check to see if Quaternions can be sequentially multiplied with results assigned to an intermediate calculation-type Quaternion, 
+	///		and said Quaternion can be converted to the output Matrix.
+	/// </para>
+	/// <para> Where this returns false, it will also trigger static assertions. </para>
+	/// </summary>
+	/// <returns>
+	///		<para> 
+	///			1: If no arguments are provided for `OptionalQuaternionTs_`: 
+	///			True if a Quaternion with `FirstQuaternionT_` as its type argument can be converted to the specified output Matrix; otherwise false.
+	///		</para>
+	///		<para>
+	///			2: If at least 1 additional argument is provided for `OptionalQuaternionTs_`: True if all of the following are met, otherwise false:
+	///			<para>
+	///				--- A: The first 2 Quaternions can be multiplied and the result output as an intermediate calculation-type Quaternion.
+	///			</para>
+	///			<para>
+	///				--- B: If the number of `OptionalQuaternionTs_` is greater than 1, 
+	///				this intermediate must also be multiply-assignable with all remaining Quaternions. 
+	///				(Note: If the number of `OptionalQuaternionTs_` is greater than 1, this check is not performed).
+	///			</para>
+	///			<para>
+	///				--- C: A Quaternion of the determined calculation type can be converted to the specified output Matrix.
+	///			</para>
+	///		</para>
+	/// </returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, typename FirstQuaternionT_, typename...OptionalQuaternionTs_>
+	[[nodiscard]] constexpr inline bool matrix_assert_can_make_from_quaternion()
+	{
+		return _matrix_underlying::_matrix_can_make_from_quaternions
+		<
+			true,
+			false,
+			EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>,
+			FirstQuaternionT_,
+			OptionalQuaternionTs_...
+		>();
+	}
+	
+	/// <summary>
+	/// <para>
+	///		Check to see if a Matrix of the provided type can be calculated from Quaternions with the provided typeargs, 
+	///		attempting to use fused operations where applicable.
+	/// </para>
+	/// <para>
+	///		If no arguments are provided for `OptionalQuaternionTs_`: 
+	///		This is a check to see if a direct Quaternion-to-Matrix conversion can be performed. 
+	/// </para>
+	/// <para>
+	///		If at least 1 additional argument is provided for `OptionalQuaternionTs_`:
+	///		This is a check to see if Quaternions can be sequentially multiplied with results assigned to an intermediate calculation-type Quaternion, 
+	///		and said Quaternion can be converted to the output Matrix.
+	/// </para>
+	/// </summary>
+	/// <returns>
+	///		<para> 
+	///			1: If no arguments are provided for `OptionalQuaternionTs_`: 
+	///			True if a Quaternion with `FirstQuaternionT_` as its type argument can be converted to the specified output Matrix; otherwise false.
+	///		</para>
+	///		<para>
+	///			2: If at least 1 additional argument is provided for `OptionalQuaternionTs_`: True if all of the following are met, otherwise false:
+	///			<para>
+	///				--- A: The first 2 Quaternions can be fused-multiplied and the result output as an intermediate calculation-type Quaternion.
+	///			</para>
+	///			<para>
+	///				--- B: If the number of `OptionalQuaternionTs_` is greater than 1, 
+	///				this intermediate must also be fused-multiply-assignable with all remaining Quaternions. 
+	///				(Note: If the number of `OptionalQuaternionTs_` is greater than 1, this check is not performed).
+	///			</para>
+	///			<para>
+	///				--- C: A Quaternion of the determined calculation type can be converted to the specified output Matrix.
+	///			</para>
+	///		</para>
+	/// </returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, typename FirstQuaternionT_, typename...OptionalQuaternionTs_>
+	[[nodiscard]] constexpr inline bool matrix_can_fused_make_from_quaternion()
+	{
+		return _matrix_underlying::_matrix_can_make_from_quaternions
+		<
+			false,
+			true,
+			EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>,
+			FirstQuaternionT_,
+			OptionalQuaternionTs_...
+		>();
+	}
+
+	/// <summary>
+	/// <para>
+	///		Check to see if a Matrix of the provided type can be calculated from Quaternions with the provided typeargs, 
+	///		attempting to use fused operations where applicable.
+	/// </para>
+	/// <para>
+	///		If no arguments are provided for `OptionalQuaternionTs_`: 
+	///		This is a check to see if a direct Quaternion-to-Matrix conversion can be performed. 
+	/// </para>
+	/// <para>
+	///		If at least 1 additional argument is provided for `OptionalQuaternionTs_`:
+	///		This is a check to see if Quaternions can be sequentially multiplied with results assigned to an intermediate calculation-type Quaternion, 
+	///		and said Quaternion can be converted to the output Matrix.
+	/// </para>
+	/// <para> Where this returns false, it will also trigger static assertions. </para>
+	/// </summary>
+	/// <returns>
+	///		<para> 
+	///			1:  If no arguments are provided for `OptionalQuaternionTs_`: 
+	///			True if a Quaternion with `FirstQuaternionT_` as its type argument can be converted to the specified output Matrix; otherwise false.
+	///		</para>
+	///		<para>
+	///			2: If at least 1 additional argument is provided for `OptionalQuaternionTs_`: True if all of the following are met, otherwise false:
+	///			<para>
+	///				--- A: The first 2 Quaternions can be fused-multiplied and the result output as an intermediate calculation-type Quaternion.
+	///			</para>
+	///			<para>
+	///				--- B: If the number of `OptionalQuaternionTs_` is greater than 1, 
+	///				this intermediate must also be fused-multiply-assignable with all remaining Quaternions. 
+	///				(Note: If the number of `OptionalQuaternionTs_` is greater than 1, this check is not performed).
+	///			</para>
+	///			<para>
+	///				--- C: A Quaternion of the determined calculation type can be converted to the specified output Matrix.
+	///			</para>
+	///		</para>
+	/// </returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, typename FirstQuaternionT_, typename...OptionalQuaternionTs_>
+	[[nodiscard]] constexpr inline bool matrix_assert_can_fused_make_from_quaternion()
+	{
+		return _matrix_underlying::_matrix_can_make_from_quaternions
+		<
+			true,
+			true,
+			EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>,
+			FirstQuaternionT_,
+			OptionalQuaternionTs_...
+		>();
+	}
+#pragma endregion
+
+#pragma region MAKE_FROM_QUATERNIONS
+	/// <summary>
+	/// <para> Converts the passed Quaternion into a Matrix of the specified type, representing a 3D rotation transformation. </para>
+	/// <para> The size of the output Matrix may be omitted, in which case it will default to 4x4. </para>
+	/// </summary>
+	/// <param name="quaternion_">EmuMath Quaternion to convert to a 3D rotation transformation Matrix.</param>
+	/// <returns>3D transformation Matrix of the specified type, representing the same rotation as the passed Quaternion.</returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_ = true, typename QuaternionT_>
+	[[nodiscard]] constexpr inline auto matrix_make_rotation_3d(const EmuMath::Quaternion<QuaternionT_>& quaternion_)
+		-> std::enable_if_t
+		<
+			matrix_can_make_from_quaternion<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_, QuaternionT_>(),
+			EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+		>
+	{
+		return _matrix_underlying::_matrix_rotate_3_from_quaternion<EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>>(quaternion_);
+	}
+
+	template<typename OutT_, bool OutColumnMajor_ = true, typename QuaternionT_>
+	[[nodiscard]] constexpr inline auto matrix_make_rotation_3d(const EmuMath::Quaternion<QuaternionT_>& quaternion_)
+		-> std::enable_if_t
+		<
+			matrix_can_make_from_quaternion<4, 4, OutT_, OutColumnMajor_, QuaternionT_>(),
+			EmuMath::Matrix<4, 4, OutT_, OutColumnMajor_>
+		>
+	{
+		return _matrix_underlying::_matrix_rotate_3_from_quaternion<EmuMath::Matrix<4, 4, OutT_, OutColumnMajor_>>(quaternion_);
+	}
+	
+	/// <summary>
+	/// <para> Combines the passed Quaternions and converts the result into a Matrix of the specified type, representing a 3D rotation transformation. </para>
+	/// <para> The Quaternions will be combined in sequence from left-to-right. </para>
+	/// <para> The size of the output Matrix may be omitted, in which case it will default to 4x4. </para>
+	/// </summary>
+	/// <param name="first_quaternion_">EmuMath Quaternion appearing first in the rotation sequence.</param>
+	/// <param name="second_quaternion_">EmuMath Quaternion appearing second in the rotation sequence.</param>
+	/// <returns>3D transformation Matrix of the specified type, representing the rotation resulting from sequentially combining the passed Quaternions.</returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_ = true, typename FirstQuatT_, typename SecondQuatT_>
+	[[nodiscard]] constexpr inline auto matrix_make_rotation_3d
+	(
+		const EmuMath::Quaternion<FirstQuatT_>& first_quaternion_,
+		const EmuMath::Quaternion<SecondQuatT_>& second_quaternion_
+	)
+		-> std::enable_if_t
+		<
+			matrix_can_make_from_quaternion<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_, FirstQuatT_, SecondQuatT_>(),
+			EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+		>
+	{
+		return _matrix_underlying::_matrix_rotate_3_from_quaternion_sequence<EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>, false>
+		(
+			first_quaternion_,
+			second_quaternion_
+		);
+	}
+
+	template<typename OutT_, bool OutColumnMajor_ = true, typename FirstQuatT_, typename SecondQuatT_>
+	[[nodiscard]] constexpr inline auto matrix_make_rotation_3d
+	(
+		const EmuMath::Quaternion<FirstQuatT_>& first_quaternion_,
+		const EmuMath::Quaternion<SecondQuatT_>& second_quaternion_
+	)
+		-> std::enable_if_t
+		<
+			matrix_can_make_from_quaternion<4, 4, OutT_, OutColumnMajor_, FirstQuatT_, SecondQuatT_>(),
+			EmuMath::Matrix<4, 4, OutT_, OutColumnMajor_>
+		>
+	{
+		return _matrix_underlying::_matrix_rotate_3_from_quaternion_sequence<EmuMath::Matrix<4, 4, OutT_, OutColumnMajor_>, false>
+		(
+			first_quaternion_,
+			second_quaternion_
+		);
+	}
+
+	/// <summary>
+	/// <para> Combines the passed Quaternions and converts the result into a Matrix of the specified type, representing a 3D rotation transformation. </para>
+	/// <para> The Quaternions will be combined in sequence from left-to-right. </para>
+	/// <para> The size of the output Matrix may be omitted, in which case it will default to 4x4. </para>
+	/// </summary>
+	/// <param name="first_quaternion_">EmuMath Quaternion appearing first in the rotation sequence.</param>
+	/// <param name="second_quaternion_">EmuMath Quaternion appearing second in the rotation sequence.</param>
+	/// <returns>3D transformation Matrix of the specified type, representing the rotation resulting from sequentially combining the passed Quaternions.</returns>
+	template
+	<
+		std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_ = true,
+		typename FirstQuatT_, typename SecondQuatT_, typename...RemainingQuatTs_
+	>
+	[[nodiscard]] constexpr inline auto matrix_make_rotation_3d
+	(
+		const EmuMath::Quaternion<FirstQuatT_>& first_quaternion_,
+		const EmuMath::Quaternion<SecondQuatT_>& second_quaternion_,
+		const EmuMath::Quaternion<RemainingQuatTs_>&...remaining_quaternions_in_sequence_
+	)
+		-> std::enable_if_t
+		<
+			matrix_can_make_from_quaternion<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_, FirstQuatT_, SecondQuatT_, RemainingQuatTs_...>(),
+			EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+		>
+	{
+		return _matrix_underlying::_matrix_rotate_3_from_quaternion_sequence<EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>, false>
+		(
+			first_quaternion_,
+			second_quaternion_,
+			remaining_quaternions_in_sequence_...
+		);
+	}
+
+	template<typename OutT_, bool OutColumnMajor_ = true, typename FirstQuatT_, typename SecondQuatT_, typename...RemainingQuatTs_>
+	[[nodiscard]] constexpr inline auto matrix_make_rotation_3d
+	(
+		const EmuMath::Quaternion<FirstQuatT_>& first_quaternion_,
+		const EmuMath::Quaternion<SecondQuatT_>& second_quaternion_,
+		const EmuMath::Quaternion<RemainingQuatTs_>&...remaining_quaternions_in_sequence_
+	)
+		-> std::enable_if_t
+		<
+			matrix_can_make_from_quaternion<4, 4, OutT_, OutColumnMajor_, FirstQuatT_, SecondQuatT_, RemainingQuatTs_...>(),
+			EmuMath::Matrix<4, 4, OutT_, OutColumnMajor_>
+		>
+	{
+		return _matrix_underlying::_matrix_rotate_3_from_quaternion_sequence<EmuMath::Matrix<4, 4, OutT_, OutColumnMajor_>, false>
+		(
+			first_quaternion_,
+			second_quaternion_,
+			remaining_quaternions_in_sequence_...
+		);
+	}
+#pragma endregion
+
+#pragma region FUSED_MAKE_FROM_QUATERNIONS
+	/// <summary>
+	/// <para> Converts the passed Quaternion into a Matrix of the specified type, representing a 3D rotation transformation. </para>
+	/// <para> The size of the output Matrix may be omitted, in which case it will default to 4x4. </para>
+	/// <para>
+	///		This function will attempt to take advantage of fused instructions (such as FMADD) if possible, or emulate them otherwise. 
+	///		Use of such instructions may improve accuracy and/or performance.
+	/// </para>
+	/// </summary>
+	/// <param name="quaternion_">EmuMath Quaternion to convert to a 3D rotation transformation Matrix.</param>
+	/// <returns>3D transformation Matrix of the specified type, representing the same rotation as the passed Quaternion.</returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_ = true, typename QuaternionT_>
+	[[nodiscard]] constexpr inline auto matrix_make_rotation_3d_fused(const EmuMath::Quaternion<QuaternionT_>& quaternion_)
+		-> std::enable_if_t
+		<
+			matrix_can_fused_make_from_quaternion<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_, QuaternionT_>(),
+			EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+		>
+	{
+		return _matrix_underlying::_matrix_rotate_3_from_quaternion<EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>>(quaternion_);
+	}
+
+	template<typename OutT_, bool OutColumnMajor_ = true, typename QuaternionT_>
+	[[nodiscard]] constexpr inline auto matrix_make_rotation_3d_fused(const EmuMath::Quaternion<QuaternionT_>& quaternion_)
+		-> std::enable_if_t
+		<
+			matrix_can_fused_make_from_quaternion<4, 4, OutT_, OutColumnMajor_, QuaternionT_>(),
+			EmuMath::Matrix<4, 4, OutT_, OutColumnMajor_>
+		>
+	{
+		return _matrix_underlying::_matrix_rotate_3_from_quaternion<EmuMath::Matrix<4, 4, OutT_, OutColumnMajor_>>(quaternion_);
+	}
+	
+	/// <summary>
+	/// <para> Combines the passed Quaternions and converts the result into a Matrix of the specified type, representing a 3D rotation transformation. </para>
+	/// <para> The Quaternions will be combined in sequence from left-to-right. </para>
+	/// <para> The size of the output Matrix may be omitted, in which case it will default to 4x4. </para>
+	/// <para>
+	///		This function will attempt to take advantage of fused instructions (such as FMADD) if possible, or emulate them otherwise. 
+	///		Use of such instructions may improve accuracy and/or performance.
+	/// </para>
+	/// </summary>
+	/// <param name="first_quaternion_">EmuMath Quaternion appearing first in the rotation sequence.</param>
+	/// <param name="second_quaternion_">EmuMath Quaternion appearing second in the rotation sequence.</param>
+	/// <returns>3D transformation Matrix of the specified type, representing the rotation resulting from sequentially combining the passed Quaternions.</returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_ = true, typename FirstQuatT_, typename SecondQuatT_>
+	[[nodiscard]] constexpr inline auto matrix_make_rotation_3d_fused
+	(
+		const EmuMath::Quaternion<FirstQuatT_>& first_quaternion_,
+		const EmuMath::Quaternion<SecondQuatT_>& second_quaternion_
+	)
+		-> std::enable_if_t
+		<
+			matrix_can_fused_make_from_quaternion<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_, FirstQuatT_, SecondQuatT_>(),
+			EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+		>
+	{
+		return _matrix_underlying::_matrix_rotate_3_from_quaternion_sequence<EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>, true>
+		(
+			first_quaternion_,
+			second_quaternion_
+		);
+	}
+
+	template<typename OutT_, bool OutColumnMajor_ = true, typename FirstQuatT_, typename SecondQuatT_>
+	[[nodiscard]] constexpr inline auto matrix_make_rotation_3d_fused
+	(
+		const EmuMath::Quaternion<FirstQuatT_>& first_quaternion_,
+		const EmuMath::Quaternion<SecondQuatT_>& second_quaternion_
+	)
+		-> std::enable_if_t
+		<
+			matrix_can_fused_make_from_quaternion<4, 4, OutT_, OutColumnMajor_, FirstQuatT_, SecondQuatT_>(),
+			EmuMath::Matrix<4, 4, OutT_, OutColumnMajor_>
+		>
+	{
+		return _matrix_underlying::_matrix_rotate_3_from_quaternion_sequence<EmuMath::Matrix<4, 4, OutT_, OutColumnMajor_>, true>
+		(
+			first_quaternion_,
+			second_quaternion_
+		);
+	}
+
+	/// <summary>
+	/// <para> Combines the passed Quaternions and converts the result into a Matrix of the specified type, representing a 3D rotation transformation. </para>
+	/// <para> The Quaternions will be combined in sequence from left-to-right. </para>
+	/// <para> The size of the output Matrix may be omitted, in which case it will default to 4x4. </para>
+	/// <para>
+	///		This function will attempt to take advantage of fused instructions (such as FMADD) if possible, or emulate them otherwise. 
+	///		Use of such instructions may improve accuracy and/or performance.
+	/// </para>
+	/// </summary>
+	/// <param name="first_quaternion_">EmuMath Quaternion appearing first in the rotation sequence.</param>
+	/// <param name="second_quaternion_">EmuMath Quaternion appearing second in the rotation sequence.</param>
+	/// <returns>3D transformation Matrix of the specified type, representing the rotation resulting from sequentially combining the passed Quaternions.</returns>
+	template
+	<
+		std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_ = true,
+		typename FirstQuatT_, typename SecondQuatT_, typename...RemainingQuatTs_
+	>
+	[[nodiscard]] constexpr inline auto matrix_make_rotation_3d_fused
+	(
+		const EmuMath::Quaternion<FirstQuatT_>& first_quaternion_,
+		const EmuMath::Quaternion<SecondQuatT_>& second_quaternion_,
+		const EmuMath::Quaternion<RemainingQuatTs_>&...remaining_quaternions_in_sequence_
+	)
+		-> std::enable_if_t
+		<
+			matrix_can_fused_make_from_quaternion<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_, FirstQuatT_, SecondQuatT_, RemainingQuatTs_...>(),
+			EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+		>
+	{
+		return _matrix_underlying::_matrix_rotate_3_from_quaternion_sequence<EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>, true>
+		(
+			first_quaternion_,
+			second_quaternion_,
+			remaining_quaternions_in_sequence_...
+		);
+	}
+
+	template<typename OutT_, bool OutColumnMajor_ = true, typename FirstQuatT_, typename SecondQuatT_, typename...RemainingQuatTs_>
+	[[nodiscard]] constexpr inline auto matrix_make_rotation_3d_fused
+	(
+		const EmuMath::Quaternion<FirstQuatT_>& first_quaternion_,
+		const EmuMath::Quaternion<SecondQuatT_>& second_quaternion_,
+		const EmuMath::Quaternion<RemainingQuatTs_>&...remaining_quaternions_in_sequence_
+	)
+		-> std::enable_if_t
+		<
+			matrix_can_fused_make_from_quaternion<4, 4, OutT_, OutColumnMajor_, FirstQuatT_, SecondQuatT_, RemainingQuatTs_...>(),
+			EmuMath::Matrix<4, 4, OutT_, OutColumnMajor_>
+		>
+	{
+		return _matrix_underlying::_matrix_rotate_3_from_quaternion_sequence<EmuMath::Matrix<4, 4, OutT_, OutColumnMajor_>, true>
+		(
+			first_quaternion_,
+			second_quaternion_,
+			remaining_quaternions_in_sequence_...
+		);
+	}
+#pragma endregion
 }
 
 #endif

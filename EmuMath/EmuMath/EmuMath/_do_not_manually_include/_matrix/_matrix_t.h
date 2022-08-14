@@ -5538,7 +5538,7 @@ namespace EmuMath
 		[[nodiscard]] static constexpr inline bool valid_assign_rotation_3d_z_constexpr_arg()
 		{
 			return valid_rotation_3d_constexpr_arg<Angle_, AngleIsRads_, 2, true, NumTrigIterations_, TrigMod_>();
-		}
+		}		
 #pragma endregion
 
 #pragma region ROTATION_3D_TRANSFORMATION
@@ -5808,6 +5808,70 @@ namespace EmuMath
 			-> std::enable_if_t<valid_assign_rotation_3d_z_constexpr_arg<Angle_, AngleIsRads_, NumTrigIterations_, TrigMod_>(), void>
 		{
 			EmuMath::Helpers::matrix_assign_rotation_3d_z_constexpr<NumTrigIterations_, TrigMod_, AngleIsRads_>(*this, std::forward<Angle_>(angle_));
+		}
+#pragma endregion
+
+#pragma region ROTATION_3D_TRANSFORMATION_FROM_QUATERNION_VALIDITY
+	public:
+		template<typename OutT_, typename FirstQuaternionT_, typename...OtherQuaternionTs_>
+		[[nodiscard]] static constexpr inline bool valid_make_rotation_3d_from_quaternion_args()
+		{
+			return EmuMath::Helpers::matrix_can_make_from_quaternion<num_columns, num_rows, OutT_, is_column_major, FirstQuaternionT_, OtherQuaternionTs_...>();
+		}
+
+		template<typename OutT_, typename FirstQuaternionT_, typename...OtherQuaternionTs_>
+		[[nodiscard]] static constexpr inline bool valid_make_rotation_3d_from_quaternion_args_fused()
+		{
+			return EmuMath::Helpers::matrix_can_fused_make_from_quaternion<num_columns, num_rows, OutT_, is_column_major, FirstQuaternionT_, OtherQuaternionTs_...>();
+		}
+#pragma endregion
+
+#pragma region ROTATION_3D_TRANSFORMATION_FROM_QUATERNION_FUNCS
+	public:
+		/// <summary>
+		/// <para> Converts the passed Quaternion into a 3D rotation transformation Matrix. </para>
+		/// <para> The type stored in the output Matrix may be omitted, and defaults to this Matrix type's `preferred_floating_point`. </para>
+		/// <para> If more than one Quaternion is passed, they will be combined in sequence from left-to-right and the result will be converted. </para>
+		/// </summary>
+		/// <param name="quaternion_">EmuMath Quaternion(s) to convert to a 3D rotation transformation Matrix.</param>
+		/// <returns>
+		///		3D transformation Matrix of the specified type (with size and major order matching those of this Matrix type),
+		///		representing the same rotation as the passed Quaternion (or the Quaternion resulting from sequencing all passed Quaternions).
+		/// </returns>
+		template<typename OutT_ = preferred_floating_point, typename...SequentialQuaternionTs_>
+		[[nodiscard]] static constexpr inline auto make_rotation_3d(const EmuMath::Quaternion<SequentialQuaternionTs_>&...sequential_quaternions_)
+			-> std::enable_if_t
+			<
+				valid_make_rotation_3d_from_quaternion_args<OutT_, SequentialQuaternionTs_...>(),
+				EmuMath::Matrix<num_columns, num_rows, OutT_, is_column_major>
+			>
+		{
+			return EmuMath::Helpers::matrix_make_rotation_3d<num_columns, num_rows, OutT_, is_column_major>(sequential_quaternions_...);
+		}
+
+		/// <summary>
+		/// <para> Converts the passed Quaternion into a 3D rotation transformation Matrix. </para>
+		/// <para> The type stored in the output Matrix may be omitted, and defaults to this Matrix type's `preferred_floating_point`. </para>
+		/// <para> If more than one Quaternion is passed, they will be combined in sequence from left-to-right and the result will be converted. </para>
+		/// <para>
+		///		This function will attempt to take advantage of fused instructions (such as FMADD) if possible, or emulate them otherwise. 
+		///		Use of such instructions may improve accuracy and/or performance.
+		/// </para>
+		/// </summary>
+		/// <param name="quaternion_">EmuMath Quaternion(s) to convert to a 3D rotation transformation Matrix.</param>
+		/// <returns>
+		///		3D transformation Matrix of the specified type (with size and major order matching those of this Matrix type),
+		///		representing the same rotation as the passed Quaternion (or the Quaternion resulting from sequencing all passed Quaternions).
+		/// </returns>
+		template<typename OutT_ = preferred_floating_point, typename...SequentialQuaternionTs_>
+		[[nodiscard]] static constexpr inline auto make_rotation_3d_fused(const EmuMath::Quaternion<SequentialQuaternionTs_>&...sequential_quaternions_)
+			-> std::enable_if_t
+			<
+				valid_make_rotation_3d_from_quaternion_args_fused<OutT_, SequentialQuaternionTs_...>(),
+				EmuMath::Matrix<num_columns, num_rows, OutT_, is_column_major>
+			>
+		{
+			return EmuMath::Helpers::matrix_make_rotation_3d_fused<num_columns, num_rows, OutT_, is_column_major>(sequential_quaternions_...);
 		}
 #pragma endregion
 
