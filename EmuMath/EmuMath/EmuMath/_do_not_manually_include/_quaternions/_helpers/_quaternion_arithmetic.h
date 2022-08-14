@@ -161,7 +161,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			return quaternion_can_scalar_multiply_assign<LhsT_, Rhs_, LhsT_, StaticAssert_>();
+			return quaternion_can_scalar_multiply_assign<LhsT_, Rhs_, StaticAssert_>();
 		}
 	}
 
@@ -185,7 +185,7 @@ namespace EmuMath::Helpers
 		}
 		else
 		{
-			return quaternion_can_scalar_multiply_assign<LhsT_, Rhs_, LhsT_, StaticAssert_>();
+			return quaternion_can_scalar_multiply_assign<LhsT_, Rhs_, StaticAssert_>();
 		}
 	}
 
