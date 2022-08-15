@@ -572,6 +572,15 @@ int main()
 
 	std::cout << "\n\n" << mat_from_quats << "\n\n" << mat_from_fused_quats << "\n";
 
+	std::cout << "\n\n";
+	constexpr auto perspective_mat = EmuMath::Helpers::matrix_perspective_vk_reverse_depth_constexpr<double>
+	(
+		0.785398,
+		1920.0 / 1080.0,
+		0.1,
+		100.0
+	);
+	std::cout << perspective_mat << "\n" << perspective_mat.Flatten() << "\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

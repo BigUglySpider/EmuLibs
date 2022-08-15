@@ -7,6 +7,7 @@
 #include "../_underlying_helpers/_matrix_underlying_get.h"
 #include "../_underlying_helpers/_matrix_underlying_misc_arithmetic.h"
 #include "../_underlying_helpers/_matrix_underlying_mutate.h"
+#include "../_underlying_helpers/_matrix_underlying_projections.h"
 #include "../_underlying_helpers/_matrix_special_arithmetic.h"
 #include "../_underlying_helpers/_matrix_underlying_special_operations.h"
 #include "../_underlying_helpers/_matrix_underlying_stream_append.h"

@@ -190,6 +190,10 @@
     <ClInclude Include="EmuMath\Quaternion.h" />
     <ClInclude Include="EmuMath\Random.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_vectors\_fast_vector_t.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_projections.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_projections\_vulkan\_matrix_perspectives_vulkan.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_matrix_underlying_projections.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_underlying_projections\_matrix_underlying_perspective.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_helpers\_all_helpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_helpers\_common_quaternion_helper_includes.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_helpers\_conversions\_quaternion_conversion_from_euler.h" />
