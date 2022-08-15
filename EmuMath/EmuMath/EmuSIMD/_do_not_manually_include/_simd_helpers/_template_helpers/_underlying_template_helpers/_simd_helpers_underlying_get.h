@@ -208,7 +208,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 	}
 
 	template<typename Out_, class Register_, typename NoConstReq_ = std::enable_if_t<!std::is_const_v<Out_>>>
-	[[nodiscard]] inline void _store_register(Register_ register_, Out_* p_out_)
+	inline void _store_register(Register_ register_, Out_* p_out_)
 	{
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<Register_>)
 		{

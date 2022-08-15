@@ -119,6 +119,11 @@ namespace EmuMath::Helpers::_matrix_underlying
 		{
 			using out_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
 			using out_value_uq = typename out_mat_uq::value_type_uq;
+
+			// 6287 silenced here as there is a warning for function calls due to potential side-effects
+			// --- In this context, side-effects are not expected. If there are any, it will be due to an ill-formed specialisation
+#pragma warning(push)
+#pragma warning(disable: 6287)
 			return
 			(
 				... &&
@@ -129,6 +134,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 					decltype(std::declval<OutMatrix_>().template at<ColumnIndices_, RowIndices_>())
 				>()
 			);
+#pragma warning(pop)
 		}
 		else
 		{
@@ -151,6 +157,10 @@ namespace EmuMath::Helpers::_matrix_underlying
 		{
 			using out_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
 			using out_value_uq = typename out_mat_uq::value_type_uq;
+			// 6287 silenced here as there is a warning for function calls due to potential side-effects
+			// --- In this context, side-effects are not expected. If there are any, it will be due to an ill-formed specialisation
+#pragma warning(push)
+#pragma warning(disable: 6287)
 			return
 			(
 				... &&
@@ -161,6 +171,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 					decltype(std::declval<OutMatrix_>().template at<ColumnIndices_, RowIndices_>())
 				>()
 			);
+#pragma warning(pop)
 		}
 		else
 		{
@@ -341,7 +352,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 	}
 
 	template<class OutMatrix_, class TranslateArg_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
-	[[nodiscard]] constexpr inline void _matrix_translate_assign_single_arg
+	constexpr inline void _matrix_translate_assign_single_arg
 	(
 		OutMatrix_& out_matrix_,
 		std::index_sequence<ColumnIndices_...> column_indices_,

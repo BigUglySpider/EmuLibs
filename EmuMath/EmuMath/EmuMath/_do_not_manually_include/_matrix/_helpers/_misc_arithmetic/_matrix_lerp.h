@@ -698,7 +698,7 @@ namespace EmuMath::Helpers
 		std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_,
 		class B_, class T_, typename TA_, std::size_t NumColumnsA_, std::size_t NumRowsA_, bool ColumnMajorA_
 	>
-	[[nodiscard]] constexpr inline void matrix_lerp_range_no_copy
+	constexpr inline void matrix_lerp_range_no_copy
 	(
 		EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_,
 		const EmuMath::Matrix<NumColumnsA_, NumRowsA_, TA_, ColumnMajorA_>& matrix_a_,

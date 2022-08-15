@@ -40,7 +40,7 @@ namespace EmuSIMD
 	/// <param name="register_">Register to store the contained data of.</param>
 	/// <param name="p_out_">Non-const pointer to a memory location to output to.</param>
 	template<typename Out_, class Register_, typename NoConstReq_ = std::enable_if_t<!std::is_const_v<Out_>>>
-	[[nodiscard]] inline void store(Register_ register_, Out_* p_out_)
+	inline void store(Register_ register_, Out_* p_out_)
 	{
 		if constexpr (EmuSIMD::TMP::is_simd_register_v<Register_>)
 		{

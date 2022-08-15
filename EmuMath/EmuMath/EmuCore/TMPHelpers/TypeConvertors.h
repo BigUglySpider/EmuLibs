@@ -500,6 +500,32 @@ namespace EmuCore::TMP
 	};
 	template<typename T_>
 	using forward_result_t = typename forward_result<T_>::type;
+
+	/// <summary>
+	/// <para> Helper for determining the type argument of a template where the type is known to be a template, but the template instantiation itself is not available. </para>
+	/// <para> This will only work with single-argument templates. </para>
+	/// <para> When passed a non-template type or a type with non-type parameters and/or more than 1 argument will result in a `type` of `void`. </para>
+	/// <para> When passed a template instantiation of that takes just a single argument, `type` will be the type passed to instantiate the template. </para>
+	/// </summary>
+	template<typename T_>
+	struct type_argument
+	{
+	private:
+		using _t_uq = typename EmuCore::TMP::remove_ref_cv<T_>::type;
+
+	public:
+		using type = typename std::conditional_t
+		<
+			std::is_same_v<_t_uq, T_>,
+			EmuCore::TMP::dummy_type_wrapper<void>,
+			type_argument<_t_uq>
+		>::type;
+	};
+	template<template<class Arg_> class Template_, typename T_>
+	struct type_argument<Template_<T_>>
+	{
+		using type = T_;
+	};
 }
 
 #endif

@@ -592,7 +592,7 @@ namespace EmuMath::Helpers
 		bool InColumnMajor_,
 		class...Args_
 	>
-	[[nodiscard]] constexpr inline void matrix_mutate_copy_to
+	constexpr inline void matrix_mutate_copy_to
 	(
 		EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_,
 		EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>& in_matrix_,
@@ -633,7 +633,7 @@ namespace EmuMath::Helpers
 		bool InColumnMajor_,
 		class...Args_
 	>
-	[[nodiscard]] constexpr inline void matrix_mutate_copy_to
+	constexpr inline void matrix_mutate_copy_to
 	(
 		EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_,
 		const EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>& in_matrix_,
@@ -674,7 +674,7 @@ namespace EmuMath::Helpers
 		bool InColumnMajor_,
 		class...Args_
 	>
-	[[nodiscard]] constexpr inline void matrix_mutate_copy_to
+	constexpr inline void matrix_mutate_copy_to
 	(
 		EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_,
 		EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>&& in_matrix_,
@@ -733,7 +733,7 @@ namespace EmuMath::Helpers
 		bool InColumnMajor_,
 		class...Args_
 	>
-	[[nodiscard]] constexpr inline void matrix_mutate_copy_to
+	constexpr inline void matrix_mutate_copy_to
 	(
 		EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_,
 		EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>& in_matrix_,
@@ -772,7 +772,7 @@ namespace EmuMath::Helpers
 		bool InColumnMajor_,
 		class...Args_
 	>
-	[[nodiscard]] constexpr inline void matrix_mutate_copy_to
+	constexpr inline void matrix_mutate_copy_to
 	(
 		EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_,
 		const EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>& in_matrix_,
@@ -811,7 +811,7 @@ namespace EmuMath::Helpers
 		bool InColumnMajor_,
 		class...Args_
 	>
-	[[nodiscard]] constexpr inline void matrix_mutate_copy_to
+	constexpr inline void matrix_mutate_copy_to
 	(
 		EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_,
 		EmuMath::Matrix<InNumColumns_, InNumRows_, InT_, InColumnMajor_>&& in_matrix_,
