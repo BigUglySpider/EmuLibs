@@ -12,6 +12,7 @@
 #include "EmuMath/Noise.h"
 #include "EmuMath/Quaternion.h"
 #include "EmuMath/Random.h"
+#include "EmuMath/Rect.h"
 #include "EmuMath/Vector.h"
 
 // Test harness execution
@@ -581,6 +582,15 @@ int main()
 		100.0
 	);
 	std::cout << perspective_mat << "\n" << perspective_mat.Flatten() << "\n";
+
+	constexpr auto rect = EmuMath::Rect<float>(5);
+	constexpr auto rect_centre = rect.Centre();
+	constexpr auto rect_b = EmuMath::Rect<double>(3, 4.2, 10, 10);
+	constexpr auto rect_b_centre = rect_b.Centre();
+	constexpr auto rect_well_formed = rect.WellFormed();
+	constexpr auto rect_temp_well_formed = EmuMath::Rect<float>(0, 3, -1, 3).WellFormed();
+	constexpr auto rect_made_central = EmuMath::Rect<float>(23, 10).MakeCentred(5, 5);
+	constexpr auto rect_made_central = EmuMath::Rect<float>(23, 10).MakeCentred(EmuMath::Vector<2, int>(3, 217));
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
