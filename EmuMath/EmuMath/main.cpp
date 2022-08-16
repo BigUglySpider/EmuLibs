@@ -322,7 +322,6 @@ int main()
 
 
 	std::cout << "ASSIGN_TRANSLATION TESTS\n";
-	using Mat4x4f32CM = EmuMath::Matrix<4, 4, float, true>;
 	EmuMath::Matrix<4, 4, float, true> translate_assign_matrix(10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160);
 	std::cout << translate_assign_matrix << "\n\n";
 	translate_assign_matrix.AssignTranslation(5);
@@ -341,8 +340,8 @@ int main()
 	std::cout << "Constexpr:\n" << rot_0 << "\n\n:Runtime:\n" << EmuMath::Helpers::matrix_make_rotation_3d_z<true, float, false>(-33) << "\n\n";
 
 	std::cout << "ROTATION MEMBER TESTS\n";
-	auto member_rot_runtime = Mat4x4f32CM::make_rotation_3d_z<false>(33);
-	constexpr auto member_rot = Mat4x4f32CM::make_rotation_3d_z_constexpr<4, true, false>(33);
+	auto member_rot_runtime = EmuMath::Matrix<4, 4, float, true>::make_rotation_3d_z<false>(33);
+	constexpr auto member_rot = EmuMath::Matrix<4, 4, float, true>::make_rotation_3d_z_constexpr<4, true, false>(33);
 	std::cout << "runtime: " << (member_rot_runtime * point_to_rotate) << "\n";
 	std::cout << "constexpr: " << (member_rot * point_to_rotate) << "\n";
 
@@ -630,7 +629,6 @@ int main()
 	constexpr EmuMath::Rect<float> rect_from_init_list = { 1, 2, 3, 4 };
 	constexpr EmuMath::Vector<12, float> vec_from_init_list = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
 	auto yoiyoi = vec_from_init_list;
-	yoiyoi = { 13, 14, 15, 16,  17, 18, 19, 20, 21, 22, 23, 24 };
 
 
 	system("pause");
