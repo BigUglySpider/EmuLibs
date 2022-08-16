@@ -116,6 +116,20 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region CONST_ARITHMETIC_OPERATORS
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> operator*(const preferred_floating_point& rhs_scale_) const
+		{
+			return Scale<OutT_>(rhs_scale_, rhs_scale_);
+		}
+
+		template<typename OutT_ = preferred_floating_point, std::size_t VecSize_, typename VecT_>
+		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> operator*(const EmuMath::Vector<VecSize_, VecT_>& scale_vector_2d_) const
+		{
+			return Scale<OutT_>(scale_vector_2d_.template AtTheoretical<0>(), scale_vector_2d_.template AtTheoretical<1>());
+		}
+#pragma endregion
+
 #pragma region ACCESSORS
 	private:
 		template<std::size_t Index_, std::size_t Left_, std::size_t Top_, std::size_t Right_, std::size_t Bottom_>
@@ -535,6 +549,79 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline bool ContainsPoint(const EmuMath::Vector<VecSize_, VecT_>& point_vec_2d_) const
 		{
 			return ContainsPoint(point_vec_2d_.template AtTheoretical<0>(), point_vec_2d_.template AtTheoretical<1>());
+		}
+#pragma endregion
+
+#pragma region CONST_ARITHMETIC_FUNCS
+	public:
+		/// <summary>
+		/// <para>
+		///		Creates a copy of this Rect scaled about its centre, 
+		///		changing all boundaries to scale its size in respective axes whilst maintaining the same central point.
+		/// </para>
+		/// <para> This assumes that the Rect is well-formed. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `value_type_uq`. </para>
+		/// </summary>
+		/// <param name="scale_x_">Scale to apply to this Rect's width.</param>
+		/// <param name="scale_y_">Scale to apply to this Rect's height.</param>
+		/// <returns>This Rect scaled by the provided factors in respective axes, with the same central point.</returns>
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> Scale(const preferred_floating_point& scale_x_, const preferred_floating_point& scale_y_) const
+		{
+			using add_func = EmuCore::do_add<preferred_floating_point, preferred_floating_point>;
+			using sub_func = EmuCore::do_subtract<preferred_floating_point, preferred_floating_point>;
+			using mul_func = EmuCore::do_multiply<preferred_floating_point, preferred_floating_point>;
+			using div_func = EmuCore::do_divide<preferred_floating_point, preferred_floating_point>;
+
+			preferred_floating_point width = Width<preferred_floating_point>();
+			preferred_floating_point height = Height<preferred_floating_point>();
+
+			preferred_floating_point centre_y = add_func()(Top(), div_func()(height, preferred_floating_point(2)));
+			preferred_floating_point centre_x = add_func()(Left(), div_func()(width, preferred_floating_point(2)));
+
+			// Set width and height to half of new width and height; these are subtracted/added from centres to form begin/end boundaries
+			width = div_func()(mul_func()(width, scale_x_), preferred_floating_point(2));
+			height = div_func()(mul_func()(height, scale_y_), preferred_floating_point(2));
+
+			return EmuMath::Rect<OutT_>
+			(
+				sub_func()(centre_x, width),
+				sub_func()(centre_y, height),
+				add_func()(centre_x, width),
+				add_func()(centre_y, height)
+			);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Creates a copy of this Rect scaled about its centre, 
+		///		changing all boundaries to scale its size in all axes whilst maintaining the same central point.
+		/// </para>
+		/// <para> This assumes that the Rect is well-formed. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `value_type_uq`. </para>
+		/// </summary>
+		/// <param name="shared_scale_">Scale to apply to this Rect's width and height.</param>
+		/// <returns>This Rect scaled by the provided factor in all axes, with the same central point.</returns>
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> Scale(const preferred_floating_point& shared_scale_) const
+		{
+			return Scale(shared_scale_, shared_scale_);
+		}
+
+		/// <summary>
+		/// <para>
+		///		Creates a copy of this Rect scaled about its centre, 
+		///		changing all boundaries to scale its size in respective axes whilst maintaining the same central point.
+		/// </para>
+		/// <para> This assumes that the Rect is well-formed. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `value_type_uq`. </para>
+		/// </summary>
+		/// <param name="scale_vector_2d_">EmuMath Vector of scales to apply to this Rect, with X and Y and theoretical indices 0 and 1 respectively.</param>
+		/// <returns>This Rect scaled by the provided factors in respective axes, with the same central point.</returns>
+		template<typename OutT_ = preferred_floating_point, std::size_t VecSize_, typename VecT_>
+		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> Scale(const EmuMath::Vector<VecSize_, VecT_>& scale_vector_2d_) const
+		{
+			return Scale(scale_vector_2d_.template AtTheoretical<0>(), scale_vector_2d_.template AtTheoretical<1>());
 		}
 #pragma endregion
 

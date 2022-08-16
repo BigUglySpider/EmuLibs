@@ -591,6 +591,18 @@ int main()
 	constexpr auto rect_temp_well_formed = EmuMath::Rect<float>(0, 3, -1, 3).WellFormed();
 	constexpr auto rect_made_central = EmuMath::Rect<float>(23, 10).MakeCentred(5, 5);
 	constexpr auto central_contains_point_a_ = rect_made_central.ContainsPoint(4, 3);
+	constexpr auto rect_to_scale = EmuMath::Rect<float>(1, -2, 2.5, 4.17);
+	constexpr auto pre_scale_centre = rect_to_scale.Centre();
+	constexpr auto pre_scale_width = rect_to_scale.Width();
+	constexpr auto pre_scale_size = rect_to_scale.Size();
+	constexpr auto scaled_rect = rect_to_scale * 2;
+	constexpr auto scaled_centre = scaled_rect.Centre();
+	constexpr auto scaled_width = scaled_rect.Width();
+	constexpr auto scaled_size = scaled_rect.Size();
+	constexpr auto reduce_scaled_rect = rect_to_scale * 0.5;
+	constexpr auto reduce_scaled_centre = reduce_scaled_rect.Centre();
+	constexpr auto reduce_scaled_width = reduce_scaled_rect.Width();
+	constexpr auto reduce_scaled_size = reduce_scaled_rect.Size();
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
