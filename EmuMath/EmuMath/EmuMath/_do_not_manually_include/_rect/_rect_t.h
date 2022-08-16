@@ -502,6 +502,42 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region CONTAINS_CHECKS
+	public:
+		/// <summary>
+		/// <para> Determines if a given point is contained within this Rect based on its current Left, Top, Right, and Bottom boundaries </para>
+		/// <para> This assumes that the Rect is well-formed. </para>
+		/// </summary>
+		/// <param name="x_">X coordinate to check for.</param>
+		/// <param name="y_">Y coordinate to check for.</param>
+		/// <returns>True if the provided X and Y coordinates are contained within this Rect's boundaries.</returns>
+		template<typename X_, typename Y_>
+		[[nodiscard]] constexpr inline bool ContainsPoint(X_&& x_, Y_&& y_) const
+		{
+			using cmp_less_equal = EmuCore::do_cmp_less_equal<value_type_uq, value_type_uq>;
+			using cmp_greater_equal = EmuCore::do_cmp_greater_equal<value_type_uq, value_type_uq>;
+			value_type_uq x = static_cast<value_type_uq>(std::forward<X_>(x_));
+			value_type_uq y = static_cast<value_type_uq>(std::forward<Y_>(y_));
+			return
+			(
+				(cmp_less_equal()(Top(), y) && cmp_greater_equal()(Bottom(), y)) &&
+				(cmp_less_equal()(Left(), x) && cmp_greater_equal()(Right(), x))
+			);
+		}
+
+		/// <summary>
+		/// <para> Determines if a given point is contained within this Rect based on its current Left, Top, Right, and Bottom boundaries </para>
+		/// <para> This assumes that the Rect is well-formed. </para>
+		/// </summary>
+		/// <param name="point_vec_2d_">EmuMath Vector with coordinates to search for in the X- and Y-axes in theoretical indices 0 and 1 respectively..</param>
+		/// <returns>True if the provided coordinates are contained within this Rect's boundaries.</returns>
+		template<std::size_t VecSize_, typename VecT_>
+		[[nodiscard]] constexpr inline bool ContainsPoint(const EmuMath::Vector<VecSize_, VecT_>& point_vec_2d_) const
+		{
+			return ContainsPoint(point_vec_2d_.template AtTheoretical<0>(), point_vec_2d_.template AtTheoretical<1>());
+		}
+#pragma endregion
+
 	private:
 		_underlying_vector _left_top_right_bottom;
 	};

@@ -183,6 +183,8 @@
     <ClInclude Include="EmuCore\TMPHelpers\Values.h" />
     <ClInclude Include="EmuCore\TMPHelpers\VariadicHelpers.h" />
     <ClInclude Include="EmuMath\Colour.h" />
+    <ClInclude Include="EmuMath\Common3D.h" />
+    <ClInclude Include="EmuMath\Fast3D.h" />
     <ClInclude Include="EmuMath\FastNoise.h" />
     <ClInclude Include="EmuMath\FastVector.h" />
     <ClInclude Include="EmuMath\Matrix.h" />

@@ -590,7 +590,7 @@ int main()
 	constexpr auto rect_well_formed = rect.WellFormed();
 	constexpr auto rect_temp_well_formed = EmuMath::Rect<float>(0, 3, -1, 3).WellFormed();
 	constexpr auto rect_made_central = EmuMath::Rect<float>(23, 10).MakeCentred(5, 5);
-	constexpr auto rect_made_central = EmuMath::Rect<float>(23, 10).MakeCentred(EmuMath::Vector<2, int>(3, 217));
+	constexpr auto central_contains_point_a_ = rect_made_central.ContainsPoint(4, 3);
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
