@@ -627,6 +627,12 @@ int main()
 	constexpr auto reflect_alt_i = to_reflect.Reflect(0, 1);
 	constexpr auto reflect_alt_j = to_reflect.Reflect(1, 1).Reflect(-1, -1);
 
+	constexpr EmuMath::Rect<float> rect_from_init_list = { 1, 2, 3, 4 };
+	constexpr EmuMath::Vector<12, float> vec_from_init_list = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+	auto yoiyoi = vec_from_init_list;
+	yoiyoi = { 13, 14, 15, 16,  17, 18, 19, 20, 21, 22, 23, 24 };
+
+
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;

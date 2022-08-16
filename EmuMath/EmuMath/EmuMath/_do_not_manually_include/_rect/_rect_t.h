@@ -71,7 +71,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="size_">Size of the square to create the Rect as.</param>
 		template<typename Size_>
-		constexpr inline Rect(Size_&& size_) :
+		explicit constexpr inline Rect(Size_&& size_) :
 			_left_top_right_bottom(_make_data(std::forward<Size_>(size_)))
 		{
 		}
@@ -105,7 +105,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="to_copy_">Rect of a different type to copy/convert.</param>
 		template<typename ToCopyT_, typename = std::enable_if_t<!std::is_same_v<T_, ToCopyT_>>>
-		constexpr inline Rect(const EmuMath::Rect<ToCopyT_>& to_copy_) :
+		explicit constexpr inline Rect(const EmuMath::Rect<ToCopyT_>& to_copy_) :
 			_left_top_right_bottom(_make_data(to_copy_.Left(), to_copy_.Top(), to_copy_.Right(), to_copy_.Bottom()))
 		{
 		}
@@ -115,7 +115,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="to_copy_">Rect of a different type to copy/convert.</param>
 		template<typename ToCopyT_, typename = std::enable_if_t<!std::is_same_v<T_, ToCopyT_>>>
-		constexpr inline Rect(EmuMath::Rect<ToCopyT_>& to_copy_) :
+		explicit constexpr inline Rect(EmuMath::Rect<ToCopyT_>& to_copy_) :
 			_left_top_right_bottom(_make_data(to_copy_.Left(), to_copy_.Top(), to_copy_.Right(), to_copy_.Bottom()))
 		{
 		}
@@ -125,9 +125,21 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="to_move_">Rect of a different type to move/convert.</param>
 		template<typename ToCopyT_, typename = std::enable_if_t<!std::is_same_v<T_, ToCopyT_>>>
-		constexpr inline Rect(EmuMath::Rect<ToCopyT_>&& to_move_) :
+		explicit constexpr inline Rect(EmuMath::Rect<ToCopyT_>&& to_move_) :
 			_left_top_right_bottom(_make_data(std::move(to_move_.Left()), std::move(to_move_.Top()), std::move(to_move_.Right()), std::move(to_move_.Bottom())))
 		{
+		}
+#pragma endregion
+
+#pragma region ASSIGNMENT_FUNCS
+	public:
+		template<typename Left_, typename Top_, typename Right_, typename Bottom_>
+		constexpr inline void Set(Left_&& left_, Top_&& top_, Right_&& right_, Bottom_&& bottom_)
+		{
+			EmuCore::TMP::assign_direct_or_cast<value_type_uq>(Left(), std::forward<Left_>(left_));
+			EmuCore::TMP::assign_direct_or_cast<value_type_uq>(Top(), std::forward<Top_>(top_));
+			EmuCore::TMP::assign_direct_or_cast<value_type_uq>(Right(), std::forward<Right_>(right_));
+			EmuCore::TMP::assign_direct_or_cast<value_type_uq>(Bottom(), std::forward<Bottom_>(bottom_));
 		}
 #pragma endregion
 
@@ -139,9 +151,37 @@ namespace EmuMath
 			return *this;
 		}
 
+		constexpr inline this_type& operator=(Rect<T_>& to_copy_)
+		{
+			_left_top_right_bottom = to_copy_._left_top_right_bottom;
+			return *this;
+		}
+
 		constexpr inline this_type& operator=(Rect<T_>&& to_move_) noexcept
 		{
 			_left_top_right_bottom = std::move(to_move_._left_top_right_bottom);
+			return *this;
+		}
+
+		template<typename RhsT_>
+		constexpr inline this_type& operator=(const Rect<RhsT_>& rhs_)
+		{
+			Set(rhs_.Left(), rhs_.Top(), rhs_.Right(), rhs_.Bottom());
+			return *this;
+		}
+
+		template<typename RhsT_>
+		constexpr inline this_type& operator=(Rect<RhsT_>& rhs_)
+		{
+			Set(rhs_.Left(), rhs_.Top(), rhs_.Right(), rhs_.Bottom());
+			return *this;
+		}
+
+
+		template<typename RhsT_>
+		constexpr inline this_type& operator=(Rect<RhsT_>&& rhs_)
+		{
+			Set(std::move(rhs_.Left()), std::move(rhs_.Top()), std::move(rhs_.Right()), std::move(rhs_.Bottom()));
 			return *this;
 		}
 #pragma endregion
