@@ -604,6 +604,29 @@ int main()
 	constexpr auto reduce_scaled_width = reduce_scaled_rect.Width();
 	constexpr auto reduce_scaled_size = reduce_scaled_rect.Size();
 
+	constexpr auto to_reflect = EmuMath::Rect<float>(1.5, 3, 2, 4);
+	constexpr auto reflect_a = to_reflect.Reflect<0, 0>();
+	constexpr auto reflect_b = to_reflect.Reflect<-1, 0>();
+	constexpr auto reflect_c = to_reflect.Reflect<1, 0>();
+	constexpr auto reflect_d = to_reflect.Reflect<0, -1>();
+	constexpr auto reflect_e = to_reflect.Reflect<0, 1>();
+	constexpr auto reflect_f = to_reflect.Reflect<-1, -1>();
+	constexpr auto reflect_g = to_reflect.Reflect<-1, 1>();
+	constexpr auto reflect_h = to_reflect.Reflect<1, -1>();
+	constexpr auto reflect_i = to_reflect.Reflect<1, 1>();
+	constexpr auto reflect_j = to_reflect.Reflect<1, 1>().Reflect<-1, -1>();
+
+	constexpr auto reflect_alt_a = to_reflect.Reflect(0, 0);
+	constexpr auto reflect_alt_b = to_reflect.Reflect(-1, 0);
+	constexpr auto reflect_alt_c = to_reflect.Reflect(1, 0);
+	constexpr auto reflect_alt_d = to_reflect.Reflect(0, -1);
+	constexpr auto reflect_alt_e = to_reflect.Reflect(0, 1);
+	constexpr auto reflect_alt_f = to_reflect.Reflect(0, -1);
+	constexpr auto reflect_alt_g = to_reflect.Reflect(0, 1);
+	constexpr auto reflect_alt_h = to_reflect.Reflect(0, -1);
+	constexpr auto reflect_alt_i = to_reflect.Reflect(0, 1);
+	constexpr auto reflect_alt_j = to_reflect.Reflect(1, 1).Reflect(-1, -1);
+
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;

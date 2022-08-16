@@ -99,6 +99,36 @@ namespace EmuMath
 			_left_top_right_bottom(_make_data(std::forward<Left_>(left_), std::forward<Top_>(top_), std::forward<Right_>(right_), std::forward<Bottom_>(bottom_)))
 		{
 		}
+
+		/// <summary>
+		/// <para> Converts the input Rect into the newly constructed type of Rect. </para>
+		/// </summary>
+		/// <param name="to_copy_">Rect of a different type to copy/convert.</param>
+		template<typename ToCopyT_, typename = std::enable_if_t<!std::is_same_v<T_, ToCopyT_>>>
+		constexpr inline Rect(const EmuMath::Rect<ToCopyT_>& to_copy_) :
+			_left_top_right_bottom(_make_data(to_copy_.Left(), to_copy_.Top(), to_copy_.Right(), to_copy_.Bottom()))
+		{
+		}
+
+		/// <summary>
+		/// <para> Converts the input Rect into the newly constructed type of Rect. </para>
+		/// </summary>
+		/// <param name="to_copy_">Rect of a different type to copy/convert.</param>
+		template<typename ToCopyT_, typename = std::enable_if_t<!std::is_same_v<T_, ToCopyT_>>>
+		constexpr inline Rect(EmuMath::Rect<ToCopyT_>& to_copy_) :
+			_left_top_right_bottom(_make_data(to_copy_.Left(), to_copy_.Top(), to_copy_.Right(), to_copy_.Bottom()))
+		{
+		}
+			
+		/// <summary>
+		/// <para> Moves and converts the input Rect into the newly constructed type of Rect. </para>
+		/// </summary>
+		/// <param name="to_move_">Rect of a different type to move/convert.</param>
+		template<typename ToCopyT_, typename = std::enable_if_t<!std::is_same_v<T_, ToCopyT_>>>
+		constexpr inline Rect(EmuMath::Rect<ToCopyT_>&& to_move_) :
+			_left_top_right_bottom(_make_data(std::move(to_move_.Left()), std::move(to_move_.Top()), std::move(to_move_.Right()), std::move(to_move_.Bottom())))
+		{
+		}
 #pragma endregion
 
 #pragma region ASSIGNMENT_OPERATORS
@@ -117,6 +147,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONST_ARITHMETIC_OPERATORS
+	public:
 		template<typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> operator*(const preferred_floating_point& rhs_scale_) const
 		{
@@ -127,6 +158,21 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> operator*(const EmuMath::Vector<VecSize_, VecT_>& scale_vector_2d_) const
 		{
 			return Scale<OutT_>(scale_vector_2d_.template AtTheoretical<0>(), scale_vector_2d_.template AtTheoretical<1>());
+		}
+#pragma endregion
+
+#pragma region ARITHMETIC_ASSIGN_OPERATORS
+	public:
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline this_type& operator*=(const preferred_floating_point& rhs_scale_)
+		{
+			return this->operator=(Scale<OutT_>(rhs_scale_, rhs_scale_));
+		}
+
+		template<typename OutT_ = preferred_floating_point, std::size_t VecSize_, typename VecT_>
+		[[nodiscard]] constexpr inline this_type& operator*=(const EmuMath::Vector<VecSize_, VecT_>& scale_vector_2d_)
+		{
+			return this->operator=(Scale<OutT_>(scale_vector_2d_.template AtTheoretical<0>(), scale_vector_2d_.template AtTheoretical<1>()));
 		}
 #pragma endregion
 
@@ -553,6 +599,113 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONST_ARITHMETIC_FUNCS
+	private:
+		template<std::int32_t Direction_>
+		[[nodiscard]] constexpr inline decltype(auto) _get_reflected_left() const
+		{
+			if constexpr (Direction_ == 0)
+			{
+				return Left();
+			}
+			else if constexpr (Direction_ < 0)
+			{
+				return EmuCore::do_subtract<value_type_uq, value_type_uq>()(Left(), Width<value_type_uq>());
+			}
+			else
+			{
+				return Right();
+			}
+		}
+
+		template<std::int32_t Direction_>
+		[[nodiscard]] constexpr inline decltype(auto) _get_reflected_right() const
+		{
+			if constexpr (Direction_ == 0)
+			{
+				return Right();
+			}
+			else if constexpr (Direction_ < 0)
+			{
+				return Left();
+			}
+			else
+			{
+				return EmuCore::do_add<value_type_uq, value_type_uq>()(Right(), Width<value_type_uq>());
+			}
+		}
+
+		template<std::int32_t Direction_>
+		[[nodiscard]] constexpr inline decltype(auto) _get_reflected_top() const
+		{
+			if constexpr (Direction_ == 0)
+			{
+				return Top();
+			}
+			else if constexpr (Direction_ < 0)
+			{
+				return EmuCore::do_subtract<value_type_uq, value_type_uq>()(Top(), Height<value_type_uq>());
+			}
+			else
+			{
+				return Bottom();
+			}
+		}
+
+		template<std::int32_t Direction_>
+		[[nodiscard]] constexpr inline decltype(auto) _get_reflected_bottom() const
+		{
+			if constexpr (Direction_ == 0)
+			{
+				return Bottom();
+			}
+			else if constexpr (Direction_ < 0)
+			{
+				return Top();
+			}
+			else
+			{
+				return EmuCore::do_add<value_type_uq, value_type_uq>()(Bottom(), Height<value_type_uq>());
+			}
+		}
+
+		[[nodiscard]] constexpr inline std::pair<value_type_uq, value_type_uq> _get_reflected_x(std::int32_t direction_) const
+		{
+			using add_func = EmuCore::do_add<value_type_uq, value_type_uq>;
+			using sub_func = EmuCore::do_subtract<value_type_uq, value_type_uq>;
+
+			if (direction_ == 0)
+			{
+				return std::pair<value_type_uq, value_type_uq>(Left(), Right());
+			}
+			else if (direction_ < 0)
+			{
+				return std::pair<value_type_uq, value_type_uq>(sub_func()(Left(), Width<value_type_uq>()), Left());
+			}
+			else
+			{
+				return std::pair<value_type_uq, value_type_uq>(Right(), add_func()(Right(), Width<value_type_uq>()));
+			}
+		}
+
+		[[nodiscard]] constexpr inline std::pair<value_type_uq, value_type_uq> _get_reflected_y(std::int32_t direction_) const
+		{
+			using add_func = EmuCore::do_add<value_type_uq, value_type_uq>;
+			using sub_func = EmuCore::do_subtract<value_type_uq, value_type_uq>;
+
+			if (direction_ == 0)
+			{
+				return std::pair<value_type_uq, value_type_uq>(Top(), Bottom());
+			}
+			else if (direction_ < 0)
+			{
+				return std::pair<value_type_uq, value_type_uq>(sub_func()(Top(), Height<value_type_uq>()), Top());
+			}
+			else
+			{
+				return std::pair<value_type_uq, value_type_uq>(Bottom(), add_func()(Bottom(), Height<value_type_uq>()));
+			}
+		}
+
 	public:
 		/// <summary>
 		/// <para>
@@ -616,12 +769,87 @@ namespace EmuMath
 		/// <para> This assumes that the Rect is well-formed. </para>
 		/// <para> The output type may be customised, but if omitted will default to this Rect's `value_type_uq`. </para>
 		/// </summary>
-		/// <param name="scale_vector_2d_">EmuMath Vector of scales to apply to this Rect, with X and Y and theoretical indices 0 and 1 respectively.</param>
+		/// <param name="scale_vector_2d_">EmuMath Vector of scales to apply to this Rect, with X and Y at theoretical indices 0 and 1 respectively.</param>
 		/// <returns>This Rect scaled by the provided factors in respective axes, with the same central point.</returns>
 		template<typename OutT_ = preferred_floating_point, std::size_t VecSize_, typename VecT_>
 		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> Scale(const EmuMath::Vector<VecSize_, VecT_>& scale_vector_2d_) const
 		{
 			return Scale(scale_vector_2d_.template AtTheoretical<0>(), scale_vector_2d_.template AtTheoretical<1>());
+		}
+
+		/// <summary>
+		/// <para> Creates a copy of this Rect moved by the specified amounts in respective axes. </para>
+		/// <para> This effectively adds the `x_` translation to `Left` and `Right`, and adds `y_` to `Top` and `Bottom`. </para>
+		/// </summary>
+		/// <param name="x_">Amount to move this Rectangle by in the X-axis.</param>
+		/// <param name="y_">Amount to move this Rectangle by in the Y-axis.</param>
+		/// <returns>This Rect translated by the specified amounts in respective axes.</returns>
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> Translate(const preferred_floating_point& x_, const preferred_floating_point& y_) const
+		{
+			using add_func = EmuCore::do_add<preferred_floating_point, preferred_floating_point>;
+			return EmuMath::Rect<OutT_>
+			(
+				add_func()(Left(), x_),
+				add_func()(Top(), y_),
+				add_func()(Right(), x_),
+				add_func()(Bottom(), y_)
+			);
+		}
+
+		/// <summary>
+		/// <para> Creates a copy of this Rect moved by the specified amounts in respective axes. </para>
+		/// <para> This effectively adds the `x_` translation to `Left` and `Right`, and adds `y_` to `Top` and `Bottom`. </para>
+		/// </summary>
+		/// <param name="translation_vector_2d_">
+		///		EmuMath Vector of translations to apply to this Rect, with X and Y at theoretical indices 0 and 1 respectively.
+		/// </param>
+		/// <returns>This Rect translated by the specified amounts in respective axes.</returns>
+		template<typename OutT_ = preferred_floating_point, std::size_t VecSize_, typename VecT_>
+		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> Translate(const EmuMath::Vector<VecSize_, VecT_>& translation_vector_2d_) const
+		{
+			return Translate(translation_vector_2d_.template AtTheoretical<0>(), translation_vector_2d_.template AtTheoretical<1>());
+		}
+
+		/// <summary>
+		/// <para> Creates a reflected copy of this Rect in the specified X- and Y-directions </para>
+		/// <para> XDirection_: 0: No X-axis reflection; Positive: Reflect against Right boundary; Negative: Reflect against Left boundary. </para>
+		/// <para> YDirection_: 0: No Y-axis reflection; Positive: Reflect against Bottom boundary; Negative: Reflect against Top boundary. </para>
+		/// </summary>
+		/// <returns>This Rect reflected as specified by the passed template arguments.</returns>
+		template<std::int32_t XDirection_, std::int32_t YDirection_, typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> Reflect() const
+		{
+			return EmuMath::Rect<OutT_>
+			(
+				_get_reflected_left<XDirection_>(),
+				_get_reflected_top<YDirection_>(),
+				_get_reflected_right<XDirection_>(),
+				_get_reflected_bottom<YDirection_>()
+			);
+		}
+
+		/// <summary>
+		/// <para> Creates a reflected copy of this Rect in the specified X- and Y-directions </para>
+		/// <para> If `x_direction_` and `y_direction_` are known compile-time constants, it is recommended to pass them as template arguments instead. </para>
+		/// </summary>
+		/// <param name="x_direction_">0: No X-axis reflection; Positive: Reflect against Right boundary; Negative: Reflect against Left boundary.</param>
+		/// <param name="y_direction_">0: No Y-axis reflection; Positive: Reflect against Bottom boundary; Negative: Reflect against Top boundary.</param>
+		/// <returns>This Rect reflected as specified by the passed arguments.</returns>
+		template<typename OutT_ = preferred_floating_point>
+		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> Reflect(std::int32_t x_direction_, std::int32_t y_direction_) const
+		{
+			auto left_right = _get_reflected_x(x_direction_);
+			auto top_bottom = _get_reflected_y(y_direction_);
+
+			using std::get;
+			return EmuMath::Rect<OutT_>
+			(
+				std::move(get<0>(left_right)),
+				std::move(get<0>(top_bottom)),
+				std::move(get<1>(left_right)),
+				std::move(get<1>(top_bottom))
+			);
 		}
 #pragma endregion
 
