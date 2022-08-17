@@ -848,7 +848,7 @@
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonAlgebra.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuCore\TMPHelpers\DescriptiveEnableIfTypeargs.h">
+    <ClInclude Include="EmuCore\TMPHelpers\DescriptiveEnableIf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

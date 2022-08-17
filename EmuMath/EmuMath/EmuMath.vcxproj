@@ -171,7 +171,7 @@
     <ClInclude Include="EmuCore\Functors\StdOps.h" />
     <ClInclude Include="EmuCore\TestingHelpers\LoopingTestHarness.h" />
     <ClInclude Include="EmuCore\TMPHelpers\DefaultItemBases.h" />
-    <ClInclude Include="EmuCore\TMPHelpers\DescriptiveEnableIfTypeargs.h" />
+    <ClInclude Include="EmuCore\TMPHelpers\DescriptiveEnableIf.h" />
     <ClInclude Include="EmuCore\TMPHelpers\OperatorChecks.h" />
     <ClInclude Include="EmuCore\TMPHelpers\SafeEnumFuncs.h" />
     <ClInclude Include="EmuCore\TMPHelpers\StdAliases.h" />
