@@ -833,5 +833,23 @@
     <ClInclude Include="EmuMath\Fast3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_underlying_helpers\_rect_tmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_helpers\_rect_get.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_helpers\_common_rect_helper_includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_helpers\_all_rect_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuCore\ArithmeticHelpers\CommonAlgebra.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuCore\TMPHelpers\DescriptiveEnableIfTypeargs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -23,6 +23,11 @@
 // Fast Vector
 #include "EmuMath/FastVector.h"
 
+#include "EmuCore/ArithmeticHelpers/CommonAlgebra.h"
+
+constexpr auto test_dot = EmuCore::dot<float>(1, 2, 6, 3, 7, 10);
+constexpr auto test_dot_2 = EmuCore::dot(5, 7);
+
 template<typename T_, std::size_t Size_>
 inline std::ostream& operator<<(std::ostream& str_, const std::array<T_, Size_>& arr_)
 {
@@ -627,9 +632,11 @@ int main()
 	constexpr auto reflect_alt_j = to_reflect.Reflect(1, 1).Reflect(-1, -1);
 
 	constexpr EmuMath::Rect<float> rect_from_init_list = { 1, 2, 3, 4 };
-	constexpr EmuMath::Vector<12, float> vec_from_init_list = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+	constexpr auto vec_from_init_list = std::move(EmuMath::Vector<12, float>{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
 	auto yoiyoi = vec_from_init_list;
 
+	constexpr auto blongo_dongo = EmuMath::Helpers::rect_get_left(rect_from_init_list);
+	constexpr auto mbmfgkbmlk = EmuMath::Helpers::rect_get_left(EmuMath::Rect<int>(1, 2, 3, 4));
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

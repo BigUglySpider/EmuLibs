@@ -1,6 +1,7 @@
 #ifndef EMU_MATH_RECT_T_H_INC_
 #define EMU_MATH_RECT_T_H_INC_ 1
 
+#include "_helpers/_all_rect_helpers.h"
 #include "../../Vector.h"
 
 namespace EmuMath
@@ -133,6 +134,15 @@ namespace EmuMath
 
 #pragma region ASSIGNMENT_FUNCS
 	public:
+		/// <summary>
+		/// <para> Sets this Rectangle's boundaries to the respective passed values. </para>
+		/// <para> If `left_` is greater than `right_`, or `top_` is greater than `bottom_`, this makes the Rect ill-formed. </para>
+		/// <para> Rectangles exist in a space where the origin point (0, 0) is in the top-left corner. </para>
+		/// </summary>
+		/// <param name="left_">X-coordinate of the leftmost boundary of the Rectangle.</param>
+		/// <param name="top_">Y-coordinate of the topmost boundary of the Rectangle.</param>
+		/// <param name="right_">X-coordinate of the rightmost boundary of the Rectangle.</param>
+		/// <param name="bottom_">Y-coordinate of the bottommost boundary of the Rectangle.</param>
 		template<typename Left_, typename Top_, typename Right_, typename Bottom_>
 		constexpr inline void Set(Left_&& left_, Top_&& top_, Right_&& right_, Bottom_&& bottom_)
 		{
@@ -282,26 +292,31 @@ namespace EmuMath
 		/// <para> Retrieves a reference to the value indicating the X coordinate of corners on the left of this Rectangle. </para>
 		/// </summary>
 		/// <returns>Reference to the X coordinate of left corners in this Rectangle.</returns>
-		[[nodiscard]] constexpr inline value_type& Left()
+		[[nodiscard]] constexpr inline value_type& Left() &
 		{
 			return _left_top_right_bottom.template at<_left_index>();
 		}
 
-		[[nodiscard]] constexpr inline const value_type& Left() const
+		[[nodiscard]] constexpr inline const value_type& Left() const&
 		{
 			return _left_top_right_bottom.template at<_left_index>();
+		}
+
+		[[nodiscard]] constexpr inline value_type&& Left() &&
+		{
+			return std::move(_left_top_right_bottom.template at<_left_index>());
 		}
 
 		/// <summary>
 		/// <para> Retrieves a reference to the value indicating the X coordinate of corners on the right of this Rectangle. </para>
 		/// </summary>
 		/// <returns>Reference to the X coordinate of right corners in this Rectangle.</returns>
-		[[nodiscard]] constexpr inline value_type& Right()
+		[[nodiscard]] constexpr inline value_type& Right() &
 		{
 			return _left_top_right_bottom.template at<_right_index>();
 		}
 
-		[[nodiscard]] constexpr inline const value_type& Right() const
+		[[nodiscard]] constexpr inline const value_type& Right() const&
 		{
 			return _left_top_right_bottom.template at<_right_index>();
 		}
@@ -310,12 +325,12 @@ namespace EmuMath
 		/// <para> Retrieves a reference to the value indicating the Y coordinate of corners on the top of this Rectangle. </para>
 		/// </summary>
 		/// <returns>Reference to the Y coordinate of top corners in this Rectangle.</returns>
-		[[nodiscard]] constexpr inline value_type& Top()
+		[[nodiscard]] constexpr inline value_type& Top() &
 		{
 			return _left_top_right_bottom.template at<_top_index>();
 		}
 
-		[[nodiscard]] constexpr inline const value_type& Top() const
+		[[nodiscard]] constexpr inline const value_type& Top() const&
 		{
 			return _left_top_right_bottom.template at<_top_index>();
 		}
@@ -324,12 +339,12 @@ namespace EmuMath
 		/// <para> Retrieves a reference to the value indicating the Y coordinate of corners on the bottom of this Rectangle. </para>
 		/// </summary>
 		/// <returns>Reference to the Y coordinate of bottom corners in this Rectangle.</returns>
-		[[nodiscard]] constexpr inline value_type& Bottom()
+		[[nodiscard]] constexpr inline value_type& Bottom() &
 		{
 			return _left_top_right_bottom.template at<_bottom_index>();
 		}
 
-		[[nodiscard]] constexpr inline const value_type& Bottom() const
+		[[nodiscard]] constexpr inline const value_type& Bottom() const&
 		{
 			return _left_top_right_bottom.template at<_bottom_index>();
 		}
@@ -343,7 +358,7 @@ namespace EmuMath
 		template<typename Out_ = value_type_uq>
 		[[nodiscard]] constexpr inline Out_ Width() const
 		{
-			return static_cast<Out_>(EmuCore::do_subtract<value_type_uq, value_type_uq>()(Right(), Left()));
+			return EmuMath::Helpers::rect_get_width<Out_>(*this);
 		}
 
 		/// <summary>
@@ -355,7 +370,7 @@ namespace EmuMath
 		template<typename Out_ = value_type_uq>
 		[[nodiscard]] constexpr inline Out_ Height() const
 		{
-			return static_cast<Out_>(EmuCore::do_subtract<value_type_uq, value_type_uq>()(Bottom(), Top()));
+			return EmuMath::Helpers::rect_get_height<Out_>(*this);
 		}
 
 		/// <summary>
@@ -368,7 +383,7 @@ namespace EmuMath
 		template<typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::Vector<2, OutT_> Size() const
 		{
-			return EmuMath::Vector<2, OutT_>(Width(), Height());
+			return EmuMath::Helpers::rect_get_size<OutT_>(*this);
 		}
 
 		/// <summary>
@@ -380,7 +395,7 @@ namespace EmuMath
 		template<typename Out_ = value_type_uq>
 		[[nodiscard]] constexpr inline Out_ DiagonalSquaredLength() const
 		{
-			return EmuMath::Helpers::vector_square_magnitude<Out_>(Size<Out_>());
+			return EmuMath::Helpers::rect_get_diagonal_length_squared<Out_>(*this);
 		}
 
 		/// <summary>
@@ -393,7 +408,7 @@ namespace EmuMath
 		template<typename Out_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline Out_ DiagonalLengthConstexpr() const
 		{
-			return EmuMath::Helpers::vector_magnitude_constexpr<Out_>(Size<Out_>());
+			return EmuMath::Helpers::rect_get_diagonal_length_constexpr<Out_>(*this);
 		}
 
 		/// <summary>
@@ -405,7 +420,7 @@ namespace EmuMath
 		template<typename Out_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline Out_ DiagonalLength() const
 		{
-			return EmuMath::Helpers::vector_magnitude<Out_>(Size<Out_>());
+			return EmuMath::Helpers::rect_get_diagonal_length<Out_>(*this);
 		}
 
 		/// <summary>
@@ -417,11 +432,7 @@ namespace EmuMath
 		template<typename Out_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline Out_ CentralX() const
 		{
-			return EmuCore::do_add<Out_, Out_>()
-			(
-				static_cast<Out_>(Left()),
-				EmuCore::do_divide<Out_, Out_>()(Width<Out_>(), Out_(2))
-			);
+			return EmuMath::Helpers::rect_get_centre_x<Out_>(*this);
 		}
 
 		/// <summary>
@@ -433,11 +444,7 @@ namespace EmuMath
 		template<typename Out_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline Out_ CentralY() const
 		{
-			return EmuCore::do_add<Out_, Out_>()
-			(
-				static_cast<Out_>(Top()),
-				EmuCore::do_divide<Out_, Out_>()(Height<Out_>(), Out_(2))
-			);
+			return EmuMath::Helpers::rect_get_centre_y<Out_>(*this);
 		}
 
 		/// <summary>
@@ -449,7 +456,7 @@ namespace EmuMath
 		template<typename OutT_ = preferred_floating_point>
 		[[nodiscard]] constexpr inline EmuMath::Vector<2, OutT_> Centre() const
 		{
-			return EmuMath::Vector<2, OutT_>(CentralX<OutT_>(), CentralY<OutT_>());
+			return EmuMath::Helpers::rect_get_centre<OutT_>(*this);
 		}
 
 		/// <summary>
