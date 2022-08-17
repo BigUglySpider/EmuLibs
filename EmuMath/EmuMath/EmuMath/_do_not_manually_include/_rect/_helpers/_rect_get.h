@@ -104,18 +104,34 @@ namespace EmuMath::Helpers
 		return EmuMath::Helpers::vector_square_magnitude<Out_>(rect_get_size<Out_>(std::forward<Rect_>(rect_)));
 	}
 
+	/// <summary>
+	/// <para> Calculates the length of the passed Rectangle's diagonal. </para>
+	/// <para> This assumes that the Rect is well-formed, and is based on the `Size` of the passed Rectangle. </para>
+	/// </summary>
+	/// <returns>The length of the passed Rectangle.</returns>
 	template<typename Out_, EmuMath::TMP::EmuRect Rect_>
 	[[nodiscard]] constexpr inline Out_ rect_get_diagonal_length(Rect_&& rect_)
 	{
 		return EmuMath::Helpers::vector_magnitude<Out_>(rect_get_size<Out_>(std::forward<Rect_>(rect_)));
 	}
 
+	/// <summary>
+	/// <para> Calculates the length of the passed Rectangle's diagonal. </para>
+	/// <para> This assumes that the Rect is well-formed, and is based on the `Size` of the passed Rectangle. </para>
+	/// <para> Calculation will aim to be constexpr-evaluable if possible, which may affect accuracy and/or performance. </para>
+	/// </summary>
+	/// <returns>The length of the passed Rectangle.</returns>
 	template<typename Out_, EmuMath::TMP::EmuRect Rect_>
 	[[nodiscard]] constexpr inline Out_ rect_get_diagonal_length_constexpr(Rect_&& rect_)
 	{
 		return EmuMath::Helpers::vector_magnitude_constexpr<Out_>(rect_get_size<Out_>(std::forward<Rect_>(rect_)));
 	}
 
+	/// <summary>
+	/// <para> Calculates the central point of the passed Rectangle in the X-axis. </para>
+	/// <para> This assumes that the Rect is well-formed, and is based on the `Width` of the passed Rectangle. </para>
+	/// </summary>
+	/// <returns>Central point of the passed Rectangle in the X-axis.</returns>
 	template<typename Out_, EmuMath::TMP::EmuRect Rect_>
 	[[nodiscard]] constexpr inline Out_ rect_get_centre_x(Rect_&& rect_)
 	{
@@ -139,6 +155,11 @@ namespace EmuMath::Helpers
 		);
 	}
 
+	/// <summary>
+	/// <para> Calculates the central point of the passed Rectangle in the Y-axis. </para>
+	/// <para> This assumes that the Rect is well-formed, and is based on the `Height` of the passed Rectangle. </para>
+	/// </summary>
+	/// <returns>Central point of the passed Rectangle in the Y-axis.</returns>
 	template<typename Out_, EmuMath::TMP::EmuRect Rect_>
 	[[nodiscard]] constexpr inline Out_ rect_get_centre_y(Rect_&& rect_)
 	{
@@ -162,6 +183,11 @@ namespace EmuMath::Helpers
 		);
 	}
 
+	/// <summary>
+	/// <para> Calculates the central point of the passed Rectangle, and outputs the X- and Y-axes' points as indices 0 and 1 (respectively) of a 2D Vector. </para>
+	/// <para> This assumes that the Rect is well-formed, and is based on the `Width` and `Height` of the passed Rectangle. </para>
+	/// </summary>
+	/// <returns>2D EmuMath Vector containing the passed Rect's central X and Y points in indices 0 and 1 respectively.</returns>
 	template<typename OutT_, EmuMath::TMP::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<2, OutT_> rect_get_centre(Rect_&& rect_)
 	{
