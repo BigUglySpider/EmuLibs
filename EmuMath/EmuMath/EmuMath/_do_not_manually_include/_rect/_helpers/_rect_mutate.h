@@ -339,6 +339,190 @@ namespace EmuMath::Helpers
 		const auto& scale_x_and_y_lval = EmuCore::TMP::const_lval_ref_cast<ScaleScalar_>(std::forward<ScaleScalar_>(scale_x_and_y_));
 		return rect_scale_anchored<XAnchorDirection_, YAnchorDirection_, OutT_>(std::forward<Rect_>(rect_), scale_x_and_y_lval, scale_x_and_y_lval);
 	}
+
+	/// <summary>
+	/// <para> Creates a copy of the passed Rect moved by the specified amounts in respective axes. </para>
+	/// <para> This effectively adds the `x_` translation to `Left` and `Right`, and adds `y_` to `Top` and `Bottom`. </para>
+	/// </summary>
+	/// <param name="x_">Amount to move the passed Rectangle by in the X-axis.</param>
+	/// <param name="y_">Amount to move the passed Rectangle by in the Y-axis.</param>
+	/// <returns>The passed Rect translated by the specified amounts in respective axes.</returns>
+	template<typename OutT_, typename X_, typename Y_, EmuMath::TMP::EmuRect Rect_>
+	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_translate(Rect_&& rect_, X_&& x_, Y_&& y_)
+	{
+		using x_uq = typename EmuCore::TMP::remove_ref_cv<X_>::type;
+		using y_uq = typename EmuCore::TMP::remove_ref_cv<Y_>::type;
+		using in_uq = typename EmuCore::TMP::remove_ref_cv<Rect_>::type;
+		using out_value_uq = typename EmuMath::Rect<OutT_>::value_type_uq;
+		using in_value_uq = typename in_uq::value_type_uq;
+		using in_fp = typename in_uq::preferred_floating_point;
+		using out_fp = typename EmuMath::Rect<OutT_>::preferred_floating_point;
+		using calc_type = typename std::conditional
+		<
+			EmuCore::TMP::is_any_floating_point_v<x_uq, y_uq, in_value_uq>,
+			typename EmuCore::TMP::largest_floating_point<x_uq, y_uq, in_value_uq, in_fp, out_value_uq, out_fp>::type,
+			typename EmuCore::TMP::highest_byte_size<x_uq, y_uq, in_value_uq>::type
+		>::type;
+
+		using add_func = EmuCore::do_add<calc_type, calc_type>;
+		calc_type x = static_cast<calc_type>(std::forward<X_>(x_));
+		calc_type y = static_cast<calc_type>(std::forward<Y_>(y_));
+
+		return EmuMath::Rect<OutT_>
+		(
+			add_func()(rect_get_left(std::forward<Rect_>(rect_)), x),
+			add_func()(rect_get_top(std::forward<Rect_>(rect_)), y),
+			add_func()(rect_get_right(std::forward<Rect_>(rect_)), x),
+			add_func()(rect_get_bottom(std::forward<Rect_>(rect_)), y)
+		);
+	}
+
+	/// <summary>
+	/// <para> Creates a copy of the passed Rect moved by the specified amounts in respective axes. </para>
+	/// <para> This effectively adds the `x_` translation to `Left` and `Right`, and adds `y_` to `Top` and `Bottom`. </para>
+	/// </summary>
+	/// <param name="translation_vector_2d_">
+	///		EmuMath Vector of translations to apply to the passed Rect, with X and Y at theoretical indices 0 and 1 respectively.
+	/// </param>
+	/// <returns>The passed Rect translated by the specified amounts in respective axes.</returns>
+	template<typename OutT_, EmuMath::TMP::EmuVector TranslationVector_, EmuMath::TMP::EmuRect Rect_>
+	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_translate(Rect_&& rect_, TranslationVector_&& translation_vector_2d_)
+	{
+		return rect_translate<OutT_>
+		(
+			std::forward<Rect_>(rect_),
+			std::forward<TranslationVector_>(translation_vector_2d_).template AtTheoretical<0>(),
+			std::forward<TranslationVector_>(translation_vector_2d_).template AtTheoretical<1>()
+		);
+	}
+
+	/// <summary>
+	/// <para> Creates a reflected copy of the passed Rect in the specified X- and Y-directions </para>
+	/// <para> XDirection_: 0: No X-axis reflection; Positive: Reflect against Right boundary; Negative: Reflect against Left boundary. </para>
+	/// <para> YDirection_: 0: No Y-axis reflection; Positive: Reflect against Bottom boundary; Negative: Reflect against Top boundary. </para>
+	/// <para> This assumes that the Rect is well-formed. </para>
+	/// </summary>
+	/// <returns>The passed Rect reflected as specified by the passed template arguments.</returns>
+	template<signed int XDirection_, signed int YDirection_, typename OutT_, EmuMath::TMP::EmuRect Rect_>
+	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_reflect(Rect_&& rect_)
+	{
+		using in_uq = typename EmuCore::TMP::remove_ref_cv<Rect_>::type;
+		using in_value_uq = typename in_uq::value_type_uq;
+
+		using add_func = EmuCore::do_add<in_value_uq, in_value_uq>;
+		using sub_func = EmuCore::do_subtract<in_value_uq, in_value_uq>;
+
+		in_value_uq left = rect_get_left(std::forward<Rect_>(rect_));
+		in_value_uq top = rect_get_top(std::forward<Rect_>(rect_));
+		in_value_uq right = rect_get_right(std::forward<Rect_>(rect_));
+		in_value_uq bottom = rect_get_bottom(std::forward<Rect_>(rect_));
+
+		// If a direction is 0, there is no reflection in that axis and thus boundaries remain the same
+		// --- If reflecting in negative direction, negative boundary has size subtracted and positive boundary becomes old negative boundary
+		// --- If reflecting in positive direction, negative boundary becomes old positive boundary and positive boundary has size added
+		if constexpr (XDirection_ < 0)
+		{
+			// left = (old_left - width), right = old_left
+			in_value_uq width = sub_func()(right, left);
+			right = std::move(left);
+			left = sub_func()(right, std::move(width));
+		}
+		else if constexpr (XDirection_ > 0)
+		{
+			// left = old_right, right = (old_right + width)
+			in_value_uq width = sub_func()(right, left);
+			left = std::move(right);
+			right = add_func()(left, std::move(width));
+		}
+
+		if constexpr (YDirection_ < 0)
+		{
+			// top = (old_top - height), right = old_top
+			in_value_uq height = sub_func()(bottom, top);
+			bottom = std::move(top);
+			top = sub_func()(bottom, std::move(height));
+		}
+		else if constexpr (YDirection_ > 0)
+		{
+			// top = old_bottom, bottom = (old_bottom + height)
+			in_value_uq height = sub_func()(bottom, top);
+			top = std::move(bottom);
+			bottom = add_func()(top, std::move(height));
+		}
+
+		return EmuMath::Rect<OutT_>
+		(
+			std::move(left),
+			std::move(top),
+			std::move(right),
+			std::move(bottom)
+		);
+	}
+
+	/// <summary>
+	/// <para> Creates a reflected copy of the passed Rect in the specified X- and Y-directions </para>
+	/// <para> If `x_direction_` and `y_direction_` are known compile-time constants, it is recommended to pass them as template arguments instead. </para>
+	/// <para> This assumes that the Rect is well-formed. </para>
+	/// </summary>
+	/// <param name="x_direction_">0: No X-axis reflection; Positive: Reflect against Right boundary; Negative: Reflect against Left boundary.</param>
+	/// <param name="y_direction_">0: No Y-axis reflection; Positive: Reflect against Bottom boundary; Negative: Reflect against Top boundary.</param>
+	/// <returns>The passed Rect reflected as specified by the passed arguments.</returns>
+	template<typename OutT_, EmuMath::TMP::EmuRect Rect_>
+	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_reflect(Rect_&& rect_, signed int x_direction_, signed int y_direction_)
+	{
+		// Identical to above version, but runtime conditional branches
+		using in_uq = typename EmuCore::TMP::remove_ref_cv<Rect_>::type;
+		using in_value_uq = typename in_uq::value_type_uq;
+
+		using add_func = EmuCore::do_add<in_value_uq, in_value_uq>;
+		using sub_func = EmuCore::do_subtract<in_value_uq, in_value_uq>;
+
+		in_value_uq left = rect_get_left(std::forward<Rect_>(rect_));
+		in_value_uq top = rect_get_top(std::forward<Rect_>(rect_));
+		in_value_uq right = rect_get_right(std::forward<Rect_>(rect_));
+		in_value_uq bottom = rect_get_bottom(std::forward<Rect_>(rect_));
+
+		// If a direction is 0, there is no reflection in that axis and thus boundaries remain the same
+		// --- If reflecting in negative direction, negative boundary has size subtracted and positive boundary becomes old negative boundary
+		// --- If reflecting in positive direction, negative boundary becomes old positive boundary and positive boundary has size added
+		if (x_direction_ < 0)
+		{
+			// left = (old_left - width), right = old_left
+			in_value_uq width = sub_func()(right, left);
+			right = std::move(left);
+			left = sub_func()(right, std::move(width));
+		}
+		else if (x_direction_ > 0)
+		{
+			// left = old_right, right = (old_right + width)
+			in_value_uq width = sub_func()(right, left);
+			left = std::move(right);
+			right = add_func()(left, std::move(width));
+		}
+
+		if (y_direction_ < 0)
+		{
+			// top = (old_top - height), right = old_top
+			in_value_uq height = sub_func()(bottom, top);
+			bottom = std::move(top);
+			top = sub_func()(bottom, std::move(height));
+		}
+		else if (y_direction_ > 0)
+		{
+			// top = old_bottom, bottom = (old_bottom + height)
+			in_value_uq height = sub_func()(bottom, top);
+			top = std::move(bottom);
+			bottom = add_func()(top, std::move(height));
+		}
+
+		return EmuMath::Rect<OutT_>
+		(
+			std::move(left),
+			std::move(top),
+			std::move(right),
+			std::move(bottom)
+		);
+	}
 }
 
 #endif
