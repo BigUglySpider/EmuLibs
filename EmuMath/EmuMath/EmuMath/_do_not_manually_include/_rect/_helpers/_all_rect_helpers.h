@@ -3,5 +3,6 @@
 
 #include "_common_rect_helper_includes.h"
 #include "_rect_get.h"
+#include "_rect_mutate.h"
 
 #endif

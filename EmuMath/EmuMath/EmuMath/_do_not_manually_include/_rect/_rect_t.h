@@ -545,107 +545,6 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region MUTATIONS
-	public:
-		/// <summary>
-		/// <para> Creates an adjusted form of this Rect which is centred on the provided points in the X- and Y-axes respectively. </para>
-		/// <para> One should be wary of potential inaccuracies when outputting integral types. This issue can be avoided by outputting floating-point types. </para>
-		/// <para> The output type may be customised, but if omitted will default to this Rect's `preferred_floating_point`. </para>
-		/// </summary>
-		/// <param name="x_">Point in the X-axis to centre the new Rect on.</param>
-		/// <param name="y_">Point in the Y-axis to centre the new Rect on.</param>
-		/// <returns>Copy of this Rect adjusted to be centred on the provided coordinates in respective axes.</returns>
-		template<typename OutT_ = preferred_floating_point, typename X_, typename Y_>
-		[[nodiscard]] constexpr inline Rect<OutT_> MakeCentred(X_&& x_, Y_&& y_) const
-		{
-			OutT_ width_div_2 = EmuCore::do_divide<OutT_, OutT_>()(Width<OutT_>(), OutT_(2));
-			OutT_ height_div_2 = EmuCore::do_divide<OutT_, OutT_>()(Height<OutT_>(), OutT_(2));
-			OutT_ x = static_cast<OutT_>(std::forward<X_>(x_));
-			OutT_ y = static_cast<OutT_>(std::forward<Y_>(y_));
-			return Rect<OutT_>
-			(
-				EmuCore::do_subtract<OutT_, OutT_>()(x, width_div_2),
-				EmuCore::do_subtract<OutT_, OutT_>()(y, height_div_2),
-				EmuCore::do_add<OutT_, OutT_>()(x, width_div_2),
-				EmuCore::do_add<OutT_, OutT_>()(y, height_div_2)
-			);
-		}
-
-		/// <summary>
-		/// <para> Creates an adjusted form of this Rect which is centred on the provided points in the X- and Y-axes respectively. </para>
-		/// <para> One should be wary of potential inaccuracies when outputting integral types. This issue can be avoided by outputting floating-point types. </para>
-		/// <para> The output type may be customised, but if omitted will default to this Rect's `preferred_floating_point`. </para>
-		/// </summary>
-		/// <param name="x_and_y_vector_">
-		///		EmuMath Vector containing the points to centre the new Rect on in the X- and Y-axes in theoretical indices 0 and 1, respectively.
-		/// </param>
-		/// <returns>Copy of this Rect adjusted to be centred on the provided coordinates in respective axes.</returns>
-		template<typename OutT_ = preferred_floating_point, std::size_t VecSize_, typename VecT_>
-		[[nodiscard]] constexpr inline Rect<OutT_> MakeCentred(const EmuMath::Vector<VecSize_, VecT_>& x_and_y_vector_) const
-		{
-			return MakeCentred(x_and_y_vector_.template AtTheoretical<0>(), x_and_y_vector_.template AtTheoretical<1>());
-		}
-
-		/// <summary>
-		/// <para> Creates an adjusted form of this Rect which is centred on the provided point in both the X- and Y-axes. </para>
-		/// <para> One should be wary of potential inaccuracies when outputting integral types. This issue can be avoided by outputting floating-point types. </para>
-		/// <para> The output type may be customised, but if omitted will default to this Rect's `preferred_floating_point`. </para>
-		/// </summary>
-		/// <param name="x_and_y_">Scalar point in both the X- and Y-axes to centre the new Rect on.</param>
-		/// <returns>Copy of this Rect adjusted to be centred on the provided coordinate in both axes.</returns>
-		template<typename OutT_ = preferred_floating_point, typename SharedPoint_>
-		[[nodiscard]] constexpr inline auto MakeCentred(SharedPoint_&& x_and_y_) const
-			-> std::enable_if_t<!EmuMath::TMP::is_emu_vector_v<typename EmuCore::TMP::remove_ref_cv<SharedPoint_>::type>, Rect<OutT_>>
-		{
-			OutT_ width_div_2 = EmuCore::do_divide<OutT_, OutT_>()(Width<OutT_>(), OutT_(2));
-			OutT_ height_div_2 = EmuCore::do_divide<OutT_, OutT_>()(Height<OutT_>(), OutT_(2));
-			OutT_ x_and_y = static_cast<OutT_>(std::forward<SharedPoint_>(x_and_y_));
-			return Rect<OutT_>
-			(
-				EmuCore::do_subtract<OutT_, OutT_>()(x_and_y, width_div_2),
-				EmuCore::do_subtract<OutT_, OutT_>()(x_and_y, height_div_2),
-				EmuCore::do_add<OutT_, OutT_>()(x_and_y, width_div_2),
-				EmuCore::do_add<OutT_, OutT_>()(x_and_y, height_div_2)
-			);
-		}
-#pragma endregion
-
-#pragma region CONTAINS_CHECKS
-	public:
-		/// <summary>
-		/// <para> Determines if a given point is contained within this Rect based on its current Left, Top, Right, and Bottom boundaries </para>
-		/// <para> This assumes that the Rect is well-formed. </para>
-		/// </summary>
-		/// <param name="x_">X coordinate to check for.</param>
-		/// <param name="y_">Y coordinate to check for.</param>
-		/// <returns>True if the provided X and Y coordinates are contained within this Rect's boundaries.</returns>
-		template<typename X_, typename Y_>
-		[[nodiscard]] constexpr inline bool ContainsPoint(X_&& x_, Y_&& y_) const
-		{
-			using cmp_less_equal = EmuCore::do_cmp_less_equal<value_type_uq, value_type_uq>;
-			using cmp_greater_equal = EmuCore::do_cmp_greater_equal<value_type_uq, value_type_uq>;
-			value_type_uq x = static_cast<value_type_uq>(std::forward<X_>(x_));
-			value_type_uq y = static_cast<value_type_uq>(std::forward<Y_>(y_));
-			return
-			(
-				(cmp_less_equal()(Top(), y) && cmp_greater_equal()(Bottom(), y)) &&
-				(cmp_less_equal()(Left(), x) && cmp_greater_equal()(Right(), x))
-			);
-		}
-
-		/// <summary>
-		/// <para> Determines if a given point is contained within this Rect based on its current Left, Top, Right, and Bottom boundaries </para>
-		/// <para> This assumes that the Rect is well-formed. </para>
-		/// </summary>
-		/// <param name="point_vec_2d_">EmuMath Vector with coordinates to search for in the X- and Y-axes in theoretical indices 0 and 1 respectively..</param>
-		/// <returns>True if the provided coordinates are contained within this Rect's boundaries.</returns>
-		template<std::size_t VecSize_, typename VecT_>
-		[[nodiscard]] constexpr inline bool ContainsPoint(const EmuMath::Vector<VecSize_, VecT_>& point_vec_2d_) const
-		{
-			return ContainsPoint(point_vec_2d_.template AtTheoretical<0>(), point_vec_2d_.template AtTheoretical<1>());
-		}
-#pragma endregion
-
-#pragma region CONST_ARITHMETIC_FUNCS
 	private:
 		template<std::int32_t Direction_>
 		[[nodiscard]] constexpr inline decltype(auto) _get_reflected_left() const
@@ -755,41 +654,88 @@ namespace EmuMath
 
 	public:
 		/// <summary>
+		/// <para> Creates an adjusted form of this Rect which is centred on the provided points in the X- and Y-axes respectively. </para>
+		/// <para> One should be wary of potential inaccuracies when outputting integral types. This issue can be avoided by outputting floating-point types. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `preferred_floating_point`. </para>
+		/// </summary>
+		/// <param name="x_">Point in the X-axis to centre the new Rect on.</param>
+		/// <param name="y_">Point in the Y-axis to centre the new Rect on.</param>
+		/// <returns>Copy of this Rect adjusted to be centred on the provided coordinates in respective axes.</returns>
+		template<typename OutT_ = preferred_floating_point, typename X_, typename Y_>
+		[[nodiscard]] constexpr inline Rect<OutT_> MakeCentred(X_&& x_, Y_&& y_) const
+		{
+			return EmuMath::Helpers::rect_make_centred<OutT_>(*this, std::forward<X_>(x_), std::forward<Y_>(y_));
+		}
+
+		/// <summary>
+		/// <para> Creates an adjusted form of this Rect which is centred on the provided points in the X- and Y-axes respectively. </para>
+		/// <para> One should be wary of potential inaccuracies when outputting integral types. This issue can be avoided by outputting floating-point types. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `preferred_floating_point`. </para>
+		/// </summary>
+		/// <param name="x_and_y_vector_">
+		///		EmuMath Vector containing the points to centre the new Rect on in the X- and Y-axes in theoretical indices 0 and 1, respectively.
+		/// </param>
+		/// <returns>Copy of this Rect adjusted to be centred on the provided coordinates in respective axes.</returns>
+		template<typename OutT_ = preferred_floating_point, EmuMath::TMP::EmuVector CentreVector_>
+		[[nodiscard]] constexpr inline Rect<OutT_> MakeCentred(CentreVector_&& x_and_y_vector_) const
+		{
+			return EmuMath::Helpers::rect_make_centred<OutT_>(*this, std::forward<CentreVector_>(x_and_y_vector_));
+		}
+
+		/// <summary>
+		/// <para> Creates an adjusted form of this Rect which is centred on the provided point in both the X- and Y-axes. </para>
+		/// <para> One should be wary of potential inaccuracies when outputting integral types. This issue can be avoided by outputting floating-point types. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `preferred_floating_point`. </para>
+		/// </summary>
+		/// <param name="x_and_y_">Scalar point in both the X- and Y-axes to centre the new Rect on.</param>
+		/// <returns>Copy of this Rect adjusted to be centred on the provided coordinate in both axes.</returns>
+		template<typename OutT_ = preferred_floating_point, typename SharedPoint_>
+		[[nodiscard]] constexpr inline auto MakeCentred(SharedPoint_&& x_and_y_) const
+			-> std::enable_if_t<!EmuMath::TMP::is_emu_vector_v<typename EmuCore::TMP::remove_ref_cv<SharedPoint_>::type>, Rect<OutT_>>
+		{
+			OutT_ width_div_2 = EmuCore::do_divide<OutT_, OutT_>()(Width<OutT_>(), OutT_(2));
+			OutT_ height_div_2 = EmuCore::do_divide<OutT_, OutT_>()(Height<OutT_>(), OutT_(2));
+			OutT_ x_and_y = static_cast<OutT_>(std::forward<SharedPoint_>(x_and_y_));
+			return Rect<OutT_>
+			(
+				EmuCore::do_subtract<OutT_, OutT_>()(x_and_y, width_div_2),
+				EmuCore::do_subtract<OutT_, OutT_>()(x_and_y, height_div_2),
+				EmuCore::do_add<OutT_, OutT_>()(x_and_y, width_div_2),
+				EmuCore::do_add<OutT_, OutT_>()(x_and_y, height_div_2)
+			);
+		}
+		
+		/// <summary>
 		/// <para>
 		///		Creates a copy of this Rect scaled about its centre, 
 		///		changing all boundaries to scale its size in respective axes whilst maintaining the same central point.
 		/// </para>
 		/// <para> This assumes that the Rect is well-formed. </para>
-		/// <para> The output type may be customised, but if omitted will default to this Rect's `value_type_uq`. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `preferred_floating_point`. </para>
 		/// </summary>
 		/// <param name="scale_x_">Scale to apply to this Rect's width.</param>
 		/// <param name="scale_y_">Scale to apply to this Rect's height.</param>
 		/// <returns>This Rect scaled by the provided factors in respective axes, with the same central point.</returns>
-		template<typename OutT_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> Scale(const preferred_floating_point& scale_x_, const preferred_floating_point& scale_y_) const
+		template<typename OutT_ = preferred_floating_point, typename X_, typename Y_>
+		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> Scale(X_&& scale_x_, Y_&& scale_y_) const
 		{
-			using add_func = EmuCore::do_add<preferred_floating_point, preferred_floating_point>;
-			using sub_func = EmuCore::do_subtract<preferred_floating_point, preferred_floating_point>;
-			using mul_func = EmuCore::do_multiply<preferred_floating_point, preferred_floating_point>;
-			using div_func = EmuCore::do_divide<preferred_floating_point, preferred_floating_point>;
+			return EmuMath::Helpers::rect_scale<OutT_>(*this, std::forward<X_>(scale_x_), std::forward<Y_>(scale_y_));
+		}
 
-			preferred_floating_point width = Width<preferred_floating_point>();
-			preferred_floating_point height = Height<preferred_floating_point>();
-
-			preferred_floating_point centre_y = add_func()(Top(), div_func()(height, preferred_floating_point(2)));
-			preferred_floating_point centre_x = add_func()(Left(), div_func()(width, preferred_floating_point(2)));
-
-			// Set width and height to half of new width and height; these are subtracted/added from centres to form begin/end boundaries
-			width = div_func()(mul_func()(width, scale_x_), preferred_floating_point(2));
-			height = div_func()(mul_func()(height, scale_y_), preferred_floating_point(2));
-
-			return EmuMath::Rect<OutT_>
-			(
-				sub_func()(centre_x, width),
-				sub_func()(centre_y, height),
-				add_func()(centre_x, width),
-				add_func()(centre_y, height)
-			);
+		/// <summary>
+		/// <para>
+		///		Creates a copy of this Rect scaled about its centre, 
+		///		changing all boundaries to scale its size in respective axes whilst maintaining the same central point.
+		/// </para>
+		/// <para> This assumes that the Rect is well-formed. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `preferred_floating_point`. </para>
+		/// </summary>
+		/// <param name="scale_vector_2d_">EmuMath Vector of scales to apply to this Rect, with X and Y at theoretical indices 0 and 1 respectively.</param>
+		/// <returns>This Rect scaled by the provided factors in respective axes, with the same central point.</returns>
+		template<typename OutT_ = preferred_floating_point, EmuMath::TMP::EmuVector ScaleVector_>
+		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> Scale(ScaleVector_&& scale_vector_2d_) const
+		{
+			return EmuMath::Helpers::rect_scale<OutT_>(*this, std::forward<ScaleVector_>(scale_vector_2d_));
 		}
 
 		/// <summary>
@@ -798,30 +744,74 @@ namespace EmuMath
 		///		changing all boundaries to scale its size in all axes whilst maintaining the same central point.
 		/// </para>
 		/// <para> This assumes that the Rect is well-formed. </para>
-		/// <para> The output type may be customised, but if omitted will default to this Rect's `value_type_uq`. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `preferred_floating_point`. </para>
 		/// </summary>
-		/// <param name="shared_scale_">Scale to apply to this Rect's width and height.</param>
+		/// <param name="scale_x_and_y_">Scale to apply to this Rect's width and height.</param>
 		/// <returns>This Rect scaled by the provided factor in all axes, with the same central point.</returns>
-		template<typename OutT_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> Scale(const preferred_floating_point& shared_scale_) const
+		template<typename OutT_ = preferred_floating_point, typename ScaleScalar_>
+		[[nodiscard]] constexpr inline auto Scale(ScaleScalar_&& scale_x_and_y_) const
+			-> std::enable_if_t<!EmuMath::TMP::is_emu_vector_v<ScaleScalar_>, EmuMath::Rect<OutT_>>
 		{
-			return Scale(shared_scale_, shared_scale_);
+			return EmuMath::Helpers::rect_scale<OutT_>(*this, std::forward<ScaleScalar_>(scale_x_and_y_));
 		}
 
 		/// <summary>
-		/// <para>
-		///		Creates a copy of this Rect scaled about its centre, 
-		///		changing all boundaries to scale its size in respective axes whilst maintaining the same central point.
-		/// </para>
+		/// <para> Creates a copy of this Rect scaled about the specified anchor. </para>
+		/// <para> XAnchorDirection_: 0: Centre of the X-axis; Negative: Left boundary of the X-axis; Positive non-0: Right boundary of the X-axis. </para>
+		/// <para> YAnchorDirection_: 0: Centre of the Y-axis; Negative: Top boundary of the Y-axis; Positive non-0: Bottom boundary of the Y-axis. </para>
+		/// <para> When anchored to a boundary, that boundary will not be modified and the opposite boundary will receive the full effect of the scale. </para>
+		/// <para> When anchored to a central point, both of that axis's boundaries scaled by half the amount to maintain the same central point. </para>
 		/// <para> This assumes that the Rect is well-formed. </para>
-		/// <para> The output type may be customised, but if omitted will default to this Rect's `value_type_uq`. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `preferred_floating_point`. </para>
 		/// </summary>
-		/// <param name="scale_vector_2d_">EmuMath Vector of scales to apply to this Rect, with X and Y at theoretical indices 0 and 1 respectively.</param>
-		/// <returns>This Rect scaled by the provided factors in respective axes, with the same central point.</returns>
-		template<typename OutT_ = preferred_floating_point, std::size_t VecSize_, typename VecT_>
-		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> Scale(const EmuMath::Vector<VecSize_, VecT_>& scale_vector_2d_) const
+		/// <param name="scale_x_">Scale to apply to this Rect's width.</param>
+		/// <param name="scale_y_">Scale to apply to this Rect's height.</param>
+		/// <returns>This Rect scaled by the provided factor in all axes, with points of specified anchors maintained as the same value.</returns>
+		template<signed int XAnchorDirection_, signed int YAnchorDirection_, typename OutT_ = preferred_floating_point, typename X_, typename Y_>
+		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> ScaleAnchored(X_&& scale_x_, Y_&& scale_y_) const
 		{
-			return Scale(scale_vector_2d_.template AtTheoretical<0>(), scale_vector_2d_.template AtTheoretical<1>());
+			return EmuMath::Helpers::rect_scale_anchored<XAnchorDirection_, YAnchorDirection_, OutT_>
+			(
+				*this,
+				std::forward<X_>(scale_x_),
+				std::forward<Y_>(scale_y_)
+			);
+		}
+
+		/// <summary>
+		/// <para> Creates a copy of this Rect scaled about the specified anchor. </para>
+		/// <para> XAnchorDirection_: 0: Centre of the X-axis; Negative: Left boundary of the X-axis; Positive non-0: Right boundary of the X-axis. </para>
+		/// <para> YAnchorDirection_: 0: Centre of the Y-axis; Negative: Top boundary of the Y-axis; Positive non-0: Bottom boundary of the Y-axis. </para>
+		/// <para> When anchored to a boundary, that boundary will not be modified and the opposite boundary will receive the full effect of the scale. </para>
+		/// <para> When anchored to a central point, both of that axis's boundaries scaled by half the amount to maintain the same central point. </para>
+		/// <para> This assumes that the Rect is well-formed. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `preferred_floating_point`. </para>
+		/// </summary>
+		/// <param name="rect_">EmuMath Rect to create a scaled form of.</param>
+		/// <param name="scale_vector_2d_">EmuMath Vector of scales to apply to this Rect, with X and Y at theoretical indices 0 and 1 respectively.</param>
+		/// <returns>This Rect scaled by the provided factor in respective axes, with points of specified anchors maintained as the same value.</returns>
+		template<signed int XAnchorDirection_, signed int YAnchorDirection_, typename OutT_ = preferred_floating_point, EmuMath::TMP::EmuVector ScaleVector_>
+		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> ScaleAnchored(ScaleVector_&& scale_vector_2d_) const
+		{
+			return EmuMath::Helpers::rect_scale_anchored<XAnchorDirection_, YAnchorDirection_, OutT_>(*this, std::forward<ScaleVector_>(scale_vector_2d_));
+		}
+
+		/// <summary>
+		/// <para> Creates a copy of this Rect scaled about the specified anchor. </para>
+		/// <para> XAnchorDirection_: 0: Centre of the X-axis; Negative: Left boundary of the X-axis; Positive non-0: Right boundary of the X-axis. </para>
+		/// <para> YAnchorDirection_: 0: Centre of the Y-axis; Negative: Top boundary of the Y-axis; Positive non-0: Bottom boundary of the Y-axis. </para>
+		/// <para> When anchored to a boundary, that boundary will not be modified and the opposite boundary will receive the full effect of the scale. </para>
+		/// <para> When anchored to a central point, both of that axis's boundaries scaled by half the amount to maintain the same central point. </para>
+		/// <para> This assumes that the Rect is well-formed. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `preferred_floating_point`. </para>
+		/// </summary>
+		/// <param name="scale_x_and_y_">Scale to apply to this Rect's width and height.</param>
+		/// <returns>This Rect scaled by the provided factor in all axes, with points of specified anchors maintained as the same value.</returns>
+		template<signed int XAnchorDirection_, signed int YAnchorDirection_, typename OutT_ = preferred_floating_point, typename ScaleScalar_>
+		[[nodiscard]] constexpr inline auto ScaleAnchored(ScaleScalar_&& scale_x_and_y_)
+			-> std::enable_if_t<!EmuMath::TMP::is_emu_vector_v<ScaleScalar_>, EmuMath::Rect<OutT_>>
+		{
+			return EmuMath::Helpers::rect_scale_anchored<XAnchorDirection_, YAnchorDirection_, OutT_>(*this, std::forward<ScaleScalar_>(scale_x_and_y_));
 		}
 
 		/// <summary>
@@ -898,6 +888,45 @@ namespace EmuMath
 				std::move(get<1>(top_bottom))
 			);
 		}
+#pragma endregion
+
+#pragma region CONTAINS_CHECKS
+	public:
+		/// <summary>
+		/// <para> Determines if a given point is contained within this Rect based on its current Left, Top, Right, and Bottom boundaries </para>
+		/// <para> This assumes that the Rect is well-formed. </para>
+		/// </summary>
+		/// <param name="x_">X coordinate to check for.</param>
+		/// <param name="y_">Y coordinate to check for.</param>
+		/// <returns>True if the provided X and Y coordinates are contained within this Rect's boundaries.</returns>
+		template<typename X_, typename Y_>
+		[[nodiscard]] constexpr inline bool ContainsPoint(X_&& x_, Y_&& y_) const
+		{
+			using cmp_less_equal = EmuCore::do_cmp_less_equal<value_type_uq, value_type_uq>;
+			using cmp_greater_equal = EmuCore::do_cmp_greater_equal<value_type_uq, value_type_uq>;
+			value_type_uq x = static_cast<value_type_uq>(std::forward<X_>(x_));
+			value_type_uq y = static_cast<value_type_uq>(std::forward<Y_>(y_));
+			return
+			(
+				(cmp_less_equal()(Top(), y) && cmp_greater_equal()(Bottom(), y)) &&
+				(cmp_less_equal()(Left(), x) && cmp_greater_equal()(Right(), x))
+			);
+		}
+
+		/// <summary>
+		/// <para> Determines if a given point is contained within this Rect based on its current Left, Top, Right, and Bottom boundaries </para>
+		/// <para> This assumes that the Rect is well-formed. </para>
+		/// </summary>
+		/// <param name="point_vec_2d_">EmuMath Vector with coordinates to search for in the X- and Y-axes in theoretical indices 0 and 1 respectively..</param>
+		/// <returns>True if the provided coordinates are contained within this Rect's boundaries.</returns>
+		template<std::size_t VecSize_, typename VecT_>
+		[[nodiscard]] constexpr inline bool ContainsPoint(const EmuMath::Vector<VecSize_, VecT_>& point_vec_2d_) const
+		{
+			return ContainsPoint(point_vec_2d_.template AtTheoretical<0>(), point_vec_2d_.template AtTheoretical<1>());
+		}
+#pragma endregion
+
+#pragma region CONST_ARITHMETIC_FUNCS
 #pragma endregion
 
 	private:

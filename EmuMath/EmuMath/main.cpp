@@ -631,8 +631,16 @@ int main()
 	constexpr auto reflect_alt_i = to_reflect.Reflect(0, 1);
 	constexpr auto reflect_alt_j = to_reflect.Reflect(1, 1).Reflect(-1, -1);
 
+	constexpr auto test_scale_rect_base = EmuMath::Rect<float>(1);
+	constexpr auto scaled_a = test_scale_rect_base.Scale(2);
+	constexpr auto scaled_b = test_scale_rect_base.ScaleAnchored<0, 0>(2, 2);
+	constexpr auto scaled_c = test_scale_rect_base.ScaleAnchored<1, 0>(2, 2);
+	constexpr auto scaled_d = test_scale_rect_base.ScaleAnchored<-1, 0>(2, 2);
+	constexpr auto scaled_e = test_scale_rect_base.ScaleAnchored<0, 1>(2, 2);
+	constexpr auto scaled_f = test_scale_rect_base.ScaleAnchored<1, -1>(2, 2);
+
 	constexpr EmuMath::Rect<float> rect_from_init_list = { 1, 2, 3, 4 };
-	constexpr auto vec_from_init_list = std::move(EmuMath::Vector<12, float>{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+	constexpr auto vec_from_init_list = EmuMath::Vector<12, float>{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
 	auto yoiyoi = vec_from_init_list;
 
 	constexpr auto blongo_dongo = EmuMath::Helpers::rect_get_left(rect_from_init_list);

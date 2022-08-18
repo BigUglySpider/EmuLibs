@@ -136,7 +136,8 @@ namespace EmuMath::Helpers
 	[[nodiscard]] constexpr inline Out_ rect_get_centre_x(Rect_&& rect_)
 	{
 		using rect_uq = typename EmuCore::TMP::remove_ref_cv<Rect_>::type;
-		using calc_fp = typename EmuCore::TMP::largest_floating_point<Out_, typename rect_uq::preferred_floating_point, float>::type;
+		using out_uq = typename EmuCore::TMP::remove_ref_cv<Out_>::type;
+		using calc_fp = typename EmuCore::TMP::largest_floating_point<out_uq, typename rect_uq::preferred_floating_point, float>::type;
 		using sub_func = EmuCore::do_subtract<calc_fp, calc_fp>;
 		using div_func = EmuCore::do_divide<calc_fp, calc_fp>;
 
@@ -164,7 +165,8 @@ namespace EmuMath::Helpers
 	[[nodiscard]] constexpr inline Out_ rect_get_centre_y(Rect_&& rect_)
 	{
 		using rect_uq = typename EmuCore::TMP::remove_ref_cv<Rect_>::type;
-		using calc_fp = typename EmuCore::TMP::largest_floating_point<Out_, typename rect_uq::preferred_floating_point, float>::type;
+		using out_uq = typename EmuCore::TMP::remove_ref_cv<Out_>::type;
+		using calc_fp = typename EmuCore::TMP::largest_floating_point<out_uq, typename rect_uq::preferred_floating_point, float>::type;
 		using sub_func = EmuCore::do_subtract<calc_fp, calc_fp>;
 		using div_func = EmuCore::do_divide<calc_fp, calc_fp>;
 

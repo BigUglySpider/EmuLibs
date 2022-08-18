@@ -184,6 +184,7 @@
     <ClInclude Include="EmuCore\TMPHelpers\TypeObfuscation.h" />
     <ClInclude Include="EmuCore\TMPHelpers\Values.h" />
     <ClInclude Include="EmuCore\TMPHelpers\VariadicHelpers.h" />
+    <ClInclude Include="EmuMath\BringHelpersToEmuMathNamespace.h" />
     <ClInclude Include="EmuMath\Colour.h" />
     <ClInclude Include="EmuMath\Common3D.h" />
     <ClInclude Include="EmuMath\Fast3D.h" />
@@ -277,6 +278,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_helpers\_all_rect_helpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_helpers\_common_rect_helper_includes.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_helpers\_rect_get.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_helpers\_rect_mutate.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_rect_t.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_underlying_helpers\_rect_tmp.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_core_functor_specialisations\_all_core_functor_specialisations.h" />
