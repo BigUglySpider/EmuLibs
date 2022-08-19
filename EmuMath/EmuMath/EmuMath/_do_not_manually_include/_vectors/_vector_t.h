@@ -566,6 +566,12 @@ namespace EmuMath
 		{
 			return valid_args_for_variadic_constructor<0, Args_...>();
 		}
+
+		template<class...Args_>
+		[[nodiscard]] static constexpr inline bool is_variadic_constructor_explicit()
+		{
+			return sizeof...(Args_) != size || EmuCore::TMP::is_any_check<EmuMath::TMP::is_emu_vector, Args_...>::value;
+		}
 #pragma endregion
 
 #pragma region UNDERLYING_CONSTRUCTION_HELPERS
@@ -1075,11 +1081,11 @@ namespace EmuMath
 
 		template
 		<
-			class...ConstructionArgs_,
-			typename = std::enable_if_t<valid_args_for_variadic_constructor<0, ConstructionArgs_...>()>
+			class...Args_,
+			typename = std::enable_if_t<valid_args_for_variadic_constructor<0, Args_...>()>
 		>
-		explicit constexpr inline Vector(ConstructionArgs_&&...construction_args_) :
-			_data(_variadic_construct<0>(std::forward<ConstructionArgs_>(construction_args_)...))
+		explicit(is_variadic_constructor_explicit<Args_...>()) constexpr inline Vector(Args_&&...construction_args_) : 
+			_data(_variadic_construct<0>(std::forward<Args_>(construction_args_)...))
 		{
 		}
 #pragma region ACCESS

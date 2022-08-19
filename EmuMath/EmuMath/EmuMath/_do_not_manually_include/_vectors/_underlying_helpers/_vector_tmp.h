@@ -169,6 +169,9 @@ namespace EmuMath::TMP
 	template<class T_>
 	static constexpr bool is_emu_vector_v = is_emu_vector<T_>::value;
 
+	template<typename T_>
+	concept EmuVector = is_emu_vector_v<T_>;
+
 	template<std::size_t Index_, class T_>
 	struct emu_vector_theoretical_return
 	{

@@ -119,7 +119,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -152,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EmuCore\ArithmeticHelpers\BitHelpers.h" />
+    <ClInclude Include="EmuCore\ArithmeticHelpers\CommonAlgebra.h" />
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonMath.h" />
     <ClInclude Include="EmuCore\ArithmeticHelpers\CommonValues.h" />
     <ClInclude Include="EmuCore\CommonTypes\ComparisonEnum.h" />
@@ -170,6 +171,7 @@
     <ClInclude Include="EmuCore\Functors\StdOps.h" />
     <ClInclude Include="EmuCore\TestingHelpers\LoopingTestHarness.h" />
     <ClInclude Include="EmuCore\TMPHelpers\DefaultItemBases.h" />
+    <ClInclude Include="EmuCore\TMPHelpers\DescriptiveEnableIf.h" />
     <ClInclude Include="EmuCore\TMPHelpers\OperatorChecks.h" />
     <ClInclude Include="EmuCore\TMPHelpers\SafeEnumFuncs.h" />
     <ClInclude Include="EmuCore\TMPHelpers\StdAliases.h" />
@@ -182,17 +184,22 @@
     <ClInclude Include="EmuCore\TMPHelpers\TypeObfuscation.h" />
     <ClInclude Include="EmuCore\TMPHelpers\Values.h" />
     <ClInclude Include="EmuCore\TMPHelpers\VariadicHelpers.h" />
+    <ClInclude Include="EmuMath\BringHelpersToEmuMathNamespace.h" />
     <ClInclude Include="EmuMath\Colour.h" />
+    <ClInclude Include="EmuMath\Common3D.h" />
+    <ClInclude Include="EmuMath\Fast3D.h" />
     <ClInclude Include="EmuMath\FastNoise.h" />
     <ClInclude Include="EmuMath\FastVector.h" />
     <ClInclude Include="EmuMath\Matrix.h" />
     <ClInclude Include="EmuMath\Noise.h" />
     <ClInclude Include="EmuMath\Quaternion.h" />
     <ClInclude Include="EmuMath\Random.h" />
+    <ClInclude Include="EmuMath\Rect.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_vectors\_fast_vector_t.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_matrix_projections.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_helpers\_projections\_vulkan\_matrix_perspectives_vulkan.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_matrix_underlying_projections.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_underlying_projections\_matrix_underlying_ortho.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_underlying_projections\_matrix_underlying_perspective.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_helpers\_all_helpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_helpers\_common_quaternion_helper_includes.h" />
@@ -268,6 +275,14 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_underlying_helpers\_quaternion_tmp.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_underlying_helpers\_quaternion_underlying_arithmetic.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_underlying_helpers\_quaternion_underlying_get.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_helpers\_all_rect_helpers.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_helpers\_common_rect_helper_includes.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_helpers\_rect_conversions.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_helpers\_rect_get.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_helpers\_rect_mutate.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_helpers\_rect_checks.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_rect_t.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_underlying_helpers\_rect_tmp.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_core_functor_specialisations\_all_core_functor_specialisations.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_core_functor_specialisations\_std_ops\_vector_do_swap_specialisation.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_helpers\_common_vector_helpers.h" />

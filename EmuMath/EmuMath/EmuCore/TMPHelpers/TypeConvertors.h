@@ -442,6 +442,27 @@ namespace EmuCore::TMP
 		return static_cast<std::remove_reference_t<T_>&>(ref_);
 	}
 
+	/// <summary>
+	/// <para> Casts a reference to a const-qualified lvalue-reference. </para>
+	/// <para> This can effectively be considered an `unmove` cast, treating lvalues as lvalues and casting rvalues to lvalues. </para>
+	/// <para>
+	///		WARNING: This is for casting pre-existing, named rvalues.
+	///		Passing a new rvalue (such as `my_type(5)) will result in output of a dangling reference. 
+	/// </para>
+	/// </summary>
+	/// <param name="ref_">Reference to cast to an lvalue reference.</param>
+	/// <returns>The passed ref_ cast to a const-qualified lvalue reference.</returns>
+	template<typename T_>
+	[[nodiscard]] constexpr inline const std::remove_reference_t<T_>& const_lval_ref_cast(std::remove_reference_t<T_>& ref_)
+	{
+		return ref_;
+	}
+	template<typename T_>
+	[[nodiscard]] constexpr inline const std::remove_reference_t<T_>& const_lval_ref_cast(std::remove_reference_t<T_>&& ref_)
+	{
+		return static_cast<std::remove_reference_t<T_>&>(ref_);
+	}
+
 	/// <summary> Type used to alias type T_ as its internal type alias. Mainly for use in conditions such as `std::conditional_t&lt;bool, x, y&gt;::type`. </summary>
 	/// <typeparam name="T_">Type to be accessible by the defined type alias.</typeparam>
 	template<typename T_>
