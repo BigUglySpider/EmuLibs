@@ -65,6 +65,14 @@ namespace EmuMath::Helpers
 		return rect_has_well_formed_x(std::forward<Rect_>(rect_)) && rect_has_well_formed_y(std::forward<Rect_>(rect_));
 	}
 
+	/// <summary>
+	/// <para> Determines if a given point is contained within the passed Rect based on its current Left, Top, Right, and Bottom boundaries </para>
+	/// <para> This assumes that the Rect is well-formed. </para>
+	/// <para> May customise whether the point is classed as outside if on the boundaries of the Rect via IgnoreEqual_. If omitted, this defaults to `true`. </para>
+	/// </summary>
+	/// <param name="x_">X coordinate to check for.</param>
+	/// <param name="y_">Y coordinate to check for.</param>
+	/// <returns>True if the provided X and Y coordinates are contained within the passed Rect's boundaries.</returns>
 	template<bool IgnoreEqual_ = true, typename X_, typename Y_, EmuMath::TMP::EmuRect Rect_>
 	[[nodiscard]] constexpr inline bool rect_contains_point(Rect_&& rect_, X_&& x_, Y_&& y_)
 	{
@@ -100,6 +108,14 @@ namespace EmuMath::Helpers
 #pragma warning(pop)
 	}
 
+
+	/// <summary>
+	/// <para> Determines if a given point is contained within the passed Rect based on its current Left, Top, Right, and Bottom boundaries </para>
+	/// <para> This assumes that the Rect is well-formed. </para>
+	/// <para> May customise whether the point is classed as outside if on the boundaries of the Rect via IgnoreEqual_. If omitted, this defaults to `true`. </para>
+	/// </summary>
+	/// <param name="point_vec_2d_">EmuMath Vector with coordinates to search for in the X- and Y-axes in theoretical indices 0 and 1 respectively..</param>
+	/// <returns>True if the provided coordinates are contained within the passed Rect's boundaries.</returns>
 	template<bool IgnoreEqual_ = true, EmuMath::TMP::EmuVector PointVector_, EmuMath::TMP::EmuRect Rect_>
 	[[nodiscard]] constexpr inline bool rect_contains_point(Rect_&& rect_, PointVector_&& point_vector_2d_)
 	{
@@ -114,6 +130,14 @@ namespace EmuMath::Helpers
 #pragma warning(pop)
 	}
 
+	/// <summary>
+	/// <para> Checks if the two passed Rects are colliding in an axis-aligned context (i.e. they are considered not rotated or warped in any way). </para>
+	/// <para> This assumes that both Rects are well-formed. </para>
+	/// <para> May customise whether a point is classed as outside if on the boundaries of a Rect via IgnoreEqual_. If omitted, this defaults to `true`. </para>
+	/// </summary>
+	/// <param name="rect_a_">First Rect involved in the collision check.</param>
+	/// <param name="rect_b_">Second Rect involved in the collision check.</param>
+	/// <returns>If the two passed Rects are colliding, `true`; otherwise `false`.</returns>
 	template<bool IgnoreEqual_ = true, EmuMath::TMP::EmuRect RectA_, EmuMath::TMP::EmuRect RectB_>
 	[[nodiscard]] constexpr inline bool rect_colliding_axis_aligned(RectA_&& rect_a_, RectB_&& rect_b_)
 	{

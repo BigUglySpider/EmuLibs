@@ -66,12 +66,12 @@ namespace EmuMath
 		{
 		}
 
-		constexpr inline Rect(const Rect& to_copy_) :
+		constexpr inline Rect(const Rect<T_>& to_copy_) :
 			_left_top_right_bottom(to_copy_._left_top_right_bottom)
 		{
 		}
 
-		constexpr inline Rect(Rect&& to_move_) noexcept : 
+		constexpr inline Rect(Rect<T_>&& to_move_) noexcept : 
 			_left_top_right_bottom(std::move(to_move_._left_top_right_bottom))
 		{
 		}
@@ -185,22 +185,21 @@ namespace EmuMath
 		template<typename RhsT_>
 		constexpr inline this_type& operator=(const Rect<RhsT_>& rhs_)
 		{
-			Set(rhs_.Left(), rhs_.Top(), rhs_.Right(), rhs_.Bottom());
+			EmuMath::Helpers::rect_cast(*this, rhs_);
 			return *this;
 		}
 
 		template<typename RhsT_>
 		constexpr inline this_type& operator=(Rect<RhsT_>& rhs_)
 		{
-			Set(rhs_.Left(), rhs_.Top(), rhs_.Right(), rhs_.Bottom());
+			EmuMath::Helpers::rect_cast(*this, rhs_);
 			return *this;
 		}
-
 
 		template<typename RhsT_>
 		constexpr inline this_type& operator=(Rect<RhsT_>&& rhs_)
 		{
-			Set(std::move(rhs_.Left()), std::move(rhs_.Top()), std::move(rhs_.Right()), std::move(rhs_.Bottom()));
+			EmuMath::Helpers::rect_cast(*this, std::move(rhs_));
 			return *this;
 		}
 #pragma endregion
@@ -278,67 +277,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region ACCESSORS
-	private:
-		template<std::size_t Index_, std::size_t Left_, std::size_t Top_, std::size_t Right_, std::size_t Bottom_>
-		[[nodiscard]] constexpr inline decltype(auto) _get_item_for_vector()
-		{
-			if constexpr (Index_ == Left_)
-			{
-				return Left();
-			}
-			else if constexpr (Index_ == Top_)
-			{
-				return Top();
-			}
-			else if constexpr (Index_ == Right_)
-			{
-				return Right();
-			}
-			else if constexpr (Index_ == Bottom_)
-			{
-				return Bottom();
-			}
-			else
-			{
-				static_assert
-				(
-					EmuCore::TMP::get_false<Left_>(),
-					"Failed to shuffle an EmuMath Rect into a 4D EmuMath Vector: At least one of the provided directional indices is invalid."
-				);
-			}
-		}
-
-		template<std::size_t Left_, std::size_t Top_, std::size_t Right_, std::size_t Bottom_>
-		[[nodiscard]] static constexpr inline bool _valid_convert_to_vector_indices()
-		{
-			return
-			(
-				(Left_ != 0 && Top_ != 0 && Right_ != 0 && Bottom_ != 0) &&
-				(Left_ >= 0 && Left_ <= 3 && Top_ >= 0 && Top_ <= 3 && Right_ >= 0 && Right_ <= 3 && Bottom_ >= 0 && Bottom_ <= 3)
-			);
-		}
-
 	public:
-		template<std::size_t Left_, std::size_t Top_, std::size_t Right_, std::size_t Bottom_, typename OutT_ = value_type_uq>
-		[[nodiscard]] static constexpr inline bool can_convert_to_vector()
-		{
-			return
-			(
-				_valid_convert_to_vector_indices<Left_, Top_, Right_, Bottom_>() &&
-				std::is_constructible_v<EmuMath::Vector<4, OutT_>, value_type&, value_type&, value_type&, value_type&>
-			);
-		}
-
-		template<std::size_t Left_, std::size_t Top_, std::size_t Right_, std::size_t Bottom_, typename OutT_ = value_type_uq>
-		[[nodiscard]] static constexpr inline bool can_const_convert_to_vector()
-		{
-			return
-			(
-				_valid_convert_to_vector_indices<Left_, Top_, Right_, Bottom_>() &&
-				std::is_constructible_v<EmuMath::Vector<4, OutT_>, const value_type&, const value_type&, const value_type&, const value_type&>
-			);
-		}
-
 		/// <summary>
 		/// <para> Retrieves a reference to the value indicating the X coordinate of corners on the left of this Rectangle. </para>
 		/// </summary>
@@ -586,16 +525,7 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline auto MakeCentred(SharedPoint_&& x_and_y_) const
 			-> std::enable_if_t<!EmuMath::TMP::is_emu_vector_v<typename EmuCore::TMP::remove_ref_cv<SharedPoint_>::type>, Rect<OutT_>>
 		{
-			OutT_ width_div_2 = EmuCore::do_divide<OutT_, OutT_>()(Width<OutT_>(), OutT_(2));
-			OutT_ height_div_2 = EmuCore::do_divide<OutT_, OutT_>()(Height<OutT_>(), OutT_(2));
-			OutT_ x_and_y = static_cast<OutT_>(std::forward<SharedPoint_>(x_and_y_));
-			return Rect<OutT_>
-			(
-				EmuCore::do_subtract<OutT_, OutT_>()(x_and_y, width_div_2),
-				EmuCore::do_subtract<OutT_, OutT_>()(x_and_y, height_div_2),
-				EmuCore::do_add<OutT_, OutT_>()(x_and_y, width_div_2),
-				EmuCore::do_add<OutT_, OutT_>()(x_and_y, height_div_2)
-			);
+			return EmuMath::Helpers::rect_make_centred<OutT_>(std::forward<SharedPoint_>(x_and_y_));
 		}
 		
 		/// <summary>
@@ -769,6 +699,7 @@ namespace EmuMath
 		/// <summary>
 		/// <para> Determines if a given point is contained within this Rect based on its current Left, Top, Right, and Bottom boundaries </para>
 		/// <para> This assumes that the Rect is well-formed. </para>
+		/// <para> May customise whether the point is classed as outside if on the boundaries of the Rect via IgnoreEqual_. If omitted, this defaults to `true`. </para>
 		/// </summary>
 		/// <param name="x_">X coordinate to check for.</param>
 		/// <param name="y_">Y coordinate to check for.</param>
@@ -782,6 +713,7 @@ namespace EmuMath
 		/// <summary>
 		/// <para> Determines if a given point is contained within this Rect based on its current Left, Top, Right, and Bottom boundaries </para>
 		/// <para> This assumes that the Rect is well-formed. </para>
+		/// <para> May customise whether the point is classed as outside if on the boundaries of the Rect via IgnoreEqual_. If omitted, this defaults to `true`. </para>
 		/// </summary>
 		/// <param name="point_vec_2d_">EmuMath Vector with coordinates to search for in the X- and Y-axes in theoretical indices 0 and 1 respectively..</param>
 		/// <returns>True if the provided coordinates are contained within this Rect's boundaries.</returns>
@@ -791,6 +723,16 @@ namespace EmuMath
 			return EmuMath::Helpers::rect_contains_point<IgnoreEqual_>(*this, std::forward<PointVector_>(point_vector_2d_));
 		}
 
+		/// <summary>
+		/// <para> 
+		///		Checks if this Rect and the passed Rect are colliding in an axis-aligned context 
+		///		(i.e. they are considered not rotated or warped in any way).
+		/// </para>
+		/// <para> This assumes that both Rects are well-formed. </para>
+		/// <para> May customise whether a point is classed as outside if on the boundaries of a Rect via IgnoreEqual_. If omitted, this defaults to `true`. </para>
+		/// </summary>
+		/// <param name="rect_b_">Second Rect involved in the collision check.</param>
+		/// <returns>If the this Rect and the passed Rect are colliding, `true`; otherwise `false`.</returns>
 		template<bool IgnoreEqual_ = true, EmuMath::TMP::EmuRect RectB_>
 		[[nodiscard]] constexpr inline bool CollidingAxisAligned(RectB_&& rect_b_) const
 		{
@@ -800,6 +742,26 @@ namespace EmuMath
 
 #pragma region CONVERSIONS
 	public:
+		template<std::size_t Left_, std::size_t Top_, std::size_t Right_, std::size_t Bottom_, typename OutT_ = value_type_uq>
+		[[nodiscard]] static constexpr inline bool can_convert_to_vector()
+		{
+			return
+			(
+				EmuMath::Helpers::rect_valid_index_args_for_vector_conversion<Left_, Top_, Right_, Bottom_>() &&
+				std::is_constructible_v<EmuMath::Vector<4, OutT_>, value_type&, value_type&, value_type&, value_type&>
+			);
+		}
+
+		template<std::size_t Left_, std::size_t Top_, std::size_t Right_, std::size_t Bottom_, typename OutT_ = value_type_uq>
+		[[nodiscard]] static constexpr inline bool can_const_convert_to_vector()
+		{
+			return
+			(
+				EmuMath::Helpers::rect_valid_index_args_for_vector_conversion<Left_, Top_, Right_, Bottom_>() &&
+				std::is_constructible_v<EmuMath::Vector<4, OutT_>, const value_type&, const value_type&, const value_type&, const value_type&>
+			);
+		}
+
 		/// <summary>
 		/// <para> Casts this Rect to an EmuMath Rect of the specified type. </para>
 		/// <para> The output type may be customised, but if omitted will default to this Rect's `value_type_uq`. </para>

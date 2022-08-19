@@ -655,6 +655,8 @@ int main()
 	constexpr auto colliding_e = collide_a.CollidingAxisAligned(collide_b.Scale(2, 2));
 	constexpr auto colliding_f = collide_a.CollidingAxisAligned(collide_b.Translate(-5.9, -5.9));
 
+	auto ree = EmuMath::Rect<double>();
+
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
