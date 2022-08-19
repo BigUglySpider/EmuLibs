@@ -65,7 +65,7 @@ namespace EmuMath::Helpers
 		return rect_has_well_formed_x(std::forward<Rect_>(rect_)) && rect_has_well_formed_y(std::forward<Rect_>(rect_));
 	}
 
-	template<typename X_, typename Y_, EmuMath::TMP::EmuRect Rect_>
+	template<bool IgnoreEqual_ = true, typename X_, typename Y_, EmuMath::TMP::EmuRect Rect_>
 	[[nodiscard]] constexpr inline bool rect_contains_point(Rect_&& rect_, X_&& x_, Y_&& y_)
 	{
 		using rect_uq = typename EmuCore::TMP::remove_ref_cv<Rect_>::type;
@@ -85,24 +85,27 @@ namespace EmuMath::Helpers
 		x_type x = static_cast<x_type>(std::forward<X_>(x_));
 		y_type y = static_cast<y_type>(std::forward<Y_>(y_));
 
+		using cmp_less = typename std::conditional<IgnoreEqual_, EmuCore::do_cmp_less<void, void>, EmuCore::do_cmp_less_equal<void, void>>::type;
+		using cmp_greater = typename std::conditional<IgnoreEqual_, EmuCore::do_cmp_greater<void, void>, EmuCore::do_cmp_greater_equal<void, void>>::type;
+
 #pragma warning(push)
 #pragma warning(disable: 26800)
 		return
 		(
-			EmuCore::do_cmp_less_equal<get_left_uq, x_uq>()(rect_get_left(std::forward<Rect_>(rect_)), x) &&
-			EmuCore::do_cmp_less_equal<get_top_uq, y_uq>()(rect_get_top(std::forward<Rect_>(rect_)), y) &&
-			EmuCore::do_cmp_greater_equal<get_right_uq, x_uq>()(rect_get_right(std::forward<Rect_>(rect_)), x) &&
-			EmuCore::do_cmp_greater_equal<get_bottom_uq, y_uq>()(rect_get_bottom(std::forward<Rect_>(rect_)), y)
+			cmp_less()(rect_get_left(std::forward<Rect_>(rect_)), x) &&
+			cmp_less()(rect_get_top(std::forward<Rect_>(rect_)), y) &&
+			cmp_greater()(rect_get_right(std::forward<Rect_>(rect_)), x) &&
+			cmp_greater()(rect_get_bottom(std::forward<Rect_>(rect_)), y)
 		);
 #pragma warning(pop)
 	}
 
-	template<EmuMath::TMP::EmuVector PointVector_, EmuMath::TMP::EmuRect Rect_>
+	template<bool IgnoreEqual_ = true, EmuMath::TMP::EmuVector PointVector_, EmuMath::TMP::EmuRect Rect_>
 	[[nodiscard]] constexpr inline bool rect_contains_point(Rect_&& rect_, PointVector_&& point_vector_2d_)
 	{
 #pragma warning(push)
 #pragma warning(disable: 26800)
-		return rect_contains_point
+		return rect_contains_point<IgnoreEqual_>
 		(
 			std::forward<Rect_>(rect_),
 			std::forward<PointVector_>(point_vector_2d_).template AtTheoretical<0>(),

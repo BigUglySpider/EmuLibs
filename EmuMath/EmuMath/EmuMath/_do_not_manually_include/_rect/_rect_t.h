@@ -773,10 +773,10 @@ namespace EmuMath
 		/// <param name="x_">X coordinate to check for.</param>
 		/// <param name="y_">Y coordinate to check for.</param>
 		/// <returns>True if the provided X and Y coordinates are contained within this Rect's boundaries.</returns>
-		template<typename X_, typename Y_>
+		template<bool IgnoreEqual_ = true, typename X_, typename Y_>
 		[[nodiscard]] constexpr inline bool ContainsPoint(X_&& x_, Y_&& y_) const
 		{
-			return EmuMath::Helpers::rect_contains_point(*this, std::forward<X_>(x_), std::forward<Y_>(y_));
+			return EmuMath::Helpers::rect_contains_point<IgnoreEqual_>(*this, std::forward<X_>(x_), std::forward<Y_>(y_));
 		}
 
 		/// <summary>
@@ -785,10 +785,10 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="point_vec_2d_">EmuMath Vector with coordinates to search for in the X- and Y-axes in theoretical indices 0 and 1 respectively..</param>
 		/// <returns>True if the provided coordinates are contained within this Rect's boundaries.</returns>
-		template<EmuMath::TMP::EmuVector PointVector_>
+		template<bool IgnoreEqual_ = true, EmuMath::TMP::EmuVector PointVector_>
 		[[nodiscard]] constexpr inline bool ContainsPoint(PointVector_&& point_vector_2d_) const
 		{
-			return EmuMath::Helpers::rect_contains_point(*this, std::forward<PointVector_>(point_vector_2d_));
+			return EmuMath::Helpers::rect_contains_point<IgnoreEqual_>(*this, std::forward<PointVector_>(point_vector_2d_));
 		}
 
 		template<bool IgnoreEqual_ = true, EmuMath::TMP::EmuRect RectB_>
