@@ -857,5 +857,11 @@
     <ClInclude Include="EmuMath\BringHelpersToEmuMathNamespace.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_helpers\_rect_checks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_rect\_helpers\_rect_conversions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

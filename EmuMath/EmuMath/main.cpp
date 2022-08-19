@@ -646,6 +646,15 @@ int main()
 	constexpr auto blongo_dongo = EmuMath::Helpers::rect_get_left(rect_from_init_list);
 	constexpr auto mbmfgkbmlk = EmuMath::Helpers::rect_get_left(EmuMath::Rect<int>(1, 2, 3, 4));
 
+	constexpr auto collide_a = EmuMath::Rect<float>(0, 0, 5, 5);
+	constexpr auto collide_b = EmuMath::Rect<double>(5, 5, 6, 6);
+	constexpr auto colliding_a = collide_a.CollidingAxisAligned<true>(collide_b);
+	constexpr auto colliding_b = collide_a.CollidingAxisAligned<false>(collide_b);
+	constexpr auto colliding_c = collide_a.CollidingAxisAligned(collide_b);
+	constexpr auto colliding_d = collide_a.CollidingAxisAligned(collide_b.Translate(-0.2, -0.5));
+	constexpr auto colliding_e = collide_a.CollidingAxisAligned(collide_b.Scale(2, 2));
+	constexpr auto colliding_f = collide_a.CollidingAxisAligned(collide_b.Translate(-5.9, -5.9));
+
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
 	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;

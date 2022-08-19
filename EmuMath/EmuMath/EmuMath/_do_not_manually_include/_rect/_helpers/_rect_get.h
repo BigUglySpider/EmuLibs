@@ -59,7 +59,11 @@ namespace EmuMath::Helpers
 	{
 		using rect_uq = typename EmuCore::TMP::remove_ref_cv<Rect_>::type;
 		using sub_func = EmuCore::do_subtract<typename rect_uq::value_type_uq, typename rect_uq::value_type_uq>;
+
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		return static_cast<OutT_>(sub_func()(rect_get_right(std::forward<Rect_>(rect_)), rect_get_left(std::forward<Rect_>(rect_))));
+#pragma warning(pop)
 	}
 
 	/// <summary>
@@ -72,7 +76,11 @@ namespace EmuMath::Helpers
 	{
 		using rect_uq = typename EmuCore::TMP::remove_ref_cv<Rect_>::type;
 		using sub_func = EmuCore::do_subtract<typename rect_uq::value_type_uq, typename rect_uq::value_type_uq>;
+
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		return static_cast<OutT_>(sub_func()(rect_get_bottom(std::forward<Rect_>(rect_)), rect_get_top(std::forward<Rect_>(rect_))));
+#pragma warning(pop)
 	}
 
 	/// <summary>
@@ -86,11 +94,14 @@ namespace EmuMath::Helpers
 	template<typename OutT_, EmuMath::TMP::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<2, OutT_> rect_get_size(Rect_&& rect_)
 	{
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		return EmuMath::Vector<2, OutT_>
 		(
 			rect_get_width<OutT_>(std::forward<Rect_>(rect_)),
 			rect_get_height<OutT_>(std::forward<Rect_>(rect_))
 		);
+#pragma warning(pop)
 	}
 
 	/// <summary>
@@ -141,6 +152,9 @@ namespace EmuMath::Helpers
 		using sub_func = EmuCore::do_subtract<calc_fp, calc_fp>;
 		using div_func = EmuCore::do_divide<calc_fp, calc_fp>;
 
+
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		calc_fp right = static_cast<calc_fp>(rect_get_right(std::forward<Rect_>(rect_)));
 		return static_cast<Out_>
 		(
@@ -154,6 +168,7 @@ namespace EmuMath::Helpers
 				)
 			)
 		);
+#pragma warning(pop)
 	}
 
 	/// <summary>
@@ -170,6 +185,8 @@ namespace EmuMath::Helpers
 		using sub_func = EmuCore::do_subtract<calc_fp, calc_fp>;
 		using div_func = EmuCore::do_divide<calc_fp, calc_fp>;
 
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		calc_fp bottom = static_cast<calc_fp>(rect_get_bottom(std::forward<Rect_>(rect_)));
 		return static_cast<Out_>
 		(
@@ -183,6 +200,7 @@ namespace EmuMath::Helpers
 				)
 			)
 		);
+#pragma warning(pop)
 	}
 
 	/// <summary>
@@ -193,11 +211,14 @@ namespace EmuMath::Helpers
 	template<typename OutT_, EmuMath::TMP::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<2, OutT_> rect_get_centre(Rect_&& rect_)
 	{
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		return EmuMath::Vector<2, OutT_>
 		(
 			rect_get_centre_x<OutT_>(std::forward<Rect_>(rect_)),
 			rect_get_centre_y<OutT_>(std::forward<Rect_>(rect_))
 		);
+#pragma warning(pop)
 	}
 }
 

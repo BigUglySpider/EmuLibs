@@ -34,6 +34,8 @@ namespace EmuMath::Helpers
 		calc_fp x = static_cast<calc_fp>(std::forward<X_>(centre_x_));
 		calc_fp y = static_cast<calc_fp>(std::forward<Y_>(centre_y_));
 
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		return EmuMath::Rect<OutT_>
 		(
 			sub_func()(x, width_div_2),
@@ -41,6 +43,7 @@ namespace EmuMath::Helpers
 			add_func()(x, width_div_2),
 			add_func()(y, height_div_2)
 		);
+#pragma warning(pop)
 	}
 
 	/// <summary>
@@ -55,12 +58,15 @@ namespace EmuMath::Helpers
 	template<typename OutT_, EmuMath::TMP::EmuVector CentreVector_, EmuMath::TMP::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_make_centred(Rect_&& rect_, CentreVector_&& vector_centre_2d_)
 	{
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		return rect_make_centred<OutT_>
 		(
 			std::forward<Rect_>(rect_),
 			std::forward<CentreVector_>(vector_centre_2d_).template AtTheoretical<0>(),
 			std::forward<CentreVector_>(vector_centre_2d_).template AtTheoretical<1>()
 		);
+#pragma warning(pop)
 	}
 
 	/// <summary>
@@ -85,9 +91,12 @@ namespace EmuMath::Helpers
 		using sub_func = EmuCore::do_subtract<calc_fp, calc_fp>;
 		using div_func = EmuCore::do_divide<calc_fp, calc_fp>;
 
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		calc_fp width_div_2 = div_func()(rect_get_width<calc_fp>(std::forward<Rect_>(rect_)), calc_fp(2));
 		calc_fp height_div_2 = div_func()(rect_get_height<calc_fp>(std::forward<Rect_>(rect_)), calc_fp(2));
-		calc_fp x_and_y = static_cast<calc_fp>(std::forward<ScalarSharedCentre_>(shared_centre_x_and_y_)); 
+		calc_fp x_and_y = static_cast<calc_fp>(std::forward<ScalarSharedCentre_>(shared_centre_x_and_y_));
+#pragma warning(pop)
 
 		return EmuMath::Rect<OutT_>
 		(
@@ -126,6 +135,8 @@ namespace EmuMath::Helpers
 		using mul_func = EmuCore::do_multiply<calc_fp, calc_fp>;
 		using div_func = EmuCore::do_divide<calc_fp, calc_fp>;
 
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		// Central values start as value in of the boundary in the negative direction
 		calc_fp centre_x = static_cast<calc_fp>(rect_get_left(std::forward<Rect_>(rect_)));
 		calc_fp centre_y = static_cast<calc_fp>(rect_get_top(std::forward<Rect_>(rect_)));
@@ -134,6 +145,7 @@ namespace EmuMath::Helpers
 		// --- Reminder: centre_x and centre_y are actually the negative-direction boundaries at this stage, so this is (bottom - top) and (right - left)
 		calc_fp half_height = div_func()(sub_func()(static_cast<calc_fp>(rect_get_bottom(std::forward<Rect_>(rect_))), centre_y), calc_fp(2));
 		calc_fp half_width = div_func()(sub_func()(static_cast<calc_fp>(rect_get_right(std::forward<Rect_>(rect_))), centre_x), calc_fp(2));
+#pragma warning(pop)
 
 		// Actually centre these values
 		centre_x = add_func()(centre_x, half_width);
@@ -165,12 +177,15 @@ namespace EmuMath::Helpers
 	template<typename OutT_, EmuMath::TMP::EmuVector ScaleVector_, EmuMath::TMP::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_scale(Rect_&& rect_, ScaleVector_&& scale_vector_2d_)
 	{
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		return rect_scale<OutT_>
 		(
 			std::forward<Rect_>(rect_),
 			std::forward<ScaleVector_>(scale_vector_2d_).template AtTheoretical<0>(),
 			std::forward<ScaleVector_>(scale_vector_2d_).template AtTheoretical<1>()
 		);
+#pragma warning(pop)
 	}
 
 	/// <summary>
@@ -226,6 +241,8 @@ namespace EmuMath::Helpers
 			using mul_func = EmuCore::do_multiply<calc_fp, calc_fp>;
 			using div_func = EmuCore::do_divide<calc_fp, calc_fp>;
 
+#pragma warning(push)
+#pragma warning(disable: 26800)
 			// Central values start as value of the boundary in the negative direction
 			calc_fp anchored_x = static_cast<calc_fp>(rect_get_left(std::forward<Rect_>(rect_)));
 			calc_fp anchored_y = static_cast<calc_fp>(rect_get_top(std::forward<Rect_>(rect_)));
@@ -235,6 +252,7 @@ namespace EmuMath::Helpers
 			// --- Respective sizes will be halved later for anchors in the positive direction
 			calc_fp height = sub_func()(static_cast<calc_fp>(rect_get_bottom(std::forward<Rect_>(rect_))), anchored_y);
 			calc_fp width = sub_func()(static_cast<calc_fp>(rect_get_right(std::forward<Rect_>(rect_))), anchored_x);
+#pragma warning(pop)
 
 			// Actually anchor these values, and update sizes to correctly calculate end results
 			// --- No need to modify if anchor direction is negative, as we are already bound to that anchor with the correct width for calculation
@@ -313,12 +331,15 @@ namespace EmuMath::Helpers
 	template<signed int XAnchorDirection_, signed int YAnchorDirection_, typename OutT_, EmuMath::TMP::EmuVector ScaleVector_,  EmuMath::TMP::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_scale_anchored(Rect_&& rect_, ScaleVector_&& scale_vector_2d_)
 	{
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		return rect_scale_anchored<XAnchorDirection_, YAnchorDirection_, OutT_>
 		(
 			std::forward<Rect_>(rect_),
 			std::forward<ScaleVector_>(scale_vector_2d_).template AtTheoretical<0>(),
 			std::forward<ScaleVector_>(scale_vector_2d_).template AtTheoretical<1>()
 		);
+#pragma warning(pop)
 	}
 
 	/// <summary>
@@ -368,6 +389,8 @@ namespace EmuMath::Helpers
 		calc_type x = static_cast<calc_type>(std::forward<X_>(x_));
 		calc_type y = static_cast<calc_type>(std::forward<Y_>(y_));
 
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		return EmuMath::Rect<OutT_>
 		(
 			add_func()(rect_get_left(std::forward<Rect_>(rect_)), x),
@@ -375,6 +398,7 @@ namespace EmuMath::Helpers
 			add_func()(rect_get_right(std::forward<Rect_>(rect_)), x),
 			add_func()(rect_get_bottom(std::forward<Rect_>(rect_)), y)
 		);
+#pragma warning(pop)
 	}
 
 	/// <summary>
@@ -388,12 +412,15 @@ namespace EmuMath::Helpers
 	template<typename OutT_, EmuMath::TMP::EmuVector TranslationVector_, EmuMath::TMP::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_translate(Rect_&& rect_, TranslationVector_&& translation_vector_2d_)
 	{
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		return rect_translate<OutT_>
 		(
 			std::forward<Rect_>(rect_),
 			std::forward<TranslationVector_>(translation_vector_2d_).template AtTheoretical<0>(),
 			std::forward<TranslationVector_>(translation_vector_2d_).template AtTheoretical<1>()
 		);
+#pragma warning(pop)
 	}
 
 	/// <summary>
@@ -412,10 +439,13 @@ namespace EmuMath::Helpers
 		using add_func = EmuCore::do_add<in_value_uq, in_value_uq>;
 		using sub_func = EmuCore::do_subtract<in_value_uq, in_value_uq>;
 
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		in_value_uq left = rect_get_left(std::forward<Rect_>(rect_));
 		in_value_uq top = rect_get_top(std::forward<Rect_>(rect_));
 		in_value_uq right = rect_get_right(std::forward<Rect_>(rect_));
 		in_value_uq bottom = rect_get_bottom(std::forward<Rect_>(rect_));
+#pragma warning(pop)
 
 		// If a direction is 0, there is no reflection in that axis and thus boundaries remain the same
 		// --- If reflecting in negative direction, negative boundary has size subtracted and positive boundary becomes old negative boundary
@@ -477,10 +507,13 @@ namespace EmuMath::Helpers
 		using add_func = EmuCore::do_add<in_value_uq, in_value_uq>;
 		using sub_func = EmuCore::do_subtract<in_value_uq, in_value_uq>;
 
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		in_value_uq left = rect_get_left(std::forward<Rect_>(rect_));
 		in_value_uq top = rect_get_top(std::forward<Rect_>(rect_));
 		in_value_uq right = rect_get_right(std::forward<Rect_>(rect_));
 		in_value_uq bottom = rect_get_bottom(std::forward<Rect_>(rect_));
+#pragma warning(pop)
 
 		// If a direction is 0, there is no reflection in that axis and thus boundaries remain the same
 		// --- If reflecting in negative direction, negative boundary has size subtracted and positive boundary becomes old negative boundary

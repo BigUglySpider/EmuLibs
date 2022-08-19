@@ -12,25 +12,33 @@ namespace EmuMath
 	template<typename T_>
 	struct Rect
 	{
+#pragma region NON_STD_IMPLEMENTATION_DETAILS
 	private:
 		using _underlying_vector = EmuMath::Vector<4, T_>;
 		static constexpr std::size_t _left_index = 0;
 		static constexpr std::size_t _top_index = 1;
 		static constexpr std::size_t _right_index = 2;
 		static constexpr std::size_t _bottom_index = 3;
+#pragma endregion
 
+#pragma region STD_IMPLEMENTATION_DETAILS
 	public:
 		using this_type = Rect<T_>;
 		using stored_type = typename _underlying_vector::stored_type;
 		using value_type = typename _underlying_vector::value_type;
 		using value_type_uq = typename _underlying_vector::value_type_uq;
 		using preferred_floating_point = typename _underlying_vector::preferred_floating_point;
+#pragma endregion
 
+#pragma region STD_IMPLEMENTATION_FUNCS
+	public:
 		[[nodiscard]] static constexpr inline value_type_uq get_implied_zero()
 		{
 			return _underlying_vector::get_implied_zero();
 		}
+#pragma endregion
 
+#pragma region NON_STD_IMPLEMENTATION_FUNCS
 	private:
 		template<typename Left_, typename Top_, typename Right_, typename Bottom_>
 		[[nodiscard]] static constexpr inline _underlying_vector _make_data(Left_&& left_, Top_&& top_, Right_&& right_, Bottom_&& bottom_)
@@ -50,6 +58,7 @@ namespace EmuMath
 			auto& size = EmuCore::TMP::lval_ref_cast<Size_>(std::forward<Size_>(size_));
 			return _underlying_vector(get_implied_zero(), get_implied_zero(), static_cast<value_type>(size), static_cast<value_type>(size));
 		}
+#pragma endregion
 
 #pragma region CONSTRUCTORS
 	public:
@@ -198,31 +207,73 @@ namespace EmuMath
 
 #pragma region CONST_ARITHMETIC_OPERATORS
 	public:
-		template<typename OutT_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> operator*(const preferred_floating_point& rhs_scale_) const
+		/// <summary>
+		/// <para>
+		///		Creates a copy of this Rect scaled about its centre, 
+		///		changing all boundaries to scale its size in respective axes whilst maintaining the same central point.
+		/// </para>
+		/// <para> This assumes that the Rect is well-formed. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `preferred_floating_point`. </para>
+		/// </summary>
+		/// <param name="scale_vector_2d_">EmuMath Vector of scales to apply to this Rect, with X and Y at theoretical indices 0 and 1 respectively.</param>
+		/// <returns>This Rect scaled by the provided factors in respective axes, with the same central point.</returns>
+		template<typename OutT_ = preferred_floating_point, EmuMath::TMP::EmuVector ScaleVector_>
+		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> operator*(ScaleVector_&& scale_vector_2d_) const
 		{
-			return Scale<OutT_>(rhs_scale_, rhs_scale_);
+			return EmuMath::Helpers::rect_scale<OutT_>(*this, std::forward<ScaleVector_>(scale_vector_2d_));
 		}
 
-		template<typename OutT_ = preferred_floating_point, std::size_t VecSize_, typename VecT_>
-		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> operator*(const EmuMath::Vector<VecSize_, VecT_>& scale_vector_2d_) const
+		/// <summary>
+		/// <para>
+		///		Creates a copy of this Rect scaled about its centre, 
+		///		changing all boundaries to scale its size in all axes whilst maintaining the same central point.
+		/// </para>
+		/// <para> This assumes that the Rect is well-formed. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `preferred_floating_point`. </para>
+		/// </summary>
+		/// <param name="scale_x_and_y_">Scale to apply to this Rect's width and height.</param>
+		/// <returns>This Rect scaled by the provided factor in all axes, with the same central point.</returns>
+		template<typename OutT_ = preferred_floating_point, typename ScaleScalar_>
+		[[nodiscard]] constexpr inline auto operator*(ScaleScalar_&& scale_x_and_y_) const
+			-> std::enable_if_t<!EmuMath::TMP::is_emu_vector_v<ScaleScalar_>, EmuMath::Rect<OutT_>>
 		{
-			return Scale<OutT_>(scale_vector_2d_.template AtTheoretical<0>(), scale_vector_2d_.template AtTheoretical<1>());
+			return EmuMath::Helpers::rect_scale<OutT_>(*this, std::forward<ScaleScalar_>(scale_x_and_y_));
 		}
 #pragma endregion
 
 #pragma region ARITHMETIC_ASSIGN_OPERATORS
 	public:
-		template<typename OutT_ = preferred_floating_point>
-		[[nodiscard]] constexpr inline this_type& operator*=(const preferred_floating_point& rhs_scale_)
+		/// <summary>
+		/// <para>
+		///		Creates a copy of this Rect scaled about its centre, 
+		///		changing all boundaries to scale its size in respective axes whilst maintaining the same central point.
+		/// </para>
+		/// <para> This assumes that the Rect is well-formed. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `preferred_floating_point`. </para>
+		/// </summary>
+		/// <param name="scale_vector_2d_">EmuMath Vector of scales to apply to this Rect, with X and Y at theoretical indices 0 and 1 respectively.</param>
+		/// <returns>This Rect scaled by the provided factors in respective axes, with the same central point.</returns>
+		template<EmuMath::TMP::EmuVector ScaleVector_>
+		constexpr inline this_type& operator*=(ScaleVector_&& scale_vector_2d_)
 		{
-			return this->operator=(Scale<OutT_>(rhs_scale_, rhs_scale_));
+			return this->operator=(EmuMath::Helpers::rect_scale<value_type_uq>(*this, std::forward<ScaleVector_>(scale_vector_2d_)));
 		}
 
-		template<typename OutT_ = preferred_floating_point, std::size_t VecSize_, typename VecT_>
-		[[nodiscard]] constexpr inline this_type& operator*=(const EmuMath::Vector<VecSize_, VecT_>& scale_vector_2d_)
+		/// <summary>
+		/// <para>
+		///		Creates a copy of this Rect scaled about its centre, 
+		///		changing all boundaries to scale its size in all axes whilst maintaining the same central point.
+		/// </para>
+		/// <para> This assumes that the Rect is well-formed. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `preferred_floating_point`. </para>
+		/// </summary>
+		/// <param name="scale_x_and_y_">Scale to apply to this Rect's width and height.</param>
+		/// <returns>This Rect scaled by the provided factor in all axes, with the same central point.</returns>
+		template<typename ScaleScalar_>
+		constexpr inline auto operator*=(ScaleScalar_&& scale_x_and_y_)
+			-> std::enable_if_t<!EmuMath::TMP::is_emu_vector_v<ScaleScalar_>, this_type&>
 		{
-			return this->operator=(Scale<OutT_>(scale_vector_2d_.template AtTheoretical<0>(), scale_vector_2d_.template AtTheoretical<1>()));
+			return this->operator=(EmuMath::Helpers::rect_scale<value_type_uq>(*this, std::forward<ScaleScalar_>(scale_x_and_y_)));
 		}
 #pragma endregion
 
@@ -458,57 +509,6 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::rect_get_centre<OutT_>(*this);
 		}
-
-		/// <summary>
-		/// <para> Outputs a 4D Vector containing this Rect's Left, Top, Right, and Bottom values in indices 0, 1, 2, and 3 respectively. </para>
-		/// <para> The output type may be customised, but if omitted will default to this Rect's `value_type_uq`. </para>
-		/// <para> This function supports output of references. </para>
-		/// </summary>
-		/// <returns>4D EmuMath Vector containing this Rect's Left, Top, Right, and Bottom values in indices 0, 1, 2, and 3 respectively.</returns>
-		template<typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::Vector<4, OutT_> AsVector()
-		{
-			return EmuMath::Vector<4, OutT_>(Left(), Top(), Right(), Bottom());
-		}
-
-		template<typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::Vector<4, OutT_> AsVector() const
-		{
-			return EmuMath::Vector<4, OutT_>(Left(), Top(), Right(), Bottom());
-		}
-
-		/// <summary>
-		/// <para> Outputs a 4D Vector containing this Rect's Left, Top, Right, and Bottom values in the respective specified indices. </para>
-		/// <para> The valid inclusive index range is 0:3, and the same index may not be repeated. Specified indices relate to the output Vector. </para>
-		/// <para> The output type may be customised, but if omitted will default to this Rect's `value_type_uq`. </para>
-		/// <para> This function supports output of references. </para>
-		/// </summary>
-		/// <returns>4D EmuMath Vector containing this Rect's Left, Top, Right, and Bottom values in the respective specified indices..</returns>
-		template<std::size_t Left_, std::size_t Top_, std::size_t Right_, std::size_t Bottom_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline auto AsVector()
-			-> std::enable_if_t<can_convert_to_vector<Left_, Top_, Right_, Bottom_, OutT_>(), EmuMath::Vector<4, OutT_>>
-		{
-			return EmuMath::Vector<4, OutT_>
-			(
-				_get_item_for_vector<0, Left_, Top_, Right_, Bottom_>(),
-				_get_item_for_vector<1, Left_, Top_, Right_, Bottom_>(),
-				_get_item_for_vector<2, Left_, Top_, Right_, Bottom_>(),
-				_get_item_for_vector<3, Left_, Top_, Right_, Bottom_>()
-			);
-		}
-
-		template<std::size_t Left_, std::size_t Top_, std::size_t Right_, std::size_t Bottom_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline auto AsVector() const
-			-> std::enable_if_t<can_const_convert_to_vector<Left_, Top_, Right_, Bottom_, OutT_>(), EmuMath::Vector<4, OutT_>>
-		{
-			return EmuMath::Vector<4, OutT_>
-			(
-				_get_item_for_vector<0, Left_, Top_, Right_, Bottom_>(),
-				_get_item_for_vector<1, Left_, Top_, Right_, Bottom_>(),
-				_get_item_for_vector<2, Left_, Top_, Right_, Bottom_>(),
-				_get_item_for_vector<3, Left_, Top_, Right_, Bottom_>()
-			);
-		}
 #pragma endregion
 
 #pragma region VALIDITY_CHECKS
@@ -520,7 +520,7 @@ namespace EmuMath
 		/// <returns>True if this Rect's X-axis is well-formed; otherwise false.</returns>
 		[[nodiscard]] constexpr inline bool WellFormedX() const
 		{
-			return EmuCore::do_cmp_less_equal<value_type_uq, value_type_uq>()(Left(), Right());
+			return EmuMath::Helpers::rect_has_well_formed_x(*this);
 		}
 
 		/// <summary>
@@ -530,7 +530,7 @@ namespace EmuMath
 		/// <returns>True if this Rect's Y-axis is well-formed; otherwise false.</returns>
 		[[nodiscard]] constexpr inline bool WellFormedY() const
 		{
-			return EmuCore::do_cmp_less_equal<value_type_uq, value_type_uq>()(Top(), Bottom());
+			return EmuMath::Helpers::rect_has_well_formed_y(*this);
 		}
 
 		/// <summary>
@@ -540,7 +540,7 @@ namespace EmuMath
 		/// <returns>True if this Rect's X- and Y-axes are both well-formed; otherwise false.</returns>
 		[[nodiscard]] constexpr inline bool WellFormed() const
 		{
-			return WellFormedX() && WellFormedY();
+			return EmuMath::Helpers::rect_is_well_formed(*this);
 		}
 #pragma endregion
 
@@ -764,7 +764,7 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region CONTAINS_CHECKS
+#pragma region CONTAINMENT_AND_COLLISION_CHECKS
 	public:
 		/// <summary>
 		/// <para> Determines if a given point is contained within this Rect based on its current Left, Top, Right, and Bottom boundaries </para>
@@ -776,15 +776,7 @@ namespace EmuMath
 		template<typename X_, typename Y_>
 		[[nodiscard]] constexpr inline bool ContainsPoint(X_&& x_, Y_&& y_) const
 		{
-			using cmp_less_equal = EmuCore::do_cmp_less_equal<value_type_uq, value_type_uq>;
-			using cmp_greater_equal = EmuCore::do_cmp_greater_equal<value_type_uq, value_type_uq>;
-			value_type_uq x = static_cast<value_type_uq>(std::forward<X_>(x_));
-			value_type_uq y = static_cast<value_type_uq>(std::forward<Y_>(y_));
-			return
-			(
-				(cmp_less_equal()(Top(), y) && cmp_greater_equal()(Bottom(), y)) &&
-				(cmp_less_equal()(Left(), x) && cmp_greater_equal()(Right(), x))
-			);
+			return EmuMath::Helpers::rect_contains_point(*this, std::forward<X_>(x_), std::forward<Y_>(y_));
 		}
 
 		/// <summary>
@@ -793,14 +785,120 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="point_vec_2d_">EmuMath Vector with coordinates to search for in the X- and Y-axes in theoretical indices 0 and 1 respectively..</param>
 		/// <returns>True if the provided coordinates are contained within this Rect's boundaries.</returns>
-		template<std::size_t VecSize_, typename VecT_>
-		[[nodiscard]] constexpr inline bool ContainsPoint(const EmuMath::Vector<VecSize_, VecT_>& point_vec_2d_) const
+		template<EmuMath::TMP::EmuVector PointVector_>
+		[[nodiscard]] constexpr inline bool ContainsPoint(PointVector_&& point_vector_2d_) const
 		{
-			return ContainsPoint(point_vec_2d_.template AtTheoretical<0>(), point_vec_2d_.template AtTheoretical<1>());
+			return EmuMath::Helpers::rect_contains_point(*this, std::forward<PointVector_>(point_vector_2d_));
+		}
+
+		template<bool IgnoreEqual_ = true, EmuMath::TMP::EmuRect RectB_>
+		[[nodiscard]] constexpr inline bool CollidingAxisAligned(RectB_&& rect_b_) const
+		{
+			return EmuMath::Helpers::rect_colliding_axis_aligned<IgnoreEqual_>(*this, std::forward<RectB_>(rect_b_));
 		}
 #pragma endregion
 
-#pragma region CONST_ARITHMETIC_FUNCS
+#pragma region CONVERSIONS
+	public:
+		/// <summary>
+		/// <para> Casts this Rect to an EmuMath Rect of the specified type. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `value_type_uq`. </para>
+		/// </summary>
+		/// <returns>Converted form of this Rect.</returns>
+		template<typename OutT_>
+		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> Cast()
+		{
+			return EmuMath::Helpers::rect_cast<OutT_>(*this);
+		}
+
+		template<typename OutT_>
+		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> Cast() const
+		{
+			return EmuMath::Helpers::rect_cast<OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Casts this Rect to an EmuMath Rect of the specified type. </para>
+		/// <para> Functionally identical to `Cast`, and is present for `static_cast` syntactic sugar. </para>
+		/// </summary>
+		/// <returns>Converted form of this Rect.</returns>
+		template<typename OutT_>
+		explicit constexpr inline operator EmuMath::Rect<OutT_>()
+		{
+			return EmuMath::Helpers::rect_cast<OutT_>(*this);
+		}
+
+		template<typename OutT_>
+		explicit constexpr inline operator EmuMath::Rect<OutT_>() const
+		{
+			return EmuMath::Helpers::rect_cast<OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Converts this Rect to a 4D Vector of its 4 boundaries as specified. </para>
+		/// <para>
+		///		Input indices indicate which Vector index to assign the named boundary to. 
+		///		These may only be non-repeating values in the inclusive range 0:3.
+		/// </para>
+		/// <para> Input indices may be omitted, in which case they will default to 0, 1, 2, 3. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `value_type_uq`. </para>
+		/// </summary>
+		/// <returns>4D EmuMath Vector containing the 4 boundaries of this Rect in specified indices.</returns>
+		template<std::size_t LeftIndex_, std::size_t TopIndex_, std::size_t RightIndex_, std::size_t BottomIndex_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline auto AsVector()
+			-> std::enable_if_t
+			<
+				EmuMath::Helpers::rect_valid_index_args_for_vector_conversion<LeftIndex_, TopIndex_, RightIndex_, BottomIndex_>(),
+				EmuMath::Vector<4, OutT_>
+			>
+		{
+			return EmuMath::Helpers::rect_as_vector<LeftIndex_, TopIndex_, RightIndex_, BottomIndex_, OutT_>(*this);
+		}
+
+		template<std::size_t LeftIndex_, std::size_t TopIndex_, std::size_t RightIndex_, std::size_t BottomIndex_, typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline auto AsVector() const
+			-> std::enable_if_t
+			<
+				EmuMath::Helpers::rect_valid_index_args_for_vector_conversion<LeftIndex_, TopIndex_, RightIndex_, BottomIndex_>(),
+				EmuMath::Vector<4, OutT_>
+			>
+		{
+			return EmuMath::Helpers::rect_as_vector<LeftIndex_, TopIndex_, RightIndex_, BottomIndex_, OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Converts this Rect to a 4D Vector of its Left, Top, Right, and Bottom boundaries at indices 0, 1, 2, and 3 respectively. </para>
+		/// <para> The output type may be customised, but if omitted will default to this Rect's `value_type_uq`. </para>
+		/// </summary>
+		/// <returns>4D EmuMath Vector containing the 4 Left, Top, Right, and Bottom boundaries of this Rect at indices 0, 1, 2, and 3 respectively..</returns>
+		template<typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::Vector<4, OutT_> AsVector()
+		{
+			return EmuMath::Helpers::rect_as_vector<OutT_>(*this);
+		}
+
+		template<typename OutT_ = value_type_uq>
+		[[nodiscard]] constexpr inline EmuMath::Vector<4, OutT_> AsVector() const
+		{
+			return EmuMath::Helpers::rect_as_vector<OutT_>(*this);
+		}
+
+		/// <summary>
+		/// <para> Converts this Rect to a 4D Vector of its Left, Top, Right, and Bottom boundaries at indices 0, 1, 2, and 3 respectively. </para>
+		/// <para> Functionally identical to `AsVector` (without index arguments), and is present for `static_cast` syntactic sugar. </para>
+		/// </summary>
+		/// <returns>4D EmuMath Vector containing the 4 Left, Top, Right, and Bottom boundaries of this Rect at indices 0, 1, 2, and 3 respectively..</returns>
+		template<typename OutT_>
+		[[nodiscard]] explicit constexpr inline operator EmuMath::Vector<4, OutT_>()
+		{
+			return EmuMath::Helpers::rect_as_vector<OutT_>(*this);
+		}
+
+		template<typename OutT_>
+		[[nodiscard]] explicit constexpr inline operator EmuMath::Vector<4, OutT_>() const
+		{
+			return EmuMath::Helpers::rect_as_vector<OutT_>(*this);
+		}
 #pragma endregion
 
 	private:
