@@ -8,7 +8,7 @@ namespace EmuMath::Helpers
 {
 	namespace _rect_underlying
 	{
-		template<std::size_t ForIndex_, std::size_t LeftIndex_, std::size_t TopIndex_, std::size_t RightIndex_, std::size_t BottomIndex_, EmuMath::TMP::EmuRect Rect_>
+		template<std::size_t ForIndex_, std::size_t LeftIndex_, std::size_t TopIndex_, std::size_t RightIndex_, std::size_t BottomIndex_, EmuConcepts::EmuRect Rect_>
 		[[nodiscard]] constexpr inline decltype(auto) _get_for_vector_index(Rect_&& rect_)
 		{
 			if constexpr (ForIndex_ == LeftIndex_)
@@ -61,7 +61,7 @@ namespace EmuMath::Helpers
 	/// </summary>
 	/// <param name="rect_">Rect to convert.</param>
 	/// <returns>Converted form of the input Rect.</returns>
-	template<typename OutT_, EmuMath::TMP::EmuRect Rect_>
+	template<typename OutT_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_cast(Rect_&& rect_)
 	{
 		using out_value_uq = typename EmuMath::Rect<OutT_>::value_type_uq;
@@ -87,7 +87,7 @@ namespace EmuMath::Helpers
 	/// </summary>
 	/// <param name="out_rect_">EmuMath Rect to assign conversion results to.</param>
 	/// <param name="rect_">Rect to convert.</param>
-	template<typename OutT_, EmuMath::TMP::EmuRect Rect_>
+	template<typename OutT_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline void rect_cast(EmuMath::Rect<OutT_>& out_rect_, Rect_&& rect_)
 	{
 		using out_value_uq = typename EmuMath::Rect<OutT_>::value_type_uq;
@@ -112,7 +112,7 @@ namespace EmuMath::Helpers
 	/// </summary>
 	/// <param name="rect_">Rect to convert to a Vector.</param>
 	/// <returns>4D EmuMath Vector containing the 4 boundaries of the input Rect in specified indices.</returns>
-	template<std::size_t LeftIndex_, std::size_t TopIndex_, std::size_t RightIndex_, std::size_t BottomIndex_, typename OutT_, EmuMath::TMP::EmuRect Rect_>
+	template<std::size_t LeftIndex_, std::size_t TopIndex_, std::size_t RightIndex_, std::size_t BottomIndex_, typename OutT_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline auto rect_as_vector(Rect_&& rect_)
 		-> std::enable_if_t<rect_valid_index_args_for_vector_conversion<LeftIndex_, TopIndex_, RightIndex_, BottomIndex_>(), EmuMath::Vector<4, OutT_>>
 	{
@@ -128,7 +128,7 @@ namespace EmuMath::Helpers
 #pragma warning(pop)
 	}
 
-	template<typename OutT_, EmuMath::TMP::EmuRect Rect_>
+	template<typename OutT_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<4, OutT_> rect_as_vector(Rect_&& rect_)
 	{
 		return rect_as_vector<0, 1, 2, 3>(std::forward<Rect_>(rect_));

@@ -8,7 +8,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 #pragma region GENERATION_COMPONENTS_VK_ORTHO
 	template
 	<
-		std::size_t ColumnIndex_, std::size_t RowIndex_, EmuMath::TMP::EmuMatrix OutMatrix_,
+		std::size_t ColumnIndex_, std::size_t RowIndex_, EmuConcepts::EmuMatrix OutMatrix_,
 		typename Out00_, typename Out11_, typename Out22_, typename Out30_, typename Out31_, typename Out32_
 	>
 	[[nodiscard]] constexpr inline decltype(auto) _make_orth_vk_arg_for_index
@@ -69,7 +69,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 
 	template
 	<
-		typename CalcType_, EmuMath::TMP::EmuMatrix OutMatrix_, typename Left_, typename Top_, typename Right_, typename Bottom_, typename Near_, typename Far_,
+		typename CalcType_, EmuConcepts::EmuMatrix OutMatrix_, typename Left_, typename Top_, typename Right_, typename Bottom_, typename Near_, typename Far_,
 		std::size_t...ColumnIndices_, std::size_t...RowIndices_
 	>
 	[[nodiscard]] constexpr inline OutMatrix_ _make_ortho_vk
@@ -128,7 +128,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 #pragma warning(pop)
 	}
 
-	template<EmuMath::TMP::EmuMatrix OutMatrix_, typename Left_, typename Top_, typename Right_, typename Bottom_, typename Near_, typename Far_>
+	template<EmuConcepts::EmuMatrix OutMatrix_, typename Left_, typename Top_, typename Right_, typename Bottom_, typename Near_, typename Far_>
 	[[nodiscard]] constexpr inline OutMatrix_ _make_ortho_vk(Left_&& left_, Top_&& top_, Right_&& right_, Bottom_&& bottom_, Near_&& near_, Far_&& far_)
 	{
 		using out_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
@@ -158,7 +158,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 		);
 	}
 
-	template<EmuMath::TMP::EmuMatrix OutMatrix_, EmuMath::TMP::EmuRect ViewRect_, typename Near_, typename Far_>
+	template<EmuConcepts::EmuMatrix OutMatrix_, EmuConcepts::EmuRect ViewRect_, typename Near_, typename Far_>
 	[[nodiscard]] constexpr inline OutMatrix_ _make_ortho_vk(ViewRect_&& view_rect_, Near_&& near_, Far_&& far_)
 	{
 		using EmuMath::Helpers::rect_get_left;

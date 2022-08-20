@@ -216,7 +216,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="scale_vector_2d_">EmuMath Vector of scales to apply to this Rect, with X and Y at theoretical indices 0 and 1 respectively.</param>
 		/// <returns>This Rect scaled by the provided factors in respective axes, with the same central point.</returns>
-		template<typename OutT_ = preferred_floating_point, EmuMath::TMP::EmuVector ScaleVector_>
+		template<typename OutT_ = preferred_floating_point, EmuConcepts::EmuVector ScaleVector_>
 		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> operator*(ScaleVector_&& scale_vector_2d_) const
 		{
 			return EmuMath::Helpers::rect_scale<OutT_>(*this, std::forward<ScaleVector_>(scale_vector_2d_));
@@ -252,7 +252,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="scale_vector_2d_">EmuMath Vector of scales to apply to this Rect, with X and Y at theoretical indices 0 and 1 respectively.</param>
 		/// <returns>This Rect scaled by the provided factors in respective axes, with the same central point.</returns>
-		template<EmuMath::TMP::EmuVector ScaleVector_>
+		template<EmuConcepts::EmuVector ScaleVector_>
 		constexpr inline this_type& operator*=(ScaleVector_&& scale_vector_2d_)
 		{
 			return this->operator=(EmuMath::Helpers::rect_scale<value_type_uq>(*this, std::forward<ScaleVector_>(scale_vector_2d_)));
@@ -508,7 +508,7 @@ namespace EmuMath
 		///		EmuMath Vector containing the points to centre the new Rect on in the X- and Y-axes in theoretical indices 0 and 1, respectively.
 		/// </param>
 		/// <returns>Copy of this Rect adjusted to be centred on the provided coordinates in respective axes.</returns>
-		template<typename OutT_ = preferred_floating_point, EmuMath::TMP::EmuVector CentreVector_>
+		template<typename OutT_ = preferred_floating_point, EmuConcepts::EmuVector CentreVector_>
 		[[nodiscard]] constexpr inline Rect<OutT_> MakeCentred(CentreVector_&& x_and_y_vector_) const
 		{
 			return EmuMath::Helpers::rect_make_centred<OutT_>(*this, std::forward<CentreVector_>(x_and_y_vector_));
@@ -555,7 +555,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="scale_vector_2d_">EmuMath Vector of scales to apply to this Rect, with X and Y at theoretical indices 0 and 1 respectively.</param>
 		/// <returns>This Rect scaled by the provided factors in respective axes, with the same central point.</returns>
-		template<typename OutT_ = preferred_floating_point, EmuMath::TMP::EmuVector ScaleVector_>
+		template<typename OutT_ = preferred_floating_point, EmuConcepts::EmuVector ScaleVector_>
 		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> Scale(ScaleVector_&& scale_vector_2d_) const
 		{
 			return EmuMath::Helpers::rect_scale<OutT_>(*this, std::forward<ScaleVector_>(scale_vector_2d_));
@@ -613,7 +613,7 @@ namespace EmuMath
 		/// <param name="rect_">EmuMath Rect to create a scaled form of.</param>
 		/// <param name="scale_vector_2d_">EmuMath Vector of scales to apply to this Rect, with X and Y at theoretical indices 0 and 1 respectively.</param>
 		/// <returns>This Rect scaled by the provided factor in respective axes, with points of specified anchors maintained as the same value.</returns>
-		template<signed int XAnchorDirection_, signed int YAnchorDirection_, typename OutT_ = preferred_floating_point, EmuMath::TMP::EmuVector ScaleVector_>
+		template<signed int XAnchorDirection_, signed int YAnchorDirection_, typename OutT_ = preferred_floating_point, EmuConcepts::EmuVector ScaleVector_>
 		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> ScaleAnchored(ScaleVector_&& scale_vector_2d_) const
 		{
 			return EmuMath::Helpers::rect_scale_anchored<XAnchorDirection_, YAnchorDirection_, OutT_>(*this, std::forward<ScaleVector_>(scale_vector_2d_));
@@ -658,7 +658,7 @@ namespace EmuMath
 		///		EmuMath Vector of translations to apply to this Rect, with X and Y at theoretical indices 0 and 1 respectively.
 		/// </param>
 		/// <returns>This Rect translated by the specified amounts in respective axes.</returns>
-		template<typename OutT_ = preferred_floating_point, EmuMath::TMP::EmuVector TranslationVector_>
+		template<typename OutT_ = preferred_floating_point, EmuConcepts::EmuVector TranslationVector_>
 		[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> Translate(TranslationVector_&& translation_vector_2d_) const
 		{
 			return EmuMath::Helpers::rect_translate<OutT_>(*this, std::forward<TranslationVector_>(translation_vector_2d_));
@@ -717,7 +717,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="point_vec_2d_">EmuMath Vector with coordinates to search for in the X- and Y-axes in theoretical indices 0 and 1 respectively..</param>
 		/// <returns>True if the provided coordinates are contained within this Rect's boundaries.</returns>
-		template<bool IgnoreEqual_ = true, EmuMath::TMP::EmuVector PointVector_>
+		template<bool IgnoreEqual_ = true, EmuConcepts::EmuVector PointVector_>
 		[[nodiscard]] constexpr inline bool ContainsPoint(PointVector_&& point_vector_2d_) const
 		{
 			return EmuMath::Helpers::rect_contains_point<IgnoreEqual_>(*this, std::forward<PointVector_>(point_vector_2d_));
@@ -733,7 +733,7 @@ namespace EmuMath
 		/// </summary>
 		/// <param name="rect_b_">Second Rect involved in the collision check.</param>
 		/// <returns>If the this Rect and the passed Rect are colliding, `true`; otherwise `false`.</returns>
-		template<bool IgnoreEqual_ = true, EmuMath::TMP::EmuRect RectB_>
+		template<bool IgnoreEqual_ = true, EmuConcepts::EmuRect RectB_>
 		[[nodiscard]] constexpr inline bool CollidingAxisAligned(RectB_&& rect_b_) const
 		{
 			return EmuMath::Helpers::rect_colliding_axis_aligned<IgnoreEqual_>(*this, std::forward<RectB_>(rect_b_));

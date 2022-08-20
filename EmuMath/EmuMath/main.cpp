@@ -686,6 +686,15 @@ int main()
 	std::cout << "Translated (rhs): " <<
 		EmuMath::Helpers::matrix_multiply<float>(EmuMath::Helpers::matrix_make_translation<float>(1, 2, 3), point_to_project_3d) << "\n";
 
+	if constexpr (EmuCore::TMP::type_check_ignore_ref_cv<std::is_integral, const int&>::value)
+	{
+		std::cout << "HBTRGFHBKGFRNBOLGFNBKGFNBOGFNBFGB" << "\n";
+	}
+
+	EmuCore::TMP::type_check_ignore_ref_cv<std::is_integral, int>;
+
+
+
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

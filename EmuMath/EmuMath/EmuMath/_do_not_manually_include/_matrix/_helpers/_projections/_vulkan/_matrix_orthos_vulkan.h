@@ -61,7 +61,7 @@ namespace EmuMath::Helpers
 	template
 	<
 		std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_ = true,
-		EmuMath::TMP::EmuRect ViewRect_, typename Near_, typename Far_
+		EmuConcepts::EmuRect ViewRect_, typename Near_, typename Far_
 	>
 	[[nodiscard]] constexpr inline auto matrix_ortho_vk(ViewRect_&& view_rect_, Near_&& near_, Far_&& far_)
 		-> EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
@@ -74,7 +74,7 @@ namespace EmuMath::Helpers
 		);
 	}
 
-	template<typename OutT_, bool OutColumnMajor_ = true, EmuMath::TMP::EmuRect ViewRect_, typename Near_, typename Far_>
+	template<typename OutT_, bool OutColumnMajor_ = true, EmuConcepts::EmuRect ViewRect_, typename Near_, typename Far_>
 	[[nodiscard]] constexpr inline auto matrix_ortho_vk(ViewRect_&& view_rect_, Near_&& near_, Far_&& far_)
 		-> EmuMath::Matrix<4, 4, OutT_, OutColumnMajor_>
 	{

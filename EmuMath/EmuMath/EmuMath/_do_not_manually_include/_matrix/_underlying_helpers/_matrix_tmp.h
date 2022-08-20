@@ -1,6 +1,7 @@
 #ifndef EMU_MATH_MATRIX_TMP_H_INC_
 #define EMU_MATH_MATRIX_TMP_H_INC_ 1
 
+#include "../../__common/_common_math_tmp.h"
 #include "../../../../EmuCore/TMPHelpers/TypeConvertors.h"
 #include "../../../Quaternion.h"
 #include "../../../Rect.h"
@@ -15,30 +16,11 @@ namespace EmuMath
 
 namespace EmuMath::TMP
 {
-	/// <summary>
-	/// <para> Type to determine if the passed T_ is a type of EmuMath Matrix. </para>
-	/// <para> The value will be true if T_ is a reference to an EmuMath Matrix, and ignores const/ref qualifiers. </para>
-	/// </summary>
-	template<typename T_>
-	struct is_emu_matrix
-	{
-		static constexpr bool value = std::conditional_t
-		<
-			std::is_same_v<T_, EmuCore::TMP::remove_ref_cv_t<T_>>,
-			std::false_type,
-			is_emu_matrix<EmuCore::TMP::remove_ref_cv_t<T_>>
-		>::value;
-	};
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
 	struct is_emu_matrix<EmuMath::Matrix<NumColumns_, NumRows_, T_, ColumnMajor_>>
 	{
 		static constexpr bool value = true;
 	};
-	template<typename T_>
-	static constexpr bool is_emu_matrix_v = is_emu_matrix<T_>::value;
-
-	template<typename T_>
-	concept EmuMatrix = is_emu_matrix_v<T_>;
 
 	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Matrix_>
 	struct is_theoretical_matrix_index

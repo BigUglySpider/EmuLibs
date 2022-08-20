@@ -316,6 +316,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_stream_append_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_tmp.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_vector_t.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\__common\_common_math_tmp.h" />
     <ClInclude Include="EmuSIMD\SIMDHelpers.h" />
     <ClInclude Include="EmuMath\Vector.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_colours\_colour_arithmetic_functors.h" />

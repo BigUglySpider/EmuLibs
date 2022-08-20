@@ -10,7 +10,7 @@ namespace EmuMath::Helpers
 	/// </summary>
 	/// <param name="rect_">EmuMath Rect to retrieve to `left` value of.</param>
 	/// <returns>Lvalue or Rvalue reference to the X coordinate of left corners in the passed Rect, depending on the qualification of `rect_`.</returns>
-	template<EmuMath::TMP::EmuRect Rect_>
+	template<EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline decltype(auto) rect_get_left(Rect_&& rect_)
 	{
 		return std::forward<Rect_>(rect_).Left();
@@ -21,7 +21,7 @@ namespace EmuMath::Helpers
 	/// </summary>
 	/// <param name="rect_">EmuMath Rect to retrieve to `right` value of.</param>
 	/// <returns>Lvalue or Rvalue reference to the X coordinate of right corners in the passed Rect, depending on the qualification of `rect_`.</returns>
-	template<EmuMath::TMP::EmuRect Rect_>
+	template<EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline decltype(auto) rect_get_right(Rect_&& rect_)
 	{
 		return std::forward<Rect_>(rect_).Right();
@@ -32,7 +32,7 @@ namespace EmuMath::Helpers
 	/// </summary>
 	/// <param name="rect_">EmuMath Rect to retrieve to `top` value of.</param>
 	/// <returns>Lvalue or Rvalue reference to the Y coordinate of top corners in the passed Rect, depending on the qualification of `rect_`.</returns>
-	template<EmuMath::TMP::EmuRect Rect_>
+	template<EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline decltype(auto) rect_get_top(Rect_&& rect_)
 	{
 		return std::forward<Rect_>(rect_).Top();
@@ -43,7 +43,7 @@ namespace EmuMath::Helpers
 	/// </summary>
 	/// <param name="rect_">EmuMath Rect to retrieve to `bottom` value of.</param>
 	/// <returns>Lvalue or Rvalue reference to the Y coordinate of bottom corners in the passed Rect, depending on the qualification of `rect_`.</returns>
-	template<EmuMath::TMP::EmuRect Rect_>
+	template<EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline decltype(auto) rect_get_bottom(Rect_&& rect_)
 	{
 		return std::forward<Rect_>(rect_).Bottom();
@@ -54,7 +54,7 @@ namespace EmuMath::Helpers
 	/// <para> This assumes that the Rect is well-formed. </para>
 	/// </summary>
 	/// <returns>The width of the passed Rect, based on `Right - Left`.</returns>
-	template<typename OutT_, EmuMath::TMP::EmuRect Rect_>
+	template<typename OutT_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline OutT_ rect_get_width(Rect_&& rect_)
 	{
 		using rect_uq = typename EmuCore::TMP::remove_ref_cv<Rect_>::type;
@@ -71,7 +71,7 @@ namespace EmuMath::Helpers
 	/// <para> This assumes that the Rect is well-formed. </para>
 	/// </summary>
 	/// <returns>The height of the passed Rect, based on `Bottom - Top`.</returns>
-	template<typename OutT_, EmuMath::TMP::EmuRect Rect_>
+	template<typename OutT_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline OutT_ rect_get_height(Rect_&& rect_)
 	{
 		using rect_uq = typename EmuCore::TMP::remove_ref_cv<Rect_>::type;
@@ -91,7 +91,7 @@ namespace EmuMath::Helpers
 	/// <para> This assumes that the Rect is well-formed. </para>
 	/// </summary>
 	/// <returns>2D Vector containing the width of the passed Rect in index 0, and its height in index 1.</returns>
-	template<typename OutT_, EmuMath::TMP::EmuRect Rect_>
+	template<typename OutT_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<2, OutT_> rect_get_size(Rect_&& rect_)
 	{
 #pragma warning(push)
@@ -109,7 +109,7 @@ namespace EmuMath::Helpers
 	/// <para> This assumes that the Rect is well-formed, and is based on the `Size` of the passed Rectangle. </para>
 	/// </summary>
 	/// <returns>The squared length of the passed Rectangle.</returns>
-	template<typename Out_, EmuMath::TMP::EmuRect Rect_>
+	template<typename Out_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline Out_ rect_get_diagonal_length_squared(Rect_&& rect_)
 	{
 		return EmuMath::Helpers::vector_square_magnitude<Out_>(rect_get_size<Out_>(std::forward<Rect_>(rect_)));
@@ -120,7 +120,7 @@ namespace EmuMath::Helpers
 	/// <para> This assumes that the Rect is well-formed, and is based on the `Size` of the passed Rectangle. </para>
 	/// </summary>
 	/// <returns>The length of the passed Rectangle.</returns>
-	template<typename Out_, EmuMath::TMP::EmuRect Rect_>
+	template<typename Out_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline Out_ rect_get_diagonal_length(Rect_&& rect_)
 	{
 		return EmuMath::Helpers::vector_magnitude<Out_>(rect_get_size<Out_>(std::forward<Rect_>(rect_)));
@@ -132,7 +132,7 @@ namespace EmuMath::Helpers
 	/// <para> Calculation will aim to be constexpr-evaluable if possible, which may affect accuracy and/or performance. </para>
 	/// </summary>
 	/// <returns>The length of the passed Rectangle.</returns>
-	template<typename Out_, EmuMath::TMP::EmuRect Rect_>
+	template<typename Out_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline Out_ rect_get_diagonal_length_constexpr(Rect_&& rect_)
 	{
 		return EmuMath::Helpers::vector_magnitude_constexpr<Out_>(rect_get_size<Out_>(std::forward<Rect_>(rect_)));
@@ -143,7 +143,7 @@ namespace EmuMath::Helpers
 	/// <para> This assumes that the Rect is well-formed, and is based on the `Width` of the passed Rectangle. </para>
 	/// </summary>
 	/// <returns>Central point of the passed Rectangle in the X-axis.</returns>
-	template<typename Out_, EmuMath::TMP::EmuRect Rect_>
+	template<typename Out_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline Out_ rect_get_centre_x(Rect_&& rect_)
 	{
 		using rect_uq = typename EmuCore::TMP::remove_ref_cv<Rect_>::type;
@@ -176,7 +176,7 @@ namespace EmuMath::Helpers
 	/// <para> This assumes that the Rect is well-formed, and is based on the `Height` of the passed Rectangle. </para>
 	/// </summary>
 	/// <returns>Central point of the passed Rectangle in the Y-axis.</returns>
-	template<typename Out_, EmuMath::TMP::EmuRect Rect_>
+	template<typename Out_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline Out_ rect_get_centre_y(Rect_&& rect_)
 	{
 		using rect_uq = typename EmuCore::TMP::remove_ref_cv<Rect_>::type;
@@ -208,7 +208,7 @@ namespace EmuMath::Helpers
 	/// <para> This assumes that the Rect is well-formed, and is based on the `Width` and `Height` of the passed Rectangle. </para>
 	/// </summary>
 	/// <returns>2D EmuMath Vector containing the passed Rect's central X and Y points in indices 0 and 1 respectively.</returns>
-	template<typename OutT_, EmuMath::TMP::EmuRect Rect_>
+	template<typename OutT_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Vector<2, OutT_> rect_get_centre(Rect_&& rect_)
 	{
 #pragma warning(push)

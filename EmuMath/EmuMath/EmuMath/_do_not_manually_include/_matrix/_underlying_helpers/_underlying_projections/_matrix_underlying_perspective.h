@@ -125,7 +125,7 @@ namespace EmuMath::Helpers::_matrix_underlying
 #pragma endregion
 
 #pragma region GENERATION_COMPONENTS_VK
-	template<std::size_t ColumnIndex_, std::size_t RowIndex_, typename CalcFP_, EmuMath::TMP::EmuMatrix OutMatrix_>
+	template<std::size_t ColumnIndex_, std::size_t RowIndex_, typename CalcFP_, EmuConcepts::EmuMatrix OutMatrix_>
 	[[nodiscard]] constexpr inline decltype(auto) _make_perspective_arg_vk
 	(
 		const CalcFP_& aspect_ratio_,

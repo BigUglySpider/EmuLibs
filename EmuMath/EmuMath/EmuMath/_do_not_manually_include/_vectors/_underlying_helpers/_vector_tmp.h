@@ -2,6 +2,7 @@
 #define EMU_MATH_VECTOR_TMP_H_INC_ 1
 
 #include <cstddef>
+#include "../../__common/_common_math_tmp.h"
 #include "../../../../EmuCore/CommonTypes/DeferrableReferenceWrapper.h"
 #include "../../../../EmuCore/TMPHelpers/StdFeatureChecks.h"
 #include "../../../../EmuCore/TMPHelpers/TypeComparators.h"
@@ -151,26 +152,11 @@ namespace EmuMath
 
 namespace EmuMath::TMP
 {
-	template<class T_>
-	struct is_emu_vector
-	{
-		static constexpr bool value = std::conditional_t
-		<
-			std::is_same_v<T_, EmuCore::TMP::remove_ref_cv_t<T_>>,
-			std::false_type,
-			is_emu_vector<EmuCore::TMP::remove_ref_cv_t<T_>>
-		>::value;
-	};
 	template<std::size_t Size_, typename T_>
 	struct is_emu_vector<EmuMath::Vector<Size_, T_>>
 	{
 		static constexpr bool value = true;
 	};
-	template<class T_>
-	static constexpr bool is_emu_vector_v = is_emu_vector<T_>::value;
-
-	template<typename T_>
-	concept EmuVector = is_emu_vector_v<T_>;
 
 	template<std::size_t Index_, class T_>
 	struct emu_vector_theoretical_return

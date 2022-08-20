@@ -14,7 +14,7 @@ namespace EmuMath::Helpers
 	/// <param name="centre_x_">Point in the X-axis to centre the new Rect on.</param>
 	/// <param name="centre_y_">Point in the Y-axis to centre the new Rect on.</param>
 	/// <returns>Copy of the passed Rect adjusted to be centred on the provided coordinates in respective axes.</returns>
-	template<typename OutT_, typename X_, typename Y_, EmuMath::TMP::EmuRect Rect_>
+	template<typename OutT_, typename X_, typename Y_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_make_centred(Rect_&& rect_, X_&& centre_x_, Y_&& centre_y_)
 	{
 		using rect_uq = typename EmuCore::TMP::remove_ref_cv<Rect_>::type;
@@ -55,7 +55,7 @@ namespace EmuMath::Helpers
 	///		EmuMath Vector containing the points to centre the new Rect on in the X- and Y-axes in theoretical indices 0 and 1, respectively.
 	/// </param>
 	/// <returns>Copy of the passed Rect adjusted to be centred on the provided coordinates in respective axes.</returns>
-	template<typename OutT_, EmuMath::TMP::EmuVector CentreVector_, EmuMath::TMP::EmuRect Rect_>
+	template<typename OutT_, EmuConcepts::EmuVector CentreVector_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_make_centred(Rect_&& rect_, CentreVector_&& vector_centre_2d_)
 	{
 #pragma warning(push)
@@ -76,7 +76,7 @@ namespace EmuMath::Helpers
 	/// <param name="rect_">EmuMath Rect to create a centred form of.</param>
 	/// <param name="shared_centre_x_and_y_">Scalar point in both the X- and Y-axes to centre the new Rect on.</param>
 	/// <returns>Copy of the passed Rect adjusted to be centred on the provided coordinate in both axes.</returns>
-	template<typename OutT_, typename ScalarSharedCentre_, EmuMath::TMP::EmuRect Rect_>
+	template<typename OutT_, typename ScalarSharedCentre_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline auto rect_make_centred(Rect_&& rect_, ScalarSharedCentre_&& shared_centre_x_and_y_)
 		-> std::enable_if_t<!EmuMath::TMP::is_emu_vector_v<ScalarSharedCentre_>, EmuMath::Rect<OutT_>>
 	{
@@ -118,7 +118,7 @@ namespace EmuMath::Helpers
 	/// <param name="scale_x_">Scale to apply to the passed Rect's width.</param>
 	/// <param name="scale_y_">Scale to apply to the passed Rect's height.</param>
 	/// <returns>The passed Rect scaled by the provided factors in respective axes, with the same central point.</returns>
-	template<typename OutT_, typename X_, typename Y_, EmuMath::TMP::EmuRect Rect_>
+	template<typename OutT_, typename X_, typename Y_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_scale(Rect_&& rect_, X_&& scale_x_, Y_&& scale_y_)
 	{
 		using rect_uq = typename EmuCore::TMP::remove_ref_cv<Rect_>::type;
@@ -174,7 +174,7 @@ namespace EmuMath::Helpers
 	/// <param name="rect_">EmuMath Rect to create a scaled form of.</param>
 	/// <param name="scale_x_and_y_">Scale to apply to the passed Rect's width and height.</param>
 	/// <returns>The passed Rect scaled by the provided factors in all axes, with the same central point.</returns>
-	template<typename OutT_, EmuMath::TMP::EmuVector ScaleVector_, EmuMath::TMP::EmuRect Rect_>
+	template<typename OutT_, EmuConcepts::EmuVector ScaleVector_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_scale(Rect_&& rect_, ScaleVector_&& scale_vector_2d_)
 	{
 #pragma warning(push)
@@ -198,7 +198,7 @@ namespace EmuMath::Helpers
 	/// <param name="rect_">EmuMath Rect to create a scaled form of.</param>
 	/// <param name="scale_vector_2d_">EmuMath Vector of scales to apply to the passed Rect, with X and Y at theoretical indices 0 and 1 respectively.</param>
 	/// <returns>The passed Rect scaled by the provided factors in respective axes, with the same central point.</returns>
-	template<typename OutT_, typename ScaleScalar_, EmuMath::TMP::EmuRect Rect_>
+	template<typename OutT_, typename ScaleScalar_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline auto rect_scale(Rect_&& rect_, ScaleScalar_&& scale_x_and_y_)
 		-> std::enable_if_t<!EmuMath::TMP::is_emu_vector_v<ScaleScalar_>, EmuMath::Rect<OutT_>>
 	{
@@ -218,7 +218,7 @@ namespace EmuMath::Helpers
 	/// <param name="scale_x_">Scale to apply to the passed Rect's width.</param>
 	/// <param name="scale_y_">Scale to apply to the passed Rect's height.</param>
 	/// <returns>The passed Rect scaled by the provided factor in respective axes, with points of specified anchors maintained as the same value.</returns>
-	template<signed int XAnchorDirection_, signed int YAnchorDirection_, typename OutT_, typename X_, typename Y_, EmuMath::TMP::EmuRect Rect_>
+	template<signed int XAnchorDirection_, signed int YAnchorDirection_, typename OutT_, typename X_, typename Y_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_scale_anchored(Rect_&& rect_, X_&& scale_x_, Y_&& scale_y_)
 	{
 		if constexpr (XAnchorDirection_ == 0 && YAnchorDirection_ == 0)
@@ -328,7 +328,7 @@ namespace EmuMath::Helpers
 	/// <param name="rect_">EmuMath Rect to create a scaled form of.</param>
 	/// <param name="scale_vector_2d_">EmuMath Vector of scales to apply to the passed Rect, with X and Y at theoretical indices 0 and 1 respectively.</param>
 	/// <returns>The passed Rect scaled by the provided factor in respective axes, with points of specified anchors maintained as the same value.</returns>
-	template<signed int XAnchorDirection_, signed int YAnchorDirection_, typename OutT_, EmuMath::TMP::EmuVector ScaleVector_,  EmuMath::TMP::EmuRect Rect_>
+	template<signed int XAnchorDirection_, signed int YAnchorDirection_, typename OutT_, EmuConcepts::EmuVector ScaleVector_,  EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_scale_anchored(Rect_&& rect_, ScaleVector_&& scale_vector_2d_)
 	{
 #pragma warning(push)
@@ -353,7 +353,7 @@ namespace EmuMath::Helpers
 	/// <param name="rect_">EmuMath Rect to create a scaled form of.</param>
 	/// <param name="scale_x_and_y_">Scale to apply to the passed Rect's width and height.</param>
 	/// <returns>The passed Rect scaled by the provided factor in all axes, with points of specified anchors maintained as the same value.</returns>
-	template<signed int XAnchorDirection_, signed int YAnchorDirection_, typename OutT_, typename ScaleScalar_,  EmuMath::TMP::EmuRect Rect_>
+	template<signed int XAnchorDirection_, signed int YAnchorDirection_, typename OutT_, typename ScaleScalar_,  EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline auto rect_scale_anchored(Rect_&& rect_, ScaleScalar_&& scale_x_and_y_)
 		-> std::enable_if_t<!EmuMath::TMP::is_emu_vector_v<ScaleScalar_>, EmuMath::Rect<OutT_>>
 	{
@@ -368,7 +368,7 @@ namespace EmuMath::Helpers
 	/// <param name="x_">Amount to move the passed Rectangle by in the X-axis.</param>
 	/// <param name="y_">Amount to move the passed Rectangle by in the Y-axis.</param>
 	/// <returns>The passed Rect translated by the specified amounts in respective axes.</returns>
-	template<typename OutT_, typename X_, typename Y_, EmuMath::TMP::EmuRect Rect_>
+	template<typename OutT_, typename X_, typename Y_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_translate(Rect_&& rect_, X_&& x_, Y_&& y_)
 	{
 		using x_uq = typename EmuCore::TMP::remove_ref_cv<X_>::type;
@@ -409,7 +409,7 @@ namespace EmuMath::Helpers
 	///		EmuMath Vector of translations to apply to the passed Rect, with X and Y at theoretical indices 0 and 1 respectively.
 	/// </param>
 	/// <returns>The passed Rect translated by the specified amounts in respective axes.</returns>
-	template<typename OutT_, EmuMath::TMP::EmuVector TranslationVector_, EmuMath::TMP::EmuRect Rect_>
+	template<typename OutT_, EmuConcepts::EmuVector TranslationVector_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_translate(Rect_&& rect_, TranslationVector_&& translation_vector_2d_)
 	{
 #pragma warning(push)
@@ -430,7 +430,7 @@ namespace EmuMath::Helpers
 	/// <para> This assumes that the Rect is well-formed. </para>
 	/// </summary>
 	/// <returns>The passed Rect reflected as specified by the passed template arguments.</returns>
-	template<signed int XDirection_, signed int YDirection_, typename OutT_, EmuMath::TMP::EmuRect Rect_>
+	template<signed int XDirection_, signed int YDirection_, typename OutT_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_reflect(Rect_&& rect_)
 	{
 		using in_uq = typename EmuCore::TMP::remove_ref_cv<Rect_>::type;
@@ -497,7 +497,7 @@ namespace EmuMath::Helpers
 	/// <param name="x_direction_">0: No X-axis reflection; Positive: Reflect against Right boundary; Negative: Reflect against Left boundary.</param>
 	/// <param name="y_direction_">0: No Y-axis reflection; Positive: Reflect against Bottom boundary; Negative: Reflect against Top boundary.</param>
 	/// <returns>The passed Rect reflected as specified by the passed arguments.</returns>
-	template<typename OutT_, EmuMath::TMP::EmuRect Rect_>
+	template<typename OutT_, EmuConcepts::EmuRect Rect_>
 	[[nodiscard]] constexpr inline EmuMath::Rect<OutT_> rect_reflect(Rect_&& rect_, signed int x_direction_, signed int y_direction_)
 	{
 		// Identical to above version, but runtime conditional branches

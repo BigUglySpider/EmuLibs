@@ -16,6 +16,13 @@ namespace EmuMath
 	///		This common interface is nulled when using the Matrix via STL iterators or flattened indices (i.e. only a single, scalar index argument), 
 	///		in which case the specified contiguous storage order will be used.
 	/// </para>
+	/// <para>
+	///		--- NOTATION: Where cx = column x, rx = row x, columns and rows are referred to as the following for this Matrix type:
+	///		<para> --- | c0r0, c1r0, ..., cNumColumns_r0					  </para>
+	///		<para> --- | c0r1, c1r1, ..., cNumColumns_r1					  </para>
+	///		<para> --- | ...												  </para>
+	///		<para> --- | c0rNumRows_, c1rNumRows_, ..., cNumColumns_rNumRows_ </para>
+	/// </para>
 	/// </summary>
 	template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool ColumnMajor_>
 	struct Matrix
