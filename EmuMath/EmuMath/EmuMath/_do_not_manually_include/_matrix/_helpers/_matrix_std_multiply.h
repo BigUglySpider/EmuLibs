@@ -124,6 +124,26 @@ namespace EmuMath::Helpers
 	}
 #pragma endregion
 
+#pragma region MULTIPLY_WITH_VECTOR_LHS
+	template<typename OutT_, EmuMath::TMP::EmuMatrix Matrix_, std::size_t LhsSize_, typename LhsT_>
+	[[nodiscard]] constexpr inline auto matrix_multiply(const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_, Matrix_&& rhs_matrix_)
+		-> EmuMath::Vector<LhsSize_, OutT_>
+	{
+		return _matrix_underlying::_matrix_std_multiply_vector_mat<OutT_>(lhs_vector_, std::forward<Matrix_>(rhs_matrix_));
+	}
+
+	template<std::size_t OutSize_, typename OutT_, EmuMath::TMP::EmuMatrix Matrix_, std::size_t LhsSize_, typename LhsT_>
+	[[nodiscard]] constexpr inline void matrix_multiply
+	(
+		EmuMath::Vector<OutSize_, OutT_>& out_vector_,
+		const EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_,
+		Matrix_&& rhs_matrix_
+	)
+	{
+		_matrix_underlying::_matrix_std_multiply_assign_vector_mat(out_vector_, lhs_vector_, std::forward<Matrix_>(rhs_matrix_));
+	}
+#pragma endregion
+
 #pragma region MULTIPLY_WITH_VECTOR_RHS
 	/// <summary>
 	/// <para> Outputs an EmuMath Vector resulting from a multiplication with the provided Matrix. The Vector will be treated as a single-column Matrix. </para>

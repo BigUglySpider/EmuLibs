@@ -426,6 +426,22 @@ namespace EmuMath::Helpers
 	}
 
 	/// <summary>
+	/// <para> Interprets the left-hand Vector as a Matrix with a single row of the Vector's size and multiplies it with the right-hand Matrix. </para>
+	/// <para> The left-hand Vector must have a size equal to the Matrix's number of columns (or its columns - 1, where the missing index is an implicit 1). </para>
+	/// </summary>
+	/// <param name="lhs_vector_">EmuMath Vector to interpret as a Row Matrix on the left-hand side of multiplication.</param>
+	/// <param name="rhs_matrix_">EmuMath Matrix appearing on the right-hand side of multiplication.</param>
+	template<EmuMath::TMP::EmuMatrix Matrix_, std::size_t LhsSize_, typename LhsT_>
+	[[nodiscard]] constexpr inline void matrix_multiply_assign
+	(
+		EmuMath::Vector<LhsSize_, LhsT_>& lhs_vector_,
+		Matrix_&& rhs_matrix_
+	)
+	{
+		_matrix_underlying::_matrix_std_multiply_assign_vector_mat(lhs_vector_, std::forward<Matrix_>(rhs_matrix_));
+	}
+
+	/// <summary>
 	/// <para> Performs a multiply-assign operation (e.g. operator*=) between the passed EmuMath Matrix and EmuMath Vector. </para>
 	/// <para> Unlike most arithmetic-assign operations, this will assign to the right-hand operand, as the result will be a Vector of equal size instead of a Matrix. </para>
 	/// <para> If needed, a copy of the provided Vector will be formed automatically to prevent invalid results developing from its assignment. </para>

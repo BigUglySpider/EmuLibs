@@ -646,8 +646,21 @@ int main()
 	constexpr auto colliding_f = collide_a.CollidingAxisAligned(collide_b.Translate(-5.9, -5.9));
 	
 
-	std::cout << "\n\nPERSPECTIVE:\n";
-	constexpr auto perspective_mat = EmuMath::Helpers::matrix_perspective_vk_reverse_depth_constexpr<double>
+	std::cout << "\n\nPERSPECTIVE (REVERSE DEPTH):\n";
+	constexpr auto point_to_project = EmuMath::Vector<4, float>(1, 2, 3, 1);
+	constexpr auto point_to_project_3d = EmuMath::Vector<3, float>(1, 2, 3);
+	constexpr auto perspective_mat_reverse_z = EmuMath::Helpers::matrix_perspective_vk_reverse_depth_constexpr<double>
+	(
+		0.785398,
+		1920.0 / 1080.0,
+		0.1,
+		100.0
+	);
+	std::cout << perspective_mat_reverse_z << "\n\nFlattened: " << perspective_mat_reverse_z.Flatten() << "\n";
+	std::cout << "Transformed point: " << (perspective_mat_reverse_z * point_to_project) << "\n";
+
+	std::cout << "---\n\nPERSPECTIVE:\n";
+	constexpr auto perspective_mat = EmuMath::Helpers::matrix_perspective_vk_constexpr<double>
 	(
 		0.785398,
 		1920.0 / 1080.0,
@@ -655,10 +668,24 @@ int main()
 		100.0
 	);
 	std::cout << perspective_mat << "\n\nFlattened: " << perspective_mat.Flatten() << "\n";
+	std::cout << "Transformed point: " << (perspective_mat * point_to_project) << "\n";
 
 	std::cout << "---\n\nORTHO:\n";
 	constexpr auto ortho_a = EmuMath::Helpers::matrix_ortho_vk<float>(EmuMath::Rect<double>(0, 0, 1280, 1280), 0.1, 100.0);
 	std::cout << ortho_a << "\n\nFlattened: " << ortho_a.Flatten() << "\n\n";
+	std::cout << "Transformed point: " << (ortho_a * point_to_project) << "\n";
+	std::cout << "Transformed point as mat:\n" << 
+		(EmuMath::Matrix<4, 4, float, false>(point_to_project, EmuMath::Vector<4, float>(), EmuMath::Vector<4, float>(), EmuMath::Vector<4, float>()) * ortho_a) 
+		<< "\n";
+	std::cout << "Transformed point as row vector: " << EmuMath::Helpers::matrix_multiply<float>(point_to_project_3d, ortho_a) << "\n";
+	auto runtime_point_to_project = point_to_project_3d;
+	EmuMath::Helpers::matrix_multiply_assign(runtime_point_to_project, ortho_a);
+	std::cout << "Transformed point as row vector (assigned): " << runtime_point_to_project << "\n";
+	std::cout << "Translated (lhs): " <<
+		EmuMath::Helpers::matrix_multiply<float>(point_to_project_3d, EmuMath::Helpers::matrix_make_translation<float>(1, 2, 3)) << "\n";
+	std::cout << "Translated (rhs): " <<
+		EmuMath::Helpers::matrix_multiply<float>(EmuMath::Helpers::matrix_make_translation<float>(1, 2, 3), point_to_project_3d) << "\n";
+
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
