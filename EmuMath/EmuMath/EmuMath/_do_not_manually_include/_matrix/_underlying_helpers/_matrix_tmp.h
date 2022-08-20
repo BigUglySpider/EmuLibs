@@ -3,6 +3,7 @@
 
 #include "../../../../EmuCore/TMPHelpers/TypeConvertors.h"
 #include "../../../Quaternion.h"
+#include "../../../Rect.h"
 #include "../../../Vector.h"
 #include <type_traits>
 
@@ -35,6 +36,9 @@ namespace EmuMath::TMP
 	};
 	template<typename T_>
 	static constexpr bool is_emu_matrix_v = is_emu_matrix<T_>::value;
+
+	template<typename T_>
+	concept EmuMatrix = is_emu_matrix_v<T_>;
 
 	template<std::size_t ColumnIndex_, std::size_t RowIndex_, class Matrix_>
 	struct is_theoretical_matrix_index

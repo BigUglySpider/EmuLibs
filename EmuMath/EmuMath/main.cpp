@@ -577,16 +577,6 @@ int main()
 
 	std::cout << "\n\n" << mat_from_quats << "\n\n" << mat_from_fused_quats << "\n";
 
-	std::cout << "\n\n";
-	constexpr auto perspective_mat = EmuMath::Helpers::matrix_perspective_vk_reverse_depth_constexpr<double>
-	(
-		0.785398,
-		1920.0 / 1080.0,
-		0.1,
-		100.0
-	);
-	std::cout << perspective_mat << "\n" << perspective_mat.Flatten() << "\n";
-
 	constexpr auto rect = EmuMath::Rect<float>(5);
 	constexpr auto rect_centre = rect.Centre();
 	constexpr auto rect_b = EmuMath::Rect<double>(3, 4.2, 10, 10);
@@ -654,8 +644,21 @@ int main()
 	constexpr auto colliding_d = collide_a.CollidingAxisAligned(collide_b.Translate(-0.2, -0.5));
 	constexpr auto colliding_e = collide_a.CollidingAxisAligned(collide_b.Scale(2, 2));
 	constexpr auto colliding_f = collide_a.CollidingAxisAligned(collide_b.Translate(-5.9, -5.9));
+	
 
-	auto ree = EmuMath::Rect<double>();
+	std::cout << "\n\nPERSPECTIVE:\n";
+	constexpr auto perspective_mat = EmuMath::Helpers::matrix_perspective_vk_reverse_depth_constexpr<double>
+	(
+		0.785398,
+		1920.0 / 1080.0,
+		0.1,
+		100.0
+	);
+	std::cout << perspective_mat << "\n\nFlattened: " << perspective_mat.Flatten() << "\n";
+
+	std::cout << "---\n\nORTHO:\n";
+	constexpr auto ortho_a = EmuMath::Helpers::matrix_ortho_vk<float>(EmuMath::Rect<double>(0, 0, 1280, 1280), 0.1, 100.0);
+	std::cout << ortho_a << "\n\nFlattened: " << ortho_a.Flatten() << "\n\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
