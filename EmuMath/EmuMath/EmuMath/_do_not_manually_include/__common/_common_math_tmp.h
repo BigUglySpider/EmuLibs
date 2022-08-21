@@ -3,6 +3,7 @@
 
 #include "../../../EmuCore/TMPHelpers/TypeConvertors.h"
 
+#pragma region CHECKS
 namespace EmuMath::TMP
 {
 	/// <summary>
@@ -71,7 +72,9 @@ namespace EmuMath::TMP
 	template<class T_>
 	static constexpr bool is_emu_vector_v = is_emu_vector<T_>::value;
 }
+#pragma endregion
 
+#pragma region CONCEPTS
 namespace EmuMath::Concepts
 {
 	/// <summary>
@@ -115,5 +118,6 @@ namespace EmuConcepts
 {
 	using namespace EmuMath::Concepts;
 }
+#pragma endregion
 
 #endif

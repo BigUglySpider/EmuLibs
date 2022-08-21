@@ -324,7 +324,7 @@ namespace EmuCore::TMP
 	{
 		using type = typename Template_<Ts_...>::value_type;
 	};
-	template<template<std::size_t Size__, typename Ts__> class Template_, std::size_t Size_, typename...Ts_>
+	template<template<std::size_t InSize_, typename Ts__> class Template_, std::size_t Size_, typename...Ts_>
 	struct get_value_type<Template_<Size_, Ts_...>>
 	{
 		using type = typename Template_<Size_, Ts_...>::value_type;
@@ -334,12 +334,12 @@ namespace EmuCore::TMP
 	{
 		using type = typename Template_<SizeX_, SizeY_, Ts_...>::value_type;
 	};
-	template<template<typename T__, std::size_t Size__> class Template_, typename T_, std::size_t Size_>
+	template<template<typename U_, std::size_t InSize_> class Template_, typename T_, std::size_t Size_>
 	struct get_value_type<Template_<T_, Size_>>
 	{
 		using type = typename Template_<T_, Size_>::value_type;
 	};
-	template<template<typename T__, std::size_t SizeX__, std::size_t SizeY__> class Template_, typename T_, std::size_t SizeX_, std::size_t SizeY_>
+	template<template<typename U_, std::size_t SizeX__, std::size_t SizeY__> class Template_, typename T_, std::size_t SizeX_, std::size_t SizeY_>
 	struct get_value_type<Template_<T_, SizeX_, SizeY_>>
 	{
 		using type = typename Template_<T_, SizeX_, SizeY_>::value_type;

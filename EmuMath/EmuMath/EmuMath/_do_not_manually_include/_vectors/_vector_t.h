@@ -85,15 +85,15 @@ namespace EmuMath
 			return EmuMath::Helpers::vector_get_non_contained<this_type>();
 		}
 
-		// Helper to decide if a type should be an EmuMath Vector of size Size__ and type T__, or void.
-		// --- If std::is_void_v<T__> is true, the underlying type will be void; otherwise, it will be Vector<Size__, T__>.
-		template<std::size_t Size__, typename T__, typename = void>
+		// Helper to decide if a type should be an EmuMath Vector of size InSize_ and type U_, or void.
+		// --- If std::is_void_v<U_> is true, the underlying type will be void; otherwise, it will be Vector<InSize_, U_>.
+		template<std::size_t InSize_, typename U_, typename = void>
 		struct _vector_or_void
 		{
-			using type = EmuMath::Vector<Size__, T__>;
+			using type = EmuMath::Vector<InSize_, U_>;
 		};
-		template<std::size_t Size__, typename T__>
-		struct _vector_or_void<Size__, T__, std::enable_if_t<std::is_void_v<T__>>>
+		template<std::size_t InSize_, typename U_>
+		struct _vector_or_void<InSize_, U_, std::enable_if_t<std::is_void_v<U_>>>
 		{
 			using type = void;
 		};
@@ -1502,90 +1502,6 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region UNARY_ARITHMETIC_OPERATORS
-	public:
-		// INCREMENT OPERATORS
-		constexpr inline this_type& operator++()
-		{
-			return EmuMath::Helpers::vector_pre_increment(*this);
-		}
-		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator++()
-		{
-			return EmuMath::Helpers::vector_pre_increment<OutSize_, OutT_>(*this);
-		}
-		template<typename OutT_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator++()
-		{
-			return EmuMath::Helpers::vector_pre_increment<size, OutT_>(*this);
-		}
-
-		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator++(int)
-		{
-			return EmuMath::Helpers::vector_post_increment<OutSize_, OutT_>(*this);
-		}
-		template<typename OutT_ = value_type_uq>
-		constexpr inline typename _vector_or_void<size, OutT_>::type operator++(int)
-		{
-			if constexpr (std::is_void_v<OutT_>)
-			{
-				EmuMath::Helpers::vector_post_increment_no_copy(*this);
-			}
-			else
-			{
-				return EmuMath::Helpers::vector_post_increment<size, OutT_>(*this);
-			}
-		}
-
-		// DECREMENT OPERATORS
-		constexpr inline this_type& operator--()
-		{
-			return EmuMath::Helpers::vector_pre_decrement(*this);
-		}
-		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator--()
-		{
-			return EmuMath::Helpers::vector_pre_decrement<OutSize_, OutT_>(*this);
-		}
-		template<typename OutT_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator--()
-		{
-			return EmuMath::Helpers::vector_pre_decrement<size, OutT_>(*this);
-		}
-
-		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator--(int)
-		{
-			return EmuMath::Helpers::vector_post_decrement<OutSize_, OutT_>(*this);
-		}
-		template<typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline typename _vector_or_void<size, OutT_>::type operator--(int)
-		{
-			if constexpr (std::is_void_v<OutT_>)
-			{
-				EmuMath::Helpers::vector_post_decrement_no_copy(*this);
-			}
-			else
-			{
-				return EmuMath::Helpers::vector_post_decrement<size, OutT_>(*this);
-			}
-		}
-		
-		// NEGATION OPERATORS
-		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator-() const
-		{
-			return EmuMath::Helpers::vector_negate<OutSize_, OutT_>(*this);
-		}
-
-		template<typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator-() const
-		{
-			return EmuMath::Helpers::vector_negate<size, OutT_>(*this);
-		}
-#pragma endregion
-
 #pragma region ASSIGNMENT_OPERATORS
 		constexpr inline this_type& operator=(this_type& rhs_)
 		{
@@ -1626,15 +1542,7 @@ namespace EmuMath
 		constexpr inline auto operator=(alternative_rep&& rhs_)
 			-> std::enable_if_t<_can_alt_move_assign<Unused_>(), this_type&>
 		{
-			EmuMath::Helpers::vector_copy(*this, std::forward<alternative_rep>(rhs_));
-			return *this;
-		}
-
-		template<std::size_t Unused_ = 0>
-		constexpr inline auto operator=(const alternative_rep&& rhs_)
-			-> std::enable_if_t<_can_alt_const_move_assign<Unused_>(), this_type&>
-		{
-			EmuMath::Helpers::vector_copy(*this, std::forward<alternative_rep>(rhs_));
+			EmuMath::Helpers::vector_copy(*this, std::move(rhs_));
 			return *this;
 		}
 
@@ -1661,296 +1569,6 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region CONST_ARITHMETIC_OPERATORS
-	public:
-		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator+(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_add<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator+(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_add<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator-(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_subtract<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator-(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_subtract<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator*(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_multiply<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator*(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_multiply<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator/(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_divide<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator/(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_divide<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator%(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_mod<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator%(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_mod<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-#pragma endregion
-
-#pragma region CONST_BITWISE_OPERATORS
-	public:
-		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator~() const
-		{
-			return EmuMath::Helpers::vector_bitwise_not<OutSize_, OutT_>(*this);
-		}
-		template<typename OutT_ = value_type_uq>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator~() const
-		{
-			return EmuMath::Helpers::vector_bitwise_not<size, OutT_>(*this);
-		}
-
-		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator&(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_bitwise_and<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator&(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_bitwise_and<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator|(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_bitwise_or<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator|(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_bitwise_or<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator^(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_bitwise_xor<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator^(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_bitwise_xor<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator<<(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_shift_left<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator<<(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_shift_left<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> operator>>(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_shift_right<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> operator>>(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_shift_right<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
-		}
-#pragma endregion
-
-#pragma region CMP_OPERATORS
-	public:
-		template<bool IncludeNonContained_ = true, class Rhs_>
-		[[nodiscard]] constexpr inline bool operator==(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_cmp_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
-		[[nodiscard]] constexpr inline bool operator==(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_cmp_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<bool IncludeNonContained_ = true, class Rhs_>
-		[[nodiscard]] constexpr inline bool operator!=(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_cmp_not_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
-		[[nodiscard]] constexpr inline bool operator!=(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_cmp_not_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<bool IncludeNonContained_ = true, class Rhs_>
-		[[nodiscard]] constexpr inline bool operator>(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_cmp_greater<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
-		[[nodiscard]] constexpr inline bool operator>(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_cmp_greater<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<bool IncludeNonContained_ = true, class Rhs_>
-		[[nodiscard]] constexpr inline bool operator<(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_cmp_less<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
-		[[nodiscard]] constexpr inline bool operator<(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_cmp_less<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<bool IncludeNonContained_ = true, class Rhs_>
-		[[nodiscard]] constexpr inline bool operator>=(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_cmp_greater_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
-		[[nodiscard]] constexpr inline bool operator>=(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_cmp_greater_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<bool IncludeNonContained_ = true, class Rhs_>
-		[[nodiscard]] constexpr inline bool operator<=(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_cmp_less_equal<IncludeNonContained_>(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, class Rhs_>
-		[[nodiscard]] constexpr inline bool operator<=(Rhs_&& rhs_) const
-		{
-			return EmuMath::Helpers::vector_cmp_less_equal<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
-		}
-#pragma endregion
-
-#pragma region ARITHMETIC_ASSIGN_OPERATORS
-	public:
-		template<typename Rhs_>
-		constexpr inline this_type& operator+=(Rhs_&& rhs_)
-		{
-			return EmuMath::Helpers::vector_add_assign(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
-		constexpr inline this_type& operator+=(Rhs_&& rhs_)
-		{
-			return EmuMath::Helpers::vector_add_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<typename Rhs_>
-		constexpr inline this_type& operator-=(Rhs_&& rhs_)
-		{
-			return EmuMath::Helpers::vector_subtract_assign(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
-		constexpr inline this_type& operator-=(Rhs_&& rhs_)
-		{
-			return EmuMath::Helpers::vector_subtract_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<typename Rhs_>
-		constexpr inline this_type& operator*=(Rhs_&& rhs_)
-		{
-			return EmuMath::Helpers::vector_multiply_assign(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
-		constexpr inline this_type& operator*=(Rhs_&& rhs_)
-		{
-			return EmuMath::Helpers::vector_multiply_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<typename Rhs_>
-		constexpr inline this_type& operator/=(Rhs_&& rhs_)
-		{
-			return EmuMath::Helpers::vector_divide_assign(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
-		constexpr inline this_type& operator/=(Rhs_&& rhs_)
-		{
-			return EmuMath::Helpers::vector_divide_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<typename Rhs_>
-		constexpr inline this_type& operator%=(Rhs_&& rhs_)
-		{
-			return EmuMath::Helpers::vector_mod_assign(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
-		constexpr inline this_type& operator%=(Rhs_&& rhs_)
-		{
-			return EmuMath::Helpers::vector_mod_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
-		}
-#pragma endregion
-
-#pragma region BITWISE_ASSIGN_OPERATORS
-	public:
-		template<typename Rhs_>
-		constexpr inline this_type& operator&=(Rhs_&& rhs_)
-		{
-			return EmuMath::Helpers::vector_bitwise_and_assign(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
-		constexpr inline this_type& operator&=(Rhs_&& rhs_)
-		{
-			return EmuMath::Helpers::vector_bitwise_and_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<typename Rhs_>
-		constexpr inline this_type& operator|=(Rhs_&& rhs_)
-		{
-			return EmuMath::Helpers::vector_bitwise_or_assign(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
-		constexpr inline this_type& operator|=(Rhs_&& rhs_)
-		{
-			return EmuMath::Helpers::vector_bitwise_or_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
-		}
-
-		template<typename Rhs_>
-		constexpr inline this_type& operator^=(Rhs_&& rhs_)
-		{
-			return EmuMath::Helpers::vector_bitwise_xor_assign(*this, std::forward<Rhs_>(rhs_));
-		}
-		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_>
-		constexpr inline this_type& operator^=(Rhs_&& rhs_)
-		{
-			return EmuMath::Helpers::vector_bitwise_xor_assign<BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
-		}
-#pragma endregion
-
 #pragma region UNARY_ARITHMETIC_FUNCS
 	public:
 		/// <summary>
@@ -1961,11 +1579,13 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::vector_pre_increment(*this);
 		}
+
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> PreIncrement()
 		{
 			return EmuMath::Helpers::vector_pre_increment<OutSize_, OutT_>(*this);
 		}
+
 		template<typename OutT_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> PreIncrement()
 		{
@@ -1982,6 +1602,7 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::vector_post_increment<OutSize_, OutT_>(*this);
 		}
+
 		template<typename OutT_ = value_type_uq>
 		constexpr inline typename _vector_or_void<size, OutT_>::type PostIncrement()
 		{
@@ -2003,11 +1624,13 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::vector_pre_decrement(*this);
 		}
+
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq>
 		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> PreDecrement()
 		{
 			return EmuMath::Helpers::vector_pre_decrement<OutSize_, OutT_>(*this);
 		}
+
 		template<typename OutT_>
 		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> PreDecrement()
 		{
@@ -2024,6 +1647,7 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::vector_post_decrement<OutSize_, OutT_>(*this);
 		}
+
 		template<typename OutT_ = value_type_uq>
 		constexpr inline typename _vector_or_void<size, OutT_>::type PostDecrement()
 		{
@@ -2348,16 +1972,20 @@ namespace EmuMath
 		/// <summary>
 		/// <para> Returns the result of multiplying this Vector by rhs_. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be multiplied. Otherwise, all elements are multiplied by rhs_. </para>
+		/// <para> This cannot be used to multiply by an EmuMath Matrix. Use `operator*` for such use cases. </para>
 		/// </summary>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to multiply this Vector by.</param>
 		/// <returns>Copy of this Vector multiplied by rhs_, using the OutSize_ arg (defaults to size) and OutT_ arg (defaults to value_type_uq).</returns>
 		template<std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> Multiply(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline auto BasicMultiply(Rhs_&& rhs_) const
+			-> std::enable_if_t<!EmuMath::TMP::is_emu_matrix_v<Rhs_>, EmuMath::Vector<OutSize_, OutT_>>
 		{
 			return EmuMath::Helpers::vector_multiply<OutSize_, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
+
 		template<typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> Multiply(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline auto BasicMultiply(Rhs_&& rhs_) const
+			-> std::enable_if_t<!EmuMath::TMP::is_emu_matrix_v<Rhs_>, EmuMath::Vector<size, OutT_>>
 		{
 			return EmuMath::Helpers::vector_multiply<size, OutT_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -2365,11 +1993,13 @@ namespace EmuMath
 		/// <summary>
 		/// <para> Outputs the result of multiplying this Vector by rhs_, via the provided out_vector_. </para>
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be multiplied. Otherwise, all elements are multiplied by rhs_. </para>
+		/// <para> This cannot be used to multiply by an EmuMath Matrix. Use `operator*` for such use cases. </para>
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to multiply this Vector by.</param>
 		template<typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void Multiply(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline auto BasicMultiply(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+			-> std::enable_if_t<!EmuMath::TMP::is_emu_matrix_v<Rhs_>, void>
 		{
 			EmuMath::Helpers::vector_multiply(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -2379,6 +2009,10 @@ namespace EmuMath
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be multiplied. Otherwise, all elements are multiplied by rhs_. </para>
 		/// <para> BeginIndex_: Inclusive index at which to start multiplying elements. </para>
 		/// <para> EndIndex_: Exclusive index at which to stop multiplying elements. </para>
+		/// <para> 
+		///		This cannot be used to multiply by an EmuMath Matrix. Use `operator*` for such use cases, 
+		///		although you may not do a range-based matrix multiplication as this function does.
+		/// </para>
 		/// </summary>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to multiply elements by in the specified range.</param>
 		/// <returns>
@@ -2386,12 +2020,14 @@ namespace EmuMath
 		///		with indices in the provided range multiplied by rhs_.
 		/// </returns>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> MultiplyRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline auto BasicMultiplyRange(Rhs_&& rhs_) const
+			-> std::enable_if_t<!EmuMath::TMP::is_emu_matrix_v<Rhs_>, EmuMath::Vector<OutSize_, OutT_>>
 		{
 			return EmuMath::Helpers::vector_multiply_range<OutSize_, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> MultiplyRange(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline auto BasicMultiplyRange(Rhs_&& rhs_) const
+			-> std::enable_if_t<!EmuMath::TMP::is_emu_matrix_v<Rhs_>, EmuMath::Vector<size, OutT_>>
 		{
 			return EmuMath::Helpers::vector_multiply_range<size, OutT_, BeginIndex_, EndIndex_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -2404,11 +2040,16 @@ namespace EmuMath
 		/// <para> If Rhs_ is an EmuMath Vector: Respective elements will be multiplied. Otherwise, all elements are multiplied by rhs_. </para>
 		/// <para> BeginIndex_: Inclusive index at which to start multiplying elements. </para>
 		/// <para> EndIndex_: Exclusive index at which to stop multiplying elements. </para>
+		/// <para> 
+		///		This cannot be used to multiply by an EmuMath Matrix. Use `operator*` for such use cases, 
+		///		although you may not do a range-based matrix multiplication as this function does.
+		/// </para>
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to multiply elements by in the specified range.</param>
 		template<std::size_t BeginIndex_, std::size_t EndIndex_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MultiplyRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline auto BasicMultiplyRange(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+			-> std::enable_if_t<!EmuMath::TMP::is_emu_matrix_v<Rhs_>, void>
 		{
 			EmuMath::Helpers::vector_multiply_range<BeginIndex_, EndIndex_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}
@@ -2420,6 +2061,10 @@ namespace EmuMath
 		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
 		/// <para> MulBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform arithmetic. </para>
+		/// <para> 
+		///		This cannot be used to multiply by an EmuMath Matrix. Use `operator*` for such use cases, 
+		///		although you may not do a range-based matrix multiplication as this function does.
+		/// </para>
 		/// </summary>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to multiply elements by in the specified range.</param>
 		/// <returns>
@@ -2427,12 +2072,14 @@ namespace EmuMath
 		///		with indices within this Vector multiplied by rhs_ in the provided range, and default-constructed elements elsewhere.
 		/// </returns>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MulBegin_, std::size_t OutSize_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> MultiplyRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline auto BasicMultiplyRangeNoCopy(Rhs_&& rhs_) const
+			-> std::enable_if_t<!EmuMath::TMP::is_emu_matrix_v<Rhs_>, EmuMath::Vector<OutSize_, OutT_>>
 		{
 			return EmuMath::Helpers::vector_multiply_range_no_copy<OutSize_, OutT_, OutBegin_, OutEnd_, MulBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MulBegin_, typename OutT_ = value_type_uq, typename Rhs_>
-		[[nodiscard]] constexpr inline EmuMath::Vector<size, OutT_> MultiplyRangeNoCopy(Rhs_&& rhs_) const
+		[[nodiscard]] constexpr inline auto BasicMultiplyRangeNoCopy(Rhs_&& rhs_) const
+			-> std::enable_if_t<!EmuMath::TMP::is_emu_matrix_v<Rhs_>, EmuMath::Vector<size, OutT_>>
 		{
 			return EmuMath::Helpers::vector_multiply_range_no_copy<size, OutT_, OutBegin_, OutEnd_, MulBegin_>(*this, std::forward<Rhs_>(rhs_));
 		}
@@ -2444,11 +2091,16 @@ namespace EmuMath
 		/// <para> OutBegin_: Inclusive index at which to start writing arithmetic results to the output Vector. </para>
 		/// <para> OutEnd_: Exclusive index at which to stop writing arithmetic results to the output Vector. </para>
 		/// <para> MulBegin_: Inclusive index at which to start reading elements from this Vector (and rhs_ if it is an EmuMath Vector) to perform arithmetic. </para>
+		/// <para> 
+		///		This cannot be used to multiply by an EmuMath Matrix. Use `operator*` for such use cases, 
+		///		although you may not do a range-based matrix multiplication as this function does.
+		/// </para>
 		/// </summary>
 		/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 		/// <param name="rhs_">: Scalar or EmuMath Vector to multiply elements by in the specified range.</param>
 		template<std::size_t OutBegin_, std::size_t OutEnd_, std::size_t MulBegin_, typename Rhs_, std::size_t OutSize_, typename OutT_>
-		constexpr inline void MultiplyRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+		constexpr inline auto BasicMultiplyRangeNoCopy(EmuMath::Vector<OutSize_, OutT_>& out_vector_, Rhs_&& rhs_) const
+			-> std::enable_if_t<!EmuMath::TMP::is_emu_matrix_v<Rhs_>, void>
 		{
 			EmuMath::Helpers::vector_multiply_range_no_copy<OutBegin_, OutEnd_, MulBegin_>(out_vector_, *this, std::forward<Rhs_>(rhs_));
 		}

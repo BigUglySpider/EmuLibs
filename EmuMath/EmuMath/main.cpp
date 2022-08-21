@@ -691,8 +691,16 @@ int main()
 		std::cout << "HBTRGFHBKGFRNBOLGFNBKGFNBOGFNBFGB" << "\n";
 	}
 
-	EmuCore::TMP::type_check_ignore_ref_cv<std::is_integral, int>;
+	constexpr auto translation = EmuMath::Helpers::matrix_make_translation<float>(1, 2, 3).Transpose();
+	constexpr auto translated_test = EmuMath::Vector<3, float>(1, 1, 1) * translation;
+	constexpr auto normal_mul_test = EmuMath::Vector<3, float>(1, 1, 1) * 29;
+	constexpr auto hmm = EmuMath::Vector<3, float>(10, 10, 10) * (translation);
+	constexpr auto bloog = -hmm;
 
+	auto runtime_trans = EmuMath::Vector<3, float>(-5, 0, 5);
+	std::cout << "Before trans: " << runtime_trans << "\n";
+	runtime_trans *= translation;
+	std::cout << "After trans: " << runtime_trans << "\n ";
 
 
 

@@ -202,6 +202,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_matrix_underlying_projections.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_underlying_projections\_matrix_underlying_ortho.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_underlying_helpers\_underlying_projections\_matrix_underlying_perspective.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_matrix\_vector_extensions.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_helpers\_all_helpers.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_helpers\_common_quaternion_helper_includes.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_quaternions\_helpers\_conversions\_quaternion_conversion_from_euler.h" />
@@ -315,6 +316,7 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_special_operations_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_stream_append_underlying.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_underlying_helpers\_vector_tmp.h" />
+    <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_vector_operators.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_vector_t.h" />
     <ClInclude Include="EmuMath\_do_not_manually_include\__common\_common_math_tmp.h" />
     <ClInclude Include="EmuSIMD\SIMDHelpers.h" />

@@ -28,7 +28,7 @@ namespace EmuMath
 	/// <param name="to_ref_">: Reference to wrap as a vector_internal_ref.</param>
 	/// <returns>Passed reference to_ref_ wrapped as a vector_internal_ref of the related type.</returns>
 	template
-		<
+	<
 		typename TypeToReference_,
 		typename = std::enable_if_t
 		<
