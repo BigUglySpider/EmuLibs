@@ -5,6 +5,17 @@
 
 namespace EmuMath::Helpers
 {
+	/// <summary>
+	/// <para> Stores the data of the passed FastMatrix to a normal EmuMath Matrix of the specified type. </para>
+	/// <para> 
+	///		All arguments for the output Matrix type may be omitted, in which case they will match that of the passed FastMatrix 
+	///		(except for `T_`, which will instead be this FastMatrix's `value_type`).
+	/// </para>
+	/// <para> Indices that the passed FastMatrix does not encapsulate will be zeroed. </para>
+	/// <para> This may not be used to output references. </para>
+	/// </summary>
+	/// <param name="fast_matrix_">EmuMath Fast Matrix to retrieve data from.</param>
+	/// <returns>EmuMath Matrix of the specified type containing respective data of the passed Matrix's registers.</returns>
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_ = true, class FastMatrix_>
 	requires EmuConcepts::EmuFastMatrix<FastMatrix_>
 	[[nodiscard]] constexpr inline auto fast_matrix_store(FastMatrix_&& fast_matrix_)
@@ -32,6 +43,17 @@ namespace EmuMath::Helpers
 		);
 	}
 
+	/// <summary>
+	/// <para> Stores the data of the passed FastMatrix to the passed normal EmuMath Matrix. </para>
+	/// <para>
+	///		Where possible, data will be stored directly to contiguous chunks of the output Matrix without an intermediate. 
+	///		This requires that the output Matrix's `stored_type` is the same as the passed FastMatrix's `value_type`, 
+	///		and that is shares the same major storage order.
+	/// </para>
+	/// <para> Indices that the passed FastMatrix does not encapsulate will be zeroed. </para>
+	/// </summary>
+	/// <param name="fast_matrix_">EmuMath Fast Matrix to retrieve data from.</param>
+	/// <param name="out_matrix_">EmuMath Matrix reference to output respective data to.</param>
 	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, class FastMatrix_>
 	requires EmuConcepts::EmuFastMatrix<FastMatrix_>
 	constexpr inline void fast_matrix_store(FastMatrix_&& fast_matrix_, EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_)

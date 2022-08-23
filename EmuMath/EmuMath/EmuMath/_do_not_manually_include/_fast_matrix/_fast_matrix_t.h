@@ -95,6 +95,16 @@ namespace EmuMath
 
 #pragma region STORERS
 	public:
+		/// <summary>
+		/// <para> Stores the data of this FastMatrix to a normal EmuMath Matrix of the specified type. </para>
+		/// <para> 
+		///		All arguments for the output Matrix type may be omitted, in which case they will match that of this FastMatrix 
+		///		(except for `T_`, which will instead be this FastMatrix's `value_type`).
+		/// </para>
+		/// <para> Indices that this FastMatrix does not encapsulate will be zeroed. </para>
+		/// <para> This may not be used to output references. </para>
+		/// </summary>
+		/// <returns>EmuMath Matrix of the specified type containing respective data of this Matrix's registers.</returns>
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline auto Store() const
 			-> EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
@@ -109,6 +119,16 @@ namespace EmuMath
 			return EmuMath::Helpers::fast_matrix_store<num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
 		}
 
+		/// <summary>
+		/// <para> Stores the data of this FastMatrix to the passed normal EmuMath Matrix. </para>
+		/// <para>
+		///		Where possible, data will be stored directly to contiguous chunks of the output Matrix without an intermediate. 
+		///		This requires that the output Matrix's `stored_type` is the same as this FastMatrix's `value_type`, 
+		///		and that is shares the same major storage order.
+		/// </para>
+		/// <para> Indices that this FastMatrix does not encapsulate will be zeroed. </para>
+		/// </summary>
+		/// <param name="out_matrix_">EmuMath Matrix reference to output respective data to.</param>
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
 		[[nodiscard]] constexpr inline void Store(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
 		{
