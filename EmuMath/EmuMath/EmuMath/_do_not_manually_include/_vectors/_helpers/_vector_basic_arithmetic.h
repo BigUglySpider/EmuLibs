@@ -426,31 +426,33 @@ namespace EmuMath::Helpers
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of multiplication.</param>
 	/// <returns>EmuMath Vector of the desired OutSize_ (defaults to LhsSize_) and OutT_ (defaults to vector_lhs_'s value_type_uq), containing multiplication results.</returns>
 	template<std::size_t OutSize_, typename OutT_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<OutSize_, OutT_> vector_multiply(const EmuMath::Vector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline auto vector_multiply(const EmuMath::Vector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+		-> std::enable_if_t<!EmuMath::TMP::is_emu_matrix_v<Rhs_>, EmuMath::Vector<OutSize_, OutT_>>
 	{
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_multiply, OutSize_, OutT_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<typename OutT_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsSize_, OutT_> vector_multiply(const EmuMath::Vector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	[[nodiscard]] constexpr inline auto vector_multiply(const EmuMath::Vector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+		-> std::enable_if_t<!EmuMath::TMP::is_emu_matrix_v<Rhs_>, EmuMath::Vector<LhsSize_, OutT_>>
 	{
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_multiply, LhsSize_, OutT_)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<std::size_t OutSize_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsSize_, typename EmuMath::Vector<LhsSize_, LhsT_>::value_type_uq> vector_multiply
+	[[nodiscard]] constexpr inline auto vector_multiply
 	(
 		const EmuMath::Vector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
-	)
+	) -> std::enable_if_t<!EmuMath::TMP::is_emu_matrix_v<Rhs_>, EmuMath::Vector<LhsSize_, typename EmuMath::Vector<LhsSize_, LhsT_>::value_type_uq>>
 	{
 		using lhs_value_uq = typename EmuMath::Vector<LhsSize_, LhsT_>::value_type_uq;
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_multiply, OutSize_, lhs_value_uq)(vector_lhs_, std::forward<Rhs_>(rhs_));
 	}
 	template<typename Rhs_, typename LhsT_, std::size_t LhsSize_>
-	[[nodiscard]] constexpr inline EmuMath::Vector<LhsSize_, typename EmuMath::Vector<LhsSize_, LhsT_>::value_type_uq> vector_multiply
+	[[nodiscard]] constexpr inline auto vector_multiply
 	(
 		const EmuMath::Vector<LhsSize_, LhsT_>& vector_lhs_,
 		Rhs_&& rhs_
-	)
+	) -> std::enable_if_t<!EmuMath::TMP::is_emu_matrix_v<Rhs_>, EmuMath::Vector<LhsSize_, typename EmuMath::Vector<LhsSize_, LhsT_>::value_type_uq>>
 	{
 		using lhs_value_uq = typename EmuMath::Vector<LhsSize_, LhsT_>::value_type_uq;
 		return EMU_MATH_VECTOR_MUTATE_TEMPLATE(EmuCore::do_multiply, LhsSize_, lhs_value_uq)(vector_lhs_, std::forward<Rhs_>(rhs_));
@@ -458,13 +460,17 @@ namespace EmuMath::Helpers
 
 	/// <summary>
 	/// <para> Outputs the results of multiplying vector_lhs_ by rhs_ to the provided out_vector_. </para>
-	/// <para> If Rhs_ is an EmuMath Vector: Respective elements in each Vector will be multiplied. Otherwise, all elements in vector_lhs_ will be multiplied by rhs_. </para>
+	/// <para>
+	///		If Rhs_ is an EmuMath Vector: Respective elements in each Vector will be multiplied. 
+	///		Otherwise, all elements in vector_lhs_ will be multiplied by rhs_.
+	/// </para>
 	/// </summary>
 	/// <param name="out_vector_">: EmuMath Vector to output to.</param>
 	/// <param name="vector_lhs_">: EmuMath Vector appearing on the left-hand side of multiplication.</param>
 	/// <param name="rhs_">: Scalar or EmuMath Vector appearing on the right-hand side of multiplication.</param>
 	template<std::size_t OutSize_, typename OutT_, std::size_t LhsSize_, typename LhsT_, typename Rhs_>
-	constexpr inline void vector_multiply(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+	constexpr inline auto vector_multiply(EmuMath::Vector<OutSize_, OutT_>& out_vector_, const EmuMath::Vector<LhsSize_, LhsT_>& vector_lhs_, Rhs_&& rhs_)
+		-> std::enable_if_t<!EmuMath::TMP::is_emu_matrix_v<Rhs_>, void>
 	{
 		return EMU_MATH_VECTOR_MUTATE_REF_TEMPLATE(EmuCore::do_multiply, OutSize_, OutT_)(out_vector_, vector_lhs_, std::forward<Rhs_>(rhs_));
 	}

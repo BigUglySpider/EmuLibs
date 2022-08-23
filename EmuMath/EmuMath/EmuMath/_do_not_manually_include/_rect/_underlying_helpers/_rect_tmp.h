@@ -1,5 +1,5 @@
-#ifndef EMU_MATH_QUATERNION_TMP_H_INC_
-#define EMU_MATH_QUATERNION_TMP_H_INC_ 1
+#ifndef EMU_MATH_RECT_TMP_H_IN_
+#define EMU_MATH_RECT_TMP_H_IN_ 1
 
 #include "../../__common/_common_math_tmp.h"
 #include "../../../Vector.h"
@@ -7,13 +7,13 @@
 namespace EmuMath
 {
 	template<typename T_>
-	struct Quaternion;
+	struct Rect;
 }
 
 namespace EmuMath::TMP
 {
 	template<typename T_>
-	struct is_emu_quaternion<EmuMath::Quaternion<T_>>
+	struct is_emu_rect<EmuMath::Rect<T_>>
 	{
 		static constexpr bool value = true;
 	};

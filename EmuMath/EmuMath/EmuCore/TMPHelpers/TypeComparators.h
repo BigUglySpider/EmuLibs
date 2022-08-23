@@ -5,6 +5,7 @@
 #include <type_traits>
 #include "TypeConvertors.h"
 #include "OperatorChecks.h"
+#include "Values.h"
 
 namespace EmuCore::TMP
 {
@@ -433,6 +434,134 @@ namespace EmuCore::TMP
 	};
 	template<template<class...> class Template_, class...TypeArgs_>
 	static constexpr bool valid_template_args_v = valid_template_args<Template_, TypeArgs_...>::value;
+
+	/// <summary>
+	/// <para> Base component for performing a semi-recursive type check with an arbitrary number of type arguments. </para>
+	/// <para> Checks will ignore reference and constant qualification, and any type T will be treated as `EmuCore::TMP::remove_ref_cv&lt;T_&gt;::type`. </para>
+	/// <para> Pointers are still applied and will not be removed. </para>
+	/// <para> Where all args are their unqualified state already, `value` will be `DefaultStaticValueType_::value`. </para>
+	/// <para> Where any arg is ref/cv qualified, `value` will be `Template_&lt;EmuCore::TMP::remove_ref_cv&lt;Args_...&gt;::type...&gt;::value` </para>
+	/// <para>
+	///		This is intended as a base-class for type checks which recursively call back to themselves and have a trivial, non-conditional default value 
+	///		(e.g. a default template whose default value is always `false`), but where ref/cv qualification is wanted to be ignored.
+	/// </para>
+	/// <para>For a recursive check on any arbitrary template without a default value, use `type_check_ignore_ref_cv`.</para>
+	/// </summary>
+	template<template<class...TemplateArgs_> class Template_, class DefaultStaticValueType_, class...Args_>
+	struct type_check_ignore_ref_cv_base
+	{
+	private:
+		static constexpr inline decltype(auto) _get()
+		{
+			if constexpr ((... && std::is_same_v<Args_, typename EmuCore::TMP::remove_ref_cv<Args_>::type>))
+			{
+				if constexpr (has_static_value<DefaultStaticValueType_>::value)
+				{
+					return DefaultStaticValueType_::value;
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<DefaultStaticValueType_>(),
+						"Attempted to create a semi-recursive, ref-cv-ignoring type check via `EmuCore::TMP::type_check_ignore_ref_cv_base`, but the provided `DefaultStaticValueType_` does not have a static `value` member."
+					);
+					return "ERROR: Bad DefaultStaticValueType_";
+				}
+			}
+			else
+			{
+				if constexpr (valid_template_args_v<Template_, typename EmuCore::TMP::remove_ref_cv<Args_>::type...>)
+				{
+					using _finalised_template_for_value = Template_<typename EmuCore::TMP::remove_ref_cv<Args_>::type... >;
+					if constexpr (has_static_value<_finalised_template_for_value>::value)
+					{
+						return _finalised_template_for_value::value;
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<_finalised_template_for_value>(),
+							"Attempted to create a semi-recursive, ref-cv-ignoring type check via `EmuCore::TMP::type_check_ignore_ref_cv_base`, but the instantiated template with ref/cv removed type arguments does not have a static `value`."
+						);
+						return "ERROR: Template instance from ref/cv-removed Args_ has no static `value`";
+					} 
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Args_...>(),
+						"Attempted to create a semi-recursive, ref-cv-ignoring type check via `EmuCore::TMP::type_check_ignore_ref_cv_base`, but the provided `Args_` with ref/cv qualification removed are not valid for instantiating the provided `Template_`."
+					);
+					return "ERROR: Bad Args_";
+				}
+			}
+
+			if constexpr (valid_template_args_v<Template_, Args_...>)
+			{
+				if constexpr (has_static_value<DefaultStaticValueType_>::value)
+				{
+					return std::conditional_t
+					<
+						(... && std::is_same_v<Args_, typename EmuCore::TMP::remove_ref_cv<Args_>::type>),
+						DefaultStaticValueType_,
+						Template_<typename EmuCore::TMP::remove_ref_cv<Args_>::type...>
+					>::value;
+				}
+			}
+		}
+
+	public:
+		static constexpr auto value = _get();
+	};
+
+	/// <summary>
+	/// <para> Template for performing a semi-recursive type check with an arbitrary number of type arguments. </para>
+	/// <para> Checks will ignore reference and constant qualification, and any type T will be treated as `EmuCore::TMP::remove_ref_cv&lt;T_&gt;::type`. </para>
+	/// <para> Pointers are still applied and will not be removed. </para>
+	/// <para> Where all args are their unqualified state already, `value` will be `Template_&lt;Args_...&gt;::value`. </para>
+	/// <para> Where any arg is ref/cv qualified, `value` will be `Template_&lt;EmuCore::TMP::remove_ref_cv&lt;Args_...&gt;::type...&gt;::value` </para>
+	/// <para>For a recursive check with a default value if already unqualified, use `type_check_ignore_ref_cv_base`.</para>
+	/// </summary>
+	template<template<class...TemplateArgs_> class Template_, class...Args_>
+	struct type_check_ignore_ref_cv
+	{
+	private:
+		static constexpr inline decltype(auto) _get()
+		{
+			if constexpr (valid_template_args_v<Template_, typename EmuCore::TMP::remove_ref_cv<Args_>::type...>)
+			{
+				using _finalised_template_for_value = Template_<typename EmuCore::TMP::remove_ref_cv<Args_>::type...>;
+				if constexpr (has_static_value<_finalised_template_for_value>::value)
+				{
+					return _finalised_template_for_value::value;
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<_finalised_template_for_value>(),
+						"Attempted to create a semi-recursive, ref-cv-ignoring type check via `EmuCore::TMP::type_check_ignore_ref_cv`, but the instantiated template with ref/cv removed type arguments does not have a static `value`."
+					);
+					return "ERROR: Template instance from ref/cv-removed Args_ has no static `value`";
+				} 
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Args_...>(),
+					"Attempted to create a semi-recursive, ref-cv-ignoring type check via `EmuCore::TMP::type_check_ignore_ref_cv`, but the provided `Args_` are not valid for instantiating the provided `Template_` when its ref/cv qualifiers are removed."
+				);
+				return "ERROR: Bad Args_";
+			}
+		}
+
+	public:
+		static constexpr auto value = _get();
+	};
 
 	template<class T_>
 	struct is_integer_sequence

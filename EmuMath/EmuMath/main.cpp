@@ -12,6 +12,7 @@
 #include "EmuMath/Noise.h"
 #include "EmuMath/Quaternion.h"
 #include "EmuMath/Random.h"
+#include "EmuMath/Rect.h"
 #include "EmuMath/Vector.h"
 
 // Test harness execution
@@ -21,6 +22,11 @@
 
 // Fast Vector
 #include "EmuMath/FastVector.h"
+
+#include "EmuCore/ArithmeticHelpers/CommonAlgebra.h"
+
+constexpr auto test_dot = EmuCore::dot<float>(1, 2, 6, 3, 7, 10);
+constexpr auto test_dot_2 = EmuCore::dot(5, 7);
 
 template<typename T_, std::size_t Size_>
 inline std::ostream& operator<<(std::ostream& str_, const std::array<T_, Size_>& arr_)
@@ -321,7 +327,6 @@ int main()
 
 
 	std::cout << "ASSIGN_TRANSLATION TESTS\n";
-	using Mat4x4f32CM = EmuMath::Matrix<4, 4, float, true>;
 	EmuMath::Matrix<4, 4, float, true> translate_assign_matrix(10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160);
 	std::cout << translate_assign_matrix << "\n\n";
 	translate_assign_matrix.AssignTranslation(5);
@@ -340,8 +345,8 @@ int main()
 	std::cout << "Constexpr:\n" << rot_0 << "\n\n:Runtime:\n" << EmuMath::Helpers::matrix_make_rotation_3d_z<true, float, false>(-33) << "\n\n";
 
 	std::cout << "ROTATION MEMBER TESTS\n";
-	auto member_rot_runtime = Mat4x4f32CM::make_rotation_3d_z<false>(33);
-	constexpr auto member_rot = Mat4x4f32CM::make_rotation_3d_z_constexpr<4, true, false>(33);
+	auto member_rot_runtime = EmuMath::Matrix<4, 4, float, true>::make_rotation_3d_z<false>(33);
+	constexpr auto member_rot = EmuMath::Matrix<4, 4, float, true>::make_rotation_3d_z_constexpr<4, true, false>(33);
 	std::cout << "runtime: " << (member_rot_runtime * point_to_rotate) << "\n";
 	std::cout << "constexpr: " << (member_rot * point_to_rotate) << "\n";
 
@@ -571,6 +576,132 @@ int main()
 	);
 
 	std::cout << "\n\n" << mat_from_quats << "\n\n" << mat_from_fused_quats << "\n";
+
+	constexpr auto rect = EmuMath::Rect<float>(5);
+	constexpr auto rect_centre = rect.Centre();
+	constexpr auto rect_b = EmuMath::Rect<double>(3, 4.2, 10, 10);
+	constexpr auto rect_b_centre = rect_b.Centre();
+	constexpr auto rect_well_formed = rect.WellFormed();
+	constexpr auto rect_temp_well_formed = EmuMath::Rect<float>(0, 3, -1, 3).WellFormed();
+	constexpr auto rect_made_central = EmuMath::Rect<float>(23, 10).MakeCentred(5, 5);
+	constexpr auto central_contains_point_a_ = rect_made_central.ContainsPoint(4, 3);
+	constexpr auto rect_to_scale = EmuMath::Rect<float>(1, -2, 2.5, 4.17);
+	constexpr auto pre_scale_centre = rect_to_scale.Centre();
+	constexpr auto pre_scale_width = rect_to_scale.Width();
+	constexpr auto pre_scale_size = rect_to_scale.Size();
+	constexpr auto scaled_rect = rect_to_scale * 2;
+	constexpr auto scaled_centre = scaled_rect.Centre();
+	constexpr auto scaled_width = scaled_rect.Width();
+	constexpr auto scaled_size = scaled_rect.Size();
+	constexpr auto reduce_scaled_rect = rect_to_scale * 0.5;
+	constexpr auto reduce_scaled_centre = reduce_scaled_rect.Centre();
+	constexpr auto reduce_scaled_width = reduce_scaled_rect.Width();
+	constexpr auto reduce_scaled_size = reduce_scaled_rect.Size();
+
+	constexpr auto to_reflect = EmuMath::Rect<float>(1.5, 3, 2, 4);
+	constexpr auto reflect_a = to_reflect.Reflect<0, 0>();
+	constexpr auto reflect_b = to_reflect.Reflect<-1, 0>();
+	constexpr auto reflect_c = to_reflect.Reflect<1, 0>();
+	constexpr auto reflect_d = to_reflect.Reflect<0, -1>();
+	constexpr auto reflect_e = to_reflect.Reflect<0, 1>();
+	constexpr auto reflect_f = to_reflect.Reflect<-1, -1>();
+	constexpr auto reflect_g = to_reflect.Reflect<-1, 1>();
+	constexpr auto reflect_h = to_reflect.Reflect<1, -1>();
+	constexpr auto reflect_i = to_reflect.Reflect<1, 1>();
+	constexpr auto reflect_j = to_reflect.Reflect<1, 1>().Reflect<-1, -1>();
+
+	constexpr auto reflect_alt_a = to_reflect.Reflect(0, 0);
+	constexpr auto reflect_alt_b = to_reflect.Reflect(-1, 0);
+	constexpr auto reflect_alt_c = to_reflect.Reflect(1, 0);
+	constexpr auto reflect_alt_d = to_reflect.Reflect(0, -1);
+	constexpr auto reflect_alt_e = to_reflect.Reflect(0, 1);
+	constexpr auto reflect_alt_f = to_reflect.Reflect(0, -1);
+	constexpr auto reflect_alt_g = to_reflect.Reflect(0, 1);
+	constexpr auto reflect_alt_h = to_reflect.Reflect(0, -1);
+	constexpr auto reflect_alt_i = to_reflect.Reflect(0, 1);
+	constexpr auto reflect_alt_j = to_reflect.Reflect(1, 1).Reflect(-1, -1);
+
+	constexpr auto test_scale_rect_base = EmuMath::Rect<float>(1);
+	constexpr auto scaled_a = test_scale_rect_base.Scale(2);
+	constexpr auto scaled_b = test_scale_rect_base.ScaleAnchored<0, 0>(2, 2);
+	constexpr auto scaled_c = test_scale_rect_base.ScaleAnchored<1, 0>(2, 2);
+	constexpr auto scaled_d = test_scale_rect_base.ScaleAnchored<-1, 0>(2, 2);
+	constexpr auto scaled_e = test_scale_rect_base.ScaleAnchored<0, 1>(2, 2);
+	constexpr auto scaled_f = test_scale_rect_base.ScaleAnchored<1, -1>(2, 2);
+
+	constexpr EmuMath::Rect<float> rect_from_init_list = { 1, 2, 3, 4 };
+	constexpr auto vec_from_init_list = EmuMath::Vector<12, float>{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+	auto yoiyoi = vec_from_init_list;
+
+	constexpr auto blongo_dongo = EmuMath::Helpers::rect_get_left(rect_from_init_list);
+	constexpr auto mbmfgkbmlk = EmuMath::Helpers::rect_get_left(EmuMath::Rect<int>(1, 2, 3, 4));
+
+	constexpr auto collide_a = EmuMath::Rect<float>(0, 0, 5, 5);
+	constexpr auto collide_b = EmuMath::Rect<double>(5, 5, 6, 6);
+	constexpr auto colliding_a = collide_a.CollidingAxisAligned<true>(collide_b);
+	constexpr auto colliding_b = collide_a.CollidingAxisAligned<false>(collide_b);
+	constexpr auto colliding_c = collide_a.CollidingAxisAligned(collide_b);
+	constexpr auto colliding_d = collide_a.CollidingAxisAligned(collide_b.Translate(-0.2, -0.5));
+	constexpr auto colliding_e = collide_a.CollidingAxisAligned(collide_b.Scale(2, 2));
+	constexpr auto colliding_f = collide_a.CollidingAxisAligned(collide_b.Translate(-5.9, -5.9));
+	
+
+	std::cout << "\n\nPERSPECTIVE (REVERSE DEPTH):\n";
+	constexpr auto point_to_project = EmuMath::Vector<4, float>(1, 2, 3, 1);
+	constexpr auto point_to_project_3d = EmuMath::Vector<3, float>(1, 2, 3);
+	constexpr auto perspective_mat_reverse_z = EmuMath::Helpers::matrix_perspective_vk_reverse_depth_constexpr<double>
+	(
+		0.785398,
+		1920.0 / 1080.0,
+		0.1,
+		100.0
+	);
+	std::cout << perspective_mat_reverse_z << "\n\nFlattened: " << perspective_mat_reverse_z.Flatten() << "\n";
+	std::cout << "Transformed point: " << (perspective_mat_reverse_z * point_to_project) << "\n";
+
+	std::cout << "---\n\nPERSPECTIVE:\n";
+	constexpr auto perspective_mat = EmuMath::Helpers::matrix_perspective_vk_constexpr<double>
+	(
+		0.785398,
+		1920.0 / 1080.0,
+		0.1,
+		100.0
+	);
+	std::cout << perspective_mat << "\n\nFlattened: " << perspective_mat.Flatten() << "\n";
+	std::cout << "Transformed point: " << (perspective_mat * point_to_project) << "\n";
+
+	std::cout << "---\n\nORTHO:\n";
+	constexpr auto ortho_a = EmuMath::Helpers::matrix_ortho_vk<float>(EmuMath::Rect<double>(0, 0, 1280, 1280), 0.1, 100.0);
+	std::cout << ortho_a << "\n\nFlattened: " << ortho_a.Flatten() << "\n\n";
+	std::cout << "Transformed point: " << (ortho_a * point_to_project) << "\n";
+	std::cout << "Transformed point as mat:\n" << 
+		(EmuMath::Matrix<4, 4, float, false>(point_to_project, EmuMath::Vector<4, float>(), EmuMath::Vector<4, float>(), EmuMath::Vector<4, float>()) * ortho_a) 
+		<< "\n";
+	std::cout << "Transformed point as row vector: " << EmuMath::Helpers::matrix_multiply<float>(point_to_project_3d, ortho_a) << "\n";
+	auto runtime_point_to_project = point_to_project_3d;
+	EmuMath::Helpers::matrix_multiply_assign(runtime_point_to_project, ortho_a);
+	std::cout << "Transformed point as row vector (assigned): " << runtime_point_to_project << "\n";
+	std::cout << "Translated (lhs): " <<
+		EmuMath::Helpers::matrix_multiply<float>(point_to_project_3d, EmuMath::Helpers::matrix_make_translation<float>(1, 2, 3)) << "\n";
+	std::cout << "Translated (rhs): " <<
+		EmuMath::Helpers::matrix_multiply<float>(EmuMath::Helpers::matrix_make_translation<float>(1, 2, 3), point_to_project_3d) << "\n";
+
+	if constexpr (EmuCore::TMP::type_check_ignore_ref_cv<std::is_integral, const int&>::value)
+	{
+		std::cout << "HBTRGFHBKGFRNBOLGFNBKGFNBOGFNBFGB" << "\n";
+	}
+
+	constexpr auto translation = EmuMath::Helpers::matrix_make_translation<float>(1, 2, 3).Transpose();
+	constexpr auto translated_test = EmuMath::Vector<3, float>(1, 1, 1) * translation;
+	constexpr auto normal_mul_test = EmuMath::Vector<3, float>(1, 1, 1) * 29;
+	constexpr auto hmm = EmuMath::Vector<3, float>(10, 10, 10) * (translation);
+	constexpr auto bloog = -hmm;
+
+	auto runtime_trans = EmuMath::Vector<3, float>(-5, 0, 5);
+	std::cout << "Before trans: " << runtime_trans << "\n";
+	runtime_trans *= translation;
+	std::cout << "After trans: " << runtime_trans << "\n ";
+
 
 
 	system("pause");

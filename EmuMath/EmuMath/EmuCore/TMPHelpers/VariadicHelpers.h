@@ -2,6 +2,7 @@
 #define EMU_CORE_VARIADIC_HELPERS_H_INC_ 1
 
 #include "TypeComparators.h"
+#include "TypeConvertors.h"
 #include "../Functors/Comparators.h"
 #include <utility>
 
@@ -642,6 +643,60 @@ namespace EmuCore::TMP
 	public:
 		using type = typename _instantiation::type;
 		static constexpr bool success = _instantiation::success;
+	};
+
+	/// <summary>
+	/// <para> Determines if all passed compile-time constants are unique. </para>
+	/// <para> If at least 1 equality exists (regardless of types), `value` will be false; otherwise, it is `true`. </para>
+	/// </summary>
+	template<auto...Constants_>
+	struct all_consts_unique
+	{
+		static constexpr bool value = false;
+	};
+
+	template<>
+	struct all_consts_unique<>
+	{
+		static constexpr bool value = true;
+	};
+
+	template<auto First_>
+	struct all_consts_unique<First_>
+	{
+		static constexpr bool value = true;
+	};
+
+	template<auto First_, auto Second_>
+	struct all_consts_unique<First_, Second_>
+	{
+	private:
+		using _first_uq = typename EmuCore::TMP::remove_ref_cv<decltype(First_)>::type;
+		using _second_uq = typename EmuCore::TMP::remove_ref_cv<decltype(Second_)>::type;
+		using _cmp = typename EmuCore::do_cmp_equal_to<_first_uq, _second_uq>;
+
+	public:
+		static constexpr bool value = !_cmp()(First_, Second_);
+	};
+
+	template<auto First_, auto Second_, auto...Remaining>
+	struct all_consts_unique<First_, Second_, Remaining...>
+	{
+	private:
+		static constexpr inline bool _get()
+		{
+			if constexpr (all_consts_unique<First_, Second_>::value)
+			{
+				return all_consts_unique<Second_, Remaining...>::value;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+	public:
+		static constexpr inline bool value = _get();
 	};
 }
 

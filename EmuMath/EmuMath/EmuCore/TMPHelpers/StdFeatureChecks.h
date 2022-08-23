@@ -6,12 +6,27 @@
 namespace EmuCore::TMP
 {
 	/// <summary>
+	/// <para> Boolean indicating if the current C++ Standard supports concepts. </para>
+	/// </summary>
+	[[nodiscard]] constexpr inline bool feature_concepts()
+	{
+#ifdef __cpp_concepts
+		return true;
+#else
+		return false;
+#endif
+	}
+
+	/// <summary>
 	/// <para> Boolean indicating if the current C++ Standard supports constexpr dynamic memory allocation (such as constexpr std::string). </para>
-	/// <para> Under MSVC, will always be false without the /Zc:__cplusplus switch enabled, as of 2022/02/07. </para>
 	/// </summary>
 	[[nodiscard]] constexpr inline bool feature_constexpr_dynamic_memory()
 	{
-		return __cplusplus >= 201907L;
+#ifdef __cpp_constexpr_dynamic_alloc
+		return true;
+#else
+		return false;
+#endif
 	}
 }
 

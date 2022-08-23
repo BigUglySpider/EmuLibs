@@ -324,7 +324,7 @@ namespace EmuCore::TMP
 	{
 		using type = typename Template_<Ts_...>::value_type;
 	};
-	template<template<std::size_t Size__, typename Ts__> class Template_, std::size_t Size_, typename...Ts_>
+	template<template<std::size_t InSize_, typename Ts__> class Template_, std::size_t Size_, typename...Ts_>
 	struct get_value_type<Template_<Size_, Ts_...>>
 	{
 		using type = typename Template_<Size_, Ts_...>::value_type;
@@ -334,12 +334,12 @@ namespace EmuCore::TMP
 	{
 		using type = typename Template_<SizeX_, SizeY_, Ts_...>::value_type;
 	};
-	template<template<typename T__, std::size_t Size__> class Template_, typename T_, std::size_t Size_>
+	template<template<typename U_, std::size_t InSize_> class Template_, typename T_, std::size_t Size_>
 	struct get_value_type<Template_<T_, Size_>>
 	{
 		using type = typename Template_<T_, Size_>::value_type;
 	};
-	template<template<typename T__, std::size_t SizeX__, std::size_t SizeY__> class Template_, typename T_, std::size_t SizeX_, std::size_t SizeY_>
+	template<template<typename U_, std::size_t SizeX__, std::size_t SizeY__> class Template_, typename T_, std::size_t SizeX_, std::size_t SizeY_>
 	struct get_value_type<Template_<T_, SizeX_, SizeY_>>
 	{
 		using type = typename Template_<T_, SizeX_, SizeY_>::value_type;
@@ -438,6 +438,27 @@ namespace EmuCore::TMP
 	}
 	template<typename T_>
 	[[nodiscard]] constexpr inline std::remove_reference_t<T_>& lval_ref_cast(std::remove_reference_t<T_>&& ref_)
+	{
+		return static_cast<std::remove_reference_t<T_>&>(ref_);
+	}
+
+	/// <summary>
+	/// <para> Casts a reference to a const-qualified lvalue-reference. </para>
+	/// <para> This can effectively be considered an `unmove` cast, treating lvalues as lvalues and casting rvalues to lvalues. </para>
+	/// <para>
+	///		WARNING: This is for casting pre-existing, named rvalues.
+	///		Passing a new rvalue (such as `my_type(5)) will result in output of a dangling reference. 
+	/// </para>
+	/// </summary>
+	/// <param name="ref_">Reference to cast to an lvalue reference.</param>
+	/// <returns>The passed ref_ cast to a const-qualified lvalue reference.</returns>
+	template<typename T_>
+	[[nodiscard]] constexpr inline const std::remove_reference_t<T_>& const_lval_ref_cast(std::remove_reference_t<T_>& ref_)
+	{
+		return ref_;
+	}
+	template<typename T_>
+	[[nodiscard]] constexpr inline const std::remove_reference_t<T_>& const_lval_ref_cast(std::remove_reference_t<T_>&& ref_)
 	{
 		return static_cast<std::remove_reference_t<T_>&>(ref_);
 	}

@@ -14,20 +14,19 @@ namespace EmuMath::Helpers::_matrix_underlying
 		{
 			if constexpr (ColumnIndex_ == (out_mat_uq::num_columns - 1))
 			{
-				constexpr std::size_t tuple_index = RowIndex_;
-				if constexpr (tuple_index < std::tuple_size_v<std::tuple<Args_...>>)
+				if constexpr (RowIndex_ < std::tuple_size_v<std::tuple<Args_...>>)
 				{
 					// Retrieve translation for the dimension, which will be the respective element in the tuple
 					// --- Move if not lvalue reference
 					using std::get;
-					using arg = typename std::tuple_element<tuple_index, std::tuple<Args_...>>::type;
+					using arg = typename std::tuple_element<RowIndex_, std::tuple<Args_...>>::type;
 					if constexpr (std::is_lvalue_reference_v<arg>)
 					{
-						return get<tuple_index>(args_tuple_);
+						return get<RowIndex_>(args_tuple_);
 					}
 					else
 					{
-						return std::move(get<tuple_index>(args_tuple_));
+						return std::move(get<RowIndex_>(args_tuple_));
 					}
 				}
 				else
