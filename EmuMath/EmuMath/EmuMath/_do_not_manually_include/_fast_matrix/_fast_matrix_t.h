@@ -85,6 +85,14 @@ namespace EmuMath
 		{
 		}
 
+		/// <summary>
+		/// <para> Constructor for a FastMatrix which will load or set its registers via respective data within the passed Matrix. </para>
+		/// <para> 
+		///		Optimised loads will be used where possible if the input Matrix has the same `stored_type` as this FastMatrix type's `value_type`, 
+		///		and it shares the same major storage order. Otherwise, only sets will be used.
+		/// </para>
+		/// </summary>
+		/// <param name="scalar_matrix_">Normal EmuMath Matrix to load or set the new FastMatrix's registers via.</param>
 		template<class Matrix_>
 		requires EmuConcepts::EmuMatrix<Matrix_>
 		explicit constexpr inline FastMatrix(Matrix_&& scalar_matrix_) :
@@ -137,6 +145,11 @@ namespace EmuMath
 #pragma endregion
 #pragma region DATA
 	public:
+		/// <summary>
+		/// <para> Array of SIMD-optimised Vectors, each representing a single major chunk within this Matrix. </para>
+		/// <para> If this FastMatrix is column-major, this is an array of its columns. </para>
+		/// <para> If this FastMatrix is row-major, this is an array of its rows. </para>
+		/// </summary>
 		data_type major_vectors;
 #pragma endregion
 	};

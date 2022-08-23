@@ -5,6 +5,12 @@
 
 namespace EmuMath::Helpers
 {
+	/// <summary>
+	/// <para> Copies the array of major Vectors of the passed Matrix (or moves them if it is not an lvalue reference). </para>
+	/// </summary>
+	/// <param name="matrix_">EmuMath Fast Matrix to copy or move the major Vectors of.</param>
+	/// <param name="major_index_sequence_">Index sequence of major indices to be copied/moved. This should be a sequence of all of Matrix_'s major indices.</param>
+	/// <returns>Copy (or moved result) of the passed Matrix's array of major Vectors.</returns>
 	template<class Matrix_, std::size_t...MajorIndices_>
 	requires EmuConcepts::EmuFastMatrix<Matrix_>
 	[[nodiscard]] constexpr inline auto fast_matrix_copy_data_type(Matrix_&& matrix_, std::index_sequence<MajorIndices_...> major_index_sequence_)
@@ -24,6 +30,12 @@ namespace EmuMath::Helpers
 		}		
 	}
 
+	/// <summary>
+	/// <para> Moves the array of major Vectors of the passed Matrix. </para>
+	/// </summary>
+	/// <param name="matrix_">EmuMath Fast Matrix to move the major Vectors of.</param>
+	/// <param name="major_index_sequence_">Index sequence of major indices to be move. This should be a sequence of all of Matrix_'s major indices.</param>
+	/// <returns>Moved result of the passed Matrix's array of major Vectors.</returns>
 	template<class Matrix_, std::size_t...MajorIndices_>
 	requires EmuConcepts::EmuFastMatrix<Matrix_>
 	[[nodiscard]] constexpr inline auto fast_matrix_move_data_type(Matrix_&& matrix_, std::index_sequence<MajorIndices_...> major_index_sequence_)
@@ -35,6 +47,16 @@ namespace EmuMath::Helpers
 #pragma warning(pop)
 	}
 
+	/// <summary>
+	/// <para> Creates an array of major Vectors for a FastMatrix of the specified `OutMatrix_` type. </para>
+	/// <para> Output registers will be loaded or set via respective data within the passed Matrix. </para>
+	/// <para> 
+	///		Optimised loads will be used where possible if the input Matrix has the same `stored_type` as the output FastMatrix type's `value_type`, 
+	///		and it shares the same major storage order. Otherwise, only sets will be used.
+	/// </para>
+	/// </summary>
+	/// <param name="scalar_matrix_">Normal EmuMath Matrix to load or set the new FastMatrix's registers via.</param>
+	/// <returns>Array of major Vectors used by an EmuMath FastMatrix of the specified `OutMatrix_` type.</returns>
 	template<EmuConcepts::EmuFastMatrix OutMatrix_, EmuConcepts::EmuMatrix ScalarMatrix_, std::size_t...MajorIndices_>
 	[[nodiscard]] constexpr inline auto fast_matrix_make_majors_from_scalar_matrix
 	(
