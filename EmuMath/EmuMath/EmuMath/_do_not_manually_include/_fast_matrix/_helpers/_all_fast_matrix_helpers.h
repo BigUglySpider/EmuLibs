@@ -3,5 +3,6 @@
 
 #include "_common_fast_matrix_helper_includes.h"
 #include "_fast_matrix_set.h"
+#include "_fast_matrix_store.h"
 
 #endif

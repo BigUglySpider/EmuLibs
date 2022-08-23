@@ -94,84 +94,19 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region STORERS
-	private:
-		template<std::size_t...MajorIndices_>
-		[[nodiscard]] constexpr inline void _dump_data(value_type* p_dump_, std::index_sequence<MajorIndices_...> major_indices_) const
-		{
-			(
-				major_vectors[MajorIndices_].template Store<false>
-				(
-					p_dump_ + (MajorIndices_ * full_width_size_per_major)
-				), ...
-			);
-		}
-
-		template<EmuConcepts::EmuMatrix OutMatrix_, std::size_t ColumnIndex_, std::size_t RowIndex_>
-		[[nodiscard]] static constexpr inline decltype(auto) _get_index_for_matrix_store(value_type* p_dump_)
-		{
-			if constexpr ((ColumnIndex_ < num_columns) && (RowIndex_ < num_rows))
-			{
-				constexpr std::size_t major_index = is_column_major ? ColumnIndex_ : RowIndex_;
-				constexpr std::size_t non_major_index = is_column_major ? RowIndex_ : ColumnIndex_;
-
-				// Offset major index by full register size as we dump all data from a major for better efficiency
-				constexpr std::size_t flattened_index = (major_index * full_width_size_per_major) + non_major_index;
-				return std::move(*(p_dump_ + flattened_index));
-			}
-			else
-			{
-				using _out_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
-				return _out_mat_uq::get_implied_zero();
-			}
-		}
-
-		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
-		[[nodiscard]] static constexpr inline auto _store_to_new_matrix
-		(
-			value_type* p_dump_,
-			std::index_sequence<ColumnIndices_...> out_column_indices_,
-			std::index_sequence<RowIndices_...> out_row_indices_
-		) -> EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
-		{
-			// We won't be moving the same index of the pointed-to memory twice, so silence this warning for its false positives
-#pragma warning(push)
-#pragma warning(disable: 26800)
-			return EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
-			(
-				_get_index_for_matrix_store<EmuMath::Matrix<OutNumColumns_, OutNumColumns_, OutT_, OutColumnMajor_>, ColumnIndices_, RowIndices_>
-				(
-					p_dump_
-				)...
-			);
-#pragma warning(pop)
-		}
-
 	public:
 		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_ = value_type, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline auto Store() const
 			-> EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
 		{
-			using _out_mat = EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>;
-
-			// Load as few major elements as possible (e.g. if 4x4CM outputting to a 2x4 (any major), we only need 2 of our majors as it only has 2 columns)
-			// --- On the contrary, if 4x4RM outputting to a 2x4 (any major), we still need all 4 majors as the output has 4 rows
-			constexpr std::size_t out_mat_matching_major_size = is_column_major ? _out_mat::num_columns : _out_mat::num_rows;
-			constexpr std::size_t smallest_major_size = num_major_elements <= out_mat_matching_major_size ? num_major_elements : out_mat_matching_major_size;
-			value_type data_dump[smallest_major_size * full_width_size_per_major];
-			_dump_data(data_dump, std::make_index_sequence<smallest_major_size>());
-
-			// Moved relevant dumped data to the output Matrix
-			using out_indices = EmuMath::TMP::make_full_matrix_index_sequences<_out_mat>;
-			using out_column_indices = typename out_indices::column_index_sequence;
-			using out_row_indices = typename out_indices::row_index_sequence;
-			return _store_to_new_matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(data_dump, out_column_indices(), out_row_indices());
+			return EmuMath::Helpers::fast_matrix_store<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
 		}
 
 		template<typename OutT_ = value_type, bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline auto Store() const
 			-> EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_>
 		{
-			return Store<num_columns, num_rows, OutT_, OutColumnMajor_>();
+			return EmuMath::Helpers::fast_matrix_store<num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
 		}
 #pragma endregion
 #pragma region DATA
