@@ -415,7 +415,7 @@ namespace EmuMath
 #pragma region CONSTRUCTORS
 	public:
 		/// <summary>
-		/// <para> Default constructor for a Vector, which uses the default construction method of its underlying SIMD registers.. </para>
+		/// <para> Default constructor for a Vector, which uses the default construction method of its underlying SIMD registers. </para>
 		/// </summary>
 		constexpr inline FastVector() noexcept : data()
 		{
@@ -490,7 +490,7 @@ namespace EmuMath
 		/// <para> Private constructor for creating a new instance of this FastVector type with a newly created data_type. Disabled if this Vector has 1 register. </para>
 		/// </summary>
 		template<typename = std::enable_if_t<contains_multiple_registers>>
-		explicit constexpr inline FastVector(data_type&& data_) : data(std::move(data_))
+		explicit constexpr inline FastVector(data_type&& data_) noexcept : data(std::move(data_))
 		{
 		}
 #pragma endregion

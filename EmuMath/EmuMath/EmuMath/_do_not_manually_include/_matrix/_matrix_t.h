@@ -1004,7 +1004,7 @@ namespace EmuMath
 			{
 				static_assert
 				(
-					EmuCore::TMP::get_false<stored_type>(),
+					EmuCore::TMP::get_false<std::size_t, Offset_>(),
 					"Attempted to access a contiguous data pointer for an EmuMath Matrix which contains references. As referenced data is not guaranteed to be contiguous, this behaviour is prohibited."
 				);
 			}
@@ -1014,6 +1014,41 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline const stored_type* data() const
 		{
 			return const_cast<this_type*>(this)->template data<Offset_>();
+		}
+
+		template<std::size_t ColumnIndex_, std::size_t RowIndex_>
+		[[nodiscard]] constexpr inline stored_type* data()
+		{
+			if constexpr (ColumnIndex_ < num_columns)
+			{
+				if constexpr (RowIndex_ < num_rows)
+				{
+					constexpr std::size_t flattened_offset = get_flattened_index(ColumnIndex_, RowIndex_);
+					return _data.data() + flattened_offset;
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<ColumnIndex_>(),
+						"Attempted to access a contiguous data pointer for an EmuMath Matrix using a Column and Row offset, but the provided Row offset exceeds the Matrix's contained range."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<ColumnIndex_>(),
+					"Attempted to access a contiguous data pointer for an EmuMath Matrix using a Column and Row offset, but the provided Column offset exceeds the Matrix's contained range."
+				);
+			}
+		}
+
+		template<std::size_t ColumnIndex_, std::size_t RowIndex_>
+		[[nodiscard]] constexpr inline stored_type* data() const
+		{
+			return const_cast<this_type*>(this)->template data<ColumnIndex_, RowIndex_>();
 		}
 
 		/// <summary>

@@ -875,5 +875,26 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_vectors\_vector_operators.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EmuMath\FastMatrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_fast_matrix_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_underlying_helpers\_fast_matrix_tmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_helpers\_fast_matrix_set.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_helpers\_all_fast_matrix_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_underlying_helpers\_fast_matrix_underlying_set.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="EmuMath\_do_not_manually_include\_fast_matrix\_helpers\_common_fast_matrix_helper_includes.h" />
   </ItemGroup>
 </Project>

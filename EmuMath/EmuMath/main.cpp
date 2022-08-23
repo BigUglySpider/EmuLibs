@@ -21,6 +21,7 @@
 #include "EmuCore/Functors/StdOps.h"
 
 // Fast Vector
+#include "EmuMath/FastMatrix.h"
 #include "EmuMath/FastVector.h"
 
 #include "EmuCore/ArithmeticHelpers/CommonAlgebra.h"
@@ -702,7 +703,13 @@ int main()
 	runtime_trans *= translation;
 	std::cout << "After trans: " << runtime_trans << "\n ";
 
-
+	std::cout << "\n\n\nFast Matrix\n";
+	EmuMath::FastMatrix<4, 4, float> fast_mat_4x4f;
+	std::cout << fast_mat_4x4f << "\n\n";
+	
+	constexpr auto fast_mat_in_scalar_a = EmuMath::Helpers::matrix_ortho_vk<float, true>(0, 0, 1920, 1080, 0.001, 1000);
+	std::cout << EmuMath::FastMatrix<4, 4, float>(fast_mat_in_scalar_a) << "\n\n";
+	std::cout << EmuMath::FastMatrix<4, 4, float>(EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)) << "\n\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

@@ -18,6 +18,17 @@ namespace EmuMath::TMP
 	static constexpr bool is_emu_colour_v = is_emu_colour<T_>::value;
 
 	/// <summary>
+	/// <para> Type to determine if the passed T_ is a type of EmuMath Fast Matrix. </para>
+	/// <para> The value will also be true if T_ is a reference to an EmuMath Fast Matrix, and ignores const/ref qualifiers. Pointers remain false. </para>
+	/// </summary>
+	template<class T_>
+	struct is_emu_fast_matrix : public EmuCore::TMP::type_check_ignore_ref_cv_base<is_emu_fast_matrix, std::false_type, T_>
+	{
+	};
+	template<class T_>
+	static constexpr bool is_emu_fast_matrix_v = is_emu_fast_matrix<T_>::value;
+
+	/// <summary>
 	/// <para> Type to determine if the passed T_ is a type of EmuMath Fast Vector. </para>
 	/// <para> The value will also be true if T_ is a reference to an EmuMath Fast Vector, and ignores const/ref qualifiers. Pointers remain false. </para>
 	/// </summary>
@@ -82,6 +93,12 @@ namespace EmuMath::Concepts
 	/// </summary>
 	template<class T_>
 	concept EmuColour = EmuMath::TMP::is_emu_colour_v<T_>;
+
+	/// <summary>
+	/// <para> Concept that determines if the passed type T_ is an EmuMath Fast Matrix. Effectively a check that `is_emu_fast_vector::value` is true. </para>
+	/// </summary>
+	template<class T_>
+	concept EmuFastMatrix = EmuMath::TMP::is_emu_fast_matrix_v<T_>;
 
 	/// <summary>
 	/// <para> Concept that determines if the passed type T_ is an EmuMath Fast Vector. Effectively a check that `is_emu_fast_vector::value` is true. </para>
