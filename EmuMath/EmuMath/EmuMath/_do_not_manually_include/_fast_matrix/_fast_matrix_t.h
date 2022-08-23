@@ -108,6 +108,12 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::fast_matrix_store<num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
 		}
+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_>
+		[[nodiscard]] constexpr inline void Store(EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>& out_matrix_) const
+		{
+			return EmuMath::Helpers::fast_matrix_store(*this, out_matrix_);
+		}
 #pragma endregion
 #pragma region DATA
 	public:

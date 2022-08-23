@@ -708,8 +708,15 @@ int main()
 	std::cout << fast_mat_4x4f << "\n\n";
 	
 	constexpr auto fast_mat_in_scalar_a = EmuMath::Helpers::matrix_ortho_vk<float, true>(0, 0, 1920, 1080, 0.001, 1000);
+	constexpr auto fast_mat_in_scalar_b = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 	std::cout << EmuMath::FastMatrix<4, 4, float>(fast_mat_in_scalar_a) << "\n\n";
-	std::cout << EmuMath::FastMatrix<4, 4, float>(EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)) << "\n\n";
+	std::cout << EmuMath::FastMatrix<4, 4, float>(fast_mat_in_scalar_b) << "\n\n";
+
+	auto another_runtime_mat_yay = EmuMath::Matrix<4, 4, float, true>(1337);
+	std::cout << "Before: \n" << another_runtime_mat_yay << "\n\n";
+	EmuMath::Helpers::fast_matrix_store(EmuMath::FastMatrix<4, 4, float>(fast_mat_in_scalar_b), another_runtime_mat_yay);
+	std::cout << "After: \n" << another_runtime_mat_yay << "\n\n";
+
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
