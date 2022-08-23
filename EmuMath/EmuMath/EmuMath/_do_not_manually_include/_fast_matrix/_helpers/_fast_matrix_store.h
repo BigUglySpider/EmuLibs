@@ -9,7 +9,7 @@ namespace EmuMath::Helpers
 	/// <para> Stores the data of the passed FastMatrix to a normal EmuMath Matrix of the specified type. </para>
 	/// <para> 
 	///		All arguments for the output Matrix type may be omitted, in which case they will match that of the passed FastMatrix 
-	///		(except for `T_`, which will instead be this FastMatrix's `value_type`).
+	///		(except for `T_`, which will instead be the passed FastMatrix's `value_type`).
 	/// </para>
 	/// <para> Indices that the passed FastMatrix does not encapsulate will be zeroed. </para>
 	/// <para> This may not be used to output references. </para>
