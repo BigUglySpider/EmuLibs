@@ -175,7 +175,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region CONST_ARITHMETIC_FUNCS
-	private:
+	public:
 		template<class Rhs_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
 		[[nodiscard]] constexpr inline auto _naive_multiply_impl_rm_cm
 		(
@@ -193,34 +193,12 @@ namespace EmuMath
 			);
 		}
 
-	public:
-		template<class Rhs_>
-		requires EmuConcepts::EmuFastMatrixMultPair<this_type, Rhs_>
-		[[nodiscard]] constexpr inline auto Multiply(Rhs_&& rhs_) const
-			-> EmuMath::FastMatrix<num_columns, num_rows, value_type, is_column_major, register_width>
+		template<class RhsMatrix_>
+		requires EmuConcepts::EmuFastMatrixMultPair<this_type, RhsMatrix_>
+		[[nodiscard]] constexpr inline auto Multiply(RhsMatrix_&& rhs_matrix_) const
+			-> auto
 		{
-			// TODO: MULTIPLY
-			if constexpr (is_row_major)
-			{
-				using _rhs_mat_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
-				if constexpr (_rhs_mat_uq::is_column_major)
-				{
-					using out_indices = EmuMath::TMP::make_full_matrix_index_sequences<matrix_type>;
-					using out_column_indices = typename out_indices::column_index_sequence;
-					using out_row_indices = typename out_indices::row_index_sequence;
-					return _naive_multiply_impl_rm_cm(std::forward<Rhs_>(rhs_), out_column_indices(), out_row_indices());
-				}
-				else
-				{
-					static_assert(EmuCore::TMP::get_false<Rhs_>(), "Not implemented FastMat multiply with rhs row-major");
-					return *this;
-				}
-			}
-			else
-			{
-				static_assert(EmuCore::TMP::get_false<Rhs_>(), "Not implemented FastMat multiply with lhs column-major");
-				return *this;
-			}
+			return EmuMath::Helpers::fast_matrix_multiply(*this, std::forward<RhsMatrix_>(rhs_matrix_));
 		}
 #pragma endregion
 

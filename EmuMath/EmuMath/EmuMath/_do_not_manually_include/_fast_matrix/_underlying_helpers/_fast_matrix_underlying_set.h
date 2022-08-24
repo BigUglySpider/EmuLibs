@@ -3,7 +3,6 @@
 
 #include "_fast_matrix_tmp.h"
 #include "../../../Matrix.h"
-#include <ostream>
 
 namespace EmuMath::Helpers::_fast_matrix_underlying
 {
