@@ -723,7 +723,7 @@ int main()
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
-	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN;
+	//constexpr EmuMath::NoiseType test_noise_type_flag = EmuMath::NoiseType::PERLIN; 
 	//constexpr std::size_t test_noise_dimensions = 3;
 	//constexpr auto sample_count = EmuMath::make_vector<std::size_t>(1024, 1024, 1);
 	//constexpr bool use_fractal = true;
