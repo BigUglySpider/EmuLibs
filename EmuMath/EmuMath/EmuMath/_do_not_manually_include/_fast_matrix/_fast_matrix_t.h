@@ -32,6 +32,7 @@ namespace EmuMath
 		using register_type = typename major_vector_type::register_type;
 		using register_arg_type = typename major_vector_type::register_arg_type;
 		using shift_register_type = typename major_vector_type::shift_register_type;
+		static constexpr std::size_t register_width = major_vector_type::register_width;
 		static constexpr std::size_t shift_register_per_element_width = major_vector_type::shift_register_per_element_width;
 
 		static constexpr bool is_integral = major_vector_type::is_integral;
@@ -101,8 +102,37 @@ namespace EmuMath
 		}
 #pragma endregion
 
-#pragma region STORERS
+#pragma region GETTERS
 	public:
+		/// <summary>
+		/// <para> Retrieves a reference to this FastMatrix's major Vector at the provided index. </para>
+		/// <para> If this FastMatrix is column-major, this retrieves the column at the specified index. </para>
+		/// <para> If this FastMatrix is row-major, this retrieves the row at the specified index. </para>
+		/// </summary>
+		/// <returns>Reference to this FastMatrix's major Vector at the specified index.</returns>
+		template<std::size_t MajorIndex_>
+		[[nodiscard]] constexpr inline major_vector_type& GetMajor()
+		{
+			if constexpr (MajorIndex_ < num_major_elements)
+			{
+				return major_vectors[MajorIndex_];
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<MajorIndex_>(),
+					"Attempted to retrieve a Major Vector from an EmuMath Fast Matrix, but the provided MajorIndex_ exceeds the number of Major Vectors that the FastMatrix contains."
+				);
+			}
+		}
+
+		template<std::size_t MajorIndex_>
+		[[nodiscard]] constexpr inline const major_vector_type& GetMajor() const
+		{
+			return const_cast<this_type*>(this)->template GetMajor<MajorIndex_>();
+		}
+
 		/// <summary>
 		/// <para> Stores the data of this FastMatrix to a normal EmuMath Matrix of the specified type. </para>
 		/// <para> 
@@ -143,6 +173,57 @@ namespace EmuMath
 			return EmuMath::Helpers::fast_matrix_store(*this, out_matrix_);
 		}
 #pragma endregion
+
+#pragma region CONST_ARITHMETIC_FUNCS
+	private:
+		template<class Rhs_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+		[[nodiscard]] constexpr inline auto _naive_multiply_impl_rm_cm
+		(
+			Rhs_&& rhs_,
+			std::index_sequence<ColumnIndices_...>,
+			std::index_sequence<RowIndices_...>
+		) const
+		{
+			return this_type
+			(
+				EmuMath::Matrix<num_columns, num_rows, value_type, true>
+				(
+					major_vectors[ColumnIndices_].Dot(rhs_.major_vectors[RowIndices_]).template at<0>()...
+				)
+			);
+		}
+
+	public:
+		template<class Rhs_>
+		requires EmuConcepts::EmuFastMatrixMultPair<this_type, Rhs_>
+		[[nodiscard]] constexpr inline auto Multiply(Rhs_&& rhs_) const
+			-> EmuMath::FastMatrix<num_columns, num_rows, value_type, is_column_major, register_width>
+		{
+			// TODO: MULTIPLY
+			if constexpr (is_row_major)
+			{
+				using _rhs_mat_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+				if constexpr (_rhs_mat_uq::is_column_major)
+				{
+					using out_indices = EmuMath::TMP::make_full_matrix_index_sequences<matrix_type>;
+					using out_column_indices = typename out_indices::column_index_sequence;
+					using out_row_indices = typename out_indices::row_index_sequence;
+					return _naive_multiply_impl_rm_cm(std::forward<Rhs_>(rhs_), out_column_indices(), out_row_indices());
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<Rhs_>(), "Not implemented FastMat multiply with rhs row-major");
+					return *this;
+				}
+			}
+			else
+			{
+				static_assert(EmuCore::TMP::get_false<Rhs_>(), "Not implemented FastMat multiply with lhs column-major");
+				return *this;
+			}
+		}
+#pragma endregion
+
 #pragma region DATA
 	public:
 		/// <summary>

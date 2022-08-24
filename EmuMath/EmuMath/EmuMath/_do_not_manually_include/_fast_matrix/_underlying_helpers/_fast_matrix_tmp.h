@@ -23,4 +23,17 @@ namespace EmuMath::TMP
 	};
 }
 
+namespace EmuConcepts
+{
+	template<class Lhs_, class Rhs_>
+	concept EmuFastMatrixMultPair =
+	(
+		(EmuConcepts::EmuFastMatrix<Lhs_>) &&
+		(EmuConcepts::EmuFastMatrix<Rhs_>) &&
+		(EmuCore::TMP::remove_ref_cv_t<Lhs_>::num_columns == EmuCore::TMP::remove_ref_cv_t<Rhs_>::num_rows) &&
+		(EmuCore::TMP::remove_ref_cv_t<Lhs_>::register_width == EmuCore::TMP::remove_ref_cv_t<Rhs_>::register_width) &&
+		(std::is_same_v<typename EmuCore::TMP::remove_ref_cv_t<Lhs_>::value_type, typename EmuCore::TMP::remove_ref_cv_t<Rhs_>::value_type>)
+	);
+}
+
 #endif
