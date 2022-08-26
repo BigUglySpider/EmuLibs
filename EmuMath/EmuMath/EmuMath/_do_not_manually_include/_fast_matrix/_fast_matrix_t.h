@@ -186,6 +186,49 @@ namespace EmuMath
 		{
 			return EmuMath::Helpers::fast_matrix_store(*this, out_matrix_);
 		}
+
+		template<std::size_t ColumnIndex_, std::size_t RowIndex_, bool AllowHiddenIndices_ = false>
+		[[nodiscard]] constexpr inline register_type AllAsIndexRegister() const
+		{
+			constexpr std::size_t major_index = is_column_major ? ColumnIndex_ : RowIndex_;
+			constexpr std::size_t non_major_index = is_column_major ? RowIndex_ : ColumnIndex_;
+
+			if constexpr (major_index < num_major_elements)
+			{
+				constexpr std::size_t max_non_major_index = AllowHiddenIndices_ ? full_width_size_per_major : num_non_major_elements;
+				if constexpr (non_major_index < max_non_major_index)
+				{
+					return major_vectors[major_index].template AllAsIndexRegister<non_major_index, AllowHiddenIndices_>();
+				}
+				else
+				{
+					if constexpr (AllowHiddenIndices_)
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<non_major_index>(),
+							"Attempted to retrieve an index-filled register from an EmuMath FastMatrix (with `AllowHiddenIndices_ == true`), but the provided non-major index (RowIndex_ if `is_column_major == true`, otherwise ColumnIndex_) exceeds the greatest major index for a chunk of the Matrix."
+						);
+					}
+					else
+					{
+						static_assert
+						(
+							EmuCore::TMP::get_false<non_major_index>(),
+							"Attempted to retrieve an index-filled register from an EmuMath FastMatrix (with `AllowHiddenIndices_ == false`), but the provided non-major index (RowIndex_ if `is_column_major == true`, otherwise ColumnIndex_) exceeds the greatest ecapsulated index for a major chunk of the Matrix."
+						);
+					}
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<major_index>(),
+					"Attempted to retrieve an index-filled register from an EmuMath FastMatrix, but the provided major index (ColumnIndex_ if `is_column_major == true`, otherwise RowIndex_) exceeds the greatest major index for the Matrix."
+				);
+			}
+		}
 #pragma endregion
 
 #pragma region CONST_ARITHMETIC_FUNCS
@@ -213,6 +256,59 @@ namespace EmuMath
 			-> auto
 		{
 			return EmuMath::Helpers::fast_matrix_multiply(*this, std::forward<RhsMatrix_>(rhs_matrix_));
+		}
+#pragma endregion
+
+#pragma region MATRIX_OPERATIONS
+	private:
+		template<std::size_t...MajorIndices_>
+		[[nodiscard]] constexpr inline auto _make_basic_transpose_of_other_major(std::index_sequence<MajorIndices_...> major_indices_) const
+			-> EmuMath::FastMatrix<num_columns, num_rows, value_type, !is_column_major, register_width>
+		{
+			return EmuMath::FastMatrix<num_columns, num_rows, value_type, !is_column_major, register_width>
+			(
+				major_vectors[MajorIndices_]...
+			);
+		}
+
+	public:
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline auto Transpose() const
+			-> EmuMath::FastMatrix<num_columns, num_rows, value_type, OutColumnMajor_, register_width>
+		{
+			if constexpr (OutColumnMajor_ == is_column_major)
+			{
+				if constexpr (per_element_width == 32 && register_width == 128 && num_registers_per_major == 1 && num_major_elements == 4)
+				{
+					// Comment notation: mx = major x, nmx = non-major x
+					register_type temp_0 = EmuSIMD::shuffle<0, 1, 0, 1>(major_vectors[0].data, major_vectors[1].data); // m0nm0 m0nm1 m1nm0 m1nm1
+					register_type temp_1 = EmuSIMD::shuffle<0, 1, 0, 1>(major_vectors[2].data, major_vectors[3].data); // m2nm0 m2nm1 m3nm0 m3nm1
+					register_type temp_2 = EmuSIMD::shuffle<2, 3, 2, 3>(major_vectors[0].data, major_vectors[1].data); // m0nm2 m0nm3 m1nm2 m1nm3
+					register_type temp_3 = EmuSIMD::shuffle<2, 3, 2, 3>(major_vectors[2].data, major_vectors[3].data); // m2nm2 m2nm3 m3nm2 m3nm3
+
+					return EmuMath::FastMatrix<num_columns, num_rows, value_type, OutColumnMajor_>
+					(
+						major_vector_type(EmuSIMD::shuffle<0, 2, 0, 2>(temp_0, temp_1)),
+						major_vector_type(EmuSIMD::shuffle<1, 3, 1, 3>(temp_0, temp_1)),
+						major_vector_type(EmuSIMD::shuffle<0, 2, 0, 2>(temp_2, temp_3)),
+						major_vector_type(EmuSIMD::shuffle<1, 3, 1, 3>(temp_2, temp_3))
+					);
+				}
+				else
+				{
+					static_assert(EmuCore::TMP::get_false<OutColumnMajor_>(), "Generic FastMatrix Transpose not implemented.");
+				}
+			}
+			else
+			{
+				return _make_basic_transpose_of_other_major(major_index_sequence());
+			}
+		}
+
+		[[nodiscard]] constexpr inline auto ToOtherMajor() const
+			-> EmuMath::FastMatrix<num_columns, num_rows, value_type, !is_column_major, register_width>
+		{
+			return this->template Transpose<is_column_major>()._make_basic_transpose_of_other_major(major_index_sequence());
 		}
 #pragma endregion
 

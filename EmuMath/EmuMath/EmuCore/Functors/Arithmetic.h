@@ -2027,7 +2027,7 @@ namespace EmuCore
 			// Approxiation adapted from NVIDIA reference @ https://developer.download.nvidia.com/cg/asin.html
 			out_t one = out_t(1);
 			bool is_neg = in_ < 0;
-			out_t abs_in = mul_(in_, static_cast<out_t>(!is_neg) + static_cast<out_t>(-1 * is_neg)); // abs_in = is_neg ? -in_ : in_
+			out_t abs_in = mul_(in_, static_cast<out_t>(!is_neg) + (static_cast<out_t>(-1) * is_neg)); // abs_in = is_neg ? -in_ : in_
 			out_t result = out_t(-0.0187293);
 			result = mul_(result, abs_in);
 			result = add_(result, out_t(0.0742610));

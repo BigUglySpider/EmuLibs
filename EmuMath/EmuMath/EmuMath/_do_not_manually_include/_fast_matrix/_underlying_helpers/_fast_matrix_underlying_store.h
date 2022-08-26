@@ -79,6 +79,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		std::index_sequence<MajorIndices_...> major_index_sequence_
 	)
 	{
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		(
 			(
 				_dump_data_from_major_index_contained_only<MajorIndices_, OutputSize_, OutputNumNonMajors_>
@@ -88,6 +90,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 				)
 			), ...
 		);
+#pragma warning(pop)
 	}
 
 	template<std::size_t ColumnIndex_, std::size_t RowIndex_, EmuConcepts::EmuMatrix OutMatrix_, EmuConcepts::EmuFastMatrix FastMatrix_, class Data_>

@@ -13,64 +13,68 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		return lhs_.major_vectors[ColumnIndex_].DotScalar(rhs_.major_vectors[RowIndex_]);
 	}
 
-	template<std::size_t RhsMajorIndex_, class LhsMatrix_, class RhsMatrix_, std::size_t...LhsMajorIndicesMinus0_>
+	template<std::size_t RhsColumnIndex_, class LhsMatrix_, class RhsMatrix_, std::size_t...LhsColumnIndicesExcept0_>
 	requires EmuConcepts::EmuFastMatrixMultPair<LhsMatrix_, RhsMatrix_>
 	[[nodiscard]] constexpr inline decltype(auto) _updated_multiply_major_out_impl_lhs_cm
 	(
 		const LhsMatrix_& lhs_,
 		const RhsMatrix_& rhs_,
-		std::index_sequence<LhsMajorIndicesMinus0_...> lhs_major_indices_except_0_
+		std::index_sequence<LhsColumnIndicesExcept0_...> lhs_major_indices_except_0_
 	)
 	{
 		using _rhs_matrix_uq = typename EmuCore::TMP::remove_ref_cv<RhsMatrix_>::type;
 		constexpr bool out_column_major = true;
 
-		if constexpr(_rhs_matrix_uq::is_column_major)
+		const auto& major_rhs = rhs_.template GetMajor<RhsColumnIndex_>();
+		if constexpr (sizeof...(LhsColumnIndicesExcept0_) != 0)
 		{
-			const auto& major_rhs = rhs_.template GetMajor<RhsMajorIndex_>();
-			if constexpr (sizeof...(LhsMajorIndicesMinus0_) != 0)
-			{
-				auto out_chunk = lhs_.template GetMajor<0>().Multiply(major_rhs.template AllAsIndexRegister<0>());
+			auto out_chunk = lhs_.template GetMajor<0>().Multiply(rhs_.template AllAsIndexRegister<RhsColumnIndex_, 0>());
 
+			(
 				(
+					out_chunk = lhs_.template GetMajor<LhsColumnIndicesExcept0_>().Fmadd
 					(
-						out_chunk = lhs_.template GetMajor<LhsMajorIndicesMinus0_>().Fmadd
-						(
-							major_rhs.template AllAsIndexRegister<LhsMajorIndicesMinus0_>(),
-							out_chunk
-						)
-					), ...
-				);
+						rhs_.template AllAsIndexRegister<RhsColumnIndex_, LhsColumnIndicesExcept0_>(),
+						out_chunk
+					)
+				), ...
+			);
 
-				return out_chunk;
-			}
-			else
-			{
-				return lhs_.template GetMajor<0>().Multiply(major_rhs.template AllAsIndexRegister<0>());
-			}
+			return out_chunk;
 		}
 		else
 		{
-			if constexpr (sizeof...(LhsMajorIndicesMinus0_) != 0)
-			{
-				auto out_chunk =  lhs_.template GetMajor<0>().Multiply(rhs_.template GetMajor<0>().template AllAsIndexRegister<RhsMajorIndex_>());
+			return lhs_.template GetMajor<0>().Multiply(major_rhs.template AllAsIndexRegister<0>());
+		}
+	}
 
+	template<std::size_t RhsRowIndex_, class LhsMatrix_, class RhsMatrix_, std::size_t...RhsRowIndicesExcept0_>
+	requires EmuConcepts::EmuFastMatrixMultPair<LhsMatrix_, RhsMatrix_>
+	[[nodiscard]] constexpr inline decltype(auto) _updated_multiply_major_out_impl_lhs_rm_rhs_rm
+	(
+		const LhsMatrix_& lhs_,
+		const RhsMatrix_& rhs_,
+		std::index_sequence<RhsRowIndicesExcept0_...> lhs_major_indices_except_0_
+	)
+	{
+		using _rhs_mat_uq = typename EmuCore::TMP::remove_ref_cv<RhsMatrix_>::type;		
+		if constexpr (sizeof...(RhsRowIndicesExcept0_))
+		{
+			auto out_chunk = rhs_.template GetMajor<0>().Multiply(lhs_.template AllAsIndexRegister<0, RhsRowIndex_>());
+			(
 				(
+					out_chunk = rhs_.template GetMajor<RhsRowIndicesExcept0_>().Fmadd
 					(
-						out_chunk = lhs_.template GetMajor<LhsMajorIndicesMinus0_>().Fmadd
-						(
-							rhs_.template GetMajor<LhsMajorIndicesMinus0_>().template AllAsIndexRegister<RhsMajorIndex_>(),
-							out_chunk
-						)
-					), ...
-				);
-
-				return out_chunk;
-			}
-			else
-			{
-				return lhs_.template GetMajor<0>().Multiply(rhs_.template GetMajor<0>().template AllAsIndexRegister<0>());
-			}
+						lhs_.template AllAsIndexRegister<RhsRowIndicesExcept0_, RhsRowIndex_>(),
+						out_chunk
+					)
+				), ...
+			);
+			return out_chunk;
+		}
+		else
+		{
+			return rhs_.template GetMajor<0>().Multiply(lhs_.template AllAsIndexRegister<0, RhsRowIndex_>());
 		}
 	}
 
@@ -93,15 +97,47 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 			lhs_uq::is_column_major,
 			lhs_uq::register_width
 		>;
-		return _out_mat_type
-		(
-			_updated_multiply_major_out_impl_lhs_cm<RhsMajorIndices_>
+
+		if constexpr(lhs_uq::is_column_major)
+		{
+			return _out_mat_type
 			(
-				lhs_,
-				rhs_,
-				lhs_indices()
-			)...
-		);
+				_updated_multiply_major_out_impl_lhs_cm<RhsMajorIndices_>
+				(
+					lhs_,
+					rhs_,
+					lhs_indices()
+				)...
+			);
+		}
+		else
+		{
+			if constexpr (rhs_uq::is_column_major)
+			{
+				auto rhs_rm = rhs_.ToOtherMajor();
+				return _out_mat_type
+				(
+					_updated_multiply_major_out_impl_lhs_rm_rhs_rm<RhsMajorIndices_>
+					(
+						lhs_,
+						rhs_rm,
+						lhs_indices()
+					)...
+				);
+			}
+			else
+			{
+				return _out_mat_type
+				(
+					_updated_multiply_major_out_impl_lhs_rm_rhs_rm<RhsMajorIndices_>
+					(
+						lhs_,
+						rhs_,
+						lhs_indices()
+					)...
+				);
+			}
+		}
 	}
 
 	template<EmuConcepts::EmuFastMatrix OutMatrix_, class LhsMatrix_, class RhsMatrix_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>

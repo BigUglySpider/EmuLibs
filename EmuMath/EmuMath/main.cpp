@@ -717,9 +717,13 @@ int main()
 	EmuMath::Helpers::fast_matrix_store(EmuMath::FastMatrix<4, 4, float>(fast_mat_in_scalar_b), another_runtime_mat_yay);
 	std::cout << "After: \n" << another_runtime_mat_yay << "\n\n";
 
-	auto woo = EmuMath::FastMatrix<4, 4, float, true>(fast_mat_in_scalar_a).Multiply(EmuMath::FastMatrix<4, 4, float, false>(fast_mat_in_scalar_b));
+
+	auto woo = EmuMath::FastMatrix<4, 4, float, false>(fast_mat_in_scalar_a).Multiply(EmuMath::FastMatrix<4, 4, float, true>(fast_mat_in_scalar_b));
 	std::cout << "By fast: \n" <<  woo << "\n\n";
-	std::cout << "By scalar: \n" << (fast_mat_in_scalar_a * fast_mat_in_scalar_b) << "\n";
+	std::cout << "By scalar: \n" << (fast_mat_in_scalar_a * fast_mat_in_scalar_b) << "\n\n";
+	std::cout << EmuMath::FastMatrix<4, 4, float, false>(fast_mat_in_scalar_b) << "\n\n";
+	std::cout << EmuMath::FastMatrix<4, 4, float, false>(fast_mat_in_scalar_b).Transpose() << "\n\n";
+
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
