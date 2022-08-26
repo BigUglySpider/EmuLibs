@@ -259,6 +259,15 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region ASSIGNMENT_OPERATORS
+	public:
+		constexpr inline this_type& operator=(this_type&& to_move_) noexcept
+		{
+			major_vectors = std::move(to_move_.major_vectors);
+			return *this;
+		}
+#pragma endregion
+
 #pragma region MATRIX_OPERATIONS
 	private:
 		template<std::size_t...MajorIndices_>
