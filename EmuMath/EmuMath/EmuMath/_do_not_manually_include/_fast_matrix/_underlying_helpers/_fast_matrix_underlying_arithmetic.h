@@ -6,16 +6,9 @@
 
 namespace EmuMath::Helpers::_fast_matrix_underlying
 {
-	template<std::size_t ColumnIndex_, std::size_t RowIndex_, EmuConcepts::EmuFastMatrix OutMatrix_, class LhsMatrix_, class RhsMatrix_>
-	requires EmuConcepts::EmuFastMatrixMultPair<LhsMatrix_, RhsMatrix_>
-	[[nodiscard]] constexpr inline decltype(auto) _naive_multiply_index_rm_cm(LhsMatrix_&& lhs_, RhsMatrix_&& rhs_)
-	{
-		return lhs_.major_vectors[ColumnIndex_].DotScalar(rhs_.major_vectors[RowIndex_]);
-	}
-
 	template<std::size_t RhsColumnIndex_, class LhsMatrix_, class RhsMatrix_, std::size_t...LhsColumnIndicesExcept0_>
 	requires EmuConcepts::EmuFastMatrixMultPair<LhsMatrix_, RhsMatrix_>
-	[[nodiscard]] constexpr inline decltype(auto) _updated_multiply_major_out_impl_lhs_cm
+	[[nodiscard]] constexpr inline decltype(auto) _std_multiply_impl_lhs_cm
 	(
 		const LhsMatrix_& lhs_,
 		const RhsMatrix_& rhs_,
@@ -50,7 +43,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 
 	template<std::size_t RhsRowIndex_, class LhsMatrix_, class RhsMatrix_, std::size_t...RhsRowIndicesExcept0_>
 	requires EmuConcepts::EmuFastMatrixMultPair<LhsMatrix_, RhsMatrix_>
-	[[nodiscard]] constexpr inline decltype(auto) _updated_multiply_major_out_impl_lhs_rm_rhs_rm
+	[[nodiscard]] constexpr inline decltype(auto) _std_multiply_impl_lhs_rm_rhs_rm
 	(
 		const LhsMatrix_& lhs_,
 		const RhsMatrix_& rhs_,
@@ -81,7 +74,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 	}
 
 	template<class LhsMatrix_, class RhsMatrix_, std::size_t...RhsMajorIndices_>
-	[[nodiscard]] constexpr inline decltype(auto) _updated_multiply
+	[[nodiscard]] constexpr inline decltype(auto) _std_multiply
 	(
 		const LhsMatrix_& lhs_,
 		const RhsMatrix_& rhs_,
@@ -104,7 +97,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		{
 			return _out_mat_type
 			(
-				_updated_multiply_major_out_impl_lhs_cm<RhsMajorIndices_>
+				_std_multiply_impl_lhs_cm<RhsMajorIndices_>
 				(
 					lhs_,
 					rhs_,
@@ -119,7 +112,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 				auto rhs_rm = rhs_.ToOtherMajor();
 				return _out_mat_type
 				(
-					_updated_multiply_major_out_impl_lhs_rm_rhs_rm<RhsMajorIndices_>
+					_std_multiply_impl_lhs_rm_rhs_rm<RhsMajorIndices_>
 					(
 						lhs_,
 						rhs_rm,
@@ -131,7 +124,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 			{
 				return _out_mat_type
 				(
-					_updated_multiply_major_out_impl_lhs_rm_rhs_rm<RhsMajorIndices_>
+					_std_multiply_impl_lhs_rm_rhs_rm<RhsMajorIndices_>
 					(
 						lhs_,
 						rhs_,
@@ -140,29 +133,6 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 				);
 			}
 		}
-	}
-
-	template<EmuConcepts::EmuFastMatrix OutMatrix_, class LhsMatrix_, class RhsMatrix_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
-	requires EmuConcepts::EmuFastMatrixMultPair<LhsMatrix_, RhsMatrix_>
-	[[nodiscard]] constexpr inline auto _naive_multiply_impl_rm_cm
-	(
-		LhsMatrix_&& lhs_,
-		RhsMatrix_&& rhs_,
-		std::index_sequence<ColumnIndices_...>,
-		std::index_sequence<RowIndices_...>
-	)
-	{
-		return OutMatrix_
-		(
-			typename OutMatrix_::matrix_type
-			(
-				_naive_multiply_index_rm_cm<ColumnIndices_, RowIndices_, OutMatrix_>
-				(
-					std::forward<LhsMatrix_>(lhs_),
-					std::forward<RhsMatrix_>(rhs_)
-				)...
-			)
-		);
 	}
 }
 
