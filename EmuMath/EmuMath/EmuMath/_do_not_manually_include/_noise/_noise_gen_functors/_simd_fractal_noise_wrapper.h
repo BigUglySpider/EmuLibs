@@ -106,7 +106,7 @@ namespace EmuMath::Functors
 				{
 					static_assert
 					(
-						false,
+						EmuCore::TMP::get_false<generator_type>(),
 						"Invalid generator type provided for a fast_fractal_noise_wrapper when invoked with 3 coordinate registers. The generator must return the provided register type, and take the following type arguments: register_type, register_type, register_type, register_type, integral_register_type, EmuMath::NoisePermutations, interpreted as: `points_x`, `points_y`, `points_z`, `freq`, `permutation_mask`, `permutations`"
 					);
 				}
@@ -152,7 +152,7 @@ namespace EmuMath::Functors
 				{
 					static_assert
 					(
-						false,
+						EmuCore::TMP::get_false<generator_type>(),
 						"Invalid generator type provided for a fast_fractal_noise_wrapper when invoked with 2 coordinate registers. The generator must return the provided register type, and take the following type arguments: register_type, register_type, register_type, integral_register_type, EmuMath::NoisePermutations, interpreted as: `points_x`, `points_y`, `freq`, `permutation_mask`, `permutations`"
 					);
 				}
@@ -198,7 +198,7 @@ namespace EmuMath::Functors
 				{
 					static_assert
 					(
-						false,
+						EmuCore::TMP::get_false<generator_type>(),
 						"Invalid generator type provided for a fast_fractal_noise_wrapper when invoked with 1 coordinate register. The generator must return the provided register type, and take the following type arguments: register_type, register_type, integral_register_type, EmuMath::NoisePermutations, interpreted as: `points_x`, `freq`, `permutation_mask`, `permutations`"
 					);
 				}
@@ -265,7 +265,7 @@ namespace EmuMath::Functors
 			{
 				static_assert
 				(
-					false,
+					EmuCore::TMP::get_false<generator_type>(),
 					"Invalid generator type provided for a no_fractal_noise_wrapper taking __m128 values when invoked with 3 coordinate registers. The generator must return the __m128 type, and take the following type arguments: __m128, __m128, __m128, __m128, __m128i, EmuMath::NoisePermutations, interpreted as: `points_x`, `points_y`, `points_z`, `freq`, `permutation_mask`, `permutations`"
 				);
 			}
@@ -286,7 +286,7 @@ namespace EmuMath::Functors
 			{
 				static_assert
 				(
-					false,
+					EmuCore::TMP::get_false<generator_type>(),
 					"Invalid generator type provided for a no_fractal_noise_wrapper taking __m128 values when invoked with 2 coordinate registers. The generator must return the __m128 type, and take the following type arguments: __m128, __m128, __m128, __m128i, EmuMath::NoisePermutations, interpreted as: `points_x`, `points_y`, `freq`, `permutation_mask`, `permutations`"
 				);
 			}
@@ -307,7 +307,7 @@ namespace EmuMath::Functors
 			{
 				static_assert
 				(
-					false,
+					EmuCore::TMP::get_false<generator_type>(),
 					"Invalid generator type provided for a no_fractal_noise_wrapper taking __m128 values when invoked with 1 coordinate register. The generator must return the __m128 type, and take the following type arguments: __m128, __m128, __m128i, EmuMath::NoisePermutations, interpreted as: `points_x`, `freq`, `permutation_mask`, `permutations`"
 				);
 			}

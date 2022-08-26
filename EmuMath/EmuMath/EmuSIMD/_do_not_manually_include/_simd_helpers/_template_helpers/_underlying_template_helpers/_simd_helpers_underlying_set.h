@@ -316,7 +316,7 @@ namespace EmuSIMD::_underlying_simd_helpers
 			// UNSUPPORTED
 			static_assert
 			(
-				false,
+				EmuCore::TMP::get_false<Register_>(),
 				"Attempted to set a floating-point SIMD register via EmuSIMD helpers, but the provided Register_ type was not a supported floating-point SIMD register."
 			);
 		}

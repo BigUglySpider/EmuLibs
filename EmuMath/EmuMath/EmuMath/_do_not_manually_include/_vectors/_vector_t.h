@@ -928,14 +928,7 @@ namespace EmuMath
 		template<std::size_t ReadOffset_, class...Args_>
 		[[nodiscard]] static constexpr inline data_storage_type _construct_all_from_one_arg_per_element(Args_&&...args_)
 		{
-			if constexpr (std::is_constructible_v<data_storage_type, decltype(std::forward<Args_>(args_))...>)
-			{
-				return data_storage_type({ std::forward<Args_>(args_)... });
-			}
-			else
-			{
-				return data_storage_type({ _forward_or_make_stored_type<ReadOffset_>(std::forward<Args_>(args_))... });
-			}
+			return data_storage_type({ EmuCore::TMP::construct_or_cast<stored_type>(std::forward<Args_>(args_))... });
 		}
 
 		template<std::size_t ReadOffset_, class...Args_>
@@ -964,7 +957,7 @@ namespace EmuMath
 				{
 					static_assert
 					(
-						EmuCore::TMP::get_false(),
+						EmuCore::TMP::get_false<ReadOffset_>(),
 						"Internal SFINAE Failure: Invalid variadic construction arguments for an EmuMath Vector have been provided as no possible branch for variadic construction with 1 argument was true."
 					);
 					return data_storage_type();
@@ -974,7 +967,7 @@ namespace EmuMath
 			{
 				static_assert
 				(
-					EmuCore::TMP::get_false(),
+					EmuCore::TMP::get_false<ReadOffset_>(),
 					"Internal SFINAE Failure: Invalid variadic construction arguments for an EmuMath Vector have been provided as no possible branch for variadic construction with a number of arguments not equal to 1 was true."
 				);
 				return data_storage_type();
