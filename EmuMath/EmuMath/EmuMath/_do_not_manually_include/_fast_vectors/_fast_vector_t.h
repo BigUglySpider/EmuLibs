@@ -7055,6 +7055,80 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region SHUFFLES
+	private:
+		template<std::size_t Index_, bool AllowHiddenIndices_>
+		[[nodiscard]] constexpr inline register_type _get_register_filled_from_index() const
+		{
+			constexpr std::size_t max_index = AllowHiddenIndices_ ? full_width_size : size;
+			if constexpr (Index_ < max_index)
+			{
+				if constexpr (num_registers == 1)
+				{
+					return EmuSIMD::set_all_to_index<Index_, per_element_width>(data);
+				}
+				else
+				{
+					constexpr std::size_t register_index = Index_ / elements_per_register;
+					constexpr std::size_t element_index_in_register = Index_ % elements_per_register;
+					return EmuSIMD::set_all_to_index<element_index_in_register, per_element_width>(data[register_index]);
+				}
+			}
+			else
+			{
+				if constexpr (AllowHiddenIndices_)
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Index_>(),
+						"Attempted to retrieve an index-filled register from an EmuMath FastVector (with `AllowHiddenInidces_ == true`), but the provided index exceeds the full-width number of indices within the Vector's underlying registers."
+					);
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<Index_>(),
+						"Attempted to retrieve an index-filled register from an EmuMath FastVector (with `AllowHiddenIndices_ == false`), but the provided index exceeds the number of encapsulated indices. To access a contained index which is not part of the encapsulated size, set the `AllowHiddenIndices_` template argument to `true`."
+					);
+				}				
+			}
+		}
+
+	public:
+		/// <summary>
+		/// <para> Creates a Vector of this length with all indices set to match the value at the given index. </para>
+		/// <para>
+		///		By default, this will trigger a static assertion if the index exceeds the encapsulated range. 
+		///		To allow indices in the contained registers that are not in the encapsulated range 
+		///		(e.g. element[3] of a 3D Vector of 32-bit values using 128-bit registers), set the second template argument 
+		///		`AllowHiddenIndices_` to `true`.
+		/// </para>
+		/// </summary>
+		/// <returns>FastVector of this type with all values set to match the given index within this Vector.</returns>
+		template<std::size_t Index_, bool AllowHiddenIndices_ = false>
+		[[nodiscard]] constexpr inline EmuMath::FastVector<size, T_, RegisterWidth_> AllAsIndex() const
+		{
+			return EmuMath::FastVector<size, T_, RegisterWidth_>(_get_register_filled_from_index<Index_, AllowHiddenIndices_>());
+		}
+
+		/// <summary>
+		/// <para> Creates an instance of this Vector's underlying register with all values set to match the value at the given index. </para>
+		/// <para>
+		///		By default, this will trigger a static assertion if the index exceeds the encapsulated range. 
+		///		To allow indices in the contained registers that are not in the encapsulated range 
+		///		(e.g. element[3] of a 3D Vector of 32-bit values using 128-bit registers), set the second template argument 
+		///		`AllowHiddenIndices_` to `true`.
+		/// </para>
+		/// </summary>
+		/// <returns>Register of of this Vector's `register_type` with all values set to match the given index within this Vector.</returns>
+		template<std::size_t Index_, bool AllowHiddenIndices_ = false>
+		[[nodiscard]] constexpr inline register_type AllAsIndexRegister() const
+		{
+			return _get_register_filled_from_index<Index_, AllowHiddenIndices_>();
+		}
+#pragma endregion
+
 #pragma region VECTOR_DATA
 	public:
 		/// <summary>

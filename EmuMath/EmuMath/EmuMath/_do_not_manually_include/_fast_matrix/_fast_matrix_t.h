@@ -100,6 +100,20 @@ namespace EmuMath
 			major_vectors(EmuMath::Helpers::fast_matrix_make_majors_from_scalar_matrix<this_type>(std::forward<Matrix_>(scalar_matrix_), major_index_sequence()))
 		{
 		}
+
+		template
+		<
+			EmuConcepts::EmuFastVector...MajorVectors_,
+			typename = std::enable_if
+			<
+				sizeof...(MajorVectors_) == num_major_elements &&
+				(... && std::is_same_v<typename EmuCore::TMP::remove_ref_cv<MajorVectors_>::type, major_vector_type>)
+			>
+		>
+		explicit constexpr inline FastMatrix(MajorVectors_&&...major_vectors_) :
+			major_vectors({std::forward<MajorVectors_>(major_vectors_)...})
+		{
+		}
 #pragma endregion
 
 #pragma region GETTERS
