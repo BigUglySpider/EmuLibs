@@ -126,6 +126,27 @@ namespace EmuMath::Helpers
 			_fast_matrix_underlying::_move_dump_to_scalar_matrix(out_matrix_, data_dump, out_column_indices(), out_row_indices());
 		}
 	}
+
+	template<bool FullWidth_ = false, std::size_t OutputSize_ = std::numeric_limits<std::size_t>::max(), typename Out_, class FastMatrix_>
+	requires EmuConcepts::EmuFastMatrix<FastMatrix_>
+	constexpr inline void fast_matrix_store(FastMatrix_&& fast_matrix_, Out_* p_out_)
+	{
+		using _fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
+		using major_index_sequence = std::make_index_sequence<_fast_mat_uq::num_major_elements>;
+		if constexpr (FullWidth_)
+		{
+			_fast_matrix_underlying::_dump_data(std::forward<FastMatrix_>(fast_matrix_), p_out_, major_index_sequence());
+		}
+		else
+		{
+			_fast_matrix_underlying::_dump_data_contained_only<OutputSize_, _fast_mat_uq::num_non_major_elements>
+			(
+				std::forward<FastMatrix_>(fast_matrix_),
+				p_out_,
+				major_index_sequence()
+			);
+		}
+	}
 }
 
 #endif

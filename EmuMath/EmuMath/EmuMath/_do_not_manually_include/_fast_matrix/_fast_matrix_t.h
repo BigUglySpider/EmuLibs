@@ -263,18 +263,42 @@ namespace EmuMath
 	private:
 		template<std::size_t...MajorIndices_>
 		[[nodiscard]] constexpr inline auto _make_basic_transpose_of_other_major(std::index_sequence<MajorIndices_...> major_indices_) const
-			-> EmuMath::FastMatrix<num_columns, num_rows, value_type, !is_column_major, register_width>
+			-> EmuMath::FastMatrix<num_rows, num_columns, value_type, !is_column_major, register_width>
 		{
-			return EmuMath::FastMatrix<num_columns, num_rows, value_type, !is_column_major, register_width>
+			return EmuMath::FastMatrix<num_rows, num_columns, value_type, !is_column_major, register_width>
 			(
 				major_vectors[MajorIndices_]...
+			);
+		}
+
+		template<std::size_t MajorIndex_, std::size_t NonMajorIndex_, EmuConcepts::EmuFastMatrix OutFastMatrix_, typename Data_>
+		[[nodiscard]] static constexpr inline decltype(auto) _move_transposed_item(Data_* p_data_)
+		{
+			constexpr std::size_t non_major_offset = NonMajorIndex_ * OutFastMatrix_::full_width_size_per_major;
+			return std::move(*(p_data_ + non_major_offset + MajorIndex_));
+		}
+
+		template<EmuConcepts::EmuFastMatrix OutFastMatrix_, typename Data_, std::size_t...OutMajorIndices_, std::size_t...OutNonMajorIndices_>
+		[[nodiscard]] static constexpr inline OutFastMatrix_ _make_transposed
+		(
+			Data_* p_data_,
+			std::index_sequence<OutMajorIndices_...> major_index_sequence_,
+			std::index_sequence<OutNonMajorIndices_...> non_major_index_sequence_
+		)
+		{
+			return OutFastMatrix_
+			(
+				typename OutFastMatrix_::matrix_type
+				(
+					_move_transposed_item<OutMajorIndices_, OutNonMajorIndices_, OutFastMatrix_>(p_data_)...
+				)
 			);
 		}
 
 	public:
 		template<bool OutColumnMajor_ = is_column_major>
 		[[nodiscard]] constexpr inline auto Transpose() const
-			-> EmuMath::FastMatrix<num_columns, num_rows, value_type, OutColumnMajor_, register_width>
+			-> EmuMath::FastMatrix<num_rows, num_columns, value_type, OutColumnMajor_, register_width>
 		{
 			if constexpr (OutColumnMajor_ == is_column_major)
 			{
@@ -296,7 +320,31 @@ namespace EmuMath
 				}
 				else
 				{
-					static_assert(EmuCore::TMP::get_false<OutColumnMajor_>(), "Generic FastMatrix Transpose not implemented.");
+					using _out_fast_mat = EmuMath::FastMatrix<num_rows, num_columns, value_type, OutColumnMajor_, register_width>;
+					using out_indices = EmuMath::TMP::make_full_matrix_index_sequences<typename _out_fast_mat::matrix_type>;
+					using out_column_indices = typename out_indices::column_index_sequence;
+					using out_row_indices = typename out_indices::row_index_sequence;
+					value_type data_dump[full_width_size];
+					EmuMath::Helpers::fast_matrix_store<true>(*this, data_dump);
+
+					if constexpr (OutColumnMajor_)
+					{
+						return _make_transposed<_out_fast_mat>
+						(
+							data_dump,
+							out_column_indices(),
+							out_row_indices()
+						);
+					}
+					else
+					{
+						return _make_transposed<_out_fast_mat>
+						(
+							data_dump,
+							out_row_indices(),
+							out_column_indices()
+						);
+					}
 				}
 			}
 			else

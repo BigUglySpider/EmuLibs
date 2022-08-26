@@ -724,6 +724,11 @@ int main()
 	std::cout << EmuMath::FastMatrix<4, 4, float, false>(fast_mat_in_scalar_b) << "\n\n";
 	std::cout << EmuMath::FastMatrix<4, 4, float, false>(fast_mat_in_scalar_b).Transpose() << "\n\n";
 
+	constexpr auto test_scalar_a = EmuMath::Matrix<6, 5, float, true>
+		(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30);
+	auto test_fast_a = EmuMath::FastMatrix<6, 5, float, true>(test_scalar_a);
+	std::cout << test_fast_a << "\n\n" << test_fast_a.Transpose() << "\n\n";
+
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

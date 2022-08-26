@@ -5,29 +5,40 @@
 
 namespace EmuMath::Helpers::_fast_matrix_underlying
 {
-	template<EmuConcepts::EmuFastMatrix FastMatrix_, std::size_t...MajorIndices_>
+	template<EmuConcepts::EmuFastMatrix FastMatrix_, typename Data_, std::size_t...MajorIndices_>
 	constexpr inline void _dump_data
 	(
 		FastMatrix_&& fast_matrix_,
-		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::value_type* p_out_,
+		Data_* p_out_,
 		std::index_sequence<MajorIndices_...> major_index_sequence_
 	)
 	{
-		using _fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
+		if constexpr(!std::is_const_v<Data_>)
+		{
+			using _fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
 
-		// Variadically output to all required indices
-		// --- False-positive warning silenced as correct use will never have repeated index accesses
+			// Variadically output to all required indices
+			// --- False-positive warning silenced as correct use will never have repeated index accesses
 #pragma warning(push)
 #pragma warning(disable: 26800)
-		(
 			(
-				std::forward<FastMatrix_>(fast_matrix_).major_vectors[MajorIndices_].template Store<true>
 				(
-					p_out_ + (MajorIndices_ * _fast_mat_uq::full_width_size_per_major)
-				)
-			), ...
-		);
+					std::forward<FastMatrix_>(fast_matrix_).major_vectors[MajorIndices_].template Store<true>
+					(
+						p_out_ + (MajorIndices_ * _fast_mat_uq::full_width_size_per_major)
+					)
+				), ...
+			);
 #pragma warning(pop)
+		}
+		else
+		{
+			static_assert
+			(
+				EmuCore::TMP::get_false<Data_>(),
+				"Unable to dump data from an EmuMath FastMatrix as the output pointer is const-qualified."
+			);
+		}
 	}
 
 	template<std::size_t MajorIndex_, std::size_t OutputSize_, std::size_t OutputNumNonMajors_, EmuConcepts::EmuFastMatrix FastMatrix_, typename OutData_>
