@@ -41,25 +41,25 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		}
 	}
 
-	template<std::size_t RhsRowIndex_, class LhsMatrix_, class RhsMatrix_, std::size_t...RhsRowIndicesExcept0_>
+	template<std::size_t RhsRowIndex_, class LhsMatrix_, class RhsMatrix_, std::size_t...LhsRowIndicesExcept0_>
 	requires EmuConcepts::EmuFastMatrixMultPair<LhsMatrix_, RhsMatrix_>
 	[[nodiscard]] constexpr inline decltype(auto) _std_multiply_impl_lhs_rm_rhs_rm
 	(
 		const LhsMatrix_& lhs_,
 		const RhsMatrix_& rhs_,
-		std::index_sequence<RhsRowIndicesExcept0_...> lhs_major_indices_except_0_
+		std::index_sequence<LhsRowIndicesExcept0_...> lhs_major_indices_except_0_
 	)
 	{
 		using _rhs_mat_uq = typename EmuCore::TMP::remove_ref_cv<RhsMatrix_>::type;
-		if constexpr (sizeof...(RhsRowIndicesExcept0_))
+		if constexpr (sizeof...(LhsRowIndicesExcept0_))
 		{
 			auto out_chunk = rhs_.template GetMajor<0>().Multiply(lhs_.template AllAsIndexRegister<0, RhsRowIndex_>());
 
 			(
 				(
-					out_chunk = rhs_.template GetMajor<RhsRowIndicesExcept0_>().Fmadd
+					out_chunk = rhs_.template GetMajor<LhsRowIndicesExcept0_>().Fmadd
 					(
-						lhs_.template AllAsIndexRegister<RhsRowIndicesExcept0_, RhsRowIndex_>(),
+						lhs_.template AllAsIndexRegister<LhsRowIndicesExcept0_, RhsRowIndex_>(),
 						out_chunk
 					)
 				), ...
@@ -74,12 +74,20 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 	}
 
 	template<class LhsMatrix_, class RhsMatrix_, std::size_t...RhsMajorIndices_>
-	[[nodiscard]] constexpr inline decltype(auto) _std_multiply
+	requires EmuConcepts::EmuFastMatrixMultPair<LhsMatrix_, RhsMatrix_>
+	[[nodiscard]] constexpr inline auto _std_multiply
 	(
 		const LhsMatrix_& lhs_,
 		const RhsMatrix_& rhs_,
 		std::index_sequence<RhsMajorIndices_...> rhs_major_indices_
-	)
+	) -> EmuMath::FastMatrix
+		<
+			EmuCore::TMP::remove_ref_cv_t<RhsMatrix_>::num_columns,
+			EmuCore::TMP::remove_ref_cv_t<LhsMatrix_>::num_rows,
+			typename EmuCore::TMP::remove_ref_cv_t<LhsMatrix_>::value_type,
+			EmuCore::TMP::remove_ref_cv_t<LhsMatrix_>::is_column_major,
+			EmuCore::TMP::remove_ref_cv_t<LhsMatrix_>::register_width
+		>
 	{
 		using lhs_uq = typename EmuCore::TMP::remove_ref_cv<LhsMatrix_>::type;
 		using rhs_uq = typename EmuCore::TMP::remove_ref_cv<RhsMatrix_>::type;
@@ -109,6 +117,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		{
 			if constexpr (rhs_uq::is_column_major)
 			{
+				// Worst case scenario; we don't have a fallback for row-major rhs as we do in column-major, so we have to convert rhs to row-major
+				// --- This means we're performing a transpose before multiplication
 				auto rhs_rm = rhs_.ToOtherMajor();
 				return _out_mat_type
 				(
