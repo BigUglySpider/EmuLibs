@@ -7346,7 +7346,7 @@ namespace EmuMath
 			return data_type({ register_type(std::move(to_move_.data[Indices_]))... });
 		}
 
-		static constexpr inline data_type _do_move(this_type&& to_move_) noexcept
+		static constexpr inline decltype(auto) _do_move(this_type&& to_move_) noexcept
 		{
 			if constexpr (contains_multiple_registers)
 			{
@@ -7354,7 +7354,7 @@ namespace EmuMath
 			}
 			else
 			{
-				return data_type(std::move(to_move_.data));
+				return std::move(to_move_.data);
 			}
 		}
 #pragma endregion
@@ -7397,7 +7397,7 @@ namespace EmuMath
 			return data_type({ _construct_register_discard_index<RegisterIndices_>(to_set_all_registers_to_)... });
 		}
 
-		static constexpr inline data_type _do_set_all_same_register(register_type to_set_all_registers_to_) noexcept
+		static constexpr inline data_type _do_set_all_same_register(register_arg_type to_set_all_registers_to_) noexcept
 		{
 			if constexpr (contains_multiple_registers)
 			{

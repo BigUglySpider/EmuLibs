@@ -57,10 +57,11 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		std::index_sequence<RhsRowIndicesExcept0_...> lhs_major_indices_except_0_
 	)
 	{
-		using _rhs_mat_uq = typename EmuCore::TMP::remove_ref_cv<RhsMatrix_>::type;		
+		using _rhs_mat_uq = typename EmuCore::TMP::remove_ref_cv<RhsMatrix_>::type;
 		if constexpr (sizeof...(RhsRowIndicesExcept0_))
 		{
 			auto out_chunk = rhs_.template GetMajor<0>().Multiply(lhs_.template AllAsIndexRegister<0, RhsRowIndex_>());
+
 			(
 				(
 					out_chunk = rhs_.template GetMajor<RhsRowIndicesExcept0_>().Fmadd
@@ -70,6 +71,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 					)
 				), ...
 			);
+
 			return out_chunk;
 		}
 		else
@@ -79,7 +81,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 	}
 
 	template<class LhsMatrix_, class RhsMatrix_, std::size_t...RhsMajorIndices_>
-	[[nodiscard]] constexpr inline decltype(auto) _updated_multiply_lhs_cm
+	[[nodiscard]] constexpr inline decltype(auto) _updated_multiply
 	(
 		const LhsMatrix_& lhs_,
 		const RhsMatrix_& rhs_,

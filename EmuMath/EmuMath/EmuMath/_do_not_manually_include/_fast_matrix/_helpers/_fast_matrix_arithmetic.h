@@ -15,7 +15,7 @@ namespace EmuMath::Helpers
 
 		if constexpr (true)
 		{
-			return _fast_matrix_underlying::_updated_multiply_lhs_cm
+			return _fast_matrix_underlying::_updated_multiply
 			(
 				lhs_matrix_,
 				rhs_matrix_,

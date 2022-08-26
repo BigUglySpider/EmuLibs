@@ -29,6 +29,20 @@
 constexpr auto test_dot = EmuCore::dot<float>(1, 2, 6, 3, 7, 10);
 constexpr auto test_dot_2 = EmuCore::dot(5, 7);
 
+static std::ostream& print_mat4x4(DirectX::XMFLOAT4X4 mat4x4)
+{
+	for (auto i = 0; i < 4; ++i)
+	{
+		std::cout << "{ ";
+		for (auto j = 0; j < 4; ++j)
+		{
+			std::cout << mat4x4(i, j) << ", ";
+		}
+		std::cout << " }\n";
+	}
+	return std::cout;
+}
+
 template<typename T_, std::size_t Size_>
 inline std::ostream& operator<<(std::ostream& str_, const std::array<T_, Size_>& arr_)
 {
@@ -724,11 +738,20 @@ int main()
 	std::cout << EmuMath::FastMatrix<4, 4, float, false>(fast_mat_in_scalar_b) << "\n\n";
 	std::cout << EmuMath::FastMatrix<4, 4, float, false>(fast_mat_in_scalar_b).Transpose() << "\n\n";
 
-	constexpr auto test_scalar_a = EmuMath::Matrix<6, 5, float, true>
+	constexpr auto test_scalar_a = EmuMath::Matrix<6, 5, float, false>
 		(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30);
-	auto test_fast_a = EmuMath::FastMatrix<6, 5, float, true>(test_scalar_a);
+	auto test_fast_a = EmuMath::FastMatrix<6, 5, float, false>(test_scalar_a);
 	std::cout << test_fast_a << "\n\n" << test_fast_a.Transpose() << "\n\n";
 
+	DirectX::XMFLOAT4X4 dxm_storage = {};
+	EmuMath::Matrix<4, 4, float, false> emum_storage = {};
+	constexpr auto test_storage = EmuMath::Matrix<4, 4, float, false>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+	auto testdxm = DirectX::XMLoadFloat4x4(reinterpret_cast<const DirectX::XMFLOAT4X4*>(test_storage.data()));
+	auto testemum = EmuMath::FastMatrix<4, 4, float, false>(test_storage);
+
+	std::cout << "TEST OF MATRIX MULTIPLIES\n";
+	auto dxm_res = DirectX::XMMatrixMultiply(testdxm, testdxm);
+	auto emum_res = EmuMath::Helpers::fast_matrix_multiply(testemum, testemum);
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
@@ -824,6 +847,9 @@ int main()
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();
+	DirectX::XMStoreFloat4x4(&dxm_storage, dxm_res);
+	print_mat4x4(dxm_storage) << "\n";
+	std::cout << emum_res << "\n";
 #pragma endregion
 	//std::cout << result.Add(rand()) << " :)";
 	return 0;

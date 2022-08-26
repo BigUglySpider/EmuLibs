@@ -444,6 +444,17 @@ namespace EmuSIMD::TMP
 	};
 	template<class Register_, std::size_t Index_, std::size_t PerElementWidthIfIntegral_ = 32>
 	static constexpr bool valid_register_index_v = valid_register_index<Register_, Index_, PerElementWidthIfIntegral_>::value;
+
+	namespace Concepts
+	{
+		template<typename T_>
+		concept KnownSIMD = EmuSIMD::TMP::is_simd_register_v<T_>;
+	}
+}
+
+namespace EmuConcepts
+{
+	using namespace EmuSIMD::TMP::Concepts;
 }
 
 #endif

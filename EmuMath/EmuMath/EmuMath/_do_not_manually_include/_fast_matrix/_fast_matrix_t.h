@@ -114,6 +114,20 @@ namespace EmuMath
 			major_vectors({std::forward<MajorVectors_>(major_vectors_)...})
 		{
 		}
+
+		template
+		<
+			EmuConcepts::KnownSIMD...MajorVectorRegisters_,
+			typename = std::enable_if
+			<
+				sizeof...(MajorVectorRegisters_) == num_major_elements &&
+				(... && std::is_same_v<typename EmuCore::TMP::remove_ref_cv<MajorVectorRegisters_>::type, register_type>)
+			>
+		>
+		explicit constexpr inline FastMatrix(MajorVectorRegisters_&&...major_vector_registers_) :
+			major_vectors({ major_vector_type(std::forward<MajorVectorRegisters_>(major_vector_registers_))... })
+		{
+		}
 #pragma endregion
 
 #pragma region GETTERS

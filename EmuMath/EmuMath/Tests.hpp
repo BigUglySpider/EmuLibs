@@ -168,7 +168,7 @@ namespace EmuCore::TestingHelpers
 
 		static constexpr std::size_t vec_size = 4;
 		using t_arg = float;
-		using mat_type = EmuMath::FastMatrix<4, 4, t_arg, false, 128>;
+		using mat_type = EmuMath::FastMatrix<4, 4, t_arg, true, 128>;
 		using vec_type = EmuMath::FastVector<4, t_arg, 128>;
 
 		EmuFastMatrixTest()
