@@ -104,7 +104,7 @@ namespace EmuCore::TestingHelpers
 	{
 		static constexpr bool DO_TEST = true;
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 5000000;
+		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr std::string_view NAME = "Emu Matrix Mult";
 
@@ -162,13 +162,13 @@ namespace EmuCore::TestingHelpers
 	{
 		static constexpr bool DO_TEST = true;
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 5000000;
+		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr std::string_view NAME = "Emu FastMatrix Mult";
 
 		static constexpr std::size_t vec_size = 4;
 		using t_arg = float;
-		using mat_type = EmuMath::FastMatrix<4, 4, t_arg, true, 128>;
+		using mat_type = EmuMath::FastMatrix<4, 4, t_arg, false, 128>;
 		using vec_type = EmuMath::FastVector<4, t_arg, 128>;
 
 		EmuFastMatrixTest()
@@ -220,7 +220,7 @@ namespace EmuCore::TestingHelpers
 	{
 		static constexpr bool DO_TEST = true;
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 5000000;
+		static constexpr std::size_t NUM_LOOPS = 500000;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr std::string_view NAME = "DirectX Mat Mult";
 
