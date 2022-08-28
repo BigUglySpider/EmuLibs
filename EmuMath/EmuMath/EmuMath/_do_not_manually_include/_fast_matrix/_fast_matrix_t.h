@@ -18,31 +18,31 @@ namespace EmuMath
 		static constexpr bool is_row_major = !is_column_major;
 		static constexpr std::size_t num_major_elements = is_column_major ? num_columns : num_rows;
 		static constexpr std::size_t num_non_major_elements = is_column_major ? num_rows : num_columns;
-		/// <summary> The number of elements that this Vector behaves to encapsulate. </summary>
+		/// <summary> The number of elements that this Matrix behaves to encapsulate. </summary>
 		static constexpr std::size_t size = num_columns * num_rows;
-		/// <summary> The width provided for this Vector's registers to use, in bits. </summary>
+		/// <summary> The width provided for this Matrix's registers to use, in bits. </summary>
 		static constexpr std::size_t register_width = RegisterWidth_ > 0 ? RegisterWidth_ : 1;
 
-		/// <summary> Alias to this Vector type. </summary>
+		/// <summary> Alias to this Matrix type. </summary>
 		using this_type = EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>;
-		/// <summary> Alias to the type of values within this Vector. </summary>
+		/// <summary> Alias to the type of values within this Matrix. </summary>
 		using value_type = typename std::remove_cv<T_>::type;
-		/// <summary> Alias to the type of SIMD register used for this Vector's data. </summary>
+		/// <summary> Alias to the type of SIMD register used for this Matrix's data. </summary>
 		using register_type = typename EmuSIMD::TMP::register_type<value_type, register_width>::type;
-		/// <summary> Alias to the argument type used to pass an instance of this Vector's register_type. </summary>
+		/// <summary> Alias to the argument type used to pass an instance of this Matrix's register_type. </summary>
 		using register_arg_type = typename EmuSIMD::TMP::register_arg_type<value_type, register_width>::type;
 		/// <summary> Alias to the register type used as an argument for the number of shifts performed when a register argument is used instead of a constant. </summary>
 		using shift_register_type = __m128i;
-		/// <summary> The number of bits each element is interpreted to consume within this Vector's shift_register_type, with 8-bit bytes regardless of CHAR_BIT. </summary>
+		/// <summary>The number of bits each element is interpreted to consume within this Matrix's shift_register_type, with 8-bit bytes regardless of CHAR_BIT. </summary>
 		static constexpr std::size_t shift_register_per_element_width = 64;
-		/// <summary> The preferred floating-point type for this Vector, used for floating-point-based calculations using this Vector. </summary>
+		/// <summary> The preferred floating-point type for this Matrix, used for floating-point-based calculations using this Matrix. </summary>
 		using preferred_floating_point = typename std::conditional<(sizeof(value_type) >= 64), double, float>::type;
 
-		/// <summary> Boolean indicating if this Vector's encapsulated type is integral. </summary>
+		/// <summary> Boolean indicating if this Matrix's encapsulated type is integral. </summary>
 		static constexpr bool is_integral = std::is_integral<value_type>::value;
-		/// <summary> Boolean indicating if this Vector's encapsulated type is floating-point. </summary>
+		/// <summary> Boolean indicating if this Matrix's encapsulated type is floating-point. </summary>
 		static constexpr bool is_floating_point = std::is_floating_point<value_type>::value;
-		/// <summary> Boolean indicating if this Vector's encapsulated type is signed. </summary>
+		/// <summary> Boolean indicating if this Matrix's encapsulated type is signed. </summary>
 		static constexpr bool is_signed = std::is_signed<value_type>::value;
 
 		/// <summary> The number of bytes consumed by a single element in this Matrix. </summary>
@@ -67,11 +67,58 @@ namespace EmuMath
 
 #pragma region CONSTRUCTION_HELPERS
 	private:
-		template<EmuConcepts::EmuFastVector...FastMajorVectors_, std::size_t...MajorIndices_>
-		[[nodiscard]] static constexpr inline data_type _make_data_from_fast_vectors(std::index_sequence<MajorIndices_...> major_indices_, FastMajorVectors_&&...fast_major_vectors_)
+		template<std::size_t RegisterIndex_, EmuConcepts::EmuFastVector FastMajorVector_>
+		[[nodiscard]] static constexpr inline register_type _retrieve_register_from_fast_vector(FastMajorVector_&& fast_major_vector_)
 		{
-			// TODO: Better checks
-			return data_type({ std::forward<FastMajorVectors_>(fast_major_vectors_).data... });
+			using _fast_major_vector_uq = typename EmuCore::TMP::remove_ref_cv<FastMajorVector_>::type;
+			if constexpr (RegisterIndex_ < _fast_major_vector_uq::num_registers)
+			{
+				if constexpr (_fast_major_vector_uq::num_registers > 1)
+				{
+					return std::forward<FastMajorVector_>(fast_major_vector_).data[RegisterIndex_];
+				}
+				else
+				{
+					return std::forward<FastMajorVector_>(fast_major_vector_).data;
+				}
+			}
+			else
+			{
+				return EmuSIMD::setzero<register_type>();
+			}
+		}
+
+		template<EmuConcepts::EmuFastVector FastMajorVector_, std::size_t...PerMajorRegisterIndices_>
+		[[nodiscard]] static constexpr inline major_chunk_type _make_major_chunk_from_fast_vector(FastMajorVector_&& fast_major_vector_)
+		{
+			return major_chunk_type
+			({
+				_retrieve_register_from_fast_vector<PerMajorRegisterIndices_>(std::forward<FastMajorVector_>(fast_major_vector_))...
+			});
+		}
+
+		template<EmuConcepts::EmuFastVector...FastMajorVectors_, std::size_t...MajorIndices_, std::size_t...PerMajorRegisterIndices_>
+		[[nodiscard]] static constexpr inline data_type _make_data_from_fast_vectors
+		(
+			std::index_sequence<MajorIndices_...> major_indices_,
+			std::index_sequence<PerMajorRegisterIndices_...> per_major_register_indices_,
+			FastMajorVectors_&&...fast_major_vectors_
+		)
+		{
+			if constexpr (sizeof...(PerMajorRegisterIndices_) > 1)
+			{
+				return data_type
+				({
+					_make_major_chunk_from_fast_vector<FastMajorVectors_, PerMajorRegisterIndices_...>
+					(
+						std::forward<FastMajorVectors_>(fast_major_vectors_)
+					)...
+				});
+			}
+			else
+			{
+				return data_type({ std::forward<FastMajorVectors_>(fast_major_vectors_).data... });
+			}
 		}
 
 		template<std::size_t MajorIndex_, EmuConcepts::KnownSIMD...Registers_, std::size_t...RegisterIndices_>
@@ -113,49 +160,141 @@ namespace EmuMath
 		}
 #pragma endregion
 
+#pragma region CONSTRUCTOR_VALIDITY_CHECKS
+	private:
+		template<std::size_t Unused_, EmuConcepts::EmuFastVector...MajorFastVectors_>
+		[[nodiscard]] static constexpr inline bool _valid_major_fast_vector_construction()
+		{
+			return
+			(
+				Unused_ >= 0 &&
+				sizeof...(MajorFastVectors_) == num_major_elements &&
+				(... && std::is_same_v<typename EmuCore::TMP::remove_ref_cv_t<MajorFastVectors_>::register_type, register_type>)
+			);
+		}
+
+		template<std::size_t Unused_, EmuConcepts::KnownSIMD...MajorRegisters_>
+		[[nodiscard]] static constexpr inline bool _valid_major_fast_vector_construction()
+		{
+			return
+			(
+				Unused_ >= 0 &&
+				sizeof...(MajorRegisters_) == total_num_registers &&
+				(... && std::is_same_v<typename EmuCore::TMP::remove_ref_cv<MajorRegisters_>::type, register_type>)
+			);
+		}
+
+		template<std::size_t Unused_, class...MajorChunks_>
+		[[nodiscard]] static constexpr inline bool _valid_major_chunk_construction()
+		{
+			return
+			(
+				Unused_ >= 0 &&
+				num_registers_per_major != 1 &&
+				sizeof...(MajorChunks_) == num_major_elements &&
+				(... && std::is_same_v<typename EmuCore::TMP::remove_ref_cv<MajorChunks_>::type, major_chunk_type>)
+			);
+		}
+
+	public:
+		template<EmuConcepts::EmuFastVector...MajorFastVectors_>
+		[[nodiscard]] static constexpr inline bool valid_major_fast_vector_construction()
+		{
+			return _valid_major_fast_vector_construction<0, MajorFastVectors_...>();
+		}
+
+		template<EmuConcepts::KnownSIMD...MajorRegisters_>
+		[[nodiscard]] static constexpr inline bool valid_major_register_construction()
+		{
+			return _valid_major_register_construction<0, MajorRegisters_...>();
+		}
+
+		template<class...MajorChunks_>
+		[[nodiscard]] static constexpr inline bool valid_major_chunk_construction()
+		{
+			return _valid_major_chunk_construction<0, MajorChunks_...>();
+		}
+#pragma endregion
+
 #pragma region CONSTRUCTORS
 	public:
 		constexpr inline FastMatrix() noexcept = default;
 		constexpr inline FastMatrix(this_type&&) noexcept = default;
 		constexpr inline FastMatrix(const this_type&) noexcept = default;
 
+		/// <summary>
+		/// <para> Constructs a FastMatrix loaded from the passed scalar EmuMath Matrix. </para>
+		/// <para>
+		///		Optimised loads will be prioritised over sets where possible. 
+		///		Loads are only possible with matching major storage order, 
+		///		and where there are enough elements available to perform a contiguous load for a register.
+		/// </para>
+		/// </summary>
+		/// <param name="scalar_matrix_to_load_">EmuMath Matrix to load into the newly-constructed FastMatrix.</param>
 		template<EmuConcepts::EmuMatrix ScalarMatrix_>
-		constexpr inline FastMatrix(ScalarMatrix_&& scalar_matrix_to_load_) noexcept :
-			major_chunks(EmuMath::Helpers::fast_matrix_load_data_type<this_type>(std::forward<ScalarMatrix_>(scalar_matrix_to_load_)))
+		constexpr inline FastMatrix(ScalarMatrix_&& scalar_matrix_to_load_) noexcept
+			: major_chunks(EmuMath::Helpers::fast_matrix_load_data_type<this_type>(std::forward<ScalarMatrix_>(scalar_matrix_to_load_)))
 		{
 		}
 
+		/// <summary>
+		/// <para> Constructs a FastMatrix using the registers of the passed FastVectors to create respective major chunks. </para>
+		/// </summary>
+		/// <param name="major_vectors_">
+		///		<para>
+		///			EmuMath `FastVectors`, each representing a major chunk of the result Matrix in order from 0 to last. 
+		///			The number of arguments should be equal to this Matrix type's `num_major_elements`.
+		///		</para>
+		///		<para> The passed `FastVectors` may be any size, but their `register_type` must be the same as this Matrix type's `register_type`. </para>
+		/// </param>
 		template
 		<
+			std::size_t Unused_ = 0,
 			EmuConcepts::EmuFastVector...MajorFastVectors_,
-			typename = std::enable_if_t<sizeof...(MajorFastVectors_) == num_major_elements>
+			typename = std::enable_if_t<_valid_major_fast_vector_construction<Unused_, MajorFastVectors_...>()>
 		>
-		constexpr inline FastMatrix(MajorFastVectors_&&...major_vectors_) :
-			major_chunks(_make_data_from_fast_vectors(major_index_sequence(), std::forward<MajorFastVectors_>(major_vectors_)...))
+		constexpr inline FastMatrix(MajorFastVectors_&&...major_vectors_) noexcept
+			: major_chunks(_make_data_from_fast_vectors(major_index_sequence(), major_register_sequence(), std::forward<MajorFastVectors_>(major_vectors_)...))
 		{
 		}
 
+		/// <summary>
+		/// <para> Constructs a FastMatrix using the passed registers exactly as they are when passed. </para>
+		/// <para> Registers are used in this Matrix type's major storage order; a full major-element of registers will be used before moving to the next. </para>
+		/// </summary>
+		/// <param name="major_order_registers_">
+		///		<para> EmuSIMD-recognised SIMD registers representing each register used by this Matrix, in its major-storage order. </para>
+		///		<para>
+		///			The passed registers must be the same as this Matrix type's `register_type`, 
+		///			and the amount of arguments must be equal to this Matrix type's `total_num_registers`. 
+		///		</para>
+		/// </param>
 		template
 		<
-			EmuConcepts::KnownSIMD...Registers_,
-			typename = std::enable_if_t
-			<
-				sizeof...(Registers_) == total_num_registers
-			>
+			std::size_t Unused_ = 0,
+			EmuConcepts::KnownSIMD...MajorRegisters_,
+			typename = std::enable_if_t<_valid_major_fast_vector_construction<Unused_, MajorRegisters_...>()>
 		>
-		constexpr inline FastMatrix(Registers_&&...major_order_registers_)
-			: major_chunks(_make_data_from_registers(major_index_sequence(), std::forward<Registers_>(major_order_registers_)...))
+		constexpr inline FastMatrix(MajorRegisters_&&...major_order_registers_) noexcept
+			: major_chunks(_make_data_from_registers(major_index_sequence(), std::forward<MajorRegisters_>(major_order_registers_)...))
 		{
 		}
 
+		/// <summary>
+		/// <para> Constructs a FastMatrix using the passed major chunks to create its own respective major chunks. </para>
+		/// </summary>
+		/// <param name="major_chunks_">
+		///		<para>
+		///			Sequential major chunks to construct the new FastMatrix via.
+		///			The number of arguments should be equal to this Matrix type's `num_major_elements`.
+		///		</para>
+		///		<para> All passed arguments must be of this Matrix type's `major_chunk_type`. </para>
+		/// </param>
 		template
 		<
+			std::size_t Unused_ = 0,
 			class...MajorChunks_,
-			typename = std::enable_if_t
-			<
-				sizeof...(MajorChunks_) == num_major_elements &&
-				num_registers_per_major != 1
-			>
+			typename = std::enable_if_t<_valid_major_chunk_construction<Unused_, MajorChunks_...>()>
 		>
 		constexpr inline FastMatrix(MajorChunks_&&...major_chunks_)
 			: major_chunks({std::forward<MajorChunks_>(major_chunks_)...})
@@ -165,6 +304,11 @@ namespace EmuMath
 
 #pragma region GETS
 	public:
+		/// <summary>
+		/// <para> Retrieves the register at the provided `MajorIndex_` of this Matrix's major chunks. </para>
+		/// <para> By default, the first register in the chunk will be selected. To choose a different register index, provide a second template argument. </para>
+		/// </summary>
+		/// <returns>Reference to the register at the given point within this Matrix.</returns>
 		template<std::size_t MajorIndex_, std::size_t RegisterIndex_ = 0>
 		[[nodiscard]] constexpr inline register_type& GetRegister()
 		{
@@ -206,6 +350,10 @@ namespace EmuMath
 			return const_cast<this_type*>(this)->template GetRegister<MajorIndex_, RegisterIndex_>();
 		}
 
+		/// <summary>
+		/// <para> Makes a register of this Matrix's `register_type` with all elements set to match the element at the given index of this Matrix. </para>
+		/// </summary>
+		/// <returns>Register filled with the value at the given index of this Matrix.</returns>
 		template<std::size_t ColumnIndex_, std::size_t RowIndex_>
 		[[nodiscard]] constexpr inline register_type GetRegisterOfIndex() const
 		{
@@ -264,6 +412,14 @@ namespace EmuMath
 
 #pragma region DATA
 	public:
+		/// <summary>
+		/// <para> Major-order collection of register chunks used by this Matrix. </para>
+		/// <para> If this Matrix is column-major, this is a collection of columns. Otherwise, it is a collection of rows. </para>
+		/// <para> 
+		///		If a major chunk can be stored with just one register, this will be a collection of registers. 
+		///		Otherwise, it will be a collection of collections of registers.
+		/// </para>
+		/// </summary>
 		data_type major_chunks;
 #pragma endregion
 	};
