@@ -258,7 +258,7 @@ namespace EmuMath
 			EmuConcepts::EmuFastMatrix Lhs_, EmuConcepts::EmuFastMatrix Rhs_,
 			std::size_t RegisterIndex_, std::size_t LhsRowIndex_, std::size_t...RhsRowIndicesExcept0_
 		>
-		[[nodiscard]] static constexpr inline register_type _multiply_squares_chunk_lhsrm_rhsrm(Lhs_&& lhs_, Rhs_&& rhs_)
+		[[nodiscard]] static constexpr inline register_type _multiply_chunk_segment_rm_rm(Lhs_&& lhs_, Rhs_&& rhs_)
 		{
 			using _lhs_uq = typename EmuCore::TMP::remove_ref_cv<Lhs_>::type;
 			constexpr std::size_t calc_per_element_per_width = _lhs_uq::per_element_width;
@@ -272,7 +272,6 @@ namespace EmuMath
 			}
 			else
 			{
-				register_type lhs_major = std::forward<Lhs_>(lhs_).template GetRegister<LhsRowIndex_, RegisterIndex_>();
 				register_type result = EmuSIMD::mul_all<calc_per_element_per_width>
 				(
 					std::forward<Lhs_>(lhs_).template GetRegisterOfIndex<0, LhsRowIndex_>(),
@@ -298,7 +297,7 @@ namespace EmuMath
 			std::size_t LhsRowIndex_, EmuConcepts::EmuFastMatrix Lhs_, EmuConcepts::EmuFastMatrix Rhs_,
 			std::size_t...LhsRowIndices_, std::size_t...RhsRowIndicesExcept0_, std::size_t...RegisterIndices_
 		>
-		[[nodiscard]] static constexpr inline auto _do_squares_multiply_multi_registers_for_chunk_lhsrm_rhsrm
+		[[nodiscard]] static constexpr inline auto _do_multiply_multi_registers_for_chunk_rm_rm
 		(
 			Lhs_&& lhs_,
 			Rhs_&& rhs_,
@@ -311,7 +310,7 @@ namespace EmuMath
 			using _out_mat = FastMatrix<_rhs_uq::num_columns, _lhs_uq::num_rows, typename _lhs_uq::value_type, _lhs_uq::is_column_major, _lhs_uq::register_width>;
 			return typename _out_mat::major_chunk_type
 			({
-				_multiply_squares_chunk_lhsrm_rhsrm<Lhs_, Rhs_, RegisterIndices_, LhsRowIndex_, RhsRowIndicesExcept0_...>
+				_multiply_chunk_segment_rm_rm<Lhs_, Rhs_, RegisterIndices_, LhsRowIndex_, RhsRowIndicesExcept0_...>
 				(
 					std::forward<Lhs_>(lhs_),
 					std::forward<Rhs_>(rhs_)
@@ -324,7 +323,7 @@ namespace EmuMath
 			EmuConcepts::EmuFastMatrix Lhs_, EmuConcepts::EmuFastMatrix Rhs_,
 			std::size_t...LhsRowIndices_, std::size_t...RhsRowIndicesExcept0_, std::size_t...RegisterIndices_
 		>
-		[[nodiscard]] static constexpr inline auto _do_squares_multiply_multi_registers_lhsrm_rhsrm
+		[[nodiscard]] static constexpr inline auto _do_multiply_multi_registers_rm_rm
 		(
 			Lhs_&& lhs_,
 			Rhs_&& rhs_,
@@ -338,7 +337,7 @@ namespace EmuMath
 			using _out_mat = FastMatrix<_rhs_uq::num_columns, _lhs_uq::num_rows, typename _lhs_uq::value_type, _lhs_uq::is_column_major, _lhs_uq::register_width>;
 			return _out_mat
 			(
-				_do_squares_multiply_multi_registers_for_chunk_lhsrm_rhsrm<LhsRowIndices_>
+				_do_multiply_multi_registers_for_chunk_rm_rm<LhsRowIndices_>
 				(
 					std::forward<Lhs_>(lhs_),
 					std::forward<Rhs_>(rhs_),
@@ -349,7 +348,7 @@ namespace EmuMath
 		}
 
 		template<EmuConcepts::EmuFastMatrix Lhs_, EmuConcepts::EmuFastMatrix Rhs_, std::size_t...LhsRowIndices_, std::size_t...RhsRowIndicesExcept0_>
-		[[nodiscard]] static constexpr inline auto _do_multiply_lhsrm_rhsrm
+		[[nodiscard]] static constexpr inline auto _do_multiply_rm_rm
 		(
 			Lhs_&& lhs_,
 			Rhs_&& rhs_,
@@ -364,56 +363,32 @@ namespace EmuMath
 				EmuCore::TMP::remove_ref_cv_t<Lhs_>::register_width
 			>
 		{
-			// TODO: BETTER GENERALISE
 			using _lhs_uq = typename EmuCore::TMP::remove_ref_cv<Lhs_>::type;
 			using _rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
 			using _out_mat = FastMatrix<_rhs_uq::num_columns, _lhs_uq::num_rows, typename _lhs_uq::value_type, _lhs_uq::is_column_major, _lhs_uq::register_width>;
-			constexpr bool both_square = _lhs_uq::num_columns == _lhs_uq::num_rows && _rhs_uq::num_columns == _rhs_uq::num_rows;
 
-			if constexpr(both_square)
+			if constexpr (_out_mat::num_registers_per_major > 1)
 			{
-				if constexpr(_lhs_uq::num_registers_per_major == 1)
-				{
-					return _out_mat
-					(
-						_multiply_squares_chunk_lhsrm_rhsrm<Lhs_, Rhs_, 0, LhsRowIndices_, RhsRowIndicesExcept0_...>
-						(
-							std::forward<Lhs_>(lhs_),
-							std::forward<Rhs_>(rhs_)
-						)...
-					);
-				}
-				else
-				{
-					return _do_squares_multiply_multi_registers_lhsrm_rhsrm
-					(
-						std::forward<Lhs_>(lhs_),
-						std::forward<Rhs_>(rhs_),
-						std::index_sequence<LhsRowIndices_...>(),
-						std::index_sequence<RhsRowIndicesExcept0_...>(),
-						std::make_index_sequence<_lhs_uq::num_registers_per_major>()
-					);
-				}
+				using register_indices = std::make_index_sequence<_out_mat::num_registers_per_major>;
+				return _do_multiply_multi_registers_rm_rm
+				(
+					std::forward<Lhs_>(lhs_),
+					std::forward<Rhs_>(rhs_),
+					std::index_sequence<LhsRowIndices_...>(),
+					std::index_sequence<RhsRowIndicesExcept0_...>(),
+					register_indices()
+				);
 			}
 			else
 			{
-				// TODO: NON-SQUARE MULT
-				if constexpr (_lhs_uq::num_registers_per_major == 1 && _rhs_uq::num_registers_per_major == 1 && _out_mat::num_registers_per_major == 1)
-				{
-					// We can fallback to the basic square implementation here
-					return _do_squares_multiply_multi_registers_lhsrm_rhsrm
+				return _out_mat
+				(
+					_multiply_chunk_segment_rm_rm<Lhs_, Rhs_, 0, LhsRowIndices_, RhsRowIndicesExcept0_...>
 					(
 						std::forward<Lhs_>(lhs_),
-						std::forward<Rhs_>(rhs_),
-						std::index_sequence<LhsRowIndices_...>(),
-						std::index_sequence<RhsRowIndicesExcept0_...>(),
-						std::make_index_sequence<_lhs_uq::num_registers_per_major>()
-					);
-				}
-				else
-				{
-					return {};
-				}
+						std::forward<Rhs_>(rhs_)
+					)...
+				);
 			}
 		}
 
@@ -438,7 +413,7 @@ namespace EmuMath
 					_rhs_fast_mat_uq::num_rows
 				);
 				using rhs_row_indices_except_0 = EmuCore::TMP::make_offset_index_sequence<1, rhs_used_size - 1>;
-				return _do_multiply_lhsrm_rhsrm(*this, std::forward<RhsFastMatrix_>(rhs_), lhs_row_indices(), rhs_row_indices_except_0());
+				return _do_multiply_rm_rm(*this, std::forward<RhsFastMatrix_>(rhs_), lhs_row_indices(), rhs_row_indices_except_0());
 			}
 		}
 #pragma endregion
