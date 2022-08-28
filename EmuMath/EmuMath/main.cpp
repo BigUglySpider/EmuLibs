@@ -821,42 +821,47 @@ int main()
 	);
 	constexpr auto fast8x8_in_b = fast8x8_in_a.Transpose();
 	
-	auto fast8x8_a = EmuMath::FastMatrix<8, 7, float, tests_column_major>
-	(
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<0, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<0, 4>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<1, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<1, 4>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<2, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<2, 4>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<3, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<3, 4>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<4, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<4, 4>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<5, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<5, 4>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<6, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<6, 4>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<7, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<7, 4>())
-	);
-	auto fast8x8_b = EmuMath::FastMatrix<7, 8, float, tests_column_major>
-	(
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<0, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<0, 4>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<1, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<1, 4>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<2, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<2, 4>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<3, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<3, 4>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<4, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<4, 4>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<5, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<5, 4>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<6, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<6, 4>())
-	);
+	//auto fast8x8_a = EmuMath::FastMatrix<8, 7, float, tests_column_major>
+	//(
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<0, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<0, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<1, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<1, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<2, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<2, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<3, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<3, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<4, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<4, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<5, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<5, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<6, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<6, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<7, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_a.data<7, 4>())
+	//);
+	//auto fast8x8_b = EmuMath::FastMatrix<7, 8, float, tests_column_major>
+	//(
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<0, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<0, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<1, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<1, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<2, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<2, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<3, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<3, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<4, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<4, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<5, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<5, 4>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<6, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast8x8_in_b.data<6, 4>())
+	//);
+	//auto fast8x8_a = EmuMath::Helpers::fast_matrix_load<EmuMath::FastMatrix<8, 7, float, tests_column_major>>(fast8x8_in_a);
+	//auto fast8x8_b = EmuMath::Helpers::fast_matrix_load<EmuMath::FastMatrix<7, 8, float, tests_column_major>>(fast8x8_in_b);
+	auto fast8x8_a = EmuMath::FastMatrix<8, 7, float, tests_column_major>(fast8x8_in_a);
+	auto fast8x8_b = EmuMath::FastMatrix<7, 8, float, tests_column_major>(fast8x8_in_b);
+
 	std::cout << fast8x8_a << "\nMUL\n" << fast8x8_b << "\n=\n" << (fast8x8_a * fast8x8_b) << "\n\n";
 	std::cout << "Scalar result:\n" << (fast8x8_in_a * fast8x8_in_b) << "\n\n";
 	std::cout << "REVERSED: " << fast8x8_a << "\nMUL\n" << fast8x8_b << "\n=\n" << (fast8x8_b * fast8x8_a) << "\n\n";
@@ -882,20 +887,22 @@ int main()
 	);
 	constexpr auto fast4x4_in_b = fast4x4_in_a.Transpose();
 
-	auto fast4x4_a = EmuMath::FastMatrix<4, 4, float, tests_column_major>
-	(
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_a.data<0, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_a.data<1, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_a.data<2, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_a.data<3, 0>())
-	);
-	auto fast4x4_b = EmuMath::FastMatrix<4, 4, float, tests_column_major>
-	(
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_b.data<0, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_b.data<1, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_b.data<2, 0>()),
-		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_b.data<3, 0>())
-		);
+	//auto fast4x4_a = EmuMath::FastMatrix<4, 4, float, tests_column_major>
+	//(
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_a.data<0, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_a.data<1, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_a.data<2, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_a.data<3, 0>())
+	//);
+	//auto fast4x4_b = EmuMath::FastMatrix<4, 4, float, tests_column_major>
+	//(
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_b.data<0, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_b.data<1, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_b.data<2, 0>()),
+	//	EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, tests_column_major>::register_type>(fast4x4_in_b.data<3, 0>())
+	//);
+	auto fast4x4_a = EmuMath::FastMatrix<4, 4, float, tests_column_major>(fast4x4_in_a);
+	auto fast4x4_b = EmuMath::FastMatrix<4, 4, float, tests_column_major>(fast4x4_in_b);
 	std::cout << fast4x4_a << "\nMUL\n" << fast4x4_b << "\n=\n" << fast4x4_a.Multiply(fast4x4_b) << "\n\n";
 	std::cout << "Scalar result:\n" << (fast4x4_in_a * fast4x4_in_b) << "\n\n";
 	std::cout << "REVERSED: " << fast4x4_a << "\nMUL\n" << fast4x4_b << "\n=\n" << fast4x4_b.Multiply(fast4x4_a) << "\n\n";

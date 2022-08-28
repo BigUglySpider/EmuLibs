@@ -58,6 +58,7 @@ namespace EmuMath
 		/// <summary> The total nubmer of registers used to store this Matrix, including partial ones if needed. </summary>
 		static constexpr std::size_t total_num_registers = num_registers_per_major * num_major_elements;
 		static constexpr std::size_t num_elements_per_register = register_width / per_element_width;
+		static constexpr std::size_t num_elements_in_partial_registers = majors_require_partial_register ? (num_non_major_elements % num_elements_per_register) : 0;
 
 		using major_chunk_type = typename std::conditional<(num_registers_per_major <= 1), register_type, std::array<register_type, num_registers_per_major>>::type;
 		using data_type = std::array<major_chunk_type, num_major_elements>;
@@ -66,41 +67,6 @@ namespace EmuMath
 
 #pragma region CONSTRUCTION_HELPERS
 	private:
-		template<EmuConcepts::EmuMatrix ScalarMatrix_, std::size_t...MajorIndices_>
-		[[nodiscard]] static constexpr inline data_type _make_data_from_scalar_matrix(ScalarMatrix_&& scalar_matrix_, std::index_sequence<MajorIndices_...> major_indices_)
-		{
-			using _in_scalar_mat_uq = typename EmuCore::TMP::remove_ref_cv<ScalarMatrix_>::type;
-			if constexpr (_in_scalar_mat_uq::is_column_major == is_column_major)
-			{
-				if constexpr (num_registers_per_major == 1)
-				{
-					if constexpr (is_column_major)
-					{
-						return data_type
-						({
-							EmuSIMD::load<register_type>(std::forward<ScalarMatrix_>(scalar_matrix_).template data<MajorIndices_, 0>())...
-						});
-					}
-					else
-					{
-						return data_type
-						({
-							EmuSIMD::load<register_type>(std::forward<ScalarMatrix_>(scalar_matrix_).template data<0, MajorIndices_>())...
-						});
-					}
-				}
-				else
-				{
-					// TODO: Sequential load of major chunks where > 1 register per chunk
-				}
-			}
-			else
-			{
-				// TODO: Set only when loading mismatched major
-
-			}
-		}
-
 		template<EmuConcepts::EmuFastVector...FastMajorVectors_, std::size_t...MajorIndices_>
 		[[nodiscard]] static constexpr inline data_type _make_data_from_fast_vectors(std::index_sequence<MajorIndices_...> major_indices_, FastMajorVectors_&&...fast_major_vectors_)
 		{
@@ -154,8 +120,8 @@ namespace EmuMath
 		constexpr inline FastMatrix(const this_type&) noexcept = default;
 
 		template<EmuConcepts::EmuMatrix ScalarMatrix_>
-		constexpr inline FastMatrix(ScalarMatrix_&& scalar_matrix_to_load_) :
-			major_chunks(_make_data_from_scalar_matrix(std::forward<ScalarMatrix_>(scalar_matrix_to_load_), major_index_sequence()))
+		constexpr inline FastMatrix(ScalarMatrix_&& scalar_matrix_to_load_) noexcept :
+			major_chunks(EmuMath::Helpers::fast_matrix_load_data_type<this_type>(std::forward<ScalarMatrix_>(scalar_matrix_to_load_)))
 		{
 		}
 
