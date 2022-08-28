@@ -252,169 +252,19 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region ARITHMETIC
-	private:
-		template
-		<
-			EmuConcepts::EmuFastMatrix Lhs_, EmuConcepts::EmuFastMatrix Rhs_,
-			std::size_t RegisterIndex_, std::size_t LhsRowIndex_, std::size_t...RhsRowIndicesExcept0_
-		>
-		[[nodiscard]] static constexpr inline register_type _multiply_chunk_segment_rm_rm(Lhs_&& lhs_, Rhs_&& rhs_)
-		{
-			using _lhs_uq = typename EmuCore::TMP::remove_ref_cv<Lhs_>::type;
-			constexpr std::size_t calc_per_element_per_width = _lhs_uq::per_element_width;
-			if constexpr (sizeof...(RhsRowIndicesExcept0_) == 0)
-			{
-				return EmuSIMD::mul_all<calc_per_element_per_width>
-				(
-					std::forward<Lhs_>(lhs_).template GetRegisterOfIndex<0, LhsRowIndex_>(),
-					std::forward<Rhs_>(rhs_).template GetRegister<0, RegisterIndex_>()
-				);
-			}
-			else
-			{
-				register_type result = EmuSIMD::mul_all<calc_per_element_per_width>
-				(
-					std::forward<Lhs_>(lhs_).template GetRegisterOfIndex<0, LhsRowIndex_>(),
-					std::forward<Rhs_>(rhs_).template GetRegister<0, RegisterIndex_>()
-				);
-
-				(
-					(
-						result = EmuSIMD::fmadd<calc_per_element_per_width>
-						(
-							std::forward<Lhs_>(lhs_).template GetRegisterOfIndex<RhsRowIndicesExcept0_, LhsRowIndex_>(),
-							std::forward<Rhs_>(rhs_).template GetRegister<RhsRowIndicesExcept0_, RegisterIndex_>(),
-							result
-						)
-					), ...
-				);
-				return result;
-			}
-		}
-
-		template
-		<
-			std::size_t LhsRowIndex_, EmuConcepts::EmuFastMatrix Lhs_, EmuConcepts::EmuFastMatrix Rhs_,
-			std::size_t...LhsRowIndices_, std::size_t...RhsRowIndicesExcept0_, std::size_t...RegisterIndices_
-		>
-		[[nodiscard]] static constexpr inline auto _do_multiply_multi_registers_for_chunk_rm_rm
-		(
-			Lhs_&& lhs_,
-			Rhs_&& rhs_,
-			std::index_sequence<RhsRowIndicesExcept0_...> rhs_row_indices_except_0_,
-			std::index_sequence<RegisterIndices_...> register_indices_
-		)
-		{
-			using _lhs_uq = typename EmuCore::TMP::remove_ref_cv<Lhs_>::type;
-			using _rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
-			using _out_mat = FastMatrix<_rhs_uq::num_columns, _lhs_uq::num_rows, typename _lhs_uq::value_type, _lhs_uq::is_column_major, _lhs_uq::register_width>;
-			return typename _out_mat::major_chunk_type
-			({
-				_multiply_chunk_segment_rm_rm<Lhs_, Rhs_, RegisterIndices_, LhsRowIndex_, RhsRowIndicesExcept0_...>
-				(
-					std::forward<Lhs_>(lhs_),
-					std::forward<Rhs_>(rhs_)
-				)...
-			});
-		}
-
-		template
-		<
-			EmuConcepts::EmuFastMatrix Lhs_, EmuConcepts::EmuFastMatrix Rhs_,
-			std::size_t...LhsRowIndices_, std::size_t...RhsRowIndicesExcept0_, std::size_t...RegisterIndices_
-		>
-		[[nodiscard]] static constexpr inline auto _do_multiply_multi_registers_rm_rm
-		(
-			Lhs_&& lhs_,
-			Rhs_&& rhs_,
-			std::index_sequence<LhsRowIndices_...> lhs_row_indices_,
-			std::index_sequence<RhsRowIndicesExcept0_...> rhs_row_indices_except_0_,
-			std::index_sequence<RegisterIndices_...> register_indices_
-		)
-		{
-			using _lhs_uq = typename EmuCore::TMP::remove_ref_cv<Lhs_>::type;
-			using _rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
-			using _out_mat = FastMatrix<_rhs_uq::num_columns, _lhs_uq::num_rows, typename _lhs_uq::value_type, _lhs_uq::is_column_major, _lhs_uq::register_width>;
-			return _out_mat
-			(
-				_do_multiply_multi_registers_for_chunk_rm_rm<LhsRowIndices_>
-				(
-					std::forward<Lhs_>(lhs_),
-					std::forward<Rhs_>(rhs_),
-					std::index_sequence<RhsRowIndicesExcept0_...>(),
-					std::index_sequence<RegisterIndices_...>()
-				)...
-			);
-		}
-
-		template<EmuConcepts::EmuFastMatrix Lhs_, EmuConcepts::EmuFastMatrix Rhs_, std::size_t...LhsRowIndices_, std::size_t...RhsRowIndicesExcept0_>
-		[[nodiscard]] static constexpr inline auto _do_multiply_rm_rm
-		(
-			Lhs_&& lhs_,
-			Rhs_&& rhs_,
-			std::index_sequence<LhsRowIndices_...> lhs_row_indices_,
-			std::index_sequence<RhsRowIndicesExcept0_...> rhs_row_indices_except_0_
-		) -> EmuMath::FastMatrix
-			<
-				EmuCore::TMP::remove_ref_cv_t<Rhs_>::num_columns,
-				EmuCore::TMP::remove_ref_cv_t<Lhs_>::num_rows,
-				typename EmuCore::TMP::remove_ref_cv_t<Lhs_>::value_type,
-				EmuCore::TMP::remove_ref_cv_t<Lhs_>::is_column_major,
-				EmuCore::TMP::remove_ref_cv_t<Lhs_>::register_width
-			>
-		{
-			using _lhs_uq = typename EmuCore::TMP::remove_ref_cv<Lhs_>::type;
-			using _rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
-			using _out_mat = FastMatrix<_rhs_uq::num_columns, _lhs_uq::num_rows, typename _lhs_uq::value_type, _lhs_uq::is_column_major, _lhs_uq::register_width>;
-
-			if constexpr (_out_mat::num_registers_per_major > 1)
-			{
-				using register_indices = std::make_index_sequence<_out_mat::num_registers_per_major>;
-				return _do_multiply_multi_registers_rm_rm
-				(
-					std::forward<Lhs_>(lhs_),
-					std::forward<Rhs_>(rhs_),
-					std::index_sequence<LhsRowIndices_...>(),
-					std::index_sequence<RhsRowIndicesExcept0_...>(),
-					register_indices()
-				);
-			}
-			else
-			{
-				return _out_mat
-				(
-					_multiply_chunk_segment_rm_rm<Lhs_, Rhs_, 0, LhsRowIndices_, RhsRowIndicesExcept0_...>
-					(
-						std::forward<Lhs_>(lhs_),
-						std::forward<Rhs_>(rhs_)
-					)...
-				);
-			}
-		}
-
 	public:
+		/// <summary>
+		/// <para> Standard MAT*MAT multiplication, treating this Matrix as the left-hand operand and the passed Matrix as the right-hand operand. </para>
+		/// <para> This is not available where `this_matrix * rhs` is an invalid matrix multiplication operation. </para>
+		/// </summary>
+		/// <param name="rhs_fast_matrix_">FastMatrix appearing on the right-hand side of Matrix multiplication.</param>
+		/// <returns>EmuMath FastMatrix containing resulting from multiply this Matrix with the passed right-hand Matrix.</returns>
 		template<EmuConcepts::EmuFastMatrix RhsFastMatrix_>
 		requires EmuConcepts::EmuFastMatrixMultPair<this_type, RhsFastMatrix_>
 		[[nodiscard]] constexpr inline auto Multiply(RhsFastMatrix_&& rhs_) const
 			-> EmuMath::FastMatrix<EmuCore::TMP::remove_ref_cv_t<RhsFastMatrix_>::num_columns, num_rows, value_type, is_column_major, register_width>
 		{
-			if constexpr (is_column_major)
-			{
-				// TODO: Support for more than RM*RM
-			}
-			else
-			{
-				using _rhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<RhsFastMatrix_>::type;
-				using lhs_row_indices = std::make_index_sequence<num_rows>;
-				constexpr std::size_t rhs_used_size =
-				(
-					_rhs_fast_mat_uq::num_columns < _rhs_fast_mat_uq::num_rows ?
-					_rhs_fast_mat_uq::num_columns :
-					_rhs_fast_mat_uq::num_rows
-				);
-				using rhs_row_indices_except_0 = EmuCore::TMP::make_offset_index_sequence<1, rhs_used_size - 1>;
-				return _do_multiply_rm_rm(*this, std::forward<RhsFastMatrix_>(rhs_), lhs_row_indices(), rhs_row_indices_except_0());
-			}
+			return EmuMath::Helpers::fast_matrix_multiply(*this, std::forward<RhsFastMatrix_>(rhs_));
 		}
 #pragma endregion
 

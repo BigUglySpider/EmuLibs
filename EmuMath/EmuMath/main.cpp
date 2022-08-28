@@ -809,16 +809,6 @@ int main()
 
 
 
-
-
-
-
-
-
-
-
-
-
 	constexpr auto fast8x8_in_a = EmuMath::Matrix<8, 7, float, false>
 	(
 		1, 2, 3, 4, 5, 6, 7, 8,
@@ -867,9 +857,9 @@ int main()
 		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, false>::register_type>(fast8x8_in_b.data<0, 7>()),
 		EmuSIMD::load<EmuMath::FastMatrix<8, 8, float, false>::register_type>(fast8x8_in_b.data<4, 7>())
 	);
-	std::cout << fast8x8_a << "\nMUL\n" << fast8x8_b << "\n=\n" << fast8x8_a.Multiply(fast8x8_b) << "\n\n";
+	std::cout << fast8x8_a << "\nMUL\n" << fast8x8_b << "\n=\n" << (fast8x8_a * fast8x8_b) << "\n\n";
 	std::cout << "Scalar result:\n" << (fast8x8_in_a * fast8x8_in_b) << "\n\n";
-	std::cout << "REVERSED: " << fast8x8_a << "\nMUL\n" << fast8x8_b << "\n=\n" << fast8x8_b.Multiply(fast8x8_a) << "\n\n";
+	std::cout << "REVERSED: " << fast8x8_a << "\nMUL\n" << fast8x8_b << "\n=\n" << (fast8x8_b * fast8x8_a) << "\n\n";
 	std::cout << "REVERSED: " << "Scalar result:\n" << (fast8x8_in_b * fast8x8_in_a) << "\n\n";
 
 	system("pause");
