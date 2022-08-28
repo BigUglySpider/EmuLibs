@@ -723,35 +723,8 @@ int main()
 	
 	constexpr auto fast_mat_in_scalar_a = EmuMath::Helpers::matrix_ortho_vk<float, true>(0, 0, 1920, 1080, 0.001, 1000);
 	constexpr auto fast_mat_in_scalar_b = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-	std::cout << EmuMath::FastMatrix<4, 4, float>(fast_mat_in_scalar_a) << "\n\n";
-	std::cout << EmuMath::FastMatrix<4, 4, float>(fast_mat_in_scalar_b) << "\n\n";
-
-	auto another_runtime_mat_yay = EmuMath::Matrix<4, 4, float, true>(1337);
-	std::cout << "Before: \n" << another_runtime_mat_yay << "\n\n";
-	EmuMath::Helpers::fast_matrix_store(EmuMath::FastMatrix<4, 4, float>(fast_mat_in_scalar_b), another_runtime_mat_yay);
-	std::cout << "After: \n" << another_runtime_mat_yay << "\n\n";
 
 
-	auto woo = EmuMath::FastMatrix<4, 4, float, false>(fast_mat_in_scalar_a).Multiply(EmuMath::FastMatrix<4, 4, float, true>(fast_mat_in_scalar_b));
-	std::cout << "By fast: \n" <<  woo << "\n\n";
-	std::cout << "By scalar: \n" << (fast_mat_in_scalar_a * fast_mat_in_scalar_b) << "\n\n";
-	std::cout << EmuMath::FastMatrix<4, 4, float, false>(fast_mat_in_scalar_b) << "\n\n";
-	std::cout << EmuMath::FastMatrix<4, 4, float, false>(fast_mat_in_scalar_b).Transpose() << "\n\n";
-
-	constexpr auto test_scalar_a = EmuMath::Matrix<6, 5, float, false>
-		(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30);
-	auto test_fast_a = EmuMath::FastMatrix<6, 5, float, false>(test_scalar_a);
-	std::cout << test_fast_a << "\n\n" << test_fast_a.Transpose() << "\n\n";
-
-	DirectX::XMFLOAT4X4 dxm_storage = {};
-	EmuMath::Matrix<4, 4, float, false> emum_storage = {};
-	constexpr auto test_storage = EmuMath::Matrix<4, 4, float, false>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-	auto testdxm = DirectX::XMLoadFloat4x4(reinterpret_cast<const DirectX::XMFLOAT4X4*>(test_storage.data()));
-	auto testemum = EmuMath::FastMatrix<4, 4, float, false>(test_storage);
-
-	std::cout << "TEST OF MATRIX MULTIPLIES\n";
-	auto dxm_res = DirectX::XMMatrixMultiply(testdxm, testdxm);
-	auto emum_res = EmuMath::Helpers::fast_matrix_multiply(testemum, testemum);
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####
@@ -847,9 +820,6 @@ int main()
 #pragma region TEST_HARNESS_EXECUTION
 	system("pause");
 	EmuCore::TestingHelpers::PerformTests();
-	DirectX::XMStoreFloat4x4(&dxm_storage, dxm_res);
-	print_mat4x4(dxm_storage) << "\n";
-	std::cout << emum_res << "\n";
 #pragma endregion
 	//std::cout << result.Add(rand()) << " :)";
 	return 0;
