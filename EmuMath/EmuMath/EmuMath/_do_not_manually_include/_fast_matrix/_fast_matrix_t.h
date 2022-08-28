@@ -198,7 +198,7 @@ namespace EmuMath
 #pragma endregion
 
 #pragma region GETS
-	private:
+	public:
 		template<std::size_t MajorIndex_, std::size_t RegisterIndex_ = 0>
 		[[nodiscard]] constexpr inline register_type& GetRegister()
 		{
@@ -398,6 +398,22 @@ namespace EmuMath
 			else
 			{
 				// TODO: NON-SQUARE MULT
+				if constexpr (_lhs_uq::num_registers_per_major == 1 && _rhs_uq::num_registers_per_major == 1 && _out_mat::num_registers_per_major == 1)
+				{
+					// We can fallback to the basic square implementation here
+					return _do_squares_multiply_multi_registers_lhsrm_rhsrm
+					(
+						std::forward<Lhs_>(lhs_),
+						std::forward<Rhs_>(rhs_),
+						std::index_sequence<LhsRowIndices_...>(),
+						std::index_sequence<RhsRowIndicesExcept0_...>(),
+						std::make_index_sequence<_lhs_uq::num_registers_per_major>()
+					);
+				}
+				else
+				{
+					return {};
+				}
 			}
 		}
 
@@ -407,11 +423,23 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline auto Multiply(RhsFastMatrix_&& rhs_) const
 			-> EmuMath::FastMatrix<EmuCore::TMP::remove_ref_cv_t<RhsFastMatrix_>::num_columns, num_rows, value_type, is_column_major, register_width>
 		{
-			// TODO: Support for more than RM*RM
-			using _rhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<RhsFastMatrix_>::type;
-			using lhs_row_indices = std::make_index_sequence<num_rows>;
-			using rhs_row_indices_except_0 = EmuCore::TMP::make_offset_index_sequence<1, _rhs_fast_mat_uq::num_rows - 1>;
-			return _do_multiply_lhsrm_rhsrm(*this, std::forward<RhsFastMatrix_>(rhs_), lhs_row_indices(), rhs_row_indices_except_0());
+			if constexpr (is_column_major)
+			{
+				// TODO: Support for more than RM*RM
+			}
+			else
+			{
+				using _rhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<RhsFastMatrix_>::type;
+				using lhs_row_indices = std::make_index_sequence<num_rows>;
+				constexpr std::size_t rhs_used_size =
+				(
+					_rhs_fast_mat_uq::num_columns < _rhs_fast_mat_uq::num_rows ?
+					_rhs_fast_mat_uq::num_columns :
+					_rhs_fast_mat_uq::num_rows
+				);
+				using rhs_row_indices_except_0 = EmuCore::TMP::make_offset_index_sequence<1, rhs_used_size - 1>;
+				return _do_multiply_lhsrm_rhsrm(*this, std::forward<RhsFastMatrix_>(rhs_), lhs_row_indices(), rhs_row_indices_except_0());
+			}
 		}
 #pragma endregion
 
@@ -468,7 +496,7 @@ inline std::ostream& operator<<(std::ostream& str_, const EmuMath::FastMatrix<Nu
 	}
 	else
 	{
-		str_ << "oops, not done non 4x4/8x8 output yet";
+		str_ << "oops, not done non-square 4x4-8x8 output yet";
 	}
 	return str_;
 }

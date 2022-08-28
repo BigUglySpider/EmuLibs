@@ -25,6 +25,11 @@ namespace EmuMath::TMP
 
 namespace EmuConcepts
 {
+	/// <summary>
+	/// <para> Concept representing a pair of types meeting the `EmuFastMatrix` concept which can additionally be multiplied in the given order. </para>
+	/// <para> Multiplication order is important; `Lhs_ * Rhs_` may not be a valid multiplication, while `Rhs_ * Lhs_` may be valid, for example. </para>
+	/// <para> If Lhs_ is column-major, Rhs_ may have any major-order. Otherwise, Lhs_ and Rhs_ must have the same major-order. </para>
+	/// </summary>
 	template<class Lhs_, class Rhs_>
 	concept EmuFastMatrixMultPair =
 	(
@@ -32,7 +37,11 @@ namespace EmuConcepts
 		(EmuConcepts::EmuFastMatrix<Rhs_>) &&
 		(EmuCore::TMP::remove_ref_cv_t<Lhs_>::num_columns == EmuCore::TMP::remove_ref_cv_t<Rhs_>::num_rows) &&
 		(EmuCore::TMP::remove_ref_cv_t<Lhs_>::register_width == EmuCore::TMP::remove_ref_cv_t<Rhs_>::register_width) &&
-		(std::is_same_v<typename EmuCore::TMP::remove_ref_cv_t<Lhs_>::value_type, typename EmuCore::TMP::remove_ref_cv_t<Rhs_>::value_type>)
+		(std::is_same_v<typename EmuCore::TMP::remove_ref_cv_t<Lhs_>::value_type, typename EmuCore::TMP::remove_ref_cv_t<Rhs_>::value_type>) &&
+		(
+			(EmuCore::TMP::remove_ref_cv_t<Lhs_>::is_column_major) ||
+			(EmuCore::TMP::remove_ref_cv_t<Lhs_>::is_column_major == EmuCore::TMP::remove_ref_cv_t<Rhs_>::is_column_major)
+		)
 	);
 }
 
