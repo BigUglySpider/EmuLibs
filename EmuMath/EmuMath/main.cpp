@@ -724,7 +724,7 @@ int main()
 	constexpr auto fast_mat_in_scalar_a = EmuMath::Helpers::matrix_ortho_vk<float, true>(0, 0, 1920, 1080, 0.001, 1000);
 	constexpr auto fast_mat_in_scalar_b = EmuMath::Matrix<4, 4, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 
-
+	auto etjner = EmuMath::FastMatrix<4, 4, float, true, 128>(__m128(), __m128(), __m128(), __m128());
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

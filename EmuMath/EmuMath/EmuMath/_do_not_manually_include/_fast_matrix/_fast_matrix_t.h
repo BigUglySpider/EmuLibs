@@ -102,7 +102,21 @@ namespace EmuMath
 		template<EmuConcepts::EmuFastVector...FastMajorVectors_, std::size_t...MajorIndices_>
 		[[nodiscard]] static constexpr inline data_type _make_data_from_fast_vectors(std::index_sequence<MajorIndices_...> major_indices_, FastMajorVectors_&&...fast_major_vectors_)
 		{
+			// TODO: Better checks
 			return data_type({ std::forward<FastMajorVectors_>(fast_major_vectors_).data... });
+		}
+
+		template<EmuConcepts::KnownSIMD...Registers_, std::size_t...MajorIndices_>
+		[[nodiscard]] static constexpr inline data_type _make_data_from_registers(std::index_sequence<MajorIndices_...> major_indices_, Registers_&&...registers_)
+		{
+			if constexpr (num_registers_per_major == 1)
+			{
+				return data_type({ std::forward<Registers_>(registers_)... });
+			}
+			else
+			{
+				// TODO: Multi-register chunks construction from register args
+			}
 		}
 #pragma endregion
 
@@ -127,78 +141,146 @@ namespace EmuMath
 			major_chunks(_make_data_from_fast_vectors(major_index_sequence(), std::forward<MajorFastVectors_>(major_vectors_)...))
 		{
 		}
+
+		template
+		<
+			EmuConcepts::KnownSIMD...Registers_,
+			typename = std::enable_if_t
+			<
+				sizeof...(Registers_) == total_num_registers
+			>
+		>
+		constexpr inline FastMatrix(Registers_&&...major_order_registers_)
+			: major_chunks(_make_data_from_registers(major_index_sequence(), std::forward<Registers_>(major_order_registers_)...))
+		{
+		}
+#pragma endregion
+
+#pragma region GETS
+	private:
+		template<std::size_t MajorIndex_, std::size_t RegisterIndex_ = 0>
+		[[nodiscard]] constexpr inline register_type& GetRegister()
+		{
+			if constexpr (MajorIndex_ < num_major_elements)
+			{
+				if constexpr (RegisterIndex_ < num_registers_per_major)
+				{
+					if constexpr (num_registers_per_major > 1)
+					{
+						return major_chunks[MajorIndex_][RegisterIndex_];
+					}
+					else
+					{
+						return major_chunks[MajorIndex_];
+					}
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<RegisterIndex_>(),
+						"Attempted to retrieve a register from an EmuMath FastMatrix, but the provided Register Index exceeds the maximum register index for a major within the Matrix."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<MajorIndex_>(),
+					"Attempted to retrieve a register from an EmuMath FastMatrix, but the provided Major index exceeds the maximum major index of the Matrix."
+				);
+			}
+		}
+
+		template<std::size_t MajorIndex_, std::size_t RegisterIndex_ = 0>
+		[[nodiscard]] constexpr inline const register_type& GetRegister() const
+		{
+			return const_cast<this_type*>(this)->template GetRegister<MajorIndex_, RegisterIndex_>();
+		}
 #pragma endregion
 
 #pragma region ARITHMETIC
+	private:
+		template
+		<
+			EmuConcepts::EmuFastMatrix Lhs_, EmuConcepts::EmuFastMatrix Rhs_,
+			std::size_t RegisterIndex_, std::size_t LhsRowIndex_, std::size_t...RhsRowIndicesExcept0_
+		>
+		[[nodiscard]] static constexpr inline register_type _multiply_chunk_lhsrm_rhsrm(Lhs_&& lhs_, Rhs_&& rhs_)
+		{
+			using _lhs_uq = typename EmuCore::TMP::remove_ref_cv<Lhs_>::type;
+			constexpr std::size_t calc_per_element_per_width = _lhs_uq::per_element_width;
+			if constexpr (sizeof...(RhsRowIndicesExcept0_) == 0)
+			{
+				return EmuSIMD::mul_all<calc_per_element_per_width>
+				(
+					EmuSIMD::set_all_to_index<0, calc_per_element_per_width>(std::forward<Lhs_>(lhs_).template GetRegister<LhsRowIndex_, RegisterIndex_>()),
+					std::forward<Rhs_>(rhs_).template GetRegister<0, RegisterIndex_>()
+				);
+			}
+			else
+			{
+				register_type lhs_major = std::forward<Lhs_>(lhs_).template GetRegister<LhsRowIndex_, RegisterIndex_>();
+				register_type result = EmuSIMD::mul_all<calc_per_element_per_width>
+				(
+					EmuSIMD::set_all_to_index<0, calc_per_element_per_width>(lhs_major),
+					std::forward<Rhs_>(rhs_).template GetRegister<0, RegisterIndex_>()
+				);
+
+				(
+					(
+						result = EmuSIMD::fmadd<calc_per_element_per_width>
+						(
+							EmuSIMD::set_all_to_index<RhsRowIndicesExcept0_, calc_per_element_per_width>(lhs_major),
+							std::forward<Rhs_>(rhs_).template GetRegister<RhsRowIndicesExcept0_, RegisterIndex_>(),
+							result
+						)
+					), ...
+				);
+				return result;
+			}
+		}
+
+		template<EmuConcepts::EmuFastMatrix Lhs_, EmuConcepts::EmuFastMatrix Rhs_, std::size_t...LhsRowIndices_, std::size_t...RhsRowIndicesExcept0_>
+		[[nodiscard]] static constexpr inline auto _do_multiply_lhsrm_rhsrm
+		(
+			Lhs_&& lhs_,
+			Rhs_&& rhs_,
+			std::index_sequence<LhsRowIndices_...> lhs_row_indices_,
+			std::index_sequence<RhsRowIndicesExcept0_...> rhs_row_indices_except_0_
+		) -> EmuMath::FastMatrix
+			<
+				EmuCore::TMP::remove_ref_cv_t<Rhs_>::num_columns,
+				EmuCore::TMP::remove_ref_cv_t<Lhs_>::num_rows,
+				typename EmuCore::TMP::remove_ref_cv_t<Lhs_>::value_type,
+				EmuCore::TMP::remove_ref_cv_t<Lhs_>::is_column_major,
+				EmuCore::TMP::remove_ref_cv_t<Lhs_>::register_width
+			>
+		{
+			// TODO: BETTER GENERALISE
+			using _lhs_uq = typename EmuCore::TMP::remove_ref_cv<Lhs_>::type;
+			using _rhs_uq = typename EmuCore::TMP::remove_ref_cv<Rhs_>::type;
+			return EmuMath::FastMatrix<_rhs_uq::num_columns, _lhs_uq::num_rows, typename _lhs_uq::value_type, _lhs_uq::is_column_major, _lhs_uq::register_width>
+			(
+				_multiply_chunk_lhsrm_rhsrm<Lhs_, Rhs_, 0, LhsRowIndices_, RhsRowIndicesExcept0_...>
+				(
+					std::forward<Lhs_>(lhs_),
+					std::forward<Rhs_>(rhs_)
+				)...
+			);
+		}
+
 	public:
 		template<EmuConcepts::EmuFastMatrix RhsFastMatrix_>
 		requires EmuConcepts::EmuFastMatrixMultPair<this_type, RhsFastMatrix_>
 		[[nodiscard]] constexpr inline auto Multiply(RhsFastMatrix_&& rhs_) const
+			-> EmuMath::FastMatrix<EmuCore::TMP::remove_ref_cv_t<RhsFastMatrix_>::num_columns, num_rows, value_type, is_column_major, register_width>
 		{
-			this_type mResult;
-			register_type vW = major_chunks[0];
-			register_type vX = EmuSIMD::shuffle<0>(vW);
-			register_type vY = EmuSIMD::shuffle<1>(vW);
-			register_type vZ = EmuSIMD::shuffle<2>(vW);
-			vW = EmuSIMD::shuffle<3>(vW);
-
-			// Perform the operation on the first row
-			vX = _mm_mul_ps(vX, rhs_.major_chunks[0]);
-			vY = _mm_mul_ps(vY, rhs_.major_chunks[1]);
-			vZ = _mm_mul_ps(vZ, rhs_.major_chunks[2]);
-			vW = _mm_mul_ps(vW, rhs_.major_chunks[3]);
-			// Perform a binary add to reduce cumulative errors
-			vX = _mm_add_ps(vX, vZ);
-			vY = _mm_add_ps(vY, vW);
-			vX = _mm_add_ps(vX, vY);
-			mResult.major_chunks[0] = vX;
-			// Repeat for the other 3 rows
-
-			vW = major_chunks[1];
-			vX = EmuSIMD::shuffle<0>(vW);
-			vY = EmuSIMD::shuffle<1>(vW);
-			vZ = EmuSIMD::shuffle<2>(vW);
-			vW = EmuSIMD::shuffle<3>(vW);
-
-			vX = _mm_mul_ps(vX, rhs_.major_chunks[0]);
-			vY = _mm_mul_ps(vY, rhs_.major_chunks[1]);
-			vZ = _mm_mul_ps(vZ, rhs_.major_chunks[2]);
-			vW = _mm_mul_ps(vW, rhs_.major_chunks[3]);
-			vX = _mm_add_ps(vX, vZ);
-			vY = _mm_add_ps(vY, vW);
-			vX = _mm_add_ps(vX, vY);
-			mResult.major_chunks[1] = vX;
-
-			vW = major_chunks[2];
-			vX = EmuSIMD::shuffle<0>(vW);
-			vY = EmuSIMD::shuffle<1>(vW);
-			vZ = EmuSIMD::shuffle<2>(vW);
-			vW = EmuSIMD::shuffle<3>(vW);
-
-			vX = _mm_mul_ps(vX, rhs_.major_chunks[0]);
-			vY = _mm_mul_ps(vY, rhs_.major_chunks[1]);
-			vZ = _mm_mul_ps(vZ, rhs_.major_chunks[2]);
-			vW = _mm_mul_ps(vW, rhs_.major_chunks[3]);
-			vX = _mm_add_ps(vX, vZ);
-			vY = _mm_add_ps(vY, vW);
-			vX = _mm_add_ps(vX, vY);
-			mResult.major_chunks[2] = vX;
-
-			vW = major_chunks[3];
-			vX = EmuSIMD::shuffle<0>(vW);
-			vY = EmuSIMD::shuffle<1>(vW);
-			vZ = EmuSIMD::shuffle<2>(vW);
-			vW = EmuSIMD::shuffle<3>(vW);
-
-			vX = _mm_mul_ps(vX, rhs_.major_chunks[0]);
-			vY = _mm_mul_ps(vY, rhs_.major_chunks[1]);
-			vZ = _mm_mul_ps(vZ, rhs_.major_chunks[2]);
-			vW = _mm_mul_ps(vW, rhs_.major_chunks[3]);
-			vX = _mm_add_ps(vX, vZ);
-			vY = _mm_add_ps(vY, vW);
-			vX = _mm_add_ps(vX, vY);
-			mResult.major_chunks[3] = vX;
-			return mResult;
+			using _rhs_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<RhsFastMatrix_>::type;
+			using lhs_row_indices = std::make_index_sequence<num_rows>;
+			using rhs_row_indices_except_0 = EmuCore::TMP::make_offset_index_sequence<1, _rhs_fast_mat_uq::num_rows - 1>;
+			return _do_multiply_lhsrm_rhsrm(*this, std::forward<RhsFastMatrix_>(rhs_), lhs_row_indices(), rhs_row_indices_except_0());
 		}
 #pragma endregion
 
@@ -218,7 +300,13 @@ namespace EmuMath
 template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool IsColumnMajor_, std::size_t RegisterWidth_>
 inline std::ostream& operator<<(std::ostream& str_, const EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>& fast_matrix_)
 {
-	//str_ << fast_matrix_.Store();
+	// TODO: GENERALISE FOR ANY SIZE, NOT JUST 4x4 RM
+	EmuMath::Matrix<4, 4, float, false> mat;
+	_mm_store_ps(mat.data<0, 0>(), fast_matrix_.major_chunks[0]);
+	_mm_store_ps(mat.data<0, 1>(), fast_matrix_.major_chunks[1]);
+	_mm_store_ps(mat.data<0, 2>(), fast_matrix_.major_chunks[2]);
+	_mm_store_ps(mat.data<0, 3>(), fast_matrix_.major_chunks[3]);
+	str_ << mat;
 	return str_;
 }
 
