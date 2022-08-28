@@ -244,10 +244,32 @@ namespace EmuMath
 		[[nodiscard]] constexpr inline register_type GetRegisterOfIndex() const
 		{
 			constexpr std::size_t major_index = is_column_major ? ColumnIndex_ : RowIndex_;
-			constexpr std::size_t non_major_index = is_column_major ? RowIndex_ : ColumnIndex_;
-			constexpr std::size_t register_index = non_major_index / num_elements_per_register;
-			constexpr std::size_t element_index = non_major_index % num_elements_per_register;
-			return EmuSIMD::set_all_to_index<element_index, per_element_width>(GetRegister<major_index, register_index>());
+			if constexpr (major_index < num_major_elements)
+			{
+				constexpr std::size_t non_major_index = is_column_major ? RowIndex_ : ColumnIndex_;
+				constexpr std::size_t register_index = non_major_index / num_elements_per_register;
+				if constexpr (register_index < num_registers_per_major)
+				{
+					constexpr std::size_t element_index = non_major_index % num_elements_per_register;
+					return EmuSIMD::set_all_to_index<element_index, per_element_width>(GetRegister<major_index, register_index>());
+				}
+				else
+				{
+					static_assert
+					(
+						EmuCore::TMP::get_false<register_index>(),
+						"Attempted to make a register from a single index within an EmuMath FastMatrix, but the provided non-major index requires a register outside of the contained range of the Matrix."
+					);
+				}
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<major_index>(),
+					"Attempted to make a register from a single index within an EmuMath FastMatrix, but the provided Major index exceeds the maximum major index of the Matrix."
+				);
+			}
 		}
 #pragma endregion
 
