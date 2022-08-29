@@ -648,6 +648,43 @@ namespace EmuMath
 		{
 			EmuMath::Helpers::fast_matrix_store<FullWidth_>(*this, p_out_data_);
 		}
+
+		/// <summary>
+		/// <para> Stores this Matrix's data into a newly constructed scalar Matrix of the specified type. </para>
+		/// <para> Arguments for the output Matrix are all optional, and given in sequential order as per `EmuMath::Matrix` arguments. </para>
+		/// <para> 
+		///		Omitted arguments will default to the same argument as used to instantiate this FastMatrix, 
+		///		except for `OutT_` which will default to this FastMatrix's `value_type`.
+		/// </para>
+		/// <para> 
+		///		If this is being used to assign to an existing scalar Matrix, consider passing a reference to that Matrix instead to 
+		///		take advantage of optimised direct-stores and remove potential constructor overhead.
+		/// </para>
+		/// </summary>
+		/// <returns>Scalar EmuMath Matrix of the specified type containing data mimicking this Matrix.</returns>
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_> Store() const
+		{
+			return EmuMath::Helpers::fast_matrix_store<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_> Store() const
+		{
+			return EmuMath::Helpers::fast_matrix_store<OutNumColumns_, OutNumRows_, value_type, OutColumnMajor_>(*this);
+		}
+
+		template<typename OutT_, bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, OutT_, OutColumnMajor_> Store() const
+		{
+			return EmuMath::Helpers::fast_matrix_store<num_columns, num_rows, OutT_, OutColumnMajor_>(*this);
+		}
+
+		template<bool OutColumnMajor_ = is_column_major>
+		[[nodiscard]] constexpr inline EmuMath::Matrix<num_columns, num_rows, value_type, OutColumnMajor_> Store() const
+		{
+			return EmuMath::Helpers::fast_matrix_store<num_columns, num_rows, value_type, OutColumnMajor_>(*this);
+		}
 #pragma endregion
 
 #pragma region ARITHMETIC
@@ -691,10 +728,7 @@ namespace EmuMath
 template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool IsColumnMajor_, std::size_t RegisterWidth_>
 inline std::ostream& operator<<(std::ostream& str_, const EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>& fast_matrix_)
 {
-	// TODO: GENERALISE FOR ANY SIZE, NOT JUST 4x4/8x8
-	auto mat = EmuMath::Matrix<NumColumns_, NumRows_, T_, IsColumnMajor_>();
-	EmuMath::Helpers::fast_matrix_store(fast_matrix_, mat);
-	str_ << mat;
+	str_ << EmuMath::Helpers::fast_matrix_store(fast_matrix_);
 	return str_;
 }
 

@@ -25,8 +25,8 @@ namespace EmuMath::Helpers
 			using lhs_column_indices_except_0 = EmuCore::TMP::make_offset_index_sequence<1, lhs_used_size - 1>;
 			return _fast_matrix_underlying::_do_multiply_cm_any
 			(
-				std::forward<LhsFastMatrix_>(lhs_fast_matrix_),
-				std::forward<RhsFastMatrix_>(rhs_fast_matrix_),
+				EmuCore::TMP::const_lval_ref_cast<LhsFastMatrix_>(std::forward<LhsFastMatrix_>(lhs_fast_matrix_)),
+				EmuCore::TMP::const_lval_ref_cast<RhsFastMatrix_>(std::forward<RhsFastMatrix_>(rhs_fast_matrix_)),
 				rhs_column_indices(),
 				lhs_column_indices_except_0()
 			);
@@ -44,8 +44,8 @@ namespace EmuMath::Helpers
 			using rhs_row_indices_except_0 = EmuCore::TMP::make_offset_index_sequence<1, rhs_used_size - 1>;
 			return _fast_matrix_underlying::_do_multiply_rm_rm
 			(
-				std::forward<LhsFastMatrix_>(lhs_fast_matrix_),
-				std::forward<RhsFastMatrix_>(rhs_fast_matrix_),
+				EmuCore::TMP::const_lval_ref_cast<LhsFastMatrix_>(std::forward<LhsFastMatrix_>(lhs_fast_matrix_)),
+				EmuCore::TMP::const_lval_ref_cast<RhsFastMatrix_>(std::forward<RhsFastMatrix_>(rhs_fast_matrix_)),
 				lhs_row_indices(),
 				rhs_row_indices_except_0()
 			);

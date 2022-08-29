@@ -939,8 +939,12 @@ int main()
 	std::cout << "\nAfter store: ";
 	EmuMath::FastMatrix<3, 3, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9).Store<true>(test_out_floats);
 	PrintIndexable<16>(test_out_floats);
-	std::cout << "\n";
+	std::cout << "\n\n";
 
+	std::cout << EmuMath::Helpers::fast_matrix_store
+	(
+		EmuMath::FastMatrix<4, 4, float, false>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+	) << "\n\n";
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

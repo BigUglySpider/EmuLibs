@@ -43,6 +43,9 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		using _out_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
 		if constexpr (InColumnMajor_)
 		{
+			// Safe to ignore these warnings as we should never be accessing the same pointed-to item more than once
+#pragma warning(push)
+#pragma warning(disable: 26800)
 			(
 				EmuCore::TMP::assign_direct_or_cast<typename _out_mat_uq::value_type_uq>
 				(
@@ -50,9 +53,12 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 					std::move(*(p_data_ + NonMajorIndices_))
 				), ...
 			);
+#pragma warning(pop)
 		}
 		else
 		{
+#pragma warning(push)
+#pragma warning(disable: 26800)
 			(
 				EmuCore::TMP::assign_direct_or_cast<typename _out_mat_uq::value_type_uq>
 				(
@@ -60,6 +66,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 					std::move(*(p_data_ + NonMajorIndices_))
 				), ...
 			);
+#pragma warning(pop)
 		}
 	}
 
@@ -119,6 +126,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 			using _out_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
 			if constexpr (column_index < _out_mat_uq::num_columns && row_index < _out_mat_uq::num_rows)
 			{
+#pragma warning(push)
+#pragma warning(disable: 26800)
 				if constexpr (_out_mat_uq::is_column_major == _fast_mat_uq::is_column_major)
 				{
 					constexpr std::size_t out_flattened_major_offset = _out_mat_uq::num_non_major_elements * MajorIndex_;
@@ -144,6 +153,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 					// Loads not possible as conflicting major orders
 					_move_register_to_scalar_matrix<MajorIndex_, RegisterIndex_>(out_matrix_, std::forward<FastMatrix_>(fast_matrix_));
 				}
+#pragma warning(pop)
 			}
 		}
 		else
@@ -159,6 +169,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 	template<std::size_t MajorIndex_, EmuConcepts::EmuMatrix OutMatrix_, EmuConcepts::EmuFastMatrix FastMatrix_, std::size_t...RegisterIndices_>
 	constexpr inline void _store_major_to_scalar_matrix(OutMatrix_& out_matrix_, FastMatrix_&& fast_matrix_)
 	{
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		(
 			_store_register_to_scalar_matrix<MajorIndex_, RegisterIndices_>
 			(
@@ -166,6 +178,7 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 				std::forward<FastMatrix_>(fast_matrix_)
 			), ...
 		);
+#pragma warning(pop)
 	}
 
 	template<EmuConcepts::EmuMatrix OutMatrix_, EmuConcepts::EmuFastMatrix FastMatrix_, std::size_t...MajorIndices_, std::size_t...RegisterIndices_>
@@ -264,6 +277,117 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 				std::forward<FastMatrix_>(fast_matrix_),
 				p_out_data_
 			), ...
+		);
+#pragma warning(pop)
+	}
+#pragma endregion
+
+#pragma region OUTPUT_TO_NEW_SCALAR_MATRIX
+	template<EmuConcepts::EmuFastMatrix FastMatrix_, std::size_t MajorIndex_, std::size_t...RegisterIndices_>
+	constexpr inline void _dump_major_data(FastMatrix_&& fast_matrix_, typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::value_type* p_dump_)
+	{
+		using _fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
+		constexpr std::size_t per_major_offset = sizeof...(RegisterIndices_) * _fast_mat_uq::num_elements_per_register;
+		constexpr std::size_t major_offset = MajorIndex_ * per_major_offset;
+
+#pragma warning(push)
+#pragma warning(disable: 26800)
+		(
+			EmuSIMD::store
+			(
+				std::forward<FastMatrix_>(fast_matrix_).template GetRegister<MajorIndex_, RegisterIndices_>(),
+				p_dump_ + major_offset + (RegisterIndices_ * _fast_mat_uq::num_elements_per_register)
+			), ...
+		);
+#pragma warning(pop)
+	}
+
+	template<EmuConcepts::EmuFastMatrix FastMatrix_, std::size_t...MajorIndices_, std::size_t...RegisterIndices_>
+	[[nodiscard]] constexpr inline void _dump_data
+	(
+		FastMatrix_&& fast_matrix_,
+		typename EmuCore::TMP::remove_ref_cv_t<FastMatrix_>::value_type* p_dump_,
+		std::index_sequence<MajorIndices_...> major_indices_,
+		std::index_sequence<RegisterIndices_...> register_indices_
+	)
+	{
+#pragma warning(push)
+#pragma warning(disable: 26800)
+		(
+			_dump_major_data<FastMatrix_, MajorIndices_, RegisterIndices_...>
+			(
+				std::forward<FastMatrix_>(fast_matrix_),
+				p_dump_
+			), ...
+		);
+#pragma warning(pop)
+	}
+
+	template
+	<
+		std::size_t ColumnIndex_, std::size_t RowIndex_, std::size_t LoadedMajors_, std::size_t LoadedRegisters_,
+		EmuConcepts::EmuMatrix OutMatrix_, EmuConcepts::EmuFastMatrix FastMatrix_, typename Data_
+	>
+	[[nodiscard]] constexpr inline decltype(auto) _move_arg_from_index(Data_* p_data_)
+	{
+		using _fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
+		if constexpr (ColumnIndex_ < _fast_mat_uq::num_columns && RowIndex_ < _fast_mat_uq::num_rows)
+		{
+			constexpr std::size_t major_index = _fast_mat_uq::is_column_major ? ColumnIndex_ : RowIndex_;
+			constexpr std::size_t non_major_index = _fast_mat_uq::is_column_major ? RowIndex_ : ColumnIndex_;
+			constexpr std::size_t per_major_offset = LoadedRegisters_ * _fast_mat_uq::num_elements_per_register;
+			constexpr std::size_t major_flattened_offset = major_index * per_major_offset;
+			constexpr std::size_t max_major_offset = (LoadedMajors_ - 1) * per_major_offset;
+
+			if constexpr (major_flattened_offset <= max_major_offset)
+			{
+				constexpr std::size_t offset = major_flattened_offset + non_major_index;
+
+#pragma warning(push)
+#pragma warning(disable: 26800)
+				return std::move(*(p_data_ + offset));
+#pragma warning(pop)
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	template
+	<
+		std::size_t NumMajorsToStore_, std::size_t NumRegistersToStorePerMajor_, EmuConcepts::EmuMatrix OutMatrix_,
+		EmuConcepts::EmuFastMatrix FastMatrix_, std::size_t...OutColumnIndices_, std::size_t...OutRowIndices_
+	>
+	[[nodiscard]] constexpr inline auto _store_to_new_scalar_matrix
+	(
+		FastMatrix_&& fast_matrix_,
+		std::index_sequence<OutColumnIndices_...> out_column_indices_,
+		std::index_sequence<OutRowIndices_...> out_row_indices_
+	) -> typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type
+	{
+		using _fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
+		constexpr std::size_t stored_register_count = NumMajorsToStore_ * NumRegistersToStorePerMajor_;
+		constexpr std::size_t stored_count = stored_register_count * _fast_mat_uq::num_elements_per_register;
+
+		using major_index_sequence = std::make_index_sequence<NumMajorsToStore_>;
+		using register_index_sequence = std::make_index_sequence<NumRegistersToStorePerMajor_>;
+		typename _fast_mat_uq::value_type data_dump[stored_count];
+		_dump_data(std::forward<FastMatrix_>(fast_matrix_), data_dump, major_index_sequence(), register_index_sequence());
+
+#pragma warning(push)
+#pragma warning(disable: 26800)
+		return typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type
+		(
+			_move_arg_from_index<OutColumnIndices_, OutRowIndices_, NumMajorsToStore_, NumRegistersToStorePerMajor_, OutMatrix_, FastMatrix_>
+			(
+				data_dump
+			)...
 		);
 #pragma warning(pop)
 	}

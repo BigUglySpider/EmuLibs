@@ -206,15 +206,16 @@ namespace EmuCore::TestingHelpers
 		void operator()(std::size_t i_)
 		{
 			//out_mats[i_] = lhs[i_].Multiply(rhs[i_]);
-			EmuMath::Helpers::fast_matrix_store
-			(
-				EmuMath::Helpers::fast_matrix_multiply
-				(
-					fast_mat_type(lhs[i_]),
-					fast_mat_type(rhs[i_])
-				),
-				out_mats[i_]
-			);
+			//EmuMath::Helpers::fast_matrix_store
+			//(
+			//	EmuMath::Helpers::fast_matrix_multiply
+			//	(
+			//		fast_mat_type(lhs[i_]),
+			//		fast_mat_type(rhs[i_])
+			//	),
+			//	out_mats[i_]
+			//);
+			(fast_mat_type(lhs[i_]) * fast_mat_type(rhs[i_])).Store(out_mats[i_]);
 		}
 		void OnTestsOver()
 		{

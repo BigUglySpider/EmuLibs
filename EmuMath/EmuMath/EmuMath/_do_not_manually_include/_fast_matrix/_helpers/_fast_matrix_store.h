@@ -152,6 +152,107 @@ namespace EmuMath::Helpers
 			register_index_sequence()
 		);
 	}
+
+	/// <summary>
+	/// <para> Stores the passed Matrix's data into a newly constructed scalar Matrix of the specified type. </para>
+	/// <para> Arguments for the output Matrix are all optional, and given in sequential order as per `EmuMath::Matrix` arguments. </para>
+	/// <para> 
+	///		Omitted arguments will default to the same argument as used to instantiate the passed FastMatrix, 
+	///		except for `OutT_` which will default to the passed FastMatrix's `value_type`.
+	/// </para>
+	/// <para> 
+	///		If this is being used to assign to an existing scalar Matrix, consider passing a reference to that Matrix instead to 
+	///		take advantage of optimised direct-stores and remove potential constructor overhead.
+	/// </para>
+	/// </summary>
+	/// <returns>Scalar EmuMath Matrix of the specified type containing data mimicking the passed FastMatrix.</returns>
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, bool OutColumnMajor_, EmuConcepts::EmuFastMatrix FastMatrix_>
+	[[nodiscard]] constexpr inline auto fast_matrix_store(FastMatrix_&& fast_matrix_)
+		-> EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+	{
+		using _in_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
+		constexpr std::size_t out_matching_major_size = _in_fast_mat_uq::is_column_major ? OutNumColumns_ : OutNumRows_;
+		constexpr std::size_t num_majors_to_store = EmuCore::TMP::smallest_constant_v<std::size_t, out_matching_major_size, _in_fast_mat_uq::num_major_elements>;
+
+		constexpr std::size_t out_matching_non_major_size = _in_fast_mat_uq::is_column_major ? OutNumRows_ : OutNumColumns_;
+		constexpr std::size_t register_size = _in_fast_mat_uq::num_elements_per_register;
+		constexpr std::size_t registers_per_major = _in_fast_mat_uq::num_registers_per_major;
+		constexpr std::size_t out_required_registers = 
+		(
+			(out_matching_non_major_size / register_size) + ((out_matching_non_major_size % register_size) == 0 ? 0 : 1)
+		);
+		constexpr std::size_t num_registers_to_store = EmuCore::TMP::smallest_constant_v<std::size_t, out_required_registers, registers_per_major>;
+
+		using out_indices = EmuMath::TMP::make_ranged_matrix_index_sequences<0, OutNumColumns_, 0, OutNumRows_, OutColumnMajor_>;
+		using column_indices = typename out_indices::column_index_sequence;
+		using row_indices = typename out_indices::row_index_sequence;
+		return _fast_matrix_underlying::_store_to_new_scalar_matrix
+		<
+			num_majors_to_store,
+			num_registers_to_store,
+			EmuMath::Matrix<OutNumColumns_, OutNumRows_, OutT_, OutColumnMajor_>
+		>(std::forward<FastMatrix_>(fast_matrix_), column_indices(), row_indices());
+	}
+
+	template<typename OutT_, bool OutColumnMajor_, EmuConcepts::EmuFastMatrix FastMatrix_>
+	[[nodiscard]] constexpr inline auto fast_matrix_store(FastMatrix_&& fast_matrix_)
+	{
+		using _in_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
+		return fast_matrix_store<_in_fast_mat_uq::num_columns, _in_fast_mat_uq::num_rows, OutT_, OutColumnMajor_>
+		(
+			std::forward<FastMatrix_>(fast_matrix_)
+		);
+	}
+
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, bool OutColumnMajor_, EmuConcepts::EmuFastMatrix FastMatrix_>
+	[[nodiscard]] constexpr inline auto fast_matrix_store(FastMatrix_&& fast_matrix_)
+	{
+		using _in_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
+		return fast_matrix_store<OutNumColumns_, OutNumRows_, typename _in_fast_mat_uq::value_type, OutColumnMajor_>
+		(
+			std::forward<FastMatrix_>(fast_matrix_)
+		);
+	}
+
+	template<bool OutColumnMajor_, EmuConcepts::EmuFastMatrix FastMatrix_>
+	[[nodiscard]] constexpr inline auto fast_matrix_store(FastMatrix_&& fast_matrix_)
+	{
+		using _in_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
+		return fast_matrix_store<_in_fast_mat_uq::num_columns, _in_fast_mat_uq::num_rows, typename _in_fast_mat_uq::value_type, OutColumnMajor_>
+		(
+			std::forward<FastMatrix_>(fast_matrix_)
+		);
+	}
+
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, typename OutT_, EmuConcepts::EmuFastMatrix FastMatrix_>
+	[[nodiscard]] constexpr inline auto fast_matrix_store(FastMatrix_&& fast_matrix_)
+	{
+		using _in_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
+		return fast_matrix_store<OutNumColumns_, OutNumRows_, OutT_, _in_fast_mat_uq::is_column_major>
+		(
+			std::forward<FastMatrix_>(fast_matrix_)
+		);
+	}
+
+	template<std::size_t OutNumColumns_, std::size_t OutNumRows_, EmuConcepts::EmuFastMatrix FastMatrix_>
+	[[nodiscard]] constexpr inline auto fast_matrix_store(FastMatrix_&& fast_matrix_)
+	{
+		using _in_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
+		return fast_matrix_store<OutNumColumns_, OutNumRows_, typename _in_fast_mat_uq::value_type, _in_fast_mat_uq::is_column_major>
+		(
+			std::forward<FastMatrix_>(fast_matrix_)
+		);
+	}
+
+	template<EmuConcepts::EmuFastMatrix FastMatrix_>
+	[[nodiscard]] constexpr inline auto fast_matrix_store(FastMatrix_&& fast_matrix_)
+	{
+		using _in_fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
+		return fast_matrix_store<_in_fast_mat_uq::num_columns, _in_fast_mat_uq::num_rows, typename _in_fast_mat_uq::value_type, _in_fast_mat_uq::is_column_major>
+		(
+			std::forward<FastMatrix_>(fast_matrix_)
+		);
+	}
 }
 
 #endif
