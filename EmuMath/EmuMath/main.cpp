@@ -908,15 +908,35 @@ int main()
 	std::cout << "REVERSED: " << fast4x4_a << "\nMUL\n" << fast4x4_b << "\n=\n" << fast4x4_b.Multiply(fast4x4_a) << "\n\n";
 	std::cout << "REVERSED: " << "Scalar result:\n" << (fast4x4_in_b * fast4x4_in_a) << "\n\n";
 
+	std::cout << EmuMath::FastMatrix<4, 4, float, true>(10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 101, 120, 130, 140, 150, 160) << "\n\n";
+	std::cout << EmuMath::FastMatrix<4, 4, float, false>(10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 101, 120, 130, 140, 150, 160) << "\n\n";
 
+	// If I ever write something like this outside of a quick and dirty test, please put me down
+	std::cout << EmuMath::FastMatrix<8, 8, float, true>
+	(
+		1, 2, 3, 4, 5, 6, 7, 8,
+		9, 10, 11, 12, 13, 14, 15, 16,
+		17, 18, 19, 20, 21, 22, 23, 24,
+		25, 26, 27, 28, 29, 30, 31, 32,
+		33, 34, 35, 36, 37, 38, 39, 40,
+		41, 42, 43, 44, 45, 46, 47, 48,
+		49, 50, 51, 52, 53, 54, 55, 56,
+		57, 58, 59, 60, 61, 62, 63, 64
+	) << "\n\n" << EmuMath::FastMatrix<8, 8, float, false>
+	(
+		1, 2, 3, 4, 5, 6, 7, 8,
+		9, 10, 11, 12, 13, 14, 15, 16,
+		17, 18, 19, 20, 21, 22, 23, 24,
+		25, 26, 27, 28, 29, 30, 31, 32,
+		33, 34, 35, 36, 37, 38, 39, 40,
+		41, 42, 43, 44, 45, 46, 47, 48,
+		49, 50, 51, 52, 53, 54, 55, 56,
+		57, 58, 59, 60, 61, 62, 63, 64
+	) << "\n\n";
 
-
-
-
-
-
-
-
+	float some_test_float_array[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+	std::cout << EmuMath::FastMatrix<2, 2, float, true>(some_test_float_array) << "\n\n";
+	std::cout << EmuMath::FastMatrix<2, 2, float, false>(some_test_float_array) << "\n\n";
 
 
 	system("pause");

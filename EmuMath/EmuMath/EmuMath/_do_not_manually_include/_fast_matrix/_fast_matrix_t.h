@@ -59,14 +59,155 @@ namespace EmuMath
 		static constexpr std::size_t total_num_registers = num_registers_per_major * num_major_elements;
 		static constexpr std::size_t num_elements_per_register = register_width / per_element_width;
 		static constexpr std::size_t num_elements_in_partial_registers = majors_require_partial_register ? (num_non_major_elements % num_elements_per_register) : 0;
+		static constexpr std::size_t full_width_major_size = num_elements_per_register * num_registers_per_major;
+		static constexpr std::size_t full_width_size = full_width_major_size * num_major_elements;
+		static constexpr std::size_t expected_count_for_default_load_pointer =
+		(
+			((num_major_elements - 1) * num_non_major_elements) + full_width_major_size
+		);
 
 		using major_chunk_type = typename std::conditional<(num_registers_per_major <= 1), register_type, std::array<register_type, num_registers_per_major>>::type;
 		using data_type = std::array<major_chunk_type, num_major_elements>;
 		using major_index_sequence = std::make_index_sequence<num_major_elements>;
 		using major_register_sequence = std::make_index_sequence<num_registers_per_major>;
 
+#pragma region CONSTRUCTOR_VALIDITY_CHECKS
+	private:
+		template<std::size_t Unused_, EmuConcepts::EmuFastVector...MajorFastVectors_>
+		[[nodiscard]] static constexpr inline bool _valid_major_fast_vector_construction()
+		{
+			return
+			(
+				Unused_ >= 0 &&
+				sizeof...(MajorFastVectors_) == num_major_elements &&
+				(... && std::is_same_v<typename EmuCore::TMP::remove_ref_cv_t<MajorFastVectors_>::register_type, register_type>)
+			);
+		}
+
+		template<std::size_t Unused_, EmuConcepts::KnownSIMD...MajorRegisters_>
+		[[nodiscard]] static constexpr inline bool _valid_major_fast_vector_construction()
+		{
+			return
+			(
+				Unused_ >= 0 &&
+				sizeof...(MajorRegisters_) == total_num_registers &&
+				(... && std::is_same_v<typename EmuCore::TMP::remove_ref_cv<MajorRegisters_>::type, register_type>)
+			);
+		}
+
+		template<std::size_t Unused_, class...MajorChunks_>
+		[[nodiscard]] static constexpr inline bool _valid_major_chunk_construction()
+		{
+			return
+			(
+				Unused_ >= 0 &&
+				num_registers_per_major != 1 &&
+				sizeof...(MajorChunks_) == num_major_elements &&
+				(... && std::is_same_v<typename EmuCore::TMP::remove_ref_cv<MajorChunks_>::type, major_chunk_type>)
+			);
+		}
+
+		template<std::size_t Unused_, typename...Args_>
+		[[nodiscard]] static constexpr inline bool _valid_per_element_construction_args()
+		{
+			return
+			(
+				Unused_ >= 0 &&
+				sizeof...(Args_) == size &&
+				(... && EmuCore::TMP::is_static_castable_v<typename EmuCore::TMP::forward_result<Args_>::type, value_type>)
+			);
+		}
+
+		template<std::size_t Unused_, typename...Args_>
+		[[nodiscard]] static constexpr inline bool _valid_variadic_construction_args()
+		{
+			return
+			(
+				_valid_per_element_construction_args<Unused_, Args_...>() ||
+				_valid_major_chunk_construction<Unused_, Args_...>()
+			);
+		}
+
+	public:
+		template<EmuConcepts::EmuFastVector...MajorFastVectors_>
+		[[nodiscard]] static constexpr inline bool valid_major_fast_vector_construction()
+		{
+			return _valid_major_fast_vector_construction<0, MajorFastVectors_...>();
+		}
+
+		template<EmuConcepts::KnownSIMD...MajorRegisters_>
+		[[nodiscard]] static constexpr inline bool valid_major_register_construction()
+		{
+			return _valid_major_register_construction<0, MajorRegisters_...>();
+		}
+
+		template<class...MajorChunks_>
+		[[nodiscard]] static constexpr inline bool valid_major_chunk_construction()
+		{
+			return _valid_major_chunk_construction<0, MajorChunks_...>();
+		}
+
+		template<typename...Args_>
+		[[nodiscard]] static constexpr inline bool valid_per_element_construction_args()
+		{
+			return _valid_per_element_construction_args<0, Args_...>();
+		}
+
+		template<typename...Args_>
+		[[nodiscard]] static constexpr inline bool valid_variadic_construction_args()
+		{
+			return _valid_variadic_construction_args<0, Args_...>();
+		}
+#pragma endregion
+
 #pragma region CONSTRUCTION_HELPERS
 	private:
+		template<bool FullWidthOffset_, std::size_t MajorIndex_, std::size_t RegisterIndex_>
+		[[nodiscard]] static constexpr inline register_type _load_major_chunk_register_from_pointer(const value_type* p_to_load_)
+		{
+			constexpr std::size_t per_major_offset = FullWidthOffset_ ? (num_elements_per_register * num_registers_per_major) : num_non_major_elements;
+			constexpr std::size_t major_offset = MajorIndex_ * per_major_offset;
+			constexpr std::size_t register_offset = RegisterIndex_ * num_elements_per_register;
+			constexpr std::size_t offset = major_offset + register_offset;
+			return EmuSIMD::load<register_type>(p_to_load_ + offset);
+		}
+
+		template<bool FullWidthOffset_, std::size_t MajorIndex_, std::size_t...MajorRegisterIndices_>
+		[[nodiscard]] static constexpr inline major_chunk_type _load_major_chunk_from_pointer(const value_type* p_to_load_)
+		{
+			if constexpr (num_registers_per_major > 1)
+			{
+				return major_chunk_type
+				({
+					_load_major_chunk_register_from_pointer<FullWidthOffset_, MajorIndex_, MajorRegisterIndices_>
+					(
+						p_to_load_
+					)...
+				});
+			}
+			else
+			{
+				return _load_major_chunk_register_from_pointer<FullWidthOffset_, MajorIndex_, 0>(p_to_load_);
+			}
+		}
+
+		template<bool FullWidthOffset_, std::size_t...MajorIndices_, std::size_t...MajorRegisterIndices_>
+		[[nodiscard]] static constexpr inline data_type _load_data_from_pointer
+		(
+			const value_type* p_to_load_,
+			std::index_sequence<MajorIndices_...> major_indices_,
+			std::index_sequence<MajorRegisterIndices_...> major_register_indices_
+		)
+		{
+			return data_type
+			({
+				_load_major_chunk_from_pointer<FullWidthOffset_, MajorIndices_, MajorRegisterIndices_...>
+				(
+					p_to_load_
+				)...
+			});
+		}
+
 		template<std::size_t RegisterIndex_, EmuConcepts::EmuFastVector FastMajorVector_>
 		[[nodiscard]] static constexpr inline register_type _retrieve_register_from_fast_vector(FastMajorVector_&& fast_major_vector_)
 		{
@@ -158,61 +299,104 @@ namespace EmuMath
 				});
 			}
 		}
-#pragma endregion
 
-#pragma region CONSTRUCTOR_VALIDITY_CHECKS
-	private:
-		template<std::size_t Unused_, EmuConcepts::EmuFastVector...MajorFastVectors_>
-		[[nodiscard]] static constexpr inline bool _valid_major_fast_vector_construction()
+		template<bool IncludeNonEncapsulated_, std::size_t MajorIndex_, std::size_t NonMajorIndex_, typename...Args_>
+		[[nodiscard]] static constexpr inline decltype(auto) _get_per_element_arg(std::tuple<Args_...>& args_)
 		{
-			return
+			if constexpr (IncludeNonEncapsulated_ || (MajorIndex_ < num_major_elements && NonMajorIndex_ < num_non_major_elements))
+			{
+				constexpr std::size_t per_major_offset = IncludeNonEncapsulated_ ? (num_elements_per_register * num_registers_per_major) : num_non_major_elements;
+				constexpr std::size_t flattened_major_offset = MajorIndex_ * per_major_offset;
+				return std::forward<decltype(std::get<flattened_major_offset + NonMajorIndex_>(args_))>
+				(
+					std::get<flattened_major_offset + NonMajorIndex_>(args_)
+				);
+			}
+			else
+			{
+				return 0;
+			}
+		}
+
+		template<bool IncludeNonEncapsulated_, std::size_t MajorIndex_, std::size_t RegisterIndex_, std::size_t...NonMajorIndices_, typename...Args_>
+		[[nodiscard]] static constexpr inline register_type _make_register_from_per_element_args(std::tuple<Args_...>& args_)
+		{
+			constexpr std::size_t non_major_offset = RegisterIndex_ * num_elements_per_register;
+			return EmuSIMD::setr<register_type, per_element_width>
 			(
-				Unused_ >= 0 &&
-				sizeof...(MajorFastVectors_) == num_major_elements &&
-				(... && std::is_same_v<typename EmuCore::TMP::remove_ref_cv_t<MajorFastVectors_>::register_type, register_type>)
+				std::forward<decltype(_get_per_element_arg<IncludeNonEncapsulated_, MajorIndex_, non_major_offset + NonMajorIndices_>(args_))>
+				(
+					_get_per_element_arg<IncludeNonEncapsulated_, MajorIndex_, non_major_offset + NonMajorIndices_>(args_)
+				)...
 			);
 		}
 
-		template<std::size_t Unused_, EmuConcepts::KnownSIMD...MajorRegisters_>
-		[[nodiscard]] static constexpr inline bool _valid_major_fast_vector_construction()
+		template<bool IncludeNonEncapsulated_, std::size_t MajorIndex_, std::size_t...MajorRegisterIndices_, std::size_t...NonMajorIndices_, typename...Args_>
+		[[nodiscard]] static constexpr inline major_chunk_type _make_major_chunk_from_per_element_args
+		(
+			std::tuple<Args_...>& args_,
+			std::index_sequence<MajorRegisterIndices_...> major_register_indices_,
+			std::index_sequence<NonMajorIndices_...> non_major_indices_
+		)
 		{
-			return
-			(
-				Unused_ >= 0 &&
-				sizeof...(MajorRegisters_) == total_num_registers &&
-				(... && std::is_same_v<typename EmuCore::TMP::remove_ref_cv<MajorRegisters_>::type, register_type>)
-			);
+			if constexpr (num_registers_per_major > 1)
+			{
+				return major_chunk_type
+				({
+					_make_register_from_per_element_args<IncludeNonEncapsulated_, MajorIndex_, MajorRegisterIndices_, NonMajorIndices_...>
+					(
+						args_
+					)...
+				});
+			}
+			else
+			{
+				return _make_register_from_per_element_args<IncludeNonEncapsulated_, MajorIndex_, 0, NonMajorIndices_...>(args_);
+			}
 		}
 
-		template<std::size_t Unused_, class...MajorChunks_>
-		[[nodiscard]] static constexpr inline bool _valid_major_chunk_construction()
+		template<bool IncludeNonEncapsulated_, typename...Args_, std::size_t...MajorIndices_>
+		[[nodiscard]] static constexpr inline data_type _make_data_from_per_element_args
+		(
+			std::index_sequence<MajorIndices_...> major_indices_,
+			std::tuple<Args_...> args_
+		)
 		{
-			return
-			(
-				Unused_ >= 0 &&
-				num_registers_per_major != 1 &&
-				sizeof...(MajorChunks_) == num_major_elements &&
-				(... && std::is_same_v<typename EmuCore::TMP::remove_ref_cv<MajorChunks_>::type, major_chunk_type>)
-			);
+			return data_type
+			({
+				_make_major_chunk_from_per_element_args<IncludeNonEncapsulated_, MajorIndices_>
+				(
+					args_,
+					std::make_index_sequence<num_registers_per_major>(),
+					std::make_index_sequence<num_elements_per_register>()
+				)...
+			});
 		}
 
-	public:
-		template<EmuConcepts::EmuFastVector...MajorFastVectors_>
-		[[nodiscard]] static constexpr inline bool valid_major_fast_vector_construction()
+		template<typename...Args_>
+		[[nodiscard]] static constexpr inline data_type _make_data_from_variadic_args(Args_&&...args_)
 		{
-			return _valid_major_fast_vector_construction<0, MajorFastVectors_...>();
-		}
-
-		template<EmuConcepts::KnownSIMD...MajorRegisters_>
-		[[nodiscard]] static constexpr inline bool valid_major_register_construction()
-		{
-			return _valid_major_register_construction<0, MajorRegisters_...>();
-		}
-
-		template<class...MajorChunks_>
-		[[nodiscard]] static constexpr inline bool valid_major_chunk_construction()
-		{
-			return _valid_major_chunk_construction<0, MajorChunks_...>();
+			if constexpr (valid_per_element_construction_args<Args_...>())
+			{
+				// Per encapsulated value (but ignore contained outside of encapsulated range)
+				return _make_data_from_per_element_args<false>
+				(
+					major_index_sequence(),
+					std::forward_as_tuple<Args_...>(std::forward<Args_>(args_)...)
+				);
+			}
+			else if constexpr (valid_major_chunk_construction<Args_...>())
+			{
+				return data_type({ std::forward<Args_>(args_)... });
+			}
+			else
+			{
+				static_assert
+				(
+					EmuCore::TMP::get_false<Args_...>(),
+					"Internal EmuMath Error: False-positive allowance to invoke variadic FastMatrix constructor as the provided arguments do not match any valid construction method."
+				);
+			}
 		}
 #pragma endregion
 
@@ -221,6 +405,24 @@ namespace EmuMath
 		constexpr inline FastMatrix() noexcept = default;
 		constexpr inline FastMatrix(this_type&&) noexcept = default;
 		constexpr inline FastMatrix(const this_type&) noexcept = default;
+
+		/// <summary>
+		/// <para> Loads the passed contiguous data pointer directly into a newly constructed Matrix. </para>
+		/// <para> 
+		///		The pointed-to data must contain a number of values equal to at least `expected_count_for_default_load_pointer`,
+		///		which itself is equal to `((num_major_elements - 1) * num_non_major_elements) + full_width_major_size`.
+		/// </para>
+		/// <para> If the pointed-to data count does not meet this constraint, unsafe memory may be loaded and undefined behaviour becomes likely. </para>
+		/// <para>
+		///		If loading data from an EmuMath `Matrix` of the same major-order, it is recommended to pass the `Matrix` directly. 
+		///		Said constructor will perform adaptive loads regardless of size, where possible.
+		/// </para>
+		/// </summary>
+		/// <param name="p_data_to_load_">Pointer to at least `expected_count_for_default_load_pointer` items of this Matrix's `value_type`.</param>
+		constexpr inline FastMatrix(const value_type* p_data_to_load_)
+			: major_chunks(_load_data_from_pointer<false>(p_data_to_load_, major_index_sequence(), major_register_sequence()))
+		{
+		}
 
 		/// <summary>
 		/// <para> Constructs a FastMatrix loaded from the passed scalar EmuMath Matrix. </para>
@@ -281,23 +483,21 @@ namespace EmuMath
 		}
 
 		/// <summary>
-		/// <para> Constructs a FastMatrix using the passed major chunks to create its own respective major chunks. </para>
+		/// <para> Variadic constructor which may be used to create this FastMatrix type in one of multiple ways: </para>
+		/// <para> 
+		///		1: Per-element construction, where 1 argument will be taken for each encapsulated element in contiguous order. 
+		///		This is available where the number of passed Args_ is equal to this Matrix type's `size`, and they are all usable as its `value_type`.
+		/// </para>
+		/// <para>
+		///		2: Per-major-chunk construction, where 1 argument will be taken for each major chunk in contiguous order. 
+		///		This is available where the number of passed Args_ is equal to this Matrix type's `num_major_elements`, and they are all its `major_chunk_type`.
+		/// </para>
+		/// <para> Where multiple of these constraints are met, the first appearing in the above list will be used. </para>
 		/// </summary>
-		/// <param name="major_chunks_">
-		///		<para>
-		///			Sequential major chunks to construct the new FastMatrix via.
-		///			The number of arguments should be equal to this Matrix type's `num_major_elements`.
-		///		</para>
-		///		<para> All passed arguments must be of this Matrix type's `major_chunk_type`. </para>
-		/// </param>
-		template
-		<
-			std::size_t Unused_ = 0,
-			class...MajorChunks_,
-			typename = std::enable_if_t<_valid_major_chunk_construction<Unused_, MajorChunks_...>()>
-		>
-		constexpr inline FastMatrix(MajorChunks_&&...major_chunks_)
-			: major_chunks({std::forward<MajorChunks_>(major_chunks_)...})
+		/// <param name="args_">Variadic arguments meeting at least one of the described constraints.</param>
+		template<std::size_t Unused_ = 0, typename...Args_, typename = std::enable_if_t<_valid_variadic_construction_args<Unused_, Args_...>() >>
+		constexpr inline FastMatrix(Args_&&...args_)
+			: major_chunks(_make_data_from_variadic_args(std::forward<Args_>(args_)...))
 		{
 		}
 #pragma endregion
@@ -428,40 +628,77 @@ namespace EmuMath
 template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool IsColumnMajor_, std::size_t RegisterWidth_>
 inline std::ostream& operator<<(std::ostream& str_, const EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>& fast_matrix_)
 {
-	// TODO: GENERALISE FOR ANY SIZE, NOT JUST 4x4 RM
+	// TODO: GENERALISE FOR ANY SIZE, NOT JUST 4x4/8x8
 	if constexpr (NumColumns_ == NumRows_)
 	{
-		constexpr std::size_t OutSize_ = NumColumns_ <= 4 ? 4 : 8;
-		EmuMath::Matrix<OutSize_, OutSize_, float, false> mat;
-		if constexpr (NumColumns_ <= 4)
+		if constexpr (IsColumnMajor_)
 		{
-			_mm_store_ps(mat.data<0, 0>(), fast_matrix_.major_chunks[0]);
-			_mm_store_ps(mat.data<0, 1>(), fast_matrix_.major_chunks[1]);
-			_mm_store_ps(mat.data<0, 2>(), fast_matrix_.major_chunks[2]);
-			_mm_store_ps(mat.data<0, 3>(), fast_matrix_.major_chunks[3]);
+			constexpr std::size_t OutSize_ = NumColumns_ <= 4 ? 4 : 8;
+			EmuMath::Matrix<OutSize_, OutSize_, float, true> mat;
+			if constexpr (NumColumns_ <= 4)
+			{
+				_mm_store_ps(mat.data<0, 0>(), fast_matrix_.major_chunks[0]);
+				_mm_store_ps(mat.data<1, 0>(), fast_matrix_.major_chunks[1]);
+				_mm_store_ps(mat.data<2, 0>(), fast_matrix_.major_chunks[2]);
+				_mm_store_ps(mat.data<3, 0>(), fast_matrix_.major_chunks[3]);
+			}
+			else if constexpr (NumColumns_ <= 8)
+			{
+				_mm_store_ps(mat.data<0, 0>(), fast_matrix_.major_chunks[0][0]);
+				_mm_store_ps(mat.data<1, 0>(), fast_matrix_.major_chunks[1][0]);
+				_mm_store_ps(mat.data<2, 0>(), fast_matrix_.major_chunks[2][0]);
+				_mm_store_ps(mat.data<3, 0>(), fast_matrix_.major_chunks[3][0]);
+				_mm_store_ps(mat.data<4, 0>(), fast_matrix_.major_chunks[4][0]);
+				_mm_store_ps(mat.data<5, 0>(), fast_matrix_.major_chunks[5][0]);
+				_mm_store_ps(mat.data<6, 0>(), fast_matrix_.major_chunks[6][0]);
+				_mm_store_ps(mat.data<7, 0>(), fast_matrix_.major_chunks[7][0]);
+
+				_mm_store_ps(mat.data<0, 4>(), fast_matrix_.major_chunks[0][1]);
+				_mm_store_ps(mat.data<1, 4>(), fast_matrix_.major_chunks[1][1]);
+				_mm_store_ps(mat.data<2, 4>(), fast_matrix_.major_chunks[2][1]);
+				_mm_store_ps(mat.data<3, 4>(), fast_matrix_.major_chunks[3][1]);
+				_mm_store_ps(mat.data<4, 4>(), fast_matrix_.major_chunks[4][1]);
+				_mm_store_ps(mat.data<5, 4>(), fast_matrix_.major_chunks[5][1]);
+				_mm_store_ps(mat.data<6, 4>(), fast_matrix_.major_chunks[6][1]);
+				_mm_store_ps(mat.data<7, 4>(), fast_matrix_.major_chunks[7][1]);
+			}
+
+			str_ << mat;
 		}
-		else if constexpr (NumColumns_ <= 8)
+		else
 		{
-			_mm_store_ps(mat.data<0, 0>(), fast_matrix_.major_chunks[0][0]);
-			_mm_store_ps(mat.data<0, 1>(), fast_matrix_.major_chunks[1][0]);
-			_mm_store_ps(mat.data<0, 2>(), fast_matrix_.major_chunks[2][0]);
-			_mm_store_ps(mat.data<0, 3>(), fast_matrix_.major_chunks[3][0]);
-			_mm_store_ps(mat.data<0, 4>(), fast_matrix_.major_chunks[4][0]);
-			_mm_store_ps(mat.data<0, 5>(), fast_matrix_.major_chunks[5][0]);
-			_mm_store_ps(mat.data<0, 6>(), fast_matrix_.major_chunks[6][0]);
-			_mm_store_ps(mat.data<0, 7>(), fast_matrix_.major_chunks[7][0]);
+			constexpr std::size_t OutSize_ = NumColumns_ <= 4 ? 4 : 8;
+			EmuMath::Matrix<OutSize_, OutSize_, float, false> mat;
+			if constexpr (NumColumns_ <= 4)
+			{
+				_mm_store_ps(mat.data<0, 0>(), fast_matrix_.major_chunks[0]);
+				_mm_store_ps(mat.data<0, 1>(), fast_matrix_.major_chunks[1]);
+				_mm_store_ps(mat.data<0, 2>(), fast_matrix_.major_chunks[2]);
+				_mm_store_ps(mat.data<0, 3>(), fast_matrix_.major_chunks[3]);
+			}
+			else if constexpr (NumColumns_ <= 8)
+			{
+				_mm_store_ps(mat.data<0, 0>(), fast_matrix_.major_chunks[0][0]);
+				_mm_store_ps(mat.data<0, 1>(), fast_matrix_.major_chunks[1][0]);
+				_mm_store_ps(mat.data<0, 2>(), fast_matrix_.major_chunks[2][0]);
+				_mm_store_ps(mat.data<0, 3>(), fast_matrix_.major_chunks[3][0]);
+				_mm_store_ps(mat.data<0, 4>(), fast_matrix_.major_chunks[4][0]);
+				_mm_store_ps(mat.data<0, 5>(), fast_matrix_.major_chunks[5][0]);
+				_mm_store_ps(mat.data<0, 6>(), fast_matrix_.major_chunks[6][0]);
+				_mm_store_ps(mat.data<0, 7>(), fast_matrix_.major_chunks[7][0]);
 
-			_mm_store_ps(mat.data<4, 0>(), fast_matrix_.major_chunks[0][1]);
-			_mm_store_ps(mat.data<4, 1>(), fast_matrix_.major_chunks[1][1]);
-			_mm_store_ps(mat.data<4, 2>(), fast_matrix_.major_chunks[2][1]);
-			_mm_store_ps(mat.data<4, 3>(), fast_matrix_.major_chunks[3][1]);
-			_mm_store_ps(mat.data<4, 4>(), fast_matrix_.major_chunks[4][1]);
-			_mm_store_ps(mat.data<4, 5>(), fast_matrix_.major_chunks[5][1]);
-			_mm_store_ps(mat.data<4, 6>(), fast_matrix_.major_chunks[6][1]);
-			_mm_store_ps(mat.data<4, 7>(), fast_matrix_.major_chunks[7][1]);
+				_mm_store_ps(mat.data<4, 0>(), fast_matrix_.major_chunks[0][1]);
+				_mm_store_ps(mat.data<4, 1>(), fast_matrix_.major_chunks[1][1]);
+				_mm_store_ps(mat.data<4, 2>(), fast_matrix_.major_chunks[2][1]);
+				_mm_store_ps(mat.data<4, 3>(), fast_matrix_.major_chunks[3][1]);
+				_mm_store_ps(mat.data<4, 4>(), fast_matrix_.major_chunks[4][1]);
+				_mm_store_ps(mat.data<4, 5>(), fast_matrix_.major_chunks[5][1]);
+				_mm_store_ps(mat.data<4, 6>(), fast_matrix_.major_chunks[6][1]);
+				_mm_store_ps(mat.data<4, 7>(), fast_matrix_.major_chunks[7][1]);
+			}
+
+			str_ << mat;
 		}
-
-		str_ << mat;
 	}
 	else
 	{
