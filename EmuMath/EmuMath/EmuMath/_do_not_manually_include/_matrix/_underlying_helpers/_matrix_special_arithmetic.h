@@ -20,13 +20,20 @@ namespace EmuMath::Helpers::_matrix_underlying
 		const EmuMath::Matrix<RhsNumColumns_, RhsNumRows_, RhsT_, RhsColumnMajor_>& rhs_matrix_
 	)
 	{
-		using lhs_get_result_uq = EmuCore::TMP::remove_ref_cv_t<decltype(lhs_matrix_.template at<DpIndex_, RowIndex_>())>;
-		using rhs_get_result_uq = EmuCore::TMP::remove_ref_cv_t<decltype(rhs_matrix_.template at<ColumnIndex_, DpIndex_>())>;
-		return EmuCore::do_multiply<lhs_get_result_uq, rhs_get_result_uq>()
-		(
-			lhs_matrix_.template at<DpIndex_, RowIndex_>(),
-			rhs_matrix_.template at<ColumnIndex_, DpIndex_>()
-		);
+		if constexpr(DpIndex_ < LhsNumColumns_ && DpIndex_ < RhsNumRows_)
+		{
+			using lhs_get_result_uq = EmuCore::TMP::remove_ref_cv_t<decltype(lhs_matrix_.template at<DpIndex_, RowIndex_>())>;
+			using rhs_get_result_uq = EmuCore::TMP::remove_ref_cv_t<decltype(rhs_matrix_.template at<ColumnIndex_, DpIndex_>())>;
+			return EmuCore::do_multiply<lhs_get_result_uq, rhs_get_result_uq>()
+			(
+				lhs_matrix_.template at<DpIndex_, RowIndex_>(),
+				rhs_matrix_.template at<ColumnIndex_, DpIndex_>()
+			);
+		}
+		else
+		{
+			return 0;
+		}
 	}
 
 	template

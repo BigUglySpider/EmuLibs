@@ -884,25 +884,28 @@
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_underlying_helpers\_fast_matrix_tmp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_helpers\_fast_matrix_set.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_helpers\_all_fast_matrix_helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_underlying_helpers\_fast_matrix_underlying_set.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_helpers\_fast_matrix_store.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_underlying_helpers\_fast_matrix_underlying_store.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_underlying_helpers\_fast_matrix_underlying_mat_mult.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_helpers\_fast_matrix_arithmetic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_underlying_helpers\_fast_matrix_underlying_arithmetic.h">
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_fast_matrix_operators.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_underlying_helpers\_fast_matrix_underlying_load.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_helpers\_fast_matrix_load.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_underlying_helpers\_fast_matrix_underlying_store.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmuMath\_do_not_manually_include\_fast_matrix\_helpers\_fast_matrix_store.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

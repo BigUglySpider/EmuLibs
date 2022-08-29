@@ -21,6 +21,7 @@
 
 namespace EmuCore::TestingHelpers
 {
+	static constexpr std::size_t shared_num_loops = 5000000;
 	static constexpr unsigned long long shared_fill_seed_ = 1337;
 	static constexpr unsigned long long shared_select_seed_ = -25;
 
@@ -104,7 +105,7 @@ namespace EmuCore::TestingHelpers
 	{
 		static constexpr bool DO_TEST = true;
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr std::size_t NUM_LOOPS = shared_num_loops;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr std::string_view NAME = "Emu Matrix Mult";
 
@@ -162,14 +163,15 @@ namespace EmuCore::TestingHelpers
 	{
 		static constexpr bool DO_TEST = true;
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr std::size_t NUM_LOOPS = shared_num_loops;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr std::string_view NAME = "Emu FastMatrix Mult";
 
 		static constexpr std::size_t vec_size = 4;
 		using t_arg = float;
-		using mat_type = EmuMath::FastMatrix<4, 4, t_arg, false, 128>;
-		using vec_type = EmuMath::FastVector<4, t_arg, 128>;
+		using mat_type = EmuMath::Matrix<4, 4, t_arg, false>;
+		using fast_mat_type = EmuMath::FastMatrix<4, 4, t_arg, false, 128>;
+		using vec_type = EmuMath::Vector<4, t_arg>;
 
 		EmuFastMatrixTest()
 		{
@@ -203,7 +205,17 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i_)
 		{
-			out_mats[i_] = lhs[i_].Multiply(rhs[i_]);
+			//out_mats[i_] = lhs[i_].Multiply(rhs[i_]);
+			//EmuMath::Helpers::fast_matrix_store
+			//(
+			//	EmuMath::Helpers::fast_matrix_multiply
+			//	(
+			//		fast_mat_type(lhs[i_]),
+			//		fast_mat_type(rhs[i_])
+			//	),
+			//	out_mats[i_]
+			//);
+			(fast_mat_type(lhs[i_]) * fast_mat_type(rhs[i_])).Store(out_mats[i_]);
 		}
 		void OnTestsOver()
 		{
@@ -220,13 +232,14 @@ namespace EmuCore::TestingHelpers
 	{
 		static constexpr bool DO_TEST = true;
 		static constexpr bool PASS_LOOP_NUM = true;
-		static constexpr std::size_t NUM_LOOPS = 500000;
+		static constexpr std::size_t NUM_LOOPS = shared_num_loops;
 		static constexpr bool WRITE_ALL_TIMES_TO_STREAM = false;
 		static constexpr std::string_view NAME = "DirectX Mat Mult";
 
 		static constexpr std::size_t vec_size = 4;
 		using t_arg = float;
-		using mat_type = DirectX::XMMATRIX;
+		using mat_type = DirectX::XMFLOAT4X4;
+		using fast_mat_type = DirectX::XMMATRIX;
 		using vec_type = DirectX::XMFLOAT4;
 
 		DirectXSimdTest()
@@ -261,7 +274,16 @@ namespace EmuCore::TestingHelpers
 		}
 		void operator()(std::size_t i_)
 		{
-			out_mats[i_] = DirectX::XMMatrixMultiply(lhs[i_], rhs[i_]);
+			//out_mats[i_] = DirectX::XMMatrixMultiply(lhs[i_], rhs[i_]);
+			DirectX::XMStoreFloat4x4
+			(
+				&(out_mats[i_]),
+				DirectX::XMMatrixMultiply
+				(
+					DirectX::XMLoadFloat4x4(&(lhs[i_])),
+					DirectX::XMLoadFloat4x4(&(rhs[i_]))
+				)
+			);
 		}
 		void OnTestsOver()
 		{
@@ -295,10 +317,10 @@ namespace EmuCore::TestingHelpers
 		{
 			DirectX::XMFLOAT4X4 mat4x4;
 			DirectX::XMStoreFloat4x4(&mat4x4, mat);
-			return print_mat4x4(mat4x4);
+			return print_mat(mat4x4);
 		}
 
-		static std::ostream& print_mat4x4(DirectX::XMFLOAT4X4 mat4x4)
+		static std::ostream& print_mat(DirectX::XMFLOAT4X4 mat4x4)
 		{
 			for (auto i = 0; i < 4; ++i)
 			{
@@ -314,12 +336,19 @@ namespace EmuCore::TestingHelpers
 
 		static mat_type make_mat(const vec_type& a, const vec_type& b, const vec_type& c, const vec_type& d)
 		{
+			//return mat_type
+			//(
+			//	DirectX::XMLoadFloat4(&a),
+			//	DirectX::XMLoadFloat4(&b),
+			//	DirectX::XMLoadFloat4(&c),
+			//	DirectX::XMLoadFloat4(&d)
+			//);
 			return mat_type
 			(
-				DirectX::XMLoadFloat4(&a),
-				DirectX::XMLoadFloat4(&b),
-				DirectX::XMLoadFloat4(&c),
-				DirectX::XMLoadFloat4(&d)
+				a.x, a.y, a.z, a.w,
+				b.x, b.y, b.z, b.w,
+				c.x, c.y, c.z, c.w,
+				d.x, d.y, d.z, d.w
 			);
 		}
 
