@@ -215,10 +215,6 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		if constexpr (!std::is_const_v<OutMatrix_>)
 		{
 			(
-				(std::cout << "(" << ColumnIndices_ << ", " << RowIndices_ << "), "), ...
-			);
-
-			(
 				EmuCore::TMP::assign_direct_or_cast<typename _out_mat_uq::value_type>
 				(
 					out_matrix_.template at<ColumnIndices_, RowIndices_>(),
