@@ -60,6 +60,25 @@ inline std::ostream& operator<<(std::ostream& str_, const std::array<T_, Size_>&
 	return str_;
 }
 
+template<std::size_t Size_, typename T_>
+inline void PrintIndexable(const T_& indexable)
+{
+	if constexpr (Size_ > 0)
+	{
+		std::cout << "{ " << indexable[0];
+		for (std::size_t i = 1; i < Size_; ++i)
+		{
+			std::cout << ", ";
+			std::cout << indexable[i];
+		}
+		std::cout << " }";
+	}
+	else
+	{
+		std::cout << "{ }";
+	}
+}
+
 template<class NoiseTable_>
 inline void WriteNoiseTableToPPM(const NoiseTable_& noise_table_, const std::string& out_name_ = "test_noise")
 {
@@ -914,6 +933,14 @@ int main()
 	EmuMath::Matrix<5, 5, float, false> basic_store_test(1337);
 	EmuMath::Helpers::fast_matrix_store(fast4x4_a, basic_store_test);
 	std::cout << "STORED SCALAR:\n" << basic_store_test << "\n\nFAST VER:\n" << fast4x4_a << "\n\n";
+	float test_out_floats[16] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+	std::cout << "Basic float array: ";
+	PrintIndexable<16>(test_out_floats);
+	std::cout << "\nAfter store: ";
+	EmuMath::FastMatrix<3, 3, float, true>(1, 2, 3, 4, 5, 6, 7, 8, 9).Store<true>(test_out_floats);
+	PrintIndexable<16>(test_out_floats);
+	std::cout << "\n";
+
 
 	system("pause");
 	// // ##### SCALAR vs SIMD NOISE #####

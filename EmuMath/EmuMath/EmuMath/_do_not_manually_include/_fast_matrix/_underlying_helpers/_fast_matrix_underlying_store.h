@@ -5,50 +5,38 @@
 
 namespace EmuMath::Helpers::_fast_matrix_underlying
 {
-	template<typename In_, typename Out_, std::size_t...Indices_>
-	constexpr inline void _move_data_to_pointer_data(In_* p_to_move_, Out_* p_out_, std::index_sequence<Indices_...> indices_)
+#pragma region GENERAL_HELPERS
+	template<EmuConcepts::EmuMatrix OutMatrix_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
+	constexpr inline void _zero_scalar_range
+	(
+		OutMatrix_& out_matrix_,
+		std::index_sequence<ColumnIndices_...> column_indices_,
+		std::index_sequence<RowIndices_...> row_indices_
+	)
 	{
-		(
-			EmuCore::TMP::assign_direct_or_cast<typename EmuCore::TMP::remove_ref_cv<Out_>::type>
-			(
-				*(p_out_ + Indices_),
-				std::move(*(p_to_move_ + Indices_))
-			), ...
-		);
-	}
-
-	template<bool FullWidth_, std::size_t MajorIndex_, std::size_t RegisterIndex_, EmuConcepts::EmuFastMatrix FastMatrix_, typename Data_>
-	constexpr inline void _store_register_to_pointer(FastMatrix_&& fast_matrix_, Data_* p_out_)
-	{
-		if constexpr (!std::is_const_v<Data_>)
+		using _out_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
+		if constexpr (!std::is_const_v<OutMatrix_>)
 		{
-			using _fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
-			constexpr std::size_t per_major_offset = FullWidth_ ? _fast_mat_uq::full_width_major_size : _fast_mat_uq::num_non_major_elements;
-			constexpr std::size_t major_offset = MajorIndex_ * per_major_offset;
-			constexpr std::size_t non_major_offset = RegisterIndex_ * _fast_mat_uq::num_elements_per_register;
-			constexpr std::size_t offset = major_offset + non_major_offset;
-
-			if constexpr (std::is_same_v<typename EmuCore::TMP::remove_ref_cv<Data_>::type, typename _fast_mat_uq::value_type>)
-			{
-				EmuSIMD::store(std::forward<FastMatrix_>(fast_matrix_).template GetRegister<MajorIndex_, RegisterIndex_>(), p_out_ + offset);
-			}
-			else
-			{
-				typename _fast_mat_uq::value_type batch_dump[_fast_mat_uq::num_elements_per_register];
-				EmuSIMD::store(std::forward<FastMatrix_>(fast_matrix_).template GetRegister<MajorIndex_, RegisterIndex_>(), batch_dump);
-				_move_data_to_pointer_data(batch_dump, p_out_ + offset);
-			}
+			(
+				EmuCore::TMP::assign_direct_or_cast<typename _out_mat_uq::value_type>
+				(
+					out_matrix_.template at<ColumnIndices_, RowIndices_>(),
+					0
+				), ...
+			);
 		}
 		else
 		{
 			static_assert
 			(
-				EmuCore::TMP::get_false<Data_>(),
-				"Unable to store a register from an EmuMath `FastMatrix` as the passed output pointer is const-qualified."
+				EmuCore::TMP::get_false<OutMatrix_>(),
+				"Unable to zero indices in an EmuMath Matrix as the passed Matrix reference is const-qualified."
 			);
-		}
+		}		
 	}
+#pragma endregion
 
+#pragma region ASSIGN_TO_SCALAR_MATRIX
 	template<bool InColumnMajor_, std::size_t MajorIndex_, EmuConcepts::EmuMatrix OutMatrix_, typename Data_, std::size_t...NonMajorIndices_>
 	constexpr inline void _move_data_to_scalar_matrix(OutMatrix_& out_matrix_, Data_* p_data_, std::index_sequence<NonMajorIndices_...> non_major_indices_)
 	{
@@ -144,11 +132,6 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 							std::forward<FastMatrix_>(fast_matrix_).template GetRegister<MajorIndex_, RegisterIndex_>(),
 							out_matrix_.template data<column_index, row_index>()
 						);
-						//_mm_storeu_ps
-						//(
-						//	out_matrix_.template data<column_index, row_index>(),
-						//	std::forward<FastMatrix_>(fast_matrix_).template GetRegister<MajorIndex_, RegisterIndex_>()
-						//);
 					}
 					else
 					{
@@ -194,6 +177,8 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 		std::index_sequence<RegisterIndices_...> register_indices_
 	)
 	{
+#pragma warning(push)
+#pragma warning(disable: 26800)
 		(
 			_store_major_to_scalar_matrix<MajorIndices_, OutMatrix_, FastMatrix_, RegisterIndices_...>
 			(
@@ -201,36 +186,88 @@ namespace EmuMath::Helpers::_fast_matrix_underlying
 				std::forward<FastMatrix_>(fast_matrix_)
 			), ...
 		);
+#pragma warning(pop)
+	}
+#pragma endregion
+
+#pragma region OUTPUT_TO_POINTER
+	template<typename In_, typename Out_, std::size_t...Indices_>
+	constexpr inline void _move_data_to_pointer_data(In_* p_to_move_, Out_* p_out_, std::index_sequence<Indices_...> indices_)
+	{
+		(
+			EmuCore::TMP::assign_direct_or_cast<typename EmuCore::TMP::remove_ref_cv<Out_>::type>
+			(
+				*(p_out_ + Indices_),
+				std::move(*(p_to_move_ + Indices_))
+			), ...
+		);
 	}
 
-	template<EmuConcepts::EmuMatrix OutMatrix_, std::size_t...ColumnIndices_, std::size_t...RowIndices_>
-	constexpr inline void _zero_scalar_range
-	(
-		OutMatrix_& out_matrix_,
-		std::index_sequence<ColumnIndices_...> column_indices_,
-		std::index_sequence<RowIndices_...> row_indices_
-	)
+	template<bool FullWidth_, std::size_t MajorIndex_, std::size_t RegisterIndex_, EmuConcepts::EmuFastMatrix FastMatrix_, typename Data_>
+	constexpr inline void _store_register_to_pointer(FastMatrix_&& fast_matrix_, Data_* p_out_)
 	{
-		using _out_mat_uq = typename EmuCore::TMP::remove_ref_cv<OutMatrix_>::type;
-		if constexpr (!std::is_const_v<OutMatrix_>)
+		if constexpr (!std::is_const_v<Data_>)
 		{
-			(
-				EmuCore::TMP::assign_direct_or_cast<typename _out_mat_uq::value_type>
-				(
-					out_matrix_.template at<ColumnIndices_, RowIndices_>(),
-					0
-				), ...
-			);
+			using _fast_mat_uq = typename EmuCore::TMP::remove_ref_cv<FastMatrix_>::type;
+			constexpr std::size_t per_major_offset = FullWidth_ ? _fast_mat_uq::full_width_major_size : _fast_mat_uq::num_non_major_elements;
+			constexpr std::size_t major_offset = MajorIndex_ * per_major_offset;
+			constexpr std::size_t non_major_offset = RegisterIndex_ * _fast_mat_uq::num_elements_per_register;
+			constexpr std::size_t offset = major_offset + non_major_offset;
+
+			if constexpr (std::is_same_v<typename EmuCore::TMP::remove_ref_cv<Data_>::type, typename _fast_mat_uq::value_type>)
+			{
+				EmuSIMD::store(std::forward<FastMatrix_>(fast_matrix_).template GetRegister<MajorIndex_, RegisterIndex_>(), p_out_ + offset);
+			}
+			else
+			{
+				typename _fast_mat_uq::value_type batch_dump[_fast_mat_uq::num_elements_per_register];
+				EmuSIMD::store(std::forward<FastMatrix_>(fast_matrix_).template GetRegister<MajorIndex_, RegisterIndex_>(), batch_dump);
+				_move_data_to_pointer_data(batch_dump, p_out_ + offset);
+			}
 		}
 		else
 		{
 			static_assert
 			(
-				EmuCore::TMP::get_false<OutMatrix_>(),
-				"Unable to zero indices in an EmuMath Matrix as the passed Matrix reference is const-qualified."
+				EmuCore::TMP::get_false<Data_>(),
+				"Unable to store a register from an EmuMath `FastMatrix` as the passed output pointer is const-qualified."
 			);
-		}		
+		}
 	}
+
+	template<bool FullWidth_, std::size_t MajorIndex_, EmuConcepts::EmuFastMatrix FastMatrix_, typename OutData_, std::size_t...RegisterIndices_>
+	constexpr inline void _store_major_to_data_pointer(FastMatrix_&& fast_matrix_, OutData_* p_out_data_)
+	{
+		(
+			_store_register_to_pointer<FullWidth_, MajorIndex_, RegisterIndices_>
+			(
+				std::forward<FastMatrix_>(fast_matrix_),
+				p_out_data_
+			), ...
+		);
+	}
+
+	template<bool FullWidth_, typename OutData_, EmuConcepts::EmuFastMatrix FastMatrix_, std::size_t...MajorIndices_, std::size_t...RegisterIndices_>
+	constexpr inline void _store_to_data_pointer
+	(
+		FastMatrix_&& fast_matrix_,
+		OutData_* p_out_data_,
+		std::index_sequence<MajorIndices_...> major_indices_,
+		std::index_sequence<RegisterIndices_...> register_indices_
+	)
+	{
+#pragma warning(push)
+#pragma warning(disable: 26800)
+		(
+			_store_major_to_data_pointer<FullWidth_, MajorIndices_, FastMatrix_, OutData_, RegisterIndices_...>
+			(
+				std::forward<FastMatrix_>(fast_matrix_),
+				p_out_data_
+			), ...
+		);
+#pragma warning(pop)
+	}
+#pragma endregion
 }
 
 #endif

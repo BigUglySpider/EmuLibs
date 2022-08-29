@@ -594,6 +594,60 @@ namespace EmuMath
 				);
 			}
 		}
+
+		/// <summary>
+		/// <para> Stores this Matrix to the output scalar Matrix. </para>
+		/// <para>
+		///		Where the `stored_type` of the output Matrix matches this Matrix's `value_type`
+		///		shares the same major storage order,
+		///		and contiguous storage remaining in the output Matrix allows, optimised stores will be used. 
+		///		Otherwise, intermediate data will be stored and then assigned to respective output indices, with conversions performed if necessary.
+		/// </para>
+		/// <para> 
+		///		If `ZeroNonEncapsulated_` is `true`, indices in the output Matrix that are not encapsulated by this Matrix 
+		///		will be set to 0 after storing. Otherwise, data will be stored while leaving unaffected indices as-is.
+		///		By default, this is `true`.
+		/// </para>
+		/// <para>
+		///		Note that where `ZeroNonEncapsualted_ == false`, the output Matrix will contain non-encapsulated, potentially invalid data, in cases
+		///		where the output Matrix is larger than an input Matrix with partial registers (for example, outputting a 3x3 FastMatrix to a 4x4 scalar Matrix).
+		/// </para>
+		/// </summary>
+		/// <param name="out_scalar_matrix_">Scalar Matrix to output to.</param>
+		template<bool ZeroNonEncapsulated_ = true, EmuConcepts::EmuMatrix OutMatrix_>
+		constexpr inline void Store(OutMatrix_& out_matrix_) const
+		{
+			EmuMath::Helpers::fast_matrix_store<ZeroNonEncapsulated_>(*this, out_matrix_);
+		}
+
+		/// <summary>
+		/// <para> Stores this Matrix's data contiguously into the pointed-to memory location. </para>
+		/// <para> 
+		///		If the pointed-to data is of the same type as this Matrix's `value_type`, it will be stored directly. 
+		///		Otherwise, intermediate conversions will be performed on a per-element basis. 
+		/// </para>
+		/// <para> 
+		///		May optionally output the full width of the Matrix's registers instead of only its encapsulated data. 
+		///		This can be enabled by setting `FullWidth_` to `true`, which itself defaults to `false`.
+		/// </para>
+		/// <para>
+		///		Where `FullWidth_ == false`: The pointed-to data should have a number of contiguous elements 
+		///		equal to at least expected_count_for_default_load_pointer`, which equates to 
+		///		`((num_major_elements - 1) * num_non_major_elements) + full_width_major_size`.
+		/// </para>
+		/// <para>
+		///		Where `FullWidth_ == true`, the pointed-to data should have a number of contiguous elements
+		///		equal to at least `full_width_size`.
+		/// </para>
+		/// <para> Failing to meet size constraints is likely to result in illegal memory reads/writes and/or undefined behaviour. </para>
+		/// </summary>
+		/// <param name="p_out_data_">Pointer to memory meeting described constraints, where the data of this Matrix will be contiguously stored.</param>
+		template<bool FullWidth_ = false, typename OutData_>
+		requires (!std::is_const_v<OutData_>)
+		constexpr inline void Store(OutData_* p_out_data_) const
+		{
+			EmuMath::Helpers::fast_matrix_store<FullWidth_>(*this, p_out_data_);
+		}
 #pragma endregion
 
 #pragma region ARITHMETIC
