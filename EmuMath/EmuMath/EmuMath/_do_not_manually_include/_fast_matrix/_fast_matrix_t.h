@@ -55,12 +55,17 @@ namespace EmuMath
 		static constexpr bool majors_require_partial_register = (per_major_width % register_width) != 0;
 		/// <summary> The total number of registers required to store each major chunk of this Matrix, including the partial register if needed. </summary>
 		static constexpr std::size_t num_registers_per_major = (per_major_width / register_width) + (majors_require_partial_register ? 1 : 0);
-		/// <summary> The total nubmer of registers used to store this Matrix, including partial ones if needed. </summary>
+		/// <summary> The total number of registers used to store this Matrix, including partial ones if needed. </summary>
 		static constexpr std::size_t total_num_registers = num_registers_per_major * num_major_elements;
+		/// <summary> The number of elements contained in a single one of this Matrix type's registers. </summary>
 		static constexpr std::size_t num_elements_per_register = register_width / per_element_width;
+		/// <summary> The number of encapsulated elements accounted for by individual partial registers of this Matrix type. </summary>
 		static constexpr std::size_t num_elements_in_partial_registers = majors_require_partial_register ? (num_non_major_elements % num_elements_per_register) : 0;
+		/// <summary> The total number of elements included in each major chunk of this Matrix type, including non-encapsulated padding. </summary>
 		static constexpr std::size_t full_width_major_size = num_elements_per_register * num_registers_per_major;
+		/// <summary> The total number of elements included in this Matrix type, including non-encapsulated padding. </summary>
 		static constexpr std::size_t full_width_size = full_width_major_size * num_major_elements;
+		/// <summary> The number of elements that pointers are expected to point to when using default loads with this Matrix type. </summary>
 		static constexpr std::size_t expected_count_for_default_load_pointer =
 		(
 			((num_major_elements - 1) * num_non_major_elements) + full_width_major_size
@@ -165,7 +170,7 @@ namespace EmuMath
 		template<bool FullWidthOffset_, std::size_t MajorIndex_, std::size_t RegisterIndex_>
 		[[nodiscard]] static constexpr inline register_type _load_major_chunk_register_from_pointer(const value_type* p_to_load_)
 		{
-			constexpr std::size_t per_major_offset = FullWidthOffset_ ? (num_elements_per_register * num_registers_per_major) : num_non_major_elements;
+			constexpr std::size_t per_major_offset = FullWidthOffset_ ? full_width_major_size : num_non_major_elements;
 			constexpr std::size_t major_offset = MajorIndex_ * per_major_offset;
 			constexpr std::size_t register_offset = RegisterIndex_ * num_elements_per_register;
 			constexpr std::size_t offset = major_offset + register_offset;
@@ -305,7 +310,7 @@ namespace EmuMath
 		{
 			if constexpr (IncludeNonEncapsulated_ || (MajorIndex_ < num_major_elements && NonMajorIndex_ < num_non_major_elements))
 			{
-				constexpr std::size_t per_major_offset = IncludeNonEncapsulated_ ? (num_elements_per_register * num_registers_per_major) : num_non_major_elements;
+				constexpr std::size_t per_major_offset = IncludeNonEncapsulated_ ? full_width_major_size : num_non_major_elements;
 				constexpr std::size_t flattened_major_offset = MajorIndex_ * per_major_offset;
 				return std::forward<decltype(std::get<flattened_major_offset + NonMajorIndex_>(args_))>
 				(
@@ -416,6 +421,10 @@ namespace EmuMath
 		/// <para>
 		///		If loading data from an EmuMath `Matrix` of the same major-order, it is recommended to pass the `Matrix` directly. 
 		///		Said constructor will perform adaptive loads regardless of size, where possible.
+		/// </para>
+		/// <para>
+		///		If padding is required for pointed-to data to meet the constraints, it should be padded at the tail-end
+		///		(e.g. for a 2x2 Matrix: [1, 2, 3, 4, padding...]
 		/// </para>
 		/// </summary>
 		/// <param name="p_data_to_load_">Pointer to at least `expected_count_for_default_load_pointer` items of this Matrix's `value_type`.</param>
@@ -629,81 +638,9 @@ template<std::size_t NumColumns_, std::size_t NumRows_, typename T_, bool IsColu
 inline std::ostream& operator<<(std::ostream& str_, const EmuMath::FastMatrix<NumColumns_, NumRows_, T_, IsColumnMajor_, RegisterWidth_>& fast_matrix_)
 {
 	// TODO: GENERALISE FOR ANY SIZE, NOT JUST 4x4/8x8
-	if constexpr (NumColumns_ == NumRows_)
-	{
-		if constexpr (IsColumnMajor_)
-		{
-			constexpr std::size_t OutSize_ = NumColumns_ <= 4 ? 4 : 8;
-			EmuMath::Matrix<OutSize_, OutSize_, float, true> mat;
-			if constexpr (NumColumns_ <= 4)
-			{
-				_mm_store_ps(mat.data<0, 0>(), fast_matrix_.major_chunks[0]);
-				_mm_store_ps(mat.data<1, 0>(), fast_matrix_.major_chunks[1]);
-				_mm_store_ps(mat.data<2, 0>(), fast_matrix_.major_chunks[2]);
-				_mm_store_ps(mat.data<3, 0>(), fast_matrix_.major_chunks[3]);
-			}
-			else if constexpr (NumColumns_ <= 8)
-			{
-				_mm_store_ps(mat.data<0, 0>(), fast_matrix_.major_chunks[0][0]);
-				_mm_store_ps(mat.data<1, 0>(), fast_matrix_.major_chunks[1][0]);
-				_mm_store_ps(mat.data<2, 0>(), fast_matrix_.major_chunks[2][0]);
-				_mm_store_ps(mat.data<3, 0>(), fast_matrix_.major_chunks[3][0]);
-				_mm_store_ps(mat.data<4, 0>(), fast_matrix_.major_chunks[4][0]);
-				_mm_store_ps(mat.data<5, 0>(), fast_matrix_.major_chunks[5][0]);
-				_mm_store_ps(mat.data<6, 0>(), fast_matrix_.major_chunks[6][0]);
-				_mm_store_ps(mat.data<7, 0>(), fast_matrix_.major_chunks[7][0]);
-
-				_mm_store_ps(mat.data<0, 4>(), fast_matrix_.major_chunks[0][1]);
-				_mm_store_ps(mat.data<1, 4>(), fast_matrix_.major_chunks[1][1]);
-				_mm_store_ps(mat.data<2, 4>(), fast_matrix_.major_chunks[2][1]);
-				_mm_store_ps(mat.data<3, 4>(), fast_matrix_.major_chunks[3][1]);
-				_mm_store_ps(mat.data<4, 4>(), fast_matrix_.major_chunks[4][1]);
-				_mm_store_ps(mat.data<5, 4>(), fast_matrix_.major_chunks[5][1]);
-				_mm_store_ps(mat.data<6, 4>(), fast_matrix_.major_chunks[6][1]);
-				_mm_store_ps(mat.data<7, 4>(), fast_matrix_.major_chunks[7][1]);
-			}
-
-			str_ << mat;
-		}
-		else
-		{
-			constexpr std::size_t OutSize_ = NumColumns_ <= 4 ? 4 : 8;
-			EmuMath::Matrix<OutSize_, OutSize_, float, false> mat;
-			if constexpr (NumColumns_ <= 4)
-			{
-				_mm_store_ps(mat.data<0, 0>(), fast_matrix_.major_chunks[0]);
-				_mm_store_ps(mat.data<0, 1>(), fast_matrix_.major_chunks[1]);
-				_mm_store_ps(mat.data<0, 2>(), fast_matrix_.major_chunks[2]);
-				_mm_store_ps(mat.data<0, 3>(), fast_matrix_.major_chunks[3]);
-			}
-			else if constexpr (NumColumns_ <= 8)
-			{
-				_mm_store_ps(mat.data<0, 0>(), fast_matrix_.major_chunks[0][0]);
-				_mm_store_ps(mat.data<0, 1>(), fast_matrix_.major_chunks[1][0]);
-				_mm_store_ps(mat.data<0, 2>(), fast_matrix_.major_chunks[2][0]);
-				_mm_store_ps(mat.data<0, 3>(), fast_matrix_.major_chunks[3][0]);
-				_mm_store_ps(mat.data<0, 4>(), fast_matrix_.major_chunks[4][0]);
-				_mm_store_ps(mat.data<0, 5>(), fast_matrix_.major_chunks[5][0]);
-				_mm_store_ps(mat.data<0, 6>(), fast_matrix_.major_chunks[6][0]);
-				_mm_store_ps(mat.data<0, 7>(), fast_matrix_.major_chunks[7][0]);
-
-				_mm_store_ps(mat.data<4, 0>(), fast_matrix_.major_chunks[0][1]);
-				_mm_store_ps(mat.data<4, 1>(), fast_matrix_.major_chunks[1][1]);
-				_mm_store_ps(mat.data<4, 2>(), fast_matrix_.major_chunks[2][1]);
-				_mm_store_ps(mat.data<4, 3>(), fast_matrix_.major_chunks[3][1]);
-				_mm_store_ps(mat.data<4, 4>(), fast_matrix_.major_chunks[4][1]);
-				_mm_store_ps(mat.data<4, 5>(), fast_matrix_.major_chunks[5][1]);
-				_mm_store_ps(mat.data<4, 6>(), fast_matrix_.major_chunks[6][1]);
-				_mm_store_ps(mat.data<4, 7>(), fast_matrix_.major_chunks[7][1]);
-			}
-
-			str_ << mat;
-		}
-	}
-	else
-	{
-		str_ << "oops, not done non-square 4x4-8x8 output yet";
-	}
+	auto mat = EmuMath::Matrix<NumColumns_, NumRows_, T_, IsColumnMajor_>();
+	EmuMath::Helpers::fast_matrix_store(fast_matrix_, mat);
+	str_ << mat;
 	return str_;
 }
 
