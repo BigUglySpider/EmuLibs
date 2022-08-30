@@ -56,6 +56,16 @@ namespace EmuConcepts
 			(EmuCore::TMP::remove_ref_cv_t<Lhs_>::is_column_major == EmuCore::TMP::remove_ref_cv_t<Rhs_>::is_column_major)
 		)
 	);
+
+	template<class Lhs_, class...Others_>
+	concept EmuFastMatrixBasicOpCompatible =
+	(
+		(EmuConcepts::EmuFastMatrix<Lhs_>) &&
+		(... && EmuConcepts::EmuFastMatrix<Others_>) &&
+		(... && (EmuCore::TMP::remove_ref_cv_t<Lhs_>::register_width == EmuCore::TMP::remove_ref_cv_t<Others_>::register_width)) &&
+		(... && std::is_same_v<typename EmuCore::TMP::remove_ref_cv_t<Lhs_>::value_type, typename EmuCore::TMP::remove_ref_cv_t<Others_>::value_type>) &&
+		(... && (EmuCore::TMP::remove_ref_cv_t<Lhs_>::is_column_major == EmuCore::TMP::remove_ref_cv_t<Others_>::is_column_major))
+	);
 }
 
 namespace EmuMath::TMP

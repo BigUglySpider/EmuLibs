@@ -75,6 +75,15 @@ namespace EmuMath
 		using data_type = std::array<major_chunk_type, num_major_elements>;
 		using major_index_sequence = std::make_index_sequence<num_major_elements>;
 		using major_register_sequence = std::make_index_sequence<num_registers_per_major>;
+#pragma endregion
+
+#pragma region STATIC_HELPER_FUNCTIONS
+	public:
+		static constexpr inline register_type make_zero_register()
+		{
+			return EmuSIMD::setzero<register_type>();
+		}
+#pragma endregion
 
 #pragma region CONSTRUCTOR_VALIDITY_CHECKS
 	private:

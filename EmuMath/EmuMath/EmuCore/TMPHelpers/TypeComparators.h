@@ -588,6 +588,32 @@ namespace EmuCore::TMP
 	};
 	template<class T_>
 	static constexpr bool is_index_sequence_v = is_index_sequence<T_>::value;
+	
+	/// <summary>
+	/// <para> Type to check if the passed type `T_` is a std::array instance. </para>
+	/// <para>
+	///		May optionally check for an array containing a specific type `Contains_`. 
+	///		If `Contains_` is `void`, the result `value` will be `true` for any `std::array` instance regardless of contained type.
+	/// </para>
+	/// </summary>
+	template<class T_, typename Contains_ = void>
+	struct is_std_array : public EmuCore::TMP::type_check_ignore_ref_cv_base<is_std_array, std::false_type, T_, Contains_>
+	{
+	};
+
+	template<std::size_t Size_, typename T_, typename Contains_>
+	struct is_std_array<std::array<T_, Size_>, Contains_>
+	{
+		static constexpr bool value = std::conditional_t
+		<
+			std::is_void_v<Contains_>,
+			std::true_type,
+			std::is_same<T_, Contains_>
+		>::value;
+	};
+
+	template<class T_, typename Contains_ = void>
+	static constexpr bool is_std_array_v = is_std_array<T_, Contains_>::value;
 }
 
 #endif

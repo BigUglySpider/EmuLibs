@@ -215,7 +215,12 @@ namespace EmuCore::TestingHelpers
 			//	),
 			//	out_mats[i_]
 			//);
-			(fast_mat_type(lhs[i_]) * fast_mat_type(rhs[i_])).Store(out_mats[i_]);
+			//(fast_mat_type(lhs[i_]) * fast_mat_type(rhs[i_])).Store(out_mats[i_]);
+			EmuMath::Helpers::fast_matrix_store
+			(
+				EmuMath::Helpers::fast_matrix_add(fast_mat_type(lhs[i_]), fast_mat_type(rhs[i_])),
+				out_mats[i_]
+			);
 		}
 		void OnTestsOver()
 		{
@@ -275,13 +280,53 @@ namespace EmuCore::TestingHelpers
 		void operator()(std::size_t i_)
 		{
 			//out_mats[i_] = DirectX::XMMatrixMultiply(lhs[i_], rhs[i_]);
-			DirectX::XMStoreFloat4x4
+			//DirectX::XMStoreFloat4x4
+			//(
+			//	&(out_mats[i_]),
+			//	DirectX::XMMatrixMultiply
+			//	(
+			//		DirectX::XMLoadFloat4x4(&(lhs[i_])),
+			//		DirectX::XMLoadFloat4x4(&(rhs[i_]))
+			//	)
+			//);
+
+			DirectX::XMStoreFloat4
 			(
-				&(out_mats[i_]),
-				DirectX::XMMatrixMultiply
+				reinterpret_cast<DirectX::XMFLOAT4*>(&(out_mats[i_](0, 0))),
+				DirectX::XMVectorAdd
 				(
-					DirectX::XMLoadFloat4x4(&(lhs[i_])),
-					DirectX::XMLoadFloat4x4(&(rhs[i_]))
+					DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&lhs[i_](0, 0))),
+					DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&rhs[i_](0, 0)))
+				)
+			);
+
+			DirectX::XMStoreFloat4
+			(
+				reinterpret_cast<DirectX::XMFLOAT4*>(&(out_mats[i_](1, 0))),
+				DirectX::XMVectorAdd
+				(
+					DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&lhs[i_](1, 0))),
+					DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&rhs[i_](1, 0)))
+				)
+			);
+
+			DirectX::XMStoreFloat4
+			(
+				reinterpret_cast<DirectX::XMFLOAT4*>(&(out_mats[i_](2, 0))),
+				DirectX::XMVectorAdd
+				(
+					DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&lhs[i_](2, 0))),
+					DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&rhs[i_](2, 0)))
+				)
+			);
+
+			DirectX::XMStoreFloat4
+			(
+				reinterpret_cast<DirectX::XMFLOAT4*>(&(out_mats[i_](3, 0))),
+				DirectX::XMVectorAdd
+				(
+					DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&lhs[i_](3, 0))),
+					DirectX::XMLoadFloat4(reinterpret_cast<DirectX::XMFLOAT4*>(&rhs[i_](3, 0)))
 				)
 			);
 		}
